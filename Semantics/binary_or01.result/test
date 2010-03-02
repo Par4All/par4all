@@ -99,8 +99,15 @@ int binary_or01()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[binary_or01] (add_or_kill_equivalenced_variables) storage return
 INITIAL_PRECONDITION[foo] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning binary_or01 instead
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[foo] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[binary_or01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[binary_or01] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[binary_or01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[binary_or01] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[foo] (add_or_kill_equivalenced_variables) storage return
 PRECONDITIONS_INTER_FULL[foo] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[foo] (add_or_kill_equivalenced_variables) storage return

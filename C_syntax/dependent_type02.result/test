@@ -16,9 +16,14 @@ Variable list:
 	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
 	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "main:0`a" with type "variable" "allocatable_2d"
+	Declared entity "main:main" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
 
 Layouts for memory areas:
 

@@ -4,7 +4,7 @@ typedef struct {int champ1; int champ2;} mystruct;
 void decl04(mystruct s)
 {
   mystruct s_loc = s;
-  
+
   s_loc.champ1 = s_loc.champ1 -1;
 }
 

@@ -5,13 +5,13 @@ void call03(int i, float x)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 //               <must be read   >: x
 //               <must be written>: x
-   x++;                                                                 /*0006*/
+   x++;                                                                 /*0009*/
 }
 
 Source code with cumulated effects
@@ -22,13 +22,13 @@ void call03(int i, float x)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 //               <must be read   >: x
 //               <must be written>: x
-   x++;                                                                 /*0006*/
+   x++;                                                                 /*0009*/
 }
 
 Source code with transformers for "call03"
@@ -41,15 +41,15 @@ void call03(int i, float x)
 
 //  T(i) {i==i#init+1}
 
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0007*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 
 //  T() {}
 
-   x++;                                                                 /*0006*/
+   x++;                                                                 /*0009*/
 }
 
 Source code with transformers for "main"
@@ -89,15 +89,15 @@ void call03(int i, float x)
 
 //  P() {TOP-LEVEL:j==0, i==3}
 
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0007*/
 
 //  P(i) {TOP-LEVEL:j==0, i==4}
 
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 
 //  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==4, j#init==0}
 
-   x++;                                                                 /*0006*/
+   x++;                                                                 /*0009*/
 }
 
 Source code with preconditions for "main"
@@ -130,6 +130,13 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call03] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call03!] (ordinary_summary_precondition) empty precondition to call03! because not in call tree from main.

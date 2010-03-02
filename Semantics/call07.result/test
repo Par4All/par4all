@@ -5,7 +5,7 @@ int call07(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   return i++;                                                          /*0004*/
+   return i++;                                                          /*0005*/
 }
 
 Source code with cumulated effects
@@ -15,7 +15,7 @@ int call07(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   return i++;                                                          /*0004*/
+   return i++;                                                          /*0005*/
 }
 
 Source code with transformers for "call07"
@@ -28,7 +28,7 @@ int call07(int i)
 
 //  T(call07,i) {call07==i-1, call07==i#init}
 
-   return i++;                                                          /*0004*/
+   return i++;                                                          /*0005*/
 }
 
 Source code with transformers for "main"
@@ -41,12 +41,12 @@ int main()
 
 //  T() {}
 
-   int ai;                                                              /*0004*/
+   int ai;                                                              /*0010*/
 
 //  T(ai) {ai==2}
 
 
-   ai = call07(2);                                                      /*0006*/
+   ai = call07(2);                                                      /*0012*/
 }
 
 Source code with preconditions for "call07"
@@ -59,7 +59,7 @@ int call07(int i)
 
 //  P() {i==2}
 
-   return i++;                                                          /*0004*/
+   return i++;                                                          /*0005*/
 }
 
 Source code with preconditions for "main"
@@ -72,23 +72,30 @@ int main()
 
 //  P() {}
 
-   int ai;                                                              /*0004*/
+   int ai;                                                              /*0010*/
 
 //  P() {}
 
 
-   ai = call07(2);                                                      /*0006*/
+   ai = call07(2);                                                      /*0012*/
 }
 
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call07] (add_or_kill_equivalenced_variables) storage return
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call07] (NormalizeExpression) expression is already normalized
 PRINT_CODE_TRANSFORMERS[call07] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call07] (add_or_kill_equivalenced_variables) storage return
 PRECONDITIONS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call07] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call07!] (ordinary_summary_precondition) empty precondition to call07! because not in call tree from main.

@@ -5,8 +5,8 @@ void foo(int *p)
 {
 //               <must be read   >: p
 //               <must be written>: p[0]
-   *p = 4;                                                              /*0004*/
-   return;                                                              /*0005*/
+   *p = 4;                                                              /*0011*/
+   return;                                                              /*0012*/
 }
 
 Proper effects for "main"
@@ -77,8 +77,8 @@ void foo(int *p)
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==0}>
 
-   *p = 4;                                                              /*0004*/
-   return;                                                              /*0005*/
+   *p = 4;                                                              /*0011*/
+   return;                                                              /*0012*/
 }
 
 Regions for "main"
@@ -258,6 +258,6 @@ void foo(int *p)
 
 //  <p[PHI1]-OUT-EXACT-{PHI1==0}>
 
-   *p = 4;                                                              /*0004*/
-   return;                                                              /*0005*/
+   *p = 4;                                                              /*0011*/
+   return;                                                              /*0012*/
 }

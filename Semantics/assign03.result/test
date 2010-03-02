@@ -3,38 +3,38 @@ Source code with proper effects
 
 void assign03()
 {
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int k;                                                               /*0006*/
-   int n;                                                               /*0007*/
+   int i;                                                               /*0010*/
+   int j;                                                               /*0011*/
+   int k;                                                               /*0012*/
+   int n;                                                               /*0013*/
 //               <must be written>: j
 
-   j = 2;                                                               /*0009*/
+   j = 2;                                                               /*0015*/
 //               <must be read   >: j
 //               <must be written>: i j
-   i = j+(j = 0)+j;                                                     /*0010*/
+   i = j+(j = 0)+j;                                                     /*0016*/
 //               <must be read   >: i
 
-   foo(i);                                                              /*0012*/
+   foo(i);                                                              /*0018*/
 }
 
 Source code with cumulated effects
 
 void assign03()
 {
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int k;                                                               /*0006*/
-   int n;                                                               /*0007*/
+   int i;                                                               /*0010*/
+   int j;                                                               /*0011*/
+   int k;                                                               /*0012*/
+   int n;                                                               /*0013*/
 //               <must be written>: j
 
-   j = 2;                                                               /*0009*/
+   j = 2;                                                               /*0015*/
 //               <must be read   >: j
 //               <must be written>: i j
-   i = j+(j = 0)+j;                                                     /*0010*/
+   i = j+(j = 0)+j;                                                     /*0016*/
 //               <must be read   >: i
 
-   foo(i);                                                              /*0012*/
+   foo(i);                                                              /*0018*/
 }
 
 Source code with transformers
@@ -47,31 +47,31 @@ void assign03()
 
 //  T() {}
 
-   int i;                                                               /*0004*/
+   int i;                                                               /*0010*/
 
 //  T() {}
 
-   int j;                                                               /*0005*/
+   int j;                                                               /*0011*/
 
 //  T() {}
 
-   int k;                                                               /*0006*/
+   int k;                                                               /*0012*/
 
 //  T() {}
 
-   int n;                                                               /*0007*/
+   int n;                                                               /*0013*/
 
 //  T(j) {j==2}
 
 
-   j = 2;                                                               /*0009*/
+   j = 2;                                                               /*0015*/
 
 //  T(i,j) {i==j#init, j==0}
 
-   i = j+(j = 0)+j;                                                     /*0010*/
+   i = j+(j = 0)+j;                                                     /*0016*/
 
 //  T() {}
 
 
-   foo(i);                                                              /*0012*/
+   foo(i);                                                              /*0018*/
 }

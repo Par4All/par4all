@@ -1,35 +1,35 @@
 int main()
 {
    // BEGIN BLOCK
-   int i, j, k;                                                         /*0004*/
-   int a[500];                                                          /*0005*/
+   int i, j, k;                                                         /*0003*/
+   int a[500];                                                          /*0004*/
 //               <must be written>: i
 
-   i = 0;                                                               /*0007*/
+   i = 0;                                                               /*0006*/
 //               <must be written>: j
-   j = 1;                                                               /*0008*/
+   j = 1;                                                               /*0007*/
 //               <must be read   >: i
-   while (i<=499) {                                                     /*0009*/
+   while (i<=499) {                                                     /*0008*/
       // BEGIN BLOCK
 //               <must be read   >: j
 //               <must be written>: j
       // The lower bound on i and j should not be lost...
-      j++;                                                              /*0011*/
+      j++;                                                              /*0010*/
 //               <must be read   >: i
 //               <must be written>: a[i]
       // Cumulated effects should be a[i] here and not a[*]
-      a[i] = i;                                                         /*0013*/
+      a[i] = i;                                                         /*0012*/
 //               <must be read   >: i
 //               <must be written>: i
-      i = i+1;                                                          /*0014*/
+      i = i+1;                                                          /*0013*/
       // END BLOCK
    }
 //               <must be written>: k
    // We should have the precondition i == 500, j == 501
    // if we would use the proper fix point operator (derivative)
-   k = 2;                                                               /*0018*/
+   k = 2;                                                               /*0017*/
 //               <must be read   >: k
-   return k;                                                            /*0019*/
+   return k;                                                            /*0018*/
    // END BLOCK
 }
 int main()
@@ -38,17 +38,17 @@ int main()
 //               <must be read   >: i j k
 //               <must be written>: i j k
    // BEGIN BLOCK
-   int i, j, k;                                                         /*0004*/
-   int a[500];                                                          /*0005*/
+   int i, j, k;                                                         /*0003*/
+   int a[500];                                                          /*0004*/
 //               <must be written>: i
 
-   i = 0;                                                               /*0007*/
+   i = 0;                                                               /*0006*/
 //               <must be written>: j
-   j = 1;                                                               /*0008*/
+   j = 1;                                                               /*0007*/
 //               <may be written >: a[*]
 //               <must be read   >: i j
 //               <must be written>: i j
-   while (i<=499) {                                                     /*0009*/
+   while (i<=499) {                                                     /*0008*/
 //               <may be written >: a[*]
 //               <must be read   >: i j
 //               <must be written>: i j
@@ -56,22 +56,22 @@ int main()
 //               <must be read   >: j
 //               <must be written>: j
       // The lower bound on i and j should not be lost...
-      j++;                                                              /*0011*/
+      j++;                                                              /*0010*/
 //               <may be written >: a[*]
 //               <must be read   >: i
       // Cumulated effects should be a[i] here and not a[*]
-      a[i] = i;                                                         /*0013*/
+      a[i] = i;                                                         /*0012*/
 //               <must be read   >: i
 //               <must be written>: i
-      i = i+1;                                                          /*0014*/
+      i = i+1;                                                          /*0013*/
       // END BLOCK
    }
 //               <must be written>: k
    // We should have the precondition i == 500, j == 501
    // if we would use the proper fix point operator (derivative)
-   k = 2;                                                               /*0018*/
+   k = 2;                                                               /*0017*/
 //               <must be read   >: k
-   return k;                                                            /*0019*/
+   return k;                                                            /*0018*/
    // END BLOCK
 }
 
@@ -86,24 +86,24 @@ int main()
 
 //  T() {}
 
-   int i, j, k;                                                         /*0004*/
+   int i, j, k;                                                         /*0003*/
 
 //  T() {}
 
-   int a[500];                                                          /*0005*/
+   int a[500];                                                          /*0004*/
 
 //  T(i) {i==0}
 
 
-   i = 0;                                                               /*0007*/
+   i = 0;                                                               /*0006*/
 
 //  T(j) {i==0, j==1}
 
-   j = 1;                                                               /*0008*/
+   j = 1;                                                               /*0007*/
 
 //  T(i,j) {i#init==0, j#init==1, i<=499}
 
-   while (i<=499) {                                                     /*0009*/
+   while (i<=499) {                                                     /*0008*/
 
 //  T(i,j) {i==i#init+1, j==j#init+1, i<=500}
 
@@ -112,16 +112,16 @@ int main()
 //  T(j) {j==j#init+1, i<=499}
 
       // The lower bound on i and j should not be lost...
-      j++;                                                              /*0011*/
+      j++;                                                              /*0010*/
 
 //  T() {i<=499}
 
       // Cumulated effects should be a[i] here and not a[*]
-      a[i] = i;                                                         /*0013*/
+      a[i] = i;                                                         /*0012*/
 
 //  T(i) {i==i#init+1, i<=500}
 
-      i = i+1;                                                          /*0014*/
+      i = i+1;                                                          /*0013*/
       // END BLOCK
    }
 
@@ -129,11 +129,11 @@ int main()
 
    // We should have the precondition i == 500, j == 501
    // if we would use the proper fix point operator (derivative)
-   k = 2;                                                               /*0018*/
+   k = 2;                                                               /*0017*/
 
 //  T(main) {i==500, k==2, main==2}
 
-   return k;                                                            /*0019*/
+   return k;                                                            /*0018*/
    // END BLOCK
 }
 
@@ -148,24 +148,24 @@ int main()
 
 //  P() {}
 
-   int i, j, k;                                                         /*0004*/
+   int i, j, k;                                                         /*0003*/
 
 //  P() {}
 
-   int a[500];                                                          /*0005*/
+   int a[500];                                                          /*0004*/
 
 //  P() {}
 
 
-   i = 0;                                                               /*0007*/
+   i = 0;                                                               /*0006*/
 
 //  P(i) {i==0}
 
-   j = 1;                                                               /*0008*/
+   j = 1;                                                               /*0007*/
 
 //  P(i,j) {i==0, j==1}
 
-   while (i<=499) {                                                     /*0009*/
+   while (i<=499) {                                                     /*0008*/
 
 //  P(i,j) {i<=499}
 
@@ -174,16 +174,16 @@ int main()
 //  P(i,j) {i<=499}
 
       // The lower bound on i and j should not be lost...
-      j++;                                                              /*0011*/
+      j++;                                                              /*0010*/
 
 //  P(i,j) {i<=499}
 
       // Cumulated effects should be a[i] here and not a[*]
-      a[i] = i;                                                         /*0013*/
+      a[i] = i;                                                         /*0012*/
 
 //  P(i,j) {i<=499}
 
-      i = i+1;                                                          /*0014*/
+      i = i+1;                                                          /*0013*/
       // END BLOCK
    }
 
@@ -191,10 +191,10 @@ int main()
 
    // We should have the precondition i == 500, j == 501
    // if we would use the proper fix point operator (derivative)
-   k = 2;                                                               /*0018*/
+   k = 2;                                                               /*0017*/
 
 //  P(i,j,k) {i==500, k==2}
 
-   return k;                                                            /*0019*/
+   return k;                                                            /*0018*/
    // END BLOCK
 }

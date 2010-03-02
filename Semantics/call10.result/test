@@ -3,16 +3,16 @@ Source code with proper effects
 
 double call10(int i)
 {
-   double x = 3.;                                                       /*0004*/
+   double x = 3.;                                                       /*0009*/
 //               <must be read   >: i
 //               <must be written>: i
-   i += 10;                                                             /*0005*/
+   i += 10;                                                             /*0010*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0006*/
+   j++;                                                                 /*0011*/
 //               <must be read   >: x
 
-   return x;                                                            /*0008*/
+   return x;                                                            /*0013*/
 }
 
 Source code with cumulated effects
@@ -21,16 +21,16 @@ Source code with cumulated effects
 //               <must be written>: TOP-LEVEL:j
 double call10(int i)
 {
-   double x = 3.;                                                       /*0004*/
+   double x = 3.;                                                       /*0009*/
 //               <must be read   >: i
 //               <must be written>: i
-   i += 10;                                                             /*0005*/
+   i += 10;                                                             /*0010*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0006*/
+   j++;                                                                 /*0011*/
 //               <must be read   >: x
 
-   return x;                                                            /*0008*/
+   return x;                                                            /*0013*/
 }
 
 Source code with transformers for "call10"
@@ -43,20 +43,20 @@ double call10(int i)
 
 //  T() {}
 
-   double x = 3.;                                                       /*0004*/
+   double x = 3.;                                                       /*0009*/
 
 //  T(i) {i==i#init+10}
 
-   i += 10;                                                             /*0005*/
+   i += 10;                                                             /*0010*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
-   j++;                                                                 /*0006*/
+   j++;                                                                 /*0011*/
 
 //  T() {}
 
 
-   return x;                                                            /*0008*/
+   return x;                                                            /*0013*/
 }
 
 Source code with transformers for "main"
@@ -92,20 +92,20 @@ double call10(int i)
 
 //  P() {TOP-LEVEL:j==0, i==4}
 
-   double x = 3.;                                                       /*0004*/
+   double x = 3.;                                                       /*0009*/
 
 //  P() {TOP-LEVEL:j==0, i==4}
 
-   i += 10;                                                             /*0005*/
+   i += 10;                                                             /*0010*/
 
 //  P(i) {TOP-LEVEL:j==0, i==14}
 
-   j++;                                                                 /*0006*/
+   j++;                                                                 /*0011*/
 
 //  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==14, j#init==0}
 
 
-   return x;                                                            /*0008*/
+   return x;                                                            /*0013*/
 }
 
 Source code with preconditions for "main"
@@ -134,10 +134,17 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call10] (NormalizeExpression) expression is already normalized
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
 TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call10" ignored.
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call10] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call10] (NormalizeExpression) expression is already normalized
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call10!] (ordinary_summary_precondition) empty precondition to call10! because not in call tree from main.

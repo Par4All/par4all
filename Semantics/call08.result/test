@@ -5,13 +5,13 @@ int call08(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i += 10;                                                             /*0004*/
+   i += 10;                                                             /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 //               <must be read   >: i
 
-   return i;                                                            /*0007*/
+   return i;                                                            /*0010*/
 }
 
 Source code with cumulated effects
@@ -22,13 +22,13 @@ int call08(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i += 10;                                                             /*0004*/
+   i += 10;                                                             /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 //               <must be read   >: i
 
-   return i;                                                            /*0007*/
+   return i;                                                            /*0010*/
 }
 
 Source code with transformers for "call08"
@@ -41,16 +41,16 @@ int call08(int i)
 
 //  T(i) {i==i#init+10}
 
-   i += 10;                                                             /*0004*/
+   i += 10;                                                             /*0007*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 
 //  T(call08) {call08==i}
 
 
-   return i;                                                            /*0007*/
+   return i;                                                            /*0010*/
 }
 
 Source code with transformers for "main"
@@ -86,16 +86,16 @@ int call08(int i)
 
 //  P() {TOP-LEVEL:j==0, i==4}
 
-   i += 10;                                                             /*0004*/
+   i += 10;                                                             /*0007*/
 
 //  P(i) {TOP-LEVEL:j==0, i==14}
 
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 
 //  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==14, j#init==0}
 
 
-   return i;                                                            /*0007*/
+   return i;                                                            /*0010*/
 }
 
 Source code with preconditions for "main"
@@ -125,14 +125,21 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call08] (add_or_kill_equivalenced_variables) storage return
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call08] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call08] (NormalizeExpression) expression is already normalized
 PRINT_CODE_TRANSFORMERS[call08] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
 TRANSFORMERS_INTER_FULL[main] (any_scalar_assign_to_transformer) Variable 0`ai in lhs is uselessly updated by the rhs 'call08(++ai)'
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call08] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call08] (NormalizeExpression) expression is already normalized
 PRECONDITIONS_INTER_FULL[call08] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call08] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call08!] (ordinary_summary_precondition) empty precondition to call08! because not in call tree from main.

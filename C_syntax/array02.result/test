@@ -15,9 +15,14 @@ Variable list:
 	Declared entity "array02:0`a" with type "variable" "int"
 	Declared entity "array02:0`b" with type "variable" "int"
 	Declared entity "array02:0`i" with type "variable" "int"
+	Declared entity "array02:array02" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "array02:array02"	size = 4
 
 Layouts for memory areas:
 

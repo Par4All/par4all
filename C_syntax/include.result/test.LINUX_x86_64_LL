@@ -2161,6 +2161,8 @@ extern int ftrylockfile(FILE *__stream);
 
 /* Relinquish the ownership granted for STREAM.  */
 extern void funlockfile(FILE *__stream);
+/* If we are compiling with optimizing read this file.  It contains
+   several optimizing inline functions and macros.  */
 extern int main();
 int main()
 {
