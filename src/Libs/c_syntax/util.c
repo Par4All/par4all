@@ -1981,8 +1981,54 @@ void RemoveDummyArguments(entity f, list refs)
   }
 }
 
-  /* Update the entity with final type, storage and initial value;
-     and also (sometimes?) declare it at the module level */
+/* If necessary, create the return entity, which is a hidden variable
+   used in PIPS internal representation to carry the value returned by
+   a function. */
+void CreateReturnEntity(entity f)
+{
+  type ft = ultimate_type(entity_type(f));
+
+  if(type_functional_p(ft)) {
+      type rt = functional_result(type_functional(ft));
+
+      if(!type_void_p(rt)) {
+	/* Create the return value */
+	string fn = entity_local_name(f);
+	entity re = FindOrCreateEntity(fn,fn);
+	if(type_undefined_p(entity_type(re))) {
+	  entity_type(re) = copy_type(rt);
+	  entity_storage(re) = make_storage_return(f);
+	  entity_initial(re) = make_value_unknown();
+	  AddToDeclarations(re, f);
+	}
+      }
+  }
+  else
+    pips_internal_error("This function should only be called with a function entity\n");
+}
+
+/* A subset of UpdateEntity, used when the function entity is already
+   more defined because the return type is implicit. See call site cyacc.y
+ */
+void UpdateEntity2(entity f, stack FormalStack, stack OffsetStack)
+{
+  type ft = ultimate_type(entity_type(f));
+
+  pips_assert("f has a functional type", type_functional_p(ft));
+
+  CreateReturnEntity(f);
+
+}
+
+/* Update the entity with final type, storage and initial value;
+   and also (sometimes?) declare it at the module level
+
+   Replace dummy arguments by formal arguments for functions
+
+   Generate the return variables for functions returning a result
+
+   And probably much more...
+ */
 
 void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack FunctionStack,
 		  stack OffsetStack, bool is_external, bool is_declaration)
@@ -2057,8 +2103,9 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 
   /************************* STORAGE PART *******************************************/
 
-  /* FI: no longer true, I believe "this field is always pre-defined. It is temporarilly used to
-     store a type. See cyacc.y rule direct-decl:" */
+  /* FI: no longer true, I believe "this field is always
+     pre-defined. It is temporarilly used to store a type. See cyacc.y
+     rule direct-decl:" */
 
 
   if (!storage_undefined_p(c_parser_context_storage(context))) {
@@ -2134,19 +2181,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       AddToDeclarations(e, get_current_module_entity());
     else if(!intrinsic_entity_p(e)) {
       /* We are defining the current module entity */
-      type rt = functional_result(type_functional(ultimate_type(entity_type(e))));
-
-      if(!type_void_p(rt)) {
-	/* Create the return value */
-	string fn = entity_local_name(e);
-	entity re = FindOrCreateEntity(fn,fn);
-	if(type_undefined_p(entity_type(re))) {
-	  entity_type(re) = copy_type(rt);
-	  entity_storage(re) = make_storage_return(e);
-	  entity_initial(re) = make_value_unknown();
-	  AddToDeclarations(re, e);
-	}
-      }
+      CreateReturnEntity(e);
     }
     else {
       /* Test case C_syntax/function_name_conflict01.c */

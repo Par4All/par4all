@@ -137,8 +137,8 @@ void error_reset_current_C_line_number()
 
 /* Comment management:
 
-   - comments in declarations are lost (because there is no corresponding
-     attachment point)
+   - comments within declarations are misplaced (because there is no
+     corresponding attachment point)
 
    - comments for structured control structures such as "for", "switch",
      "while",... are stacked;
@@ -157,7 +157,8 @@ void error_reset_current_C_line_number()
      is generated to carry them yet)
 
    - linefeed and comments inside a statement are collected as a comment
-     before statement (some weird impact on print-out may occur);
+     before statement (some weird impact on print-out may occur); same as
+     for declaration statements, but less frequent
 
    - some comments are still ignored, although available (to be implemented)
 
@@ -167,8 +168,10 @@ static string C_current_comment = string_undefined;
 
 DEFINE_LOCAL_STACK(comments, string)
 
-/* Return the current comment as a string to be freed (if not undefined)
-   by the caller and reset the current comment. */
+/* Return the current comment as a string to be freed    by the caller
+   and reset the current comment. If the current comment is undefined,
+   returns a copy of the empty string, "".
+ */
 string get_current_C_comment()
 {
   string cc = C_current_comment;
@@ -201,9 +204,11 @@ string get_current_C_comment()
 	/* It is a trailing new-line: just get rid of it: */
 	//last_newline[0] = '\0';
 	;
-}
+      }
     }
   }
+  else
+    cc = strdup("");
   /* pips_debug(3, "get_current_C_comment comment \"%s\"\n",
      cc); */
   return cc;

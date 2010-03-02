@@ -96,9 +96,11 @@ static int abstract_counter = 1; /**< to create temporary entities for abstract 
 extern int loop_counter; /**< Global counter */
 extern int derived_counter;
 
-/* The following structures must be stacks because all the related entities are in recursive structures.
-   Since there are not stacks with basic types such as integer or logical domain, I used basic_domain
-   to avoid creating special stacks for FormalStack, OffsetStack, ... */
+/* The following structures must be stacks because all the related
+   entities are in recursive structures.  Since there are not stacks
+   with basic types such as integer or logical domain, I used
+   basic_domain to avoid creating special stacks for FormalStack,
+   OffsetStack, ... */
 
 extern stack LoopStack;
 extern stack SwitchControllerStack;
@@ -488,7 +490,7 @@ static list GetDerivedEntityDeclarations()
   return l;
 }
 
-static list ResetDerivedEntityDeclarations()
+static void ResetDerivedEntityDeclarations()
 {
   if(!ENDP(internal_derived_entity_declarations)) {
     gen_free_list(internal_derived_entity_declarations);
@@ -3105,7 +3107,9 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  // Too late for full UpdateEntity() but at
 			  //least the return value and the formal
 			  //parameters should be properly defined
-			  //UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, FALSE);
+			  //UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,
+			  //FALSE);
+			  UpdateEntity2(e, FormalStack, OffsetStack);
 			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
