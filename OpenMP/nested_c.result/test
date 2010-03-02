@@ -1,44 +1,44 @@
 // OMP style
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0003*/
-   int sum = 0;                                                         /*0004*/
+   int k = 0, i = 0;                                                    /*0004*/
+   int sum = 0;                                                         /*0005*/
 
 
    for(k = 0; k <= 99; k += 1) {
       for(i = 0; i <= 99; i += 1)
-         sum += i;                                                      /*0008*/
-      sum += k;                                                         /*0010*/
+         sum += i;                                                      /*0009*/
+      sum += k;                                                         /*0011*/
    }
 
 
    for(i = 0; i <= 99; i += 1)
-      sum += i;                                                         /*0014*/
+      sum += i;                                                         /*0015*/
 
-   printf("sum: %d\n", sum);                                            /*0017*/
+   printf("sum: %d\n", sum);                                            /*0018*/
 
-   return 0;                                                            /*0019*/
+   return 0;                                                            /*0020*/
 }
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0003*/
-   int sum = 0;                                                         /*0004*/
+   int k = 0, i = 0;                                                    /*0004*/
+   int sum = 0;                                                         /*0005*/
 
 
 #pragma omp parallel for reduction(+:sum)
    for(k = 0; k <= 99; k += 1) {
 #pragma omp parallel for reduction(+:sum)
       for(i = 0; i <= 99; i += 1)
-         sum += i;                                                      /*0008*/
-      sum += k;                                                         /*0010*/
+         sum += i;                                                      /*0009*/
+      sum += k;                                                         /*0011*/
    }
 
 
 #pragma omp parallel for reduction(+:sum)
    for(i = 0; i <= 99; i += 1)
-      sum += i;                                                         /*0014*/
+      sum += i;                                                         /*0015*/
 
-   printf("sum: %d\n", sum);                                            /*0017*/
+   printf("sum: %d\n", sum);                                            /*0018*/
 
-   return 0;                                                            /*0019*/
+   return 0;                                                            /*0020*/
 }
