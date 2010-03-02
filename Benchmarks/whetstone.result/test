@@ -1,5 +1,5 @@
 main file
-main()
+int main()
 {
    
    /* initialize constants */
@@ -164,7 +164,7 @@ main()
       x = sqrt(exp(log(x)/t1));
 }
 aftter privatization
-main()
+int main()
 {
    
    /* initialize constants */
