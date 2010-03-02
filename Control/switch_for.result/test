@@ -1,14 +1,14 @@
 void gl_enable()
 {
-   int cap,  p;                                                         /*0004*/
+   int cap, p;                                                          /*0003*/
    if (cap==1) {
    }
    else {
       goto break_1;
    }
 switch_1_case_1:   ;
-   p = 0;                                                               /*0009*/
-   if (!(p<6)) {                                                        /*0009*/
+   p = 0;                                                               /*0008*/
+   if (!(p<6)) {                                                        /*0008*/
    }
 break_2:   ;
 break_1:   ;
