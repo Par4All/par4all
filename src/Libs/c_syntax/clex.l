@@ -426,8 +426,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                    int initial_C_line_number = -1;
                                    int items = sscanf(yytext+1, "%d", &initial_C_line_number);
                                    if(items==1) {
-                                      /* Get rid of the pragma LF itself */
-                                      C_line_number = initial_C_line_number-1;
+                                      C_line_number = initial_C_line_number;
                                    }
                                    else {
                                       pips_user_warning("No line number after a #: \"%s\".\n", yytext);
