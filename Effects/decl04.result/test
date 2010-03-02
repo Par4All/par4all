@@ -1,0 +1,22 @@
+
+Proper effects
+
+void decl04(mystruct s)
+{
+   mystruct s_loc = s;                                                  /*0006*/
+//               <must be read   >: s_loc[1]
+//               <must be written>: s_loc[1]
+
+   s_loc.champ1 = s_loc.champ1-1;                                       /*0008*/
+}
+
+Cumulated effects 
+
+void decl04(mystruct s)
+{
+   mystruct s_loc = s;                                                  /*0006*/
+//               <must be read   >: s_loc[1]
+//               <must be written>: s_loc[1]
+
+   s_loc.champ1 = s_loc.champ1-1;                                       /*0008*/
+}
