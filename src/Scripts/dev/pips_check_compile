@@ -179,10 +179,10 @@ mv CURRENT PREVIOUS
 if ! cmp -s CURRENT PREVIOUS
 then
   # something may have changed, let us recompile
-  nice make unbuild > out 2> err \
+  nice make -j 8 -l 2.5 unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
   # what about a "timeout"? how to differentiate from a simple failure?
-  nice make build > out 2> err \
+  nice make -j 8 -l 2.5 build > out 2> err \
       || report 'KO:make' 'build' 'cannot "make build"'
   test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
