@@ -60,7 +60,7 @@ static void push_path(void)
     string dir;
     pips_assert("not set", !some_saved_path);
     dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
-    saved_pips_src_path = pips_srcpath_append(dir);
+    //saved_pips_src_path = strdup(pips_srcpath_append(dir));
     some_saved_path = TRUE;
     free(dir);
 }
@@ -69,9 +69,9 @@ static void pop_path(void)
 {
     pips_assert("set", some_saved_path);
     pips_srcpath_set(saved_pips_src_path);
-    free(saved_pips_src_path),
-      saved_pips_src_path = NULL,
-      some_saved_path = FALSE;
+    free(saved_pips_src_path);
+    saved_pips_src_path = NULL;
+    some_saved_path = FALSE;
 }
 
 /* tpips used to convert lower cases into upper cases for all module

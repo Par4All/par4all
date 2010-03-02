@@ -849,7 +849,7 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \Pips{}.
 
 
-\section{Preprocessing and Splitting}
+\section{Preprocessing and splitting}
 \label{subsection-preprocessing-and-splitting}
 \index{Preprocessing}
 \index{Splitting}
@@ -857,38 +857,43 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \index{Hollerith}
 \index{Missing file}
 
-\subsection{Fortran Case}
+\subsection{Fortran case of preprocessing and splitting}
+\label{sec:fortran-case}
+
 
 The Fortran files specified as input to \Pips{} by the user are
 preprocessed in various ways.
 
-\begin{description}
+\subsubsection{Fortran syntax verification}
+\label{sec:fortr-synt-verif}
 
-\item[Fortran syntax:] if the \verb|PIPS_CHECK_FORTRAN| shell environment
-  variable is defined to true, the syntax of the file is checked by
-  compiling it with \verb|f77| (namely, the \verb|PIPS_FLINT| variable is
-  used for that purpose, and defaults to \verb|f77 -c -ansi|).
+If the \verb|PIPS_CHECK_FORTRAN| shell environment variable is defined to
+true, the syntax of the file is checked by compiling it with a Fortran 77
+compiler (namely, the \verb|PIPS_FLINT| variable is used for that purpose,
+and defaults to \verb|f77 -c -ansi|).
 
-  In case of failure, a warning is displayed. Note that if the program
-  cannot be compiled properly with a Fortran compiler, it is likely that
-  many problems will be encountered within \Pips{}.
+In case of failure, a warning is displayed. Note that if the program
+cannot be compiled properly with a Fortran compiler, it is likely that
+many problems will be encountered within \Pips{}.
 
-  The next property also triggers this preliminary syntactic verification.
+The next property also triggers this preliminary syntactic verification.
 
-\begin{PipsProp}{CHECK_FORTRAN_SYNTAX_BEFORE_PIPS} 
+\begin{PipsProp}{CHECK_FORTRAN_SYNTAX_BEFORE_PIPS}
 CHECK_FORTRAN_SYNTAX_BEFORE_PIPS FALSE
 \end{PipsProp}
 
 \Pips{} requires source code for all leaves in its visible call graph. By
 default, a user error is raised by Function \verb/initializer/ if a user
 request cannot be satisfied because some source code is missing. It also
-is possible to generate some synthetic code (a.k.a. {\em stubs} or ???)
+is possible to generate some synthetic code (also known as {\em stubs})
 and to update the current module list but this is not a very satisfying
 option because all interprocedural analysis results are going to be wrong.
 The user should retrieve the generated \verb/.f/ files in the workspace,
-under the Tmp directory, and add some assignments (def) and uses. The user
-modified synthetic files should then be saved and used to generate a new
-workspace.
+under the \texttt{Tmp} directory, and add some assignments (\emph{def})
+and \emph{use}s to mimic the action of the real code to have a sufficient
+behavior from the point of view of the analysis or transformations you
+want to apply on the whole program. The user modified synthetic files
+should then be saved and used to generate a new workspace.
 
 Valid settings: \verb|error generate query|.
 
@@ -896,45 +901,40 @@ Valid settings: \verb|error generate query|.
 PREPROCESSOR_MISSING_FILE_HANDLING "error"
 \end{PipsProp}
 
-\item[File Preprocessing:] if the file suffix is \verb|.F| or ,\verb|.c| then
-  the file is preprocessed. By default pips uses \verb|gfortran -E| for fortran
-  files and \verb|cpp -C| for C files. These preprocessors can be changed by
-  setting the following environment variables:
-  \begin{itemize}
-  \item \verb|PIPS_FPP| for \verb|.F| files,
-  \item \verb|PIPS_CPP| for \verb|.c| files.
-  \end{itemize}
-  Moreover the preprocessing options used can be extended with the following
-  environment variables:
-  \begin{itemize}
-  \item \verb|PIPS_FPP_FLAGS| variable, default to \verb|-P -D__PIPS__ -D__HPFC__|,
-  \item \verb|PIPS_CPP_FLAGS| variable, default to \verb|-D__PIPS__ -D__HPFC__ -U__GNUC__|.
-  \end{itemize}
 
-  The Shell variable \verb|PIPS_CPP_FLAGS| may be used to locate the include
-  files. Directories to search are specified with the \verb/-I/ option.
+\subsubsection{Fortran file preprocessing}
+\label{sec:fortr-file-prepr}
 
-\item[Fortran Split:] the file is then split into one file per module
-  using a PIPS specialized version of \texttt{fsplit}\footnote{The PIPS
-    version of \texttt{fsplit} is derived from the BSD \texttt{fsplit}.
-    Several improvements have been performed.}. This preprocessing also
-  handles (1) Hollerith constants by converting them to the quoted
+If the file suffix is \verb|.F| then the file is preprocessed. By default
+PIPS uses \verb|gfortran -E| for Fortran files. This preprocessor can be
+changed by setting the \verb|PIPS_FPP| environment variable.
+
+Moreover the default preprocessing options are %
+\verb|-P -D__PIPS__ -D__HPFC__| and they can be extended (not replaced...)
+with the \verb|PIPS_FPP_FLAGS| environment variable.
+
+
+\subsubsection{Fortran split}
+\label{sec:fortran-split}
+
+The file is then split into one file per module using a PIPS specialized
+version of \texttt{fsplit}\footnote{The PIPS version of \texttt{fsplit} is
+  derived from the BSD \texttt{fsplit} and several improvements have been
+  performed.}. This preprocessing also handles
+\begin{enumerate}
+\item Hollerith constants by converting them to the quoted
   syntax\footnote{Hollerith constants are considered obsolete by the new
-    Fortran standards.}, (2) unnamed modules by adding \texttt{MAIN000} or
-  \texttt{PROGRAM MAIN000} or or \texttt{DATA000} or \texttt{BLOCK DATA
-    DATA000} according to needs.
-
-\end{description}
+    Fortran standards and date back to 1889...};
+\item unnamed modules by adding \texttt{MAIN000} or \texttt{PROGRAM
+    MAIN000} or or \texttt{DATA000} or \texttt{BLOCK DATA DATA000}
+  according to needs.
+\end{enumerate}
 
 The output of this phase is a set of \verb|.f_initial| files in per-module
 subdirectories. They constitute the resource \verb|INITIAL_FILE|.
 
-\subsection{C Case}
 
-The C preprocessor is applied before the splitting.
-
-
-\section{Fortran Syntactic Preprocessing}
+\subsubsection{Fortran Syntactic Preprocessing}
 \label{subsection-syntactic-preprocessing}
 \index{Preprocessing}
 \index{Include}
@@ -954,18 +954,30 @@ Figure~\ref{figure-user-and-source-files}.
 \label{figure-user-and-source-files}
 \end{figure}
 
-\begin{description}
+Each module source file is then processed by \texttt{top-level} to handle
+Fortran \verb|include| and to comment out \texttt{IMPLICIT NONE} which are
+not managed by \Pips{}. Also this phase performs some transformations of
+complex constants to help the \Pips{} parser. Files referenced in Fortran
+\texttt{include} statements are looked for from the directory where the
+Fortran file is. The Shell variable \verb|PIPS_CPP_FLAGS| is {\em not}
+used to locate these include files.
 
-\item[Cleaning:] each module source file is then processed by
-  \texttt{top-level} to handle Fortran \verb|include| and to comment out
-  \texttt{IMPLICIT NONE} which are not managed by \Pips{}. Also this phase
-  performs some transformations of complex constants to help the pips
-  parser. Files referenced in Fortran \texttt{include} statements are
-  looked for from the directory where the Fortran file is.  The Shell
-  variable \verb|PIPS_CPP_FLAGS| is {\em not} used to locate these include
-  files.
 
-\end{description}
+\subsection{C case of preprocessing and splitting}
+\label{sec:c-case-preprocessing}
+
+The C preprocessor is applied before the splitting. By default PIPS uses
+\verb|cpp -C| for C files. This preprocessor can be changed by setting
+the \verb|PIPS_CPP| environment variable.
+
+Moreover the \verb|-D__PIPS__ -D__HPFC__ -U__GNUC__| preprocessing options
+are used and can be extended (not replaced) with the \verb|PIPS_CPP_FLAGS|
+environment variable.
+
+This \verb|PIPS_CPP_FLAGS| variable can also be used to locate the include
+files. Directories to search are specified with the \texttt{-I\emph{file}}
+option, as usual for the C preprocessor.
+
 
 \section{Source File}
 \label{subsection-source-file}
@@ -1563,11 +1575,11 @@ preprocessed\footnote{Macros are interpreted and include files are
   expanded. The result depends on the C preprocessor used,on its option
   and on the system environment (\texttt{/usr/include},...).} using for
 instance \texttt{gcc -E}\footnote{It can be redefined using
-  \texttt{CPP\_PIPS\_ENV} and \texttt{CPP\ PIPS\_OPTIONS\_ENV} environment
-  variables} and broken into a new \index{compilation unit} which contains
-only the file-global variable declarations, the function declarations and
-the type definitions, and one C file for each C function defined in the
-initial C file.
+  \texttt{CPP\_PIPS} and \texttt{PIPS\_CPP\_FLAGS} environment variables
+  as explained in \S~\ref{sec:c-case-preprocessing}.} and broken into a
+new \index{compilation unit} which contains only the file-global variable
+declarations, the function declarations and the type definitions, and one
+C file for each C function defined in the initial C file.
 
 The new compilation units must be parsed before the new files, containing
 each one exactly one function definition, can be parsed. The new

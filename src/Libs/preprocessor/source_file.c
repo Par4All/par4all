@@ -151,7 +151,13 @@ string pips_change_directory(char *dir)
 
 /********************************************************* PIPS SOURCE PATH */
 
-/* set to path or unset if null */
+/* Set the PIPS source path
+
+   @param path is used to set the search path or to unset if path is NULL
+
+   Strangely this environment variable is set many times in PIPS to pass
+   some information...
+*/
 void pips_srcpath_set(string path)
 {
   if (path)
@@ -160,17 +166,22 @@ void pips_srcpath_set(string path)
     unsetenv(SRCPATH);
 }
 
+
 /* returns an allocated pointer to the old value */
 string pips_srcpath_append(string pathtoadd)
 {
   string old_path, new_path;
   old_path = getenv(SRCPATH);
-  if (old_path) old_path = strdup(old_path); /* duplicate? */
+  if (old_path)
+    /* Strdup the string since it is returned and use later in many other
+       places */
+    old_path = strdup(old_path);
   new_path = concatenate(old_path? old_path: "", old_path? ":": "",
 			 pathtoadd, NULL);
   pips_srcpath_set(new_path);
   return old_path;
 }
+
 
 /*************************** MODULE PROCESSING (INCLUDES and IMPLICIT NONE) */
 
@@ -660,28 +671,21 @@ int find_eol_coding(string name)
   return eol_code;
 }
 
+
 /* Process a file name.c through the C preprocessor to generate a
-   name.cpp_processed.c file */
-static string process_thru_C_pp(string name)
-{
+   name.cpp_processed.c file
+
+   @param name is the name of the file to process
+
+   @return the name of the produced file
+*/
+static string process_thru_C_pp(string name) {
     string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
     int status = 0;
-    string includes = getenv(SRCPATH);
-    string new_includes = includes; /* pointer towards the current
-                                       character in includes. */
-    size_t include_option_length =
-      5+strlen(includes)+3*colon_number(includes)+1+1;
-    /* Dynamic size, gcc only? Use malloc() instead */
-    char include_options[include_option_length];
-    /* Pointer to the current end of include_options: */
-    string new_include_options = string_undefined;
-    /* Pointer to the beginning of include_options, for debugging purposes: */
-    string old_include_options = &include_options[0];
+    string include_path = getenv(SRCPATH);
     /* To manage file encoding */
     int eol_code = -1;
 
-    (void) strcpy(old_include_options, " -I. ");
-    new_include_options = include_options+strlen(include_options);
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, C_FILE_SUFFIX);
     new_name = strdup(concatenate(dir_name, "/", simpler, PP_C_ED, NULL));
@@ -692,32 +696,25 @@ static string process_thru_C_pp(string name)
     cpp = getenv(CPP_PIPS_ENV);
     cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
 
-    /* Convert PIPS_SRCPATH syntax to gcc -I syntax */
-    /* Could have reused nth_path()... */
-    if (includes && *includes) {
-      (void) strcat(old_include_options, " -I");
-      new_include_options += 3;
-      do {
-	/* Skip leading and trailing colons. */
-	if(*new_includes==':' && new_includes!=includes+1 &&
-	   *new_includes!='\000') {
-	  new_includes++;
-	  *new_include_options = '\000';
-	  new_include_options = strcat(new_include_options, " -I");
-	  new_include_options += 3;
-	}
-	else
-	  *new_include_options++ = *new_includes++;
-      } while(includes && *new_includes);
+
+    /* At least include files from the current directory: */
+    string includes = strdup("");
+
+    /* Transform the include path p1:p2:... into -Ip1 -Ip2...*/
+    for(int i = 0;; i++) {
+      // Get the path i:
+      string p = nth_path(include_path, i);
+      if (p == NULL)
+	// No more directory
+	break;
+      string old_includes = includes;
+      includes = strdup(concatenate(includes, " -I", p, NULL));
+      free(p);
+      free(old_includes);
     }
-    *new_include_options++ = ' ';
-    *new_include_options++ = '\000';
 
-    pips_assert("include_options is large enough",
-		strlen(include_options) < include_option_length);
-
-    pips_debug(1, "PIPS_SRCPATH=\"%s\"\n", includes);
-    pips_debug(1, "INCLUDE=\"%s\"\n", include_options);
+    pips_debug(1, "PIPS_SRCPATH=\"%s\"\n", include_path);
+    pips_debug(1, "INCLUDE=\"%s\"\n", includes);
 
     eol_code = find_eol_coding(name);
     eol_code = 0;
@@ -729,8 +726,10 @@ static string process_thru_C_pp(string name)
     status = safe_system_no_abort
       (concatenate(cpp? cpp: CPP_CPP,
 		   CPP_CPPFLAGS, cpp_options? cpp_options: "",
-		   old_include_options,
+		   includes, " ",
 		   name, " > ", new_name, " 2> ", cpp_err, NULL));
+
+    free(includes);
 
     if(status) {
       (void) safe_system_no_abort(concatenate("cat ", cpp_err, NULL));
