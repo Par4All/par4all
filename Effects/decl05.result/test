@@ -3,7 +3,6 @@ Proper effects
 
 int main()
 {
-//               <may be written >: tab[*]
    int tab[3] = {0, 1, 2};                                              /*0006*/
 //               <must be read   >: tab[0]
 //               <must be written>: tab[0]
@@ -16,7 +15,6 @@ Cumulated effects
 
 int main()
 {
-//               <may be written >: tab[*]
    int tab[3] = {0, 1, 2};                                              /*0006*/
 //               <must be read   >: tab[0]
 //               <must be written>: tab[0]
