@@ -201,6 +201,12 @@ SIMD_MULPD (double DEST[2], double SRC1[2], double SRC2[2])
     DEST[0] = SRC1[0] * SRC2[0];
     DEST[1] = SRC1[1] * SRC2[1];
 }
+void
+SIMD_ADDPD (double DEST[2], double SRC1[2], double SRC2[2])
+{
+    DEST[0] = SRC1[0] + SRC2[0];
+    DEST[1] = SRC1[1] + SRC2[1];
+}
 
 void
 SIMD_DIVPS (float DEST[4], float SRC1[4], float SRC2[4])

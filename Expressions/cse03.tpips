@@ -1,15 +1,15 @@
-delete cse02
-create cse02 cse02.c
+delete cse03
+create cse03 cse02.c
 module foo
 display PRINTED_FILE
 apply COMMON_SUBEXPRESSION_ELIMINATION
 display PRINTED_FILE
 close
 
-delete cse02
-create cse02 cse02.c
+delete cse03
+create cse03 cse02.c
 module foo
-setproperty COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS FALSE
+setproperty COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT TRUE
 apply COMMON_SUBEXPRESSION_ELIMINATION
 display PRINTED_FILE
 close

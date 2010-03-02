@@ -889,11 +889,12 @@
       EXTERNAL XERBLA
       REAL*4 SIZE
       PARAMETER (SIZE = 10)
-      INTEGER LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, 
-     &LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, 
-     &LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, 
-     &LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, 
-     &NCOLA, NROWA, NROWB
+      INTEGER LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, 
+     &LU_IND7, LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, 
+     &LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, 
+     &LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC
+     &, I, INFO, J, L, NCOLA, NROWA, NROWB
       REAL*4 F_7, F_6, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, 
      &ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:
      &SIZE), TEMP, ONE, ZERO
@@ -1063,55 +1064,68 @@
 *
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
-                  DO 50 I = 1, M                                        0120
-                     C(I,J) = ZERO                                      0121
-50                   CONTINUE                                           0122
-               ELSEIF (BETA.NE.ONE) THEN                                0119
                   LU_NUB0 = M
                   LU_IB0 = MOD(LU_NUB0, 4)
                   DO 99997 LU_IND0 = 0, LU_IB0-1
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 99997                CONTINUE
                   DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
 c SIMD_COMMENT_0
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+2,J) = BETA*C(LU_IND0+2,J)               0125
+                     C(LU_IND0+2,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+3,J) = BETA*C(LU_IND0+3,J)               0125
+                     C(LU_IND0+3,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+4,J) = BETA*C(LU_IND0+4,J)               0125
+                     C(LU_IND0+4,J) = ZERO                              0121
 99996                CONTINUE
                   I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+2,J) = BETA*C(LU_IND1+2,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)               0125
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
                ENDIF
                DO 80 L = 1, K                                           0128
                   IF (B(L,J).NE.ZERO) THEN                              0129
                      TEMP = ALPHA*B(L,J)                                0130
-                     LU_NUB1 = M
-                     LU_IB1 = MOD(LU_NUB1, 4)
-                     DO 99995 LU_IND1 = 0, LU_IB1-1
-                        F_0 = TEMP*A(LU_IND1+1,L)
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_0             0132
-99995                   CONTINUE
-                     DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_0 = TEMP*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+1,L)
+                        F_0 = TEMP*A(LU_IND2+1,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_0             0132
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+2,L)
+                        F_0 = TEMP*A(LU_IND2+2,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+2,J) = C(LU_IND1+2,J)+F_0             0132
+                        C(LU_IND2+2,J) = C(LU_IND2+2,J)+F_0             0132
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+3,L)
+                        F_0 = TEMP*A(LU_IND2+3,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+3,J) = C(LU_IND1+3,J)+F_0             0132
+                        C(LU_IND2+3,J) = C(LU_IND2+3,J)+F_0             0132
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+4,L)
+                        F_0 = TEMP*A(LU_IND2+4,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+4,J) = C(LU_IND1+4,J)+F_0             0132
-99994                   CONTINUE
-                     I = MAX0(LU_NUB1, 0)+1
+                        C(LU_IND2+4,J) = C(LU_IND2+4,J)+F_0             0132
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
                   ENDIF
 80                CONTINUE                                              0135
 90             CONTINUE                                                 0136
@@ -1122,31 +1136,31 @@ c SIMD_COMMENT_1
             DO 120 J = 1, N                                             0141
                DO 110 I = 1, M                                          0142
                   TEMP = ZERO                                           0143
-                  LU_NUB2 = K
-                  LU_IB2 = MOD(LU_NUB2, 4)
-                  DO 99993 LU_IND2 = 0, LU_IB2-1
-                     F_1 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
                      TEMP = TEMP+F_1                                    0145
-99993                CONTINUE
-                  DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+99991                CONTINUE
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
 c SIMD_COMMENT_1
                      TEMP = TEMP+F_1                                    0145
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+2,I)*B(LU_IND2+2,J)
+                     F_1 = A(LU_IND3+2,I)*B(LU_IND3+2,J)
 c SIMD_COMMENT_1
                      TEMP = TEMP+F_1                                    0145
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+3,I)*B(LU_IND2+3,J)
+                     F_1 = A(LU_IND3+3,I)*B(LU_IND3+3,J)
 c SIMD_COMMENT_1
                      TEMP = TEMP+F_1                                    0145
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+4,I)*B(LU_IND2+4,J)
+                     F_1 = A(LU_IND3+4,I)*B(LU_IND3+4,J)
 c SIMD_COMMENT_1
                      TEMP = TEMP+F_1                                    0145
-99992                CONTINUE
-                  L = MAX0(LU_NUB2, 0)+1
+99990                CONTINUE
+                  L = MAX0(LU_NUB3, 0)+1
                   L_7 = BETA.EQ.ZERO
                   C0 = ALPHA*TEMP
                   C(I,J) = L_7?C0:C(I,J)
@@ -1164,55 +1178,68 @@ c SIMD_COMMENT_1
 *
          DO 170 J = 1, N                                                0160
             IF (BETA.EQ.ZERO) THEN                                      0161
-               DO 130 I = 1, M                                          0162
-                  C(I,J) = ZERO                                         0163
-130               CONTINUE                                              0164
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
             ELSEIF (BETA.NE.ONE) THEN                                   0161
-               LU_NUB3 = M
-               LU_IB3 = MOD(LU_NUB3, 4)
-               DO 99991 LU_IND3 = 0, LU_IB3-1
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
-99991             CONTINUE
-               DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
 c SIMD_COMMENT_0
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+2,J) = BETA*C(LU_IND3+2,J)                  0167
+                  C(LU_IND5+2,J) = BETA*C(LU_IND5+2,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+3,J) = BETA*C(LU_IND3+3,J)                  0167
+                  C(LU_IND5+3,J) = BETA*C(LU_IND5+3,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+4,J) = BETA*C(LU_IND3+4,J)                  0167
-99990             CONTINUE
-               I = MAX0(LU_NUB3, 0)+1
+                  C(LU_IND5+4,J) = BETA*C(LU_IND5+4,J)                  0167
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
             ENDIF
             DO 160 L = 1, K                                             0170
                IF (B(J,L).NE.ZERO) THEN                                 0171
                   TEMP = ALPHA*B(J,L)                                   0172
-                  LU_NUB4 = M
-                  LU_IB4 = MOD(LU_NUB4, 4)
-                  DO 99989 LU_IND4 = 0, LU_IB4-1
-                     F_4 = TEMP*A(LU_IND4+1,L)
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_4                0174
-99989                CONTINUE
-                  DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_4 = TEMP*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+1,L)
+                     F_4 = TEMP*A(LU_IND6+1,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_4                0174
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+2,L)
+                     F_4 = TEMP*A(LU_IND6+2,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+2,J) = C(LU_IND4+2,J)+F_4                0174
+                     C(LU_IND6+2,J) = C(LU_IND6+2,J)+F_4                0174
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+3,L)
+                     F_4 = TEMP*A(LU_IND6+3,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+3,J) = C(LU_IND4+3,J)+F_4                0174
+                     C(LU_IND6+3,J) = C(LU_IND6+3,J)+F_4                0174
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+4,L)
+                     F_4 = TEMP*A(LU_IND6+4,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+4,J) = C(LU_IND4+4,J)+F_4                0174
-99988                CONTINUE
-                  I = MAX0(LU_NUB4, 0)+1
+                     C(LU_IND6+4,J) = C(LU_IND6+4,J)+F_4                0174
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
                ENDIF
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
@@ -1223,31 +1250,31 @@ c SIMD_COMMENT_1
          DO 200 J = 1, N                                                0183
             DO 190 I = 1, M                                             0184
                TEMP = ZERO                                              0185
-               LU_NUB5 = K
-               LU_IB5 = MOD(LU_NUB5, 4)
-               DO 99987 LU_IND5 = 0, LU_IB5-1
-                  F_5 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
                   TEMP = TEMP+F_5                                       0187
-99987             CONTINUE
-               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+99983             CONTINUE
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
 c SIMD_COMMENT_1
                   TEMP = TEMP+F_5                                       0187
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+2,I)*B(J,LU_IND5+2)
+                  F_5 = A(LU_IND7+2,I)*B(J,LU_IND7+2)
 c SIMD_COMMENT_1
                   TEMP = TEMP+F_5                                       0187
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+3,I)*B(J,LU_IND5+3)
+                  F_5 = A(LU_IND7+3,I)*B(J,LU_IND7+3)
 c SIMD_COMMENT_1
                   TEMP = TEMP+F_5                                       0187
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+4,I)*B(J,LU_IND5+4)
+                  F_5 = A(LU_IND7+4,I)*B(J,LU_IND7+4)
 c SIMD_COMMENT_1
                   TEMP = TEMP+F_5                                       0187
-99986             CONTINUE
-               L = MAX0(LU_NUB5, 0)+1
+99982             CONTINUE
+               L = MAX0(LU_NUB7, 0)+1
                L_8 = BETA.EQ.ZERO
                C2 = ALPHA*TEMP
                C(I,J) = L_8?C2:C(I,J)
@@ -1264,28 +1291,41 @@ c SIMD_COMMENT_1
 99998 CONTINUE
       IF (BETA.EQ.ZERO) THEN                                            0095
          DO 20 J = 1, N                                                 0096
-            DO 10 I = 1, M                                              0097
-               C(I,J) = ZERO                                            0098
-10             CONTINUE                                                 0099
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
 20          CONTINUE                                                    0100
       ELSE
          DO 40 J = 1, N                                                 0102
-            LU_NUB6 = M
-            LU_IB6 = MOD(LU_NUB6, 4)
-            DO 99985 LU_IND6 = 0, LU_IB6-1
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
-99985          CONTINUE
-            DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
 c SIMD_COMMENT_0
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+2,J) = BETA*C(LU_IND6+2,J)                     0104
+               C(LU_IND9+2,J) = BETA*C(LU_IND9+2,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+3,J) = BETA*C(LU_IND6+3,J)                     0104
+               C(LU_IND9+3,J) = BETA*C(LU_IND9+3,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+4,J) = BETA*C(LU_IND6+4,J)                     0104
-99984          CONTINUE
-            I = MAX0(LU_NUB6, 0)+1
+               C(LU_IND9+4,J) = BETA*C(LU_IND9+4,J)                     0104
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
 40          CONTINUE                                                    0106
       ENDIF
       RETURN
@@ -1303,11 +1343,12 @@ c SIMD_COMMENT_0
       EXTERNAL XERBLA
       REAL*4 SIZE
       PARAMETER (SIZE = 10)
-      INTEGER LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, 
-     &LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, 
-     &LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, 
-     &LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, 
-     &NCOLA, NROWA, NROWB
+      INTEGER LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, 
+     &LU_IND7, LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, 
+     &LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, 
+     &LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC
+     &, I, INFO, J, L, NCOLA, NROWA, NROWB
       REAL*4 RED3(0:3), RED2(0:0), RED1(0:3), RED0(0:0), F_7, F_6, 
      &F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 
      &1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE
@@ -1478,55 +1519,68 @@ c SIMD_COMMENT_0
 *
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
-                  DO 50 I = 1, M                                        0120
-                     C(I,J) = ZERO                                      0121
-50                   CONTINUE                                           0122
-               ELSEIF (BETA.NE.ONE) THEN                                0119
                   LU_NUB0 = M
                   LU_IB0 = MOD(LU_NUB0, 4)
                   DO 99997 LU_IND0 = 0, LU_IB0-1
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 99997                CONTINUE
                   DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
 c SIMD_COMMENT_0
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+2,J) = BETA*C(LU_IND0+2,J)               0125
+                     C(LU_IND0+2,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+3,J) = BETA*C(LU_IND0+3,J)               0125
+                     C(LU_IND0+3,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+4,J) = BETA*C(LU_IND0+4,J)               0125
+                     C(LU_IND0+4,J) = ZERO                              0121
 99996                CONTINUE
                   I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+2,J) = BETA*C(LU_IND1+2,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)               0125
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
                ENDIF
                DO 80 L = 1, K                                           0128
                   IF (B(L,J).NE.ZERO) THEN                              0129
                      TEMP = ALPHA*B(L,J)                                0130
-                     LU_NUB1 = M
-                     LU_IB1 = MOD(LU_NUB1, 4)
-                     DO 99995 LU_IND1 = 0, LU_IB1-1
-                        F_0 = TEMP*A(LU_IND1+1,L)
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_0             0132
-99995                   CONTINUE
-                     DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_0 = TEMP*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+1,L)
+                        F_0 = TEMP*A(LU_IND2+1,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_0             0132
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+2,L)
+                        F_0 = TEMP*A(LU_IND2+2,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+2,J) = C(LU_IND1+2,J)+F_0             0132
+                        C(LU_IND2+2,J) = C(LU_IND2+2,J)+F_0             0132
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+3,L)
+                        F_0 = TEMP*A(LU_IND2+3,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+3,J) = C(LU_IND1+3,J)+F_0             0132
+                        C(LU_IND2+3,J) = C(LU_IND2+3,J)+F_0             0132
 c SIMD_COMMENT_0
-                        F_0 = TEMP*A(LU_IND1+4,L)
+                        F_0 = TEMP*A(LU_IND2+4,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+4,J) = C(LU_IND1+4,J)+F_0             0132
-99994                   CONTINUE
-                     I = MAX0(LU_NUB1, 0)+1
+                        C(LU_IND2+4,J) = C(LU_IND2+4,J)+F_0             0132
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
                   ENDIF
 80                CONTINUE                                              0135
 90             CONTINUE                                                 0136
@@ -1537,38 +1591,38 @@ c SIMD_COMMENT_1
             DO 120 J = 1, N                                             0141
                DO 110 I = 1, M                                          0142
                   TEMP = ZERO                                           0143
-                  LU_NUB2 = K
-                  LU_IB2 = MOD(LU_NUB2, 4)
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
                   RED0(0) = 0.000000
-                  DO 99993 LU_IND2 = 0, LU_IB2-1
-                     F_1 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
                      RED0(0) = RED0(0)+F_1                              0145
-99993                CONTINUE
+99991                CONTINUE
                   TEMP = RED0(0)+TEMP
                   RED1(0) = 0.000000
                   RED1(1) = 0.000000
                   RED1(2) = 0.000000
                   RED1(3) = 0.000000
-                  DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
 c SIMD_COMMENT_1
                      RED1(0) = RED1(0)+F_1                              0145
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+2,I)*B(LU_IND2+2,J)
+                     F_1 = A(LU_IND3+2,I)*B(LU_IND3+2,J)
 c SIMD_COMMENT_1
                      RED1(1) = RED1(1)+F_1                              0145
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+3,I)*B(LU_IND2+3,J)
+                     F_1 = A(LU_IND3+3,I)*B(LU_IND3+3,J)
 c SIMD_COMMENT_1
                      RED1(2) = RED1(2)+F_1                              0145
 c SIMD_COMMENT_0
-                     F_1 = A(LU_IND2+4,I)*B(LU_IND2+4,J)
+                     F_1 = A(LU_IND3+4,I)*B(LU_IND3+4,J)
 c SIMD_COMMENT_1
                      RED1(3) = RED1(3)+F_1                              0145
-99992                CONTINUE
+99990                CONTINUE
                   TEMP = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP
-                  L = MAX0(LU_NUB2, 0)+1
+                  L = MAX0(LU_NUB3, 0)+1
                   L_7 = BETA.EQ.ZERO
                   C0 = ALPHA*TEMP
                   C(I,J) = L_7?C0:C(I,J)
@@ -1586,55 +1640,68 @@ c SIMD_COMMENT_1
 *
          DO 170 J = 1, N                                                0160
             IF (BETA.EQ.ZERO) THEN                                      0161
-               DO 130 I = 1, M                                          0162
-                  C(I,J) = ZERO                                         0163
-130               CONTINUE                                              0164
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
             ELSEIF (BETA.NE.ONE) THEN                                   0161
-               LU_NUB3 = M
-               LU_IB3 = MOD(LU_NUB3, 4)
-               DO 99991 LU_IND3 = 0, LU_IB3-1
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
-99991             CONTINUE
-               DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
 c SIMD_COMMENT_0
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+2,J) = BETA*C(LU_IND3+2,J)                  0167
+                  C(LU_IND5+2,J) = BETA*C(LU_IND5+2,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+3,J) = BETA*C(LU_IND3+3,J)                  0167
+                  C(LU_IND5+3,J) = BETA*C(LU_IND5+3,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+4,J) = BETA*C(LU_IND3+4,J)                  0167
-99990             CONTINUE
-               I = MAX0(LU_NUB3, 0)+1
+                  C(LU_IND5+4,J) = BETA*C(LU_IND5+4,J)                  0167
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
             ENDIF
             DO 160 L = 1, K                                             0170
                IF (B(J,L).NE.ZERO) THEN                                 0171
                   TEMP = ALPHA*B(J,L)                                   0172
-                  LU_NUB4 = M
-                  LU_IB4 = MOD(LU_NUB4, 4)
-                  DO 99989 LU_IND4 = 0, LU_IB4-1
-                     F_4 = TEMP*A(LU_IND4+1,L)
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_4                0174
-99989                CONTINUE
-                  DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_4 = TEMP*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+1,L)
+                     F_4 = TEMP*A(LU_IND6+1,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_4                0174
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+2,L)
+                     F_4 = TEMP*A(LU_IND6+2,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+2,J) = C(LU_IND4+2,J)+F_4                0174
+                     C(LU_IND6+2,J) = C(LU_IND6+2,J)+F_4                0174
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+3,L)
+                     F_4 = TEMP*A(LU_IND6+3,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+3,J) = C(LU_IND4+3,J)+F_4                0174
+                     C(LU_IND6+3,J) = C(LU_IND6+3,J)+F_4                0174
 c SIMD_COMMENT_0
-                     F_4 = TEMP*A(LU_IND4+4,L)
+                     F_4 = TEMP*A(LU_IND6+4,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+4,J) = C(LU_IND4+4,J)+F_4                0174
-99988                CONTINUE
-                  I = MAX0(LU_NUB4, 0)+1
+                     C(LU_IND6+4,J) = C(LU_IND6+4,J)+F_4                0174
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
                ENDIF
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
@@ -1645,38 +1712,38 @@ c SIMD_COMMENT_1
          DO 200 J = 1, N                                                0183
             DO 190 I = 1, M                                             0184
                TEMP = ZERO                                              0185
-               LU_NUB5 = K
-               LU_IB5 = MOD(LU_NUB5, 4)
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
                RED2(0) = 0.000000
-               DO 99987 LU_IND5 = 0, LU_IB5-1
-                  F_5 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
                   RED2(0) = RED2(0)+F_5                                 0187
-99987             CONTINUE
+99983             CONTINUE
                TEMP = RED2(0)+TEMP
                RED3(0) = 0.000000
                RED3(1) = 0.000000
                RED3(2) = 0.000000
                RED3(3) = 0.000000
-               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
 c SIMD_COMMENT_1
                   RED3(0) = RED3(0)+F_5                                 0187
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+2,I)*B(J,LU_IND5+2)
+                  F_5 = A(LU_IND7+2,I)*B(J,LU_IND7+2)
 c SIMD_COMMENT_1
                   RED3(1) = RED3(1)+F_5                                 0187
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+3,I)*B(J,LU_IND5+3)
+                  F_5 = A(LU_IND7+3,I)*B(J,LU_IND7+3)
 c SIMD_COMMENT_1
                   RED3(2) = RED3(2)+F_5                                 0187
 c SIMD_COMMENT_0
-                  F_5 = A(LU_IND5+4,I)*B(J,LU_IND5+4)
+                  F_5 = A(LU_IND7+4,I)*B(J,LU_IND7+4)
 c SIMD_COMMENT_1
                   RED3(3) = RED3(3)+F_5                                 0187
-99986             CONTINUE
+99982             CONTINUE
                TEMP = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP
-               L = MAX0(LU_NUB5, 0)+1
+               L = MAX0(LU_NUB7, 0)+1
                L_8 = BETA.EQ.ZERO
                C2 = ALPHA*TEMP
                C(I,J) = L_8?C2:C(I,J)
@@ -1693,28 +1760,41 @@ c SIMD_COMMENT_1
 99998 CONTINUE
       IF (BETA.EQ.ZERO) THEN                                            0095
          DO 20 J = 1, N                                                 0096
-            DO 10 I = 1, M                                              0097
-               C(I,J) = ZERO                                            0098
-10             CONTINUE                                                 0099
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
 20          CONTINUE                                                    0100
       ELSE
          DO 40 J = 1, N                                                 0102
-            LU_NUB6 = M
-            LU_IB6 = MOD(LU_NUB6, 4)
-            DO 99985 LU_IND6 = 0, LU_IB6-1
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
-99985          CONTINUE
-            DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
 c SIMD_COMMENT_0
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+2,J) = BETA*C(LU_IND6+2,J)                     0104
+               C(LU_IND9+2,J) = BETA*C(LU_IND9+2,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+3,J) = BETA*C(LU_IND6+3,J)                     0104
+               C(LU_IND9+3,J) = BETA*C(LU_IND9+3,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+4,J) = BETA*C(LU_IND6+4,J)                     0104
-99984          CONTINUE
-            I = MAX0(LU_NUB6, 0)+1
+               C(LU_IND9+4,J) = BETA*C(LU_IND9+4,J)                     0104
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
 40          CONTINUE                                                    0106
       ENDIF
       RETURN
@@ -1733,11 +1813,13 @@ c SIMD_COMMENT_0
       REAL*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
-     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND6, LU_IB6, 
-     &LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, 
-     &LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, 
-     &LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N
-     &, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, NROWB
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, 
+     &I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, 
+     &NROWA, NROWB
       REAL*4 TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, F_14, TEMP5
      &, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, C10, TEMP3, 
      &F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, F_53, F_52, 
@@ -1922,55 +2004,68 @@ c SIMD_COMMENT_0
 *
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
-                  DO 50 I = 1, M                                        0120
-                     C(I,J) = ZERO                                      0121
-50                   CONTINUE                                           0122
-               ELSEIF (BETA.NE.ONE) THEN                                0119
                   LU_NUB0 = M
                   LU_IB0 = MOD(LU_NUB0, 4)
                   DO 99997 LU_IND0 = 0, LU_IB0-1
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 99997                CONTINUE
                   DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
 c SIMD_COMMENT_0
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+2,J) = BETA*C(LU_IND0+2,J)               0125
+                     C(LU_IND0+2,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+3,J) = BETA*C(LU_IND0+3,J)               0125
+                     C(LU_IND0+3,J) = ZERO                              0121
 c SIMD_COMMENT_0
-                     C(LU_IND0+4,J) = BETA*C(LU_IND0+4,J)               0125
+                     C(LU_IND0+4,J) = ZERO                              0121
 99996                CONTINUE
                   I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+2,J) = BETA*C(LU_IND1+2,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)               0125
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
                ENDIF
                DO 80 L = 1, K                                           0128
                   IF (B(L,J).NE.ZERO) THEN                              0129
                      TEMP7 = ALPHA*B(L,J)                               0130
-                     LU_NUB1 = M
-                     LU_IB1 = MOD(LU_NUB1, 4)
-                     DO 99995 LU_IND1 = 0, LU_IB1-1
-                        F_04 = TEMP7*A(LU_IND1+1,L)
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_04            0132
-99995                   CONTINUE
-                     DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
 c SIMD_COMMENT_0
-                        F_03 = TEMP7*A(LU_IND1+1,L)
+                        F_03 = TEMP7*A(LU_IND2+1,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_03            0132
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_03            0132
 c SIMD_COMMENT_0
-                        F_02 = TEMP7*A(LU_IND1+2,L)
+                        F_02 = TEMP7*A(LU_IND2+2,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+2,J) = C(LU_IND1+2,J)+F_02            0132
+                        C(LU_IND2+2,J) = C(LU_IND2+2,J)+F_02            0132
 c SIMD_COMMENT_0
-                        F_01 = TEMP7*A(LU_IND1+3,L)
+                        F_01 = TEMP7*A(LU_IND2+3,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+3,J) = C(LU_IND1+3,J)+F_01            0132
+                        C(LU_IND2+3,J) = C(LU_IND2+3,J)+F_01            0132
 c SIMD_COMMENT_0
-                        F_00 = TEMP7*A(LU_IND1+4,L)
+                        F_00 = TEMP7*A(LU_IND2+4,L)
 c SIMD_COMMENT_1
-                        C(LU_IND1+4,J) = C(LU_IND1+4,J)+F_00            0132
-99994                   CONTINUE
-                     I = MAX0(LU_NUB1, 0)+1
+                        C(LU_IND2+4,J) = C(LU_IND2+4,J)+F_00            0132
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
                   ENDIF
 80                CONTINUE                                              0135
 90             CONTINUE                                                 0136
@@ -1981,38 +2076,38 @@ c SIMD_COMMENT_1
             DO 120 J = 1, N                                             0141
                DO 110 I = 1, M                                          0142
                   TEMP6 = ZERO                                          0143
-                  LU_NUB2 = K
-                  LU_IB2 = MOD(LU_NUB2, 4)
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
                   RED0(0) = 0.000000
-                  DO 99993 LU_IND2 = 0, LU_IB2-1
-                     F_14 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
                      RED0(0) = RED0(0)+F_14                             0145
-99993                CONTINUE
+99991                CONTINUE
                   TEMP5 = RED0(0)+TEMP6
                   RED1(0) = 0.000000
                   RED1(1) = 0.000000
                   RED1(2) = 0.000000
                   RED1(3) = 0.000000
-                  DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
 c SIMD_COMMENT_0
-                     F_13 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                     F_13 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
 c SIMD_COMMENT_1
                      RED1(0) = RED1(0)+F_13                             0145
 c SIMD_COMMENT_0
-                     F_12 = A(LU_IND2+2,I)*B(LU_IND2+2,J)
+                     F_12 = A(LU_IND3+2,I)*B(LU_IND3+2,J)
 c SIMD_COMMENT_1
                      RED1(1) = RED1(1)+F_12                             0145
 c SIMD_COMMENT_0
-                     F_11 = A(LU_IND2+3,I)*B(LU_IND2+3,J)
+                     F_11 = A(LU_IND3+3,I)*B(LU_IND3+3,J)
 c SIMD_COMMENT_1
                      RED1(2) = RED1(2)+F_11                             0145
 c SIMD_COMMENT_0
-                     F_10 = A(LU_IND2+4,I)*B(LU_IND2+4,J)
+                     F_10 = A(LU_IND3+4,I)*B(LU_IND3+4,J)
 c SIMD_COMMENT_1
                      RED1(3) = RED1(3)+F_10                             0145
-99992                CONTINUE
+99990                CONTINUE
                   TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
-                  L = MAX0(LU_NUB2, 0)+1
+                  L = MAX0(LU_NUB3, 0)+1
                   L_710 = BETA.EQ.ZERO
                   C00 = ALPHA*TEMP4
                   C(I,J) = L_710?C00:C(I,J)
@@ -2030,55 +2125,68 @@ c SIMD_COMMENT_1
 *
          DO 170 J = 1, N                                                0160
             IF (BETA.EQ.ZERO) THEN                                      0161
-               DO 130 I = 1, M                                          0162
-                  C(I,J) = ZERO                                         0163
-130               CONTINUE                                              0164
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
             ELSEIF (BETA.NE.ONE) THEN                                   0161
-               LU_NUB3 = M
-               LU_IB3 = MOD(LU_NUB3, 4)
-               DO 99991 LU_IND3 = 0, LU_IB3-1
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
-99991             CONTINUE
-               DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
 c SIMD_COMMENT_0
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+2,J) = BETA*C(LU_IND3+2,J)                  0167
+                  C(LU_IND5+2,J) = BETA*C(LU_IND5+2,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+3,J) = BETA*C(LU_IND3+3,J)                  0167
+                  C(LU_IND5+3,J) = BETA*C(LU_IND5+3,J)                  0167
 c SIMD_COMMENT_0
-                  C(LU_IND3+4,J) = BETA*C(LU_IND3+4,J)                  0167
-99990             CONTINUE
-               I = MAX0(LU_NUB3, 0)+1
+                  C(LU_IND5+4,J) = BETA*C(LU_IND5+4,J)                  0167
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
             ENDIF
             DO 160 L = 1, K                                             0170
                IF (B(J,L).NE.ZERO) THEN                                 0171
                   TEMP3 = ALPHA*B(J,L)                                  0172
-                  LU_NUB4 = M
-                  LU_IB4 = MOD(LU_NUB4, 4)
-                  DO 99989 LU_IND4 = 0, LU_IB4-1
-                     F_44 = TEMP3*A(LU_IND4+1,L)
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_44               0174
-99989                CONTINUE
-                  DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
 c SIMD_COMMENT_0
-                     F_43 = TEMP3*A(LU_IND4+1,L)
+                     F_43 = TEMP3*A(LU_IND6+1,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_43               0174
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_43               0174
 c SIMD_COMMENT_0
-                     F_42 = TEMP3*A(LU_IND4+2,L)
+                     F_42 = TEMP3*A(LU_IND6+2,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+2,J) = C(LU_IND4+2,J)+F_42               0174
+                     C(LU_IND6+2,J) = C(LU_IND6+2,J)+F_42               0174
 c SIMD_COMMENT_0
-                     F_41 = TEMP3*A(LU_IND4+3,L)
+                     F_41 = TEMP3*A(LU_IND6+3,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+3,J) = C(LU_IND4+3,J)+F_41               0174
+                     C(LU_IND6+3,J) = C(LU_IND6+3,J)+F_41               0174
 c SIMD_COMMENT_0
-                     F_40 = TEMP3*A(LU_IND4+4,L)
+                     F_40 = TEMP3*A(LU_IND6+4,L)
 c SIMD_COMMENT_1
-                     C(LU_IND4+4,J) = C(LU_IND4+4,J)+F_40               0174
-99988                CONTINUE
-                  I = MAX0(LU_NUB4, 0)+1
+                     C(LU_IND6+4,J) = C(LU_IND6+4,J)+F_40               0174
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
                ENDIF
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
@@ -2089,38 +2197,38 @@ c SIMD_COMMENT_1
          DO 200 J = 1, N                                                0183
             DO 190 I = 1, M                                             0184
                TEMP2 = ZERO                                             0185
-               LU_NUB5 = K
-               LU_IB5 = MOD(LU_NUB5, 4)
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
                RED2(0) = 0.000000
-               DO 99987 LU_IND5 = 0, LU_IB5-1
-                  F_54 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
                   RED2(0) = RED2(0)+F_54                                0187
-99987             CONTINUE
+99983             CONTINUE
                TEMP1 = RED2(0)+TEMP2
                RED3(0) = 0.000000
                RED3(1) = 0.000000
                RED3(2) = 0.000000
                RED3(3) = 0.000000
-               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
 c SIMD_COMMENT_0
-                  F_53 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+                  F_53 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
 c SIMD_COMMENT_1
                   RED3(0) = RED3(0)+F_53                                0187
 c SIMD_COMMENT_0
-                  F_52 = A(LU_IND5+2,I)*B(J,LU_IND5+2)
+                  F_52 = A(LU_IND7+2,I)*B(J,LU_IND7+2)
 c SIMD_COMMENT_1
                   RED3(1) = RED3(1)+F_52                                0187
 c SIMD_COMMENT_0
-                  F_51 = A(LU_IND5+3,I)*B(J,LU_IND5+3)
+                  F_51 = A(LU_IND7+3,I)*B(J,LU_IND7+3)
 c SIMD_COMMENT_1
                   RED3(2) = RED3(2)+F_51                                0187
 c SIMD_COMMENT_0
-                  F_50 = A(LU_IND5+4,I)*B(J,LU_IND5+4)
+                  F_50 = A(LU_IND7+4,I)*B(J,LU_IND7+4)
 c SIMD_COMMENT_1
                   RED3(3) = RED3(3)+F_50                                0187
-99986             CONTINUE
+99982             CONTINUE
                TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
-               L = MAX0(LU_NUB5, 0)+1
+               L = MAX0(LU_NUB7, 0)+1
                L_810 = BETA.EQ.ZERO
                C20 = ALPHA*TEMP0
                C(I,J) = L_810?C20:C(I,J)
@@ -2137,28 +2245,41 @@ c SIMD_COMMENT_1
 99998 CONTINUE
       IF (BETA.EQ.ZERO) THEN                                            0095
          DO 20 J = 1, N                                                 0096
-            DO 10 I = 1, M                                              0097
-               C(I,J) = ZERO                                            0098
-10             CONTINUE                                                 0099
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
 20          CONTINUE                                                    0100
       ELSE
          DO 40 J = 1, N                                                 0102
-            LU_NUB6 = M
-            LU_IB6 = MOD(LU_NUB6, 4)
-            DO 99985 LU_IND6 = 0, LU_IB6-1
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
-99985          CONTINUE
-            DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
 c SIMD_COMMENT_0
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+2,J) = BETA*C(LU_IND6+2,J)                     0104
+               C(LU_IND9+2,J) = BETA*C(LU_IND9+2,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+3,J) = BETA*C(LU_IND6+3,J)                     0104
+               C(LU_IND9+3,J) = BETA*C(LU_IND9+3,J)                     0104
 c SIMD_COMMENT_0
-               C(LU_IND6+4,J) = BETA*C(LU_IND6+4,J)                     0104
-99984          CONTINUE
-            I = MAX0(LU_NUB6, 0)+1
+               C(LU_IND9+4,J) = BETA*C(LU_IND9+4,J)                     0104
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
 40          CONTINUE                                                    0106
       ENDIF
       RETURN
@@ -2177,11 +2298,13 @@ c SIMD_COMMENT_0
       REAL*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
-     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND6, LU_IB6, 
-     &LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, 
-     &LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, 
-     &LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N
-     &, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, NROWB
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, 
+     &I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, 
+     &NROWA, NROWB
       REAL*4 v4sf_vec57(0:3), v4sf_vec56(0:3), v4sf_vec55(0:3), 
      &v4sf_vec54(0:3), v4sf_vec50(0:3), v4sf_vec49(0:3), v4sf_vec48(0
      &:3), v4sf_vec47(0:3), v4sf_vec46(0:3), v4sf_vec45(0:3), 
@@ -2383,41 +2506,54 @@ c SIMD_COMMENT_0
 *
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
-                  DO 50 I = 1, M                                        0120
-                     C(I,J) = ZERO                                      0121
-50                   CONTINUE                                           0122
-               ELSEIF (BETA.NE.ONE) THEN                                0119
                   LU_NUB0 = M
                   LU_IB0 = MOD(LU_NUB0, 4)
                   DO 99997 LU_IND0 = 0, LU_IB0-1
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 99997                CONTINUE
                   DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
-                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND0
-     &               +1,J), C(LU_IND0+2,J), C(LU_IND0+3,J), C(LU_IND0
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
+99996                CONTINUE
+                  I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
      &               +4,J))
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, 
      &               BETA, BETA, BETA)
                      CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
-                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND0
-     &               +1,J), C(LU_IND0+2,J), C(LU_IND0+3,J), C(LU_IND0
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
      &               +4,J))
-99996                CONTINUE
-                  I = MAX0(LU_NUB0, 0)+1
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
                ENDIF
                DO 80 L = 1, K                                           0128
                   IF (B(L,J).NE.ZERO) THEN                              0129
                      TEMP7 = ALPHA*B(L,J)                               0130
-                     LU_NUB1 = M
-                     LU_IB1 = MOD(LU_NUB1, 4)
-                     DO 99995 LU_IND1 = 0, LU_IB1-1
-                        F_04 = TEMP7*A(LU_IND1+1,L)
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_04            0132
-99995                   CONTINUE
-                     DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
                         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec6, A(
-     &                  LU_IND1+1,L), A(LU_IND1+2,L), A(LU_IND1+3,L)
-     &                  , A(LU_IND1+4,L))
+     &                  LU_IND2+1,L), A(LU_IND2+2,L), A(LU_IND2+3,L)
+     &                  , A(LU_IND2+4,L))
                         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec5, TEMP7
      &                  , TEMP7, TEMP7, TEMP7)
                         CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5, 
@@ -2425,15 +2561,15 @@ c SIMD_COMMENT_0
                         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec4, F_03, 
      &                  F_02, F_01, F_00)
                         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec7, C(
-     &                  LU_IND1+1,J), C(LU_IND1+2,J), C(LU_IND1+3,J)
-     &                  , C(LU_IND1+4,J))
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
                         CALL SIMD_ADDPS(v4sf_vec7, v4sf_vec7, 
      &                  v4sf_vec4)
                         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec7, C(
-     &                  LU_IND1+1,J), C(LU_IND1+2,J), C(LU_IND1+3,J)
-     &                  , C(LU_IND1+4,J))
-99994                   CONTINUE
-                     I = MAX0(LU_NUB1, 0)+1
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
                   ENDIF
 80                CONTINUE                                              0135
 90             CONTINUE                                                 0136
@@ -2444,25 +2580,25 @@ c SIMD_COMMENT_0
             DO 120 J = 1, N                                             0141
                DO 110 I = 1, M                                          0142
                   TEMP6 = ZERO                                          0143
-                  LU_NUB2 = K
-                  LU_IB2 = MOD(LU_NUB2, 4)
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
                   RED0(0) = 0.000000
-                  DO 99993 LU_IND2 = 0, LU_IB2-1
-                     F_14 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
                      RED0(0) = RED0(0)+F_14                             0145
-99993                CONTINUE
+99991                CONTINUE
                   TEMP5 = RED0(0)+TEMP6
                   RED1(0) = 0.000000
                   RED1(1) = 0.000000
                   RED1(2) = 0.000000
                   RED1(3) = 0.000000
-                  DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec16, B(
-     &               LU_IND2+1,J), B(LU_IND2+2,J), B(LU_IND2+3,J), B(
-     &               LU_IND2+4,J))
+     &               LU_IND3+1,J), B(LU_IND3+2,J), B(LU_IND3+3,J), B(
+     &               LU_IND3+4,J))
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec15, A(
-     &               LU_IND2+1,I), A(LU_IND2+2,I), A(LU_IND2+3,I), A(
-     &               LU_IND2+4,I))
+     &               LU_IND3+1,I), A(LU_IND3+2,I), A(LU_IND3+3,I), A(
+     &               LU_IND3+4,I))
                      CALL SIMD_MULPS(v4sf_vec14, v4sf_vec15, 
      &               v4sf_vec16)
                      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec14, F_13, 
@@ -2471,9 +2607,9 @@ c SIMD_COMMENT_0
                      CALL SIMD_ADDPS(v4sf_vec17, v4sf_vec17, 
      &               v4sf_vec14)
                      CALL SIMD_SAVE_V4SF(v4sf_vec17, RED1(0))
-99992                CONTINUE
+99990                CONTINUE
                   TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
-                  L = MAX0(LU_NUB2, 0)+1
+                  L = MAX0(LU_NUB3, 0)+1
                   L_710 = BETA.EQ.ZERO
                   CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec26, TEMP4, 
      &            TEMP4)
@@ -2495,41 +2631,54 @@ c SIMD_COMMENT_0
 *
          DO 170 J = 1, N                                                0160
             IF (BETA.EQ.ZERO) THEN                                      0161
-               DO 130 I = 1, M                                          0162
-                  C(I,J) = ZERO                                         0163
-130               CONTINUE                                              0164
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
             ELSEIF (BETA.NE.ONE) THEN                                   0161
-               LU_NUB3 = M
-               LU_IB3 = MOD(LU_NUB3, 4)
-               DO 99991 LU_IND3 = 0, LU_IB3-1
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
-99991             CONTINUE
-               DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND3+1
-     &            ,J), C(LU_IND3+2,J), C(LU_IND3+3,J), C(LU_IND3+4,J)
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
      &            )
                   CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec28, BETA, BETA
      &            , BETA, BETA)
                   CALL SIMD_MULPS(v4sf_vec27, v4sf_vec28, v4sf_vec27)
-                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND3+1
-     &            ,J), C(LU_IND3+2,J), C(LU_IND3+3,J), C(LU_IND3+4,J)
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
      &            )
-99990             CONTINUE
-               I = MAX0(LU_NUB3, 0)+1
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
             ENDIF
             DO 160 L = 1, K                                             0170
                IF (B(J,L).NE.ZERO) THEN                                 0171
                   TEMP3 = ALPHA*B(J,L)                                  0172
-                  LU_NUB4 = M
-                  LU_IB4 = MOD(LU_NUB4, 4)
-                  DO 99989 LU_IND4 = 0, LU_IB4-1
-                     F_44 = TEMP3*A(LU_IND4+1,L)
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_44               0174
-99989                CONTINUE
-                  DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec33, A(
-     &               LU_IND4+1,L), A(LU_IND4+2,L), A(LU_IND4+3,L), A(
-     &               LU_IND4+4,L))
+     &               LU_IND6+1,L), A(LU_IND6+2,L), A(LU_IND6+3,L), A(
+     &               LU_IND6+4,L))
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec32, TEMP3, 
      &               TEMP3, TEMP3, TEMP3)
                      CALL SIMD_MULPS(v4sf_vec31, v4sf_vec32, 
@@ -2537,15 +2686,15 @@ c SIMD_COMMENT_0
                      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec31, F_43, 
      &               F_42, F_41, F_40)
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec34, C(
-     &               LU_IND4+1,J), C(LU_IND4+2,J), C(LU_IND4+3,J), C(
-     &               LU_IND4+4,J))
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
                      CALL SIMD_ADDPS(v4sf_vec34, v4sf_vec34, 
      &               v4sf_vec31)
                      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec34, C(
-     &               LU_IND4+1,J), C(LU_IND4+2,J), C(LU_IND4+3,J), C(
-     &               LU_IND4+4,J))
-99988                CONTINUE
-                  I = MAX0(LU_NUB4, 0)+1
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
                ENDIF
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
@@ -2556,22 +2705,22 @@ c SIMD_COMMENT_0
          DO 200 J = 1, N                                                0183
             DO 190 I = 1, M                                             0184
                TEMP2 = ZERO                                             0185
-               LU_NUB5 = K
-               LU_IB5 = MOD(LU_NUB5, 4)
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
                RED2(0) = 0.000000
-               DO 99987 LU_IND5 = 0, LU_IB5-1
-                  F_54 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
                   RED2(0) = RED2(0)+F_54                                0187
-99987             CONTINUE
+99983             CONTINUE
                TEMP1 = RED2(0)+TEMP2
                RED3(0) = 0.000000
                RED3(1) = 0.000000
                RED3(2) = 0.000000
                RED3(3) = 0.000000
-               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
-                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND5+1))
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND5+1
-     &            ,I), A(LU_IND5+2,I), A(LU_IND5+3,I), A(LU_IND5+4,I)
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND7+1))
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND7+1
+     &            ,I), A(LU_IND7+2,I), A(LU_IND7+3,I), A(LU_IND7+4,I)
      &            )
                   CALL SIMD_MULPS(v4sf_vec41, v4sf_vec42, v4sf_vec43)
                   CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec41, F_53, F_52
@@ -2579,9 +2728,9 @@ c SIMD_COMMENT_0
                   CALL SIMD_LOAD_V4SF(v4sf_vec44, RED3(0))
                   CALL SIMD_ADDPS(v4sf_vec44, v4sf_vec44, v4sf_vec41)
                   CALL SIMD_SAVE_V4SF(v4sf_vec44, RED3(0))
-99986             CONTINUE
+99982             CONTINUE
                TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
-               L = MAX0(LU_NUB5, 0)+1
+               L = MAX0(LU_NUB7, 0)+1
                L_810 = BETA.EQ.ZERO
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec53, TEMP0, TEMP0)
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec52, ALPHA, ALPHA)
@@ -2600,27 +2749,40 @@ c SIMD_COMMENT_0
 99998 CONTINUE
       IF (BETA.EQ.ZERO) THEN                                            0095
          DO 20 J = 1, N                                                 0096
-            DO 10 I = 1, M                                              0097
-               C(I,J) = ZERO                                            0098
-10             CONTINUE                                                 0099
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
 20          CONTINUE                                                    0100
       ELSE
          DO 40 J = 1, N                                                 0102
-            LU_NUB6 = M
-            LU_IB6 = MOD(LU_NUB6, 4)
-            DO 99985 LU_IND6 = 0, LU_IB6-1
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
-99985          CONTINUE
-            DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
-               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND6+1,J)
-     &         , C(LU_IND6+2,J), C(LU_IND6+3,J), C(LU_IND6+4,J))
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
                CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec55, BETA, BETA, 
      &         BETA, BETA)
                CALL SIMD_MULPS(v4sf_vec54, v4sf_vec55, v4sf_vec54)
-               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND6+1,J)
-     &         , C(LU_IND6+2,J), C(LU_IND6+3,J), C(LU_IND6+4,J))
-99984          CONTINUE
-            I = MAX0(LU_NUB6, 0)+1
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
 40          CONTINUE                                                    0106
       ENDIF
       RETURN
@@ -2639,11 +2801,13 @@ c SIMD_COMMENT_0
       REAL*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
-     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND6, LU_IB6, 
-     &LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, 
-     &LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, 
-     &LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N
-     &, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, NROWB
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, 
+     &I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, 
+     &NROWA, NROWB
       REAL*4 v4sf_vec57(0:3), v4sf_vec56(0:3), v4sf_vec55(0:3), 
      &v4sf_vec54(0:3), v4sf_vec50(0:3), v4sf_vec49(0:3), v4sf_vec48(0
      &:3), v4sf_vec47(0:3), v4sf_vec46(0:3), v4sf_vec45(0:3), 
@@ -2845,57 +3009,70 @@ c SIMD_COMMENT_0
 *
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
-                  DO 50 I = 1, M                                        0120
-                     C(I,J) = ZERO                                      0121
-50                   CONTINUE                                           0122
-               ELSEIF (BETA.NE.ONE) THEN                                0119
                   LU_NUB0 = M
                   LU_IB0 = MOD(LU_NUB0, 4)
                   DO 99997 LU_IND0 = 0, LU_IB0-1
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 99997                CONTINUE
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, BETA, 
-     &            BETA, BETA)
                   DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
-                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND0
-     &               +1,J), C(LU_IND0+2,J), C(LU_IND0+3,J), C(LU_IND0
-     &               +4,J))
-                     CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
-                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND0
-     &               +1,J), C(LU_IND0+2,J), C(LU_IND0+3,J), C(LU_IND0
-     &               +4,J))
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
 99996                CONTINUE
                   I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, BETA, 
+     &            BETA, BETA)
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+                     CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
                ENDIF
                DO 80 L = 1, K                                           0128
                   IF (B(L,J).NE.ZERO) THEN                              0129
                      TEMP7 = ALPHA*B(L,J)                               0130
-                     LU_NUB1 = M
-                     LU_IB1 = MOD(LU_NUB1, 4)
-                     DO 99995 LU_IND1 = 0, LU_IB1-1
-                        F_04 = TEMP7*A(LU_IND1+1,L)
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_04            0132
-99995                   CONTINUE
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec5, TEMP7, 
      &               TEMP7, TEMP7, TEMP7)
-                     DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
                         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec6, A(
-     &                  LU_IND1+1,L), A(LU_IND1+2,L), A(LU_IND1+3,L)
-     &                  , A(LU_IND1+4,L))
+     &                  LU_IND2+1,L), A(LU_IND2+2,L), A(LU_IND2+3,L)
+     &                  , A(LU_IND2+4,L))
                         CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5, 
      &                  v4sf_vec6)
                         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec7, C(
-     &                  LU_IND1+1,J), C(LU_IND1+2,J), C(LU_IND1+3,J)
-     &                  , C(LU_IND1+4,J))
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
                         CALL SIMD_ADDPS(v4sf_vec7, v4sf_vec7, 
      &                  v4sf_vec4)
                         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec7, C(
-     &                  LU_IND1+1,J), C(LU_IND1+2,J), C(LU_IND1+3,J)
-     &                  , C(LU_IND1+4,J))
-99994                   CONTINUE
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+99992                   CONTINUE
                      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec4, F_03, 
      &               F_02, F_01, F_00)
-                     I = MAX0(LU_NUB1, 0)+1
+                     I = MAX0(LU_NUB2, 0)+1
                   ENDIF
 80                CONTINUE                                              0135
 90             CONTINUE                                                 0136
@@ -2907,36 +3084,36 @@ c SIMD_COMMENT_0
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec25, ALPHA, ALPHA)
                DO 110 I = 1, M                                          0142
                   TEMP6 = ZERO                                          0143
-                  LU_NUB2 = K
-                  LU_IB2 = MOD(LU_NUB2, 4)
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
                   RED0(0) = 0.000000
-                  DO 99993 LU_IND2 = 0, LU_IB2-1
-                     F_14 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
                      RED0(0) = RED0(0)+F_14                             0145
-99993                CONTINUE
+99991                CONTINUE
                   TEMP5 = RED0(0)+TEMP6
                   RED1(0) = 0.000000
                   RED1(1) = 0.000000
                   RED1(2) = 0.000000
                   RED1(3) = 0.000000
                   CALL SIMD_LOAD_V4SF(v4sf_vec17, RED1(0))
-                  DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec16, B(
-     &               LU_IND2+1,J), B(LU_IND2+2,J), B(LU_IND2+3,J), B(
-     &               LU_IND2+4,J))
+     &               LU_IND3+1,J), B(LU_IND3+2,J), B(LU_IND3+3,J), B(
+     &               LU_IND3+4,J))
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec15, A(
-     &               LU_IND2+1,I), A(LU_IND2+2,I), A(LU_IND2+3,I), A(
-     &               LU_IND2+4,I))
+     &               LU_IND3+1,I), A(LU_IND3+2,I), A(LU_IND3+3,I), A(
+     &               LU_IND3+4,I))
                      CALL SIMD_MULPS(v4sf_vec14, v4sf_vec15, 
      &               v4sf_vec16)
                      CALL SIMD_ADDPS(v4sf_vec17, v4sf_vec17, 
      &               v4sf_vec14)
-99992                CONTINUE
+99990                CONTINUE
                   CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec14, F_13, F_12
      &            , F_11, F_10)
                   CALL SIMD_SAVE_V4SF(v4sf_vec17, RED1(0))
                   TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
-                  L = MAX0(LU_NUB2, 0)+1
+                  L = MAX0(LU_NUB3, 0)+1
                   L_710 = BETA.EQ.ZERO
                   CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec26, TEMP4, 
      &            TEMP4)
@@ -2956,57 +3133,70 @@ c SIMD_COMMENT_0
 *
          DO 170 J = 1, N                                                0160
             IF (BETA.EQ.ZERO) THEN                                      0161
-               DO 130 I = 1, M                                          0162
-                  C(I,J) = ZERO                                         0163
-130               CONTINUE                                              0164
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
             ELSEIF (BETA.NE.ONE) THEN                                   0161
-               LU_NUB3 = M
-               LU_IB3 = MOD(LU_NUB3, 4)
-               DO 99991 LU_IND3 = 0, LU_IB3-1
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
-99991             CONTINUE
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
                CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec28, BETA, BETA, 
      &         BETA, BETA)
-               DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND3+1
-     &            ,J), C(LU_IND3+2,J), C(LU_IND3+3,J), C(LU_IND3+4,J)
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
      &            )
                   CALL SIMD_MULPS(v4sf_vec27, v4sf_vec28, v4sf_vec27)
-                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND3+1
-     &            ,J), C(LU_IND3+2,J), C(LU_IND3+3,J), C(LU_IND3+4,J)
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
      &            )
-99990             CONTINUE
-               I = MAX0(LU_NUB3, 0)+1
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
             ENDIF
             DO 160 L = 1, K                                             0170
                IF (B(J,L).NE.ZERO) THEN                                 0171
                   TEMP3 = ALPHA*B(J,L)                                  0172
-                  LU_NUB4 = M
-                  LU_IB4 = MOD(LU_NUB4, 4)
-                  DO 99989 LU_IND4 = 0, LU_IB4-1
-                     F_44 = TEMP3*A(LU_IND4+1,L)
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_44               0174
-99989                CONTINUE
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
                   CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec32, TEMP3, 
      &            TEMP3, TEMP3, TEMP3)
-                  DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec33, A(
-     &               LU_IND4+1,L), A(LU_IND4+2,L), A(LU_IND4+3,L), A(
-     &               LU_IND4+4,L))
+     &               LU_IND6+1,L), A(LU_IND6+2,L), A(LU_IND6+3,L), A(
+     &               LU_IND6+4,L))
                      CALL SIMD_MULPS(v4sf_vec31, v4sf_vec32, 
      &               v4sf_vec33)
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec34, C(
-     &               LU_IND4+1,J), C(LU_IND4+2,J), C(LU_IND4+3,J), C(
-     &               LU_IND4+4,J))
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
                      CALL SIMD_ADDPS(v4sf_vec34, v4sf_vec34, 
      &               v4sf_vec31)
                      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec34, C(
-     &               LU_IND4+1,J), C(LU_IND4+2,J), C(LU_IND4+3,J), C(
-     &               LU_IND4+4,J))
-99988                CONTINUE
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+99984                CONTINUE
                   CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec31, F_43, F_42
      &            , F_41, F_40)
-                  I = MAX0(LU_NUB4, 0)+1
+                  I = MAX0(LU_NUB6, 0)+1
                ENDIF
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
@@ -3018,32 +3208,32 @@ c SIMD_COMMENT_0
             CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec52, ALPHA, ALPHA)
             DO 190 I = 1, M                                             0184
                TEMP2 = ZERO                                             0185
-               LU_NUB5 = K
-               LU_IB5 = MOD(LU_NUB5, 4)
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
                RED2(0) = 0.000000
-               DO 99987 LU_IND5 = 0, LU_IB5-1
-                  F_54 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
                   RED2(0) = RED2(0)+F_54                                0187
-99987             CONTINUE
+99983             CONTINUE
                TEMP1 = RED2(0)+TEMP2
                RED3(0) = 0.000000
                RED3(1) = 0.000000
                RED3(2) = 0.000000
                RED3(3) = 0.000000
                CALL SIMD_LOAD_V4SF(v4sf_vec44, RED3(0))
-               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
-                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND5+1))
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND5+1
-     &            ,I), A(LU_IND5+2,I), A(LU_IND5+3,I), A(LU_IND5+4,I)
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND7+1))
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND7+1
+     &            ,I), A(LU_IND7+2,I), A(LU_IND7+3,I), A(LU_IND7+4,I)
      &            )
                   CALL SIMD_MULPS(v4sf_vec41, v4sf_vec42, v4sf_vec43)
                   CALL SIMD_ADDPS(v4sf_vec44, v4sf_vec44, v4sf_vec41)
-99986             CONTINUE
+99982             CONTINUE
                CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec41, F_53, F_52, 
      &         F_51, F_50)
                CALL SIMD_SAVE_V4SF(v4sf_vec44, RED3(0))
                TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
-               L = MAX0(LU_NUB5, 0)+1
+               L = MAX0(LU_NUB7, 0)+1
                L_810 = BETA.EQ.ZERO
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec53, TEMP0, TEMP0)
                CALL SIMD_MULPD(v2df_vec51, v2df_vec52, v2df_vec53)
@@ -3061,27 +3251,40 @@ c SIMD_COMMENT_0
 99998 CONTINUE
       IF (BETA.EQ.ZERO) THEN                                            0095
          DO 20 J = 1, N                                                 0096
-            DO 10 I = 1, M                                              0097
-               C(I,J) = ZERO                                            0098
-10             CONTINUE                                                 0099
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
 20          CONTINUE                                                    0100
       ELSE
          DO 40 J = 1, N                                                 0102
-            LU_NUB6 = M
-            LU_IB6 = MOD(LU_NUB6, 4)
-            DO 99985 LU_IND6 = 0, LU_IB6-1
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
-99985          CONTINUE
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
             CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec55, BETA, BETA, BETA
      &      , BETA)
-            DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
-               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND6+1,J)
-     &         , C(LU_IND6+2,J), C(LU_IND6+3,J), C(LU_IND6+4,J))
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
                CALL SIMD_MULPS(v4sf_vec54, v4sf_vec55, v4sf_vec54)
-               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND6+1,J)
-     &         , C(LU_IND6+2,J), C(LU_IND6+3,J), C(LU_IND6+4,J))
-99984          CONTINUE
-            I = MAX0(LU_NUB6, 0)+1
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
 40          CONTINUE                                                    0106
       ENDIF
       RETURN
@@ -3098,11 +3301,12 @@ c SIMD_COMMENT_0
       REAL*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
-     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND6, LU_IB6, 
-     &LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, 
-     &LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, 
-     &LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, M, N, K, LDA, LDB, 
-     &LDC, I, INFO, J, L, NCOLA, NROWA
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, M
+     &, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA
       REAL*4 v4sf_vec55(0:3), v4sf_vec54(0:3), v4sf_vec44(0:3), 
      &v4sf_vec43(0:3), v4sf_vec42(0:3), v4sf_vec41(0:3), v4sf_vec34(0
      &:3), v4sf_vec33(0:3), v4sf_vec32(0:3), v4sf_vec31(0:3), 
@@ -3285,57 +3489,70 @@ c SIMD_COMMENT_0
 *
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
-                  DO 50 I = 1, M                                        0120
-                     C(I,J) = ZERO                                      0121
-50                   CONTINUE                                           0122
-               ELSEIF (BETA.NE.ONE) THEN                                0119
                   LU_NUB0 = M
                   LU_IB0 = MOD(LU_NUB0, 4)
                   DO 99997 LU_IND0 = 0, LU_IB0-1
-                     C(LU_IND0+1,J) = BETA*C(LU_IND0+1,J)               0125
+                     C(LU_IND0+1,J) = ZERO                              0121
 99997                CONTINUE
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, BETA, 
-     &            BETA, BETA)
                   DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
-                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND0
-     &               +1,J), C(LU_IND0+2,J), C(LU_IND0+3,J), C(LU_IND0
-     &               +4,J))
-                     CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
-                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND0
-     &               +1,J), C(LU_IND0+2,J), C(LU_IND0+3,J), C(LU_IND0
-     &               +4,J))
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
 99996                CONTINUE
                   I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, BETA, 
+     &            BETA, BETA)
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+                     CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
                ENDIF
                DO 80 L = 1, K                                           0128
                   IF (B(L,J).NE.ZERO) THEN                              0129
                      TEMP7 = ALPHA*B(L,J)                               0130
-                     LU_NUB1 = M
-                     LU_IB1 = MOD(LU_NUB1, 4)
-                     DO 99995 LU_IND1 = 0, LU_IB1-1
-                        F_04 = TEMP7*A(LU_IND1+1,L)
-                        C(LU_IND1+1,J) = C(LU_IND1+1,J)+F_04            0132
-99995                   CONTINUE
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec5, TEMP7, 
      &               TEMP7, TEMP7, TEMP7)
-                     DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
                         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec6, A(
-     &                  LU_IND1+1,L), A(LU_IND1+2,L), A(LU_IND1+3,L)
-     &                  , A(LU_IND1+4,L))
+     &                  LU_IND2+1,L), A(LU_IND2+2,L), A(LU_IND2+3,L)
+     &                  , A(LU_IND2+4,L))
                         CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5, 
      &                  v4sf_vec6)
                         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec7, C(
-     &                  LU_IND1+1,J), C(LU_IND1+2,J), C(LU_IND1+3,J)
-     &                  , C(LU_IND1+4,J))
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
                         CALL SIMD_ADDPS(v4sf_vec7, v4sf_vec7, 
      &                  v4sf_vec4)
                         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec7, C(
-     &                  LU_IND1+1,J), C(LU_IND1+2,J), C(LU_IND1+3,J)
-     &                  , C(LU_IND1+4,J))
-99994                   CONTINUE
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+99992                   CONTINUE
                      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec4, F_03, 
      &               F_02, F_01, F_00)
-                     I = MAX0(LU_NUB1, 0)+1
+                     I = MAX0(LU_NUB2, 0)+1
                   ENDIF
 80                CONTINUE                                              0135
 90             CONTINUE                                                 0136
@@ -3347,36 +3564,36 @@ c SIMD_COMMENT_0
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec25, ALPHA, ALPHA)
                DO 110 I = 1, M                                          0142
                   TEMP6 = ZERO                                          0143
-                  LU_NUB2 = K
-                  LU_IB2 = MOD(LU_NUB2, 4)
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
                   RED0(0) = 0.000000
-                  DO 99993 LU_IND2 = 0, LU_IB2-1
-                     F_14 = A(LU_IND2+1,I)*B(LU_IND2+1,J)
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
                      RED0(0) = RED0(0)+F_14                             0145
-99993                CONTINUE
+99991                CONTINUE
                   TEMP5 = RED0(0)+TEMP6
                   RED1(0) = 0.000000
                   RED1(1) = 0.000000
                   RED1(2) = 0.000000
                   RED1(3) = 0.000000
                   CALL SIMD_LOAD_V4SF(v4sf_vec17, RED1(0))
-                  DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec16, B(
-     &               LU_IND2+1,J), B(LU_IND2+2,J), B(LU_IND2+3,J), B(
-     &               LU_IND2+4,J))
+     &               LU_IND3+1,J), B(LU_IND3+2,J), B(LU_IND3+3,J), B(
+     &               LU_IND3+4,J))
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec15, A(
-     &               LU_IND2+1,I), A(LU_IND2+2,I), A(LU_IND2+3,I), A(
-     &               LU_IND2+4,I))
+     &               LU_IND3+1,I), A(LU_IND3+2,I), A(LU_IND3+3,I), A(
+     &               LU_IND3+4,I))
                      CALL SIMD_MULPS(v4sf_vec14, v4sf_vec15, 
      &               v4sf_vec16)
                      CALL SIMD_ADDPS(v4sf_vec17, v4sf_vec17, 
      &               v4sf_vec14)
-99992                CONTINUE
+99990                CONTINUE
                   CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec14, F_13, F_12
      &            , F_11, F_10)
                   CALL SIMD_SAVE_V4SF(v4sf_vec17, RED1(0))
                   TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
-                  L = MAX0(LU_NUB2, 0)+1
+                  L = MAX0(LU_NUB3, 0)+1
                   L_710 = BETA.EQ.ZERO
                   CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec26, TEMP4, 
      &            TEMP4)
@@ -3396,57 +3613,70 @@ c SIMD_COMMENT_0
 *
          DO 170 J = 1, N                                                0160
             IF (BETA.EQ.ZERO) THEN                                      0161
-               DO 130 I = 1, M                                          0162
-                  C(I,J) = ZERO                                         0163
-130               CONTINUE                                              0164
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
             ELSEIF (BETA.NE.ONE) THEN                                   0161
-               LU_NUB3 = M
-               LU_IB3 = MOD(LU_NUB3, 4)
-               DO 99991 LU_IND3 = 0, LU_IB3-1
-                  C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)                  0167
-99991             CONTINUE
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
                CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec28, BETA, BETA, 
      &         BETA, BETA)
-               DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND3+1
-     &            ,J), C(LU_IND3+2,J), C(LU_IND3+3,J), C(LU_IND3+4,J)
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
      &            )
                   CALL SIMD_MULPS(v4sf_vec27, v4sf_vec28, v4sf_vec27)
-                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND3+1
-     &            ,J), C(LU_IND3+2,J), C(LU_IND3+3,J), C(LU_IND3+4,J)
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
      &            )
-99990             CONTINUE
-               I = MAX0(LU_NUB3, 0)+1
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
             ENDIF
             DO 160 L = 1, K                                             0170
                IF (B(J,L).NE.ZERO) THEN                                 0171
                   TEMP3 = ALPHA*B(J,L)                                  0172
-                  LU_NUB4 = M
-                  LU_IB4 = MOD(LU_NUB4, 4)
-                  DO 99989 LU_IND4 = 0, LU_IB4-1
-                     F_44 = TEMP3*A(LU_IND4+1,L)
-                     C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_44               0174
-99989                CONTINUE
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
                   CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec32, TEMP3, 
      &            TEMP3, TEMP3, TEMP3)
-                  DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec33, A(
-     &               LU_IND4+1,L), A(LU_IND4+2,L), A(LU_IND4+3,L), A(
-     &               LU_IND4+4,L))
+     &               LU_IND6+1,L), A(LU_IND6+2,L), A(LU_IND6+3,L), A(
+     &               LU_IND6+4,L))
                      CALL SIMD_MULPS(v4sf_vec31, v4sf_vec32, 
      &               v4sf_vec33)
                      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec34, C(
-     &               LU_IND4+1,J), C(LU_IND4+2,J), C(LU_IND4+3,J), C(
-     &               LU_IND4+4,J))
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
                      CALL SIMD_ADDPS(v4sf_vec34, v4sf_vec34, 
      &               v4sf_vec31)
                      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec34, C(
-     &               LU_IND4+1,J), C(LU_IND4+2,J), C(LU_IND4+3,J), C(
-     &               LU_IND4+4,J))
-99988                CONTINUE
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+99984                CONTINUE
                   CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec31, F_43, F_42
      &            , F_41, F_40)
-                  I = MAX0(LU_NUB4, 0)+1
+                  I = MAX0(LU_NUB6, 0)+1
                ENDIF
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
@@ -3458,32 +3688,32 @@ c SIMD_COMMENT_0
             CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec52, ALPHA, ALPHA)
             DO 190 I = 1, M                                             0184
                TEMP2 = ZERO                                             0185
-               LU_NUB5 = K
-               LU_IB5 = MOD(LU_NUB5, 4)
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
                RED2(0) = 0.000000
-               DO 99987 LU_IND5 = 0, LU_IB5-1
-                  F_54 = A(LU_IND5+1,I)*B(J,LU_IND5+1)
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
                   RED2(0) = RED2(0)+F_54                                0187
-99987             CONTINUE
+99983             CONTINUE
                TEMP1 = RED2(0)+TEMP2
                RED3(0) = 0.000000
                RED3(1) = 0.000000
                RED3(2) = 0.000000
                RED3(3) = 0.000000
                CALL SIMD_LOAD_V4SF(v4sf_vec44, RED3(0))
-               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
-                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND5+1))
-                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND5+1
-     &            ,I), A(LU_IND5+2,I), A(LU_IND5+3,I), A(LU_IND5+4,I)
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND7+1))
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND7+1
+     &            ,I), A(LU_IND7+2,I), A(LU_IND7+3,I), A(LU_IND7+4,I)
      &            )
                   CALL SIMD_MULPS(v4sf_vec41, v4sf_vec42, v4sf_vec43)
                   CALL SIMD_ADDPS(v4sf_vec44, v4sf_vec44, v4sf_vec41)
-99986             CONTINUE
+99982             CONTINUE
                CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec41, F_53, F_52, 
      &         F_51, F_50)
                CALL SIMD_SAVE_V4SF(v4sf_vec44, RED3(0))
                TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
-               L = MAX0(LU_NUB5, 0)+1
+               L = MAX0(LU_NUB7, 0)+1
                L_810 = BETA.EQ.ZERO
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec53, TEMP0, TEMP0)
                CALL SIMD_MULPD(v2df_vec51, v2df_vec52, v2df_vec53)
@@ -3501,27 +3731,40 @@ c SIMD_COMMENT_0
 99998 CONTINUE
       IF (BETA.EQ.ZERO) THEN                                            0095
          DO 20 J = 1, N                                                 0096
-            DO 10 I = 1, M                                              0097
-               C(I,J) = ZERO                                            0098
-10             CONTINUE                                                 0099
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
 20          CONTINUE                                                    0100
       ELSE
          DO 40 J = 1, N                                                 0102
-            LU_NUB6 = M
-            LU_IB6 = MOD(LU_NUB6, 4)
-            DO 99985 LU_IND6 = 0, LU_IB6-1
-               C(LU_IND6+1,J) = BETA*C(LU_IND6+1,J)                     0104
-99985          CONTINUE
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
             CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec55, BETA, BETA, BETA
      &      , BETA)
-            DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
-               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND6+1,J)
-     &         , C(LU_IND6+2,J), C(LU_IND6+3,J), C(LU_IND6+4,J))
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
                CALL SIMD_MULPS(v4sf_vec54, v4sf_vec55, v4sf_vec54)
-               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND6+1,J)
-     &         , C(LU_IND6+2,J), C(LU_IND6+3,J), C(LU_IND6+4,J))
-99984          CONTINUE
-            I = MAX0(LU_NUB6, 0)+1
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
 40          CONTINUE                                                    0106
       ENDIF
       RETURN
@@ -3906,6 +4149,15 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   float red2[0 - 0 + 1];
   float red1[3 - 0 + 1];
   float red0[0 - 0 + 1];
+  int lu_ind9;
+  int lu_ib9;
+  int lu_nub9;
+  int lu_ind8;
+  int lu_ib8;
+  int lu_nub8;
+  int lu_ind7;
+  int lu_ib7;
+  int lu_nub7;
   int lu_ind6;
   int lu_ib6;
   int lu_nub6;
@@ -4093,45 +4345,56 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	    {
 	      if (beta == zero)
 		{
-		  for (i = 1; i <= m; i++)
+		  lu_nub0 = m;
+		  lu_ib0 = mod (lu_nub0, 4);
+		  for (lu_ind0 = 0; lu_ind0 <= lu_ib0 - 1; lu_ind0++)
 		    {
-		      c[j - 1][i - 1] = zero;
+		      c[j - 1][(lu_ind0 + 1) - 1] = zero;
 		      continue;
 		    }
+		  for (lu_ind0 = lu_ib0; lu_ind0 <= lu_nub0 - 1; lu_ind0 += 4)
+		    {
+		      c[j - 1][(lu_ind0 + 1) - 1] = zero;
+		      c[j - 1][(lu_ind0 + 2) - 1] = zero;
+		      c[j - 1][(lu_ind0 + 3) - 1] = zero;
+		      c[j - 1][(lu_ind0 + 4) - 1] = zero;
+		      continue;
+		    }
+		  i = (max0 (lu_nub0, 0) + 1);
 		}
 	      else
 		{
 		  if (beta != one)
 		    {
-		      lu_nub0 = m;
-		      lu_ib0 = mod (lu_nub0, 4);
-		      for (lu_ind0 = 0; lu_ind0 <= lu_ib0 - 1; lu_ind0++)
+		      lu_nub1 = m;
+		      lu_ib1 = mod (lu_nub1, 4);
+		      for (lu_ind1 = 0; lu_ind1 <= lu_ib1 - 1; lu_ind1++)
 			{
-			  c[j - 1][(lu_ind0 + 1) - 1] =
-			    (beta * c[j - 1][(lu_ind0 + 1) - 1]);
+			  c[j - 1][(lu_ind1 + 1) - 1] =
+			    (beta * c[j - 1][(lu_ind1 + 1) - 1]);
 			  continue;
 			}
 		      simd_load_generic_v4sf (v4sf_vec1, beta, beta, beta,
 					      beta);
-		      for (lu_ind0 = lu_ib0; lu_ind0 <= lu_nub0 - 1;
-			   lu_ind0 += 4)
+		      for (lu_ind1 = lu_ib1; lu_ind1 <= lu_nub1 - 1;
+			   lu_ind1 += 4)
 			{
 			  simd_load_generic_v4sf (v4sf_vec0,
-						  c[j - 1][(lu_ind0 + 1) - 1],
-						  c[j - 1][(lu_ind0 + 2) - 1],
-						  c[j - 1][(lu_ind0 + 3) - 1],
-						  c[j - 1][(lu_ind0 + 4) -
+						  c[j - 1][(lu_ind1 + 1) - 1],
+						  c[j - 1][(lu_ind1 + 2) - 1],
+						  c[j - 1][(lu_ind1 + 3) - 1],
+						  c[j - 1][(lu_ind1 + 4) -
 							   1]);
 			  simd_mulps (v4sf_vec0, v4sf_vec1, v4sf_vec0);
 			  simd_save_generic_v4sf (v4sf_vec0,
-						  c[j - 1][(lu_ind0 + 1) - 1],
-						  c[j - 1][(lu_ind0 + 2) - 1],
-						  c[j - 1][(lu_ind0 + 3) - 1],
-						  c[j - 1][(lu_ind0 + 4) -
+						  c[j - 1][(lu_ind1 + 1) - 1],
+						  c[j - 1][(lu_ind1 + 2) - 1],
+						  c[j - 1][(lu_ind1 + 3) - 1],
+						  c[j - 1][(lu_ind1 + 4) -
 							   1]);
 			  continue;
 			}
-		      i = (max0 (lu_nub0, 0) + 1);
+		      i = (max0 (lu_nub1, 0) + 1);
 		    }
 		}
 	      for (l = 1; l <= k; l++)
@@ -4139,45 +4402,45 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  if (b[j - 1][l - 1] != zero)
 		    {
 		      temp7 = (alpha * b[j - 1][l - 1]);
-		      lu_nub1 = m;
-		      lu_ib1 = mod (lu_nub1, 4);
-		      for (lu_ind1 = 0; lu_ind1 <= lu_ib1 - 1; lu_ind1++)
+		      lu_nub2 = m;
+		      lu_ib2 = mod (lu_nub2, 4);
+		      for (lu_ind2 = 0; lu_ind2 <= lu_ib2 - 1; lu_ind2++)
 			{
-			  f_04 = (temp7 * a[l - 1][(lu_ind1 + 1) - 1]);
-			  c[j - 1][(lu_ind1 + 1) - 1] =
-			    (c[j - 1][(lu_ind1 + 1) - 1] + f_04);
+			  f_04 = (temp7 * a[l - 1][(lu_ind2 + 1) - 1]);
+			  c[j - 1][(lu_ind2 + 1) - 1] =
+			    (c[j - 1][(lu_ind2 + 1) - 1] + f_04);
 			  continue;
 			}
 		      simd_load_generic_v4sf (v4sf_vec5, temp7, temp7, temp7,
 					      temp7);
-		      for (lu_ind1 = lu_ib1; lu_ind1 <= lu_nub1 - 1;
-			   lu_ind1 += 4)
+		      for (lu_ind2 = lu_ib2; lu_ind2 <= lu_nub2 - 1;
+			   lu_ind2 += 4)
 			{
 			  simd_load_generic_v4sf (v4sf_vec6,
-						  a[l - 1][(lu_ind1 + 1) - 1],
-						  a[l - 1][(lu_ind1 + 2) - 1],
-						  a[l - 1][(lu_ind1 + 3) - 1],
-						  a[l - 1][(lu_ind1 + 4) -
+						  a[l - 1][(lu_ind2 + 1) - 1],
+						  a[l - 1][(lu_ind2 + 2) - 1],
+						  a[l - 1][(lu_ind2 + 3) - 1],
+						  a[l - 1][(lu_ind2 + 4) -
 							   1]);
 			  simd_mulps (v4sf_vec4, v4sf_vec5, v4sf_vec6);
 			  simd_load_generic_v4sf (v4sf_vec7,
-						  c[j - 1][(lu_ind1 + 1) - 1],
-						  c[j - 1][(lu_ind1 + 2) - 1],
-						  c[j - 1][(lu_ind1 + 3) - 1],
-						  c[j - 1][(lu_ind1 + 4) -
+						  c[j - 1][(lu_ind2 + 1) - 1],
+						  c[j - 1][(lu_ind2 + 2) - 1],
+						  c[j - 1][(lu_ind2 + 3) - 1],
+						  c[j - 1][(lu_ind2 + 4) -
 							   1]);
 			  simd_addps (v4sf_vec7, v4sf_vec7, v4sf_vec4);
 			  simd_save_generic_v4sf (v4sf_vec7,
-						  c[j - 1][(lu_ind1 + 1) - 1],
-						  c[j - 1][(lu_ind1 + 2) - 1],
-						  c[j - 1][(lu_ind1 + 3) - 1],
-						  c[j - 1][(lu_ind1 + 4) -
+						  c[j - 1][(lu_ind2 + 1) - 1],
+						  c[j - 1][(lu_ind2 + 2) - 1],
+						  c[j - 1][(lu_ind2 + 3) - 1],
+						  c[j - 1][(lu_ind2 + 4) -
 							   1]);
 			  continue;
 			}
 		      simd_save_generic_v4sf (v4sf_vec4, f_03, f_02, f_01,
 					      f_00);
-		      i = (max0 (lu_nub1, 0) + 1);
+		      i = (max0 (lu_nub2, 0) + 1);
 		    }
 		  continue;
 		}
@@ -4192,14 +4455,14 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	      for (i = 1; i <= m; i++)
 		{
 		  temp6 = zero;
-		  lu_nub2 = k;
-		  lu_ib2 = mod (lu_nub2, 4);
+		  lu_nub3 = k;
+		  lu_ib3 = mod (lu_nub3, 4);
 		  red0[0] = 0.000000;
-		  for (lu_ind2 = 0; lu_ind2 <= lu_ib2 - 1; lu_ind2++)
+		  for (lu_ind3 = 0; lu_ind3 <= lu_ib3 - 1; lu_ind3++)
 		    {
 		      f_14 =
-			(a[i - 1][(lu_ind2 + 1) - 1] *
-			 b[j - 1][(lu_ind2 + 1) - 1]);
+			(a[i - 1][(lu_ind3 + 1) - 1] *
+			 b[j - 1][(lu_ind3 + 1) - 1]);
 		      red0[0] = (red0[0] + f_14);
 		      continue;
 		    }
@@ -4209,18 +4472,18 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  red1[2] = 0.000000;
 		  red1[3] = 0.000000;
 		  simd_load_v4sf (v4sf_vec17, red1[0]);
-		  for (lu_ind2 = lu_ib2; lu_ind2 <= lu_nub2 - 1; lu_ind2 += 4)
+		  for (lu_ind3 = lu_ib3; lu_ind3 <= lu_nub3 - 1; lu_ind3 += 4)
 		    {
 		      simd_load_generic_v4sf (v4sf_vec16,
-					      b[j - 1][(lu_ind2 + 1) - 1],
-					      b[j - 1][(lu_ind2 + 2) - 1],
-					      b[j - 1][(lu_ind2 + 3) - 1],
-					      b[j - 1][(lu_ind2 + 4) - 1]);
+					      b[j - 1][(lu_ind3 + 1) - 1],
+					      b[j - 1][(lu_ind3 + 2) - 1],
+					      b[j - 1][(lu_ind3 + 3) - 1],
+					      b[j - 1][(lu_ind3 + 4) - 1]);
 		      simd_load_generic_v4sf (v4sf_vec15,
-					      a[i - 1][(lu_ind2 + 1) - 1],
-					      a[i - 1][(lu_ind2 + 2) - 1],
-					      a[i - 1][(lu_ind2 + 3) - 1],
-					      a[i - 1][(lu_ind2 + 4) - 1]);
+					      a[i - 1][(lu_ind3 + 1) - 1],
+					      a[i - 1][(lu_ind3 + 2) - 1],
+					      a[i - 1][(lu_ind3 + 3) - 1],
+					      a[i - 1][(lu_ind3 + 4) - 1]);
 		      simd_mulps (v4sf_vec14, v4sf_vec15, v4sf_vec16);
 		      simd_addps (v4sf_vec17, v4sf_vec17, v4sf_vec14);
 		      continue;
@@ -4229,7 +4492,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  simd_save_v4sf (v4sf_vec17, red1[0]);
 		  temp4 =
 		    (red1[3] + (red1[2] + (red1[1] + (red1[0] + temp5))));
-		  l = (max0 (lu_nub2, 0) + 1);
+		  l = (max0 (lu_nub3, 0) + 1);
 		  l_710 = (beta == zero);
 		  simd_load_generic_v2df (v2df_vec26, temp4, temp4);
 		  simd_mulpd (v2df_vec24, v2df_vec25, v2df_vec26);
@@ -4255,45 +4518,56 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	    {
 	      if (beta == zero)
 		{
-		  for (i = 1; i <= m; i++)
+		  lu_nub4 = m;
+		  lu_ib4 = mod (lu_nub4, 4);
+		  for (lu_ind4 = 0; lu_ind4 <= lu_ib4 - 1; lu_ind4++)
 		    {
-		      c[j - 1][i - 1] = zero;
+		      c[j - 1][(lu_ind4 + 1) - 1] = zero;
 		      continue;
 		    }
+		  for (lu_ind4 = lu_ib4; lu_ind4 <= lu_nub4 - 1; lu_ind4 += 4)
+		    {
+		      c[j - 1][(lu_ind4 + 1) - 1] = zero;
+		      c[j - 1][(lu_ind4 + 2) - 1] = zero;
+		      c[j - 1][(lu_ind4 + 3) - 1] = zero;
+		      c[j - 1][(lu_ind4 + 4) - 1] = zero;
+		      continue;
+		    }
+		  i = (max0 (lu_nub4, 0) + 1);
 		}
 	      else
 		{
 		  if (beta != one)
 		    {
-		      lu_nub3 = m;
-		      lu_ib3 = mod (lu_nub3, 4);
-		      for (lu_ind3 = 0; lu_ind3 <= lu_ib3 - 1; lu_ind3++)
+		      lu_nub5 = m;
+		      lu_ib5 = mod (lu_nub5, 4);
+		      for (lu_ind5 = 0; lu_ind5 <= lu_ib5 - 1; lu_ind5++)
 			{
-			  c[j - 1][(lu_ind3 + 1) - 1] =
-			    (beta * c[j - 1][(lu_ind3 + 1) - 1]);
+			  c[j - 1][(lu_ind5 + 1) - 1] =
+			    (beta * c[j - 1][(lu_ind5 + 1) - 1]);
 			  continue;
 			}
 		      simd_load_generic_v4sf (v4sf_vec28, beta, beta, beta,
 					      beta);
-		      for (lu_ind3 = lu_ib3; lu_ind3 <= lu_nub3 - 1;
-			   lu_ind3 += 4)
+		      for (lu_ind5 = lu_ib5; lu_ind5 <= lu_nub5 - 1;
+			   lu_ind5 += 4)
 			{
 			  simd_load_generic_v4sf (v4sf_vec27,
-						  c[j - 1][(lu_ind3 + 1) - 1],
-						  c[j - 1][(lu_ind3 + 2) - 1],
-						  c[j - 1][(lu_ind3 + 3) - 1],
-						  c[j - 1][(lu_ind3 + 4) -
+						  c[j - 1][(lu_ind5 + 1) - 1],
+						  c[j - 1][(lu_ind5 + 2) - 1],
+						  c[j - 1][(lu_ind5 + 3) - 1],
+						  c[j - 1][(lu_ind5 + 4) -
 							   1]);
 			  simd_mulps (v4sf_vec27, v4sf_vec28, v4sf_vec27);
 			  simd_save_generic_v4sf (v4sf_vec27,
-						  c[j - 1][(lu_ind3 + 1) - 1],
-						  c[j - 1][(lu_ind3 + 2) - 1],
-						  c[j - 1][(lu_ind3 + 3) - 1],
-						  c[j - 1][(lu_ind3 + 4) -
+						  c[j - 1][(lu_ind5 + 1) - 1],
+						  c[j - 1][(lu_ind5 + 2) - 1],
+						  c[j - 1][(lu_ind5 + 3) - 1],
+						  c[j - 1][(lu_ind5 + 4) -
 							   1]);
 			  continue;
 			}
-		      i = (max0 (lu_nub3, 0) + 1);
+		      i = (max0 (lu_nub5, 0) + 1);
 		    }
 		}
 	      for (l = 1; l <= k; l++)
@@ -4301,45 +4575,45 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  if (b[l - 1][j - 1] != zero)
 		    {
 		      temp3 = (alpha * b[l - 1][j - 1]);
-		      lu_nub4 = m;
-		      lu_ib4 = mod (lu_nub4, 4);
-		      for (lu_ind4 = 0; lu_ind4 <= lu_ib4 - 1; lu_ind4++)
+		      lu_nub6 = m;
+		      lu_ib6 = mod (lu_nub6, 4);
+		      for (lu_ind6 = 0; lu_ind6 <= lu_ib6 - 1; lu_ind6++)
 			{
-			  f_44 = (temp3 * a[l - 1][(lu_ind4 + 1) - 1]);
-			  c[j - 1][(lu_ind4 + 1) - 1] =
-			    (c[j - 1][(lu_ind4 + 1) - 1] + f_44);
+			  f_44 = (temp3 * a[l - 1][(lu_ind6 + 1) - 1]);
+			  c[j - 1][(lu_ind6 + 1) - 1] =
+			    (c[j - 1][(lu_ind6 + 1) - 1] + f_44);
 			  continue;
 			}
 		      simd_load_generic_v4sf (v4sf_vec32, temp3, temp3, temp3,
 					      temp3);
-		      for (lu_ind4 = lu_ib4; lu_ind4 <= lu_nub4 - 1;
-			   lu_ind4 += 4)
+		      for (lu_ind6 = lu_ib6; lu_ind6 <= lu_nub6 - 1;
+			   lu_ind6 += 4)
 			{
 			  simd_load_generic_v4sf (v4sf_vec33,
-						  a[l - 1][(lu_ind4 + 1) - 1],
-						  a[l - 1][(lu_ind4 + 2) - 1],
-						  a[l - 1][(lu_ind4 + 3) - 1],
-						  a[l - 1][(lu_ind4 + 4) -
+						  a[l - 1][(lu_ind6 + 1) - 1],
+						  a[l - 1][(lu_ind6 + 2) - 1],
+						  a[l - 1][(lu_ind6 + 3) - 1],
+						  a[l - 1][(lu_ind6 + 4) -
 							   1]);
 			  simd_mulps (v4sf_vec31, v4sf_vec32, v4sf_vec33);
 			  simd_load_generic_v4sf (v4sf_vec34,
-						  c[j - 1][(lu_ind4 + 1) - 1],
-						  c[j - 1][(lu_ind4 + 2) - 1],
-						  c[j - 1][(lu_ind4 + 3) - 1],
-						  c[j - 1][(lu_ind4 + 4) -
+						  c[j - 1][(lu_ind6 + 1) - 1],
+						  c[j - 1][(lu_ind6 + 2) - 1],
+						  c[j - 1][(lu_ind6 + 3) - 1],
+						  c[j - 1][(lu_ind6 + 4) -
 							   1]);
 			  simd_addps (v4sf_vec34, v4sf_vec34, v4sf_vec31);
 			  simd_save_generic_v4sf (v4sf_vec34,
-						  c[j - 1][(lu_ind4 + 1) - 1],
-						  c[j - 1][(lu_ind4 + 2) - 1],
-						  c[j - 1][(lu_ind4 + 3) - 1],
-						  c[j - 1][(lu_ind4 + 4) -
+						  c[j - 1][(lu_ind6 + 1) - 1],
+						  c[j - 1][(lu_ind6 + 2) - 1],
+						  c[j - 1][(lu_ind6 + 3) - 1],
+						  c[j - 1][(lu_ind6 + 4) -
 							   1]);
 			  continue;
 			}
 		      simd_save_generic_v4sf (v4sf_vec31, f_43, f_42, f_41,
 					      f_40);
-		      i = (max0 (lu_nub4, 0) + 1);
+		      i = (max0 (lu_nub6, 0) + 1);
 		    }
 		  continue;
 		}
@@ -4354,14 +4628,14 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	      for (i = 1; i <= m; i++)
 		{
 		  temp2 = zero;
-		  lu_nub5 = k;
-		  lu_ib5 = mod (lu_nub5, 4);
+		  lu_nub7 = k;
+		  lu_ib7 = mod (lu_nub7, 4);
 		  red2[0] = 0.000000;
-		  for (lu_ind5 = 0; lu_ind5 <= lu_ib5 - 1; lu_ind5++)
+		  for (lu_ind7 = 0; lu_ind7 <= lu_ib7 - 1; lu_ind7++)
 		    {
 		      f_54 =
-			(a[i - 1][(lu_ind5 + 1) - 1] *
-			 b[(lu_ind5 + 1) - 1][j - 1]);
+			(a[i - 1][(lu_ind7 + 1) - 1] *
+			 b[(lu_ind7 + 1) - 1][j - 1]);
 		      red2[0] = (red2[0] + f_54);
 		      continue;
 		    }
@@ -4371,15 +4645,15 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  red3[2] = 0.000000;
 		  red3[3] = 0.000000;
 		  simd_load_v4sf (v4sf_vec44, red3[0]);
-		  for (lu_ind5 = lu_ib5; lu_ind5 <= lu_nub5 - 1; lu_ind5 += 4)
+		  for (lu_ind7 = lu_ib7; lu_ind7 <= lu_nub7 - 1; lu_ind7 += 4)
 		    {
 		      simd_load_v4sf (v4sf_vec43,
-				      b[(lu_ind5 + 1) - 1][j - 1]);
+				      b[(lu_ind7 + 1) - 1][j - 1]);
 		      simd_load_generic_v4sf (v4sf_vec42,
-					      a[i - 1][(lu_ind5 + 1) - 1],
-					      a[i - 1][(lu_ind5 + 2) - 1],
-					      a[i - 1][(lu_ind5 + 3) - 1],
-					      a[i - 1][(lu_ind5 + 4) - 1]);
+					      a[i - 1][(lu_ind7 + 1) - 1],
+					      a[i - 1][(lu_ind7 + 2) - 1],
+					      a[i - 1][(lu_ind7 + 3) - 1],
+					      a[i - 1][(lu_ind7 + 4) - 1]);
 		      simd_mulps (v4sf_vec41, v4sf_vec42, v4sf_vec43);
 		      simd_addps (v4sf_vec44, v4sf_vec44, v4sf_vec41);
 		      continue;
@@ -4388,7 +4662,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  simd_save_v4sf (v4sf_vec44, red3[0]);
 		  temp0 =
 		    (red3[3] + (red3[2] + (red3[1] + (red3[0] + temp1))));
-		  l = (max0 (lu_nub5, 0) + 1);
+		  l = (max0 (lu_nub7, 0) + 1);
 		  l_810 = (beta == zero);
 		  simd_load_generic_v2df (v2df_vec53, temp0, temp0);
 		  simd_mulpd (v2df_vec51, v2df_vec52, v2df_vec53);
@@ -4412,11 +4686,22 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       for (j = 1; j <= n; j++)
 	{
-	  for (i = 1; i <= m; i++)
+	  lu_nub8 = m;
+	  lu_ib8 = mod (lu_nub8, 4);
+	  for (lu_ind8 = 0; lu_ind8 <= lu_ib8 - 1; lu_ind8++)
 	    {
-	      c[j - 1][i - 1] = zero;
+	      c[j - 1][(lu_ind8 + 1) - 1] = zero;
 	      continue;
 	    }
+	  for (lu_ind8 = lu_ib8; lu_ind8 <= lu_nub8 - 1; lu_ind8 += 4)
+	    {
+	      c[j - 1][(lu_ind8 + 1) - 1] = zero;
+	      c[j - 1][(lu_ind8 + 2) - 1] = zero;
+	      c[j - 1][(lu_ind8 + 3) - 1] = zero;
+	      c[j - 1][(lu_ind8 + 4) - 1] = zero;
+	      continue;
+	    }
+	  i = (max0 (lu_nub8, 0) + 1);
 	  continue;
 	}
     }
@@ -4424,29 +4709,29 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       for (j = 1; j <= n; j++)
 	{
-	  lu_nub6 = m;
-	  lu_ib6 = mod (lu_nub6, 4);
-	  for (lu_ind6 = 0; lu_ind6 <= lu_ib6 - 1; lu_ind6++)
+	  lu_nub9 = m;
+	  lu_ib9 = mod (lu_nub9, 4);
+	  for (lu_ind9 = 0; lu_ind9 <= lu_ib9 - 1; lu_ind9++)
 	    {
-	      c[j - 1][(lu_ind6 + 1) - 1] =
-		(beta * c[j - 1][(lu_ind6 + 1) - 1]);
+	      c[j - 1][(lu_ind9 + 1) - 1] =
+		(beta * c[j - 1][(lu_ind9 + 1) - 1]);
 	      continue;
 	    }
 	  simd_load_generic_v4sf (v4sf_vec55, beta, beta, beta, beta);
-	  for (lu_ind6 = lu_ib6; lu_ind6 <= lu_nub6 - 1; lu_ind6 += 4)
+	  for (lu_ind9 = lu_ib9; lu_ind9 <= lu_nub9 - 1; lu_ind9 += 4)
 	    {
-	      simd_load_generic_v4sf (v4sf_vec54, c[j - 1][(lu_ind6 + 1) - 1],
-				      c[j - 1][(lu_ind6 + 2) - 1],
-				      c[j - 1][(lu_ind6 + 3) - 1],
-				      c[j - 1][(lu_ind6 + 4) - 1]);
+	      simd_load_generic_v4sf (v4sf_vec54, c[j - 1][(lu_ind9 + 1) - 1],
+				      c[j - 1][(lu_ind9 + 2) - 1],
+				      c[j - 1][(lu_ind9 + 3) - 1],
+				      c[j - 1][(lu_ind9 + 4) - 1]);
 	      simd_mulps (v4sf_vec54, v4sf_vec55, v4sf_vec54);
-	      simd_save_generic_v4sf (v4sf_vec54, c[j - 1][(lu_ind6 + 1) - 1],
-				      c[j - 1][(lu_ind6 + 2) - 1],
-				      c[j - 1][(lu_ind6 + 3) - 1],
-				      c[j - 1][(lu_ind6 + 4) - 1]);
+	      simd_save_generic_v4sf (v4sf_vec54, c[j - 1][(lu_ind9 + 1) - 1],
+				      c[j - 1][(lu_ind9 + 2) - 1],
+				      c[j - 1][(lu_ind9 + 3) - 1],
+				      c[j - 1][(lu_ind9 + 4) - 1]);
 	      continue;
 	    }
-	  i = (max0 (lu_nub6, 0) + 1);
+	  i = (max0 (lu_nub9, 0) + 1);
 	  continue;
 	}
     }
