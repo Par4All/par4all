@@ -1,0 +1,236 @@
+#! /usr/bin/env python3.1
+
+# -*- coding: utf-8 -*-
+
+"""
+Validation utility for Par4All
+
+Add object oriented organization above PIPS validation.
+
+Introduce the concept of validation class, not that far from CfEngine one.
+
+Ronan.Keryell@hpc-project.com
+"""
+
+import re, optparse, pickle, os, shutil, subprocess
+
+verbose = False
+
+class Validation:
+    "Abstract the PIPS validation concepts"
+
+    @staticmethod
+    def basic_name(s):
+        "Get the basic validation name from a file name found in a validation output"
+        # Remove the extension (.f, .tpips...)
+        (root, ext) = os.path.splitext(s)
+        return root
+
+
+    @staticmethod
+    def diff_filename(s):
+        "Get the file name containing the differences associated to a validation case"
+        # Replace all the "/" by a "_"
+        d = Validation.basic_name(s).replace('/', '_') + '.diff'
+        return os.path.join('RESULTS', d)
+
+
+    @staticmethod
+    def reference_directory_name(s):
+        """For a given validation name, return the reference output
+        validation directory name"""
+        # Remove the extension (.f, .tpips...) if any, add the directory
+        # extension:
+        return Validation.basic_name(s) + ".result"
+
+
+    @staticmethod
+    def reference_file_name(s):
+        """For a given validation name, return the reference output
+        validation file name"""
+        # This is the "test" file in the validation directory:
+        return os.path.join(Validation.reference_directory_name(s), "test")
+
+
+    @staticmethod
+    def output_file_name(s):
+        """For a given validation name, return the reference output
+        validation file name"""
+        # This is the "out" file in the validation directory:
+        return os.path.join(Validation.reference_directory_name(s), "out")
+
+
+    @staticmethod
+    def accept(s):
+        "Accept the output of this validation case as a reference"
+        shutil.move(Validation.output_file_name(s),
+                    Validation.reference_file_name(s))
+
+
+    @staticmethod
+    def git_add(s):
+        "Add with git the validation reference"
+        subprocess.call(["git", "add", Validation.reference_file_name(s)])
+
+
+class ValidationClass:
+    """Implement the concept of PIPS validation classes"""
+
+    # Match a changed information:
+    changed_re = re.compile("^> changed: (.*)$", re.MULTILINE)
+
+
+    def __init__(self, diff_string):
+        # The set of validation elements of this class:
+        self.elements = set()
+
+        # Find all the changes:
+        #print(diff_string)
+        for m in ValidationClass.changed_re.finditer(diff_string):
+            changed = m.group(1)
+            if verbose:
+                print(changed)
+            # Add the change to the current set:
+            self.elements.add(changed)
+
+
+    def __str__(self):
+        return str(self.elements)
+
+
+    def ordered_list(self):
+        "Return the ordered elements of this class"
+        l = list(self.elements)
+        l.sort()
+        return l
+
+
+    def show_diff_files(self):
+        "Display the differences associated to the elements"
+        for n in self.ordered_list():
+            if verbose:
+                print('Reading', n)
+            f = open(Validation.diff_filename(n))
+            # slurp all the file in a string:
+            content = f.read()
+            f.close()
+            print (content)
+
+
+    def accept(self):
+        "Accept the validation files of the class"
+        for e in self.elements:
+            Validation.accept(e)
+
+
+    def git_add(self):
+        "Add with git the validation reference of this class"
+        for e in self.elements:
+            Validation.git_add(e)
+
+
+    def git_commit(self, message):
+        "Commit with git the current validation with the message"
+        subprocess.call(["git", "commit", "-m", message])
+
+
+    def re_filter(self, res):
+        "Only keep the validation elements matching this regex string"
+        regex = re.compile(res)
+        to_keep = set()
+        for e in self.elements:
+            if regex.match(e):
+                # Remove an element with a matching name:
+                to_keep.add(e)
+        self.elements = to_keep
+
+
+    def re_filter_out(self, res):
+        "Remove the validation elements matching this regex string"
+        regex = re.compile(res)
+        to_remove = set()
+        for e in self.elements:
+            if regex.match(e):
+                # Remove an element with a matching name:
+                to_remove.add(e)
+        self.elements -= to_remove
+
+
+def validation_class_from_diff_file(file_name):
+    """Build a class from a changed-file"""
+
+    f = open(file_name)
+    # slurp all the file in a string:
+    content = f.read()
+    f.close()
+
+    c = ValidationClass(content)
+
+    #c.re_filter("^Control")
+
+    #print(c)
+
+    return c
+
+
+def main():
+    global verbose
+
+    parser = optparse.OptionParser(usage = "usage: %prog [options] [<files>]",
+                                   version = "$Id")
+
+    parser.add_option("-d",  "--diff-file", dest="diff_file_name",
+                      help = "Initialize a validation class from a new difference found in a validation diff file",
+                      metavar="FILE")
+
+    parser.add_option("-f",  "--filter", dest="filter",
+                      help = "Filter the current class by applying a regex on the file names",
+                      metavar="REGULAR-EXPRESSION")
+
+    parser.add_option("-s",  "--show",
+                      action = "store_true", dest = "show", default = False,
+                      help = "Show the output differences for the current class")
+
+    parser.add_option("-a",  "--accept",
+                      action = "store_true", dest = "accept", default = False,
+                      help = "Accept for the current validation class")
+
+    parser.add_option("-c",  "--commit", dest="message",
+                      help = "Commit in git the accepted modifications with the given message",
+                      metavar="MESSAGE")
+
+    group = optparse.OptionGroup(parser, "Debug options")
+
+    group.add_option("-v",  "--verbose",
+                     action = "store_true", dest = "verbose", default = False,
+                     help = "Run in verbose mode")
+
+    group.add_option("-q",  "--quiet",
+                     action = "store_false", dest = "verbose",
+                     help = "Run in quiet mode [default]")
+
+    parser.add_option_group(group)
+
+    (options, args) = parser.parse_args()
+
+    verbose = options.verbose
+
+    if options.diff_file_name:
+        vc = validation_class_from_diff_file(options.diff_file_name)
+
+    if options.filter:
+        vc.re_filter(options.filter)
+
+    if options.show:
+        vc.show_diff_files()
+
+    if options.accept:
+        vc.accept()
+
+    if options.message:
+        vc.git_add()
+        vc.git_commit(options.message)
+
+# If this programm is independent it is executed:
+if __name__ == "__main__":
+    main()

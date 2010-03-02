@@ -447,8 +447,32 @@ repository with less risks.
 
 
 Validation of \Apfa is done inside the \texttt{validation} directory with
-\texttt{make validate}.\marginpar{ Right now it is still mostly in the
-  \texttt{package/PIPS/validation} directory. RK}
+\texttt{make validate}.
+
+But right now it is still mostly done in the
+\texttt{package/PIPS/validation} directory.
+
+To ease interacting with the validation, the \verb|p4a_validate| is a
+script that adds the concept of validation classes to the \Apips
+validation. A class is a set of validation cases. For example we may have
+a class for \texttt{ALL} the validation, the \texttt{CHANGED},
+\texttt{FAILED}, \texttt{PASS}, \verb|PREVIOUS_ALL|,
+\verb|PREVIOUS_CHANGED|, \verb|PREVIOUS_FAILED|, \verb|PREVIOUS_PASS|,
+whatever user class and it is possible to make actions with them, combine
+them with operators (unions, intersections...).
+
+Some other classes can be defined directly in the validation directories
+with \texttt{.vclass} line-oriented regexp filter lines or
+generic Python code \texttt{.vclasspy}.
+
+\verb|p4a_validate| has a small script interface, but the power user
+should use the Python classes directly, for example from \texttt{iPython}
+to add interactivity.
+
+The first use in \Apfa is to select from \Apips only the test cases that
+pass the validation (futuristic cases are interesting for \Apips but from
+least interest for \Apfa...), defining smaller validation classes such as
+a \Amat (Minimal Acceptance Test).
 
 
 \section{Branches}
