@@ -9,7 +9,7 @@ Cumulated effects for function "jacobi"
 //               <must be read   >: nb
 int jacobi(int nb, int **a, int **b)
 {
-   int indice_i, indice_j;                                              /*0003*/
+   int indice_i, indice_j;                                              /*0008*/
 //               <may be read    >: a a[*] b b[*] b[*][*]
 //               <may be written >: a[*][*]
 //               <must be read   >: nb
@@ -29,10 +29,10 @@ int jacobi(int nb, int **a, int **b)
          
          
          
-         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0012*/
+         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0017*/
    
    
-   return 0;                                                            /*0017*/
+   return 0;                                                            /*0022*/
 }
 
 Cumulated effects for function "main"
@@ -130,7 +130,7 @@ Parallel code for function "jacobi"
 
 int jacobi(int nb, int **a, int **b)
 {
-   int indice_i, indice_j;                                              /*0003*/
+   int indice_i, indice_j;                                              /*0008*/
 
 
 #pragma omp parallel for private(indice_j)
@@ -142,10 +142,10 @@ int jacobi(int nb, int **a, int **b)
          
          
          
-         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0012*/
+         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0017*/
    
    
-   return 0;                                                            /*0017*/
+   return 0;                                                            /*0022*/
 }
 
 Parallel code for function "main"
