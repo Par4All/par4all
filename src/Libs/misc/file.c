@@ -40,7 +40,7 @@
 #include "misc.h"
 #include "properties.h"
 
-/* @return a file descriptor. 
+/* @return a file descriptor.
  */
 FILE * check_fopen(char * file, char * mode)
 {
@@ -63,7 +63,7 @@ FILE * safe_fopen(char *filename, char *what)
     return(f);
 }
 
-int 
+int
 safe_fclose(FILE * stream, char *filename)
 {
     if(fclose(stream) == EOF) {
@@ -80,7 +80,7 @@ safe_fclose(FILE * stream, char *filename)
     return(0);
 }
 
-int 
+int
 safe_fflush(FILE * stream, char *filename)
 {
     if(fflush(stream) == EOF) {
@@ -91,7 +91,7 @@ safe_fflush(FILE * stream, char *filename)
     return(0);
 }
 
-FILE * 
+FILE *
 safe_freopen(char *filename, char *what, FILE * stream)
 {
     FILE *f;
@@ -104,7 +104,7 @@ safe_freopen(char *filename, char *what, FILE * stream)
     return(f);
 }
 
-int 
+int
 safe_fseek(FILE * stream, long int offset, int wherefrom, char *filename)
 {
     if( fseek( stream, offset, wherefrom) != 0) {
@@ -115,7 +115,7 @@ safe_fseek(FILE * stream, long int offset, int wherefrom, char *filename)
     return(0);
 }
 
-long int 
+long int
 safe_ftell(FILE * stream, char *filename)
 {
     long int pt;
@@ -128,7 +128,7 @@ safe_ftell(FILE * stream, char *filename)
     return(pt);
 }
 
-void 
+void
 safe_rewind(FILE * stream, char *filename)
 {
     rewind( stream );
@@ -139,7 +139,7 @@ safe_rewind(FILE * stream, char *filename)
     }
 }
 
-int 
+int
 safe_fgetc(FILE * stream, char *filename)
 {
     int value;
@@ -151,7 +151,7 @@ safe_fgetc(FILE * stream, char *filename)
     return(value);
 }
 
-int 
+int
 safe_getc(FILE * stream, char *filename)
 {
     int value;
@@ -163,7 +163,7 @@ safe_getc(FILE * stream, char *filename)
     return(value);
 }
 
-char * 
+char *
 safe_fgets(s, n, stream, filename)
 char * s, * filename;
 int n;
@@ -259,24 +259,24 @@ safe_list_files_in_directory(
     bool (*file_name_predicate)(const char *) /* condition to list a file */)
 {
     DIR * dirp;
-    struct dirent * dp;   
+    struct dirent * dp;
     int index = 0;
 
     pips_assert("some dir", strcmp(dir, "") != 0);
 
     dirp = opendir(dir);
-    
-    if (dirp != NULL) 
+
+    if (dirp != NULL)
     {
 	regex_t re_compiled;
 
 	if (regcomp(&re_compiled, re, REG_ICASE))
 	    pips_user_error("regcomp() failed to compile \"%s\".\n", re);
-	
+
 	while((dp = readdir(dirp)) != NULL) {
 	    if (!regexec(&re_compiled, dp->d_name, 0, NULL, 0))
 	    {
-		char * full_file_name = 
+		char * full_file_name =
 		    strdup(concatenate(dir, "/", dp->d_name, NULL));
 		if (file_name_predicate(full_file_name))
 		    gen_array_dupaddto(files, index++, dp->d_name);
@@ -309,21 +309,21 @@ list_files_in_directory(
 {
     int return_code = safe_list_files_in_directory
 	(files, dir, re, file_name_predicate);
-    
+
     if (return_code == -1)
 	user_error("list_files_in_directory",
 		   "opendir() failed on directory \"%s\", %s.\n",
 		   dir,  strerror(errno));
 }
 
-bool 
+bool
 directory_exists_p(const char * name)
 {
     struct stat buf;
     return (stat(name, &buf) == 0) && S_ISDIR(buf.st_mode);
 }
 
-bool 
+bool
 file_exists_p(const char * name)
 {
     struct stat buf;
@@ -333,7 +333,7 @@ file_exists_p(const char * name)
 #define COLON ':'
 /* returns the allocated nth path in colon-separated path list.
  */
-static string
+string
 nth_path(const char * path_list, int n)
 {
     int len=0,i;
@@ -344,7 +344,7 @@ nth_path(const char * path_list, int n)
     while (path_list[len] && path_list[len]!=COLON) len++;
     result = (string) malloc(len+1);
     pips_assert("malloc ok", result);
-    for (i=0; i<len; i++) 
+    for (i=0; i<len; i++)
 	result[i]=path_list[i];
     result[len]='\0';
     return result;
@@ -357,7 +357,7 @@ relative_name_if_necessary(const char * name)
     else return strdup(concatenate("./", name, NULL));
 }
 
-/* returns an allocated string pointing to the file, possibly 
+/* returns an allocated string pointing to the file, possibly
  * with an additional path taken from colon-separated dir_path.
  * returns NULL if no file was found.
  */
@@ -376,12 +376,12 @@ find_file_in_directories(const char *file_name, const char *dir_path)
 
     /* looks for the file with an additionnal path ahead.
      */
-    while ((path=nth_path(dir_path, n++))) 
+    while ((path=nth_path(dir_path, n++)))
     {
-	char *name = strdup(concatenate(path, "/", file_name, NULL)), 
+	char *name = strdup(concatenate(path, "/", file_name, NULL)),
 	  *res=NULL;
 	free(path);
-	if (file_exists_p(name)) 
+	if (file_exists_p(name))
 	    res = relative_name_if_necessary(name);
 	free(name);
 	if (res) return res;
@@ -390,14 +390,14 @@ find_file_in_directories(const char *file_name, const char *dir_path)
     return (string) NULL;
 }
 
-bool 
+bool
 file_readable_p(char * name)
 {
     struct stat buf;
     return !stat(name, &buf) && (S_IRUSR & buf.st_mode);
 }
 
-bool 
+bool
 create_directory(char *name)
 {
     bool success = TRUE;
@@ -415,7 +415,7 @@ create_directory(char *name)
     return success;
 }
 
-bool 
+bool
 purge_directory(char *name)
 {
     bool success = TRUE;
@@ -463,7 +463,7 @@ get_cwd(void)
 /* returns the allocated line read, whatever its length.
  * returns NULL on EOF. also some asserts. FC 09/97.
  */
-char * 
+char *
 safe_readline(FILE * file)
 {
     int i=0, size = 20, c;
@@ -486,15 +486,15 @@ safe_readline(FILE * file)
 /* returns the file as an allocated string.
  * \n is dropped at the time.
  */
-char * 
+char *
 safe_readfile(FILE * file)
 {
     char * line, * buf=NULL;
     while ((line=safe_readline(file)))
     {
-	if (buf) 
+	if (buf)
 	{
-	    buf = (char*) 
+	    buf = (char*)
 		realloc(buf, sizeof(char)*(strlen(buf)+strlen(line)+2));
 	    strcat(buf, " ");
 	    strcat(buf, line);
@@ -505,19 +505,19 @@ safe_readfile(FILE * file)
     return buf;
 }
 
-void 
+void
 safe_cat(FILE * out, FILE * in)
 {
     int c;
-    while ((c=getc(in))!=EOF) 
+    while ((c=getc(in))!=EOF)
 	if (putc(c, out)==EOF)
 	    pips_internal_error("cat failed");
 }
 
-void 
+void
 safe_append(
-    FILE * out        /* where to output the file content */, 
-    char *file        /* the content of which is appended */, 
+    FILE * out        /* where to output the file content */,
+    char *file        /* the content of which is appended */,
     int margin        /* number of spaces for shifting */ ,
     bool but_comments /* do not shift F77 comment lines */)
 {
@@ -528,12 +528,12 @@ safe_append(
     {
 	if (first && (!but_comments || (c!='C' && c!='c' && c!='*' && c!='!')))
 	{
-	    for (i=0; i<margin; i++) 
+	    for (i=0; i<margin; i++)
 		if (putc(' ', out)==EOF)
 		    pips_internal_error("append failed");
 	    first = FALSE;
 	}
-	if (c=='\n') 
+	if (c=='\n')
 	    first = TRUE;
 	if (putc(c, out)==EOF)
 	    pips_internal_error("append failed");
@@ -571,7 +571,7 @@ pips_basename(char *fullpath, char *suffix)
     for (i=len; i>=0; i--) if (fullpath[i]=='/') break;
     /* fullpath[i+1:len] */
     result = (char*) malloc(sizeof(char)*(len-i+1));
-    for (i++, j=0; i<=len; i++, j++) 
+    for (i++, j=0; i<=len; i++, j++)
 	result[j] = fullpath[i];
     result[j++] = '\0';
     return result;
@@ -593,11 +593,11 @@ pips_dirname(char *fullpath)
 /* Delete the given file.
 
    Throw a pips_internal_error() if it fails.
-*/   
+*/
 void
 safe_unlink(char *file_name)
 {
-    if (unlink(file_name)) 
+    if (unlink(file_name))
     {
 	perror("[safe_unlink] ");
 	pips_internal_error("unlink %s failed\n", file_name);
@@ -675,7 +675,7 @@ safe_system_substitute(char * what)
  * the name is freshly allocated.
  *
  * FI: mkstemp() is being deprecated and it returns an integer, usable as
- * file descriptor, not a character string. 
+ * file descriptor, not a character string.
  *
  */
 char * safe_new_tmp_file(char * prefix)
