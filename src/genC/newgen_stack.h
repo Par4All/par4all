@@ -84,6 +84,7 @@ extern void stack_map(const stack, gen_iter_func_t);
 extern void stack_push(void*, stack);
 extern void *stack_pop(stack);
 extern void *stack_head(const stack);
+extern void *stack_nth(const stack, int);
 extern void *stack_replace(void*, stack);
 
 /*   stack iterator

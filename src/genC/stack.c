@@ -131,6 +131,7 @@ static void update_iterator_upward(stack_iterator i)
 
 stack_iterator stack_iterator_init(const stack s, int down)
 {
+  // hmmm... there should be a way of having a stacked stack_iterator
   stack_iterator i = (stack_iterator) malloc(sizeof(_stack_iterator));
 
   STACK_CHECK(s);
@@ -407,6 +408,21 @@ void *stack_head(const stack s)
   /*   HEAD
    */
   return x->items[(x->n_item)-1];
+}
+
+/* returns the nth item starting from the head and counting from 1, or NULL.
+ */
+void *stack_nth(const stack s, int nskip)
+{
+  void * value = NULL;
+  message_assert("positive nskip", nskip>0);
+  /* message_assert("deep enough stack", stack_size(s)>=nskip); */
+
+  stack_iterator i = stack_iterator_init(s, true);
+  while (nskip && stack_iterator_next_and_go(i, &value))
+    nskip--;
+  stack_iterator_end(&i);
+  return value;
 }
 
 /* REPLACEs the item on top of stack s, and returns the old item
