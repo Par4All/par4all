@@ -398,7 +398,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 	       }
 
 
-("/*"([^*]|("*"+[^/*]))*"*"+"/")|("//"("\\\n"|[^\n])*"\n"?)	{
+("/*"([^*]|("*"+[^/*]))*"*"+"/")|("//"("\\\n"|[^\n])*"\n"?)	{ //  */
                                 pips_debug(9,"Comment %s\n",yytext);
                                 C_line_number += character_occurences_in_string(yytext, '\n');
                                 update_C_comment(yytext);
@@ -434,9 +434,6 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                       CParserError("Ill. formated # pragma\n");
                                    }
                                 }
-                                /* Current comments cannot be related to
-                                   something happening after a pragma .*/
-                                discard_C_comment();
                         }
 
 \n                      {
