@@ -1,4 +1,4 @@
 int main()
 {
-   printf("%s\n", hello_world);                                         /*0004*/
+   printf("%s\n", hello_world);                                         /*0008*/
 }

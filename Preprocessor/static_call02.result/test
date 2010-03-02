@@ -38,7 +38,6 @@ int main()
 }
 
 
-
 extern int main();
 
 Printed file for all
@@ -78,7 +77,6 @@ int main()
    foo(3);
    bar(3);
 }
-
 
 
 extern int main();
