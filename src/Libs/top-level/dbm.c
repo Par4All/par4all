@@ -121,9 +121,15 @@ bool open_module(string name)
     return success;
 }
 
+/* Open the module of a workspace if there is only one.
+
+   @return true if all was OK or if nothing has been done (there is no
+   single module).
+*/
 bool open_module_if_unique()
 {
-    bool success;
+    /* Be optimistic: */
+    bool success = TRUE;
     gen_array_t a;
 
     pips_assert("some current workspace", db_get_current_workspace_name());
