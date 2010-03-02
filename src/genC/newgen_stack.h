@@ -91,7 +91,7 @@ extern void *stack_replace(void*, stack);
  *
  *   This way the stack type is fully encapsulated, but
  *   it is not very efficient, due to the many function calls.
- *   Consider gen_map first which has a very small overhead.
+ *   Consider "stack_map" first which has a very small overhead.
  */
 extern stack_iterator stack_iterator_init(const stack, bool); /* X-ward */
 extern bool stack_iterator_next_and_go(stack_iterator, void**);
