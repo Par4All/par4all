@@ -67,11 +67,11 @@ sub print_python_method {
 			my $arg = $short_prop."=".$pipsprops{uc($prop)};
 			if( $prop eq "loop_label" ) {
 				$has_loop_label=1;
-				$extraparamssetter="\t\tif self.ws:self.ws.set_property(".uc($prop)."=self.label)\n$extraparamssetter";
+				$extraparamssetter="\t\tif self._ws:self._ws.set_property(".uc($prop)."=self._label)\n$extraparamssetter";
 			}
 			else {
 				push @props, $arg;
-				$extraparamssetter="\t\tif self.ws:self.ws.set_property(".uc($prop)."=$short_prop)\n$extraparamssetter";
+				$extraparamssetter="\t\tif self._ws:self._ws.set_property(".uc($prop)."=$short_prop)\n$extraparamssetter";
 			}
 		}
 		if( scalar(@props) > 0 ) {
@@ -90,7 +90,7 @@ sub print_python_method {
     $name =~s/\s/_/g;
 	my $self = "self";
 	if(($has_loop_label == 1)  and ($generator eq "-loop") ) {
-		$self="self.module";
+		$self="self._module";
 	}
 	if( (($has_loop_label == 1)  and ($generator eq "-loop") ) or ( ($has_loop_label == 0) and (not $generator eq "-loop") ) ) {
     	print <<EOF
@@ -103,7 +103,7 @@ EOF
 
 		if( not $generator eq "-modules" ) {
     		print <<EOF
-		$self.ws._set_property($self._update_props("$name", props))
+		$self._ws._set_property($self._update_props("$name", props))
 		$self.apply("$name")
 
 EOF
@@ -111,8 +111,8 @@ EOF
 		}
 		else {
     		print <<EOF
-		for m in self.modules:
-			m.ws._set_property(m._update_props("$name", props))
+		for m in self._modules:
+			m._ws._set_property(m._update_props("$name", props))
 			m.apply("$name")
 
 EOF
@@ -129,7 +129,7 @@ foreach(@doc_strings)
 }
 
 if( $generator eq '-module' ) {
-	print "\tall_properties=frozenset([";
+	print "\t_all_properties=frozenset([";
 	foreach(keys %pipsprops) { print "\'$_\',"; }
 	print "\"it's a megablast\"])\n";
 }

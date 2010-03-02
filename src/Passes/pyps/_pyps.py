@@ -12,9 +12,12 @@ class loop:
 
 	def __init__(self,module,label):
 		"""[[internal]] bind a loop to its module"""
-		self.module=module
-		self.label=label
-		self.ws=module.ws
+		self._module=module
+		self._label=label
+		self._ws=module._ws
+
+	@property
+	def label(self): return self._label
 
 ### loop_methods /!\ do not touch this line /!\
 
@@ -25,39 +28,42 @@ class module:
 
 	def __init__(self,ws,name,source=""):
 		"""[[internal]] bind a module to its workspace"""
-		self.name=name
-		self.source=source
-		self.ws=ws
+		self._name=name
+		self._source=source
+		self._ws=ws
+
+	@property
+	def name(self): return self._name
 
 	def show(self,rc):
 		"""returns the name of resource rc"""
-		return split(pypips.show(upper(rc),self.name))[-1]
+		return split(pypips.show(upper(rc),self._name))[-1]
 
 	def apply(self,phase):
 		"""apply transformation phase"""
-		pypips.apply(upper(phase),self.name)
+		pypips.apply(upper(phase),self._name)
 
 	def display(self,rc="printed_file",With="PRINT_CODE"):
 		"""display a given resource rc"""
-		self.ws.activate(With)
-		return pypips.display(upper(rc),self.name)
+		self._ws.activate(With)
+		return pypips.display(upper(rc),self._name)
 
 	def code(self):
 		"""return module code as a string"""
 		self.apply("print_code")
 		rcfile=self.show("printed_file")
-		return file(self.ws.dir()+rcfile).readlines()
+		return file(self._ws.dir()+rcfile).readlines()
 
 	def loops(self, label=""):
 		"""return desired loop if label given, an iterator over loops otherwise"""
 		self.apply("print_loops")
 		rcfile=self.show("loops_file")
-		return map(lambda line:loop(self,line[0:-1]), file(self.ws.dir()+rcfile).readlines()) if not label else loop(label)
+		return map(lambda line:loop(self,line[0:-1]), file(self._ws.dir()+rcfile).readlines()) if not label else loop(label)
 
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the passe name to the property when needed """
 		for name,val in props.iteritems():
-			if upper(name) not in self.all_properties:
+			if upper(name) not in self._all_properties:
 				del props[upper(name)]
 				props[upper(passe+"_"+name)]=val
 				#print "warning, changing ", name, "into", passe+"_"+name
@@ -69,16 +75,16 @@ class modules:
 	"""high level representation of a module set,
 	its only purpose is to dispatch maethod calls on contained modules"""
 	def __init__(self,modules):
-		self.modules=modules
-		self.ws= modules[0].ws if modules else None
+		self._modules=modules
+		self._ws= modules[0]._ws if modules else None
 
 	def display(self,rc="printed_file", With="PRINT_CODE"):
 		"""display all modules"""
-		map(lambda m:m.display(rc, With),self.modules)
+		map(lambda m:m.display(rc, With),self._modules)
 
 	def loops(self):
 		""" return a list of all program loops"""
-		return reduce(lambda l1,l2:l1+l2.loops(), self.modules, [])
+		return reduce(lambda l1,l2:l1+l2.loops(), self._modules, [])
 
 ### modules_methods /!\ do not touch this line /!\
 
@@ -87,46 +93,45 @@ class workspace:
 		it represents a set of source files and provides methods
 		to manipulate them"""
 
-	def __build_module_list(self):
-		for m in self.info("modules"):
-			self.modules[m]=module(self,m,self.sources[0])
-
 	def __init__(self,sources2,name="",activates=[],verboseon=True):
 		"""init a workspace from a list of sources"""
 		if name == "":
 			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
-		self.sources=reduce(helper,sources2,[])
-		pypips.create(name, self.sources)
+		self._sources=reduce(helper,sources2,[])
+		pypips.create(name, self._sources)
 		if not verboseon:self.set_property(USER_LOG_P=False)
-		self.modules = {}
 		map(lambda x:pypips.activate(x),activates)
-		self.__build_module_list()
-		self.name=self.info("workspace")[0]
-		self.cleared=False
+		self._modules = {}
+		self._build_module_list()
+		self._name=self.info("workspace")[0]
+		self._cleared=False
+
+	@property
+	def name(self):return self._name
 
 	def __iter__(self):
 		"""provide an iterator on workspace's module, so that you can write
 			map(do_something,my_workspace)"""
-		return self.modules.itervalues()
+		return self._modules.itervalues()
 
 
 	def __getitem__(self,module_name):
 		"""retreive a module of the module from its name"""
-		self.__build_module_list()
-		return self.modules[module_name]
+		self._build_module_list()
+		return self._modules[module_name]
 
 	def __setitem__(self,i):
 		"""change a module of the module from its name"""
-		return self.modules[i]
+		return self._modules[i]
 
 	def info(self,topic):
 		return split(pypips.info(topic))
 
 	def dir(self):
 		"""retreive workspace datadir"""
-		return self.name+".database/"
+		return self._name+".database/"
 
 	def _set_property(self,props):
 		"""[internal] set properties based on the dictionnary props"""
@@ -170,7 +175,7 @@ class workspace:
 		command=[CC,CFLAGS]
 		if link:
 			if not outfile:
-				outfile=self.name
+				outfile=self._name
 			command+=otmpfiles
 			command+=[LDFLAGS]
 			command+=["-o", outfile]
@@ -189,18 +194,23 @@ class workspace:
 	def filter(self,matching=lambda x:True):
 		"""create an object containing current listing of all modules,
 		filterd by the filter argument"""
-		self.__build_module_list()
-		the_modules=[m for m in self.modules.values() if matching(m)]
+		self._build_module_list()
+		the_modules=[m for m in self._modules.values() if matching(m)]
 		return modules(the_modules)
 
 	all=property(filter)
 
 	def close(self):
 		"""force cleaning and deletion of the workspace"""
-		self.cleared=True
+		self._cleared=True
 		pypips.quit()
-		pypips.delete_workspace(self.name)
+		pypips.delete_workspace(self._name)
 
 	def __del__(self):
-		if not self.cleared:self.quit()
+		if not self._cleared:self.quit()
+
+	def _build_module_list(self):
+		for m in self.info("modules"):
+			self._modules[m]=module(self,m,self._sources[0])
+
 

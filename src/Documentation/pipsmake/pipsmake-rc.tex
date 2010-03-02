@@ -7628,8 +7628,14 @@ promoted from integer to real.
 
 \textbf{Warning}: this phase relies on an external (and unavailable) binary.
 To make it work, you can set \PipsPropRef{EOLE_OPTIMIZATION_STRATEGY} to \verb+"CSE"+ or \verb+"ICM"+
-This will only activate common subexpressions eliminationor invariant code motion.
+This will only activate common subexpressions elimination or invariant code motion.
 
+\end{PipsPass}
+
+\begin{PipsPass}{common_subexpression_elimination}
+Run common sub-expression elimination.
+One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} to skip expression of the form \lstinline|a+2| and
+\PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS} to prevent elimination of left hand side of assignment.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -7689,6 +7695,9 @@ Following property is used in sac to limit the subexpressions:
 When set to true, only subexpressions without "+constant" terms are eligible.
 \begin{PipsProp}{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT}
 COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS}
 COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \end{PipsProp}
 
