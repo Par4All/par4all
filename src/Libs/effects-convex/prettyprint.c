@@ -212,7 +212,7 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
 	FOREACH(EFFECT, reg, l_reg)
 	{
 	    entity ent = effect_entity(reg);
-	    if ( get_bool_property("PRETTYPRINT_SCALAR_REGIONS") ||
+	    if (  anywhere_effect_p(reg) || get_bool_property("PRETTYPRINT_SCALAR_REGIONS") ||
 		! entity_non_pointer_scalar_p(ent))
 	    {
 		if (loose_p && !one_p )
