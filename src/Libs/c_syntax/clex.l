@@ -414,7 +414,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 		 BEGIN(the_end_of_pragma);
 		 }
 
-^"#"[ \t]*{decdigit}+[^\n]*             {
+^"#"[ \t]*{decdigit}+[^\n]*"\n"             {
                                 // \n is not part of the pragma
                                 // The line count is correct but empty lines
                                 // seem to be inserted at the beginning of
