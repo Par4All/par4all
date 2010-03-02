@@ -29,10 +29,9 @@ SHR_d="@datadir@"
 
 function display_usage_and_exit () {
     cat <<EOF
-$0 [-h|--help] file.f ...
+$0 [-h|--help] file.c ...
   Create a workspace from C source files and parallelize
   them with OpenMP syntax.
-
 '$Id$'
 EOF
     exit
