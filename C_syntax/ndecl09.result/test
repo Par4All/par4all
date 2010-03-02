@@ -69,7 +69,7 @@ Parsed printed file
 void ndecl09(char *dir)
 {
    /* Well, x is a struct of name m: x declaration disappears... */
-   struct m {                                                           /*0008*/
+   struct m {                                                           /*0009*/
       int a;
       float b;
    } x, *px, foo(), (*bar)();

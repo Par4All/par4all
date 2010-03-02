@@ -51,7 +51,6 @@ End of declarations for module decl05!
 Source code for "decl05!"
 
 
-
 /* fonction ou s'est produite l'erreur */
 //char file [500]; /* fichier ou s'est produite l'erreur  */
 //char description [500]; /* texte personalise de l'erreur eventuellement */

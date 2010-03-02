@@ -69,10 +69,10 @@ Parsed printed file
 
 void ndecl03(char *dir)
 {
-   typedef int km, *pkm, akm[10];                                       /*0004*/
-   km i;                                                                /*0005*/
-   pkm pi;                                                              /*0006*/
-   akm ai;                                                              /*0007*/
+   typedef int km, *pkm, akm[10];                                       /*0006*/
+   km i;                                                                /*0007*/
+   pkm pi;                                                              /*0008*/
+   akm ai;                                                              /*0009*/
 
-   i = 1;                                                               /*0009*/
+   i = 1;                                                               /*0011*/
 }

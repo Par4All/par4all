@@ -67,14 +67,14 @@ Code for "main"
 
 int main()
 {
-   int i;                                                               /*0004*/
-   void foo(int);                                                       /*0005*/
-   void (*bar)();                                                       /*0006*/
-   typedef void (*barbar)();                                            /*0007*/
-   int fputs();                                                         /*0008*/
+   int i;                                                               /*0007*/
+   void foo(int);                                                       /*0008*/
+   void (*bar)();                                                       /*0009*/
+   typedef void (*barbar)();                                            /*0010*/
+   int fputs();                                                         /*0011*/
    //char line[256], *fgets() ;
-   foo(i);                                                              /*0010*/
-   (*bar)(i);                                                           /*0011*/
+   foo(i);                                                              /*0013*/
+   (*bar)(i);                                                           /*0014*/
 }
 
 Call graph for "main"

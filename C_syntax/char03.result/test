@@ -1,22 +1,22 @@
 int main()
 {
-   char *s;                                                             /*0003*/
-   wchar_t *ws;                                                         /*0004*/
-   unsigned char c = '\023';                                            /*0005*/
-   wchar_t wc = '\076';                                                 /*0006*/
-   c = '\0';                                                            /*0007*/
-   c = '\01';                                                           /*0008*/
-   c = '\xc';                                                           /*0009*/
-   c = '\xef';                                                          /*0010*/
-   wc = '\xde';                                                         /*0011*/
-   wc = '\xdef';                                                        /*0012*/
-   wc = '\xabcdef01';                                                   /*0013*/
-   wc = '\U0001babe';                                                   /*0014*/
-   wc = '\ubabe';                                                       /*0015*/
+   char *s;                                                             /*0005*/
+   wchar_t *ws;                                                         /*0006*/
+   unsigned char c = '\023';                                            /*0007*/
+   wchar_t wc = '\076';                                                 /*0008*/
+   c = '\0';                                                            /*0009*/
+   c = '\01';                                                           /*0010*/
+   c = '\xc';                                                           /*0011*/
+   c = '\xef';                                                          /*0012*/
+   wc = '\xde';                                                         /*0013*/
+   wc = '\xdef';                                                        /*0014*/
+   wc = '\xabcdef01';                                                   /*0015*/
+   wc = '\U0001babe';                                                   /*0016*/
+   wc = '\ubabe';                                                       /*0017*/
 
-   s = "\023\076\0\01\xc\xef\xde";                                      /*0017*/
+   s = "\023\076\0\01\xc\xef\xde";                                      /*0019*/
 
-   ws = "\023\076\0\01\xc\xef\xde\xdef\xabcdef01\U0001babe\ubabe";      /*0019*/
+   ws = "\023\076\0\01\xc\xef\xde\xdef\xabcdef01\U0001babe\ubabe";      /*0021*/
 
-   return 0;                                                            /*0021*/
+   return 0;                                                            /*0023*/
 }

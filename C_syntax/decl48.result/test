@@ -59,12 +59,12 @@ Code
 static void flat_color_z_triangle()
 {
    {
-      typedef struct {                                                  /*0007*/
+      typedef struct {                                                  /*0009*/
          int v0;
       } EdgeT;
 
-      EdgeT eMaj;                                                       /*0009*/
+      EdgeT eMaj;                                                       /*0011*/
 
-      eMaj.v0 = 1;                                                      /*0011*/
+      eMaj.v0 = 1;                                                      /*0013*/
    }
 }

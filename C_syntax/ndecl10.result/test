@@ -67,7 +67,7 @@ Parsed printed file
 void ndecl10(char *dir)
 {
    /* Well, x is a union of name m: x declaration disappears... */
-   union m {                                                            /*0008*/
+   union m {                                                            /*0009*/
       int a;
       float b;
    } x, *px, foo();

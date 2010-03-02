@@ -9,7 +9,6 @@ Unsplit define
  * file for define.c
  */
 
-
 extern int main();
 int main()
 {

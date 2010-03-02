@@ -64,11 +64,11 @@ Parsed printed file
 void ndecl01(char *dir)
 {
    /* One variable declared alone */
-   int i;                                                               /*0005*/
+   int i;                                                               /*0007*/
    /* Two variables declared together */
-   int j, k;                                                            /*0007*/
+   int j, k;                                                            /*0009*/
    /* A C continue statement */
-   ;                                                                    /*0009*/
+   ;                                                                    /*0011*/
    /* An assignment*/
-   i = 1;                                                               /*0011*/
+   i = 1;                                                               /*0013*/
 }

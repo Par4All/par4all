@@ -73,14 +73,14 @@ Parsed printed file
 
 int main()
 {
-   typedef struct {                                                     /*0004*/
+   typedef struct {                                                     /*0003*/
       int left;
       int right;
    } TREE, *TREEPTR;
-   struct {                                                             /*0005*/
+   struct {                                                             /*0004*/
       int left;
       int right;
    } tree, *treeptr;
 
-   TREE t;                                                              /*0007*/
+   TREE t;                                                              /*0006*/
 }

@@ -104,9 +104,9 @@ Code for "decl46"
 
 void decl46(double a)
 {
-   double x;                                                            /*0004*/
+   double x;                                                            /*0010*/
 
-   x = sqrt(a);                                                         /*0006*/
+   x = sqrt(a);                                                         /*0012*/
 }
 
 Call graph for "decl46"
