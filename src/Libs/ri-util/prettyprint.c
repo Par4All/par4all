@@ -618,7 +618,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
   else if (ENTITY_ISOC99_VFSCANF_P(f))
     pc = CHAIN_SWORD(pc, ISOC99_VFSCANF_USER_FUNCTION_NAME);
   else if (ENTITY_ISOC99_VSCANF_P(f))
-    pc = CHAIN_SWORD(pc, ISOC99_VFSCANF_USER_FUNCTION_NAME);
+    pc = CHAIN_SWORD(pc, ISOC99_VSCANF_USER_FUNCTION_NAME);
   else if (ENTITY_ISOC99_VSSCANF_P(f))
     pc = CHAIN_SWORD(pc, ISOC99_VSSCANF_USER_FUNCTION_NAME);
 
