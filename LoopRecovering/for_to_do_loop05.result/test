@@ -1,37 +1,37 @@
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int ki;                                                              /*0006*/
-   int kj;                                                              /*0007*/
+   int i;                                                               /*0003*/
+   int j;                                                               /*0004*/
+   int ki;                                                              /*0005*/
+   int kj;                                                              /*0006*/
 
-   for (i = 0;i<isi;i++)                                                /*0009*/
-      for (j = 0;j<isj;j++)                                             /*0010*/
-         new_image[i][j] = image[i][j];                                 /*0011*/
+   for (i = 0;i<isi;i++)                                                /*0008*/
+      for (j = 0;j<isj;j++)                                             /*0009*/
+         new_image[i][j] = image[i][j];                                 /*0010*/
 }
 
 After for to do loop conversion
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int ki;                                                              /*0006*/
-   int kj;                                                              /*0007*/
+   int i;                                                               /*0003*/
+   int j;                                                               /*0004*/
+   int ki;                                                              /*0005*/
+   int kj;                                                              /*0006*/
 
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
-         new_image[i][j] = image[i][j];                                 /*0011*/
+         new_image[i][j] = image[i][j];                                 /*0010*/
 }
 
 Proper effects for "convol"
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int ki;                                                              /*0006*/
-   int kj;                                                              /*0007*/
+   int i;                                                               /*0003*/
+   int j;                                                               /*0004*/
+   int ki;                                                              /*0005*/
+   int kj;                                                              /*0006*/
 //               <must be read   >: isi
 //               <must be written>: i
 
@@ -41,7 +41,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
       for(j = 0; j <= isj-1; j += 1)
 //               <must be read   >: i image[i][j] isi isj j
 //               <must be written>: new_image[i][j]
-         new_image[i][j] = image[i][j];                                 /*0011*/
+         new_image[i][j] = image[i][j];                                 /*0010*/
 }
 
 Cumulated effects for "convol"
@@ -51,10 +51,10 @@ Cumulated effects for "convol"
 //               <must be read   >: isi isj ksi ksj
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int ki;                                                              /*0006*/
-   int kj;                                                              /*0007*/
+   int i;                                                               /*0003*/
+   int j;                                                               /*0004*/
+   int ki;                                                              /*0005*/
+   int kj;                                                              /*0006*/
 //               <may be read    >: i image[*][*] isj j
 //               <may be written >: j new_image[*][*]
 //               <must be read   >: isi
@@ -69,7 +69,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 //               <may be read    >: image[*][*]
 //               <may be written >: new_image[*][*]
 //               <must be read   >: i isi isj j
-         new_image[i][j] = image[i][j];                                 /*0011*/
+         new_image[i][j] = image[i][j];                                 /*0010*/
 }
 
 Transformers for "convol"
@@ -82,19 +82,19 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
 //  T() {}
 
-   int i;                                                               /*0004*/
+   int i;                                                               /*0003*/
 
 //  T() {}
 
-   int j;                                                               /*0005*/
+   int j;                                                               /*0004*/
 
 //  T() {}
 
-   int ki;                                                              /*0006*/
+   int ki;                                                              /*0005*/
 
 //  T() {}
 
-   int kj;                                                              /*0007*/
+   int kj;                                                              /*0006*/
 
 //  T(i,j) {0<=i}
 
@@ -107,7 +107,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
 //  T() {0<=i, i+1<=isi, j+1<=isj, 0<=j}
 
-         new_image[i][j] = image[i][j];                                 /*0011*/
+         new_image[i][j] = image[i][j];                                 /*0010*/
 }
 
 Preconditions for "convol"
@@ -120,19 +120,19 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
 //  P() {}
 
-   int i;                                                               /*0004*/
+   int i;                                                               /*0003*/
 
 //  P() {}
 
-   int j;                                                               /*0005*/
+   int j;                                                               /*0004*/
 
 //  P() {}
 
-   int ki;                                                              /*0006*/
+   int ki;                                                              /*0005*/
 
 //  P() {}
 
-   int kj;                                                              /*0007*/
+   int kj;                                                              /*0006*/
 
 //  P() {}
 
@@ -145,19 +145,19 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
 //  P(i,j) {0<=i, i+1<=isi, j+1<=isj, 0<=j}
 
-         new_image[i][j] = image[i][j];                                 /*0011*/
+         new_image[i][j] = image[i][j];                                 /*0010*/
 }
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int ki;                                                              /*0006*/
-   int kj;                                                              /*0007*/
+   int i;                                                               /*0003*/
+   int j;                                                               /*0004*/
+   int ki;                                                              /*0005*/
+   int kj;                                                              /*0006*/
 
 
 #pragma omp parallel for 
    for(i = 0; i <= isi-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= isj-1; j += 1)
-         new_image[i][j] = image[i][j];                                 /*0011*/
+         new_image[i][j] = image[i][j];                                 /*0010*/
 }
