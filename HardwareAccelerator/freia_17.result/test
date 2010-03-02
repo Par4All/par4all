@@ -9,7 +9,7 @@ freia_status freia_17(freia_data2d *o, freia_data2d *i)
    
    
    
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128);      /*0011*/
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128);      /*0012*/
    
    // useless copies
    // t0 = i
@@ -19,22 +19,22 @@ freia_status freia_17(freia_data2d *o, freia_data2d *i)
    // t3 = t1
    // t4 = t0
    // t5 = o
-   freia_aipo_copy(t0, i);                                              /*0021*/
-   freia_aipo_copy(t1, t0);                                             /*0022*/
-   freia_aipo_copy(t2, t1);                                             /*0023*/
-   freia_aipo_copy(o, t2);                                              /*0024*/
-   freia_aipo_copy(t3, t1);                                             /*0025*/
-   freia_aipo_copy(t4, t0);                                             /*0026*/
-   freia_aipo_copy(t5, o);                                              /*0027*/
+   freia_aipo_copy(t0, i);                                              /*0022*/
+   freia_aipo_copy(t1, t0);                                             /*0023*/
+   freia_aipo_copy(t2, t1);                                             /*0024*/
+   freia_aipo_copy(o, t2);                                              /*0025*/
+   freia_aipo_copy(t3, t1);                                             /*0026*/
+   freia_aipo_copy(t4, t0);                                             /*0027*/
+   freia_aipo_copy(t5, o);                                              /*0028*/
 
-   freia_common_destruct_data(t0);                                      /*0029*/
-   freia_common_destruct_data(t1);                                      /*0030*/
-   freia_common_destruct_data(t2);                                      /*0031*/
-   freia_common_destruct_data(t3);                                      /*0032*/
-   freia_common_destruct_data(t4);                                      /*0033*/
-   freia_common_destruct_data(t5);                                      /*0034*/
+   freia_common_destruct_data(t0);                                      /*0030*/
+   freia_common_destruct_data(t1);                                      /*0031*/
+   freia_common_destruct_data(t2);                                      /*0032*/
+   freia_common_destruct_data(t3);                                      /*0033*/
+   freia_common_destruct_data(t4);                                      /*0034*/
+   freia_common_destruct_data(t5);                                      /*0035*/
 
-   return FREIA_OK;                                                     /*0036*/
+   return FREIA_OK;                                                     /*0037*/
 }
 
 ! graphs
@@ -51,24 +51,24 @@ digraph "dag_0" {
   "t5" [shape=circle];
 
   // computation vertices
+  "28 =" [shape=circle];
+  "28 =" -> "t5";
   "27 =" [shape=circle];
-  "27 =" -> "t5";
+  "27 =" -> "t4";
   "26 =" [shape=circle];
-  "26 =" -> "t4";
+  "26 =" -> "t3";
   "25 =" [shape=circle];
-  "25 =" -> "t3";
+  "25 =" -> "28 =" [label="o"];
+  "25 =" -> "o";
   "24 =" [shape=circle];
-  "24 =" -> "27 =" [label="o"];
-  "24 =" -> "o";
+  "24 =" -> "25 =" [label="t2"];
   "23 =" [shape=circle];
-  "23 =" -> "24 =" [label="t2"];
+  "23 =" -> "26 =" [label="t1"];
+  "23 =" -> "24 =" [label="t1"];
   "22 =" [shape=circle];
-  "22 =" -> "25 =" [label="t1"];
-  "22 =" -> "23 =" [label="t1"];
-  "21 =" [shape=circle];
-  "21 =" -> "26 =" [label="t0"];
-  "21 =" -> "22 =" [label="t0"];
-  "i" -> "21 =";
+  "22 =" -> "27 =" [label="t0"];
+  "22 =" -> "23 =" [label="t0"];
+  "i" -> "22 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_17" in dot format
 digraph "dag_cleaned_0" {
@@ -96,7 +96,7 @@ freia_status freia_17(freia_data2d *o, freia_data2d *i)
    
    
    
-   freia_data2d *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128);         /*0011*/
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128);         /*0012*/
    
    // useless copies
    // t0 = i
@@ -111,9 +111,9 @@ freia_status freia_17(freia_data2d *o, freia_data2d *i)
    freia_aipo_copy(t4, i);
    freia_aipo_copy(t5, i);
 
-   freia_common_destruct_data(t3);                                      /*0032*/
-   freia_common_destruct_data(t4);                                      /*0033*/
-   freia_common_destruct_data(t5);                                      /*0034*/
+   freia_common_destruct_data(t3);                                      /*0033*/
+   freia_common_destruct_data(t4);                                      /*0034*/
+   freia_common_destruct_data(t5);                                      /*0035*/
 
-   return FREIA_OK;                                                     /*0036*/
+   return FREIA_OK;                                                     /*0037*/
 }

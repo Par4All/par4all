@@ -222,9 +222,9 @@ freia_status freia_common_close_output(freia_dataio *n)
 }
 freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 {
-   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0004*/
-   img->stuff = (int32_t) x&y&z;                                        /*0005*/
-   return img;                                                          /*0006*/
+   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0009*/
+   img->stuff = (int32_t) x&y&z;                                        /*0010*/
+   return img;                                                          /*0011*/
 }
 freia_status freia_common_destruct_data(freia_data2d *img)
 {
@@ -652,12 +652,12 @@ freia_status freia_common_close_output(freia_dataio *n)
 //               <must be read   >: x y z
 freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 {
-   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0004*/
+   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0009*/
 //               <must be read   >: img x y z
 //               <must be written>: img[0][4]
-   img->stuff = (int32_t) x&y&z;                                        /*0005*/
+   img->stuff = (int32_t) x&y&z;                                        /*0010*/
 //               <must be read   >: img
-   return img;                                                          /*0006*/
+   return img;                                                          /*0011*/
 }
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ img
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
