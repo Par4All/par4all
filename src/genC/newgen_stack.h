@@ -93,10 +93,10 @@ extern void *stack_replace(void*, stack);
  *   it is not very efficient, due to the many function calls.
  *   Consider gen_map first which has a very small overhead.
  */
-extern stack_iterator stack_iterator_init(const stack, int); /* X-ward */
-extern int stack_iterator_next_and_go(stack_iterator, void**);
+extern stack_iterator stack_iterator_init(const stack, bool); /* X-ward */
+extern bool stack_iterator_next_and_go(stack_iterator, void**);
 extern void stack_iterator_end(stack_iterator*);
-extern int stack_iterator_end_p(stack_iterator); /* not needed */
+extern bool stack_iterator_end_p(stack_iterator); /* not needed */
 
 /* applies _code on the items of _stack downward , with _item of _itemtype.
  */
@@ -113,7 +113,7 @@ extern int stack_iterator_end_p(stack_iterator); /* not needed */
   }
 
 #define STACK_MAP(_item, _itemtype, _code, _stack)	\
-  STACK_MAP_X(_item, _itemtype, _code, _stack, 1)
+  STACK_MAP_X(_item, _itemtype, _code, _stack, true)
 #endif
 
 /*  That is all

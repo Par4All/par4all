@@ -79,7 +79,7 @@ typedef struct __stack_head
 typedef struct __stack_iterator
 {
   _stack_ptr bucket; /* current bucket */
-  int downward;      /* true if downward iterations */
+  bool downward;      /* true if downward iterations */
   size_t index;      /* current index in bucket */
   _stack_ptr list;   /* all buckets */
 }
@@ -129,11 +129,9 @@ static void update_iterator_upward(stack_iterator i)
     i->index++; UPDATE_ITERATOR_UPWARD(i);	\
   }
 
-stack_iterator stack_iterator_init(const stack s, int down)
+static void stack_iterator_internal_init
+  (const stack s, int down, stack_iterator i)
 {
-  // hmmm... there should be a way of having a stacked stack_iterator
-  stack_iterator i = (stack_iterator) malloc(sizeof(_stack_iterator));
-
   STACK_CHECK(s);
 
   if ((s->size)==0)
@@ -151,25 +149,31 @@ stack_iterator stack_iterator_init(const stack s, int down)
       update_iterator_upward(i); /* NOT the define! */
     }
   }
+}
+
+stack_iterator stack_iterator_init(const stack s, bool down)
+{
+  stack_iterator i = (stack_iterator) malloc(sizeof(_stack_iterator));
+  stack_iterator_internal_init(s, down, i);
   return i;
 }
 
-int stack_iterator_next_and_go(stack_iterator i, void ** pitem)
+bool stack_iterator_next_and_go(stack_iterator i, void ** pitem)
 {
   if (STACK_ITERATOR_END_P(i))
   {
     *pitem = (void*) NULL;
-    return 0;
+    return false;
   }
   else
   {
     *pitem = (i->bucket->items)[i->index];
     NEXT_ITERATION(i);
-    return 1;
+    return true;
   }
 }
 
-int stack_iterator_end_p(stack_iterator i)
+bool stack_iterator_end_p(stack_iterator i)
 {
   return STACK_ITERATOR_END_P(i);
 }
@@ -415,13 +419,12 @@ void *stack_head(const stack s)
 void *stack_nth(const stack s, int nskip)
 {
   void * value = NULL;
-  message_assert("positive nskip", nskip>0);
-  /* message_assert("deep enough stack", stack_size(s)>=nskip); */
-
-  stack_iterator i = stack_iterator_init(s, true);
-  while (nskip && stack_iterator_next_and_go(i, &value))
+  message_assert("positive nskip", nskip>=0);
+  // message_assert("deep enough stack", stack_size(s)>=nskip);
+  _stack_iterator si;
+  stack_iterator_internal_init(s, true, &si);
+  while (nskip && stack_iterator_next_and_go(&si, &value))
     nskip--;
-  stack_iterator_end(&i);
   return value;
 }
 
