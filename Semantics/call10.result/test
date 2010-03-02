@@ -134,17 +134,10 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
-INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
-PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call10] (NormalizeExpression) expression is already normalized
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
-TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
 TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call10" ignored.
-PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
-PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
-INTERPROCEDURAL_SUMMARY_PRECONDITION[call10] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call10] (NormalizeExpression) expression is already normalized
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
-PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call10!] (ordinary_summary_precondition) empty precondition to call10! because not in call tree from main.

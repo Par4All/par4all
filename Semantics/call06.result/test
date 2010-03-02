@@ -96,17 +96,10 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call06] (add_or_kill_equivalenced_variables) storage return
-INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
-PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call06] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_TRANSFORMERS[call06] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
-TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
-PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
-INTERPROCEDURAL_SUMMARY_PRECONDITION[call06] (add_or_kill_equivalenced_variables) storage return
 PRECONDITIONS_INTER_FULL[call06] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call06] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
-PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call06!] (ordinary_summary_precondition) empty precondition to call06! because not in call tree from main.
