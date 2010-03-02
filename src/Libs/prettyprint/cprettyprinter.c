@@ -1339,7 +1339,7 @@ static string c_statement(statement s, bool breakable)
 
 static string c_code_string(entity module, statement stat)
 {
-    string before_head, head, decls, body, result;
+    string head, decls, body, result;
 
     /* What about declarations that are external a module scope ?
        Consider a source file as a module entity, put all declarations in it
@@ -1363,7 +1363,6 @@ static string c_code_string(entity module, statement stat)
     result = concatenate(/*before_head,*/ head, OPENBRACE, NL,
             decls, NL, body, CLOSEBRACE, NL, NULL);
 
-    free(before_head);
     free(head);
     free(decls);
     free(body);
