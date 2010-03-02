@@ -194,7 +194,6 @@ init_kernel:   init_kernel(imagein_re);
 
    return 0;
 }
-
 float imagein_re[64][64];
 float imagein_im[64][64];
 extern int main(int argc, char *argv[]);
@@ -252,7 +251,6 @@ init_kernel:   init_kernel(imagein_re);
 
    return 0;
 }
-
 float imagein_re[64][64];
 float imagein_im[64][64];
 extern int main(int argc, char *argv[]);

@@ -1,56 +1,56 @@
 Try to restructure the code for more precision:
 int main(int argc, char *argv[])
 {
-   float b[N], c[N], a;                                                 /*0003*/
-   int i;                                                               /*0004*/
+   float b[N], c[N], a;                                                 /*0006*/
+   int i;                                                               /*0007*/
 
-   a = 0;                                                               /*0006*/
-
-init:
-   for(i = 0; i <= 999999; i += 1) {
-      b[i] = i;                                                         /*0010*/
-      c[i] = i+1;                                                       /*0011*/
-   }
-compute:
-   for(i = 0; i <= 999999; i += 1)
-      a = a+b[i]*c[i];                                                  /*0015*/
-
-   printf("Result = %f\n", a);                                          /*0017*/
-   return 0;                                                            /*0018*/
-}
-int main(int argc, char *argv[])
-{
-   float b[N], c[N], a;                                                 /*0003*/
-   int i;                                                               /*0004*/
-
-   a = 0;                                                               /*0006*/
+   a = 0;                                                               /*0009*/
 
 init:
    for(i = 0; i <= 999999; i += 1) {
-      b[i] = i;                                                         /*0010*/
-      c[i] = i+1;                                                       /*0011*/
+      b[i] = i;                                                         /*0013*/
+      c[i] = i+1;                                                       /*0014*/
    }
 compute:
    for(i = 0; i <= 999999; i += 1)
-      a = a+b[i]*c[i];                                                  /*0015*/
+      a = a+b[i]*c[i];                                                  /*0018*/
 
-   printf("Result = %f\n", a);                                          /*0017*/
-   return 0;                                                            /*0018*/
+   printf("Result = %f\n", a);                                          /*0020*/
+   return 0;                                                            /*0021*/
 }
 int main(int argc, char *argv[])
 {
-   float b[N], c[N], a;                                                 /*0003*/
-   int i;                                                               /*0004*/
+   float b[N], c[N], a;                                                 /*0006*/
+   int i;                                                               /*0007*/
 
-   a = 0;                                                               /*0006*/
+   a = 0;                                                               /*0009*/
+
+init:
+   for(i = 0; i <= 999999; i += 1) {
+      b[i] = i;                                                         /*0013*/
+      c[i] = i+1;                                                       /*0014*/
+   }
+compute:
+   for(i = 0; i <= 999999; i += 1)
+      a = a+b[i]*c[i];                                                  /*0018*/
+
+   printf("Result = %f\n", a);                                          /*0020*/
+   return 0;                                                            /*0021*/
+}
+int main(int argc, char *argv[])
+{
+   float b[N], c[N], a;                                                 /*0006*/
+   int i;                                                               /*0007*/
+
+   a = 0;                                                               /*0009*/
    {
       //PIPS generated variable
       int i1;
 
 init:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1) {
-         b[i1] = i1;                                                    /*0010*/
-         c[i1] = i1+1;                                                  /*0011*/
+         b[i1] = i1;                                                    /*0013*/
+         c[i1] = i1+1;                                                  /*0014*/
       }
    }
    {
@@ -58,25 +58,25 @@ init:      ;
       int i1;
 compute:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1)
-         a = a+b[i1]*c[i1];                                             /*0015*/
+         a = a+b[i1]*c[i1];                                             /*0018*/
    }
 
-   printf("Result = %f\n", a);                                          /*0017*/
-   return 0;                                                            /*0018*/
+   printf("Result = %f\n", a);                                          /*0020*/
+   return 0;                                                            /*0021*/
 }
 int main(int, char *[])
 {
-   float b[N], c[N], a;                                                 /*0003*/
+   float b[N], c[N], a;                                                 /*0006*/
 
-   a = 0;                                                               /*0006*/
+   a = 0;                                                               /*0009*/
    {
       //PIPS generated variable
       int i1;
 
 init:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1) {
-         b[i1] = i1;                                                    /*0010*/
-         c[i1] = i1+1;                                                  /*0011*/
+         b[i1] = i1;                                                    /*0013*/
+         c[i1] = i1+1;                                                  /*0014*/
       }
    }
    {
@@ -84,25 +84,25 @@ init:      ;
       int i1;
 compute:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1)
-         a = a+b[i1]*c[i1];                                             /*0015*/
+         a = a+b[i1]*c[i1];                                             /*0018*/
    }
 
-   printf("Result = %f\n", a);                                          /*0017*/
-   return 0;                                                            /*0018*/
+   printf("Result = %f\n", a);                                          /*0020*/
+   return 0;                                                            /*0021*/
 }
 int main(int, char *[])
 {
-   float b[N], c[N], a;                                                 /*0003*/
+   float b[N], c[N], a;                                                 /*0006*/
 
-   a = 0;                                                               /*0006*/
+   a = 0;                                                               /*0009*/
    {
       //PIPS generated variable
       int i1;
 
 init:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1) {
-         b[i1] = i1;                                                    /*0010*/
-         c[i1] = i1+1;                                                  /*0011*/
+         b[i1] = i1;                                                    /*0013*/
+         c[i1] = i1+1;                                                  /*0014*/
       }
    }
    {
@@ -110,9 +110,9 @@ init:      ;
       int i1;
 compute:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1)
-         a = a+b[i1]*c[i1];                                             /*0015*/
+         a = a+b[i1]*c[i1];                                             /*0018*/
    }
 
-   printf("Result = %f\n", a);                                          /*0017*/
-   return 0;                                                            /*0018*/
+   printf("Result = %f\n", a);                                          /*0020*/
+   return 0;                                                            /*0021*/
 }

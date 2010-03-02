@@ -34,7 +34,6 @@ int main(int *argc, char **argv)
    return 0;
 }
 
-
 extern int main(int *argc, char **argv);
 void task_0(int a[100], int *i, int *j, int *k)
 {
