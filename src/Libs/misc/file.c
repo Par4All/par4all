@@ -331,24 +331,40 @@ file_exists_p(const char * name)
 }
 
 #define COLON ':'
-/* returns the allocated nth path in colon-separated path list.
- */
+/* Returns the allocated nth path from colon-separated path string.
+
+   @param path_list the string that contains a colon-separated path
+
+   @param n the n-th instance to extract
+
+   @return an allocated string with the n-th part name
+
+   If the path is empty or if n is out-of-bound, NULL is returned.
+*/
 string
 nth_path(const char * path_list, int n)
 {
-    int len=0,i;
-    char *result;
-    while (*path_list && n>0)
-	if (*path_list++==COLON) n--;
-    if (!*path_list) return (string) NULL;
-    while (path_list[len] && path_list[len]!=COLON) len++;
-    result = (string) malloc(len+1);
-    pips_assert("malloc ok", result);
-    for (i=0; i<len; i++)
-	result[i]=path_list[i];
-    result[len]='\0';
-    return result;
+  int len;
+
+  if (path_list == NULL)
+    return NULL;
+
+  /* Find the n-th part: */
+  while (*path_list && n > 0)
+    if (*path_list++ == COLON)
+      n--;
+
+  if (!*path_list)
+    /* Out-of-bound... */
+    return NULL;
+
+  /* Compute the length up to the COLON or the end of string: */
+  for(len = 0; path_list[len] && path_list[len] != COLON; len++)
+    ;
+
+  return strndup(path_list, len);
 }
+
 
 static char *
 relative_name_if_necessary(const char * name)
