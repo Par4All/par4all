@@ -123,18 +123,18 @@ int main()
    int y[d1][d2][d3][d4];
    int i, j;
 
-//  <y[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI3, PHI3+1<=d3, 0<=PHI4,
+//  <y[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{0<=PHI3, PHI3+1<=d3, 0<=PHI4,
 //    PHI4+1<=d4}>
 
 
    for(i = 0; i <= d1-1; i += 1)
 
-//  <y[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, 0<=PHI3, PHI3+1<=d3,
+//  <y[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, 0<=PHI3, PHI3+1<=d3,
 //    0<=PHI4, PHI4+1<=d4}>
 
       for(j = 0; j <= d2-1; j += 1)
 
-//  <y[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//  <y[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
 //    PHI3+1<=d3, 0<=PHI4, PHI4+1<=d4}>
 
          call11(d3, d4, &y[i][j][0]);
