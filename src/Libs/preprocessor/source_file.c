@@ -262,39 +262,51 @@ static string find_file(string name)
 /* cache of preprocessed includes
  */
 static hash_table processed_cache = hash_table_undefined;
-void init_processed_include_cache(void)
-{
-    pips_assert("undefined cache", hash_table_undefined_p(processed_cache));
-    processed_cache = hash_table_make(hash_string, 100);
+void init_processed_include_cache(void) {
+  /* Since these functions are called in different context, the
+     conventional pips_debug() is not well suitable, so revert to plain
+     old fprintf for debug... */
+  //fprintf(stderr, "[init_processed_include_cache] Entering\n");
+  pips_assert("undefined cache", hash_table_undefined_p(processed_cache));
+  processed_cache = hash_table_make(hash_string, 100);
 }
 
-void close_processed_include_cache(void)
-{
-    if (hash_table_undefined_p(processed_cache))
+
+void close_processed_include_cache(void) {
+  //fprintf(stderr, "[close_processed_include_cache] Entering\n");
+  if (hash_table_undefined_p(processed_cache))
     {
-	/* pips may call this without a prior call to
-	 * init_processed_include_cache under some error conditions,
-	 * such as a file not found in the initializer, or a failed cpp.
-	 */
+      /* pips may call this without a prior call to
+       * init_processed_include_cache under some error conditions,
+       * such as a file not found in the initializer, or a failed cpp.
+       */
+      /*
+	Do not warn the user about PIPS internal architecture issues... :-/
 	pips_user_warning("no 'processed include cache' to close, "
-			  "skipping...\n");
-	return;
+	"skipping...\n");
+      */
+      return;
     }
-    pips_assert("defined cache", !hash_table_undefined_p(processed_cache));
-    HASH_MAP(k, v, { unlink(v); free(v); }, processed_cache);
-    hash_table_free(processed_cache);
-    processed_cache = hash_table_undefined;
+  pips_assert("defined cache", !hash_table_undefined_p(processed_cache));
+  HASH_MAP(k, v, { unlink(v); free(v); }, processed_cache);
+  hash_table_free(processed_cache);
+  processed_cache = hash_table_undefined;
 }
 
-/* returns the processed cached file name, or null if none.
+
+/* Returns the processed cached file name, or null if none.
  */
 static string get_cached(string s)
 {
     string res;
     pips_assert("cache initialized", !hash_table_undefined_p(processed_cache));
     res = hash_get(processed_cache, s);
-    return res==HASH_UNDEFINED_VALUE? NULL: res;
+    //fprintf(stderr, "[close_processed_include_cache] Looking for %s : %s\n", s,
+    //res == HASH_UNDEFINED_VALUE ? "NULL" : res);
+
+    return res == HASH_UNDEFINED_VALUE ? NULL : res;
 }
+
 
 /* return an allocated unique cache file name.
  */
@@ -389,8 +401,11 @@ static bool handle_include_file(FILE * out, char * file_name)
 	}
 
 	/* if ok put in the cache, otherwise drop it. */
-	if (ok)
+	if (ok) {
+	  //fprintf(stderr, "[handle_include_file] Adding in the cache %s for file %s\n",
+	  //cached, file_name);
 	  hash_put(processed_cache, file_name, cached);
+	}
 	else {
 	  safe_unlink(cached);
 	  free(cached), cached = NULL;
