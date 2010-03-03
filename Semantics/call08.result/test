@@ -125,14 +125,21 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call08] (add_or_kill_equivalenced_variables) storage return
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call08] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call08] (NormalizeExpression) expression is already normalized
 PRINT_CODE_TRANSFORMERS[call08] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
 TRANSFORMERS_INTER_FULL[main] (any_scalar_assign_to_transformer) Variable 0`ai in lhs is uselessly updated by the rhs 'call08(++ai)'
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call08] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call08] (NormalizeExpression) expression is already normalized
 PRECONDITIONS_INTER_FULL[call08] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call08] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call08!] (ordinary_summary_precondition) empty precondition to call08! because not in call tree from main.
