@@ -2026,15 +2026,42 @@ void CreateReturnEntity(entity f)
 }
 
 /* A subset of UpdateEntity, used when the function entity is already
-   more defined because the return type is implicit. See call site cyacc.y
+   more defined because the return type is implicit. See call site
+   cyacc.y
+
+   The return value is created when needed.
+
+   The dummy parameters are used to create the formal parameters.
  */
-void UpdateEntity2(entity f, stack FormalStack, stack OffsetStack)
+void UpdateEntity2(entity f,
+		   stack FormalStack __attribute__ ((__unused__)),
+		   stack OffsetStack __attribute__ ((__unused__)))
 {
   type ft = ultimate_type(entity_type(f));
+  list dl = code_declarations(value_code(entity_initial(f)));
+  list cl = list_undefined;
+  int rank = 1; // formal parameter offset
 
   pips_assert("f has a functional type", type_functional_p(ft));
 
   CreateReturnEntity(f);
+
+  for(cl = dl; !ENDP(cl); POP(cl)) {
+    entity v = ENTITY(CAR(cl));
+    if(dummy_parameter_entity_p(v)) {
+      string ln = entity_user_name(v);
+      string mn = entity_local_name(f);
+      entity fp = global_name_to_entity(ln, mn);
+      if(entity_undefined_p(fp)) {
+	fp = FindOrCreateEntity(ln, mn);
+	entity_type(fp) = copy_type(entity_type(v));
+	entity_initial(fp) = make_value_unknown();
+	entity_storage(fp) = make_storage_formal(make_formal(f, rank));
+	rank++;
+	ENTITY_(CAR(cl)) = fp; // substitute v by fp in the declaration list
+      }
+    }
+  }
 
 }
 
