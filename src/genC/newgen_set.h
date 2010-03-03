@@ -135,5 +135,6 @@ extern void set_fprint(FILE *, string, const set, gen_string_func_t);
 extern list set_to_sorted_list(const set, gen_cmp_func_t);
 // no not use set_to_list, the output is not deterministic
 extern list set_to_list(const set);
+// See set_append_list for the conversion from list to set
 
 #endif // SET_INCLUDED

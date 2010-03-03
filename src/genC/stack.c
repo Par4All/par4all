@@ -414,7 +414,10 @@ void *stack_head(const stack s)
   return x->items[(x->n_item)-1];
 }
 
-/* returns the nth item starting from the head and counting from 1, or NULL.
+/* returns the nth item starting from the head and counting from 1,
+   when possible, or NULL, elsewhere.
+
+   stack_nth(stack,1)==stack_head(stack) if stack_size(stack)>=1.
  */
 void *stack_nth(const stack s, int nskip)
 {

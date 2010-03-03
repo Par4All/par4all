@@ -25,8 +25,9 @@
  *  - a stack_iterator allows to iterate over the items in a stack.
  *  - allocation with stack_make(newgen domain, bucket size)
  *  - free with stack_free(stack)
- *  - stack_size(stack) returns the size
+ *  - stack_size(stack) returns the number of elements stacked
  *  - stack_empty_p(stack) tells whether the stack is empty or not
+ *    stack_empty_p(stack)==(stack_size(stack)==0)
  *  - stack_{push,pop,head,replace} do what you may expect from them
  *  - stack_info gives informations about the stack
  *  - stack_map applies the function on all the items in stack.
