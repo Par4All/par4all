@@ -5,6 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT([linear], [0.1], [pipsdev@cri.ensmp.fr])
 AC_CONFIG_SRCDIR([src/polyedre/chernikova.c])
 AC_CONFIG_HEADER([config.h])
+AC_CONFIG_MACRO_DIR([makes/m4])
 
 AM_INIT_AUTOMAKE([gnu 1.0])
 AC_LANG([C])
