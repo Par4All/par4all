@@ -25,7 +25,7 @@ function usage()
   then
     echo -e \
       "$script [options] ...\n" \
-	"options:\n" \
+	"options (displayed in a logical sequential order to apply):\n" \
 	"  -h|--help: display the usual help message\n" \
 	"  -v|--verbose: be verbose (repeat for more, over 2 is debug)\n" \
 	"  -u|--update-git-svn: update the PIPS git-svn gateways that are\n" \
@@ -37,17 +37,18 @@ function usage()
 	"     repositories (the PIPS git-svn gateways and the polylib git)\n" \
 	"  -p|--pull-remote-git: pull the objects from the remote git\n" \
 	"     repositories into their respective branches\n"
+	"  -m|--merge-remote-git: merge the branches that buffer the remote\n" \
+	"      git repositories into the current branch\n"
   fi
   exit ${status:-1}
 }
 
 # verb level 'message to be shown...'
 verb=0
-function verb()
-{
+function verb() {
   local level=$1 msg=$2
-  [[ $verb -ge $level ]] && {
-      while let level-- ; do echo -n '#' ; done
+  (( $verb >= $level )) && {
+      while (( level-- )) ; do echo -n '#' ; done
       echo " $msg"
   } >&2
 }
@@ -78,6 +79,7 @@ EOF
 
 # Get into $current_branch the current git branch we are in:
 function get_current_git_branch() {
+    verb 1 "Entering get_current_git_branch"
     branch=`git branch | grep '^*' | sed 's/* //'`
     if [[ "$branch" == "(no branch)" ]] ; then
 	echo "We are not in a branch, exiting..."
@@ -88,6 +90,7 @@ function get_current_git_branch() {
 
 
 function do_update_CRI_git_svn() {
+    verb 1 "Entering do_update_CRI_git_svn"
   enforce_P4A_TOP
   cd $P4A_CRI_GIT_SVN
   # Execute again this script to do a recursive git svn rebase:
@@ -97,6 +100,7 @@ function do_update_CRI_git_svn() {
 
 # Apply a git action on all the git copy found inside the current directory:
 function do_recursive_git() {
+    verb 1 "Entering do_recursive_git"
     # If no argument is given, act as git svn rebase
     if [[ ! $@ ]] ; then
 	actions="svn rebase"
@@ -122,11 +126,12 @@ function do_recursive_git() {
 
 # Fetch into the par4all git all the parts from the remote git associated:
 do_fetch_remote_git() {
+    verb 1 "Entering do_fetch_remote_git"
     enforce_P4A_TOP
     stop_on_error
     cd $P4A_ROOT
     echo Assume the correct remotes are set in this par4all git copy:
-    for i in $PIPS_MODULE; do
+    for i in $PIPS_MODULES; do
 	echo Fetching CRI/$i...
 	git fetch CRI/$i
     done
@@ -137,13 +142,14 @@ do_fetch_remote_git() {
 
 # Pull into the par4all git all the parts from the remote git associated:
 do_pull_remote_git() {
+    verb 1 "Entering do_pull_remote_git"
     enforce_P4A_TOP
     stop_on_error
     cd $P4A_ROOT
     # Get the current branch to come back into later:
     get_current_git_branch
     echo Assuming the correct remotes are set in this par4all git copy...
-    for i in $PIPS_MODULE; do
+    for i in $PIPS_MODULES; do
 	# First jump into the branch of this name that will receive the
 	# pull.  The idea is to have the possibility for a central place
 	# to be able to change things here against remote inputs.
@@ -159,6 +165,24 @@ do_pull_remote_git() {
 
     # Revert back into the branch we were at the beginning:
     git checkout $current_branch
+}
+
+
+# Pull into the par4all git all the parts from the remote git associated:
+do_merge_remote_git() {
+    verb 1 "Entering do_merge_remote_git"
+    enforce_P4A_TOP
+    stop_on_error
+    cd $P4A_ROOT
+    for i in $PIPS_MODULES; do
+	# Merge into the current branch the branch that buffers the remote
+	# PIPS git svn gateway that should have been populated by a
+	# previous do_pull_remote_git:
+	git merge $i
+
+    done
+    # Same for the polylib:
+    git merge polylib
 }
 
 
@@ -178,6 +202,7 @@ while [ "$1" ] ; do
       -g|--recursive-git-svn) recursive_git_action=1 ;;
       -f|--fetch-remote-git) fetch_remote_git=1 ;;
       -p|--pull-remote-git) pull_remote_git=1 ;;
+      -m|--merge-remote-git) merge_remote_git=1 ;;
       # error
       *) usage 1 "unexpected option: $opt"
   esac
@@ -202,6 +227,10 @@ fi
 
 if [[ $pull_remote_git ]]; then
     do_pull_remote_git
+fi
+
+if [[ $merge_remote_git ]]; then
+    do_merge_remote_git
 fi
 
 # Some Emacs stuff:
