@@ -32,7 +32,8 @@ enum09		    OK  enum declaration and reference nested within a union
 enum10		    OK  simplified version of enum09, used for debugging
 enum11		    OK	deeper nesting
 
-
+generate07.c	    NOK	use a local type to type an external function (stupid but legal)
+generate13.c	    NOK	same as generate07.c, but simplified to expose the issue
 
 Note FI: I cannot deal with non-standard conformant C code because
 PIPS does not generate an error log file
