@@ -93,10 +93,13 @@ class workspace:
 		it represents a set of source files and provides methods
 		to manipulate them"""
 
-	def __init__(self,sources2,name="",activates=[],verboseon=True):
+	def __init__(self,sources2,name="",activates=[],verboseon=True,cppflags=''):
 		"""init a workspace from a list of sources"""
 		if name == "":
 			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
+		# SG: it may be smarter to save /restore the env ?
+		if cppflags != "":
+			os.environ['PIPS_CPP_FLAGS']=cppflags
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
 		self._sources=reduce(helper,sources2,[])

@@ -2692,6 +2692,11 @@ static bool _expression_similar_p(expression target, expression pattern,hash_tab
         pips_user_warning("cast ignored\n");
         return _expression_similar_p(target, cast_expression(syntax_cast(spattern)),symbols);
     }
+    if( syntax_cast_p( starget ) )
+    {
+        pips_user_warning("cast ignored\n");
+        return _expression_similar_p(cast_expression(syntax_cast(starget)), pattern,symbols);
+    }
 
     switch(syntax_tag(spattern) )
     {

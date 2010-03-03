@@ -55,8 +55,11 @@ lexer.c: lexer.l patterns.h
 	sed -e 's/yy/patterns_yy/g' lexer.l > tmp.l
 	flex -Cf -olexer.c -Ppatterns_yy tmp.l
 	rm tmp.l
+lexer.h:lexer.c
 
-patterns.c patterns.h: patterns.y
+patterns.c : patterns.y
 	sed -e 's/yy/patterns_yy/g' patterns.y > tmp.y
 	bison -o patterns.c -d -p patterns_yy tmp.y
 	rm tmp.y
+
+patterns.h: patterns.c

@@ -18,6 +18,7 @@ gpips_SOURCES=	directory_menu.c \
 		gtk_windows.c \
 		vararg.c\
 		main_gpips.c
+
 gpips_LDADD=../../Libs/libpipslibs.la
 gpips_LDFLAGS=$(GTKp_2_0_LIBS)
 
