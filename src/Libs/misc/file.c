@@ -568,35 +568,77 @@ safe_copy(char *source, char *target)
     safe_fclose(in, source);
 }
 
-
+
 /* Some OS do not define basename and dirname. Others like DEC OSF1
-   do. So define them and use another name for them: */
-/* /some/path/to/file.suffix -> file
+   do. So define them and use another name for them:
+
+   /some/path/to/file.suffix -> file
+
+   This may create conflicting file names, when the same source
+   filename is used in different subdirectory as in:
+
+   create foo mod.c src/mod.c src/init/mod.c src/close/mod.c
+
+   To avoid the problem a larger part of the access path should be
+   preserved. This can be done by substituting / by another character.
  */
-char *
-pips_basename(char *fullpath, char *suffix)
+char * pips_filename(char *fullpath, char *suffix, bool short_p)
 {
     int len = strlen(fullpath)-1, i, j;
     char *result;
-    if (suffix) /* drop the suffix */
+
+    if (suffix) /* Drop the suffix */
     {
 	int ls = strlen(suffix)-1, le = len;
 	while (suffix[ls]==fullpath[le] && ls>=0 && le>=0) ls--, le--;
 	if (ls<0) /* ok */ len=le;
     }
-    for (i=len; i>=0; i--) if (fullpath[i]=='/') break;
-    /* fullpath[i+1:len] */
-    result = (char*) malloc(sizeof(char)*(len-i+1));
-    for (i++, j=0; i<=len; i++, j++)
+
+    if(short_p) {
+      /* Keep the basename only */
+      for (i=len; i>=0; i--) if (fullpath[i]=='/') break;
+      /* fullpath[i+1:len] */
+      result = (char*) malloc(sizeof(char)*(len-i+1));
+      for (i++, j=0; i<=len; i++, j++)
 	result[j] = fullpath[i];
-    result[j++] = '\0';
+      result[j++] = '\0';
+    }
+    else {
+    /* Or substitute slashes by a neutral character */
+      char * cc;
+
+      if(fullpath[0]=='.' && fullpath[1]=='/')
+	result = strndup(fullpath+2, len-1);
+      else
+	result = strndup(fullpath, len+1);
+
+
+#define SLASH_SUBSTITUTION_CHARACTER '_'
+
+      for(cc=result; *cc!='\000'; cc++) {
+	if(*cc=='/')
+	  *cc = SLASH_SUBSTITUTION_CHARACTER;
+      }
+    }
     return result;
+}
+
+char * pips_basename(char *fullpath, char *suffix)
+{
+  return pips_filename(fullpath, suffix, TRUE);
+}
+
+/* The source file name access path is shortened or not dependeing on
+   the property. It is shorten if the name conflicts are not managed. */
+char * pips_initial_filename(char *fullpath, char *suffix)
+{
+  return pips_filename(fullpath, suffix,
+		       !get_bool_property("PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING"));
 }
 
 /* /some/path/to/file.suffix -> /some/path/to
  */
-char *
-pips_dirname(char *fullpath)
+char * pips_dirname(char *fullpath)
 {
     char *result = strdup(fullpath);
     int len = strlen(result);
@@ -605,7 +647,7 @@ pips_dirname(char *fullpath)
     return result;
 }
 
-
+
 /* Delete the given file.
 
    Throw a pips_internal_error() if it fails.

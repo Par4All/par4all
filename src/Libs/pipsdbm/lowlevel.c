@@ -138,7 +138,7 @@ string db_get_directory_name_for_module(string name)
 	    pips_user_irrecoverable_error
 		("cannot create directory %s\n", dir_name);
     return dir_name;
-}    
+}
 
 /* returns an allocated file name for a file resource.
  * may depend on the current builder, someday.
@@ -153,7 +153,7 @@ string db_build_file_resource_name(string rname, string oname, string suffix)
   /* the next name must be compatible with the Display script...
    * it may depend on the builder function maybe (if pipsmake tells)
    * may include the resource name? as lower letters?
-   */       
+   */
   result = strdup(concatenate(oname, "/", oname, suffix, NULL));
 
   pips_debug(8, "file name for %s[%s] with suffix '%s' is '%s'\n", 
@@ -219,7 +219,7 @@ static int dbll_stat_file(string file_name, bool okifnotthere)
 	}
 	if (!okifnotthere) {
 	    pips_internal_error("stat error not permitted here\n");
-	}	    
+	}
     } else time = (int) buf.st_mtime; /* humm... unsigned... */
     return time;
 }

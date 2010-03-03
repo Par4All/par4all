@@ -978,6 +978,18 @@ This \verb|PIPS_CPP_FLAGS| variable can also be used to locate the include
 files. Directories to search are specified with the \texttt{-I\emph{file}}
 option, as usual for the C preprocessor.
 
+\subsection{Source File Hierarchy}
+\label{sec:source-file-hierarchy}
+
+The source files may be placed in different directories and have the
+same name, which makes resource management more difficult. The default
+option is to assume that no file name conflicts occur. This is the
+historical option and it leads to much simpler module names.
+
+\begin{PipsProp}{PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING}
+PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING FALSE
+\end{PipsProp}
+
 
 \section{Source File}
 \label{subsection-source-file}

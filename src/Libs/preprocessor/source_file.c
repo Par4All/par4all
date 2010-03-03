@@ -702,7 +702,9 @@ static string process_thru_C_pp(string name) {
     int eol_code = -1;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
-    simpler = pips_basename(name, C_FILE_SUFFIX);
+    // FI: generates conflicts when several source files have the same name
+    //simpler = pips_basename(name, C_FILE_SUFFIX);
+    simpler = pips_initial_filename(name, C_FILE_SUFFIX);
     new_name = strdup(concatenate(dir_name, "/", simpler, PP_C_ED, NULL));
     cpp_err  = strdup(concatenate(new_name, PP_ERR, NULL));
     free(dir_name);
@@ -960,7 +962,7 @@ bool process_user_file(string file)
   file_list =
     strdup(concatenate(dir_name,
 		       dot_c_file_p(nfile)?
-		         "/.csplit_file_list" : "/.fsplit_file_list", NULL));
+		       "/.csplit_file_list" : "/.fsplit_file_list", NULL));
   unlink(file_list);
 
   user_log("Splitting file    %s\n", nfile);
@@ -993,8 +995,7 @@ bool process_user_file(string file)
       /* For each Fortran module in the line, put the initial_file and
 	 user_file resource. In C, line should have only one entry and a C
 	 source file and a user file resources are created. */
-      MAP(STRING, mod_name,
-      {
+      FOREACH(STRING, mod_name, modules) {
 	user_log("  Module         %s\n", mod_name);
 
 	if (!renamed)
@@ -1047,8 +1048,7 @@ bool process_user_file(string file)
 	 * absolute path to the file so that db moves should be ok?
 	 */
 	DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
-      },
-	  modules);
+      }
 
       gen_free_list(modules), modules=NIL;
 
