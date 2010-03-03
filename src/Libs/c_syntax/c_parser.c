@@ -474,6 +474,14 @@ static bool actual_c_parser(string module_name,
 
 	pips_debug(2,"and declarations: ");
 	print_entities(statement_declarations(ModuleStatement));
+	FOREACH(ENTITY, e, statement_declarations(ModuleStatement)) {
+	  pips_assert("e's type is defined", !type_undefined_p(entity_type(e)));
+	  pips_assert("e's storage is defined", !storage_undefined_p(entity_storage(e)));
+	  pips_assert("e's initial value is defined", !value_undefined_p(entity_initial(e)));
+	  // Too strong because the normalize field of expressions in
+	  //not initialized in the parser.
+	  //pips_assert("e is fully defined", entity_defined_p(e));
+	}
 	if(!compilation_unit_p(module_name)) {
 	  /* Even if you are not in a compilation unit, external
 	     functions may be declared many times within one scope. */

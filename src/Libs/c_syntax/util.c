@@ -751,6 +751,34 @@ entity FindOrCreateEntityFromLocalNameAndPrefixAndScope(string name,
   return e;
 }
 
+/* The parameter "scope" is potentially destroyed. */
+entity FindEntityFromLocalNameAndPrefixAndScope(string name, string prefix, string scope)
+{
+  entity ent = entity_undefined;
+
+  if (!entity_undefined_p(get_current_module_entity())) {
+    string global_name = string_undefined;
+    /* Add block scope case here */
+    do {
+      if (static_module_p(get_current_module_entity()))
+	global_name = (concatenate(/*compilation_unit_name,*/
+					 get_current_module_name(),MODULE_SEP_STRING,
+					 scope,prefix,name,NULL));
+      else
+	global_name = (concatenate(get_current_module_name(),MODULE_SEP_STRING,
+					 scope,prefix,name,NULL));
+      ent = gen_find_tabulated(global_name,entity_domain);
+      /* return values are not C variables... but they are entities. */
+      if(!entity_undefined_p(ent)
+	 && !storage_undefined_p(entity_storage(ent))
+	 && storage_return_p(entity_storage(ent))) {
+	ent = entity_undefined;
+      }
+    } while(entity_undefined_p(ent) && (scope = pop_block_scope(scope))!=NULL);
+  }
+  return ent;
+}
+
 entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 {
   /* Find an entity from its local name and prefix.
@@ -779,25 +807,8 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   pips_assert("Scope is a block scope", string_block_scope_p(scope));
   free(scope);
 
-  if (!entity_undefined_p(get_current_module_entity())) {
-    /* Add block scope case here */
-    do {
-      if (static_module_p(get_current_module_entity()))
-	global_name = (concatenate(/*compilation_unit_name,*/
-					 get_current_module_name(),MODULE_SEP_STRING,
-					 ls,prefix,name,NULL));
-      else
-	global_name = (concatenate(get_current_module_name(),MODULE_SEP_STRING,
-					 ls,prefix,name,NULL));
-      ent = gen_find_tabulated(global_name,entity_domain);
-      /* return values are not C variables... but they are entities. */
-      if(!entity_undefined_p(ent)
-	 && !storage_undefined_p(entity_storage(ent))
-	 && storage_return_p(entity_storage(ent))) {
-	ent = entity_undefined;
-      }
-    } while(entity_undefined_p(ent) && (ls = pop_block_scope(ls))!=NULL);
-  }
+  /* First, look up the surrounding scopes */
+  ent = FindEntityFromLocalNameAndPrefixAndScope(name, prefix, ls);
 
   /* Is it a formal parameter not yet converted in the function frame? */
   if(entity_undefined_p(ent)) {
@@ -826,6 +837,13 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
     ent = gen_find_tabulated(global_name,entity_domain);
   }
 
+  /* Is it a local type used within a function declaration? */
+  if(entity_undefined_p(ent) && strcmp(ls, "")==0 && ScopeStackSize()>=2) {
+    string lls = strdup(scope_to_block_scope(GetParentScope()));
+    ent = FindEntityFromLocalNameAndPrefixAndScope(name, prefix, lls);
+    free(lls);
+  }
+
   if(entity_undefined_p(ent)) {
     pips_debug(8, "Cannot find entity with local name \"%s\" with prefix \"%s\" at line %d\n",
 	       name, prefix, get_current_C_line_number());
@@ -834,7 +852,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
        typedef struct foo foo; */
     /* CParserError("Variable appears to be undefined\n"); */
   } else
-    pips_debug(5,"Entity global name is %s\n",global_name);
+    pips_debug(5,"Entity global name is %s\n",entity_name(ent));
   //free(global_name);
   free(ls_head);
   return ent;

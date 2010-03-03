@@ -362,6 +362,11 @@ void EnterScope()
 	     c_parser_context_scope(nc), nc);
 }
 
+int ScopeStackSize()
+{
+  return stack_size(ContextStack);
+}
+
 string GetScope()
 {
   string s = "";
@@ -371,6 +376,19 @@ string GetScope()
      parser */
   if(!stack_empty_p(ContextStack)) {
     c_parser_context c = (c_parser_context) stack_head(ContextStack);
+
+    s = c_parser_context_scope(c);
+  }
+
+  return s;
+}
+
+string GetParentScope()
+{
+  string s = "";
+
+  if(!stack_empty_p(ContextStack) && stack_size(ContextStack)>=2) {
+    c_parser_context c = (c_parser_context) stack_nth(ContextStack,2);
 
     s = c_parser_context_scope(c);
   }
