@@ -2359,7 +2359,12 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 
 /* Replace C operators "+C" and "-C" which can handle pointers by
    arithmetic operators "+" and "-" when it is safe to do so, i.e. when no
-   pointer arithmetic is involved. */
+   pointer arithmetic is involved.
+
+   FI: Also, it might be useful to normalize the expression in order
+   not to leave an undefined field in it. But this is a recursive
+   function and probably not the right place to cope with this.
+ */
 bool simplify_C_expression(expression e)
 {
   syntax s = expression_syntax(e);

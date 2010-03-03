@@ -1079,7 +1079,7 @@ entity FindOrCreateTopLevelEntity(string name)
 /*entity find_entity_module(name)
 string name;
 {
-    string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
+    string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
 				   MODULE_SEP_STRING, name, NULL);
     entity e = gen_find_tabulated(full_name, entity_domain);
 
