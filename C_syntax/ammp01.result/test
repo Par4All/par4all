@@ -7,8 +7,6 @@ Declarations for module "activate" with type "int x int -> int"
 
 Variable list:
 
-	Declared entity "DUMMY-PARAMETER-27588043:i1" with type "variable" "int"
-	Declared entity "DUMMY-PARAMETER-27588043:i2" with type "variable" "int"
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "activate:*DYNAMIC*" with type "area" with size 18
 	Declared entity "activate:*HEAP*" with type "area" with size 0
@@ -18,14 +16,16 @@ Variable list:
 	Declared entity "activate:0`__func__" with type "variable" "char *"
 	Declared entity "activate:activate" with type "variable" "int"
 	Declared entity "ammp01!:*STATIC*" with type "area" with size 0
+	Declared entity "i1:activate" with type "variable" "int"
+	Declared entity "i2:activate" with type "variable" "int"
 
 * empty extern declaration list *
 
 
 Layout for formal parameters:
 
-	Variable DUMMY-PARAMETER-27588043:i1	offset = 1
-	Variable DUMMY-PARAMETER-27588043:i2	offset = 2
+	Variable i1:activate	offset = 1
+	Variable i2:activate	offset = 2
 
 Layout for return variable:
 
