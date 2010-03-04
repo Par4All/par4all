@@ -78,12 +78,13 @@ function report()
     # summary
     echo PIPS compilation status has changed to $current
 
-    # details
+    # some details
     echo previous state: $previous
     echo previous compile: $prevcomp
     echo new state: $current
     echo new compile: $compile
     echo message: $msg
+    echo run time: $SECONDS
 
     # revisions
     echo
