@@ -218,9 +218,11 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
 {
     FOREACH(REDUCTION, r, reductions)
     {
-        pips_debug(3,"red bas\n");
-        print_reference(reduction_reference(r));
-        pips_debug(3,"\n");
+        ifdebug(3) {
+            pips_debug(3,"red bas\n");
+            print_reference(reduction_reference(r));
+            pips_debug(3,"\n");
+        }
 
         if(reduction_in_statement_p(r,s))
         {

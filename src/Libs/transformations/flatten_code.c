@@ -564,9 +564,12 @@ bool flatten_code(string module_name)
   clean_up_sequences(module_stat);
 
   /* Step 3 and 4: unroll loops and clean up sequences */
-  gen_recurse( module_stat,
-	       statement_domain, gen_true, unroll_loops_in_statement
-	       );
+  if(get_bool_property("FLATTEN_CODE_UNROLL"))
+  {
+      gen_recurse( module_stat,
+              statement_domain, gen_true, unroll_loops_in_statement
+              );
+  }
   clean_up_sequences(module_stat); // again
 
   // This might not really be necessary, probably thanks to clean_up_sequences
