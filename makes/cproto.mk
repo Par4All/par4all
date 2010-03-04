@@ -29,11 +29,11 @@ $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
 	} | sed -e '/ yy/ d' > $(TARGET).h-tmp ; \
 	if cmp -s $(TARGET).h $(TARGET).h-tmp ; then \
 		echo "file is unchanged, updating timestamp only" ; \
-		rm $(TARGET).h-tmp ;\
+		rm -f $(TARGET).h-tmp ;\
 		for s in $$SOURCES ; do test $$s -ot $(TARGET).h || touch -r $$s $(TARGET).h ; done ;\
 	 else \
 	 	echo "udpating file"; \
-		rm $(TARGET).h ; \
+		rm -f $(TARGET).h ; \
 	    mv $(TARGET).h-tmp $(TARGET).h ;\
 	 fi
 

@@ -208,7 +208,8 @@ $PACKAGE_NAME Configuration:
 $[]AX_MSG([$1])
 m4_foreach_w([_i_],[$2],[dnl
   Build _i_ ? $[]AX_WITH(_i_)
-   $[]AX_MSG(_i_)])
+  $[]AX_MSG(_i_)
+])
 EOF
 
 	pushdef([_TEST_],[AX_HAS($1)])
@@ -241,4 +242,20 @@ AC_DEFUN([AX_ARG_ENABLE],[
 		AM_CONDITIONAL(WITH_[]AX_TR_UP([$1]),[AX_HAS([$1])])
 	]
 )
+
+dnl checks presence of cproto
+dnl usage AX_CHECK_CPROTO(minimum-version-number)
+dnl sets AX_WITH(cproto) and AX_MSG(cproto)
+AC_DEFUN([AX_CHECK_CPROTO],[
+	AX_CHECK_PROG([cproto])
+	AS_IF([AX_HAS([cproto])],[
+		AC_MSG_CHECKING([wether cproto version is >= $1])
+		ax_cproto_version="`$CPROTO -V 2>&1 | sed -e 's/[[a-zA-Z]]//g'`"
+		AX_COMPARE_VERSION([$ax_cproto_version],[ge],[$1],[AC_MSG_RESULT([yes ($ax_cproto_version)])],[
+			AC_MSG_RESULT([no ($ax_cproto_version)])
+			AX_WITH([cproto])="no"
+			AX_MSG([cproto])="cproto version too low"
+		])
+	])
+])
 
