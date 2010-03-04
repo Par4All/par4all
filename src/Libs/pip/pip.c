@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Name     : pip.c
  * Package  : pip
  * Author   : F. Dumontet, A. Platonoff and A. Leservot

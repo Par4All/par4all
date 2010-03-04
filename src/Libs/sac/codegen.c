@@ -21,7 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-#define _GNU_SOURCE
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"

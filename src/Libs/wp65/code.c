@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* Code Generation for Distributed Memory Machines
   *
   * Code generating routine for a given partitioning and a given loop nest

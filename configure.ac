@@ -13,6 +13,7 @@ AM_PATH_PYTHON(2.5)
 # Checks for programs.
 AC_PROG_YACC
 AC_PROG_CC_C99
+gl_EARLY
 AC_PROG_CPP
 AC_PROG_LEX
 AC_PROG_INSTALL
@@ -20,7 +21,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AX_CHECK_PROG([perl])
-AX_CHECK_PROG([cproto])
+AX_CHECK_CPROTO([4.7])
 AX_CHECK_PROG([newgen])
 AX_CHECK_PROG([make_all_specs])
 
@@ -60,7 +61,8 @@ AC_FUNC_REALLOC
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AX_CHECK_FUNCS([dup2 getcwd gethostname gettimeofday memset mkdir putenv regcomp setenv strcasecmp strchr strcspn strdup strerror strndup strrchr strspn strstr strtol strtoul strtoull])
+AX_CHECK_FUNCS([dup2 getcwd gethostname gettimeofday memset mkdir putenv regcomp setenv strcasecmp strchr strcspn strerror strrchr strspn strstr strtol strtoul strtoull])
+
 
 # gpips
 AX_ARG_ENABLE([gpips],
@@ -77,7 +79,8 @@ AX_ARG_ENABLE([tpips],
 			[yes],
 			[
 			 AX_CHECK_PKG([readline], [readline], [readline/readline.h])
-			 AX_DEPENDS([tpips],[readline])
+			 AX_CHECK_PKG([termcap],[tgetent],[term.h])
+			 AX_DEPENDS([tpips],[readline termcap])
 			]
 )
 
@@ -108,6 +111,10 @@ AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps
 
 # set the optionnal scripts dirs there
 AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc"])
+
+# this takes care of the gnulib stuff, the CPPFLAGS change is mandatory
+gl_INIT
+CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/Libs/gnulib"
 
 AC_CONFIG_FILES([Makefile
                  src/Documentation/Makefile
@@ -166,6 +173,7 @@ AC_CONFIG_FILES([Makefile
                  src/Libs/static_controlize/Makefile
                  src/Libs/paf-util/Makefile
                  src/Libs/wp65/Makefile
+				 src/Libs/gnulib/Makefile
                  src/Makefile
                  src/Passes/Makefile
                  src/Passes/gpips/Makefile
@@ -213,6 +221,6 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 
-AX_DEPENDS([minimum],[newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strdup_strerror_strndup_strrchr_strspn_strstr_strtol_strtoul_strtoull])
+AX_DEPENDS([minimum],[newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
 AX_EXIT([minimum],[tpips pyps gpips hpfc])

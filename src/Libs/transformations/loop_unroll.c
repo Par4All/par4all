@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  
   LOOP_UNROLL()
@@ -719,7 +722,7 @@ unroll(char *mod_name)
 }
 
 static
-bool apply_full_loop_unroll(statement s)
+bool apply_full_loop_unroll(struct _newgen_struct_statement_ * s)
 {
   instruction inst = statement_instruction (s);
   bool go_on = TRUE;
@@ -759,7 +762,7 @@ full_unroll(char * mod_name)
         /* do the job */
         if(entity_undefined_p(lb_ent)) {
             gen_recurse (mod_stmt, statement_domain, 
-                    apply_full_loop_unroll, gen_null);
+                    (bool(*)(void*))apply_full_loop_unroll, gen_null);
         }
         else {
             statement loop_statement = find_loop_from_label(mod_stmt,lb_ent);

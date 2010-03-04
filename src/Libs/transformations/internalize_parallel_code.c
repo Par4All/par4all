@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
   For historical reasons, a parallelized program in PIPS is no longer a
   classical PIPS program we can work on later because sequential code and

@@ -67,6 +67,9 @@
 %type <array> owner list_of_owner_name
 
 %{
+#ifdef HAVE_CONFIG_H
+	#include "pips_config.h"
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

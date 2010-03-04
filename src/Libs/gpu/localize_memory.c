@@ -2,6 +2,9 @@
 
    Ronan.Keryell@hpc-project.com
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "genC.h"
 #include "linear.h"

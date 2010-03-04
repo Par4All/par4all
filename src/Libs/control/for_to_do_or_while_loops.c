@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /** Some passes to transform for-loops into do-loops or while-loops that
     may be easier to analyze by PIPS.
 */

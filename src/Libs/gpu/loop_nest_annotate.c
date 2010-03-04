@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /* loop nests transformation phase for par4all :
 
@@ -58,7 +61,6 @@ kernel2:
 
 for further generation of CUDA code.
  */
-#define _GNU_SOURCE
 
 /* Ansi includes	*/
 #include <stdio.h>

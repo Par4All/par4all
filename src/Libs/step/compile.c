@@ -14,6 +14,9 @@ License.
 
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "defines-local.h"
 #include "effects-convex.h"

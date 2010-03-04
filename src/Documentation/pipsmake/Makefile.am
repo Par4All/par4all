@@ -45,4 +45,4 @@ builder_map.h: pipsmake.rc $(srcdir)/make-builder-map
 epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex generate_all_menu_documentation
 	$(srcdir)/generate_all_menu_documentation -layout < $(srcdir)/pipsmake-rc.tex
 
-CLEANFILES=$(dist_noinst_DATA) $(nodist_include_HEADERS) $(sysconf_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el
+CLEANFILES=$(nodist_include_HEADERS) $(sysconf_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el

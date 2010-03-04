@@ -53,6 +53,9 @@
 *)*/
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -21,12 +21,14 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * The motivation of text is to delay string concatenation by dealing with
  * lists of strings instead as more as possible.
  */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>

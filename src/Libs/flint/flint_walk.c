@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* This file contains a set of functions defined to walk through the
  * internal representation of a module and chek different things, as the
  * number of arguments, the compatibility of the types of these arguments,

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* bourdoncle.c
 
    Decomposition of a CFG into SCC's and sub-SCC's. Algorithm 3.9, Page

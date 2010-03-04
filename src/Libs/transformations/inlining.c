@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /**
  * @file inlining.c
  * @brief add inlining support to pips, with two flavors
@@ -31,7 +34,6 @@
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
  * @date 2009-01-07
  */
-#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /*******************  STATEMENTS *******************/
 
@@ -28,7 +31,6 @@
    statement in Fortran (make_continue_statement means make_null_statement)*/
 
 // To have strndup(), asprintf()...:
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -34,6 +34,9 @@
  * Grammaire Lex pour interpreter une solution fournie par PIP en un "quast
  * newgen".
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "solpip_parse.h"
 %}

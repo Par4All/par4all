@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Some modifications are made to save the current makefile (s.a. files
  * pipsmake/readmakefile.y openclose.h )
  * They only occure between following tags: 

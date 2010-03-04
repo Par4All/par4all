@@ -2,7 +2,7 @@ TARGET	= tpips
 bin_PROGRAMS=tpips
 tpips_SOURCES=tp_yacc.y tp_lex.l tpips.c wrapper.c revisions.c main_tpips.c
 tpips_LDADD=../../Libs/libpipslibs.la
-tpips_LDFLAGS=$(READLINE_LIBS)
+tpips_LDFLAGS=$(READLINE_LIBS) $(TERMCAP_LIBS)
 nodist_noinst_HEADERS=completion_list.h $(TARGET).h
 dist_noinst_SCRIPTS=make_completion_lists.sh
 
@@ -30,7 +30,7 @@ completion_list.h :	\
 
 BUILT_SOURCES=$(TARGET).h revisions.h completion_list.h
 AM_CPPFLAGS=\
-	$(READLINE_CFLAGS) \
+	$(READLINE_CFLAGS) $(TERMCAP_CFLAGS)\
 	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
 	-I$(top_srcdir)/src/Documentation/constants\
 	-I../../Documentation/pipsmake\

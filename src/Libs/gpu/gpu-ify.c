@@ -2,9 +2,11 @@
 
    Ronan.Keryell@hpc-project.com
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 // To have asprintf:
-#define _GNU_SOURCE
 #include <stdio.h>
 
 #include "genC.h"

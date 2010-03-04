@@ -57,6 +57,9 @@
 %type <tag>		dir
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -23,6 +23,9 @@
   Pierre.Villalon@hpc-project.com
   Ronan.Keryell@hpc-project.com
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "linear.h"
 #include "genC.h"

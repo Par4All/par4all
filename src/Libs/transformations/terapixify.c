@@ -25,8 +25,10 @@
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
  * @date 2009-07-01
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
-#define _GNU_SOURCE
 
 #include "genC.h"
 #include "linear.h"

@@ -21,9 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 // strndup are GNU extensions...
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 

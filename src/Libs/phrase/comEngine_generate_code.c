@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
 This file contains functions used to generate the MMCDs generation code and
 The HRE code if we want to have only one process on the HRE

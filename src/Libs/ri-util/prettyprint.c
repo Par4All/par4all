@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #ifndef lint
 char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
@@ -103,7 +106,6 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
   */
 
 // To have asprintf:
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -21,6 +21,9 @@ static bool all_reduction = FALSE;
 ///@brief reset the all_reduction flag
 static void reset_all_reduction (void) {
   all_reduction = TRUE;
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 }
 
 ///@return TRUE if the statement is a reduction

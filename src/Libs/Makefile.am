@@ -1,4 +1,4 @@
-SUBDIRS=\
+PIPS_SUBDIRS=\
 	misc newgen properties text-util pipsdbm \
 	top-level ri-util conversion movements \
 	comp_sections transformer bootstrap control flint \
@@ -10,13 +10,15 @@ SUBDIRS=\
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake step to_begin_with gpu scalopes static_controlize paf-util
 
+SUBDIRS=gnulib $(PIPS_SUBDIRS)
+
 BUILT_SOURCES=cprotoify
 
 pips_includes:Makefile
-	{ for dir in $(SUBDIRS) ; do echo -n "-I../$$dir -I../$(top_srcdir)/src/Libs/$$dir " ; done } > $@
+	{ for dir in $(PIPS_SUBDIRS) ; do printf -- "-I../$$dir -I../$(top_srcdir)/src/Libs/$$dir " ; done } > $@
 
 cprotoify:Makefile pips_includes
-	for dir in $(SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h ; done
+	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h ; done
 
 
 CLEANFILES=pips_includes
@@ -76,5 +78,6 @@ libpipslibs_la_LIBADD=\
   	scalopes/libscalopes.la\
   	newgen/libnewgen.la \
 	static_controlize/libstatic_controlize.la \
-	paf-util/libpaf-util.la
+	paf-util/libpaf-util.la \
+	gnulib/libgnu.la
 

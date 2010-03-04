@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* -- privatize.c 
 
    This algorithm introduces local definitions into loops that are
@@ -32,7 +35,6 @@
    fail in C when a dynamic variable is initialized.
 
  */
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 

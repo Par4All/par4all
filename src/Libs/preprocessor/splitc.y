@@ -50,6 +50,9 @@
    * does not resemble Hugues's original one at all  *)*/
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* C declarations */
 #include <stdio.h>
 #include <string.h>
