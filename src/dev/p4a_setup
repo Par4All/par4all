@@ -1,6 +1,6 @@
 #! /bin/bash -vx
 #
-# Inspired from setup_pips.sh
+# Inspired from setup_pips.sh and get-pips4u.sh
 #
 
 if [[ -z $P4A_ROOT ]]; then
@@ -10,10 +10,19 @@ fi
 
 # Where everything is built:
 P4A_BUILD=$P4A_ROOT/build
-mkdir -p $P4A_BUILD
 
 P4A_ETC=$P4A_BUILD/etc
 
+pips4u_configure_common_flags="--disable-static"
+if test -z "$INSTALL_PREFIX" ; then
+	INSTALL_PREFIX=$P4A_BUILD
+fi
+
+if test -z "$SRCDIR" ; then
+	SRCDIR=$PWD/pips4u/src
+fi
+
+pips4u_configure_prefix="--prefix=$INSTALL_PREFIX"
 cd $P4A_ROOT
 
 PIPS_COMPONENTS="linear newgen pips"
@@ -46,19 +55,75 @@ warn()
   read
 }
 
-#gih(){
-# Compile and install the polyLib:
+
+echo "- building polylib ..."
 (
     cd $P4A_ROOT/packages/polylib
-    ./autogen.sh
-    ./configure --prefix=$P4A_BUILD --libdir=$P4A_BUILD/lib/$PIPS_ARCH
+    autoreconf -i
+    mkdir -p _build
+    cd _build
+    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix
     make
     make install
-    cd $P4A_BUILD/lib/$PIPS_ARCH
-    ln -s libpolylib64.a libpolylib.a
 )
-#}
 
+
+echo "- building newgen ..."
+(
+    cd $PIPS_DIR/newgen
+    autoreconf -i
+    mkdir -p _build
+    cd _build
+    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix
+    make
+    make install
+)
+
+
+echo "- building linear ..."
+(
+    cd $PIPS_DIR/linear
+    autoreconf -i
+    mkdir -p _build
+    cd _build
+    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix PKG_CONFIG_PATH="$INSTALL_PREFIX"/lib/pkgconfig:$PKG_CONFIG_PATH
+    make
+    make install
+)
+
+
+echo "- building pips ..."
+(
+    cd $PIPS_DIR/pips
+    autoreconf -vi
+    mkdir -p _build
+    cd _build
+    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix PKG_CONFIG_PATH="$INSTALL_PREFIX"/lib/pkgconfig:$PKG_CONFIG_PATH PATH="$INSTALL_PREFIX"/bin:$PATH $PIPS_CONFIG
+    make
+    make install
+)
+
+rm -f $pips4u_log
+
+# that's all folks
+cat << EOF
+============================================
+pips4u is ready
+everything got installed in $INSTALL_PREFIX
+all sources are available from $SRCDIR
+
+you should consider add the following lines
+to your .bashrc or whatever:
+
+export PATH=$INSTALL_PREFIX/bin:$PATH
+export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib
+export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib/pkgconfig
+export PYTHONPATH=$INSTALL_PREFIX/lib/python2.6/site-packages/pips
+
+============================================
+EOF
+
+exit 0
 
 echo
 echo "### creating `basename $P4A_RC_SH`"
