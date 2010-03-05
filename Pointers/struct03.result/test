@@ -6,6 +6,7 @@ int struct03()
       int **p;
    } m, n;
 
+//               <must be written>: i j k
    int i = 0, j = 1, k = 2;
    int *r;
 //               <must be written>: r
@@ -35,15 +36,17 @@ int struct03()
    int i = 0, j = 1, k = 2;
    int *r;
    r = &k;
-//  points to = {(r,k,E)}
+//  points to = {(r,k,-Exact-)}
    m.q = &i;
-//  points to = {(m[1],i,E)(r,k,E)}
+//  points to = {(m[1],i,-Exact-);(r,k,-Exact-)}
    m.p = &j;
-//  points to = {(m[2],j,E)(m[1],i,E)(r,k,E)}
+//  points to = {(m[2],j,-Exact-);(m[1],i,-Exact-);(r,k,-Exact-)}
    n = m;
-//  points to = {(n[2],j,E)(n[1],i,E)(m[2],j,E)(m[1],i,E)(r,k,E)}
+//  points to = {(n[2],j,-Exact-);(n[1],i,-Exact-);(m[2],j,
+//   -Exact-);(m[1],i,-Exact-);(r,k,-Exact-)}
    r = n.p;
-//  points to = {(n[2],j,E)(n[1],i,E)(m[2],j,E)(m[1],i,E)(r,j,E)}
+//  points to = {(n[2],j,-Exact-);(n[1],i,-Exact-);(m[2],j,
+//   -Exact-);(m[1],i,-Exact-);(r,j,-Exact-)}
    return 0;
    // END BLOCK
 }

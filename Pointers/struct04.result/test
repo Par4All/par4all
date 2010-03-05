@@ -6,6 +6,7 @@ int struct04()
       int **p;
    } m, n;
 
+//               <must be written>: i j k
    int i = 0, j = 1, k = 2;
    int *r, *s;
 //               <must be written>: r
