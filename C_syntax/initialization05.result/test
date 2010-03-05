@@ -19,7 +19,7 @@ Transformers for "initialization05"
 int initialization05()
 {
 
-//  T() {}
+//  T(a) {}
 
    int a = a;
 

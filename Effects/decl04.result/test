@@ -3,6 +3,7 @@ Proper effects
 
 void decl04(mystruct s)
 {
+//               <must be read   >: s
    mystruct s_loc = s;                                                  /*0006*/
 //               <must be read   >: s_loc[1]
 //               <must be written>: s_loc[1]
@@ -12,8 +13,10 @@ void decl04(mystruct s)
 
 Cumulated effects 
 
+//               <must be read   >: s
 void decl04(mystruct s)
 {
+//               <must be read   >: s
    mystruct s_loc = s;                                                  /*0006*/
 //               <must be read   >: s_loc[1]
 //               <must be written>: s_loc[1]

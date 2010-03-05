@@ -79,6 +79,7 @@ Printed file with proper effects for "main"
 
 int main()
 {
+//               <must be written>: BlockEnd
    int i, j, n, BlockEnd = 3;
 //               <must be written>: i
 
@@ -143,7 +144,7 @@ Printed file with transformers for "main"
 int main()
 {
 
-//  T() {BlockEnd==3}
+//  T(BlockEnd) {BlockEnd==3}
 
    int i, j, n, BlockEnd = 3;
 

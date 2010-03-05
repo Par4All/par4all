@@ -28,6 +28,7 @@ int struct02()
       int first;
       int second;
    } x[10];
+//               <must be written>: i
    int i = 0;
 //               <must be written>: i
 
@@ -58,6 +59,7 @@ int struct02()
       int first;
       int second;
    } x[10];
+//               <must be written>: i
    int i = 0;
 //               <may be read    >: i
 //               <may be written >: x[*][1] x[*][2]
@@ -99,7 +101,7 @@ int struct02()
       int second;
    } x[10];
 
-//  T() {i==0}
+//  T(i) {i==0}
 
    int i = 0;
 

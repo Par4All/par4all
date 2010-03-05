@@ -25,18 +25,18 @@ int main()
 
    printf("Begin\n");
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    
    /* The a label */
 a:   printf("a\n");
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    /* The b label */
 b:   printf("b\n");
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    /* Oh, go to a... */
    ;

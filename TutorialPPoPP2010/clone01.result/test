@@ -4,7 +4,7 @@ Source code with transformers
 C  T(clone01) {n<=clone01+1, clone01<=n+1}
 int clone01(int n, int s)
 {
-//  T() {n==r}
+//  T(r) {n==r}
    int r = n;
 //  T(r) {n==r#init, r<=n+1, n<=r+1}
    if (s<0)
