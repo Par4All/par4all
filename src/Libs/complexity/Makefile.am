@@ -10,8 +10,12 @@ libcomplexity_la_SOURCES=\
 	comp_matrice.c
 
 complexity_cost_tables.tar.gz:
-	test -d complexity_cost_tables || cp -r $(srcdir)/complexity_cost_tables .
-	tar czf $@ --exclude="*.svn*" complexity_cost_tables
+	test -d complexity_cost_tables || $(LN_S) $(srcdir)/complexity_cost_tables .
+	if test -r $(srcdir)/complexity_cost_tables.tar.gz ; then \
+		$(LN_S) $(srcdir)/complexity_cost_tables.tar.gz . ; \
+	else \
+		tar czf $@ --exclude="*.svn*" complexity_cost_tables ; \
+	fi
 
 include $(srcdir)/../pipslibs_includes.mk
 install-data-hook:complexity_cost_tables.tar.gz
