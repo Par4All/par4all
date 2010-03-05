@@ -33,19 +33,19 @@ int main()
    c = 0;
    d = 1;
    b = &c;
-//  points to = {(b,c,E)}
+//  points to = {(b,c,-Exact-)}
 
    while (c>0) {
-//  points to = {(a,d,M)(b,c,M)(a,c,M)(b,d,M)}
+//  points to = {(a,d,-MAY-);(b,c,-MAY-);(a,c,-MAY-);(b,d,-MAY-)}
       // BEGIN BLOCK
 
       a = b;
       b = &d;
       // END BLOCK
    }
-//  points to = {(a,d,M)(b,c,M)(a,c,M)(b,d,M)}
+//  points to = {(a,d,-MAY-);(b,c,-MAY-);(a,c,-MAY-);(b,d,-MAY-)}
    b = &c;
-//  points to = {(a,d,M)(b,c,E)(a,c,M)}
+//  points to = {(a,d,-MAY-);(b,c,-Exact-);(a,c,-MAY-)}
    return 0;
    // END BLOCK
 }

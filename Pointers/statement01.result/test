@@ -21,7 +21,7 @@ int main()
    k = 0;
    j = k;
    i = &j;
-//  points to = {(i,j,E)}
+//  points to = {(i,j,-Exact-)}
 
    return 0;
    // END BLOCK

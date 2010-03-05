@@ -40,20 +40,23 @@ int struct04()
    int i = 0, j = 1, k = 2;
    int *r, *s;
    r = &k;
-//  points to = {(r,k,E)}
+//  points to = {(r,k,-Exact-)}
    s = &j;
-//  points to = {(s,j,E)(r,k,E)}
+//  points to = {(s,j,-Exact-);(r,k,-Exact-)}
    m.q = &r;
-//  points to = {(m[1],r,E)(s,j,E)(r,k,E)}
+//  points to = {(m[1],r,-Exact-);(s,j,-Exact-);(r,k,-Exact-)}
    m.p = &s;
-//  points to = {(m[2],s,E)(m[1],r,E)(s,j,E)(r,k,E)}
+//  points to = {(m[2],s,-Exact-);(m[1],r,-Exact-);(s,j,-Exact-);(r,k,
+//   -Exact-)}
    m.q = m.p;
-//  points to = {(m[2],s,E)(m[1],s,E)(s,j,E)(r,k,E)}
+//  points to = {(m[2],s,-Exact-);(m[1],s,-Exact-);(s,j,-Exact-);(r,k,
+//   -Exact-)}
    *m.p = &k;
-//  points to = {(m[2],s,E)(m[1],s,E)(r,k,E)(s,k,E)}
+//  points to = {(m[2],s,-Exact-);(m[1],s,-Exact-);(r,k,-Exact-);(s,k,
+//   -Exact-)}
    n = m;
-//  points to = {(n[2],s,E)(n[1],s,E)(m[2],s,E)(m[1],s,E)(r,k,E)(s,k,
-//   E)}
+//  points to = {(n[2],s,-Exact-);(n[1],s,-Exact-);(m[2],s,
+//   -Exact-);(m[1],s,-Exact-);(r,k,-Exact-);(s,k,-Exact-)}
    return 0;
    // END BLOCK
 }
