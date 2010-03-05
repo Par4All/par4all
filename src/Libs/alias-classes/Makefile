@@ -21,10 +21,18 @@
 
 TARGET	= alias-classes
 
-LIB_CFILES =	alias_pairs.c \
+LIB_CFILES = 	alias_pairs.c \
 		alias_lists.c \
 		alias_classes.c \
-		prettyprint.c
+		points_to_set.c	\
+		anywhere_abstract_locations.c \
+		eval.c \
+		abstract_location.c \
+		points_to_analysis.c \
+		points_to_interprocedural_analysis.c \
+	 	prettyprint.c \
+		points_to_prettyprint.c 
+	
 
 INC_TARGET =	$(TARGET).h
 

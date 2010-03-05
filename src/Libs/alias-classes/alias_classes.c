@@ -61,6 +61,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 
+//#include "points_to_private.h"
 #include "alias-classes.h"
 
 static list l_alias_lists, l_alias_classes;
