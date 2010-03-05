@@ -530,71 +530,73 @@ void regions_remove_phi_variables(list l_reg)
  */
 list regions_dynamic_elim(list l_reg)
 {
-    list l_res = NIL;
-
-    debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
-    debug_regions_consistency(l_reg);
-
-    MAP(EFFECT, reg, 
-     {
+  list l_res = NIL;
+  
+  debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
+  debug_regions_consistency(l_reg);
+  
+  MAP(EFFECT, reg, 
+      {
         entity reg_ent = region_entity(reg);
         storage reg_s = entity_storage(reg_ent);
         boolean ignore_this_region = FALSE;
-
+	
 	ifdebug(4)
-	{
+	  {
 	    pips_debug(4, "current region: \n%s\n", region_to_string(reg));
-	}
-
+	  }
+	
 	/* If the reference is a common variable (ie. with storage ram but
 	 * not dynamic) or a formal parameter, the region is not ignored.
 	 */
-        switch (storage_tag(reg_s))
-	{
-	case is_storage_return:
-	    pips_debug(5, "return var ignored (%s)\n", entity_name(reg_ent));
-	    ignore_this_region = TRUE;
-	    break;
-	case is_storage_ram:
-	{
-	    ram r = storage_ram(reg_s);
-	    if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
-		|| stack_area_p(ram_section(r)))
+	if(!anywhere_effect_p(reg)) {
+	  switch (storage_tag(reg_s))
 	    {
-		pips_debug(5, "dynamic or pointed var ignored (%s)\n", entity_name(reg_ent));
-		ignore_this_region = TRUE;
+	    case is_storage_return:
+	      pips_debug(5, "return var ignored (%s)\n", entity_name(reg_ent));
+	      ignore_this_region = TRUE;
+	      break;
+	    case is_storage_ram:
+	      {
+		ram r = storage_ram(reg_s);
+		if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
+		    || stack_area_p(ram_section(r)))
+		  {
+		    pips_debug(5, "dynamic or pointed var ignored (%s)\n", entity_name(reg_ent));
+		    ignore_this_region = TRUE;
+		  }
+		break;
+	      }
+	    case is_storage_formal:
+	      break;
+	    case is_storage_rom:
+	      pips_internal_error("bad tag for %s (rom)\n", entity_name(reg_ent));
+	    default:
+	      pips_internal_error("case default reached\n");
 	    }
-	    break;
 	}
-	case is_storage_formal:
-	    break;
-	case is_storage_rom:
-	    pips_internal_error("bad tag for %s (rom)\n", entity_name(reg_ent));
-	default:
-	    pips_internal_error("case default reached\n");
-        }
 	
         if (! ignore_this_region)  /* Eliminate dynamic variables. */
-	{
+	  {
 	    region r_res = region_dup(reg);
 	    region_dynamic_var_elim(r_res);
 	    ifdebug(4)
-	    {
+	      {
 		pips_debug(4, "region kept : \n\t %s\n", region_to_string(r_res));
-	    }
+	      }
             l_res = region_add_to_regions(r_res,l_res);
-        }
+	  }
 	else 
-	    ifdebug(4)
+	  ifdebug(4)
 	    {
-		pips_debug(4, "region removed : \n\t %s\n", region_to_string(reg));
+	      pips_debug(4, "region removed : \n\t %s\n", region_to_string(reg));
 	    }
-    },
-	l_reg);
-    debug_regions_consistency(l_reg);    
-    debug_off();
-
-    return(l_res);
+      },
+      l_reg);
+  debug_regions_consistency(l_reg);    
+  debug_off();
+  
+  return(l_res);
 }
 
 
@@ -1076,7 +1078,8 @@ void region_exact_projection_along_variable(region reg, entity var)
 
 		if (gen_find_eq(var, l_phi_var) == chunk_undefined)
 		{
-		    sc_projection_along_variable_ofl_ctrl(&sc,(Variable) var,
+		  Psysteme psc = &sc;
+		    sc_projection_along_variable_ofl_ctrl(psc,(Variable) var,
 							  FWD_OFL_CTRL);
 		    sc_base_remove_variable(sc, (Variable) var);
 		    sc = region_sc_normalize(sc,2);

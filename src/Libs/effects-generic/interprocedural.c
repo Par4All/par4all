@@ -103,9 +103,15 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 
   type real_arg_t = expression_to_type(real_arg);
   int real_arg_t_d = effect_type_depth(real_arg_t);
-  transformer context = effects_private_current_context_head();
+  transformer context;
 
-
+  if (effects_private_current_context_empty_p())
+    context = transformer_undefined;
+  else
+    {
+      context = effects_private_current_context_head();
+    }
+  
   pips_debug(6,"actual argument %s, with type %s, and type depth %d\n",
 	     words_to_string(words_expression(real_arg,NIL)),
 	     type_to_string(real_arg_t), real_arg_t_d);
@@ -253,7 +259,8 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
       
     } /* else du if (real_arg_t_d == 0) */
     
-  (*effects_precondition_composition_op)(l_res, context);
+  if (!transformer_undefined_p(context))
+    (*effects_precondition_composition_op)(l_res, context);
  
   ifdebug(6)
     {

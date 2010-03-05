@@ -1359,3 +1359,115 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 
    return l_res;
 }
+
+
+/***************************************/
+list derived_type_fields(type t)
+{
+  list l=NIL;
+  
+  switch (type_tag(t))
+    {
+    case is_type_struct: 
+      l = type_struct(t);
+      break;
+    case is_type_union:
+      l = type_union(t);
+      break;
+    case is_type_enum:
+      l = type_enum(t);
+      break;
+    default:
+      pips_assert("input type is a struct union, or enum\n", type_struct_p(t) || type_union_p(t) || type_enum_p(t) );
+      
+    }
+  return l;
+}
+
+entity effect_field_dimension_entity(expression exp, list l_fields)
+{
+  if(expression_constant_p(exp))
+    {
+      int rank = expression_to_int(exp);
+      return ENTITY(gen_nth(rank-1, l_fields));
+    }
+  else
+    {
+      return expression_to_entity(exp);
+    }
+}
+
+static bool effect_indices_contain_pointer_dimension_p(list current_l_ind, type current_type, bool *exact_p)
+{
+  bool result = false; /*assume there is no pointer */
+  basic current_basic = variable_basic(type_variable(current_type));
+  size_t current_nb_dim = gen_length(variable_dimensions(type_variable(current_type)));
+
+  pips_assert("there should be no effect on variable names\n", gen_length(current_l_ind) >= current_nb_dim);
+
+  
+  pips_debug(8, "input type : %s\n", type_to_string(current_type));
+
+  switch (basic_tag(current_basic)) 
+    {
+    case is_basic_pointer:
+      {
+	result = true;
+	*exact_p = true;
+	break;
+      }
+    case is_basic_derived:
+      {
+	int i;
+	/*first skip array dimensions if any*/
+	for(i=0; i< (int) current_nb_dim; i++, POP(current_l_ind));
+	pips_assert("there must be at least one index left for the field\n", gen_length(current_l_ind) > 0);
+
+	current_type = entity_type(basic_derived(current_basic));
+	list l_fields = derived_type_fields(current_type);
+	
+	entity current_field_entity = effect_field_dimension_entity(EXPRESSION(CAR(current_l_ind)), l_fields);
+
+	if (same_string_p(entity_local_name(current_field_entity), UNBOUNDED_DIMENSION_NAME))
+	  {
+	    while (!ENDP(l_fields) && result == false)
+	      {
+		current_field_entity = ENTITY(CAR(l_fields));
+		current_type =  basic_concrete_type(entity_type(current_field_entity));
+		result = effect_indices_contain_pointer_dimension_p(CDR(current_l_ind), current_type, exact_p);
+		POP(l_fields);
+	      }
+	    *exact_p = !result;
+	  }
+	else
+	  {
+	    current_type = basic_concrete_type(entity_type(current_field_entity));
+	  }
+
+	break;
+      }
+    default:
+      {
+	result = false;
+	*exact_p = true;
+	break;
+      }
+    }
+  
+  return result;
+  
+}
+
+bool effect_reference_contains_pointer_dimension_p(reference ref, bool *exact_p)
+{
+  entity ent = reference_variable(ref);
+  list current_l_ind = reference_indices(ref);
+  type current_type = basic_concrete_type(entity_type(ent));
+
+  pips_assert("the initial type must be variable\n", type_variable_p(current_type));
+
+  pips_debug(8, "input reference : %s\n", words_to_string(effect_words_reference(ref)));
+
+  return effect_indices_contain_pointer_dimension_p(current_l_ind, current_type, exact_p);
+
+}

@@ -890,7 +890,10 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
       
 	if(!effect_undefined_p(e)) 
 	  {
-	    transformer context = effects_private_current_context_head();
+	    transformer context = transformer_undefined;
+
+	    if( !effects_private_current_context_empty_p())
+	      context = effects_private_current_context_head();
 
 	    type addexp_t = expression_to_type(addexp);
 
@@ -909,7 +912,8 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 		free_effect(e);
 	      }
 
-	    (*effects_precondition_composition_op)(le, context);
+	    if (!transformer_undefined_p(context))
+	      (*effects_precondition_composition_op)(le, context);
 	    
 	  }	
 
@@ -980,7 +984,7 @@ generic_proper_effects_of_subscript(subscript s)
       if (! ENDP(inds)) 
 	le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
       
-
+      
 	(*effects_precondition_composition_op)(le, context);
     }
 
@@ -1605,24 +1609,108 @@ static void proper_effects_of_sequence(sequence block __attribute__((__unused__)
 
 static bool stmt_filter(statement s)
 {
-  pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
+  pips_debug(1, "Entering statement with ordering: %03zd and number: %03zd\n", 
+	     statement_ordering(s), statement_number(s));
   effects_private_current_stmt_push(s);
   effects_private_current_context_push((*load_context_func)(s));
   return(TRUE);
 }
 
-static void proper_effects_of_statement(statement s)
+/**
+ @param entity is a
+ @param 
+ @return : a list of effects corresponding to the effects of the rhs if there
+           is an initialization in the declaration., plus the effects of the lhs
+*/
+static list generic_proper_effects_of_declaration(entity decl)
 {
-    if (!bound_proper_rw_effects_p(s))
-     {
-       pips_debug(2, "Warning, proper effects undefined, set to NIL\n");
-       store_proper_rw_effects_list(s,NIL);
-     }
-    effects_private_current_stmt_pop();
-    effects_private_current_context_pop();
+  list l_eff = NIL;
+  pips_debug(1, "declaration of entity %s \n", entity_local_name(decl));
 
-    pips_debug(1, "End statement%03zd :\n", statement_ordering(s));
+  if(type_variable_p(entity_type(decl)))
+    {
+      value v_init = entity_initial(decl);
+      
+      pips_debug(1, "begin\n");
+      /* generate effects due to the initialisation */ 
+      if (value_expression_p(v_init))
+	{
+	  expression exp_init = value_expression(v_init);
+	  l_eff = generic_proper_effects_of_expression(exp_init); 
+	}
+      
+      /* if there is an initial value, 
+	 then there is a write on the entity (well on  the reference constituted
+	 by the entity name with no indices !).
+	 There may be a memory leak here because we do not want a preference in 
+	 the effect. However, I do not have a good solution for the time being 
+	 because in declarations, the left hand side is not a reference. BC.
+	 I should may be call generic_proper_effects_of lhs instead, but the case is
+	 slightly different for arrays. Or directly (*reference_to_effect_func) in case of a scalar ?
+      */
+      if (!value_unknown_p(v_init))
+	{
+	  type decl_t = basic_concrete_type(entity_type(decl));
+	  list l_tmp = NIL;
+	  
+	  if (!ENDP(variable_dimensions(type_variable(decl_t))) || basic_derived_p(variable_basic(type_variable(decl_t))))
+	    {
+	      effect decl_eff = (*reference_to_effect_func)(make_reference(decl,NIL), is_action_write, true);
+	      l_tmp =  generic_effect_generate_all_accessible_paths_effects(decl_eff, decl_t, is_action_write);
+	    }
+	  else
+	    l_tmp = generic_proper_effects_of_reference(make_reference(decl, 
+								       NIL),	
+							true);
+	  storage decl_s = entity_storage(decl);
+	  l_eff= gen_nconc(l_eff, l_tmp);
+	  /* in case of a static variable, it is initialized only once -> may effects */
+	  if (storage_ram_p(decl_s) && static_area_p(ram_section(storage_ram(decl_s))))
+	    effects_to_may_effects(l_eff);
+	}
+      pips_debug_effects(1, "ending with:", l_eff);
+    }
+  return l_eff;
+}
 
+static void proper_effects_of_statement(statement s)
+{ 
+  /* Handling of declarations attached to a CONTINUE statement 
+    
+  */
+  pips_debug(1, "statement%03zd :\n", statement_number(s));
+  if (c_module_p(get_current_module_entity()) && 
+      (declaration_statement_p(s) /*|| block_statement_p(s)*/ ))
+    {
+      list l_eff = NIL;
+      list l_decls = statement_declarations(s);
+      
+      pips_debug(1, "declaration statement \n");
+
+      FOREACH(ENTITY, e, l_decls)
+	{
+	  l_eff = gen_nconc(l_eff,generic_proper_effects_of_declaration(e));
+	}
+      if(bound_proper_rw_effects_p(s))
+	{
+	  l_eff = gen_nconc(l_eff,
+			    load_proper_rw_effects_list(s));
+	  update_proper_rw_effects_list(s, l_eff);
+	}
+      else
+	store_proper_rw_effects_list(s,l_eff);
+    }
+
+  if (!bound_proper_rw_effects_p(s))
+    {
+      pips_debug(2, "Warning, proper effects undefined, set to NIL\n");
+      store_proper_rw_effects_list(s,NIL);
+    }
+  effects_private_current_stmt_pop();
+  effects_private_current_context_pop();
+  
+  pips_debug(1, "End statement%03zd :\n", statement_number(s));
+  
 }
 
 void proper_effects_of_module_statement(statement module_stat)
