@@ -1,4 +1,36 @@
-F_c=cloning.c property.c step_private.c graph.c message.c freia_spoc_private.c eole_private.c text.c hpf.c sac_private.c reduction.c dcdg.c compsec.c interval_graph.c dg.c alias_private.c database.c tiling.c paf_ri.c outlining_private.c word_attachment.c ubs_private.c hpf_private.c makefile.c parser_private.c complexity_ri.c optimizer.c ri.c reductions_private.c ri_C.c abc_private.c pipsdbm_private.c c_parser_private.c
+F_c=ri.c \
+	dg.c \
+	compsec.c \
+	word_attachment.c \
+	reductions_private.c \
+	interval_graph.c \
+	pipsdbm_private.c \
+	eole_private.c \
+	abc_private.c \
+	alias_private.c \
+	ubs_private.c \
+	c_parser_private.c \
+	complexity_ri.c \
+	database.c \
+	paf_ri.c \
+	tiling.c \
+	graph.c \
+	parser_private.c \
+	hpf_private.c \
+	property.c \
+	makefile.c \
+	reduction.c \
+	message.c \
+	text.c \
+	hpf.c \
+	sac_private.c \
+	ri_C.c \
+	cloning.c \
+	outlining_private.c \
+	step_private.c \
+	points_to_private.c \
+	freia_spoc_private.c
+
 
 dist_noinst_SCRIPTS=remove-latex-comments
 noinst_LTLIBRARIES=libnewgenaux.la
