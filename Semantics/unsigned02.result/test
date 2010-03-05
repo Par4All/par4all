@@ -21,15 +21,15 @@ Transformers for "main"
 int main()
 {
 
-//  T() {i==2}
+//  T(i) {i==2}
 
    unsigned int i = 2;
 
-//  T() {j==4}
+//  T(j) {j==4}
 
    int j = 4;
 
-//  T() {k==6}
+//  T(k) {k==6}
 
    int k = 6;
 
@@ -147,15 +147,15 @@ Transformers for "main" after transformer refining
 int main()
 {
 
-//  T() {i==2}
+//  T(i) {i==2}
 
    unsigned int i = 2;
 
-//  T() {i==2, j==4}
+//  T(j) {i==2, j==4}
 
    int j = 4;
 
-//  T() {i==2, j==4, k==6}
+//  T(k) {i==2, j==4, k==6}
 
    int k = 6;
 

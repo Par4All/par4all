@@ -7,7 +7,7 @@ C  T() {}
 void update05()
 {
 
-//  T() {i==1}
+//  T(i) {i==1}
 
    int i = 1;
 
@@ -15,7 +15,7 @@ void update05()
 
    int j;
 
-//  T() {i==1, k1==0, k2==0}
+//  T(k1,k2) {i==1, k1==0, k2==0}
 
    int k1 = 0, k2 = 0;
 

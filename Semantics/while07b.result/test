@@ -34,9 +34,6 @@ int main()
 }
 int main()
 {
-//               <may be written >: a[*]
-//               <must be read   >: i j k
-//               <must be written>: i j k
    // BEGIN BLOCK
    int i, j, k;                                                         /*0003*/
    int a[500];                                                          /*0004*/

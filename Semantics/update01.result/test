@@ -16,6 +16,7 @@ Proper effects for "update01"
 
 void update01()
 {
+//               <must be written>: i
    int i = 1;
 //               <must be read   >: i
 //               <must be written>: i
@@ -36,6 +37,7 @@ Cumulated effects for "update01"
 
 void update01()
 {
+//               <must be written>: i
    int i = 1;
 //               <must be read   >: i
 //               <must be written>: i
@@ -60,7 +62,7 @@ Transformers for "update01"
 void update01()
 {
 
-//  T() {i==1}
+//  T(i) {i==1}
 
    int i = 1;
 

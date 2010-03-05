@@ -7,7 +7,7 @@ Transformers for "generate01"
 int generate01()
 {
 
-//  T() {i==1}
+//  T(i) {i==1}
 
    int i = 1;
 

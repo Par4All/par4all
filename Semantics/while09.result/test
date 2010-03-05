@@ -7,7 +7,7 @@ C  T() {}
 void while09()
 {
 
-//  T() {i==1}
+//  T(i) {i==1}
 
    int i = 1;
 

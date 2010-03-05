@@ -15,7 +15,7 @@ int repeat02()
 
    int i, j;
 
-//  T() {n==10}
+//  T(n) {n==10}
 
    int n = 10;
 

@@ -61,7 +61,7 @@ Source code with transformers for "main"
 int main()
 {
 
-//  T() {ai==3}
+//  T(ai) {ai==3}
 
    int ai = 3;                                                          /*0015*/
 

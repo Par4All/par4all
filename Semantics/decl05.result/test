@@ -23,7 +23,10 @@ Cumulated effects for "decl05"
 
 void decl05()
 {
+//               <must be written>: i
    int i = 1;
+//               <must be read   >: i
+//               <must be written>: j
    int j = i+1;
 //               <must be read   >: i
 
@@ -38,11 +41,11 @@ Transformers for "decl05"
 void decl05()
 {
 
-//  T() {i==1}
+//  T(i) {i==1}
 
    int i = 1;
 
-//  T() {i==j-1}
+//  T(j) {i==j-1}
 
    int j = i+1;
 

@@ -3,6 +3,7 @@ Source code with proper effects
 
 int binary_or01()
 {
+//               <must be written>: ret
    int ret = 1;                                                         /*0014*/
 //               <may be read    >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
@@ -31,6 +32,7 @@ Source code with cumulated effects
 //               <must be read   >: TOP-LEVEL:stderr
 int binary_or01()
 {
+//               <must be written>: ret
    int ret = 1;                                                         /*0014*/
 //               <may be read    >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
@@ -58,7 +60,7 @@ Source code with transformers for "binary_or01"
 int binary_or01()
 {
 
-//  T() {ret==1}
+//  T(ret) {ret==1}
 
    int ret = 1;                                                         /*0014*/
 

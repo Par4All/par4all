@@ -1,15 +1,15 @@
-bar!
+externalloc12_bar!
 
-Declarations for module "bar!" with type "() -> unknown"
+Declarations for module "externalloc12_bar!" with type "() -> unknown"
 
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
 	Declared entity "TOP-LEVEL:k" with type "variable" "int"
-	Declared entity "bar!:*DYNAMIC*" with type "area" with size 0
-	Declared entity "bar!:*HEAP*" with type "area" with size 0
-	Declared entity "bar!:*STACK*" with type "area" with size 0
-	Declared entity "bar!:*STATIC*" with type "area" with size 0
+	Declared entity "externalloc12_bar!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "externalloc12_bar!:*HEAP*" with type "area" with size 0
+	Declared entity "externalloc12_bar!:*STACK*" with type "area" with size 0
+	Declared entity "externalloc12_bar!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
 
@@ -20,36 +20,36 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
 	Variable "TOP-LEVEL:k"	offset = 0	size = 4
 
 
-Layout for memory area "bar!:*DYNAMIC*" of size 0:
+Layout for memory area "externalloc12_bar!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "bar!:*HEAP*" of size 0:
+Layout for memory area "externalloc12_bar!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for memory area "bar!:*STACK*" of size 0:
+Layout for memory area "externalloc12_bar!:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "bar!:*STATIC*" of size 0:
+Layout for memory area "externalloc12_bar!:*STATIC*" of size 0:
 	* empty area *
 
-End of declarations for module bar!
+End of declarations for module externalloc12_bar!
 
-foo!
+externalloc12_foo!
 
-Declarations for module "foo!" with type "() -> unknown"
+Declarations for module "externalloc12_foo!" with type "() -> unknown"
 
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 12
 	Declared entity "TOP-LEVEL:i" with type "variable" "int"
 	Declared entity "TOP-LEVEL:j" with type "variable" "int"
-	Declared entity "foo!:*DYNAMIC*" with type "area" with size 0
-	Declared entity "foo!:*HEAP*" with type "area" with size 0
-	Declared entity "foo!:*STACK*" with type "area" with size 0
-	Declared entity "foo!:*STATIC*" with type "area" with size 0
+	Declared entity "externalloc12_foo!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "externalloc12_foo!:*HEAP*" with type "area" with size 0
+	Declared entity "externalloc12_foo!:*STACK*" with type "area" with size 0
+	Declared entity "externalloc12_foo!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
 
@@ -62,22 +62,22 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 12:
 	Variable "TOP-LEVEL:j"	offset = 8	size = 4
 
 
-Layout for memory area "foo!:*DYNAMIC*" of size 0:
+Layout for memory area "externalloc12_foo!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "foo!:*HEAP*" of size 0:
+Layout for memory area "externalloc12_foo!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for memory area "foo!:*STACK*" of size 0:
+Layout for memory area "externalloc12_foo!:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "foo!:*STATIC*" of size 0:
+Layout for memory area "externalloc12_foo!:*STATIC*" of size 0:
 	* empty area *
 
-End of declarations for module foo!
+End of declarations for module externalloc12_foo!
 
 int k;
 int i;

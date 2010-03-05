@@ -3,6 +3,7 @@ Source code with proper effects
 
 double call10(int i)
 {
+//               <must be written>: x
    double x = 3.;                                                       /*0009*/
 //               <must be read   >: i
 //               <must be written>: i
@@ -21,6 +22,7 @@ Source code with cumulated effects
 //               <must be written>: TOP-LEVEL:j
 double call10(int i)
 {
+//               <must be written>: x
    double x = 3.;                                                       /*0009*/
 //               <must be read   >: i
 //               <must be written>: i
@@ -67,7 +69,7 @@ Source code with transformers for "main"
 int main()
 {
 
-//  T() {ai==3}
+//  T(ai) {ai==3}
 
    int ai = 3;                                                          /*0018*/
 

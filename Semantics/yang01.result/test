@@ -2,25 +2,25 @@
 Transformers for "foo"
 
 
-C  T(foo) {}
+C  T(foo) {s<=foo+1, foo<=s+1}
 
 int foo(int s)
 {
 
-//  T(foo) {s+1<=foo, foo<=s+5}
+//  T(foo) {s<=foo+1, foo<=s+1}
 
    // BEGIN BLOCK
 
-//  T() {s==t-2}
+//  T(t) {s==t-2}
 
    int t = s+2;
 
-//  T(t) {t#init<=t+1, t<=t#init+3}
+//  T(t) {t#init<=t+3, t+1<=t#init}
 
 
    if (t>6)
 
-//  T(t) {t==t#init+3}
+//  T(t) {t==t#init-3}
 
       t -= 3;
    else
@@ -39,29 +39,29 @@ int foo(int s)
 Transformers for "bar"
 
 
-//  T(bar) {}
+//  T(bar) {1<=bar}
 
 int bar()
 {
 
-//  T(bar) {}
+//  T(bar) {1<=bar}
 
    // BEGIN BLOCK
 
-//  T() {x==3}
+//  T(x) {x==3}
 
    int x = 3;
 
-//  T() {x==y+3}
+//  T(y) {x==y+3}
 
    int y = x-3;
 
-//  T(x,y) {x<=4, x#init<=4, y#init<=y}
+//  T(x,y) {x<=4, x#init+y#init<=x+y, x+y#init<=x#init+y, x#init<=4}
 
 
    while (x<=4) {
 
-//  T(x,y) {y==y#init+1}
+//  T(x,y) {y==y#init+1, x#init<=x+1, x<=x#init+1}
 
       // BEGIN BLOCK
 
@@ -69,13 +69,13 @@ int bar()
 
       y++;
 
-//  T(x) {}
+//  T(x) {x#init<=x+1, x<=x#init+1}
 
       x = foo(x);
       // END BLOCK
    }
 
-//  T(y) {}
+//  T(y) {y#init<=y+1, y<=y#init+1}
 
    y = foo(y);
 
@@ -111,25 +111,25 @@ int bar()
 
    while (x<=4) {
 
-//  P(x,y) {x<=4, x<=y+3, 0<=y}
+//  P(x,y) {x<=4, 3<=x+y, x<=y+3}
 
       // BEGIN BLOCK
 
-//  P(x,y) {x<=4, x<=y+3, 0<=y}
+//  P(x,y) {x<=4, 3<=x+y, x<=y+3}
 
       y++;
 
-//  P(x,y) {x<=4, x<=y+2, 1<=y}
+//  P(x,y) {x<=4, 4<=x+y, x<=y+2}
 
       x = foo(x);
       // END BLOCK
    }
 
-//  P(x,y) {5<=x, 1<=y}
+//  P(x,y) {x==5, 2<=y}
 
    y = foo(y);
 
-//  P(x,y) {5<=x}
+//  P(x,y) {x==5, 1<=y}
 
 
    return y;
@@ -166,7 +166,7 @@ int foo(int s)
 
       t--;
 
-//  P(t) {t<=s+5, s+1<=t}
+//  P(t) {t<=s+1, s<=t+1}
 
 
    return t;
@@ -334,22 +334,22 @@ int bar()
 
    while (x<=4) {
 
-//  P(_return0,x,y) {x==y+3, 3<=x, x<=4}
+//  P(_return0,x,y) {x<=4, 3<=x+y, x<=y+3}
 
       // BEGIN BLOCK
 
-//  P(_return0,x,y) {x==y+3, 3<=x, x<=4}
+//  P(_return0,x,y) {x<=4, 3<=x+y, x<=y+3}
 
       // BEGIN BLOCK
       y++;
       {
 
-//  P(_return0,x,y) {x==y+2, 3<=x, x<=4}
+//  P(_return0,x,y) {x<=4, 4<=x+y, x<=y+2}
 
          // BEGIN BLOCK
          // BEGIN BLOCK
 
-//  P(_return0,x,y) {x==y+2, 3<=x, x<=4}
+//  P(_return0,x,y) {x<=4, 4<=x+y, x<=y+2}
 
          int t = x+2;
 
@@ -391,14 +391,12 @@ int bar()
    }
    {
 
-//  P(_return0,x,y) {_return0==x, 5<=_return0, _return0<=9,
-//    y+3<=_return0, _return0<=5y+3, 1<=y, y<=2}
+//  P(_return0,x,y) {_return0==5, x==5, 2<=y}
 
       // BEGIN BLOCK
       // BEGIN BLOCK
 
-//  P(_return0,x,y) {_return0==x, 5<=_return0, _return0<=9,
-//    y+3<=_return0, _return0<=5y+3, 1<=y, y<=2}
+//  P(_return0,x,y) {_return0==5, x==5, 2<=y}
 
       int t = x+2;
 

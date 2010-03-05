@@ -3,6 +3,7 @@ Source code with proper effects
 
 void assign02()
 {
+//               <must be written>: i
    int i = 1;                                                           /*0010*/
    int j;                                                               /*0011*/
    int k;                                                               /*0012*/
@@ -32,6 +33,7 @@ Source code with cumulated effects
 
 void assign02()
 {
+//               <must be written>: i
    int i = 1;                                                           /*0010*/
    int j;                                                               /*0011*/
    int k;                                                               /*0012*/
@@ -65,7 +67,7 @@ Source code with transformers
 void assign02()
 {
 
-//  T() {i==1}
+//  T(i) {i==1}
 
    int i = 1;                                                           /*0010*/
 

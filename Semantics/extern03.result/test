@@ -16,9 +16,9 @@ Cumulated effects for "main"
 //               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
 int main()
 {
-//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2 i
-//               <must be written>: i
+//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
    // BEGIN BLOCK
+//               <must be written>: i
    float i = 0.;
 //               <must be read   >: TOP-LEVEL:delta i
 //               <must be written>: i
@@ -45,7 +45,7 @@ int main()
 
    // BEGIN BLOCK
 
-//  T() {0.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  T(i) {0.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
 
    float i = 0.;
 

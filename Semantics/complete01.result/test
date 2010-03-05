@@ -7,6 +7,7 @@ void complete01()
    int i;                                                               /*0010*/
    {
       // BEGIN BLOCK
+//               <must be written>: j
       int j = 0;                                                        /*0014*/
 //               <must be read   >: i
 //               <must be written>: i
@@ -26,14 +27,13 @@ Source code with cumulated effects
 
 void complete01()
 {
-//               <must be read   >: i j
-//               <must be written>: i j
    // BEGIN BLOCK
    int i;                                                               /*0010*/
    {
-//               <must be read   >: i j
-//               <must be written>: i j
+//               <must be read   >: i
+//               <must be written>: i
       // BEGIN BLOCK
+//               <must be written>: j
       int j = 0;                                                        /*0014*/
 //               <must be read   >: i j
 //               <must be written>: i j
@@ -70,7 +70,7 @@ void complete01()
 
       // BEGIN BLOCK
 
-//  T() {j==0}
+//  T(j) {j==0}
 
       int j = 0;                                                        /*0014*/
 
