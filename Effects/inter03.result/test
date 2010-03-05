@@ -112,6 +112,8 @@ void foo(int *p)
 Regions for "main"
 
 
+//  <TOP-LEVEL:*MEMORY*-R-MAY-{}>
+//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 

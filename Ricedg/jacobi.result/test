@@ -41,19 +41,20 @@ Cumulated effects for function "main"
 //                                  _MALLOC_EFFECTS:_MALLOC_
 //               <may be written >: TOP-LEVEL:*MEMORY* 
 //                                  _MALLOC_EFFECTS:_MALLOC_
-//               <must be read   >: argc
 int main(int argc, char *argv[])
 {
    //int i;for(i=0;i<argc;i++) printf("_%s_\n",argv[i]);
    int **a;                                                             /*0028*/
    int **b;                                                             /*0029*/
    int indice_i;                                                        /*0030*/
-//               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ a a[*] b 
-//                                  b[*] b[*][*] nb
+//               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ a a[*] 
+//                                  argv[1] b b[*] b[*][*]
 //               <may be written >: _MALLOC_EFFECTS:_MALLOC_ a a[*] 
 //                                  a[*][*] b b[*] indice_i
 //               <must be read   >: argc
    if (argc>1) {                                                        /*0031*/
+//               <must be read   >: argv[1]
+//               <must be written>: nb
       int nb = atol(argv[1]);                                           /*0032*/
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ nb
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b

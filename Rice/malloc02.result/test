@@ -64,7 +64,8 @@ void malloc02()
 Cumulated effects
 
 //               <may be read    >: _MALLOC_EFFECTS:_MALLOC_
-//               <may be written >: _MALLOC_EFFECTS:_MALLOC_
+//               <may be written >: TOP-LEVEL:*MEMORY* 
+//                                  _MALLOC_EFFECTS:_MALLOC_
 void malloc02()
 {
    int *p[10];                                                          /*0003*/
@@ -86,16 +87,25 @@ void malloc02()
 
 Regions
 
+
+//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
 void malloc02()
 {
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
 
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1) {
 
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       p[i] = malloc(sizeof(int));                                       /*0007*/

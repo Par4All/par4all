@@ -65,7 +65,9 @@ Proper effects for "main"
 
 int main()
 {
+//               <must be written>: d1
    int d1 = 10;
+//               <must be written>: d2
    int d2 = 10;
    int y[d1][d2];
 //               <may be written >: y[*][*]
@@ -78,7 +80,9 @@ Cumulated effects for "main"
 
 int main()
 {
+//               <must be written>: d1
    int d1 = 10;
+//               <must be written>: d2
    int d2 = 10;
    int y[d1][d2];
 //               <may be written >: y[*][*]
@@ -135,7 +139,13 @@ Regions for "main"
 
 int main()
 {
+
+//  <d1-W-EXACT-{}>
+
    int d1 = 10;
+
+//  <d2-W-EXACT-{}>
+
    int d2 = 10;
    int y[d1][d2];
 

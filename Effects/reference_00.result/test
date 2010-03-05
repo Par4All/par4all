@@ -8,6 +8,7 @@ void reference_00(void)
 }
 void reference_00(void)
 {
+//               <must be written>: i
    int i = 0;                                                           /*0003*/
    int a[10];                                                           /*0004*/
    // effects on empty references...
@@ -16,6 +17,7 @@ void reference_00(void)
 }
 void reference_00(void)
 {
+//               <must be written>: i
    int i = 0;                                                           /*0003*/
    int a[10];                                                           /*0004*/
    // effects on empty references...

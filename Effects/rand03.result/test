@@ -106,6 +106,7 @@ PRINT CUMULATED EFFECTS for main
 //               <may be written >: _RANDOM_EFFECTS:GEN_SEED
 int main()
 {
+//               <must be written>: nx ny
    int ny = 10, nx = 10;
    Cplfloat pt_in[ny][nx];
    float Sigma2;
@@ -296,6 +297,10 @@ PRINT REGIONS for main
 
 int main()
 {
+
+//  <nx-W-EXACT-{}>
+//  <ny-W-EXACT-{}>
+
    int ny = 10, nx = 10;
    Cplfloat pt_in[ny][nx];
    float Sigma2;

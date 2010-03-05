@@ -5,6 +5,7 @@ void f3(int n_ptrs, int f4_after, ...)
 {
    va_list ap, ap_save;
    char *array[31];
+//               <must be written>: ptr_no
    int ptr_no = 0;
 //               <must be read   >: n_ptrs
    if (n_ptrs>31) 

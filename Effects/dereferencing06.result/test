@@ -15,7 +15,9 @@ Proper effetcs for "dereferencing06"
 
 void dereferencing06()
 {
+//               <must be written>: x
    double x = 1.;
+//               <must be written>: p
    double *p = &x;
 //               <must be read   >: p p[0]
 //               <must be written>: p
@@ -31,7 +33,9 @@ Cumulated effects for "dereferencing06"
 
 void dereferencing06()
 {
+//               <must be written>: x
    double x = 1.;
+//               <must be written>: p
    double *p = &x;
 //               <must be read   >: p p[0]
 //               <must be written>: p
@@ -47,7 +51,13 @@ Regions for "dereferencing06"
 
 void dereferencing06()
 {
+
+//  <x-W-EXACT-{}>
+
    double x = 1.;
+
+//  <p-W-EXACT-{}>
+
    double *p = &x;
 
 //  <p[PHI1]-R-EXACT-{PHI1==0}>

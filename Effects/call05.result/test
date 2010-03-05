@@ -56,7 +56,9 @@ Proper effects for "main"
 
 int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
    int i, j;
@@ -90,7 +92,9 @@ Cumulated effects for "main"
 //               <may be written >: __IO_EFFECTS:LUNS[1]
 int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
    int i, j;

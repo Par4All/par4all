@@ -575,8 +575,8 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(space, save);
-kernel2:   p4a_kernel_launcher_1(space, save);
+kernel1:   p4a_kernel_launcher_0(save, space);
+kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 void get_data(char filename[])
@@ -657,24 +657,24 @@ int main(int argc, char *argv[])
    return 0;
    // END BLOCK
 }
-void p4a_kernel_0(int j, int i, float_t space[501][501], float_t save[501][501])
+void p4a_kernel_0(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    
    save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 }
-void p4a_kernel_1(int j, int i, float_t space[501][501], float_t save[501][501])
+void p4a_kernel_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    
    space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
-void p4a_kernel_2(int j, int i, float_t space[501][501])
+void p4a_kernel_2(float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    space[i][j] = 0;
 }
-void p4a_kernel_launcher_0(float_t space[501][501], float_t save[501][501])
+void p4a_kernel_launcher_0(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
@@ -689,10 +689,10 @@ kernel1:
          // To be assigned to a call to P4A_vp_0: i
          // To be assigned to a call to P4A_vp_1: j
          
-         p4a_kernel_wrapper_0(j, i, space, save);
+         p4a_kernel_wrapper_0(save, space, i, j);
    // END BLOCK
 }
-void p4a_kernel_launcher_1(float_t space[501][501], float_t save[501][501])
+void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
@@ -704,7 +704,7 @@ kernel2:
          // To be assigned to a call to P4A_vp_0: i
          // To be assigned to a call to P4A_vp_1: j
          
-         p4a_kernel_wrapper_1(j, i, space, save);
+         p4a_kernel_wrapper_1(save, space, i, j);
    // END BLOCK
 }
 void p4a_kernel_launcher_2(float_t space[501][501])
@@ -719,36 +719,36 @@ void p4a_kernel_launcher_2(float_t space[501][501])
       for(j = 0; j <= 500; j += 1)
          // To be assigned to a call to P4A_vp_0: i
          // To be assigned to a call to P4A_vp_1: j
-         p4a_kernel_wrapper_2(j, i, space);
+         p4a_kernel_wrapper_2(space, i, j);
    // END BLOCK
 }
-void p4a_kernel_wrapper_0(int j, int i, float_t space[501][501], float_t save[501][501])
+void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    
-   p4a_kernel_0(j, i, space, save);
+   p4a_kernel_0(save, space, i, j);
    // END BLOCK
 }
-void p4a_kernel_wrapper_1(int j, int i, float_t space[501][501], float_t save[501][501])
+void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    
-   p4a_kernel_1(j, i, space, save);
+   p4a_kernel_1(save, space, i, j);
    // END BLOCK
 }
-void p4a_kernel_wrapper_2(int j, int i, float_t space[501][501])
+void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
-   p4a_kernel_2(j, i, space);
+   p4a_kernel_2(space, i, j);
    // END BLOCK
 }
 void write_data(char filename[])
@@ -818,7 +818,7 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(space, save);
+kernel1:   p4a_kernel_launcher_0(save, space);
 
 //  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
@@ -826,7 +826,7 @@ kernel1:   p4a_kernel_launcher_0(space, save);
 //  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
-kernel2:   p4a_kernel_launcher_1(space, save);
+kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 
@@ -1041,7 +1041,7 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(space, save);
+kernel1:   p4a_kernel_launcher_0(save, space);
 
 //  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
@@ -1049,7 +1049,7 @@ kernel1:   p4a_kernel_launcher_0(space, save);
 //  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
-kernel2:   p4a_kernel_launcher_1(space, save);
+kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 void get_data(char filename[])
@@ -1225,13 +1225,13 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(space, save);
+kernel1:   p4a_kernel_launcher_0(save, space);
 
 //  <TOP-LEVEL:save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
 //    PHI1+PHI2<=999}>
 
-kernel2:   p4a_kernel_launcher_1(space, save);
+kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 
@@ -1404,13 +1404,13 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(space, save);
+kernel1:   p4a_kernel_launcher_0(save, space);
 
 //  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
 //    PHI1+PHI2<=999}>
 
-kernel2:   p4a_kernel_launcher_1(space, save);
+kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 
@@ -1565,8 +1565,8 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(space, save);
-kernel2:   p4a_kernel_launcher_1(space, save);
+kernel1:   p4a_kernel_launcher_0(save, space);
+kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 void get_data(char filename[])
@@ -1614,19 +1614,17 @@ void get_data(char filename[])
    p4a_kernel_launcher_2(space);
    
    /* Read the pixel grey value: */
-#pragma omp DO private(c,j)
+#pragma omp for private(c,j)
    for(j = 0; j <= ny-1; j += 1)
 
 //  <c-PRIVATE-EXACT-{}>
 
-#pragma omp DO private(c,i)
+#pragma omp for private(c,i)
       for(i = 0; i <= nx-1; i += 1) {
 
 //  <c-PRIVATE-EXACT-{}>
 
          // BEGIN BLOCK
-      private(c,j)
-         private(c,i)
          c = fgetc(fp);
          /* Truncate the image if too big: */
          if (i<501&&j<501) 

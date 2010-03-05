@@ -36,6 +36,7 @@ int main()
 {
    // But it is not handled nicely here although the declaration statement is identical
    void decl35(int);
+//               <must be written>: i
    int i = 1;
 //               <must be read   >: i
 

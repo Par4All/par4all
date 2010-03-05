@@ -73,6 +73,7 @@ Proper effects for "main"
 int main()
 {
    tf_t s;
+//               <must be written>: sp
    tf_t *sp = &s;
 //               <may be written >: s[2][*] sp[0][2][*]
 //               <must be read   >: s[1] sp sp[0][1]
@@ -85,6 +86,7 @@ Cumulated effects for "main"
 int main()
 {
    tf_t s;
+//               <must be written>: sp
    tf_t *sp = &s;
 //               <may be written >: s[2][*] sp[0][2][*]
 //               <must be read   >: s[1] sp sp[0][1]
@@ -125,6 +127,9 @@ Regions for "main"
 int main()
 {
    tf_t s;
+
+//  <sp-W-EXACT-{}>
+
    tf_t *sp = &s;
 
 //  <s[PHI1]-R-EXACT-{PHI1==1}>

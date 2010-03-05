@@ -15,7 +15,9 @@ Proper effects for "lhs02"
 
 void lhs02()
 {
+//               <must be written>: i
    int i = 2;
+//               <must be written>: j
    int j = 2;
 //               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: i
@@ -33,7 +35,9 @@ Cumulated effects for "lhs02"
 //               <may be written >: TOP-LEVEL:*MEMORY*
 void lhs02()
 {
+//               <must be written>: i
    int i = 2;
+//               <must be written>: j
    int j = 2;
 //               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: i

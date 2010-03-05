@@ -37,6 +37,7 @@ Cumulated effects for "main"
 int main()
 {
    tf_t s;
+//               <must be written>: sp
    tf_t *sp = &s;
 //               <must be read   >: s[1] sp sp[0][1]
 
@@ -55,6 +56,9 @@ Regions for "main"
 int main()
 {
    tf_t s;
+
+//  <sp-W-EXACT-{}>
+
    tf_t *sp = &s;
 
 //  <s[PHI1]-R-EXACT-{PHI1==1}>

@@ -649,9 +649,12 @@ freia_status freia_common_close_output(freia_dataio *n)
 {
    return FREIA_OK;                                                     /*0050*/
 }
-//               <must be read   >: x y z
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ x y z
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ img
    freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0009*/
 //               <must be read   >: img x y z
 //               <must be written>: img[0][4]

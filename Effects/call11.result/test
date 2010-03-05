@@ -65,9 +65,13 @@ Cumulated effects for "main"
 
 int main()
 {
+//               <must be written>: d1
    int d1 = 10;
+//               <must be written>: d2
    int d2 = 10;
+//               <must be written>: d3
    int d3 = 10;
+//               <must be written>: d4
    int d4 = 10;
    int y[d1][d2][d3][d4];
    int i, j;
