@@ -1,0 +1,61 @@
+%%
+%% $Id: alias_private.tex 14503 2009-07-10 15:11:52Z mensi $
+%%
+%% Copyright 1989-2009 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass{article}
+
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Points\_to Analysis}
+\author{Amira Mensi}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\domain{import reference from "ri.newgen"}
+{}
+\domain{import approximation from "ri.newgen"}
+{}
+\domain{import statement from "ri.newgen"}
+{}
+% These newgen data structure are used to propagate interprocedural points_to
+% information. A points_to relation involved two entities :source and
+% sink and an approximation of their relation.  
+ 
+
+
+ 
+\domain{points\_to = source:access x sink:access x relation:approximation}
+{}
+\domain{access = referencing:points\_to\_path + addressing:points\_to\_path + dereferencing:points\_to\_path}
+{}
+\domain{points\_to\_path = reference}
+{}
+\domain{points\_to\_graph = arcs:points\_to*}
+{}
+\domain{points\_to\_list = list : points\_to*}
+{}
+\domain{statement\_points\_to = persistant statement -> points\_to\_list}
+{}
+
+\end{document}

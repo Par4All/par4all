@@ -4474,7 +4474,105 @@ alias_classes > MODULE.alias_classes
         < PROGRAM.entities
         < MODULE.alias_lists
 \end{PipsMake}
+\subsection{Points to Analysis}
 
+points\_to\_analysis phase.
+
+This function is being implemented by Amira \textsc{Mensi}.
+
+\begin{PipsMake}
+alias points_to_analysis  'Points To Analysis'
+
+points_to_analysis > MODULE.points_to_list
+        < PROGRAM.entities
+        < MODULE.code
+
+\end{PipsMake}
+\subsection{Points to  Properties}
+The following properties are defined to ensure the safe use
+of \PipsPassRef{points_to_analysis}.
+The property \PipsPropRef{ALIASING_ACROSS_TYPES} specifies that two
+pointers of different effective types can be aliased. The default
+value it is set to TRUE, when it is turned to false two pointers of
+different types are never aliased.
+\begin{PipsProp}{ALIASING_ACROSS_TYPES}
+ALIASING_ACROSS_TYPES TRUE
+\end{PipsProp}
+The property \PipsPropRef{ALIASING_ACROSS_FORMEL_PARAMETERS} is used
+to handle the aliasing between formel parameters and global
+variables of pointer type. When it is set to TRUE two formels parameters or a formal
+one and a global pointer or two global pointers can be aliased. If it
+is turned to FALSE, such pointers are assumed to be unaliased for
+intraprocedural analysis and generally for root module(i.e. modules
+without callers).
+\begin{PipsProp}{ALIASING_ACROSS_FORMEL_PARAMETERS}
+ALIASING_ACROSS_FORMEL_PARAMETERS TRUE
+\end{PipsProp}
+This property specifies that one data structure can recursively
+contain two pointers pointing to the same location. If it is turned to
+FALSE, it is assumed that two different not included
+ memory access paths cannot point to the same memory locations. The safe default value is TRUE.
+
+\begin{PipsProp}{ALIASING_INSIDE_DATA_STRUCTURE}
+ALIASING_INSIDE_DATA_STRUCTURE TRUE
+\end{PipsProp}
+
+This following string property defines the lattice of maximal elements to use when
+precise information is lost. Three values are possible: "unique",
+"function" and "area". The first value is the default va
+lue. A unique identifier is defined to represent any set of unknown
+locations. The second value defines a separate identifier for each
+function and compilation unit. Note that compilation units require
+more explanation about this definition and about the conflictdetection
+scheme. The third value, "area", requires a separate identifier for
+each area of each function or compilation unit. These abstract
+lcoation lattice values are furtther refined if the property
+\PipsPropRef{ALIASING_ACROSS_TYPES} is set to FALSE.The abstract location API hides
+all these local maximal values fromits callers. Note that the
+dereferencing of any such top abstractlocation returns the very top of all abstract locations.
+% \begin{PipsProp}{ABSTRACT_LOCATION_TOP[_LATTICE]}
+% ABSTRACT_LOCATION_TOP[_LATTICE] "unique"
+% \end{PipsProp}
+
+The \PipsPropRef{ABSTRACT_HEAP_LOCATIONS} specifies the modeling of
+the heap. The possible values are "unique", "insensitive",
+"flow-sensitive" and "context-sensitive". Each value defined
+ a stricly refined analysis with respect to analyses defined by
+ previous values [This may not be a good idea,since flow and context
+ sensitivity are orhtogonal]. The default value, "unique", implies
+ that the heap is a unique array. It is enough to parallelize simple
+ loops containing pointer-based references such as 
+"p[i]". In the "insensitive" case and all other cases, one array is
+allocated in each function to modelize the heap. In the
+"flow-sensitive" case, the statement numbers of the malloc()
+ call sites are used to subscribe this array, as well as all indices
+ of the surrounding loops [Two improvements in one property...]. In
+ the "context\_sensitive" case, the interprocedural
+ translation of memory acces paths based on the abstract heap are
+ prefixed by the same information regarding the call site: function
+ containing the call site, statement number of the call
+ site and indices of surrounding loops. Note that the naming of
+ options is not fully compatible with the usual notations in pointer
+ analyses. Note also that the insensitive case is
+ redundant with context sensitive case: in the later case, a unique
+ heap associated to malloc() would carry exactly the same amount of
+ information [flow and context sensitivity are
+ orthogonal]. Finally, note that abstract heap arrays are
+ distinguished according to their types if the property
+ \PipsPropRef{ALIASING_ACROSS_TYPES} is set to FALSE [impact on
+ abstract heap location API]. Else, the heap array is of type
+ unknown. If a heap
+ abstract location is dereferenced without any point-to
+ information nor heap aliasing information, the safe result is the top abstract location.
+\begin{PipsProp}{ABSTRACT_HEAP_LOCATIONS}
+ABSTRACT_HEAP_LOCATIONS "unique"
+\end{PipsProp}
+
+The following property is used to bound the length of any generic
+access path or reference. Its default value is 0.It means that no limit is set.
+\begin{PipsProp}{GAP_MAX_LENGTH}
+GAP_MAX_LENGTH 0
+\end{PipsProp}
 
 \subsection{Menu for Alias Views}
 
@@ -9359,6 +9457,7 @@ alias print_code_proper_regions 'Statements & Proper Regions'
 alias print_code_proper_references 'Statements & Proper References'
 alias print_code_cumulated_references 'Statements & Cumulated References'
 alias print_initial_precondition 'Initial Preconditions'
+alias print_code_points_to_list 'Statements & Points To'
 \end{PipsMake}
 
 \subsection{Standard Sequential View}
@@ -9722,6 +9821,19 @@ print_code_static_control       > MODULE.printed_file
         < MODULE.static_control
 \end{PipsMake}
 
+\subsection{Sequential View with Points To  Information}
+
+%%@UserManualDocumentation: print_code_points_to_sets
+Display the code decorated with the points to information.
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+print_code_points_to_list      > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.points_to_list
+\end{PipsMake}
 
 \subsection{Prettyprint properties}
 
