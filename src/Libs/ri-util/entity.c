@@ -1642,7 +1642,7 @@ entity update_operator_to_regular_operator(entity op)
   if(ENTITY_PLUS_UPDATE_P(op))
     sop = entity_intrinsic(PLUS_C_OPERATOR_NAME);
   else if(ENTITY_MINUS_UPDATE_P(op))
-    sop = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+    sop = entity_intrinsic(MINUS_C_OPERATOR_NAME);
   else if(ENTITY_MULTIPLY_UPDATE_P(op))
     sop = entity_intrinsic(MULTIPLY_OPERATOR_NAME);
   else if(ENTITY_DIVIDE_UPDATE_P(op))

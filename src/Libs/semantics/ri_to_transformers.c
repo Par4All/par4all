@@ -1836,9 +1836,38 @@ transformer statement_to_transformer(
 	print_transformer(ipre);
       }
 
-      it = instruction_to_transformer(i, ipre, e);
-      nt = transformer_combine(dt, it);
-      free_transformer(it);
+      /* FI: how do we want to handle declarations:
+      *
+      * int i = 1; => T() {i==1}
+      *
+      * or
+      *
+      * int i = 1; => T(i) {i==1}
+      *
+      * What is the impact of this choice? BC prefers the second one
+      * because it it consistent for convec effect computation.
+      *
+      * Note: this issue could be dealt with earlier in
+      * declarations_to_transformer()
+      */
+      /* FI: the code below might be useful again when declarations
+	 are carried by any kind of statement */
+      //it = instruction_to_transformer(i, ipre, e);
+      //nt = transformer_combine(dt, it);
+      //free_transformer(it);
+      if(FALSE) {
+	/* Option 1 */
+	nt = dt;
+      }
+      else {
+	/* Option 2, currently bugged */
+	/* Currently, the preconditions is useless as only the
+	   effects will be used to compute the CONTINUE transformer. */
+	it = instruction_to_transformer(i, pre, e);
+	nt = transformer_image_intersection(it, dt);
+	free_transformer(it);
+	free_transformer(dt);
+      }
       free_transformer(post);
       // free_transformer(ipre);
     }

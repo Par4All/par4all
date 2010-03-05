@@ -463,7 +463,7 @@ static transformer update_operation_to_transformer(entity v,
   /* Too early: you are projecting v and loosing all useful information
      within an expression! */
   /* tf = transformer_temporary_value_projection(tf); */
-    
+
   //free_transformer(tf2);
   //free_transformer(tf12);
   //free_transformer(tf12u);
