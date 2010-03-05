@@ -28,7 +28,6 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 
 #include "genC.h"
