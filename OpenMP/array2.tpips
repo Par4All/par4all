@@ -17,7 +17,7 @@ create array2 array2.c
 #SELECT C LANGUAGE
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 #echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 #echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:

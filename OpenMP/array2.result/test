@@ -1,55 +1,55 @@
 // OMP style
 int main()
 {
-   int b[size];                                                         /*0006*/
-   int i;                                                               /*0007*/
-   int j;                                                               /*0008*/
-   i = 0;                                                               /*0009*/
-   j = 0;                                                               /*0010*/
+   int b[size];
+   int i;
+   int j;
+   i = 0;
+   j = 0;
 
 
 #pragma omp parallel for 
    for(i = 0; i <= size-1; i += 1)
-      b[i] = 0;                                                         /*0013*/
+      b[i] = 0;
 
 
 #pragma omp parallel for private(i)
    for(j = 0; j <= size-1; j += 1)
       for(i = 0; i <= 99; i += 1)
-         b[j] = b[j]+i;                                                 /*0018*/
+         b[j] = b[j]+i;
 
 
    for(i = 0; i <= 99; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= size-1; j += 1)
-         b[j] = b[j]+i;                                                 /*0024*/
+         b[j] = b[j]+i;
 
-   return 0;                                                            /*0028*/
+   return 0;
 }
 int main()
 {
-   int b[size];                                                         /*0006*/
-   int i;                                                               /*0007*/
-   int j;                                                               /*0008*/
-   i = 0;                                                               /*0009*/
-   j = 0;                                                               /*0010*/
+   int b[size];
+   int i;
+   int j;
+   i = 0;
+   j = 0;
 
 
 #pragma omp parallel for
    for(i = 0; i <= size-1; i += 1)
-      b[i] = 0;                                                         /*0013*/
+      b[i] = 0;
 
 
 #pragma omp parallel for private(i)
    for(j = 0; j <= size-1; j += 1)
       for(i = 0; i <= 99; i += 1)
-         b[j] = b[j]+i;                                                 /*0018*/
+         b[j] = b[j]+i;
 
 
    for(i = 0; i <= 99; i += 1)
 #pragma omp parallel for
       for(j = 0; j <= size-1; j += 1)
-         b[j] = b[j]+i;                                                 /*0024*/
+         b[j] = b[j]+i;
 
-   return 0;                                                            /*0028*/
+   return 0;
 }
