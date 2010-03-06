@@ -4,4 +4,4 @@ include ../validate.mk
 
 clean: local-clean
 local-clean:
-	$(RM) ve
+	$(RM) ve fabien1.f fabien2.f
