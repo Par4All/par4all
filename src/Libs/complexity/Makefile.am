@@ -10,7 +10,7 @@ libcomplexity_la_SOURCES=\
 	comp_matrice.c
 
 complexity_cost_tables.tar.gz:
-	if ! test -d complexity_cost_tables -a -d $(srcdir)/complexity_cost_tables ; then \
+	if test ! -d complexity_cost_tables && test -d $(srcdir)/complexity_cost_tables ; then \
 		$(LN_S) $(srcdir)/complexity_cost_tables . ; \
 	fi
 	if test -r $(srcdir)/complexity_cost_tables.tar.gz ; then \
