@@ -496,7 +496,8 @@ static void reductions_rewrite(statement s)
             break;
 
         case is_instruction_call:
-            body = s;
+            if(get_bool_property("SIMD_REMOVE_REDUCTIONS_ONLY_IN_LOOP")) return;
+            else body = s;
             break;
 
         default:

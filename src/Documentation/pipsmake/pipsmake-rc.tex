@@ -5146,6 +5146,9 @@ simd_remove_reductions      > MODULE.code
         < MODULE.code
         < MODULE.dg
 \end{PipsMake}
+\begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_ONLY_IN_LOOP}
+SIMD_REMOVE_REDUCTIONS_ONLY_IN_LOOP TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{deatomizer}
 ...
@@ -7620,10 +7623,12 @@ old_reductions                      > MODULE.code
 \index{Forward substitution}
 \index{Invariant code motion}
 
+\begin{PipsPass}{forward_substitute}
 Scalars can be forward substituted. The effect is to undo already
 performed optimizations such as invariant code motion and common
 subexpression elimination, or manual atomization. However we hope to
 do a better job automatically!
+\end{PipsPass}
 
 \begin{PipsMake}
 alias forward_substitute 'Forward Substitution'
@@ -7635,6 +7640,13 @@ forward_substitute      > MODULE.code
         < MODULE.dg
         < MODULE.cumulated_effects
 \end{PipsMake}
+
+One can set \PipsPropRef{FORWARD_SUBSTITUTE_OPTIMISTIC_CLEAN} to TRUE in order to
+clean (without check) forward - substituted assignments.
+Use cautiously !
+\begin{PipsProp}{FORWARD_SUBSTITUTE_OPTIMISTIC_CLEAN}
+FORWARD_SUBSTITUTE_OPTIMISTIC_CLEAN FALSE
+\end{PipsProp}
 
 \subsection{Expression Substitution}
 
@@ -7818,6 +7830,7 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INLINING
 
+
 \subsection{Inlining}
 \label{subsection-inlining}
 \index{Inlining}
@@ -7857,6 +7870,15 @@ inlining_simple      > CALLERS.parsed_code
         < CALLERS.printed_file
 		< MODULE.code
         < MODULE.callers
+\end{PipsMake}
+
+\begin{PipsPass}{recompile_module}
+Regenerate the ri from the ri ...
+\end{PipsPass}
+
+\begin{PipsMake}
+recompile_module > MODULE.parsed_code
+	< MODULE.code
 \end{PipsMake}
 
 
@@ -8245,10 +8267,12 @@ ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 
 \subsection{Scalarization}
 
+\begin{PipsPass}{scalarization}
 Scalarization is the process of replacing array references with scalar
 variables wherever appropriate. Expected benefits include lower memory
 footprint (e.g. registers can be used instead of allocating heap
 space) and hence, better execution times.
+\end{PipsPass}
 
 Scalarizing a given array reference is subject to two successive
 criteria, a Legality criterion and a Profitability criterion:
