@@ -234,7 +234,7 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
     /* create the scalar */
 	entity new = make_new_scalar_variable(
 			get_current_module_entity(),
-			copy_basic(variable_basic(type_variable(entity_type(efrom))))
+			basic_of_expression(from)
 			);
     /* set intial */
     if(!expression_undefined_p(from))
@@ -536,10 +536,16 @@ reget:
                             new = call_function(expression_call(from));
                         else
                         {
-                            new = make_temporary_scalar_entity(e,from);
-                            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
-                        }
-                        break;
+                                if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
+                                {
+                                    new = make_temporary_scalar_entity(e,from);
+                                }
+                                else
+                                {
+                                  new = make_temporary_scalar_entity(e,from);
+                                }
+                                AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+                        } break;
                     case is_syntax_subscript:
                         /* need a temporary variable */
                         {
