@@ -325,8 +325,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         string cu_name = compilation_unit_of_module(get_current_module_name());
         //string mln = module_local_name(inlined_module(p));
         set inlined_referenced_entities = get_referenced_entities(inlined_module_statement(p));
+        list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
+        set_free(inlined_referenced_entities);
         //list new_externs = NIL;
-        SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
+        FOREACH(ENTITY,ref_ent,lire)
         {
             if( entity_field_p(ref_ent) ) /* special hook for struct member : consider their structure instead of the field */
             {
@@ -360,7 +362,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 }
             }
         }
-        set_free(inlined_referenced_entities);
+        gen_free_list(lire);
     }
 
 
