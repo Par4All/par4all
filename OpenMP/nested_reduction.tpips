@@ -1,9 +1,9 @@
 #
-delete nested_c
+delete nested_reduction
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create nested_c nested_c.c
+create nested_reduction nested_reduction.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -13,7 +13,7 @@ create nested_c nested_c.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setenv SEMANTICS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
-#setenv OPMIFY_CODE_DEBUG_LEVEL 9
+setenv OPMIFY_CODE_DEBUG_LEVEL 9
 
 #SELECT C LANGUAGE
 activate C_PARSER
@@ -26,7 +26,6 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 setproperty PRAGMA_TYPE "expr"
-setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
@@ -38,9 +37,10 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
-apply UNSPLIT (%ALL)
+#activate PRINT_CODE_CUMULATED_REDUCTIONS
+#display PRINTED_FILE(main)
 
 close
-#delete nested_c
+#delete nested_reduction
 quit
 # EOF

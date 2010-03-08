@@ -1,44 +1,47 @@
 // OMP style
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0004*/
-   int sum = 0;                                                         /*0005*/
+   int k = 0, i = 0;                                                    /*0006*/
+   float sum = 0;                                                       /*0007*/
+   float array[size][size];                                             /*0008*/
 
 
-   for(k = 0; k <= 99; k += 1) {
-      for(i = 0; i <= 99; i += 1)
-         sum += i;                                                      /*0009*/
-      sum += k;                                                         /*0011*/
-   }
+#pragma omp parallel for private (i)
+   for(k = 0; k <= size-1; k += 1)
+#pragma omp parallel for 
+      for(i = 0; i <= size-1; i += 1)
+         array[k][i] = i+k;                                             /*0012*/
 
 
-   for(i = 0; i <= 99; i += 1)
-      sum += i;                                                         /*0015*/
+   for(i = 0; i <= size-1; i += 1)
+      for(k = 0; k <= size-1; k += 1)
+         sum += array[i][k];                                            /*0018*/
 
-   printf("sum: %d\n", sum);                                            /*0018*/
+   printf("sum: %f\n", sum);                                            /*0022*/
 
-   return 0;                                                            /*0020*/
+   return 0;                                                            /*0024*/
 }
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0004*/
-   int sum = 0;                                                         /*0005*/
+   int k = 0, i = 0;                                                    /*0006*/
+   float sum = 0;                                                       /*0007*/
+   float array[size][size];                                             /*0008*/
 
 
+#pragma omp parallel for private (i)
+   for(k = 0; k <= size-1; k += 1)
+#pragma omp parallel for
+      for(i = 0; i <= size-1; i += 1)
+         array[k][i] = i+k;                                             /*0012*/
+
+
+#pragma omp parallel for reduction(+:sum) private (k)
+   for(i = 0; i <= size-1; i += 1)
 #pragma omp parallel for reduction(+:sum)
-   for(k = 0; k <= 99; k += 1) {
-#pragma omp parallel for reduction(+:sum)
-      for(i = 0; i <= 99; i += 1)
-         sum += i;                                                      /*0009*/
-      sum += k;                                                         /*0011*/
-   }
+      for(k = 0; k <= size-1; k += 1)
+         sum += array[i][k];                                            /*0018*/
 
+   printf("sum: %f\n", sum);                                            /*0022*/
 
-#pragma omp parallel for reduction(+:sum)
-   for(i = 0; i <= 99; i += 1)
-      sum += i;                                                         /*0015*/
-
-   printf("sum: %d\n", sum);                                            /*0018*/
-
-   return 0;                                                            /*0020*/
+   return 0;                                                            /*0024*/
 }
