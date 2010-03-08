@@ -20,7 +20,6 @@ void call17(int *x)
 
 Cumulated effects for "call17"
 
-//               <must be read   >: x
 //               <must be written>: x[0]
 void call17(int *x)
 {
