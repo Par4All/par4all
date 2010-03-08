@@ -2192,6 +2192,7 @@ void insert_statement(statement s,
       else
 	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s1,NIL));
 
+      statement_instruction(s)=instruction_undefined;/* SG: this is important*/
       update_statement_instruction(s, make_instruction_sequence(make_sequence(ls)));
     }
 }
