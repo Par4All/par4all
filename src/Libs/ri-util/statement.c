@@ -2187,6 +2187,7 @@ void insert_statement(statement s,
   else
     {
       statement s2 = copy_statement(s);
+      statement_label(s)=entity_empty_label();
       if (before)
 	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else
