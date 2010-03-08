@@ -495,6 +495,10 @@ static void reductions_rewrite(statement s)
             body = forloop_body(instruction_forloop(i));
             break;
 
+        case is_instruction_call:
+            body = s;
+            break;
+
         default:
             return;
     }
@@ -521,7 +525,7 @@ static void reductions_rewrite(statement s)
             case is_instruction_sequence:
                 {
                     FOREACH(STATEMENT, curStat,sequence_statements(instruction_sequence(ibody)))
-                        rename_statement_reductions(curStat, &reductions_info, reductions_list(load_cumulated_reductions(curStat)));
+                        rename_statement_reductions(curStat, &reductions_info, reductions);
                 } break;
 
             case is_instruction_call:
@@ -548,11 +552,12 @@ static void reductions_rewrite(statement s)
         gen_full_free_list(reductions_info);
 
         // Replace the old statement instruction by the new one
-        update_statement_instruction(s,make_instruction_sequence(
-                    make_sequence(
-                    gen_concatenate(preludes, 
-                        CONS(STATEMENT, copy_statement(s),
-                            compacts)))));
+        statement scp = copy_statement(s);
+        sequence seq = make_sequence(
+                gen_concatenate(
+                    preludes,
+                    CONS(STATEMENT, scp,compacts)));
+        update_statement_instruction(s,make_instruction_sequence(seq));
     }
 }
 

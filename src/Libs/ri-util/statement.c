@@ -2192,14 +2192,7 @@ void insert_statement(statement s,
       else
 	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s1,NIL));
 
-      statement_comments(s) = empty_comments;
-      statement_label(s)= entity_empty_label();
-      statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-      statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-
-      /* free_instruction(statement_instruction(s));*/
-      statement_instruction(s) = make_instruction(is_instruction_sequence,
-						  make_sequence(ls));
+      update_statement_instruction(s, make_instruction_sequence(make_sequence(ls)));
     }
 }
 
@@ -2350,7 +2343,7 @@ statement update_statement_instruction(statement s,instruction i)
     {
       cs = make_call_statement(CONTINUE_FUNCTION_NAME,
 			       NIL,
-			       statement_label(s),
+			       return_label_p(entity_name(statement_label(s)))?entity_empty_label():statement_label(s),
 			       statement_comments(s));
 
       statement_comments(s) = empty_comments;
@@ -2371,6 +2364,8 @@ statement update_statement_instruction(statement s,instruction i)
        * maybe we should regenerate the new one if any to keep global coherency ?*/
       gen_free_list(statement_declarations(s));
       statement_declarations(s)=NIL;
+      if(return_label_p(entity_name(statement_label(s))) && !return_statement_p(s))
+          statement_label(s)=entity_empty_label();
     }
   return s;
 }
