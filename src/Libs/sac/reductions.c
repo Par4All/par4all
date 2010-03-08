@@ -216,16 +216,21 @@ static bool reduction_in_statement_p(reduction red, statement stat)
    to do the reduction. */
 static void rename_statement_reductions(statement s, list * reductions_info, list reductions)
 {
+    ifdebug(3) {
+        pips_debug(3,"considering statement:\n");
+        print_statement(s);
+    }
     FOREACH(REDUCTION, r, reductions)
     {
         ifdebug(3) {
-            pips_debug(3,"red bas\n");
+            pips_debug(3,"considering reduction:\n");
             print_reference(reduction_reference(r));
-            pips_debug(3,"\n");
+            fprintf(stderr,"\n");
         }
 
         if(reduction_in_statement_p(r,s))
         {
+            pips_debug(3,"found in the statement ! rewriting ...\n");
             basic b = basic_of_reference(reduction_reference(r));
             if(!basic_undefined_p(b))
             {
@@ -235,6 +240,8 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
                     gen_context_recurse(s,ri,expression_domain,gen_true,rename_reduction_ref_walker);
             }
         }
+        else
+            pips_debug(3,"not found in the statement ! skipping ...\n");
     }
 }
 
@@ -499,6 +506,13 @@ static void reductions_rewrite(statement s)
 
         //Compute the reductions list for the loop
         list reductions = reductions_list(load_cumulated_reductions(s));
+        ifdebug(2) {
+            if(!ENDP(reductions))
+                pips_debug(2,"found reductions for loop:\n");
+            else
+                pips_debug(2,"no reduction for loop:\n");
+            print_statement(s);
+        }
 
         //Lookup the reductions in the loop's body, and change the loop body accordingly
         instruction ibody = statement_instruction(body);
@@ -507,7 +521,7 @@ static void reductions_rewrite(statement s)
             case is_instruction_sequence:
                 {
                     FOREACH(STATEMENT, curStat,sequence_statements(instruction_sequence(ibody)))
-                        rename_statement_reductions(curStat, &reductions_info, reductions);
+                        rename_statement_reductions(curStat, &reductions_info, reductions_list(load_cumulated_reductions(curStat)));
                 } break;
 
             case is_instruction_call:
@@ -534,17 +548,11 @@ static void reductions_rewrite(statement s)
         gen_full_free_list(reductions_info);
 
         // Replace the old statement instruction by the new one
-        statement_instruction(s) = make_instruction_sequence(make_sequence(
+        update_statement_instruction(s,make_instruction_sequence(
+                    make_sequence(
                     gen_concatenate(preludes, 
                         CONS(STATEMENT, copy_statement(s),
-                            compacts))));
-
-        statement_label(s) = entity_empty_label();
-        statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-        statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-        statement_comments(s) = empty_comments;
-        statement_declarations(s) = NIL;
-        statement_decls_text(s) = string_undefined;
+                            compacts)))));
     }
 }
 
