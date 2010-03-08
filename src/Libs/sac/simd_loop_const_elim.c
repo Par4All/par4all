@@ -344,17 +344,8 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
     list oldStatDecls = statement_declarations(s);
     statement_declarations(s) = NIL;
 
-    free_instruction(statement_instruction(s));
-
     // Replace the old statement instruction by the new one
-    statement_instruction(s) = make_instruction_sequence(make_sequence(newseq));
-
-    statement_label(s) = entity_empty_label();
-    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-    statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-    statement_comments(s) = empty_comments;
-    statement_declarations(s) = oldStatDecls;
-    statement_decls_text(s) = string_undefined;
+    update_statement_instruction(s, make_instruction_sequence(make_sequence(newseq)));
 
 }
 
