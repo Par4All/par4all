@@ -28,7 +28,7 @@
 #include <time.h>
 #include <float.h>
 
-#define DP
+#define SP
 
 #ifdef SP
 #define ZERO        0.0

@@ -8,7 +8,7 @@ static void daxpy_r(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -40,7 +40,7 @@ static void daxpy_ur(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -82,10 +82,10 @@ static REAL ddot_r(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -116,10 +116,10 @@ static REAL ddot_ur(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy, m;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -176,7 +176,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -188,7 +188,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_r(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -206,7 +206,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
    else {
@@ -224,7 +224,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -236,7 +236,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_ur(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -254,7 +254,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
 }
@@ -562,8 +562,8 @@ l99999:   ;
       if (malloc_arg!=memreq||(mempool = malloc(malloc_arg))==(void *) 0)
          printf("Not enough memory available for given array size.\n\n");
       else {
-         printf("\n\nLINPACK benchmark, %s precision.\n", "Double");
-         printf("Machine precision:  %d digits.\n", 15);
+         printf("\n\nLINPACK benchmark, %s precision.\n", "Single");
+         printf("Machine precision:  %d digits.\n", 6);
          printf("Array size %d X %d.\n", arsize, arsize);
          printf("Average rolled and unrolled performance:\n\n");
          printf("    Reps Time(s) DGEFA   DGESL  OVERHEAD    KFLOPS\n");
@@ -589,7 +589,7 @@ static void daxpy_r(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -621,7 +621,7 @@ static void daxpy_ur(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -663,10 +663,10 @@ static REAL ddot_r(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -697,10 +697,10 @@ static REAL ddot_ur(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy, m;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -757,7 +757,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -769,7 +769,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_r(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -787,7 +787,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
    else {
@@ -805,7 +805,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -817,7 +817,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_ur(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -835,7 +835,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
 }
@@ -1143,8 +1143,8 @@ l99999:   ;
       if (malloc_arg!=memreq||(mempool = malloc(malloc_arg))==(void *) 0)
          printf("Not enough memory available for given array size.\n\n");
       else {
-         printf("\n\nLINPACK benchmark, %s precision.\n", "Double");
-         printf("Machine precision:  %d digits.\n", 15);
+         printf("\n\nLINPACK benchmark, %s precision.\n", "Single");
+         printf("Machine precision:  %d digits.\n", 6);
          printf("Array size %d X %d.\n", arsize, arsize);
          printf("Average rolled and unrolled performance:\n\n");
          printf("    Reps Time(s) DGEFA   DGESL  OVERHEAD    KFLOPS\n");
@@ -1170,7 +1170,7 @@ static void daxpy_r(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -1204,7 +1204,7 @@ static void daxpy_ur(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -1253,10 +1253,10 @@ static REAL ddot_r(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -1288,10 +1288,10 @@ static REAL ddot_ur(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy, m;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -1348,7 +1348,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -1360,7 +1360,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_r(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -1378,7 +1378,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
    else {
@@ -1396,7 +1396,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -1408,7 +1408,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_ur(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -1426,7 +1426,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
 }
@@ -1759,8 +1759,8 @@ l99999:   ;
       if (malloc_arg!=memreq||(mempool = malloc(malloc_arg))==(void *) 0)
          printf("Not enough memory available for given array size.\n\n");
       else {
-         printf("\n\nLINPACK benchmark, %s precision.\n", "Double");
-         printf("Machine precision:  %d digits.\n", 15);
+         printf("\n\nLINPACK benchmark, %s precision.\n", "Single");
+         printf("Machine precision:  %d digits.\n", 6);
          printf("Array size %d X %d.\n", arsize, arsize);
          printf("Average rolled and unrolled performance:\n\n");
          printf("    Reps Time(s) DGEFA   DGESL  OVERHEAD    KFLOPS\n");
@@ -1786,7 +1786,7 @@ static void daxpy_r(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -1820,7 +1820,7 @@ static void daxpy_ur(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
 
    if (n<=0) 
       return;
-   if (da==0.0e0) 
+   if (da==0.0) 
       return;
 
    if (incx!=1||incy!=1) {
@@ -1869,10 +1869,10 @@ static REAL ddot_r(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -1904,10 +1904,10 @@ static REAL ddot_ur(int n, REAL *dx, int incx, REAL *dy, int incy)
    REAL dtemp;
    int i, ix, iy, m;
 
-   dtemp = 0.0e0;
+   dtemp = 0.0;
 
    if (n<=0) 
-      return 0.0e0;
+      return 0.0;
 
    if (incx!=1||incy!=1) {
       
@@ -1964,7 +1964,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -1976,7 +1976,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_r(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -1994,7 +1994,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
    else {
@@ -2012,7 +2012,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
             /* zero pivot implies this column already
                                triangularized */
             
-            if (a[lda*k+l]!=0.0e0) {
+            if (a[lda*k+l]!=0.0) {
                
                /* interchange if necessary */
                
@@ -2024,7 +2024,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                
                /* compute multipliers */
                
-               t = -(1.0e0/a[lda*k+k]);
+               t = -(1.0/a[lda*k+k]);
                dscal_ur(n-(k+1), t, &a[lda*k+k+1], 1);
                
                /* row elimination with column indexing */
@@ -2042,7 +2042,7 @@ static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
                *info = k;
          }
       ipvt[n-1] = n-1;
-      if (a[lda*(n-1)+n-1]==0.0e0) 
+      if (a[lda*(n-1)+n-1]==0.0) 
          *info = n-1;
    }
 }
@@ -2375,8 +2375,8 @@ l99999:   ;
       if (malloc_arg!=memreq||(mempool = malloc(malloc_arg))==(void *) 0)
          printf("Not enough memory available for given array size.\n\n");
       else {
-         printf("\n\nLINPACK benchmark, %s precision.\n", "Double");
-         printf("Machine precision:  %d digits.\n", 15);
+         printf("\n\nLINPACK benchmark, %s precision.\n", "Single");
+         printf("Machine precision:  %d digits.\n", 6);
          printf("Array size %d X %d.\n", arsize, arsize);
          printf("Average rolled and unrolled performance:\n\n");
          printf("    Reps Time(s) DGEFA   DGESL  OVERHEAD    KFLOPS\n");
