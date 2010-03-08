@@ -20,14 +20,15 @@ int foo(int a, int b[10], int c[10])
    return c[I_0];
 }
 
-code after cse, skip added constant
+code after cse, lhs not skipped
 
 int foo(int a, int b[10], int c[10])
 {
    int k;
    //PIPS generated variable
-   int I_0, I_1, I_2;
-   c[a+2] = b[a+2+k];
-   return c[a+2];
+   int I_0, I_1, I_2, I_3;
+   I_0 = a+2;
+   c[I_0] = b[I_0+k];
+   return c[I_0];
 }
 
