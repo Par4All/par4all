@@ -4498,15 +4498,15 @@ different types are never aliased.
 \begin{PipsProp}{ALIASING_ACROSS_TYPES}
 ALIASING_ACROSS_TYPES TRUE
 \end{PipsProp}
-The property \PipsPropRef{ALIASING_ACROSS_FORMEL_PARAMETERS} is used
+The property \PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} is used
 to handle the aliasing between formel parameters and global
 variables of pointer type. When it is set to TRUE two formels parameters or a formal
 one and a global pointer or two global pointers can be aliased. If it
 is turned to FALSE, such pointers are assumed to be unaliased for
 intraprocedural analysis and generally for root module(i.e. modules
 without callers).
-\begin{PipsProp}{ALIASING_ACROSS_FORMEL_PARAMETERS}
-ALIASING_ACROSS_FORMEL_PARAMETERS TRUE
+\begin{PipsProp}{ALIASING_ACROSS_FORMAL_PARAMETERS}
+ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
 \end{PipsProp}
 This property specifies that one data structure can recursively
 contain two pointers pointing to the same location. If it is turned to
@@ -4517,29 +4517,30 @@ FALSE, it is assumed that two different not included
 ALIASING_INSIDE_DATA_STRUCTURE TRUE
 \end{PipsProp}
 
-This following string property defines the lattice of maximal elements to use when
-precise information is lost. Three values are possible: "unique",
-"function" and "area". The first value is the default va
-lue. A unique identifier is defined to represent any set of unknown
+The following string property defines the lattice of maximal elements
+to use when precise information is lost. Three values are possible:
+"unique", "function" and "area". The first value is the default
+value. A unique identifier is defined to represent any set of unknown
 locations. The second value defines a separate identifier for each
 function and compilation unit. Note that compilation units require
-more explanation about this definition and about the conflictdetection
+more explanation about this definition and about the conflict detection
 scheme. The third value, "area", requires a separate identifier for
 each area of each function or compilation unit. These abstract
-lcoation lattice values are furtther refined if the property
-\PipsPropRef{ALIASING_ACROSS_TYPES} is set to FALSE.The abstract location API hides
-all these local maximal values fromits callers. Note that the
-dereferencing of any such top abstractlocation returns the very top of all abstract locations.
+lcoation lattice values are further refined if the property
+\PipsPropRef{ALIASING_ACROSS_TYPES} is set to FALSE. The abstract
+location API hides all these local maximal values from its
+callers. Note that the dereferencing of any such top abstract location
+returns the very top of all abstract locations.
 % \begin{PipsProp}{ABSTRACT_LOCATION_TOP[_LATTICE]}
 % ABSTRACT_LOCATION_TOP[_LATTICE] "unique"
 % \end{PipsProp}
 
 The \PipsPropRef{ABSTRACT_HEAP_LOCATIONS} specifies the modeling of
 the heap. The possible values are "unique", "insensitive",
-"flow-sensitive" and "context-sensitive". Each value defined
+"flow-sensitive" and "context-sensitive". Each value defines
  a stricly refined analysis with respect to analyses defined by
- previous values [This may not be a good idea,since flow and context
- sensitivity are orhtogonal]. The default value, "unique", implies
+ previous values [This may not be a good idea, since flow and context
+ sensitivity are orthogonal]. The default value, "unique", implies
  that the heap is a unique array. It is enough to parallelize simple
  loops containing pointer-based references such as 
 "p[i]". In the "insensitive" case and all other cases, one array is
@@ -4569,7 +4570,7 @@ ABSTRACT_HEAP_LOCATIONS "unique"
 \end{PipsProp}
 
 The following property is used to bound the length of any generic
-access path or reference. Its default value is 0.It means that no limit is set.
+access path or reference. Its default value is 0. It means that no limit is set.
 \begin{PipsProp}{GAP_MAX_LENGTH}
 GAP_MAX_LENGTH 0
 \end{PipsProp}
