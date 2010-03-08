@@ -1,5 +1,5 @@
 raw file with loop flagged and privated variables scanned
-int pop(int op)
+int pop(int pop)
 {
    int i, j;
 #pragma omp for private(i,j)
@@ -10,7 +10,7 @@ l99999:
    }
 }
 after loop expansion
-int pop(int op)
+int pop(int pop)
 {
    int i, j;
    //PIPS generated variable

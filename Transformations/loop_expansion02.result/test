@@ -1,5 +1,5 @@
 raw file with loop flagged
-int pop(int op)
+int pop(int pop)
 {
    int i = 0;
 l99999:
@@ -7,7 +7,7 @@ l99999:
       printf("%d", i);
 }
 after loop expansion
-int pop(int op)
+int pop(int pop)
 {
    int i = 0;
    //PIPS generated variable
