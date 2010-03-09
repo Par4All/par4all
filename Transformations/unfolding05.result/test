@@ -1,0 +1,7 @@
+End of property settings
+int main()
+{
+   int j;                                                               /*0022*/
+
+   j = unfolding05(4);                                                  /*0024*/
+}

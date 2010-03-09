@@ -1,0 +1,35 @@
+delete unfolding05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG -I./fulguro-2-1-1.src/core -I./fulguro-2-1-1.src/arith -I./fulguro-2-1-1.src/image -I./fulguro-2-1-1.src/morpho -I./fulguro-2-1-1.src/measure -I./fulguro-2-1-1.src/datatools -I./fulguro-2-1-1.src/histogram -I/usr/include/SDL "
+
+# Contains recursive calls between flgr2d_destroy and flgr2d_destroy_link
+#	fulguro-2-1-1.src/core/flgrCoreData.c \
+
+create unfolding05 unfolding05.c
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# source code for middleware send_buff() and receive_buff() not available:
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo End of property settings
+
+display PRINTED_FILE[main]
+//shell sleep 60
+apply UNFOLDING
+display PRINTED_FILE[main]
+
+
+close
+#delete unfolding05
+quit
