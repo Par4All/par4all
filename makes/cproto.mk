@@ -7,11 +7,12 @@
 # if a change occured, we validate it !
 # erros from cproto are just dropped (-O switch)
 #
-$(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
-	if ! test -f $(TARGET).h ; then \
-		cp $(srcdir)/$(TARGET)-local.h $(TARGET).h ;\
-	fi
-	SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
+# not that the time stamp is here to prevent too many runs of cproto ...
+
+CPROTO_STAMP_FILE=.cproto.stamp
+$(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES)
+	test -f $(TARGET).h || cp $(srcdir)/$(TARGET)-local.h $(TARGET).h
+	SOURCES=`for s in $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 	{ \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
       	echo "/* Warning! Do not modify this file that is automatically generated! */"; \
@@ -26,20 +27,17 @@ $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
 			$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$s ;\
 		done ; \
       	echo "#endif /* $${guard} */"; \
-	} | sed -e '/ yy/ d' > $(TARGET).h-tmp ; \
-	if cmp -s $(TARGET).h $(TARGET).h-tmp ; then \
-		echo "file is unchanged, updating timestamp only" ; \
-		rm -f $(TARGET).h-tmp ;\
-		for s in $$SOURCES ; do test $$s -ot $(TARGET).h || touch -r $$s $(TARGET).h ; done ;\
-	 else \
-	 	echo "udpating file"; \
-		rm -f $(TARGET).h ; \
-	    mv $(TARGET).h-tmp $(TARGET).h ;\
-	 fi
+	} | sed -e '/ yy/ d' > $(CPROTO_STAMP_FILE)
+
+# here is the trick: if our stamp file is similar to the header, we do not touch the header
+# and so do not trigger rebuild of all files including the header
+$(TARGET).h:$(CPROTO_STAMP_FILE)
+	cmp -s $(TARGET).h $(CPROTO_STAMP_FILE) || cp $(CPROTO_STAMP_FILE) $(TARGET).h
 
 $(TARGET)-local.h:
 	touch $@
 
 clean-local:
-	rm -f $(TARGET).h
+	rm -f $(TARGET).h $(CPROTO_STAMP_FILE)
+
 EXTRA_DIST=$(TARGET)-local.h

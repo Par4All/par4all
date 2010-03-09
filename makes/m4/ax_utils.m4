@@ -140,29 +140,31 @@ dnl usage : AX_CHECK_HEADERS(header ...,[action-if-found],[action-if-not-found])
 dnl defines with_std_headers=(yes|no) and msg_system_headers
 AC_DEFUN([AX_CHECK_HEADERS],
     [
-        AC_CHECK_HEADERS([$1],
-            [
-                AS_IF([test x${AX_WITH([std headers])} = xno ],
-                    [
-                        AX_WITH([std headers])=no
-						AX_MSG([std headers])="${AX_MSG([std headers])}
-$ac_header not found"
-                        m4_ifval([$3],[$3])dnl
-                    ],
-                    [
-                        AX_WITH([std headers])=yes
-                        m4_ifval([$2],[$2])dnl
-                    ]
-                )
-            ],
-            [
-                AX_WITH([std headers])=no
-                AX_MSG([std headers])="${AX_MSG([std headers])}
-$ac_header not found"
-                m4_ifval([$3],[$3])
-            ]
-        )
-    ]
+		m4_foreach_w([_header_],[$1],[
+			AC_CHECK_HEADER(_header_,
+				[
+				AS_IF([test x${AX_WITH([std headers])} = xno ],
+					[
+					AX_WITH([std headers])=no
+					AX_MSG([std headers])="${AX_MSG([std headers])}
+    _header_ not found"
+					m4_ifval([$3],[$3])dnl
+					],
+					[
+					AX_WITH([std headers])=yes
+					m4_ifval([$2],[$2])dnl
+					]
+					)
+				],
+				[
+				AX_WITH([std headers])=no
+				AX_MSG([std headers])="${AX_MSG([std headers])}
+    _header_ not found"
+				m4_ifval([$3],[$3])
+				]
+			)
+			])
+    	]
 )
 
 dnl create dependecy info
@@ -259,3 +261,23 @@ AC_DEFUN([AX_CHECK_CPROTO],[
 	])
 ])
 
+dnl checks for yacc and sets ax_ variables accordingly
+AC_DEFUN([AX_PROG_YACC],[
+	AC_PROG_YACC
+	AS_IF([test "${YACC}" = yacc],[AX_CHECK_PROG([yacc])],[
+		AX_WITH([yacc])="yes"
+		AX_MSG([yacc])=""
+	])
+])
+
+dnl checks for lex in an ax_ compatible way
+AC_DEFUN([AX_PROG_LEX],[
+	AC_PROG_LEX
+	AS_IF([test "${LEX}" = ":"],[
+		AX_WITH([lex])="no"
+		AX_MSG([lex])="[f]lex not found"
+	],[
+		AX_WITH([lex])="yes"
+		AX_MSG([lex])=""
+	])
+])
