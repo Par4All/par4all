@@ -11,10 +11,10 @@ AM_INIT_AUTOMAKE([gnu 1.0])
 AC_LANG([C])
 
 # Checks for programs.
-AC_PROG_YACC
+AX_PROG_YACC
 AC_PROG_CC_C99
 AC_PROG_CPP
-AC_PROG_LEX
+AX_PROG_LEX
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -49,5 +49,5 @@ AC_CONFIG_FILES([Makefile
                  ])
 AC_OUTPUT
 
-AX_DEPENDS([minimum],[cproto std_headers strdup])
+AX_DEPENDS([minimum],[lex yacc cproto std_headers strdup])
 AX_EXIT([minimum])
