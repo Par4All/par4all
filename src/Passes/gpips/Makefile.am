@@ -23,9 +23,8 @@ gpips_LDADD=../../Libs/libpipslibs.la
 gpips_LDFLAGS=$(GTKp_2_0_LIBS)
 
 AM_CPPFLAGS=\
-	$(GTKp_2_0_CFLAGS)\
-	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
 	-I$(top_srcdir)/src/Documentation/constants\
+	-I../Passes/wpips -I$(srcdir)/../wpips\
 	-I../../Documentation/pipsmake\
 	-I../../Documentation/newgen\
 	-I../../Libs/newgen\
@@ -34,7 +33,9 @@ AM_CPPFLAGS=\
 	-I../../Libs/pipsmake\
 	-I../../Libs/top-level\
 	-I../../Libs/properties\
-	-I../../Libs/pipsdbm
+	-I../../Libs/pipsdbm\
+	$(GTKp_2_0_CFLAGS)\
+	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
 
 
 TARGET	= gpips

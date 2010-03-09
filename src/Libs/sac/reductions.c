@@ -554,6 +554,7 @@ static void reductions_rewrite(statement s)
 
         // Replace the old statement instruction by the new one
         statement scp = copy_statement(s);
+        statement_label(s)=entity_empty_label();
         sequence seq = make_sequence(
                 gen_concatenate(
                     preludes,

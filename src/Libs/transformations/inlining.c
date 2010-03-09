@@ -229,8 +229,9 @@ void statement_with_static_declarations_p(statement s,inlining_parameters p )
 /* create a scalar similar to `efrom' initialized with expression `from'
  */
 static
-entity make_temporary_scalar_entity(entity efrom, expression from)
+entity make_temporary_scalar_entity(expression from)
 {
+    pips_assert("expression is valid",expression_consistent_p(from)&&!expression_undefined_p(from));
     /* create the scalar */
 	entity new = make_new_scalar_variable(
 			get_current_module_entity(),
@@ -388,9 +389,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      */
     {
         list tail = sequence_statements(instruction_sequence(statement_instruction(expanded)));
-        if( ENDP(tail) || ENDP(CDR(tail)) )
-            pips_user_warning("expanded sequence_statements seems empty to me\n");
-        else
+        pips_assert("inlinined statement is not empty",!ENDP(tail) && !ENDP(CDR(tail)));
         {
             tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
 
@@ -518,7 +517,7 @@ reget:
                             {
                                 if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
                                 {
-                                    new = make_temporary_scalar_entity(e,from);
+                                    new = make_temporary_scalar_entity(from);
                                 }
                                 else
                                 {
@@ -540,11 +539,11 @@ reget:
                         {
                                 if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
                                 {
-                                    new = make_temporary_scalar_entity(e,from);
+                                    new = make_temporary_scalar_entity(from);
                                 }
                                 else
                                 {
-                                  new = make_temporary_scalar_entity(e,from);
+                                  new = make_temporary_scalar_entity(from);
                                 }
                                 AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
                         } break;
@@ -552,7 +551,7 @@ reget:
                         /* need a temporary variable */
                         {
                             if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
-                                new = make_temporary_scalar_entity(e,from);
+                                new = make_temporary_scalar_entity(from);
                             else
                             {
                                 new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
@@ -590,6 +589,7 @@ reget:
      */
     gen_recurse(expanded,statement_domain,gen_true,fix_statement_attributes_if_sequence);
     unnormalize_expression(expanded);
+    ifdebug(1) statement_consistent_p(declaration_holder);
     return declaration_holder;
 }
 
@@ -609,6 +609,7 @@ void inline_expression(expression expr, inlining_parameters  p)
                 {
                     insert_statement(new_statements(p),s,true);
                 }
+                ifdebug(1) statement_consistent_p(s);
         }
     }
 }
@@ -663,6 +664,7 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
         update_statement_instruction(stmt,statement_instruction(new_statements(p)));
         //pips_assert("inlining statement generation is ok",statement_consistent_p(stmt));
     }
+    ifdebug(1) statement_consistent_p(stmt);
 }
 
 /* split the declarations from s from their initialization if they contain a call to inlined_module
@@ -722,6 +724,7 @@ inline_calls(inlining_parameters p ,char * module)
     gen_context_recurse(modified_module_statement, inlined_module(p), statement_domain, gen_true, inline_split_declarations);
     /* inline all calls to inlined_module */
     gen_context_recurse(modified_module_statement, p, statement_domain, gen_true, inline_statement_crawler);
+    ifdebug(1) statement_consistent_p(modified_module_statement);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, modified_module_statement);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module, compute_callees(modified_module_statement));
@@ -828,22 +831,30 @@ bool inlining_simple(char *module_name)
  * @param caller_name calling module name
  * @param module_name called module name
  */
-static void
+static bool
 run_inlining(string caller_name, string module_name, inlining_parameters p)
 {
     /* Get the module ressource */
     inlined_module (p)= module_name_to_entity( module_name );
     inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    if(statement_block_p(inlined_module_statement (p)) && ENDP(statement_block(inlined_module_statement (p))))
+    {
+        pips_user_warning("not inlining empty function, this should be a generated skeleton ...\n");
+        return false;
+    }
+    else {
 
-    if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+        if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
-    /* check them */
-    pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
-    pips_assert("statements found", !statement_undefined_p(inlined_module_statement(p)) );
+        /* check them */
+        pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
+        pips_assert("statements found", !statement_undefined_p(inlined_module_statement(p)) );
 
-    /* inline call */
-    inline_calls( p, caller_name );
-    if(use_effects(p)) reset_cumulated_rw_effects();
+        /* inline call */
+        inline_calls( p, caller_name );
+        if(use_effects(p)) reset_cumulated_rw_effects();
+        return true;
+    }
 }
 
 
@@ -911,7 +922,8 @@ bool do_unfolding(inlining_parameters p, char* module_name)
         if( (statement_has_callee=!set_empty_p(calls_name)) )
         {
             SET_FOREACH(string,call_name,calls_name) {
-                run_inlining(module_name,call_name,p);
+                if(!run_inlining(module_name,call_name,p))
+                    set_add_element(unfolding_filters,unfolding_filters,call_name);
             }
             recompile_module(module_name);
             /* we can try to remove some labels now*/

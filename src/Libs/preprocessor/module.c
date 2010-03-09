@@ -299,8 +299,6 @@ recompile_module(char* module)
     entity modified_module = module_name_to_entity(module);
     statement modified_module_statement =
         (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
-    //pips_assert("module entity is consistent after recompile module",entity_consistent_p(modified_module));
-    //pips_assert("module statements are consistent after recompile module",statement_consistent_p(modified_module_statement));
 
     set_current_module_entity( modified_module );
     set_current_module_statement( modified_module_statement );
@@ -322,7 +320,7 @@ recompile_module(char* module)
         list p = NIL;
         FOREACH(ENTITY, e, entity_declarations(modified_module))
         {
-            if( same_string_p(entity_module_name(e),module) && !entity_area_p(e) )
+            if( same_string_p(entity_module_name(e),module) && !entity_area_p(e) && !entity_label_p(e) )
                 gen_clear_tabulated_element((gen_chunk*)e);
 
             else
@@ -356,8 +354,6 @@ recompile_module(char* module)
     }
 
     bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
-    //pips_assert("module entity is consistent after recompile module",entity_consistent_p(modified_module));
-    //pips_assert("module statements are consistent after recompile module",statement_consistent_p((statement)db_get_memory_resource(DBR_CODE,module,true)));
     if(!parsing_ok)
         pips_user_error("failed to recompile module");
     if(!controlizer(module))

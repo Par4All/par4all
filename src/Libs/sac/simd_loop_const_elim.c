@@ -336,7 +336,9 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
 
     /* put everything together*/
     list newseq = footerSeq;
-    newseq = CONS(STATEMENT, copy_statement(s), newseq);
+    statement scp = copy_statement(s);
+    statement_label(s)=entity_empty_label();/*scp now holds the label*/
+    newseq = CONS(STATEMENT, scp, newseq);
     newseq = gen_nconc(headerSeq, newseq);
 
 

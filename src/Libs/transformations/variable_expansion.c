@@ -152,6 +152,7 @@ bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
         insert_statement(parent,
                 make_assign_statement(entity_to_expression(I),copy_expression(range_lower(r))),true);
         init=entity_to_expression(I);
+#if 0
         list peffects = proper_effects_of_expression(range_lower(r));
         if(!effects_write_at_least_once_p(peffects))
         {
@@ -160,6 +161,7 @@ bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
                 loop_locals(ll)=CONS(ENTITY,I,loop_locals(ll));
         }
         gen_full_free_list(peffects);
+#endif
 
 
     }

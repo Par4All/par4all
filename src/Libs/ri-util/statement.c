@@ -2187,7 +2187,9 @@ void insert_statement(statement s,
   else
     {
       statement s2 = copy_statement(s);
+      /* s2 now holds the label */
       statement_label(s)=entity_empty_label();
+      statement_label(s1)=entity_empty_label();
       if (before)
 	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else
@@ -2333,43 +2335,40 @@ statement add_declaration_statement(statement s, entity e)
 
 statement update_statement_instruction(statement s,instruction i)
 {
-  list seq = NIL;
-  statement cs = statement_undefined;
+    /* reset numbering and ordering */
+    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+    statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
 
-
-  statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-  statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-
-  if (instruction_sequence_p(i) &&
-      ((!statement_with_empty_comment_p(s)) || (!unlabelled_statement_p(s))))
+    /* try hard to keep comments and label when relevant */
+    if (instruction_sequence_p(i) && (
+                !statement_with_empty_comment_p(s) ||
+                (!unlabelled_statement_p(s) && !entity_return_label_p(statement_label(s))) /*SG:note the special returnèlabel case */
+                ) )
     {
-      cs = make_call_statement(CONTINUE_FUNCTION_NAME,
-			       NIL,
-			       return_label_p(entity_name(statement_label(s)))?entity_empty_label():statement_label(s),
-			       statement_comments(s));
+        statement cs = make_continue_statement(statement_label(s));
+        statement_comments(cs)= statement_comments(s);
+        statement_comments(s) = empty_comments;
+        statement_label(s)=entity_empty_label();
 
-      statement_comments(s) = empty_comments;
-      statement_label(s)= entity_empty_label();
+        /* add the CONTINUE statement before the sequence instruction i */
+        list seq = make_statement_list(cs,instruction_to_statement(i));
 
-      /* add the CONTINUE statement before the sequence instruction i */
-      seq = CONS(STATEMENT, cs, CONS(STATEMENT,instruction_to_statement(i),NIL));
-
-      free_instruction(statement_instruction(s));
-      statement_instruction(s) =  make_instruction(is_instruction_sequence,make_sequence(seq));
+        free_instruction(statement_instruction(s));
+        statement_instruction(s) =  make_instruction_sequence(make_sequence(seq));
     }
 
-  else
+    else
     {
-      free_instruction(statement_instruction(s));
-      statement_instruction(s) = i;
-      /* SG: if the old statement add declarations, they are removed
-       * maybe we should regenerate the new one if any to keep global coherency ?*/
-      gen_free_list(statement_declarations(s));
-      statement_declarations(s)=NIL;
-      if(return_label_p(entity_name(statement_label(s))) && !return_statement_p(s))
-          statement_label(s)=entity_empty_label();
+        if(entity_return_label_p(statement_label(s)) && !return_statement_p(s))
+            statement_label(s)=entity_empty_label();
+        free_instruction(statement_instruction(s));
+        statement_instruction(s) = i;
+        /* SG: if the old statement had declarations, they are removed
+         * maybe we should regenerate the new one if any to keep global coherency ?*/
+        gen_free_list(statement_declarations(s));
+        statement_declarations(s)=NIL;
     }
-  return s;
+    return s;
 }
 
 /* Assume that statement rs appears in statement as and replaced it
