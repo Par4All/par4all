@@ -2187,9 +2187,10 @@ void insert_statement(statement s,
   else
     {
       statement s2 = copy_statement(s);
-      /* s2 now holds the label */
+      /* SG: s still holds the label
+       * we would like to move the label to s2 and to clear s
+       * however this would lead to incoherency*/
       statement_label(s)=entity_empty_label();
-      statement_label(s1)=entity_empty_label();
       if (before)
 	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else

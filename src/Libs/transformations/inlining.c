@@ -380,8 +380,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
     /* add label at the end of the statement */
     laststmt(p)=make_continue_statement(make_new_label( modified_module_name ) );
-    gen_nconc( sequence_statements(instruction_sequence(statement_instruction(expanded))), CONS( STATEMENT, laststmt(p), NIL) );
-
+    insert_statement(expanded,laststmt(p),false);
 
     /* fix `return' calls
      * in case a goto is immediatly followed by its targeted label

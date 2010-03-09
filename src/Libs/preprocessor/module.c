@@ -334,7 +334,7 @@ recompile_module(char* module)
     reset_current_module_statement();
 
     /* the ugliest glue ever produced by SG 
-     * needed to get all the declarations etc right : we must call unsplit before
+     * needed to get all the declarations etc right
      * unfortunetly we do it without calling pipsmake, so handle it by hand
      * signed: SG
      */
@@ -347,10 +347,9 @@ recompile_module(char* module)
             string m = gen_array_item(modules, i);
             if(!db_resource_required_or_available_p(DBR_CODE,m))
                 controlizer(m);
-            if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
-                print_code(m);
+//            if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
+//                print_code(m);
         }
-        //unsplit(cu);
     }
 
     bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
