@@ -1,9 +1,8 @@
-delete unfolding05
+delete unfolding06
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create unfolding05 unfolding05.c
-
+create unfolding06 unfolding06.c
 activate C_PARSER
 activate C_SYMBOL_TABLE
 
@@ -21,12 +20,13 @@ setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 echo End of property settings
 
 display PRINTED_FILE[main]
-# To see wich files are new with ls -lt
-# shell sleep 60
+#shell sleep 60
+display CALLGRAPH_FILE[main]
+setproperty UNFOLDING_CALLEES[unfolding06]
 apply UNFOLDING
 display PRINTED_FILE[main]
 
 
 close
-#delete unfolding05
+#delete unfolding06
 quit

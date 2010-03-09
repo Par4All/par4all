@@ -1,0 +1,11 @@
+End of property settings
+int main()
+{
+   int j;                                                               /*0013*/
+
+   j = unfolding05(4);                                                  /*0015*/
+}
+ main
+     unfolding05
+         foo
+         bar
