@@ -22,6 +22,14 @@ SIMD_GTD(int R[4], int X1[4], int X2[4])
     for (i=0;i<4;i++)
         R[i]=X1[i]>X2[i];
 }
+void
+SIMD_LOAD_V4SI (int VEC[4], int BASE[4])
+{
+    VEC[0] = BASE[0];
+    VEC[1] = BASE[1];
+    VEC[2] = BASE[2];
+    VEC[3] = BASE[3];
+}
 
 void
 SIMD_LOAD_V4SF (float VEC[4], float BASE[4])
@@ -45,6 +53,14 @@ SIMD_LOAD_GENERIC_V2DF (double VEC[2], double X0, double X1)
     VEC[0] = X0;
     VEC[1] = X1;
 }
+void
+SIMD_LOAD_GENERIC_V4SI (int VEC[4], int X0, int X1, int X2, int X3)
+{
+    VEC[0] = X0;
+    VEC[1] = X1;
+    VEC[2] = X2;
+    VEC[3] = X3;
+}
 
 void
 SIMD_LOAD_GENERIC_V4SF (float VEC[4], float X0, float X1, float X2, float X3)
@@ -64,16 +80,15 @@ SIMD_LOAD_CONSTANT_V4SF (float VEC[4], float X0, float X1, float X2, float X3)
     VEC[2] = X2;
     VEC[3] = X3;
 }
+
 void
-SIMD_LOAD_CONSTANT_V4SI (int VEC[4], int X0, int X1, int X2, int X3)
-{
-
-    VEC[0] = X0;
-    VEC[1] = X1;
-    VEC[2] = X2;
-    VEC[3] = X3;
+SIMD_SAVE_V4SI (int VEC[4], int BASE[4])
+{  
+    BASE[0] = VEC[0];
+    BASE[1] = VEC[1];
+    BASE[2] = VEC[2];
+    BASE[3] = VEC[3];
 }
-
 void
 SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
 {  
@@ -104,6 +119,16 @@ SIMD_SAVE_GENERIC_V2DF (double VEC[2], double X1[1], double X2[1])
 
     X1 [0]= VEC[0];
     X2 [0]= VEC[1];
+}
+void
+SIMD_SAVE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1],
+        int X3[1], int X4[1])
+{
+
+    X1 [0]= VEC[0];
+    X2 [0]= VEC[1];
+    X3 [0]= VEC[2];
+    X4 [0]= VEC[3];
 }
 void
 SIMD_SAVE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
@@ -284,31 +309,7 @@ SIMD_SAVE_GENERIC_V2SI (int VEC[2], int X1[1], int X2[1])
     X2 [0]= VEC[1];
 }
 
-void
-SIMD_LOAD_V4SI (int VEC[1], int BASE[1])
-{  VEC[0] = BASE[0];
-    VEC[1] = BASE[1];
-    VEC[2] = BASE[2];
-    VEC[3] = BASE[3];
-}
 
-void
-SIMD_LOAD_GENERIC_V4SI (int VEC[4], int X1, int X2, int X3, int X4)
-{
-
-    VEC[0] = X1;
-    VEC[1] = X2;
-    VEC[2] = X3;
-    VEC[3] = X4;
-}
-
-void
-SIMD_SAVE_V4SI (int VEC[4], int BASE[4])
-{  BASE[0] = VEC[0];
-    BASE[1] = VEC[1];
-    BASE[2] = VEC[2];
-    BASE[3] = VEC[3];
-}
 void
 SIMD_SAVE_V2DI (int VEC[2], int BASE[2])
 {  BASE[0] = VEC[0];
@@ -316,34 +317,30 @@ SIMD_SAVE_V2DI (int VEC[2], int BASE[2])
 }
 
 void
-SIMD_SAVE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1], int X3[1], int X4[1])
-{
-
-    X1 [0]= VEC[0];
-    X2 [0]= VEC[1];
-    X3 [0]= VEC[2];
-    X4 [0]= VEC[3];
-}
-
-void
-SIMD_ADDW (short DEST[8], int SRC1[2], int SRC2[2])
+SIMD_ADDW (short DEST[8], short SRC1[8], short SRC2[8])
 {
     DEST[0] = SRC1[0] + SRC2[0];
     DEST[1] = SRC1[1] + SRC2[1];
+    DEST[2] = SRC1[2] + SRC2[2];
+    DEST[3] = SRC1[3] + SRC2[3];
 }
 
 void
-SIMD_SUBW (short DEST[2], short SRC1[2], short SRC2[2])
+SIMD_SUBW (short DEST[8], short SRC1[8], short SRC2[8])
 {
     DEST[0] = SRC1[0] - SRC2[0];
     DEST[1] = SRC1[1] - SRC2[1];
+    DEST[2] = SRC1[2] - SRC2[2];
+    DEST[3] = SRC1[3] - SRC2[3];
 }
 
 void
-SIMD_MULW (short DEST[2], short SRC1[2], short SRC2[2])
+SIMD_MULW (short DEST[8], short SRC1[8], short SRC2[8])
 {
     DEST[0] = SRC1[0] * SRC2[0];
     DEST[1] = SRC1[1] * SRC2[1];
+    DEST[2] = SRC1[2] * SRC2[2];
+    DEST[3] = SRC1[3] * SRC2[3];
 }
 
 void
@@ -354,12 +351,16 @@ SIMD_DIVW (short DEST[2], short SRC1[2], short SRC2[2])
 }
 
 void
-SIMD_LOAD_CONSTANT_V4HI (short VEC[4], int HIGH, int LOW)
-{
-    VEC[0] = (short) LOW;
-    VEC[1] = (short) (LOW >> 2);
-    VEC[2] = (short) HIGH;
-    VEC[3] = (short) (HIGH >> 2);
+SIMD_LOAD_GENERIC_V8HI(short VEC[8], short BASE0, short BASE1, short BASE2, short BASE3, short BASE4, short BASE5, short BASE6, short BASE7)
+{  
+    VEC[0] = BASE0;
+    VEC[1] = BASE1;
+    VEC[2] = BASE2;
+    VEC[3] = BASE3;
+    VEC[4] = BASE4;
+    VEC[5] = BASE5;
+    VEC[6] = BASE6;
+    VEC[7] = BASE7;
 }
 
 void
@@ -383,15 +384,6 @@ SIMD_LOAD_V4QI_TO_V4HI (short VEC[4], char BASE[4])
     VEC[3] = BASE[3];
 }
 
-void
-SIMD_LOAD_GENERIC_V4HI (short VEC[4], short X1, short X2, short X3, short X4)
-{
-
-    VEC[0] = X1;
-    VEC[1] = X2;
-    VEC[2] = X3;
-    VEC[3] = X4;
-}
 
 void
 SIMD_SAVE_V8HI (short VEC[8], short BASE[8])
@@ -406,23 +398,7 @@ SIMD_SAVE_V8HI (short VEC[8], short BASE[8])
     BASE[7] = VEC[7];
 }
 
-void
-SIMD_SAVE_GENERIC_V4HI (short VEC[4], short X1[1],
-        short X2[1], short X3[1], short X4[1])
-{
 
-    X1 [0]= VEC[0];
-    X2 [0]= VEC[1];
-    X3 [0]= VEC[2];
-    X4 [0]= VEC[3];
-}
-
-void
-SIMD_GTW (LOGICAL DEST[4], short SRC1[4], short SRC2[4])
-{
-    DEST[0] = SRC1[0] > SRC2[0];
-    DEST[1] = SRC1[1] > SRC2[1];
-}
 
 void
 SIMD_PHID (int DEST[4], LOGICAL COND[4], int SRC1[4], int SRC2[4])
@@ -713,7 +689,6 @@ SIMD_SETB (char DEST[8], char SRC[8])
     DEST[6] = SRC[6];
     DEST[7] = SRC[7];
 }
-
 
 #undef LOGICAL
 #undef DMAX

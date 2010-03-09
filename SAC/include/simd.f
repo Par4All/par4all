@@ -396,6 +396,26 @@
       vec(7) = base(7)
       vec(8) = base(8)
       end
+      subroutine simd_load_generic_v8hi(vec,b0,b1,b2,b3,b4,b5,b6,b7)
+      integer*1 vec(8)
+      integer*1 b0(8)
+      integer*1 b1(8)
+      integer*1 b2(8)
+      integer*1 b3(8)
+      integer*1 b4(8)
+      integer*1 b5(8)
+      integer*1 b6(8)
+      integer*1 b7(8)
+      
+      vec(1) = b1
+      vec(2) = b2
+      vec(3) = b3
+      vec(4) = b4
+      vec(5) = b5
+      vec(6) = b6
+      vec(7) = b7
+      vec(8) = b8
+      end
 
       subroutine simd_load_generic_v4hi(vec, x1, x2, x3, x4)
       integer*2 vec(4)

@@ -1,9 +1,9 @@
 End of property settings
 int main()
 {
-   int j;                                                               /*0023*/
+   int j;                                                               /*0027*/
 
-   j = unfolding07(4);                                                  /*0025*/
+   j = unfolding07(4);                                                  /*0029*/
 }
  main
      unfolding07
@@ -12,25 +12,18 @@ int main()
 int main()
 {
    int j;                                                               /*0003*/
-   /*0003*/
-   /*0023*/
+   /*0027*/
    //PIPS generated variable
-   int _return0;                                                        /*0006*/
-   /*0005*/
-   //PIPS generated variable
-   int _return1, _return2;                                              /*0008*/
+   int _return0;                                                        /*0005*/
    {
-      int ret;                                                          /*0010*/
-      /*0009*/
-      /*0015*/
+      int ret;                                                          /*0009*/
+      /*0019*/
       
-      _return2 = 4;                                                     /*0014*/
-      ret = _return2;                                                   /*0017*/
-      /*0017*/
-      _return1 = 4;                                                     /*0020*/
-      ret |= _return1;                                                  /*0023*/
-      /*0018*/
+      ret = foo(4);                                                     /*0011*/
+      /*0021*/
+      ret |= bar(4);                                                    /*0012*/
+      /*0022*/
       ;
    }
-   j = _return0;                                                        /*0027*/
+   j = _return0;                                                        /*0015*/
 }

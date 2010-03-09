@@ -195,6 +195,10 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
+   ;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
       LU_NUB0 = 62;
@@ -307,6 +311,9 @@ void compute()
    int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
    //PIPS generated variable
    float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -427,6 +434,9 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
       LU_NUB0 = 62;
@@ -498,6 +508,16 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+   ;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
       LU_NUB0 = 62;
@@ -564,6 +584,16 @@ void compute()
    float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec24[3+1], v4sf_vec25[3+1], v4sf_vec26[3+1], v4sf_vec27[3+1], v4sf_vec29[3+1], v4sf_vec30[3+1], v4sf_vec32[3+1], v4sf_vec33[3+1], v4sf_vec34[3+1];
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+   ;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */

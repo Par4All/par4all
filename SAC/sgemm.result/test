@@ -1517,6 +1517,9 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A*B + beta*C.
 *
+*
+*           Form  C := alpha*A*B + beta*C.
+*
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
                   LU_NUB0 = M
@@ -1588,6 +1591,9 @@ c SIMD_COMMENT_1
 *
 *           Form  C := alpha*A'*B + beta*C
 *
+*
+*           Form  C := alpha*A'*B + beta*C
+*
             DO 120 J = 1, N                                             0141
                DO 110 I = 1, M                                          0142
                   TEMP = ZERO                                           0143
@@ -1635,6 +1641,9 @@ c SIMD_COMMENT_1
 120            CONTINUE                                                 0153
          ENDIF
       ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
 *
 *           Form  C := alpha*A*B' + beta*C
 *
@@ -1706,6 +1715,9 @@ c SIMD_COMMENT_1
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
       ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
@@ -2002,6 +2014,9 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A*B + beta*C.
 *
+*
+*           Form  C := alpha*A*B + beta*C.
+*
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
                   LU_NUB0 = M
@@ -2073,6 +2088,9 @@ c SIMD_COMMENT_1
 *
 *           Form  C := alpha*A'*B + beta*C
 *
+*
+*           Form  C := alpha*A'*B + beta*C
+*
             DO 120 J = 1, N                                             0141
                DO 110 I = 1, M                                          0142
                   TEMP6 = ZERO                                          0143
@@ -2120,6 +2138,9 @@ c SIMD_COMMENT_1
 120            CONTINUE                                                 0153
          ENDIF
       ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
 *
 *           Form  C := alpha*A*B' + beta*C
 *
@@ -2191,6 +2212,9 @@ c SIMD_COMMENT_1
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
       ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
@@ -2504,6 +2528,9 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A*B + beta*C.
 *
+*
+*           Form  C := alpha*A*B + beta*C.
+*
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
                   LU_NUB0 = M
@@ -2577,6 +2604,9 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A'*B + beta*C
 *
+*
+*           Form  C := alpha*A'*B + beta*C
+*
             DO 120 J = 1, N                                             0141
                DO 110 I = 1, M                                          0142
                   TEMP6 = ZERO                                          0143
@@ -2626,6 +2656,9 @@ c SIMD_COMMENT_0
 120            CONTINUE                                                 0153
          ENDIF
       ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
 *
 *           Form  C := alpha*A*B' + beta*C
 *
@@ -2699,6 +2732,9 @@ c SIMD_COMMENT_0
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
       ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
@@ -3007,6 +3043,15 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A*B + beta*C.
 *
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
                   LU_NUB0 = M
@@ -3080,6 +3125,15 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A'*B + beta*C
 *
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
             DO 120 J = 1, N                                             0141
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec25, ALPHA, ALPHA)
                DO 110 I = 1, M                                          0142
@@ -3128,6 +3182,15 @@ c SIMD_COMMENT_0
 120            CONTINUE                                                 0153
          ENDIF
       ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
 *
 *           Form  C := alpha*A*B' + beta*C
 *
@@ -3201,6 +3264,15 @@ c SIMD_COMMENT_0
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
       ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
@@ -3487,6 +3559,15 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A*B + beta*C.
 *
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
             DO 90 J = 1, N                                              0118
                IF (BETA.EQ.ZERO) THEN                                   0119
                   LU_NUB0 = M
@@ -3560,6 +3641,15 @@ c SIMD_COMMENT_0
 *
 *           Form  C := alpha*A'*B + beta*C
 *
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
             DO 120 J = 1, N                                             0141
                CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec25, ALPHA, ALPHA)
                DO 110 I = 1, M                                          0142
@@ -3608,6 +3698,15 @@ c SIMD_COMMENT_0
 120            CONTINUE                                                 0153
          ENDIF
       ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
 *
 *           Form  C := alpha*A*B' + beta*C
 *
@@ -3681,6 +3780,15 @@ c SIMD_COMMENT_0
 160            CONTINUE                                                 0177
 170         CONTINUE                                                    0178
       ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
@@ -4341,6 +4449,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       if (nota)
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
 	      if (beta == zero)
@@ -4449,6 +4558,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	}
       else
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
 	      simd_load_generic_v2df (v2df_vec25, alpha, alpha);
@@ -4514,6 +4624,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       if (nota)
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
 	      if (beta == zero)
@@ -4622,6 +4733,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	}
       else
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
 	      simd_load_generic_v2df (v2df_vec52, alpha, alpha);
