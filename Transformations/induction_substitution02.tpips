@@ -14,12 +14,23 @@ echo
 
 display PRINTED_FILE[induction02]
 
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Preconditions for "induction02"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[induction02]
 
 # necessary because stupid tpips won't produce the same transformer when lauched
 # tpips my_script.tpips
 # and
 # tpips < my_script.tpips
-apply REFINE_TRANSFORMERS[induction02]
+#apply REFINE_TRANSFORMERS[induction02]
 
 # setenv INDUCTION_SUBSTITUTION_DEBUG_LEVEL 6
 apply INDUCTION_SUBSTITUTION[induction02]
@@ -28,8 +39,10 @@ apply INDUCTION_SUBSTITUTION[induction02]
 echo
 echo Code for "induction02" after induction substitution
 echo
+activate PRINT_CODE
 display PRINTED_FILE[induction02]
 
 
 close induction_substitution02
 delete induction_substitution02
+quit
