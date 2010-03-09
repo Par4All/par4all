@@ -11,11 +11,11 @@ AM_PROG_CC_C_O
 AM_PATH_PYTHON(2.5)
 
 # Checks for programs.
-AC_PROG_YACC
+AX_PROG_YACC
 AC_PROG_CC_C99
 gl_EARLY
 AC_PROG_CPP
-AC_PROG_LEX
+AX_PROG_LEX
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -221,6 +221,6 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 
-AX_DEPENDS([minimum],[newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
+AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
 AX_EXIT([minimum],[tpips pyps gpips hpfc])
