@@ -1,8 +1,8 @@
-delete unfolding06
+delete unfolding07
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create unfolding06 unfolding06.c
+create unfolding07 unfolding07.c
 activate C_PARSER
 activate C_SYMBOL_TABLE
 
@@ -22,12 +22,11 @@ echo End of property settings
 display PRINTED_FILE[main]
 #shell sleep 60
 display CALLGRAPH_FILE[main]
-# Do not restrict the unfolding
-#setproperty UNFOLDING_CALLEES "unfolding06"
+setproperty UNFOLDING_CALLEES "unfolding07"
 apply UNFOLDING[main]
 display PRINTED_FILE[main]
 
 
 close
-#delete unfolding06
+#delete unfolding07
 quit

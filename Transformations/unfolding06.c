@@ -1,6 +1,14 @@
-/* Attempt at reproducing bugs happening in video_survey_freia() */
+/* Attempt at reproducing bugs happening in video_survey_freia().
 
-int unfolding05(int i)
+   Similar to FREIA's case. I assumed that foo() and bar() did not
+   need to be defined because I requested an unfolding of unfolding06
+   in main, but in fact unfolding is not restricted to
+   unfolding06. All call sites to unfolding06 are fully inlined down
+   to the smallest function. This make unfolding useless for FREIA
+   coarse and middle grain approaches.
+ */
+
+int unfolding06(int i)
 {
   int ret;
 
@@ -12,5 +20,5 @@ int main()
 {
   int j;
 
-  j = unfolding05(4);
+  j = unfolding06(4);
 }
