@@ -7898,10 +7898,11 @@ INLINING_PURGE_LABELS TRUE
 \label{subsection-unfolding}
 
 \begin{PipsPass}{unfolding}
-Unfolding is a complementary transformation of
-inlining~\ref{subsection-inlining}.  While inlining inlines all calls to a
-module in other modules, unfolding inlines all calls in a module, thus
-unfolding the content of the module.
+  Unfolding is a complementary transformation of
+  inlining~\ref{subsection-inlining}.  While inlining inlines all call
+  sites to a given module in other modules, unfolding inlines
+  recursively all call sites in a given module, thus unfolding the
+  content of the module. An unfolded source code does not contain
 \end{PipsPass}
 \begin{PipsMake}
 
@@ -7915,7 +7916,8 @@ unfolding      > MODULE.parsed_code
 \end{PipsMake}
 
 \begin{PipsPass}{unfolding_simple}
-Same as unfolding but always simulates the by-copy argument passing
+Same as unfolding, but cumulated effects are not used, and the
+resulting code always simulates the by-copy argument passing:
 \end{PipsPass}
 \begin{PipsMake}
 
@@ -7926,14 +7928,20 @@ unfolding_simple      > MODULE.parsed_code
         < CALLERS.code
 \end{PipsMake}
 
-Using \PipsPropRef{UNFOLDING_CALLEES}, you can specify which module you want to inline in the unfolded module.
-The unfolding will be performed as long as one of the module in \PipsPropRef{UNFOLDING_CALLEES} is called.
-More than one module can be specified, they are separated by blank spaces.
+Using \PipsPropRef{UNFOLDING_CALLEES}, you can specify which modules
+you want to inline in the unfolded module. The unfolding will be
+performed as long as one of the module in
+\PipsPropRef{UNFOLDING_CALLEES} is called. More than one module can
+be specified, they are separated by blank spaces.
 \begin{PipsProp}{UNFOLDING_CALLEES}
 UNFOLDING_CALLEES ""
 \end{PipsProp}
 
-The default behavior of unfolding is to recursively inline all callees from given module, as long as a callee remains. Use \PipsPropRef{UNFOLDING_FILTER} to inline all calls not in the space separated module list
+The default behavior of unfolding is to recursively inline all callees
+from given module, as long as a callee remains. Use
+\PipsPropRef{UNFOLDING_FILTER} to inline all call sites to a module
+not present in the space
+separated module list defined by the property:
 \begin{PipsProp}{UNFOLDING_FILTER}
 UNFOLDING_FILTER ""
 \end{PipsProp}
