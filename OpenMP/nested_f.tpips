@@ -12,6 +12,6 @@ apply OMPIFY_CODE(NESTED)
 display PRINTED_FILE(NESTED)
 
 close
-#delete nested_f
+delete nested_f
 quit
 # EOF

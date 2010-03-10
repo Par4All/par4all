@@ -32,15 +32,13 @@ apply PRIVATIZE_MODULE(main)
 echo // OMP style
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(main)
-#build PARALLELPRINTED_FILE(main)
 apply INTERNALIZE_PARALLEL_CODE
-#display PRINTED_FILE(main)
 apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
 apply UNSPLIT (%ALL)
 
 close
-#delete nested_c
+delete nested_c
 quit
 # EOF
