@@ -140,8 +140,14 @@
 /* Resource for alias analysis */
 { DBR_ALIAS_ASSOCIATIONS,       NEWGEN_METHODS },
 
+/* Resource for points to analysis */
+{ DBR_POINTS_TO_LIST,           STATEMENT_FUNCTION_METHODS },
+
+
+
 /* Resource for used before set analysis */
 { DBR_UBS,			NEWGEN_METHODS },
+
 
 /* COMPLEXITY
  */
