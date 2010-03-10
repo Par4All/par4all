@@ -1,0 +1,17 @@
+delete nested_f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create nested_f nested_f.f
+
+setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply PRIVATIZE_MODULE(NESTED)
+apply INTERNALIZE_PARALLEL_CODE(NESTED)
+apply OMPIFY_CODE(NESTED)
+display PRINTED_FILE(NESTED)
+
+close
+#delete nested_f
+quit
+# EOF

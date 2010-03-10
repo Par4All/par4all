@@ -11,14 +11,14 @@ int main()
       b[i] = 0;
 
 
-#pragma omp parallel for 
+#pragma omp parallel for private (i)
    for(j = 0; j <= size-1; j += 1)
       for(i = 0; i <= 99; i += 1)
          b[j] = b[j]+i;
 
 
    for(i = 0; i <= 99; i += 1)
-#pragma omp parallel for 
+#pragma omp parallel for
       for(j = 0; j <= size-1; j += 1)
          b[j] = b[j]+i;
 
@@ -36,7 +36,7 @@ int main()
       b[i] = 0;
 
 
-#pragma omp parallel for
+#pragma omp parallel for private (i)
    for(j = 0; j <= size-1; j += 1)
       for(i = 0; i <= 99; i += 1)
          b[j] = b[j]+i;

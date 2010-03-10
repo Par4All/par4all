@@ -6,13 +6,8 @@ int main (void) {
 
   for (k = 0; k < 100; k++) {
     for (i = 0; i < 100; i++) {
-      sum += i;
+      sum += i+k;
     }
-    sum += k;
-  }
-
-  for (i = 0; i < 100; i++) {
-    sum += i;
   }
 
   printf ("sum: %d\n", sum);

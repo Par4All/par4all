@@ -15,11 +15,9 @@ int main (void) {
 
   for (i = 0; i < size; i++) {
     for (k = 0; k < size; k++) {
-      sum += array[i][k];
+      printf ("array[%d][%d] = %f", i, k, array[k][i]);
     }
   }
-
-  printf ("sum: %f\n", sum);
 
   return 0;
 }

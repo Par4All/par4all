@@ -1,0 +1,19 @@
+      PROGRAM NESTED_REDUCTION
+      INTEGER K,I,SIZE
+      PARAMETER (SIZE=100)
+      REAL SUM
+
+      SUM = 0                                                           0006
+
+!$omp parallel do reduction(+:SUM) private (k)
+      DO I = 1, SIZE                                                    0008
+!$omp parallel do reduction(+:SUM)
+         DO K = 1, SIZE                                                 0009
+            SUM = SUM+I+K                                               0010
+         ENDDO
+!$omp end parallel do
+      ENDDO
+!$omp end parallel do
+
+      PRINT *, SUM                                                      0014
+      END

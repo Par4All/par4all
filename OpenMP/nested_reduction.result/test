@@ -5,19 +5,13 @@ int main(void)
    int sum = 0;                                                         /*0005*/
 
 
-   for(k = 0; k <= 99; k += 1) {
+   for(k = 0; k <= 99; k += 1)
       for(i = 0; i <= 99; i += 1)
-         sum += i;                                                      /*0009*/
-      sum += k;                                                         /*0011*/
-   }
+         sum += i+k;                                                    /*0009*/
 
+   printf("sum: %d\n", sum);                                            /*0013*/
 
-   for(i = 0; i <= 99; i += 1)
-      sum += i;                                                         /*0015*/
-
-   printf("sum: %d\n", sum);                                            /*0018*/
-
-   return 0;                                                            /*0020*/
+   return 0;                                                            /*0015*/
 }
 int main(void)
 {
@@ -26,19 +20,12 @@ int main(void)
 
 
 #pragma omp parallel for reduction(+:sum) private (i)
-   for(k = 0; k <= 99; k += 1) {
+   for(k = 0; k <= 99; k += 1)
 #pragma omp parallel for reduction(+:sum)
       for(i = 0; i <= 99; i += 1)
-         sum += i;                                                      /*0009*/
-      sum += k;                                                         /*0011*/
-   }
+         sum += i+k;                                                    /*0009*/
 
+   printf("sum: %d\n", sum);                                            /*0013*/
 
-#pragma omp parallel for reduction(+:sum)
-   for(i = 0; i <= 99; i += 1)
-      sum += i;                                                         /*0015*/
-
-   printf("sum: %d\n", sum);                                            /*0018*/
-
-   return 0;                                                            /*0020*/
+   return 0;                                                            /*0015*/
 }

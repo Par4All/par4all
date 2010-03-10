@@ -15,11 +15,9 @@ int main(void)
 
    for(i = 0; i <= size-1; i += 1)
       for(k = 0; k <= size-1; k += 1)
-         sum += array[i][k];                                            /*0018*/
+         printf("array[%d][%d] = %f", i, k, array[k][i]);               /*0018*/
 
-   printf("sum: %f\n", sum);                                            /*0022*/
-
-   return 0;                                                            /*0024*/
+   return 0;                                                            /*0022*/
 }
 int main(void)
 {
@@ -35,13 +33,9 @@ int main(void)
          array[k][i] = i+k;                                             /*0012*/
 
 
-#pragma omp parallel for reduction(+:sum) private (k)
    for(i = 0; i <= size-1; i += 1)
-#pragma omp parallel for reduction(+:sum)
       for(k = 0; k <= size-1; k += 1)
-         sum += array[i][k];                                            /*0018*/
+         printf("array[%d][%d] = %f", i, k, array[k][i]);               /*0018*/
 
-   printf("sum: %f\n", sum);                                            /*0022*/
-
-   return 0;                                                            /*0024*/
+   return 0;                                                            /*0022*/
 }

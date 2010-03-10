@@ -1,0 +1,17 @@
+delete nested_reduction_f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create nested_reduction_f nested_reduction_f.f
+
+setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply PRIVATIZE_MODULE(NESTED_REDUCTION)
+apply INTERNALIZE_PARALLEL_CODE(NESTED_REDUCTION)
+apply OMPIFY_CODE(NESTED_REDUCTION)
+display PRINTED_FILE(NESTED_REDUCTION)
+
+close
+#delete nested_reduction_f
+quit
+# EOF
