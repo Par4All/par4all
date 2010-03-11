@@ -1,6 +1,8 @@
 #
 delete nested_c
 
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create nested_c nested_c.c

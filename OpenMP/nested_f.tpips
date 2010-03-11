@@ -1,5 +1,7 @@
 delete nested_f
 
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create nested_f nested_f.f

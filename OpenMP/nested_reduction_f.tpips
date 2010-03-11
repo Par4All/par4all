@@ -12,6 +12,6 @@ apply OMPIFY_CODE(NESTED_REDUCTION)
 display PRINTED_FILE(NESTED_REDUCTION)
 
 close
-#delete nested_reduction_f
+delete nested_reduction_f
 quit
 # EOF

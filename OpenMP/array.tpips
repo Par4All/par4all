@@ -13,6 +13,7 @@ create array array.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setenv SEMANTICS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
+setenv OMPIFY_CODE_DEBUG_LEVEL 9
 
 #SELECT C LANGUAGE
 activate C_PARSER
@@ -22,11 +23,12 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 #echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+#setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
 
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE(main)
+#activate PRINT_PARALLELIZEDOMP_CODE
+#display PARALLELPRINTED_FILE(main)
 
 #unset parallal printed of do loop to avoid pragma duplication
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
