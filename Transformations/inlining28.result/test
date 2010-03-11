@@ -27,7 +27,8 @@ void bar()
    struct a A = {0};
    {
       //PIPS generated variable
-      struct a *P_0 = &A;
+      struct a *P_0;
+      P_0 = &A;
       P_0->b = 1;
    }
    printf("%d\n", A.b);

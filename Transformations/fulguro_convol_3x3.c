@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <flgrCoreData.h>
 #include <flgrCoreDataIO.h>
+#include <flgrCoreIO.h>
 #include <flgrCoreCopy.h>
 #include <flgrCoreNhbManage.h>
 #include <flgrLinearConvolution.h>

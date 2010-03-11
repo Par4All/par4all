@@ -19,7 +19,8 @@ void bar(int **a)
 {
    {
       //PIPS generated variable
-      int *P_0 = *a;
+      int *P_0;
+      P_0 = *a;
       *P_0 = 0;
    }
 }

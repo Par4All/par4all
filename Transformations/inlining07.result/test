@@ -25,7 +25,8 @@ int main(int argc, char **argv)
    int _return0;
    {
       //PIPS generated variable
-      int I_0 = 2+3;
+      int I_0;
+      I_0 = 2+3;
       {
          int c;
          c = I_0>argc?I_0:argc;

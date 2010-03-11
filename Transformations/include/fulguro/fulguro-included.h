@@ -2,7 +2,7 @@
 #include <flgrCoreSlideWindow.h>
 
 #define flgr_free_align flgr_free
-#define flgr_malloc_align flgr_malloc
+#define flgr_malloc_align(a,b) flgr_malloc(a)
 #define FLGR_MACRO_RASTER_SLIDE_WINDOW_2D(dtype,get_nhb_op)	\
   int i,j,w,h,spp = imgsrc->spp;				\
   dtype *vector_array;						\
@@ -790,59 +790,28 @@
   }								\
 								\
   return
+void flgr_free(void *ptr) {
+  
+
+  free(ptr);
+}
+void *flgr_malloc(size_t size) {
+  void *tmp = malloc(size);
+
+  
+
+  if(tmp==NULL) {
+    POST_ERROR("Could not allocate data, returning NULL pointer !\n");
+    return NULL;
+  }
+
+  return tmp;
+}
 
 void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *extr) {
   FLGR_MACRO_GET_NHB_CONV_2D(fgUINT16);
 }
 
-  fgUINT16 flgr2d_get_data_array_fgUINT16(fgUINT16** array, int row, int col) {
-    return flgr_get_array_fgUINT16(array[row],col);
-  }
-  void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_array, int spp, int pos) {
-    register fgUINT16 val;
-    register int i,k;
-
-    for(k=0,i=pos*spp ; k<spp ; k++,i++) {
-      val = flgr_get_array_fgUINT16(data_array,i);
-      flgr_set_array_fgUINT16(vector_array,k,val);
-    }
-  }
-  fgUINT16 flgr_get_array_fgUINT16(fgUINT16* array, int pos) {
-    return array[pos];
-  }
-  void flgr_set_array_fgUINT16(fgUINT16* array, int pos, fgUINT16 value) {
-    array[pos]=value;
-  }
-
-  void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_array, int spp, int pos) {
-    register fgUINT16 val;
-    register int i,k;
-
-    for(k=0,i=pos*spp ; k<spp ; k++,i++) {
-      val = flgr_get_array_fgUINT16(vector_array,k);
-      flgr_set_array_fgUINT16(data_array,i,val);
-    }
-  }
-#if 0
- void *memcpy(void *dest, const void *src, size_t n)
-{
-	size_t i;
-	char *d=(char*)dest;
-	char *s=(char*)src;
-	for(i=0;i<n;i++)
-		d[i]=s[i];
-	return dest;
-}
-void *memset(void *s, int c, size_t n)
-{
-	size_t i;
-	char * t = (char*)s;
-	for(i=0;i<n;i++)
-		t[i]=c;
-	return s;
-
-}
-#endif
   static __inline__ fgUINT16 flgr_defop_sup_fgUINT16(fgUINT16 a,fgUINT16 b) {
     return (a<b?b:a);
   }
@@ -967,18 +936,6 @@ int flgr_normalize_coordinate(int axis_coord, int axis_length) {
 
   return axis_coord;
 }
-void *flgr_malloc(size_t size) {
-  void *tmp = malloc(size);
-
-  
-
-  if(tmp==NULL) {
-    POST_ERROR("Could not allocate data, returning NULL pointer !\n");
-    return NULL;
-  }
-
-  return tmp;
-}
 FLGR_Ret flgr_is_data_type_valid(FLGR_Type type) {
   
 
@@ -1039,11 +996,6 @@ int flgr_get_bps_from_type(FLGR_Type type) {
     return FLGR_RET_TYPE_UNKNOWN;
   }
 
-}
-void flgr_free(void *ptr) {
-  
-
-  free(ptr);
 }
 void flgr_backtrace_print(void) {
 #if defined(__GNUC__)

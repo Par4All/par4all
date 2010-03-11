@@ -9,7 +9,7 @@ FLGR_Ret flgr1d_clear_all(FLGR_Data1D *data)
    if (data==(void *) 0) {
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1455, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1407, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -25,12 +25,12 @@ FLGR_Data1D * flgr1d_create_fgUINT16(int length, int spp, FLGR_Shape shape)
 {
    FLGR_Data1D *dat;
    if (length<0) {
-      fprintf(stderr, "Negative length!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1652, __FUNCTION__);
+      fprintf(stderr, "Negative length!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1604, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
    if (spp<1) {
-      fprintf(stderr, "Sample Per Pixel (spp) must be > 0 !\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1652, __FUNCTION__);
+      fprintf(stderr, "Sample Per Pixel (spp) must be > 0 !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1604, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -42,7 +42,7 @@ FLGR_Data1D * flgr1d_create_fgUINT16(int length, int spp, FLGR_Shape shape)
    dat->shape = shape;
    dat->spp = spp;
    dat->length = length;
-   dat->array_phantom = flgr_malloc(length*dat->bps*spp/8+64, 16);
+   dat->array_phantom = flgr_malloc(length*dat->bps*spp/8+64);
    dat->array = dat->array_phantom+32;
    dat->type = FLGR_UINT16;
    return dat;
@@ -52,7 +52,7 @@ FLGR_Ret flgr1d_destroy(FLGR_Data1D *dat)
    if (dat==(void *) 0) {
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1600, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1552, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -98,7 +98,7 @@ FLGR_Ret flgr2d_clear_all(FLGR_Data2D *data)
       
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1468, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1420, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -115,7 +115,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
 {
    FLGR_Ret ret;
    if (datdest==(void *) 0||datsrc==(void *) 0||nhb==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1792, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1744, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -136,13 +136,13 @@ FLGR_Ret flgr2d_copy(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
    int error = 0;
    FLGR_Ret ret;
    if (datdest==(void *) 0||datsrc==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1393, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1345, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
    if ((ret = flgr2d_is_data_same_size(datsrc, datdest))!=FLGR_RET_OK) {
 
-      fprintf(stderr, "src and dest dat have different size !\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1398, __FUNCTION__);
+      fprintf(stderr, "src and dest dat have different size !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1350, __FUNCTION__);
       flgr_backtrace_print();
       return ret;
    }
@@ -159,7 +159,7 @@ FLGR_Ret flgr2d_copy(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
       error = 1;
 
    if (error==1) {
-      fprintf(stderr, "dest data type unknown!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1443, __FUNCTION__);
+      fprintf(stderr, "dest data type unknown!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1395, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_TYPE_UNKNOWN;
    }
@@ -181,7 +181,7 @@ FLGR_Data2D * flgr2d_create(int size_y, int size_x, int spp, FLGR_Type type, FLG
    
    if (type==FLGR_UINT16) 
       return flgr2d_create_fgUINT16(size_y, size_x, spp, shape, connexity);
-   fprintf(stderr, "Type unknown!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1663, __FUNCTION__);
+   fprintf(stderr, "Type unknown!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1615, __FUNCTION__);
    flgr_backtrace_print();
    return (void *) 0;
 }
@@ -196,17 +196,17 @@ FLGR_Data2D * flgr2d_create_fgUINT16(int size_y, int size_x, int spp, FLGR_Shape
    //PIPS generated variable
    FLGR_Data1D **P_4;
    if (size_y<0) {
-      fprintf(stderr, "Number of rows is negative !\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1656, __FUNCTION__);
+      fprintf(stderr, "Number of rows is negative !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1608, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
    if (size_x<0) {
-      fprintf(stderr, "Number of columns is negative !\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1656, __FUNCTION__);
+      fprintf(stderr, "Number of columns is negative !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1608, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
    if (spp<1) {
-      fprintf(stderr, "Sample Per Pixel (spp) must be > 0 !\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1656, __FUNCTION__);
+      fprintf(stderr, "Sample Per Pixel (spp) must be > 0 !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1608, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -241,7 +241,7 @@ FLGR_Data2D * flgr2d_create_from(FLGR_Data2D *datsrc)
    if (datsrc==(void *) 0) {
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1375, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1327, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -264,7 +264,7 @@ FLGR_NhbBox2D * flgr2d_create_neighbor_box(FLGR_Data2D *data)
       
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1724, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1676, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -321,17 +321,17 @@ FLGR_Data2D * flgr2d_create_neighborhood(int size_y, int size_x, int spp, FLGR_T
       
       
       
-      fprintf(stderr, "Warning NhbWidth(%d) is even! Changing to the next odd value (%d) \n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1674, __FUNCTION__, size_x, size_x+1);
+      fprintf(stderr, "Warning NhbWidth(%d) is even! Changing to the next odd value (%d) \n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1626, __FUNCTION__, size_x, size_x+1);
       flgr_backtrace_print();
       size_x++;
    }
    if (size_y%2==0) {
-      fprintf(stderr, "Warning NhbWidth(%d) is even! Changing to the next odd value (%d) \n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1678, __FUNCTION__, size_y, size_y+1);
+      fprintf(stderr, "Warning NhbWidth(%d) is even! Changing to the next odd value (%d) \n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1630, __FUNCTION__, size_y, size_y+1);
       flgr_backtrace_print();
       size_y++;
    }
    if (connexity!=FLGR_4_CONNEX&&connexity!=FLGR_6_CONNEX&&connexity!=FLGR_8_CONNEX) {
-      fprintf(stderr, "bad connexity : %d\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1683, __FUNCTION__, connexity);
+      fprintf(stderr, "bad connexity : %d\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1635, __FUNCTION__, connexity);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -350,7 +350,7 @@ FLGR_Data2D * flgr2d_create_neighborhood_from(FLGR_Data2D *nhbsrc)
    if (nhbsrc==(void *) 0) {
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1644, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1596, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -368,7 +368,7 @@ int flgr2d_data_is_connexity(FLGR_Data2D *data, FLGR_Connexity connexity)
    if (data==(void *) 0) {
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1294, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1246, __FUNCTION__);
       flgr_backtrace_print();
       return 0;
    }
@@ -383,13 +383,13 @@ FLGR_Ret flgr2d_destroy(FLGR_Data2D *dat)
       
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1615, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1567, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
 
    if (dat->link_overlap>-1) {
-      fprintf(stderr, "Destroying a linked data, branching to flgr2d_destroy_link\n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1620, __FUNCTION__);
+      fprintf(stderr, "Destroying a linked data, branching to flgr2d_destroy_link\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1572, __FUNCTION__);
       flgr_backtrace_print();
       return flgr2d_destroy_link(dat);
    }
@@ -414,13 +414,13 @@ FLGR_Ret flgr2d_destroy_link(FLGR_Data2D *dat)
       
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1558, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1510, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
 
    if (dat->link_overlap==-1) {
-      fprintf(stderr, "Destroying a non-linked data, branching to flgr2d_destroy\n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1563, __FUNCTION__);
+      fprintf(stderr, "Destroying a non-linked data, branching to flgr2d_destroy\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1515, __FUNCTION__);
       flgr_backtrace_print();
       return flgr2d_destroy(dat);
    }
@@ -470,7 +470,7 @@ void flgr2d_destroy_neighbor_box(FLGR_NhbBox2D *extr)
    if (extr==(void *) 0) {
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1529, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1481, __FUNCTION__);
       flgr_backtrace_print();
       return;
    }
@@ -643,24 +643,24 @@ void flgr2d_draw_vertical_line_fgUINT16(FLGR_Data2D *dat, int x, int y, int size
 FLGR_Ret flgr2d_fill_neighborhood(FLGR_Data2D *nhb, FLGR_Shape shape, int width, int height)
 {
    if (nhb==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1482, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1434, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
 
    if (nhb->shape!=shape) {
-      fprintf(stderr, "given shape does not correspond to FLGR_Data2D shape\n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1487, __FUNCTION__);
+      fprintf(stderr, "given shape does not correspond to FLGR_Data2D shape\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1439, __FUNCTION__);
       flgr_backtrace_print();
    }
 
    if (width>nhb->size_x) {
-      fprintf(stderr, "width too high\n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1491, __FUNCTION__);
+      fprintf(stderr, "width too high\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1443, __FUNCTION__);
       flgr_backtrace_print();
       width = nhb->size_x;
    }
 
    if (width<0) {
-      fprintf(stderr, "width < 0\n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1496, __FUNCTION__);
+      fprintf(stderr, "width < 0\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1448, __FUNCTION__);
       flgr_backtrace_print();
       width = 0;
    }
@@ -669,13 +669,13 @@ FLGR_Ret flgr2d_fill_neighborhood(FLGR_Data2D *nhb, FLGR_Shape shape, int width,
       width++;
 
    if (height>nhb->size_y) {
-      fprintf(stderr, "height too high\n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1505, __FUNCTION__);
+      fprintf(stderr, "height too high\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1457, __FUNCTION__);
       flgr_backtrace_print();
       height = nhb->size_y;
    }
 
    if (height<0) {
-      fprintf(stderr, "height < 0\n""WARNING: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1510, __FUNCTION__);
+      fprintf(stderr, "height < 0\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1462, __FUNCTION__);
       flgr_backtrace_print();
       height = 0;
    }
@@ -747,7 +747,7 @@ FLGR_Ret flgr2d_fill_nhb_even_rows(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
 {
    FLGR_Ret ret;
    if (datsrc==(void *) 0||datdest==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1280, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1232, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -798,7 +798,7 @@ FLGR_Ret flgr2d_fill_nhb_odd_rows(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
 {
    FLGR_Ret ret;
    if (datsrc==(void *) 0||datdest==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1264, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1216, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -849,7 +849,7 @@ FLGR_Ret flgr2d_fill_nhbs_for_6_connexity(FLGR_Data2D *nhbEven, FLGR_Data2D *nhb
 {
    FLGR_Ret ret;
    if (nhb==(void *) 0||nhbOdd==(void *) 0||nhbEven==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1306, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1258, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -880,10 +880,6 @@ FLGR_Ret flgr2d_fill_nhbs_for_6_connexity(FLGR_Data2D *nhbEven, FLGR_Data2D *nhb
    }
 
    return FLGR_RET_OK;
-}
-fgUINT16 flgr2d_get_data_array_fgUINT16(fgUINT16 **array, int row, int col)
-{
-   return flgr_get_array_fgUINT16(array[row], col);
 }
 void flgr2d_get_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
@@ -1027,7 +1023,7 @@ void flgr2d_import_raw_fgUINT16(FLGR_Data2D *datdest, void *raw)
 FLGR_Ret flgr2d_import_raw_ptr(FLGR_Data2D *datdest, void *raw)
 {
    if (datdest==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1245, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1197, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -1037,7 +1033,7 @@ FLGR_Ret flgr2d_is_data_same_attributes(FLGR_Data2D *data1, FLGR_Data2D *data2, 
 {
    FLGR_Ret ret;
    if (data1==(void *) 0||data2==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1194, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1146, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -1076,7 +1072,7 @@ FLGR_Ret flgr2d_is_data_same_attributes(FLGR_Data2D *data1, FLGR_Data2D *data2, 
 FLGR_Ret flgr2d_is_data_same_size(FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
    if (data1==(void *) 0||data2==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1178, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1130, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -1088,7 +1084,7 @@ FLGR_Ret flgr2d_is_data_same_size(FLGR_Data2D *data1, FLGR_Data2D *data2)
 FLGR_Ret flgr2d_is_data_same_spp(FLGR_Data2D *dat1, FLGR_Data2D *dat2)
 {
    if (dat1==(void *) 0||dat2==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1161, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1113, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -1108,7 +1104,7 @@ FLGR_Ret flgr2d_is_data_same_type(FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
    FLGR_Ret ret;
    if (data1==(void *) 0||data2==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1143, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1095, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -1126,7 +1122,7 @@ FLGR_Ret flgr2d_mirror_horizontal(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
 {
    FLGR_Ret ret;
    if (datdest==(void *) 0||datsrc==(void *) 0) {
-      fprintf(stderr, "Null objects\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1127, __FUNCTION__);
+      fprintf(stderr, "Null objects\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1079, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -1172,7 +1168,7 @@ FLGR_Ret flgr2d_mirror_vertical_hmorph(FLGR_Data2D *dat)
       
       
       
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1090, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1042, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -1496,10 +1492,6 @@ void flgr_free(void *ptr)
    
    free(ptr);
 }
-fgUINT16 flgr_get_array_fgUINT16(fgUINT16 *array, int pos)
-{
-   return array[pos];
-}
 int flgr_get_bps_from_type(FLGR_Type type)
 {
 
@@ -1543,18 +1535,6 @@ switch_1_case_FLGR_BIT:   ;
    return 1;
 switch_1_default:   ;
    return FLGR_RET_TYPE_UNKNOWN;
-}
-void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_array, int spp, int pos)
-{
-   register fgUINT16 val;
-   register int i, k;
-   i = pos*spp;
-
-   for(k = 0; k <= spp-1; k += 1) {
-      val = flgr_get_array_fgUINT16(data_array, i);
-      flgr_set_array_fgUINT16(vector_array, k, val);
-      i++;
-   }
 }
 int flgr_get_sizeof(FLGR_Type type)
 {
@@ -1627,7 +1607,7 @@ FLGR_Type flgr_get_type_from_string(char *type)
    if (strcmp(type, "fgFLOAT64")==0) 
       return FLGR_FLOAT64;
 
-   fprintf(stderr, "Unknown type %s\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1020, __FUNCTION__, type);
+   fprintf(stderr, "Unknown type %s\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 977, __FUNCTION__, type);
    flgr_backtrace_print();
    return FLGR_UINT8;
 }
@@ -1692,7 +1672,7 @@ void * flgr_malloc(size_t size)
       
       
       
-      fprintf(stderr, "Could not allocate data, returning NULL pointer !\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 976, __FUNCTION__);
+      fprintf(stderr, "Could not allocate data, returning NULL pointer !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 804, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -1724,22 +1704,6 @@ int flgr_normalize_coordinate(int axis_coord, int axis_length)
    
    return axis_coord;
 }
-void flgr_set_array_fgUINT16(fgUINT16 *array, int pos, fgUINT16 value)
-{
-   array[pos] = value;
-}
-void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_array, int spp, int pos)
-{
-   register fgUINT16 val;
-   register int i, k;
-   i = pos*spp;
-
-   for(k = 0; k <= spp-1; k += 1) {
-      val = flgr_get_array_fgUINT16(vector_array, k);
-      flgr_set_array_fgUINT16(data_array, i, val);
-      i++;
-   }
-}
 FLGR_Vector * flgr_vector_create(int spp, FLGR_Type type)
 {
    FLGR_Vector *vct;
@@ -1747,13 +1711,13 @@ FLGR_Vector * flgr_vector_create(int spp, FLGR_Type type)
    
    
    if (flgr_is_vector_type_valid(type)!=FLGR_RET_OK) {
-      fprintf(stderr, "unknwon type\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 916, __FUNCTION__);
+      fprintf(stderr, "unknwon type\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 885, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
 
    if (spp<1) {
-      fprintf(stderr, "Sample Per Pixel (spp) cannot be < 1\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 921, __FUNCTION__);
+      fprintf(stderr, "Sample Per Pixel (spp) cannot be < 1\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 890, __FUNCTION__);
       flgr_backtrace_print();
       return (void *) 0;
    }
@@ -1764,10 +1728,10 @@ FLGR_Vector * flgr_vector_create(int spp, FLGR_Type type)
    vct->spp = spp;
    vct->type = type;
 
-   vct->array = flgr_malloc(spp*vct->bps/8+16, 16);
+   vct->array = flgr_malloc(spp*vct->bps/8+16);
    if (vct->array==(void *) 0) {
 
-      fprintf(stderr, "Allocation error !\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 934, __FUNCTION__);
+      fprintf(stderr, "Allocation error !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 903, __FUNCTION__);
       flgr_backtrace_print();
       flgr_free(vct);
       return (void *) 0;
@@ -1780,13 +1744,13 @@ FLGR_Ret flgr_vector_destroy(FLGR_Vector *vct)
    if (vct==(void *) 0) {
       
       
-      fprintf(stderr, "Null object\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 866, __FUNCTION__);
+      fprintf(stderr, "Null object\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 835, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
    if (vct->array==(void *) 0) {
 
-      fprintf(stderr, "Vector array is null\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 871, __FUNCTION__);
+      fprintf(stderr, "Vector array is null\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 840, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -5616,6 +5580,25 @@ static fgFLOAT64 flgr2d_get_data_array_fgFLOAT64(fgFLOAT64 **array, int row, int
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  ***************************************************************/
+/****************************************************************
+ * Fulguro
+ * Copyright (C) 2004 Christophe Clienti
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ ***************************************************************/
 
 extern FLGR_Ret flgr1d_copy(FLGR_Data1D *datdest, FLGR_Data1D *datsrc);
 extern FLGR_Ret flgr2d_copy(FLGR_Data2D *datdest, FLGR_Data2D *datsrc);
@@ -7384,19 +7367,11 @@ extern void flgr2d_anti_raster_slide_window_before_op_fgFLOAT32(FLGR_Data2D *img
 
 
 extern void flgr2d_anti_raster_slide_window_before_op_fgFLOAT64(FLGR_Data2D *imgdest, FLGR_Data2D *imgsrc, FLGR_Data2D *imgarith, FLGR_Data2D *nhb, int nhb_sym, FLGR_ComputeNhb2D computeNhb, FLGR_ComputeArith computeArith);
+extern void flgr_free(void *ptr);
+extern void *flgr_malloc(size_t size);
+
 extern void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *extr);
 
-
-extern fgUINT16 flgr2d_get_data_array_fgUINT16(fgUINT16 **array, int row, int col);
-
-extern void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_array, int spp, int pos);
-
-extern fgUINT16 flgr_get_array_fgUINT16(fgUINT16 *array, int pos);
-
-extern void flgr_set_array_fgUINT16(fgUINT16 *array, int pos, fgUINT16 value);
-
-
-extern void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_array, int spp, int pos);
 
 static fgUINT16 flgr_defop_sup_fgUINT16(fgUINT16 a, fgUINT16 b);
 extern void flgr_vector_sup_fgUINT16(FLGR_Vector *vctdest, FLGR_Vector *vct1, FLGR_Vector *vct2);
@@ -7409,11 +7384,9 @@ extern FLGR_Ret flgr_vector_destroy(FLGR_Vector *vct);
 extern FLGR_Ret flgr_is_vector_type_valid(FLGR_Type type);
 extern FLGR_Vector *flgr_vector_create(int spp, FLGR_Type type);
 extern int flgr_normalize_coordinate(int axis_coord, int axis_length);
-extern void *flgr_malloc(size_t size);
 extern FLGR_Ret flgr_is_data_type_valid(FLGR_Type type);
 extern FLGR_Type flgr_get_type_from_string(char *type);
 extern int flgr_get_bps_from_type(FLGR_Type type);
-extern void flgr_free(void *ptr);
 extern void flgr_backtrace_print(void);
 extern void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct);
 extern void flgr2d_native_dilate_8_connexity_fgUINT16(FLGR_Data2D *nhb);
@@ -8047,7 +8020,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
 {
    FLGR_Ret ret;
    if (datdest==(void *) 0||datsrc==(void *) 0||nhb==(void *) 0) {
-      fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Null objects!\n", "./fulguro-included.h", 1792, __FUNCTION__);
+      fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Null objects!\n", "include/fulguro/fulguro-included.h", 1744, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -8063,7 +8036,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
       }
    }
 }
-fgUINT16 flgr_get_array_fgUINT16(fgUINT16 *array, int pos)
+static fgUINT16 flgr_get_array_fgUINT16(fgUINT16 *array, int pos)
 {
    return array[pos];
 }
@@ -8239,7 +8212,8 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                   for(j_ = startcol; j_ <= stopcol; j_ += 1) {
                      {
                         //PIPS generated variable
-                        int I_2 = l*spp+n;
+                        int I_2;
+                        I_2 = l*spp+n;
                         {
                            //PIPS generated variable
                            unsigned short _return0;
@@ -8256,7 +8230,8 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                      if (nhb_val!=0) {
                         {
                            //PIPS generated variable
-                           int I_3 = j_*spp+n;
+                           int I_3;
+                           I_3 = j_*spp+n;
                            {
                               //PIPS generated variable
                               unsigned short _return0;
@@ -8381,9 +8356,11 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
             P_21 = imgsrc->array;
             {
                //PIPS generated variable
-               void *P_47 = extr->center_data_val->array;
+               void *P_46;
                //PIPS generated variable
-               void *P_48 = P_21[i];
+               void *P_47;
+               P_46 = extr->center_data_val->array;
+               P_47 = P_21[i];
                {
                   register fgUINT16 val;
                   register int i, k;
@@ -8392,9 +8369,9 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                   i = j*spp;
 
                   for(k = 0; k <= spp-1; k += 1) {
-                     _return0 = P_48[i];
+                     _return0 = P_47[i];
                      val = _return0;
-                     P_47[k] = val;
+                     P_46[k] = val;
                      i++;
                   }
                }
@@ -8402,9 +8379,11 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
             P_22 = nhbrs->array;
             {
                //PIPS generated variable
-               void *P_49 = extr->center_nhb_val->array;
+               void *P_48;
                //PIPS generated variable
-               void *P_50 = P_22[nhbsize_ydiv2];
+               void *P_49;
+               P_48 = extr->center_nhb_val->array;
+               P_49 = P_22[nhbsize_ydiv2];
                {
                   register fgUINT16 val;
                   register int i, k;
@@ -8413,9 +8392,9 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                   i = nhbsize_xdiv2*spp;
 
                   for(k = 0; k <= spp-1; k += 1) {
-                     _return0 = P_50[i];
+                     _return0 = P_49[i];
                      val = _return0;
-                     P_49[k] = val;
+                     P_48[k] = val;
                      i++;
                   }
                }
@@ -8436,7 +8415,8 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                   for(j_ = startcol; j_ <= stopcol; j_ += 1) {
                      {
                         //PIPS generated variable
-                        int I_2 = l*spp+n;
+                        int I_2;
+                        I_2 = l*spp+n;
                         {
                            //PIPS generated variable
                            unsigned short _return0;
@@ -8453,7 +8433,8 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                      if (nhb_val!=0) {
                         {
                            //PIPS generated variable
-                           int I_3 = j_*spp+n;
+                           int I_3;
+                           I_3 = j_*spp+n;
                            {
                               //PIPS generated variable
                               unsigned short _return0;
@@ -8531,7 +8512,8 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
       if (sum!=0) {
          {
             //PIPS generated variable
-            double F_0 = tmp/sum;
+            double F_0;
+            F_0 = tmp/sum;
             presult[k] = F_0;
          }
       }
@@ -8542,7 +8524,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
 {
    FLGR_Ret ret;
    if (datdest==(void *) 0||datsrc==(void *) 0||nhb==(void *) 0) {
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1792, __FUNCTION__);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1744, __FUNCTION__);
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
@@ -8637,11 +8619,11 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                         P_21 = imgsrc->array;
                         {
                            //PIPS generated variable
-                           void *P_47;
+                           void *P_46;
                            //PIPS generated variable
-                           void *P_48;
-                           P_47 = extr->center_data_val->array;
-                           P_48 = P_21[i];
+                           void *P_47;
+                           P_46 = extr->center_data_val->array;
+                           P_47 = P_21[i];
                            {
                               register fgUINT16 val;
                               register int i, k;
@@ -8650,9 +8632,9 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                               i = j*spp;
 
                               for(k = 0; k <= spp-1; k += 1) {
-                                 _return0 = P_48[i];
+                                 _return0 = P_47[i];
                                  val = _return0;
-                                 P_47[k] = val;
+                                 P_46[k] = val;
                                  i++;
                               }
                            }
@@ -8660,11 +8642,11 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                         P_22 = nhbrs->array;
                         {
                            //PIPS generated variable
-                           void *P_49;
+                           void *P_48;
                            //PIPS generated variable
-                           void *P_50;
-                           P_49 = extr->center_nhb_val->array;
-                           P_50 = P_22[nhbsize_ydiv2];
+                           void *P_49;
+                           P_48 = extr->center_nhb_val->array;
+                           P_49 = P_22[nhbsize_ydiv2];
                            {
                               register fgUINT16 val;
                               register int i, k;
@@ -8673,9 +8655,9 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                               i = nhbsize_xdiv2*spp;
 
                               for(k = 0; k <= spp-1; k += 1) {
-                                 _return0 = P_50[i];
+                                 _return0 = P_49[i];
                                  val = _return0;
-                                 P_49[k] = val;
+                                 P_48[k] = val;
                                  i++;
                               }
                            }
