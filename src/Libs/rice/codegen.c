@@ -28,6 +28,7 @@
 #include "local.h"
 #include "effects-generic.h"
 
+/* FI: I did not know this was still used... */
 extern entity current_module_entity;
 
 
@@ -40,33 +41,29 @@ dal is the arc label
 
 level is the minimum level
 */
-static bool AK_ignore_this_level(dal, level)
-dg_arc_label dal;
-int level;
+static bool AK_ignore_this_level(dg_arc_label dal, int level)
 {
-    bool true_dep = get_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY" ) ;
+  bool true_dep = get_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY" ) ;
 
-    MAPL(pc, {
-	conflict c = CONFLICT(CAR(pc));
+  FOREACH(CONFLICT, c, dg_arc_label_conflicts(dal)) {
+    if( conflict_cone(c) != cone_undefined ) {
+      FOREACH(int, l, cone_levels(conflict_cone(c))) {
+	if( l >= level ) {
+	  if( true_dep ) {
+	    action s = effect_action( conflict_source( c )) ;
+	    action k = effect_action( conflict_sink( c )) ;
 
-	if( conflict_cone(c) != cone_undefined ) {
-	    MAPL(pi, {
-		if( INT(CAR(pi)) >= level ) {
-		    if( true_dep ) {
-			action s = effect_action( conflict_source( c )) ;
-			action k = effect_action( conflict_sink( c )) ;
-
-			return( action_write_p( s ) && action_read_p( k )) ;
-		    }
-		    else {
-			return(FALSE);
-		    }
-		}, cone_levels(conflict_cone(c)));
-	     }
+	    return( action_write_p( s ) && action_read_p( k )) ;
+	  }
+	  else {
+	    return(FALSE);
+	  }
 	}
-    }, dg_arc_label_conflicts(dal));
-   
-    return(TRUE);
+      }
+    }
+  }
+
+  return(TRUE);
 }
 
 
@@ -75,20 +72,18 @@ int level;
 this function checks if a vertex v should be ignored, i.e. does not
 belong to region
 */
-static bool AK_ignore_this_vertex(region, v)
-set region;
-vertex v;
+static bool AK_ignore_this_vertex(set region, vertex v)
 {
-    dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
-    statement st = ordering_to_statement(dg_vertex_label_statement(dvl));
+  dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
+  statement st = ordering_to_statement(dg_vertex_label_statement(dvl));
 
-    return(! set_belong_p(region, (char *) st));
+  return(! set_belong_p(region, (char *) st));
 }
 
 
 
 /*
-this function checks if a successoressor su of a vertex should be
+this function checks if a successor su of a vertex should be
 ignored, i.e.  if it is linked through an arc whose level is less than
 'level' or if it does not belong to region
 */
@@ -104,7 +99,8 @@ static bool AK_ignore_this_successor(vertex __attribute__ ((unused)) v,
   if (!ignore_p)
     ignore_p = AK_ignore_this_level(al, level);
 
-  if (!ignore_p && get_bool_property("PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES")) {
+  if (!ignore_p
+      && get_bool_property("PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES")) {
     list cl = dg_arc_label_conflicts(al);
     bool thread_safe_p = TRUE;
 
@@ -131,172 +127,161 @@ be ignored at level l.
 A conflict is to be ignored if the variable that creates the conflict is
 local to one of the enclosing loops.
 
-Attension: The loops around every statement got by load_statement_loops(statement) here are just these after
-taking off the loops on which the Kennedy's algo. can't be applied. (YY)
+FI: this should be extended to variables declared within the last loop
+body for C code?
+
+Note: The loops around every statement got by
+load_statement_loops(statement) here are just these after taking off
+the loops on which the Kennedy's algo. can't be applied. (YY)
+
+FI: I do not understand the note above.
 */
 
-bool ignore_this_conflict(v1, v2, c, l)
-vertex v1, v2;
-conflict c;
-int l;
+bool ignore_this_conflict(vertex v1, vertex v2, conflict c, int l)
 {
-    extern int enclosing;
-    effect e1 = conflict_source(c);
-    reference r1 = effect_any_reference(e1) ;
-    entity var1 = reference_variable(r1);
-    statement s1 = vertex_to_statement(v1);
-    list loops1 = load_statement_enclosing_loops(s1);
+  extern int enclosing;
+  effect e1 = conflict_source(c);
+  reference r1 = effect_any_reference(e1) ;
+  entity var1 = reference_variable(r1);
+  statement s1 = vertex_to_statement(v1);
+  list loops1 = load_statement_enclosing_loops(s1);
 
-    effect e2 = conflict_sink(c);
-    reference r2 = effect_any_reference( e2 ) ;
-    entity var2 = reference_variable(r2);
-    statement s2 = vertex_to_statement(v2);
-    list loops2 = load_statement_enclosing_loops(s2);
-   register int i;
+  effect e2 = conflict_sink(c);
+  reference r2 = effect_any_reference( e2 ) ;
+  entity var2 = reference_variable(r2);
+  statement s2 = vertex_to_statement(v2);
+  list loops2 = load_statement_enclosing_loops(s2);
+  register int i;
 
-    if (var1 != var2) {
-	/* equivalences do not deserve more cpu cycles */
-	return(FALSE);
-    }
-
-
-    for (i = 1; i < l-enclosing; i++) {
-	if( !ENDP(loops1)) {
-	    loops1 = CDR(loops1);
-	}
-	if( !ENDP(loops2)) {
-	    loops2 = CDR(loops2);
-	}
-    }
-
-    ifdebug(8) {
-	fprintf(stderr, "\n[ignore_this_conflict] verifing the following conflit at level %d: \n",l);
-	fprintf(stderr, "\t%02td --> %02td ", statement_number(s1), statement_number(s2));
-	fprintf(stderr, "\t\tfrom ");
-	print_words(stderr, (list) words_effect(conflict_source(c)));
-
-	fprintf(stderr, " to ");
-	print_words(stderr,  (list) words_effect(conflict_sink(c)));
-	fprintf(stderr, "\n");
-    }
-
-    MAPL(pl, {
-	statement st = STATEMENT(CAR(pl));
-	list l = loop_locals(instruction_loop(statement_instruction(st)));
-	ifdebug(8) {
-	  print_statement(st);
-	    fprintf(stderr,"The list of prived variables : \n");
-	    MAPL(v, {entity e = ENTITY (CAR(v));
-		     fprintf(stderr," %s", entity_local_name(e));
-		 }, l);
-	    fprintf(stderr,"\n");
-	}
-
-	if (gen_find_eq(var1, l) != entity_undefined) {
-	    return(TRUE);
-	}
-    }, loops1);
-   
-    MAPL(pl, {
-	statement st = STATEMENT(CAR(pl));
-	list l = loop_locals(instruction_loop(statement_instruction(st)));
-	ifdebug(8) {
-	  print_statement(st);
-	    fprintf(stderr,"The list of prived variables : \n");
-	    MAPL(v, {entity e = ENTITY (CAR(v));
-		     fprintf(stderr," %s", entity_local_name(e));
-		 }, l);
-	    fprintf(stderr,"\n");
-	}
-	if (gen_find_eq(var1, l) != entity_undefined)  {
-	    return(TRUE);
-	}
-    }, loops2);
+  if (var1 != var2) {
+    /* equivalences do not deserve more cpu cycles */
     return(FALSE);
+  }
+
+
+  for (i = 1; i < l-enclosing; i++) {
+    if( !ENDP(loops1)) {
+      loops1 = CDR(loops1);
+    }
+    if( !ENDP(loops2)) {
+      loops2 = CDR(loops2);
+    }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "verifying the following conflit at level %d: \n",l);
+    fprintf(stderr, "\t%02td --> %02td ",
+	    statement_number(s1), statement_number(s2));
+    fprintf(stderr, "\t\tfrom ");
+    print_effect(conflict_source(c));
+
+    fprintf(stderr, " to ");
+    print_effect(conflict_sink(c));
+    fprintf(stderr, "\n");
+  }
+
+  FOREACH(STATEMENT, st, loops1) {
+    list l = loop_locals(instruction_loop(statement_instruction(st)));
+    ifdebug(8) {
+      print_statement(st);
+      fprintf(stderr,"The list of privatized/private variables : \n");
+      print_entities(l);
+      fprintf(stderr,"\n");
+    }
+
+    if (gen_find_eq(var1, l) != entity_undefined) {
+      return(TRUE);
+    }
+  }
+
+  FOREACH(STATEMENT, st, loops2) {
+    list l = loop_locals(instruction_loop(statement_instruction(st)));
+    ifdebug(8) {
+      print_statement(st);
+      fprintf(stderr,"The list of privatized/private variables : \n");
+      print_entities(l);
+      fprintf(stderr,"\n");
+    }
+    if (gen_find_eq(var1, l) != entity_undefined)  {
+      return(TRUE);
+    }
+  }
+  return(FALSE);
 }
 
 
 
-/* s is a strongly connected component s which is being analyzed at
-level l. its vertices are enclosed in at least l loops. this gives us a
-solution to retrieve the level l loop enclosing a scc: to take its first
-vertex and retrieve the l th loop aroung this vertex.  */
-
-statement find_level_l_loop_statement(s, l)
-scc s;
-int l;
+/* s is a strongly connected component which is analyzed at level
+l. Its vertices are enclosed in at least l loops. This gives us a
+solution to retrieve the level l loop enclosing a scc: to take its
+first vertex and retrieve the l-th loop around this vertex.
+ */
+statement find_level_l_loop_statement(scc s, int l)
 {
-    vertex v = VERTEX(CAR(scc_vertices(s)));
-    statement st = vertex_to_statement(v);
-    list loops = load_statement_enclosing_loops(st);
-   
-    if (l > 0)
-	MAPL(pl, {
-	    if (l-- == 1)
-		return(STATEMENT(CAR(pl)));
-	}, loops);
-    return( statement_undefined ) ;
+  vertex v = VERTEX(CAR(scc_vertices(s)));
+  statement st = vertex_to_statement(v);
+  list loops = load_statement_enclosing_loops(st);
+
+  if (l > 0)
+    MAPL(pl, {
+	if (l-- == 1)
+	  return(STATEMENT(CAR(pl)));
+      }, loops);
+  return( statement_undefined ) ;
 }
 
 
 set scc_region(scc s)
 {
-    set region = set_make(set_pointer);
-    MAPL(pv, {
-	set_add_element(region, region,
-			(char *) vertex_to_statement(VERTEX(CAR(pv))));
+  set region = set_make(set_pointer);
+  MAPL(pv, {
+      set_add_element(region, region,
+		      (char *) vertex_to_statement(VERTEX(CAR(pv))));
     }, scc_vertices(s));
-    return(region);
+  return(region);
 }
 
 
 /* s is a strongly connected component for which a DO loop is being
 produced.  this function returns FALSE if s contains no dependences at
-level l. in this case, the loop will be a DOALL loop. */
-
-bool contains_level_l_dependence(s, region, level)
-scc s;
-set region;
-int level;
+level l. in this case, the loop will be a DOALL loop.
+*/
+bool contains_level_l_dependence(scc s, set region, int level)
 {
-    MAPL(pv, {
-	vertex v = VERTEX(CAR(pv));
-	statement s1 = vertex_to_statement(v);
-	MAPL(ps, {
-	    successor su = SUCCESSOR(CAR(ps));
-	    vertex vs = successor_vertex(su);
-	    statement s2 = vertex_to_statement(vs);
+  FOREACH(VERTEX, v, scc_vertices(s)) {
+    statement s1 = vertex_to_statement(v);
+    FOREACH(SUCCESSOR, su, vertex_successors(v)) {
+      vertex vs = successor_vertex(su);
+      statement s2 = vertex_to_statement(vs);
 
-	    if (! AK_ignore_this_vertex(region, vs)) {
-		dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
-		MAPL(pc, {
-		    conflict c = CONFLICT(CAR(pc));
-		    if (! ignore_this_conflict(v, vs, c, level)) {
-			if (conflict_cone(c) != cone_undefined){
-			    MAPL(pi, {
-				if (INT(CAR(pi)) == level) {
-				    ifdebug(7) {
-					fprintf(stderr,
-						"\n[contains_level_l_dependence] containing conflit at level %d: ",level); 
-					fprintf(stderr, "\t%02td --> %02td ",
-						statement_number(s1), statement_number(s2));
-					fprintf(stderr, "\t\tfrom ");
-					print_words(stderr, (list) words_effect(conflict_source(c)));
-					fprintf(stderr, " to ");
-					print_words(stderr,  (list) words_effect(conflict_sink(c)));
-					fprintf(stderr, "\n");
-				    }
-				    return(TRUE);
-				}
-			    }, cone_levels(conflict_cone(c)));
-			}
-		    }
-		}, dg_arc_label_conflicts(dal));
+      if (! AK_ignore_this_vertex(region, vs)) {
+	dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
+	FOREACH(CONFLICT, c, dg_arc_label_conflicts(dal)) {
+	  if (! ignore_this_conflict(v, vs, c, level)) {
+	    if (conflict_cone(c) != cone_undefined){
+	      FOREACH(int, l, cone_levels(conflict_cone(c))) {
+		if (l == level) {
+		  ifdebug(7) {
+		    pips_debug(7, "containing conflit at level %d: ",level);
+		    fprintf(stderr, "\t%02td --> %02td ",
+			    statement_number(s1), statement_number(s2));
+		    fprintf(stderr, "\t\tfrom ");
+		    print_effect(conflict_source(c));
+		    fprintf(stderr, " to ");
+		    print_effect(conflict_sink(c));
+		    fprintf(stderr, "\n");
+		  }
+		  return(TRUE);
+		}
+	      }
 	    }
-	}, vertex_successors(v));
-    }, scc_vertices(s));
+	  }
+	}
+      }
+    }
+  }
 
-    return(FALSE);
+  return(FALSE);
 }
 
 
@@ -304,27 +289,24 @@ int level;
 /* this function returns TRUE if scc s is stronly connected at level l,
 i.e. dependence arcs at level l or greater form at least one cycle */
 
-bool strongly_connected_p(s, l)
-scc s;
-int l;
+bool strongly_connected_p(scc s, int l)
 {
-    cons *pv = scc_vertices(s);
-    vertex v = VERTEX(CAR(pv));
+  cons *pv = scc_vertices(s);
+  vertex v = VERTEX(CAR(pv));
 
-    /* if s contains more than one vertex, it is strongly connected */
-    if (CDR(pv) != NIL)
-	return(TRUE);
+  /* if s contains more than one vertex, it is strongly connected */
+  if (CDR(pv) != NIL)
+    return(TRUE);
 
-    /* if there is a dependence from v to v, s is strongly connected */
-    MAPL(ps, {
-	successor s = SUCCESSOR(CAR(ps));
-	if (!AK_ignore_this_level((dg_arc_label) successor_arc_label(s), l) &&
-	    successor_vertex(s) == v)
-	    return(TRUE);
-    }, vertex_successors(v));
+  /* if there is a dependence from v to v, s is strongly connected */
+  FOREACH(SUCCESSOR, s, vertex_successors(v)) {
+    if (!AK_ignore_this_level((dg_arc_label) successor_arc_label(s), l) &&
+	successor_vertex(s) == v)
+      return(TRUE);
+  }
 
-    /* s is not strongly connected */
-    return(FALSE);
+  /* s is not strongly connected */
+  return(FALSE);
 }
 
 
@@ -334,71 +316,76 @@ statement whose iterations may execute in parallel.
 
 loops is the loop nest that was around body in the original program. l
 is the current level; it tells us how many loops have already been
-processed. */
+processed.
 
-statement MakeNestOfParallelLoops(l, loops, body, task_parallelize_p)
-int l;
-cons *loops;
-statement body;
-bool task_parallelize_p;
+ */
+statement MakeNestOfParallelLoops(int l,
+				  cons *loops,
+				  statement body,
+				  bool task_parallelize_p)
 {
-    statement s;
-    debug(3, " MakeNestOfParallelLoops"," at level %d ...\n",l);
+  statement s;
+  pips_debug(3, " at level %d ...\n",l);
 
-    if (loops == NIL)
-	s = body;
-    else if( l > 0 )
-	s = MakeNestOfParallelLoops(l-1,
-				    CDR(loops), body, task_parallelize_p) ;
-    else {
-      statement slo = STATEMENT(CAR(loops));
-	loop lo = statement_loop(slo);
-	tag  seq_or_par = ((CDR(loops) == NIL || task_parallelize_p)
-			   && index_private_p(lo)) ?
-			       is_execution_parallel : is_execution_sequential;
-	
-	/* At most one outer loop parallel */
-	bool task_parallelize_inner =
-	  (seq_or_par == is_execution_parallel
-	   && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ? 
-	  FALSE:task_parallelize_p;
-	
-	s = MakeLoopAs(slo, seq_or_par,
-		       MakeNestOfParallelLoops(0, CDR(loops), body,
-					       task_parallelize_inner));
-    }
-    return(s);
+  if (loops == NIL)
+    s = body;
+  else if( l > 0 )
+    s = MakeNestOfParallelLoops(l-1,
+				CDR(loops), body, task_parallelize_p) ;
+  else {
+    statement slo = STATEMENT(CAR(loops));
+    loop lo = statement_loop(slo);
+    tag  seq_or_par = ((CDR(loops) == NIL || task_parallelize_p)
+		       && index_private_p(lo)) ?
+      is_execution_parallel : is_execution_sequential;
+
+    /* At most one outer loop parallel */
+    bool task_parallelize_inner =
+      (seq_or_par == is_execution_parallel
+       && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
+      FALSE:task_parallelize_p;
+
+    s = MakeLoopAs(slo, seq_or_par,
+		   MakeNestOfParallelLoops(0, CDR(loops), body,
+					   task_parallelize_inner));
+  }
+  return(s);
 }
 
 int statement_imbrication_level(statement st)
 {
-    list loops = load_statement_enclosing_loops(st);
-    return(gen_length(loops));
+  list loops = load_statement_enclosing_loops(st);
+  return(gen_length(loops));
 }
 
-statement MakeNestOfStatementList(int l, int nbl,list *lst, list loops, list * block,
-			 list * eblock, bool task_parallelize_p)
+statement MakeNestOfStatementList(int l,
+				  int nbl,
+				  list *lst,
+				  list loops,
+				  list * block,
+				  list * eblock,
+				  bool task_parallelize_p)
 {
-    statement stat = statement_undefined;
-    statement rst = statement_undefined;
-    extern int enclosing;
+  statement stat = statement_undefined;
+  statement rst = statement_undefined;
+  extern int enclosing;
 
-    debug_on("RICE_DEBUG_LEVEL");
+  debug_on("RICE_DEBUG_LEVEL");
 
-    if (*lst !=NIL && nbl) {
-	if (gen_length(*lst)== 1)
-	    rst = (STATEMENT(CAR(*lst)));
-	else rst = make_block_statement(*lst);
-	if (nbl>=l-1)
-	    stat = MakeNestOfParallelLoops(l-1-enclosing,loops,rst,
-					   task_parallelize_p);
-	else stat=rst;
-	*lst=NIL;
-	INSERT_AT_END(*block, *eblock, CONS(STATEMENT, stat, NIL));
-    }
+  if (*lst !=NIL && nbl) {
+    if (gen_length(*lst)== 1)
+      rst = (STATEMENT(CAR(*lst)));
+    else rst = make_block_statement(*lst);
+    if (nbl>=l-1)
+      stat = MakeNestOfParallelLoops(l-1-enclosing,loops,rst,
+				     task_parallelize_p);
+    else stat=rst;
+    *lst=NIL;
+    INSERT_AT_END(*block, *eblock, CONS(STATEMENT, stat, NIL));
+  }
 
-    debug_off();
-    return(stat);
+  debug_off();
+  return(stat);
 }
 
 /* This function implements Allen & Kennedy's algorithm.
@@ -443,7 +430,7 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
   for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
     scc s = SCC(CAR(ps));
     stata = statement_undefined;
-    if(strongly_connected_p(s, l)) 
+    if(strongly_connected_p(s, l))
       stata = ConnectedStatements(g, s, l, task_parallelize_p);
     else {
       if (!get_bool_property("PARTIAL_DISTRIBUTION"))
@@ -455,7 +442,7 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
 	/* statements that are independent are gathered
 	   into the same doall loop */
 	stata = IsolatedStatement(s, l, task_parallelize_p);
-		
+
 	/* set inner_region = scc_region(s);
 	   if (contains_level_l_dependence(s,inner_region,l)) {
 	   stat = IsolatedStatement(s, l, task_parallelize_p);
@@ -480,11 +467,11 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
 	*/
       }
     }
-	
+
     /* In order to preserve the dependences, statements that have
        been collected should be generated before the isolated statement
        that has just been detected */
-	
+
     if (stata != statement_undefined) {
       ifdebug(9) {
 	pips_debug(9, "generated statement:\n") ;
@@ -494,9 +481,9 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
       INSERT_AT_END(block, eblock, CONS(STATEMENT, stata, NIL));
     }
   }
-   
+
   statb = MakeNestOfStatementList(l,nbl,&lst, loops,&block,&eblock,task_parallelize_p);
-  
+
   switch(gen_length(block)) {
   case 0:
     rst = statement_undefined ;
@@ -504,15 +491,15 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
   default:
     rst = make_block_statement(block);
   }
-   
+
   ifdebug(8) {
     debug(8, "CodeGenerate", "Result:\n") ;
-	
-    if (rst==statement_undefined) 
+
+    if (rst==statement_undefined)
       debug(8, "CodeGenerate", "No code to generate\n") ;
     else
       print_parallel_statement(rst);
-	
+
   }
   debug_off();
   return(rst);
@@ -520,16 +507,15 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
 
 
 
-/* this function creates a new loop whose characteristics (index,
+/* This function creates a new loop whose characteristics (index,
  * bounds, ...) are similar to those of old_loop. The body and the
  * execution type are different between the old and the new loop.
+ *
  * fixed bug about private variable without effects, FC 22/09/93
  */
-
-statement MakeLoopAs(old_loop_statement, seq_or_par, body)
-statement old_loop_statement;
-tag seq_or_par;
-statement body;
+statement MakeLoopAs(statement old_loop_statement,
+		     tag seq_or_par,
+		     statement body)
 {
   loop old_loop = statement_loop(old_loop_statement);
   loop new_loop;
@@ -541,10 +527,10 @@ statement body;
   if (instruction_loop_p(ibody))
     body = make_block_statement(CONS(STATEMENT,body,NIL));
   ibody = statement_instruction(body);
- 
+
   if (rice_distribute_only)
     seq_or_par = is_execution_sequential;
- 
+
   // copy declaration from old body to new body
   if ((statement_decls_text (old_body) != string_undefined) &&
       (statement_decls_text (old_body) != NULL))
@@ -572,8 +558,8 @@ statement body;
   ifdebug(8) {
     pips_assert("Execution is either parallel or sequential",
 		seq_or_par==is_execution_sequential || seq_or_par==is_execution_parallel);
-    debug(8, "MakeLoopAs", "New %s loop\n",
-	  seq_or_par==is_execution_sequential? "sequential" : "parallel");
+    pips_debug(8, "New %s loop\n",
+	       seq_or_par==is_execution_sequential? "sequential" : "parallel");
     print_parallel_statement(new_loop_s);
   }
 
@@ -589,40 +575,32 @@ statement body;
  *
  * FC 22/09/93
  */
-list NewLoopLocals(body, locals)
-statement body;
-list locals;
+list NewLoopLocals(statement body, list locals)
 {
-    list
-	body_effects = statement_to_effects(body),
-	result = NIL;
+  list body_effects = statement_to_effects(body);
+  list result = NIL;
 
     ifdebug(8) {
-      debug(8, "NewLoopLocals", "body is:\n");
+      pips_debug(8, "body is:\n");
       print_statement(body);
-      debug(8, "NewLoopLocals", "effects considered are:\n");
+      pips_debug(8, "effects considered are:\n");
       print_effects(body_effects);
     }
 
-    MAPL(ce,
-     {  entity
-	     private_variable = ENTITY(CAR(ce));
+    FOREACH(ENTITY, private_variable, locals) {
+      pips_debug(8, "considering entity %s with given effects\n",
+		 entity_local_name(private_variable));
 
-	 debug(8, "NewLoopLocals",
-	       "considering entity %s with given effects\n",
-	       entity_local_name(private_variable));
-
-	 if (effects_read_or_write_entity_p(body_effects, private_variable))
-	     result = CONS(ENTITY, private_variable, result);
-     },
-	 locals);
+      if (effects_read_or_write_entity_p(body_effects, private_variable))
+	result = CONS(ENTITY, private_variable, result);
+     }
 
     gen_free_list(body_effects);
 
-    debug(8, "NewLoopLocals",
-	  "%d private variables kept out of %d\n",
-	  gen_length(result),
-	  gen_length(locals));
+    pips_debug(8,
+	       "%td private variables kept out of %td\n",
+	       gen_length(result),
+	       gen_length(locals));
 
     return(result);
 }
@@ -651,45 +629,43 @@ statement IsolatedStatement(scc s,
 
 
 
-/* bb: ConnectedStatements() is called when s contains more than one
+/* BB: ConnectedStatements() is called when s contains more than one
 vertex or one vertex dependent upon itself. Thus, vectorization can't
-occur */
-statement ConnectedStatements(g, s, l, task_parallelize_p)
-graph g;
-scc s;
-int l;
-bool task_parallelize_p;
+occur.
+ */
+statement ConnectedStatements(graph g, scc s, int l, bool task_parallelize_p)
 {
-    extern int enclosing ;
-    statement slo = find_level_l_loop_statement(s, l-enclosing);
-    loop lo = statement_loop(slo);
-    statement inner_stat;
-    set inner_region;
-    tag seq_or_par;
-    bool task_parallelize_inner;
+  extern int enclosing ;
+  statement slo = find_level_l_loop_statement(s, l-enclosing);
+  loop lo = statement_loop(slo);
+  statement inner_stat;
+  set inner_region;
+  tag seq_or_par;
+  bool task_parallelize_inner;
 
-    debug(8, "ConnectedStatements", "at level %d:",l);
-    ifdebug(8)	PrintScc(s);
-	
-    inner_region = scc_region(s);
-    seq_or_par = (!task_parallelize_p
-		  || contains_level_l_dependence(s, inner_region, l)
-		  || ! index_private_p(lo)) ?
-		      is_execution_sequential : is_execution_parallel;
+  pips_debug(8, "at level %d:",l);
+  ifdebug(8) PrintScc(s);
 
-    /* At most one outer loop parallel */
-    task_parallelize_inner =
-	(seq_or_par == is_execution_parallel
-	 && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
-	FALSE : task_parallelize_p;
+  inner_region = scc_region(s);
+  seq_or_par = (!task_parallelize_p
+		|| contains_level_l_dependence(s, inner_region, l)
+		|| ! index_private_p(lo)) ?
+    is_execution_sequential : is_execution_parallel;
 
-    /* CodeGenerate don't use the first parameter... */
-    inner_stat = CodeGenerate(/* big hack */ statement_undefined, g, inner_region, l+1, task_parallelize_inner);
+  /* At most one outer loop parallel */
+  task_parallelize_inner =
+    (seq_or_par == is_execution_parallel
+     && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
+    FALSE : task_parallelize_p;
 
-    set_free(inner_region);
+  /* CodeGenerate don't use the first parameter... */
+  inner_stat = CodeGenerate(/* big hack */ statement_undefined,
+			    g, inner_region, l+1, task_parallelize_inner);
 
-    if (statement_undefined_p(inner_stat))
-	return inner_stat;
-    else
-	return MakeLoopAs(slo, seq_or_par, inner_stat);
+  set_free(inner_region);
+
+  if (statement_undefined_p(inner_stat))
+    return inner_stat;
+  else
+    return MakeLoopAs(slo, seq_or_par, inner_stat);
 }
