@@ -37,14 +37,14 @@ int main()
    int j;
    j = 2;
    m = (my_str *) malloc(sizeof(my_str));
-//  points to = {(m,*ANYWHERE*:*HEAP*,M)}
+//  points to = {(m,*ANYWHERE*,-MAY-)}
    m->i = 1;
-//  points to = {(m,*ANYWHERE*:*HEAP*,M)}
+//  points to = {(m,*ANYWHERE*,-MAY-)}
    m->p = &j;
-//  points to = {(m,*ANYWHERE*:*HEAP*,M)(m[0][2],j,E)}
+//  points to = {(m[0][2],j,-Exact-);(m,*ANYWHERE*,-MAY-)}
    n = m;
-//  points to = {(n,*ANYWHERE*:*HEAP*,M)(m,*ANYWHERE*:*HEAP*,
-//   M)(m[0][2],j,E)}
+//  points to = {(m[0][2],j,-Exact-);(n,*ANYWHERE*,-MAY-);(m,
+//   *ANYWHERE*,-MAY-)}
 
    return 0;
    // END BLOCK
