@@ -1,5 +1,5 @@
 TARGET	= hwac
-nodist_include_HEADERS=$(TARGET).h
+include_HEADERS=$(TARGET).h
 dist_noinst_HEADERS=freia_spoc.h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk

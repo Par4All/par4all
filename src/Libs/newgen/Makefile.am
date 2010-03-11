@@ -1,7 +1,7 @@
 
 TARGET	= newgen
 BUILT_SOURCES=$(TARGET).h
-nodist_include_HEADERS=$(TARGET).h
+include_HEADERS=$(TARGET).h
 noinst_LTLIBRARIES=libnewgen.la
 libnewgen_la_SOURCES=\
 		newgen.c \

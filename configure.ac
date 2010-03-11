@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([pips],[0.1], [pipsdev@cri.ensmp.fr])
+AC_INIT([pips],[0.1],[pipsdev@cri.ensmp.fr])
 AC_CONFIG_SRCDIR([src/Passes/pips/pips.c])
 AC_CONFIG_HEADER([pips_config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
@@ -218,9 +218,7 @@ AC_CONFIG_FILES([Makefile
                  #src/Documentation/manl/Makefile
                  #src/Documentation/tpips-user-manual/Makefile
                  #src/Documentation/web/Makefile
-AC_OUTPUT
-
 
 AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
-AX_EXIT([minimum],[tpips pyps gpips hpfc])
+AX_OUTPUT([minimum],[tpips pyps gpips hpfc])

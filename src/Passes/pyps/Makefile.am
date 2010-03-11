@@ -1,11 +1,11 @@
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
 dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.pl
 
-nodist_pkgpython_PYTHON = pyps.py pypips.py 
-dist_pkgpython_PYTHON= pipscc.py pii.py
+dist_pkgpython_PYTHON = pyps.py pypips.py pipscc.py pii.py
 pkgpyexec_LTLIBRARIES = _pypips.la
 _pypips_la_SOURCES = pypips_aux.c 
-nodist__pypips_la_SOURCES =pypips_wrap.c
+dist__pypips_la_SOURCES =pypips_wrap.c
+
 _pypips_la_LDFLAGS = -module $(PYTHON_LDFLAGS)
 _pypips_la_LIBADD = ../../Libs/libpipslibs.la $(PYTHON_EXTRALIBS) $(LINEARLIBS_LIBS) $(NEWGENLIBS_LIBS)
 _pypips_la_CPPFLAGS = \
@@ -50,4 +50,4 @@ pyps.py:$(p2p_cmd) _pyps.py
 	$(PERL) $(p2p_cmd) -modules >> $@
 	sed -n -e '/### modules_methods/,$$ p' $(srcdir)/_pyps.py >> $@
 
-CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h
+MAINTAINERCLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h

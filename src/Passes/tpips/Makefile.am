@@ -3,8 +3,9 @@ bin_PROGRAMS=tpips
 tpips_SOURCES=tp_yacc.y tp_lex.l tpips.c wrapper.c revisions.c main_tpips.c
 tpips_LDADD=../../Libs/libpipslibs.la
 tpips_LDFLAGS=$(READLINE_LIBS) $(TERMCAP_LIBS)
-nodist_noinst_HEADERS=completion_list.h $(TARGET).h
+include_HEADERS=completion_list.h $(TARGET).h
 dist_noinst_SCRIPTS=make_completion_lists.sh
+
 
 AM_YFLAGS=-d -p tp_
 AM_LFLAGS=-p tp_
@@ -50,4 +51,4 @@ AM_CPPFLAGS=\
 	-DCC_VERSION='"unknown"'
 	
 include $(top_srcdir)/makes/cproto.mk
-CLEANFILES=completion_list.h revisions.h $(TARGET).h
+DISTCLEANFILES=completion_list.h revisions.h

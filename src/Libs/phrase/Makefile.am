@@ -1,5 +1,5 @@
 TARGET = phrase
-nodist_include_HEADERS=$(TARGET).h
+include_HEADERS=$(TARGET).h
 dist_noinst_HEADERS=smalltalk-defs.h fsm_generation.h phrase_tools.h spaghettify.h phrase_distribution.h comEngine.h comEngine_generate_code.h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk

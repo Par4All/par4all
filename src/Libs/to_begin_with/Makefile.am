@@ -1,5 +1,5 @@
 TARGET	= to_begin_with
-nodist_include_HEADERS=$(TARGET).h
+include_HEADERS=$(TARGET).h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libto_begin_with.la

@@ -1,5 +1,5 @@
 TARGET	= comp_sections
-nodist_include_HEADERS=$(TARGET).h
+include_HEADERS=$(TARGET).h
 dist_noinst_HEADERS=all.h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk

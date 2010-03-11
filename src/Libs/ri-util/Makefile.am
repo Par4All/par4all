@@ -1,5 +1,5 @@
 TARGET	= ri-util
-nodist_include_HEADERS=$(TARGET).h operator.h
+include_HEADERS=$(TARGET).h
 dist_noinst_HEADERS=operator.h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk

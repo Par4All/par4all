@@ -1,9 +1,10 @@
 dist_noinst_SCRIPTS=make-pips-menu make-builder-map generate_all_menu_documentation pipspassdep.pl
+
 sysconf_DATA=pipsmake.rc properties.rc pipsdep.rc wpips.rc properties-2009-10-31.rc 
 dist_noinst_DATA=pipsmake.sed pipsmake-rc.tex properties-2009-10-31.rc.model resources.sed
-BUILT_SOURCES=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
 
-nodist_include_HEADERS=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
+BUILT_SOURCES=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
+include_HEADERS=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
 
 pipsmake_flt	= $(SED) -f $(srcdir)/pipsmake.sed
 pipsprop_flt	= $(SED) -f pipsprop.sed

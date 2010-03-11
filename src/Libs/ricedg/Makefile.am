@@ -1,5 +1,5 @@
 TARGET	= ricedg
-nodist_include_HEADERS=$(TARGET).h
+include_HEADERS=$(TARGET).h
 dist_noinst_HEADERS=local.h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk

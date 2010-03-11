@@ -1,6 +1,6 @@
 TARGET	= syntax
-nodist_include_HEADERS=$(TARGET).h
-dist_noinst_HEADERS=warning.h
+include_HEADERS=$(TARGET).h
+dist_noinst_HEADERS=warning.h keywtbl.h tokyacc.h
 dist_sysconf_DATA=f77keywords f77symboles
 dist_noinst_DATA=gram.y
 
@@ -43,5 +43,7 @@ tokyacc.h: warning.h f77keywords f77symboles Makefile
 		cat $(srcdir)/warning.h ; \
 		sed 's,\([^A-Z]*\)\(.*\),%token \1 TK_\2,' $(srcdir)/f77keywords $(srcdir)/f77symboles ;\
 	} > $@
+
 include $(srcdir)/../pipslibs_includes.mk
-CLEANFILES=keywtbl.h syn_yacc.h syn_yacc.c tokyacc.h syn_yacc.y
+EXTRA_DIST+=syn_yacc.y
+MAINTAINERCLEANFILES=keywtbl.h syn_yacc.h syn_yacc.c tokyacc.h syn_yacc.y

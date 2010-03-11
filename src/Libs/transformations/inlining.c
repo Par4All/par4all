@@ -229,7 +229,7 @@ void statement_with_static_declarations_p(statement s,inlining_parameters p )
 /* create a scalar similar to `efrom' initialized with expression `from'
  */
 static
-entity make_temporary_scalar_entity(expression from)
+entity make_temporary_scalar_entity(expression from,statement * assign)
 {
     pips_assert("expression is valid",expression_consistent_p(from)&&!expression_undefined_p(from));
     /* create the scalar */
@@ -240,8 +240,7 @@ entity make_temporary_scalar_entity(expression from)
     /* set intial */
     if(!expression_undefined_p(from))
     {
-        free_value(entity_initial(new));
-        entity_initial(new) = make_value_expression(copy_expression(from));
+        *assign=make_assign_statement(entity_to_expression(new),copy_expression(from));
     }
 	return new;
 }
@@ -325,7 +324,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     {
         string cu_name = compilation_unit_of_module(get_current_module_name());
         //string mln = module_local_name(inlined_module(p));
-        set inlined_referenced_entities = get_referenced_entities(inlined_module_statement(p));
+        set inlined_referenced_entities = get_referenced_entities(expanded);
         list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
         set_free(inlined_referenced_entities);
         //list new_externs = NIL;
@@ -408,7 +407,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                             copy_basic(variable_basic(type_variable(treturn)))
                             );
                     /* make_new_scalar_variable does not ensure the entity is not defined in enclosing statement, we check this */
-                    FOREACH(ENTITY,ent,statement_declarations(inlined_module_statement(p)))
+                    FOREACH(ENTITY,ent,statement_declarations(expanded))
                     {
                         if(same_string_p(entity_user_name(ent),entity_user_name(returned_entity(p))))
                         {
@@ -494,6 +493,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
                 AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
                 replace_entity(expanded,e,new);
+                pips_debug(2,"replace %s by %s",entity_user_name(e),entity_user_name(new));
             }
             /* substitute variables */
             else
@@ -516,7 +516,10 @@ reget:
                             {
                                 if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
                                 {
-                                    new = make_temporary_scalar_entity(from);
+                                    statement st=statement_undefined;
+                                    new = make_temporary_scalar_entity(from,&st);
+                                    if(!statement_undefined_p(st))
+                                        insert_statement(declaration_holder,st,false);
                                 }
                                 else
                                 {
@@ -538,11 +541,17 @@ reget:
                         {
                                 if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
                                 {
-                                    new = make_temporary_scalar_entity(from);
+                                    statement st=statement_undefined;
+                                    new = make_temporary_scalar_entity(from,&st);
+                                    if(!statement_undefined_p(st))
+                                        insert_statement(declaration_holder,st,false);
                                 }
                                 else
                                 {
-                                  new = make_temporary_scalar_entity(from);
+                                    statement st=statement_undefined;
+                                    new = make_temporary_scalar_entity(from,&st);
+                                    if(!statement_undefined_p(st))
+                                        insert_statement(declaration_holder,st,false);
                                 }
                                 AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
                         } break;
@@ -550,7 +559,12 @@ reget:
                         /* need a temporary variable */
                         {
                             if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
-                                new = make_temporary_scalar_entity(from);
+                            {
+                                    statement st=statement_undefined;
+                                    new = make_temporary_scalar_entity(from,&st);
+                                    if(!statement_undefined_p(st))
+                                        insert_statement(declaration_holder,st,false);
+                            }
                             else
                             {
                                 new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
@@ -574,6 +588,7 @@ reget:
                     gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
                     if(add_dereferencment) replace_entity_by_expression(expanded ,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
                     else replace_entity(expanded ,e,new);
+                    pips_debug(3,"replace %s by %s\n",entity_user_name(e),entity_user_name(new));
 
             }
 
@@ -589,6 +604,10 @@ reget:
     gen_recurse(expanded,statement_domain,gen_true,fix_statement_attributes_if_sequence);
     unnormalize_expression(expanded);
     ifdebug(1) statement_consistent_p(declaration_holder);
+    ifdebug(2) {
+        pips_debug(2,"inlined statement after substitution\n");
+        print_statement(declaration_holder);
+    }
     return declaration_holder;
 }
 
@@ -609,6 +628,10 @@ void inline_expression(expression expr, inlining_parameters  p)
                     insert_statement(new_statements(p),s,true);
                 }
                 ifdebug(1) statement_consistent_p(s);
+                ifdebug(2) {
+                    pips_debug(2,"inserted inline statement\n");
+                    print_statement(new_statements(p));
+                }
         }
     }
 }
@@ -661,6 +684,10 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
                 stmt=STATEMENT(CAR(iter));
         }
         update_statement_instruction(stmt,statement_instruction(new_statements(p)));
+        ifdebug(2) {
+            pips_debug(2,"updated statement instruction\n");
+            print_statement(stmt);
+        }
         //pips_assert("inlining statement generation is ok",statement_consistent_p(stmt));
     }
     ifdebug(1) statement_consistent_p(stmt);
@@ -715,6 +742,7 @@ inline_calls(inlining_parameters p ,char * module)
     statement modified_module_statement =
         (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
     pips_assert("statements found", !statement_undefined_p(modified_module_statement) );
+    pips_debug(2,"inlining %s in %s\n",entity_user_name(inlined_module(p)),module);
 
     set_current_module_entity( modified_module );
     set_current_module_statement( modified_module_statement );
@@ -724,6 +752,10 @@ inline_calls(inlining_parameters p ,char * module)
     /* inline all calls to inlined_module */
     gen_context_recurse(modified_module_statement, p, statement_domain, gen_true, inline_statement_crawler);
     ifdebug(1) statement_consistent_p(modified_module_statement);
+    ifdebug(2) {
+        pips_debug(2,"in inline_calls for %s\n",module);
+        print_statement(modified_module_statement);
+    }
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, modified_module_statement);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module, compute_callees(modified_module_statement));

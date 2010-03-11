@@ -4,7 +4,7 @@ pips_LDADD=../../Libs/libpipslibs.la
 
 TARGET	= pips
 BUILT_SOURCES=$(TARGET).h revisions.h
-nodist_noinst_HEADERS=$(TARGET).h revisions.h
+include_HEADERS=$(TARGET).h revisions.h
 include $(top_srcdir)/makes/cproto.mk
 revisions.h:
 	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
@@ -28,7 +28,7 @@ AM_CPPFLAGS=\
 	-DNLPMAKE_REV='"unknown"' \
 	-DCC_VERSION='"unknown"'
 
-CLEANFILES=revisions.h $(TARGET).h
+MAINTAINERCLEANFILES=revisions.h
 
 
 

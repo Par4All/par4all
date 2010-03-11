@@ -1,6 +1,6 @@
 TARGET=alias-classes
 BUILT_SOURCES=$(TARGET).h
-nodist_include_HEADERS=$(TARGET).h
+include_HEADERS=$(TARGET).h
 
 noinst_LTLIBRARIES=libalias-classes.la
 libalias_classes_la_SOURCES=alias_pairs.c \
