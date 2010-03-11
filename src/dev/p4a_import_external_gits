@@ -1,29 +1,52 @@
-#! /bin/bash -vx
+#! /bin/bash
 
 # Add remotes for git instances:
 # - the SVN PIPS-related repositories from Mines ParisTech/CRI
 # - the PolyLib library from Strasbourg University/ICPS
 
-# Where to get the git-svn instances from:
-GIT_SVN_PIPS_DIR=/home/keryell/projets/Wild_Systems/Par4All/CRI-git-svn
+function enforce_P4A_TOP() {
+    if [[ -z "$P4A_TOP" ]] ; then
+	cat <<EOF
+P4A_TOP variable is not set.
+It should contain the directory name with the Par4All git repository
+working copies in it:
+- par4all at least
+and according to what you want to do, also:
+- par4all-priv
+- CRI-git-svn/linear
+- CRI-git-svn/newgen
+- CRI-git-svn/nlpmake
+- CRI-git-svn/pips
+- CRI-git-svn/validation
+EOF
+	exit 1
+    fi
+    # Set variables pointing to various Par4All parts:
+    # Where to get the git-svn instances from:
+    P4A_CRI_GIT_SVN=$P4A_TOP/CRI-git-svn
+    P4A_ROOT=$P4A_TOP/par4all
+    P4A_PRIV_ROOT=$P4A_TOP/par4all-priv
 
-# List of PIPS repositories, sorted in appearance of commit order into the
-# target git, so put the most important at end (well very subjective :-)
-# ):
-PIPS_SVN_REPOSITORIES="validation linear newgen nlpmake pips"
+    # To be change when the global installation infrastructure is more stable:
+    source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
+}
 
-if [[ -z $P4A_ROOT ]]; then
-    echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory"
-    exit
+enforce_P4A_TOP
+
+# Since everything is touchy, stop if anything fails:
+stop_on_error
+
+if (( $verb >= 2 )) ; then
+    # Put shell tracing on:
+    set -vx
 fi
 
 cd $P4A_ROOT
 
 COMMIT_MESSAGE_FILE=`mktemp`
-#echo $COMMIT_MESSAGE_FILE
 
 # Create the remote/CRI/<repository>
-import_git() {
+function import_git() {
     # Get the function parameters:
     REMOTE_NAME=$1
     REMOTE_GIT_URL=$2
@@ -60,15 +83,25 @@ import_git() {
 
 
 # Create the remote/CRI/<repository> from <repository> given as parameter:
-import_PIPS_git_svn() {
-    # Import from $GIT_SVN_PIPS_DIR/<repository> URL as remote name
+function import_PIPS_git_svn() {
+    # Import from $P4A_CRI_GIT_SVN/<repository> URL as remote name
     # CRI/<repository> into packages/PIPS/<repository> local directory
-	# Put the import and merge in a specific branch
-	git checkout master
-	git checkout -b $1
-    import_git CRI/$1 $GIT_SVN_PIPS_DIR/$1 packages/PIPS/$1
-	# Revert to main branch
-	git checkout master
+
+    # Save the branch we are into:
+    get_current_git_branch
+    # Create a branch with a reflog representing the remote component by
+    # its own directly into the "initial" branch that should point to the
+    # first commit of the Par4All git repository:
+    git branch -l $1 initial
+
+    # Jump into the reserved branch to this module:
+    git checkout $1
+
+    # Put the import and merge in a specific branch
+    import_git CRI/$1 $P4A_CRI_GIT_SVN/$1 packages/PIPS/$1
+
+    # Revert to previous branch
+    revert_current_git_branch
 }
 
 ### To import a branch from PIPS :
@@ -76,19 +109,24 @@ import_PIPS_git_svn() {
 # exit
 
 # Add the PIPS git svn repositories to Par4All:
-for i in $PIPS_SVN_REPOSITORIES; do
+for i in $PIPS_MODULES; do
     import_PIPS_git_svn $i
 done
 
+# Save the branch we are into:
+get_current_git_branch
+
 # http://icps.u-strasbg.fr/polylib
 # Create a branch pointing to the polylib import:
-git checkout master
-git checkout -b polylib
+git branch -l polylib initial
+
+git checkout polylib
 # Add the PolyLib git repository to Par4All in the packages/polylib
 # directory as the polylib remote:
 import_git polylib git://repo.or.cz/polylib.git packages/polylib
-# Revert to main branch
-git checkout master
+
+# Revert to previous branch
+revert_current_git_branch
 
 
 # There was a SVN reorganization of the CRI nlpmake repository to
@@ -114,7 +152,9 @@ echo "    git fetch polylib"
 echo "    git merge -s subtree polylib/master"
 
 
-#%%% Local Variables:
-#%%% mode: text
-#%%% ispell-local-dictionary: "american"
-#%%% End:
+# Some Emacs stuff:
+### Local Variables:
+### mode: sh
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:
