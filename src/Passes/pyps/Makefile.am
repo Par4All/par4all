@@ -50,4 +50,4 @@ pyps.py:$(p2p_cmd) _pyps.py
 	$(PERL) $(p2p_cmd) -modules >> $@
 	sed -n -e '/### modules_methods/,$$ p' $(srcdir)/_pyps.py >> $@
 
-MAINTAINERCLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h
+CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h

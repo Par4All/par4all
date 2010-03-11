@@ -27,6 +27,8 @@ AM_CPPFLAGS=\
 	-I../Passes/wpips -I$(srcdir)/../wpips\
 	-I../../Documentation/pipsmake\
 	-I../../Documentation/newgen\
+	-I$(srcdir)/../../Documentation/pipsmake\
+	-I$(srcdir)/../../Documentation/newgen\
 	-I../../Libs/newgen\
 	-I../../Libs/misc\
 	-I../../Libs/ri-util\
