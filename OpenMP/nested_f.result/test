@@ -1,3 +1,24 @@
+
+Parallelized code
+
+      PROGRAM NESTED
+
+      INTEGER K,I,SIZE
+      PARAMETER (SIZE=100)
+      REAL ARRAY(SIZE,SIZE)
+
+      DOALL I = 1, SIZE                                                 0007
+         PRIVATE K
+         DOALL K = 1, SIZE                                              0008
+            ARRAY(K,I) = I+K                                            0009
+         ENDDO
+      ENDDO
+
+      PRINT *, ARRAY                                                    0013
+      END
+
+Open MP version
+
       PROGRAM NESTED
 
       INTEGER K,I,SIZE

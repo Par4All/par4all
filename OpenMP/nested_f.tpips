@@ -9,8 +9,20 @@ create nested_f nested_f.f
 setproperty PRAGMA_TYPE "expr"
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply PRIVATIZE_MODULE(NESTED)
+
+echo
+echo Parallelized code
+echo
+
+display PARALLELPRINTED_FILE
+
 apply INTERNALIZE_PARALLEL_CODE(NESTED)
 apply OMPIFY_CODE(NESTED)
+
+echo
+echo Open MP version
+echo
+
 display PRINTED_FILE(NESTED)
 
 close
