@@ -2,17 +2,6 @@
 
 # Script to deal with Par4All repositories
 
-PIPS_MODULES="linear newgen nlpmake pips validation"
-
-script=${0/*\//}
-
-function stop_on_error() {
-    # Stop on error, since going on after errors may lead to havoc for
-    # example by working on some incorrect branch and so on
-    set -o errexit
-}
-
-
 # Display help
 function usage()
 {
@@ -43,16 +32,6 @@ function usage()
   exit ${status:-1}
 }
 
-# verb level 'message to be shown...'
-verb=0
-function verb() {
-  local level=$1 msg=$2
-  (( $verb >= $level )) && {
-      while (( level-- )) ; do echo -n '#' ; done
-      echo " $msg"
-  } >&2
-}
-
 
 function enforce_P4A_TOP() {
     if [[ -z "$P4A_TOP" ]] ; then
@@ -60,7 +39,8 @@ function enforce_P4A_TOP() {
 P4A_TOP variable is not set.
 It should contain the directory name with the Par4All git repository
 working copies in it:
-- par4all
+- par4all at least
+and according to what you want to do, also:
 - par4all-priv
 - CRI-git-svn/linear
 - CRI-git-svn/newgen
@@ -71,120 +51,16 @@ EOF
 	exit 1
     fi
     # Set variables pointing to various Par4All parts:
+    # Where to get the git-svn instances from:
     P4A_CRI_GIT_SVN=$P4A_TOP/CRI-git-svn
     P4A_ROOT=$P4A_TOP/par4all
     P4A_PRIV_ROOT=$P4A_TOP/par4all-priv
+
+    # To be change when the global installation infrastructure is more stable:
+    source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
 }
 
-
-# Get into $current_branch the current git branch we are in:
-function get_current_git_branch() {
-    verb 1 "Entering get_current_git_branch"
-    branch=`git branch | grep '^*' | sed 's/* //'`
-    if [[ "$branch" == "(no branch)" ]] ; then
-	echo "We are not in a branch, exiting..."
-	exit
-    fi
-    current_branch=$branch
-}
-
-
-function do_update_CRI_git_svn() {
-    verb 1 "Entering do_update_CRI_git_svn"
-  enforce_P4A_TOP
-  cd $P4A_CRI_GIT_SVN
-  # Execute again this script to do a recursive git svn rebase:
-  $0 --recursive-git-svn
-}
-
-
-# Apply a git action on all the git copy found inside the current directory:
-function do_recursive_git() {
-    verb 1 "Entering do_recursive_git"
-    # If no argument is given, act as git svn rebase
-    if [[ ! $@ ]] ; then
-	actions="svn rebase"
-    else
-	actions=$@
-    fi
-
-    # Use -prune since for each .git encountered it is useless to dig into:
-    git_dirs=`find . -name .git -prune`
-
-    for g in $git_dirs; do
-	d=`dirname $g`
-	(
-	    echo Entering directory $d:
-	    cd $d
-	    echo "    Action: git $actions"
-	    git $actions
-	)
-	echo
-    done
-}
-
-
-# Fetch into the par4all git all the parts from the remote git associated:
-do_fetch_remote_git() {
-    verb 1 "Entering do_fetch_remote_git"
-    enforce_P4A_TOP
-    stop_on_error
-    cd $P4A_ROOT
-    echo Assume the correct remotes are set in this par4all git copy:
-    for i in $PIPS_MODULES; do
-	echo Fetching CRI/$i...
-	git fetch CRI/$i
-    done
-    echo Fetching polylib...
-    git fetch polylib
-}
-
-
-# Pull into the par4all git all the parts from the remote git associated:
-do_pull_remote_git() {
-    verb 1 "Entering do_pull_remote_git"
-    enforce_P4A_TOP
-    stop_on_error
-    cd $P4A_ROOT
-    # Get the current branch to come back into later:
-    get_current_git_branch
-    echo Assuming the correct remotes are set in this par4all git copy...
-    for i in $PIPS_MODULES; do
-	# First jump into the branch of this name that will receive the
-	# pull.  The idea is to have the possibility for a central place
-	# to be able to change things here against remote inputs.
-	git checkout $i
-	# Pull the master branch of the remote git. Use a subtree merge
-	# strategy since the root directory of the remote git is relocated
-	# in a subdirectory of the Par4All git:
-	git pull --strategy=subtree CRI/$i master
-    done
-    # Same for the polylib:
-    git checkout polylib
-    git pull --strategy=subtree polylib master
-
-    # Revert back into the branch we were at the beginning:
-    git checkout $current_branch
-}
-
-
-# Pull into the par4all git all the parts from the remote git associated:
-do_merge_remote_git() {
-    verb 1 "Entering do_merge_remote_git"
-    enforce_P4A_TOP
-    stop_on_error
-    cd $P4A_ROOT
-    for i in $PIPS_MODULES; do
-	# Merge into the current branch the branch that buffers the remote
-	# PIPS git svn gateway that should have been populated by a
-	# previous do_pull_remote_git:
-	git merge $i
-
-    done
-    # Same for the polylib:
-    git merge polylib
-}
-
+enforce_P4A_TOP
 
 # Get options:
 while [ "$1" ] ; do
@@ -218,7 +94,7 @@ if [[ $update_git_svn ]]; then
 fi
 
 if [[ $recursive_git_action ]]; then
-    recursive_git $@
+    do_recursive_git $@
 fi
 
 if [[ $fetch_remote_git ]]; then
