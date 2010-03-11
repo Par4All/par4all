@@ -1,12 +1,15 @@
 // OMP style
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0006*/
-   float sum = 0;                                                       /*0007*/
+   int k, i;                                                            /*0006*/
+   k = 0;
+   i = 0;
+   float sum;                                                           /*0007*/
+   sum = 0;
    float array[size][size];                                             /*0008*/
 
 
-#pragma omp parallel for private (i)
+#pragma omp parallel for private(i)
    for(k = 0; k <= size-1; k += 1)
 #pragma omp parallel for 
       for(i = 0; i <= size-1; i += 1)
@@ -21,12 +24,15 @@ int main(void)
 }
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0006*/
-   float sum = 0;                                                       /*0007*/
+   int k, i;                                                            /*0006*/
+   k = 0;
+   i = 0;
+   float sum;                                                           /*0007*/
+   sum = 0;
    float array[size][size];                                             /*0008*/
 
 
-#pragma omp parallel for private (i)
+#pragma omp parallel for private(i)
    for(k = 0; k <= size-1; k += 1)
 #pragma omp parallel for
       for(i = 0; i <= size-1; i += 1)

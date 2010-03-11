@@ -1,8 +1,11 @@
 // OMP style
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0004*/
-   int sum = 0;                                                         /*0005*/
+   int k, i;                                                            /*0004*/
+   k = 0;
+   i = 0;
+   int sum;                                                             /*0005*/
+   sum = 0;
 
 
    for(k = 0; k <= 99; k += 1)
@@ -15,11 +18,14 @@ int main(void)
 }
 int main(void)
 {
-   int k = 0, i = 0;                                                    /*0004*/
-   int sum = 0;                                                         /*0005*/
+   int k, i;                                                            /*0004*/
+   k = 0;
+   i = 0;
+   int sum;                                                             /*0005*/
+   sum = 0;
 
 
-#pragma omp parallel for reduction(+:sum) private (i)
+#pragma omp parallel for reduction(+:sum) private(i)
    for(k = 0; k <= 99; k += 1)
 #pragma omp parallel for reduction(+:sum)
       for(i = 0; i <= 99; i += 1)

@@ -30,6 +30,7 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty PRAGMA_TYPE "expr"
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 
+apply SPLIT_INITIALIZATIONS(main)
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
 activate PRINT_PARALLELIZEDOMP_CODE
