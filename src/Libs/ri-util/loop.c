@@ -332,12 +332,25 @@ list loop_private_variables_as_entites (loop obj, bool local, bool index) {
   // locals field of the loop.
   list result = gen_copy_seq (loop_locals(obj));
 
+  ifdebug(9) {
+    pips_debug (9, "private entites to the loop:\n");
+    print_entities (result);
+    fprintf (stderr, "\n");
+  }
+
   if (local == TRUE) {
     // List of localy declared entities that are stored in loop body
     list decl_var = statement_declarations (loop_body (obj));
+    ifdebug(9) {
+      pips_debug (9, "localy declaed entites:\n");
+      print_entities (decl_var);
+      fprintf (stderr, "\n");
+    }
     gen_list_and_not (&result, decl_var);
   }
+
   if (index == TRUE) {
+    pips_debug (9, "loop_indexl to remove : %s\n", entity_name (loop_index(obj)));
     gen_remove (&result, loop_index(obj));
   }
 
