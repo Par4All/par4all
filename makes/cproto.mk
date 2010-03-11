@@ -11,7 +11,7 @@
 
 CPROTO_STAMP_FILE=.cproto.stamp
 $(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES)
-	test -f $(TARGET).h || cp $(srcdir)/$(TARGET)-local.h $(TARGET).h
+	test -f $(TARGET).h || ( cp $(srcdir)/$(TARGET)-local.h $(TARGET).h && chmod u+w $(TARGET).h )
 	SOURCES=`for s in $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 	{ \
 		guard=`echo $(TARGET)_header_included | tr - _`;\

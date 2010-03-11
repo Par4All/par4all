@@ -188,9 +188,16 @@ AC_DEFUN([AX_DEPENDS],
 )
 
 dnl exit with relevant exit status and an extended configuration message
-dnl usage: AX_EXIT(required-dependency-var-name,optional-dependency-var-names)
-AC_DEFUN([AX_EXIT],[
-	# configure summary
+dnl usage: AX_OUTPUT(required-dependency-var-name,optional-dependency-var-names)
+AC_DEFUN([AX_OUTPUT],[
+# test if configure is a succes
+	pushdef([_TEST_],[AX_HAS($1)])
+	m4_foreach_w([_i_],[$2],[m4_append([_TEST_],&& AX_HAS_OR_DISABLED(_i_) )])
+
+# if it's a success, perform substitution
+	AS_IF(_TEST_,[AC_OUTPUT])
+
+# in both case print a summary
 	eval my_bindir="`eval echo $[]{bindir}`"
 	eval my_libdir="`eval echo $[]{libdir}`"
 	eval my_docdir="`eval echo $[]{docdir}`"
@@ -214,8 +221,7 @@ m4_foreach_w([_i_],[$2],[dnl
 ])
 EOF
 
-	pushdef([_TEST_],[AX_HAS($1)])
-	m4_foreach_w([_i_],[$2],[m4_append([_TEST_],&& AX_HAS_OR_DISABLED(_i_) )])
+# and a conclusion message
 	AS_IF(_TEST_,[AS_MESSAGE([Configure succeded])],[
 		AS_MESSAGE([Configure failed])
 		AS_EXIT([1])
