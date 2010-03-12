@@ -7,10 +7,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 create nested2_f nested2_f.f
 
 setproperty PRAGMA_TYPE "expr"
-setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply PRIVATIZE_MODULE(NESTED)
 activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE(NESTED)
 
 echo
 echo Parallelized code
@@ -25,6 +23,7 @@ echo
 echo Open MP version
 echo
 
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 display PRINTED_FILE(NESTED)
 
 apply UNSPLIT
