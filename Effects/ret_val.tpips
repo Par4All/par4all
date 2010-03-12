@@ -1,0 +1,13 @@
+delete ret_val
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ret_val ret_val.c
+
+setproperty PRAGMA_TYPE "expr"
+apply COARSE_GRAIN_PARALLELIZATION(%ALL)
+apply OMPIFY_CODE(%ALL)
+
+close
+delete ret_val
+quit
