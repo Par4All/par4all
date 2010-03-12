@@ -601,7 +601,12 @@ list NewLoopLocals(statement body, list locals)
 	       "%td private variables kept out of %td\n",
 	       gen_length(result),
 	       gen_length(locals));
-
+    ifdebug(9) {
+      pips_debug(9, "the kept varaibles are : \n");
+      FOREACH(ENTITY, private, result) {
+	pips_debug(9, "%s\n", entity_local_name(private));
+      }
+    }
     return(result);
 }
 
