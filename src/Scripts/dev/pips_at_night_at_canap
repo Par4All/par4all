@@ -33,7 +33,7 @@ email=pips-validation@cri.ensmp.fr
   email="$1"
   shift
 }
-target=/home/local/pips/PIPS
+target=/home/local/fabien/NIGHTY
 
 # set environment...
 test -f $target/pipsrc.sh && source $target/pipsrc.sh
