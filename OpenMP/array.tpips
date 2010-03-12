@@ -37,6 +37,10 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
+apply UNSPLIT
+shell gcc -fopenmp -c array.database/Src/array.c
+shell rm *.o
+
 close
 delete array
 quit

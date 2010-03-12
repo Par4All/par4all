@@ -11,6 +11,10 @@ apply INTERNALIZE_PARALLEL_CODE(NESTED_REDUCTION)
 apply OMPIFY_CODE(NESTED_REDUCTION)
 display PRINTED_FILE(NESTED_REDUCTION)
 
+apply UNSPLIT
+shell gfortran -fopenmp -c nested_reduction_f.database/Src/nested_reduction_f.f
+shell rm *.o
+
 close
 delete nested_reduction_f
 quit

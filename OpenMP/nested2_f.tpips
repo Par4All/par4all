@@ -27,6 +27,10 @@ echo
 
 display PRINTED_FILE(NESTED)
 
+apply UNSPLIT
+shell gfortran -fopenmp -c nested2_f.database/Src/nested2_f.f
+shell rm *.o
+
 close
 delete nested2_f
 quit

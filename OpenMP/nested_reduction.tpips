@@ -41,6 +41,10 @@ display PRINTED_FILE(main)
 #activate PRINT_CODE_CUMULATED_REDUCTIONS
 #display PRINTED_FILE(main)
 
+apply UNSPLIT
+shell gcc -fopenmp -c nested_reduction.database/Src/nested_reduction.c
+shell rm *.o
+
 close
 #delete nested_reduction
 quit

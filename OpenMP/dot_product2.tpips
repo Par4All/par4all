@@ -1,8 +1,8 @@
-delete dot_product
+delete dot_product2
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create dot_product dot_product.f
+create dot_product2 dot_product.f
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -29,7 +29,11 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 display PRINTED_FILE(DOT_PRODUCT)
 
+apply UNSPLIT
+shell gfortran -fopenmp -c dot_product2.database/Src/dot_product.f
+shell rm *.o
+
 close
-delete dot_product
+delete dot_product2
 quit
 # EOF
