@@ -221,7 +221,7 @@ The \verb|p4a_git| options come into short and long form:
 \item[\texttt{-g} or \texttt{--recursive-git-svn}] apply a \Agit command
   to all the git working copies inside the current directory. If no argument
   is given, a \texttt{git svn rebase} is done;
-\item\texttt{[-f} or \texttt{--fetch-remote-git}] fetch the objects from
+\item[\texttt{-f} or \texttt{--fetch-remote-git}] fetch the objects from
   the remote \Agit repositories (the \Apips \Agit-\Asvn gateways and the
   \Apolylib \Agit);
 \item[\texttt{-p} or \texttt{--pull-remote-git}] pull the objects from the
@@ -451,7 +451,7 @@ projects or if things go really wrong. There are located in
   case we loose them and want to recreate them with exactly with the same
   identifiers (that depends from the creation parameters);
 \item \verb/p4a_import_external_gits/ imports all the external \Agit
-  repositories into the \Apfa \Agit repository. It should be used only
+  repositories into the \Apfa{} \Agit repository. It should be used only
   once but are included as example for other projects or to help adding
   other repositories later;
 \item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
@@ -543,24 +543,51 @@ prefer to use \texttt{-} to add hierarchy.
 To ease the developments and the organization, there are some already
 defined branches:
 \begin{description}
+\item[\texttt{\emph{numerical}}] a branch corresponding to a given version
+  snapshot;
+\item[\texttt{\emph{numerical}-alpha}] a branch corresponding to an alpha
+  version of a given version snapshot;
+\item[\texttt{\emph{numerical}-beta}] a branch corresponding to an beta
+  version of a given version snapshot;
+\item[{full}] is the branch to get the full latest \Apfa version with all
+  the different packages here;
 \item[\texttt{gcc-4.4.1}] is the original \Agcc 4.4.1 core \& Fortran in
   \texttt{package/pips-gfc};
 \item[\texttt{gcc-4.4.2}] is the original \Agcc 4.4.2 core \& Fortran in
   \texttt{package/pips-gfc};
-\item[\texttt{linear}] points to the import of \Apips \texttt{linear} part;
+\item[\texttt{initial}] points to the initial commit of the \Apfa
+  repository. It is useful to add stuff directly add the root of the
+  repository to set the branch for the different packages. It should not
+  be useful for normal people;
+\item[\texttt{linear}] points to the import of \Apips \texttt{linear}
+  part. Thus this branch should contain only the files from
+  \texttt{package/PIPS/linear} and used to merge from when you want to use
+  the last version from \texttt{linear};
 \item[\texttt{master}] is the branch for the main latest developments in
-  \Apfa;
+  the \Apfa infrastructure;
 \item[\texttt{newgen}] points to the import of \Apips \texttt{newgen}
-  part;
-\item[\texttt{nlpmake}] points to the import of \Apips \texttt{nlpnake}
-  part;
-\item[\texttt{pips}] points to the import of \Apips \texttt{pips} part;
+  part. So this branch should contain only the files from
+  \texttt{package/PIPS/newgen};
+\item[\texttt{nlpmake}] points to the import of \Apips \texttt{nlpmake}
+  part. Thus this branch should contain only the files from
+  \texttt{package/PIPS/nlpmake};
+\item[\texttt{own}] points to the last development of the \Apfa own files,
+  without packages, etc;
+\item[\texttt{pips}] points to the import of \Apips \texttt{pips}
+  par. Thus this branch should contain only the files from
+  \texttt{package/PIPS/pips} and used to merge from when you want to use
+  the last version from \texttt{pips};
 \item[\texttt{pips-gfc+gcc}] points to a working \Apipsgfc implementation
   of the Fortran 95 extension for \Apips in \texttt{package/pips-gfc};
 \item[\texttt{pips-gfc-4.4.1}] points to the original developments of
   Raphaël in \Agcc in \texttt{package/pips-gfc};
+\item[\texttt{polylib}] points to the import of \Apips \texttt{polylib}
+  par. Thus this branch should contain only the files from
+  \texttt{package/polylib} and used to merge from when you want to use
+  the last version from \texttt{polylib};
 \item[\texttt{validation}] points to the import of \Apips
-  \texttt{validation} part.
+  \texttt{validation} part, with only files into
+  \texttt{package/PIPS/validation}.
 \end{description}
 
 
