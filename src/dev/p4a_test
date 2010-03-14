@@ -1,0 +1,37 @@
+# Test case of the script to build the infrastructure up:
+git init p3
+cd p3
+git remote add par4all ../par4all
+git pull par4all own
+git branch own
+git branch initial ecd50e4a9fa1e04a9f07d6f5f892b8f7ed4a21a9
+
+
+# Import
+git branch -l linear initial
+git checkout linear
+git remote add CRI/linear ../CRI-git-svn/linear
+git fetch CRI/linear
+git read-tree --prefix=packages/PIPS/linear -u 920bf79c5c2b723af34320cff6bee5954b76fdb8
+git commit -m "melange"
+git merge --strategy=ours 920bf79c5c2b723af34320cff6bee5954b76fdb8
+git checkout initial
+git checkout -b p4a
+git merge linear
+git merge own
+git checkout -b CRI-linear remotes/CRI/linear/master
+git checkout linear
+#git pull --log --strategy=subtree CRI/linear master
+git merge --log --strategy=subtree CRI-linear
+gitk&
+
+exit
+
+../par4all/src/dev/p4a_import_external_gits
+git checkout linear
+gitk&
+
+git checkout initial
+git checkout -b p4a
+git merge linear
+git merge own
