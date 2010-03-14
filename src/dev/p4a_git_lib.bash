@@ -5,6 +5,14 @@
 # Script to deal with Par4All repositories
 
 PIPS_MODULES="linear newgen nlpmake pips validation"
+#PIPS_MODULES=linear
+
+# Set variables pointing to various Par4All parts:
+# Where to get the git-svn instances from:
+P4A_CRI_GIT_SVN=$P4A_TOP/CRI-git-svn
+P4A_ROOT=$P4A_TOP/par4all
+P4A_ROOT=$P4A_TOP/p3
+P4A_PRIV_ROOT=$P4A_TOP/par4all-priv
 
 script=${0/*\//}
 
@@ -113,11 +121,11 @@ do_pull_remote_git() {
 	# Pull the master branch of the remote git. Use a subtree merge
 	# strategy since the root directory of the remote git is relocated
 	# in a subdirectory of the Par4All git:
-	git pull --strategy=subtree CRI/$i master
+	git pull --log --strategy=subtree CRI/$i master
     done
     # Same for the polylib:
     git checkout polylib
-    git pull --strategy=subtree polylib master
+    git pull --log --strategy=subtree polylib master
 
     # Revert back into the branch we were at the beginning:
     git checkout $current_branch
@@ -134,11 +142,11 @@ do_merge_remote_git() {
 	# Merge into the current branch the branch that buffers the remote
 	# PIPS git svn gateway that should have been populated by a
 	# previous do_pull_remote_git:
-	git merge $i
+	git merge --log $i
 
     done
     # Same for the polylib:
-    git merge polylib
+    git merge --log polylib
 }
 
 

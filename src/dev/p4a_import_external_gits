@@ -21,12 +21,6 @@ and according to what you want to do, also:
 EOF
 	exit 1
     fi
-    # Set variables pointing to various Par4All parts:
-    # Where to get the git-svn instances from:
-    P4A_CRI_GIT_SVN=$P4A_TOP/CRI-git-svn
-    P4A_ROOT=$P4A_TOP/par4all
-    P4A_PRIV_ROOT=$P4A_TOP/par4all-priv
-
     # To be change when the global installation infrastructure is more stable:
     source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
 }
@@ -51,6 +45,7 @@ function import_git() {
     REMOTE_NAME=$1
     REMOTE_GIT_URL=$2
     TARGET_LOCAL_DIR=$3
+    BRANCH_TO_IMPORT=init
 
     echo Add the git svn as remote git repository:
     git remote add $REMOTE_NAME $REMOTE_GIT_URL
@@ -61,22 +56,22 @@ function import_git() {
     echo Extract a copy of the files of the remote repository into the local
     echo repository at packages/PIPS, merge it and update the files in the work
     echo tree:
-    git read-tree --prefix=$TARGET_LOCAL_DIR -u $REMOTE_NAME/master
+    git read-tree --prefix=$TARGET_LOCAL_DIR -u $REMOTE_NAME/$BRANCH_TO_IMPORT
 
     # Build the merging message:
     echo "Merging from git-svn remotes/$REMOTE_NAME into $TARGET_LOCAL_DIR that is:" > $COMMIT_MESSAGE_FILE
 
     # Get the last commit message from the remote to branch from:
-    git log -n 1 remotes/$REMOTE_NAME/master >> $COMMIT_MESSAGE_FILE
+    git log -n 1 remotes/$REMOTE_NAME/$BRANCH_TO_IMPORT >> $COMMIT_MESSAGE_FILE
 
     # Commit with the built merging message:
     git commit --file=$COMMIT_MESSAGE_FILE
 
     echo Connect the SVN history to this one by fetching it and merging it with
-    echo "the our strategy (since what we want is what we've just built up above"
-    echo into packages/PIPS and not at the top level as each individual svn
+    echo "the 'ours' strategy (since what we want is what we've just built up above"
+    echo into packages/PIPS and not also at the top level as each individual svn
     echo "repository):"
-    git pull -s ours $REMOTE_NAME master
+    git pull --strategy=ours $REMOTE_NAME $BRANCH_TO_IMPORT
 
     rm $COMMIT_MESSAGE_FILE
 }
