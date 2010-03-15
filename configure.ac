@@ -72,9 +72,7 @@ AC_CONFIG_FILES([Makefile
                  src/sommet/Makefile
                  src/sparse_sc/Makefile
                  src/vecteur/Makefile])
-AC_OUTPUT
-
 
 AX_DEPENDS([minimum],[lex yacc polylib64 cproto std_headers alarm_gettimeofday_memset_mkdir_strchr_strdup])
-AX_EXIT([minimum])
+AX_OUTPUT([minimum])
 
