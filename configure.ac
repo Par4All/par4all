@@ -47,7 +47,5 @@ AC_CONFIG_FILES([Makefile
                  src/genC/genspec/Makefile
                  src/scripts/Makefile
                  ])
-AC_OUTPUT
-
 AX_DEPENDS([minimum],[lex yacc cproto std_headers strdup])
-AX_EXIT([minimum])
+AX_OUTPUT([minimum])
