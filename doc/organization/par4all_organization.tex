@@ -255,7 +255,7 @@ a remote in the \Apfa{} \Agit.
 So to import the latest \Apolylib development into the \Apfa{} \Agit for
 inspection, choice for inclusion, you fetch \Apolylib with:
 \begin{verbatim}
-git fetch polylib
+git fetch ICPS/polylib
 \end{verbatim}
 
 You can then merge the feature you want with
@@ -543,14 +543,6 @@ prefer to use \texttt{-} to add hierarchy.
 To ease the developments and the organization, there are some already
 defined branches:
 \begin{description}
-\item[\texttt{\emph{numerical}}] a branch corresponding to a given version
-  snapshot;
-\item[\texttt{\emph{numerical}-alpha}] a branch corresponding to an alpha
-  version of a given version snapshot;
-\item[\texttt{\emph{numerical}-beta}] a branch corresponding to an beta
-  version of a given version snapshot;
-\item[{full}] is the branch to get the full latest \Apfa version with all
-  the different packages here;
 \item[\texttt{gcc-4.4.1}] is the original \Agcc 4.4.1 core \& Fortran in
   \texttt{package/pips-gfc};
 \item[\texttt{gcc-4.4.2}] is the original \Agcc 4.4.2 core \& Fortran in
@@ -559,35 +551,41 @@ defined branches:
   repository. It is useful to add stuff directly add the root of the
   repository to set the branch for the different packages. It should not
   be useful for normal people;
-\item[\texttt{linear}] points to the import of \Apips \texttt{linear}
+\item[\texttt{p4a-\emph{numerical}}] a branch corresponding to a given version
+  snapshot;
+\item[\texttt{p4a-\emph{numerical}-alpha}] a branch corresponding to an alpha
+  version of a given version snapshot;
+\item[\texttt{p4a-\emph{numerical}-beta}] a branch corresponding to an beta
+  version of a given version snapshot;
+\item[{p4a}] is the branch to get the full latest \Apfa version with all
+  the different packages here;
+\item[\texttt{p4a-linear}] points to the import of \Apips \texttt{linear}
   part. Thus this branch should contain only the files from
   \texttt{package/PIPS/linear} and used to merge from when you want to use
   the last version from \texttt{linear};
-\item[\texttt{master}] is the branch for the main latest developments in
-  the \Apfa infrastructure;
-\item[\texttt{newgen}] points to the import of \Apips \texttt{newgen}
+\item[\texttt{p4a-newgen}] points to the import of \Apips \texttt{newgen}
   part. So this branch should contain only the files from
   \texttt{package/PIPS/newgen};
-\item[\texttt{nlpmake}] points to the import of \Apips \texttt{nlpmake}
+\item[\texttt{p4a-nlpmake}] points to the import of \Apips \texttt{nlpmake}
   part. Thus this branch should contain only the files from
   \texttt{package/PIPS/nlpmake};
-\item[\texttt{own}] points to the last development of the \Apfa own files,
+\item[\texttt{p4a-own}] points to the last development of the \Apfa own files,
   without packages, etc;
-\item[\texttt{pips}] points to the import of \Apips \texttt{pips}
+\item[\texttt{p4a-pips}] points to the import of \Apips \texttt{pips}
   par. Thus this branch should contain only the files from
   \texttt{package/PIPS/pips} and used to merge from when you want to use
   the last version from \texttt{pips};
-\item[\texttt{pips-gfc+gcc}] points to a working \Apipsgfc implementation
-  of the Fortran 95 extension for \Apips in \texttt{package/pips-gfc};
-\item[\texttt{pips-gfc-4.4.1}] points to the original developments of
-  Raphaël in \Agcc in \texttt{package/pips-gfc};
-\item[\texttt{polylib}] points to the import of \Apips \texttt{polylib}
+\item[\texttt{p4a-polylib}] points to the import of \Apips \texttt{polylib}
   par. Thus this branch should contain only the files from
   \texttt{package/polylib} and used to merge from when you want to use
   the last version from \texttt{polylib};
-\item[\texttt{validation}] points to the import of \Apips
+\item[\texttt{p4a-validation}] points to the import of \Apips
   \texttt{validation} part, with only files into
-  \texttt{package/PIPS/validation}.
+  \texttt{package/PIPS/validation};
+\item[\texttt{pips-gfc+gcc}] points to a working \Apipsgfc implementation
+  of the Fortran 95 extension for \Apips in \texttt{package/pips-gfc};
+\item[\texttt{pips-gfc-4.4.1}] points to the original developments of
+  Raphaël in \Agcc in \texttt{package/pips-gfc}.
 \end{description}
 
 

@@ -7,7 +7,7 @@
 function enforce_P4A_TOP() {
     if [[ -z "$P4A_TOP" ]] ; then
 	cat <<EOF
-P4A_TOP variable is not set.
+The P4A_TOP variable is not set.
 It should contain the directory name with the Par4All git repository
 working copies in it:
 - par4all at least
@@ -42,10 +42,20 @@ COMMIT_MESSAGE_FILE=`mktemp`
 # Create the remote/CRI/<repository>
 function import_git() {
     # Get the function parameters:
-    REMOTE_NAME=$1
-    REMOTE_GIT_URL=$2
-    TARGET_LOCAL_DIR=$3
-    BRANCH_TO_IMPORT=init
+    MODULE=$1
+    TRACKING_BRANCH=$2
+    REMOTE_NAME=$3
+    REMOTE_GIT_URL=$4
+    TARGET_LOCAL_DIR=$5
+    BRANCH_TO_IMPORT=import
+
+    # Save the branch we are into:
+    get_current_git_branch
+
+    # Create a branch with a reflog representing the remote component by
+    # its own directly into the "initial" branch that should point to the
+    # first commit of the Par4All git repository:
+    git branch -l p4a-$MODULE initial
 
     echo Add the git svn as remote git repository:
     git remote add $REMOTE_NAME $REMOTE_GIT_URL
@@ -53,10 +63,17 @@ function import_git() {
     echo Fetch the history:
     git fetch $REMOTE_NAME
 
+    echo Create the tracking branches:
+    git branch $TRACKING_BRANCH $REMOTE_NAME/master
+    git branch $TRACKING_BRANCH-$BRANCH_TO_IMPORT $REMOTE_NAME/$BRANCH_TO_IMPORT
+
+    # Jump into the reserved branch to this module:
+    git checkout p4a-$MODULE
+
     echo Extract a copy of the files of the remote repository into the local
     echo repository at packages/PIPS, merge it and update the files in the work
     echo tree:
-    git read-tree --prefix=$TARGET_LOCAL_DIR -u $REMOTE_NAME/$BRANCH_TO_IMPORT
+    git read-tree --prefix=$TARGET_LOCAL_DIR -u $TRACKING_BRANCH-$BRANCH_TO_IMPORT
 
     # Build the merging message:
     echo "Merging from git-svn remotes/$REMOTE_NAME into $TARGET_LOCAL_DIR that is:" > $COMMIT_MESSAGE_FILE
@@ -68,12 +85,18 @@ function import_git() {
     git commit --file=$COMMIT_MESSAGE_FILE
 
     echo Connect the SVN history to this one by fetching it and merging it with
-    echo "the 'ours' strategy (since what we want is what we've just built up above"
-    echo into packages/PIPS and not also at the top level as each individual svn
-    echo "repository):"
+    echo "the 'ours' strategy (since what we want is what we've just built up"
+    echo  above into something like packages/PIPS and not also at the top level
+    echo " as each individual svn repository):"
     git pull --strategy=ours $REMOTE_NAME $BRANCH_TO_IMPORT
 
     rm $COMMIT_MESSAGE_FILE
+
+    # This first import is indeed the Par4All 0.1-alpha component:
+    git branch p4a-0.1-alpha-$MODULE p4a-$MODULE
+
+    # Revert to previous branch
+    revert_current_git_branch
 }
 
 
@@ -82,48 +105,26 @@ function import_PIPS_git_svn() {
     # Import from $P4A_CRI_GIT_SVN/<repository> URL as remote name
     # CRI/<repository> into packages/PIPS/<repository> local directory
 
-    # Save the branch we are into:
-    get_current_git_branch
-    # Create a branch with a reflog representing the remote component by
-    # its own directly into the "initial" branch that should point to the
-    # first commit of the Par4All git repository:
-    git branch -l $1 initial
-
-    # Jump into the reserved branch to this module:
-    git checkout $1
-
     # Put the import and merge in a specific branch
-    import_git CRI/$1 $P4A_CRI_GIT_SVN/$1 packages/PIPS/$1
-
-    # Revert to previous branch
-    revert_current_git_branch
+    import_git $1 CRI-$1 CRI/$1 $P4A_CRI_GIT_SVN/$1 packages/PIPS/$1
 }
 
 ### To import a branch from PIPS :
 # import_git CRI/pips-gfc ../CRI-git-svn/roosz-pips-gfc packages/pips-gfc/gcc/fortran
-# exit
 
 # Add the PIPS git svn repositories to Par4All:
 for i in $PIPS_MODULES; do
     import_PIPS_git_svn $i
 done
 
-# Save the branch we are into:
-get_current_git_branch
-
 # http://icps.u-strasbg.fr/polylib
 # Create a branch pointing to the polylib import:
-git branch -l polylib initial
-
-git checkout polylib
 # Add the PolyLib git repository to Par4All in the packages/polylib
 # directory as the polylib remote:
-import_git polylib git://repo.or.cz/polylib.git packages/polylib
+#import_git polylib git://repo.or.cz/polylib.git packages/polylib
+import_git polylib ICPS-polylib ICPS/polylib $P4A_TOP/polylib packages/polylib
 
-# Revert to previous branch
-revert_current_git_branch
-
-
+exit
 # There was a SVN reorganization of the CRI nlpmake repository to
 # introduce branches, so put things in the correct order:
 git checkout nlpmake

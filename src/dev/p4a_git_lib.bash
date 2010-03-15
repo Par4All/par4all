@@ -11,7 +11,7 @@ PIPS_MODULES="linear newgen nlpmake pips validation"
 # Where to get the git-svn instances from:
 P4A_CRI_GIT_SVN=$P4A_TOP/CRI-git-svn
 P4A_ROOT=$P4A_TOP/par4all
-P4A_ROOT=$P4A_TOP/p3
+#P4A_ROOT=$P4A_TOP/p3
 P4A_PRIV_ROOT=$P4A_TOP/par4all-priv
 
 script=${0/*\//}
@@ -88,8 +88,9 @@ function do_recursive_git() {
 }
 
 
-# Fetch into the par4all git all the parts from the remote git associated:
-do_fetch_remote_git() {
+# Fetch into the par4all git all the parts from the remote git associated
+# and merge into the tracking branches:
+function do_fetch_remote_git() {
     verb 1 "Entering do_fetch_remote_git"
     enforce_P4A_TOP
     stop_on_error
@@ -99,33 +100,46 @@ do_fetch_remote_git() {
 	echo Fetching CRI/$i...
 	git fetch CRI/$i
     done
-    echo Fetching polylib...
-    git fetch polylib
+    echo Fetching ICPS/polylib...
+    git fetch ICPS/polylib
+}
+
+
+# Pull one module into Par4All:
+function pull_remote_1_git() {
+    MODULE=$1
+    TRACKING_BRANCH=$2
+    REMOTE_NAME=$3
+
+    # First update the tracking branch:
+    git checkout $TRACKING_BRANCH
+    git pull $REMOTE_NAME master
+    # Then jump into the branch of this name that will receive the
+    # pull.  The idea is to have the possibility for a central place
+    # to be able to change things here against remote inputs.
+    git checkout $MODULE
+    # Pull the master branch of the remote git. Use a subtree merge
+    # strategy since the root directory of the remote git is relocated
+    # in a subdirectory of the Par4All git:
+    git merge --log --strategy=subtree $TRACKING_BRANCH
 }
 
 
 # Pull into the par4all git all the parts from the remote git associated:
-do_pull_remote_git() {
+function do_pull_remote_git() {
     verb 1 "Entering do_pull_remote_git"
     enforce_P4A_TOP
     stop_on_error
     cd $P4A_ROOT
     # Get the current branch to come back into later:
     get_current_git_branch
+
     echo Assuming the correct remotes are set in this par4all git copy...
     for i in $PIPS_MODULES; do
-	# First jump into the branch of this name that will receive the
-	# pull.  The idea is to have the possibility for a central place
-	# to be able to change things here against remote inputs.
-	git checkout $i
-	# Pull the master branch of the remote git. Use a subtree merge
-	# strategy since the root directory of the remote git is relocated
-	# in a subdirectory of the Par4All git:
-	git pull --log --strategy=subtree CRI/$i master
+	pull_remote_1_git p4a-$i CRI-$i CRI/$i
     done
     # Same for the polylib:
-    git checkout polylib
-    git pull --log --strategy=subtree polylib master
+    pull_remote_1_git p4a-polylib ICPS-polylib ICPS/polylib
 
     # Revert back into the branch we were at the beginning:
     git checkout $current_branch
@@ -133,7 +147,7 @@ do_pull_remote_git() {
 
 
 # Pull into the par4all git all the parts from the remote git associated:
-do_merge_remote_git() {
+function do_merge_remote_git() {
     verb 1 "Entering do_merge_remote_git"
     enforce_P4A_TOP
     stop_on_error
@@ -142,13 +156,12 @@ do_merge_remote_git() {
 	# Merge into the current branch the branch that buffers the remote
 	# PIPS git svn gateway that should have been populated by a
 	# previous do_pull_remote_git:
-	git merge --log $i
+	git merge --log p4a-$i
 
     done
     # Same for the polylib:
-    git merge --log polylib
+    git merge --log p4a-polylib
 }
-
 
 
 # Some Emacs stuff:

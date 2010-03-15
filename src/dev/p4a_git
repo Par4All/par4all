@@ -36,7 +36,7 @@ function usage()
 function enforce_P4A_TOP() {
     if [[ -z "$P4A_TOP" ]] ; then
 	cat <<EOF
-P4A_TOP variable is not set.
+The P4A_TOP variable is not set.
 It should contain the directory name with the Par4All git repository
 working copies in it:
 - par4all at least
@@ -56,6 +56,10 @@ EOF
 }
 
 enforce_P4A_TOP
+
+if [ $# == 0 ]; then
+    usage 1 "You should specify an option"
+fi
 
 # Get options:
 while [ "$1" ] ; do
