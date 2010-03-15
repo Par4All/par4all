@@ -82,7 +82,11 @@ set_methods_for_proper_references()
     reference_to_effect_func = reference_to_reference_effect;
     effect_to_store_independent_effect_list_func = 
       effect_to_store_independent_sdfi_list;
-
+    effect_add_expression_dimension_func =
+      simple_effect_add_expression_dimension;
+    effect_change_ith_dimension_expression_func =
+      simple_effect_change_ith_dimension_expression;
+ 
     /* FI: no longer good with conditional expressions? Should we use
        EffectsMustUnion or ReferenceMustUnion? Does not seem to have
        an impact... */
@@ -152,7 +156,11 @@ set_methods_for_cumulated_references()
     reference_to_effect_func = reference_to_reference_effect;
     effect_to_store_independent_effect_list_func = 
       effect_to_store_independent_sdfi_list;
-
+    effect_add_expression_dimension_func =
+      simple_effect_add_expression_dimension;
+    effect_change_ith_dimension_expression_func =
+      simple_effect_change_ith_dimension_expression;
+ 
     /* effect_union_op = ; *//* ??? */
     effects_union_op = ReferenceUnion;
     effects_test_union_op = ReferenceTestUnion;
