@@ -4488,6 +4488,18 @@ points_to_analysis > MODULE.points_to_list
         < MODULE.code
 
 \end{PipsMake}
+\subsection{Intraprocedural Summary Points to Analysis}
+This phase will handle the interprocedural part of the points-to
+analysis. At the beginning summary points\_to should be an empty set,
+especially if we have a function that is never called.
+\begin{PipsMake}
+alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Points To Analysis'
+
+intraprocedural_summary_points_to_analysis > MODULE.intraprocedural_summary_points_to_list
+           < PROGRAM.entities
+           < MODULE.code
+           < MODULE.points_to_list
+\end{PipsMake}
 \subsection{Points to  Properties}
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.

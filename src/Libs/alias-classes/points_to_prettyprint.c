@@ -68,117 +68,56 @@
 GENERIC_GLOBAL_FUNCTION(printed_points_to_list, statement_points_to)
 
 /************************************************************* BASIC WORDS */
-reference access_reference1(access acc)
-{
-  points_to_path p = points_to_path_undefined;
-  reference r = reference_undefined;
-  if(access_referencing_p(acc)){
-    p = access_referencing(acc);
-    r = points_to_path_reference(p);
-  }
-  if(access_dereferencing_p(acc)){
-    p = access_dereferencing(acc);
-    r = points_to_path_reference(p);
-  }
-  if(access_addressing_p(acc)){
-    p = access_addressing(acc);
-    r = points_to_path_reference(p);
-  }
-
-  return copy_reference(r);
-
-}
-
+/*Already exist in cprettyprint but in mode static. To be removed later.*/
 static bool variable_p(entity e)
 {
 	return type_undefined_p(entity_type(e));
 }
 
-
+/* To modelize the heap locations we manufacture fictious reference,
+ * that triggered a bug when it appears as an argument of entity_user_name(). */
 list
-words_reference_1(reference obj)
+words_fictious_reference(reference obj)
 {
   list pc = NIL;
-  string begin_attachment;
-
   entity e = reference_variable(obj);
-
   pc = CHAIN_SWORD(pc, entity_name(e));
-  begin_attachment = STRING(CAR(pc));
-
-  if (reference_indices(obj) != NIL) {
-    if (prettyprint_is_fortran)
-      {
-	pc = CHAIN_SWORD(pc,"(");
-	MAPL(pi, {
-	  expression subscript = EXPRESSION(CAR(pi));
-	  syntax ssubscript = expression_syntax(subscript);
-
-	  if(syntax_range_p(ssubscript)) {
-			pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript),NIL));
-	  }
-	  else {
-			pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE,NIL));
-	  }
-
-	  if (CDR(pi) != NIL)
-	    pc = CHAIN_SWORD(pc,",");
-	}, reference_indices(obj));
-	pc = CHAIN_SWORD(pc,")");
-      }
-    else
-      {
-	MAPL(pi, {
-	  expression subscript = EXPRESSION(CAR(pi));
-	  syntax ssubscript = expression_syntax(subscript);
-	  pc = CHAIN_SWORD(pc, "[");
-	  if(syntax_range_p(ssubscript)) {
-			pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript),NIL));
-	  }
-	  else {
-			pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, NIL));
-	  }
-	  pc = CHAIN_SWORD(pc, "]");
-	}, reference_indices(obj));
-      }
-  }
-  /* attach_reference_to_word_list(begin_attachment," ", */
-/*   			obj); */
-
   return(pc);
 }
 
 
 list word_points_to(points_to pt)
 {
-  list l2 = NIL;
-  if( points_to_undefined_p(pt))
-    {
-      
-    }
- access a1 = points_to_source(pt);
- access a2 = points_to_sink(pt);
- reference r1 = access_reference1(copy_access(a1));
- reference r2 = access_reference1(copy_access(a2));
- approximation rel = points_to_relation(pt);
- string l3 = "-MAY-";;
- if (approximation_exact_p(rel))
-   l3 = "-Exact-";
- if(!variable_p(reference_variable(r2)))
-	 l2 = words_reference(r2,NIL);
- else
-   l2 = words_reference_1(r2);
+  list l2 = NIL, l1 = NIL, rlt1 = NIL;
+
+  pips_assert("pt is defined", !points_to_undefined_p(pt));
+  points_to_consistent_p(pt);
+  cell c1 = points_to_source(pt);
+  cell c2 = points_to_sink(pt);
+  // FI->AM: check all your copy_xxxx(); you often copy a large object
+  // to obtain a small part of it
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  approximation rel = points_to_approximation(pt);
+  string l3 = "-MAY-";
+  if (approximation_exact_p(rel))
+    l3 = "-Exact-";
+  if(variable_p(reference_variable(r2)))
+    l2 = words_fictious_reference(r2);
+	else
+	  l2 = words_reference(copy_reference(r2),NIL);
+
+  l1 = words_reference(copy_reference(r1), NIL);
  
- list l1 = words_reference(r1, NIL);
- list rlt1 = gen_nconc((CONS(STRING,strdup("("), NIL)),l1);
- rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(","), NIL)));
- 
- rlt1 = gen_nconc(rlt1, l2);
- rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(","), NIL)));
- rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(l3), NIL)));
- rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(")"), NIL)));
- rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(";"), NIL)));
- return rlt1;
+  rlt1 = gen_nconc((CONS(STRING,strdup("("), NIL)),l1);
+  rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(","), NIL)));
+
+  rlt1 = gen_nconc(rlt1, l2);
+  rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(","), NIL)));
+  rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(l3), NIL)));
+  rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(")"), NIL)));
+  rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(";"), NIL)));
+  return rlt1;
 }
 
 //extern void print_points_to(
@@ -188,7 +127,6 @@ list words_points_to_list( string note, points_to_list s)
 
 	FOREACH (POINTS_TO, j,points_to_list_list(s))
 	{
-		// points_to_consistent_p(pt);
 		l = gen_nconc(l,word_points_to(j));
 	}
 	l = gen_nconc((CONS(STRING,strdup("{"), NIL)),l);
@@ -204,12 +142,11 @@ text text_points_to(entity module,int margin, statement s)
 
   text t;
   t = bound_printed_points_to_list_p(s)?
-	  words_predicate_to_commentary
-	  (words_points_to_list(PT_TO_DECO,
-				load_printed_points_to_list(s)),
-	   PIPS_COMMENT_SENTINEL)
-	  :make_text(NIL);
-
+    words_predicate_to_commentary
+    (words_points_to_list(PT_TO_DECO,
+			  load_printed_points_to_list(s)),
+     PIPS_COMMENT_SENTINEL)
+    :make_text(NIL);
   return t;
 }
 
@@ -228,8 +165,8 @@ text text_points_to(entity module,int margin, statement s)
 
  bool
  print_code_points_to(string module_name,
-											string resource_name,
-											string file_suffix)
+		      string resource_name,
+		      string file_suffix)
 {
  text t;
 
@@ -243,7 +180,7 @@ text text_points_to(entity module,int margin, statement s)
  set_printed_points_to_list((statement_points_to)
  db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE));
  // statement_points_to_consistent_p(get_printed_points_to_list());
- //statement_points_to_consistent_p(get_printed_points_to_list());
+ statement_points_to_consistent_p(get_printed_points_to_list());
  set_current_module_statement((statement)
 			      db_get_memory_resource(DBR_CODE,
 						     module_name,

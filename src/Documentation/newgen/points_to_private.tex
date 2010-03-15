@@ -32,7 +32,9 @@
 
 \section{Introduction}
 
-\domain{import reference from "ri.newgen"}
+\domain{import cell from "ri.newgen"}
+{}
+\domain{import descriptor from "ri.newgen"}
 {}
 \domain{import approximation from "ri.newgen"}
 {}
@@ -45,16 +47,28 @@
 
 
  
-\domain{points\_to = source:access x sink:access x relation:approximation}
+The domains points-to indicates that an abstract memory location
+called {\em source} points to another abstract memory location called
+{\em sink}. The arc between the two locations may either always exist,
+and the approximation is EXACT, or possibly exist, and the
+approximation is MAY. The abstract memory locations may contain
+program variables or PIPS entities in their subscript expressions, and
+their values are constrained by the {\em descriptor}.
+
+\domain{points\_to = source:cell x sink:cell x approximation x descriptor}
 {}
-\domain{access = referencing:points\_to\_path + addressing:points\_to\_path + dereferencing:points\_to\_path}
-{}
-\domain{points\_to\_path = reference}
-{}
-\domain{points\_to\_graph = arcs:points\_to*}
-{}
+Note: the domains {\em approximation} and {\em descriptor} are
+documented in ri.tex.
+
+% \domain{access = referencing:points\_to\_path + addressing:points\_to\_path + dereferencing:points\_to\_path}{}
+%\domain{points\_to\_path = reference}{}
+%\domain{points\_to\_graph = arcs:points\_to*}{}
+
+The points-to information is a list of points-to relations:
 \domain{points\_to\_list = list : points\_to*}
 {}
+
+This domain is used to associate its points-to information to each statement:
 \domain{statement\_points\_to = persistant statement -> points\_to\_list}
 {}
 
