@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* -- privatize.c 
+/* -- privatize.c
 
    This algorithm introduces local definitions into loops that are
    kennedizable. The privatization is only performed on dynamic scalar
@@ -74,18 +74,21 @@ static bool privatizable(entity e)
        declaration and the other references. This is not very smart,
        because it all depends on where e is declared.
 
+       FI: OK, I removed this safety test because declarations now
+       have effects and are part of the use-def chains
+
        Also, stack_area_p() would be OK for a privatization.
     */
 
-    return( entity_scalar_p( e ) && 
+    return( entity_scalar_p( e ) &&
 	    storage_ram_p( s ) &&
-	    value_unknown_p(entity_initial(e)) &&
+	    //value_unknown_p(entity_initial(e)) &&
 	    dynamic_area_p( ram_section( storage_ram( s )))) ;
 }
 
-/* SCAN_STATEMENT gathers the list of enclosing LOOPS of statement S. 
-   Moreover, the locals of loops are initialized to all possible private
-   entities. */
+/* SCAN_STATEMENT gathers the list of enclosing LOOPS of statement S.
+   Moreover, the locals of loops are initialized to all possible
+   private entities. */
 
 static void scan_unstructured(unstructured u, list loops) ;
 
