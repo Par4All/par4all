@@ -28,6 +28,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
+#include <ctype.h>
 
 
 #include "genC.h"
@@ -591,11 +592,23 @@ bool  entity_used_in_loop_bound_p(entity e)
 #define TERAPIX_MASK_PREFIX "ma"
 #define TERAPIX_REGISTER_PREFIX "re"
 
+static bool terapix_renamed_p(string s, string prefix)
+{
+    string found = strstr(s,prefix);
+    if(found)
+    {
+        for(found+=strlen(prefix)+1;*found;++found)
+            if(!isdigit(*found)) return false;
+        return true;
+    }
+    return false;
+}
+
 static
 entity terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt)
 {
     /* change parameter name and generate an assignment */
-    if(arg_prefix && (strncmp(arg_prefix,entity_user_name(e),strlen(arg_prefix))) ) {
+    if(arg_prefix && !terapix_renamed_p(entity_user_name(e),arg_prefix) ) {
         string new_name;
         asprintf(&new_name,"%s" MODULE_SEP_STRING  "%s%u",entity_module_name(e),arg_prefix,(*arg_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
@@ -622,7 +635,7 @@ entity terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,str
     }
 
     /* to respect terapix asm, we also have to change the name of variable e */
-    if(ass_prefix && (strncmp(ass_prefix,entity_user_name(e),strlen(ass_prefix)))) {
+    if(ass_prefix && !terapix_renamed_p(entity_user_name(e),ass_prefix)) {
         string new_name;
         asprintf(&new_name,"%s" MODULE_SEP_STRING "%s%u",entity_module_name(e),ass_prefix,(*ass_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
