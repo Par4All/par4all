@@ -592,7 +592,7 @@ bool  entity_used_in_loop_bound_p(entity e)
 #define TERAPIX_REGISTER_PREFIX "re"
 
 static
-void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt)
+entity terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt)
 {
     /* change parameter name and generate an assignment */
     if(arg_prefix && (strncmp(arg_prefix,entity_user_name(e),strlen(arg_prefix))) ) {
@@ -610,12 +610,15 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
                 CAR(iter).p=(gen_chunkp)ne;
             }
         }
+#if 1
         /* we now have FIFOx in ne and will generate an assignment from ne to e 
          * we also have to change the storage for e ...*/
         free_storage(entity_storage(e)); entity_storage(e) = storage_undefined;
         AddEntityToCurrentModule(e);
         statement ass = make_assign_statement(entity_to_expression(e),entity_to_expression(ne));
         insert_statement(get_current_module_statement(),ass,true);
+#endif
+        return ne;
     }
 
     /* to respect terapix asm, we also have to change the name of variable e */
@@ -626,6 +629,7 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
         AddEntityToCurrentModule(ne);
         free(new_name);
         replace_entity(get_current_module_statement(),e,ne);
+        return ne;
     }
 }
 
@@ -658,16 +662,36 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
         entity loop_bound = entity_undefined;
         if(terapix_suitable_loop_bound_p(nb_iter))
         {
-            /* generate new entity */
-            string new_name;
-            asprintf(&new_name,TERAPIX_LOOPARG_PREFIX "%u",(*p->cnt)++);
-            loop_bound=make_scalar_integer_entity(new_name,get_current_module_name());
-            value v = entity_initial(loop_bound);
-            free_constant(value_constant(v));
-            value_tag(v)=is_value_expression;
-            value_expression(v)=nb_iter;
-            AddEntityToCurrentModule(loop_bound);
-            free(new_name);
+            /* generate new entity if needed */
+            if(expression_reference_p(nb_iter)) /* use the reference , but we must rename it however !*/
+            {
+                loop_bound=reference_variable(expression_reference(nb_iter));
+                string new_name;
+                asprintf(&new_name,"%s" MODULE_SEP_STRING TERAPIX_LOOPARG_PREFIX "%u",get_current_module_name(),(*p->cnt)++);
+                entity new_loop_bound=make_entity_copy_with_new_name(loop_bound,new_name,false);
+                for(list iter = code_declarations(value_code(entity_initial(get_current_module_entity())));
+                        !ENDP(iter);
+                        POP(iter))
+                {
+                    entity ee = ENTITY(CAR(iter));
+                    if(same_entity_p(loop_bound,ee)) {
+                        CAR(iter).p=(gen_chunkp)new_loop_bound;
+                    }
+                }
+                replace_entity(get_current_module_statement(),loop_bound,new_loop_bound);
+                loop_bound=new_loop_bound;
+            }
+            else {
+                string new_name;
+                asprintf(&new_name,TERAPIX_LOOPARG_PREFIX "%u",(*p->cnt)++);
+                loop_bound=make_scalar_integer_entity(new_name,get_current_module_name());
+                value v = entity_initial(loop_bound);
+                free_constant(value_constant(v));
+                value_tag(v)=is_value_expression;
+                value_expression(v)=nb_iter;
+                AddEntityToCurrentModule(loop_bound);
+                free(new_name);
+            }
 
             /* patch loop */
             free_expression(range_lower(loop_range(l)));
