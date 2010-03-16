@@ -73,7 +73,6 @@
 
 #include "c_syntax.h"
 
-#include "cyacc.h"
 extern int c_lineno;
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
