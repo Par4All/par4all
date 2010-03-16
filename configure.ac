@@ -63,6 +63,17 @@ AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AX_CHECK_FUNCS([dup2 getcwd gethostname gettimeofday memset mkdir putenv regcomp setenv strcasecmp strchr strcspn strerror strrchr strspn strstr strtol strtoul strtoull])
 
+# doc
+AX_ARG_ENABLE([doc],
+			  [enable documentation build],
+			  [no],
+			  [
+			   AX_CHECK_PROG([pdflatex])
+			   AX_LATEX_PACKAGE([pstricks])
+			   AX_DEPENDS([doc],[pdflatex pstricks])
+			  ]
+)
+AM_CONDITIONAL([WITH_DOC],[AX_HAS([doc])])
 
 # gpips
 AX_ARG_ENABLE([gpips],
@@ -187,6 +198,8 @@ AC_CONFIG_FILES([Makefile
                  src/Scripts/simple_tools/Makefile
                  src/Scripts/simple_tools/pips_c2openmp
                  src/Scripts/simple_tools/pips_f2openmp
+
+                 src/Documentation/dev_guide/Makefile
 ])
                  #src/Libs/pip/Makefile
                  #src/Libs/prgm_mapping/Makefile
@@ -221,4 +234,4 @@ AC_CONFIG_FILES([Makefile
 
 AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
-AX_OUTPUT([minimum],[tpips pyps gpips hpfc])
+AX_OUTPUT([minimum],[tpips pyps gpips hpfc doc])
