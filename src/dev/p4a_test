@@ -4,12 +4,12 @@
 # Stop on error:
 set -o errexit
 
-ALL_MODULES="linear polylib"
+ALL_MODULES="polylib linear newgen nlpmake validation pips"
 
 # Get a clean repository:
 git init p3
 cd p3
-
+#false && {
 # Get stuff from the old one:
 git remote add par4all ../par4all
 # Create the tracking branches:
@@ -19,9 +19,9 @@ git pull par4all master
 # Point to the top of the repository:
 git branch initial ecd50e4a9fa1e04a9f07d6f5f892b8f7ed4a21a9
 
-# Import the branches of the packages:
-../par4all/src/dev/p4a_import_external_gits
-
+# Import the branches of the packages here:
+../par4all/src/dev/p4a_import_external_gits --root .
+#}
 # Create the branch to integrate the packages:
 git branch p4a-packages initial
 git checkout p4a-packages
@@ -64,31 +64,3 @@ git branch p4a-0.2-alpha
 
 # Have a look to the world creation:
 gitk&
-exit
-
-# Some wild tests:
-
-# Import
-git branch -l linear initial
-git checkout linear
-git remote add CRI/linear ../CRI-git-svn/linear
-git fetch CRI/linear
-git read-tree --prefix=packages/PIPS/linear -u 920bf79c5c2b723af34320cff6bee5954b76fdb8
-git commit -m "melange"
-git merge --strategy=ours 920bf79c5c2b723af34320cff6bee5954b76fdb8
-git checkout initial
-git checkout -b p4a
-git merge linear
-git merge own
-git checkout -b CRI-linear remotes/CRI/linear/master
-git checkout linear
-#git pull --log --strategy=subtree CRI/linear master
-git merge --log --strategy=subtree CRI-linear
-gitk&
-
-exit
-
-git checkout initial
-git checkout -b p4a
-git merge linear
-git merge own

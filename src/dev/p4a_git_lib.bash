@@ -4,14 +4,14 @@
 
 # Script to deal with Par4All repositories
 
+# The PIPS modules:
 PIPS_MODULES="linear newgen nlpmake pips validation"
-#PIPS_MODULES=linear
+#PIPS_MODULES=nlpmake
 
 # Set variables pointing to various Par4All parts:
 # Where to get the git-svn instances from:
 P4A_CRI_GIT_SVN=$P4A_TOP/CRI-git-svn
 P4A_ROOT=$P4A_TOP/par4all
-#P4A_ROOT=$P4A_TOP/p3
 P4A_PRIV_ROOT=$P4A_TOP/par4all-priv
 
 script=${0/*\//}

@@ -1,8 +1,27 @@
-#! /bin/bash
+#! /bin/bash -vx
 
 # Add remotes for git instances:
 # - the SVN PIPS-related repositories from Mines ParisTech/CRI
 # - the PolyLib library from Strasbourg University/ICPS
+
+# Display help
+function usage()
+{
+  local status=$1 msg=$2
+  if [[ $msg ]]
+  then
+    echo -e "message: $msg\n" >&2
+  fi
+  if [[ $status == 0 || $status == 1 ]]
+  then
+    echo -e \
+      "$script [options] ...\n" \
+	"options (displayed in a logical sequential order to apply):\n" \
+	"  -r|--root <directory-name>: create a git repository of this name\n" \
+	"     instead of 'par4all'"
+  fi
+  exit ${status:-1}
+}
 
 function enforce_P4A_TOP() {
     if [[ -z "$P4A_TOP" ]] ; then
@@ -26,6 +45,25 @@ EOF
 }
 
 enforce_P4A_TOP
+
+
+# Get options:
+while [ "$1" ] ; do
+  opt=$1
+  case $opt in
+      --) shift ; break ;; # end of option
+      -*) shift ;; # one option, processed by next "case"
+      *) break ;; # must be an argument, stop option processing...
+  esac
+
+  case $opt in
+      -h|--help) usage 0 ;;
+      -v|--verbose) let verb++ ;;
+      -r|--root) P4A_ROOT=$1 ; shift ;;
+      # error
+      *) usage 1 "unexpected option: $opt"
+  esac
+done
 
 # Since everything is touchy, stop if anything fails:
 stop_on_error
@@ -104,9 +142,47 @@ function import_git() {
 function import_PIPS_git_svn() {
     # Import from $P4A_CRI_GIT_SVN/<repository> URL as remote name
     # CRI/<repository> into packages/PIPS/<repository> local directory
+    if [ $1 = nlpmake ]; then
+	# nlpmake has a more chaotic story since at the beginning it was a
+	# flat SVN repository and later it was reorganized as trunk,
+	# branches and tags. So first import the first part:
+	import_git $1 CRI-$1-all CRI/$1-all $P4A_CRI_GIT_SVN/$1-all packages/PIPS/$1
+	# Then add the trunk story of nlpmake:
+	MODULE=$1
+	TRACKING_BRANCH=CRI-$1
+	REMOTE_NAME=CRI/$1
+	REMOTE_GIT_URL=$P4A_CRI_GIT_SVN/$1
+	TARGET_LOCAL_DIR=packages/PIPS/$1
+	BRANCH_TO_IMPORT=import
 
-    # Put the import and merge in a specific branch
-    import_git $1 CRI-$1 CRI/$1 $P4A_CRI_GIT_SVN/$1 packages/PIPS/$1
+        # Save the branch we are into:
+	get_current_git_branch
+
+	echo Add the git svn as remote git repository:
+	git remote add $REMOTE_NAME $REMOTE_GIT_URL
+
+	echo Fetch the history:
+	git fetch $REMOTE_NAME
+
+	echo Create the tracking branches:
+	git branch $TRACKING_BRANCH $REMOTE_NAME/master
+	git branch $TRACKING_BRANCH-$BRANCH_TO_IMPORT $REMOTE_NAME/$BRANCH_TO_IMPORT
+
+        # Jump into the reserved branch to this module:
+	git checkout p4a-$MODULE
+	# There are conflicts if we merge with a recent version, so we
+	# first merge the nlpmake trunk just after the move into the
+	# trunk:
+	git pull --log --strategy=subtree $REMOTE_NAME trunk
+	# And the merge the recent part of the nlpmake history:
+	git merge --log --strategy=subtree $TRACKING_BRANCH-$BRANCH_TO_IMPORT
+        # This first import is indeed the Par4All 0.1-alpha
+        # component. Override the branch done by the previous import_git:
+	git branch -f p4a-0.1-alpha-$MODULE p4a-$MODULE
+    else
+        # Put the import and merge in a specific branch
+	import_git $1 CRI-$1 CRI/$1 $P4A_CRI_GIT_SVN/$1 packages/PIPS/$1
+    fi
 }
 
 ### To import a branch from PIPS :
@@ -124,20 +200,6 @@ done
 #import_git polylib git://repo.or.cz/polylib.git packages/polylib
 import_git polylib ICPS-polylib ICPS/polylib $P4A_TOP/polylib packages/polylib
 
-exit
-# There was a SVN reorganization of the CRI nlpmake repository to
-# introduce branches, so put things in the correct order:
-git checkout nlpmake
-git mv packages/PIPS/nlpmake/trunk/makes packages/PIPS/nlpmake/makes
-git rm -r packages/PIPS/nlpmake/{branches,tags}
-git commit --message="There was a SVN reorganization of the CRI nlpmake repository
-around revision 747-750 to introduce branches,
-so put the makes directory at the top-level back"
-# Since git do not track directories and trunk is now empty, use a simple
-# directory deletion:
-rm -rf packages/PIPS/nlpmake/{branches,tags,trunk}
-git checkout master
-
 echo 'Do not forget to use "merge -s subtree" when getting new CRI stuff later'
 echo "For example you can get the last upstream version with:"
 for i in $SVN_REPOSITORIES; do
@@ -146,7 +208,7 @@ for i in $SVN_REPOSITORIES; do
 done
 echo "    git fetch polylib"
 echo "    git merge -s subtree polylib/master"
-
+echo "or better use the p4a_git scripts"
 
 # Some Emacs stuff:
 ### Local Variables:
