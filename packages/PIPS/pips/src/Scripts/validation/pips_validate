@@ -1,0 +1,558 @@
+#!/bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+script=${0/*\//}
+
+rev='$Rev$'
+rev=${rev/*: /}
+rev=${rev/ */}
+
+# To be sure that extended globing is available:
+shopt -s extglob
+
+# find pips root (to find scripts arch.sh & version.sh), see pips.sh
+if [[ $PIPS_ROOT ]]
+then
+  root="$PIPS_ROOT"
+else
+  # find the actual directory of the current script
+  # I have not found this information in any of bash variables.
+  case $0 in
+    /*)
+      # script launched with an absolute path: /abs/path/to/{bin,utils}/XXX
+      where=`dirname $0`
+      ;;
+    */*)
+      # script launched with a relative path: rel/path/to/{bin,utils}/XXX
+      where=$PWD/`dirname $0`
+      ;;
+    *)
+      # else script launched based on PATH: XXX
+      name=`basename $0`
+      where=`type -p $name`
+      ;;
+  esac
+
+  # check that we get something...
+  [ "$where" ] || error 2 "no such directory: $where"
+
+  # derive pips root by stripping the last directory component of this script
+  root=`dirname $where`
+
+  [ -d ${root} ] || error 2 "no such directory: $root"
+fi
+
+# DEFAULTS
+# where is the validation?
+vdir=${PIPS_VALIDDIR:-$root/../../validation}
+
+# default running directory
+rdir=$PWD
+recurse=
+
+# get default architecture and tpips/pips
+arch=${PIPS_ARCH:-$($root/makes/arch.sh)}
+tpips=$(type -p tpips)
+pips=$(type -p pips)
+sysarch=$(uname -m)
+
+# get good version of python with proper PYTHONPATH
+export PYTHONPATH=${PIPS_PYTHONPATH:-$root/lib/$arch}
+python=$(type -p python)
+
+# by default, do not create a missing .result directory:
+auto_result_create=""
+
+# By default do not display the diff:
+display_diff=
+
+# By default, no archive:
+keep_archive=
+
+# Where is stored the validation archives:
+archive_dir_basename=SUMMARY_Archive
+
+# Whether to run with some timeout
+timeout=''
+
+# fix collation (sort) order to default ASCII for all validations
+unset LANG LC_ALL LC_COLLATE
+export LC_ALL=C
+
+# display help
+function usage()
+{
+  local status=$1 msg=$2
+  if [[ $msg ]]
+  then
+    echo -e "message: $msg\n" >&2
+  fi
+  if [[ $status == 0 || $status == 1 ]]
+  then
+    echo -e \
+      "$script [options] directories or files...\n" \
+	"revision $rev\n" \
+	"options:\n" \
+	"  -h|--help: show some help\n" \
+	"  -v|--verbose: be verbose (repeat for more, over 2 is debug)\n" \
+	"  -p|--pips pips: use this 'pips' executable\n" \
+	"     default '$pips'\n" \
+	"  -t|--tpips tpips: use this 'tpips' executable\n" \
+	"     default '$tpips'\n" \
+	"  -m|--mail email: send mails (not a good idea?)\n" \
+	"  -V|--valid dir: validation destination directory\n" \
+	"     default '$vdir'\n" \
+	"  -R|--run dir: running directory, default '.'\n" \
+        "  -r|--recurse: look for subdirectories...\n" \
+	"  -d|--diff: display also a diff against previous validation\n" \
+	"     to show what changed. Imply the --archive option\n" \
+	"  -k|--archive: keep a summary of the validation in directory\n" \
+	"    '$archive_dir_basename'\n" \
+	"  -O|--out|--output dir: output directory, default '.'\n" \
+	"arguments:\n" \
+	"  -a|--auto-result-create: create a .result directory if it does\n" \
+	"     not exist yet. Useful to create a new validation test,\n" \
+	"     followed by a manual accept\n" \
+        "  -T|--timeout seconds) timout for one file (default none)\n" \
+	"  validation directories (e.g. Semantics Regions ...)\n" \
+	"  or files (e.g. Semantics/w14.f ...)\n"
+  fi
+  exit ${status:-1}
+}
+
+# verb level 'message to be shown...'
+verb=0
+function verb()
+{
+  local level=$1 msg=$2
+  [[ $verb -ge $level ]] && {
+      while let level-- ; do echo -n '#' ; done
+      echo " $msg"
+  } >&2
+}
+
+# get options
+while [ "$1" ] ; do
+  opt=$1
+  case $opt in
+      --) shift ; break ;; # end of option
+      -*) shift ;; # one option, processed by next "case"
+      *) break ;; # must be an argument, stop option processing...
+  esac
+
+  case $opt in
+      -h|--help) usage 0 ;;
+      -v|--verbose) let verb++ ;;
+      --version) echo "$script revision $rev" ; exit 0 ;;
+      # look for work
+      -r|--recurse) recurse=1 ;;
+      # binaries to use
+      -t|--tpips) tpips=$1 ; shift ;;
+      --tpips=*) tpips=${opt#*=} ;;
+      -p|--pips) pips=$1 ; shift ;;
+      --pips=*) pips=${opt#*=} ;;
+      # directories to use
+      -V|--valid) vdir=$1 ; shift ;;
+      --valid=*) vdir=${opt#*=} ;;
+      -R|--run) rdir=$1 ; shift ;;
+      --run=*) rdir=${opt#*=} ;;
+      # result
+      -O|--out|--output) odir=$1 ; shift ;;
+      --out=*|--output=*) odir=${opt#*=} ;;
+      -m|--mail) mail="$mail $1" ; shift ;;
+      --mail=*) mail="$mail ${opt#*=}" ;;
+      -a|--auto-result-create) auto_result_create=1 ;;
+      # archive to detect changes
+      -d|--diff) display_diff=1; keep_archive=1 ;;
+      -k|--archive) keep_archive=1 ;;
+      -T|--timeout) timeout="timeout $1" ; shift ;;
+      --timeout=*) timeout="timeout ${opt#*=}";;
+      # error
+      *) usage 1 "unexpected option: $opt"
+  esac
+done
+
+# use a full path name
+[[ $vdir == .* ]] && vdir=$PWD/$vdir
+
+# ignore timeout if not available
+type timeout > /dev/null 2>&1 || timeout=''
+
+# option checks
+[[ -d $vdir ]] || usage 3 "no validation directory: $vdir"
+[[ -d $rdir ]] || usage 4 "no run directory: $rdir"
+
+# result directory
+[[ $odir ]] || odir=$rdir/validation_results.$$
+[[ $odir != /* ]] && odir=$PWD/$odir
+[[ -d $odir ]] && usage 5 "output directory already exists: $odir"
+mkdir $odir || usage 6 "error on mkdir $odir"
+
+[[ -x $pips ]] || usage 7 "not executable: $pips"
+[[ -x $tpips ]] || usage 8 "not executable: $tpips"
+
+[[ -f properties.rc ]] && usage 17 "cannot run with local 'properties.rc'"
+[[ -f pipsmake.rc ]] && usage 18 "cannot run with local 'pipsmake.rc'"
+
+# go into running directory
+[[ $rdir != '.' ]] && pushd $rdir
+
+# start summary
+summary=$odir/SUMMARY
+
+# directory for validation archives
+archive_dir=$vdir/$archive_dir_basename
+# previous validation summary
+previous_summary=$archive_dir/SUMMARY-previous
+# last validation summary
+last_summary=$archive_dir/SUMMARY-last
+
+# create the archive directory only if necessary:
+[[ $keep_archive && ! -d $archive_dir ]] && mkdir $archive_dir
+
+# Save last summary for later diff or inspection:
+if [[ $keep_archive && -f $last_summary ]]; then
+    # deal with symbolic links:
+    rm -f $previous_summary
+    mv $last_summary $previous_summary
+fi
+
+echo "validation for $@
+host: $(hostname)
+directory: ${vdir}/
+  $($root/makes/version.sh $vdir)
+arch: $arch ($sysarch)
+pips: $pips
+$(${pips} -v)
+tpips: $tpips
+$(${tpips} -v)
+output directory: ${odir}/
+running directory: ${rdir}/
+user: $(whoami)
+date: $(date)
+" >> $summary
+
+# set default directories if necessary
+if [[ ! $@ ]] ; then
+  [[ -r $vdir/defaults ]] || usage 10 "cannot read $vdir/defaults"
+  set - $(cat $vdir/defaults | grep -v '#')
+fi
+
+# validate a file
+# returns whether it is a success
+# appends errors to $summary
+function validate_file()
+{
+  # file='/some/path/to/directory/file.(f|c|F|tpips)'
+  local file=$1
+  [[ -f $file ]] || usage 12 "no such source file: $file"
+  verb 4 "validating $file..."
+
+  # full_name='/some/path/to/directory/file' without the extension
+  # name='file'
+  # upper='FILE'
+  local full_name=${file%.@([cfF]|tpips|py)}
+  if [[ ! -d $full_name.result ]]
+  then
+    if [[ -n $auto_result_create ]]
+    then
+      mkdir $full_name.result
+      touch $full_name.result/test
+      echo "Directory $full_name.result created."
+      echo "Think to run a pips_manual_accept to set the results of the validation"
+      echo "  of this file as the reference."
+    else
+      verb 1 "skipping $file: no matching result directory"
+      echo "skipped: ${file#$vdir/}" >> $summary
+      return 0
+    fi
+  fi
+
+  local name=${full_name/*\//}
+  local upper=$(echo $name | tr '[a-z]' '[A-Z]')
+
+  # dir='/some/path/to/directory'
+  local dir=${full_name%/*}
+  [[ -d $dir ]] || usage 13 "no such 'dir' directory: $dir"
+
+  # go to this directory
+  pushd $dir > /dev/null || usage 13 "cannot cd to $dir"
+
+  # fix path to help more or less relative validation?
+  export PIPS_VALIDDIR=$vdir # re-export...
+  export PIPS_SRCPATH=$dir # set path for tpips?
+
+  # updir='/some/path/to'
+  local updir=${dir%/*}
+  [[ -d $updir ]] || usage 14 "no such 'updir' directory: $updir"
+
+  # prefix='directory/file'
+  local prefix=${full_name/$updir\//}
+  # output='directory_file'
+  output=${prefix/\//_}
+  verb 4 "output suffix is: $output"
+
+  # out="$odir/directory_file"
+  local out=$odir/$output
+
+  # rel_file='directory/file.f'
+  local rel_file=${file/$updir\//}
+  # Just in case pips command are not found and all the following tests
+  # fail, initialize the status:
+  local status=-1
+
+  if [[ -r $full_name.test ]] ; then
+    verb 3 "$prefix.test method"
+    verb 4 "$full_name.test"
+    # ??? what about using default_test substitution?!
+    $timeout $full_name.test 2> $out.err ; status=$?
+
+  elif [[ -r $full_name.py ]] ; then
+    verb 3 "$prefix.py method"
+    verb 4 "$python $full_name.py"
+    $timeout $python $full_name.py 2> $out.err ; status=$?
+
+  elif [[ -r $full_name.tpips ]] ; then
+    verb 3 "$prefix.tpips method"
+    verb 4 "$tpips $full_name.tpips"
+    $timeout $tpips $full_name.tpips 2> $out.err ; status=$?
+
+  elif [[ -r $full_name.tpips2 ]] ; then
+    verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
+    verb 4 "$tpips $full_name.tpips"
+    $timeout $tpips $full_name.tpips2 2>&1 ; status=$?
+
+  elif [[ -r $dir/default_test ]] ; then
+    verb 3 'default_test method'
+    # juste rely on env var, as tpips
+    FILE=$file WSPACE=$name NAME=$upper \
+      $timeout $dir/default_test 2> $out.err
+    status=$?
+
+  elif [[ -r $dir/default_tpips ]] ; then
+    verb 3 'default_tpips method'
+    verb 4 "FILE=$file WSPACE=$name ${tpips} $dir/default_tpips"
+    FILE=$file WSPACE=$name \
+	$timeout ${tpips} $dir/default_tpips 2> $out.err ; status=$?
+
+  else
+    verb 3 'default method: Init/Display/Delete'
+    {
+      $timeout Delete $name 2> /dev/null 1>&2 # ignore delete failure...
+      $timeout Init -f $file -d $name ; status=$?
+      while read module ; do
+	Display -m $module -w $name ; status=$?
+      done < $name.database/modules
+      $timeout Delete $name 2> /dev/null 1>&2 # ignore delete failure...
+    } 2> $out.err
+  fi > $out.tmp
+
+  # filter out absolute path anyway, there may be some because of
+  # cpp or other stuff run by pips, even if relative path names are used.
+  sed "s|$PWD/\./|./|g;s|$PWD/|./|g" < $out.tmp > $out.out
+  rm $out.tmp
+
+  verb 4 "Status = $status"
+
+  [[ -f core ]] && rm -f core # cleanup
+
+  if [[ $status -eq 0 ]] ; then
+    # generate diff and clean if okay
+    local file_resdir=$full_name.result
+    [[ -d $file_resdir ]] || usage 15 "no result directory: $file_resdir"
+
+    local reference=$file_resdir/test.$arch
+    [[ -f $reference ]] || reference=$file_resdir/test
+
+    # let's apply some filter on output if define by user
+    # First try to apply a test_and_out filter on both expected and obtained output
+    # Else try to apply test and out filter on test and out output
+    local test_and_out_filter=$file_resdir/test_and_out.filter
+    local test_filter=$file_resdir/test.filter
+    local out_filter=$file_resdir/out.filter
+    local reference_filtered=$reference
+    local out_filtered=$out.out
+    local out_is_filtered=
+    local ref_is_filtered=
+
+    if [[ -f $test_and_out_filter ]] ; then
+	# apply the user define filter on both the reference
+	chmod +x $test_and_out_filter
+	reference_filtered=$reference.filtered
+	out_filtered=$out.out.filtered
+	$test_and_out_filter $reference > $reference_filtered
+	$test_and_out_filter $out.out > $out_filtered
+	out_is_filtered=1
+	ref_is_filtered=1
+    else
+	# apply the user define filter on the reference
+	if [[ -f $test_filter ]] ; then
+	    chmod +x $test_filter
+	    reference_filtered=$reference.filtered
+	    $test_filter $reference > $reference_filtered
+	    ref_is_filtered=1
+	fi
+	# apply the user define filter on the output
+	if [[ -f $out_filter ]] ; then
+	    chmod +x $out_filter
+	    out_filtered=$out.out.filtered
+	    $out_filter $out.out > $out_filtered
+	    out_is_filtered=1
+	fi
+    fi
+
+    ${PIPS_DIFF:-diff -b -u} $reference_filtered $out_filtered > $out.diff
+
+    if [[ -s $out.diff ]] ; then
+      verb 2 "$rel_file: CHANGED"
+      echo "changed: $rel_file" >> $summary
+      cp $out.out $file_resdir/out
+      [[ $out_is_filtered ]] && cp $out_filtered $file_resdir/out.filtered
+      status=1 # something was wrong...
+    else
+      verb 3 "$rel_file: SUCCEEDED" # ok!
+      rm -f $out.* $file_resdir/*.filtered
+    fi
+
+  else
+      verb 2 "$rel_file: FAILED"
+      echo "failed: $rel_file" >> $summary
+  fi
+
+  popd > /dev/null
+  return $status
+}
+
+# process directories (or possibly files)
+dones=0
+errors=0
+elist=''
+
+# what do we have to do?
+if [[ $recurse ]] ; then
+  what=$(find "$@" -type d -print |
+         egrep -v '(\.svn|OLD|\.result|\.src|\.include)')
+else
+  what="$@"
+fi
+
+# this is not good.
+# what means to be validated is when *.result directories are available
+# and then we should look for available tpips/test/sources to do so?
+for obj in $what
+do
+  failed=
+  if [ -d $vdir/$obj ] ; then
+    verb 1 "considering '$obj' directory"
+    # this list may be empty: e.g. with the "pipspriv" repository
+    for file in $vdir/$obj/*.@([cfF]|tpips|py); do
+      verb 3 " - considering '${file//$vdir\//}' file"
+      base=${file%.@([cfF]|tpips|py)}
+      ext=${file/*./}
+      if [[ $ext != tpips &&  $ext != py && -f $base.tpips ]] ; then
+	  # If there is a file and a .tpips associated, skip the
+	  # validation done for this file since it is done for the .tpips
+	  continue
+      elif [[ $ext != tpips &&  $ext != py && -f $base.py ]] ; then
+	  # If there is a file and a .py associated, skip the
+	  # validation done for this file since it is done for the .py
+	  continue
+      fi
+      validate_file $file || let errors++ failed=1
+      let dones++
+    done
+  elif [ -f $vdir/$obj ] ; then
+    verb 1 "considering '$obj' file"
+    validate_file $vdir/$obj || let errors++ failed=1
+    let dones++
+  else
+    usage 11 "unexpected object: $obj"
+  fi
+  [[ $failed ]] && elist="$elist$obj "
+done
+
+echo -e "\n$errors failed out of $dones on $(date)" >> $summary
+rm -rf *.database # cold cleanup
+
+# report on stdout and possibly by mail
+if [[ $errors -eq 0 ]] ; then
+    msg='SUCCEEDED'
+else
+    msg="FAILED $errors/$dones ($elist)"
+fi
+
+if [[ $keep_archive ]]; then
+    # keep a copy as archive with date of the last modification of the
+    # file in its name, inside a year/month directory.
+
+    # summary file timestamp
+    sum_ts=$(stat --format %z $summary)
+    sum_ts=${sum_ts/.*/}
+    # date part as "2009-03-20", then extract year and month
+    sum_date=${sum_ts/ */}
+    sum_year=${sum_ts/-*/}
+    sum_month=${sum_ts#*-}
+    sum_month=${sum_month/-*/}
+    # time part as "09_10_57"
+    sum_time=${sum_ts/* /}
+    sum_time=${sum_time//:/_}
+
+    # archive directory and file
+    sub_dir=$sum_year/$sum_month
+    sum_file=SUMMARY.${sum_date}_${sum_time}
+    archive_summary=$archive_dir/$sub_dir/$sum_file
+
+    # keep it!
+    mkdir -p $archive_dir/$sub_dir
+    cp -a $summary $archive_summary
+    # use relative symbolic link
+    rm -f $last_summary
+    ln -s $sub_dir/$sum_file $last_summary
+fi
+
+# output difference to stdout if required
+function do_diff()
+{
+  echo 'Differences from previous summary:'
+  if [[ -f $previous_summary && -f $last_summary ]]
+  then
+    diff $previous_summary $last_summary
+  else
+    echo ' - previous or last summary is missing, no diff...'
+  fi
+  echo
+}
+
+echo -e "\nvalidation $msg\n"
+[[ $display_diff ]] && do_diff
+cat $summary
+
+if [[ $mail ]] ; then
+  {
+    [[ $display_diff ]] && do_diff
+    cat $summary
+  } | ${PIPS_MAIL:-Mail} -s "validation $sysarch $msg" $mail
+fi
+
+# ensure okay to make
+exit 0

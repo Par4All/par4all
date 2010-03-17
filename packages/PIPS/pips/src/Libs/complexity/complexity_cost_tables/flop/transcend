@@ -1,0 +1,19 @@
+# cost_transcend_1  - Unity cost for each intrinsic transcendantal functions
+
+#	int	float	double	complex	double-complex    <-- type of argument(s)
+
+MIN	0	1	1	1	1
+MAX	0	1	1	1	1
+SQRT	0	1	1	1	1
+DSQRT	0	1	1	1	1
+CSQRT	0	1	1	1	1
+EXP	0	1	1	1	1
+DEXP	0	1	1	1	1
+CEXP	0	1	1	1	1
+ALOG	0	1	1	1	1
+DLOG	0	1	1	1	1
+CLOG	0	1	1	1	1
+ALOG10	0	1	1	1	1
+DLOG10	0	1	1	1	1
+LOG	0	1	1	1	1
+LOG10	0	1	1	1	1

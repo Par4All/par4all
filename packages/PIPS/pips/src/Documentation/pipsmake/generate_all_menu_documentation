@@ -1,0 +1,381 @@
+#! /usr/bin/perl -w
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Generate various files for the User Manual:
+# 
+# Transformations are taken from a menu in the .tex file.
+#
+# $debug = 8;
+
+my $debug = 0;
+
+$generate_menu_layout = 0;
+if ($ARGV[0] eq "-layout") {
+    shift;
+    # Used to generate wpips_transform_menu_layout.h
+    $generate_menu_layout = 1;
+}
+
+$general_warning = "%% Warning, this file is automagically generated from the \"pipsmake-rc.tex\"\n%%\t file through \"$0\".\n\n";
+
+
+# Slurp all the file in only one string:
+undef $/;
+$PipsMakeRc = <>;
+
+if ($debug >= 9) { print $PipsMakeRc; }
+
+if ( $generate_menu_layout == 0) {
+    # Open the various output files:
+    &OpenInWriteMode(TheDeclarations, "wpips-epips-declarations.tex");
+    &OpenInWriteMode(TheOptionsMenu, "wpips-epips-options-menu.tex");
+    &OpenInWriteMode(TheTransformationsMenu, "wpips-epips-transform-menu.tex");
+    &OpenInWriteMode(TheTransformationsAtEnd, "wpips-epips-transform-end.tex");
+}
+else {
+    &OpenInWriteMode(TheWpipsTransformationMenuLayout, "wpips_transform_menu_layout.h");
+    &OpenInWriteMode(TheEpipsTransformationMenuLayout, "epips_transform_menu_layout.el");
+    &OpenInWriteMode(TheWpipsViewMenuLayout, "wpips_view_menu_layout.h");
+    &OpenInWriteMode(TheEpipsViewMenuLayout, "epips_view_menu_layout.el");
+}
+
+
+# Extract all the verbatim part:
+$in_verbatim = 0;
+while($PipsMakeRc =~ /^(.*)$/mg) {
+	# For each line: */
+	my($the_text) = $1;
+	if ($in_verbatim) {
+		if ( $the_text =~ /^\s*\end\{PipsMake\}/ ) {
+			$in_verbatim = 0;}
+		else {
+			# Add the verbatim content:
+			$PipsMakeRcVerbatim .= $the_text . "\n";
+		}
+	}
+	else {
+		if ( $the_text =~ /^\s*\\begin\{PipsMake\}/ ) {
+			$in_verbatim = 1;
+		}
+	}
+}
+
+
+# Deal with every declaration :
+($rien = $PipsMakeRc) =~ s/\\begin\{PipsPass\}(.*?)\\end\{PipsPass\}/&DealWithDeclarations($1)/egm;
+
+
+# Extract the documentation of the various functions:
+while ($PipsMakeRc =~ /\\begin\{PipsPass\}\{(\w*)\}\s*(.*?)\\end\{PipsPass\}/gm) { &StoreFunctionDoc($1,$2) };
+
+
+# Parse the aliases that link a full name to a function name:
+while($PipsMakeRcVerbatim =~ /^\s*alias\s+(\w+)\s+\'([^\']+)\'\s*$/mg) {
+    if ($debug >= 5) {
+        print "*** Alias $1 -> $2\n";
+    }
+    $function_name_aliases{$2} = $1;
+    $full_name_aliases{$1} = $2;
+}
+
+# Deal with the transformations :
+if ( $generate_menu_layout == 0) {
+    print TheTransformationsMenu $general_warning;
+}
+($rien = $PipsMakeRc) =~ s/\\begin\{PipsMenu\}\{Transformations\}(.*?)\\end\{PipsMenu\}/&DealWithTransformations($1)/egms;
+
+($rien = $PipsMakeRc) =~ s/\\begin\{PipsMenu\}\{View\}(.*?)\\end\{PipsMenu\}/&DealWithViews($1)/egms;
+
+
+# Parse the function list and the generated output:
+# FC: clone modifies CALLERS...
+while($PipsMakeRcVerbatim =~ /^\s*(\w+)\s*>\s*(MODULE|CALLERS)\.(\w+)\s*$/mg) {
+    if ($debug >= 5) {
+	print "*** function $1 generates $3 ($2)\n";
+    }
+    # An associative array of arrays:
+    push @{$ressource_is_generated_by{$3}}, $1;
+}
+
+# The option menu is derived from the fact that we need to choose
+# some functions when there is more than 1 way to do a MODULE ressource:
+# First, build a list of such ressources:
+while (($ressource,$functions) = each %ressource_is_generated_by) {
+	if ($debug >= 5) {
+		print "$ressource ($full_name_aliases{$ressource}):@$functions\n";
+		foreach $function (@$functions) {
+			print "\t$function ($full_name_aliases{$function})\n";
+		}
+	}
+    if (defined $full_name_aliases{$ressource} && ($#$functions >= 1)) {
+        # If there is an alias on the ressource and at least 2 way
+        # to build it, generate an option menu:
+        if ($debug >= 5) { print "$#$functions\n"; }
+        foreach $function (@$functions) {
+            if (! defined $full_name_aliases{$function}) {
+                print STDERR "Cannot find an alias for function \"$function\".\n";
+            }
+			else {
+				push @{$option_menu{$full_name_aliases{$ressource}}}, $full_name_aliases{$function};
+				if ($debug >= 5) { print "$ressource($full_name_aliases{$ressource}) -> $function($full_name_aliases{$function})\n" };
+			}
+        }
+    }
+}
+
+# Output the Option menu documentation now:
+if ($generate_menu_layout == 0) {
+	print TheOptionsMenu $general_warning;
+	&InitDocDescription;
+# Output an unindented description:
+	&BeginDocDescription(0);
+	foreach $option (sort keys %option_menu) {
+		# Skip separator lines:
+		if ($option ne "-") {
+			# Add the documentation about this option for output:
+			&AddItemDocDescription(0, $option, $function_name_aliases{$option});
+			# Output an 1-indented description:
+			&BeginDocDescription(1);
+			# Should be sorted here ?
+			foreach $choice (@{$option_menu{$option}}) {
+				# Add the documentation about this choice:
+				&AddItemDocDescription(1, $choice, $function_name_aliases{$choice});
+			}
+			&EndDocDescription(1);
+		}
+	}
+	&EndDocDescription(0);
+# Write all the option stuff on disk:
+	&WriteDocDescription(TheOptionsMenu);
+}
+else {
+    # Generate the wpips_transform_menu_layout.h
+
+}
+
+
+sub DealWithDeclarations {
+    local($the_text) = @_;
+    if ($debug >= 8) { print '***' . $the_text; }
+    print TheDeclarations $the_text;
+    return $the_text;
+}
+
+#
+# let us deal with transformations...
+#
+sub DealWithTransformations {
+	local($the_text) = @_;
+	if ($debug >= 8) { print '***DealWithTransformations ' . $the_text; }
+
+	if ($generate_menu_layout == 0) {
+		print TheTransformationsMenu "The following description of the ``Transform/Edit'' menu is automatically generated from ``pipsmake-rc.tex'' through \\verb|$0|.\n\n";
+		# Get the documentation of the pseudo-function "TheTransformations"
+		# that describes indeed the concept of transformations:
+		print TheTransformationsMenu 
+		$DocFunction{"TheTransformations"};
+		# Get the end of the description:
+		print TheTransformationsAtEnd 
+		$DocFunction{"TheTransformationsAtEnd"};
+
+		&InitDocDescription;
+		# Output an unindented description:
+		&BeginDocDescription(0);
+	}
+	else {
+		print TheEpipsTransformationMenuLayout ";; The following description of the ``Transform/Edit'' menu is automatically generated from ``pipsmake-rc.tex'' through \\verb|$0|.\n\n";
+		print TheEpipsTransformationMenuLayout "(setq epips-transformation-menu-layout '(\n";
+		print TheWpipsTransformationMenuLayout "/* The following description of the ``Transform/Edit'' menu is automatically generated from ``pipsmake-rc.tex'' through \\verb|$0|. */\n\n";
+	}
+
+	chop $the_text;
+	#print "A $the_text\n";
+	$the_text =~ s/\n\s*\n/\nx\n/g;
+	($rien = $the_text) =~ s/^\s*(\S*)\s*$/&DealWithEachTransformation($1)/egm;
+	if ($generate_menu_layout == 0) {
+		&EndDocDescription(0);
+		&WriteDocDescription(TheTransformationsMenu);
+	}
+	else {
+		print TheEpipsTransformationMenuLayout "))\n";
+	}
+	return $the_text;
+}
+
+sub DealWithEachTransformation {
+	my($function_name) = @_;
+	my($this_item, $the_title);
+	my($builder_name);
+	if ($debug >= 8) { 
+		print "*** Generate \\item documentation for transformation \"$function_name\".\n"; 
+	}
+
+	if ($function_name ne "x") {
+		if (! defined $DocFunction{$function_name}) {
+			print "Can't find the documentation for the \"$function_name\" transformation function.\n";
+		}
+		else {
+			# The menu title and the transformation name is in fact the alias:
+			if (! defined $full_name_aliases{$function_name}) {
+				print "Can't find the alias for the \"$function_name\" transformation function.\n";
+			}
+			else {
+				$the_title = $full_name_aliases{$function_name};
+				($builder_name = $function_name) =~ tr/a-z/A-Z/;
+				$builder_name = "BUILDER_" . $builder_name;
+			}
+		}
+	}
+	else {
+		# It is just a menu separator item:
+		$the_title = "";
+		$builder_name = "\"\"";
+	}
+
+	if ($generate_menu_layout == 0) {
+		AddItemDocDescription(0, $the_title, $function_name);
+	}
+	elsif ($the_title){
+		print TheWpipsTransformationMenuLayout 
+		"{ \"$the_title\", $builder_name },\n";
+		print TheEpipsTransformationMenuLayout 
+		"\t(\"$the_title\")\n";
+	}
+	return "";
+}
+
+
+sub DealWithViews {
+    local($the_text) = @_;
+    if ($debug >= 8) { print '***DealWithViews ' . $the_text; }
+    print TheEpipsViewMenuLayout ";; The following description of the ``View'' menu is automatically generated from ``pipsmake-rc.tex'' through \\verb|$0|.\n\n";
+    print TheWpipsViewMenuLayout "/* The following description of the ``View'' menu is automatically generated from ``pipsmake-rc.tex'' through \\verb|$0|. */\n\n";
+
+    print TheEpipsViewMenuLayout "(setq epips-view-menu-layout '(\n";
+    chop $the_text;
+    #print "A $the_text\n";
+    # The format is "function -> wpips_method,epips_method,icon_name"
+    $the_text =~ s/\n\s*\n/\nx->x,x,x\n/g;
+    # Many + and * to accept "" as a menu separator:
+    # Added the x horror hack to have the following workin... :-(
+    ($rien = $the_text) =~ s/^\s*(\S*)\s*->+\s*(\S*)\s*,+\s*(\S*)\s*,+\s*(\S*)\s*$/&DealWithEachView($1,$2,$3,$4)/egm;
+    print TheEpipsViewMenuLayout "))\n";
+    return $the_text;
+}
+
+sub DealWithEachView {
+	my($function_name,$wpips_method,$epips_method,$icon_name) = @_;
+	my($this_item, $the_title);
+	my($builder_name);
+	if ($debug >= 8) { print "*** Generate \\item documentation for transformation \"$function_name\".\n"; }
+	if ($function_name ne "x") {
+		# The menu title and the view name is in fact the alias:
+		if (! defined $full_name_aliases{$function_name}) {
+			print "Can't find the alias for the \"$function_name\" view file function.\n";
+		}
+		else {
+			$the_title = $full_name_aliases{$function_name};
+			($resource_name = $function_name) =~ tr/a-z/A-Z/;
+		}
+	}
+	else {
+		# It is just a menu separator item:
+		$the_title = "";
+		$resource_name = "";
+		$wpips_method = "NULL";
+		$epips_method = "NULL";
+		$icon_name = "";
+	}
+	if($the_title) {
+		print TheWpipsViewMenuLayout "{ \"$the_title\", \"$resource_name\", $wpips_method, \"$icon_name\" },\n";
+		print TheEpipsViewMenuLayout "\t(\"$the_title\" \"$resource_name\" $epips_method \"$icon_name\")\n";
+	}
+	return "";
+}
+
+
+sub StoreFunctionDoc {
+    local($function_name, $the_content) = @_;
+    if ($debug >= 7) { print "*** Found documentation for \"$function_name\":\n<<\n$the_content\n>>\n\n"; }
+    $DocFunction{$function_name} = $the_content;    
+    return "";
+}
+
+# The \begin{description}...\end{description} stuff:
+sub InitDocDescription {
+    $the_documentation_description = "";
+}
+
+sub BeginDocDescription {
+    my($tabbing_level) = @_;
+    $the_documentation_description .= "\t" x $tabbing_level . "\\begin{description}\n\n";
+}
+
+sub AddItemDocDescription {
+	my($tabbing_level, $item_title, $function_name) = @_;
+	# Get the documentation about the given function name:
+	my($item_content) = $DocFunction{$function_name};
+	# Skip separator lines:
+	if ($item_content and $function_name ne "-") {
+		# Protect the "&" in the item title:
+		$item_title =~ s/&/\\&/g;
+		# Each item content should begin with a small cap letter:
+		if (! ($item_content =~ /^\s*\\/) ) {
+			# Change only if the line does not begin with a "\\":
+			$item_content =~ s/(\s*)(\w)/$1\l$2/;
+		}
+		# Each item content should end with ";" instead of ".":
+		$item_content =~ s/\.(\s*)$/;$1/;
+		$the_documentation_description .= "\t" x $tabbing_level . "\\item[$item_title:] $item_content";
+		# Warn if there is no documentation:
+		if (! defined $item_content) {
+			print STDERR "*Warning* Cannot find any documentation about the \"$function_name\" function...\n";
+			$the_documentation_description .= "~";
+		}
+		$the_documentation_description .= "\n\n";
+	}
+}
+
+sub EndDocDescription {
+    my($tabbing_level) = @_;
+    $the_documentation_description .= "\t" x $tabbing_level . "\\end{description}\n\n";
+}
+
+sub WriteDocDescription {
+    my($file_descriptor) = @_;
+    # The last item should end with a "." instead of a ";":
+    $the_documentation_description =~ s/;(\s*\\end{description}\s*)$/.$1/;
+    # Transform all the "\ref{" in "\externalref{":
+    $the_documentation_description =~ s/\\ref{\s*/\\externalref{/g;
+    # Remove the "\cite{...}" since there is no BibTeX-bibliography file :
+    $the_documentation_description =~ s/\s*\\cite{[^}]*}//g;
+
+    print $file_descriptor $the_documentation_description;
+    undef $the_documentation_description;
+}
+
+
+sub OpenInWriteMode {
+    my($file_descriptor, $file_name) = @_;
+    open($file_descriptor, ">$file_name") || die ("Cannot open in writing mode \"$file_name\"\n");
+}

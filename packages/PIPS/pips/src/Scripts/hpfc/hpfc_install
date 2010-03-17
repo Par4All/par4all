@@ -1,0 +1,152 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Installation in directory...
+
+# defaults
+
+unset tdir srcdir basedir reffiles toinstall tomake unsplit
+
+verb=':'
+debug=':'
+srcdir=${HPFC_RUNTIME:-$PIPS_ROOT/runtime/hpfc}
+MAKE=${HPFC_MAKE:-${PIPS_MAKE:-gmake}}
+M4=${HPFC_M4:-m4}
+
+verbose()
+{ echo "[hpfc_install]:" "$@" >&2;}
+
+#
+
+if [ -f "${PIPS_CURRENT_PROGRAM:-.pipsprogram}" ] 
+then
+  basedir="$PWD/`sed -n 's,^PGM=\(.*\)\$,\1,p' .pipsprogram`.database"
+fi
+
+# get options
+
+usage()
+{
+  code=$1 msg=$2
+  shift 2
+  [ "$msg" ] && echo "$msg" >&2
+  cat <<-EOF
+	Usage: hpfc_install [options]
+	   version $Revision$
+	   -h: help
+	   -i: install
+	   -m: make
+	   -v: verbose
+	   -d: debug
+	   -q: quiet
+	   -o: regenerate an origin file
+	   -n name: target name
+	   -t dir: target directory (default hpfc)
+	   -b dir: database (default current database)
+	   -s dir: where other sources are (default HPFC_INCLUDE then EXTEDIR)
+	   -f file: reference file (default none)
+	EOF
+  exit ${code:-1}
+}
+
+while getopts himvdqot:s:b:f:n: OPT
+do
+  case $OPT in
+    h) usage 0 ;;
+    i) toinstall=1 ;;
+    m) tomake=1 ;;
+    v) verb='verbose' ;;
+    d) debug='verbose' ;;
+    q) verb=':' ;;
+    o) unsplit=':' ;;
+    t) tdir="$OPTARG" ;;
+    s) srcdir="$OPTARG" ;;
+    b) basedir="$OPTARG" ;;
+    f) reffiles="$reffiles $OPTARG" ;;
+    n) name="$OPTARG" ;;
+    *) usage
+  esac
+done
+
+$debug "args:" "$@"
+shift `expr $OPTIND - 1`
+
+#
+$debug checking
+
+[ "$#" -eq 0 ] || usage
+[ "$basedir" ] || usage
+[ -d $srcdir ] || echo "no runtime directory: $srcdir" >&2
+
+name=`echo ${name:-\`basename $basedir .database\`} | tr 'A-Z' 'a-z'`
+
+[ "$tdir" ] ||
+{
+  tdir=$basedir/hpfc
+  $verb "cleaning $tdir"
+  rm -rf $tdir
+  mkdir $tdir
+}
+
+$debug installating
+
+if [ "$toinstall" ]
+then
+  $verb "installing in $tdir"
+
+  src_makefile=$srcdir/hpfc_Makefile_init
+  if [ -f $src_makefile ]
+  then
+    echo "NAME = $name"
+    cat $src_makefile
+  fi > $tdir/Makefile
+
+  cp $basedir/Src/* $tdir
+
+  [ "$unsplit" ] && set $basedir/[A-Z][A-Z]*/*.f_initial
+  [ "$reffiles" ] && set `echo "$reffiles" | cut -d " " -f 2`
+
+  $debug rebuilding initial source file
+  for f
+  do
+    $debug "considering $f"
+    egrep -s '(^[!cC\*][Ff][Cc][Dd]\$[ 	]*[Ff][Aa][Kk][Ee][ 	]*$|hpfc9)' \
+	$f || { $debug "adding $f" ; cat $f ; }
+  done > $tdir/$name.f
+
+  chmod ug+w $tdir/*
+fi
+
+$debug making
+
+if [ "$tomake" ] 
+then
+  $verb "making"
+  cd $tdir
+  $MAKE Makefile
+  $MAKE all
+fi
+
+#
+# that is all
+#

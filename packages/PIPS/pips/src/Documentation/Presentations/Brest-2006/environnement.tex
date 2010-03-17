@@ -1,0 +1,449 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\slidepart{L'établi PIPS}
+
+
+\begin{trans}{Pourquoi un établi ?}
+  \begin{itemizec}
+  \item \hypertarget{Environnement}{Paralléliseurs} et compilateurs pour
+    \begin{itemizet}
+    \item Superalculateurs \& serveurs parallèles
+    \item Stations de travail superscalaires
+    \item Super DSP parallèles
+    \item ASP, FPGA, SoC, MP-SoC...
+    \end{itemizet}
+  \item Même usage d'analyses et transformations de programme avancées
+    \begin{itemizet}
+    \item Analyses semantiques interprocédurales
+    \item Optimiszations de code
+    \item Vectorisation \& parallelisation
+    \item Restructuration \& ingéniérie à rebour
+    \end{itemizet}
+  \end{itemizec}
+  \vavers Factorise le tout dans un outil de développement commun pour
+  réutiliser le code
+\end{trans}
+
+
+\begin{trans}{PIPS --- perspective de l'utilisateur}
+  \psfiglarge{dessins/external_overview.idraw}
+\end{trans}
+
+
+\begin{trans}{PIPS : l'établi}
+  \begin{itemizer}
+  \item PIPS $\equiv$ compilateur source à source (Fortran...) découpé en
+    phases :
+    \begin{itemizet}
+    \item Analyses interprocédurales
+    \item Transformations
+    \item Générateurs de code
+    \item « \emph{Pretty-printers} »
+    \item Infrastructure et ménage
+    \end{itemizet}
+  \item Usage intensif d'algèbre linéaire \vavers « bibliothèque $C^3$ »
+    (matrices, vecteurs, systèmes de contraintes linéaires, forme normale
+    de \textsc{Hermite},...)
+  \item NewGen : gestionnaire de structures de données
+  \end{itemizer}
+\end{trans}
+
+
+
+\begin{trans}{Phases d'analyse}
+  \begin{itemizer}
+  \item Effets d'instructions sur variables en lecture ou écriture/utilisées
+    ou nécessaires
+  \item Graphes de dépendance
+  \item Préconditions --- prédicats sur les variables entières des
+    instructions
+  \item Régions --- sections de tableaux polyédriques. Étend les effects
+  \item Graphe de flot de données, plannification, base de temps et
+    répartition
+  \item Détection de réductions
+  \item Complexités symboliques
+  \item Fortran \texttt{lint}
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Phases de transformation}
+  \begin{itemizer}
+  \item Boucles : distribution, déroulage, strip-mining, échange,
+    normalisation,...
+  \item Évaluation partielle
+  \item Élimination de code mort, élimination use-def, déspaghettification
+  \item Privatisation tableaux \& scalaires
+  \item Atomiseur
+  \item Clonage
+  \item Nettoyage des déclarations
+  \item Optimiseur d'expressions EOLE
+  \item Restructuration avec STF/ToolPack (emballeur en C)
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Phases de compilation}
+  \begin{itemizer}
+  \item Parallélisation et vectorisation
+    \begin{itemizet}
+    \item Fortran 77 + directives OMP
+    \item Fortran 77 + directives HPF
+    \item Fortran 77 + \texttt{DOALL}
+    \item Expressions de tableau Fortran 90
+    \item Directives Fortran Cray
+    \end{itemizet}
+  \item Compilateur HPF (redistributions, I/O), bibliothèque PVM/MPI
+  \item « méthode polyédrique : CM-Fortran, CRAFT
+  \item « WP65 » : mémoire virtuelle paratagée compilée avec bibliothèque PVM
+  \end{itemizer} 
+\end{trans}
+
+
+\slidepart{Rajouter une phase à PIPS}
+
+
+\begin{trans}{Élimination de code mort}
+  Utile pour :
+  \begin{itemizer}
+  \item Spécialisation de code (e.g. après clonage ou inlining)
+  \item Rétro-ingéniérie de vieux codes stratifiés/fossilisés
+  \item Nettoyage après transformations source à source
+  \item Simplification avant application d'autres analyses
+  \end{itemizer}
+  Combinée avec profit avec\\
+  évaluation partielle, élimination use-def, restructuration graphe de
+  contrôle
+\end{trans}
+
+
+\begin{trans}{Plan du rajout de phase}
+  \begin{itemizer}
+  \item Exemple avec \texttt{OCEAN}\\
+    25 des 57 tests éliminés dans la procédure principale\\
+    (8 true branches and 17 false branches)
+    %% Vérifier ces chiffres à l'occasion. J'ai aussi 6/19...
+  \item Élimination de code mort \& autres analyses concernées
+  \item Gestionnaire de consitance interprocédural PIPSmake
+  \item Gestionnaire d'objets NewGen and PIPSdbm
+  \item Interfaces
+  \item Environnement
+  \end{itemizer}
+  \belleboite{\vavers PIPS workbench}
+\end{trans}
+
+
+\slidepart{Exemple OCEAN}
+
+
+\begin{trans}{OCEAN (PerfectClub)}
+  \begin{itemizer}
+  \item Simulation de fluide 2D avec équations de \textsc{Boussinesq}
+  \item Beaucoup d'options (avec ou sans la température,...)
+  \item Initialisations dans la sous-routine \texttt{START}
+  \end{itemizer}
+  \belleboite{\vavers nécessite une information \emph{interprocédurale}
+    pour simplifier le code}
+\end{trans}
+
+
+\slidepart{Élimination de code mort}
+
+
+\begin{trans}{Préconditions interprocédurales}
+  Predicats sur variables entières scalaires\\
+  \psfiglarge{images/epips_ocean_prec.eps}
+\end{trans}
+
+
+\begin{trans}{Transformation élimination de code mort}
+  Utilise préconditions calculées pour enlever les instructions jamais
+  exécutées
+  \begin{itemizet}
+  \item Instructions avec préconditions fausses
+  \item Branches de test toujours vraies ou toujours fausses\\
+    \emph{Calcule la condition de toute manière si \emph{effet de bord} !}
+  \item Boucle exécutée 0 fois
+  \item Boucle exécutée 1 fois
+  \end{itemizet}
+  \belleboite{\begin{tabular}{c}\vavers Élimination itérative use-def, restructuration\\
+      graphe du flot de contrôle et évaluation partielle\end{tabular}}
+\end{trans}
+
+
+\slidepart{PIPSmake}
+
+\newcommand{\BResource}[1]{\psframebox*[fillcolor=indianred]{\blue #1}}
+\newcommand{\BPhase}[1]{\psframebox*[fillcolor=blue]{\white #1}}
+\newcommand{\BOwner}[1]{\psframebox*[fillcolor=lightseagreen]{\white #1}}
+\begin{trans}{PIPSmake --- gestion automatique de la consistance}
+  Pour appliquer une transformation ou avoir une analyse :
+  \belleboite{?` Quelles analyses sont nécessaires pour quel module ?}
+  \belleboite{!` Il suffit de demander !}
+  \begin{center}
+  Calcul à la demande de style \texttt{\large make}\\
+  \end{center}
+  \begin{alltt}
+    \BPhase{suppress_dead_code}   > \BOwner{MODULE}.\BResource{code}
+        < \BOwner{MODULE}.\BResource{code}
+        < \BOwner{MODULE}.\BResource{proper_effects}
+        < \BOwner{MODULE}.\BResource{preconditions}
+      \end{alltt}
+      
+      \centerline{\vavers étendu pour traiter les problèmes interprocéduraux}
+\end{trans}
+
+\begin{trans}{Exemple interprocédural}
+  \begin{tabular}[c]{c}
+    \parbox{0.3\hsize}{Interprocéduralité avec \BOwner{CALLERS} et
+      \BOwner{CALLEES}}%
+  \end{tabular}
+  \begin{tabular}[c]{c}
+    \psfig{file=dessins/code_interprocedural.idraw,width=0.6\hsize}%
+  \end{tabular}
+  \begin{alltt}
+    \BPhase{preconditions_inter}   > \BOwner{MODULE}.\BResource{preconditions}
+        < \BOwner{MODULE}.\BResource{code}
+        < \BOwner{MODULE}.\BResource{transformers}
+        < \BOwner{CALLERS}.\BResource{preconditions}
+  \end{alltt}  
+\end{trans}
+
+
+\slidepart{PIPSdbm}
+
+\begin{trans}{PIPSdbm --- gestionnaire de base de données}
+  Gère ressources PIPS... Tout est ressource
+  \begin{itemizer}
+  \item Charge automatiquement en mémoire les ressources fichiers si
+    nécessaire
+  \item Indépendent de l'architecture et du placement mémoire
+  \item Lit \& écrit des objets NewGen
+  \item Objets non-NewGen avec des méthodes utilisateur
+  \item Interface de base de toutes les phases PIPS
+    \begin{itemizet}
+    \item Persistance \vavers experiences multi-run
+    \item Points de préemption aux limites de phase
+    \item Phases externes possibles
+    \end{itemizet}
+  \end{itemizer}
+\end{trans}
+
+
+\slidepart{NewGen}
+
+\newcommand{\Ul}{\texttt{\_}}
+\newcommand{\Ob}{\texttt{\{}}
+\newcommand{\Cb}{\texttt{\}}}
+\newcommand{\Cm}[1]{{\red/* #1 */}}
+\newcommand{\Ng}[1]{{\orange{#1}}}
+\newcommand{\Ln}[1]{{\mediumorchid{#1}}}
+
+
+\newcommand{\Dlinear}[1]{{\mediumorchid #1}}
+\newcommand{\Dnewgen}[1]{{\mediumorchid #1}}
+\newcommand{\Gnewgen}[1]{{\orange #1}}
+\begin{trans}{Newgen --- gestionnaire de structures de données}
+  Éviter gestion explicite de structures de données complexes :
+\input{codes/gen_recurse_fc}
+
+  \newslide
+
+  \centerline{\textbf{Outil \Ng{NewGen}}}
+  Génération automatique depuis fichiers \LaTeX{}
+
+  Representation interne hiérarchique de PIPS:
+\begin{alltt}
+\BResource{statement} = label:entity x number:int x ordering:int
+          x comments:string x instruction ;
+\BResource{instruction} = sequence + test + loop + goto:statement
+          + call + unstructured ;
+\BResource{sequence} = statements:statement* ;
+\end{alltt}
+\end{trans}
+
+
+\begin{trans}{Newgen --- gestionnaire de structures de données}
+\input{codes/dead_statement_filter_fc}
+
+  \newslide
+
+  \begin{itemizer}
+  \item Construction de types complexes à partir de listes, tables
+    associatives, unions, produits, ensembles,... à la IDL
+  \item Accesseurs, constructeurs, destructeurs, lecteurs, écrivains...
+  \item Vérificateur de consistance
+  \item Iterateurs génériques optimisés
+  \item méthodes multi-language (C \& Common-Lisp pour l'instant)
+  \item Support pour la persistance (PIPSdbm)
+  \item Construction de passes indépendentes possible (sans PIPSmake) :
+    EOLE
+  \end{itemizer}
+\end{trans}
+
+
+\slidepart{Algèbre linéaire}
+
+
+\begin{trans}{Bibliothèque d'algèbre linéaire $C^3$}
+  PIPS est basé sur l'algèbre linéaire :
+  \begin{itemize}
+  \item Vecteurs, matrices (e.g. forme normale de Hermite)
+  \item Constraintes linéaires, systèmes (e.g. faisabilité via
+    Fourier-Motzkin)
+  \item Systèmes générateurs, enveloppe convexe (Chernikova)
+  \item simplex, PIP
+  \end{itemize}
+  
+  \input{codes/feasible_fc}
+\end{trans}
+  
+
+\slidepart{Programmation littérale}
+
+
+\begin{trans}{Programmation littérale}
+  La consistance des sources de PIPS est conservée automatiquement :
+
+  \psfig{file=dessins/documentation_configuration.idraw,width=\textwidth}
+
+  Chaque fichier est sous SCCS/RCS :\\
+  versions de développement, production et distribution
+\end{trans}
+
+
+\begin{trans}{pipsmake-rc.tex}
+  \scriptsize
+  \begin{alltt}
+    {\firebrick\verb|\|subsubsection\{Dead Code Elimination\}}
+    %%@UserManualDocumentation: \BPhase{suppress_dead_code}
+    Function \verb|\|verb+suppress_dead_code+ is used to delete non-executed code,
+    ...
+    %%ÿUserManualDocumentation
+{\yellow\verb|\|begin\{verbatim\}}
+alias suppress_dead_code 'Dead Code Elimination'
+\BPhase{suppress_dead_code}          > \BOwner{MODULE}.\BResource{code}
+        < \BOwner{PROGRAM}.\BResource{entities}
+        < \BOwner{MODULE}.\BResource{code}
+        < \BOwner{MODULE}.\BResource{proper_effects}
+        < \BOwner{MODULE}.\BResource{cumulated_effects}
+        < \BOwner{MODULE}.\BResource{preconditions}
+{\yellow\verb|\|end\{verbatim\}}
+{\hotpink\verb|\|begin\{PipsMenu\}\{Transformations\}}
+...
+  \BPhase{suppress_dead_code}
+...
+{\hotpink\verb|\|end\{PipsMenu\}}
+  \end{alltt}
+\end{trans}
+
+
+\begin{trans}{Interfaces utilisateur}
+  Pas moins de 5 interfaces suite à la longue vie de PIPS...
+  \begin{description}
+  \item[{{\yellow Shell :}}] tests rapides, debug et tests de
+    non-régression
+  \item[{{\yellow TTY :}}] expérimentations, debug et tests de
+    non-régression
+  \item[{{\yellow X11/XView :}}] Interface avec menus
+  \item[{{\yellow Java Swing :}}] Interface avec menus à la mode et
+    portable
+  \item[{{\yellow GNU-Emacs:}}] La totale avec hypertexte, graphes avec
+    \emph{daVinci},...
+  \end{description}
+  \verb|logfile_to_tpips| pour tests de non-régression
+\end{trans}
+
+
+\slidepart{Conclusion environnement}
+
+\begin{trans}{EPips Show}
+  \centerline{\psfig{file=images/epips_snapshot.eps,height=\textheight}}
+\end{trans}
+
+
+\begin{trans}{PIPS --- Internal overview}
+  \psfig{file=dessins/internal_overview.idraw,width=\textwidth}
+\end{trans}
+
+
+\DeclareFontFamily{OT1}{callig}{}
+\DeclareFontShape{OT1}{callig}{m}{n}{<-> callig15}{}
+
+\begin{trans}{Le recette finale}
+  La petite \emph{cuisine} :
+  \belleboite{\Large\fontfamily{callig}\selectfont Cassolette de PIPS
+    aux phases\ }
+  \begin{itemizer}
+  \item Créer des objets NewGen si nécessaire
+  \item Écrire votre code (!) pour traiter un module
+  \item Compiler et tester avec "pips-makemake"
+  \item Déclarer la nouvelle phase dans "pipsmake-rc.tex"
+  \end{itemizer}
+  \centerline{\begin{tabular}[c]{c}
+    \parbox{0.6\hsize}{\vavers Nouvelle analyse/transformation\\
+      interprocédurale avec interface\\
+      graphique}%
+  \end{tabular}
+  \begin{tabular}[c]{c}
+    \psfig{file=images/bipolar_process_reduit.eps,width=0.25\hsize}
+  \end{tabular}}
+\end{trans}
+
+
+\begin{trans}{Travaux approchants}
+  Autres établis de compilation :
+  \begin{itemizer}
+  \item SUIF (Monica Lam, Stanford)
+    \begin{itemizet}
+    \item Plutôt orienté C, génération de code de + bas niveau
+    \item Pas d'interprocéduralité dans la version distribuée
+    \item Ne gère par l'"EQUIVALENCE" Fortran
+    \item Pas d'équivalent de PIPSmake pour garantir automatiquement la
+      cohérence et gérer l'interprocéduralité
+    \item Pas de gestionnaire d'objets à la NewGen \vavers écrire ses
+      propres classes C++
+    \end{itemizet}
+  %% \item VFCS
+    
+\newslide
+
+  \item PARAFRASE~2 (Constantin Polychronopoulos, UIUC)
+    \begin{itemizet}
+    \item Pas d'équivalent de PIPSmake (- interprocéduralité)
+    \item Pas de NewGen (C++ brut de fonderie)
+    \end{itemizet}
+  \item POLARIS (David Padua, UIUC)
+    \begin{itemizet}
+    \item + vérificateur de sémantique Fortran
+    \item Pas d'équivalent de PIPSmake (- interprocéduralité)
+    \item Pas de NewGen (C++)
+    \end{itemizet}
+  \end{itemizer}
+\end{trans}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "trans"
+%%% End: 

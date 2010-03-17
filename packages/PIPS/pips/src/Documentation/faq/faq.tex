@@ -1,0 +1,388 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%% PIPS faq
+
+%% titlepage,
+\documentclass[a4paper]{article}
+
+\usepackage{psfig,amstext,alltt,html}
+
+\title{\bf {\Huge PIPS} \\ Frequently Asked Questions}
+
+\author{
+\begin{tabular}{rl}
+  François & IRIGOIN
+\end{tabular}
+}
+
+\date{September 1997}
+
+\renewcommand{\indexname}{Index}
+\makeindex
+
+\newcommand{\PIPSMAKERC}{\htmladdnormallink{\texttt{pipsmake-rc}}{http://www.cri.ensmp.fr/pips/pipsmake-rc}}
+
+\newcommand{\PIPS}{\htmladdnormallink{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
+\newcommand{\WPIPS}{\htmladdnormallink{{\em WPIPS}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\TPIPS}{\htmladdnormallink{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
+\newcommand{\PROPERTIES}{\htmladdnormallink{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+
+\begin{document}
+\maketitle
+
+\begin{latexonly}
+  \clearpage
+  \tableofcontents  
+\end{latexonly}
+
+\newpage
+\section*{Welcome}
+
+Welcome to the not so frequently asked questions about PIPS. Not so
+frequently, because the PIPS user population, however growing, still is
+small. Please send more questions to \verb/pips-support@cri.ensmp.fr/.
+
+\section{Some of my source code is missing. What can I do?}
+\index{Source File}
+
+PIPS is designed as a whole application compiler and it complains about
+missing source code for leaf modules in the call graph. In fact PIPS may
+even generate a user error and stop if the missing piece of code is needed
+to answer the user request. For instance, PIPS cannot compute the side
+effects of procedure \verb/P/ without analyzing the code procedure
+\verb/Q/ called by \verb/P/.
+
+However, it is possible to write a minimal version of the missing routine,
+called a {\em stub}, with the proper effects on the arguments and possibly
+on global variables in COMMON.
+
+If memory effects are not required, PIPS can generate stubs for the
+missing routines if this option is requested with property
+\verb+PREPROCESSOR_MISSING_FILE_HANDLING+ set to \verb+"generate"+.
+
+This also is useful if some modules are not written in Fortran but in C or
+in another language than is not parsed by PIPS.
+
+\section{Why is PIPS parser so limited?}
+\index{Parser}
+\index{Input Language}
+\index{Fortran PIPS}
+
+Parsing is divided in multiple stages and extensive preprocessing is
+available to convert Fortran features which are not directly supported by
+PIPS into equivalent forms. For instance, ALTERNATE RETURN, ENTRY and
+ASSIGNED GO TO statements can be converted into equivalent constructs.
+Explicit return code variables and tests of these variables are added to
+mimic the alternate return mechanism. Each entry is converted into a first
+class SUBROUTINE or FUNCTION and a common is added to store static
+variables. ASSIGN statements are converted into standard assignments to an
+integer variable whose value can be tested to control a branch.
+
+Statement functions can also be substituted.
+
+These program transformations modify the user code and most of them are
+not applied by default. The corresponding properties must be set (see \PROPERTIES{}):
+
+\begin{itemize}
+
+\item \verb+PARSER_SUBSTITUTE_ALTERNATE_RETURNS+
+
+\item \verb+PARSER_SUBSTITUTE_ENTRIES+
+
+\item \verb+PARSER_SUBSTITUTE_ASSIGNED_GOTO+
+
+\item \verb+PARSER_EXPAND_STATEMENT_FUNCTIONS+
+
+\end{itemize}
+
+Formal functional are still unsupported ($Date: 1999/01/12 21:14:43 $) and
+the internal representation of DATA statements is unsatisfactory.
+
+Recursivity, which is not in Fortran 77 standard, is not supported.
+
+\section{My include files are in a different directory}
+\index{Include}
+
+Use the Shell environment variable \verb/PIPS_CPPFLAGS/ and the usual
+\verb/-I/ option to specify directories to lookup for include files.
+For instance, assuming that csh is used:
+
+\begin{quote}
+\verb|setenv PIPS_CPP_FLAGS "-I ../includes -I ../../generic/includes"|
+\end{quote}
+
+The current directory is searched first. For more information, see the
+preprocessing sections in \PIPSMAKERC{}.
+
+\section{How can I execute the transformed code?}
+
+The transformed code is stored in the current workspace by an explicit
+close or by exiting \PIPS{}. The best way to do it is to open the
+workspace with \TPIPS{} and to type:
+
+\begin{quote}
+{\tt make UNSPLIT}
+\end{quote}
+
+See \PIPSMAKERC for more information about the {\tt UNSPLIT}
+pseudo-resource.
+
+Otherwise, the various files can be retrieved, on a one-by-one basis, from
+the workspace and renamed with a {\tt .f} suffix required by {\tt f77}.
+
+\section{How can I replay a session?}
+\index{logfile\_to\_tpips}
+
+Each PIPS workspace contains a log. This log can be processed using the
+{\tt logfile\_to\_tpips} Shell script. The output is a {\tt tpips} script
+which can be replayed with the {\tt tpips} interface.
+
+Some commands, such as {\tt cd}, {\tt open}, {\tt close}, {\tt delete},
+may destroy the log file or change the current workspace. It is not
+possible to recreate a global log from different workspaces.
+
+\section{What should I read to use \PIPS{}?}
+
+You might decide to get started using the \WPIPS{} X-Window interface and a
+small Fortran program. On-line help is available.
+
+\section{How can I process several Fortran files?}
+
+The answer depends on the PIPS interface used. With the basic Shell
+interface, the argument of the {\tt -f} option can be quoted to use Shell
+filename expansion. For instance, the command
+
+\begin{quote}
+{\tt Init -d -f "*.f Src/*.f" foo}
+\end{quote}
+
+deletes a possibly existing {\tt foo} workspace and creates a new one with
+all Fortran files in the current directory and in the {\tt Src}
+subdirectory.
+
+The window interface, {\tt wpips}, let you select a number of Fortran
+files when you create a workspace but these files must all belong to the
+current directory.
+
+The script interface, {\tt tpips}, let you select any number of Fortran
+files using the standard Shell syntax. For instance, the above {\tt Init}
+command would be:
+
+\begin{quote}
+{\tt delete foo}\\
+{\tt create foo *.f}
+\end{quote}
+
+The standard convention is used for include files.
+
+\section{How can I get the dependence graphs of several modules in one command?}
+\index{Dependence Graph}
+\index{DG}
+
+The script interface, {\tt tpips}, let you require several data structures
+in one command. For instance, you can compute the dependence graphs for
+all modules in the current workspace with:
+
+\begin{quote}
+{\tt display DG\_FILE[\%ALL]}
+\end{quote}
+
+It also is possible to specify a list of relevant modules:
+
+\begin{quote}
+{\tt display DG\_FILE[A B C]}
+\end{quote}
+
+It is not possible to submit such requests with the other PIPS user interfaces.
+
+\section{PIPS tells me to set a property? What is it? How can I do it}
+\index{Property}
+
+Properties are used to encapsulate global variables and to fine tune the
+behavior of PIPS. This fine tuning was not intended for PIPS users but for
+PIPS developpers. However the property mechanism has been used to extend
+PIPS parser and users should be able to define {\em some} properties (see
+the
+\htmladdnormallink{\emph{property}}{http://www.cri.ensmp.fr/pips/properties-rc}
+documentation).
+
+Default values for properties are defined in file
+\verb+$PIPS_ROOT/Share/properties.rc+. 
+% $
+when \PIPS{} is installed. However,
+they can be modified in every directory by creating a local file called {\tt
+  properties.rc}. Properties can also be modified dynamically with the
+most recent \PIPS user interfaces, \TPIPS{} and jpips.
+
+\TPIPS users can also modify the properties in their home directory using
+a file called \verb+.tpipsrc+.
+
+\section{PIPS has just core dumped...}
+\index{core dump}
+
+It is hard to believe but not impossible. The most effective way to
+receive support is to {\tt tar} the current workspace and to mail it to
+{\tt pips-support@cri.ensmp.fr} after compression (e.g. gzip) and encoding
+(e.g. uudencode).
+
+\section{How can I optimize my code?}
+\index{Program transformation}
+\index{Code transformation}
+\index{Code optimization}
+
+\PIPS{} does not support {\em automatic} code optimization for any target. PIPS
+can apply automatically some loop transformations but none of these
+transformations is uniformly good for all pieces of code and for all
+target machines. So it is better to let the user decide what is good and
+to perform the transformation for him. This process is tedious but it can
+be replayed automatically with \TPIPS{}.
+
+For the time being, the legality of a transformation requested by the
+user is not checked with respect to dependencies.
+
+The loop transformations include loop interchange, loop unrolling, full
+unrolling, hyperplane method, tiling,... See \PIPSMAKERC{} for the
+exhaustive code transformation list.
+
+Some transformations are applied in a systematic way: the different
+parallelization phases, loop distribution (although it is not an
+optimizing transformation), statement atomization (because it is a
+pre-pass to some parallelization phase), forward subsitution (same reason)
+and scalar and array privatizations because they cannot degrade
+performance. Dead-code elimination and constant propagation also are
+performed systematically.
+
+The complexity analysis, which is automatic like all analyses because they
+cannot degrade performance, provides some static symbolic information
+about the impact of a given code transformation on the number of executed
+operations.
+
+\section{This loop should be parallelized!}
+\index{Parallelization}
+
+Many conditions must be met for a loop to be declared parallel and PIPS,
+as a research tool, offers (too) many options. By default, the simplest
+algorithms are used but this may be changed by customizing
+\verb/pipsmake.rc/ and \verb/properties.rc/.
+
+Is your loop pretty simple and legal for Allen\&Kennedy parallelization
+algorithm? This means no test, no branch within its body, and no label on
+the DO statement because the parallel code generation ignores control
+dependences and regenerates the loops around each strongly-connected
+component (SCC) of the dependence graph.
+
+If your loop body is not a simple sequence of assignments, you should
+select another parallelization algorithm such as
+\verb/coarse_grain_parallelization/ (explore the option menus of \verb/jpips/ and
+wpips or use the \verb/activate/ command with \verb/tpips/).
+
+Some trivial dependences may require a preliminary privatization. For
+temporary scalars, apply the code transformation
+\verb/privatize_module/. If temporary arrays are used, an array
+privatization is necessary. The privatization information is based on IN
+and OUT regions which are computed using MUST READ and MUST WRITE
+regions... PIPS does not offer compound commands and, regardless of the
+PIPS user interface you are used to, several commands are necessary to
+perform a scalar or array privatization followed by a parallelization.
+
+Finally, dependence tests use more or less information. If contextual
+information is necessary to find out that a loop is parallel, a dependence
+test using preconditions (\verb/rice_semantics_dependence_graph/) or
+regions (\verb/rice_regions_dependence_graph/) should be selected.
+Furthermore, regions depend on transformers which, like preconditions, may
+be computed in different ways. The most accurate information is gathered
+with the two selections \verb/transformers_inter_full/ and
+\verb/preconditions_inter_full/. Induction variables are found and can be
+visualized in preconditions and used in dependence tests. But they are not
+substituted and may carry the last dependence arc which prevents a loop
+parallelization.
+
+\section{This loop should not be parallelized!}
+\index{Parallelization}
+
+A sequential loop may be parallelized by PIPS if it is never executed
+because it is part of some dead code. The information is carried by the
+preconditions or by the loop bounds and used in the dependence systems. As
+a result, no dependence is found because there are no iterations and the
+loop is declared parallel.
+
+A loop with only one iteration also is always parallel, regardless of the
+references in its body.
+
+This is surprising for the user and we might change PIPS behavior so as
+not to parallelize useless loops. But this would require an extra
+feasibility test which will slow down PIPS and this would keep sequential
+trivially parallel loops which is another source of surprise!
+
+\section{How can I clean up my code?}
+\index{Declaration}
+\index{Use-def elimination}
+\index{Dead code elimination}
+\index{Constant propagation}
+\index{Partial evaluation}
+
+After several transformations, a piece of code may contain useless
+declarations and statements. PIPS does not offer a magic clean-up function
+because the process is iterative and lengthy. Four code transformations
+are available for cleanup:
+
+\begin{itemize}
+
+\item \verb/clean_declarations/: get rid of unreferenced variables
+
+\item \verb/use_def_elimination/: get rid of useless definitions
+
+\item \verb/suppress_dead_code/: dead code elimination
+
+\item \verb/partial_eval/: constant propagation
+
+\end{itemize}
+
+There is no best order of application but \verb/clean_declarations/ should
+be performed last. If many modules must be processed, it is necessary to
+perform a concurrent apply to avoid an unbearable number of recomputations
+(\verb/capply/ command for \TPIPS{}). Each time a module code is touched,
+effects, transformers and preconditions should be recomputed across the
+whole application to maintain a full consistency. Since these
+transformations do not modify the semantics of the modules, a relaxed
+consistency can be used and a concurrent application of the
+transformations is legal.
+
+Note that constant propagation can improve the preconditions by making
+some non-linear expressions linear. The best result is obtained with a fix
+point of these transformations. If a polynomial of degree $k$ can be
+replaced by an affine expression, no more than $k-1$ rounds of
+transformations are necessary.
+
+\newpage
+
+
+{\small
+\bibliographystyle{plain}
+\bibliography{faq}
+}
+
+\input{faq.ind}
+
+\end{document}
+\end

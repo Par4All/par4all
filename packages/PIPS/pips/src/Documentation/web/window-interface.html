@@ -1,0 +1,78 @@
+<html>
+
+<head> <title>PIPS: Window Interface</title> </head>
+
+<body>
+
+<center>
+
+<IMG SRC=images/logo-pips.half-size.gif> <H1>PIPS</H1>
+
+<h2>X-Window Interface</h2>
+
+</center>
+
+<hr>
+
+<h2> Content </h2>
+
+<ul>
+  <li> <a href="index.html#introduction">Introduction</a>
+  <li> <a href="index.html#tech">Technical Pages</a>
+</ul>
+
+<hr>
+
+<a name="introduction"><h2>Introduction</h2></a>
+
+<b>PIPS</b> functionalities are available thru a set of buttons and
+menus. The interface is self-explanatory and on-line help is available.
+
+<p>
+
+Interprocedural and intermediate results are stored in a workspace which
+must be created or re-open via the Select button. The same button is
+then used to choose a current module. Different views of this module,
+corresponding to different analyses, can be displayed with the View
+button. The module code can be transformed using the transform menu.
+
+<p>
+
+If default options are not satisfactory, new ones can be chosen with the
+Options menu. These options are badly documented on-line. See the pipsmake
+documentation.
+
+<p>
+
+It is useful to open the Log window to follow PIPS computation (see the
+Log button), especially when interprocedural options have been chosen.
+
+<p>
+
+On quitting, the workspace can be saved on disk in a consistent way for
+future use, or destroyed (Ronan: not true!) to terminate the wpips
+process faster.
+
+<p>
+
+Note: a <a href="line-interface.html">line interface</a> and a <a
+href="batch-interface.html">Shell interface</a> are also available. The
+Shell interface is the less user-friendly interface but it also is the
+safest one because memory corruptions cannot be propagated from on query
+to the next one, since each of them is an independent Shell process. The
+line interface is a nice trade-off between the security of the Shell
+interface and the user-friendliness of the window interface.
+
+<hr>
+
+<a name="tech"><h2>Technical Pages</h2></a>
+
+<ul>
+  <li> <a href="wpips.html">wpips</a>
+  <li> <a href="wpips-epips-user-manual/wpips-epips-user-manual.html">wpips an epips user manual</a>
+</ul>
+
+<hr>
+
+</body>
+</html>

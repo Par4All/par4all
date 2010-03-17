@@ -1,0 +1,144 @@
+#!/bin/sh
+# Copyright 2007, 2008 Alain Muller, Frederique Silber-Chaussumier
+#
+#This file is part of STEP.
+#
+#The program is distributed under the terms of the GNU General Public
+#License.
+
+
+#
+#	Script permettant de transformer des directives en appel de
+#	fonction parsable par pips.
+#
+#
+#	- Une unique sentinelle est autorisee (remplacee par un texte
+#	  fixe qui lui est propre) :
+#
+#		s,^[Cc!\*]$SENTINELLE\(.\)[ 	]*,\1$SENTIOUT,;
+#
+#	- La sentinelle doit faire 5 caracteres
+#
+#
+#	- Une directive peut se repartir sur plusieurs lignes
+#	  consecutives si :
+#
+#		- Toutes ses lignes sont gardees par une sentinelle
+#
+#		- Une ligne complementaire a un caractere different
+#		 de l'espace en 6ieme colonne
+#
+#		  ou
+#
+#		  La ligne precedant une ligne complementaire se
+#		  finit par un espace et un & (qui seront supprimes
+#		  ainsi que les blancs precedant le saut de ligne)
+#
+#			nb : Dans tous les autres cas les caracteres
+#			situes apres la 6ieme colonne et le saut de
+#			ligne sont conserves.  
+#
+#
+#
+#	- Aucun commentaire n'est accepte sur une ligne (ou entre les
+#	  lignes) d'une directive (multiligne)
+#
+#       - Les sentinelles de compilation [Cc!\*]\$ et [ ]*!\$ sont
+#         remplacees par deux espaces
+#
+#
+#
+#	- Les commentaires ! ne sont pas acceptes sur les lignes
+#	  gardees par une sentinelle de compilation
+#       - pips ne garde pas les blancs apres la colonne 6 pour les
+#         lignes gardeees par une sentinelle de compilation
+#	- pips n'accepte pas le & multi-ligne
+#
+
+
+SED=sed
+TR=tr
+
+SENTINELLE=^[Cc!\*]\$[oO][mM][pP]
+SENTIOUT=PARA
+
+#
+# normalisation d'une directive pour etre lue par Pips
+#
+$SED "#
+      # substitution de la sentinelle par le caractere 
+      # on garde le caracter de 6ieme colone pour pouvoir
+      # reconstruire la directive en cas de lignes multiples
+      #
+      s,$SENTINELLE\(.\),\1$SENTIOUT,;
+#      s,^[Cc!\*]\$[Pp][Dd][Oo]\(.\)[ 	]*,\1PARA,;
+      # on supprime les eventuels commentaire en fin de ligne "!" dans les lignes de directives
+#      /.*/s,^\([^'\"]*\)!.*,\1,;
+#      /.*/s,^\([^'\"]*'[^'\"]*'[^'\"]*\)!.*,\1,;
+#      /.*/s,^\([^'\"]*\"[^'\"]*\"[^'\"]*\)!.*,\1,;
+
+	# Passage en minscule des lignes de directives pour facilité par la suite leur reconnaissances
+	: while
+	      /.*/s,^\([^'\"]*\)A,\1a,g;
+	      /.*/s,^\([^'\"]*\)B,\1b,g;
+	      /.*/s,^\([^'\"]*\)C,\1c,g;
+	      /.*/s,^\([^'\"]*\)D,\1d,g;
+	      /.*/s,^\([^'\"]*\)E,\1e,g;
+	      /.*/s,^\([^'\"]*\)F,\1f,g;
+	      /.*/s,^\([^'\"]*\)G,\1g,g;
+	      /.*/s,^\([^'\"]*\)H,\1h,g;
+	      /.*/s,^\([^'\"]*\)I,\1i,g;
+	      /.*/s,^\([^'\"]*\)J,\1j,g;
+	      /.*/s,^\([^'\"]*\)K,\1k,g;
+	      /.*/s,^\([^'\"]*\)L,\1l,g;
+	      /.*/s,^\([^'\"]*\)M,\1m,g;
+	      /.*/s,^\([^'\"]*\)N,\1n,g;
+	      /.*/s,^\([^'\"]*\)O,\1o,g;
+	      /.*/s,^\([^'\"]*\)P,\1p,g;
+	      /.*/s,^\([^'\"]*\)Q,\1q,g;
+	      /.*/s,^\([^'\"]*\)R,\1r,g;
+	      /.*/s,^\([^'\"]*\)S,\1s,g;
+	      /.*/s,^\([^'\"]*\)T,\1t,g;
+	      /.*/s,^\([^'\"]*\)U,\1u,g;
+	      /.*/s,^\([^'\"]*\)V,\1v,g;
+	      /.*/s,^\([^'\"]*\)W,\1w,g;
+	      /.*/s,^\([^'\"]*\)X,\1x,g;
+	      /.*/s,^\([^'\"]*\)Y,\1y,g;
+	      /.*/s,^\([^'\"]*\)Z,\1z,g;
+      t while" $1 |
+
+
+# Mise du texte sur une ligne pour gerer les directives sur plusieurs lignes
+$TR '\012' '' | 
+
+# Substitution d'une concatenation "&" de directive par une concatenation
+# 6ieme colonne si la ligne suivante a une sentinelle
+$SED 's,\(.[^]*[^]*\)[ 	]&[ 	]*.\([^]*\),\1x\2,g' |
+
+# Concatenation 6ieme colonne avec son debut
+$SED ': while s,\( [^]*[^]*\)[^ ][^]*,\1,g;t while' |
+
+# Toutes les substitutions 6ieme colonnes sont faites celles qui restent sont 
+# des erreurs de syntaxe (comme & finissant des directives)
+$SED 's,[^ ]\([^]*\)[^]*,erreur de syntaxe \1,g' | 
+$SED 's,.\([^]*\)[^]*[ 	]&[ 	]*,erreur de syntaxe \1,g' |
+
+# Suppression des sentinelles de compilation conditionnelle : [Cc*!]$
+$SED 's,[Cc!\*]\$,  ,g' |
+$SED 's,\([ 	]*\)!\$,\1  ,g' |
+
+# Retour a un texte sur plusieurs lignes (mais chaque directive est sur une ligne)
+$TR '' '\012' |
+
+# Remplacement des directives par un appel de fonctions :
+#   premier argument : $SENTIOUT
+#   seconde argument : la directive (donc on a retire les blancs situés au debut)
+#$SED "s, \([^]*\)[ 	]*\([^]*\),      call STEP_directives_('\1'\,'\2'),g" |
+$SED "s, \([^]*\)[ 	]*\([^]*\),      call STEP_directives_('\2'),g" |
+
+# Decoupage des appels trop long pour les contenir sur 72 colonnes
+#$SED "/^[^Cc\*!].... call STEP_directives_('.\{40,\}$/s/\([^]\{65\}\)/\1     x/g" |
+$SED "/^[^Cc\*!].... call STEP_directives_('.\{43,\}$/s/\(.\{72\}\)\([^]*\)/\1\n\2/" |
+$SED "/$/s,\([^]\{66\}\),     >\1\n,g" |
+$SED "/$/s,\([^]*\),     x\1,g" |
+$TR '' '\012'

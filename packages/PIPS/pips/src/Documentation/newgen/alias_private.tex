@@ -1,0 +1,73 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass{article}
+
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Alias Analysis}
+\author{Nga Nguyen}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import expression from "ri.newgen"}
+{}
+
+% These newgen data structure are used to propagate interprocedural alias
+% information. When a formal parameter is associated with a actual
+% variable by a certain call path, we assign the section and the offset of
+% the actual variable to the formal one. 
+
+% Lower and upper offsets are kept to give more information to the alias
+% check phase, but when the exact offset can be translated to the callee's
+% frame, we only keep this exact one. 
+
+% 13/06/2001 NN : as we can not use preconditions (because we may have an
+% alias violation in the code, so computed precondition are not true), we
+% need only offset, not lower or upper offset.
+
+% Call-site ordering is used to localize the call in the caller function. 
+
+% 13/11/2001 NN: offset is not enough to remove some useless checks
+% (because the section is not unique, useless tests on varibales in the
+% same common block although there is no intersection of storage sequence,
+% or in the same SUB*DYNAMIC* section, for example). So lower and upper
+% bounds of the offset are added in order to simplify some false
+% tests. These bounds are integers, for scalar variable: lower = upper =
+% offset, for array variable: lower = &A <= offset <= upper = &A +
+% size_of_array(A) 
+ 
+\domain{call\_site = function:entity x ordering:int}
+{}
+\domain{alias\_association = variable:entity x section:entity x offset:expression x lower\_offset:int x upper\_offset:int x call\_chain:call\_site*}
+{}
+\domain{alias\_associations = list:alias\_association*}
+{}
+\domain{dynamic\_check = first:entity x second:entity x checked:bool}
+{}
+
+\end{document}

@@ -1,0 +1,341 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+!
+!     Reductions management 
+!
+!     it is supposed that the reduction is computed on a full
+!     array, which is nor replicated anyway. If used on a part,
+!     should work, but I am not so sure.
+!
+!----------
+!
+! macros to generate the code
+!
+define(`REDUCTION_NODE_DECL',`
+      integer ifelse(REDTYPE, logical, t$1`,') i$1, l$1, u$1, s$1, d$1')dnl
+define(`COMPUTE_LOCALIND',`
+      t$1 = HPFC LOCALIND(an, $1, lo$1)')dnl
+define(`LIST_DECL_BOUNDS',`
+     & dl$1, du$1')dnl
+define(`LIST_RED_BOUNDS',`
+     & lo$1, up$1')dnl
+define(`ARRAY_DECL',`dl$1:du$1')dnl
+define(`LOWER_REF',`lo$1')dnl
+define(`TEMPO_REF',`t$1')dnl
+define(`INDEX_REF',`i$1')dnl
+define(`ZERO_REF',`0')dnl
+define(`LOOP_BOUNDS_COMPUTATION',`
+      d$1 = HPFC PROCESSOR DIM(an, $1)
+      CALL HPFC LOOP BOUNDS(l$1, u$1, s$1, lo$1, up$1, an, d$1)')dnl
+define(`DO_LOOP',`
+      do i$1 = l$1, u$1')dnl
+define(`ENDDO_LOOP',`
+      enddo')dnl
+define(`DISJUNCTION',
+`ifelse(REDTYPE, logical, $1,
+        REDTYPE, cumulate, $2,
+        `errprint(m4: unexpected reduction type)')')dnl
+!
+! Generic reduction
+!
+! REDTYPE may be logical or cumulate
+! NAME may be MIN, MAX, SUM, MULT
+! LEVEL may be 1 to 7
+!
+define(`GENERIC_REDUCTION',`dnl
+pushdef(`REDTYPE',$1)dnl
+pushdef(`LEVEL',$2)dnl
+pushdef(`PVMTYPE',$3)dnl
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
+pushdef(`NAME',$4)dnl
+pushdef(`OPERATOR',$5)dnl
+!
+!    REDTYPE REDUCTION NAME FOR TYPE, LEVEL DIMENSIONS
+!
+!     
+! NODE PART
+!
+      TYPE function build_name(nred,LEVEL,PVMTYPE,NAME)(a, an, dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
+     & )
+_CM5(`      include "cmmd_fort.h"')
+      include "hpfc_commons.h"
+      include "hpfc_rtsupport.h"
+      integer dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
+      TYPE 
+     $ a(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
+      integer 
+     &    an, dnl
+COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
+      TYPE result
+SIMPLE_REPLICATE(LEVEL, `REDUCTION_NODE_DECL')
+
+      debug(print *, MYLID, "[build_name(nred,LEVEL,PVMTYPE,NAME)] in")
+
+!
+! initiate with a valid value
+!
+
+DISJUNCTION(``
+      'CALL HPFC CMPOWNERS(an, 
+     $  COMMA_REPLICATE(LEVEL, `LOWER_REF'),
+     $  COMMA_REPLICATE(TO7(LEVEL), `ZERO_REF'))
+      if (HPFC SENDERP()) then
+SIMPLE_REPLICATE(LEVEL, `COMPUTE_LOCALIND')
+         result = a(COMMA_REPLICATE(LEVEL, `TEMPO_REF'))
+         call COM_PREFIX NSNDTO A(PVMTYPE, result)
+      else
+         call COM_PREFIX RCVFR NBCAST S(PVMTYPE, result)
+      endif',``
+      'result = ifelse(NAME, `SUM', 0, NAME, `MULT', 1, dnl
+                      FATAL_ERROR(`unexpected name'))')
+
+      debug(print *, MYLID, "NRED initate done ")
+
+
+!
+! compute the loop bounds
+!
+SIMPLE_REPLICATE(LEVEL, `LOOP_BOUNDS_COMPUTATION')
+!
+! local reduction
+!
+REVERSE_REPLICATE(LEVEL, `DO_LOOP')
+DISJUNCTION(``
+      'if (a(COMMA_REPLICATE(LEVEL, `INDEX_REF')) OPERATOR result) 
+     &    result = a(COMMA_REPLICATE(LEVEL, `INDEX_REF'))',``
+      'result = result OPERATOR  a(COMMA_REPLICATE(LEVEL, `INDEX_REF'))')
+SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
+!
+! send partial result to host, and get the final result
+!
+ifelse(PVM_ARCH,`CM5',`dnl
+      if (0.ne.CMMD_send(
+     $     CM HOST ID,
+     $     HOST SND CHANNEL,
+     $     result,
+     $     M4_PVM_LENGTH(PVMTYPE))) then
+         write (unit=0, fmt=*) "hpfc reduction: send failed"
+         stop
+      endif
+
+      debug(print *, MYLID, "NRED compute loop bounds done")
+
+
+      HOST SND CHANNEL = HOST SND CHANNEL+2
+      call CMMD_receive_bc_from_host(result, M4_PVM_LENGTH(PVMTYPE))',`
+
+      debug(print *, MYLID, "[build_name(nred,LEVEL,PVMTYPE,NAME)]")
+
+      debug(print *, MYLID, "send partial results to", HOSTLID)
+      call HPFC SNDTO H(PVMTYPE, result)
+      debug(`print *, MYLID, "receive final results by bcast 
+     $     from", HOSTLID')
+      call HPFC RCVFR HNBCAST H(PVMTYPE, result)')
+      build_name(nred,LEVEL,PVMTYPE,NAME) = result
+      return
+      end
+!
+! HOST PART
+!
+      TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
+_CM5(`      include "cmmd_fort.h"')
+      include "hpfc_commons.h"
+      TYPE result(MAX MAX SIZE OF PROCS), final
+      integer i
+!
+! get partial results
+!
+      do i=1, MAX SIZE OF PROCS
+ifelse(PVM_ARCH,`CM5',`dnl
+         if (0.ne.CMMD_receive(
+     $     CM NODE IDS(i),
+     $     RECV CHANNELS(i),
+     $     result(i),
+     $     M4_PVM_LENGTH(PVMTYPE))) then
+            write (unit=0, fmt=*)  "hpfc reduction: reveive failed"
+         endif
+         RECV CHANNELS(i) = RECV CHANNELS(i)+2',`dnl
+c         SENDER TID = NODE TIDS(i)
+         SENDERLID = i
+         debug(print *, "get partial results from ", SENDERLID)
+         CALL HPFC RCVFR S(PVMTYPE, result(i))')
+         debug(print *, "partial result received from", SENDERLID)
+      enddo
+!
+! compute final result
+!
+      final = result(1)
+      do i=2, MAX SIZE OF PROCS
+DISJUNCTION(``
+      '  if (result(i) OPERATOR final) 
+     &     final = result(i)',``
+      '   final = final OPERATOR result(i)')
+      debug(print *, "compute final result - final = ", final)
+      enddo
+!
+! send final result to nodes
+!      
+ifelse(PVM_ARCH,`CM5',`dnl
+      call CMMD_bc_from_host(final, M4_PVM_LENGTH(PVMTYPE))',`dnl 
+      call HPFC HSNDTO A(PVMTYPE, final)')
+      debug(print *, "send final result to nodes")
+      build_name(hred,LEVEL,PVMTYPE,NAME) = final
+      return
+      end
+!
+!------------
+!
+popdef(`REDTYPE')dnl
+popdef(`LEVEL')dnl
+popdef(`TYPE')dnl
+popdef(`PVMTYPE')dnl
+popdef(`NAME')dnl
+popdef(`OPERATOR')')dnl
+
+
+define(`SEVEN_DIMENSION',`
+forloop(`_D_',1,_HPFC_DIMENSIONS_,`GENERIC_REDUCTION($1, _D_, $2, $3, $4)')
+')dnl
+define(`LOGICAL_REDUCTION',`SEVEN_DIMENSION(logical, $1, $2, $3)')dnl
+define(`LOGICAL_REDUCTIONS',`
+LOGICAL_REDUCTION($1, MIN, .LT.)
+LOGICAL_REDUCTION($1, MAX, .GT.)
+')dnl
+define(`CUMULATE_REDUCTION',`SEVEN_DIMENSION(cumulate, $1, $2, $3)')dnl
+define(`CUMULATE_REDUCTIONS',`
+CUMULATE_REDUCTION($1, SUM, +)
+CUMULATE_REDUCTION($1, MULT, *)
+')dnl
+define(`REDUCTIONS',`
+LOGICAL_REDUCTIONS($1)
+dnl CUMULATE_REDUCTIONS($1)
+')dnl
+!
+! All the reductions:
+!
+ifdef(`_HPFC_NO_BYTE1_',,`REDUCTIONS(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`REDUCTIONS(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`REDUCTIONS(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`REDUCTIONS(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`REDUCTIONS(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`CUMULATE_REDUCTIONS(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`CUMULATE_REDUCTIONS(HPFC COMPLEX16)')
+
+dnl
+dnl 
+dnl Runtime for the REDUCTION DIRECTIVE
+dnl
+dnl
+dnl
+dnl pvm_reduce does not allow all members to get the result:-(
+dnl
+!define(`hpfc_opname',`ifelse($1,`PROD',HPFC PROD,HPFC`'$1)')dnl
+define(`hpfc_opname',`HPFC`'$1')dnl
+define(`identity',`ifelse($1,`SUM',0,$1,`PROD',1,$2)')dnl
+define(`HPFC_REDUCTIONS',`dnl
+pushdef(`NAME',$1)dnl
+pushdef(`PVMTYPE',$2)
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
+!-----
+!
+! Functions for NAME reduction on TYPE scalars:
+!
+      subroutine build_name(hpre,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
+      end
+      subroutine build_name(npre,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
+      integer i
+      do i=1, size
+         val(i) = identity(NAME,val(i))
+      enddo
+      end
+      subroutine build_name(hpost,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
+      include "hpfc_commons.h"
+!      external pvm_opname(NAME)
+      integer info, bufid
+!
+! performs the reduction to the host
+!
+      call HPFC REDUCTION(hpfc_opname(NAME),
+     x      val,size,PVMTYPE,MCAST HOST,0,info)
+      MCAST HOST = MCAST HOST+2
+
+ 
+!
+! send final result to nodes 
+!      
+      call HPFC INIT SEND(BUFFER ENCODING, bufid)
+      call HPFC PACK(PVMTYPE, val, size, 1, info)
+      call HPFC HCAST
+      end 
+
+      subroutine build_name(npost,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
+      include "hpfc_commons.h"
+!      external pvm_opname(NAME)
+      integer info
+!
+! performs the reduction to the host
+!
+      call HPFC REDUCTION(hpfc_opname(NAME),
+     x      val,size,PVMTYPE,MCASTHOST,0,info)
+      MCAST HOST=MCAST HOST+2
+
+!
+! get final result 
+!      
+      call HPFC NCAST
+      call HPFC UNPACK(PVMTYPE, val, size, 1, info)
+      MCASTHOST = MCASTHOST + 2
+      end
+!
+popdef(`NAME')dnl
+popdef(`PVMTYPE')dnl
+popdef(`TYPE')')dnl
+dnl
+define(`ALL_HPFC_REDUCTIONS',`dnl
+HPFC_REDUCTIONS(SUM,$1)
+HPFC_REDUCTIONS(PROD,$1)
+HPFC_REDUCTIONS(MAX,$1)
+HPFC_REDUCTIONS(MIN,$1)')dnl
+dnl
+
+ifdef(`_HPFC_NO_BYTE1_',,`ALL_HPFC_REDUCTIONS(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`ALL_HPFC_REDUCTIONS(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`ALL_HPFC_REDUCTIONS(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`ALL_HPFC_REDUCTIONS(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`ALL_HPFC_REDUCTIONS(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`ALL_HPFC_REDUCTIONS(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`ALL_HPFC_REDUCTIONS(HPFC COMPLEX16)')
+
+!
+! that is all
+!

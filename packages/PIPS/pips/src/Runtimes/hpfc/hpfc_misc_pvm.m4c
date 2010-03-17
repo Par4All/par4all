@@ -1,0 +1,154 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+/* a set a functions to print the host and node status in PVM,
+ * called from a Fortran subroutine. 
+ * Portability based on pvm m4 macros.
+ *
+ * Fabien Coelho, 1993-1994-1995-1996
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+#include "pvm3.h"
+
+/* PVM 3.2 / PVMe compatibility: managed by m4
+ *  - pvmhostinfo -> hostinfo
+ *  - pvmtaskinfo -> taskinfo (also adds ti_pid)
+ */
+
+ifdef(`_HPFC_NO_PVM_VERSION_',
+char * pvm_version() { return "special pvm on PVM_ARCH";} )
+
+/* quick checking of PVM function returns
+ */
+#define check(var, msg) if(var<0)fprintf(stderr,"Error %d (%s)\n",var,msg);
+
+
+/* returns the host name from its number and the table of hosts.
+ * ??? I guess I should abort if not found...
+ */
+static char *
+host_name(
+    int ti_host, /* the host number we are looking for */
+    int nhost,   /* the number of hosts */
+    struct pvmhostinfo *hostp) /* the struct in which the information is */
+{
+    int i;
+    for(i=0 ; i<nhost ; i++)
+	if (hostp[i].hi_tid==ti_host) return hostp[i].hi_name;
+
+    fprintf(stderr, "[hpfc.host_name] no host tid=0x%x among %d hosts\n",
+	    ti_host, nhost);
+
+    return "name not found";
+}
+
+
+/* returns the task information structure that holds the data 
+ * for a given task. ??? should I abort if not found? I guess so?
+ */
+static struct pvmtaskinfo *
+which_task(
+    int ti_tid, /* the task number we are looking for */
+    int ntask,  /* the number of tasks */
+    struct pvmtaskinfo *taskp)/* the struct in which the information is */
+{
+    int i;
+    
+    for(i=0 ; i<ntask ; i++)
+    {
+	int tid = taskp[i].ti_tid;
+	_getpe(tid=pvm_get_PE(tid);)
+	if (tid==ti_tid) return &taskp[i];
+    }
+
+    fprintf(stderr, "[hpfc.which_task] no task tid=0x%x among %d tasks\n", 
+	    ti_tid, ntask);
+
+    return (struct pvmtaskinfo *) NULL;
+}
+
+/* Function called by the RUNTIME under the DEMO compilation option. 
+ * Prints the hosts that compose the Parallel Virtual Machine.
+ */
+void 
+FUNCTION(printhostinfo) ARGS(`') /* `' */
+{
+    int i, info, nhost, narch;
+    struct pvmhostinfo *hostp;
+
+    info = pvm_config(&nhost, &narch, &hostp);
+    check(info, "pvm_config");
+
+    /* print hosts
+     */
+    fprintf(stderr, "PVM version %s running\n%d machine%s:\n",
+	    pvm_version(), nhost, nhost==1 ? "" : "s");
+
+    for( i=0 ; i<nhost ; i++ )
+	fprintf(stderr, "%s\t(%s)\n", hostp[i].hi_name, hostp[i].hi_arch);
+
+    fprintf(stderr, "\n");
+}
+
+/* Function called by the RUNTIME under the DEMO compilation option.
+ * Called the the host. Prints the tasks and the machine they are running on.
+ */
+void 
+FUNCTION(printtaskinfo) ARGS(`number, tids, hosttid') /* `' */
+int *number, *tids, *hosttid;
+{
+    int i, info, nhost, narch, ntask;
+    struct pvmtaskinfo *taskp, *found;
+    struct pvmhostinfo *hostp;
+    
+    /* get informations from pvm
+     */
+    info = pvm_config(&nhost, &narch, &hostp);
+    check(info, "pvm_config");
+
+    info = pvm_tasks(0, &ntask, &taskp);
+    check(info, "pvm_tacks");
+
+    /* print tasks
+     */
+    found = which_task(*hosttid, ntask, taskp);
+    fprintf(stderr, "host running on %s\n",
+	    found ? host_name(found->ti_host, nhost, hostp) : "not found");
+
+    fprintf(stderr, "%d nodes:\n", (*number));
+
+    for( i=0 ; i<(*number) ; i++ )
+    {
+	found = which_task(tids[i], ntask, taskp);
+	fprintf(stderr, "%d running on %s\n", i+1,
+		found ? host_name(found->ti_host, nhost, hostp) : "not found");
+    }
+
+    fprintf(stderr, "\n");	
+}
+
+/* 
+   That's all
+*/

@@ -1,0 +1,40 @@
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+INSTALL_UTL =	analyze_libraries \
+		grep_libraries \
+		order_libraries \
+		order_libraries_from_include \
+		pips_at_night \
+		pips_at_night_at_verone \
+		pips_at_night_at_canap \
+		pips_at_night_at_hpc_meudon \
+		pips_at_night_at_HPCAS \
+		pips_publish_www \
+		pips_svn_stat \
+		build_so_files \
+		pips_branch \
+		pips_git
+
+# common stuff
+ROOT    = ../../..
+#PROJECT = pips
+include $(ROOT)/makes/main.mk

@@ -1,0 +1,93 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[11pt]{freport}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\titre}{
+	RAPPORT FINAL DU PROJET PIPS \\
+	LOT 9
+}
+\newcommand{\auteur}{
+        François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{17 Septembre 1990}
+\newcommand{\numero}{Exxx}
+
+\setlength{\parindent}{0cm}
+
+\newfont{\pipsfont}{cmssbx10}
+
+\newcommand{\pips}{{\pipsfont PIPS ~}}
+	
+\newcommand{\pipsmake}{{\pipsfont pips-make ~}}
+\newcommand{\pipsdbm}{{\pipsfont pips-dbm ~}}
+
+\newcommand{\tpips}{{\pipsfont t-pips ~}}
+\newcommand{\wpips}{{\pipsfont w-pips ~}}
+
+\newcommand{\entity}{{\pipsfont entity ~}}
+\newcommand{\statement}{{\pipsfont statement ~}}
+\newcommand{\parserprivate}{{\pipsfont parser\_private ~}}
+\newcommand{\complexity}{{\pipsfont complexity\_ri ~}}
+\newcommand{\database}{{\pipsfont database ~}}
+\newcommand{\property}{{\pipsfont property ~}}
+\newcommand{\dg}{{\pipsfont dg ~}}
+\newcommand{\reduction}{{\pipsfont reduction ~}}
+\newcommand{\graph}{{\pipsfont graph ~}}
+\newcommand{\text}{{\pipsfont text ~}}
+\newcommand{\makefile}{{\pipsfont makefile ~}}
+\newcommand{\parser}{{\pipsfont parser ~}}
+
+
+\newcommand{\initializer}{{\pipsfont initializer ~}}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+\tableofcontents
+
+\input{introduction}
+
+\input{presentation}
+
+\input{newgen}
+
+\input{structures}
+
+\input{interfaces}
+
+\input{utilitaires}
+
+\input{analyses}
+
+\input{transformations}
+
+\input{hierarchie}
+
+% \input{benchmarks}
+
+\input{bibliographie}
+\end{document}
+\end

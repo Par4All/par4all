@@ -1,0 +1,195 @@
+#! /bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# usage: $0 /path/to/prod email.address@somewhere
+# - check that pips does still compile.
+# - designed to be run from cron.
+# - report is sent by mail if the status changed.
+# - if there is a persistant LOCK, investigate by hand...
+
+# this script runs very minutes on canapville under login coelho
+
+prod=${1:-.}
+dest=${2:-$LOGNAME@cri.ensmp.fr}
+
+# remove pips-related environment variables to use default settings
+unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
+
+# report current-state compile message
+# current-state: ok skip locked KO:*
+# compile: ok unknown unchanged unbuild build exe
+function report()
+{
+  [ $# -eq 3 ] || {
+    # internal error
+    echo "report() got $# args but expecting 3" >> LOG
+    exit 1
+  }
+
+  # get function arguments
+  local current=$1 compile=$2 msg=$3
+  local previous='unknown' prevcomp='unknown'
+
+  # get previous state if available
+  test -f STATE && read previous prevcomp < STATE
+
+  # log report anyway...
+  echo "$(date +%Y%m%d%H%M%S): $current $compile ($SECONDS seconds) $msg" >> LOG
+
+  # out if locked
+  [ $current = 'locked' ] && {
+    echo "message: $msg" | mailx -s 'PIPS compilation status is locked' $dest
+    exit 0
+  }
+
+  # out if locked (2)
+  [ $current = 'skip-lock' ] && exit 0
+
+  # no compilation, nothing to report...
+  # however, if there was a *temporary* KO (network down),
+  # it is nice to report that it is up again...
+  [ $current = 'skip' -a $previous != 'KO:svn-up' ] && { rmdir LOCK ; exit 0 ; }
+
+  # no change, no report
+  [ "$previous" -a "$current" = "$previous" ] && { rmdir LOCK ; exit 0 ; }
+
+  # else generate report
+  {
+    # summary
+    echo PIPS compilation status has changed to $current
+
+    # details
+    echo previous state: $previous
+    echo previous compile: $prevcomp
+    echo new state: $current
+    echo new compile: $compile
+    echo message: $msg
+
+    # revisions
+    echo
+    echo version:
+    cat CURRENT
+    echo
+    echo previous:
+    cat PREVIOUS
+
+    if [ $current != 'ok' ]
+    then
+      # show stderr/stdout?
+      test -f err && {
+        echo
+        echo err:
+        tail -15 err
+      }
+
+      test -f out && {
+        echo
+        echo out:
+        tail -10 out
+      }
+
+      # show recent commits
+      echo
+      echo last commits:
+      local repos
+      for repos in pips newgen linear pips/makes
+      do
+        echo $repos:
+	svn log --revision COMMITTED $repos
+      done
+    fi
+  } | mailx -s "PIPS compilation status is $current" $dest
+
+  # fix compile with previous state on 'unchanged'
+  [ $compile = 'unchanged' ] && compile=$prevcomp
+
+  # hmmm... regenerate previous before network interruption
+  [ $current = 'skip' ] && current=$compile
+
+  # record new state
+  echo $current $compile > STATE
+
+  # good bye! always 0 for cron
+  rmdir LOCK
+  exit 0
+}
+
+# check for working copy... this should not fail!
+[ -d $prod ] || \
+    report 'KO:no-dir' 'unknown' "working copy directory '$prod' not found"
+[ -d $prod/.svn ] || \
+    report 'KO:no-wc' 'unknown' "'$prod' is not a working copy '$prod'"
+cd $prod || \
+    report 'KO:cd-prod' 'unknown' "cannot 'cd $prod'"
+
+# manual locking based on mkdir
+mkdir LOCK > /dev/null 2>&1 ||
+{
+  # warn after 1200 seconds (20mn) locking
+  created=$(stat -c %Y LOCK)
+  now=$(date +%s)
+  delay=$(($now - $created))
+  if [ $delay -gt 1200 ]
+  then
+    report 'locked' 'unknown' "working copy '$prod' is already locked..."
+    touch LOCK
+  else
+    report 'skip-lock' 'unknown' "working copy '$prod' is locked"
+  fi
+}
+
+rm -f out err
+nice svn up >> out 2>> err || {
+  # possible failures: network dns svn...
+  # hmmm... try to cleanup after svn up failure
+  svn cleanup >> out 2>> err
+  report 'KO:svn-up' 'unchanged' 'cannot "svn up"'
+}
+
+[ -f CURRENT ] || touch CURRENT
+mv CURRENT PREVIOUS
+{
+  # this is local, it should not fail
+  echo pips: $(svnversion -c pips)
+  echo newgen: $(svnversion -c newgen)
+  echo linear: $(svnversion -c linear)
+  echo nlpmake: $(svnversion -c pips/makes)
+} > CURRENT
+
+if ! cmp -s CURRENT PREVIOUS
+then
+  # something may have changed, let us recompile
+  nice make unbuild > out 2> err \
+      || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
+  nice make build > out 2> err \
+      || report 'KO:make' 'build' 'cannot "make build"'
+  test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
+      || report 'KO:make' 'executable' 'no "tpips" executable found!'
+
+  # clean up
+  rm -f out err
+  report 'ok' 'ok' 'pips is fine'
+else
+  # no updates
+  report 'skip' 'unchanged' 'no commit since last check'
+fi

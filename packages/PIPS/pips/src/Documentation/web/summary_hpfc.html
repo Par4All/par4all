@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>HPFC: At a glance ($Date$)</title>
+</head>
+
+<body>
+<h1>HPFC at a glance</h1>
+
+<a href=/pips/hpfc.html>HPFC</a> is a prototype High Performance Fortran
+Compiler which is being developed within the <a href="/pips">PIPS</a>
+framework by <a href="/~coelho">Fabien COELHO</a> at
+<a href=/index-english.html>CRI</a>, &Eacute;cole des mines de Paris.
+It aims at testing new compilation techniques for distributed-memory
+parallel architectures. Funded by PARADIGME.
+<b>URL: </b>http://www.cri.ensmp.fr/pips/hpfc.html
+
+<h2>Input language</h2>
+<ul>
+  <li> Fortran 77
+  <li> HPF <b>static</b> and <b>dynamic</b> mapping directives
+  <li> <b>prescriptive</b> and <b>descriptive</b> mappings for arguments
+  <li> HPF <code>independent</code> and <code>new</code> directives
+  <li> private <code>local</code>, <code>pure</code> and
+       <code>io</code> directives
+  <li> assumes all sizes as known at compile time
+  <li> arrays in commons can be distributed statically
+</ul>
+
+<h2>Output</h2>
+<ul>
+  <li> 2 programs: host for I/Os and SPMD node for computations
+  <li> Fortran 77 + HPFC Runtime support + PVM 3
+</ul>
+
+<h2>Implementation</h2>
+<ul>
+  <li> data structures based on NEWGEN. Linear/C3 library for linear techniques.
+  <li> 18,000 lines of ANSI C for the compiler (HPFC, a PIPS module) 
+  <li> 1,000 lines of shell and C for the driver and other utilities
+  <li> 3,000 lines of m4/fortran for the runtime support library
+       (expanded to +8,000)
+  <li> PIPS as a whole is around 200,000 lines of code.
+</ul>
+
+<h2>Standard Optimizations</h2>
+<ul>
+  <li> run-time resolution to handle general cases.
+  <li> reduced allocation of distributed arrays on nodes.
+  <li> overlaps, partial shifts and reductions
+       for block-distributed stride-1 aligned arrays.
+  <li> simple copies for any aligned arrays are recognized.
+</ul>
+
+<h2>Advanced Optimizations</h2>
+<ul>
+  <li> for I/O-related communications
+       (<a href="/~coelho/doc/A-264.abstract">abstract</a>,
+        <a href="/~coelho/doc/A-264.ps.gz">paper</a>)
+  <li> for array remappings
+       (<a href="/~coelho/doc/A-277.abstract">abstract</a>,
+        <a href="/~coelho/doc/A-277.ps.gz">paper</a>)
+  <li> and more  linear algebra-based techniques to come
+       (<a href="/~coelho/doc/A-278.abstract">abstract</a>,
+        <a href="/~coelho/doc/A-278.ps.gz">paper</a>).
+</ul>
+
+<h2>Experiments</h2>
+<ul>
+  <li> +100 small or medium size codes for non regression test.
+  <li> SOR on a network of SUN workstations
+       (<a href="/~coelho/doc/A-257.abstract">abstract</a>,
+        <a href="/~coelho/doc/A-257.ps.gz">paper</a>).
+  <li> wave propagation code from IFP (French Oil Institute)
+       on the SEH/ETCA CM5. 
+  <li> matrix transpose on a DEC Alpha farm (see remappings).
+</ul>
+
+</body>
+</html>

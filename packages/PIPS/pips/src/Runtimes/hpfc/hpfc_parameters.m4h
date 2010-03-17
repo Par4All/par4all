@@ -1,0 +1,71 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+!
+! parameters used to compile 
+!
+! type declarations
+!
+      integer
+     $     INT FLAG,
+     $     MAX NB OF ARRAYS,
+     $     MAX NB OF TEMPLATES,
+     $     MAX NB OF PROCESSORS,
+     $     MAX MAX SIZE OF PROCS,
+     $     MAX MAX SIZE OF BUFFER,
+     $     MAX SIZE OF STATUS,
+     $     DATARAW ENCODING,
+     $     BUFFER ENCODING,
+     $     HPFC SUM,
+     $     HPFC PROD,
+     $     HPFC MAX,
+     $     HPFC MIN
+
+
+!
+! parameters
+!
+      parameter(INT FLAG = -1234567890)
+      parameter(MAX NB OF ARRAYS = 100)
+      parameter(MAX NB OF TEMPLATES = 32)
+      parameter(MAX NB OF PROCESSORS = 32)
+      parameter(MAX MAX SIZE OF PROCS = _HPFC_MAX_NPES_)
+      parameter(MAX SIZE OF STATUS = 10)
+      parameter(HPFC SUM=1)
+      parameter(HPFC PROD=2)
+      parameter(HPFC MAX=3)
+      parameter(HPFC MIN=4)
+!
+! MAXMAXSIZEOFBUFFER is around 1 MB
+!
+      parameter(MAX MAX SIZE OF BUFFER = 1000000)
+
+
+!
+! SPECIFIC BUFFER ENCODING (1=Pvmdataraw and 2=_HPFC_ENCODING_) 
+!
+      parameter(DATARAW ENCODING = 1)
+      parameter(BUFFER ENCODING = 2)  
+
+!
+! that s all
+!
+

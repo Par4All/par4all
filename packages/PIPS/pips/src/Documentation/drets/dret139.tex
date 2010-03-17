@@ -1,0 +1,139 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS \\
+		LISTING DE L'ANALYSEUR SEMANTIQUE 
+}
+
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E139}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+L'analyseur sémantique contient des phases très diverses permettant
+aussi le bien le calcul des {\em use-def chains} qui sont un
+préliminaire à l'optimisation globale classique et au calcul du graphe
+de dépendance que le calcul de prédicats et la propagation
+interprocédurale de constante qui sont des pre-requis du test de
+dépendance et des transformations de programmes.
+
+Ce rapport ne contient pas de descriptions des structures de données
+utilisées parce qu'elles sont inclues directement avec la
+représentation interne des programmes (structure de données {\em ri}).
+
+La construction interprocédurale des {\em use-def chains} repose sur
+trois bibliothéques dont les listings suivent:
+\begin{itemize}
+  \item {\em Effects} calcule les effets {\em read} et {\em write} 
+	 des instructions sur la mémoire,
+	en preservant l'information {\em may/must};
+  \item {\em SDFI} calcule les effets cumulés à toute une procédure et
+	les restreint à leur sous-ensemble visible interprocéduralement;
+  \item {\em Chains} calcule les trois ou quatre différents type de
+	{\em use-def chains} ({\em use-def}, {\em def-def}, {\em def-def} et,
+	facultativement, {\em use-use}) qui sont classiquement utilisés en
+	compilation.
+\end{itemize}
+
+Le calcul intraprocédural des prédicats et la propagation
+interprocédurale des constantes reposent sur trois bibliothèques. La
+plus grosse des trois (environ 20000 lignes de C), la bibliothéque
+d'algèbre linéaire de base, n'a pas été développée dans le cadre
+de ce contrat. Elle est disponible sous forme objet sur la cassette de
+livraison mais les sources ne sont pas disponibles dans ce rapport. Les
+deux autres bibliothèques, {\em Semantics} et {\em Transformer}, sont 
+par contre partie intégrante du projet PIPS et leurs fichiers sources sont
+imprimés ci-dessous. La première contient les modules efectuant
+l'interprétation abstraite d'un programme dans le formalisme de
+Cousot/Halbwachs. La seconde est une bibliothèque d'accompagnement de
+la structure de données {\em transformer} (voir la documentation sur la
+{\em ri}).
+
+\newpage
+
+\section{Bibliothèque {\em Effects}}
+
+Cette bibliothèque contient les routines effectuant une interprétation
+abstraite des programmes en terme d'accès mémoire. Deux types d'acc`es
+sont reconnus, {\em read} et {\em write}. Ces accès peuvent être
+certains ou conditionnels ({\em may} or {\em must}). 
+
+\input{effects.listing}
+
+\section{Bibliothèque {\em SDFI}}
+
+Cette bibliothèque calcule les {\em summary data flow information},
+c'est-à-dire les effets mémoire au niveau d'une procédure, restreint
+à ceux de ces effets qui sont potentiellement observables par une
+procédure appelante.
+
+\input{sdfi.listing}
+
+\section{Bibliothèque {\em Chains}}
+
+La bibliothéque {\em chains} a été développée en utilisant les
+algorithmes classiques ({\em Dragon Book}).
+
+\input{chains.listing}
+
+\section{Bibliothèque {\em Semantics}}
+
+La bilbiothèque {\em Semantics} contient les programmes effectuant une
+analyse sémantique de type {\em Cousot/Halbwachs}.
+
+\input{semantics.listing}
+
+\section{Bibliothèque {\em Transformer}}
+
+La bibliothèque {\em transformer} contient les opérateurs
+mathématiques relatifs à la structure de données NewGen aussi appelée
+{\em Transformer}. Elle est basée sur la bilbiothéque d'algèbre
+linéaire du CAII.
+
+\input{transformer.listing}
+
+\end{document}

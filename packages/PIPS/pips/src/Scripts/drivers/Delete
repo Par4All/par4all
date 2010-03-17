@@ -1,0 +1,92 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Delete removes a list of workspaces whose names are provided
+# after the command, no matter which the current workspace is.
+# Filename generation rules can be used to expres the workspace 
+# name, provided that special characters are quoted.
+#
+# Exemples equivalents:
+# Delete foo
+# Delete foo.database
+# Delete foo.database/
+# Delete `pwd`/foo.database
+# Delete -a = Delete *.database
+
+unset ws all
+
+verbose=1
+script=`basename $0`
+
+pips_current_program=${PIPS_CURRENT_PROGRAM:-.pipsprogram}
+
+verb()
+{ echo "$script:" "$@" >&2 ; }
+
+usage()
+{ echo "$script [-s] [-a|workspace names]" >&2 ; exit 1;}
+
+while getopts sa opt
+do
+    case ${opt} in
+    s) verbose= ;;
+    a) all=1 ;;
+    *) usage ;;
+    esac 
+done
+
+shift `expr $OPTIND - 1`
+
+if [ "$all" ] 
+then 
+  test "`echo *.database`" != '*.database' && {
+      verb "deleting all databases in $PWD"
+      set *.database
+  }
+fi
+
+for ws 
+do
+  ws=`echo $ws | sed 's/\/$//'`
+  # delete .PIPS_CURRENT_PROGRAM
+  rm -f `dirname $ws`/$pips_current_program
+  # so that both zzz.database and zzz are good workspace names
+  ws=`dirname $ws`/`basename $ws .database`.database
+
+  if [ ! -d "$ws" ]
+  then
+    if [ "${verbose}" ] 
+    then
+	verb "No such directory \`$ws\'"
+	exit 2
+    fi
+  else
+    [ "$all" ] && verb "Deleting $ws"
+
+    # was rm -r?
+    rm -rf $ws || {
+      verb "Cannot remove $ws"
+      exit 3
+    }
+  fi
+done

@@ -1,0 +1,418 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Filter to switch from hpf directives to subroutine calls to be parsed
+# by the PIPS Fortran 77 parser. 
+# Maybe some perl or awk might be much nicer and more efficient, 
+# but I'm not very good at it, and I hate perl:-) 
+# Looks like an exercice of style, "yes I can do it with seds and trs";-)
+# It may be thought as clever or stupid:-)
+#
+# F77 and HPF directives -> 
+# calls to HPFC special subroutines and functions -> 
+# HPFC subs and functs analyzed and removed -> 
+# analyzes on the correct transformed code
+#
+#
+# Notes:
+#
+# - Only one subroutine or function should be put in the pipe. 
+#   this is because declaration directives switched to calls are 
+#   moved after the declarations, so that they can be recognized as 
+#   calls...
+# - I do deal with "R E A L" like Fortran lexical problems,
+#   by removing all spaces, but then sed has troubles to differentiate
+#   "DISTRIBUTE T ONTO PONTOP" and "DISTRIBUTE TONTOP ONTO P".
+#   That does not matter because such a syntax is forbidden by HPF
+#   hpfc choses what sed choses.
+# - INDEPENDENT, NEW and REDUCTION are orthogonal, because it should have
+#   been defined as such.
+# - Ctrl-L, Ctrl-G, Ctrl-V and Ctrl-W are used as intermediate characters, 
+#   thus should not appear in the program, otherwise troubles...
+#   . Ctrl-G: replacement for CR
+#   . Ctrl-V: replacement for HPF directive origin
+#   . Ctrl-W: replacement for FCD directive origin
+#   . Ctrl-L: temporary substitution for marker call
+# - some default value is assigned to number of processors 
+#   (currently is should be 8, or some environment variable)
+# - some specific directives for HPFC are introduced by !FCD$
+#   (FCD stands for Fabien Coelho Directives:-) 
+# - simple management of descriptive interfaces: 
+#   they are switched to prescriptive ones!:-)
+# - ! style comments in directives are okay.
+# - INHERIT is translated into DISTRIBUTE:-) Allowed by HPF?
+# - simple 1d and 2d independent forall without continuation nor mask are 
+#   translated to equivalent DO loops...
+#
+# (c) Fabien Coelho, February 95 and later.
+#
+#########################################################################
+#                                                                       #
+#   DON'T EXPECT ANYTHING FROM THIS SCRIPT. SO NO DISAPPOINTEMENT:-)    #
+#                                                                       #
+#########################################################################
+#
+
+#
+# HPF directives:
+#
+# _a: align
+# _b: realign
+# _c: cyclic
+# _d: distribute, inherit
+# _e: redistribute
+# _i: independent
+# _k: block 
+# _n: new
+# _p: processors
+# _r: reduction
+# _s: *
+# _t: template
+# _y: dynamic
+# _#: number_of_processors()
+#
+# _X: special default processor arrangement
+#
+# missing: inherit
+#
+# static directives are moved AFTER declarations, 
+# since I need to parse them as statements.
+#
+# HPFC directives: (FCD = Fabien Coelho Directives:-)
+#
+# local/endlocal (hack for localized computations, cannot be nested)
+# _u: pure  // it is not a directive in HPF, but an attribute...
+# _1: synchro
+# _2: time (was timeon)
+# _3: end time (was timeoff)
+# _4: setbool // to change the compiler global behavior...
+# _5: setint  // dangerous and added for validation purposes...
+# _6: io      // declares an io function (host call only...)
+# _7: host/end host // host section...
+# _8: kill // tell that the values of an array are dead...
+# _9: fake // tells that the function is fake.
+# _0: tell // print out a synchronized message
+#
+# (_ is hpfc)
+#
+# removed:
+# ld {io,pure}: addition of a linker option
+#
+
+#
+# commands:
+#
+# the sed version should be able to handle very large lines... 
+# gnu sed is okay. idem tr. SUN sed is not ok.
+
+SED=${HPFC_SED:-sed}
+TR=${HPFC_TR:-tr}
+RM=rm
+
+# number of processors:
+NOP=${1:-${HPFC_NUMBER_OF_PROCESSORS:-8}}
+
+# temporary files prefix:
+TMP=/tmp/hpfc_directives.$$
+$RM -f $TMP.*
+
+#
+# directive normalization.
+# FCD are simply translated into hpf-like prefixed directives
+# ??? maybe should I add some option to avoid this translation?
+#
+$SED "#
+      # switch HPF and FC directive origins to Ctrl-V ot Ctrl-W
+      #
+      s,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
+      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
+      #
+      # ! style comments are removed. 
+      #
+      /[]/s,^\([^'\"]*\)!.*,\1,;
+      /[]/s,^\([^'\"]*'[^'\"]*'[^'\"]*\)!.*,\1,;
+      /[]/s,^\([^'\"]*\"[^'\"]*\"[^'\"]*\)!.*,\1,;
+      #
+      # switch to lower case letters the directive lines *only*,
+      # up to any quote...
+      #
+      : while
+      /[]/s,^\([^'\"]*\)A,\1a,g;
+      /[]/s,^\([^'\"]*\)B,\1b,g;
+      /[]/s,^\([^'\"]*\)C,\1c,g;
+      /[]/s,^\([^'\"]*\)D,\1d,g;
+      /[]/s,^\([^'\"]*\)E,\1e,g;
+      /[]/s,^\([^'\"]*\)F,\1f,g;
+      /[]/s,^\([^'\"]*\)G,\1g,g;
+      /[]/s,^\([^'\"]*\)H,\1h,g;
+      /[]/s,^\([^'\"]*\)I,\1i,g;
+      /[]/s,^\([^'\"]*\)J,\1j,g;
+      /[]/s,^\([^'\"]*\)K,\1k,g;
+      /[]/s,^\([^'\"]*\)L,\1l,g;
+      /[]/s,^\([^'\"]*\)M,\1m,g;
+      /[]/s,^\([^'\"]*\)N,\1n,g;
+      /[]/s,^\([^'\"]*\)O,\1o,g;
+      /[]/s,^\([^'\"]*\)P,\1p,g;
+      /[]/s,^\([^'\"]*\)Q,\1q,g;
+      /[]/s,^\([^'\"]*\)R,\1r,g;
+      /[]/s,^\([^'\"]*\)S,\1s,g;
+      /[]/s,^\([^'\"]*\)T,\1t,g;
+      /[]/s,^\([^'\"]*\)U,\1u,g;
+      /[]/s,^\([^'\"]*\)V,\1v,g;
+      /[]/s,^\([^'\"]*\)W,\1w,g;
+      /[]/s,^\([^'\"]*\)X,\1x,g;
+      /[]/s,^\([^'\"]*\)Y,\1y,g;
+      /[]/s,^\([^'\"]*\)Z,\1z,g;
+      t while" |
+#
+# continuation handling:
+# - put the whole file on one line:-)
+# - then we can pattern-match on carriage returns!
+# - remove not desired cr (& and 6 column styles)
+# - and back to a normal file
+#
+$TR '\012' '' | 
+$SED 's,&[ 	]*[]., ,g;s, *[][^ ], ,g' | 
+$TR '' '\012' | 
+#
+# massive pattern-matching transformations:
+# directives are switched to hpfc specials calls.
+#
+$SED "#
+      # space normalization (pattern-matching is easier afterwards)
+      # all spaces are removed befoew quotes...
+      #
+      : while
+      /[]/s,^\([^'\"]*\)[ 	][ 	]*,\1,;
+      t while
+      /[]/s,\([]\),\1 ,;
+      #
+      # simple 1D FORALL instruction without continuation... 
+      s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4\5enddo,
+      # simple 2D FORALL instruction without continuation... 
+      s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\)\,\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4do \5=\6\,\7\8enddoenddo,
+      #
+      # descriptive mappings: switched to prescriptive!
+      //s, align\(.*\)with\*, align\1with,;
+      //s, distribute\([a-z0-9_]*\)\*, distribute\1,;
+      #
+      # indirect reserved words: block, cyclic, *, nop
+      #
+      //s,\([\,(]\)block\([\,()]\),\1k\2,g
+      //s,\([\,(]\)block\([\,()]\),\1k\2,g
+      //s,k\([\,)]\),k()\1,g
+      //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
+      //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
+      //s,c\([\,)]\),c(1)\1,g
+      # the * if not a product...
+      //s,\*\([\,)]\),s()\1,g
+      //s,number_of_processors(),#,g
+      #
+      # obsolescent FC directives:
+      s, timeon,2,
+      s, timeoff,3,
+      #
+      # FC directives and hacks...
+      #
+      s, synchro,1,
+      s, time,2,
+      # end time, set{bool,int} and tell may not be normalized
+      s, endtime,3,
+      s, tell,0,
+      s, setbool,4,
+      s, setint,5,
+      s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
+      s, endlocal,      enddo,
+      s, io\(.*\),6(\1),
+      s, fake\(.*\),9(\1),
+      s, kill\(.*\),8(\1),
+      #
+      # remove LD(IO|PURE) and STUBS directives
+      #
+      s, \(ld.*\),!ignored: \1,
+      s, \(stubs.*\),!ignored: \1,
+      #
+      # host section: hack to build blocks...
+      # (two levels needed because of some unstructured...)
+      #
+      s, host,      if (.true.) then7if (.true.) then,
+      s, endhost,      endifendif,
+      #
+      # HPF declaration directives (well, pure is not)
+      #
+      s, dynamic\(.*\),y(\1),
+      s, template\(.*\),      logical \1t(\1),
+      s, processors\(.*\),      logical \1p(\1),
+      s, pure\(.*\),u(\1),
+      #
+      # pure/io/fake args should look like calls for pips
+      /[69u](/s,\,,()\,,g;
+      /[69u](/s,\([a-z0-9]\))\$,\1()),;
+      #
+      # HPF static and dynamic mapping directives
+      #  - some simple free style is parsed.
+      #
+      # inherit... I am still laughing about it
+      s, inherit, distribute,;
+      #
+      s, alignwith\(.*\)::\(.*\),a(\2\,\1),
+      s, align\(.*\)with\(.*\)::\(.*\),a(hpfck\1\,\3\,\2),
+      s, align\(.*\)with\(.*\),a(\1\,\2),
+      s, realignwith\(.*\)::\(.*\),b(\2\,\1),
+      s, realign\(.*\)with\(.*\)::\(.*\),b(hpfck\1\,\3\,\2),
+      s, realign\(.*\)with\(.*\),b(\1\,\2),
+      #
+      s, distribute\(.*\)onto\(.*\)::\(.*\),d(\3\,\2\1),
+      s, distribute\(.*\)onto\(.*\),d(\1\,\2),
+      s, distribute\(.*\),d(\1\,hpfcX),
+      s, redistribute\(.*\)onto\(.*\)::\(.*\),e(\3\,\2\1),
+      s, redistribute\(.*\)onto\(.*\),e(\1\,\2),
+      s, redistribute\(.*\),e(\1\,hpfcX),
+      #
+      # HPF parallelism directives
+      #
+      # list of directives are managed orthogonaly... (see A-284)
+      # independent must be handles with and without arguments.
+      //s,\,new(, new(,g
+      //s,\,reduction(, reduction(,g
+      //s,\,independent\([(\,]\), independent\1,g
+      //s,\,independent *\$, independent,
+      # specific handling
+      s, new,n,g
+      s, reduction,r,g
+      s, independent,i,g
+      #
+      # directives that may remain are errors:
+      #
+      s,[], hpfc syntax error:,
+      # 
+      # insert needed spaces
+      #
+      s,\([^]\),      \1,g
+      #
+      # SWITCH to special hpfc functions...
+      #
+      s,\([0123456789abdeintpryu]\),      call hpfc\1,g
+      s,\([ck#s]\),hpfc\1,g
+      s,hpfc#,$NOP,g;" | 
+#
+# handles multi lines breaking (independent/new/reduction...)
+#
+$TR '' '\012' |
+#
+# number_of_processors substitution.
+# separates static directives from others.
+#
+$SED "# clean template and processors declaration calls
+      : while
+      /      call hpfc[pt]/s/\((.*\)([^)(]*)/\1/;
+      t while
+      # separation
+      /^      call hpfc[ptu69]/w $TMP.1
+      /^      call hpfc[ady45]/w $TMP.2
+      /^      call hpfc[adptuy4569]/d" > $TMP.0
+
+#
+# line before which the static directives will be inserted
+# i.e. last line of the declarations.
+#
+# first, find the last declaration line 
+# (program/subroutine/function/parameter/common/data are also needed...)
+
+LINE=`$SED -n '
+     /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Pp][Aa][Rr][Aa][Mm][Ee][Tt][Ee][Rr][ 	(]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\/]/=
+     /^[^Cc\*!].... [ 	]*[Dd][Aa][Tt][Aa][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Hh][Aa][Rr][Aa][Cc][Tt][Ee][Rr][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Dd][Oo][Uu][Bb][Ll][Ee][Pp][Rr][Ee][Cc][Ii][Ss][Ii][Oo][Nn][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Dd][Ii][Mm][Ee][Nn][Ss][Ii][Oo][Nn][ 	\*]/=' $TMP.0 |
+$SED -n '$p'`
+
+[ "$LINE" ] || LINE=1
+
+#
+# then deal with continuations if any.
+# comments and blank lines are also skipped, or why should I not ?
+
+LAST_LINE=`
+$SED -n "1,$LINE b
+         s,^\([^Cc\*!]....[^ ]\),\1,
+         s,^\([Cc\*!]\),\1,
+         s,^\([ 	]*\)\$,\1,
+         t cont
+         q
+         : cont
+         =" $TMP.0 | 
+$SED -n '$p'`
+
+LINE=${LAST_LINE:-$LINE}
+
+DEFAULT_USED=`$SED -n '/\,hpfcX)/p;/\,hpfcX)/q;' $TMP.0 $TMP.1 $TMP.2`
+
+#
+# final output
+{
+  $SED -n "1,$LINE p" $TMP.0
+  #
+  # default processor arrangement is 1D. should be managed elsewhere?
+  #
+  [ "$DEFAULT_USED" ] &&
+  { 
+    echo "      logical hpfcX($NOP)"
+    echo "      call hpfcp(hpfcX($NOP))"
+  }
+  $SED -n p $TMP.1
+  $SED -n p $TMP.2
+  $SED "1,$LINE d" $TMP.0
+} | 
+#
+# breaks generated lines which are too long
+# first insert some marks, after comma or parenthesis
+# there should be no identifiers larger than 15 characters (55+15=70)
+#
+$SED '/^[^Cc\*!].... call hpfc.[( ].\{50,\}$/s/\([^]\{55\}[^,()]*[,()]\)/\1     x /g' |
+#
+# later replaced by CR
+#
+$TR '' '\012'
+
+#
+# list remaining syntax errors onto stderr
+#
+$SED "/^ hpfc syntax error:/!d" $TMP.* 1>&2
+
+#
+# clean temporary files
+
+$RM -f $TMP.*
+
+# That is all
+#

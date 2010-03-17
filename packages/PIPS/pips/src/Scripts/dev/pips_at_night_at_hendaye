@@ -1,0 +1,85 @@
+#! /bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# what to do at night from the irigoin account on hendaye
+
+umask 0077
+
+expected='hendaye'
+host=$(hostname)
+
+[[ "$host" = "$expected" ]] || {
+  echo "script must run on '$expected', not '$host'" >&2
+  exit 1
+}
+
+email="irigoin@cri.ensmp.fr coelho@cri.ensmp.fr ancourt@cri.ensmp.fr"
+target=/home/local/irigoin/NIGHTY
+
+# set environment...
+test -f $target/pipsrc.sh && source $target/pipsrc.sh
+
+start=$(date)
+arch=$(uname -m)
+
+# use a copy of the 'pips_at_night' script:
+# the script may be removed by 'unbuild'
+pips_at_night=$target/pan
+cp $target/prod/pips/src/Scripts/dev/pips_at_night $pips_at_night
+chmod a+rx $pips_at_night
+
+$pips_at_night -t $target -m "$email" -u -b -v -T 1800 -av private "$@" \
+    > out.$$ 2> err.$$
+status=$?
+
+if [ $status -ne 0 ] ; then
+  result="failed ($status)"
+else
+  result='succeeded'
+fi
+
+mv out.$$ $target/out
+mv err.$$ $target/err
+
+end=$(date)
+
+{
+  echo "script=$0"
+  echo "target=$target"
+  echo "host=$host"
+  echo "arch=$PIPS_ARCH ($arch)"
+  echo "out=$target/out"
+  echo "err=$target/err"
+  echo "email=$email"
+  echo "start=$start"
+  echo "end=$end"
+  echo "result=$result"
+  echo
+  echo "software revisions used in this night job:"
+  echo "pips: $(svnversion -c $target/prod/pips)"
+  echo "newgen: $(svnversion -c $target/prod/newgen)"
+  echo "linear: $(svnversion -c $target/prod/linear)"
+  echo "nlpmake: $(svnversion -c $target/prod/pips/makes)"
+  echo "validation: $(svnversion -c $target/validation)"
+  echo "private: $(svnversion -c $target/private)"
+} | ${PIPS_MAIL:-Mail} -s "[pips] $arch night job $result" $email

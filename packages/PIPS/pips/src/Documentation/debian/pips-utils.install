@@ -1,0 +1,10 @@
+usr/bin/pips_c2openmp
+usr/bin/pips_f2openmp
+usr/bin/hpfc
+usr/bin/hpfc_compile
+usr/bin/hpfc_delete
+usr/bin/hpfc_directives
+usr/bin/hpfc_install
+usr/bin/run_step.script
+usr/bin/step_directives
+usr/bin/step_install

@@ -1,0 +1,53 @@
+#! /usr/bin/perl -w
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+$program_name = $ARGV[0];
+print @ARGV;
+while (<>) {
+    /\\begin{PipsMenu}{Transformations}/ && do {
+	$transformation_menu = 1;
+	print "/* The table that describes the transform menu: */\n";
+	print "/* It has been generated automatically from the pipsmake-rc.tex file with " . $program_name . ". */\n";
+	next;
+    };
+    /\\end{PipsMenu}/ && do {
+	$transformation_menu = 0;
+        close(MENU);
+	next;
+    };
+    if ($transformation_menu == 0) {
+	next;
+    };
+    if ( /\s*(\b.*\b)\s*->\s*(\b.*\b)/ ) {
+	$item = "\"" . $1 . "\"";
+	$function = $2;
+	$function =~tr/a-z/A-Z/;
+	$function = "BUILDER_" . $function;
+    }
+    else {
+	# It is a separator:
+	$item = "WPIPS_MENU_SEPARATOR_ID";
+	$function = "\"\"";
+    }
+    print "{\n\t$item, $function\n\t},\n";
+}

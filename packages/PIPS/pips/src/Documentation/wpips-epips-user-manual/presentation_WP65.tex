@@ -1,0 +1,250 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%\documentstyle[psfig,11pt]{article}
+
+%\title{Code Generation for distributed memory machines}
+%\author{Corinne Ancourt}
+%\begin{document}
+%\maketitle
+
+
+To provide accurate results in reasonable time, real applications such
+as seismic, fluid mechanics and structure computation applications (that
+use large set of data and costly algorithms) need to be widely
+parallelized. Distributed memory machines are good candidates for these
+applications because they support large number of processors without
+the shared memory bottle neck problem.  However, distributed memory machines
+are much more difficult to program efficiently than shared memory machines.  Shared memories are
+often managed by the hardware. Conscientious programmer must only
+restructure its program in order to take care of  cache use.
+In distributed memory machines, the distribution of data onto the local 
+memories must be designed  carefully in order to keep good performance and 
+to avoid too much communications.
+
+Many approaches to generate distributed code have been suggested.
+Some are language-based. The programmer has to specify the data
+distribution pattern and the parallelism but he does not have to
+generate processes nor send/receive pairs between processors.
+Processes are automatically derived from the data distribution using
+the so-called {\em owner computes rule} and a SPMD model: each
+processor executes instruction producing a piece of data located in
+its memory.  Send/recei\-ve pairs are derived from the data
+distribution and from the instruction reference patterns.
+
+
+Other approaches are  based on the operating system or/and 
+hardware support. A virtual shared memory provides the uniform address space.
+Some software mechanisms or complex cache systems maintains the memory consistency.
+
+
+Three different approaches have been implemented in Pips. The first one
+is language-based. High Performance Fortran is designed to express data
+parallel applications for distributed memory machines. It provides the
+user with  a set of directives to specify data distribution and parallelism. A prototype  HPF compiler  is implemented in Pips.
+
+The second  approach is also language-based but the data  distribution and the scheduling are 
+automatically computed. Designed for static control programs, this technique
+ generates SIMD programs expressed  in CRAFT (Fortran CRAY-T3D) or CM-Fortran.
+
+Finally, the third approach  suggests the emulation of a shared memory onto a
+distributed memory machine. Classical parallelization techniques are used
+to generate SPMD code. The compiler manages the emulated shared memory and the maintenance of memory coherency.
+
+The following section introduces some characteristics of  these three
+ approaches. It focuses on the scheduling differences. More details are 
+given   in the associated presentation papers.
+ Example presented  in Figure~\ref{ex1} illustrates the approaches.
+
+
+\begin{figure}[htp]
+\begin{verbatim}
+    DO I=1,10
+S1       B(I,I)=1
+    ENDDO
+    DO I=1,10
+      DO J= I+1,10
+S2        B(I,J)=1
+S3        A(I,J)=B(I,J-1)
+      ENDDO
+    ENDDO  
+\end{verbatim}
+\caption{Program 1}
+\label{ex1}
+\end{figure}
+
+\subsubsection{HPF program}
+
+In HPF, the  data distribution and the parallelism are specified
+ via directives. The
+parallel execution of the distributed application is guided by the {\it
+owner computes} rule: a processor can update only its local variables. Let's take our example. 
+
+\begin{figure}[htp]
+\psfig{file=figures/hpfc1.idraw}
+\caption{Data distribution}
+\label{hpfc}
+\end{figure}
+
+Due to the data dependences existing on the second dimension of Array B, 
+the data distribution that minimizes
+the communications groups the array elements by rows. Here,
+ blocks of 2 rows are distributed onto the 5 processor local memories as 
+depicted in Figure~\ref{direct}.
+
+\begin{figure}[htp]
+\begin{verbatim}
+CHPF$ ALIGN A WITH B
+CHPF$ PROCESSORS p1(5)
+CHPF$ DISTRIBUTE B(block,*) ONTO p1
+\end{verbatim}
+\caption{ HPF Directives}
+\label{direct}
+\end{figure}
+
+According to the {\it owner computes} rule,  2 blocks of
+iterations of \verb+J+ are executed on each processor. The corresponding 
+generated code is presented in Figure \ref{hpfcc}.
+
+\begin{figure}[htp]
+\begin{verbatim}
+C
+    DO I=2*PROC_ID, 2*PROC_ID+1
+S1       B(I,I)=1
+    ENDDO
+    DO I=2*PROC_ID, 2*PROC_ID+1
+      DO J= I+1,10
+S2        B(I,J)=1
+S3        A(I,J)=B(I,J-1)
+      ENDDO
+    ENDDO  
+\end{verbatim}
+\caption{Code generated from HPF}
+\label{hpfcc}
+\end{figure}
+
+The "HPFC" presentation details all the characteristics of our HPF compiler.
+
+\subsubsection{Automatic placement}
+
+The problem of solving automatically data and control distributions is
+NP-complet. Thus, they are sequentially solved. In the suggested approach,
+scheduling is first computed. Then, the data distribution computes the mapping
+of each array onto a virtual processor grid so as to minimize 
+the communication cost.
+
+First, the array data flow graph is built. It characterizes the 
+ precedence relations between instruction instances and contains only true 
+dependences because the program is put into a single assignment form. 
+ Figure \ref{plac} presents these precedence relations for program 1. 
+Instructions \verb+S1+ and \verb+S2+ that assign array elements of B, should 
+be executed before instruction \verb+S3+. Some array elements are assigned
+by \verb+S1+ and others by \verb+S2+. The resulting code generated from the 
+DFG is presented in Figure \ref{plac2}
+
+\begin{figure}[htp]
+\psfig{file=figures/plac.idraw}
+\caption{Precedence Relations}
+\label{plac}
+\end{figure}
+
+\begin{figure}[htp]
+\begin{verbatim}
+CDIR$ SHARED B1(:BLOCK, :BLOCK)
+CDIR$ SHARED B2(:BLOCK, :BLOCK)
+CDIR$ SHARED A(:BLOCK, :BLOCK)
+
+CDIR$ DOSHARED(I) ON B1(I,I)
+    DO I=1,9
+       B1(I,I)=1
+    ENDDO
+
+CDIR$ DOSHARED(I,J) ON B2(I,J)
+    DO I=1,10
+      DO J= I+1,10
+        B2(I,J)=1
+      ENDDO
+    ENDDO  
+CDIR$ DOSHARED(I) ON A(I,I+1)
+    DO I=1,9
+       J= I+1
+        A(I,J)=B1(I,J-1)
+      ENDDO
+    ENDDO  
+
+CDIR$ DOSHARED(I,J) ON A(I,J)
+    DO I=1,8
+       DO J= I+2,10
+        A(I,J)=B2(I,J-1)
+      ENDDO
+    ENDDO  
+\end{verbatim}
+\caption{CRAFT Code}
+\label{plac2}
+\end{figure}
+
+This technique is detailed in the "Polyhedric method" presentation.
+
+\subsubsection{Emulated Shared Memory}
+
+
+Since the management of data  distribution is complex, this approach suggests
+ the emulation of a shared memory onto a
+distributed memory machine. Control distribution is applied through {\it 
+tiling}. The iteration domain is partitioned into tiles that can be executed 
+concurrently on different processors. Figure \ref{wp65d} illustrates this 
+tiling and the assignment to the processors.  Tiles  are distributed in
+ a cyclic way. 
+
+\begin{figure}[htp]
+\psfig{file=figures/wp651.idraw}
+\caption{Control distribution}
+\label{wp65d}
+\end{figure}
+
+
+Data distribution is implicit.  One half of the processors perform
+computations and the other half emulate memory banks.
+Figure \ref{wp65c} presents the corresponding generated code for the 
+computations. The necessary communications are inserted in the generated code 
+automatically by the compiler. The "Distributed code generation" presentation 
+ details all the compilation phases of this approach.
+
+
+\begin{figure}[htp]
+\begin{verbatim}
+
+    DO I=PROC_ID,10,5
+S1       B(I,I)=1
+    ENDDO
+    DO I=PROC_ID,10,5
+      DO J= I+1,10
+S2        B(I,J)=1
+S3        A(I,J)=B(I,J-1)
+      ENDDO
+    ENDDO  
+\end{verbatim}
+\caption{Wp65 code}
+\label{wp65c}
+\end{figure}
+
+%\end{document}

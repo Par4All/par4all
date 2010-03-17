@@ -1,0 +1,87 @@
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Fait des vérifications exhaustives :
+# (i.e. not very fast)
+# FC	=	f77
+# FFLAGS	=	-g -U -u -C 
+
+ifdef WP65_FC
+FC	= $(WP65_FC)
+else
+FC	= g77
+endif
+
+ifdef WP65_FFLAGS
+FFLAGS	= $(WP65_FFLAGS)
+else
+ifeq ($(FC),g77)
+FFLAGS	+= -Wimplicit
+else
+FFLAGS	+= -u
+endif
+endif
+
+ifndef WP65_RUNTIME
+WP65_RUNTIME = 	$(PIPS_ROOT)/Runtime/wp65
+endif
+
+LD	= $(FC)
+LDFLAGS = -L$(WP65_RUNTIME)/$(PVM_ARCH) \
+	  -L$(NEWGEN_ROOT)/Lib/$(PIPS_ARCH) \
+	  -L$(PIPS_ROOT)/Lib/$(PIPS_ARCH) \
+	  -L$(PVM_ROOT)/lib/$(PVM_ARCH)
+
+#
+# Ronan links to 3 pips libraries (wp65, misc, properties) 
+# and to the newgen linrary (genC)...
+# I think that the wp65runtime should be standalone... FC:-)
+#-lF77
+LDLIBS= -lwp65runtime -lgpvm3 -lpvm3 -lwp65 -lm -lmisc -lproperties -lgenC
+LINK	= $(LD) $(LDFLAGS) -o
+
+#
+# files
+
+OBJECTS.f = $(SOURCES.f:%.f=%.o)
+RUNDIR = $(HOME)/pvm3/bin/$(PVM_ARCH)
+
+# CIBLE is expected from somewhere...
+
+all: $(RUNDIR) $(CIBLE)
+
+#
+# rules
+
+$(CIBLE): $(OBJECTS.f) 
+	$(LINK) $@ $(OBJECTS.f) $(LDLIBS)
+	#
+	# Installe l'exécutable chez soi dans son répertoire pvm pour PVM :
+	cp -p $@ $(RUNDIR)
+
+$(RUNDIR):
+	mkdir -p $@
+
+clean:
+	-$(RM) *~ $(OFILES) $(LOCAL_LIB)
+
+# that is all
+#

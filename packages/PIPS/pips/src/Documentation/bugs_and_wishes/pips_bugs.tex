@@ -1,0 +1,2462 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentstyle[12pt]{article}
+%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\titre}{PIPS BUGS and WISHES \\
+                    Version 1.1 \\
+                        Draft (November 21, 1991)}
+\newcommand{\auteur}{Franc,ois Irigoin\\
+                et al.}
+\newcommand{\docdate}{10 January 1992}
+\newcommand{\numero}{Exxx}
+
+\begin{document}
+
+%%\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+Should be augmented with meeting results: solved problems and new
+problems and new priorities.
+
+\paragraph{Priorities as defined in May 1991:}
+
+\begin{itemize}
+
+  \item programming environment \marginpar{(PJ/FI/BB)} 
+
+  \item parallelization correctness \marginpar{(PJ)} 
+
+  \item parser robustness \marginpar{(FI)} 
+
+  \item pips process size: pipsdbm and pipsmake 
+
+  \item evaluation and quantification and benchmarking \marginpar{(YY)}
+
+\end{itemize}
+
+\paragraph{Goals for 1992:}
+
+\begin{itemize}
+
+  \item PIPS-CRAY
+
+  \item Yi-Qing's PhD;
+
+  \item Lei's PhD;
+
+  \item CEA's goals;
+
+  \item PIPS evaluation: interprocedural analysis, interprocedural
+        parallelization;
+
+\end{itemize}
+
+Non-regression: please fill in Validate and Bugs in a systematic way!
+
+\section{Atomizer (Alexis Platonoff)}
+
+\section{Bootstrap}
+
+\begin{enumerate}
+
+  \item intrinsic \verb+LOG+ is missing; 27 February 1992; to be added
+        in effects library too; fixed by FI, 10 March 1992;
+
+  \item same thing for \verb+LOG10+; fixed by FI, 10 March 1992;
+
+  \item intrinsics with a varying number of arguments are encoded
+        as having 0 arguments; no good solution has yet been found;
+        FI, 18 March 1991 (this would also solve the next problem);
+
+  \item \verb+STOP+ was declared as always having one parameter;
+        this was changed to {\em zero} parameters; modified by
+        FI, 19 March 1992
+
+\end{enumerate}
+
+
+\subsection{Wishes}
+
+\begin{itemize}
+
+  \item information about intrinsics, scattered in syntax, ri-util,
+        bootstrap and effects should be centralized, probably in
+        ri-util; FI, 27 March 1992;
+
+\end{itemize}
+
+\section{Call Graph (Lei Zhou)}
+
+\begin{enumerate}
+
+  \item make a difference between the Call Graph based on symbol tables
+        and the elided interprocedural Control Flow Graph, which is
+        currently called {\em call graph}
+
+  \item present\marginpar{(LZ/FI)} {\em call graph} is broken by
+        unstructured; no relation with the source program; use {\em
+        parsed\_code} instead? Faster... but not as fast as a real call
+        graph based on declarations; 
+
+  \item property \verb+ALL_DO+ to see nesting levels regardless of procedure
+        calls; i.e. display another kind of squeletton for the ICFG:
+        all loop control structure, DO-loops and while, every control
+        structures, including IFs;
+
+  \item unstructured are not displayed and so WHILE loops are not
+        visible (i.e. cycles in the control graph);
+
+  \item function calls are not taken into account; FI, 29 July 1992;
+
+\end{enumerate}
+
+\section{Chains}
+
+Pierre Jouvelot.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item local variables should be handled as global ones; else,
+        statement grouped by a private declaration may be distributed;
+        this doesn't explain the erronneous behavior observed; problems with
+        B should also occur;
+
+  \item \verb+KEEP_READ_READ_DEPENDENCE+: \verb+pips_error in dept_type+;
+
+  \item test added so as never not taking into account proper effects or
+        regions of blocks; this is due to semantics difference between
+        proper effects and regions which look a bit more like cumulated
+        effects; FI, 5 August 1992;
+
+\end{enumerate}
+
+\subsection{Modifications}
+
+\begin{enumerate}
+
+  \item two new routines added to compute base chain computation on
+        proper effects (as before) or on regions; FI, 5 August 1992;
+
+\end{enumerate}
+
+\section{Code-Generate}
+
+This library was merged into library Transformations by Bruno Baron.
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item Perform priv is required to detect that the inner loop is
+parallel in the following case:
+\begin{verbatim}
+      program dist
+      real a(100,100)
+
+      do 10 i=1,100
+         m = j
+         do 20 j=1,m
+            a(i,j) = m
+ 20      continue
+ 10   continue
+      end
+\end{verbatim}
+The fast privatize routine is unable to detect that J is local.  But
+this may not be correct. Depends of the semantics of DOALL.
+      
+\end{enumerate}
+
+\section{Complexity}
+
+The complexity library is managed by Lei.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item Do not substract negative execution time for loops with
+        non-satisfied conditions
+
+  \item The callee's complexity result which contains the COMMON
+        variables as its component CANNOT be added to the caller's
+        complexity which contains the same COMMON variables.
+        LZ thinks it is beacuse of the restriction of module name.
+        like: FOO:IL and TOTO:IL , they can't be added. 24/02/92
+
+  \item pips core dumps when writing ZPROAX.COMPLEXITY after an
+        interprocedural analysis;
+        see \verb+zproax.f+ in \verb+Bugs/Complexity+;
+        FI, 9 August 1992;
+
+  \item Fail to pass FFT algorithm:
+        The sample version is kept in Bugs/Complexity/fstr2.f .
+        There are two problems: 1) N is unknown in Loop 12, that is to
+        say, the precondition is not available.
+        2) MMAX is unknown, it is no surprise beacuse it is updated
+        on each iteration. Then MMAX has the value ``UR'' as final
+        complexity results. Loop 13 and Loop 12 both have MMAX as 
+        loop bound and ``UR'' is kept out of C3/polynomial library,
+        so two polynomials can not be added, let alone multiplication.
+        What we can get is ``Bad internal polynomial representation''.
+        LZ, Oct. 8, 92
+
+  \item For tmines.f program in ~pips/Pips/Expe*/Complexity,
+        when {\bf setenv COMPLEXITY\_DEBUG\_LEVEL 9} is set,
+        {\bf Display -m calcg comp} core dumped.
+        If the debug level is not set, it works.
+        LZ, 08/06/04
+
+\end{enumerate}
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item The loop bound cannot be the value of an array.
+        When the inner loop's bound are independent, we have no way to
+        evaluate the outer loop's body complexity.
+        That is, we cannot use a polynomial form to represent the inner
+        loop's complexity. 
+        Though it's not a normal case. FI: Example?
+
+  \item How should target machines be modeled? Define a NewGen structure
+        and an external format? See \verb+model.rc+ in WP65.
+
+  \item Where should model files be stored? How
+        should they be accessed? Everything should be in Documentation
+        in a LATEX form...
+
+  \item Evaluate parallel complexity for different kind of processors
+        (unbounded PRAM machine, multiprocessor, vector processor,...)
+
+  \item Evaluate space and communication complexities
+
+  \item Evaluate dynamic complexity: how much does each statement contribute
+        to the total complexity? Proper complexity times number of executions.
+
+  \item Propagate complexities downwards so as to know how many times a
+        statement is executed
+
+  \item set up cost tables to compute the number of (visible) floating point
+        operations and/or memory requests (loads and stores); intrinsics
+        like \verb+SIN+are not taken into account;
+
+  \item define a mechanism to select a particular cost table;
+
+  \item build and test a cost table for Sparcstation 1;
+
+\end{enumerate}
+
+\section{Control}
+
+Build the control graph and generate the \verb+CONTROLIZED_CODE+.
+
+\begin{enumerate}
+
+  \item FORMATs which are unreachable are dead-code eliminated;
+        see \verb+Bug/Control/tformat.f+
+
+  \item unstructured code seems to unstructure nearby structured code;
+        see \verb+dyna/vt.f+; the bug hasn't been reproduced
+        on smaller cases; FI, 5 August 1992;
+
+\end{enumerate}
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item \marginpar{PJ} make unstructureds as small as possible;
+        see TMINES and its semantic analysis for instance or \verb+split.f+
+        and the complexity evaluation; BAS should be preserved; prologue
+        and postlogue should be moved out of the unstructured;
+
+  \item recognize structured constructs like
+        IF/THEN/ELSE? Should be performed by an external tool: 
+
+  \item STOPs in subroutines and functions are not handled at 
+        all (core dumped); control effects?
+
+\end{enumerate}
+
+\section{Conversion}
+
+Who's responsible?
+
+\section{Dg-util (Utilities for the dependence graph)}
+
+\section{Effects}
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item improve \marginpar{(FI)} reshaping handling for numerical array
+        bounds: T(961) and U(31,31) in spec77 for instance 
+
+  \item recompute
+        effects a second time, using information about constant
+        propagation \item document the origin of {\em bad array reshaping} 
+
+  \item
+        add a property to cope silently with * dimension declaration; CEA
+        suggestion; is it possible to trust the user better?  
+
+  \item bug with spec77/del4 (dim transformed in foodim):
+        \verb+pips_assertion_failed in reference_ith_index() +
+
+  \item use order on cumulated effects to
+        destroy useless read effects; should be also useful for proper effects
+        of composite instruction like DO; may have been done since 
+        \verb=Bugs/Effects/effect.f= is correctly parallelized (FI, 17 January
+        1992)
+
+  \item add an array of logical
+        units (this entity should be created at parse time) and generate
+        write effects on this entity for IO statements
+
+  \item core dumps in PerfectClub/W.WS with function {\em gfidi}:\\
+        \verb+pips assertion failed in reference_ith_index+
+
+  \item demo/ifp-pips.f, module onde24 with {\tt PIPSDBM\_DEBUG\_LEVEL=5}:
+\\ 
+\verb+[db_put_resource] Checking Newgen Consistency for resource
+PROPER_EFFECTS(ONDE24):+ \\
+\verb+Newgen User Error -- gen_check: Type clash (expecting entity,
+getting unit)+ \\
+Could probably be illustrated with another code.
+
+  \item generate a \verb+MAY+ effect instead of a \verb+MUST+ effect when
+        an array element is referenced; this produce wrong \verb+array kill+
+        information for subroutine; see \verb+Bugs/Effects/effect2.f+
+        (FI, 6 May 1991);
+
+  \item WRITE has a \verb+read+ effects on its IO-list; see for instance
+        \verb+ker22.f+
+
+  \item \verb+TOP-LEVEL:PAUSE+ is not recognized by 
+        \verb+proper_effects_of_call()+;
+        see \verb+Bugs/Syntax/pset.f+; FI, 7 February 1992;
+        the bug was in \verb+bootstrap+ where \verb+PAUSE+ was not
+        recognized as intrinsics; \verb+PAUSE+ was not recognized
+        in effects either;
+
+  \item control effects are ignored in \verb+PAUSE+ and \verb+STOP+;
+        FI, 7 February 1992
+
+  \item effects of IO lists are redundant; the same item is counted
+        n times, where n is its position in the io list;
+        this has a dramatic effect on use-def chain counts;
+        see \verb+Bugs/Effects/udread.f+; YY et FI, 23 June 1992;
+        fixed by FI, 23 June 1992;
+
+  \item typo for \verb+OPEN+ with \verb+ACCESS+ option; observed
+        with \verb+dyna.f+; fixed by FI in \verb+io.c+, 30 July 1992;
+
+  \item output buffers in \verb+store_text_line+ were filled in without
+        checking for overflow; they were allocated in the stack so
+        as to create havoc on overflow; observed and fixed - size
+        increase and overflow check - by FI,
+        31 July 1992;
+
+  \item print stars '*' for unknown array indices when prettyprinting
+        effects; FI, 2 August 1992;
+
+  \item This last modification seems to put the same array many times in
+        the same list; maybe, this was an old bug; when are the stars
+        added? When the effect is built? When the effect is printed?
+        This shows in cumulated effects: each proper effect is
+        transformed into a cumulated effect without reduction for
+        redundant cumulated effects; FI, 27 April 1993;
+
+  \item wrong reshaping on \verb+Y+ in \verb+zproax+; a macro was
+        called with a functional argument expansed twice: too bad
+        for the side effects; FI, 11 August 1992;
+
+  \item proper effects of DO's include a MAY-READ of the loop index
+        due to its incrementation; this does not let the MUST-WRITE
+        of the loop index kill use-def chains that should be killed
+        and legal privatizations are not possible and parallel loops
+        are kept serial; this is due to the compound nature of the PIPS DO
+        instruction;
+
+        It is difficult to define a semantics for the effects ordering
+        as the masking does not always occur (see test instructions for
+instance).
+        It is hard to add a masking system to the effect computation.
+        It was not chosen to give a copy-in copy-out semantics to
+        private variables.
+        It was chosen to handle the DO as a special case and to
+        suppress the MAY-READ effect on the loop index.
+
+        See \verb+Validation/Effects/loop.f+. FI, RK, March 12, 1993.
+
+  \item the effect print buffer may be too small; size increased to
+        2048; overflow check added; FI, 26 May 1993;
+
+  \item \verb+effects_conflict_with_entity()+ modified to call
+        \verb+entity_conflict_p()+ instead of performing a pointer
+        comparison; \verb+effects_read_or_write_entity()+ added;
+        FI, 29 JUne 1993
+        
+\end{enumerate}
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item bad reshaping wrongly found for \verb+A+ in \verb+zproax.f+; function
+        \verb+translate_array_effect+ does not handle arrays of dimension
+        greater than or equal to three because the direct test is not
+        linear; a new test should be developped to test that the first
+        k-1 dimensions have the same sized in the formal and actual arguments
+        and that formal dimension k is less then actual dimension k;
+        the formal dimension is k; the actual dimension must be greater
+        than or equal to k; equality between two expressions can be proved
+        by checking that their difference evaluates to 0 (\verb+sc_eval+);
+        FI, 11 August 1992;
+
+  \item effects should be alphabetically sorted by variable names to
+        improve readability; FI, 1 Dec. 1992;
+
+  \item \verb+MUST+ effects should mask \verb+MAY+ effects; 
+        for instance, the same
+        statement should not have a \verb+MUST WRITE T+ and a
+        \verb+MAY WRITE T+ simultaneously; the \verb+MAY+ effect
+        should be deleted; let say that different kind of effects could
+        be computed;
+
+  \item control effects (stop/exit) should also be computed;
+
+  \item effects should take into account the declarations; see
+        \$PIPSDIR/Test/Bugs/Semantics/contrex3.f for an example. FI, BA,
+        9 february 1994.
+        
+
+        
+\end{enumerate}
+
+\section{Evaluation of PIPS}
+
+\begin{enumerate}
+
+  \item see what happens in OASSEM (cr2cnf) after privatization;
+
+  \item parser core dumps on SPHOT (PerfectClub)
+
+  \item PerfectClub
+
+  \item Riceps
+
+  \item SIDOLO (YY)
+
+\end{enumerate}
+
+\section{Generation}
+
+Who's responsible?
+
+\section{Hyperplane}
+
+Hyperplane method, meaning linear scheduling, i.e. unimodular transformations.
+Include loop interchange.
+
+\begin{enumerate}
+
+  \item \marginpar{YY} should include a test for dependences
+
+  \item \marginpar{BB} should include a machine dependent cost 
+function for interchange decision
+
+  \item should handle not perfectly nested loops
+\end{enumerate}
+
+\section{ICFG}
+
+Interprocedural Control Flow Graph.
+
+\section{Linear}
+
+\verb+linear.h+ was suppressed. It was redundant with ri.h because
+of NewGen requirements for external types. It was not properly
+installed as not derived from any particular library. FI, December 91.
+
+\subsection{Vecteur}
+
+\begin{enumerate}
+
+  \item integer overflow are usually not detected; one test was
+        added in \verb+vect_cl2()+
+
+\end{enumerate}
+
+\subsection{Contrainte}
+
+\begin{enumerate}
+
+  \item \verb+contrainte_normalize+ did not handle correctly constant terms
+in inequalities; the new bound was off by 1, in the safe direction; fixed
+by FI, October 91;
+
+  \item coefficients in pairwise elimination were not reduced by their
+        GCD; fixed by FI, December 91;
+
+\end{enumerate}
+
+\subsection{Syste`me de Contraintes}
+
+\begin{enumerate}
+
+  \item \verb+sc_rm_empty_constraints()+ did not update the numbers of
+        equalities and inequalities (FI, Oct. 30, 1991);
+
+\end{enumerate}
+
+\begin{enumerate}
+
+  \item modify the grammar so as to allow comments linear system
+        description files (FI, 8 August 1992)
+
+\end{enumerate}
+
+\subsection{Polye`dres}
+
+\subsubsection{Bugs}
+
+\begin{enumerate}
+
+  \item the convex hull operator core dumps with (Alexis Platonoff,
+        6 August 1992, using CEA version):
+
+\begin{verbatim}
+        {PHI3<=60, 1<=PHI3, PHI2<=21, 1<=PHI2, PHI1<=52, 1<=PHI1,
+         PHI3==1, PHI2==4, PHI1==4}
+
+        {1<=PHI1, PHI1<=52, 1<=PHI2, PHI2<=21, 1<=PHI3, PHI3<=60,
+         PHI1==5, PHI2==5, PHI3==1}
+
+Assertion failed: file "binaires.c", line 181
+/java/home3/pips/Pips/Utilities/Pips: 14764 Abort - core dumped
+Exit code for pips: 134; exiting /java/home3/pips/Pips/Utilities/Pips
+\end{verbatim}
+
+  \item the convex hull operator is too slow for large systems as produced
+        by semantic analysis on \verb+aile.f+; a new version
+        \verb+sc_fast_convex_hull+ was introduced, but it's slower
+        for small systems; FI, 9 August 1992;
+
+  \item the convex hull operator does not eliminate redundancy properly;
+        see for instance the precondition for the call to \verb+NORM+
+        in \verb+geom.f+ (part of \verb+aile.f+)
+
+\end{enumerate}
+
+\subsubsection{Wishes}
+
+\begin{enumerate}
+
+  \item reproduce optimization for small systems that are in 
+        \verb+sc_enveloppe+ into \verb+sc_fast_convex_hull+;
+        FI, 9 August 1992;
+
+\end{enumerate}
+
+
+\section{Link(er)}
+
+\begin{enumerate}
+
+  \item could \marginpar{(BB/LZ)} it be executed before the controlizer
+to get a nicer interprocedural control flow graph? Remi may have decided
+to activate the controlizer just after the parser to save a load/unload
+sequence?
+
+  \item LZ: bug linked to variable name change from T to Q
+
+  \item calls in unreachable code seems are not linked; see
+        \verb+Bugs/Newgen/simple4.f+; this bug may disappear because the
+        link is going to be executed in the parser; 
+        Franc,ois Irigoin, 3~February~1992;
+
+  \item core dumps with an illegal branching inside a loop; see
+        \verb+Bugs/Link/branch.f+; Bruno Baron, 31 mars 1991.
+        Pips is not supposed to work on illegal fortran programs.
+        AL, 12 august 1992.
+
+\end{enumerate}
+
+\section{Loop Distribution}
+
+No library. Included in Allen \& Kennedy parallelization algorithm and
+as such coded in \verb+rice+.
+
+\begin{enumerate}
+
+  \item induction variables definitions are distributed when they appear
+        in inner loop bounds; difficult to correct because of Allen \&
+        Kennedy algorithm; PMACS: lots of dependence arcs are added between
+        the index definition and the loop body; it was decided not to do
+        that in PIPS for performance reasons;
+
+  \item definition of privates variables are sometimes distributed wrt
+        their uses; see example mailed to Pierre; corrected
+
+  \item useless privatization after loop distribution; Re'mi is likely to
+        reuse the same DO statement...
+
+\end{enumerate}
+
+\section{Loop\_normalize}
+
+\section{Loops\_Interchange}
+
+Mispelled...
+
+\section{Misc(ellaneous)}
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item \verb+concatenate+ does not check for overflows; observed by FI,
+        31 July 1992; fixed by FI, 1 August 1992; wish: \verb+concatenate+
+        should automatically malloc'ed a larger buffer when necessary...
+
+\end{enumerate}
+
+Is it a library or a special section?
+
+\begin{enumerate}
+
+  \item define an installation procedure for Paris; how is the PIPS account
+        doing? Look at make-tape?
+
+  \item PIPS documentation has to be translated into English...
+
+  \item cycles between libraries: misc (get\_bool\_property) and properties
+        (concatenate and pips\_error); what the best solution with these
+        low-level libraries? Fuse them? Duplicate some functions with
+        diferent names in different libraries? Temporary fix: these libraries
+        are called twice;
+
+        Bruno suggests to fuse the two libraries. Properties is a low level
+        library. It could be used regardless of PIPS. It contains only
+        one file and a few functions. Any disagreement?
+
+        Another solution would be to use a \verb+getenv()+ in \verb+misc+
+        to decided whether or not to print messages.
+
+\end{enumerate}
+
+\section{Movements}
+
+\section{NewGen}
+
+Pierre is responsible for NewGen maintenance.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item support for mappings over untabulated types?
+
+  \item proper handling of double quotes (onde24.f); fixed, PJ;
+
+  \item consistent code is written using \verb+gen_write()+ and is re-read
+        and found not consistent anymore; see onde24.f; summarized
+        in \verb+Bugs/Newgen/tformat.f+; further summarized in
+        \verb+Bugs/Newgen/simpl4.f+; FI, January 1992; the problem
+        is due to Newgen handling of forward referencex; a fixed order
+        is now imposed for file input: tabulated domain have to be
+        read first; fixed by PJ, February 1992;
+
+  \item SPACE characters are lost in strings delimited by double quotes;
+        see the parsed code for tformat (with double quotes used in
+        format 1100; FI, January 1992; the bug may be due to PIPS parser;
+
+  \item \verb+gen_free()+ does not go across persistant arcs but tests for
+        sharing beyond them; this is highly inefficient when effects
+        are freed; fixed by PJ, February 1992;
+
+  \item \verb+gen_read+ does not accept forward references in a tabulated
+        domain, entity, with a recursive data structure; FI, 10 February 1992;
+        fixed by PJ;
+
+  \item \verb+gen_read+ does accept forward references in a tabulated
+        domain, entity, with a recursive data structure; but it does
+        not check that they are all filled in at the end; FI, February 1992;
+        fixed by PJ by adding \verb+gen_read_and_check_tabulated+; FI:
+        I do not understand why this facility is not available at the
+        \verb+gen_read+ level? Because the check is already available for
+        non-tabulated domain?
+
+  \item \verb+gen_free()+ does dereference a free area and core dumps;
+        fixed by PJ, July 1992;
+
+  \item \verb+read.l+ does not check \verb+yytext+ overflows; fixed, FI,
+        July 1992;
+
+  \item untested overflow for tabulated domain in \verb+enter_tabulated_def()+;
+        FI, 28 July 1992;
+
+\end{enumerate}
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item support for mappings over untabulated types?
+
+  \item efficient handling of persistant arcs in \verb+gen_free()+
+        (and in its call to shared pointers).
+
+  \item better density for NewGen files; for instance, \verb+hash_tables+ are
+        stored as dense arrays and, as a consequence, half of entity files
+        are likely to be full of \verb+#]null+ to represent empty buckets;
+
+  \item check for disk full condition; 
+
+  \item mapping.h : MAKE\_STATEMENT\_MAPPING should take no argument in
+        order to be coherent with the make functions usually generated
+        by NewGen; fixed, BA, August 1993. 
+
+\end{enumerate}
+
+\section{Normalize}
+
+Should be merged into Ri-util (20 October 1991). FI in charge? Done,
+Dec. 12, 1991.
+
+\newpage
+
+\section{Pips}
+
+Batch interface. The program is named \verb+pips+ and the script shell
+used to make it more user-friendly is named \verb+Pips+.
+
+Provides support for \verb+Init+\verb+Select+n, \verb+Build+ and
+\verb+Perform+. See also \verb+Delete+. See man(l) for details about options.
+
+\subsection{Bugs:}
+
+\begin{itemize}
+
+  \item varying exit codes; no explicit \verb+exit()+ was executed;
+        fixed by Bruno Baron, 27 March 1992.
+
+  \item illegal instruction in exit() avec ifp.f; Bruno Baron, 16 June 96;
+        the bug seems to have been an overflow in \verb+Newgen/read.l+;
+        the code generated by Lex does not check for overflows or
+        \verb=yytext=;
+        fixed by FI, 19 July 1992;
+
+  \item no \verb+-v+ option for Perform; non-uniform interface;
+        fixed by FI, 23 July 1992;
+
+  \item \verb+Display+ advertizes a non-existing \verb+para+ option
+        and do not display the existing \verb+cray+ option;
+        found and fixed by FI, 23 July 1992;
+
+  \item modified to accept many \verb+-b+ options so as to compute
+        more than one result per call (\verb+tpips+ should be revived
+        for large applications); FI, 4 August 1992;
+
+\end{itemize}
+
+\section{Pipsdbm}
+
+\begin{enumerate}
+
+  \item there is no need for absolute file names; they should be relative
+        to the location of the database schema file;
+
+  \item xxx.schema and xxx.pipsmake should be hidden in xxx.database.
+        ( Done by LZ Sep.91 )
+        
+  \item pipsdbm should be rewritten; who is interested in it? BB.
+
+  \item builder\_map: should be derived automatically from pipsmake-rc.f.tex
+
+  \item shall we keep the PURE/IMPURE request parameter or move the problem
+        upwards in pipsmake? Is it possible? When an IMPURE request is made,
+        pipsdbm copy the existing resource on disk, read it back and
+        return a pointer towards the copy. This means that all data structures
+        based on it are potentially flawed. As an example, suppose you
+        get a module code with the impure flag set up. The dependence
+        graph that was built before on the module code is not consistent
+        with the copy: its nodes point towards the initial copy of the
+        code and its arcs point towards the initial references.
+
+        In the same way, statement mappings are likely to be unusable
+        after an IMPURE request.
+
+        The solution to this problem is linked to a NewGen extension to
+        support absolute naming and some kind of type (or object?) hierarchy.
+        All object should be ...?!?
+
+        Fixes (kludges!):
+
+  \begin{enumerate}
+
+    \item to avoid problems with references in \verb+rice+, a special
+        test
+        is performed in \verb+db_unload()+ so as not to free the
+        statements
+        of a module;
+
+    \item \verb+Wp65+ modifies the code but performs a \verb+pure+
+        get which is OK to generate code in batch mode but kills
+        \verb+wpips+
+
+    \item \verb+Privatize+
+
+    \item \verb+Loop Interchange+
+
+    \item \verb+Partial Eval+
+
+  \end{enumerate}
+
+  \item \verb+put+ with \verb+PIPSDBM_DEBUG_LEVEL+ higher than 5 calls
+        \verb+gen_consistent_p+ on \verb+DBR_PRECONDITIONS+ which is
+        not a Newgen object; fixed, FI, 11 February 1992;
+        \verb+DBM_SUMMARY_PRECONDITION+ is also not tested (although
+        it should theoretically be tested);
+
+  \item empty lists seem not to be well handled; pipsdbm behaves as
+        if the resource was non-existent; see \verb+ifp.f+ and
+        \verb+openfile+ effects: the latter are always re-computed
+        whenever they are needed; this seems to be due to the fact
+        that an empty list is represented by NIL; FI, 22 July 1992;
+        problem with \verb+string_undefined+; fixed, FI, 3 August 1992;
+
+  \item calls to unput() from within a MAP over the resources;
+        the current cons in the MAP is destroyed by unput()...
+        fixed by FI, 20 July 1992;
+
+  \item \verb+REGIONS+ and \verb+SUMMARY_REGIONS+ added; FI, AL,
+        4 August 1992;
+
+\end{enumerate}
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item add a dirty bit to resource description to avoid useless copy back;
+        this will introduce a higher risk of non-consistency since 
+        resources can be modified although pipsdbm is not notified;
+        FI/BB, 21 February 1992;
+
+\end{enumerate}
+
+\newpage
+
+\section{Pipsmake}
+
+Modifications of \verb+pipsmake-rc.f.tex+ are recorded here along with
+information regarding library \verb+pipsmake+.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item unique type {\tt text} for all displayable objects; why should
+        we have special cases like parallel code and call graph?!?
+        automatic display as soon as a function producing a text object
+        is selected (no more {\tt view}?)? Why should we have to distinguish
+        between them? Because they might be parsed again later? One
+        reason is to generate wpips menus;
+
+  \item direct display of text objects: no double selection like
+        {\em statement + transformer} and {\em view sequential}; it's
+        not practical
+
+  \item hash tables on statements are wrong as soon as the code is saved
+        on disk (i.e. after a program transformation or a
+        parallelization); the code is saved on disk when pipsdbm is called
+        with an IMPURE spec. and reloaded in memory at different addresses;
+        one could think of unloading every data based on code when code
+        is modified (could it be infered automatically by an extended
+        NewGen with mappings?); one could also use statement\_ordering as
+        a storage invariant key in the statement\_mapping package;
+        it is more a pipsdbm problem than a pipsmake problem;
+
+  \item cope with formal functions by assuming that they have no side
+        effects?
+
+  \item use network parallelism?
+
+  \item blockdata exploitation?
+
+  \item vfork() for close\_module()? It's a pain to demo pips each time
+        you've used the main! Bug generating feature?
+
+  \item a way to make macros, i.e. to chain privatization and
+        parallelization would be interesting for some demonstration and
+        for naive users; how could we get:
+        \begin{quote}
+                parallelize(privatise(MODULE.code))
+        \end{quote}
+        without having to write C code; we need a o operator! on
+        pourrait ajouter a pips une option -c pour donner une liste de
+        Commandes (select, build et perform); 
+        pipsmake is orthogonal wrt Parafrase pass list; 
+
+  \item we need a compile-make to write (temporarily) useless objects
+        onto disk and to minimize memory need (see aile.f); similar to
+        life span and register allocation?
+
+  \item correctness bug spotted by Bruno; rules should be checked when expansed
+        to make sure they still expand in the same way (CALLEES might have
+        changed for instance)
+
+  \item correctness problem with \verb+SUMMARY_PRECONDITION+; \verb+pips_make+
+        should explictly destroy any resource detected as inconsistent; this
+        would prevent \verb+pips_dbm+ from providing stale resources; this
+        should never happen with a {\em clean} make mechanism, but we have
+        to be not so clean when resources like summary preconditions are
+        incrementally computed; see \verb+Bugs/Semantics/eval.f+, unless
+        it's in \verb+demo/Vienna+: preconditions are not accurately recomputed
+        after a \verb+Perform eval+ which linearized part of the code;
+        FI, 6 August 1992;
+
+\end{enumerate}
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item incremental source file addition: very frustrating when three
+        lines are missing out of 4000; at least, a list of missing sources
+        should be provided; there is a need for some user interaction:
+        \verb+query_user+; FI, each time a new program is analyzed!
+
+  \item user file restoration (same file names, same content, same order);
+        keep some additional information: user\_file/source\_file/rank;
+        MODULE.user\_file
+
+  \item \verb+builder_map+ should be automatically derived from
+        \verb+pipsmake-rc.f.tex+
+
+\end{enumerate}
+
+\subsection{Modifications}
+
+\begin{enumerate}
+
+  \item old rule \verb+chains+ replaced by \verb+atomic_chains+ (which
+        is equivalent and \verb+region_chains+ which let pips build the
+        use-def chains and the dependence graph on top of regions;
+        FI, 5 August 1992;
+
+  \item rules for icfg are modified to enforce recursive calls
+
+\end{enumerate}
+
+\section{Prettyprint(er)}
+
+Managed by Lei Zhou, \verb+<zhou@cri.ensmp.fr>+.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item SUBROUTINE and FUNCTION calls with no arguments should not be
+        displayed with a parenthesized empty argument list.
+
+  \item redundant parentheses should not be displayed; unbearable with
+        complex expressions (i.e. intricate); 
+        AC in charge, April 90; fixed by LZ, November 91;
+
+  \item some COMMENTs disappear in onde24.f; maybe a parser problem,
+        or a controlizer problem, or...
+
+  \item a function to print all declarations is missing; necessary when some
+        code is generated (i.e. Atomizer, wp65); done: new version of the
+        prettyprinter written by Lei Zhou (October 1991);
+
+  \item there seems to be no way to know whether a module is a PROGRAM
+        or a SUBROUTINE; the problem is usually avoided by keeping all
+        declarations in a string called \verb+decls_text+; in doubt,
+        SUBROUTINEs with no arguments are deemed to be PROGRAMs (Lei Zhou,
+        October 1991);
+
+  \item wrong user line numbering (detected by Bruno Baron, 23 October 1991);
+        observed again by BB, November 12; use {\em validate} to get
+        the bug; moved to \verb+Syntax+ (FI, 3 January 1992);
+
+  \item \marginpar{LZ}
+        no \verb+ENDDO+ after \verb+DOALL+; fixed by LZ 17/01/92. 
+        Initial loop label should only be preserved in comments;
+        ( Note: when the loop has to be distributed , loop label and
+        \verb+CONTINUE+ have been suppressed in 
+        \verb+PARALLELIZED_CODE+, How can
+        we pick these things up to make them into comments.)
+
+  \item \marginpar{LZ} missing \verb+ENDDO+ after \verb+DOALL+;
+        ( Same thing, See previous item LZ , 17/01/92 )
+
+  \item \marginpar{LZ} option needed to avoid printing statement number in
+        columns~73-80 (November 8, 1991);
+
+  \item loop increments equal to 1 are not printed anymore (LZ)
+
+  \item statement ordering missed before the IF statement.
+        observed by LZ. 20/02/92 in \verb+Bugs/Prettyprint/intpl.f+;
+        likely to be a bug in PJ's stuff to prettyprint controls (FI);
+
+  \item remove the confusion between para, para77 and para90; para should
+        disappear from pipsmake.rc; Lei is in charge (17 January 1992);
+
+  \item RETURN statements are kept implicit whenever possible;
+        FI, AL, 16 July 1992;
+
+  \item the priority between the integer division and the integer
+        multiplication is not observed; useful parentheses as in
+        \verb+2*(I/2)+ disappear; FI, 10 July 1993
+
+\end{enumerate}
+
+\section{Privatize}
+
+\begin{enumerate}
+
+  \item with nested loops internal private variables are also privatized
+        in the outer loop (to be checked);
+
+  \item privatization at the block level, or at least at the procedure
+        level would be useful for wp65; at the procedure level, interprocedural
+        effects might be enough;
+
+\end{enumerate}
+
+\section{Programming Environment}
+
+See report dret146.
+
+\begin{enumerate}
+
+  \item get PIPS\_LIBS from the shell environment and not from the
+        config.makefile; done (PJ);
+
+  \item add a restore: entry in standard PIPS makefile; i.e. modify install
+        to preserve the current files in a Backup sub-tree; install:
+        mv Production/xxx Backup/xxx; mkdir Production/xxx
+
+  \item archivage des versions successives?
+
+  \item develop new makefiles/shell script in Production to try option
+        -O2 or -O3 and -pg; problem with external libraries NewGen and Linear;
+        problem with /usr/debug/malloc (add a new environment variable,
+        PIPS\_MALLOC?);
+        see make-tape for preliminary cleanup; conflicts with
+        development activities (available libraries won't be dbx
+        compatible); FI, BB: new utility added, {\tt make-pips}.
+
+  \item set core size limit to 0 for demonstration to avoid wasting time;
+        how can we do that automatically? On the {\em dret} account? see
+        \verb+$PIPSDIR/Tests/demo/demo.rc+;
+
+  \item avoid copying binary codes and libraries twice on {\em install};
+        install vs quick-install?!? BB: pips-makemake is modified
+
+  \item add a {\em local pips} entry to library makefile to test library
+        changes; the present situation is unbearable if two people work
+        at the same time; PJ: a new entry, {\tt test}, is added.
+
+  \item non-regression test: \verb+validate+ added by PJ (November 91);
+        bug: validate executes in the Validation directory and
+        uses only \verb+Pips/Bin/pips+ (i.e. the pips version visible
+        from the Validation directory); fixed by FI, 11 February 1992:
+        validate now runs in the current directory;
+
+  \item validate: specific test script shell must be written so as
+        to be executable from anywhere, i.e. the user file names must
+        be prefixed by \verb+$PIPSDIR/Tests/Validation/xxx+. As a benefit,
+        the Validation directories can be write-protected since there
+        is no good reason to run validate there. 12 February 1992.
+
+  \item validate generates unpredictable results if two validate
+        processes are executed simultaneously in the same directory;
+        FI, 12 February 1992.
+
+  \item validate may generate a positive results although some user
+        defined tests failed; we do not know if the problem is with
+        shell script tests not returning a proper exit code or
+        with validate failing to test that a result file exists;
+        FI, BB: 12 February 1992.
+
+  \item validate does not always destroy temporary files like diff.nnnnn,
+        validate.nnnnn
+        and errors.nnnnn in /tmp; maybe interruptions are not trapped;
+        FI, 28 February 1992;
+
+\end{enumerate}
+
+\subsection{Wishes:}
+
+\begin{enumerate}
+
+  \item add an option ``-l'' to validate to force \verb+PIPSDBM_DEBUG_LEVEL+ to
+        0 (default), 5 or 9.
+
+  \item move PIPS into a SUNOS 4.1 environment
+
+\end{enumerate}
+
+\section{Properties}
+
+\begin{enumerate}
+
+  \item Should they be included in the pipsmake mechanism as variables?
+        Wpips could generate automatically their potential values.
+        Consistency problem since properties are indirectly used to implement
+        pipsmake functions.
+
+  \item \verb+properties-rc.f.tex+ has to be filled in (17 January 1992);
+        Lei has to put information about the complexity options; Yi-Qing
+        has to explain how her statistics are organized; the present
+        content is too sketchy;
+
+\end{enumerate}
+
+\newpage
+
+\section{Regions}
+
+Managed by Beatrice Apvrille, \verb+<apvrille@cri.ensmp.fr>+.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item debug Alexis's code; done, June 1992;
+
+  \item elementary statements are decorated with proper regions
+        instead of cumulated regions; FI, 2 August 1992;
+        useless information is kept but it's hard to decide whether
+        a predicate is useful or not (connected components?); {\em
+        Franc,ois has found a counter-example that shows that all the 
+        information from the predicate must be kept.\/}
+        redundant information should be eliminated at least;
+
+  \item three intrinsics were missing: \verb+LOG+, \verb+LOG10+ and
+        \verb+PAUSE+; too bad that so many different tables define
+        them; FI, 2 August 1992;
+
+  \item \verb+make_phi_entity()+ generated entities with 
+        \verb+undefined_storage+; changed to \verb+rom+ to avoid
+        later problems; FI, 3 August 1992;
+
+  \item the TCST entity was added in a \verb+sc+ basis in \verb+add_phi_xxx+;
+        test added to avoid it; FI, 3 August 1992;
+
+  \item regions could not be computed for io statement with more than
+        one element in the io-list; same problem in library effects;
+        dealt with in a different way; the keyword \verb+IOLIST==+
+        seems ot prefix {\em every} io-list element; FI, 3 August 1992;
+
+  \item debug statements directly and indirectly called by \verb+regions+
+        \verb+summary_regions+ do require a value mapping regardless of
+        the debug level because arguments of \verb+debug()+ are evaluated
+        even if debug does do anything with them; \verb+debug()+ is not
+        a macro because varying arguments are not supported by the
+        preprocessor; FI, 4 August 1992;
+
+  \item prettyprint modified (as well as \verb+pipsmake-rc.f.tex+) 
+        to display the summary region at the beginning of the listing;
+        FI, 4 August 1992;
+
+  \item no indices are displayed for regions imported from a called
+        procedure; this makes their prettyprinting unreadable and
+        the dependence test wrong; fixed by FI and AL, 5 August 1992;
+
+  \item user subscript expressions are substituted by phi variables
+        and a polyhedron just before the regions are stored in the
+        statement mapping; this is too late for proper combining
+        between two (or more) references in the same statement and/or
+        expression; see Alexis' mail; FI, 6 August 1992;
+
+  \item dynamic buffer overflow in \verb+words_predicate+; partially
+        fixed (buffer size increased, buffer made static and a
+        posteriori check); FI, 9 August 1992;
+
+  \item improper profile for function \verb+regions_of_implied_do()+;
+        this function expects an expression and an action tag as
+        arguments; this is what's passed when it is called from
+        \verb+regions_of_iolist()+; but an entity and a list of
+        expressions are passed when it is called from 
+        \verb+regions_of_intrinsics()+; I cannot think of any easy
+        solution to retrieve the action tag, but to set it in a static
+        variable when the first call is issued from \verb+regions_of_iolist+;
+        see \verb+norm+ in \verb+aile.f+; FI, 9 August 1992;
+        I must have fixed it when I debugged {\tt regions\_of\_implied\_do} in
+        september or october 1993. But I don't remember how. 
+        BA, 10 February 1994.
+
+  \item inadequate optimization in region translation was losing one
+        region out of two: each array could have either one READ region
+        or one WRITE region; FI, 9 August 1992;
+
+  \item preconditions were not added to regions computed for a user
+        call; this bug is likely to have been introduced when FI
+        decided to add context to reference predicates as early
+        as possible; FI, 7 December 1992; see \verb+Bugs/Regions/vt.f+
+
+  \item the region given for the expression 
+                \verb+A(1,1)+ + \verb+A(3,3)+ 
+        is a MUST region; it must be a MAY region because the convex
+        hull of the two elementary regions is not equal to their strict
+        union. BA, September 17, 1993.
+        fixed, BA, September 20, 1993 : each time a convex hull is
+        calculated, the resulting region is set to MAY. 
+
+  \item the regions given for an implied do are wrong :
+        \begin{verbatim}
+        C <A-W-MUST-\{PHI1==I\}>
+        READ (UNIT=5, FMT=*) (A(I), I=1,5)
+        \end{verbatim}
+        is displayed instead of :
+        \begin{verbatim}
+        C <A(PHI1)-W-MUST-\{PHI1<=5, 1<=PHI1\}>
+        READ (UNIT=5, FMT=*) (A(I), I=1,5)
+        \end{verbatim}
+        BA, September 23, 1993
+        fixed, even for nested IMPLIED\_DO; BA, September 27, 1993
+
+      \item {\tt sc\_projection} returns a {\tt SC\_EMPTY} predicate when an
+        unfeasible system is given as argument. This induces a bug in {\tt
+        enlarge\_statement\_regions} because a {\tt sc\_rn} is expected (bug
+        detected in {\tt regions\_exact\_convex\_hull}).  Fixed, BA,
+        September 28, 1993.
+
+  \item there is a pb during the translation of regions. see mm.f in
+        Validation/Regions. BA, February 10, 1994.
+
+
+\end{enumerate}
+
+\subsection{Whishes}
+
+\begin{enumerate}
+
+  \item use the dependence graph to decide whether or not two elementary
+        regions shoud or should not be fused;
+
+  \item the handling of reshaping could benefit from preconditions;
+        see \verb+zproax+ in \verb+cr2cnf.f+; Franc,ois Irigoin,
+        13 July 1992;
+
+  \item use {Corinne}'s conditions to derive MUST regions? How about MAY/MUST
+        preconditions? When preconditions are added within a loop they
+        can only *restrain* the region; as long as no (unsafe) projection
+        and no convex hull is performed, the region is a {\em must} region
+        and it can be used for an array kill if the inclusion of the
+        read-may into the write-must can be proved (we could try to use
+        the rational generating system, check that it is integer, and
+        verify that all vertices are meet the other region constraints);
+        this could not be done with the present implementation of regions
+        because proper regions are only available for elementary statements
+        and not for compound statements; instead of using the \verb+arguments+
+        field of transformers, the write effects of the compound statement
+        should be used (as for transformers and preconditions);
+        FI, 4 August 1992;
+
+  \item in the line with previous paragraph, change the projection
+        policy for each control structure: block, test, loop and
+        unstructured; the projection should no longer be performed
+        uniformely at the statement level in \verb+regions_of_statement+;
+        this may create havoc as a major design assumption is changed;
+        FI, 5 August 1992; Done, see report E/181/CRI. BA, February 10, 1994.
+
+      \item replace \verb+SC_UNDEFINED+ by \verb+transformer_undefined+ as
+        context for scalar variables. Replced by {\tt sc\_rn(..}). BA,
+        February 10, 1994.
+
+\end{enumerate}
+
+Note: array kill information is necessary to get rid of dependences on
+temporary arrays. The restriction to true dependences does not eliminate
+false write-read dependences because there is no way to prove that an
+intermediate write rewrites the whole array.
+
+\subsection{Modifications}
+
+\begin{enumerate}
+
+  \item associate to statement cumulated regions instead of summary regions;
+        i.e. delay the projection of modified variables as much as
+        possible; FI, 5 August 1992; a first step was carried out for
+        elementary instruction (i.e. \verb+call+ instruction); well, I
+        prettyprint proper regions for elementary statements, but I
+        compute cumulated regions to have the regions of a block. See
+        report E/181/CRI. BA, February 10, 1994.
+        
+
+  \item better computation of MUST vs MAY regions; a new projection procedure
+        should be used to know whether the result is exact or not; only
+        loop indices can be safely projected (because of the loop semantics);
+        loop bounds have to be checked to make sure they are both used
+        in the region context before the region is declared MUST; projection
+        of variables that are not enclosing loop indices always result
+        in a MAY region, regardless of the projection exactness;
+        FI, 6 August 1992;
+
+        YY wrote \verb+combiner_with_test(sc, v)+ to check exactness;
+        it's in \verb+ricedg/testdep_util.c+ and is cluttered with
+        measurement statements; YY, 6 August 1992;
+
+\end{enumerate}
+
+\section{Ri-util}
+
+\begin{enumerate}
+
+  \item break the ri-util.c file into smaller files, one per data type
+        (entity, expression, etc...) or at least by data type SCC; we
+        need an entity.c for sure; done;
+
+  \item \verb+sc_gen_write+ and \verb+sc_gen_read+ could not handle
+        \verb+SC_UNDEFINED+; fixed, FI, 4 August 1992;
+
+        botched: the representation chosen for {\tt SC\_UNDEFINED} is a
+        linear system with no equalities and no inequalities over a
+        0-dimensional space; this is just the system representing an
+        identity transformer;
+
+        suggestion: do not use {\tt SC\_UNDEFINED} in valid data structure;
+        modify library region to use \verb+transformer_undefined+ as context
+        for scalar variables;
+
+        other suggestion: choose a more complicated scheme to store
+        undefined \verb+Psysteme+; for instance \verb+(SC_UNDEFINED)+;
+        this implies a test after the opening parenthesis but seems
+        pretty easy to implement; FI, 8 August 1992;
+
+  \item dynamic and static areas are declared when a module is created
+
+  \item intrinsic \verb+PAUSE+ was not recognized as an intrinsics:
+        there is still another intrinsic table in
+        \verb+ri-util/prettyprint.c+;
+        FI, 12 March 1993
+
+  \item \verb+entity_conflict_p()+ was deadly wrong; it returned almost
+        always false; it contains a static hash table that is going to
+        cause trouble in wpips sone day! FI, 29 June 1993;
+
+
+  \item NORMALIZE\_EXPRESSION is now used instead of
+        NormalizeExpression to recurse in normalize.c. RK, FI, 3/12/93.
+
+
+\end{enumerate}
+
+\section{Rice (parallelization phases)}
+
+\begin{enumerate}
+
+  \item take control dependences into account? Use properly the hierarchical
+        control graph? To be studied by BB;
+
+  \item \marginpar{PJ} option to only use data flow dependences
+        (\verb+RICE_DG_DATAFLOW_DEPENDENCE_ONLY+); seems to be bugged: only
+        output dependencies are ignored (FI);
+
+  \item \marginpar{YY} 
+        quantify/summarize parallelization results; comparison with FPP
+        should be made easier;
+
+  \item Distribution doesn't work if the loop has a label. pips\_error()
+        in local\_name() instead. First loop should keep the label,
+        shouldn't it? (BB, 3.1.92)
+
+  \item some parallel loops seem not to be detected in onde24.f and
+        its simplification, Wp65/seismic.f
+
+  \item bug in Tests/demo/gewpp.f: combination of tests and loops; 
+        GEWPP: Gaussian Elimination With Partial Pivoting;
+        a \verb/+1/ had
+        been commented out for unknown reasons; fixed by YY, Nov. 8,
+        1991;
+
+  \item bug in distribution because of control dependences: if inner
+        loop range depends on a statement in the outer loop, it doesn't
+        inhibit distribution! See Bugs/Rice/ctrl.f. Bruno Baron,
+        6~April~92; this bug was initially detected by Nahid Emad in 1990;
+
+        Basically, the proper effects of statements inside loops now include
+        some kind of "control" effects that force sequentialization when loop
+        bounds depend on previously defined variables.  The statements' effects
+        within a loop have an added read effect on the (possible) variables
+        appearing in the loop bounds. The loop body, even if it is a block has
+        a proper read effect on these variables. Fix by Pierre Jouvelot, 21 May
+        1992;
+
+  \item bug in INTERF from mdg.f; rice does not handle labelled DO loops
+like:
+\begin{quote}
+100 DO 200 I = 1, N
+\end{quote}
+Label 100 should be reported on an additional previous CONTINUE
+statement, because the Allen\&Kennedy algorithm may duplicate loops.
+FI, PJ: 16 June 1993; see above, comments from BB on 3 Jan. 92;
+
+\end{enumerate}
+
+\newpage
+\section{Ricedg (Dependence Graph Computation)}
+
+This library is managed by Yi-Qing, FI and BA.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item \marginpar{YY} normalization problem for:
+        \begin{quote}
+\begin{verbatim}
+A(2*I+4*J) = A(2*I+4*J+1)
+\end{verbatim}
+        \end{quote}
+        Fixed by YY, Nov. 7, 1991; a normalization step was added before
+        a call to \verb+sc_minmax_of_variable()+; 
+        however, normalization steps
+        were later added in \verb+sc_minmax_of_variable()+ by CA for PUMA;
+        this should be cleaned up;
+  \item \verb+quick_privatize_graph()+ did not work very well. I have
+        modified it slightly. It works well now for Wolfe's Cholesky. I can't assure
+        it always works for any other programs. If it fails, use
+        \verb+Perform priv+ before; (YY)
+
+      \item the types {\tt arc\_label} and {\tt vertex\_label} were not
+        defined. They were declared as externals in graph.hand used to
+        define vertex; {\tt dg\_vertex\_label} and {\tt dg\_arc\_label} are
+        defined in dg.h using vertex.  It didn't appear until PJ added
+        castings in dg.h.  fixed by FI and BA, August 1993, by defining the
+        types {\tt arc\_label} and {\tt vertex\_label} in {\tt
+        ricedg-local.h}.
+
+\end{enumerate}
+
+\subsection{Wishes}
+
+\begin{enumerate}
+
+  \item ddv \marginpar{(YY/FI/PJ)}implementation; necessary for
+        PIPS-CRAY and for PUMA; how can we preserve distances (necessary for
+        Benoit)? NewGen ddv representation;  can we replace $<$ with
+        +1 and say we define a generator of an over-approximation of the
+        dependence set?  Decision: dependence cones are implemented;
+
+  \item \marginpar{YY} dependences should be prettyprintable, 
+        filterable, and so on; Dominique Cle'ment and visitors in
+        Brussels;
+
+  \item the dependence graph should be saved on disk; this is likely
+        to become necessary to cooperate with CEA (it was planned
+        in FIPEX); it is also very inconvenient when one switches
+        from parallel Fortran to Fortran 90 as output style: everything
+        has to be recomputed; also, it would make testing easier: now,
+        bugs in the dependence graph are likely to be seen as bug in the
+        parallelizer; two problems have to be solved, unless one is
+        ready to save the statements with it (which may be the easiest
+        way): replace pointers from vertices to statements by statement
+        ordering (as in mappings), replace pointers from arcs to
+        references by some kind of numbering (number of the reference
+        in the statement + statement ordering?);
+
+  \item \marginpar{YY}
+         an ASCII version of the dependence graph is necessary to validate
+         its computation regardless of its use (paralellization, PUMA, Cray);
+         its also useful as a debugging tool and as a way of comparison with
+         other systems like PAF;
+
+  \item should \marginpar{(PJ)}we introduce control dependences?
+        Or rely on our hierarchical control flow graph? should it be
+        stored on disk? No NewGen support? 
+
+  \item \marginpar{YY} loops with control structures, structured or not,
+       are not analyzed; Remi probably skipped them to gain time because he
+       knew that his parallelizer, based on A\&K, would not handle them;
+       however, we now need dg information about these loops for PUMA,
+       PIPS-CRAY, Yi-Qing's PhD and CEA; the easiest change would be to add a
+       property
+\verb+RICEDG_ANALYZE_SIMPLE_LOOPS+, which should be set to
+\verb+true+ to obtain Remi's behavior; when set to \verb+false+,
+its default value, the whole dg would be analyzed; Yi-Qing is in
+charge of writing the missing pieces of code; 
+
+The new version was bugged because statements could not be ordered
+any more using the low weight part of \verb+statement_ordering+ (YY);
+PJ suggests to consider non comparable statements as belonging to
+the same compound statement (wich is true). He also suggests to
+handle compound statements like user calls, but the use-def chains
+are not build that way (so does FI believe).
+
+  \item code related to statistics gathering should not be intimately
+        mixed with functional code; FI, 5 August 1992;
+
+  \item the partial evaluation of expression should be used for the
+        symbolic loop increment; (YY, 08/92) 
+\end{enumerate}
+
+\subsection{Modifications and improvements}
+
+\begin{enumerate}
+
+  \item the dependence cones are implemented which are represented by 
+        generating system from \verb+C3/Linear+; (YY, finished in 08/91)
+
+  \item ricedg did not contain the tests of faisabilities for the
+        initial system of dependence before the projection to the Di system.The
+        modification has been done.  (YY, 18/10/91) 
+
+  \item The module computing
+        the levels of dependences gave a false level when di$\leq$0. 
+        Thus the case
+        of di = NotPositif has been considered in ricedg now.  (YY, 10/91)
+
+  \item auxiliary difference variables have been introduced for all
+        variables modified in the current environment (i.e. current
+        loop nest); so in this case the dependence test is correct now;
+        (YY, 08/92)
+
+  \item the symbolic increment can be accepted by ricedg; the
+        independence can be found by GCD test and Di ``all zeros'' test
+        in this case; (YY, 08/92) 
+
+  \item statistics \marginpar{(YY)}
+        about dependence tests :number of tests, number of dependences, etc...(see
+        properties-rc.f.tex also) have been done; its results are stocked
+        in a file by setting the property (\verb+RICEDG_PROVIDE_STATISTICS+) TRUE;   
+        (YY, 08/92)
+
+  \item the dependence graph is prettyprintable with a option ``dg''
+        (ex. Display module dg); (YY, 08/92)
+
+  \item ricedg was (slightly) modified to use the \verb+context+ field 
+        of effects decorating the dependence graph; this is possible
+        with the \verb+rice+ option but not with \verb+rfulldg+ or
+        \verb+rsdg+ as the additional information they would brought
+        is already contained in the context; to use this new option,
+        you have to select the  \verb+region_chains+ option to compute
+        the use-def chains; FI, 6 August 1992;
+
+\end{enumerate}
+
+\section{SDFI}
+
+Summary Data Flow Information.
+
+\begin{enumerate}
+
+  \item \verb+same_sdfi_p()+ was bugged; this was shown on 
+        \verb+ONERA/aile.f+; fixed, FI, 7 August 1992;
+
+\end{enumerate}
+
+\section{Semantics}
+
+\begin{enumerate}
+
+  \item Karr like fix-point operator for induction variables; not implemented;
+
+  \item some integer scalar variables are ignored; JH in EXTR;
+        IX, IY, INCX, INCY in SDOT; see transformers and effects
+
+  \item use declarations to derive constraints like N.ge.1; use these
+        extra-constraints to get MUST effects information for loop bodies?
+        see section {\em Regions};
+
+  \item exploit intrinsics like MOD, MAX, MIN and /; keep it simple;
+        do not try to use temporary variables for sub-expressions;
+
+  \item check that common variables are properly handled; they should
+        be translated like formal parameters; done, FI, July 1992;
+
+  \item EQUIVALENCE equations are lost
+
+  \item change transformer\_convex\_hull() to take into account distinct
+        basis; a 0-dimensional space should be a neutral element (always?); how
+        partial subspaces could be dealt with? Is transformer\_identity\_p()
+        satisfying?
+
+  \item display summary\_transformer before module declarations when
+        prettyprinting transformers;
+
+  \item value\_mappings should be reset in module\_name\_to\_transformers,
+        module\_name\_to\_preconditions, prettyprint\_transformers,
+        prettyprint\_preconditions
+
+  \item does the name {\em t} of the Fortran program have the magic
+        effects? we can't get the effects of the Fortran program that
+        has the name {\em t}. when we change the name, everything works
+        fine. Strange indeed ?! ( added by lz 05/06/91 )
+
+  \item improve handling of test like \verb+i.eq.1+ to cope with Wegman/Zadeck
+        example (see \verb+zadeck.f+); 
+        useful for switches too: if-elseif-elseif....
+
+  \item propagate call site preconditions for functions (only call to
+        subroutines are handled);
+
+  \item integer variables stored in COMMON are not handled interprocedurally;
+        the translation routines wrongly assumed that they were named as
+        \verb+common_name:variable_name+; in fact, they are named like
+        any other variable as \verb+module_name:variable_name+; fixed,
+        FI, July 1992;
+
+  \item a new bug cropped up for equivalenced variables; it appeared
+        the first time for ICS'91; it seems that \verb+entity_conflict_p+
+        was modified: equivalenced variables do not conflict anymore...
+        see \verb+equi.f+;
+
+  \item integer user functions like {\tt m = ifoo()} are not exploited because 
+        the expression is not linear; FI: I think it is very unusual to
+        know the value returned by a function; LZ: I have a case in
+        Hermann Mierendorf code; December 1991;
+
+  \item preconditions are not properly computed after a privatization
+        in demo/choles.f:
+
+  \item in func.f : information about function values is lost when
+        transformers are computed: see interprocedural preconditions of func.
+
+  \item Pips doesn't work for the empty THEN or ELSE block, needs a
+        CONTINUE to be passed by pips. LZ 24/02/93
+
+\begin{verbatim}
+   baron@isatis Tests/demo : Init -d -f choles.f ch
+   baron@isatis Tests/demo : Perform -m choles priv
+   baron@isatis Tests/demo : Select rsdg
+   baron@isatis Tests/demo : Display -v
+   Workspace ch (default)
+   Module CHOLES (default)
+   pips -m CHOLES -s PRINT_PARALLELIZED_CODE -b PARALLELPRINTED_FILE ch
+   Workspace ch opened
+   Selecting rule: PRINT_PARALLELIZED_CODE
+   Request: build resource PARALLELPRINTED_FILE for module CHOLES.
+     PROPER_EFFECTS       building   PROPER_EFFECTS(CHOLES)
+     CUMULATED_EFFECTS    building   CUMULATED_EFFECTS(CHOLES)
+     CHAINS               building   CHAINS(CHOLES)
+     SUMMARY_EFFECTS      building   SUMMARY_EFFECTS(CHOLES)
+     TRANSFORMERS_INTRA_F building   TRANSFORMERS(CHOLES)
+     PRECONDITIONS_INTRA  building   PRECONDITIONS(CHOLES)user warning in call_site
+   _count: not implemented yet, always returns 1
+   pips error in entity_to_new_value: unbounded entity K
+\end{verbatim}
+
+        Fixed by FI, 1 August 1992; two changes were performed; (1) conditions
+        on loop indices are added only if the loop index has a value;
+        (2) privatized scalar integer variables are declared as having
+        a value although they do not have any effect; see \verb+mappings.c+
+
+  \item \verb+Bugs/Semantics/lmult.f+: assertion violated in sommet.c;
+        this routine computes values close to MAXINT using parentheses
+        to avoid overflows; YY/FI: 18 February 1992;
+
+  \item \verb+add_or_kill_equivalenced_variable()+ warns about return
+        storage of \verb+isamax+ in \verb+isamax+; this warning does
+        seem to be useful, but is it really useful? FI, 23 July 1992
+
+  \item summary preconditions are not always correct; there is no way
+        to reset them and they are always increasing when convex hulls
+        are performed; so if a summary precondition has been set equal
+        to the whole space at some time, it can never be made more
+        precise afterwards; see \verb+eval.f+; FI, BB, 30 July 1992;
+
+  \item prettyprint modified (as well as \verb+pipsmake-rc.f.tex+) 
+        to display the summary precondition or transformer
+        at the beginning of the listing;
+        FI, 4 August 1992;
+
+  \item exponential time and space for interprocedural preconditions
+        of \verb+onera/aile.f+; heuristics used to trade accuracy
+        vs speed; FI, 13 Jan. 1993;
+
+  \item global value translation: an actual parameter was a COMMON
+        variable in the caller, and just a formal in the callee;
+        translation from the caller into the callee was attempted;
+        see \verb+translate_global_value+, FI, 13 Jan. 93;
+
+  \item seems to loop forever on LMULT in LGS.f (QCD Perfect Benchmark);
+        likely origin: subtle additions of 2**31... FI, 5 May 1993
+
+  \item value entity \verb+PROFYL:IS1ST#init+ is found with fields type,
+        storage and value undefined (\verb+undefined_xxx+) when
+        computing preconditions for \verb+TRACK+; the core dump occured
+        when the summary precondition of \verb+THINIT+ was computed;
+        the bug was not reproducable; it seems due to a long use of
+        a workspace; I applied \verb+stf-workspace+ after a first run;
+        no idea; FI, 18 June 1993;
+
+  \item call to \verb+sc_minmax_of_variable+ added in
+        \verb+add_good_loop_conditions+ to handle symbolic steps
+        when their signs are known; suggested by Kathryn McKinley;
+        FI, 28 June 1993;
+
+  \item \verb+translate_global_value+ and
+        \verb+precondition_intra_to_inter+ are modified to let invisible
+        information pass thru intermediate procedures; e.g. A calls B
+        and B calls C; A and C share common variables, which are not
+        seen from B; however, B summary transformer and precondition
+        must take them into account; FI, 29 June 1993;
+
+  \item code added for MIN0 and MAX0 intrinsics; FI, 18 August 1993;
+
+  \item code added for STOP intrinsic; FI, 3 February 1993; this may be
+        devastating in a main; STOP is abstracted as the non-feasible
+        transformer;
+
+  \item prettyprint of transformers and preconditions with the parsed
+        code instead of the code to avoid display troubles introduced by
+        the controlizer; FI, 3 February 1994
+
+      \item in {\tt statement\_to\_transformer}, the transformer is not
+        copied before being stored in the statement mapping and is then
+        returned to the caller. {\tt loop\_to\_transformer} modifies it by
+        side effect. The transformer and the preconditions computed with it
+        where wrong in some cases (see {\tt
+        Validation/Semantics/li92\_1.f}. BC, oct. 94.
+\end{enumerate}
+
+\subsection{Wishes:}
+
+\begin{enumerate}
+
+  \item the precondition list should not be reversed from each statement
+        to the next;
+
+  \item equalities with negative constants are not nicely printed:
+        \verb+I==-1+ is shown as \verb/I+1==0/;
+
+  \item it would be useful to compute the buffer size necessary to
+        read a precondition p (i.e. a Pvecteur) each time p is
+        written;
+
+  \item it would be nice to accept a user file as an initializer for
+        summary preconditions, at least for the main; if the C3/Linear
+        format is used, a parser is already available; \verb+user_request+
+        could be used to enter a file name; FI, 30 July 1992
+
+  \item LOGICAL variables should be handled; see bdna.f (perfect Club)
+        as an example; this is also requested by Stein and Fox in CPE,
+        Dec. 93; FI, 10 February 1994
+
+\end{enumerate}
+
+\section{Syntax}
+
+Lexical and syntactic analyzer. 
+
+% Should be called \verb+parser+. BTW, to
+% see debug messages, set \verb+PARSER_DEBUG_LEVEL+ instead of 
+% \verb+SYNTAX_DEBUG_LEVEL+!
+%
+% No more: I changed PARSER_DEBUG_LEVEL into SYNTAX_DEBUG_LEVEL; FI, 15
+% September 1993
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item \label{name-spaces}
+        unique space for COMMON names and variable names; modify lexical
+        analyzer and parser to keep slashes around common names so as to
+        distinguish them textually from variables? See MakeCommon and the
+        prettyprinter. Or use a general scheme to distinguish external
+        variables from internal variables.
+
+        bug in Bugs/Syntax/decl2.f: the common is declared before the variable;
+        a nice {\em user} error message is printed; fixed by FI;
+
+        bug in CEA benchmark \verb+matrie.f+
+        (also stored in \verb+Bugs/Syntax/matrie.f+): 
+        double use of \verb+ZZZZ+ as
+        a logical variable name and as a common name; PIPS used to core dump
+        because no doucle declaration check was performed when the
+        variable was declared before the common; fixed (if I may say so!)
+        by FI, 16 January 1992: a proper {\em user} error message 
+        is printed before PIPS stops...
+
+        The PIPS grammar \verb+gram.y+ and \verb+MakeIntrinsic+ were
+        modified to directly prefix global names
+        with \verb+TOP-LEVEL+ instead of \verb+CurrentModule+.
+        \verb+MakeAtom+ should also be modified to update entity names
+        when it finds out that it is an external entity; \verb+MakeAtom+
+        modified mainly through \verb+MakeExternalFunction+; FI, 9 March 1992
+
+  \item unique space for INTRINSIC names and variable names; 
+
+        intrinsics 
+        detection could (should) be delayed to link time, but their names
+        should not appear as callees (done); else the request for source file
+        will abort; check that the linker does not use callees to build
+        its link hash table; how is the INTRINSIC statement handled? The
+        EXTERNAL one?
+
+        more or less fixed by FI, 21 September 1991; there is still a unique
+        name space for intrinsics and variables but a variable can have
+        as name the name of an intrinsic;
+
+        further fixed by FI, 16 January 1992; see previous 
+        bug \ref{name-spaces};
+
+  \item Pips' parser bug : type problem.
+        It is observed when running ``pips'' on BLAS3 subroutines for the 
+        control-flow graph.
+        The problem comes from the following declaration:
+        \begin{verbatim} 
+                CHARACTER*( * )    NAME, OPTS
+        \end{verbatim}
+        pips' parser fails to give a good type to \verb+NAME+ and
+        \verb1OPTS1.
+        dbx detects that 
+        MakeFortranType(t = 9, v = 0x1ee1b8),line 755 in syntax/declaration.c 
+        where 9 is too large for a Fortran type. ( Supposed to be 1 to 7 ).
+        The sample program is kept in ~pips/Pips/Tests/Bugs/Syntax/ilaenc.f .
+        Reported by LZ, Oct. 9, 92.
+
+        Fixed; FI, 15 September 1993
+
+  \item missing declarations observed by Lei Zhou when building the call
+        graph; might be due to name captures?
+
+  \item see if the call to FindOrCreateEntity() should/could not be delayed
+        in gram.y; when an entity is recognized, only its name should
+        be passed in \$\$ instead of a pointer to an entity whose full name
+        is still unknown; entities should be effectively created when the
+        context is better known, COMMON statement or not, declaration
+        or instruction part of the module.
+
+        In fact, this is dealt with in bug \ref{name-spaces}.
+
+  \item accept BLOCKDATA, even if they are not exploited, to avoid core
+        dumps on real programs; try to do that when writing a pips fsplit
+        in awk (FI); but awk cannot open more than 7 files and is stuck
+        when more than 6 subroutines have to be split;
+
+        BLOCKDATA are parsed like other modules; FI, 15 September 1993;
+
+  \item run PIPS on SPEC77 (PerfectClub); look at \verb+del4+, \verb+gloop+ and \verb+gwater+;
+        these files are now properly parsed; parallelization bug from
+        Yi-qing prevents interprocedural parallelization in \verb+del4+; effects
+        bug in \verb+gfidi+ prevents interprocedural parallelization in \verb+gloop+;
+        effects bug in \verb+lrgscl+ prevents interprocedural parallelization in
+        gwater;
+
+  \item ParserError() should accept varargs; at least errors should be better
+        documented using user\_error() before;
+
+  \item {\em conflict for symbol ...}: no line number specified;
+
+  \item move as many modules as possible into ri-util; they are going to
+        be used to generate code automatically in PIPS-CRAY and PUMA;
+        Corinne has already taken a look at this; Bruno too;
+
+  \item EXTERNAL declaration in onde24.f causes a core dump (not a syntax
+        error); fixed by FI, 21 September 1991;
+
+  \item functional formal parameter should be detected by the parser and
+        processing should be stopped with a proper warning;
+
+        Theoretically fixed by FI, 18 January 1992, but not checked.
+        Checked with formel.f and installed in Validation/Syntax,
+        FI, 12 February 1992.
+
+  \item some comments seem to be lost in onde24.f, although they are
+        not linked to control statement (i.e. \verb+GO_TO+);
+
+  \item constant \verb+MAXBLOCK+ controls the nesting level; since
+        \verb+ELSEIF+ are desugared in nested \verb+IF+, its value of
+        10 was too small; it was increased to 20 (FI, 2 December 1991)
+
+  \item wrong user line numbering (detected by Bruno Baron, 23 October 1991);
+        observed again by BB, November 12; use {\em validate} to get
+        the bug; \verb+stat_num+ was statically initialized; statement
+        number depended on the module ordering for parsing (FI, 3
+        January 1991); this does not explain the problem with validate
+        since everything should be redone in the same order unless
+        databases are not destroyed;
+
+  \item unique space for {\em intrinsics} and user names; keywords like
+        \verb+RETURN+ are handled as intrinsics and are misinterpreted
+        as calls to a user function, it is defined:
+
+\begin{verbatim}
+      subroutine return
+      return
+      end
+\end{verbatim}
+
+        PIPS core dumps because this is encoded as recursive calls to
+        user function \verb+return+. There is no difference in the RI
+        for \verb+RETURN+ and \verb+CALL RETURN+.
+
+        This may have now changed because external names are directly prefixed
+        by \verb+TOP-LEVEL:+. Such user function names should
+        be refused as redefinition of an intrinsic. 
+        See the correction of the first Syntax bug.
+        To be checked (FI, 22 January 1992).
+
+  \item \label{complex-constant}
+        complex constants are not parsed: \verb+syntax error near ,+;
+        discovered because Dongarra parallelizer benchmark was not
+        accepted; see Bugs/Syntax/complex.f; FI, 08/01/92; 
+
+        partially fixed at the lexical level: pairs of floating point
+        numbers are recongized but not pairs of integer numbers or
+        integer/floating point combinations (see paragraph 4.6.1 in
+        the standard); FI, 9 January 1992; this does not work: pairs
+        of floating point numbers can appear in a function call like
+        \verb+FOO(1.,2.)+;back
+        to the previous version;
+
+        Fixed by modifying \verb+gram.y+. See comments there.
+        FI, 18 January 1992;
+
+        This introduced a bug related to IO list (see below
+        \ref{implicit-do}). Complex
+        constants are not recognized in PIPS Fortran. They have to
+        be replaced by a call to \verb+CMPLX+.
+
+  \item COMMON length are likely to be varying from a module to another.
+        They are statically allocated as \verb+TOP-LEVEL:FOO+ instead
+        of \verb+CURRENT:FOO+ and common variables are systematically
+        added at the current end of the common.
+
+        This bugs was fixed a first time by generating {\em local}
+        common names, to be later linked (more or less?). This caused
+        problems when a variable and a common have the same name. This
+        seems to be more the rule than the exception: programmers
+        name their common like the most important variable of the
+        common.
+
+        It should be fixed by adding a \verb+common_size_map+ in the
+        parser to remember the current size of the common wrt. the
+        current module. The consistence between the different
+        declarations of a given common could be checked at the
+        end of each module syntactic analysis.
+
+        A new bug file should be added to \verb+Bug/Syntax+.
+
+        Fixed by FI, February 1992.
+
+  \item character constants are not handled in a uniform and consistent
+        way in statements and in FORMATs. See \verb+Bug/Syntax/string.f+
+
+  \item \label{implicit-do}
+        implicit DO in IO lists seem to be refused by the parser; see
+        \verb+Bugs/Syntax/edition.f+ from \verb+aile.f+ and
+        \verb+Bugs/Syntax/grandg.f+ from \verb+cfc2.f+ (SIDOLO);
+        Yi-Qing bumped into the problem many other times in Sidolo
+        and ONERA benchmarks; this used to work; 29 January 1992;
+        this might be linked to the new rule introduced to parse
+        complex constants (see above \ref{complex-constant})
+
+        No simple solution seems to exist; complex constants have
+        to be not recognized for the time being; FI, 4 February 1992.
+
+  \item blank commons are not handled properly; see \verb+Lib/syntax/common3.f+
+        FI, 6 February 1992;
+
+  \item long lists of values in DATA are not accepted: yacc stack overflow;
+        see \verb+Bugs/Syntax/hit.f+; Yi-Qing, 5 February 1992;
+        fixed, FI, 6 February 1992;
+
+  \item long list of variables and values found inconsistent by PIPS in
+        \verb+AnalyzeData+:
+        \begin{quote}
+        Too few initializers
+        \end{quote}
+        but not by f77; see \verb+Bugs/Syntax/calavs.f+, Yi-Qing,
+        6 February 1992
+
+        Same problem seems to occur in \verb+Bugs/Syntax/rffti1.f+ which
+        is extracted from \verb+APS.f+; the context is easier;
+        FI, 14 February 1992;
+
+        MakeDataVar() used to assume that a whole array was initialized
+        each time an array element was initialized; AnalyzeData() seemed
+        to have a wrong test for the error message \verb+too few initializer+;
+        fixed (?), FI, 18 February 1992;
+
+  \item long lists of arguments in CALL are not accepted: yacc stack overflow;
+        see \verb+Bugs/Syntax/pset.f+; Lei Zhou, 6 February 1992;
+        fixed, FI, 6 February 1992;
+
+  \item \verb+fsplit+ does not indentify subroutines whose names appear
+        only in a continuation line; FI, 7 February 1992
+
+  \item empty programs having just one END statement are declared illegal;
+        FI, 7 February 1992 (almost a feature; this is due to the grammar;
+        PJ tried to update it but failed);
+
+  \item the substring operator is recognized but not accepted; it is not
+        possible to generate a regular call to the substring function
+        because it may appear as a lhs; however, in SIDOLO, the program
+        where we bumped into te problem, all substring operations seem
+        to appear in expressions (i.e. rhs)
+        FI, June 1991 and 11 February 92.
+
+  \item long lists of formal parameters are not accepted: yacc stack overflow;
+        see \verb+run.f+ in Perfect Club benchmark \verb+APS.f+;
+        Francois Irigoin, 12 February 1992; 
+
+  \item no overflow check for the comment buffer; array \verb+keywidx+ was thus
+        overwritten when parsing \verb+RUN+ in 
+        Perfect Club benchmark \verb+APS.f+; Francois Irigoin, 12
+        February 1992; overflow check added (and tested) and then
+        buffer size doubled; FI, 12 February 1992.
+
+  \item \verb+implicit_type_p()+ seems to be to strict; 
+        see \verb+Bugs/Syntax/imprif.f+; because the implicit statement
+        occurs (necessarily) after the formal parameter declaration, they
+        do not have their current implicit type when they are redeclared;
+        see variable \verb+CN+ in \verb+imprif.f+; LZ, FI: 12 February 1992;
+        the only short term fix I can think of is to move formal parameter
+        declarations {\em before} the \verb+IMPLICIT+ statement;
+
+  \item one more (unidentified) bug with \verb+RUN+ in 
+        Perfect Club benchmark \verb+APS.f+; 
+        \begin{quote}
+        user error in MakeExternalFunction: parser error between lines 303
+        and 304 \\
+        Formal functions are not supported
+        \end{quote}
+        Franc,ois Irigoin, 12 February 1992
+
+        In fact, it was a bug in \verb+APS.f+; 
+        YY had commented out declarations in \verb+run.f+ thus making regular
+        array (formal parameter) look like formal functions; the error
+        message should be more informative; fixed;
+
+  \item TABs are not properly expanded; see \verb+Bugs/Syntax/tabs.f+;
+        they seem to be systematically replaced by 7 spaces 
+        in \verb+GetChar()+; FI, 21 February 1992; fixed, FI, 26
+        February 1992 (Column was replaced by col in the test)
+
+  \item pips core dumps with too many ENDIFs instead of issuing a user
+        error; see \verb+Bugs/Syntax/endif.f+; missing check in
+        \verb+MakeEndif()+; FI, 21 February 1992
+
+  \item SPACEs in empty lines are taken into account to compute the
+        truncation at column 73 in the next instruction; FI, 27 February
+        1992; fixed by reinitializing col one more time, FI, 27 February 1992;
+
+  \item on \verb+user_error+ the database is not saved; \verb+sserror+
+        (i.e. \verb+yyerror+ in gram.y) ends with a regular exit;
+        this exit was replaced by a call to \verb+pips_error+; FI, BB,
+        27 February 1992;
+
+  \item \verb+LOG+ and \verb+LOG10+ are standard generic intrinsics;
+        they were forgotten in bootstrap and effects; 
+        see \verb+Validation/Syntax/testlog.f+
+        fixed, FI, 27 February 1992;
+
+  \item all symbols declared in an EXTERNAL statement are considered
+        FUNCTIONS and their results are given implicit types;
+        this clashes when it is discovered later that is is a SUBROUTINE;
+        the type consistency test was soften to allow implicit types
+        to be redefined; why is the \verb+unknown_type+ not used? See
+        above the problems with types of formal parameters. FI, 9 March 1992.
+
+  \item comment lines starting with an asterisk are not recognized
+        although this is part of the standard (section 3.2.1);
+        see \verb+Bugs/Syntax/asterisk.f+, FI, 10 March 1992;
+        fixed, FI, 12 March 1992;
+
+  \item initial lines with a zero in continuation column were mistaken
+        as continuation lines; see \verb+Validation/Syntax/cont0.f+;
+        FI, 12 March 1992;
+
+  \item PIPS core dumps on the following string declaration:
+        \verb+CHARACTER*(*) MESAGE+; see \verb+/Bugs/Syntax/errors.f+; YQ,
+        6 Apr. 1992; Fixed, FI, 15 September 1993;
+
+  \item type reconstruction error in \verb+MakeExternalFunction+; see
+        \verb+Validation/Syntax/linear.f+ and \verb+formel.f+; the bug
+        was introduced by FI when trying to perform link at parse time;
+        fixed; FI, 12 July 1992;
+
+  \item TABs were not properly expanded; see \verb+Validation/Syntax/sdot.f+;
+        fixed; FI, 14 July 1992;
+
+  \item global \verb+SAVE+ statement without argument list is not recognized;
+        FI, 28 July 1992; fixed in gram.y but no action implemented, FI,
+        28 July 1992;
+
+  \item calls to function without arguments are not taken into account
+        in \verb+CALLEES+; see \verb+Bugs/syntax/funcall.f+;FI, 30 July 1992;
+
+  \item comments carried by \verb+CONTINUE+ statements seem to disappear;
+        this may not be due to the parser but to the controlizer;
+        FI, 5 August 1992;
+
+  \item comments carried by instruction formated on multiple lines seem
+        to disappear; see \verb+Bugs/syntax/contcom.f+; FI, 30 December 1992;
+
+  \item parameterless function calls are analyzed as reference to
+        variables; see \verb+Bugs/Syntax/time.f+; FI, 11 March 1993;
+        fix on March 11 showed a bug in ri-util on PAUSE;
+
+  \item buffer size increased for very long declarations in ocean.f,
+        PerfectClub; FI, 21 June 1993;
+
+  \item {\tt free\_entity()} added in procedure.c when a assumed variable turns
+        out to be a function and when that variable has been explictly 
+        declared before as in:
+\begin{quote}
+INTEGER*4 CLOCK
+
+I = CLOCK()
+\end{quote}
+        This does not solve all problems if LOG = LOG(3) is allowed
+        by Fortran standard. See comments in procedure.c.
+        FI, 21 June 1993
+
+  \item bug in oa118.f because of the previous modification; the freed
+        entity is not removed from the module declaration list; YY, FI,
+        24 June 1993; new function \verb+remove_variable_entity()+
+        added in \verb+ricedg+ to clean decalrations better; FI, 25 June
+        1993
+
+  \item bug in validate: formal functional parameter are no longer
+        detected; previous modification is refined according to the
+        storage in MakeExternalFunction()+; the bug was not apparent
+        because the validation shell scripts were bugged; fixed; FI, 29
+        June 1993
+
+  \item bug in ??? (renault.f) in a statement containing an expression looking like
+\begin{quote}
+ALOG(0.5*ALOG(X))
+\end{quote}
+        \verb+remove_variable_entity()+ is called on the fly and one of
+        the two pointers to \verb+MODULE:ALOG+ is left dangling; a list
+        of variables to remove should be built and non-existent
+        variables should be removed at the end of the parsing phase;
+        CA, FI: 8 July 1993; fixed the same day;
+
+  \item intrinsics \verb+BACKSPACE+ was only partially recognized in the
+        parser, and forgotten in bootstrap/bootstrap.c and
+        effects/intrinsics.c; CA, FI: 8 July 1993
+        
+  \item character constants are unduly capitalized (see standard section
+        4.8: {\em any character capable of representation in the processor});
+        FC: July 1993
+
+  \item computed GOTO are desugared; FI, 15 September1993;
+
+  \item field offset is fixed at the end of the declaration section; it
+        was wrong when the type was declared after the first occurence
+        of the variable; this bug introduced pseudo-conflict between
+        variables in the same common (see TRACK for instance); FI, 1 December 1993
+
+  \item commons already in the symbol table are now properly declared as
+        visible in the current module declaration field; FI, 1 December 1993
+
+  \item bug on offset computation for variables of different modules
+        fixed; FI, 2 December 1993
+
+  \item CleanLocalVariables() improved to clean up the layout field of
+        commons; possible explanantion for a problem with free added;
+        FI, 2 December 1993
+
+  \item bug on area layout when types of variables are redeclared: the
+        type redeclaration modifies the length used by the variable in
+        the area but not its offset; observed on track-fi.f; 1 February
+        1994; problem avoided by ignoring type redefinition for
+        variables whose store is already defined; FI, 1 February 1994;
+
+  \item bug on area layout (again); previous modification was a mistake;
+        bug in {\tt update\_common\_layout()} fixed; validation with retype.f;
+        FI, 7 February 1994;
+
+\end{enumerate}
+
+\subsection{Wishes:}
+
+\begin{enumerate}
+
+  \item recognize and handle Fortran macros
+
+  \item recognize and handle ENTRY
+
+\end{enumerate}
+
+\section{Text and Text-Util}
+
+Low-level data structure used by prettyprint oriented functions.
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item likely to be responsible for many memory leaks (FI); intermediate
+        storage is not freed, just in case it might be shared, which happens
+        sometimes! Please no more code of that kind in PIPS\verb+:-)+.
+
+  \item the layout is Fortran dependent; information from ri-util,
+        namely \verb+STATEMENT_NUMBER_UNDEFINED+, should be used but is
+        not available according to the PIPS library hierarchy; this constant
+        is assumed {\em negative}; the bug was: multiple line statements
+        unconditionally had -001 as statement number for all lines but
+        the last one, that had the proper number; FI, 16 November 1991;
+
+  \item strings to long to fit on one line were not broken into parts
+        and continuation lines but just printed; code produced by PIPS
+        was not compilable; this showed mainly in FORMAT statements;
+        FI, 15 March 1993.
+
+\end{enumerate}
+
+\section{Tiling}
+
+No library yet. See {\em wp65}.
+
+\subsection{Wishes:}
+
+\begin{enumerate}
+
+  \item handle not perfectly nested loops by adding guards and optimize
+        guards in generated code by moving as many of them as possible
+        in loop bounds
+
+  \item handle adjacent loops, like the ones in image processing, by
+        using a \verb+switch+-like statement
+
+\end{enumerate}
+
+\section{Top-Level}
+
+\subsection{Bugs:}
+
+\begin{enumerate}
+
+  \item can we assume there exist a split shell script? Is it easier
+        to modify than C code? Not compatible with file regeneration
+        when pips is stopped? Adapt \verb+top-level/source_file.c+
+        and test \verb+Utilities/split.awk+
+
+\end{enumerate}
+
+\section{Transformer}
+
+Low level data structure for semantic analysis (see {\em Semantics}).
+
+\subsection{Bugs:}
+
+\begin{enumerate}
+
+  \item \verb+transformer_filter+ had to be extended to cope with
+        empty relations (non-feasable systems)
+
+  \item \verb+transformer_combine+ was extended to cope with dead code
+        by generating a non-satisfiable transformer; FI, 27 May 1993;
+
+  \item \verb+print_transformer+ was restricted to well-defined
+        transformers; i.e. a pips error is generated; FI, 27 May 1993;
+        
+  \item \verb+transformer_convex_hulls+ was extended to cope with dead code
+        by generating a non-satisfiable transformer; FI, 27 May 1993;
+
+  \item \verb+arguments_union+ was not unioning its second argument;
+        FI, 27 May 1993
+
+  \item \verb+value_entity_p()+ added; FI, 29 June 1993
+
+\end{enumerate}
+
+\section{Utilities}
+
+\subsection{Bugs}
+
+\begin{enumerate}
+
+  \item \verb+validate+ does not complain directly 
+        when it is run on a non-existing directory (it sends an e-mail message)
+
+  \item \verb+Perform+ does not check the existence of a rule before
+        starting Pips and pips; this leads to a core dump for a typo!
+        FI, 10 August 1992
+
+  \item \verb+pips-makemake+ modified to use sccs; RK, FI, June 1993
+
+\end{enumerate}
+
+\section{WP65}
+
+Code written for the PUMA project: emulated shared memory scheme.
+
+\begin{enumerate}
+
+  \item allocate scalar variables cyclically over the banks; how are we
+        going to remember on which bank is what? One more hash-table?
+
+  \item also allocate array starting cyclically over the banks; the initial
+        bank has to be remembered; this is going to make the address equation
+        more complicated;
+
+  \item se'parer clairement le calcul du nombre de copies
+        a` effectuer du calcul de leur dimension (?!?);
+
+  \item estimate the space complexity;
+
+  \item improve (!) the tiling decision making procedure;
+
+  \item improve the target machine description (see also Complexity and 
+        Bruno's work);
+
+  \item \marginpar{CA}
+        the message lengths (\verb+LS+) 
+        for \verb+WP65_SEND+ and \verb+WP65_RECEIVE+ should be
+        expressed in bytes instead of number of elements; 
+        the underlying library has no way to guess the data type used;
+        (fixed by CA in \verb+build_sc_machine.c+ \& 
+        \verb+tiling.c+, January 1992)
+
+  \item in the target machine description, the bank width (i.e. the
+        line size \verb+LS+) should be expressed in bytes;
+        (have to be fixed in each model.rc)
+
+  \item \verb+model.rc+ should be stored as \verb+model-rc.tex+ in
+        \verb+Documentation+ and derived automatically as for other
+        \verb+xxx.rc+ files
+
+  \item initial loop indices should be replaced by expressions and not
+        by local loop indices when they do not appear in subscript
+        expressions; example: \verb+MAT(I,J)= I + J+; general
+        expression:
+        \begin{quote}
+        \verb/I = P I_0 + O + L_I/
+        \end{quote}
+
+  \item parallelism over the channel requests cannot be expressed in
+        Fortran~3L; it's OK with sockets because IO's are buffered;
+
+  \item make WP65 code validation easier; add a call to generic (?) init
+        and validate procedures?
+
+  \item \verb+load code+ should be based on local declarations:
+
+    \begin{enumerate}
+
+        \item multiple references are almost always reads;
+
+        \item local declarations cannot contains elements that
+        do not exist in the emulated shared memory; to be proved,
+        using the fact that arrays are rectangular;
+
+        \item see with Corinne if the global problem cannot be broken
+        into pieces;
+
+        \item use \verb+sc_proj_test+ and other test routines to see
+        if thinks would be easier when the bank number or the processor
+        number are numerically known;
+
+    \end{enumerate}
+
+  \item \marginpar{LZ} 
+        \verb+REAL+ variables are generated with type \verb+REAL*8+
+        instead of \verb+REAL*4+
+
+  \item \marginpar{CA} temporary local variables like loop indices are declared
+        more than once; (fixed by CA, january 92)
+
+\end{enumerate}
+
+\section{Wpips}
+
+\begin{enumerate}
+
+  \item no problem with X-events sent to a stopped wpips at Rice nor at
+        ICASE; we should compile with XView3 available on font (waits
+        until /usr/lib/libc.so.1.6 is available: required for XView3);
+
+  \item do not create any database before the user have selected the
+        fortran files. This way, should no more core dump after: create
+        workspace in a directory without .f file, change directory,
+        create workspace again.
+
+  \item {\tt wpips\_user\_error} debugged (RK, January 1993)
+
+  \item numerous interface bugs corrected (RK, FI, January 1993)
+
+\end{enumerate}
+
+\subsection{Wishes:}
+
+\begin{enumerate}
+
+  \item simpler module selection: direct input from the main window;
+        selection in any window (e.g. from a displayed call graph
+        or from some displayed code); first solution: the module
+        selection window can stay as long as you want;
+
+  \item try dynamic linking to reduce startup time
+
+  \item give a new exit choice to avoid storing lots of stuff in the
+        database; done;
+
+  \item new entry point like \verb+user_error+ to display information or query
+        the user; suppose we write a \verb+check_call_sites+ (as we should have
+        according to PIPS contract): how are we going to display binding
+        errors (parameter number, type, in/out mismatches)? How are we
+        going to display the problem location?
+
+  \item Parascope has a special {\tt snapshot} button to include screen
+        views in papers; also available here (xwd -frame | xpr -device
+        ps | lpr -Pnec); sa. xselection
+
+  \item delay calls to pipsmake() when a user selects a rule; he may change
+        his mind and resources may be unnecessarily destroyed; done by BB;
+
+  \item do not print {\em closing module} when nothing is done; thanks!
+
+  \item add a copyright notification (for instance an extra-window displayed
+        while wpips is dynamically linked...)
+
+  \item no documentation available yet; needed for ICS'91 in June 91;
+
+  \item \verb+char * top_level_query_user(char * prompt)+ needed for 
+        interactive phases (prettyprint dependences, unrolling, etc...);
+
+\end{enumerate}
+
+\subsection{Modifications}
+
+\begin{enumerate}
+
+  \item new buttons have been added in the menu for icfg, dependence
+        graph and various transformations (FI, January 1993)
+        
+\end{enumerate}
+
+\end{document}
+\end

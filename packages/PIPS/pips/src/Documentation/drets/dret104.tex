@@ -1,0 +1,490 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\batchmode
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\titre}{RAPPORT D'AVANCEMENT No 1 \\
+                    ANALYSE SYNTAXIQUE ET ANALYSE SEMANTIQUE
+}
+\newcommand{\auteur}{François IRIGOIN \\
+                     Pierre JOUVELOT \\
+                     Rémi TRIOLET
+}
+\newcommand{\docdate}{Décembre 1988}
+\newcommand{\numero}{E104}
+
+\begin{document}
+\sloppy
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+Nous présentons dans ce rapport l'état d'avancement du projet PIPS en
+ce qui concerne:
+\begin{itemize}
+\item   la reception du matériel,
+\item   l'analyseur lexical,
+\item   la définition de la représentation interne,
+\item   l'analyseur syntaxique,
+\item   l'analyseur sémantique.
+\end{itemize}
+
+\section{Matériel}
+
+\paragraph{}
+Nous avons à ce jour reçu la quasi totalité du matériel
+commandé pour l'exécution de ce contrat. Le serveur est
+opérationel dans sa configuration complète depuis le début du mois
+de Septembre, quand aux stations clientes, nous les avons reçues
+une par une, entre début Octobre et fin Novembre. Les stations
+clientes ne sont pas complètes, puisqu'elles n'ont été livrées
+qu'avec 4 Mo de mémoire au lieu des 8 commandés. Sun France nous
+promet la mémoire manquante pour Mars 1989.
+
+\paragraph{}
+L'installation des ces quatre machines s'est faite sans gros problème,
+car nous avons pu profiter de l'expérience d'autres chercheurs de
+l'Ecole des Mines de Paris qui se sont équippés avant nous. Nos
+quatre machines composent la majeure partie du réseau du CAI, qui
+comportera d'ci la fin de l'année 7 stations: 1 serveur Sun, 5
+stations clientes Sun, et un serveur Hewlett-Packard. 
+
+\paragraph{}
+L'Ecole des Mines de Paris est d'autre part en train de développer un
+{\em réseau inter centres (RIC)} pour relier ses différents centres de
+recherche. Le réseau du CAI sera relié au RIC dès que possible,
+sans doute à la fin du permier trimestre 1989.
+
+\section{Analyse lexicale}
+
+L'analyse lexicale de Fortran pose quelques problèmes puisque ce
+langage ne contient pas de mots clefs réservés comme c'est le cas de
+langages plus récents tels que Pascal ou C.
+
+Par exemple, on détecte que l'instruction suivante est une affectation
+car le caractère qui suit la parenthèse fermant la référence au
+tableau IF est le caractère '='.
+\begin{verbatim}
+IF(I, J, K) = 6.66
+\end{verbatim}
+
+\paragraph{}
+En conséquence, l'utilitaire {\em lex}, disponible sous UNIX, ne
+permet pas de réaliser un analyseur lexical pour Fortran. Une
+première solution consistait donc à écrire complètement un
+analyseur lexical pour Fortran, ce qui aurait représenté beaucoup de
+travail.
+
+Nous avons préféré décomposer l'analyse lexicale de Fortran en
+deux parties, une première partie ayant pour objet de lever les
+ambiguités contenues dans un programme Fortran grâce à une
+pré-analyse qui introduit des mots clefs au début de chaque
+instruction, et une seconde partie, beaucoup plus simple car basée sur
+lex, qui réalise l'analyse syntaxique du Fortran avec mots clefs produit
+par la première partie.
+
+\subsection{Pré-analyseur lexical}
+
+La première partie revient à fournir à l'utilitaire {\em yacc} une
+fonction 'getc' qui permette de lever les difficultés liées à
+Fortran.
+
+La nouvelle fonction getc fonctionne de la façon suivante.  Getc lit
+d'un seul coup toutes les lignes d'une instruction Fortran, c'est à
+dire la ligne initiale et les 19 éventuelles lignes de continuation, et
+les stocke dans le buffer 'Stmt'.  Au vol, getc repère le label,
+enlève tous les blancs, détecte les caractères entre simples
+quotes, et met à jour 4 variables externes, qui représentent pour
+l'instruction courante la première et la dernière ligne commentaire,
+et la première et la dernière ligne source.  Ensuite, le contenu du
+buffer Stmt est analysé pour y détecter les mot clefs, c'est à
+dire traiter les cas des instructions IF, ELSEIF, ASSIGN, DO, des
+déclaratives IMPLICIT et FUNCTION, et des operateurs {\em .XX.} (.EQ.,
+.NEQV., ...).
+
+Lorsqu'un mot clef est détecté, il est mis en miniscules dans le
+texte source, sauf la première lettre qui reste en majuscule.  Ainsi,
+lex peut faire la différence entre le mot clef 'Assign' et
+l'identificateur 'ASSIGN'.  Grâce à la première lettre, lex peut
+détecter deux mots clef successifs, même sans blanc pour les
+séparer, comme dans 'IntegerFunctionASSIGN(X)'.
+
+Lorsqu'un opérateur .XX. est détecté, il est remplacé dans le
+source par \verb+_XX_+.  Ainsi, lex peut faire la difference entre une
+constante réelle et un opérateur, comme dans \verb/(X+1._EQ_5)/.
+
+\subsection{Post-analyseur lexical}
+
+La seconde partie est tout à fait classique, c'est une spécification
+d'analyseur lexical, dans le langage proposé par lex. Cette
+spécification se compose d'une liste d'expressions régulières
+correspondant aux tokens du langage, ave{c}, pour chacune d'entre elles,
+le code du token à renvoyer à yacc lorsqu'un token de ce type est
+détecté dans le programme source.
+
+\paragraph{}
+Nous donnons en annexe le texte source de l'analyseur lexical de PIPS.
+
+\section{Représentation interne}
+
+La représentation interne (RI) de PIPS n'est pas encore parfaitement
+définie. Nous avons plusieurs objectifs que nous nous efforçons de
+respecter pour le design de la RI:
+\begin{itemize}
+\item utilisation de Newgen;
+\item indépendance vis à vis de Fortran;
+\item simplicité.
+\end{itemize}
+
+Voici quelques explications sur ces trois objectifs.
+
+\subsection{L'outil Newgen}
+
+Newgen\footnote{{\em Newgen: a Language-Independant Program Generator},
+Pierre Jouvelot et Rémi Triolet, Rapport Interne ENSMP-CAI en cours de
+préparation} est un outil de spécification logiciel développé au CAI
+dans le but de faciliter la conception et l'implémentation de
+programmes manipulant des structures de données complexes. A partir de
+la définition en langage de haut niveau de structures de données,
+Newgen génère automatiquement l'ensemble des fonctions nécessaires à
+la manipulation de telles structures (création, accès et
+modification). De plus, il est possible de sauvegarder et de relire sur
+fichier des structures de données gérées par Newgen.  Ces fonctions
+(ou macros) peuvent être écrites dans tout langage de programmation
+supporté par Newgen.  Les langages actuellement traités sont C et
+CommonLISP.
+
+A titre d'exemple, voici la manière dont pourrait être décrite une
+structure de donnée représentant un arbre syntaxique:
+\begin{verbatim}
+expression = constante:int + unaire:expression + binaire
+binaire = gauche:expression x droite:expression x operateur:string
+\end{verbatim}
+A partir d'une telle définition, Newgen génère automatiquement des
+fonctions comme {\tt make\_expression} pour créer des expressions, {\tt
+expression\_constante\_p} pour tester l'appartenance d'une expression à
+la sous-classe des expressions constantes, {\tt binaire\_gauche} pour
+accéder au fils gauche d'une expression binaire, etc.  Il est également
+possible d'écrire (via {\tt gen\_write}) et lire (via {\tt gen\_read}) des
+structures gérées par Newgen. Parmi les autres caractéristiques de
+Newgen, signalons la possibilité de libérer la place allouée à des
+objets ({\tt gen\_free}), de déclarer des types complexes comme des
+listes ou tableaux multi-dimensionnels, de tester à l'exécution la
+conformité d'une structure avec sa déclaration Newgen, de tabuler des
+objets, de gérer l'écriture et la lecture de données circulaires ou
+partagées,...
+
+Nous avons décidé d'utiliser Newgen dans le cadre du projet Pips pour
+plusieurs raisons :
+\begin{itemize}
+\item
+        Newgen permet de définir les structures de données manipulées
+par Pips dans un langage de haut-niveau, fournissant de fait une
+documentation automatique de Pips et imposant une certaine normalisation
+dans l'écriture des logiciels par l'utilisation des fonctions
+automatiquement créées par Newgen,
+\item
+        Newgen est utile dans une phase de prototypage car il permet de
+tester différents choix de structures de données sans nécessiter de
+recodage majeur, ce qui est un avantage dans un projet de recherche
+comme Pips,
+\item
+        Newgen permet de tester la cohérence des structures de données
+créées par Pips, soit en ``real-tim{e}'' par un système de typage
+géré automatiquement par Newgen, soit au moment des écritures et
+relectures de structures de données sur fichier,
+\item
+        Newgen permet la compatibilité au niveau fichier entre les
+parties de Pips écrites dans des langages différents (ainsi, par
+exemple, l'analyseur syntaxique basé sur Yacc est écrit en C et le
+pretty-printer l'est en CommonLISP), permettant ainsi l'évolution
+``douc{e}'' de modules de CommonLISP (en phase de prototypage) vers C si
+des questions de performance le requièrent.  A noter que cette
+compatibilité peut être encore plus intéressante si on utilise les
+``pipes'' d'Unix pour éviter les accès-disque.
+\item
+        Newgen autorise l'utilisation de types de données
+pré-existants ce qui permet la réutilisation de logiciels écrits en
+dehors de l'environnement Newgen.
+\end{itemize}
+
+\subsection{Indépendance vis à vis de Fortran}
+
+Il nous a paru important pour le projet PIPS d'être le plus possible
+indépendant du langage Fortran, même si Fortran reste le langage
+favori des numériciens. La plupart des constructeurs vont d'ailleurs
+dans ce sens puisqu'on voit de plus en plus apparaitre des
+compilateurs-vectoriseur capables aussi bien de vectoriser Fortran, C ou
+Ada.
+
+L'expérience que nous avons jusqu'à présent montre que le surplus de
+travail nécessaire pour s'abstraire de Fortran est très faible, et
+qu'au contraire, l'analyse poussée de Fortran que nous avons due faire
+nous a permis de mieux comprendre les diverses constructions de ce langage.
+
+\subsection{Simplicité de la RI}
+
+La simplicité de la RI permet de limiter la quantité de code à
+écrire pour réaliser les phases d'analyses et de transformations de
+programme qui s'appuieront sur la RI.
+
+Notre objectif principal a été, encore une fois, de s'abstraire de
+Fortran le plus possible pour permettre à un plus grand nombre de
+constructions syntaxiques d'utiliser les mêmes structures de données.
+Ceci permet de limiter le volume de code à écrire puisqu'à chaque
+structure de données devra correspondre des fonctions d'analyse et de
+transformation. Donnons quelques exemples d'abstractions.
+
+Les variables scalaires n'existent pas dans notre RI car elles sont
+représentées par des tableaux à 0 dimension. Les constantes
+n'existent pas non plus car elles sont représentées par des appels à
+des fonctions sans code, dont la valeur est la valeur de la constante.
+Le même principe a été adopté pour les opérateurs.
+Il en résulte que les structures de données pour stoker les
+expressions sont très simples:
+\begin{verbatim}
+expression = reference + call
+
+reference = variable:entity x indices:expression*
+
+call = function:entity x args:expression*
+\end{verbatim}
+
+Ces trois lignes signifient que:
+\begin{itemize}
+\item   une expression est un appel de fonction (\verb+call+) ou une
+référence à une variable (\verb+reference+);
+
+\item   une référence est composée d'une entrée dans la table
+des symboles (\verb+entity+) et d'une liste d'expressions (\verb+expression*+) qui sont
+les indices;
+
+\item   un call est composée d'une entrée dans la table des symboles
+(\verb+entity+) et d'une liste d'expressions (\verb+expression*+) qui sont les
+arguments de l'appel;
+\end{itemize}
+
+Nous n'avons que quatre types d'instructions dans notre RI: le test, la
+boucle, le goto et le call. La plupart des instructions Fortran (STOP,
+RETURN, AFFECTATION, READ, WRITE, ...) sont transformées en des calls
+à des fonctions intrinsics, dont le nom permet de retrouver, si besoin
+est, l'instruction Fortran d'origine.
+
+\paragraph{}
+
+Un rapport complet sur la RI sera fourni avec le prochain rapport sur
+l'analyse syntaxique.
+
+\section{Analyse syntaxique}
+
+L'analyse syntaxique de PIPS sera réalisée avec l'utilitaire yacc. Cet
+utilitaire permet de définir une grammaire par un ensemble de règles
+construites sur les tokens du langage et sur d'autres symboles appelés
+symboles non terminaux. Voici quelques exemples de règles.
+\begin{verbatim}
+linstruction: instruction TK_EOS
+        | linstruction instruction TK_EOS
+        ;
+
+expression: reference
+        | call
+        | constante
+        | signe expression
+        | expression TK_PLUS expression
+        | expression TK_MINUS expression
+        | ...
+        ;
+\end{verbatim}
+
+La première règle signifie qu'une liste d'instructions est composée
+de plusieurs instructions séparées par des tokens \verb+TK_EOS+ (token
+end-of-statement). La seconde règle signifie qu'une expression est soit
+une référence, soit un call, soit une constante, soit un signe suivie
+d'une expression, soit la somme ou la différence de deux expressions.
+Les symboles call, constante, reference, ... sont des non-terminaux, et
+doivent donc être définis plus loin en fonction des tokens du langage.
+
+\paragraph{}
+Yacc permet en plus d'associer à chaque règle une portion de code
+écrit en langage C, qui est exécutée chaque fois que la règle en
+question est reconnue dans le programme Fortran soumis à l'analyseur.
+L'exemple suivant montre une partie de la règle instruction, et la
+portion de code associée; il s'agit dans ce cas d'un appel de fonction
+pour chainer l'instruction que l'on vient de reconnaitre au bloc
+d'instructions courant.
+\begin{verbatim}
+instruction: return_inst
+            { LinkInstToCurrentBlock($1); }
+        | ...
+        ;
+\end{verbatim}
+
+\paragraph{}
+L'analyse syntaxique est en cours de développement, et le
+texte source de cette partie sera fournie avec le prochain rapport.
+
+\section{Analyse sémantique}
+
+Un des objectifs du projet PIPS est d'étudier l'intérêt d'une
+analyse sémantique approfondie pour la parallélisation
+interprocédurale. La méthode choisie, développée par P. Cousot
+et N. Halbwachs, fournit des égalités et inégalités linéaires
+entre variables scalaires entières. Ces égalités et inégalités
+généralisent les techniques habituelles en optimisation globale:
+propagation de constante, détection de variables inductives,
+détection d'égalités linéaires entre variables, indices
+appartenant à l'intervalle défini par les bornes de boucles. Ces
+égalités et inégalités linéaires ont de plus l'avantage de
+pouvoir être aisément utilisées dans le calcul du graphe de
+dépendance. Rappelons que cette analyse détaillée n'est
+effectuée qu'au niveau intra-procédural et qu'une technique plus
+simple est prévue au niveau interprocédural.
+
+Ce premier rapport présente dans une première partie l'architecture
+générale de l'analyseur sémantique et dans une deuxième partie la
+première couche de modules mathématiques, un package de vecteur
+creux.
+
+\subsection{Architecture générale de l'analyseur sémantique}
+
+L'analyseur sémantique consiste à associer aux états mémoires des
+interprétations non-standard, généralement des approximations, et
+aux instructions des opérateurs sur ces interprétations. Des
+opérateurs supplémentaires sont introduits pour prendre en compte
+les noeuds de jonction du graphe de contrôle, qu'ils servent à fermer
+un test ou une boucle.
+
+Il est donc possible de distinguer deux phases indépendantes. La
+première est la traduction du graphe de contrôle (control flow
+graph) décoré par des instructions en un système d'équations aux
+polyèdres (un système d'égalités et d'inégalités peut être
+vu comme un polyèdre). (un système d'égalités et
+d'inégalités peut être vu comme un polyèdre).
+
+La deuxième phase consiste à résoudre le système ou plus
+exactement à en trouver un point fixe aussi bon que possible. Il ne
+reste plus alors qu'à rattacher les résultats aux noeuds graphes de
+contrôle.
+
+\subsubsection{Traduction du graphe de contrôle} 
+
+La traduction du graphe de contrôle se décompose à nouveau en deux
+activités distinctes. Chaque instruction doit d'abord être traduite
+en une opération sur des polyèdres. Les affectations affines,
+inversibles ou non, et les tests linéaires se traduisent bien mais il
+peut aussi arriver qu'aucune information ne soit disponible et que
+certaines instructions se traduisent en une simple perte d'information.
+Cette traduction dépend malheureusement elle-même des connaissances
+sémantiques que nous avons du programme. Par exemple l'instruction
+\verb+I=J*K+ n'est pas a priori une transformation linéaire. Mais elle le
+devient si on détecte que K est une constante valant par exemple 4.
+
+Pour éviter ce problème la traduction des instructions est
+retardée dans l'analyseur SYNTOX et reportée à la phase de
+résolution. Nous n'avons pas retenu cette solution pour le moment
+parce que la traduction d'une instruction en une suite d'opération sur
+les polyèdres est coûteuse en temps CPU et parce qu'elle devrait
+être effectuée à chaque itération de la résolution du système.
+Cela n'est pas aussi génant dans SYNTOX. Il manipule des intervalles
+définis indépendemment sur chaque variable. Il est aisé de
+réécrire les opérateurs usuels des langages de programmation en
+opérateurs sur les intervalles.
+
+Cela veut donc dire qu'il faudrait faire précéder l'analyse
+sémantique "à la Cousot" par une propagation interprocédurale de
+constantes. Ces constantes permettraient de trouver davantage
+d'opérations linéaires et réduiraient la dimensionalité des
+polyèdres à traiter (leur dimension est égale a priori aux nombres de
+variables scalaires entières du module analysé).
+
+Une autre solution consisterait à procéder à plusieurs analyses
+sémantiques successives et à utiliser les résultats de l'analyse
+précédente pour effectuer la traduction.
+
+La deuxième activité consiste à associer les bons opérateurs aux
+noeuds de jointure et à sélectionner les points auxquels il faudra
+appliquer des élargissements (en analyse avant). L'opération
+d'élargissement permet de trouver un point fixe en un nombre limité
+d'itérations au prix d'une perte d'information. Cette perte
+d'information conduit à de mauvais résultats si ces points sont mal
+choisis et si aucune stratégie de convergence locale dans les boucles
+les plus internes n'est définie.
+
+\subsubsection{Résolution du système aux polyèdres} 
+
+Cette phase débute avec en entrée un système d'équations aux polyèdres et
+une suite de groupe de noms de polyèdres. Une solution triviale basée sur le
+botton du treillis des polynomes et sur les éléments neutres d'opérateurs
+est fixée. Elle est ensuite propagée itérativement à travers le système
+d'équations jusqu'à convergence, en ne prenant en compte que les polyèdres
+du 2ème groupe et ainsi de suite jusqu'à ce qu'on ait trouvé un point fixe
+global, valable pour tous les polyèdres.
+
+Les premiers polyèdres traités sont les invariants des boucles les plus
+internes puis on remonte ensuite vers le top level en ajoutant les
+invariants des bandes intermédiaires.
+
+Cette résolution itérative est très côuteuse car les opérations
+élémentaires constituent chacune un problème linéaire complexe
+mettant en jeu les deux représentations des polyèdres, les systèmes
+d'égalités et d'inégalités et les systèmes générateurs, et
+présentant une complexité exponentielle. Un gros effort va être fait
+pour optimiser ces modules, dont certains serviront d'ailleurs aussi au
+test de dépendance et à la génération de code, et pour profiter du
+caractère creux des vecteurs manipulés.
+
+\subsubsection{Phase terminale de l'analyse} 
+
+Il faut calculer les invariants associés à chaque point du graphe de
+contrôle à partir des invariants calculés itérativement uniquement
+pour les premiers noeuds de chaque intervalle ou bloc de base du graphe
+de contrôle.
+
+Il faut ensuite essayer de factoriser ces invariants sur les graphes de
+contrôle structurés pour éviter de répéter sur chaque noeud une
+information comme UNIT=5 et pour diminuer l'espace mémoire utilisé.
+
+Finalement les invariants doivent être attachés directement aux noeuds du
+graphe de contrôle pour en permettre l'utilisation par les phases
+ultérieures de PIPS.
+
+\subsection{Manipulation de vecteurs creux} 
+
+Les vecteurs constituent la première couche de structures de données
+conduisant aux systèmes linéaires d'égalités et d'inégalités et
+aux systèmes générateurs.
+
+Expérimentalement, ces vecteurs dont la longueur est égale au nombre de
+constantes scalaires entières sont très creux car seule une ou deux
+variables et une constante y apparaissent. Les coefficients des autres
+variables sont nuls et n'ont pas besoin d'être représentés.
+
+Tous les algorithmes sont basés sur des répétitons de combinaisons
+linéaires de tels vecteurs. Elles doivent donc s'effectuer très
+vite.
+
+D'autres packages (égalités, inégalités, matrices, systèmes
+d'inégalités) seront basées sur ce premier package de vecteur
+creux.
+
+\end{document}
+\end

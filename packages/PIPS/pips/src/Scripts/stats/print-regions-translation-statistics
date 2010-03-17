@@ -1,0 +1,314 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+# Formattage sous latex de certaines des informations conservees
+# optionnellement lors du calcul des regions
+
+# Be'atrice Creusillet, Fe'vrier 1997
+
+
+workspace=$1
+prefix=$2
+global=tmp$$
+
+#echo $workspace
+#echo $prefix
+
+#dir=$PIPS_ROOT/Utils
+dir=$PIPS_DEVEDIR/Scripts/stats
+awk=/usr5/gnu/SPARC/bin/gawk
+
+if [ ! -d $workspace.database ]
+then
+	echo Workspace $workspace does not exist!
+	exit
+fi
+
+>$global.$prefix
+for source in $workspace.database/*.f
+do  
+	module=`basename $source .f`
+	module=`echo $module | tr a-z A-Z`
+	#echo module=$module
+	stats=$workspace.database/$module.$prefix\_inter_trans_stat
+	#echo stats="$stats"
+	if [ -f $stats ]
+	then
+		#echo $0: including statistics for module $module
+		cat $stats >>$global.$prefix
+	else
+		echo $0: missing statistics for module $module
+		echo "$module 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0">>$global.$prefix
+	fi
+done
+
+cat >$workspace-$prefix.tex <<EOF
+\batchmode
+
+\documentclass[11pt,a4]{article}
+\usepackage{array}
+\usepackage{amssymb,amstex,righttag}
+
+\addtolength{\textwidth}{50pt}
+\setlength{\oddsidemargin}{5mm}
+\setlength{\evensidemargin}{3mm}
+\addtolength{\textheight}{50pt}
+\addtolength{\topmargin}{-8mm}
+
+
+\title{Array Region Translation: Statistics for Workspace $workspace}
+\author{$NAME}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section{Inputs}
+
+The next table gives statistics about the type of translation: scalar to
+scalar, scalar to or from array, array to array. These statistics are given
+for each module, as well as the number of times the array translation
+routine is called.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r r|r r|r r|r|} \\hline
+type & \multicolumn{2}{c|}{scalar to scalar}  
+     & \multicolumn{2}{c|}{scalar to array}  
+     & \multicolumn{2}{c|}{array to array} & total arrays \\\\ 
+     & & \\% & & \\% & & \\% & \\\\\\hline
+EOF
+
+#echo "type"
+$awk -f $dir/region_trans_stat_type.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+The next table gives the number of dimensions of the source array against
+the number of dimensions of the target array. This is not detailed for each module.
+Only the total is given.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r r|r r|r r|r r|r r|r r|r r|r r|} \\hline
+source $\blacktriangleright$ & 0 & & 1 & & 2 & & 3 & & 4 & & 5 & & 6 & & 7 & \\\\
+target $\blacktriangledown$ &  & \\% &  & \\% &  & \\% & & \\% & & \\% & & \\% & & \\% & & \\% \\\\ \\hline
+EOF
+
+#echo "dim"
+$awk -f $dir/region_trans_stat_dim.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+The next table shows the ratio between the size of the source array
+elements, and the target array elements.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r r|r r|r r|r r|r r|} \\hline
+size ratio & 1 & & 2 & & 3 & & 4 & & other & \\\\ 
+ & & \\% & & \\% & & \\% & & \\% & & \\& \\\\ \\hline
+EOF
+
+#echo "size"
+$awk -f $dir/region_trans_stat_size.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+Finally, we give the percentage of zero offset: 
+EOF
+
+#echo "offset"
+$awk -f $dir/region_trans_stat_offset.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+
+\section{Translation}
+
+This second section gives statistics about the way the translation is
+performed. Is it mostly exact? Where does inexactness come from?
+
+The first phase of the translation tries to discover \emph{similar
+dimensions} between the source and target array. The next array gives
+statistics about this phase. The first column gives the name of the
+module. The second one, the number of calls to this phase. The next one the
+number and percentage of cases in which this phase discovers that all common
+dimensions are similar. The remaining columns give statistics about the
+reasons this phase has failed for all dimensions: the first reason is that
+the common dimensions may actually not be similar; the second reason maybe
+due to non-linear dimension declarations.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r|r r|r r|r r|}\\hline
+module & calls & \multicolumn{2}{c|}{all dim. similar} & 
+  \multicolumn{2}{c|}{all dim. not similar} & \multicolumn{2}{c|}{nonlinear decl.} \\\\ 
+ & & & \\% & & \\% & & \\% \\\\ \\hline
+EOF
+
+#echo "common dim"
+$awk -f $dir/region_trans_stat_common_dim.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+When the previous phase partially or entirely fails, the linearization part
+of the algorithm is applied. The results of this next phase are summarized
+in the next table. The first column gives the module name, the second one,
+the number of calls of this phase. The third column gives the number of
+cases in which this phase is successful. And the remaining columns are about
+the failures of the phase, which may be due to nonlinear declarations
+(Column~4) or to a nonlinear term in the linearized equation (Column~5).
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r|r r|r r|r r|}\\hline
+module & calls & \multicolumn{2}{c|}{full success} & 
+  \multicolumn{2}{c|}{nonlinear decl.} & \multicolumn{2}{c|}{nonlinear eq.} \\\\  
+ & & & \\% & & \\% & & \\% \\\\ \\hline
+EOF
+
+#echo "linearization"
+$awk -f $dir/region_trans_stat_linearization.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+When the search for similar common dimension is fully successful, the
+remaining dimensions of the higher dimensional array are handled using
+either their declarations or the offset as it appears in the module call. In
+this case, failures are only due to non-linear declarations or array
+subscripts.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r|r r|r r|}\\hline
+module & calls & \multicolumn{2}{c|}{full success} & 
+  \multicolumn{2}{c|}{nonlinearity}\\\\  
+ & & & \\% & & \\%  \\\\ \\hline
+EOF
+
+#echo "remaining dims"
+$awk -f $dir/region_trans_stat_remaining_dims.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+At this stage, the translation system is built, either entirely, or
+partially. The next steps are the elimination of $\delta$ and $\Phi$
+variables, which may lead to inexact regions, and the translation of the
+region predicate from the source module name space to the target module name
+space. This last operation may be inexact because of unknown relations
+between variables values, or because of inexact variable eliminations.
+
+We first give statistics about the $\delta$ variable elimination phase. The
+first column gives the module name, the second one the number of exact
+regions before the phase, and the second one the number of exact regions
+after the phase.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r|r r|r r|}\\hline
+module & calls & \multicolumn{2}{c|}{exact before} & 
+  \multicolumn{2}{c|}{exact after}\\\\   
+ & & & \\% & & \\%  \\\\ \\hline
+EOF
+
+#echo "delta elim"
+$awk -f $dir/region_trans_stat_delta_elim.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+The next table gives statistics about the $\Phi$ variable elimination
+phase. The first column gives the module name, the second one the number of
+exact regions before the phase, and the second one the number of exact
+regions after the phase.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r|r r|r r|}\\hline
+module & calls & \multicolumn{2}{c|}{exact before} & 
+  \multicolumn{2}{c|}{exact after}\\\\   
+ & & & \\% & & \\%  \\\\ \\hline
+EOF
+
+#echo "phi elim"
+$awk -f $dir/region_trans_stat_phi_elim.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+Finally, the last table gives statistics about the predicate translation phase.
+
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|r|r r|r r|}\\hline
+module & calls & \multicolumn{2}{c|}{exact before} & 
+  \multicolumn{2}{c|}{exact after}\\\\   
+ & & & \\% & & \\%  \\\\ \\hline
+EOF
+
+#echo "predicate translations"
+$awk -f $dir/region_trans_stat_pred_trans.awk WORKSPACE=$workspace <$global.$prefix >>$workspace-$prefix.tex
+
+cat >>$workspace-$prefix.tex <<EOF
+\hline
+\end{tabular}}
+\end{center}
+
+EOF
+
+rm $global.$prefix
+
+
+cat >>$workspace-$prefix.tex <<EOF
+
+\end{document}
+EOF
+
+latex $workspace-$prefix.tex
+
+
+
+
+

@@ -1,0 +1,266 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\slidepart{Optimisation évaluation expressions}
+
+\begin{trans}{Optimisation de l'évaluation d'expressions}
+  \begin{dinglist}{224}
+  \item {\yellow \hypertarget{EOLE}{Problème}}
+    \begin{itemizer}      
+    \item Évaluation répétée de grosses expressions      
+    \item Améliorer évaluation pour processeurs et DSP superscalaires \&
+      VLIW
+    \end{itemizer}
+  \item {\yellow Approche}
+    \begin{itemizer}      
+    \item Explorer l'espace des expressions mathématiquement équivalentes    
+    \item Étudier l'impact des {\red transformations algébriques} sur les
+      performances
+    \end{itemizer}
+  \item {\yellow Contraintes}
+    \begin{itemizer}
+    \item Éviter l'explosion combinatoire
+    \item Prendre en compte ILP et nouvelles instructions
+    \end{itemizer}
+  \end{dinglist}
+\end{trans}
+
+%
+% Example
+%
+
+\slidepart{Example}
+\begin{trans}{ONDE24 - survol du noyau}
+\begin{minipage}{5.5cm}
+{\scriptsize\begin{alltt}
+[...]
+ DO J = 3,NP-2
+   DO I = 3, NP-2
+     U(I,J,KP) = 
+$      2 * U(I,J,KM) -{\yellow U(I,J,KP)}
+$      - V(I,J) * ( 60*U(I,J,KM) 
+$      -16*({\orange U(I+1,J,KM)} +{\orange U(I-1,J,KM)} 
+$      +{\orange U(I,J-1,KM)} +{\orange U(I,J+1,KM)})
+$      +{\red U(I+2,J,KM)} +{\red U(I-2,J,KM)} 
+$      +{\red U(I,J-2,KM)} +{\red U(I,J+2,KM)})
+   ENDDO               
+ ENDDO
+[...]
+\end{alltt}}
+\hspace{1.3cm}\psfig{file=dessins/pattern.idraw,width=0.4\hsize}
+\end{minipage}
+\begin{minipage}{6.5cm}
+  \psfig{file=dessins/graphe2.idraw,width=0.9\hsize}
+\end{minipage}
+\end{trans}
+
+\begin{trans}{ONDE24 - transformations}
+  \begin{center}
+    \begin{tabular}[c]{cc}
+      \begin{tabular}[c]{c}
+        \psfig{file=dessins/graphe2-choix.idraw,width=0.48\hsize} 
+      \end{tabular} 
+      &
+      \begin{tabular}[c]{c}
+        \psfig{file=dessins/graphe3-choix.idraw,width=0.42\hsize}
+      \end{tabular} 
+    \end{tabular}
+  \end{center}
+  \vspace{1cm}
+  \centerline{\bf \red 2 factorisations et 4 $\times+$}
+\end{trans}
+
+\begin{trans}{ONDE24 - beaucoup de choix...}
+  \centerline{\psfig{file=dessins/cas_complexe_eng.idraw,width=0.65\hsize}}
+  \vspace{0.5cm}
+  \belleboite{69300 expressions mathématiquement équivalentes}
+\end{trans}
+
+\begin{trans}{ONDE24 - contexte expérimental}
+  \begin{dinglist}{224}
+  \item {\yellow Architecture}
+    \begin{itemizer}
+    \item {\tt \red IBM RS6000} avec processeurs 120 \& 160 MHz {\small
+        (P2SC 595)}
+    \item $ \left. \begin{array}{l}
+          \mbox{2 unités flottantes} \\
+          \mbox{pipeline flottant à latence de 2}
+        \end{array}  \right\} \mbox{4 opérations indépendantes} $
+    \item Instruction {\red multiplication-addition} (même latence que
+      l'addition)
+    \end{itemizer}
+  \item {\yellow Compilation}
+    \begin{itemizer}
+    \item IBM {\tt XLFortran} release 4.1 ({\small -O3 -qarch=pwr2 -qhot})
+    \item Préprocesseur {\tt KAP} pour Fortran IBM (V3.3)
+    \end{itemizer}
+  \end{dinglist}
+\end{trans}
+
+
+\begin{trans}{ONDE24 - quelques résultats sur un P2SC 595 à 160MHz}
+  \begin{center}
+    \begin{tabular}[c]{cp{0.2cm}c}
+      \begin{tabular}[c]{c}
+        \psfig{file=dessins/fma2_expliq.idraw,width=0.45\hsize}
+      \end{tabular} %
+      & & 
+      \begin{tabular}[c]{c}
+        \psfig{file=dessins/fma4_expliq.idraw,width=0.45\hsize}
+      \end{tabular} \\
+      {\yellow 149 MFLOP/s} & & {\yellow 130 MFLOP/s} \\ \vspace{0.2cm}     
+    \end{tabular}
+  \end{center}
+  \vspace{0.2cm}
+  \centerline{\red \ding{225} 2 chemins critiques différents}
+\end{trans}
+
+\begin{trans}{ONDE24 - quelques résultats sur un P2SC 595 à 160MHz}
+  \begin{center}
+    \begin{tabular}[c]{cp{0.1cm}c}
+      \begin{tabular}[c]{c}
+        \psfig{file=dessins/original.idraw,width=0.32\hsize}
+      \end{tabular} %
+      & & %
+      \begin{tabular}[c]{c}
+        \psfig{file=dessins/fma5.idraw,width=0.52\hsize}
+      \end{tabular} \\
+      {\yellow 102 MFLOP/s} & & {\yellow 162 MFLOP/s} 
+    \end{tabular}
+  \end{center}
+  \vspace{0.5cm}
+  \centerline{\red \ding{225} 60\% d'augmentation des performances}
+\end{trans}
+
+
+
+%
+% Optimizing expressions
+%
+\slidepart{Optimisation des expressions}
+
+
+\begin{trans}{Optimisation des expressions}
+  \hspace{-0.3cm}
+  \begin{minipage}{10cm}
+    \begin{dinglist}{227}
+    \item {\yellow Notre approche} \subitem Chercher dans l'espace des
+      expressions algébriquement équivalentes \subitem Prendre une {\em
+        bonne} expression finale \vspace{0.5cm}
+  \item {\yellow Néanmoins}
+    \subitem L'espace des expressions est {\bf trop large}
+    \vspace{0.5cm}
+  \item {\yellow D'où ... }{\red heuristique gloutonne}
+    \subitem Suivre un processus {\bf itératif}
+    \subitem Prendre des {\bf décisions locales}
+    \subitem Limiter l'espace des {\bf transformations élémentaires}
+    \subitem Trouver un {\bf critère de choix} simple et efficace
+  \end{dinglist}
+  \end{minipage}
+  \hspace{-2.6cm}
+  \begin{minipage}{9cm}
+    \psfig{file=dessins/heuristics.idraw,width=0.45\hsize}
+  \end{minipage}
+\end{trans}
+
+\begin{trans}{Application à l'extraction des $\times+$}
+  \begin{center}\begin{minipage}{12cm}
+    \vspace{-0.3cm}
+    \centerline{2 {\bf \yellow transformations élémentaires}
+      intéressantes selectionnées}
+    \vspace{0.4cm}
+    \begin{minipage}{7.5cm}
+      \psfig{file=dessins/algo_fma_simple.idraw,width=0.95\hsize}
+    \end{minipage}
+    \hspace{1cm}
+    \begin{minipage}{3.3cm}
+      {\bf \yellow Critère de choix} \\
+      \ding{225} \barrer{Coût réel} \\
+      \ding{225} coût estimé
+      \begin{itemize}
+      \item {\red $W$} $= \sum_{i=1}^{n} w_i$ 
+      \item {\red $C$} $= \max_{i=1}^{n} d_i$
+      \item {\red $G$} $= \frac{\sum_{i=1}^{n} w_i\times d_i}{W}$
+      \end{itemize}
+    \end{minipage}
+    \vspace{0.7cm}
+    \begin{center} \begin{minipage}{10cm}
+        \centerline{\bf \yellow Heuristique gloutonne :}
+        \centerline{Sélectionne une transformation selon le critère de
+          choix}
+      \end{minipage}
+    \end{center}
+  \end{minipage}
+\end{center}
+\end{trans}
+
+\begin{trans}{Un processus en 3 étapes}
+  \begin{enumerate}
+  \item {\yellow Normalisation} - {\em \red pattern matching}
+    \begin{itemizer}
+    \item Garantit que les expressions peuvent être librement réarrangées
+    \item Applique des simplifications algebriques simples
+    \end{itemizer}
+  \item {\yellow Factorisation} - {\em \red heuristique gloutonne}
+    \begin{itemizer}
+    \item Réduit le nombre des opérations
+    \item Sélectionne l'arbre le mieux équilibré
+    \item Favorise la factorisation ultérieure de code invariant
+    \end{itemizer}
+  \item {\yellow Extraction de $\times+$} - {\em \red heuristique gloutonne}
+    \begin{itemizer}
+    \item Extrait autant de $\times+$ que possible
+    \item Sélectionne l'arbre le mieux équilibré
+  \end{itemizer}
+\end{enumerate}
+\end{trans}
+
+
+%
+% Conclusion and future work
+%
+\slidepart{Conclusion projet EOLE}
+
+\begin{trans}{EOLE --- résultats}
+  \begin{dinglist}{224}
+  \item {\yellow Résultats expérimentaux prometteurs}
+    \begin{itemizer}
+    \item Amélioration des performances jusqu'à un facteur 3
+    \end{itemizer}
+  \item {\yellow Complètement imnplémenté}
+    \begin{itemizer}
+    \item Utilise CAVEAT (CEA) et STORM (LIFO, Stony Brook)
+    \item Inclus dans PIPS
+    \end{itemizer}
+  \item {\yellow Temps d'optimisation raisonnable} dans un contexte de
+    compilation
+    \begin{itemizer}
+    \item ONDE24 (500 lines) \ding{225} 4 sec (Sun Ultra1 143
+        MHz)
+    \end{itemizer}
+\end{dinglist}
+\end{trans}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "trans"
+%%% End: 

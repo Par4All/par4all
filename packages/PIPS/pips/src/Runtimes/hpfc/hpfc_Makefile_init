@@ -1,0 +1,581 @@
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# This is the initial makefile for HPFC compilation
+# a NAME macro is expected somewhere... could be derived automatically?
+# Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
+
+SHELL=/bin/sh
+
+#
+# usual default target is to build and install the seq and par versions
+all: out mainpvm mainmpi install
+	#
+	# $(NAME)_out sequential version compiled
+	# $(NAME)_mainpvm parallel pvm version compiled and installed
+	# $(NAME)_mainmpi parallel mpi version compiled
+
+#
+# help target
+help:
+	#
+	# SOME HELP!
+	#
+	# NOTE: this make file should be run with GNU make (gmake)
+	#
+	# Possible targets of high interest: out mainpvm mainmpi install run
+	#
+	# COMPILATION and INSTALLATION
+	#
+	#   out: generates $(NAME)_out sequential executable 
+	#   mainpvm: generates $(NAME)_mainpvm paralle PVM executable 
+	#     (one SPMD executable which insures both I/O and computations)
+	#   mainmpi: generates $(NAME)_mainmpi parallel MPI executable
+	#   install: insures that $(NAME)_mainpvm is copied in the PVM directory
+	#   hostnode: generates $(NAME)_{host,node} PVM executables
+	#     (two executables, one for I/Os and a SPMD one for the nodes)
+	#
+	# OTHERS
+	#
+	#   all: out mainpvm mainmpi install
+	#   diffpvm: compares sequential and parallel pvm stdouts!
+	#   diffmpi: compares sequential and parallel mpi stdouts!
+	#	(not yet implemented)
+	#   clean: removes deducable files
+	#   clobber: also removes executables files.
+	#   reset: reset pvm
+	#   restart: restart pvm (useful when debugging) 
+	#   install_{mainpvm,hostnode}: 
+	#     copies executables to the pvm directory (where spawn find them)
+	#   mpi_start: start the MPI deamon
+	#   mpi_run: start the MPI version of your program (give the number of processors 
+	#               by setting the $(NBPROCS) variable)
+	#   mpi_reset: reset MPI (useful when debugging)
+	#   mpi_stop: stop the MPI deamon
+	#   paradyn: in order to link with the paradyn object files
+
+#
+# Other tools
+
+STRIP	=	strip
+COPY 	= 	cp
+
+
+#
+# PVM interactive command
+
+PVM=pvm
+
+#
+# architecture
+
+ifndef PIPS_ARCH
+PIPS_ARCH=.
+endif
+
+# the RT architecture relies both on PVM and PIPS architectures,
+# because of obscure issues related to naming conventions when g77 is used...
+
+RT_ARCH=$(PIPS_ARCH)/$(PVM_ARCH)
+
+ifdef HPFC_RUNTIME
+RT_DIR=	$(HPFC_RUNTIME)
+else
+RT_DIR= $(PIPS_ROOT)/Runtime/hpfc
+endif
+
+# source files from the runtime needed to compile a spmd program
+RT_SRC_FILES =	hpfc_check.f \
+		hpfc_*.h \
+		hpfc_main.f \
+		hpfc_main_host.f \
+		hpfc_main_node.f \
+		hpfc_architecture_m4_macros
+
+# the default is to use the same compilers and options as the library.
+include $(RT_DIR)/$(RT_ARCH)/compilers.make
+
+#
+# PVM architexture dependent settings
+
+ifeq ($(PVM_ARCH),CM5)
+MIMD = 1
+CMLD = cmmd-ld
+# CMLD_FLAGS = -v
+CMLD_FLAGS =
+endif
+
+ifeq ($(PVM_ARCH),PGON)
+MIMD = 1
+PVM_HLIB	+= -lrpc
+PVM_NLIB	+= -lnx -lrpc
+ALL_NLIBS	+= $(PVMHOST)
+endif
+
+ifeq ($(PVM_ARCH),SUN4)
+NETWORK = 1
+endif
+
+ifeq ($(PVM_ARCH),SUN4SOL2)
+NETWORK = 1
+RUNTIME_LIBS	+= -lnsl -lsocket
+#FFLAGS		+= -lbsd
+FLINKER 	= 	hf77
+LAMHF77		= 	$(FC)
+endif
+
+ifeq ($(PVM_ARCH),SUNMP)
+NETWORK = 1
+RUNTIME_LIBS     += -lnsl -lsocket -lthread
+endif
+
+ifeq ($(PVM_ARCH),ALPHA)
+NETWORK = 1
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+NETWORK = 1
+# bsd helps with signals (e.g. if xpomp is used)
+FFLAGS	+= -lbsd
+FLINKER 	= mpxlf
+endif
+
+ifeq ($(PVM_ARCH),LINUX)
+NETWORK = 1
+endif
+
+#
+# Directories... 
+# libraries...
+
+pvmbin 	= $(HOME)/pvm3/bin/$(PVM_ARCH)
+pvmlib	= $(PVM_ROOT)/lib/$(PVM_ARCH)
+pvminc	= $(PVM_ROOT)/include
+mpibin	= $(MPI_ROOT)/bin
+mpilib  = $(MPI_ROOT)/lib
+mpiinc	= $(MPI_ROOT)/h
+
+ifeq ($(PVM_ARCH),RS6K)
+mpiinc		= $(MPI_ROOT)/include
+mpilib  	= /usr/lpp/ppe.poe/lib/
+endif
+
+LIBS_DIR	+= -L. -L$(pvmlib) -L$(RT_DIR)/$(RT_ARCH)
+LIBS_MPI_DIR	+= -L. -L$(mpilib) -L$(RT_DIR)/$(RT_ARCH)
+
+PVM_FLIB 	+= -lfpvm3
+PVM_GLIB 	+= -lgpvm3
+PVM_HLIB 	+= -lpvm3
+
+MPI_LIB	+= -lmpi
+
+PARADYN_DIR	= $(PARADYN_ROOT)/lib/$(PLATFORM)
+
+ifdef _HPFC_USE_PVMe_
+# we're using pvme, that's sure!
+PVM=pvme
+# for requesting nodes on the SP2: pvmd3e -ip -share cpu 8 &
+# load leveller command files:
+all:	$(NAME).cmd
+# the directory organization is fun with IBM: 
+# e.g. headers are in /lib (I guess this is IBM standard:-)
+pvmlib		= $(PVM_ROOT)/lib
+pvminc		= $(PVM_ROOT)/lib
+PVM_GLIB	=
+
+
+#
+# two possible protocols: less efficient one used by default:-)
+# US (dedicated, 40MB/s) or IP (sharable, 15MB/s)
+# LIBS_DIR	+= -L/usr/lpp/ssp/css/libus
+LIBS_DIR	+= -L/usr/lpp/ssp/css/libip
+COMMON_PVM_LIBS	+= -lmpci -bI:$(pvmlib)/pvm3e.exp
+endif
+
+ifdef MIMD
+PVMHOST = $(pvmlib)/pvmhost.o
+PVM_NLIB 	+= -lpvm3pe
+endif
+
+ifdef NETWORK
+PVM_NLIB 	+= -lpvm3
+endif
+
+ifeq ($(PVM_ARCH),CRAY)
+#
+# the CRAY T3D does not require any library... 
+#
+PVM_FLIB =
+PVM_GLIB =
+PVM_HLIB =
+PVM_NLIB =
+# 
+pvminc  = /usr/include/mpp
+pvmlib	= .
+#
+# cannot strip MPP executables?
+#
+STRIP	= :
+#
+# QSUB...
+#
+all:	$(NAME).qsub
+main:	$(NAME).qsub
+endif
+
+# LoadLeveller...
+$(NAME).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(NAME)
+# QNS...
+$(NAME).qsub:; $(RT_DIR)/hpfc_qsub $(NAME) > $@
+
+RUNTIME_LIBS	+= -lhpfcruntime
+HPFC_PVM_LIB	+= -lhpfcpvm
+HPFC_PMI_LIB	+= -lhpfcmpi
+
+COMMON_LIBS	+= $(RUNTIME_LIBS) 
+COMMON_PVM_LIBS	+= $(HPFC_PVM_LIB) $(PVM_FLIB) $(PVM_GLIB) 
+COMMON_MPI_LIBS += $(HPFC_PMI_LIB) $(MPI_LIB)
+HOST_LIBS	+= $(PVM_HLIB)
+NODE_LIBS 	+= $(PVM_NLIB) 
+
+#
+# Files (the wildcards are GNU make extensions:-)
+
+PVM_HEADERS 	= 	pvm3.h fpvm3.h
+MPI_HEADERS	= 	mpif.h
+HEADERS_PVM 	=	$(wildcard hpfc_*.h) $(PVM_HEADERS)
+HEADERS_MPI 	=	$(wildcard hpfc_*.h) $(MPI_HEADERS)
+RT_INIT		= 	hpfc_initialize_runtime.f
+
+COMMON_FFILES	=	$(RT_INIT) hpfc_check.f $(wildcard [A-Z]*_both.f)
+HOST_FFILES 	=	$(wildcard [A-Z]*_host.f)
+NODE_FFILES 	= 	$(wildcard [A-Z]*_node.f)
+
+COMMON_OFILES	=	$(COMMON_FFILES:.f=.o) 
+HOST_OFILES 	= 	$(HOST_FFILES:.f=.o) 
+NODE_OFILES 	= 	$(NODE_FFILES:.f=.o)
+PARADYN_START_OFILE	= $(PARADYN_DIR)/DYNINSTstartCode.o 
+PARADYN_END_OFILE	= $(PARADYN_DIR)/DYNINSTendCode.o
+PARADYN_LIB_OFILE	= $(PARADYN_DIR)/libdyninstRT.o
+
+FTEST	=	$(NAME).f
+OTEST	=	$(NAME).o
+
+
+
+#
+# Executables
+
+RTEST	=	$(NAME)_out
+HOST 	= 	$(NAME)_host
+NODE 	= 	$(NAME)_node
+MAINPVM	=	$(NAME)_mainpvm
+MAINMPI =	$(NAME)_mainmpi
+MAINPARADYN = 	$(NAME)_mainpvm
+
+RUNABLES = $(HOST) $(NODE) $(RTEST) $(MAINPVM) $(MAINMPI)
+DEDUCED = $(PVM_HEADERS) $(MPI_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
+
+#
+# Rules
+
+# all:	$(DEDUCED) 
+
+.SUFFIXES:	.f .o .m4
+
+#
+# make is the target asked for by pipsmake for HPFC_MAKE
+
+make: $(DEDUCED) all pvm
+
+
+#
+# MPI Quick Control 
+
+
+# Starting MPI deamon
+ifeq ($(PVM_ARCH),SUN4SOL2)
+mpi_start:
+	lamboot -v $(MPI_ROOT)/boot/bhost.def
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_start:
+	@echo "mpi has been allready started"
+endif
+
+
+# Starting $(NAME)_mainmpi program (NBPROCS= to give the number of processor)	
+ifeq ($(PVM_ARCH),SUN4SOL2)
+mpi_run: $(MAINMPI)
+	@echo "**** Don't forget to specify the number of processors by setting NBPROCS ****"
+	mpirun -v -c $(NBPROCS) -s h $(NAME)_mainmpi
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_run: $(MAINMPI)
+	poe $(NAME)_mainmpi -procs $(NBPROCS)
+endif
+
+
+#Reset mpi environnement (useful when debugging)
+
+ifeq ($(PVM_ARCH),SUN4SOL2)	
+mpi_reset:
+	lamclean -v
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_reset:
+	@echo "not yet implemented"
+endif
+
+
+#stop the MPI deamon
+ifeq ($(PVM_ARCH),SUN4SOL2)	
+mpi_stop:
+	wipe -v $(MPI_ROOT)/boot/bhost.def 
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_stop:
+	@mpi "You can not stop MPI in the POE environnement!"
+endif
+
+
+#
+# PVM quick control
+
+pvm:
+	# starting pvm daemon if needed...
+	@if [ -f /tmp/pvmd.$(shell id -u) ] ; \
+	then echo "PVM already running..." ; \
+	else echo quit | $(PVM) ; fi
+
+reset:
+	@echo "resetting PVM"
+	@echo reset | $(PVM)
+restart:
+	@echo  "PVM halt"
+	@echo halt | $(PVM)
+	@echo  "PVM start"
+	@echo quit | $(PVM)
+
+#
+# Installation to run
+
+$(pvmbin):; mkdir -p $(pvmbin)
+$(pvmbin)/%: % $(pvmbin); $(COPY) $< $@
+
+hostnode: host node
+host: $(HOST) 
+node: $(NODE)
+mainpvm: $(MAINPVM)
+out: $(RTEST)
+mainmpi: $(MAINMPI)
+paradyn: $(MAINPARADYN)
+
+install_main: $(pvmbin)/$(MAINPVM)
+install_hostnode: install_node install_host
+install_host: $(pvmbin)/$(HOST)
+install_node: $(pvmbin)/$(NODE)
+
+
+install_main_forced:; $(RM) $(pvmbin)/$(MAINPVM); $(MAKE) install_main;
+
+# install in PVM directory what can be
+install:
+	-test -f $(MAINPVM) && $(MAKE) install_main_forced
+	-test -f $(HOST) && $(MAKE) install_hostnode
+
+run: install pvm
+	$(pvmbin)/$(HOST)
+
+diffpvm: $(MAINPVM) $(RTEST) install pvm
+	$(pvmbin)/$(MAINPVM) > parallel.out 2> parallel.err
+	$(RTEST) > sequential.out 2> sequential.err
+	@if cmp -s parallel.out sequential.out ; \
+	then echo "DIFF ON STDOUT: none!" ; \
+	else echo "DIFF ON STDOUT:" ; diff parallel.out sequential.out ; fi
+	@# make is stopped at the diff if different...
+	$(RM) parallel.out parallel.err sequential.out sequential.err
+
+diffmpi: $(MAINMPI) $(RTEST) 
+	@echo "**** Don't forget to specify the number of processors by setting NBPROCS ****"
+	$(MAKE) mpi_run > parallel_mpi.out 2> parallel_mpi.err
+	$(RTEST) > sequential.out 2> sequential.err
+	@if cmp -s parallel_mpi.out sequential.out ; \
+	then echo "DIFF ON STDOUT: none!" ; \
+	else echo "DIFF ON STDOUT:" ; diff parallel_mpi.out sequential.out ; fi
+	@# make is stopped at the diff if different...
+	$(RM) parallel_mpi.out parallel_mpi.err sequential.out sequential.err
+
+
+
+#
+# Headers
+
+$(RT_SRC_FILES):
+	$(COPY) $(addprefix $(RT_DIR)/,$(RT_SRC_FILES)) .
+
+pvm3.h:	$(pvminc)/pvm3.h
+	$(COPY) $(pvminc)/pvm3.h .
+
+fpvm3.h:$(pvminc)/fpvm3.h
+	$(COPY) $(pvminc)/fpvm3.h .
+
+mpif.h:	$(mpiinc)/mpif.h
+	$(COPY) $(mpiinc)/mpif.h .
+
+
+
+#
+# Compilation
+
+$(RT_INIT:.f=.m4):;	$(RT_DIR)/hpfc_generate_init -n $(NAME) .
+
+$(RT_INIT): $(RT_INIT:.f=.m4)
+	$(M4) -D PVM_ARCH=$(PVM_ARCH) $< > $@
+
+%.o: %.f; $(FC) $(FFLAGS) $(FOPT) -c $< 
+
+#
+# Link
+
+# also insures that a directive is there only once? 
+# should be ok?
+# what about continuations?
+# LD IO: Link eDitor I/O (host & source)
+# LD PURE: Link eDitor PURE (all)
+
+LDIO:=$(shell \
+  sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd][ 	]*[Ii][Oo],,p'\
+		$(NAME).f | sort -u)
+LDPURE:=$(shell \
+  sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd][ 	]*[Pp][Uu][Rr][Ee],,p'\
+		$(NAME).f | sort -u)
+
+$(HOST):  $(HEADERS_PVM) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) -o $@ hpfc_main_host.o \
+		$(HOST_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
+		$(HOST_LIBS) \
+		$(LDIO) $(LDPURE)
+	$(STRIP) $@
+
+$(NODE):  $(HEADERS_PVM) hpfc_main_node.o $(COMMON_OFILES) $(NODE_OFILES) 
+	$(FC) $(FFLAGS) $(FOPT) -o $@ hpfc_main_node.o \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
+		$(NODE_LIBS) \
+		$(LDPURE)
+	$(STRIP) $@
+
+$(MAINPVM): $(HEADERS_PVM) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) $(FOPT) -o $@ hpfc_main.o \
+		$(HOST_OFILES) \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
+		$(NODE_LIBS)\
+		$(LDIO) $(LDPURE)
+	$(STRIP) $@
+
+$(MAINMPI): $(HEADERS_MPI) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FLINKER) $(FFLAGS) $(FOPT) -o $@ hpfc_main.o \
+		$(HOST_OFILES) \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_MPI_DIR) \
+		$(COMMON_LIBS) \
+		$(COMMON_MPI_LIBS) \
+		$(LDIO) $(LDPURE)
+	$(STRIP) $@
+
+paradyn:  $(HEADERS_PVM) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) -static -g $(FOPT) -o $(MAINPARADYN) \
+		$(PARADYN_START_OFILE) \
+		hpfc_main.o \
+		$(HOST_OFILES) \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(PARADYN_END_OFILE) \
+		$(PARADYN_LIB_OFILE) \
+		$(LIBS_DIR) \
+		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
+		$(NODE_LIBS)\
+		$(LDIO) $(LDPURE)
+
+ifeq ($(PVM_ARCH),CM5)
+$(NODE): $(HOST_OFILES)
+	$(CMLD) $(CMLD_FLAGS) \
+	   -comp $(FC) -o $(NODE) \
+	   -host \
+		$(HOST_OFILES) \
+		$(COMMON_OFILES) \
+		$(PVMHOST) \
+	 	$(LIBS_DIR) \
+		$(ALL_HLIBS) \
+	   -node \
+		$(NODE_OFILES) 
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(ALL_NLIBS)
+	$(STRIP) $(NODE)
+endif
+
+$(RTEST):  $(FTEST)
+	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST) $(LDIO) $(LDPURE)
+	$(STRIP) $(RTEST)
+
+#
+# Cleaning
+
+clean:;	$(RM) *.o *~ *.trace $(RT_INIT:.f=.m4) $(DEDUCED) core mppcore
+clobber: clean; $(RM) $(RUNABLES) $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) \
+	run.out run.err $(NAME).qsub 
+
+echo:; @echo $(ECHO)
+
+#
+# Taring
+
+TAR =	tar
+ZIP =	gzip -v9
+
+tar: clean
+	# taring the sources, maybe for export
+	cd .. ;\
+	$(TAR) cf $(NAME).tar $(NAME).hpfc ;\
+	$(ZIP) $(NAME).tar
+
+
+# that is all
+#

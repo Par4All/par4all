@@ -1,0 +1,327 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS:
+		DETECTEUR DE PARALLELISME ET GENERATEUR DE PROGRAMME \\
+		RAPPORT DE SYNTHESE }
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E138}
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+La détection du parallélisme et la production de programmes
+parallèles s'appuient sur les résultats obtenus lors de l'analyse
+sémantique (cf. rapport EMP-CAI-I~E137). Ces résultats comprennent une
+première version du graphe de dépendance correspondant aux {\em
+use-def chains}, des informations sur les effets interprocéduraux des
+procédures ({\em SDFI}) et des prédicats sur les variables scalaires
+entières du programme.
+
+Modifiant légèrement l'ordre de présentation prévu dans le contrat,
+nous décrivons successivement les transformations scalaires qui sont
+effectuées pour supprimer un maximum de dépendances dues à cette
+classe de variables, le test de dépendance, propre au CAI, qui fait
+intervenir des calculs en nombres entiers et qui supprime un maximum de
+dépendances portées par les tableaux, les transformations de
+boucles qui sont effectuées en prenant en compte le graphe de
+dépendance raffiné par la phase précédente et enfin la génération
+de programmes parallèles.
+
+Rappelons que les transformations de programmes sont présentées
+globalement dans le rapport EMP-CAI-I~E/141.
+
+\section{Transformations scalaires}
+
+Comme nous l'expliquons dans le rapport consacré aux transformations de
+programme (EMP-CAI-I~E/141), les transformations prévues peuvent être
+généralisées en une transformation unique plus générale, la {\em
+privatisation}. La privatisation consiste à détecter les variables
+dont la durée de vie est égale à une itération de corps de boucle et
+dont on peut donc ignorer les {\em output} et {\em anti} dépendances.
+
+Une variable est locale (i.e. privée) à un corps de boucle (on pourra
+ultérieurement généraliser cette notion à toutes les instructions,
+en particulier les blocs) si sa valeur en entrée de boucle et sa valeur
+en sortie ne sont pas utilisées; c'est typiquement le cas d'une
+variable temporaire. Les dépendances inter-itérations dues à cette
+variable peuvent être omises durant la phase de parallélisation;
+chaque itération de boucle aura sa propre version de cette variable.
+
+Pour effectuer automatiquement ce type de transformation (dont la
+fréquence est très élevée en pratique), les chaines {\em use-def}
+sont nécessaires pour vérifier les conditions de privatisation.  Les
+paralléliseurs qui n'utilisent pas de chaines {\em use-def} ont
+généralement recours à des directives fournies par l'utilisateur
+(certifiant le caractère non-vivant de ces variables en entrée et
+sortie de boucle) pour effectuer cette opération.
+
+L'algorithme de privatisation est basé sur un calcul d'élimination.
+Toutes les variables sont supposées locales aux boucles qui les
+englobent. On parcourt alors le graphe de dépendance (en fait, les
+{\em use-def chains}) de telle manière que chaque conflit détermine
+le sous-ensemble des boucles englobantes communes qui préservent le
+conflit. Une fois le graphe de dépendance parcouru, seules les
+déclarations sémantiquement correctes de variables locales subsistent.
+Ces déclarations sont stockées dans le membre {\tt locals}
+définissant les boucles (le prettyprinter générant des déclarations
+de type {\tt PRIVATE} quand des variables locales sont présentes).
+
+D'autres transformations scalaires ont été expérimentées dans le
+cadre de la détection des réductions. Voir ci-dessous les
+transformations de boucles.
+
+\section{Test de dépendance}
+
+Le calcul du graphe de dépendances (voir la structure de données dans
+l'annexe 1) est effectué selon les techniques de calcul linéaire
+développées au CAI et publiées dans les proceedings de SIGPLAN'86. Il
+consiste à raffiner le graphe de dépendances correspondant aux
+{\em use-def chains}. Le calcul précis du graphe des dépendances est fait en
+étudiant chaque conflit suggéré par les {\em use-def chains}. Il est
+nécessaire de vérifier chaque conflit car les {\em use-def chains} ne
+tiennent pas compte des indices de tableaux. Cela signifie que certains
+conflits existant au niveau des {\em use-def} chaines vont disparaître
+après le calcul précis des dépendances. Dans le cas d'une dépendance
+entre deux éléments de tableaux {\tt T(E)} et {\tt T(F)}, il convient
+de tester si, en fonction des variables apparaissant dans les
+expressions {\tt E} et {\tt F}, ces deux expressions peuvent être
+égales. Ces variables sont soit des indices de boucles englobantes,
+soit des paramètres de structure, soit des expressions complexes.
+Ainsi, la boucle suivante comporte deux conflits sur le tableau {\tt T}
+(producteur-con\-som\-ma\-teur et con\-som\-ma\-teur-producteur) dont un
+seul subsiste (producteur-con\-som\-ma\-teur) après l'analyse plus
+fine.
+\begin{verbatim}
+        DO I = 1, 10
+           T(I) = ...
+           ...  = T(I) ...
+        ENDDO
+\end{verbatim}
+On se limite, pour des raisons à la fois pratique (présence dans les
+programmes rééls) et théorique (décidablité du problème), au cas
+où les expressions d'indice sont des expressions linéaires; si ce
+n'est pas le cas, on prend l'attitude conservative consistant à
+supposer l'existence d'un conflit.
+
+Le coeur du calcul des dépendances est donc formé de la construction,
+puis du test de la faisabilité, d'un système linéaire en nombres
+entiers. Ce test de faisabilité est basé sur une version légèrement
+améliorée de l'algorithme d'élimination de Fourier-Motzkin. Le
+premier changement consiste à traiter les égalités, de manière
+exacte, avant de combiner deux-à-deux les inégalités. 
+
+Le second aspect réside dans une résolution incrémentale du système
+de contraintes, en le projetant successivement, niveau par niveau, sur
+les sous-espaces de dépendance et en testant la satisfiabilité du
+système résultant, après rajout de contraintes additionnelles de la
+forme $di=0$ ou $di>0$ ($i$ est un index de boucle et $di$ correspond à
+la direction de dépendance à tester).  
+
+Les programmes de test de dépendances font massivement appel à la
+bibliothèque linéaire développée au CAI dans le cadre d'un contrat
+avec le PRC $C^3$. Une version objet de cette bibliothèque est livrée
+avec les sources de PIPS et se trouve dans le répertoire
+\verb+Utilities+.
+
+Il est aussi nécessaire d'étudier chaque conflit pour rechercher quelle
+boucle le crée véritablement. Cette étude a pour but de mettre à
+jour le niveau de chaque dépendance, c'est à dire d'indiquer quelle
+boucle ferait disparaître ce conflit si on l'exécutait
+séquentiellement. Dans l'exemple précédent, le niveau de l'unique
+dépendance sur {\tt T} vaut 2, ce qui signifie que ce conflit ne peut
+pas disparaître en séquentialisant une boucle. La boucle unique est
+néanmoins parallèle et le conflit est résolu au sein de chaque itération.
+
+Un point essentiel de Pips concerne la prise en compte des appels de
+procédures. Les effets de celles-ci, obtenus de manière
+interprocédurale, sont repercutés au niveau du site d'appel. Les
+éléments de tableaux concernés en lecture ou écriture sont
+précisés par l'intermédiaire des régions et des résulats de
+l'analyse sémantique (cf. rapport EMP-CAI-I~E137). Ces prédicats sont
+rajoutés au contexte d'appel (i.e., indices des boucles englobantes)
+dans la construction du système de contraintes.
+
+Il est important de remarquer que les dépendances dues aux variables
+locales ne sont pas ignorées. Les conflits demeurent même si les
+variables sont locales. Nous allons voir dans la section suivante
+comment les variables privées sont prises en compte au niveau de la
+parallélisation. 
+
+Les structures de données utilisées sont décrites dans le rapport
+EMP-CAI-I E/137 au chapitre consacré aux {\em use-def chains} pour {\em
+graph} et {\em dg} et au chapitre consacré à la détection des
+relations linéaires entre variables pour les systèmes linéaires.
+
+\section{Transformations de boucles}
+
+Deux transformations de boucles peuvent être effectuées par PIPS. La
+première est la distribution de boucle. C'est la seule qui soit
+intéressante pour détecter du parallélisme et pour générer des
+instructions vectorielles. Elle est faite en utilisant l'algorithme
+d'Allen \& Kennedy cité ci-dessous, soit isolément, soit couplée avec
+la détection du parallélisme. A noter que cette tranformation n'est
+intéressante que dans le cas où l'architecture-cible est munie d'une
+unité vectorielle. PIPS étant un paralléliseur générique, le choix
+de la mise en place de cette transformation est laissé à
+l'utilisateur. Cette transformation est couplée avec le prettyprinter;
+celui-ci utilise, sur demande de l'utilisateur, la syntaxe ``vecteur''
+de Fortran 90 pour imprimer les boucles vectorielles.
+
+La seconde transformation est l'échange de boucle. Elle est implantée
+comme un cas particulier de transformation unimodulaire en utilisant les
+algorithmes décrits par François Irigoin dans {\em Dependence
+Approximation and Global Parallel Code Generation for Nested Loops},
+International Workshop on Parallel and Distributed Algorithms, Bonas,
+1988, dans {\em Code Generation for the Hyperplane Method and Loop
+Interchange}, rapport EMP-CAI-I~E/102, et dans {\em Scanning Polyhedra
+with DO Loops}, PPoPP'91. Cette transformation n'a pas pu être
+intégré dans le paralléliseur, faute de machine cible permettant de
+dériver une fonction de choix. Elle ne produit pas de parallélisme et
+elle peut être appliquée de beaucoup de manières différentes: le
+choix en est donc laissé à l'utilisateur et n'est pas fait
+automatiquement. Si plus tard une machine cible est défini, il sera
+possible de l'utiliser pour faire varier la granularité du
+parallélisme et/ou pour améliorer la localité.
+
+Une dernière transformation, encore au stade expérimental, a été
+implémentée en CommonLISP, mais n'a pas été intégrée. Elle
+effectue la détection des réductions généralisées, i.e. des
+invariants de boucle, des variables d'induction et des réductions. Cet
+algorithme est basé sur la communication de Pierre Jouvelot et Babak Dehbonei
+intitulée {\em A Unified Semantic Approach for the Vectorization and
+Parallelization of Generalized Reductions} qui a été publiée dans les
+proceedings de la conférence internationale ACM SIGARCH ICS'89. La
+détection des réductions, tels les produits scalaires, permet la mise
+en évidence d'opérations généralement efficacement implémentées
+sur les superordinateurs actuels. PIPS étant un outil générique, il
+n'est cependant pas possible de considérer que ces tranformations
+augmentent à tout coup le parallélisme.
+
+\section{Génération de programmes parallèles}
+
+L'algorithme de parallélisation utilisé est une variante de celui
+d'Allen \& Kennedy.  Il est détaillé dans la revue {\em ACM TOPLAS}
+volume 9, numéro 4 d'octobre 1987. Il travaille sur les boucles
+imbriquées qui ne comportent pas de branchements. A noter que la
+présence du graphe de contrôle structuré dans PIPS permet de masquer
+l'existence de banchements locaux, autorisant ainsi un accroissement du
+nombre de boucles susceptibles d'être traitées par le paralléliseur.
+Contrairement à l'algorithme d'Allen \& Kennedy classique, la technique
+de parallélisation utilisée est donc définie de manière récursive;
+si une boucle contient un branchement, les instructions de son corps
+sont récursivement analysées tandis que si elle est bien structurée,
+la parallélisation est effectuée.
+
+Le calcul des composantes fortement connexes du graphe des dépendances
+et le tri topologique de ces composantes sont faits en utilisant des
+algorithmes classiques, présentés dans l'ouvrage {\em TYPES DE DONNEES
+ET ALGORITHMES --- Recherche, Tri, Algorithmes sur les Graphes} par
+Marie-Claude Gaudel, Michèle Soria et Christine Froidevaux dans la
+collection Didactique de l'INRIA. 
+
+Il nous a fallu adapter l'algorithme de Allen et Kennedy pour pouvoir
+paralléliser les boucles comportant des conflits dues aux variables
+locales. En effet, la version standard
+de cet algorithme ne sait pas traiter par
+exemple la boucle suivante:
+\begin{verbatim}
+        DO I = 1, 10
+           PRIVATE S
+           S = T(I) ...         (1)
+           U(I) = S ...         (2)
+        ENDDO
+\end{verbatim}
+En effet, si le conflit sur {\tt S} con\-som\-ma\-teur-producteur de 2 vers 1
+est conservé, la boucle reste séquentielle; et si le conflit est
+détruit par la phase de calcul des dépendances la boucle est
+distribuée et on obtient:
+\begin{verbatim}
+        DOALL I = 1, 10
+           PRIVATE S
+           S = T(I) ...         (1)
+        ENNDO
+        DOALL I = 1, 10
+           PRIVATE S
+           U(I) = S ...         (2)
+        ENDDO
+\end{verbatim}
+ce qui n'est pas correct.
+
+La solution que nous avons adoptée consiste à conserver tous les
+conflits, de façon à empêcher les mauvaises distributions de boucle,
+et à analyser a posteriori chaque boucle déclarée séquentielle par
+Kennedy et Allen pour vérifier si les cycles sont brisés lorsque les
+conflits dus aux variables privées sont ignorés. Dans ce dernier cas,
+la boucle est déclarée parallèle.
+
+Dans l'annexe technique du contrat PIPS, il était prévu de générer
+des boucles DOACROSS. Cette construction, proposée en 1984 par Ron
+Cytron dans son PhD, constitue une extension intéressante des boucles
+séquentielles et parallèles. Elle permet d'exprimer un pourcentage
+de parallélisme fonction du recouvrement possible des itérations
+de corps de boucle. Les boucles parallèles correspondent à un
+recouvrement complet (100~\%) et les boucles séquentielles à un
+recouvrement nul (0~\%).
+
+La génération de boucle DOACROSS a été abandonnée parce qu'aucun
+résultat expérimental n'est venu en montrer l'intérêt pour des
+programmes réels tournant sur des machines du commerce.
+
+\section{Conclusion}
+
+Outil de parallélisation générique, PIPS permet la mise en évidence
+du parallélisme de type vectoriel ou MIMD. La phase de détection du
+parallélisme utilise une version améliorée de l'algorithme d'Allen \&
+Kennedy pour prendre en compte la présence des variables locales au
+corps des boucles et la structure du graphe de contrôle de PIPS.
+
+\section{Annexe: Description du graphe de dépendances}
+
+\input{dg.datastructure}
+
+\end{document}

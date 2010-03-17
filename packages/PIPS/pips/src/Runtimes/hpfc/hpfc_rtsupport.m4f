@@ -1,0 +1,1147 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+!
+! Runtime Support Functions for the High Performance Fortran Compiler
+! by Fabien COELHO.
+!
+!-----------------
+!
+! HPFC TEMPLATE
+!
+! this subroutine computes the coordonates of array number an 
+! on the template tn
+!
+      subroutine HPFC TEMPLATE(inda, an, indt, tn)
+      integer inda(7), an, indt(7), tn
+      include "hpfc_commons.h"
+      integer i, adim
+      do i=1, NODIMT(tn)
+         adim = ALIGN(an, i, 1)
+         if (adim.EQ.INTFLAG) then
+!
+! no alignment
+!
+            indt(i) = INTFLAG
+         else
+            if (adim.EQ.0) then
+!
+! constant alignment
+!
+               indt(i) = ALIGN(an, i, 3)
+            else
+!
+! linear alignment
+!
+               indt(i) = (ALIGN(an, i, 2) * inda(adim)) 
+     $              + ALIGN(an, i, 3)
+            endif
+         endif
+      enddo
+      end
+!
+!-----------------
+!
+! HPFC PROCESSORS
+!
+! this subroutine computes on which processor a template element is mapped
+!
+      subroutine HPFC PROCESSORS(indt, tn, indp, pn, replicated)
+      integer indt(7), tn, indp(7), pn
+      logical replicated
+      include "hpfc_commons.h"
+      integer i, tdim, param
+      replicated = .FALSE.
+      do i=1, NODIMP(pn)
+         tdim = DIST(tn, i, 1)
+!
+! replicated if a non specified template dimension is distributed
+!
+         if (indt(tdim).EQ.INTFLAG) then
+            replicated = .TRUE.
+            indp(i) = INTFLAG
+         else
+            param = DIST(tn, i, 2)
+            if (param.GT.0) then
+!
+! here the distribution is BLOCK
+!
+               indp(i) = (((indt(tdim) - RANGET(tn, tdim, 1)) / param) 
+     $              + RANGEP(pn, i, 1))
+            else
+!
+! here the distribution is CYCLIC
+!
+               param = - param
+               indp(i) = ( (MOD((indt(tdim) 
+     $              - RANGET(tn, tdim, 1)), (param*RANGEP(pn, i, 3))) 
+     $              / param) + RANGEP(pn, i, 1) )
+            endif
+         endif
+      enddo
+      end
+!
+!-----------------
+!
+! HPFC PROCLID
+!
+      subroutine HPFC PROCLID(indp, pn, lid, replicated)
+      integer indp(7), pn, lid
+      logical replicated
+      include "hpfc_commons.h"
+      integer i, t
+      if (replicated) then
+         lid = INTFLAG
+      else
+         if (NODIMP(pn).EQ.0) then
+            lid = 1
+         else
+            t = indp(1) - RANGEP(pn, 1, 1)
+            do i=2, NODIMP(pn)
+               t = (t * RANGEP(pn, i, 3))
+     $              + (indp(i) - RANGEP(pn, i, 1))
+            enddo
+            lid = t+1
+         endif
+      endif
+      end
+!
+!-----------------
+!
+! HPFC COMPLID
+!
+      integer function HPFC COMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
+      integer pn, p1, p2, p3, p4, p5, p6, p7
+      include "hpfc_commons.h"
+      integer lid, indp(7)
+      indp(1)=p1
+      indp(2)=p2
+      indp(2)=p3
+      indp(4)=p4
+      indp(5)=p5
+      indp(6)=p6
+      indp(7)=p7
+      call HPFC PROCLID(indp, pn, lid, .FALSE.)
+      HPFC COMPLID=lid
+      end
+!
+!-----------------
+!
+! HPFC_CMPPOS
+!
+! returns the vector of indices of lid in pn.
+!
+      subroutine HPFC CMPPOS(pn, lid, indp)
+      integer pn, lid, indp(7)
+      include "hpfc_commons.h"
+      integer ndim, i, t, dim, size
+      ndim = NODIMP(pn)
+      t = lid-1
+      do i=0, ndim-1
+         dim = ndim-i
+         size = RANGEP(pn, dim, 3)
+         indp(dim) = MOD(t, size) + RANGEP(pn, dim, 1)
+         t = t / size
+      enddo
+      end
+!
+!-----------------
+!
+! true if dimension dim of processor arrangement pn 
+! is a distributed dimension for array an.
+!
+      logical function HPFC DIST P(an, dim)
+      integer an, dim
+      include "hpfc_commons.h"
+      HPFC DIST P = ALIGN(an, DIST(ATOT(an), dim, 1), 1).ne.INTFLAG 
+      end
+!
+!-----------------
+!
+! true if lid and the current pe are twins (hold same data) 
+! on processor arrangement of array an.
+! most of the information computed here could be precomputed and store
+! once at the initialization phase of the runtime. 
+!
+      logical function HPFC TWIN P(an, lid)
+      integer an, lid
+      include "hpfc_commons.h"
+      external HPFC DIST P
+      logical HPFC DIST P
+      integer ip(7), pn, dim
+      pn = TTOP(ATOT(an))
+      call HPFC CMPPOS(pn, lid, ip)
+      do dim=1, NODIMP(pn)
+         if (HPFC DIST P(an, dim).and.ip(dim).ne.MYPOS(dim,pn)) then
+            HPFC TWIN P = .FALSE.
+            return
+         endif
+      enddo
+!
+! now the pe id on pn maybe differs ONLY on replicated dimensions
+!
+      HPFC TWIN P = .TRUE.
+      end
+!
+!-----------------
+!
+! HPFC CMPOWNERS
+!
+      subroutine HPFC CMPOWNERS(an, i1, i2, i3, i4, i5, i6, i7)
+      integer an, i1, i2, i3, i4, i5, i6, i7
+      include "hpfc_commons.h"
+      integer inda(7), indt(7), indp(7), tn, i
+      inda(1) = i1
+      inda(2) = i2
+      inda(3) = i3
+      inda(4) = i4
+      inda(5) = i5
+      inda(6) = i6
+      inda(7) = i7
+      tn  = ATOT(an)
+      OPN = TTOP(tn)
+      call HPFC TEMPLATE(inda, an, indt, tn)
+      call HPFC PROCESSORS(indt, tn, OINDP, OPN, OREPLICATED)
+      if (OREPLICATED) then
+         OWNERLID = INTFLAG
+c         OWNERTID = INTFLAG
+         do i=1, NODIMP(OPN)
+            if (OINDP(i).EQ.INTFLAG) then
+               indp(i) = RANGEP(OPN, i, 1)
+            else
+               indp(i) = OINDP(i)
+            endif
+         enddo
+         call HPFC PROCLID(indp, OPN, SENDERLID, .FALSE.)
+c         SENDERTID  = NODETIDS(SLID)
+      else
+         call HPFC PROCLID(OINDP, OPN, OWNERLID, OREPLICATED)
+c         OWNERTID  = NODETIDS(OLID)
+c         SENDERTID = OWNERTID
+         SENDERLID = OWNERLID
+      endif
+      end
+!
+!-----------------
+!
+! HPFC CMPCOMPUTER
+!
+      subroutine HPFC CMPCOMPUTER(an, i1, i2, i3, i4, i5, i6, i7)
+      integer an, i1, i2, i3, i4, i5, i6, i7
+      include "hpfc_commons.h"
+      integer inda(7), indt(7), tn, i
+      logical replicated
+      inda(1) = i1
+      inda(2) = i2
+      inda(3) = i3
+      inda(4) = i4
+      inda(5) = i5
+      inda(6) = i6
+      inda(7) = i7
+      tn  = ATOT(an)
+      CPN = TTOP(tn)
+      call HPFC TEMPLATE(inda, an, indt, tn)
+      call HPFC PROCESSORS(indt, tn, CINDP, CPN, replicated)
+      if (replicated) then
+         do i=1, NODIMP(CPN)
+            if (CINDP(i).EQ.INTFLAG) 
+     $           CINDP(i) = RANGEP(CPN, i, 1)
+         enddo
+         replicated = .FALSE.
+      endif
+      call HPFC PROCLID(CINDP, CPN, COMPUTERLID, replicated)
+c      COMPUTERTID  = NODETIDS(COMPUTERLID)
+      CPOSCOMPUTED = .FALSE.
+      end
+!
+!-----------------
+!
+! HPFC_CMPNEIGHBOUR
+!
+! this function computes the neighbour tid of the current process,
+! given the delta switch in the linearised processors representation.
+!
+      subroutine HPFC CMPNEIGHBOUR(delta)
+      integer delta
+      include "hpfc_commons.h"
+      integer bufid
+      NEIGHBORLID = MYLID + DELTA
+c      NTID = NODETIDS(NEIGHBORLID)
+!
+! where should I put it?
+!
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      end
+!
+!-----------------
+!
+! HPFC OWNERP
+!
+!
+      logical function HPFC OWNERP()
+      include "hpfc_commons.h"
+      logical result
+      integer i
+      if (OREPLICATED) then
+         result = .TRUE.
+         do i=1, NODIMP(OPN)
+            if (OINDP(i).NE.INTFLAG) 
+     $           result = result.AND.(OINDP(i).EQ.MYPOS(i, OPN))
+         enddo
+      else
+         result = MYLID.EQ.OWNERLID
+      endif
+      HPFC OWNERP = result
+      end
+!
+!-----------------
+!
+! HPFC SENDERP
+!
+!
+      logical function HPFC SENDERP()
+      include "hpfc_commons.h"
+      HPFC SENDERP = MYLID.EQ.SENDERLID
+      end
+!
+!-----------------
+!
+! HPFC COMPUTERP
+!
+!
+      logical function HPFC COMPUTERP()
+      include "hpfc_commons.h"
+      HPFC COMPUTERP = MYLID.EQ.COMPUTERLID
+      end
+!
+!-----------------
+!
+! HPFC COMPUTERINOWNERSP
+!
+!
+      logical function HPFC COMPUTERINOWNERSP()
+      include "hpfc_commons.h"
+      logical result
+      integer i
+      if (OREPLICATED) then
+         result = .TRUE.
+         if (OPN.EQ.CPN) then
+!
+! both owners and computer are set on the same processors.
+!
+            do i=1, NODIMP(OPN)
+               if (OINDP(i).NE.INTFLAG)
+     $              result = result.AND.(OINDP(i).EQ.CINDP(i))
+            enddo
+         else
+!
+! the processors are different, we have to compute the computer
+! position on the owners processors, if it has not been done.
+!
+            if ((.NOT.CPOSCOMPUTED).OR.(CPOSPN.NE.OPN)) then
+               call HPFC CMPPOS(OPN, COMPUTERLID, CPOS)
+               CPOSPN = OPN
+               CPOSCOMPUTED = .TRUE.
+            endif
+            do i=1, NODIMP(OPN)
+               if (OINDP(i).NE.INTFLAG)
+     $              result = result.AND.(OINDP(i).EQ.CPOS(i))
+            enddo
+         endif
+      else
+         result = COMPUTERLID.EQ.OWNERLID
+      endif
+      HPFC COMPUTERINOWNERSP = result
+      end
+
+!
+!-----------------
+!
+! HPFC SNDTO C
+! send to computer
+!
+      subroutine HPFC SNDTO C(what, val)
+      integer what, val
+      include "hpfc_commons.h"
+      integer bufid, info
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC SEND(COMPUTERLID, SENDCHANNELS(COMPUTERLID), info)
+      SENDCHANNELS(COMPUTERLID) = SENDCHANNELS(COMPUTERLID) + 2
+      end
+!
+!-----------------
+!
+! HPFC SNDTO H
+!
+! send to host
+!
+      subroutine HPFC SNDTO H(what, val)
+      integer what, val
+      include "hpfc_commons.h"
+      integer bufid, info
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC SEND(HOSTLID, HOST SND CHANNEL, info)
+      HOST SND CHANNEL = HOST SND CHANNEL + 2
+      end
+!
+!-----------------
+!
+! HPFC SNDTO O
+!
+! send to owner, when there is just one
+!
+      subroutine HPFC SNDTO O(what, val)
+      integer what, val
+      include "hpfc_commons.h"
+      integer bufid, info
+      debug(print *, "sending to ", OWNERLID)
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC SEND(OWNERLID, SENDCHANNELS(OWNERLID), info)
+      SENDCHANNELS(OWNERLID) = SENDCHANNELS(OWNERLID) + 2
+      end
+
+!
+_CM5(
+!-----------------
+!
+! CM SNDTO A
+!
+! send to all nodes, cmmd version
+!
+      subroutine CM SNDTO A(what, val)
+      integer what, val
+      include "cmmd_fort.h"
+      include "hpfc_commons.h"
+      external HPFC PVMLENGTH
+      integer HPFC PVMLENGTH
+      integer i, len
+      len = HPFC PVMLENGTH(what)
+      do i=1, NBOFTASKS
+         if (i.ne.MYLID) then
+            if (0.ne.CMMD_send(
+     $           CM NODE IDS(i),
+     $           MCASTNODES,
+     $           val,
+     $           len)) then
+               write (unit=0,fmt=*)
+     $              "[CM SNDTO A] send error ", MYLID, " to ", i
+            endif
+         endif
+      enddo
+      MCASTNODES = MCASTNODES + 2
+      end
+!
+!-----------------
+!
+! CM RCVFR mCS
+!
+      subroutine CM RCVFR mCS(what, goal)
+      integer what, goal
+      include "cmmd_fort.h"
+      include "hpfc_commons.h"
+      external HPFC PVMLENGTH
+      integer HPFC PVMLENGTH
+      integer len
+      len = HPFC PVMLENGTH(what)
+      if (0.ne.CMMD_receive(
+     $     CM NODE IDS(SENDERLID),
+     $     MCASTNODES,
+     $     goal,
+     $     len)) then
+         write (unit=0,fmt=*) "[CM RCVFR mCS] receive error on ", MYLID
+      endif
+      MCASTNODES = MCASTNODES + 2
+      end
+!)
+
+!
+!-----------------
+!
+! HPFC SNDTO OS
+!
+! send to owners, by someone who is not in owners
+!
+      subroutine HPFC SNDTO OS(what, val)
+      integer what, val
+      include "hpfc_commons.h"
+      integer bufid, info, i
+      integer i1, i2, i3, i4, i5, i6, i7
+      integer lb(7), ub(7), indp(7), lid
+      if (OREPLICATED) then
+         do i=1, NODIMP(OPN)
+            debug(print *, "i = ", i, " index is ", OINDP(i))
+            if (OINDP(i).EQ.INTFLAG) then
+               lb(i) = RANGEP(OPN, i, 1)
+               ub(i) = RANGEP(OPN, i, 2)
+            else
+               lb(i) = OINDP(i)
+               ub(i) = OINDP(i)
+            endif
+            debug(print *, "bounds ", lb(i), ub(i))
+         enddo
+         do i=(NODIMP(OPN)+1), 7
+            lb(i) = 1
+            ub(i) = 1
+         enddo
+         call HPFC INIT SEND(DATARAW ENCODING, bufid)
+         call HPFC PACK(what, val, 1, 1, info)
+         do i7=lb(7), ub(7)
+            indp(7) = i7
+            do i6=lb(6), ub(6)
+               indp(6) = i6
+               do i5=lb(5), ub(5)
+                  indp(5) = i5
+                  do i4=lb(4), ub(4)
+                     indp(4) = i4
+                     do i3=lb(3), ub(3)
+                        indp(3) = i3
+                        do i2=lb(2), ub(2)
+                           indp(2) = i2
+                           do i1=lb(1), ub(1)
+                              indp(1) = i1
+!     
+! too much computation is made inside this call, and some 
+! factorisation could be made out of the inner loop, but I don t
+! have time for that...
+!
+                              call HPFC PROCLID(
+     $                             indp, OPN, lid, .FALSE.)
+                              call HPFC SEND(
+     $                             lid, 
+     $                             SENDCHANNELS(lid), 
+     $                             info)
+                              SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
+                              debug(print *, "sending to ", lid)
+                           enddo
+                        enddo
+                     enddo
+                  enddo
+               enddo
+            enddo
+         enddo
+      else
+         call HPFC SNDTO O(what, val)
+      endif
+      end
+!
+!-----------------
+!
+! HPFC SNDTO OOS
+!
+! send to other owners, if any
+!
+      subroutine HPFC SNDTO OOS(what, val)
+      integer what, val
+      include "hpfc_commons.h"
+      integer bufid, info,  i
+      integer i1, i2, i3, i4, i5, i6, i7
+      integer lb(7), ub(7), indp(7), lid
+      do i=1, NODIMP(OPN)
+         debug(print *, "i = ", i, " index is ", OINDP(i))
+         if (OINDP(i).EQ.INTFLAG) then
+            lb(i) = RANGEP(OPN, i, 1)
+            ub(i) = RANGEP(OPN, i, 2)
+         else
+            lb(i) = OINDP(i)
+            ub(i) = OINDP(i)
+         endif
+         debug(print *, "bounds ", lb(i), ub(i))
+      enddo
+      do i=(NODIMP(OPN)+1), 7
+         lb(i) = 1
+         ub(i) = 1
+      enddo
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      do i7=lb(7), ub(7)
+         indp(7) = i7
+         do i6=lb(6), ub(6)
+            indp(6) = i6
+            do i5=lb(5), ub(5)
+               indp(5) = i5
+               do i4=lb(4), ub(4)
+                  indp(4) = i4
+                  do i3=lb(3), ub(3)
+                     indp(3) = i3
+                     do i2=lb(2), ub(2)
+                        indp(2) = i2
+                        do i1=lb(1), ub(1)
+                           indp(1) = i1
+!
+! too much computation is made inside this call, and some 
+! factorisation could be made out of the inner loop, but I don t
+! have time for that...
+!
+                           call HPFC PROCLID(indp, OPN, lid, .FALSE.)
+                           if (lid.NE.COMPUTERLID) then
+                              call HPFC SEND(
+     $                             lid, 
+     $                             SENDCHANNELS(lid), 
+     $                             info)
+                              SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
+                           endif
+                        enddo
+                     enddo
+                  enddo
+               enddo
+            enddo
+         enddo
+      enddo
+      end
+!
+!-----------------
+!
+! HPFC SNDTO NO
+!
+! send to not owners, when replicated...
+!
+      subroutine HPFC SNDTO NO(what, val)
+      integer what, val
+      include "hpfc_commons.h"
+      integer bufid, info, i, indp(7), ndim, lid
+      logical result
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      ndim = NODIMP(OPN)
+      do lid=1, NBOFTASKS
+!
+! this leads to much much stupid computation, but all I need is the function
+! done, and not the performances... however I think a better job could be done
+!
+! is lid in owners ?
+!         
+         call HPFC CMPPOS(OPN, lid, indp)
+         result = .TRUE.
+         do i=1, ndim
+            if (OINDP(i).NE.INTFLAG)
+     $           result = result.AND.(OINDP(i).EQ.indp(i))
+         enddo
+         if (.NOT.result) then
+            call HPFC SEND(lid, SENDCHANNELS(lid), info)
+            SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
+         endif
+      enddo
+      end
+!     
+!-----------------
+!
+! HPFC SNDTO HNO
+!
+! send to host and not owners, when replicated
+!
+      subroutine HPFC SNDTO HNO(what, val)
+      integer what, val
+      include "hpfc_commons.h"
+      call HPFC SNDTO H(what, val)
+      call HPFC SNDTO NO(what, val)
+      end
+!
+!-----------------
+!
+! HPFC RCVFR S
+!
+      subroutine HPFC RCVFR S(what, goal)
+      integer what, goal
+      include "hpfc_commons.h"
+      integer info
+      call HPFC RECEIVE(SENDERLID, RECVCHANNELS(SENDERLID))
+      call HPFC UNPACK(what, goal, 1, 1, info)
+      RECVCHANNELS(SENDERLID) = RECVCHANNELS(SENDERLID) + 2
+      end
+!
+!-----------------
+!
+! HPFC RCVFR C
+!
+      subroutine HPFC RCVFR C(what, goal)
+      integer what, goal
+      include "hpfc_commons.h"
+      integer info
+      call HPFC RECEIVE(COMPUTERLID, RECVCHANNELS(COMPUTERLID))
+      call HPFC UNPACK(what, goal, 1, 1, info)
+      RECVCHANNELS(COMPUTERLID) = RECVCHANNELS(COMPUTERLID) + 2
+      end
+!
+!-----------------
+!
+! HPFC RCVFR H
+!
+      subroutine HPFC RCVFR H(what, goal)
+      integer what, goal
+      include "hpfc_commons.h"
+      integer info
+      call HPFC RECEIVE(HOSTLID, HOST RCV CHANNEL)
+      call HPFC UNPACK(what, goal, 1, 1, info)
+      HOST RCV CHANNEL = HOST RCV CHANNEL + 2
+      debug(print *, MYLID, " receiving from host")
+      end
+
+!
+!-----------------
+!
+! HPFC LOCALINDGAMMA
+!
+! computation of the gamma function for local indice access
+!
+!
+      integer function HPFC LOCALINDGAMMA(an, dim, indice)
+      integer an, dim, indice
+      include "hpfc_commons.h"
+      integer n, sc, no, bmtm
+      integer t, nc, ni
+!
+! static parameters for the computation
+!
+      n    = RANGEA(an, dim, 5)
+      sc   = RANGEA(an, dim, 6)
+      no   = RANGEA(an, dim, 7)
+      bmtm = RANGEA(an, dim, 8)
+!
+! the computation
+!
+      t    = indice + bmtm
+      nc   = t / sc
+      ni   = MOD(t, n)
+      HPFC LOCALINDGAMMA = n*(nc-no) + ni + 1
+      end
+!
+!-----------------
+!
+! HPFC LOCALINDDELTA
+!
+! computation of the delta function for local indice access
+!
+!
+      integer function HPFC LOCALINDDELTA(an, dim, indice)
+      integer an, dim, indice
+      include "hpfc_commons.h"
+      integer n, sc, no, bmtm, rate, chsz
+      integer t, nc, ni
+!
+! static parameters for the computation
+!
+      n    = RANGEA(an, dim, 5)
+      sc   = RANGEA(an, dim, 6)
+      no   = RANGEA(an, dim, 7)
+      bmtm = RANGEA(an, dim, 8)
+      rate = RANGEA(an, dim, 9)
+      chsz = RANGEA(an, dim, 10)
+!
+! the computation
+!
+      t    = rate*indice + bmtm
+      nc   = t / sc
+      ni   = MOD(t, n) / abs(rate)
+      HPFC LOCALINDDELTA = chsz*(nc - no) + ni + 1
+      end
+!
+!-----------------
+!
+! HPFC LOCALIND
+!
+!
+      integer function HPFC LOCALIND(an, dim, indice)
+      integer an, dim, indice
+      include "hpfc_commons.h"
+!
+! I cannot include the .h because of the external declaration of the 
+! function itself...
+!
+      external HPFC LOCALINDGAMMA
+      integer HPFC LOCALINDGAMMA
+      external HPFC LOCALINDDELTA
+      integer HPFC LOCALINDDELTA
+      integer newdecl, rate
+      newdecl = RANGEA(an, dim, 4)
+      if (newdecl.EQ.0) then
+! no new declaration
+         HPFC LOCALIND = indice
+         return
+      else
+      if (newdecl.EQ.1) then
+! alpha new declaration
+         HPFC LOCALIND = indice - RANGEA(an, dim, 5)
+         return
+      else
+      if (newdecl.EQ.2) then
+! beta new declaration
+         rate = RANGEA(an, dim, 6)
+         HPFC LOCALIND = 1 +
+     &        (MOD(rate*indice+RANGEA(an, dim, 7), 
+     &             RANGEA(an, dim, 5)) / ABS(RANGEA(an, dim, 6)))
+         return
+      else
+      if (newdecl.EQ.3) then
+! gamma new declaration
+         HPFC LOCALIND = HPFC LOCALINDGAMMA(an, dim, indice)
+         return
+      else
+         HPFC LOCALIND = HPFC LOCALINDDELTA(an, dim, indice)
+         return
+      endif
+      endif
+      endif
+      endif
+      end
+
+
+
+!
+!-----------------
+!
+! HPFC INIT COMMON PROCS
+!
+      subroutine HPFC INIT COMMON PROCS
+      include "hpfc_commons.h"
+      integer i
+      do i=1, NBOFTASKS
+         SENDCHANNELS(i) = 2
+      enddo
+      do i=1, NBOFTASKS
+         RECVCHANNELS(i) = 2
+      enddo
+      MCASTNODES = 1
+      MCASTHOST  = 3
+      OPN = 0
+      CPOSPN = 0
+      HOST SND CHANNEL = 2
+      HOST RCV CHANNEL = 2
+      end
+!-----------------
+!
+! HPFC INIT COMMON BUFFER
+      subroutine HPFC INIT COMMON BUFFER
+      include "hpfc_commons.h"
+      HPFC BYTE1 BUFFSIZE = SIZEOFBUFFER
+      HPFC STRING BUFFSIZE = SIZEOFBUFFER
+      HPFC INTEGER2 BUFFSIZE = SIZEOFBUFFER/2
+      HPFC INTEGER4 BUFFSIZE = SIZEOFBUFFER/4
+      HPFC REAL4 BUFFSIZE = SIZEOFBUFFER/4
+      HPFC REAL8 BUFFSIZE = SIZEOFBUFFER/8
+      HPFC COMPLEX8 BUFFSIZE = SIZEOFBUFFER/8
+      HPFC COMPLEX16 BUFFSIZE = SIZEOFBUFFER/16
+      SEND NOT INITIALIZED = .TRUE.
+      RECEIVED NOT PERFORMED = .TRUE.
+      end
+!
+!-----------------
+!
+! HPFC INIT COMMON PARAM LIB
+!
+      subroutine HPFC INIT COMMON PARAM LIB
+      include "hpfc_commons.h"
+      integer i
+      do i=1, MAXNBOFARRAYS
+         LIVEMAPPING(i) = .FALSE.
+      enddo
+!
+! the next routine is compiler generated
+!
+      call HPFC INIT COMMON PARAM
+      end
+
+!
+!
+!-----------------
+!
+! HPFC HOST END
+!
+      subroutine HPFC HOST END
+      integer info
+      include "hpfc_commons.h"
+      debug(print *, "[HPFC HOST END] ", MY LID)
+      sync_exit(call HPFC SYNCHRO)
+      call HPFC TERMINATE TASK(info)
+!!      stop
+      end
+!
+!-----------------
+!
+! HPFC STOP
+!
+      subroutine HPFC STOP
+      integer info
+      include "hpfc_commons.h"
+      debug(print *, "[HPFC STOP] ", MY LID)
+      sync_exit(call HPFC SYNCHRO)
+      call HPFC TERMINATE TASK(info)
+      stop
+      end
+      
+!
+!-----------------
+!
+! HPFC NODE END
+!
+      subroutine HPFC NODE END
+      integer info
+      include "hpfc_commons.h"
+      debug(print *, "[HPFC NODE END] ", MY LID)
+      sync_exit(call HPFC SYNCHRO)
+      call HPFC TERMINATE TASK(info)
+!!      stop
+      end
+!
+!-----------------
+!
+! HPFC RCVFR N
+!
+      subroutine HPFC RCVFR N
+      include "hpfc_commons.h"
+      call HPFC RECEIVE(NEIGHBORLID, RECVCHANNELS(NEIGHBORLID))
+      end
+!
+!-----------------
+!
+! HPFC SNDTO N
+!
+      subroutine HPFC SNDTO N
+      include "hpfc_commons.h"
+      integer info
+      call HPFC SEND(NEIGHBORLID, SENDCHANNELS(NEIGHBORLID), info)
+      end
+!
+!-----------------
+!
+! HPFC REMOTE LOOP BOUNDS
+!
+      subroutine HPFC REMOTE LOOP BOUNDS
+     $     (nlb, nub, llb, lb, ub, an, dp, pos)
+      integer nlb, nub, llb, lb, ub, an, dp, pos
+      include "hpfc_commons.h"
+      integer d, n, tn, pn, b, dt, da
+      if (dp.EQ.0) then
+         nlb = lb
+         nub = ub
+         llb = lb-1
+         return
+      endif 
+      tn = ATOT(an)
+      pn = TTOP(tn)
+      dt = DIST(tn, dp, 1)
+      n  = DIST(tn, dp, 2)
+      da = ALIGN(an, dt, 1)
+      b  = ALIGN(an, dt, 3)
+!
+! d is the first template cell of the considered dimension that
+! is mapped onto the given processors cell:
+!
+      d  = n*(pos-RANGEP(pn, dp, 1)) + RANGET(tn, dt, 1)
+      llb = MAX(lb, d-b)-1
+      nlb = llb+b-d+2
+      nub = MIN(ub+b, d+n-1)-d+1
+      end
+!
+!-----------------
+!
+      integer function HPFC SIZE OF PROCS(pn)
+      integer pn
+      include "hpfc_commons.h"
+      integer size, i
+      size = 1
+      do i=1, NODIMP(pn)
+         size = size * RANGEP(pn, i, 3)
+      end do
+      HPFC SIZE OF PROCS = size
+      end
+!
+!
+!-----------------
+!
+! HPFC LOOP BOUNDS
+!
+! Computation of the local loop bounds:
+! nlb (new lower bound) and nub (new upper bound)
+! and llb, the local lower bound in the former global loop,
+! with lb (initial lower bound) and ub (initial upper bound)
+! that access dimension of array da of array number an, mapped
+! onto dimension of processors dp of processors number pn.
+! 
+      subroutine HPFC LOOP BOUNDS(nlb, nub, llb, lb, ub, an, dp)
+      integer nlb, nub, llb, lb, ub, an, dp
+      include "hpfc_commons.h"
+      external hpfc size of procs
+      integer hpfc size of procs
+      integer pn
+      debug(print *, "HPFC LOOP BOUNDS ", lb, ub, " array ", an, dp)
+      pn = TTOP(ATOT(an))
+      if (MY LID.gt.HPFC SIZE OF PROCS(pn)) then
+         nlb = 0
+         nub = -1
+         llb = -1
+      else
+         call HPFC REMOTE LOOP BOUNDS
+     $        (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, pn))
+      end if
+      debug(print *, "init lb: ", llb, " new lb: ", nlb, " new ub: ", nub)
+      end
+
+!
+!-----------------
+!
+! HPFC HTIMEON
+!
+      subroutine HPFC HTIMEON
+      call HPFC SYNCHRO
+      call HPFC TIMEON
+      call HPFC SYNCHRO
+      end
+!
+!-----------------
+!
+! HPFC NTIMEON
+!
+      subroutine HPFC NTIMEON
+      call HPFC SYNCHRO
+      call HPFC SYNCHRO
+      end
+!
+!-----------------
+!
+! HPFC HTIMEOFF
+!
+      subroutine HPFC HTIMEOFF(comment)
+      character comment*(*)
+      call HPFC SYNCHRO
+      call HPFC TIMEOFF(comment)
+      end
+!
+!-----------------
+!
+! HPFC NTIMEOFF
+!
+      subroutine HPFC NTIMEOFF(comment)
+      character comment*(*)
+      call HPFC SYNCHRO
+      end
+!
+!--------------
+! HPFC H/NTELL
+!
+      subroutine HPFC HTELL(comment)
+      character comment*(*)
+      call HPFC SYNCHRO
+      call HPFC TELL(comment)
+      end
+!
+      subroutine HPFC NTELL(comment)
+      character comment*(*)
+      call HPFC SYNCHRO
+      end
+!
+!-----------------
+!
+! HPFC DIVIDE
+!
+      integer function HPFC DIVIDE(i, j)
+      integer i,j
+      if (i.ge.0) then
+         HPFC DIVIDE = i/j
+      else
+         HPFC DIVIDE = -((-i+j-1)/j)
+      endif
+      end
+!
+!----------
+!
+! HPFC PROCESSOR DIM
+!
+! this could be computed statically, where it is used...
+! used for the reductions...
+!
+      integer function HPFC PROCESSOR DIM(an, ad)
+      include "hpfc_commons.h"
+      integer an, ad
+      integer tn, pn, i, it, ip
+      tn = ATOT(an)
+      pn = TTOP(tn)
+      it = 0
+      ip = 0
+      do i=1, NODIMT(tn)
+         if (ALIGN(an, i, 1).EQ.ad) it = i
+      enddo
+      if (it.NE.0) then
+         do i=1, NODIMP(pn)
+            if (DIST(tn, i, 1).EQ.it) ip = i
+         enddo
+      endif
+      HPFC PROCESSOR DIM = ip
+      return
+      end
+
+!-------------------- HPFC SND TO HOST   -----------------
+!
+! a node sends a message to host
+!
+      subroutine HPFC SND TO HOST
+      include "hpfc_commons.h"
+      integer info
+      debug(print *, "snd to host ", MYLID, " - ", HOST SND CHANNEL)
+      call HPFC SEND(HOST LID, HOST SND CHANNEL, info)
+      debug(print *, "snd to host done")
+      HOST SND CHANNEL = HOST SND CHANNEL+2
+      end
+
+!-------------------- HPFC RCV FROM HOST  -----------------
+!
+! a node receive a message from host
+!
+      subroutine HPFC RCV FROM HOST
+      include "hpfc_commons.h"
+      debug(print *, "rcv from host ", MY LID, " - ", HOST RCV CHANNEL)
+      call HPFC RECEIVE(HOST LID, HOST RCV CHANNEL)
+      HOST RCV CHANNEL = HOST RCV CHANNEL+2
+      debug(print *, "rcv from host done")
+      end
+
+!--------------------  HPFC SND TO NODE  -----------------
+!
+! the host sends a message from a node
+!
+      subroutine HPFC SND TO NODE(lid)
+      include "hpfc_commons.h"
+      integer lid
+      integer info
+      debug(print *, "snd to node ", lid, " - ", SEND CHANNELS(lid))
+      call HPFC SEND(lid, SEND CHANNELS(lid), info)
+      SEND CHANNELS(lid) = SEND CHANNELS(lid)+2
+      debug(print *, "snd to node done")
+      end
+
+!--------------------  HPFC RCV FROM NODE  -----------------
+!
+! the host receive a message from a node
+!
+      subroutine HPFC RCV FROM NODE(lid)
+      include "hpfc_commons.h"
+      integer lid
+
+      debug(print *, "rcv from node ", lid, " - ", RECV CHANNELS(lid))
+      call HPFC RECEIVE(lid, RECV CHANNELS(lid))
+      RECV CHANNELS(lid) = RECV CHANNELS(lid)+2
+      debug(print *, "rcv from node done")
+      end
+!
+!
+!

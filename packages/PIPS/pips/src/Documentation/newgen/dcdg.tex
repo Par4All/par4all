@@ -1,0 +1,58 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\begin{document}
+\sloppy
+The data structures following are used for the construction of the graph
+of dependence cone. They are construted by using the data structure
+\verb+statement+ and \verb+effect+ that are defined in the data structure
+\verb+ri.newgen+ , the general structures \verb+vertex+ and \verb+arc+
+from the package {\em graph}, and the domain {\tt Ptsg} is imported by the
+linear integer library of CRI.   
+
+\domain{Import statement from "ri.newgen"}
+{}
+\domain{Import effect from "ri.newgen"}
+{}
+\domain{Import vertex from "graph.newgen"}
+{}      
+\domain{External Ptsg}
+
+\domain{dcdg\_vertex\_label = statement:int}
+{This domain is used for the contain of the vertex of the graph of
+dependence cone.}
+
+\domain{dcdg\_arc\_label = dc\_conflicts:dc\_conflict*}
+{This domain is used for the contain of the arc of the graph of
+dependence cone.}
+
+\domain{dc\_conflict = source:effect x sink:effect x dcsg: Ptsg}
+{This domain contain the informations of two vertexs of the conflict and
+dependence representation in generating system.} 
+
+\end{document}
+\end
+
+

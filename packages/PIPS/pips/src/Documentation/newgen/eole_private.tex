@@ -1,0 +1,60 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass[a4paper]{article}
+\usepackage{verbatim,comment,newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{PIPS to EOLE data structures}
+\author{Julien Zory \and Fabien Coelho}
+\date{
+$Date: 1999/01/05 08:56:05 $
+}
+
+\begin{document}
+\maketitle
+
+
+\section{Pips to Eole data structures} 
+
+\domain{import expression from "ri.newgen"}
+{}
+\domain{import entity from "ri.newgen"}
+{}
+\domain{expressionwithlevel = level:entity* x expression}
+{}
+\domain{lexpressionwithlevel = list:expressionwithlevel*}
+{}
+
+
+\section{Nested sequence data structure}
+
+\domain{function = op:entity x args:entity*}
+{}
+\domain{assignment = lhs:function x rhs:function x dependences:entity* }
+{}
+
+
+\domain{persistant\_expression\_to\_entity = persistant expression -> entity}
+{}
+
+\end{document}

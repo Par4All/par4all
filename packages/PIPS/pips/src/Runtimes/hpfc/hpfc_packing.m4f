@@ -1,0 +1,97 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+!
+! everything about packing
+!
+! macros for code generation
+!
+define(`LIST_DECL_BOUNDS',`
+     $ dl$1, du$1')dnl
+define(`LIST_SECTION',`
+     $ rl$1, ru$1, ri$1')dnl
+define(`DO_LOOP',`
+      do i$1 = rl$1, ru$1, ri$1')dnl
+define(`ENDDO_LOOP',`
+      enddo')dnl
+define(`ARRAY_DECL',`dl$1:du$1')dnl
+define(`INDEX_REF',`i$1')dnl
+define(`GENERIC_PACKING',`dnl
+pushdef(`LEVEL',$1)dnl
+pushdef(`PVMFUNCTION',$2)dnl
+pushdef(`NAME',$3)dnl
+pushdef(`PVMTYPE',$4)dnl
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
+!
+! Packing LEVEL dimensional array
+!
+      subroutine build_name(PVMTYPE,NAME,LEVEL)(
+     $     array, dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL, `LIST_SECTION')
+     $)
+      integer dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL, `LIST_SECTION')
+      TYPE
+     $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
+      include "hpfc_commons.h"
+      integer info, nitem
+      integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
+      i1=rl1
+      nitem=(ru1-rl1+1)/ri1
+REVERSE_BUT_LAST_REPLICATE(LEVEL, `DO_LOOP')
+         call PVMFUNCTION
+     $        (PVMTYPE,
+     $         array(COMMA_REPLICATE(LEVEL, `INDEX_REF')),
+     $         nitem, ri1, info)  dnl
+SIMPLE_REPLICATE(eval(LEVEL - 1), `ENDDO_LOOP')
+      end  
+!
+popdef(`LEVEL')dnl
+popdef(`PVMFUNCTION')dnl
+popdef(`NAME')dnl
+popdef(`TYPE')dnl
+popdef(`PVMTYPE')')dnl
+!
+define(ONE_PACKING,`
+GENERIC_PACKING($1,HPFC PACK,PACK,$2)
+GENERIC_PACKING($1,HPFC UNPACK,UNPACK,$2)')dnl
+define(ALLPACK,`
+! ----------------------------------------
+!
+! Packing serie for pvmtype $1
+!
+forloop(`_D_',1,_HPFC_DIMENSIONS_,`ONE_PACKING(_D_,$1)')
+!')dnl
+!
+ifdef(`_HPFC_NO_BYTE1_',,`ALLPACK(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`ALLPACK(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`ALLPACK(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`ALLPACK(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`ALLPACK(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`ALLPACK(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`ALLPACK(HPFC COMPLEX16)')
+ifdef(`_HPFC_NO_STRING_',,`ALLPACK(HPFC STRING)')
+
+!
+! that is all
+!

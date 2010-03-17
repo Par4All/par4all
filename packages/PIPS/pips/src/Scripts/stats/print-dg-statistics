@@ -1,0 +1,105 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+# Formattage sous latex de certaines des informations conservees
+# optionnellement lors du calcul du test de dependance
+
+# Francois Irigoin, 28 mai 1993
+
+workspace=$1
+global=tmp$$
+
+if [ ! -d $workspace.database ]
+then
+	echo Workspace $workspace does not exist!
+	exit
+fi
+
+dgoptions="resulttestfast resulttestseman resulttestfull"
+
+for dgoption in $dgoptions
+do
+	>$global.$dgoption
+	for source in $workspace.database/*.f
+	do
+		module=`basename $source .f`
+		module=`echo $module | tr a-z A-Z`
+#		echo module=$module
+		stats=$workspace.database/$module.$dgoption
+#		echo stats="$stats"
+		if [ -f $stats ]
+		then
+			cat $stats >>$global.$dgoption
+		else
+			echo $0: missing statistics for module $module and option $dgoption
+			echo "$module 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" >>$global.$dgoption
+		fi
+	done
+done
+
+# exit
+
+for dgoption in $dgoptions
+do
+	dependencetest=`echo $dgoption|sed s/resulttest//`
+#	cat $PIPS_UTILDIR/dg-statistics.texheader >$workspace-$dgoption.tex
+	cat >$workspace-$dgoption.tex <<EOF
+\batchmode
+
+\documentstyle[]{seminar}
+
+\renewcommand{\landscape}{\special{landscape}}
+
+\slideframe{plain}
+
+\slidestyle{empty}
+
+\pagestyle{myheadings}
+
+\markboth{PIPS - Dependence Graph Statistics {\em $dependencetest} for $workspace\hfill\today~~~}{PIPS - Dependence Graph Statistics {\em $dependencetest} for $workspace\hfill\today~~~}
+
+\begin{document}
+
+\begin{slide}
+
+{\scriptsize
+\begin{tabular}{| l | r | r | r | r |} \hline
+Module & array pairs & self & independent & dependent \\\\ \hline
+EOF
+	awk -f $PIPS_UTILDIR/dg-statistics.awk WORKSPACE=$workspace <$global.$dgoption >>$workspace-$dgoption.tex
+#	cat $PIPS_UTILDIR/dg-statistics.textrailer >>$workspace-$dgoption.tex
+	cat >>$workspace-$dgoption.tex <<EOF
+\end{tabular}
+
+}
+
+\vfill
+
+\end{slide}
+
+\end{document}
+EOF
+	latex $workspace-$dgoption.tex
+	rm $global.$dgoption
+done

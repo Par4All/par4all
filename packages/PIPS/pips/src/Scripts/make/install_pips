@@ -1,0 +1,531 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# installation for pips softwares and automatic generation of pipsrc
+#
+# TODO: use autogen/autoconf and the like for real portable software.
+
+unset archdir type
+
+problems=./encountered_problems
+rm -f $problems
+
+# some of uname to fix unix-version related problems
+uname_s=`uname -s`
+uname_v=`uname -v`
+uname_r=`uname -r`
+
+## on f... AIX/IBM, sh is ksh and type is whence:-(
+
+type=type
+
+test ${uname_s} = AIX && type=/bin/type
+
+if test -x /bin/type 
+then
+  type=/bin/type
+else
+  type=type
+fi
+
+export type
+
+## Whether we have a working echo -n
+
+if [ "`echo -n foo`" = foo ] 
+then
+  echon="echo -n"
+else
+  echon="echo"
+fi
+
+################################################################# FUNCTIONS
+
+error()
+{
+    ret=$1 ; 
+    shift ; 
+    echo "[install_pips]:" "$@" >&2 ; 
+    exit $ret ; 
+}
+
+# question mesg
+question()
+{
+    echo
+    $echon "[install_pips]:" "$@" "(y/n) [y]: "
+    read answer
+    if [ ${answer:-y} = n ]
+    then
+	return 1
+    else
+	return 0
+    fi
+}
+
+# query VAR mesg
+query() 
+{
+    var=$1
+    shift
+    echo
+    $echon "[install_pips]" "$@"": "
+    read $var
+}
+
+verb()
+{
+    echo "[install_pips]" "$@"
+}
+
+verbn()
+{
+    $echon "[install_pips]" "$@"
+}
+
+warning()
+{
+    echo "$@" ""
+}
+
+# executable foo what-for what-if-not-there
+executable()
+{
+    exe=$1
+    comment=$2
+    shift 2
+    verbn "looking for $exe ($comment): "
+    if $type $exe > /dev/null 2>&1
+    then
+	echo "ok!"
+    else
+	warning "not found!"
+	verb "--" "$@"
+	echo "exe: $exe ($comment)" "$@" >> $problems
+    fi
+}
+
+# library foo what-for what-if-not-there
+library()
+{
+    lib=$1
+    comment=$2
+    shift 2
+    verbn "looking for $lib ($comment): "
+    for l in `echo $LD_LIBRARY_PATH:./extern/lib/$ARCH | tr : ' '`
+    do
+	test -r $l/$lib && { echo found ; return 0 ; } ;
+    done
+    warning  "not found!"
+    verb "--" "$@"
+    echo "lib: $lib ($comment)" "$@" >> $problems
+    return 1
+}
+
+# check for environment variables
+environment()
+{
+    var=$1
+    comment=$2
+    shift 2
+    verbn "looking for ""$""$var ($comment): "
+    # Hum... echo -n "" print '-n'!
+    if test "." != "`eval echo .\\$$var`"
+    then
+	echo "ok!"
+    else
+	warning "not set!"
+	verb "--" "$@"
+	echo "env: $var ($comment)" "$@" >> $problems
+    fi
+}
+
+################################################################## SOFTWARES
+
+pwd=`pwd`
+
+#
+# Pips
+#
+
+if test -d ./pips 
+then
+    PIPS_ROOT=$pwd/pips
+
+    # cleans pipsrc files...
+    test -d $PIPS_ROOT/etc && {
+	x=$PIPS_ROOT/etc/pipsrc
+	rm -f $x.*.old
+	test $x.sh && mv $x.sh $x.sh.old
+	test $x.csh && mv $x.sh $x.csh.old
+    }
+fi
+
+#
+# daVinci
+#
+
+verbn "looking for a version of daVinci "
+d=`echo daVinci*`
+$echon "($d): "
+if test $d != 'daVinci*'
+then
+    echo found
+    addavincihome="DAVINCIHOME=\${SOFT_ROOT}/$d"
+    eval $addavincihome
+    adddavincipath="PATH=\${PATH}:\$DAVINCIHOME"
+else
+    warning "not found!"
+    addavincihome=""
+    adddavincipath=""
+fi
+
+#
+# Toolpack
+#
+
+verbn "looking for a version of Toolpack "
+d=`echo toolpack*`
+$echon "($d): "
+if test $d != 'toolpack*'
+then
+    echo found
+    addtoolpackdir="TOOLPACK_DIR=\${SOFT_ROOT}/$d"
+else
+    warning "not found!"
+    addtoolpackdir=""
+    eval $addtoolpackdir
+fi
+
+#
+# the default pips ARCH is chosen depending on the unix we're on
+#
+
+test -x ${PIPS_ROOT}/makes/arch.sh &&
+{
+    ARCH=`${PIPS_ROOT}/makes/arch.sh`
+}
+
+#
+# confirmation of the chosen ARCH
+#
+
+if question "Is software architure $ARCH ok as a default?"
+then
+    verb keeping ARCH=$ARCH
+else
+    query ARCH "please enter a new default software architecture"
+fi
+
+verb "Selected default software architecture: $ARCH"
+
+
+##################################################################### PIPSRC
+
+cat > pipsrc.tmp <<EOF
+#
+# Environment variables for PIPS.
+#
+# Softwares common root:
+# just edit this setting if you move the pips softwares globally
+SOFT_ROOT=$pwd
+#
+# Pips root directory
+PIPS_ROOT="\${SOFT_ROOT}/pips"
+#
+# Newgen root directory
+NEWGEN_ROOT="\${SOFT_ROOT}/newgen"
+#
+# Linear root directory
+LINEAR_ROOT="\${SOFT_ROOT}/linear"
+#
+# Extern root directory
+# external libraries and so expected for building tpips
+EXTERN_ROOT="\${SOFT_ROOT}/extern"
+#
+# path updates
+PATH="\${EXTERN_ROOT}/bin:\${PATH}"
+PATH="\${PIPS_ROOT}/bin:\${PIPS_ROOT}/utils:\${PATH}"
+MANPATH="\${PIPS_ROOT}/man:\${MANPATH}"
+#
+############################################################################
+#
+# Other variables of interest (and their implicit default):
+#
+# PIPS_CPP (cpp)
+#  - what to use for preprocessing .F files.
+#   linux: gcc -E
+#
+# PIPS_COSTDIR (\${PIPS_ROOT}/Share/complexity_cost_tables)
+#  - where to find const tables for the complexity analysis
+#
+# PIPS_ZIP (gzip -v9)
+#  - command to compress the distribution
+# 
+# PIPS_MAKE (gmake)
+#  - make command to build pips (it MUST be GNU make)
+#
+# PIPS_VALIDDIR (\${PIPS_ROOT}/Validation)
+#  - where to find non-regression tests
+#
+# PIPS_HOSTS (\`hostname\`) [:-separated list]
+#  - hosts to be used with rsh to run the validation
+#
+# PIPS_PING (ping)
+#  - command to test whether a host is alive
+#   aix and linux: "ping -c 1"
+# 
+# PIPS_DIFF (diff) [gdiff?]
+#  - differences of validation results
+#   aix: "gdiff" and install GNU diff..
+#
+# PIPS_MORE (less) [more, cat]
+#  - command to display a file built by pips
+#   aix: "cat"
+#
+# PIPS_FLINT (f77 -c -ansi) 
+#  - command to check the fortran syntax before pips
+#
+# PIPS_CHECK_FORTRAN ()
+#  - triggers the fortran syntax checking above if defined to true
+#
+# 
+# EPIPS_EMACS (emacs)
+#  - emacs to run epips
+#
+# EPIPS_LISP (\${PIPS_ROOT}/share/epips.el)
+#  - emacs-lisp file for epips
+#
+#
+# HPFC_RUNTIME (\${PIPS_ROOT}/runtime/hpfc)
+#  - where to find HPFC runtime
+#
+# HPFC_SED (gsed)
+#  - sed command used by hpfc to analyze the directives...
+#    although I do not use any extensions, GNU sed is the only I found 
+#    that has no static limitations.
+# 
+# HPFC_TR (tr)
+#  - tr command for the directive analysis.
+#
+# HPFC_MAKE (gmake)
+#  - make command for hpfc runtime, must be GNU make.
+#
+# HPFC_M4 (gm4)
+#  - m4 preprocessor to build hpfc runtime. 
+#    although I do not use any extensions, GNU m4 1.4 is the only that resists
+#    the scripts (sun: "shift not implemented", and problems with dec/cray/ibm)
+#
+#
+# XPOMP_RUNTIME (\${PIPS_ROOT}/runtime/xpomp)
+#  - where to find xpomp runtime
+#
+#
+# WP65_RUNTIME (\${PIPS_ROOT}/runtime/wp65)
+#  - where to find wp65 runtime
+#
+#############################################################################
+#
+# External sofwares:
+# TOOLPACK_DIR (???/Toolpack/toolpack1.2) (pips: stf transformation)
+$addtoolpackdir
+# X11_ROOT (xpomp)
+# DAVINCIHOME (davinci)
+$addavincihome
+$adddavincipath
+# OPENWINHOME/xview (wpips)
+EOF
+
+
+
+#
+# FIXES for some OS
+#
+
+verb "fixes for ${uname_s} if necessary"
+
+test ${uname_s} = AIX && cat >> pipsrc.tmp <<EOF
+#
+# fixes for AIX
+#
+PIPS_FLINT='xlf -c -u -qlanglvl=77std'
+PIPS_PING='ping -c 1'
+PIPS_DIFF='gdiff'
+PIPS_MORE='cat'
+#
+# end of AIX fixes
+#
+EOF
+
+test ${uname_s} = Linux && cat >> pipsrc.tmp <<EOF
+#
+# fixes for Linux
+#
+PIPS_CPP='gcc -E'
+PIPS_PING='ping -c 1'
+PIPS_FLINT='g77 -c -Wall -Wimplicit'
+#
+HPFC_SED='sed'
+HPFC_M4='m4'
+#
+# end of Linux fixes
+#
+EOF
+
+
+#
+# Generate the actual pipsrc files
+#
+
+verb "generating pipsrc.sh"
+{
+    echo "# automatically generated pipsrc.sh:"
+    echo "PIPS_ARCH=\${PIPS_ARCH:-$ARCH}"
+    echo "export PIPS_ARCH"
+    cat pipsrc.tmp
+    sed -n 's,^[ 	]*\([-A-Za-z0-9_]*\)=.*,export \1,p;' pipsrc.tmp |
+	sort -u
+} > pipsrc.sh
+
+verb "generating pipsrc.csh"
+{
+    echo "# automatically generated pipsrc.csh:"
+    echo 'if ( $?PIPS_ARCH == 0 ) setenv PIPS_ARCH' $ARCH
+    sed  's,\(.*\)=\(.*\),setenv \1 \2,;' pipsrc.tmp
+} > pipsrc.csh
+
+rm -f pipsrc.tmp
+
+# source the just created environment!
+. ./pipsrc.sh
+
+##################################################################### CHECKS
+
+free="freeware - see http://www.cri.ensmp.fr/pips/distribution.html"
+unix="should be available on any UN*X"
+
+test -d ./pips &&
+{
+    question "do you plan to run PIPS? -- should be yes!" &&
+    {
+	executable /bin/sh "mandatory" $unix
+	# executable fsplit "mandatory" $free
+	# executable perl "could be useful" $free
+	executable /bin/csh "alas useful" $unix
+	environment TOOLPACK_DIR "useful" $free
+    }
+
+    question "do you plan to run WPIPS?" &&
+    {
+	executable xtree "useful" $free
+	executable daVinci "nice" $free
+	environment DAVINCIHOME "nice" 
+    }
+
+    question "do you plan to run EPIPS?" &&
+    {
+	executable emacs "mandatory" $free
+    }
+
+    question "do you plan to run HPFC?" &&
+    {
+	executable gsed "GNU sed! mandatory" $free
+    }
+
+    question "do you plan to run HPFC generated codes?" &&
+    {
+	environment PVM_ROOT "mandatory" 
+	environment PVM_ARCH "mandatory" 
+	# executable pvm "mandatory" $free
+	executable gm4 "GNU m4 -- mandatory" $free
+	executable gmake "GNU make -- mandatory" $free
+	executable egrep "Extended GREP -- mandatory" $unix
+    }
+}
+
+test -d ./pips/src &&
+{
+    question "do you plan to compile HPFC runtime?" &&
+    {
+	environment PVM_ROOT "mandatory" 
+	environment PVM_ARCH "mandatory" 
+	executable gm4 "GNU m4 -- mandatory" $free
+	executable gmake "GNU make -- mandatory" $free
+    }
+}
+
+test -d ./pips/src -o -d ./newgen/src -o -d ./linear/src &&
+{
+    question "do you plan to compile PIPS, NEWGEN or LINEAR?" &&
+    {
+	# compile
+	# how to check that it is GNU make?
+	executable make "mandatory" $free
+	executable cproto "mandatory" $free
+	executable flex "GNU Fast lex -- mandatory" $free
+	executable bison "GNU yacc -- mandatory" $free
+	executable gcc "GNU cc -- useful" $free
+	#executable g77 "GNU f77 -- nice" $free
+
+	# doc
+	executable latex "useful" $free
+	executable makeindex "useful" $free
+	executable bibtex "useful" $free
+	executable latex2html "useful" $free
+	executable rman "useful" $free
+
+	# misc
+	executable awk "useful" $unix
+    }
+}
+
+test -d ./pips/src &&
+{
+    question "do you plan to compile PIPS?" &&
+    {
+	library libreadline.a "mandatory" $free
+    }
+
+    question "do you plan to compile wpips?" &&
+    {
+	# externals
+	environment OPENWINHOME "mandatory for wpips" "???"
+    }
+}
+
+#
+# done
+
+echo
+verb "if some required or useful softwares are not available,"
+verb "you can look for sources/pointers from the PIPS web page"
+verb "    http://www.cri.ensmp.fr/pips"
+echo
+warning "Source pipsrc.{sh,csh} as appropriate to your shell!"
+
+test -f $problems && {
+  echo
+  echo "SUMMARY: "
+  cat $problems
+  echo
+}

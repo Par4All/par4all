@@ -1,0 +1,241 @@
+<TITLE>Polyhedric method</TITLE>
+
+<H1> POLYHEDRIC METHOD </H1>
+
+<HR>
+
+Author: <A HREF="/~platonof/index.html"> Alexis Platonoff </A>
+<ADDRESS>platonof@cri.ensmp.fr</ADDRESS>
+<EM>Last update: September 14th, 1995</EM>
+
+<HR>
+
+<H2>Contents</H2>
+<ul>
+<li><A HREF="#intro">Introduction</A>
+<li><A HREF="#stco">Static control</A>
+<li><A HREF="#adfg">Array Data Flow Graph</A>
+<li><A HREF="#bdt">Scheduling</A>
+<li><A HREF="#plc">Mapping</A>
+<li><A HREF="#coge">Code generation</A>
+<li><A HREF="#bibl">References</A>
+</ul>
+
+<HR>
+
+<a name="intro"><H2> Introduction </H2>
+
+The polyhedric method was invented by <A
+HREF="http://www.prism.uvsq.fr/english/parallel/paf/people/PRISM_paf_angl.html">
+Paul Feautrier</A> of the <A HREF="http://www.prism.uvsq.fr/">PRiSM
+laboratory</A> of University of Versailles (France). Initially, it was
+implemented in the parallelizer PAF (Automatic Parallelizer of Fortran)
+developped at PRiSM with Le_Lisp. The implementation of this method in the
+parallelizer PIPS was carried out under a contract between the University
+of Versailles, the Ecole des mines de Paris and the Commissariat &agrave;
+l'Energie Atomique (CEA). It has been done in CEA at Centre d'Etudes de
+Limeil-Valenton by Benoit de Dinechin and Arnauld Leservot and Alexis
+Platonoff <a href="#bibl">[Pla95a]</a>, with the help of Antoine
+Clou&eacute; and Francois Dumontet.  <P>
+
+The compilation is a sequence of five phases. The first phase checks that
+the imput is a static control program, <i>i.e.</i>, fulfills some
+restrictions. The second phase builds an array data flow graph (DFG). The
+third one constructs a scheduling function compatible with the DFG. This
+function minimizes the execution time for an unbounded PRAM. The fourth
+one computes a mapping value for a physical distributed memory parallel
+machine. Finally, the last phase generates the parallel code.  <P>
+
+Although this compilation scheme is implemented in PIPS, it is NOT
+interprocedural yet.  <P>
+
+<HR>
+
+<a name="stco"><H2>Static Control</H2>
+
+This method is limited to a certain class of programs called <em>static
+control programs</em> <a href="#bibl">[Fea91]</a>. In such programs, the
+authorized statements are:
+
+<UL>
+<LI> DO loop and the IF test control structures;
+<LI> assignment and input/output statements;
+</UL>
+
+Also, loop bound expressions and array subscript expressions must be
+integer affine functions of surrounding loop indices and <i>structure
+parameters</i>.  A <em>structure parameter</em> is an integer variable
+defined only once in the program, typically a constant that defines the
+size of the arrays.  <P>
+
+<HR>
+
+<a name="adfg"><H2>Array Data Flow Graph</H2>
+
+The <em>Array Data Flow Graph</em> (DFG) is computed from a static control
+program <a href="#bibl">[Fea91]</a>. The DFG is in fact a kind of
+dependence graph in which only true dependences appear. Arrays and scalars
+are expended (implicitly) and assigned only once. <P>
+
+To each node of the DFG are associated an <em>instruction</em> and an
+<em>execution domain</em>. The execution domain is a set of constraints
+specifying the variation domain of the surrounding loop indices of the
+instruction.  <P>
+
+Nodes are connected by arcs which represent true data dependences. To each
+edge of the DFG are associated the <em>reference</em> of the use
+dependence, a <em>transformation function</em> in which each index of the
+definition iteration domain is expressed as a linear function of the
+indices of the use iteration domain, and a <em>governing predicate</em>
+that specifies the sub-space of the sink's iteration domain on which the
+edge exists (it is a system of constraints upon the indices of the sink's
+iteration domain).  <P>
+
+<HR>
+
+<a name="bdt"><H2>Scheduling</H2>
+
+The scheduling function is computed from the DFG <a
+href="#bibl">[Fea92a]</a> to minimize the total execution time with no
+resource constraint. The schedule provides for each operation of a program
+the logical date at which it must be executed. For an occurence of indice
+<tt>s</tt>, it is expressed as a multidimensional affine function
+<tt>Ts</tt> of the loop indices and the structure parameters.  <P>
+
+For a given time <tt>t</tt>, the scheduling function defines a set of
+independent operations which can be executed simultaneously.  This set is
+called a front. The execution of two successive fronts must be sequential.
+<P>
+
+Even with the static control restrictions, it is not possible to always
+have a unidimensional linear schedule. Typically, this happens when there
+are two or more sequential loops in the same loop nest.  In that case, a
+<em>multidimensional</em> linear schedule is computed <a
+href="#bibl">[Fea92b]</a>.  <P>
+
+<HR>
+
+<a name="plc"><H2>Mapping</H2>
+
+The placement function associates to each statement a multidimensional
+affine function of the loop indices and the structure parameters <a
+href="#bibl">[Fea93]</a>. This function specifies explicitly the placement
+of the instruction on a virtual processor grid, <i>i.e.</i>, gives the
+identity of the processor that executes each occurence of the instruction.
+<P>
+
+Each dimension of the placement function defines a placement direction for
+the instruction and all these directions constitute the distribution space
+of the target machine.  The number of dimensions to compute is arbitrary
+with a maximum equal to the dimension of iteration space minus the
+dimension of the scheduling function. <P>
+
+Initially, the goal of the algorithm that computes the placement function
+was to reduce the number of communications. For an edge of the DFG, there
+is a potential communication between its source and its destination, which
+can be represented by a distance.  If such a distance is equal to zero
+(the edge is ``cut'') then the source and the destination will be mapped
+onto the same processor, and there will be no communication at all.  <P>
+
+The principle of the method is to nullify as many distances as possible.
+To each edge is associated a <em>cutting condition</em> represented by a
+system of equalities. The length of an edge is nullified if its cutting
+condition is satisfied, i.e. its equalities are satisfied.  These
+equalities corresponds to the nullification of the factors of the
+variables (loop indices and structure parameters) appearing in the
+distance.  In most cases, satisfying the cutting conditions of all the
+edges will lead to the trivial solution: some null dimensions,
+<i>i.e.</i>, all the occurences of the instruction are placed on the same
+processor. To avoid this, some edges should not be cut. To choose them, a
+greedy algorithm has been proposed <a href="#bibl">[Fea93]</a>, it treats
+the edges by decreasing importance. The importance of an edge is
+represented by its weight which is equal to the volume of data which has
+to be sent if the edge is not cut.  <P>
+
+This method does not take into account the type (and hence the temporal
+cost) of the communications. To that purpose, an extension of the method
+has been implemented. It is based on a special treatment of potential
+communications that can be optimized <a href="#bibl">[Pla95b]</a>, for
+instance spread, reduction...
+
+<HR>
+
+<a name="coge"><H2>Code Generation</H2>
+
+The final phase builds the parallel program using the results of all
+previous phases. At a given time step, the parallel program has to execute
+the corresponding front (see above), synchronize and pass to the next time
+step. This induces the following general architecture of the parallel
+program:<br>
+
+<pre>
+do t = 1, number of fronts
+  execute concurrently all operations in F(t)
+  synchronize
+end do
+</pre>
+
+The code generation is based upon three transformations:
+
+<dl>
+<dt> Total expansion of scalars and arrays:
+<dd> transformation of the initial program into a dynamic single
+     assignment form <a href="#bibl">[Fea88]</a>.
+<dt> Loop reordering:
+<dd> rearrangment of the iteration domain of the initial loops according
+     to the scheduling and placement functions (the first gives the
+     sequential loops, the second the parallel ones). The reordering is
+     equivalent to scanning polyhedra with do loops <a
+     href="#bibl">[AI91]</a>.
+<dt> Reindexing:
+<dd> substitution of all the array access functions with new ones computed
+     according to the new loops.
+</dl>
+
+A general method for generating parallel code from the results of the
+preceding phases has been proposed by Collard <a href="#bibl">[CF93]</a>.
+<P>
+
+In PIPS, the generated parallel code can be either CM Fortran (for the
+CM-5) or CRAFT Fortran (for the Cray-T3D). <P>
+
+<HR>
+
+<a name="bibl"><H2>References</H2>
+
+[AI91] C. Ancourt and F. Irigoin. Scanning polyhedra with DO
+loops. in PPOPP'91, 1991. <P>
+
+[CF93] J.-F. Collard and P. Feautrier. Automatic generation of data
+parallel code. In Fourth International Workshop on Compilers for Parallel
+Computers, Delft University of Technology, The Netherlands, December 1993.
+<P>
+
+[Fea88] P. Feautrier. Array expansion. in ACM Int. Conf. on
+Supercomputing, Saint-Malo, jul 1988. <P>
+
+[Fea91] P. Feautrier. Dataflow Analysis of Array and Scalar
+References. Int. Journal of Parallel Programming, 20(1):23-53, February
+1991.  <P>
+
+[Fea92a] P.Feautrier. Some Efficient Solutions to the Affine Scheduling
+Problem, Part I : One-dimensional Time. Int. J. of Parallel Programming,
+21(5):313-348, October 1992.  <P>
+
+[Fea92b] P. Feautrier. Some Efficient Solutions to the Affine Scheduling
+Problem, Part II : Multidimensional Time. Int. J. of Parallel Programming,
+21(6):389-420, December 1992.  <P>
+
+[Fea93] P. Feautrier. Toward Automatic Partitioning of Arrays on
+Distributed Memory Computers. In ACM ICS'93, pages 175-184, Tokyo, July
+1993.  <P>
+
+<a href="http://www.cri.ensmp.fr/doc/A-268.ps.Z">[Pla95a]</a>
+A. Platonoff. Contribution &agrave; la distribution Automatique des
+Donn&eacute;es pour Machines Massivement Parall&egrave;les. Th&egrave;se
+de Doctorat de l'Universit&eacute; P. et M. Curie, March 9th 1995. <P>
+
+<a href="http://www.cri.ensmp.fr/doc/A-271.ps.gz">[Pla95b]</a> A. Platonoff. Automatic
+Data Distribution for Massively Parallel Computers. In 5th International
+Workshop on Compilers for Parallel Computers, Malaga University, Spain,
+June 1995.  <P>

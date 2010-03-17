@@ -1,0 +1,326 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{verbatim,comment,newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{PIPS: Use-Def Chains and Dependence Graph}
+\author{François Irigoin \\
+    Pierre Jouvelot \\
+    Rémi Triolet\\
+    Yi-Qing Yang \\
+\\
+    CRI, MINES ParisTech}
+
+
+\begin{document}
+\maketitle
+
+%% \sloppy
+
+The dependence graph specific data structures, as well as auxiliary data
+structures used to compute it, are described in this report. The graph
+itself is a generic graph defined in \verb/Newgen/graph.tex/. It is
+specialized into a dependence graph by using specific arc and vertex
+labels. The standard use-def, def-use and def-def chains are encoded with
+this data structure, as well as non-standard use-use chains useful for
+cache and locality management. The dependence graph data structure is used
+in libraries \verb/chains/ which computes the use-def chains,
+\verb/ricedg/ which refines the use-def chains into a dependence graph
+using various dependence tests\footnote{The dependence tests used were not
+  all designed at Rice university but the dependence levels defined at
+  Rice are used.}, and \verb/rice/ which uses the dependence
+graph to compute strongly connected components according to the
+Allen\&Kennedy algorithm~\cite{AK87}.
+
+The genericity is not supported explicitly by NewGen\cite{JT89,JT90}. Although the arc
+and vertex labels are NewGen objects, they are seen as {\em external}
+types when used in C code. Specific procedures are specified in calls to
+\verb/gen_init_external/ (see \verb/initialize_newgen/ in Library
+\verb/top-level/). C modules using these labels must use explicit
+casts to convert the generic labels into dependence graph labels.
+
+Auxiliary data structures are used to compute the strongly connected
+components (SCC) of the dependence graph. The SCC routines are not as
+generic as could be hoped. They take into account the graph hierarchy
+implied by the dependence levels of the Allen \& Kennedy parallelization
+algorithm~\cite{AK87}. This explains why the SCC related data structures are declared
+here and not with graph data structure.
+%%\htmladdnormallink{{\tt graph}}{http://www.cri.ensmp.fr/pips/graph}.
+
+\begin{comment}
+Les structures de données suivantes sont utilisées par la phase de
+construction du graphe des dépendances. Elles sont construites en
+utilisant les structures de données \verb+statement+ et \verb+effect+
+qui ont été définies dans la représentation interne, ainsi que la
+structure de données génériques \verb+vertex+ qui fait partie du
+package graph 
+%%\htmladdnormallink{{\em graph}}{http://www.cri.ensmp.fr/pips/graph}.
+\end{comment}
+
+Several functions compute or print a dependence graph. See the
+PipsMake manual for the list of
+%%{http://www.cri.ensmp.fr/pips/pipsmake-rc}
+user-callable functions. Advanced users have access to more functions
+through the PIPS properties.
+%% {http://www.cri.ensmp.fr/pips/properties-rc}.
+
+It is not possible to save efficiently
+the internal representation of a dependence graph onto disk. The
+dependence graph structure contains pointers to memory effects and
+indirectly to memory references included in code statements. These
+references which are part of the code data structure do not have {\em
+  names} and would have to be duplicated in the dependence graph
+file. Because of the evaluation mechanism used by PipsMake manual,
+%%{http://www.cri.ensmp.fr/pips/pipsmake-rc}
+it is not possible to
+reuse a parallelized code from one PIPS session to the next one. The
+parallelized code depends on the dependence graph, and the dependence
+graph cannot be retrived. Hence the parallelized code, however correct, is
+deemed inconsistent with respect to the workspace.
+
+Section~\ref{section-imported-newgen-types} deals with the usual import of
+other NewGen data structures.
+Section~\ref{section-data-structures-external-to-newgen} contains the
+declarations of data structure external to NewGen.
+Section~\ref{section-arc-and-vertex-lables-for-the-dependence-graph}
+presents the arc and vertex decorations specific to the dependence graph.
+And the last section, Section~\ref{section-strongly-connected-components},
+is used to describe the data structures required by the Allen\&Kennedy
+parallelization algorithm.
+
+\section{Imported NewGen Types}
+\label{section-imported-newgen-types}
+
+The dependence graph points to statement and to memory effects (see
+use-def chains for both data structures).
+%%\htmladdnormallink{use-def chains}{http://www.cri.ensmp.fr/pips/ri}
+
+
+\begin{comment}
+\domain{Import statement from "ri.newgen"}
+{}
+\end{comment}
+
+\domain{Import effect from "ri.newgen"}
+{}
+
+The dependence graph data structure is  a particular instance of the
+\verb/graph/ data structure.
+
+\domain{Import vertex from "graph.newgen"}
+{}
+
+\section{Data Structures External to NewGen}
+\label{section-data-structures-external-to-newgen}
+
+Generating systems are used to abstract a set of dependence arcs by
+dependence cones (convex and transitive closure of the dependence set)
+and/or dependence polyhedron (convex closure). This data structure,
+\verb/generating system/, is
+part of the C3 Linear Algebra library.
+
+\domain{External Ptsg}
+
+\section{Arc and Vertex Labels for the Dependence Graph}
+\label{section-arc-and-vertex-lables-for-the-dependence-graph}
+
+\subsection{DG Vertex Label}
+
+\domain{dg\_vertex\_label = statement:int x sccflags}
+{}
+
+This data type carries information attached to each dependence graph
+vertex (a.k.a. node). Graph nodes are of type \verb/node/ defined in
+{\tt graph.tex}.  Field \verb/statement/ contains a
+\verb/statement_ordering/, i.e. a unique statement identifier (see {\tt
+ri.tex}). The effective statement can be retrieved using mapping
+\verb/OrderingToStatement/.
+
+Field \verb/sccs_flags/ is used to compute strongly connected components
+of the dependence graph.
+
+\subsection{DG Arc Label}
+
+\domain{dg\_arc\_label = conflicts:conflict*}
+{}
+
+This data type contains information attached to a dependence graph arc.
+See Newgen data type \verb/graph/ in file \verb/graph.tex/. Each DG arc
+points to the list of all conflicts due to references in either the
+source or the sink statements, i.e. the statements attached to the sink
+or the source vertex.
+
+\begin{comment}
+Ce domaine est utilisé pour contenir les informations qui sont
+attachées à chaque arc du graphe de dépendances (voir le domaine {\tt
+graph} dans le fichier {\tt graph.tex}). Chaque arc du GD contient les
+conflits entre les deux statements des noeuds du graphe de dépendance.
+\end{comment}
+
+\subsection{Dependence Conflict}
+
+\domain{conflict = persistant source:effect x persistant sink:effect x cone}
+{}
+
+A conflict is generated by two effects, one in the source statement and
+one in the sink statement. Simple effects are due to references in
+statements. More complex effects are generated for procedure
+calls. Different kinds of arcs (a.k.a. chains), use-def, def-use,
+use-use and def-def, are derived from the different kinds of effects,
+read and write. Note that def-def conflicts are computed to provide
+locality information. This information is or might be used in phase WP65.
+
+\begin{comment}
+Un conflit existe entre deux effets présents dans deux noeuds voisins
+du graphe de dépendance. Les types d'effet (write, read) sert à
+distinguer les conflits ``use-def'', ``def-def'' et ``{def-use}''. Le
+cone comprend les informations precises de conflict.
+\end{comment}
+
+\subsection{Dependence Levels and Dependence Cone}
+
+\domain{cone = levels:int* x generating\_system:Ptsg}
+{}
+
+Dependence arcs do not carry enough information to parallelize and/or
+transform loops~\cite{YAI95}. The simplest loop parallelization
+information is called {\em dependence levels}. Each level correspond to
+one common enclosing loop. A common enclosing loop contains both source
+and sink statements. The outermost enclosing loop is denoted 1, and the
+innermost loop has the higher level. Non-loop carried dependences have
+level {\em number of common enclosing loops plus one}, which makes
+impossible to know if a dependence is loop carried or not if the number of
+common enclosing loops is unknown.
+
+Intra-statement conflicts, i.e. conflict between two references of the
+same statement, are preserved, even if they are not loop-carried. They
+are required for instruction level scheduling (not implemented in PIPS)
+and for consistency across program transformations. After instruction
+atomization (see \verb/pipsmake-rc.tex/), the number of dependence arc
+should remain the same.
+
+Loop interchange, for instance, requires more information than
+dependence levels, namely {\em dependence direction vectors}
+(DDV). DDV's are not computed in PIPS because a more precise
+information, dependence cone and/or dependence polyhedron, is made
+available. These convex polyhedra are not represented by sets of affine
+constraints but by their generating systems because generating systems
+are directly useful to constraint schedules (hyperplane methods) and
+tilings (supernode partitioning).
+
+The ultimate dependence information is {\em value} and not {\em
+location} based. PIPS contains an implementation of Pr. Feautrier's
+Array Data Flow Graph (DFG). The DFG is implemented with another data
+structure described in \verb/paf_ri.tex/.
+
+\begin{comment}
+Le domaine cône définit une approximation polyédrique de l'ensemble
+des dépendances portées par un arc. Plusieurs types d'approximation
+sont possibles: les niveaux de dépendance, les vecteurs de direction de
+dépendance, les systèmes générateurs (aussi
+connus sous le nom de {\em cône de dépendance}) et le mécanisme
+du {\em Data Flow Graph} n'est pas implémenté avec cette structure
+de données mais avec \verb|paf_ri|.
+\end{comment}
+
+\begin{comment}
+Le niveau d'une dépendance décrivent le nombre de boucles englobantes
+concernées.  ``{generating\_system}'' est la répresentation de
+system generateur.
+\end{comment}
+
+\section{Strongly Connected Components}
+\label{section-strongly-connected-components}
+
+\subsection{Flags for Strongly Connected Components}
+
+\domain{Sccflags = enclosing\_scc:scc x mark:int x dfnumber:int x lowlink:int}
+{}
+
+This type is an auxiliary type used when computing the strongly
+connected components of the dependence graph. More information
+available in Tarjan's algorithm description?
+
+\begin{comment}
+Ce domaine est utilisé par l'algorithme de calcul des composantes
+fortement connexes d'un graphe.
+\end{comment}
+
+\subsection{Sets of Strongly Connected Components}
+
+\domain{Sccs = sccs:scc*}
+{}
+
+This data type is used to return the strongly connected components of
+the dependence graph. It is a simple list of SCC's.
+
+\begin{comment}
+Ce domaine permet de contenir le résultat de l'algorithme de calcul
+des composantes fortement connexes d'un graphe. Il s'agit d'une liste de
+{\tt scc}, c'est à dire de composantes fortement connexes.
+\end{comment}
+
+\subsection{Strongly Connected Component}
+
+\domain{Scc = vertices:vertex* x indegree:int}
+{}
+
+A strongly connected component is a set of vertices, represented as a
+list, and an integer field, \verb/indegree/, used for their topological
+sort. Allen \& Kennedy algorithm~\cite{AK87} is based on topological sorts of the
+dependence graph SCC's.
+
+\begin{comment}
+Ce domaine permet de représenter une composante fortement connexe d'un
+graphe. Une {\tt scc} se compose d'un ensemble de noeuds, et d'un
+sous-domaine {\tt indegree} utilisé par l'algorithme de tri topologique.
+\end{comment}
+
+\begin{thebibliography}{9}
+
+% pipsmake
+
+\bibitem{AK87} J. Allen, K. Kennedy,
+{\em Automatic Translation of {FORTRAN} Programs to Vector Form},
+TOPLAS, V. 9, n. 4, 1987
+
+\bibitem{JT89} P. Jouvelot, R. Triolet,
+{\em NewGen: A Language Independent Program Generator},
+Rapport Interne CAII 191, 1989
+
+\bibitem{JT90} P. Jouvelot, R. Triolet,
+{\em NewGen User Manual},
+Rapport Interne CAII ???, 1990
+
+\bibitem{YAI95} Y. Yang, C. Ancourt, F. Irigoin,
+{\em Minimal Data Dependence Abstractions for Loop Transformations}, 
+International Journal of Parallel Programming,
+v. 23, n. 4, Aug. 1995, pp.~359-388
+
+\end{thebibliography}
+
+\end{document}
+\end

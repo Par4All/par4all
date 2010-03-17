@@ -1,0 +1,1980 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 0 0 254 2524
+%%Creator: daVinci V2.0.1 (info available from daVinci@Informatik.Uni-Bremen.DE)
+%%For: keryell@deauville (Ronan KERYELL,,(+33 1)64.69.48.44,)
+%%Title: 
+%%CreationDate: Tue Jun 17 17:33:55 1997
+
+%%Pages: 1
+%%DocumentNeededResources:
+%%+ font LucidaSans
+%%+ font LucidaSans-Bold
+%%+ font LucidaSans-Italic
+%%+ font LucidaSans-BoldItalic
+%%+ font Times-Roman
+%%+ font Times-Bold
+%%+ font Times-Italic
+%%+ font Times-BoldItalic
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Helvetica-Oblique
+%%+ font Helvetica-BoldOblique
+%%+ font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%+ font ZapfChancery-MediumItalic
+%%EndComments
+
+%%BeginProlog
+/daVinci_dict 200 dict def
+daVinci_dict begin
+/fontsize 12 def
+
+/cp % NameOfFontToBeCopied
+{ findfont dup length dict begin 
+  { 1 index /FID ne {def} {pop pop} ifelse} forall 
+  /Encoding ISOLatin1Encoding def currentdict end 
+} def
+/rn % NameOfNewFontWithIsoEncoding
+{ exch definefont pop } def
+/sf % NameOfFontToBeSet
+{ findfont fontsize scalefont setfont } def
+
+% Copy all fonts to get ISO 8-bit chars
+/Times-Roman cp /FontTimes rn
+/Times-Bold cp /FontTimesBold rn
+/Times-Italic cp /FontTimesItalic rn
+/Times-BoldItalic cp /FontTimesBoldItalic rn
+/Helvetica cp /FontHelveticaNarrow rn
+/Helvetica-Bold cp /FontHelveticaNarrowBold rn
+/Helvetica-Oblique cp /FontHelveticaNarrowItalic rn
+/Helvetica-BoldOblique cp /FontHelveticaNarrowBoldItalic rn
+/Courier cp /FontCourier rn
+/Courier-Bold cp /FontCourierBold rn
+/Courier-Oblique cp /FontCourierItalic rn
+/Courier-BoldOblique cp /FontCourierBoldItalic rn
+/LucidaSans cp /FontLucida rn
+/LucidaSans-Bold cp /FontLucidaBold rn
+/LucidaSans-Italic cp /FontLucidaItalic rn
+/LucidaSans-BoldItalic cp /FontLucidaBoldItalic rn
+/Helvetica cp /FontHelvetica rn
+/Helvetica-Bold cp /FontHelveticaBold rn
+/Helvetica-Oblique cp /FontHelveticaItalic rn
+/Helvetica-BoldOblique cp /FontHelveticaBoldItalic rn
+
+% Define fonts
+/font_times_normal { /FontTimes sf } def
+/font_times_bold { /FontTimesBold sf } def
+/font_times_italic { /FontTimesItalic sf } def
+/font_times_bold_italic { /FontTimesBoldItalic sf } def
+/font_helvetica_normal { /FontHelveticaNarrow sf } def
+/font_helvetica_bold { /FontHelveticaNarrowBold sf } def
+/font_helvetica_italic { /FontHelveticaNarrowItalic sf } def
+/font_helvetica_bold_italic { /FontHelveticaNarrowBoldItalic sf } def
+/font_courier_normal { /FontCourier sf } def
+/font_courier_bold { /FontCourierBold sf } def
+/font_courier_italic { /FontCourierItalic sf } def
+/font_courier_bold_italic { /FontCourierBoldItalic sf } def
+
+% Special case: use font Helvetica, if Lucida is not supported
+/font_lucida_normal
+{ /LucidaSans dup FontDirectory exch known
+  { /FontLucida sf } { /FontHelvetica sf } ifelse pop
+} def
+/font_lucida_bold 
+{ /LucidaSans-Bold dup FontDirectory exch known
+  { /FontLucidaBold sf } { /FontHelveticaBold sf } ifelse pop
+} def
+/font_lucida_italic 
+{ /LucidaSans-Italic dup FontDirectory exch known
+  { /FontLucidaItalic sf } { /FontHelveticaItalic sf } ifelse pop
+} def
+/font_lucida_bold_italic 
+{ /LucidaSans-BoldItalic dup FontDirectory exch known
+  { /FontLucidaBoldItalic sf } { /FontHelveticaBoldItalic sf } ifelse pop
+} def
+
+/white {1 1 1 setrgbcolor} def
+/black {0 0 0 setrgbcolor} def
+
+/solid { } bind def
+/dotted { [1 2] 1 setdash} bind def
+/dashed { [4 8] 0 setdash} bind def
+
+/rectangle % OriginX OriginY Width Height
+{ newpath
+  3 index 3 index moveto % OriginX/OriginY
+  1 index 0 rlineto % OriginX+Width/OriginY
+  0 1 index neg rlineto % OriginX+Width/OriginY+Height
+  exch neg 0 rlineto % OriginX/OriginY+Height
+  0 exch rlineto % OriginX/OriginY
+  closepath pop pop
+} def
+/draw_rectangle { gsave rectangle stroke grestore} def
+/fill_rectangle { gsave rectangle fill grestore} def
+
+/circle % OriginX OriginY 2*Radius
+{ newpath
+  2 index 1 index 2 div add 2 index 2 index 2 div sub % CenterX/CenterY
+  2 index 2 div 0 360 arc
+  closepath pop pop pop
+} def
+/draw_circle { gsave circle stroke grestore} def
+/fill_circle { gsave circle fill grestore} def
+
+/ellipse % OriginX OriginY Width Height
+{ newpath
+  3 index 3 index 2 index 0.5 mul sub moveto % OriginX/OriginY-(Height/2)
+  3 index 3 index 2 index 0.14 mul add % OriginX/OriginY+(Height*0.14)
+  5 index 4 index add 5 index 4 index 0.14 mul add % OriginX+Width/OriginY+(Height*0.14)
+  7 index 6 index add 7 index 6 index 0.5 mul sub curveto % OriginX+Width/OriginY-(Height/2)
+  3 index 2 index add 3 index 2 index 1.14 mul sub % OriginX+Width/OriginY-(Height*1.14)
+  5 index 5 index 4 index 1.14 mul sub % OriginX/OriginY-(Height*1.14)
+  7 index 7 index 6 index 0.5 mul sub curveto % OriginX/OriginY-(Height/2)
+  closepath pop pop pop pop
+} def
+/draw_ellipse {gsave ellipse stroke grestore} def
+/fill_ellipse {gsave ellipse fill grestore} def
+
+/rhombus % OriginX OriginY Width Height
+{ newpath
+  3 index 2 index 2 div add 3 index moveto % OriginX+(Width/2)/OriginY
+  1 index 2 div 1 index 2 div neg rlineto % OriginX+Width/OriginY-(Height/2)
+  1 index 2 div neg 1 index 2 div neg rlineto % OriginX+(Width/2)/OriginY-Height
+  1 index 2 div neg 1 index 2 div rlineto % OriginX/OriginY-(Height/2)
+  closepath pop pop pop pop
+} def
+/draw_rhombus {gsave rhombus stroke grestore} def
+/fill_rhombus {gsave rhombus fill grestore} def
+
+/draw_string % String CenterX CenterY
+{ gsave moveto show grestore
+} def
+
+/draw_centered_string % String CenterX CenterY
+{ gsave newpath 
+	exch 2 index stringwidth pop 2 div sub exch 
+	moveto show grestore
+} def
+
+/draw_line % StartX StartY EndX EndX
+{ gsave newpath 3 index 3 index moveto lineto closepath pop pop 
+	stroke grestore
+} def
+
+/draw_arrow % HeadX HeadY Point1X Point1Y Point2X Point2Y
+{ gsave newpath moveto lineto lineto closepath fill grestore} def
+
+/draw_selfref_circle % OriginX OriginY 2*Radius
+{ gsave newpath
+  2 index 1 index 2 div add 2 index 2 index 2 div sub % CenterX/CenterY
+  2 index 2 div 45 360 arc
+  pop pop pop stroke grestore
+} def
+
+/draw_selfref_circle_horizontal % OriginX OriginY 2*Radius
+{ gsave newpath
+  2 index 1 index 2 div add 2 index 2 index 2 div sub % CenterX/CenterY
+  2 index 2 div 135 450 arc
+  pop pop pop stroke grestore
+} def
+
+/readstring {
+  currentfile exch readhexstring pop  
+} bind def
+/picstr 1 string def
+
+/daVinci_logo
+{ /ZapfChancery-MediumItalic findfont 10 scalefont setfont
+  (daVinci) show
+  4 0 rmoveto /Helvetica findfont 8 scalefont setfont (V2.0.1) show} def
+
+%%EndProlog
+
+%%BeginSetup
+%%IncludeResource:
+%%+ font LucidaSans
+%%+ font LucidaSans-Bold
+%%+ font LucidaSans-Italic
+%%+ font LucidaSans-BoldItalic
+%%+ font Times-Roman
+%%+ font Times-Bold
+%%+ font Times-Italic
+%%+ font Times-BoldItalic
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Helvetica-Oblique
+%%+ font Helvetica-BoldOblique
+%%+ font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%+ font ZapfChancery-MediumItalic
+%%EndSetup
+
+%%Page: 1 1
+
+gsave 20 15 moveto 90 rotate daVinci_logo grestore
+25 dup translate
+0.1000 dup scale
+
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1714 20982 1709 20996 1719 20996 draw_arrow 1714 21062 1714 20996 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1991 20557 1978 20562 1984 20570 draw_arrow 1832 20701 1981 20566 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  2005 20455 2000 20469 2010 20469 draw_arrow 2005 20530 2005 20469 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1694 20261 1703 20272 1708 20263 draw_arrow 1955 20402 1706 20267 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1423 19829 1418 19843 1428 19843 draw_arrow 1423 19909 1423 19843 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1717 19359 1704 19364 1711 19372 draw_arrow 1554 19510 1707 19368 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1730 19206 1725 19220 1735 19220 draw_arrow 1730 19332 1730 19220 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1374 18628 1383 18639 1388 18630 draw_arrow 1730 18819 1386 18634 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1730 18958 1730 18819 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1343 18260 1333 18270 1341 18274 draw_arrow 1278 18382 1337 18272 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1349 18158 1344 18172 1354 18172 draw_arrow 1349 18233 1349 18172 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1128 18055 1139 18064 1142 18055 draw_arrow 1321 18135 1140 18060 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1047 17907 1042 17921 1052 17921 draw_arrow 1047 17987 1047 17921 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1192 17437 1182 17447 1190 17451 draw_arrow 1127 17559 1186 17449 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1198 17335 1193 17349 1203 17349 draw_arrow 1198 17410 1198 17349 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1007 16747 1009 16761 1017 16757 draw_arrow 1083 16892 1013 16759 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1185 16177 1173 16184 1181 16191 draw_arrow 1050 16342 1177 16187 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1195 16075 1190 16089 1200 16089 draw_arrow 1195 16150 1195 16089 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1195 15522 1190 15536 1200 15536 draw_arrow 1195 15602 1195 15536 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1478 15097 1465 15102 1471 15110 draw_arrow 1314 15242 1468 15106 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1492 14995 1487 15009 1497 15009 draw_arrow 1492 15070 1492 15009 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1769 14570 1756 14575 1762 14583 draw_arrow 1610 14714 1759 14579 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1783 14468 1778 14482 1788 14482 draw_arrow 1783 14543 1783 14482 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  963 13884 974 13893 977 13884 draw_arrow 1512 14108 975 13889 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  642 13752 652 13762 656 13752 draw_arrow 835 13833 654 13757 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  597 13634 592 13648 602 13648 draw_arrow 597 13714 597 13648 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 1472 632 1222 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 1776 848 1472 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 2059 848 1776 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 2302 848 2059 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 2565 848 2302 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 3102 848 2565 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 3490 848 3102 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 3605 848 3490 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 3868 848 3605 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 4270 848 3868 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 4562 848 4270 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 4749 848 4562 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 4879 848 4749 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 5142 848 4879 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 5476 848 5142 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 6457 848 5476 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 7367 848 6457 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 7630 848 7367 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 8677 848 7630 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 9657 848 8677 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 9855 848 9657 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 10118 848 9855 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 10790 848 10118 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 11523 848 10790 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 11848 848 11523 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 12111 848 11848 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 12655 848 12111 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 13033 848 12655 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  848 13296 848 13033 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  632 13551 644 13544 637 13538 draw_arrow 641 13541 848 13296 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  600 1222 43 27 fill_rectangle
+black (THEN) 621 1204 draw_centered_string
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  446 13413 451 13426 458 13420 draw_arrow 562 13551 455 13423 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  506 13046 495 13055 503 13060 draw_arrow 428 13168 499 13057 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  514 12944 509 12958 519 12958 draw_arrow 514 13019 514 12958 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  514 12286 509 12300 519 12300 draw_arrow 514 12366 514 12300 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  582 11861 574 11873 583 11875 draw_arrow 554 11960 579 11874 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  574 11759 571 11773 580 11772 draw_arrow 584 11834 575 11772 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  449 11206 449 11220 457 11217 draw_arrow 474 11286 453 11219 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  323 10293 318 10307 328 10307 draw_arrow 323 10373 323 10307 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  391 9868 383 9880 392 9882 draw_arrow 363 9967 388 9881 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  463 9766 451 9773 459 9780 draw_arrow 404 9841 455 9777 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  516 9468 514 9482 523 9480 draw_arrow 530 9548 518 9481 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  395 7805 390 7819 400 7819 draw_arrow 395 7885 395 7819 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  463 7380 455 7392 464 7394 draw_arrow 435 7479 460 7393 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  474 7278 468 7291 477 7292 draw_arrow 467 7353 473 7291 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  407 5555 405 5569 414 5568 draw_arrow 420 5635 409 5568 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  395 5317 390 5331 400 5331 draw_arrow 395 5397 395 5331 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  463 4892 455 4904 464 4906 draw_arrow 435 4991 460 4905 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  521 4790 510 4799 518 4804 draw_arrow 474 4865 514 4801 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  447 4626 451 4640 459 4633 draw_arrow 513 4707 455 4636 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  395 4416 390 4430 400 4430 draw_arrow 395 4496 395 4430 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  395 4043 390 4057 400 4057 draw_arrow 395 4123 395 4057 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  463 3618 455 3630 464 3632 draw_arrow 435 3717 460 3631 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  528 3516 516 3524 525 3530 draw_arrow 475 3591 520 3527 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  504 3383 504 3397 513 3394 draw_arrow 536 3463 509 3395 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  395 2740 390 2754 400 2754 draw_arrow 395 2820 395 2754 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  463 2315 455 2327 464 2329 draw_arrow 435 2414 460 2328 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  496 2213 487 2224 496 2227 draw_arrow 470 2288 492 2226 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  421 1825 423 1839 432 1834 draw_arrow 464 1905 427 1837 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  395 1647 390 1661 400 1661 draw_arrow 395 1727 395 1661 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  395 1222 390 1236 400 1236 draw_arrow 395 1297 395 1236 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  395 1121 390 1135 400 1135 draw_arrow 395 1195 395 1135 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  395 1033 390 1047 400 1047 draw_arrow 395 1113 395 1047 draw_line
+1 setlinewidth grestore
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  124 1033 542 1013 fill_rectangle
+black 124 1033 542 1013 draw_rectangle
+(      WRITE \(6, 1010\) TXXXIN, TXXOUT, TXXRCS, TXXCSR, TXSCSC, TXACAC    0615) 129 1018 draw_string
+(     &, TFTVMT, TXSHUF, TUSHUF, TXPRNT, TXLOG2                          0615) 129 1003 draw_string
+(      WRITE \(6, 1012\) EXXRCS, EXXCSR, EXSCSC, EXACAC, EFTVMT            0616) 129 988 draw_string
+(      WRITE \(6, 1020\) NXXXIN, NXXOUT, NXXRCS, NXXCSR, NXSCSC, NXACAC    0617) 129 973 draw_string
+(     &, NFTVMT, NXSHUF, NUSHUF, NXPRNT, NXLOG2                          0617) 129 958 draw_string
+(C                                                                       ) 129 943 draw_string
+(      CALL BUG\('AFTER  ALL'\)                                            0618) 129 928 draw_string
+(1010  FORMAT\(/2X,'SUBROUTINE    IN, EX-TIME FOR FIRST CALL =',1PE13.6,' ) 129 913 draw_string
+(     &SECONDS'/2X,'SUBROUTINE   OUT, EX-TIME FOR FIRST CALL =',1PE13.6/2) 129 898 draw_string
+(     &X,'SUBROUTINE   RCS, EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUT) 129 883 draw_string
+(     &INE   CSR, EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUTINE  SCSC,) 129 868 draw_string
+(     & EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUTINE  ACAC, EX-TIME F) 129 853 draw_string
+(     &OR FIRST CALL =',1PE13.6/2X,'SUBROUTINE FTRVMT EX-TIME FOR FIRST C) 129 838 draw_string
+(     &ALL =',1PE13.6/2X,'SUBROUTINE  SHUF, EX-TIME FOR FIRST CALL =',1PE) 129 823 draw_string
+(     &13.6/2X,'SUBROUTINE UNSHUF EX-TIME FOR FIRST CALL =',1PE13.6/2X,'S) 129 808 draw_string
+(     &UBROUTINE RPRINT EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUTINE ) 129 793 draw_string
+(     &XLOG2, EX-TIME FOR FIRST CALL =',1PE13.6\)                         0619) 129 778 draw_string
+(1012  FORMAT\(/2X,'SUBROUTINE   RCS, EX-TIME LAST TIMESTEP  =',1PE13.6,' ) 129 763 draw_string
+(     &SECONDS'/2X,'SUBROUTINE   CSR, EX-TIME LAST TIMESTEP  =',1PE13.6/2) 129 748 draw_string
+(     &X,'SUBROUTINE  SCSC, EX-TIME LAST TIMESTEP  =',1PE13.6/2X,'SUBROUT) 129 733 draw_string
+(     &INE  ACAC, EX-TIME LAST TIMESTEP  =',1PE13.6/2X,'SUBROUTINE FTRVMT) 129 718 draw_string
+(     & EX-TIME LAST TIMESTEP  =',1PE13.6\)                               0620) 129 703 draw_string
+(1020  FORMAT\(/2X,'SUBROUTINE    IN, CUMULATIVE CALLS TO    =',I12/2X,'SU) 129 688 draw_string
+(     &BROUTINE   OUT, CUMULATIVE CALLS TO    =',I12/2X,'SUBROUTINE   RCS) 129 673 draw_string
+(     &, CUMULATIVE CALLS TO    =',I12/2X,'SUBROUTINE   CSR, CUMULATIVE C) 129 658 draw_string
+(     &ALLS TO    =',I12/2X,'SUBROUTINE  SCSC, CUMULATIVE CALLS TO    =',) 129 643 draw_string
+(     &I12/2X,'SUBROUTINE  ACAC, CUMULATIVE CALLS TO    =',I12/2X,'SUBROU) 129 628 draw_string
+(     &TINE FTRVMT CUMULATIVE CALLS TO    =',I12/2X,'SUBROUTINE  SHUF, CU) 129 613 draw_string
+(     &MULATIVE CALLS TO    =',I12/2X,'SUBROUTINE UNSHUF CUMULATIVE CALLS) 129 598 draw_string
+(     & TO    =',I12/2X,'SUBROUTINE RPRINT CUMULATIVE CALLS TO    =',I12/) 129 583 draw_string
+(     &2X,'SUBROUTINE XLOG2, CUMULATIVE CALLS TO    =',I12\)              0621) 129 568 draw_string
+(C                                                                       ) 129 553 draw_string
+(      CALL CPUTIM\(CPU2\)                                                 0622) 129 538 draw_string
+(      CALL ELAPSE\(TCLCK2\)                                               0623) 129 523 draw_string
+(C                                                                       ) 129 508 draw_string
+(      TWALL = MOD\(TCLCK2-TCLCK1+1000000.0, 1000000.0\)                   0624) 129 493 draw_string
+(      WRITE \(6, 1040\) TWALL                                             0625) 129 478 draw_string
+(1040  FORMAT\(/2X,'MEASURE OF WALL-CLOCK TIME \(ENVIRONMENT SENSITIVE\)'/2X) 129 463 draw_string
+(     &,'FOR EXECUTION ONLY =',1PE13.6,1X,'SECONDS'\)                     0626) 129 448 draw_string
+(      WRITE \(1, *\)                                                      0627) 129 433 draw_string
+(      WRITE \(1, *\) 'ELAPSED CPU TIME IN SECONDS: ', CPU2-CPU1           0628) 129 418 draw_string
+(C MFLOPS RATE = MFLOP 1 CPU CRAY X-MP/CPU TIME                          ) 129 403 draw_string
+(      WRITE \(1, *\) 'MFLOPS RATE: ', 1657.863/\(CPU2-CPU1\)                0629) 129 388 draw_string
+(      WRITE \(1, *\) 'ELAPSED WALLCLOCK TIME IN SECONDS: ', TWALL         0630) 129 373 draw_string
+(      WRITE \(1, 9992\)                                                   0631) 129 358 draw_string
+(      WRITE \(1, 9995\) \(CDAT\(I\), I = 1, 15\)                              0632) 129 343 draw_string
+(      VALID = 1                                                         0633) 129 328 draw_string
+(      DO 7 I = 1, 15                                                    0634) 129 313 draw_string
+(         IF \(I.EQ.3.OR.I.EQ.13\) THEN                                    0635) 129 298 draw_string
+(            IF \(ABS\(CDAT\(I\)\).GT.ABS\(VDAT\(I\)\)\) VALID = 0                 0636) 129 283 draw_string
+(         ELSEIF \(ABS\(VDAT\(I\)-CDAT\(I\)\).GT.ABS\(.01*VDAT\(I\)\)\) THEN         0635) 129 268 draw_string
+(            VALID = 0                                                   0639) 129 253 draw_string
+(         ENDIF) 129 238 draw_string
+(7        CONTINUE                                                       0640) 129 223 draw_string
+(C                                                                       ) 129 208 draw_string
+(      IF \(VALID.EQ.1\) THEN                                              0641) 129 193 draw_string
+(         WRITE \(1, 9993\)                                                0642) 129 178 draw_string
+(      ELSE) 129 163 draw_string
+(         WRITE \(1, 9994\)                                                0643) 129 148 draw_string
+(      ENDIF) 129 133 draw_string
+(C                                                                       ) 129 118 draw_string
+(9992  FORMAT\(/1X,'VALIDATION PARAMETERS:'/\)                             0644) 129 103 draw_string
+(9993  FORMAT\(//1X,'RESULTS FOR THIS RUN ARE:   VALID'\)                  0645) 129 88 draw_string
+(9994  FORMAT\(//1X,'RESULTS FOR THIS RUN ARE: INVALID'\)                  0646) 129 73 draw_string
+(9995  FORMAT\(5E15.5\)                                                    0647) 129 58 draw_string
+(      STOP                                                              0648) 129 43 draw_string
+(      END) 129 28 draw_string
+
+font_courier_bold
+ 0.90 0.90 0.90 setrgbcolor  388 1120 14 7 fill_ellipse
+black 388 1120 14 7 draw_ellipse
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  375 1222 41 27 fill_rectangle
+black (ELSE) 395 1204 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  610 1222 598 1229 605 1235 draw_arrow 495 1356 601 1232 draw_line
+1 setlinewidth grestore
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  92 1647 606 350 fill_rhombus
+black 92 1647 606 350 draw_rhombus
+(      IF \(NUMBER.GE.NSTEPS\) THEN                                        0613) 129 1476 draw_string
+(      ENDIF) 129 1461 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  124 1825 542 98 fill_rectangle
+black 124 1825 542 98 draw_rectangle
+(C                                                                       ) 129 1810 draw_string
+(C AT LAST, THE END OF THE TIME STEP:                                    ) 129 1795 draw_string
+(C                                                                       ) 129 1780 draw_string
+(501   DTT = DT+DT                                                       0610) 129 1765 draw_string
+(      T = T+DT                                                          0611) 129 1750 draw_string
+(      NSTEPS = NSTEPS+1                                                 0612) 129 1735 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  275 2213 542 308 fill_rectangle
+black 275 2213 542 308 draw_rectangle
+(C                                                                       ) 280 2198 draw_string
+(C UPDATE TEMPERATURE:                                                   ) 280 2183 draw_string
+(C                                                                       ) 280 2168 draw_string
+(      IF \(NOALS.EQ.1\) CALL IN\(EVAL, LEIG, NWEIG\)                        0594) 280 2153 draw_string
+(      KTN = LTN                                                         0596) 280 2138 draw_string
+(      F1 = RKAPA*DTT                                                    0597) 280 2123 draw_string
+(      DO 500 J = 1, N1H                                                 0598) 280 2108 draw_string
+(         CALL IN\(CWORK, KTN, N2PD\)                                      0599) 280 2093 draw_string
+(         F = REAL\(\(J-1\)*\(J-1\)\)*FXSQ                                     0600) 280 2078 draw_string
+(         DO 490 I = 2, N2                                               0601) 280 2063 draw_string
+(            CWORK\(I\) = CWORK\(I\)*F2/\(1.0-F1*\(EVAL\(I-1\)-F\)\)               0602) 280 2048 draw_string
+(490         CONTINUE                                                    0603) 280 2033 draw_string
+(         CWORK\(1\) = CWORK\(1\)*F2/\(1.0+F1*F\)                              0604) 280 2018 draw_string
+(         CWORK\(N2P\) = 0.0                                               0605) 280 2003 draw_string
+(         CALL OUT\(CWORK, KTN, N2PD\)                                     0606) 280 1988 draw_string
+(500      KTN = KTN+N2PD                                                 0607) 280 1973 draw_string
+(C                                                                       ) 280 1958 draw_string
+(C DE-ALIASE IF REQUESTED:                                               ) 280 1943 draw_string
+(C                                                                       ) 280 1928 draw_string
+(      IF \(NOALS.EQ.1\) CALL DEALSE\(CA, N2P, N1H, LTN\)                    0608) 280 1913 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  446 2315 41 27 fill_rectangle
+black (ELSE) 466 2297 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  395 2315 390 2329 400 2329 draw_arrow 395 2390 395 2329 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  369 1825 358 1834 367 1839 draw_arrow 244 2059 363 1837 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  387 2288 244 2059 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  374 2315 43 27 fill_rectangle
+black (THEN) 395 2297 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  92 2740 606 350 fill_rhombus
+black 92 2740 606 350 draw_rhombus
+(      IF \(NOTEMP.EQ.1\) THEN                                             0592) 129 2569 draw_string
+(      ENDIF) 129 2554 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  124 3383 542 563 fill_rectangle
+black 124 3383 542 563 draw_rectangle
+(461   KZN = LZN                                                         0561) 129 3368 draw_string
+(      KPN = LPN                                                         0562) 129 3353 draw_string
+(      F2 = 1./\(4.*REAL\(N2\)\)                                             0563) 129 3338 draw_string
+(      F1 = RNU*DTT                                                      0564) 129 3323 draw_string
+(C                                                                       ) 129 3308 draw_string
+(C FIND PRESSURE NOW OR NEVER \(IF REQUIRED...\)                           ) 129 3293 draw_string
+(C                                                                       ) 129 3278 draw_string
+(      CALL IN\(EVAL, LEIG, NWEIG\)                                        0565) 129 3263 draw_string
+(      LVECT = N2M                                                       0566) 129 3248 draw_string
+(      LSKIP = 2                                                         0567) 129 3233 draw_string
+(      NVECT = 2                                                         0568) 129 3218 draw_string
+(      NVSKIP = 1                                                        0569) 129 3203 draw_string
+(      FXSQ = FX*FX                                                      0570) 129 3188 draw_string
+(C                                                                       ) 129 3173 draw_string
+(C UPDATE VORTICITY AND FIND THE NEW STREAMFUNCTION:                     ) 129 3158 draw_string
+(C                                                                       ) 129 3143 draw_string
+(      DO 480 J = 1, N1H                                                 0571) 129 3128 draw_string
+(         CALL IN\(CWORK, KZN, N2PD\)                                      0572) 129 3113 draw_string
+(         F = REAL\(\(J-1\)*\(J-1\)\)*FXSQ                                     0573) 129 3098 draw_string
+(         DO 470 I = 2, N2                                               0574) 129 3083 draw_string
+(            CWORK\(I\) = CWORK\(I\)*F2/\(1.0-F1*\(EVAL\(I-1\)-F\)\)               0575) 129 3068 draw_string
+(            CWORK2\(I\) = CWORK\(I\)/\(EVAL\(I-1\)-F\)                          0576) 129 3053 draw_string
+(470         CONTINUE                                                    0577) 129 3038 draw_string
+(         CWORK\(1\) = CWORK\(1\)*F2/\(1.0+F1*F\)                              0578) 129 3023 draw_string
+(         CWORK2\(1\) = 0.0                                                0579) 129 3008 draw_string
+(         IF \(F.NE.0.0\) CWORK2\(1\) = -CWORK\(1\)/F                          0580) 129 2993 draw_string
+(         CWORK\(N2P\) = 0.0                                               0582) 129 2978 draw_string
+(         CWORK2\(N2P\) = 0.0                                              0583) 129 2963 draw_string
+(         CALL OUT\(CWORK, KZN, N2PD\)                                     0584) 129 2948 draw_string
+(         CALL OUT\(CWORK2, KPN, N2PD\)                                    0585) 129 2933 draw_string
+(         KPN = KPN+N2PD                                                 0586) 129 2918 draw_string
+(480      KZN = KZN+N2PD                                                 0587) 129 2903 draw_string
+(C                                                                       ) 129 2888 draw_string
+(C DE-ALIASE UPDATED FIELDS IF REQUESTED:                                ) 129 2873 draw_string
+(C                                                                       ) 129 2858 draw_string
+(      IF \(NOALS.EQ.1\) CALL DEALSE\(CA, N2P, N1H, LZN\)                    0588) 129 2843 draw_string
+(      IF \(NOALS.EQ.1\) CALL DEALSE\(CA, N2P, N1H, LPN\)                    0590) 129 2828 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  275 3516 542 53 fill_rectangle
+black 275 3516 542 53 draw_rectangle
+(      CALL IN\(A, LTN, NW\)                                               0558) 280 3501 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0559) 280 3486 draw_string
+(      CALL OUT\(A, LTN, NW\)                                              0560) 280 3471 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  446 3618 41 27 fill_rectangle
+black (ELSE) 466 3600 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  395 3618 390 3632 400 3632 draw_arrow 395 3693 395 3632 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  286 3383 277 3394 286 3397 draw_arrow 244 3490 281 3396 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  377 3591 244 3490 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  374 3618 43 27 fill_rectangle
+black (THEN) 395 3600 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  92 4043 606 350 fill_rhombus
+black 92 4043 606 350 draw_rhombus
+(      IF \(NOTEMP.EQ.1\) THEN                                             0556) 129 3872 draw_string
+(      ENDIF) 129 3857 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  124 4416 542 293 fill_rectangle
+black 124 4416 542 293 draw_rectangle
+(            DO 450 I = 1, N2P                                           0537) 129 4401 draw_string
+(               WORK\(I\) = F*U\(I\)                                         0538) 129 4386 draw_string
+(               CA\(I,K2QJ\) = CMPLX\(1.0, -WORK\(I\)\)*CA\(I,K2QJ\)/\(1.0+WORK   0539) 129 4371 draw_string
+(     &         \(I\)*WORK\(I\)\)                                             0539) 129 4356 draw_string
+(450            CONTINUE                                                 0540) 129 4341 draw_string
+(         IF \(NOTEMP.NE.1\) CALL OUT\(CA, KTN, NWH\)                        0541) 129 4326 draw_string
+(         CALL OUT\(CA\(1,K2Q\), KZN, NWH\)                                  0543) 129 4311 draw_string
+(         KTN = KTN+NWH                                                  0544) 129 4296 draw_string
+(460      KZN = KZN+NWH                                                  0545) 129 4281 draw_string
+(      NPTS = 2*N2                                                       0546) 129 4266 draw_string
+(      NSKIP = 1                                                         0547) 129 4251 draw_string
+(      MTRN = N1H                                                        0548) 129 4236 draw_string
+(      MSKIP = N2P                                                       0549) 129 4221 draw_string
+(      ISIGN = -1                                                        0550) 129 4206 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0551) 129 4191 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0552) 129 4176 draw_string
+(      CALL IN\(A, LZN, NW\)                                               0553) 129 4161 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0554) 129 4146 draw_string
+(      CALL OUT\(A, LZN, NW\)                                              0555) 129 4131 draw_string
+
+font_courier_bold
+ 0.90 0.90 0.90 setrgbcolor  112 4627 566 131 fill_ellipse
+black 112 4627 566 131 draw_ellipse
+(449         CONTINUE                                                    0536) 395 4558 draw_centered_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  275 4790 542 83 fill_rectangle
+black 275 4790 542 83 draw_rectangle
+(            DO 448 I = 1, N2P                                           0532) 280 4775 draw_string
+(               WORK\(I\) = F*U\(I\)                                         0533) 280 4760 draw_string
+(               CA\(I,J\) = CMPLX\(1.0, -WORK\(I\)\)*CA\(I,J\)/\(1.0+WORK\(I\)*     0534) 280 4745 draw_string
+(     &         WORK\(I\)\)                                                 0534) 280 4730 draw_string
+(448            CONTINUE                                                 0535) 280 4715 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  446 4892 41 27 fill_rectangle
+black (ELSE) 466 4874 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  395 4892 390 4906 400 4906 draw_arrow 395 4967 395 4906 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  343 4626 331 4633 339 4640 draw_arrow 244 4749 335 4636 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  379 4865 244 4749 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  374 4892 43 27 fill_rectangle
+black (THEN) 395 4874 draw_centered_string
+
+font_courier_bold
+ 0.68 1.00 0.85 setrgbcolor  92 5317 606 350 fill_rhombus
+black 92 5317 606 350 draw_rhombus
+(            IF \(NOTEMP.EQ.1\) THEN                                       0530) 129 5146 draw_string
+(            ENDIF) 129 5131 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  124 5555 542 158 fill_rectangle
+black 124 5555 542 158 draw_rectangle
+(441   DTF = 0.25*DTT*FX                                                 0519) 129 5540 draw_string
+(      F = -DTF                                                          0520) 129 5525 draw_string
+(      KZN = LZN                                                         0521) 129 5510 draw_string
+(      KTN = LTN                                                         0522) 129 5495 draw_string
+(      DO 460 K = 1, 2                                                   0523) 129 5480 draw_string
+(         IF \(NOTEMP.NE.1\) CALL IN\(CA, KTN, NWH\)                         0524) 129 5465 draw_string
+(         CALL IN\(CA\(1,K2Q\), KZN, NWH\)                                   0526) 129 5450 draw_string
+(         DO 450 J = 1, N1Q                                              0527) 129 5435 draw_string
+(            K2QJ = J+K2QM                                               0528) 129 5420 draw_string
+(            F = F+DTF                                                   0529) 129 5405 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  275 7278 542 1643 fill_rectangle
+black 275 7278 542 1643 draw_rectangle
+(C                                                                       ) 280 7263 draw_string
+(C FIND DT/DY:                                                           ) 280 7248 draw_string
+(C                                                                       ) 280 7233 draw_string
+(      NPTS = 2*N2                                                       0421) 280 7218 draw_string
+(      NSKIP = 1                                                         0422) 280 7203 draw_string
+(      MTRN = N1H                                                        0423) 280 7188 draw_string
+(      MSKIP = N2P                                                       0424) 280 7173 draw_string
+(      ISIGN = 1                                                         0425) 280 7158 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0426) 280 7143 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0427) 280 7128 draw_string
+(      CALL IN\(CA, LTN, NW\)                                              0428) 280 7113 draw_string
+(      F = 0.                                                            0429) 280 7098 draw_string
+(      DO 380 I = 1, N2                                                  0430) 280 7083 draw_string
+(         DO 370 J = 1, N1H                                              0431) 280 7068 draw_string
+(370         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0432) 280 7053 draw_string
+(380      F = F+1.                                                       0433) 280 7038 draw_string
+(      DO 385 J = 1, N1H                                                 0434) 280 7023 draw_string
+(385      CA\(N2P,J\) = 0.                                                 0435) 280 7008 draw_string
+(      CALL SCSC\(CA, EX, WORK\)                                           0436) 280 6993 draw_string
+(      CALL OUT\(CA, LZY, NW\)                                             0437) 280 6978 draw_string
+(      CALL IN\(CA, LTN, NW\)                                              0438) 280 6963 draw_string
+(      CALL ACAC\(CA, EX, WORK\)                                           0439) 280 6948 draw_string
+(      CALL OUT\(CA, LTN, NW\)                                             0440) 280 6933 draw_string
+(      NPTS = N1                                                         0441) 280 6918 draw_string
+(      NSKIP = N2P                                                       0442) 280 6903 draw_string
+(      MTRN = N2P                                                        0443) 280 6888 draw_string
+(      MSKIP = 1                                                         0444) 280 6873 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0445) 280 6858 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0446) 280 6843 draw_string
+(      IF \(NSTEPS.EQ.1\) THEN                                             0447) 280 6828 draw_string
+(         CALL TEMPHY\(A, N2PD, N1H, EX, WORK, 0\)                         0448) 280 6813 draw_string
+(      ELSEIF \(MOD\(NSTEPS, KTP\).EQ.1.OR.MOD\(NSTEPS, KPP\).EQ.1\) THEN      0447) 280 6798 draw_string
+(         CALL TEMPHY\(A, N2PD, N1H, EX, WORK, -1\)                        0450) 280 6783 draw_string
+(      ENDIF) 280 6768 draw_string
+(C                                                                       ) 280 6753 draw_string
+(C TEMPERATURE INFLUENCE:                                                ) 280 6738 draw_string
+(C                                                                       ) 280 6723 draw_string
+(      F = -FX                                                           0451) 280 6708 draw_string
+(      KZN = LZN                                                         0452) 280 6693 draw_string
+(      KZX = LZX                                                         0453) 280 6678 draw_string
+(      KTN = LTN                                                         0454) 280 6663 draw_string
+(      DTA = 0.5*ALPHA*DTT                                               0455) 280 6648 draw_string
+(      DO 400 K = 1, 2                                                   0456) 280 6633 draw_string
+(         CALL IN\(CA, KZN, NWH\)                                          0457) 280 6618 draw_string
+(         CALL IN\(CA\(1,K2Q\), KTN, NWH\)                                   0458) 280 6603 draw_string
+(         DO 390 J = 1, N1Q                                              0459) 280 6588 draw_string
+(            K2QJ = J+K2QM                                               0460) 280 6573 draw_string
+(            F = F+FX                                                    0461) 280 6558 draw_string
+(            DO 390 I = 1, N2P                                           0462) 280 6543 draw_string
+(               CA\(I,K2QJ\) = CMPLX\(-F*AIMAG\(CA\(I,K2QJ\)\), F*REAL\(CA\(I,    0463) 280 6528 draw_string
+(     &         K2QJ\)\)\)                                                  0463) 280 6513 draw_string
+(390            CA\(I,J\) = CA\(I,J\)+DTA*CA\(I,K2QJ\)                         0464) 280 6498 draw_string
+(         CALL OUT\(CA, KZN, NWH\)                                         0465) 280 6483 draw_string
+(         CALL OUT\(CA\(1,K2Q\), KZX, NWH\)                                  0466) 280 6468 draw_string
+(         KZX = KZX+NWH                                                  0467) 280 6453 draw_string
+(         KTN = KTN+NWH                                                  0468) 280 6438 draw_string
+(400      KZN = KZN+NWH                                                  0469) 280 6423 draw_string
+(      CALL IN\(A, LZX, NW\)                                               0470) 280 6408 draw_string
+(      CALL CSR\(A, EX\)                                                   0471) 280 6393 draw_string
+(      CALL OUT\(A, LZX, NW\)                                              0472) 280 6378 draw_string
+(      CALL IN\(A, LZY, NW\)                                               0473) 280 6363 draw_string
+(      CALL CSR\(A, EX\)                                                   0474) 280 6348 draw_string
+(      CALL OUT\(A, LZY, NW\)                                              0475) 280 6333 draw_string
+(      KPN = LPN                                                         0476) 280 6318 draw_string
+(      KPY = LPY                                                         0477) 280 6303 draw_string
+(      KZX = LZX                                                         0478) 280 6288 draw_string
+(      KZY = LZY                                                         0479) 280 6273 draw_string
+(C                                                                       ) 280 6258 draw_string
+(C IN PHYSICAL SPACE - FIND  \(U,V\).GRAD\(T\):                              ) 280 6243 draw_string
+(C                                                                       ) 280 6228 draw_string
+(      DO 420 K = 1, 4                                                   0480) 280 6213 draw_string
+(         CALL IN\(A, KPY, NWQ\)                                           0481) 280 6198 draw_string
+(         CALL IN\(A\(1,K1Q\), KPN, NWQ\)                                    0482) 280 6183 draw_string
+(         CALL IN\(A\(1,K2Q\), KZY, NWQ\)                                    0483) 280 6168 draw_string
+(         CALL IN\(A\(1,K3Q\), KZX, NWQ\)                                    0484) 280 6153 draw_string
+(         DO 410 I = 1, N2PD                                             0485) 280 6138 draw_string
+(            IPH = \(I+1\)/2                                               0486) 280 6123 draw_string
+(            GG = G\(IPH\)                                                 0487) 280 6108 draw_string
+(            DO 410 J = 1, N1E                                           0488) 280 6093 draw_string
+(               A\(I,J\) = A\(I,J\)*A\(I,K3QM+J\)-A\(I,K1QM+J\)*A\(I,K2QM+J\)*GG   0489) 280 6078 draw_string
+(410            CONTINUE                                                 0490) 280 6063 draw_string
+(         CALL OUT\(A, KZY, NWQ\)                                          0491) 280 6048 draw_string
+(         KPN = KPN+NWQ                                                  0492) 280 6033 draw_string
+(         KPY = KPY+NWQ                                                  0493) 280 6018 draw_string
+(         KZX = KZX+NWQ                                                  0494) 280 6003 draw_string
+(420      KZY = KZY+NWQ                                                  0495) 280 5988 draw_string
+(      ISIGN = -1                                                        0496) 280 5973 draw_string
+(      CALL IN\(A, LZY, NW\)                                               0497) 280 5958 draw_string
+(      CALL RCS\(A, EX\)                                                   0498) 280 5943 draw_string
+(      CALL OUT\(A, LZY, NW\)                                              0499) 280 5928 draw_string
+(      KTN = LTN                                                         0500) 280 5913 draw_string
+(      KTO = LTO                                                         0501) 280 5898 draw_string
+(      KZY = LZY                                                         0502) 280 5883 draw_string
+(      DO 440 K = 1, 2                                                   0503) 280 5868 draw_string
+(         CALL IN\(CA, KTO, NWH\)                                          0504) 280 5853 draw_string
+(         CALL IN\(A\(1,K2Q\), KTN, NWH\)                                    0505) 280 5838 draw_string
+(         DO 425 J = K2Q, N1H                                            0506) 280 5823 draw_string
+(            DO 425 I = 1, N2PD                                          0507) 280 5808 draw_string
+(425            A\(I,J\) = 0.5*A\(I,J\)                                      0508) 280 5793 draw_string
+(         CALL OUT\(A\(1,K2Q\), KTO, NWH\)                                   0509) 280 5778 draw_string
+(         CALL IN\(CA\(1,K2Q\), KZY, NWH\)                                   0510) 280 5763 draw_string
+(         DO 430 J = 1, N1Q                                              0511) 280 5748 draw_string
+(            K2QJ = J+K2QM                                               0512) 280 5733 draw_string
+(            DO 430 I = 1, N2P                                           0513) 280 5718 draw_string
+(430            CA\(I,J\) = CA\(I,J\)+DTFAC*CA\(I,K2QJ\)                       0514) 280 5703 draw_string
+(         CALL OUT\(CA, KTN, NWH\)                                         0515) 280 5688 draw_string
+(         KTN = KTN+NWH                                                  0516) 280 5673 draw_string
+(         KTO = KTO+NWH                                                  0517) 280 5658 draw_string
+(440      KZY = KZY+NWH                                                  0518) 280 5643 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  446 7380 41 27 fill_rectangle
+black (ELSE) 466 7362 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  395 7380 390 7394 400 7394 draw_arrow 395 7455 395 7394 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  383 5555 376 5568 385 5569 draw_arrow 244 6457 381 5568 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  393 7353 244 6457 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  374 7380 43 27 fill_rectangle
+black (THEN) 395 7362 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  92 7805 606 350 fill_rhombus
+black 92 7805 606 350 draw_rhombus
+(      IF \(NOTEMP.EQ.1\) THEN                                             0419) 129 7634 draw_string
+(      ENDIF) 129 7619 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  124 9468 542 1583 fill_rectangle
+black 124 9468 542 1583 draw_rectangle
+(271   CALL IN\(CA, LZN, NW\)                                              0324) 129 9453 draw_string
+(C                                                                       ) 129 9438 draw_string
+(C FIND DZ/DY:                                                           ) 129 9423 draw_string
+(C                                                                       ) 129 9408 draw_string
+(      F = 0.                                                            0325) 129 9393 draw_string
+(      DO 290 I = 1, N2                                                  0326) 129 9378 draw_string
+(         DO 280 J = 1, N1H                                              0327) 129 9363 draw_string
+(280         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0328) 129 9348 draw_string
+(290      F = F+1.                                                       0329) 129 9333 draw_string
+(      DO 295 J = 1, N1H                                                 0330) 129 9318 draw_string
+(295      CA\(N2P,J\) = 0.                                                 0331) 129 9303 draw_string
+(      CALL SCSC\(CA, EX, WORK\)                                           0332) 129 9288 draw_string
+(      CALL OUT\(CA, LZY, NW\)                                             0333) 129 9273 draw_string
+(      CALL IN\(CA, LZN, NW\)                                              0334) 129 9258 draw_string
+(      CALL ACAC\(CA, EX, WORK\)                                           0335) 129 9243 draw_string
+(      DO 300 J = 1, N1H                                                 0336) 129 9228 draw_string
+(         DO 300 I = 1, N2P                                              0337) 129 9213 draw_string
+(300         CA\(I,J\) = CA\(I,J\)*0.5                                       0338) 129 9198 draw_string
+(      CALL OUT\(CA, LZN, NW\)                                             0339) 129 9183 draw_string
+(      NPTS = N1                                                         0340) 129 9168 draw_string
+(      NSKIP = N2P                                                       0341) 129 9153 draw_string
+(      MTRN = N2P                                                        0342) 129 9138 draw_string
+(      MSKIP = 1                                                         0343) 129 9123 draw_string
+(      ISIGN = 1                                                         0344) 129 9108 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0345) 129 9093 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0346) 129 9078 draw_string
+(      IF \(MOD\(NSTEPS, KZP\).EQ.1\) CALL ZETAPH\(CA, N2PD, N1H, EX, WORK    0347) 129 9063 draw_string
+(     &, -1\)                                                             0347) 129 9048 draw_string
+(      IF \(MOD\(NSTEPS, KZP\).EQ.1\) CALL IN\(CA, LZN, NW\)                   0349) 129 9033 draw_string
+(C                                                                       ) 129 9018 draw_string
+(C FIND DZ/DX:                                                           ) 129 9003 draw_string
+(C                                                                       ) 129 8988 draw_string
+(      F = 0.                                                            0351) 129 8973 draw_string
+(      DO 320 J = 1, N1H                                                 0352) 129 8958 draw_string
+(         DO 310 I = 1, N2P                                              0353) 129 8943 draw_string
+(310         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0354) 129 8928 draw_string
+(320      F = F+FX2                                                      0355) 129 8913 draw_string
+(      CALL CSR\(CA, EX\)                                                  0356) 129 8898 draw_string
+(      CALL OUT\(CA, LZX, NW\)                                             0357) 129 8883 draw_string
+(      CALL IN\(CA, LZY, NW\)                                              0358) 129 8868 draw_string
+(      CALL CSR\(CA, EX\)                                                  0359) 129 8853 draw_string
+(      CALL OUT\(CA, LZY, NW\)                                             0360) 129 8838 draw_string
+(      CALL IN\(CA, LPN, NW\)                                              0361) 129 8823 draw_string
+(      CALL CSR\(CA, EX\)                                                  0362) 129 8808 draw_string
+(      CALL OUT\(CA, LPN, NW\)                                             0363) 129 8793 draw_string
+(      CALL IN\(CA, LPY, NW\)                                              0364) 129 8778 draw_string
+(      CALL CSR\(CA, EX\)                                                  0365) 129 8763 draw_string
+(      CALL OUT\(CA, LPY, NW\)                                             0366) 129 8748 draw_string
+(C                                                                       ) 129 8733 draw_string
+(C WE ARE IN PHYSICAL SPACE NOW - FIND  \(U,V\).GRAD \(Z\):                  ) 129 8718 draw_string
+(C                                                                       ) 129 8703 draw_string
+(      IF \(MOD\(NSTEPS, KUP\).EQ.1\) CALL UVELPH\(A, N2PD, N1H, WORK, -1\)    0367) 129 8688 draw_string
+(      IF \(MOD\(NSTEPS, KVP\).EQ.1\) CALL VVELPH\(A, N2PD, N1H, WORK, -1\)    0369) 129 8673 draw_string
+(      KPY = LPY                                                         0371) 129 8658 draw_string
+(      KPN = LPN                                                         0372) 129 8643 draw_string
+(      KZY = LZY                                                         0373) 129 8628 draw_string
+(      KZX = LZX                                                         0374) 129 8613 draw_string
+(      UKSM1F = REAL\(2-KSM\)                                              0375) 129 8598 draw_string
+(      DO 340 K = 1, 4                                                   0376) 129 8583 draw_string
+(         CALL IN\(A, KPY, NWQ\)                                           0377) 129 8568 draw_string
+(         CALL IN\(A\(1,K1Q\), KPN, NWQ\)                                    0378) 129 8553 draw_string
+(         CALL IN\(A\(1,K2Q\), KZY, NWQ\)                                    0379) 129 8538 draw_string
+(         CALL IN\(A\(1,K3Q\), KZX, NWQ\)                                    0380) 129 8523 draw_string
+(         DO 330 I = 1, N2PD                                             0381) 129 8508 draw_string
+(            IPH = \(I+1\)/2                                               0382) 129 8493 draw_string
+(            GG = G\(IPH\)                                                 0383) 129 8478 draw_string
+(            UU = U\(IPH\)*UKSM1F                                          0384) 129 8463 draw_string
+(            DO 330 J = 1, N1E                                           0385) 129 8448 draw_string
+(               A\(I,J\) = A\(I,J\)*GG+UU                                    0386) 129 8433 draw_string
+(               A\(I,K2QM+J\) = A\(I,J\)*A\(I,K3QM+J\)-A\(I,K1QM+J\)*A\(I,K2QM+   0387) 129 8418 draw_string
+(     &         J\)*GG                                                    0387) 129 8403 draw_string
+(330            CONTINUE                                                 0388) 129 8388 draw_string
+(         CALL OUT\(A, KPY, NWQ\)                                          0389) 129 8373 draw_string
+(         CALL OUT\(A\(1,K2Q\), KZY, NWQ\)                                   0390) 129 8358 draw_string
+(         KPN = KPN+NWQ                                                  0391) 129 8343 draw_string
+(         KPY = KPY+NWQ                                                  0392) 129 8328 draw_string
+(         KZX = KZX+NWQ                                                  0393) 129 8313 draw_string
+(340      KZY = KZY+NWQ                                                  0394) 129 8298 draw_string
+(C                                                                       ) 129 8283 draw_string
+(C [Z\(OLD\) + \(MEAN -U\) * \(-DZ\(OLD\)/DX\)] + \(U,V\).GRAD\(Z\)                  ) 129 8268 draw_string
+(C                                                                       ) 129 8253 draw_string
+(      ISIGN = -1                                                        0395) 129 8238 draw_string
+(      CALL IN\(A, LZY, NW\)                                               0396) 129 8223 draw_string
+(      CALL RCS\(A, EX\)                                                   0397) 129 8208 draw_string
+(      CALL OUT\(A, LZY, NW\)                                              0398) 129 8193 draw_string
+(      KZO = LZO                                                         0399) 129 8178 draw_string
+(      KZN = LZN                                                         0400) 129 8163 draw_string
+(      KZY = LZY                                                         0401) 129 8148 draw_string
+(      DTFAC = 0.125*DTT/REAL\(N1\)                                        0402) 129 8133 draw_string
+(      F1 = DTT*FX*0.25                                                  0403) 129 8118 draw_string
+(      F = F1                                                            0404) 129 8103 draw_string
+(      DO 360 K = 1, 2                                                   0405) 129 8088 draw_string
+(         CALL IN\(CA, KZO, NWH\)                                          0406) 129 8073 draw_string
+(         CALL IN\(CA\(1,K2Q\), KZN, NWH\)                                   0407) 129 8058 draw_string
+(         CALL OUT\(CA\(1,K2Q\), KZO, NWH\)                                  0408) 129 8043 draw_string
+(         CALL IN\(CA\(1,K2Q\), KZY, NWH\)                                   0409) 129 8028 draw_string
+(         DO 350 J = 1, N1Q                                              0410) 129 8013 draw_string
+(            K2QJ = J+K2QM                                               0411) 129 7998 draw_string
+(            F = F-F1                                                    0412) 129 7983 draw_string
+(            DO 350 I = 1, N2P                                           0413) 129 7968 draw_string
+(350            CA\(I,J\) = CA\(I,J\)*CMPLX\(1., F*U\(I\)\)+DTFAC*CA\(I,K2QJ\)     0414) 129 7953 draw_string
+(         CALL OUT\(CA, KZN, NWH\)                                         0415) 129 7938 draw_string
+(         KZN = KZN+NWH                                                  0416) 129 7923 draw_string
+(         KZO = KZO+NWH                                                  0417) 129 7908 draw_string
+(360      KZY = KZY+NWH                                                  0418) 129 7893 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  275 9766 542 218 fill_rectangle
+black 275 9766 542 218 draw_rectangle
+(C                                                                       ) 280 9751 draw_string
+(C T\(TOTAL\) = T-BETA*Y                                                   ) 280 9736 draw_string
+(C WHERE BETA < 0 MEANS   STABLE STRATIFICATION AND                      ) 280 9721 draw_string
+(C       BETA > 0 MEANS UNSTABLE STRATIFICATION                          ) 280 9706 draw_string
+(C                                                                       ) 280 9691 draw_string
+(      KTO = LTO                                                         0315) 280 9676 draw_string
+(      DTB = 0.5*BETA*DTT                                                0316) 280 9661 draw_string
+(      DO 270 J = 1, N1H                                                 0317) 280 9646 draw_string
+(         CALL IN\(CWORK, KTO, N2PD\)                                      0318) 280 9631 draw_string
+(         F = -REAL\(J-1\)*FX*DTT*0.25                                     0319) 280 9616 draw_string
+(         DO 260 I = 1, N2P                                              0320) 280 9601 draw_string
+(260         CWORK\(I\) = CWORK\(I\)*CMPLX\(1., U\(I\)*F\)+DTB*CA\(I,J\)           0321) 280 9586 draw_string
+(         CALL OUT\(CWORK, KTO, N2PD\)                                     0322) 280 9571 draw_string
+(270      KTO = KTO+N2PD                                                 0323) 280 9556 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  374 9868 41 27 fill_rectangle
+black (ELSE) 394 9850 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  323 9868 318 9882 328 9882 draw_arrow 323 9943 323 9882 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  274 9468 267 9481 276 9482 draw_arrow 244 9657 272 9481 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  318 9841 244 9657 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  302 9868 43 27 fill_rectangle
+black (THEN) 323 9850 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  20 10293 606 350 fill_rhombus
+black 20 10293 606 350 draw_rhombus
+(      IF \(NOTEMP.EQ.1\) THEN                                             0313) 57 10122 draw_string
+(      ENDIF) 57 10107 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  52 11206 542 833 fill_rectangle
+black 52 11206 542 833 draw_rectangle
+(C                                                                       ) 57 11191 draw_string
+(C THE BEGINING OF A NORMAL TIME STEP                                    ) 57 11176 draw_string
+(C \(U IS X VELOCITY AND V IS Y VELOCITY\)                                 ) 57 11161 draw_string
+(C FIND \(-U\) = D\(PSI\)/DY                                                 ) 57 11146 draw_string
+(C                                                                       ) 57 11131 draw_string
+(211   CONTINUE                                                          0268) 57 11116 draw_string
+(C                                                                       ) 57 11101 draw_string
+(      IF \(NSTEPS.LT.3\) THEN                                             0269) 57 11086 draw_string
+(         CALL IN\(CA, LPN, NW\)                                           0270) 57 11071 draw_string
+(         CALL PSIPHY\(CA, N2P, N1H, EX, G, U, WORK, CWORK3, 1\)           0271) 57 11056 draw_string
+(      ELSE) 57 11041 draw_string
+(         CALL IN\(CA, LPN, NW\)                                           0272) 57 11026 draw_string
+(         IF \(MOD\(NSTEPS, KPP\).EQ.1\) CALL PSIPHY\(CA, N2P, N1H, EX, G,    0273) 57 11011 draw_string
+(     &   U, WORK, CWORK3, -1\)                                           0273) 57 10996 draw_string
+(      ENDIF) 57 10981 draw_string
+(C                                                                       ) 57 10966 draw_string
+(      NPTS = 2*N2                                                       0275) 57 10951 draw_string
+(      NSKIP = 1                                                         0276) 57 10936 draw_string
+(      MTRN = N1H                                                        0277) 57 10921 draw_string
+(      MSKIP = N2P                                                       0278) 57 10906 draw_string
+(      ISIGN = 1                                                         0279) 57 10891 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0280) 57 10876 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0281) 57 10861 draw_string
+(      CALL IN\(CA, LPN, NW\)                                              0282) 57 10846 draw_string
+(      F = 0.                                                            0283) 57 10831 draw_string
+(      DO 230 I = 1, N2                                                  0284) 57 10816 draw_string
+(         DO 220 J = 1, N1H                                              0285) 57 10801 draw_string
+(220         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0286) 57 10786 draw_string
+(230      F = F+1.                                                       0287) 57 10771 draw_string
+(      DO 235 J = 1, N1H                                                 0288) 57 10756 draw_string
+(235      CA\(N2P,J\) = 0.                                                 0289) 57 10741 draw_string
+(      CALL SCSC\(CA, EX, WORK\)                                           0290) 57 10726 draw_string
+(      CALL OUT\(CA, LPY, NW\)                                             0291) 57 10711 draw_string
+(      IF \(KSM.EQ.1\) CALL MEAN\(CA, U, G\)                                 0292) 57 10696 draw_string
+(      IF \(MOD\(NSTEPS, KUF\).EQ.1\) CALL UVELFO\(CA, N2P, N1H, G, EX,       0294) 57 10681 draw_string
+(     &CWORK\)                                                            0294) 57 10666 draw_string
+(      CALL IN\(CA, LPN, NW\)                                              0296) 57 10651 draw_string
+(C                                                                       ) 57 10636 draw_string
+(C FIND  V = D\(PSI\)/DX                                                   ) 57 10621 draw_string
+(C                                                                       ) 57 10606 draw_string
+(      F = 0.                                                            0297) 57 10591 draw_string
+(      DO 250 J = 1, N1H                                                 0298) 57 10576 draw_string
+(         DO 240 I = 1, N2P                                              0299) 57 10561 draw_string
+(240         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0300) 57 10546 draw_string
+(250      F = F+FX                                                       0301) 57 10531 draw_string
+(      CALL ACAC\(CA, EX, WORK\)                                           0302) 57 10516 draw_string
+(      CALL OUT\(CA, LPN, NW\)                                             0303) 57 10501 draw_string
+(      IF \(MOD\(NSTEPS, KPP\).EQ.1.AND.NOTEMP.NE.1\) CALL IN\(CA, LPN, NW\)   0304) 57 10486 draw_string
+(      NPTS = 2*N2                                                       0306) 57 10471 draw_string
+(      NSKIP = 1                                                         0307) 57 10456 draw_string
+(      MTRN = N1H                                                        0308) 57 10441 draw_string
+(      MSKIP = N2P                                                       0309) 57 10426 draw_string
+(      ISIGN = 1                                                         0310) 57 10411 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0311) 57 10396 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0312) 57 10381 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  275 11759 542 473 fill_rectangle
+black 275 11759 542 473 draw_rectangle
+(C                                                                       ) 280 11744 draw_string
+(C TIME AVERAGE TEMPERATURE:                                             ) 280 11729 draw_string
+(C                                                                       ) 280 11714 draw_string
+(      ISIGN = -1                                                        0240) 280 11699 draw_string
+(      MTRN = N1H                                                        0241) 280 11684 draw_string
+(      CALL IN\(A, LTO, NW\)                                               0242) 280 11669 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0243) 280 11654 draw_string
+(      F = 0.125/REAL\(N2\)                                                0244) 280 11639 draw_string
+(      DO 190 J = 1, N1H                                                 0245) 280 11624 draw_string
+(         DO 190 I = 1, N2PD                                             0246) 280 11609 draw_string
+(190         A\(I,J\) = F*A\(I,J\)                                           0247) 280 11594 draw_string
+(      CALL OUT\(A, LTO, NW\)                                              0248) 280 11579 draw_string
+(      ISIGN = 1                                                         0249) 280 11564 draw_string
+(      MTRN = N1Q                                                        0250) 280 11549 draw_string
+(      KTO = LTO                                                         0251) 280 11534 draw_string
+(      KTN = LTN                                                         0252) 280 11519 draw_string
+(      DO 210 K = 1, 2                                                   0253) 280 11504 draw_string
+(         CALL IN\(A, KTO, NWH\)                                           0254) 280 11489 draw_string
+(         CALL IN\(A\(1,K2Q\), KTN, NWH\)                                    0255) 280 11474 draw_string
+(         DO 200 J = 1, N1Q                                              0256) 280 11459 draw_string
+(            K2QJ = J+K2QM                                               0257) 280 11444 draw_string
+(            DO 200 I = 1, N2PD                                          0258) 280 11429 draw_string
+(200            A\(I,J\) = A\(I,J\)+0.5*A\(I,K2QJ\)                            0259) 280 11414 draw_string
+(         CALL OUT\(A, KTN, NWH\)                                          0260) 280 11399 draw_string
+(         CALL ACAC\(A, EX, WORK\)                                         0261) 280 11384 draw_string
+(         DO 205 J = 1, N1Q                                              0262) 280 11369 draw_string
+(            DO 205 I = 1, N2PD                                          0263) 280 11354 draw_string
+(205            A\(I,J\) = 0.5*A\(I,J\)                                      0264) 280 11339 draw_string
+(         CALL OUT\(A, KTO, NWH\)                                          0265) 280 11324 draw_string
+(         KTO = KTO+NWH                                                  0266) 280 11309 draw_string
+(210      KTN = KTN+NWH                                                  0267) 280 11294 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  565 11861 41 27 fill_rectangle
+black (ELSE) 585 11843 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  514 11861 509 11875 519 11875 draw_arrow 514 11936 514 11875 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  279 11206 273 11219 282 11220 draw_arrow 244 11523 278 11219 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  503 11834 244 11523 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  493 11861 43 27 fill_rectangle
+black (THEN) 514 11843 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  211 12286 606 350 fill_rhombus
+black 211 12286 606 350 draw_rhombus
+(      IF \(NOTEMP.EQ.1\) THEN                                             0238) 248 12115 draw_string
+(      ENDIF) 248 12100 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  243 12944 542 578 fill_rectangle
+black 243 12944 542 578 draw_rectangle
+(C                                                                       ) 248 12929 draw_string
+(C TIME AVERAGE VORTICITY:                                               ) 248 12914 draw_string
+(C                                                                       ) 248 12899 draw_string
+(      DTT = DT                                                          0203) 248 12884 draw_string
+(      T = T-0.5*DT                                                      0204) 248 12869 draw_string
+(      CALL IN\(A, LZO, NW\)                                               0205) 248 12854 draw_string
+(      NPTS = 2*N2                                                       0206) 248 12839 draw_string
+(      NSKIP = 1                                                         0207) 248 12824 draw_string
+(      MTRN = N1H                                                        0208) 248 12809 draw_string
+(      MSKIP = N2P                                                       0209) 248 12794 draw_string
+(      ISIGN = -1                                                        0210) 248 12779 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0211) 248 12764 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0212) 248 12749 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0213) 248 12734 draw_string
+(      F = 0.125/REAL\(N2\)                                                0214) 248 12719 draw_string
+(      DO 160 J = 1, N1H                                                 0215) 248 12704 draw_string
+(         DO 160 I = 1, N2PD                                             0216) 248 12689 draw_string
+(160         A\(I,J\) = A\(I,J\)*F                                           0217) 248 12674 draw_string
+(      CALL OUT\(A, LZO, NW\)                                              0218) 248 12659 draw_string
+(      ISIGN = 1                                                         0219) 248 12644 draw_string
+(      MTRN = N1Q                                                        0220) 248 12629 draw_string
+(      KZN = LZN                                                         0221) 248 12614 draw_string
+(      KZO = LZO                                                         0222) 248 12599 draw_string
+(      DO 180 K = 1, 2                                                   0223) 248 12584 draw_string
+(         CALL IN\(A, KZO, NWH\)                                           0224) 248 12569 draw_string
+(         CALL IN\(A\(1,K2Q\), KZN, NWH\)                                    0225) 248 12554 draw_string
+(         DO 170 J = 1, N1Q                                              0226) 248 12539 draw_string
+(            K2QJ = J+K2QM                                               0227) 248 12524 draw_string
+(            DO 170 I = 1, N2PD                                          0228) 248 12509 draw_string
+(170            A\(I,J\) = A\(I,J\)+0.5*A\(I,K2QJ\)                            0229) 248 12494 draw_string
+(         CALL OUT\(A, KZN, NWH\)                                          0230) 248 12479 draw_string
+(         CALL ACAC\(A, EX, WORK\)                                         0231) 248 12464 draw_string
+(         DO 175 J = 1, N1Q                                              0232) 248 12449 draw_string
+(            DO 175 I = 1, N2PD                                          0233) 248 12434 draw_string
+(175            A\(I,J\) = 0.5*A\(I,J\)                                      0234) 248 12419 draw_string
+(         CALL OUT\(A, KZO, NWH\)                                          0235) 248 12404 draw_string
+(         KZO = KZO+NWH                                                  0236) 248 12389 draw_string
+(180      KZN = KZN+NWH                                                  0237) 248 12374 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  494 13046 41 27 fill_rectangle
+black (ELSE) 514 13028 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  188 13046 191 13060 199 13055 draw_arrow 266 13168 195 13057 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  242 11206 235 11218 244 11220 draw_arrow 180 11523 240 11219 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  180 11848 180 11523 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  180 12111 180 11848 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  180 12655 180 12111 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  180 13019 180 12655 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  159 13046 43 27 fill_rectangle
+black (THEN) 180 13028 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  44 13471 606 350 fill_rhombus
+black 44 13471 606 350 draw_rhombus
+(      IF \(MOD\(NSTEPS+1, KTA\).NE.1\) THEN                                 0201) 81 13300 draw_string
+(      ENDIF) 81 13285 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  326 13634 542 83 fill_rectangle
+black 326 13634 542 83 draw_rectangle
+(150   IF \(MOD\(NSTEPS, KTF\).EQ.1.AND.NOTEMP.NE.1\) CALL TEMPFO\(CA, N2P    0193) 331 13619 draw_string
+(     &, N1H, CWORK\)                                                     0193) 331 13604 draw_string
+(      IF \(MOD\(NSTEPS, KPF\).EQ.1\) CALL PSIFOU\(CA, N2P, N1H, CWORK\)       0195) 331 13589 draw_string
+(      IF \(MOD\(NSTEPS, KZF\).EQ.1\) CALL ZETAFO\(CA, N2P, N1H, CWORK\)       0197) 331 13574 draw_string
+(      IF \(MOD\(NSTEPS, KVF\).EQ.1\) CALL VVELFO\(CA, N2P, N1H, FX, CWORK\)   0199) 331 13559 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  326 13752 542 38 fill_rectangle
+black 326 13752 542 38 draw_rectangle
+(145   CALL RUNINF                                                       0191) 331 13737 draw_string
+(      CALL BUG\('AFT INITAL'\)                                            0192) 331 13722 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  628 13885 542 53 fill_rectangle
+black 628 13885 542 53 draw_rectangle
+(140   T = 0.                                                            0188) 633 13870 draw_string
+(      DTT = DT                                                          0189) 633 13855 draw_string
+(      NSTEPS = 1                                                        0190) 633 13840 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  1512 14468 542 503 fill_rectangle
+black 1512 14468 542 503 draw_rectangle
+(C                                                                       ) 1517 14453 draw_string
+(C TEMPERATURE IS SUPPLIED IN PHYSICAL SPACE - SHUFFLE THE DATA AND      ) 1517 14438 draw_string
+(C GO TO FOURIER REPRESENTATION:                                         ) 1517 14423 draw_string
+(C                                                                       ) 1517 14408 draw_string
+(      CALL IN\(A, LTN, NW\)                                               0147) 1517 14393 draw_string
+(      CALL SHUF\(A, N2P, N1, WORK\)                                       0148) 1517 14378 draw_string
+(      NPTS = N1                                                         0149) 1517 14363 draw_string
+(      NSKIP = N2P                                                       0150) 1517 14348 draw_string
+(      MTRN = N2P                                                        0151) 1517 14333 draw_string
+(      MSKIP = 1                                                         0152) 1517 14318 draw_string
+(      ISIGN = -1                                                        0153) 1517 14303 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0154) 1517 14288 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0155) 1517 14273 draw_string
+(      CALL RCS\(A, EX\)                                                   0156) 1517 14258 draw_string
+(      F = 0.5/REAL\(N1\)                                                  0157) 1517 14243 draw_string
+(      DO 100 J = 1, N1H                                                 0158) 1517 14228 draw_string
+(         DO 100 I = 1, N2PD                                             0159) 1517 14213 draw_string
+(100         A\(I,J\) = F*A\(I,J\)                                           0160) 1517 14198 draw_string
+(      CALL OUT\(A, LTO, NW\)                                              0161) 1517 14183 draw_string
+(      NPTS = 2*N2                                                       0162) 1517 14168 draw_string
+(      NSKIP = 1                                                         0163) 1517 14153 draw_string
+(      MTRN = N1H                                                        0164) 1517 14138 draw_string
+(      MSKIP = N2P                                                       0165) 1517 14123 draw_string
+(      ISIGN = -1                                                        0166) 1517 14108 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0167) 1517 14093 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0168) 1517 14078 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0169) 1517 14063 draw_string
+(C           F = 0.25/REAL\(N2\)                                           ) 1517 14048 draw_string
+(      F = 0.125/REAL\(N2\)                                                0170) 1517 14033 draw_string
+(      DO 110 J = 1, N1H                                                 0171) 1517 14018 draw_string
+(         DO 110 I = 1, N2PD                                             0172) 1517 14003 draw_string
+(110         A\(I,J\) = F*A\(I,J\)                                           0173) 1517 13988 draw_string
+(      CALL OUT\(A, LTN, NW\)                                              0174) 1517 13973 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1763 14570 41 27 fill_rectangle
+black (ELSE) 1783 14552 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1215 14570 1222 14583 1228 14575 draw_arrow 1374 14714 1225 14579 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1201 14341 1196 14355 1206 14355 draw_arrow 1201 14543 1201 14355 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  920 13885 925 13898 932 13892 draw_arrow 1097 14093 929 13895 draw_line
+1 setlinewidth grestore
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  930 14341 542 248 fill_rectangle
+black 930 14341 542 248 draw_rectangle
+(120   CALL IN\(A, LTN, NW\)                                               0175) 935 14326 draw_string
+(C                                                                       ) 935 14311 draw_string
+(C NEW TEMPERATURE KNOWN - SET UP T\(OLD\):                                ) 935 14296 draw_string
+(C                                                                       ) 935 14281 draw_string
+(      NPTS = 2*N2                                                       0176) 935 14266 draw_string
+(      NSKIP = 1                                                         0177) 935 14251 draw_string
+(      MTRN = N1H                                                        0178) 935 14236 draw_string
+(      MSKIP = N2P                                                       0179) 935 14221 draw_string
+(      ISIGN = 1                                                         0180) 935 14206 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0181) 935 14191 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0182) 935 14176 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0183) 935 14161 draw_string
+(      DO 130 J = 1, N1H                                                 0184) 935 14146 draw_string
+(         DO 130 I = 1, N2PD                                             0185) 935 14131 draw_string
+(130         A\(I,J\) = A\(I,J\)*0.5                                         0186) 935 14116 draw_string
+(      CALL OUT\(A, LTO, NW\)                                              0187) 935 14101 draw_string
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  1180 14570 43 27 fill_rectangle
+black (THEN) 1201 14552 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  1189 14995 606 350 fill_rhombus
+black 1189 14995 606 350 draw_rhombus
+(      IF \(KDATA.NE.1\) THEN                                              0145) 1226 14824 draw_string
+(      ENDIF) 1226 14809 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1472 15097 41 27 fill_rectangle
+black (ELSE) 1492 15079 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  913 15097 920 15110 926 15102 draw_arrow 1076 15241 923 15106 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  899 13885 894 13899 904 13899 draw_arrow 899 14217 899 13899 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  899 14557 899 14217 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  899 14820 899 14557 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  899 15070 899 14820 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  878 15097 43 27 fill_rectangle
+black (THEN) 899 15079 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  892 15522 606 350 fill_rhombus
+black 892 15522 606 350 draw_rhombus
+(      IF \(NOTEMP.EQ.1\) THEN                                             0143) 929 15351 draw_string
+(      ENDIF) 929 15336 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  924 16075 542 473 fill_rectangle
+black 924 16075 542 473 draw_rectangle
+(C                                                     2                 ) 929 16060 draw_string
+(C STREAMFUNCTION KNOWN - FIND THE VORTICITY:  Z =  DEL  \(PSI\):          ) 929 16045 draw_string
+(C                                                                       ) 929 16030 draw_string
+(      CALL IN\(EVAL, LEIG, NWEIG\)                                        0115) 929 16015 draw_string
+(      KZN = LZN                                                         0116) 929 16000 draw_string
+(      LVECT = N2M                                                       0117) 929 15985 draw_string
+(      LSKIP = 2                                                         0118) 929 15970 draw_string
+(      NVECT = 2                                                         0119) 929 15955 draw_string
+(      NVSKIP = 1                                                        0120) 929 15940 draw_string
+(      DO 60 J = 1, N1H                                                  0121) 929 15925 draw_string
+(         CALL IN\(CWORK, KZN, N2PD\)                                      0122) 929 15910 draw_string
+(         F = REAL\(\(J-1\)*\(J-1\)\)*FX*FX                                    0123) 929 15895 draw_string
+(         DO 50 I = 2, N2                                                0124) 929 15880 draw_string
+(50          CWORK\(I\) = \(EVAL\(I-1\)-F\)*CWORK\(I\)                           0125) 929 15865 draw_string
+(         CWORK\(1\) = -F*CWORK\(1\)                                         0126) 929 15850 draw_string
+(         CWORK\(N2P\) = 0.0                                               0127) 929 15835 draw_string
+(         CALL OUT\(CWORK, KZN, N2PD\)                                     0128) 929 15820 draw_string
+(60       KZN = KZN+N2PD                                                 0129) 929 15805 draw_string
+(      NPTS = 2*N2                                                       0130) 929 15790 draw_string
+(      NSKIP = 1                                                         0131) 929 15775 draw_string
+(      MTRN = N1H                                                        0132) 929 15760 draw_string
+(      MSKIP = N2P                                                       0133) 929 15745 draw_string
+(      ISIGN = 1                                                         0134) 929 15730 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0135) 929 15715 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0136) 929 15700 draw_string
+(      CALL IN\(A, LZN, NW\)                                               0137) 929 15685 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0138) 929 15670 draw_string
+(      DO 70 J = 1, N1H                                                  0139) 929 15655 draw_string
+(         DO 70 I = 1, N2PD                                              0140) 929 15640 draw_string
+(70          A\(I,J\) = 0.5*A\(I,J\)                                         0141) 929 15625 draw_string
+(      CALL OUT\(A, LZO, NW\)                                              0142) 929 15610 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1175 16177 41 27 fill_rectangle
+black (ELSE) 1195 16159 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  607 16177 611 16191 619 16184 draw_arrow 742 16342 615 16187 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 13752 592 13766 602 13766 draw_arrow 597 13859 597 13766 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 14217 597 13859 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 14557 597 14217 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 14820 597 14557 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 15084 597 14820 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 15347 597 15084 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 15839 597 15347 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  597 16150 597 15839 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  576 16177 43 27 fill_rectangle
+black (THEN) 597 16159 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  411 16812 970 560 fill_rhombus
+black 411 16812 970 560 draw_rhombus
+(C                                                                       ) 630 16641 draw_string
+(CC*****C H E C K   F O U R I E R   C O E F F I C I E N T S**************) 630 16626 draw_string
+(C                                                                       ) 630 16611 draw_string
+(C         WRITE \(6,7010\) A\(1,1\),A\(1,2\),A\(1,3\)                           ) 630 16596 draw_string
+(C         WRITE \(6,7020\) A\(2,1\),A\(2,2\),A\(2,3\)                           ) 630 16581 draw_string
+(C         WRITE \(6,7030\) A\(3,1\),A\(3,2\),A\(3,3\)                           ) 630 16566 draw_string
+(C 7010    FORMAT\(/2X,26HCHECK FOURIER COEFFICIENTS/4X,8HA\(1,1\) =,1PE13.6) 630 16551 draw_string
+(C     1   2X,8HA\(1,2\) =,1PE13.6,2X,8HA\(1,3\) =,1PE13.6\)                  ) 630 16536 draw_string
+(C 7020    FORMAT\(4X,8HA\(2,1\) =,1PE13.6,2X,8HA\(2,2\) =,1PE13.6,2X,        ) 630 16521 draw_string
+(C     1   8HA\(2,3\) =,1PE13.6\)                                           ) 630 16506 draw_string
+(C 7030    FORMAT\(4X,8HA\(3,1\) =,1PE13.6,2X,8HA\(3,2\) =,1PE13.6,2X,        ) 630 16491 draw_string
+(C     1   8HA\(3,3\) =,1PE13.6/\)                                          ) 630 16476 draw_string
+(C                                                                       ) 630 16461 draw_string
+(C                                                                       ) 630 16446 draw_string
+(40    IF \(KDATA.EQ.3\) THEN                                              0113) 630 16431 draw_string
+(      ENDIF) 630 16416 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  927 17335 542 443 fill_rectangle
+black 927 17335 542 443 draw_rectangle
+(C                                                                       ) 932 17320 draw_string
+(C THE INPUT WAS STREAMFUNCTION IN PHYSICAL SPACE - SHUFFLE THE DATA AND ) 932 17305 draw_string
+(C GO TO FOURIER SPACE:                                                  ) 932 17290 draw_string
+(C                                                                       ) 932 17275 draw_string
+(      CALL IN\(A, LPN, NW\)                                               0089) 932 17260 draw_string
+(      CALL SHUF\(A, N2P, N1, WORK\)                                       0090) 932 17245 draw_string
+(      NPTS = N1                                                         0091) 932 17230 draw_string
+(      NSKIP = N2P                                                       0092) 932 17215 draw_string
+(      MTRN = N2P                                                        0093) 932 17200 draw_string
+(      MSKIP = 1                                                         0094) 932 17185 draw_string
+(      ISIGN = -1                                                        0095) 932 17170 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0096) 932 17155 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0097) 932 17140 draw_string
+(      CALL RCS\(A, EX\)                                                   0098) 932 17125 draw_string
+(      NPTS = 2*N2                                                       0099) 932 17110 draw_string
+(      NSKIP = 1                                                         0100) 932 17095 draw_string
+(      MTRN = N1H                                                        0101) 932 17080 draw_string
+(      MSKIP = N2P                                                       0102) 932 17065 draw_string
+(      ISIGN = -1                                                        0103) 932 17050 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0104) 932 17035 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0105) 932 17020 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0106) 932 17005 draw_string
+(C           F = 0.125/REAL\(N1*N2\)                                       ) 932 16990 draw_string
+(      F = 0.0625/REAL\(N1*N2\)                                            0107) 932 16975 draw_string
+(      DO 30 J = 1, N1H                                                  0108) 932 16960 draw_string
+(         DO 30 I = 1, N2PD                                              0109) 932 16945 draw_string
+(30          A\(I,J\) = A\(I,J\)*F                                           0110) 932 16930 draw_string
+(      CALL OUT\(A, LPN, NW\)                                              0111) 932 16915 draw_string
+(      CALL OUT\(A, LZN, NW\)                                              0112) 932 16900 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1178 17437 41 27 fill_rectangle
+black (ELSE) 1198 17419 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  902 17437 904 17451 912 17447 draw_arrow 967 17559 908 17449 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  896 16812 891 16826 901 16826 draw_arrow 896 17114 896 16826 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  896 17410 896 17114 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  875 17437 43 27 fill_rectangle
+black (THEN) 896 17419 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  705 17907 684 395 fill_rhombus
+black 705 17907 684 395 draw_rhombus
+(C                                                                       ) 781 17736 draw_string
+(C PREPARE THE INPUT FOR PROCESSING:                                     ) 781 17721 draw_string
+(C                                                                       ) 781 17706 draw_string
+(      IF \(KDATA.NE.1\) THEN                                              0087) 781 17691 draw_string
+(      ENDIF) 781 17676 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  776 18055 542 68 fill_rectangle
+black 776 18055 542 68 draw_rectangle
+(13    CONTINUE                                                          0083) 781 18040 draw_string
+(14    CONTINUE                                                          0084) 781 18025 draw_string
+(      FX = 2.0*PI/BOXX                                                  0085) 781 18010 draw_string
+(      FX2 = 2.*FX                                                       0086) 781 17995 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  1078 18158 542 23 fill_rectangle
+black 1078 18158 542 23 draw_rectangle
+(      CALL DATAST\(A, N2P, N1, GMAPP\)                                    0082) 1349 18143 draw_centered_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1329 18260 41 27 fill_rectangle
+black (ELSE) 1349 18242 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1053 18260 1055 18274 1063 18270 draw_arrow 1118 18382 1059 18272 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1047 18055 1042 18069 1052 18069 draw_arrow 1047 18147 1047 18069 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1047 18233 1047 18147 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  1026 18260 43 27 fill_rectangle
+black (THEN) 1047 18242 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  856 18730 684 395 fill_rhombus
+black 856 18730 684 395 draw_rhombus
+(C                                                                       ) 932 18559 draw_string
+(C READ THE DATA:                                                        ) 932 18544 draw_string
+(C                                                                       ) 932 18529 draw_string
+(      IF \(KDATA.NE.1.AND.KDATA.NE.2\) THEN                               0080) 932 18514 draw_string
+(      ENDIF) 932 18499 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  1459 19206 542 248 fill_rectangle
+black 1459 19206 542 248 draw_rectangle
+(C                                                                       ) 1464 19191 draw_string
+(C LINEAR MAPPING - EIGENVALUES KNOWN, EIGENFUNCTIONS ARE SIMPLY SINES   ) 1464 19176 draw_string
+(C AND COSINES, SO THAT NO MATRICES ARE NEEDED:                          ) 1464 19161 draw_string
+(C                                                                       ) 1464 19146 draw_string
+(      F = H/REAL\(N2\)                                                    0064) 1464 19131 draw_string
+(      FZ = PI/H                                                         0065) 1464 19116 draw_string
+(      FZSQ = FZ*FZ                                                      0066) 1464 19101 draw_string
+(      GMAPP\(1\) = 0.                                                     0067) 1464 19086 draw_string
+(      G\(1\) = FZ                                                         0068) 1464 19071 draw_string
+(      DO 1 I = 1, N2M                                                   0069) 1464 19056 draw_string
+(         GMAPP\(I+1\) = F*REAL\(I\)                                         0070) 1464 19041 draw_string
+(         G\(I+1\) = FZ                                                    0071) 1464 19026 draw_string
+(1        EVAL\(I\) = -REAL\(I\)**2*FZSQ                                     0072) 1464 19011 draw_string
+(      GMAPP\(N2P\) = H                                                    0073) 1464 18996 draw_string
+(      G\(N2P\) = FZ                                                       0074) 1464 18981 draw_string
+(      CALL OUT\(EVAL, LEIG, NWEIG\)                                       0075) 1464 18966 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1710 19359 41 27 fill_rectangle
+black (ELSE) 1730 19341 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1129 19359 1135 19372 1142 19364 draw_arrow 1292 19510 1139 19368 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1116 19257 1111 19271 1121 19271 draw_arrow 1116 19332 1116 19271 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1151 18831 1145 18844 1153 18845 draw_arrow 1138 18920 1149 18844 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  1170 18713 1163 18725 1172 18727 draw_arrow 1154 18805 1168 18726 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1132 18832 41 27 fill_rectangle
+black (ELSE) 1152 18814 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1082 18832 1080 18846 1088 18845 draw_arrow 1095 18920 1084 18845 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1133 18692 1124 18703 1133 18706 draw_arrow 1086 18805 1128 18704 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  1060 18832 43 27 fill_rectangle
+black (THEN) 1081 18814 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  813 19257 606 350 fill_rhombus
+black 813 19257 606 350 draw_rhombus
+(2     IF \(LMAPP.NE.2\) THEN                                              0076) 850 19086 draw_string
+(      ENDIF) 850 19071 draw_string
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  1095 19359 43 27 fill_rectangle
+black (THEN) 1116 19341 draw_centered_string
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  1081 19829 684 395 fill_rhombus
+black 1081 19829 684 395 draw_rhombus
+(C                                                                       ) 1157 19658 draw_string
+(C SET UP ARRAYS ASSOCIATED WITH THE MAPPING FUNCTION:                   ) 1157 19643 draw_string
+(C                                                                       ) 1157 19628 draw_string
+(      IF \(LMAPP.NE.1\) THEN                                              0062) 1157 19613 draw_string
+(      ENDIF) 1157 19598 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  1152 20322 542 413 fill_rectangle
+black 1152 20322 542 413 draw_rectangle
+(C                                                                       ) 1157 20307 draw_string
+(67    LZN = LCMREQ\(LARGE\)                                               0040) 1157 20292 draw_string
+(      LTN = LZN+NW                                                      0041) 1157 20277 draw_string
+(      IF \(NOTEMP.EQ.1\) LTN = LZN                                        0042) 1157 20262 draw_string
+(      LPN = LTN+NW                                                      0044) 1157 20247 draw_string
+(      LZO = LPN+NW                                                      0045) 1157 20232 draw_string
+(      LTO = LZO+NW                                                      0046) 1157 20217 draw_string
+(      IF \(NOTEMP.EQ.1\) LTO = LZO                                        0047) 1157 20202 draw_string
+(      LPY = LTO+NW                                                      0049) 1157 20187 draw_string
+(      LZX = LPY+NW                                                      0050) 1157 20172 draw_string
+(      LZY = LZX+NW                                                      0051) 1157 20157 draw_string
+(      LPRESS = LZN+LARGE-NWEIG                                          0052) 1157 20142 draw_string
+(      LEIG = LPRESS                                                     0053) 1157 20127 draw_string
+(      IF \(KPRESS.GT.1.AND.LMAPP.NE.1\) LEIG = LPRESS-NWEIG               0054) 1157 20112 draw_string
+(C                                                                       ) 1157 20097 draw_string
+(C THESE LCM ADDRESSES ARE USED BY EIGSET AND LCMRQR                     ) 1157 20082 draw_string
+(C                                                                       ) 1157 20067 draw_string
+(      LE = LZN                                                          0056) 1157 20052 draw_string
+(      LH = LE+N2M*N2M                                                   0057) 1157 20037 draw_string
+(      LEV = LH+N2M*N2M                                                  0058) 1157 20022 draw_string
+(C                                                                       ) 1157 20007 draw_string
+(      CALL EXSET\(EX, NMAX2\)                                             0059) 1157 19992 draw_string
+(C                                                                       ) 1157 19977 draw_string
+(C SET ALL  U\(I\) TO 0. TO AVOID TROUBLE IF NO MEAN FLOW IS DESIRED       ) 1157 19962 draw_string
+(C                                                                       ) 1157 19947 draw_string
+(      DO 11 I = 1, N2P                                                  0060) 1157 19932 draw_string
+(11       U\(I\) = 0.                                                      0061) 1157 19917 draw_string
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  1734 20455 542 53 fill_rectangle
+black 1734 20455 542 53 draw_rectangle
+(C                                                                       ) 1739 20440 draw_string
+(      IF \(KPRESS.GT.1\) LARGE = MAX\(LARGE, 3*N2M*N2M\)+NWEIG+NWEIG        0035) 1739 20425 draw_string
+(      IF \(KPRESS.LE.1\) LARGE = MAX\(LARGE+NWEIG, 3*N2M*N2M\)              0037) 1739 20410 draw_string
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  1985 20557 41 27 fill_rectangle
+black (ELSE) 2005 20539 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1437 20557 1444 20570 1450 20562 draw_arrow 1596 20701 1447 20566 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  1423 20448 1418 20462 1428 20462 draw_arrow 1423 20530 1423 20462 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  1423 20322 1418 20336 1428 20336 draw_arrow 1423 20410 1423 20336 draw_line
+1 setlinewidth grestore
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  1152 20448 542 38 fill_rectangle
+black 1152 20448 542 38 draw_rectangle
+(C                                                                       ) 1157 20433 draw_string
+(66    LARGE = LARGE+NWEIG                                               0039) 1157 20418 draw_string
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  1402 20557 43 27 fill_rectangle
+black (THEN) 1423 20539 draw_centered_string
+
+font_courier_bold
+ 0.68 1.00 0.85 setrgbcolor  1411 20982 606 350 fill_rhombus
+black 1411 20982 606 350 draw_rhombus
+(      IF \(LMAPP.NE.2\) THEN                                              0033) 1448 20811 draw_string
+(      ENDIF) 1448 20796 draw_string
+
+font_courier_bold
+ 1.00 1.00 0.00 setrgbcolor  1443 24970 542 3908 fill_rectangle
+black 1443 24970 542 3908 draw_rectangle
+(C     1993 version - Modified by Beatrice Creusillet for PIPS -) 1448 24955 draw_string
+(C) 1448 24940 draw_string
+(C     MODIFICATIONS:) 1448 24925 draw_string
+(C) 1448 24910 draw_string
+(C     - CXxxxxx and CYyyyyy commentaries removed for clarity.) 1448 24895 draw_string
+(C     - CPUTIM and ELAPSE subroutines uncommented.) 1448 24880 draw_string
+(C     - BLOCK DATA moved in main procedure. ) 1448 24865 draw_string
+(C     - Macro definition LSTMOD\(MODEHI\) in module DEALSE replaced where) 1448 24850 draw_string
+(C       it is used.) 1448 24835 draw_string
+(C     - \(1.,0.\) replaced by CMPLX\(1.,0.\) wherever needed) 1448 24820 draw_string
+(C     - in RUNINF, computed GOTO's are replaced by block if's) 1448 24805 draw_string
+(C) 1448 24790 draw_string
+(C#) 1448 24775 draw_string
+(C#) 1448 24760 draw_string
+(C#      BLOCK DATA) 1448 24745 draw_string
+(C#      COMMON /TIMING/ TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC,TXACAC,TFTVMT, ) 1448 24730 draw_string
+(C#     1                TXSHUF,TUSHUF,TXPRNT,TXLOG2,                      ) 1448 24715 draw_string
+(C#     2                EXXRCS,EXXCSR,EXSCSC,EXACAC,EFTVMT,               ) 1448 24700 draw_string
+(C#     3                NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,NXACAC,NFTVMT, ) 1448 24685 draw_string
+(C#     4                NXSHUF,NUSHUF,NXPRNT,NXLOG2                       ) 1448 24670 draw_string
+(C#      COMMON /VERIFY/ VDAT\(15\),CDAT\(15\)                                 ) 1448 24655 draw_string
+(C#      COMMON /PI/ PI                                                    ) 1448 24640 draw_string
+(C#      COMMON /DEBUG/ NUMBER,TLAST                                       ) 1448 24625 draw_string
+(C#C                                                                       ) 1448 24610 draw_string
+(C#      DATA            TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC,TXACAC,TFTVMT  ) 1448 24595 draw_string
+(C#     1              /     0.,    0.,    0.,    0.,    0.,    0.,    0./ ) 1448 24580 draw_string
+(C#      DATA            TXSHUF,TUSHUF,TXPRNT,TXLOG2                       ) 1448 24565 draw_string
+(C#     1              /     0.,    0.,    0.,    0./                      ) 1448 24550 draw_string
+(C#      DATA            EXXRCS,EXXCSR,EXSCSC,EXACAC,EFTVMT                ) 1448 24535 draw_string
+(C#     1              /     0.,    0.,    0.,    0.,    0./               ) 1448 24520 draw_string
+(C#      DATA            NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,NXACAC,NFTVMT  ) 1448 24505 draw_string
+(C#     1              /     0 ,    0 ,    0 ,    0 ,    0 ,    0 ,    0 / ) 1448 24490 draw_string
+(C#      DATA            NXSHUF,NUSHUF,NXPRNT,NXLOG2                       ) 1448 24475 draw_string
+(C#     1              /     0 ,    0 ,    0 ,    0 /                      ) 1448 24460 draw_string
+(C#      DATA VDAT/                                                        ) 1448 24445 draw_string
+(C#     * 0.10000E+03,-0.10000E+03, 0.10000E-04,-0.10000E+03,-0.15708E+01, ) 1448 24430 draw_string
+(C#     * 0.99983E+02,-0.18147E+01,-0.20427E+01,-0.22452E+01,-0.24181E+01, ) 1448 24415 draw_string
+(C#     * 0.95976E+02,-0.95977E+02, 0.10000E-04,-0.95978E+02,-0.25589E+01/ ) 1448 24400 draw_string
+(C#C                                                                       ) 1448 24385 draw_string
+(C#C PI IS A USEFULL CONSTANT                                              ) 1448 24370 draw_string
+(C#C                                                                       ) 1448 24355 draw_string
+(C#      DATA  PI /3.141592653589793/                                      ) 1448 24340 draw_string
+(C#      DATA NUMBER /1/, TLAST /0.0/                                      ) 1448 24325 draw_string
+(C#      END                                                               ) 1448 24310 draw_string
+(C#) 1448 24295 draw_string
+(C#) 1448 24280 draw_string
+(C                                                                       ) 1448 24265 draw_string
+(C                                                                       ) 1448 24250 draw_string
+(C******NOTE: USE OF MACHINE-DEPENDENT CONSTANT: ZERO IN SUBROUTINE RUNIN) 1448 24235 draw_string
+(C                                                                       ) 1448 24220 draw_string
+(C            ZERO = 1.0E-200 \(MAY HAVE TO REPLACE WITH YOUR MACHINES    ) 1448 24205 draw_string
+(C                             RELATIVE PRECISION FOR REAL DATA TYPE\)    ) 1448 24190 draw_string
+(C                                                                       ) 1448 24175 draw_string
+(      PROGRAM OCEAN) 1448 24160 draw_string
+(C***********************************************************************) 1448 24145 draw_string
+(C                        OCEAN FORTRAN PROGRAMS                         ) 1448 24130 draw_string
+(C                        CREATION DATE: 3/22/81                         ) 1448 24115 draw_string
+(C***********************************************************************) 1448 24100 draw_string
+(C                                                                       ) 1448 24085 draw_string
+(C  D\(Z\)/DT + \(U,V\).GRAD\(Z\) = RNU*DELSQ\(Z\) + ALPHA*D\(TEMP\)/DX            ) 1448 24070 draw_string
+(C                                                                       ) 1448 24055 draw_string
+(C  D\(TEMP\)/DT + \(U,V\).GRAD\(TEMP\) = RKAPA*DELSQ\(TEMP\) + BETA*V           ) 1448 24040 draw_string
+(C                                                                       ) 1448 24025 draw_string
+(C                                                                       ) 1448 24010 draw_string
+(C                                                                       ) 1448 23995 draw_string
+(C THIS PROGRAM SIMULATES TWO-DIMENSIONAL FLUID FLOW ON A   \(N2+1\) * N1  ) 1448 23980 draw_string
+(C GRID. IT IS POSSIBLE TO SPECIFY NON-LINEAR DISTRIBUTION OF DATA POINTS) 1448 23965 draw_string
+(C THE Y-DIRECTION \(THE FIRST INDEX CORRESPONDS TO Y DIRECTION, SECOND TO) 1448 23950 draw_string
+(C X DIRECTION\). N1 AND N2 HAVE TO BE POWERS OF TWO GREATER OR EQUAL TO 8) 1448 23935 draw_string
+(C                                                                       ) 1448 23920 draw_string
+(C THE PROGRAM USES LARGE CORE MEMORY. IT REQUIRES 8*\(N2+1\)*N1+\(N2-1\)*\(N2) 1448 23905 draw_string
+(C WORDS OF IT. IF NOTEMP = 1 IT IS POSSIBLE TO SAVE 2*\(N2+1\)*N1 WORDS,  ) 1448 23890 draw_string
+(C IF LMAPP = 1 YOU SAVE ADDITIONAL \(N2-1\)*\(N2+1\) WORDS.                 ) 1448 23875 draw_string
+(C                                                                       ) 1448 23860 draw_string
+(C IF  LMAPP = 2 , LCM REQUIREMENTS ARE AT LEAST  3 * \(N2-1\) * \(N2-1\)    ) 1448 23845 draw_string
+(C MORE MEMORY COULD BE NEEDED IN THIS CASE BECAUSE OF EIGSET AND LCMRQR.) 1448 23830 draw_string
+(C                                                                       ) 1448 23815 draw_string
+(C                                                                       ) 1448 23800 draw_string
+(C FOR CDC7600 RUNS: DELETE ROUTINES LCMREQ, IN AND OUT FROM THE END OF  ) 1448 23785 draw_string
+(C                   THIS PACKAGE. ON CDC7600 THE LCM IS USED THROUGH    ) 1448 23770 draw_string
+(C                   THE ASSEMBLY ROUTINES.                              ) 1448 23755 draw_string
+(C                                                                       ) 1448 23740 draw_string
+(C                   LIBRARY.                                            ) 1448 23725 draw_string
+(C FOR CRAY-1 RUNS : DELETE ROUTINES SECOND, DATE, TIME, EXSET AND       ) 1448 23710 draw_string
+(C                   LOG2 FROM THE END OF THIS PACKAGE. THEY ARE         ) 1448 23695 draw_string
+(C                   OBTAINED AT LOAD TIME FROM CRAY LIBRARIES AND       ) 1448 23680 draw_string
+(C                   FFTLIB.                                             ) 1448 23665 draw_string
+(C                   ALSO, ADJUST THE SIZE OF PARAMETER LCMSIZ IN        ) 1448 23650 draw_string
+(C                   THE ROUTINE LCMREQ SO THAT THE COMMON IS LARGE      ) 1448 23635 draw_string
+(C                   ENOUGH TO EMULATE CDC7600 LCM REQUIRED FOR THE RUN. ) 1448 23620 draw_string
+(C                                                                       ) 1448 23605 draw_string
+(C THE FOLLOWING PARAMETERS DEFINE THE SIZE OF THE RUN:                  ) 1448 23590 draw_string
+(C                                                                       ) 1448 23575 draw_string
+(C                                                                       ) 1448 23560 draw_string
+(C PLEASE REFER TO THE DIMENSIONING AND EQUIVALENCING INSTRUCTIONS IN    ) 1448 23545 draw_string
+(C THE CASE YOUR COMPILER CANNOT HANDLE PARAMETER STATEMENTS...          ) 1448 23530 draw_string
+(C COMMON BLOCKS:                                                        ) 1448 23515 draw_string
+(C                                                                       ) 1448 23500 draw_string
+(C                                                                       ) 1448 23485 draw_string
+(C THE DIMENSION OF  GSOLV  HAS TO BE AT LEAST \(N2-1\)                    ) 1448 23470 draw_string
+(C                                                                       ) 1448 23455 draw_string
+(C                                                                       ) 1448 23440 draw_string
+(C THE DIMENSIONS OF  GMAPP  AND  G  HAVE TO BE AT LEAST \(N2+1\)          ) 1448 23425 draw_string
+(C                                                                       ) 1448 23410 draw_string
+(C                                                                       ) 1448 23395 draw_string
+(C                                                                       ) 1448 23380 draw_string
+(C COMPLEX ARRAYS HAVE TO BE DIMENSIONED EXACTLY AS THE FORMULAS SAY:    ) 1448 23365 draw_string
+(C            CA        \(N2+1\) X N1/2                                    ) 1448 23350 draw_string
+(C            CWORK     N2+1                                             ) 1448 23335 draw_string
+(C            CWORK2    N2+1                                             ) 1448 23320 draw_string
+(C            CWORK3    N2+1                                             ) 1448 23305 draw_string
+(C            EX        MAX\(2*N2, N1\)                                    ) 1448 23290 draw_string
+(C                                                                       ) 1448 23275 draw_string
+(C EX ARRAY MUST NOT BE THE FIRST ARRAY IN THE MEMORY.                   ) 1448 23260 draw_string
+(C                                                                       ) 1448 23245 draw_string
+(C                                                                       ) 1448 23230 draw_string
+(C REAL ARRAYS HAVE TO BE DIMENSIONED EXACTLY AS THE FORMULAS SAY:       ) 1448 23215 draw_string
+(C            A      2*\(N2+1\) X N1/2                                     ) 1448 23200 draw_string
+(C            E      \(N2-1\)   X \(N2-1\)                                   ) 1448 23185 draw_string
+(C            WORK   N2+1     X MAX\(6, 2*MIN\(64, N1/2\)\)   \(AT LEAST\)     ) 1448 23170 draw_string
+(C            EVAL   N2-1                                                ) 1448 23155 draw_string
+(C            IR     N2-1                                                ) 1448 23140 draw_string
+(C            IC     N2-1                                                ) 1448 23125 draw_string
+(C                                                                       ) 1448 23110 draw_string
+(C                                                                       ) 1448 23095 draw_string
+(C EQUIVALENCE STATEMENTS ARE SAVING MEMORY SPACE. THE FOLLOWING PATTERN ) 1448 23080 draw_string
+(C HAS TO BE FOLLOWED EXACTLY:                                           ) 1448 23065 draw_string
+(C                                                                       ) 1448 23050 draw_string
+(C     A-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+           ) 1448 23035 draw_string
+(C     CA+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+           ) 1448 23020 draw_string
+(C     EVAL+-+IR-+-+-IC+-+-+E+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+             ) 1448 23005 draw_string
+(C                                                                       ) 1448 22990 draw_string
+(C                                                                       ) 1448 22975 draw_string
+(C     WORK+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                 ) 1448 22960 draw_string
+(C     CWORK-+-+-+CWORK2-+-+-CWORK3+-+-+                                 ) 1448 22945 draw_string
+(C                                                                       ) 1448 22930 draw_string
+(C      EQUIVALENCE \(A,CA,EVAL\), \(A\(NY\),IR\), \(A\(NI\),IC\), A\(NEQ\),E\) - ORGI) 1448 22915 draw_string
+(C      EQUIVALENCE \(A,CA,EVAL\), \(EVAL\(NY\),IR\), \(EVAL\(NI\),IC\),           ) 1448 22900 draw_string
+(C     *             \(EVAL\(NEQ\),E\) - MACFARLANE'S FIX. BAD.              ) 1448 22885 draw_string
+(C POINTER'S FIX. ANSI REQUIRES THAT THE NUMBER OF SUBSCRIPTS MATCH      ) 1448 22870 draw_string
+(C THE NUMBER OF DIMENSIONS OF THE ARRAY. THAT WAS THE PROBLEM WITH      ) 1448 22855 draw_string
+(C THE ORGINAL STATEMENT. THE PROBLEM WITH MACFARLANE'S FIX IS THAT      ) 1448 22840 draw_string
+(C NY,NI,NEQ>NE \(THE DIMENSION OF EVAL\). HERE 3*NE+1-NA1 IS THE 3*NE+1TH ) 1448 22825 draw_string
+(C ELEMENT OF A AND 3*NE+1 = NEQ.                                        ) 1448 22810 draw_string
+(C) 1448 22795 draw_string
+(C     former BLOCK DATA                                     ) 1448 22780 draw_string
+(C                                                                       ) 1448 22765 draw_string
+(C) 1448 22750 draw_string
+(C                                                                       ) 1448 22735 draw_string
+(C PI IS A USEFULL CONSTANT                                              ) 1448 22720 draw_string
+(C                                                                       ) 1448 22705 draw_string
+(C) 1448 22690 draw_string
+(C) 1448 22675 draw_string
+(C                                                                       ) 1448 22660 draw_string
+(C NOW WE CAN START WITH THE PROGRAM...                                  ) 1448 22645 draw_string
+(C SUBROUTINE START TELLS OCEAN WHAT TO DO:                              ) 1448 22630 draw_string
+(C                                                                       ) 1448 22615 draw_string
+(      INTEGER*4 NX) 1448 22600 draw_string
+(      PARAMETER \(NX = 128\)) 1448 22585 draw_string
+(      INTEGER*4 NY) 1448 22570 draw_string
+(      PARAMETER \(NY = 128\)) 1448 22555 draw_string
+(      INTEGER*4 NA1) 1448 22540 draw_string
+(      PARAMETER \(NA1 = 2*\(NY+1\)\)) 1448 22525 draw_string
+(      INTEGER*4 NA2) 1448 22510 draw_string
+(      PARAMETER \(NA2 = NX/2\)) 1448 22495 draw_string
+(      INTEGER*4 NE) 1448 22480 draw_string
+(      PARAMETER \(NE = NY-1\)) 1448 22465 draw_string
+(      INTEGER*4 NW1) 1448 22450 draw_string
+(      PARAMETER \(NW1 = NY+1\)) 1448 22435 draw_string
+(      INTEGER*4 NW2) 1448 22420 draw_string
+(      PARAMETER \(NW2 = 128\)) 1448 22405 draw_string
+(      INTEGER*4 NEX) 1448 22390 draw_string
+(      PARAMETER \(NEX = 256\)) 1448 22375 draw_string
+(      INTEGER*4 NI) 1448 22360 draw_string
+(      PARAMETER \(NI = 2*NY-1\)) 1448 22345 draw_string
+(      INTEGER*4 NEQ) 1448 22330 draw_string
+(      PARAMETER \(NEQ = 3*NY-2\)) 1448 22315 draw_string
+(      INTEGER*4 NCW2) 1448 22300 draw_string
+(      PARAMETER \(NCW2 = 2*NW1+1\)) 1448 22285 draw_string
+(      INTEGER*4 NCW3) 1448 22270 draw_string
+(      PARAMETER \(NCW3 = 4*NW1+1\)) 1448 22255 draw_string
+(      INTEGER NPTS,NSKIP,MTRN,MSKIP,ISIGN,LOG,IEXSHF,LVECT,LSKIP,) 1448 22240 draw_string
+(     &NVECT,NVSKIP,NSTEPS,N1,N2,NUMBER,KDATA,LMAPP,NOTEMP,KTA,KTAPE,) 1448 22225 draw_string
+(     &KSM,KPP,KZP,KTP,KUP,KVP,KPF,KZF,KTF,KUF,KVF,KPRESS,NOALS,N1H,) 1448 22210 draw_string
+(     &N1Q,N1E,N2M,N2P,N2DP,N2DM,N2PD,NMAX2,LZN,LTN,LPN,LZO,LTO,LPY,) 1448 22195 draw_string
+(     &LZX,LZY,LEIG,LE,LH,LEV,NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,) 1448 22180 draw_string
+(     &NXACAC,NFTVMT,NXSHUF,NUSHUF,NXPRNT,NXLOG2,VALID,NW,NWH,NWQ,) 1448 22165 draw_string
+(     &NWEIG,K1Q,K2Q,K3Q,K1QM,K2QM,K3QM,LARGE,LPRESS,I,J,KZN,KZO,K,) 1448 22150 draw_string
+(     &K2QJ,KTO,KTN,KPY,KPN,KZY,KZX,IPH) 1448 22135 draw_string
+(      REAL*4 GSOLV\(1:127\),GMAPP\(1:129\),G\(1:129\),U\(1:129\),ALPHA,BETA,) 1448 22120 draw_string
+(     &BOXX,H,RNU,RKAPA,DT,DTT,T,PI,TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC) 1448 22105 draw_string
+(     &,TXACAC,TFTVMT,TXSHUF,TUSHUF,TXPRNT,TXLOG2,EXXRCS,EXXCSR,EXSCSC) 1448 22090 draw_string
+(     &,EXACAC,EFTVMT,A\(1:NA1,1:NA2\),E\(1:NE,1:NE\),WORK\(1:NW1*NW2\),EVAL) 1448 22075 draw_string
+(     &\(1:NE\),IR\(1:NE\),IC\(1:NE\),VDAT\(1:15\),CDAT\(1:15\),TLAST,CPU1,) 1448 22060 draw_string
+(     &TCLCK1,F,FZ,FZSQ,FX,FX2,DTB,UKSM1F,GG,UU,DTFAC,F1,DTA,DTF,F2,) 1448 22045 draw_string
+(     &FXSQ,CPU2,TCLCK2,TWALL) 1448 22030 draw_string
+(      COMPLEX CA\(1:NW1,1:NA2\),CWORK\(1:NW1\),CWORK2\(1:NW1\),CWORK3\(1:NW1) 1448 22015 draw_string
+(     &\),EX\(1:NEX\),CF) 1448 22000 draw_string
+(      COMMON /VERIFY/ VDAT,CDAT) 1448 21985 draw_string
+(      COMMON /TIMING/ TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC,TXACAC,) 1448 21970 draw_string
+(     &TFTVMT,TXSHUF,TUSHUF,TXPRNT,TXLOG2,EXXRCS,EXXCSR,EXSCSC,EXACAC,) 1448 21955 draw_string
+(     &EFTVMT,NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,NXACAC,NFTVMT,NXSHUF,) 1448 21940 draw_string
+(     &NUSHUF,NXPRNT,NXLOG2) 1448 21925 draw_string
+(      COMMON /LADDR/ LZN,LTN,LPN,LZO,LTO,LPY,LZX,LZY,LEIG,LE,LH,LEV) 1448 21910 draw_string
+(      COMMON /EXSIZE/ NMAX2) 1448 21895 draw_string
+(      COMMON /NMBRS/ N1H,N1Q,N1E,N2M,N2P,N2DP,N2DM,N2PD) 1448 21880 draw_string
+(      COMMON /PI/ PI) 1448 21865 draw_string
+(      COMMON /OPTONS/ N1,N2,NUMBER,KDATA,LMAPP,NOTEMP,KTA,KTAPE,KSM,) 1448 21850 draw_string
+(     &KPP,KZP,KTP,KUP,KVP,KPF,KZF,KTF,KUF,KVF,KPRESS,NOALS) 1448 21835 draw_string
+(      COMMON /DATA/ ALPHA,BETA,BOXX,H,RNU,RKAPA,DT,DTT,T,NSTEPS) 1448 21820 draw_string
+(      COMMON /MFLOW/ U) 1448 21805 draw_string
+(      COMMON /MAPING/ GMAPP,G) 1448 21790 draw_string
+(      COMMON /SOLV/ LVECT,LSKIP,NVECT,NVSKIP,GSOLV) 1448 21775 draw_string
+(      COMMON /FT/ NPTS,NSKIP,MTRN,MSKIP,ISIGN,LOG,IEXSHF) 1448 21760 draw_string
+(      ) 1448 21745 draw_string
+(      EQUIVALENCE \(A,CA\), \(A,EVAL\), \(A\(128,1\),IR\), \(A\(255,1\),IC\), \(A\() 1448 21730 draw_string
+(     &124,2\),E\)) 1448 21715 draw_string
+(      EQUIVALENCE \(WORK,CWORK\), \(WORK\(259\),CWORK2\), \(WORK\(517\),CWORK3) 1448 21700 draw_string
+(     &\)) 1448 21685 draw_string
+(      CALL CPUTIM\(CPU1\)                                                 0001) 1448 21670 draw_string
+(      CALL ELAPSE\(TCLCK1\)                                               0002) 1448 21655 draw_string
+(      OPEN \(UNIT=1,FILE='OCV'\)                                          0003) 1448 21640 draw_string
+(      OPEN \(UNIT=6,FILE='OCO6'\)                                         0004) 1448 21625 draw_string
+(      WRITE \(1, 9991\)                                                   0005) 1448 21610 draw_string
+(9991  FORMAT\(1X,'OUTPUT FOR PERFECT CLUB BENCHMARK: OCEAN INSTRUMENTED V) 1448 21595 draw_string
+(     &ERSION'/1X,'$Revision: 1.A.1 $ $Author: psharma $'/\)              0006) 1448 21580 draw_string
+(      CALL START\(NX, NY\)                                                0007) 1448 21565 draw_string
+(C                                                                       ) 1448 21550 draw_string
+(C IF  LMAPP = 1 , H  \(THE SIZE OF THE BOX IN Y DIRECTION\)  SHOULD BE    ) 1448 21535 draw_string
+(C SPECIFIED IN THE MAIN PROGRAM.                                        ) 1448 21520 draw_string
+(C                                                                       ) 1448 21505 draw_string
+(      H = PI                                                            0008) 1448 21490 draw_string
+(C                                                                       ) 1448 21475 draw_string
+(C DEFINING CONSTANTS THAT WILL BE NEEDED:                               ) 1448 21460 draw_string
+(C                                                                       ) 1448 21445 draw_string
+(      N1H = N1/2                                                        0009) 1448 21430 draw_string
+(      N1Q = N1/4                                                        0010) 1448 21415 draw_string
+(      N1E = N1/8                                                        0011) 1448 21400 draw_string
+(      N2M = N2-1                                                        0012) 1448 21385 draw_string
+(      N2P = N2+1                                                        0013) 1448 21370 draw_string
+(      N2DP = 2*N2+1                                                     0014) 1448 21355 draw_string
+(      N2DM = 2*N2-1                                                     0015) 1448 21340 draw_string
+(      N2PD = 2*N2P                                                      0016) 1448 21325 draw_string
+(      NW = N2PD*N1H                                                     0017) 1448 21310 draw_string
+(      NWH = NW/2                                                        0018) 1448 21295 draw_string
+(      NWQ = NW/4                                                        0019) 1448 21280 draw_string
+(      NWEIG = N2M                                                       0020) 1448 21265 draw_string
+(      IF \(LMAPP.NE.1\) NWEIG = \(N2M+3\)*N2M                               0021) 1448 21250 draw_string
+(      NMAX2 = MAX\(2*N2, N1\)                                             0023) 1448 21235 draw_string
+(      K1Q = N1E+1                                                       0024) 1448 21220 draw_string
+(      K2Q = K1Q+N1E                                                     0025) 1448 21205 draw_string
+(      K3Q = K2Q+N1E                                                     0026) 1448 21190 draw_string
+(      K1QM = K1Q-1                                                      0027) 1448 21175 draw_string
+(      K2QM = K2Q-1                                                      0028) 1448 21160 draw_string
+(      K3QM = K3Q-1                                                      0029) 1448 21145 draw_string
+(C                                                                       ) 1448 21130 draw_string
+(C LCM ALLOCATION AND COMPUTATION OF ADDRESSES:                          ) 1448 21115 draw_string
+(C                                                                       ) 1448 21100 draw_string
+(      LARGE = 8*NW                                                      0030) 1448 21085 draw_string
+(      IF \(NOTEMP.EQ.1\) LARGE = 6*NW                                     0031) 1448 21070 draw_string
+
+end
+showpage
+%%Trailer
+%%EOF

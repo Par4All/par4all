@@ -1,0 +1,1275 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt,A4,french,verbatim]{farticle}
+
+\usepackage[latin1]{inputenc}
+\title{ Compilation pour machines à mémoire répartie \\
+	 - Rapport de synthèse finale - \\
+Contrat 92/0017 BC 08}
+\setlength{\parindent}{0mm}
+\newcommand{\PIPS}{\mbox{PIPS}}
+\newcommand{\CRI}{\mbox{CRI}}
+\newcommand{\ARMINES}{\mbox{ARMINES}}
+\newcommand{\IN}{\mbox{IN}}
+\newcommand{\PRISM}{\mbox{PRISM}}
+\newcommand{\OUT}{\mbox{OUT}}
+\newcommand{\PVM}{\mbox{PVM}}
+\author{Corinne Ancourt}
+\begin{document}
+
+\maketitle 
+
+\section{Objet de l'étude}
+
+L'objectif général de cette étude est le développement de techniques
+de compilation associées aux machines à mémoire répartie et leur
+intégration dans une chaîne de compilation opérationnelle.
+
+Basée sur une collaboration entre le \PRISM{} de l'Université de
+Versailles-St Quentin et \ARMINES{}, la partie commune aux deux équipes
+a pour but  la définition d'un format général de directives
+permettant l'intégration des résultats déjà fournis par l'un ou
+l'autre des  outils de parallélisation automatique de programmes
+scientifiques FORTRAN développés par le \PRISM{} et \ARMINES{}.
+
+La partie en charge d'\ARMINES{} représente l'extension et la
+consolidation des travaux menés dans le cadre du projet ESPRIT PUMA.
+Une maquette a été développée. Elle 
+génère à partir d'un programme FORTRAN 77 séquentiel,  un programme FORTRAN 77 distribué comportant des appels à une
+librairie de communications, permettant d'effectuer facilement des
+tests sur un réseau de stations de travail.
+
+Plusieurs membres du CRI ont contribué au bon déroulement de ce
+projet: Corinne Ancourt (Chargée de recherche),  Fabien Coelho
+(Scientifique du contingent en 94),  Béatrice Creusillet (Elève
+chercheur), François Irigoin (Directeur de recherche), et Ronan Keryell
+(Chargé de recherche). 
+
+\section{Intérêt de l'étude}
+
+Les multiprocesseurs à mémoire distribuée ont été introduits sur le
+marché depuis de nombreuses années mais leur programmation reste
+néanmoins toujours difficile. Les données d'une application doivent
+être divisées et placées sur les mémoires locales du
+multiprocesseur. Les allocations des éléments de tableaux ainsi
+distribués et des éléments temporaires utilisés lors des calculs
+doivent être effectuées. Des instructions {\em receive} doivent être
+ajoutées à chaque processus pour récupérer les données résidant
+dans d'autres processeurs et, de même, des instructions {\em send}
+doivent être introduites dans ceux des processus qui peuvent accéder
+localement ces mêmes éléments.
+
+Des outils de distribution automatique des données d'une application
+commencent à faire leur apparition mais restent, pour le moment, dans
+le domaine de la recherche \cite{Dart93,Feau93,GuPr93}.  Ecrire et
+mettre au point des processus 
+distribués est beaucoup plus difficile que de déclarer une boucle
+parallèle. Il faut tenir compte à la fois de l'ordonnancement des
+calculs et de la distribution des données afin de minimiser les
+communications et conserver un bon taux de parallélisme.
+
+La majorité des études de compilation associées aux multiprocesseurs
+à mémoire répartie utilise la règle d'exécution, {\em owner
+computes rule}.  Le code de transposition d'une matrice est simple, et
+permet de montrer les limites de ce modèle.
+
+\begin{center}
+\begin{figure}[htp]
+\begin{verbatim}
+DO I = 1, SIZE-1
+   DO J = I+1, SIZE
+      T = M(I,J)
+      M(I,J) = M(J,I)
+      M(J,I) = T
+   ENDDO
+ENDDO
+\end{verbatim}
+\label{code-transposition}
+\caption{Transposition de matrice}
+\end{figure}
+\end{center}
+
+\input{access-pattern.tex}
+
+En effet, il est  difficile de distribuer les
+itérations du corps de boucles de telle sorte qu'un processeur
+possède tous les éléments qu'il doit mettre à jour:
+\verb+M(I,J)+ et \verb+M(J,I)+ sont dans la majorité du temps sur des
+processeurs différents.  La technique définie par Gerndt dans
+\cite{Gerndt89} trouverait que l'ensemble de la matrice \verb+M+ doit
+être stockée sur tous les processeurs (car elle correspond à la
+{\em zone de recouvrement} existant entre deux itérations
+différentes). Il est de même impossible de recourir aux techniques
+de {\em distribution} de boucles car la variable \verb+T+ est locale
+au corps de boucles. Il faudrait
+pour utiliser cette technique expanser la variable, ce qui reviendrait
+à allouer  une nouvelle matrice \verb+T+ aussi grande que la matrice
+\verb+M+. 
+
+ L'approche que nous avons choisie dans le cadre du projet PUMA (projet
+ESPRIT 2701) est d'abandonner la {\em owner computes rule} et
+de la remplacer par une mémoire partagée émulée par logiciel. Les
+avantages potentiels sont:
+\begin{enumerate}
+\item la suppression du problème de la distribution des données;
+\item la prise en compte efficace de plus de constructions que ne le
+permet la {\em owner computes rule};
+\item la possibilité de servir les requêtes mémoire sur des
+processeurs dédiés n'effectuant aucun calcul;
+\item l'obtention plus aisée d'un bon équilibre de charge puisque
+n'importe quel processus peut être exécuté sur n'importe quel
+processeur;
+\item le contrôle plus fin de la granularité du parallélisme qui
+n'est plus implicitement liée à la distribution des données; ceci
+peut aussi améliorer l'équilibre de charge.
+\end{enumerate}
+
+La seconde idée est d'utiliser des serveurs mémoire spécifiques à
+l'application, connaissant les requêtes mémoire devant être
+effectuées au cours de l'exécution. Aucune requête mémoire explicite
+n'est alors nécessaire, ce qui augmente la bande passante globale utile
+du réseau d'interconnexion.
+
+Compte tenu des restrictions du type d'applications que nous
+traitions dans le cadre du projet PUMA (nids de boucles parallèles et
+parfaitement imbriquées), cette étude a permis l'extension du
+prototype vers des applications petites ou moyennes beaucoup plus
+générales, dont les caractéristiques sont décrites dans la section
+suivante. 
+
+Les appels à communication sont traduits en appels à une librairie de
+communications, \PVM{}, disponibles sur de nombreux multiprocesseurs.  Ce
+choix  nous a permis d'effectuer des tests et de  commencer à valider 
+nos options  sur un réseau de stations de travail.
+
+\subsection{Objectifs précis de la recherche}
+
+L'objectif de cette étude est de développer un prototype de compilation pour
+machines à mémoire distribuée permettant de tester plusieurs
+approches dans un contexte de {\em mémoire partagée émulée} sur diverses  machines à mémoire répartie possédant des
+possibilités de connexion processeur à processeur: 
+\begin{itemize}
+\item diverses applications (diverses tailles de noyaux de calcul,
+calculs creux), 
+\item diverses distributions (dans un premier temps par colonne ou ligne)
+\item divers  partitionnements (dans un premier temps selon la taille,
+puis selon la forme)
+\end{itemize}
+
+
+ Le langage d'entrée utilisé est le FORTRAN 77 et le langage de sortie
+est le FORTRAN 77 augmenté d'appels à une bibliothèque de
+communication portable \PVM{}.  Les points principaux de développement et
+d'extension du langage étaient les suivants:
+
+\begin{itemize}
+\item définition des pragmas;
+\item développement de techniques de partitionnement pour des boucles non
+parfaitement imbriquées;
+\item compilation de structures de contrôle dynamiques, comme les
+conditionnelles;
+\item compilation de structures de données dynamiques, comme les
+indirections;
+\item développement de techniques d'analyse statique de complexité en
+temps.
+\end{itemize}
+
+Ces différents points ont été traités. Ils sont présentés brièvement en
+Section \ref{etapes} et/ou  détaillés en Section \ref {annexe}.
+\subsection{Historique des études antérieures}
+
+ Dès les années 70, la DRET a soutenu un certain nombre de projets de
+recherche en parallélisation. Le projet VESTA, développé au sein du
+Centre de Recherches de CII-Honeywell Bull avec la collaboration du
+Pr.~Feautrier, prévoit la conception d'un compilateur vectoriseur pour
+Fortran. Ecrit en PL1, ce prototype n'a pas connu de suites immédiates,
+en partie du fait de l'absence de machines cibles françaises.
+Le projet VATIL, développé à l'INRIA par l'équipe
+du Pr.~Lichnewsky, a poursuivi dans cette voie de recherche par la
+réalisation d'un vectoriseur écrit en Le-Lisp. Ce vectoriseur a été
+progressivement enrichi et transformé en un paralléliseur.
+
+Le \CRI{}/\ARMINES{} a développé, avec un financement DRET, de 1988 à
+1991 le prototype \PIPS{} de parallélisation automatique de programmes
+destiné aux machines à mémoire partagée (projet
+DRET~87/017~bc~01). Les résultats les plus significatifs de cette
+étude se résument par (1) la qualité de la précision des phases
+d'analyse sémantique utilisées pour la détection automatique du
+parallélisme implicite, (2) leur caractère inter-procédural ainsi que
+(3) par la classe d'applications réelles traitées.
+
+Cette étude s'est prolongée de 1992 à 1993 par le contrat \PIPS{}-2
+(DRET~87/017~bc~18) qui avait pour objectif l'évaluation des travaux
+précédemment effectués et l'ajout d'une phase de génération de code
+vectoriel approprié au CRAY, incluant des primitives de
+micro-tasking.
+
+Parallèlement à ces deux projets (1991-1992), et sur un financement
+ESPRIT, le \CRI{}/\ARMINES{} a débuté une étude de génération de code
+distribué, dédié aux machines à mémoire répartie possédant des
+possibilités de connexion processeur à processeur. Cette étude a
+permis le développement d'un prototype de compilation/distribution pour
+des applications restreintes à des nids de boucles parallèles et
+parfaitement imbriquées.
+
+\subsection{Résultats acquis antérieurement}
+
+ \PIPS{} dispose d'un ensemble de phases
+d'analyse (syntaxiques, sémantiques,...), de transformations de
+programme (distribution, parallélisation,...) et d'outils de
+manipulation de structures de bases (polyèdres, graphes,...) qui, grâce
+à sa structure modulaire, peuvent
+être utilisées et appliquées indépendamment. Les développements
+effectués au cours de cette année ont grandement profité de cette
+modularité.
+
+D'une part, les résultats des phases d'analyse des dépendances, de
+calcul des préconditions et de détection des {\em variables privées}
+ont été directement utilisées. L'algorithme de distribution de nids
+de boucles a été amélioré pour mieux cibler les caractéristiques de
+notre approche. L'algorithme utilisé par l'{\em atomizer} pour
+transformer un programme en une suite d'affectations de variables
+scalaires ou/et de références directes à un tableau, a aussi été
+amélioré.
+
+D'autre part, les phases de partitionnement de programmes, de
+génération du code {\em distribué/partitionné}, de génération des
+communications et des déclarations associées aux allocations mémoire
+ont été réalisées ou adaptées aux nouveaux besoins.  Ces phases
+représentent un module indépendant de \PIPS{} nommée {\em distribution}.
+ 
+
+
+\section{Déroulement de l'étude}
+\label{etapes}
+
+Le projet {\em Compilation pour machines à mémoire répartie} s'est
+déroulé sur une période d'un an. Son objectif était principalement
+l'extension du langage d'entrée restreint, dans le cadre du projet
+ESPRIT PUMA, aux nids de boucles parallèles et parfaitement
+imbriquées. Après un rappel des caractéristiques de l'approche
+retenue, et des différentes étapes utiles à la génération d'un code
+distribué que nous avons étudiées, les sections suivantes retracent les
+états d'avancement  du projet.
+
+\subsection{Rappel des différentes étapes}
+
+Avant de présenter les différentes étapes de cette étude, nous
+rappelons les caractéristiques de l'approche retenue dans le cadre
+de PUMA. 
+
+\subsubsection{Caractéristiques de notre approche}
+
+Les processus sont divisés en deux catégories. Les processus de
+calculs exécutent les instructions du programme ainsi que les
+communications nécessaires à leur exécution. Seules les données
+utiles aux calculs associés au processus seront allouées dans la 
+mémoire locale du processeur associé. Les processus qui émulent
+la mémoire partagée (bancs mémoire) n'effectuent que les
+communications et le stockage.
+
+\paragraph{\bf Distribution des données}
+La distribution des données est implicite.  Les éléments de tableaux
+sont cycliquement alloués dans les bancs de la mémoire partagée.
+La figure 3 illustre cette distribution. Comme il s'agit de tableaux
+ForTran, ils sont alloués cycliquement par blocs d'éléments
+appartenant consécutivement à une même colonne.  La taille des blocs
+est donnée par l'utilisateur dans le fichier de configuration
+(model.rc) qui contient également le nombre de processeurs et de bancs
+mémoire.
+
+\input{matrix-mapping.tex}
+
+\paragraph{\bf Distribution des calculs}
+La distribution des calculs est basée sur le partitionnement des
+itérations des nids de boucles \cite{IrTr88}. Pour le moment, ce
+partitionnement s'effectue par blocs réguliers, parallèles aux
+directions des boucles initiales \\(Figure \ref{control-distribution}). La taille des partitions peut être
+aisément ajustée de manière à réduire les surcoûts de
+communication et de contrôle dûs au démarrage des tâches
+parallèles, et à équilibre les temps de communication et de calcul.
+La granularité du parallélisme peut être aussi ajustée, car elle
+n'est pas directement liée à la distribution des données mais
+uniquement au graphe de contrôle du programme.
+
+\begin{figure}
+\setlength{\unitlength}{1.0pt}
+\begin{picture}(180,90)(0,0)
+
+% partitioning
+
+\thicklines
+\put(0,90){\line(1,0){90}}
+\put(30,60){\line(1,0){90}}
+\put(90,30){\line(1,0){60}}
+\put(150,0){\line(1,0){30}}
+
+\put(0,90){\line(1,-1){30}}
+\put(30,90){\line(1,-1){60}}
+\put(60,90){\line(1,-1){90}}
+\put(90,90){\line(1,-1){90}}
+
+% iteration domain
+
+\thinlines
+\put(10,85){\line(1,0){70}}
+\put(10,85){\line(2,-1){140}}
+\put(80,85){\line(1,-1){70}}
+
+% iterations
+
+\multiput(10,85)(10,0){8}{\circle{2}}
+\multiput(30,75)(10,0){7}{\circle{2}}
+\multiput(50,65)(10,0){6}{\circle{2}}
+\multiput(70,55)(10,0){5}{\circle{2}}
+\multiput(90,45)(10,0){4}{\circle{2}}
+\multiput(110,35)(10,0){3}{\circle{2}}
+\multiput(130,25)(10,0){2}{\circle{2}}
+\multiput(150,15)(10,0){1}{\circle{2}}
+
+\end{picture}
+
+\caption{Distribution des calculs}
+\label{control-distribution}
+\end{figure}
+
+Les dépendences entre
+instructions sont analysées de manière à trouver les
+contraintes d'ordonnancement entre les itérations des boucles.  Si cet
+ordonnancement est un ordre total, les boucles devront s'exécuter
+séquentiellement et il ne sera pas possible d'effectuer un
+partitionnement intéressant des instructions permettant de réduire
+le temps d'exécution.  Des techniques de partitionnement peuvent
+toutefois être utilisées pour pallier aux contraintes de taille des
+mémoires locales (réduction des données devant être stockées
+au cours de l'exécution).
+
+Chaque bloc est vu comme une tâche indépendante. Chaque tâche
+est constituée de trois parties: la première correspond aux
+transferts des données utiles à l'exécution de la tâche de la
+mémoire globale vers la mémoire locale du processeur, la seconde
+correspond aux calculs et la dernière aux transferts des données,
+modifiées au cours de l'exécution, dans la mémoire partagée.
+
+Les tâches parallèles sont distribuées sur les processeurs
+ de calcul. Les calculs ne font plus référence aux éléments de tableaux
+via les indices de  boucles initiaux, mais utilisent les indices locaux à 
+chacun des blocs (partitions). Tous les calculs qui dépendent des
+indices de boucles initiaux sont remplacés par une série
+d'instructions relatives aux indices locaux.
+
+D'une part, pour respecter le modèle SPMD et, d'autre part, pour limiter les
+synchronisations et communications éventuelles internes à un nid de
+boucles, l'ensemble des exécutions séquentielles est effectué par tous
+les processeurs. Ce choix limite les diffusions de données qui seraient
+calculées séquentiellement et utilisées au cours de calculs
+parallèles distribués internes au nid de boucles séquentiel.
+
+Un bon équilibre de charge est plus facile à obtenir que dans le cas
+de la {\em owner computes rule} car n'importe quel processus
+peut être exécuté sur n'importe quel processeur. La taille des
+processus peut même être ajustée dynamiquement.
+
+\paragraph{\bf Transferts de données}
+
+Lorsque le partitionnement des instructions en processus
+est déterminé, les transferts de données entre la mémoire 
+partagée émulée et les mémoires locales des processeurs de calcul 
+peuvent être calculés.
+
+Les transferts, de la mémoire partagée vers les mémoires locales des
+processeurs de calcul, des données utilisées au cours de l'exécution
+doivent être exécutés avant le début de chaque processus.  Ceux de
+la mémoire locale des processeurs de calcul vers la mémoire partagée
+doivent l'être à la fin de chaque exécution.  Ils nécessitent la
+caractérisation de l'ensemble des données {\em utilisées} et {\it
+modifiées} pendant les phases de calculs.
+
+La caractérisation de ces données est problématique quand il
+s'agit de tableaux, car c'est l'ensemble des éléments
+référencés par le tableau dans le corps de boucle de la tâche
+parallèle qui doit être calculé. Cet ensemble correspond à un
+ensemble de points entiers.  C'est la cause de la plupart des
+problèmes rencontrés.  Cet ensemble ne correspond pas toujours à un
+ensemble convexe de points entiers ce qui rend difficile son parcours
+par un corps de boucles {\em simples}. Les techniques utilisées pour
+générer automatiquement ces codes de transfert sont détaillées
+dans~\cite{Ancourt90}.
+
+\paragraph{\bf Chargement des données.}
+Pour transférer les données {\em utilisées} de la mémoire partagée vers 
+les mémoires locales, il n'est pas nécessaire de copier l'ensemble exact des 
+données utilisées par la tâche. Un ensemble de données légèrement 
+plus grand peut être copié car ces données ne seront utilisées que 
+localement. Aucun conflit entre les différentes mémoires locales ne peut se 
+produire. 
+
+Si l'ensemble des éléments à transférer est non convexe, son
+enveloppe convexe sera transférée.  Dans le cas de plusieurs
+références au même tableau en dépendance dans le corps de boucles, un
+seul code de transfert des données sera généré pour l'ensemble de
+ces références.
+
+\paragraph{\bf Rangement des résultats.}
+Pour transférer les données de la mémoire locale des processeurs de
+calcul vers la mémoire partagée, il ne serait pas correct de copier un
+élément qui n'a pas été modifié par la tâche. En effet, cet
+élément peut avoir été modifié par une tâche s'exécutant en
+parallèle, et deux valeurs d'une même donnée ne peuvent coexister
+dans une mémoire partagée cohérente. Il faut donc recopier l'ensemble
+exact des données {\em modifiées} par la tâche.
+
+\input{bank-access-pattern.tex}
+
+Si cet ensemble n'est pas un ensemble convexe, des divisions entières sont
+introduites dans les expressions des bornes de boucles de manière à
+traduire cette non convexité. Un test linéaire est aussi parfois
+nécessaire. Pour éviter ce test, qui conduit à une augmentation du
+coût du contrôle, les codes de transfert pourraient être décomposés:
+un code de transfert par ensemble convexe constituant l'ensemble non
+convexe des données modifiées serait alors généré.
+
+
+La figure \ref{data-movements} illustre l'ensemble des éléments
+référencés par l'un des blocs de calculs lors d'une transposition de
+matrice. L'ensemble des éléments du bloc inférieur gauche et
+supérieur droit doivent être transférés pour mettre à jour les
+éléments de tableaux symétriques correspondants. La distribution de
+ces éléments référencés sur les bancs de la mémoire partagée
+illustre bien la non convexité des ensembles d'éléments à
+transférer. Cette non convexité explique  la complexité du
+code généré. 
+
+
+\paragraph{\bf Déclaration des variables locales et partagées}
+En ce qui concerne les problèmes d'allocation mémoire et de
+déclarations des données partagées et locales associées, on
+remarque que : 
+\begin{itemize}
+\item Il est important de pouvoir détecter les variables locales à un
+corps de boucles, telle que $T$ dans l'exemple de la transposition de
+matrice, parce qu'elles peuvent être allouées directement dans les
+mémoires locales des processeurs de calcul. Elles n'ont pas besoin
+d'être transférées entre la mémoire partagée et les mémoires
+locales durant les exécutions.  Les variables scalaires {\it
+privées} sont détectées par \PIPS{}\cite{IrJoTr91}. Elles sont
+déclarées dans les mémoires locales mais pas dans la mémoire
+partagée émulée.
+
+\item Il est aussi indispensable de prendre en compte les {\em input
+dependences} qui existent entre des lectures de la même variable pour
+savoir combien de copies locales il faut associer à chaque variable initiale.
+
+Dans le cas de la transposition de matrice, les deux références
+\verb+M(I,J)+ et \verb+M(J,I)+ sont totalement indépendantes. Il faut donc
+prévoir la déclaration de {\em deux} zones de copies locales pour
+\verb+M+, qui sont appelées \verb+L_M_0+ et \verb+L_M_1+(\verb+L+ comme
+local). 
+Par contre, dans le cas d'un calcul de convolution, on trouverait que
+toutes les références à un voisinage sont en dépendance et donc
+qu'il ne faut allouer qu'une seule copie locale.
+\end{itemize}
+
+\subsubsection{Premier trimestre}
+
+Les développements réalisés au cours du premier trimestre avaient
+pour but essentiel d'installer une procédure de validation complète
+des codes distribués générés par notre prototype. Ces développements
+se sont concrétisés par  
+
+\begin{itemize}
+
+\item l'installation d'une procédure de validation du code généré 
+ qui comporte des  programmes contenant, actuellement, en fin de projet:
+\begin{itemize}
+\item plusieurs nids de boucles parfaitement et non parfaitement
+imbriqués, séquentiels, partiellement ou totalement parallèles
+englobant une séquence d'affectations,
+\item d'éventuelles indirections,
+\item mais pas de conditionnelles,
+\item  des références à des éléments de tableaux qui  sont  disjointes ou  se recouvrent.
+\end{itemize}
+
+\item l'ajout d'une interface avec \PVM{} et de sa validation sur réseau de stations de
+travail,   présentées dans
+le rapport intermédiaire.
+
+\end{itemize} 
+
+\paragraph{\bf Les indirections}
+
+Simultanément, nous avons commencé l'extension du langage d'entrée
+considéré. 
+La présence des indirections dans les programmes soulèvent les mêmes
+problèmes que ceux exposés pour les affectations conditionnelles: on
+ne connaît pas à la compilation les éléments référencés au cours
+des calculs. 
+
+ L'{\em atomizer} est une transformation de programme qui simplifie les
+phases d'analyse et de génération des communications dans les cas où
+il y a des indirections (et des entrées/sorties), puisque les variables
+temporaires créées par l'atomizer représentent les différentes
+opérations ou communications qui devront être effectuées pour
+finaliser l'envoi ou la réception d'un accès indirect aux éléments
+d'un tableau.
+
+\begin{center}
+\begin{figure}[hpt]
+\begin{verbatim}
+                                      ITMP1 = I             
+                                      ITMP2 = J
+                                      ITMP3 = A(ITMP1, ITMP2)
+                                      ITMP4 = ITMP1 -1
+                                      ITMP5= ITMP2 +1
+       B(I-1,J+1)=A(I,J)              B(ITMP4,ITMP5) = ITMP3
+       C(A(I,J),J) = I                C(ITMP3,ITMP2) = ITMP1
+\end{verbatim}
+\caption{Atomizer}
+\label{prog3}
+\end{figure}
+\end{center}
+
+Cette transformation de programme a été intégrée à \PIPS{}. Si
+l'optimiseur d'un compilateur sait optimiser le code généré,
+notre prototype n'effectue pas d'optimisations. Afin de minimiser les
+allocations de temporaires, une passe simplifiée de cette
+transformation, permettant de préciser que l'on ne désire appliquer la
+transformation qu'aux références aux éléments de tableaux
+indirectes, a aussi été intégrée à \PIPS.
+
+
+\subsubsection{Deuxième trimestre}
+Cette deuxième partie du projet  a été consacrée, d'une part, à la
+définition des pragmas et, d'autre part, à la définition du schéma
+de calcul et de 
+communications adapté aux nouvelles structures de données et de
+contrôle introduites.
+
+
+\paragraph{\bf Définition des pragmas.} En collaboration avec le
+\PRISM{}, nous avons
+déterminé les informations intéressantes qui seront échangées entre
+PAF et PIPS. Plus précisément, il s'agit des {\em préconditions} et
+des {\it régions}, calculées par PIPS et disponibles sous forme de
+commentaire dans les programmes, qui seront utilisées par PAF et des
+{\it réductions}, détectées par PAF, qui seront utilisées par
+PIPS. Le format d'échanges des réductions choisi est celui décrit
+dans le premier rapport d'avancement rédigé par M. Barreteau,
+P. Feautrier et X. Redon.
+
+
+\paragraph{\bf Schéma de calcul et communications adapté aux nouvelles structures.}
+Dans le cadre du projet PUMA, seule la génération de code distribué
+pour les nids de  boucles parfaitement imbriquées et parallèles était
+proposée et optimisée. L'extension du type d'applications traitées
+nécessitait la définition d'un nouveau schéma de calcul et de
+communications. Une ébauche de cette étude a été présentée dans
+le rapport intermédiaire. Nous en donnons une version  plus
+détaillée dans l'annexe~\ref{annexe}.
+ 
+\paragraph{\bf Complexité statique}
+
+Le calcul de la complexité des tâches parallèles  à exécuter sur
+les différents processeurs est utile, en autres, pour évaluer  le bon 
+équilibrage ``coûts des communications'' et ``coûts des calculs''.
+
+Cette phase de calcul, qui est intégrée à \PIPS{}, a été
+présentée brièvement dans le rapport intermédiaire et détaillée
+dans~\cite{Zhou94}. Pour des raisons de temps (réduction de la durée
+du projet de 3 à 1 an), les résultats de cette phase d'analyse ne sont
+pas encore exploités par l'algorithme de partitionnement. Cette
+optimisation fait, cependant, partie des perspectives intéressantes de
+recherche et d'expérimentation.
+
+
+
+\subsubsection{Troisième trimestre}
+
+Cette période a été consacrée à l'implantation du schéma de calcul
+et communications, présenté en section~\ref{annexe} , à l'implantation 
+et  l'amélioration des régions \IN{} et \OUT{}. 
+
+\paragraph{\bf Régions \IN{} et \OUT{}}
+
+Les techniques de compilation, utilisées actuellement par le prototype,
+traitent successivement les nids de boucles. Elles génèrent pour
+chacun d'entre eux, une tâche parallèle composée des communications
+de la mémoire partagée vers les mémoires locales, du code de calcul,
+puis des communications des mémoires locales vers la mémoire
+partagée. Etant donné que les parties de programme séquentielles sont
+exécutées par l'ensemble des processeurs, lorsque plusieurs nids de
+boucles successifs totalement séquentiels référencent le même
+ensemble de données, ces techniques générent des communications
+inutiles qui ne tiennent pas compte de l'héritage de données
+cohérentes provenant de tâches séquentielles précédentes. Pour
+palier ce surcoût de communications, il ne faut effectuer (si les
+capacités mémoire le permettent) les communications qu'au début et à
+la fin de la partie séquentielle du programme. L'ensemble des données
+à transférer est, dans ce cas, donné par les régions \IN{} et \OUT{}
+\cite{Creu95} de la section de programme considérée. 
+
+
+
+\subsubsection{Dernier trimestre}
+
+
+La dernière partie du projet a permis de réaliser une phase de
+transformation adaptée aux nids de boucles mal imbriqués et
+d'améliorer les déclarations associées aux allocations mémoire,
+aussi bien pour les processeurs de calcul que pour les processeurs
+mémoire. 
+
+
+\paragraph{\bf Déclaration des tableaux locaux}
+
+Les processeurs de calcul exécutent les parties de calcul correspondant
+aux itérations séquentielles et aux itérations parallèles
+qui leur sont attribuées. L'espace nécessaire au stockage des éléments
+de tableaux référencés au cours de ces itérations doit être alloué
+en {\em local}.
+
+Plusieurs références à un même tableau caractérisant des sections
+de tableau disjointes sont allouées de manière indépendante.  Comme
+l'illustre le code de la transposition de matrice en Annexe, les
+sections symétriques du tableau \verb+M+ : \verb+L_M_0+ et \verb+L_M_1+
+(Local variable \verb+M+)
+référencées au sein du même nid de boucles parallèles sont
+allouées indépendamment .  Si les références caractérisent des
+sections non disjointes, un même espace leur est alloué. Sa dimension
+correspond à l'enveloppe convexe des différentes sections.  L'espace
+alloué aux tableaux locaux dépend directement de la taille des blocs
+définie par le partitionnement.
+
+
+\paragraph{\bf Déclaration des variables globales}
+
+Les processeurs mémoire émulent une mémoire globale sur laquelle est
+alloué l'ensemble des tableaux de l'application. Les tableaux sont
+stockés cycliquement sur les bancs (processeurs mémoires) par blocs,
+de taille égale à celle des lignes de bancs définies dans le fichier
+de configuration.  La position d'un élément de tableau \verb+M+ est
+définie par le numéro de banc auquel il appartient, le numéro de la
+ligne sur le banc et sa position dans la ligne.  La taille des tableaux
+en mémoire globale est identique à celle des tableaux initiaux.  Une
+matrice  \verb+M(100x100)+ distribuée sur 4 bancs mémoire par lignes de 100
+éléments sera déclarée sur chacun des bancs sous la forme
+\verb+ES_M(0:24,0:99)+ (Emulated Shared variable  \verb+M+).
+
+\paragraph{\bf  Traitement des nids de boucles mal imbriquées}
+
+Afin d'augmenter le taux de parallélisme exploitable et les
+possibilités d'appliquer efficacement le partitionnement, le code est
+tout d'abord transformé~; une distribution partielle est
+appliquée. Après distribution en composantes fortement connexes des
+différentes instructions d'un nid de boucles, les instructions
+indépendantes (non liées par des dépendances) sont regroupées au
+sein d'un même nid de boucles qui sera au moins partiellement (pour
+l'indice de boucle considéré) parallélisé. Plutôt qu'une
+distribution totale, cette transformation permet, dans le cadre de notre
+étude, de diminuer l'overhead de contrôle et d'améliorer
+l'équilibrage de charge.  Les instructions liées par des dépendances
+cycliques, qui ne peuvent pas être {\em cassées} par simple
+distribution des instructions, sont aussi regroupées au sein d'un même
+nid de boucles, dans le même but.  Les instructions qui appartiennent
+à une même composante connexe sont effectivement distribuées de
+façon à permettre la parallélisation.
+
+L'application de cette transformation génère des nids de boucles
+parfaitement bien imbriquées parallèles ou séquentiels et des nids de
+boucles mal imbriqués dont la boucle externe  est
+séquentielle. 
+
+\subsection{Difficultés, faits significatifs et résultats}
+
+La réalisation de cette étude n'a pas soulevé de problème technique
+particulier. La difficulté que nous avons rencontré est temporelle et
+s'explique par la réduction de trois à un an de la période allouée
+initialement au projet . Les différentes étapes du projet ont été
+abordées et la majorité d'entre elles a été implantée dans le
+prototype de parallélisation \PIPS{}.
+
+
+Avec ces nouvelles phases d'analyse, de transformation et
+génération de code distribué, \PIPS{} dispose d'une plateforme de
+recherche et d'expérimentation, très modulaire, qui devrait permettre
+d'effectuer des comparaisons intéressantes avec les approches basées
+sur la  {\em owner computes rule} et plus particulièrement l'approche
+\verb+HPF+ . 
+
+Cette étude a permis l'introduction de nouvelles phases indépendantes
+dans \PIPS{} qui pourront être utilisées dans un autre contexte. 
+Notamment, la transformation de distribution partielle sera utile à
+tout type d'architecture ou stratégie de compilation nécessitant un
+grain moyen de parallélisme.
+
+
+\section{Récapitulation des résultats}
+
+Le développement de ce prototype a montré que PIPS possédait les
+phases d'analyses et de transformations nécessaires au développement
+rapide d'algorithmes de génération de code distribué. Les étapes
+ intégrées à \PIPS{} sont les suivantes:
+\begin{itemize}
+\item définition des pragmas permettant aux deux équipes \PRISM{} et
+\CRI{} de profiter rapidement des résultats des techniques avancées
+développées par l'un et  l'autre des prototypes,
+\item compilation des structures de contrôle séquentielles,
+\item compilation des structures de données dynamiques, comme les
+indirections
+\item développement de techniques de partitionnement pour des boucles non
+parfaitement imbriquées
+\item génération de code faisant appel à une bibliothèque de
+communications \PVM{},
+\item développement d'une phase de validation permettant de conserver
+au cours  des améliorations des algorithmes de génération de code, les résultats antérieurs acquis sans
+possibilités de régression. 
+\end{itemize}
+
+Les phases qu'il reste à intégrer en vue d'optimiser le code généré
+sont:
+
+\begin{itemize}
+\item compilation de structures de contrôle dynamiques, comme les
+conditionnelles 
+\item intégration des techniques d'analyse statique de complexité en
+temps 
+\item intégration des régions \IN{} et \OUT{}
+\end{itemize}
+
+
+\section{Conclusion}
+
+Après quelques mois de retard, dû en grande partie au fait que l'on
+désirait, malgré la réduction de temps imparti au projet, développer
+et intégrer la majeure partie des phases de l'étude dans la chaine de
+compilation opérationelle \PIPS{}, en vue d'obtenir une maquette du
+prototype de génération de code distribué avancée, ce projet s'est
+bien déroulé et a fournit un ensemble de  résultats techniques
+cohérents en un an.
+
+
+\section{Perspectives ultérieures}
+
+Comme nous l'avons déjà signalé au cours de la présentation des
+différentes étapes de réalisation de cette étude, par manque de
+temps, certaines optimisations ne sont pas intégrées dans les étapes
+de génération de code distribué. La phase de calcul de la complexité
+statique d'une application devrait permettre d'améliorer le {\em load
+balancing} des applications parallèles (partitionnement selon une
+dimension plutôt qu'une autre). La phase d'analyse des {\em régions
+\IN{} et \OUT{}} devrait aussi, une fois intégrée aux algorithmes de
+génération des comunications, conduire à une diminution significative
+du coût des communications.
+
+Une autre perspective importante est l'utilisation des différentes
+phases de {\em distribution} pour valider et tester les choix retenus
+dans notre approche. Les premiers résultats expérimentaux, menés sur
+un réseau de stations de travail, sont ceux que l'on attendait. Notre
+approche offre des possibilités d'exécution d'applications gourmandes
+en mémoire et (2) obtiennent de meilleurs temps d'exécution sur les
+tâches parallèles comportant de nombreux calculs.
+
+\section{Annexe Technique - Schéma de communication adapté aux nouvelles
+structures}
+\label{annexe} 
+
+La première étape de distribution/parallélisation d'un programme,
+composé uniquement d'un ensemble de boucles parallèles et parfaitement
+imbriquées, consiste à regrouper les calculs en tâches parallèles de
+taille raisonnable (relativement à la taille des caches ou aux lignes de
+bancs mémoire, par exemple). Une fois les calculs regroupés en tâches
+parallèles, l'étape suivante est la génération des communications
+nécessaires à l'exécution des tâches sur les différents
+processeurs. Pour ce type de code, la stratégie choisie consistait à
+transférer l'ensemble des éléments référencés en lecture
+(respectivement en écriture) avant (respectivement après) l'exécution
+de chacune des tâches parallèles. Cependant, l'extension de notre
+langage d'entrée impose un schéma de communication plus complet.
+
+\paragraph{\bf Recouvrement des calculs et communications}
+
+Les expériences réalisées ont été effectuées sur un réseau de
+stations de travail. Le gain que l'on peut attendre de ce type
+d'expérience se situe sur la granularité des applications qui peuvent
+être exécutées comparées à une exécution sur un seul
+processeur. Dans ce contexte, un pipeline de séquences d'instructions
+effectuant les communications et d'autres les calculs n'a pas
+d'intérêt.  En fait, il induirait même un surcroît d'allocations
+mémoire, nécessaire au stockage des tableaux locaux pour les
+différents niveaux de pipeline. Nous n'avons donc pas implanté de
+techniques permettant de recouvrir calculs et communications, et
+l'ensemble des communications nécessaires aux calculs d'une tâche sont
+effectuées immédiatement avant l'exécution des calculs.
+
+
+     
+\subsection{Stratégies de communication} 
+
+Différentes stratégies de communication peuvent être utilisées pour
+transférer les éléments utiles à l'exécution des tâches sur les
+processeurs selon les différentes structures du programme.  Celle que
+nous avons choisie est la suivante:
+
+\subsubsection{Affectation simple}
+ \begin{itemize}
+\item les éléments   référencés en lecture
+sont transférés avant l'exécution de cette instruction, pas
+nécessairement juste avant, mais le plus souvent regroupés avec ceux de
+structures plus englobantes, de manière à favoriser des possibilités
+d'effectuer des  communications groupées.
+\item Les  éléments  scalaires référencés en écriture sont
+transférés juste après l'exécution, tandis que les éléments de
+tableaux modifiés sont regroupés avec ceux d'une structure plus
+englobante pour favoriser les possibilités de transferts d'éléments
+contigus, moins coûteux. 
+\end{itemize}
+
+\subsubsection{Séquence d'affectations}
+
+\begin{itemize}
+\item l'ensemble des éléments référencés en lecture est transféré
+avant l'exécution de cette séquence, si aucun des termes des indices
+des fonctions d'accès aux éléments d'un tableau ne dépend d'une
+variable scalaire qui est modifiée dans cette séquence linéaire (voir
+Figure \ref{prog1}).  Sinon, une communication en réception est
+générée juste avant l'instruction référençant le tableau.
+
+\begin{center}
+
+\begin{figure}[hpt]
+\begin{verbatim}
+                                 A = ...
+                                 C = T(A)
+\end{verbatim}
+\caption{Séquence d'affectations - référence indirecte}
+\label{prog1}
+\end{figure}
+\end{center}
+
+
+\item  Les  éléments  scalaires référencés en écriture sont
+transférés juste après l'exécution, tandis que les éléments de
+tableaux modifiés sont regroupés au niveau de la séquence
+d'instructions.
+\end{itemize}
+
+\subsubsection{Séquence d'affectations- références indirectes}
+Les scalaires étant distribués sur tous les bancs mémoire, tous les 
+processeurs émulant la mémoire partagée disposent de la valeur de ces
+scalaires.  Les éléments de tableaux référencés par des fonctions
+d'accès numériques ou paramétriques, sous la condition que ce
+paramètre soit connue au début de l'exécution de la boucle, sont
+traités identiquement aux autres éléments de tableaux dont la
+fonction d'accès est linéaire. Ils représentent un cas particulier
+pour lequel la valeur des indices est nulle.
+Par contre, les éléments de tableaux dont la fonction d'accès est 
+paramétrique et pour lesquelles la valeur du paramètre n'est connue que
+lors de l'exécution, doivent être traités différemment. On distingue
+aussi, pour des raisons d'optimisation, le cas où le nid de boucle est
+totalement séquentiel des autres cas:
+
+
+\paragraph{\bf Le nid de boucles est totalement séquentiel}
+
+Chaque processeur de calcul déduit des équations de linéarisation,
+dérivant de l'allocation cyclique sur les bancs mémoire des éléments
+de tableaux, la position mémoire (numéro de banc, numéro de la ligne
+sur le banc et l'offset sur la ligne) de l'élément a
+transférer. Cette position est ensuite communiquée au banc mémoire
+correspondant au numéro du processeur de calcul. Après réception, le
+banc mémoire qui possède la mémoire (simple test sur les valeurs
+recues) envoie à chacun des processeurs la valeur de l'élément.
+
+\paragraph{\bf Le nid de boucles est partiellement ou totalement parallèle}
+
+Chaque processeur effectue des calculs qui peuvent être différents de
+ceux exécutés sur les autres processeurs de calcul. La valeur du
+paramètre peut donc être différente pour chacun des
+processeurs. Chaque processeur doit diffuser la position de l'élément
+dont il a besoin à l'ensemble des bancs mémoire. Le banc mémoire
+correspondant renvoie en retour l'élément au processeur exécutant le
+bloc correspondant.
+
+\begin{verbatim} 
+C   PROGRAMME d'ENTREE
+C   programme comportant 
+C      - des iterateurs i et j dans les calculs 
+C      - des acces aux elements de tableaux parametres
+C
+C
+      do 100 i = 1, size
+         do 200 j = 1, size
+            b(i,j) = (i-1)*size+(j-1)
+            p = 1
+            m = b(p,j)
+            c(i,j) = b(i,j)/(size*size)
+ 200     continue
+ 100  continue
+\end{verbatim}
+
+\begin{verbatim} 
+C   PROGRAME GENERE PAR LE PROTOTYPE
+C   code distribue utilisant les iterateurs locaux L_I et L_J
+C
+         DO 99978 L_I = 0, 0
+          DO 99979 L_J = 0, 1
+          X3 = 1+I_0+L_I
+          X4 = 1+2*J_0+L_J
+          L_B_0_0(L_I,L_J) = (X3-1)*SIZE+X4-1
+          P = 1
+          L = (-1+20*J_0+10*L_J+P)/20
+          X1 = (-1+20*J_0+10*L_J+P-20*L)/10
+          O = -1+20*J_0+10*L_J+P-20*L-10*X1
+          DOALL X2 = 0, 1
+             CALL WP65_SEND_4(X2, X1, 1)
+             CALL WP65_SEND_4(X2, L, 1)
+             CALL WP65_SEND_4(X2, O, 1)
+          ENDDO
+          CALL WP65_RECEIVE_4(X1, L_B_0_0(P,L_J), 1)
+          M = L_B_0_0(P,L_J)  
+          L_C_0_0(L_I,L_J) = L_B_0_0(L_I,L_J)/(SIZE*SIZE)
+99979 CONTINUE
+99978 CONTINUE
+\end{verbatim}
+
+ Il faut noter que les variables qui sont {\em privées}\footnote{Une
+variable est privée à un nid de boucles, si sa valeur en entrée de
+boucle et sa valeur en sortie ne sont pas utilisées dans le nid de
+boucles en dehors de cette boucle; c'est le cas des variables
+temporaires.}  à une séquence d'instructions n'impose une
+communication qu'après exécution de la séquence d'instructions et pas
+avant.
+
+
+\subsubsection{Les nids de boucles totalement parallèles}
+ Les éléments de tableaux ou scalaires référencés en lecture
+(respectivement en écriture) sont transférés globalement
+avant (respectivement après) l'exécution. Il n'y a pas de conflits
+mémoire entre les accès aux données référencées puisque les
+exécutions sont parallèles.
+
+
+\subsubsection{Les nids de boucles  séquentielles} 
+
+Les calculs séquentiels sont exécutés sur un seul processeur. Tous
+les éléments référencés en lecture (respectivement en écriture)
+peuvent être transférées globalement avant (respectivement après)
+l'exécution du nid de boucles, car les dépendances sont respectées
+par la séquentialité de l'exécution.
+
+
+\paragraph{\bf Taille des blocs d'itérations séquentielles}
+D'une part pour respecter le modèle SPMD et d'autre part pour limiter
+les synchronisations et communications éventuelles internes à un nid
+de boucles, l'ensemble des exécutions séquentielles sont effectuées
+par tous les processeurs. Deux solutions permettent de distribuer les
+itérations séquentielles sur l'ensemble des processeurs de calcul:
+soit 1) on considère des blocs de taille égale à la section de
+tableau correspondant aux itérations de l'espace initial, soit 2) on
+considère des blocs de taille unitaire. Dans le premier cas, le volume
+des données à communiquer et à allouer est important et correspond à
+l'ensemble des éléments du tableau auxquels la fonction d'accès fait
+référence. Dans le second cas, seuls les éléments de tableaux
+référencés par une valeur de l'indice sont communiqués et alloués.
+
+Actuellement, le prototype  dimensionne les "blocs
+séquentiels" selon 2) pour les boucles
+séquentielles externes (éventuelles) aux boucles parallèles et selon
+1) pour les boucles séquentielles internes
+(éventuelles) aux boucles parallèles.  Dans le cas de nid de
+boucles totalement séquentielles, un compromis mixte devra être
+introduit pour conserver des possibilités de communications
+vectorielles ou regroupées et limiter les transferts toujours coûteux
+de données uniques.
+    
+
+
+\subsubsection{Les conditionnelles (pas encore intégrées)}
+Par défaut, les deux branches de la
+conditionnelle sont traitées de manière indépendante selon les
+structures précédemment décrites auxquelles elles appartiennent. 
+Toutefois, il est possible d'effectuer quelques optimisations pour les
+deux cas suivants:
+\begin{itemize}
+\item La conditionnelle est une inéquation linéaire dépendante d'un
+indice de boucle. Dans ce cas il est possible d'introduire cette
+contrainte dans le domaine d'itérations et de générer un ou deux
+nouveaux nids de boucles et leurs communications sans
+conditionnelle. Les nids de boucles traduiront respectivement la branche
+vraie et la branche fausse de la contrainte.
+
+\item La conditionnelle est une fonction linéaire indépendante des
+termes contenus  dans les deux branches du test. Cette contrainte est
+alors extraite du nid de boucles et placée à l'extérieur. Les
+communications sont générées pour chacune des branches
+indépendamment. Toutefois, le  test est effectué en dehors du nid de
+boucles et pas une fois pour chacune des valeurs du domaine
+d'itérations. 
+\end{itemize}
+
+\subsection{Code généré pour la transposition d'une matrice M}
+{\scriptsize
+\begin{verbatim}
+      SUBROUTINE WP65(PROC_ID)
+      INTEGER*4 idiv
+      EXTERNAL idiv
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J,L_I_1,L_I_2,L_J_1,
+     &L_J_2
+      REAL*4 L_M_0_0(0:24,0:24),L_M_1_0(0:24,0:24),T
+
+C     WP65 DISTRIBUTED CODE FOR TRANSP
+
+C     To scan the tile set for WP65
+      DO 99973 I_0 = PROC_ID, 3, 4
+         DO 99974 J_0 = I_0, 3
+            DOALL BANK_ID = 0, 3
+               DO 99995 L_J = MAX(0, 1+25*I_0-25*J_0), 24
+                  DO 99996 L = MAX(idiv(I_0+100*J_0, 16), idiv(4+101*
+     &            I_0, 16)), idiv(96+I_0+100*J_0, 16)
+                     L_I_1 = MAX(0, 100*BANK_ID-25*I_0-2500*J_0+400*L
+     &               -100*L_J)
+                     L_I_2 = MIN(24, 23-25*I_0+25*J_0, idiv(-1+100*
+     &               BANK_ID-2525*I_0+400*L, 101), 99+100*BANK_ID-25*
+     &               I_0-2500*J_0+400*L-100*L_J)
+                     IF (L_I_1.LE.L_I_2) THEN
+                        CALL WP65_RECEIVE_4(BANK_ID, L_M_0_0(L_I_1,
+     &                  L_J), L_I_2-L_I_1+1)
+                     ENDIF
+99996                CONTINUE
+99995             CONTINUE
+99994          CONTINUE
+            ENDDO
+            DOALL BANK_ID = 0, 3
+               DO 99990 L_I = 0, MIN(24, 23-25*I_0+25*J_0)
+                  DO 99991 L = MAX(idiv(100*I_0+J_0, 16), idiv(301-
+     &            100*BANK_ID+2525*I_0+101*L_I, 400)), MIN(idiv(96+
+     &            100*I_0+J_0, 16), idiv(92+101*J_0, 16), idiv(-1*
+     &            BANK_ID+25*I_0+L_I, 4))
+                     L_J_1 = MAX(0, 1+25*I_0-25*J_0, 1+25*I_0-25*J_0+
+     &               L_I, -9800+100*BANK_ID-25*J_0+400*L, 100*BANK_ID
+     &               -2500*I_0-25*J_0+400*L-100*L_I)
+                     L_J_2 = MIN(24, 99+100*BANK_ID-2500*I_0-25*J_0+
+     &               400*L-100*L_I, 99+100*BANK_ID-25*J_0+400*L)
+                     IF (L_J_1.LE.L_J_2) THEN
+                        CALL WP65_RECEIVE_4(BANK_ID, L_M_1_0(L_J_1,
+     &                  L_I), L_J_2-L_J_1+1)
+                     ENDIF
+99991                CONTINUE
+99990             CONTINUE
+99989          CONTINUE
+            ENDDO
+C           To scan each iteration of the current tile
+            DO 99975 L_I = 0, 24
+               DO 99976 L_J = MAX(1+25*I_0-25*J_0+L_I, 0), 24
+                  T = L_M_0_0(L_I,L_J)
+                  L_M_0_0(L_I,L_J) = L_M_1_0(L_J,L_I)
+                  L_M_1_0(L_J,L_I) = T
+200               CONTINUE
+99976             CONTINUE
+99975          CONTINUE
+            DOALL BANK_ID = 0, 3
+               DO 99984 L_J = MAX(0, 1+25*I_0-25*J_0), 24
+                  DO 99985 L = MAX(idiv(I_0+100*J_0, 16), idiv(4+101*
+     &            I_0, 16), idiv(3-BANK_ID+25*J_0+L_J, 4)), MIN(idiv(
+     &            96+I_0+100*J_0, 16), idiv(99-BANK_ID, 4), idiv(-1-
+     &            100*BANK_ID+2525*J_0+101*L_J, 400))
+                     L_I_1 = MAX(0, 100*BANK_ID-25*I_0-2500*J_0+400*L
+     &               -100*L_J)
+                     L_I_2 = MIN(24, 23-25*I_0+25*J_0, idiv(-1+100*
+     &               BANK_ID-2525*I_0+400*L, 101))
+                     IF (L_I_1.LE.L_I_2) THEN
+                        CALL WP65_SEND_4(BANK_ID, L_M_0_0(L_I_1,L_J)
+     &                  , L_I_2-L_I_1+1)
+                     ENDIF
+99985                CONTINUE
+99984             CONTINUE
+99983          CONTINUE
+            ENDDO
+            DOALL BANK_ID = 0, 3
+               DO 99978 L_I = 0, MIN(24, 23-25*I_0+25*J_0)
+                  DO 99979 L = MAX(idiv(100*I_0+J_0, 16), idiv(301-
+     &            100*BANK_ID+2525*I_0+101*L_I, 400)), MIN(idiv(96+
+     &            100*I_0+J_0, 16), idiv(92+101*J_0, 16), idiv(-1*
+     &            BANK_ID+25*I_0+L_I, 4))
+                     L_J_1 = MAX(0, 1+25*I_0-25*J_0, 1+25*I_0-25*J_0+
+     &               L_I)
+                     L_J_2 = MIN(24, 99+100*BANK_ID-25*J_0+400*L, 99+
+     &               100*BANK_ID-2500*I_0-25*J_0+400*L-100*L_I)
+                     IF (L_J_1.LE.L_J_2) THEN
+                        CALL WP65_SEND_4(BANK_ID, L_M_1_0(L_J_1,L_I)
+     &                  , L_J_2-L_J_1+1)
+                     ENDIF
+99979                CONTINUE
+99978             CONTINUE
+99977          CONTINUE
+            ENDDO
+99974       CONTINUE
+99973    CONTINUE
+      RETURN
+      END
+\end{verbatim}
+}
+\newpage
+{\scriptsize
+\begin{verbatim}
+      SUBROUTINE BANK(BANK_ID)
+      INTEGER*4 idiv
+      EXTERNAL idiv
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J,O_1,O_2
+      REAL*4 ES_M(0:99,0:25)
+
+C     BANK DISTRIBUTED CODE FOR TRANSP
+
+C     To scan the tile set for BANK
+      DO 99971 I_0 = 0, 3
+         PROC_ID = MOD(I_0, 4)
+         DO 99972 J_0 = I_0, 3
+            DO 99997 L_J = MAX(0, BANK_ID-25*J_0, 1+25*I_0-25*J_0), 
+     &      24
+               DO 99998 L = MAX(idiv(3-BANK_ID+25*J_0, 4), idiv(4-
+     &         BANK_ID+25*I_0, 4)), idiv(24-BANK_ID+25*J_0, 4)
+                  O_1 = MAX(0, -100*BANK_ID+2500*J_0-400*L+100*L_J, 
+     &            -100*BANK_ID+25*I_0+2500*J_0-400*L+100*L_J)
+                  O_2 = MIN(99, 9998-100*BANK_ID-400*L, 9924-100*
+     &            BANK_ID+25*I_0-400*L, -1-100*BANK_ID+2525*J_0-400*L
+     &            +101*L_J, 24-100*BANK_ID+25*I_0+2500*J_0-400*L+100*
+     &            L_J)
+                  IF (O_1.LE.O_2) THEN
+                     CALL BANK_SEND_4(PROC_ID, ES_M(O_1,L), O_2-O_1+1
+     &               )
+                  ENDIF
+99998             CONTINUE
+99997          CONTINUE
+            DO 99992 L_I = MAX(0, idiv(3+4*BANK_ID-100*I_0-J_0, 4)), 
+     &      MIN(24, 23-25*I_0+25*J_0)
+               DO 99993 L = MAX(0, idiv(12-4*BANK_ID+100*I_0+J_0, 16)
+     &         ), MIN(idiv(96-4*BANK_ID+100*I_0+J_0, 16), idiv(92-4*
+     &         BANK_ID+101*J_0, 16))
+                  O_1 = MAX(0, 1-100*BANK_ID-400*L, 1-100*BANK_ID+
+     &            2525*I_0-400*L+101*L_I, -100*BANK_ID+25*J_0-400*L, 
+     &            -100*BANK_ID+2500*I_0+25*J_0-400*L+100*L_I)
+                  O_2 = MIN(99, 2399-100*BANK_ID+2500*J_0, 24-100*
+     &            BANK_ID+2500*I_0+25*J_0-400*L+100*L_I)
+                  IF (O_1.LE.O_2) THEN
+                     CALL BANK_SEND_4(PROC_ID, ES_M(O_1,L), O_2-O_1+1
+     &               )
+                  ENDIF
+99993             CONTINUE
+99992          CONTINUE
+            DO 99986 L_J = MAX(0, BANK_ID-25*J_0, 1+25*I_0-25*J_0), 
+     &      24
+               DO 99987 L = MAX(idiv(3-BANK_ID+25*J_0, 4), idiv(4-
+     &         BANK_ID+25*I_0, 4)), idiv(24-BANK_ID+25*J_0, 4)
+                  DO 99988 O = MAX(0, -100*BANK_ID+25*I_0+2500*J_0-
+     &            400*L+100*L_J), MIN(99, 24-100*BANK_ID+25*I_0+2500*
+     &            J_0-400*L+100*L_J, 98-100*BANK_ID+2500*J_0-400*L+
+     &            100*L_J, -1-100*BANK_ID+2525*J_0-400*L+101*L_J)
+                     IF (idiv(202+100*BANK_ID+400*L+O, 101).LE.idiv(
+     &               100+100*BANK_ID-25*I_0+400*L+O, 100).AND.idiv(
+     &               101+100*BANK_ID+400*L+O, 100).LE.idiv(100+100*
+     &               BANK_ID-25*I_0+400*L+O, 100).AND.idiv(175+100*
+     &               BANK_ID-25*I_0+400*L+O, 100).LE.idiv(100+100*
+     &               BANK_ID-25*I_0+400*L+O, 100)) THEN
+                        CALL BANK_RECEIVE_4(PROC_ID, ES_M(O,L), 1)
+                     ENDIF
+99988                CONTINUE
+99987             CONTINUE
+99986          CONTINUE
+            DO 99980 L_I = MAX(0, idiv(3+4*BANK_ID-100*I_0-J_0, 4)), 
+     &      MIN(24, 23-25*I_0+25*J_0)
+               DO 99981 L = MAX(0, idiv(12-4*BANK_ID+100*I_0+J_0, 16)
+     &         ), MIN(idiv(96-4*BANK_ID+100*I_0+J_0, 16), idiv(92-4*
+     &         BANK_ID+101*J_0, 16))
+                  DO 99982 O = MAX(0, -100*BANK_ID+2500*I_0+25*J_0-
+     &            400*L+100*L_I, 1-100*BANK_ID+2525*I_0-400*L+101*L_I
+     &            ), MIN(99, 2399-100*BANK_ID+2500*J_0, 24-100*
+     &            BANK_ID+2500*I_0+25*J_0-400*L+100*L_I)
+                     IF (idiv(175+100*BANK_ID-25*J_0+400*L+O, 100)
+     &               .LE.idiv(100+100*BANK_ID+400*L+O, 101).AND.idiv(
+     &               175+100*BANK_ID-25*J_0+400*L+O, 100).LE.idiv(100
+     &               +100*BANK_ID-25*J_0+400*L+O, 100)) THEN
+                        CALL BANK_RECEIVE_4(PROC_ID, ES_M(O,L), 1)
+                     ENDIF
+99982                CONTINUE
+99981             CONTINUE
+99980          CONTINUE
+99972       CONTINUE
+99971    CONTINUE
+      RETURN
+      END
+\end{verbatim}
+}
+
+\begin{thebibliography}{99}
+
+\bibitem{Ancourt90} C. Ancourt,
+{\em Génération automatique de codes de transfert pour multiprocesseurs
+à mémoires locales},
+Thèse de doctorat, Université Paris~6, 1990
+
+
+\bibitem{Creu95} 
+Béatrice Creusillet,
+{\em Analyse de Flot de donnees: REGIONS de tableaux IN et OUT},
+Conférence RenPar'7, Mons, Belgique, 30 mai-2 Juin 1995.
+
+\bibitem{Dart93}  
+Darte Alain and Robert Yves,
+{\em Mapping Uniform Loop Nests onto Distributed
+		Memory Architectures},Report jan. 93, LIP, ENS-Lyon.
+	
+
+\bibitem{Feau93}
+Feautrier Paul,
+{\em Toward Automatic Partitioning of Arrays on Distributed Memory
+		Computers}, ICS'93, pages 175--184,
+	
+
+\bibitem{Gerndt89} 
+H.M. Gerndt,
+{\em Automatic parallelization for distributed-memory multiprocessing systems},
+PhD, Bonn University, 1989
+
+\bibitem{GuPr93}
+Gupta Manish and Banerjee Prithviraj,
+{\em Paradigme: A Compiler for Automatic Data Distribution on
+		  Multicomputers}, 
+	ICS'93, jul,pages 87--96
+
+\bibitem{IrTr88} F. Irigoin, R. Triolet,
+{\em Supernode Partitioning},
+ACM Symposium on Principles of Programming Languages, San-Diego, 1988
+
+\bibitem{IrJoTr91} F. Irigoin, P. Jouvelot, R. Triolet,
+{\em Semantical Interprocedural Parallelization: An Overview of the PIPS Project},
+ACM International Conference on Supercomputing (ICS'91), Cologne, 1991
+
+\bibitem{Zhou94}
+Lei Zhou,
+``Static Evaluation of Fortran Program Complexity ``,
+{\it Thèse de l'Université Pierre et Marie Curie },
+1994.
+
+
+
+\end{thebibliography}
+\end{document}

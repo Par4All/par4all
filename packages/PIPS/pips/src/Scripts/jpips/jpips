@@ -1,0 +1,129 @@
+#!/bin/sh
+#
+# $Id$
+#
+# a shell wrapper for "JPips", the java-based pips interface.
+#
+
+usage()
+{
+    cat <<-EOF >&2
+	jpips [-m menu] [-hnde]
+	-m menu: the type of menu that should be used (default: test)
+	-h: some help
+	-n: no console with jpips
+	-d: debug
+	-e: launched by emacs
+EOF
+}
+
+error()
+{
+    ret=${1}
+    shift
+    echo "jpips: $@" >&2
+    usage
+    exit ${ret}
+}
+
+unset jpips forward menu_type
+
+props="";
+jar=jpips.jar
+gif=DownArrow.gif
+
+while getopts m:hnde opt
+do
+    case ${opt} in
+	m) menu_type=$OPTARG ;;
+	h) usage ;;
+	n) forward="${forward} -n" ;;
+	d) props="${props} -Djava.compiler=NONE";;
+	e) props="${props} -Djpips.emacs=true";;
+	*) error 1 "unexpected option ${opt}" ;;
+    esac
+done
+
+shift `expr $OPTIND - 1`
+
+forward="${forward} $@"
+
+# default menu is "jpips_basic.menu"
+men=jpips_${menu_type:-basic}.menu
+
+[ "$PIPS_ROOT" ] ||
+{
+    # try to define PIPS_ROOT if none available
+    case $0 in
+	/*) 
+	    where=`dirname $0`
+	    ;;
+	*)
+	    where=`type -p jpips`
+	    ;;
+    esac
+    PIPS_ROOT=`dirname $where`
+    export PIPS_ROOT
+}
+
+#
+# which jpips.jar file
+
+if [ -f ${jar} ]
+then
+    jpips=${jar}
+else
+    if [ -f ${PIPS_ROOT}/share/${jar} ]
+    then
+	jpips=${PIPS_ROOT}/share/${jar}
+    fi
+fi
+
+[ "$jpips" ] || error 2 "cannot find $jar"
+
+#
+# which DownArrow.gif file
+
+if [ -f ${gif} ]
+then
+    props="${props} -Djpips.downarrow=${gif}"
+else
+    if [ -f ${PIPS_ROOT}/share/${gif} ]
+    then
+	props="${props} -Djpips.downarrow=${PIPS_ROOT}/share/${gif}"
+    fi
+fi
+
+#
+# which menu
+
+if [ -f ${men} ]
+then
+    props="${props} -Djpips.menus=${men}"
+    unset men
+else
+    if [ -f ${PIPS_ROOT}/share/${men} ]
+    then
+	props="${props} -Djpips.menus=${PIPS_ROOT}/share/${men}"
+	unset men
+    fi
+fi
+
+[ ! "${men}" ] || error 3 "menu ${men} not found"
+
+# always as a shell...
+
+TPIPS_IS_A_SHELL=1
+export TPIPS_IS_A_SHELL
+
+if [ "$PIPS_SRCPATH" ]
+then
+    PIPS_SRCPATH=$PIPS_SRCPATH:.
+else
+    PIPS_SRCPATH=.
+fi
+export PIPS_SRCPATH
+
+# verbose execution...
+set -x
+exec java ${props} -jar ${jpips} ${forward}

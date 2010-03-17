@@ -1,0 +1,62 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+#
+# Perform [-w wspace] [-m module] rule
+#
+
+USAGE="Usage: Perform [-w wspace] [-m module] [-v] rule"
+
+if [ $# -eq 0 ]
+then	echo $USAGE >&2
+	exit 2
+fi
+
+while getopts w:m:v opt
+do
+	case $opt in
+	w)	OPT_PGM=$OPTARG;;
+	m)	OPT_MOD=$OPTARG;;
+	v)	VERBOSE=TRUE;;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+shift `expr $OPTIND - 1`
+
+if [ $# -eq 1 ]
+then
+	RULE=$1
+	shift
+else
+	echo $USAGE >&2
+	exit 1
+fi
+
+if [ -z "$VERBOSE" ]
+then
+	Pips -w "$OPT_PGM" -m "$OPT_MOD" -p $RULE 1>/dev/null || exit 1;
+else
+	Pips -w "$OPT_PGM" -m "$OPT_MOD" -p $RULE 1>&2 || exit 1;
+fi

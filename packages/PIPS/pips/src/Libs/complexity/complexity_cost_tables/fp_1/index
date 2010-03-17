@@ -1,0 +1,10 @@
+# cost_index_1  - Unity costs for array indexation
+
+#		int	float	double	complex	double-complex    <-- type of argument(s)
+
+TWO-INDEX	0	0	0	0	0
+THREE-INDEX	0	0	0	0	0
+FOUR-INDEX	0	0	0	0	0
+FIVE-INDEX	0	0	0	0	0
+SIX-INDEX	0	0	0	0	0
+SEVEN-INDEX	0	0	0	0	0

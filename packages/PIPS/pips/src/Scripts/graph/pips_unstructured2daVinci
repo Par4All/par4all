@@ -1,0 +1,336 @@
+#!/usr/bin/perl -w
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# This takes a PIPS output file in the GRAPH format as a file name
+# and generates a new one in the daVinci format on stdout.
+#
+# Ronan.Keryell@cri.ensmp.fr, 5/09/1995.
+
+$statement_number = 0;
+$indent_level = 0;
+$output_statement_buffer = "";
+$this_is_the_unstructured_entry_p = 0;
+%node_attribute_to_add = ();
+%edge_attribute_to_add = ();
+
+sub indent_string {
+    local($i) = $indent_level;
+
+    return " " x $indent_level;
+}
+
+
+sub output_indent {
+    print &indent_string;
+}
+
+
+sub indent_plus {
+    $indent_level += 2;
+}
+
+sub indent_minus {
+    $indent_level -= 2;
+}
+
+sub output_a_statement_begin {
+    local($label, $comment) = @_;
+    &output_indent;
+    print "l(\"$label\",\n";
+    $indent_level += 2;
+    &output_indent;
+    print "n(\"$comment\",\n";
+    $indent_level += 2;
+    &output_indent;
+    # Remove the \ and n at the end:
+    chop $output_statement_buffer;
+    chop $output_statement_buffer;
+    print "[\n";
+    &indent_plus;
+    if ($this_is_the_unstructured_entry_p == 1) {
+	&add_a_node_attribute("_GO", "ellipse");
+    }
+    &add_a_node_attribute("OBJECT", $output_statement_buffer);
+    &add_a_node_attribute("FONTFAMILY", "courier");
+    $output_statement_buffer = "";
+    &output_some_other_node_attributes;
+    &indent_minus ;
+    &output_indent;
+    print "],\n";
+    &output_indent;
+    print "[\n";
+    &indent_plus ;
+}
+
+
+sub output_a_successor {
+    local($successor, $comment) = @_;
+
+    &output_indent;
+    print "e(\"$comment\", [";
+    &output_some_other_edge_attributes;
+    print "], r(\"$successor\")),\n";
+}
+
+
+sub output_a_statement_end {
+    &indent_minus;
+    &output_indent;
+    print "]\n";
+    &indent_minus;
+    &output_indent;
+    print " )\n";
+    &indent_minus;
+    &output_indent;
+    print " ),\n";
+    $this_is_the_unstructured_entry_p = 0;
+}
+
+
+sub output_some_other_node_attributes {
+    while (($attribute, $value) = each %node_attribute_to_add) {
+	&output_indent;
+	print "a(\"$attribute\", \"$value\"),\n";
+    }
+    %node_attribute_to_add = ();
+}
+sub add_a_node_attribute {
+    local($attribute, $value) = @_;
+    # Keep only the last value for this attribute:
+    $node_attribute_to_add{$attribute} = $value;
+}
+
+
+sub output_some_other_edge_attributes {
+    while (($attribute, $value) = each %edge_attribute_to_add) {
+	&output_indent;
+	print "a(\"$attribute\", \"$value\"),\n";
+    }
+    %edge_attribute_to_add = ();
+}
+
+
+sub add_an_edge_attribute {
+    local($attribute, $value) = @_;
+    # Keep only the last value for this attribute:
+    $edge_attribute_to_add{$attribute} = $value;
+}
+
+
+sub output_a_node {
+    local($label, $name, $successors, $comment) = @_;
+    &output_indent;
+    print "l(\"$label\",\n";
+    $indent_level += 2;
+    &output_indent;
+    print "n(\"$comment\",\n";
+    $indent_level += 2;
+    &output_indent;
+    # Remove the \ and n at the end:
+    chop $output_statement_buffer;
+    chop $output_statement_buffer;
+    print "[\n";
+    &indent_plus ;
+    &add_a_node_attribute("OBJECT", $name);
+    &output_some_other_node_attributes;
+    &indent_minus ;
+    &output_indent;
+    print "],\n";
+    &output_indent;
+    print "[\n";
+    &indent_plus ;
+    foreach $successor (split(/ /, $successors)) {
+	&output_a_successor($successor, $comment);
+    }
+    &indent_minus;
+    &output_indent;
+    print "]\n";
+    &indent_minus;
+    &output_indent;
+    print " )\n";
+    &indent_minus;
+    &output_indent;
+    print " ),\n";
+}
+
+
+# If the node given to this procedure is an entry node of an
+# unstructured that has an unreachable exit node, display a dashed arrow
+# from the entry node to the exit:
+sub output_an_eventual_unreachable_arrow {
+    my($control) = @_;
+
+    if ($unreachable_exit{$control}) {
+	$exit_node = $unreachable_exit{$control};
+ 	&add_an_edge_attribute("EDGEPATTERN", "dashed");
+ 	&add_an_edge_attribute("EDGECOLOR", "violet");
+	&output_a_successor($exit_node, "Unreachable from $control to $exit_node");
+   }
+}
+
+
+sub keep_for_output {
+    my($string) = @_;
+    $output_statement_buffer .= $string . "\\n";
+}
+
+
+$input_file_name = $ARGV[0];
+shift;
+
+# First build a map of unstructured with unreachable exit:
+open(INPUT, "<$input_file_name") || die "Cannot open \"$input_file_name\".";
+while (<INPUT>) {
+    /^\204Unstructured Unreachable (.*) -> (.*)$/ && do {
+	# \204Unstructured Unreachable 0xf4a3e8 -> 0xf4a8a8
+	$entry_control = $1;
+	$exit_control = $2;
+	$unreachable_exit{$entry_control} = $exit_control;
+    }
+}
+close INPUT || die "Cannot close \"$input_file_name\".";
+
+
+print "[\n";
+$indent_level += 2;
+
+# The label of the statement:
+$control = $statement_number;
+
+# Entry node of the module:
+&add_a_node_attribute("COLOR", "yellow");
+
+# Open again the imput file:
+open(INPUT, "<$input_file_name") || die "Cannot open \"$input_file_name\".";
+while (<INPUT>) {
+    #print;
+    chop;
+    # daVinci do not like at all TABs:
+    s/\t/        /g;
+    # Protect the "" :
+    s/"/\\"/g;
+    ($a_command_line = $_) =~ s/.(.*)/$1/;
+
+    /^\200Unstructured (.*) end: (.*)$/ && do {
+	# €Unstructured 0x3c79f0 end: 0x3c8f30
+	$unstructured_begin = $1;
+	$unstructured_end = $2;
+	&output_a_statement_begin($control,
+				  "Statement not from an unstructured");
+	&output_a_successor($unstructured_begin,
+			    "Go to the entry of the unstructured");
+	&output_a_statement_end();
+	$statement_number ++;
+	# Keep track of the number of the statement that should follow
+	# this unstructured at its exit:
+	push(@statement_number_stack, $statement_number);
+	# Since the first node could be an IF, delay the _GO
+	$this_is_the_unstructured_entry_p = 1;
+	#&add_a_node_attribute("_GO", "ellipse");
+	&add_a_node_attribute("COLOR", "lightgreen");
+	next;
+    };
+
+    /^\201Unstructured End (.*) end: (.*)$/ && do {
+	# Unstructured End 0x3cfa40 end: 0x3cfa40
+	$unstructured_begin = $1;
+	$unstructured_end = $2;
+	$control = pop(@statement_number_stack);
+
+	next;
+    };
+
+    /^\202Unstructured Item (.*)$/ && do {
+	# \202Unstructured Item 0x3c79f0
+	# Should use a stack here ?
+	$control = $1;
+	next;
+    };
+
+    /^\203Unstructured Successor ->(.*)$/ && do {
+	# \203Unstructured Successor 0x3c8280
+	@successors = split(/ /, $1);
+	# Be careful, if there is something in the the successors, the first
+	# blank generated a void element...
+#	print "\n**** @successors, $#successors\n";
+	if ($#successors == -1) {
+	    &add_a_node_attribute("_GO", "ellipse");
+	    &add_a_node_attribute("COLOR", "lightgray");   
+	    &output_a_statement_begin($control, $a_command_line);
+	    &output_a_successor($statement_number_stack[$#statement_number_stack],
+				"The unstructured end point to the statement following the unstructured");
+	}
+	elsif ($#successors == 2) {
+	    # 2 successors, that is an "if then else":
+	    &add_a_node_attribute("_GO", "rhombus");
+	    if ($this_is_the_unstructured_entry_p == 0) {
+		&add_a_node_attribute("COLOR", "cyan");
+	    }
+	    else {
+		# Display a lightgreen rhombus to mark the IF at the unstructured entry:
+		$this_is_the_unstructured_entry_p = 0;
+	    }
+	    &output_a_statement_begin($control, $a_command_line);
+	    &output_an_eventual_unreachable_arrow($control);
+	    &add_an_edge_attribute("EDGECOLOR", "red");
+	    &output_a_successor("then_$statement_number", $a_command_line);
+	    &add_an_edge_attribute("EDGECOLOR", "blue");
+	    &output_a_successor("else_$statement_number", $a_command_line);
+	    &output_a_statement_end();
+	    &add_a_node_attribute("COLOR", "lightred");
+	    &add_a_node_attribute("_GO", "text");
+	    &add_a_node_attribute("FONTFAMILY", "helvetica");
+	    &add_a_node_attribute("FONTSTYLE", "bold_italic");
+	    &add_an_edge_attribute("EDGECOLOR", "red");
+	    &output_a_node("then_$statement_number", "THEN",
+			   $successors[1], $a_command_line);
+	    &add_a_node_attribute("COLOR", "lightblue");
+	    &add_a_node_attribute("_GO", "text");
+	    &add_a_node_attribute("FONTFAMILY", "helvetica");
+	    &add_a_node_attribute("FONTSTYLE", "bold_italic");
+	    &add_an_edge_attribute("EDGECOLOR", "blue");
+	    &output_a_node("else_$statement_number", "ELSE",
+			   $successors[2], $a_command_line);
+	    $statement_number ++;
+	    next;
+	    }
+	    else {
+		# Just a sequence I guess: */
+		&output_a_statement_begin($control, $a_command_line);
+		&output_a_successor($successors[1], $a_command_line);
+		&output_an_eventual_unreachable_arrow($control);
+	    }
+	&output_a_statement_end();
+	next;
+    };
+
+    # By default, put the statement with a an explicit \ n for daVinci:
+    &keep_for_output($_);
+}
+close INPUT || die "Cannot close \"$input_file_name\".";
+
+&output_a_statement_begin($control,
+			  "Statement not from an unstructured");
+&output_a_statement_end();
+
+print "]\n";

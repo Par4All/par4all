@@ -1,0 +1,712 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+!
+!-----------------
+!
+! HPFC INIT MAIN
+!
+! entry point in the library for a non differentiated host/node program.
+! 
+      subroutine HPFC INIT MAIN
+
+      include "hpfc_commons_mpi.h"
+      
+      integer info, comm, rank, size, i
+      
+      debug(print *, "[HPFC INIT MAIN] in")
+!
+! GLOBAL INITS
+! 
+      call HPFC CHECK
+
+      NB OF TASKS = MAX SIZE OF PROCS
+
+      call HPFC INIT COMMON PARAM LIB
+
+!      
+! initialize MPI        
+!
+      call MPI_INIT(info)
+
+      debug(print *, "[HPFC INIT MAIN] info ", info) 
+
+!
+! duplicate MPI_COMM_WORL to HPFC COMMUNICATOR (safety)
+!
+      call MPI_COMM_DUP(comm, HPFC COMMUNICATOR, info)
+
+      debug(`print *, "[HPFC INIT MAIN] new comm created ", 
+     $     HPFC COMMUNICATOR') 
+
+      call MPI_COMM_RANK(comm, rank, info)
+
+      debug(print *, "[HPFC INIT MAIN] rank ", rank) 
+
+      call MPI_COMM_SIZE(comm, size, info)
+
+!
+! Create a new communicator containing all nodes
+!
+
+
+
+
+      debug(print *, "[HPFC INIT MAIN] size ", size) 
+
+      if (NB OF TASKS.ne.(size-1)) then
+       print *, "[HPFC INIT MAIN] problem with size - size :", size
+     $      , " NB OF TASKS :", NB OF TASKS
+      endif
+     
+      MY LID = rank
+      MY TID = rank
+
+      HOST LID = 0 
+      HOST TID = 0
+
+      do i=0, NB OF TASKS
+         NODE TIDS(i) = i
+      enddo
+
+
+      debug(print *, "[HPFC INIT MAIN] exiting")
+
+      end
+
+!
+!-----------------
+!
+! HPFC INIT NODE
+!
+! this is the entry point in the hpfc runtime library for a node.
+!
+      subroutine HPFC INIT NODE
+      include "hpfc_commons_mpi.h"
+      integer i, info
+
+      debug(print *, "[HPFC INIT NODE] in ")
+
+! ?????      _direct(call HPFC DIRECTROUTE IF POSSIBLE)
+
+      call HPFC INIT COMMON PROCS
+      call HPFC INIT COMMON BUFFER
+      call HPFC INIT SPECIFIC COMMONS
+
+      do i=1, NB OF PROCESSORS
+         call HPFC CMPPOS(i, MY LID, MY POS(1, i))
+      enddo
+
+!
+! 1 sends node version key to host
+!
+      if (MY LID.eq.1) then
+      debug(print *, "[HPFC INIT NODE] sending key to ", HOSTLID)
+         call HPFC INIT SEND(0, 0)
+         call HPFC PACK(HPFC STRING, hpfc key, 64, 1, info)
+         call HPFC SEND(HOSTLID, 1, info)
+      endif
+
+!
+! insures that all nodes joined the group and are there
+!
+!      call HPFC SYNCHRO
+      call CREATE NEW HPFC COMM NODES
+      debug(print *, "[HPFC INIT NODE] out", MY LID)
+
+      end
+
+
+!
+!-----------------
+!
+! HPFC INIT HOST
+!
+! this is the entry point in the hpfc runtime library for a program.
+!
+      subroutine HPFC INIT HOST
+      include "hpfc_commons_mpi.h"
+      integer info
+      character*64 node key
+      
+      debug(print *, MY LID, "[HPFC INIT HOST] in ")
+      
+! ????      _direct(call HPFC DIRECTROUTE IF POSSIBLE)
+
+      call HPFC INIT COMMON PROCS
+      call HPFC INIT COMMON BUFFER
+      call HPFC INIT SPECIFIC COMMONS
+
+!
+! check version of host and node
+! to insure that both host and node where generated together...
+!
+      debug(print *, "[HPFC INIT HOST] receiving key")
+      call HPFC RECEIVE(1, 1)
+      call HPFC UNPACK(HPFC STRING, node key, 64, 1, info)
+      if (node key.ne.hpfc key) then
+         print *, "*** incompatible version keys!"
+         print *, "*** host: ", hpfc key
+         print *, "*** node: ", node key
+         call HPFC KILL ALLTASKS
+!the following line should be deleted ??          
+         call HPFC TERMINATE TASK(info)
+         stop
+        debug(`else
+            print *, "[HPFC INIT HOST] key received and ok"') 
+      endif
+
+!
+! insures that all nodes joined the group...
+!
+!      call HPFC SYNCHRO
+      call CREATE NEW HPFC COMM NODES
+      debug(print *, "[HPFC INIT HOST] out ", MY LID)
+
+      end
+
+
+
+
+!
+! HPFC INIT MPI COMMONS 
+!
+      subroutine HPFC INIT SPECIFIC COMMONS 
+      include "hpfc_commons_mpi.h"
+      data HPFC TYPE MPI /MPI_INTEGER, MPI_INTEGER, MPI_REAL, 
+     $     MPI_DOUBLE_PRECISION, MPI_CHARACTER, MPI_BYTE,
+     $     MPI_COMPLEX, MPI_DOUBLE_COMPLEX/ 
+      data HPFC REDFUNC MPI /MPI_SUM, MPI_PROD, MPI_MAX, MPI_MIN/
+
+      RECEIVED BY BROADCAST = .FALSE.
+      BUFFER ATTACHED = .FALSE.
+
+      end
+
+
+
+!
+! HPFC REDUCTION
+!
+! Reduce operation 
+!
+!!!!! root has not the same signification in mpi and pvm
+! in mpi : root is a lid 
+!
+
+
+      subroutine HPFC REDUCTION(func, data, count, datatype, msgtag
+     $     , root, info)
+      include "hpfc_commons_mpi.h"
+      integer count, datatype, msgtag, root, info, func, data
+      
+      debug(print *, MYLID, "[HPFC REDUCTION] in - func :", func)
+      call MPI_REDUCE(data, data, count, HPFC TYPE MPI(datatype),
+     $      HPFC REDFUNC MPI(func), root, HPFC COMMUNICATOR, info) 
+      debug(print *, MYLID, "[HPFC REDUCTION] done")
+      end
+
+
+!--------------------  HPFC MESSAGE INFO -----------------
+!
+! Give informations about the received message (or buffer) 
+! (length, tag, source, info) 
+!
+!
+      subroutine HPFC MESSAGE INFO(length, tag, source, info)
+      include "hpfc_commons_mpi.h"
+      integer length, tag, source, info
+      
+      source = BUFFER ID(MPI_SOURCE)
+      tag = BUFFER ID(MPI_TAG)
+      info = BUFFER ID(MPI_ERROR)
+
+      if (RECEIVED BY BROADCAST) then
+       length = BCAST LENGTH
+       debug(print *,"[HPFC MESSAGE INFO] - with Bcast") 
+      else
+       call MPI_GET_COUNT(BUFFER ID, MPI_PACKED, length, info)
+      endif
+
+      RECEIVED BY BROADCAST = .FALSE.
+
+      debug(`print *, MYLID, "[HPFC MESSAGE INFO] ", info, " length = ", 
+     $  length, " tag = ", tag , " source = ", source ')
+
+      end 
+
+
+!--------------------  HPFC PRINT ERROR MSG  -----------------
+!
+! Return an error string associated with the error code 
+! plus additional information to the error message 
+!
+!
+      subroutine HPFC PRINT ERROR MSG(message, error code)
+      include "hpfc_commons_mpi.h"
+      integer error code, info, resultlen
+      character*(*) message
+      call MPI_ERROR_STRING(error code,message, resultlen, info)
+      debug(print *, "[HPFC PRINT ERROR]", "resultlen", resultlen)
+      end
+
+
+!-------------------- HPFC TERMINATE TASK   -----------------
+!
+! Terminate the current task 
+!
+      subroutine HPFC TERMINATE TASK
+      include "hpfc_commons_mpi.h"
+      integer info
+      debug(print *, MYLID , "hpfc terminate task")
+      call MPI_FINALIZE(info)
+      end
+
+!--------------------  HPFC KILL ALLTASKS  -----------------
+!
+! Kill all the tasks
+!
+      subroutine HPFC KILL ALLTASKS
+      include "hpfc_commons_mpi.h"
+      integer info, errorcode
+      errorcode = 0
+      call MPI_ABORT(HPFC COMMUNICATOR, errorcode, info)
+      end
+
+!-------------------- HPFC SYNCHRO  -----------------
+!
+! add a synchronisation step 
+!
+      subroutine HPFC SYNCHRO
+      include "hpfc_commons_mpi.h"
+      integer info
+      debug(print *, MYLID, "[hpfc synchro] waiting ", NBOFTASKS+1, "tasks")
+      call MPI_BARRIER(HPFC COMMUNICATOR,info)
+      debug(print *, MYLID, "[hpfc synchro] done")
+      end
+
+
+!-------------------- HPFC INIT SEND  -----------------
+!
+! Initialize the current buffer
+!
+      subroutine HPFC INIT SEND(encoding,bufid)
+      include "hpfc_commons_mpi.h"
+      integer bufid,encoding
+      debug(print *, MYLID, "[HPFC INIT SEND] in")
+      PACKING BUFFER POSITION = 0 
+      debug(print *, MYLID, "[HPFC INIT SEND] buffer initialized")
+      end 
+
+!-------------------- HPFC PACK  -----------------
+!
+! Packing count value in the current buffer...
+!
+!
+      subroutine HPFC PACK(what, value, count, stride, info) 
+      include "hpfc_commons_mpi.h"
+      integer what, value, count, stride, info
+      debug(print *, MYLID, "[HPFC PACK] in")
+      debug(print *, MYLID, "[HPFC PACK] count -", count,"type -",what)
+      call MPI_PACK(value, count, HPFC TYPE MPI(what), DATA BUFFER, 
+     $     MAX MAX SIZE OF BUFFER, PACKING BUFFER POSITION, 
+     $     HPFC COMMUNICATOR, info)
+      debug(`print *, MYLID, "[HPFC PACK] value packed ", 
+     $     "PACKING BUFFER POSITION -" ,PACKING BUFFER POSITION')
+      end
+
+!-------------------- HPFC SEND  -----------------
+!
+! Sending the current buffer to dest...
+!
+!
+      subroutine HPFC SEND(dest, tag, info)
+      include "hpfc_commons_mpi.h"
+      integer dest, tag, info
+      debug(`print *, MYLID, "[HPFC SEND] - sending message to - ",
+     $     dest, "tag -", tag, "Comm", HPFC COMMUNICATOR')
+      call MPI_SEND(DATA BUFFER, PACKING BUFFER POSITION, 
+     $     MPI_PACKED, dest, tag, HPFC COMMUNICATOR, info)  
+      debug(print *, MYLID, "[HPFC SEND] message sent to - ", dest)
+      end
+
+!-------------------- HPFC BSEND  -----------------
+!
+! Sending the current buffer to dest...
+!    message is always buffered
+!
+      subroutine HPFC BSEND(dest, tag, info)
+      include "hpfc_commons_mpi.h"
+      integer dest, tag, info, size
+      character buffer(MAX MAX SIZE OF BUFFER)
+      
+      if (BUFFER ATTACHED) then 
+       debug(print *, MYLID, "[HPFC BSEND] buffer already allocated")
+       call MPI_BUFFER_DETACH(buffer,size,info)
+       debug(print *, MYLID, "[HPFC BSEND] buffer detached")
+      endif
+
+      call MPI_BUFFER_ATTACH(buffer,MAX MAX SIZE OF BUFFER  , info)
+      debug(print *, MYLID, "[HPFC BSEND] buffer allocated")
+      BUFFER ATTACHED = .TRUE.
+
+      debug(`print *, MYLID, "[HPFC BSEND] - sending message to - ",
+     $     dest, "tag -", tag, "Comm", HPFC COMMUNICATOR')
+      call MPI_BSEND(DATA BUFFER, PACKING BUFFER POSITION, 
+     $     MPI_PACKED, dest, tag, HPFC COMMUNICATOR, info)
+      debug(print *, MYLID, "[HPFC BSEND] message sent to - ", dest)
+      end
+
+
+
+
+!-------------------- HPFC UNPACK  -----------------
+!
+! Unpacking count value from the current buffer
+!
+!
+      subroutine HPFC UNPACK(what, value, count, stride, info) 
+      include "hpfc_commons_mpi.h"
+      integer what, value, count, stride, info
+!      debug(print *, MYLID, "[HPFC UNPACK] count", count)
+!      debug(print *, MYLID, "[HPFC UNPACK] type", what)
+      debug(`print *, MYLID, "[HPFC UNPACK] position",
+     $     UNPACKING BUFFER POSITION') 
+      call MPI_UNPACK(DATA BUFFER, MAX MAX SIZE OF BUFFER, 
+     $     UNPACKING BUFFER POSITION, value, count, HPFC TYPE MPI(what),
+     $     HPFC COMMUNICATOR, info)
+!      debug(print *, MYLID, "value unpacked - ", value)
+      end
+
+!--------------------  HPFC RECEIVE -----------------
+!
+! Receiving a message from source
+!
+!
+      subroutine HPFC RECEIVE(source, tag)
+      include "hpfc_commons_mpi.h"
+      integer source, tag, info
+
+      debug(`print *, MYLID, "receiving a message from - ", source,
+     $     "tag - ", tag')
+      call MPI_RECV(DATA BUFFER, MAX MAX SIZE OF BUFFER, MPI_PACKED,
+     $     source, tag, HPFC COMMUNICATOR, BUFFER ID, info)
+      UNPACKING BUFFER POSITION = 0
+      debug(print *, MYLID, "message received from - ", source)
+      end
+
+!-------------------- HPFC BCAST ROOT  -----------------
+!
+! Root initiate a broadcast communication 
+!
+      subroutine HPFC BCAST ROOT(root, comm, info)
+      include "hpfc_commons_mpi.h"
+      integer info, comm, size, root, newrank
+
+      if (comm.ne.HPFC COMMUNICATOR) then
+       call HPFC TRANSLATE RANK(root, HPFC COMMUNICATOR, newrank, comm)
+      else
+       newrank = root
+      endif
+
+      size = PACKING BUFFER POSITION
+      debug(`print *, MY LID, "[HPFC BCAST ROOT] size -"
+     $     , size, "root -", newrank, "comm -", comm')
+      call MPI_BCAST(size, 1, MPI_INTEGER, newrank,
+     $     comm, info)
+      debug(print *,MYLID,"[HPFC BCAST ROOT] size sent -" , size)
+!      call HPFC PARTIAL SYNCHRO(comm)
+      debug(print *,MYLID,"[HPFC BCAST ROOT] before bcast")
+      debug(`print *,MYLID,"[HPFC BCAST ROOT] size -", size, 
+     $     "newrank -", newrank, "comm -", comm') 
+       call MPI_BCAST(DATA BUFFER, size,
+     $     MPI_PACKED, newrank, comm, info)
+      debug(print *, MY LID, "[HPFC BCAST ROOT] performed")
+!      call HPFC PARTIAL SYNCHRO(comm)
+
+
+
+      end
+
+!-------------------- HPFC BCAST RECV  -----------------
+!
+! Receive from a broadcast communication 
+!
+      subroutine HPFC BCAST RECV(source, comm)
+      include "hpfc_commons_mpi.h"
+      integer source, info, size, comm, newrank
+      
+      if (comm.ne.HPFC COMMUNICATOR) then
+       call HPFC TRANSLATE RANK(source, HPFC COMMUNICATOR, 
+     $      newrank, comm)
+      else
+       newrank = source
+      endif
+
+      debug(`print *, MYLID, "[HPFC BCAST RECV] from", newrank, 
+     $     "comm -", comm')
+      call MPI_BCAST(size,1,MPI_INTEGER, newrank,
+     $     comm, info)
+      debug(`print *,MYLID,"[HPFC BCAST RECV] size -",size')
+!      call HPFC PARTIAL SYNCHRO(comm)
+      debug(print *,MYLID,"[HPFC BCAST RECV] before bcast")
+      debug(`print *,MYLID,"[HPFC BCAST RECV] size -", size, 
+     $     "source -", newrank, "comm -", comm') 
+       call MPI_BCAST(DATA BUFFER, size,
+     $      MPI_PACKED , newrank, comm, info)
+      debug(print *, MYLID, "[HPFC BCAST RECV] performed from", newrank )
+!      call HPFC PARTIAL SYNCHRO(comm)
+!
+! Broadcast communication is not including a status parameter
+! 
+      BUFFER ID(MPI_SOURCE) = source
+      BUFFER ID(MPI_TAG) = 0 
+      BCAST LENGTH = size
+      BUFFER ID(MPI_ERROR) = info 
+      RECEIVED BY BROADCAST = .TRUE.
+      UNPACKING BUFFER POSITION = 0
+      end 
+
+!-------------------- HPFC HCAST -----------------
+!
+! The host send a message to every node.
+!
+
+      subroutine HPFC HCAST
+      include "hpfc_commons_mpi.h"
+      integer info
+      debug(print *,MYLID,"[HPFC HCAST] in")
+      call HPFC BCAST ROOT(HOSTLID, HPFC COMMUNICATOR, info) 
+      MCAST HOST = MCAST HOST + 2
+      debug(print *,MYLID,"[HPFC HCAST] done")
+      end
+
+!
+!-------------------- HPFC NCAST  -----------------
+!
+! every node receive a broadcast from host.
+!
+
+      subroutine HPFC NCAST
+      include "hpfc_commons_mpi.h"
+      debug(print *,MYLID,"[HPFC HBCAST RECV] in")
+      call HPFC BCAST RECV(HOSTLID, HPFC COMMUNICATOR) 
+      MCAST HOST = MCAST HOST + 2
+      debug(print *,MYLID,"[HPFC HBCAST RECV] done")
+      end
+
+!
+!-----------------
+!
+! HPFC NSNDTO A
+!
+! One node send to all nodes (broadcast communication)
+!
+      subroutine HPFC NSNDTO A(what, val)
+      integer what, val
+      include "hpfc_commons_mpi.h"
+      integer bufid, info
+      debug(print *,MYLID, "[HPFC NSNDTO A] in")
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC BCAST ROOT(MYLID,HPFC COMM NODES,info)
+      debug(print *,MYLID, "[HPFC NSNDTO A] in")
+      end
+    
+
+!
+!-----------------
+!
+! HPFC HSNDTO A
+!
+! host send to all nodes (broadcast communication)
+!
+      subroutine HPFC HSNDTO A(what, val)
+      integer what, val
+      include "hpfc_commons_mpi.h"
+      integer bufid, info
+      debug(print *, MYLID,"[HPFC HSNDTO A] in")
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC BCAST ROOT(HOSTLID,HPFC COMMUNICATOR,info)
+      debug(print *, MYLID,"[HPFC HSNDTO A] done")
+      end
+
+!
+!-----------------
+!
+! HPFC NSNDTO HA
+!
+! One node send to host and all nodes (broadcast communication)
+!
+      subroutine HPFC NSNDTO HA(what, val)
+      integer what, val
+      include "hpfc_commons_mpi.h"
+      integer bufid, info
+      debug(print *,MYLID, "[HPFC NSNDTO HA] in")
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC BCAST ROOT(MYLID,HPFC COMMUNICATOR,info)
+      debug(print *,MYLID, "[HPFC NSNDTO HA] done")
+      end
+
+!
+!-----------------
+!
+! HPFC RCVFR NBCAST S
+!
+! Receive from a BROADCAST between nodes
+! root is SENDERLID, comm is HPFC COMM NODES
+!
+      subroutine HPFC RCVFR NBCAST S(what, goal)
+      integer what, goal
+      include "hpfc_commons_mpi.h"
+      integer info
+      debug(print *,MYLID,"[HPFC RCVFR NBCAST S] in")
+      call HPFC BCAST RECV(SENDERLID, HPFC COMM NODES, info)
+      call HPFC UNPACK(what, goal, 1, 1, info)
+      debug(print *,MYLID,"[HPFC RCVFR NBCAST S] done")
+      end
+!
+!-----------------
+!
+! HPFC RCVFR HNBCAST S
+!
+! Receive from a broadcast between nodes and host
+! root is SENDERLID, comm is HPFC COMMUNICATOR
+!
+      subroutine HPFC RCVFR HNBCAST S(what, goal)
+      integer what, goal
+      include "hpfc_commons_mpi.h"
+      integer info
+      debug(print *,MYLID,"[HPFC RCVFR HNBCAST S] in")
+      call HPFC BCAST RECV(SENDERLID, HPFC COMMUNICATOR, info)
+      call HPFC UNPACK(what, goal, 1, 1, info)
+      debug(print *,MYLID,"[HPFC RCVFR HNBCAST S] done")
+      end
+
+!
+!-----------------
+!
+! HPFC RCVFR HNBCAST H
+!
+! Receive from a broadcast between nodes and host
+! root is HOSTLID, comm is HPFC COMMUNICATOR
+!
+      subroutine HPFC RCVFR HNBCAST H(what, goal)
+      integer what, goal
+      include "hpfc_commons_mpi.h"
+      integer info
+      debug(print *,MYLID,"[HPFC RCVFR HNBCAST H] in")
+      call HPFC BCAST RECV(HOSTLID, HPFC COMMUNICATOR, info)
+      call HPFC UNPACK(what, goal, 1, 1, info)
+      debug(print *,MYLID,"[HPFC  RCVFR HNBCAST H] done")
+      end
+
+!
+!-----------------
+!
+! CREATE NEW HPFC COMM NODES
+!
+! create a new communicator containing of all nodes
+
+
+      subroutine CREATE NEW HPFC COMM NODES
+      include "hpfc_commons_mpi.h"
+      integer group, newgroup, rank, size, info
+      debug(print *,MYLID,"creating new communicator")
+      call MPI_COMM_GROUP(HPFC COMMUNICATOR, group, info)
+      debug(print *,MYLID,"actual group is", group)
+      call MPI_GROUP_INCL(group, NBOFTASKS, NODETIDS(1), 
+     $     newgroup,info)
+      debug(print *,MYLID,"newgroup is", newgroup)
+      call MPI_COMM_CREATE(HPFC COMMUNICATOR, newgroup, 
+     $      HPFC COMM NODES,info)
+      debug(print *,MYLID,"new communicator is", HPFC COMM NODES)
+
+      if (HPFC COMM NODES.ne.MPI_COMM_NULL) then 
+       call MPI_COMM_RANK(HPFC COMM NODES, rank, info)
+       debug(print *,MYLID, "[CREATE NEW COMM] rank ", rank) 
+       call MPI_COMM_SIZE(HPFC COMM NODES, size, info)
+       debug(print *,MYLID, "[CREATE NEW COMM] size ", size) 
+      else
+       debug(print *,MYLID, "[CREATE NEW COMM] not in group ") 
+      endif
+
+!      call HPFC TEST COMM NODES
+
+      end
+
+!
+! Test the new communicator 
+!      
+      subroutine HPFC TEST COMM NODES
+      include "hpfc_commons_mpi.h"
+      integer bidon, info
+
+      call HPFC PARTIAL SYNCHRO(HPFC COMMUNICATOR)
+      if (HPFC COMM NODES.ne.MPI_COMM_NULL) then 
+       bidon = 7
+       print *,MYLID,"bidon before", bidon
+       call MPI_BCAST(bidon, 1, MPI_INTEGER, 1, HPFC COMM NODES, info)
+       print *,MYLID,"bidon after", bidon
+       call HPFC PARTIAL SYNCHRO(HPFC COMM NODES)
+      endif
+      
+      end
+
+
+!
+! HPFC PARTIAL SYNCHRO 
+!
+
+      subroutine HPFC PARTIAL SYNCHRO(comm) 
+      include "hpfc_commons_mpi.h"
+      integer info, comm
+      debug(`print *, MYLID, "[hpfc partial synchro] waiting 
+     $     - comm ", comm')
+      call MPI_BARRIER(comm,info)
+      debug(print *, MYLID, "[hpfc partial synchro] done")
+      end
+
+
+!
+! HPFC TRANSLATE RANK
+! translate rank from comm1 to comm2
+!
+      subroutine HPFC TRANSLATE RANK(rank, comm1, newrank, comm2)
+      include "hpfc_commons_mpi.h"
+      integer rank, comm1, comm2, newrank
+      integer group1, group2, info
+
+      debug(print *,MYLID,"[HPFC TRANSLATE RANK] rank :", rank)
+      call MPI_COMM_GROUP(comm1, group1, info)
+      debug(print *,MYLID,"[HPFC TRANSLATE RANK] group1 :", group1)
+      call MPI_COMM_GROUP(comm2, group2, info)
+      debug(print *,MYLID,"[HPFC TRANSLATE RANK] group2 :", group2)
+      call MPI_GROUP_TRANSLATE_RANKS(group1, 1, rank, group2,
+     $     newrank, info)
+      debug(print *,MYLID,"[HPFC TRANSLATE RANK] newrank :", newrank)
+
+      end
+
+
+

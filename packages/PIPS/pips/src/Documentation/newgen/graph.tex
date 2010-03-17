@@ -1,0 +1,186 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{PIPS: Generic Oriented Graph}
+\author{François Irigoin \\
+	Pierre Jouvelot \\
+	Rémi Triolet\\
+\\
+	CRI, Ecole des Mines de Paris}
+
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+
+The \verb+graph+ type implements an oriented graph or multigraph
+(i.e. more than one arc may link two vertices). This data structure is
+not really generic, i.e. types for vertices and arcs are not imported,
+but types for vertex and arc {\em labels} are imported. They do not have
+to be NewGen types. If they are NewGen types, they have to be handled as
+non-NewGen types and explicitly dynamically declared at
+initialization. When labels are used, they have to be explictly casted
+into their effective type.
+
+Since NewGen was not really designed to support re-entrance, unusual
+bugs may occur when using standard or high-level NewGen primitive such
+as \verb+free+ or \verb+gen_multi_recurse()+. See NewGen documentation.
+
+The \verb+graph+ type is used for dependence graphs and for use-def
+chains, with specific vertex and arc labels (see the \verb+dg+ data
+structures). It should have been used for control flow graphs, but
+another graph representation is embedded in the internal representation
+(see \verb+unstructured+).
+
+There is no \verb+graph-util+ package containing primitives for graph,
+such as adding a vertex, removing a vertex, adding an arc, removing an
+arc, printing a graph, walking a graph,.... This probably is due to the
+facts that the generic graph datastructure is used only twice throughout
+PIPS and that interesting algorithms like strongly connected component
+computation require extra-datastructures. These datastructures are
+closely linked to the concept of dependence graph because of arc levels,
+and they are joined to the dependence graph specific labels.
+
+The dependence graph, defined in \verb+dg.f.tex+, is built by the
+\verb+chains+ library, updated by the \verb+ricedg+ library and used by
+privatization transformations and by automatic parallelization (see the
+\verb+transformation+ and \verb+rice+ libraries). Another version of the
+dependence graph, the Data Flow Graph (DFG) is defined in
+\verb+paf_ri.f.tex+.
+
+\iffalse
+La structure de données suivante implémente un graphe orienté. Cette
+structure est générique, mais elle peut être adaptée aux besoins de
+chacun grâce aux deux domaines externes {\tt vertex\_label} et {\tt
+arc\_label} qui sont attachés respectivement aux n{\oe}uds et aux arcs du
+graphe.
+
+Cette structure est utilisée pour le graphe des dépendances et aurait
+dû l'être pour le graphe de contrôle d'un module.
+\fi
+
+\section*{Vertex and Arc Labels}
+
+\domain{External vertex\_label}
+{}
+
+The \verb+vertex_label+ field points to the information attached to a
+vertex or node. It is not defined here and must be provided by the user.
+
+\iffalse
+Le domaine {\tt vertex\_label} porte l'information attachée aux sommets
+du graphe.
+\fi
+
+\domain{External arc\_label}
+{}
+
+The \verb+arc_label+ field points to the information attached to an arc.
+It is not defined here and must be provided by the user.
+
+\iffalse
+Le domaine {\tt arc\_label} porte l'information attachée aux n{\oe}udes
+du graphe.
+\fi
+
+\section*{Graph Structure}
+
+An oriented graph is defined mathematically as a set of vertices and a
+set of arcs.
+
+\domain{Graph = vertices:vertex*}
+{}
+
+The set of vertices is implemented as a NewGen \verb+list+. It is not
+clear how sets are implemented with list as long as equality is not
+defined. Here, vertices only are known by their addresses and their
+uniqueness is easy to check. Arcs are attached to vertices and there is
+not set of arcs.
+
+\iffalse
+Un graphe se compose tout simplement de l'ensemble de tous ses n{\oe}uds,
+chacun d'eux étant représentés par le domaine {\tt vertex}. Les arcs
+du graphe
+sont directement attachés aux n{\oe}uds}
+\fi
+
+\domain{Vertex = vertex\_label x successors:successor*}
+{}
+
+Each vertex is represented by an object of type \verb+vertex+. It is
+identified by its address and points to its label thru the
+\verb+vertex_label+ field, and to a list of arcs thru the
+\verb+successors+ field. Quite unfortunately, arcs are named {\em
+successor}, although they only {\em point} to successors.
+
+The type of a \verb+vertex_label+ is assumed not to be a NewGen type. it
+is application specific and must be defined somewhere else. See for
+instance type \verb+dg_vertex_label+ defined in file \verb+dg.f.tex+.
+
+\iffalse
+Chaque n{\oe}ud d'un graphe est représenté par un {\tt vertex}. Le
+sous-domaine {\tt successors} donne la liste des successeurs du n{\oe}ud. Le
+sous-domaine {\tt vertex\_label} doit être utilisé pour les informations
+attachées à chaque n{\oe}ud et dont la nature dépend de l'application
+utilisant le graphe; voir par exemple le domaine {\tt dg\_vertex\_label}
+dans le fichier {\tt dg.f.tex}.}
+\fi
+
+\domain{Successor = arc\_label x vertex}
+{}
+
+Each arc in the graph is implemented as an object of type
+\verb+successor+. The \verb+vertex+ field contains the {\em effective}
+successor. The \verb+vertex_label+ field contains some information
+attached to the arc. This information depends on the application. See
+for instance the type \verb+dg_arc_label+ defined in file \verb+dg.f.tex+.
+
+Note that more than one arc may link two vertices. There is no graph
+primitive to add an arc. Each arc is known by its memory address. There
+is no direct way to find the {\em origin} of an arc.
+
+There is no primitive to check if a graph data structure represent a
+graph or a multigraph. There is no primitive to check consistency
+(e.g. each vertex pointed to by an arc in the graph vertex set).
+
+Graphs are walked with two nested loops. The outer loop is over the
+vertices. The innermost one is over each vertex edges, so-called
+\verb+successors+.
+
+\iffalse
+Chaque arc d'un graphe est représenté par un {\tt successor}. Le
+sous-domaine {\tt vertex} contient le n{\oe}ud vers lequel l'arc pointe. Le
+sous-domaine {\tt arc\_label} doit être utilisé pour contenir les
+informations attachées à chaque arc{,} et dont la nature dépend de
+l'application utilisant le graphe; voir par exemple le domaine {\tt
+dg\_arc\_label} dans le fichier {\tt dg.f.tex}.}
+\fi
+
+\end{document}
+\end

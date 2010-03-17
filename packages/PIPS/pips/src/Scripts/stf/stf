@@ -1,0 +1,127 @@
+#!/bin/csh -f
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+#  stf is a csh script to standardize the structure of a Fortran program
+#  using ISTST.
+#    (via the combined tool fragment ISTLY = ISTLX/ISTYP and then ISTST)
+#
+#
+#  Invocation:
+#
+#  stf Fortran_source_file
+#
+#  Check command line validity.
+
+set echo_err = $TOOLPACK_DIR/util/echoerr
+
+if ( $#argv < 1 ) then
+	$echo_err Invocation:
+	$echo_err ""
+	$echo_err stf Fortran_source_file
+	$echo_err ""
+	$echo_err Structured code is sent to standard output
+	$echo_err '(and may be redirected to a file).'
+	$echo_err ""
+	exit 1
+endif
+
+#  Check that Fortran_source_file exists.
+
+if ( -e $1 == 0 ) then
+	$echo_err "'$1' does not exist."
+	exit 1
+endif
+
+#
+#  Create PFS.  If PFS already exists, exit with an advisory message.
+#
+
+if ( -e _.TOOLPACK == 0 ) then
+	mkdir _.TOOLPACK
+else
+	$echo_err Toolpack-created directory '"_.TOOLPACK"' exists.
+	$echo_err Remove with script '"discard"'.
+	exit 1
+endif
+
+#  Make a tab-free copy of the Fortran source and use it as source.
+set src = ly.src$$
+expand $1 > _.TOOLPACK/$src
+#  Comment file name.
+set cmt = _.lycmt
+#  Parse tree file name.
+set tree = _.lytree
+#  Symbol table file name.
+set symb = _.ypsymb
+#  Comment index file name.
+set indx = _.lyindx
+
+#  Create the interprocess file IST.CMD and append parameters for ISTLY.
+$TOOLPACK_DIR/util/mkipf \
+$src $cmt $tree $symb $indx
+
+#
+#  Invoke ISTLY.
+#
+
+# On Solaris 2 there are some spurious 'status,fd = -1 , 3'... Add a sed! RK.
+$TOOLPACK_DIR/exec/istly.u | sed '/^status,/d' 
+if ($status != 0) then
+	$echo_err "Unable to run istly.u"
+	/bin/rm -rf _.TOOLPACK
+	exit 1
+endif
+
+#
+#  If tool terminated with errors, advise user to obtain listing.  Exit.
+if ( `cat _.TOOLPACK/_.info` == -1 ) then
+	$echo_err ""
+	$echo_err Errors detected.
+	$echo_err Invoke script '"getlst"' to obtain a listing showing
+	$echo_err statement and token numbers.
+	$echo_err ""
+	#/bin/rm -rf _.TOOLPACK
+	exit
+endif
+
+#  Create the interprocess file IST.CMD and append parameters for ISTST.
+$TOOLPACK_DIR/util/mkipf \
+$tree $symb $indx $cmt \#1 -
+
+#
+#  Invoke ISTST.
+#
+
+# On Solaris 2 there are some spurious 'status,fd = -1 , 3'... Add a sed! RK.
+$TOOLPACK_DIR/exec/istst.u | sed '/^status,/d' 
+if ($status != 0) then
+	echo "Unable to run istst.u"
+	/bin/rm -rf _.TOOLPACK
+	exit 1
+endif
+
+/bin/rm -rf _.TOOLPACK
+
+
+#EOF

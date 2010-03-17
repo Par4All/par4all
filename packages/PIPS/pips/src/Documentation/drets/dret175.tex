@@ -1,0 +1,292 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\addtolength{\textheight}{30pt}
+
+\newcommand{\titre}{PROJET PIPS \\
+		FICHE D'EXPLOITATION}
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT\\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Avril 1993}
+\newcommand{\numero}{E175}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\begin{tabular}{||l|p{10cm}||} \hline\hline
+Numéro du Contrat 	& 88.017.01 DRET/ARMINES \\ \hline
+Auteur(s) du Résumé	& Mme. CORINNE ANCOURT \\
+			& M. FRANCOIS IRIGOIN \\
+			& M. PIERRE JOUVELOT \\ \hline\hline
+Résumé		&
+{PIPS est un paralléliseur automatique et interprocédural de programmes
+scientifiques. Ce paralléliseur prend en entrée des programmes Fortran
+77 séquentiel et fournit en sortie des programmes équivalents dont le
+parallélisme a été explicité par des directives de micro-tasking
+Cray CFT~77. L'objectif est
+d'étudier l'effet des analyses interprocédurales pour
+l'optimisation de la compilation de programmes Fortran à partir de
+l'exécution de benchmarks du CEA et de l'ONERA sur Cray Y-MP.
+} \\ \hline\hline
+Brevets			& Néant \\ \hline\hline
+\multicolumn{2}{||c||}{Publications effectuées dans le cadre du contrat} \\ \hline
+% \begin{tabular}{lp{6cm}}
+Auteurs: & François Irigoin, Pierre Jouvelot, Rémi Triolet \\ 
+Revue: & 1991 International Conference on Supercomputing, Cologne, June 1991 \\
+Titre: & Semantical Interprocedural Parallelization: An Overview of the PIPS Project\\ \hline
+Auteurs: & François Irigoin \\
+Revue: & Workshop on Environments and Tools for Parallel Scientific Computing,
+CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992 \\
+Titre: & Interprocedural Analyses for Programming Environments \\ \hline\hline
+\end{tabular}
+
+\newpage
+
+\setcounter{section}{0}
+
+Ce document présente le rapport final de la convention DRET/ARMINES
+87.017 (bon de commande 87.017.01.018, reconduction 1991) décrivant la
+prise en compte de machines Cray comme cible par le paralléliseur
+automatique et interprocédural de programmes scientifiques PIPS. Ce
+paralléliseur prend en entrée des programmes Fortran 77 séquentiel et
+fournit en sortie des programmes équivalents dont le parallélisme a
+été explicité par des directives de micro-tasking Cray CFT~77.
+
+\section{Objet de l'étude}
+
+Cette étude entre dans le cadre défini formellement par les deux rubriques
+suivantes:
+\begin{itemize}
+\item
+	{\em Domaine II}: Etude d'outils logiciels de programmation et
+d'exploitation des calculateurs scientifiques.
+\item
+	{\em Thème II.1}: Adaptation automatique de programmes
+scientifiques aux calculateurs parallèles.
+\end{itemize}
+
+Plus précisement, son objectif est de permettre une évaluation et,
+éventuellement, une exploitation des avancées effectuées en matière
+de parallélisation automatique de Fortran lors du précédent contrat
+dans le domaine des analyses interprocédurales. Une phase
+d'exploitation du parallélisme {\em utile} pour machine Cray a été
+ajoutée pour permettre les expérimentations.
+
+\section{Intérêt de l'étude}
+
+Le domaine de la recherche des outils de programmation des calculateurs
+scientifiques du type {\em supercalculateur} connaît un développement
+croissant depuis l'arrivée des superordinateurs vectoriels. Ce
+développement s'est encore amplifié avec l'apparition de
+super-microprocesseurs incluant divers types de parallélisme
+(pipelining, unités fonctionnelles multiples) et des hiérarchies
+mémoire complexes (cache secondaire). Ces machines, et leur
+programmation efficace, sont une des clefs de la maîtrise technologique
+de nombreux secteurs vitaux pour la Défense Nationale.  Le
+développement d'outils d'aide à la programmation efficace s'avère
+être nécessaire pour maîtriser le coût et faciliter la conception de
+logiciels qui tirent parti des caractéristiques architecturales de ces
+machines.
+
+\subsection{Objectifs de la recherche}
+
+Les objectifs principaux de la recherche effectuée dans le cadre de
+ce contrat sont multiples:
+\begin{itemize}
+\item
+	Etudier et concevoir un compilateur effectuant la {\em
+parallélisation} efficace des programmes et non plus la simple mise en
+évidence de parallélisme implicite,
+\item
+	Etudier l'intérêt d'une parallélisation de grain
+grossier, au niveau des procédures utilisées dans les langages
+scientifiques, 
+\item
+	Etudier l'impact des analyses interprocédurales
+qui semblent devoir s'imposer dans les compilateurs/optimiseurs de demain.
+\end{itemize}
+Ils visent tous à évaluer la qualité de l'exploitation qui peut être
+faite automatiquement du parallélisme de grain moyen ou fin présent
+dans les programmes scientifiques.
+
+\subsection{Historique des études antérieures}
+
+Les acteurs principaux sur ce terrain sont américains, comme les
+machines cibles. Après les travaux de pionniers de David Kuck à
+l'Université d'Urbana-Champaign (Illinois) , les groupes de Ken Kennedy
+à l'Université de Rice (Texas), de Michael Burke à IBM Yorktown
+Heights (New York) et de Monica Lam (Stanford) ont poursuivi et
+développé cet axe de recherche avec toute une famille de projets.
+Ayant perçu l'importance stratégique de ce domaine, la DRET a lancé
+un certain nombre de projets pour y soutenir la recherche francaise
+(VESTA, VATIL, PIPS, PAF).
+
+\subsection{Résultats acquis antérieurement}
+
+L'essentiel des travaux effectués précédemment dans le domaine de la
+compilation pour superordinateurs était axé vers la vectorisation des
+applications scientifiques. Les résultats primordiaux concernaient la
+création de graphes de dépendances aussi précis que possible entre
+instructions en vue de détecter celles qui sont vectorisables. 
+
+La notion même de vectorisation était incompatible avec le traitement
+des appels de procédure puisqu'un call vectoriel n'a pas grand sens.
+Les premiers résultats ont été décrits dans la thèse de Rémi
+Triolet (1984) et ce sont eux qui sont à l'origine du projet. 
+
+\section{Déroulement de l'étude}
+
+Le projet PIPS-2 (Paralléliseur Interprocédural de Programmes
+Scientifiques, adaptation aux multiprocesseurs Cray) s'est déroulé sur
+1 an. Le point qui s'est révélé le plus délicat et qui nous a fait
+perdre beaucoup de temps a été l'accès à une machine Cray, malgré la
+collaboration instaurée entre l'Ecole des Mines et le CEA.
+
+Une présentation et une première démonstration de la nouvelle version
+de PIPS a été effectuée en janvier 1993. Le système a aussi été
+présenté à quelques sociétés industrielles. L'une d'entre elles,
+Connexité, envisage d'ailleurs d'intégrer certaines des
+fonctionnalités de PIPS dans son environnement de programmation
+parallèle, FORESYS.
+
+\subsection{Rappel des différentes étapes}
+
+\begin{description}
+
+\item[Etat d'Avancement 1 - Janvier 1992]
+	Le rapport joint à cet état d'avancement présente
+rapidement les algorithmes utilisés pour effectuer la détection des
+réductions généralisées, le remplacement des constantes (évaluation
+partielle du code), la sélection du parallélisme pour le Cray Y-MP et
+pour le déroulage de boucle.
+
+\item[Rapport Intermédiaire - Avril 1992]
+	Le rapport intermédiaire présente la génération de code
+parallèle avec des directives Cray CFT77, les fonctionnalités de la
+phase d'évaluation partielle et l'algorithme codé en LISP pour la
+détection des réductions généralisées.
+
+\item[Etat d'avancement 2 - Juillet 1992]
+	Les travaux effectués pendant cette période sont de trois
+natures. Tout d'abord, des expériences ont été effectuées sur Cray
+Y-MP pour valider et invalider les optimisations prévues. Ensuite, la
+détection des réductions généralisées a été améliorée.  Enfin,
+le portage de PIPS sous UNICOS a été commencé, puis abandonné.
+
+\item[Dernier trimestre - juillet 92 à la fin du contrat]
+	Cette dernière période a eu pour objectifs la réalisation
+d'expériences sur Cray avec les benchmarks de l'ONERA et du CEA.
+L'essentiel du temps a été consacré au durcissement de PIPS pour que
+toutes les options puissent être utilisées sur des programmes
+complets et à l'analyse des résultats obtenus sur Cray.
+
+\item[Participation à des conférences]
+	PIPS a été présenté en démonstration à la conférence {\em
+Third International Workshop on Compilers for Parallel Computers}
+(juillet 92). Les analyses interprocédurales de PIPS ont aussi été
+présentées au {\em Workshop on Environments and Tools for
+Parallel Scientific Computing} (septembre 1992).
+
+\item[Présentation à la DRET]
+	Les résultats obtenus ainsi que les problèmes rencontrés ont
+été présentés à la DRET lors d'une réunion le 19 janvier 1993.
+
+\end{description}
+
+\subsection{Difficultés, faits significatifs et résultats}
+
+L'essentiel du project PIPS s'est déroulé selon l'échéancier prévu
+pendant les 9 premiers mois mais a ensuite pris du retard pour deux
+raisons: les difficultés d'accès à une machine Cray et le manque de
+robustesse initial de PIPS.
+
+Les expériences ont montré qu'il était indispensable de prendre en
+compte des programmes mal structurés, que cela soit dû aux traitements
+d'exception ou à l'ancienneté des codes traités. L'utilisation d'un
+restructureur automatique en amont de PIPS s'impose donc pour des
+applications un peu anciennes.  Les expériences ont aussi mis en
+évidence des problèmes de complexité dans les analyses
+interprocédurales. Ces problèmes ont été surmontés.
+
+La comparaison qui a été effectuée par rapport à FPP a montré que
+PIPS disposait bien des transformations de base mais qu'il serait utile
+d'y ajouter au moins la privatisation de tableau.
+
+Le couplage de l'analyse sémantique et de l'évaluation partielle a
+permis de simplifier la génération de code parallèle, d'appliquer
+récursivement PIPS pour dépasser les habituelles contraintes de
+linéarité, et de fournir une interface vers d'autres systèmes.
+
+Le test de dépendance utilisé dans PIPS a été reconnu comme efficace
+aux Etats-Unis et, d'après des études expérimentales, les autres
+nouveautés introduites font toutes parties des domaines dans lesquels
+les paralléliseurs commerciaux ont des faiblesses conduisant à de
+mauvais résultats.
+
+\section{Récapitulation des résultats}
+
+Le paralléliseur PIPS a été considérablement durci ce qui a permis
+de l'appliquer non seulement aux benchmarks requis mais à ceux du
+Perfect Club. La comparaison qui a été effectuée avec FPP a montré
+que PIPS pouvait appliquer les transformations les plus utiles de FPP et
+qu'il allait au-delà sur de nombreux points. La réalisation du
+générateur de micro-tasking permet maintenant d'effectuer des
+évaluations expérimentales complètes de PIPS.
+
+\section{Conclusion}
+
+Malgré un retard de quelques mois dû à des difficultés imprévues
+(accès à des Cray, manque de fiabilité du prototype), le projet PIPS-2 a abouti aux
+résultats escomptés. Des programmes réels ont été parallélisés
+interprocéduralement et du code Cray avec micro-tasking a été
+produit. PIPS a atteint un niveau de fiabilité qui devrait permettre
+à des utilisateurs de l'appliquer sur leurs applications en
+coopération avec le CRI.
+
+\section{Perspectives ultérieures}
+
+Trois directions semblent devoir être explorées simultanément. Tout
+d'abord, les acquis en analyse interprocédurale devraient être
+transférés à un produit commercial. Ensuite, des expérimen\-tations
+de PIPS devraient être réalisées conjointement par le CRI et par des
+utilisateurs. Enfin, PIPS est la meilleure base actuellement disponible
+pour réaliser un compilateur pour machines à mémoire répartie, qu'il
+soit basé sur HPF ou sur des techniques encore plus avancées comme le
+placement automatique des données ou la mémoire virtuelle répartie.
+
+\end{document}

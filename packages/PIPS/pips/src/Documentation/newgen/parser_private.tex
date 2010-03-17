@@ -1,0 +1,67 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\begin{document}
+\sloppy
+
+\domain{Import entity from "ri.newgen"}
+{}
+\domain{Import constant from "ri.newgen"}
+{}
+
+\domain{Equivalences = chains:chain*}
+{Le domaine {\tt equivalences} permet de calculer les adresses des
+variables d'un programmes Fortran. C'est une séquence de chaînes
+d'équivalences.}
+
+\domain{Chain = atoms:atom*}
+{Le domaine {\tt chain} est utilisé pour stocker une chaine
+d'équivalence. C'est une séquence d'atomes.}
+
+\domain{Atom = equivar:entity x equioff:int}
+{Le domaine {\tt atom} permet de connaître l'offset d'une variable par
+rapport au début de la chaine d'équivalence à laquelle cette variable
+appartient. L'offset peut être négatif. Une variable peut apparaître
+dans plus d'une chaîne.}
+
+\domain{Data = datavars:datavar* x datavals:dataval*}
+{Le domaine {\tt data} permet de calculer les valeurs initiales des
+variables d'un programme Fortran. Il se compose d'une liste de positions
+mémoire à initialiser et d'une liste de valeurs. }
+
+\domain{Datavar = variable:entity x nbelements:int}
+{Le domaine {\tt datavar} permet de représenter une séquence de
+positions de la mémoire. cette séquence est repérée par une variable
+et une longueur.}
+
+\domain{Dataval = constant x nboccurrences:int}
+{Le domaine {\tt dataval} permet de représenter une liste de valeurs.
+Toutes les valeurs sont identiques, et sont données par le sous-domaine
+{\tt constant}.}
+
+\end{document}
+\end

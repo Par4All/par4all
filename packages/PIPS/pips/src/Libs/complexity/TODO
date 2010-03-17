@@ -1,0 +1,4 @@
+* remove "complexity_cost_tables" sub-directory
+- only ONE configuration file per target architecture ?
+- file format : explicit vs implicit ?
+- move everything into Documentation ?

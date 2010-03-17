@@ -1,0 +1,40 @@
+%% $Id$
+
+%% Known feature :\domain{...} must be followed by a newline character
+%% and no other "}" can be followed by a newline in the macro
+%% argument.
+
+%%\RequirePackage{html}
+%%\newcommand{\domain}[1]{\par{#1}}
+%%\begin{htmlonly}
+%%  %% Fait croire que cela fonctionne à LaTeX2HTML
+%%  \newcommand{\domain}[1]{\begin{alltt}
+%%      #1
+%%    \end{alltt}}
+%%\end{htmlonly}
+%% Les gros hacks pour la version LaTeX :
+%%\begin{latexonly}
+  \gdef\domain{\medskip\par%
+    \begingroup%
+    \catcode `{=12\catcode `}=12\catcode `\_=12%
+    \catcode `\^^M=10\catcode `==\active%
+      \hack@domain}
+%%\end{latexonly}
+\begingroup
+%% Définit les nouveaux { et } :
+\catcode `\^^01=1
+\catcode `\^^02=2
+\catcode `\{=12
+\catcode `\}=12
+% Le retour charriot est comme un blanc :
+\catcode`\^^M=10%
+% Le = devient un séparateur de style :
+\catcode `==\active%
+%% Mange les accolades de premier niveau terminées par un retour charriot:
+\gdef\hack@domain{#1}^^M^^01\def=^^01\egroup\bgroup\string=^^02\texttt\bgroup\textit\bgroup#1\egroup\egroup\endgroup\medskip\par\LONGtextit^^02%
+\endgroup
+
+\long\def\LONGtextit#1{{\em #1}}
+
+%% end of it
+%%

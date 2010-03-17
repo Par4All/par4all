@@ -1,0 +1,647 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%\documentstyle[11pt,a4]{article}
+
+%\newcommand{\mytilde}{}
+%\newsavebox{\boite}
+%\setbox\boite=\hbox{\verb+~+}
+
+%\title{Array Regions for Interprocedural Parallelization and Array
+%Privatization}
+%\author{Béatrice {\sc Creusillet}\thanks{{\tt e-mail: <creusil@cri.ensmp.fr>,
+%web: <http://www.cri.ensmp.fr/\usebox{\boite}creusil>}}\\ \\
+%Centre de Recherche en Informatique \\ {\'E}cole des mines de Paris \\
+%Internal Report A/279/CRI}
+%\date{}
+
+\input{Commandes-beatrice}
+
+%\begin{document}
+
+%\maketitle 
+
+%\begin{abstract}
+%  \em Three demonstrations are presented, that highlight the need for
+%  interprocedural analyses such as {\em preconditions\/} and exact {\em
+%  array regions\/}, in order to parallelize loops that contain subroutine
+%  calls or temporary arrays. These analyses are provided by PIPS in an
+%  interactive environment.
+%\end{abstract}
+
+
+\subsection{Interprocedural Parallelization}
+
+\verb+AILE+ is an application from the ONERA, the French institute of
+aerospatial research. It has more than 3000 lines of FORTRAN code. It has
+been slightly modified to test the coherence of some input values.
+
+The aim of this demonstration is to show that interprocedural analyses are
+necessary for an automatic parallelization. 
+
+
+For that purpose, we have chosen the subroutine (or {\em module\/})
+\verb+EXTR+, which is called by the module \verb+GEOM+, itself called by
+the main routine \verb+AILE+. An excerpt is given in Figure~\ref{fig:AILE}
+(without the intermediate call to \verb+GEOM+).
+
+
+\begin{figure}[htbp] 
+  \begin{center} \footnotesize
+    \leavevmode
+\begin{minipage}{12cm}
+\begin{verbatim}
+      PROGRAM AILE
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L      
+      ...
+      READ(NXYZ) I1,I2,J1,JA,K1,K2
+C     
+      IF(J1.GE.1.AND.K1.GE.1) THEN
+         N4=4
+         J1=J1+1
+         J2=2*JA+1
+         JA=JA+1
+         K1=K1+1
+         ...
+         CALL EXTR(NI,NC)
+      ENDIF
+      END
+
+      SUBROUTINE EXTR(NI,NC)
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      L=NI
+      K=K1
+      DO 300 J=J1,JA
+         S1=D(J,K  ,J,K+1)
+         S2=D(J,K+1,J,K+2)+S1
+         S3=D(J,K+2,J,K+3)+S2
+         T(J,1,NC+3)=S2*S3/((S1-S2)*(S1-S3))
+         T(J,1,NC+4)=S3*S1/((S2-S3)*(S2-S1))
+         T(J,1,NC+5)=S1*S2/((S3-S1)*(S3-S2))
+         JH=J1+J2-J
+         T(JH,1,NC+3)=T(J,1,NC+3)
+         T(JH,1,NC+4)=T(J,1,NC+4)
+         T(JH,1,NC+5)=T(J,1,NC+5)
+ 300  CONTINUE      
+      END
+
+      REAL FUNCTION D(J,K,JP,KP)
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CNI/L
+C     
+      D=SQRT((T(J,K,L  )-T(JP,KP,L  ))**2
+     1     +(T(J,K,L+1)-T(JP,KP,L+1))**2
+     2     +(T(J,K,L+2)-T(JP,KP,L+2))**2)
+      END
+
+\end{verbatim}
+  \end{minipage}
+  \end{center}
+  \caption{Excerpt from program {\tt AILE}.}
+  \label{fig:AILE}
+\end{figure}
+
+\subsubsection{EXTR}
+
+\verb+EXTR+ contains a \verb+DO+ loop that has several characteristics:
+\begin{enumerate}
+\item There are several read and write references to elements of the array
+  \verb+T+. This induces dependences that cannot be disproved if we don't
+  know the relations between index expressions, and more precisely between
+  \verb+J+ and \verb+JH+. We already know that \verb|JH=J1+J2-J|, but we
+  don't know the values of \verb+J1+, \verb+J2+ and \verb+JA+, which are
+  global variables initialized in \verb+AILE+. Thus, we can disprove the
+  loop-carried dependences between \verb|T(J,1,NC+3)| and
+  \verb|T(JH,1,NC+3)| for instance, only if we interprocedurally propagate
+  the values of \verb+J1+, \verb+J2+ and \verb+JA+ from \verb+AILE+. This
+  type of information is called {\em precondition\/} in PIPS~\cite{Irig:91,cnrs-nsf92:pips}.
+
+\item There are three calls to the function \verb+D+ in \verb+EXTR+.
+  \verb+D+ contains several read references to the global array \verb+T+.
+  So, we must assume that the whole array is potentially read by each call
+  to \verb+D+. This induces dependences in \verb+EXTR+ between the calls to
+  \verb+D+ and the other statements. In order to disprove these dependences,
+  we need a way to represent the set of array elements read by any
+  invocation of \verb+D+, and be able to use this information at each call
+  site. These sets are called {\em array regions\/} in PIPS~\cite{Creu:95a}.
+
+\item \verb+S1+, \verb+S2+, \verb+S3+ and \verb+JH+ are defined and used at
+  each iteration. This induces loop-carried dependences. But we may notice
+  that each use is preceded by a definition in the same iteration. These
+  variables can be privatized (this means that a local copy is assigned to
+  each iteration) to remove the spurious dependences.
+\end{enumerate}
+
+
+\subsubsection{D}
+
+As written before, there are several references to elements of the array
+\verb+T+ in \verb+D+. Our aim is to represent this set of elements, such
+that it can be used at each call site to help disproving dependences. 
+
+If we know nothing about the relations between the values of \verb+K+ and
+\verb+KP+ or between \verb+J+ and \verb+JP+, all we can deduce is that the
+third index of all the array elements ranges between \verb+L+ and
+\verb|L+2|. This is represented by the region:
+\begin{regions} 
+<T(\phik{1},\phik{2},\phik{3})-R-MAY-\{L<=\phik{3}<=L+2\}>
+\end{regions}
+The $\phi$ variables represent the dimensions of the array; \verb+R+ means
+that we consider the {\em read\/} effects on the variable; and \verb+MAY+
+means that the region is an over-approximation of the set of elements that
+are actually read.
+
+The relations between the values of \verb+K+ and \verb+KP+ or \verb+J+ and
+\verb+JP+ are those that exist between the real arguments. At each call
+site, we have {\tt JP==J} and {\tt KP==K+1}. These contidions hold true
+before each execution of {\tt D}; we call them {\em preconditions\/}. Under
+these conditions, we can now recompute the region associated to the array
+{\tt T}:
+\begin{regions} 
+<T(\phik{1},\phik{2},\phik{3})-R-MUST-\{\phik{1}==J, K<=\phik{2}<=K+1, L<=\phik{3}<=L+2\}>
+\end{regions}
+Notice that this is a {\tt MUST} region, because it exactly represents the
+set of array elements read by any invocation of function {\tt D}. 
+
+\subsubsection{Parallelisation of EXTR}
+
+We can now parallelize {\tt EXTR} by:
+\begin{enumerate}
+\item privatizing the scalar variables;
+\item using {\em array regions\/} to summarize the read effects on the array
+  {\tt T} by each invocation of {\tt D};
+\item using the {\em preconditions\/} induced by the initialization of
+  global scalar variables (in {\tt AILE}) to disprove the remaining dependences.
+\end{enumerate}
+This leads to the parallelized version of Figure~\ref{fig:EXTR_para}.
+
+\begin{figure}[htbp]
+  \begin{center} \footnotesize
+    \leavevmode
+    \begin{minipage}{12cm}
+\begin{verbatim}
+      SUBROUTINE EXTR(NI,NC)
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      L = NI                                                        
+      K = K1                                                        
+      DOALL J = J1, JA
+         PRIVATE S1,S2,S3
+         S1 = D(J, K, J, K+1)                                       
+         S2 = D(J, K+1, J, K+2)+S1                                  
+         S3 = D(J, K+2, J, K+3)+S2                                  
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                      
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                      
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                      
+      ENDDO
+      DOALL J = J1, JA
+         PRIVATE JH
+         JH = J1+J2-J                                               
+         T(JH,1,NC+3) = T(J,1,NC+3)                                 
+         T(JH,1,NC+4) = T(J,1,NC+4)                                 
+         T(JH,1,NC+5) = T(J,1,NC+5)                                 
+      ENDDO
+      END
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+  \caption{Parallelized version of {\tt EXTR}.}
+  \label{fig:EXTR_para}
+\end{figure}
+
+
+\subsection{Array Privatization}
+
+Array privatization is not yet implemented in PIPS, but the information
+needed to perform the transformation is already available: {\em IN and OUT
+regions}~\cite{Creu:95a,Creu:95b}.
+
+To illustrate the characteritics of these regions, we will consider two
+examples: {\tt NORM} is another excerpt from {\tt AILE}, and {\tt RENPAR6}
+is a contrived example that highlights some details of the computation of
+regions and the possibilities opened up by IN and OUT regions.
+
+
+\subsubsection{NORM}
+
+
+\begin{figure}[htbp]
+  \begin{center} \footnotesize
+    \leavevmode
+    \begin{minipage}{12cm}
+\begin{verbatim}
+      PROGRAM AILE
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      DATA N1,N3,N4,N7,N10,N14,N17/1,3,4,7,10,14,17/
+
+      READ(NXYZ) I1,I2,J1,JA,K1,K2
+C     
+      IF(J1.GE.1.AND.K1.GE.1) THEN
+         N4=4
+         J1=J1+1
+         J2=2*JA+1
+         JA=JA+1
+         K1=K1+1
+         CALL NORM(N10,N7,N4,N14,N17,I2)
+      ENDIF
+      END
+
+      SUBROUTINE NORM(LI,NI,MI,NN,NC ,I) 
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/T/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC ,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C ....
+DO 300 K=K1,K2
+      DO 300 J=J1,JA
+
+      CALL PVNMUT(TI)
+      T(J,K,NN  )=S*TI(1)
+      T(J,K,NN+1)=S*TI(2)
+      T(J,K,NN+2)=S*TI(3)
+  300 CONTINUE
+C ....
+      END
+
+      SUBROUTINE PVNMUT(C)
+      DIMENSION C(3), CX(3)
+      CX(1)= 1
+      CX(2)= 2
+      CX(3)= 3
+      R=SQRT(CX(1)*CX(1)+CX(2)*CX(2)+CX(3)*CX(3))
+      IF(R.LT.1.E-12) R=1.
+      DO I = 1,3
+      C(I) = CX(I)/R
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+  \caption{Another excerpt from {\tt AILE}: {\tt NORM}}
+  \label{fig:NORM}
+\end{figure}
+
+This is a very simple example (see Figure~\ref{fig:NORM}) that shows the
+necessity of array privatization, and the need for IN and OUT array regions.
+
+In the loop of subroutine {\tt NORM}, the references to the array {\tt T} do
+not induce loop-carried dependences.  Furthermore, there are only read-read
+dependences on {\tt S}.  However, notice that the array {\tt TI} is a real
+argument in the call to {\tt PVNMUT}, and that there are 3 read references
+to array {\tt TI}.  This induces potential interprocedural dependences. We
+have seen with the previous example that these dependences can sometimes be
+disproved with array regions.
+
+We must first compute the regions of array {\tt TI} that are referenced in
+{\tt {\tt PVNMUT}}. In {\tt PVNMUT}, {\tt TI} is called {\tt C}. And the 3
+elements of {\tt C} are written, but not read. This leads to:
+\begin{regions}
+<C(\phik{1})-W-MUST-\{1<=\phik{1}<=3\}>
+\end{regions}
+({\tt W} means that this  is a {\em write\/} effect)
+
+At the call site, {\tt C} is translated into {\tt TI}, which gives the
+region:
+\begin{regions}
+<TI(\phik{1})-W-MUST-\{1<=\phik{1}<=3\}>
+\end{regions}
+And finally, the regions corresponding to the whole body of the loop nest
+are:
+\begin{regions}
+<TI(\phik{1})-W-MUST-\{1<=\phik{1}<=3\}> \\
+<TI(\phik{1})-R-MUST-\{1<=\phik{1}<=3\}>
+\end{regions}
+
+These regions are identical, which means that each iteration of loops {\tt K} and
+{\tt J} reads and writes to the same memory locations of array {\tt TI}. Thus, there are
+loop-carried dependences, and the loop cannot be parallelized.
+
+However, these dependences are false dependences, because if we allocate a
+copy of array {\tt TI} to each iteration (in fact to each processor), there are no
+more dependences. This is what is called array privatization. In order to
+privatize an array, we must be sure that, in each iteration, no element is
+read before being written in the same iteration. Thus, there are no
+loop-carried producer-consumer dependences.  
+
+This last property cannot be verified by using READ regions, because they
+contain all the elements that are read, and not only those that are read
+before being written. This is represented in PIPS by IN regions. In our case,
+we must verify that no element of {\tt TI} belongs to the IN region corresponding
+to the loop body, which is the case. 
+
+We must also be sure that no element of {\tt TI} that is initialized by a single
+iteration is used in the subsequent iterations or after the loops.
+This information is provided in PIPS by the OUT regions. They represent
+the set of live array elements, that is to say those that are used in
+the continuation.
+
+We can now parallelize {\tt NORM} by:
+\begin{enumerate}
+\item using {\em array regions\/} to perform the dependence analysis;
+\item using {\em IN\/} and {\em OUT array regions\/} to privatize the array
+  {\tt TI}.
+\end{enumerate}
+
+
+This leads to the parallelized version of Figure~\ref{fig:NORM_para}.
+
+\begin{figure}[htbp]
+  \begin{center} \footnotesize
+    \leavevmode
+    \begin{minipage}{12cm}
+\begin{verbatim}
+      SUBROUTINE NORM(LI,NI,MI,NN,NC ,I) 
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/CT/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC ,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C     ....
+      DOALL K = K1, K2
+         PRIVATE J
+         DOALL J = J1, JA
+            PRIVATE TI
+            CALL PVNMUT(TI)                                             
+            T(J,K,NN) = S*TI(1)                                         
+            T(J,K,NN+1) = S*TI(2)                                       
+            T(J,K,NN+2) = S*TI(3)                                       
+         ENDDO
+      ENDDO
+C     ....
+      END
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+  \caption{Parallelized version of {\tt NORM}.}
+  \label{fig:NORM_para}
+\end{figure}
+
+\subsubsection{RENPAR6}
+
+
+\begin{figure}[htbp]
+  \begin{center} \footnotesize
+    \leavevmode
+    \begin{minipage}{12cm}
+\begin{verbatim}
+      SUBROUTINE RENPAR6(A,N,K,M)
+      INTEGER N,K,M,A(N)
+      DIMENSION WORK(100,100)
+      K = M * M
+      DO I = 1,N
+         DO J = 1,N
+            WORK(J,K) = J + K
+         ENDDO
+
+         CALL INC1(K)
+
+         DO J = 1,N
+            WORK(J,K) = J * J - K * K
+            A(I) = A(I) + WORK(J,K) + WORK(J,K-1)
+         ENDDO
+      ENDDO
+      END
+      
+      SUBROUTINE INC1(I)
+      I = I + 1
+      END
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+  \caption{Contrived example: {\tt RENPAR6}}
+  \label{fig:RENPAR6}
+\end{figure}
+
+{\tt RENPAR6} is a contrived example (see Figure~\ref{fig:RENPAR6}) designed
+to show on a very simple program the power of READ, WRITE, IN and OUT
+regions, and some particular details of their computations, especially when
+integer scalar variables that appear in array indices are modified.
+
+The main purpose is to see that array {\tt WORK} is only a temporary and can
+be privatized.  Notice that the value of {\tt K} is unknown on entry to the
+loop {\tt I}, and that its value is modified by a call to {\tt INC1} at each
+iteration ({\tt INC1} simply increments its value by 1).
+
+
+We are interested in the sets of array elements that are referenced in each
+iteration. However, since the value of {\tt K} is not the same in the two written
+references, we cannot summarize the write accesses if we do not know the
+relation that exists between the two values of {\tt K}. This is achieved in PIPS
+by using transformers, that here show how the new value of {\tt K} is related to the
+value before the {\tt CALL} ({\tt K\#init}):
+\begin{regions}
+T(K) \{K==K\#init+1\}
+\end{regions}
+And the transformer of the loop shows how the value of {\tt K} at each step
+is related to the values of {\tt I} and {\tt K\#init} (value of {\tt K}
+before the loop):
+\begin{regions}
+T(I,K) \{K==I+K\#init-1\}
+\end{regions}
+
+This previous information is used to summarize the sets of elements that are
+read or written by each program structure. In order to compute the summary
+for the loop {\tt I}, we must merge the sets for the two {\tt J} loops. Be
+careful that the value of {\tt K} is not the same for these two loops. We
+must use the transformer of the {\tt CALL} to translate the value of {\tt K}
+in the second region into the value of {\tt K} before the CALL. At this
+step, we have a summary of what is done by a single iteration. We then
+compute the regions for the whole loop {\tt I}. This is done with the help
+of the transformer of the loop that gives the relation between {\tt K} and
+{\tt I}.
+
+However, as we have seen with {\tt NORM}, READ and WRITE regions are not
+sufficient for array privatization, because we must verify that every
+element of {\tt WORK} that is read by an iteration is previously written in
+the same iteration. This is achieved by the IN region.  Then OUT regions
+allow us to verify that no element of {\tt WORK} is used in the subsequent
+iterations or in the continuation of the loop. 
+
+
+
+
+We can now try to parallelize {\tt RENPAR6} by:
+\begin{enumerate}
+\item using {\em transfomers\/} to compute {\em array regions\/};
+\item using {\em array regions\/} to perform the dependence analysis;
+\item using {\em IN\/} and {\em OUT array regions\/} to privatize the array
+  {\tt WORK}.
+\end{enumerate}
+
+
+This leads to the parallelized version of Figure~\ref{fig:RENPAR6_para}. The
+array {\tt WORK} is privatized in loop {\tt I}. However, the loop is not
+parallelized, because automatic induction variable substitution is not
+available in PIPS. This transformation has been performed by hand. This
+leads to the subroutine {\tt RENPAR6\_2} in figure~\ref{fig:RENPAR6_2}.
+And after array privatization, PIPS is able to parallelize the loop {\tt I}
+(see Figure~\ref{fig:RENPAR6_2_para}).
+
+\begin{figure}[htbp]
+  \begin{center} \footnotesize
+    \leavevmode
+    \begin{minipage}{12cm}
+\begin{verbatim}
+      SUBROUTINE RENPAR6(A,N,K,M)
+      INTEGER N,K,M,A(N)
+      DIMENSION WORK(100,100)
+      K = M*M                                                      
+      DO I = 1, N
+         PRIVATE WORK,I
+         DOALL J = 1, N
+            PRIVATE J
+            WORK(J,K) = J+K                                         
+         ENDDO
+         CALL INC1(K)                                              
+         DOALL J = 1, N
+            PRIVATE J
+            WORK(J,K) = J*J-K*K                                     
+         ENDDO
+         DO J = 1, N
+            PRIVATE J
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                        
+         ENDDO
+      ENDDO
+      END
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+  \caption{Parallelized version of {\tt RENPAR6}.}
+  \label{fig:RENPAR6_para}
+\end{figure}
+
+
+\begin{figure}[htbp]
+  \begin{center} \footnotesize
+    \leavevmode
+    \begin{minipage}{12cm}
+\begin{verbatim}
+      SUBROUTINE RENPAR6_2(A,N,K,M)
+      INTEGER N,K,M,A(N)
+      DIMENSION WORK(100,100)
+      K0 = M * M
+      DO I = 1,N
+         K = K0+I-1
+         DO J = 1,N
+            WORK(J,K) = J + K
+         ENDDO
+
+         CALL INC1(K)
+
+         DO J = 1,N
+            WORK(J,K) = J * J - K * K
+            A(I) = A(I) + WORK(J,K) + WORK(J,K-1)
+         ENDDO
+      ENDDO
+      END
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+  \caption{{\tt RENPAR6\_2}.}
+  \label{fig:RENPAR6_2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center} \footnotesize
+    \leavevmode
+    \begin{minipage}{12cm}
+\begin{verbatim}
+      SUBROUTINE RENPAR6_2(A,N,K,M)
+      INTEGER N,K,M,A(N)
+      DIMENSION WORK(100,100)
+      K0 = M*M                                                 
+      DOALL I = 1, N
+         PRIVATE WORK,J,K,I
+         K = K0+I-1                                                
+         DOALL J = 1, N
+            PRIVATE J
+            WORK(J,K) = J+K                                        
+         ENDDO
+         CALL INC1(K)                                               
+         DOALL J = 1, N
+            PRIVATE J
+            WORK(J,K) = J*J-K*K                                       
+         ENDDO
+         DO J = 1, N
+            PRIVATE J
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                         
+         ENDDO
+      ENDDO
+      END
+\end{verbatim}
+    \end{minipage}
+  \end{center}
+  \caption{Parallelized version of {\tt RENPAR6\_2}.}
+  \label{fig:RENPAR6_2_para}
+\end{figure}
+
+
+
+
+
+
+In fact, IN and OUT regions could also be used to reduce the set of elements
+of array {\tt WORK} to allocate to each processor, because each iteration
+only accesses  a sub-array. These regions provide an exact representation of the
+set of elements that are actually needed.
+
+%{\small
+%\bibliographystyle{plain}
+%\bibliography{mybib}
+
+%}\end{document}
+
+
+
+
+
+

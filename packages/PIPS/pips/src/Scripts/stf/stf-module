@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+#
+# Guillaume Oget, Francois Irigoin, 15 sep 1995
+#
+
+# Modifcations:
+#  - list of failed modules kept in variable FAILURES; FI, 2 July 1993
+
+# Bug: interruptions should be caught to run "discard"
+
+USAGE="Usage: $0 module.f"
+
+if [ $# -eq 0 ]
+then
+	exit 1
+fi
+
+source=$1
+
+if stf $source >$source$$ 2>$source.$$.log
+then
+: #do nothing ...
+else
+	echo $?
+	rm -f $source$$
+	rm -f $source.$$.log
+	exit 3
+fi
+
+if grep '_.TOOLPACK' $source.$$.log
+then
+	rm -f $source.$$.log
+	rm -f $source$$
+	exit 2
+fi
+
+if grep ERROR $source.$$.log
+then
+	rm -f $source.$$.log
+	exit 1
+else
+	rm -f $source
+	sed -e '/\[ISTLY Normal Termination\]/d' <$source$$ >$source
+	rm -f $source$$
+	rm -f $source.$$.log
+	exit 0
+fi
+exit 1 # should never be here...

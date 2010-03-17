@@ -1,0 +1,109 @@
+#! /bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# accept validation files differences...
+set -e
+
+svn=
+shopt -s nullglob
+shopt -s extglob
+
+# something done?
+something=
+
+# what is the current arch?
+arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
+
+function handle_out_file()
+{
+    local outfile=$1
+    local ref=${outfile%\/out}/test
+    [ -f $ref.$arch ] && ref=$ref.$arch
+
+    # show differences
+    if [ -f $ref ] ; then
+	echo "CONSIDERING $ref and $outfile"
+	something=1
+	if [[ ! $PIPS_GRAPHICAL_DIFF ]] ; then
+            diff -b -u $ref $outfile | ${PIPS_MORE:-less}
+	else
+	    # Useless to use PIPS_MORE since for higher level graphical
+	    # tools for example
+	    ${PIPS_GRAPHICAL_DIFF} $ref $outfile
+	fi
+    else
+	echo "NEW OUTPUT $outfile"
+	${PIPS_MORE:-less} $outfile
+    fi
+
+    # ask...
+    echo -e "accept (y|n)? \a"
+    read answer
+    if [[ $answer == [yY]* ]] ; then
+	mv $outfile $ref
+	if [ -d .svn ]; then
+	    svn=1
+	fi
+    else
+	echo "$outfile not accepted"
+    fi
+}
+
+function handle_directory()
+{
+    local dir=$1 outfile
+   for outfile in $dir/*.result/out ; do
+	handle_out_file $outfile
+    done
+}
+
+if [[ ! $@ ]] ; then
+    # If no directory names given, ask for accepting all the validation
+    set -- *
+fi
+
+if [[ $1 == "--new" ]] ; then
+  # Validate all against what is newer in the last validation than in the
+  # previous one:
+  set -- `diff SUMMARY_Archive/SUMMARY-previous SUMMARY_Archive/SUMMARY-last | sed -n 's/> changed: //p'`
+fi
+
+for arg ; do
+  if [[ -d $arg ]] ; then
+      handle_directory $arg
+  elif [[ -f $arg ]] ; then
+      outfile=${arg%.@([Ffc]|tpips|py)}.result/out
+      if [[ -f $outfile ]] ; then
+	  handle_out_file $outfile
+      else
+	  echo "$arg skipped, no '$outfile' out file"
+      fi
+  else
+      echo "$arg skipped, no such file"
+  fi
+done
+
+[[ $svn ]] && echo "Consider running \"svn ci $@\" to commit changes"
+[[ $something ]] || echo "Nothing to accept"
+
+exit 0

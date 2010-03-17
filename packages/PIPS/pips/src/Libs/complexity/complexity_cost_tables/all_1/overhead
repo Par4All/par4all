@@ -1,0 +1,20 @@
+# cost_overhead_1  - Unity cost for overheads
+
+#	         	int	float	double	complex	double-complex   <-- type of argument(s)
+
+LOOP-INIT-OVERHEAD  	1	1	1	1	1
+LOOP-BRANCH-OVERHEAD  	1	1	1	1	1
+CALL-ZERO-OVERHEAD  	1	1	1	1	1
+CALL-ONE-OVERHEAD  	1	1	1	1	1
+CALL-TWO-OVERHEAD  	1	1	1	1	1
+CALL-THREE-OVERHEAD  	1	1	1	1	1
+CALL-FOUR-OVERHEAD  	1	1	1	1	1
+CALL-FIVE-OVERHEAD  	1	1	1	1	1
+CALL-SIX-OVERHEAD  	1	1	1	1	1
+CALL-SEVEN-OVERHEAD  	1	1	1	1	1
+
+
+# This is overhead for loop and call.
+# It means that extra charge is to be added to the whole cost.
+# The arguments are of no importance. I keep it only because of consistence
+# with other cost files.

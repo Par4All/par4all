@@ -1,0 +1,83 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+%\usepackage{newgen_domain}
+\newcommand{\domain}[1]{\par{#1}}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Simple reductions}
+\author{Fabien Coelho}
+
+
+\begin{document}
+\maketitle
+
+\section{Imported domains}
+\label{sec:import}
+
+\domain{import reference from "ri.newgen"}
+\domain{import preference from "ri.newgen"}
+\domain{import entity from "ri.newgen"}
+\domain{import statement from "ri.newgen"}
+
+\section{Operators}
+\label{sec:operators}
+
+Current operators are stored directly.
+We could add user defined operators if required.
+None is used to mark dead reductions. 
+
+\domain{reduction\_operator = \{ none , min , max , sum , csum , prod , and , or , bitwise\_and , bitwise\_or , bitwise\_xor , eqv, neqv\}}
+{}
+
+\section{Reduction}
+\label{sec:reduction}
+
+A reduction is a reference describing the object on which the reduction is
+performed. This object may be a scalar, a full array, part of an array,
+and so on. The operator is also specified. The dependences is the list of
+entities the reduction reference depends on, and is used in the
+construction algorithm. The trusted references are those the effects of
+contribute to the reduction. They are only used and significant in the
+proper reductions construction algorithm.
+
+\domain{reduction = reference x op:reduction\_operator x dependences:entity* x trusted:preference*}
+{}
+
+List of reductions are separated.
+
+\domain{reductions = list:reduction*}
+{}
+
+
+\section{Functions}
+\label{sec:functions}
+
+Function from statement to reductions to be used for proper and cumulated
+reductions. 
+
+\domain{pstatement\_reductions = persistent statement->reductions}
+{}
+
+
+
+\end{document}

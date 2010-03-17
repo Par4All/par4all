@@ -1,0 +1,708 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{report}
+\usepackage[latin9]{inputenc}
+\usepackage[backref,pagebackref]{hyperref}
+\usepackage{xspace}
+\usepackage{url}
+\usepackage{epsfig,xr,fancybox,amstext,alltt,pstricks}
+%% Since it includes some parts of pipsmake-rc.tex, add some external
+%% references from it:
+%\externallabels{http://www.cri.ensmp.fr/pips/pipsmake-rc}{/projects/Pips/Documentation/public_html/pipsmake-rc/labels.pl}
+%\externaldocument{../pipsmake/pipsmake-rc}
+%% Idem for LaTeX with "xr":
+%% Je voudrais bien trouver un moyen de rajouter un préfixe à ces
+%% labels... :-(
+
+\newenvironment{PipsExample}{\VerbatimEnvironment
+\begin{Verbatim}}{\end{Verbatim}}
+
+\newcommand{\PipsWEpipsPDF}{\url{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc/wpips-epips-user-manual.pdf}}
+\newcommand{\PipsWEpipsHTDOC}{\url{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
+
+\input{wpips-epips-declarations.tex}
+
+\begin{document}
+
+\title{WPips \& EPips User Manual\\ (Paralléliseur Interprocédural de
+  Programmes Scientifiques) \\
+  --- \\
+  Linear Algebra based Automatic
+  Parallelizer \& Program Transformer}
+
+\author{Ronan Keryell}
+
+\maketitle
+
+A WWW version of this report can be shown at \PipsWEpipsHTDOC and a
+printable version of this report at \PipsWEpipsPDF.
+
+\setcounter{tocdepth}{6}
+\tableofcontents
+
+\centerline{\psfig{file=images/logo-pips-embossed.eps,width=0.25\hsize}}
+
+
+\chapter{Introduction}
+\label{cha:introduction}
+
+\PIPS{} is an automatic parallelizer for scientific programs that takes as
+input Fortran 77 and HPF codes.  Since its inception in 1988, it
+emphasizes interprocedural techniques based on linear algebra
+techniques.
+
+\PIPS{} is a highly modular framework which can be used to test and
+implement independently various compilation schemes, program analyses
+and transformations, such as automatic vectorization and
+parallelization (Cray Fortran, CRAFT, CM Fortran, F90 \& PVM output),
+HPF compilation, loop transformations, partial evaluation,\ldots
+
+The compiler is made of independent phases that are called on demand to
+perform the analyses or transformations required by the user.
+Consistency and interprocedurality issues are dealt with
+automatically.
+
+The phase chaining is driven by an interprocedural make system
+\PIPSMAKE{} and internal data structures are automatically stored in a
+database {\em pipsdbm\/} wich manages persistence through different
+runs. Persistence is used to avoid the memory bottleneck when large
+programs are analyzed interprocedurally. It is also used by newcommers
+to develop new applications without interferring with existing code.
+
+\PIPS{} is built on top of two tools. The first one is data structure
+description language, \PNEWGEN{}, which manages allocation,
+de-allocation, storage for persistent objects, walks thru complex data
+structures, and provides basic classes, such as list, set and mapping.
+\PNEWGEN{} is embedded in C, CommonLISP and SML.
+All \PIPS{} data-types are declared with \PNEWGEN{} descriptions and used with the C or the Common LISP embedding.
+
+The second tool is the \PLinear{} library which handles
+linear formul\ae{} and structures based on these, such as vectors,
+constraints, polyhedra, generating system. This library is used to
+analyze codes (preconditions, regions, dependence test) and to generate
+new versions of codes (partial evaluation, unimodular transformations,
+tiling, send/receive, temporary array allocation,...)
+
+Three interfaces are available: a shell interface ({\em Pips\/}), an X-WindowS interface
+({\tt wpips\/}) and a hypertextual interface ({\tt epips\/}).
+
+To have more information:
+\url{http://www.cri.ensmp.fr/pips}.
+
+This report give a user manual on the X-WindowS (XView) interface
+\WPIPS{} and the hypertextual GNU-Emacs based interface \EPIPS{}.
+
+With these interfaces, a user can use most of the \PIPS{} project
+environment features:
+\begin{itemize}
+\item create workspaces from Fortran sources;
+\item close and re-open these workspace later by exploiting the
+  \PNEWGEN{} persistent data types;
+\item edit the Fortran sources;
+\item analyse the programs by displaying various interprocedural
+  informations based on the interprodural linear algebra framework
+  developped in the \PIPS{} project, such as the known execution
+  context for each instruction (the \Ppreconditions);
+\item apply interactively by using menus various program
+  transformations such as partial evaluation, loop transformations,
+  etc, to improve program efficiency;
+\item parallelize the code and target various parallel Fortran
+  dialects including one emulating a shared memory in \PVM{};
+\item compile \HPF{} code to Fortran~77 with a \PVM{} back-end
+\end{itemize}
+
+The \PIPS{} environment is also configurable and quite modular at the
+developper level and allow easily some various extensions.
+
+\chapter{Getting started}
+\label{cha:getting_started}
+
+
+In the {\tt GettingStarted} directory, there is a collection of small
+programs to start up with the \PIPS{} environment.
+
+\section{Parallelizing a small program}
+\label{sec:parallelizing_a_small_program}
+
+We begin here by using 4 different parallelizing methods on a small
+program, a matrix multiplication.
+
+
+\subsection{Parallelize or vectorize the code}
+\label{sec:parallelize_or_vectorize_the_code}
+
+
+\subsection{Generate parallel PVM code from HPF}
+\label{sec:generate_parallel_PVM_code_from_HPF}
+
+
+\subsection{Generate distributed code for processors and memory banks}
+\label{sec:generate_distributed_code}
+
+{\em This section comes mainly from Corinne A{\sc ncourt}.}
+
+\input{presentation_WP65.tex}
+
+
+\subsection{Parallelize the code with a polyhedric method}
+\label{sec:parallelize_polyhedric}
+
+
+
+
+\section{Optimizing a small program}
+\label{sec:optimizing_a_small_program}
+
+
+\section{Array Regions for Interprocedural Parallelization and Array
+  Privatization}
+\label{sec:parallelizing_a_program_with_aray_privatization}
+
+{\em This is mainly the internal report A/279/CRI from Béatrice C{\sc
+    reusillet} you can get at
+  \htmladdnormallink{http://www.cri.ensmp.fr/doc/A-279.ps.Z}{http://www.cri.ensmp.fr/doc/A-279.ps.Z}.}
+
+\input{A-279-modified}
+
+
+\chapter{User manual}
+
+
+\section{PIPS input language}
+\label{sec:input_language}
+
+To be defined... :-(
+
+F77, implicit none, include, .F (cpp) \& .f
+
+What is not in the \PIPS input language...
+
+
+\section{The PIPS Unix commands}
+\label{sec:unix_commands}
+
+
+\subsection{WPips}
+\label{sec:unix_wpips}
+
+The {\tt wpips} command is used to run the OpenLook/X11 interface for
+\PIPS. {\tt wpips} does not need any OpenWindows specific feature. You
+need to have a correctly initialized {\tt DISPLAY} variable with
+enough access rights to the X11 display.
+
+The default directory is the one where {\tt wpips} is launched.
+
+
+
+\subsection{EPips}
+\label{sec:unix_epips}
+
+For more GNU Emacs familiar users, there is an extension to {\tt
+  wpips} that use some Emacs windows to display various \PIPS{}
+informations. You can bennefit various Emacs advanced features, like
+couloured prettyprinted Fortran code, hypertextual interaction on
+the code, etc.
+
+If you have already an Emacs running, {\tt M-X epips} launches a
+special {\tt wpips} instance from Emacs. You need to load some E-Lisp
+stuff before, for example by modifying your {\tt .emacs} file
+according to the \PIPS{} {\tt README}. The default directory is the
+one of the Emacs buffer where {\tt wpips} is launched.
+
+You can also launch a separate Emacs that deals with 
+
+\section{Some basics about the OpenLook interface}
+\label{sec:openlook}
+
+The most useful button is the {\bf right mouse button} since it is
+used to select everything you want in the menus or the panels.
+
+The left button is used to pick a default selection as a short cut if
+you want exactly what you want. By using the control+right mouse
+button you can change the default selection of a menu as you want.
+
+Some menus have a ``push pin''. If you click on it, the menu is
+changed in a panel window you can place as you want. It is useful when
+you often use a menu.
+
+Some menu items or display items may be shaded. That means that they
+cannot be selected by the user according to the current situation.
+
+
+\section{Basic Pips containers: workspaces \& modules}
+\label{sec:workspace_module}
+
+In order to analyse Fortran programs, \PIPS{} create a workspace where
+it puts all the information about the source, the transformated code,
+some compiled code, some executables for \PVM{} output, etc. Thus the
+first thing to begin with \PIPS{} is to ask for a workspace creation
+in the current directory.
+
+Each source code is splitted in modules that are the functions and
+procedures of the program. Most of the \PIPS{} transformations can
+deal with a module but some other ones, like interprocedural analyses,
+deal with all the modules at once, that is with all the modules of the
+workspace.
+
+Workspaces and modules are thus the basic containers used in \PIPS{}.
+
+\section{WPips: the main panel}
+\label{sec:main_panel}
+
+\psfig{file=images/main_panel.eps,width=\hsize}
+
+The main panel contains most of the menus usable in \PIPS{} and is the
+window that appears first when \PIPS{} begins. It also give various
+informations on the \PIPS{} current state.
+
+
+\subsection{Message}
+\label{sec:main_message}
+
+The line give you the last information message given by \PIPS, such as
+a warning, a log or an error message. Usually, this line is the same
+as the last line of the log window (see~\ref{sec:log_window}) but is
+useful since this may be closed or hidden.
+
+
+\subsection{Directory}
+\label{sec:main_directory}
+
+This line display the current directory and can be user-edited to
+change directory (but only when there is no workspace currently
+open). By using the small directory menu, one can change the directory
+by browsing the tree structure.
+
+
+
+\subsection{Workspace}
+\label{sec:main_workspace}
+
+This line of the main panel display the current open workspace. It can
+be edited to open an old workspace or create a new one if a workspace
+with this name does not already exist in the current directory.  If a
+workspace is already open, it is first closed befor opening or
+creating a new one.
+
+There is also a small workspace menu that allows to open a workspace
+from the current directory, to close the current one or to delete a
+workspace. If one try to delete the current workspace, it is closed
+first. 
+
+Creating a workspace ask for a workspace name. If a workspace with
+this name already exists, \PIPS{} ask for its deletion.
+Then, \PIPS{} pop a window with the list of all the Fortran programs
+of the current directory. One can give a list of file names separated
+with space(s) or more easily by selecting the files with the mouse in
+the scrolling list.
+
+
+
+\subsection{Module}
+\label{sec:main_module}
+
+After selecting a workspace, the module line and menu should become active.
+
+The module line display the current module selected that is the main
+module (the module from a {\tt PROGRAM} statement) if any.
+
+The user can type a module name to select one or use the small menu to
+select one quickly (if there is not too many modules to fit in the
+screen).
+
+
+
+\subsection{Memory}
+\label{sec:main_memory}
+
+This line display an idea of the {\tt break} limit of the \PIPS{}
+process, that is the memory used in megabytes by the code and the data
+(but not by the stack). This information cannot be modified by the
+user\footnote{It is not possible to give some memory back...}.
+
+
+\subsection{CPU time}
+\label{sec:main_CPU_time}
+
+Another useful information for experimentation is the \CPU{} user
+time given by this line.
+
+
+\subsection{Number of display windows}
+\label{sec:main_number_display_windows}
+
+This item shows the number of active windows at this time. The default
+number is 2, that means that when some code is displayed it uses,
+cyclicly the 2 windows availables (see also \ref{sec:display_windows} to
+retains some windows).
+
+The number of active windows can be modified by editing the line or
+easier by clicking up or down the small arrows.
+
+
+
+\subsection{PIPS icon button}
+\label{sec:pips_icon_button}
+
+This button is used to interrupt the current \PIPS{} work. It is taken
+into account by \PIPSMAKE{} at a phase boundary. That means that if
+you are doing a compute intensive phase, you will wait until the end
+of this one, since it is the only way to have clean and easy data
+coherence.
+
+%\section{Select menu}
+%\label{sec:select_menu}
+
+%\psfig{file=images/select_menu.eps,width=\hsize}
+
+
+
+\section{Log window}
+\label{sec:log_window}
+
+Since \PIPS is an interactive environment, some information about what
+is hapening or what failed, etc. is important. A special window is
+allocated to this purpose.
+
+Since dealing with big programs can lead to huge log information, think
+to empty the log windows from time to time.
+
+
+\subsection{WPips log window}
+\label{sec:wpips_log_window}
+
+In the \WPIPS mode, an XView {\tt textedit}-like window is used.
+It can be opened, closed or emptied from the main panel.
+
+
+\subsection{EPips log window}
+\label{sec:Epips_log_window}
+
+In the Emacs mode, the log window is naturally an Emacs buffer. This
+able to display different messages with various text properties (such
+as colors, shape, etc.) according to the importance of each messages:
+a user warning, a user error, a pips error, etc.
+
+There is also \PIPS-specific menus added to the buffer.
+
+
+\section{View windows}
+\label{sec:display_windows}
+
+According to the mode, that is \EPIPS or \WPIPS, different kind of
+windows are used to give information to the user, such as display the
+code, display the data dependences, edit the code, etc.
+
+A window to be diplayed is chosen among a pool of $n$ windows, $n$
+given by the number of display windows in the main panel
+(Section~\ref{sec:main_number_display_windows}). To do some advance
+usage, it is often useful to increase the number of available windows
+at the same time from the default value of 2 to a greater value.
+
+Since it is useful to keep some information in a window, such as for
+example the original code when the user is applying various
+transformations on the code, windows can be frozen and retained unused
+when they have a retain attribute. According to the mode, different
+methods are used to change the retain state.
+
+\subsection{Wpips display windows}
+\label{sec:wpips_display_windows}
+
+
+\subsubsection{Default XView windows}
+
+By default a XView textedit window is open to display user
+information. 
+
+Functionalities of this kind of windows can be found in the manual
+page with {\tt man textedit}. The most interesting thing to know about
+is that you can display a menu with the right button to do operations
+on files, etc.
+
+At the bottom of the window there is a mark box to retain a window.
+Its retain state can be changer by clicking on this button.
+
+\subsubsection{Alternate view/edit windows}
+
+Some users found useful to be able to chose their editors. For this
+feature, an environment variable is used: \verb|PIPS_WPIPS_EDITOR|.
+If this variable is set, its value is the name of the command to
+execute to display or edit a file. The name of the file to display is
+concatenated to that value before being executed.
+For example, in a \verb|csh|-like shell,
+\begin{verbatim}
+setenv PIPS_WPIPS_EDITOR 'xterm -e vi'
+\end{verbatim}
+will use a \verb|vi| editor in an \verb|xterm|.
+
+Note that with this feature, the control of these windows are under
+the control of their users, that means that the retain mode is
+meaningless and there is no pool of windows. A new editor windows is
+used to display each new data and the user is responsible to remove no
+longer used windows.
+
+
+\subsection{Epips display windows}
+\label{sec:epips_display_windows}
+
+In the Emacs mode, an Emacs buffer is of course used to inherit of the
+editing power, language-orented editing, hypertextual interactivity,
+colored highlighting, etc.
+
+Each \EPIPS window has some \PIPS specific menus and a special keymap.
+
+As for the XView windows of \WPIPS, the number of windows in the pool
+is choosen according to the number of display windows in the main panel
+(Section~\ref{sec:main_number_display_windows}).
+
+Note that the visited file name of the buffer is set to the displayed
+file but since a file cannot be directly visited in different buffer
+in Emacs, when \EPIPS is asked to display twice the same version of
+the same resource, a confirmation is asked to the user and the file
+name is not set in the last buffer.
+
+\section{View menu}
+\label{sec:epips_view_menu}
+
+It is used to display some code or some informations from \PIPS. To
+display these, \PIPS{} may execute lots of analyses or code
+transformations according to \PIPSMAKE.
+
+\begin{center}
+  \mbox{\psfig{file=images/view_menu.eps,width=0.3\hsize}  }
+\end{center}
+
+\begin{description}
+\item[Lasts/No selection:] in \WPIPS{} only, to open all the last
+  display windows;
+
+\item[\PSequentialView:] it is the basic view of a module : the code is
+  displayed as \PIPS{} understands it. It may be decorated with some
+  internal informations by using options ``\PSequentialView''
+  (section~\ref{sec:option_sequential_view});
+
+\item[\PUserView:] since the Sequential View is a prettyprinted version
+  of the code, some program details may have been modified an
+  ``\PUserView'' give the code before parsing by \PIPS{}. It is closer
+  to the original code. Of course, after transforming the code by the
+  user, this code may be meaningles... As for the Sequential View, the
+  code can be decorated with some internal informations by using
+  options ``\PUserView'' (section~\ref{sec:option_user_view});
+
+\item[\PSequentialViewControlGraph:] this button is used to
+  display the \Pcontrolgraph{} of the \Pcurrentmodule{} with the graph
+  editor \PdaVinci{}. Each node contains some code statements that can
+  be decorated as for the \PSequentialView{} by using options
+  ``\PSequentialViewControlGraph''
+  (section~\ref{sec:option_sequential_view_control_graph}).
+  
+  Displaying the control flow graph is interesting to precisely
+  analyze some codes in order to figure out what structural
+  optimizations to apply. This kind of graph view is also used to
+  display the interprocedural control flow graph (see
+  section~\ref{sec:ICFG_view}) and the more classical call graph (see
+  section~\ref{sec:call_graph_view}) the linking the various
+  procedures and functions of a program.
+  
+  In \PIPS{}, the control graph is represented with a hierachical
+  control flow graph, as explained about the \Punstructured{} in the
+  \Pri{}. The controf flow graph is hierarchical since a statement can
+  contain an unstructured graph to represent another control graph
+  with no edge outside of the statement.
+
+  
+  The control flow is represented in a directed graph of
+  \Punstructured{} nodes. For example, a \PGOTO{} leads to an edge
+  from the source to the destination, an \PIF{} with some \PGOTO{}s
+  leads to one edge to the \PTHEN{} branch and another one to the
+  \PELSE{} branch.
+  
+  As a consequence a node without predecessor is unreachable and can
+  be discarded (see section~\ref{sec:unspaghettify}).
+  
+  In the \PdaVinci{} output, the following style hints are used:
+  \begin{itemize}
+  \item the first statement block of the programm is yellow;
+  \item the entry node of an \Punstructured{} is a light green ellipse;
+  \item the exit node of an \Punstructured{} is a light grey ellipse;
+  \item an unstructured \PIF{} (that is an \PIF{} with some \PGOTO{}s)
+    is a cyan rhombus (if it is the entry of the \Punstructured{} it is
+    a light green one);
+  \item a \PTHEN{} branch is blue;
+  \item a \PELSE{} branch is red.
+  \end{itemize}
+
+\item[\PDependenceGraphView:] displays the dependence graph view. \ref{NeedFI};
+  
+\item[\PArrayDataFlowGraphView:] displays the array dataflow graph of
+  the code, that is the information used to track array data flowing
+  in the program as used in the method also known as {\em
+    Feautrier\/}'s one. Just an example to explain a little bit the
+  output:
+\begin{verbatim}
+INS_100:
+********
+ Execution Domain for 100:
+{
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_130:
+  Reference: X
+  Transformation: [I,J]
+  Governing predicate:
+{
+  K - 1 <= 0 ,
+} 
+  Execution Domain for 130:
+{
+- I + K + 1 <= 0 ,
+- K + 1 <= 0 ,
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+}
+\end{verbatim}
+  It first describes the data generated by the instruction 0 of line
+  10, that is {\tt INS100} with its execution domain. There is a
+  use-def dependence with instruction 0 of line 13, that is {\tt
+    INS130}, about array {\tt X} only if the governing predicate is
+  true, that is $K - 1 \leq 0$ here. Then, we have the execution
+  domain on {\tt X(I,J)} that used the data previously defined in {\tt
+    INS100}. {\tt Transformation: [I,J]} means that {\tt X(I,J)}
+  is defined in the loop-nest {\tt INS100(i,j)} with $i=I,j=J$;
+
+\item[\PSchedulingView:] give a tiem base for each instruction. For example 
+\begin{verbatim}
+ins_140:
+     pred: TRUE
+     dims: -1+3*I
+\end{verbatim}
+  means that if the predicate is true (here it is of course always
+  true...), these instruction ins executed at time $-1+3\times I$;
+
+\item[\PPlacementView:] gives where an instruction is executed. For example
+\begin{verbatim}
+Ins_140 :I , J
+\end{verbatim}
+  means that these instruction is executed on processor $(I,J)$;
+  
+\item[\PCallgraphView:] display a tree of all the functions or
+  procedures called in the current module. The code can also be
+  decorated according to the options ``\PCallgraphView''
+  (section~\ref{sec:option_call_graph});
+  
+\item[\PICFGView:] display a more precise tree than the
+  \PCallgraphView. It is the Interprocedural COntrol Flow Graph, where
+  each call, {\tt do}-loops and \PIF{} added according to the options
+  ``\PICFGView'' (section~\ref{sec:option_ICFG_view});
+  
+\item[\PDistributedView:] ask \PIPS{} for parallelizing the code with
+  the WP65/PUMA method, {\bf with all the prerequisite of this method
+    on the input code}. The output is in fact not 1 code but 2 ones:
+  \begin{itemize}
+  \item the computational code;
+  \item the memory bank code that does the parallel memory feature;
+  \end{itemize}
+
+\item[\PParallelView:] ask \PIPS{} for parallelizing the code and
+  displaying it according the parallel dialect given in the options 
+  ``\PParallelView'' (section~\ref{sec:option_parallel_view});
+
+\item[\PFlintView:] launch a Fortran {\tt lint} on the module and give
+  the information back to the user;
+
+\item[Close:] in \WPIPS{} only, to close all display windows.
+\end{description}
+
+
+\section{Transform/Edit}
+\label{sec:transform/edit_menu}
+
+The Transform/Edit menu is used to apply various transformations on
+the current module in \PIPS. Furthermore, the user can edit the code
+of the module as a special transformation.
+
+\begin{center}
+  \mbox{\psfig{file=images/transform_edit_menu.eps,width=0.6\hsize}}
+\end{center}
+
+\input{wpips-epips-transform-menu.tex}
+
+  
+\begin{description}
+\item[\PEdit:] a special transformation : the user one! Load the
+  original code of the module. Do not forget to save your modification
+  after you have finished (the menu {\em File/Save Current File\/} in
+  a \WPIPS{} Edit window or the menu {\em Save the file after edit in
+    the seminal .f} in \EPIPS).
+\end{description}
+
+%% Get a more precise comment about the transformations:
+\input{wpips-epips-transform-end.tex}
+
+
+\section{Compile}
+\label{sec:compile_menu}
+
+\begin{center}
+  \mbox{\psfig{file=images/compile_menu.eps,width=0.3\hsize}}
+\end{center}
+
+\begin{description}
+\item[\PCompileAnHPFProgram:] compile all the modules with the \HPF{}
+  compiler;
+
+\item[\PMakeAnHPFProgram:] run {\tt make} on the \HPF{} program;
+
+\item[\PRunAnHPFProgram:] go a step further by trying to run the
+  Fortran 77 output of the \HPF{} compiler;
+
+\item[\PViewTheHPFCompilerOutput:] this menu allows you to view one of
+  the files generated by the \HPF{} compiler. For each module, the
+  main files are the {\tt \_host.f} file for the scalar code and the
+  {\tt \_node.f}  file for the parallel code.
+
+\end{description}
+
+\section{Options}
+\label{sec:options_menu}
+
+\begin{center}
+  \mbox{\psfig{file=images/options_menu.eps,width=0.3\hsize}}
+\end{center}
+
+\input{wpips-epips-options-menu.tex}
+
+\chapter{Conclusion}
+\label{cha:conclusion}
+
+{\small
+\bibliographystyle{plain}
+\bibliography{mybib-beatrice}
+}
+
+\end{document}

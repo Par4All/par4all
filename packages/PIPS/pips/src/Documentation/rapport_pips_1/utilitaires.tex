@@ -1,0 +1,250 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\chapter{Les phases utilitaires}
+
+\section{Création d'un programme}
+\subsection{Découpage du programme}
+\subsection{Création des entités intrinsèques}
+
+
+\section{Analyse syntaxique d'un module}
+
+\paragraph{}
+L'analyse syntaxique du texte source d'un module {\tt M} du programme
+{\tt P} est réalisée par la phase \parser. Rappelons que ce texte se
+trouve dans la ressource {\tt SOURCE\_FILE(M)} créée par la phase
+d'initialisation. 
+
+\paragraph{}
+L'exécution de cette phase consiste en la création d'un objet de type
+{\tt statement} qui formera la ressource {\tt PARSED\_CODE} et en la mise
+a jour de la ressource {\tt ENTITIES(P)} avec les entités déclarées
+ou utilisées dans {\tt P}.
+
+\paragraph{}
+L'analyse 
+
+\subsection{Langage d'entrée}
+\label{fortran-pips}
+
+\paragraph{}
+Le langage d'entrée de \pips est Fortran-77 amputé de quelques unes de
+ses constructions syntaxiques les plus anciennes. Ces restrictions ont
+été faites dans le but de limiter la quantité de code à écrire pour
+mener à bien le projet \pips.
+
+\paragraph{}
+Les restrictions que nous proposons dans la suite de ce document
+n'entrainent pratiquement pas de modifications des programmes benchmarks
+qui nous ont été confiés par l'ONERA (cf. section~\ref{bench-onera}).
+
+\paragraph{}
+A l'opposé, nous avons introduit dans notre langage les extensions
+admises par la plupart des grands constructeurs (IBM, CDC, CRAY, etc.),
+qui sont relativement utiles ey qui risquent d'être présentes dans
+d'autres programmes scientifiques.
+
+\paragraph{}
+La définition de notre sous ensemble de Fortran, noté Fortran-Pips
+dans la suite de ce document, est conforme à la norme ANSI X3.9-1978,
+à l'exception des restrictions citées dans la
+section~\ref{restrictions} et des extensions citées dans la
+section~\ref{extensions}.
+
+\paragraph{}
+Nous donnons en annexe les SYNTAX CHARTS de la norme ANSI modifiés en
+tenant compte des restrictions et des extensions.
+
+\subsubsection{Restrictions}
+\label{restrictions}
+
+\paragraph{Instruction ENTRY.}
+
+L'instruction ENTRY permet de spécifier des points d'entrée
+multiples pour un module. Son utilisation crée des difficultés pour
+un analyseur automatique car le graphe des appels -- graphe qui permet
+de savoir quels modules sont appelés par un module donné -- peut
+devenir très complexe.
+
+Cette instruction est peu utilisée, et de toute manière peut être
+eliminée facilement en dupliquant les modules contenant des ENTRYs.
+
+\paragraph{Module BLOCK DATA.}
+
+Les modules BLOCK DATA permettent de regrouper les initialisations par
+DATA des variables globales. Fortran ne perd rien à sa
+généralité si on interdit les BLOCK DATA et si on insère dans le
+PROGRAM les initialisations contenues dans ceux-ci.
+
+\paragraph{Instructions ASSIGN et GOTO nom-de-variable.}
+
+L'instruction ASSIGN permet de stocker dynamiquement un label dans une
+variable de type INTEGER. L'instruction GOTO nom-de-variable permet
+d'exécuter un branchement vers le label contenu dans une variable.
+
+Un programme contenant ces deux instructions est particulièrement
+difficile à lire pour un programmeur, car le saut peut aboutir
+n'importe où. Dans le cas d'une analyse automatique, l'utilisation des
+ces constructions va résulter en un graphe de contrôle complexe qui
+fera apparaitre de nombreuses dépendances de contrôle. Les
+transformations de parallélisation seront très improbables.
+
+Ces deux instructions peuvent être éliminées en remplaçant les
+instructions \verb+ASSIGN label TO variable+ par des affectations
+\verb+variable = label+, et les instructions \verb+GOTO variable+ par
+une suite d'instructions \verb+IF (variable .EQ. label) GOTO label+.
+
+\paragraph{Instruction RETURN expression.}
+
+Les retours secondaires de subroutine permettent d'exécuter un
+branchement après une instruction CALL dont la destination dépend
+d'une valeur transmise au moment de l'exécution du RETURN dans la
+procédure appelée.
+
+Cette construction pose les mêmes problèmes de complexité du
+graphe de contrôle que précédemment. Elle peut être remplacée
+en transformant la subroutine en fonction et en exécutant apr\`s le
+CALL un branchement vers un label calculé à partir du résultat
+renvoyé par la fonction.
+
+\paragraph{Instruction COMPUTED GOTO.}
+
+Cette instruction permet d'exécuter un branchement vers un label dont
+la valeur dépend de la valeur d'une expression entière.
+
+Cette construction pose les mêmes problèmes de complexité du
+graphe de contrôle que précedemment. Elle peut être remplacée
+par une suite d'instructions \verb+IF (variable .EQ. valeur) GOTO label+.
+
+\paragraph{Instruction INQUIRE.}
+
+L'instruction INQUIRE permet d'interroger le système d'exploitation
+sur les caractéristiques d'un fichier.
+
+Elle est très peu utilisée, et n'a aucun impact sur la
+parallélisation automatique.
+
+\paragraph{Extraction de sous-chaines.}
+
+Fortran 77 permet de déclarer des variables chaines de caractères,
+puis de référencer des portions de ces variables. Cette
+possibilité augmente la complexité des programmes d'analyse de la
+représentation interne.
+
+Cette construction est très peu utilisée et n'a aucun impact sur la
+parallélisation. Nous conservons donc le type chaine de caractères,
+mais interdisons la possibilité d'utiliser des sous-chaines.
+
+\subsection{Extensions}
+\label{extensions}
+
+Nous introduisons dans Fortran-Pips la possibilité de préciser le
+nombre d'octets utilisés par les types de données, comme dans:
+
+\begin{verbatim}
+        REAL*4 T1,T2,TMP(2),TL1,TL2,ETIME
+        REAL*4 T1,T2,TMP(2),ETIME
+        REAL*8 FUNCTION PHI(J,X)
+\end{verbatim}
+
+Nous introduisons d'autre part les instructions d'entrées-sorties
+asynchrones BUFFER IN et BUFFER OUT, dont la syntaxe est la suivante:
+
+\begin{verbatim}
+        BUFFER IN  (UNIT, MODE) (BBLOCK, EBLOCK)
+        BUFFER OUT (UNIT, MODE) (BBLOCK, EBLOCK)
+\end{verbatim}
+
+où UNIT est le numéro de l'unité d'entré-sortie, MODE est une
+constante spécifiant le mode d'entrée-sortie, BBLOCK et EBLOCK
+sont des noms de variables ou d'éléments de tableaux indiquant la
+zone à tranférer.
+
+\subsection{Analyse lexicale}
+
+L'analyse lexicale de Fortran-Pips pose quelques problèmes puisque ce
+langage ne contient pas de mots clefs réservés comme c'est le cas de
+langages plus récents tels que Pascal ou C.
+
+Par exemple, on détecte que l'instruction suivante est une affectation
+car le caractère qui suit la parenthèse fermant la référence au
+tableau IF est le caractère '='.
+\begin{verbatim}
+IF(I, J, K) = 6.66
+\end{verbatim}
+
+\paragraph{}
+En conséquence, l'utilitaire {\em lex}, disponible sous UNIX, ne permet
+pas de réaliser un analyseur lexical pour Fortran-Pips. Une première
+solution consistait donc à écrire complètement un analyseur lexical
+pour Fortran-Pips, ce qui aurait représenté beaucoup de travail.
+
+Nous avons préféré décomposer l'analyse lexicale de Fortran-Pips en
+deux parties, une première partie ayant pour objet de lever les
+ambiguités contenues dans un programme grâce à une pré-analyse qui
+introduit des mots clefs au début de chaque instruction, et une seconde
+partie, beaucoup plus simple car basée sur lex, qui réalise l'analyse
+syntaxique du programme avec mots clefs produit par la première partie.
+
+\subsubsection{Pré-analyseur lexical}
+
+La première partie revient à fournir à l'utilitaire {\em yacc} une
+fonction 'getc' qui permette de lever les difficultés liées à
+Fortran-Pips.
+
+La nouvelle fonction getc fonctionne de la façon suivante.  Getc lit
+d'un seul coup toutes les lignes d'une instruction, c'est à dire la
+ligne initiale et les 19 éventuelles lignes de continuation, et les
+stocke dans le buffer 'Stmt'.  Au vol, getc repère le label, enlève
+tous les blancs, détecte les caractères entre simples quotes, et met
+à jour 4 variables externes, qui représentent pour l'instruction
+courante la première et la dernière ligne commentaire, et la première
+et la dernière ligne source.  Ensuite, le contenu du buffer Stmt est
+analysé pour y détecter les mot clefs, c'est à dire traiter les cas
+des instructions IF, ELSEIF, ASSIGN, DO, des déclaratives IMPLICIT et
+FUNCTION, et des operateurs {\em .XX.} (.EQ., .NEQV., ...).
+
+Lorsqu'un mot clef est détecté, il est mis en miniscules dans le texte
+source, sauf la première lettre qui reste en majuscule.  Ainsi, lex
+peut faire la différence entre le mot clef 'Assign' et l'identificateur
+'ASSIGN'.  Grâce à la première lettre, lex peut détecter deux mots
+clef successifs, même sans blanc pour les séparer, comme dans
+'IntegerFunctionASSIGN(X)'.
+
+Lorsqu'un opérateur .XX. est détecté, il est remplacé dans le source
+par \verb+_XX_+.  Ainsi, lex peut faire la difference entre une
+constante réelle et un opérateur, comme dans \verb/(X+1._EQ_5)/.
+
+\subsection{Post-analyseur lexical}
+
+La seconde partie est tout à fait classique, c'est une spécification
+d'analyseur lexical, dans le langage proposé par lex. Cette
+spécification se compose d'une liste d'expressions régulières
+correspondant aux tokens du langage, ave{c}, pour chacune d'entre elles,
+le code du token à renvoyer à yacc lorsqu'un token de ce type est
+détecté dans le programme source.
+
+\section{Graphe de contrôle structuré}
+
+\section{Edition des liens entre modules}
+
+\section{Reproduction de programmes sources}
