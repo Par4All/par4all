@@ -1,6 +1,9 @@
 #include <stdlib.h>
+int aaaaaaaaaaaaaaaaaaaaa;
 #include <stdarg.h>
+int bbbbbbbbbbbbbbbbbbbbb;
 #include <stdio.h>
+int ccccccccccccccccccccc;
 
 int main(char *fmt1, ...)
 {
