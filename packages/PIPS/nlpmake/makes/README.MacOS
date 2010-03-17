@@ -1,0 +1,7 @@
+Installation under MacOS X 10.5 (Leopard)
+
+- http://freshmeat.net/projects/cproto/
+  ./configure; make; make install
+- MacPorts for etags (standard version under MacOS X is the BSD variant)
+  sudo port install etags
+- MacTeX from TUG DVD
