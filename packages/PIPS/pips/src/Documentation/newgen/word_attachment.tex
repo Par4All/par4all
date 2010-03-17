@@ -1,0 +1,91 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Attachment of some information to text words\\Data structures}
+\author{Ronan Keryell\\
+                \\
+        CRI, École des mines de Paris}
+
+\begin{document}
+
+\section*{Introduction}
+
+This report present the data structures used to attach
+informations to some word of text, mainly to use in the hypertext Emacs
+interface.
+
+\domain{import call from "ri.newgen"}
+{}
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import loop from "ri.newgen"}
+{}
+\domain{import reference from "ri.newgen"}
+{}
+
+I need to store pointer object:
+\domain{External void_star}
+
+\section{Attachments}
+
+Are only a list of {\tt attachment}s:
+
+\domain{attachments = attachment*}
+{}
+
+
+\section{Attachment}
+
+Here is what can be attached to a word:
+
+\domain{attachment = attachee x begin:int x end:int}
+{}
+
+{\tt begin} is the position of the attachment begin in the output
+file and {\tt end} the position of its end.
+
+The various objects that can be attached:
+\domain{attachee = statement_line_number:int + persistent reference + persistent call + persistent declaration:entity + type:string + persistent loop + persistent module_head:entity + complementary_sections:unit + complexities:unit + continuation_conditions:unit + cumulated_effects:unit + out_regions:unit + preconditions:unit + privatized_regions:unit + proper_effects:unit + proper_regions:unit + regions:unit + static_control:unit + transformers:unit + decoration:unit + comment:unit}
+{}
+
+Persistence is need because we do not want the RI to be broken when
+the attachments are freed.
+
+
+
+\section{The mapping used to attach various internal informations}
+
+%Each attachment point to a word of the code:
+%\domain{attachment_to_word = attachment->string}
+
+Each word can have a list of attachments:
+\domain{word_to_attachments = word_pointer:void_star->attachments}
+{}
+\verb|word_pointer| is an {\tt int} instead of a {\tt string} since
+the address must be used instead of the string content. So it needs a
+cast...
+
+
+\end{document}

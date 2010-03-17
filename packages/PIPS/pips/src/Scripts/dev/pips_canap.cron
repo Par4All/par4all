@@ -1,0 +1,6 @@
+# $Id$
+# PIPS account cron at CRI on canapville, bootstrap with:
+# pips@canap> setup_pips.sh /home/local/pips/PIPS
+# fix /home/local/pips/PIPS/pipsrc.sh
+# must fix PIPS_F77 and PIPS_FLINT, g77 package is needed
+03 03 * * * /home/local/pips/PIPS/prod/pips/utils/pips_at_night_at_canap

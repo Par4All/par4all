@@ -1,0 +1,124 @@
+<!DOCTYPE HTML SYSTEM "legacy.dtd">
+<HTML>
+
+<HEAD>
+<TITLE> PIPS: Phases and Transformations </TITLE>
+</HEAD>
+
+<BODY>
+<H1> PIPS: Phases and Transformations</H1>
+
+<P>
+
+This page contains a very brief description of PIPS analysis and
+transformation phases. For more information, see the corresponding
+technical pages when they exist.
+
+<P>
+<HR>
+<P>
+
+<h2> <a name="analyses">ANALYSES</a> </h2>
+<P>
+
+<H3> Initializer </H3>
+Creates the undelying data base and splits the program into modules
+corresponding to the different subroutines or functions.
+<P>
+
+<H3> Parser </H3>
+Produces the abstract syntax tree of each module.
+<P>
+
+<H3> Controlizer </H3>
+Computes the hierarchical control flow graph of the current module.
+<P>
+
+<H3> Callgraph </H3>
+Interprocedural control flow graph: for each module, computes its callers.
+<P>
+
+<H3> Prettyprinters </H3>
+<P>
+
+<H3> Effects </H3> The effects describe the memory operations of instructions. PIPS
+distinguishes WRITE and READ effects, as well as MAY and MUST
+effects. Effects on array elements are handled as effects on the whole
+array. Three types of effect are computed in PIPS:
+<UL>
+<LI> <I>Proper effects</I> describe the local references of an instructions. For
+an assignment, they contain all the variables used or defined. For a loop,
+they only describe the effects on the loop index, on the loop bounds, and on
+the increment. 
+<LI> <I>Cumulated effects</I> are a summary of the effects of a complex
+statement and of its sub-statements.
+<LI> <I>Summary effects</I> of a subroutine are the cumulated effects of its
+body, from which local variables have been eliminated; these effects are
+used at call sites in order to obtain the proper effects, after translating
+the formal parameters into real ones. 
+</UL>
+<P>
+
+<H3> Transformers </H3>
+Transformers abstract the effects of intructions or procedures upon the
+values of integer scalar variables by giving the affine relations that exist
+between their values before and after the execution of a statement or
+procedure call. They are propagated bottom-up.
+<P>
+
+<H3> Preconditions </H3>
+Preconditions are predicate over integer scalar variables. They hold just
+before the execution of the corresponding instruction or procedure. They are
+propagated top-down.
+<P>
+
+<H3> <A HREF="/~creusil/regions.html">Regions</A> </H3>
+Regions are sets of array elements described by equalities and inequalities
+defining a convex polyhedron. There are READ, WRITE, IN and OUT regions.
+
+<P>
+
+<H3> Complexity </H3>
+<P>
+
+<H3> Chains </H3>
+Computes use-def chains, using either effects or regions.
+<P>
+
+<H3> Dependence graphs </H3>
+<P>
+
+<H3> Static control verification</H3>
+Verifies if the input program is a static control program. Pre-requisite
+to the computation of the Array DFG.
+<P>
+
+<H3> Array data flow graph </H3>
+<I>&Agrave; la Feautrier</I> array data flow graph. 
+
+<P>
+
+<P>
+<HR>
+<P>
+
+<h2> <a name="transformations">TRANSFORMATIONS</a> </h2>
+
+<H3> Loop exchange </H3>
+<H3> Loop parallelization </H3>
+<H3> Loop distribution </H3>
+<H3> Loop blocking </H3>
+<H3> Loop unrolling </H3>
+<H3> Scalar privatization </H3>
+<H3> Partial evaluation </H3>
+<H3> Dead code elimination </H3>
+<h3> High Performance Fortran Compiler </h3> see
+   <a href="hpfc.html">HPFC</a>
+
+<p>
+
+<P>
+<HR>
+<A HREF="/~pips"><IMG SRC="/icons/back.xbm" ALIGN="top"></A> Back to PIPS page.
+ 
+</BODY>

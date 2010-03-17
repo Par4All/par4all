@@ -1,0 +1,165 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# HPFC scripts very front-end.
+# just an easy way not to have to remember the name of some scripts.
+#
+# (c) Fabien COELHO 1993, 1994, 1995, 1996, 1997... I'm getting old!
+#
+# TODO: enhance the help capabilities. (That is write a doc:-)
+#
+
+script=`basename $0`
+
+# HELP message
+
+usage()
+{
+  cat >&2 <<-END
+
+	$script is the HPF Compiler driver in front of pips.
+
+	usage: $script [-hvdqt] [-o name] [-D cpp-macros]
+	       function [options] [arguments]
+	  OPTIONS:
+	    -h: this help
+	    -v: verbose
+	    -d: demo (default)
+	    -q: quiet
+	    -t: timings
+	    -T: time pips
+	    -o name: name for the generated file (forwarded to compiler)
+	    -D macro: additionnal cpp macros
+	    -E var=val: additional environment variables
+
+	  typical example: "hpfc -D NPES=4 -D SIZE=1000 -o adi adi2d.F"
+	  to generate an "adi.hpfc" directory with everything in it...
+
+	  also some function among (3 significant characters):
+	  COMPILATION:
+	    i|interactive: (thanks to GNU readline library) (\,cd)
+	    c|compile: compile
+	    m|make: compile and link
+	    r|run: run
+	    f|full: compile + make (shorthand for demos)
+	    d|delete: delete hpfc directory
+	    q|quit: does nothing
+	  DEBUG:
+	    D|debug: compile with debug option
+	    C|clean: clean directories (pips and hpfc)
+	    F|filter: show filter result
+	  MISC:
+	    !|sh: (sh) shell escape
+	    p|pvm: pvm control
+	    h|help: gives this help (but nothing more:-)
+	    validate: used by the validation...
+
+	END
+  exit ${1:-1}
+}
+
+# DEFAULT MODE:
+#
+# May be overwritten in the environment, thus enabling several level of
+# hpfc thru the interactive option to share the same behavior.
+#
+# The default is demo (stderr silent, no warnings) because it does not
+# look nice to make some "hpfc -q ..." and to have to explain that it
+# is for demonstration purposes, in order to hide the generated warnings:-)
+# I was kind enough to generate these (many) warnings, as a reminder of
+# the (many) weaknesses of this prototype compiler.
+
+HPFC_MODE=${HPFC_MODE:-demo}
+export HPFC_MODE
+TIMING=void
+unset COPT
+
+# options
+
+while getopts hvdqtTo:D:E: OPT
+do
+  case $OPT in
+    v) HPFC_MODE=void ;;
+    q) HPFC_MODE=demo ;;
+    d) HPFC_MODE=debug ;;
+    t) TIMING=timing ;;
+    T) COPT="-T $COPT" ;;
+    o) COPT="-w $OPTARG $COPT";;
+    h) usage 0 ;;
+    D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D$OPTARG" ;;
+    E) export $OPTARG ;;
+    *) usage 4
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+# DEFAULT if no arguments: interactive. That makes sense.
+
+# fix path to find hpfc_compile
+arch=${PIPS_ARCH:-`$PIPS_ROOT/makes/arch.sh`}
+bindir=`dirname $0`
+PATH=$PATH:./$arch:$bindir/$arch:$PIPS_ROOT/bin/$arch
+
+[ "$#" -eq 0 ] && exec hpfc_interactive
+
+# ELSE exec the required command.
+#
+# if the argument is a file, the default is to compile it,
+# else the command is executed. I allowed this non homogeneous
+# feature to enable "hpfc file" to compile that file, in normal mode...
+# just a shorthand for MY personnal use. FC.
+
+key=$1
+if [ -f "$key" ]
+then
+  HPFC_MODE=void
+  key=compile
+else
+  shift
+fi
+
+# The following should be coherent with the help...
+
+export PIPS_CPP_FLAGS
+
+case $key in
+  h|hel*) usage 0 ;;
+  c|com*) hpfc_compile -k $HPFC_MODE -k $TIMING $COPT "$@" ;;
+  f|ful*) hpfc_compile -k $HPFC_MODE -k $TIMING -k full $COPT "$@" ;;
+  D|deb*) hpfc_compile -k $HPFC_MODE -k $TIMING $COPT "$@" ;;
+  C|cle*) Delete "$@" ; hpfc_delete "$@" ;;
+  d|del*) hpfc_delete "$@" ;;
+  F|fil*) hpfc_directives < "$@" ;;
+  m|mak*) cd `basename $1 .hpfc`.hpfc ; make all ;;
+  r|run*) hpfc_run "$@" ;;
+  p|pvm*) echo "$@" | pvm ; echo ;;
+  i|int*) hpfc_interactive ;;
+  q|qui*) : ;;
+  !|sh) eval "$@" ;;
+  val*) hpfc_compile -k validate "$@" ;;
+  *) usage 2
+esac
+
+# that is all
+#

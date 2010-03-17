@@ -1,0 +1,341 @@
+<html>
+
+<head><title>PIPS: Pipsmake</title></head>
+
+<body>
+
+<H1><IMG SRC=images/logo-pips.small.gif> Pipsmake library</H1>
+
+<HR>
+
+<H2>Contents</H2>
+
+<UL>
+	<LI> <A HREF="#INTRO">1) Introduction</A>
+	<LI> <A HREF="#DESCRIP">2) Internal description</A>
+	<LI> <A HREF="#DBM">3) Resource management</A>
+	<LI> <A HREF="#API">4) Application programing interface</A>
+	<LI> <A HREF="#WORK">5) Related work</A>
+</UL>
+
+<HR>
+
+<H2><A NAME="INTRO">1) Introduction</A></H2>
+
+<P>From a theorectical point of view, the object types and functions
+avalaible in <A HREF="http://www.cri.ensmp.fr/~pips">PIPS</A> define an
+heterogenous algebra with contructors (e.g. parser), extarctors
+(e.g. prettyprinter) and operators (e.g. loop unrolling). Very few
+combinations of functions make sense, but many functions and object
+types are available. This abundance is confusing for casual and
+experienced users and is was deemed necessary to assist them by
+providing default computation rules and automatic consistency
+management.
+</P>
+
+<P>The <i>Pipsmake</i> library - not so far from the Unix make utility
+- is intended for interprocedural use. The objects it manages are
+resources, stored in memory or/and on disk.  The phases are described
+by generic rules, which use and produce resources.
+</P>
+
+<HR>
+
+<H2><A NAME="DESCRIP">2) Internal description</A></H2>
+
+<H3>2.1) Different kinds of rules</H3>
+
+<P>The <i>pipsmake.rc</i> file contains rules, which define the
+behaviour of the library. <A HREF="http://www.cri.ensmp.fr/~pips"
+>PIPS</A> phases have been divided in two types:
+<br>
+
+<UL>
+	<LI><b>Analyses</b>, generating one or more resources.<br>
+	These phases cannot require resources they produce. e.g. parser,
+dependance graph, parallel views ...
+	<LI><b>Transformations</b>, modifying one or more existing
+resources.<br>
+	These phases update resources - all produced resources
+are required. e.g. loop unrolling, dead code elimination ...
+</UL>
+
+</P>
+
+<P>
+Let's see an example of analyses:
+<pre>
+parser                 &gt MODULE.parsed_code
+                       &gt MODULE.callees
+    &lt PROGRAM.entities
+    &lt MODULE.source_file
+
+hpfc_close             &gt PROGRAM.hpfc_commons
+    ! SELECT.hpfc_parser
+    ! ALL.hpfc_directives
+    # PROGRAM.entities
+    # PROGRAM.hpfc_status
+    &lt MAIN.hpfc_host
+</pre>
+
+The first rule is the parser phase. To parse a module, you need the
+resources describing the entities of the whole program and the source
+file of the module to be up-to-date. Then you'll get the parsed code
+of the module and its callees (i.e. the list of the functions it
+calls).
+<br>
+
+The second rule - much more complex - is the last one of the HPF
+compiler. It will create the resource <tt>hpfc_commons</tt> for the
+program. It requires the resource <tt>hpfc_host</tt> of the main
+function and it will destroy the resources <tt>entities</tt> and
+<tt>hpfc_status</tt>. Morover it will first run the transformation
+called <tt>hpfc_directives</tt>. Also it requires the code to be parsed
+by <tt>hpfc_parser</tt> instead of the usual parser.
+
+</P>
+
+<P>
+Now take a look at some transformations:
+<pre>
+unroll                 &gt MODULE.code
+    &lt PROGRAM.entities
+    &lt MODULE.code
+
+hpfc_filter            &gt MODULE.source_file
+    &lt MODULE.source_file
+
+hpfc_directives        &gt MODULE.code
+                       &gt PROGRAM.hpfc_status
+    &lt PROGRAM.entities
+    &lt PROGRAM.hpfc_status
+    &lt MODULE.code
+</pre>
+
+The first transformation describes the loop unrolling phase. It needs
+the entities of the program and it will update the code of the module.
+<br>
+
+The second phase is a source file filter made for the HPF compiler. So
+it will update the source file of the desired module.
+<br>
+
+The last example - used by the rule <tt>hpfc_close</tt> - is a
+transformation updating the <tt>code</tt> and the
+<tt>hpfc_status</tt>.
+
+</P>
+
+<P>
+
+Let's see another excerpt of the configuration file, which emphasizes
+the inter-procedural capabilities of <i>Pipsmake</i>:
+
+<pre>
+proper_effects         &gt MODULE.proper_effects 
+    &lt PROGRAM.entities
+    &lt MODULE.code
+    &lt CALLEES.summary_effects
+
+cumulated_effects      &gt MODULE.cumulated_effects
+    &lt PROGRAM.entities 
+    &lt MODULE.code 
+    &lt MODULE.proper_effects
+
+summary_effects        &gt MODULE.summary_effects
+    &lt PROGRAM.entities
+    &lt MODULE.code 
+    &lt MODULE.cumulated_effects
+</pre>
+
+Here, for instance, the phase <tt>cumulated_effects</tt> computes the
+accumulated effects (such as a read on a given variable, called
+<b>entity</b> in <A HREF="http://www.cri.ensmp.fr/~pips">PIPS</A>) of all
+the statements of a <b>MODULE</b>. It needs the definition of all the
+entities of the <b>PROGRAM</b> - recall that <A
+HREF="http://www.cri.ensmp.fr/~pips">PIPS</A> is interprocedural-, the
+code of the module and its proper effects, i.e. the effects of the
+atomic subroutine calls.
+
+This architecture is incremental, since data structures are computed
+only when needed by some phase, and flexible, since each phase does
+not have to worry about the others and only request resources at its
+outset. This organization permits the interprocedurality to be almost
+transparent to the programmer of a given phase since he can ignore how
+resources are computed. Each necessary resource is requested from
+<i>Pipsdbm</i> and the appropriate function has previously been
+automatically activated by <i>Pipsmake</i>, if the rules are
+correct. This allows for easy implementations of both top-down and
+bottom-up algorithms on the call graph of a program. Note however that
+it relies heavily upon the non recursivity of Fortran77. It also
+provides the database structure necessary to combine interprocedural
+analysis and the speed necessary for interactivity: objects are
+computed only when there is a need to and when they are not already
+available and up-to-date.
+</P>
+
+<h3>2.2) Complete rule format</h3>
+
+<P>
+
+Frist a rule has a name ;=), and a list of constraints concerning its
+appliance which are:
+
+<UL>
+	<LI><b>required resources (&lt)</b><br>
+	These resources need to be proved up to date before applying the rule
+	<LI><b>output resources (&gt)</b><br>
+	These resources will be produced by this rule
+	<LI><b>modified resources (#)</b><br>
+	These resources are going to be destroyed (they are needed only if
+they are in the	required_resources list)
+	<LI><b>unalterated resources (=)</b><br>
+	These resources will not be altered by the appliance of the rule
+unless rule dependancies should state it (they will be touched)
+	<LI><b>transformation rules to be applied before (!)</b><br>
+	These are <b>rule names</b> corresponding to transformations which
+have to be run before
+</UL>
+
+</P>
+
+<P>
+
+Rules are generic and will be instanciated for a module at
+runtime. For a given module name, resources <b>owner</b> may be:
+<br>
+
+<UL>
+<LI><b>PROGRAM</b>: the complete program (i.e. all modules in the source files)
+<LI><b>MODULE</b>: the module itself
+<LI><b>MAIN</b>: the main module (if any)
+<LI><b>ALL</b>: all the modules
+<LI><b>CALLERS</b>: the set of calling modules (of the current one)
+<LI><b>CALLEES</b>: the set of called modules (by the current one)
+<LI><b>SELECT</b>: allows to force a selection, if several rules may produce
+  a same resource. does only make sense with the bang syntax.
+</UL>
+
+A resource is referenced by both its - lowercase- <b>name</b> and its -
+uppercase - <b>owner</b> with the following syntax:
+<br>
+
+<pre>
+    OWNER.name
+</pre>
+
+Resources with a generic owner are called <b>virtual
+resources</b>. When instanciated they are called <b>real
+resources</b>.
+
+</P>
+
+<P>
+
+You may want to see the <A HREF="pipsmake-rc.htdoc">complete
+description of the rules</A> for PIPS. Note that a consistent subset of
+these rules could be defined to derive automatically a tool with a
+subset of PIPS capabilities. For instance, PIPS could be restricted to
+program analyses or to parallelization for shared-memory machines.
+
+</P>
+<h3>2.3) Up to date resources</h3>
+
+<P>
+
+For each resource, at least one analyse rule producing it should
+exist. If many rules could be used to produce a resource, then the
+first one - in the file - is used. In order to specify another rule,
+<A HREF="#API">a rule activation process</A> is present.
+
+</P>
+
+<P>
+
+According to the rule activated for a given resource, one can say this
+resource is up to date when:
+
+<UL>
+	<LI>the resource exists - in the database
+	<LI>all the required resources (&lt) but the modified ones (#) are
+up to date (recursively)
+	<LI>the <b>logical dates</b> of the previous resources are less or equal
+to the current resource one
+</UL>
+
+</P>
+
+<P>
+
+Resources logical dates have been introduced because of the lack of
+precision of Unix files dates. It is a number, incremented by one for
+each new phase launched by <i>pipsmake</i>. So that resources built by
+the same rule will have the same logical date. For file resources Unix
+dates are kept, too. It is then possible to determine whether such a
+resource has been modified - e.g. edited.
+
+</P>
+
+<HR>
+
+<H2><A NAME="DBM">3) Resource management</A></H2>
+
+<P>
+
+A data base - created on NewGen - allow clear resources status
+management. Some resources are unloadable, some can only be kept in
+memory and others can be stored either in memory or on disk. This data
+manager (<i>pipsdbm</I>) gives confort and security to the resources
+manipulations. Called on demand, this library will give clean resource
+status (e.g. date) or allow consistent resource modifications.
+
+</P>
+
+<HR>
+
+<H2><A NAME="API">4) A.P.I.</A></H2> 
+
+The Application Programing Interface of this library consists of three
+functions:
+<br>
+
+<UL>
+	<LI><tt>make(resource name, owner name)</tt>: is going to build
+the resources '<i>resource name</i>' for the set of modules described
+by '<i>owner name</i>'.
+	<LI><tt>apply(phase name, owner name)</tt>: will apply the phase
+'<i>phase name</I>' to the set of modules described by '<i>owner
+name</i>'.
+	<LI><tt>activate(phase name)</tt>: will activate this rule for all
+it produced resources. It is going do delete from the database all the
+produced resources <b>recursively</b> (using activated rules only).
+
+</UL>
+
+<HR>
+
+<H2><A NAME="RWORK">5) Related work</A></H2> 
+
+<UL>
+
+	<LI>F. Irigoin, P. Jouvelot and R. Triolet, <b>"Semantical
+Interprocedural Parallelization: An Overview of the PIPS Project"</b>,
+ACM International Conference on Supercomputing, June 1991.
+
+	<LI>Mary W. Hall, John M. Mellor-Crummey,Alan Carle and René
+G. Rodríguez, <b>"FIAT: A Framework for Interprocedural Analysis and
+Transformation"</b>, sixth workshop on languages and compilers for
+parallel computing, Portland, OR, August 1993.
+
+	<LI>D.A. Padua, K.A. Faigin, J.P. Hoeflinger, P.M. Petersen and
+S.A. Weatherford, <b>"The Polaris Internal Representation"</b>, fourth
+international workshop on compilers for parallel computers, Delft,
+December 1993.
+
+	<LI>A.H. Veen and M. de Lange, <b>"Overview of the PREPARE
+Project"</b>, fourth international workshop on compilers for parallel
+computers, Delft, December 1993.
+
+</UL> <HR>
+
+</body> </html>

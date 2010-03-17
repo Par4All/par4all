@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Derivation of builder_map.h (stdout) from pipsmake.rc (stdin)
+
+functions=`grep '^[a-z]' | sed 's/ .*//' | sort -u`
+
+# echo $functions >/dev/tty
+
+for f in $functions
+do
+    echo "extern bool $f(char *);"
+done
+
+cat <<EOF
+
+static struct builder_map {
+    char *builder_name;
+    bool (*builder_func)(char *);
+} builder_maps[] = {
+
+EOF
+
+for f in $functions
+do
+  # echo $func
+  F=`echo $f | tr '[a-z]' '[A-Z]'`
+  echo "    { BUILDER_$F, $f },"
+done
+
+cat <<EOF
+
+    { NULL, NULL }
+};
+EOF
+
+# end of it
+#
+

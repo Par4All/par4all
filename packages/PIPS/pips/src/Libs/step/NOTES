@@ -1,0 +1,45 @@
+#
+# Notes inspirees des notes de developpement
+# de la bibliotheque GOMP de GCC
+#
+# Creation: F. Silber-Chaussumier, 2007
+
+Implementing PARALLEL DO construct
+
+!$OMP PARALLEL DO
+    DO 10 i=1,N
+      a(i,1)=i
+    CONTINUE
+!$OMP END PARALLEL DO
+
+=>
+
+!$OMP PARALLEL DO
+    CALL SUM_D010
+!$OMP END PARALLEL DO
+
+
+Implementing SECTIONS construct
+
+!$OMP PARALLEL SECTIONS
+
+!$OMP SECTION
+    stmt1;
+!$OMP SECTION
+    stmt2;
+!$OMP SECTION
+    stmt3;
+
+!$OMP END PARALLEL SECTIONS
+
+=>
+	CALL STEP_init_sections()
+
+	{
+	  CALL SECTION_D11(args1_1, args1_2, args1_3...);
+	  CALL SECTION_D12(args2_1, args2_2, args2_3...);
+	  CALL SECTION_D13(args3_1, args3_2, args3_3...);
+	}
+	
+	CALL STEP_finalize_sections()
+

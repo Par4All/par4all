@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+# This takes a PIPS output file in the GRAPH format
+# and display it using the given viewer or the one by default.
+
+
+usage="                                                              \n"\
+"usage: $0 format graph [viewer]                                      \n"\
+"\tformat : it can be davinci or dot                                  \n"\
+"\tgraph  : it should be an output pips file such as graph.pref-graph \n"\
+"\tviewer : viewer to use, default is daVinci or evince               \n\n"
+
+
+viewer="default"
+
+if [ $# -eq 3 -o $# -eq 2 ]
+then
+
+    if [ $# -eq 3 ]
+    then
+	# set the viewer if given in the command line
+	viewer=$3 
+    fi
+    # set the format and input-file nme from the command line
+    format=$1
+    input_file_name=$2
+    if [ "$format" = "davinci" ]
+    then
+	# daVinci case
+	output_file_name="$input_file_name"".da"
+	pips_unstructured2daVinci $input_file_name > $output_file_name
+	if [ $# -eq 2 ]
+	then
+	    # no viewer given by command line set it to daVinci
+	    viewer="daVinci"
+	fi
+    elif [ "$format" = "dot" ]
+    then
+	# dot case
+	output_file_name="$input_file_name"".ps"
+	pips_unstructured2dot $input_file_name
+	if [ $# -eq 2 ]
+	then
+	    # no viewer given by command line set it to evince
+	    viewer="evince"
+	fi
+    else
+	# unsuported case
+	echo $usage
+	exit 1
+    fi
+
+    # display the result
+    $viewer $output_file_name&
+
+    exit 0
+fi
+
+echo $usage
+exit 1

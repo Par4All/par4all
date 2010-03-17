@@ -1,0 +1,2200 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass[a4paper]{report}
+\usepackage[nofancy]{svninfo}
+\usepackage{verbatim,newgen_domain}
+\usepackage{listings}
+\usepackage{array}
+\usepackage[backref,pagebackref]{hyperref}
+
+\lstset{extendedchars=true, language=C}
+
+% Ou est le fichier de biblio ?
+
+\title{PIPS: Extension of the Internal Representation for C}
+\author{
+  Fabien Coelho \\
+  Fran\c{c}ois Irigoin \\
+  Pierre Jouvelot \\
+  Thi Viet Nga Nguyen \\
+  CRI, MINES ParisTech}
+\date{\svnInfoLongDate{}, revision \svnInfoRevision}
+
+\begin{document}
+\svnInfo $Id$
+
+\noindent
+\maketitle
+\tableofcontents
+
+
+\chapter*{Introduction}
+
+This document discusses the implementation choices of the high-level
+description of data structures used in PIPS as internal representations
+(RI) of C programs.
+
+These data structures are declared using the Newgen Data Definition
+Language in the Abstract Syntax Tree \texttt{ri.tex} companion
+document and shared with the Fortran77 parser..
+
+Here are the goals of our work:
+\begin{itemize}
+\item Enough information must be preserved to prettyprint source code
+  from the internal representation: this is the ultimate goal we must
+  meet.
+\item Whole program must be stored in the internal
+  representation. Modules written in different languages such as
+  Fortran and C must be stored in memory as part of one application,
+  using the very same data structures.
+\item Make the internal representation compatible with the SPEC2000
+  CFP, SPEC1995 INT and SPEC2002 HPC as a first step, and extend it
+  later if necessary to cover all of C ISO 99.
+\end{itemize}
+The reader is assumed knowledgeable in Newgen \cite{Jouv90} and the
+internal representation used for Fortran \cite{Coel01}. Another
+important reference is CIL, a C Intermediate Language developed at
+University of California \cite{Necu02}, which is used for comparison
+purposes.
+
+The standard initially used was ISO C89, but C99 extensions must be
+supported too.
+
+In Section~\ref{chpater:naming}, we deal with naming issues. Then in
+Section~\ref{chapter::storage}, the memory storage of different
+classes of variables is presented. Types in C are much more diverse
+than in Fortran 77 and numerous extesnsions are presented in
+Section\ref{chapter:type}. C expressions are also extended beyond
+Fortran 77 with features such as casts, sizeof and address-of. These
+issues are handled in Section~\ref{chapter:expressions}. Finally
+control flow extensions with respect to Fortran 77 are covered in
+Section~\ref{chapter:control-flow}.
+
+Beeware that details about such or such value given in this report may
+be outdated. Please check \verb/ri.newgen/ and \verb/ri-util-local.h/
+files for programming purposes.
+
+
+\chapter{Naming}
+\label{chpater:naming}
+
+In C, the scope of a local variable is the block where it is declared,
+the scope of an external static variable is the source file where it
+is declared, not the module as in Fortran. So when it is necessary, we
+have to add all information such as the current source file, module
+and block to the entity name in order to locate an entity in the
+symbol table. Here are several objectives for naming different kinds
+of entities:
+\begin{itemize}
+\item As short as possible;
+\item As significant as possible;
+\item As uniform as possible;
+\item As efficient as possible;
+\item To be able to recompile after modifying a file (???);
+\item Faithful with respect to the original declarations ;
+\item Compatible with the existing internal representation (Fortran).  
+\end{itemize}
+Before entering the details related to this naming issue, here are some
+recalls of the C standard \cite{ISOC}.
+
+\section{ISO C concepts}
+
+An identifier can denote
+\begin{itemize}
+\item an object (i.e. a variable)
+\item a function
+\item a tag of a structure, union or enumeration
+\item a member of a structure, union or enumeration
+\item a typedef name
+\item a label name
+\end{itemize}
+
+\subsection{Scopes of identifiers (6.2.1)}
+
+There are four kinds of scopes: function definition, file, block and
+function prototype, also known as function declaration.
+\begin{itemize}
+\item A label name has {\it function definition scope}.
+\item If the declarator or type specifier that declares the identifier
+  appears outside of any block or list of parameters, the identifier has
+  {\it file scope}.
+\item If the declarator or type specifier that declares the identifier
+  appears inside a block, the identifier has
+  {\it block scope}.
+\item If the declarator or type specifier that declares the identifier
+  appears inside the list of formal parameters of a function
+  definition, the identifier has {\it function definition scope}.
+\item If the declarator or type specifier that declares the identifier
+  appears within the list of parameter declarations in a function
+  prototype, the identifier has {\it function prototype scope}.
+\end{itemize}
+
+\subsection{Linkages of identifiers (6.2.2)}
+
+An identifier declared in different scopes or in the same scope more than
+once can be made to refer to the same object or function by the {\it
+  linkage} (external, internal and none). 
+
+So the concept of global entity (\verb/TOP_LEVEL/) does not exist for
+C, but we can use it to refer to external linkage entities, which
+include functions and objects but not tags for structures, unions,
+enumerations and typedef names.
+
+\subsection{Name spaces of identifiers (6.2.3)}
+
+There are separate name spaces : 
+\begin{itemize}
+\item label names
+\item tags of structures, unions and enumerations 
+\item members of structures or unions
+\item ordinary identifiers 
+\end{itemize}
+
+Members of enumerations are handled as identifiers.
+
+\section{File name scope}
+
+There may be functions or variables that have the same name but in physically
+  different files, such as :
+
+\begin{itemize}
+\item in \texttt{Directory1/foo.c}:
+  \begin{lstlisting}
+    static bar()
+  \end{lstlisting}
+\item in \texttt{Directory2/foo.c}:
+  \begin{lstlisting}
+    static bar()
+  \end{lstlisting}
+\end{itemize}
+
+In order to distinguish these two static functions, the two different
+absolute file names must be taken into account\footnote{This may not
+  be implemented in August 2008}. The same situation can arrive with
+\verb/typedef, struct, union/ and \verb/enum/ types, i.e two
+structures with the same name in different files are different.  There
+are several possibilities to uniquely name a source file
+\begin{enumerate}
+\item Use the absolute paths (problem with name lengths and file moves)
+\item Use the relative paths (problem when copying/moving the
+  database system)
+\item Use specific naming in PIPS DBM, with a database that stores the
+  correspondences between the actual file name (absolute or relative, FC
+  ?) and the specific name. This is the current solution for Fortran.
+\item By default: relative and an option for absolute 
+\end{enumerate}
+There may be problems related to special characters used in a C file
+name which can be in conflict with characters used as separators in
+the entity name, but on;y the \verb/MODULE_SEPARATOR/ is critical.
+
+Another possible whole program compilation problem: different
+compilation units use different names for structurally equivalent
+types. CIL \cite{Necu02} resolves this problem by some merging phases
+: merge types and tags and rewrite variable declarations and function
+bodies.
+
+\section{Block scope}
+
+There are different solutions to handle the blocks:
+\begin{enumerate}
+\item Flattening like CIL \cite{Necu02} and then ignoring completely
+  these block scopes, except for memory allocation and for
+  prettyprinting.
+\item Flattening the blocks and conserving the scope information
+  somewhere to regenerate code. There must have special separators and
+  tables to interchange between the internal names and external
+  names. Problem for debugging? Problem for controlizer?
+\item Dewey indexing for blocks (like trees). It can be associated to
+  the above solution ?
+\item Multiple symbol tables. Note: the actual solution, a unique
+  symbol table for general "entity" may create problem when dealing
+  with large-scale programs and prevents PIPS distribution.
+\end{enumerate}
+We do not use flattening as in CIL because the source programs are
+transformed too much, which is not appropriated for a source-to-source
+compiler, although the separation of declaration and code makes it
+more easier to analyze the program. For example, in CIL, local
+variables in inner scopes are pulled to function scope with variable
+renaming like this:
+\begin{lstlisting}
+int main() {
+  int x = 6;
+  {
+    int x = 7;
+  }
+  return x;
+}
+
+int main() {
+  int x__0;
+  int x__1; 
+  {
+    x__0 = 6;
+    x__1 = 7
+  }
+  return x__0;
+}
+\end{lstlisting}
+Impact of block scope on analyses of PIPS ? When propagating
+transformers or preconditions, we must take into account the block
+scope of variables, and pay attention to the different variables that
+have the same user name when prettyprinting results of analyses.
+
+\section{Current naming mechanism}
+
+An entity name contains the name of the object, concatenated to a
+prefix string and a special separator \verb/MODULE_SEP_STRING/
+(":"). The prefix string is the name of the package defining the scope
+of the object which can be \verb/"TOP-LEVEL"/
+(\verb/TOP_LEVEL_MODULE_NAME/) or a module name.
+
+In Fortran 77, the intrinsic \verb/ABS/ has internal name
+\verb/"TOP-LEVEL:ABS"/ while variable \verb/INIT/ of module \verb/FOO/
+has \verb/"FOO:INIT"/ as internal name.
+
+There are also special prefixes to distinguish between a main program,
+a common, a block data, an identifier or a label. For instance,
+\verb/MAIN_PREFIX/ ("\%"), \verb/LABEL_PREFIX/ ("@"). result in
+\begin{verbatim}
+TOP-LEVEL:%MAIN
+TOP-LEVEL:@LAB
+
+Here are the characters corresponding to special separators (attention, \$
+can be used in the identifier name): 
+\begin{verbatim}
+MODULE_SEP_STRING ":"
+FILE_SEP_STRING "%" (compilation unit names are suffiexes by "!")
+BLOCK_SEP_STRING "~" (redefined as "`")
+\end{verbatim}  
+
+So the entity name can be 
+\begin{itemize}
+\item 
+\verb/TOP-LEVEL:name/
+\item or 
+\verb/[file%][module:][block~]name/ which can be one of the following: 
+\begin{verbatim}
+FILE%name
+MODULE:name
+FILE%MODULE:name
+MODULE:BLOCK~name
+FILE%MODULE:BLOCK~name
+\end{verbatim}  
+\end{itemize} 
+In the current implementation, \verb/FILE%/ is (incorrectly) replaced
+ by the compilation unit name, which is not sufficient to eliminate
+ all anme conflicts.
+
+The name of a label is MODULE:@label because it has function scope. 
+
+In addition, to distinguish a structure, an union or an enumerator
+that has the same name as other program variables, we have to add
+special constant characters such as
+\verb/STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX/ to the name prefix. We
+also have to keep the name of the structure and the union in the
+global name of its members in order to distinguish these members with
+other program variables, and so a \verb/MEMBER_SEP_STRING/ is needed.
+It is not necessary for the enum member, because the name of a
+variable must be different from the name of an enumerator
+member\footnote{Enumerator members are represented as nullary
+  functions with symbolic values, like Fortran parameters.}.  A prefix
+for typedef \verb/TYPEDEF_PREFIX/ is necessary to distinguish a
+defined name and to regenerate code.
+\begin{verbatim}
+STRUCT_PREFIX #
+UNION_PREFIX *
+ENUM_PREFIX ?
+TYPEDEF_PREFIX $
+
+MEMBER_SEP_STRING ^
+\end{verbatim}
+
+All prefixes and separators are defined in
+\verb/ri-util-local.h/. They are defined twice as string and as
+characters. Hence they are often assumed to be of length one by PIPS
+programmers.
+
+Examples: 
+\begin{verbatim}
+struct node {};            [file%][module:][block~]#node
+struct key {int node};     [file%][module:][block~]key^node 
+typedef int node;          [file%][module:][block~]$node
+int key;                   [file%][module:][block~]key
+union key2 {int node};     [file%][module:][block~]*key2 
+                           [file%][module:][block~]key2^node 
+enum hue {toto,tata};      [file%][module:][block~]?hue
+                           [file%][module:][block~]toto 
+int hue;                   [file%][module:][block~]hue
+\end{verbatim}   
+
+A function formal parameter in a function definition does not contain
+ any block information. A function formal parameter in a function
+ declaration is named with a special dummy module name.
+
+
+Note: C distinguishes between uppercases and lowercases while Fortran
+ 77 considers all characters to be upper case, except in string
+ constants.
+ 
+The scope of struct, union, enum and typedef is the current
+ compilation unit (current source file), whose name contains a special
+ character, defined as \verb/FILE_SEP_STRING/. Struct and union share
+ the same space. A struct and a union cannot have the same name within
+ one scope, which may make the above distinction between unions and
+ structures redundant.
+ 
+
+\chapter{Storage}
+\label{chapter:storage}
+
+The storage class determines the location and lifetime of the storage
+associated with a variable. 
+
+\section{External variables}
+
+\label{external}
+External variables are defined outside any function, and are thus
+ potentially available to any function that declares it
+ \verb/extern/. Any function may access an external variable by
+ referring to it by name, if the name has been declared somehow. If an
+ external variable is to be referred to before it is defined, or if it
+ is defined in a different source file, then an \verb/extern/
+ declaration is mandatory.
+\begin{verbatim}
+Name prefix = TOP-LEVEL:
+Storage = ram 
+Ram_function = TOP-LEVEL-ENTITY 
+Ram_section = TOP-LEVEL area 
+\end{verbatim}
+In Fortran, the scope of a variable is the module, or in other words, 
+a global variable is always associated to the list of entities
+of a module, which facilitates code regeneration. 
+
+In order not to allocate external variables several times and to
+ prettyprint their declarations properly, they are kept in the
+ \verb/externs/ field of the \verb/code/ data structure.
+
+In the old versions of C, we can declare (extern is not a real
+ declaration, since it doesn't allocate memory per se) the same
+ variable in multiple places (files) with no problem at link
+ time. This is probably what we had in mind when we designed this part
+ of the RI.
+%%
+This is not working anymore with more recent versions of C. As it
+ produces linking error, multiple declarations although allowed by
+ some explicit arguments to the compilers (like \verb/-z muldefs/ in
+ \textsc{gcc}) are not clean programmin practice. Hence there must be
+ some way to know the difference between the declarations of external
+ variable and global variables and how to regenerate the declaration
+ related to external variables, such as:
+\begin{itemize}
+\item in \texttt{file1.c}:
+\begin{lstlisting}
+  int m;
+  void func1 { }
+\end{lstlisting}
+\item in \texttt{file2.c}:
+\begin{lstlisting}
+  int i;
+  extern int m;
+  void func2 { }
+\end{lstlisting}
+in \texttt{file3.c}:
+\begin{lstlisting}
+  void func3() {
+    extern int m;
+  }
+\end{lstlisting}
+\end{itemize}
+
+Multiple declarations are allowed in a compilation unit only, but
+ multiple initializations are forbidden even when they are compatible.
+
+A source file can be considered as a module, and in the first case,
+ the entity $m$ can be added to the list of entities associated to
+ this source file. They are named \verb/"TOP-LEVEL:m"/. In the
+ second and third cases there should not be any memory allocation for
+ entity $m$. The real problem lies to differentiate between entity $i$
+ and entity $m$ for second case and hence allocate memory for \verb/i/ but
+ not for \verb/m/. We need to have some information in the internal
+ representation: it is carried by the \verb/externs/ field of
+ \verb/code/.
+
+\section{Static variables}
+
+\subsection{Internal static variables}
+
+\begin{lstlisting}
+int foo() {
+  ...
+  {
+     static int i;
+     ...
+  } 
+}  
+\end{lstlisting}
+
+\begin{verbatim}
+Name = foo!:0`11`i, where 0`11` is just an example of block numbering 
+Storage = ram 
+Ram_function = current module or compilation unit, "foo!"
+Ram_section = *STATIC* area of current module, "foo:*STATIC*"
+\end{verbatim}
+The outermost block can be omitted, since in fact it is considered as
+ the current module. It is not necessary to generate an entity for
+ each block, we only need to number the blocks. The offset of a
+ variable is computed from the declarations of variables in the same
+ block. So variables with the same offset but in different blocks are
+ different.
+
+\subsection{External static variables}
+
+An external static variable is defined outside of any function, and is
+ known within the remainder of the source file in which it is
+ declared, but not in any other file. The source file is called a
+ compilation unit and a pseudo-function is associated to it.
+
+In file \texttt{foo.c}
+\begin{lstlisting}
+static int i = 0; 
+int f() {
+}
+\end{lstlisting}
+we have a corresponding entity to this external static variable:
+\begin{verbatim}
+Name = foo!:i
+Storage = ram 
+Ram_function = source file, "TOP-LEVEL:foo!"
+Ram_section = *STATIC* area of source file , "foo!:*SSTATIC*"
+\end{verbatim}
+In addition, other entities are generated for the source file and the 
+\texttt{*STATIC*} area of this source file.
+\begin{verbatim}
+Source file (or compilation unit)
+   name = TOP-LEVEL:source_file_name, "TOP-LEVEL:foo!"
+   type = functional (parameters = NIL, result = void)
+   storage = rom
+
+Area
+   name = source_file_name:*STATIC*, "foo!:*SSTATIC*"
+   type = area
+   storage = rom (as for all area entities)
+\end{verbatim}
+ The prettyprint of the external static variable is based on the list
+ of entities associated to the source file entity. The position of the
+ variable declaration in the source file is the position in the
+ declaration field of the \verb/code/ data structure.
+
+\section{Automatic variables}
+
+They are handled like dynamic local variables in Fortran \cite{Coel01}. 
+The outermost block cannot be omitted to handle conflicts with formal parameter names. 
+\begin{verbatim}
+Name prefix =  [file%]module:[block~]
+Storage = ram 
+Ram_function = current module 
+\end{verbatim}
+If the size in bytes of the object is known at compile time, we use:
+\begin{verbatim}
+Ram_section = *DYNAMIC* area of current module
+\end{verbatim}
+Else we use
+\begin{verbatim}
+Ram_section = *STACK* area of current module
+\end{verbatim}
+as in Fortran for varying size arrays that are not formal parameters..
+The keyword \verb/auto/ is kept in variable qualifiers, presented in
+\ref{type_qualifiers}. 
+
+\section{Formal variables}
+
+If they appera in a function definition, they are represented as formal variables in Fortran \cite{Coel01}. 
+\begin{verbatim}
+Name prefix = [file%]module:
+Storage = formal 
+\end{verbatim}
+
+Note that no block information appears.
+
+If they appear in function declaration, aka function signatures, aka
+ function types, their name prefix is synthesized to avoid any
+ conflict (see \verb/DUMMY_PARAMETER_PREFIX/).
+
+\section{Register variables}
+
+A declaration of an identifier for an object with storage-class specifier
+\verb/register/ suggests that access to the object be as fast as possible and 
+the address of any part of an object declared with register cannot be
+computed.  A \verb/register/ declaration can only be applied to automatic 
+variables and to the formal parameters of a function. 
+ 
+\begin{lstlisting}
+f(c,n)
+register int c,n;
+{
+  register int i;
+}
+\end{lstlisting}
+
+\begin{verbatim}
+storage = return:entity + ram + formal + rom:unit
+\end{verbatim}
+
+Since a formal variable can be declared with register, creating
+ another type of storage such as \verb/register/ to store this
+ information does not work and is not compatible with the pre-existing
+ data structuress. Furthermore, for a source-to-source compiler, this
+ information is not important, it is only used to regenerate the
+ source code. So we only need to add this information some where in
+ the type structure. A solution is presented in \ref{type_qualifiers},
+ which also deals with \verb/const, volatile/ and \verb/restrict/.
+
+
+\chapter{Type}
+\label{chapter:type}
+
+The type system of C is much more extended than Fortran 77's which
+ makes the backward compatibility difficult to ensure.  Beside some
+ usual data types such as int, float and char, C also has enumerated
+ type and derived types such as array, structure, union, function and
+ pointer.  Usually, these kinds of type are added to \verb/type/:
+ 
+\verb/type += basic + array + pointer + struct + union + enum/
+
+\verb/array = type x dimensions/
+
+\verb/basic = int + float + .../
+
+However, since PIPS Newgen internal representation has been designed
+ for Fortran where the main data structure is array, the Newgen
+ structure \verb/variable/ (\verb/variable = basic x dimensions/),
+ used to represent Fortran scalar and array variables, must be handled
+ compatibly.  Here are different possible solutions to deal with this:
+\begin{enumerate}
+\item Try to replace all the functions related to \verb/variable/ by
+  macros, then \verb/variable/ is no more used in the new version.
+
+\verb/type += basic + array + pointer + struct + union + enum/
+
+\verb/array = type x dimensions/
+
+\verb/basic = int + float + .../
+
+\item Keep \verb/variable/ and \verb/array/ in parallel 
+
+\verb/type += basic + array + variable + pointer + struct + union + enum/
+
+\verb/array = type x dimensions/
+
+\verb/variable = basic x dimensions/
+
+\verb/basic = int + float + .../
+
+\item To avoid the modifications related to \verb/variable/, which is
+ expensive, the new types can be added to \verb/basic/. This method is
+ called {\it array-oriented}. The Newgen data structure \verb/basic/
+ is modified to enable the recursion among array, pointer, structure,
+ ....
+  
+\verb/type = statement + area + variable + functional + void + .../
+
+\verb/variable = basic x dimensions /
+
+\verb/basic = int + float + logical + string + pointer + .../
+
+However, in this method, the traversal is not always direct, i.e to
+ access a pointer, we have to go through \verb/variable/, ... which
+ may create bugs with malloc, free and it is not easy for debugging.
+\end{enumerate}
+
+The third solution is chosen because it requires less modifications in
+ the actual internal representation. However its main impediment is
+ that functional \verb/typedef/ appears as \verb/variable/ at firat,
+ although the placement of \verb/typedef/ in the \verb/basic/ or
+ \verb/type/ data structures does not appear clearly in the above
+ dicussion. In particular, unlike \verb/pointer/, \verb/typedef/ does
+ not require the dimension field provided by \verb/variable/.
+
+\section{Basic types}
+
+\subsection{Integer type}
+\label{int}
+
+C has different kinds of predefined integer type : int, signed int,
+ unsigned int, short, long, long long, ... and char, signed char,
+ unsigned char. Since \verb/int x/ and \verb/signed int x/
+ declarations are implementation-defined (which is found in the file
+ stdio.h but not in SPEC 2000), they should be distinguished.
+
+Furthermore, new types are added such as \verb/intptr_t/,
+ \verb/int32_t/,...
+
+Currently, PIPS does not have a proper mechanism to adapt to a
+ particular architecture. At best, \verb/#define/ are used. They
+ define a 32 bit architecture: pointers are assumed stored in 32 bits
+ like long int.
+
+There are different solutions to represent all this information:
+\begin{enumerate}
+\item A compact representation that only uses the basic \verb/int/ and gives different values to
+each kind of type:
+\begin{verbatim}
+char                   = 1
+short_int              = 2
+int                    = 4
+long_int               = 6
+long_long_int          = 8
+
+unsigned_char          = 11
+unsigned_short_int     = 12
+unsigned_int           = 14
+unsigned_long_int      = 16
+unsigned_long_long_int = 18
+
+signed_char            = 21
+signed_short_int       = 22
+signed_int             = 24
+signed_long_int        = 26
+signed_long_long_int   = 28
+\end{verbatim}
+
+We could use \verb/mod(int,10)/ to know the basic size and
+ \verb/div(int,10)/ to know if the variable is unsigned, signed or
+ not. However, this not fully compatible with the Fortran version
+ \cite{Coel01} where the value of int is the number of bytes required
+ to store one scalar object of this type. And this does not hold for \verb/long_int/.
+
+\item A less compact but simpler solution is to represent three different
+  cases: unsigned, signed or not. 
+
+\verb/basic += int:int + signed:int + unsigned:int/
+
+In each case, different values are associated to short int,
+int, long int or long long int. 
+\begin{verbatim}
+short_int              = 1
+int                    = 2
+long_int               = 4
+long_long_int          = 8
+\end{verbatim}
+\end{enumerate}
+
+The first solution is currently implemented. The numbering scheme can
+ be checked in \verb/ri-util/prettyprint.c/ and in \verb/cyacc.y/. See
+ also function \verb/SizeOfarray()/.
+
+It is not clear that merging signed and unsigned types is a good idea,
+ especially in another data structure, \verb/constant/.
+
+\subsection{Character type} 
+
+\begin{enumerate}
+\item A character variable is in fact an integer variable, so it can
+ be associated to the basic \verb/int/, as in the first solution of
+ \ref{int}.
+\begin{verbatim}
+unsigned_char          = 11
+char                   = 21
+signed_char            =  1
+\end{verbatim}
+
+\item It may also be better to treat character independently. 
+
+\verb/basic += char:int/
+
+where the value of \verb/int/ is 
+\begin{verbatim}
+unsigned_char          = 11
+char                   = 21
+signed_char            = 31
+\end{verbatim}
+
+\item Ambiguity between \verb/string/ and array of characters ?
+ \verb/string/ is not used for C? Impact on semantic analysis, which
+ does not handle arrays but handles strings optionnally?
+
+\end{enumerate}
+
+The first solution is chosen and the basic type \verb/string/ is not
+ used for C internal representation.
+
+\subsection{Bit type}
+
+We have to add a basic type \verb/bit/ to represent the integral bit fields
+occurred in a structure declaration.   
+
+\verb/basic += bit:int/
+\begin{verbatim}
+int a:1 
+unsigned b:2 
+signed c:3
+\end{verbatim}
+
+\subsection{Boolean}
+
+A special type, \verb/_Bool/ is used by gcc, according to ISO
+ standard. This type is mapped on the logical basic.
+
+\subsection{Varying argument lists}
+
+The gcc compiler uses a special builtin type, \verb/va_list/. It is
+ defined like a typedef, with not much information beyond what is
+ needed for the prettyprinter.
+
+\section{Arrays}
+
+As in Fortran, we have to represent fixed size array and varying size
+ arrays, arrays (and typedef) which are sized by expressions evaluated
+ dynamically.
+
+We also have to represent implictly sized arrays, whose sizes are
+ implied by their initial values but should not be given in the
+ declaration itself.
+
+\section{Pointers}
+
+Pointer can point to any variable: to a scalar variable, to an array variable, to a function, ...
+To represent an array of pointers and to keep the initial internal representation, a new type \verb/pointer/ is
+added to \verb/basic/.   
+
+\verb/basic +=  pointer:type/
+
+\subsection{Pointer to integers}
+
+\begin{verbatim}
+int *p1
+name = p1
+type = variable
+   dimension = NIL
+   basic = pointer
+         pointer of type variable
+             basic = int
+             dimension = NIL.
+\end{verbatim}
+with this dynamic allocation:
+\begin{lstlisting}
+p = malloc(5*sizeof(int));
+\end{lstlisting}
+to store the size of the corresponding memory zone, the dimension of the
+pointer can be changed to : 
+\begin{verbatim}
+int *p1
+name = p1
+type = variable
+   dimension = NIL
+   basic = pointer
+         pointer of type variable
+             basic = int
+             dimension =5.
+\end{verbatim}
+
+But how about most cases, as in
+ Section~\ref{subsection:pointer-to-pointer}?
+
+Anyway, the dynamic analysis of pointers is not part of the
+ parser. Calls to \verb/malloc()/ are not taken into account in the
+ parser to do any memory sizing. The size of a pointer is either 32 or
+ 64 bits, but only the 32 bit architecture is implemented (see
+ \verb/DEFAULT_POINTER_TYPE_SIZE/ in \verb/ri-util-local.h/, but this
+ should be improved to chose the architecture dynamically). The first
+ approach is used.
+
+\subsection{Pointer to pointer}
+\label{subsection:pointer-to-pointer}
+
+\begin{lstlisting}
+char **p;
+p = malloc(n*sizeof(char *));
+for (i=0;i<n;i++)
+   p[i] = malloc((i+1)*sizeof(char));
+\end{lstlisting}
+Initially, with the declaration, we have :
+\begin{verbatim}
+name = p
+type = variable
+   dimension = NIL
+   basic = pointer
+         pointer of type variable
+             basic = pointer of type variable (basic = int/char, dimension
+             = NIL)
+             dimension = NIL.
+\end{verbatim}
+After the first allocation, p points to an array of n pointers (attention
+to the scope of n):
+\begin{verbatim}
+             basic = pointer of type variable (basic = int/char, dimension
+             = NIL)
+             dimension = n.
+\end{verbatim}
+
+How to know the memory size pointed by this each pointer? And the size
+ is i-related ...? \lstinline/p[i]/ represents an entity or \lstinline/p/ only?
+ The size of p[i] is lost There is a particular case where
+ \lstinline/(i+1)/ is replaced by \lstinline/m/ (arrays of same size), we can
+ keep this information in dimension of the second pointer.
+
+This is left aside for future pointer analyses.
+
+\subsection{Pointer to an array}
+
+Declaration \lstinline/int (*p2)[13]/ defines \lstinline/p2/ as a
+ pointer to an array of 13 integers:
+\begin{verbatim}
+name = p2
+type = variable
+   dimension = NIL
+   basic = pointer
+         pointer of type variable
+             basic = int
+             dimension = [13].
+\end{verbatim}
+
+\subsection{Array of pointers}
+
+\lstinline/int *a[13]/ is an array of 13 pointers to integers
+\begin{verbatim}
+name = a
+type = variable
+    dimension = [13]
+    basic = pointer
+         pointer of type variable
+             basic = int
+             dimension = NIL.
+\end{verbatim}
+
+\subsection{Function returning a pointer}
+
+\lstinline/char *f(n)/, f is a function that returns a pointer to a character
+string
+\begin{verbatim}
+name = f
+type = functional 
+      result = variable
+          dimension = NIL
+          basic = pointer,
+              pointer of type variable
+                 basic = char
+                 dimension = NIL. 
+\end{verbatim}
+
+\subsection{Pointer to a function}
+
+\lstinline/int (*p)()/
+\begin{verbatim}
+name = p
+type = variable
+      dimension = NIL
+      basic = pointer
+           pointer of type functional
+                parameters = undefined
+                result = int.
+\end{verbatim}
+
+Note: \lstinline/undefined/ is supposed to be avoided in PIPS internal
+ data structure. The \lstinline/gen_defined_p()/ predicate should
+ always return true. Unknwon or unspecified would be better. Is
+ \lstinline/void/ ending up with one parameter of type
+ \lstinline{void}, different from \lstinline/NIL/? See the
+ prettyprinter source code?
+
+\section{Structure, Union and Enumerated Types} 
+
+The common point between a structure, an union or an enumerated type
+ is that each of these types has a name and a list of members. In
+ addition, these members can be represented as entities, because they
+ have name, type and eventually initial value. There are two
+ possibilities to represent these new derived types:
+
+\begin{enumerate}
+\item Each type is represented separately:
+
+\verb/type +=  struct:entity* + union:entity* + enum:entity*/ 
+\item They are grouped into a composed type
+
+\verb/type +=  composed/ 
+
+\verb/composed =  members:entity* x kind/
+
+\verb/kind = struct:unit + union:unit + enum:unit/
+\end{enumerate}
+The first solution is chosen because it is simpler and more direct when
+we want to access a special type. 
+
+In addition, in order to be homogeneous with \verb/pointer/, these
+new types can be added to \verb/basic/:
+
+\verb/basic +=  struct:entity* + union:entity* + enum:entity*/ 
+
+\noindent
+but adding them to \verb/type/ would make the traversal much
+ shorter. We do not have to pass through \verb/variable/ each time we
+ want to refer to an entity of struct/union/enum type.
+
+The storage class of the struct/union/enum entities and their members
+ is \verb/rom/. The \verb/initial value/ of a member entity can be
+ used (or is used?) to represent the offset in bytes of the member in
+ the struct.
+
+All the above discussions talk about the entity related to the
+struct/union/enum declaration (this template about the shape of a
+structure create no storage) such as 
+\begin{lstlisting}
+struct key {
+  int tab[3];
+  int keycount;
+};
+\end{lstlisting}
+
+This entity \verb/key/ is of type \verb/struct/ and is (implictly)
+ associated to a list of members: \lstinline/"#key"/,
+ \lstinline/"key^tab"/, \lstinline/"key^keycount"/. Note that the special
+ character \lstinline/#/ is not repeated in the field names.\\
+
+In the declaration like \lstinline/struct key var = {{1,2,3}, 3}/, the
+ entity \verb/var/ is of type \lstinline/struct key/ and there are two
+ possibilities to represent its type:
+
+\begin{enumerate}
+\item Associate it directly  to the entity \verb/key/
+\item Associate it to a composed type which contains the name of the
+ structure (\verb/key/) and the list of members, etc. This solution is
+ redundant because we have to store the same information for each
+ variable of type \lstinline/struct key/.
+\end{enumerate}
+
+So to represent a variable whose type is struct/union/enum, we add to
+ \verb/basic/ the \verb/derived/ type to point to these new types.
+
+\verb/basic += derived:entity/
+
+The initial value of \verb/var/ in this case is a list of lists, which
+ is not representable actually in Newgen. But since we know statically
+ the size of the array \verb/tab/ in the \lstinline/struct key/, we
+ could represent this value as a normal list \{1,2,3,3\} and the
+ information can be extracted when needed. A new psesudo-operator,
+ \lstinline{BRACE_INTRINSIC}, is added to be able to represent exactly
+ the list of lists of expressions.
+
+Structures, unions and enumrations that are not named receive a
+ default internal name (see \lstinline/DUMMY_STRUCT_PREFIX/,
+ \lstinline/DUMMY_UNION_PREFIX/ and \lstinline/DUMMY_ENUM_PREFIX/ in
+ ri-util-local.h).
+
+Whithin one scope, a named structure has a unique name, even if it is
+ defined within another structure or union.
+
+\subsection{Structure declaration}
+
+\begin{lstlisting}
+struct key {
+  char *keyword;
+  int keycount;
+};
+\end{lstlisting}
+
+\begin{verbatim}
+name = key
+type = struct 
+
+     name = keyword
+     type = variable
+          dimension = NIL
+          basic =  pointer of type variable
+                  basic = char
+                  dimension = NIL
+     storage = rom
+     initial = 8
+
+     name = keycount
+     type = variable
+          dimension = NIL
+          basic = int
+     storage = rom
+     initial = 8
+\end{verbatim}
+Nga's comments: the traversal is much shorter if
+ \verb/pointer, array, basic/ are added to \verb/type/ as in the other
+ solution (which is more logic ...but there were too few type
+ constructor in Fortran 77 to anticipate correctly the needs of C).
+\begin{verbatim}
+     name = keyword
+     type = pointer of type basic = int
+
+     name = keycount
+     type = basic = int
+\end{verbatim}
+
+\subsection{Pointer to structures}
+
+\begin{lstlisting}
+  struct key *p;
+\end{lstlisting}
+
+\begin{verbatim}
+name = p
+type = variable
+    dimension = NIL
+    basic =  pointer of type variable
+          basic = derived = entity key
+          dimension = NIL
+\end{verbatim}
+
+\subsection{Array of structures}
+
+\begin{lstlisting}
+  struct key keytab[10];
+\end{lstlisting}
+
+\begin{verbatim}
+name = keytab
+type = variable
+     dimension = [0:9]
+     basic = derived = entity key
+\end{verbatim}
+
+\subsection{Self-referential structure (recursive data structure)}
+
+\begin{lstlisting}
+struct node {
+  char word[10];
+  struct node * next;
+};
+\end{lstlisting}
+
+\begin{verbatim}
+name = node
+type = struct 
+
+      name = word
+      type = variable
+          basic = char
+          dimension = [0:9] 
+
+      name = next
+      type = variable
+           dimension = NIL
+           basic = pointer of type variable
+                  basic = derived = entity node
+                  dimension = NIL
+\end{verbatim}
+
+\section{Typedef}
+
+\begin{lstlisting}
+typedef char *STRING;
+typedef int A[2][3];
+typedef int (*PFI)();
+typedef struct {} TREE,*TREEPTR;
+typedef int f(char);
+\end{lstlisting}
+\verb/STRING, A, PFI, TREE, TREEPTR/ are entities with:
+\begin{itemize}
+\item Global name = \verb/TYPEDEF_PREFIX/ + local name. The \verb/TYPEDEF_PREFIX/ is
+  used to regenerate code. 
+\item Storage = rom 
+\item Type = type which is named;
+\item Initial value = could be the type wich is named, but the ype field is alreay used for this
+\end{itemize}
+It is more logic if the initial value of a typedef entity is
+ \verb/type/. But in this case, we have to modify the \verb/value/
+ Newgen structure, so it is better to put the type directly in the
+ \verb/type/ of the entity. Too bad for functional typedefs whose type
+ is \verb/variable/ at first look. The dimensions field is not useful
+ either.
+
+To represent variables whose type is a \verb/typedef/ entity, we add to
+\verb/basic/ the \verb/typedef/ structure. 
+
+\verb/basic += typedef:entity/ 
+
+\begin{lstlisting}
+typedef struct key {...} key;
+key k1;
+struct key k2; 
+\end{lstlisting}  
+
+\begin{verbatim}
+name = STRUCT_PREFIXkey
+type = struct  
+storage = rom 
+
+name = TYPEDEF_PREFIXkey 
+type = variable 
+     dimension = NIL
+     basic = derived = entity STRUCT_PREFIX:key
+storage = rom
+
+name = k1
+type = variable 
+     dimension = NIL
+     basic = typedef = entity TYPEDEF_PREFIXkey
+
+name = k2
+type = variable 
+     dimension = NIL
+     basic = derived = entity STRUCT_PREFIX:key
+\end{verbatim}
+
+\section{Functional Type}
+
+Functional types have already been treated for Fortran, except for
+ some (small) details.
+
+\verb/type = functional + .../
+
+\verb/functional = parameters:parameter* x result:type/
+
+\verb/parameter = type x mode /
+
+\begin{itemize}
+\item For \lstinline/extern int f(void);/, \verb/parameters/ is a list
+ of one element of type \lstinline/void/. The number of parameters is
+ mislseading in this case.
+\item How to represent \lstinline/extern int f();/ (the same for
+ Fortran with \verb/EXTERNAL F/ ?) \verb/parameters_undefined/ creates
+ consistency/updating problems ?
+\item We can add a Newgen structure for the function qualifier
+ \verb/inline/ but it was not necessary for during the first parser
+ development because no inlined functions appear in SPEC 2000. It is
+ snot clear the \lstinline/inline/ should be part of the type since
+ two functions can have the same signature and hence the same type,
+ but they do not have to be both inlined. Should it be a type
+ qualifier? But qualifier a are restricted to variable types...
+\end{itemize}
+
+C supports varying argument lists and a special keyword,
+ \lstinline/va_arg()/, whose two arguments are a variable and a
+ type. As for \verb/sizeof/ which takes either a type or a variable as
+ argument, this is not representable with a standard \verb/call/..
+
+\section{Type qualifiers : Const, Restrict, Volatile}
+\label{type_qualifiers}
+
+\begin{lstlisting}
+const int *p;
+void func(const a);
+void h(int * const restrict p);
+\end{lstlisting}
+
+Although only a small percent of variables are declared with these
+ qualifiers and it is expensive, we choose to create a new Newgen
+ structure for them. Attempts to put these information in existing
+ Newgen structures, such as a \verb/rom/ storage for local variables
+ qualified with \verb/const/, \verb/shared/ field of \verb/ram/ for
+ \verb/restrict/ed local variables are not successful because they do
+ not handle all possible cases. For example, \verb/rom/ cannot be used
+ for a formal variable declared \verb/const/ (which can be found in
+ SPEC 2000 benchmarks), \verb/shared/ cannot be used for a formal
+ variable declared \verb/restrict/.
+
+We can add a new field \verb/qualifiers/ for \verb/type/, at the
+ \verb/variable/ level. This qualifier can also contain the
+ \verb/register/ and \verb/auto/ cases.
+
+\verb/variable = basic x dimensions x qualifiers:qualifier*/
+
+\verb/qualifier = const:unit+restrict:unit+volatile:unit+register:unit+auto:unit/
+
+There are about 36 make\_variable in PIPS source code to modify.
+
+\section{Conclusion}
+
+Some important information is carried by the entity name and not by
+ the type data structure. This is the case for struct, union and
+ enum. As a result, numerous characters become reserved and it is not
+ always possible to use the external operator name as internal PIPS
+ operator name. This old assumption of PIPS internal representation
+ not longer holds.
+
+\chapter{Expressions}
+\label{chapter:expressions}
+
+Expressions in Fortran PIPS must be extended to handle new kinds of
+expressions found in the C language. Here are the Fortan 77 data structures used to represent expressions:
+
+\verb/expression = syntax x normalized/
+
+\verb/syntax = reference + range + call/
+
+\verb/reference = variable:entity x indices:expression*/
+
+New kinds of syntax are added to handle C language. They are {\it cast},
+ {\it sizeof}, {\it subscripting array} and
+{\it function application} expressions. The subscripting array expression
+is an extension of the reference expression, which includes other
+more complicated array objects such as pointer, function, 
+structure or union member... The same extension is made to call
+expression, named function application, because the called function is
+not necessarily an entity but can be any expression that denotes a function.   
+
+\verb/syntax += cast + sizeofexpression + subscript + application/
+
+\section{Cast}
+
+\verb/cast = type x expression/
+
+Cast cannot be reprenseted easily as intrinsicss as in Fortran,
+ because their number is unbounded due to the typedef mechanism.
+
+\section{Sizeof}
+\verb/sizeofexpression = type + expression/
+
+\section{Subscript}
+
+In C, pointer expressions can be subscripted, not arrays only.
+
+\verb/subscript = array:expression x indices:expression*/
+
+\section{Application}
+
+C is mot flexible than Fortran about functional pointer. Such pointers
+ can be stored in data structures isntead of being restricted to
+ function call.
+
+\verb/application = function:expression x arguments:expression*/
+
+For example, we have such a function call in C::
+\begin{lstlisting}
+  (*ctx->Driver.RendererString)()
+\end{lstlisting}
+
+
+\section{Special calls}
+
+To represent C construct, specific calls are used
+
+\subsection{Member references }
+
+There are different solutions:
+\begin{enumerate}
+\item A special call expression, \lstinline/FIELD_MEMBER_CALL(exp1, exp2)/, to handle for example
+\lstinline|str[1].fld[2]|
+\item
+  \verb/reference = variable:entity x indices:expression x offset:entity*/
+  This is not sufficient because we can have in C99 \lstinline|foo().x|
+  where foo is a function returning a struct... That means that we need to
+  extract fields from non l-values too.
+
+More explaination here !
+\end{enumerate}
+ Distinguish between \texttt{.} and \verb/->/ ? The last one can be represented by
+ the first one and \texttt{*}. 
+ Disadvantages for type checking, program
+analyses, transformations?
+
+See \verb/ri-util-local.h/:
+\begin{verbatim}
+#define FIELD_OPERATOR_NAME             "."
+#define POINT_TO_OPERATOR_NAME          "->"
+#define DEREFERENCING_OPERATOR_NAME     "*indirection"
+#define ADDRESS_OF_OPERATOR_NAME         "__address-of__"       // &
+
+#define COMMA_OPERATOR_NAME             ","
+\end{verbatim}
+
+\subsection{Address of, value of}
+
+Special functional intrinsics are used for \verb/&/ and \texttt{*}.
+
+\subsection{Comma operator - list of expressions}
+
+\lstinline|f(a, (t=3,t+2),c)|
+
+Special call expression COMMA\_OPERATOR: n-ary or binary call ?
+
+The same holds for \lstinline/a=b=c=d/. 
+
+\subsection{Conditional expression}
+
+\lstinline|e1 ? e2 : e3 |
+
+Special call expression based on CONDITIONAL\_OPERATOR. This is the
+only operastor with 3 arguments.
+
+
+\chapter{Control Flow}
+\label{chapter:control-flow}
+
+\section{Module Code}
+
+\verb/code = declarations:entity* x decls_text:string x initializations:sequence/
+
+As discussed in section \ref{external}, external variables that are
+declared outside a module can be pretty-printed if the source file is
+considered as a module, with the declarations list and the decls\_text
+string. This is implemented in the data structure \verb/code/ but the
+field \verb/decl_text/ does not seem to be initialized by the parser
+and is not used by the prettyprinter.
+
+However, this does not let us know if a global variable has been
+declared \verb/extern/ or not. For instance, the two declarations:
+\begin{verbatim}
+extern int i;
+\end{verbatim}
+et
+\begin{verbatim}
+int i;
+\end{verbatim}
+outside of a function definition result both in the declaration of a
+global variable, \lstinline/top-level:i/, within a compilation unit.
+To remember in which C file the keyword \verb/extern/ appears, a new
+field, \verb/externs/ is added to \verb/code/. Note that the
+initialization and/or the declaration without extern can appear only
+once within an application. However, the sequence:
+\begin{verbatim}
+extern int i;
+...
+extern int i;
+...
+int i;
+\end{verbatim}
+is legal, probably to simplify the design of include files.
+
+The field \verb/code_declarations/ contains all variables declared
+within the function definition. Iternal PIPS entities such as memory
+areas are declared first, followed by formal parameters. Other
+variables declared within statement blocks are also listed here. So
+most variables appear in a \verb/statement_declarations/ field and in
+the \verb/code_declarations/ field of the module.
+
+For a compilation unit, which does not really have a body, the
+\verb/code_declarations/ field can be used.
+
+The field \verb/initializations/ is used to represent DATA statements
+in Fortran. In C, the initializer for a scalar variable is a single
+expression, for objects that have aggregate or union types is an
+initializer list, which can be not complete and by default, the
+remaining elements are initialized by zero (for arithmetic type) or
+null pointer (for pointer type).
+
+There are two possibilities to represent this initialization information:
+\begin{itemize}
+\item Represent this initialization in the initial values of
+entities. New kinds of value can be added to \verb/value/ such as
+\verb/expression/ for scalar variables, 
+aggregate or union types (array, structure, ...). String can be used to
+  regenerate code, list (list of lists is not permitted in Newgen) can be used  to
+  have fine preconditions on array elements, structure member, ... But the
+  list length is the array size ?
+
+Other problem: how to represent \verb/int i = j;/ ? The initial value of i
+is j ?
+\item Treat this initialization as a special kind of statements like DATA
+  in Fortran.
+\item since any statement and hence any instruction can include a
+  declaration and since ISO C99 allows mix of declarations and
+  executable statements, represent \lstinline/int i =j/ as
+  \lstinline/int i; i = j;/.
+\end{itemize}
+The first solution is chosen and the field \verb/initial_value/ leads
+to a value containing the initialization expression thru
+\verb/value_expression/. Sepcial expressions are built for array and
+structure initializations.
+
+\section{Statement}
+\label{statement}
+ 
+The Fortran 77 structure of a statement is:
+ 
+\verb/statement = label x number x ordering x comments x instruction/
+
+Since in C, a declaration can appear in any block, not only at the
+beginning of a function, we have to associate variable declarations to
+blocks. There are two possibilities to perform this in the current
+internal representation: declaration can be associated to either a
+statement or a sequence (a block in fact). But since the true and
+false branches of a conditional statement as well as the body of a
+loop are not necessarily sequences, declarations in these statements
+will be lost if they are associated to sequence. So we choose to
+associate them to a statement, although it may be useless for some
+elementary statements such as call, test or loop.
+
+Another approach would have been to consider declarations as
+statements (see discussion about initializations in previous section)
+and/or to use a NOP instruction such as Fortran \verb/CONTINUE/ to
+carry the declarations. This let us also preserve more comments than
+other approaches.
+
+Note: we have to pay attention in coding in PIPS that we cannot refer
+to declarations once we have already reach the instruction because
+there is no upward pointer from instruction to statement.
+
+So we suggests to modify \verb/statement/ in the following way:
+
+\verb/statement += declarations:entity* x decls_text:string/
+
+instead of creating a new instruction, which could be called
+declaration. When a new instruction is needed, PIPS designers often
+use a new intrinsic rather than a new instruction because fewer PIPS
+source code modifications are necessary.
+
+Member \verb/declarations/ contains a list of entities in the
+statement scope (all kinds of entities such as intrinsics, ... or only
+those that are effectively declared).  Member \verb/decls_text/ could
+be used to regenerate source code (as for module code) if the parser
+initializes it.
+
+This does not specify which statements carry the declarations. A first
+implementation, based on C89, used block statements only to carry
+declarations. All other statements had to have an empty declaration
+list. This is too restrictive with respect to C99, which allow
+declarations to appear anywhere among executable statements, and with
+respect to source-to-source constraints. By putting all declarations
+of a block in one statement, individual comments and line numbers are
+lost.
+
+A second implementation is based on C nop, ";", i.e. Fortran
+CONTINUE. This statement has no effect and can be ignored, but for the
+possible initial values, by PIPS analyses. PIPS transformations must
+preserve it.
+
+\section{Instruction}
+
+The \verb/instruction/ for Fortran 77 is a union:
+
+\verb/sequence + test + loop + whileloop + goto + call + unstructured/
+
+Other kinds of instructions in C such as \verb/switch/, \verb/for/,
+... can be added to \verb/instruction/ or represented using the
+existing structures declared above.
+
+In addition, a statement in C can be any expression, not only call
+expression, so we have to add \verb/expression/ to \verb/instruction/.
+However, to make PIPS backward compatible, we try to create a call
+statement for each call expression. Expression statement is only used
+for special cases, such as cast expression.
+
+Not data structure is added for the \verb/switch/ construct.
+
+A new field is added to \verb/whileloop/ to indicate if the condition
+is evaluated before the body or after the body.
+
+To simplify the prettyprinter, a \verb/forloop/ is added.
+
+In each case, a decision must be made between the requirements of the
+prettyprinter for the source-to-source use of PIPS (the more
+structures the better) and the code complexity of the analyses (the
+fewer the structures the better).
+
+\subsection{Switch}
+
+There are two solutions: we can add a new kind of instruction
+\verb/multitest/ (the keyword \verb/switch/ cannot be used) or we can
+represent a switch through \verb/if/ and \verb/goto/ statements.  
+
+First solution: 
+
+\verb/instruction += multitest/
+\verb/multitest = controller:expression x body:statement/
+
+The second solution is choosen: 
+ 
+\verb/case/ and \verb/default/ are two kinds of labeled statements, which
+can be treated as \verb/goto/. Their
+associated labels are entities which must be unique.  The initial values of these
+entities are constant expressions. We can add them to the
+declarations list of the switch statement in order to match them to the actual
+switch? The entity local name is the constant expression of case, and a
+special name for default.  
+
+The \verb/break/ statement can be treated as a \verb/goto/.
+
+\begin{lstlisting}
+   switch (c) {
+     case 1:
+       s1;
+     case 2: 
+       s2;  
+       break;
+     default: 
+       sd;
+   }
+
+   if (c==1) goto switch_xxx_case_1;
+   if (c==2) goto switch_xxx_case_2;
+   goto switch_xxx_default;
+ switch_xxx_case_1: ;
+   s1;
+ switch_xxx_case_2: ;
+   s2;
+   goto switch_exit_xxx;
+ switch_xxx_default: ;
+   sd;      
+ switch_exit_xxx:
+\end{lstlisting}
+
+Note that this solution assume that the \verb/default/ case always
+appears and that it appears after all other cases. Since this is not
+always true, a direct syntactic translation is not possible and some
+post-processing is required.
+
+How about code regeneration? It might be easier to regenerate nice
+code for structured if the internal control structure were based on:
+
+\begin{lstlisting}
+if(c!=1) 
+  s1;
+  goto continue1;
+else if(c!=2)
+continue_1:
+  s2;
+  goto continue2;
+else if(...)
+continue_2:
+...
+else /* default case */
+continue_n:
+  sd;
+\end{lstlisting}
+
+If \verb/s1/ and \verb/s2/ end with a \verb/break/, the
+\verb/goto continuex/ are not reachable and the if-else-if structure
+is preserved.
+
+Some pattern-matching could be tried on the resulting
+\verb/untructured/ and/or the \verb/unspaghettify/ option of the
+controlizer might be able to put things back nicely when it is
+possible...
+
+\subsection{While Loop}
+
+The ``\lstinline/while (expression) statement/'' and 
+``\lstinline/do statement while (expression)/'' in C can be represented together
+ by adding a new field to distinguish
+if the evaluation of the
+controlling expression takes place before or after each execution of the
+loop body.   
+
+\begin{verbatim}
+whileloop = condition:expression x body:statement x label:entity x evaluation
+evaluation = before:unit + after:unit
+\end{verbatim}
+To maximise the readability, \verb|evaluation:bool| is not used here,
+as in other cases in the internal representation (\verb/mode/,
+\verb/action/, ...).
+
+\subsection{For Loop}
+
+There is always a trade-off between regrouping different loop structures
+and separating them. The first case makes program analyses more compact,
+with less code to write but it makes pretty-printing original code
+difficult. It is reverse for the second case. 
+
+We have different possibilities to consider:
+\begin{enumerate}
+\item Represent for loop as while loop
+\item Represent for loop as loop (do loop in Fortran), but it is not always
+  possible. Loops could be pretty-printed as for loops but for loops cannot
+  always be represented as loops (several loop indexes).
+\item In order to keep the initial program structures, we can treat the for loop
+separately from the other loops. 
+
+\begin{verbatim}
+forloop = initialization:expression x condition:expression
+          x incrementation:expression x body:statement
+\end{verbatim}
+\end{enumerate}
+
+The ISO C standard \cite{ISOC} states that the initialization of a for
+loop may contain variable declaration, which is not the case for
+\cite{Kern78}. Such declarations could be moved in the statement
+containing the for, but for the time being the parser does not accept
+such declarations.
+
+Initializations could be put into the very statement containing the
+\texttt{for} instruction and naming the block in a way to prettyprint
+correctly the declaration into the \texttt{for}.
+
+\subsection{Null statement}
+Null statement in C, \verb/";"/, is treated as CONTINUE statement in
+Fortran. We only need to make the differences at the prettyprinter
+level.
+
+\subsection{Return statement}
+Return statement in C (return; or return (exp);) is treated as RETURN statement in Fortran, which is
+considered as nullary operator but can have 0 or 1 argument, such as the
+cases of STOP and PAUSE statements. 
+
+\subsection{Break, Continue, Exit, Jump, Interruption}
+
+We can add new kinds of instruction to handle break and continue: 
+
+\verb/instruction += break + continue /
+
+CIL says that leaving \verb/break/ and \verb/continue/ as they are
+makes transformations such as code motion easier? The semantic
+difference between \verb/continue/ in Fortran and \verb/continue/ in
+C?
+
+Another solution is to treat \verb/break/ and \verb/continue/ as
+\verb/goto/, which is choosen as solution for the moment. How about code
+regeneration ? Some semantics can be added into the generated label names.
+
+PIPS analyses are preserved, but the prettyprinter of unstructured
+must be improved to pattern-match \verb/continue/ and \verb/break/.
+
+\chapter{Memory Effects}
+\label{chapter:memory-effects}
+
+\section{Pointers}
+
+Pointers are a key part of C since parameters are passed by value and
+since recursive data structures require pointers. In the Fotran
+implementation, the memory effects are represented by the
+\verb/effect/ data structure and its fields, and by lists of such data
+structures:
+
+\begin{verbatim}
+effects = effects:effect* ;
+effects_classes = classes:effects* ;
+effect = cell x action x approximation x descriptor ;
+cell = reference + preference ;
+action = read:unit + write:unit ;
+approximation = may:unit + must:unit + exact:unit ;
+descriptor = convexunion:Psysteme* + convex:Psysteme + none:unit ;
+reference = variable:entity x indices:expression* ;
+preference = persistant reference ;
+\end{verbatim}
+
+In this framework, the effect of a statement like \verb/*p=1;/ can
+ only be expressed as a reference to a large memory
+ entity, an area or a set of areas, as no information is locally
+ available about \verb/p/.
+
+Effects are abstractions of effective memory effects. For instance
+\verb/d[i]/ can be captured as \verb/d[i]/ because the data structure
+\verb/reference/ let us do so, as \verb/d[*]/ to obtain a constant
+effect independent of the current store, or as an array region, with
+constant reference \verb/d[phi]/ and store sensitive descriptor
+\verb/{phi=i}/.
+
+We need a new abstraction to deal with indirect effects in such a way
+that constant pointers can be detected and taken advantage of. For
+instance, a C function incrementing an integer, \verb/void inc(*int p)/,
+should be analyzed in such a way that the call site effect of
+\verb/inc(&i)/ can be derived exactly.
+
+We need to know that \verb/inc/ performs an indirect write through
+\verb/p/.  This is not a great new abstraction for pointers. It is the
+minimum needed in a first phase.
+
+We need to encode \verb/p->in/, which is equivalent to
+ \verb/(*p).in/. Assuming that \verb/in/ is the third field of the
+ pointed structure, this could be rewritten \verb/(*p)[3]/.
+
+We also need to encode \verb/(*p)[i][j][k]/ which is an array access to
+ a formal array parameter. Pointer \verb/p/ may be a pointer to a
+ dynamicically typed variable such as \verb/double x[n][m]/, where
+ \verb/n/ and \verb/m/ are formal parameters too.
+
+We do not know if we need to keep track of pointer arrays, as in
+ \verb/*(p[3])/: our region framework can handle it effortlessly, but
+ what can we do with information about pointer arrays? If our lattice
+ is too simple, we won't be able to make a difference between
+ \verb/*(p[3])/ and\verb/(*p)[3]/. However, since we transform
+ accesses to structure fields into indexing (Section
+ \ref{section:data-structures}), we might be interested in the post
+ index form to keep or to retrieve information about data structures
+ containing pointers on functions.
+
+What is the new information we want to add? How can we add this new
+information in the current PIPS data structure? Many solutions are
+possible:
+\begin{enumerate}
+
+\item \label{variable-level}add nothing in the data structures and
+ keep the information at the source code level: have different
+ variables for direct and indirect effects;
+
+\item \label{new-level}define a new level of effects, like
+\verb/g_effect = direct:effect + indirect:effect + .../ or, at the list
+level, \verb/g_effects = direct:effects + indirect:effects + .../
+
+\item \label{new-action}add new kinds of actions such as
+ \verb/indirect_read/ or \verb/indirect_write/;
+
+\item re-use the \verb/descriptor/ field; this does seem to make less
+ sense than the previous solution;
+
+\item \label{new-effect}define a brand new pointer effect data structure, extending
+ solution~\ref{new-level};
+
+\item \label{new-effect-field} add a new effect field, \verb/addressing/,
+ in \verb/effect/;
+
+\item \label{new-effect-reference-dimension} represent pointer accesses using additional effect reference dimensions ; for instance an effect on \verb/*p/ could be represented as \verb/p[0]/;
+
+\end{enumerate}
+
+How do we chose given the current implementation and our goals?
+
+Separating indirect effects and direct effects at the variable level
+ would require a huge reworking of the current code since functions
+ should return a structure containing several lists instead of a
+ single list. This would prevent us from giving a meaning to the
+ effect order in an order list: it is useful to know that a write
+ occurs before a read.
+
+This holds whether lists are separated at the variable level (solution
+ \ref{variable-level}) or at the data structure level (solution
+ \ref{new-level}).
+
+Adding new actions, Solution~\ref{new-action}, does not respect the
+ field semantics and its link with Bernstein's conditions. The number of
+ new actions can be great if we take into account indirect pre- and
+ post-indexation. However, we may not need pre- and post-
+ indexation. And it might make debugging easier with unknown action
+ detection. Unfortunately, with only two actions, people do not use
+ switch and default when there are only two actions. They assume that
+ if it is not the first one, it has to be the second one.
+
+Solution~\ref{new-effect} would require a proper
+ survey of most published pointer analyses. It would be nice if the
+ old effect data structure could be mapped onto it to minimize source
+ code modifications via macros. This could also be done later and
+ independently, using simple pointer information gathered with the
+ effect data structure as a starting point for more advanced analyses.
+
+
+Adding a new field to effect, for instance \verb/addressing/ or
+ \verb/addressing_mode/, Solution~\ref{new-effect-field}, is nicely
+ orthogonal, let us structure it as we want, and avoid a combination
+ of attribute with the read and write actions. It requires source code
+ modifications for \verb/make_effect/. And the bugs due to a lack of
+ access checking will not be syntactically detectable.
+
+However indirect accesses would have to be reduced to standard
+ accesses before the dependence test can be used and after the
+ semantics analysis has managed to propagate pointer values and
+ equality. The region analysis does not expect any indirect
+ effects. The easiest way out might be to add a new phase using
+ general effects and reducing them all to standard effects, exploiting
+ semantics information. This would require a renaming of effects at
+ the pipsmake and database level to avoid confusion and to force the
+ conversion of resources.
+
+This is the solution which was first chosen. It consisted in adding a new field
+ \verb/addressing_mode/ (or \verb/addressing/ to avoid underscore in
+ field names?) with three values for pre- and post-indexation:
+
+\begin{verbatim}
+effect = cell x action x approximation x descriptor x addressing;
+addressing = index:unit + pre:unit + post:unit
+\end{verbatim}
+
+All accesses were indexed by default in PIPS internal representation,
+ so \verb/post/ and \verb/pre/ were equivalent for scalar accesses.
+
+Mode \verb/index/ could have been called \verb/direct_indexing/ to be more
+ homogeneous, but indexing always occured. So \verb/index/ could have been
+ called \verb/direct/.
+
+The mode \verb/preindexing/ did not seem to be very useful in the
+ short term.
+
+
+But it proved to lack accuracy to handle real applications which use indirect accesses at several levels of data structures, and not only at the uppermost level. So, lastly, solution \ref{new-effect-reference-dimension} was retained. Table~\ref{tab:effects}, which is not limitative, shows that many cases of indirect accesses can be handled this way. Moreover, an obvious advantage of this approach is to unify all effects into effects on arrays which can be handled by following phases. 
+
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{| >{\tt}l | >{\tt}l | >{\tt}l |}
+
+\hline
+declarations & reference & effects \\ \hline
+
+int a, *p; &   & \\
+      & a & a\\
+      &*p & p[0] \\\hline
+
+int t[N], *p, (*q)[N], *u[N], **v; & & \\ 
+        & *t & t[0] \\
+        & t[I] & t[I] \\
+        & *p & p[0] \\
+         & p[I]& p[I]\\ 
+        & (*q)[I] & q[0][I] \\
+        & *u[I]& u[I][0]\\
+        & *v[I]& v[I][0]\\\hline
+
+typedef struct \{ & & \\
+int num; && \\
+int tab1[N] ; && \\
+int *tab2; \} mys;&& \\
+&& \\
+
+mys a, b[N], *c, **d; & & \\
+                  & a.num  & a[1] \\
+                  & a.tab1[J] & a[2][J] \\
+                  & a.tab2[K] & a[3][K] \\
+&& \\
+                  & b[I].num & b[I][1] \\
+                  & b[I].tab1[J] & b[I][2][J]\\
+                  & b[I].tab2[K]& b[I][3][K]\\
+&& \\
+                  & c->num & c[0][1]\\
+                  & c->tab1[J] & c[0][2][J] \\
+                  & c->tab2[K] & c[0][3][K] \\
+&& \\
+                  & d[I]->num & d[I][0][1]\\
+                  & d[I]->tab1[J] & d[I][0][2][J]\\
+                  & d[I]->tab2[K] & d[I][0][3][K]\\ \hline
+                  
+\end{tabular}
+\end{center}
+\caption{Representinf effects with additional dimensions}\label{tab:effects}
+\end{table}
+
+
+\section{Data structures}
+\label{section:data-structures}
+
+PIPS was designed primarily for arrays and this shows in the reference
+ data structure, which only support the indexed access mode. Hence, we
+ need to map the offset accesses found with data structure references
+ such as \verb/c.in/ onto indexed accesses.
+
+Several possibilities come to mind for data structures if the current
+ effect data structure is to be preserved:
+\begin{enumerate}
+
+\item to mimic the address computation at the byte level, assuming any
+ field access can be interpreted as an array access of some byte
+ elements; this does not account for bit fields, but those are not frequently used;
+
+\item to rename fields by their ranks and to access them by indexing;
+ this is not correct for a compiler, but the access information is
+ preserved, which is enough for an analyzer; array fields are a
+ natural dimension, inserted at the right place among index
+ dimensions;
+
+\item to build new variable names located at the field address,
+ i.e. in equivalence with the whole data structure but not with its
+ other fields; for instance \verb/a.b.c/ would be represented by one
+ variable of name \verb/a-b-c/ with no name conflict if dash is used
+ inside the new name; array fields are would be taken care of as with
+ a regular array; for instance \verb/a.b[i].c/ would be represented by
+ \verb/a-b-c[i]/;
+
+\item to build new variable names based on the offset values and to
+ define some kind array type reflecting the real increments: an
+ element size is associated to each dimension, so that the impact of
+ any index is exactly reproduced; this might be a cross of the first
+ two solutions; the offset based name may be equivalent to using the
+ global offset as a unique last dimension instead of using one
+ dimension per field and array traversal.
+
+\end{enumerate}
+
+We have to analyze the impact of the choice with respect to effect
+ computation, but also with region and semantics analyses, as well as
+ dependence testing.
+
+Regions are similar to effects and are not impacted. The semantics
+ analyses is not compatible with the first option, for instance
+ because the value of an integer will not be analyzed since four
+ different bytes are involved. The second option requires the
+ semantics analysis to be extended to deal with fixed array elements
+ such as \verb/x[1][2]/, which has been a long pending extension. The
+ third option requires the semantics analysis to be extended to deal
+ with equivalenced variables: currently, the analyses are restricted
+ to non aliased variables.
+
+The dependence test should be able to deal with all three options
+ because it deals with regions, i.e. set of array elements, and with
+ equivalenced variables, i.e. an aliasing test is performed before the
+ array dependence test.
+
+The third option requires improvements in memory allocation and in
+ aliasing management. Data structures for aliasing exist because of
+ Fortran, but they are not currently used for C. The scalar analysis
+ of semantics can be used right away to analyze structure fields.
+
+The effect prettyprinter is easier with option 2, unless the naming
+ scheme is exaclty C scheme, i.e. \verb/a.x/ is equivalenced with a
+ variable of name \verb/a.x/. Hopefully, a dot in a variable name is
+ not going to create implementation nightmares. But field names may
+ conflict: they should include the structure name and \verb/a.x/ would
+ become something like \verb/a.a-x/.
+
+All three schemes are minimum. They are sufficient to represent any
+ constant address with indexing equivalent to a field access
+ expression. And any field expression is represented in only one way.
+
+\section{Unions}
+\label{section:unions}
+
+Union are more difficult to track. They create an equivalence between
+ two structures located at the same address. This reminds us of
+ Fortran equivalences, extended to data structures.
+
+For instance, \verb/union {int i; double x;} u;/ could be interpreted
+ as three variables called verb/u/, /u-i/ and /u-x/ located at the very same
+ address.
+
+Parallelism could be safely detected for arrays of unions and for unions of
+ arrays using existing PIPS technology.
+
+It is not yet clear how this could be extended when unions are part of
+ more complex data structures. Can we still use a naming scheme
+ (option 3 for data structures) and move all index information at the
+ end of the reference? It this still a way to denote precisely the
+ address accessed such that all analyses are based on a correct
+ representation of locations?
+
+If we use a naming scheme (option 3 above), we should be able to
+ compute addresses and ranges for combination of union and struct and
+ to build aliasing information due to unions. To be refined.
+
+Indexing may be more difficult to deal with as its impact on address
+ computation must be precisely reproduced when dealing with
+ equivalenced variables.
+
+If we use the basic byte based representation (Solution 1), union can
+ be handled like structures and lead to automatic parallelization. But
+ difference sets of indices will lead to array linearization.
+
+So we have to find the best trade-off between naming, indexing and
+ linearization for dependence testing when unions are used.
+
+\section{Point to Operator}
+
+The point to operator is syntactic sugar. The expression \verb/a->x/
+ can be replaced by \verb/(*a).x/.
+
+\section{Address Expressions}
+
+Address expressions are very general as base and offset can be
+ provided by function calls and offset by any integer arithmetic
+ expressions. Pointers differences are allowed to compute offsets,
+ making it difficult to identify a base pointer and an
+ offset. Consider for instance \verb/*(p+q-r)/: is it \verb/p/ or
+ \verb/q/ the offset?
+
+If we could distinguish a base pointer \verb/p/ and one offset, the address
+ expression could be rewritten \verb/*(p[offset])/.
+
+But the basis may be returned by a function, as in \verb/f()->x/.
+
+Multiple indirections, as in \verb/a->x->y/, \verb/M[M[a]+x]+y/ make
+ the notions of base and offset ludicrous.
+
+So we need a way to express fuzzy address, for instance using a
+ special address value {\em anywhere} equivalent to the whole memory
+ \verb/M/.
+
+\section{Indirect Effect Normalization}
+
+When pointers value are known, indirect accesses can be converted
+ precisely into direct accesses as in \verb/*(&i)=1/.
+
+Fuzzy pointer values, i.e. sets of pointer values, must be introduced
+ to cover other cases, using if possible PIPS support for aliasing,
+ a.k.a. equivalence in Fortran. The lattice for pointer values may be
+ built with areas, finite sets of areas or special new areas such as
+ the area containing all areas. PIPS uses four areas for each module:
+ the static area for objects of constant addresses, the dynamic area
+ for objects of constant sizes\footnote{They are given constant
+ addresses in this area, but they are only constant with respect to
+ the frame pointer.}, the stack area for objects of unknown size and
+ the heap area for dynamic memory allocation. Currently aliasing is
+ only statically handled in the static and dynamic areas, using
+ constant addresses.
+
+The potentiel levels are:
+\begin{enumerate}
+
+\item at least three as for any constant propagation lattice, with
+ {\em anywhere} used as soon as the constant value is unknown;
+
+\item but it could be slightly increased by taking into account the
+ scope of a function and the scope of its compilation unit.
+
+\item or it could include all subsets of the area set since the latest
+ is bounded by the number of functions and compilation units.
+
+\item or...
+
+\end{enumerate}
+
+Note that \verb/free/ does not let us infer that two pointers are
+ different because both of them were malloced. Hence the different
+ heap areas\footnote{A separate heap area is used for each function.}
+ are in fact a unique heap.
+
+What aliasing assumptions should we make about formal parameters and
+ global variables? Do we assume constant value for formal pointers and
+ hence no aliasing between them and between local pointers?
+
+How do we implement the lattice? By multiplying the effects in the
+ effect list, with one effect per area possibly accessed? By adding
+ new super areas including several subareas and using equivalence
+ information? By limiting the number of levels in the lattice?
+
+\section{Putting together pointers, structures, unions and C address computations...}
+
+The general case has not been discussed yet as we are driven by the
+ Ter@ops project and its requirements:
+\begin{enumerate}
+\item key information such as array dimensions and loop bounds are
+ parts of structures;
+\item array dimensions and hence typing are dynamic; formal arrays are
+ likely to be accessed via pointers as in \verb/(*p)[i]j]/;
+\item ...
+\end{enumerate}
+
+This does not require mixes of structures, unions and pointers to be
+ dealt with...
+
+\chapter*{Conclusion}
+
+There is no perfect solution, especially before full implementations
+tell us how much each solution does really cost.
+
+We need to keep a proper balance between information needed to
+prettyprint source code and unifications which streamlines the code
+for analyses and transformations.
+
+This document is an evolving document. Information is not always up to
+date.with respect to PIPS source code, especially the \verb/ri-util/,
+\verb/c_syntax/ and, to a lesser esxtent, \verb/preprocessor/
+libraries. In \verb/ri-util/, the files \verb/ri-util-local.h/,
+\verb/prettyprint.c/ and \verb/cyacc.y/ are especially relevant.
+
+\nocite{Kern78, Necu02}
+
+The choices that have been done are in the companion file \texttt{ri.tex}
+
+
+\appendix{}
+
+\chapter{Inital Fortran-oriented internal representation}
+
+\begin{verbatim}
+action = read:unit + write:unit ;
+approximation = may:unit + must:unit + exact:unit ;
+area = size:int x layout:entity* ;
+basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value ;
+call = function:entity x arguments:expression* ;
+callees = callees:string* ;
+cell = reference + preference ;
+code = declarations:entity* x decls_text:string x initializations:sequence ;
+constant = int + litteral:unit + call:entity ;
+control = statement x predecessors:control* x successors:control* ;
+controlmap = persistant statement->control ;
+descriptor = convexunion:Psysteme* + convex:Psysteme + none:unit ;
+dimension = lower:expression x upper:expression ;
+effect = cell x action x approximation x descriptor ;
+effects = effects:effect* ;
+effects_classes = classes:effects* ;
+entity_effects = entity->effects ;
+entity_int = entity->int ;
+execution = sequential:unit + parallel:unit ;
+expression = syntax x normalized ;
+formal = function:entity x offset:int ;
+functional = parameters:parameter* x result:type ;
+instruction = sequence + test + loop + whileloop + goto:statement + call + unstructured ;
+loop = index:entity x range x body:statement x label:entity x execution x locals:entity* ;
+mode = value:unit + reference:unit ;
+normalized = linear:Pvecteur + complex:unit ;
+parameter = type x mode ;
+persistant_expression_to_effects = persistant expression -> effects ;
+persistant_statement_to_control = persistant statement -> persistant control ;
+persistant_statement_to_int = persistant statement -> int ;
+persistant_statement_to_statement = persistant statement -> persistant statement ;
+predicate = system:Psysteme ;
+preference = persistant reference ;
+ram = function:entity x section:entity x offset:int x shared:entity* ;
+range = lower:expression x upper:expression x increment:expression ;
+reference = variable:entity x indices:expression* ;
+sequence = statements:statement* ;
+statement = label:entity x number:int x ordering:int x comments:string x instruction ;
+statement_effects = persistent statement->effects ;
+storage = return:entity + ram + formal + rom:unit ;
+symbolic = expression x constant ;
+syntax = reference + range + call ;
+tabulated entity = name:string x type x storage x initial:value ;
+test = condition:expression x true:statement x false:statement ;
+transformer = arguments:entity* x relation:predicate ;
+type = statement:unit + area + variable + functional + varargs:type + unknown:unit + void:unit ;
+unstructured = entry:control x exit:control ;
+value = code + symbolic + constant + intrinsic:unit + unknown:unit ;
+variable = basic x dimensions:dimension* ;
+whileloop = condition:expression x body:statement x label:entity ;
+\end{verbatim}
+
+\chapter{Proposed new internal representation (modified structures only)}
+
+This information may be outdated. Please check \verb/ri.newgen/ for
+PIPS current data structures. This information was useful initially to
+estimate the changes in the data structure and the impact on the
+existing code. It does not seem useful to maintain it now that the C
+parser is implemented..
+
+\begin{verbatim}
+basic = int:int + float:int + logical:int + overloaded:unit + complex:int 
++ string:value + bit:int + pointer:type + derived:entity + typedef:entity;
+
+instruction = sequence + test + loop + whileloop + goto:statement + call +
+unstructured + forloop + expression;
+
+forloop = initialization:expression x condition:expression x
+incrementation:expression x body:statement ;
+
+statement = label:entity x number:int x ordering:int x comments:string x
+instruction x declarations:entity* x decls_text:string ;
+
+syntax = reference + range + call + cast + sizeofexpression + subscript + application;
+
+cast = type x expression ;
+
+sizeofexpression = type + expression ;
+
+subscript = array:expression x indices:expression* ;
+
+application = function:expression x arguments:expression* ;
+
+type = statement:unit + area + variable + functional + varargs:type +
+unknown:unit + void:unit + struct:entity* + union:entity* + enum:entity*;
+
+variable = basic x dimensions:dimension* x qualifiers:qualifier* ;
+
+qualifier = const:unit + restrict:unit + volatile:unit + register:unit + auto:unit;
+
+whileloop = condition:expression x body:statement x label:entity x
+evaluation ;
+
+evaluation = before:unit + after:unit ;
+
+value = code + symbolic + constant + intrinsic:unit + unknown:unit + expression;
+\end{verbatim}
+
+\bibliographystyle{abbrv}
+\bibliography{biblio}
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% ispell-local-dictionary: "american"
+%%% End: 

@@ -1,0 +1,89 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{PIPS: Complementary sections}
+\author{Manjunathaiah M and Be'atrice Creusillet}
+\date{April 19th, 1996}
+
+\begin{document}
+\sloppy
+
+This document contains the newgen structures for Manjunathaiah M
+complementary sections.
+
+\domain{External Pvecteur}
+{}
+
+\domain{Import reference from "ri.newgen"}
+{}
+\domain{Import action from "ri.newgen"}
+{}
+
+\domain{simple\_section = context:context\_info x dad:dad\_struct }
+{}
+A simple section has two parts. a) context information and 
+b) the section descriptor
+
+\domain{context\_info = line:int x rank:int x nest:int }
+{}
+Context includes the line number of the source, the dimensionality
+of the array(denoted as rank) and the scope of the array reference
+
+\domain{dad\_struct = rtemps:ref\_temp* x shape:bound\_pair*}
+{}
+The descriptor is a two tuple. The first element is used when
+applying translation algorithm. The second element describes
+the access shape a.k.a convex polyhedron.
+
+\domain{ref\_temp = index:int x rtype }
+{}
+Actually we want an array of ints of size = Rank. Hence a partial
+function index -> rtype. I don't like this roundabout but I don't
+have the time to look at different options. 
+
+\domain{rtype = nonlinear:unit + linvariant:unit + lininvariant:unit}
+{}
+The different values that each element of reftemps can hold.
+I would have prefered enumerated types.
+
+\domain{bound\_pair = index:int x lb:Pvecteur x ub:Pvecteur}
+{}
+Again a partial function to simulate arrays.
+
+\domain{comp\_sec = hull:simple\_section x complements:simple\_section*}
+{}
+A complementary section is a list of simple sections.
+It is structured as a pair (E,{C}) for conceptual reasons.
+If the second element of this pair is empty then Compsec = simple section!
+
+\domain{comp\_desc = persistant reference x action x section:comp\_sec }
+{}
+A descriptor includes the array entity and the section information
+
+\domain{comp\_desc\_set = comp\_descs:comp\_desc*}
+{}
+And finally the set of descriptors.
+\end{document}
+\end

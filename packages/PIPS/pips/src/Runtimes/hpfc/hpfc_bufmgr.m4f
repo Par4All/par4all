@@ -1,0 +1,107 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+!
+! First routines to fake the pack/unpack of data.
+! The issue is to allow quite simply to measure the different
+! overheads in the enumaration/packing/message stuff.
+! Counts the number of calls, say for some statistics.
+! The the routines for doing the job...
+!
+! ??? the routines are used for I/O communication with the reception
+! already performed, hence the use of a global BUFFER ID...
+! 
+!
+define(`GENERIC_BUFFER_PACK',`dnl
+pushdef(`PVMTYPE',$1)dnl
+fake_buffers(dnl
+      subroutine build_name(PVMTYPE,fake bufpck)()
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      SEND NOT INITIALIZED=.FALSE.
+      BUFINDEX=0
+      hpfc fake bufpck=hpfc fake bufpck+1
+      end)
+      subroutine build_name(PVMTYPE,bufpck)()
+      integer info, bufid
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      if (SEND NOT INITIALIZED) then
+         call HPFC INIT SEND(BUFFER ENCODING, bufid)
+         debug(if (bufid.lt.0) 
+     $        write (unit=0,fmt=*) "hpfc init send error")
+         SEND NOT INITIALIZED=.FALSE.
+      endif
+      call HPFC PACK(PVMTYPE, build_name(PVMTYPE,BUFF),
+     $     BUFINDEX, 1, info)
+      BUFINDEX=0
+      end
+popdef(`PVMTYPE')')dnl
+define(`GENERIC_BUFFER_UPCK',`dnl
+pushdef(`PVMTYPE',$1)dnl
+fake_buffers(dnl
+      subroutine build_name(PVMTYPE,fake bufupk)(lid)
+      integer lid
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      if (RECEIVED NOT PERFORMED) then
+         RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
+         RECEIVED NOT PERFORMED = .FALSE.
+      endif
+      SIZEOFRECEIVEDBUFFER=build_name(PVMTYPE,BUFFSIZE)
+      hpfc fake bufupk=hpfc fake bufupk+1
+      end)
+      subroutine build_name(PVMTYPE,bufupk)(lid)
+      integer lid
+      integer info, length, tag, tid
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      debug(print *, MYLID, " [hpfc bufupk] in ", RECEIVED NOT PERFORMED)
+      if (RECEIVED NOT PERFORMED) then
+         debug(print *, "RCV from ", lid, RECVCHANNELS(lid))
+         call HPFC RECEIVE(lid, RECVCHANNELS(lid))
+         RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
+         RECEIVED NOT PERFORMED = .FALSE.
+         debug(print *, "RCV done")
+      endif
+      debug(print *,"hpfc bufupk",MYLID,"before message info") 
+      call HPFC MESSAGE INFO(length, tag, tid, info)
+      SIZEOFRECEIVEDBUFFER = length / M4_PVM_LENGTH(PVMTYPE)
+      call HPFC UNPACK(PVMTYPE, build_name(PVMTYPE,BUFF),
+     $     SIZEOFRECEIVEDBUFFER, 1, info)
+      debug(print *,MYLID, " [hpfc bufupk] done")
+      end
+popdef(`PVMTYPE')')dnl
+define(`GENERIC_BUFFER',`
+GENERIC_BUFFER_PACK($1)
+GENERIC_BUFFER_UPCK($1)')
+
+ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_BUFFER(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_BUFFER(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_BUFFER(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`GENERIC_BUFFER(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`GENERIC_BUFFER(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`GENERIC_BUFFER(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`GENERIC_BUFFER(HPFC COMPLEX16)')
+ifdef(`_HPFC_NO_STRING_',,`GENERIC_BUFFER(HPFC STRING)')
+
+!
+! that is all
+!

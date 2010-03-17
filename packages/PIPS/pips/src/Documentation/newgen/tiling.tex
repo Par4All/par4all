@@ -1,0 +1,73 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{PUMA: Représentation du Partitionnement}
+\author{François Irigoin \\
+	Corinne Ancourt\\
+\\
+	CRI, Ecole des Mines de Paris}
+
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section{Structures de données externes}
+\label{external}
+
+\domain{External Pvecteur}
+{ Le domaine {\tt Pvecteur} est utilisé pour représenter l'origine
+du partitionnement, c'est-à-dire les coordonnées de l'origine de
+la {\em tile} 0 dans le système de coordonnées initial.
+
+Un Pvecteur est une suite de monômes, un monôme étant un couple
+(coefficient,variable).  Le coefficient d'un tel couple est un entier,
+positif ou négatif. La variable est une entité, sauf dans le cas du
+terme constant qui est représenté par la variable prédéfinie de nom
+{\tt TCST}. Les entités utilisées dans ce cas sont les indices initiaux.
+
+La structure de données Pvecteur est importée de la bibliothèque d'algèbre
+linéaire en nombres entiers du CRI.
+}
+\domain{External matrice}
+{
+Le domaine {\tt matrice} est utilisé pour représenter la matrice $P$
+de partitionnement, qui définit le changement de base du système
+de coordonnées des {\em tiles} au système de coordonnées initial.
+
+Les matrices sont à coefficients rationnels, représentés par
+des numérateurs entiers et un unique dénominateur. Les numérateurs sont
+stockés sous forme pleine. Les dimensions de la matrice sont implicites.
+
+Comme le domaine Pvecteur, la structure de données matrice est
+importée de la bibliothèque d'algèbre linéaire en nombres entiers du
+CRI.  }
+
+\domain{tiling = tile:matrice x origin:Pvecteur}
+
+\end{document}
+\end

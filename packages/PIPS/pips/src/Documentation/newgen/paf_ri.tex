@@ -1,0 +1,266 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Structures Newgen pour l'intégration de PAF dans PIPS}
+
+\author{Françoise Lamour \\
+        Arnauld Leservot \\
+        Alexis Platonoff \\
+        \\
+        DMA/PCP, CEA CEL-V}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+Les structures de donn\'ees suivantes sont utilis\'ees par les phases qui 
+reproduisent les calculs mis en \oe uvre dans le parall\'eliseur PAF~: le {\em 
+graphe du fl\^ot de donn\'ees (DFG, ``Data Flow Graph'')}, la {\em base de 
+temps (BDT)}, la {\em fonction de placement (PLC)} et les appels au logiciel de
+r\'esolution de syst\`emes param\'etriques en nombres entiers ({\em PIP}).
+
+Apr\`es une description rapide des structures de donn\'ees import\'ees et 
+externes, nous pr\'esentons successivement les notions de DFG, de BDT, de PLC, 
+de Quast, de Lisp\_expression et de Static\_control.
+
+\section{Structures de donn\'ees import\'ees}
+
+\domain{Import reference from "ri.newgen"}
+{Le domaine {\tt reference} est utilis\'e pour repr\'esenter une r\'ef\'erence 
+\`a un \'el\'ement de tableau. Les variables scalaires \'etant repr\'esent\'ees
+par des tableaux de dimension 0, les r\'ef\'erences \`a des scalaires sont 
+aussi prises en compte. Elles contiennent une liste vide d'expressions 
+d'indices.}
+
+\domain{Import predicate from "ri.newgen"}
+{Le domaine {\tt predicate} d\'efinit une relation entre valeurs de variables 
+scalaires enti\`eres.}
+
+\domain{Import expression from "ri.newgen"}
+{Le domaine {\tt expression} permet de stocker les expressions sous deux 
+formes. La premi\`ere est une description de l'expression telle qu'elle 
+appara\^{\i}t dans le texte source du programme et la deuxi\`eme est une 
+description compil\'ee des expressions lin\'eaires sous forme de Pvecteur.}
+
+\domain{Import loop from "ri.newgen"}
+{Le domaine {\tt loop} permet de repr\'esenter les boucles du type DO Fortran ou
+FOR Pascal.}
+
+\domain{Import statement from "ri.newgen"}
+{Le domaine {\tt statement} permet de rep\'erer les instructions d'un module.}
+
+\domain{Import entity from "ri.newgen"}
+{Tout objet ayant un nom dans un programme Fortran est repr\'esent\'e par une 
+{\tt entity}. Un tel objet peut \^etre un module, une variable, un common, un 
+op\'erateur, une constante, un label, etc.}
+
+\domain{Import sccflags from "dg.newgen"}
+{Le domaine {\tt sccflags} est utilis\'e par l'algorithme de calcul des 
+composantes fortement connexes d'un graphe.}
+
+\section{Structures de donn\'ees externes}
+
+\domain{External Pvecteur}
+{Le domaine {\tt Pvecteur} est utilis\'e pour repr\'esenter les expressions 
+lin\'eaires telles que {\tt 3I+2} ou des contraintes lin\'eaires telles que 
+{\tt 3I + J <= 2} ou {\tt 3I == J}.
+
+Un Pvecteur est une suite de mon\^omes, un mon\^ome \'etant un couple 
+(coefficient,variable). Le coefficient d'un tel couple est un entier, positif 
+ou n\'egatif. La variable est une entit\'e, sauf dans le cas du terme constant 
+qui est repr\'esent\'e par la variable pr\'ed\'efinie de nom {\tt TCST}.
+
+La structure de donn\'ees Pvecteur est import\'ee de la biblioth\`eque (C3) 
+d'alg\'ebre lin\'eaire en nombres entiers du CRI.}
+
+\section{Graphe du fl\^ot de donn\'ees}
+
+\domain{Dfg\_vertex\_label = statement:int x exec\_domain:predicate x sccflags}
+{Le domaine {\tt dfg\_vertex\_label} d\'efinit la structure des informations 
+qui seront attach\'ees \`a un n\oe ud du DFG. Le sous-domaine {\tt statement} 
+sp\'ecifie l'instruction sur laquelle porte la d\'e\-pen\-dance~; cet entier 
+correspond au champ {\tt ordering} du domaine {\tt statement}. Le sous-domaine 
+{\tt exec\_domain} est le domaine d'ex\'ecution de cette instruction~; c'est un
+pr\'edicats, qui correspond aux bornes
+des boucles englobantes ainsi qu'aux tests englobants. Le sous-domaine 
+{\tt sccflags} contient diverses informations utiles pour le calcul des 
+composantes fortement connexes. La structure de graphe elle-m\^eme (domaine 
+{\tt graph}) est d\'efinit dans le fichier {\tt graph.f.tex}.}
+
+\domain{Dfg\_arc\_label = dataflows:dataflow*}
+{Le domaine {\tt dfg\_arc\_label} d\'efinit la structure des informations qui 
+seront attach\'ees \`a un arc du DFG, {\em i.e.} le fl\^ot de donn\'ees 
+passant par cet arc. La structure de graphe elle-m\^eme (domaine {\tt graph}) 
+est d\'efinit dans le fichier {\tt graph.f.tex}.}
+
+\domain{Dataflow = reference x transformation:expression* x governing\_pred:predicate x communication}
+{Le domaine {\tt dataflow} permet de d\'ecrire les informations n\'ecessaires 
+\`a la description du fl\^ot d'une donn\'ee. Le sous-domaine {\tt reference} 
+donne la r\'ef\'erence sur laquelle porte la d\'ependance. Le sous-domain {\tt 
+transformation} donne dans l'ordre la liste d'expressions qui donnent la valeur
+des indices des boucles englobantes de l'instruction source en fonction des 
+indices des boucles englobantes de l'instruction destination. Le sous-domaine 
+{\tt governing\_pred} donne le pr\'edicat de contr\^ole de la d\'ependance. 
+Enfin, le sous-domaine {\tt communication} sp\'ecifie le type de communication 
+que ce fl\^ot engendre.}
+
+\domain{Communication = broadcast:predicate x reduction:predicate x shift:predicate}
+{Le domaine {\tt communication} permet de sp\'ecifier le type de communication 
+qui peut \^etre engendr\'ee par le fl\^ot auquelle elle est associ\'ee. Le 
+sous-domaine {\tt broadcast} correspond \`a une diffusion. Le sous-domaine {\tt
+reduction} correspond \`a une r\'ecurrence. Le sous-domaine {\tt shift} 
+correspond \`a une translation.
+
+La direction d'une communication est caract\'eris\'ee par un Pvecteur qui est 
+exprim\'ee en fonction des indices des boucles englobantes. Chaque type peut 
+avoir plusieurs directions, ainsi, nous utilisons la structure {\tt predicate} 
+pour les sp\'ecifier. Dans ce {\tt predicate}, le Psysteme correspondant ne 
+sera constitu\'e que d'\'equations, chacune repr\'esentant la direction de 
+communication.}
+
+\section{Base de temps}
+
+\domain{Bdt = schedules:schedule*}
+{Le domaine {\tt bdt} d\'efinit la base de temps pour l'ensemble des 
+instructions du programme. Elle se compose tout simplement d'une liste de 
+fonctions de temps, chacune associ\'ee \`a une instruction et un pr\'edicat.}
+
+\domain{Schedule = statement:int x predicate x dims:expression*}
+{Le domaine {\tt schedule} est utilis\'e pour d\'ecrire la fonction de temps 
+associ\'ee \`a une instruction et un pr\'edicat. C'est en fait une liste de 
+fonctions, car la base de temps peut \^etre multidimensionnelle. Le 
+sous-domaine {\tt statement} correspond au champ {\tt ordering} du {\tt 
+statement} auquel correspond cette base de temps. Le sous-domaine {\tt 
+predicate} donne le pr\'edicat d'existence de cette fonction. Enfin, le 
+sous-domaine {\tt dims} donne les diff\'erentes expressions de la fonction 
+multi-dimensionnelle.}
+
+\section{Fonction de placement}
+
+\domain{Plc = placements:placement*}
+{Le domaine {\tt plc} d\'efinit la fonction de placement pour l'ensemble des 
+instructions du programme. Elle se compose tout simplement d'une liste de de 
+placements, chacun associ\'e \`a une instruction.}
+
+\domain{Placement = statement:int x dims:expression*}
+{Le domaine {\tt placement} est utilis\'e pour d\'ecrire le placement 
+associ\'ee \`a une instruction. C'est en fait une liste d'expressions, car la 
+fonction de placement peut \^etre multidimensionnelle. Le sous-domaine {\tt 
+statement} correspond au champ {\tt ordering} du {\tt statement} auquel 
+correspond ce placement. Enfin, le sous-domaine {\tt dims} donne les 
+diff\'erentes expressions de la fonction multi-dimensionnelle.}
+
+\section{Repr\'esentation des quasts}
+
+\domain{Quast = quast\_value x newparms:var\_val*}
+{Le domaine {\tt quast} est utilis\'e pour contenir les informations 
+renvoy\'ees par PIP. Ces informations sont l'expression (d\'ependant de 
+certaines conditions) de la valeur de chaque variable du syst\`eme en fonction 
+des param\`etres de structure. Le sous-domaine {\tt quast\_value} donne la 
+valeur du quast.
+
+Le sous-domaine {\tt newparms} donne la liste des nouveaux param\`etres de 
+structure introduit par le quast. Pour chaque nouveau param\`etre, 
+l'information est compos\'ee d'une {\tt variable} et d'une {\tt value}. La {\tt
+variable} est une entit\'e repr\'esentant le nouveau param\`etre de structure 
+et la {\tt value} est l'expression de sa valeur en fonction des autres 
+param\`etres de structure. La cr\'eation de nouveau param\`etre de structure 
+est n\'ecessaire lorsqu'apparaissent dans les expressions des divisions par des
+constantes, comme par exemple~: \( n/2\).}
+
+\domain{Quast\_value = quast\_leaf + conditional}
+{Le domaine {\tt quast\_value} contient la valeur du quast dans une structure 
+directement inspir\'ee de la structure lisp ``quast'' utilis\'ee dans Paf. 
+Cette valeur est soit une feuille {\tt quast\_leaf},
+soit un {\tt conditional}.}
+
+\domain{Conditional = predicate x true\_quast:quast x false\_quast:quast}
+{Le domaine {\tt conditional} est utilis\'e pour contenir les informations d'un
+{\tt quast} qui d\'ependent d'un pr\'edicat. Si le {\tt predicate} est vrai, 
+alors l'information utilis\'ee est celle contenue dans {\tt true\_quast}, sinon
+l'information utilis\'ee est celle contenue dans {\tt false\_quast}.}
+
+\domain{Quast\_leaf = solution:expression* x leaf\_label}
+{Le domaine {\tt quast\_leaf} contient une {\tt solution} rendu par PIP et 
+le champ {\tt leaf\_label} utilis\'e lors du calcul d'une source dans
+le data flow graph.
+{\tt Solution} est une liste d'expressions, dont chacune donne la valeur de la 
+solution trouv\'ee par PIP pour la variable de m\^eme rang dans la liste des 
+variables du syst\`eme (l'ordre de ces deux listes est donc {\em tr\`es}
+important).}
+
+\domain{Leaf\_label = statement:int x depth:int}
+{}
+
+Le domaine {\tt leaf\_label} est utilis\'e lors du calcul d'une source :
+il informe sur l'origine de cette source ({\tt statement})  
+ainsi que sur la profondeur de la dependance ({\tt depth}).
+Le quast rendu par PIP n'utilise pas ce champ ; il est dans ce cas
+mis \`a {\tt leaf\_label\_undefined}.
+
+\domain{Var\_val = variable:entity x value:expression}
+{}
+
+Le domaine {\tt var\_val} est utilis\'e pour sp\'ecifier l'association d'une 
+variable et de sa valeur exprim\'ee en fonction d'autres variables.
+
+
+\section{Repr\'esentation des expressions Lisp}
+
+\domain{Lisp\_expression = operation:string x args:expression*}
+{}
+
+Le domaine {\tt lisp\_expression} permet de d\'ecrire les informations 
+contenues dans une expression num\'erique en notation Lisp. Une telle 
+expression est compos\'ee d'un op\'erateur et d'une liste d'arguments (chaque 
+argument \'etant une {\tt expression}). Cette structure est utilis\'ee pour les
+codes r\'ealisants le transfert des structures de PAF depuis les fichiers de 
+sortie \'ecrits en notation Le\_Lisp vers les structures newgen d\'efinies plus
+haut.
+
+\section{Repr\'esentation du contr\^ole statique}
+
+\domain{Static\_control = yes:bool x params:entity* x loops:loop* x tests:expression*}
+{}
+
+Le domaine {\tt static\_control} d\'efinit la structure de l'information qui 
+est associ\'ee \`a une instruction ({\em i.e.} un {\tt statement}). Le 
+sous-domaine {\tt yes} indique si ce statement se trouve dans une zone \`a 
+contr\^ole statique~; si ce n'est pas le cas, les trois sous-domaines suivant 
+sont vides. Le sous-domaine {\tt params} donne la liste des param\`etres de 
+structure de la zone \`a contr\^ole statique dans laquelle se trouve ce 
+statement. Le sous-domaine {\tt loops} donne la liste des boucles englobantes 
+de ce statement. Le sous-domaine {\tt tests} donne la liste des conditions 
+trouv\'ees dans les tests englobants de ce statement.
+
+\end{document}
+
+
+

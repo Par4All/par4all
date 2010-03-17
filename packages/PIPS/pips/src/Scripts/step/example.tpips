@@ -1,0 +1,12 @@
+delete myProgram
+create myProgram myProg.f mySubprog1.f mySubProg2.f
+
+activate TRANSFORMERS_INTER_FULL 
+activate MUST_REGIONS
+activate STEP_DIRECTIVE_PARSER
+
+apply STEP_DIRECTIVES[%ALL]
+apply STEP_ANALYSE[%ALL]
+apply STEP_MPI[%MAIN]
+
+close

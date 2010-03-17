@@ -1,0 +1,19 @@
+# Copyright 2007, 2008 Alain Muller, Frederique Silber-Chaussumier
+#
+#This file is part of STEP.
+#
+#The program is distributed under the terms of the GNU General Public
+#License.
+
+
+#! /bin/sh
+
+SED=sed
+
+$SED 's/ *## *//g' $1 |
+$SED 's/[ ]*!\$/!\$\n/g' |
+$SED '/^.\{,72\}!\$$/s/!\$//g' |
+$SED '/^[^Cc\*!].... [^!]\{66,\}.*!\$$/s/\(.\{72\}\)\(.*\)!\$/\1\n     >\2!\$/' |
+$SED '/^[^!]\{72,\}.*!\$$/s/\([^!]\{72\}\)\(.*\)!\$/\1\n     >\2!\$/g' |
+$SED '/!\$$/s/!\$//g' |
+$SED '/^ *$/d'

@@ -1,0 +1,259 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS \\
+		FICHE D'EXPLOITATION}
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT\\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E136}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\begin{tabular}{||l|p{10cm}||} \hline\hline
+Numéro du Contrat 	& 88.017.01 DRET/ARMINES \\ \hline
+Auteur(s) du Résumé	& M. FRANCOIS IRIGOIN \\
+			& M. PIERRE JOUVELOT \\ \hline\hline
+Résumé		&
+{PIPS est un paralléliseur automatique et interprocédural de programmes
+scientifiques. Ce paralléliseur prend en entrée des programmes Fortran
+77 séquentiel et fournit en sortie des programmes équivalents dont le
+parallélisme a été explicité par des instructions DOALL et des
+instructions vectorielles Fortran~90. L'objectif à long terme est
+d'étudier le potentiel des analyses interprocédurales pour
+l'optimisation de la compilation de programmes Fortran.
+} \\ \hline\hline
+Brevets			& Néant \\ \hline\hline
+\multicolumn{2}{||c||}{Publications eefectuées dans le cadre du contrat} \\ \hline
+% \begin{tabular}{lp{6cm}}
+Auteurs: & François Irigoin, Pierre Jouvelot, Rémi Triolet \\ 
+Revue: & Int. Workshop on Compilers for Parallel Computers, Paris, 1990 \\
+Titre: & An Overview of the PIPS Project \\ \hline\hline
+% \end{tabular}
+\end{tabular}
+
+\newpage
+
+\setcounter{section}{0}
+
+Ce document présente le rapport final de la convention DRET/ARMINES
+87.017 (bon de commande 88.017.01) décrivant la réalisation du
+paralléliseur automatique et interprocédural de programmes
+scientifiques PIPS. Ce paralléliseur prend en entrée des programmes
+Fortran 77
+séquentiel et fournit en sortie des programmes équivalents dont le
+parallélisme a été explicité par des instructions DOALL et des
+instructions vectorielles Fortran~90.
+
+\section{Objet de l'étude}
+
+Cette étude entre dans le cadre défini formellement par les deux rubriques
+suivantes:
+\begin{itemize}
+\item
+	{\em Domaine II}: Etude d'outils logiciels de programmation et
+d'exploitation des calculateurs scientifiques.
+\item
+	{\em Thème II.1}: Adaptation automatique de programmes
+scientifiques aux calculateurs parallèles.
+\end{itemize}
+Plus précisement, son objectif à long terme est d'étudier le
+potentiel des analyses interprocédurales pour l'optimisation de la
+compilation de programmes Fortran.  Pour ce faire, un paralléliseur
+source à source Fortran a été réalisé.  Il est complété par une
+bibliothèque de transformations de base (distribution de boucle,
+privatisation, échange de boucles) et par les phases d'analyses
+interprocédurales.
+
+\section{Intérêt de l'étude}
+
+Le domaine de la recherche des outils de programmation des calculateurs
+scientifiques du type {\em supercalculateur} connaît un développement
+croissant depuis l'arrivée des machines vectorielles du type CRAY-1
+dans le milieu des années 70. Ces superordinateurs, et leur
+programmation efficace, sont une des clefs de la maîtrise technologique
+de nombreux secteurs vitaux pour la Défense Nationale.
+Le développement d'outils sophistiqués d'aide à la programmation,
+qu'ils soient purement automatiques ou interactifs, s'avère être un
+point de passage obligé pour maîtriser le coût et faciliter la
+conception de logiciels qui tirent parti des caractéristiques
+architecturales de ces machines à processeurs vectoriels multiples,
+avec une mémoire hiérarchique, globale ou partagée.
+
+\subsection{Objectifs de la recherche}
+
+Les objectifs principaux de la recherche effectuée dans le cadre de
+ce contrat sont multiples:
+\begin{itemize}
+\item
+	Etudier et concevoir un compilateur effectuant la {\em
+parallélisation} des programmes et non plus leur simple vectorisation,
+\item
+	Etudier la faisabilité d'une parallélisation de grain
+grossier, au niveau des procédures utilisées dans les langages
+scientifiques, 
+\item
+	Etudier l'importance des analyses sémantiques sophistiquées
+qui seront la clef des compilateurs à venir.
+\end{itemize}
+Mais ils visent tous à l'obtention automatique de parallélisme de
+grain moyen ou fin.
+
+\subsection{Historique des études antérieures}
+
+Les acteurs principaux sur ce terrain sont américains, comme les
+machines cibles. Après les travaux de pionniers
+de David Kuck à l'Université d'Urbana-Champaign (Illinois) , les
+groupes de Ken Kennedy à l'Université de Rice (Texas) et de Michael
+Burke à IBM Yorktown Heights (New York) ont poursuivi et développé
+cet axe de recherche avec toute une famille de projets.  Ayant perçu
+l'importance stratégique de ce domaine, la DRET a lancé un certain
+nombre de projets de recherche pour y soutenir la recherche francaise
+(VESTA, VATIL).
+
+\subsection{Résultats acquis antérieurement}
+
+L'essentiel des travaux effectués précédemment dans le domaine de la
+compilation pour superordinateurs était axé vers la vectorisation des
+applications scientifiques. Les résultats primordiaux concernaient la
+création de graphes de dépendances aussi précis que possible entre
+instructions en vue de détecter celles qui sont vectorisables. 
+
+La notion même de vectorisation était incompatible avec le traitement
+des appels de procédure puisqu'un call vectoriel n'a pas grand sens.
+Les premiers résultats ont été décrits dans la thèse de Rémi
+Triolet (1984) et ce sont eux qui sont à l'origine du projet. 
+
+\section{Déroulement de l'étude}
+
+Le projet PIPS (Paralléliseur Interprocédural de Programmes
+Scientifiques) s'est déroulé sur 2 ans. Il a été convenu dès le
+départ de ne pas cibler PIPS pour une machine particulière, mais de le
+considérer comme un paralléliseur générique.
+
+Une collaboration entre l'Ecole des Mines et l'ONERA a été instaurée
+pour définir les constructions Fortran-77 qui pourraient ne pas être
+traitées.
+
+Une présentation et une première démonstration de PIPS ont été
+effectuées en Avril 1990, en présence de membres de l'Ecole des Mines,
+de la DRET, de l'INRIA, de l'Université Pierre et Marie Curie et du CEA
+(l'ONERA étant excusé). Une autre réunion de point a eu lieu en
+juillet 90.  En outre, une autre présentation a été organisée au
+cours du workshop {\em International Workshop on Compilers for Parallel
+Computers} mis en place par l'Ecole des Mines et l'Université Pierre et
+Marie Curie.
+
+\subsection{Rappel des différentes étapes}
+
+\begin{description}
+\item[Fortran - Mars 1988]
+	Au vu des programmes fournis par l'ONERA (AILE, CR2CNF, OA118 et
+TMINES), une définition précise du sous-Fortran utilisé par PIPS est
+élaborée.
+\item[Rapport d'Avancement 2 - Décembre 1988]
+	Une présentation détaillée de NewGen , outil utilisé
+intensivement dans PIPS et développé en interne à l'Ecole des Mines.
+est donnée avant une définition exhaustive de la RI de PIPS. 
+\item[Rapport Final ``Analyse Lexicale/Syntaxique Intra'' - Mai 1989]
+	Ce gros rapport contient l'ensemble du code représentant le
+frontal intraprocédural de PIPS, avec une description complète de la
+RI. 
+\item[Rapport Final ``Analyse Syntaxique Inter'' - Mai 1989]
+	Ce lot décrit la phase d'édition de liens permettant de
+terminer l'analyse syntaxique d'un programme Fortran.
+\item[Rapport d'avancement 4 - Septembre 1989]
+	Ce rapport intermédiaire décrit et donne le listing du
+constructeur de graphe de contrôle structuré utilisé dans PIPS. 
+\item[Rapport d'Avancement 5 - Décembre 1989]
+	Y sont décrites les phases d'analyse sémantique et de
+détection de parallélisme.
+\item[Rapport d'Avancement 6 - Mars 1990]
+	L'essentiel de ce lot concerne la parallélisation
+interprocédurale.
+\item[Présentation - 24 Avril 1990]
+	L'équipe PIPS a organisé une présentation du projet à
+diverses personnalités de la DRET (Ph. Sarazin), du CEA (G. Meurant), de
+l'INRIA (W. Jalby) et de Paris 6 (P. Feautrier). 
+\item[Présentation - Mai 1990]
+	Une seconde édition de la présentation du 24 Avril a été
+organisée au cours du mois de Mai pour Cray France. 
+\item[Workshop - 3 au 5 Décembre 1990]
+	L'Ecole des Mines et l'Université Paris 6 ont organisé en
+commun l'{\em International Workshop on Compilers for Parallel
+Computers} à Paris. 
+\end{description}
+
+Une lettre envoyée par le directeur du CAII évoque les raisons du
+retard de quelques mois pris par le projet PIPS.
+
+\subsection{Difficultés, faits significatifs et résultats}
+
+L'essentiel du project PIPS s'est déroulé selon l'échéancier
+caractéristique des projets de recherche, c'est-à-dire pour lesquels
+une approche de prototypage est préférée à un schéma classique.
+Cette approche s'est révéléee facilitée par l'utilisation du
+logiciel NewGen, qui permet une évolution en douceur des structures de
+données centrales.
+
+\section{Récapitulation des résultats}
+
+Le paralléliseur PIPS a tenu ses promesses.  Des programmes rééls ont
+été analysés avec succès, avec des performances acceptables.
+
+\section{Conclusion}
+
+Malgré un retard de quelques mois, le projet PIPS a abouti aux
+résultats escomptés. Des programmes réels ont été parallélisés
+(ce qui est une première en France) et des techniques sophistiquées
+d'analyse statique de programmes, présentées auparavant dans des
+congrès internationaux, ont été implémentées et sont ainsi à la
+disposition du monde scientifique français (le CEA ayant, par exemple,
+montré son intérêt pour une réutilisation de PIPS).
+
+\section{Perspectives ultérieures}
+
+PIPS apparaît comme une plateforme puissante pour le développement
+d'environnement de programmation parallèle.  Il serait souhaitable de
+développer cet aspect, répondant ainsi à un besoin des utilisateurs.
+En aval de cet axe de recherche, PIPS étant un paralléliseur
+source/source, une phase de génération de code pour une machine-cible
+donnée semble être du plus haut intérêt.
+
+\end{document}

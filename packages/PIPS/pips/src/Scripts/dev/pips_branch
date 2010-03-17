@@ -1,0 +1,225 @@
+#! /bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# creates a coherent branch/tag/snapshot for all of pips
+#
+# TODO
+# - check svn version, should be at least 1.5
+
+# script revision
+script=${0##*/}
+rev='$Revision$'
+rev=${rev#* }
+rev=${rev% *}
+
+# defaults
+root='http://svn.cri.ensmp.fr/svn'
+svn='svn'
+msg=
+default_tmp="/tmp/${script}_$$"
+do_bundle=1
+revs=
+
+# repositories
+src_repos='newgen linear pips'
+
+function usage()
+{
+  local code=$1 msg=$2
+  shift 2
+  [[ $msg ]] && echo "error: $msg" >&2
+  echo -e \
+    "$script [options] source type name\n" \
+    "  -h: help!\n" \
+    "  -v: increase verbosity\n" \
+    "  -V: show script revision ($rev)\n" \
+    "  -d: dry run (this is the default)\n" \
+    "  -D: do run! do a dry run once before doint it\n" \
+    "  -b: do bundle (this is the default)\n" \
+    "  -n: no bundle\n" \
+    "  -r url: root url of repositories, ($root)\n" \
+    "  -s svn: svn binary to use ($svn)\n" \
+    "  -t tmp: temporary directory ($default_tmp)\n" \
+    "  -m msg: commit message\n" \
+    "  -R rev: set per repository revision\n" \
+    "    -R 'nlpmake=941 newgen=964 linear=1272 pips=13589 validation=377'\n" \
+    "  source: directory 'trunk', 'branches/something'...\n" \
+    "  type: 'branches', 'tags' or 'snapshots'\n" \
+    "  name: must be unique among tags or branches for the bundle\n" \
+    "        it may include a subdirectory: 'calvin/test'\n" \
+    "Examples:\n" \
+    "  dry run: $script trunk branches 1.0.x\n" \
+    "  then do; $script -D trunk branches 1.0.x\n" \
+    "  subdirs: $script -D branches/1.0.x tags 1.0.1\n" >&2
+  exit $code
+}
+
+verb=0
+function verb()
+{
+  local level=$1 n=$1
+  shift
+  if [[ $level -le $verb ]] ; then
+    while let n-- ; do echo -n '#' ; done
+    echo " $@"
+  fi >&2
+}
+
+# default is not to run...
+run=:
+function doit()
+{
+  verb 2 "$@"
+  $run "$@" || { echo "error $?: $@" ; exit 1 ; }
+}
+
+# options
+while [[ $1 == -* ]] ; do
+  opt=$1
+  shift
+  [[ $opt = '--' ]] && break
+
+  case $opt in
+    -h|--help) usage 0 '' ;;
+    -V|--version) echo "revision $rev" ; exit 0 ;;
+    -v|--verbose) let verb++ ;;
+    # what to do
+    -d|--dry-run) run=: ;;
+    -D|--do-run) run= ;;
+    -b|--do-bundle) do_bundle=1 ;;
+    -n|--no-bundle) do_bundle= ;;
+    # control revisions
+    -R|--revision) revs+=" $1 " ; shift ;;
+    --revision=*) revs+=" ${opt#*=} " ;;
+    # commit message, a default is supplied
+    -m|--message) msg=$1 ; shift;;
+    --message=*) msg=${opt#*=} ;;
+    # svn command
+    -s|--svn) svn=$1 ; shift ;;
+    --svn=*) svn=${opt#*=} ;;
+    # tmp directory
+    -t|--tmp) tmp=$1 ; shift ;;
+    --tmp=*) tmp=${opt#*=} ;;
+    # root url (for tests)
+    -r|--root) root=$1 ; shift ;;
+    --root=*) root=${opt#*=} ;;
+    # option error
+    *) usage 1 "unexpected option '$opt'" ;;
+  esac
+done
+
+# check and get arguments
+[[ $# -eq 3 ]] || usage 2 "expecting 3 arguments, got $#"
+
+src=$1 type=$2 name=$3
+shift 3
+
+[[ $type = 'branches' || $type = 'tags' || $type = 'snapshots' ]] || \
+  usage 3 "type argument must be 'branches', 'tags' or 'snapshots'"
+
+# should it always be trunk?
+[[ $src == trunk || $src == branches/* ]] || \
+  usage 4 "source argument must be 'trunk' or 'branches/...'"
+
+# may create a branch from a branch?
+#[[ $type = 'branches' && $src == branches/* ]]
+
+# set default message if necessary
+[[ $msg ]] || msg="creating '$name' in '$type' from '$src'"
+
+# get parent directory for name
+pdir=
+[[ $name == */* ]] && pdir=${name%/*}
+
+# set default temporary directory
+[[ $tmp ]] ||
+{
+  tmp=$default_tmp
+  verb 2 "creating $tmp temporary directory"
+  mkdir $tmp
+}
+
+# repos_rev pips
+# return the revision number if set with -R
+function repos_rev()
+{
+  local rep=$1 r=$revs
+  shift
+  r=${r#*$rep=}
+  r=${r%% *}
+  [[ $r ]] && echo "-r $r"
+}
+
+# create per repos branches or tags
+for repos in nlpmake validation
+do
+  verb 1 "branching $repos"
+  doit $svn cp --parents -m "$msg" $(repos_rev $repos) \
+    $root/$repos/$src $root/$repos/$type/$name
+done
+
+echo "makes $root/nlpmake/$type/$name/makes" > $tmp/makes_externals
+for repos in $src_repos
+do
+  verb 1 "branching $repos"
+
+  # get directory
+  doit $svn co --depth immediates $root/$repos/$type $tmp/$repos
+
+  # branch copy...
+  # this does a checkout, so it is slow, but it avoids another commit
+  doit $svn cp --parents $(repos_rev $repos) $root/$repos/$src $tmp/$repos/$name
+
+  # fix externals in source repositories
+  doit $svn pset svn:externals --file $tmp/makes_externals $tmp/$repos/$name
+
+  # done
+  doit $svn commit -m "$msg" $tmp/$repos
+done
+
+if [[ $do_bundle ]] ; then
+
+  verb 1 "creating bundle at $root/pips/bundles/$name"
+
+  # create full bundle, including validation
+  doit $svn co --depth immediates $root/pips/bundles $tmp/bundle
+
+  # fix directory
+  doit $svn mkdir --parents $tmp/bundle/$name
+
+  # create externals
+  for repos in $src_repos validation ; do
+    echo "$repos $root/$repos/$type/$name"
+  done > $tmp/bundle_externals
+  doit $svn pset svn:externals --file $tmp/bundle_externals $tmp/bundle/$name
+
+  # get Makefile
+  doit $svn cp $root/pips/bundles/trunks/Makefile $tmp/bundle/$name
+
+  # OK!
+  doit $svn commit -m "$msg: bundle" $tmp/bundle
+fi
+
+# cleanup
+rm -rf $tmp
+[[ $run ]] && verb 0 "Use -D option to actually DO it..."

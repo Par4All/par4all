@@ -1,0 +1,89 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%% newgen domain for pips detabase management.
+
+\documentclass[a4paper]{article}
+
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Pips Database Manager \\ private data structures}
+\author{Fabien Coelho}
+
+\begin{document}
+
+\maketitle
+
+\section{New database structures}
+\label{sec:new}
+
+New database structures for manipulation by \texttt{pipsdbm}.
+The idea is to improve \texttt{pipsdbm} performances by providing an
+underlying fast mapping-based implementation instead of the old list,
+which does not scale well with the number of modules.
+
+Conceptually, the database manages resources. However, resources are both
+owned by a module and have a type (from the \texttt{pipsmake} point of view),
+and the altogether forms the resource identification. After discussing it
+a while, it was decided that \texttt{pipsdbm} should know about this
+subclassification of resources, and this is finally reflected by the
+data structures.
+
+\domain{external db_void}
+
+\subsection{Named objects}
+\label{sec:named}
+
+The key for the mapping management is a string, however they are not
+managed by functions, which need a full newgen domain. Hence this small
+tabulated domain which can associate a unique object to a string.
+It can be used for both owners (modules) and type strings.
+
+\domain{tabulated db_symbol = name:string}
+
+
+\subsection{A resource for pips}
+\label{sec:rs}
+
+A resource is just some pointer to the resource in memory.
+It is associated a logical time and maybe a file time, to check for
+possibly modified files. It may be loaded (the pointer actually points to
+the resource) or unloaded (the pointer may store the name of the
+resource?), or being required by pipsmake but not yet produced.
+
+\domain{db_status = loaded:unit + stored:unit + required:unit + loaded_and_stored:unit}
+
+\domain{db_resource = pointer:db_void x db_status x time:int x file_time:int}
+
+
+\subsection{Resource mappings}
+\label{sec:map}
+
+Now the pips resources are stored internally with a two level function. 
+The first one relies on the owner name, the second on the resource name.
+
+\domain{db_owned_resources = db_symbol -> db_resource}
+
+\domain{db_resources = db_symbol -> db_owned_resources}
+
+\end{document}

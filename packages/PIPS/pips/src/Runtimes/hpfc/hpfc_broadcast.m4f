@@ -1,0 +1,116 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+!
+! management of broadcasts
+! typical call: hpfc broadcast x(lid, [number, step]*x)
+! broadcast the current message to the described set of pe.
+! fake version added...
+! special guarded version for remappings:
+! typical call: hpfc remapbrd x(an, lid, [number, step]*x)
+!   where an is the source array arrangement of the remapping.
+!
+define(`LIST_DECL_AREA',`
+     $     n$1, s$1')dnl
+define(`LIST_INDEX_DECL',`
+     $     i$1')dnl
+define(`DO_LOOP',`
+      do i$1 = i`'eval($1 - 1), i`'eval($1 - 1)+(n$1-1)*s$1, s$1')dnl
+define(`ENDDO_LOOP',`
+      enddo')dnl
+!
+! broadcast function
+!
+define(`GENERIC_BROADCAST',`
+pushdef(`LEVEL',$1)dnl
+!
+! fake broadcast
+!
+fake_buffers(dnl
+      subroutine build_name(hpfc fake broadcast,LEVEL)(
+     $     i0`'LEVEL_ZERO(,``,'') dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'))
+      integer
+     $     i0`'LEVEL_ZERO(,``,'') dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA')`'LEVEL_ZERO(,``,'')dnl
+COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')
+      include "hpfc_commons.h"
+SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
+      if (i`'LEVEL.ne.MYLID) then
+         SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
+      endif
+SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+      hpfc fake bcasts=hpfc fake bcasts+1
+      end)
+!
+! braodcast
+!
+      subroutine build_name(hpfc broadcast,LEVEL)(
+     $     i0`'LEVEL_ZERO(,``,'') dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'))
+      integer
+     $     i0, dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA')`'LEVEL_ZERO(,``,'')dnl
+COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
+     $     info
+      include "hpfc_commons.h"
+      debug(print *, "[hpfc broadcast LEVEL] ", i0)
+SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
+      if (i`'LEVEL.ne.MYLID) then
+         debug(print *, MY LID, " BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
+         call HPFC SEND(i`'LEVEL, 
+     $        SENDCHANNELS(i`'LEVEL), info)
+         SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
+         debug(print *, "BRD sent")
+      endif
+SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+      debug(print *, "[hpfc broadcast LEVEL] done")
+      end
+!
+! remapping broadcast
+!
+      subroutine build_name(hpfc remapbrd,LEVEL)(
+     $     an, i0`'LEVEL_ZERO(,``,'') dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'))
+      integer
+     $     an, i0, dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA')`'LEVEL_ZERO(,``,'')dnl
+COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
+     $     info
+      include "hpfc_commons.h"
+      external HPFC TWIN P
+      logical HPFC TWIN P
+      debug(print *, "[hpfc remapbrd LEVEL] ", an, i0)
+SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
+      if (i`'LEVEL.ne.MYLID.and..not.HPFC TWIN P(an, i`'LEVEL)) then
+         debug(print *, MY LID, " BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
+         call HPFC SEND(i`'LEVEL, 
+     $        SENDCHANNELS(i`'LEVEL), info)
+         SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
+         debug(print *, "BRD sent")
+      endif
+SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+      debug(print *, "[hpfc remapbrd LEVEL] done")
+      end')dnl
+
+forloop(`_D_',0,_HPFC_DIMENSIONS_,`GENERIC_BROADCAST(_D_)')
+!
+! that is all
+!

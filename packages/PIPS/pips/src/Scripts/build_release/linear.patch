@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+WDIR="$1"
+
+# default config, nicer for new users
+cp config.mk $WDIR/makes/
+sed -i -e 's/lpolylib/lpolylib64/g' $WDIR/src/linearlibs/Makefile

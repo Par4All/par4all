@@ -1,0 +1,100 @@
+<HTML>
+<HEAD>
+<TITLE> WP65: A Summary</TITLE>
+</HEAD>
+<BODY>
+<h1> WP65: A Summary</h1>
+
+The WP65 compilation scheme was developped in 1990 to provide the
+programmer of Transputer networks with a unique address space.  It is
+based on a shared-memory emulation using one half of the target machine
+processors for pure computation, and the other half for data
+management. It is equaivalent to a full-software cache.
+
+INMOS T9000 processor and C104 hardware router provided the necessary
+hardware support for multithreading computations and communications, and
+for uniform point-to-point communication. Efficient use of the hardware
+is possible when the memory emulation is statically compiled and when
+computation and communication can overlap.
+
+The project was funded by Esprit project 2701 (PUMA - WorkPackage 6.5)
+and DRET, and developed by <a href=/~ancourt>Corinne ANCOURT</a> and
+<a href=/~irigoin>Fran&ccedil;ois IRIGOIN</a>.
+
+<h2>Input</h2>
+<P>
+<ul>
+  <li> Fortran 77 with one main program.
+  <li> Set of loop nests (maybe non-perfectly nested).
+  <li> Affine loop bounds.
+  <li> Neither guards nor calls.
+  <li> Indirections are supported, but affine array subscripts
+	 are necessary for efficiency.
+</ul>
+
+<h2> Compilation</h2>
+<P>
+<ul>
+  <li> <b>Implicit</b> distribution of data over the software memory banks
+ (general block-cyclic)
+  <li> Task generation based on <b>control</b> partioning
+    <ul>
+      <li> Legal tiling of loop nests chosen to parallelize the code
+      <li> Use of the dependence graph for copy allocation
+      <li> Partial loop distribution...
+      <li> Default tile size used.
+    </ul>
+  <li> Code generation for the tiles over the processors (send, receive
+	and compute codes).
+</ul>
+
+<h2> Output  </h2>
+<P>
+<ul>
+  <li> 2 complementary SPMD Fortran 77 programs
+    <ul>
+      <li> <code>COMPUTE(PROC_ID)</code> for the compute processors
+      <li> <code>BANK(BANK_ID)</code> for the memory bank processors
+    </ul>
+  <li> Similar structures, for each tile: 
+    <ul>
+      <li> Bank processors to computational processors communications
+	(software cache prefetch) 
+      <li> Computations on main processors
+      <li> Processors to banks communications
+	(software cache flush)
+    </ul>
+  <li> Main difficulties:
+    <ul>
+      <li> Data needed for one tile are often apart on different banks
+      <li> Memory coherency requires that only written data is flushed
+      <li> Thus complex code with guards may be generated for communications
+      <li> Local allocation and addressing to be selected and 
+	computed on the processors
+    </ul>
+  <li> PVM 3.3 used as run-time for testing correctness
+</ul>
+
+<h2> Features </h2>
+<P>
+<ul>
+  <li> No static or dynamic explicit data partitioning...
+  <li> More general than owner-computes rule
+  <li> Memory server and computation processes can each be put on a different processor and/or multiplexed:
+    <ul>
+      <li> to control communication bandwidth,
+      <li> to reduce the number of context switches
+    </ul>
+  <li> Load balancing: any process can be started on any processor...
+  <li> Parallelism granularity tuning easier 
+	since independent of data distribution.
+  <li> Communications and computations may be performed on processors of
+different kinds (heterogeneous machines).
+  <li> Although a full-software cache cannot be fully statically compiled,
+	 regular loops can exploit the underlying INMOS hardware
+	 very efficiently.
+</ul>
+
+<p>URL: <a href=/pips/wp65.html><code>http://www.cri.ensmp.fr/pips/wp65.html</code></a>
+</body>
+</html>

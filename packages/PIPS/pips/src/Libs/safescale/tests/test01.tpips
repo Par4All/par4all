@@ -1,0 +1,49 @@
+delete test01
+create test01 test01.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+
+activate C_PARSER
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+display PRINTED_FILE[main]
+
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[main]
+
+#activate PRINT_CODE_TRANSFORMERS
+#display PRINTED_FILE[main]
+
+#activate PRINT_CODE_PRECONDITIONS
+#display PRINTED_FILE[main]
+
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[main]
+
+activate MUST_REGIONS
+display PRINTED_FILE[main]
+
+#apply SAFESCALE_DISTRIBUTOR_INIT
+#display PRINTED_FILE[main]
+
+apply SAFESCALE_DISTRIBUTOR
+display PRINTED_FILE[main]
+display PRINTED_FILE[traou!]
+display PRINTED_FILE[traou]
+
+close
+
+#delete test01
+
+quit

@@ -1,0 +1,189 @@
+#!/bin/bash
+# Copyright 2009 Alain Muller
+#
+#This file is part of STEP.
+#
+#The program is distributed under the terms of the GNU General Public
+#License.
+#
+# For usage, see below.
+
+script=$(basename $0);
+usage()
+{
+  cat >&2 <<-END
+	
+	$script is the STEP driver in front of pips.
+	
+	Usage: $script file.tpips
+	   As: tpips file.tpips
+
+	Usage: $script [options] destination file_1.f [file_n.f]
+	   Move file_1.f [file_n.f] in destination
+	   Create a .tpips file in destination with moved files as source
+	   Execute the genereted .tpips file
+
+	Usage: $script [options] file_1.f [file_n.f]";
+	   As: $script [options] file_1 file_1.f [file_n.f]"
+
+
+	OPTIONS:
+            -i file: include file
+	    -g generated: genereted source files path
+	    -c: clean database
+	    -f: if destination exist force remove
+            -s file: stubs files for pips analysis (file.stubs.f file.fix file.f)
+            -d destination: destination directory
+            -v: verbose
+
+	END
+  exit ${1:-1}
+}
+
+# options
+while getopts i:g:cfs:d:v OPT
+do
+  case $OPT in
+    i) INCLUDE=$OPTARG;;
+    g) PATH_GENERATED_FILE=$OPTARG;;
+    c) CLEAN_DATABASE="clean" ;;
+    f) FORCE="force" ;;
+    s) STUBS="$STUBS $OPTARG";;
+    d) destination=$OPTARG;;
+    v) VERBOSE="verbose";;
+    *) usage 4
+  esac
+done
+shift `expr $OPTIND - 1`
+
+if [ $# -lt 1 ]
+then
+    usage 4
+    exit;
+fi
+
+arg1=$1;
+extension=${arg1#${arg1%.*}};
+case $extension in
+    .tpips)
+	tpips $1;
+	exit $?;
+	;;
+    .f)
+	workspace=$(basename $1 .f);
+	;;
+    *)
+	workspace=$(basename $1);
+	shift;
+	;;
+esac
+
+if [ -z "$destination" ]
+then destination=$workspace;
+fi
+
+if [ -e $destination ]
+then 
+    if [ -n "$FORCE" ]
+    then
+	rm -rf $destination;
+    else
+	echo Destination : $destination;
+	read -p "Remove $destination ? [y/n] : " -n 1 rep ;
+	if [ $rep != "y" ]; then echo ;echo "Abandon";
+	    exit 1;
+	fi
+	rm -rf $destination;
+    fi
+fi
+
+mkdir -p $destination/Source;
+
+#Stubs handling
+if [ -n "$STUBS" ]
+then
+    echo "Stubs handling"
+    for f in $STUBS
+    do
+	echo $f;
+	stub=$f".stubs.f"
+	echo "cp $stub $destination/Source/;"
+	cp $stub $destination/Source/;
+	f=$f".f"
+	echo "cp $f $destination/Source/;"
+	cp $f $destination/Source/;
+	f=$f"ix"
+	echo "cp $f $destination/;"
+	cp $f $destination/;
+	
+	source_files="$source_files ./Source/$(basename $stub)";
+    done
+fi
+
+#Source file copy
+for i in $INCLUDE;
+do
+    cp $i $destination;
+done
+for f in $*
+do
+    cp $f $destination/Source/;
+    source_files="$source_files ./Source/$(basename $f)";
+done
+
+if [ -z "$PATH_GENERATED_FILE" ]
+then
+    PATH_GENERATED_FILE=$workspace.database/Src/
+fi
+
+
+
+#tpips file generation
+tpips_file=$destination/$workspace.tpips;
+cat >$tpips_file <<EOF
+delete $workspace
+create $workspace $source_files
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+apply STEP_DIRECTIVES[%ALL]
+apply STEP_ANALYSE[%ALL]
+apply STEP_COMPILE[%MAIN]
+setproperty STEP_INSTALL_PATH "$PATH_GENERATED_FILE"
+apply STEP_INSTALL
+close
+EOF
+
+if [ -n "$STUBS" ]
+then
+    for f in $STUBS
+    do
+	f=$(basename $f)
+	cat >>$tpips_file <<EOF
+!cd ./Source && cp $f.f ../$workspace.database/Src/
+!. $f.fix ./$workspace.database/Src/
+EOF
+    done
+fi
+cat >>$tpips_file <<EOF
+quit
+EOF
+#end tpips file generation
+
+
+#tpips run
+cd $destination;
+if [ -n "$VERBOSE" ]
+then
+    tpips $workspace.tpips
+else
+    tpips $workspace.tpips &> /dev/null
+fi
+
+#clean
+if [ -n "$CLEAN_DATABASE" ]
+then
+    rm -rf $workspace.database;
+fi
+
+echo;echo;echo "Source files copied in : $destination/Source/";
+echo "Generated source files : $destination/$PATH_GENERATED_FILE"

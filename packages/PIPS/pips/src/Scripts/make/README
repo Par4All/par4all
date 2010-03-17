@@ -1,0 +1,44 @@
+# $Id$
+
+USUAL DISCLAIMER:
+-----------------
+
+PIPS IS PROVIDED AS IS WITH NO WARRANTY WHAT SO EVER ABOUT ANYTHING.
+YOU CANNOT SUE US FOR ANYTHING, DIRECT OR INDIRECT CONSEQUENCES OF
+USING THIS SOFTWARE.
+
+Well, if it works for you, fine.
+
+
+COPYRIGHT:
+----------
+
+(c) Centre de Recherche en Informatique,
+    École des mines de Paris,
+    35, rue Saint-Honoré,
+    F-77305 Fontainebleau cedex, FRANCE.
+
+    e-mail: pipsgroup@cri.ensmp.fr
+    phone: +33 1 64 69 47 08
+
+
+WHAT:
+-----
+
+PIPS stands for "Interprocedural Parallelizer for Scientific Programs".
+It deals with Fortran 77. It performs code analyses and transformations.
+
+You may consult the online documentation about PIPS and related sofwares
+on http://www.cri.ensmp.fr/pips
+
+Read the local INSTALL file for installation instructions.
+
+
+GETTING STARTED:
+----------------
+
+Go in one of the example directories in Pips/Examples/SC95 and launch epips
+(for a full-fledged version) or wpips (without Emacs).
+Begin with a workspace creation that asks for one or more Fortran files you
+are interested in to study.
+Select a module, view the code, apply some transformations and so on...

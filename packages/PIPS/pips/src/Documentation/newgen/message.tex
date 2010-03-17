@@ -1,0 +1,60 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{HPFC \\ (High Performance Fortran Compiler) \\ datastructure}
+\author{Fabien Coelho\\
+                \\
+        CRI, École des mines de Paris}
+
+\begin{document}
+\maketitle
+
+\section*{Introduction}
+  Ce document présente très brèvement les domaines Newgen utilisés
+par le prototype de compilateur {\tt hpfc} pour décrire les motifs de
+messages qui doivent être échangés.
+
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import range from "ri.newgen"}
+{}
+
+\domain{external Pvecteur}
+{}
+
+\domain{message = array:entity x content:range* x neighbour:Pvecteur x dom:range*}
+{Un message concerne un des tableaux du programme ({\tt array:entity})
+et pour ce tableau, un morceau des déclarations locales, généralement
+un bord ({\tt content:range*}). Le destinataire est décrit relativement
+sous la forme de la désignation d'un voisin dans le tableau de {\em
+processors} sur lequel est distribué le tableau ({\tt
+neighbour:Pvecteur}), et concerne le domaine de {\em template} ({\tt
+domain:range*}). 
+}
+
+\end{document}

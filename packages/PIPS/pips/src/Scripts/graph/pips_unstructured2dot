@@ -1,0 +1,273 @@
+#! /usr/bin/env python
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+"""
+Take a graph prettyprint file (GRAPH_PRINTED_FILE ressource) from PIPS and
+output a dot graph that can be displayed by a dot/graphviz-compatible
+tool, such as ZGRViewer.
+"""
+
+import sys, re
+
+#import pygraphviz
+import pygraphviz as pgv
+
+#Define the fonts, shapes,styles and colors to be used in the graph
+##SHAPES
+STATEMENT_DEFAULT_SHAPE = "box"
+UNSTRUCTURED_ENTRY_EXIT_POINT_SHAPE = "ellipse"
+IF_THEN_ELSE_STATEMENT_SHAPE = "diamond"
+THEN_ELSE_BOX_SHAPE = "triangle"
+##COLORS
+UNREACHABLE_NODE_COLOR="red"
+UNSTRUCTURED_ENTRY_POINT_COLOR="green"
+UNSTRUCTURED_EXIT_POINT_COLOR="orange"
+MODULE_ENTRY_POINT_COLOR="yellow"
+THEN_EDGE_COLOR="red"
+ELSE_EDGE_COLOR="blue"
+THEN_BOX_COLOR="pink"
+ELSE_BOX_COLOR="lightblue"
+IF_THEN_ELSE_STATEMENT_COLOR="cyan"
+UNREACH_EDGE_COLOR="violet"
+##FONTS
+THEN_ELSE_FONT="helevetica"
+##STYLES
+UNREACH_EDGE_STYLE="dotted"
+
+# The current node number
+node_number = 0
+# To keep track of nested unstructured instructions:
+statement_number_stack = []
+
+# The code to output in a node:
+output_statement_buffer = []
+
+newline_re = re.compile("\n")
+
+def protect_newline(text):
+    "Transform all the newline into tex to \n"
+    return newline_re.sub("\\n", text)
+
+def keep_for_output(text):
+    "Add the text to be prettyprinted later"
+    global output_statement_buffer
+
+    output_statement_buffer.append(text)
+
+graph = pgv.AGraph(strict = False, directed = True)
+graph.graph_attr['label'] = "Source Control Graph"
+graph.node_attr['style']='filled'
+graph.node_attr['shape']=STATEMENT_DEFAULT_SHAPE
+
+attributes_to_add_to_next_node = []
+
+def add_attribute_to_next_node(attribute, value):
+    global attributes_to_add_to_next_node
+    attributes_to_add_to_next_node.append([attribute, value])
+
+def set_attribute(graphic_object, attribute, value):
+    graphic_object.attr[attribute] = value
+
+this_is_the_unstructured_entry_p = False
+
+def left_justify (label):
+  nl_re=  re.compile("\\\\n")
+  label_left_justified = nl_re.sub("\\l", label)
+  label_left_justified += "\\l"
+  return label_left_justified
+
+def add_a_node(node, label, comment = " "):
+  graph.add_node(node)
+  n = graph.get_node (node)
+  if (label==''):
+      label = " "
+  n.attr['label']   = left_justify (label)
+  n.attr['comment'] = comment
+  if (node_number == 0): set_attribute(n, "color", MODULE_ENTRY_POINT_COLOR)
+  return n
+
+remove_leading_blank_lines_re = re.compile("^([ \\t]*\\\\n)+")
+
+def add_a_statement(node, comment):
+    global this_is_the_unstructured_entry_p, output_statement_buffer
+    global attributes_to_add_to_next_node
+
+    # Transforn the list of lines into text:
+    text = '\\n'.join(output_statement_buffer)
+    text = remove_leading_blank_lines_re.sub(" ", text)
+    output_statement_buffer = []
+
+    n = add_a_node(node, text, comment)
+
+    for a in attributes_to_add_to_next_node:
+        set_attribute (n, a[0], a[1])
+    attributes_to_add_to_next_node = []
+
+    if (this_is_the_unstructured_entry_p):
+        set_attribute (n, 'shape', UNSTRUCTURED_ENTRY_EXIT_POINT_SHAPE)
+        set_attribute (n, 'color', UNSTRUCTURED_ENTRY_POINT_COLOR)
+        this_is_the_unstructured_entry_p = False
+
+    return n
+
+def add_a_successor(n, successor):
+    graph.add_edge(n, successor)
+    return graph.get_edge (n, successor)
+
+def add_an_eventual_unreachable_arrow(node):
+    """If the node given to this procedure is an entry node of an
+    unstructured that has an unreachable exit node, display a dashed arrow
+    from the entry node to the exit"""
+    if (node in unreachable_hash_table):
+	exit_node = unreachable_hash_table[node]
+	n = add_a_node(exit_node, "Unreachable from %s to %s" % (node, exit_node))
+        set_attribute (n, "color", UNREACHABLE_NODE_COLOR)
+        edge = add_a_successor(node, n)
+ 	set_attribute(edge, "style", UNREACH_EDGE_STYLE)
+ 	set_attribute(edge, "color", UNREACH_EDGE_COLOR)
+
+# First build a map of unstructured with unreachable exit:
+f = open(sys.argv[1])
+unreachable_exit = []
+unreachable_hash_table = {}
+unreachable_re = re.compile("^\204Unstructured Unreachable (.*) -> (.*)$")
+for line in f.readlines():
+    m = unreachable_re.match(line)
+    if m:
+        entry_control = m.group(1);
+	exit_control = m.group(2);
+        unreachable_exit.append(exit_control)
+	unreachable_hash_table[entry_control] = exit_control;
+f.close()
+
+# Parse the PIPS output:
+unstructured_re = re.compile("^\200Unstructured (.*) end: (.*)$")
+unstructured_end_re = re.compile("^\201Unstructured End (.*) end: (.*)$")
+unstructured_item_re = re.compile("^\202Unstructured Item (.*)$")
+unstructured_successor_re = re.compile("^\203Unstructured Successor -> ?(.*)$")
+f = open(sys.argv[1])
+control = node_number
+for line in f.readlines():
+    line = line[:-1] # To skip the marker
+    m = unstructured_re.match(line)
+    if m:
+        # \200Unstructured 0xa0aa20 end: 0x3cfa40
+        unstructured_begin = m.group(1)
+        unstructured_end = m.group(2)
+        # Create the node before the unstructured entry:
+        n = add_a_statement(control, "Statement not from an unstructured")
+        # Add an edge from this node to the unstructured entry:
+        add_a_successor(n, unstructured_begin)
+        # Since the first node could be an IF, delay the attributes for
+        # the beginning:
+	this_is_the_unstructured_entry_p = True
+	node_number += 1
+	# Keep track of the number of the statement that should follow
+	# this unstructured at its exit:
+	statement_number_stack.append(node_number)
+        continue
+
+    m = unstructured_end_re.match(line)
+    if m:
+        # \201Unstructured End 0xa0aa20 end: 0x3cfa40
+        unstructured_begin = m.group(1)
+        unstructured_end = m.group(2)
+        control = statement_number_stack.pop()
+        continue
+
+    m = unstructured_item_re.match(line)
+    if m:
+        # \202Unstructured Item 0x3c79f0
+	# Should use a stack here ?
+	control = m.group(1)
+        continue
+
+    m = unstructured_successor_re.match(line)
+    if m:
+        # ^\203Unstructured Successor -> ?(.*)
+        successors = m.group(1).split(' ')
+        if (successors == ['']):
+            n = add_a_statement(control, line[1:])
+            set_attribute(n, "shape", UNSTRUCTURED_ENTRY_EXIT_POINT_SHAPE)
+            if (n not in unreachable_exit):
+                set_attribute(n, "color", UNSTRUCTURED_EXIT_POINT_COLOR)
+            # Reconnect to the node outside of the unstructured:
+            add_a_successor(n, statement_number_stack[-1])
+            continue
+        elif (len(successors) == 2):
+	    # 2 successors, that is an "if then else":
+	    add_attribute_to_next_node("shape", IF_THEN_ELSE_STATEMENT_SHAPE)
+            if (not this_is_the_unstructured_entry_p):
+		add_attribute_to_next_node("color", IF_THEN_ELSE_STATEMENT_COLOR)
+            else:
+                # Display a lightgreen rhombus to mark the IF at the
+                # unstructured entry:
+                add_attribute_to_next_node('color', UNSTRUCTURED_ENTRY_POINT_COLOR)
+                this_is_the_unstructured_entry_p = False
+            n = add_a_statement(control, line[1:])
+	    add_an_eventual_unreachable_arrow(n)
+            # Display the "then" and "else" arrows and block 
+	    then_edge = add_a_successor(n, "then_%d" % node_number)
+	    set_attribute(then_edge, "color", THEN_EDGE_COLOR)
+	    else_edge = add_a_successor(n, "else_%d" % node_number)
+	    set_attribute(else_edge, "color", ELSE_EDGE_COLOR)
+	    then_st = add_a_node("then_%d" % node_number,
+                                 "THEN", line[1:])
+	    set_attribute(then_st, "color", THEN_BOX_COLOR)
+	    set_attribute(then_st, "shape", THEN_ELSE_BOX_SHAPE)
+	    set_attribute(then_st, "fontname", THEN_ELSE_FONT)
+	    then_edge2 = add_a_successor(then_st, successors[0])
+	    set_attribute(then_edge2, "color", THEN_EDGE_COLOR)
+	    else_st = add_a_node("else_%d" % node_number,
+                                 "ELSE", line[1:])
+	    set_attribute(else_st, "color", ELSE_BOX_COLOR)
+	    set_attribute(else_st, "shape", THEN_ELSE_BOX_SHAPE);
+	    set_attribute(else_st, "fontname", THEN_ELSE_FONT);
+	    else_edge2 = add_a_successor(else_st, successors[1])
+	    set_attribute(else_edge2, "color", ELSE_EDGE_COLOR)
+	    node_number += 1
+            continue
+
+        else:
+            # Just a sequence I guess:
+            n = add_a_statement(control, line[1:])
+            add_a_successor(n, successors[0])
+            add_an_eventual_unreachable_arrow(n)
+	    continue
+    m = unreachable_re.match(line)
+    if m:
+        # \204Unstructured Unreachable
+        # already process just skip it
+        continue
+    # Add the source line to the current node label to set later:
+    keep_for_output(line)
+
+# Add what foloowed the unstructured part 
+n = add_a_statement(control, line[1:])
+
+output_file_name_dot = sys.argv[1] + '.dot'
+output_file_name_ps = sys.argv[1] + '.ps'
+
+graph.write(output_file_name_dot)
+graph.layout('dot')
+graph.draw (output_file_name_ps)

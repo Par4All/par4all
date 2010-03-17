@@ -1,0 +1,106 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%% newgen domain for pips detabase management.
+
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Pips Database Manager}
+
+\begin{document}
+
+\maketitle
+
+\section{Old database structures}
+
+\domain{Database = name:string x directory:string x resources:resource*}
+{ Le domaine {\tt database} est utilisé par pips-db pour décrire
+l'état d'un programme utilisateur. Ce domaine contient son nom ({\tt
+name}), le répertoire dans lequel il a été créé, et les
+informations qui ont été calculées pour les différents modules ({\tt
+resources}). En fait, le nom de la base et le nom de la directory
+utilisée sont directement lié, en pratique. Le nom de la directory est
+le nom de la base suffisé par \textsc{database}.
+
+Un élément de type {\tt resource} est ajouté à la liste {\tt resources}
+pour chaque objet calculé pour ce programme par les phases d'analyse ou
+de transformation de Pips. 
+
+La bibliothèque qui exploite cette structure de données est
+\texttt{pipsdbm}.  Elle devrait être nommée \texttt{database-util} si une
+règle de nommage était observée.
+
+}
+
+\domain{Resource = name:string x owner\_name:string x status x time:int x file\_time:int}
+{ Le domaine {\tt resource} est utilisé par pips-db pour décrire l'une
+des informations suceptibles d'être calculées par Pips pour un module
+ou un programme. Pour chaque information, il faut connaître son nom
+({\tt name}), savoir qui elle décore ({\tt owner\_name}), savoir si elle
+est présente en mémoire ou rangée dans un fichier ({\tt status}),
+connaitre sa date de création logique ({\tt time}), et eventuellement
+la date (Unix) de création du fichier correspondant ({\tt file\_time}).
+
+Le {\tt name} de la ressource est en fait un type et aurait pu être
+défini comme un type énuméré. C'est par souci de simplicité et
+généricité de pipsdbm que nous avons choisi de le définir comme par
+une chaine de caractères. C'est ce {\tt name} qui permet notamment à
+pipsdbm de choisir la fonction pour lire, écrire ou libérer une
+ressource.
+
+A un moment donné, chaque ressource est identifiée demanière unique
+par son nom, \texttt{name}, et le nom de son {\em owner}, \texttt{owner\_name}.
+
+Nous avons longement discute de l'utilité d'avoir un owner\_type pour
+preciser ce que décore la ressource: un programme (cas des entités),
+un module (cas de toutes les autres ressources), une boucle, une
+instruction, etc. Nous y avons renoncé car à l'heure actuelle, nous
+n'avons que des ressources attachables à des programmes ou à des
+modules, et que cette information peut être déduite du {\tt name} de
+la ressource. En fait, nous n'avons qu'une ressource attachable à un
+programme, ce sont les entités (et les \texttt{user\_file}, mais ils sont
+largement maltraités pour le moment).}
+
+\domain{Status = memory:string + file:string}
+{ Le domaine {\tt status} est utilisé par pips-db pour savoir si la
+ressource concernée peut résider en mémoire, auxquel cas elle peut se
+trouver soit en mémoire, si elle a été réclamée par un processus,
+soit sur disque, ou bien si elle est constituée d'un fichier, qui n'est
+a priori jamais chargée en mémoire. Dans
+ce dernier cas, le sous-domaine {\tt file} donne le nom de ce fichier.
+Le nom du fichier doit être relatif au workspace, s'il se trouve dans
+le workspace, et doit être absolu, s'il se trouve hors du workspace, de
+sorte qu'on puisse faire des \texttt{mv} et des \texttt{cp -pr} sur le workspace.
+Si la ressource est en mémoire, le sous-domaine {\tt memory} contient
+un pointeur vers cette ressource.
+
+How resources in a file a and file resources differ? It cannot be seen
+from this description! The list of the laters is explicitely managed
+somewhere in pipsdbm! 
+}
+
+\end{document}
+

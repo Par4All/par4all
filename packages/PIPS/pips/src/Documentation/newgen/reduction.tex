@@ -1,0 +1,69 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\begin{document}
+\sloppy
+
+Ces structures de données implémentent la détection des réductions
+généralisées. Voir: Jouvelot, P., et Dehbonei, Babak, ``A Unified
+Semantic Approach for the Vectorization and Parallelization of
+Generalized Reductions'', ACM-ICS'89, Crete.
+
+\section {Evaluation Symbolique}
+
+\domain{Import expression from "ri.newgen"}
+{}
+
+\domain{Import entity from "ri.newgen"}
+{}
+
+Définition des expression symboliques utilisées pour la détection des
+réductions. 
+
+\domain{gexpression = guard:expression x expression}
+{Une expression guardée est formée d'une garde et d'une expression
+symbolique. La garde indique quand l'expression symbolique est valide }
+
+\domain{sexpression = gexpressions:gexpression*}
+{Une expression symbolique est formée d'une liste d'expressions
+gardées. Toutes les gardes sont mutuellement exclusives.}
+
+\section{Pattern-matching}
+
+Definition des patterns qui décrivent les réductions généralisées.
+
+\domain{pattern = variable:entity x condition:expression x parameter:expression x operator:entity x indices:entity*}
+{Un {\tt pattern} décrit une réduction. La {\tt variable} est
+l'entité sur laquelle la réduction est effectuée. La {\tt condition}
+décrit la garde associée (dans le cas de conditionnelle, e.g., max).
+Le {\tt parameter} définit la partie indépendante de la réduction.
+L'{\tt operator} définit l'opération entre la variable et le
+paramètre. Les {\tt indices} est la liste des variables d'unification
+qui doivent être égales à l'index de la boucle la plus englobante.}
+
+\end{document}
+\end

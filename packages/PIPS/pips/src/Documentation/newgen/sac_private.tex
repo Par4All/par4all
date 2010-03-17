@@ -1,0 +1,142 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{PIPS/SAC: SIMD Architecture Compiler}
+\author{François Ferrand \\
+\\
+        ENST Bretagne}
+
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+
+This document defines and describes the data structures used by SAC, the
+SIMD Architecture Compiler. SAC is a new PIPS phase, which allows to
+generate code optimized for architectures supporting multimedia
+instruction sets, such as MMX, SSE or VIS.
+
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import expression from "ri.newgen"}
+{}
+\domain{import statement from "ri.newgen"}
+{}
+\domain{import reference from "ri.newgen"}
+{}
+\domain{import reduction from "reductions_private.newgen"}
+{}
+
+\domain{reductionInfo = persistent reduction x count:int x persistent vector:entity}
+{}
+
+\section*{Opcodes and opcode classes}
+
+\domain{opcode = name:string x vectorSize:int x argType:int* x cost:float}
+{}
+
+\domain{tabulated opcodeClass = name:string x nbArgs:int x opcodes:opcode*}
+{}
+
+\section*{Statement matching}
+
+Statement matching is used to detect ``patterns'' in the code. It
+works on the expression tree representing the program. The actual
+patterns are read from a file, to create a matchTree that is used to
+efficiently parse the expression tree. This process returns a list of
+matches, indicating the various opcodes that can thus be generated,
+and with which arguments.
+
+
+A \verb+patternArg+ specifies how an argument is to be generated. It
+can be an integer constant, with the specified value, or extracted
+from the actual expression tree.
+
+\domain{patternArg = static:int + dynamic:unit}
+{}
+
+A \verb+pattern+ identifies what to generate. It specifies the opcode
+class corresponding to the pattern, as well as a list that can be used
+to translate from original statement references or constants to
+arguments for the opcode.
+
+\domain{patternx = class:opcodeClass x args:patternArg*}
+{}
+
+\domain{matchTreeSons = int->matchTree}
+{}
+
+\verb+matchTree+ is a structure used to efficiently identify
+patterns corresponding to a statement. When traversed, it can thus map
+a statement to a list of patterns that can be used.
+
+\domain{matchTree = patterns:patternx* x sons:matchTreeSons}
+{}
+
+A \verb+pattern+ can be translated into a \verb+match+ by mapping the
+arguments properly. The argument list in a \verb+match+ is constructed
+from the arguments of the statement, following the rules of pattern
+arguments (list of \verb+patternArg+).
+
+\domain{match = type:opcodeClass x args:expression*}
+{}
+
+\section*{Statement information}
+
+\domain{referenceInfo = reference x nbDimensions:int x lExp:expression* x lIndex:reference* x lOffset:int*}
+{}
+
+The \verb+referenceInfo+ domain reprensents an easier to use
+representation of reference of the form \verb+A[I+5]+. The reference 
+expression has already been parsed to find all the items.
+
+
+\domain{vectorElement = statement:simdStatementInfo x vectorIndex:int x element:int}
+{}
+
+\domain{statementArgument = expression x dependances:vectorElement*}
+{}
+
+\domain{simdStatementInfo = opcode x nbArgs:int x vectors:entity[16] x arguments:statementArgument[48]}
+{}
+
+\domain{statementInfo = simd:simdStatementInfo + nonsimd:statement}
+{}
+
+\domain{argumentInfo = expression x placesAvailable:vectorElement*}
+{}
+
+\section*{Transformation}
+
+\domain{transformation = name:string x vectorLengthOut:int x subwordSizeOut:int x vectorLengthIn:int x subwordSizeIn:int x nbArgs:int x mapping:int[16]}
+{}
+
+\end{document}
+\end

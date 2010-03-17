@@ -1,0 +1,1298 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 0 0 894 1646
+%%Creator: daVinci V2.0.1 (info available from daVinci@Informatik.Uni-Bremen.DE)
+%%For: keryell@deauville (Ronan KERYELL,,(+33 1)64.69.48.44,)
+%%Title: 
+%%CreationDate: Tue Jun 17 17:46:33 1997
+
+%%Pages: 1
+%%DocumentNeededResources:
+%%+ font LucidaSans
+%%+ font LucidaSans-Bold
+%%+ font LucidaSans-Italic
+%%+ font LucidaSans-BoldItalic
+%%+ font Times-Roman
+%%+ font Times-Bold
+%%+ font Times-Italic
+%%+ font Times-BoldItalic
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Helvetica-Oblique
+%%+ font Helvetica-BoldOblique
+%%+ font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%+ font ZapfChancery-MediumItalic
+%%EndComments
+
+%%BeginProlog
+/daVinci_dict 200 dict def
+daVinci_dict begin
+/fontsize 12 def
+
+/cp % NameOfFontToBeCopied
+{ findfont dup length dict begin 
+  { 1 index /FID ne {def} {pop pop} ifelse} forall 
+  /Encoding ISOLatin1Encoding def currentdict end 
+} def
+/rn % NameOfNewFontWithIsoEncoding
+{ exch definefont pop } def
+/sf % NameOfFontToBeSet
+{ findfont fontsize scalefont setfont } def
+
+% Copy all fonts to get ISO 8-bit chars
+/Times-Roman cp /FontTimes rn
+/Times-Bold cp /FontTimesBold rn
+/Times-Italic cp /FontTimesItalic rn
+/Times-BoldItalic cp /FontTimesBoldItalic rn
+/Helvetica cp /FontHelveticaNarrow rn
+/Helvetica--Bold cp /FontHelveticaNarrowBold rn
+/Helvetica--Oblique cp /FontHelveticaNarrowItalic rn
+/Helvetica-BoldOblique cp /FontHelveticaNarrowBoldItalic rn
+/Courier cp /FontCourier rn
+/Courier-Bold cp /FontCourierBold rn
+/Courier-Oblique cp /FontCourierItalic rn
+/Courier-BoldOblique cp /FontCourierBoldItalic rn
+/LucidaSans cp /FontLucida rn
+/LucidaSans-Bold cp /FontLucidaBold rn
+/LucidaSans-Italic cp /FontLucidaItalic rn
+/LucidaSans-BoldItalic cp /FontLucidaBoldItalic rn
+/Helvetica cp /FontHelvetica rn
+/Helvetica-Bold cp /FontHelveticaBold rn
+/Helvetica-Oblique cp /FontHelveticaItalic rn
+/Helvetica-BoldOblique cp /FontHelveticaBoldItalic rn
+
+% Define fonts
+/font_times_normal { /FontTimes sf } def
+/font_times_bold { /FontTimesBold sf } def
+/font_times_italic { /FontTimesItalic sf } def
+/font_times_bold_italic { /FontTimesBoldItalic sf } def
+/font_helvetica_normal { /FontHelveticaNarrow sf } def
+/font_helvetica_bold { /FontHelveticaNarrowBold sf } def
+/font_helvetica_italic { /FontHelveticaNarrowItalic sf } def
+/font_helvetica_bold_italic { /FontHelveticaNarrowBoldItalic sf } def
+/font_courier_normal { /FontCourier sf } def
+/font_courier_bold { /FontCourierBold sf } def
+/font_courier_italic { /FontCourierItalic sf } def
+/font_courier_bold_italic { /FontCourierBoldItalic sf } def
+
+% Special case: use font Helvetica, if Lucida is not supported
+/font_lucida_normal
+{ /LucidaSans dup FontDirectory exch known
+  { /FontLucida sf } { /FontHelvetica sf } ifelse pop
+} def
+/font_lucida_bold 
+{ /LucidaSans-Bold dup FontDirectory exch known
+  { /FontLucidaBold sf } { /FontHelveticaBold sf } ifelse pop
+} def
+/font_lucida_italic 
+{ /LucidaSans-Italic dup FontDirectory exch known
+  { /FontLucidaItalic sf } { /FontHelveticaItalic sf } ifelse pop
+} def
+/font_lucida_bold_italic 
+{ /LucidaSans-BoldItalic dup FontDirectory exch known
+  { /FontLucidaBoldItalic sf } { /FontHelveticaBoldItalic sf } ifelse pop
+} def
+
+/white {1 1 1 setrgbcolor} def
+/black {0 0 0 setrgbcolor} def
+
+/solid { } bind def
+/dotted { [1 2] 1 setdash} bind def
+/dashed { [4 8] 0 setdash} bind def
+
+/rectangle % OriginX OriginY Width Height
+{ newpath
+  3 index 3 index moveto % OriginX/OriginY
+  1 index 0 rlineto % OriginX+Width/OriginY
+  0 1 index neg rlineto % OriginX+Width/OriginY+Height
+  exch neg 0 rlineto % OriginX/OriginY+Height
+  0 exch rlineto % OriginX/OriginY
+  closepath pop pop
+} def
+/draw_rectangle { gsave rectangle stroke grestore} def
+/fill_rectangle { gsave rectangle fill grestore} def
+
+/circle % OriginX OriginY 2*Radius
+{ newpath
+  2 index 1 index 2 div add 2 index 2 index 2 div sub % CenterX/CenterY
+  2 index 2 div 0 360 arc
+  closepath pop pop pop
+} def
+/draw_circle { gsave circle stroke grestore} def
+/fill_circle { gsave circle fill grestore} def
+
+/ellipse % OriginX OriginY Width Height
+{ newpath
+  3 index 3 index 2 index 0.5 mul sub moveto % OriginX/OriginY-(Height/2)
+  3 index 3 index 2 index 0.14 mul add % OriginX/OriginY+(Height*0.14)
+  5 index 4 index add 5 index 4 index 0.14 mul add % OriginX+Width/OriginY+(Height*0.14)
+  7 index 6 index add 7 index 6 index 0.5 mul sub curveto % OriginX+Width/OriginY-(Height/2)
+  3 index 2 index add 3 index 2 index 1.14 mul sub % OriginX+Width/OriginY-(Height*1.14)
+  5 index 5 index 4 index 1.14 mul sub % OriginX/OriginY-(Height*1.14)
+  7 index 7 index 6 index 0.5 mul sub curveto % OriginX/OriginY-(Height/2)
+  closepath pop pop pop pop
+} def
+/draw_ellipse {gsave ellipse stroke grestore} def
+/fill_ellipse {gsave ellipse fill grestore} def
+
+/rhombus % OriginX OriginY Width Height
+{ newpath
+  3 index 2 index 2 div add 3 index moveto % OriginX+(Width/2)/OriginY
+  1 index 2 div 1 index 2 div neg rlineto % OriginX+Width/OriginY-(Height/2)
+  1 index 2 div neg 1 index 2 div neg rlineto % OriginX+(Width/2)/OriginY-Height
+  1 index 2 div neg 1 index 2 div rlineto % OriginX/OriginY-(Height/2)
+  closepath pop pop pop pop
+} def
+/draw_rhombus {gsave rhombus stroke grestore} def
+/fill_rhombus {gsave rhombus fill grestore} def
+
+/draw_string % String CenterX CenterY
+{ gsave moveto show grestore
+} def
+
+/draw_centered_string % String CenterX CenterY
+{ gsave newpath 
+	exch 2 index stringwidth pop 2 div sub exch 
+	moveto show grestore
+} def
+
+/draw_line % StartX StartY EndX EndX
+{ gsave newpath 3 index 3 index moveto lineto closepath pop pop 
+	stroke grestore
+} def
+
+/draw_arrow % HeadX HeadY Point1X Point1Y Point2X Point2Y
+{ gsave newpath moveto lineto lineto closepath fill grestore} def
+
+/draw_selfref_circle % OriginX OriginY 2*Radius
+{ gsave newpath
+  2 index 1 index 2 div add 2 index 2 index 2 div sub % CenterX/CenterY
+  2 index 2 div 45 360 arc
+  pop pop pop stroke grestore
+} def
+
+/draw_selfref_circle_horizontal % OriginX OriginY 2*Radius
+{ gsave newpath
+  2 index 1 index 2 div add 2 index 2 index 2 div sub % CenterX/CenterY
+  2 index 2 div 135 450 arc
+  pop pop pop stroke grestore
+} def
+
+/readstring {
+  currentfile exch readhexstring pop  
+} bind def
+/picstr 1 string def
+
+/daVinci_logo
+{ /ZapfChancery-MediumItalic findfont 10 scalefont setfont
+  (daVinci) show
+  4 0 rmoveto /Helvetica findfont 8 scalefont setfont (V2.0.1) show} def
+
+%%EndProlog
+
+%%BeginSetup
+%%IncludeResource:
+%%+ font LucidaSans
+%%+ font LucidaSans-Bold
+%%+ font LucidaSans-Italic
+%%+ font LucidaSans-BoldItalic
+%%+ font Times-Roman
+%%+ font Times-Bold
+%%+ font Times-Italic
+%%+ font Times-BoldItalic
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Helvetica-Oblique
+%%+ font Helvetica-BoldOblique
+%%+ font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%+ font ZapfChancery-MediumItalic
+%%EndSetup
+
+%%Page: 1 1
+
+gsave 20 15 moveto 90 rotate daVinci_logo grestore
+25 dup translate
+0.1000 dup scale
+
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  4348 9043 4343 9057 4353 9057 draw_arrow 4348 9123 4348 9057 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  4515 1472 4423 1222 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  4504 1730 4509 1717 4500 1716 draw_arrow 4504 1717 4515 1472 draw_line
+1 setlinewidth grestore
+
+font_helvetica_bold_italic
+ 1.00 0.78 0.78 setrgbcolor  4398 1222 43 27 fill_rectangle
+black (THEN) 4419 1204 draw_centered_string
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  4188 1642 4184 1656 4193 1655 draw_arrow 4192 1730 4188 1655 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  4340 1222 4329 1231 4337 1236 draw_arrow 4262 1344 4333 1233 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 1.00 setrgbcolor  4348 1121 4343 1135 4353 1135 draw_arrow 4348 1195 4348 1135 draw_line
+1 setlinewidth grestore
+gsave 1 setlinewidth
+ 0.00 0.00 0.00 setrgbcolor  4348 1033 4343 1047 4353 1047 draw_arrow 4348 1113 4348 1047 draw_line
+1 setlinewidth grestore
+
+font_courier_bold
+ 1.00 1.00 1.00 setrgbcolor  4077 1033 542 1013 fill_rectangle
+black 4077 1033 542 1013 draw_rectangle
+(      WRITE \(6, 1010\) TXXXIN, TXXOUT, TXXRCS, TXXCSR, TXSCSC, TXACAC    0615) 4082 1018 draw_string
+(     &, TFTVMT, TXSHUF, TUSHUF, TXPRNT, TXLOG2                          0615) 4082 1003 draw_string
+(      WRITE \(6, 1012\) EXXRCS, EXXCSR, EXSCSC, EXACAC, EFTVMT            0616) 4082 988 draw_string
+(      WRITE \(6, 1020\) NXXXIN, NXXOUT, NXXRCS, NXXCSR, NXSCSC, NXACAC    0617) 4082 973 draw_string
+(     &, NFTVMT, NXSHUF, NUSHUF, NXPRNT, NXLOG2                          0617) 4082 958 draw_string
+(C                                                                       ) 4082 943 draw_string
+(      CALL BUG\('AFTER  ALL'\)                                            0618) 4082 928 draw_string
+(1010  FORMAT\(/2X,'SUBROUTINE    IN, EX-TIME FOR FIRST CALL =',1PE13.6,' ) 4082 913 draw_string
+(     &SECONDS'/2X,'SUBROUTINE   OUT, EX-TIME FOR FIRST CALL =',1PE13.6/2) 4082 898 draw_string
+(     &X,'SUBROUTINE   RCS, EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUT) 4082 883 draw_string
+(     &INE   CSR, EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUTINE  SCSC,) 4082 868 draw_string
+(     & EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUTINE  ACAC, EX-TIME F) 4082 853 draw_string
+(     &OR FIRST CALL =',1PE13.6/2X,'SUBROUTINE FTRVMT EX-TIME FOR FIRST C) 4082 838 draw_string
+(     &ALL =',1PE13.6/2X,'SUBROUTINE  SHUF, EX-TIME FOR FIRST CALL =',1PE) 4082 823 draw_string
+(     &13.6/2X,'SUBROUTINE UNSHUF EX-TIME FOR FIRST CALL =',1PE13.6/2X,'S) 4082 808 draw_string
+(     &UBROUTINE RPRINT EX-TIME FOR FIRST CALL =',1PE13.6/2X,'SUBROUTINE ) 4082 793 draw_string
+(     &XLOG2, EX-TIME FOR FIRST CALL =',1PE13.6\)                         0619) 4082 778 draw_string
+(1012  FORMAT\(/2X,'SUBROUTINE   RCS, EX-TIME LAST TIMESTEP  =',1PE13.6,' ) 4082 763 draw_string
+(     &SECONDS'/2X,'SUBROUTINE   CSR, EX-TIME LAST TIMESTEP  =',1PE13.6/2) 4082 748 draw_string
+(     &X,'SUBROUTINE  SCSC, EX-TIME LAST TIMESTEP  =',1PE13.6/2X,'SUBROUT) 4082 733 draw_string
+(     &INE  ACAC, EX-TIME LAST TIMESTEP  =',1PE13.6/2X,'SUBROUTINE FTRVMT) 4082 718 draw_string
+(     & EX-TIME LAST TIMESTEP  =',1PE13.6\)                               0620) 4082 703 draw_string
+(1020  FORMAT\(/2X,'SUBROUTINE    IN, CUMULATIVE CALLS TO    =',I12/2X,'SU) 4082 688 draw_string
+(     &BROUTINE   OUT, CUMULATIVE CALLS TO    =',I12/2X,'SUBROUTINE   RCS) 4082 673 draw_string
+(     &, CUMULATIVE CALLS TO    =',I12/2X,'SUBROUTINE   CSR, CUMULATIVE C) 4082 658 draw_string
+(     &ALLS TO    =',I12/2X,'SUBROUTINE  SCSC, CUMULATIVE CALLS TO    =',) 4082 643 draw_string
+(     &I12/2X,'SUBROUTINE  ACAC, CUMULATIVE CALLS TO    =',I12/2X,'SUBROU) 4082 628 draw_string
+(     &TINE FTRVMT CUMULATIVE CALLS TO    =',I12/2X,'SUBROUTINE  SHUF, CU) 4082 613 draw_string
+(     &MULATIVE CALLS TO    =',I12/2X,'SUBROUTINE UNSHUF CUMULATIVE CALLS) 4082 598 draw_string
+(     & TO    =',I12/2X,'SUBROUTINE RPRINT CUMULATIVE CALLS TO    =',I12/) 4082 583 draw_string
+(     &2X,'SUBROUTINE XLOG2, CUMULATIVE CALLS TO    =',I12\)              0621) 4082 568 draw_string
+(C                                                                       ) 4082 553 draw_string
+(      CALL CPUTIM\(CPU2\)                                                 0622) 4082 538 draw_string
+(      CALL ELAPSE\(TCLCK2\)                                               0623) 4082 523 draw_string
+(C                                                                       ) 4082 508 draw_string
+(      TWALL = MOD\(TCLCK2-TCLCK1+1000000.0, 1000000.0\)                   0624) 4082 493 draw_string
+(      WRITE \(6, 1040\) TWALL                                             0625) 4082 478 draw_string
+(1040  FORMAT\(/2X,'MEASURE OF WALL-CLOCK TIME \(ENVIRONMENT SENSITIVE\)'/2X) 4082 463 draw_string
+(     &,'FOR EXECUTION ONLY =',1PE13.6,1X,'SECONDS'\)                     0626) 4082 448 draw_string
+(      WRITE \(1, *\)                                                      0627) 4082 433 draw_string
+(      WRITE \(1, *\) 'ELAPSED CPU TIME IN SECONDS: ', CPU2-CPU1           0628) 4082 418 draw_string
+(C MFLOPS RATE = MFLOP 1 CPU CRAY X-MP/CPU TIME                          ) 4082 403 draw_string
+(      WRITE \(1, *\) 'MFLOPS RATE: ', 1657.863/\(CPU2-CPU1\)                0629) 4082 388 draw_string
+(      WRITE \(1, *\) 'ELAPSED WALLCLOCK TIME IN SECONDS: ', TWALL         0630) 4082 373 draw_string
+(      WRITE \(1, 9992\)                                                   0631) 4082 358 draw_string
+(      WRITE \(1, 9995\) \(CDAT\(I\), I = 1, 15\)                              0632) 4082 343 draw_string
+(      VALID = 1                                                         0633) 4082 328 draw_string
+(      DO 7 I = 1, 15                                                    0634) 4082 313 draw_string
+(         IF \(I.EQ.3.OR.I.EQ.13\) THEN                                    0635) 4082 298 draw_string
+(            IF \(ABS\(CDAT\(I\)\).GT.ABS\(VDAT\(I\)\)\) VALID = 0                 0636) 4082 283 draw_string
+(         ELSEIF \(ABS\(VDAT\(I\)-CDAT\(I\)\).GT.ABS\(.01*VDAT\(I\)\)\) THEN         0635) 4082 268 draw_string
+(            VALID = 0                                                   0639) 4082 253 draw_string
+(         ENDIF) 4082 238 draw_string
+(7        CONTINUE                                                       0640) 4082 223 draw_string
+(C                                                                       ) 4082 208 draw_string
+(      IF \(VALID.EQ.1\) THEN                                              0641) 4082 193 draw_string
+(         WRITE \(1, 9993\)                                                0642) 4082 178 draw_string
+(      ELSE) 4082 163 draw_string
+(         WRITE \(1, 9994\)                                                0643) 4082 148 draw_string
+(      ENDIF) 4082 133 draw_string
+(C                                                                       ) 4082 118 draw_string
+(9992  FORMAT\(/1X,'VALIDATION PARAMETERS:'/\)                             0644) 4082 103 draw_string
+(9993  FORMAT\(//1X,'RESULTS FOR THIS RUN ARE:   VALID'\)                  0645) 4082 88 draw_string
+(9994  FORMAT\(//1X,'RESULTS FOR THIS RUN ARE: INVALID'\)                  0646) 4082 73 draw_string
+(9995  FORMAT\(5E15.5\)                                                    0647) 4082 58 draw_string
+(      STOP                                                              0648) 4082 43 draw_string
+(      END) 4082 28 draw_string
+
+font_courier_bold
+ 0.90 0.90 0.90 setrgbcolor  4341 1120 14 7 fill_ellipse
+black 4341 1120 14 7 draw_ellipse
+
+font_helvetica_bold_italic
+ 0.68 0.85 1.00 setrgbcolor  4328 1222 41 27 fill_rectangle
+black (ELSE) 4348 1204 draw_centered_string
+gsave 1 setlinewidth
+ 1.00 0.00 0.00 setrgbcolor  4408 1222 4395 1229 4403 1235 draw_arrow 4285 1358 4399 1232 draw_line
+1 setlinewidth grestore
+
+font_courier_bold
+ 0.00 1.00 1.00 setrgbcolor  3878 1647 606 350 fill_rhombus
+black 3878 1647 606 350 draw_rhombus
+(      IF \(NUMBER.GE.NSTEPS\) THEN                                        0613) 3915 1476 draw_string
+(      ENDIF) 3915 1461 draw_string
+
+font_courier_bold
+ 0.68 1.00 0.85 setrgbcolor  20 9043 8656 7316 fill_ellipse
+black 20 9043 8656 7316 draw_ellipse
+(150   IF \(MOD\(NSTEPS, KTF\).EQ.1.AND.NOTEMP.NE.1\) CALL TEMPFO\(CA, N2P    0193) 4082 8974 draw_string
+(     &, N1H, CWORK\)                                                     0193) 4082 8959 draw_string
+(      IF \(MOD\(NSTEPS, KPF\).EQ.1\) CALL PSIFOU\(CA, N2P, N1H, CWORK\)       0195) 4082 8944 draw_string
+(      IF \(MOD\(NSTEPS, KZF\).EQ.1\) CALL ZETAFO\(CA, N2P, N1H, CWORK\)       0197) 4082 8929 draw_string
+(      IF \(MOD\(NSTEPS, KVF\).EQ.1\) CALL VVELFO\(CA, N2P, N1H, FX, CWORK\)   0199) 4082 8914 draw_string
+(      IF \(MOD\(NSTEPS+1, KTA\).NE.1\) THEN                                 0201) 4082 8899 draw_string
+(      ELSE) 4082 8884 draw_string
+(C                                                                       ) 4082 8869 draw_string
+(C TIME AVERAGE VORTICITY:                                               ) 4082 8854 draw_string
+(C                                                                       ) 4082 8839 draw_string
+(         DTT = DT                                                       0203) 4082 8824 draw_string
+(         T = T-0.5*DT                                                   0204) 4082 8809 draw_string
+(         CALL IN\(A, LZO, NW\)                                            0205) 4082 8794 draw_string
+(         NPTS = 2*N2                                                    0206) 4082 8779 draw_string
+(         NSKIP = 1                                                      0207) 4082 8764 draw_string
+(         MTRN = N1H                                                     0208) 4082 8749 draw_string
+(         MSKIP = N2P                                                    0209) 4082 8734 draw_string
+(         ISIGN = -1                                                     0210) 4082 8719 draw_string
+(         IEXSHF = NMAX2/NPTS                                            0211) 4082 8704 draw_string
+(         CALL XLOG2\(NPTS, LOG\)                                          0212) 4082 8689 draw_string
+(         CALL ACAC\(A, EX, WORK\)                                         0213) 4082 8674 draw_string
+(         F = 0.125/REAL\(N2\)                                             0214) 4082 8659 draw_string
+(         DO 160 J = 1, N1H                                              0215) 4082 8644 draw_string
+(            DO 160 I = 1, N2PD                                          0216) 4082 8629 draw_string
+(160            A\(I,J\) = A\(I,J\)*F                                        0217) 4082 8614 draw_string
+(         CALL OUT\(A, LZO, NW\)                                           0218) 4082 8599 draw_string
+(         ISIGN = 1                                                      0219) 4082 8584 draw_string
+(         MTRN = N1Q                                                     0220) 4082 8569 draw_string
+(         KZN = LZN                                                      0221) 4082 8554 draw_string
+(         KZO = LZO                                                      0222) 4082 8539 draw_string
+(         DO 180 K = 1, 2                                                0223) 4082 8524 draw_string
+(            CALL IN\(A, KZO, NWH\)                                        0224) 4082 8509 draw_string
+(            CALL IN\(A\(1,K2Q\), KZN, NWH\)                                 0225) 4082 8494 draw_string
+(            DO 170 J = 1, N1Q                                           0226) 4082 8479 draw_string
+(               K2QJ = J+K2QM                                            0227) 4082 8464 draw_string
+(               DO 170 I = 1, N2PD                                       0228) 4082 8449 draw_string
+(170               A\(I,J\) = A\(I,J\)+0.5*A\(I,K2QJ\)                         0229) 4082 8434 draw_string
+(            CALL OUT\(A, KZN, NWH\)                                       0230) 4082 8419 draw_string
+(            CALL ACAC\(A, EX, WORK\)                                      0231) 4082 8404 draw_string
+(            DO 175 J = 1, N1Q                                           0232) 4082 8389 draw_string
+(               DO 175 I = 1, N2PD                                       0233) 4082 8374 draw_string
+(175               A\(I,J\) = 0.5*A\(I,J\)                                   0234) 4082 8359 draw_string
+(            CALL OUT\(A, KZO, NWH\)                                       0235) 4082 8344 draw_string
+(            KZO = KZO+NWH                                               0236) 4082 8329 draw_string
+(180         KZN = KZN+NWH                                               0237) 4082 8314 draw_string
+(         IF \(NOTEMP.EQ.1\) THEN                                          0238) 4082 8299 draw_string
+(         ELSE) 4082 8284 draw_string
+(C                                                                       ) 4082 8269 draw_string
+(C TIME AVERAGE TEMPERATURE:                                             ) 4082 8254 draw_string
+(C                                                                       ) 4082 8239 draw_string
+(            ISIGN = -1                                                  0240) 4082 8224 draw_string
+(            MTRN = N1H                                                  0241) 4082 8209 draw_string
+(            CALL IN\(A, LTO, NW\)                                         0242) 4082 8194 draw_string
+(            CALL ACAC\(A, EX, WORK\)                                      0243) 4082 8179 draw_string
+(            F = 0.125/REAL\(N2\)                                          0244) 4082 8164 draw_string
+(            DO 190 J = 1, N1H                                           0245) 4082 8149 draw_string
+(               DO 190 I = 1, N2PD                                       0246) 4082 8134 draw_string
+(190               A\(I,J\) = F*A\(I,J\)                                     0247) 4082 8119 draw_string
+(            CALL OUT\(A, LTO, NW\)                                        0248) 4082 8104 draw_string
+(            ISIGN = 1                                                   0249) 4082 8089 draw_string
+(            MTRN = N1Q                                                  0250) 4082 8074 draw_string
+(            KTO = LTO                                                   0251) 4082 8059 draw_string
+(            KTN = LTN                                                   0252) 4082 8044 draw_string
+(            DO 210 K = 1, 2                                             0253) 4082 8029 draw_string
+(               CALL IN\(A, KTO, NWH\)                                     0254) 4082 8014 draw_string
+(               CALL IN\(A\(1,K2Q\), KTN, NWH\)                              0255) 4082 7999 draw_string
+(               DO 200 J = 1, N1Q                                        0256) 4082 7984 draw_string
+(                  K2QJ = J+K2QM                                         0257) 4082 7969 draw_string
+(                  DO 200 I = 1, N2PD                                    0258) 4082 7954 draw_string
+(200                  A\(I,J\) = A\(I,J\)+0.5*A\(I,K2QJ\)                      0259) 4082 7939 draw_string
+(               CALL OUT\(A, KTN, NWH\)                                    0260) 4082 7924 draw_string
+(               CALL ACAC\(A, EX, WORK\)                                   0261) 4082 7909 draw_string
+(               DO 205 J = 1, N1Q                                        0262) 4082 7894 draw_string
+(                  DO 205 I = 1, N2PD                                    0263) 4082 7879 draw_string
+(205                  A\(I,J\) = 0.5*A\(I,J\)                                0264) 4082 7864 draw_string
+(               CALL OUT\(A, KTO, NWH\)                                    0265) 4082 7849 draw_string
+(               KTO = KTO+NWH                                            0266) 4082 7834 draw_string
+(210            KTN = KTN+NWH                                            0267) 4082 7819 draw_string
+(         ENDIF) 4082 7804 draw_string
+(      ENDIF) 4082 7789 draw_string
+(C                                                                       ) 4082 7774 draw_string
+(C THE BEGINING OF A NORMAL TIME STEP                                    ) 4082 7759 draw_string
+(C \(U IS X VELOCITY AND V IS Y VELOCITY\)                                 ) 4082 7744 draw_string
+(C FIND \(-U\) = D\(PSI\)/DY                                                 ) 4082 7729 draw_string
+(C                                                                       ) 4082 7714 draw_string
+(211   CONTINUE                                                          0268) 4082 7699 draw_string
+(C                                                                       ) 4082 7684 draw_string
+(      IF \(NSTEPS.LT.3\) THEN                                             0269) 4082 7669 draw_string
+(         CALL IN\(CA, LPN, NW\)                                           0270) 4082 7654 draw_string
+(         CALL PSIPHY\(CA, N2P, N1H, EX, G, U, WORK, CWORK3, 1\)           0271) 4082 7639 draw_string
+(      ELSE) 4082 7624 draw_string
+(         CALL IN\(CA, LPN, NW\)                                           0272) 4082 7609 draw_string
+(         IF \(MOD\(NSTEPS, KPP\).EQ.1\) CALL PSIPHY\(CA, N2P, N1H, EX, G,    0273) 4082 7594 draw_string
+(     &   U, WORK, CWORK3, -1\)                                           0273) 4082 7579 draw_string
+(      ENDIF) 4082 7564 draw_string
+(C                                                                       ) 4082 7549 draw_string
+(      NPTS = 2*N2                                                       0275) 4082 7534 draw_string
+(      NSKIP = 1                                                         0276) 4082 7519 draw_string
+(      MTRN = N1H                                                        0277) 4082 7504 draw_string
+(      MSKIP = N2P                                                       0278) 4082 7489 draw_string
+(      ISIGN = 1                                                         0279) 4082 7474 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0280) 4082 7459 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0281) 4082 7444 draw_string
+(      CALL IN\(CA, LPN, NW\)                                              0282) 4082 7429 draw_string
+(      F = 0.                                                            0283) 4082 7414 draw_string
+(      DO 230 I = 1, N2                                                  0284) 4082 7399 draw_string
+(         DO 220 J = 1, N1H                                              0285) 4082 7384 draw_string
+(220         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0286) 4082 7369 draw_string
+(230      F = F+1.                                                       0287) 4082 7354 draw_string
+(      DO 235 J = 1, N1H                                                 0288) 4082 7339 draw_string
+(235      CA\(N2P,J\) = 0.                                                 0289) 4082 7324 draw_string
+(      CALL SCSC\(CA, EX, WORK\)                                           0290) 4082 7309 draw_string
+(      CALL OUT\(CA, LPY, NW\)                                             0291) 4082 7294 draw_string
+(      IF \(KSM.EQ.1\) CALL MEAN\(CA, U, G\)                                 0292) 4082 7279 draw_string
+(      IF \(MOD\(NSTEPS, KUF\).EQ.1\) CALL UVELFO\(CA, N2P, N1H, G, EX,       0294) 4082 7264 draw_string
+(     &CWORK\)                                                            0294) 4082 7249 draw_string
+(      CALL IN\(CA, LPN, NW\)                                              0296) 4082 7234 draw_string
+(C                                                                       ) 4082 7219 draw_string
+(C FIND  V = D\(PSI\)/DX                                                   ) 4082 7204 draw_string
+(C                                                                       ) 4082 7189 draw_string
+(      F = 0.                                                            0297) 4082 7174 draw_string
+(      DO 250 J = 1, N1H                                                 0298) 4082 7159 draw_string
+(         DO 240 I = 1, N2P                                              0299) 4082 7144 draw_string
+(240         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0300) 4082 7129 draw_string
+(250      F = F+FX                                                       0301) 4082 7114 draw_string
+(      CALL ACAC\(CA, EX, WORK\)                                           0302) 4082 7099 draw_string
+(      CALL OUT\(CA, LPN, NW\)                                             0303) 4082 7084 draw_string
+(      IF \(MOD\(NSTEPS, KPP\).EQ.1.AND.NOTEMP.NE.1\) CALL IN\(CA, LPN, NW\)   0304) 4082 7069 draw_string
+(      NPTS = 2*N2                                                       0306) 4082 7054 draw_string
+(      NSKIP = 1                                                         0307) 4082 7039 draw_string
+(      MTRN = N1H                                                        0308) 4082 7024 draw_string
+(      MSKIP = N2P                                                       0309) 4082 7009 draw_string
+(      ISIGN = 1                                                         0310) 4082 6994 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0311) 4082 6979 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0312) 4082 6964 draw_string
+(      IF \(NOTEMP.EQ.1\) THEN                                             0313) 4082 6949 draw_string
+(      ELSE) 4082 6934 draw_string
+(C                                                                       ) 4082 6919 draw_string
+(C T\(TOTAL\) = T-BETA*Y                                                   ) 4082 6904 draw_string
+(C WHERE BETA < 0 MEANS   STABLE STRATIFICATION AND                      ) 4082 6889 draw_string
+(C       BETA > 0 MEANS UNSTABLE STRATIFICATION                          ) 4082 6874 draw_string
+(C                                                                       ) 4082 6859 draw_string
+(         KTO = LTO                                                      0315) 4082 6844 draw_string
+(         DTB = 0.5*BETA*DTT                                             0316) 4082 6829 draw_string
+(         DO 270 J = 1, N1H                                              0317) 4082 6814 draw_string
+(            CALL IN\(CWORK, KTO, N2PD\)                                   0318) 4082 6799 draw_string
+(            F = -REAL\(J-1\)*FX*DTT*0.25                                  0319) 4082 6784 draw_string
+(            DO 260 I = 1, N2P                                           0320) 4082 6769 draw_string
+(260            CWORK\(I\) = CWORK\(I\)*CMPLX\(1., U\(I\)*F\)+DTB*CA\(I,J\)        0321) 4082 6754 draw_string
+(            CALL OUT\(CWORK, KTO, N2PD\)                                  0322) 4082 6739 draw_string
+(270         KTO = KTO+N2PD                                              0323) 4082 6724 draw_string
+(      ENDIF) 4082 6709 draw_string
+(271   CALL IN\(CA, LZN, NW\)                                              0324) 4082 6694 draw_string
+(C                                                                       ) 4082 6679 draw_string
+(C FIND DZ/DY:                                                           ) 4082 6664 draw_string
+(C                                                                       ) 4082 6649 draw_string
+(      F = 0.                                                            0325) 4082 6634 draw_string
+(      DO 290 I = 1, N2                                                  0326) 4082 6619 draw_string
+(         DO 280 J = 1, N1H                                              0327) 4082 6604 draw_string
+(280         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0328) 4082 6589 draw_string
+(290      F = F+1.                                                       0329) 4082 6574 draw_string
+(      DO 295 J = 1, N1H                                                 0330) 4082 6559 draw_string
+(295      CA\(N2P,J\) = 0.                                                 0331) 4082 6544 draw_string
+(      CALL SCSC\(CA, EX, WORK\)                                           0332) 4082 6529 draw_string
+(      CALL OUT\(CA, LZY, NW\)                                             0333) 4082 6514 draw_string
+(      CALL IN\(CA, LZN, NW\)                                              0334) 4082 6499 draw_string
+(      CALL ACAC\(CA, EX, WORK\)                                           0335) 4082 6484 draw_string
+(      DO 300 J = 1, N1H                                                 0336) 4082 6469 draw_string
+(         DO 300 I = 1, N2P                                              0337) 4082 6454 draw_string
+(300         CA\(I,J\) = CA\(I,J\)*0.5                                       0338) 4082 6439 draw_string
+(      CALL OUT\(CA, LZN, NW\)                                             0339) 4082 6424 draw_string
+(      NPTS = N1                                                         0340) 4082 6409 draw_string
+(      NSKIP = N2P                                                       0341) 4082 6394 draw_string
+(      MTRN = N2P                                                        0342) 4082 6379 draw_string
+(      MSKIP = 1                                                         0343) 4082 6364 draw_string
+(      ISIGN = 1                                                         0344) 4082 6349 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0345) 4082 6334 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0346) 4082 6319 draw_string
+(      IF \(MOD\(NSTEPS, KZP\).EQ.1\) CALL ZETAPH\(CA, N2PD, N1H, EX, WORK    0347) 4082 6304 draw_string
+(     &, -1\)                                                             0347) 4082 6289 draw_string
+(      IF \(MOD\(NSTEPS, KZP\).EQ.1\) CALL IN\(CA, LZN, NW\)                   0349) 4082 6274 draw_string
+(C                                                                       ) 4082 6259 draw_string
+(C FIND DZ/DX:                                                           ) 4082 6244 draw_string
+(C                                                                       ) 4082 6229 draw_string
+(      F = 0.                                                            0351) 4082 6214 draw_string
+(      DO 320 J = 1, N1H                                                 0352) 4082 6199 draw_string
+(         DO 310 I = 1, N2P                                              0353) 4082 6184 draw_string
+(310         CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)         0354) 4082 6169 draw_string
+(320      F = F+FX2                                                      0355) 4082 6154 draw_string
+(      CALL CSR\(CA, EX\)                                                  0356) 4082 6139 draw_string
+(      CALL OUT\(CA, LZX, NW\)                                             0357) 4082 6124 draw_string
+(      CALL IN\(CA, LZY, NW\)                                              0358) 4082 6109 draw_string
+(      CALL CSR\(CA, EX\)                                                  0359) 4082 6094 draw_string
+(      CALL OUT\(CA, LZY, NW\)                                             0360) 4082 6079 draw_string
+(      CALL IN\(CA, LPN, NW\)                                              0361) 4082 6064 draw_string
+(      CALL CSR\(CA, EX\)                                                  0362) 4082 6049 draw_string
+(      CALL OUT\(CA, LPN, NW\)                                             0363) 4082 6034 draw_string
+(      CALL IN\(CA, LPY, NW\)                                              0364) 4082 6019 draw_string
+(      CALL CSR\(CA, EX\)                                                  0365) 4082 6004 draw_string
+(      CALL OUT\(CA, LPY, NW\)                                             0366) 4082 5989 draw_string
+(C                                                                       ) 4082 5974 draw_string
+(C WE ARE IN PHYSICAL SPACE NOW - FIND  \(U,V\).GRAD \(Z\):                  ) 4082 5959 draw_string
+(C                                                                       ) 4082 5944 draw_string
+(      IF \(MOD\(NSTEPS, KUP\).EQ.1\) CALL UVELPH\(A, N2PD, N1H, WORK, -1\)    0367) 4082 5929 draw_string
+(      IF \(MOD\(NSTEPS, KVP\).EQ.1\) CALL VVELPH\(A, N2PD, N1H, WORK, -1\)    0369) 4082 5914 draw_string
+(      KPY = LPY                                                         0371) 4082 5899 draw_string
+(      KPN = LPN                                                         0372) 4082 5884 draw_string
+(      KZY = LZY                                                         0373) 4082 5869 draw_string
+(      KZX = LZX                                                         0374) 4082 5854 draw_string
+(      UKSM1F = REAL\(2-KSM\)                                              0375) 4082 5839 draw_string
+(      DO 340 K = 1, 4                                                   0376) 4082 5824 draw_string
+(         CALL IN\(A, KPY, NWQ\)                                           0377) 4082 5809 draw_string
+(         CALL IN\(A\(1,K1Q\), KPN, NWQ\)                                    0378) 4082 5794 draw_string
+(         CALL IN\(A\(1,K2Q\), KZY, NWQ\)                                    0379) 4082 5779 draw_string
+(         CALL IN\(A\(1,K3Q\), KZX, NWQ\)                                    0380) 4082 5764 draw_string
+(         DO 330 I = 1, N2PD                                             0381) 4082 5749 draw_string
+(            IPH = \(I+1\)/2                                               0382) 4082 5734 draw_string
+(            GG = G\(IPH\)                                                 0383) 4082 5719 draw_string
+(            UU = U\(IPH\)*UKSM1F                                          0384) 4082 5704 draw_string
+(            DO 330 J = 1, N1E                                           0385) 4082 5689 draw_string
+(               A\(I,J\) = A\(I,J\)*GG+UU                                    0386) 4082 5674 draw_string
+(               A\(I,K2QM+J\) = A\(I,J\)*A\(I,K3QM+J\)-A\(I,K1QM+J\)*A\(I,K2QM+   0387) 4082 5659 draw_string
+(     &         J\)*GG                                                    0387) 4082 5644 draw_string
+(330            CONTINUE                                                 0388) 4082 5629 draw_string
+(         CALL OUT\(A, KPY, NWQ\)                                          0389) 4082 5614 draw_string
+(         CALL OUT\(A\(1,K2Q\), KZY, NWQ\)                                   0390) 4082 5599 draw_string
+(         KPN = KPN+NWQ                                                  0391) 4082 5584 draw_string
+(         KPY = KPY+NWQ                                                  0392) 4082 5569 draw_string
+(         KZX = KZX+NWQ                                                  0393) 4082 5554 draw_string
+(340      KZY = KZY+NWQ                                                  0394) 4082 5539 draw_string
+(C                                                                       ) 4082 5524 draw_string
+(C [Z\(OLD\) + \(MEAN -U\) * \(-DZ\(OLD\)/DX\)] + \(U,V\).GRAD\(Z\)                  ) 4082 5509 draw_string
+(C                                                                       ) 4082 5494 draw_string
+(      ISIGN = -1                                                        0395) 4082 5479 draw_string
+(      CALL IN\(A, LZY, NW\)                                               0396) 4082 5464 draw_string
+(      CALL RCS\(A, EX\)                                                   0397) 4082 5449 draw_string
+(      CALL OUT\(A, LZY, NW\)                                              0398) 4082 5434 draw_string
+(      KZO = LZO                                                         0399) 4082 5419 draw_string
+(      KZN = LZN                                                         0400) 4082 5404 draw_string
+(      KZY = LZY                                                         0401) 4082 5389 draw_string
+(      DTFAC = 0.125*DTT/REAL\(N1\)                                        0402) 4082 5374 draw_string
+(      F1 = DTT*FX*0.25                                                  0403) 4082 5359 draw_string
+(      F = F1                                                            0404) 4082 5344 draw_string
+(      DO 360 K = 1, 2                                                   0405) 4082 5329 draw_string
+(         CALL IN\(CA, KZO, NWH\)                                          0406) 4082 5314 draw_string
+(         CALL IN\(CA\(1,K2Q\), KZN, NWH\)                                   0407) 4082 5299 draw_string
+(         CALL OUT\(CA\(1,K2Q\), KZO, NWH\)                                  0408) 4082 5284 draw_string
+(         CALL IN\(CA\(1,K2Q\), KZY, NWH\)                                   0409) 4082 5269 draw_string
+(         DO 350 J = 1, N1Q                                              0410) 4082 5254 draw_string
+(            K2QJ = J+K2QM                                               0411) 4082 5239 draw_string
+(            F = F-F1                                                    0412) 4082 5224 draw_string
+(            DO 350 I = 1, N2P                                           0413) 4082 5209 draw_string
+(350            CA\(I,J\) = CA\(I,J\)*CMPLX\(1., F*U\(I\)\)+DTFAC*CA\(I,K2QJ\)     0414) 4082 5194 draw_string
+(         CALL OUT\(CA, KZN, NWH\)                                         0415) 4082 5179 draw_string
+(         KZN = KZN+NWH                                                  0416) 4082 5164 draw_string
+(         KZO = KZO+NWH                                                  0417) 4082 5149 draw_string
+(360      KZY = KZY+NWH                                                  0418) 4082 5134 draw_string
+(      IF \(NOTEMP.EQ.1\) THEN                                             0419) 4082 5119 draw_string
+(      ELSE) 4082 5104 draw_string
+(C                                                                       ) 4082 5089 draw_string
+(C FIND DT/DY:                                                           ) 4082 5074 draw_string
+(C                                                                       ) 4082 5059 draw_string
+(         NPTS = 2*N2                                                    0421) 4082 5044 draw_string
+(         NSKIP = 1                                                      0422) 4082 5029 draw_string
+(         MTRN = N1H                                                     0423) 4082 5014 draw_string
+(         MSKIP = N2P                                                    0424) 4082 4999 draw_string
+(         ISIGN = 1                                                      0425) 4082 4984 draw_string
+(         CALL XLOG2\(NPTS, LOG\)                                          0426) 4082 4969 draw_string
+(         IEXSHF = NMAX2/NPTS                                            0427) 4082 4954 draw_string
+(         CALL IN\(CA, LTN, NW\)                                           0428) 4082 4939 draw_string
+(         F = 0.                                                         0429) 4082 4924 draw_string
+(         DO 380 I = 1, N2                                               0430) 4082 4909 draw_string
+(            DO 370 J = 1, N1H                                           0431) 4082 4894 draw_string
+(370            CA\(I,J\) = CMPLX\(-F*AIMAG\(CA\(I,J\)\), F*REAL\(CA\(I,J\)\)\)      0432) 4082 4879 draw_string
+(380         F = F+1.                                                    0433) 4082 4864 draw_string
+(         DO 385 J = 1, N1H                                              0434) 4082 4849 draw_string
+(385         CA\(N2P,J\) = 0.                                              0435) 4082 4834 draw_string
+(         CALL SCSC\(CA, EX, WORK\)                                        0436) 4082 4819 draw_string
+(         CALL OUT\(CA, LZY, NW\)                                          0437) 4082 4804 draw_string
+(         CALL IN\(CA, LTN, NW\)                                           0438) 4082 4789 draw_string
+(         CALL ACAC\(CA, EX, WORK\)                                        0439) 4082 4774 draw_string
+(         CALL OUT\(CA, LTN, NW\)                                          0440) 4082 4759 draw_string
+(         NPTS = N1                                                      0441) 4082 4744 draw_string
+(         NSKIP = N2P                                                    0442) 4082 4729 draw_string
+(         MTRN = N2P                                                     0443) 4082 4714 draw_string
+(         MSKIP = 1                                                      0444) 4082 4699 draw_string
+(         CALL XLOG2\(NPTS, LOG\)                                          0445) 4082 4684 draw_string
+(         IEXSHF = NMAX2/NPTS                                            0446) 4082 4669 draw_string
+(         IF \(NSTEPS.EQ.1\) THEN                                          0447) 4082 4654 draw_string
+(            CALL TEMPHY\(A, N2PD, N1H, EX, WORK, 0\)                      0448) 4082 4639 draw_string
+(         ELSEIF \(MOD\(NSTEPS, KTP\).EQ.1.OR.MOD\(NSTEPS, KPP\).EQ.1\) THEN   0447) 4082 4624 draw_string
+(            CALL TEMPHY\(A, N2PD, N1H, EX, WORK, -1\)                     0450) 4082 4609 draw_string
+(         ENDIF) 4082 4594 draw_string
+(C                                                                       ) 4082 4579 draw_string
+(C TEMPERATURE INFLUENCE:                                                ) 4082 4564 draw_string
+(C                                                                       ) 4082 4549 draw_string
+(         F = -FX                                                        0451) 4082 4534 draw_string
+(         KZN = LZN                                                      0452) 4082 4519 draw_string
+(         KZX = LZX                                                      0453) 4082 4504 draw_string
+(         KTN = LTN                                                      0454) 4082 4489 draw_string
+(         DTA = 0.5*ALPHA*DTT                                            0455) 4082 4474 draw_string
+(         DO 400 K = 1, 2                                                0456) 4082 4459 draw_string
+(            CALL IN\(CA, KZN, NWH\)                                       0457) 4082 4444 draw_string
+(            CALL IN\(CA\(1,K2Q\), KTN, NWH\)                                0458) 4082 4429 draw_string
+(            DO 390 J = 1, N1Q                                           0459) 4082 4414 draw_string
+(               K2QJ = J+K2QM                                            0460) 4082 4399 draw_string
+(               F = F+FX                                                 0461) 4082 4384 draw_string
+(               DO 390 I = 1, N2P                                        0462) 4082 4369 draw_string
+(                  CA\(I,K2QJ\) = CMPLX\(-F*AIMAG\(CA\(I,K2QJ\)\), F*REAL\(CA\(   0463) 4082 4354 draw_string
+(     &            I,K2QJ\)\)\)                                             0463) 4082 4339 draw_string
+(390               CA\(I,J\) = CA\(I,J\)+DTA*CA\(I,K2QJ\)                      0464) 4082 4324 draw_string
+(            CALL OUT\(CA, KZN, NWH\)                                      0465) 4082 4309 draw_string
+(            CALL OUT\(CA\(1,K2Q\), KZX, NWH\)                               0466) 4082 4294 draw_string
+(            KZX = KZX+NWH                                               0467) 4082 4279 draw_string
+(            KTN = KTN+NWH                                               0468) 4082 4264 draw_string
+(400         KZN = KZN+NWH                                               0469) 4082 4249 draw_string
+(         CALL IN\(A, LZX, NW\)                                            0470) 4082 4234 draw_string
+(         CALL CSR\(A, EX\)                                                0471) 4082 4219 draw_string
+(         CALL OUT\(A, LZX, NW\)                                           0472) 4082 4204 draw_string
+(         CALL IN\(A, LZY, NW\)                                            0473) 4082 4189 draw_string
+(         CALL CSR\(A, EX\)                                                0474) 4082 4174 draw_string
+(         CALL OUT\(A, LZY, NW\)                                           0475) 4082 4159 draw_string
+(         KPN = LPN                                                      0476) 4082 4144 draw_string
+(         KPY = LPY                                                      0477) 4082 4129 draw_string
+(         KZX = LZX                                                      0478) 4082 4114 draw_string
+(         KZY = LZY                                                      0479) 4082 4099 draw_string
+(C                                                                       ) 4082 4084 draw_string
+(C IN PHYSICAL SPACE - FIND  \(U,V\).GRAD\(T\):                              ) 4082 4069 draw_string
+(C                                                                       ) 4082 4054 draw_string
+(         DO 420 K = 1, 4                                                0480) 4082 4039 draw_string
+(            CALL IN\(A, KPY, NWQ\)                                        0481) 4082 4024 draw_string
+(            CALL IN\(A\(1,K1Q\), KPN, NWQ\)                                 0482) 4082 4009 draw_string
+(            CALL IN\(A\(1,K2Q\), KZY, NWQ\)                                 0483) 4082 3994 draw_string
+(            CALL IN\(A\(1,K3Q\), KZX, NWQ\)                                 0484) 4082 3979 draw_string
+(            DO 410 I = 1, N2PD                                          0485) 4082 3964 draw_string
+(               IPH = \(I+1\)/2                                            0486) 4082 3949 draw_string
+(               GG = G\(IPH\)                                              0487) 4082 3934 draw_string
+(               DO 410 J = 1, N1E                                        0488) 4082 3919 draw_string
+(                  A\(I,J\) = A\(I,J\)*A\(I,K3QM+J\)-A\(I,K1QM+J\)*A\(I,K2QM+J\)   0489) 4082 3904 draw_string
+(     &            *GG                                                   0489) 4082 3889 draw_string
+(410               CONTINUE                                              0490) 4082 3874 draw_string
+(            CALL OUT\(A, KZY, NWQ\)                                       0491) 4082 3859 draw_string
+(            KPN = KPN+NWQ                                               0492) 4082 3844 draw_string
+(            KPY = KPY+NWQ                                               0493) 4082 3829 draw_string
+(            KZX = KZX+NWQ                                               0494) 4082 3814 draw_string
+(420         KZY = KZY+NWQ                                               0495) 4082 3799 draw_string
+(         ISIGN = -1                                                     0496) 4082 3784 draw_string
+(         CALL IN\(A, LZY, NW\)                                            0497) 4082 3769 draw_string
+(         CALL RCS\(A, EX\)                                                0498) 4082 3754 draw_string
+(         CALL OUT\(A, LZY, NW\)                                           0499) 4082 3739 draw_string
+(         KTN = LTN                                                      0500) 4082 3724 draw_string
+(         KTO = LTO                                                      0501) 4082 3709 draw_string
+(         KZY = LZY                                                      0502) 4082 3694 draw_string
+(         DO 440 K = 1, 2                                                0503) 4082 3679 draw_string
+(            CALL IN\(CA, KTO, NWH\)                                       0504) 4082 3664 draw_string
+(            CALL IN\(A\(1,K2Q\), KTN, NWH\)                                 0505) 4082 3649 draw_string
+(            DO 425 J = K2Q, N1H                                         0506) 4082 3634 draw_string
+(               DO 425 I = 1, N2PD                                       0507) 4082 3619 draw_string
+(425               A\(I,J\) = 0.5*A\(I,J\)                                   0508) 4082 3604 draw_string
+(            CALL OUT\(A\(1,K2Q\), KTO, NWH\)                                0509) 4082 3589 draw_string
+(            CALL IN\(CA\(1,K2Q\), KZY, NWH\)                                0510) 4082 3574 draw_string
+(            DO 430 J = 1, N1Q                                           0511) 4082 3559 draw_string
+(               K2QJ = J+K2QM                                            0512) 4082 3544 draw_string
+(               DO 430 I = 1, N2P                                        0513) 4082 3529 draw_string
+(430               CA\(I,J\) = CA\(I,J\)+DTFAC*CA\(I,K2QJ\)                    0514) 4082 3514 draw_string
+(            CALL OUT\(CA, KTN, NWH\)                                      0515) 4082 3499 draw_string
+(            KTN = KTN+NWH                                               0516) 4082 3484 draw_string
+(            KTO = KTO+NWH                                               0517) 4082 3469 draw_string
+(440         KZY = KZY+NWH                                               0518) 4082 3454 draw_string
+(      ENDIF) 4082 3439 draw_string
+(441   DTF = 0.25*DTT*FX                                                 0519) 4082 3424 draw_string
+(      F = -DTF                                                          0520) 4082 3409 draw_string
+(      KZN = LZN                                                         0521) 4082 3394 draw_string
+(      KTN = LTN                                                         0522) 4082 3379 draw_string
+(      DO 460 K = 1, 2                                                   0523) 4082 3364 draw_string
+(         IF \(NOTEMP.NE.1\) CALL IN\(CA, KTN, NWH\)                         0524) 4082 3349 draw_string
+(         CALL IN\(CA\(1,K2Q\), KZN, NWH\)                                   0526) 4082 3334 draw_string
+(         DO 450 J = 1, N1Q                                              0527) 4082 3319 draw_string
+(            K2QJ = J+K2QM                                               0528) 4082 3304 draw_string
+(            F = F+DTF                                                   0529) 4082 3289 draw_string
+(            IF \(NOTEMP.EQ.1\) THEN                                       0530) 4082 3274 draw_string
+(            ELSE) 4082 3259 draw_string
+(               DO 448 I = 1, N2P                                        0532) 4082 3244 draw_string
+(                  WORK\(I\) = F*U\(I\)                                      0533) 4082 3229 draw_string
+(                  CA\(I,J\) = CMPLX\(1.0, -WORK\(I\)\)*CA\(I,J\)/\(1.0+WORK\(I\)   0534) 4082 3214 draw_string
+(     &            *WORK\(I\)\)                                             0534) 4082 3199 draw_string
+(448               CONTINUE                                              0535) 4082 3184 draw_string
+(            ENDIF) 4082 3169 draw_string
+(449         CONTINUE                                                    0536) 4082 3154 draw_string
+(            DO 450 I = 1, N2P                                           0537) 4082 3139 draw_string
+(               WORK\(I\) = F*U\(I\)                                         0538) 4082 3124 draw_string
+(               CA\(I,K2QJ\) = CMPLX\(1.0, -WORK\(I\)\)*CA\(I,K2QJ\)/\(1.0+WORK   0539) 4082 3109 draw_string
+(     &         \(I\)*WORK\(I\)\)                                             0539) 4082 3094 draw_string
+(450            CONTINUE                                                 0540) 4082 3079 draw_string
+(         IF \(NOTEMP.NE.1\) CALL OUT\(CA, KTN, NWH\)                        0541) 4082 3064 draw_string
+(         CALL OUT\(CA\(1,K2Q\), KZN, NWH\)                                  0543) 4082 3049 draw_string
+(         KTN = KTN+NWH                                                  0544) 4082 3034 draw_string
+(460      KZN = KZN+NWH                                                  0545) 4082 3019 draw_string
+(      NPTS = 2*N2                                                       0546) 4082 3004 draw_string
+(      NSKIP = 1                                                         0547) 4082 2989 draw_string
+(      MTRN = N1H                                                        0548) 4082 2974 draw_string
+(      MSKIP = N2P                                                       0549) 4082 2959 draw_string
+(      ISIGN = -1                                                        0550) 4082 2944 draw_string
+(      IEXSHF = NMAX2/NPTS                                               0551) 4082 2929 draw_string
+(      CALL XLOG2\(NPTS, LOG\)                                             0552) 4082 2914 draw_string
+(      CALL IN\(A, LZN, NW\)                                               0553) 4082 2899 draw_string
+(      CALL ACAC\(A, EX, WORK\)                                            0554) 4082 2884 draw_string
+(      CALL OUT\(A, LZN, NW\)                                              0555) 4082 2869 draw_string
+(      IF \(NOTEMP.EQ.1\) THEN                                             0556) 4082 2854 draw_string
+(      ELSE) 4082 2839 draw_string
+(         CALL IN\(A, LTN, NW\)                                            0558) 4082 2824 draw_string
+(         CALL ACAC\(A, EX, WORK\)                                         0559) 4082 2809 draw_string
+(         CALL OUT\(A, LTN, NW\)                                           0560) 4082 2794 draw_string
+(      ENDIF) 4082 2779 draw_string
+(461   KZN = LZN                                                         0561) 4082 2764 draw_string
+(      KPN = LPN                                                         0562) 4082 2749 draw_string
+(      F2 = 1./\(4.*REAL\(N2\)\)                                             0563) 4082 2734 draw_string
+(      F1 = RNU*DTT                                                      0564) 4082 2719 draw_string
+(C                                                                       ) 4082 2704 draw_string
+(C FIND PRESSURE NOW OR NEVER \(IF REQUIRED...\)                           ) 4082 2689 draw_string
+(C                                                                       ) 4082 2674 draw_string
+(      CALL IN\(EVAL, LEIG, NWEIG\)                                        0565) 4082 2659 draw_string
+(      LVECT = N2M                                                       0566) 4082 2644 draw_string
+(      LSKIP = 2                                                         0567) 4082 2629 draw_string
+(      NVECT = 2                                                         0568) 4082 2614 draw_string
+(      NVSKIP = 1                                                        0569) 4082 2599 draw_string
+(      FXSQ = FX*FX                                                      0570) 4082 2584 draw_string
+(C                                                                       ) 4082 2569 draw_string
+(C UPDATE VORTICITY AND FIND THE NEW STREAMFUNCTION:                     ) 4082 2554 draw_string
+(C                                                                       ) 4082 2539 draw_string
+(      DO 480 J = 1, N1H                                                 0571) 4082 2524 draw_string
+(         CALL IN\(CWORK, KZN, N2PD\)                                      0572) 4082 2509 draw_string
+(         F = REAL\(\(J-1\)*\(J-1\)\)*FXSQ                                     0573) 4082 2494 draw_string
+(         DO 470 I = 2, N2                                               0574) 4082 2479 draw_string
+(            CWORK\(I\) = CWORK\(I\)*F2/\(1.0-F1*\(EVAL\(I-1\)-F\)\)               0575) 4082 2464 draw_string
+(            CWORK2\(I\) = CWORK\(I\)/\(EVAL\(I-1\)-F\)                          0576) 4082 2449 draw_string
+(470         CONTINUE                                                    0577) 4082 2434 draw_string
+(         CWORK\(1\) = CWORK\(1\)*F2/\(1.0+F1*F\)                              0578) 4082 2419 draw_string
+(         CWORK2\(1\) = 0.0                                                0579) 4082 2404 draw_string
+(         IF \(F.NE.0.0\) CWORK2\(1\) = -CWORK\(1\)/F                          0580) 4082 2389 draw_string
+(         CWORK\(N2P\) = 0.0                                               0582) 4082 2374 draw_string
+(         CWORK2\(N2P\) = 0.0                                              0583) 4082 2359 draw_string
+(         CALL OUT\(CWORK, KZN, N2PD\)                                     0584) 4082 2344 draw_string
+(         CALL OUT\(CWORK2, KPN, N2PD\)                                    0585) 4082 2329 draw_string
+(         KPN = KPN+N2PD                                                 0586) 4082 2314 draw_string
+(480      KZN = KZN+N2PD                                                 0587) 4082 2299 draw_string
+(C                                                                       ) 4082 2284 draw_string
+(C DE-ALIASE UPDATED FIELDS IF REQUESTED:                                ) 4082 2269 draw_string
+(C                                                                       ) 4082 2254 draw_string
+(      IF \(NOALS.EQ.1\) CALL DEALSE\(CA, N2P, N1H, LZN\)                    0588) 4082 2239 draw_string
+(      IF \(NOALS.EQ.1\) CALL DEALSE\(CA, N2P, N1H, LPN\)                    0590) 4082 2224 draw_string
+(      IF \(NOTEMP.EQ.1\) THEN                                             0592) 4082 2209 draw_string
+(      ELSE) 4082 2194 draw_string
+(C                                                                       ) 4082 2179 draw_string
+(C UPDATE TEMPERATURE:                                                   ) 4082 2164 draw_string
+(C                                                                       ) 4082 2149 draw_string
+(         IF \(NOALS.EQ.1\) CALL IN\(EVAL, LEIG, NWEIG\)                     0594) 4082 2134 draw_string
+(         KTN = LTN                                                      0596) 4082 2119 draw_string
+(         F1 = RKAPA*DTT                                                 0597) 4082 2104 draw_string
+(         DO 500 J = 1, N1H                                              0598) 4082 2089 draw_string
+(            CALL IN\(CWORK, KTN, N2PD\)                                   0599) 4082 2074 draw_string
+(            F = REAL\(\(J-1\)*\(J-1\)\)*FXSQ                                  0600) 4082 2059 draw_string
+(            DO 490 I = 2, N2                                            0601) 4082 2044 draw_string
+(               CWORK\(I\) = CWORK\(I\)*F2/\(1.0-F1*\(EVAL\(I-1\)-F\)\)            0602) 4082 2029 draw_string
+(490            CONTINUE                                                 0603) 4082 2014 draw_string
+(            CWORK\(1\) = CWORK\(1\)*F2/\(1.0+F1*F\)                           0604) 4082 1999 draw_string
+(            CWORK\(N2P\) = 0.0                                            0605) 4082 1984 draw_string
+(            CALL OUT\(CWORK, KTN, N2PD\)                                  0606) 4082 1969 draw_string
+(500         KTN = KTN+N2PD                                              0607) 4082 1954 draw_string
+(C                                                                       ) 4082 1939 draw_string
+(C DE-ALIASE IF REQUESTED:                                               ) 4082 1924 draw_string
+(C                                                                       ) 4082 1909 draw_string
+(         IF \(NOALS.EQ.1\) CALL DEALSE\(CA, N2P, N1H, LTN\)                 0608) 4082 1894 draw_string
+(      ENDIF) 4082 1879 draw_string
+(C                                                                       ) 4082 1864 draw_string
+(C AT LAST, THE END OF THE TIME STEP:                                    ) 4082 1849 draw_string
+(C                                                                       ) 4082 1834 draw_string
+(501   DTT = DT+DT                                                       0610) 4082 1819 draw_string
+(      T = T+DT                                                          0611) 4082 1804 draw_string
+(      NSTEPS = NSTEPS+1                                                 0612) 4082 1789 draw_string
+
+font_courier_bold
+ 1.00 1.00 0.00 setrgbcolor  4077 16196 542 7073 fill_rectangle
+black 4077 16196 542 7073 draw_rectangle
+(C     1993 version - Modified by Beatrice Creusillet for PIPS -) 4082 16181 draw_string
+(C) 4082 16166 draw_string
+(C     MODIFICATIONS:) 4082 16151 draw_string
+(C) 4082 16136 draw_string
+(C     - CXxxxxx and CYyyyyy commentaries removed for clarity.) 4082 16121 draw_string
+(C     - CPUTIM and ELAPSE subroutines uncommented.) 4082 16106 draw_string
+(C     - BLOCK DATA moved in main procedure. ) 4082 16091 draw_string
+(C     - Macro definition LSTMOD\(MODEHI\) in module DEALSE replaced where) 4082 16076 draw_string
+(C       it is used.) 4082 16061 draw_string
+(C     - \(1.,0.\) replaced by CMPLX\(1.,0.\) wherever needed) 4082 16046 draw_string
+(C     - in RUNINF, computed GOTO's are replaced by block if's) 4082 16031 draw_string
+(C) 4082 16016 draw_string
+(C#) 4082 16001 draw_string
+(C#) 4082 15986 draw_string
+(C#      BLOCK DATA) 4082 15971 draw_string
+(C#      COMMON /TIMING/ TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC,TXACAC,TFTVMT, ) 4082 15956 draw_string
+(C#     1                TXSHUF,TUSHUF,TXPRNT,TXLOG2,                      ) 4082 15941 draw_string
+(C#     2                EXXRCS,EXXCSR,EXSCSC,EXACAC,EFTVMT,               ) 4082 15926 draw_string
+(C#     3                NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,NXACAC,NFTVMT, ) 4082 15911 draw_string
+(C#     4                NXSHUF,NUSHUF,NXPRNT,NXLOG2                       ) 4082 15896 draw_string
+(C#      COMMON /VERIFY/ VDAT\(15\),CDAT\(15\)                                 ) 4082 15881 draw_string
+(C#      COMMON /PI/ PI                                                    ) 4082 15866 draw_string
+(C#      COMMON /DEBUG/ NUMBER,TLAST                                       ) 4082 15851 draw_string
+(C#C                                                                       ) 4082 15836 draw_string
+(C#      DATA            TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC,TXACAC,TFTVMT  ) 4082 15821 draw_string
+(C#     1              /     0.,    0.,    0.,    0.,    0.,    0.,    0./ ) 4082 15806 draw_string
+(C#      DATA            TXSHUF,TUSHUF,TXPRNT,TXLOG2                       ) 4082 15791 draw_string
+(C#     1              /     0.,    0.,    0.,    0./                      ) 4082 15776 draw_string
+(C#      DATA            EXXRCS,EXXCSR,EXSCSC,EXACAC,EFTVMT                ) 4082 15761 draw_string
+(C#     1              /     0.,    0.,    0.,    0.,    0./               ) 4082 15746 draw_string
+(C#      DATA            NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,NXACAC,NFTVMT  ) 4082 15731 draw_string
+(C#     1              /     0 ,    0 ,    0 ,    0 ,    0 ,    0 ,    0 / ) 4082 15716 draw_string
+(C#      DATA            NXSHUF,NUSHUF,NXPRNT,NXLOG2                       ) 4082 15701 draw_string
+(C#     1              /     0 ,    0 ,    0 ,    0 /                      ) 4082 15686 draw_string
+(C#      DATA VDAT/                                                        ) 4082 15671 draw_string
+(C#     * 0.10000E+03,-0.10000E+03, 0.10000E-04,-0.10000E+03,-0.15708E+01, ) 4082 15656 draw_string
+(C#     * 0.99983E+02,-0.18147E+01,-0.20427E+01,-0.22452E+01,-0.24181E+01, ) 4082 15641 draw_string
+(C#     * 0.95976E+02,-0.95977E+02, 0.10000E-04,-0.95978E+02,-0.25589E+01/ ) 4082 15626 draw_string
+(C#C                                                                       ) 4082 15611 draw_string
+(C#C PI IS A USEFULL CONSTANT                                              ) 4082 15596 draw_string
+(C#C                                                                       ) 4082 15581 draw_string
+(C#      DATA  PI /3.141592653589793/                                      ) 4082 15566 draw_string
+(C#      DATA NUMBER /1/, TLAST /0.0/                                      ) 4082 15551 draw_string
+(C#      END                                                               ) 4082 15536 draw_string
+(C#) 4082 15521 draw_string
+(C#) 4082 15506 draw_string
+(C                                                                       ) 4082 15491 draw_string
+(C                                                                       ) 4082 15476 draw_string
+(C******NOTE: USE OF MACHINE-DEPENDENT CONSTANT: ZERO IN SUBROUTINE RUNIN) 4082 15461 draw_string
+(C                                                                       ) 4082 15446 draw_string
+(C            ZERO = 1.0E-200 \(MAY HAVE TO REPLACE WITH YOUR MACHINES    ) 4082 15431 draw_string
+(C                             RELATIVE PRECISION FOR REAL DATA TYPE\)    ) 4082 15416 draw_string
+(C                                                                       ) 4082 15401 draw_string
+(      PROGRAM OCEAN) 4082 15386 draw_string
+(C***********************************************************************) 4082 15371 draw_string
+(C                        OCEAN FORTRAN PROGRAMS                         ) 4082 15356 draw_string
+(C                        CREATION DATE: 3/22/81                         ) 4082 15341 draw_string
+(C***********************************************************************) 4082 15326 draw_string
+(C                                                                       ) 4082 15311 draw_string
+(C  D\(Z\)/DT + \(U,V\).GRAD\(Z\) = RNU*DELSQ\(Z\) + ALPHA*D\(TEMP\)/DX            ) 4082 15296 draw_string
+(C                                                                       ) 4082 15281 draw_string
+(C  D\(TEMP\)/DT + \(U,V\).GRAD\(TEMP\) = RKAPA*DELSQ\(TEMP\) + BETA*V           ) 4082 15266 draw_string
+(C                                                                       ) 4082 15251 draw_string
+(C                                                                       ) 4082 15236 draw_string
+(C                                                                       ) 4082 15221 draw_string
+(C THIS PROGRAM SIMULATES TWO-DIMENSIONAL FLUID FLOW ON A   \(N2+1\) * N1  ) 4082 15206 draw_string
+(C GRID. IT IS POSSIBLE TO SPECIFY NON-LINEAR DISTRIBUTION OF DATA POINTS) 4082 15191 draw_string
+(C THE Y-DIRECTION \(THE FIRST INDEX CORRESPONDS TO Y DIRECTION, SECOND TO) 4082 15176 draw_string
+(C X DIRECTION\). N1 AND N2 HAVE TO BE POWERS OF TWO GREATER OR EQUAL TO 8) 4082 15161 draw_string
+(C                                                                       ) 4082 15146 draw_string
+(C THE PROGRAM USES LARGE CORE MEMORY. IT REQUIRES 8*\(N2+1\)*N1+\(N2-1\)*\(N2) 4082 15131 draw_string
+(C WORDS OF IT. IF NOTEMP = 1 IT IS POSSIBLE TO SAVE 2*\(N2+1\)*N1 WORDS,  ) 4082 15116 draw_string
+(C IF LMAPP = 1 YOU SAVE ADDITIONAL \(N2-1\)*\(N2+1\) WORDS.                 ) 4082 15101 draw_string
+(C                                                                       ) 4082 15086 draw_string
+(C IF  LMAPP = 2 , LCM REQUIREMENTS ARE AT LEAST  3 * \(N2-1\) * \(N2-1\)    ) 4082 15071 draw_string
+(C MORE MEMORY COULD BE NEEDED IN THIS CASE BECAUSE OF EIGSET AND LCMRQR.) 4082 15056 draw_string
+(C                                                                       ) 4082 15041 draw_string
+(C                                                                       ) 4082 15026 draw_string
+(C FOR CDC7600 RUNS: DELETE ROUTINES LCMREQ, IN AND OUT FROM THE END OF  ) 4082 15011 draw_string
+(C                   THIS PACKAGE. ON CDC7600 THE LCM IS USED THROUGH    ) 4082 14996 draw_string
+(C                   THE ASSEMBLY ROUTINES.                              ) 4082 14981 draw_string
+(C                                                                       ) 4082 14966 draw_string
+(C                   LIBRARY.                                            ) 4082 14951 draw_string
+(C FOR CRAY-1 RUNS : DELETE ROUTINES SECOND, DATE, TIME, EXSET AND       ) 4082 14936 draw_string
+(C                   LOG2 FROM THE END OF THIS PACKAGE. THEY ARE         ) 4082 14921 draw_string
+(C                   OBTAINED AT LOAD TIME FROM CRAY LIBRARIES AND       ) 4082 14906 draw_string
+(C                   FFTLIB.                                             ) 4082 14891 draw_string
+(C                   ALSO, ADJUST THE SIZE OF PARAMETER LCMSIZ IN        ) 4082 14876 draw_string
+(C                   THE ROUTINE LCMREQ SO THAT THE COMMON IS LARGE      ) 4082 14861 draw_string
+(C                   ENOUGH TO EMULATE CDC7600 LCM REQUIRED FOR THE RUN. ) 4082 14846 draw_string
+(C                                                                       ) 4082 14831 draw_string
+(C THE FOLLOWING PARAMETERS DEFINE THE SIZE OF THE RUN:                  ) 4082 14816 draw_string
+(C                                                                       ) 4082 14801 draw_string
+(C                                                                       ) 4082 14786 draw_string
+(C PLEASE REFER TO THE DIMENSIONING AND EQUIVALENCING INSTRUCTIONS IN    ) 4082 14771 draw_string
+(C THE CASE YOUR COMPILER CANNOT HANDLE PARAMETER STATEMENTS...          ) 4082 14756 draw_string
+(C COMMON BLOCKS:                                                        ) 4082 14741 draw_string
+(C                                                                       ) 4082 14726 draw_string
+(C                                                                       ) 4082 14711 draw_string
+(C THE DIMENSION OF  GSOLV  HAS TO BE AT LEAST \(N2-1\)                    ) 4082 14696 draw_string
+(C                                                                       ) 4082 14681 draw_string
+(C                                                                       ) 4082 14666 draw_string
+(C THE DIMENSIONS OF  GMAPP  AND  G  HAVE TO BE AT LEAST \(N2+1\)          ) 4082 14651 draw_string
+(C                                                                       ) 4082 14636 draw_string
+(C                                                                       ) 4082 14621 draw_string
+(C                                                                       ) 4082 14606 draw_string
+(C COMPLEX ARRAYS HAVE TO BE DIMENSIONED EXACTLY AS THE FORMULAS SAY:    ) 4082 14591 draw_string
+(C            CA        \(N2+1\) X N1/2                                    ) 4082 14576 draw_string
+(C            CWORK     N2+1                                             ) 4082 14561 draw_string
+(C            CWORK2    N2+1                                             ) 4082 14546 draw_string
+(C            CWORK3    N2+1                                             ) 4082 14531 draw_string
+(C            EX        MAX\(2*N2, N1\)                                    ) 4082 14516 draw_string
+(C                                                                       ) 4082 14501 draw_string
+(C EX ARRAY MUST NOT BE THE FIRST ARRAY IN THE MEMORY.                   ) 4082 14486 draw_string
+(C                                                                       ) 4082 14471 draw_string
+(C                                                                       ) 4082 14456 draw_string
+(C REAL ARRAYS HAVE TO BE DIMENSIONED EXACTLY AS THE FORMULAS SAY:       ) 4082 14441 draw_string
+(C            A      2*\(N2+1\) X N1/2                                     ) 4082 14426 draw_string
+(C            E      \(N2-1\)   X \(N2-1\)                                   ) 4082 14411 draw_string
+(C            WORK   N2+1     X MAX\(6, 2*MIN\(64, N1/2\)\)   \(AT LEAST\)     ) 4082 14396 draw_string
+(C            EVAL   N2-1                                                ) 4082 14381 draw_string
+(C            IR     N2-1                                                ) 4082 14366 draw_string
+(C            IC     N2-1                                                ) 4082 14351 draw_string
+(C                                                                       ) 4082 14336 draw_string
+(C                                                                       ) 4082 14321 draw_string
+(C EQUIVALENCE STATEMENTS ARE SAVING MEMORY SPACE. THE FOLLOWING PATTERN ) 4082 14306 draw_string
+(C HAS TO BE FOLLOWED EXACTLY:                                           ) 4082 14291 draw_string
+(C                                                                       ) 4082 14276 draw_string
+(C     A-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+           ) 4082 14261 draw_string
+(C     CA+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+           ) 4082 14246 draw_string
+(C     EVAL+-+IR-+-+-IC+-+-+E+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+             ) 4082 14231 draw_string
+(C                                                                       ) 4082 14216 draw_string
+(C                                                                       ) 4082 14201 draw_string
+(C     WORK+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                 ) 4082 14186 draw_string
+(C     CWORK-+-+-+CWORK2-+-+-CWORK3+-+-+                                 ) 4082 14171 draw_string
+(C                                                                       ) 4082 14156 draw_string
+(C      EQUIVALENCE \(A,CA,EVAL\), \(A\(NY\),IR\), \(A\(NI\),IC\), A\(NEQ\),E\) - ORGI) 4082 14141 draw_string
+(C      EQUIVALENCE \(A,CA,EVAL\), \(EVAL\(NY\),IR\), \(EVAL\(NI\),IC\),           ) 4082 14126 draw_string
+(C     *             \(EVAL\(NEQ\),E\) - MACFARLANE'S FIX. BAD.              ) 4082 14111 draw_string
+(C POINTER'S FIX. ANSI REQUIRES THAT THE NUMBER OF SUBSCRIPTS MATCH      ) 4082 14096 draw_string
+(C THE NUMBER OF DIMENSIONS OF THE ARRAY. THAT WAS THE PROBLEM WITH      ) 4082 14081 draw_string
+(C THE ORGINAL STATEMENT. THE PROBLEM WITH MACFARLANE'S FIX IS THAT      ) 4082 14066 draw_string
+(C NY,NI,NEQ>NE \(THE DIMENSION OF EVAL\). HERE 3*NE+1-NA1 IS THE 3*NE+1TH ) 4082 14051 draw_string
+(C ELEMENT OF A AND 3*NE+1 = NEQ.                                        ) 4082 14036 draw_string
+(C) 4082 14021 draw_string
+(C     former BLOCK DATA                                     ) 4082 14006 draw_string
+(C                                                                       ) 4082 13991 draw_string
+(C) 4082 13976 draw_string
+(C                                                                       ) 4082 13961 draw_string
+(C PI IS A USEFULL CONSTANT                                              ) 4082 13946 draw_string
+(C                                                                       ) 4082 13931 draw_string
+(C) 4082 13916 draw_string
+(C) 4082 13901 draw_string
+(C                                                                       ) 4082 13886 draw_string
+(C NOW WE CAN START WITH THE PROGRAM...                                  ) 4082 13871 draw_string
+(C SUBROUTINE START TELLS OCEAN WHAT TO DO:                              ) 4082 13856 draw_string
+(C                                                                       ) 4082 13841 draw_string
+(      INTEGER*4 NX) 4082 13826 draw_string
+(      PARAMETER \(NX = 128\)) 4082 13811 draw_string
+(      INTEGER*4 NY) 4082 13796 draw_string
+(      PARAMETER \(NY = 128\)) 4082 13781 draw_string
+(      INTEGER*4 NA1) 4082 13766 draw_string
+(      PARAMETER \(NA1 = 2*\(NY+1\)\)) 4082 13751 draw_string
+(      INTEGER*4 NA2) 4082 13736 draw_string
+(      PARAMETER \(NA2 = NX/2\)) 4082 13721 draw_string
+(      INTEGER*4 NE) 4082 13706 draw_string
+(      PARAMETER \(NE = NY-1\)) 4082 13691 draw_string
+(      INTEGER*4 NW1) 4082 13676 draw_string
+(      PARAMETER \(NW1 = NY+1\)) 4082 13661 draw_string
+(      INTEGER*4 NW2) 4082 13646 draw_string
+(      PARAMETER \(NW2 = 128\)) 4082 13631 draw_string
+(      INTEGER*4 NEX) 4082 13616 draw_string
+(      PARAMETER \(NEX = 256\)) 4082 13601 draw_string
+(      INTEGER*4 NI) 4082 13586 draw_string
+(      PARAMETER \(NI = 2*NY-1\)) 4082 13571 draw_string
+(      INTEGER*4 NEQ) 4082 13556 draw_string
+(      PARAMETER \(NEQ = 3*NY-2\)) 4082 13541 draw_string
+(      INTEGER*4 NCW2) 4082 13526 draw_string
+(      PARAMETER \(NCW2 = 2*NW1+1\)) 4082 13511 draw_string
+(      INTEGER*4 NCW3) 4082 13496 draw_string
+(      PARAMETER \(NCW3 = 4*NW1+1\)) 4082 13481 draw_string
+(      INTEGER NPTS,NSKIP,MTRN,MSKIP,ISIGN,LOG,IEXSHF,LVECT,LSKIP,) 4082 13466 draw_string
+(     &NVECT,NVSKIP,NSTEPS,N1,N2,NUMBER,KDATA,LMAPP,NOTEMP,KTA,KTAPE,) 4082 13451 draw_string
+(     &KSM,KPP,KZP,KTP,KUP,KVP,KPF,KZF,KTF,KUF,KVF,KPRESS,NOALS,N1H,) 4082 13436 draw_string
+(     &N1Q,N1E,N2M,N2P,N2DP,N2DM,N2PD,NMAX2,LZN,LTN,LPN,LZO,LTO,LPY,) 4082 13421 draw_string
+(     &LZX,LZY,LEIG,LE,LH,LEV,NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,) 4082 13406 draw_string
+(     &NXACAC,NFTVMT,NXSHUF,NUSHUF,NXPRNT,NXLOG2,VALID,NW,NWH,NWQ,) 4082 13391 draw_string
+(     &NWEIG,K1Q,K2Q,K3Q,K1QM,K2QM,K3QM,LARGE,LPRESS,I,J,KZN,KZO,K,) 4082 13376 draw_string
+(     &K2QJ,KTO,KTN,KPY,KPN,KZY,KZX,IPH) 4082 13361 draw_string
+(      REAL*4 GSOLV\(1:127\),GMAPP\(1:129\),G\(1:129\),U\(1:129\),ALPHA,BETA,) 4082 13346 draw_string
+(     &BOXX,H,RNU,RKAPA,DT,DTT,T,PI,TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC) 4082 13331 draw_string
+(     &,TXACAC,TFTVMT,TXSHUF,TUSHUF,TXPRNT,TXLOG2,EXXRCS,EXXCSR,EXSCSC) 4082 13316 draw_string
+(     &,EXACAC,EFTVMT,A\(1:NA1,1:NA2\),E\(1:NE,1:NE\),WORK\(1:NW1*NW2\),EVAL) 4082 13301 draw_string
+(     &\(1:NE\),IR\(1:NE\),IC\(1:NE\),VDAT\(1:15\),CDAT\(1:15\),TLAST,CPU1,) 4082 13286 draw_string
+(     &TCLCK1,F,FZ,FZSQ,FX,FX2,DTB,UKSM1F,GG,UU,DTFAC,F1,DTA,DTF,F2,) 4082 13271 draw_string
+(     &FXSQ,CPU2,TCLCK2,TWALL) 4082 13256 draw_string
+(      COMPLEX CA\(1:NW1,1:NA2\),CWORK\(1:NW1\),CWORK2\(1:NW1\),CWORK3\(1:NW1) 4082 13241 draw_string
+(     &\),EX\(1:NEX\),CF) 4082 13226 draw_string
+(      COMMON /VERIFY/ VDAT,CDAT) 4082 13211 draw_string
+(      COMMON /TIMING/ TXXXIN,TXXOUT,TXXRCS,TXXCSR,TXSCSC,TXACAC,) 4082 13196 draw_string
+(     &TFTVMT,TXSHUF,TUSHUF,TXPRNT,TXLOG2,EXXRCS,EXXCSR,EXSCSC,EXACAC,) 4082 13181 draw_string
+(     &EFTVMT,NXXXIN,NXXOUT,NXXRCS,NXXCSR,NXSCSC,NXACAC,NFTVMT,NXSHUF,) 4082 13166 draw_string
+(     &NUSHUF,NXPRNT,NXLOG2) 4082 13151 draw_string
+(      COMMON /LADDR/ LZN,LTN,LPN,LZO,LTO,LPY,LZX,LZY,LEIG,LE,LH,LEV) 4082 13136 draw_string
+(      COMMON /EXSIZE/ NMAX2) 4082 13121 draw_string
+(      COMMON /NMBRS/ N1H,N1Q,N1E,N2M,N2P,N2DP,N2DM,N2PD) 4082 13106 draw_string
+(      COMMON /PI/ PI) 4082 13091 draw_string
+(      COMMON /OPTONS/ N1,N2,NUMBER,KDATA,LMAPP,NOTEMP,KTA,KTAPE,KSM,) 4082 13076 draw_string
+(     &KPP,KZP,KTP,KUP,KVP,KPF,KZF,KTF,KUF,KVF,KPRESS,NOALS) 4082 13061 draw_string
+(      COMMON /DATA/ ALPHA,BETA,BOXX,H,RNU,RKAPA,DT,DTT,T,NSTEPS) 4082 13046 draw_string
+(      COMMON /MFLOW/ U) 4082 13031 draw_string
+(      COMMON /MAPING/ GMAPP,G) 4082 13016 draw_string
+(      COMMON /SOLV/ LVECT,LSKIP,NVECT,NVSKIP,GSOLV) 4082 13001 draw_string
+(      COMMON /FT/ NPTS,NSKIP,MTRN,MSKIP,ISIGN,LOG,IEXSHF) 4082 12986 draw_string
+(      ) 4082 12971 draw_string
+(      EQUIVALENCE \(A,CA\), \(A,EVAL\), \(A\(128,1\),IR\), \(A\(255,1\),IC\), \(A\() 4082 12956 draw_string
+(     &124,2\),E\)) 4082 12941 draw_string
+(      EQUIVALENCE \(WORK,CWORK\), \(WORK\(259\),CWORK2\), \(WORK\(517\),CWORK3) 4082 12926 draw_string
+(     &\)) 4082 12911 draw_string
+(      CALL CPUTIM\(CPU1\)                                                 0001) 4082 12896 draw_string
+(      CALL ELAPSE\(TCLCK1\)                                               0002) 4082 12881 draw_string
+(      OPEN \(UNIT=1,FILE='OCV'\)                                          0003) 4082 12866 draw_string
+(      OPEN \(UNIT=6,FILE='OCO6'\)                                         0004) 4082 12851 draw_string
+(      WRITE \(1, 9991\)                                                   0005) 4082 12836 draw_string
+(9991  FORMAT\(1X,'OUTPUT FOR PERFECT CLUB BENCHMARK: OCEAN INSTRUMENTED V) 4082 12821 draw_string
+(     &ERSION'/1X,'$Revision: 1.A.1 $ $Author: psharma $'/\)              0006) 4082 12806 draw_string
+(      CALL START\(NX, NY\)                                                0007) 4082 12791 draw_string
+(C                                                                       ) 4082 12776 draw_string
+(C IF  LMAPP = 1 , H  \(THE SIZE OF THE BOX IN Y DIRECTION\)  SHOULD BE    ) 4082 12761 draw_string
+(C SPECIFIED IN THE MAIN PROGRAM.                                        ) 4082 12746 draw_string
+(C                                                                       ) 4082 12731 draw_string
+(      H = PI                                                            0008) 4082 12716 draw_string
+(C                                                                       ) 4082 12701 draw_string
+(C DEFINING CONSTANTS THAT WILL BE NEEDED:                               ) 4082 12686 draw_string
+(C                                                                       ) 4082 12671 draw_string
+(      N1H = N1/2                                                        0009) 4082 12656 draw_string
+(      N1Q = N1/4                                                        0010) 4082 12641 draw_string
+(      N1E = N1/8                                                        0011) 4082 12626 draw_string
+(      N2M = N2-1                                                        0012) 4082 12611 draw_string
+(      N2P = N2+1                                                        0013) 4082 12596 draw_string
+(      N2DP = 2*N2+1                                                     0014) 4082 12581 draw_string
+(      N2DM = 2*N2-1                                                     0015) 4082 12566 draw_string
+(      N2PD = 2*N2P                                                      0016) 4082 12551 draw_string
+(      NW = N2PD*N1H                                                     0017) 4082 12536 draw_string
+(      NWH = NW/2                                                        0018) 4082 12521 draw_string
+(      NWQ = NW/4                                                        0019) 4082 12506 draw_string
+(      NWEIG = N2M                                                       0020) 4082 12491 draw_string
+(      IF \(LMAPP.NE.1\) NWEIG = \(N2M+3\)*N2M                               0021) 4082 12476 draw_string
+(      NMAX2 = MAX\(2*N2, N1\)                                             0023) 4082 12461 draw_string
+(      K1Q = N1E+1                                                       0024) 4082 12446 draw_string
+(      K2Q = K1Q+N1E                                                     0025) 4082 12431 draw_string
+(      K3Q = K2Q+N1E                                                     0026) 4082 12416 draw_string
+(      K1QM = K1Q-1                                                      0027) 4082 12401 draw_string
+(      K2QM = K2Q-1                                                      0028) 4082 12386 draw_string
+(      K3QM = K3Q-1                                                      0029) 4082 12371 draw_string
+(C                                                                       ) 4082 12356 draw_string
+(C LCM ALLOCATION AND COMPUTATION OF ADDRESSES:                          ) 4082 12341 draw_string
+(C                                                                       ) 4082 12326 draw_string
+(      LARGE = 8*NW                                                      0030) 4082 12311 draw_string
+(      IF \(NOTEMP.EQ.1\) LARGE = 6*NW                                     0031) 4082 12296 draw_string
+(      IF \(LMAPP.NE.2\) THEN                                              0033) 4082 12281 draw_string
+(C                                                                       ) 4082 12266 draw_string
+(66       LARGE = LARGE+NWEIG                                            0039) 4082 12251 draw_string
+(      ELSE) 4082 12236 draw_string
+(C                                                                       ) 4082 12221 draw_string
+(         IF \(KPRESS.GT.1\) LARGE = MAX\(LARGE, 3*N2M*N2M\)+NWEIG+NWEIG     0035) 4082 12206 draw_string
+(         IF \(KPRESS.LE.1\) LARGE = MAX\(LARGE+NWEIG, 3*N2M*N2M\)           0037) 4082 12191 draw_string
+(      ENDIF) 4082 12176 draw_string
+(C                                                                       ) 4082 12161 draw_string
+(67    LZN = LCMREQ\(LARGE\)                                               0040) 4082 12146 draw_string
+(      LTN = LZN+NW                                                      0041) 4082 12131 draw_string
+(      IF \(NOTEMP.EQ.1\) LTN = LZN                                        0042) 4082 12116 draw_string
+(      LPN = LTN+NW                                                      0044) 4082 12101 draw_string
+(      LZO = LPN+NW                                                      0045) 4082 12086 draw_string
+(      LTO = LZO+NW                                                      0046) 4082 12071 draw_string
+(      IF \(NOTEMP.EQ.1\) LTO = LZO                                        0047) 4082 12056 draw_string
+(      LPY = LTO+NW                                                      0049) 4082 12041 draw_string
+(      LZX = LPY+NW                                                      0050) 4082 12026 draw_string
+(      LZY = LZX+NW                                                      0051) 4082 12011 draw_string
+(      LPRESS = LZN+LARGE-NWEIG                                          0052) 4082 11996 draw_string
+(      LEIG = LPRESS                                                     0053) 4082 11981 draw_string
+(      IF \(KPRESS.GT.1.AND.LMAPP.NE.1\) LEIG = LPRESS-NWEIG               0054) 4082 11966 draw_string
+(C                                                                       ) 4082 11951 draw_string
+(C THESE LCM ADDRESSES ARE USED BY EIGSET AND LCMRQR                     ) 4082 11936 draw_string
+(C                                                                       ) 4082 11921 draw_string
+(      LE = LZN                                                          0056) 4082 11906 draw_string
+(      LH = LE+N2M*N2M                                                   0057) 4082 11891 draw_string
+(      LEV = LH+N2M*N2M                                                  0058) 4082 11876 draw_string
+(C                                                                       ) 4082 11861 draw_string
+(      CALL EXSET\(EX, NMAX2\)                                             0059) 4082 11846 draw_string
+(C                                                                       ) 4082 11831 draw_string
+(C SET ALL  U\(I\) TO 0. TO AVOID TROUBLE IF NO MEAN FLOW IS DESIRED       ) 4082 11816 draw_string
+(C                                                                       ) 4082 11801 draw_string
+(      DO 11 I = 1, N2P                                                  0060) 4082 11786 draw_string
+(11       U\(I\) = 0.                                                      0061) 4082 11771 draw_string
+(C                                                                       ) 4082 11756 draw_string
+(C SET UP ARRAYS ASSOCIATED WITH THE MAPPING FUNCTION:                   ) 4082 11741 draw_string
+(C                                                                       ) 4082 11726 draw_string
+(      IF \(LMAPP.NE.1\) THEN                                              0062) 4082 11711 draw_string
+(2        IF \(LMAPP.NE.2\) THEN                                           0076) 4082 11696 draw_string
+(         ENDIF) 4082 11681 draw_string
+(      ELSE) 4082 11666 draw_string
+(C                                                                       ) 4082 11651 draw_string
+(C LINEAR MAPPING - EIGENVALUES KNOWN, EIGENFUNCTIONS ARE SIMPLY SINES   ) 4082 11636 draw_string
+(C AND COSINES, SO THAT NO MATRICES ARE NEEDED:                          ) 4082 11621 draw_string
+(C                                                                       ) 4082 11606 draw_string
+(         F = H/REAL\(N2\)                                                 0064) 4082 11591 draw_string
+(         FZ = PI/H                                                      0065) 4082 11576 draw_string
+(         FZSQ = FZ*FZ                                                   0066) 4082 11561 draw_string
+(         GMAPP\(1\) = 0.                                                  0067) 4082 11546 draw_string
+(         G\(1\) = FZ                                                      0068) 4082 11531 draw_string
+(         DO 1 I = 1, N2M                                                0069) 4082 11516 draw_string
+(            GMAPP\(I+1\) = F*REAL\(I\)                                      0070) 4082 11501 draw_string
+(            G\(I+1\) = FZ                                                 0071) 4082 11486 draw_string
+(1           EVAL\(I\) = -REAL\(I\)**2*FZSQ                                  0072) 4082 11471 draw_string
+(         GMAPP\(N2P\) = H                                                 0073) 4082 11456 draw_string
+(         G\(N2P\) = FZ                                                    0074) 4082 11441 draw_string
+(         CALL OUT\(EVAL, LEIG, NWEIG\)                                    0075) 4082 11426 draw_string
+(      ENDIF) 4082 11411 draw_string
+(C                                                                       ) 4082 11396 draw_string
+(C READ THE DATA:                                                        ) 4082 11381 draw_string
+(C                                                                       ) 4082 11366 draw_string
+(      IF \(KDATA.NE.1.AND.KDATA.NE.2\) THEN                               0080) 4082 11351 draw_string
+(      ELSE) 4082 11336 draw_string
+(         CALL DATAST\(A, N2P, N1, GMAPP\)                                 0082) 4082 11321 draw_string
+(      ENDIF) 4082 11306 draw_string
+(13    CONTINUE                                                          0083) 4082 11291 draw_string
+(14    CONTINUE                                                          0084) 4082 11276 draw_string
+(      FX = 2.0*PI/BOXX                                                  0085) 4082 11261 draw_string
+(      FX2 = 2.*FX                                                       0086) 4082 11246 draw_string
+(C                                                                       ) 4082 11231 draw_string
+(C PREPARE THE INPUT FOR PROCESSING:                                     ) 4082 11216 draw_string
+(C                                                                       ) 4082 11201 draw_string
+(      IF \(KDATA.NE.1\) THEN                                              0087) 4082 11186 draw_string
+(      ELSE) 4082 11171 draw_string
+(C                                                                       ) 4082 11156 draw_string
+(C THE INPUT WAS STREAMFUNCTION IN PHYSICAL SPACE - SHUFFLE THE DATA AND ) 4082 11141 draw_string
+(C GO TO FOURIER SPACE:                                                  ) 4082 11126 draw_string
+(C                                                                       ) 4082 11111 draw_string
+(         CALL IN\(A, LPN, NW\)                                            0089) 4082 11096 draw_string
+(         CALL SHUF\(A, N2P, N1, WORK\)                                    0090) 4082 11081 draw_string
+(         NPTS = N1                                                      0091) 4082 11066 draw_string
+(         NSKIP = N2P                                                    0092) 4082 11051 draw_string
+(         MTRN = N2P                                                     0093) 4082 11036 draw_string
+(         MSKIP = 1                                                      0094) 4082 11021 draw_string
+(         ISIGN = -1                                                     0095) 4082 11006 draw_string
+(         CALL XLOG2\(NPTS, LOG\)                                          0096) 4082 10991 draw_string
+(         IEXSHF = NMAX2/NPTS                                            0097) 4082 10976 draw_string
+(         CALL RCS\(A, EX\)                                                0098) 4082 10961 draw_string
+(         NPTS = 2*N2                                                    0099) 4082 10946 draw_string
+(         NSKIP = 1                                                      0100) 4082 10931 draw_string
+(         MTRN = N1H                                                     0101) 4082 10916 draw_string
+(         MSKIP = N2P                                                    0102) 4082 10901 draw_string
+(         ISIGN = -1                                                     0103) 4082 10886 draw_string
+(         CALL XLOG2\(NPTS, LOG\)                                          0104) 4082 10871 draw_string
+(         IEXSHF = NMAX2/NPTS                                            0105) 4082 10856 draw_string
+(         CALL ACAC\(A, EX, WORK\)                                         0106) 4082 10841 draw_string
+(C           F = 0.125/REAL\(N1*N2\)                                       ) 4082 10826 draw_string
+(         F = 0.0625/REAL\(N1*N2\)                                         0107) 4082 10811 draw_string
+(         DO 30 J = 1, N1H                                               0108) 4082 10796 draw_string
+(            DO 30 I = 1, N2PD                                           0109) 4082 10781 draw_string
+(30             A\(I,J\) = A\(I,J\)*F                                        0110) 4082 10766 draw_string
+(         CALL OUT\(A, LPN, NW\)                                           0111) 4082 10751 draw_string
+(         CALL OUT\(A, LZN, NW\)                                           0112) 4082 10736 draw_string
+(      ENDIF) 4082 10721 draw_string
+(C                                                                       ) 4082 10706 draw_string
+(CC*****C H E C K   F O U R I E R   C O E F F I C I E N T S**************) 4082 10691 draw_string
+(C                                                                       ) 4082 10676 draw_string
+(C         WRITE \(6,7010\) A\(1,1\),A\(1,2\),A\(1,3\)                           ) 4082 10661 draw_string
+(C         WRITE \(6,7020\) A\(2,1\),A\(2,2\),A\(2,3\)                           ) 4082 10646 draw_string
+(C         WRITE \(6,7030\) A\(3,1\),A\(3,2\),A\(3,3\)                           ) 4082 10631 draw_string
+(C 7010    FORMAT\(/2X,26HCHECK FOURIER COEFFICIENTS/4X,8HA\(1,1\) =,1PE13.6) 4082 10616 draw_string
+(C     1   2X,8HA\(1,2\) =,1PE13.6,2X,8HA\(1,3\) =,1PE13.6\)                  ) 4082 10601 draw_string
+(C 7020    FORMAT\(4X,8HA\(2,1\) =,1PE13.6,2X,8HA\(2,2\) =,1PE13.6,2X,        ) 4082 10586 draw_string
+(C     1   8HA\(2,3\) =,1PE13.6\)                                           ) 4082 10571 draw_string
+(C 7030    FORMAT\(4X,8HA\(3,1\) =,1PE13.6,2X,8HA\(3,2\) =,1PE13.6,2X,        ) 4082 10556 draw_string
+(C     1   8HA\(3,3\) =,1PE13.6/\)                                          ) 4082 10541 draw_string
+(C                                                                       ) 4082 10526 draw_string
+(C                                                                       ) 4082 10511 draw_string
+(40    IF \(KDATA.EQ.3\) THEN                                              0113) 4082 10496 draw_string
+(      ELSE) 4082 10481 draw_string
+(C                                                     2                 ) 4082 10466 draw_string
+(C STREAMFUNCTION KNOWN - FIND THE VORTICITY:  Z =  DEL  \(PSI\):          ) 4082 10451 draw_string
+(C                                                                       ) 4082 10436 draw_string
+(         CALL IN\(EVAL, LEIG, NWEIG\)                                     0115) 4082 10421 draw_string
+(         KZN = LZN                                                      0116) 4082 10406 draw_string
+(         LVECT = N2M                                                    0117) 4082 10391 draw_string
+(         LSKIP = 2                                                      0118) 4082 10376 draw_string
+(         NVECT = 2                                                      0119) 4082 10361 draw_string
+(         NVSKIP = 1                                                     0120) 4082 10346 draw_string
+(         DO 60 J = 1, N1H                                               0121) 4082 10331 draw_string
+(            CALL IN\(CWORK, KZN, N2PD\)                                   0122) 4082 10316 draw_string
+(            F = REAL\(\(J-1\)*\(J-1\)\)*FX*FX                                 0123) 4082 10301 draw_string
+(            DO 50 I = 2, N2                                             0124) 4082 10286 draw_string
+(50             CWORK\(I\) = \(EVAL\(I-1\)-F\)*CWORK\(I\)                        0125) 4082 10271 draw_string
+(            CWORK\(1\) = -F*CWORK\(1\)                                      0126) 4082 10256 draw_string
+(            CWORK\(N2P\) = 0.0                                            0127) 4082 10241 draw_string
+(            CALL OUT\(CWORK, KZN, N2PD\)                                  0128) 4082 10226 draw_string
+(60          KZN = KZN+N2PD                                              0129) 4082 10211 draw_string
+(         NPTS = 2*N2                                                    0130) 4082 10196 draw_string
+(         NSKIP = 1                                                      0131) 4082 10181 draw_string
+(         MTRN = N1H                                                     0132) 4082 10166 draw_string
+(         MSKIP = N2P                                                    0133) 4082 10151 draw_string
+(         ISIGN = 1                                                      0134) 4082 10136 draw_string
+(         CALL XLOG2\(NPTS, LOG\)                                          0135) 4082 10121 draw_string
+(         IEXSHF = NMAX2/NPTS                                            0136) 4082 10106 draw_string
+(         CALL IN\(A, LZN, NW\)                                            0137) 4082 10091 draw_string
+(         CALL ACAC\(A, EX, WORK\)                                         0138) 4082 10076 draw_string
+(         DO 70 J = 1, N1H                                               0139) 4082 10061 draw_string
+(            DO 70 I = 1, N2PD                                           0140) 4082 10046 draw_string
+(70             A\(I,J\) = 0.5*A\(I,J\)                                      0141) 4082 10031 draw_string
+(         CALL OUT\(A, LZO, NW\)                                           0142) 4082 10016 draw_string
+(         IF \(NOTEMP.EQ.1\) THEN                                          0143) 4082 10001 draw_string
+(         ELSEIF \(KDATA.NE.1\) THEN                                       0143) 4082 9986 draw_string
+(120         CALL IN\(A, LTN, NW\)                                         0175) 4082 9971 draw_string
+(C                                                                       ) 4082 9956 draw_string
+(C NEW TEMPERATURE KNOWN - SET UP T\(OLD\):                                ) 4082 9941 draw_string
+(C                                                                       ) 4082 9926 draw_string
+(            NPTS = 2*N2                                                 0176) 4082 9911 draw_string
+(            NSKIP = 1                                                   0177) 4082 9896 draw_string
+(            MTRN = N1H                                                  0178) 4082 9881 draw_string
+(            MSKIP = N2P                                                 0179) 4082 9866 draw_string
+(            ISIGN = 1                                                   0180) 4082 9851 draw_string
+(            CALL XLOG2\(NPTS, LOG\)                                       0181) 4082 9836 draw_string
+(            IEXSHF = NMAX2/NPTS                                         0182) 4082 9821 draw_string
+(            CALL ACAC\(A, EX, WORK\)                                      0183) 4082 9806 draw_string
+(            DO 130 J = 1, N1H                                           0184) 4082 9791 draw_string
+(               DO 130 I = 1, N2PD                                       0185) 4082 9776 draw_string
+(130               A\(I,J\) = A\(I,J\)*0.5                                   0186) 4082 9761 draw_string
+(            CALL OUT\(A, LTO, NW\)                                        0187) 4082 9746 draw_string
+(         ELSE) 4082 9731 draw_string
+(C                                                                       ) 4082 9716 draw_string
+(C TEMPERATURE IS SUPPLIED IN PHYSICAL SPACE - SHUFFLE THE DATA AND      ) 4082 9701 draw_string
+(C GO TO FOURIER REPRESENTATION:                                         ) 4082 9686 draw_string
+(C                                                                       ) 4082 9671 draw_string
+(            CALL IN\(A, LTN, NW\)                                         0147) 4082 9656 draw_string
+(            CALL SHUF\(A, N2P, N1, WORK\)                                 0148) 4082 9641 draw_string
+(            NPTS = N1                                                   0149) 4082 9626 draw_string
+(            NSKIP = N2P                                                 0150) 4082 9611 draw_string
+(            MTRN = N2P                                                  0151) 4082 9596 draw_string
+(            MSKIP = 1                                                   0152) 4082 9581 draw_string
+(            ISIGN = -1                                                  0153) 4082 9566 draw_string
+(            CALL XLOG2\(NPTS, LOG\)                                       0154) 4082 9551 draw_string
+(            IEXSHF = NMAX2/NPTS                                         0155) 4082 9536 draw_string
+(            CALL RCS\(A, EX\)                                             0156) 4082 9521 draw_string
+(            F = 0.5/REAL\(N1\)                                            0157) 4082 9506 draw_string
+(            DO 100 J = 1, N1H                                           0158) 4082 9491 draw_string
+(               DO 100 I = 1, N2PD                                       0159) 4082 9476 draw_string
+(100               A\(I,J\) = F*A\(I,J\)                                     0160) 4082 9461 draw_string
+(            CALL OUT\(A, LTO, NW\)                                        0161) 4082 9446 draw_string
+(            NPTS = 2*N2                                                 0162) 4082 9431 draw_string
+(            NSKIP = 1                                                   0163) 4082 9416 draw_string
+(            MTRN = N1H                                                  0164) 4082 9401 draw_string
+(            MSKIP = N2P                                                 0165) 4082 9386 draw_string
+(            ISIGN = -1                                                  0166) 4082 9371 draw_string
+(            CALL XLOG2\(NPTS, LOG\)                                       0167) 4082 9356 draw_string
+(            IEXSHF = NMAX2/NPTS                                         0168) 4082 9341 draw_string
+(            CALL ACAC\(A, EX, WORK\)                                      0169) 4082 9326 draw_string
+(C           F = 0.25/REAL\(N2\)                                           ) 4082 9311 draw_string
+(            F = 0.125/REAL\(N2\)                                          0170) 4082 9296 draw_string
+(            DO 110 J = 1, N1H                                           0171) 4082 9281 draw_string
+(               DO 110 I = 1, N2PD                                       0172) 4082 9266 draw_string
+(110               A\(I,J\) = F*A\(I,J\)                                     0173) 4082 9251 draw_string
+(            CALL OUT\(A, LTN, NW\)                                        0174) 4082 9236 draw_string
+(         ENDIF) 4082 9221 draw_string
+(140      T = 0.                                                         0188) 4082 9206 draw_string
+(         DTT = DT                                                       0189) 4082 9191 draw_string
+(         NSTEPS = 1                                                     0190) 4082 9176 draw_string
+(      ENDIF) 4082 9161 draw_string
+(145   CALL RUNINF                                                       0191) 4082 9146 draw_string
+(      CALL BUG\('AFT INITAL'\)                                            0192) 4082 9131 draw_string
+
+end
+showpage
+%%Trailer
+%%EOF

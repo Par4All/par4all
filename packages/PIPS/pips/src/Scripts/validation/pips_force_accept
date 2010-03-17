@@ -1,0 +1,109 @@
+#! /bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Accept entries in the PIPS validation
+# Should be merged in a unique tool with pips_manual_accept?
+
+failed=0
+success=0
+list_lgt=0
+
+function accept_one_file ()
+{
+    dir=$1
+    log=$2
+    # Accept also .test, .tpips,...
+    dir=${dir/.[Ffc]/.result}
+    dir=${dir/.test/.result}
+    dir=${dir/.tpips2/.result}
+    dir=${dir/.tpips/.result}
+    dir=${dir/.py/.result}
+
+    let list_lgt++
+
+    if [ -d $dir ]; then
+	if [ -f $dir/out ]
+	then
+	    cp $dir/out $dir/test
+	    if [ -f $dir/test ]
+	    then
+		let success++
+		echo "Success: reference changed in $dir" >> $log
+	    else
+		let failed++
+		echo "ERROR:can not create test in $dir" >> $log
+	    fi
+	else
+	    echo "ERROR:No output defined in directory $dir
+	    Consider runing the validation first" >> $log
+	    let failed++
+	fi
+    else
+	echo "ERROR: Directory $dir does not exist" >> $log
+	let failed++
+    fi
+}
+
+echo "starting $0 script with folowing argument(s):"> /tmp/pips_force_accept.log
+echo "$@" >> /tmp/pips_force_accept.log
+
+if [[ "$1" == "-h" || "$1" == "--help" || $# == 0 ]]
+then
+    echo "usage: $0 [-f file | directory_list]"
+    echo "  directory_list: a list of .tpips/.test/... or .result directory where you want the previous"
+    echo "                  validation output to be considered as the new reference"
+    echo "                  for future validation tests"
+    echo "  file          : a file with the validation SUMMARY format (check RESULT/SUMMARY"
+    echo "                  file in validation folder). Basically the script will track all"
+    echo "                  the changed line in the file and will make the changed result"
+    echo "                  as the new reference"
+   exit
+else
+    # in this case we want to process a SUMMARY file
+    if [[ $# == 2 && $1 == '-f' && -f $2 ]]; then
+	# Select the lines to validate from the validation mail or file in
+	# summary or diff output:
+	l=`sed -n -e 's/^changed: \(.*\)/\1/p' -e 's/^> changed: \(.*\)/\1/p' $2`
+	# Use this list as arguments fot the following:
+	set $l
+    fi
+
+    # Accept on all files:
+    for dir in $@
+    do
+	accept_one_file $dir /tmp/pips_force_accept.log
+    done
+fi
+
+echo "
+$0 completes with following statistics :
+$list_lgt directories processed
+$success succeed
+$failed failed" >> /tmp/pips_force_accept.log
+
+echo "
+$0 completes with following statistics :
+$list_lgt directories processed
+$success succeed
+$failed failed
+logs are in /tmp/pips_force_accept.log"

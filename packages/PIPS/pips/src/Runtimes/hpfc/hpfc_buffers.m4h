@@ -1,0 +1,117 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+!
+! COMMON /HPFC BUFFERS/ 
+!
+! buffers to avoid small pvmf(un)pack calls...
+! and to sends buckets of messages if necessary...
+!
+      common /HPFC BUFFERS/
+     $     DATA BUFFER(MAX MAX SIZE OF BUFFER),
+     $     BUF INDEX,
+     $     BUFFER ID(MAX SIZE OF STATUS),
+     $     SIZE OF RECEIVED BUFFER,
+     $     HPFC STRING BUFFSIZE,
+     $     HPFC BYTE1 BUFFSIZE,
+     $     HPFC INTEGER2 BUFFSIZE,
+     $     HPFC INTEGER4 BUFFSIZE,
+     $     HPFC REAL4 BUFFSIZE,
+     $     HPFC REAL8 BUFFSIZE,
+     $     HPFC COMPLEX8 BUFFSIZE,
+     $     HPFC COMPLEX16 BUFFSIZE,
+     $     LAZY SEND,
+     $     LAZY RECV,
+     $     SEND NOT INITIALIZED,
+     $     RECEIVED NOT PERFORMED
+      integer
+     $     BUF INDEX,
+     $     BUFFER ID,
+     $     SIZE OF RECEIVED BUFFER,
+     $     HPFC STRING BUFFSIZE,
+     $     HPFC BYTE1 BUFFSIZE,
+     $     HPFC INTEGER2 BUFFSIZE,
+     $     HPFC INTEGER4 BUFFSIZE,
+     $     HPFC REAL4 BUFFSIZE,
+     $     HPFC REAL8 BUFFSIZE,
+     $     HPFC COMPLEX8 BUFFSIZE,
+     $     HPFC COMPLEX16 BUFFSIZE
+      logical
+     $     LAZY SEND,
+     $     LAZY RECV,
+     $     SEND NOT INITIALIZED,
+     $     RECEIVED NOT PERFORMED
+      ifdef(`_HPFC_NO_BYTE1_',character,byte)
+     $     DATA BUFFER
+
+!
+! buffer sizes
+!
+ifdef(`_HPFC_NO_BYTE1_',,`
+      integer BYTE1 MAXBUFFSIZE
+      parameter (BYTE1 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
+      byte HPFC BYTE1 BUFF(BYTE1 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC BYTE1 BUFF)')dnl
+
+ifdef(`_HPFC_NO_STRING_',,`
+      integer STRING MAXBUFFSIZE
+      parameter (STRING MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
+      character HPFC STRING BUFF(STRING MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC STRING BUFF)')dnl
+
+ifdef(`_HPFC_NO_INTEGER2_',,`
+      integer INTEGER2 MAXBUFFSIZE
+      parameter (INTEGER2 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/2)
+      integer*2 HPFC INTEGER2 BUFF(INTEGER2 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC INTEGER2 BUFF)')dnl
+
+ifdef(`_HPFC_NO_INTEGER4_',,`
+      integer INTEGER4 MAXBUFFSIZE
+      parameter (INTEGER4 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
+      integer*4 HPFC INTEGER4 BUFF(INTEGER4 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC INTEGER4 BUFF)')dnl
+
+ifdef(`_HPFC_NO_REAL4_',,`
+      integer REAL4 MAXBUFFSIZE
+      parameter (REAL4 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
+      real*4 HPFC REAL4 BUFF(REAL4 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC REAL4 BUFF)')dnl
+
+ifdef(`_HPFC_NO_REAL8_',,`
+      integer REAL8 MAXBUFFSIZE
+      parameter (REAL8 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
+      real*8 HPFC REAL8 BUFF(REAL8 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC REAL8 BUFF)')dnl
+
+ifdef(`_HPFC_NO_COMPLEX8_',,`
+      integer COMPLEX8 MAXBUFFSIZE
+      parameter (COMPLEX8 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
+      complex*8 HPFC COMPLEX8 BUFF(COMPLEX8 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC COMPLEX8 BUFF)')dnl
+
+ifdef(`_HPFC_NO_COMPLEX16_',,`
+      integer COMPLEX16 MAXBUFFSIZE
+      parameter (COMPLEX16 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/16)
+      complex*16 HPFC COMPLEX16 BUFF(COMPLEX16 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, HPFC COMPLEX16 BUFF)')dnl
+
+!
+! that is all
+!

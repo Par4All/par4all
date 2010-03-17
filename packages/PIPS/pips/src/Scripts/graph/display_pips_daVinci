@@ -1,0 +1,41 @@
+#! /bin/csh -f
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+# This takes a PIPS output file in the GRAPH format
+# and display it with daVinci.
+
+# Ronan.Keryell@cri.ensmp.fr, 5/09/1995.
+
+if ($#argv != 1) then
+	echo "$0 takes one file name such as OCEAN.pref-graph and display it with daVinci."
+	exit 1
+endif
+
+set input_file_name=$1
+# Hum... A cleaner way, Fabien ? :-)
+alias set_output_file_name 'set output_file_name=\!*:s/-graph/-daVinci/'
+eval set_output_file_name $input_file_name
+pips_unstructured2daVinci $input_file_name > $output_file_name
+
+exec daVinci $output_file_name

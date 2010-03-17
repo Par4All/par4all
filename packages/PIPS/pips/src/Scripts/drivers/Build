@@ -1,0 +1,61 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# Build [-v] [-w wspace] [-m module] resource
+#
+
+USAGE="Usage: Build [-v] [-w wspace] [-m module] resource"
+
+if [ $# -eq 0 ]
+then	echo $USAGE >&2
+	exit 2
+fi
+
+while getopts vw:m: opt
+do
+	case $opt in
+	v)	VERBOSE=TRUE;;
+	w)	OPT_PGM=$OPTARG;;
+	m)	OPT_MOD=$OPTARG;;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+shift `expr $OPTIND - 1`
+
+if [ $# -eq 1 ]
+then
+	RES=$1
+	shift
+else
+	echo $USAGE >&2
+	exit 1
+fi
+
+if [ -z "$VERBOSE" ]
+then
+	Pips -w "$OPT_PGM" -m "$OPT_MOD" -b $RES 1>/dev/null || exit 1;
+else
+	Pips -w "$OPT_PGM" -m "$OPT_MOD" -b $RES 1>&2 || exit 1;
+fi

@@ -1,0 +1,26 @@
+# cost_trigo_1  - Unity cost for each intrinsic trigonometrical function
+
+#	int	float	double	complex	double-complex    <-- type of argument(s)
+
+SIN	-	92	108	736	-
+DSIN	-	-	108	-	-
+CSIN	-	-	-	736	-
+COS	-	92	131	742	-
+DCOS	-	-	132	-	-
+CCOS	-	-	-	742	-
+TAN	-	110	147	-	-
+DTAN	-	-	147	-	-
+ASIN	-	300	280	-	-
+DASIN	-	-	339	-	-
+ACOS	-	401	356	-	-
+DACOS	-	-	358	-	-
+ATAN	-	31	36	-	-
+DATAN	-	-	82	-	-
+ATAN2	-	151	233	-	-
+DATAN2	-	-	230	-	-
+SINH	-	310	290	-	-
+DSINH	-	-	290	-	-
+COSH	-	172	152	-	-
+DCOSH	-	-	152	-	-
+TANH	-	307	288	-	-
+DTANH	-	-	288	-	-

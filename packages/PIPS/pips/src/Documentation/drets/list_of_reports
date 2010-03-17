@@ -1,0 +1,151 @@
+#
+# GENERATION DE FICHIERS LATEX A INCLURE DANS LES RAPPORTS
+#
+# generation des fichiers ".listing" qui sont inclus dans les rapports
+# devant contenir des listings comme une suite de subsection Latex
+# et generation des fichiers ".datastructure" qui decrivent les structures
+# de donnees et peuvent aussi etre inclue comme suite de subsection Latex.
+# Les descriptions de structures de donnees sont recherchees dans la
+# sous-directory "Newgen".
+#
+# Remarques:
+#  - la variable "library" peut aussi bien correspondre a une passe qu'a
+# une bibliotheque
+#  - les config.makefile sont generalement trop gros pour Latex; il faudrait
+# pouvoir les casser par des form feeds (control-L)
+#  - a cause du make install rapide, les headers ne sont plus installes;
+# c'est pourquoi ils sont recherches dans INCLUDEDIR
+#  - l'utilisation de .DEFAULT n'est pas propre puisque n'importe quelle
+# requete peut y aboutir; il faudrait verifier que l'extension du
+# fichier argument est bien ".listing" ou ".datastructure"
+#  - il faut que les dependances des rapports sur ces fichiers soient
+# explicitees dans ce fichier "Makefile"
+#  - les dependances sur les fichiers sources ne sont pas explicitees; il
+# faut explicitement detruire le fichier ".listing" ou ".datastructure"
+# correspondant
+#  - les sources sont cherches dans Production et non dans Development;
+# ne pas oublier le "make install" eventuel;
+#
+#
+# LISTE DES RAPPORTS PRODUIT DANS LE CADRE DU CONTRAT PIPS AVEC LA DRET
+#
+# pips-org.tex: figure donnant la structure generale de pips
+#
+# dret103: definition du sous-fortran pips. restrictions et extensions.
+#		(mars 1988)
+#		1. Presentation des programmes
+#		2. Restrictions et extensions
+#		3. Problemes divers (execution)
+# dret104: rapport d'avancement No 1: analyse syntaxique au niveau programme.
+#		analyse semantique (decembre 1988)
+#		1. Materiel
+#		2. Analyse lexicale
+#		3. Representation interne
+#		4. Analyse syntaxique
+#		5. Analyse semantique
+# dret105: rapport d'avancement No 2: analyse syntaxique au niveau programme.
+#		analyse semantique (mars 1989)
+#		1. Presentation de NewGen
+#		2. Description de la representation intermediaire
+#			(avec mapping de Fortran sur la ri)
+#		3. Structures de donnees de l'analyse semantique 
+#		   intraprocedurale
+# dret109: rapport d'avancement No 3: analyse syntaxique au niveau programme.
+#		analyse semantique (mai 1989)
+#		1. Analyse syntaxique au niveau programme
+#		2. Analyse semantique intra-procedurale (premiers resultats)
+# dret110: rapport final sur l'analyse lexicale et
+#		sur l'analyse syntaxique intra-proce'durale
+#		(septembre 1989); contient des listings
+#		1. Organisation generale du parser
+#		2. Description de la representation intermediaire
+#			(avec mapping de Fortran)
+#		3. Implementation du parser
+#		4. Analyse syntaxique
+# dret116: rapport d'avancement No 4 (lot 5): analyseur semantique et 
+#		detecteur de parallelisme (septembre 1989)
+#		1. Introduction
+#		2. Detection du parallelisme
+#		3. Construction du graphe de controle
+#		4. Analyse semantique
+#		5. Conclusion
+#		6. Annexe 1: Detection du parallelisme
+#			(structures de donnees graph et dg)
+#		7. Annexe 2: Resultats du paralleliseur
+#		8. Annexe 3: listing pour le graphe de controle
+# dret117: rapport final sur l'analyse syntaxique inter-proce'durale
+#		(septembre 1989); contient des listings
+#		1. Objectif
+#		2. Rappels sur le parser
+#		3. Utilisation des autres phases de PIPS
+#		4. Pre'sentation du linker
+#		5. Algorithme
+#		6. Conclusion
+#		7. Annexe 1: programme "bootstrap"
+#		8. Annexe 2: programme "linker"
+# dret124: rapport d'avancement No 5 (lot 6): analyseur semantique et 
+#		detecteur de parallelisme
+#		(decembre 1989)
+#		1. Introduction
+#		2. Analyseur semantique
+#			(structures de donnees, constante intra, info inter)
+#		3. Detecteur de parallelisme
+#			3.1 Meilleure detection des dependances
+#			3.2 Organisation du calcul des dependances
+#			3.3 Effets des instructions
+#			3.4 Chaines use-def
+#			3.5 Privatisation
+#			3.6 Calcul precis du graphe de dependance
+#			3.7 Adaptation de l'algorithme d'Allen et Kennedy
+# dret127: rapport d'avancement No 6 (lot 7): analyseur semantique et 
+#		detecteur de parallelisme
+#		(8 mars 1990; envoye a la DRET le 14 mai 1990)
+#		1. Introduction
+#		2. Analyse semantique
+#			2.1 Modification de la representation intermediaire
+#			2.2 Impression des resultats
+#			2.3 Nouvelles fonctionalite's
+#			2.4 Options d'analyse
+#		3. Detection du parallelisme
+#			3.1 Robustesse du paralleliseur (tmines.f)
+#			3.2 Vitesse du paralleliseur
+#			3.3 Parallelisation interprocedurale
+#				(effets resumes d'un module, traduction)
+#			3.4 Echange de boucles et loop skewing
+# dret128: rapport d'avancement No 7 (lot 8): analyseur semantique et 
+#		detecteur de parallelisme (juin 1990 officiellement)
+#		1. Introduction
+#		2. Analyse semantique (quasi-vide)
+#		3. Detection du parallelisme
+#			3.1 Decomposition des phases de detection
+#			3.2 Detection des indices vivant en sortie de boucle
+#			3.3 Diminution du nombre des dependances
+# dret133: pipsmake et pipsdbm. motivations et fonctionalites
+#		(septembre 1990); non couvert par le contrat PIPS
+#
+# Tous les rapports qui suivent font partie du lot 9, le lot final (7.1.91)
+#
+# dret134: rapport de synthese final
+# dret136: fiche d'exploitation
+# dret137: rapport de synthese analyseur semantique
+# dret138: rapport de synthese detecteur de parallelisme et generateur
+#		de programme
+# dret139: listing de l'analyseur semantique
+# dret140: listing du detecteur de parallelisme
+# dret141: liste des transformations
+# dret142: listing du module generateur
+# dret143: resultats sur les programmes tests
+# dret144: manuel d'utilisation du paralleliseur
+#
+# Rapports hors contrat
+#
+# dret145: structures de donnees de base et listings associes
+# dret146: environnement de developpement
+# dret151: resultat de parallelisation interprocedurale
+#
+# Contrat PIPS-2 (PIPS-CRAY)
+#
+# dret161: Pips-Cray Etat d'avancement des travaux No 1 (janvier 92)
+# dret163: rapport intermediaire
+# dret174: rapport de synthe`se finale
+# dret175: fiche d'exploitation

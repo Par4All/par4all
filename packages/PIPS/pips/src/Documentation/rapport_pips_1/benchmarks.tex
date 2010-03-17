@@ -1,0 +1,81 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\chapter{Benchmarks}
+
+\section{Benchmarks de l'ONERA}
+\label{bench-onera}
+
+L'ONERA nous a fourni les quatre programmes suivants:
+
+\begin{itemize}
+\item AILE: écoulement 3d transonique autour d'une aile en flèche;
+\item CR2CNF: calcul des matrices sans bulles;
+\item OA118: équations intégrales;
+\item TMINES: programme de calcul de l'écoulement potentiel dans une tuyère
+      à section rectangulaire variable.
+\end{itemize}
+
+Les tailles des ces quatre programmes sont données par le tableau suivant:
+\begin{verbatim}
+        Fichier   Nombre de Lignes   Taille en octets
+
+        aile.f          3011              92107
+        cr2cnf.f         989              31956
+        oa118.f         1449              39003
+        tmines.f        1042              25873
+
+        total           6491             188939
+\end{verbatim}
+
+Le nombre et les noms des modules -- FUNCTIONS ou SUBROUTINES --
+composant ces quatre programmes sont donnés par le tableau suivant:
+\begin{verbatim}
+Programme   Functions   Subroutines   Noms
+
+AILE        1                         D
+                        25            CHRONO CLCOUPJ CLCOUPK CLGLISJ
+                                      CLGLISK CLGLISP CLINJEC CLNOREF
+                                      CLTANGT COEF CORREC DISSB
+                                      DISSIP DIST EDITION EFFORTS
+                                      EXTR F GEOM INIT NORM POUSSE
+                                      PREDIC PVN RESIDU
+
+CR2CNF      3                         DPHI PHI SDOT
+                        23            CHOLES DESCEN FRONT IMPFRO
+                                      IMPRIF IMPRIM INITB INITBM
+                                      INVFRO INVOPT MATELT MBTELT MXV
+                                      MXVADD NBDIAG OASSEM TESFRO
+                                      TRANSP VCLR VMOV VSUB ZASSEM
+                                      ZPROAX
+
+OA118       1                         SDOT
+                        9             GRAD1 SOLV SOLV3 OAMAT1 OAMET
+                                      OAVITEL PHWAK PHWPAN PMAT
+
+TMINES      0
+                        10            CALCG CALMAT DES MAILLA POLTRI
+                                      PREPCG PROD REP RESUL ROMAT
+\end{verbatim}
+
+\section{Benchmarks du CEA}
+
+\section{Benchmarks du Perfect-Club}

@@ -1,0 +1,302 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# HPFC driver, Fabien COELHO
+
+sh=`basename $0`
+STATUS='0'
+verbose=':'
+VERBOSEARG=
+debug=':'
+DEBUGARG=
+DELETE=':'
+MAKE=':'
+PIPS='pips'
+TMP="/tmp/hpfc_tmp.`hostname`.$$"
+PIPSARGS='-s MUST_REGIONS'
+HPFC='-p HPFC_INSTALL'
+TIMEPROP=
+PIPSPROP=
+TIME=
+
+unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
+	REDIRECT FILES HPFFILES
+
+# ??? fix sort order
+unset LANG
+setenv LC_ALL=C
+
+rm -f $TMP.*
+
+# auto set PIPS_ROOT and PIPS_ARCH
+[ "$PIPS_ROOT" ] || {
+  bin=`dirname $0`
+  export PIPS_ROOT=`dirname $bin`
+}
+
+[ "$PIPS_ARCH" ] || {
+  export PIPS_ARCH=`$PIPS_ROOT/makes/arch.sh`
+}
+
+# PATH fixed
+PATH=./${PIPS_ARCH}:.:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PATH}
+
+# some functions
+
+verb()
+{
+  echo "$sh: $@"
+}
+
+deb()
+{
+  echo "$sh: $@" >&2
+}
+
+default_module()
+{
+  sed -n 's,^       *[Pp][Rr][Oo][Gg][Rr][Aa][Mm] \([^ ]*\),\1,p' $@ |
+  tr '[a-z]' '[A-Z]'
+}
+
+#
+# source ~/.hpfcrc if exists. May be used to modify the defaults
+
+[ -r "$HOME/.hpfcrc" ] && . $HOME/.hpfcrc
+
+#
+
+usage()
+{
+  cat <<-EOF
+	Usage: $sh [-vxDdhMqstTirT] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
+	  version is $Revision$
+	  -t: test (dump the resulting files)
+	  -i: no installation
+	  -p P: P pips version to be used
+	  -r: pips redirection (>&2)
+	  -v: verbose about what is being done
+	  -x: not verbose
+	  -D: debug messages
+	  -d: delete the pips database
+	  -h: help, this help is displayed
+	  -M: make (compile and link) the generated codes
+	  -q: quiet  (stdout=/dev/null)
+	  -s: silent (stderr=/dev/null - for demonstations:-)
+	  -T: time pips
+	  -w W: workspace W is used for pips and hpfc
+	  -m M: module M is compiled (should be the main)
+	  -n N: source number n
+	  -k K: keyword control (debug,demo,full,validate,timing,void|none)
+	  file: source file
+	EOF
+  exit ${1:-1}
+}
+
+#
+# the keyword control enables a global control of the switches
+
+while getopts rtTivxDdMqsn:hm:w:p:k: OPT
+do
+  case $OPT in
+    t) DUMPFILES='1' ;;
+    T) TIME=time ;;
+    i) NOINSTALL='1' ; HPFC='-p HPFC_CLOSE' ;;
+    p) PIPS="$OPTARG" ;;
+    r) REDIRECT=':' ;;
+    v) verbose='verb' ;;
+    x) verbose=':' ;;
+    D) debug='deb' ;;
+    d) DELETE='Delete' ;;
+    M) MAKE='make' ;;
+    q) STDOUT='/dev/null' ;;
+    s) STDERR='/dev/null' ;;
+    n) HPFFILES="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
+    m) MODULE="$OPTARG" ;;
+    w) WORKSPACE="$OPTARG" ;;
+    k) case $OPTARG in
+	 demo)
+	     STDERR='/dev/null'
+	     PIPSPROP='-1 HPFC_NO_WARNING -1 NO_USER_WARNING'
+	     verbose='verb'
+	     HPFC='-p HPFC_INSTALL'
+	     ;;
+	 full)
+	     DELETE='Delete'
+	     HPFC='-p HPFC_INSTALL'
+	     MAKE='make'
+	     ;;
+	 timing)
+	     TIMEPROP='-1 LOG_TIMINGS'
+	     ;;
+	 void|none) : ;;
+	 validate)
+	     DUMPFILES=':'
+	     NOINSTALL=':'
+	     REDIRECT=':'
+	     verbose=':'
+	     DELETE='Delete'
+	     ;;
+      	 debug)
+	     VERBOSEARG='-v'
+	     DEBUGARG='-d'
+	     PIPSPROP='-0 HPFC_NO_WARNING -0 NO_USER_WARNING -1 LOG_TIMINGS'
+	     verbose='verb'
+	     debug='deb'
+	     DELETE=':'
+	     REDIRECT=':'
+	     ;;
+	 *)  echo "no $OPTARG keyword" ;
+	     usage 3
+	     ;;
+       esac ;;
+    h|*) usage 1 ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+[ "$#" -ne 0 ] &&
+for f
+do
+  HPFFILES="$HPFFILES `dirname $f`/`basename $f`"
+done
+
+[ "$HPFFILES" ] || usage 2
+[ "$MODULE" ] || MODULE=`default_module $HPFFILES`
+[ "$WORKSPACE" ] || WORKSPACE=`echo $MODULE | tr '[A-Z]' '[a-z]'`
+
+#
+# special file that contains FC special fake subroutines...
+#
+
+FAKES="`egrep '^[Cc!\*][Ff][Cc][Dd]\\\$ [ 	]*([Ss][Yy][Nn][Cc][Hh][Rr][Oo]|[Tt][Ii][Mm][Ee]|[Hh][Oo][Ss][Tt]|[Kk][Ii][Ll][Ll]|[Tt][Ee][Ll][Ll])' $HPFFILES`"
+
+dir=${HPFC_RUNTIME:-${PIPS_ROOT}/share}
+
+if [ "$FAKES" ] 
+then
+    $debug "adding needed fake file"
+    for d in ${HPFC_RUNTIME} ${PIPS_ROOT}/share ; do
+	for f in hpfc_stubs.direct.f hpfc_stubs.f ; do
+	    [ -f $d/$f -a ! "$fake" ] && fake=$d/$f ;
+	done
+    done
+    HPFFILES="$HPFFILES $fake"
+else
+    $debug "no fake file needed"
+fi
+
+#
+# STUBS directive may specify a stub file...
+#
+
+stubs="`sed -n 's,^[Cc!\*][Ff][Cc][Dd]\$ [ 	]*[Ss][Tt][Uu][Bb][Ss],,p' \
+    $HPFFILES | sort -u`"
+stubs="`eval echo $stubs`"
+
+$debug "stubs: $stubs"
+
+# looks for the specified stubs file in
+# (1) ./ (2) $PIPS_ROOT/share
+# prefers preprocessed versions (.direct) to .f
+
+for s in $stubs
+do
+    x=`basename $s .f`
+    NOTDONE=1
+    for f in $x.direct $s $PIPS_ROOT/share/$x.direct.f $PIPS_ROOT/share/$s
+    do
+	test -f $f -a "$NOTDONE" && {
+	    HPFFILES="$HPFFILES $f"
+	    NOTDONE=
+	}
+    done
+    test "$NOTDONE" && echo "warning: stub $s not found"
+done
+
+#
+#
+#
+
+$verbose "applying hpfc on file(s):"
+for f in $HPFFILES
+do
+  $verbose " - $f"
+  FILES="$FILES -f $f"
+done
+
+$debug "`type $PIPS`"
+
+#
+# PIPS execution with possible redirections...
+
+[ "$debug" != : ] && set -x
+
+eval $TIME \
+     $PIPS $FILES $PIPSARGS $HPFC $PIPSPROP $TIMEPROP -m $MODULE $WORKSPACE \
+	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
+
+STATUS="$?"
+set +x
+
+[ "$STATUS" -eq 0 ] || 
+{
+  $verbose "exiting - pips error"
+  exit $STATUS
+}
+
+[ "$NOINSTALL" ] ||
+{
+  $verbose "installing generated codes"
+  [ -d $WORKSPACE.hpfc ] && rm -rf $WORKSPACE.hpfc
+  mv  $WORKSPACE.database/hpfc $WORKSPACE.hpfc
+}
+
+[ "$DUMPFILES" ] &&
+{
+  $verbose "dumping generated files"
+  # sort needed so that the file order is deterministic
+  ls -d $WORKSPACE.database/Src/*.[fh] | sort | xargs cat
+}
+
+[ "$DELETE" = : ] ||
+{
+  $verbose "deleting $WORKSPACE workspace"
+  $DELETE $WORKSPACE
+}
+
+[ "$MAKE" = : ] ||
+{
+  $verbose "making $WORKSPACE"
+  cd $WORKSPACE.hpfc
+  eval $MAKE all \
+  	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
+}
+
+$verbose "done"
+
+exit $STATUS
+
+# that is all
+#

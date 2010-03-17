@@ -1,0 +1,250 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# Display [-w wspace] [-m module] [-v] [pretty-print]
+#
+# Option -l (last) also available to avoid call to Pips
+#
+
+# Modifications
+# - uses less instead of more to avoid extra-characters
+#   when Display is run in background
+
+USAGE="Usage: Display [-h] [-w wspace] [-m module] [-v] [-l] [pretty-print]"
+AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg cgcomp cgprec cgtran cgprop cgcumu cgreg cgin cgout icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg edg lcdg wdg wp65 bank flint dead"
+
+more=${PIPS_MORE:-less}
+export more
+
+show()
+{
+    echo Display of file ${1} >&2
+    ${more} ${1}
+}
+
+# display workspace module extension
+display()
+{
+    file="${1}/${3}"
+    test -f ${file} && show ${file}
+    file="${1}/${2}${3}"
+    test -f ${file} && show ${file}
+    file="${1}/${2}/${2}${3}"
+    test -f ${file} && show ${file}
+}
+
+#if [ $# -eq 0 ]
+#then	echo $USAGE >&2
+#	exit 2
+#fi
+
+while getopts w:m:vlh opt
+do
+	case $opt in
+	h)      echo "$USAGE" ; echo "$AVAILABLE_PRETTY_P" ;;
+	w)	OPT_PGM=$OPTARG;;
+	m)	OPT_MOD=$OPTARG;;
+	v)	VERBOSE=TRUE;;
+	l)	LAST=TRUE;;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+shift `expr $OPTIND - 1`
+if [ $# -eq 1 ]
+then
+	PRETTY_P=$1
+	shift
+elif [ $# -eq 0 ]
+then
+	PRETTY_P=para77
+else
+	echo $USAGE >&2
+	exit 1
+fi
+
+PERFORM=""
+ASSOC_EXT=""
+ASSOC_RES=""
+
+case $PRETTY_P in
+        adfg)   SELECT=PRINT_ARRAY_DFG
+                RESOURCE=ADFG_FILE;;
+        bdt)    SELECT=PRINT_BDT
+                RESOURCE=BDT_FILE;;
+        plc)    SELECT=PRINT_PLC
+                RESOURCE=PLC_FILE;;
+	code)	SELECT=PRINT_CODE
+		RESOURCE=PRINTED_FILE;;
+	tran)	SELECT=PRINT_CODE_TRANSFORMERS
+		RESOURCE=PRINTED_FILE;;
+	prec)	SELECT=PRINT_CODE_PRECONDITIONS
+		RESOURCE=PRINTED_FILE;;
+	usour)	SELECT=PRINT_SOURCE
+		RESOURCE=PARSED_PRINTED_FILE;;
+	utran)	SELECT=PRINT_SOURCE_TRANSFORMERS
+		RESOURCE=PARSED_PRINTED_FILE;;
+	uprec)	SELECT=PRINT_SOURCE_PRECONDITIONS
+		RESOURCE=PARSED_PRINTED_FILE;;
+	ureg)	SELECT=PRINT_SOURCE_REGIONS
+		RESOURCE=PARSED_PRINTED_FILE;;
+	ucomp)	SELECT=PRINT_SOURCE_COMPLEXITIES
+		RESOURCE=PARSED_PRINTED_FILE;;
+	uprop)	SELECT=PRINT_SOURCE_PROPER_EFFECTS
+		RESOURCE=PARSED_PRINTED_FILE;;
+	ucumu)	SELECT=PRINT_SOURCE_CUMULATED_EFFECTS
+		RESOURCE=PARSED_PRINTED_FILE;;
+	comp)	SELECT=PRINT_CODE_COMPLEXITIES
+		RESOURCE=PRINTED_FILE;;
+	regi)	SELECT=PRINT_CODE_REGIONS
+		RESOURCE=PRINTED_FILE;;
+	inreg)  SELECT=PRINT_CODE_IN_REGIONS
+		RESOURCE=PRINTED_FILE;;
+	outreg) SELECT=PRINT_CODE_OUT_REGIONS
+		RESOURCE=PRINTED_FILE;;
+	prop)	SELECT=PRINT_CODE_PROPER_EFFECTS
+		RESOURCE=PRINTED_FILE;;
+	cumu)	SELECT=PRINT_CODE_CUMULATED_EFFECTS
+		RESOURCE=PRINTED_FILE;;
+	para77)	SELECT=PRINT_PARALLELIZED77_CODE
+		RESOURCE=PARALLELPRINTED_FILE;;
+	para90)	SELECT=PRINT_PARALLELIZED90_CODE
+		RESOURCE=PARALLELPRINTED_FILE;;
+	cray)	SELECT=PRINT_PARALLELIZEDCRAY_CODE
+		RESOURCE=PARALLELPRINTED_FILE;;
+        cmf)    SELECT=PRINT_PARALLELIZEDCMF_CODE
+                RESOURCE=PARALLELPRINTED_FILE;;
+        craft)  SELECT=PRINT_PARALLELIZEDCRAFT_CODE
+                RESOURCE=PARALLELPRINTED_FILE;;
+	cg)	SELECT=PRINT_CALL_GRAPH
+		RESOURCE=CALLGRAPH_FILE;;
+	cgcomp)	SELECT=PRINT_CALL_GRAPH_WITH_COMPLEXITIES
+		RESOURCE=CALLGRAPH_FILE;;
+	cgprec)	SELECT=PRINT_CALL_GRAPH_WITH_PRECONDITIONS
+		RESOURCE=CALLGRAPH_FILE;;
+	cgtran)	SELECT=PRINT_CALL_GRAPH_WITH_TRANSFORMERS
+		RESOURCE=CALLGRAPH_FILE;;
+	cgprop)	SELECT=PRINT_CALL_GRAPH_WITH_PROPER_EFFECTS
+		RESOURCE=CALLGRAPH_FILE;;
+	cgcumu)	SELECT=PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
+		RESOURCE=CALLGRAPH_FILE;;
+	cgreg)	SELECT=PRINT_CALL_GRAPH_WITH_REGIONS
+		RESOURCE=CALLGRAPH_FILE;;
+	cgin)	SELECT=PRINT_CALL_GRAPH_WITH_IN_REGIONS
+		RESOURCE=CALLGRAPH_FILE;;
+	cgout)	SELECT=PRINT_CALL_GRAPH_WITH_OUT_REGIONS
+		RESOURCE=CALLGRAPH_FILE;;
+	icfg)	SELECT=PRINT_ICFG
+		RESOURCE=ICFG_FILE;;
+	icfgprec) SELECT=PRINT_ICFG_WITH_PRECONDITIONS
+		RESOURCE=ICFG_FILE;;
+	icfgcomp) SELECT=PRINT_ICFG_WITH_COMPLEXITIES
+		RESOURCE=ICFG_FILE;;
+	icfgl)	SELECT=PRINT_ICFG_WITH_LOOPS
+		RESOURCE=ICFG_FILE;;
+	icfglprec) SELECT=PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+		RESOURCE=ICFG_FILE;;
+	icfglcomp) SELECT=PRINT_ICFG_WITH_LOOPS_COMPLEXITIES
+		RESOURCE=ICFG_FILE;;
+	icfgc)	SELECT=PRINT_ICFG_WITH_CONTROL
+		RESOURCE=ICFG_FILE;;
+	icfgcprec) SELECT=PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+		RESOURCE=ICFG_FILE;;
+	icfgccomp) SELECT=PRINT_ICFG_WITH_CONTROL_COMPLEXITIES
+		RESOURCE=ICFG_FILE;;
+	dg)     SELECT=PRINT_WHOLE_DEPENDENCE_GRAPH
+                RESOURCE=DG_FILE;;
+	edg)    SELECT=PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+                RESOURCE=DG_FILE;;
+	lcdg)   SELECT=PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+                RESOURCE=DG_FILE;;
+	wdg)    SELECT=PRINT_WHOLE_DEPENDENCE_GRAPH
+                RESOURCE=DG_FILE;;
+	wp65)	SELECT=RICE_FULL_DEPENDENCE_GRAPH
+		PERFORM=PRIVATIZER
+		ASSOC_EXT=.bank
+		RESOURCE=WP65_COMPUTE_FILE
+		ASSOC_RES=WP65_BANK_FILE;;
+	bank)	SELECT=
+		RESOURCE=BANK_FILE;;
+	flint)	RESOURCE=FLINTED;;
+        stco)   SELECT=PRINT_CODE_STATIC_CONTROL
+                RESOURCE=PRINTED_FILE;;
+	dead)	SELECT=PRINT_CODE
+		PERFORM=SUPPRESS_DEAD_CODE
+		RESOURCE=PRINTED_FILE;;
+	*)	echo Unknown Pretty-print $PRETTY_P\; $AVAILABLE_PRETTY_P >&2
+		exit 1;;
+esac
+
+[ "$SELECT" ] && SELECT="-s $SELECT"
+[ "$PERFORM" ] && PERFORM="-p $PERFORM"
+
+if [ -z "$LAST" ]
+then
+  if [ -z "$VERBOSE" ]
+  then
+    Pips -w "$OPT_PGM" -m "$OPT_MOD" \
+	 $SELECT $PERFORM -b $RESOURCE 1>/dev/null || exit 1;
+  else
+    Pips -w "$OPT_PGM" -m "$OPT_MOD" \
+	 $SELECT $PERFORM -b $RESOURCE 1>&2 || exit 1;
+  fi
+fi
+
+# Argh!!! this is incompatible with any parallel run of scripts
+# in the same directory, say for the validation...
+. ./${PIPS_CURRENT_PROGRAM:-.pipsprogram}
+
+uppercase()
+{
+  echo "$*" | tr a-z A-Z
+}
+
+if [ -n "$LAST" ]
+then
+  if [ -n "$OPT_PGM" ]
+  then
+    PGM=$OPT_PGM
+  fi
+  if [ -n "$OPT_MOD" ]
+  then
+    MOD=`uppercase $OPT_MOD`
+  fi
+fi
+
+# The extensions are now language sensitive, while Display has no hint
+# about the source languages used.
+#
+# This change makes Display less sensitive to constant modifications
+# in Documentation/constants/constants.h and elsewhere in the
+# prettyprinter, but I have no idea if some functionalities are
+# lost. Display is in its obsolesnce phase. Use tpips instead.
+
+EXT=`cat $PGM.database/$MOD/$RESOURCE`
+
+display $PGM.database $MOD $EXT
+[ "$ASSOC_EXT" ] && display $PGM.database $MOD $ASSOC_EXT
+
+exit 0

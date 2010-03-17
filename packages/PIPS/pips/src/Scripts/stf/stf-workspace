@@ -1,0 +1,83 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+#
+# Francois Irigoin, 29 May 1993
+#
+
+# Modifcations:
+#  - list of failed modules kept in variable FAILURES; FI, 2 July 1993
+
+# Bug: interruptions should be caught to run "discard"
+
+USAGE="Usage: $0 workspace"
+
+if [ $# -eq 0 ]
+then	echo $USAGE >&2
+	exit 2
+fi
+
+WORKSPACE=$1
+
+if [ ! -d $WORKSPACE.database ]
+then
+	echo unknown workspace "$WORKSPACE"
+	exit
+fi
+
+# loop on modules
+
+FAILURES=""
+
+for source in $WORKSPACE.database/*.f
+do
+	echo source="$source"
+	stf $source >$source$$ 2>$source.$$.log
+	if grep '_.TOOLPACK' $source.$$.log
+	then
+		echo clean up with toolpack command "discard"
+		exit 1
+	fi
+	if grep ERROR $source.$$.log
+	then
+		echo
+		echo stf failed for file $source
+		echo
+		FAILURES="$FAILURES $source"
+	else
+#		mv $source $source.backup
+		rm $source
+#		mv $source$$ $source
+		sed -e '/\[ISTLY Normal Termination\]/d' <$source$$ >$source
+		rm $source$$
+		echo stf succeeded
+	fi
+	rm $source.$$.log
+#	exit
+done
+
+if [ ! -z "$FAILURES" ]
+then
+	echo failed for $FAILURES
+fi

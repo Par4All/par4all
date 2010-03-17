@@ -1,0 +1,375 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# if [ `uname -s -r` -eq "SunOS 5.8" ]
+# then
+#   echo "SunOS 5.8"
+#   PIPS_TR=/usr/xpg4/bin/tr
+# else
+#   PIPS_TR=/usr/bin/tr
+# fi
+
+# Test function
+
+pips_prgm=${pips_prgm:-.pipsprogram}
+
+unset OPT_PGM SOURCE_FILES SELECT_RULES OPT_MOD USING_RULE BUILD_RES
+
+check ()
+{
+  FOO=
+  #foo $1
+}
+
+foo ()
+{
+  echo $1
+  echo PGM=$PGM
+  echo SOURCE_FILES=$SOURCE_FILES
+  echo SELECT_RULES=$SELECT_RULES
+  echo MOD=$MOD
+  echo USING_RULE=$USING_RULE
+  echo BUILD_RES=$BUILD_RES
+  echo
+}
+
+usage ()
+{
+  echo "Usage: Pips -q [-w wspace] [-f source_file[,source_file]...]"
+  echo "                          [-s selected_rule[,selected_rule]...]"
+  echo "                          [-m module] [-p performed_rule]"
+  echo "                                      [-b build_resource]"
+}
+
+if [ $# -eq 0 ]
+then
+  usage >&2
+  exit 1
+fi
+
+VERBOSE='echo'
+
+while getopts qw:f:s:m:p:b: opt
+do
+  case $opt in
+    q)  VERBOSE=':';;
+    w)	OPT_PGM=$OPTARG;;
+    f)	SOURCE_FILES="$SOURCE_FILES $OPTARG";;
+    s)	SELECT_RULES="$SELECT_RULES $OPTARG";;
+    m)	OPT_MOD=$OPTARG;;
+    p)	USING_RULE=$OPTARG;;
+    b)	BUILD_RES=$OPTARG;;
+    \?)	usage >&2
+	exit 1;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+if [ $# -ge 1 ]
+then
+  usage >&2
+  exit 1
+fi
+
+################################################ SET OR CHECK PIPS ENVIRONMENT
+
+if [ -z "$PIPS_ROOT" ]
+then
+  bin=`dirname $0`
+  PIPS_ROOT=`dirname $bin`
+  export PIPS_ROOT
+fi
+
+if [ ! -d "$PIPS_ROOT" ]
+then
+  echo "no such directory: $PIPS_ROOT" >&2
+  exit 1
+fi
+
+if [ ! "$PIPS_ARCH" ]
+then
+  PIPS_ARCH=`$PIPS_ROOT/makes/arch.sh`
+  export PIPS_ARCH
+fi
+
+# Get PGM
+BAD_WORKSPACE="Unknown workspace"
+
+if [ ! -x $pips_prgm ]
+then
+  if [ -z "$OPT_PGM" ]
+  then
+    echo $BAD_WORKSPACE >&2
+    exit 1
+  else	PGM=$OPT_PGM
+  fi
+else
+  . ./$pips_prgm
+  if [ "$OPT_PGM" ]
+  then
+    if [ "$OPT_PGM" != "$PGM" ]
+    then
+      MOD=""
+      PGM=$OPT_PGM
+    fi
+  else
+    echo Workspace $PGM \(default\)
+    if [ -z "$OPT_MOD" ]
+    then
+      echo Module $MOD \(default\)
+    fi
+  fi
+fi
+
+if [ "$OPT_MOD" ]
+then
+  MOD=$OPT_MOD
+fi
+
+if [ ! -r "$PGM.database" ]
+then
+  # case the program does not exist and must be created
+  # check that source file exists
+  if [ -z "$SOURCE_FILES" ]
+  then
+    echo $BAD_WORKSPACE \`$PGM\' >&2
+    exit 1
+  fi
+
+  # check that each source file is a readable file
+  TMP_IFS=$IFS
+  IFS=","
+  set $SOURCE_FILES
+  IFS=$TMP_IFS
+  SOURCE_FILES=""
+  for file in $*
+  do
+    if  [ ! -r "$file" ]
+    then
+      echo Cannot read $file; >&2
+      exit 1
+    else
+      SOURCE_FILES="$SOURCE_FILES -f $file"
+    fi
+  done
+else
+
+  # check owner
+  #  if [ -z "`find . -name $PGM.database -user \`logname\` -prune -print`" ]
+  #
+  # gnu test would allow [ ! -O $PGM.database ]
+  #
+  if [ ! "`find $PGM.database -prune -user \`whoami\` -print`" ]
+  then
+    echo WARNING: You are working on workspace \`$PGM\', created by another user. >&2
+  fi
+
+  if [ "$SOURCE_FILES" ]
+  then
+    echo Workspace $PGM already exists. Use \`Delete\' before creating a new one. >&2
+    exit 1
+  fi
+fi
+
+check 10
+#
+# Manage aliases
+#
+rename ()
+{
+  echo "$1" | sed -e " \
+        s/^PPF$/ParallelPrinted_File/; \
+	s/^CGF$/CallGraph_File/; \
+	s/^WPF$/WP65_compute_File/; \
+	s/^unr$/UNRoll/; \
+	s/^sm$/Strip_Mine/; \
+	s/^linter$/Loop_INTERchange/; \
+	s/^ach$/Atomic_CHains/; \
+	s/^rgch$/ReGion_CHains/; \
+	s/^iorgch$/In_Out_ReGions_CHains/; \
+	s/^pricfgl$/PRint_ICFG_with_Loops/; \
+	s/^pricfgc$/PRint_ICFG_with_Control/; \
+	s/^pricfg$/PRint_ICFG/; \
+	s/^pev$/Partial_EVal/; \
+        s/^PF$/Printed_File/; \
+	s/^ricetrue$/RICE_data_dependence/; \
+	s/^ricec$/RICE_Cray/; \
+	s/^ricea$/RICE_All_dependence/; \
+        s/^rfulldg$/Rice_FULL_Dependence_Graph/; \
+        s/^rfdg$/Rice_FULL_Dependence_Graph/; \
+        s/^rsdg$/Rice_Semantics_Dependence_Graph/; \
+        s/^rdg$/Rice_fast_Dependence_Graph/; \
+        s/^tffull$/TransFormers_intra_FULL/; \
+        s/^tfinterfull$/TransFormers_INTER_FULL/; \
+        s/^tfinter$/TransFormers_INTER_fast/; \
+        s/^tf$/TransFormers_intra_fast/; \
+        s/^pcinterfull$/PreConditions_INTER_FULL/; \
+        s/^pcinter$/PreConditions_INTER_fast/; \
+        s/^pc$/PreConditions_intra/; \
+	s/^mayreg$/MAY_REGions/; \
+	s/^mustreg$/MUST_REGions/; \
+	s/^inreg$/In_REGions/; \
+	s/^outreg$/Out_REGions/; \
+	s/^prcg$/PRint_Call_Graph/; \
+	s/^prcr$/PRint_Code_Regions/; \
+	s/^prcir$/PRint_Code_In_Regions/; \
+	s/^prcor$/PRint_Code_Out_Regions/; \
+        s/^prct$/PRint_Code_Transformers/; \
+	s/^prcpe$/PRint_Code_Proper_Effects/; \
+	s/^prcce$/PRint_Code_Cumulated_Effects/; \
+        s/^prcp$/PRint_Code_Preconditions/; \
+	s/^prcc$/PRint_Code_Complexities/; \
+        s/^prc$/PRint_Code/; \
+        s/^dist$/DISTributer/; \
+        s/^priv$/PRIVatize_module/; \
+        s/^prv$/PRIVatizer/; \
+	s/^red$/REDuctions/; \
+        s/^hpfc$/HPFCompile/;"
+}
+
+
+uppercase ()
+{
+  echo "$*" | tr '[a-z]' '[A-Z]'
+}
+
+MOD=`uppercase $MOD`
+
+
+#
+# Prepare arguments to call PIPS
+#
+check 20
+# Select rule if necessary.
+if [ "$SELECT_RULES" ]
+then
+  TMP_IFS=$IFS
+  IFS=","
+  set $SELECT_RULES
+  IFS=$TMP_IFS
+  SELECT_RULES=""
+  for rule in $*
+  do
+    RULE=`rename $rule`
+    RULE=`uppercase $RULE`
+    if [ \( $RULE != "DISTRIBUTER" \) \
+      -a \( $RULE != "PRIVATIZER" \) ]
+    then
+      SELECT_RULES="$SELECT_RULES -s $RULE"
+    else
+      echo $RULE canNOT be selected. >&2
+      exit 1
+    fi
+  done
+fi
+
+check 30
+# Verify $MOD is initialized
+if [ "$USING_RULE" -o "$BUILD_RES" ]
+then
+  if [ -z "$MOD" ]
+  then
+    echo One module must be specified. >&2
+    exit 1
+  elif [ -f $PGM.database/modules ]
+  then
+    if test ! "`grep \"^$MOD\$\" $PGM.database/modules`"
+    then
+      echo Module $MOD does not exist in workspace $PGM >&2
+      exit 1
+    fi
+  fi
+  ARG_MOD="-m $MOD"
+fi
+
+check 40
+# Perform rule when required
+if [ "$USING_RULE" ]
+then
+  USING_RULE=`rename $USING_RULE`
+  USING_RULE=-p\ `uppercase $USING_RULE`
+fi
+
+check 50
+# Build resource when required
+if [ "$BUILD_RES" ]
+then
+  BUILD_RES=`rename $BUILD_RES`
+  BUILD_RES=-b\ `uppercase $BUILD_RES`
+fi
+
+check 60
+#
+# Call PIPS
+#
+error ()
+{
+  echo "Exit code for pips: $?; exiting Pips"
+  exit 1;
+}
+
+#
+# to avoid a which call, where ~/.cshrc is executed and so on!
+#
+# FC, Tue Mar  8 14:19:50 MET 1994
+#
+
+which_pips()
+{
+  type pips | sed -e 's,^pips is ,,'
+}
+
+#
+# pips_version is taken from the environment if possible...
+# just to be able to use Validate not in the current directory
+# funny bug for my parallel validation stuff:-)
+#
+
+pips_version=${pips_version:-`which_pips`}
+
+$VERBOSE $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM
+
+$pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM || error
+
+# Build `modules' ???
+if [ "$SOURCE_FILES" ]
+then
+  ### ??? cd on loreto somtimes outputs the dirname...
+  cd $PGM.database > /dev/null
+  ls */*.initial.f | sed 's/\/.*//' | tr '[a-z]' '[A-Z]' > modules
+  cd ..
+fi
+
+# Update file $pips_prgm
+rm -f $pips_prgm
+echo PGM=$PGM > $pips_prgm
+if [ ! -z "$MOD" ]
+then
+  echo MOD=$MOD >> $pips_prgm
+fi
+# change mod -> convention so that only the owner uses this file
+chmod u+x $pips_prgm
+
+#
+# that's all
+#

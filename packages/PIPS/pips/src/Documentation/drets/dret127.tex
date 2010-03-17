@@ -1,0 +1,400 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\titre}{RAPPORT D'AVANCEMENT No 6 (LOT 7)\\
+                    ANALYSEUR SÉMANTIQUE ET DÉTECTEUR DE PARALLÉLISME}
+\newcommand{\auteur}{
+        François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{8 Mars 1990}
+\newcommand{\numero}{E127}
+
+\newcommand{\SEC}[1]{\section{#1}}
+\newcommand{\SSE}[1]{\subsection{#1}}
+\newcommand{\SSS}[1]{\subsubsection{#1}}
+\newcommand{\PAR}[1]{\paragraph{#1}}
+\newcommand{\SPA}[1]{\subparagraph{#1}}
+\newcommand{\BQU}{\begin{quote}}
+\newcommand{\EQU}{\end{quote}}
+\newcommand{\BIT}{\begin{itemize}}
+\newcommand{\EIT}{\end{itemize}}
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BEQ}{\begin{equation}}
+\newcommand{\EEQ}{\end{equation}}
+\newcommand{\BAR}{\begin{array}}
+\newcommand{\EAR}{\end{array}}
+\newcommand{\BDO}{\begin{document}}
+\newcommand{\EDO}{\end{document}}
+\newcommand{\BCE}{\begin{center}}
+\newcommand{\ECE}{\end{center}}
+\newcommand{\BTG}{\begin{tabbing}}
+\newcommand{\ETG}{\end{tabbing}}
+\newcommand{\BTR}{\begin{tabular}}
+\newcommand{\ETR}{\end{tabular}}
+\newcommand{\BAB}{\begin{abstract}}
+\newcommand{\EAB}{\end{abstract}}
+\newcommand{\BEN}{\begin{enumerate}}
+\newcommand{\EEN}{\end{enumerate}}
+\newcommand{\BFI}{\begin{figure}}
+\newcommand{\EFI}{\end{figure}}
+\newcommand{\VSP}{\vspace*{\baselineskip}}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\sloppy
+
+\SEC{Introduction}
+\PAR{}
+Ce rapport intermédiaire donne l'état d'avancement de nos travaux sur
+l'analyse sémantique et la détection du parallélisme.
+
+\paragraph{}
+Dans le cadre de l'analyse sémantique, la représentation intermédiaire
+a tout d'abord été très légèrement modifiée pour augmenter la
+quantité d'information portée par les préconditions. Cette même
+analyse sémantique a aussi été mieux intégrée au prettyprinter
+de manière à pouvoir afficher les résultats d'une
+manière confortable pour l'utilisateur. Trois nouvelles fonctionnalités ont
+été ajoutées: le traitement des tests, le traitement des {\em bonnes
+boucles} (au sens de la thèse de Rémi Triolet) et la prise en compte précise
+des effets des procédures appelées grâce à un mécanisme de traduction
+des transformers. Enfin, un système d'option a été ajouté de manière
+à permettre aux usagers de choisir le compromis vitesse-précision
+le plus adapté a leurs besoins.
+
+\paragraph{}
+La phase de parallélisation a aussi été considérablement améliorée.
+Tout d'abord, un certain nombre d'erreurs ont été corrigées ce qui a 
+permis d'analyser complètement un des benchmarks de l'ONERA, {\em tmines.f}.
+Ces premières analyses complètes ont mis en évidence des lenteurs dans
+PIPS qui ont été largement réduites en remaniant les parties 
+critiques du code. Ces travaux n'apportent pas de nouvelles fonctionalités
+à PIPS mais ils sont indispensables pour le rendre utilisable. Côté
+fonctionalité, un premier niveau de parallélisation interprocédurale
+basée sur les correspondances entre vecteurs et colonnes ou
+sous-colonnes de matrice a été implémenté. D'autre part, l'implémentation
+des algorithmes de bases nécessaires à l'échange de boucles et au loop
+skewing (méthode hyperplane réduite de Michael Wolfe) a commencé.
+
+\section{Analyse sémantique}
+
+\subsection{Modification de la représentation intermédiaire}
+
+\paragraph{}
+Les méthodes d'analyse sémantiques usuelles calculent des prédicats
+sur les états mémoires ({\em store}) associés à chaque instruction.
+Ces prédicats sont appelés {\em préconditions} et sont utilisés,
+par exemple, pour vérifier que les indices de tableaux appartiennent
+bien à l'intervalle de déclaration.
+
+\paragraph{}
+Ce type d'information n'est pas le mieux adapté au calcul de dépendance
+pour lequel deux et non une instruction sont prises en compte. Idéalement,
+il faudrait un prédicat portant sur les relations entre les valeurs des
+variables avant l'exécution de ces deux instructions.
+
+\paragraph{}
+Le nombre de tels prédicats augmente malheureusement comme le carré
+du nombre d'instructions et il ne semble pas rentable de les calculer.
+Par contre, il est possible d'ajouter un peu d'information aux préconditions
+usuelles en les remplaçant par une caractérisation de la relation entre
+les valeurs initiales à l'entrée d'un module et les valeurs associées
+a' chaque instruction.
+
+\paragraph{}
+Ceci permet par exemple de savoir que la variable {\tt N}, utilisée dans
+des bornes de boucle, est (ou n'est pas) constante sur tout un module.
+Cette information est cruciale pour le test de dépendance et pour le
+calcul des régions selon l'algorithme de Triolet.
+
+\paragraph{}
+Dans le domaine {\tt statement} de la représentation intermédiaire, le
+champ {\tt precondition} a donc été redéfini comme {\tt transformer}
+au lieu de {\tt predicate}.
+
+\subsection{Impression des résultats}
+
+\paragraph{}
+Le prettyprinter a été modifié pour permettre l'impression des
+préconditions et transformers associés aux statements et au code
+d'une procédure. Deux nouvelles options ont été ajoutées:
+\begin{itemize}
+  \item {\tt -t} pour les transformers
+  \item {\tt -c} pour les préconditions (c est à mémoriser comme {\em
+contexte} d'exécution)
+\end{itemize}
+Ces deux options s'ajoutent aux deux précédentes, {\tt -s} pour obtenir
+l'impression de la version séquentielle du code et {\tt -p} pour la
+version parallèle.
+
+\subsection{Nouvelles fonctionalités}
+
+\paragraph{}
+Tout d'abord, les tests structurés sont correctement pris en compte. Pour
+éviter une explosion exponentielle de la longueur des expressions,
+les postconditions obtenues sur les deux branches du test sont unifiées
+en en prenant l'enveloppe convexe comme proposé par Cousot et Halbwachs.
+
+\paragraph{}
+Ensuite, les contraintes sur les indices de boucle, que l'on peut facilement
+dériver des bornes données dans les instructions DO (méthode dite
+{\em des bonnes boucles} de Rémi Triolet) et qui permettent de traiter
+les boucles triangulaires, sont correctement calculées et invalidées
+si les expressions de bornes ne sont pas invariantes.
+
+\paragraph{}
+Enfin, les transformers globaux des modules appelés sont utilisées
+lors de l'analyse des modules appelants après avoir été traduits
+dans le nouveau contexte. Ceci est effectué lors de la phase {\em bottom-up}
+de l'analyse sémantique et permet de prendre en compte les initialisations
+et les modifications de paramètres survenant dans des modules appelés.
+
+\subsection{Options d'analyse}
+
+\paragraph{}
+Chacune des nouvelles fonctionalités nécessite davantage de temps
+calcul mais n'apporte pas forcément davantage d'information pertinente.
+L'utilisateur peut donc choisir de les utiliser ou non. L'option minimale
+de base comprend la propagation {\em flow-insensitive} des constantes
+symboliques (i.e. propagation des valeurs constantes) et l'analyse
+des bonnes boucles DO. Les options restantes sont, pour le moment:
+\begin{itemize}
+  \item {\tt -f} (f comme flow-sensitive): utilisation de l'enveloppe
+	convexe pour traiter les tests
+  \item {\tt -i} (i comme interprocédurale): utilisation des transformers
+	globaux des modules appelés dans l'analyse du module appelant
+\end{itemize}
+
+\section{Détection du parallélisme}
+
+\subsection{Robustesse du paralléliseur}
+
+\paragraph{}
+La taille des programmes traités a été augmentée régulièrement
+pour pouvoir traiter complètement un des benchmarks de l'ONERA, {\tt
+tmines.f}. Cela a nécessité du travail de mise au point sur le parser,
+le linker et le paralléliseur.
+
+\subsection{Vitesse du paralléliseur}
+
+\paragraph{}
+L'augmentation de la taille des programmes traités a permis de faire
+apparaître les premiers goulots d'étranglements. Après profiling,
+plusieurs algorithmes de base portant sur l'implémentation des
+ensembles et des mappings (i.e. fonctions à support borné) ont été
+modifiés.
+
+\subsection{Parallélisation interprocédurale}
+
+\paragraph{}
+Le calcul des effets des instructions a été modifié pour implémenter
+un premier algorithme de parallélisation interprocédurale. 
+
+\paragraph{}
+Jusqu'à présent, les effets des instructions call n'étaient calculés
+que dans le cas où la fonction appelée était un opérateur ou un
+intrinsic. La phase de calcul des effets se terminait donc anormalement
+dans le cas d'une instruction du genre \verb/CALL P/ où \verb/P/ était
+un module défini dans le programme en cours de traitement.
+
+\paragraph{}
+Cette phase a donc été modifiée pour
+\begin{itemize}
+  \item calculer le résumé des effets d'un module sur les variables du
+        programme, 
+  \item déduire du résumé associé à un module les effets d'une
+        instruction d'appel à ce module.
+\end{itemize}
+
+\subsubsection{Calcul du résumé des effets d'un module}
+\paragraph{}
+Le calcul des résumés n'a pas posé de problèmes puisque les effets
+des instructions élémentaires (affectation, entrées-sorties, ...)
+d'un module sont {\em remontés} sur les instructions non élémentaires
+(tests, blocs, boucles, ...); il en résulte que tous les effets d'un
+module sont associés au statement bloc de ce module. Le calcul du
+résumé a simplement consisté à dupliquer les effets associés à ce
+bloc en y éliminant les effets sur les variables locales du module. 
+
+\paragraph{}
+Dans cette première version du résumé des effets, les tableaux sont
+considérés comme des entités, ce qui signifie que la consultation
+(resp. la modification) d'un seul élément du tableau implique que la
+totalité du tableau est considérée comme consultée (resp.
+modifiée). Il en résulte que le résumé ne comporte que des effets
+dont la référence n'a pas d'expressions d'indices. Ce choix a pour
+conséquence de diminuer considérablement la taille du résumé et
+d'accroitre la rapidité de Pips.
+
+\paragraph{}
+Il est important de noter que le calcul du résumé n'est fait qu'une
+seule fois pour chaque module, quel que soit le nombre des appels aux
+différents modules.
+
+\subsubsection{Calcul des effets d'un call à un module}
+\paragraph{}
+Les effets d'une instruction call à un module P sont déduits des
+effets résumés de P de la manière suivante.
+
+\paragraph{}
+Les effets sur les variables communes et statiques se trouvant dans le
+résumé de P sont dupliqués et associés à l'instruction call. Les
+effets sur les paramètres formels de P sont traduits en des effets sur
+les arguments réels de l'appel; ces effets traduits sont ajoutés à la
+liste des effets de l'instruction call.
+
+\paragraph{}
+La traduction est immédiate dans le cas où le paramètre réel est une
+expression: il n'y a pas d'effet traduit.
+
+\paragraph{}
+La traduction est simple dans le cas où le paramètre réel et le
+paramètre formel ont le même rang (nombre de dimensions). Dans ce cas,
+l'effet traduit est identique à l'effet résumé mis à part que la
+variable formelle est remplacée par la variable réelle dans la
+référence de l'effet traduit.
+
+\paragraph{}
+Deux cas peuvent se présenter lorsque le paramètre réel et le
+paramètre formel n'ont pas le même rang:
+\begin{itemize}
+\item 
+ le paramètre formel est un scalaire et le paramètre reél est un
+ élément de tableau; dans ce cas, la référence de l'effet traduit
+ est la référence à l'élément de tableau, et les autres champs de
+ l'effet traduit sont identiques à ceux de l'effet résumé.
+
+\item les paramètres réels et formels sont des tableaux de tailles
+        différentes. 
+\end{itemize}
+
+\paragraph{}
+Dans ce dernier cas, notre algorithme tente de détecter les situations
+où l'effet sur la variable formelle peut être traduit en un effet plus
+précis que la totalité du tableau réel. C'est notament le cas lorsque
+le paramètre formel est un vecteur (tableau à une dimension) associé
+à une colonne d'une matrice (tableau à deux dimensions). Lorsqu'une
+telle situation est détectée, nous utilisons les ranges dans les
+expressions d'indice pour indiquer qu'une colonne d'une matrice a été
+changée; ainsi, la lecture de la J+1 ème colonne d'une matrice 100x100
+sera représentée par l'effet:
+\begin{verbatim}
+{ MAT(1:100,J+1) , {is_action_read, UU} , {is_approximation_must , UU} } 
+\end{verbatim}
+
+\paragraph{}
+Pour avoir le droit de générer ce genre d'effet, il faut s'assurer que
+la taille du tableau formel est inférieure ou égale à la taille de la
+région correspondante du tableau réel; il faut par exemple vérifier
+que la taille d'un vecteur est bien inférieure à la taille d'une
+colonne d'une matrice. Pour effectuer cette vérification, nous formons
+un système d'équations et d'inéquations linéaires qui n'est faisable
+que s'il y a effectivement dépassement de la zone réelle par le
+tableau formel, puis nous prouvons que ce système est infaisable.
+
+\paragraph{}
+La souplesse de notre représentation interne et l'extrème qualité de
+notre code font que nous n'avons pas eu à modifier la moindre ligne de
+code dans le calcul des dépendances pour prendre en compte ce nouveau
+genre d'effets et paralleliser ainsi des boucles contenant des appels de
+procédure. 
+
+\paragraph{}
+L'exemple suivant est un résultat de Pips qui montre la puissance de
+notre calcul d'effet interprocédural. La boucle sur J du module MM03
+contient un appel à SAXPY qui ne modifie que la J ième colonne de C.
+Notre calcul d'effet s'en rend compte grâce à une analyse des effets
+de SAXPY et une traduction de ces effets pour le call concerné; ce
+résultat permet à notre algorithme de parallélisation de transformer
+la boucle séquentielle sur J en une boucle parallèle.
+\begin{verbatim}
+      SUBROUTINE MM03(N, A, B, C)
+      ...
+      DOALL J = 1,N,1
+         PRIVATE K
+         DO K = 1,N,1
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                            11
+         ENDDO
+      ENDDO
+      ...
+      END
+
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C     
+      M = MOD(N,4)
+      DO I = 1, M
+         X(I) = X(I) + S*Y(I)
+      ENDDO
+C     
+      DO I = M+1, N, 4
+         X(I) = X(I) + S*Y(I)
+         X(I+1) = X(I+1) + S*Y(I+1)
+         X(I+2) = X(I+2) + S*Y(I+2)
+         X(I+3) = X(I+3) + S*Y(I+3)
+      ENDDO
+C
+      RETURN
+      END
+\end{verbatim}
+
+\subsection{Echange de boucles et loop skewing}
+
+\paragraph{}
+L'échange de boucle généralisé et la version réduite de la méthode
+hyperplane proposée par Michael Wolfe, le {\em loop skewing}, nécessitent
+des calculs de base et de changement de base. Le codage de ces algorithmes
+d'algèbre linéaire a débuté.
+
+\section{Conclusion}
+
+\paragraph{}
+Le travail sur Pips s'est poursuivi normalement durant les trois derniers
+mois. La phase d'analyse sémantique a été complétée par
+l'ajout d'options d'exécutions, par le traitement
+des tests et par un traitement précis des appels de procédure.
+
+\paragraph{}
+La phase de parallélisation a été rendue plus robuste. Il est maintenant
+possible d'exécuter PIPS sur un des benchmark de l'ONERA, tmines.f.
+Le calcul des dépendances a
+par ailleurs été amélioré pour prendre en compte les effets
+interprocéduraux et pour permettre ainsi un premier niveau de parallélisation
+interprocédurale.
+
+\paragraph{}
+Ceci a permis de se rendre compte que le Fortran réduit, défini à partir
+des benchmarks de l'ONERA, était adapté à d'autres benchmarks comme ceux
+du CEA pourvu que les modules BLOCKDATA soient réincorporés.
+
+\end{document}
+\end

@@ -1,0 +1,112 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\newcommand{\references}[1]{{\em #1~references}}
+
+\newcommand{\mybfitem}[1]{\item[{\bf#1}]}
+\newcommand{\myttitem}[1]{\item[{\tt#1}]}
+\newenvironment{mylist}{\begin{list}%
+        {}{}}{\end{list}}
+
+\newcommand{\smallverb}[1]{{\small \verb+#1+}}
+\newcommand{\smalltt}[1]{{\small \tt #1}}
+
+\newenvironment{csmalltt} {\begin{center} \small \tt}
+                           {\end{center}}
+%\newenvironment{regions} {\begin{center} \small \tt \begin{tabular}{l}}
+%                           {\end{tabular} \end{center}}
+\newenvironment{regions} {\[\begin{array}{l}}
+                           {\end{array} \]}
+
+
+\newenvironment{videitemize}{\renewcommand{\labelitemi}{}
+\renewcommand{\labelitemii}{} \renewcommand{\labelitemiii}{}
+\renewcommand{\labelitemiv}{}
+\begin{itemize}}
+{\end{itemize}}
+
+%noms
+\newcommand{\pips}[0]{{\sc pips}}
+\newcommand{\PIPS}[0]{{\sc pips}}
+\newcommand{\fortran}[0]{{\sc fortran}}
+
+% pour les figures encadr{\'e}es en haut et en bas
+\newcommand{\drawline}[0]{\leavevmode\hrulefill}
+\newenvironment{myfigure}{\begin{figure} 
+                         \drawline }
+                            { \drawline 
+                        \end{figure}}
+
+\newenvironment{myfigurep}{\begin{figure}[p] 
+                         \drawline }
+                            { \drawline 
+                        \end{figure}}
+
+% symboles math{\'e}matiques
+\newcommand{\union}[0]{\cup}
+\newcommand{\U}[0]{\cup}
+\newcommand{\inter}[0]{\cap}
+\newcommand{\loand}[0]{\wedge}
+\newcommand{\loor}[0]{\vee}
+\newcommand{\tq}[0]{\:|\:}
+\newcommand{\ilexiste}[0]{\exists\:}
+\newcommand{\implique}[0]{\Longrightarrow}
+\newcommand{\rond}[0]{\circ}
+\newcommand{\meet}[0]{\wedge}
+\newcommand{\Meet}[0]{\bigwedge}
+\newcommand{\qqsoit}[0]{\forall \:}
+\newcommand{\Umust}[0]{\cup_{must}}
+\newcommand{\Umay}[0]{\cup_{may}}
+\newcommand{\rminus}[0]{\circleddash}
+
+% r{\'e}gions 
+%\newcommand{\convexhull}[0]{convexhull}
+%\newcommand{\must}[0]{{\tt MUST}}
+%\newcommand{\may}[0]{{\tt MAY}}
+\newcommand{\Tinverse}[0]{\widetilde{T}_k^{-1}}
+\newcommand{\Ttilde}[2]{{\cal T}_{\sigma_{#1} \rightarrow \sigma_{#2}}}
+\newcommand{\Ttildepriv}[3]{{\cal T}_{\sigma_{#1} \rightarrow
+\sigma_{#2} \backslash {#3} }}
+%\newcommand{\phik}[1]{\ifmmode\else$\fi\phi_{#1}\ifmmode\else$\fi}
+\newcommand{\rread}[0]{{\tt  READ}}
+\newcommand{\rwrite}[0]{{\tt  WRITE}}
+\newcommand{\rin}[0]{{\tt   IN}}
+\newcommand{\rout}[0]{{\tt OUT}}
+\newcommand{\rw}[0]{{\tt READ/WRITE}}
+
+
+% th{\'e}or\`{e}mes et similaires
+\newtheorem{property}{Property}
+\newtheorem{algorithm}{Algorithm}
+%\newtheorem{definition}{Definition}
+\newtheorem{notation}{Notation}
+\newtheorem{criterium}{Criterium}
+%\newtheorem{corollary}{Corollary}
+\newenvironment{proff}{\paragraph{Proof:}}
+                        { {\hfill\ \hfill \(\square\)} \paragraph{} }
+
+
+
+\newcommand{\matheq}[1]{$#1$}
+
+
+\newcommand{\tab}{\hspace{5mm}}

@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+
+import os, sys, tempfile, pickle
+from optparse   import OptionParser
+from subprocess import Popen, PIPE
+from shutil     import rmtree
+from pyps       import workspace, module
+
+
+class Object_Code:
+	"""Preprocessed C source file descriptor
+	"""
+	def __init__(self, sourcefile, cppflags, cflags):
+		self.cflags=cflags
+		CPP = os.getenv('CPP', 'cpp')
+		cmd = [CPP, '-U__GNUC__'] + cppflags + [sourcefile]
+		print '# running', cmd
+		sp = Popen(cmd, stdout = PIPE)
+		sp.wait()
+		self.code  = sp.stdout.read()
+		self.cname = sourcefile.replace(os.sep, '__')
+		
+	def set_cname(self, cname):
+		self.cname=cname
+		for op in self.cflags:
+			if op == '-c':
+				i=self.cflags.index(op)
+				self.cflags[i+1]=self.cname
+				break
+			
+	def dump_to_c(self, in_dir):
+		self.set_cname(os.path.join(in_dir, self.cname))
+		file(self.cname, 'w').write(self.code)
+
+class Pipscc:
+	"""modular pips compiler front-end
+	"""
+	def run(self):
+		"""run the compilation"""
+		if not options.is_ld:
+			self.pipscpp() 
+		else:
+			self.pipsld() 
+
+	def pipscpp(self):
+		"""simulate the behavior of the c preprocessor
+		"""
+		OUTFILE = options.ofile or args[0][:-1] + 'o' 
+		print '# CPPFLAGS: ', cppflags
+		# look for input file
+		for arg in args:
+			# generate internal representation of preprocessed code
+			obj = Object_Code(arg, cppflags, sys.argv[1:])
+			# serialize it
+			pickle.dump(obj, file(OUTFILE, 'w'))
+			print '# OBJ written: ', OUTFILE
+			break
+		# that's all folks
+
+	def unpickle(self, WDIR, files):
+		"""generate a list of unpickled object files from files"""
+		O_FILES=[]
+		for ifile in files:
+				obj=pickle.load(file(ifile, 'r'))
+				obj.dump_to_c(WDIR)
+				obj.oname=ifile
+				O_FILES+=[obj]
+		return O_FILES
+
+	def changes(self, ws):
+		"""apply any change to the workspace, should be overloaded by the user"""
+		map(module.display, ws)
+
+	def get_wd(self):
+		"""selects a working directory for pipscc"""
+		WDIR=tempfile.mkdtemp('pipscc')
+		print '# intermediate files generated in', WDIR
+		return WDIR
+
+	def get_workspace(self, c_files):
+		return workspace(c_files)
+
+	def compile(self, wdir, o_files):
+		CC=os.getenv('CC', 'gcc')
+		for obj in o_files:
+			cmd=[CC]+obj.cflags+['-o', obj.oname]
+			print '# running', cmd
+			sp = Popen(cmd)
+			sp.wait()
+		
+		cmd=reduce(lambda x, y:x+' '+y, sys.argv[1:], CC)
+		print '# running', cmd
+		res=os.system(cmd)
+		exitcode= (res >>8)& 0xFF
+		if exitcode:
+			rmtree(wdir)
+
+	def pipsld(self):
+		"""simulate c linker, all computation is done at link time
+		"""
+		WDIR = self.get_wd()
+		
+		# gather pickled input files
+		INPUT_FILES = [f for f in args if f[-2:]=='.o']
+		# load pickled input files
+		O_FILES = self.unpickle(WDIR, INPUT_FILES)
+		C_FILES = [o.cname for o in O_FILES]
+		print '# input files: ', ' '.join(C_FILES)
+
+		#if C_FILES:
+		# run pips with this informations
+		print '# running pips'
+		ws = self.get_workspace(C_FILES)
+		# add extra operations 
+		self.changes(ws)
+		# commit changes
+		ws.save(indir=WDIR)
+		# the end for pips
+		ws.quit()
+		
+		# now run the compiler
+		self.compile(WDIR, O_FILES)
+
+
+#
+##
+#
+
+if __name__ == '__main__':
+	
+	cppflags=[]
+	def cpp_arg(option, opt_str, value, parser):		
+		cppflags.append(str(option) + value)
+
+	parser = OptionParser()
+	parser.add_option('-c', dest='is_ld', action='store_false', default=True,
+			  help='Compile the source files, but do not link')
+	parser.add_option('-o', dest='ofile', action='store',
+			  help='Place output in file FILE', metavar='FILE')
+	parser.add_option('-D', action='callback', callback=cpp_arg, type='string',
+			  help='Predefine NAME as a macro' , metavar='NAME')
+	parser.add_option('-I', action='callback', callback=cpp_arg, type='string',
+			  help='Add the directory DIR to the list of directories to be searched for header files',
+			  metavar='DIR')
+	(options, args) = parser.parse_args()
+
+	if args:
+		thecompiler = Pipscc()
+		thecompiler.run()
+	else:
+		print 'pipscc: no input files'

@@ -1,0 +1,73 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+script=`basename $0`
+VERBOSE=':'
+DEBUG=':'
+
+usage()
+{
+  cat 2>&1 <<-EOF
+	Usage: $script [-vDh] ws...
+	  version is $Revision$
+	  -v: verbose
+	  -D: debug
+	  -h: help
+	  ws: workspace(s) (default *.hpfc)
+	EOF
+  exit ${1:-1}
+}
+
+verbose()
+{
+  echo "$script: $@"
+}
+
+debug()
+{
+  echo "$script: $@" 1>&2
+}
+
+while getopts vDh OPT
+do
+  case $OPT in
+    v) VERBOSE='verbose' ;; 
+    D) DEBUG='debug' ;;
+    h|*) usage 1 ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+[ $# -eq 0 ] && set *.hpfc
+
+for ws
+do
+  WORKSPACE=`echo $ws | sed 's,\.hpfc/*$,,'`
+  $VERBOSE "deleting $WORKSPACE"
+  [ -d "$WORKSPACE.hpfc" ] && rm -rf "$WORKSPACE.hpfc"
+done
+
+#
+# That is all
+#

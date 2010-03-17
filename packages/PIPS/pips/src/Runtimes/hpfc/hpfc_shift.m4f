@@ -1,0 +1,377 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+!
+!
+      subroutine hpfc tdim(array, dim, template, tdim)
+      integer array, dim, template, tdim
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      integer i
+!
+      template = ATOT(dim)
+      tdim = 0
+      do i=1, NODIMT(template)
+         if (ALIGN(array,i,1).eq.dim) tdim=i
+      enddo
+      debug(`write (unit=0, fmt=*)
+     $     "[hpfc tdim] ", array, dim, template, tdim')
+      end
+!
+!
+      subroutine hpfc pdim(template, tdim, procs, pdim)
+      integer template, tdim, procs, pdim
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      integer i
+!
+      procs = TTOP(template)
+      pdim = 0
+      do i=1, NODIMP(procs)
+         if (DIST(template,i,1).eq.tdim) pdim=i
+      enddo
+      debug(`write (unit=0, fmt=*)
+     $     "[hpfc pdim] ", template, tdim, procs, pdim')
+      end
+!
+!
+      integer function hpfc proc dim(an, dim)
+      integer an, dim
+      integer template, tdim, procs, pdim
+      call hpfc tdim(an, dim, template, tdim)
+      call hpfc pdim(template, tdim, procs, pdim)
+      hpfc proc dim=pdim
+      end
+!
+!
+      subroutine hpfc template cell
+     $     (array, dim, index, template, tdim, cell)
+      integer array, dim, index, template, tdim, cell
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+!
+      call hpfc tdim(array, dim, template, tdim)
+      if (tdim.eq.INTFLAG) stop
+      if (tdim.eq.0) then
+         cell = ALIGN(array,tdim,3)
+      else
+         cell = ALIGN(array,tdim,2)*index+ALIGN(array,tdim,3)
+      endif
+      end
+!
+!
+      subroutine hpfc procs n(template, tdim, cell, procs, pdim, n)
+      integer template, tdim, cell, procs, pdim, n
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      integer param
+!
+      call hpfc pdim(template, tdim, procs, pdim)
+      if (pdim.eq.INTFLAG) stop
+      param = DIST(template, pdim, 2)
+      if (param.gt.0) then
+! BLOCK distribution
+         n = ((cell-RANGET(template, tdim, 1)) / param) 
+     $        + RANGEP(procs, pdim, 1)
+      else
+! CYCLIC distribution
+         param = -param
+         n = MOD(((cell-RANGET(template, tdim, 1))/param),
+     $             RANGEP(procs, pdim, 3)) + RANGEP(procs, pdim, 1)
+      endif
+      end
+!
+! ARRAY TO PROCESSORS
+!
+      subroutine hpfc array to procs
+     $     (array, dim, index, procs, pdim, n)
+      integer array, dim, index, procs, pdim, n
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      integer template, tdim, cell
+      call hpfc template cell(array, dim, index, template, tdim, cell)
+      call hpfc procs n(template, tdim, cell, procs, pdim, n)
+      end
+!
+! Assumes a block distribution and a positive (?) alignment
+!
+      subroutine hpfc last local item
+     $     (procs, pdim, n, array, dim, last)
+      integer procs, pdim, n, array, dim, last
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      integer template, tdim
+!
+      call hpfc tdim(array, dim, template, tdim)
+      last = (DIST(template, pdim, 2)
+     $     * (n-RANGEP(procs, pdim, 1)+1) - 1
+     $     + RANGET(template, tdim, 1)
+     $     - ALIGN(array, tdim,  3)) / ALIGN(array, tdim, 2)
+      debug(`write (unit=0, fmt=*) "[hpfc tdim] ",
+     $     procs, "[", pdim, "](", n,  ") last ", last')
+      end
+!
+! computes the relative lid 
+!
+      subroutine hpfc cmp lid(procs, pdim, n, lid)
+      integer procs, pdim, n
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      logical replicated
+      integer indp(7), i, lid
+! humm.... should be coherent with the compiler...
+      replicated = .false.
+      do i=1, NODIMP(procs)
+         indp(i)=MYPOS(i, procs)
+      enddo
+      indp(pdim)=n
+      call HPFC PROCLID(indp, procs, lid, replicated)
+      end
+!
+! Considering array(DIM=dim lb:ub) the accessed area, with shift
+! to be performed, computes the processes to be sent data and
+! the area to be touched, as expressed in local addresses.
+! 
+! The dual use is to compute the area written and the relative senders.
+!
+! If one of the delta processes is zero, it means that the shift is local.
+!
+      subroutine hpfcshift(array, dim, lb, ub, sh, 
+     $                      lb1, ub1, lid1, lb2, ub2, lid2)
+      integer array, dim, lb, ub, sh,
+     $     lb1, ub1, lid1, lb2, ub2, lid2
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      integer nlb, nub, llb, pdim, procs, tdim, template
+      integer glb, gub, glbd, gubd, p1, p2, last
+!
+      debug(`write (unit=0, fmt=*)
+     $     "[hpfcshift] array/dim/area: ", array, dim, lb, ub')
+      call hpfc tdim(array, dim, template, tdim)
+      call hpfc pdim(template, tdim, procs, pdim)
+      call hpfc loop bounds(nlb, nub, llb, lb, ub, array, pdim)
+!
+! empty
+!
+      if (nlb.gt.nub) then
+         lb1=1
+         ub1=0
+         lid1=-1
+         lb2=1
+         ub2=0
+         lid2=-1
+         debug(write (unit=0, fmt=*) "[hpfcshift] nothing for ", MYLID)
+         return
+      endif
+      glb = llb+1
+      glbd = glb+sh
+      gub = glb + nub-nlb
+      gubd = gub+sh
+!
+! now array(DIM=dim glb:gub) is the accessed area for the current process
+! and array(DIM=dim glbd:gubd) is the target area
+!
+      call hpfc array to procs(array, dim, glbd, procs, pdim, p1)
+      call hpfc array to procs(array, dim, gubd, procs, pdim, p2)
+      
+      if (p1.eq.p2) then
+! only one target
+         lb1=nlb
+         ub1=nub
+         call hpfc cmp lid(procs, pdim, p1, lid1)
+         lb2=1
+         ub2=0
+         lid2=-1
+      else
+         lb1=nlb
+         call hpfc last local item(procs, pdim, p1, array, dim, last)
+         ub1 = last-glbd+lb1
+         call hpfc cmp lid(procs, pdim, p1, lid1)
+         lb2=ub1+1
+         ub2=nub
+         call hpfc cmp lid(procs, pdim, p2, lid2)
+      endif
+      end
+!
+! after packing functions
+! 
+define(`LIST_DECL_BOUNDS',`
+     $ dl$1, du$1')dnl
+define(`LIST_SECTION',`
+     $ rl$1, ru$1')dnl
+define(`LIST_NEW_SECTION',`
+     $ l($1), u($1), 1')dnl
+define(`DO_LOOP',`
+      do i$1 = l($1), u($1)')dnl
+define(`REVERSE_DO_LOOP',`
+      do i$1 = u($1), l($1), -1')dnl
+define(`ENDDO_LOOP',`
+      enddo')dnl
+define(`ARRAY_DECL',`dl$1:du$1')dnl
+define(`INDEX_REF',`i$1')dnl
+define(`INDEX_REFSH',`i$1+s($1)')
+define(`INIT_TABLE',`dnl
+      il($1)=rl$1
+      iu($1)=ru$1
+')dnl
+!
+define(`GENERIC_SHIFT',`dnl
+pushdef(`LEVEL',$1)dnl
+pushdef(`PVMTYPE',$2)dnl
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
+      subroutine build_name(PVMTYPE,SHIFT,LEVEL)(
+     $  array, an, dim, sh, dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL, `LIST_SECTION')
+     $)
+      integer
+     $     an, dim, sh, dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL, `LIST_SECTION')
+      TYPE
+     $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
+      integer info, tmp, i, lid(2), j, bufid
+      integer l(LEVEL), u(LEVEL), lp, up, li, ui, il(LEVEL), iu(LEVEL)
+      integer s(LEVEL)
+SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl      
+!
+! TO
+!      
+      do i=1, LEVEL
+         if (dim.ne.i) then
+            call HPFC LOOP BOUNDS
+     $           (l(i), u(i), tmp, il(i), iu(i), 
+     $            an, hpfc proc dim(an, i))
+            debug(`write (unit=0, fmt=*) MYLID, " dim ", i, " bounds: ", 
+     $           l(i), u(i)')
+         else
+            call hpfcshift
+     $           (an, dim, il(i), iu(i), sh,
+     $            l(i), u(i), lid(1),
+     $            lp, up, lid(2))
+         endif
+      enddo
+      do i=1, LEVEL
+         if (dim.ne.i) then
+            s(i)=0
+         else
+            s(i)=sh
+         endif
+      enddo
+
+!
+! SEND TO
+!
+      li=l(dim)
+      ui=u(dim)
+      do j=1, 2
+         if (lid(j).ne.MY LID.and.lid(j).gt.0) then
+            debug(`write (unit=0, fmt=*)
+     $           MYLID, " sending Shift to ", lid(j)')
+!
+! the SHIFT is to another processor
+!
+            call HPFC INIT SEND(DATARAW ENCODING, bufid)
+            call build_name(PVMTYPE,PACK,LEVEL)
+     $           (array, dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
+            call HPFC SEND(lid(j),SENDCHANNELS(lid(j)),info)
+            SENDCHANNELS(lid(j))=SENDCHANNELS(lid(j))+2
+         endif
+         l(dim)=lp
+         u(dim)=up
+      end do
+
+!
+! LOCAL
+!
+      l(dim)=li
+      u(dim)=ui
+      do j=1, 2
+         if (lid(j).eq.MY LID) then
+            if (sh.lt.0) then
+REVERSE_REPLICATE(LEVEL,`DO_LOOP')
+            array(COMMA_REPLICATE(LEVEL,`INDEX_REFSH'))=
+     $         array(COMMA_REPLICATE(LEVEL,`INDEX_REF'))
+SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+            else
+REVERSE_REPLICATE(LEVEL,`REVERSE_DO_LOOP')
+            array(COMMA_REPLICATE(LEVEL,`INDEX_REFSH'))=
+     $         array(COMMA_REPLICATE(LEVEL,`INDEX_REF'))
+SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+            end if
+         end if
+         l(dim)=lp
+         u(dim)=up
+      enddo
+
+!
+! RECEIVE FROM
+!      
+      il(dim)=il(dim)+sh
+      iu(dim)=iu(dim)+sh
+      call hpfcshift
+     $     (an, dim, il(dim), iu(dim), -sh,
+     $      l(dim), u(dim), lid(1),
+     $      lp, up, lid(2))
+!
+       do j=1, 2
+          if (lid(j).gt.0.and.lid(j).ne.MY LID) then
+             debug(`write (unit=0, fmt=*) 
+     $            MY LID, " receiving Shift from ", lid(j)')
+!
+! the SHIFT is to another processor
+!
+             call HPFC RECEIVE(lid(j),
+     $            RECVCHANNELS(lid(j)))
+             RECV CHANNELS(lid(j))=RECV CHANNELS(lid(j))+2
+             call build_name(PVMTYPE,UNPACK,LEVEL)
+     $            (array, dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
+         endif
+         l(dim)=lp
+         u(dim)=up
+      enddo
+      end
+!     
+popdef(`LEVEL')dnl
+popdef(`TYPE')dnl
+popdef(`PVMTYPE')')dnl
+!
+!
+forloop(`_D_',1,_HPFC_DIMENSIONS_,`
+ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_SHIFT(_D_,HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_SHIFT(_D_,HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_SHIFT(_D_,HPFC INTEGER4)')
+ifdef(`_HPFC_NO_STRING_',,`GENERIC_SHIFT(_D_,HPFC STRING)')
+ifdef(`_HPFC_NO_REAL4_',,`GENERIC_SHIFT(_D_,HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`GENERIC_SHIFT(_D_,HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`GENERIC_SHIFT(_D_,HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`GENERIC_SHIFT(_D_,HPFC COMPLEX16)')')
+
+!
+! That is all
+!

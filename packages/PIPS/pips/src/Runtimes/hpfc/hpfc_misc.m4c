@@ -1,0 +1,256 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+/* a set a timer functions written in C and 
+ * called from a Fortran subroutine. 
+ *
+ * Fabien Coelho, 1993-1994-1995-1996
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+
+/******************************************************************** TIME */
+/* functions to measure wall clock time and be called by the rt.
+ * there is a static stack of ten timer starts, thus imbrication is possible.
+ * going too far would result in an abort.
+ */
+
+#include <sys/time.h>
+
+#define MAX_COMMENT_LENGTH 63
+
+/* static stack of timings...
+ */
+#define TIMER_STACK_SIZE 10
+static struct timeval initial[TIMER_STACK_SIZE];
+static int timer_index=0;
+
+
+
+/* static stack of cumulated timings */
+#define C_TIMER_STACK_SIZE 10
+
+typedef struct
+{ struct timeval initial;
+  long   t_seconds;
+  long   t_micros;
+} c_timer;
+
+static c_timer cumulated_timer[C_TIMER_STACK_SIZE];
+static int identity_array[C_TIMER_STACK_SIZE];
+
+/* gettimeofday is not declared anywhere! (on sunos at least)
+ */
+/* extern int gettimeofday(struct timeval *, struct timezone *); */
+
+
+/* to print the micros with leading and trailing 0s if needed.
+ * ??? static buffer... I could not find any way to do that with formats.
+ */
+static char *
+print_micros(long micros)
+{
+    static char buffer[7];
+    int i;
+
+    sprintf(buffer, "%6ld", micros);
+
+    for (i=0; i<6; i++)
+	if (buffer[i]==' ') buffer[i]='0' ;
+
+    return buffer;
+}
+
+/* Initialize informations about timer identity */
+void 
+FUNCTION(init_timer) ARGS(`') /* `' */
+{
+    int i;
+    for(i=0;i<C_TIMER_STACK_SIZE;i++)  
+	identity_array[i]=-1;
+}
+
+/* Returns the rank corresponding to the given timer tag */
+static int 
+identify_timer(int tag) /* `' */
+{
+    int i;
+    
+    /* First try to identify it */
+    for (i=0;i<C_TIMER_STACK_SIZE;i++)
+	if(tag==identity_array[i]) return i;
+
+    /* if not found, it's a "new" one */
+    for (i=0;i<C_TIMER_STACK_SIZE;i++)
+	if(identity_array[i] == -1){
+	    identity_array[i] = tag;
+	    return i;
+	}
+
+    /* No more space */
+    assert(0);
+}
+
+/* Start a cumulated timer <timer> */
+/* <timer> is just a TAG which allows to identify the timer */
+void
+FUNCTION(hpfcctimeon) ARGS(`timer') /* `' */
+int timer;
+{
+    int rank;
+
+    rank = identify_timer(timer);
+
+    /* push current time
+     */
+    if (gettimeofday(&cumulated_timer[rank].initial, (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
+}
+
+/* Stop cumulated timer <timer> */
+void 
+FUNCTION(hpfcctimeoff) ARGS(`timer') /* `' */
+int timer;
+{
+    struct timeval current;
+    long seconds, micros;
+    int rank;
+
+    rank = identify_timer(timer);
+
+    /* get current time, and compute the delta.
+     */
+    if (gettimeofday(&current, (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
+
+    seconds = current.tv_sec-cumulated_timer[rank].initial.tv_sec;
+    micros = current.tv_usec-cumulated_timer[rank].initial.tv_usec;
+    if (micros<0) micros+=1000000, seconds--;
+
+    
+    /* cumulate with earlier results */
+    cumulated_timer[rank].t_seconds += seconds;
+    cumulated_timer[rank].t_micros += micros;
+    if (cumulated_timer[rank].t_micros>=1000000)
+	cumulated_timer[rank].t_micros -= 1000000, cumulated_timer[rank].t_seconds++;
+    
+}
+
+/* Print cumulated value for that timer */
+void 
+FUNCTION(hpfcprintctime) ARGS(`timer, STRING_ARG(comment)') /* `' */
+int timer;
+STRING_ARG_DECL(comment);
+{
+    char buffer[ MAX_COMMENT_LENGTH + 1 ];
+    int i,rank;
+
+    rank = identify_timer(timer);
+
+    /* copy the comment in the buffer to ensure there is a NULL at the end.
+     */  
+    for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
+	buffer[i] = STRING_PTR(comment)[i];
+    buffer[i]='\0';
+
+    /* display the result, with the associated level.
+     */
+    fprintf(ifdef(`USE_PVMe',stdout,stderr), "%s [%d]: %ld.%s s\n", buffer, timer, cumulated_timer[rank].t_seconds, print_micros(cumulated_timer[rank].t_micros));
+
+    /* remove from the list of useful timer */
+    identity_array[rank] = -1;
+}
+
+
+
+void
+FUNCTION(hpfctimeon) ARGS(`') /* `' */
+{
+    assert(timer_index<TIMER_STACK_SIZE);
+
+    /* push current time
+     */
+    if (gettimeofday(&initial[timer_index++], (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
+
+    /* I could diplay some message, maybe with the level.
+     */
+}
+
+
+
+void
+FUNCTION(hpfctell) ARGS(`STRING_ARG(comment)') /* `' */
+STRING_ARG_DECL(comment);
+{
+    char buffer[ MAX_COMMENT_LENGTH + 1 ];
+    int i;
+    
+    /* copy the comment in the buffer to ensure there is a NULL at the end.
+     */  
+    for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
+	buffer[i] = STRING_PTR(comment)[i];
+    buffer[i]='\0';
+
+    fprintf(ifdef(`USE_PVMe',stdout,stderr), "[hpfctell] %s\n", buffer);
+}/* `' */
+
+void 
+FUNCTION(hpfctimeoff) ARGS(`STRING_ARG(comment)') /* `' */
+STRING_ARG_DECL(comment);
+{
+    char buffer[ MAX_COMMENT_LENGTH + 1 ];
+    struct timeval current;
+    long seconds, micros;
+    int i;
+
+    assert(timer_index>0); timer_index--;
+
+    /* copy the comment in the buffer to ensure there is a NULL at the end.
+     */  
+    for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
+	buffer[i] = STRING_PTR(comment)[i];
+    buffer[i]='\0';
+
+    /* get current time, and compute the delta.
+     */
+    if (gettimeofday(&current, (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
+
+    seconds = current.tv_sec-initial[timer_index].tv_sec;
+    micros = current.tv_usec-initial[timer_index].tv_usec;
+    if (micros<0) micros+=1000000, seconds--;
+
+    /* display the result, with the associated level.
+     */
+    /* stdout or stderr. stderr! 
+     * but I'm not sure of what is done by loadleveler on the SP2,
+     * so I put, hopefully temporarily, stdout as the output for that machine.
+     */
+    fprintf(ifdef(`USE_PVMe',stdout,stderr), "%s [%d]: %ld.%s s\n", 
+	    buffer, timer_index, seconds, print_micros(micros));
+}
+
+/* that is all
+ */

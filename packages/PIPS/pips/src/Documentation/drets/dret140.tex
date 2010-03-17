@@ -1,0 +1,145 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\newcommand{\titre}{PROJET PIPS \\
+		LISTING DU DETECTEUR DE PARALLELISME
+}
+
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E140}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+La détection du parallélisme comprend de nombreuses étapes. Une fois les
+phases d'analyse terminées (cf. rapport E139), il reste à construire
+le graphe de dépendance, à effectuer les transformations qui peuvent l'être
+pour augmenter le parallélisme et à exhiber ce dernier.
+
+Ce rapport couvre la normalisation des expressions, les structures de
+données utilisées pour représenter le graphe de dépendance ainsi que
+les routines de bases exploitant ce graphe, le calcul du graphe de
+dépendance et le test de dépendance associé, l'utilisation du graphe
+de dépendance pour la privatisation des variables scalaires, la
+détection du parallélisme à proprement parler, et finalement les
+transformations unimodulaires de nid de boucle (par exemple, l'échange
+de boucles).
+
+\newpage
+
+\section{Bibliothèque {\em Normalize}}
+
+La bibliothéque {\em normalize} recherche les expressions linéaires
+qui pourront être utilisées dans les tests de dépendance et dans le
+calcul des préconditions et transforme les expressions qui peuvent
+l'être en structure {\em vecteur}.
+
+\input{normalize.listing}
+
+\section{Structure de données {\em Graph}}
+
+La structure de données {\em graph} est une structure de données
+génériques pouvant être utilisée pour construire et exploiter
+n'importe quel type de graphe. Elle est décrite ici pour faciliter le
+compréhension de la structure représentant le graphe de dépendance,
+{\em ricedg}.
+
+\input{graph.datastructure}
+
+\section{Structure de données {\em Dg}}
+
+La structure de données {\em dg} est déclarée en NewGen. Elle encode
+le graphe de dépendance en utilisant la structure générique {\em
+graph}.
+
+\input{dg.datastructure}
+
+\section{Bibliothèque {\em Dg-util}}
+
+La bibliothèque {\em dg-util} contient les routines de base de la
+structure de données {\em dg} qui n'ont pas été généré
+automatiquement par Newgen.
+
+\input{dg-util.listing}
+
+\section{Bibliothèque {\em Ricedg}}
+
+La bibliothèque {em ricedg} contient les routines nécessaires à la
+construction d'un graphe de dépendance de type Allen \& Kennedy. Le
+test de dépendance utilisé est celui qui a été développé au CAII.
+
+\input{ricedg.listing}
+
+\section{Bibliothèque {\em Privatize}}
+
+Comme son nom l'indique cette bibliothèque contient les routines
+nécessaires à la privatisation des variables. La bibliothéque {\em
+rice} contient aussi une passe de privatisation très limitée qui est
+appliquée systématiquement.
+
+\input{privatize.listing}
+
+\section{Bibliothèque {\em Rice}}
+
+La bibliothéque {\em Rice} contient les routines effectuant la
+parallélisation effective des programmes. L'algorithme de
+parallélisation est celui d'Allen \& Kennedy.
+
+\input{rice.listing}
+
+\section{Bibliothèque {\em Hyperplane}}
+
+La bibliothéque {\em Hyperplane} contient toutes les transformations
+unimodulaires sur les boucles, à commencer par l'échange de boucles
+à n'importe quel niveau et, comme son nom l'indique, la méthode
+hyperplane. Tous les algorithmes ont été développés au CAII.
+
+\input{hyperplane.listing}
+
+\end{document}

@@ -1,0 +1,87 @@
+<html>
+
+<head> <title>PIPS: Batch Interface</title> </head>
+
+<body>
+
+<center>
+
+<IMG SRC=images/logo-pips.half-size.gif> <H1>PIPS</H1>
+
+<h2>Shell Interface</h2>
+
+</center>
+
+<hr>
+
+<h2> Content </h2>
+
+<ul>
+  <li> <a href="index.html#introduction">Introduction</a>
+  <li> <a href="index.html#tech">Technical Pages</a>
+</ul>
+
+<hr>
+
+<a name="introduction"><h2>Introduction</h2></a>
+
+<b>PIPS</b> functionalities are available thru a set of Shell scripts
+based on a C program, <a href="pips.html">pips</a>. A workspace must
+first be initialized by the <a href="Init.html">Init</a> command which
+creates a directory containing the set of Fortran files to analyze and
+transform. Different views of each module can be obtained with the <a
+href="Display.html">Display</a> command. If a default computation rule
+is not satisfactory, if can be changed with the <a
+href="Select.html">Select</a> command. Code transformations are
+performed with the <a href="Perform.html">Perform</a> command. Finally,
+the workspace directory and its content can be removed with <a
+href="Delete.html">Delete</a>.
+
+<p>
+
+If a workspace with the same name already exists it is open without
+re-initialization by <a href="Init.html">Init</a>.
+
+<p>
+
+The Shell scripts share a common context. A current workspace and module
+are memorized as early as possible to simplify the interface and to
+minimize the typing effort..
+
+<p>
+
+Four-letter abbreviations for analyses and transformations (via the
+so-called <em>resources</em>) can be used.
+
+<p>
+
+See the <em>PIPS user manual</em> (in French) for more information.
+
+<p>
+
+Note: a <a href="line-interface.html">line interface</a> and a <a
+href="window-interface.html">X-Window interface</a> are also
+available. The Shell interface is the less user-friendly interface but
+it also is the safest one because memory corruptions cannot be
+propagated from on query to the next one, since each of them is an
+independent Shell process. The line interface is a nice trade-off
+between the security of the Shell interface and the user-friendliness of
+the window interface.
+
+<hr>
+
+<a name="tech"><h2>Technical Pages</h2></a>
+
+<ul>
+  <li> <a href="Delete.html">Delete</a>
+  <li> <a href="Display.html">Display</a>
+  <li> <a href="Init.html">Init</a>
+  <li> <a href="Perform.html">Perform</a>
+  <li> <a href="Select.html">Select</a>
+  <li> <a href="pips.html">pips</a>
+</ul>
+
+<hr>
+
+</body>
+</html>

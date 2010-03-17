@@ -1,0 +1,54 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+/* a set a functions to print the host and node status in MPI,
+ * called from a Fortran subroutine.
+ *
+ * Fabien Coelho, 1993-1994-1995-1996
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+/* returns the host name from its number and the table of hosts.
+ * ??? I guess I should abort if not found...
+ */
+
+
+
+void 
+FUNCTION(printhostinfo) ARGS(`') /* `' */
+{
+    
+    fprintf(stderr,"not yet implemented \n");
+}
+
+void 
+FUNCTION(printtaskinfo) ARGS(`number, tids, hosttid') /* `' */
+int *number, *tids, *hosttid;
+{
+    fprintf(stderr,"not yet implemented \n");
+}
+ 
+/*
+That's all
+*/

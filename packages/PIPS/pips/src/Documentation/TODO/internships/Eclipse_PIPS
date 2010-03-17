@@ -1,0 +1,25 @@
+From: Ronan Keryell <Ronan.Keryell@cri.ensmp.fr>
+Subject: Eclipse PIPS
+To: pipsdev@cri.ensmp.fr
+Date: Thu, 15 Nov 2007 03:49:07 +0100
+
+J'ai parcouru  rapidement le 'Platform Plug-in Developer Guide' et le méta
+'Plug-in Development Environment Guide' dans
+http://help.eclipse.org/help33/index.jsp
+
+Il faudrait développer un Plugin qui emballe tpips, analyse les fichiers
+de config des menus et actions générés pour wpips pour générer les menus
+et widgets d'Eclipse et récupère les sorties de tpips dans des fenêtres en
+utilisant le plugin Photran ou CDT d'Eclipse pour la coloration
+syntaxique. Cela permettrait de faire un wpips sauce Eclipse assez
+rapidement.
+
+Ensuite, en remettant en place les attachments de PIPS et en analysant les
+annotations Epips-iennes en Lisp dans le plugin, on pourrait attacher la
+RI et autres infos sémantiques au texte et faire afficher ça selon des
+actions dans Eclipse.
+
+En collant un peu plus les ressources de PIPS à celle d'Eclipse et en
+forçant la synchro de PIPSDBM avec le disque après chaque action, on
+pourrait transformer le Undo d'Eclipse en un Undo de PIPS en gardant une
+version de chaque fichier. :-)

@@ -1,0 +1,988 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\newcommand{\titre}{PROJET PIPS \\
+		ANALYSEUR SEMANTIQUE \\
+		RAPPORT DE SYNTHESE }
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E137}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+L'analyseur sémantique contient des phases très diverses permettant
+aussi le bien le calcul des {\em use-def chains} qui sont un
+préliminaire à l'optimisation globale classique et au calcul du graphe
+de dépendance que le calcul de prédicats et la propagation
+interprocédurale de constante qui sont des pré-requis du test de
+dépendance et des transformations de programmes.
+
+Toutes ces phases supposent connu le graphe de contrôle des modules à
+analyser et fournissent des résultats d'autant meilleurs que ce graphe
+est plus structuré. Elles sont donc précédées d'une phase d'analyse
+du contrôle qui isole autant que possible les zones structurées qui
+peuvent être conservées en l'état, des zones non structurées qui
+nécessitent la construction effective d'un graphe de contrôle.
+Cette analyse est présentée en premier.
+
+La construction interprocédurale des {\em use-def chains} repose sur
+phases d'analyse qui seront détaillées dans le même ordre:
+\begin{itemize}
+  \item calcul des effets {\em read} et {\em write} 
+	des instructions sur la mémoire,
+	en préservant l'information {\em may/must};
+  \item calcul des effets cumulés à toute une procédure et
+	restriction à leur sous-ensemble visible interprocéduralement;
+  \item calcul les trois ou quatre différents type de
+	{\em use-def chains} ({\em use-def}, {\em def-use}, {\em def-def} et,
+	facultativement, {\em use-use}) qui sont classiquement utilisés en
+	compilation.
+\end{itemize}
+
+Le calcul intraprocédural des prédicats et la propagation
+interprocédurale des constantes n'ont pas été implémentés comme
+deux phases d'analyse indépendantes mais regroupées en une unique
+phase plus générale, qui est appelée {\em analyse sémantique}.
+Elle calcule des relations linéaires entre variables scalaires, intra-
+et inter-procéduralement.
+
+Ce rapport ne contient pas directement les descriptions des structures
+de données utilisées parce qu'elles sont toutes incluses directement avec la
+représentation interne des programmes (structure de données {\em ri})
+qui est fournie en annexe.
+
+\newpage
+
+\section{Calcul du graphe de contrôle}
+
+La majorité des programmes utilisateurs sont (ou devraient) être
+structurés. Prenant ce fait en considération, nous avons conçu le
+graphe de contrôle comme une extension de l'arbre de syntaxe abstrait.
+Les structures de données structurées (i.e., boucle, conditionnelle,
+séquence et instruction élémentaire) sont préservées telles quelles
+dans le graphe de contrôle tandis que seuls les branchements
+``cassent'' cette structure hiérarchique pour créer un graphe
+orienté. Ceci permettra de traiter de manière simple les parties
+parallélisables d'un programme, puisque les ruptures de contrôle
+empêchent généralement toute parallélisation (mais voir ci-dessous).
+Un tel graphe de contrôle est appelé {\em Structured Control Graph}.
+Cette intégration du graphe de contrôle avec les instructions du
+programme se reflète dans sa description récursive dans le fichier de
+description NewGen:
+
+\begin{verbatim}
+control = statement x predecessors:control* x successors:control* ;
+instruction = block:statement* + test + loop + ploop + goto:statement + 
+              call + unstructured:control ;
+statement = label:entity x number:int x ordering:int x comments:string x
+            instruction ;
+\end{verbatim}
+
+Dans un noeud du graphe de contrôle, le champ {\tt statement} sera toujours
+structuré; cet invariant est introduit par l'algorithme de création du
+graphe de contrôle. Dans la majorité des cas, les champs {\tt
+predecessors} et {\tt successors} auront des listes réduites à un
+élément. Seule une instruction de branchement conditionnelle (dont le
+{\tt statement} est un {\tt test}) créera une liste {\tt successors}
+ayant plus d'un élément, le premier correspondant au branchement dans
+le cas où la condition est vérifiée. Des noeuds de jointure pourront
+avoir plus d'un prédécesseur.
+
+La liste des types d'instructions possibles d'un programme a été
+augmentée d'un champ {\tt unstructured} qui apparaîtra après
+construction du graphe de contrôle; il n'est jamais introduit par les
+phases précédentes de PIPS.
+
+Ce graphe de contrôle implémente la notion importante de {\em
+masquage de contrôle}. Par exemple, si une boucle utilise un corps qui
+comporte des branchements locaux (ceci est vérifié au cours de la
+construction du graphe), alors, vue de l'extérieur, cette boucle sera
+considérée comme structurée. Dans le cas d'une implémentation
+parallèle, la rupture de séquence dans une itération est en effet
+indépendante des autres itérations et n'empêche en rien l'exécution
+parallèle du programme. 
+
+\subsection{Un exemple simple}
+Dans le programme:
+\begin{verbatim}
+       do 10 i=1,n
+       t(i) = i
+       if ( i .le. m ) goto 20
+           t(i) = i
+20     continue
+10     continue
+\end{verbatim}
+le corps de la boucle sera considéré comme un graphe composé, entre
+autres, d'un noeud d'affectation et d'un noeud de contrôle qui
+correspond au saut conditionnel. Ceci est visible dans le pretty-print
+du graphe de contrôle donné ci-dessous:
+\begin{verbatim}
+Graph 60a48
+           --> Node 60a48
+           statement 61508
+           Preds: 
+           Succs: 
+           Code of 60a48:
+           DO @10 I = 1,N,1
+               Graph 60c40
+                   --> Node 60c40
+                   statement 5d718
+                   Preds: 
+                   Succs: 60ca8 
+                   Code of 60c40:
+                   =(T(I),I)
+                   End of code of 60c40
+                   --> Node 60ca8
+                   statement 5ff98
+                   Preds: 60c40 
+                   Succs: 60d38 60d50 
+                   Code of 60ca8:
+                   IF (.LE.(I,M)) THEN
+                       GOTO @20
+                   ELSE
+                       CONTINUE()
+                   ENDIF
+                   End of code of 60ca8
+                   --> Node 60d38
+                   statement 60e70
+                   Preds: 60ca8 
+                   Succs: 608e0 
+                   Code of 60d38:
+                   End of code of 60d38
+                   --> Node 608e0
+                   statement 61300
+                   Preds: 61180 60d38 
+                   Succs: 
+                   Code of 608e0:
+20                 CONTINUE()
+10                 CONTINUE()
+                   End of code of 608e0
+                   --> Node 61180
+                   statement 61160
+                   Preds: 60da0 
+                   Succs: 608e0 
+                   Code of 61180:
+                   =(T(I),I)
+                   End of code of 61180
+                   --> Node 60da0
+                   statement 60d80
+                   Preds: 60d50 60e40 
+                   Succs: 61180 
+                   Code of 60da0:
+                   End of code of 60da0
+                   --> Node 60d50
+                   statement 61098
+                   Preds: 60ca8 
+                   Succs: 60da0 
+                   Code of 60d50:
+                   CONTINUE()
+                   End of code of 60d50
+                   --> Node 60e40
+                   statement 60e20
+                   Preds: 
+                   Succs: 60da0 
+                   Code of 60e40:
+                   End of code of 60e40
+               End of graph 60c40
+           ENDDO
+00000      CONTINUE()
+           End of code of 60a48
+End of graph 60a48
+\end{verbatim}
+
+\subsection{Construction du graphe}
+La routine principale de construction du graphe de contrôle prend en
+entrée un {\tt statement} et retourne le graphe de contrôle
+correspondant. Comme précisé précédemment, si le statement en
+question est complètement structuré, le graphe de contrôle sera
+limité à un noeud; cela sera le cas, par exemple, de la routine de
+multiplication de matrices.
+
+L'algorithme utilisé est défini par induction sur la structure d'arbre
+abstrait du programme. La routine récursive principale est {\tt
+controlize} qui, pour un statement {\tt st} ayant {\tt pred} pour noeud
+prédecesseur et {\tt succ} pour noeud successeur, retourne dans {\tt
+c\_res} le noeud de contrôle correspondant et met à jour l'argument
+{\tt used\_labels} qui contient la liste des occurrences des étiquettes
+utilisées dans une instruction (ceci est utilisé dans
+l'implémentation du masquage de contrôle).
+
+Le but essentiel de {\tt controlize} est d'éliminer les {\tt goto} et
+de les remplacer par des arcs dans le graphe de contrôle. Ceci est fait
+via deux structures de données (implémentées par des tables de
+hachage); {\tt label\_statements} associe à tout nom d'étiquette la
+liste des instructions qui la référencent, tandis que {\tt
+label\_control} associe à tout nom d'étiquette le noeud de contrôle
+correspondant (qui est utilisé dans le cas de branchement en avant).
+Ces deux structures de données sont construites lors d'un premier
+parcours de {\tt st} par la routine {\tt create\_statements\_of\_labels}.
+
+Le masquage de contrôle nécessite de compactifier les graphes de
+contrôle des composantes d'une instruction en vue de les remplacer par
+un seul noeud. La routine de test principale est {\tt covers\_labels\_p}
+qui vérifie si les occurrences des étiquettes utilisées dans
+l'instruction représentent toutes les apparences possibles de ces
+étiquettes, auquel cas les branchements correspondants sont locaux et
+pourront être négligés dans les instructions englobantes. Une étape
+de compaction importante est {\tt compact\_list} correspondant aux
+séquences; elle permet de regrouper dans des sous-séquences (i.e.,
+{\em basic blocs}) les instructions qui ne comportent pas de
+branchement.
+
+Une conséquence de la construction du graphe de contrôle est la
+possibilité de détecter les instructions du pogramme qui correspondent
+à du ``code mort''. Si cette information est inutile à la
+parallélisation proprement dite, elle peut indiquer une erreur de
+conception du programme d'applications et est donc indiquée à
+l'utilisateur.
+
+\section{Calcul des effets des instructions}
+
+Les dépendances utilisent la notion de conflit entre instructions.
+Celui-ci est déterminé par les effets des instructions sur l'état
+mémoire: quelles variables ou éléments de tableaux sont-ils lus et/ou
+modifiés par chaque instruction du module?
+
+En vue de traiter le problème dans son cas le plus général (et, {donc},
+interprocédural), les effets des instructions sont cumulés selon la
+structure syntaxique du programme à paralléliser. Comme la
+détermination exacte des effets d'une instruction est un problème non
+décidable (penser aux tests, par exemple), nous avons étendu la
+définition d'un effet pour prendre en compte le type d'{\em
+approximation} connu (cf. la définition de la représentation
+intermédiaire de PIPS en annexe). Ainsi, un effet est caractérisé
+par:
+\begin{itemize}
+\item la variable ou l'élément de tableau référencé: une {\tt
+reference};
+
+\item l'attribut permettant de savoir si cet effet est une lecture ou
+une écriture: une {\tt action}; 
+
+\item l'attribut permettant de savoir si cet effet est certain ou
+seulement possible: une {\tt approximation};
+\end{itemize}
+
+Ceci s'écrit en NewGen:
+\begin{verbatim}
+effect =  reference x action x approximation x context:transformer ;
+effects =  effects:effect* ;
+action = read:unit + write:unit ;
+approximation = may:unit + must:unit ;
+\end{verbatim}
+Le champ \verb+context+ n'est pas utilisé dans le cadre du contrat PIPS.
+
+L'effet de l'exemple suivant sur {\tt T} est {\tt <T(I), WRITE, MUST>}
+car la première instruction est effectuée à coup sûr alors que
+l'effet sur {\tt M} est {\tt <M(I,J), READ, MAY>} à cause du test.
+\begin{verbatim}
+        T(I) = 0.0
+        IF (I .EQ. J) PRINT *, M(I,J)
+\end{verbatim}
+
+L'information {\tt approximation} est de plus nécessaire pour calculer
+les chaînes {\em use-def} de manière précise car elle permet de
+savoir si une affectation à une variable ``{tue}'' ou non toutes les
+définitions précédentes de cette variable.
+
+\section{Calcul des {\em Summary Data Flow Information} ({\em SDFI})}
+
+Le calcul des {\em Summary Data Flow Information} ne pose pas de
+problèmes particuliers. Comme indiqué précédemment, il faut
+consolider les effets partiels en mettant à jour les informations {\em
+may/must} et les filtrer au niveau module pour ne conserver que les
+effets visibles interprocéduralement. 
+
+Cependant, l'algorithme traditionnel a été modifié pour implémenter
+un algorithme de parallélisation interprocédurale. 
+
+Jusqu'à présent, les effets des instructions call n'étaient calculés
+que dans le cas où la fonction appelée était un opérateur ou un
+intrinsic. La phase de calcul des effets se terminait donc anormalement
+dans le cas d'une instruction du genre \verb/CALL P/ où \verb/P/ était
+un module défini dans le programme en cours de traitement.
+
+Cette phase a donc été modifiée pour
+\begin{itemize}
+  \item calculer le résumé des effets d'un module sur les variables du
+        programme, 
+  \item déduire du résumé associé à un module les effets d'une
+        instruction d'appel à ce module.
+\end{itemize}
+
+\subsubsection{Calcul du résumé des effets d'un module}
+
+Le calcul des résumés n'a pas posé de problèmes puisque les effets
+des instructions élémentaires (affectation, entrées-sorties, ...)
+d'un module sont {\em remontés} sur les instructions non élémentaires
+(tests, blocs, boucles, ...); il en résulte que tous les effets d'un
+module sont associés au statement bloc de ce module. Le calcul du
+résumé a simplement consisté à dupliquer les effets associés à ce
+bloc en y éliminant les effets sur les variables locales du module. 
+
+Dans cette première version du résumé des effets, les tableaux sont
+considérés comme des entités, ce qui signifie que la consultation
+(resp. la modification) d'un seul élément du tableau implique que la
+totalité du tableau est considérée comme consultée (resp.
+modifiée). Il en résulte que le résumé ne comporte que des effets
+dont la référence n'a pas d'expressions d'indices. Ce choix a pour
+conséquence de diminuer considérablement la taille du résumé et
+d'accroître la rapidité de Pips.
+
+Il est important de noter que le calcul du résumé n'est fait qu'une
+seule fois pour chaque module, quel que soit le nombre des appels aux
+différents modules.
+
+\subsubsection{Calcul des effets d'un call à un module}
+
+Les effets d'une instruction call à un module P sont déduits des
+effets résumés de P de la manière suivante.
+
+Les effets sur les variables communes et statiques se trouvant dans le
+résumé de P sont dupliqués et associés à l'instruction call. Les
+effets sur les paramètres formels de P sont traduits en des effets sur
+les arguments réels de l'appel; ces effets traduits sont ajoutés à la
+liste des effets de l'instruction call.
+
+La traduction est immédiate dans le cas où le paramètre réel est une
+expression: il n'y a pas d'effet traduit.
+
+La traduction est simple dans le cas où le paramètre réel et le
+paramètre formel ont le même rang (nombre de dimensions). Dans ce cas,
+l'effet traduit est identique à l'effet résumé mis à part que la
+variable formelle est remplacée par la variable réelle dans la
+référence de l'effet traduit.
+
+Deux cas peuvent se présenter lorsque le paramètre réel et le
+paramètre formel n'ont pas le même rang:
+\begin{itemize}
+\item 
+ le paramètre formel est un scalaire et le paramètre réel est un
+ élément de tableau; dans ce cas, la référence de l'effet traduit
+ est la référence à l'élément de tableau, et les autres champs de
+ l'effet traduit sont identiques à ceux de l'effet résumé.
+
+\item les paramètres réels et formels sont des tableaux de tailles
+        différentes. 
+\end{itemize}
+
+Dans ce dernier cas, notre algorithme tente de détecter les situations
+où l'effet sur la variable formelle peut être traduit en un effet plus
+précis que la totalité du tableau réel. C'est notamment le cas
+lorsque le paramètre formel est un vecteur (tableau à une dimension)
+associé à une colonne d'une matrice (tableau à deux dimensions).
+Lorsqu'une telle situation est détectée, nous utilisons les
+intervalles (i.e.  {\em ranges}) dans les expressions d'indice pour
+indiquer qu'une colonne d'une matrice a été changée; ainsi, la
+lecture de la J+1 ème colonne d'une matrice 100x100 sera représentée
+par l'effet:
+\begin{verbatim}
+{ MAT(1:100,J+1) , {is_action_read, UU} , {is_approximation_must , UU} } 
+\end{verbatim}
+
+Pour avoir le droit de générer ce genre d'effet, il faut s'assurer que
+la taille du tableau formel est inférieure ou égale à la taille de la
+région correspondante du tableau réel; il faut par exemple vérifier
+que la taille d'un vecteur est bien inférieure à la taille d'une
+colonne d'une matrice. Pour effectuer cette vérification, nous formons
+un système d'équations et d'inéquations linéaires qui n'est faisable
+que s'il y a effectivement dépassement de la zone réelle par le
+tableau formel, puis nous prouvons que ce système est infaisable.
+
+La souplesse de notre représentation interne et l'extrême qualité de
+notre code font que nous n'avons pas eu à modifier la moindre ligne de
+code dans le calcul des dépendances pour prendre en compte ce nouveau
+genre d'effets et paralléliser ainsi des boucles contenant des appels de
+procédure. 
+
+L'exemple suivant est un résultat de Pips qui montre la puissance de
+notre calcul d'effet interprocédural. La boucle sur J du module MM03
+contient un appel à SAXPY qui ne modifie que la J ième colonne de C.
+Notre calcul d'effet s'en rend compte grâce à une analyse des effets
+de SAXPY et une traduction de ces effets pour le call concerné; ce
+résultat permet à notre algorithme de parallélisation de transformer
+la boucle séquentielle sur J en une boucle parallèle.
+\begin{verbatim}
+      SUBROUTINE MM03(N, A, B, C)
+      ...
+      DOALL J = 1,N,1
+         PRIVATE K
+         DO K = 1,N,1
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                            11
+         ENDDO
+      ENDDO
+      ...
+      END
+
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C     
+      M = MOD(N,4)
+      DO I = 1, M
+         X(I) = X(I) + S*Y(I)
+      ENDDO
+C     
+      DO I = M+1, N, 4
+         X(I) = X(I) + S*Y(I)
+         X(I+1) = X(I+1) + S*Y(I+1)
+         X(I+2) = X(I+2) + S*Y(I+2)
+         X(I+3) = X(I+3) + S*Y(I+3)
+      ENDDO
+C
+      RETURN
+      END
+\end{verbatim}
+
+\section{Calcul des {\em Use-Def Chains}}
+
+Les chaînes {\em use-def}, telles que définies dans les ouvrages
+classiques de compilation, permettent de relier toute utilisation d'une
+variable à la liste des définitions qui sont susceptibles de lui
+correspondre. Nous avons étendu de manière naturelle cet algorithme
+classique à notre GCS; ceci implique une nouvelle stratégie de calcul
+de point-fixe pour déterminer la solution des équations {\em
+data-flow} dans le cas de programmes non-structurés. Des travaux sont
+en cours pour démontrer la correction de notre méthode dans le cas
+général (les cas pratiques étant pour leur part presque toujours
+trivialement corrects étant donné la simplicité des graphes de
+contrôle rencontrés).
+
+Si les chaînes {\em use-def} sont bien adaptées aux méthodes
+d'optimisation rencontrées dans les compilateurs, elles ne sont pas
+suffisantes pour traiter tous les cas de dépendance qu'il est
+nécessaire de prendre en compte pour préserver la sémantique
+séquentielle d'un programme au cours de sa parallélisation (le
+graphe de dépendance est calculé à partir des chaines {\em use-def},
+cf. ci-dessous). Ainsi, outre les définitions de variables, il nous
+faut propager également leur utilisation en vue de pouvoir
+ultérieurement calculer les dépendances de type {\em anti}. Cette
+adaptation a également été implémentée.
+
+Le résultat du calcul des chaînes {\em use-def} est une première
+version, extrêmement fruste, du graphe de dépendances, basée
+uniquement sur les conflits entre variables, indépendamment des indices
+de tableaux éventuels; à noter que les notions d'équivalence sont
+traitées dans cette phase. Ce premier graphe de dépendance est
+ultérieurement affiné en prenant en compte la notion de niveau 
+nécessaire pour l'algorithme d'Allen et Kennedy et en utilisant les
+tests de dépendance de type Banerjee et Fourier-Motzkin.
+
+Les deux structures de données utilisées pour représenter les {\em
+use-def chains} sous forme de graphe sont {\em graph}, qui est une
+structure de données générique, et sa spécialisation {\em dg} ({\em
+Dependence Graph}).
+
+\subsection{Structure de données {\em Graph}}
+
+\input{graph.datastructure}
+
+\subsection{Structure de données {\em DG}}
+
+\input{dg.datastructure}
+
+\section{Calcul de relations linéaires entre variables scalaires}
+
+Un des objectifs du projet PIPS est d'étudier l'intérêt d'une
+analyse sémantique approfondie pour la parallélisation
+interprocédurale. La méthode choisie, développée par P. Cousot
+et N. Halbwachs, fournit des égalités et inégalités linéaires
+entre variables scalaires entières. Ces égalités et inégalités
+généralisent les techniques habituelles en optimisation globale:
+propagation de constante, détection de variables inductives,
+détection d'égalités linéaires entre variables, indices
+appartenant à l'intervalle défini par les bornes de boucles. Ces
+égalités et inégalités linéaires ont de plus l'avantage de
+pouvoir être aisément utilisées dans le calcul du graphe de
+dépendance. Rappelons que cette analyse détaillée n'était
+prévue qu'au niveau intra-procédural et qu'une nouvelle technique a
+permis de l'élargir au niveau interprocédural.
+
+En effet, une première implémentation de la méthode intraprocédurale
+de Cousot \& Halbwachs en a fait ressortir un certain nombre de défauts
+qui ont dû être corrigés dans la mesure du possible ou contournés.
+Ces problèmes ont été présentés en détail dans le rapport
+EMP-CAI-I~E/109. Les deux plus importants étaient que:
+\begin{itemize}
+  \item la complexité est
+exponentielle par rapport au niveau d'imbrication des boucles alors que
+certains programmes de tests fournis par l'ONERA comptent jusqu'à 7 niveaux
+d'imbrications;
+  \item les prédicats portant sur les états
+en un unique point du programme sont mal adaptés au calcul des dépendances.
+\end{itemize}
+
+La deuxième implémentation repose sur trois bibliothèques. La
+plus grosse des trois (environ 20000 lignes de C), la bibliothéque
+d'algèbre linéaire de base, n'a pas été développée dans le cadre
+de ce contrat. Elle est disponible sous forme objet sur la cassette de
+livraison mais les sources ne sont pas disponibles dans ce rapport. Les
+deux autres bibliothèques, {\em Semantics} et {\em Transformer}, sont 
+par contre partie intégrante du projet PIPS et leurs fichiers sources sont
+imprimés ci-dessous. La première contient les modules efectuant
+l'interprétation abstraite d'un programme dans le formalisme de
+Cousot/Halbwachs. La seconde est une bibliothèque d'accompagnement de
+la structure de données {\em transformer} (voir la documentation sur la
+{\em ri}).
+
+Nous présentons successivement les modifications apportées à l'algorithme
+de Halbwachs, les structures de données {\em transformer} et {\em
+precondition} puis les structures de données propres à l'algèbre linéaire.
+Nous terminons en donnant la liste des principales fonctions liées
+aux {\em transformers} ainsi que la liste des options d'analyse.
+
+\subsection{Modification de l'algorithme de Halbwachs}
+
+\paragraph{Notion de variable}
+
+L'algorithme présenté dans la thèse de N. Halbwachs ne prend pas en
+compte ni l'aliasing implicite entre paramètres formels ou entre
+paramètres formels et variables globales, ni l'aliasing explicite (i.e.
+intra-procédural) créé par la déclaration {\tt EQUIVALENCE}. Nous
+proposons de suivre la norme Fortran~77 qui élimine l'aliasing
+implicite pour considérer que le premier problème ne se pose pas
+(ANSI~X3.9-1978 section~15.9.3.6 et 15.9.4). Pour
+traiter l'aliasing explicite nous prendrons aléatoirement une des
+variables scalaires en alias, si plusieurs scalaires sont concernés. En
+cas d'alias entre tableaux et scalaires, les instructions d'affectation
+au tableau seront considérées comme des {\em kill}'s de la variable.
+Cette règle pourrait être améliorée ultérieurement par un test de
+dépendance si le besoin s'en fait sentir. Ces problèmes sont traités
+dans le module \verb+value.c+ de la bibliothèque {\em transformer}.
+
+\paragraph{Réduction de la complexité}
+
+Le comportement exponentiel de l'algorithme de résolution décrit
+dans la thèse de Halbwachs et implémenté dans le prototype d'analyseur
+sémantique est inacceptable pour des programmes scientifiques.
+
+Nous avons donc découpé la résolution globale du système aux
+polyèdres en des résolutions partielles, dont la combinaison risque
+bien sûr de donner des résultats moins précis mais dont le temps
+d'exécution devrait être à peu près linéaire par rapport à
+la taille du programme.
+
+L'idée consiste à calculer pour chaque composante du graphe de
+contrôle structuré (cf. section~3) une relation, appelée {\em
+relation de transfert} dans la suite et implémentée par la structure
+de données {\em transformer}, entre le prédicat d'entrée
+(précondition) et le prédicat de sortie (post-condition). Les
+relations de transfert sont propagées de base en haut en fonction des
+opérateurs de structuration du graphe de contrôle: séquence (composition),
+test (enveloppe convexe), boucle (élargissement) et control (pour les
+parties non structurées du programme analysé). Cette phase de
+propagation montante est implémentée dans le module
+\verb+ri_to_transformers.c+ qui se trouve dans la bibliothèque {\em
+semantics}.
+
+Chaque boucle a une profondeur d'imbrication de 1, car les boucles
+internes auront été précédemment transformées en relation de
+transfert.  Le placement des opérations d'élargissement nécessaires
+à la convergence est trivial, ainsi que celui des opérations de
+fermeture convexe. 
+
+Seules les parties non structurées du graphe de contrôle nécessitent
+l'application de l'algorithme initial, mais elles sont maintenant
+réduites à quelques noeuds par la phase de structuration et le graphe
+de contrôle hiérarchique et elles ne correspondent plus qu'à des
+zones de programmes qui ne peuvent pas être parallélisées. Leur
+traitement n'apporte donc aucune information utile au processus de
+parallélisation et il n'est donc pas effectué ainsi.  Nous effectuons
+à la place une projection des variables {\em tuées} par les statements
+correspondants.  L'analyse des parties structurées éventuellement
+présentes sous cette zone control est naturellement reprise
+normalement.
+
+Les instructions élémentaires (call assign, call read, call min,...)
+fournissent les relations de transfert de base.
+
+Une fois la relation de transfert calculée de bas en haut, il ne reste
+plus qu'à propager les invariants de haut en bas du graphe de contrôle
+du module analysé.  Cette deuxième phase est implémentée par le
+module \verb+ri_to_preconditions+.
+
+Cette approche s'applique aussi d'une manière interprocédurale en
+ajoutant une traduction de la relation de transfert globale d'une
+procédure à chacun de ses sites d'appel. Ceci alourdit l'analyse et
+n'est effectué que sur requête explicite de l'utilisateur. Par défaut,
+les appels de procédures sont pris en compte en utilisant les {\em
+SDFI} pour éliminer par projection les variables modifiées par l'appel.
+
+Cette approche permettrait éventuellement d'ajouter un peu
+d'information lors de la constitution du système de dépendance entre
+deux références, en profitant de la présence de la relation de
+transfert entre les deux statements contenant ces références, mais
+cette possibilité ne s'est pas avérée intéressante sur les
+programmes tests de l'ONERA.
+
+L'inconvénient essentiel de cet algorithme est qu'il dépend de la nature
+des relations de transfert choisies. Pour obtenir les mêmes résultats
+qu'avec l'algorithme d'Halbwachs, il faudrait au moins avoir des relations
+de transfert {\em conditionnelles} où les conditions d'application
+partielles et les relations de transfert partielles seraient définies
+par des polyèdres\footnote{Ceci est plus général que les formules
+conditionelles utilisées en évaluation symbolique dans le projet
+VELOURS et que la généralisation de la propagation de constantes
+proposée par Jean Goubault.}. Pour accélérer l'exécution,
+nous avons réduit cette union de relations de transfert
+partielles en une unique relation de transfert inconditionnelle par
+fermeture convexe. Cette simplification n'a posé de problèmes sur
+aucun des programmes testés.
+
+\subsection{Notions de {\em transformer} et de {\em precondition}}
+
+Ces deux notions, {\em transformer} et {\em precondition}, sont toutes
+les deux implémentées par une unique structure de données,
+malheureusement appelée elle-aussi {\em transformer}. Cette confusion
+vient du rôle particulier que jouent les préconditions dans le test de
+dépendance.
+
+Les tests de dépendance ne s'effectue pas sur une unique instruction
+mais sur un {\em couple} d'instructions. Dans ces conditions, il est
+beaucoup plus important de connaître les relations existant entre les
+préconditions de chacune des instructions. Par exemple, la valeur de la
+variable \verb+L+ n'est peut-être connue dans aucune des deux
+préconditions alors qu'on peut voir qu'elle est {\em identique}.
+
+Une application directe de cette remarque conduirait au calcul d'un nombre
+de relations proportionnel au carré du nombre d'instructions. Pour
+éviter cette explosion tout en traitant le cas cité ci-dessus, les
+préconditions qui ont été choisies caractérisent la relation
+existant entre les valeurs des variables à l'entrée du module et leurs
+valeurs juste avant l'exécution d'une instruction.
+
+Formellement, il s'agit donc bien de {\em transformers} bien qu'elles
+n'encodent pas le même type d'information que ce qui était appelé
+{\em transformer} dans la section précédente.
+
+Voici la déclaration NewGen de la structure de données {\em transformer},
+telle qu'elle figure dans la {\em RI}:
+\domain{Transformer = arguments:entity* x relation:predicate}
+{
+Le domaine {\tt transformer} définit une relation entre deux états
+mémoire. Cette relation
+porte sur les valeurs des variables scalaires entières d'un module ou
+des variables globales au programme.
+}
+
+Les variables qui apparaissent dans la liste des arguments sont celles
+qui ont été modifiées entre les deux états. Deux valeurs
+sont donc associées à chacune d'entre elles: la pre- et la
+post-valeur.  Les post-valeurs sont portées par les entités
+elles-mêmes. Les pré-valeurs sont portées par des entités
+spéciales. Les variables scalaires entières qui ne sont pas modifiées
+et qui n'apparaissent donc pas dans la liste des arguments n'ont qu'une
+seule valeur, portée par l'entité correspondant à la variable.
+
+La relation est définie par des égalités et des inégalités
+linéaires entre valeurs.
+
+Pour résumer, deux types de transformers sont utilisés. Le premier,
+aussi appelé transformer, est propre à un {\tt statement} et donne une
+abstraction de son effet sur les variables entières. Les variables qui
+apparaissent dans la liste des arguments sont celles qui sont affectées
+lors de son exécution.  Le second, aussi associé à un {\tt statement}
+mais appelé {\em precondition}, donne une relation entre l'état
+initial d'un module et l'état précédent l'exécution de ce {\tt
+statement}. Les variables qui apparaissent dans la liste des arguments
+sont celles qui sont affectées entre le point d'entrée du module et
+son exécution.
+
+Les transformers à proprement parler ne sont disponibles qu'après une
+phase d'analyse sémantique (\verb+ri_to_transformers+). Les
+préconditions ne le sont qu'après la deuxième phase
+(\verb+ri_to_preconditions+). Les transformer et precondition attachés
+à un statement peuvent être obtenus par le biais d'une table de hash code.
+
+Le deuxième champ de la structure {\em transformer} est aussi déclaré
+en NewGen:
+\domain{Predicate = system:Psysteme}
+{
+Le domaine {\tt predicate} définit une relation entre valeurs de
+variables scalaires entières.
+}
+
+Ce n'est qu'un renommage d'une structure de données {\em Psysteme} qui
+est importée de la bibliothèque d'algèbre linéaire du CAII. Bien
+qu'elle ne soit pas couverte par le contrat PIPS, ses structures de
+données sont décrites ci-dessous pour matérialiser la notion de {\em
+Predicate}.
+
+\subsection{Structures de données liées à l'algèbre linéaire}
+
+Le but de cette section est de présenter les structures de données
+utilisées pour implémenter la méthode d'analyse sémantique de Cousot
+et Halbwachs ainsi que la généralisation qui en a été effectuée
+pour accélérer le calcul des prédicats et prendre en compte les
+appels de procédures.
+
+Les ensembles de valeurs entières que peuvent prendre les variables
+scalaires entières des modules en chaque point de contrôle sont
+approximés par des polyèdres à bornes {\em rationnelles} et non
+entières pour diminuer la complexité des calculs.
+
+Ces polyèdres peuvent être définis de deux manières
+équivalentes:
+\begin{itemize}
+  \item implicitement, par un système d'égalités et d'inégalités
+	linéaires
+        vérifié par les points appartenant au polyèdre,
+  \item ou explicitement, par un système générateur formé de sommets,
+        rayons et droites dont les combinaisons linéaires sont les
+        points du polyèdre.
+\end{itemize}
+Ces deux représentations, qui font l'objet des deux premières
+sous-sections, sont utilisées simultanément parce que certaines
+opérations s'effectuent mieux avec l'une qu'avec l'autre (intersection
+par système d'équations, union par système générateur) et parce
+qu'on les utilise toutes les deux pour éliminer la redondance qui
+apparaît au fur et à mesure des calculs. Les polyèdres que nous
+manipulerons comporteront donc deux parties, l'une donnant la
+représentation par système d'équations et l'autre la représentation
+par système générateur.
+
+\subsection{Représentation des systèmes d'égalités et d'inégalités 
+linéaires}
+
+Le système de contraintes est représenté par la matrice de ses
+coefficients et par un vecteur de termes constants. Cette matrice,
+généralement très creuse, est représentée par des vecteurs
+creux et par lignes.  En effet, il faut choisir entre une
+représentation par ligne et par colonne, et on effectue plus souvent
+des combinaisons linéaires de lignes dans l'algorithme de test de 
+dépendance qui partage cette structure de données avec l'analyse sémantique.
+
+Chaque colonne de la matrice correspond à la valeur d'une variable
+scalaire entière du module analysé, une entité de la représentation
+interne. Trois types de valeurs sont distingués:
+\begin{itemize}
+  \item les valeurs initiales
+  \item les valeurs finales
+  \item les valeurs intermédiaires
+\end{itemize}
+Les valeurs finales sont directement portées par l'entité concernée
+et visualisées tel que. Les valeurs initiales et intermédiaires sont
+portées par des entités spéciales, propres au package {\em transformer}
+(voir \verb+value.c+). Les valeurs initiales sont visualisées en suffixant
+la chaîne \verb+#INIT+ au nom de l'entité correspondante. Les valeurs
+intermédiaires ne sont jamais visualisées, sauf dans des impressions
+de mise au point où elles apparaissent avec le suffixe \verb+#TMP+.
+
+Dans tous les cas, le numéro de colonne (aussi appelé numéro de
+variable) est donné par l'adresse de l'entité choisie.  Des tableaux
+de correspondance permettent de passer des entités aux valeurs et des
+valeurs aux entités et à leurs noms (voir \verb+value.c+).
+
+On complète chaque ligne de la matrice de contraintes par le terme
+constant (\verb+TCST+) qui reçoit conventionnellement le numéro de
+variable 0 (i.e. l'adresse 0, puisqu'il s'agit de pointeurs).
+
+\subsubsection{Vecteur}
+
+Un vecteur est une liste de couples (numéro de variable, valeur).
+Cette liste de couples n'est pas ordonnée dans la première implémentation
+qui est faite car nous faisons l'hypothèse que le nombre de coefficients
+non nuls restera très faible tout au long des calculs. 
+
+Le vecteur nul est représenté par une liste vide.
+
+Ce type {\em vecteur} est utilisé pour représenter les contraintes,
+les sommets, les rayons et les droites, ainsi que les expressions
+linéarisées de la représentation interne.
+
+\subsubsection{Contrainte}
+
+Une contrainte est soit une égalité, soit une inégalité (on ne sait pas
+faire la distinction à ce niveau). Elle contient donc implicitement
+un terme constant associé à la variable de numéro 0.
+
+On associe à chaque contrainte de type inégalité les éléments du système
+génerateur qui la sature au moyen de tableaux d'entiers.
+
+Chaque contrainte contient aussi un pointeur vers une autre contrainte
+pour pouvoir constituer directement les deux listes d'égalités et
+d'inégalités d'un système.
+
+\subsubsection{Système}
+
+Un système linéaire est constitué de deux listes de contraintes,
+égalités et inégalités. C'est à ce niveau que l'on dispose de
+l'information nécessaire pour savoir comment traiter les termes constants.
+Il contient aussi le nombre de ces égalités
+et de ces inégalités, ainsi que le nombre de variables du système.
+
+\subsection{Représentation des systèmes générateurs}
+
+\subsubsection{Définition d'un système générateur}
+
+Comme les systèmes générateurs sont moins connus que les systèmes
+d'inégalités, nous rappelons que ce sont des triplets de trois ensembles
+appelés respectivement sommets, rayons et droites. Le polyèdre $P$
+généré par un système $S=\{\{\vec{s_i}\},\{\vec{r_j}\},\{\vec{d_k}\}\}$
+est défini par l'équation:
+\[
+P = \left\{ { \vec{v} / 
+        \exists \lambda_i \geq 0 \; \wedge \; \sum_i \lambda_i = 1 \;
+                \exists \mu_j \geq 0 \;
+                \exists \nu_k \;
+                \vec{v} = \sum_i \lambda_i \vec{s_i} +
+                \sum_j \mu_j \vec{r_j} +
+                \sum_k \nu_k \vec{d_k} 
+        }\right\}
+\]
+
+\subsubsection{Sommets}
+
+Comme nous approximons les ensembles de valeurs entières par des
+ensembles de valeurs rationnelles, il se peut que les sommets aient
+des coordonnées rationnelles. Ils sont donc représentés
+par un vecteur à coefficients entiers et par un unique dénominateur.
+
+On associe aussi à chaque sommet un tableau des équations qu'il
+sature (i.e. vérifie).
+
+Enfin, chaque sommet contient un lien vers un sommet suivant, qui permet
+de constituer l'ensemble des sommets d'un système générateur.
+
+Au plus haut niveau, on garde un pointeur vers le premier
+sommet, ainsi que le nombre total de sommets de la liste.
+
+\subsubsection{Rayons et droites}
+
+Les rayons et les droites sont des objets identiques. Seule change
+l'interprétation qu'on en donne et la manière dont on les traite.
+
+Ils sont représentés comme les sommets, mais ne contiennent pas de
+champs dénominateur puisqu'ils sont définis à une constante
+multiplicative près.  A chacun d'eux est associé un vecteur, un
+ensemble de numéros d'équations saturées, et un pointeur vers
+l'élément suivant. En tête de liste, on conserve le nombre
+d'éléments.
+
+\subsubsection{Système générateur}
+
+Un système générateur comporte donc trois champs, qui sont les têtes
+de liste des sommets, des rayons et des droites.
+
+\subsection{Système d'équations aux polyèdres}
+
+\subsubsection{Divers types d'équations sémantiques}
+
+Les différents types d'équations que nous savons traiter sont:
+\begin{itemize}
+  \item les affectations non-linéaires (\verb%I=J**2%),
+  \item les affectations linéaires inversibles (\verb%I=I+1%),
+  \item les affectations linéaires non-inversibles (\verb%I=J%),
+  \item les tests non linéaires,
+  \item les tests linéaires de type inégalité pour les branches
+        vrai et faux (\verb%I.LE.J-3%),
+  \item les tests linéaires à égalité, branches vrai et faux
+        (\verb%I.EQ.0%),
+  \item les noeuds de jonction qui sont les noeuds du graphe de contrôle
+        qui ont plus d'un antécédent (regroupement après un \verb%IF%,
+        ou en tête de \verb%DO%, ou encore sur un \verb%CONTINUE% à cause
+        d'un \verb%GOTO%),
+  \item les noeuds d'élargissements, qui caractérisent les boucles
+        et qui permettent d'éviter les itérations infinies vers un
+        point fixe (opérateur d'élargisssement défini par Cousot).
+\end{itemize}
+
+\subsection{Fonctions principales sur les {\em transformers}}
+
+Les routines essentielles pour l'analyse sémantique par polyèdre sont:
+\begin{itemize}
+  \item {\em affectation}, qui calcule l'effet d'une affectation affine
+         sur un polyèdre
+        (i.e. sur son système de contraintes et sur son système génerateur);
+  \item {\em projection}, qui calcule l'effet d'une affectation non linéaire;
+  \item {\em intersection\_demi}, qui calcule le nouveau prédicat d'une
+        branche de test de la forme {\tt I.GE.J} 
+        ({\em demi} signifie demi-espace);
+  \item {\em intersection\_hyperplan}, qui calcule le nouveau prédicat
+        d'une branche de test vraie de la forme {\tt I.EQ.J};
+  \item {\em enveloppe}, qui calcule l'enveloppe convexe de deux prédicats
+        sur les points de jonction du graphe de contrôle (fin d'un test,
+        boucle);
+  \item {\em élargissement}, qui permet de calculer un polyèdre point fixe
+        pour les boucles (opérateur $\nabla$ de la thèse de Halbwachs);
+  \item {\em sc\_to\_sg}, qui permet de passer d'un système de contraintes
+        à un système générateur;
+  \item {\em normalisation}, qui permet d'éliminer les contraintes 
+        et les éléments du système générateur qui sont redondants;
+\end{itemize}
+Ces fonctions sont construites à partir de fonctions similaires sur les
+systèmes de contraintes et sur les systèmes générateurs.
+
+\subsection{Options d'analyse et impression des résultats}
+
+Diverses options permettent d'effectuer plus ou rapidement et plus ou
+moins précisément l'analyse sémantique. La version la plus rapide est
+insensible au flow de données et n'effectue qu'une simple propagation
+de constante intra-procédurale. La version la plus précise applique un
+calcul d'enveloppe convexe en sortie des tests (elle est donc {\em flow
+sensitive}) et exploite les transformers associés aux modules appelés
+(elle est donc aussi interprocédurale).
+
+\section{Conclusion}
+
+Les différentes analyses prévues dans le contrat PIPS ont été
+implémentées en prenant en compte les difficultés rencontrées sur
+les programmes fournis par l'ONERA. Cette confrontation avec la
+réalité a permis de séparer l'utile de l'inutile et d'adapter les
+algorithmes prévus initialement pour tirer le maximum d'information
+possible avant d'aborder la phase de parallélisation.
+
+\newpage
+
+\section{Annexe: Description des structures de données dans la {\em RI}}
+
+\input{ri.datastructure}
+
+\end{document}

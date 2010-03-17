@@ -1,0 +1,84 @@
+#! /bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# what to do at night from the pips account at TB/HPCAS.
+
+umask 022
+
+# A nice side effect of 32-bit system is that crazy processes die when
+# reaching 2 GB of memory usage. :-)
+
+# On a 64-bit system there is no longer such a limit, so put an arbitrary
+# one to avoid host crashing during validation. Do not use more than 2 GB
+# per process:
+ulimit -v 2000000
+ulimit -d 2000000
+
+#email=pips-validation@cri.ensmp.fr
+email=pips-by-night@enstb.org
+target=~/PIPS
+
+# set environment...
+test -f $target/pipsrc.sh && source $target/pipsrc.sh
+
+start=$(date)
+
+pips_at_night --target $target --mail $email --update --full-compile --validate "$@" > out.$$ 2> err.$$
+
+status=$?
+
+if [ $status -ne 0 ] ; then
+  result="failed ($status)"
+else
+  result='succeeded'
+fi
+
+# Compile the Doxygen documentation and publish the documentation:
+(
+    pips_publish_www
+    cd $target/prod;
+    make doxygen
+    DOXYGEN_PUBLISH_LOCATION_DIR=/var/www/pips/doxygen make doxygen-publish
+) >> out.$$ 2>> err.$$
+
+mv out.$$ $target/out
+mv err.$$ $target/err
+
+end=$(date)
+
+{
+  echo "target=$target"
+  echo "out=$target/out"
+  echo "err=$target/err"
+  echo "email=$email"
+  echo "start=$start"
+  echo "end=$end"
+  echo "result=$result"
+  echo
+  echo "software revisions used in this validation:"
+  echo "pips: $(svnversion $target/prod/pips)"
+  echo "newgen: $(svnversion $target/prod/newgen)"
+  echo "linear: $(svnversion $target/prod/linear)"
+  echo "nlpmake: $(svnversion $target/prod/pips/makes)"
+  echo "valid: $(svnversion $target/validation)"
+} | echo ${PIPS_MAIL:-Mail} -s "[pips] `hostname` night job $result" $email

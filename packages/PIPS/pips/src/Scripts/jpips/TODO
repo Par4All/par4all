@@ -1,0 +1,8 @@
+* documentation
+- add javadoc html generation and installation
+- there is no overall doc
+
+* jpips
+- redesign the menu file syntax
+- use typed containers, no more Vector
+- replace gif image by something else?

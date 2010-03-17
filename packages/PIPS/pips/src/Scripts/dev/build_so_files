@@ -1,0 +1,64 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# build a .so file for the specified .a files.
+# quite experimental at the time. 
+
+script=`basename $0`
+verb=echo
+
+################################################################# UTILS
+
+verbose()
+{
+  $verb "[$script] " "$@"
+}
+
+usage()
+{
+  cat  <<-EOF
+	${script} libraries...
+EOF
+}
+
+############################################################## DO THE JOB
+
+# convert a .a to a .so
+convert()
+{
+   name=`dirname ${1}`/`basename ${1} .a`
+
+   rm -f ${name}.so
+   ofiles=`ar t ${name}.a`
+   ar xv ${name}.a
+   gcc -g -shared -o ${name}.so ${ofiles}
+   rm -f ${ofiles}
+   chmod a+rx-w ${name}.so
+}
+
+
+for l ; do
+  verbose converting $l
+  convert $l
+done
+

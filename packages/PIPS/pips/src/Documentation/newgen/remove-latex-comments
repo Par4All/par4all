@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Conversion d'un fichier Latex en un fichier NewGen
+#
+# Remi Triolet
+#
+# Modifications
+#  - ajout de l'option bidon "-" aux commandes "echo" (FI, 29/12/89)
+#  - suppression de la mise en minuscule pour les "external domains"
+#    (FI, 29/12/89)
+#  - remplacement de la mise en minuscule systematique des domaines
+#    definies par la mise en minuscule du PREMIER caractere de chaque
+#    declaration NewGen pour conserver la belle presentation du
+#    chef de projet-president :-) (FI, 29/12/89)
+# - shorten and changed, FC
+#
+# Bugs:
+#  \begin{domain} ... \end{domain} is not used anywhere, and buggy.
+
+input=$1
+tmp=`basename $1 .tex`
+output=$tmp.newgen
+
+tmp=/tmp/rlc.$$
+rm -rf $tmp.*
+
+cat > $output <<!
+--	   --------------------------------------------------------
+--	   --------------------------------------------------------
+--
+--				    WARNING
+--
+--		  THIS FILE HAS BEEN AUTOMATICALLY GENERATED
+--
+--			       DO NOT MODIFY IT
+--
+--	   --------------------------------------------------------
+--	   --------------------------------------------------------
+!
+
+# keep domain definitions
+# (2 seds instead of 1 because of a bug on sunos)
+#
+sed -n '/^\\domain{/s,^\\domain{ *\(.*\)} *$,\1 ;,p;
+        /^\\begin{domain}/,/^\\end{domain}/p' $input |
+sed    "/^\\\\begin{domain}/d;/^\\\\end{domain}/d;
+	s,\\\\,,g;
+        # stupid uppercase letters as the first char must be removed...
+	s,^A,a,;s,^B,b,;s,^C,c,;s,^D,d,;s,^E,e,;s,^F,f,;s,^G,g,;s,^H,h,;
+	s,^I,i,;s,^J,j,;s,^K,k,;s,^L,l,;s,^M,m,;s,^N,n,;s,^O,o,;s,^P,p,;
+	s,^Q,q,;s,^R,r,;s,^S,s,;s,^T,t,;s,^U,u,;s,^V,v,;s,^W,w,;s,^X,x,;
+        s,^Y,y,;s,^Z,z,;
+	/^import /w $tmp.import
+	/^import /d
+	/^external /w $tmp.external
+	/^external /d" |
+#
+# sort the result
+#
+sort > $tmp.domains
+
+{
+  echo
+  echo "-- Imported domains"
+  echo "-- ----------------"
+  cat $tmp.import
+  echo
+  echo "-- External domains"
+  echo "-- ----------------"
+  cat $tmp.external
+  echo
+  echo "-- Domains"
+  echo "-- -------"
+  cat $tmp.domains
+} >> $output
+
+rm -rf $tmp.*
+
+# end of it
+#

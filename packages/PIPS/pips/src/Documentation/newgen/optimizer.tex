@@ -1,0 +1,44 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass[a4paper]{article}
+
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{}
+\author{Julien Zory \and Fabien Coelho \\ CRI, École des mines de Paris}
+
+\begin{document}
+\maketitle
+
+\domain{import entity from "ri.newgen"}
+\domain{import reference from "ri.newgen"}
+\domain{import expression from "ri.newgen"}
+
+\domain{operation = \{ condition , loop , assigns , exists \}}
+
+\domain{computation = reference x operation x expressions:expression* x depends:entity* x hash:int}
+
+\domain{nested_sequence = computations:computation*}
+
+\end{document}

@@ -1,0 +1,87 @@
+<!-- $Id$  -->
+#define FTP_CRI  ftp://ftp.cri.ensmp.fr/pub/Pips
+#define HTTP_CRI distrib
+
+#define GET(name, file) \
+  <b>name</b> (<a href=FTP_CRI/file>ftp</a>,<a href=HTTP_CRI/file>http</a>)
+
+#define HTTP_PUB Public
+
+<html>
+<head><title>PIPS Distribution</title></head>
+<body>
+
+
+
+<h1>PIPS Distribution</h1>
+
+
+
+The PIPS software is distributed no longer distributed in an executable
+	  form but only in source code. Note that the source code is not
+	  bullet-proof and is large (200,000 lines of C code). Its compilation
+	  requires many public-domain tools to be installed, thus we recommend
+	  that you use the small script <code>setup_pips.sh</code> to help you
+	  to build a PIPS working version you can use as is or as a base for
+	  developing new analysis or transformation phases. <p>
+
+When installing PIPS on your system, please read the README and INSTALL
+files at the root directory of the distribution for further instructions
+on how to run or compile PIPS. For help mail to
+<code>pipsgroup@cri.ensmp.fr</code>.
+
+
+<h2>PIPS and tools at the source level</h2>
+
+PIPS and public domain tools PIPS is built upon are available at the
+source level.  Note that the code is distributed as is with no warranty,
+even implicit, of any kind. It is distributed under the term of the GNU
+public license (GPL) that you may find quite easily on the net. <p>
+
+GNU make, cproto, flex, bison and some other tools are required to build
+PIPS. See the next section for pointers on how to find and download these
+tools which are not included in the basic distribution.
+
+Now everything is available in a SubVersioN repository as described in <A
+			HREF="http://svn.cri.ensmp.fr/pips.html">http://svn.cri.ensmp.fr/pips.html</a>. An
+			anonymous access is enough to get the software, but if you
+			want to contribute to PIPS, just ask for an account with
+			commit access. 
+
+<h2>Other softwares of interest</h2>
+
+Here are (some quite old) pointers to some external software that is used
+by PIPS or by PIPS generated codes or for building the PIPS software. This
+sofware is generally freely distributed.
+<ul>
+  <li> <a href=http://www.netlib.org/pvm3>PVM 3.3</a>: for the runtime of 
+       <a href=http://www.cri.ensmp.fr/pips/hpfc.html>HPFC</a> and
+       <a href=http://www.cri.ensmp.fr/pips/wp65.html>WP65</a>.
+       
+  <li> <a href=ftp://prep.ai.mit.edu/pub/gnu>GNU software</a>
+       (gmake gm4 gtar gzip gcc emacs readline malloc gsed).
+       
+  <li> <a href=http://www.informatik.uni-bremen.de/~inform/forschung/daVinci>
+       Da Vinci</a> graph displayer.
+       
+  <li> <a href=HTTP_PUB/cproto-4.3.tar.gz>Cproto 4.3</a>
+       (automatic prototype generation for C).
+       
+  <li> <a href=HTTP_PUB/rman-2.4.tar.gz>Rman 2.4</a>
+       (conversion of man pages to html).
+       
+  <li> <a href=http://www.cis.ufl.edu/perl/>perl 5</a>
+       
+  <li> <a href=http://cbl.leeds.ac.uk/nikos/tex2html/doc/latex2html/latex2html.html>LaTeX2Html</a> is also helpful to convert the documentation to html pages.
+       
+  <li> <a href=ftp://ftp.germany.eu.net/pub/utils/toolpack>Toolpack</a>
+       (kit of Fortran to Fortran transformations structurations and so on,
+       written in Fortran).
+       
+  <li> xtree to display call graphs.
+</ul>
+
+#include "go_back.html"
+
+</body>
+</html>

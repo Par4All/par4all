@@ -1,0 +1,75 @@
+#! /usr/bin/perl -w
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+###
+#
+# PERL Script
+#
+
+sub debug {
+    #printf STDERR @_;
+}
+
+sub include {
+    my($file_name) = @_;
+    &debug("Include file \"%s\"\n", $file_name);
+    printf "! Inlining file '%s':\n", $file_name;
+    # Since there is no module in the .f,
+    # they may be have been forbidden,
+    # so try in the originate directory:
+    open(++$input,"<../$file_name")
+	|| die "Include cannot open \"$file_name\"\n";
+}
+
+sub end_include {
+    close($input--) || die "Cannot close stdin.\n";
+    if ($input >= 1) {
+	print "! End Inlining file.\n";
+    }
+}
+
+$file_name = $ARGV[0];
+$input = 0;
+&debug("File \"%s\"\n", $file_name);
+open(++$input,"<$file_name") 
+	|| die "Include cannot open \"$file_name\"\n";
+($output_file_name = $file_name) =~ s/\.f$/.FF/;
+open(STDOUT, ">$output_file_name")
+	|| die "Include cannot open \"$output_file_name\"\n";
+
+while ($input >= 1) {
+    while (<$input>) {
+	# Execute the 'include':
+	/^\s+include\s*'([^']*)'/i && &include($1) && next;
+        # Put any 'implicit none' as comment.
+        /^(\s+implicit\s*none)/i && 
+	s/^/! Not yet implemented in Pips\n! (MIL-STD-1553 Fortran):\n!/;
+        print;
+    }
+    &end_include;
+}
+
+rename $file_name, $file_name.orig
+	|| die "rename $file_name, $file_name.orig failed";
+rename $output_file_name, $file_name
+	|| die "rename $file_name, $file_name.orig failed";

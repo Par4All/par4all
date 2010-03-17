@@ -1,0 +1,30 @@
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+
+%%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{OUTLINING}
+\author{Alain Muller\\
+                \\
+        IT-SudParis}
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+
+
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import statement from "ri.newgen"}
+{}
+\domain{import expression from "ri.newgen"}
+{}
+\domain{outline_data = module:entity x block:statement* x formal:entity* x arguments: expression*}
+{}
+\domain{outline_map = entity->outline_data}
+{}
+\end{document}

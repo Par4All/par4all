@@ -1,0 +1,328 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\titre}{DEFINITION DU SOUS-FORTRAN PIPS \\
+                    RESTRICTIONS ET EXTENSIONS}
+\newcommand{\auteur}{Rémi TRIOLET}
+\newcommand{\docdate}{Mars 1988}
+\newcommand{\numero}{E103}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\section{Présentation des programmes}
+
+L'ONERA nous a fourni les quatre programmes suivants:
+
+\begin{itemize}
+\item AILE: écoulement 3d transonique autour d'une aile en flèche;
+\item CR2CNF: calcul des matrices sans bulles;
+\item OA118: équations intégrales;
+\item TMINES: programme de calcul de l'écoulement potentiel dans une tuyère
+      à section rectangulaire variable.
+\end{itemize}
+
+Les tailles des ces quatre programmes sont données par le tableau suivant:
+\begin{verbatim}
+        Fichier   Nombre de Lignes   Taille en octets
+
+        aile.f          3011              92107
+        cr2cnf.f         989              31956
+        oa118.f         1449              39003
+        tmines.f        1042              25873
+
+        total           6491             188939
+\end{verbatim}
+
+Le nombre et les noms des modules -- FUNCTIONS ou SUBROUTINES --
+composant ces quatre programmes sont donnés par le tableau suivant:
+\begin{verbatim}
+Programme   Functions   Subroutines   Noms
+
+AILE        1                         D
+                        25            CHRONO CLCOUPJ CLCOUPK CLGLISJ
+                                      CLGLISK CLGLISP CLINJEC CLNOREF
+                                      CLTANGT COEF CORREC DISSB
+                                      DISSIP DIST EDITION EFFORTS
+                                      EXTR F GEOM INIT NORM POUSSE
+                                      PREDIC PVN RESIDU
+
+CR2CNF      3                         DPHI PHI SDOT
+                        23            CHOLES DESCEN FRONT IMPFRO
+                                      IMPRIF IMPRIM INITB INITBM
+                                      INVFRO INVOPT MATELT MBTELT MXV
+                                      MXVADD NBDIAG OASSEM TESFRO
+                                      TRANSP VCLR VMOV VSUB ZASSEM
+                                      ZPROAX
+
+OA118       1                         SDOT
+                        9             GRAD1 SOLV SOLV3 OAMAT1 OAMET
+                                      OAVITEL PHWAK PHWPAN PMAT
+
+TMINES      0
+                        10            CALCG CALMAT DES MAILLA POLTRI
+                                      PREPCG PROD REP RESUL ROMAT
+\end{verbatim}
+
+\section{Restrictions et extensions}
+
+Aucune des restrictions que nous souhaitons faire à Fortran n'est
+présente dans ces quatre programmes, à l'exception de l'utilisation
+des constantes Hollerith.
+
+Cela signifie que les restrictions que nous proposons dans la suite de
+ce document n'entrainent pratiquement pas de modifications des
+programmes originaux.
+
+\paragraph{}
+
+Trois de ces quatre programmes sont parfaitement compatibles avec la
+norme Fortran 77 (Norme ANSI X3.9-1978). Par contre, le programme AILE
+utilisent les entrées sorties asynchrones BUFFER~IN et BUFFER~OUT,
+ainsi que la fonction INIT qui permet d'attendre la fin d'un échange
+asynchrone.
+
+Ces extensions sont admises par la plupart des grands constructeurs
+(IBM, CDC, CRAY, etc.), et de plus, elle sont relativement utiles. En
+conséquence, elles risquent d'être présentes dans d'autres
+programmes scientifiques, et c'est pourquoi nous avons décidé de les
+incorporer à notre sous-ensemble de Fortran.
+
+Il en est de même pour l'extension classique qui consiste à
+permettre au programmeur de spécifier la longueur en unités de
+longueur numériques (généralement des octets) de chaque
+type de données numérique: LOGICAL*1 BOOL, REAL*8 MAT(N,N), ...
+
+\paragraph{}
+
+La définition de notre sous ensemble de Fortran, noté Fortran PIPS
+dans la suite de ce document, est conforme à la norme ANSI X3.9-1978,
+à l'exception des restrictions citées dans la
+section~\ref{restrictions}  et des extensions citées dans la
+section~\ref{extensions}.
+
+Nous donnons en annexe les SYNTAX CHARTS de la norme ANSI modifiés en
+tenant compte des restrictions et des extensions. Les restrictions sont
+surlignées en vert. Les extensions ont été dessinées en respectant
+le format de la norme; elles sont signalées par un trait vertical bleu
+dans la marge.
+
+\subsection{Restrictions}
+\label{restrictions}
+
+\paragraph{Instruction ENTRY.}
+
+L'instruction ENTRY permet de spécifier des points d'entrée
+multiples pour un module. Son utilisation crée des difficultés pour
+un analyseur automatique car le graphe des appels -- graphe qui permet
+de savoir quels modules sont appelés par un module donné -- peut
+devenir très complexe.
+
+Cette instruction est peu utilisée, et de toute manière peut être
+eliminée facilement en dupliquant les modules contenant des ENTRYs.
+
+\paragraph{Module BLOCK DATA.}
+
+Les modules BLOCK DATA permettent de regrouper les initialisations par
+DATA des variables globales. Fortran ne perd rien à sa
+généralité si on interdit les BLOCK DATA et si on insère dans le
+PROGRAM les initialisations contenues dans ceux-ci.
+
+\paragraph{Instructions ASSIGN et GOTO nom-de-variable.}
+
+L'instruction ASSIGN permet de stocker dynamiquement un label dans une
+variable de type INTEGER. L'instruction GOTO nom-de-variable permet
+d'exécuter un branchement vers le label contenu dans une variable.
+
+Un programme contenant ces deux instructions est particulièrement
+difficile à lire pour un programmeur, car le saut peut aboutir
+n'importe où. Dans le cas d'une analyse automatique, l'utilisation des
+ces constructions va résulter en un graphe de contrôle complexe qui
+fera apparaitre de nombreuses dépendances de contrôle. Les
+transformations de parallélisation seront très improbables.
+
+Ces deux instructions peuvent être éliminées en remplaçant les
+instructions \verb+ASSIGN label TO variable+ par des affectations
+\verb+variable = label+, et les instructions \verb+GOTO variable+ par
+une suite d'instructions \verb+IF (variable .EQ. label) GOTO label+.
+
+\paragraph{Instruction RETURN expression.}
+
+Les retours secondaires de subroutine permettent d'exécuter un
+branchement après une instruction CALL dont la destination dépend
+d'une valeur transmise au moment de l'exécution du RETURN dans la
+procédure appelée.
+
+Cette construction pose les mêmes problèmes de complexité du
+graphe de contrôle que précédemment. Elle peut être remplacée
+en transformant la subroutine en fonction et en exécutant apr\`s le
+CALL un branchement vers un label calculé à partir du résultat
+renvoyé par la fonction.
+
+\paragraph{Instruction COMPUTED GOTO.}
+
+Cette instruction permet d'exécuter un branchement vers un label dont
+la valeur dépend de la valeur d'une expression entière.
+
+Cette construction pose les mêmes problèmes de complexité du
+graphe de contrôle que précedemment. Elle peut être remplacée
+par une suite d'instructions \verb+IF (variable .EQ. valeur) GOTO label+.
+
+\paragraph{Instruction INQUIRE.}
+
+L'instruction INQUIRE permet d'interroger le système d'exploitation
+sur les caractéristiques d'un fichier.
+
+Elle est très peu utilisée, et n'a aucun impact sur la
+parallélisation automatique.
+
+\paragraph{Extraction de sous-chaines.}
+
+Fortran 77 permet de déclarer des variables chaines de caractères,
+puis de référencer des portions de ces variables. Cette
+possibilité augmente la complexité des programmes d'analyse de la
+représentation interne.
+
+Cette construction est très peu utilisée et n'a aucun impact sur la
+parallélisation. Nous conservons donc le type chaine de caractères,
+mais interdisons la possibilité d'utiliser des sous-chaines.
+
+\subsection{Extensions}
+\label{extensions}
+
+Nous introduisons dans le Fortran PIPS la possibilité de préciser le
+nombre d'octets utilisés par les types de données, comme dans:
+
+\begin{verbatim}
+        REAL*4 T1,T2,TMP(2),TL1,TL2,ETIME
+        REAL*4 T1,T2,TMP(2),ETIME
+        REAL*8 FUNCTION PHI(J,X)
+\end{verbatim}
+
+Nous introduisons d'autre part les instructions d'entrées-sorties
+asynchrones BUFFER IN et BUFFER OUT, dont la syntaxe est la suivante:
+
+\begin{verbatim}
+        BUFFER IN  (UNIT, MODE) (BBLOCK, EBLOCK)
+        BUFFER OUT (UNIT, MODE) (BBLOCK, EBLOCK)
+\end{verbatim}
+
+où UNIT est le numéro de l'unité d'entré-sortie, MODE est une
+constante spécifiant le mode d'entrée-sortie, BBLOCK et EBLOCK
+sont des noms de variables ou d'éléments de tableaux indiquant la
+zone à tranférer.
+
+\subsection{Mise en conformité des programmes de l'ONERA}
+
+Les programmes de l'ONERA n'ont presque pas été modifiés.
+L'utilitaire UNIX \verb+diff+ a été utilisé pour obtenir les
+différences suivantes.
+
+\paragraph{Programme CR2CNF.} Aucune modification.
+
+\paragraph{Programme TMINES.} Aucune modification.
+
+\paragraph{Programme OA118.} Ajout d'une fonction CLOCK pour simuler
+l'appel système CLOCK, inexistant sous Sun OS.
+
+\begin{verbatim}
+En plus: INTEGER*4 FUNCTION CLOCK() 
+         CLOCK = TIME()
+         RETURN
+         END
+\end{verbatim}
+
+\paragraph{Programme AILE.} Remplacement des constantes Hollerith
+utilisées dans des initialisations par DATA par les constantes chaines
+de caractères équivalentes; rappelons que les constantes Hollerith
+ont été éliminées de la norme Fortran en 1978.
+
+Suppression des paramètres formels du programme principal; ceux-ci
+sont utilisés comme interface avec le système d'exploitation chez
+certains constructeurs, et ne sont d'aucun intérêt pour la
+parallélisation.
+
+\begin{verbatim}
+Avant    PROGRAM AILE(INPUT=129,OUTPUT,TAPE1=INPUT,TAPE2=OUTPUT,TAPE4,
+        1        TAPE5=0,TAPE6=0,TAPE7=0,TAPE8=0,TAPE9=0)
+
+Apres    PROGRAM AILE
+
+
+
+Avant    DATA TIT/10H        MA,10HCH        ,
+        1         10H      ENTR,10HOPIE      ,
+        2         10H  PRESSION,10H STATIQUE ,
+        3         10H         R,10HO         ,
+        4         10H    ANGLE ,10H(OX,OY)   ,
+        5         10H    ANGLE ,10H(OX,OZ)   ,
+        6         10H PAS DE TE,10HMPS X 1000/
+
+Apres    DATA TIT/'        MA','CH        ',
+        1         '      ENTR','OPIE      ',
+        2         '  PRESSION',' STATIQUE ',
+        3         '         R','O         ',
+        4         '    ANGLE ','(OX,OY)   ',
+        5         '    ANGLE ','(OX,OZ)   ',
+        6         ' PAS DE TÉ,'MPS X 1000'/
+\end{verbatim}
+
+\section{Problèmes divers}
+
+Les problèmes suivants devront être abordés lors de la
+première réunion avec l'ONERA.
+
+\paragraph{Exécution des programmes.}
+
+Il est important pour le projet PIPS de pouvoir exécuter les
+programmes de l'ONERA pour vérifier, avec les résultats, que les
+transformations effectuées n'ont pas modifié la sémantique des
+programmes. 
+
+Les programmes OA118 et AILE ne peuvent actuellement pas être
+exécutés: OA118 lit un fichier OARES inexistant, et AILE fait des
+E/S asynchrones. Les deux autres programmes peuvent être exécutés,
+mais en un temps très long.
+
+Il faudrait donc d'une part trouver une solution pour les programmes non
+exécutables, et d'autre part, que les chercheurs de l'ONERA nous
+indiquent quelles variables il faut modifier pour obtenir des temps
+d'exécution raisonnables.
+
+\paragraph{Variables statiques.}
+
+Il faudra vérifier avec les chercheurs de l'ONERA que les programmes
+fournis ne sont pas basés sur le fait que les variables locales sont
+statiques, ce qui est contraire à la norme mais hélas dans les
+usages, et qui fait perdre beaucoup de parallélisme interprocédural.
+
+\section{Conclusion}
+
+Les restrictions présentés dans ce document ne suppriment aucune
+difficulté, mais limitent le volume de code à ècrire pour le
+projet PIPS. Les points clef tels que COMMON, EQUIVALENCE, fonction
+passée en paramètre, etc. sont tous pris en compte.
+
+\end{document}
+\end

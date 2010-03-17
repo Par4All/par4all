@@ -1,0 +1,186 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+# Formattage sous latex de certaines des informations conservees
+# optionnellement lors du calcul des regions
+
+# Be'atrice Creusillet, Septembre 1994
+
+
+workspace=$1
+global=tmp$$
+
+if [ ! -d $workspace.database ]
+then
+	echo Workspace $workspace does not exist!
+	exit
+fi
+
+optypes="proj_var_op_stat proj_param_op_stat umust_op_stat umay_op_stat dsup_op_stat "
+default_binary="umay_op_stat dsup_op_stat " 
+
+
+## regions read et write, ou in, ou out.
+for prefix in rrw rin rout 
+do
+
+	case $prefix in
+		rrw) nompref="";;
+		rin) nompref="IN";;
+		rout) nompref="OUT";;
+	esac
+
+	cat >$workspace-$prefix.tex <<EOF
+\batchmode
+
+\documentstyle[]{seminar}
+
+
+\rotateheaderstrue
+
+\renewcommand{\printlandscape}{\special{landscape}}
+
+\slideframe{plain}
+
+\slidestyle{empty}
+
+\pagestyle{myheadings}
+
+\begin{document}
+
+EOF
+
+
+## differents operateurs.
+for optype in $optypes
+do
+	>$global.$optype
+	for source in $workspace.database/*.f
+	do
+		module=`basename $source .f`
+		module=`echo $module | tr a-z A-Z`
+		#echo module=$module
+		stats=$workspace.database/$module.$prefix-$optype
+		#echo stats="$stats"
+		if [ -f $stats ]
+		then
+			cat $stats >>$global.$optype
+		else
+			echo $0: missing statistics for module $module and operator $optype
+			echo "$module 0 0 0 0 0 0 0 0 0 0 ">>$global.$prefix_$optype
+		fi
+	done
+done
+
+for optype in $optypes
+do 
+
+	case $optype in
+		proj_param*) nomop="parameter projection";;
+		proj_var*) nomop="variable projection";;
+		umust*) nomop="$\cup_{must}$";;
+		umay*) nomop="$\cup_{may}$";;
+		dsup*) nomop="$ -_{sup}$";;
+	esac
+	cat >>$workspace-$prefix.tex <<EOF
+
+\markboth{PIPS - $nompref Regions Operators Statistics ({\em $nomop}) for $workspace\hfill\today~~~}{PIPS - $nompref Regions Operators Statistics ({\em $nomop}) for $workspace\hfill\today~~~}
+
+
+\begin{slide}
+EOF
+
+## operateurs de projection
+if [ $optype = proj_param_op_stat ]
+then
+	cat >>$workspace-$prefix.tex <<EOF
+
+{\scriptsize
+\begin{tabular}{| l | r | r | r | r | r | r |} \hline
+Module & nb & pot must & must res & ofl errors & hermite & hermite +  \\\\ \hline
+EOF
+	awk -f $PIPS_UTILDIR/region-proj-param-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+
+
+elif [ $optype = proj_var_op_stat ]
+then 
+	cat >>$workspace-$prefix.tex <<EOF
+{\scriptsize
+\begin{tabular}{| l | r | r | r | r |} \hline
+Module & nb & pot must & must res & ofl errors  \\\\ \hline
+EOF
+	awk -f $PIPS_UTILDIR/region-proj-var-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+
+#
+
+
+## union must
+elif [ $optype = umust_op_stat ]
+then
+	cat >>$workspace-$prefix.tex <<EOF
+{\scriptsize
+\begin{tabular}{| l | r | r | r | r | r | r |} \hline
+Module & nb & must/must & must res & must/may & must res & sc\_rn \\\\ \hline
+EOF
+	awk -f $PIPS_UTILDIR/region-umust-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+
+#
+
+
+## operateur binaires a affichage standard.
+else
+	cat >>$workspace-$prefix.tex <<EOF
+
+{\scriptsize
+\begin{tabular}{| l | r | r | r |} \hline
+Module & invocation number &  pot. must results & must results   \\\\ \hline
+EOF
+	awk -f $PIPS_UTILDIR/region-binary-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+fi
+
+	cat >>$workspace-$prefix.tex <<EOF
+\end{tabular}
+
+}
+
+\vfill
+
+\end{slide}
+EOF
+
+	rm $global.$optype
+done
+
+	cat >>$workspace-$prefix.tex <<EOF
+
+\end{document}
+EOF
+
+	latex $workspace-$prefix.tex
+
+done
+
+
+
+

@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Usage: Init [-f file.f]... [-d] workspace
+#
+# When workspace is "", the previous selected one is selected again.
+#
+# reste a ajouter:
+# - un systeme d'invalidation de Init sans argument apres n minutes de non 
+#  utilisation
+# - Faire une veritable initialisation (en particulier pipsmakefile doit 
+#  etre parse puis stocke pour eviter le warning  apres le build
+#
+
+unset sources delete workspace
+
+usage () 
+{
+    echo "Usage: Init [-d] [-f files]... workspace" 1>&2
+    exit ${1:-1}
+}
+
+[ $# -eq 0 ] && usage 2
+
+while getopts f:d opt
+do
+    case $opt in
+	f)	sources="$sources $OPTARG";;
+	d)	delete=1;;
+	*)	usage 7 ;;
+    esac
+done
+
+shift `expr $OPTIND - 1`
+
+[ $# -eq 1 ] || usage 4
+
+workspace=${1}
+
+[ "$delete" ] && \
+{
+    Delete -s "${workspace}"
+    [ $? -eq 3 ] && exit 3
+}
+
+if [ "$sources" ]
+then
+    Pips -w "${workspace}" -f "$sources" || exit 5
+else
+    Pips -w "${workspace}" || exit 6
+fi

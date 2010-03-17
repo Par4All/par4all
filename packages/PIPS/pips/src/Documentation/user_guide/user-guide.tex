@@ -1,0 +1,1213 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%	Rapport dret144
+%	Manuel Utilisateur du Paralléliseur
+%	Version 1.0
+%	rendue le 07.01.91
+%	Version 1.1
+%	preparee a partir du 15.03.91 (apres la recette)
+%
+% Il faudra faire evoluer ce manuel en tenant compte des remarques des
+% utilisateurs et au fur et a mesure de l'evolution de PIPS.
+% Les corrections les plus urgentes sont specifiees en commentaire
+% commencant par %%
+
+
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS \\
+		Manuel Utilisateur du Paralléliseur Batch (Version 2.1)}
+\newcommand{\auteur}{
+		Bruno BARON \\
+        	François IRIGOIN \\
+        	Pierre JOUVELOT\\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\renewcommand{\docdate}{13 Juillet 1992}
+\newcommand{\numero}{E144}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\section*{Introduction}
+
+Le Paralléliseur Interprocédural de Programmes Scientifiques PIPS est
+un compilateur-restructureur {\em source à source} qui transforme du
+code Fortran séquentiel en du code Fortran parallèle. La version
+actuelle de PIPS ne vise pas une machine particulière. L'objectif est
+simplement de détecter autant de parallélisme que possible.
+
+Cette notice s'adresse à l'utilisateur averti qui a de bonnes
+connaissances en programmation et en parallélisation automatique. Il
+convient de porter son attention directement sur les exemples, en
+réservant la compréhension de toutes les explications à une lecture
+postérieure. Elle est restreinte à la version {\em batch} de PIPS.
+La version multifenêtre de PIPS, {\tt wpips}, n'est pas présentée.
+ 
+Nous présentons tout d'abord les principes et le vocabulaire de base.
+Nous montrons ensuite comment initialiser l'espace de travail qui va
+permettre de conserver les nouvelles versions du programme et les
+informations qui y sont attachées. 
+
+Nous détaillons ensuite la commande {\em Display} qui permet d'afficher
+directement des résultats à l'écran. Une utilisation plus complète
+des fonctionalités de PIPS nécessite l'utilisation d'autres commandes
+comme {\em Select} qui permet de choisir des options de compilation ou
+d'analyse, {\em Build} qui permet de calculer des informations ou de
+transformer le programme sans afficher les résultats et {\em Perform}
+qui permet d'effectuer des transformations de programme explicitement.
+La commande {\em Pips}, à laquelle fait appel chacune des commandes
+ci-desssus, permet d'effectuer toutes les transformations et analyses
+nécessaires à la parallélisation d'un programme.
+
+Nous donnons ensuite la liste des analyses et des transformations de programme
+qui peuvent être effectuées avec PIPS.
+
+\section{Principes du fonctionnement}
+
+%est décrite par le schema 1.
+
+Pour préserver les
+fichiers sources, pour permettre le développement de plusieurs versions
+et pour regrouper en un unique endroit l'ensemble des fichiers qui sont
+créés au cours de la compilation d'un programme, l'analyse et les
+transformations de programme sont réalisées dans le cadre d'un {\bf
+workspace} (espace de travail) qui n'est qu'un sous-répertoire du
+répertoire courant.
+
+A cet espace de travail est associée une base de données qui indique
+à chaque instant quelles sont les informations disponibles et quelles
+sont les options choisies.  Chaque {\bf phase} du compilateur va ajouter
+dans le {\em workspace} de nouveaux fichiers, appelés {\bf ressources}
+dans la terminologie PIPS.  Plusieurs {\em phases} sont généralement
+enchaînées pour satisfaire une seule requête de l'utilisateur.
+
+Afin d'assurer la cohérence de cet enchaînement, toutes les requêtes
+de l'utilisateur sont effectuées par {\bf Display}, {\bf Select}, {\bf
+Build}, {\bf Perform} ou {\em Pips}. Ces commandes calculent
+l'enchaînement nécessaire à la construction cohérente de la
+ressource demandée ou à l'application correcte d'une règle.
+
+A un programme source donné peuvent naturellement correspondre plusieurs
+espaces de travail, contenant chacun des versions parallélisées différentes,
+obtenues par la sélection d'options de compilation différentes ou
+par l'application explicite de diverses transformations de programmes.
+
+\subsection{Notion de workspace}
+
+% programme ressource
+
+Pour travailler sur un code source, il faut donc commencer par créer un {\bf
+workspace}, composé de {\bf modules}. Plusieurs {\em workspaces}
+peuvent être créés à partir des mêmes fichiers sources, afin d'obtenir
+plusieurs versions d'analyses et de transformations d'un programme. Un
+{\bf module} correspond à une procédure du programme associé au workspace.
+
+\subsection{Notion de ressource et de requête}
+
+% pipsdbm, ressources, actions (ex création d'une ressource)
+
+Les {\bf ressources} sont des objets typés, qui correspondent à des
+structures de données. Chacune d'entre elles est stockée d'une
+manière permanente dans un fichier portant le même nom. Elles sont
+entièrement gérées par le {\em contrôleur de ressources}, qui permet
+de disposer des ressources sur disque comme en mémoire. Les ressources
+de chaque type sont produites lors de l'exécution d'une {\bf phase}
+particulière de PIPS, et sont relatives soit au programme tout entier,
+soit à un module particulier, qu'il s'agisse du programme principal,
+d'une procédure ou d'une fonction.
+
+% a une entité du {\em workspace} (dite {\em
+% owner}): PROGRAM pour le {\em programme}, MODULE pour le {\em module},
+% CALLERS pour les modules {\em appelants} le module courant ou CALLEES
+% pour les modules {\em appelés} par le module courant.
+
+% Gestion de la base (ne rien faire en dehors de pips)
+
+Les ressources sont créées directement par une requête explicite de
+l'utilisateur, ou indirectement parce qu'elles s'avèrent nécessaires
+au calcul d'une autre ressource demandée, elle, explicitement.
+
+On peut considérer les requêtes essentielles comme une action sur la
+base de ressources. Afin de préserver la cohérence de cette base de
+ressources, il ne faut manipuler ces ressources qu'avec les utilitaires
+PIPS décrits dans cette notice: {\tt Display}, {\tt Select}, {\tt
+Build}, {\tt Perform}, {\tt Pips} ainsi que {\tt Delete}.
+
+\subsection{Manipulations du workspace. Contrôleur de ressources}
+
+%% Etre explicite sur le controleur de ressources
+%% Donner dans Build et Perform l'explication de:
+%% Request: Build RESOURCE for module MODULE...
+%% Request: Perform RULE for module MODULE...
+
+Afin de minimiser le temps de calcul et de rendre PIPS interactif
+malgré son caractère interprocédural, les ressources ne sont
+construites qu'à la demande. A l'intérieur de {\tt Display}, {\tt
+Build}, {\tt Perform}, et {\tt Pips} des mécanismes de type {\em
+make} enchaînent récursivement l'exécution de chaque règle (ie.
+chaque phase) requise au moment où les ressources dont elle a besoin
+ont été produites. Ces mécanismes s'appellent dans PIPS les
+contrôleurs de ressources (pipsmake). Cela assure aussi la
+réutilisation des ressources, dans la mesure où pour chaque règle les
+ressources produites sont postérieures aux ressources requises.
+
+\subsection{Analyses et Transformations}
+De nombreuses phases d'analyse et de transformation du programme peuvent
+être appliquées successivement, sans souci de la cohérence des
+enchaînements, qui est prise en charge par le contrôleur de
+ressources. Ainsi l'utilisateur peut-il se concentrer sur le travail où
+sa connaissance du programme est réellement utile.
+
+
+\section{Création d'un workspace: Init}
+
+\subsection{Environnement de PIPS}
+
+% repertoire, source lu seulement
+
+
+Pour utiliser PIPS, il faut pouvoir exécuter {\tt Init}, {\tt Build},
+{\tt Perform}, {\tt Select} et {\tt Pips}. Il convient d'ajouter à son
+path la directory où se trouvent ces shell-scripts et de définir
+quelques variables d'environnement. Pour cela, il suffit d'exécuter
+l'un des shell-scripts (selon votre shell usuel) fourni avec PIPS: 
+
+{\tt \$ . Pips/pipsrc.sh} (shell sh ou ksh) ou 
+
+{\tt \$ source Pips/pipsrc.csh} (shell csh ou tcsh). 
+
+Si vous utilisez PIPS plusieurs fois, cette commande devrait être
+placée dans votre fichier d'initialisation du shell.
+
+Toutes ces commandes seront appelées depuis le répertoire où sont
+situés les fichiers sources du programme que vous voulez paralléliser.
+
+PIPS nécessite beaucoup de place à la fois en mémoire et sur disque.
+Assurez-vous que vous disposez d'une capacité suffisante avant de
+commencer une nouvelle session... 
+
+\subsection{Init}
+
+% Utilisation, resultats
+
+\begin{description}
+
+\item Usage: {\bf Init [-f file1.f] [-f file2.f] ... [-d] workspace \\
+ou  Init [-f "file1.f file2.f ..."] [-d] workspace}
+
+
+Pour créer un workspace de nom {\tt wspace} en vue de  paralléliser les
+fichiers sources Fortran {\tt src1.f} et {\tt src2.f}, exécuter:\\
+{\tt \$ Init -f src1.f -f src2.f wspace ou  \$ Init -f "src1.f src2.f"
+wspace}.  
+
+Si le workspace  de nom {\tt wspace} existe préalablement, utiliser
+l'option {\tt d}:\\ {\tt \$ Init -f "src1.f src2.f" -d wspace}
+
+Si le nom du workspace n'est pas spécifié, le nom du workspace
+précédemment sélectionné est repris. 
+Si vous n'êtes pas seul à travailler dans un même répertoire, il
+faut spécifier votre workspace à chaque commande.
+
+La commande  {\tt \$ Init wspace} permet de  revenir à un workspace
+déjà existant. 
+
+
+\end{description}
+
+Un répertoire {\em wspace.database} est créé; il  contiendra 
+la base des  ressources. Le fichier {\em wspace.database/schema}
+décrit cette base, chaque ressource est  un fichier. La base des
+ressources  est initialisée avec les 
+SOURCE\_FILE, correspondant au  source de chacunes des procédures du
+programme (ou {\em modules}) 
+choisi. Ces SOURCE\_FILEs sont dérivés à partir de vos
+fichiers sources, à l'aide de l'utilitaire {\em fsplit}. 
+
+Vos propres fichiers  sont considérés aussi comme des ressources,
+dites USER\_FILE, qui sont exceptionnellement en dehors du  répertoire
+{\em wspace.database} et qui ne seront jamais modifiés. 
+
+Chaque fichier SOURCE\_FILE ne contient qu'un unique module et prend
+comme nom le nom de ce module. Le fichier {\em wspace.database/modules}
+contient la liste de ces modules. 
+
+Toutes les informations propres à l'environnement de travail
+(règles de production des ressources) sont conservées dans le
+fichier {\em wspace.database/pipsmake}.
+
+
+\subsection{Exemple}
+Soit le fichier matmul.f qui comprend les procédures mm et saxpy. Pour
+créer l'espace de travail mm1 à partir de ce fichier, placez-vous sous un
+répertoire qui contient matmul.f et tapez la commande:
+
+{\tt \$ Init -f matmul.f mm1}
+
+Les messages qui notifient l'activité de PIPS sont nombreux, ils
+permettent de suivre les calculs réalisés. Remarquer simplement parmi
+ceux de la commande Init:
+\begin{verbatim}
+Spliting file    matmul.f
+  Module         MM
+  Module         SAXPY
+\end{verbatim}
+Ils précisent que les modules de mm1 sont MM et SAXPY (ces derniers peuvent
+être donnés en lettres minuscules dans les commandes suivantes).
+
+Les fichiers créés sous le répertoire {\tt mm1.database} sont {\tt
+schema}, {\tt mm.f}, {\tt saxpy.f}, {\tt modules} et {\tt pipsmake}.
+
+\subsection{Destruction d'un workspace: Delete}
+
+Afin de supprimer un workspace de nom wspace, il suffit de faire:\\
+{\tt \$ Delete wspace}
+
+Noter que les sources réels du programme (ressources USER\_FILE) ne sont pas
+effacés par {\tt Delete}.
+
+
+\section{Affichage des résultats: Display}
+
+\subsection{Principe}
+
+Les résultats des analyses et des transformations de programme,
+construits avec les règles adéquates, sont lisibles dans l'une des
+ressources PRINTED\_FILE, PARALLELPRINTED\_FILE, CALLGRAPH\_FILE,
+ICFG\_FILE, DG\_FILE, WP65\_COMPUTE\_FILE ou encore WP65\_BANK\_FILE.
+Les transformations de code y sont  effectuées, et les 
+résultats des analyses  sont visibles en commentaire de ces fichiers
+Fortran. La fabrication des ressources et leur affichage sont
+automatiquement réalisés par la commande {\tt Display}, qui exécute
+un appel à {\tt Pips}. 
+
+\subsection{Display}
+\begin{description}
+
+\item Usage: {\bf Display [-w wspace] [-m module] [-v] [pretty-print]}
+
+où les valeurs possibles de pretty-print sont: {\tt  para77 para90 cray
+code tran prec comp regi prop cumu cg icfg icfgl icfgc dg wp65 flint}. 
+La valeur par défaut est {\tt para77}. 
+
+Le workspace (resp. le module) courant est utilisé à moins qu'un nom
+ne soit spécifié par l'option {\tt -w} (resp. {\tt -m}).
+
+L'option {\tt v} permet l'affichage des messages décrivant les
+différentes opérations qui sont effectuées.
+
+\end{description}
+
+{\bf pretty-print} est une clé à laquelle sont associés des
+traitements PIPS qui aboutissent à la fabrication d'une ressource
+parmi: PRINTED\_FILE, PARALLELPRINTED\_FILE, CALLGRAPH\_FILE,
+ICFG\_FILE, DG\_FILE, WP65\_COMPUTE\_FILE ou encore WP65\_BANK\_FILE;
+ces ressources sont des fichiers de texte qui 
+permettent d'afficher les analyses et transformations de programme qui
+ont été effectuées. 
+
+\paragraph{PRINTED\_FILE} construit avec:
+\begin{itemize}
+\item{\tt code} donne le pretty-print de la représentation intermédiaire
+du module qu'utilise PIPS;
+\item{\tt tran} donne en plus l'analyse sémantique des transformers en
+commentaire;
+\item{\tt prec} fait de même avec les préconditions;
+\item{\tt comp} fait de même avec les complexités;
+\item{\tt regi} fait de même avec les régions;
+\item{\tt prop} fait de même avec les effets propres;
+\item{\tt cumu} fait de même avec les effets cumules.
+\end{itemize}
+
+\paragraph{CALLGRAPH\_FILE} construit avec:
+\begin{itemize}
+\item{\tt cg} affiche le graphe des appels
+\end{itemize}
+
+\paragraph{ICFG\_FILE} construit avec:
+\begin{itemize}
+\item{\tt icfg} affiche le graphe de contrôle
+\item{\tt icfgl} donne en plus les boucles qui comprennent des appels
+\item{\tt icfgc} fait de même avec les structures de contrôle.
+\end{itemize}
+
+\paragraph{DG\_FILE} construit avec:
+\begin{itemize}
+\item{\tt dg} affiche le graphe de dépendences.
+\end{itemize}
+
+\paragraph{PARALLELPRINTED\_FILE} construit avec:
+\begin{itemize}
+\item{\tt para77} donne le pretty-print du code parallèle;
+\item{\tt para90} donne aussi le pretty-print du code parallèle, mais avec
+la notation Fortran 90;
+\item{\tt cray} donne le pretty-print du code parallèle sous le format cray.
+\end{itemize}
+
+
+\paragraph{WP65\_COMPUTE\_FILE et WP65\_BANK\_FILE} construits avec:
+\begin{itemize}
+\item {\tt wp65} génére une version distribuée du programme pour
+multiprocesseur à mémoire distribuée (une mémoire
+partagée est émulée).  Le code complet est composé des deux
+ressources WP65\_COMPUTE\_FILE (code exécuté par les processeurs de
+calcul) et WP65\_BANK\_FILE (code exécuté par les processeurs émulant la
+mémoire partagée). 
+\end{itemize}	
+
+
+\paragraph{FLINTED\_FILE} construit avec:
+\begin{itemize}
+\item {\tt flint} affiche le résultat de la vérification de 
+cohérence  d'un module. 
+\end{itemize}	
+
+
+La ressource construite est affichée sur le fichier de sortie standard
+stdout, alors que les messages informatifs sortent sur le fichier
+d'erreur standard stderr.
+
+\subsection{Exemple}
+Pour visualiser la version parallèle du module MM de mm1, taper:
+
+{\tt \$ Display -m mm}
+
+Toutes les phases doivent s'enchaîner pour construire la ressource
+\newline PARALLELPRINTED\_FILE du module MM. Finalement, on obtient:
+
+\begin{verbatim}
+Display of file mm1.database/MM.parf
+C
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C
+      SUBROUTINE MM(N, A, B, C)
+C
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C
+      DOALL I = 1,N,1
+         PRIVATE I
+         DOALL J = 1,N,1
+            PRIVATE J
+            C(I,J) = 0.0                                          0006
+         ENDDO
+      ENDDO
+C
+      DOALL J = 1,N,1
+         PRIVATE J
+         DO K = 1,N,1
+            PRIVATE K
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                 0011
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+Pour conserver dans le fichier mm1.mm.prec les préconditions de ce module,
+faire: 
+
+{\tt \$ Display prec > mm1.mm.prec}
+
+Il faut noter que malgré sa grande utilité, la commande {\tt Display}
+ne permet pas de bénéficier de toute la puissance de PIPS. Aussi
+faut-il savoir recourir à {\tt Select} , {\tt Perform}, {\tt
+Build} ou {\tt Pips}.
+
+
+\section{Choix des options: Select}
+
+% Makefile reconfigurable
+
+Pour initialiser un {\em workspace}, il faut spécifier quelles sont les
+règles de construction des ressources. Une phase est une exécution
+d'une règle, et à chaque ressource est associée au moins une règle de
+production. Un exemple de règle par défaut est fourni dans le fichier
+{\tt \$LIBDIR/pipsmake.rc}
+
+\subsection{Fichier pipsmake.rc}
+
+Au premier appel de {\tt Build}, {\tt Perform}, {\tt
+Select} ou {\tt Pips}  un fichier {\tt pipsmake.rc} est lu pour apprendre à
+PIPS les règles de production des ressources: celui du répertoire
+courant s'il existe, celui de {\tt \$LIBDIR} à défaut. Aussi
+pouvez-vous créer votre propre fichier d'initialisation de PIPS en
+copiant  {\tt pipsmake.rc} et en le modifiant (voir la syntaxe de ce
+fichier en annexe {\em pipsmake}).
+
+Lorsque plusieurs règles sont disponibles dans {\tt pipsmake.rc} pour
+créer une même ressource, la première d'entre elles est
+sélectionnée. Une autre règle pourra être sélectionnée à la place
+de la première au moyen de la commande {\tt Select}.
+
+Une règle sélectionnée sera au besoin utilisée pour une phase afin
+de calculer une ressource requise. C'est là le principe du {\em make}.
+
+Une fois que {\tt pipsmake.rc} a été lu, il ne sera plus jamais
+utilisé pour ce workspace, puisqu'une représentation interne du
+pipsmake est conservée et tenue à jour pour chaque workspace. Elle est
+stockée dans le fichier {\tt wspace/pipsmake}.
+
+\subsection{Select}
+\begin{description}
+
+\item Usage: {\bf Select [-w wspace] rule [rule] ...}
+
+Le workspace courant est utilisé à moins qu'un nom ne soit spécifié
+par l'option {\tt -w}.
+
+Les règles à sélectionner peuvent être spécifiées  soit par un nom
+interne à PIPS \newline (ex. {\tt rice\_full\_dependence\_graph}), soit
+par un alias géré par le shell-script {\tt Pips} (ex. {\tt rfulldg}).
+Voir l'annexe {\em alias}.
+\end{description}
+
+La commande {\tt Select} permet de choisir parmi les différents
+algorithmes proposés celui que vous désirez effectuer pour transformer
+ou analyser un programme.
+
+\subsection{Exemple}
+Soit le programme {\tt choles.f}. Montrons qu'il est nécessaire de
+sélectionner la règle \newline {\tt rice\_full\_dependence\_graph}
+pour le paralléliser:
+
+{\tt \$ Init c2 choles.f}
+
+Un seul module: CHOLES.
+
+{\tt \$ Perform -m choles privatizer}
+
+Ainsi sont privatisées les variables pour lesquelles cette
+transformation est licite.
+
+{\tt \$ Display para >c2.para}
+%%on pourrait faire 2>/dev/null (...) mais ne marche pas sous csh ni tcsh
+
+Mais ce pretty-print n'est pas parallèle:
+\begin{verbatim} 
+$ cat c2.para
+C
+C     CHOLESKI METHOD - VERSION 1
+C
+C     PRIVATIZATION
+C     DEPENDENCE COMPUTATION WITH AND WITHOUT EXECUTION CONTEXT
+C
+      SUBROUTINE CHOLES(A, P, N)
+      REAL X, A(N,N), P(N)
+C
+      DO I = 1,N,1
+         PRIVATE I,KK,J,K,X
+         X = A(I,I)                                              0004
+         DO K = 1,(I-1),1
+            PRIVATE K
+            X = (X-(A(I,K)*A(I,K)))                              0007
+         ENDDO
+         P(I) = (1.0/SQRT(X))                                    0008
+         DO J = (I+1),N,1
+            PRIVATE J,KK,X
+            X = A(I,J)                                           0011
+            DO KK = 1,(I-1),1
+               PRIVATE KK
+               X = (X-(A(I,J)*A(I,KK)))                          0014
+            ENDDO
+            A(J,I) = (X*P(I))                                    0015
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+Donc il convient de choisir une règle qui implémente un algorithme qui
+tienne compte des préconditions:
+
+{\tt \$ Select rfulldg}
+
+Ainsi la règle RICE\_FULL\_DEPENDENCE\_GRAPH est sélectionnée.
+
+{\tt \$ Display para >c2.para}
+
+Qui calcule une version effectivement parallèle:
+\begin{verbatim} 
+$ cat c2.para
+C
+C     CHOLESKI METHOD - VERSION 1
+C
+C     PRIVATIZATION
+C     DEPENDENCE COMPUTATION WITH AND WITHOUT EXECUTION CONTEXT
+C
+      SUBROUTINE CHOLES(A, P, N)
+      REAL X, A(N,N), P(N)
+C
+      DO I = 1,N,1
+         PRIVATE I,KK,J,K,X
+         X = A(I,I)                                                    0004
+         DO K = 1,(I-1),1
+            PRIVATE K
+            X = (X-(A(I,K)*A(I,K)))                                    0007
+         ENDDO
+         P(I) = (1.0/SQRT(X))                                          0008
+         DOALL J = (I+1),N,1
+            PRIVATE J,KK,X
+            X = A(I,J)                                                 0011
+            DO KK = 1,(I-1),1
+               PRIVATE KK
+               X = (X-(A(I,J)*A(I,KK)))                                0014
+            ENDDO
+            A(J,I) = (X*P(I))                                          0015
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+\subsection{Avertissement}
+
+Comme nous le constatons sur l'exemple précédent, certaines règles ne
+doivent pas être sélectionnées, mais appliquées. L'application
+consiste à demander l'exécution {\em immédiate} d'une règle
+spécifique; elle est toujours licite. Par contre, la sélection
+consiste à choisir la règle qui sera utilisée {\em ultérieurement}
+par défaut pour produire une ressource d'un certain type.
+
+Toutes les règles ne peuvent pas être sélectionnées, afin de ne pas
+introduire de cycle dans l'enchaînement des règles. Par exemple,
+la règle de nom {\tt distributer}, qui effectue la distribution de
+boucles, et la règle {\tt privatizer}, qui privatise les variables
+scalaires dans 
+les boucles, produisent toutes deux la ressource {\tt CODE} à partir
+d'une ressource {\tt CODE} qui doit être déjà disponible pour le
+même module. Il faut donc que reste sélectionnée une autre règle qui
+produise initialement {\tt CODE} ({\tt link} par défaut). Cela ne
+serait plus vrai si l'on sélectionnait {\tt distributer} ou {\tt
+privatizer} (cf. section {\em Application d'une règle: Perform}).
+
+
+\section{Demande d'une ressource: Build}
+
+\subsection{Build}
+\begin{description}
+
+\item Usage: {\bf Build [-w wspace] [-m module] resource}
+
+Le workspace (resp. le module) courant est utilisé à moins qu'un nom
+ne soit spécifié par l'option {\tt -w} (resp. {\tt -m}).
+
+La ressource peut être spécifiée par son vrai nom
+ou par un alias. Les noms sont généralement plus explicites mais
+aussi plus longs.
+
+\end{description}
+
+
+Vous souhaitez une ressource qui ne soit pas visualisable à l'écran
+comme les effets d'une procédure ou un graphe de dépendance (cf. annexe
+{\em Base de ressources}). Pour l'obtenir, vous devez alors utiliser
+Build. Cela est utile à des fins de debug ou bien pour récupérer des
+résultats partiels à l'intention d'un autre logiciel. Le graphe de
+dépendance pourrait ainsi être réutilisé pour faire de l'ordonnancement
+d'instructions.
+
+
+\section{Application d'une règle: Perform}
+
+\subsection{Perform}
+\begin{description}
+\item Usage: {\bf Perform [-w wspace] [-m module] [-v] rule}
+
+Le workspace (resp. le module) courant est utilisé à moins qu'un nom
+ne soit spécifié par l'option {\tt -w} (resp. {\tt -m}).
+
+La règle rule peut être spécifiée par son nom vrai ou par son nom
+d'alias.
+
+L'option {\tt v} permet l'affichage des messages décrivant les
+différentes opérations qui sont effectuées.
+\end{description}
+
+Il est nécessaire d'appliquer explicitement les règles qui ne
+produisent pas directement une ressource mais qui la modifie.  C'est
+notamment le cas de {\tt distributer} et {\tt privatizer} pour la
+production de CODE.
+
+\section{Pips}
+
+\begin{description}
+\item Usage: Pips [-w wspace] [-f source\_file[,source\_file]...]"
+     "                        [-s selected\_rule[,selected\_rule]...]"
+     "                        [-m module] [-p performed\_rule]"
+     "                                    [-b build\_resource]"
+
+
+Le workspace (resp. le module) courant est utilisé à moins qu'un nom
+ne soit spécifié par l'option {\tt w} (resp. {\tt m}).
+
+La règles et la ressource peuvent être spécifiées par leur vrai nom
+ou par un alias. Les alias sont généralement moins explicites mais
+aussi moins longs.
+\end{description}
+
+Les règles {\tt selected\_rule} éventuellement spécifiées avec
+l'option {\tt s} sont sélectionnées (cf. {\em Select}).
+
+Ensuite la règle {\tt performed\_rule} éventuellement spécifiée avec
+l'option {\tt p} est appliquée (cf. {\em Perform}).
+
+Pour finir, la ressource {\tt build\_resource} est calculée (build), à
+moins que ce ne soit une chaîne vide, auquel cas seuls le Select et le
+Perform sont effectués.
+
+Display, Select, Perform et Build  font un appel
+à Pips qui effectue les conversions et vérifications requises puis
+appelle les binaires nécessaires. Les alias doivent être modifiés
+dans Pips  pour valoir pour les autres shell-scripts (cf. annexe {\em
+Alias}). 
+
+
+\section{Analyses}
+% chains et dg lost
+
+Pour chacune des phases d'analyse: (1) calcul des prédicats (les
+transformers et les préconditions), (2) calcul du graphe de
+dépendance, (3)  calcul des {\em use-def chains} et (4) calcul du
+graphe de conrôle, plusieurs algorithmes ont été développés. Il est 
+possible de choisir le type d'algorithme que vous  désirez
+utiliser pour effectuer une analyse en utilisant {\em
+Select}. Cf. rapport EMP-CAI-I E/137 pour plus de détails.
+
+\subsection{Transformers}
+Quatre algorithmes sont disponibles et leur distinction se fait sur deux
+critères: Ils sont plus ou moins précis et intra ou inter-procéduraux.
+
+Les règles associées à ces algorithmes sont: TransFormers\_intra\_fast
+(alias tf), TransFormers\_intra\_FULL (alias tffull),
+TransFormers\_INTER\_fast (alias tfinter) TransFormers\_INTER\_FULL
+(alias tfinterfull). 
+
+\subsection{Préconditions}
+De manière similaire, les règles sont: PreConditions\_intra (alias
+pc),\newline PreConditions\_INTER\_fast (alias pcinter),
+PreConditions\_INTER\_FULL (alias pcinterfull).
+
+\subsection{Graphe de dépendance}
+Trois algorithmes sont disponibles:  (1) Rice\_fast\_Dependence\_Graph (alias
+rdg),  le plus rapide mais aussi le moins précis, (2) \newline
+Rice\_FULL\_Dependence\_Graph (alias rfulldg) qui prend en compte les
+bornes de boucles et (3) \newline Rice\_Semantics\_Dependence\_Graph
+(alias rsdg)  qui prend en compte les préconditions. 
+
+\subsection {Use-Def chains}
+
+Deux algorithmes sont proposés pour calculer les {\em use-def et
+def-use chains} . L'algorithme classique peut être aplliqué en
+utilisant  Atomic\_CHains.  Le second, est
+basé sur le calcul des régions et est  donc plus précis; il est
+appliquable par  Region\_CHains. 
+
+\subsection {ICFG}
+
+Trois algorithmes permettent d'obtenir le graphe de contrôle, du moins
+au plus précis, sont proposés: (1) PRint\_ICFG (alias pricfg), (2)
+PRint\_ICFG\_with\_Loops (alias pricfgl) qui donne les appels et les boucles 
+imbriquées, et (3) PRint\_ICFG\_with\_Control (alias pricfgc) qui donne
+en plus les tests de contrôle.  
+
+\subsection {Parallélisation}
+
+Plusieurs options de parallélisation sont disponibles suivant le
+type  des dépendences dont vous désirez tenir compte lors de la
+parallélisation: RICE\_All\_dependence (alias ricea) ou
+RICE\_data\_dependence (alias ricetrue), ou que vous désirez générer
+du code approprié au Cray: rice\_cray (alias ricec).  
+
+\section{Transformations du programme}
+
+\subsection{Privatisation de variables}
+Celle-ci est toujours réalisée pour les indices de boucle sans qu'elle
+soit demandée. Par contre il faut appliquer la règle {\tt PRIVatizer}
+(alias {\tt priv}) pour privatiser toutes les variables qui peuvent
+l'être, avant de demander la parallélisation, naturellement.
+
+\subsection{Distribution de boucles}
+Elle est réalisée en appliquant la règle {\tt DISTributer} 
+(alias {\tt dist}). 
+
+\subsection{Evaluation Partielle}
+
+La règle  Partial\_EVal (alias pev)  génère le code où les expressions constantes
+ont été remplacées par leur valeur. 
+
+
+\subsection{Déroulage de boucle}
+
+Le {\em déroulage de boucle}  déroule {\tt n} itérations d'une boucle. Le
+label de la boucle ainsi que le nombre  {\tt n} doivent être donnés au
+moment de  l'exécution par l'utilisateur. La transformation est très
+générale et il est intéressant d'effectuer une {\em évaluation
+partielle} du code après cette transformation. Cette transformation est
+appliquée grâce à {\tt UNRoll} (alias unr). L'option {\tt v} doit
+être utilisée. 
+
+
+\subsection{Strip\_mine}
+
+Un label de boucle ainsi que: soit une taille de bloc ou un nombre de
+blocs sont demandés à l'utilisateur. Le {\em strip-minig} de la boucle
+est effectuée en utilisant: Strip\_Mine (alias sm). L'option {\tt v}
+doit être utilisée. 
+
+
+
+\subsection{Echange de boucles}
+
+L'échange de boucle échange la boucle dont le label est donné par
+l'utilisateur avec la boucle la plus interne du même nid de boucles.
+Elle est appliquable avec la règle:  Loop\_Interchange  (alias li).
+L'option {\tt v} doit être utilisée. 
+
+
+\subsection {Réductions}
+
+Pour détecter les réductions utiliser: {\tt REDuctions} (alias red).
+
+
+\subsection{Parallélisation de nid de boucles}
+
+C'est la transformation de programme par défaut; elle est obtenue en
+demandant {\tt Display [para]}, qui construit la ressource 
+PARALLELPRINTED\_FILE.
+A la différence des transformations précédentes, celle-ci est
+élaborée à partir de la ressource PARALLELIZED\_CODE distincte de la
+ressource CODE à partir de laquelle elle a été construite. Elle peut
+donc être demandée implicitement.
+
+Ainsi, la parallélisation interprocédurale d'un module \verb+foo+ d'un
+programme Fortran \verb+bar+ contenu dans le fichier \verb+source.f+ se
+résume à:
+\begin{verbatim}
+$ Init bar-v1 source.f
+$ Display -m foo
+\end{verbatim}
+où \verb+bar-v1+ est la zone contenant la première version
+parallélisée du programme \verb+bar+. Une deuxième procédure,
+\verb+foofoo+, peut être ensuite traitée par une unique commande dans
+le même espace de travail \verb+bar-v1+:
+\begin{verbatim}
+$ Display -m foofoo 
+\end{verbatim}
+à condition, bien sûr, que son code se soit trouvé dans votre
+fichier Fortran \verb+source.f+.
+
+\newpage
+
+\section*{Conclusion}
+
+PIPS est un paralléliseur interprocédural expérimental. La version
+décrite dans ce rapport est la première qui soit mise entre les mains
+d'utilisateurs extérieurs à l'Ecole des Mines. Il est vraisemblable que
+de nombreuses erreurs subsistent et nous vous sommes d'avance reconnaissant
+de nous les signaler (e-mail: \verb+<pipsgroup@ensmp.fr>+). Néanmoins nous
+espérons que PIPS vous permettra d'obtenir des résultats intéressants
+en parallélisation interprocédurale.
+
+%\section{Récupération d'erreurs}
+
+
+%\section{Debug}
+
+\newpage
+
+\section*{Annexe 1: Installation de PIPS}
+
+La version initiale de PIPS est fournie pour stations et serveurs SUN4,
+exploités sous SUNOS~4.0.3. PIPS fonctionne avec 8~Mo de mémoire physique
+et 14~Mo d'espace {\em swap} pour de petits programmes, mais il faut disposer
+de plus d'espace de swap pour des programmes de plusieurs milliers de lignes,
+et si possible de plus de mémoire. La configuration utilisée à l'Ecole
+des Mines consiste en un SUN~4/260, 32~Mo de mémoire et 50~Mo d'espace
+de swap.
+
+Il faut:
+\begin{enumerate}
+
+  \item choisir un répertoire, un propriétaire et un groupe pour la
+sous-arborescence PIPS; nous avons choisi de définir au CRI un compte
+{\em pips} qui se trouve dans le groupe {\em staff} comme les chercheurs;
+
+  \item effectuer un \verb+tar x Pips+ dans le répertoire où Pips doit être
+installé; ce répertoire est au CRI {\em /home/users/pips}
+
+  \item mettre à jour le propriétaire, le groupe et les droits pour
+cette sous-arborescence; généralement {\tt chmod} a une option récursive;
+sinon, il faut utiliser find;
+
+  \item mettre à jour les variables shell PIPSDIR, LINEARDIR, NEWGENDIR,
+TMPDIR et éventuellement OPENWINHOME dans le fichier {\tt
+Pips/pipsrc.sh} en fonction du répertoire qui a été 
+choisi pour l'installation; il est préférable de donner des noms
+absolus à ces variables; au CRI, {\tt PIPSDIR=/home/users/pips/Pips}.
+Le fichier {\tt Pips/pipsrc.csh} doit alors être mis à jour en
+executant la commande {\tt Pips/make-pipsrc.csh}.
+
+  \item exécuter directement celui de ces deux fichiers qui correspond
+à l'analyseur de commande retenu (cf. section {\em Environnement de
+PIPS}); avec le Bourne Shell ou le Korn Shell:
+\begin{quote}
+{\tt . pipsrc.sh}
+\end{quote}
+avec le C Shell ou le TC Shell:
+\begin{quote}
+{\tt source pipsrc.csh}
+\end{quote}
+
+  \item pour continuer l'installation suivre les instructions du fichier
+\verb+$UTILDIR/install-pips-src+.
+
+  \item Pour installer le {\tt man} (dans {\tt /usr/man/manl}:\\
+\verb+ cd $DOCDIR
+make man+
+
+\end{enumerate}
+
+%%Preciser la structure de la cassette
+
+\newpage
+
+\section*{Annexe 2: Fortran PIPS}
+
+Le compilateur PIPS n'accepte pas l'ensemble du langage Fortran tel
+qu'il est défini dans la norme Fortran-77. Les restrictions et
+extensions qui lui ont été apportées sont définies et justifiées en
+détail dans le rapport EMP-CAI-I~E/103.
+
+Les restrictions essentielles au langage sont les suivantes:
+\begin{enumerate}
+
+  \item ENTRY 
+
+  \item BLOCKDATA
+
+  \item ASSIGN et GOTO assigné
+
+  \item RETURN multiple
+
+  \item GOTO calculé
+
+  \item opérateur substring ``:''
+
+  \item initialisation de chaînes de caractères de type Hollerith \\
+(par exemple \verb+DATA A /8HOPERATIN,8HG POINT /+ doit être
+transformé en \verb+DATA A /'OPERATIN','G POINT '/+)
+
+  \item le caractère {\em double quote} est prohibé comme dans la
+norme bien que de nombreux compilateurs acceptent un jeu de caractères
+plus grand que celui qui est spécifié dans la norme;
+
+  \item les fonctions formules ne sont pas traitées;
+
+  \item les constantes complexes doivent être remplacées par un appel
+à \verb+CMPLX+;
+
+  \item les déclarations de COMMONs doivent apparaître après
+	toutes les déclarations de type.
+
+\end{enumerate}
+
+Ces restrictions peuvent être contournées en modifiant {\em
+syntaxiquement} le programme (voir le rapport EMP-CAI-I~E/103). Les
+mécanismes fondamentaux de Fortran sont bien tous traités par PIPS.
+
+Il est aussi à noter que les restrictions 1 (M.V.13), 2 (M.III.4,
+M.V.17), 3 (M.III.6), 4 (M.V.12, M.V.16) et 7 (M.VI.15) )font partie des
+constructions qu'il est conseillé d'éviter dans:
+\begin{quote}
+FORTRAN 77 - Guide pour l'écriture de programmes portables \\
+Françoise Ficheux-Vapné\\
+(annexe B)
+\end{quote}
+D'autres conseils donnés dans cet ouvrage permettront d'améliorer
+les résultats donnés par PIPS:
+\begin{itemize}
+  \item utilisation de \verb+END+ sans \verb+STOP+ ni \verb+RETURN+
+	pour terminer les unités de programme (M.IV.3, M.V.1, M.V.8, M.V.14);
+  \item définition uniforme des \verb+COMMONs+ dans tout un programme
+	(M.V.21)
+\end{itemize}
+
+% Il n'est pas non plus possible d'utiliser la même chaîne de
+% caractères pour un symbole global comme un nom de module ou de common
+% et pour un symbole local comme un nom de variable ou de paramètre formel.
+% Cette dernière restriction est une source d'erreurs quelques fois difficiles
+% à comprendre.
+
+Il faut s'assurer que tous les modules sont explicitement nommés par
+une instruction \verb+PROGRAM+, \verb+SUBROUTINE+ ou \verb+FUNCTION+.
+Cela veut dire qu'il faut ajouter l'instruction:
+\begin{center}
+\begin{verbatim}
+PROGRAM MAIN
+\end{verbatim}
+\end{center}
+aux programmes principaux qui ne comprennent pas d'instructions \verb+PROGRAM+.
+Un nom plus évocateur que \verb+MAIN+ peut bien sûr être choisi.
+
+L'objectif n'étant pas d'écrire un compilateur commercial, les
+messages d'erreurs ne sont pas forcément très explicites. Il faut donc
+s'assurer au préalable que le programme soumis à PIPS est accepté par
+un compilateur conventionnel. Les options de compilation choisie devraient
+être aussi sévères que possible de manière à éliminer au maximum
+les extensions par rapport à la norme Fortran-77.
+
+Un des problèmes rencontrés est la restriction des instructions aux colonnes
+7 a 72. Avec les editeurs pleine page, il est parfois difficile de se rendre
+compte qu'on a depasser cette limite. Les messages fournis par PIPS sont
+alors imprévisibles et incompréhensibles par celui qui regarde le source.
+
+Pour minimiser les problèmes, les déclarations devraient avoir la structure
+suivante:
+\begin{enumerate}
+
+  \item déclaration des arguments;
+
+  \item ordre \verb+IMPLICIT+ optionnel;
+
+  \item déclaration des types et dimensions des variables;
+
+  \item déclaration des externes, l'ordre EXTERNAL précédant la
+	déclaration de type;
+
+  \item déclaration des \verb+COMMON+s.
+
+\end{enumerate}
+
+\newpage
+
+\section*{Annexe 3: Messages d'erreur}
+
+De nombreux messages d'erreurs ou d'avertissement peuvent être émis par PIPS
+(fichier non existant, erreur de syntaxe, option inconnue, etc...).
+Les erreurs propres au compilateur provoquent volontairement
+un message {\em core dumped} de manière à pouvoir analyser ce qui s'est
+passé.
+
+Le non-fonctionnement de \verb+pips_make+, qui se traduit par des recalculs
+inutiles ou par des absences de calculs utiles, est généralement dû
+au fonctionnement de NFS. Il faut vérifier que la machine sur laquelle
+tourne PIPS a exactement la même heure que la machine qui gère les
+fichiers. Le test peut se faire avec une commande du genre:
+
+\begin{verbatim}
+date; echo bonjour >foo; ls -l foo;rm foo
+\end{verbatim}
+
+Les stations peuvent être resynchronisées sur le serveur NFS en
+utilisant la commande \verb+rdate+.
+
+\section*{Annexe 4: Erreurs connues}
+
+% L'algorithme de parallélisation ne prend pas en compte les dépendances
+% portant sur les {\em bornes} de boucles. Une distribution de boucle
+% malencontreuse est parfois appliquée à des affectations de variables
+% scalaires locales. Il faut essayer d'éliminer ces variables scalaires
+% en remplaçant leurs occurences par leur expression d'initialisation.
+% Le programme résultant est faux.
+
+L'algorithme de calcul des {\em use-def chains} crée de fausses
+dépendances sur des indices de boucle. Elles sont dues à l'utilisation
+d'un indice identique dans un DO implicite ou dans une expression de bornes
+d'autres boucles. Ce problème est facilement identifiable parce que
+l'indice de la boucle non parallélisée n'est pas déclaré {\tt
+PRIVATE.} Le programme résultant n'est pas optimal mais est correct.
+
+% Ces deux comportements aberrants sont dus au calcul des effets des
+% instructions. Nous n'avons pas encore trouvé une solution qui soit à
+% la fois correcte et efficace.
+
+Les commentaires portant sur les instructions {\tt GOTO} et {\tt RETURN}
+sont perdus. Ceci est dû au traitement des {\tt RETURN} comme des {\tt
+GOTO} vers la fin de la procédure courante et à la conversion des {\tt
+GOTO} en arcs du graphe de contrôle. Il n'a pas été prévu de faire
+porter des commentaires par ces arcs. 
+
+L'impression des formats longs de plus d'une ligne se fait en un seul
+enregistrement. Les lignes suites qui devraient être crées ne le sont pas.
+Le fichier résultant n'est pas compilable.
+
+Les fonctions formelles sont reconnues par le parser mais elles ne sont
+pas traitées correctement par les phases d'analyse. Le parser
+emet un message de type \verb+user_error+.
+
+Dans les déclarations, les informations de type et de dimension doivent
+être données avant les déclarations de commons. En cas d'inversion,
+les adresses des variables dans les commons peuvent être fausses ainsi que
+les calculs de dépendance qui porteront sur elles.
+
+% L'ordre {\tt EXTERNAL} n'est pas reconnu par le parser.
+
+Les STOPs apparaissant dans des sous-programmes et les exceptions en
+général ne sont pas correctement traités.
+
+Le caractère {\em double quote} est pas accepté dans les chaînes de
+caractères (N.B. il ne fait pas partie du jeu de caractères standard
+de Fortran). Mais il ne peut pas servir comme délimiteur de constante
+chaîne de caractères.
+% Il faudrait quand même le filtrer automatiquement. Le problème
+% vient de NewGen et non de PIPS.
+
+\newpage
+
+\section*{Annexe 5: Base de ressources}
+
+Les calculs effectués, la ressource sera disponible dans le fichier 
+\newline {\tt wspace.database/MODULE.extension}. extension est en
+lettres majuscules s'il s'agit d'une ressource structurée pour PIPS (et
+correspond au nom de la ressource), et en lettres minuscules s'il s'agit
+d'une ressource construite par un pretty-printer (qui génère du code
+plus des commentaires).
+
+Les ressources structurées pour PIPS ne sont pas lisibles, et ne
+peuvent servir qu'à de futurs calculs dans la base.
+
+Parmi les pretty-prints, on aura les extensions {\tt f} pour le Fortran
+du SOURCE\_FILE, {\tt pref} pour le pretty-print du Fortran séquentiel,
+{\tt parf} pour le pretty-print du Fortran parallèle, {\tt pred} pour
+le pretty-print des prédicats. Pourtant, il est préférable d'utiliser
+la commande Display qui fournit une version toujours mise à jour du
+pretty-print requis.
+
+Les manipulation directes du workshpace sont à prohiber parce qu'elles
+risquent d'engendrer des incohérences entre la base et son schéma.
+
+\newpage
+
+\section*{Annexe 6: Contrôleur de ressources pipsmake}
+
+La syntaxe d'une règle du fichier pipsmake.rc est la suivante:
+\begin{verbatim}
+rule		> OWNER.resource
+		[> OWNER.resource]...
+	[< OWNER.resource]...
+\end{verbatim}
+
+Ces règles ne doivent pas être modifiées, mais il est possible d'en
+changer l'ordre. Cf. rapport EMP-CAI-I~E/133 pour plus de détails.
+
+La manipulation directe du fichier \verb+pipsmake.rc+ est à éviter.
+Il faut commencer par en faire une copie dans la directory courante.
+Cette copie n'est prise en compte que pour les nouveaux workspaces.
+
+Tous les résultats souhaitables doivent pouvoir être obtenus à l'aide
+de la commande {\em Select}, sauf la modification des 
+options par défaut. Par exemple, le test de dépendance rapide peut être
+remplacé par le test de dépendance précis en échangeant les règles
+\verb+rice_fast_dependence_graph+ et \verb+rice_full_dependence_graph+.
+
+\newpage
+
+\section*{Annexe 7: Alias}
+
+Les alias sont utilisables pour les règles et les ressources,
+dans chacun des arguments correspondants de Build, Perform et Select.
+Pourtant leur usage n'est jamais nécessaire (les noms de règles ou les
+ressources sont aussi valides).
+
+Les alias sont implémentés dans le shell-script de Pips (présent
+dans {\tt \$UTILDIR/Pips}), au moyen de la commande {\tt sed} de la
+fonction {\tt rename()}. Une ligne correspond à un alias, et la syntaxe
+est la suivante:
+
+{\tt s/alias\_name/true\_name/;}
+
+Lorsque l'alias\_name est une sous-chaîne d'un autre alias, il faut
+qu'il soit positionné après lui.
+
+%% Autres regles a preciser
+
+Chaque utilisateur peut donc redéfinir les alias, qui sont initialisés
+ainsi:
+
+% A chaque modification de la zone verbatim suivante, refaire M-x untabify
+% sur la region.
+\begin{verbatim}
+
+# resources
+        s/PPF/ParallelPrinted_File/; \
+        s/CGF/CallGraph_File/; \
+        s/PF/Printed_File/; \
+        s/WPF/WP65_compute_File/; \
+# rules for
+    #dg
+        s/rfulldg/Rice_FULL_Dependence_Graph/; \
+        s/rsdg/Rice_Semantics_Dependence_Graph/; \
+        s/rdg/Rice_fast_Dependence_Graph/; \
+    #transformers
+        s/tffull/TransFormers_intra_FULL/; \
+        s/tfinterfull/TransFormers_INTER_FULL/; \
+        s/tfinter/TransFormers_INTER_fast/; \
+        s/tf/TransFormers_intra_fast/; \
+    #preconditions
+        s/pcinterfull/PreConditions_INTER_FULL/; \
+        s/pcinter/PreConditions_INTER_fast/; \
+        s/pc/PreConditions_intra/; \
+    #callgraph_file
+        s/prcg/PRint_Call_Graph/; \
+    #use-def chains
+        s/ach/Atomic_CHains/; \
+        s/rgch/ReGion_CHains/; \
+    #ICFG
+        s/pricfgl/PRint_ICFG_with_Loops/; \
+        s/pricfgc/PRint_ICFG_with_Control/; \
+        s/pricfg/PRint_ICFG/; \
+    #printed_file
+        s/prct/PRint_Code_Transformers/; \
+        s/prcpe/PRint_Code_Proper_Effects/; \
+        s/prcce/PRint_Code_Cumulated_Effects/; \
+        s/prcp/PRint_Code_Preconditions/; \
+        s/prcc/PRint_Code_Complexities/; \
+        s/prcr/PRint_Code_Regions/; \
+        s/prc/PRint_Code/; \
+    #parallelisation
+	s/ricetrue/RICE_data_dependence/; \
+	s/ricea/RICE_All_dependence/; \
+	s/ricec/RICE_Cray/; \
+#Transformations to perform:
+        s/dist/DISTributer/; \
+        s/priv/PRIVatizer/; \
+        s/pev/Partial_EVal/; \
+        s/unr/UNRoll/; \
+        s/sm/Strip_Mine/; \
+        s/li/Loop_Interchange/; \
+        s/red/REDuctions/; \
+\end{verbatim}
+
+\end{document}

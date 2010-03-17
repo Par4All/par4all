@@ -1,0 +1,803 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%% Nos reflexions sur les manipulations de systèmes linéaires...
+
+\documentclass[a4paper,11pt]{article}
+\usepackage{amsmath,amssymb,psfig}
+
+\title{Linear Algebra as a Proof Engine}
+
+\author{Corinne Ancourt \\
+  Fabien Coelho \\
+  François Irigoin}
+
+\begin{document}
+
+\maketitle
+
+{\small
+\begin{center}
+\begin{verbatim}
+ $Id$
+\end{verbatim}
+\end{center}
+}
+
+\begin{abstract}
+  Linear algebra algorithm can be used to prove program properties.
+  However its worse-case exponential complexity is a problem because space
+  and time are limited for a compiler. The problem sizes must be reduced
+  as much as possible for time and space. Moreover, coefficient magnitude
+  also is a complexity issue and sub-optimal or heuristics solutions must
+  be found when arithmetic overflows occur in order to limit or control the
+  information loss.
+\end{abstract}
+
+\section{Introduction}
+
+Integer linear programming, Fourier-Motzkin variable elimination, the
+simplexe, PIP, Chernikova convex hull algorithm can be used on the integer
+or rational domains to prove some properties in programs. These algorithms
+often have a polynomial complexity but the worst-case exponential
+complexity hits sometimes. Heuristics are needed to avoid infinite
+precision arithmetic and to maintain an execution speed fast enough to
+process large real applications of more than 100,000 lines of code with
+hundreds of variables linked by hundreds of constraints.
+
+Adding information about a program should always result in more accurate
+analyses. It is not true when 32 or 64 bit integers are used. When
+information is added, more overflows may occur in the linear algebra
+algorithm and approximations must be made, resulting in less accurate
+analyses.
+
+Although linear algebra algorithms are appealing as simple and fast proof
+engines, their usage in a compiler is not as straightforward as it seems
+at first.
+
+To analyze programs, we need to approximate unbounded sets and predicates
+and operators on sets, such as union, intersection, difference,... , as
+well as functions and relations and their operators, such as combining,
+applying and fixpoint (i.e. transitive closure). The exact set theory
+operators can be used to write dataflow equations. These equations must
+then be refined using under- and over-approximated sets and operators
+which is difficult.
+
+The dynamic behavior of programs is often controlled by integers, booleans
+and character strings. They all can be mapped on integers whereas linear
+algebra is mostly based on real and rational numbers. Linear algebra does
+not provide exact set operators very often. So different implementations of
+a set operator by linear lagebra algorithms can be exact, over- or
+under-approximation and be compared for accuracy and speed.
+
+\section{Fourier-Motzkin Elimination and Feasibility}
+
+Fourier-Motzkin elimination can be used to check that a set is empty or
+not empty, or that a property holds or not since these two checks are
+identical.
+
+For convex sets of integer, a Fourier-Motzkin proves that a set is empty
+but it cannot prove in general that a set is non-empty, unless additional
+conditions are met~\cite{CA91}.
+
+Decomposition: $\Omega$-library. Can we apply the decomposition by factorisation to feasibility test or not?
+
+\section{Simplexe}
+
+Pure simplex
+Can we use decomposition by factorisation to feasibility test or not?
+
+\section{Janus}
+
+A combination of Fourier Motzkin and Simplex?
+Can we use decomposition by factorisation to feasibility test or not?
+
+\section{Redundancy Elimination}
+
+On the integer or rational domain...
+
+Using Fourier-Motzkin...
+
+Using the simplexe...
+
+Using Chernikova and a canonical generating system...
+
+Keeping all information or ready to lose some to avoid all redundancy...
+
+\section{Convex Hull or Union}
+
+The union of two convex sets is not a convex set. The union is usually
+over-approximated by the convex hull.
+
+\subsection{Definition}
+
+Let $A$ et $B$ be two finite subsets of an affine or vector space $E$, the convex hull
+of $A$ and $B$ is:
+
+\begin{eqnarray}
+\{ x ~ \in ~ E |
+\exists~a~\in~A~~~\exists~b~\in~B~~~\exists~\lambda~\in~[0..1]~~s.t.~~ x =
+\lambda a + (1 - \lambda b) \}
+\end{eqnarray}
+
+If $A$ or $B$ is not finite, the closure of the previous set is their
+convex hull.
+
+\subsection{Properties}
+
+\begin{eqnarray}
+A \subset A \vee A
+\end{eqnarray}
+
+\begin{eqnarray}
+A = A \vee A \Longleftrightarrow A ~is~ convex
+\end{eqnarray}
+
+\subsubsection{Convex Hull and Intersection}
+
+Since the computation of the convex hull of two sets is expensive, it would be nice to
+reduce it by extracting common constraints and using the distributivity:
+
+\begin{eqnarray} \label{equation-distributivity}
+A \cap ( B_1 \vee B_2 ) = (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+Unfortunately, this property does not hold in general.
+
+\begin{figure}
+\begin{center}
+% \mbox{\psfig{file=distrib01.idraw,width=0.3\hsize,height=0.3\vsize}}
+\mbox{\psfig{file=distrib01.idraw}}
+\end{center}
+\caption{The convex hull should be performed first}
+\label{figure-distrib01}
+\end{figure}
+
+For instance, look at figure~\ref{figure-distrib01}. The convex hull of
+$B_1$ and $B_2$ is a segment which intersects $A$ whereas the
+intersections of $A$ with $B_1$ and $B_2$ are both empty.
+
+\begin{eqnarray}
+A \cap ( B_1 \vee B_2 ) \not\subset (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+\begin{figure}
+\begin{center}
+% \mbox{\psfig{file=distrib02.idraw,width=0.3\hsize,height=0.3\vsize}}
+\mbox{\psfig{file=distrib02.idraw}}
+\end{center}
+\caption{The intersection should be performed first}
+\label{figure-distrib02}
+\end{figure}
+
+The converse is not true either. In Figure~\ref{figure-distrib02}, the
+intersection of the circle $A$ with the convex hull of $B_1$ and $B_2$ is just $B_1$
+and $B_2$. But the convex hull of $A \cap B_1$ and $A \cap B_2$ is the
+diameter $[B_1 B_2]$.
+
+\begin{eqnarray}
+A \cap ( B_1 \vee B_2 ) \not\supset (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+If $A$ is convex (and $B_1$ abd $B_2$ are finite sets), then:
+
+\begin{eqnarray}
+A \cap ( B_1 \vee B_2 ) \supset (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+Proof: $x~\in~(A \cap B_1 ) \vee (A \cap B_2 )$ implies there exist $x_1$
+and $x_2$ such that $x_1$ belongs to $A \cap B_1$ and $x_2$ belongs to $A
+\cap B_2$, as well as $\lambda$ in $[0..1]$ and $x = \lambda x_1 +
+(1-\lambda) x_2$. Since $x_1$ and $x_2$ belong to $A$ and since $A$ is
+convex, $x$ belongs to $A$ by definition of convexity. Furthermore, $x$
+belongs to $B_1 \cap B_2$ by definition of convex hull.
+
+\begin{figure}
+\begin{center}
+% \mbox{\psfig{file=distrib03.idraw,width=0.3\hsize,height=0.3\vsize}}
+\mbox{\psfig{file=distrib03.idraw}}
+\end{center}
+\caption{Distribution with an affine subset}
+\label{figure-distrib03}
+\end{figure}
+
+If $A$ is a vector or affine subset, this is not a sufficient condition
+for equation~\ref{equation-distributivity} to hold. In
+  Figure~\ref{figure-distrib03}, let $A$ be the $(Ox, Oy)$ plane and $B_1$
+  and $B_2$ two lines intersecting $A$ in $X$ and $Y$ respectively. The
+  point $(1,1,0)$ belongs to the intersection of $A$ and the convex
+  enveloppe of $B_1$ and $B_2$, which is generated by $X$, $Y$ and the two
+  lines $(1,0,1)$ and $(0,1,-1)$, but not to the segment $[B_1 b_2]$ which is
+  the convex hull of the intersections of $A$ with $B_1$ and $B_2$, namely
+  $X=(1,0,0)$ and $Y=(0,1,0)$ respectively.
+
+\[
+\left( \begin{array}{c}
+1 \\
+1 \\
+0 \\
+\end{array}
+\right)
+ = \frac{1}{2} \left(
+\left( \begin{array}{c}
+1 \\
+0 \\
+0 \\
+\end{array}
+\right)
++
+\left( \begin{array}{c}
+0 \\
+1 \\
+0 \\
+\end{array}
+\right)
++
+\left( \begin{array}{c}
+1 \\
+0 \\
+1 \\
+\end{array}
+\right)
++
+\left( \begin{array}{c}
+0 \\
+1 \\
+-1\\
+\end{array}
+\right)
+\right)
+\]
+
+Stronger conditions than convexity are needed on $A$, $B_1$ and $B_2$ for the distributivity to hold (Equation~\ref{equation-distributivity}).
+
+Note however that:
+
+\[
+(A \cap B_1 ) \vee (A \cap B_2 ) \subset A \cap (B_1 \vee B_2) \subset A
+\]
+
+Hence $A$ can be used as an upper-approximation of $(A \cap B_1 ) \vee (A
+\cap B_2 )$ and common constraints in $C$ and $D$ can be used as an
+upper-approximation of $C \vee D$.
+
+\subsubsection{Decomposition with Free Affine Subspaces}
+
+Let assume that $A$ intersects $B_1$ and $B_2$ and let $a_1 ~\in~A \cap
+B_1$ and $a_2 ~\in~A \cap B_2$.
+
+Let assume that all generating vectors of $A$ are free with respect to the
+generating vectors of $B_1$ and $B_2$.
+
+For all $x$ in $A \cap ( B_1 \vee B_2)$, there exists $x_1$ in $B_1$,
+$x_2$ in $B_2$ and $\lambda$ in $[0..1]$ such that:
+
+\[
+x = \lambda x_1 + ( 1 - \lambda ) x_2
+\]
+
+Since $B_1$ and $B_2$ are affine subspace:
+
+\[
+x_1 = a_1 + \sum_{i=1}^{n_1} c^1_i e^1_i
+\]
+
+\[
+x_2 = a_2 + \sum_{i=1}^{n_2} c^2_i e^2_i
+\]
+
+and
+
+\[
+x = \lambda a_1 + ( 1 - \lambda ) a_2
+  + \sum_{i=1}^{n_1} \lambda c^1_i e^1_i
+  + \sum_{i=1}^{n_2} (1-\lambda)c^2_i e^2_i
+\]
+
+Since $e^1_i$ and $e^2_i$ cannot generate vectors in $A$, their linear
+combination must be 0:
+
+\[
+x = \lambda a_1 + ( 1 - \lambda ) a_2
+\]
+
+Since $a_1$ belongs to $A \cap B_1$ and $a_2$ belongs to $A \cap B_2$, $x$
+belongs to $(A \cap B_1) \vee (A \cap B_2)$ by definition.
+
+\paragraph{Theorem:} If $A$ is an affine subspace intersecting affine
+subspaces $B_1$ and $B_2$ and if all generating vectors in $A$ are free
+with respect to $B_1$ and $B_2$, then:
+
+\[
+A \cap ( B_1 \vee B_2 ) = (A \cap B_1 ) \vee (A \cap B_2 )
+\]
+
+The same property might hold for convex sets by considering the smallest
+affine subsets containg them.
+
+\subsubsection{Decomposition with Free Complementary Subspaces}
+
+Must be Fabien's decomposition, or a more general one or nothing?
+
+This approach is dual to the previous one. Complementary (should we use
+orthogonal ones?) subspaces are
+linked to affine constraints.
+
+Let $A$, $B_1$ and $B_2$ be affine subsets such that the vector
+complementary/orthogonal subspace of $A$ is free with respect to the vector
+complementary/orthogonal subspaces of $B_1$ and $B_2$.
+
+TO BE DONE.
+
+\subsubsection{Decomposition by Corinne Fabien and Fabien}
+
+\paragraph{Note FI:} Lots of problems to refine these proposals
+and proof. Affine subspaces and convex subsets are not vector sets. Let's
+consider the two lines in a 2-D space, $D_1 = \{(x,y)|x=1\}$ and
+$D_2=\{(x,y)|y=2\}$. They are orthogonal because the underlying vector
+subspaces are orthogonal. Nevertheless, you cannot claim that any vector
+in $d_1$ and any vector in $d_2$ are orthogonal. Take for instance $(1,2)$
+and $(2,1)$.
+
+The purpose again is to find a set $P$ which can be factored out of the
+convex enveloppe:
+\[
+ P_1 \vee P_2 = (P \cap X_1) \vee (P \cap X_2) = P \cap (X_1 \vee X_2)
+\]
+
+\paragraph{Definition:} Two convex sets $X$ and $Y$ are said to be
+orthogonal, $X \bot Y$, if and only if:
+
+\begin{eqnarray}
+\forall~x~\in~X~~\forall~y~\in~Y~~ <x.y> = 0
+\end{eqnarray}
+
+This implies that any pair of vectors in their generating systems are
+orthogonal. There exist a basis such that elements in $X$ may only have
+non-zero coefficients in the first $n_X$ rows and that elements in $Y$ may only have
+non-zero coefficients in rows $n_X+1$ to $n_X+n_Y$, $n_x$ and $n_Y$ being
+the dimension of the smallest vector subspace containing $X$ and $Y$.
+
+This is a very strong definition of orthogonality since most orthogonal
+lines in a plane are founf to be non-orthogonal. They must be vector
+subspace, i.e. must contain 0, to be found orthogonal with this definition.
+
+\paragraph{Lemma:} Let $A$ and $B$ be two convex sets defined by affine
+constraints and $var(A)$ and $var(B)$ the sets of dimensions with a non-zero
+coefficient in at least one constraint of $A$, resp. $B$:
+
+\begin{eqnarray}
+var(A) \cap var(B) = \emptyset \Rightarrow proper(A) \bot proper(B)
+\end{eqnarray}
+
+Proof: If a dimension is unconstrained, a corresponding line is added to
+the generating system. This line can be used to reduce the coefficients
+for that dimension to 0 in all other generating systems.
+
+The implication might be reversable: if $A$ and $B$ have orthogonal proper
+???, there must exist a basis such that $var(A) \cap var(B)$.
+
+\paragraph{Decomposition and Transitive Closure}
+
+Let's decompose $P_1 \vee P_2$.
+
+Let $P$ be a convex set defined by constraints appearing both in $P_1$ and
+$P_2$. This is a syntactic definition and $P$ depends on the
+representation of $P_1$ and $P_2$ since there is no canonical
+representation. Let $P_1 = X_1 \cap P$ and $P_2 = X_2 \cap P$. The sets
+$X_1$ and $X_2$ are defined by the constraints in $P_1$, resp. $P_2$, that
+are not in $P$.
+
+$P$ is broken down into $P'$ and $P''$. If a constraint $c$ in $P$ and a
+constraint in $X_1$ or $X_2$ have both a non-zero coefficient in the same
+dimension, $c$ belongs to $P''$. $P'$ contains the constraints in $P$ that
+do not belong to $P''$. 
+
+This depends on the basis chosen:
+
+\[
+P_1 = \{(x,y)|x+y=2, x-y=0, x+y \leq 10 \}
+\]
+\[
+P_2 = \{(x,y)|x+y=2, x-y=0, x+y \geq 10 \}
+\]
+\[
+P = \{(x,y)|x+y=2, x-y=0 \},~P'' = \{(x,y)|x+y=2, x-y=0 \}, P'=\{(x,y)\}
+\]
+
+If we change basis and use $u=x+y$ and $v=x-y$, then $P'$ is constraint by:
+\[
+P = \{(x,y)|x-y=0 \}
+\]
+
+As a result, $proper(P')$ is orthogonal to $proper(P'')$.
+
+Let $ P = P' \cap P'' $ so that $P' \bot X1$ and $P' \bot X2$ and $P' \bot P''$ built
+by transitive closure, then:
+
+\[
+P_1 \vee P_2 = (P' \cap (P'' \cap X_1)) \vee (P' \cap (P'' \cap X_2)) =
+                 P' \cap ((P'' \cap X_1) \vee (P'' \cap X_2))
+\]
+
+Proof: by considering the generating systems:
+
+Lemma:
+
+\begin{eqnarray}
+ A \bot B <=> var(A) \cap var(B) = 0
+\end{eqnarray}
+
+\paragraph{Property (?):} $A \cap B$ if $A \bot B$
+
+Let $A = (x,v,l)$, $B = (y,w,m)$
+
+\[
+\begin{array}{lcl}
+A \cap B &=& \left\{ z | z = \left(\begin{array}{c} x \\ 0 \end{array}\right) \mu
+   + \left(\begin{array}{c} d \\ 0 \end{array}\right) d
+   + \left(\begin{array}{c} l \\ 0 \end{array}\right) e
+   + \left(\begin{array}{c} 0 \\ I \end{array}\right) f \right.\\
+         & & \wedge
+ z = \left(\begin{array}{c} 0 \\ y \end{array}\right) \mu
+   + \left(\begin{array}{c} 0 \\ w \end{array}\right) g
+   + \left(\begin{array}{c} 0 \\ m \end{array}\right) h
+   + \left(\begin{array}{c} I \\ 0 \end{array}\right) f' \\
+   & &  \left. with \mu \geq 0, \nu \geq 0, \sum_i\mu_i=1,
+         \sum_j\nu_j=1, d \geq 0, g \geq 0 \right\}
+\end{array}
+\]
+
+We can always find $f$ and $f'$ equals to the other part (by extension)
+so:
+
+\[
+\begin{array}{lcl}
+A \cap B &=& \left\{ z | \exists~\mu~~\exists~\nu~~... \right.\\
+         & & \left. z = 
+         \left(
+           \begin{array}{cc}
+             x & 0\\
+             0 & y
+           \end{array}
+         \right)
+         \left(
+           \begin{array}{c}
+             \mu\\
+             \nu
+           \end{array}
+         \right)
+         +
+         \left(
+           \begin{array}{cc}
+             v & 0\\
+             0 & w
+           \end{array}
+         \right)
+         \left(
+           \begin{array}{c}
+             d\\
+             g
+           \end{array}
+         \right)
+         +
+         \left(
+           \begin{array}{cc}
+             l & 0\\
+             0 & m
+           \end{array}
+         \right)
+         \left(
+           \begin{array}{c}
+             e\\
+             h
+           \end{array}
+         \right)
+\right\}
+\end{array}
+\]
+
+It is a convex set, as could be expected from the intersection of two
+convex sets:
+
+\begin{eqnarray}
+\left(
+\left(\begin{array}{c}x_i\\y_j\end{array}\right)
+\left(\begin{array}{cc}v & 0\\ 0 & w\end{array}\right)
+\left(\begin{array}{cc}l & 0\\ 0 & m\end{array}\right)
+\right)
+\end{eqnarray}
+
+
+We just need to prove that $Cmn = Cg$ defined as:
+
+\begin{eqnarray}
+\left(\begin{array}{cc}x&0\\0&y\end{array}\right)
+\left(\begin{array}{c}\mu\\\nu\end{array}\right)
+==
+\left(\begin{array}{c}x_i\\y_j\end{array}\right) \gamma
+~~   \gamma \geq 0 \wedge \sum_i \mu_i + \sum_j \nu_j = 1 
+\end{eqnarray}
+
+$Cg$ is included in a convex.
+
+$Cg \in Cmn$ since $((xi)|(yj) ij)$ is in $Cmn$ 
+  with $\mu = \delta i$, $\nu = \delta j$
+
+$Cmn \in Cg$ by chosing $\gamma_ij = \mu_i\nu_j$, which $>0$ and $\sum = 1$
+
+\paragraph{Lemma}: If $A$ is orthogonal to $B$ and $C$, it is orthogonal
+to their convex hull and to their intersection.
+
+\begin{eqnarray}
+A \bot B \wedge A \bot C => A \bot (B \vee C) \wedge A \bot (B \cap C)
+\end{eqnarray}
+
+Proof: for all $a$ in $A$, for all $x$ in $B \cap C$, $x$ belongs to $B$ and
+hence $<a.x>=0$.
+
+For all $a$ in $A$, for all $x$ in $B \vee C$, there exist $b$ in $B$ and $c$ in $C$ and
+$\lambda$ such that $x=\lambda b + (1-\lambda)c$. $x$ is orthogonal to $A$
+since $b$ and $c$ are orthogonal to $A$:
+
+\[
+<a . x > = <a .\lambda b + (1-\lambda)c > = \lambda <a.b> + (1-\lambda)<a.c>=0
+\]
+
+\paragraph{Theorem:} If $A$ is orthogonal to both $B$ and $C$ then the
+intersection is distributive with respect to the convex hull:
+
+\begin{eqnarray}
+A \bot B \wedge A \bot C => (A \cap B) \vee (A \cap C) = A \cap (B \vee C)
+\end{eqnarray}
+
+Proof: compute both generating systems with above propositions, theorems
+and lemmas and check that they are equal. \newpage
+
+\subsection{Decomposition by factorisation}
+DN
+In this section, we consider the polyhedra and their possible decomposition in order to speed up the polyhedral operators in C3, especially calculation of convex hull of two polyhedra, using factorisation notation of cite(). We intend to improve the acticle. Firslty, we recall some neccessary definitions.
+
+\subsubsection{Preliminary definitions}
+\paragraph{Definition: Factorisation}
+
+Let $I$ be a subset of \{1...n\}. We note $P \downarrow I$ the projection of the polyherdon $P$ on variables with indices in $I$ (i.e., the result, in $N^{|I|}$ of the existential quantification of all variables with indices outside $I$).
+
+Let $(I_1,I_2,... I_l)$ be a partition of \{1...n\}. We say that a polyhedron $P$ can be factorized according to  $(I_1,I_2,... I_l)$ if and only if:
+
+ $P = P \downarrow I_1 \times P \downarrow I_2 \times ... \times P \downarrow I_l $
+
+We also note $p = (p_1, p_2, ... p_l)$ for each element $p \in P$, where $p_1 \in P \downarrow I_1, p_2 \in P \downarrow I_2 , ... p_l \in P \downarrow I_l$. We say a element p consists of many components of some dimensions.
+
+\paragraph{Definition: Convex hull}
+
+Let $Y$ and $Z$ be two polyhedra. The convex hull of these two polyhedra is a polyhedron denoted $Y \vee Z$ that satisfies:
+
+$\forall x \in Y \vee Z,$ then $\exists \lambda \in [0...1], y \in Y, z \in Z$ such that: $x = \lambda y + (1 - \lambda)z$
+
+\subsubsection{Polytopes}
+\paragraph{Lemma 1:}
+
+Let $Y$ and $Z$ be two polyhedra that can be factorized according to the same partition $(I_1,I_2)$, so that we can write: $Y = Y_1 \times Y_2$ and $ Z = Z_1 \times Z_2 $, knowing that $Y_1$ and $Z_1$ have the same dimensions (variables), reciprocally for $Y_2$ and $Z_2$. Then we have:
+\begin{eqnarray}
+ (Y_1 \times Y_2) \vee (Z_1 \times Z_2) \subseteq (Y_1 \vee Y_2) \times (Z_1 \vee Z_2)
+\end{eqnarray}
+
+Proof 1:
+
+Let's call $X =(Y_1 \times Y_2) \vee (Z_1 \times Z_2)$, $X_1 = Y_1 \vee Y_2$ and $X_2 = Z_1 \vee Z_2$. By definition of convex hull, we have:
+
+$\forall x \in X,$ then $\exists \lambda \in [0...1], x_1 \in (Y_1 \times Y_2), x_2 \in (Z_1 \times Z_2)$ such that:
+
+$x = \lambda x_1 + (1 - \lambda) x_2$
+
+Because $x_1 \in (Y_1 \times Y_2)$, so $\exists y_1 \in Y_1, y_2 \in Y_2$ such that $x_1 = (y_1, y_2)$. The same we have: $\exists z_1 \in Z_1$ and $z_2 \in Z_2$ such that: $x_2 = (y_2, z_2)$. Finally:
+$ x = \lambda (y_1,y_2) + (1 - \lambda)(z_1,z_2)
+  = (\lambda y_1, \lambda y_2) + ((1 - \lambda) z_1, (1 - \lambda) z_2)
+  = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)$
+
+So we can write:
+
+$\forall x \in X,$ then $\exists \lambda \in [0...1], y_1 \in Y_1, y_2 \in Y_2, z_1 \in Z_1$ and $z_2 \in Z_2$ such that:
+\[
+x  = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)
+\]
+
+Furthermore, by definition of factorisation: $\forall x' \in X_1 \times X_2,$ then $\exists x'_1 \in X_1, x'_2 \in X_2 $, such that $x' = (x'_1, x'_2)$. Like above, we can have:
+
+$\forall x' \in X_1 \times X_2,$ there $\exists \mu \in [0...1], y_1' \in Y_1, y_2' \in Y_2, \nu \in [0...1], z_1' \in Z_1, z_2' \in Z_2$ such that: 
+
+$x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')$
+
+We need to prove that for all points x belonging to X, there is a point x' corresponding to x, belongs to $X_1 \times X_2$. 
+
+Let's consider $x \in X$, then $\exists \lambda \in [0...1], y_1 \in Y_1, y_2 \in Y_2, z_1 \in Z_1$ and $z_2 \in Z_2$ such that:
+\[
+x = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)
+\]
+
+Choose $\mu = \lambda, \nu = \lambda, y_1' = y_1, y_2' = y_2, z_1' = z_1, z_2' = z_2$, we have $x' \in  X_1 \times X_2$, and
+
+\[
+x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2') 
+   = (\lambda y_1 + (1 - \lambda) z_1, \lambda y_2 + (1 - \lambda) z_2)   = x
+\]
+
+This means $X \subseteq  X_1 \times X_2$. Note: In fact, we can have this lemma from results of section 5.2.1, because the factorisation operator can be understood as the intersection operator in this case.
+
+\paragraph{Lemma 2:}
+
+Consider 2 polytopes Y and Z. If exists a point $y_0 \in Y$ such that $y_0 \not\in Z$, then always exists an extremal point (vertex) of Y that does not belong to Z.
+
+Proof 2:
+
+Let's consider $y_0$ not being an extremal point. Otherwise it is trivial. Note that a polytope always has extremal points and suppose that $\forall y_e^i$, extremal points of Y : $y_e^i \in Z$, we need to prove this leeds to a contradiction. We can have this contradiction, by showing that $y_0$ is always a convex combination of some extremal points of Y, which means $y_0 \in Z$ convex.
+
+Note: We can refer to the Section VII, page 187 of the book ``theory of linear and integer programming'' of Alexander Shrijver, which says: ``If P is a polytope, then for any given rational vector y in P we can find affinely independent vertices $x_0, ... x_d$ of P, and $\lambda _0, ... \lambda _d \geq 0$ such that $\lambda _0 + ... +\lambda _d = 1$ and $y = \lambda _0 x_0 + ... + \lambda _d x_d$.'' The proof is mentioned but complicated.
+
+The idea somehow can be simplified as follows: As $y_0$ is not an extremal point, $\exists \lambda_0 \in [0...1], y_l, y_r: y_0 = \lambda_0 y_l + (1 - \lambda_0)y_r$, where $y_l, y_r$ belong to some facets of the polytope Y.
+
+\begin{itemize}
+\item If $y_l, y_r$ are extremal points of Y, we'll have: $y_0$ is a convex combination of points that are in Z, which means $y_0 \in Z$.
+
+\item If $y_l$ or/and $y_r$ are not extremal points of Y, so they must be represented by convex combinations of other points: $\exists \lambda _l \in [0...1], \lambda _r \in [0...1], y_l^1, y_l^2, y_r^1$ and $y_r^2$ where $y_l^1, y_l^2, y_r^1$ and $y_r^2$ belong to some intersections of facets of the polytope Y, such that:
+
+$y_l = \lambda _l y_l^1 + (1-\lambda_l) y_l^2$
+
+$y_r = \lambda _r y_r^1 + (1-\lambda_r) y_r^2$
+
+All the extremal points of a polytope are in fact intersections of facets of the polytope, so continue this procedure, due to the finite number of facets of the polytope, we can reach for some extremal points of Y. It means $y_0$ can be represented by a convex combination of these extremal points.
+\end{itemize}
+
+\paragraph{Theorem}
+
+Let $Y$ and $Z$ be two polyhedra that can be factorized according to the same partition $(I_1,I_2)$, so that we can write: $Y = Y_1 \times Y_2$ and $ Z = Z_1 \times Z_2 $, knowing that $Y_1$ and $Z_1$ have the same dimensions (variables), reciprocally for $Y_2$ and $Z_2$. Then we have:
+
+\begin{eqnarray}
+(Y_1 \times Y_2) \vee (Z_1 \times Z_2) = (Y_1 \vee Y_2) \times (Z_1 \vee Z_2)
+\end{eqnarray}
+
+if and only if:
+
+\begin{eqnarray}
+[(Z_1 \subseteq Y_1) \lor (Y_2 \subseteq Z_2)] \land [(Y_1 \subseteq Z_1) \lor (Z_2 \subseteq Y_2)]
+\end{eqnarray}
+
+Proof:
+
+To simplify the procedure, the proof firstly is limited for the polytopes. Using these 2 lemmas above, we begin by rewriting the condition in the right:
+\begin{eqnarray}
+[Z_1 = Y_1] \lor [(Y_1 \subset Z_1) \land (Y_2 \subset Z_2)] \lor [(Z_1 \subset Y_1) \land (Z_2 \subset Y_2)] \lor [Z_2 = Y_2]
+\end{eqnarray}
+
+Again, let's call $X =(Y_1 \times Y_2) \vee (Z_1 \times Z_2)$, $X_1 = Y_1 \vee Y_2$ and $X_2 = Z_1 \vee Z_2$.
+To prove the sufficiency, we need to prove $X_1 \times X_2 \subseteq X$. We will prove that for all $x' \in X_1 \times X_2,$ there is a point x corresponding to $x'$, belongs to $X$. The condition is divided into 4 cases:
+
+\begin{enumerate}
+\item $Y_1 = Z_1$ :
+We have: $\forall x' \in X_1 \times X_2,$ then $\exists \mu \in [0...1], \nu \in [0...1], y_1' \in Y_1, y_2' \in Y_2, z_1' \in Z_1, z_2' \in Z_2$ such that
+$x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')$
+
+Choose $\lambda = \nu, y_2 = y_2' \in Y_2, z_2 = z_2' \in Z_2, y_1 = z_1 = \mu y_1' + (1-\mu)z_1' \in Y_1 = Z_1 $, then 
+
+$x = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2) 
+   = (\nu y_1 + (1-\nu) y_1, \nu y_2' + (1- \nu) z_2') 
+   = (y_1,  \nu y_2' + (1- \nu) z_2') 
+   = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')
+   = x'$.
+ 
+\item $(Z_2 = Y_2)$ : 
+The same.
+
+\item $((Z_1 \subset Y_1) \land (Z_2 \subset Y_2))$ :
+We have: $\forall x' \in X_1 \times X_2, $ then $\exists \mu, \nu, y_1', y_2', z_1', z_2'$ such that $x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')$
+
+Take $\lambda = 1, y_1 = \mu y_1' + (1-\mu)z_1' \in Y_1, y_2 = \nu y_2' + (1-\nu)z_2' \in Y_2, z_1 = z_1' \in Z_1, z_2 = z_2' \in Z_2 $, then:
+
+$ x = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)
+   = (y_1, y_2)
+   = (\mu y_1' + (1-\mu)z_1', \nu y_2' + (1-\nu) z_2') 
+   = x'$.
+
+\item $((Y_1 \subset Z_1) \land (Y_2 \subset Z_2))$ : 
+The same.
+
+\end{enumerate}
+
+To prove the necessarity, we firstly suppose that $Y_1 \not\subseteq Z_1$, then $\exists p_0 \in Y_1 : p_0 \not\in Z_1$. According to lemma 2, $\exists$ an extremal point of $Y_1$ such that: $p_e \in Y_1,$ but $p_e \not\in Z_1$.
+
+$\forall x' \in X_1 \times X_2$:  $x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2'),$ where $\mu \in [0...1], y_1' \in Y_1, y_2' \in Y_2, \nu \in [0...1], z_1' \in Z_1$ and $z_2' \in Z_2$. If $\mu = 1, \nu = 0,$ then $x' = (y_1', z_2')$. 
+
+Consider now $y_1' = p_e, \mu = 1, \nu = 0$ and note that $Y_1, Z_1$ are independent from $Y_2, Z_2$ so $z_2'$ can span all the $Z_2$. 
+
+Because $X = X_1 \times X_2$, so for all $x = x' \in X,$ we have$ x  = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)$ where $ \lambda \in [0...1], y_1 \in Y_1, y_2 \in Y_2, z_1 \in Z_1$ and $z_2 \in Z_2$. 
+
+We can see that in the dimensions of $Y_1$ (and $Z_1$), the chosen value $p_e$ of $x'$ coresponds to $\lambda = 1$ as follows:
+
+$p_e = \lambda y_1 + (1 - \lambda) z_1$. Note that $z_1 \in Z_1, p_e \not\in Z_1$. Moreover, as an extremal point, $p_e$ cannot be a combination of other points in $Y_1$ (otherwise, some of these points may belong to $Z_1$), so we have: $p_e = y_1, \lambda = 1$. 
+
+Then we have $y_2 = z_2'$ with $y_2 \in Y_2$ . This means $\forall z_2' \in Z_2, z_2' = y_2 \in Y_2$, which signifies that $Z_2 \subseteq Y_2$.
+
+Continue, we can see that if $Z_2 = Y_2$ then it is obvious. Else $Z_2 \subset Y_2$, then $\exists q_0 \in Y_2: q_0 \not\in Z_2$. So, $\exists$ an extremal point of $Y_2: q_e \in Y_2,$ that $q_e \not\in Z_2$.
+
+Now, consider $\forall x' \in X_1 \times X_2$ such that $\mu = 0, \nu = 1,$ then $x' = q_e + z_1'$. Also note that $Y_2, Z_2$ are independent from $Y_1, Z_1$ so $z_1'$ can span all the $Z_1$
+
+We see that if $x = x' \in X$, then like above, we have $y_1 = z_1'$. From this, we can say $\forall z_1' \in Z_1, y_1 = z_1' \in Y_1$, which signifies that $Z_1 \subseteq Y_1$.
+
+If we have $Y_1 \subseteq Z_1$, then by doing the same steps, we can deduce that $Y_2 \subseteq Z_2$. The necessarity is proved.
+
+\paragraph{Lemma 3}
+
+Consider 2 pointed polyhedron Y and Z. If exists a point $y_0 \in Y$ that $y_0 \not\in Z$, then always exists a point $p_e$ of Y that does not belong to Z, such that: $p_e$ is an extremal point, or $p_e$ belongs to an extremal ray.
+
+Proof:
+
+The proof can be directly derived from the Section IX, page 188 of the book ``theory of linear and integer programming'' of Alexander Shrijver. We have: ``If P is a pointed polyhedron, and a rational vector x in P is given, then we can find vertices $x_0, ..., x_d$ of P, extremal rays $y_1, ..., y_t$ of char.cone P, and $\lambda _0, ... \lambda _d,\mu _1, ...,\mu _t \geq 0$ such that $x = \lambda _0 x_0 + ... + \lambda _d x_d + \mu _1 y_1 + ... + \mu _t y_t, \lambda _1 + ... + \lambda _d = 1,$ and $x_1 - x_0, ..., x_d -x_0, y_1, ... y_t$ are linearly independent''.
+
+Indeed, we need to prove that there exists whether an extremal point or an extremal ray of Y that does not belong entirely to Z. By contradiction:  suppose that $\forall y_e^i$, extremal points of Y : $y_e^i \in Z$ and  $\forall r_e^j$, extremal rays of Y : $r_e^j \in Z$. 
+
+The same result as lemma 2 can be attained when we notice that Z is a convex polyhedron that contains completely all these points and rays, then their combination must belong to Z. Lemma 3 is then proved.
+
+\subsubsection{Extended to pointed polyhedron} 
+
+According to lemma 3 and note that we only need to consider 2 cases: Exists an extremal point of Y that does not belong to Z (like above); or exists a point $\in$ an extremal ray of Y, that does not belongs to Z.
+
+In fact, for all points $x' \in X_1 \times X_2$ such that $x' = p_e + z_2'$ (coresponding to $\mu = 1, \nu = 0$), where $p_e$ is a point which belongs to an extremal ray of $Y_1$ (the choice of $p_e$ in the dimensions of $Y_1$ always corespond to $\lambda = 1$), it's easy to see that the same result as the proof above of the theorem holds.
+
+\subsubsection{The general case}
+We need then to consider the cases where the polyhedron is degenerated (not full dimensional), and the case where the polyhedron is not pointed.
+
+Consider the first case: the polyhedron is not pointed. Refering to the page 106 of the same book, we can write the decomposition of a polyhedron, as:
+
+P = convex.hull() + cone() + linear.space P
+
+For a point y belongs to Y1 but not Z1, we have 3 cases:
+exists an extremal point belongs to Y1 but not Z1 in convex.hull()
+an extremal ray in cone
+a point x in linear.space
+
+TO BE DONE
+
+\subsection{Heuristics}
+
+If an overflow occurs during the computation of a convex hull $A_1 \vee
+A_2$, and if there exist $A$, $B_1$ and $B_2$ convex sets such that:
+
+\[
+A_1 = A \cap B_1 ~~~\wedge~~~ A_2 = A \cap B_2
+\]
+
+then $A$ and $A \cap (B_1 \vee B_2)$ are over-approximations of $A_1 \vee
+A_2$.
+
+\section{Implementation}
+
+Arithmetic overflows: should they generate exceptions, and memory leaks,
+or return codes, and less readable code?
+
+How do you decide which level in the library should cope with them?
+
+\section{Experiments}
+
+\section{Conclusion}
+
+\end{document}

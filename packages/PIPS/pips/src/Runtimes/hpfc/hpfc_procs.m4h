@@ -1,0 +1,73 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+
+!
+! COMMON /HPFC PROCS/
+!
+      common /HPFC PROCS/
+     $     MY LID,
+     $     MY TID,
+     $     HOST TID,
+     $     HOST LID,
+     $     NODE TIDS(0:MAX MAX SIZE OF PROCS),
+     $     MY POS(7, MAX NB OF PROCESSORS),
+     $     NB OF TASKS,
+     $     SEND CHANNELS(MAX MAX SIZE OF PROCS),
+     $     RECV CHANNELS(MAX MAX SIZE OF PROCS),
+     $     HOST SND CHANNEL,
+     $     HOST RCV CHANNEL,
+     $     MCAST HOST,
+     $     MCAST NODES,
+     $     HOST NODE MODEL,
+     $     SPAWN PERFORMED,
+     $     OUTSIDE SPAWN,
+     $     MAIN PROGRAM NAME,
+     $     NODE PROGRAM NAME,
+     $     NODE ARCHITECTURE,
+     $     HPFC GROUP NAME _CM5(`,
+     $     CM HOST ID,
+     $     CM MY ID,
+     $     CM SIZE,
+     $     CM NODE IDS(MAX MAX SIZE OF PROCS)')dnl
+
+!
+      integer 
+     $     MY LID, MY TID, HOST TID, NODE TIDS, NB OF TASKS, MY POS,
+     $     SEND CHANNELS, RECV CHANNELS, HOST LID,
+     $     HOST SND CHANNEL, HOST RCV CHANNEL,
+     $     MCAST HOST, MCAST NODES _CM5(`,
+     $     CM HOST ID, CM MY ID, CM SIZE,
+     $     CM NODE IDS(MAX MAX SIZE OF PROCS)')dnl
+
+      logical
+     $     HOST NODE MODEL,
+     $     OUTSIDE SPAWN,
+     $     SPAWN PERFORMED
+
+      character*32 
+     $     MAIN PROGRAM NAME,
+     $     NODE PROGRAM NAME, 
+     $     NODE ARCHITECTURE,
+     $     HPFC GROUP NAME
+!
+!
+! that is all 
+!

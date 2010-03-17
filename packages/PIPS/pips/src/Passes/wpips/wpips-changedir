@@ -1,0 +1,219 @@
+#! /usr/bin/env wish
+#
+# $Id$
+#
+# (c) Fabien COELHO, CRI, École des mines de Paris, September 1996.
+#     e-mail: coelho@cri.ensmp.fr
+#
+# What: This script allows to chose a directory interactively. 
+#       the chosen directory (when clicking "Ok") is put on stdout.
+#
+# Usage: wpips-changedir [ -- default-start-directory ]
+#
+# Wish is started without assumption on its location.
+# (because here it is not in /usr/local/bin as usual).
+#
+# Wish script
+#
+
+# fills the list listbox with directories. links are followed...
+#  - dlist: the listbox window to be dealt with for directories
+#  - flist: idem for files
+#  - dir: the considered directory
+#
+proc filldirlist { dlist flist dir } {
+    $dlist delete 0 end
+    $flist delete 0 end
+    set pwd [pwd]
+    cd $dir
+    foreach d [lsort [glob * .*]] {
+	if {$d != "." && [file readable $d]} {
+	    set name $d
+	    # follows link...
+	    while {[file type $d] == "link"} {
+		set d [file readlink $d]
+	    }
+	    # then append if is a directory
+	    if {[file isdirectory $d]} {
+		$dlist insert end $name
+	    } else {
+		$flist insert end $name
+	    }
+	}
+    }
+    cd $pwd
+    $dlist selection clear 0 end
+    $flist selection clear 0 end
+}
+
+#
+# appends newdir to dir with managing especially .., / and .
+#  - dir: the current directory
+#  - newdir: the incremental adjuntion to be appended
+#
+proc appenddir { dir newdir } {
+    if {$newdir == ""} { return $dir }
+    if {$newdir != ".."} {
+	if {$dir != "/"} {
+	    return $dir/$newdir
+	} else {
+	    return /$newdir
+	}
+    } else {
+	set ldir [split $dir /]
+	set len  [llength $ldir]
+	set last [lindex $ldir [expr $len-1]]
+	if {($last != "..") && ($last != ".") } {
+	    set ldir [lrange $ldir 0 [expr $len-2]]
+    	    if {$len == 2 && [lindex $ldir 0] == {}} { return / }
+	} else {
+	    lappend ldir $newdir
+	}
+	return [join $ldir /]
+    }
+}
+
+#
+# interactive directory choice.
+#  - root: root of the window to create ("" for main window)
+#  - currentdir: default startpoint (may be absolute or relative)
+#
+proc changedir { root currentdir } {
+    #
+    # the global local variables:-)
+    #
+    global changedir_result changedir_dir changedir_root changedir_home
+
+    set changedir_dir  $currentdir
+    set changedir_root $root
+    set changedir_home $currentdir
+
+    #
+    # creates the window if needed
+    #
+    if {$root == ""} {
+	set wroot .
+    } else {
+	toplevel $root
+	set wroot $root
+    }
+    wm title $wroot "Change Directory"
+
+    #
+    # top buttons: "/" "Home" "Ok" "Quit"
+    #
+    frame $root.top 
+    button $root.top.root -text "/" -borderwidth 3 -command {
+	set changedir_dir / 
+	filldirlist $changedir_root.list.dirs $changedir_root.flist.files \
+	    $changedir_dir
+        $changedir_root.direct.entry xview end
+    }
+    button $root.top.home -text "Home" -borderwidth 3  -command {
+	set changedir_dir $changedir_home; 
+	filldirlist $changedir_root.list.dirs $changedir_root.flist.files \
+	    $changedir_dir
+        $changedir_root.direct.entry xview end
+    }
+    button $root.top.okay -text "Ok" -borderwidth 3 -command {
+	set changedir_result $changedir_dir
+        if {$changedir_root == ""} {
+	    puts $changedir_result
+	    exit
+	} 
+    }
+    button $root.top.quit -text "Quit" -borderwidth 3 -command {
+	set changedir_dir $changedir_home
+	$changedir_root.top.okay invoke
+    }
+    pack $root.top.root $root.top.home $root.top.okay $root.top.quit \
+	-side left -expand true -fill x -padx 2 -pady 2 -ipadx 1 -ipady 1
+
+    #
+    # direct entry in the middle 
+    #
+    frame $root.direct
+    label $root.direct.lab -text " Directory: "
+    entry $root.direct.entry -width 30 -relief sunken -borderwidth 3 \
+	-textvariable changedir_dir 
+    # <Return> is okay
+    bind  $root.direct.entry <Return> {
+	$changedir_root.top.okay invoke
+    }
+    # <Tab> updates the displayed list
+    bind  $root.direct.entry <Tab> {
+	filldirlist $changedir_root.list.dirs $changedir_root.flist.files \
+	    $changedir_dir
+    }
+    pack  $root.direct.lab -side left -padx 2 -pady 2 -ipadx 1 -ipady 1
+    pack  $root.direct.entry -side left \
+	-padx 2 -pady 2 -ipadx 1 -ipady 1 -fill x -expand true
+
+    #
+    # choice from the list
+    #
+    frame $root.list
+    listbox $root.list.dirs -relief raised -height 15 \
+	-yscrollcommand "$root.list.scroll set" 
+    scrollbar $root.list.scroll -command "$root.list.dirs yview"
+    bind $root.list.dirs <Double-1> { 
+	# update dir according to the clicked item
+	set i [%W curselection]
+	if {$i != ""} {
+	    set changedir_dir [appenddir $changedir_dir [%W get $i]]
+	    # update display
+	    filldirlist %W $changedir_root.flist.files $changedir_dir
+	    $changedir_root.direct.entry xview end
+	}
+    }
+    pack $root.list.dirs -side left -fill both -expand true \
+	-padx 2 -pady 2 -ipadx 1 -ipady 1
+    pack $root.list.scroll -side left -fill y -padx 2 -pady 2
+
+    #
+    # list of files...
+    #
+    frame $root.flist
+    listbox $root.flist.files -relief raised -height 15 \
+	-yscrollcommand "$root.flist.scroll set" 
+    scrollbar $root.flist.scroll -command "$root.flist.files yview"
+    pack $root.flist.files -side left -fill both -expand true \
+	-padx 2 -pady 2 -ipadx 1 -ipady 1
+    pack $root.flist.scroll -side left -fill y -padx 2 -pady 2
+
+    #
+    # full window (if resized, .list is expanded on x/y)
+    #
+    pack $root.top $root.direct -fill both 
+    pack $root.list -fill both -expand true
+    pack $root.flist -fill both -expand true
+
+    # set initial display
+    filldirlist $root.list.dirs $root.flist.files $changedir_dir
+    $root.direct.entry xview end
+
+    # focus and interaction...
+    set old [focus]
+    grab set $wroot
+    focus $wroot
+
+    # waits for changedir_result to be set, then returns...
+    tkwait variable changedir_result
+    destroy $wroot
+    focus $old
+    return $changedir_result
+}
+
+#
+# default startpoint directory is .
+#
+if {$argc == 0} {
+    set dir .
+} else {
+    set dir [lindex $argv 0]
+}
+
+#
+# print out the result
+#
+puts [changedir "" $dir ]

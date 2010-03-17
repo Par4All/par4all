@@ -1,0 +1,180 @@
+<HTML>
+<HEAD>
+<TITLE> Distributed Code Generation - The WP65 Scheme</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" Distributed Code Generation-  The WP65 Scheme">
+<meta name="keywords" value="wp65">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+
+<H1><A NAME=SECTION00010000000000000000> Distributed Code Generation - The WP65 Scheme</A></H1>
+<P>
+ <BR>
+<BR>
+Last update: 95/09/1 - Author: <a href="/~ancourt">Corinne ANCOURT</a>
+ <P><BR>
+ <BR>
+ This phase was designed to automatize the generation of Fortran 77
+program onto distributed memory machines using an <i> Emulated Shared
+Memory</i> scheme and to exploit the universal message passing
+capability provided by the INMOS T9000 processor and C104 hardware
+router.  One half of the processors perform computations and the other
+half emulate memory banks providing the compiler with a better
+understood target machine, a multiprocessor with a fast local memory
+managed as a software cache and a slow shared memory. The fast context
+switching times and intelligent on-chip channel processors make possible
+to overlap computations and communications when T9000 and C104 are used.
+<P>
+ <BR> This work was partially funded by ESPRIT project 2701 (PUMA
+- WorkPackage 6.5) and by DRET.  <P>
+ <BR>
+<BR><HR> <BR>
+<h2> Input  </h2>
+<P>
+ <BR>
+This phase takes as input a sequential Fortran77 program meeting  the following conditions:
+<P>
+<OL><LI>it is made of  a single main program whose body is made of a set of
+	perfectly or non-perfectly nested loop(s) whose upper and lower
+	bounds are affine expressions and assignments ;
+<P>
+  <LI> it  may contain indirections but neither guards nor calls and I/Os.
+</OL>
+<P>
+ <BR>
+<BR><HR> <BR>
+<h2> WP65 Approach </h2>
+<P>
+ <BR> Task generation is based on control partitioning. The data
+dependence graph between program instructions is used to build parallel
+tasks. Loop transformations like <i> tiling transformation</i> and <i>
+distribution</i> are used on nested loops in order to define blocks of
+loop iterations that can be computed in parallel.
+
+<P> The dependence graph is used to decide if a given tiling is
+legal. The current implementation does not include an automatic
+estimation of the tile size and a default size is used.
+
+<P> Each tile is seen as a logically independent task. Each task is made
+of three parts: a prologue to read the input data from the emulated
+shared memory, a computational part and a final part to store the
+results. Ideally several tasks should be executed by the same physical
+processor to overlap communications and computations.  
+
+<P>
+ <BR>
+<BR><HR> <BR>
+<h2> Output  </h2>
+<P>
+ <BR> A 2-PMD distributed Fortran77 program containing calls to the
+runtime communication library PVM is generated. The input program is
+transformed into two subroutines: <P>
+
+<OL><LI> one subroutine, called <code>COMPUTE(PROC_ID)</code>, contains the
+	computational part of the code and receives a (logical) processor 
+	number as parameter;
+<P>
+  <LI> one subroutine, called <code>BANK(BANK_ID)</code>, contains the
+	shared memory emulator part of the code and
+	receives a (logical) bank
+	number as parameter.
+<P>
+</OL>
+<P>
+The general structures of these two subroutines are very close since each
+send (receive) must be met by a corresponding receive (send).  Like the
+input program they are sequences of nested loop. The outermost
+loop nest defines which tile is being executed.  Each tile body is made of two
+or three sections:
+<P>
+<OL><LI> a sequence of nested loops used to load the different local
+	copies from the emulated shared memory; this sequence may
+	be empty when there is no input, as is the case with a simple
+	array initialization; it can be viewed as a software cache prefetch.
+<P>
+  <LI> a sequence of nested loops to execute all iterations of the
+	current tile; the loop body is a copy of the initial loop
+	body but references to user variables are replaced by
+	references to local variables; this section is empty in
+	the memory emulator code;
+<P>
+  <LI> a sequence of nested loops used to store the different local
+	copies in the emulated shared memory, i.e. a cache flush.
+<P>
+</OL>
+<P>
+ <BR>
+<BR><HR> <BR>
+<h2> Features </h2>
+<P>
+ <BR>
+The potential advantages of this approach are:
+<UL><LI> implicit data distribution based on control partitioning, which
+means there is no need for static or dynamic explicit data partitioning;
+<P>
+  <LI> efficient handling of more general constructs than with the owner
+rule (e.g. Fortran HPF compilation);
+<P>
+  <LI> memory servers do not have to be run on the same processors as
+computations; this increases the communication bandwidth and decreases
+the number of context switches on computational processors;
+<P>
+  <LI> easier load balancing because any process can be started on any
+processor;
+<P>
+  <LI> parallelism granularity can be easily tuned because it is not
+implicitly linked to a data distribution; this also may improve load balancing.
+<P>
+</UL>
+<P>
+
+The obvious disavantage is that a full software cache cannot be fully statically compiled. However regular code can exploit the underlying INMOS hardware very efficiently.
+<P>
+
+ <BR>
+<BR><HR> <BR>
+<h2>  More information </h2>
+<P>
+ <BR>
+A full description of the approach and examples are given in  [<A HREF="doc/A-226.ps.gz">3</A>].
+<P>
+To run the WP65 phase with <a href="wpips.html">wpips</a>, ask the <em>distributed view</em>.
+<P>
+e-mail: ancourt@cri.ensmp.fr and pipsgroup@cri.ensmp.fr
+ <BR>
+<BR><HR> <BR>
+ <BR>
+
+ <P><A NAME=SECTIONREF><H2>References</H2></A><P>
+<DL COMPACT>
+<DT><A NAME=Ancourt90><STRONG>1</STRONG></A><DD> C. Ancourt,
+<em> Generation automatique de codes de transfert pour multiprocesseurs
+a memoires locales</em>,
+These de doctorat, Universite Paris 6, 1990
+<P>
+<DT><A NAME=AnIr91><STRONG>2</STRONG></A><DD> C. Ancourt, F. Irigoin,
+<em> Scanning Polyhedra with DO loops</em>,
+Third ACM Symposium on Principles and Practice of Parallel Programming (PPoPP'91), Williamsburg, 1991
+<P>
+<DT><A NAME=AnIr92><STRONG>3</STRONG></A><DD> C. Ancourt, F. Irigoin,
+<em> Automatic Code Distribution</em>, 
+: The Third Workshop on Compilers for Parallel
+Computers (CPC'92),  Vienna, Austria, July 6-9, 1992.
+<P>
+<DT><A NAME=IrTr88><STRONG>4</STRONG></A><DD> F. Irigoin, R. Triolet,
+<em> Supernode Partitioning</em>,
+ACM Symposium on Principles of Programming Languages, San-Diego, 1988
+<P>
+<DT><A NAME=IrJoTr91><STRONG>5</STRONG></A><DD> F. Irigoin, P. Jouvelot, R. Triolet,
+<em> Semantical Interprocedural Parallelization: An Overview of the PIPS Project</em>,
+ACM International Conference on Supercomputing (ICS'91), Cologne, 1991
+<P>
+<DT><A NAME=Zhou91><STRONG>6</STRONG></A><DD> L. Zhou,
+<em> Enhanced Static Evaluation of Fortran Programs in the PIPS Environment</em>,
+Tech. Report E/160/CRI, Ecole des Mines de Paris, 1991
+</DL><BR> <HR>
+
+</BODY>
+
+</html>

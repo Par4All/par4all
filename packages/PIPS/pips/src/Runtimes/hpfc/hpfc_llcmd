@@ -1,0 +1,116 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# generation of a command file for loadleveler. 
+
+script=`basename $0`
+verbose=:
+debug=:
+dir=
+name=
+
+usage()
+{
+  cat <<-END
+	Usage: $script [-hvd] [-n name] [-i dir] [-p procs]
+	END
+  exit ${1:-1}
+}
+
+#
+# set defaults 
+
+[ -f $HOME/.hpfc_llcmdrc ] && . $HOME/.hpfc_llcmdrc
+
+#
+# get options
+
+while getopts hvdn:i:p: opt
+do
+  case $opt in
+    h) usage 0 ;;
+    v) verbose=echo ;;
+    d) debug=echo ;;
+    n) name=$OPTARG ;;
+    i) LL_DIR=$OPTARG ;;
+    p) LL_NPROCESSORS=$OPTARG ;;
+    *) usage 2
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+#
+# default number of processors
+nproc=`sed -n 's,      parameter(REALMAXSIZEOFPROCS = \([0-9]*\)),\1,p' \
+    global_parameters.h`
+nproc=`expr $nproc + 1`
+
+#
+# other defaults if needed
+
+$debug "LL_DIR" ${LL_DIR:=$HOME/tmp}
+$debug "LL_OUT" ${LL_OUT:='$(Executable).$(Cluster).$(Process).out'}
+$debug "LL_ERR" ${LL_ERR:='$(Executable).$(Cluster).$(Process).err'}
+$debug "LL_ENV" ${LL_ENV:='PVMHFN=pvmdname.$(cluster).$(Process)'}
+$debug "LL_CLA" ${LL_CLA:=PVM}
+$debug "LL_JOB" ${LL_JOB:=parallel}
+$debug "LL_MIN" ${LL_MIN:=$nproc}
+$debug "LL_MAX" ${LL_MAX:=$nproc}
+$debug "LL_RQR" ${LL_RQR:='(Arch == "R6000") && (OpSys == "AIX32") && (Adapter == "hps_user")'}
+$debug "LL_USR" ${LL_USR:=`whoami`}
+$debug "LL_ANO" ${LL_ANO:=system}
+$debug "LL_NOT" ${LL_NOT:=complete}
+
+#
+$verbose generation of the command file
+
+cat > $name.cmd <<%%%
+#! /bin/ksh
+#
+# automatically generated file for loadleveler.
+#
+# @ initialdir = ${LL_DIR}
+# @ output = ${LL_OUT}
+# @ error = ${LL_ERR}
+# @ environment = ${LL_ENV}
+# @ class = ${LL_CLA}
+# @ job_type = ${LL_JOB}
+# @ min_processors = ${LL_MIN}
+# @ max_processors = ${LL_MAX}
+# @ requirements = ${LL_RQR}
+# @ notify_user = ${LL_USR}
+# @ account_no = ${LL_ANO}
+# @ notification = ${LL_NOT}
+# @ checkpoint = no
+# @ restart = no
+# @ queue
+
+echo $name start
+/usr/lpp/pvm3/pvmd3e -exec $HOME/pvm3/bin/RS6K/${name}_host
+echo $name end 
+
+%%%
+
+# that is all
+#

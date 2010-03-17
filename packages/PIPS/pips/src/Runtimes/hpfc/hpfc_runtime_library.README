@@ -1,0 +1,89 @@
+# $Id$
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+This file describes the content of the Hpfc Runtime Library.
+Don't expect anything from these sources, so you won't be disappointed.
+
+
+Introduction:
+-------------
+
+This library was developed as a support to the Prototype HPF Compiler
+generated codes. It includes functions for runtime description of the
+distributed arrays, communications, shifts, broadcasts, and so on.
+It is based on PVM. Some never tested extensions tried to use the CMMD
+library of the CM5. Plans to switch to MPI. Most of the functions are
+generated thru m4 templates, that get rid of types and data dimensions.
+
+
+How to built the library:
+-------------------------
+
+Define the following environment variables:
+
+# HPFC_M4 (gm4)
+#  These m4 should include the shift operator. 
+#  I had bad experiences with SUN, IBM, DEC and CRAY m4. 
+#  GNU m4 1.4 is okay.
+PVM_ROOT and PVM_ARCH
+USE_GNU if you want to compile the library with gnu compilers
+M4OPT:
+ _HPFC_DEMO_          (print some messages when launched)
+ _HPFC_DIRECT_        (use direct connexions, if enough pes...)
+ _HPFC_DEBUG_         (verbose run)
+ _HPFC_SYNC_EXIT_     (synchronize on exit, needed by old PVM versions)
+ _HPFC_USE_PVMe_      (for IBM's PVM. a PVM3_ROOT is expected if set)
+ _HPFC_ENCODING_      (PvmDataRaw or PvmDataInPlace)
+ _HPFC_FAKE_BUFFERS_  (whether to generate fake broadcast/bufpck/bufupk
+                   subroutines. Were used to measure PVM overheads...)
+
+ _HPFC_NO_PVM_VERSION_
+ _HPFC_NO_BYTE1_
+ _HPFC_NO_STRING_
+ _HPFC_NO_INTEGER2_
+ _HPFC_NO_INTEGER4_
+ _HPFC_NO_REAL4_
+ _HPFC_NO_REAL8_
+ _HPFC_NO_COMPLEX8_
+ _HPFC_NO_COMPLEX16_
+ _HPFC_DIMENSIONS_ = ...
+
+Then make (and hope:-)...
+
+
+Library content and organization:
+---------------------------------
+
+Misc: Demo support: verbose run, timings...
+Runtime: (rtsupport) everything to manage data distributions descriptors.
+Reductions: for stride-1 aligned block-distributed arrays.
+Broadcast: functions for partial broadcasts.
+Packing: (un)pack of borders...
+Shifts: for stride-1 aligned block-distributed arrays.
+Buffers: (bufmgr) intermediate to squeeze PVM inefficiency.
+
+
+Bugs:
+-----
+
+Many of them!
+I should build one lib for the host and one the nodes?
+Demand driven compilation of functions?

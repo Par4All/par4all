@@ -1,0 +1,102 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+# http://python-modules.alioth.debian.org/python-central_howto.txt
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+
+PYVERS=$(shell pyversions -vr)
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	# Add here commands to configure the package.
+	touch configure-stamp
+
+
+build: build-stamp $(PYVERS:%=build-python%)
+
+build-python%:
+	cd $(CURDIR)/src/Passes/pypips && python$* setup.py build
+	touch $@
+
+
+MAKE_OPT=COPT='-g -O0' WITH_DYNAMIC_LIBRARIES=1 NEWGEN_ROOT=/usr LINEAR_ROOT=/usr
+build-stamp: configure-stamp
+	dh_testdir
+
+	# Add here commands to compile the package.
+	$(MAKE) $(MAKE_OPT) CONFIG_DIR=/etc build
+	$(MAKE) $(MAKE_OPT) -C $(CURDIR)/src/Passes/pypips setup.py
+	#docbook-to-man debian/pips.sgml > pips.1
+
+	touch $@
+
+clean: 
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp $(CURDIR)/debian/pyps.install $(CURDIR)/debian/pyps.dirs
+
+	$(MAKE) unbuild
+
+	dh_clean 
+
+install: build pre-install $(PYVERS:%=install-python%)
+	$(MAKE) $(MAKE_OPT) \
+		INSTALL_DIR=$(CURDIR)/debian/tmp/usr ETC.d=$(CURDIR)/debian/tmp/etc \
+		install
+	# Add here commands to install the package into debian/pips.
+
+pre-install:
+	dh_testdir
+	dh_testroot
+	dh_clean 
+	dh_installdirs
+
+
+install-python%:
+	cd $(CURDIR)/src/Passes/pypips && python$* setup.py install --no-compile --root $(CURDIR)/debian/python-pips
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs 
+	dh_installdocs
+	dh_installexamples
+	dh_install --sourcedir=debian/tmp
+#	dh_installmenu
+#	dh_installdebconf	
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+	dh_pysupport
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_perl
+	dh_makeshlibs -X_pypips
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

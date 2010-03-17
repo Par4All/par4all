@@ -1,0 +1,53 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\begin{document}
+\sloppy
+Définition d'une propriété.
+
+Une liste de propriétés est lue dans un fichier au démarrage de
+Pips. Cette liste permet de modifier le comportement par
+défaut de Pips. Chaque propriété est significative pour au moins une
+passe.
+
+Ces propriétés ne doivent pas être directement modifiées par un
+utilisateur. Elles sont normalement positionnées par le biais des
+sélections de règles (cf. {\em makefile} et {\em pipsmake}). Un
+utilisateur averti peut s'y risquer mais le maintien de la cohérence
+entre objets n'est plus garanti par {\em pipsmake}.
+
+Une propriété peut être un entier, un booléen ou une chaîne de
+caractères. Le fichier de référence se trouve dans Production/Lib
+sous le nom de {\em properties.rc}. Ce fichier est lu en premier mais les
+valeurs des propriétés peuvent être modifiées en fonction d'un
+deuxième fichier {\em properties.rc} se trouvant dans le répertoire
+courant.
+
+\domain{property = int + bool + string}
+{}
+\end{document}
+\end

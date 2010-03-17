@@ -1,0 +1,62 @@
+dnl $Id$
+dnl
+dnl Copyright 1989-2010 MINES ParisTech
+dnl
+dnl This file is part of PIPS.
+dnl
+dnl PIPS is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl any later version.
+dnl
+dnl PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE.
+dnl
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+dnl
+dnl
+dnl DEFAULT ARCHITECTURE
+dnl
+ifdef(`PVM_ARCH',,`define(`PVM_ARCH',`syscmd(pvmgetarch)')')dnl
+dnl
+dnl MACHINE TYPE
+dnl
+define(`COM_PREFIX',`HPFC')dnl
+define(`_SUN4')dnl
+define(`_SUNMP')dnl
+define(`_PGON')dnl
+define(`_CM5')dnl
+define(`_CRAY')dnl
+define(`_RS6K')dnl
+define(`_ALPHA')dnl
+dnl
+dnl
+define(`_spawn',`$@')dnl
+define(`_getpe',)dnl
+dnl
+dnl PECULIAR DEFINITIONS
+dnl 
+ifelse(PVM_ARCH,`CM5',`define(`COM_PREFIX',`CM')')dnl
+ifelse(PVM_ARCH,`SUN4',`define(`_SUN4',`$@')',
+       PVM_ARCH,`SUNMP',`define(`_SUNMP',`$@')', 
+       PVM_ARCH,`PGON',`define(`_PGON',`$@')',
+       PVM_ARCH,`CM5',`define(`_CM5',`$@')',
+       PVM_ARCH,`ALPHA',`define(`_ALPHA',`$@')',
+       PVM_ARCH,`RS6K',`define(`_RS6K',`$@')',
+       PVM_ARCH,`CRAY',`define(`_CRAY',`$@')')dnl
+dnl
+dnl whether to spawn
+dnl
+ifelse(PVM_ARCH, `CRAY', `define(`_spawn',)')dnl
+ifelse(PVM_ARCH, `CRAY', `define(`_getpe',`$@')')dnl
+dnl
+dnl TO USE IBM PVMe IMPLEMENTATION
+dnl 
+ifdef(`USE_PVMe',`define(`_PVMe',`$@')',`define(`_PVMe',)')dnl
+dnl
+dnl THAT IS ALL
+dnl

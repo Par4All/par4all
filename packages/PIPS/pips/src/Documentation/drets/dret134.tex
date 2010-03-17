@@ -1,0 +1,542 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS \\
+		RAPPORT DE SYNTHESE FINALE}
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E134}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+Ce document présente le rapport final de la convention DRET/ARMINES
+87.017 (bon de commande 88.017.01) décrivant la réalisation d'un
+paralléliseur automatique et interprocédural de programmes scientifiques.
+Ce paralléliseur a été appelé PIPS\footnote{Paralléliseur
+Interprocédural de Programmes Scientifiques}. Il prend
+en entrée des programmes Fortran 77 séquentiel et fournit en sortie
+des programmes équivalents dont le parallélisme a été explicité par
+des instructions DOALL et des instructions vectorielles Fortran~90.
+
+Le plan de ce rapport est standard. Après avoir rappelé l'objet de
+l'étude, nous en montrerons l'intérêt. Nous en détaillerons ensuite
+le déroulement puis en présenterons les résultats essentiels avant de
+conclure et de présenter les perspectives ouvertes par ce travail.
+
+\section{Objet de l'étude}
+
+Cette étude rentre dans le cadre défini formellement par les deux rubriques
+suivantes:
+\begin{itemize}
+\item
+	{\em Domaine II}: Etude d'outils logiciels de programmation et
+d'exploitation des calculateurs scientifiques.
+\item
+	{\em Thème II.1}: Adaptation automatique de programmes
+scientifiques aux calculateurs parallèles.
+\end{itemize}
+Plus précisement, son objectif à long terme est d'étudier le
+potentiel des analyses interprocédurales pour l'optimisation de la
+compilation de programmes Fortran. Deux types d'analyses sont effectuées,
+une analyse sémantique permettant, entre autres, de propager des
+constantes interprocéduralement, et une analyse du parallélisme
+implicite.
+
+Pour ce faire, un paralléliseur source à source Fortran a été
+réalisé.  Il est complété par une bibliothèque de transformations
+de base (distribution de boucle, privatisation, échange de boucles) et
+par les phases d'analyses interprocédurales.
+
+\section{Intérêt de l'étude}
+
+Le domaine de la recherche des outils de programmation des calculateurs
+scientifiques du type {\em supercalculateur} connaît un développement
+croissant depuis l'arrivée des machines vectorielles du type CRAY-1
+dans le milieu des années 70. Ces superordinateurs, et leur
+programmation efficace, sont une des clefs de la maîtrise technologique
+de nombreux secteurs vitaux pour la Défense Nationale, que cela soit
+dans le domaine de la simulation de processus physiques (e.g., étude
+des écoulements fluides ou analyse de structures) ou de nouveaux
+produits (e.g., conception et validation de circuits intégrés).
+
+L'intérêt stratégique de ce type d'architectures, la difficulté
+intrinsèque de leur programmation et les problèmes que posent la
+détection et l'exploitation efficace du parallélisme, qui est
+indispensable pour obtenir les performances attendues de ces
+machines, justifient les recherches en cours visant à faciliter leur
+utilisation.
+
+En particulier, le développement d'outils sophistiqués d'aide à la
+programmation, qu'ils soient purement automatiques ou interactifs,
+s'avère être un point de passage obligé pour maîtriser le coût et
+faciliter la conception de logiciels qui tirent parti des
+caractéristiques architecturales de ces machines comportant
+plusieurs processeurs
+vectoriels, avec une mémoire hiérarchique, globale ou partagée.
+
+\subsection{Objectifs de la recherche}
+
+Les superordinateurs apparaissant sur le marché offrent des facilités
+d'exécution parallèle qui s'éloignent du mode vectoriel (dit SIMD)
+présent sur les machines de la classe du CRAY-1, mode dont
+l'exploitation automatique par compilateur, dit {\em vectorisation}, est
+relativement bien maîtrisé maintenant. 
+
+Les architectures les plus récentes offrent aussi la possibilité
+d'exécuter des tâches différentes sur des processeurs multiples; ces
+multiprocesseurs permettent ainsi des exécutions de type MIMD dont la
+génération automatique est plus difficile à mettre en place. En
+effet, les overheads associés au parallélisme MIMD sont généralement
+plus importants que ceux qui sont associés aux instructions
+vectorielles. Il faut donc rechercher du parallélisme de grain moins fin
+et donc tester un nombre beaucoup plus important de dépendances.
+
+Les objectifs principaux de la recherche effectuée dans le cadre de
+ce contrat sont multiples:
+\begin{itemize}
+\item
+	Etudier et concevoir un compilateur effectuant la {\em
+parallélisation} des programmes et non plus leur simple vectorisation,
+\item
+	Etudier la faisabilité d'une parallélisation de grain
+grossier, au niveau des procédures utilisées dans les langages
+scientifiques, 
+\item
+	Etudier l'importance des analyses sémantiques sophistiquées
+qui seront la clef des compilateurs à venir.
+\end{itemize}
+Mais ils visent tous l'obtention automatique de parallélisme de
+grain moyen ou fin.
+
+Les retombées secondaires sont aussi importantes, qu'il s'agisse
+de profiter de l'analyse sémantique interprocédurale pour améliorer
+le choix des transformations ou de mettre les résultats des analyses
+automatiques à la disposition des programmeurs pour qu'ils puissent
+comprendre pourquoi les sections de code qu'ils croyaient parallèles
+ne sont pas reconnues telles par le compilateur. Par exemple,
+la propagation interprocédurale de constante permet de mieux choisir
+les boucles vectorielles et parallèles en fonction des nombres d'itérations
+des boucles. Le calcul automatique des effets des procédures sur la mémoire
+et leur affichage permettent de voir rapidement quels COMMONs et quelles
+variables sont modifiés par une procédure et par toutes celles qu'elle
+appelle directement ou indirectement.
+
+\subsection{Historique des études antérieures}
+
+Les acteurs principaux sur ce terrain sont américains, ainsi que les
+machines cibles. Après les travaux de pionniers
+de David Kuck à l'Université d'Urbana-Champaign (Illinois), travaux
+qui ont commencé avec le projet ILLIAC~IV, qui ont conduit au
+développement du premier vectoriseur de recherche (Projet Parafrase) et
+qui ont abouti à la création du CSRD (Center for Supercomputing
+Research and Development), les groupes de Ken Kennedy à l'Université
+de Rice (Texas) et de Michael Burke à IBM Yorktown Heights (New York)
+ont poursuivi et développé cet axe de recherche avec toute une famille
+de projets à Rice, allant du vectoriseur/paralléliseur PFC (Parallel
+Fortran Compiler) à l'environnement de programmation parallèle $R^N$
+et un grand projet à Yorktown Heights, PTRAN (Parallel Translator).
+
+Ce domaine a donné lieu à la création de startups comme Pacific
+Sierra ou Kuck Associates, Inc. qui commercialisent, depuis le début
+des années 80, des compilateurs pour machines vectorielles. Il s'agit
+le plus souvent de pré-compilateurs ou même de compilateurs source à source
+effectuant la détection du parallélisme et son explicitation à l'aide
+de directives propres au constructeur de la machine cible. Pacific Sierra
+fournit actuellement le paralléliseur de Cray Research.
+
+Les techniques mises au point dans ces centres ont, par ailleurs, été
+utilisées abondamment dans les compilateurs développés en interne
+par des sociétés comme Alliant ou Convex.
+
+Ayant perçu l'importance stratégique de ce domaine, la DRET a lancé un
+certain nombre de projets de recherche pour y soutenir la recherche
+francaise. Dès les années 70, le projet VESTA, développé au sein du
+Centre de Recherches de CII-Honeywell Bull avec la collaboration du
+Pr.~Feautrier, prévoit la conception d'un compilateur vectoriseur pour
+Fortran. Ecrit en PL1, ce prototype n'a pas connu de suites immédiates,
+en partie du fait de l'absence de machines cibles françaises.
+
+Plus récemment, le projet VATIL, développé à l'INRIA par l'équipe
+du Pr.~Lichnewsky, a poursuivi dans cette voie de recherche par la
+réalisation d'un vectoriseur écrit en Le-Lisp. Ce vectoriseur a été
+progressivement enrichi et transformé en un paralléliseur.
+
+\subsection{Résultats acquis antérieurement}
+
+L'essentiel des travaux effectués précédemment dans le domaine de la
+compilation pour superordinateurs était axé vers la vectorisation des
+applications scientifiques. Les résultats primordiaux concernaient la
+création de graphes de dépendances aussi précis que possible entre
+instructions en vue de détecter celles qui sont vectorisables. 
+
+La notion même de vectorisation était incompatible avec le traitement
+des appels de procédure puisqu'un call vectoriel n'a pas grand sens.
+Les travaux en matière d'interprocéduralité ont donc commencé au
+début des années 1980 en utilisant l'expansion de procédure et
+les calculs d'effets {\em atomiques}: la modification d'un élément
+de tableau est considérée comme une modification du tableau complet.
+
+Les premiers résultats plus précis ont été décrits dans la thèse
+de Rémi Triolet (1984) et ce sont eux qui sont à l'origine du projet.
+Depuis, plusieurs autres méthodes ont été présentées, dont beaucoup
+sont des variations basées sur la méthode de Rémi Triolet. Ces variations
+consistent en des compromis variés entre la précision et la vitesse
+d'analyse. La plupart de ces méthodes n'ont pas été complètement
+implémentées et aucune comparaison valable n'a encore pu être effectuée.
+
+La gestion des boucles imbriquées, basée sur les notions d'échange de
+boucles et de partitionnement, n'a pas encore été étudiée de
+manière approfondie. Seules des transformations élémentaires ont été
+proposées mais leur enchaînement reste problématique. Des méthodes
+plus globales ont été développées par Francois Irigoin en 1988, puis
+indépendamment par une équipe de Stanford (Monica Lam) et chez Intel
+par Uptal Banerjee.
+
+Ces méthodes n'ont pas semblé apporter grand-chose dans le domaine de
+de la parallélisation interprocédurale.  Elles devront néanmoins
+être prise en compte pour obtenir de bons résultats pour une machine
+cible particulière.
+
+\section{Déroulement de l'étude}
+
+Le projet PIPS (Paralléliseur Interprocédural de Programmes
+Scientifiques) s'est déroulé sur 2 ans. Un certain laps de temps a
+tout d'abord été nécessaire pour définir de manière très précise
+les objectifs et pour obtenir la livraison des machines nécessaires au
+projet.  Etant données les inconnues qui frappaient les machines cibles
+potentielles de l'époque (Marie, Isis, Marisis), il a été convenu
+dès le départ de ne pas cibler PIPS pour une machine particulière,
+mais de le considérer comme un paralléliseur générique, transformant
+un source Fortran-77 en une version optimisée, écrite en un Fortran-77
+étendu permettant de spécifier le parallélisme détecté. Ce
+paralléliseur contient aussi une bibliothéque de transformations qui
+ne sont pas systématiquement appliquées puisqu'en l'absence de machine
+cible aucune fonction de coût ne permet d'en déterminer
+l'opportunité.
+
+Une collaboration entre l'Ecole des Mines et l'ONERA a été instaurée
+pour définir les constructions Fortran-77 qui pourraient ne pas être
+traitées en vue de diminuer le volume de code nécessaire à la
+réalisation de PIPS. Ces restrictions,
+décrites dans le rapport CAII-E103, ne concernent que les ENTRY,
+les BLOCK DATA, les GOTO calculés et assignés, les RETURN calculés,
+les INQUIRE et les accès aux sous-chaînes de caractères.
+Elles ne devaient pas imposer des
+contraintes trop sévères sur les types de benchmarks susceptibles
+d'être traités par PIPS. Il s'est avéré que les programmes de
+benchmark de l'ONERA étaient analysés par PIPS sans modification
+préalable une
+fois accepté l'ajout des ordres non standards BUFFERIN et BUFFFEROUT.
+
+Outre les différents lots décrits dans la section suivante, une
+présentation et une première démonstration de PIPS ont été
+effectuées en Avril 1990, en présence de membres de l'Ecole des Mines,
+de la DRET, de l'INRIA, de l'Université Pierre et Marie Curie et du CEA
+(l'ONERA étant excusé). Une autre réunion de point a eu lieu en
+juillet 90. 
+
+Ces deux réunions ont permis de mettre en évidence l'inadéquation de
+la structure initiale du projet. Le fonctionnement purement {\em batch}
+qui était prévu s'est révélé largement incompatible avec les
+analyses interprocédurales qui conduisent très naturellement à faire
+intervenir l'utilisateur dans le processus de parallélisation.
+De plus, pour des raisons de temps de réponse, le fonctionnement
+interactif impose un mode de travail
+incrémental dans lequel seuls les effets induits par les modules
+modifiés sont recalculés.
+Les modifications considérables qu'a entraîné cet ajustement de
+l'objectif ont engendré un certain retard. Le surcroît
+de travail n'a cependant pas été imputé à la DRET malgré l'intérêt
+évident de l'opération pour l'exploitation du projet PIPS par d'autres
+équipes dépendant largement de la Défense (CEA, ONERA) ou de la
+recherche française (IRISA, Université Pierre et Marie Curie).
+
+En outre, une autre présentation a été organisée au cours du
+workshop {\em International Workshop on Compilers for Parallel
+Computers} mis en place par l'Ecole des Mines et l'Université Pierre et
+Marie Curie auxquels ont assisté des représentants des équipes PTRAN
+de IBM Yorktown Heights, du CSRD, de Cray France et du groupe de
+compilation de Cray Research.  Deux démonstrations du système ont
+ensuite été organisées à Fontainebleau pour les chercheurs de Cray
+Research et d'IBM et ont donné lieu à des échanges de vues informels
+sur l'avenir des analyses interprocédurales.
+
+\subsection{Rappel des différentes étapes}
+
+Les étapes marquantes du projet PIPS sont décrites rapidement dans
+cette section. Outre les rapports d'avancement et les rapports finals,
+certaines dates clefs sont évoquées.
+
+\begin{description}
+\item[Fortran - Mars 1988]
+	Au vu des programmes fournis par l'ONERA (AILE, CR2CNF, OA118 et
+TMINES), une définition précise du sous-Fortran utilisé par PIPS est
+élaborée. Il s'avère que la majeure partie des instructions et
+déclarations Fortran peut être utilisée telle quelle. Par ailleurs,
+on explique comment un certain nombre de constructions plus rares (par
+exemple les GOTO assignés) peuvent être, de manière
+quasi-automatique, transformées dans PIPS Fortran. Ceci est décrit
+dans le
+document CAII-E103 et son annexe présentant les {\em syntax charts} de
+Fortran modifiés.
+\item[Rapport d'Avancement 1 - Mars 1988]
+	Le Lot 1 décrit la structure générale de l'ana\-lyseur lexical
+de PIPS, complexe du fait du caractère peu orthogonal de la syntaxe de
+Fortran. Une présentation rapide de l'outil de génie logiciel NewGen,
+utilisé intensivement dans PIPS et développé en interne à l'Ecole
+des Mines, ainsi que de l'ébauche de la Représentation Intermédiaire
+(RI) de PIPS est effectuée avant d'aborder la description des analyses
+syntaxiques et sémantiques.
+\item[Rapport d'Avancement 2 - Décembre 1988]
+	Une présentation détaillée de NewGen est donnée avant une
+définition exhaustive de la RI de PIPS. Est précisée, en particulier,
+la manière dont la syntaxe Fortran est décrite par les structures
+NewGen de la RI. La RI n'evoluera que de manière marginale au cours de
+la vie du projet PIPS. Enfin, une description succinte des structures de
+données utilisées dans la phase d'analyse sémantique est donnée.
+\item[Rapport d'Avancement 3 - Mars 1989]
+	L'essentiel de ce rapport d'avancement est de préciser l'état
+de l'implémentation du frontal de PIPS, basé sur les définitions
+données dans les rapports précédents. En ce qui concerne les phases
+d'analyse, les problèmes théoriques à aborder, ainsi que ceux,
+pratiques, d'interface avec NewGen sont déve\-loppés.
+\item[Rapport Final ``Analyse Lexicale/Syntaxique Intra'' - Mai 1989]
+	Ce gros rapport\\
+contient l'ensemble du code représentant le
+frontal intraprocédural de PIPS, avec une description complète de la
+RI. Par l'utilisation d'une RI très simple et orthogonale (utilisation
+maximale de la notion de fonction dans la représentation des structures
+de Fortran), le volume de programmes écrit a été limité par rapport
+à une approche plus classique.
+\item[Rapport Final ``Analyse Syntaxique Inter'' - Mai 1989]
+	Ce lot décrit la phase d'édi\-tion de liens permettant de
+terminer l'analyse syntaxique d'un programme Fortran (ce rapport inclut
+le listing du programme). A noter que ce module a été prototypé une
+première fois en CommonLISP (listing non fourni), profitant ainsi des
+possibilités de NewGen, avant d'être récrit, dans sa version
+définitive, en C.
+\item[Rapport d'avancement 4 - Septembre 1989]
+	Ce rapport intermédiaire décrit et donne le listing du
+constructeur de graphe de contrôle structuré utilisé dans PIPS. Cette
+structure de données nouvelle permet de représenter de manière
+hiérarchique un programme pouvant contenir des branchements, permettant
+ainsi de localiser finement les parties non-parallélisables (du fait de
+leur non-structuration). En ce qui concerne l'analyse sémantique, les
+modifications apportées à l'algorithme d'Halbwachs sont décrites,
+essentiellement pour prendre en compte l'aliasing et améliorer les
+performances. 
+\item[Rapport d'Avancement 5 - Décembre 1989]
+	Y sont décrites les phases d'analyse sé\-mantique et de
+détection de parallélisme. De manière plus précise, les additions à
+la RI nécessaires pour prendre en compte l'analyse sémantique sont
+présentées (via la notion de {\em transformer}). La construction du
+graphe {\em use-def} est décrite, ainsi que son utilisation pour la
+privatisation de variables locales (les impacts sur l'algorithme de
+parallélisation d'Allen et Kennedy sont présentés). 
+\item[Rapport d'Avancement 6 - Mars 1990]
+	L'essentiel de ce lot concerne la parallélisation
+interprocédurale. Sa puissance peut être bien perçue par un exemple
+d'utilisation de la routine SAXPY extraite de la librairie BLAS; cet
+exemple, traité par PIPS, est présenté dans le rapport.
+\item[Présentation - 24 Avril 1990]
+	L'équipe PIPS a organisé une présentation du projet à
+diverses personnalités de la DRET (Ph. Sarazin), du CEA (G. Meurant), de
+l'INRIA (W. Jalby) et de Paris 6 (P. Feautrier). Une démonstration en
+temps-réel du paralléliseur avait été préparée, en utilisant les
+programmes de tests de l'ONERA (P. Leca, excusé). Cette journée a été
+un succès, de nombreux participants exprimant leur intérêt dans le
+projet et souhaitant obtenir une version de PIPS, une fois celui-ci
+terminé. 
+\item[Présentation - Mai 1990]
+	Une seconde édition de la présentation du 24 Avril a été
+organisée au cours du mois de Mai pour Cray France. Toujours à la
+recherche des derniers développements concernant la parallélisation
+d'applications, Cray a montré son intérêt pour le projet PIPS. En
+particulier, nous avons pu tester le résultat du préprocesseur du Cray
+sur les benchmarks utilisés par PIPS (voir ci-dessous). A noter que le
+Cray YMP est une des machines envisagées comme cibles de PIPS. Le
+préprocesseur de Cray Research est d'origine Pacific Sierra. Il
+détecte le parallélisme et l'exprime à l'aide de directives
+compatibles avec le compilateur Cray qui génère le code vectoriel et
+optimise aussi le code scalaire.
+\item[Rapport d'Avancement 7 - Juin 1990]
+	Ce rapport présente les dernières modifications de PIPS,
+essentiellement pour des problèmes de performances (diminution de la
+taille du graphe de dépendances).
+\item[Workshop - 3 au 5 Décembre 1990]
+	L'Ecole des Mines et l'Université Paris 6 ont organisé en
+commun l'{\em International Workshop on Compilers for Parallel
+Computers} à Paris. De nombreux chercheurs internationaux (Europe et
+USA essentiellement) y ont participé. On notera en particulier des
+représentants de IBM Yorktown Heights (Michael Burke, Jeanne Ferrante,
+Larry Carter), du CSRD de l'Université d'Illinois (Luddy Harrison) et
+de Cray Research US (Irene Qualters). Outre une présentation en
+conférence du projet PIPS par François Irigoin, deux démonstrations
+du paralléliseur ont été organisées pour l'équipe PTRAN d'IBM et la
+responsable Dévelop\-pement Logiciel de Cray US; ces deux présentations
+ont été appréciées. La présence des représentants de Cray US
+donnait suite à la rencontre précédente avec Cray France; des
+collaborations ultérieures sont possibles sur ce sujet prometteur.
+\end{description}
+
+Une lettre envoyée par Michel Lenci (référence 5020/ML du 27
+Septembre 1990) évoque les raisons du retard de quelques mois pris par
+le projet PIPS, essentiellement pour la raison du développement, non
+prévu par le contrat DRET mais nécessaire vu l'évolution des
+environnements de programmation, d'une interface interactive sous X
+Window ayant entraîné une remise en cause de la structure globale de
+PIPS. Ceci est décrit dans le rapport CAII-E133 remis à la DRET.  De
+plus, un des membres de l'équipe, Rémi Triolet, a décidé de prendre
+une année sabbatique, ce qui n'a fait que confirmer ce retard de quatre
+mois, retard accepté par la DRET par lettre en date du 24 novembre 1990.
+
+\subsection{Difficultés, faits significatifs et résultats}
+
+L'essentiel du project PIPS s'est déroulé selon l'échéancier
+caractéristique des projets de recherche, c'est-à-dire pour lesquels
+une approche de prototypage est préférée à un schéma classique du
+type {\em waterfall} avec des phases séparées de spécification,
+développement et test. Cette approche s'est révélée facilitée par
+l'utilisation du logiciel NewGen, qui permet une évolution en douceur
+des structures de données centrales.
+
+La représentation intermédiaire de PIPS a été conçue de manière
+extrêmement soignée dès le départ. Elle n'a été significativement
+modifiée qu'au cours de l'année 1990 pour permettre de faire cohabiter
+les approches orientées batch (objet du contrat) et interactive
+(souhaitée par les utilisateurs et nécessaire vu l'évolution des
+environnements de programmation parallèle). Cette remise à jour avait
+pour principal objectif de permettre un meilleur découplage des
+différentes phases de PIPS, pour en faciliter l'utilisation ``à la
+carte{}''. Ceci était également utile pour permettre des
+développements parallèles sur PIPS, comme de nouvelles phases
+d'analyse ou de transformations.
+
+Les avantages évoqués précédemment se voient néanmoins entachés
+d'un inconvénient qu'il convient de noter. La version interactive de
+PIPS utilise le partage de structures de données en mémoire et ne
+passe donc plus, comme la version batch, par des fichiers externes. Il
+s'ensuit qu'un soin particulier doit être apporté à la gestion de la
+mémoire (le langage d'implémentation, C, n'offrant pas de {\em garbage
+collector}), induisant des risques supplémentaires d'erreur et
+alourdissant la tâche de programmation et de mise au point.
+
+Un autre aspect du projet a été l'insistance sur des performances
+raisonnables. Cela a exclu l'utilisation de langages de programmation
+plus conviviaux comme Lisp (quoique NewGen permette, d'une certaine
+manière, de les concilier avec l'objectif d'efficacité) au profit de
+C. Les performances obtenues, uniques dans ce domaine en France, ont
+requis un coût de programmation plus important qu'il est habituel dans
+ce type de projet.
+
+\section{Récapitulation des résultats}
+
+Le paralléliseur PIPS a tenu ses promesses. 
+
+Des programmes réels, tel que le programme TMINES de l'ONERA de calcul
+d'écoulement potentiel dans une tuyère et comportant plus de 1000
+lignes de code Fortran, ont été analysés avec succès en utilisant
+une variante de l'algorithme de parallélisation d'Allen et Kennedy. Le
+code généré s'est montré aussi bon que celui produit par FPP, le
+préprocesseur paralléliseur de Cray. L'utilisation de l'analyse
+sémantique interprocédurale sur TMINES ne permet pas de détecter plus
+de parallélisme qu'une analyse locale. Par contre, elle devrait
+permettre de mieux calibrer la phase de génération de code, la
+propagation des constantes interprocédurale permettant de mieux
+connaître les bornes supérieures des boucles et donc de décider à
+meilleur escient quelles boucles doivent être parallèles ou
+vectorielles. Bien évidemment, FPP n'est pas capable de paralléliser
+des programmes nécessitant des propagations interprocédurales
+d'informations qui sont effectuées par PIPS.
+
+Cette exécution sur des codes rééls se fait, de plus, avec des
+performances acceptables; ainsi TMINES est parallélisé en un peu plus
+de dix minutes, sachant que la somme d'informations glanées sur le
+comportement dynamique du programme n'a pas d'équivalent dans
+l'ensemble des paralléliseurs existants, que cela soit dans les milieux
+industriels ou de recherche. Ces informations pourront être d'un
+intérêt majeur pour les phases de génération de code qui passeraient
+derrière PIPS.
+
+La réalisation de PIPS a permis un test en vrai grandeur de la
+bibliothèque mathématique de calcul en nombre entiers développée à
+l'Ecole des Mines, en collaboration avec le projet $C^3$. Ces routines
+sont au coeur des algorithmes de décision utilisés par PIPS pour la
+construction du graphe de dépendances. Ces tests de dépendance
+utilisent les informations interprocédurales propagées par l'analyse
+sémantique.
+
+\section{Conclusion}
+
+Malgré un retard de quelques mois, essentiellement dû à un enrichissement
+du cahier des charges, le projet PIPS a abouti aux résultats
+escomptés. Des programmes réels ont été parallélisés (ce qui est
+une première en France) et des techniques sophistiquées d'analyse
+statique de programmes, présentées auparavant dans des congrès
+internationaux, ont été implémentées et sont ainsi à la disposition
+du monde scientifique français (le CEA ayant, par exemple, montré son
+intérêt pour une réutilisation de PIPS). La collaboration entre
+l'Ecole des Mines et l'Université Pierre et Marie Curie a été
+renforcée, comme le montre l'organisation conjointe d'un workshop
+international sur les compilateurs pour machines parallèles à Paris. 
+
+\section{Perspectives ultérieures}
+
+PIPS apparaît comme une plateforme puissante pour le développement
+d'environnement de programmation parallèle. Par la richesse des
+informations recueillies par l'analyseur sémantique interprocédurale
+et la structure modulaire du paralléliseur lui-même au niveau de son
+implémentation, l'addition de modules annexes devrait être
+particulièrement aisée. Ainsi, une interface utilisateur interactive
+graphique est un {\em must}, un prototype sous X Window System ayant
+été développé à cet effet pour les besoins propres de l'Ecole des
+Mines.  Il serait souhaitable de développer cet aspect, répondant
+ainsi à un besoin des utilisateurs qui demandent une facilité plus
+importante d'intervention interactive dans le processus de
+parallélisation.
+
+En aval de cet axe de recherche, PIPS étant un paralléliseur
+source/source, une phase de génération de code pour une machine-cible
+donnée semble être du plus haut intérêt. Suite aux contacts avec
+différentes utilisateurs (ONERA, CEA) et constructeurs (Cray France et
+US), la machine la plus généralement évoquée, en l'absence de
+candidats français, est le Cray YMP.
+
+\end{document}
