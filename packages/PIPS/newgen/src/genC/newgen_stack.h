@@ -25,8 +25,9 @@
  *  - a stack_iterator allows to iterate over the items in a stack.
  *  - allocation with stack_make(newgen domain, bucket size)
  *  - free with stack_free(stack)
- *  - stack_size(stack) returns the size
+ *  - stack_size(stack) returns the number of elements stacked
  *  - stack_empty_p(stack) tells whether the stack is empty or not
+ *    stack_empty_p(stack)==(stack_size(stack)==0)
  *  - stack_{push,pop,head,replace} do what you may expect from them
  *  - stack_info gives informations about the stack
  *  - stack_map applies the function on all the items in stack.
@@ -84,18 +85,19 @@ extern void stack_map(const stack, gen_iter_func_t);
 extern void stack_push(void*, stack);
 extern void *stack_pop(stack);
 extern void *stack_head(const stack);
+extern void *stack_nth(const stack, int);
 extern void *stack_replace(void*, stack);
 
 /*   stack iterator
  *
  *   This way the stack type is fully encapsulated, but
  *   it is not very efficient, due to the many function calls.
- *   Consider gen_map first which has a very small overhead.
+ *   Consider "stack_map" first which has a very small overhead.
  */
-extern stack_iterator stack_iterator_init(const stack, int); /* X-ward */
-extern int stack_iterator_next_and_go(stack_iterator, void**);
+extern stack_iterator stack_iterator_init(const stack, bool); /* X-ward */
+extern bool stack_iterator_next_and_go(stack_iterator, void**);
 extern void stack_iterator_end(stack_iterator*);
-extern int stack_iterator_end_p(stack_iterator); /* not needed */
+extern bool stack_iterator_end_p(stack_iterator); /* not needed */
 
 /* applies _code on the items of _stack downward , with _item of _itemtype.
  */
@@ -112,7 +114,7 @@ extern int stack_iterator_end_p(stack_iterator); /* not needed */
   }
 
 #define STACK_MAP(_item, _itemtype, _code, _stack)	\
-  STACK_MAP_X(_item, _itemtype, _code, _stack, 1)
+  STACK_MAP_X(_item, _itemtype, _code, _stack, true)
 #endif
 
 /*  That is all

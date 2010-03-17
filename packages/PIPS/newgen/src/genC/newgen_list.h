@@ -351,5 +351,6 @@ extern int gen_position(const void *, const list);
 
 extern bool gen_list_cyclic_p (const list ml);
 extern list gen_list_head(list *, int);
+void gen_substitute_chunk_by_list(list * pl, const void * o, list sl);
 
 #endif /* newgen_list_included */
