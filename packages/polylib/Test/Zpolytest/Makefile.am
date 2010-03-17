@@ -54,3 +54,4 @@ tests:
 	else \
 	        echo "Test Zpolytest works correctly"; \
         fi
+CLEANFILES=xyz

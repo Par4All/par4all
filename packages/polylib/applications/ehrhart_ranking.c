@@ -1,4 +1,21 @@
 /* Program for testing the ranking function. */
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 
 #include <stdio.h>
 #include <string.h>
@@ -10,7 +27,7 @@
 int main( int argc, char **argv)
 {
   int i;
-  char ** param_name = NULL;
+  const char **param_name = NULL;
   Matrix *M;
   Polyhedron *P, *D, *C;
   Enumeration *e, *en;
@@ -89,8 +106,6 @@ int main( int argc, char **argv)
       free( e );
       e = en;
     }
-  for( i=0 ; i<nb_parms ; i++ )
-    free( param_name[i] );
-  free(param_name);
+  Free_ParamNames(param_name, nb_parms);
   return 0;
 }

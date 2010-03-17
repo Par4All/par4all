@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /* polyhedron.c
      COPYRIGHT
           Both this software and its documentation are
@@ -67,7 +84,7 @@
     calling program (e.g. Domlib.c, ReadAlpha, etc...).
     See errormsg.c for an example of such a function.  */
 
-void errormsg1(char *f , char *msgname, char *msg);
+void errormsg1(const char *f, const char *msgname, const char *msg);
 
 int Pol_status;                    /* error status after operations */
 
@@ -220,13 +237,13 @@ static void Combine(Value *p1, Value *p2, Value *p3, int pos, unsigned length) {
   value_absolute(abs_a2,a2);
 
   /* gcd  = Gcd(abs(a1), abs(a2)) */
-  Gcd(abs_a1,abs_a2,&gcd);
+  value_gcd(gcd, abs_a1, abs_a2);
 
   /* a1 = a1/gcd */
-  value_division (a1,a1,gcd);
+  value_divexact(a1, a1, gcd);
 
   /* a2 = a2/gcd */
-  value_division (a2,a2,gcd);
+  value_divexact(a2, a2, gcd);
 
   /* neg_a1 = -(a1) */
   value_oppose(neg_a1,a1);
@@ -353,38 +370,6 @@ static void SatMatrix_Extend(SatMatrix *Sat, Matrix* Mat, unsigned rows)
   for (i = 0; i < rows; ++i)
     Sat->p[i] = Sat->p_init + (i * cols);
   Sat->NbRows = rows;
-}
-
-static void Matrix_Extend(Matrix *Mat, unsigned NbRows)
-{
-  Value *p, **q;
-  int i,j;
-
-  q = (Value **)realloc(Mat->p, NbRows * sizeof(*q));
-  if(!q) {
-    errormsg1("Matrix_Extend", "outofmem", "out of memory space");
-    return;
-  }
-  Mat->p = q;
-  if (Mat->p_Init_size < NbRows * Mat->NbColumns) {
-    p = (Value *)realloc(Mat->p_Init, NbRows * Mat->NbColumns * sizeof(Value));
-    if(!p) {
-      errormsg1("Matrix_Extend", "outofmem", "out of memory space");
-      return;
-    }
-    Mat->p_Init = p;
-    Vector_Set(Mat->p_Init + Mat->NbRows*Mat->NbColumns, 0,
-	       Mat->p_Init_size - Mat->NbRows*Mat->NbColumns);
-    for (i = Mat->p_Init_size; i < Mat->NbColumns*NbRows; ++i)
-	value_init(Mat->p_Init[i]);
-    Mat->p_Init_size = Mat->NbColumns*NbRows;
-  } else
-    Vector_Set(Mat->p_Init + Mat->NbRows*Mat->NbColumns, 0,
-	       (NbRows - Mat->NbRows) * Mat->NbColumns);
-  for (i=0;i<NbRows;i++) {
-    Mat->p[i] = Mat->p_Init + (i * Mat->NbColumns);
-  }
-  Mat->NbRows = NbRows;
 }
 
 /* 
@@ -750,7 +735,7 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
 {
   int i, j, k, pivot, Rank;
   int *column_index = NULL;
-  Value gcd, *cp;
+  Value gcd;
 
   value_init(gcd);
   column_index=(int *)malloc(Dimension * sizeof(int));
@@ -783,24 +768,11 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
 	/* gcd = Vector_Gcd(p[Rank]+1,Dimension) */
 	Vector_Gcd(p[Rank]+1,Dimension,&gcd);
 	
-	/* if (gcd >= 2) */
-	if (value_cmp_si(gcd, 2) >= 0) { 
-	  cp = &p[Rank][1];
-	  for (k=0; k<Dimension; k++) {
-	    value_division (*cp,*cp,gcd);       /* *cp /= gcd */    
-	    cp++;
-	  }
-	}
+	if (value_cmp_si(gcd, 2) >= 0)
+	  Vector_AntiScale(p[Rank]+1, p[Rank]+1, gcd, Dimension);
 	
-	/* if (Mat->p[Rank][j] < 0) */
-	if (value_neg_p(p[Rank][j])) { 
-	  cp = p[Rank]+1;	
-	  for (k=0; k<Dimension; k++) { 
-	    value_oppose(*cp, *cp); /* *cp *= -1 */ 
-	    cp++;
-	  }
-	}
-	/* End of normalize */
+	if (value_neg_p(p[Rank][j]))
+	  Vector_Oppose(p[Rank]+1, p[Rank]+1, Dimension);
 	
 	pivot=i;
 	for (i=pivot+1; i<NbEq; i++) {  /* Zero out the rest of the column */
@@ -887,93 +859,51 @@ int Gauss(Matrix *Mat, int NbEq, int Dimension)
 static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsigned *Filter) { 
   
   int i, j, k;
-  unsigned Dimension, sat_nbcolumns, NbRay, NbConstraints, RowSize1, RowSize2, 
+  unsigned Dimension, sat_nbcolumns, NbRay, NbConstraints, RowSize2,
            *Trace = NULL, *bx = NULL, *jx = NULL, Dim_RaySpace, b;
   unsigned NbBid, NbUni, NbEq, NbIneq;
   unsigned NbBid2, NbUni2, NbEq2, NbIneq2;
   int Redundant;
   int aux, *temp2 = NULL;
   Polyhedron *Pol = NULL;
-  Value *temp1 = NULL;
-  Value *p, *q;
-  Value Status,tmp1,tmp2,tmp3;
+  Vector *temp1 = NULL;
+  unsigned Status;
   
   Dimension = Mat->NbColumns-1;     /* Homogeneous Dimension */
   NbRay = Ray->NbRows;
   sat_nbcolumns = Sat->NbColumns;
   NbConstraints = Mat->NbRows;
-  RowSize1=(Dimension+1);
   RowSize2=sat_nbcolumns * sizeof(int);
   
-  temp1=(Value *)malloc(RowSize1*sizeof(Value));
-  if(!temp1) {	
+  temp1 = Vector_Alloc(Dimension+1);
+  if (!temp1) {
     errormsg1("Remove_Redundants", "outofmem", "out of memory space");
     return 0;
   }
 
-  /* Initialize all the 'Value' variables */
-  value_init(Status); value_init(tmp1);
-  value_init(tmp2); value_init(tmp3);
-  
-  for(i=0;i<RowSize1;i++)
-    value_init(temp1[i]);
-
-  temp2=(int *)malloc(RowSize2);
-  if(!temp2) {
-    errormsg1("Remove_Redundants", "outofmem", "out of memory space");
-    
-    /* Clear all the 'Value' variables */
-    value_clear(Status); value_clear(tmp1);
-    value_clear(tmp2); value_clear(tmp3);
-    for(i=0;i<RowSize1;i++)
-      value_clear(temp1[i]);
-    free(temp1);
-    return 0;
+  if (Filter) {
+    temp2 = (int *)calloc(sat_nbcolumns, sizeof(int));
+    if (!temp2)
+      goto oom;
   }
   
   /* Introduce indirections into saturation matrix 'Sat' to simplify */
   /* processing with 'Sat' and allow easy exchanges of columns.      */
   bx = (unsigned *)malloc(NbConstraints * sizeof(unsigned));
-  if(!bx) {
-    errormsg1("Remove_Redundants", "outofmem", "out of memory space");
-    
-    /* Clear all the 'Value' variables */
-    value_clear(Status); value_clear(tmp1);
-    value_clear(tmp2); value_clear(tmp3);
-    for(i=0;i<RowSize1;i++)
-      value_clear(temp1[i]);
-    free(temp1); free(temp2);
-    return 0;
-  }
+  if (!bx)
+    goto oom;
   jx = (unsigned *)malloc(NbConstraints * sizeof(unsigned));
-  if(!jx) {
-    errormsg1("Remove_Redundants", "outofmem", "out of memory space");
-    
-    /* Clear all the 'Value' variables */
-    value_clear(Status); value_clear(tmp1);
-    value_clear(tmp2); value_clear(tmp3);
-    for(i=0;i<RowSize1;i++)
-      value_clear(temp1[i]);
-    free(temp1); free(temp2); free(bx);
-    return 0;
-  }
+  if (!jx)
+    goto oom;
   CATCH(any_exception_error) {  
     
-    if (temp1) {           
-      for(i=0;i<RowSize1;i++)
-	value_clear(temp1[i]);
-      free(temp1);
-    }  
+    Vector_Free(temp1);
     if (temp2) free(temp2);
     if (bx) free(bx);
     if (jx) free(jx);
     if (Trace) free(Trace);
     if (Pol) Polyhedron_Free(Pol);
 
-    /* Clear all the 'Value' variables */
-    value_clear(Status); value_clear(tmp1);
-    value_clear(tmp2); value_clear(tmp3);
-    
     RETHROW();
   }
   TRY {
@@ -1011,19 +941,8 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     }
     
     /* If no vertices, return an empty polyhedron. */
-    if (!aux) { 
-      
-      /* Clear all the 'Value' variables */
-      value_clear(Status); value_clear(tmp1);
-      value_clear(tmp2); value_clear(tmp3);
-      for(i=0;i<RowSize1;i++)
-	value_clear(temp1[i]);
-      
-      /* Return an empty polyhedron */
-      free(temp1); free(temp2); free(jx); free(bx);
-      UNCATCH(any_exception_error);
-      return Empty_Polyhedron(Dimension-1);
-    }
+    if (!aux)
+      goto empty;
     
 #ifdef POLY_RR_DEBUG
     fprintf(stderr, "[Remove_redundants : Init]\nConstraints =");
@@ -1042,7 +961,6 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
      */
     
     NbEq=0;
-    memset((char *)temp2, 0, RowSize2);
     
 #ifdef POLY_RR_DEBUG
     fprintf (stderr, " j = ");
@@ -1062,16 +980,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
       value_set_si(Mat->p[j][0],0);
       
       /* Identify and remove the positivity constraint 1>=0 */
-      for (i=1, p = &Mat->p[j][1]; i<Dimension; i++) { 
-	
-	/* if (*p) */
-	if (value_notzero_p(*p)) {
-	  p++; 
-	  break;
-	}
-	else 
-	  p++;
-      }
+      i = First_Non_Zero(Mat->p[j]+1, Dimension-1);
       
 #ifdef POLY_RR_DEBUG
       fprintf(stderr, "[Remove_redundants : IntoStep1]\nConstraints =");
@@ -1083,7 +992,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
       /* is 1==0. If constraint(j) saturates all the rays of the matrix 'Ray'*/
       /* then it is an equality. in this case, return an empty polyhedron.   */
       
-      if (i==Dimension) { 
+      if (i == -1) {
 	for (i=0; i<NbRay; i++)
 	  if (!(Sat->p[i][jx[j]]&bx[j])) {
 	    
@@ -1093,26 +1002,14 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
 	
         /* if ((Mat->p[j][0] == NbRay) &&   : it is an equality
 	   (Mat->p[j][Dimension] != 0)) : and its not 0=0 */
-	value_set_si(tmp1,NbRay);
-        if ((value_eq(Mat->p[j][0],tmp1)) &&  
-            (value_notzero_p(Mat->p[j][Dimension]))) {
-	  
-	  /* Clear all the 'Value' variables */
-	  value_clear(Status); value_clear(tmp1);
-	  value_clear(tmp2); value_clear(tmp3);
-	  for(i=0;i<RowSize1;i++)
-	    value_clear(temp1[i]);
-	  
-	  /* Return an empty polyhedron */
-	  free(temp1); free(temp2); free(jx); free(bx);
-	  UNCATCH(any_exception_error);
-	  return Empty_Polyhedron(Dimension-1);
-        }
+        if ((value_cmp_si(Mat->p[j][0], NbRay) == 0) &&
+            (value_notzero_p(Mat->p[j][Dimension])))
+	  goto empty;
 	
         /* Delete the positivity constraint */
         NbConstraints--;
         if (j==NbConstraints) continue;
-        Vector_Exchange(Mat->p[j], Mat->p[NbConstraints],RowSize1);
+        Vector_Exchange(Mat->p[j], Mat->p[NbConstraints], temp1->Size);
         exchange(jx[j], jx[NbConstraints], aux);
         exchange(bx[j], bx[NbConstraints], aux);
         j--; continue;
@@ -1131,8 +1028,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
 	}
       
       /* if (Mat->p[j][0]==NbRay) then increment the number of eq. count */
-      value_set_si(tmp1,NbRay);
-      if (value_eq(Mat->p[j][0],tmp1)) 
+      if (value_cmp_si(Mat->p[j][0], NbRay) == 0)
 	NbEq++;    /* all vertices/rays are saturated */
     }
     Mat->NbRows = NbConstraints;
@@ -1151,8 +1047,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
       /* 'NbBid' by one.                                               */
       
       /* if (Ray->p[i][0]==NbConstraints+1) */
-      value_set_si(tmp1,(NbConstraints+1));
-      if (value_eq(Ray->p[i][0],tmp1))
+      if (value_cmp_si(Ray->p[i][0], NbConstraints+1) == 0)
 	NbBid++;
     }
     
@@ -1173,25 +1068,24 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     for (i=0; i<NbEq; i++) {
       
       /* If constraint(i) doesn't saturate some ray, then it is an inequality*/
-      value_set_si(tmp1,NbRay);
-      if (value_ne(Mat->p[i][0],tmp1)) { 
+      if (value_cmp_si(Mat->p[i][0], NbRay) != 0) {
 	
-	value_set_si(tmp1,NbRay);
 	/* Skip over inequalities and find an equality */
-	for (k=i+1;value_ne(Mat->p[k][0],tmp1) && k<NbConstraints;k++);
+	for (k=i+1; value_cmp_si(Mat->p[k][0], NbRay) != 0 && k < NbConstraints; k++)
+	  ;
 	if (k==NbConstraints) /* If none found then error */ break;
 	
 	/* Slide inequalities down the array 'Mat' and move equality up to */
 	/* position 'i'.                                                   */
-	Vector_Copy(Mat->p[k], temp1,RowSize1);
+	Vector_Copy(Mat->p[k], temp1->p, temp1->Size);
 	aux = jx[k];
 	j   = bx[k];
 	for (;k>i;k--) {  
-	  Vector_Copy(Mat->p[k-1],Mat->p[k],RowSize1);
+	  Vector_Copy(Mat->p[k-1], Mat->p[k], temp1->Size);
 	  jx[k] = jx[k-1];
 	  bx[k] = bx[k-1];
 	}
-	Vector_Copy(temp1,Mat->p[i],RowSize1);
+	Vector_Copy(temp1->p, Mat->p[i], temp1->Size);
 	jx[i] = aux;
 	bx[i] = j;
       }
@@ -1218,15 +1112,11 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
 	/* Detect implicit constraints such as y>=3 and y<=3 */
 	Redundant = 0;
 	for (j=i+1; j<NbEq; j++) {
-	  for (k=0, p=&Mat->p[i][1], q=&Mat->p[j][1]; k<Dimension; k++,p++,q++) {  
-	    /* if (*p!=*q) */
-	    if (value_ne(*p, *q)) 
-	      break;
-	  }
-	  
+	  /* Only check equalities, i.e., 'temp2' has entry 1             */
+	  if (!(temp2[jx[j]] & bx[j]))
+	    continue;
 	  /* Redundant if both are same `and' constraint(j) was equality. */
-	  /* That is, 'temp2' has entry 1                                 */
-	  if (k==Dimension && (temp2[jx[j]] & bx[j])) { 
+	  if (Vector_Equal(Mat->p[i]+1, Mat->p[j]+1, Dimension)) {
 	    Redundant=1; 
 	    break;
 	  }
@@ -1256,18 +1146,8 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     /* If number of equalities is not less then the homogenous dimension, */
     /* return an empty polyhedron.                                        */
     
-    if (NbEq2>=Dimension) {		
-      
-      /* Clear all the 'Value' variables */
-      value_clear(Status); value_clear(tmp1);
-      value_clear(tmp2); value_clear(tmp3);
-      for(i=0;i<RowSize1;i++)
-	value_clear(temp1[i]);
-      
-      free(temp1); free(temp2); free(jx); free(bx);
-      UNCATCH(any_exception_error);
-      return Empty_Polyhedron(Dimension-1);
-    }
+    if (NbEq2 >= Dimension)
+      goto empty;
     
 #ifdef POLY_RR_DEBUG
     fprintf(stderr, "[Remove_redundants : Step3]\nConstraints =");
@@ -1285,18 +1165,16 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     
     
     for (i=0, k=NbRay; i<NbBid && k>i; i++) {
-      value_set_si(tmp1,(NbConstraints+1));
-      
       /* If ray(i) doesn't saturate some constraint then it is not a line */
-      if (value_ne(Ray->p[i][0],tmp1)) { 
+      if (value_cmp_si(Ray->p[i][0], NbConstraints+1) != 0) {
 	
-	value_set_si(tmp1,(NbConstraints+1));
 	/* Skip over rays and vertices and find a line (bi-directional rays) */
-	while (--k >i && value_ne(Ray->p[k][0],tmp1)) ;
+	while (--k > i && value_cmp_si(Ray->p[k][0], NbConstraints+1) != 0)
+	  ;
 	
 	/* Exchange positions of ray(i) and line(k), thus sorting lines to */
 	/* the top of matrix 'Ray'.                                        */
-	Vector_Exchange(Ray->p[i], Ray->p[k], RowSize1);
+	Vector_Exchange(Ray->p[i], Ray->p[k], temp1->Size);
 	bexchange(Sat->p[i], Sat->p[k], RowSize2);
       }     
     }	
@@ -1326,16 +1204,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     /* an empty polyhedron.                                                 */
     if (NbBid2>=Dimension) {
       errormsg1("RemoveRedundants", "rmrdt", "dimension error");
-      
-      /* Clear all the 'Value' variables */
-      value_clear(Status); value_clear(tmp1);
-      value_clear(tmp2); value_clear(tmp3);
-      for(i=0;i<RowSize1;i++)
-	value_clear(temp1[i]);
-      
-      free(temp1); free(temp2); free(jx); free(bx);
-      UNCATCH(any_exception_error);
-      return Empty_Polyhedron(Dimension-1);
+      goto empty;
     }
     
     /* Compute dimension of non-homogenous ray space */
@@ -1355,42 +1224,20 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
      * store count in 'NbIneq'.  
      */
  
-    value_set_si(tmp2,Dim_RaySpace);
-    value_set_si(tmp3,NbRay);
     NbIneq=0;
     for (j=0; j<NbConstraints; j++) {
       
       /* Identify and remove the positivity constraint 1>=0 */
-      for (i=1, p = &Mat->p[j][1]; i<Dimension; i++)
-	if (value_notzero_p (*p)) {
-	  p++; 
-	  break;
-	}
-	else
-	  p++;
+      i = First_Non_Zero(Mat->p[j]+1, Dimension-1);
       
       /* Check if constraint(j) is a positivity constraint, 1>= 0, or if it */
       /* is 1==0.                                                           */
-      if (i==Dimension) {  
-	
-	value_set_si(tmp1,NbRay);
-	
+      if (i == -1) {
         /* if ((Mat->p[j][0]==NbRay) &&   : it is an equality 
 	   (Mat->p[j][Dimension]!=0))    : and its not 0=0 */
-        if ((value_eq (Mat->p[j][0],tmp1)) &&
-            (value_notzero_p(Mat->p[j][Dimension]))) {
-	  
-	  /* Clear all the 'Value' variables */
-	  value_clear(Status); value_clear(tmp1);
-	  value_clear(tmp2); value_clear(tmp3);
-	  for(i=0;i<RowSize1;i++)
-	    value_clear(temp1[i]);
-	  
-	  /* Return an empty polyhedron */
-	  free(temp1); free(temp2); free(jx); free(bx);
-	  UNCATCH(any_exception_error);
-	  return Empty_Polyhedron(Dimension-1);
-        }	
+        if ((value_cmp_si(Mat->p[j][0], NbRay) == 0) &&
+            (value_notzero_p(Mat->p[j][Dimension])))
+	  goto empty;
 	
         /* Set the positivity constraint redundant by setting status element */
         /* equal to 2.                                                       */
@@ -1398,33 +1245,17 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
         continue;
       }
       
-      /* Status = Mat->p[j][0] */
-      value_assign(Status, Mat->p[j][0]);
+      Status = VALUE_TO_INT(Mat->p[j][0]);
       
-      /* if (Status == 0) then constraint is redundant */
-      if (value_zero_p(Status)) 	
-	
-	/* Mat->p[j][0]=2 : redundant */
-	value_set_si(Mat->p[j][0],2);	
-      
-      /* else if (Status<Dim_RaySpace) then constraint is redundant */   
-      else if (value_lt(Status,tmp2)) 	
-	
-	/* Mat->p[j][0]=2 : redundant */
-	value_set_si(Mat->p[j][0],2);	
-      
-      /* else if (Status==NbRay) then constraint is an equality */
-      else if (value_eq(Status,tmp3)) 	
-	
-	/* Mat->p[j][0]=0 : equality */
-	value_set_si(Mat->p[j][0],0);
-      
-      /* else constraint is an irredundant inequality */ 
+      if (Status == 0) 	
+	value_set_si(Mat->p[j][0], 2);	/* constraint is redundant */
+      else if (Status < Dim_RaySpace) 	
+	value_set_si(Mat->p[j][0], 2);	/* constraint is redundant */
+      else if (Status == NbRay) 	
+	value_set_si(Mat->p[j][0], 0);	/* constraint is an equality */
       else { 
-	NbIneq++; 	
-	
-	/* Mat->p[j][0]=1 : inequality */
-	value_set_si(Mat->p[j][0],1);
+	NbIneq++; 			/* constraint is an irredundant inequality */ 
+	value_set_si(Mat->p[j][0], 1);	/* inequality */
       }
     }
     
@@ -1440,32 +1271,17 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
      * Count the irredundant Rays and store count in 'NbUni'. 
      */
     
-    value_set_si(tmp2,Dim_RaySpace);
-    value_set_si(tmp3,(NbConstraints+1));
     NbUni=0;
     for (j=0; j<NbRay; j++) { 
+      Status = VALUE_TO_INT(Ray->p[j][0]);
       
-      /* Status = Ray->p[j][0] */
-      value_assign(Status, Ray->p[j][0]);
-      
-      /* if (Status < Dim_RaySpace) the ray is redundant */
-      if (value_lt(Status,tmp2)) 	
-	
-	/* Ray->p[j][0]=2 : redundant */
-	value_set_si(Ray->p[j][0],2);	
-      
-      /* else if (Status == (NbConstraints+1)) then ray is a line */
-      else if (value_eq(Status,tmp3)) 
-	
-	/* Ray->p[j][0]=0 : line */
-	value_set_si(Ray->p[j][0],0);
-      
-      /* else ray is an irredundant unidirectional ray. */
+      if (Status < Dim_RaySpace) 	
+	value_set_si(Ray->p[j][0], 2);	/* ray is redundant */
+      else if (Status == NbConstraints+1) 
+	value_set_si(Ray->p[j][0], 0);	/* ray is a line */
       else {
-	NbUni++; 
-	
-	/* Ray->p[j][0]=1 : ray */
-	value_set_si(Ray->p[j][0],1);
+	NbUni++;			/* an irredundant unidirectional ray. */
+	value_set_si(Ray->p[j][0], 1);	/* ray */
       }
     }
     
@@ -1479,17 +1295,8 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     
     Pol = Polyhedron_Alloc(Dimension-1, NbIneq+NbEq2+1, NbUni+NbBid2);
     if (!Pol) {
-      errormsg1("Remove_redundants", "outofmem", "out of memory space");
-      
-      /* Clear all the 'Value' variables */
-      value_clear(Status); value_clear(tmp1);
-      value_clear(tmp2); value_clear(tmp3);
-      for(i=0;i<RowSize1;i++)
-	value_clear(temp1[i]);
-      
-      free(temp1); free(temp2); free(jx); free(bx);
       UNCATCH(any_exception_error);
-      return 0;
+      goto oom;
     }
     Pol->NbBid = NbBid2;
     Pol->NbEq  = NbEq2;
@@ -1520,17 +1327,8 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     /* which saturate some constraint 'j'. See figure below:-               */
     Trace=(unsigned *)malloc(sat_nbcolumns * sizeof(unsigned));
     if(!Trace) {
-      errormsg1("Remove_Redundants", "outofmem", "out of memory space");
-      
-      /* Clear all the 'Value' variables */
-      value_clear(Status); value_clear(tmp1);
-      value_clear(tmp2); value_clear(tmp3);
-      for(i=0;i<RowSize1;i++)
-	value_clear(temp1[i]);
-      
-      free(temp1); free(temp2); free(jx); free(bx);
       UNCATCH(any_exception_error);
-      return 0;
+      goto oom;
     }
     
     /*                         NbEq      NbConstraints
@@ -1613,17 +1411,8 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     
     Trace=(unsigned *)malloc(NbRay * sizeof(unsigned));
     if(!Trace) {
-      errormsg1("Remove_Redundants", "outofmem", "out of memory space");
-      
-      /* Clear all the 'Value' variables */
-      value_clear(Status); value_clear(tmp1);
-      value_clear(tmp2); value_clear(tmp3);
-      for(i=0;i<RowSize1;i++)
-	value_clear(temp1[i]);
-      
-      free(bx); free(jx); free(temp2); free(temp1);
       UNCATCH(any_exception_error);
-      return 0;
+      goto oom;
     }
     
     /* 			   NbEq     NbConstraints
@@ -1726,20 +1515,39 @@ NbBid -	|	|       |      | |   |  |  |e|
   free(Trace);
   free(bx);
   free(jx);
-  free(temp2);
+  if (temp2)
+    free(temp2);
   
   Pol->NbConstraints = NbEq2 + NbIneq2;
   Pol->NbRays = NbBid2 + NbUni2;
   
-  /* Clear all the 'Value' variables */
-  value_clear(Status); value_clear(tmp1);
-  value_clear(tmp2); value_clear(tmp3);
-  for(i=0;i<RowSize1;i++)
-    value_clear(temp1[i]);
-  free(temp1);
+  Vector_Free(temp1);
   F_SET(Pol, 
         POL_VALID | POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
   return Pol;
+
+oom:
+  errormsg1("Remove_Redundants", "outofmem", "out of memory space");
+
+  Vector_Free(temp1);
+  if (temp2)
+    free(temp2);
+  if (bx)
+    free(bx);
+  if (jx)
+    free(jx);
+  return NULL;
+
+empty:
+  Vector_Free(temp1);
+  if (temp2)
+    free(temp2);
+  if (bx)
+    free(bx);
+  if (jx)
+    free(jx);
+  UNCATCH(any_exception_error);
+  return Empty_Polyhedron(Dimension-1);
 } /* Remove_Redundants */
 
 /*
@@ -1819,8 +1627,8 @@ void Domain_Free(Polyhedron *Pol)
 /*
  * Print the contents of a polyhedron. 
  */
-void Polyhedron_Print(FILE *Dst,char *Format,Polyhedron *Pol) { 
-
+void Polyhedron_Print(FILE *Dst, const char *Format, const Polyhedron *Pol)
+{
   unsigned Dimension, NbConstraints, NbRays;
   int      i, j;
   Value    *p;
@@ -2154,8 +1962,9 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
     if (POL_ISSET(NbMaxRays, POL_INTEGER))
       value_clear(tmp);
     Pol = Polyhedron_Alloc(Dimension-1, Constraints->NbRows - (NbEq-Rank), 0);
-    Vector_Copy(Constraints->p[0], Pol->Constraint[0], 
-		Rank * Constraints->NbColumns);
+    if (Rank > 0)
+	Vector_Copy(Constraints->p[0], Pol->Constraint[0], 
+		    Rank * Constraints->NbColumns);
     if (Constraints->NbRows > NbEq)
 	Vector_Copy(Constraints->p[NbEq], Pol->Constraint[Rank], 
 		    (Constraints->NbRows - NbEq) * Constraints->NbColumns);
@@ -2491,7 +2300,24 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
   if (NbConstraints == 0)
     return Polyhedron_Copy(Pol);
   
-  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_INEQUALITIES(Pol);
+  Dimension	= Pol->Dimension + 2;	/* Homogeneous Dimension + Status */
+
+  if (POL_ISSET(NbMaxRays, POL_NO_DUAL)) {
+    NbCon      	= Pol->NbConstraints + NbConstraints;
+    
+    Mat = Matrix_Alloc(NbCon, Dimension);
+    if (!Mat) {
+      errormsg1("AddConstraints", "outofmem", "out of memory space");
+      return NULL;
+    }
+    Vector_Copy(Pol->Constraint[0], Mat->p[0], Pol->NbConstraints * Dimension);
+    Vector_Copy(Con, Mat->p[Pol->NbConstraints], NbConstraints * Dimension);  
+    NewPol = Constraints2Polyhedron(Mat, NbMaxRays);
+    Matrix_Free(Mat);  
+    return NewPol;
+  }
+
   POL_ENSURE_VERTICES(Pol);
 
   CATCH(any_exception_error) {
@@ -2504,11 +2330,6 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
   TRY {
     NbRay	= Pol->NbRays;
     NbCon      	= Pol->NbConstraints + NbConstraints;
-    Dimension	= Pol->Dimension + 2;	/* Homogeneous Dimension + Status */
-
-    /* Ignore for now */
-    if (POL_ISSET(NbMaxRays, POL_NO_DUAL))
-      NbMaxRays = 0;
 
     if (NbRay > NbMaxRays)
       NbMaxRays = NbRay;
@@ -3465,7 +3286,9 @@ Polyhedron *DomainSimplify(Polyhedron *Pol1, Polyhedron *Pol2, unsigned NbMaxRay
   Dimension = Pol1->Dimension+2;     /* Homogenous Dimension + Status  */
   d = (Polyhedron *)0;
   for (p1=Pol1; p1; p1=p1->next) { 
-    
+
+    POL_ENSURE_VERTICES(p1);
+
     /* Filter is an array of integers, each bit in an element of Filter */
     /* array corresponds to a constraint. The bit is marked 1 if the    */
     /* corresponding constraint is non-redundant and is 0 if it is      */
@@ -3488,6 +3311,8 @@ Polyhedron *DomainSimplify(Polyhedron *Pol1, Polyhedron *Pol2, unsigned NbMaxRay
     /* Filter the constraints of p1 in context of polyhedra p2(s) */
     empty = 1;
     for (p2=Pol2; p2; p2=p2->next) {
+
+      POL_ENSURE_VERTICES(p2);
       
       /* Store the non-redundant constraints in array 'Filter'. With    */
       /* successive loops, the array 'Filter' holds the union of all    */
@@ -3761,8 +3586,10 @@ Polyhedron *DomainConvex(Polyhedron *Pol,unsigned NbMaxConstrs) {
       return (Polyhedron*) 0;
     }
     
+    POL_ENSURE_VERTICES(Pol);
     NewPol = Polyhedron_Copy(Pol);
     for (p=Pol->next; p; p=p->next) {
+      POL_ENSURE_VERTICES(p);
       q = AddRays(p->Ray[0], p->NbRays, NewPol, NbMaxConstrs);
       Polyhedron_Free(NewPol);
       NewPol = q;
@@ -3839,6 +3666,7 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
   
   int i, j, k;
   Polyhedron *p = NULL, **next, *result = NULL;
+  unsigned dim;
 
   CATCH(any_exception_error) {
     if (result) Polyhedron_Free(result);
@@ -3847,26 +3675,34 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
   TRY {
     
     if (!Pol) return Pol;
+    dim = Pol->Dimension;
     if (align_dimension < Pol->Dimension) {
       errormsg1("align_context", "diffdim", "context dimension exceeds data");
       UNCATCH(any_exception_error);
-      return Pol;
+      return NULL;
     }
     if (align_dimension == Pol->Dimension) {
       UNCATCH(any_exception_error);
-      return Polyhedron_Copy(Pol);
+      return Domain_Copy(Pol);
     }
 
     /* 'k' is the dimension increment */
     k = align_dimension - Pol->Dimension;
     next = &result;
 
-    /* Expand the dimension of all polyhedron in the polyhedral domain 'Pol' */
+    /* Expand the dimension of all polyhedra in the polyhedral domain 'Pol' */
     for (; Pol; Pol=Pol->next) {
       int have_cons = !F_ISSET(Pol, POL_VALID) || F_ISSET(Pol, POL_INEQUALITIES);
       int have_rays = !F_ISSET(Pol, POL_VALID) || F_ISSET(Pol, POL_POINTS);
       unsigned NbCons = have_cons ? Pol->NbConstraints : 0;
       unsigned NbRays = have_rays ? Pol->NbRays + k : 0;
+
+      if (Pol->Dimension != dim) {
+	Domain_Free(result);
+	errormsg1("align_context", "diffdim", "context not of uniform dimension");
+	UNCATCH(any_exception_error);
+	return NULL;
+      }
 
       p = Polyhedron_Alloc(align_dimension, NbCons, NbRays);
       if (have_cons) {
@@ -3986,8 +3822,14 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
   flag = LB_INFINITY | UB_INFINITY;
   for (i=0; i<P->NbConstraints; i++) {
     value_assign(d,P->Constraint[i][pos]);
-    if (value_zero_p(d)) continue;    
     Inner_Product(&context[1],&(P->Constraint[i][1]),P->Dimension+1,&n);
+    if (value_zero_p(d)) {
+      /* If context doesn't satisfy constraints, return empty loop. */
+      if (value_neg_p(n) ||
+	  (value_zero_p(P->Constraint[i][0]) && value_notzero_p(n)))
+	goto empty_loop;
+      continue;
+    }
     value_oppose(n,n);
     
     /*---------------------------------------------------*/
@@ -4006,15 +3848,9 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
       value_modulus(tmp,n,d);
       
       /* if not integer, return 0; */
-      if(value_notzero_p(tmp)) {
-	value_set_si(*LBp,1);
-	value_set_si(*UBp,0);	/* empty loop */
-	
-	/* Clear all the 'Value' variables */
-	value_clear(LB); value_clear(UB); value_clear(tmp);
-	value_clear(n); value_clear(n1); value_clear(d);
-	return 0;
-      }
+      if (value_notzero_p(tmp))
+	goto empty_loop;
+
       value_division(n1,n,d);
       
       /* Upper and Lower bounds found */
@@ -4064,6 +3900,13 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
   }
   if ((flag & LB_INFINITY)==0) value_assign(*LBp,LB);
   if ((flag & UB_INFINITY)==0) value_assign(*UBp,UB);
+
+  if (0) {
+empty_loop:
+    flag = 0;
+    value_set_si(*LBp, 1);
+    value_set_si(*UBp, 0);	/* empty loop */
+  }
   
   /* Clear all the 'Value' variables */
   value_clear(LB); value_clear(UB); value_clear(tmp);
@@ -4777,7 +4620,7 @@ Polyhedron *Disjoint_Domain( Polyhedron *P, int flag, unsigned NbMaxRays )
 
 
 /* Procedure to print constraint matrix of a polyhedron */
-void Polyhedron_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
+void Polyhedron_PrintConstraints(FILE *Dst, const char *Format, Polyhedron *Pol)
 {
 	int i,j;
 
@@ -4792,7 +4635,7 @@ void Polyhedron_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
 }
 
 /* Procedure to print constraint matrix of a domain */
-void Domain_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
+void Domain_PrintConstraints(FILE *Dst, const char *Format, Polyhedron *Pol)
 {
     Polyhedron *Q;
     for (Q = Pol; Q; Q = Q->next)
@@ -4808,16 +4651,24 @@ static Polyhedron *p_simplify_constraints(Polyhedron *P, Vector *row,
 
     /* Also look at equalities.
      * If an equality can be "simplified" then there
-     * are no integer solutions anyway and the following loop
-     * will add a conflicting constraint
+     * are no integer solutions and we return an empty polyhedron
      */
     for (r = 0; r < R->NbConstraints; ++r) {
 	if (ConstraintSimplify(R->Constraint[r], row->p, len, g)) {
 	    T = R;
-	    R = AddConstraints(row->p, 1, R, MaxRays);
+	    if (value_zero_p(R->Constraint[r][0])) {
+		R = Empty_Polyhedron(R->Dimension);
+		r = R->NbConstraints;
+	    } else if (POL_ISSET(MaxRays, POL_NO_DUAL)) {
+		R = Polyhedron_Copy(R);
+		F_CLR(R, POL_FACETS | POL_VERTICES | POL_POINTS);
+		Vector_Copy(row->p+1, R->Constraint[r]+1, R->Dimension+1);
+	    } else {
+		R = AddConstraints(row->p, 1, R, MaxRays);
+		r = -1;
+	    }
 	    if (T != P)
 		Polyhedron_Free(T);
-	    r = -1;
 	}
     }
     if (R != P)

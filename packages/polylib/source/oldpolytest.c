@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /* polytest.c */
 #include <stdio.h>
 #include <polylib/polylib.h>
@@ -361,9 +378,9 @@ int GaussSimplify(Matrix *Mat1,Matrix *Mat2) {
 	    value_init(a); value_init(a1); value_init(a2);
 	    value_absolute(a1,Mat1->p[i][j]);
 	    value_absolute(a2,Mat1->p[Rank][j]);
-	    Gcd(a1,a2,&a));
-	    value_division(a1,a1,a);
-	    value_division(a2,a2,a);
+	    value_gcd(a, a1, a2));
+	    value_divexact(a1, a1, a);
+	    value_divexact(a2, a2, a);
 	    value_oppose(a1,a1);
 	    Vector_Combine(Mat1->p[i],Mat1->p[Rank],Mat1->p[i],a2, 
 			   a1,NbCols);
@@ -396,9 +413,9 @@ int GaussSimplify(Matrix *Mat1,Matrix *Mat2) {
 	  value_init(a); value_init(a1); value_init(a2);
 	  value_absolute(a1,Mat2->p[i][j]);
 	  value_absolute(a2,Mat2->p[k][j]);
-	  Gcd(a1,a2,&a);
-	  value_division(a1,a1,a);
-	  value_division(a2,a2,a);
+	  value_gcd(a, a1, a2);
+	  value_divexact(a1, a1, a);
+	  value_divexact(a2, a2, a);
 	  value_oppose(a1,a1);
 	  if (value_one_p(a2)) {
 	    Vector_Combine(Mat2->p[i],Mat1->p[k],Mat2->p[i],a2,

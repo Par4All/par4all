@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /** homogenization.c 
     copyright 2004-2005 Bavo Nootaert
 **/
@@ -114,9 +131,9 @@ static evalue *dehomogenize_polynomial(enode *en){
   }
   
   /** simplify num/den **/
-  Gcd(num, den, &gcd);
-  value_division(num, num, gcd);
-  value_division(den, den, gcd);
+  value_gcd(gcd, num, den);
+  value_divexact(num, num, gcd);
+  value_divexact(den, den, gcd);
 
   /** create new evalue representing num/den**/
   enn = (evalue*)malloc(sizeof(evalue));

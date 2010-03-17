@@ -29,3 +29,4 @@ tests:
 	else \
 	        echo "Test ehrhart_ranking works correctly"; \
         fi
+CLEANFILES=xyz

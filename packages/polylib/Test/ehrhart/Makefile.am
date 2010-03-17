@@ -4,7 +4,8 @@
 
 OBJ_DIR = $(top_builddir)
 
-EHRHART =  \
+
+EHRHART_BASE =  \
 	0D.in \
 	0D2.in \
 	8hedron.in \
@@ -49,14 +50,18 @@ EHRHART =  \
 	t12.in\
 	tpar.in
 
-EXTRA_DIST = $(EHRHART) \
-	$(EHRHART:%.in=%.out) 
+EHRHART_EXTRA=bart8.in isnm2.in e16.in esum.in t12.in
 
-# These do not pass in 32 bits mode (integer overflow): isnm isnm2 e16
-OVER = $(if $(findstring 32, $(TEST_BITS)), \
-	    bart8.in isnm.in isnm2.in e16.in esum.in t12.in,)
+EHRHART=$(EHRHART_BASE) $(EHRHART_EXTRA)
 
-EHRHART_TESTS = $(filter-out $(LONG_EHRHART_TESTS) $(OVER), $(EHRHART))
+EXTRA_DIST = $(EHRHART)
+
+# not using %.in GNU extension
+dist-hook:
+	for pl_file in $(EHRHART) ; do test -f $(distdir)/`basename $$pl_file .in`.out || cp -p $(srcdir)/`basename $$pl_file .in`.out $(distdir) ; done
+
+# not using filter-out gnu extension
+EHRHART_TESTS = `if test $(TEST_BITS) = 32 ; then echo $(EHRHART_BASE) ; else echo $(EHRHART) ; fi `
 
 tests:
 	@failedtest=0; \
@@ -83,3 +88,4 @@ longtest:
 		echo "Verify Ehrhart for $$x"; \
 		$(OBJ_DIR)/verif_ehrhart$(TEST_BITS) < $(srcdir)/$$x ;\
 	done ;
+CLEANFILES=xyz
