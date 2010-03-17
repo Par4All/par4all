@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /* vector.c
           COPYRIGHT
           Both this software and its documentation are
@@ -173,8 +190,8 @@ void Vector_Free(Vector *vector) {
 /* 
  * Print the contents of a Vector 
  */
-void Vector_Print(FILE *Dst,char *Format,Vector *vector) {
-  
+void Vector_Print(FILE *Dst, const char *Format, Vector *vector)
+{
   int i;
   Value *p;
   unsigned length;
@@ -340,35 +357,40 @@ void Vector_Scale(Value *p1,Value *p2,Value lambda,unsigned length) {
 
 /* 
  * Antiscale Vector 'p1' by lambda and store in 'p2' 
+ * Assumes all elements of 'p1' are divisble by lambda.
  */
-void Vector_AntiScale(Value *p1,Value *p2,Value lambda,unsigned length) {
-  
-  Value *cp1, *cp2;
+void Vector_AntiScale(Value *p1, Value *p2, Value lambda, unsigned length)
+{
   int i;
   
-  cp1=p1;
-  cp2=p2;
-  for (i=0;i<length;i++) {
-    
-    /* *cp2++=*cp1++ / lambda; */
-    value_division(*cp2,*cp1,lambda);
-    cp1++; cp2++;
-  }
+  for (i = 0; i < length; i++)
+    value_divexact(p2[i], p1[i], lambda);
 } /* Vector_AntiScale */
+
+/*
+ * Puts negative of 'p1' in 'p2'
+ */
+void Vector_Oppose(Value *p1, Value *p2, unsigned len)
+{
+  unsigned i;
+
+  for (i = 0; i < len; ++i)
+    value_oppose(p2[i], p1[i]);
+}
 
 /* 
  * Return the inner product of the two Vectors 'p1' and 'p2' 
  */
-void Inner_Product(Value *p1,Value *p2,unsigned length,Value *ip) {
-  
+void Inner_Product(Value *p1, Value *p2, unsigned length, Value *ip)
+{
   int i;
 
-  value_multiply(*ip,*p1,*p2);
-  p1++; p2++;
-  for(i=1;i<length;i++) {
-    value_addmul(*ip, *p1, *p2);
-    p1++; p2++;
-  }
+  if (length != 0)
+    value_multiply(*ip, p1[0], p2[0]);
+  else
+    value_set_si(*ip, 0);
+  for(i = 1; i < length; i++)
+    value_addmul(*ip, p1[i], p2[i]);
 } /* Inner_Product */
 
 /* 
@@ -409,52 +431,34 @@ void Vector_Min(Value *p,unsigned length,Value *min) {
 /* 
  * Given Vectors 'p1' and 'p2', return Vector 'p3' = lambda * p1 + mu * p2. 
  */
-void  Vector_Combine(Value *p1,Value *p2, Value *p3,Value lambda,Value  mu,unsigned length) {
-  
-  Value *cp1, *cp2, *cp3;
-  Value tmp1, tmp2;
+void Vector_Combine(Value *p1, Value *p2, Value *p3, Value lambda, Value mu,
+		    unsigned length)
+{
+  Value tmp;
   int i;
   
-  value_init(tmp1); value_init(tmp2);
-  cp1=p1;
-  cp2=p2;
-  cp3=p3;
-  
-  for (i=0;i<length;i++) {
-    
-    /* tmp1 = lambda * *cp1 */
-    value_multiply(tmp1,lambda,*cp1);
-    
-    /* tmp2 = mu * *cp2 */
-    value_multiply(tmp2,mu,*cp2);
-    
-    /* *cp3 = tmp1 + tmp2 */
-    value_addto(*cp3,tmp1,tmp2);
-    cp1++; cp2++; cp3++;
+  value_init(tmp);
+  for (i = 0; i < length; i++) {
+    value_multiply(tmp, lambda, p1[i]);
+    value_addmul(tmp, mu, p2[i]);
+    value_assign(p3[i], tmp);
   }
-  value_clear(tmp1);
-  value_clear(tmp2);
+  value_clear(tmp);
   return;
 } /* Vector_Combine */
 
 /* 
  * Return 1 if 'Vec1' equals 'Vec2', otherwise return 0 
  */
-int Vector_Equal(Value *Vec1,Value *Vec2,unsigned n) {
-  
+int Vector_Equal(Value *Vec1, Value *Vec2, unsigned n)
+{
   int i;
-  Value *p1, *p2;
-  
-  p1=Vec1;
-  p2=Vec2;
-  for(i=0;i<n;i++) {
-  
-    /* if (*p1++!=*p2++) break; */
-    if (value_ne(*p1,*p2))
-      break;
-    p1++; p2++;
-  }
-  return (i==n);
+
+  for (i = 0; i < n; ++i)
+    if (value_ne(Vec1[i], Vec2[i]))
+      return 0;
+
+  return 1;
 } /* Vector_Equal */
 
 /* 
@@ -462,39 +466,30 @@ int Vector_Equal(Value *Vec1,Value *Vec2,unsigned n) {
  * points to the component index that has the minimum value. If no such value
  * and index is found, Value 1 is returned.
  */
-void Vector_Min_Not_Zero(Value *p,unsigned length,int *index,Value *min) {
+void Vector_Min_Not_Zero(Value *p,unsigned length,int *index,Value *min)
+{
+  Value aux;
+  int i;
   
-  Value *cp, aux;
-  int i,j;
   
-  value_init(aux);
-  
-  cp=p;
-  for(i=0;i<length;i++) {
-    if (value_notzero_p(*cp)) {
-      value_absolute(*min,*cp);
-      *index = i;
-      break;
-    }
-    ++cp;
-  }
-  if (i == length) {
+  i = First_Non_Zero(p, length);
+  if (i == -1) {
     value_set_si(*min,1);
-    value_clear(aux);
-    cp = NULL;
     return;
   }
-  ++cp;
-  for(j=i+1;j<length;j++) {
-    value_absolute(aux,*cp);
-    if (value_lt(aux,*min) && value_notzero_p(aux)) {
+  *index = i;
+  value_absolute(*min, p[i]);
+  value_init(aux);
+  for (i = i+1; i < length; i++) {
+    if (value_zero_p(p[i]))
+      continue;
+    value_absolute(aux, p[i]);
+    if (value_lt(aux,*min)) {
       value_assign(*min,aux);
-      *index = j;
+      *index = i;
     }  
-    cp++;
   }
   value_clear(aux);
-  cp = NULL;
 } /* Vector_Min_Not_Zero */
 
 /* 
@@ -572,26 +567,17 @@ void Vector_Map(Value *p1,Value *p2,Value *p3,unsigned length,
  */
 void Vector_Normalize(Value *p,unsigned length) {
   
-  Value *cp, gcd,tmp;
+  Value gcd;
   int i;
   
-  value_init(tmp);value_init(gcd);
+  value_init(gcd);
 
   Vector_Gcd(p,length,&gcd);
-  value_set_si(tmp,1);
   
-  if (value_gt(gcd,tmp)) {
-    cp = p;    
-    for (i=0; i<length; i++) { 
-      
-      /* *cp /= gcd */
-      value_division(*cp,*cp,gcd);
-      cp++;
-    }
-  }
-  value_clear(tmp);
+  if (value_notone_p(gcd))
+    Vector_AntiScale(p, p, gcd, length);
+
   value_clear(gcd);
-  return;
 } /* Vector_Normalize */
 
 /* 
@@ -608,11 +594,8 @@ void Vector_Normalize_Positive(Value *p,int length,int pos) {
   if (value_neg_p(p[pos]))
     value_oppose(gcd,gcd);
   if(value_notone_p(gcd))
-    for(i=0; i<length; i++)
-      value_division(p[i],p[i],gcd);
+    Vector_AntiScale(p, p, gcd, length);
   value_clear(gcd);
-
-  return;
 } /* Vector_Normalize_Positive */
 
 /* 

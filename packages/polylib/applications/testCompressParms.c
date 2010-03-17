@@ -5,6 +5,23 @@
  * @author B. Meister, 3/2006
  * 
  */
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 
 #include <polylib/polylib.h>
 #include <stdio.h>
@@ -25,7 +42,8 @@
 
 #define maxRays 200
 
-char * origNames[] = {"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+const char *origNames[] =
+	{"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
 
 int main(int argc, char ** argv) {
   int isOk = 0;
@@ -213,9 +231,10 @@ void valuesWithoutElim(Matrix * origParms, unsigned int * elimParms,
  * reused if not.
  * @return the number of names in the returned list.
  */
-unsigned int namesWithoutElim(char ** parms, unsigned nbParms,
+unsigned int namesWithoutElim(const char **parms, unsigned nbParms,
 			      unsigned int * elimParms,
-			      char *** newParms) {
+			      const char ***newParms)
+{
   unsigned int i, j=0;
   unsigned int newSize = nbParms -elimParms[0];
   if (dbg) {
@@ -264,7 +283,7 @@ int test_Constraints_fullDimensionize(Matrix * A, Matrix * B,
   Polyhedron * P, *PC;
   Matrix * M, *C;
   Enumeration * origEP, * fullEP=NULL;
-  char ** fullNames = NULL;
+  const char **fullNames = NULL;
   int isOk = 1; /* holds the result */
 
   /* compute the origial Ehrhart polynomial */
@@ -315,13 +334,13 @@ int test_Constraints_fullDimensionize(Matrix * A, Matrix * B,
     show_matrix(parmVL);
     show_matrix(VLInv);
   }
-  srandom(nbSamples);
+  srand(nbSamples);
   value_init(mod);
   value_init(div);
   for (i = 0; i< nbSamples; i++) {
     /* create a random sample */
     for (j=0; j< nbOrigParms; j++) {
-      value_set_si(sample->p[0][j], random()%100);
+      value_set_si(sample->p[0][j], rand()%100);
     }
     /* compute the corresponding value for the full-dimensional
        constraints */

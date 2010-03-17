@@ -1,6 +1,21 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /** 
- * $Id: matrix_addon.h,v 1.8 2006/10/01 02:10:46 meister Exp $
- * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented in implicit form (set of
  * constraints).
@@ -39,6 +54,8 @@ void split_constraints(Matrix const * M, Matrix ** Eqs, Matrix **Ineqs);
 
 /* returns the dim-dimensional identity matrix */
 Matrix * Identity_Matrix(unsigned int dim);
+
+void Matrix_identity(unsigned int dim, Matrix **I);
 
 /* given a n x n integer transformation matrix transf, compute its inverse M/g,
  where M is a nxn integer matrix.  g is a common denominator for elements of
@@ -87,6 +104,11 @@ unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs,
 /** returns a contiguous submatrix of a matrix. */
 void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc, 
 		      unsigned int nbR, unsigned int nbC, Matrix ** sub);
+/**
+ * Cloning function. Similar to Matrix_Copy() but allocates the target matrix
+ * if it is set to NULL.
+ */
+void Matrix_clone(Matrix * M, Matrix ** Cl);
 
 /**
  * Copies a contiguous submatrix of M1 into M2, at the indicated position.

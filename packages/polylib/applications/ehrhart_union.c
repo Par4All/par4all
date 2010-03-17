@@ -1,11 +1,29 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <polylib/polylib.h>
 
 
-void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
+void Union_Read(Polyhedron **P, Polyhedron **C, const char ***param_name)
 {
 	Matrix *pm;
 	Polyhedron *ptmp;
@@ -55,8 +73,9 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 
 	if( f )
 	{
+		char **pp = (char **)malloc((*C)->Dimension*sizeof(char *));
+		*param_name = (const char **)pp;
 		/* read the parameter names */
-		*param_name = (char **)malloc( (*C)->Dimension*sizeof(char *) );
 		c = 0;
 		for( i=0 ; i<(*C)->Dimension ; ++i )
 		{
@@ -76,8 +95,8 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 			if( j==0 )
 				break;
 			param[j] = 0;
-			(*param_name)[i] = (char *)malloc( j );
-			strcpy( (*param_name)[i], param );
+			pp[i] = (char *)malloc(j);
+			strcpy(pp[i], param);
 		}
 		if( i != (*C)->Dimension )
 		{
@@ -90,7 +109,7 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 
 }
 
-void recurse ( 	Polyhedron *C, char **param_name, Enumeration *e, 
+void recurse(Polyhedron *C, const char **param_name, Enumeration *e,
                   Value *pmin, Value *pmax, Value *p, int l )
 {
 	Value z, *tmp; int k;
@@ -125,7 +144,7 @@ void recurse ( 	Polyhedron *C, char **param_name, Enumeration *e,
 int main( int argc, char **argv)
 {
 	Polyhedron *P, *C;
-	char **param_name;
+	const char **param_name;
 	Enumeration *e, *en;
 	Value *pmin, *pmax, *p; int i, k; char str[256], *s;
 

@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /* matrix.c 
      COPYRIGHT
           Both this software and its documentation are
@@ -83,11 +100,43 @@ void Matrix_Free(Matrix *Mat)
 
 } /* Matrix_Free */
 
+void Matrix_Extend(Matrix *Mat, unsigned NbRows)
+{
+  Value *p, **q;
+  int i,j;
+
+  q = (Value **)realloc(Mat->p, NbRows * sizeof(*q));
+  if(!q) {
+    errormsg1("Matrix_Extend", "outofmem", "out of memory space");
+    return;
+  }
+  Mat->p = q;
+  if (Mat->p_Init_size < NbRows * Mat->NbColumns) {
+    p = (Value *)realloc(Mat->p_Init, NbRows * Mat->NbColumns * sizeof(Value));
+    if(!p) {
+      errormsg1("Matrix_Extend", "outofmem", "out of memory space");
+      return;
+    }
+    Mat->p_Init = p;
+    Vector_Set(Mat->p_Init + Mat->NbRows*Mat->NbColumns, 0,
+	       Mat->p_Init_size - Mat->NbRows*Mat->NbColumns);
+    for (i = Mat->p_Init_size; i < Mat->NbColumns*NbRows; ++i)
+	value_init(Mat->p_Init[i]);
+    Mat->p_Init_size = Mat->NbColumns*NbRows;
+  } else
+    Vector_Set(Mat->p_Init + Mat->NbRows*Mat->NbColumns, 0,
+	       (NbRows - Mat->NbRows) * Mat->NbColumns);
+  for (i=0;i<NbRows;i++) {
+    Mat->p[i] = Mat->p_Init + (i * Mat->NbColumns);
+  }
+  Mat->NbRows = NbRows;
+}
+
 /* 
  * Print the contents of the Matrix 'Mat'
  */
-void Matrix_Print(FILE *Dst,char *Format,Matrix *Mat) {
-  
+void Matrix_Print(FILE *Dst, const char *Format, Matrix *Mat)
+{
   Value *p;
   int i, j;
   unsigned NbRows, NbColumns;
@@ -157,10 +206,13 @@ Matrix *Matrix_Read(void) {
   unsigned NbRows, NbColumns;
   char s[1024];
   
-  while(fgets(s, 1024, stdin)==0);
+  if (fgets(s, 1024, stdin) == NULL)
+    return NULL;
   while ((*s=='#' || *s=='\n') ||
-	 (sscanf(s, "%d %d", &NbRows, &NbColumns)<2))
-    fgets(s, 1024, stdin);
+	 (sscanf(s, "%d %d", &NbRows, &NbColumns)<2)) {
+    if (fgets(s, 1024, stdin) == NULL)
+      return NULL;
+  }
   Mat = Matrix_Alloc(NbRows,NbColumns);
   if(!Mat) {
     errormsg1("Matrix_Read", "outofmem", "out of memory space");
@@ -610,10 +662,10 @@ int MatInverse(Matrix *Mat,Matrix *MatInv ) {
       value_assign(x,Mat->p[j][i]);
       if(value_notzero_p(x)) {
 	value_assign(piv,Mat->p[i][i]);
-	Gcd(x,piv,&gcd);
+	value_gcd(gcd, x, piv);
 	if (value_notone_p(gcd) ) {
-	  value_division(x,x,gcd);
-	  value_division(piv,piv,gcd);
+	  value_divexact(x, x, gcd);
+	  value_divexact(piv, piv, gcd);
 	}
 	for(c=((j>i)?i:0);c<k;++c) {
 	  value_multiply(m1,piv,Mat->p[j][c]);
@@ -630,11 +682,11 @@ int MatInverse(Matrix *Mat,Matrix *MatInv ) {
 	/* dividing the rows with the common GCD.                     */
 	Vector_Gcd(&MatInv->p[j][0],k,&m1);
 	Vector_Gcd(&Mat->p[j][0],k,&m2);
-	Gcd(m1,m2,&gcd);
+	value_gcd(gcd, m1, m2);
 	if(value_notone_p(gcd)) {
 	  for(c=0;c<k;++c) {
-	    value_division(Mat->p[j][c],Mat->p[j][c],gcd);
-	    value_division(MatInv->p[j][c],MatInv->p[j][c],gcd);
+	    value_divexact(Mat->p[j][c], Mat->p[j][c], gcd);
+	    value_divexact(MatInv->p[j][c], MatInv->p[j][c], gcd);
 	  }
 	}
       }
@@ -681,8 +733,8 @@ void rat_prodmat(Matrix *S,Matrix *X,Matrix *P) {
   for(k=1;k<P->NbRows;++k) {
     value_assign(old_lcm,lcm);
     value_assign(last_column_entry,P->p[k][last_column_index]);
-    Gcd(lcm,last_column_entry,&gcd);
-    value_division(m1,last_column_entry,gcd);
+    value_gcd(gcd, lcm, last_column_entry);
+    value_divexact(m1, last_column_entry, gcd);
     value_multiply(lcm,lcm,m1);
   }
   
@@ -909,10 +961,10 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
       value_assign(x,Mat->p[j][i]);
       if(value_notzero_p(x)) {
 	value_assign(piv,Mat->p[i][i]);
-	Gcd(x,piv,&gcd);
+	value_gcd(gcd, x, piv);
 	if (value_notone_p(gcd) ) {
-	  value_division(x,x,gcd);
-	  value_division(piv,piv,gcd);
+	  value_divexact(x, x, gcd);
+	  value_divexact(piv, piv, gcd);
 	}
 	for(c=((j>i)?i:0);c<k;++c) {
 	  value_multiply(m1,piv,Mat->p[j][c]);
@@ -929,11 +981,11 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
 	/* dividing the rows with the common GCD.                     */
 	Vector_Gcd(&MatInv->p[j][0],k,&m1);
 	Vector_Gcd(&Mat->p[j][0],k,&m2);
-	Gcd(m1,m2,&gcd);
+	value_gcd(gcd, m1, m2);
 	if(value_notone_p(gcd)) {
 	  for(c=0;c<k;++c) {
-	    value_division(Mat->p[j][c],Mat->p[j][c],gcd);
-	    value_division(MatInv->p[j][c],MatInv->p[j][c],gcd);
+	    value_divexact(Mat->p[j][c], Mat->p[j][c], gcd);
+	    value_divexact(MatInv->p[j][c], MatInv->p[j][c], gcd);
 	  }
 	}
       }
@@ -949,16 +1001,16 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
      
      /* gcd is always positive */
      Vector_Gcd(&MatInv->p[j][0],k,&gcd);
-     Gcd(gcd,den[j],&gcd);
+     value_gcd(gcd, gcd, den[j]);
      if (value_neg_p(den[j])) 
        value_oppose(gcd,gcd); /* make denominator positive */
      if (value_notone_p(gcd)) {
        for (c=0; c<k; c++) 
-	 value_division(MatInv->p[j][c],MatInv->p[j][c],gcd); /* normalize */
-       value_division(den[j],den[j],gcd);
+	 value_divexact(MatInv->p[j][c], MatInv->p[j][c], gcd); /* normalize */
+       value_divexact(den[j], den[j], gcd);
      }  
-     Gcd(x,den[j],&gcd);
-     value_division(m1,den[j],gcd);
+     value_gcd(gcd, x, den[j]);
+     value_divexact(m1, den[j], gcd);
      value_multiply(x,x,m1);
    }
    if (value_notone_p(x)) 

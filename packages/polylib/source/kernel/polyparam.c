@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /***********************************************************************/
 /*                Parametrized polyhedra V4.20                         */
 /*                copyright 1995-2000 Vincent Loechner                 */
@@ -33,13 +50,8 @@
 
 #include <polylib/polylib.h>
 
-#ifdef __STDC__
-static void traite_m_face(Polyhedron *, unsigned int *);
+static void traite_m_face(Polyhedron *, unsigned int *, unsigned int *);
 static void scan_m_face(int,int,Polyhedron *,unsigned int *);
-#else
-static void traite_m_face();
-static void scan_m_face();
-#endif /* __STDC__ */
 
 /*
  * Return the intersection of two polyhedral domains 'Pol1' and 'Pol2' such 
@@ -85,8 +97,8 @@ Polyhedron *PDomainIntersection(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMax
 /* 
  * Given polyhderal domains 'Pol1' and 'Pol2', return the difference of the 
  * two domains with a modification that the resulting polyhedra in the new 
- * domain don't have a 1 unit space around cut and the degenrate results are 
- * discarded. 
+ * domain don't have a 1 unit space around cut and the degenerate results
+ * (of smaller dimension) are discarded. 
  */
 Polyhedron *PDomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRays) {
   
@@ -180,7 +192,7 @@ static int TestRank(Matrix *Mat) {
     for(j=k+1;j<Mat->NbRows;++j) {
       
       /* Make every other entry (below row(k)) in column(k) zero */
-      Gcd(Mat->p[j][k],Mat->p[k][k],&gcd);
+      value_gcd(gcd, Mat->p[j][k], Mat->p[k][k]);
       for(i=k+1;i<Mat->NbColumns;++i) {
 	
 	/* pour tous les indices i > k */
@@ -275,7 +287,7 @@ static int nr;			/* (NbRays-1)/32 + 1 */
 
 static Polyhedron *CEqualities;/* Equalities in the context */
 static SatMatrix   *Sat;       /* Saturation Matrix (row=constraint, col=ray)*/
-static int *egalite;	       /* Bool vector marking constraints in m-face  */
+static unsigned int *egalite;  /* Bool vector marking constraints in m-face  */
 static Matrix *Xi, *Pi;	       /* Xi and Pi */
 static Matrix *PiTest;	       /* Matrix used to test if Pi is full ranked? */
 static Matrix *CTest;
@@ -324,14 +336,33 @@ static Polyhedron *Add_CEqualities(Polyhedron *D) {
   }
 } /* Add_CEqualities */
 
+#define INT_BITS (sizeof(unsigned) * 8)
+
+unsigned int *int_array2bit_vector(unsigned int *array, int n)
+{
+  int i, ix;
+  unsigned bx;
+  int words = (n+INT_BITS-1)/INT_BITS;
+  unsigned int *bv = (unsigned int *)calloc(words, sizeof(unsigned));
+  assert(bv);
+  for (i = 0, ix = 0, bx = MSB; i < n; ++i) {
+    if (array[i])
+      bv[ix] |= bx;
+    NEXT(ix, bx);
+  }
+  return bv;
+}
+
 /*----------------------------------------------------------------------*/
 /* traite_m_face                                                        */
 /*       Given an m-face, compute the parameterized vertex              */
+/* D  	   - The entire domain						*/
+/* mf 	   - Bit vector marking the lines/rays in the m-face		*/
+/* egalite - boolean vector marking saturated constraints in m-face	*/
 /*----------------------------------------------------------------------*/
-static void traite_m_face(Polyhedron *D,unsigned int *mf) {
-     /* D  - The entire domain */
-     /* mf - Bit vector marking the lines/rays in the m-face */
-
+static void traite_m_face(Polyhedron *D, unsigned int *mf,
+			  unsigned int *egalite)
+{
   Matrix *Si;				/* Solution */
   Polyhedron *PDi;		        /* polyhedron Di */
   Param_Vertices *PV;
@@ -450,6 +481,7 @@ static void traite_m_face(Polyhedron *D,unsigned int *mf) {
   PV->next = PV_Result;
   PV->Vertex = Si;
   PV->Domain = NULL;
+  PV->Facets = int_array2bit_vector(egalite, D->NbConstraints);
   PV_Result = PV;
   nbPV++;         /* increment vertex count */
   
@@ -523,6 +555,22 @@ static int count_sat (unsigned int *mf) {
   return cnt;
 } /* count_sat */
 
+/* Returns true if all bits in part are also set in bv */
+static int bit_vector_includes(unsigned int *bv, int len, unsigned int *part)
+{
+  int j;
+
+  for (j = 0; j < len; j++) {
+#ifdef DEBUGPP4
+    fprintf(stderr, "mf=%08X Sat=%08X &=%08X\n",
+		    part[j],bv[j], (part[j] & bv[j]));
+#endif
+    if ((part[j] & bv[j]) != part[j])
+      return 0;
+  }
+  return 1;
+}
+
 /*----------------------------------------------------------------------*/
 /* let D + E + L be the dimension of the polyhedron                     */
 /* D = Dimension of polytope (ray space)                                */
@@ -550,7 +598,7 @@ static int count_sat (unsigned int *mf) {
 /*----------------------------------------------------------------------*/
 /* scan_m_face                                                          */
 /*      pos : the next candidate constraint position                    */
-/*    nb-un : number of saturated constraints needed to finish a face   */
+/*    nb_un : number of saturated constraints needed to finish a face   */
 /*        D : the source polyhedron (context included )                 */
 /*       mf : bit-array marking rays which are saturated so far         */
 /* From Global area:                                                    */
@@ -588,7 +636,7 @@ static void scan_m_face(int pos,int nb_un,Polyhedron *D,unsigned int *mf) {
 #endif
 
   if(nb_un == 0) {	/* Base case */   
-    int i,j;
+    int i;
     
     /*********** ELIMINATION OF REDUNDANT FACES ***********/
     /* if all these vertices also verify a previous constraint */
@@ -600,28 +648,27 @@ static void scan_m_face(int pos,int nb_un,Polyhedron *D,unsigned int *mf) {
 			continue;       /* already selected */
       
 		/* if Sat[i] & mf == mf then it's redundant */
-		for (j=0;j<nr;j++)
-		{
-	
 #ifdef DEBUGPP4
-			fprintf(stderr,"mf=%08X Sat[%d]=%08X &=%08X\n",mf[j],i,Sat->p[i][j],
-				(mf[j] & Sat->p[i][j]) );
+		fprintf(stderr, "Sat[%d]\n", i);
 #endif
-
-			if (((mf[j]) & (Sat->p[i][j])) != mf[j])
-				break;	/* it's not redundant */
+		if (bit_vector_includes(Sat->p[i], nr, mf)) {
+#ifdef DEBUGPP4
+		  fprintf(stderr, "Redundant with constraint %d\n", i);
+#endif
+		  return;	/* it is redundant */
 		}
-      
-#ifdef DEBUGPP4
-		if (j==nr) fprintf(stderr, "Redundant with constraint %d\n", i);
-#endif
-    
-		if (j==nr) return;	/* it is redundant */
 	}
     /********* END OF ELIMINATION OF DEGENERATE FACES *********/    
+    /* Now check for other constraints that are verified */
+    for (i = pos; i < D->NbConstraints; ++i) {
+      if (bit_vector_includes(Sat->p[i], nr, mf))
+	egalite[i] = 1;
+    }
     /* if we haven't found a constraint verified by all */
     /* the rays, its OK, it's a new face. */
-    traite_m_face(D,mf);
+    traite_m_face(D, mf, egalite);
+    for (i = pos; i < D->NbConstraints; ++i)
+      egalite[i] = 0;
     return;
   }
 
@@ -759,8 +806,8 @@ static SatMatrix *Poly2Sat(Polyhedron *Pol,unsigned int **L) {
  * Create a parametrized polyhedron with zero parameters. This function was 
  * first written by Xavier Redon, and was later modified by others.
  */
-Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
-  
+Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol, Matrix *Rays)
+{
   Param_Polyhedron *result;
   int nbRows, nbColumns;
   int i, size, rays;
@@ -778,6 +825,8 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
   result=(Param_Polyhedron *)malloc(sizeof(Param_Polyhedron));
   result->nbV=nbRows-rays;
   result->V=NULL;
+  result->Constraints = Polyhedron2Constraints(Pol);
+  result->Rays = Rays;
   
   /* Build the parametric vertices */
   for(i=0;i<nbRows;i++) {
@@ -801,6 +850,7 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
     paramVertex->Domain=Matrix_Alloc(1,2);
     value_set_si(paramVertex->Domain->p[0][0],1);
     value_set_si(paramVertex->Domain->p[0][1],1);    
+    paramVertex->Facets = NULL;
     paramVertex->next=result->V;
     result->V=paramVertex;
   }
@@ -960,6 +1010,55 @@ Polyhedron *Elim_Columns(Polyhedron *A,Polyhedron *E,int *p,int *ref) {
   return(R);
 } /* Elim_Columns */
 
+
+static Polyhedron *Recession_Cone(Polyhedron *P, unsigned nvar, unsigned MaxRays)
+{
+    int i;
+    Matrix *M = Matrix_Alloc(P->NbConstraints, 1 + nvar + 1);
+    Polyhedron *R;
+    for (i = 0; i < P->NbConstraints; ++i)
+	Vector_Copy(P->Constraint[i], M->p[i], 1+nvar);
+    R = Constraints2Polyhedron(M, MaxRays);
+    Matrix_Free(M);
+    return R;
+}
+
+/* Compute lines/unidirectional rays of the (non parametric) polyhedron */
+/* Input :
+ *   D1 : combined polyhedron,
+ * Output :
+ *   Rays : non parametric ray matrix
+ *   return value : number of lines
+ */
+static int ComputeNPLinesRays(int n, Polyhedron *D1, Matrix **Rays)
+{
+  int i, j, nbr, dimfaces;
+  Polyhedron *RC;  /* Recession Cone */
+
+  RC = Recession_Cone(D1, n, ws);
+
+  /* get the rays/lines from RC */
+  nbr = 0;
+  for (i = 0; i < RC->NbRays ;i++)
+    if (value_zero_p(RC->Ray[i][n+1]))
+      nbr++;
+  *Rays=Matrix_Alloc(nbr, n+2);
+  for (i = 0, j = 0; j < nbr ;i++)
+    if (value_zero_p(RC->Ray[i][n+1]))
+      Vector_Copy(RC->Ray[i], (*Rays)->p[j++], n+2);
+
+  dimfaces = RC->NbBid;
+  Polyhedron_Free(RC);
+
+#ifdef DEBUGPP31
+  fprintf(stderr, "Rays = ");
+  Matrix_Print(stderr, P_VALUE_FMT, *Rays);
+  fprintf(stderr, "dimfaces = %d\n", dimfaces);
+#endif
+
+  return dimfaces;
+}
+
 /* 
  * Given a polyhedron 'Di' in combined data and parameter space and a context 
  * polyhedron 'C' representing the constraints on the parameter space, create
@@ -969,13 +1068,16 @@ Polyhedron *Elim_Columns(Polyhedron *A,Polyhedron *E,int *p,int *ref) {
 Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int working_space,Polyhedron **CEq,Matrix **CT) {	
   
   unsigned int *mf;
-  int i, j;
+  int i, j, dimfaces;
   Polyhedron *D=*Di,
              *C1,         /* true context */
              *D1;         /* the combined polyhedron, including context C */
-  Matrix *M;
+  Matrix *Rays,           /* lines/rays (non parametric) */
+         *M;
   Param_Polyhedron *res;
   int *p, *ref;
+
+  CEqualities = NULL;
 
   if(CT) {
     *CEq = NULL;
@@ -994,7 +1096,7 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
     return (Param_Polyhedron *) 0;
   }
   if (m==0)
-    return GenParamPolyhedron(D);
+    return GenParamPolyhedron(D,Matrix_Alloc(0,2));
   
   /* Add constraints from Context to D -> result in D1 */
   C1 = align_context(C,D->Dimension,ws);
@@ -1016,8 +1118,12 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   
   Domain_Free(C1);
 
-  if(!D1 || emptyQ(D1))
+  if (!D1)
     return(NULL);
+  if (emptyQ(D1)) {
+    Polyhedron_Free(D1);
+    return(NULL);
+  }
   
   /* Compute the true context C1 */
   /* M : lines in the direction of the first n indices (index space) */
@@ -1031,16 +1137,17 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   fprintf(stderr,"True context C1 = ");
   Polyhedron_Print(stderr,P_VALUE_FMT,C1);
 #endif
-  
+
+  dimfaces = ComputeNPLinesRays(n, D1, &Rays);
+
   /* CEqualities contains the constraints (to be added again later) */
   /* *CT is the transformation matrix to add the removed parameters */
   if(!CT) {
     if (C1->NbEq == 0) {
       Polyhedron_Free(C1);
-      CEqualities = NULL;
+      C1 = NULL;
     } else {
       Polyhedron *CEq1,	/* CEqualities, in homogeneous dim */
-	         *C2,	/* C1 (temporary) simplified */
 	         *D2;	/* D1, (temporary) simplified */
       
       /* Remove equalities from true context C1 and from D1             */     
@@ -1068,7 +1175,6 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   }
   else { /* if( CT  ) */
     Polyhedron *CEq1,	/* CEqualities */
-               *C2,	/* C1 (temporary) simplified */
                *D2;	/* D1, (temporary) simplified */
 
     /* Suppress all useless constraints in parameter domain */
@@ -1136,7 +1242,7 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
       /* return the new D1 too */
       *Di = D1;
 
-      return GenParamPolyhedron(D1);
+      return GenParamPolyhedron(D1, Rays);
     }
   }
 
@@ -1153,7 +1259,11 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   PV_Result = NULL;
   nbPV = 0;
   
-  if (D1->NbRays==0) return 0;
+  if (emptyQ(D1)) {
+    Polyhedron_Free(D1);
+    Matrix_Free(Rays);
+    return NULL;
+  }
   
   /* mf : a bit array indicating which rays are part of the m-face */
   /* Poly2Sat initializes mf to all ones */
@@ -1171,7 +1281,7 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 #endif
   
   /* A boolean array saying which constraints are part of the m-face */
-  egalite = (int *)malloc(sizeof(int)*D1->NbConstraints );
+  egalite = (unsigned int *)malloc(sizeof(int)*D1->NbConstraints);
   memset(egalite,0, sizeof(int)*D1->NbConstraints);
 
   for (i=0; i<D1->NbEq; i++)
@@ -1184,11 +1294,27 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   PiInv  = Matrix_Alloc(m+1,m+2);
   RaysDi = Matrix_Alloc(D1->NbRays,m+2);
   m_dim = m;
-  
+
+  /* m_dim has to be increased by the dimension of the smallest faces
+   * of the (non parametric) polyhedron
+   */
+  m_dim += dimfaces;
+
+  /* if the smallest face is of smaller dimension than m_dim,
+   * then increase m_dim (I think this should never happen --Vincent)
+   */
+#ifdef DEBUGPP3
+  if (m_dim < D1->NbBid)
+     fprintf(stderr, "m_dim (%d) < D1->NbBid (%d)\n", m_dim, D1->NbBid );
+#endif
+  if (m_dim < D1->NbBid)
+      m_dim = D1->NbBid;
+
 #ifdef DEBUGPP
   nbfaces=0;
 #endif
 #ifdef DEBUGPP3
+  fprintf(stderr, "m_dim = %d\n", m_dim);
   fprintf(stderr,
 	  "Target: find faces that saturate %d constraints and %d rays/lines\n",
 	  D1->Dimension - m_dim,m_dim+1);
@@ -1218,15 +1344,18 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 	}
   */
 
+  res = (Param_Polyhedron *) malloc (sizeof(Param_Polyhedron));
+  res->nbV = nbPV;
+  res->V = PV_Result;
+  res->D = PDomains;
+  res->Constraints = Polyhedron2Constraints(D1);
+  res->Rays = Rays;
+
   if(CT)		/* return the new D1 too ! */
     *Di = D1;
   else
     Domain_Free(D1);
 
-  res = (Param_Polyhedron *) malloc (sizeof(Param_Polyhedron));
-  res->nbV = nbPV;
-  res->V = PV_Result;
-  res->D = PDomains;
   return(res);
 } /* Find_m_faces */
 
@@ -1453,6 +1582,7 @@ void Param_Vertices_Free(Param_Vertices *PV) {
     next_pv = PV->next;
     if (PV->Vertex) Matrix_Free(PV->Vertex);
     if (PV->Domain) Matrix_Free(PV->Domain);
+    if (PV->Facets) free(PV->Facets);
     free(PV);  
     PV = next_pv;
   }
@@ -1461,8 +1591,8 @@ void Param_Vertices_Free(Param_Vertices *PV) {
 /*
  * Print a list of parametrized vertices *
  */
-void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
-  
+void Print_Vertex(FILE *DST, Matrix *V, const char **param_names)
+{
   int l, v;
   int first;
   Value gcd,tmp;
@@ -1477,26 +1607,23 @@ void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
     fprintf(DST, " " );
     for(v=0;v < V->NbColumns-2;++v) {
       if(value_notzero_p(V->p[l][v])) {
-	Gcd(V->p[l][v],V->p[l][V->NbColumns-1],&gcd);
-	value_absolute(gcd,gcd);
-	value_division(tmp,V->p[l][v],gcd);
+	value_gcd(gcd, V->p[l][v], V->p[l][V->NbColumns-1]);
+	value_divexact(tmp, V->p[l][v], gcd);
 	if(value_posz_p(tmp)) {
 	  if(!first) 
 	    fprintf(DST, "+");
-	  value_division(tmp,V->p[l][v],gcd);
 	  if(value_notone_p(tmp)) { 
 	    value_print(DST,VALUE_FMT,tmp);
 	  }  
 	}
 	else { /* V->p[l][v]/gcd<0 */
-	  value_division(tmp,V->p[l][v],gcd);
 	  if(value_mone_p(tmp))
 	    fprintf(DST, "-" );
 	  else {
 	    value_print(DST,VALUE_FMT,tmp);
 	  }
 	}
-	value_division(tmp,V->p[l][V->NbColumns-1],gcd);
+	value_divexact(tmp, V->p[l][V->NbColumns-1], gcd);
 	if(value_notone_p(tmp)) {
 	  fprintf(DST, "%s/", param_names[v]);
 	  value_print(DST,VALUE_FMT,tmp);
@@ -1511,11 +1638,10 @@ void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
     if(value_notzero_p(V->p[l][v]) || first) {
       if(value_posz_p(V->p[l][v]) && !first)
 	fprintf(DST,"+");
-	Gcd(V->p[l][v],V->p[l][V->NbColumns-1],&gcd);
-      value_absolute(gcd,gcd);
-      value_division(tmp,V->p[l][v],gcd);
+	value_gcd(gcd, V->p[l][v], V->p[l][V->NbColumns-1]);
+	value_divexact(tmp, V->p[l][v], gcd);
       value_print(DST,VALUE_FMT,tmp);
-      value_division(tmp,V->p[l][V->NbColumns-1],gcd);
+	value_divexact(tmp, V->p[l][V->NbColumns-1], gcd);
       if(value_notone_p(tmp)) {
 	fprintf(DST,"/");
 	value_print(DST,VALUE_FMT,tmp);
@@ -1564,8 +1690,8 @@ Matrix *VertexCT(Matrix *V,Matrix *CT) {
 /*
  * Print the validity Domain 'D' of a parametric polyhedron 
  */ 
-void Print_Domain(FILE *DST,Polyhedron *D,char **pname) {
-  
+void Print_Domain(FILE *DST, Polyhedron *D, const char **pname)
+{
   int l, v;
   int first;
   
@@ -1617,8 +1743,8 @@ void Print_Domain(FILE *DST,Polyhedron *D,char **pname) {
  * Given a list of parametrized vertices and an array of parameter names, Print
  * a list of parametrized vertices in a comprehensible format. 
  */
-void Param_Vertices_Print(FILE *DST,Param_Vertices *PV,char **param_names) {
-   
+void Param_Vertices_Print(FILE *DST, Param_Vertices *PV, const char **param_names)
+{
   Polyhedron *poly;
   
   while(PV) {
@@ -1651,6 +1777,9 @@ Param_Polyhedron *Polyhedron2Param_Domain(Polyhedron *Din,Polyhedron *Cin,int wo
   POL_ENSURE_VERTICES(Din);
   POL_ENSURE_FACETS(Cin);
   POL_ENSURE_VERTICES(Cin);
+
+  if (emptyQ(Din) || emptyQ(Cin))
+    return NULL;
  
 #ifdef DEBUGPP
   fprintf(stderr,"Polyhedron2Param_Polyhedron algorithm starting at : %.2fs\n",
@@ -1753,6 +1882,10 @@ void Param_Polyhedron_Free(Param_Polyhedron *P) {
   if (!P) return;
   Param_Vertices_Free(P->V);
   Param_Domain_Free(P->D);
+  if (P->Constraints)
+    Matrix_Free(P->Constraints);
+  if (P->Rays)
+    Matrix_Free(P->Rays);
   free(P);
   return;
 } /* Param_Polyhedron_Free */
@@ -1786,20 +1919,19 @@ void Param_Polyhedron_Scale_Integer(Param_Polyhedron *PP, Polyhedron **P,
   /* b- scan the vertices and compute the variables' global lcms */
   for (V = PP->V; V; V = V->next)
     for (i = 0; i < nb_vars; i++)
-      Lcm3(denoms->p[i], V->Vertex->p[i][nb_param+1], &denoms->p[i]);
+      value_lcm(denoms->p[i], denoms->p[i], V->Vertex->p[i][nb_param+1]);
 
   value_set_si(global_var_lcm, 1);
   for (i = 0; i < nb_vars; i++) {
     value_multiply(*det, *det, denoms->p[i]);
-    Lcm3(global_var_lcm, denoms->p[i], &global_var_lcm);
+    value_lcm(global_var_lcm, global_var_lcm, denoms->p[i]);
   }
 
   /* scale vertices */
   for (V = PP->V; V; V = V->next)
     for (i = 0; i < nb_vars; i++) {
       Vector_Scale(V->Vertex->p[i], V->Vertex->p[i], denoms->p[i], nb_param+1);
-      Vector_AntiScale(V->Vertex->p[i], V->Vertex->p[i],
-		       V->Vertex->p[i][nb_param+1], nb_param+2);
+      Vector_Normalize(V->Vertex->p[i], nb_param+2);
     }
 
   /* the expansion can be actually writen as global_var_lcm.L^{-1} */
