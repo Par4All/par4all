@@ -1,0 +1,7 @@
+/home/local/fabien/PIPS/prod/pips/bin/pips -f $VDIR/foo.f foo
+	PROGRAM FOO
+	INTEGER T(100)
+      DOALL I = 1, 100                                                  0003
+         T(I) = 0                                                       0004
+      ENDDO
+      END

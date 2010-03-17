@@ -5,7 +5,7 @@ int foo()
    };
    return 1;
 }
-main()
+int main()
 {
    int i = 1;
    struct key {
@@ -22,7 +22,7 @@ struct key {
    int node;
 };
 
-extern  main();
+extern int main();
 
 extern int foo();
 

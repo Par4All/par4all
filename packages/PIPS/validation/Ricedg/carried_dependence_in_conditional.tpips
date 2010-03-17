@@ -1,0 +1,11 @@
+delete carried_dependence_in_conditional
+create carried_dependence_in_conditional carried_dependence_in_conditional.c
+
+
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
+
+
+display DG_FILE
+close
+ 

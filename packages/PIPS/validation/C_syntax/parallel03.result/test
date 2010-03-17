@@ -21,8 +21,17 @@ Preconditions
 
 void parallel03()
 {
+
+//  P() {}
+
    double x[10];
+
+//  P() {}
+
    double y[10];
+
+//  P() {}
+
    int i;
 
 //  P() {}

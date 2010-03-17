@@ -4,7 +4,7 @@ Proper effects for "main"
 int main()
 {
    // BEGIN BLOCK
-   int *p,  *q;
+   int *p, *q;
 //               <must be read   >: p
 //               <must be written>: p[0]
 
@@ -29,7 +29,7 @@ int main()
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
    // BEGIN BLOCK
-   int *p,  *q;
+   int *p, *q;
 //               <must be read   >: p
 //               <must be written>: p[0]
 

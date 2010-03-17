@@ -30,7 +30,7 @@ echo
 
 apply UNSPLIT
 shell gcc outlining02.c -o outlining
-shell gcc outlining02.database/Src/outlining02.c outlining02.database/Src/outlined.c -o outlining02.database/Src/outlining
+shell gcc outlining02.database/Src/outlining02.c -o outlining02.database/Src/outlining
 shell if test `outlining02.database/Src/outlining` = `outlining`; then echo "ok"; else echo "ko" ; fi
 shell rm -rf outlining02.database/Src/outlining outlining
 

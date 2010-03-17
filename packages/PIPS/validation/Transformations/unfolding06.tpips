@@ -1,0 +1,33 @@
+delete unfolding06
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create unfolding06 unfolding06.c
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# source code for middleware send_buff() and receive_buff() not available:
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo End of property settings
+
+display PRINTED_FILE[main]
+#shell sleep 60
+display CALLGRAPH_FILE[main]
+# Do not restrict the unfolding
+#setproperty UNFOLDING_CALLEES "unfolding06"
+apply UNFOLDING[main]
+display PRINTED_FILE[main]
+
+
+close
+#delete unfolding06
+quit

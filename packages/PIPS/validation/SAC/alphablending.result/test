@@ -319,20 +319,18 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
 
       END
 /* C pretty print for module ALPHABLENDING. */
-#define size 50000
-
 void
-alphablending (float result[50000], float src[50000], float dest[50000],
-	       float alpha)
+alphablending (float result[size - 1 + 1], float src[size - 1 + 1],
+	       float dest[size - 1 + 1], float alpha)
 {
-  float v4sf_vec9[4];
-  float v4sf_vec8[4];
-  float v4sf_vec6[4];
-  float v4sf_vec4[4];
-  float v4sf_vec3[4];
-  float v4sf_vec2[4];
-  float v4sf_vec1[4];
-  float v4sf_vec0[4];
+  float v4sf_vec9[3 - 0 + 1];
+  float v4sf_vec8[3 - 0 + 1];
+  float v4sf_vec6[3 - 0 + 1];
+  float v4sf_vec4[3 - 0 + 1];
+  float v4sf_vec3[3 - 0 + 1];
+  float v4sf_vec2[3 - 0 + 1];
+  float v4sf_vec1[3 - 0 + 1];
+  float v4sf_vec0[3 - 0 + 1];
   float f_03;
   float f_13;
   float f_23;
@@ -348,6 +346,8 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   int lu_ind0;
   int lu_ib0;
   int lu_nub0;
+  static const int size = 50000;
+  ;
   int i;
 
   lu_nub0 = 50000;

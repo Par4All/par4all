@@ -34,6 +34,10 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
+apply UNSPLIT
+shell gcc -fopenmp -c mix3.database/Src/mix.c
+shell rm *.o
+
 close
 delete mix3
 quit

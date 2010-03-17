@@ -1,0 +1,29 @@
+End of property settings
+int main()
+{
+   int j;                                                               /*0027*/
+
+   j = unfolding07(4);                                                  /*0029*/
+}
+ main
+     unfolding07
+         foo
+         bar
+int main()
+{
+   int j;                                                               /*0003*/
+   /*0027*/
+   //PIPS generated variable
+   int _return0;                                                        /*0005*/
+   {
+      int ret;                                                          /*0009*/
+      /*0019*/
+      
+      ret = foo(4);                                                     /*0011*/
+      /*0021*/
+      ret |= bar(4);                                                    /*0012*/
+      /*0022*/
+      ;
+   }
+   j = _return0;                                                        /*0015*/
+}

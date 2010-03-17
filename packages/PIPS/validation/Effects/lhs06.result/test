@@ -23,7 +23,9 @@ Proper effects for "lhs06"
 int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
 {
    int nbout;
+//               <must be written>: col
    int col = 0;
+//               <must be written>: indent
    int indent = 0;
    int ui32;
    int i32;
@@ -49,7 +51,9 @@ Cumulated effects for "lhs06"
 int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
 {
    int nbout;
+//               <must be written>: col
    int col = 0;
+//               <must be written>: indent
    int indent = 0;
    int ui32;
    int i32;

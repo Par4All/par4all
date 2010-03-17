@@ -81,55 +81,67 @@ int main()
    d = 4;
 
    pa = &a;
-//  points to = {(pa,a,E)}
+//  points to = {(pa,a,-Exact-)}
    ppa = &b;
-//  points to = {(pa,a,E)(ppa,b,E)}
+//  points to = {(pa,a,-Exact-);(ppa,b,-Exact-)}
    *ppa = &pa;
-//  points to = {(pa,a,E)(ppa,b,E)}
+//  points to = {(pa,a,-Exact-);(ppa,b,-Exact-)}
 
    pb = &b;
-//  points to = {(pb,b,E)(pa,a,E)(ppa,b,E)}
+//  points to = {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-)}
    ppb = &a;
-//  points to = {(pb,b,E)(pa,a,E)(ppa,b,E)(ppb,a,E)}
+//  points to = {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-);(ppb,a,
+//   -Exact-)}
    *ppb = &pb;
-//  points to = {(pb,b,E)(pa,a,E)(ppb,a,E)(ppa,b,E)}
+//  points to = {(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,-Exact-);(ppa,b,
+//   -Exact-)}
 
    pc = &c;
-//  points to = {(pc,c,E)(pb,b,E)(pa,a,E)(ppb,a,E)(ppa,b,E)}
+//  points to = {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,
+//   -Exact-);(ppa,b,-Exact-)}
    ppc = &d;
-//  points to = {(pc,c,E)(pb,b,E)(pa,a,E)(ppb,a,E)(ppa,b,E)(ppc,d,E)}
+//  points to = {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,
+//   -Exact-);(ppa,b,-Exact-);(ppc,d,-Exact-)}
    *ppc = &pc;
-//  points to = {(pc,c,E)(pb,b,E)(pa,a,E)(ppc,d,E)(ppa,b,E)(ppb,a,E)}
+//  points to = {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppc,d,
+//   -Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
 
    pd = &d;
-//  points to = {(pd,d,E)(pc,c,E)(pb,b,E)(pa,a,E)(ppc,d,E)(ppa,b,
-//   E)(ppb,a,E)}
+//  points to = {(pd,d,-Exact-);(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,
+//   -Exact-);(ppc,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
    ppd = &c;
-//  points to = {(pa,a,E)(ppb,a,E)(ppa,b,E)(pd,d,E)(pc,c,E)(ppc,d,
-//   E)(ppd,c,E)(pb,b,E)}
+//  points to = {(pa,a,-Exact-);(ppb,a,-Exact-);(ppa,b,-Exact-);(pd,d,
+//   -Exact-);(pc,c,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pb,b,
+//   -Exact-)}
    *ppd = &pd;
-//  points to = {(pd,d,E)(ppa,b,E)(ppb,a,E)(pc,c,E)(pb,b,E)(ppd,c,
-//   E)(ppc,d,E)(pa,a,E)}
+//  points to = {(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pc,c,
+//   -Exact-);(pb,b,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pa,a,
+//   -Exact-)}
 
    pc = pd;
-//  points to = {(pd,d,E)(ppa,b,E)(ppb,a,E)(pc,d,E)(pb,b,E)(ppc,d,
-//   E)(ppd,c,E)(pa,a,E)}
+//  points to = {(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pc,d,
+//   -Exact-);(pb,b,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pa,a,
+//   -Exact-)}
 
    *ppc = &a;
-//  points to = {(pc,d,E)(ppb,a,E)(ppa,b,E)(pb,b,E)(pa,a,E)(ppd,c,
-//   E)(ppc,d,E)(pd,d,E)}
+//  points to = {(pc,d,-Exact-);(ppb,a,-Exact-);(ppa,b,-Exact-);(pb,b,
+//   -Exact-);(pa,a,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pd,d,
+//   -Exact-)}
 
    *ppa = pc;
-//  points to = {(pa,a,E)(b,d,E)(ppa,b,E)(ppb,a,E)(pd,d,E)(pc,d,
-//   E)(ppc,d,E)(ppd,c,E)(pb,b,E)}
+//  points to = {(pa,a,-Exact-);(b,d,-Exact-);(ppa,b,-Exact-);(ppb,a,
+//   -Exact-);(pd,d,-Exact-);(pc,d,-Exact-);(ppc,d,-Exact-);(ppd,c,
+//   -Exact-);(pb,b,-Exact-)}
 
    pa = *ppd;
-//  points to = {(b,d,E)(ppa,b,E)(ppb,a,E)(pd,d,E)(pc,d,E)(ppd,c,
-//   E)(ppc,d,E)(pb,b,E)}
+//  points to = {(b,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pd,d,
+//   -Exact-);(pc,d,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pb,b,
+//   -Exact-)}
 
    *ppa = *ppd;
-//  points to = {(b,d,E)(ppa,b,E)(ppb,a,E)(pd,d,E)(pc,d,E)(ppc,d,
-//   E)(ppd,c,E)(pb,b,E)}
+//  points to = {(b,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pd,d,
+//   -Exact-);(pc,d,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pb,b,
+//   -Exact-)}
 
    return 0;
    // END BLOCK

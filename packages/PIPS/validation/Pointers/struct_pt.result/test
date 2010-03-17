@@ -1,0 +1,51 @@
+int main()
+{
+   // BEGIN BLOCK
+   typedef struct my_struct {
+      int i;
+      int *p;
+   } my_str;
+   my_str *m, *n;
+   int j;
+//               <must be written>: j
+   j = 2;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m
+   m = (my_str *) malloc(sizeof(my_str));
+//               <must be read   >: m
+//               <must be written>: m[0][1]
+   m->i = 1;
+//               <must be read   >: m
+//               <must be written>: m[0][2]
+   m->p = &j;
+//               <must be read   >: m
+//               <must be written>: n
+   n = m;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   typedef struct my_struct {
+      int i;
+      int *p;
+   } my_str;
+   my_str *m, *n;
+   int j;
+   j = 2;
+   m = (my_str *) malloc(sizeof(my_str));
+//  points to = {(m,*ANYWHERE*,-MAY-)}
+   m->i = 1;
+//  points to = {(m,*ANYWHERE*,-MAY-)}
+   m->p = &j;
+//  points to = {(m[0][2],j,-Exact-);(m,*ANYWHERE*,-MAY-)}
+   n = m;
+//  points to = {(m[0][2],j,-Exact-);(n,*ANYWHERE*,-MAY-);(m,
+//   *ANYWHERE*,-MAY-)}
+
+   return 0;
+   // END BLOCK
+}

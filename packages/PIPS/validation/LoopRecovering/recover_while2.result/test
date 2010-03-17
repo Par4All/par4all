@@ -1,19 +1,19 @@
 int find_while(int i)
 {
 
-begin2:   if (i++<9) {                                                         /*0006*/
+begin2:   if (i++<9) {                                                         /*0005*/
    }
    else {
       goto begin2;
    }
 
 end2:   i++;
-begin:   if (i<9) goto l99999;                                                /*0013*/
-   i = 8*i;                                                             /*0017*/
+begin:   if (i<9) goto l99999;                                                /*0012*/
+   i = 8*i;                                                             /*0016*/
    goto begin;
 l99999:   ;
 
-   i++;                                                                 /*0014*/
+   i++;                                                                 /*0013*/
 
 the_end:   return i;
 }
@@ -25,8 +25,8 @@ int find_while(int i)
 end2:   ;
    i++;
    while (!(i<9)) 
-      i = 8*i;                                                          /*0017*/
-   i++;                                                                 /*0014*/
+      i = 8*i;                                                          /*0016*/
+   i++;                                                                 /*0013*/
 
 the_end:   return i;
 }
@@ -38,8 +38,8 @@ int find_while(int i)
 end2:   ;
    i++;
    while (!(i<9)) 
-      i = 8*i;                                                          /*0017*/
-   i++;                                                                 /*0014*/
+      i = 8*i;                                                          /*0016*/
+   i++;                                                                 /*0013*/
 
 the_end:   return i;
 }
@@ -51,8 +51,8 @@ int find_while(int i)
 end2:   ;
    i++;
    while (!(i<9)) 
-      i = 8*i;                                                          /*0017*/
-   i++;                                                                 /*0014*/
+      i = 8*i;                                                          /*0016*/
+   i++;                                                                 /*0013*/
 
 the_end:   return i;
 }

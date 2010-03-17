@@ -6,7 +6,10 @@ C  T(if01) {0<=if01+1, if01<=1}
 
 int if01()
 {
-   int i,  n;
+
+//  T() {}
+
+   int i, n;
 
 //  T(i) {i==0}
 
@@ -51,7 +54,10 @@ Preconditions for "if01"
 
 int if01()
 {
-   int i,  n;
+
+//  P() {}
+
+   int i, n;
 
 //  P() {}
 

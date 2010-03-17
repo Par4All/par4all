@@ -6,7 +6,7 @@ activate C_PARSER
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 display PRINTED_FILE[%ALLFUNC]
 apply INLINING[foo]
-display PRINTED_FILE[inlining20]
+display PRINTED_FILE[inlining20!,inlining20]
 apply FLATTEN_CODE[inlining20]
 display PRINTED_FILE[inlining20]
 close

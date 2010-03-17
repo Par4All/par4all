@@ -23,21 +23,31 @@ module transfo
 apply UNFOLDING
 display PRINTED_FILE
 
-#setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
-#apply OPTIMIZE_EXPRESSIONS
-#apply PARTIAL_EVAL
-#apply SUPPRESS_DEAD_CODE
-#apply CLEAN_DECLARATIONS
-#display PRINTED_FILE
+apply SPLIT_INITIALIZATIONS
+display PRINTED_FILE
 
-setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
-apply OPTIMIZE_EXPRESSIONS
+setproperty COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS FALSE
+apply COMMON_SUBEXPRESSION_ELIMINATION
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+apply FORWARD_SUBSTITUTE
+display PRINTED_FILE
+
+#setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+#apply OPTIMIZE_EXPRESSIONS
 #apply PARTIAL_EVAL
 #apply SUPPRESS_DEAD_CODE
 #apply CLEAN_DECLARATIONS
 display PRINTED_FILE
 apply FLATTEN_CODE
 display PRINTED_FILE
+
+
+# missing loop_fusion
+# missing saturated arith detection
+# missing loop coalescing
+# sould add loop_interchange somewhere
 
 # apply CLEAN_DECLARATIONS[]
 # display PRINTED_FILE[]

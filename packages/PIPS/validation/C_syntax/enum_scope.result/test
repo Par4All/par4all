@@ -1,4 +1,4 @@
-bar()
+int bar()
 {
    int a;
 }
@@ -7,8 +7,8 @@ enum hue {node, nide};
 extern int foo();
 enum test {a, b};
 // int a;
-extern  bar();
-foo()
+extern int bar();
+int foo()
 {
    enum hue {node, nide};
    enum hue1 {node1, nide1};
@@ -16,7 +16,7 @@ foo()
    enum hue x;
    int hue;
 }
-main()
+int main()
 {
    enum hue {node, nide};
    enum hue1 {node1, nide1};

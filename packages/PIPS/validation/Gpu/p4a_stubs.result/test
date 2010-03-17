@@ -1,0 +1,42 @@
+/home/keryell/projets/Wild_Systems/PIPS/git-svn-work/pips/bin/pips -f ././p4a_stubs.f p4a_stubs
+
+
+	SUBROUTINE P4A_ACCEL_FREE(DEST)
+	INTEGER DEST
+! Do nothing since it is not representable in Fortran 77...
+      END
+
+
+	SUBROUTINE P4A_ACCEL_MALLOC(DEST, N)
+	INTEGER N
+	INTEGER DEST
+! Do nothing since it is not representable in Fortran 77...
+      END
+
+
+	FUNCTION P4A_COPY_FROM_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
+	INTEGER N
+	CHARACTER HOST_ADDRESS(N)
+	CHARACTER ACCEL_ADDRESS(N)
+	INTEGER I
+	INTEGER P4A_COPY_FROM_ACCEL
+
+      DOALL I = 1, N                                                    0010
+         HOST_ADDRESS(I) = ACCEL_ADDRESS(I)                             0011
+      ENDDO
+      P4A_COPY_FROM_ACCEL = HOST_ADDRESS                                0013
+      END
+! Equivalent stubs of Par4All runtime to keep the PIPS analyzes happy
+
+	FUNCTION P4A_COPY_TO_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
+	INTEGER N
+	CHARACTER HOST_ADDRESS(N)
+	CHARACTER ACCEL_ADDRESS(N)
+	INTEGER I
+	INTEGER P4A_COPY_TO_ACCEL
+
+      DOALL I = 1, N                                                    0010
+         ACCEL_ADDRESS(I) = HOST_ADDRESS(I)                             0011
+      ENDDO
+      P4A_COPY_TO_ACCEL = ACCEL_ADDRESS                                 0013
+      END

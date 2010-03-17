@@ -25,11 +25,11 @@ int main()
    k = 1;
    h = 2;
    y = &h;
-//  points to = {(y,h,E)}
+//  points to = {(y,h,-Exact-)}
    *x = y;
-//  points to = {(y,h,E)}
+//  points to = {(y,h,-Exact-)}
    printf("x = %p \n", x);
-//  points to = {(y,h,E)}
+//  points to = {(y,h,-Exact-)}
    return 0;
    // END BLOCK
 }

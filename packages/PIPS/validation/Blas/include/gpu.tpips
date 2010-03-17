@@ -1,0 +1,35 @@
+setproperty EVAL_SYMBOLIC_CONSTANT FALSE
+setproperty GPU_LAUNCHER_PREFIX "P4A_KERNEL_LAUNCHER"
+setproperty GPU_WRAPPER_PREFIX "P4A_KERNEL_WRAPPER"
+setproperty GPU_KERNEL_PREFIX "P4A_KERNEL"
+setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_ACCEL_MALLOC"
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_ACCEL_FREE"
+setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_COPY_TO_ACCEL"
+setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_COPY_FROM_ACCEL"
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+# Loop normalize for the C language and GPU friendly
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 0
+# It is legal in the following by construction:
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+# If we do this here, the side effect at the end of a loop on the index
+# break parallelization. It would require to apply USE_DEF_ELIM...
+
+display PRINTED_FILE
+
+apply LOOP_NORMALIZE
+apply PRIVATIZE_MODULE
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE
+
+apply GPU_IFY
+display PRINTED_FILE[%ALLFUNC]
+display C_PRINTED_FILE[%ALLFUNC]
+
+apply KERNEL_LOAD_STORE
+display PRINTED_FILE

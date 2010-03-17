@@ -22,7 +22,7 @@ setproperty INLINING_CALLERS "gradient"
 apply INLINING[dilate]
 apply INLINING[erode]
 
-display PRINTED_FILE[gradient]
+display PRINTED_FILE[inlining26!,gradient]
 close
 delete inlining26
 quit

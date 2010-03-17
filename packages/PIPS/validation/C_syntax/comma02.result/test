@@ -48,7 +48,7 @@ int foo(int i, int j)
 
 //  T(foo) {i+j==foo}
 
-   return i+j;                                                          /*0004*/
+   return i+j;                                                          /*0008*/
 }
 
 Transformers for "main"
@@ -58,6 +58,9 @@ Transformers for "main"
 
 int main()
 {
+
+//  T() {}
+
    int i, j;                                                            /*0013*/
 
 //  T(i,j) {i==2, j==1}
@@ -82,6 +85,9 @@ Preconditions for "main"
 
 int main()
 {
+
+//  P() {}
+
    int i, j;                                                            /*0013*/
 
 //  P() {}
@@ -109,5 +115,5 @@ int foo(int i, int j)
 
 //  P() {i==-5, j==-6}
 
-   return i+j;                                                          /*0004*/
+   return i+j;                                                          /*0008*/
 }

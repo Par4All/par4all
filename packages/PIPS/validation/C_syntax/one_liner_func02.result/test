@@ -1,10 +1,10 @@
 int a(char *b)
 {
-   fputs(b);                                                            /*0002*/
+   fputs(b);                                                            /*0001*/
 }
 float b(double c)
 {
-   return b;                                                            /*0003*/
+   return b;                                                            /*0002*/
 }
 float c(int d)
 {
@@ -24,11 +24,11 @@ extern float c(int d);                                                  /*0006*/
 double zz;                                                              /*0009*/
 int a(char *b)
 {
-   fputs(b);                                                            /*0002*/
+   fputs(b);                                                            /*0001*/
 }
 float b(double c)
 {
-   return b;                                                            /*0003*/
+   return b;                                                            /*0002*/
 }
 float c(int d)
 {
@@ -56,22 +56,22 @@ double zz;
 int a(char * b){ fputs(b); }
 int a(char *b)
 {
-   fputs(b);                                                            /*0002*/
+   fputs(b);                                                            /*0001*/
 }
 int a(char *b)
 {
-   fputs(b);                                                            /*0002*/
+   fputs(b);                                                            /*0001*/
 }
 # 1
 float b(double c) {
   return b;}
 float b(double c)
 {
-   return b;                                                            /*0003*/
+   return b;                                                            /*0002*/
 }
 float b(double c)
 {
-   return b;                                                            /*0003*/
+   return b;                                                            /*0002*/
 }
 # 2
 float c(int d){return i+d;}

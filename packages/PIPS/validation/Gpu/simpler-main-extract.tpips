@@ -1,9 +1,9 @@
-setenv WKS gpu-extract
+setenv WKS simpler-main-extract
 delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create $WKS simpler-main-extract.c $P4A_DIR/p4a_stubs.c
+create $WKS $WKS.c p4a_stubs.c
 
 echo Select some options to deal with the C Language:
 echo Parse as C:
@@ -100,14 +100,14 @@ echo
 
 apply UNSPLIT
 
-shell echo Generating P4A code:
-shell echo
-shell cd $WKS.database; $P4A_DIR/p4a_post_processor.py Src/*.c
 
 close
 #delete $WKS
 quit
 
+shell echo Generating P4A code:
+shell echo
+shell cd $WKS.database; $P4A_DIR/p4a_post_processor.py Src/*.c
 
 
 shell echo

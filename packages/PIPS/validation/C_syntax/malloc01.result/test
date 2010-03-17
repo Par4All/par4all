@@ -17,8 +17,8 @@ Variable list:
 	Declared entity "malloc01:*HEAP*" with type "area" with size 0
 	Declared entity "malloc01:*STACK*" with type "area" with size 0
 	Declared entity "malloc01:*STATIC*" with type "area" with size 0
-	Declared entity "malloc01:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "malloc01:0`__func__" with type "variable" "char"
+	Declared entity "malloc01:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "malloc01:0`__func__" with type "variable" "char *"
 
 * empty extern declaration list *
 

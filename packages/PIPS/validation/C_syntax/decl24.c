@@ -59,7 +59,7 @@ void *HDL_progress_end(HDL_progress_handler *prog)
 void HDL_progress_start_monitor(HDL_progress_handler * progress /*,ERR_mgr * emgr,const void * data*/)
 {
   /* ERR_MGR_IF_DO( ! progress , emgr , ERR_TBD , return ); */
-  
+
   if(progress)
     {
       progress->percent_start = 0;

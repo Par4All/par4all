@@ -8,15 +8,15 @@ Declarations for module "main" with type "() -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "main:*DYNAMIC*" with type "area" with size 30
+	Declared entity "main:*DYNAMIC*" with type "area" with size 34
 	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "main:0`t" with type "variable" "TREE"
-	Declared entity "main:0`tree" with type "variable" "struct {int left; int right;}"
-	Declared entity "main:0`treeptr" with type "variable" "struct {int left; int right;} *"
+	Declared entity "main:0`tree" with type "variable" "struct  {int left; int right;}"
+	Declared entity "main:0`treeptr" with type "variable" "struct  {int left; int right;} *"
 	Declared entity "main:main" with type "variable" "int"
 	Declared entity "ndecl12!:*STATIC*" with type "area" with size 0
 
@@ -30,8 +30,8 @@ Derived entities:
 
 Typedef entities:
 
-	Typedef "main:0`$TREE"	with type "variable" "struct {int left; int right;}"
-	Typedef "main:0`$TREEPTR"	with type "variable" "struct {int left; int right;} *"
+	Typedef "main:0`$TREE"	with type "variable" "struct  {int left; int right;}"
+	Typedef "main:0`$TREEPTR"	with type "variable" "struct  {int left; int right;} *"
 
 Layout for return variable:
 
@@ -43,10 +43,10 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "main:*DYNAMIC*" of size 30:
+Layout for memory area "main:*DYNAMIC*" of size 34:
 	Variable "main:0`tree"	offset = 10	size = 8
-	Variable "main:0`treeptr"	offset = 18	size = 4
-	Variable "main:0`t"	offset = 22	size = 8
+	Variable "main:0`treeptr"	offset = 18	size = 8
+	Variable "main:0`t"	offset = 26	size = 8
 	Variable "main:0`__func__"	offset = 0	size = 5
 	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
 
@@ -73,14 +73,14 @@ Parsed printed file
 
 int main()
 {
-   typedef struct {                                                     /*0004*/
+   typedef struct {                                                     /*0003*/
       int left;
       int right;
    } TREE, *TREEPTR;
-   struct {                                                             /*0005*/
+   struct {                                                             /*0004*/
       int left;
       int right;
    } tree, *treeptr;
 
-   TREE t;                                                              /*0007*/
+   TREE t;                                                              /*0006*/
 }

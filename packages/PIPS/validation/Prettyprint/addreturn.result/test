@@ -1,0 +1,8 @@
+/home/local/fabien/PIPS/prod/pips/bin/pips -f $VDIR/addreturn.f addreturn
+      SUBROUTINE ADDRETURN(N)
+C     Bug: an explicit RETURN is added by the prettyprinter; PIPS output
+C     are not PIPS compatible as input in some cases (WP65)
+      N = 1                                                             0004
+      IF (N.NE.1) RETURN                                                0005
+      N = 3                                                             0008
+      END

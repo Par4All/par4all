@@ -1,9 +1,9 @@
 
 Parser output
 
-main()
+int main()
 {
-   int i,  j,  k,  l;
+   int i, j, k, l;
    i = 015;
    // octal constant
    j = 0x1ae;
@@ -15,9 +15,9 @@ main()
 
 Controlizer output
 
-main()
+int main()
 {
-   int i,  j,  k,  l;
+   int i, j, k, l;
    i = 015;
    // octal constant
    j = 0x1ae;
@@ -32,9 +32,12 @@ Preconditions
 
 //  P() {}
 
-main()
+int main()
 {
-   int i,  j,  k,  l;
+
+//  P() {}
+
+   int i, j, k, l;
 
 //  P() {}
 

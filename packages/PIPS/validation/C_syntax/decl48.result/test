@@ -14,8 +14,8 @@ Variable list:
 	Declared entity "decl48!flat_color_z_triangle:*STACK*" with type "area" with size 0
 	Declared entity "decl48!flat_color_z_triangle:*STATIC*" with type "area" with size 0
 	Declared entity "decl48!flat_color_z_triangle:0`1`eMaj" with type "variable" "EdgeT"
-	Declared entity "flat_color_z_triangle:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "flat_color_z_triangle:0`__func__" with type "variable" "char"
+	Declared entity "flat_color_z_triangle:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "flat_color_z_triangle:0`__func__" with type "variable" "char *"
 
 * empty extern declaration list *
 
@@ -59,12 +59,12 @@ Code
 static void flat_color_z_triangle()
 {
    {
-      typedef struct {                                                  /*0007*/
+      typedef struct {                                                  /*0009*/
          int v0;
       } EdgeT;
 
-      EdgeT eMaj;                                                       /*0009*/
+      EdgeT eMaj;                                                       /*0011*/
 
-      eMaj.v0 = 1;                                                      /*0011*/
+      eMaj.v0 = 1;                                                      /*0013*/
    }
 }

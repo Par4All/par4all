@@ -8,11 +8,9 @@ C     to privatization02.f)
 
 !$OMP DO PRIVATE(I,K)
       DO I = 1, 10                                                      0008
-         PRIVATE(I,K)
 
 !$OMP    DO PRIVATE(K)
          DO K = 1, 10                                                   0009
-            PRIVATE(K)
             J = J+1                                                     0010
          ENDDO
          A(I) = J                                                       0012

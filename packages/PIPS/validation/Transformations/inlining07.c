@@ -1,4 +1,4 @@
-#include<stdio.h>
+extern  int printf(const char *format, ...);
 static int pmax(int a, int b)
 {
     int c =a > b ? a : b;

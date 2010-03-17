@@ -1,0 +1,1 @@
+Unlike Semantics, the tpips scripts use the current pipsmake environment and not the initial one.

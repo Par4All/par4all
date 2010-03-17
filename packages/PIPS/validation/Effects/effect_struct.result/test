@@ -11,7 +11,7 @@ and statement transformers:
 Try to restructure the code for more precision:
 float main(int argc, char *argv[])
 {
-   int i,  j,  k;
+   int i, j, k;
 //               <must be written>: i
 
    for(i = 0; i <= 8; i += 1)
@@ -32,7 +32,7 @@ float main(int argc, char *argv[])
 //               <must be read   >: TOP-LEVEL:imagein[2][1][1]
 float main(int argc, char *argv[])
 {
-   int i,  j,  k;
+   int i, j, k;
 //               <may be read    >: i j
 //               <may be written >: TOP-LEVEL:imagein[*][*][1] 
 //                                  TOP-LEVEL:imagein[*][*][2] j
@@ -62,7 +62,7 @@ float main(int argc, char *argv[])
 
 float main(int argc, char *argv[])
 {
-   int i,  j,  k;
+   int i, j, k;
 
 //  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=8,
 //    0<=PHI2, PHI2<=8, 1<=PHI3, PHI3<=2}>
@@ -94,7 +94,7 @@ float main(int argc, char *argv[])
 Privatize scalar variables on all the modules of the program:
 float main(int argc, char *argv[])
 {
-   int i,  j,  k;
+   int i, j, k;
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= 8; i += 1)

@@ -3,7 +3,7 @@ Cumulated effects for "main"
 
 //               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
 //               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
-main()
+int main()
 {
 //               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
 //               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
@@ -31,6 +31,9 @@ void static01()
 //  T(i) {i==i#init+1}
 
    // BEGIN BLOCK
+
+//  T() {}
+
    static int i = 0;
 
 //  T(i) {i==i#init+1}
@@ -49,7 +52,7 @@ Transformers for "main"
 
 //  T(static01:0`i) {static01:0`i==3, static01:0`i#init==0}
 
-main()
+int main()
 {
 
 //  T(static01:0`i) {static01:0`i==3, static01:0`i#init==0}
@@ -75,7 +78,7 @@ Preconditions for "main"
 
 //  P() {static01:0`i==0}
 
-main()
+int main()
 {
 
 //  P() {static01:0`i==0}

@@ -1,29 +1,29 @@
 // OMP style
 void main(int argc, char **argv)
 {
-   int i, j, k;                                                         /*0003*/
-   int a[10];                                                           /*0004*/
-   i = 0;                                                               /*0005*/
-   j = 0;                                                               /*0006*/
-   k = 0;                                                               /*0007*/
+   int i, j, k;                                                         /*0006*/
+   int a[10];                                                           /*0007*/
+   i = 0;                                                               /*0008*/
+   j = 0;                                                               /*0009*/
+   k = 0;                                                               /*0010*/
    if (argc==2) goto switch_1_case_2;
    if (argc==6) goto switch_1_case_6;
 switch_1_default:   ;
 #pragma omp parallel for 
    for(k = k; k <= 9; k += 1)
-      a[k] = k;                                                         /*0021*/
+      a[k] = k;                                                         /*0024*/
    goto break_1;
 switch_1_case_6:   ;
 #pragma omp parallel for 
    for(j = 6; j <= 9; j += 1)
-      a[j] = j;                                                         /*0016*/
+      a[j] = j;                                                         /*0019*/
    goto break_1;
 switch_1_case_2:   ;
 #pragma omp parallel for 
    for(i = 2; i <= 9; i += 1)
-      a[i] = i;                                                         /*0011*/
+      a[i] = i;                                                         /*0014*/
 break_1:   ;
-   return 0;                                                            /*0025*/
+   return 0;                                                            /*0028*/
 }
 // This test case used to make pips ricedg phase to fail because of
 // the expression case was not handled.

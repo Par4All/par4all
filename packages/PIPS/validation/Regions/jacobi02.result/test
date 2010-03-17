@@ -686,6 +686,9 @@ void p4a_kernel_launcher_0(float_t save[501][501], float_t space[501][501])
 kernel1:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
+         // To be assigned to a call to P4A_vp_0: i
+         // To be assigned to a call to P4A_vp_1: j
+         
          p4a_kernel_wrapper_0(save, space, i, j);
    // END BLOCK
 }
@@ -698,6 +701,9 @@ void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
 kernel2:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
+         // To be assigned to a call to P4A_vp_0: i
+         // To be assigned to a call to P4A_vp_1: j
+         
          p4a_kernel_wrapper_1(save, space, i, j);
    // END BLOCK
 }
@@ -711,6 +717,8 @@ void p4a_kernel_launcher_2(float_t space[501][501])
    /* Erase the memory, in case the image is not big enough: */
    for(i = 0; i <= 500; i += 1)
       for(j = 0; j <= 500; j += 1)
+         // To be assigned to a call to P4A_vp_0: i
+         // To be assigned to a call to P4A_vp_1: j
          p4a_kernel_wrapper_2(space, i, j);
    // END BLOCK
 }
@@ -718,12 +726,9 @@ void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
-   // BEGIN BLOCK
-   // To be replaced with a call to P4A_vp_0
-   i = i;
-   // To be replaced with a call to P4A_vp_1
-   j = j;
-
+   // To be assigned to a call to P4A_vp_0: i
+   // To be assigned to a call to P4A_vp_1: j
+   
    p4a_kernel_0(save, space, i, j);
    // END BLOCK
 }
@@ -731,12 +736,9 @@ void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
-   // BEGIN BLOCK
-   // To be replaced with a call to P4A_vp_0
-   i = i;
-   // To be replaced with a call to P4A_vp_1
-   j = j;
-
+   // To be assigned to a call to P4A_vp_0: i
+   // To be assigned to a call to P4A_vp_1: j
+   
    p4a_kernel_1(save, space, i, j);
    // END BLOCK
 }
@@ -744,11 +746,8 @@ void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
-   // BEGIN BLOCK
-   // To be replaced with a call to P4A_vp_0
-   i = i;
-   // To be replaced with a call to P4A_vp_1
-   j = j;
+   // To be assigned to a call to P4A_vp_0: i
+   // To be assigned to a call to P4A_vp_1: j
    p4a_kernel_2(space, i, j);
    // END BLOCK
 }
@@ -1615,19 +1614,17 @@ void get_data(char filename[])
    p4a_kernel_launcher_2(space);
    
    /* Read the pixel grey value: */
-#pragma omp DO private(c,j)
+#pragma omp for private(c,j)
    for(j = 0; j <= ny-1; j += 1)
 
 //  <c-PRIVATE-EXACT-{}>
 
-#pragma omp DO private(c,i)
+#pragma omp for private(c,i)
       for(i = 0; i <= nx-1; i += 1) {
 
 //  <c-PRIVATE-EXACT-{}>
 
          // BEGIN BLOCK
-      private(c,j)
-         private(c,i)
          c = fgetc(fp);
          /* Truncate the image if too big: */
          if (i<501&&j<501) 

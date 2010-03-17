@@ -7,15 +7,15 @@ Privatize scalar variables
 
  **************** Effective Dependence Graph ****************
 
-	08 --> 11 with conflicts
+	15 --> 18 with conflicts
 		from <TOP-LEVEL:Matrix(i)-W-MUST> to <TOP-LEVEL:Matrix(i,j)-W-MUST> at levels  2
-	08 --> 11 with conflicts
+	15 --> 18 with conflicts
 		from <TOP-LEVEL:Matrix(i)-W-MUST> to <TOP-LEVEL:Matrix(i)-R-MUST> at levels  2
-	08 --> 08 with conflicts
+	15 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
-	08 --> 08 with conflicts
+	15 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
-	08 --> 08 with conflicts
+	15 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
@@ -24,51 +24,51 @@ Privatize scalar variables
 
 int main(void)
 {
-   int i, j;                                                            /*0003*/
+   int i, j;                                                            /*0010*/
 
-   Matrix = (int **) malloc(N*sizeof(int *));                           /*0005*/
+   Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
    for(i = 0; i <= N-1; i += 1)
-      Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
+      Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
 #pragma omp parallel for private(j)
    for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= Z-1; j += 1)
-         Matrix[i][j] = i*j;                                            /*0011*/
-   return 0;                                                            /*0014*/
+         Matrix[i][j] = i*j;                                            /*0018*/
+   return 0;                                                            /*0021*/
 }
 
 Internalize parallel code
 
 int main(void)
 {
-   int i, j;                                                            /*0003*/
+   int i, j;                                                            /*0010*/
 
-   Matrix = (int **) malloc(N*sizeof(int *));                           /*0005*/
+   Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
    for(i = 0; i <= N-1; i += 1)
-      Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
+      Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
 #pragma omp parallel for private(j)
    for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= Z-1; j += 1)
-         Matrix[i][j] = i*j;                                            /*0011*/
-   return 0;                                                            /*0014*/
+         Matrix[i][j] = i*j;                                            /*0018*/
+   return 0;                                                            /*0021*/
 }
 
 Ompify code
 
 int main(void)
 {
-   int i, j;                                                            /*0003*/
+   int i, j;                                                            /*0010*/
 
-   Matrix = (int **) malloc(N*sizeof(int *));                           /*0005*/
+   Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
    for(i = 0; i <= N-1; i += 1)
-      Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
+      Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
 #pragma omp parallel for private(j)
    for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for
       for(j = 0; j <= Z-1; j += 1)
-         Matrix[i][j] = i*j;                                            /*0011*/
-   return 0;                                                            /*0014*/
+         Matrix[i][j] = i*j;                                            /*0018*/
+   return 0;                                                            /*0021*/
 }
 
 Unsplit code

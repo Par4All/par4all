@@ -74,8 +74,8 @@ user warning in safe_do_something: Request aborted under pipsmake: build resourc
 user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
 echo
 
-echo Parsed rinted file for "decl13"
-Parsed rinted file for "decl13"
+echo Parsed printed file for "decl13"
+Parsed printed file for "decl13"
 echo
 
 Module decl13 selected

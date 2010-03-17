@@ -1,7 +1,6 @@
 
 Printed files for file1.c
 
-
 int i;
 extern void a();
 
@@ -42,7 +41,6 @@ Unsplit files
 /*
  * file for file1.c
  */
-
 int i;
 extern void a();
 
@@ -71,7 +69,6 @@ int d()
 /*
  * file for file3.c
  */
-
 extern void e();
 
 extern int f();

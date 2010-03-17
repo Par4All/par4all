@@ -15,20 +15,38 @@ C  T() {}
 
 void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
+
+//  T() {}
+
    int i, j;
 
 //  T(i,j) {0<=i}
 
    for(i = 0; i <= n-1; i += 1) {
 
-//  T(j) {0<=i, i+1<=n, j#init<=idx, 0<=j}
+//  T(j) {0<=i, i+1<=n, 0<=j}
 
       for(j = 0; j <= n-1; j += 1) {
+
+//  T(idx) {0<=i, i+1<=n, j<=idx, 0<=j, j+1<=n}
+
          int idx = i*n+j;
 
+
+//  T() {0<=i, i+1<=n, j<=idx, 0<=j, j+1<=n}
+
          _Bool right = i>0;
+
+//  T() {0<=i, i+1<=n, j<=idx, 0<=j, j+1<=n}
+
          _Bool left = i<n-1;
+
+//  T() {0<=i, i+1<=n, j<=idx, 0<=j, j+1<=n}
+
          _Bool top = j>0;
+
+//  T() {0<=i, i+1<=n, j<=idx, 0<=j, j+1<=n}
+
          _Bool bottom = j<n-1;
 
 //  T() {0<=i, i+1<=n, j<=idx, 0<=j, j+1<=n}
@@ -43,20 +61,42 @@ Check preconditions for "conv_cpu"
 
 void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
+
+//  P() {n==10000}
+
    int i, j;
 
-//  P() {10000i+j==idx, n==10000}
+//  P() {n==10000}
 
    for(i = 0; i <= n-1; i += 1) {
 
-//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000}
+//  P(i,j) {n==10000, 0<=i, i<=9999}
 
       for(j = 0; j <= n-1; j += 1) {
+
+//  P(i,j) {n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
+
          int idx = i*n+j;
 
+
+//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
+//    j<=9999}
+
          _Bool right = i>0;
+
+//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
+//    j<=9999}
+
          _Bool left = i<n-1;
+
+//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
+//    j<=9999}
+
          _Bool top = j>0;
+
+//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
+//    j<=9999}
+
          _Bool bottom = j<n-1;
 
 //  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,

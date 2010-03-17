@@ -29,13 +29,15 @@ echo Parsed printed file for "decl21"
 echo
 
 display PARSED_PRINTED_FILE[decl21]
-quit
-echo
-echo Printed file
-echo
 
-display PRINTED_FILE[decl21]
+#echo
+#echo Printed file
+#echo
+#
+#display PRINTED_FILE[decl21]
 
+apply UNSPLIT
+shell cc -c decl21.database/Src/decl21.c
 
 close
 delete decl21

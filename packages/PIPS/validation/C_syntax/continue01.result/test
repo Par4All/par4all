@@ -3,8 +3,8 @@ Parsed printed file
 
 void continue01()
 {
-   int i;                                                               /*0004*/
+   int i;                                                               /*0005*/
    /* Continue are preserved by comments */
-   ;                                                                    /*0006*/
+   ;                                                                    /*0007*/
 
 }

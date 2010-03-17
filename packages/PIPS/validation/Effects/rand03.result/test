@@ -3,8 +3,8 @@ PRINT CODE for AddNoise
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
-   int ix,  iy;
-   double u,  A,  v,  B;
+   int ix, iy;
+   double u, A, v, B;
    
    // MOTIF 
    u = 0;
@@ -36,8 +36,8 @@ PRINT CUMULATED EFFECTS for AddNoise
 //               <must be read   >: nx ny
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
-   int ix,  iy;
-   double u,  A,  v,  B;
+   int ix, iy;
+   double u, A, v, B;
 //               <must be written>: u
    
    // MOTIF 
@@ -104,9 +104,10 @@ PRINT CUMULATED EFFECTS for main
 
 //               <may be read    >: _RANDOM_EFFECTS:GEN_SEED
 //               <may be written >: _RANDOM_EFFECTS:GEN_SEED
-main()
+int main()
 {
-   int ny = 10,  nx = 10;
+//               <must be written>: nx ny
+   int ny = 10, nx = 10;
    Cplfloat pt_in[ny][nx];
    float Sigma2;
    Cplfloat pt_out[ny][nx];
@@ -134,8 +135,8 @@ PRINT REGIONS for AddNoise
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
-   int ix,  iy;
-   double u,  A,  v,  B;
+   int ix, iy;
+   double u, A, v, B;
 
 //  <u-W-EXACT-{}>
 
@@ -294,9 +295,13 @@ PRINT REGIONS for main
 //  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
 //  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 
-main()
+int main()
 {
-   int ny = 10,  nx = 10;
+
+//  <nx-W-EXACT-{}>
+//  <ny-W-EXACT-{}>
+
+   int ny = 10, nx = 10;
    Cplfloat pt_in[ny][nx];
    float Sigma2;
    Cplfloat pt_out[ny][nx];

@@ -43,12 +43,14 @@ void call08(int r, int m, int *x)
 
 Proper effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
-   int i,  j;
+   int i, j;
 //               <must be read   >: d1
 //               <must be written>: i
 
@@ -60,12 +62,14 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
-   int i,  j;
+   int i, j;
 //               <may be read    >: d2 i
 //               <may be written >: y[*][5]
 //               <must be read   >: d1

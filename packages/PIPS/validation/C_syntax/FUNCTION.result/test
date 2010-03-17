@@ -1,14 +1,14 @@
 
 parsed printed file
 
-main()
+int main()
 {
    fprintf(stderr, "%s\n", __FUNCTION__);
 }
 
 printed file
 
-main()
+int main()
 {
    fprintf(stderr, "%s\n", __FUNCTION__);
 }

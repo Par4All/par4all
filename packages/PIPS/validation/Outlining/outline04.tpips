@@ -35,7 +35,6 @@ apply PRIVATIZE_MODULE[%ALLFUNC]
 apply COARSE_GRAIN_PARALLELIZATION[init_kernel]
 echo The loop nest of init_kernel should be parallel:
 display PRINTED_FILE[%ALL]
-display PARALLELPRINTED_FILE[%ALLFUNC]
 
 close
 quit

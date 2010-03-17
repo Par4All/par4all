@@ -106,44 +106,44 @@ display PRINTED_FILE
 #apply INVARIANT_CODE_MOTION
 #display PRINTED_FILE
 
-echo
-echo Microcode after flattening
-echo
-
-apply FLATTEN_CODE
-apply PARTIAL_EVAL
-#apply USE_DEF_ELIMINATION
-apply SUPPRESS_DEAD_CODE
-apply CLEAN_DECLARATIONS
-display PRINTED_FILE
-
-
-echo
-echo Microcode after CSE
-echo
-
-setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
-apply OPTIMIZE_EXPRESSIONS
-apply CLEAN_DECLARATIONS
-display PRINTED_FILE
-
-echo
-echo Microcode after ICM
-echo
-
-setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
-apply OPTIMIZE_EXPRESSIONS
-apply PARTIAL_EVAL
-apply SUPPRESS_DEAD_CODE
-apply CLEAN_DECLARATIONS
-display PRINTED_FILE
-
-echo
-echo Microcode After atomization
-echo
-
-apply SIMD_ATOMIZER
-display PRINTED_FILE
+#echo
+#echo Microcode after flattening
+#echo
+#
+#apply FLATTEN_CODE
+#apply PARTIAL_EVAL
+##apply USE_DEF_ELIMINATION
+#apply SUPPRESS_DEAD_CODE
+#apply CLEAN_DECLARATIONS
+#display PRINTED_FILE
+#
+#
+#echo
+#echo Microcode after CSE
+#echo
+#
+#setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
+#apply OPTIMIZE_EXPRESSIONS
+#apply CLEAN_DECLARATIONS
+#display PRINTED_FILE
+#
+#echo
+#echo Microcode after ICM
+#echo
+#
+#setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+#apply OPTIMIZE_EXPRESSIONS
+#apply PARTIAL_EVAL
+#apply SUPPRESS_DEAD_CODE
+#apply CLEAN_DECLARATIONS
+#display PRINTED_FILE
+#
+#echo
+#echo Microcode After atomization
+#echo
+#
+#apply SIMD_ATOMIZER
+#display PRINTED_FILE
 
 
 close

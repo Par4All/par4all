@@ -1,0 +1,17 @@
+raw file with loop flagged
+int pop()
+{
+   int i;
+l99999:
+   for(i = 0; i <= 119; i += 1)
+      printf("%d", i);
+}
+after loop expansion
+int pop()
+{
+   int i;
+l99999:
+   for(i = 0; i <= 127; i += 1)
+      if (i>=0&&i<=119) 
+         printf("%d", i);
+}

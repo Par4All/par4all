@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
       return 2;
    {
       int i;
-      for (i = 0;i<n-1;i++)
+      for(i = 0; i <= n-1-1; i += 1)
          str[i] = 'a'+(char) i;
       str[n-1] = 0;
    }
@@ -37,10 +37,12 @@ int main(int argc, char *argv[])
 }
 void outlined(int n, char *str)
 {
-   int i;
-   for (i = 0;i<n-1;i++)
-      str[i] = 'a'+(char) i;
-   str[n-1] = 0;
+   {
+      int i;
+      for(i = 0; i <= n-1-1; i += 1)
+         str[i] = 'a'+(char) i;
+      str[n-1] = 0;
+   }
 }
 
 Unsplit resulting code

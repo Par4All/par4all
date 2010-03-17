@@ -16,7 +16,7 @@ extern int i;
 void foo();
 
 extern int main();
-main()
+int main()
 {
    // printf("%d\n",i);
    foo();
@@ -25,7 +25,7 @@ main()
 Printed file for scope02_b
 
 int i = 1;
-main()
+int main()
 {
    // printf("%d\n",i);
    foo();
@@ -41,7 +41,7 @@ extern int i;
 void foo();
 
 extern int main();
-main()
+int main()
 {
    // printf("%d\n",i);
    foo();

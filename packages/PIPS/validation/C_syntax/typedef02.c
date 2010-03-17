@@ -3,7 +3,7 @@ main()
 {
   typedef int myint;
   myint n;
-  typedef myint MYINT; 
+  typedef myint MYINT;
   MYINT m;
   struct s {
     int i;

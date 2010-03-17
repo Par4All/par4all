@@ -3,9 +3,10 @@ Parsed printed file
 
 int unstructured02()
 {
-   int a1,  a2,  i,  b,  lambda,  n;
+   int a1, a2, i, b, lambda, n;
 
    for (i = 1;i<=n;i++) {
+
       while (a2!=0) {
          for (i = 0;i<n;i++)
             if (a2==a1)
@@ -36,7 +37,7 @@ Printed file
 
 int unstructured02()
 {
-   int a1,  a2,  i,  b,  lambda,  n;
+   int a1, a2, i, b, lambda, n;
    i = 1;
 l99995:   ;
 
@@ -82,7 +83,7 @@ printed file after RESTRUCTURE_CONTROL
 
 int unstructured02()
 {
-   int a1,  a2,  i,  b,  lambda,  n;
+   int a1, a2, i, b, lambda, n;
    i = 1;
 l99998:   ;
 

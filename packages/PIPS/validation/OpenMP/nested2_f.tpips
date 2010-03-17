@@ -1,0 +1,36 @@
+delete nested2_f
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create nested2_f nested2_f.f
+
+setproperty PRAGMA_TYPE "expr"
+apply PRIVATIZE_MODULE(NESTED)
+activate PRINT_PARALLELIZEDOMP_CODE
+
+echo
+echo Parallelized code
+echo
+
+display PARALLELPRINTED_FILE
+
+apply INTERNALIZE_PARALLEL_CODE(NESTED)
+apply OMPIFY_CODE(NESTED)
+
+echo
+echo Open MP version
+echo
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+display PRINTED_FILE(NESTED)
+
+apply UNSPLIT
+shell gfortran -fopenmp -c nested2_f.database/Src/nested2_f.f
+shell rm *.o
+
+close
+delete nested2_f
+quit
+# EOF

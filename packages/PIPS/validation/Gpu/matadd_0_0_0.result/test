@@ -1,0 +1,29 @@
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+
+
+!$OMP PARALLEL DO PRIVATE(J)
+      DO I = 1, M                                                       0008
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0009
+            B(I,J) = I                                                  0010
+            C(I,J) = J                                                  0011
+         ENDDO
+      ENDDO
+
+
+!$OMP PARALLEL DO PRIVATE(J)
+      DO I = 1, M                                                       0015
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0016
+            A(I,J) = B(I,J)+C(I,J)                                      0017
+         ENDDO
+      ENDDO
+
+      END

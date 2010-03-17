@@ -1,4 +1,4 @@
-main()
+int main()
 {
    unsigned int i = 2;
    int j = 4;
@@ -12,10 +12,19 @@ main()
 
 //  P() {i==2, j==4, k==6}
 
-main()
+int main()
 {
+
+//  P() {i==2, j==4, k==6}
+
    unsigned int i = 2;
+
+//  P() {i==2, j==4, k==6}
+
    int j = 4;
+
+//  P() {i==2, j==4, k==6}
+
    int k = 6;
 
 //  P() {i==2, j==4, k==6}

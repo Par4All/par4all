@@ -1,0 +1,29 @@
+int erminable(char isme)
+{
+   int the, follow, ce, luke;
+   follow = the;
+   ce;
+   while (luke) 
+      ;
+
+   for(the = 2; the <= 1; the += 1) {
+      ce = luke;
+      luke = ce;
+   }
+}
+extern int erminable(char isme);
+int erminable(char isme)
+{
+   int the, follow, ce, luke;
+   follow = the;
+   ce;
+   while (luke) 
+      ;
+
+#pragma omp for private(ce,luke,the)
+   for(the = 2; the <= 1; the += 1) {
+      ce = luke;
+      luke = ce;
+   }
+}
+extern int erminable(char isme);

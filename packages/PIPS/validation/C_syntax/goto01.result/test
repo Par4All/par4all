@@ -1,7 +1,7 @@
 
 Parser output
 
-main()
+int main()
 {
    int i = 0;
    goto lab;
@@ -11,7 +11,7 @@ lab:   i = i+1;
 
 Controlizer output
 
-main()
+int main()
 {
    int i = 0;
 lab:   i = i+1;

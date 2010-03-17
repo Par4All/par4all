@@ -1,0 +1,329 @@
+void compute()
+{
+   int i, j;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+void get_data(char filename[])
+{
+   int i, j, nx, ny;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "r"))==(void *) 0) {
+      perror("Error loading file");
+      exit(0);
+   }
+   
+   /* Get *.pgm file type */
+   c = fgetc(fp);
+   c = fgetc(fp);
+   do {
+      while ((c = fgetc(fp))!='\n') 
+         ;
+   }
+   while ((c = fgetc(fp))=='#');
+   
+   /* Put back good char */
+   ungetc(c, fp);
+   
+   /* Get image dimensions */
+   fscanf(fp, "%d %d\n", &nx, &ny);
+   /* Get grey levels */
+   fscanf(fp, "%d", &i);
+   /* Get ONE carriage return */
+   fgetc(fp);
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
+   
+   
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         c = fgetc(fp);
+         space[i][j] = c;
+      }
+
+   fclose(fp);
+}
+int main(int argc, char *argv[])
+{
+   int t;
+
+   if (argc!=2) {
+      
+      
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);
+      exit(0);
+   }
+   get_data(argv[1]);
+
+   for(t = 0; t <= 63; t += 1)
+      compute();
+
+   write_data("output.pgm");
+
+   return 0;
+}
+void memalloc(void **ptr, size_t n)
+{
+   *ptr = malloc(n);
+}
+void memfree(void *ptr)
+{
+   free(ptr);
+}
+void * memload(void **dest, void *src, size_t n)
+{
+   size_t i;
+   void *pdest = *dest = malloc(n);
+
+   if (!pdest) 
+      return (void *) 0;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) pdest)[i] = ((const char *) src)[i];
+   return pdest;
+}
+void * memstore(void **dest, void *src, size_t n)
+{
+   size_t i;
+   void *pdest = *dest = malloc(n);
+
+   if (!pdest) 
+      return (void *) 0;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) pdest)[i] = ((const char *) src)[i];
+   return pdest;
+}
+void write_data(char filename[])
+{
+   int i, j;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "w"))==(void *) 0) {
+      perror("Error opening file");
+      exit(0);
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 64, 64);
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         c = space[i][j];
+         fputc(c, fp);
+      }
+   fclose(fp);
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   int i_1;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:   launch_kernel1(save, space);
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 62; i += 1)
+#pragma omp parallel for 
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+void get_data(char filename[])
+{
+   int i, j, nx, ny;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "r"))==(void *) 0) {
+      perror("Error loading file");
+      exit(0);
+   }
+   
+   /* Get *.pgm file type */
+   c = fgetc(fp);
+   c = fgetc(fp);
+   do {
+      while ((c = fgetc(fp))!='\n') 
+         ;
+   }
+   while ((c = fgetc(fp))=='#');
+   
+   /* Put back good char */
+   ungetc(c, fp);
+   
+   /* Get image dimensions */
+   fscanf(fp, "%d %d\n", &nx, &ny);
+   /* Get grey levels */
+   fscanf(fp, "%d", &i);
+   /* Get ONE carriage return */
+   fgetc(fp);
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
+   
+   
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         c = fgetc(fp);
+         space[i][j] = c;
+      }
+
+   fclose(fp);
+}
+void kernel1(float_t save[64][64], float_t space[64][64], int i)
+{
+   //PIPS generated variable
+   int j;
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+9, 62); i_1 += 1)
+         for(j = 1; j <= 62; j += 1)
+
+            save[i_1][j] = 0.25*(space[i_1-1][j]+space[i_1+1][j]+space[i_1][j-1]+space[i_1][j+1]);
+   }
+}
+void launch_kernel1(float_t save[64][64], float_t space[64][64])
+{
+   //PIPS generated variable
+   int i, j;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+           could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 10)
+      kernel1(save, space, i);
+}
+int main(int argc, char *argv[])
+{
+   int t;
+
+   if (argc!=2) {
+      
+      
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);
+      exit(0);
+   }
+   get_data(argv[1]);
+
+   for(t = 0; t <= 63; t += 1)
+      compute();
+
+   write_data("output.pgm");
+
+   return 0;
+}
+void memalloc(void **ptr, size_t n)
+{
+   *ptr = malloc(n);
+}
+void memfree(void *ptr)
+{
+   free(ptr);
+}
+void * memload(void **dest, void *src, size_t n)
+{
+   size_t i;
+   void *pdest = *dest = malloc(n);
+
+   if (!pdest) 
+      return (void *) 0;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) pdest)[i] = ((const char *) src)[i];
+   return pdest;
+}
+void * memstore(void **dest, void *src, size_t n)
+{
+   size_t i;
+   void *pdest = *dest = malloc(n);
+
+   if (!pdest) 
+      return (void *) 0;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) pdest)[i] = ((const char *) src)[i];
+   return pdest;
+}
+void write_data(char filename[])
+{
+   int i, j;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "w"))==(void *) 0) {
+      perror("Error opening file");
+      exit(0);
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 64, 64);
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         c = space[i][j];
+         fputc(c, fp);
+      }
+   fclose(fp);
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   int i_1;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:   launch_kernel1(save, space);
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 62; i += 1)
+#pragma omp parallel for 
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+
+Code after cleanup
+
+int main(int argc, char *argv[])
+{
+   int t;
+   //PIPS generated variable
+   float_t (*P_0)[64][64], (*P_1)[64][64];
+
+   if (argc!=2) {
+      
+      
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);
+      exit(0);
+   }
+   get_data(argv[1]);
+
+   for(t = 0; t <= 63; t += 1) {
+      memalloc(&P_1, sizeof(float_t[64][64])-1+1);
+      memalloc(&P_0, sizeof(float_t[64][64])-1+1);
+      memload(save, *P_1, sizeof(float_t[64][64])-1+1);
+      memload(space, *P_0, sizeof(float_t[64][64])-1+1);
+      compute();
+      memstore(space, *P_0, sizeof(float_t[64][64])-1+1);
+      memstore(save, *P_1, sizeof(float_t[64][64])-1+1);
+      memfree(*P_1);
+      memfree(*P_0);
+   }
+
+   write_data("output.pgm");
+
+   return 0;
+}
+
+Unsplit resulting code
+
+Input image  : x=64 y=64 grey=255

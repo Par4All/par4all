@@ -54,12 +54,14 @@ void call05(int r, int m, int *x)
 
 Proper effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
-   int i,  j;
+   int i, j;
 //               <must be read   >: d1
 //               <must be written>: i
 
@@ -88,12 +90,14 @@ Cumulated effects for "main"
 
 //               <may be read    >: __IO_EFFECTS:LUNS[1]
 //               <may be written >: __IO_EFFECTS:LUNS[1]
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
-   int i,  j;
+   int i, j;
 //               <may be read    >: d2 i
 //               <may be written >: y[*][*]
 //               <must be read   >: d1
@@ -153,12 +157,12 @@ Regions for "main"
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;
    int y[d1][d2];
-   int i,  j;
+   int i, j;
 
 //  <y[PHI1][PHI2]-W-EXACT-{0<=PHI2, PHI2+1<=d2}>
 

@@ -20,8 +20,17 @@ Check transformers on strip-mined loop
 
 void comma02()
 {
+
+//  T() {}
+
    int i;
+
+//  T() {}
+
    int j;
+
+//  T() {}
+
    int k;
 
 //  T(i,j,k) {i==2, j==1, k==2}

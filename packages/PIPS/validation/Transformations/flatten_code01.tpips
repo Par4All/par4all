@@ -1,7 +1,7 @@
 delete flatten_code01
 
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_BLOCKS TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
 
 create flatten_code01 flatten_code01.c
 

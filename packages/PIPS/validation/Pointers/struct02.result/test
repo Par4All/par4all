@@ -1,0 +1,81 @@
+int struct02()
+{
+   // BEGIN BLOCK
+   struct {
+      int *q;
+      int *p;
+   } m, n;
+
+//               <must be written>: i j k
+   int i = 0, j = 1, k = 2;
+   int *r;
+//               <must be written>: r
+   r = &k;
+//               <must be written>: m[1]
+   m.q = &i;
+//               <must be written>: m[2]
+   m.p = &j;
+//               <must be read   >: m
+//               <must be written>: n
+   n = m;
+//               <must be read   >: n[2]
+//               <must be written>: r
+   r = n.p;
+   return 0;
+   // END BLOCK
+}
+
+Cumulated effects for "struct02"
+
+int struct02()
+{
+   // BEGIN BLOCK
+   struct {
+      int *q;
+      int *p;
+   } m, n;
+
+//               <must be written>: i j k
+   int i = 0, j = 1, k = 2;
+   int *r;
+//               <must be written>: r
+   r = &k;
+//               <must be written>: m[1]
+   m.q = &i;
+//               <must be written>: m[2]
+   m.p = &j;
+//               <must be read   >: m
+//               <must be written>: n
+   n = m;
+//               <must be read   >: n[2]
+//               <must be written>: r
+   r = n.p;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int struct02()
+{
+   // BEGIN BLOCK
+   struct {
+      int *q;
+      int *p;
+   } m, n;
+
+   int i = 0, j = 1, k = 2;
+   int *r;
+   r = &k;
+//  points to = {(r,k,-Exact-)}
+   m.q = &i;
+//  points to = {(m[1],i,-Exact-);(r,k,-Exact-)}
+   m.p = &j;
+//  points to = {(m[2],j,-Exact-);(m[1],i,-Exact-);(r,k,-Exact-)}
+   n = m;
+//  points to = {(n[2],j,-Exact-);(n[1],i,-Exact-);(m[2],j,
+//   -Exact-);(m[1],i,-Exact-);(r,k,-Exact-)}
+   r = n.p;
+//  points to = {(n[2],j,-Exact-);(n[1],i,-Exact-);(m[2],j,
+//   -Exact-);(m[1],i,-Exact-);(r,j,-Exact-)}
+   return 0;
+   // END BLOCK
+}

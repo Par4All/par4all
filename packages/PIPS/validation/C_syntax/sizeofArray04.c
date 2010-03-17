@@ -2,5 +2,5 @@
 #define N 10
 void foo()
 {
- int A[N];
+ int * A[N];
 }

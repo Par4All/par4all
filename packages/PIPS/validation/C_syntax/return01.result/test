@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "return01:*HEAP*" with type "area" with size 0
 	Declared entity "return01:*STACK*" with type "area" with size 0
 	Declared entity "return01:*STATIC*" with type "area" with size 0
-	Declared entity "return01:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "return01:0`__func__" with type "variable" "char"
+	Declared entity "return01:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "return01:0`__func__" with type "variable" "char *"
 	Declared entity "return01:i" with type "variable" "int"
 	Declared entity "return01:return01" with type "variable" "void *"
 
@@ -27,7 +27,7 @@ Layout for formal parameters:
 
 Layout for return variable:
 
-	Variable "return01:return01"	size = 4
+	Variable "return01:return01"	size = 8
 
 Layouts for memory areas:
 

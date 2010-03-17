@@ -1,0 +1,16 @@
+setenv WS = caxpy
+delete $WS
+create $WS $WS.f include/scabs1.f
+
+module `echo $WS | tr '[:lower:]' '[:upper:]'`
+
+display PRINTED_FILE
+apply SIMPLIFY_COMPLEX
+display PRINTED_FILE
+apply UNSPLIT
+
+shell gfortran -c $WS.database/Src/$WS.f -o /dev/null
+
+close
+#delete $WS
+quit

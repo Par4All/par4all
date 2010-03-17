@@ -19,6 +19,7 @@ Proper effects for "conditional01"
 
 char * conditional01(int i)
 {
+//               <may be written >: p[*] p[*][*]
    char *p[3] = {"a", "b", "c"};
 //               <may be read    >: p[0] p[*]
 //               <must be read   >: i
@@ -30,6 +31,7 @@ Cumulated effects for "conditional01"
 //               <must be read   >: i
 char * conditional01(int i)
 {
+//               <may be written >: p[*] p[*][*]
    char *p[3] = {"a", "b", "c"};
 //               <may be read    >: p[0] p[*]
 //               <must be read   >: i
@@ -37,6 +39,10 @@ char * conditional01(int i)
 }
 char * conditional01(int i)
 {
+
+//  <p[PHI1][PHI2]-W-MAY-{}>
+//  <p[PHI1]-W-MAY-{}>
+
    char *p[3] = {"a", "b", "c"};
 
 //  <p[PHI1]-R-MAY-{}>

@@ -45,6 +45,9 @@ echo
 
 display SYMBOL_TABLE_FILE[decl33]
 
+apply UNSPLIT
+shell cc -c decl33.database/Src/decl33.c
+
 close
 # delete decl33
 

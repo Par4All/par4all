@@ -18,6 +18,10 @@ echo
 
 display PARSED_PRINTED_FILE[decl22!]
 
+# The input C code is not OK with gcc 4.4.1
+#apply UNSPLIT
+#shell cc -c decl22.database/Src/decl22.c
+
 close
 delete decl22
 

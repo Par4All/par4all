@@ -140,12 +140,12 @@ C     BEGIN BLOCK
       ENDDO
 
       DO J = 1, 200                                                     0010
+         PRIVATE I,J,WORK(1:100)
 
 C  <I-PRIVATE-EXACT-{}>
 C  <WORK(PHI1)-PRIVATE-EXACT-{1<=PHI1, PHI1<=50, N==50, 1<=J, J<=200}>
 
 C        BEGIN BLOCK
-         PRIVATE I,J,WORK(1:100)
          DO I = 1, N                                                    0011
             PRIVATE I
             WORK(I) = I+J                                               0012

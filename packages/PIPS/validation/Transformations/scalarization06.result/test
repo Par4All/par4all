@@ -33,15 +33,21 @@ int main(int argc, char **argv)
    int i, n = 100;
    int *x, *y, *t;
 
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <x-W-EXACT-{}>
 
 
    x = (int *) malloc(sizeof(int));
 
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <y-W-EXACT-{}>
 
    y = (int *) malloc(sizeof(int));
 
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <t-W-EXACT-{}>
 
    t = (int *) malloc(sizeof(int));

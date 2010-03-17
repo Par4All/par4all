@@ -25,10 +25,16 @@ Transformers for "struct01"
 
 int struct01()
 {
+
+//  T() {}
+
    struct one {
       int first;
       int second;
    } x;
+
+//  T() {}
+
    int y[10];
 
 //  T() {}

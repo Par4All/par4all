@@ -1,0 +1,14 @@
+delete ret_val
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ret_val ret_val.c
+
+setproperty PRAGMA_TYPE "expr"
+activate PRINT_CODE_PROPER_REFERENCES
+display PRINTED_FILE(get_result)
+display PRINTED_FILE(main)
+
+close
+delete ret_val
+quit

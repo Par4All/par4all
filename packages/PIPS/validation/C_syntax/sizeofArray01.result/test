@@ -5,12 +5,12 @@ Declarations for module "fcompat" with type "() -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "fcompat:*DYNAMIC*" with type "area" with size 20
+	Declared entity "fcompat:*DYNAMIC*" with type "area" with size 24
 	Declared entity "fcompat:*HEAP*" with type "area" with size 0
 	Declared entity "fcompat:*STACK*" with type "area" with size 0
 	Declared entity "fcompat:*STATIC*" with type "area" with size 0
-	Declared entity "fcompat:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "fcompat:0`__func__" with type "variable" "char"
+	Declared entity "fcompat:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "fcompat:0`__func__" with type "variable" "char *"
 	Declared entity "fcompat:0`a" with type "variable" "int"
 	Declared entity "fcompat:0`c" with type "variable" "int"
 	Declared entity "fcompat:0`p" with type "variable" "int[n+1] *"
@@ -26,8 +26,8 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	External Variable "TOP-LEVEL:m"	offset = UNKNOWN,	size = 4
 
 
-Layout for memory area "fcompat:*DYNAMIC*" of size 20:
-	Variable "fcompat:0`p"	offset = 16	size = 4
+Layout for memory area "fcompat:*DYNAMIC*" of size 24:
+	Variable "fcompat:0`p"	offset = 16	size = 8
 	Variable "fcompat:0`__func__"	offset = 0	size = 8
 	Variable "fcompat:0`__FUNCTION__"	offset = 8	size = 8
 

@@ -1,0 +1,27 @@
+setenv WS=string05
+delete $WS
+create $WS $WS.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[$WS]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[$WS]
+
+apply UNSPLIT
+shell cc -c $WS.database/Src/$WS.c
+
+close
+#delete $WS
+quit

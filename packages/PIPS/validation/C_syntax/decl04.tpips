@@ -31,6 +31,8 @@ echo
 
 display PRINTED_FILE[decl04!]
 
+apply UNSPLIT
+shell cc -c decl04.database/Src/decl04.c
 
 close
 delete decl04

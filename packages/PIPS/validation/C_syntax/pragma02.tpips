@@ -1,0 +1,23 @@
+delete pragma02
+create pragma02 pragma02.c
+
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[pragma02]
+
+
+close
+delete pragma02
+
+quit

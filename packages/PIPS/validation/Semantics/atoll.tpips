@@ -1,0 +1,20 @@
+delete atoll
+
+create atoll atoll.c
+
+#display PRINTED_FILE(%ALL)
+#setproperty PRAGMA_TYPE "expr"
+#apply PRIVATIZE_MODULE(%ALL)
+echo // OMP style
+#apply COARSE_GRAIN_PARALLELIZATION(%ALL)
+#apply INTERNALIZE_PARALLEL_CODE(%ALLFUNC)
+#apply OMPIFY_CODE(%ALL)
+
+apply PRECONDITIONS_INTER_FULL(%ALL)
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+display PRINTED_FILE(%ALL)
+
+close
+delete atoll
+quit

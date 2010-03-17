@@ -5,9 +5,9 @@ void foo(int *col)
 {
 //               <must be read   >: col col[0]
 //               <must be written>: col
-   *col++;                                                              /*0004*/
+   *col++;                                                              /*0009*/
 
-   return;                                                              /*0006*/
+   return;                                                              /*0011*/
 }
 
 Proper effects for "main"

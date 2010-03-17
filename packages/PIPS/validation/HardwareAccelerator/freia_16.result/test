@@ -4,12 +4,12 @@
 freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c, int32_t *k, int32_t *r0, int32_t *r1, int32_t *r2)
 {
    // test re ordering of mes
-   freia_aipo_add_const(o0, i, c);                                      /*0007*/
-   freia_aipo_erode_6c(o1, i, k);                                       /*0008*/
-   freia_aipo_global_min(i, r0);                                        /*0009*/
-   freia_aipo_global_max(i, r1);                                        /*0010*/
-   freia_aipo_global_vol(i, r2);                                        /*0011*/
-   return FREIA_OK;                                                     /*0012*/
+   freia_aipo_add_const(o0, i, c);                                      /*0008*/
+   freia_aipo_erode_6c(o1, i, k);                                       /*0009*/
+   freia_aipo_global_min(i, r0);                                        /*0010*/
+   freia_aipo_global_max(i, r1);                                        /*0011*/
+   freia_aipo_global_vol(i, r2);                                        /*0012*/
+   return FREIA_OK;                                                     /*0013*/
 }
 
 ! graphs
@@ -24,18 +24,18 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 vol" [shape=diamond];
-  "10 max" [shape=diamond];
-  "9 min" [shape=diamond];
-  "8 E6" [shape=box];
-  "8 E6" -> "o1";
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "o0";
-  "i" -> "11 vol";
-  "i" -> "10 max";
-  "i" -> "9 min";
-  "i" -> "8 E6";
-  "i" -> "7 +.";
+  "12 vol" [shape=diamond];
+  "11 max" [shape=diamond];
+  "10 min" [shape=diamond];
+  "9 E6" [shape=box];
+  "9 E6" -> "o1";
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o0";
+  "i" -> "12 vol";
+  "i" -> "11 max";
+  "i" -> "10 min";
+  "i" -> "9 E6";
+  "i" -> "8 +.";
 }
 // graph for dag "dag_cleaned_0" of module "freia_16" in dot format
 digraph "dag_cleaned_0" {
@@ -47,18 +47,18 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 vol" [shape=diamond];
-  "10 max" [shape=diamond];
-  "9 min" [shape=diamond];
-  "8 E6" [shape=box];
-  "8 E6" -> "o1";
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "o0";
-  "i" -> "11 vol";
-  "i" -> "10 max";
-  "i" -> "9 min";
-  "i" -> "8 E6";
-  "i" -> "7 +.";
+  "12 vol" [shape=diamond];
+  "11 max" [shape=diamond];
+  "10 min" [shape=diamond];
+  "9 E6" [shape=box];
+  "9 E6" -> "o1";
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o0";
+  "i" -> "12 vol";
+  "i" -> "11 max";
+  "i" -> "10 min";
+  "i" -> "9 E6";
+  "i" -> "8 +.";
 }
 // graph for dag "freia_16_helper_0_0" of module "freia_16" in dot format
 digraph "freia_16_helper_0_0" {
@@ -70,18 +70,18 @@ digraph "freia_16_helper_0_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "o0";
-  "8 E6" [shape=box];
-  "8 E6" -> "o1";
-  "11 vol" [shape=diamond];
-  "10 max" [shape=diamond];
-  "9 min" [shape=diamond];
-  "i" -> "7 +.";
-  "i" -> "8 E6";
-  "i" -> "11 vol";
-  "i" -> "10 max";
-  "i" -> "9 min";
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o0";
+  "9 E6" [shape=box];
+  "9 E6" -> "o1";
+  "12 vol" [shape=diamond];
+  "11 max" [shape=diamond];
+  "10 min" [shape=diamond];
+  "i" -> "8 +.";
+  "i" -> "9 E6";
+  "i" -> "12 vol";
+  "i" -> "11 max";
+  "i" -> "10 min";
 }
 
 ! acceleration function
@@ -120,10 +120,10 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 1
-  // i [0 measure 0] -> [1 poc 0] 8 erode_6c
-  // i [1 input 0] -> [1 poc 0] 8 erode_6c
+  // i [0 measure 0] -> [1 poc 0] 9 erode_6c
+  // i [1 input 0] -> [1 poc 0] 9 erode_6c
   // nope
-  // poc 8 erode_6c stage 1 side 0
+  // poc 9 erode_6c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
@@ -131,9 +131,9 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 0
-  // i [0 input 1] -> [0 alu] 7 add_const
+  // i [0 input 1] -> [0 alu] 8 add_const
   // nope
-  // alu 7 add_const stage 0 flipped
+  // alu 8 add_const stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_ADD_IN1_CONST;
   sp.alu[0][0].constant = cst4;
 
@@ -196,13 +196,13 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
-  // measure 9 global_min stage 0 side 0
+  // measure 10 global_min stage 0 side 0
   *red0 = (int32_t) reduc.measure[0][0].minimum;
 
-  // measure 10 global_max stage 0 side 0
+  // measure 11 global_max stage 0 side 0
   *red1 = (int32_t) reduc.measure[0][0].maximum;
 
-  // measure 11 global_vol stage 0 side 0
+  // measure 12 global_vol stage 0 side 0
   *red2 = (int32_t) reduc.measure[0][0].volume;
 
   return ret;
@@ -213,6 +213,6 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c, int32_t *k, int32_t *r0, int32_t *r1, int32_t *r2)
 {
    // test re ordering of mes
-   freia_16_helper_0_0_0(o0, o1, i, r0, r1, r2, k, c);                  /*0007*/
-   return FREIA_OK;                                                     /*0012*/
+   freia_16_helper_0_0_0(o0, o1, i, r0, r1, r2, k, c);                  /*0008*/
+   return FREIA_OK;                                                     /*0013*/
 }

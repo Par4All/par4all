@@ -31,6 +31,9 @@ echo
 display PRINTED_FILE[decl20]
 
 
+apply UNSPLIT
+shell cc -c decl20.database/Src/decl20.c
+
 close
 delete decl20
 

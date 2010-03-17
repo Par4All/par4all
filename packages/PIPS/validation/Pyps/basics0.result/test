@@ -20,11 +20,7 @@ void megablast(int n)
 {
    int i, j;
    //PIPS generated variable
-   int LU_NUB0;
-   //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
+   int LU_NUB0, LU_IB0, LU_IND0;
 l99999:   LU_NUB0 = (n-1-0+1)/1;
    LU_IB0 = MOD(LU_NUB0, 2);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
@@ -55,11 +51,7 @@ void megablast(int n)
 {
    int i, j;
    //PIPS generated variable
-   int LU_NUB0;
-   //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
+   int LU_NUB0, LU_IB0, LU_IND0;
 l99999:   LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 2);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {

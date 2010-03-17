@@ -11,17 +11,17 @@ Initial code
 void flatten_code11(void)
 {
    // BEGIN BLOCK
-   int i;                                                               /*0004*/
+   int i;                                                               /*0007*/
    
    /* Let's execute this loop four times! */
    for(i = 0; i <= 3; i += 1) {
       // BEGIN BLOCK
-      static int foo = 0;                                               /*0008*/
+      static int foo = 0;                                               /*0011*/
       
       /* Let's update a static variable! */
-      foo++;                                                            /*0011*/
+      foo++;                                                            /*0014*/
 
-      fprintf(stdout, "foo=%d\n", foo);                                 /*0013*/
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0016*/
       // END BLOCK
    }
    // END BLOCK
@@ -38,7 +38,10 @@ void flatten_code11(void)
 //  P() {}
 
    // BEGIN BLOCK
-   int i;                                                               /*0004*/
+
+//  P() {}
+
+   int i;                                                               /*0007*/
 
 //  P() {}
 
@@ -49,18 +52,21 @@ void flatten_code11(void)
 //  P(foo,i) {0<=i, i<=3}
 
       // BEGIN BLOCK
-      static int foo = 0;                                               /*0008*/
+
+//  P(foo,i) {0<=i, i<=3}
+
+      static int foo = 0;                                               /*0011*/
 
 //  P(foo,i) {0<=i, i<=3}
 
       
       /* Let's update a static variable! */
-      foo++;                                                            /*0011*/
+      foo++;                                                            /*0014*/
 
 //  P(foo,i) {0<=i, i<=3}
 
 
-      fprintf(stdout, "foo=%d\n", foo);                                 /*0013*/
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0016*/
       // END BLOCK
    }
    // END BLOCK
@@ -71,31 +77,31 @@ Code after code flattening
 void flatten_code11(void)
 {
    // BEGIN BLOCK
-   int i;                                                               /*0004*/
+   int i;                                                               /*0007*/
    //PIPS generated variable
    static int foo_0 = 0;
    
    /* Let's execute this loop four times! */
    
    /* Let's update a static variable! */
-   foo_0++;                                                             /*0011*/
+   foo_0++;                                                             /*0014*/
 
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
    
    /* Let's update a static variable! */
-   foo_0++;                                                             /*0011*/
+   foo_0++;                                                             /*0014*/
 
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
    
    /* Let's update a static variable! */
-   foo_0++;                                                             /*0011*/
+   foo_0++;                                                             /*0014*/
 
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
    
    /* Let's update a static variable! */
-   foo_0++;                                                             /*0011*/
+   foo_0++;                                                             /*0014*/
 
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
    i = 4;
    // END BLOCK
 }

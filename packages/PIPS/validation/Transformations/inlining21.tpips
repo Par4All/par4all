@@ -29,7 +29,7 @@ echo after inlining
 echo
 
 apply INLINING[foo]
-display PRINTED_FILE[main]
+display PRINTED_FILE[inlining21!,main]
 
 echo
 echo Unsplit resulting code

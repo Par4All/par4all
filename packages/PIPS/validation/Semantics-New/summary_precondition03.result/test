@@ -1,0 +1,62 @@
+
+C  T(main) {main==10}
+
+int main(int argc, char **argv)
+{
+   // Parsing error because i is used in its own declaration statement
+   //int i = 10, j = i+1, a[i], k = foo(i);
+   
+
+//  T() {i==10}
+
+   int i = 10;
+
+//  T(i) {i==i#init+1, i==j+1}
+
+   int j = i++, a[i], k = foo(i);
+
+//  T(main) {j==main}
+
+
+   return j;
+}
+
+//  P() {}
+
+int main(int argc, char **argv)
+{
+   // Parsing error because i is used in its own declaration statement
+   //int i = 10, j = i+1, a[i], k = foo(i);
+   
+
+//  P() {}
+
+   int i = 10;
+
+//  P() {i==10}
+
+   int j = i++, a[i], k = foo(i);
+
+//  P(i) {i==11, j==10}
+
+
+   return j;
+}
+
+//  P() {}
+
+long long foo(char **argv)
+{
+
+//  P() {}
+
+   long long result = 0;
+
+//  P() {result==0}
+
+   result = atoll(argv[1]);
+
+//  P(result) {}
+
+   return result;
+}

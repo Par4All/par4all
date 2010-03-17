@@ -1,0 +1,1755 @@
+// OMP style
+typedef unsigned int size_t;
+
+/* Convenience types.  */
+typedef unsigned char __u_char;
+typedef unsigned short __u_short;
+typedef unsigned int __u_int;
+typedef unsigned long __u_long;
+
+/* Fixed-size types, underlying types depend on word size and compiler.  */
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef signed short __int16_t;
+typedef unsigned short __uint16_t;
+typedef signed int __int32_t;
+typedef unsigned int __uint32_t;
+
+typedef signed long __int64_t;
+typedef unsigned long __uint64_t;
+
+
+
+
+
+/* quad_t is also 64 bits.  */
+
+typedef long __quad_t;
+typedef unsigned long __u_quad_t;
+
+
+typedef unsigned long __dev_t;
+/* Type of device numbers.  */
+typedef unsigned int __uid_t;
+/* Type of user identifications.  */
+typedef unsigned int __gid_t;
+/* Type of group identifications.  */
+typedef unsigned long __ino_t;
+/* Type of file serial numbers.  */
+typedef unsigned long __ino64_t;
+/* Type of file serial numbers (LFS).*/
+typedef unsigned int __mode_t;
+/* Type of file attribute bitmasks.  */
+typedef unsigned long __nlink_t;
+/* Type of file link counts.  */
+typedef long __off_t;
+/* Type of file sizes and offsets.  */
+typedef long __off64_t;
+/* Type of file sizes and offsets (LFS).  */
+typedef int __pid_t;
+/* Type of process identifications.  */
+typedef struct {
+   int __val[2];
+} __fsid_t;
+/* Type of file system IDs.  */
+typedef long __clock_t;
+/* Type of CPU usage counts.  */
+typedef unsigned long __rlim_t;
+/* Type for resource measurement.  */
+typedef unsigned long __rlim64_t;
+/* Type for resource measurement (LFS).  */
+typedef unsigned int __id_t;
+/* General type for IDs.  */
+typedef long __time_t;
+/* Seconds since the Epoch.  */
+typedef unsigned int __useconds_t;
+/* Count of microseconds.  */
+typedef long __suseconds_t;
+/* Signed count of microseconds.  */
+
+typedef int __daddr_t;
+/* The type of a disk address.  */
+typedef long __swblk_t;
+/* Type of a swap block maybe?  */
+typedef int __key_t;
+/* Type of an IPC key.  */
+
+/* Clock ID used in clock and timer functions.  */
+typedef int __clockid_t;
+
+/* Timer ID returned by `timer_create'.  */
+typedef void *__timer_t;
+
+/* Type to represent block size.  */
+typedef long __blksize_t;
+
+/* Types from the Large File Support interface.  */
+
+/* Type to count number of disk blocks.  */
+typedef long __blkcnt_t;
+typedef long __blkcnt64_t;
+
+/* Type to count file system blocks.  */
+typedef unsigned long __fsblkcnt_t;
+typedef unsigned long __fsblkcnt64_t;
+
+/* Type to count file system nodes.  */
+typedef unsigned long __fsfilcnt_t;
+typedef unsigned long __fsfilcnt64_t;
+
+typedef long __ssize_t;
+/* Type of a byte count, or error.  */
+
+/* These few don't really vary by system, they always correspond
+   to one of the other defined types.  */
+typedef __off64_t __loff_t;
+/* Type of file sizes and offsets (LFS).  */
+typedef __quad_t *__qaddr_t;
+typedef char *__caddr_t;
+
+/* Duplicates info from stdint.h but this is used in unistd.h.  */
+typedef long __intptr_t;
+
+/* Duplicate info from sys/socket.h.  */
+typedef unsigned int __socklen_t;
+
+
+
+
+
+
+
+/* Define outside of namespace so the C++ is happy.  */
+
+
+
+/* The opaque type of streams.  This is the definition used elsewhere.  */
+typedef struct _IO_FILE FILE;
+/* The opaque type of streams.  This is the definition used elsewhere.  */
+typedef struct _IO_FILE __FILE;
+/* Value so far.  */
+typedef struct {
+   int __count;
+   union {unsigned int __wch; char __wchb[4];} __value;
+} __mbstate_t;
+typedef struct {
+   __off_t __pos;
+   __mbstate_t __state;
+} _G_fpos_t;
+typedef struct {
+   __off64_t __pos;
+   __mbstate_t __state;
+} _G_fpos64_t;
+typedef int _G_int16_t;
+typedef int _G_int32_t;
+typedef unsigned int _G_uint16_t;
+typedef unsigned int _G_uint32_t;
+/* Define __gnuc_va_list.  */
+
+
+
+typedef __builtin_va_list __gnuc_va_list;
+
+
+/* Handle lock.  */
+
+
+
+
+
+
+
+typedef void _IO_lock_t;
+struct _IO_marker {
+   struct _IO_marker *_next;
+   struct _IO_FILE *_sbuf;
+   int _pos;
+};
+
+/* This is the structure from the libstdc++ codecvt class.  */
+enum __codecvt_result {__codecvt_ok, __codecvt_partial, __codecvt_error, __codecvt_noconv};
+
+
+
+
+
+
+
+/* Make sure we don't get into trouble again.  */
+struct _IO_FILE {
+   int _flags;
+   char *_IO_read_ptr;
+   char *_IO_read_end;
+   char *_IO_read_base;
+   char *_IO_write_base;
+   char *_IO_write_ptr;
+   char *_IO_write_end;
+   char *_IO_buf_base;
+   char *_IO_buf_end;
+   char *_IO_save_base;
+   char *_IO_backup_base;
+   char *_IO_save_end;
+   struct _IO_marker *_markers;
+   struct _IO_FILE *_chain;
+   int _fileno;
+   int _flags2;
+   __off_t _old_offset;
+   unsigned short _cur_column;
+   signed char _vtable_offset;
+   char _shortbuf[1];
+   _IO_lock_t *_lock;
+   __off64_t _offset;
+   void *__pad1;
+   void *__pad2;
+   void *__pad3;
+   void *__pad4;
+   size_t __pad5;
+   int _mode;
+   char _unused2[15*sizeof(int)-4*sizeof(void *)-sizeof(size_t)];
+};
+
+
+typedef struct _IO_FILE _IO_FILE;
+
+
+
+
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+extern struct _IO_FILE_plus _IO_2_1_stdout_;
+extern struct _IO_FILE_plus _IO_2_1_stderr_;
+/* Functions to do I/O and file management for a stream.  */
+
+/* Read NBYTES bytes from COOKIE into a buffer pointed to by BUF.
+   Return number of bytes read.  */
+typedef __ssize_t __io_read_fn(void *__cookie, char *__buf, size_t __nbytes);
+
+/* Write N bytes pointed to by BUF to COOKIE.  Write all N bytes
+   unless there is an error.  Return number of bytes written, or -1 if
+   there is an error without writing anything.  If the file has been
+   opened for append (__mode.__append set), then set the file pointer
+   to the end of the file and then do the write; if not, just write at
+   the current file pointer.  */
+
+typedef __ssize_t __io_write_fn(void *__cookie, const char *__buf, size_t __n);
+
+/* Move COOKIE's file position to *POS bytes from the
+   beginning of the file (if W is SEEK_SET),
+   the current position (if W is SEEK_CUR),
+   or the end of the file (if W is SEEK_END).
+   Set *POS to the new file position.
+   Returns zero if successful, nonzero if not.  */
+typedef int __io_seek_fn(void *__cookie, __off64_t *__pos, int __w);
+
+/* Close COOKIE.  */
+typedef int __io_close_fn(void *__cookie);
+extern int __underflow(_IO_FILE *);
+extern int __uflow(_IO_FILE *);
+extern int __overflow(_IO_FILE *, int);
+extern int _IO_getc(_IO_FILE *__fp);
+extern int _IO_putc(int __c, _IO_FILE *__fp);
+extern int _IO_feof(_IO_FILE *__fp);
+extern int _IO_ferror(_IO_FILE *__fp);
+
+extern int _IO_peekc_locked(_IO_FILE *__fp);
+
+/* This one is for Emacs. */
+
+
+
+extern void _IO_flockfile(_IO_FILE *);
+extern void _IO_funlockfile(_IO_FILE *);
+extern int _IO_ftrylockfile(_IO_FILE *);
+
+extern int _IO_vfscanf(_IO_FILE *, const char *, __gnuc_va_list, int *);
+
+extern int _IO_vfprintf(_IO_FILE *, const char *, __gnuc_va_list);
+extern __ssize_t _IO_padn(_IO_FILE *, int, __ssize_t);
+extern size_t _IO_sgetn(_IO_FILE *, void *, size_t);
+
+extern __off64_t _IO_seekoff(_IO_FILE *, __off64_t, int, int);
+extern __off64_t _IO_seekpos(_IO_FILE *, __off64_t, int);
+
+extern void _IO_free_backup_area(_IO_FILE *);
+/* The type of the second argument to `fgetpos' and `fsetpos'.  */
+
+
+typedef _G_fpos_t fpos_t;
+
+
+/* Standard streams.  */
+extern struct _IO_FILE *stdin;
+/* Standard input stream.  */
+extern struct _IO_FILE *stdout;
+/* Standard output stream.  */
+extern struct _IO_FILE *stderr;
+/* Standard error output stream.  */
+/* C89/C99 say they're macros.  Make them happy.  */
+
+
+
+
+
+/* Remove file FILENAME.  */
+extern int remove(const char *__filename);
+/* Rename file OLD to NEW.  */
+extern int rename(const char *__old, const char *__new);
+
+
+
+/* Rename file OLD relative to OLDFD to NEW relative to NEWFD.  */
+
+extern int renameat(int __oldfd, const char *__old, int __newfd, const char *__new);
+
+
+
+/* Create a temporary file and open it read/write.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+
+extern FILE *tmpfile(void);
+/* Generate a temporary filename.  */
+extern char *tmpnam(char *__s);
+
+
+
+/* This is the reentrant variant of `tmpnam'.  The only difference is
+   that it does not allow S to be NULL.  */
+extern char *tmpnam_r(char *__s);
+
+
+
+
+/* Generate a unique temporary filename using up to five characters of PFX
+   if it is not NULL.  The directory to put this file in is searched for
+   as follows: First the environment variable "TMPDIR" is checked.
+   If it contains the name of a writable directory, that directory is used.
+   If not and if DIR is not NULL, that value is checked.  If that fails,
+   P_tmpdir is tried and finally "/tmp".  The storage for the filename
+   is allocated by `malloc'.  */
+
+extern char *tempnam(const char *__dir, const char *__pfx);
+
+
+
+
+/* Close STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fclose(FILE *__stream);
+/* Flush STREAM, or all streams if STREAM is NULL.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fflush(FILE *__stream);
+
+
+
+/* Faster versions when locking is not required.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fflush_unlocked(FILE *__stream);
+
+
+/* Open a file and create a new stream for it.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern FILE *fopen(const char *__filename, const char *__modes);
+/* Open a file, replacing an existing stream with it.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+
+extern FILE *freopen(const char *__filename, const char *__modes, FILE *__stream);
+/* Create a new stream that refers to an existing system file descriptor.  */
+extern FILE *fdopen(int __fd, const char *__modes);
+/* Create a new stream that refers to a memory buffer.  */
+
+extern FILE *fmemopen(void *__s, size_t __len, const char *__modes);
+
+/* Open a stream that writes into a malloc'd buffer that is expanded as
+   necessary.  *BUFLOC and *SIZELOC are updated with the buffer's location
+   and the number of characters written on fflush or fclose.  */
+extern FILE *open_memstream(char **__bufloc, size_t *__sizeloc);
+
+
+
+
+/* If BUF is NULL, make STREAM unbuffered.
+   Else make it use buffer BUF, of size BUFSIZ.  */
+extern void setbuf(FILE *__stream, char *__buf);
+/* Make STREAM use buffering mode MODE.
+   If BUF is not NULL, use N bytes of it for buffering;
+   else allocate an internal buffer N bytes long.  */
+
+extern int setvbuf(FILE *__stream, char *__buf, int __modes, size_t __n);
+
+
+
+/* If BUF is NULL, make STREAM unbuffered.
+   Else make it use SIZE bytes of BUF for buffering.  */
+
+extern void setbuffer(FILE *__stream, char *__buf, size_t __size);
+
+/* Make STREAM line-buffered.  */
+extern void setlinebuf(FILE *__stream);
+
+
+
+
+/* Write formatted output to STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int fprintf(FILE *__stream, const char *__format, ...);
+/* Write formatted output to stdout.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int printf(const char *__format, ...);
+/* Write formatted output to S.  */
+
+extern int sprintf(char *__s, const char *__format, ...);
+
+/* Write formatted output to S from argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int vfprintf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+/* Write formatted output to stdout from argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int vprintf(const char *__format, __gnuc_va_list __arg);
+/* Write formatted output to S from argument list ARG.  */
+
+extern int vsprintf(char *__s, const char *__format, __gnuc_va_list __arg);
+
+
+
+
+/* Maximum chars of output to write in MAXLEN.  */
+
+
+extern int snprintf(char *__s, size_t __maxlen, const char *__format, ...);
+
+
+
+extern int vsnprintf(char *__s, size_t __maxlen, const char *__format, __gnuc_va_list __arg);
+/* Write formatted output to a file descriptor.
+
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+
+
+extern int vdprintf(int __fd, const char *__fmt, __gnuc_va_list __arg);
+
+extern int dprintf(int __fd, const char *__fmt, ...);
+
+
+
+
+/* Read formatted input from STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int fscanf(FILE *__stream, const char *__format, ...);
+/* Read formatted input from stdin.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int scanf(const char *__format, ...);
+/* Read formatted input from S.  */
+
+extern int sscanf(const char *__s, const char *__format, ...);
+
+extern int __isoc99_fscanf(FILE *__stream, const char *__format, ...);
+extern int __isoc99_scanf(const char *__format, ...);
+
+extern int __isoc99_sscanf(const char *__s, const char *__format, ...);
+
+
+
+
+
+
+
+
+
+
+/* Read formatted input from S into argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+
+extern int vfscanf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+
+/* Read formatted input from stdin into argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int vscanf(const char *__format, __gnuc_va_list __arg);
+
+/* Read formatted input from S into argument list ARG.  */
+
+
+extern int vsscanf(const char *__s, const char *__format, __gnuc_va_list __arg);
+
+
+extern int __isoc99_vfscanf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+
+extern int __isoc99_vscanf(const char *__format, __gnuc_va_list __arg);
+
+
+extern int __isoc99_vsscanf(const char *__s, const char *__format, __gnuc_va_list __arg);
+
+
+
+
+
+
+
+
+
+
+
+/* Read a character from STREAM.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int fgetc(FILE *__stream);
+extern int getc(FILE *__stream);
+
+/* Read a character from stdin.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int getchar(void);
+
+
+/* The C standard explicitly says this is a macro, so we always do the
+   optimization for it.  */
+
+
+
+/* These are defined in POSIX.1:1996.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int getc_unlocked(FILE *__stream);
+extern int getchar_unlocked(void);
+
+
+
+/* Faster version when locking is not necessary.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fgetc_unlocked(FILE *__stream);
+
+
+
+
+/* Write a character to STREAM.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.
+
+   These functions is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fputc(int __c, FILE *__stream);
+extern int putc(int __c, FILE *__stream);
+
+/* Write a character to stdout.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int putchar(int __c);
+
+
+/* The C standard explicitly says this can be a macro,
+   so we always do the optimization for it.  */
+
+
+
+/* Faster version when locking is not necessary.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fputc_unlocked(int __c, FILE *__stream);
+
+
+
+/* These are defined in POSIX.1:1996.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int putc_unlocked(int __c, FILE *__stream);
+extern int putchar_unlocked(int __c);
+
+
+
+
+
+/* Get a word (int) from STREAM.  */
+extern int getw(FILE *__stream);
+
+/* Write a word (int) to STREAM.  */
+extern int putw(int __w, FILE *__stream);
+
+
+
+
+/* Get a newline-terminated string of finite length from STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern char *fgets(char *__s, int __n, FILE *__stream);
+
+/* Get a newline-terminated string from stdin, removing the newline.
+   DO NOT USE THIS FUNCTION!!  There is no limit on how much it will read.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern char *gets(char *__s);
+/* Read up to (and including) a DELIMITER from STREAM into *LINEPTR
+   (and null-terminate it). *LINEPTR is a pointer returned from malloc (or
+   NULL), pointing to *N characters of space.  It is realloc'd as
+   necessary.  Returns the number of characters read (not including the
+   null terminator), or -1 on error or EOF.
+
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+
+
+extern __ssize_t __getdelim(char **__lineptr, size_t *__n, int __delimiter, FILE *__stream);
+
+
+extern __ssize_t getdelim(char **__lineptr, size_t *__n, int __delimiter, FILE *__stream);
+
+/* Like `getdelim', but reads up to a newline.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+
+
+extern __ssize_t getline(char **__lineptr, size_t *__n, FILE *__stream);
+
+
+
+
+/* Write a string to STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int fputs(const char *__s, FILE *__stream);
+
+/* Write a string, followed by a newline, to stdout.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int puts(const char *__s);
+
+
+/* Push a character back onto the input buffer of STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int ungetc(int __c, FILE *__stream);
+
+
+/* Read chunks of generic data from STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+
+extern size_t fread(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+/* Write chunks of generic data to STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+
+extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
+/* Faster versions when locking is not necessary.
+
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+
+extern size_t fread_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+
+extern size_t fwrite_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+
+
+
+
+/* Seek to a certain position on STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fseek(FILE *__stream, long __off, int __whence);
+/* Return the current position of STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern long ftell(FILE *__stream);
+/* Rewind to the beginning of STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern void rewind(FILE *__stream);
+
+
+/* The Single Unix Specification, Version 2, specifies an alternative,
+   more adequate interface for the two functions above which deal with
+   file offset.  `long int' is not the right type.  These definitions
+   are originally defined in the Large File Support API.  */
+
+
+
+/* Seek to a certain position on STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fseeko(FILE *__stream, __off_t __off, int __whence);
+/* Return the current position of STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern __off_t ftello(FILE *__stream);
+
+
+/* Get STREAM's position.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fgetpos(FILE *__stream, fpos_t *__pos);
+/* Set STREAM's position.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fsetpos(FILE *__stream, const fpos_t *__pos);
+
+/* Clear the error and EOF indicators for STREAM.  */
+extern void clearerr(FILE *__stream);
+/* Return the EOF indicator for STREAM.  */
+extern int feof(FILE *__stream);
+/* Return the error indicator for STREAM.  */
+extern int ferror(FILE *__stream);
+
+
+
+/* Faster versions when locking is not required.  */
+extern void clearerr_unlocked(FILE *__stream);
+extern int feof_unlocked(FILE *__stream);
+extern int ferror_unlocked(FILE *__stream);
+
+
+
+
+/* Print a message describing the meaning of the value of errno.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern void perror(const char *__s);
+/* Declare sys_errlist and sys_nerr, or don't.  Compatibility (do) version.
+   Copyright (C) 2002 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+
+
+
+
+
+/* sys_errlist and sys_nerr are deprecated.  Use strerror instead.  */
+
+
+extern int sys_nerr;
+extern const char *sys_errlist[];
+
+
+
+/* Return the system file descriptor for STREAM.  */
+extern int fileno(FILE *__stream);
+
+
+
+/* Faster version when locking is not required.  */
+extern int fileno_unlocked(FILE *__stream);
+
+
+
+
+
+/* Create a new stream connected to a pipe running the given command.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern FILE *popen(const char *__command, const char *__modes);
+
+/* Close a stream opened by popen and return the status of its child.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int pclose(FILE *__stream);
+
+
+
+
+/* Return the name of the controlling terminal.  */
+extern char *ctermid(char *__s);
+/* These are defined in POSIX.1:1996.  */
+
+/* Acquire ownership of STREAM.  */
+extern void flockfile(FILE *__stream);
+
+/* Try to acquire ownership of STREAM but do not block if it is not
+   possible.  */
+extern int ftrylockfile(FILE *__stream);
+
+/* Relinquish the ownership granted for STREAM.  */
+extern void funlockfile(FILE *__stream);
+typedef int wchar_t;
+
+/* Returned by `div'.  */
+
+
+/* Quotient.  */
+/* Remainder.  */
+typedef struct {
+   int quot;
+   int rem;
+} div_t;
+
+/* Returned by `ldiv'.  */
+
+
+
+/* Quotient.  */
+/* Remainder.  */
+typedef struct {
+   long quot;
+   long rem;
+} ldiv_t;
+
+
+
+
+
+
+/* Returned by `lldiv'.  */
+
+
+/* Quotient.  */
+/* Remainder.  */
+typedef struct {
+   long long quot;
+   long long rem;
+} lldiv_t;
+
+
+
+
+
+/* The largest number rand will return (same as INT_MAX).  */
+
+
+
+/* We define these the same for all machines.
+   Changes from this to the outside world should be done in `_exit'.  */
+
+
+
+
+/* Maximum length of a multibyte character in the current locale.  */
+
+extern size_t __ctype_get_mb_cur_max(void);
+
+
+
+/* Convert a string to a floating-point number.  */
+
+extern double atof(const char *__nptr);
+/* Convert a string to an integer.  */
+
+extern int atoi(const char *__nptr);
+/* Convert a string to a long integer.  */
+
+extern long atol(const char *__nptr);
+
+
+
+
+/* Convert a string to a long long integer.  */
+
+extern long long atoll(const char *__nptr);
+
+
+
+
+/* Convert a string to a floating-point number.  */
+
+
+extern double strtod(const char *__nptr, char **__endptr);
+
+
+
+
+/* Likewise for `float' and `long double' sizes of floating-point numbers.  */
+
+extern float strtof(const char *__nptr, char **__endptr);
+
+
+
+extern double strtold(const char *__nptr, char **__endptr);
+
+
+
+
+/* Convert a string to a long integer.  */
+
+
+extern long strtol(const char *__nptr, char **__endptr, int __base);
+/* Convert a string to an unsigned long integer.  */
+
+
+extern unsigned long strtoul(const char *__nptr, char **__endptr, int __base);
+
+/* Convert a string to a quadword integer.  */
+
+
+
+extern long long strtoll(const char *__nptr, char **__endptr, int __base);
+/* Convert a string to an unsigned quadword integer.  */
+
+
+
+extern unsigned long long strtoull(const char *__nptr, char **__endptr, int __base);
+/* Convert N to base 64 using the digits "./0-9A-Za-z", least-significant
+   digit first.  Returns a pointer to static storage overwritten by the
+   next call.  */
+extern char *l64a(long __n);
+
+/* Read a number from a string S in base 64 as above.  */
+
+extern long a64l(const char *__s);
+
+
+
+typedef __u_char u_char;
+typedef __u_short u_short;
+typedef __u_int u_int;
+typedef __u_long u_long;
+typedef __quad_t quad_t;
+typedef __u_quad_t u_quad_t;
+typedef __fsid_t fsid_t;
+
+
+
+
+typedef __loff_t loff_t;
+
+
+
+typedef __ino_t ino_t;
+typedef __dev_t dev_t;
+
+
+
+
+typedef __gid_t gid_t;
+
+
+
+
+typedef __mode_t mode_t;
+
+
+
+
+typedef __nlink_t nlink_t;
+
+
+
+
+typedef __uid_t uid_t;
+
+
+
+
+
+typedef __off_t off_t;
+typedef __pid_t pid_t;
+
+
+
+
+typedef __id_t id_t;
+
+
+
+
+typedef __ssize_t ssize_t;
+
+
+
+
+
+typedef __daddr_t daddr_t;
+typedef __caddr_t caddr_t;
+
+
+
+
+
+typedef __key_t key_t;
+
+
+/* Returned by `time'.  */
+typedef __time_t time_t;
+
+/* Clock ID used in clock and timer functions.  */
+typedef __clockid_t clockid_t;
+
+/* Timer ID returned by `timer_create'.  */
+typedef __timer_t timer_t;
+
+
+/* Old compatibility names for C types.  */
+typedef unsigned long ulong;
+typedef unsigned short ushort;
+typedef unsigned int uint;
+
+
+/* These size-specific names are used by some of the inet code.  */
+
+
+
+/* These types are defined by the ISO C99 header <inttypes.h>. */
+
+
+typedef char int8_t;
+typedef short int16_t;
+typedef int int32_t;
+
+typedef long int64_t;
+
+
+
+
+
+/* But these were defined by ISO C without the first `_'.  */
+typedef unsigned char u_int8_t;
+typedef unsigned short u_int16_t;
+typedef unsigned int u_int32_t;
+
+typedef unsigned long u_int64_t;
+
+
+
+
+typedef int register_t;
+/* __sig_atomic_t, __sigset_t, and related definitions.  Linux version.
+   Copyright (C) 1991, 1992, 1994, 1996, 1997, 2007
+   Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+
+
+
+
+typedef int __sig_atomic_t;
+typedef struct {
+   unsigned long __val[1024/(8*sizeof(unsigned long))];
+} __sigset_t;
+
+
+
+typedef __sigset_t sigset_t;
+
+/* POSIX.1b structure for a time value.  This is like a `struct timeval' but
+   has nanoseconds instead of microseconds.  */
+
+
+/* Seconds.  */
+/* Nanoseconds.  */
+struct timespec {
+   __time_t tv_sec;
+   long tv_nsec;
+};
+
+/* A time value that is accurate to the nearest
+   microsecond but also has a range of years.  */
+
+
+/* Seconds.  */
+/* Microseconds.  */
+struct timeval {
+   __time_t tv_sec;
+   __suseconds_t tv_usec;
+};
+
+
+typedef __suseconds_t suseconds_t;
+
+
+
+
+/* The fd_set member is required to be an array of longs.  */
+typedef long __fd_mask;
+typedef struct {
+   __fd_mask __fds_bits[1024/(8*sizeof(__fd_mask))];
+} fd_set;
+
+/* Maximum number of file descriptors in `fd_set'.  */
+
+
+
+/* Sometimes the fd_set member is assumed to have this type.  */
+typedef __fd_mask fd_mask;
+
+/* Number of bits per word of `fd_set' (some code assumes this is 32).  */
+
+
+
+
+/* Access macros for `fd_set'.  */
+
+
+
+
+
+
+
+
+/* Check the first NFDS descriptors each in READFDS (if not NULL) for read
+   readiness, in WRITEFDS (if not NULL) for write readiness, and in EXCEPTFDS
+   (if not NULL) for exceptional conditions.  If TIMEOUT is not NULL, time out
+   after waiting the interval specified therein.  Returns the number of ready
+   descriptors, or -1 for errors.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+
+
+
+extern int select(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds, struct timeval *__timeout);
+
+
+/* Same as above only that the TIMEOUT value is given with higher
+   resolution and a sigmask which is been set temporarily.  This version
+   should be used.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+
+
+
+
+extern int pselect(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds, const struct timespec *__timeout, const __sigset_t *__sigmask);
+/* Types from the Large File Support interface.  */
+
+
+typedef __blkcnt_t blkcnt_t;
+/* Type to count number of disk blocks.  */
+
+
+
+typedef __fsblkcnt_t fsblkcnt_t;
+/* Type to count file system blocks.  */
+
+
+
+typedef __fsfilcnt_t fsfilcnt_t;
+/* Thread identifiers.  The structure of the attribute type is not
+   exposed on purpose.  */
+typedef unsigned long pthread_t;
+typedef union {
+   char __size[56];
+   long __align;
+} pthread_attr_t;
+typedef struct __pthread_internal_list {
+   struct __pthread_internal_list *__prev;
+   struct __pthread_internal_list *__next;
+} __pthread_list_t;
+typedef union {
+   struct __pthread_mutex_s {int __lock; unsigned int __count; int __owner; unsigned int __nusers; int __kind; int __spins; __pthread_list_t __list;} __data;
+   char __size[40];
+   long __align;
+} pthread_mutex_t;
+typedef union {
+   char __size[4];
+   int __align;
+} pthread_mutexattr_t;
+typedef union {
+   struct  {int __lock; unsigned int __futex; unsigned long long __total_seq; unsigned long long __wakeup_seq; unsigned long long __woken_seq; void *__mutex; unsigned int __nwaiters; unsigned int __broadcast_seq;} __data;
+   char __size[48];
+   long long __align;
+} pthread_cond_t;
+typedef union {
+   char __size[4];
+   int __align;
+} pthread_condattr_t;
+
+
+/* Keys for thread-specific data */
+typedef unsigned int pthread_key_t;
+
+
+/* Once-only execution */
+typedef int pthread_once_t;
+typedef union {
+   struct  {int __lock; unsigned int __nr_readers; unsigned int __readers_wakeup; unsigned int __writer_wakeup; unsigned int __nr_readers_queued; unsigned int __nr_writers_queued; int __writer; int __shared; unsigned long __pad1; unsigned long __pad2; unsigned int __flags;} __data;
+   char __size[56];
+   long __align;
+} pthread_rwlock_t;
+typedef union {
+   char __size[8];
+   long __align;
+} pthread_rwlockattr_t;
+
+
+
+
+/* POSIX spinlock data type.  */
+typedef volatile int pthread_spinlock_t;
+
+
+/* POSIX barriers data type.  The structure of the type is
+   deliberately not exposed.  */
+typedef union {
+   char __size[32];
+   long __align;
+} pthread_barrier_t;
+typedef union {
+   char __size[4];
+   int __align;
+} pthread_barrierattr_t;
+
+/* These are the functions that actually do things.  The `random', `srandom',
+   `initstate' and `setstate' functions are those from BSD Unices.
+   The `rand' and `srand' functions are required by the ANSI standard.
+   We provide both interfaces to the same random number generator.  */
+/* Return a random long integer between 0 and RAND_MAX inclusive.  */
+extern long random(void);
+
+/* Seed the random number generator with the given number.  */
+extern void srandom(unsigned int __seed);
+
+/* Initialize the random number generator to use state buffer STATEBUF,
+   of length STATELEN, and seed it with SEED.  Optimal lengths are 8, 16,
+   32, 64, 128 and 256, the bigger the better; values less than 8 will
+   cause an error and values greater than 256 will be rounded down.  */
+
+extern char *initstate(unsigned int __seed, char *__statebuf, size_t __statelen);
+
+/* Switch the random number generator to state buffer STATEBUF,
+   which should have been previously initialized by `initstate'.  */
+extern char *setstate(char *__statebuf);
+
+
+
+/* Reentrant versions of the `random' family of functions.
+   These functions all use the following data structure to contain
+   state, rather than global state variables.  */
+
+
+
+/* Front pointer.  */
+/* Rear pointer.  */
+/* Array of state values.  */
+/* Type of random number generator.  */
+/* Degree of random number generator.  */
+/* Distance between front and rear.  */
+/* Pointer behind state table.  */
+struct random_data {
+   int32_t *fptr;
+   int32_t *rptr;
+   int32_t *state;
+   int rand_type;
+   int rand_deg;
+   int rand_sep;
+   int32_t *end_ptr;
+};
+
+
+extern int random_r(struct random_data *__buf, int32_t *__result);
+
+
+extern int srandom_r(unsigned int __seed, struct random_data *__buf);
+
+
+
+
+extern int initstate_r(unsigned int __seed, char *__statebuf, size_t __statelen, struct random_data *__buf);
+
+
+
+extern int setstate_r(char *__statebuf, struct random_data *__buf);
+
+
+
+
+
+/* Return a random integer between 0 and RAND_MAX inclusive.  */
+extern int rand(void);
+/* Seed the random number generator with the given number.  */
+extern void srand(unsigned int __seed);
+
+
+
+/* Reentrant interface according to POSIX.1.  */
+extern int rand_r(unsigned int *__seed);
+
+
+
+
+/* System V style 48-bit random number generator functions.  */
+
+/* Return non-negative, double-precision floating-point value in [0.0,1.0).  */
+extern double drand48(void);
+extern double erand48(unsigned short __xsubi[3]);
+
+/* Return non-negative, long integer in [0,2^31).  */
+extern long lrand48(void);
+
+extern long nrand48(unsigned short __xsubi[3]);
+
+/* Return signed, long integers in [-2^31,2^31).  */
+extern long mrand48(void);
+
+extern long jrand48(unsigned short __xsubi[3]);
+
+/* Seed random number generator.  */
+extern void srand48(long __seedval);
+
+extern unsigned short *seed48(unsigned short __seed16v[3]);
+extern void lcong48(unsigned short __param[7]);
+
+
+/* Data structure for communication with thread safe versions.  This
+   type is to be regarded as opaque.  It's only exported because users
+   have to allocate objects of this type.  */
+
+
+/* Current state.  */
+/* Old state.  */
+/* Additive const. in congruential formula.  */
+/* Flag for initializing.  */
+/* Factor in congruential formula.  */
+struct drand48_data {
+   unsigned short __x[3];
+   unsigned short __old_x[3];
+   unsigned short __c;
+   unsigned short __init;
+   unsigned long long __a;
+};
+
+/* Return non-negative, double-precision floating-point value in [0.0,1.0).  */
+
+extern int drand48_r(struct drand48_data *__buffer, double *__result);
+
+
+extern int erand48_r(unsigned short __xsubi[3], struct drand48_data *__buffer, double *__result);
+
+/* Return non-negative, long integer in [0,2^31).  */
+
+
+extern int lrand48_r(struct drand48_data *__buffer, long *__result);
+
+
+
+extern int nrand48_r(unsigned short __xsubi[3], struct drand48_data *__buffer, long *__result);
+
+/* Return signed, long integers in [-2^31,2^31).  */
+
+
+extern int mrand48_r(struct drand48_data *__buffer, long *__result);
+
+
+
+extern int jrand48_r(unsigned short __xsubi[3], struct drand48_data *__buffer, long *__result);
+
+/* Seed random number generator.  */
+
+extern int srand48_r(long __seedval, struct drand48_data *__buffer);
+
+
+extern int seed48_r(unsigned short __seed16v[3], struct drand48_data *__buffer);
+
+
+
+extern int lcong48_r(unsigned short __param[7], struct drand48_data *__buffer);
+
+
+
+
+
+
+
+
+/* Allocate SIZE bytes of memory.  */
+extern void *malloc(size_t __size);
+/* Allocate NMEMB elements of SIZE bytes each, all initialized to 0.  */
+
+extern void *calloc(size_t __nmemb, size_t __size);
+
+
+
+
+
+/* Re-allocate the previously allocated block
+   in PTR, making the new block SIZE bytes long.  */
+/* __attribute_malloc__ is not used, because if realloc returns
+   the same pointer that was passed to it, aliasing needs to be allowed
+   between objects pointed by the old and new pointers.  */
+
+extern void *realloc(void *__ptr, size_t __size);
+/* Free a block allocated by `malloc', `realloc' or `calloc'.  */
+extern void free(void *__ptr);
+
+
+
+/* Free a block.  An alias for `free'.	(Sun Unices).  */
+extern void cfree(void *__ptr);
+
+
+
+/* Remove any previous definitions.  */
+
+
+/* Allocate a block that will be freed when the calling function exits.  */
+extern void *alloca(size_t __size);
+
+
+
+/* Allocate SIZE bytes on a page boundary.  The storage cannot be freed.  */
+extern void *valloc(size_t __size);
+
+
+
+/* Allocate memory of SIZE bytes with an alignment of ALIGNMENT.  */
+
+extern int posix_memalign(void **__memptr, size_t __alignment, size_t __size);
+
+
+
+/* Abort execution and generate a core-dump.  */
+extern void abort(void);
+
+
+/* Register a function to be called when `exit' is called.  */
+extern int atexit(void (*__func)(void));
+
+
+
+/* Register a function to be called with the status
+   given to `exit' and the given argument.  */
+
+extern int on_exit(void (*__func)(int __status, void *__arg), void *__arg);
+
+
+
+/* Call all functions registered with `atexit' and `on_exit',
+   in the reverse of the order in which they were registered,
+   perform stdio cleanup, and terminate program execution with STATUS.  */
+extern void exit(int __status);
+
+
+
+
+/* Terminate the program with STATUS without calling any of the
+   functions registered with `atexit' or `on_exit'.  */
+extern void _Exit(int __status);
+
+
+
+
+
+/* Return the value of envariable NAME, or NULL if it doesn't exist.  */
+extern char *getenv(const char *__name);
+
+
+/* This function is similar to the above but returns NULL if the
+   programs is running with SUID or SGID enabled.  */
+
+extern char *__secure_getenv(const char *__name);
+
+
+/* The SVID says this is in <stdio.h>, but this seems a better place.	*/
+/* Put STRING, which is of the form "NAME=VALUE", in the environment.
+   If there is no `=', remove NAME from the environment.  */
+extern int putenv(char *__string);
+
+
+
+/* Set NAME to VALUE in the environment.
+   If REPLACE is nonzero, overwrite an existing value.  */
+
+extern int setenv(const char *__name, const char *__value, int __replace);
+
+/* Remove the variable NAME from the environment.  */
+extern int unsetenv(const char *__name);
+
+
+
+/* The `clearenv' was planned to be added to POSIX.1 but probably
+   never made it.  Nevertheless the POSIX.9 standard (POSIX bindings
+   for Fortran 77) requires this function.  */
+extern int clearenv(void);
+
+
+
+
+/* Generate a unique temporary file name from TEMPLATE.
+   The last six characters of TEMPLATE must be "XXXXXX";
+   they are replaced with a string that makes the file name unique.
+   Returns TEMPLATE, or a null pointer if it cannot get a unique file name.  */
+extern char *mktemp(char *__template);
+
+/* Generate a unique temporary file name from TEMPLATE.
+   The last six characters of TEMPLATE must be "XXXXXX";
+   they are replaced with a string that makes the filename unique.
+   Returns a file descriptor open on the file for reading and writing,
+   or -1 if it cannot create a uniquely-named file.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+
+extern int mkstemp(char *__template);
+/* Create a unique temporary directory from TEMPLATE.
+   The last six characters of TEMPLATE must be "XXXXXX";
+   they are replaced with a string that makes the directory name unique.
+   Returns TEMPLATE, or a null pointer if it cannot get a unique name.
+   The directory is created mode 700.  */
+extern char *mkdtemp(char *__template);
+
+/* Execute the given line as a shell command.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern int system(const char *__command);
+/* Return the canonical absolute name of file NAME.  If RESOLVED is
+   null, the result is malloc'd; otherwise, if the canonical name is
+   PATH_MAX chars or more, returns null with `errno' set to
+   ENAMETOOLONG; if the name fits in fewer than PATH_MAX chars,
+   returns the name in RESOLVED.  */
+
+extern char *realpath(const char *__name, char *__resolved);
+
+
+
+/* Shorthand for type of comparison functions.  */
+
+
+typedef int (*__compar_fn_t)(void *, void *);
+
+/* Do a binary search for KEY in BASE, which consists of NMEMB elements
+   of SIZE bytes each, using COMPAR to perform the comparisons.  */
+
+
+extern void *bsearch(void *__key, void *__base, size_t __nmemb, size_t __size, __compar_fn_t __compar);
+
+/* Sort NMEMB elements of BASE, of SIZE bytes each,
+   using COMPAR to perform the comparisons.  */
+
+extern void qsort(void *__base, size_t __nmemb, size_t __size, __compar_fn_t __compar);
+
+
+
+
+
+
+
+/* Return the absolute value of X.  */
+extern int abs(int __x);
+extern long labs(long __x);
+
+
+
+
+extern long long llabs(long long __x);
+
+
+
+
+/* Return the `div_t', `ldiv_t' or `lldiv_t' representation
+   of the value of NUMER over DENOM. */
+/* GCC may have built-ins for these someday.  */
+
+extern div_t div(int __numer, int __denom);
+
+extern ldiv_t ldiv(long __numer, long __denom);
+
+
+
+
+
+
+extern lldiv_t lldiv(long long __numer, long long __denom);
+
+
+
+
+
+/* Convert floating point numbers to strings.  The returned values are
+   valid only until another call to the same function.  */
+
+/* Convert VALUE to a string with NDIGIT digits and return a pointer to
+   this.  Set *DECPT with the position of the decimal character and *SIGN
+   with the sign of the number.  */
+
+extern char *ecvt(double __value, int __ndigit, int *__decpt, int *__sign);
+
+/* Convert VALUE to a string rounded to NDIGIT decimal digits.  Set *DECPT
+   with the position of the decimal character and *SIGN with the sign of
+   the number.  */
+
+extern char *fcvt(double __value, int __ndigit, int *__decpt, int *__sign);
+
+/* If possible convert VALUE to a string with NDIGIT significant digits.
+   Otherwise use exponential representation.  The resulting string will
+   be written to BUF.  */
+
+extern char *gcvt(double __value, int __ndigit, char *__buf);
+
+
+
+/* Long double versions of above functions.  */
+
+
+extern char *qecvt(double __value, int __ndigit, int *__decpt, int *__sign);
+
+
+extern char *qfcvt(double __value, int __ndigit, int *__decpt, int *__sign);
+
+extern char *qgcvt(double __value, int __ndigit, char *__buf);
+
+
+/* Reentrant version of the functions above which provide their own
+   buffers.  */
+
+
+extern int ecvt_r(double __value, int __ndigit, int *__decpt, int *__sign, char *__buf, size_t __len);
+
+
+extern int fcvt_r(double __value, int __ndigit, int *__decpt, int *__sign, char *__buf, size_t __len);
+
+
+
+
+extern int qecvt_r(double __value, int __ndigit, int *__decpt, int *__sign, char *__buf, size_t __len);
+
+
+
+extern int qfcvt_r(double __value, int __ndigit, int *__decpt, int *__sign, char *__buf, size_t __len);
+
+
+
+
+
+/* Return the length of the multibyte character
+   in S, which is no longer than N.  */
+extern int mblen(const char *__s, size_t __n);
+/* Return the length of the given multibyte character,
+   putting its `wchar_t' representation in *PWC.  */
+
+extern int mbtowc(wchar_t *__pwc, const char *__s, size_t __n);
+/* Put the multibyte character represented
+   by WCHAR in S, returning its length.  */
+extern int wctomb(char *__s, wchar_t __wchar);
+
+
+/* Convert a multibyte string to a wide char string.  */
+
+extern size_t mbstowcs(wchar_t *__pwcs, const char *__s, size_t __n);
+/* Convert a wide char string to multibyte string.  */
+
+
+extern size_t wcstombs(char *__s, const wchar_t *__pwcs, size_t __n);
+
+
+
+
+/* Determine whether the string value of RESPONSE matches the affirmation
+   or negative response expression as specified by the LC_MESSAGES category
+   in the program's current locale.  Returns 1 if affirmative, 0 if
+   negative, and -1 if not matching.  */
+extern int rpmatch(const char *__response);
+/* X/Open pseudo terminal handling.  */
+
+
+/* Return a master pseudo-terminal handle.  */
+extern int posix_openpt(int __oflag);
+/* Put the 1 minute, 5 minute and 15 minute load averages into the first
+   NELEM elements of LOADAVG.  Return the number written (never more than
+   three, but may be less than NELEM), or -1 if an error occurred.  */
+
+extern int getloadavg(double __loadavg[], int __nelem);
+
+extern long long test_intr(char **argv);
+
+extern int main(int argc, char **argv);
+int main(int argc, char **argv)
+{
+   long long size = test_intr(argv);
+   return (int) size;
+}
+long long test_intr(char **argv)
+{
+   long long result = 0;
+   result = atoll(argv[1]);
+   return result;
+}

@@ -1,4 +1,4 @@
-main()
+int main()
 {
    volatile int i;
 }

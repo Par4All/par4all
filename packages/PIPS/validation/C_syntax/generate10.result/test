@@ -26,7 +26,13 @@ Printed file generate10 with intraprocedural preconditions
 
 void generate10()
 {
+
+//  P() {}
+
    int func(int a, ...);
+
+//  P() {}
+
    int i, j, k;
 
 //  P() {}

@@ -1,4 +1,4 @@
-main()
+int main()
 {
    signed int i1;
    signed int i2;
@@ -8,7 +8,7 @@ main()
    signed long i6;
    signed long long i7;
    signed long long i8;
-   
+
    i1 = 1;
    i2 = 2;
    i8 = 8;

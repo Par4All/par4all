@@ -5,49 +5,53 @@ void decl38(int size)
 {
 // (statement ordering unavailable)
    // BEGIN BLOCK
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int k;                                                               /*0006*/
-   float x;                                                             /*0007*/
+// (statement ordering unavailable)
+   int i;                                                               /*0003*/
+// (statement ordering unavailable)
+   int j;                                                               /*0004*/
+// (statement ordering unavailable)
+   int k;                                                               /*0005*/
+// (statement ordering unavailable)
+   float x;                                                             /*0006*/
 // (statement ordering unavailable)
 
-   for (i = 1;(i<size);i++)                                             /*0009*/
+   for (i = 1;(i<size);i++)                                             /*0008*/
 // (statement ordering unavailable)
-      ;                                                                 /*0010*/
+      ;                                                                 /*0009*/
 // (statement ordering unavailable)
    // BEGIN BLOCK
 // (statement ordering unavailable)
    
    // if the switch is removed, the loop index declarations reappears
-   ;                                                                    /*0013*/
+   ;                                                                    /*0012*/
 // (statement ordering unavailable)
    // BEGIN BLOCK
 // (statement ordering unavailable)
    if ((0==0))
 // (statement ordering unavailable)
-      goto switch_2_case_0;                                             /*0014*/
+      goto switch_2_case_0;                                             /*0013*/
    else
 // (statement ordering unavailable)
 
 // (statement ordering unavailable)
-   goto break_2;                                                        /*0017*/
+   goto break_2;                                                        /*0016*/
    // END BLOCK
 // (statement ordering unavailable)
 switch_2_case_0:   ;
 // (statement ordering unavailable)
-   for (j = 1;(j<size);j++)                                             /*0015*/
+   for (j = 1;(j<size);j++)                                             /*0014*/
 // (statement ordering unavailable)
-      ;                                                                 /*0016*/
+      ;                                                                 /*0015*/
 // (statement ordering unavailable)
 break_2:   ;
    // END BLOCK
 // (statement ordering unavailable)
 
-   for (k = 1;(k<size);k++)                                             /*0019*/
+   for (k = 1;(k<size);k++)                                             /*0018*/
 // (statement ordering unavailable)
-      ;                                                                 /*0020*/
+      ;                                                                 /*0019*/
 // (statement ordering unavailable)
-   x = 0;                                                               /*0021*/
+   x = 0;                                                               /*0020*/
    // END BLOCK
 }
 
@@ -61,15 +65,19 @@ void decl38(int size)
 // (1,2)
 // (2,1)
    // BEGIN BLOCK
-   int i;                                                               /*0004*/
-   int j;                                                               /*0005*/
-   int k;                                                               /*0006*/
-   float x;                                                             /*0007*/
+// (2,2)
+   int i;                                                               /*0003*/
+// (2,3)
+   int j;                                                               /*0004*/
+// (2,4)
+   int k;                                                               /*0005*/
+// (2,5)
+   float x;                                                             /*0006*/
 // (2,6)
 
    for(i = 1; i <= (size-1); i += 1)
 // (2,7)
-      ;                                                                 /*0010*/
+      ;                                                                 /*0009*/
    // END BLOCK
 // (3,1)
 
@@ -94,9 +102,9 @@ break_2:   ;
 
    for(k = 1; k <= (size-1); k += 1)
 // (6,4)
-      ;                                                                 /*0020*/
+      ;                                                                 /*0019*/
 // (6,5)
-   x = 0;                                                               /*0021*/
+   x = 0;                                                               /*0020*/
    // END BLOCK
    goto l99998;
 l99999:   ;
@@ -111,7 +119,7 @@ switch_2_case_0:   ;
 // (5,4)
    for(j = 1; j <= (size-1); j += 1)
 // (5,5)
-      ;                                                                 /*0016*/
+      ;                                                                 /*0015*/
    // END BLOCK
    goto break_2;
 l99998:   ;

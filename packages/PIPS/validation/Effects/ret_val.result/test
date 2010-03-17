@@ -1,0 +1,22 @@
+long long get_result(int argc, char **argv)
+{
+//               <must be written>: result
+   long long result = 0;
+//               <must be read   >: argv argv[1]
+//               <must be written>: result
+   result = atoll(argv[1]);
+//               <must be read   >: __IO_EFFECTS:LUNS[1] result
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("return value will be %lld\n", result);
+//               <must be read   >: result
+   return result;
+}
+int main(int argc, char **argv)
+{
+//               <must be read   >: __IO_EFFECTS:LUNS[1] argc argv 
+//                                  argv[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1] size
+   long long size = get_result(argc, argv);
+//               <must be read   >: size
+   return size;
+}

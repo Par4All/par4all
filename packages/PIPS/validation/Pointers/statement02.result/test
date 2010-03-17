@@ -31,15 +31,15 @@ int main()
    x1 = 0;
    y2 = 1;
    x = &x1;
-//  points to = {(x,x1,E)}
+//  points to = {(x,x1,-Exact-)}
    y1 = &y2;
-//  points to = {(y1,y2,E)(x,x1,E)}
+//  points to = {(y1,y2,-Exact-);(x,x1,-Exact-)}
    y = &y1;
-//  points to = {(y,y1,E)(y1,y2,E)(x,x1,E)}
+//  points to = {(y,y1,-Exact-);(y1,y2,-Exact-);(x,x1,-Exact-)}
    x = *y;
-//  points to = {(y,y1,E)(y1,y2,E)(x,y2,E)}
+//  points to = {(y,y1,-Exact-);(y1,y2,-Exact-);(x,y2,-Exact-)}
    *y = x;
-//  points to = {(y,y1,E)(x,y2,E)(y1,y2,E)}
+//  points to = {(y,y1,-Exact-);(x,y2,-Exact-);(y1,y2,-Exact-)}
    return 0;
    // END BLOCK
 }
