@@ -15,31 +15,29 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-#include "malloc.h"
 #include "union.h"
 
 
 extern char yytext[]; /* dialogue avec l'analyseur lexical */
-Psysteme ps_yacc;
+extern Psysteme ps_yacc;
 boolean syntax_error;
 Value valcst;
-Value fac;        /* facteur multiplicatif suivant qu'on analyse un terme*/
+extern Value fac;        /* facteur multiplicatif suivant qu'on analyse un terme*/
                       /* introduit par un moins (-1) ou par un plus (1) */
-int sens;             /* indique le sens de l'inegalite
+extern int sens;             /* indique le sens de l'inegalite
                          sens = -1  ==> l'operateur est soit > ,soit >=,
                          sens = 1   ==> l'operateur est soit <, soit <=   */
-short int cote;       /* booleen indiquant quel membre est en cours d'analyse*/
-Value b1, b2;      /* element du vecteur colonne du systeme donne 
+extern short int cote;       /* booleen indiquant quel membre est en cours d'analyse*/
+extern Value b1, b2;      /* element du vecteur colonne du systeme donne 
           par l'analyse d'une contrainte */
-Pcontrainte eq;       /* pointeur sur l'egalite ou l'inegalite courante */
-Pvecteur cp ;         /* pointeur sur le membre courant */ 
-short int operat;     /* dernier operateur rencontre */
+extern Pcontrainte eq;       /* pointeur sur l'egalite ou l'inegalite courante */
+extern Pvecteur cp ;         /* pointeur sur le membre courant */ 
+extern short int operat;     /* dernier operateur rencontre */
 
 extern   Pcontrainte p_eg_fin;
 extern   Pcontrainte p_ineg_fin;
 extern   Pvecteur p_pred;
 extern   Pvecteur p_membre_courant;
-extern   Pvecteur cp;
 Psyslist sl_yacc; Pbase ba_yacc; Variable va_yacc; 
 
 /*code des operateurs de comparaison */

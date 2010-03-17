@@ -34,7 +34,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-#include "malloc.h"
 
 /* Psysteme sc_fusion(Psysteme s1, Psysteme s2): fusion de deux systemes
  * de contraintes afin d'obtenir un systeme contenant les egalites

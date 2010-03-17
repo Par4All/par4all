@@ -35,7 +35,6 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include <malloc.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
