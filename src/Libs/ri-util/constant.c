@@ -41,60 +41,53 @@
 #include "text-util.h"
 
 extern string make_entity_fullname();
-entity 
-find_entity_0()
+
+/* As fragile as next function. Avoid if possible! */
+entity find_entity_0()
 {
     entity e_0;
     string n_0 = make_entity_fullname(TOP_LEVEL_MODULE_NAME, "0");
 
     e_0 = gen_find_tabulated(n_0, entity_domain);
 
-    pips_assert("find_entity_1", e_0 != entity_undefined);
+    pips_assert("e_0 is defined", e_0 != entity_undefined);
 
     return(e_0);
 }
 
-/* 
-  returns the top-level entity that represents the integer constant 1.
-  its name is "TOP-LEVEL:1". 
-  this entity must exist because it is necessarily created by the parser.
+/*
+  Returns the top-level entity that represents the integer constant 1.
+  its name is "TOP-LEVEL:1".
+
+  This entity must exist because it is necessarily created by the
+  parser. Or at least by the Fortran parser... but not by the C parser.
 */
-entity 
-find_entity_1()
+entity find_entity_1()
 {
     entity e_1;
     string n_1 = make_entity_fullname(TOP_LEVEL_MODULE_NAME, "1");
 
     e_1 = gen_find_tabulated(n_1, entity_domain);
 
-    pips_assert("find_entity_1", e_1 != entity_undefined);
+    pips_assert("e_1 is defined", e_1 != entity_undefined);
 
     return(e_1);
 }
-expression 
-make_expression_0()
-{
-    entity e_0 = find_entity_0();
 
-    return(make_expression(make_syntax(is_syntax_call, make_call(e_0, NIL)),
-			   normalized_undefined));
+expression make_expression_0()
+{
+  return int_to_expression(0);
 }
 
 /*
   returns the integer constant expression of value 1.
 */
-expression 
-make_expression_1()
+expression make_expression_1()
 {
-    entity e_1 = find_entity_1();
-
-    return(make_expression(make_syntax(is_syntax_call, make_call(e_1, NIL)),
-			   normalized_undefined));
+  return int_to_expression(1);
 }
 
-int 
-DefaultLengthOfBasic(t)
-tag t;
+int DefaultLengthOfBasic(tag t)
 {
 	int e=-1;
 
@@ -172,7 +165,7 @@ _int TK_CHARCON_to__int(string name)
   else { // Unrecognized format
     pips_user_warning("character constant %s not recognized\n",name);
     // pips_internal_error("not implemented yet\n");
-    r=0;//just temporory 
+    r=0;//just temporary
   }
 
   return r;
@@ -363,10 +356,7 @@ entity make_constant_entity(string name,
 
 
 /* Make a Fortran constant */
-entity 
-MakeConstant(name, bt)
-string name;
-tag bt;
+entity MakeConstant(string name, tag bt)
 {
     entity e;
 
@@ -386,10 +376,7 @@ tag bt;
  *
  * Note: I might have changed that to store DATA statements... (FI)
  */
-entity 
-MakeComplexConstant(r, i)
-expression r;
-expression i;
+entity MakeComplexConstant(expression r, expression i)
 {
     entity re = call_function(syntax_call(expression_syntax(r)));
     entity ie = call_function(syntax_call(expression_syntax(i)));
@@ -413,10 +400,8 @@ expression i;
     return e;
 }
 
-expression
-MakeComplexConstantExpression(
-			      expression r,
-			      expression i)
+expression MakeComplexConstantExpression(expression r,
+					 expression i)
 {
     expression cce = expression_undefined;
 
@@ -441,7 +426,7 @@ bool complex_constant_expression_p(expression cce)
     entity f = call_function(syntax_call(expression_syntax(cce)));
     string fn = entity_local_name(f);
 
-    is_complex_constant_p = (strcmp(fn, IMPLIED_COMPLEX_NAME)==0 
+    is_complex_constant_p = (strcmp(fn, IMPLIED_COMPLEX_NAME)==0
 			     || strcmp(fn, IMPLIED_DCOMPLEX_NAME)==0);
   }
 
@@ -451,15 +436,13 @@ bool complex_constant_expression_p(expression cce)
 /* this function creates an integer constant and then a call to that
 constant. */
 
-expression 
-MakeIntegerConstantExpression(s)
+expression MakeIntegerConstantExpression(s)
 string s;
 {
     return(MakeNullaryCall(MakeConstant(s, is_basic_int)));
 }
 
-expression 
-make_constant_boolean_expression(bool b)
+expression make_constant_boolean_expression(bool b)
 {
     return MakeNullaryCall
         (MakeConstant(b ? TRUE_OPERATOR_NAME : FALSE_OPERATOR_NAME,
@@ -469,9 +452,9 @@ make_constant_boolean_expression(bool b)
 /// @brief generate an expression from an integer value
 /// @return the integer as an expresion.
 /// @param i the integer value to generate as an expression.
-expression
-int_expr(i)
-int i;
+/* FI: see int_to_expression()? Which may be safer wrt to the obsolete
+   use of i2a? */
+expression int_expr(int i)
 {
     /* What should be the length of buffer? */
     char * istr = i2a(i);
@@ -485,10 +468,7 @@ int i;
    in the EOLE project (JZ - 11/98) */
 
 /* (*int_p) gets integer constant if any */
-bool 
-integer_constant_p(ent, int_p)
-entity ent;
-int *int_p;
+bool integer_constant_p(entity ent, int *int_p)
 {
     if( type_tag(entity_type(ent))==is_type_functional
        && value_tag(entity_initial(ent))==is_value_constant
@@ -502,10 +482,7 @@ int *int_p;
 
 
 /* (*int_p) gets integer constant if any */
-bool 
-integer_symbolic_constant_p(ent, int_p)
-entity ent;
-int *int_p;
+bool integer_symbolic_constant_p(entity ent, int *int_p)
 {
     if( type_tag(entity_type(ent))==is_type_functional
        && value_tag(entity_initial(ent))==is_value_symbolic
@@ -522,16 +499,13 @@ int *int_p;
 /* this function creates an character constant and then a call to that
 constant. */
 
-expression 
-MakeCharacterConstantExpression(s)
-string s;
+expression MakeCharacterConstantExpression(string s)
 {
     return(MakeNullaryCall(MakeConstant(s, is_basic_string)));
 }
 
-
 /* this function creates a value for a symbolic constant. the expression
-e *must* be evaluable. */
+e *must* be evaluable. Well, it does not seem necessary any more... */
 
 value MakeValueSymbolic(expression e)
 {
@@ -539,14 +513,13 @@ value MakeValueSymbolic(expression e)
   value v;
 
   if (value_unknown_p(v = EvalExpression(e))) {
-    /* pips_error("MakeValueSymbolic", 
-       "value of parameter must be constant\n"); */
+    /* pips_internal_error("value of parameter must be constant\n"); */
     free_value(v);
     s = make_symbolic(e, make_constant_unknown());
     /* s = make_symbolic(e, make_constant(is_constant_unknown, UU)); */
   }
   else {
-    pips_assert("MakeValueSymbolic", value_constant_p(v));
+    pips_assert("v is a constant value", value_constant_p(v));
 
     s = make_symbolic(e, value_constant(v));
 
@@ -557,8 +530,7 @@ value MakeValueSymbolic(expression e)
   return make_value(is_value_symbolic, s);
 }
 
-bool
-signed_constant_expression_p(expression e)
+bool signed_constant_expression_p(expression e)
 {
     syntax es = expression_syntax(e);
     bool ok = TRUE;
@@ -568,7 +540,7 @@ signed_constant_expression_p(expression e)
 
 	if(!entity_constant_p(ce)) {
 	    list args = call_arguments(syntax_call(es));
-	    
+
 	    if(ce==CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME)) {
 		syntax arg = expression_syntax(EXPRESSION(CAR(args)));
 		if( syntax_call_p(arg)) {
