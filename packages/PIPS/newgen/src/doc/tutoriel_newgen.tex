@@ -1,0 +1,1558 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of NewGen.
+%%
+%% NewGen is free software: you can redistribute it and/or modify it under the
+%% terms of the GNU General Public License as published by the Free Software
+%% Foundation, either version 3 of the License, or any later version.
+%%
+%% NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+%% License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with NewGen.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass[11pt]{article}
+
+\usepackage[french]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{\Huge NewGen}
+\author{\huge {\em Pierre Jouvelot} \\
+        \\
+        \huge CRI, Ecole des Mines (France) \\
+        \huge LCS, MIT (U.S.A.)}
+\date{}
+
+\newcommand{\newgen}{NewGen}
+
+\begin{document}
+
+{\LARGE
+\sloppypar
+
+\maketitle
+
+\vskip 3cm
+
+\begin{center}
+Conférence GRECO de Programmation
+~\\
+Paris, 28 Novembre 1991
+\end{center}
+
+\vskip 3cm
+
+\begin{center}
+$\copyright$ Pierre Jouvelot (1991)
+\end{center}
+
+\newpage
+
+\begin{center}
+{\huge\bf Qu'est-ce que NewGen}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item \newgen~(New Generation)
+\item Outil de génie logiciel
+\item Aide à l'écriture de logiciels de taille importante
+\item Développement à l'Ecole des Mines de Paris (Automne 1988)
+\item Prototype ``Public Domain'' distribué (Mines, Bull, NASA, Boeing, ...)
+\item Applications: Paralléliseurs (environ 50 klignes)
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf \newgen~en résumé}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Outil de gestion de structures de données
+\item Méta-langage de définition de {\em domaines}: base, somme,
+produit, liste, ensemble, tableau
+\item Génération automatique de fonctions de création, manipulation,
+mise à jour, libération, stockage ...
+\item Bibliothèque générale (listes, tableaux, itérateurs, ...)
+\item Intégration dans logiciels existants (externe)
+\item Modularité (import)
+\item Efficacité temps/espace
+\end{itemize}
+
+\newpage 
+
+\begin{center}
+{\huge\bf Plan}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Problématique
+\item Atouts
+\item Description du langage de spécification
+\item Fonctions de manipulation (en C)
+\item Bibliothèques
+\item Un Premier Exemple
+\item \newgen~``avancé'' :  tabulation, importation, external
+\item Retour sur l'exemple
+\item NewGen et CommonLISP
+\item Aspects de l'implémentation
+\item PIPS: Un exemple ``vraie grandeur''
+\item Autres systèmes
+\item Conclusion
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Problématique}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Modèles de Développement Logiciel: {\em waterfall}, prototypage
+\item Prototypage: Spécification vs. Implémentation
+\item Spécification: Exécutabilité vs. Expressivité
+\item Implémentation: Efficacité vs. Simplicité
+\item Solution: {\em Interopérabilité}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Interopérabilité}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Indépendance par rapport au langage cible
+\item Paradigme uniforme de programmation
+\item Etat: support pour CommonLISP (orienté spécification) et C
+(orienté implémentation)
+\item Compatibilité complète au niveau fichier
+\item Maintien de la cohérence (persistence)
+\item Transition souple (conception modulaire)
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Atouts}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item {\em Abstraction Fonctionnelle}: 
+        \begin{itemize}
+        \item Constructions de haut niveau (fonctions)
+        \item Indépendance de l'implémentation
+        \item Extensions/redéfinitions possibles
+        \end{itemize}
+\item {\em Processus Evolutif}: 
+        \begin{itemize}
+        \item Support pour logiciel multi-passes
+        \item Gestion de persistence (partage, cycle)
+        \item Multi-langages
+        \item Intégration progressive (fichiers, pipes, variables
+                globales) 
+        \end{itemize}
+\item {\em Environnement de Programmation}:
+        \begin{itemize}
+        \item Lisibilité inter-langages
+        \item Réutilisation des bibliothèques
+        \item Mise-au-point aisée (tests dynamiques possibles)
+        \end{itemize}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Langage de Description de Domaines}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item {\tt --} pour les commentaires
+\item Définitions de domaines: 
+
+\begin{verbatim}
+name = expression ;
+\end{verbatim}
+\item Prédéfinis: {\tt unit}, {\tt bool}, {\tt char}, {\tt int}, {\tt
+string}, {\tt float} 
+\item Produit de {\em membres}:
+
+\begin{verbatim}
+    user = name:string x id:int x 
+           passwd x shell:string ;
+\end{verbatim}
+\item Somme de membres:
+
+\begin{verbatim}
+    passwd = crypted:string + 
+             clear:string ;
+\end{verbatim}
+\item Enumération (vue comme somme):
+
+\begin{verbatim}
+    passwd_status = {crypted, clear} ;
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{itemize}
+\item Les {\em membres} peuvent être complexes
+\item Définitions récursives autorisées
+\item Liste ordonnée de domaines:
+
+\begin{verbatim}
+    node = information:int x 
+           children:node* ;
+\end{verbatim}
+\item Ensemble (non ordonné) de domaines:
+
+\begin{verbatim}
+    group = elements:user{} ;
+\end{verbatim}
+\item Tableau (indexé) de domaines:
+
+\begin{verbatim}
+    #define BUFFER_SIZE 100
+
+    buffer = first:int x lats:int x 
+             elements:char[ BUFFER_SIZE ] ;
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Fonctions de Manipulation: \\
+Création}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Tout domaine {\em domain} définit:
+        \begin{itemize}
+        \item un type {\em domain}
+        \item un {\em constructeur} {\tt make\_{\em domain}}
+        \item une valeur par défaut {\tt {\em domain}\_undefined}
+        \end{itemize}
+
+\item Domaines produit: création à partir des membres:
+
+\begin{verbatim}
+    user pierre = 
+        make_user( "jouvelot", 
+                   110, 
+                   passwd_undefined,
+                   "/usr/local/bin/ksh" ) ;
+\end{verbatim}
+\item Domaines somme: création à partir d'un {\em tag} et d'une
+valeur
+\item Chaque membre {\em member} d'une somme {\em domain} a un
+tag {\tt is\_{\em domain}\_{\em member}}:
+
+\begin{verbatim}
+    char buffer[ 8 ] ;
+    passwd at_login = 
+       make_passwd( is_passwd_encrypted,
+                    crypt( gets( buffer ), 
+                           "aa" )) ;
+\end{verbatim}
+\item Il existe un type {\tt tag}.
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Fonctions de Manipulation: \\
+Accès}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Call-by-sharing (vs. call-by-value, call-by-reference)
+\item Un domaine {\em domain} et un membre {\em member} définissent un
+{\em accesseur} {\tt {\em domain}\_{\em member}}:
+
+\begin{verbatim}
+    printf( "User %s logged on\n", 
+            user_name( pierre )) ;
+\end{verbatim}
+\item Le tag d'une somme {\em domain} s'obtient par {\tt {\em domain}\_tag}:
+
+\begin{verbatim}
+    if( passwd_tag( at_login ) == 
+        is_passwd_encrypted ) {
+        check( passwd_crypted( at_login )) ;
+    }
+\end{verbatim}
+\item Des prédicats {\tt {\em domain}\_{\em member}\_p} existent pour
+les som\-mes: 
+
+\begin{verbatim}
+    if( passwd_encrypted_p( at_login )) {
+        check( passwd_crypted( at_login )) ;
+    }
+\end{verbatim}
+\item Implémentation sous forme de macros.
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Fonctions de Manipulation: \\
+Modification}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Utilisation de {\tt =}:
+
+\begin{verbatim}
+    passwd_tag( at_login ) = 
+         is_passwd_clear ;
+    passwd_clear( at_login ) = "go ahead" ;
+\end{verbatim}
+\item Création de partage et cycle:
+
+\begin{verbatim}
+    node = info:int x next:node ;
+
+    node n = 
+       make_node( 1, node_undefined ) ;
+    next( n ) = n ; 
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Fonctions de Manipulation: \\
+Opérations I/O}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Tout domaine {\em domain} définit:
+    \begin{itemize}
+    \item une fonction d'écriture {\tt write\_{\em domain}}
+    \item une fonction de lecture {\tt read\_{\em domain}}
+    \end{itemize}
+
+\begin{verbatim}
+    user pierre = read_user( open_db()) ;
+    fprintf( stderr, 
+             "Read data for user %s\n", 
+             user_name( pierre )) ;
+\end{verbatim}
+\item Le partage (sharing) est preservé dans la sous-structure.
+\item Gestion des cycles.
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Fonctions de Manipulation: \\
+Libération}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Tout domaine {\em domain} définit {\tt free\_{\em domain}}.
+
+\begin{verbatim}
+    if( denied_access( pierre )) {
+        fprintf( sdterr, 
+                 "Permission denied: %s\n", 
+                 user_name( pierre )) ;
+        free_user( pierre ) ;
+        restart_top_level() ;
+    }
+\end{verbatim}
+\item Réclamation récursive des structures de données
+\item Gestion des cycles et partage {\em dans la sous-structure}
+(attention au partage transverse)
+\item Remarque: pas nécessaire en CommonLISP!
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Bibliothèques}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item A chaque constructeur de type est associée une bibliothèque
+\item Listes
+\item Ensembles
+\item Remarque: tables de hachage
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Bibliothèque: \\
+Listes}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Constructeurs classiques de Lisp: CONS, CAR, CDR, NIL, ENDP, ...
+\item Nécessité de typage explicite (listes polymorphes)
+\item Tout domain {\em domain} définit la conversion {\em DOMAIN}:
+
+\begin{verbatim}
+    list logged_on = NIL ;
+
+    void add_to_users( u )
+    user u ;
+    {
+        logged_on =
+            CONS( USER, u, logged_on ) ;
+    }
+\end{verbatim}
+\item Itérateurs:
+
+\begin{verbatim}
+    printf( "Users logged on: " ) ;
+    MAPL( users, {
+        user u = USER( CAR( users )) ;
+        printf( "%s ", user_name( u )) ;
+    }, logged_on ) ;
+\end{verbatim}  
+\item Mise-à-jour simple:
+
+\begin{verbatim}
+    CAR( logged_on ) = pierre ;
+\end{verbatim}
+\item Ensemble ``extensible{}'' de fonctions ({\tt remove}, {\tt nconc},
+{\tt copy}, {\tt find}, {\tt length}, ...)
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Bibliothèque: \\
+Ensembles}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Problème: gestion d'ensemble (et non multi-ensembles),
+implémentation efficace
+\item Support pour chaines, entiers et pointeurs
+\item Convention d'allocation à l'appelant (solution simple pour appels
+emboités).
+\item Opérations triadiques:
+
+\begin{verbatim}
+    set_op( result, operand1, operand2 ) ;
+\end{verbatim}
+\item Nécessité d'allocation:
+
+\begin{verbatim}
+    set logged_on = set_undefined ;
+
+    void add_to_users( u )
+    user u ;
+    {
+        if( set_undefined_p( logged_on )) {
+            logged_on = 
+                 set_make( set_pointer) ;
+        }
+        set_add_element( logged_on, 
+                         logged_on, 
+                         u ) ;
+    }
+\end{verbatim}
+\item Itérateurs:
+
+\begin{verbatim}
+    printf( "Users logged on: " ) ;
+    SET_MAP( u, {
+        printf( "%s ", user_name( u )) ;
+    }, logged_on ) ;
+\end{verbatim}  
+\item Ensemble ``extensible{}'' de fonctions:
+  \begin{itemize}
+  \item {\tt set\_intersection}, 
+  \item {\tt set\_union},
+  \item {\tt set\_equal\_p}, 
+  \item {\tt set\_free}, 
+  \item {\tt set\_size} ...
+  \end{itemize}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Bibliothèque: \\
+Tables de hachage}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Tables dans Unix SV ``inutilisables''
+\item Utilisation fréquente: ensembles, \newgen, ...
+\item Itérateurs:
+
+\begin{verbatim}
+    #define SET_MAP(element,code,set) { \
+        HASH_MAP(_set_map_key, element, \
+               code, \
+        (set)->table); \
+        }
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Un Premier Exemple}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item SIMPLE est un petit langage d'expression
+\item Fichier {\tt expression.tex}:
+
+\begin{verbatim}
+\title{SIMPLE Language Specifications}
+\author{Pierre Jouvelot}
+
+\begin{document}
+\domain{expression = constant:int +
+                     identifier:string + 
+                     binary + 
+                     let ;} {
+An expression is either an integer constant, 
+an identifier, a binary expression, or a 
+nested let construct.
+}
+
+\domain{binary = operator:string x 
+                 lhs:expression x
+                 rhs:expression ;} {
+A binary expression consists of an operator 
+and two subexpressions.
+}
+
+\domain{let = bindings:binding* x 
+              expression ;} {
+A let construct includes a binding list and 
+a body expression.
+}
+
+\domain{binding = name:string x 
+                  value:expression ;} {
+A binding binds a name to a value.
+}
+\end{verbatim}
+\item Fichier {\tt expression.newgen} trié, automatiquement généré
+
+\begin{verbatim}
+binary = operator:string x 
+         lhs:expression x rhs:expression ;
+binding = name:string x value:expression ;
+expression = constant:int + 
+             identifier:string +
+             binary + let ;
+let = bindings:binding* x expression ;
+\end{verbatim}
+
+\item Fichier {\tt expression.dvi} de documentation automatiquement
+généré. 
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Frontal pour SIMPLE}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Syntaxe d'entrée à la Lisp:
+
+\begin{verbatim}
+. 1
+. (+ x 1)
+. (let ((x 1)) (+ x 2))
+. (let ((x 1))
+    (let ((y (* 2 x)))
+      (+ x y)))
+\end{verbatim}
+\item Génération des structures de données NewGen:
+
+\begin{verbatim}
+. make_expression(is_expression_constant,1)
+. make_expression( 
+    is_expression_binary,
+    make_binary( 
+      "+",
+      make_expression( 
+        is_expression_identifier,
+        "x"),
+      make_expression( 
+        is_expression_constant,
+        1)))
+\end{verbatim}
+\item NewGen est compatible avec tous les outils Unix
+\item Frontal généré automatiquement par Yacc
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{verbatim}
+%{
+
+#include <stdio.h>       /* Unix standard IO */
+#include <string.h>      /* String managt. */
+#include "genC.h"        /* Newgen basic 
+                            C library */
+#include "expression.h"  /* Newgen-generated 
+                            header files */ 
+
+expression Top ;
+%}
+
+%token LP RP 
+%token LET 
+
+%term INT
+%term STRING
+
+%union {
+    expression expression ;
+    let let ;
+    list list ;
+    identifier identifier ;
+    string string ;
+}
+
+%type <expression> Axiom Expression
+%type <let> Let
+%type <identifier> Identifier
+
+%type <list> Bindings
+%type <string> String 
+
+%% 
+Axiom   : Expression {
+            Top = $1 ;
+        }
+        ;
+
+Expression  
+        : INT {
+            $$ = make_expression(
+                 is_expression_constant, 
+                 atoi( yytext )) ;
+        } 
+        | Identifier {
+            $$ = make_expression( 
+                 is_expression_identifier,$1);
+        } 
+        | LP String Expression Expression RP {
+            binary b = 
+            make_binary( $2, $3, $4 ) ; 
+               
+            $$ = make_expression(
+                 is_expression_binary, b );
+        }
+\end{verbatim}
+
+\newpage
+
+\vskip 2cm
+
+\begin{verbatim}
+        | Let {
+            $$ = make_expression( 
+                 is_expression_let, $1 ) ;
+        } 
+        ; 
+ 
+Let     : LP LET LP Bindings RP Expression RP {
+            $$ = make_let( $4, $6 ) ;
+        } 
+        ; 
+ 
+Bindings   
+        : {
+            $$ = NIL ;
+        } 
+        | Bindings LP String Expression RP {
+            $$ = CONS( BINDING,
+                       make_binding( $3, $4 ), 
+                       $1 ) ;
+        } 
+        ; 
+ 
+Identifier  
+        : String {
+            $$ = make_identifier( $1 ) ;
+        }
+        ;
+
+String  : STRING {
+            $$ = strdup( yytext ) ;
+        }
+        ;
+%%
+\end{verbatim}
+
+\newpage
+
+\begin{center}
+{\huge\bf Commande {\tt newgen}}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Commande shell de génération de code
+\item {\tt newgen} prend en arguments:
+  \begin{itemize}
+  \item Language objet ({\tt -C}, {\tt -Lisp}),
+  \item Fichiers {\tt .newgen}
+  \end{itemize}
+
+\begin{verbatim}
+% newgen -C expression.newgen
+GEN_READ_SPEC order:
+expression.spec
+% ls
+expression.newgen       expression.h    expression.spec
+%
+\end{verbatim}
+\item Pour chaque fichier {\tt foo.newgen}, on obtient deux fichiers:
+  \begin{itemize}
+  \item Déclarations C: {\tt foo.h},
+  \item Spécifications: {\tt foo.spec}
+  \end{itemize}
+\item Remarque: les {\tt spec} devraient disparaitre dans une
+nouvelle version de \newgen
+\item Fichiers {\tt spec} lus à l'exécution, {\em avant}
+tout appel de fonctions \newgen.
+\item Ordre des fichiers {\tt spec} donné par {\tt newgen}
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{verbatim}
+#include <stdio.h>       
+#include "genC.h"        
+#include "expression.h"  
+
+expression Top ; 
+
+
+main() 
+{ 
+    gen_read_spec( "expression.spec", 
+                   (char*) NULL) ; 
+    yyparse() ; 
+    fprintf( stdout, "%d\n", 
+             constant_fold( Top )) ; 
+    free_expression( Top ) ;
+}
+\end{verbatim}
+
+\newpage
+
+\vskip 2cm
+
+\begin{verbatim}
+int
+constant_fold( e )
+expression e ;
+{
+    int value ;
+    tag t ;
+
+    switch( t = expression_tag( e )) {
+    case is_expression_constant:
+        value = expression_constant( e ) ;      
+        break ;
+    case is_expression_binary:
+        binary b = expression_binary( e ) ;
+        int lhs = constant_fold(binary_lhs(b));
+        int rhs = constant_fold(binary_rhs(b));
+
+        value = 
+           eval_primitive( binary_operator(b), 
+                           lhs, rhs ) ;
+        break ;
+    default:
+        fprintf( stderr, 
+                 "Unimplemented %d\n",
+                  t ) ;
+        exit( 1 ) ;
+    }
+    return( value ) ;
+}
+
+int
+eval_primitive( op, lhs, rhs )
+char *op ;
+int lhs, rhs ;
+{
+    if( strcmp( op, "+" ) == 0 ) 
+        return( lhs+rhs ) ;
+    if( strcmp( op, "-" ) == 0 ) 
+        return( lhs-rhs ) ;
+    if( strcmp( op, "*" ) == 0 )
+        return( lhs*rhs ) ;
+    if( strcmp( op, "/" ) == 0 )
+        return( lhs/rhs ) ;
+
+    fprintf( stderr, "Primitive %s unknown\n", 
+             op ) ;
+    exit( 1 ) ;
+}
+\end{verbatim}
+
+\newpage
+
+\begin{center}
+{\huge\bf Aspects Avancés \\
+Tabulation}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Domaines {\em tabulés}
+\item Accès global aux objets d'un même type
+\item Le premier membre {\em doit} être une chaine (unique par objet):
+
+\begin{verbatim}
+    tabulated user = name:string x id:int x 
+                     passwd x shell:string ;
+\end{verbatim}
+\item Permet une dissociation entre définition et référence
+\item Notion de {\em object-id} en programmation persistente
+\item Unicité des objets ({\tt name} est une clé utilisée à la
+création des objets)
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{itemize}
+\item Utilisation: déallocation, accès fichiers, ...
+
+\begin{verbatim}
+    user pierre, francois, michel ;
+
+    list roots = CONS( USER, pierre, 
+                       CONS( USER, francois, 
+                                   NIL )) ;
+    list admins = CONS( USER, michel, 
+                        CONS( USER, pierre, 
+                                    NIL )) ;
+
+    group root = make_group( roots ) ;
+    group admin = make_group( admins ) ;
+
+    free_group( admin ) ;
+
+    --> CAR( group_elements( root )) ????
+\end{verbatim}
+\item Si {\tt user} est tabulté, pas de libération automatique
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{itemize}
+\item Chaque domaine tabulé {\em tab} définit {\tt {\em tab}\_domain}
+\item Manipulation globale d'objets tabulés en mémoire:
+
+\begin{verbatim}
+    TABULATED_MAP( u, {
+        fprintf( stdout, "User %s\n", 
+                 user_name( u )) ;
+    }, user_domain ) ;
+\end{verbatim}
+\item Libération explicite (même en CommonLISP) et IO:
+
+\begin{verbatim}
+    FILE *db = fopen("user.database","w");
+
+    gen_write_tabulated( db, user_domain ) ;
+    gen_free_tabulated( user_domain ) ;
+\end{verbatim}
+\item Remarque: Attention au problème de partage
+\item Remarque: Tabulation automatique dans une future version de \newgen
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Aspects Avancés \\
+Importation}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Définition modulaire de spécifications \newgen
+\item Spécification multifichiers 
+\item Complétude requise (mais voir {\em external})
+
+\begin{verbatim}
+    -- network.newgen
+
+    import workstation from 
+           "Include/workstation.newgen" ;
+    import gateway from 
+           "Include/gateway.newgen" ;
+ 
+    network = nodes:node* ;
+    node = workstation + gateway + 
+           repeater:node*;
+\end{verbatim}
+\item {\tt newgen} donne l'ordre pour {\tt gen\_read\_spec}
+
+\begin{verbatim}
+% newgen -C network.newgen \
+  workstation.newgen gateway.newgen
+GEN_READ_SPEC order:
+workstation.spec
+gateway.spec
+network.spec
+% 
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Aspects Avancés \\
+Externes}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Compatibilité ascendante ("dusty data")
+\item Utilisation de \newgen\ en présence de données non-\newgen
+\item Contrainte: Compatible avec {\tt char *} en C et pointeur en
+CommonLISP 
+
+\begin{verbatim}
+    external punch ;
+    import laser from "printers.newgen" ;
+    import daisy from "printers.newgen" ;
+
+    output_device = laser + daisy + punch ;
+\end{verbatim}
+\item Routines de lecture, écriture, libération et copie à fournir par
+l'utilisateur
+\item {\tt gen\_init\_external} à appeler avant toute utilisation.
+\item Définition de {\em DOMAIN} pour premier argument de {\tt
+gen\_init\_external} 
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Retour sur l'exemple}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Tabulation des identificateurs
+\item Définition séparée de {\tt identifier}:
+
+\begin{verbatim}
+-- File identifier.newgen
+
+tabulated identifier = name:string ;
+\end{verbatim}
+\item Forme ASCII compacte {\tt external}
+
+\begin{verbatim}
+-- File expression.newgen
+
+import identifier from "identifier.newgen" ;
+external compacted ;
+
+binary = operator:string x 
+         lhs:expression x rhs:expression ;
+binding = name:string x value:expression ;
+expression = constant:int + identifier + 
+             compacted + binary + let ;
+let = bindings:binding* x expression ;
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{itemize}
+\item Appel de {\tt newgen}:
+
+\begin{verbatim}
+% newgen -C expression.newgen \
+  identifier.newgen
+GEN_READ_SPEC order
+identifier.spec
+expression.spec
+%
+\end{verbatim}
+\item Création des identificateurs:
+
+\begin{verbatim}
+    | Identifier {
+        $$ = make_expression( 
+             is_expression_identifier, 
+             make_identifier( $1 )) ;
+    } 
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{itemize}
+\item Initialisation de {\tt compacted} dans {\tt main}:
+
+\begin{verbatim}
+void compacted_write( FILE *, compacted ) ;
+compacted compacted_read( FILE *, 
+                          char (*)()) ;
+void compacted_free( compacted ) ;
+compacted compacted_copy( compacted ) ;
+
+main() 
+{ 
+    gen_read_spec( "identifier.spec", 
+                   "expression.spec", 
+                   (char*) NULL) ; 
+    gen_init_external( COMPACTED, 
+                       compacted_read, 
+                       compacted_write, 
+                       compacted_free,
+                       compacted_copy ) ;
+
+    yyparse() ; 
+    fprintf( stdout, "%d\n", 
+             constant_fold( Top )) ; 
+
+#ifdef DEBUG
+    fprintf( stderr,"Bound Identifiers:\n");
+
+    TABULATED_MAP( i, {
+        fprintf( stderr, "%s,", 
+                 identifier_name( i )) ;
+    }, identifier_domain ) ;
+#endif
+
+    free_expression( Top ) ;
+    gen_free_tabulated(identifier_domain);
+}
+\end{verbatim}
+\item Support pour externes
+
+\begin{verbatim}
+void compacted_write( fd, c )
+FILE *fd ;
+compacted c ;
+{
+    int val = *(int *)(char *)c ;
+
+    fprintf( fd, "%d", 
+             (int)log2( (double)val )) ;
+}
+
+compacted
+compacted_read( fd, read )
+FILE *fd ;
+char (*read)() ;
+{
+    int *c = (int *)malloc( sizeof( int )) ;
+
+    fscanf( fd, "%d", c ) ;
+    return( (compacted)(char *)c ) ;
+}
+
+void
+compacted_free( c )
+compacted c ;
+{
+    free( c ) ;
+}
+
+compacted
+compacted_copy( c )
+compacted c ;
+{
+    int *cc = (int *)malloc( sizeof( int ));
+
+    *cc = *c ;
+    return( (compacted)(char *)cc ) ;
+}
+\end{verbatim}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf \newgen\ et CommonLISP}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Intérêt: Facilité de prototypage, développement,
+spécifications
+\item Permettre le développement ``souple{}'': LISP
+fonctionnel, LISP impératif, C
+\item Intéropérabilité C/LISP limitée en général ({\em foreign
+function interface})
+\item \newgen: pont entre deux mondes
+\item CommonLISP: {\em de facto} standard, plus norme ANSI en
+préparation
+\item Similitude de programmation (listes), mais GC
+\item Compatibilité ``fichiers'' ou pipes
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Changements}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Type \newgen: {\tt defstruct}
+\item Adaptation à la syntaxe CommonLISP:
+
+\begin{verbatim}
+    (setf pierre 
+          (make-user 
+             :name "jouvelot"
+             :id 110
+             :passwd passwd-undefined
+             :shell "/usr/local/bin/ksh"))
+\end{verbatim}
+\item Modification via {\tt setf}:
+
+\begin{verbatim}
+    (setf (user-id pierre) 120)
+\end{verbatim}
+\item Le {\tt switch} de C est définit comme une macro:
+
+\begin{verbatim}
+    (gen-switch (expression-tag e)
+            (is-expression-constant 
+               (expression-constant e))
+            (:default 
+               (error "~%Incorrect tag")))
+\end{verbatim}
+\item {\tt gen-switch} peut aussi créer des liaisons:
+
+\begin{verbatim}
+    (gen-switch (expression-tag e)
+            ((is-expression-constant c) c)
+            (:default 
+              (error "~%Incorrect tag")))
+\end{verbatim}
+\item Pas de libération explicite (sauf pour domaines tabulés)
+\item Visibilité des fonctions de manipulation via {\tt use-package}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Evaluateur pour SIMPLE}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Création des fichiers Lisp:
+
+\begin{verbatim}
+% newgen -lisp expression.newgen \
+  identifier.newgen
+REQUIRE order:
+identifier.cl
+expression.cl
+% ls
+expression.cl   expression.spec   
+identifier.cl   identifier.spec
+%
+\end{verbatim}
+\item {\tt require} pour chargement des fichiers
+\item Pas d'arguments à {\tt gen-read-spec}: auto-initialisation des
+fichiers CommonLISP
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Top Level}
+\end{center}
+
+\vskip 2cm
+
+\begin{verbatim}
+(require "genLisplib")    ; Newgen basic 
+                          ; Lisp library 
+(require "identifier")    ; Newgen-generated 
+                          ; header files 
+(require "expression") 
+ 
+(use-package '(:newgen 
+               :identifier 
+               :expression))
+
+(defun test (&optional (file *standard-input*))
+  "FILE contains the parser output."
+  (gen-read-spec) 
+  (let ((*standard-input* (open file))) 
+    (eval-expression (read-expression) '())))
+\end{verbatim}
+
+\newpage
+
+\begin{center}
+{\huge\bf Boucle d'évaluation}
+\end{center}
+
+\vskip 2cm
+
+\begin{verbatim}
+(defun eval-expression (e env) 
+  (gen-switch e 
+    ((is-expression-constant c) c) 
+    ((is-expression-identifier i) 
+     (eval-identifier i env)) 
+    ((is-expression-binary b) 
+     (eval-binary b env))
+    ((is-expression-let l) 
+      (eval-let l env))))
+
+(defun eval-identifier (i env) 
+  (let ((var-val (assoc (identifier-name i) env 
+                        :test #'string-equal))) 
+    (if (null var-val) 
+        (error "~%Unbound identifier ~S" 
+               (identifier-name i)) 
+        (cdr var-val))))
+
+(defparameter operators 
+  `((,"add" . ,\#'+) 
+    (,"sub" . ,\#'-) 
+    (,"times" . ,\#'*) 
+    (,"cons" . ,\#'cons) 
+    (,"eq" . ,\#'eq)))
+
+(defun eval-binary (b env) 
+  (let ((op (assoc (binary-operator b) 
+                   operators 
+                   :test #'string-equal))) 
+    (if (null op) 
+        (error "~\%Incorrect op code ~S" 
+               (binary-operator b)) 
+        (funcall 
+           (cdr op) 
+           (eval-expression (binary-lhs b) 
+                            env) 
+           (eval-expression (binary-rhs b) 
+                            env)))))
+ 
+(defun eval-let (l env) 
+  (let ((new-env
+           (mapcar 
+               #'(lambda (b) 
+                    `(,(binding-name b) . 
+                      ,(eval-expression
+                          (binding-value b) 
+                          env))) 
+               (let-bindings l)))) 
+    (eval-expression (let-expression l) 
+                     (append new-env env)))) 
+\end{verbatim}
+
+\newpage
+
+\begin{center}
+{\huge\bf Aspects avancés \\
+      Exemples}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item {\tt gen-recurse}: Couplage appels récursifs et dispatch:
+
+\begin{verbatim}
+(defun eval-expression (e env) 
+    (gen-recurse e 
+        ((expression tag) tag)
+        (identifier 
+          (cdr (assoc 
+                   (identifier-name i) 
+                   env 
+                   :test #'string-equal)))
+        ((binary lhs rhs) 
+          (funcall 
+            (cdr (assoc 
+                    (binary-operator b) 
+                    operators 
+                    :test #'string-equal))
+            lhs rhs))))
+\end{verbatim}
+\item Opérations implicitement itérées (sur listes)
+\item Utilisation des domaines tabulés:
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{verbatim}
+(defun gensym () 
+  "Generate a brand new identifier."
+  (do ((i 0 (+ i 1))) 
+      ((gen-find-tabulated 
+           (format nil "gensym-~D" i)
+           identifier-domain)
+       (make-identifier 
+           :name (format nil "gensym-~D"
+                         i)))))
+\end{verbatim}
+
+\newpage
+
+\begin{center}
+{\huge\bf Aspects de l'implémentation}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item Outil ``léger'': 
+  \begin{itemize}
+  \item 6 klignes de C, Yacc{}, Lex et Korn shell
+  \item 800 lignes de CommonLISP
+  \end{itemize}
+\item Compilateur:
+  \begin{description}
+  \item[token.l] Lexèmes du langage \newgen
+  \item[gram.y] Syntaxe du langage \newgen
+  \item[build.c] Compilation en fichier spec{}, création dynamique des
+descripteurs de domaines
+  \item[genC.c{}, genLisp.c] Génération de code C et Lisp
+  \item[newgen] Commande shell
+  \end{description}
+\item Run time C/Lisp:
+  \begin{description}
+  \item[genClib.c{},genLisplib.cl] Bibliothèque run-time C et Lisp
+  \item[list.c] Support de listes en C
+  \item[set.c{},set.cl] Support d'ensembles en C et Lisp
+  \item[hash.c] Package de hash-coding dynamique (interne et externe --
+set) par {\em open coding}
+  \item[read.l,read.y] Parser C de structures de données \newgen 
+(utilisation de macros en Lisp)
+  \end{description}
+\item Structure mémoire taggée, avec inlining
+\item Vérification dynamique de types ({\tt gen\_debug})
+\item Parcours générique parallèle descripteurs/structures:
+gestion de partage, écriture, copie, libération
+\item Un mot supplémentaire pour objets tabulés 
+\item Ecriture compacte sur disque (mais pas binaire)
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf PIPS: Un exemple ``vraie grandeur''}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item PIPS: Paralléliseur Interprocédural de Programmes Scientifiques
+\item Tranformation DO en DOALL (Fortran77)
+\item Projet de recherche: structure modulaire en phases (50 klignes)
+\item Prise en compte complète de Fortran:
+
+\begin{verbatim}
+-- Entities
+
+tabulated entity = name:string x type x 
+                   value x storage ;
+
+-- Expressions
+
+expression = reference + range + call ;
+reference = variable:entity x 
+            indices:expression* ;
+range = lower:expression x 
+        upper:expression x 
+        increment:expression ;
+call = function:entity x 
+       arguments:expression* ;
+
+-- Statements
+
+statement = label:entity x 
+            number:int x 
+            comments:string x 
+            instruction ;
+
+instruction = block:statement* + test + 
+              loop + call + unstructured ;
+test = condition:expression x 
+       true:statement x 
+       false:statement ;
+loop = index:entity x 
+       range x 
+       body:statement x 
+       label:entity ;
+
+unstructured = control x exit:control ;
+control = statement x 
+          predecessors:control* x 
+          successors:control* ;
+\end{verbatim}
+\item Gestion de la persistence par {\tt pipsdbm}
+\item Prototypes du linker incrémental, prettyprinter et détection des 
+réductions en CommonLISP
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Autres systèmes}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item IDL
+  \begin{itemize}
+  \item Outil logiciel (North-Carolina U., développé chez Tartan)
+  \item Génération de structures de données (C, Pascal)
+  \item Description des phases ({\em processes}) et des interconnexions
+  \item GC 
+  \item Forme limitée de sous-typage
+  \item Assertions (définition d'un langage complet d'assertions)
+  \item Format binaire
+  \item Conclusion: industriel, moins abstrait, plus lourd
+  \end{itemize}
+\item OODB (O2, ORION, VBASE, Exodus, Postgres)
+  \begin{itemize}
+  \item Extension des modèles orienté-objet aux DB (limitation du
+modèle relationnel)
+  \item Manipulation et langage de requêtes intégrés dans un langage
+classique (CO2, CommonLISP, C, C++)
+  \item Orienté accès interactif (SQL)
+  \item Conclusion: plus puissant que \newgen, accès coûteux
+(persistence implicite)
+  \end{itemize}
+\end{itemize}
+
+\newpage
+
+\vskip 2cm
+
+\begin{itemize}
+\item OOL (C++, CLOS, Smalltalk, Trellis)
+  \begin{itemize}
+  \item Dépendent d'un langage, pas {\em upward} compatible (sauf C++)
+  \item Plus puissant que \newgen: héritage, redéfinition
+  \item Performances?
+  \item Pas de persistence
+  \end{itemize}
+\item Langages Persistants
+  \begin{itemize}
+  \item Nécessite des modifications de compilateurs (Pascal/P,
+PS-algol)
+  \item Pas de standard dans les primitives
+  \end{itemize}
+\item RPC, XDR
+  \begin{itemize}
+  \item Bas niveau (orienté transferts de données)
+  \item Pas de gestion de sharing ou de cycle
+  \end{itemize}
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\huge\bf Conclusion}
+\end{center}
+
+\vskip 2cm
+
+\begin{itemize}
+\item \newgen: outil de génie logiciel (Ecole des Mines de Paris)
+\item Abstraction fonctionnelle, Multi-langages (C, CommonLISP),
+Compatibilité 
+\item Prototype ``Public Domain'' distribué par ftp anonyme (Mines,
+Bull, NASA, Boeing, ...)
+\item Applications: PIPS, PMACS (Bull)
+\item Futur: extensions aux fonctions (tabulation automatique):
+
+\begin{verbatim}
+typing = expression -> type ;
+\end{verbatim}
+\end{itemize}
+
+}
+
+\end{document}
+
+

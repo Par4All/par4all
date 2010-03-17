@@ -1,0 +1,6 @@
+newgen (0.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- serge guelton <serge.guelton@enst-bretagne.fr>  Mon, 02 Nov 2009 17:17:26 +0100
+

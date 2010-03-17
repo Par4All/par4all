@@ -1,0 +1,34 @@
+Source: newgen
+Section: devel
+Priority: extra
+Maintainer: serge guelton <serge.guelton@enst-bretagne.fr>
+Build-Depends: debhelper (>= 7), bison, flex, cproto, texlive-latex-extra, texlive-latex-recommended
+Standards-Version: 3.8.3
+Homepage: https://pips.enstb.org
+
+Package: libnewgenlibs-dev
+Section: libdevel
+Architecture: any
+Depends: libnewgenlibs0 (= ${binary:Version})
+Replaces: libgenc-dev
+Conflicts: libgenc-dev
+Description: development headers for newgen library
+ Additional files required to develop using libnewgen and newgen
+
+Package: libnewgenlibs0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: libgenc0
+Conflicts: libgenc0
+Description: newgen library
+ Library required to use newgen - generated structures
+
+
+Package: newgen
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libnewgenlibs-dev
+Description: C code generator of abstract type
+ From the high-level specification of user data types, it
+ generates creation, access and modification functions that implement
+ these data types, seen as abstract data types

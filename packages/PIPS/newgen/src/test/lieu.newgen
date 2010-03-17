@@ -1,0 +1,7 @@
+external login ;
+
+-- La destination permet de partager la voiture dans le cas ou plusieurs
+-- personnes iraient au meme endroit.
+
+lieu = connu + autre:string{} ;
+connu = { PARIS, SOPHIA, ROCQUENCOURT } ;

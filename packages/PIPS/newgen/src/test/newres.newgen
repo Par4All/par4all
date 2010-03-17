@@ -1,0 +1,31 @@
+-- Les logins seront des structures avec un nom et un user-id
+--
+import lieu from "lieu.newgen"    ;
+external login ;
+
+-- Liste des toutes les reservations de notre voiture de service pour les
+-- jours a venir.
+--
+indisponibilite = reservation* x identification;
+
+-- Une reservation se compose des informations suivantes, qui ne
+-- necessitent pas de commentaires
+--
+reservation = 	persistant conducteur:personne x date x 
+		destination:lieu x nbpassager:int x
+		passager:personne[4] x a_confirmer:date;
+
+-- Une personne est decrite par un nom et un login.
+-- Le login sert a envoyer du courrier electronique.
+--
+personne = nom:string x logins:login{} ;
+
+-- Pour la Sécu
+
+identification = personne -> int ;
+
+-- La date contient la periode de reservation, pour essayer de combiner
+-- plus une reservation par jour.
+
+tabulated date = ident:string x jour:int x mois:int x annee:int x periode;
+periode = { MATIN , APRESMIDI , JOURNEE };

@@ -1,0 +1,653 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%%
+%% This file is part of NewGen.
+%%
+%% NewGen is free software: you can redistribute it and/or modify it under the
+%% terms of the GNU General Public License as published by the Free Software
+%% Foundation, either version 3 of the License, or any later version.
+%%
+%% NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+%% License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with NewGen.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+%% -*- Mode: TeX -*-
+
+\documentclass[11pt]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage[nofancy]{svninfo}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Newgen User Manual}
+\author{Pierre Jouvelot \\
+        Rémi Triolet \\
+        \\
+        CRI, Maths \& Systems, \\
+        MINES ParisTech,\\
+        35, rue Saint-Honoré,\\
+        77305 Fontainebleau \textsc{cedex}}
+
+\date{December 1990 \\
+  last modified: \svnInfoLongDate{} \emph{(r\svnInfoRevision)}
+}
+
+\begin{document}
+\svnInfo $Id$
+
+\maketitle
+
+\section{Presentation}
+
+The design and writing of large software generally requires the
+definition and implementation of application specific data structures.
+Newgen is a programming tool that helps in the second part of this
+process. From the high-level specification of user data types, it
+generates creation, access and modification functions that implement
+these data types, seen as abstract data types. In particular, functions
+to read and write Newgen-defined values on files are supported, thus
+providing interlanguage compatibility via files or streams. For 
+instance, data structures created by a C program that uses Newgen-C
+and written on a file can be read by a CommonLISP program that uses
+Newgen-Lisp.
+
+Newgen allows the definition of {\em basis domains}. These basis domains
+are the core on which more elaborate data types can be defines. For
+instance, Newgen provides {\tt int} and {\tt float} basis domains. On
+these predefined domains, Newgen allows the definition {\em constructed
+domains}; {\em product domains} allow the manipulation of tuples, {\em
+sum domains} tagged values (reminiscent of Pascal variant types), {\em
+list domains} list of values and multidimensional {\em array domains}
+fast direct-access set of values. Moreover, to allow an
+upward-compatible use of Newgen, {\em external domains} that permit the
+introduction of values from preexisting domains inside Newgen-generated
+data structures are supported.
+
+From such definitions, Newgen generates, for each supported
+language\footnote{C and CommonLISP are the currently supported
+languages}, a set of functions that :
+\begin{itemize}
+\item create either initialized or not data values,
+\item access relevant parts of constructed values (e.g., elements in a
+list or projection on tuples),
+\item modify certain parts of constructed values,
+\item write and read values to and from files,
+\item recursively deallocate data values (if required by the underlying
+language).
+\end{itemize}
+
+This manul describes the specification language used by Newgen (section
+2), introduces a simple example which will be used throughout this paper
+in examples (section 3), presents the C (section 4) and CommonLISP
+(section 5) version of Newgen before concluding with the practical
+aspects of Newgen (section 6).
+
+\section{The Newgen Grammar}
+
+The grammar of Newgen specifications, given in a Yacc-like syntax, is
+the following :
+\begin{verbatim}
+Specification :  Imports Externs Definitions
+
+Imports : Imports IMPORT NAME FROM " NAME " ;
+        |
+
+Externs : Externs EXTERNAL NAME ;
+
+Definitions : Definitions Definition
+            | Definition
+
+Definition : Tabulated NAME = Domain ;
+
+Tabulated : TABULATED
+          |
+
+Domain  : Simple Constructed
+        | { Namelist }
+
+Simple  : Persistant Basis
+        | Persistant Basis *
+        | Persistant Basis {}
+        | Persistant Basis Dimensions
+
+Persistant : PERSISTANT
+           |
+
+Basis   : NAME
+        | NAME : NAME
+
+Constructed : x Simple Constructed
+            | + Simple Constructed
+            | Simple -> Simple
+
+Namelist : NAME , Namelist
+         | NAME
+
+Dimensions : [ INT ] Dimensions
+           | [ INT ]
+\end{verbatim}
+where terminals should be obvious. Commented lines are signalled by a
+beginning {\tt -}. Note that CPP (the Unix C preprocessor) commands can
+be used everywhere in this file (e.g., to give array dimensions in
+symbolic form); they will be automatically inserted into
+Newgen-generated files.
+
+An {\em imported} domain is any domain defined (in another file) with
+Newgen. Newgen allows multiple-files specifications; any Newgen domain
+referenced but not defined inside a specification file as to be declared
+as an imported domain. The quoted name is the file in which the imported
+domain is defined. Currently, nested imports are not supported.
+
+An {\em external} domain is used to introduce any data structure defined
+outside of Newgen. This facility allows the incremental use of Newgen
+inside projects that already have defined data structures or the
+integration of more sophisticated data structures (e.g., hash-coded
+data).
+
+Newgen domains are either tabulated or not. A {\em tabulated} domain has
+its elements that are automatically associated to a unique identifier.
+This identifier will be used to write in and read from files tabulated
+values, those providing for ways of naming values accross different
+program runs.
+
+A basis domain is a labeled name {\tt a:b} (as a short cut, {\tt a} is
+equivalent to {\tt a:a}) where {\tt b} is a built-in domain known by
+Newgen. Supported basis domain are {\tt unit, bool, char, int, float}
+and {\tt string}. The type {\tt unit} has only one value.  When used
+inside more complex domains, a basis value is always {\em inlined} so
+that no space is lost by using Newgen with predefined types. For
+instance, lists of integers are not list of pointers to integers but are
+somewhat isomorphic to the kind of structure definition a C programmer
+would have thought of.
+
+A {\em simple} domain is either a basis one, a list {\tt *} of basis, a
+set {\tt \{\}} of basis or a multidimensional array {\tt []} of basis.
+When a simple domain is tagged as {\em persistant}, it won't be freed
+when recursively reached by a deallocation expression.
+
+{\em Constructed} domains can either be a product {\tt x} or a sum {\tt
++} of simple domains; the notation {\tt \{a,b\}} is equivalent to {\tt
+a:unit+b:unit}. A sum domain is the equivalent of Pascal variant types
+and is used to represent in a single type values from different types. A
+product domain is the equivalent of Pascal record types and is used to
+represent in a single type a collection of values.  The arrow type
+\verb:->: is only available in C mode and allows functions to be
+defined.
+
+Domain definitions are mutually recursive inside one specification
+file.
+
+For instance, here are three different definitions of {\tt
+list\_of\_names} where each name is implemented by the (predefined)
+{\tt string} data type: the first one use the Newgen list constructor,
+the second explicits the recursive definition of list and the third uses
+an array to store names:
+\begin{verbatim}
+- Built-in list
+-
+list_of_names_1 = names:string *
+
+- Explicit definition
+-
+list_of_names_2 = nil:unit + not_empty_list_of_names
+not_empty_list_of_names = name:string x reste:list_of_names_2
+
+- Array implementation
+-
+#define MAX_NAMES 100
+list_of_names_3 = names:string[ MAX_NAMES ]
+\end{verbatim}
+
+Values created with Newgen primitives are first-class. They can be
+passed to functions (the passing mechanism is a call-by-sharing
+reminiscent of Lisp), stored in data structures and assigned to data
+variables.
+
+\section{An example}
+
+We will use the following example specification throughout the whole
+paper. It defines a set of domains to be used in the implementation of a
+car reservation system used in our lab. For pedagogical purposes, this
+specification will be split across two files.  The first file is
+{\tt reservation.newgen}:
+\begin{verbatim}
+- File: reservation.newgen
+-
+- The CRI car reservation system specification
+-
+- French cars are small !
+#define NB_OF_PASSENGERS 3
+
+import location from "location.newgen"
+
+external login
+
+indisponibility = reservation*
+
+reservation = driver:person x date x destination:location x
+              nbpassager:int x
+              passager:person[NB_OF_PASSAGERS] x
+              to_confirm:bool
+
+person = name:string x login
+
+tabulated date = day:int x month:int x year:int x period
+period = { morning , afternoon , day }
+\end{verbatim}
+while the second is {\tt location.newgen}:
+\begin{verbatim}
+- File: location.newgen
+-
+- Since the Ecole des Mines is decentralized, locations
+- can vary !
+-
+location = known + other:string
+known = { paris, sophia, rocquencourt }
+\end{verbatim}.
+
+In this example, dates will be tabulated. A {\tt login} is an
+external data type that is supposedly manipulated by previoulsy defined
+functions. An {\tt indisponibility} defines the already occupied slots
+for the (unique, our lab is not that rich) car. Each of these {\tt
+reservations} defines a bunch of useful information among which the {\tt
+date} and a boolean specifying whether a confirmation is requested or
+not. The other domains should by now be obvious.
+
+\section{Newgen-C}
+
+This section describes the C implementation of Newgen. Except otherwise
+specified, tabulated and untabulated domains are treated in the same way.
+
+\subsection{Creation Functions}
+
+Basis domains have been {\tt typedef}-ed. Integer, float, character and
+string (i.e. {\tt char *}) literals can be used, as well as {\tt TRUE}
+and {\tt FALSE} for booleans and {\tt UU} for {\tt unit} values.
+
+From the definition of a domain {\tt a}, the function to be used to
+create a value of that type is
+\begin{center}
+{\tt make\_a( <list-of-arguments> )}
+\end{center}
+There are as many arguments as there are subdomains in the definition of
+the domain {\tt a}.  {\em Example}: {\tt person p = make\_person("Foo",
+login\_foo );} creates a person {\tt p} with name {\tt "Foo"} and login
+{\tt login\_foo} supposedly defined outside.  Undefined values can also
+be used; for each domain {\tt a}, an undefined value {\tt a\_undefined}
+is provided.  Also the functions {\tt a\_undefined\_p}, which tests
+whether its argument is undefined, and {\tt copy\_a}, which recursively
+copies its argument (up to tabulated domains and persistant simple
+domains), are provided.
+
+The list of arguments is empty for an arrow type {\tt f = a \verb:->:
+b} .  A new arrow object can be created by extendign a previous one
+via the {\tt extend\_f} function.
+
+Lists are made of {\em cons} cells. To create a cons cell, use the macro
+{\tt CONS} that returns a value of type {\tt cons *}. You can use {\tt
+NIL} to denote the end of a list. You have to provide the type
+of the element you cons.
+{\em Example}: To create a one-element list
+containing person {\tt p} use {\tt cons *l = CONS( PERSON, p, NIL );}.
+
+An external value cannot be created within Newgen.
+
+\subsection{Access functions}
+
+For a domain {\tt a} that is constructed with a subdomain {\tt b}, use
+the macro {\tt a\_b} to access the {\tt b} field from an {\tt a} value.
+{\em Example}: {\tt string s = person\_name( p );} returns the name of a
+person {\tt p} in the string {\tt s}.
+
+For sum domains, the function {\tt or\_tag} accesses the tag (of type
+{\tt tag} which is typedefed). Tags from {\tt a = b+c} are {\tt is\_a\_b}
+and {\tt is\_a\_c}. Integer operations can be used on tags. To check the
+value of a tag, the boolean function {\tt a\_b\_p} can be used.  {\em
+Example}: To dispatch on the tag of the period {\tt r}, use {\tt tag rt
+= or\_tag( r ) ; if( rt == is\_period\_morning ) ...}. The C {\tt
+switch} construct can also be used.
+
+For the arrow domains {\tt f = a\verb:->:b}, i.e. for mappings, the
+function {\tt apply\_f} is defined. It takes a function and an object
+of type {\tt a} and returns an object of type {\tt b}.
+
+To access list elements, use the {\tt CAR} and {\tt CDR} macros. You have to
+indicate the type {\tt a} of the element with the macro {\tt A} when you
+use {\tt CAR}.
+{\em Example}: To get the second element of a list {\tt l} of persons,
+use {\tt PERSON( CAR( CDR( l )))}. A library of useful Lisp-like
+functions is provided; look for usage in the files {\tt list.h} and {\t
+list.c}.
+
+To acess set elements, use the set access functions that are exported by
+the {\tt set} module; see {\tt set.h} and {\tt set.c} for a list of
+functions. Note that this specification of sets doesn't allow the C
+assignment but requires the function {\tt set\_assign} to be used. Thus
+C aliasing is prohibited. Set elements must be accessed with the {\tt
+SET\_MAP} macro.  {\em Example}: To print the integers from a set {\tt
+s}, use {\tt SET\_MAP( i, \{printf( format, i );\}, s )}.
+
+To access array elements, use the usual C brackets. You have to indicate
+the type {\tt a} of the element with the macro {\tt A}.
+{\em Example}: To get the second element of an array {\tt t} of passengers,
+use {\tt person second = PERSON( t[1] );}
+
+External values and variables can be declared in the same way. You have
+to cast your (addresses to) exogeneous values to the external type.
+{\em Example}: If a login is defined by {\tt struct mylogin}, then use
+\begin{verbatim}
+struct mylogin {char *name ; int id;} joe ;
+joe.name = "Joe Luser" ;
+joe.id = 999 ;
+person_login( second ) = (login)&joe ;
+\end{verbatim}
+
+For debuygging purposes, you can check the validity of a NewGen data
+structures by calling the function {\tt gen\_consistent\_p}.  Also,
+the function {\tt gen\_sharing\_p} returns 1 if its two arguments have
+a pointer (either a Newgen value or a CONS cell) in common.
+
+When recursively traversing a Newgen value, one can use the
+general parametrized traversal routine {\tt gen\_recurse}, which is a
+simplified version of {\tt gen-recurse} used in the CommonLISP mode.
+It allows for easy definition of top-down and bottom-up algorithms on
+Newgen value:
+
+\begin{verbatim}
+void
+gen_recurse( obj, domain, filter, rewrite )
+"Newgen object" obj ;
+int domain ;
+bool (*filter)( <objet Newgen> ) ;
+void (*rewrite)( <object Newgen> ) ;
+\end{verbatim}
+
+The {\tt obj}ect is recursively traversed (until basis domains, except
+through persistant arcs or tabulated domains).  For any object {\tt x}
+in the {\tt domain} present in {\tt obj}, the {\tt filter} function is
+applied.  If false is returned, the traversal of {\tt x} is not
+performed.  Otherwise, once the recursive traversal of subobjects of
+{\tt x} is performed, the {\tt rewrite} function is applied, taking
+{\tt X} as an argument.
+
+For any domain {\tt d} defined in Newgen, the macro {\tt d\_domain} is
+defined.
+
+An extended version of this function is also available to traverse a
+Newgen value with top-down filtering decisions and bottom-up
+rewriting actions on several domains.
+The traversal is optimized so that only useful arcs are followed,
+\emph{i.e.} arcs that may lead to a domain to be visited.
+
+{\small
+\begin{verbatim}
+void
+gen_multi_recurse(<Newgen Obj> obj,
+ [int d, bool (*flt)(<Newgen Obj>), void (*rwt)(<Newgen Obj>)]*,
+            NULL);
+\end{verbatim}
+}
+
+
+\subsection{Modification functions}
+
+To modify a value, use the access function in the left hand side of an
+assignment.
+{\em Example}: To change the name of the second person, use
+{\tt person\_name( second ) = "new\_name";}.
+
+For arrow types, i.e. for mappings, use {\tt update\_f} or {\tt
+  extend\_f} for the domain {\tt f}.
+
+For sets, use {\tt set\_assign} or the triadic operations defined in
+{\tt set.c}.
+
+\subsection{Destruction function}
+
+To free a (non external) value created by a {\tt make} function, use
+{\tt gen\_free}; no value is returned. Values are recursively freed
+(except when an undefined member, an inlined value or a tabulated value
+is encountered). A tabulated value has to be explicitly freed by a
+direct call to {\tt gen\_free}.  {\em Example}: To free a person {\tt
+p}, use {\tt gen\_free( p )}.
+
+\subsection{IO functions}
+
+You can output (non external) Newgen values on a file with {\tt
+gen\_write} and read them back with {\tt gen\_read}. In the process,
+sharing and circular lists are preserved.
+{\em Example}: To output a person {\tt p} on a FILE * {\tt fd}, use {\tt
+gen\_write( fd, p )}. To read it back, use {\tt p = (person) gen\_read( fd
+);}.
+
+These IO functions recusively write and read their subcomponents in the
+obvious way, except for tabulated domains. A value from a tabulated
+domain, when indirectly reached, is not actually written on the file;
+the only information actually output is the unique identifier of the
+value (plus some Newgen information). To effectively write a tabulated
+value, you have to call {\tt gen\_write} directly on this value.
+
+When read back, an identifier from a tabulated domain will refer to the
+actual value; this value will have to have been previously read by a
+call to {\tt gen\_read}.
+
+\subsection{How to use Newgen-C}
+
+Once Newgen is installed, call {\tt newgen}with the {\tt -c} option
+followed by the names, here {\tt reservation.newgen}, of the file(s)
+that contain(s) your specification; the specification files must form a
+complete specification. For each file (e.g. {\tt reservation.newgen}),
+this creates one file: {\tt reservation.h}. {\tt reservation.h} contains
+all the definitions of the functions described above (this file has to
+be included in your C program).  You have to call {\tt gen\_read\_spec}
+in your C program before using any of Newgen generated functions; the
+order of the arguments (such as {\tt reservation\_spec}) is output by
+{\tt newgen}.
+
+For each external type, you have to call {\tt gen\_init\_external} with
+five arguments: the type (in upper case) with \verb|_NEWGEN_EXTERNAL|
+appended), a read function that receives
+as argument the function to read characters from, a write function that
+expects a {\tt (FILE *)}, a free function that receives an object of
+the external type and a copy function that receives an object of the
+external type and returns a freshly allocated copy of it.
+
+A program that uses Newgen functions has to include the file {\tt genC.h}.
+
+{\em Example}: To use our previous example, write:
+\begin{verbatim}
+#include <stdio.h>
+#include "genC.h"
+
+/* location is first is it is used by reservation */
+
+#include "location.h"
+#include "reservation.h"
+
+/* We use ANSI-C function prototypes */
+
+login read_login( int (*read)()) ;
+void write_login( FILE *fd, login obj ) ;
+void free_login( login obj ) ;
+login copy_login( login obj ) ;
+
+
+main()  {
+        gen_read_spec( location_spec, reservation_spec, NULL ) ;
+        gen_init_external( LOGIN_NEWGEN_EXTERNAL,
+                           read_login, write_login,
+                           free_login, copy_login ) ;
+        {
+        person p = make_person( "Foo",
+                                (login)read_login( getchar )) ;
+
+        /* Write user code here */
+        }
+}
+\end{verbatim}
+
+To run this program, you have to link it with the {\tt genC.a} library.
+
+If you want to perform run-time checking of the consistency of your data
+structures, compile your C program with the {\tt -DGEN\_CHECK} option
+(this may generate incorrect code - especially in nested function calls -
+so you should always run ``lint'' on your program and add supplementary
+parentheses where necessary) and position the {\tt gen\_debug} variable
+to {\tt GEN\_DBG\_CHECK}. To get more information about the way Newgen
+functions manipulate your data, use {\tt GEN\_DBG\_TRAV} in the {\tt
+gen\_debug} variable. Various debug flags can be ored in {\tt
+gen\_debug} (see {\tt genC.h}),
+
+Run-time checked modules can be used with non-checked modules.
+
+\section{Newgen-Lisp}
+
+This version describes the CommonLISP implementation of Newgen. All the
+defined values in a file are external (in Lisp terminology) to the
+package {\tt file}; use {\tt use-package} to easily access them. You may
+have to manage package conflicts with the {\tt shadow} function.
+
+\subsection{Creation Functions}
+
+From the definition of a domain {\tt a}, the function to be used to
+create a value of that type is
+\begin{center}
+{\tt (make-a <list-of-arguments>)}
+\end{center}
+with the syntax of CommonLISP defstructs.  {\em Example}: {\tt (setf p
+(make-person :name "Foo" :login login-foo ))} creates a person {\tt p}
+with name {\tt "Foo"} and login {\tt login-foo} supposedly defined
+outside.
+
+For every non-inlined type {\tt a}, an undefined value can be obtained
+by calling {\tt make-a} without arguments.
+
+Lists are made of Lisp cons cells.
+{\em Example}: To create a one-element list
+containing person {\tt p} use {\tt (setf l (list p))}.
+
+An external value cannot be created within Newgen.
+
+\subsection{Access functions}
+
+For a domain {\tt a} that is constructed with a subdomain {\tt b}, use
+the macro {\tt a-b} to access the {\tt b} field from an {\tt a} value.
+{\em Example}: {\tt (setf s (person-name p ))} returns the name of a
+person {\tt p} in the string {\tt s}.
+
+For sum domains, the function {\tt or-tag} access the tag. Tags from {\tt
+a = b+c} are {\tt is-a-b} and {\tt is-a-c}. Integer operations can be
+used on tags. To check the value of a tag, the boolean function {\tt
+a-b-p} can be used. You can also use the {\tt switch} macro accessible
+from the Newgen-Lisp library.
+{\em Example}: To dispatch on the tag of the period {\tt r}, use
+\begin{verbatim}
+(if (= (or-tag r)} is-period-morning) ...)
+\end{verbatim}
+With the Newgen {\tt switch} macro:
+\begin{verbatim}
+(switch (or-tag r)
+        (is-period-morning ...)
+        (:default ...))
+\end{verbatim}
+If no default is provided, a break is executed in case no tag matches.
+Insted of a tag as head of a clause, a two-element list (e.g., {\tt
+((is-a-b b) ...)}) can be used; in that case, inside the body of the
+clause, {\tt b} will be bound to the result of calling {\tt a-b} on the
+expression used in the {\tt switch} macro.
+
+To access list elements, use Lisp.  {\em Example}: To get the second
+element of a list {\tt l} of persons, use {\tt (cadr l )}.
+
+To access set elements, use the module {\tt set.cl} that uses the same
+specification as {\tt set.c} (see above).
+
+To access array elements, use the usual Lisp brackets {\tt aref}.
+{\em Example}: To get the second element of an array {\tt t} of passengers,
+use {\tt (setf second (aref t 1))}.
+
+NewGen also provides the {\tt gen-recurse} macro described in the paper
+"Recursive Pattern Matching on Concrete Data Structures" (with B.
+Dehbonei), SIGPLAN Notices, ACM, Nov.89.  This macro allows recursive
+programs over recursively defined data structures to be written very
+simply.  See the documentation string of {\tt gen-recurse} for a rapid
+description.
+
+External values and variables can be used in the obvious way.
+
+\subsection{Modification functions}
+
+To modify a value, use the {\tt setf} Lisp modification function.
+{\em Example}: To change the name of the second person, use
+{\tt (setf (person-name second) "new-name")}.
+
+For sets, use {\tt set-assign} or the triadic operations.
+
+\subsection{Destruction function}
+
+No need for that, the GC will do it for you, except for tabulated values
+(they have to be explictly freed by a call to {\tt gen-free}).
+
+\subsection{IO functions}
+
+You can output (non external) Newgen values on a file with {\tt
+gen-write} and read them back with {\tt gen-read}. In the process,
+sharing and circular lists are preserved.
+{\em Example}: To output a person {\tt p} on a stream {\tt st}, use {\tt
+(gen-write st p)}. To read it back, use {\tt (setf p (gen-read st))}.
+
+See the same subsection in Newgen-C for a discussion about tabulated
+domains.
+
+\subsection{How to use Newgen-Lisp}
+
+Once Newgen is installed, call {\tt newgen} with the {\tt -lisp} option
+followed by the name, here {\tt reservation.newgen}, of the file(s) that
+contain(s) your specifications.  For each file, this creates one file,
+e.g. {\tt reser\-va\-tion.cl}. {\tt reser\-va\-tion.cl} contains all the
+definitions of the functions described above (this file has to be loaded
+in your Lisp program).
+
+For each external type, you have to call {\tt gen-init-external} with
+three arguments: the type (in upper case), a read function that receives
+as argument the function to read characters from and a write function that
+expects a stream and a pointer to an object of the external type.
+
+A program that uses Newgen functions has to load the file {\tt genLisplib}.
+
+{\em Example}: To use our previous example, write:
+\begin{verbatim}
+(load "genLisplib")
+(load "location.cl")
+(load "reservation.cl")
+
+(use-package :reservation)
+
+(defun main ()
+        (gen-init-external login read-login write-login)
+        (setf p (make-person :name "Foo"
+                             :login (read-login read)))
+        ; Write user code here
+        )
+\end{verbatim}
+
+You can also use compiled versions of these files.
+
+\section {Conclusion}
+
+Newgen is currently available on an ``as is'' basis in the Newgen-C and
+Newgen-Lisp versions from the authors. Written in C, it has been
+successfully used on Sun-3, Sun-4 and ATT-3B5.  Requests and comments
+can be mailed to:
+\begin{verbatim}
+                jouvelot@cri.ensmp.fr
+\end{verbatim}
+
+\end{document}
