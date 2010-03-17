@@ -1,0 +1,40 @@
+delete allocation04
+create allocation04 allocation04.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+activate C_SYMBOL_TABLE
+activate C_PARSER
+
+echo
+echo Symbol table for foo
+echo
+
+display SYMBOL_TABLE_FILE[foo]
+
+echo
+echo Symbol table for main
+echo
+
+display SYMBOL_TABLE_FILE[main]
+
+echo
+echo Parsed printed file for foo
+echo
+
+display PARSED_PRINTED_FILE[foo]
+
+echo
+echo Parsed printed file for main
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+close
+delete allocation04
+quit

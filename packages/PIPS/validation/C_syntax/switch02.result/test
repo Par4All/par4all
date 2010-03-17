@@ -1,0 +1,71 @@
+
+Parsed Printed file for "switch02"
+
+int switch02(int predicate)
+{
+   int x = 0;
+
+   if (predicate==0)
+      goto switch_1_case_0;
+   if (predicate==1)
+      goto switch_1_case_1;
+   if (predicate==2)
+      goto switch_1_case_2;
+   if (predicate==3)
+      goto switch_1_case_3;
+   goto switch_1_default;
+switch_1_case_0:   ;
+   return 111;
+switch_1_default:   ;
+   return 222;
+switch_1_case_1:   ;
+   x = x+1;
+switch_1_case_2:   ;
+   return x+3;
+switch_1_case_3:   ;
+   goto break_1;
+break_1:   ;
+   return 333;
+}
+
+Parsed Printed file for "main"
+
+int main()
+{
+   int i0,  i1,  i2,  i3,  id;
+
+   i0 = switch02(0);
+   // 111
+   i1 = switch02(1);
+   // 4
+   i2 = switch02(2);
+   // 3
+   i3 = switch02(3);
+   // 333
+   id = switch02(4);
+   // 222
+   
+   fprintf(stderr, "i0=%d (111), i1=%d (4), i2=%d (3), i3=%d (333), id=%d (222)\n", i0, i1, i2, i3, id);
+}
+
+Printed file for "switch02"
+
+int switch02(int predicate)
+{
+   int x = 0;
+   if (predicate==0) goto switch_1_case_0;
+   if (predicate==1) goto switch_1_case_1;
+   if (predicate==2) goto switch_1_case_2;
+   if (predicate==3) goto switch_1_case_3;
+switch_1_default:   ;
+   return 222;
+switch_1_case_1:   ;
+   x = x+1;
+switch_1_case_2:   ;
+   return x+3;
+switch_1_case_0:   ;
+   return 111;
+switch_1_case_3:   ;
+break_1:   ;
+   return 333;
+}

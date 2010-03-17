@@ -1,0 +1,31 @@
+
+C  T() {}
+
+      PROGRAM NGA07
+C
+  
+      REAL WLOOP(13,13)
+
+C  T(M,N) {}
+
+
+C     To understand results for nga01 better: what do transformers show?
+
+      READ *, N, M                                                      0008
+
+C  T(I,J) {K<=I}
+
+
+      DO I = K, L                                                       0010
+
+C  T(J) {1<=J}
+
+         DO J = 1, M                                                    0011
+
+C  T() {}
+
+            WLOOP(I,J) = 0.                                             0012
+         ENDDO
+      ENDDO
+
+      END

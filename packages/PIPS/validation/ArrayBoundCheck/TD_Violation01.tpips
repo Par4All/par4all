@@ -1,0 +1,34 @@
+delete TD_Violation01
+create TD_Violation01 TD_Violation01.f
+
+activate MUST_REGIONS
+
+apply ARRAY_BOUND_CHECK_TOP_DOWN[%ALL]
+display PRINTED_FILE[%ALL]
+
+apply PARTIAL_REDUNDANCY_ELIMINATION[%ALL]
+display PRINTED_FILE[%ALL]
+
+close TD_Violation01
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

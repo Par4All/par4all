@@ -1,0 +1,27 @@
+delete define
+create define define.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 8
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit define
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat define.database/Src/define.c
+
+close
+
+delete define
+
+quit
+

@@ -1,0 +1,42 @@
+
+Initial code
+
+int foo(int argc, char **argv)
+{
+   int c;
+   c = bar(argc, argc);
+   return 0;
+}
+int bar(int a, int b)
+{
+   int n;
+   int j = 0;
+   for (n = 0;n<a;n++) {
+      int c = b;
+      j += 2*c;
+   }
+   return j;
+}
+
+Code after inlining
+
+int foo(int argc, char **argv)
+{
+   int c;
+   //PIPS generated variable
+   int _return0;
+   {
+      int n;
+      int j = 0;
+      for (n = 0;n<argc;n++) {
+         int c = argc;
+         j += 2*c;
+      }
+      _return0 = j;
+   }
+   c = _return0;
+   return 0;
+}
+
+Unsplit resulting code
+

@@ -1,0 +1,89 @@
+
+C  T() {}
+
+      PROGRAM FIXPOINT03
+
+C  T(J) {J==4}
+
+
+C     Information about j is lost because the convex closure of j
+C     unchanged and j = 5 is j can have any value
+
+      J = 4                                                             0006
+
+C  T(I,J) {}
+
+
+      DO I = 1, N                                                       0008
+
+C  T(J) {}
+
+         IF (X.GT.0.) J = 5                                             0009
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, J                                                        0014
+
+C  T(I,J) {}
+
+
+      DO I = 1, N                                                       0016
+
+C  T(J) {J<=5, J<=J#init}
+
+         IF (J.GE.5) J = 5                                              0017
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, J                                                        0022
+
+      END
+
+C  P() {}
+
+      PROGRAM FIXPOINT03
+
+C  P() {}
+
+
+C     Information about j is lost because the convex closure of j
+C     unchanged and j = 5 is j can have any value
+
+      J = 4                                                             0006
+
+C  P(J) {J==4}
+
+
+      DO I = 1, N                                                       0008
+
+C  P(I,J) {1<=I, I<=N}
+
+         IF (X.GT.0.) J = 5                                             0009
+      ENDDO
+
+C  P(I,J) {1<=I, N+1<=I}
+
+
+      PRINT *, J                                                        0014
+
+C  P(I,J) {1<=I, N+1<=I}
+
+
+      DO I = 1, N                                                       0016
+
+C  P(I,J) {1<=I, I<=N}
+
+         IF (J.GE.5) J = 5                                              0017
+      ENDDO
+
+C  P(I,J) {1<=I, N+1<=I}
+
+
+      PRINT *, J                                                        0022
+
+      END
+

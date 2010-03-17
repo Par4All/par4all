@@ -1,0 +1,435 @@
+
+Transformers for "foo"
+
+
+C  T(foo) {}
+
+int foo(int s)
+{
+
+//  T(foo) {s+1<=foo, foo<=s+5}
+
+   // BEGIN BLOCK
+   int t = s+2;
+
+//  T(t) {t#init<=t+1, t<=t#init+3}
+
+
+   if (t>6)
+
+//  T(t) {t==t#init+3}
+
+      t -= 3;
+   else
+
+//  T(t) {t==t#init-1}
+
+      t--;
+
+//  T(foo) {foo==t}
+
+
+   return t;
+   // END BLOCK
+}
+
+Transformers for "bar"
+
+
+//  T(bar) {}
+
+int bar()
+{
+
+//  T(bar) {}
+
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+
+//  T(x,y) {x<=4, x#init<=4, y#init<=y}
+
+
+   while (x<=4) {
+
+//  T(x,y) {y==y#init+1}
+
+      // BEGIN BLOCK
+
+//  T(y) {y==y#init+1}
+
+      y++;
+
+//  T(x) {}
+
+      x = foo(x);
+      // END BLOCK
+   }
+
+//  T(y) {}
+
+   y = foo(y);
+
+//  T(bar) {bar==y}
+
+
+   return y;
+   // END BLOCK
+}
+
+Preconditions for "bar"
+
+
+//  P() {}
+
+int bar()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+
+//  P() {x==3, y==0}
+
+
+   while (x<=4) {
+
+//  P(x,y) {x<=4, x<=y+3, 0<=y}
+
+      // BEGIN BLOCK
+
+//  P(x,y) {x<=4, x<=y+3, 0<=y}
+
+      y++;
+
+//  P(x,y) {x<=4, x<=y+2, 1<=y}
+
+      x = foo(x);
+      // END BLOCK
+   }
+
+//  P(x,y) {5<=x, 1<=y}
+
+   y = foo(y);
+
+//  P(x,y) {5<=x}
+
+
+   return y;
+   // END BLOCK
+}
+
+Preconditions for "foo"
+
+
+//  P() {}
+
+int foo(int s)
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   int t = s+2;
+
+//  P() {s==t-2}
+
+
+   if (t>6)
+
+//  P() {s==t-2, 5<=s}
+
+      t -= 3;
+   else
+
+//  P() {s==t-2, s<=4}
+
+      t--;
+
+//  P(t) {t<=s+5, s+1<=t}
+
+
+   return t;
+   // END BLOCK
+}
+
+After inlining/unfolding of "bar"
+
+int bar()
+{
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+   int _return0;
+   int _return1;
+
+   while (x<=4) {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      y++;
+      {
+         // BEGIN BLOCK
+         int t = x+2;
+
+         if (t>6)
+            t -= 3;
+         else
+            t--;
+         // BEGIN BLOCK
+         
+         
+         _return0 = t;
+         // END BLOCK
+         // END BLOCK
+      }
+      x = _return0;
+      // END BLOCK
+   }
+   {
+      // BEGIN BLOCK
+      int t = y+2;
+
+      if (t>6)
+         t -= 3;
+      else
+         t--;
+      // BEGIN BLOCK
+      
+      
+      _return1 = t;
+      // END BLOCK
+      // END BLOCK
+   }
+   y = _return1;
+   // END BLOCK
+   
+   return y;
+   // END BLOCK
+}
+
+After unspahettify of "bar"
+
+int bar()
+{
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+   int _return0;
+   int _return1;
+
+   while (x<=4) {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      y++;
+      {
+         // BEGIN BLOCK
+         int t = x+2;
+
+         if (t>6)
+            t -= 3;
+         else
+            t--;
+         // BEGIN BLOCK
+         
+         
+         _return0 = t;
+         // END BLOCK
+         // END BLOCK
+      }
+      x = _return0;
+      // END BLOCK
+   }
+   {
+      // BEGIN BLOCK
+      int t = y+2;
+
+      if (t>6)
+         t -= 3;
+      else
+         t--;
+      // BEGIN BLOCK
+      
+      
+      _return1 = t;
+      // END BLOCK
+      // END BLOCK
+   }
+   y = _return1;
+   // END BLOCK
+   
+   return y;
+   // END BLOCK
+}
+
+Preconditions for "bar"
+
+
+//  P() {}
+
+int bar()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+   int _return0;
+   int _return1;
+
+//  P() {x==3, y==0}
+
+
+   while (x<=4) {
+
+//  P(_return0,x,y) {x==y+3, 3<=x, x<=4}
+
+      // BEGIN BLOCK
+
+//  P(_return0,x,y) {x==y+3, 3<=x, x<=4}
+
+      // BEGIN BLOCK
+      y++;
+      {
+
+//  P(_return0,x,y) {x==y+2, 3<=x, x<=4}
+
+         // BEGIN BLOCK
+         int t = x+2;
+
+//  P() {0==-1}
+
+
+         if (t>6)
+
+//  P() {0==-1}
+
+            t -= 3;
+         else
+
+//  P() {0==-1}
+
+            t--;
+
+//  P() {0==-1}
+
+         // BEGIN BLOCK
+         
+         
+         _return0 = t;
+         // END BLOCK
+         // END BLOCK
+      }
+
+//  P() {0==-1}
+
+      x = _return0;
+      // END BLOCK
+   }
+   {
+
+//  P(_return0,x,y) {_return0==x, 5<=_return0, _return0<=9,
+//    y+3<=_return0, _return0<=5y+3, 1<=y, y<=2}
+
+      // BEGIN BLOCK
+      int t = y+2;
+
+//  P() {0==-1}
+
+
+      if (t>6)
+
+//  P() {0==-1}
+
+         t -= 3;
+      else
+
+//  P() {0==-1}
+
+         t--;
+
+//  P() {0==-1}
+
+      // BEGIN BLOCK
+      
+      
+      _return1 = t;
+      // END BLOCK
+      // END BLOCK
+   }
+
+//  P() {0==-1}
+
+   y = _return1;
+
+//  P() {0==-1}
+
+   // END BLOCK
+   
+   return y;
+   // END BLOCK
+}
+
+After dead code elimination of "bar"
+
+
+//  P() {}
+
+int bar()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+   int _return0;
+   int _return1;
+
+//  P() {x==3, y==0}
+
+
+   while (x<=4) {
+
+//  P(y) {x==3, 0<=y}
+
+      // BEGIN BLOCK
+
+//  P(y) {x==3, 0<=y}
+
+      // BEGIN BLOCK
+      y++;
+      {
+
+//  P(y) {x==3, 1<=y}
+
+         // BEGIN BLOCK
+         int t = x+2;
+         
+         // BEGIN BLOCK
+         
+         
+         // END BLOCK
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   {
+
+//  P() {0==-1}
+
+      // BEGIN BLOCK
+      int t = y+2;
+      
+      // BEGIN BLOCK
+      
+      
+      // END BLOCK
+      // END BLOCK
+   }
+   // END BLOCK
+   
+   // END BLOCK
+}

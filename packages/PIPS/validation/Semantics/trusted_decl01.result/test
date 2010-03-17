@@ -1,0 +1,24 @@
+
+C  P() {}
+
+      SUBROUTINE TRUSTED_DECL01
+
+      REAL A(100)
+
+C  P() {}
+
+
+      READ *, N                                                         0005
+
+C  P(N) {}
+
+
+      CALL INIT(A, N)                                                   0007
+
+C  P(N) {1<=N}
+
+
+      PRINT *, N                                                        0009
+
+      END
+

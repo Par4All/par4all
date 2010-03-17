@@ -1,0 +1,7 @@
+create silber02 silber02.f
+module SILBER02
+apply COARSE_GRAIN_PARALLELIZATION[SILBER02]
+display PRINTED_FILE[SILBER02]
+close
+delete silber02
+quit

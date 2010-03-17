@@ -1,0 +1,72 @@
+
+Initial bug
+
+
+C  T(I) {10<=I, I#init<=I}
+
+      SUBROUTINE BEATRICE(I)
+
+C  T(I) {10<=I, I#init<=I}
+
+
+C     Bug found in paper about interprocedural analyses for Zapata
+
+      IF (I.LE.10) THEN                                                 0005
+
+C  T(I) {I==10}
+
+         I = 10                                                         0006
+      ENDIF
+
+      END
+
+First variation
+
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+
+      SUBROUTINE BEATRICE2(I,X)
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+
+C     Bug found in paper about interprocedural analyses for Zapata
+C     First variation
+
+      IF (X.GT.0.) THEN                                                 0007
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0008
+      ENDIF
+
+      END
+
+Second variation
+
+
+C  T(I,J) {I+J==I#init+J#init+1, I#init<=I, I<=I#init+1}
+
+
+      SUBROUTINE BEATRICE3(I, J, X)
+
+C  T(I,J) {I+J==I#init+J#init+1, I#init<=I, I<=I#init+1}
+
+
+C     Bug found in paper about interprocedural analyses for Zapata
+C     Second variation
+
+      IF (X.GT.0.) THEN                                                 0007
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0008
+      ELSE
+
+C  T(J) {J==J#init+1}
+
+         J = J+1                                                        0010
+      ENDIF
+
+      END

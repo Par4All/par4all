@@ -1,0 +1,27 @@
+
+C  T() {}
+
+      PROGRAM NON_LINEAR04
+
+C  T(K) {2<=I, I<=10, 3<=J, J<=11, 4<=K, K<=100}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T() {2<=I, I<=10, 3<=J, J<=11}
+
+C (0,2)
+
+C     Check non-linear expression handling
+
+      IF (I.LT.2.OR.I.GT.10.OR.J.LT.3.OR.J.GT.11) STOP                  0005
+
+C  T(K) {2<=I, I<=10, 3<=J, J<=11, 4<=K, K<=100}
+
+C (0,5)
+
+      K = I*(J-1)                                                       0007
+
+C     END BLOCK
+      END
+

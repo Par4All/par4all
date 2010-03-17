@@ -1,0 +1,93 @@
+
+Refuse alternate returns
+
+
+Ignore alternate returns and substitute STOP
+
+      SUBROUTINE ALTRET02(X, FORMAL_RETURN_LABEL_1, 
+     &FORMAL_RETURN_LABEL_2)
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+      CHARACTER*(*) FORMAL_RETURN_LABEL_2
+
+      CALL FOO("*123")                                                  0003
+
+      CALL BAR(X, "*123")                                               0005
+
+      CALL BAR2("*123", X)                                              0007
+
+      CALL BAR3("*123", X, "*234")                                      0009
+
+      IF (X.GT.0.) RETURN                                               0011
+
+123   CONTINUE                                                          0013
+      STOP "1 in ALTRET02"                                              0014
+
+234   STOP "2 in ALTRET02"                                              0016
+
+      END
+
+Replace alternate returns
+
+      SUBROUTINE ALTRET02(X, FORMAL_RETURN_LABEL_1, 
+     &FORMAL_RETURN_LABEL_2, I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+      CHARACTER*(*) FORMAL_RETURN_LABEL_2
+
+      CALL FOO("*123", I_PIPS_RETURN_CODE_)                             0003
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0003
+
+      CALL BAR(X, "*123", I_PIPS_RETURN_CODE_)                          0005
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0005
+
+      CALL BAR2("*123", X, I_PIPS_RETURN_CODE_)                         0007
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0007
+
+      CALL BAR3("*123", X, "*234", I_PIPS_RETURN_CODE_)                 0009
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0009
+      IF (I_PIPS_RETURN_CODE_.EQ.2) GOTO 234                            0009
+
+      IF (X.GT.0.) GOTO 99999                                           0011
+
+123   CONTINUE                                                          0013
+      I_PIPS_RETURN_CODE_ = 1                                           0014
+      RETURN
+99999 CONTINUE
+      I_PIPS_RETURN_CODE_ = 0                                           0011
+      RETURN
+
+234   I_PIPS_RETURN_CODE_ = 2                                           0016
+      END
+      SUBROUTINE FOO(FORMAL_RETURN_LABEL_1, I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+      PRINT *, "foo was called"                                         0004
+
+      I_PIPS_RETURN_CODE_ = 0                                           0006
+      END
+      SUBROUTINE BAR(X, FORMAL_RETURN_LABEL_1, I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+      I_PIPS_RETURN_CODE_ = 1                                           0004
+      END
+      SUBROUTINE BAR2(FORMAL_RETURN_LABEL_1, X, I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+      I_PIPS_RETURN_CODE_ = 1                                           0004
+      END
+      SUBROUTINE BAR3(FORMAL_RETURN_LABEL_1, X, FORMAL_RETURN_LABEL_2
+     &, I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+      CHARACTER*(*) FORMAL_RETURN_LABEL_2
+
+      I_PIPS_RETURN_CODE_ = 2                                           0004
+      END

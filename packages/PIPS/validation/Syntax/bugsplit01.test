@@ -1,0 +1,21 @@
+#! /bin/sh
+
+echo "Should be:"
+echo "  Module         SPLIT01"
+echo "  Module         ENTRYFOO"
+echo "  Module         BLA"
+echo "  Module         FUNNY"
+
+echo "However because of fsplit bugs & hacks:"
+
+${tpips_version:-tpips} 2>&1 <<EOF | grep "  Module"
+
+delete b01
+create b01 bugsplit01.f
+close
+delete b01
+quit
+
+EOF
+
+echo "Too bad..."

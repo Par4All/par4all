@@ -1,0 +1,3 @@
+#!/bin/sh
+tpips=${tpips_version:-tpips}
+$tpips argmis.tpips 2>&1 | egrep  '(EFFECTS|Call to module)'

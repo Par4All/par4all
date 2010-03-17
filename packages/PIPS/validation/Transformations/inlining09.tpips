@@ -1,0 +1,35 @@
+delete inlining09
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining09 inlining09.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[foo]
+display PRINTED_FILE[bar]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[foo]
+display PRINTED_FILE[bar]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -c inlining09.database/Src/inlining09.c
+
+close
+delete inlining09
+quit
+

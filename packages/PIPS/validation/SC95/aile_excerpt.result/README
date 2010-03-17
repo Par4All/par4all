@@ -1,0 +1,5 @@
+The version of December 2, 1997, contains extra-information about parameters
+which are not used such as LI. I guess that the new version of summary_precondition is better restricted to useful information.
+
+ - Francois Irigoin
+.

@@ -1,0 +1,142 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: inter07: No such workspace
+Registering file inter07.f
+Splitting file    ./inter07.f
+  Module         INCR
+  Module         INTER07
+Workspace inter07 created and opened.
+Main module PROGRAM "INTER07" selected.
+Module INTER07 selected
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+Selecting rule: TRANSFORMERS_INTER_FULL
+Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
+Selecting rule: PRECONDITIONS_INTER_FULL
+Selecting rule: PRINT_CODE_TRANSFORMERS
+Module INCR selected
+Request: build resource PRINTED_FILE for module INCR.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(INCR)
+  PARSER                         building   PARSED_CODE(INCR)
+                                 building   CALLEES(INCR)
+  CONTROLIZER                    building   CODE(INCR)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(INCR)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INCR)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INCR)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INCR)
+  FILTER_FILE                    building   SOURCE_FILE(INTER07)
+  PARSER                         building   PARSED_CODE(INTER07)
+                                 building   CALLEES(INTER07)
+  CONTROLIZER                    building   CODE(INTER07)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(INTER07)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INTER07)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INTER07)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INTER07)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INCR)
+  PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INCR)
+PRINTED_FILE made for INCR.
+Module INTER07 selected
+Request: build resource PRINTED_FILE for module INTER07.
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INTER07)
+  PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INTER07)
+PRINTED_FILE made for INTER07.
+
+C  T() {}
+
+
+      SUBROUTINE INCR(X)
+
+C  T() {}
+
+      X = X+1.                                                          0003
+      END
+
+C  T() {}
+
+      PROGRAM INTER07
+
+C  T(I) {I==0}
+
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0007
+
+C  T(I) {}
+
+
+      CALL INCR(I)                                                      0009
+
+C  T() {}
+
+
+      PRINT *, I                                                        0011
+
+      END
+Selecting rule: PRINT_CODE_PRECONDITIONS
+Module INCR selected
+Request: build resource PRINTED_FILE for module INCR.
+  CALLGRAPH                      building   CALLERS(INCR)
+                                 building   CALLERS(INTER07)
+                                 building   HEIGHT(INCR)
+                                 building   HEIGHT(INTER07)
+                                 building   DEPTH(INCR)
+                                 building   DEPTH(INTER07)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INTER07)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INTER07)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INCR)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INCR)
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INCR)
+PRINTED_FILE made for INCR.
+Module INTER07 selected
+Request: build resource PRINTED_FILE for module INTER07.
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INTER07)
+PRINTED_FILE made for INTER07.
+
+C  P() {}
+
+
+      SUBROUTINE INCR(X)
+
+C  P() {}
+
+      X = X+1.                                                          0003
+      END
+
+C  P() {}
+
+      PROGRAM INTER07
+
+C  P() {}
+
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0007
+
+C  P(I) {I==0}
+
+
+      CALL INCR(I)                                                      0009
+
+C  P(I) {}
+
+
+      PRINT *, I                                                        0011
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module INCR.
+  Closing module INTER07.
+Closing program.
+Closing workspace.
+Workspace inter07 closed.
+
+Workspace inter07 deleted.

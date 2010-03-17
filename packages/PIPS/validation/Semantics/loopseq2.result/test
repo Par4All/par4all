@@ -1,0 +1,43 @@
+--- Preconditions for LOOPSEQ2
+
+C  P() {}
+
+      PROGRAM LOOPSEQ2
+
+C     Check exit condition from first loop onto second loop
+
+      REAL T(100)
+
+C  P() {}
+
+
+      IF (N.GE.1) THEN                                                  0007
+
+C  P() {1<=N}
+
+
+         DO I = 1, N                                                    0009
+
+C  P(I) {1<=I, I<=N, 1<=N}
+
+            T(I) = 0.                                                   0010
+         ENDDO
+
+C  P(I) {I==N+1, 2<=I}
+
+
+         DO J = I, N                                                    0013
+
+C  P() {0==-1}
+
+            T(J) = 0.                                                   0014
+         ENDDO
+
+C  P(I,J) {I==J, I==N+1, 2<=I}
+
+
+         PRINT *, I, J                                                  0017
+
+      ENDIF
+
+      END

@@ -1,0 +1,9 @@
+C               <must be read   >: __IO_EFFECTS:LUNS(0)
+C               <must be written>: __IO_EFFECTS:LUNS(0)
+	PROGRAM ST
+C               <must be written>: I
+      I = 1                                                             0002
+C               <must be read   >: __IO_EFFECTS:LUNS(0)
+C               <must be written>: __IO_EFFECTS:LUNS(0)
+      STOP                                                              0003
+      END

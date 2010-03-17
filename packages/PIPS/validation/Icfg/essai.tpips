@@ -1,0 +1,31 @@
+delete essai
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create essai essai.f
+
+echo ::::::::::::::
+echo essai.database/ESSAI.icfg
+echo ::::::::::::::
+
+display ICFG_FILE[ESSAI]
+
+
+echo ::::::::::::::
+echo essai.database/ESSAI.icfgc
+echo ::::::::::::::
+
+activate PRINT_ICFG_WITH_CONTROL
+display ICFG_FILE[ESSAI]
+
+
+echo ::::::::::::::
+echo essai.database/ESSAI.icfgl
+echo ::::::::::::::
+
+activate PRINT_ICFG_WITH_LOOPS
+display ICFG_FILE[ESSAI]
+
+close
+delete essai
+quit

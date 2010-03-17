@@ -1,0 +1,26 @@
+      SUBROUTINE CLEANDEC
+
+      COMMON /FOO/I,J,C(2), M, N
+      COMMON /UFOO/A,B,D
+      INTEGER O,P,Q
+      PARAMETER (K=10)
+      PARAMETER (W=5)	
+      EQUIVALENCE (O,P)
+      IF (I.GT.J) CALL BAR                                              0009
+      PRINT *, I, J, M, M, P                                            0012
+
+      END
+
+      SUBROUTINE BAR
+      COMMON /FOO/I,J,K,L,M,N
+      COMMON /UFOO/A,B,D
+      PARAMETER (X=10)
+      PARAMETER (Y=5*X)	
+      IF (I.GT.J) THEN                                                  0007
+         I = I+1                                                        0008
+         J = J+2*M                                                      0009
+         K = K+3                                                        0010
+         L = L+4*Y                                                      0011
+      ENDIF
+
+      END

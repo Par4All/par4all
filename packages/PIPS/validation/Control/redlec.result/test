@@ -1,0 +1,50 @@
+
+Output of the parser
+
+      SUBROUTINE REDLEC
+      INTEGER NFILEC
+      CHARACTER*80 LIGNE
+
+      IF (IOPERA.LE.0) THEN                                             0005
+         DO WHILE (IPOYNT.LE.LONGSF)                                    0006
+            IF (IPOYNT.GT.LONGSF) THEN                                  0007
+               READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1   0008
+     &         :LONGSF)                                                 0008
+               GOTO 99999
+               
+               GOTO 1999
+99999          CONTINUE
+               GOTO 99998
+               
+               GOTO 1999
+99998          CONTINUE
+            ELSE
+            ENDIF
+         ENDDO
+      ELSE
+      ENDIF
+1999  RETURN                                                            0012
+      END
+
+Output of the controlizer
+
+      SUBROUTINE REDLEC
+      INTEGER NFILEC
+      CHARACTER*80 LIGNE
+
+      IF (IOPERA.LE.0) THEN                                             0005
+      ELSE
+         GOTO 1999
+      ENDIF
+99999 CONTINUE
+C     DO WHILE loop with GO TO exit had to be desugared
+      IF (.NOT.IPOYNT.LE.LONGSF) GOTO 1999                              0006
+      IF (IPOYNT.GT.LONGSF) THEN                                        0007
+      ELSE
+         GOTO 99999
+      ENDIF
+      READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1:LONGSF)    0008
+      GOTO 99999
+1999  CONTINUE                                                          0012
+      END
+

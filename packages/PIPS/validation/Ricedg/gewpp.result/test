@@ -1,0 +1,32 @@
+      SUBROUTINE GEWPP(A,N)
+      REAL A(N,N)
+
+C     Gaussian elimination with partial pivoting (courtesy of Rob Schreiber)
+
+      DO K = 1, N-1                                                     0006
+c     find pivot
+         IMAX = K                                                       0008
+         DO I = K+1, N                                                  0009
+            IF (ABS(A(I,K)).GT.ABS(A(IMAX,K))) IMAX = I                 0010
+         ENDDO
+c     exchange elements and compute multipliers
+         T = A(IMAX,K)                                                  0015
+         A(IMAX,K) = A(K,K)                                             0016
+         A(K,K) = T                                                     0017
+         DOALL I = K+1, N                                               0018
+            A(I,K) = A(I,K)/A(K,K)                                      0019
+         ENDDO
+c     a(i,j)  -= a(i,k) * a(k,j) for i, j > k
+         DO J = K+1, N                                                  0022
+            T = A(IMAX,J)                                               0023
+            A(IMAX,J) = A(K,J)                                          0024
+            A(K,J) = T                                                  0025
+         ENDDO
+         DOALL J = K+1, N                                               0022
+            DOALL I = K+1, N                                            0026
+               A(I,J) = A(I,J)-A(I,K)*A(K,J)                            0027
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END

@@ -1,0 +1,89 @@
+
+Parsed code for "call15"
+
+void call15(int *pi, tf_t *q)
+{
+   *pi = 1;
+   q->one = 1;
+}
+
+Code for "call15"
+
+void call15(int *pi, tf_t *q)
+{
+   *pi = 1;
+   q->one = 1;
+}
+
+Proper effects for "call15"
+
+void call15(int *pi, tf_t *q)
+{
+//               <must be read   >: pi
+//               <must be written>: pi[0]
+   *pi = 1;
+//               <must be read   >: q
+//               <must be written>: q[0][1]
+   q->one = 1;
+}
+
+Cumulated effects for "call15"
+
+//               <must be read   >: pi q
+//               <must be written>: pi[0] q[0][1]
+void call15(int *pi, tf_t *q)
+{
+//               <must be read   >: pi
+//               <must be written>: pi[0]
+   *pi = 1;
+//               <must be read   >: q
+//               <must be written>: q[0][1]
+   q->one = 1;
+}
+
+Proper effects for "main"
+
+main()
+{
+   int i;
+   tf_t s;
+//               <must be written>: i s[1]
+
+   call15(&i, &s);
+}
+
+Regions for "call15"
+
+
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+void call15(int *pi, tf_t *q)
+{
+
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+
+   *pi = 1;
+
+//  <q-R-EXACT-{}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+   q->one = 1;
+}
+
+Regions for "main"
+
+main()
+{
+   int i;
+   tf_t s;
+
+//  <i-W-EXACT-{}>
+//  <s[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   call15(&i, &s);
+}

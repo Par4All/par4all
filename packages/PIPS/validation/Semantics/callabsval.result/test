@@ -1,0 +1,58 @@
+
+Transformers for "ABSVAL"
+
+
+C  T(NABS) {0<=N+NABS, N<=NABS}
+
+      SUBROUTINE ABSVAL(N, NABS)
+
+C  T(NABS) {0<=N+NABS, N<=NABS}
+
+      IF (N.LT.0) THEN                                                  0002
+
+C  T(NABS) {N+NABS==0}
+
+         NABS = -N                                                      0003
+      ELSE
+
+C  T(NABS) {N==NABS}
+
+         NABS = N                                                       0005
+      ENDIF
+      END
+
+Preconditions for "ABSVAL"
+
+
+C  P() {}
+
+      PROGRAM CALLABSVAL
+
+C  P() {}
+
+
+c     bug: results are better in absval than in callabsval because
+c     the absval transformer does not take the test condition into account
+
+c     note also that preconditions in the test branches are not symmetrical
+c     because 0 belongs to the [-1..1] interval and because the condition
+c     .lt. is more precise when n is negative
+
+      I = 1                                                             0010
+
+C  P(I) {I==1}
+
+      CALL ABSVAL(I, IABS)                                              0011
+
+C  P(I,IABS) {I==1, 1<=IABS}
+
+      I = -1                                                            0012
+
+C  P(I,IABS) {I==-1, 1<=IABS}
+
+      CALL ABSVAL(I, IABS)                                              0013
+
+C  P(I,IABS) {I==-1, 1<=IABS}
+
+      PRINT *, I, IABS                                                  0014
+      END

@@ -1,0 +1,60 @@
+      PROGRAM AILECLCOUPK
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/GAMMA/GAM,GAM1,GAM2,GAM3,GAM4,GAM5,GAM6,GAM7,GAM8,GAM9
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      DATA N1,N3,N4,N7,N10,N14,N17/1,3,4,7,10,14,17/
+
+      READ (NXYZ) I1, I2, J1, JA, K1, K2, GAM                           0011
+
+      GAM1 = (GAM+1.)/(2.*GAM)                                          0013
+      GAM2 = (GAM-1.)/(2.*GAM)                                          0014
+      GAM3 = (GAM+1.)/(GAM-1.)                                          0015
+      GAM4 = GAM-1.                                                     0016
+      GAM5 = 1./(GAM-1.)                                                0017
+      GAM6 = (GAM-1.)/GAM                                               0018
+      GAM7 = GAM+1.                                                     0019
+      GAM8 = -GAM1*GAM2                                                 0020
+      GAM9 = -2./(GAM-1.)                                               0021
+
+      IF (J1.GE.1.AND.K1.GE.1) THEN                                     0023
+         N4 = 4                                                         0024
+         J1 = J1+1                                                      0025
+         J2 = 2*JA+1                                                    0026
+         JA = JA+1                                                      0027
+         JAM1 = JA-1                                                    0028
+         K1 = K1+1                                                      0029
+         K2 = K2+1                                                      0030
+
+         I1P1 = I1+1                                                    0032
+         I1P2 = I1+2                                                    0033
+         I2M1 = I2-1                                                    0034
+         I2M2 = I2-2                                                    0035
+
+         NU = 11                                                        0037
+         LLU = 21                                                       0038
+         NW = LLU                                                       0039
+         MU = 6                                                         0040
+
+         CALL CLCOUPK(K1, J1, JAM1, NU, NW)                             0042
+         CALL CLCOUPK(K1, J1, JAM1, NU, NW)                             0043
+
+         DO II = I1P1, I2M1                                             0045
+            LLU = LU                                                    0046
+            LU = NU                                                     0047
+            NU = MU                                                     0048
+            MU = MMU                                                    0049
+            MMU = NW                                                    0050
+            NW = LLU                                                    0051
+         ENDDO
+
+         DOALL K = K1, K2                                               0054
+            PRIVATE KK
+            KK = K                                                      0055
+            CALL CLCOUPK(KK, J1, JA, MU, NW)                            0056
+         ENDDO
+      ENDIF
+      END

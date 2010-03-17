@@ -1,0 +1,10 @@
+# delete testerror
+create testerror testerror.f
+activate PRINT_CODE_TRANSFORMERS
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+module testerror
+display PRINTED_FILE
+close 
+delete testerror
+quit

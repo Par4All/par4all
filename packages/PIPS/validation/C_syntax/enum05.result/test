@@ -1,0 +1,41 @@
+enum {a, b, c=b+3};
+
+extern int main();
+
+Preconditions derived from enum
+
+
+//  P() {}
+
+enum {a, b, c=b+3};
+
+extern int main();
+
+
+//  P() {}
+
+main()
+{
+   int ia;
+   int ib;
+   int ic;
+   int t;
+
+//  P() {}
+
+
+   ia = a;
+
+//  P(ia) {ia==0}
+
+   ib = b;
+
+//  P(ia,ib) {ia==0, ib==1}
+
+   ic = c;
+
+//  P(ia,ib,ic) {ia==0, ib==1, ic==4}
+
+
+   t = ia+ib+ic;
+}

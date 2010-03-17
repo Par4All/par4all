@@ -1,0 +1,24 @@
+delete altret11
+create altret11 altret11.f
+
+# Make sure that ParserError cleans up the data structures
+# altret11.f is not compatible with PIPS parser.
+# The first attempt at displaying fails.
+# The second attempt due to UNSPLIT fails too, but gracefully.
+# Then the compilation fails (do not set ABORD_ON_USER_ERROR)
+# or the scheme is dead.
+
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+display PRINTED_FILE[ALTRET11]
+apply UNSPLIT
+# The flexibility is useless because the validation file cannot follow the changes in PIPS_F77
+shell ${PIPS_F77:-f77} -c altret11.database/Src/altret11.f
+#shell f77 -c altret11.database/Src/altret11.f
+shell ls altret11.o
+shell rm altret11.o
+close
+#delete altret11
+quit

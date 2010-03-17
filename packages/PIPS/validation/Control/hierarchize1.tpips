@@ -1,0 +1,13 @@
+delete hierarchize1
+create hierarchize1 hierarchize1.f
+
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+display PRINTED_FILE
+close
+delete hierarchize1

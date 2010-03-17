@@ -1,0 +1,192 @@
+
+C  P() {}
+
+c SOR 2x2 parameter and flip-flop and real*8
+      PROGRAM HPFTEST54
+c
+c version avec 4 processeurs
+c
+
+C     Modification: doall replaced by do so as not to have implictly 
+C     real indexes for all loops (FI)
+
+      INTEGER N, TIMES
+      PARAMETER (N=500)
+      PARAMETER (TIMES=100)
+      REAL*8 TEMP(N,N,2), NORTH(N), X
+      EXTERNAL REDMAX1
+      REAL*8 REDMAX1
+      EXTERNAL TIME
+      INTEGER TIME
+      INTEGER OLD, NEW, T1, T2, T3, T4, T5
+      INTEGER I, J, K
+      LOGICAL T(N,N)
+      LOGICAL P(2,2)
+
+C  P() {}
+
+      PRINT *, 'HPFTEST54 RUNNING, THERMO'                              0022
+
+C  P() {}
+
+c
+c initialization
+c
+      PRINT *, 'INITIALIZING'                                           0026
+
+C  P() {}
+
+      T1 = TIME()                                                       0027
+
+C  P(T1) {}
+
+c
+      DO I = 1, N                                                       0029
+
+C  P(I,T1) {1<=I, I<=500}
+
+         NORTH(I) = 100.0                                               0030
+      ENDDO
+
+C  P(I,T1) {I==501}
+
+      DO K = 1, 2                                                       0032
+
+C  P(I,J,K,T1) {1<=K, K<=2}
+
+         DO I = 1, N                                                    0033
+
+C  P(I,J,K,T1) {1<=I, I<=500, 1<=K, K<=2}
+
+            TEMP(1,I,K) = NORTH(I)                                      0034
+         ENDDO
+
+C  P(I,J,K,T1) {I==501, 1<=K, K<=2}
+
+         DO J = 1, N                                                    0036
+
+C  P(I,J,K,T1) {1<=J, J<=500, 1<=K, K<=2}
+
+            DO I = 2, N                                                 0037
+
+C  P(I,J,K,T1) {2<=I, I<=500, 1<=J, J<=500, 1<=K, K<=2}
+
+               TEMP(I,J,K) = 10.0                                       0038
+            ENDDO
+         ENDDO
+      ENDDO
+
+C  P(I,J,K,T1) {I==501, J==501, K==3}
+
+c
+      PRINT *, 'RUNNING'                                                0043
+
+C  P(I,J,K,T1) {I==501, J==501, K==3}
+
+      T2 = TIME()                                                       0044
+
+C  P(I,J,K,T1,T2) {I==501, J==501, K==3}
+
+c
+      NEW = 2                                                           0046
+
+C  P(I,J,K,NEW,T1,T2) {I==501, J==501, K==3, NEW==2}
+
+      DO K = 1, TIMES                                                   0047
+
+C  P(I,J,K,NEW,OLD,T1,T2) {1<=K, K<=100}
+
+         OLD = NEW                                                      0048
+
+C  P(I,J,K,NEW,OLD,T1,T2) {NEW==OLD, 1<=K, K<=100}
+
+         NEW = 3-NEW                                                    0049
+
+C  P(I,J,K,NEW,OLD,T1,T2) {NEW+OLD==3, 1<=K, K<=100}
+
+         DO J = 2, N-1                                                  0050
+
+C  P(I,J,K,NEW,OLD,T1,T2) {NEW+OLD==3, 2<=J, J<=499, 1<=K, K<=100}
+
+            DO I = 2, N-1                                               0051
+
+C  P(I,J,K,NEW,OLD,T1,T2) {NEW+OLD==3, 2<=I, I<=499, 2<=J, J<=499,
+C    1<=K, K<=100}
+
+               TEMP(I,J,NEW) = 0.25*(TEMP(I-1,J,OLD)+TEMP(I+1,J,OLD)+   0052
+     &         TEMP(I,J-1,OLD)+TEMP(I,J+1,OLD))                         0052
+            ENDDO
+         ENDDO
+      ENDDO
+
+C  P(I,J,K,NEW,OLD,T1,T2) {I==500, J==500, K==101, NEW+OLD==3}
+
+c
+c print results
+c
+      PRINT *, 'REDUCTION'                                              0060
+
+C  P(I,J,K,NEW,OLD,T1,T2) {I==500, J==500, K==101, NEW+OLD==3}
+
+      T3 = TIME()                                                       0061
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3) {I==500, J==500, K==101, NEW+OLD==3}
+
+c
+      DO I = 1, N                                                       0063
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3) {J==500, K==101, NEW+OLD==3, 1<=I,
+C    I<=500}
+
+         NORTH(I) = TEMP(2,I,OLD)                                       0064
+      ENDDO
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3) {I==501, J==500, K==101, NEW+OLD==3}
+
+      X = REDMAX1(NORTH(1), 1, N)                                       0066
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3) {I==501, J==500, K==101, NEW+OLD==3}
+
+c
+      PRINT *, 'RESULTS:'                                               0068
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3) {I==501, J==500, K==101, NEW+OLD==3}
+
+      T4 = TIME()                                                       0069
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3,T4) {I==501, J==500, K==101, NEW+OLD==3}
+
+c
+      PRINT *, 'MAX is ', X                                             0071
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3,T4) {I==501, J==500, K==101, NEW+OLD==3}
+
+10    FORMAT(F8.2,F8.2,F8.2,F8.2,F8.2)                                  0072
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3,T4) {I==501, J==500, K==101, NEW+OLD==3}
+
+      DO I = 2, 10, 2                                                   0073
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3,T4) {J==500, K==101, NEW+OLD==3, 2<=I,
+C    I<=10}
+
+         WRITE (6, 10) TEMP(I,12,OLD), TEMP(I,24,OLD), TEMP(I,36,OLD)   0074
+     &   , TEMP(I,48,OLD), TEMP(I,60,OLD)                               0074
+      ENDDO
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3,T4) {J==500, K==101, NEW+OLD==3, 11<=I,
+C    I<=12}
+
+      PRINT *, 'HPFTEST52 ENDED'                                        0077
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3,T4) {J==500, K==101, NEW+OLD==3, 11<=I,
+C    I<=12}
+
+      T5 = TIME()                                                       0078
+
+C  P(I,J,K,NEW,OLD,T1,T2,T3,T4,T5) {J==500, K==101, NEW+OLD==3, 11<=I,
+C    I<=12}
+
+      PRINT *, 'Timing: init ', T2-T1, ' run ', T3-T2, ' red ', T4-T3   0079
+     &, ' IO ', T5-T4, ' total ', T5-T1                                 0079
+      END

@@ -1,0 +1,25 @@
+# test pips on jacobi-paf-conv.f
+#
+# if Pips -f jacobi-paf-conv.f -w jacobi-paf-conv -m jacobi -s rfulldg -p priv -b PPF>&2
+# then 
+# 	Display -l para77
+# 	Delete jacobi-paf-conv>&2
+# else
+# 	echo Parallelization failed 
+# 	Delete jacobi-paf-conv>&2
+# 	exit 1
+# fi
+
+delete jacobi-paf-conv
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create jacobi-paf-conv jacobi-paf-conv.f
+
+activate RICE_FULL_DEPENDENCE_GRAPH
+apply PRIVATIZE_MODULE[JACOBI]
+display PARALLELPRINTED_FILE[JACOBI]
+
+close
+delete jacobi-paf-conv
+quit

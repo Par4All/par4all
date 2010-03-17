@@ -1,0 +1,32 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+C     non unit loop increment.
+C
+      PROGRAM INCR3
+      INTEGER I, A(12)
+
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=12}>
+
+      DO I = 1, 10, 3                                                   0005
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
+
+         A(I) = 1                                                       0006
+
+C  <A(PHI1)-W-EXACT-{PHI1==I+1, 1<=I, I<=10}>
+
+         A(I+1) = 2                                                     0007
+
+C  <A(PHI1)-W-EXACT-{PHI1==I+2, 1<=I, I<=10}>
+
+         A(I+2) = 3                                                     0008
+      ENDDO
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=12, 11<=I, I<=13}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 11<=I, I<=13}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 11<=I, I<=13}>
+
+      PRINT *, A                                                        0010
+      END

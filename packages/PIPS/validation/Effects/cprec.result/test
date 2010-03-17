@@ -1,0 +1,42 @@
+      SUBROUTINE VS
+      COMMON /COMPOSI/ JPOINT
+      COMMON /COMPOS/ EFF(401)
+C               <must be read   >: JPOINT
+C               <must be written>: EFF(JPOINT)
+
+      EFF(JPOINT) = 0.0                                                 0005
+
+      END
+C               <may be written >: EFF(*)
+C               <must be read   >: JPOINT
+      SUBROUTINE VS
+      COMMON /COMPOSI/ JPOINT
+      COMMON /COMPOS/ EFF(401)
+C               <may be written >: EFF(*)
+C               <must be read   >: JPOINT
+
+      EFF(JPOINT) = 0.0                                                 0005
+
+      END
+      PROGRAM CPREC
+
+C     check that precondition holding on common variables
+C     are passed down as they should
+
+C     check that regions are passed upwards correctly
+
+      COMMON /COMPOSI/ JPOINT
+      COMMON /COMPOS/ EFF(401)
+C               <must be read   >: N
+C               <must be written>: J
+
+      DO J = 1, N                                                       0011
+C               <must be read   >: J N
+C               <must be written>: JPOINT
+         JPOINT = J                                                     0012
+C               <may be written >: EFF(*)
+C               <must be read   >: JPOINT N
+         CALL VS                                                        0013
+      ENDDO
+
+      END

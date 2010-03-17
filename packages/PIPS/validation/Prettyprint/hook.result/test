@@ -1,0 +1,36 @@
+
+Default options: no decoration for end
+--------------------------------------
+
+C  P() {}
+
+      PROGRAM HOOK
+
+C  P() {}
+
+
+c     Depending on selected option, the should be or not be a
+c     "decoration" for END (in fact, for the hidden RETURN)
+
+      I = 1                                                             0006
+      END
+
+Decoration for end
+------------------
+
+C  P() {}
+
+      PROGRAM HOOK
+
+C  P() {}
+
+
+c     Depending on selected option, the should be or not be a
+c     "decoration" for END (in fact, for the hidden RETURN)
+
+      I = 1                                                             0006
+
+C  P(I) {I==1}
+
+      RETURN
+      END

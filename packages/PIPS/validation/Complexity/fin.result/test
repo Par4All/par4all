@@ -1,0 +1,9 @@
+C                                                                    4 (SUMMARY)
+      PROGRAM FIN
+C                                                                    3 (STMT)
+      T = T+1.                                                          0002
+C                                                                    1 (STMT)
+      PRINT *, T                                                        0003
+C                                                                    0 (STMT)
+      STOP 'fin normal'                                                 0004
+      END

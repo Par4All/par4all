@@ -1,0 +1,274 @@
+
+Printed file
+
+      SUBROUTINE CREATE (IPOINT, ITYPE, LONG)
+
+C_ARGUMENTS
+C_INPUT/OUTPUT
+      INTEGER     IPOINT, ITYPE, LONG
+
+C_LOCAL
+      INTEGER          INAN
+
+C     GENERAL INFORMATION FOR THE DATA STRUCTURE MANAGEMENT
+C
+C_LOCAL
+C
+      INTEGER                         NMEMOH
+      PARAMETER                      (NMEMOH = 2+ 12)
+      INTEGER                  IMEMOH(NMEMOH)
+C
+      EQUIVALENCE     (JMEMOH, IMEMOH(1))
+      EQUIVALENCE     (MMEMOH, IMEMOH(NMEMOH))
+C
+C_KEY
+      INTEGER          KMEMOH
+      PARAMETER      ( KMEMOH = 90199 )
+C
+C_POINTERS
+C
+      INTEGER        JMEMOH
+C
+C     DOUBLE PRECISION MEMORY SPACE
+      INTEGER        LNEXTA , LFREEA , MNEXTA
+C
+C     INTEGER MEMORY SPACE
+      INTEGER        LNEXTIA, LFREEIA, MNEXTIA
+C
+C     WORD MEMORY SPACE
+      INTEGER        LNEXTCA, LFREECA, MNEXTCA
+C
+C     POINTER MEMORY SPACE
+      INTEGER        LNEXTIP, LFREEIP, MNEXTIP
+C
+      INTEGER        MMEMOH
+C
+      COMMON /HMEMO/ JMEMOH
+     1             , LNEXTA , LFREEA , MNEXTA
+     2             , LNEXTIA, LFREEIA, MNEXTIA
+     3             , LNEXTCA, LFREECA, MNEXTCA
+     4             , LNEXTIP, LFREEIP, MNEXTIP
+     Z             , MMEMOH
+C
+C_END_DOCUMENT
+
+      INTEGER     LONGIP0, LONGA0, LONGIA0
+      PARAMETER ( LONGIP0=4000000, LONGA0=14000000, LONGIA0=16000000 )
+C
+      INTEGER     LONGA        ,  LONGIA       ,  LONGCA
+C      PARAMETER ( LONGA=1800000,  LONGIA=140000,  LONGCA=200000 )
+C_UPDATE_1
+      PARAMETER ( LONGA=2400000,  LONGIA=300000,  LONGCA=400000 )
+C_UPDATE_1
+C
+C   MEMORY SPACE OF DOUBLE PRECISION ENTITIES
+C
+      INTEGER     MINA              , MAXA
+      PARAMETER ( MINA = LONGIP0+1  , MAXA = MINA+LONGA-1 )
+C
+      DOUBLE PRECISION  A(MINA:MAXA)
+      COMMON  /FAST/    A
+C
+C
+C   MEMORY SPACE OF INTEGER ENTITIES
+C
+      INTEGER     MINIA          , MAXIA
+      PARAMETER ( MINIA = LONGA0+1 , MAXIA = MINIA+LONGIA-1 )
+C
+      INTEGER          IA(MINIA:MAXIA)
+      COMMON  /IFAST/  IA
+C
+C_END_DOCUMENT
+
+      IF (ITYPE.EQ.LDOUBL) GOTO 99999                                   0080
+      IF (ITYPE.EQ.LINTEG) GOTO 99998                                   0102
+      PRINT *, 'INVALID TYPE OF DATA IN CREATE REQUEST '                0124
+      WRITE (IOSTER, *) 'INVALID DATA TYPE IN ALLOCATION REQUEST'       0125
+9999  WRITE (IOSTER, 90000)                                             0132
+90000 FORMAT(' @(#) CREATE.f +_v14e_+ 2.1 05/26/97 ')                   0133
+      RETURN
+99998 CONTINUE
+C
+C     MEMORY ALLOCATION FOR INTEGER ARRAYS
+C
+      IF (LONG.LE.LFREEIA) GOTO 99997                                   0106
+      IPOINT = LNULL                                                    0116
+      WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR INTEGER'              0117
+      WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEIA, ' LEFT'          0118
+      GOTO 9999
+99997 CONTINUE
+      IPOINT = LNEXTIA                                                  0107
+      LNEXTIA = LNEXTIA+LONG                                            0108
+      LFREEIA = LFREEIA-LONG                                            0109
+      IF (INAN.GT.0) THEN                                               0110
+         LNEXTIA = LNEXTIA+1                                            0111
+         LFREEIA = LFREEIA-1                                            0112
+         IA(LNEXTIA-1) = INFINI(1)                                      0113
+      ENDIF
+C
+C
+C
+C
+8888  CONTINUE
+      RETURN
+99999 CONTINUE
+C
+C     MEMORY ALLOCATION FOR DOUBLE PRECISION ARRAYS
+C
+      IF (LONG.LE.LFREEA) GOTO 99996                                    0084
+      IPOINT = LNULL                                                    0095
+      WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR DOUBLE'               0096
+      WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEA, ' LEFT'           0097
+      GOTO 9999
+99996 CONTINUE
+C
+      IPOINT = LNEXTA                                                   0086
+      LNEXTA = LNEXTA+LONG                                              0087
+      LFREEA = LFREEA-LONG                                              0088
+      IF (INAN.GT.0) THEN                                               0089
+         LNEXTA = LNEXTA+1                                              0090
+         LFREEA = LFREEA-1                                              0091
+         A(LNEXTA-1) = NAND(-1.0D0)                                     0092
+      ENDIF
+C
+C
+      GOTO 8888
+C      RETURN  1
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      SUBROUTINE CREATE (IPOINT, ITYPE, LONG)
+
+C_ARGUMENTS
+C_INPUT/OUTPUT
+      INTEGER     IPOINT, ITYPE, LONG
+
+C_LOCAL
+      INTEGER          INAN
+
+C     GENERAL INFORMATION FOR THE DATA STRUCTURE MANAGEMENT
+C
+C_LOCAL
+C
+      INTEGER                         NMEMOH
+      PARAMETER                      (NMEMOH = 2+ 12)
+      INTEGER                  IMEMOH(NMEMOH)
+C
+      EQUIVALENCE     (JMEMOH, IMEMOH(1))
+      EQUIVALENCE     (MMEMOH, IMEMOH(NMEMOH))
+C
+C_KEY
+      INTEGER          KMEMOH
+      PARAMETER      ( KMEMOH = 90199 )
+C
+C_POINTERS
+C
+      INTEGER        JMEMOH
+C
+C     DOUBLE PRECISION MEMORY SPACE
+      INTEGER        LNEXTA , LFREEA , MNEXTA
+C
+C     INTEGER MEMORY SPACE
+      INTEGER        LNEXTIA, LFREEIA, MNEXTIA
+C
+C     WORD MEMORY SPACE
+      INTEGER        LNEXTCA, LFREECA, MNEXTCA
+C
+C     POINTER MEMORY SPACE
+      INTEGER        LNEXTIP, LFREEIP, MNEXTIP
+C
+      INTEGER        MMEMOH
+C
+      COMMON /HMEMO/ JMEMOH
+     1             , LNEXTA , LFREEA , MNEXTA
+     2             , LNEXTIA, LFREEIA, MNEXTIA
+     3             , LNEXTCA, LFREECA, MNEXTCA
+     4             , LNEXTIP, LFREEIP, MNEXTIP
+     Z             , MMEMOH
+C
+C_END_DOCUMENT
+
+      INTEGER     LONGIP0, LONGA0, LONGIA0
+      PARAMETER ( LONGIP0=4000000, LONGA0=14000000, LONGIA0=16000000 )
+C
+      INTEGER     LONGA        ,  LONGIA       ,  LONGCA
+C      PARAMETER ( LONGA=1800000,  LONGIA=140000,  LONGCA=200000 )
+C_UPDATE_1
+      PARAMETER ( LONGA=2400000,  LONGIA=300000,  LONGCA=400000 )
+C_UPDATE_1
+C
+C   MEMORY SPACE OF DOUBLE PRECISION ENTITIES
+C
+      INTEGER     MINA              , MAXA
+      PARAMETER ( MINA = LONGIP0+1  , MAXA = MINA+LONGA-1 )
+C
+      DOUBLE PRECISION  A(MINA:MAXA)
+      COMMON  /FAST/    A
+C
+C
+C   MEMORY SPACE OF INTEGER ENTITIES
+C
+      INTEGER     MINIA          , MAXIA
+      PARAMETER ( MINIA = LONGA0+1 , MAXIA = MINIA+LONGIA-1 )
+C
+      INTEGER          IA(MINIA:MAXIA)
+      COMMON  /IFAST/  IA
+C
+C_END_DOCUMENT
+
+      IF (ITYPE.EQ.LDOUBL) GOTO 99999                                   0080
+      IF (ITYPE.EQ.LINTEG) GOTO 99998                                   0102
+      PRINT *, 'INVALID TYPE OF DATA IN CREATE REQUEST '                0124
+      WRITE (IOSTER, *) 'INVALID DATA TYPE IN ALLOCATION REQUEST'       0125
+9999  WRITE (IOSTER, 90000)                                             0132
+90000 FORMAT(' @(#) CREATE.f +_v14e_+ 2.1 05/26/97 ')                   0133
+      RETURN
+99998 CONTINUE
+C
+C     MEMORY ALLOCATION FOR INTEGER ARRAYS
+C
+      IF (LONG.LE.LFREEIA) GOTO 99997                                   0106
+      IPOINT = LNULL                                                    0116
+      WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR INTEGER'              0117
+      WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEIA, ' LEFT'          0118
+      GOTO 9999
+99997 CONTINUE
+      IPOINT = LNEXTIA                                                  0107
+      LNEXTIA = LNEXTIA+LONG                                            0108
+      LFREEIA = LFREEIA-LONG                                            0109
+      IF (INAN.GT.0) THEN                                               0110
+         LNEXTIA = LNEXTIA+1                                            0111
+         LFREEIA = LFREEIA-1                                            0112
+         IA(LNEXTIA-1) = INFINI(1)                                      0113
+      ENDIF
+C
+C
+C
+C
+8888  CONTINUE
+      RETURN
+99999 CONTINUE
+C
+C     MEMORY ALLOCATION FOR DOUBLE PRECISION ARRAYS
+C
+      IF (LONG.LE.LFREEA) GOTO 99996                                    0084
+      IPOINT = LNULL                                                    0095
+      WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR DOUBLE'               0096
+      WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEA, ' LEFT'           0097
+      GOTO 9999
+99996 CONTINUE
+C
+      IPOINT = LNEXTA                                                   0086
+      LNEXTA = LNEXTA+LONG                                              0087
+      LFREEA = LFREEA-LONG                                              0088
+      IF (INAN.GT.0) THEN                                               0089
+         LNEXTA = LNEXTA+1                                              0090
+         LFREEA = LFREEA-1                                              0091
+         A(LNEXTA-1) = NAND(-1.0D0)                                     0092
+      ENDIF
+C
+C
+      GOTO 8888
+C      RETURN  1
+      END

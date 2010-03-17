@@ -1,0 +1,115 @@
+      PROGRAM UNROLL8
+C
+      PARAMETER (N=4)
+      REAL T(N,N)
+
+C     Outer unrolling with different labels
+
+Cxxx
+      DO 10 I = 1, N                                                    0009
+C
+         DO 20 J = 1, N                                                 0011
+            T(I,J) = -N*I+J                                             0012
+20          CONTINUE                                                    0013
+10       CONTINUE                                                       0014
+
+C     Inner unrolling with different labels
+
+      DO 30 I = 1, N                                                    0018
+Cxxx
+         DO 40 J = 1, N                                                 0020
+            T(I,J) = -N*I+J                                             0021
+40          CONTINUE                                                    0022
+30       CONTINUE                                                       0023
+
+C     Outer unrolling with same labels
+
+Cxxx
+      DO 11 I = 1, N                                                    0028
+C
+         DO 11 J = 1, N                                                 0030
+            T(I,J) = -N*I+J                                             0031
+11          CONTINUE                                                    0032
+
+C     Inner unrolling with same labels
+
+      DO 31 I = 1, N                                                    0036
+Cxxx
+         DO 31 J = 1, N                                                 0038
+            T(I,J) = -N*I+J                                             0039
+31          CONTINUE                                                    0040
+C
+      END
+      PROGRAM UNROLL8
+C
+      PARAMETER (N=4)
+      REAL T(N,N)
+
+C     Outer unrolling with different labels
+
+Cxxx
+C
+      DO J = 1, N                                                       0011
+         T(1,J) = -N*1+J                                                0012
+      ENDDO
+C
+      DO J = 1, N                                                       0011
+         T(2,J) = -N*2+J                                                0012
+      ENDDO
+C
+      DO J = 1, N                                                       0011
+         T(3,J) = -N*3+J                                                0012
+      ENDDO
+C
+      DO J = 1, N                                                       0011
+         T(4,J) = -N*4+J                                                0012
+      ENDDO
+10    CONTINUE
+      I = 5
+
+C     Inner unrolling with different labels
+
+      DO 30 I = 1, N                                                    0018
+Cxxx
+         T(I,1) = -N*I+1                                                0021
+         T(I,2) = -N*I+2                                                0021
+         T(I,3) = -N*I+3                                                0021
+         T(I,4) = -N*I+4                                                0021
+40       CONTINUE
+         J = 5
+30       CONTINUE                                                       0023
+
+C     Outer unrolling with same labels
+
+Cxxx
+C
+      DO J = 1, N                                                       0030
+         T(1,J) = -N*1+J                                                0031
+      ENDDO
+C
+      DO J = 1, N                                                       0030
+         T(2,J) = -N*2+J                                                0031
+      ENDDO
+C
+      DO J = 1, N                                                       0030
+         T(3,J) = -N*3+J                                                0031
+      ENDDO
+C
+      DO J = 1, N                                                       0030
+         T(4,J) = -N*4+J                                                0031
+      ENDDO
+11    CONTINUE
+      I = 5
+
+C     Inner unrolling with same labels
+
+      DO 31 I = 1, N                                                    0036
+Cxxx
+         T(I,1) = -N*I+1                                                0039
+         T(I,2) = -N*I+2                                                0039
+         T(I,3) = -N*I+3                                                0039
+         T(I,4) = -N*I+4                                                0039
+31       CONTINUE
+         J = 5
+C
+      END

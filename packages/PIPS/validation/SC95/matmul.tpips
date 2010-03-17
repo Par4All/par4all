@@ -1,0 +1,25 @@
+#
+# matmul demo for hpfc with tpips
+#
+delete matmul
+shell rm -rf matmul.hpfc
+#
+set HPFC_IGNORE_FCD_TIME TRUE
+set HPFC_IGNORE_FCD_SYNCHRO TRUE
+create matmul matmul.f
+#
+# compile !
+#
+activate MUST_REGIONS 
+apply HPFC_INSTALL
+close
+#
+# result
+#
+shell mv ./matmul.database/hpfc ./matmul.hpfc
+delete matmul
+# shell gmake -C matmul.hpfc
+shell cat matmul.hpfc/MATMUL_*.f 
+shell rm -rf matmul.hpfc
+#
+quit

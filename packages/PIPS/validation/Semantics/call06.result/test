@@ -1,0 +1,99 @@
+
+Source code with proper effects
+
+int call06(int i)
+{
+//               <must be read   >: i
+//               <must be written>: i
+   i++;                                                                 /*0004*/
+//               <must be read   >: i
+   return i;                                                            /*0005*/
+}
+
+Source code with cumulated effects
+
+//               <must be read   >: i
+int call06(int i)
+{
+//               <must be read   >: i
+//               <must be written>: i
+   i++;                                                                 /*0004*/
+//               <must be read   >: i
+   return i;                                                            /*0005*/
+}
+
+Source code with transformers for "call06"
+
+
+//  T(call06) {call06==i+1}
+
+int call06(int i)
+{
+
+//  T(i) {i==i#init+1}
+
+   i++;                                                                 /*0004*/
+
+//  T(call06) {call06==i}
+
+   return i;                                                            /*0005*/
+}
+
+Source code with transformers for "main"
+
+
+//  T() {}
+
+main()
+{
+   int ai;                                                              /*0004*/
+
+//  T(ai) {ai==3}
+
+
+   ai = call06(2);                                                      /*0006*/
+}
+
+Source code with preconditions for "call06"
+
+
+//  P() {i==2}
+
+int call06(int i)
+{
+
+//  P() {i==2}
+
+   i++;                                                                 /*0004*/
+
+//  P(i) {i==3}
+
+   return i;                                                            /*0005*/
+}
+
+Source code with preconditions for "main"
+
+
+//  P() {}
+
+main()
+{
+   int ai;                                                              /*0004*/
+
+//  P() {}
+
+
+   ai = call06(2);                                                      /*0006*/
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[call06] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[call06] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[call06] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+PRECONDITIONS_INTER_FULL[call06] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[call06] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call06!] (ordinary_summary_precondition) empty precondition to call06! because not in call tree from main.

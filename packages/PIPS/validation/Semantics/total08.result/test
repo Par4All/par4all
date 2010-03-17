@@ -1,0 +1,73 @@
+
+C  T() {0==-1}
+
+      PROGRAM TOTAL08
+
+C     Check that executed loops are proprely handled: a condition
+C     on N should be found. How about the second access? It makes
+C     the end unreachable.
+
+      REAL A(10)
+
+C  T() {0==-1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {1<=I}
+
+C (0,2)
+
+      DO I = 1, 10                                                      0009
+
+C  T() {1<=N, N<=10}
+
+C (0,3)
+         A(N) = 0.                                                      0010
+      ENDDO
+
+C  T() {1<=I, I<=10}
+
+C (0,4)
+
+      A(I) = 1.                                                         0013
+
+C     END BLOCK
+      END
+
+C TP() {0==-1}
+
+      PROGRAM TOTAL08
+
+C     Check that executed loops are proprely handled: a condition
+C     on N should be found. How about the second access? It makes
+C     the end unreachable.
+
+      REAL A(10)
+
+C TP() {0==-1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {0==-1}
+
+C (0,2)
+
+      DO I = 1, 10                                                      0009
+
+C TP() {0==-1}
+
+C (0,3)
+         A(N) = 0.                                                      0010
+      ENDDO
+
+C TP() {1<=I, I<=10}
+
+C (0,4)
+
+      A(I) = 1.                                                         0013
+
+C     END BLOCK
+      END
+

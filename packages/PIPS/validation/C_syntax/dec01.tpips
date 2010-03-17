@@ -1,0 +1,34 @@
+delete dec01
+create dec01 dec01.c
+
+# setenv C_SYNTAX_DEBUG_LEVEL 1
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+# setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE[do_elem]
+
+echo
+echo PRINTED_FILE
+echo
+
+display PRINTED_FILE[do_elem]
+
+
+close
+delete dec01
+
+quit

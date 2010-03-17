@@ -1,0 +1,75 @@
+user warning in tp_parse: data06: No such workspace
+Registering file data06.f
+Splitting file    ./data06.f
+  Module         DATA06
+Workspace data06 created and opened.
+Module DATA06 selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+Module DATA06 already active.
+Request: build resource PRINTED_FILE for module DATA06.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(DATA06)
+  PARSER                         building   PARSED_CODE(DATA06)
+                                 building   CALLEES(DATA06)
+
+Declarations for module DATA06 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity DATA06:*DYNAMIC*	with type area with size 0
+Declared entity DATA06:*HEAP*	with type area with size 0
+Declared entity DATA06:*STACK*	with type area with size 0
+Declared entity DATA06:*STATIC*	with type area with size 0
+Declared entity DATA06:M	with type variable INTEGER*4
+Declared entity TOP-LEVEL:~*BLANK*	with type area with size 4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*BLANK*/ of size 4:
+	Variable DATA06:M,	offset = 0,	size = 4
+
+End of declarations for module DATA06
+
+  CONTROLIZER                    building   CODE(DATA06)
+  PRINT_CODE                     building   PRINTED_FILE(DATA06)
+PRINTED_FILE made for DATA06.
+      BLOCKDATA DATA06
+
+C     Detect data bug (or ANSI extension...)
+
+      DATA M /1/
+
+      COMMON M
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module DATA06.
+Closing program.
+Closing workspace.
+Workspace data06 closed.
+
+Workspace data06 deleted.

@@ -1,0 +1,17 @@
+delete formal_variables
+create formal_variables formal_variables.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete formal_variables
+
+quit

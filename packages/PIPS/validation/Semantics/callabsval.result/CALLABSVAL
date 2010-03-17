@@ -1,0 +1,14 @@
+      PROGRAM CALLABSVAL
+
+C     BUG: RESULTS ARE BETTER IN ABSVAL THAN IN CALLABSVAL BECAUSE
+C     THE ABSVAL TRANSFORMER DOES NOT TAKE THE TEST CONDITION INTO ACCOUNT
+
+C     NOTE ALSO THAT PRECONDITIONS IN THE TEST BRANCHES ARE NOT SYMMETRICAL
+C     BECAUSE 0 BELONGS TO THE [-1..1] INTERVAL AND BECAUSE THE CONDITION
+C     .LT. IS MORE PRECISE WHEN N IS NEGATIVE
+
+      I = 1                                                             0001
+      CALL ABSVAL(I, IABS)                                              0002
+      I = -1                                                            0003
+      CALL ABSVAL(I, IABS)                                              0004
+      END

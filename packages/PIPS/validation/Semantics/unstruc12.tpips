@@ -1,0 +1,58 @@
+delete unstruc12
+create unstruc12 unstruc12.f
+
+module UNSTRUC12
+
+setenv CONTROL_DEBUG_LEVEL 0
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+# setproperty GATHER_FORMATS_AT_BEGINNING TRUE
+
+# setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+# setproperty PRETTYPRINT_INTERNAL_RETURN FALSE
+
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# setproperty PRETTYPRINT_CHECK_IO_STATEMENTS TRUE
+
+shell echo
+shell echo Code:
+shell echo
+
+display PRINTED_FILE[UNSTRUC12]
+
+# Impact on preconditions only
+# setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+# setenv CONTROL_DEBUG_LEVEL=3
+
+shell echo ""
+shell echo Transformers
+shell echo
+
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[UNSTRUC12]
+
+# quit
+
+shell echo ""
+shell echo Preconditions
+shell echo
+
+# setenv SEMANTICS_DEBUG_LEVEL 5
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[UNSTRUC12]
+close
+delete unstruc12

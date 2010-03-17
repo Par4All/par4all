@@ -1,0 +1,30 @@
+
+Initial code
+
+static void pmax(int a, int b)
+{
+   if (a>b) 
+      return;
+   printf("%d\n", a>b?a:b);
+}
+int main(int argc, char **argv)
+{
+   int d = 0;
+   pmax(2, argc);
+   return d;
+}
+
+Code after inlining
+
+int main(int argc, char **argv)
+{
+   int d = 0;
+   if (2>argc)
+      ;
+   else
+      printf("%d\n", 2>argc?2:argc);
+   return d;
+}
+
+Unsplit resulting code
+

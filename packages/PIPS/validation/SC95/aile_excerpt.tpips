@@ -1,0 +1,186 @@
+#
+# AILE: source code from the ONERA, slightly modified to test input
+#	values (the programmer SHOULD have tested these input values)
+# aile_excerpt.f is an excerpt from AILE that avoid the cost of interprocedural
+# propagation on several levels. 
+# EXTR and NORM are real routines from the original aile.f.
+# They both initialize parts of the global array T. Subsequent uses are 
+# simulated by I/O statements that are not part of the original code.
+
+echo
+echo 1- Creation of the workspace.
+echo
+delete aile_excerpt
+create aile_excerpt aile_excerpt.f
+
+echo
+echo 2- Show AILE. 
+echo
+# Notice the initialization of integer variables, and the three calls to 
+# EXTR, and the call to NORM.
+#
+module AILE
+display PRINTED_FILE
+
+
+echo
+echo 3- Show EXTR. (Retain)
+echo
+#  Notice that array T is a global variable. Several read and write references.
+#  This induces dependences that cannot be disproved if we don't know the 
+#  relations between index expressions. These expressions include variables
+#  that are initialized in the main module; hence the need for interprocedural
+#  information, as we will see later.
+#  S1, S2, S3 and JH must be privatized in order to remove spurious loop carried
+#  dependences.
+#  3 calls to the function D.
+#
+module EXTR
+display PRINTED_FILE
+apply PRIVATIZE_MODULE
+
+echo
+echo 4- Show D.
+echo
+#  There are 6 read references to the array T. The index expressions are not
+#  trivially related to each other. So, we must assume that all the array
+#  is potentially read. This induces dependences in EXTR between the call 
+#  sites of D and the other instructions
+#
+module D
+display PRINTED_FILE
+
+echo
+echo 5- Show parallel version of EXTR.
+echo
+#  We don't have enough information to parallelize the loop.
+#
+module EXTR
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+
+echo
+echo 6- Show D with regions
+echo
+#  We could try to represent the set of elements read in D, and use it at the
+#  call sites in EXTR. These sorts of sets are called "regions" in PIPS.
+#  But here, we have only information on the third dimension of T, not on the 
+#  others, because we don't have information on the relations between J and JH
+#  or K and KP. In fact, it is an over-approximation of the set of elements; 
+#  we call that a MAY region.
+#
+module D
+activate MUST_REGIONS         # to show that this really is a MAY region.
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+echo
+echo 7- Show D with MUST regions 
+echo
+#  This time, using interprocedural relations between the
+#  values of variable, the regions in D exactly represent the elements that 
+#  are read. And if we use these regions for the dependence analysis, 
+#  we can parallelize the code.  
+#
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+echo
+echo 8- Show EXTR parallelized with interprocedural information
+echo    
+#  Notice the privatized variables, and the two parallel loops.
+
+module EXTR
+activate RICE_FAST_DEPENDENCE_GRAPH
+activate REGION_CHAINS
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+
+
+echo
+echo 9- Show NORM (Retain)
+echo
+#  The references to array T do not induce loop-carried dependences.
+#  Furthermore, there are only read-read dependences on S.
+#  However, notice that array TI is a real argument in the call to
+#  PVNMUT, and that there are 3 read references to array TI.
+#  This induces potential dependences.
+#  
+module NORM
+activate PRINT_CODE
+display PRINTED_FILE
+
+
+echo
+echo 10- Show PVNMUT
+echo
+#  In PVNMUT, TI is called C. And the 3 elements of C are written, but not read
+#  
+module PVNMUT
+activate PRINT_CODE
+display PRINTED_FILE
+
+echo
+echo 11- Show NORM with regions
+echo
+
+#  If we now come back to NORM, and display the set of array elements that are 
+#  read and written by each instruction, we get..
+#  Since each iteration of loops K and J read and write to the same memory 
+#  locations of array TI, there are loop-carried dependences, and the loop 
+#  cannot be parallelized. 
+#
+# (MUST means that the region exactly represents the set of read or written
+#  array elements).
+#
+module NORM
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+
+echo
+echo 12- Show NORM with IN regions
+echo
+#  But in fact, these dependences are false dependences, because if we allocate 
+#  a copy of array TI to each iteration (in fact to each processor), there are
+#  no more dependences. This is what is called array privatization.
+#  In order to privatize an array, we must be sure that, in each iteration
+#  no element is read before being written in the same iteration. Thus,
+#  there are no loop-carried producer-consumer dependences.
+#  In PIPS, we could verify this easily by computing IN regions. IN regions
+#  represent the set of array elements that are read before being written.
+#  In our case, we must verify that no elements of TI belong to the IN regions.
+#
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+
+echo
+echo 13- Show NORM with OUT regions
+echo
+#  We must also be sure that no element of TI that is initialized by a single
+#  iteration is used in the subsequent iterations or after the loops.
+#  This information is provided in PIPS by the OUT regions. They represent
+#  the set of live array elements, that is to say those that are used in
+#  the continuation.
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+echo
+echo 14- Array privatization
+echo
+#  IN and OUT regions provide the information needed for this transformation.
+
+apply ARRAY_PRIVATIZER
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+
+close
+delete aile_excerpt
+#

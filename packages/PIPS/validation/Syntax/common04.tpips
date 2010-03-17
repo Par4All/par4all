@@ -1,0 +1,13 @@
+delete common04
+create common04 common04.f
+module COMMON04
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+module BAR
+display PRINTED_FILE[BAR]
+module COMMON04
+display PRINTED_FILE[COMMON04]
+module FOO
+display PRINTED_FILE[FOO]
+close
+quit
+# EOF

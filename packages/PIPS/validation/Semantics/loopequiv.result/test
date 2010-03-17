@@ -1,0 +1,57 @@
+
+C  P() {}
+
+      SUBROUTINE LOOPEQUIV(N, T)
+      INTEGER N, M, K
+      REAL T(100), X
+
+C     Test: there should be no information about the loop
+C     indices because the upper loop bound cannot be analyzed
+C     due to an EQUIVALENCE, and/or the loop body modifies 
+C     directly or indirectly the value of the upper bound expression
+
+      EQUIVALENCE (M,X), (K,L)
+
+C  P() {K==L}
+
+
+      DO I = I+1, M                                                     0012
+
+C  P(I) {K==L}
+
+         T(I) = 0.                                                      0013
+      ENDDO
+
+C  P(I) {K==L}
+
+
+      DO I = I+1, N+L                                                   0016
+
+C  P(I,K) {K==L}
+
+         K = 2                                                          0017
+
+C  P(I,K) {K==2, L==2}
+
+         T(I) = 0.                                                      0018
+      ENDDO
+
+C  P(I,K) {K==L}
+
+
+      DO I = I+1, N                                                     0021
+
+C  P(I,K,N) {K==L}
+
+         N = 0                                                          0022
+
+C  P(I,K,N) {K==L, N==0}
+
+         T(I) = 0.                                                      0023
+      ENDDO
+
+C  P(I,K,N) {K==L}
+
+
+      PRINT *, I, N, M, K, L                                            0026
+      END

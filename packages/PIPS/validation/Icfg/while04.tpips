@@ -1,0 +1,10 @@
+delete while04
+create while04 while04.f
+
+activate PRINT_ICFG_WITH_LOOPS
+display ICFG_FILE
+
+close
+delete while04
+quit
+

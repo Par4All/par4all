@@ -1,0 +1,108 @@
+int find_while(int i)
+{
+
+begin2:   if (i++<9)                                                           /*0006*/
+      goto end2;                                                        /*0007*/
+   goto begin2;                                                         /*0008*/
+   
+   // Just verify it works with 2 consecutive labels:
+end2:   ;
+
+begin:   if (i<9) {                                                           /*0014*/
+      i++;                                                              /*0015*/
+      goto the_end;                                                     /*0016*/
+   }
+   i = 8*i;                                                             /*0018*/
+   goto begin;                                                          /*0019*/
+
+the_end:   return i;
+}
+int find_while(int i)
+{
+
+begin2:   if (i++<9) {                                                         /*0006*/
+   }
+   else {
+      goto begin2;
+   }
+   
+   // Just verify it works with 2 consecutive labels:
+end2:   ;
+
+begin:   if (i<9) goto l99999;                                                /*0014*/
+   i = 8*i;                                                             /*0018*/
+   goto begin;
+l99999:   ;
+
+   i++;                                                                 /*0015*/
+
+the_end:   return i;
+}
+int find_while(int i)
+{
+€Unstructured c_1_1 end: c_4_1
+‚Unstructured Item c_1_1
+
+begin2:   if (i++<9)                                                           /*0006*/
+      ;
+ƒUnstructured Successor -> c_2_1 c_1_1
+‚Unstructured Item c_2_1
+   
+   // Just verify it works with 2 consecutive labels:
+end2:   ;
+ƒUnstructured Successor -> c_3_1
+‚Unstructured Item c_3_1
+
+begin:   if (i<9)                                                             /*0014*/
+      ;
+ƒUnstructured Successor -> c_4_1 c_5_1
+‚Unstructured Item c_4_1
+
+ƒUnstructured Successor ->
+‚Unstructured Item c_5_1
+   i = 8*i;                                                             /*0018*/
+ƒUnstructured Successor -> c_3_1
+Unstructured End c_1_1 end: c_4_1
+   i++;                                                                 /*0015*/
+
+the_end:   return i;
+}
+int find_while(int i)
+{
+   while (!(i++<9)) 
+      ;
+   
+   // Just verify it works with 2 consecutive labels:
+end2:   ;
+   while (!(i<9)) 
+      i = 8*i;                                                          /*0018*/
+   i++;                                                                 /*0015*/
+
+the_end:   return i;
+}
+int find_while(int i)
+{
+   while (!(i++<9)) 
+      ;
+   
+   // Just verify it works with 2 consecutive labels:
+end2:   ;
+   while (!(i<9)) 
+      i = 8*i;                                                          /*0018*/
+   i++;                                                                 /*0015*/
+
+the_end:   return i;
+}
+int find_while(int i)
+{
+   while (!(i++<9)) 
+      ;
+   
+   // Just verify it works with 2 consecutive labels:
+end2:   ;
+   while (!(i<9)) 
+      i = 8*i;                                                          /*0018*/
+   i++;                                                                 /*0015*/
+
+the_end:   return i;
+}

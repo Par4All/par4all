@@ -1,0 +1,36 @@
+
+Print code with proper reductions
+
+      SUBROUTINE ADDTO(X, J)
+      INTEGER X, J
+C  call sum[X],
+      X = X+J                                                           0003
+      END
+      PROGRAM INTERARG
+      INTEGER S, I
+      S = 0                                                             0003
+      DO I = 1, 10                                                      0004
+C  call sum[S],
+         CALL ADDTO(S, I)                                               0005
+      ENDDO
+      PRINT *, S                                                        0007
+      END
+
+Print code with cumulated reductions
+
+C  summary sum[X],
+      SUBROUTINE ADDTO(X, J)
+      INTEGER X, J
+C  call sum[X],
+      X = X+J                                                           0003
+      END
+      PROGRAM INTERARG
+      INTEGER S, I
+      S = 0                                                             0003
+C  loop sum[S],
+      DO I = 1, 10                                                      0004
+C  call sum[S],
+         CALL ADDTO(S, I)                                               0005
+      ENDDO
+      PRINT *, S                                                        0007
+      END

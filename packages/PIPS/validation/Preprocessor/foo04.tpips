@@ -1,0 +1,12 @@
+delete foo04
+create foo04 foo04.F
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE
+
+close
+delete foo04
+quit

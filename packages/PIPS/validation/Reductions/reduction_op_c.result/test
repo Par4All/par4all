@@ -1,0 +1,88 @@
+int main()
+{
+   int b = 0;
+   int i = 0;
+//  loop sum[b],
+
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b = b+i;
+//  loop prod[b],
+   for(i = 0; i <= 99; i += 1)
+//  call prod[b],
+      b = b*i;
+//  loop sum[b],
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b = b-i;
+//  loop prod[b],
+   for(i = 0; i <= 99; i += 1)
+//  call prod[b],
+      b = b/i;
+//  loop bitwise_and[b],
+   for(i = 0; i <= 99; i += 1)
+//  call bitwise_and[b],
+      b = b&i;
+//  loop bitwise_xor[b],
+   for(i = 0; i <= 99; i += 1)
+//  call bitwise_xor[b],
+      b = b^i;
+//  loop bitwise_or[b],
+   for(i = 0; i <= 99; i += 1)
+//  call bitwise_or[b],
+      b = b|i;
+//  loop sum[b],
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b += i;
+//  loop prod[b],
+   for(i = 0; i <= 99; i += 1)
+//  call prod[b],
+      b *= i;
+//  loop sum[b],
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b -= i;
+//  loop prod[b],
+   for(i = 0; i <= 99; i += 1)
+//  call prod[b],
+      b /= i;
+//  loop bitwise_and[b],
+   for(i = 0; i <= 99; i += 1)
+//  call bitwise_and[b],
+      b &= i;
+//  loop bitwise_xor[b],
+   for(i = 0; i <= 99; i += 1)
+//  call bitwise_xor[b],
+      b ^= i;
+//  loop bitwise_or[b],
+   for(i = 0; i <= 99; i += 1)
+//  call bitwise_or[b],
+      b |= i;
+//  loop sum[b],
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b++;
+//  loop sum[b],
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b--;
+//  loop sum[b],
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      ++b;
+//  loop sum[b],
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      --b;
+//  loop and[b],
+   for(i = 0; i <= 99; i += 1)
+//  call and[b],
+      b = b&&i==i;
+//  loop or[b],
+   for(i = 0; i <= 99; i += 1)
+//  call or[b],
+      b = b||i==i;
+
+   return 0;
+}

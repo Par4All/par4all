@@ -1,0 +1,22 @@
+delete warning01
+create warning01 warning01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[warning01]
+
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[warning01]
+
+close
+#delete warning01
+quit

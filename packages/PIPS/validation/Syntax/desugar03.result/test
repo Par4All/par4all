@@ -1,0 +1,18 @@
+      SUBROUTINE DESUGAR03(X, Y, *, *)
+
+C     Check desugaring of labelled DO loops with a forward reference
+
+      READ *, I                                                         0005
+
+      IF (I.LT.0) THEN                                                  0007
+      ENDIF
+400   CONTINUE
+
+c     labelled loop
+      DO 500 I = 1, N                                                   0010
+         PRINT *, I                                                     0011
+500      CONTINUE                                                       0012
+
+      I_PIPS_RETURN_CODE_ = 0                                           0014
+      END
+

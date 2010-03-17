@@ -1,0 +1,50 @@
+
+C  P() {}
+
+      PROGRAM PRECPREC
+
+C  P() {}
+
+C     Check that preconditions are properly evaluated after a
+C     partial evaluation
+
+      I = 2                                                             0005
+
+C  P(I) {I==2}
+
+      READ *, J                                                         0006
+
+C  P(I,J) {I==2}
+
+      CALL ASSIGN(I*J, K)                                               0007
+
+C  P(I,J,K) {I==2}
+
+      PRINT *, K                                                        0008
+
+      END
+
+C  P() {}
+
+      PROGRAM PRECPREC
+
+C  P() {}
+
+C     Check that preconditions are properly evaluated after a
+C     partial evaluation
+
+      I = 2                                                             0005
+
+C  P(I) {I==2}
+
+      READ *, J                                                         0006
+
+C  P(I,J) {I==2}
+
+      CALL ASSIGN(2*J, K)                                               0007
+
+C  P(I,J,K) {I==2, 2J==K}
+
+      PRINT *, K                                                        0008
+
+      END

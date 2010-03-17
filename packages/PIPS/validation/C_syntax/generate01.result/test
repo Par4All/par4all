@@ -1,0 +1,51 @@
+
+Parsed printed file
+
+void generate01()
+{
+   int i = 0;
+   double x = 1.;
+   
+   // use an undeclared function without source code, which returns
+   // implictly an int
+   func(i, x);
+}
+
+Printed file
+
+void generate01()
+{
+   int i = 0;
+   double x = 1.;
+   
+   // use an undeclared function without source code, which returns
+   // implictly an int
+   func(i, x);
+}
+
+Printed file generate01 with intraprocedural preconditions
+
+
+//  P() {}
+
+void generate01()
+{
+   int i = 0;
+   double x = 1.;
+
+//  P() {i==0}
+
+   
+   // use an undeclared function without source code, which returns
+   // implictly an int
+   func(i, x);
+}
+
+Printed file func with intraprocedural preconditions
+
+
+//  P() {}
+
+int func(int f1, double f2)
+{
+}

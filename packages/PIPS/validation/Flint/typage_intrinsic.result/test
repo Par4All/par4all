@@ -1,0 +1,261 @@
+C     This program is written for testing module TYPING
+C
+C
+      PROGRAM TYPAGE_INTRINSIC
+      LOGICAL L
+      INTEGER I
+      REAL*4 R
+      REAL*8 D
+      COMPLEX*8 C
+      COMPLEX*16 E
+      CHARACTER CH
+
+C     Conversion intrinsics
+C     =====================
+      I = INT(R)                                                        0001
+      I = INT(D)                                                        0002
+      I = INT(C)                                                        0003
+! ERROR
+!ERROR: #1 argument of 'INT' must be INT, REAL, DOUBLE, COMPLEX,  but not CHARACTER*1
+      I = INT(CH)                                                       0004
+! ERROR
+!ERROR: #1 argument of 'INT' must be INT, REAL, DOUBLE, COMPLEX,  but not LOGICAL*4
+      I = INT(L)                                                        0005
+
+      R = REAL(I)                                                       0006
+      R = REAL(D)                                                       0007
+      R = REAL(C)                                                       0008
+! ERROR
+!ERROR: #1 argument of 'REAL' must be INT, REAL, DOUBLE, COMPLEX,  but not CHARACTER*1
+      R = REAL(CH)                                                      0009
+! ERROR
+!ERROR: #1 argument of 'REAL' must be INT, REAL, DOUBLE, COMPLEX,  but not LOGICAL*4
+      R = REAL(L)                                                       0010
+
+      D = DBLE(I)                                                       0011
+      D = DBLE(R)                                                       0012
+      D = DBLE(C)                                                       0013
+! ERROR
+!ERROR: #1 argument of 'DBLE' must be INT, REAL, DOUBLE, COMPLEX,  but not CHARACTER*1
+      D = DBLE(CH)                                                      0014
+! ERROR
+!ERROR: #1 argument of 'DBLE' must be INT, REAL, DOUBLE, COMPLEX,  but not LOGICAL*4
+      D = DBLE(L)                                                       0015
+
+      C = CMPLX(REAL(I), 0.0E0)                                         0016
+      C = CMPLX(R, 0.0E0)                                               0017
+      C = CMPLX(REAL(D), 0.0E0)                                         0018
+! ERROR
+!ERROR: #1 argument of 'CMPLX' must be INT, REAL, DOUBLE, COMPLEX,  but not CHARACTER*1
+      C = CMPLX(CMPLX(CH, 0.0E0))                                       0019
+! ERROR
+!ERROR: #1 argument of 'CMPLX' must be INT, REAL, DOUBLE, COMPLEX,  but not LOGICAL*4
+      C = CMPLX(CMPLX(L, 0.0E0))                                        0020
+
+C     Argument & Result: REAL or DOUBLE
+C     ========================
+! ERROR
+!ERROR: #1 argument of 'TAN' must be REAL, DOUBLE,  but not INTEGER*4
+      I = INT(TAN(I))                                                   0021
+      R = TAN(R)                                                        0022
+      D = DTAN(D)                                                       0023
+! ERROR
+!ERROR: #1 argument of 'TAN' must be REAL, DOUBLE,  but not COMPLEX*8
+      I = INT(TAN(C))                                                   0024
+! ERROR
+!ERROR: #1 argument of 'TAN' must be REAL, DOUBLE,  but not LOGICAL*4
+      I = INT(TAN(L))                                                   0025
+
+C     Argument & Result: REAL, DOUBLE or COMPLEX
+C     =================================
+! ERROR
+!ERROR: #1 argument of 'EXP' must be REAL, DOUBLE, COMPLEX,  but not INTEGER*4
+      I = INT(EXP(I))                                                   0026
+      R = EXP(R)                                                        0027
+      D = DEXP(D)                                                       0028
+      C = CEXP(C)                                                       0029
+! ERROR
+!ERROR: #1 argument of 'EXP' must be REAL, DOUBLE, COMPLEX,  but not LOGICAL*4
+      I = INT(EXP(L))                                                   0030
+
+! ERROR
+!ERROR: #1 argument of 'LOG' must be REAL, DOUBLE, COMPLEX,  but not INTEGER*4
+      I = INT(LOG(I))                                                   0031
+      R = ALOG(R)                                                       0032
+      D = DLOG(D)                                                       0033
+      C = CLOG(C)                                                       0034
+! ERROR
+!ERROR: #1 argument of 'LOG' must be REAL, DOUBLE, COMPLEX,  but not LOGICAL*4
+      I = INT(LOG(L))                                                   0035
+
+C     Argument & Result: INT, REAL or DOUBLE
+C     =============================
+      I = MIN0(I, 15, I)                                                0036
+      R = AMIN1(REAL(I), 15.0E0, R)                                     0037
+      D = DMIN1(DBLE(I), 15.0D0, D)                                     0038
+! ERROR
+!ERROR: #3 argument of 'MIN' must be INT, REAL, DOUBLE,  but not COMPLEX*8
+      C = CMPLX(MIN0(I, 15, C))                                         0039
+! ERROR
+!ERROR: #3 argument of 'MIN' must be INT, REAL, DOUBLE,  but not LOGICAL*4
+      I = INT(MIN0(I, 15, L))                                           0040
+
+      I = MOD(I, I)                                                     0041
+      R = AMOD(R, R)                                                    0042
+      D = DMOD(D, D)                                                    0043
+      I = INT(DMOD(DBLE(R), D))                                         0044
+! ERROR
+!ERROR: #1 argument of 'MOD' must be INT, REAL, DOUBLE,  but not COMPLEX*8
+!ERROR: #2 argument of 'MOD' must be INT, REAL, DOUBLE,  but not COMPLEX*8
+      C = CMPLX(MOD(C, C))                                              0045
+
+C     Intrinsic ABS: IRDC -> IRDR
+C     ===========================
+      I = IABS(I)                                                       0046
+      R = ABS(R)                                                        0047
+      D = DABS(D)                                                       0048
+      R = CABS(C)                                                       0049
+      C = CMPLX(CABS(C))                                                0050
+! ERROR
+!ERROR: #1 argument of 'ABS' must be INT, REAL, DOUBLE, COMPLEX,  but not LOGICAL*4
+      I = INT(ABS(L))                                                   0051
+
+C     Type_argument --> Type_result
+C     ===================================
+C     INT  ->  INT
+      I = IABS(I)                                                       0052
+! ERROR
+!ERROR: Invalid argument(s) to 'IABS'!
+      I = IABS(R)                                                       0053
+! ERROR
+!ERROR: Invalid argument(s) to 'IABS'!
+      I = IABS(D)                                                       0054
+! ERROR
+!ERROR: Invalid argument(s) to 'IABS'!
+      I = IABS(C)                                                       0055
+
+C     REAL -> REAL
+! ERROR
+!ERROR: Invalid argument(s) to 'ALOG'!
+      R = ALOG(I)                                                       0056
+      R = ALOG(R)                                                       0057
+! ERROR
+!ERROR: Invalid argument(s) to 'ALOG'!
+      R = ALOG(D)                                                       0058
+! ERROR
+!ERROR: Invalid argument(s) to 'ALOG'!
+      R = ALOG(C)                                                       0059
+
+C     DOUBLE -> DOUBLE
+! ERROR
+!ERROR: Invalid argument(s) to 'DLOG'!
+      D = DLOG(I)                                                       0060
+! ERROR
+!ERROR: Invalid argument(s) to 'DLOG'!
+      D = DLOG(R)                                                       0061
+      D = DLOG(D)                                                       0062
+! ERROR
+!ERROR: Invalid argument(s) to 'DLOG'!
+      D = DLOG(C)                                                       0063
+
+C     COMPLEX -> COMPLEX 
+! ERROR
+!ERROR: Invalid argument(s) to 'CLOG'!
+      C = CLOG(I)                                                       0064
+! ERROR
+!ERROR: Invalid argument(s) to 'CLOG'!
+      C = CLOG(R)                                                       0065
+! ERROR
+!ERROR: Invalid argument(s) to 'CLOG'!
+      C = CLOG(D)                                                       0066
+      C = CLOG(C)                                                       0067
+
+C     CHAR -> INT
+      I = ICHAR(CH)                                                     0068
+! ERROR
+!ERROR: #1 argument of 'ICHAR' must be CHARACTER,  but not REAL*4
+!ERROR: Invalid argument(s) to 'ICHAR'!
+      D = DBLE(ICHAR(R))                                                0069
+
+      I = LEN(CH)                                                       0070
+! ERROR
+!ERROR: #1 argument of 'LEN' must be CHARACTER,  but not REAL*4
+!ERROR: Invalid argument(s) to 'LEN'!
+      I = LEN(R)                                                        0071
+
+      I = INDEX(CH)                                                     0072
+! ERROR
+!ERROR: #1 argument of 'INDEX' must be CHARACTER,  but not REAL*4
+!ERROR: Invalid argument(s) to 'INDEX'!
+      I = INDEX(R)                                                      0073
+
+C     INT      ->   CHAR
+      CH = CHAR(I)                                                      0074
+! ERROR
+!ERROR: Invalid argument(s) to 'CHAR'!
+      CH = CHAR(D)                                                      0075
+
+C     REAL     ->   INT
+! ERROR
+!ERROR: Invalid argument(s) to 'MIN1'!
+      I = MIN1(I, I)                                                    0076
+      I = MIN1(R, R)                                                    0077
+! ERROR
+!ERROR: Invalid argument(s) to 'MIN1'!
+      I = MIN1(I, R)                                                    0078
+! ERROR
+!ERROR: Invalid argument(s) to 'MIN1'!
+      I = MIN1(I, R, D)                                                 0079
+! ERROR
+!ERROR: Invalid argument(s) to 'MIN1'!
+      I = MIN1(I, R, D, C)                                              0080
+
+C     COMPLEX  ->   REAL
+! ERROR
+!ERROR: Invalid argument(s) to 'AIMAG'!
+      R = AIMAG(I)                                                      0081
+! ERROR
+!ERROR: Invalid argument(s) to 'AIMAG'!
+      R = AIMAG(R)                                                      0082
+! ERROR
+!ERROR: Invalid argument(s) to 'AIMAG'!
+      R = AIMAG(D)                                                      0083
+      R = AIMAG(C)                                                      0084
+
+C     REAL     ->   DOUBLE
+! ERROR
+!ERROR: Invalid argument(s) to 'DPROD'!
+      D = DPROD(I)                                                      0085
+      D = DPROD(R)                                                      0086
+! ERROR
+!ERROR: Invalid argument(s) to 'DPROD'!
+      D = DPROD(D)                                                      0087
+! ERROR
+!ERROR: Invalid argument(s) to 'DPROD'!
+      D = DPROD(C)                                                      0088
+
+C     INT      ->   REAL
+      R = AMIN0(I, I)                                                   0089
+! ERROR
+!ERROR: Invalid argument(s) to 'AMIN0'!
+      R = AMIN0(I, R)                                                   0090
+! ERROR
+!ERROR: Invalid argument(s) to 'AMIN0'!
+      R = AMIN0(R, D)                                                   0091
+! ERROR
+!ERROR: Invalid argument(s) to 'AMIN0'!
+      R = AMIN0(D, C)                                                   0092
+
+C     CHAR     ->   LOGICAL
+! ERROR
+!ERROR: #1 argument of 'LGE' must be CHARACTER,  but not INTEGER*4
+!ERROR: Invalid argument(s) to 'LGE'!
+      L = LGE(I, CH)                                                    0093
+! ERROR
+!ERROR: #1 argument of 'LGE' must be CHARACTER,  but not REAL*4
+!ERROR: Invalid argument(s) to 'LGE'!
+      L = LGE(R, CH)                                                    0094
+      L = LGE(CH, CH)                                                   0095
+
+      END
+

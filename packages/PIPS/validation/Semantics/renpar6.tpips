@@ -1,0 +1,105 @@
+#
+# renpar6.f: contrived example that shows the power of IN and OUT regions
+#            and the impact of modified integer scalar variables on regions.
+#
+
+delete renpar6
+
+#
+# 1- Create the Workspace
+#
+create renpar6 renpar6.f
+
+##########################################################################
+# select a specific fix-point operator to debug it                       #
+##########################################################################
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#
+# 1- Show RENPAR6
+#
+# The purpose is to see that array WORK is only a temporary and can be 
+# privatized.
+# Notice that the value of K is unknown on entry to the I loop, and that
+# its value is modified by a call to INC1 in each iteration (INC1 simply
+# increments its value by 1).
+#
+module RENPAR6
+activate PRINT_CODE
+display PRINTED_FILE
+
+#
+# 2- Show its transformers
+#
+# We are interested in the sets of array elements that are referenced in each
+# iteration. However, since the value of K is not the same in the two written
+# references, we cannot summarize the write accesses if we do not know the 
+# relation that exists between tha two values of K. This is achieved in PIPS
+# by the transformers. Here we see how the new value of K is related to
+# the value before the CALL. And the transformer of the loop shows
+# how the value of K at each step is related to the value of I.
+#
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+
+#
+# 3- Show its regions
+#
+#  This previous information is used to summarize the sets of elements that are 
+#  read or written by each program structure. In order to compute the summary
+#  for the I loop, we must merge the sets for the two J loops. Be careful that
+#  the value of K is not the same for these two loops. We must use the transformer
+#  of the CALL to translate the value of K in the second region into the value
+#  of K before the CALL. At this step, we have a summary of what is done by
+#  a single iteration. We then compute the regions for the whole I loop. This is
+#  done with the help of the transformer of the loop that gives the relation
+#  between K and I. 
+#
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+#
+# 4- Show its IN and OUT regions
+# 
+#  However, READ and WRITE reigons are not sufficient for array privatization,
+#  because we must verify that every element of WORK that is read by an iteration
+#  is previously written in the same iteration. This is achieved by the IN region.
+#  Then OUT regions allows us to verify that no element of WORK is used in the
+#  subsequent iterations or in the continuation of the loop.
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+
+#
+# 5- Array privatization and Parallelization
+#
+
+apply ARRAY_PRIVATIZER
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+
+
+#
+# 6- after hand induction variable substitution
+#
+
+module RENPAR6_2
+
+activate PRINT_CODE
+display PRINTED_FILE
+apply ARRAY_PRIVATIZER
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+
+close
+delete renpar6
+quit

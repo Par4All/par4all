@@ -1,0 +1,199 @@
+
+Parsed code for "call05"
+
+void call05(int r, int m, int *x)
+{
+   int j;
+
+   for (j = 0;j<m;j++)
+      x[j] = 10*r+j;
+}
+
+Code for "call05"
+
+void call05(int r, int m, int *x)
+{
+   int j;
+
+   for(j = 0; j <= m-1; j += 1)
+      x[j] = 10*r+j;
+}
+
+Proper effects for "call05"
+
+void call05(int r, int m, int *x)
+{
+   int j;
+//               <must be read   >: m
+//               <must be written>: j
+
+   for(j = 0; j <= m-1; j += 1)
+//               <must be read   >: j m r x
+//               <must be written>: x[j]
+      x[j] = 10*r+j;
+}
+
+Cumulated effects for "call05"
+
+//               <may be read    >: r x
+//               <may be written >: x[*]
+//               <must be read   >: m
+void call05(int r, int m, int *x)
+{
+   int j;
+//               <may be read    >: j r x
+//               <may be written >: x[*]
+//               <must be read   >: m
+//               <must be written>: j
+
+   for(j = 0; j <= m-1; j += 1)
+//               <may be written >: x[*]
+//               <must be read   >: j m r x
+      x[j] = 10*r+j;
+}
+
+Proper effects for "main"
+
+main()
+{
+   int d1 = 4;
+   int d2 = 4;
+   int y[d1][d2];
+   int i,  j;
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//               <may be written >: y[i][*]
+//               <must be read   >: d1 d2 i
+      call05(i, d2, y[i]);
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1) {
+//               <must be read   >: d1 d2
+//               <must be written>: j
+      for(j = 0; j <= d2-1; j += 1)
+//               <must be read   >: __IO_EFFECTS:LUNS[1] d1 d2 i j 
+//                                  y[i][j]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+//               <must be read   >: __IO_EFFECTS:LUNS[1] d1
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\n");
+   }
+}
+
+Cumulated effects for "main"
+
+//               <may be read    >: __IO_EFFECTS:LUNS[1]
+//               <may be written >: __IO_EFFECTS:LUNS[1]
+main()
+{
+   int d1 = 4;
+   int d2 = 4;
+   int y[d1][d2];
+   int i,  j;
+//               <may be read    >: d2 i
+//               <may be written >: y[*][*]
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//               <may be written >: y[*][*]
+//               <must be read   >: d1 d2 i
+      call05(i, d2, y[i]);
+//               <may be read    >: __IO_EFFECTS:LUNS[1] d2 i j 
+//                                  y[*][*]
+//               <may be written >: __IO_EFFECTS:LUNS[1] j
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1) {
+//               <may be read    >: __IO_EFFECTS:LUNS[1] i j y[*][*]
+//               <may be written >: __IO_EFFECTS:LUNS[1]
+//               <must be read   >: d1 d2
+//               <must be written>: j
+      for(j = 0; j <= d2-1; j += 1)
+//               <may be read    >: y[*][*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1] d1 d2 i j
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+//               <must be read   >: __IO_EFFECTS:LUNS[1] d1
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\n");
+   }
+}
+
+Regions for "call05"
+
+
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=m}>
+
+void call05(int r, int m, int *x)
+{
+   int j;
+
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=m}>
+
+
+   for(j = 0; j <= m-1; j += 1)
+
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{PHI1==j, 0<=j, 1+j<=m}>
+
+      x[j] = 10*r+j;
+}
+
+Regions for "main"
+
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+main()
+{
+   int d1 = 4;
+   int d2 = 4;
+   int y[d1][d2];
+   int i,  j;
+
+//  <y[PHI1][PHI2]-W-EXACT-{0<=PHI2, PHI2+1<=d2}>
+
+
+   for(i = 0; i <= d1-1; i += 1)
+
+//  <y[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=d2}>
+
+      call05(i, d2, y[i]);
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <y[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3, d1==4,
+//    d2==4}>
+
+
+   for(i = 0; i <= d1-1; i += 1) {
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <y[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=3, d1==4, d2==4,
+//    0<=i, i<=3}>
+
+      for(j = 0; j <= d2-1; j += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <y[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, d1==4, d2==4, 0<=i,
+//    i<=3, 0<=j, j<=3}>
+
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      printf("\n");
+   }
+}

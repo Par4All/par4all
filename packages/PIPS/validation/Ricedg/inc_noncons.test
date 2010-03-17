@@ -1,0 +1,16 @@
+if Init -d -f inc_noncons.f inc_noncons>&2
+then
+	Select -w inc_noncons rfulldg>&2
+	if Display -m inc
+	then
+		Delete inc_noncons>&2
+	else
+		echo Parallelization faileds
+		Delete inc_noncons>&2
+		exit 2
+	fi
+else 
+    	echo Parallelization failed
+	Delete inc_noncons>&2
+	exit 1
+fi

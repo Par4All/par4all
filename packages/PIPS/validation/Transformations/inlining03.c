@@ -1,0 +1,15 @@
+#include<stdio.h>
+static int pmax(int a, int b)
+{
+    int c =a > b ? a : b;
+    printf("%d\n",c);
+    return c;
+}
+
+int main(int argc, char **argv)
+{
+    int c ;
+    c = pmax(2,argc);
+    return 0;
+}
+

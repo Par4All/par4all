@@ -1,0 +1,11 @@
+delete cgoto03
+create cgoto03 cgoto03.f
+module CGOTO03
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[CGOTO03]
+display PRINTED_FILE[INCR]
+close
+delete cgoto03
+quit

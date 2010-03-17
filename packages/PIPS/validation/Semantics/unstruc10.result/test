@@ -1,0 +1,259 @@
+      PROGRAM UNSTRUC10
+
+C     Check behavior with subcycles (cycles are sure)
+
+      REAL A(100, 100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      READ *, N                                                         0007
+C (0,3)
+
+      IF (N.LT.2) THEN                                                  0009
+C (0,4)
+         STOP                                                           0009
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+
+      I = 1                                                             0011
+C (0,7)
+      J = 1                                                             0012
+C (0,8)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+
+100   I = I+1                                                           0014
+C (2,1)
+C     BEGIN BLOCK
+C (2,2)
+
+200   J = J+1                                                           0016
+C (2,3)
+
+      A(I,J) = 0.                                                       0018
+C     END BLOCK
+C (3,1)
+
+      IF (I.LT.N) GOTO 100                                              0020
+C (4,1)
+      IF (J.LT.N) GOTO 200                                              0021
+C     END UNSTRUCTURED
+C (0,9)
+      PRINT *, I, J, N                                                  0022
+C (0,10)
+
+      RETURN
+C     END BLOCK
+      END
+
+C  T() {}
+
+      PROGRAM UNSTRUC10
+
+C     Check behavior with subcycles (cycles are sure)
+
+      REAL A(100, 100)
+
+C  T(I,J,N) {2<=I, I<=J, N<=I, N<=J, 2<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(N) {}
+
+C (0,2)
+
+      READ *, N                                                         0007
+
+C  T() {2<=N}
+
+C (0,3)
+
+      IF (N.LT.2) THEN                                                  0009
+
+C  T() {0==-1}
+
+C (0,4)
+         STOP                                                           0009
+      ELSE
+
+C  T() {}
+
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  T(I) {I==1}
+
+C (0,6)
+
+      I = 1                                                             0011
+
+C  T(J) {J==1}
+
+C (0,7)
+      J = 1                                                             0012
+
+C  T(I,J) {I#init+1<=I, I+J#init<=I#init+J, N<=I, N<=J}
+
+C (0,8)
+C     BEGIN UNSTRUCTURED
+
+C  T(I) {I==I#init+1}
+
+C (1,1)
+
+100   I = I+1                                                           0014
+
+C  T(J) {J==J#init+1}
+
+C (2,1)
+C     BEGIN BLOCK
+
+C  T(J) {J==J#init+1}
+
+C (2,2)
+
+200   J = J+1                                                           0016
+
+C  T() {}
+
+C (2,3)
+
+      A(I,J) = 0.                                                       0018
+C     END BLOCK
+
+C  T() {}
+
+C (3,1)
+
+      IF (I.LT.N) GOTO 100                                              0020
+
+C  T() {}
+
+C (4,1)
+      IF (J.LT.N) GOTO 200                                              0021
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,9)
+      PRINT *, I, J, N                                                  0022
+
+C  T() {}
+
+C (0,10)
+
+      RETURN
+C     END BLOCK
+      END
+
+C  P() {}
+
+      PROGRAM UNSTRUC10
+
+C     Check behavior with subcycles (cycles are sure)
+
+      REAL A(100, 100)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      READ *, N                                                         0007
+
+C  P(N) {}
+
+C (0,3)
+
+      IF (N.LT.2) THEN                                                  0009
+
+C  P(N) {N<=1}
+
+C (0,4)
+         STOP                                                           0009
+      ELSE
+
+C  P(N) {2<=N}
+
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  P(N) {2<=N}
+
+C (0,6)
+
+      I = 1                                                             0011
+
+C  P(I,N) {I==1, 2<=N}
+
+C (0,7)
+      J = 1                                                             0012
+
+C  P(I,J,N) {I==1, J==1, 2<=N}
+
+C (0,8)
+C     BEGIN UNSTRUCTURED
+
+C  P(I,J,N) {1<=I, I<=J, I+1<=N}
+
+C (1,1)
+
+100   I = I+1                                                           0014
+
+C  P(I,J,N) {2<=I, I<=J+1, I<=N}
+
+C (2,1)
+C     BEGIN BLOCK
+
+C  P(I,J,N) {2<=I, I<=J+1, I<=N}
+
+C (2,2)
+
+200   J = J+1                                                           0016
+
+C  P(I,J,N) {2<=I, I<=J, I<=N}
+
+C (2,3)
+
+      A(I,J) = 0.                                                       0018
+C     END BLOCK
+
+C  P(I,J,N) {2<=I, I<=J, I<=N}
+
+C (3,1)
+
+      IF (I.LT.N) GOTO 100                                              0020
+
+C  P(I,J,N) {I==N, 2<=I, I<=J}
+
+C (4,1)
+      IF (J.LT.N) GOTO 200                                              0021
+C     END UNSTRUCTURED
+
+C  P(I,J,N) {I==N, 2<=I, I<=J}
+
+C (0,9)
+      PRINT *, I, J, N                                                  0022
+
+C  P(I,J,N) {I==N, 2<=I, I<=J}
+
+C (0,10)
+
+      RETURN
+C     END BLOCK
+      END
+

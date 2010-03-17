@@ -1,0 +1,14 @@
+
+delete trad
+create trad trad.f
+module TRAD
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE($ALL)
+close
+delete trad

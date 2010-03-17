@@ -1,0 +1,24 @@
+
+Printed file for array_declarators!
+
+/* This code is extracted from C ISO standard*/
+extern int n;
+extern int m;
+extern void fcompat(void);
+
+Unsplit array_declarators
+
+/*
+ * file for array_declarators.c
+ */
+/* This code is extracted from C ISO standard*/
+extern int n;
+extern int m;
+extern void fcompat(void);
+void fcompat(void)
+{
+   int a[n][6][m];
+   int (*p)[4][n+1];
+   int c[n][n][6][m];
+   int (*r)[n][n][n+1];
+}

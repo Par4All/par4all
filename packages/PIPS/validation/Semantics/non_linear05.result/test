@@ -1,0 +1,325 @@
+
+C  T(KSP) {}
+
+      SUBROUTINE NON_LINEAR05
+
+C     Excerpt from init in wave5_data.f
+
+      PARAMETER (NBB=512)
+      PARAMETER(NC1 = 78885)
+      PARAMETER (N1D=5000)
+
+      COMMON  PBUF(NBB,5),Q(NC1),TEMP(2*N1D),TBUF(5,NBB)
+
+      PARAMETER (NNS=25)
+      PARAMETER ( NNS1 = NNS + 1, NNS2 = NNS * 2 )
+
+      COMMON/PARAM/IT,NC,NB,NP,IMPSW,NRAND,KJSMTH,KQSMTH,
+     *    KEI,KEE,KSP,NPTIME,
+     *    NSP,NPX(NNS),NPY(NNS),NSPEC(NNS),IDNX(NNS1),IDNY(NNS1),
+     *    IBCNDL(NNS),IBCNDR(NNS),IBCNDT(NNS),IBCNDB(NNS),
+     *    LOADED(NNS),LOSTL(NNS),LOSTR(NNS),INJL(NNS),INJR(NNS)
+
+C  T(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, NX+2<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(NX1) {NX==NX1-1}
+
+C (0,2)
+
+      NX1 = NX+1                                                        0020
+
+C  T(NX2) {NX==NX2-2}
+
+C (0,3)
+      NX2 = NX+2                                                        0021
+
+C  T(NY1) {NY==NY1-1}
+
+C (0,4)
+      NY1 = NY+1                                                        0022
+
+C  T(NY2) {NY==NY2-2}
+
+C (0,5)
+      NY2 = NY+2                                                        0023
+
+C  T(NX2NY2) {}
+
+C (0,6)
+      NX2NY2 = NX2*NY2                                                  0024
+
+C  T(I,J,KSP,L) {2<=I}
+
+C (0,7)
+
+      DO 210 I = 2, NX1                                                 0026
+
+C  T(J,KSP,L) {2<=J, NY1+1<=J}
+
+C (0,8)
+C        BEGIN BLOCK
+
+C  T() {}
+
+C (0,9)
+         Q1 = 0.D0                                                      0027
+
+C  T(J,KSP,L) {2<=J}
+
+C (0,10)
+         DO 200 J = 2, NY1                                              0028
+
+C  T(KSP,L) {1<=KSP, KSP<=26, NSP+1<=KSP}
+
+C (0,11)
+C           BEGIN BLOCK
+
+C  T() {}
+
+C (0,12)
+            XX = (I-1.5D0)*HX                                           0029
+
+C  T() {}
+
+C (0,13)
+            YY = (J-1.5D0)*HY                                           0030
+
+C  T(L) {}
+
+C (0,14)
+            L = I+(J-1)*NX2                                             0031
+
+C  T(KSP) {1<=KSP}
+
+C (0,15)
+            DO 200 KSP = 1, NSP                                         0032
+
+C  T() {1<=KSP, KSP<=25, 1<=L, L<=78885}
+
+C (0,16)
+C              BEGIN BLOCK
+
+C  T() {1<=KSP, KSP<=25}
+
+C (0,17)
+c      TM=DENS(XX,YY)*DSIGN(1.0D0,QSPEC(KSP))
+               IF (NPX(KSP)*NPY(KSP).EQ.0) TM = 0.D0                    0034
+
+C  T() {1<=L, L<=78885}
+
+C (0,20)
+               Q(L) = Q(L)-TM                                           0035
+
+C  T() {}
+
+C (0,21)
+               Q1 = Q1+TM                                               0036
+
+C  T() {}
+
+C (0,22)
+200            CONTINUE                                                 0037
+C              END BLOCK
+C           END BLOCK
+
+C  T() {}
+
+C (0,23)
+         QAV = QAV-Q1                                                   0038
+
+C  T() {}
+
+C (0,24)
+210      CONTINUE                                                       0039
+C        END BLOCK
+
+C  T() {}
+
+C (0,25)
+      WRITE (9, 280) QAV                                                0040
+
+C  T() {}
+
+C (0,26)
+280   FORMAT(' NET CHARGE IN SYSTEM = ',E15.5)                          0041
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR05
+
+C     Excerpt from init in wave5_data.f
+
+      PARAMETER (NBB=512)
+      PARAMETER(NC1 = 78885)
+      PARAMETER (N1D=5000)
+
+      COMMON  PBUF(NBB,5),Q(NC1),TEMP(2*N1D),TBUF(5,NBB)
+
+      PARAMETER (NNS=25)
+      PARAMETER ( NNS1 = NNS + 1, NNS2 = NNS * 2 )
+
+      COMMON/PARAM/IT,NC,NB,NP,IMPSW,NRAND,KJSMTH,KQSMTH,
+     *    KEI,KEE,KSP,NPTIME,
+     *    NSP,NPX(NNS),NPY(NNS),NSPEC(NNS),IDNX(NNS1),IDNY(NNS1),
+     *    IBCNDL(NNS),IBCNDR(NNS),IBCNDT(NNS),IBCNDB(NNS),
+     *    LOADED(NNS),LOSTL(NNS),LOSTR(NNS),INJL(NNS),INJR(NNS)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      NX1 = NX+1                                                        0020
+
+C  P(NX1) {NX==NX1-1}
+
+C (0,3)
+      NX2 = NX+2                                                        0021
+
+C  P(NX1,NX2) {NX==NX1-1, NX==NX2-2}
+
+C (0,4)
+      NY1 = NY+1                                                        0022
+
+C  P(NX1,NX2,NY1) {NX==NX1-1, NX==NX2-2, NY==NY1-1}
+
+C (0,5)
+      NY2 = NY+2                                                        0023
+
+C  P(NX1,NX2,NY1,NY2) {NX==NX1-1, NX==NX2-2, NY==NY1-1, NY==NY2-2}
+
+C (0,6)
+      NX2NY2 = NX2*NY2                                                  0024
+
+C  P(NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2, NY==NY1-1,
+C    NY==NY2-2}
+
+C (0,7)
+
+      DO 210 I = 2, NX1                                                 0026
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1}
+
+C (0,8)
+C        BEGIN BLOCK
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1}
+
+C (0,9)
+         Q1 = 0.D0                                                      0027
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1}
+
+C (0,10)
+         DO 200 J = 2, NY1                                              0028
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1}
+
+C (0,11)
+C           BEGIN BLOCK
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1}
+
+C (0,12)
+            XX = (I-1.5D0)*HX                                           0029
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1}
+
+C (0,13)
+            YY = (J-1.5D0)*HY                                           0030
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1}
+
+C (0,14)
+            L = I+(J-1)*NX2                                             0031
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1}
+
+C (0,15)
+            DO 200 KSP = 1, NSP                                         0032
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1, 1<=KSP,
+C    KSP<=NSP}
+
+C (0,16)
+C              BEGIN BLOCK
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1, 1<=KSP,
+C    KSP<=25, KSP<=NSP}
+
+C (0,17)
+c      TM=DENS(XX,YY)*DSIGN(1.0D0,QSPEC(KSP))
+               IF (NPX(KSP)*NPY(KSP).EQ.0) TM = 0.D0                    0034
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1, 1<=KSP,
+C    KSP<=25, KSP<=NSP, 1<=L, L<=78885}
+
+C (0,20)
+               Q(L) = Q(L)-TM                                           0035
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1, 1<=KSP,
+C    KSP<=25, KSP<=NSP, 1<=L, L<=78885}
+
+C (0,21)
+               Q1 = Q1+TM                                               0036
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, J<=NY+1, 1<=KSP,
+C    KSP<=25, KSP<=NSP, 1<=L, L<=78885}
+
+C (0,22)
+200            CONTINUE                                                 0037
+C              END BLOCK
+C           END BLOCK
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, NY+2<=J}
+
+C (0,23)
+         QAV = QAV-Q1                                                   0038
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, I<=NX+1, 2<=J, NY+2<=J}
+
+C (0,24)
+210      CONTINUE                                                       0039
+C        END BLOCK
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, NX+2<=I}
+
+C (0,25)
+      WRITE (9, 280) QAV                                                0040
+
+C  P(I,J,KSP,L,NX1,NX2,NX2NY2,NY1,NY2) {NX==NX1-1, NX==NX2-2,
+C    NY==NY1-1, NY==NY2-2, 2<=I, NX+2<=I}
+
+C (0,26)
+280   FORMAT(' NET CHARGE IN SYSTEM = ',E15.5)                          0041
+
+C     END BLOCK
+      END
+

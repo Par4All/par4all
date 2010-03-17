@@ -1,0 +1,92 @@
+Transform all the control flow in one finite state machine:
+int dep(int a[100],int b[100],int c[100],int d[100])
+{
+   int i;
+   int j;
+   int k;
+   int FSM3_STATE;
+   i = 0;
+   FSM3_STATE = 1;
+   while (FSM3_STATE!=0) 
+      if (FSM3_STATE==1)
+         if (i<100) {
+            ;
+            FSM3_STATE = 2;
+         }
+         else {
+            ;
+            FSM3_STATE = 3;
+         }
+      else if (FSM3_STATE==2) {
+         a[i] = d[i];
+         c[i] = a[i-1]+1;
+         i++;
+         FSM3_STATE = 1;
+      }
+      else if (FSM3_STATE==3) {
+         //END_FPGA_dep_to_export
+         return 0;
+         FSM3_STATE = 0;
+      }
+}
+int main(int argc,char *args)
+{
+   int a[100];
+   int b[100];
+   int c[100];
+   int d[100];
+
+   dep(a, b, c, d);
+   
+   
+
+   return 0;
+}
+For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
+/* SMALLTALK pretty print for module dep. */
+dep with:a with:b with:c with:d 
+"Automatically generated with PIPS"
+
+"0`i,int "
+"0`j,int "
+"0`k,int "
+"FSM3_STATE,int "
+
+|0`i 0`j 0`k FSM3_STATE |
+
+
+
+0`i := 0.
+FSM3_STATE := 1.
+[FSM3_STATE != 0] whileTrue: [
+(FSM3_STATE == 1)
+ifTrue: [
+(0`i < 100)
+ifTrue: [
+FSM3_STATE := 2.
+]
+ifFalse: [
+FSM3_STATE := 3.
+].
+]
+ifFalse: [
+(FSM3_STATE == 2)
+ifTrue: [
+a at: 0`i-0 put: (d at: 0`i-0).
+c at: 0`i-0 put: ((a at: (0`i - 1-0)) + 1).
+0`i ++.
+FSM3_STATE := 1.
+]
+ifFalse: [
+(FSM3_STATE == 3)
+ifTrue: [
+^ result.
+FSM3_STATE := 0.
+]
+ifFalse: [
+].
+].
+].
+].
+
+

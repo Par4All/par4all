@@ -1,0 +1,22 @@
+delete bool01
+create bool01 bool01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[bool01]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[bool01]
+
+close
+#delete bool01
+quit

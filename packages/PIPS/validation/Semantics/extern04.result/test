@@ -1,0 +1,67 @@
+
+Cumulated effects for "main"
+
+//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
+main()
+{
+//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2 i
+//               <must be written>: i
+   // BEGIN BLOCK
+   int i = 0;
+//               <must be read   >: TOP-LEVEL:delta i
+//               <must be written>: i
+
+   i = i+delta;
+//               <must be read   >: TOP-LEVEL:delta2 i
+//               <must be written>: i
+   i = i+delta2;
+   // END BLOCK
+}
+
+Transformers for "main"
+
+
+//  T() {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4}
+
+main()
+{
+
+//  T() {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4}
+
+   // BEGIN BLOCK
+   int i = 0;
+
+//  T(i) {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4, i==2, i#init==0}
+
+
+   i = i+delta;
+
+//  T(i) {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4, i==6, i#init==2}
+
+   i = i+delta2;
+   // END BLOCK
+}
+
+Preconditions for "main"
+
+
+//  P() {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4}
+
+main()
+{
+
+//  P() {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4}
+
+   // BEGIN BLOCK
+   int i = 0;
+
+//  P() {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4, i==0}
+
+
+   i = i+delta;
+
+//  P(i) {TOP-LEVEL:delta==2, TOP-LEVEL:delta2==4, i==2}
+
+   i = i+delta2;
+   // END BLOCK
+}

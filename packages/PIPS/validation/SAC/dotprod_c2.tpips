@@ -1,0 +1,38 @@
+delete DOTPROD_C
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create DOTPROD_C kernels/DOTPROD/DOTPROD2.c include/SIMD.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[dotprod]
+
+apply INLINING[inner_loop]
+
+echo
+echo After Inlining
+echo
+
+display PRINTED_FILE[dotprod]
+
+source include/benchmark.tpips.h
+
+
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE[dotprod]
+
+close
+quit

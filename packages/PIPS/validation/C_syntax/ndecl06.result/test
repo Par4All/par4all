@@ -1,0 +1,11 @@
+
+Parsed printed file
+
+void ndecl06(char *dir)
+{
+   /* Well, this is a struct called m */
+   struct m {                                                           /*0008*/
+      int a;
+      float b;
+   };
+}

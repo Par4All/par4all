@@ -1,0 +1,25 @@
+
+Module ENTRY0
+
+      SUBROUTINE ENTRY02(X, N)
+      INTEGER N
+      COMPLEX*8 X(1:N)
+
+      PRINT *, X(1)                                                     0009
+
+
+      END
+
+Module INCREMENT
+
+      SUBROUTINE INCREMENT(Y, M)
+      INTEGER M
+      CHARACTER Y(1:M)
+
+99999 CONTINUE                                                          0005
+
+      PRINT *, Y(2)                                                     0007
+
+      M = M+1                                                           0009
+
+      END

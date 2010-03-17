@@ -1,0 +1,30 @@
+delete complex02
+create complex02 complex02.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Symbole table
+echo
+
+display SYMBOL_TABLE_FILE[complex02]
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[complex02]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[complex02]
+
+close
+#delete complex02
+quit

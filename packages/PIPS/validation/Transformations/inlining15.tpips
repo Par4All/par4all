@@ -1,0 +1,46 @@
+delete inlining15
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining15 inlining15.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Because %ALL is modified by code synthesis, let's get ready
+echo
+
+display CALLGRAPH_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -c inlining15.database/Src/inlining15.c
+shell rm inlining15.o
+
+close
+delete inlining15
+quit
+

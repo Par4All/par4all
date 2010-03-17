@@ -1,0 +1,56 @@
+#
+# $Id: tpips_shell.tpips,v 1.1 1997/12/13 10:35:49 coelho Exp irigoin $
+#
+# Check tpips as a shell. FC.
+#
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# turn it on.
+setproperty TPIPS_IS_A_SHELL TRUE
+
+#
+# 1 - variable and file substitutions
+#
+
+echo ## phase 1
+
+delete tps
+create tps tpips_shell.src/*.f
+
+# $ALL does not trigger the shell substitution... {} must be used.
+display PRINTED_FILE($ALL)
+
+# some shell commands
+echo ## ls...
+cd tps.database
+ls -F
+cd ..
+
+close
+# quit
+delete tps
+
+#
+# 2 - command and file substitution
+#
+
+echo ## phase 2
+
+# the link creates a simpler path where tpips is running.
+ln -s tpips_shell.src src_tmp
+
+# now filters out foo.f
+create tps `echo src_tmp/*.f | \
+		sed 's,src_tmp/foo.f,,'`
+
+# there should be only BLA there.
+display PRINTED_FILE($ALL)
+
+close
+rm src_tmp
+delete tps
+
+echo ## done
+
+quit

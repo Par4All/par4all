@@ -1,0 +1,33 @@
+      program transp10
+      INTEGER SIZE
+      PARAMETER (SIZE=10)
+      integer m(size,size)
+      
+      do 101 i = 1, size
+         do 201 j = i+1, size
+            m(i,j) = 2
+ 201        continue
+ 101        continue
+
+      do 102 i = 1, size
+         do 202 j = i, i
+            m(i,j) = 0
+ 202     continue
+ 102  continue
+
+  
+      do 103 i = 1, size
+         do 203 j = 1, i-1
+            m(i,j) = 1
+ 203     continue
+ 103  continue
+
+      do 100 i = 1, size
+         do 200 j = i+1, size
+            t = m(i,j)
+            m(i,j) = m(j,i)
+            m(j,i) = t
+ 200     continue
+ 100  continue
+
+      end

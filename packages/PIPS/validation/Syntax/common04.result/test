@@ -1,0 +1,194 @@
+user warning in tp_parse: common04: No such workspace
+Registering file common04.f
+Splitting file    ./common04.f
+  Module         BAR
+  Module         FOO
+  Module         COMMON04
+Workspace common04 created and opened.
+Main module PROGRAM "COMMON04" selected.
+Module COMMON04 selected
+Module COMMON04 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module BAR selected
+Module BAR already active.
+Request: build resource PRINTED_FILE for module BAR.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(BAR)
+  PARSER                         building   PARSED_CODE(BAR)
+                                 building   CALLEES(BAR)
+
+Declarations for module BAR with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity BAR:*DYNAMIC*	with type area with size 0
+Declared entity BAR:*HEAP*	with type area with size 0
+Declared entity BAR:*STACK*	with type area with size 0
+Declared entity BAR:*STATIC*	with type area with size 0
+Declared entity BAR:Z	with type variable REAL*4
+Declared entity TOP-LEVEL:~FOOFOO	with type area with size 4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOOFOO/ of size 4:
+	Variable BAR:Z,	offset = 0,	size = 4
+
+End of declarations for module BAR
+
+  CONTROLIZER                    building   CODE(BAR)
+  PRINT_CODE                     building   PRINTED_FILE(BAR)
+PRINTED_FILE made for BAR.
+
+      SUBROUTINE BAR
+
+      COMMON /FOOFOO/ Z
+
+      Z = 3.                                                            0006
+
+      END
+Module COMMON04 selected
+Module COMMON04 already active.
+Request: build resource PRINTED_FILE for module COMMON04.
+  FILTER_FILE                    building   SOURCE_FILE(COMMON04)
+  PARSER                         building   PARSED_CODE(COMMON04)
+                                 building   CALLEES(COMMON04)
+
+Declarations for module COMMON04 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity COMMON04:*DYNAMIC*	with type area with size 0
+Declared entity COMMON04:*HEAP*	with type area with size 0
+Declared entity COMMON04:*STACK*	with type area with size 0
+Declared entity COMMON04:*STATIC*	with type area with size 0
+Declared entity COMMON04:X	with type variable REAL*4
+Declared entity TOP-LEVEL:FOO	with type functional  () ->  void
+Declared entity TOP-LEVEL:~FOOFOO	with type area with size 4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOOFOO/ of size 4:
+	Variable COMMON04:X,	offset = 0,	size = 4
+
+End of declarations for module COMMON04
+
+  CONTROLIZER                    building   CODE(COMMON04)
+  PRINT_CODE                     building   PRINTED_FILE(COMMON04)
+PRINTED_FILE made for COMMON04.
+      PROGRAM COMMON04
+
+      COMMON /FOOFOO/ X
+
+      CALL FOO                                                          0005
+
+      PRINT *, X                                                        0007
+
+      END
+Module FOO selected
+Module FOO already active.
+Request: build resource PRINTED_FILE for module FOO.
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+
+Declarations for module FOO with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity FOO:*DYNAMIC*	with type area with size 0
+Declared entity FOO:*HEAP*	with type area with size 0
+Declared entity FOO:*STACK*	with type area with size 0
+Declared entity FOO:*STATIC*	with type area with size 0
+Declared entity FOO:Y	with type variable REAL*4
+Declared entity TOP-LEVEL:BAR	with type functional  () ->  void
+Declared entity TOP-LEVEL:~FOOFOO	with type area with size 4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOOFOO/ of size 4:
+	Variable FOO:Y,	offset = 0,	size = 4
+
+End of declarations for module FOO
+
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+
+      SUBROUTINE FOO
+
+      COMMON /FOOFOO/ Y
+
+      CALL BAR                                                          0006
+
+      Y = Y+1.                                                          0008
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module BAR.
+  Closing module COMMON04.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace common04 closed.
+
+Workspace common04 deleted.

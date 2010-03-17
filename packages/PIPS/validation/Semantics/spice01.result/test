@@ -1,0 +1,15 @@
+
+C  T(MAXMEM) {}
+
+      PROGRAM SPICE01
+
+C     Aliasing between a global variable and a formal parameter
+
+      COMMON /FOO/ MAXMEM
+
+C  T(MAXMEM) {}
+
+
+      CALL SETMEM(MAXMEM)                                               0007
+
+      END

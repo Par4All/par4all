@@ -1,0 +1,51 @@
+
+C  T() {}
+
+      PROGRAM EQUIV05
+
+C     Check static alias use for non-type compatible variables
+
+      EQUIVALENCE (X, I)
+
+C  T() {}
+
+
+      X = 4.                                                            0007
+
+C  T() {}
+
+
+      I = 5                                                             0009
+
+C  T() {}
+
+
+      PRINT *, 'x=', X, 'i=', I                                         0011
+
+      END
+
+C  P() {}
+
+      PROGRAM EQUIV05
+
+C     Check static alias use for non-type compatible variables
+
+      EQUIVALENCE (X, I)
+
+C  P() {}
+
+
+      X = 4.                                                            0007
+
+C  P() {}
+
+
+      I = 5                                                             0009
+
+C  P() {}
+
+
+      PRINT *, 'x=', X, 'i=', I                                         0011
+
+      END
+

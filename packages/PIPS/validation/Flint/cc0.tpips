@@ -1,0 +1,14 @@
+delete cc0
+create cc0 cc0.f
+echo ### initial version
+display PRINTED_FILE[%ALL]
+setproperty TYPE_CHECKER_ADD_SUMMARY TRUE
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION TRUE
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS TRUE
+apply TYPE_CHECKER[%ALL]
+echo ### after type checking
+display PRINTED_FILE[%ALL]
+close
+
+delete cc0
+quit

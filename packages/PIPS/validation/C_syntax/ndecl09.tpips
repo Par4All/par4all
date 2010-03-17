@@ -1,0 +1,29 @@
+delete ndecl09
+create ndecl09 ndecl09.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+echo
+echo Symbol table
+echo
+
+display SYMBOL_TABLE_FILE[ndecl09]
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[ndecl09]
+
+close
+#delete ndecl09
+
+quit

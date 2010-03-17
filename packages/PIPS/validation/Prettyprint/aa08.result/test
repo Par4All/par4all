@@ -1,0 +1,13 @@
+      PROGRAM AA08
+
+C     The vector expression is not prettyprinted because PIPS does not manage to
+C     parallelize such a loop. Strict monotonicity of power over positive numbers
+C     is not taken into account.
+
+      REAL U(10,10)
+
+      DO I = 1, 10                                                      0009
+         U(I,1:10) = 0.                                                 0011
+      ENDDO
+
+      END

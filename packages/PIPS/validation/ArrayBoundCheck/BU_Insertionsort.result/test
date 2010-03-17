@@ -1,0 +1,75 @@
+* Example from the C source of Andreas Podelski 
+*
+* In case : I = K -1, there are no bound violations, 
+* but we have to set at least :
+* setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+* activate TRANSFORMERS_INTER_FULL
+* #activate PRECONDITIONS_INTER_FULL
+* so that PIPS can prove it
+* 
+* In case : I = K, there are bound violations
+
+      SUBROUTINE INSERTIONSORT(A, N)
+      REAL A(0:N-1), X
+      INTEGER N
+      
+      INTEGER I,K   
+
+      DO 100 K = 1, N-1                                                 0001
+         IF (K.LT.0.OR.K.GT.N-1) STOP 
+     &   "Bound violation:array INSERTIONSORT:A, 1st dimension"
+         X = A(K)                                                       0002
+         I = K                                                          0003
+         IF (I.LT.0.OR.I.GT.N-1) STOP 
+     &   "Bound violation:array INSERTIONSORT:A, 1st dimension"
+C         I = K-1
+         DO WHILE (I.GE.0.AND.A(I).GT.X)                                0004
+            IF (I.LT.0.OR.I.GT.N-1) STOP 
+     &      "Bound violation:array INSERTIONSORT:A, 1st dimension"
+            IF (I+1.LT.0.OR.I+1.GT.N-1) STOP 
+     &      "Bound violation:array INSERTIONSORT:A, 1st dimension"
+            A(I+1) = A(I)                                               0005
+            I = I-1                                                     0006
+         ENDDO
+         IF (I+1.LT.0.OR.I+1.GT.N-1) STOP 
+     &   "Bound violation:array INSERTIONSORT:A, 1st dimension"
+         A(I+1) = X                                                     0007
+100      CONTINUE                                                       0008
+
+      END
+* Example from the C source of Andreas Podelski 
+*
+* In case : I = K -1, there are no bound violations, 
+* but we have to set at least :
+* setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+* activate TRANSFORMERS_INTER_FULL
+* #activate PRECONDITIONS_INTER_FULL
+* so that PIPS can prove it
+* 
+* In case : I = K, there are bound violations
+
+      SUBROUTINE INSERTIONSORT(A, N)
+      REAL A(0:N-1), X
+      INTEGER N
+      
+      INTEGER I,K   
+
+      DO 100 K = 1, N-1                                                 0001
+         X = A(K)                                                       0002
+         I = K                                                          0003
+C         I = K-1
+         DO WHILE (A(I).GT.X)                                           0004
+            IF (I.GT.N-1) STOP 
+     &      "Bound violation:array INSERTIONSORT:A, 1st dimension"
+            IF (I+1.GT.N-1) STOP 
+     &      "Bound violation:array INSERTIONSORT:A, 1st dimension"
+            A(I+1) = A(I)                                               0005
+            I = I-1                                                     0006
+         ENDDO
+         IF (I+1.GT.N-1) STOP 
+     &   "Bound violation:array INSERTIONSORT:A, 1st dimension"
+         A(I+1) = X                                                     0007
+100      CONTINUE                                                       0008
+
+      END
+

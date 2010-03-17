@@ -1,0 +1,9 @@
+TTICFG
+
+C  P() {J==2}
+
+    FOO
+    
+    C  P() {L==3}
+    
+        BAR

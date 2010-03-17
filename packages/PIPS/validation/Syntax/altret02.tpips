@@ -1,0 +1,36 @@
+echo
+echo Refuse alternate returns
+echo
+
+create altret02 altret02.f
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
+display PRINTED_FILE(ALTRET02)
+close
+delete altret02
+
+echo
+echo Ignore alternate returns and substitute STOP
+echo
+
+create altret02 altret02.f
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+display PRINTED_FILE(ALTRET02)
+close
+delete altret02
+
+echo
+echo Replace alternate returns
+echo
+
+create altret02 altret02.f
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "RC"
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+display PRINTED_FILE(ALTRET02)
+display PRINTED_FILE(FOO)
+display PRINTED_FILE(BAR)
+display PRINTED_FILE(BAR2)
+display PRINTED_FILE(BAR3)
+close
+delete altret02
+quit

@@ -1,0 +1,18 @@
+C     Ancien bug dans les declarations de
+C     tableau de taille suppose'e (*).
+C
+C     Be'atrice Creusillet
+C
+C     Corrige le 19 de'cembre 1994
+C
+      PROGRAM DECL3
+      REAL X(100)
+
+      CALL TOTO(X(3))                                                   0011
+      END
+
+      SUBROUTINE TOTO(V)
+      REAL V(3:*)
+
+      V(3) = 0.                                                         0005
+      END

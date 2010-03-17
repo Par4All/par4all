@@ -1,0 +1,18 @@
+void CONTINUE_TEST()
+{
+   int L1;
+   int L2;
+   int L3;
+   int L4;
+   float X;
+
+   _f77_intrinsics_read_(X) ;
+   if (X>0.)
+      ;
+   else if (X<-1.)
+      ;
+   else
+      //c        x=x+1
+      ;
+
+}

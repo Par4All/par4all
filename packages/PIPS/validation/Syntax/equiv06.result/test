@@ -1,0 +1,34 @@
+Registering file equiv06.f
+Splitting file    ./equiv06.f
+  Module         EQUIV06
+Workspace equiv06 created and opened.
+Module EQUIV06 selected
+Main module PROGRAM "EQUIV06" selected.
+Module EQUIV06 already active.
+Module EQUIV06 already active.
+Request: build resource PRINTED_FILE for module EQUIV06.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV06)
+  PARSER                         building   PARSED_CODE(EQUIV06)
+                                 building   CALLEES(EQUIV06)
+  CONTROLIZER                    building   CODE(EQUIV06)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV06)
+PRINTED_FILE made for EQUIV06.
+      PROGRAM EQUIV06
+
+C     This seems to be compatible with the Fortran 77 standard
+
+      REAL T(3)
+      COMMON /FOO/ A, B, C
+      EQUIVALENCE (T(1),A), (T(3),C)
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV06.
+Closing program.
+Closing workspace.
+Workspace equiv06 closed.
+
+Workspace equiv06 deleted.

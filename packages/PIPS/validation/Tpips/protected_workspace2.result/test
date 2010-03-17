@@ -1,0 +1,18 @@
+echo
+
+echo The message should be: workspace protected_workspace2: Permission denied
+The message should be: workspace protected_workspace2: Permission denied
+echo
+
+  Module         PROTECTED_WORKSPACE2
+Workspace protected_workspace2 created and opened.
+Module PROTECTED_WORKSPACE2 selected
+Main module PROGRAM "PROTECTED_WORKSPACE2" selected.
+Module PROTECTED_WORKSPACE2 already active.
+shell chmod u-rwx protected_workspace2.database
+Module PROTECTED_WORKSPACE2 already active.
+Request: build resource PRINTED_FILE for module PROTECTED_WORKSPACE2.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(PROTECTED_WORKSPACE2)
+user warning in create_directory: cannot create directory : ./protected_workspace2.database/PROTECTED_WORKSPACE2 (Permission denied)
+user error in db_get_directory_name_for_module: cannot create directory ./protected_workspace2.database/PROTECTED_WORKSPACE2

@@ -1,0 +1,137 @@
+user warning in tp_parse: external10: No such workspace
+Registering file external10.f
+Splitting file    ./external10.f
+  Module         F
+  Module         EXTERNAL10
+Workspace external10 created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+setproperty PARSER_TYPE_CHECK_CALL_SITES
+user error in parse_properties: bad value for property PARSER_TYPE_CHECK_CALL_SITES: 
+echo
+
+echo Main parsed last
+Main parsed last
+echo
+
+Module F selected
+Request: build resource PRINTED_FILE for module F.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(F)
+  PARSER                         building   PARSED_CODE(F)
+                                 building   CALLEES(F)
+
+Declarations for module F with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity F:*DYNAMIC*	with type area with size 0
+Declared entity F:*HEAP*	with type area with size 0
+Declared entity F:*STACK*	with type area with size 0
+Declared entity F:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module F
+
+  CONTROLIZER                    building   CODE(F)
+  PRINT_CODE                     building   PRINTED_FILE(F)
+PRINTED_FILE made for F.
+
+      SUBROUTINE F
+
+      PRINT *, "Hello world!"                                           0004
+
+      END
+Module EXTERNAL10 selected
+Request: build resource PRINTED_FILE for module EXTERNAL10.
+  FILTER_FILE                    building   SOURCE_FILE(EXTERNAL10)
+  PARSER                         building   PARSED_CODE(EXTERNAL10)
+                                 building   CALLEES(EXTERNAL10)
+user warning in SafeLocalToGlobal: Variable EXTERNAL10:F is a formal functional parameter.
+They are not (yet) supported by PIPS.
+user warning in MakeExternalFunction: unsupported formal function EXTERNAL10:F
+user warning in update_functional_type_with_actual_arguments: Functional actual argument F found.
+Functional arguments are not yet suported by PIPS
+
+Declarations for module EXTERNAL10 with type ( () ->  REAL*4
+) ->  void
+
+
+Variable list:
+
+
+Declared entity EXTERNAL10:*DYNAMIC*	with type area with size 0
+Declared entity EXTERNAL10:*HEAP*	with type area with size 0
+Declared entity EXTERNAL10:*STACK*	with type area with size 0
+Declared entity EXTERNAL10:*STATIC*	with type area with size 0
+Declared entity EXTERNAL10:F	with type functional  () ->  REAL*4
+Declared entity TOP-LEVEL:G	with type functional ( () ->  REAL*4
+) ->  void
+
+Layouts for formal parameters:
+
+	Variable EXTERNAL10:F,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EXTERNAL10
+
+  CONTROLIZER                    building   CODE(EXTERNAL10)
+  PRINT_CODE                     building   PRINTED_FILE(EXTERNAL10)
+PRINTED_FILE made for EXTERNAL10.
+C     When f is parsed, you cannot decide yet
+
+      SUBROUTINE EXTERNAL10(F)
+
+      EXTERNAL F
+
+      CALL G(F)                                                         0007
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EXTERNAL10.
+  Closing module F.
+Closing program.
+Closing workspace.
+Workspace external10 closed.
+
+Workspace external10 deleted.

@@ -1,0 +1,46 @@
+--- Preconditions for REALINDEX
+
+C  P() {}
+
+      PROGRAM REALINDEX
+
+C     Check that index with no semantics values are ignored
+
+      REAL T(10)
+
+C  P() {}
+
+
+      DO X = 1, N                                                       0007
+
+C  P() {}
+
+         T(X) = 0.                                                      0008
+      ENDDO
+
+C  P() {}
+
+
+      IF (N.GE.1) THEN                                                  0011
+
+C  P() {1<=N}
+
+         DO X = 1, N                                                    0012
+
+C  P() {1<=N}
+
+            T(X) = 0.                                                   0013
+         ENDDO
+      ELSE
+
+C  P() {N<=0}
+
+         DO X = 1, N                                                    0016
+
+C  P() {0==-1}
+
+            T(X) = 0.                                                   0017
+         ENDDO
+      ENDIF
+
+      END

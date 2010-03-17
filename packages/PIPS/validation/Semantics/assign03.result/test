@@ -1,0 +1,65 @@
+
+Source code with proper effects
+
+void assign03()
+{
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
+//               <must be written>: j
+
+   j = 2;                                                               /*0009*/
+//               <must be read   >: j
+//               <must be written>: i j
+   i = j+(j = 0)+j;                                                     /*0010*/
+//               <must be read   >: i
+
+   foo(i);                                                              /*0012*/
+}
+
+Source code with cumulated effects
+
+void assign03()
+{
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
+//               <must be written>: j
+
+   j = 2;                                                               /*0009*/
+//               <must be read   >: j
+//               <must be written>: i j
+   i = j+(j = 0)+j;                                                     /*0010*/
+//               <must be read   >: i
+
+   foo(i);                                                              /*0012*/
+}
+
+Source code with transformers
+
+
+//  T() {}
+
+void assign03()
+{
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
+
+//  T(j) {j==2}
+
+
+   j = 2;                                                               /*0009*/
+
+//  T(i,j) {i==j#init, j==0}
+
+   i = j+(j = 0)+j;                                                     /*0010*/
+
+//  T() {}
+
+
+   foo(i);                                                              /*0012*/
+}

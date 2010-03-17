@@ -1,0 +1,4 @@
+      INTEGER FUNCTION INTOWP(I)
+      INTOWP=(I+1)/2
+      RETURN
+      END

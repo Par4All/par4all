@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# Script to test pips on the semant program. A better version exists in Semantics
+#
+# M==6 should not appear because SEMANT is not a main. The effect of module SWAP
+# generates a M#INIT in the precondition because M is not initialized in this
+# part of code, in psite of the DATA statement
+#
+# Use of the rule transformers_inter_fast
+#
+# if [ -f properties.rc ]
+# then
+#     echo Incompatible with a local properties.rc file >&2
+#     exit 2
+# fi
+# echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" >properties.rc
+# if Pips -f semant.f -w semant -m semant -s pcinter -s tfinter -p prcp >&2
+# then
+# 	echo "--- Preconditions for module SEMANT"
+# 	Display -l prec
+# 	exit_status=0
+# else
+# 	exit_status=1
+# fi
+# Delete semant >&2
+# rm properties.rc
+# exit $exit_status
+
+delete semant
+
+create semant semant.f
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITIONS
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate PRINT_CODE_PRECONDITIONS
+
+echo --- Preconditions for module SEMANT
+
+display PRINTED_FILE[SEMANT]
+
+close
+delete semant
+quit

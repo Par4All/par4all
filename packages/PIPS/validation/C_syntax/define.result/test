@@ -1,0 +1,17 @@
+main()
+{
+   int i = 1;
+}
+
+Unsplit define
+
+/*
+ * file for define.c
+ */
+
+
+extern  main();
+main()
+{
+   int i = 1;
+}

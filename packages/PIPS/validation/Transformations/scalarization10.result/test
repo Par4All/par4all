@@ -1,0 +1,12 @@
+
+Code after scalarization
+
+void scalarization10(double A[SIZE], double B[SIZE][SIZE])
+{
+   // BEGIN BLOCK
+   int i, j;
+   for(i = 0; i <= SIZE-1; i += 1)
+      for(j = 0; j <= SIZE-1; j += 1)
+         A[i] = B[j][i]+get(A, i);
+   // END BLOCK
+}

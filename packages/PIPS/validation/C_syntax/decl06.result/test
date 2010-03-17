@@ -1,0 +1,74 @@
+
+Symbol table for "decl06!"
+
+decl06!
+
+Declarations for module "decl06!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:ERR_mgr_ctor" with type "functional" "char * x char * -> void"
+	Declared entity "decl06!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl06!:*HEAP*" with type "area" with size 0
+	Declared entity "decl06!:*STACK*" with type "area" with size 0
+	Declared entity "decl06!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "decl06!:#_err_manager"	kind = struct
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl06!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl06!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl06!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl06!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl06!
+
+
+Parsed printed file
+
+
+
+/*[500]*//* fonction ou est cree le manager */
+/* const char * */
+struct _err_manager {
+   char function;
+   void (*push)(int function);
+};
+
+
+void ERR_mgr_ctor(const char *file, const char *function);
+
+Printed file
+
+
+
+/*[500]*//* fonction ou est cree le manager */
+/* const char * */
+struct _err_manager {
+   char function;
+   void (*push)(int function);
+};
+
+
+void ERR_mgr_ctor(const char *file, const char *function);

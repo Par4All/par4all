@@ -1,0 +1,46 @@
+
+Check syntactic analysis of large constants
+
+
+First case
+
+      SUBROUTINE LARGE01
+
+C     Check the behavior of large integer constants stored on 32 or 64 bits
+
+      I = 1234567890                                                    0005
+      PRINT *, I                                                        0006
+
+      END
+
+C  P() {}
+
+      SUBROUTINE LARGE01
+
+C  P() {}
+
+
+C     Check the behavior of large integer constants stored on 32 or 64 bits
+
+      I = 1234567890                                                    0005
+
+C  P(I) {I==1234567890}
+
+      PRINT *, I                                                        0006
+
+      END
+
+Second case
+
+
+Third case
+
+
+Fourth case
+
+
+Fifth case
+
+
+Sixth case
+

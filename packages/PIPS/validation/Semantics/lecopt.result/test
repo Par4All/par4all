@@ -1,0 +1,203 @@
+
+C  T() {}
+
+      SUBROUTINE LECOPT ()
+  
+C     Bug in: DO   WHILE (TEXTLU(:4) .NE. 'FIN ') ?
+
+      CHARACTER * 133  TEXTLU, TXLIGN
+      COMMON  /REDTEX/ TEXTLU, TXLIGN(99)
+
+C  T(NPASSES) {NPASSES==-1}
+
+
+      NPASSES = -1                                                      0008
+
+C  T(IGRILLE) {IGRILLE==0}
+
+
+C      IGRILLE=0
+      IGRILLE = 0                                                       0011
+
+C  T(ICAL13,IRECA,ITHERM,NBOM,NETA) {}
+
+
+      DO WHILE (TEXTLU(1:4).NE.'FIN ')                                  0013
+
+C  T(ICAL13,IRECA,ITHERM,NBOM,NETA) {}
+
+         IF (TEXTLU(1:4).EQ.'TRAC') THEN                                0014
+
+C  T() {}
+
+            CALL REDLEV('IC')                                           0015
+
+C  T() {ITYPLU==1}
+
+            DO WHILE (ITYPLU.EQ.1)                                      0016
+
+C  T() {}
+
+C$PIPS STATEMENT FUNCTION KFLU SUBSTITUTED
+               CALL REDLEV('IC')                                        0018
+            ENDDO
+         ELSEIF (TEXTLU(1:7).EQ.'CAMARET') THEN                         0014
+
+C  T() {}
+
+            CALL REDLEV('C')                                            0021
+         ELSEIF (TEXTLU(1:4).EQ.'CTHE') THEN                            0014
+
+C  T(ITHERM) {ITHERM==1}
+
+            ITHERM = 1                                                  0023
+
+C  T() {}
+
+            CALL REDLEV('C')                                            0024
+         ELSEIF (TEXTLU(1:4).EQ.'BOMB') THEN                            0014
+
+C  T(NBOM) {NBOM==1}
+
+            NBOM = 1                                                    0026
+
+C  T() {}
+
+            CALL REDLEV('C')                                            0027
+         ELSEIF (TEXTLU(1:4).EQ.'FORC') THEN                            0014
+
+C  T() {}
+
+            CALL REDLEV('C')                                            0029
+         ELSEIF (TEXTLU(1:4).EQ.'CAL1') THEN                            0014
+
+C  T(ICAL13) {ICAL13==1}
+
+            ICAL13 = 1                                                  0031
+
+C  T() {}
+
+            CALL REDLEV('C')                                            0032
+         ELSEIF (TEXTLU(1:4).EQ.'RECA') THEN                            0014
+
+C  T(IRECA) {IRECA==1}
+
+            IRECA = 1                                                   0034
+
+         ELSEIF (TEXTLU(1:4).EQ.'ETAL') THEN                            0014
+
+C  T(NETA) {NETA==1}
+
+            NETA = 1                                                    0037
+         ENDIF
+      ENDDO
+      END
+
+C  P() {}
+
+      SUBROUTINE LECOPT ()
+  
+C     Bug in: DO   WHILE (TEXTLU(:4) .NE. 'FIN ') ?
+
+      CHARACTER * 133  TEXTLU, TXLIGN
+      COMMON  /REDTEX/ TEXTLU, TXLIGN(99)
+
+C  P() {}
+
+
+      NPASSES = -1                                                      0008
+
+C  P(NPASSES) {NPASSES==-1}
+
+
+C      IGRILLE=0
+      IGRILLE = 0                                                       0011
+
+C  P(IGRILLE,NPASSES) {IGRILLE==0, NPASSES==-1}
+
+
+      DO WHILE (TEXTLU(1:4).NE.'FIN ')                                  0013
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+         IF (TEXTLU(1:4).EQ.'TRAC') THEN                                0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            CALL REDLEV('IC')                                           0015
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            DO WHILE (ITYPLU.EQ.1)                                      0016
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    ITYPLU==1, NPASSES==-1}
+
+C$PIPS STATEMENT FUNCTION KFLU SUBSTITUTED
+               CALL REDLEV('IC')                                        0018
+            ENDDO
+         ELSEIF (TEXTLU(1:7).EQ.'CAMARET') THEN                         0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            CALL REDLEV('C')                                            0021
+         ELSEIF (TEXTLU(1:4).EQ.'CTHE') THEN                            0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            ITHERM = 1                                                  0023
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    ITHERM==1, NPASSES==-1}
+
+            CALL REDLEV('C')                                            0024
+         ELSEIF (TEXTLU(1:4).EQ.'BOMB') THEN                            0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            NBOM = 1                                                    0026
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NBOM==1, NPASSES==-1}
+
+            CALL REDLEV('C')                                            0027
+         ELSEIF (TEXTLU(1:4).EQ.'FORC') THEN                            0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            CALL REDLEV('C')                                            0029
+         ELSEIF (TEXTLU(1:4).EQ.'CAL1') THEN                            0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            ICAL13 = 1                                                  0031
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {ICAL13==1,
+C    IGRILLE==0, NPASSES==-1}
+
+            CALL REDLEV('C')                                            0032
+         ELSEIF (TEXTLU(1:4).EQ.'RECA') THEN                            0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            IRECA = 1                                                   0034
+
+         ELSEIF (TEXTLU(1:4).EQ.'ETAL') THEN                            0014
+
+C  P(ICAL13,IGRILLE,IRECA,ITHERM,NBOM,NETA,NPASSES) {IGRILLE==0,
+C    NPASSES==-1}
+
+            NETA = 1                                                    0037
+         ENDIF
+      ENDDO
+      END
+

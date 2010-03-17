@@ -1,0 +1,2353 @@
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <B(PHI1,PHI2)-W-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <D(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{5<=PHI1, PHI1<=6, 4<=L, 1+L<=M,
+C    2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{5<=PHI1, PHI1<=6, 4<=L, 1+L<=M,
+C    2<=N}>
+
+
+
+      SUBROUTINE TRAD(A,B,D,M,N,L,P)      
+      INTEGER M,N,L,P
+      INTEGER A(N,M), B(3:N, L:M), C(5,10), D(N,M,L), E(5,10,5), F(4,4)
+
+C  <B(PHI1,PHI2)-W-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+
+
+      READ *, B                                                         0001
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1, 4<=L, 1+L<=M, 2<=N}>
+
+
+c     array element / scalar variable
+      CALL TRADS(A)                                                     0002
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0003
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRADS(A(1,1))                                                0004
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0005
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==3, PHI2==L, PHI1<=N, 4<=L, 1+L<=M}>
+
+      CALL TRADS(A(3,L))                                                0006
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0007
+
+C  <A(PHI1,PHI2)-W-MAY-{PHI1==3, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+      CALL TRADS(A(3,L*L))                                              0008
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0009
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+c     array / array with the same number of dimensions
+
+cc       reference with no indices
+ccc         same declaration
+      CALL TRAD1(A, N, M)                                               0010
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0011
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD2(A, N, M, L)                                            0012
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0013
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD3(A, N, M, L)                                            0014
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0015
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         same declaration
+      CALL TRAD1S(A, N, M)                                              0016
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0017
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD2S(A, N, M, L)                                           0018
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0019
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD3S(A, N, M, L)                                           0020
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0021
+
+C  <B(PHI1,PHI2)-W-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+
+cc       reference with indices equal to lower bounds
+ccc         same declaration
+      CALL TRAD4(B(3,L), N, M, L)                                       0022
+
+C  <B(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0023
+
+C  <B(PHI1,PHI2)-W-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+ccc         linear offset in declaration
+      CALL TRAD5(B(3,L), N, M, L, P)                                    0024
+
+C  <B(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0025
+
+C  <B(PHI1,PHI2)-W-MAY-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+ccc         non linear offset in declaration
+      CALL TRAD6(B(3,L), N, M, L)                                       0026
+
+C  <B(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0027
+
+C  <B(PHI1,PHI2)-W-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+ccc         same declaration
+      CALL TRAD4S(B(3,L), N, M, L)                                      0028
+
+C  <B(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0029
+
+C  <B(PHI1,PHI2)-W-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+ccc         linear offset in declaration
+      CALL TRAD5S(B(3,L), N, M, L, P)                                   0030
+
+C  <B(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0031
+
+C  <B(PHI1,PHI2)-W-MAY-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+ccc         non linear offset in declaration
+      CALL TRAD6S(B(3,L), N, M, L)                                      0032
+
+C  <B(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0033
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+cc       reference with constant indices diff. from lower bounds
+cc       1- assumed-size array (A)
+ccc         same declaration
+      CALL TRAD7(A(1,2), N, M)                                          0034
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0035
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8(A(1,2), N, M, L)                                       0036
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0037
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9(A(1,2), N, M, L)                                       0038
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0039
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         same declaration
+      CALL TRAD7S(A(1,2), N, M)                                         0040
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0041
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8S(A(1,2), N, M, L)                                      0042
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0043
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9S(A(1,2), N, M, L)                                      0044
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0045
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+cc       2- constant size array (C)
+ccc         same declaration
+      CALL TRAD7(C(1,2), 5, 10)                                         0046
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0047
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8(C(1,2), 5, 10, L)                                      0048
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0049
+
+C  <C(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9(C(1,2), 5, 10, L)                                      0050
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0051
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         same declaration
+      CALL TRAD7S(C(1,2), 5, 10)                                        0052
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0053
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8S(C(1,2), 5, 10, L)                                     0054
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0055
+
+C  <C(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9S(C(1,2), 5, 10, L)                                     0056
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0057
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+
+c     array / array with less number of dimensions
+c     matrix / vector
+      CALL TRAD10(A, N)                                                 0058
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0059
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD11(A, L, N)                                              0060
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0061
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD12(A, L, N)                                              0062
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0063
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD13(A, N, M)                                              0064
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0065
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD14(A, N)                                                 0066
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0067
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD15(A, N)                                                 0068
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0069
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD16(A, L, N)                                              0070
+
+C  <A(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0071
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=15,
+C    4<=L, 1+L<=M, 2<=N}>
+
+
+      CALL TRAD10(C, 5)                                                 0072
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0073
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=15,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD11(C, L, 5)                                              0074
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0075
+
+C  <C(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD12(C, L, 5)                                              0076
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0077
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 50)                                                0078
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0079
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=15,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 10)                                                0080
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0081
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=12,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 7)                                                 0082
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0083
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=14,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 9)                                                 0084
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0085
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    PHI1+5PHI2<=5+L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, L)                                                 0086
+
+C  <C(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0087
+
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+
+c     cube / matrix
+      CALL TRAD18(D, N, M)                                              0088
+
+C  <D(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0089
+
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD19(D, N, M, P)                                           0090
+
+C  <D(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0091
+
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD20(D, N, M)                                              0092
+
+C  <D(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0093
+
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD21(D, N, M, L)                                           0094
+
+C  <D(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0095
+
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD22(D, N, M)                                              0096
+
+C  <D(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0097
+
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD23(D, N, M, L)                                           0098
+
+C  <D(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0099
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    12<=PHI2+10PHI3, PHI2+10PHI3<=25, 4<=L, 1+L<=M, 2<=N}>
+
+
+      CALL TRAD24(E, 5, 10, 5)                                          0100
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0101
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    12<=PHI2+10PHI3, PHI2+10PHI3<=25, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD25(E, 5, 10, 5, P)                                       0102
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0103
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD26(E, 50)                                                0104
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0105
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{PHI3==1, 1<=PHI1, PHI1<=5, 1<=PHI2,
+C    PHI2<=10, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD26(E, 10)                                                0106
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0107
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, PHI2+10PHI3<=10+10L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD27(E, L)                                                 0108
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0109
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD28(E)                                                    0110
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0111
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD29(E)                                                    0112
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0113
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI1+5PHI2+50PHI3<=155, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD30(E)                                                    0114
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0115
+
+C  <E(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, PHI1+5PHI2+50PHI3<=55+50L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD31(E, L)                                                 0116
+
+C  <E(PHI1,PHI2,PHI3)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0117
+
+C  <F(PHI1,PHI2)-W-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+
+
+
+C     linear subscript values, but non exact propagation
+      READ *, F                                                         0118
+
+C  <F(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=4, 8<=PHI1+4PHI2,
+C    PHI1+4PHI2<=18, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD32(F)                                                    0119
+
+C  <F(PHI1,PHI2)-R-EXACT-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, F                                                        0120
+      END
+
+
+      SUBROUTINE TRAD(A,B,D,M,N,L,P)      
+      INTEGER M,N,L,P
+      INTEGER A(N,M), B(3:N, L:M), C(5,10), D(N,M,L), E(5,10,5), F(4,4)
+
+C  <B(PHI1,PHI2)-OUT-MAY-{4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+
+
+      READ *, B                                                         0001
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{PHI1==1, PHI2==1, 4<=L, 1+L<=M, 2<=N}>
+
+
+c     array element / scalar variable
+      CALL TRADS(A)                                                     0002
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0003
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{PHI1==1, PHI2==1, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRADS(A(1,1))                                                0004
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0005
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{PHI1==3, PHI2==L, PHI1<=N, 4<=L, 1+L<=M}>
+
+      CALL TRADS(A(3,L))                                                0006
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0007
+
+C  <A(PHI1,PHI2)-OUT-MAY-{PHI1==3, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+      CALL TRADS(A(3,L*L))                                              0008
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0009
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+c     array / array with the same number of dimensions
+
+cc       reference with no indices
+ccc         same declaration
+      CALL TRAD1(A, N, M)                                               0010
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0011
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD2(A, N, M, L)                                            0012
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0013
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD3(A, N, M, L)                                            0014
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0015
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         same declaration
+      CALL TRAD1S(A, N, M)                                              0016
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0017
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD2S(A, N, M, L)                                           0018
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0019
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD3S(A, N, M, L)                                           0020
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0021
+
+C  <B(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+cc       reference with indices equal to lower bounds
+ccc         same declaration
+      CALL TRAD4(B(3,L), N, M, L)                                       0022
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0023
+
+C  <B(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD5(B(3,L), N, M, L, P)                                    0024
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0025
+
+C  <B(PHI1,PHI2)-OUT-MAY-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD6(B(3,L), N, M, L)                                       0026
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0027
+
+C  <B(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         same declaration
+      CALL TRAD4S(B(3,L), N, M, L)                                      0028
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0029
+
+C  <B(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD5S(B(3,L), N, M, L, P)                                   0030
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0031
+
+C  <B(PHI1,PHI2)-OUT-MAY-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD6S(B(3,L), N, M, L)                                      0032
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, B                                                        0033
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+cc       reference with constant indices diff. from lower bounds
+cc       1- assumed-size array (A)
+ccc         same declaration
+      CALL TRAD7(A(1,2), N, M)                                          0034
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0035
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8(A(1,2), N, M, L)                                       0036
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0037
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9(A(1,2), N, M, L)                                       0038
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0039
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         same declaration
+      CALL TRAD7S(A(1,2), N, M)                                         0040
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0041
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 2<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8S(A(1,2), N, M, L)                                      0042
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0043
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9S(A(1,2), N, M, L)                                      0044
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0045
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+cc       2- constant size array (C)
+ccc         same declaration
+      CALL TRAD7(C(1,2), 5, 10)                                         0046
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0047
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8(C(1,2), 5, 10, L)                                      0048
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0049
+
+C  <C(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9(C(1,2), 5, 10, L)                                      0050
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0051
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         same declaration
+      CALL TRAD7S(C(1,2), 5, 10)                                        0052
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0053
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         linear offset in declaration
+      CALL TRAD8S(C(1,2), 5, 10, L)                                     0054
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0055
+
+C  <C(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+ccc         non linear offset in declaration
+      CALL TRAD9S(C(1,2), 5, 10, L)                                     0056
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0057
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+
+c     array / array with less number of dimensions
+c     matrix / vector
+      CALL TRAD10(A, N)                                                 0058
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0059
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD11(A, L, N)                                              0060
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0061
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD12(A, L, N)                                              0062
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0063
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD13(A, N, M)                                              0064
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0065
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD14(A, N)                                                 0066
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0067
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD15(A, N)                                                 0068
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0069
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD16(A, L, N)                                              0070
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, A                                                        0071
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=15,
+C    4<=L, 1+L<=M, 2<=N}>
+
+
+      CALL TRAD10(C, 5)                                                 0072
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0073
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=15,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD11(C, L, 5)                                              0074
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0075
+
+C  <C(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD12(C, L, 5)                                              0076
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0077
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 50)                                                0078
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0079
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=15,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 10)                                                0080
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0081
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=12,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 7)                                                 0082
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0083
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI1+5PHI2<=14,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, 9)                                                 0084
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0085
+
+C  <C(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    PHI1+5PHI2<=5+L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD17(C, L)                                                 0086
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, C                                                        0087
+
+C  <D(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+
+c     cube / matrix
+      CALL TRAD18(D, N, M)                                              0088
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0089
+
+C  <D(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD19(D, N, M, P)                                           0090
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0091
+
+C  <D(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD20(D, N, M)                                              0092
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0093
+
+C  <D(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD21(D, N, M, L)                                           0094
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0095
+
+C  <D(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD22(D, N, M)                                              0096
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0097
+
+C  <D(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M,
+C    1<=PHI3, PHI3<=L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD23(D, N, M, L)                                           0098
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, D                                                        0099
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    12<=PHI2+10PHI3, PHI2+10PHI3<=25, 4<=L, 1+L<=M, 2<=N}>
+
+
+      CALL TRAD24(E, 5, 10, 5)                                          0100
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0101
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    12<=PHI2+10PHI3, PHI2+10PHI3<=25, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD25(E, 5, 10, 5, P)                                       0102
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0103
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD26(E, 50)                                                0104
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0105
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI3==1, 1<=PHI1, PHI1<=5, 1<=PHI2,
+C    PHI2<=10, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD26(E, 10)                                                0106
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0107
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, PHI2+10PHI3<=10+10L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD27(E, L)                                                 0108
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0109
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD28(E)                                                    0110
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0111
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD29(E)                                                    0112
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0113
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI1+5PHI2+50PHI3<=155, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD30(E)                                                    0114
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0115
+
+C  <E(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=5, PHI1+5PHI2+50PHI3<=55+50L, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD31(E, L)                                                 0116
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 4<=L, 1+L<=M, 2<=N}>
+
+      PRINT *, E                                                        0117
+
+C  <F(PHI1,PHI2)-OUT-MAY-{4<=L, 1+L<=M, 2<=N}>
+
+
+
+C     linear subscript values, but non exact propagation
+      READ *, F                                                         0118
+
+C  <F(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=4, 8<=PHI1+4PHI2,
+C    PHI1+4PHI2<=18, 4<=L, 1+L<=M, 2<=N}>
+
+      CALL TRAD32(F)                                                    0119
+      PRINT *, F                                                        0120
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 5<=M,
+C    2<=N}>
+
+
+     
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD1(AA, N, M)
+      INTEGER N, M, AA(N,M)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 5<=M,
+C    2<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=N, 1<=PHI2,
+C    PHI2<=M, 5<=M, 2<=N}>
+
+         DO J = 1, M                                                    0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=M, 1<=I,
+C    I<=N, 5<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 2<=N}>
+
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD10(V, N)
+      INTEGER V(*), N
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 2<=N}>
+
+
+      DO I = 1, 2*N                                                     0001
+
+C  <V(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=2N, 2<=N}>
+
+         V(I) = I                                                       0002
+      ENDDO
+      END
+
+C  <V(PHI1)-OUT-MAY-{L<=PHI1, PHI1+1<=L+2N, 4<=L, 2<=N}>
+
+
+      SUBROUTINE TRAD11(V, L, N)
+      INTEGER L, V(L:*), N
+
+C  <V(PHI1)-OUT-MAY-{L<=PHI1, PHI1+1<=L+2N, 4<=L, 2<=N}>
+
+
+      DO I = L, 2*N+L-1                                                 0001
+
+C  <V(PHI1)-OUT-MAY-{I==PHI1, L<=PHI1, PHI1+1<=L+2N, 4<=L, 2<=N}>
+
+         V(I) = I                                                       0002
+      ENDDO
+      END
+
+C  <V(PHI1)-OUT-MAY-{L+N==PHI1, 2+L<=PHI1, 4<=L}>
+
+
+      SUBROUTINE TRAD12(V, L, N)
+      INTEGER L, V(L*L:*), N
+
+C  <V(PHI1)-OUT-MAY-{L+N==PHI1, 4<=L, 2<=N}>
+
+
+      V(N+L) = N+L                                                      0001
+      END
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 5<=M, 2<=N}>
+
+
+      SUBROUTINE TRAD13(V, N, M)
+      INTEGER N, M, V(N*M)
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 5<=M, 2<=N}>
+
+
+      DO I = 1, 2*N                                                     0001
+
+C  <V(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=2N, 5<=M, 2<=N}>
+
+         V(I) = I                                                       0002
+      ENDDO
+      END
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 2<=N}>
+
+
+      SUBROUTINE TRAD14(V, N)
+      INTEGER N, V(2*N)
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 2<=N}>
+
+
+      DO I = 1, 2*N                                                     0001
+
+C  <V(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=2N, 2<=N}>
+
+         V(I) = I                                                       0002
+      ENDDO
+      END
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=10+2N, 2<=N}>
+
+
+         
+      SUBROUTINE TRAD15(V, N)
+      INTEGER N, V(2*N+10)
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=10+2N, 2<=N}>
+
+
+      DO I = 1, 2*N+10                                                  0001
+
+C  <V(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=10+2N, 2<=N}>
+
+         V(I) = I                                                       0002
+      ENDDO
+      END
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 4<=L, 2<=N}>
+
+
+      SUBROUTINE TRAD16(V, L, N)
+      INTEGER N, L, V(L*N)
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=2N, 4<=L, 2<=N}>
+
+
+      DO I = 1, 2*N                                                     0001
+
+C  <V(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=2N, 4<=L, 2<=N}>
+
+         V(I) = I                                                       0002
+      ENDDO
+      END
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=N, PHI1<=50, 4<=N}>
+
+      
+
+      SUBROUTINE TRAD17(V, N)
+      INTEGER N, V(N)
+
+C  <V(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=N, PHI1<=50, 4<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <V(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=N, PHI1<=50, 4<=N}>
+
+         V(I) = I                                                       0002
+      ENDDO
+      END
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=2M, 5<=M,
+C    2<=N}>
+
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD18(DD, N, M)
+      INTEGER N, M, DD(N, *)
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=2M, 5<=M,
+C    2<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=N, 1<=PHI2,
+C    PHI2<=2M, 5<=M, 2<=N}>
+
+         DO J = 1, 2*M                                                  0002
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=2M, 1<=I,
+C    I<=N, 5<=M, 2<=N}>
+
+            DD(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{P<=PHI1, PHI1+1<=N+P, 1<=PHI2, PHI2<=2M,
+C    5<=M, 2<=N}>
+
+
+      SUBROUTINE TRAD19(DD, N, M, P)
+      INTEGER N, M, P, DD(P:N+P-1, *)
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{P<=PHI1, PHI1+1<=N+P, 1<=PHI2, PHI2<=2M,
+C    5<=M, 2<=N}>
+
+
+      DO I = P, N+P-1                                                   0001
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{I==PHI1, P<=PHI1, PHI1+1<=N+P, 1<=PHI2,
+C    PHI2<=2M, 5<=M, 2<=N}>
+
+         DO J = 1, 2*M                                                  0002
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=2M, P<=I,
+C    1+I<=N+P, 5<=M, 2<=N}>
+
+            DD(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 5<=M,
+C    2<=N}>
+
+      
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD1S(AA, N, M)
+      INTEGER N, M, AA(N,*)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=M, 5<=M,
+C    2<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=N, 1<=PHI2,
+C    PHI2<=M, 5<=M, 2<=N}>
+
+         DO J = 1, M                                                    0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=M, 1<=I,
+C    I<=N, 5<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=4+N, L<=PHI2, PHI2+1<=L+M,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD2(AA, N, M, L)
+      INTEGER N, M, L, AA(5:N+4,L:M+L-1)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=4+N, L<=PHI2, PHI2+1<=L+M,
+C    4<=L, 1+L<=M, 2<=N}>
+
+
+      DO I = 5, N+4                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 5<=PHI1, PHI1<=4+N, L<=PHI2,
+C    PHI2+1<=L+M, 4<=L, 1+L<=M, 2<=N}>
+
+         DO J = L, M+L-1                                                0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, L<=PHI2, PHI2+1<=L+M,
+C    5<=I, I<=4+N, 4<=L, 1+L<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=2M, 5<=M,
+C    2<=N}>
+
+
+      SUBROUTINE TRAD20(DD, N, M)
+      INTEGER N, M, DD(N, 2*M)
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=2M, 5<=M,
+C    2<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=N, 1<=PHI2,
+C    PHI2<=2M, 5<=M, 2<=N}>
+
+         DO J = 1, 2*M                                                  0002
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=2M, 1<=I,
+C    I<=N, 5<=M, 2<=N}>
+
+            DD(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=2M, 4<=L,
+C    1+L<=M, 1<=M, 2<=N}>
+
+
+      SUBROUTINE TRAD21(DD, N, M, L)
+      INTEGER N, M, L, DD(N, L*M)
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=2M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=N, 1<=PHI2,
+C    PHI2<=2M, 4<=L, 1+L<=M, 2<=N}>
+
+         DO J = 1, 2*M                                                  0002
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=2M, 1<=I,
+C    I<=N, 4<=L, 1+L<=M, 2<=N}>
+
+            DD(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=2N, 1<=PHI2, PHI2<=5, 5<=M,
+C    2<=N}>
+
+
+      SUBROUTINE TRAD22(DD, N, M)
+      INTEGER N, M, DD(N*M, *)
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=2N, 1<=PHI2, PHI2<=5, 5<=M,
+C    2<=N}>
+
+
+      DO I = 1, 2*N                                                     0001
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=2N, 1<=PHI2,
+C    PHI2<=5, 5<=M, 2<=N}>
+
+         DO J = 1, 5                                                    0002
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=5, 1<=I,
+C    I<=2N, 5<=M, 2<=N}>
+
+            DD(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=2N, 1<=PHI2, PHI2<=L, 4<=L,
+C    1+L<=M, 1<=M, 2<=N}>
+
+
+      SUBROUTINE TRAD23(DD, N, M, L)
+      INTEGER N, M, DD(N*M, L)
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=2N, 1<=PHI2, PHI2<=L, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+      DO I = 1, 2*N                                                     0001
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=2N, 1<=PHI2,
+C    PHI2<=L, 4<=L, 1+L<=M, 2<=N}>
+
+         DO J = 1, L                                                    0002
+
+C  <DD(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=L, 1<=I,
+C    I<=2N, 4<=L, 1+L<=M, 2<=N}>
+
+            DD(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=15,
+C    L==5, M==10, N==5}>
+
+
+
+      SUBROUTINE TRAD24(EE, N, M, L)
+      INTEGER N, M, L, EE(5, *)
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=15,
+C    L==5, M==10, N==5}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, 1<=PHI1, 2<=PHI2, PHI2<=15,
+C    L==5, M==10, N==5, I<=5}>
+
+         DO J = 1, M                                                    0002
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1+J<=PHI2, 9PHI2<=5+13J, L==5,
+C    M==10, N==5, 1<=I, I<=5, J<=10}>
+
+            DO K = 1, L                                                 0003
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{PHI1==I, J+K==PHI2, 1+J<=PHI2,
+C    9PHI2<=5+13J, L==5, M==10, N==5, 1<=I, I<=5, 1<=J, J<=10, K<=5}>
+
+               EE(I,J+K) = I+J                                          0004
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{P<=PHI1, PHI1<=4+P, 2<=PHI2, PHI2<=15,
+C    L==5, M==10, N==5}>
+
+
+      SUBROUTINE TRAD25(EE, N, M, L, P)
+      INTEGER N, M, L, P, EE(P:5+P-1, *)
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{P<=PHI1, PHI1<=4+P, 2<=PHI2, PHI2<=15,
+C    L==5, M==10, N==5}>
+
+
+      DO I = P, N+P-1                                                   0001
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, P<=PHI1, 2<=PHI2, PHI2<=15,
+C    L==5, M==10, N==5, I<=4+P}>
+
+         DO J = 1, M                                                    0002
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1+J<=PHI2, 9PHI2<=5+13J, L==5,
+C    M==10, N==5, P<=I, I<=4+P, J<=10}>
+
+            DO K = 1, L                                                 0003
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{PHI1==I, J+K==PHI2, 1+J<=PHI2,
+C    9PHI2<=5+13J, L==5, M==10, N==5, P<=I, I<=4+P, 1<=J, J<=10,
+C    K<=5}>
+
+               EE(I,J+K) = I+J                                          0004
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=N, 10<=N,
+C    N<=50}>
+
+
+      SUBROUTINE TRAD26(EE, N)
+      INTEGER N, EE(5, N)
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=N, 10<=N,
+C    N<=50}>
+
+
+      DO I = 1, 5                                                       0001
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=5, 1<=PHI2,
+C    PHI2<=N, 10<=N, N<=50}>
+
+         DO J = 1, N                                                    0002
+
+C  <EE(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=N, 1<=I,
+C    I<=5, 10<=N, N<=50}>
+
+            EE(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10L,
+C    PHI2<=50, 4<=L}>
+
+
+      SUBROUTINE TRAD27(EE, L)
+      INTEGER L, EE(5, L * 10)
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=10L,
+C    PHI2<=50, 4<=L}>
+
+
+      DO I = 1, 5                                                       0001
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=5, 1<=PHI2,
+C    PHI2<=10L, PHI2<=50, 4<=L}>
+
+         DO J = 1, L*10                                                 0002
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=10L,
+C    PHI2<=50, 1<=I, I<=5, 4<=L}>
+
+            EE(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=5,
+C    51<=PHI1+50PHI2, PHI1+50PHI2<=300}>
+
+
+      SUBROUTINE TRAD28(EE)
+      INTEGER EE(50, *)
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=5}>
+
+
+      DO I = 1, 50                                                      0001
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=50, 1<=PHI2,
+C    PHI2<=5}>
+
+         DO J = 1, 5                                                    0002
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=5, 1<=I,
+C    I<=50}>
+
+            EE(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=5,
+C    51<=PHI1+50PHI2, PHI1+50PHI2<=300}>
+
+
+       
+      SUBROUTINE TRAD29(EE)
+      INTEGER EE(50, 5)
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=5}>
+
+
+      DO I = 1, 50                                                      0001
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=50, 1<=PHI2,
+C    PHI2<=5}>
+
+         DO J = 1, 5                                                    0002
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=5, 1<=I,
+C    I<=50}>
+
+            EE(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=4+N, L<=PHI2, PHI2+1<=L+M,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD2S(AA, N, M, L)
+      INTEGER N, M, L, AA(5:N+4,L:*)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=4+N, L<=PHI2, PHI2+1<=L+M,
+C    4<=L, 1+L<=M, 2<=N}>
+
+
+      DO I = 5, N+4                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 5<=PHI1, PHI1<=4+N, L<=PHI2,
+C    PHI2+1<=L+M, 4<=L, 1+L<=M, 2<=N}>
+
+         DO J = L, M+L-1                                                0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, L<=PHI2, PHI2+1<=L+M,
+C    5<=I, I<=4+N, 4<=L, 1+L<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=4+N, 4<=L, 1+L<=M,
+C    1<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD3(AA, N, M, L)
+      INTEGER N, M, L, AA(5:N+4,L*L:M+L*L-1)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=4+N, 4<=L, 1+L<=M,
+C    2<=N}>
+
+
+      DO I = 5, N+4                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, M==PHI2, 5<=PHI1, PHI1<=4+N, 4<=L,
+C    1+L<=M, 2<=N}>
+
+         AA(I,M) = I+M                                                  0002
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=2,
+C    51<=PHI1+50PHI2, PHI1+50PHI2<=150}>
+
+
+      SUBROUTINE TRAD30(EE)
+      INTEGER EE(50, 2)
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=2}>
+
+
+      DO I = 1, 50                                                      0001
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=50, 1<=PHI2,
+C    PHI2<=2}>
+
+         DO J = 1, 2                                                    0002
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=2, 1<=I,
+C    I<=50}>
+
+            EE(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=L,
+C    51<=PHI1+50PHI2, PHI1+50PHI2<=50+50L, PHI1+50PHI2<=300, 4<=L}>
+
+
+      SUBROUTINE TRAD31(EE, L)
+      INTEGER L, EE(50, L)
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=L,
+C    PHI1+50PHI2<=300, 4<=L}>
+
+
+      DO I = 1, 50                                                      0001
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=50, 1<=PHI2,
+C    PHI2<=L, PHI1+50PHI2<=300, 4<=L}>
+
+         DO J = 1, L                                                    0002
+
+C  <EE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=L,
+C    PHI1+50PHI2<=300, 1<=I, I<=50, 4<=L}>
+
+            EE(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <FF(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=2, 6<=2PHI1+PHI2,
+C    PHI2<=2PHI1+3, 6<=PHI1+2PHI2, PHI1+2PHI2<=16}>
+
+
+ 
+      SUBROUTINE TRAD32(FF)
+      INTEGER FF(2,8)
+
+C  <FF(PHI1,PHI2)-OUT-MAY-{PHI1==1, 4<=PHI2, PHI2<=5}>
+
+
+      DO J = 4, 5                                                       0001
+
+C  <FF(PHI1,PHI2)-OUT-MAY-{PHI1==1, J==PHI2, 4<=PHI2, PHI2<=5}>
+
+         FF(1,J) = J                                                    0002
+      ENDDO
+
+C  <FF(PHI1,PHI2)-OUT-MAY-{PHI1==2, 2<=PHI2, PHI2<=7}>
+
+      DO J = 2, 7                                                       0003
+
+C  <FF(PHI1,PHI2)-OUT-MAY-{PHI1==2, J==PHI2, 2<=PHI2, PHI2<=7}>
+
+         FF(2,J) = J+1                                                  0004
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=4+N, 4<=L, 1+L<=M,
+C    1<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD3S(AA, N, M, L)
+      INTEGER N, M, L, AA(5:N+4,L*L:*)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=4+N, 4<=L, 1+L<=M,
+C    2<=N}>
+
+
+      DO I = 5, N+4                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, M==PHI2, 5<=PHI1, PHI1<=4+N, 4<=L,
+C    1+L<=M, 2<=N}>
+
+         AA(I,M) = I+M                                                  0002
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+      
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD4(AA, N, M, L)
+      INTEGER N, M, L, AA(3:N,L:M)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+
+      DO I = 3, N                                                       0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 3<=PHI1, PHI1<=N, L<=PHI2,
+C    PHI2<=M, 4<=L, 1+L<=M}>
+
+         DO J = L, M                                                    0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, L<=PHI2, PHI2<=M, 3<=I,
+C    I<=N, 4<=L, 1+L<=M}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M, 2<=N}>
+
+
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD4S(AA, N, M, L)
+      INTEGER N, M, L, AA(3:N,L:*)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{3<=PHI1, PHI1<=N, L<=PHI2, PHI2<=M, 4<=L,
+C    1+L<=M}>
+
+
+      DO I = 3, N                                                       0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 3<=PHI1, PHI1<=N, L<=PHI2,
+C    PHI2<=M, 4<=L, 1+L<=M}>
+
+         DO J = L, M                                                    0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, L<=PHI2, PHI2<=M, 3<=I,
+C    I<=N, 4<=L, 1+L<=M}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=2+N, L+P<=PHI2, PHI2<=M+P,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD5(AA, N, M, L, P)
+      INTEGER N, M, L, P, AA(5:N+2,L+P:M+P)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=2+N, L+P<=PHI2, PHI2<=M+P,
+C    4<=L, 1+L<=M}>
+
+
+      DO I = 5, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 5<=PHI1, PHI1<=2+N, L+P<=PHI2,
+C    PHI2<=M+P, 4<=L, 1+L<=M}>
+
+         DO J = L+P, M+P                                                0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, L+P<=PHI2, PHI2<=M+P,
+C    5<=I, I<=2+N, 4<=L, 1+L<=M}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=2+N, L+P<=PHI2, PHI2<=M+P,
+C    4<=L, 1+L<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD5S(AA, N, M, L, P)
+      INTEGER N, M, L, P, AA(5:N+2,L+P:*)
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{5<=PHI1, PHI1<=2+N, L+P<=PHI2, PHI2<=M+P,
+C    4<=L, 1+L<=M}>
+
+
+      DO I = 5, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 5<=PHI1, PHI1<=2+N, L+P<=PHI2,
+C    PHI2<=M+P, 4<=L, 1+L<=M}>
+
+         DO J = L+P, M+P                                                0002
+
+C  <AA(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, L+P<=PHI2, PHI2<=M+P,
+C    5<=I, I<=2+N, 4<=L, 1+L<=M}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=2+N, 4<=L, 1+L<=M,
+C    2<=N}>
+
+      
+      SUBROUTINE TRAD6(AA, N, M, L)
+      INTEGER N, M, L, AA(5:N+2,L+L*L:M+L*L)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=2+N, 4<=L, 1+L<=M}>
+
+
+      DO I = 5, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, M==PHI2, 5<=PHI1, PHI1<=2+N, 4<=L,
+C    1+L<=M}>
+
+         AA(I,M) = I+M                                                  0002
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=2+N, 4<=L, 1+L<=M,
+C    2<=N}>
+
+      
+      SUBROUTINE TRAD6S(AA, N, M, L)
+      INTEGER N, M, L, AA(5:N+2,L+L*L:*)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 5<=PHI1, PHI1<=2+N, 4<=L, 1+L<=M}>
+
+
+      DO I = 5, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, M==PHI2, 5<=PHI1, PHI1<=2+N, 4<=L,
+C    1+L<=M}>
+
+         AA(I,M) = I+M                                                  0002
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 3<=PHI2, PHI2+1<=M, 5<=M,
+C    2<=N}>
+
+
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD7(AA, N, M)
+      INTEGER N, M, AA(N,M-1)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 3<=PHI2, PHI2+1<=M, 5<=M,
+C    2<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=N, 3<=PHI2,
+C    PHI2+1<=M, 5<=M, 2<=N}>
+
+         DO J = 1, M-1                                                  0002
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 3<=PHI2, PHI2+1<=M, 1<=I,
+C    I<=N, 5<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 3<=PHI2, PHI2+1<=M, 5<=M,
+C    2<=N}>
+
+
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRAD7S(AA, N, M)
+      INTEGER N, M, AA(N,*)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=N, 3<=PHI2, PHI2+1<=M, 5<=M,
+C    2<=N}>
+
+
+      DO I = 1, N                                                       0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=N, 3<=PHI2,
+C    PHI2+1<=M, 5<=M, 2<=N}>
+
+         DO J = 1, M-1                                                  0002
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 3<=PHI2, PHI2+1<=M, 1<=I,
+C    I<=N, 5<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{3<=PHI1, PHI1<=2+N, 2+L<=PHI2, PHI2+2<=L+M,
+C    4<=L, 5<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD8(AA, N, M, L)
+      INTEGER N, M, L, AA(3:N+2,L:M+L-2)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{3<=PHI1, PHI1<=2+N, 2+L<=PHI2, PHI2+2<=L+M,
+C    4<=L, 5<=M, 2<=N}>
+
+
+      DO I = 3, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, 3<=PHI1, PHI1<=2+N, 2+L<=PHI2,
+C    PHI2+2<=L+M, 4<=L, 5<=M, 2<=N}>
+
+         DO J = L, M+L-2                                                0002
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 2+L<=PHI2, PHI2+2<=L+M,
+C    3<=I, I<=2+N, 4<=L, 5<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{3<=PHI1, PHI1<=2+N, 2+L<=PHI2, PHI2+2<=L+M,
+C    4<=L, 5<=M, 2<=N}>
+
+      
+      SUBROUTINE TRAD8S(AA, N, M, L)
+      INTEGER N, M, L, AA(3:N+2,L:*)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{3<=PHI1, PHI1<=2+N, 2+L<=PHI2, PHI2+2<=L+M,
+C    4<=L, 5<=M, 2<=N}>
+
+
+      DO I = 3, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, 3<=PHI1, PHI1<=2+N, 2+L<=PHI2,
+C    PHI2+2<=L+M, 4<=L, 5<=M, 2<=N}>
+
+         DO J = L, M+L-2                                                0002
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 2+L<=PHI2, PHI2+2<=L+M,
+C    3<=I, I<=2+N, 4<=L, 5<=M, 2<=N}>
+
+            AA(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 3<=PHI1, PHI1<=2+N, 5<=PHI2, 4<=L,
+C    2<=N}>
+
+      
+      SUBROUTINE TRAD9(AA, N, M, L)
+      INTEGER N, M, L, AA(3:N+2,L+L*L:M+L+L*L-2)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 3<=PHI1, PHI1<=2+N, 4<=L, 5<=M,
+C    2<=N}>
+
+
+      DO I = 3, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, M==PHI2, 3<=PHI1, PHI1<=2+N, 4<=L,
+C    5<=M, 2<=N}>
+
+         AA(I,M) = I+M                                                  0002
+      ENDDO
+      END
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 3<=PHI1, PHI1<=2+N, 5<=PHI2, 4<=L,
+C    2<=N}>
+
+      
+      SUBROUTINE TRAD9S(AA, N, M, L)
+      INTEGER N, M, L, AA(3:N+2,L+L*L:*)
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{PHI2==M, 3<=PHI1, PHI1<=2+N, 4<=L, 5<=M,
+C    2<=N}>
+
+
+      DO I = 3, N+2                                                     0001
+
+C  <AA(PHI1,PHI2)-OUT-MAY-{I==PHI1, M==PHI2, 3<=PHI1, PHI1<=2+N, 4<=L,
+C    5<=M, 2<=N}>
+
+         AA(I,M) = I+M                                                  0002
+      ENDDO
+      END
+c     interprocedural propagation of array regions
+      PROGRAM TRADM
+      INTEGER M,N,L,P
+
+      INTEGER A(100,100), B(100,100), D(100,100,100)
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{PHI1==5}>
+
+
+      READ *, M, N, L, P                                                0001
+      IF (N.GT.1.AND.L.GT.3.AND.M.GT.L) THEN                            0002
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=100, 1<=PHI2, PHI2<=100,
+C    4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+
+         READ *, A                                                      0003
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+
+         READ *, B                                                      0004
+
+C  <D(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=100, 1<=PHI2, PHI2<=100,
+C    1<=PHI3, PHI3<=100, 4<=L, 1+L<=M, 2<=N}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, 4<=L, 1+L<=M, 2<=N}>
+
+         READ *, D                                                      0005
+         CALL TRAD(A, B, D, M, N, L, P)                                 0006
+      ENDIF
+
+      END
+
+
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      SUBROUTINE TRADS(S)
+      INTEGER S
+      S = 0                                                             0001
+      END
+

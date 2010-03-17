@@ -1,0 +1,43 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: ioerrend: No such workspace
+Registering file ioerrend.f
+Splitting file    ./ioerrend.f
+  Module         IOERREND
+Workspace ioerrend created and opened.
+Module IOERREND selected
+Main module PROGRAM "IOERREND" selected.
+Module IOERREND already active.
+Module IOERREND already active.
+Request: build resource PRINTED_FILE for module IOERREND.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(IOERREND)
+  PARSER                         building   PARSED_CODE(IOERREND)
+                                 building   CALLEES(IOERREND)
+  CONTROLIZER                    building   CODE(IOERREND)
+  PRINT_CODE                     building   PRINTED_FILE(IOERREND)
+PRINTED_FILE made for IOERREND.
+      PROGRAM IOERREND
+
+      READ (UNIT=*,FMT=100,ERR=1000,END=2000) I                         0003
+100   FORMAT(I5)                                                        0004
+
+      STOP                                                              0006
+
+1000  CONTINUE                                                          0008
+      PRINT *, 'end of file'                                            0009
+      STOP                                                              0010
+
+2000  CONTINUE                                                          0012
+      PRINT *, 'read error'                                             0013
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module IOERREND.
+Closing program.
+Closing workspace.
+Workspace ioerrend closed.
+
+Workspace ioerrend deleted.

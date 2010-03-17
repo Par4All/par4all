@@ -1,0 +1,33 @@
+void STOP_PAUSE()
+{
+   int L1;
+   int L2;
+   int L3;
+   int L4;
+   float X;
+   float RAND();
+   X = RAND();
+   if (X>0.) {
+      X = X+5.;
+      _f77_intrinsics_stop_("finished");
+   }
+   else if (X<-1.) {
+      X = X+7.;
+      exit(3);
+   }
+   else if (X!=-2.)
+      exit(0);
+   else if (X>=-3.)
+      _f77_intrinsics_pause_(10);
+   else if (X<=-4.)
+      _f77_intrinsics_pause_(0);
+   else if (X==-5.)
+      ;
+   else if (!L1)
+      X = RAND();
+   else if (L2||L3)
+l1:      ;
+   else if (L3&&L4)
+      X = X+1.;
+
+}

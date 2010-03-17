@@ -1,0 +1,124 @@
+      SUBROUTINE WP65(PROC_ID)
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J,K_0,L_K,L_J_1,L_J_2
+     &,L_I_1,L_I_2,X2,X1
+      REAL*4 L_A_0_0(0:24,1:25),L_C_0_0(0:24,0:24),L_B_0_0(0:99,1:25)
+
+C     WP65 DISTRIBUTED CODE FOR INDIRECTION
+
+C     TO SCAN THE TILE SET FOR WP65
+      DO 99978 I_0 = PROC_ID, 3, 4
+         DO 99979 J_0 = 1, 3
+            DO 99980 K_0 = 1, 3
+               DOALL BANK_ID = 0, 3
+                  DO 99995 L_K = MAX(49-25*K_0, 0), 24
+                     DO 99996 L = MAX((1-100*BANK_ID+2500*I_0+25*K_0+
+     &               L_K)/400, 0), MIN((2500-100*BANK_ID+2500*I_0+25*
+     &               K_0+L_K)/400, 25)
+                        L_J_1 = MAX(49-25*J_0, 0)
+                        L_J_2 = 24
+                        IF (L_J_1.LE.L_J_2) THEN
+                           CALL WP65_RECEIVE_4(BANK_ID, L_A_0_0(L_J_1
+     &                     ,1+L_K), L_J_2-L_J_1+1)
+                        ENDIF
+99996                   CONTINUE
+99995                CONTINUE
+99994             CONTINUE
+               ENDDO
+C           TO SCAN EACH ITERATION OF THE CURRENT TILE
+               DO 99984 L_I = 0, 24
+                  DO 99985 L_J = MAX(0, 49-25*J_0), 24
+                     DO 99986 L_K = MAX(49-25*K_0, 0), 24
+                        X1 = L_A_0_0(L_K,L_I+1)
+                        L = (99+2500*J_0+100*L_J)/400
+                        X2 = (99+2500*J_0+100*L_J-400*L)/100
+                        O = 99+2500*J_0+100*L_J-400*L-100*X2
+                        DOALL BANK_ID = 0, 3
+                           CALL WP65_SEND_4(BANK_ID, X2, 1)
+                           CALL WP65_SEND_4(BANK_ID, L, 1)
+                           CALL WP65_SEND_4(BANK_ID, O, 1)
+                        ENDDO
+                        CALL WP65_RECEIVE_4(X2, L_B_0_0(X1,L_J+1), 1)
+                        L_C_0_0(L_I,L_J) = L_B_0_0(X1,L_J+1)
+99996                   CONTINUE
+99986                   CONTINUE
+99985                CONTINUE
+99984             CONTINUE
+               DOALL BANK_ID = 0, 3
+                  DO 99989 L_J = MAX(49-25*J_0, 0), 24
+                     DO 99990 L = 12, 24
+                        L_I_1 = MAX(100*BANK_ID-25*I_0-2500*J_0+400*L
+     &                  -100*L_J, -9900+100*BANK_ID-25*I_0+400*L, 0)
+                        L_I_2 = MIN(99+100*BANK_ID-25*I_0-2500*J_0+
+     &                  400*L-100*L_J, -4801+100*BANK_ID-25*I_0+400*L
+     &                  , 24)
+                        IF (L_I_1.LE.L_I_2) THEN
+                           CALL WP65_SEND_4(BANK_ID, L_C_0_0(L_I_1,
+     &                     L_J), L_I_2-L_I_1+1)
+                        ENDIF
+99990                   CONTINUE
+99989                CONTINUE
+99988             CONTINUE
+               ENDDO
+99980          CONTINUE
+99979       CONTINUE
+99978    CONTINUE
+      RETURN
+      END
+      SUBROUTINE BANK(BANK_ID)
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J,K_0,L_K,O_1,O_2,X2
+      REAL*4 ES_A(0:99,0:25),ES_C(0:99,0:25),ES_B(0:99,0:25)
+
+C     BANK DISTRIBUTED CODE FOR INDIRECTION
+
+C     TO SCAN THE TILE SET FOR BANK
+      DO 99975 I_0 = 0, 3
+         PROC_ID = MOD(I_0, 4)
+         DO 99976 J_0 = 1, 3
+            DO 99977 K_0 = 1, 3
+               DO 99997 L_K = MAX(49-25*K_0, 0), 24
+                  DO 99998 L = 0, 25
+                     O_1 = MAX(100-100*BANK_ID+2500*I_0+25*K_0-400*L+
+     &               L_K, 0)
+                     O_2 = MIN(2500-100*BANK_ID+2500*I_0+25*K_0-400*L
+     &               +L_K, 99)
+                     IF (O_1.LE.O_2) THEN
+                        CALL BANK_SEND_4(PROC_ID, ES_A(O_1,L), O_2-
+     &                  O_1+1)
+                     ENDIF
+99998                CONTINUE
+99997             CONTINUE
+C           TO SCAN EACH ITERATION OF THE CURRENT TILE
+               DO 99981 L_I = 0, 24
+                  DO 99982 L_J = MAX(0, 49-25*J_0), 24
+                     DO 99983 L_K = MAX(49-25*K_0, 0), 24
+                        CALL BANK_RECEIVE_4(PROC_ID, X2, 1)
+                        CALL BANK_RECEIVE_4(PROC_ID, L, 1)
+                        CALL BANK_RECEIVE_4(PROC_ID, O, 1)
+                        IF (BANK_ID.EQ.X2) THEN
+                           CALL BANK_SEND_4(PROC_ID, ES_B(O,L), 1)
+                        ENDIF
+99983                   CONTINUE
+99982                CONTINUE
+99981             CONTINUE
+               DO 99991 L_J = 0, 24
+                  DO 99992 L = 12, 24
+                     DO 99993 O = MAX(4900-100*BANK_ID+25*I_0-400*L, 
+     &               -100*BANK_ID+25*I_0+2500*J_0-400*L+100*L_J, 0), 
+     &               MIN(9924-100*BANK_ID+25*I_0-400*L, 24-100*
+     &               BANK_ID+25*I_0+2500*J_0-400*L+100*L_J, 99)
+                        IF ((175+100*BANK_ID-25*I_0+400*L+O)/100.LE.(
+     &                  100+100*BANK_ID-25*I_0+400*L+O)/100.AND.(100+
+     &                  100*BANK_ID+400*L+O)/100.LE.(100+100*BANK_ID-
+     &                  25*I_0+400*L+O)/100.AND.(175+100*BANK_ID-25*
+     &                  I_0+400*L+O)/100.LE.(100+100*BANK_ID+400*L+O)
+     &                  /100) THEN
+                           CALL BANK_RECEIVE_4(PROC_ID, ES_C(O,L), 1)
+                        ENDIF
+99993                   CONTINUE
+99992                CONTINUE
+99991             CONTINUE
+99977          CONTINUE
+99976       CONTINUE
+99975    CONTINUE
+      RETURN
+      END

@@ -1,0 +1,15 @@
+# Reproduction of a bug observed in Spec-CFP95
+
+delete data02
+
+create data02 data02.f
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[DATA02]
+# setproperty PRETTYPRINT_BLOCKS TRUE
+# activate PRINT_CODE_CUMULATED_EFFECTS
+# display PRINTED_FILE[DATA02]
+close
+delete data02
+quit

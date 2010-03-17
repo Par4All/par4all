@@ -1,0 +1,12 @@
+# 1
+main()
+{
+  union x
+  {
+    int a;
+    float b;
+  };
+
+  union x y;
+}
+extern main();

@@ -1,0 +1,7 @@
+delete data17
+create data17 data17.f
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE 
+close
+delete data17
+quit

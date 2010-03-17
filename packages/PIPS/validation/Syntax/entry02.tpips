@@ -1,0 +1,21 @@
+delete entry02
+create entry02 entry02.f
+
+echo
+echo Module ENTRY0
+echo
+
+display PRINTED_FILE[ENTRY02]
+
+# Then, the code for the entry can be displayed
+# Well, now pipsmake should be able to survive 
+# a direct request for PRINTED_FILE[INCREMENT]
+
+echo
+echo Module INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+close
+delete entry02
+quit

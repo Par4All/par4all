@@ -1,0 +1,11 @@
+delete intro_example02
+create intro_example02 intro_example02.c
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
+
+apply PRIVATIZE_MODULE[foo]
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE[foo]
+display PRINTED_FILE[foo]
+
+quit

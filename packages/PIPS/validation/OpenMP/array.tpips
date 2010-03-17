@@ -1,0 +1,41 @@
+#
+delete array
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create array array.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+#apply SPLIT_INITIALIZATIONS[main]
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(main)
+
+#unset parallal printed of do loop to avoid pragma duplication
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+display PRINTED_FILE(main)
+
+close
+delete array
+quit
+# EOF

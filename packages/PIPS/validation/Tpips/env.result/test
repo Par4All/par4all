@@ -1,0 +1,10 @@
+NEWGEN_MAX_TABULATED_ELEMENTS is not defined
+NEWGEN_MAX_TABULATED_ELEMENTS=2000
+2000
+FOO foo, BLA bla
+! 
+      PROGRAM ENV
+      PRINT *, "nothing to do"                                          0001
+      END
+max tab is 2000
+done

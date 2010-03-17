@@ -1,0 +1,224 @@
+                                                                  
+      SUBROUTINE DCFT( M1, X, INC1X, INC2X, Y, INC1Y, INC2Y, N, M,
+     &   ISIGN, SCALE, RA, AUX,NQ)
+
+      IMPLICIT REAL*8(A-H,O-Z)
+      REAL*8 X(*),Y(10),RA(4*N),AUX(2*N)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C          CALL CFFT(0,M1,AUX,RA,RA(2*N+1),NQ)
+!     INITIALLY: DO 10
+      DO I = 1, M
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         IBR = (I-1)*INC2X*2+1
+C (0,5)
+         IBC = (I-1)*INC2X*2+2
+C (0,6)
+!     INITIALLY: DO 20
+         DO II = 1, N
+C (0,7)
+C           BEGIN BLOCK
+C (0,8)
+            INDR = IBR+(II-1)*2*INC1X
+C (0,9)
+            INDC = IBC+(II-1)*2*INC1X
+C (0,10)
+            RA(II) = X(INDR)
+C (0,11)
+            RA(II+N) = X(INDC)
+C (0,12)
+20          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,13)
+C          CALL CFFT(ISIGN,M1,AUX,RA,RA(2*N+1),NQ)
+!     INITIALLY: DO 30
+         DO II = 1, N
+C (0,14)
+C           BEGIN BLOCK
+C (0,15)
+            INDR = IBR+(II-1)*2*INC1X
+C (0,16)
+            INDC = IBC+(II-1)*2*INC1X
+C (0,17)
+            Y(INDR) = SCALE*RA(II)
+C (0,18)
+            Y(INDC) = SCALE*RA(II+N)
+C (0,19)
+30          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,20)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,21)
+      RETURN
+C     END BLOCK
+      END
+C     
+      SUBROUTINE  XYFFT(KN,NTSK,IND,IS)                                 
+
+      IMPLICIT    REAL*8(A-H,O-Z)                                       
+      PARAMETER   (IX= 64,IY= 64,IZ= 64 ,M1=6)
+
+      PARAMETER   (IXPP=IX+2,IXHP=IX/2+1,ITOT=IXPP*IY*IZ,               
+     +          IXY=IXHP*IY,IXZ=IXHP*IZ,IYZ=IY*IZ)                      
+      COMMON/ALL/ U(IXPP,IY,IZ)       
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+      REAL*8      AUX1(4*IX),AUX2(2*IX)                            
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL DCFT(M1, U(1,1,KN), NXHP, 1, U(1,1,KN), NXHP, 1, NY, NXHP
+     &, 1, SY, AUX1, AUX2, KN)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+
+                                                                       
+      SUBROUTINE  ZFFT(JN,NTSK,IND,IS)                                  
+      IMPLICIT    REAL*8(A-H,O-Z)                                       
+      PARAMETER   (IX= 64,IY= 64,IZ= 64 ,M1=6)
+
+      PARAMETER   (IXPP=IX+2,IXHP=IX/2+1,ITOT=IXPP*IY*IZ,               
+     +          IXY=IXHP*IY,IXZ=IXHP*IZ,IYZ=IY*IZ)                      
+      COMMON/ALL/ U(IXPP,IY,IZ)        
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+      REAL*8      AUX1(4*IX),AUX2(2*IX)                                  
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL DCFT(M1, U(1,JN,1), NXY, 1, U(1,JN,1), NXY, 1, NZ, NXHP, 1
+     &, SZ, AUX1, AUX2, JN)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for simple_turb3d.f
+!!
+
+                                                                       
+      SUBROUTINE  ZFFT(JN,NTSK,IND,IS)                                  
+     x 
+      IMPLICIT    REAL*8(A-H,O-Z)                                       
+     x 
+      PARAMETER   (IX= 64,IY= 64,IZ= 64 ,M1=6)
+
+      PARAMETER   (IXPP=IX+2,IXHP=IX/2+1,ITOT=IXPP*IY*IZ,               
+     x 
+     +          IXY=IXHP*IY,IXZ=IXHP*IZ,IYZ=IY*IZ)                      
+     x 
+      COMMON/ALL/ U(IXPP,IY,IZ)        
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      REAL*8      AUX1(4*IX),AUX2(2*IX)                                 
+     x  
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+C     BEGIN BLOCK
+C (0,2)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      CALL DCFT(M1, U(1,JN,1), NXY, 1, U(1,JN,1), NXY, 1, NZ, NXHP, 1
+     &, SZ, AUX1, AUX2, JN)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+C     
+      SUBROUTINE  XYFFT(KN,NTSK,IND,IS)                                 
+     x 
+
+      IMPLICIT    REAL*8(A-H,O-Z)                                       
+     x 
+      PARAMETER   (IX= 64,IY= 64,IZ= 64 ,M1=6)
+
+      PARAMETER   (IXPP=IX+2,IXHP=IX/2+1,ITOT=IXPP*IY*IZ,               
+     x 
+     +          IXY=IXHP*IY,IXZ=IXHP*IZ,IYZ=IY*IZ)                      
+     x 
+      COMMON/ALL/ U(IXPP,IY,IZ)       
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      REAL*8      AUX1(4*IX),AUX2(2*IX)                            
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+C     BEGIN BLOCK
+C (0,2)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      CALL DCFT(M1, U(1,1,KN), NXHP, 1, U(1,1,KN), NXHP, 1, NY, NXHP
+     &, 1, SY, AUX1, AUX2, KN)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+                                                                  
+      SUBROUTINE DCFT( M1, X, INC1X, INC2X, Y, INC1Y, INC2Y, N, M,
+     &   ISIGN, SCALE, RA, AUX,NQ)
+
+      IMPLICIT REAL*8(A-H,O-Z)
+      REAL*8 X(I_PIPS_DCFT_X),Y(10),RA(4*N),AUX(2*N)
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+C     BEGIN BLOCK
+C (0,2)
+C          CALL CFFT(0,M1,AUX,RA,RA(2*N+1),NQ)
+!     INITIALLY: DO 10
+      DO I = 1, M
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         IBR = (I-1)*INC2X*2+1
+C (0,5)
+         IBC = (I-1)*INC2X*2+2
+C (0,6)
+!     INITIALLY: DO 20
+         DO II = 1, N
+C (0,7)
+C           BEGIN BLOCK
+C (0,8)
+            INDR = IBR+(II-1)*2*INC1X
+C (0,9)
+            INDC = IBC+(II-1)*2*INC1X
+C (0,10)
+            RA(II) = X(INDR)
+C (0,11)
+            RA(II+N) = X(INDC)
+C (0,12)
+20          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,13)
+C          CALL CFFT(ISIGN,M1,AUX,RA,RA(2*N+1),NQ)
+!     INITIALLY: DO 30
+         DO II = 1, N
+C (0,14)
+C           BEGIN BLOCK
+C (0,15)
+            INDR = IBR+(II-1)*2*INC1X
+C (0,16)
+            INDC = IBC+(II-1)*2*INC1X
+C (0,17)
+            Y(INDR) = SCALE*RA(II)
+C (0,18)
+            Y(INDC) = SCALE*RA(II+N)
+C (0,19)
+30          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,20)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,21)
+      RETURN
+C     END BLOCK
+      END

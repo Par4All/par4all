@@ -1,0 +1,164 @@
+
+Initial code
+
+freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
+{
+   
+   
+   int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   
+   
+   
+   int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   
+   
+   
+   int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
+   int i;
+   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, __FUNCTION__);
+      freia_common_print_backtrace();
+      return 1;
+   }
+   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, __FUNCTION__);
+      freia_common_print_backtrace();
+      return 1;
+   }
+
+   if (size==0) {
+      freia_aipo_copy(imout, imin);
+      return 0;
+   }
+
+   if (connexity==4) goto switch_1_case_4;
+   if (connexity==6) goto switch_1_case_6;
+   if (connexity==8) goto switch_1_case_8;
+
+switch_1_default:   ;
+   return 2;
+
+switch_1_case_8:   ;
+   freia_aipo_dilate_8c(imout, imin, kernel_8c);
+   for (i = 1;i<size;i++)
+      freia_aipo_dilate_8c(imout, imout, kernel_8c);
+   goto break_1;
+
+switch_1_case_6:   ;
+   freia_aipo_dilate_6c(imout, imin, kernel_6c);
+   for (i = 1;i<size;i++)
+      freia_aipo_dilate_6c(imout, imout, kernel_6c);
+   goto break_1;
+switch_1_case_4:   ;
+   freia_aipo_dilate_8c(imout, imin, kernel_4c);
+   for (i = 1;i<size;i++)
+      freia_aipo_dilate_8c(imout, imout, kernel_4c);
+break_1:   ;
+
+   return 0;
+}
+freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
+{
+   freia_error ret;
+
+   ret = freia_cipo_dilate(imout, imin, connexity, size);
+   ret |= freia_aipo_sub(imout, imout, imin);
+
+   return ret;
+}
+
+Because %ALL is modified by code synthesis, let's get ready
+
+ freia_cipo_outer_gradient
+     freia_cipo_dilate
+         freia_common_check_image_bpp_compat
+         freia_common_print_backtrace
+         freia_aipo_copy
+         freia_aipo_dilate_8c
+         freia_aipo_dilate_6c
+     freia_aipo_sub
+
+Code after inlining
+
+freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
+{
+   freia_error ret;
+   //PIPS generated variable
+   int _return0;
+   {
+      
+      
+      int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+      
+      
+      
+      int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+      
+      
+      
+      int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
+      int i;
+      //PIPS generated variable
+      extern struct _IO_FILE *stderr;
+      if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) goto l99998;
+      if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) goto l99997;
+
+      if (size==0) goto l99996;
+
+      if (connexity==4) goto l99995;
+      if (connexity==6) goto l99994;
+      if (connexity==8) goto l99993;
+
+      _return0 = 2;
+      goto l99992;
+l99993:      ;
+
+      freia_aipo_dilate_8c(imout, imin, kernel_8c);
+      for (i = 1;i<size;i++)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c);
+l99991:      ;
+      
+      
+      _return0 = 0;
+      goto l99992;
+l99994:      ;
+
+      freia_aipo_dilate_6c(imout, imin, kernel_6c);
+      for (i = 1;i<size;i++)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c);
+      goto l99991;
+l99995:      ;
+      freia_aipo_dilate_8c(imout, imin, kernel_4c);
+      for (i = 1;i<size;i++)
+         freia_aipo_dilate_8c(imout, imout, kernel_4c);
+      goto l99991;
+l99996:      ;
+      freia_aipo_copy(imout, imin);
+      _return0 = 0;
+      goto l99992;
+l99997:      ;
+
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, __FUNCTION__);
+      freia_common_print_backtrace();
+      _return0 = 1;
+      goto l99992;
+l99998:      ;
+
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, __FUNCTION__);
+      freia_common_print_backtrace();
+      _return0 = 1;
+l99992:      ;
+
+   }
+   ret = _return0;
+   ret |= freia_aipo_sub(imout, imout, imin);
+
+   return ret;
+}
+
+Unsplit resulting code
+

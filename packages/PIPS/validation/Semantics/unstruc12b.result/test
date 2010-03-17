@@ -1,0 +1,307 @@
+
+Code:
+
+      PROGRAM UNSTRUC12B
+
+C     Reduced version of unstruc12 to track a bug in unstructured
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      J = 1                                                             0007
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99998 CONTINUE
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 44                                            0007
+C (9,1)
+      K = IINF                                                          0008
+99999 CONTINUE
+C (6,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0008
+C (7,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0009
+C (8,1)
+C     BEGIN BLOCK
+C (8,2)
+41    CONTINUE                                                          0010
+C (8,3)
+      K = K+1                                                           0008
+C     END BLOCK
+      GOTO 99999
+C (5,1)
+42    VOLUME = ZMOYEN                                                   0011
+C (3,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0012
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+31    CONTINUE                                                          0013
+C (4,3)
+      J = J+1                                                           0007
+C     END BLOCK
+      GOTO 99998
+C (2,1)
+44    CONTINUE                                                          0014
+C     END UNSTRUCTURED
+C (0,4)
+      IF (IMPC.EQ.1) THEN                                               0014
+C (0,5)
+         WRITE (6, *) SOMME                                             0014
+      ELSE
+C (0,6)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C     END BLOCK
+      END
+
+Transformers
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC12B
+
+C     Reduced version of unstruc12 to track a bug in unstructured
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+
+C  T(J,K) {1<=J}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(J) {J==1}
+
+C (0,2)
+      J = 1                                                             0007
+
+C  T(J,K) {J#init<=J}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99998 CONTINUE
+
+C  T() {}
+
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 44                                            0007
+
+C  T(K) {IINF==K}
+
+C (9,1)
+      K = IINF                                                          0008
+99999 CONTINUE
+
+C  T() {}
+
+C (6,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0008
+
+C  T() {}
+
+C (7,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0009
+
+C  T(K) {K==K#init+1}
+
+C (8,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (8,2)
+41    CONTINUE                                                          0010
+
+C  T(K) {K==K#init+1}
+
+C (8,3)
+      K = K+1                                                           0008
+C     END BLOCK
+      GOTO 99999
+
+C  T() {}
+
+C (5,1)
+42    VOLUME = ZMOYEN                                                   0011
+
+C  T() {}
+
+C (3,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0012
+
+C  T(J) {J==J#init+1}
+
+C (4,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (4,2)
+31    CONTINUE                                                          0013
+
+C  T(J) {J==J#init+1}
+
+C (4,3)
+      J = J+1                                                           0007
+C     END BLOCK
+      GOTO 99998
+
+C  T() {}
+
+C (2,1)
+44    CONTINUE                                                          0014
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,4)
+      IF (IMPC.EQ.1) THEN                                               0014
+
+C  T() {}
+
+C (0,5)
+         WRITE (6, *) SOMME                                             0014
+      ELSE
+
+C  T() {}
+
+C (0,6)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C     END BLOCK
+      END
+
+Preconditions
+
+
+C  P() {}
+
+      PROGRAM UNSTRUC12B
+
+C     Reduced version of unstruc12 to track a bug in unstructured
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+      J = 1                                                             0007
+
+C  P(J) {J==1}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99998 CONTINUE
+
+C  P(J,K) {1<=J}
+
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 44                                            0007
+
+C  P(J,K) {1<=J, J<=NJM1}
+
+C (9,1)
+      K = IINF                                                          0008
+99999 CONTINUE
+
+C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
+
+C (6,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0008
+
+C  P(J,K) {IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (7,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0009
+
+C  P(J,K) {IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (8,1)
+C     BEGIN BLOCK
+
+C  P(J,K) {IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (8,2)
+41    CONTINUE                                                          0010
+
+C  P(J,K) {IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (8,3)
+      K = K+1                                                           0008
+C     END BLOCK
+      GOTO 99999
+
+C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
+
+C (5,1)
+42    VOLUME = ZMOYEN                                                   0011
+
+C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
+
+C (3,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0012
+
+C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
+
+C (4,1)
+C     BEGIN BLOCK
+
+C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
+
+C (4,2)
+31    CONTINUE                                                          0013
+
+C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
+
+C (4,3)
+      J = J+1                                                           0007
+C     END BLOCK
+      GOTO 99998
+
+C  P(J,K) {1<=J}
+
+C (2,1)
+44    CONTINUE                                                          0014
+C     END UNSTRUCTURED
+
+C  P(J,K) {1<=J}
+
+C (0,4)
+      IF (IMPC.EQ.1) THEN                                               0014
+
+C  P(J,K) {IMPC==1, 1<=J}
+
+C (0,5)
+         WRITE (6, *) SOMME                                             0014
+      ELSE
+
+C  P(J,K) {1<=J}
+
+C (0,6)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C     END BLOCK
+      END
+

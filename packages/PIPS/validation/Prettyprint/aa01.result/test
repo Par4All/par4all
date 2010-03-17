@@ -1,0 +1,60 @@
+      PROGRAM AA01
+
+      REAL X(10), Y(10), Z(10), U(10,10)
+      INTEGER IX(10)
+
+      X(1:10) = 0.                                                      0007
+
+      X(1:10) = 0.                                                      0011
+
+C     Reset array X
+      X(1:10) = 0.                                                      0016
+
+      X(1:10) = 0.                                                      0020
+
+      X(2:10) = 0.                                                      0024
+
+      X(1:9) = 0.                                                       0028
+
+      X(1:9) = 0.                                                       0032
+
+      X(10:1:-1) = 0.                                                   0036
+
+      X(3:9:2) = 0.                                                     0040
+
+C     Cannot be parallelized by PIPS. Hence, the array assignment cannot be prettyprinted
+      DO I = 1, 3                                                       0044
+         X(I**2+1) = 0.                                                 0045
+      ENDDO
+
+      X(1:10) = Y(1:10)                                                 0049
+
+C     Detect a scalar in the right hand side
+      X(1:10) = Y(K)                                                    0054
+
+C     Use an array contructor with an implicit DO for a non-affine expression
+      X(1:10) = Y((/ (I,I=1,10) /)/2)                                   0059
+
+      X(1:10) = Y(1:10)+Z(1:10)                                         0063
+
+      DO I = 1, 10                                                      0066
+         U(I,I) = 0.                                                    0067
+      ENDDO
+
+      DO I = 1, 10                                                      0070
+         U(I,I**2) = 0.                                                 0071
+      ENDDO
+
+      DO I = 1, 10                                                      0074
+         U(I,IX(I)) = 0.                                                0075
+      ENDDO
+
+      DO I = 1, 10                                                      0078
+         CALL INC(X(I))                                                 0079
+      ENDDO
+
+      END
+
+      SUBROUTINE INC(Y)
+      Y = Y+1.                                                          0003
+      END

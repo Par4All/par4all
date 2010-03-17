@@ -1,0 +1,25 @@
+delete source02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# In case of preprocessing, UNPSLIT does not regenerate user files but
+# preprocessed user files.
+
+# FI: I do not understand these examples since they do not require any preprocessing
+
+create source02 source02.src/module01.F source02.src/module02.F
+
+echo
+echo Printed files
+echo
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo Regenerated file
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat source02.database/Src/*.f
+
+quit

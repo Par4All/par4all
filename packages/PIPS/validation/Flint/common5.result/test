@@ -1,0 +1,13 @@
+
+Flinted file
+
+flint message from check common, in module COMMON5
+overlap of incompatible variables (COMMON5:I, FOO:Y) in common BAR
+flint message from check common, in module COMMON5
+overlap of incompatible variables (COMMON5:J, FOO:X) in common BAR
+number of messages from flint for COMMON5 : 2
+flint message from check common, in module FOO
+overlap of incompatible variables (FOO:Y, COMMON5:I) in common BAR
+flint message from check common, in module FOO
+overlap of incompatible variables (FOO:X, COMMON5:J) in common BAR
+number of messages from flint for FOO : 2

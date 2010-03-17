@@ -1,0 +1,41 @@
+delete scalar10
+create scalar10 scalar10.f
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate MUST_REGIONS
+
+#activate PRINT_CODE_IN_EFFECTS
+#display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_OUT_EFFECTS
+#display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_OUT_REGIONS
+#display PRINTED_FILE[%ALL]
+
+setenv USED_BEFORE_SET_DEBUG_LEVEL 1
+#apply USED_BEFORE_SET[%ALL]
+make UBS[%ALL]
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+make PRINTED_FILE[%ALL]
+apply UNSPLIT
+
+shell ubs_checking_instrument.pl < scalar10.database/instrument.out
+
+shell grep -v "^C" scalar10.database/Src/scalar10.f |cat
+
+quit

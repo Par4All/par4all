@@ -1,0 +1,16 @@
+      PROGRAM CGOTO
+
+      IF (I.EQ.1) GOTO 100                                              0003
+      IF (I.EQ.2) GOTO 200                                              0003
+      IF (I.EQ.3) GOTO 300                                              0003
+      IF (I.EQ.4) GOTO 400                                              0003
+      J = 1                                                             0004
+100   CONTINUE                                                          0005
+      J = 2                                                             0006
+200   CONTINUE                                                          0007
+      J = 3                                                             0008
+300   CONTINUE                                                          0009
+      J = 4                                                             0010
+400   CONTINUE                                                          0011
+      J = 5                                                             0012
+      END

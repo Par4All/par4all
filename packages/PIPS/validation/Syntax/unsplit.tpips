@@ -1,0 +1,7 @@
+delete unsplit
+create unsplit unsplit.f
+apply UNSPLIT
+display USER_FILE($PROGRAM)
+shell cat unsplit.database/Src/*
+close
+delete unsplit

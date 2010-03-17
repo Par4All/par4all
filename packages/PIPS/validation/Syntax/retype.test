@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# To display the memory layout, a property is used
+# instead of a debug leve, but more information would be
+# available with SYNTAX_DEBUG_LEVEL=1.
+
+if [ -f properties.rc ]
+then
+    echo Script Syntax/retype.test is incompatible with a local properties.rc file >&2
+    exit 2
+fi
+
+echo "PARSER_DUMP_SYMBOL_TABLE TRUE" >properties.rc
+
+if Pips -q -f retype.f -w retype -m retype -b CALLGRAPH_FILE 2>&1 \
+    | sed '/file *\//d'
+then
+	exit_code=0
+else
+	exit_code=1
+fi
+Delete retype 2>/dev/null
+rm properties.rc
+exit $exit_code

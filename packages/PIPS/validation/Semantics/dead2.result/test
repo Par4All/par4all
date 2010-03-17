@@ -1,0 +1,50 @@
+
+C  P() {}
+
+C     Semantics analysis and dead code
+
+C     Partial evaluation may generate dead code and trivial tests
+
+      PROGRAM DEAD2
+
+C  P() {}
+
+
+      I = 1                                                             0007
+
+C  P(I) {I==1}
+
+      J = 1                                                             0008
+
+C  P(I,J) {I==1, J==1}
+
+      IF (I.EQ.J) THEN                                                  0009
+
+C  P(I,J) {I==1, J==1}
+
+         K = 2                                                          0010
+      ELSE
+
+C  P() {0==-1}
+
+         K = 4                                                          0012
+      ENDIF
+
+C  P(I,J,K) {I==1, J==1, K==2}
+
+      IF (1.EQ.1) THEN                                                  0014
+
+C  P(I,J,K) {I==1, J==1, K==2}
+
+         K = 2                                                          0015
+      ELSE
+
+C  P() {0==-1}
+
+         K = 4                                                          0017
+      ENDIF
+
+C  P(I,J,K) {I==1, J==1, K==2}
+
+      PRINT *, I, J, K                                                  0019
+      END

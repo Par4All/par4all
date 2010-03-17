@@ -1,0 +1,59 @@
+user warning in tp_parse: entry23: No such workspace
+Registering file entry23.f
+Splitting file    ./entry23.f
+  Module         ENTRY23
+  Module         INIBND
+Workspace entry23 created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+echo
+
+echo Module ENTRY23
+Module ENTRY23
+echo
+
+Module ENTRY23 selected
+Request: build resource PRINTED_FILE for module ENTRY23.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENTRY23)
+  PARSER                         building   PARSED_CODE(ENTRY23)
+                                 building   CALLEES(ENTRY23)
+user warning in SafeSizeOfArray: Varying size of array "ENTRY23:X"
+user warning in SafeSizeOfArray: An integer PARAMETER may have been initialized with a real value?
+user error in SafeSizeOfArray: Parser error between lines 19 and 19
+Fortran standard prohibit varying size array
+Set property PARSER_ACCEPT_ANSI_EXTENSIONS to true.
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module ENTRY23.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+echo
+
+echo Entry INIBND
+Entry INIBND
+echo
+
+Module INIBND selected
+Request: build resource PRINTED_FILE for module INIBND.
+  FILTER_FILE                    building   SOURCE_FILE(INIBND)
+  PARSER                         building   PARSED_CODE(INIBND)
+                                 building   CALLEES(INIBND)
+user warning in SafeSizeOfArray: Varying size of array "ENTRY23:X"
+user warning in SafeSizeOfArray: An integer PARAMETER may have been initialized with a real value?
+user error in SafeSizeOfArray: Parser error between lines 19 and 19
+Fortran standard prohibit varying size array
+Set property PARSER_ACCEPT_ANSI_EXTENSIONS to true.
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module INIBND.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ENTRY23.
+  Closing module INIBND.
+Closing program.
+Closing workspace.
+Workspace entry23 closed.
+
+Workspace entry23 deleted.

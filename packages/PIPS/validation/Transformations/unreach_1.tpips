@@ -1,0 +1,19 @@
+delete u
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+create u unreach_1.f
+echo # preconditions...
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE($ALL)
+activate PRINT_CODE
+echo # dead code elimination...
+apply SUPPRESS_DEAD_CODE($ALL)
+apply UNSPAGHETTIFY($ALL)
+# apply RESTRUCTURE_CONTROL($ALL)
+display PRINTED_FILE($ALL)
+close
+quit
+delete u

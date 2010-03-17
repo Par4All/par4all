@@ -1,0 +1,71 @@
+C     several small regression tests for the coarse grain 
+C     parallelization phase of PIPS
+      SUBROUTINE TEST1(A,N)
+      INTEGER N,A(N),I
+
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0006
+         A(I) = 0                                                       0007
+      ENDDO
+      END
+         
+      SUBROUTINE TEST2(A,N)
+      INTEGER N,A(N),I
+
+      DO I = 1, N                                                       0005
+         A(I) = A(I-1)                                                  0006
+      ENDDO
+      END
+         
+      SUBROUTINE TEST3(A,N)
+      INTEGER N,A(N,N),I,J
+
+      DO I = 1, N                                                       0005
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0006
+            A(I,J) = A(I+1,J)                                           0007
+         ENDDO
+      ENDDO
+      END
+         
+      SUBROUTINE TEST3(A,N)
+      INTEGER N,A(N,N),I,J
+
+      DO I = 1, N                                                       0005
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0006
+            A(I,J) = A(I+1,J)                                           0007
+         ENDDO
+      ENDDO
+      END
+         
+      SUBROUTINE TEST4(A,N,K)
+      INTEGER N,A(N),I,K
+
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0005
+         IF (I.NE.K) A(I) = 0                                           0006
+      ENDDO
+
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0011
+         IF (I.LE.K) GOTO 99999                                         0012
+
+         IF (I.GE.K) THEN                                               0017
+         ELSE
+            GOTO 10
+         ENDIF
+         A(I) = 2                                                       0018
+         GOTO 10
+99999    CONTINUE
+         A(I) = 1                                                       0013
+10       CONTINUE                                                       0021
+         A(I) = A(I)+K                                                  0021
+      ENDDO
+      END
+

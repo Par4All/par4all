@@ -1,0 +1,20 @@
+delete dowhile
+
+create dowhile dowhile.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+# USER_FILE seems to be a bit systsem dependent and hence improper to validation
+# This too bad because it was an good example of useful comments being discarded
+#display USER_FILE[main]
+
+display PRINTED_FILE[main]
+
+close
+
+delete dowhile
+
+quit

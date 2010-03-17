@@ -1,0 +1,98 @@
+foo
+
+Declarations for module "foo" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 48
+	Declared entity "foo:*HEAP*" with type "area" with size 0
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:0`A" with type "variable" "int"
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "sizeofArray04!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*DYNAMIC*" of size 48:
+	Variable "foo:0`A"	offset = 8	size = 40
+	Variable "foo:0`__func__"	offset = 0	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 4	size = 4
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray04!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module foo
+
+sizeofArray04!
+
+Declarations for module "sizeofArray04!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> void"
+	Declared entity "sizeofArray04!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "sizeofArray04!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray04!:*STACK*" with type "area" with size 0
+	Declared entity "sizeofArray04!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray04!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray04!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray04!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray04!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module sizeofArray04!
+
+
+Parsed code
+
+//Size of array should be known and should not be dynamic
+
+extern void foo();
+void foo()
+{
+   int A[10];
+}

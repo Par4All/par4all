@@ -1,0 +1,135 @@
+user warning in tp_parse: entry17: No such workspace
+Registering file entry17.f
+Splitting file    ./entry17.f
+  Module         ENTRY17
+  Module         INCREMENT
+Workspace entry17 created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+echo
+
+echo Module ENTRY17
+Module ENTRY17
+echo
+
+Module ENTRY17 selected
+Request: build resource PRINTED_FILE for module ENTRY17.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENTRY17)
+  PARSER                         building   PARSED_CODE(ENTRY17)
+                                 building   CALLEES(ENTRY17)
+
+Declarations for module ENTRY17 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity ENTRY17:*DYNAMIC*	with type area with size 0
+Declared entity ENTRY17:*HEAP*	with type area with size 0
+Declared entity ENTRY17:*STACK*	with type area with size 0
+Declared entity ENTRY17:*STATIC*	with type area with size 4
+Declared entity ENTRY17:K	with type variable INTEGER*4
+Declared entity ENTRY17:M	with type variable INTEGER*4
+Declared entity ENTRY17:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable ENTRY17:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 4:
+	Variable ENTRY17:K,	offset = 0,	size = 4
+	Variable ENTRY17:M,	offset = 0,	size = 4
+
+End of declarations for module ENTRY17
+
+user warning in MakeEntryCommon: Static variable K is aliased with M, K
+user error in MakeEntryCommon: Parser error between lines 24 and 24
+Entries with aliased static variables not yet supported by PIPS
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module ENTRY17.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+echo
+
+echo Entry INCREMENT
+Entry INCREMENT
+echo
+
+Module INCREMENT selected
+Request: build resource PRINTED_FILE for module INCREMENT.
+  FILTER_FILE                    building   SOURCE_FILE(INCREMENT)
+  PARSER                         building   PARSED_CODE(INCREMENT)
+                                 building   CALLEES(INCREMENT)
+
+Declarations for module ENTRY17 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity ENTRY17:*DYNAMIC*	with type area with size 0
+Declared entity ENTRY17:*HEAP*	with type area with size 0
+Declared entity ENTRY17:*STACK*	with type area with size 0
+Declared entity ENTRY17:*STATIC*	with type area with size 4
+Declared entity ENTRY17:K	with type variable INTEGER*4
+Declared entity ENTRY17:M	with type variable INTEGER*4
+Declared entity ENTRY17:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable ENTRY17:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 4:
+	Variable ENTRY17:K,	offset = 0,	size = 4
+	Variable ENTRY17:M,	offset = 0,	size = 4
+
+End of declarations for module ENTRY17
+
+user warning in MakeEntryCommon: Static variable K is aliased with M, K
+user error in MakeEntryCommon: Parser error between lines 24 and 24
+Entries with aliased static variables not yet supported by PIPS
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module INCREMENT.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ENTRY17.
+  Closing module INCREMENT.
+Closing program.
+Closing workspace.
+Workspace entry17 closed.
+
+Workspace entry17 deleted.

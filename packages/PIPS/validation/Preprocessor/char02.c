@@ -1,0 +1,9 @@
+main()
+{
+  char c1;
+  unsigned char c2;
+  signed char c3;
+  c1 = '\\';
+  c2 = '\'';
+  c3 = '\012';
+}

@@ -1,0 +1,7 @@
+delete param06
+create param06 param06.f
+module PARAM06
+display PRINTED_FILE[PARAM06]
+close
+delete param06
+quit

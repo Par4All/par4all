@@ -1,0 +1,97 @@
+void decl41(int size)
+{
+// (statement ordering unavailable)
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int x;                                                               /*0005*/
+// (statement ordering unavailable)
+   for (i = 1;(i<size);i++)                                             /*0006*/
+// (statement ordering unavailable)
+      x = i;                                                            /*0007*/
+// (statement ordering unavailable)
+   // BEGIN BLOCK
+// (statement ordering unavailable)
+   
+   // if the switch is removed, the loop index declarations reappears
+   ;                                                                    /*0010*/
+// (statement ordering unavailable)
+   // BEGIN BLOCK
+// (statement ordering unavailable)
+   if ((0==0))
+// (statement ordering unavailable)
+      goto switch_2_case_0;                                             /*0011*/
+   else
+// (statement ordering unavailable)
+
+// (statement ordering unavailable)
+   goto break_2;                                                        /*0014*/
+   // END BLOCK
+// (statement ordering unavailable)
+switch_2_case_0:   ;
+// (statement ordering unavailable)
+   x = 1;                                                               /*0012*/
+// (statement ordering unavailable)
+
+// (statement ordering unavailable)
+break_2:   ;
+   // END BLOCK
+// (statement ordering unavailable)
+   x = 0;                                                               /*0015*/
+   // END BLOCK
+}
+void decl41(int size)
+{
+// (0,1)
+// (1,1)
+   // BEGIN BLOCK
+// (1,2)
+// (2,1)
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int x;                                                               /*0005*/
+// (2,4)
+   for(i = 1; i <= (size-1); i += 1)
+// (2,5)
+      x = i;                                                            /*0007*/
+   // END BLOCK
+// (3,1)
+
+// if the switch is removed, the loop index declarations reappears
+   if ((0==0)) goto l99999;
+// (10,1)
+
+// (9,1)
+
+// (8,1)
+   // BEGIN BLOCK
+// (8,2)
+
+// (8,3)
+
+   // END BLOCK
+// (6,1)
+   // BEGIN BLOCK
+// (6,2)
+break_2:   ;
+// (6,3)
+   x = 0;                                                               /*0015*/
+   // END BLOCK
+   goto l99998;
+l99999:   ;
+// (4,1)
+
+// (5,1)
+   // BEGIN BLOCK
+// (5,2)
+
+// (5,3)
+switch_2_case_0:   ;
+// (5,4)
+   x = 1;                                                               /*0012*/
+   // END BLOCK
+   goto break_2;
+l99998:   ;
+// (7,1)
+
+   // END BLOCK
+}

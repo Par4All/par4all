@@ -1,0 +1,23 @@
+      PROGRAM ENTRY14
+      INTEGER ENTRY, SUBROUTINE, PROGRAM, FUNCTION, COMMON
+      INTEGER REAL, INTEGER, THEN, ENTRY FOO
+      REAL = 6                                                          0004
+      INTEGER = 7                                                       0005
+      ENTRY = 1                                                         0006
+      SUBROUTINE = 2                                                    0007
+      PROGRAM = 3                                                       0008
+      FUNCTION = 4                                                      0009
+      COMMON = 5                                                        0010
+      THEN = 8                                                          0011
+      ENTRYFOO = 9                                                      0012
+      PRINT *, 'entry = ', ENTRY                                        0013
+      PRINT *, 'subroutine = ', SUBROUTINE                              0014
+      PRINT *, 'program = ', PROGRAM                                    0015
+      PRINT *, 'function = ', FUNCTION                                  0016
+      PRINT *, 'common = ', COMMON                                      0017
+      PRINT *, 'real = ', REAL                                          0018
+      PRINT *, 'integer = ', INTEGER                                    0019
+      PRINT *, 'then = ', THEN                                          0020
+      PRINT *, 'entry foo = ', ENTRYFOO                                 0021
+      END
+

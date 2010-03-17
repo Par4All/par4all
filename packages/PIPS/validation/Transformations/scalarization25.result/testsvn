@@ -1,0 +1,18 @@
+
+Code after scalarization
+
+void scalarization25(double A[SIZE], double B[SIZE])
+{
+   // BEGIN BLOCK
+   double __scalar__0;
+   int i;
+   int j;
+   for(i = 0; i <= SIZE-1; i += 1) {
+      // BEGIN BLOCK
+      __scalar__0 = A[i];
+      __scalar__0 = B[i]+__scalar__0*++__scalar__0;
+      __scalar__0 = __scalar__0+get(A, i);
+      // END BLOCK
+   }
+   // END BLOCK
+}

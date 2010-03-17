@@ -1,0 +1,66 @@
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+l99999:   ;
+
+   if (!(j<i)) goto break_1;                                            /*0009*/
+   if (j>100) {                                                         /*0007*/
+   }
+   else {
+      goto l99999;
+   }
+break_1:   ;
+   return i;                                                            /*0010*/
+}
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+€Unstructured c_1_1 end: c_2_1
+‚Unstructured Item c_1_1
+
+   if (!(j<i))                                                          /*0009*/
+      ;
+ƒUnstructured Successor -> c_2_1 c_3_1
+‚Unstructured Item c_2_1
+break_1:   ;
+ƒUnstructured Successor ->
+‚Unstructured Item c_3_1
+   if (j>100)                                                           /*0007*/
+      ;
+ƒUnstructured Successor -> c_2_1 c_1_1
+Unstructured End c_1_1 end: c_2_1
+   return i;                                                            /*0010*/
+}
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+€Unstructured c_1_1 end: c_2_1
+‚Unstructured Item c_1_1
+
+   if (!(j<i))                                                          /*0009*/
+      ;
+ƒUnstructured Successor -> c_2_1 c_3_1
+‚Unstructured Item c_2_1
+break_1:   ;
+ƒUnstructured Successor ->
+‚Unstructured Item c_3_1
+   if (j>100)                                                           /*0007*/
+      ;
+ƒUnstructured Successor -> c_2_1 c_1_1
+Unstructured End c_1_1 end: c_2_1
+   return i;                                                            /*0010*/
+}
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+l99999:   ;
+
+   if (!(j<i)) goto break_1;                                            /*0009*/
+   if (j>100) {                                                         /*0007*/
+   }
+   else {
+      goto l99999;
+   }
+break_1:   ;
+   return i;                                                            /*0010*/
+}

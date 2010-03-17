@@ -1,0 +1,6 @@
+#!/bin/sh
+Init -d -f comments.f comments > /dev/null
+Display -v -m comments 2>&1 | grep "user error"
+exit_code=$?
+Delete comments 
+exit $exit_code

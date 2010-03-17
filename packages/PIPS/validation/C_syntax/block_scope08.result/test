@@ -1,0 +1,82 @@
+
+Symbol table for block_scope08
+
+block_scope08
+
+Declarations for module "block_scope08" with type "int -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope08!:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope08:*DYNAMIC*" with type "area" with size 32
+	Declared entity "block_scope08:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope08:*STACK*" with type "area" with size 0
+	Declared entity "block_scope08:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope08:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "block_scope08:0`__func__" with type "variable" "char"
+	Declared entity "block_scope08:0`k" with type "variable" "int"
+	Declared entity "block_scope08:block_scope08" with type "variable" "int"
+	Declared entity "block_scope08:x" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable block_scope08:x	offset = 1
+
+Layout for return variable:
+
+	Variable "block_scope08:block_scope08"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope08!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope08:*DYNAMIC*" of size 32:
+	Variable "block_scope08:0`k"	offset = 28	size = 4
+	Variable "block_scope08:0`__func__"	offset = 0	size = 14
+	Variable "block_scope08:0`__FUNCTION__"	offset = 14	size = 14
+
+
+Layout for memory area "block_scope08:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope08:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope08:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module block_scope08
+
+
+Parser output
+
+extern int block_scope08(int x);
+
+int block_scope08(int x)
+{
+   int k;
+
+   k = 1;
+}
+
+Controlizer output
+
+int block_scope08(int x)
+{
+   int k;
+
+   k = 1;
+}
+

@@ -1,0 +1,6 @@
+      program mode1
+      call foo(1)
+      end
+      subroutine foo(i)
+      i=i+1
+      end

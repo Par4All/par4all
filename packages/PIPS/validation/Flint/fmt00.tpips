@@ -1,0 +1,11 @@
+delete f
+create f fmt00.f
+echo ### initial
+display PRINTED_FILE[%ALL]
+apply TYPE_CHECKER[%ALL]
+echo ### type checked
+display PRINTED_FILE[%ALL]
+close
+
+delete f
+quit

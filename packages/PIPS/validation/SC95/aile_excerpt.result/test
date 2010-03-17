@@ -1,0 +1,469 @@
+
+1- Creation of the workspace.
+
+
+2- Show AILE. 
+
+      PROGRAM AILE
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      DATA N1,N3,N4,N7,N10,N14,N17/1,3,4,7,10,14,17/
+
+      READ (NXYZ) I1, I2, J1, JA, K1, K2                                0001
+      REWIND (NXYZ)                                                     0002
+C     
+      IF (J1.GE.1.AND.K1.GE.1) THEN                                     0003
+         J1 = J1+1                                                      0004
+         J2 = 2*JA+1                                                    0005
+         JA = JA+1                                                      0006
+         K1 = K1+1                                                      0007
+         CALL EXTR(N7, N17)                                             0008
+         PRINT *, T                                                     0009
+         CALL EXTR(N4, N17)                                             0010
+         PRINT *, T                                                     0011
+         CALL EXTR(N1, N17)                                             0012
+         PRINT *, T                                                     0013
+         CALL NORM(N10, N7, N4, N14, N17, I2)                           0014
+         PRINT *, T                                                     0015
+      ENDIF
+      END
+
+3- Show EXTR. (Retain)
+
+C
+      SUBROUTINE EXTR(NI,NC)
+C********************************************************
+C     CALCULE LES COEFFICIENTS D EXTRAPOLATION
+C     SUR LA SURFACE DE L AILE  (K=K1)
+C********************************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      L = NI                                                            0001
+      K = K1                                                            0002
+      DO 300 J = J1, JA                                                 0003
+         S1 = D(J, K, J, K+1)                                           0004
+         S2 = D(J, K+1, J, K+2)+S1                                      0005
+         S3 = D(J, K+2, J, K+3)+S2                                      0006
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0007
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0008
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0009
+         JH = J1+J2-J                                                   0010
+         T(JH,1,NC+3) = T(J,1,NC+3)                                     0011
+         T(JH,1,NC+4) = T(J,1,NC+4)                                     0012
+         T(JH,1,NC+5) = T(J,1,NC+5)                                     0013
+300      CONTINUE                                                       0014
+
+      END
+
+4- Show D.
+
+C
+      REAL FUNCTION D(J,K,JP,KP)
+C*****************************************
+C     CALCULE D=DISTANCE
+C*****************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CNI/L
+C     
+      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
+     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0001
+      END
+
+5- Show parallel version of EXTR.
+
+C
+      SUBROUTINE EXTR(NI,NC)
+C********************************************************
+C     CALCULE LES COEFFICIENTS D EXTRAPOLATION
+C     SUR LA SURFACE DE L AILE  (K=K1)
+C********************************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      L = NI                                                            0001
+      K = K1                                                            0002
+      DO J = J1, JA                                                     0003
+         S1 = D(J, K, J, K+1)                                           0004
+         S2 = D(J, K+1, J, K+2)+S1                                      0005
+         S3 = D(J, K+2, J, K+3)+S2                                      0006
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0007
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0008
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0009
+         JH = J1+J2-J                                                   0010
+         T(JH,1,NC+3) = T(J,1,NC+3)                                     0011
+         T(JH,1,NC+4) = T(J,1,NC+4)                                     0012
+         T(JH,1,NC+5) = T(J,1,NC+5)                                     0013
+      ENDDO
+
+      END
+
+6- Show D with regions
+
+
+C  <T(PHI1,PHI2,PHI3)-R-MAY-{L<=PHI3, PHI3<=2+L}>
+
+C
+      REAL FUNCTION D(J,K,JP,KP)
+C*****************************************
+C     CALCULE D=DISTANCE
+C*****************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CNI/L
+
+C  <T(PHI1,PHI2,PHI3)-R-MAY-{L<=PHI3, PHI3<=2+L}>
+
+C     
+      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
+     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0001
+      END
+
+7- Show D with MUST regions 
+
+
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
+
+C
+      REAL FUNCTION D(J,K,JP,KP)
+C*****************************************
+C     CALCULE D=DISTANCE
+C*****************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CNI/L
+
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
+
+C     
+      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
+     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0001
+      END
+
+8- Show EXTR parallelized with interprocedural information
+
+C
+      SUBROUTINE EXTR(NI,NC)
+C********************************************************
+C     CALCULE LES COEFFICIENTS D EXTRAPOLATION
+C     SUR LA SURFACE DE L AILE  (K=K1)
+C********************************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      L = NI                                                            0001
+      K = K1                                                            0002
+      DOALL J = J1, JA                                                  0003
+         PRIVATE S3,S2,S1
+         S1 = D(J, K, J, K+1)                                           0004
+         S2 = D(J, K+1, J, K+2)+S1                                      0005
+         S3 = D(J, K+2, J, K+3)+S2                                      0006
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0007
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0008
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0009
+      ENDDO
+      DOALL J = J1, JA                                                  0003
+         PRIVATE JH
+         JH = J1+J2-J                                                   0010
+         T(JH,1,NC+3) = T(J,1,NC+3)                                     0011
+         T(JH,1,NC+4) = T(J,1,NC+4)                                     0012
+         T(JH,1,NC+5) = T(J,1,NC+5)                                     0013
+      ENDDO
+
+      END
+
+9- Show NORM (Retain)
+
+C
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/CT/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C     ....
+
+      DO 300 K = K1, K2                                                 0001
+         DO 300 J = J1, JA                                              0002
+
+            CALL PVNMUT(TI)                                             0003
+            T(J,K,NN) = S*TI(1)                                         0004
+            T(J,K,NN+1) = S*TI(2)                                       0005
+            T(J,K,NN+2) = S*TI(3)                                       0006
+300         CONTINUE                                                    0007
+
+C     ....
+
+      END
+
+10- Show PVNMUT
+
+C     
+      SUBROUTINE PVNMUT(C)
+C********************************************
+C     ECRITURE DE C
+C********************************************
+      DIMENSION C(3), CX(3)
+      CX(1) = 1                                                         0001
+      CX(2) = 2                                                         0002
+      CX(3) = 3                                                         0003
+      R = SQRT(CX(1)*CX(1)+CX(2)*CX(2)+CX(3)*CX(3))                     0004
+      IF (R.LT.1.E-12) R = 1.                                           0005
+      DO I = 1, 3                                                       0007
+         C(I) = CX(I)/R                                                 0008
+      ENDDO
+      END
+
+11- Show NORM with regions
+
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{J1<=PHI1, PHI1<=JA, K1<=PHI2, PHI2<=K2,
+C    14<=PHI3, PHI3<=16, NN==14}>
+
+C
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/CT/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{J1<=PHI1, PHI1<=JA, K1<=PHI2, PHI2<=K2,
+C    14<=PHI3, PHI3<=16, NN==14}>
+C  <TI(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=JA, K1<=K2}>
+C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=JA, K1<=K2}>
+
+
+C     ....
+
+      DO 300 K = K1, K2                                                 0001
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==K, J1<=PHI1, PHI1<=JA, 14<=PHI3,
+C    PHI3<=16, NN==14, K1<=K, K<=K2}>
+C  <TI(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=JA, K1<=K, K<=K2}>
+C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=JA, K1<=K, K<=K2}>
+
+         DO 300 J = J1, JA                                              0002
+
+C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=J, J<=JA, K1<=K,
+C    K<=K2}>
+
+
+            CALL PVNMUT(TI)                                             0003
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN, NN==14,
+C    J1<=J, J<=JA, K1<=K, K<=K2}>
+C  <TI(PHI1)-R-EXACT-{PHI1==1, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN) = S*TI(1)                                         0004
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+1, NN==14,
+C    J1<=J, J<=JA, K1<=K, K<=K2}>
+C  <TI(PHI1)-R-EXACT-{PHI1==2, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN+1) = S*TI(2)                                       0005
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+2, NN==14,
+C    J1<=J, J<=JA, K1<=K, K<=K2}>
+C  <TI(PHI1)-R-EXACT-{PHI1==3, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN+2) = S*TI(3)                                       0006
+300         CONTINUE                                                    0007
+
+C     ....
+
+      END
+
+12- Show NORM with IN regions
+
+C
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/CT/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C     ....
+
+      DO 300 K = K1, K2                                                 0001
+         DO 300 J = J1, JA                                              0002
+
+            CALL PVNMUT(TI)                                             0003
+
+C  <TI(PHI1)-IN-EXACT-{PHI1==1, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN) = S*TI(1)                                         0004
+
+C  <TI(PHI1)-IN-EXACT-{PHI1==2, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN+1) = S*TI(2)                                       0005
+
+C  <TI(PHI1)-IN-EXACT-{PHI1==3, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN+2) = S*TI(3)                                       0006
+300         CONTINUE                                                    0007
+
+C     ....
+
+      END
+
+13- Show NORM with OUT regions
+
+
+C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{J1<=PHI1, 1<=PHI1, PHI1<=JA,
+C    PHI1<=52, K1<=PHI2, 1<=PHI2, PHI2<=K2, PHI2<=21, 14<=PHI3,
+C    PHI3<=16, MI==4, NC==17, NI==7, NN==14}>
+
+C
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/CT/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{J1<=PHI1, 1<=PHI1, PHI1<=JA,
+C    PHI1<=52, K1<=PHI2, 1<=PHI2, PHI2<=K2, PHI2<=21, 14<=PHI3,
+C    PHI3<=16, MI==4, NC==17, NI==7, NN==14}>
+
+
+C     ....
+
+      DO 300 K = K1, K2                                                 0001
+
+C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI2==K, J1<=PHI1, 1<=PHI1, PHI1<=JA,
+C    PHI1<=52, 1<=PHI2, PHI2<=21, 14<=PHI3, PHI3<=16, MI==4, NC==17,
+C    NI==7, NN==14, K1<=K, K<=K2}>
+
+         DO 300 J = J1, JA                                              0002
+
+C  <TI(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=J, J<=JA, K1<=K,
+C    K<=K2}>
+
+
+            CALL PVNMUT(TI)                                             0003
+
+C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI1==J, K==PHI2, PHI3==NN, 1<=PHI1,
+C    PHI1<=52, 1<=PHI2, PHI2<=21, MI==4, NC==17, NI==7, NN==14, J1<=J,
+C    J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN) = S*TI(1)                                         0004
+
+C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{J==PHI1, PHI2==K, PHI3==NN+1,
+C    1<=PHI1, PHI1<=52, 1<=PHI2, PHI2<=21, MI==4, NC==17, NI==7,
+C    NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN+1) = S*TI(2)                                       0005
+
+C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI1==J, K==PHI2, PHI3==NN+2,
+C    1<=PHI1, PHI1<=52, 1<=PHI2, PHI2<=21, MI==4, NC==17, NI==7,
+C    NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
+
+            T(J,K,NN+2) = S*TI(3)                                       0006
+300         CONTINUE                                                    0007
+
+C     ....
+
+      END
+
+14- Array privatization
+
+C
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/CT/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C     ....
+
+      DOALL K = K1, K2                                                  0001
+         PRIVATE J
+         DOALL J = J1, JA                                               0002
+            PRIVATE TI(1:3)
+
+            CALL PVNMUT(TI)                                             0003
+            T(J,K,NN) = S*TI(1)                                         0004
+            T(J,K,NN+1) = S*TI(2)                                       0005
+            T(J,K,NN+2) = S*TI(3)                                       0006
+         ENDDO
+      ENDDO
+
+C     ....
+
+      END
+

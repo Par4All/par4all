@@ -1,0 +1,44 @@
+delete dc
+create dc dcmplx.f
+echo ### initial code
+display PRINTED_FILE[%ALL]
+echo ### no dc, no summary, no explicit constants
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION FALSE
+setproperty TYPE_CHECKER_ADD_SUMMARY FALSE
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+
+delete dc
+echo ### no dc, summary, no explicit constants
+create dc dcmplx.f
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION FALSE
+setproperty TYPE_CHECKER_ADD_SUMMARY TRUE
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+
+delete dc
+echo ### dc, summary, no explicit constants
+create dc dcmplx.f
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION TRUE
+setproperty TYPE_CHECKER_ADD_SUMMARY TRUE
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+
+delete dc
+echo ### dc, summary, explicit constants
+create dc dcmplx.f
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION TRUE
+setproperty TYPE_CHECKER_ADD_SUMMARY TRUE
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS TRUE
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+
+delete dc
+quit

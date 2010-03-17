@@ -1,0 +1,8 @@
+delete extending02b
+create extending02b extending02.c
+
+apply PREPEND_CALL
+display PRINTED_FILE
+display CALLGRAPH_FILE[extending02]
+close
+quit

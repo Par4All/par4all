@@ -1,0 +1,391 @@
+
+C  P() {}
+
+      SUBROUTINE DOUBLE(B)
+      INTEGER B
+
+C  P() {}
+
+
+100   CONTINUE
+
+C  P() {}
+
+200   CONTINUE                                                          0005
+      GOTO 100
+      END
+
+C  P() {}
+
+      SUBROUTINE DOUBLE(B)
+      INTEGER B
+
+C  P() {}
+
+
+100   CONTINUE
+
+C  P() {}
+
+200   CONTINUE                                                          0005
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+      
+      SUBROUTINE SIMPLE
+
+C  P() {}
+
+
+100   CONTINUE                                                          0004
+      GOTO 100
+      END
+
+C  P() {}
+
+      
+      SUBROUTINE SIMPLE
+
+C  P() {}
+
+
+100   CONTINUE                                                          0004
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+
+      SUBROUTINE TRIPLE
+
+C  P() {}
+
+
+100   CONTINUE
+
+C  P() {}
+
+300   CONTINUE                                                          0006
+
+C  P() {}
+
+200   CONTINUE
+      GOTO 100
+      END
+
+C  P() {}
+
+
+      SUBROUTINE TRIPLE
+
+C  P() {}
+
+
+100   CONTINUE
+
+C  P() {}
+
+300   CONTINUE                                                          0006
+
+C  P() {}
+
+200   CONTINUE
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+
+      SUBROUTINE IF
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+100   IF (A.EQ.0) THEN                                                  0004
+         GOTO 100
+      ELSE
+         GOTO 100
+      ENDIF
+      END
+
+C  P() {}
+
+
+      SUBROUTINE IF
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+100   IF (A.EQ.0) THEN                                                  0004
+      ENDIF
+      GOTO 100
+      END
+
+C  P() {}
+
+
+      SUBROUTINE IF
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+100   CONTINUE                                                          0004
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+
+      SUBROUTINE SUBROUTINE TRIPLE
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+      B = -TROYE                                                        0004
+
+C  P(B) {B+TROYE==0}
+
+100   CONTINUE
+
+C  P(B) {B+TROYE==0}
+
+300   CONTINUE                                                          0007
+
+C  P(B) {B+TROYE==0}
+
+200   CONTINUE
+      GOTO 100
+      END
+
+C  P() {}
+
+
+      SUBROUTINE SUBROUTINE TRIPLE
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+      B = -TROYE                                                        0004
+
+C  P(B) {B+TROYE==0}
+
+100   CONTINUE
+
+C  P(B) {B+TROYE==0}
+
+300   CONTINUE                                                          0007
+
+C  P(B) {B+TROYE==0}
+
+200   CONTINUE
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+
+      SUBROUTINE SUBROUTINE TRIPLE
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+      B = -TROYE                                                        0004
+
+C  P(B) {B+TROYE==0}
+
+100   CONTINUE
+
+C  P(B) {B+TROYE==0}
+
+300   CONTINUE                                                          0007
+
+C  P(B) {B+TROYE==0}
+
+200   CONTINUE
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+      
+      SUBROUTINE IF SIMPLE
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+      B = -2                                                            0004
+
+C  P(B) {B==-2}
+
+100   CONTINUE                                                          0005
+      GOTO 100
+      END
+
+C  P() {}
+
+      
+      SUBROUTINE IF SIMPLE
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+      B = -2                                                            0004
+
+C  P(B) {B==-2}
+
+100   CONTINUE                                                          0005
+      GOTO 100
+      END
+
+C  P() {}
+
+      
+      SUBROUTINE IF SIMPLE
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+      B = -2                                                            0004
+
+C  P(B) {B==-2}
+
+100   CONTINUE                                                          0005
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+
+      SUBROUTINE IF DE RIEN DU TOUT
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+
+      SANSIF = TROPFACILE                                               0005
+
+C  P(SANSIF) {SANSIF==TROPFACILE}
+
+100   IF (A.EQ.0) THEN                                                  0006
+         GOTO 100
+      ELSE
+         GOTO 100
+      ENDIF
+      END
+
+C  P() {}
+
+
+      SUBROUTINE IF DE RIEN DU TOUT
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+
+      SANSIF = TROPFACILE                                               0005
+
+C  P(SANSIF) {SANSIF==TROPFACILE}
+
+100   IF (A.EQ.0) THEN                                                  0006
+      ENDIF
+      GOTO 100
+      END
+
+C  P() {}
+
+
+      SUBROUTINE IF DE RIEN DU TOUT
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+
+      SANSIF = TROPFACILE                                               0005
+
+C  P(SANSIF) {SANSIF==TROPFACILE}
+
+100   CONTINUE                                                          0006
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+
+      SUBROUTINE GOTO DOUBLE(B)
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+
+      B = -1                                                            0005
+
+C  P(B) {B==-1}
+
+
+100   CONTINUE
+
+C  P(B) {B==-1}
+
+200   CONTINUE                                                          0008
+      GOTO 100
+      END
+
+C  P() {}
+
+
+      SUBROUTINE GOTO DOUBLE(B)
+      IMPLICIT INTEGER (A-Z)
+
+C  P() {}
+
+
+      B = -1                                                            0005
+
+C  P(B) {B==-1}
+
+
+100   CONTINUE
+
+C  P(B) {B==-1}
+
+200   CONTINUE                                                          0008
+      GOTO 100
+
+C  P() {0==-1}
+
+      RETURN
+      END

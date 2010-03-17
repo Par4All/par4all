@@ -1,0 +1,25 @@
+
+Module ENTRY16
+
+      SUBROUTINE ENTRY16(N)
+      INTEGER N, K, M
+      COMMON /ENTRY_ENTRY16/ M, K
+
+      DATA K /3/
+
+      PRINT *, N                                                        0006
+
+
+      END
+
+Entry INCREMENT
+
+      SUBROUTINE INCREMENT(N)
+      INTEGER N, K, M
+      COMMON /ENTRY_ENTRY16/ M, K
+
+99999 CONTINUE                                                          0005
+
+      M = K+1                                                           0007
+
+      END

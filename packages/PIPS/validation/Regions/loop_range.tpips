@@ -1,0 +1,9 @@
+delete loop_range
+create loop_range loop_range.f
+#setenv REGIONS_OPERATORS_DEBUG_LEVEL 6
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+close
+delete loop_range
+quit

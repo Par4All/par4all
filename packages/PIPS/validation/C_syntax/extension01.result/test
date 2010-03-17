@@ -1,0 +1,8 @@
+
+parsed printed file
+
+// __extension__ keyword should be accepted for gcc preprocessing
+
+typedef unsigned long __dev_t;
+
+extern unsigned int foo();

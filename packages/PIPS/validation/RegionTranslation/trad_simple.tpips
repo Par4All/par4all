@@ -1,0 +1,8 @@
+delete trads
+create trads trad_simple.f
+module TRADM
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE(TRADM)
+close
+delete trads

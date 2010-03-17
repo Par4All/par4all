@@ -1,0 +1,42 @@
+Transform all the control flow in one finite state machine:
+      SUBROUTINE MATMUL(A, B, C)
+
+      INTEGER I, J, K
+      INTEGER MAT1(1:1000, 1:1000), MAT2(1:1000, 1:1000), 
+     & MAT3(1:1000, 1:1000)
+
+      DO 10 I = 1, 1000                                                 0001
+         DO 20 J = 1, 1000                                              0002
+! CALL_FPGA_MATMULHRE
+            CALL MATMULHRE(I, J, MAT1, MAT2)
+20          CONTINUE                                                    0006
+10       CONTINUE                                                       0006
+
+      END
+      SUBROUTINE MATMULHRE(I_PARAM_1, J_PARAM_2, MAT1_PARAM_3, 
+     &MAT2_PARAM_4)
+      INTEGER I_PARAM_1, J_PARAM_2, K_PRIV
+      INTEGER MAT1_PARAM_3(1:1000, 1:1000), MAT2_PARAM_4(1:1000, 1:
+     &1000), MAT3_PRIV(1:1000, 1:1000)
+! ANALYZED_FPGA_MATMULHRE (2 statements)
+      MAT3_PRIV(I_PARAM_1,J_PARAM_2) = 0                                0001
+      DO 30 K_PRIV = 1, 1000                                            0002
+         MAT3_PRIV(I_PARAM_1,J_PARAM_2) = MAT3_PRIV(I_PARAM_1,          0003
+     &   J_PARAM_2)+MAT1_PARAM_3(I_PARAM_1,K_PRIV)*MAT2_PARAM_4(        0003
+     &   K_PRIV,J_PARAM_2)                                              0003
+30       CONTINUE                                                       0004
+      END
+      SUBROUTINE MATMULHRE(I_PARAM_1, J_PARAM_2, MAT1_PARAM_3, 
+     &MAT2_PARAM_4)
+      INTEGER I_PARAM_1, J_PARAM_2, K_PRIV
+      INTEGER MAT1_PARAM_3(1:1000, 1:1000), MAT2_PARAM_4(1:1000, 1:
+     &1000), MAT3_PRIV(1:1000, 1:1000)
+! ANALYZED_FPGA_MATMULHRE (2 statements)
+      MAT3_PRIV(I_PARAM_1,J_PARAM_2) = 0                                0001
+      DO 30 K_PRIV = 1, 1000                                            0002
+         MAT3_PRIV(I_PARAM_1,J_PARAM_2) = MAT3_PRIV(I_PARAM_1,          0003
+     &   J_PARAM_2)+MAT1_PARAM_3(I_PARAM_1,K_PRIV)*MAT2_PARAM_4(        0003
+     &   K_PRIV,J_PARAM_2)                                              0003
+30       CONTINUE                                                       0004
+      END
+

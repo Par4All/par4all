@@ -1,0 +1,32 @@
+# Usual declarations
+      PROGRAM DECLARATIONS
+      DIMENSION A(10)
+      INTEGER A
+      COMMON /A/ A
+      DIMENSION B(10)
+      INTEGER B
+      SAVE B
+      DIMENSION C(10)
+      INTEGER C
+      DIMENSION D(10)
+      INTEGER D
+      DATA D / 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 /
+      PRINT *, 'declarations'                                           0013
+      END
+# dimensions in type
+      PROGRAM DECLARATIONS
+      INTEGER A(1:10), B(1:10), C(1:10), D(1:10)
+      COMMON /A/ A
+      SAVE D, B
+      DATA D /1, 2, 3, 4, 5, 6, 7, 8, 9, 10/
+      PRINT *, 'declarations'                                           0013
+      END
+# dimensions in common
+      PROGRAM DECLARATIONS
+      INTEGER A, B(1:10), C(1:10), D(1:10)
+      COMMON /A/ A(1:10)
+      SAVE D, B
+      DATA D /1, 2, 3, 4, 5, 6, 7, 8, 9, 10/
+      PRINT *, 'declarations'                                           0013
+      END
+

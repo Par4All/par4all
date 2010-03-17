@@ -1,0 +1,53 @@
+
+C  P() {}
+
+      PROGRAM UNSTRUC09
+
+C     Check behavior with subcycles
+
+      REAL A(100, 100)
+
+C  P() {}
+
+
+      READ *, N                                                         0007
+
+C  P(N) {}
+
+
+      I = 1                                                             0009
+
+C  P(I,N) {I==1}
+
+      J = 1                                                             0010
+
+C  P(I,J,N) {1<=I, I<=J}
+
+
+100   I = I+1                                                           0012
+
+C  P(I,J,N) {2<=I, I<=J+1}
+
+
+200   J = J+1                                                           0014
+
+C  P(I,J,N) {2<=I, I<=J}
+
+
+      A(I,J) = 0.                                                       0016
+
+C  P(I,J,N) {2<=I, I<=J}
+
+
+      IF (I.LT.N) GOTO 100                                              0018
+
+C  P(I,J,N) {2<=I, I<=J, N<=I}
+
+      IF (J.LT.N) GOTO 200                                              0019
+
+C  P(I,J,N) {2<=I, I<=J, N<=I, N<=J}
+
+      PRINT *, I, J, N                                                  0020
+
+      END
+

@@ -1,0 +1,67 @@
+delete use_def_elimination
+create use_def_elimination use_def_elimination.f
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+set PRETTYPRINT_INTERNAL_RETURN TRUE
+set PRETTYPRINT_ALL_LABELS TRUE
+set PRETTYPRINT_EMPTY_BLOCKS TRUE
+set PRETTYPRINT_UNSTRUCTURED TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+
+# Because an intraprocedural mode is chosen, the lack of calls is not
+# taken into account. The empty preconditions are not propagated down the
+# different procedures.
+
+# activate PRECONDITIONS_INTER_FULL
+# activate TRANSFORMERS_INTER_FULL
+
+#
+module TESTIF1
+display PRINTED_FILE
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+#
+module TESTIF2
+display PRINTED_FILE
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+#
+module TESTIF3
+display PRINTED_FILE
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+#
+module TESTIF4
+display PRINTED_FILE
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+#
+module TESTIF5
+display PRINTED_FILE
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+#
+close
+delete use_def_elimination
+quit

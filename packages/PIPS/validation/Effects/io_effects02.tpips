@@ -1,0 +1,7 @@
+delete io_effects02
+create io_effects02 io_effects02.f
+activate PRINT_CODE_OUT_EFFECTS
+display PRINTED_FILE
+close
+delete io_effects02
+quit

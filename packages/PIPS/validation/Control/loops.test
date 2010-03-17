@@ -1,0 +1,4 @@
+#! /bin/sh
+Init -f loops.f loops >&2
+Display -m BAR
+Delete loops

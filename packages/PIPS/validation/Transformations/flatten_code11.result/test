@@ -1,0 +1,111 @@
+
+Execute initial code
+
+foo=1
+foo=2
+foo=3
+foo=4
+
+Initial code
+
+void flatten_code11(void)
+{
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   
+   /* Let's execute this loop four times! */
+   for(i = 0; i <= 3; i += 1) {
+      // BEGIN BLOCK
+      static int foo = 0;                                               /*0008*/
+      
+      /* Let's update a static variable! */
+      foo++;                                                            /*0011*/
+
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0013*/
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+Code with preconditions
+
+
+//  P() {}
+
+void flatten_code11(void)
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+
+//  P() {}
+
+   
+   /* Let's execute this loop four times! */
+   for(i = 0; i <= 3; i += 1) {
+
+//  P(foo,i) {0<=i, i<=3}
+
+      // BEGIN BLOCK
+      static int foo = 0;                                               /*0008*/
+
+//  P(foo,i) {0<=i, i<=3}
+
+      
+      /* Let's update a static variable! */
+      foo++;                                                            /*0011*/
+
+//  P(foo,i) {0<=i, i<=3}
+
+
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0013*/
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+Code after code flattening
+
+void flatten_code11(void)
+{
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   //PIPS generated variable
+   static int foo_0 = 0;
+   
+   /* Let's execute this loop four times! */
+   
+   /* Let's update a static variable! */
+   foo_0++;                                                             /*0011*/
+
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   
+   /* Let's update a static variable! */
+   foo_0++;                                                             /*0011*/
+
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   
+   /* Let's update a static variable! */
+   foo_0++;                                                             /*0011*/
+
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   
+   /* Let's update a static variable! */
+   foo_0++;                                                             /*0011*/
+
+   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0013*/
+   i = 4;
+   // END BLOCK
+}
+
+Unsplit and compile resulting code
+
+
+Execute resulting code
+
+foo=1
+foo=2
+foo=3
+foo=4

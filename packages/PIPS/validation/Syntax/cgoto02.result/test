@@ -1,0 +1,19 @@
+      PROGRAM CGOTO02
+
+      READ *, I, J                                                      0003
+
+      ICG0 = I+J
+      IF (ICG0.EQ.1) GOTO 100                                           0005
+      IF (ICG0.EQ.2) GOTO 200                                           0005
+      IF (ICG0.EQ.3) GOTO 300                                           0005
+      IF (ICG0.EQ.4) GOTO 400                                           0005
+      J = 1                                                             0006
+100   CONTINUE                                                          0007
+      J = 2                                                             0008
+200   CONTINUE                                                          0009
+      J = 3                                                             0010
+300   CONTINUE                                                          0011
+      J = 4                                                             0012
+400   CONTINUE                                                          0013
+      J = 5                                                             0014
+      END

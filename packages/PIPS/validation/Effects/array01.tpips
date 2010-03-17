@@ -1,0 +1,70 @@
+delete array01
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create array01 array01.f
+
+echo
+echo Parsed printed file for "ARRAY01"
+echo
+
+display PARSED_PRINTED_FILE[ARRAY01]
+
+echo
+echo Proper effetcs for "ARRAY01"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[ARRAY01]
+# quit
+echo
+echo Cumulated effetcs for "ARRAY01"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[ARRAY01]
+
+# quit
+
+echo
+echo Transformers for "main"
+echo
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[ARRAY01]
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[ARRAY01]
+# quit
+echo
+echo Printed files with regions
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[ARRAY01]
+
+# Should be useless
+# apply PRIVATIZE_MODULE
+
+echo
+echo Printed files after parallelization
+echo
+
+apply COARSE_GRAIN_PARALLELIZATION
+#setproperty PRETTYPRINT_SEQUENTIAL_STYLE omp
+display PRINTED_FILE[ARRAY01]
+
+close
+delete array01
+quit

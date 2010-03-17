@@ -1,0 +1,17 @@
+delete allocation06
+create allocation06 allocation06.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+activate C_SYMBOL_TABLE
+activate C_PARSER
+
+display SYMBOL_TABLE_FILE[foo]
+display PARSED_PRINTED_FILE[foo]
+close
+delete allocation06
+quit

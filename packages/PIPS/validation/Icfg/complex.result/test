@@ -1,0 +1,37 @@
+GO
+
+C  P() {B==9}
+
+    IS2
+
+C  P() {B==7}
+
+    IS2
+
+C  P() {B==7}
+
+    IS1
+
+C  P() {B==7}
+
+    IS1
+GO
+    if
+
+C  P() {B==9}
+
+        IS2
+
+C  P() {B==7}
+
+        IS2
+    then
+
+C  P() {B==7}
+
+        IS1
+    endif
+
+C  P() {B==7}
+
+    IS1

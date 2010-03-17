@@ -1,0 +1,175 @@
+
+C  T() {}
+
+      PROGRAM INEGFLOAT02
+      REAL A, B
+
+C  T(A,B) {}
+
+      READ *, A, B                                                      0003
+
+C  T() {}
+
+      IF (A+B.EQ.0.0) THEN                                              0004
+
+C  T() {}
+
+         PRINT *, 'a+b = 0'                                             0005
+
+C  T() {}
+
+         PRINT *, A+B                                                   0006
+      ENDIF
+
+C  T() {}
+
+      IF (A.GT.0.0.AND.B.GT.0.0) THEN                                   0008
+
+C  T() {}
+
+         PRINT *, 'a>0 and b>0'                                         0009
+
+C  T() {}
+
+         PRINT *, A+B                                                   0010
+
+C  T() {}
+
+         IF (A+B.GT.0.0) THEN                                           0011
+
+C  T() {}
+
+            PRINT *, 'test redondant a+b>0'                             0012
+
+C  T() {}
+
+            PRINT *, A+B                                                0013
+         ENDIF
+      ENDIF
+
+C  T() {}
+
+      IF (A.EQ.B) THEN                                                  0016
+
+C  T() {}
+
+         PRINT *, 'a-b = 0'                                             0017
+
+C  T() {}
+
+         PRINT *, A-B                                                   0018
+      ENDIF
+
+C  T() {}
+
+      IF (A.EQ.-B) THEN                                                 0020
+
+C  T() {}
+
+         PRINT *, 'a+b = 0'                                             0021
+
+C  T() {}
+
+         PRINT *, A+B                                                   0022
+      ENDIF
+      END
+
+C  P() {}
+
+      PROGRAM INEGFLOAT02
+      REAL A, B
+
+C  P() {}
+
+      READ *, A, B                                                      0003
+
+C  P(A,B) {}
+
+      IF (A+B.EQ.0.0) THEN                                              0004
+
+C  P(A,B) {A+B==0.0}
+
+         PRINT *, 'a+b = 0'                                             0005
+
+C  P(A,B) {A+B==0.0}
+
+         PRINT *, A+B                                                   0006
+      ENDIF
+
+C  P(A,B) {}
+
+      IF (A.GT.0.0.AND.B.GT.0.0) THEN                                   0008
+
+C  P(A,B) {0.0<=A, 0.0<=B}
+
+         PRINT *, 'a>0 and b>0'                                         0009
+
+C  P(A,B) {0.0<=A, 0.0<=B}
+
+         PRINT *, A+B                                                   0010
+
+C  P(A,B) {0.0<=A, 0.0<=B}
+
+         IF (A+B.GT.0.0) THEN                                           0011
+
+C  P(A,B) {0.0<=A, 0.0<=A+B, 0.0<=B}
+
+            PRINT *, 'test redondant a+b>0'                             0012
+
+C  P(A,B) {0.0<=A, 0.0<=A+B, 0.0<=B}
+
+            PRINT *, A+B                                                0013
+         ENDIF
+      ENDIF
+
+C  P(A,B) {}
+
+      IF (A.EQ.B) THEN                                                  0016
+
+C  P(A,B) {A==B}
+
+         PRINT *, 'a-b = 0'                                             0017
+
+C  P(A,B) {A==B}
+
+         PRINT *, A-B                                                   0018
+      ENDIF
+
+C  P(A,B) {}
+
+      IF (A.EQ.-B) THEN                                                 0020
+
+C  P(A,B) {A+B==0}
+
+         PRINT *, 'a+b = 0'                                             0021
+
+C  P(A,B) {A+B==0}
+
+         PRINT *, A+B                                                   0022
+      ENDIF
+      END
+      PROGRAM INEGFLOAT02
+      REAL A, B
+      READ *, A, B                                                      0003
+      IF (A+B.EQ.0.0) THEN                                              0004
+         PRINT *, 'a+b = 0'                                             0005
+         PRINT *, A+B                                                   0006
+      ENDIF
+      IF (A.GT.0.0.AND.B.GT.0.0) THEN                                   0008
+         PRINT *, 'a>0 and b>0'                                         0009
+         PRINT *, A+B                                                   0010
+         IF (A+B.GT.0.0) THEN                                           0011
+            PRINT *, 'test redondant a+b>0'                             0012
+            PRINT *, A+B                                                0013
+         ENDIF
+      ENDIF
+      IF (A.EQ.B) THEN                                                  0016
+         PRINT *, 'a-b = 0'                                             0017
+         PRINT *, A-B                                                   0018
+      ENDIF
+      IF (A.EQ.-B) THEN                                                 0020
+         PRINT *, 'a+b = 0'                                             0021
+         PRINT *, A+B                                                   0022
+      ENDIF
+      END
+

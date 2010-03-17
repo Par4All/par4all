@@ -1,0 +1,33 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+# In case something went wrong during a previous execution
+chmod a+rwx protected_workspace.database
+Delete protected_workspace
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+echo
+echo The message should be: workspace protected_workspace: Permission denied
+echo
+
+create protected_workspace protected_workspace.f
+display PRINTED_FILE
+close
+shell chmod u-rwx protected_workspace.database
+open protected_workspace
+display PRINTED_FILE[FOO]
+shell chmod u+rwx protected_workspace.database
+# Fabien would like a close before the delete... but it should be useless
+# since the open whould have failed
+delete protected_workspace
+quit
+EOF
+
+# tpips is not too good at dealing with protection problems:
+# let's try to fix (temporarily) the problem
+rm -f core
+chmod a+rwx protected_workspace.database
+Delete protected_workspace.database
+exit 0

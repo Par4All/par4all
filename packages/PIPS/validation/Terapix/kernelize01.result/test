@@ -1,0 +1,148 @@
+void * memload(void **dest, void *src, size_t n)
+{
+   size_t i;
+   void *pdest = *dest = malloc(n);
+
+   if (!pdest) 
+      return (void *) 0;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) pdest)[i] = ((const char *) src)[i];
+   return pdest;
+}
+
+Initial code
+
+int foo(int seed[100])
+{
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   /* init */
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+   /* compute */
+kernel:
+   for(i = 0; i <= 99; i += 1)
+      c[i] = a[i]+b[i];
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+}
+
+Code after kernelization
+
+int foo(int seed[100])
+{
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   //PIPS generated variable
+   int i_1;
+   /* init */
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+   /* compute */
+kernel:   run_kernel(a, b, c);
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+}
+void run_kernel(int a[100], int b[100], int c[100])
+{
+   //PIPS generated variable
+   int i;
+   /* compute */
+kernel:
+   for(i = 0; i <= 99; i += 10)
+      kernel(a, b, c, i);
+}
+void kernel(int a[100], int b[100], int c[100], int i)
+{
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
+         c[i_1] = a[i_1]+b[i_1];
+   }
+}
+int foo(int seed[100])
+{
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   int (*P_0)[100], (*P_1)[100], (*P_2)[100];
+   /* init */
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+   memalloc(&P_2, sizeof(int[100])-1+1);
+   memalloc(&P_1, sizeof(int[100])-1+1);
+   memalloc(&P_0, sizeof(int[100])-1+1);
+   memload(a, *P_2, sizeof(int[100])-1+1);
+   memload(b, *P_1, sizeof(int[100])-1+1);
+   /* compute */
+kernel:   run_kernel(*P_2, *P_1, *P_0);
+   memstore(c, *P_0, sizeof(int[100])-1+1);
+   memfree(*P_2);
+   memfree(*P_1);
+   memfree(*P_0);
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+}
+
+Code after cleanup
+
+int foo(int seed[100])
+{
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   int (*P_0)[100], (*P_1)[100], (*P_2)[100];
+   /* init */
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+   memalloc(&P_2, sizeof(int[100])-1+1);
+   memalloc(&P_1, sizeof(int[100])-1+1);
+   memalloc(&P_0, sizeof(int[100])-1+1);
+   memload(a, *P_2, sizeof(int[100])-1+1);
+   memload(b, *P_1, sizeof(int[100])-1+1);
+   /* compute */
+   run_kernel(*P_2, *P_1, *P_0);
+   memstore(c, *P_0, sizeof(int[100])-1+1);
+   memfree(*P_2);
+   memfree(*P_1);
+   memfree(*P_0);
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+   ;
+}
+
+Unsplit resulting code
+

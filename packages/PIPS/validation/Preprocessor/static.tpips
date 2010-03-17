@@ -1,0 +1,12 @@
+delete static
+create static static.c
+
+quit
+
+activate C_PARSER
+ 
+display PRINTED_FILE[main]
+
+close
+delete static
+quit

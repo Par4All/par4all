@@ -1,0 +1,45 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP getimage:
+void getimage(char *filename)
+{
+   unsigned char c;
+   FILE *fp;
+
+   fp = fopen(filename, "r");
+   do {
+      while ((c = fgetc(fp))!='\n') 
+         ;
+   }
+   while ((c = fgetc(fp))=='#');
+   /* Skip comment lines */
+
+   fclose(fp);
+}
+void getimage(char *filename)
+{
+   unsigned char c;
+   FILE *fp;
+
+   fp = fopen(filename, "r");
+   do {
+      while ((c = fgetc(fp))!='\n') 
+         ;
+   }
+   while ((c = fgetc(fp))=='#');
+   /* Skip comment lines */
+
+   fclose(fp);
+}
+Regenerate the sources from the PIPS transformed code:

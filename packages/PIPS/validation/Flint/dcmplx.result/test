@@ -1,0 +1,149 @@
+### initial code
+      PROGRAM DC
+      DOUBLE COMPLEX A, B, C, D, E, F, G, H
+      DOUBLE PRECISION X
+      COMPLEX W, Z
+
+      A = (1.0, 1.0)                                                    0001
+      B = 1                                                             0002
+      C = 1.0E0                                                         0003
+      D = 1.0D0                                                         0004
+
+      E = A+B                                                           0005
+      F = COS(E)                                                        0006
+      X = ABS(F)                                                        0007
+      F = DCMPLX(X)                                                     0008
+      H = LOG(G)+SQRT(F)+SIN(E)+EXP(A)                                  0009
+
+      PRINT *, H                                                        0010
+
+      W = (1.0, 1.0)                                                    0011
+      Z = W+1                                                           0012
+
+      W = CMPLX(1.0, 1.0)                                               0013
+      Z = W+1                                                           0014
+
+      END
+### no dc, no summary, no explicit constants
+      PROGRAM DC
+      DOUBLE COMPLEX A, B, C, D, E, F, G, H
+      DOUBLE PRECISION X
+      COMPLEX W, Z
+
+      A = (1.0D0, 1.0D0)                                                0001
+      B = (1.0D0, 0.0D0)                                                0002
+      C = (1.0D0, 0.0D0)                                                0003
+      D = (1.0D0, 0.0D0)                                                0004
+
+!ERROR: #1 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #2 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      E = DCMPLX(A+B)                                                   0005
+!ERROR: #1 argument of 'COS' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      F = DCMPLX(COS(E))                                                0006
+!ERROR: #1 argument of 'ABS' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      X = DBLE(ABS(F))                                                  0007
+      F = DCMPLX(X, 0.0D0)                                              0008
+!ERROR: #1 argument of 'LOG' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #1 argument of 'SQRT' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #1 argument of 'SIN' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #1 argument of 'EXP' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      H = DCMPLX(LOG(G)+SQRT(F)+SIN(E)+EXP(A))                          0009
+
+      PRINT *, H                                                        0010
+
+      W = (1.0, 1.0)                                                    0011
+      Z = W+(1.0E0, 0.0E0)                                              0012
+
+      W = CMPLX(1.0, 1.0)                                               0013
+      Z = W+(1.0E0, 0.0E0)                                              0014
+
+      END
+### no dc, summary, no explicit constants
+!PIPS TYPER: 8 errors, 4 conversions, 8 simplifications
+      PROGRAM DC
+      DOUBLE COMPLEX A, B, C, D, E, F, G, H
+      DOUBLE PRECISION X
+      COMPLEX W, Z
+
+      A = (1.0D0, 1.0D0)                                                0001
+      B = (1.0D0, 0.0D0)                                                0002
+      C = (1.0D0, 0.0D0)                                                0003
+      D = (1.0D0, 0.0D0)                                                0004
+
+!ERROR: #1 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #2 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      E = DCMPLX(A+B)                                                   0005
+!ERROR: #1 argument of 'COS' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      F = DCMPLX(COS(E))                                                0006
+!ERROR: #1 argument of 'ABS' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      X = DBLE(ABS(F))                                                  0007
+      F = DCMPLX(X, 0.0D0)                                              0008
+!ERROR: #1 argument of 'LOG' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #1 argument of 'SQRT' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #1 argument of 'SIN' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+!ERROR: #1 argument of 'EXP' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
+      H = DCMPLX(LOG(G)+SQRT(F)+SIN(E)+EXP(A))                          0009
+
+      PRINT *, H                                                        0010
+
+      W = (1.0, 1.0)                                                    0011
+      Z = W+(1.0E0, 0.0E0)                                              0012
+
+      W = CMPLX(1.0, 1.0)                                               0013
+      Z = W+(1.0E0, 0.0E0)                                              0014
+
+      END
+### dc, summary, no explicit constants
+!PIPS TYPER: 0 errors, 0 conversions, 14 simplifications
+      PROGRAM DC
+      DOUBLE COMPLEX A, B, C, D, E, F, G, H
+      DOUBLE PRECISION X
+      COMPLEX W, Z
+
+      A = (1.0D0, 1.0D0)                                                0001
+      B = (1.0D0, 0.0D0)                                                0002
+      C = (1.0D0, 0.0D0)                                                0003
+      D = (1.0D0, 0.0D0)                                                0004
+
+      E = A+B                                                           0005
+      F = CDCOS(E)                                                      0006
+      X = CDABS(F)                                                      0007
+      F = DCMPLX(X, 0.0D0)                                              0008
+      H = CDLOG(G)+CDSQRT(F)+CDSIN(E)+CDEXP(A)                          0009
+
+      PRINT *, H                                                        0010
+
+      W = (1.0, 1.0)                                                    0011
+      Z = W+(1.0E0, 0.0E0)                                              0012
+
+      W = CMPLX(1.0, 1.0)                                               0013
+      Z = W+(1.0E0, 0.0E0)                                              0014
+
+      END
+### dc, summary, explicit constants
+!PIPS TYPER: 0 errors, 0 conversions, 14 simplifications
+      PROGRAM DC
+      DOUBLE COMPLEX A, B, C, D, E, F, G, H
+      DOUBLE PRECISION X
+      COMPLEX W, Z
+
+      A = DCMPLX(1.0D0, 1.0D0)                                          0001
+      B = DCMPLX(1.0D0, 0.0D0)                                          0002
+      C = DCMPLX(1.0D0, 0.0D0)                                          0003
+      D = DCMPLX(1.0D0, 0.0D0)                                          0004
+
+      E = A+B                                                           0005
+      F = CDCOS(E)                                                      0006
+      X = CDABS(F)                                                      0007
+      F = DCMPLX(X, 0.0D0)                                              0008
+      H = CDLOG(G)+CDSQRT(F)+CDSIN(E)+CDEXP(A)                          0009
+
+      PRINT *, H                                                        0010
+
+      W = CMPLX(1.0, 1.0)                                               0011
+      Z = W+CMPLX(1.0E0, 0.0E0)                                         0012
+
+      W = CMPLX(1.0, 1.0)                                               0013
+      Z = W+CMPLX(1.0E0, 0.0E0)                                         0014
+
+      END

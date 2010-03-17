@@ -1,0 +1,10 @@
+delete extending01
+create extending01 extending01.c
+
+setproperty PREPEND_COMMENT " PPoPP 2010"
+
+apply PREPEND_COMMENT
+display PRINTED_FILE
+
+close
+quit

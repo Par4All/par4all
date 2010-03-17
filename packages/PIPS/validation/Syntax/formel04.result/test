@@ -1,0 +1,7 @@
+      PROGRAM FORMEL04
+
+      I = C(1)                                                          0003
+      I = FOO(C)                                                        0004
+
+      END
+

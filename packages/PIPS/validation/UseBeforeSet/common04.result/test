@@ -1,0 +1,74 @@
+      PROGRAM MAIN
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      C = .TRUE.
+C (0,3)
+      IF (C) THEN
+C (0,4)
+         CALL P
+      ELSE
+C (0,5)
+         CALL Q
+      ENDIF
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE P
+      COMMON W
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      T = .TRUE.
+C (0,3)
+      IF (T) THEN
+C (0,4)
+         W = 4
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE Q
+      COMMON V
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      PRINT *, V
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for common04.f
+!!
+      PROGRAM MAIN
+      CALL PIPS_INITIALIZE(W)
+      C = .TRUE.
+      IF (C) THEN
+         CALL P
+      ELSE
+      CALL PIPS_VERIFY(W)
+         CALL Q
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE P
+      COMMON W
+      T = .TRUE.
+      IF (T) THEN
+         W = 4
+      ELSE
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE Q
+      COMMON V
+      PRINT *, V
+      RETURN
+      END

@@ -1,0 +1,16 @@
+delete const
+create const const.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+# display PARSED_PRINTED_FILE[main]
+display PRINTED_FILE[main]
+
+close
+
+delete const
+
+quit

@@ -1,0 +1,7 @@
+delete programme
+setproperty ABORT_ON_USER_ERROR TRUE
+create programme programme.f
+display PRINTED_FILE
+close
+delete programme
+quit

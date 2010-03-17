@@ -1,0 +1,56 @@
+delete silber01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create silber01 silber01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Code after transformations to come...
+echo
+
+module transfo
+
+apply UNFOLDING
+display PRINTED_FILE
+
+#setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
+#apply OPTIMIZE_EXPRESSIONS
+#apply PARTIAL_EVAL
+#apply SUPPRESS_DEAD_CODE
+#apply CLEAN_DECLARATIONS
+#display PRINTED_FILE
+
+setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+apply OPTIMIZE_EXPRESSIONS
+#apply PARTIAL_EVAL
+#apply SUPPRESS_DEAD_CODE
+#apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+apply FLATTEN_CODE
+display PRINTED_FILE
+
+# apply CLEAN_DECLARATIONS[]
+# display PRINTED_FILE[]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+# shell $(PIPS_CC) -c silber01.database/Src/silber01.c
+shell cc -c silber01.database/Src/silber01.c
+
+close
+#delete silber01
+quit
+

@@ -1,0 +1,5 @@
+C                                                                  227 (SUMMARY)
+      PROGRAM UP
+C                                                                  227 (STMT)
+      CALL SUB(10)                                                      0002
+      END

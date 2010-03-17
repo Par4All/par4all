@@ -1,0 +1,4 @@
+      PROGRAM TESTLOG
+C     Bug: log is not recognized as intrinsics
+      X = LOG(Y)                                                        0003
+      END

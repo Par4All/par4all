@@ -1,0 +1,8 @@
+delete mdg
+create mdg mdg.f
+module MDG
+activate PRINT_CALL_GRAPH_WITH_TRANSFORMERS
+display CALLGRAPH_FILE
+close
+delete mdg
+quit

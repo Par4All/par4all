@@ -1,0 +1,30 @@
+delete ${WSPACE}
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} ${FILE}
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[%ALL]
+
+echo
+echo Proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALL]
+# quit
+echo
+echo Cumulated effetcs
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALL]
+
+close
+delete ${WSPACE}
+quit

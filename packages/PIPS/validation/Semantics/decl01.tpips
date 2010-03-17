@@ -1,0 +1,11 @@
+delete decl01
+create decl01 decl01.f
+
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE
+
+close
+delete decl01

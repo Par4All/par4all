@@ -1,0 +1,177 @@
+
+C  P() {}
+
+      PROGRAM UNSTR4
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+c     plus unstructured decomposition
+
+      J = 2                                                             0006
+
+C  P(J) {J==2}
+
+
+100   CONTINUE                                                          0008
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0009
+
+C  P(J) {J==2}
+
+
+      J = 2                                                             0011
+
+C  P(J) {J==2}
+
+
+200   CONTINUE                                                          0013
+
+C  P(J) {J==2}
+
+      J = 3                                                             0014
+
+C  P(J) {J==3}
+
+      PRINT *, J                                                        0015
+
+C  P(J) {J==3}
+
+      IF (J.LT.3) GOTO 200                                              0016
+
+C  P(J) {J==3}
+
+
+      IF (J.LT.2) GOTO 100                                              0018
+
+C  P(J) {J==3}
+
+
+      CONTINUE                                                          0020
+
+C  P(J) {J==3}
+
+      PRINT *, J                                                        0020
+
+C  P(J) {J==3}
+
+
+      RETURN
+      END
+
+C  P() {}
+
+      PROGRAM UNSTR4
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+c     plus unstructured decomposition
+
+      J = 2                                                             0006
+
+C  P(J) {J==2}
+
+
+100   CONTINUE                                                          0008
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0009
+
+C  P(J) {J==2}
+
+
+      J = 2                                                             0011
+
+C  P(J) {J==2}
+
+
+200   CONTINUE                                                          0013
+
+C  P(J) {J==2}
+
+      J = 3                                                             0014
+
+C  P(J) {J==3}
+
+      PRINT *, J                                                        0015
+
+C  P(J) {J==3}
+
+      IF (J.LT.3) GOTO 200                                              0016
+
+C  P(J) {J==3}
+
+
+      IF (J.LT.2) GOTO 100                                              0018
+
+C  P(J) {J==3}
+
+
+      CONTINUE                                                          0020
+
+C  P(J) {J==3}
+
+      PRINT *, J                                                        0020
+
+C  P(J) {J==3}
+
+
+      RETURN
+      END
+
+C  P() {}
+
+      PROGRAM UNSTR4
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+c     plus unstructured decomposition
+
+      J = 2                                                             0006
+
+C  P(J) {J==2}
+
+
+100   CONTINUE                                                          0008
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0009
+
+C  P(J) {J==2}
+
+
+      J = 2                                                             0011
+
+C  P(J) {J==2}
+
+
+200   CONTINUE                                                          0013
+
+C  P(J) {J==2}
+
+      J = 3                                                             0014
+
+C  P(J) {J==3}
+
+      PRINT *, J                                                        0015
+
+C  P(J) {J==3}
+
+
+
+      PRINT *, J                                                        0020
+
+C  P(J) {J==3}
+
+
+      RETURN
+      END

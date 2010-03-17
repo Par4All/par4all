@@ -1,0 +1,53 @@
+--- Preconditions for LOOPEXIT4
+
+C  P() {}
+
+      PROGRAM LOOPEXIT4
+
+c     The postcondition of a certainly executed loop should be its invariant 
+c     updated by the last increment plus the exit condition
+
+      REAL T(10)
+
+C  P() {}
+
+
+      READ *, N                                                         0008
+
+C  P(N) {}
+
+
+      IF (N.GE.1) THEN                                                  0010
+
+C  P(N) {1<=N}
+
+
+         J = 0                                                          0012
+
+C  P(J,N) {J==0, 1<=N}
+
+         DO I = 1, N                                                    0013
+
+C  P(I,J,K,N) {2I==J+2, 1<=I, I<=N, 1<=N}
+
+            T(I) = 0.                                                   0014
+
+C  P(I,J,K,N) {2I==J+2, 1<=I, I<=N, 1<=N}
+
+            J = J+2                                                     0015
+
+C  P(I,J,K,N) {2I==J, 1<=I, I<=N, 1<=N}
+
+            K = 3                                                       0016
+         ENDDO
+
+C  P(I,J,K,N) {2I==J+2, I==N+1, K==3, 2<=I}
+
+
+C        Expected precondition:
+C        P(I,J,K,N) {J==2I-2, K==3, N+1<=I, I<=N+1, 1<=N}
+         PRINT *, I, J, K                                               0021
+
+      ENDIF
+
+      END

@@ -1,0 +1,38 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *a, *b, c, d, i;
+//               <must be written>: c
+   c = 0;
+//               <must be written>: d
+   d = 1;
+//               <must be written>: b
+   b = &c;
+//               <must be read   >: i
+//               <must be written>: i
+
+   for (i = 1;i<5;i++)
+//               <must be written>: c
+      c = 5;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   int *a, *b, c, d, i;
+   c = 0;
+   d = 1;
+   b = &c;
+//  points to = {(b,c,E)}
+
+   for (i = 1;i<5;i++)
+//  points to = {(b,c,E)}
+      c = 5;
+//  points to = {(b,c,E)}
+
+   return 0;
+   // END BLOCK
+}

@@ -1,0 +1,73 @@
+
+C  <A(PHI1)-R-MAY-{1<=PHI1, PHI1<=N}>
+C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=N}>
+
+C PROJNE : stands for PROJecton Not Exact. 
+C It is the same program as renpar6.f, but
+C for the function that modifies K.
+C In this case, the transformer contains only
+C an enequality, and the projection cannot preserve
+C the must approximation for the array WORK.
+
+      SUBROUTINE PROJNE(A,N,K,M)
+      INTEGER N,K,M,A(N)
+      DIMENSION WORK(100,100)
+      K = M*M                                                           0011
+
+C  <A(PHI1)-R-MAY-{1<=PHI1, PHI1<=N}>
+C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=N}>
+C  <WORK(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N}>
+C  <WORK(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+
+      IF (K.GT.0) THEN                                                  0012
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
+C  <WORK(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N}>
+C  <WORK(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+
+         DO I = 1, N                                                    0013
+
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=N}>
+
+            DO J = 1, N                                                 0014
+
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=N, 1<=J,
+C    J<=N}>
+
+               WORK(J,K) = J+K                                          0015
+            ENDDO
+
+            CALL TOTO(K)                                                0018
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
+C  <WORK(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, K<=PHI2+1, PHI2<=K,
+C    1<=I, I<=N}>
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=N}>
+
+
+            DO J = 1, N                                                 0020
+
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=N, 1<=J,
+C    J<=N}>
+
+               WORK(J,K) = J*J-K*K                                      0021
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=J, J<=N}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=J, J<=N}>
+C  <WORK(PHI1,PHI2)-R-EXACT-{PHI1==J, K<=PHI2+1, PHI2<=K, 1<=I, I<=N,
+C    1<=J, J<=N}>
+
+               A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                        0022
+            ENDDO
+         ENDDO
+      ENDIF
+      END
+
+      
+      SUBROUTINE TOTO(I)
+      IF (I.LT.10) THEN                                                 0004
+         I = I+10                                                       0005
+      ENDIF
+      END

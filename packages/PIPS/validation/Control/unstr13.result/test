@@ -1,0 +1,37 @@
+
+Printed file
+
+      PROGRAM UNSTR
+      INTEGER A, B
+
+c     10 j = 3
+10    J = 3                                                             0005
+c     20   continue: could be fuse with node 30
+20    CONTINUE                                                          0008
+
+c     if (a .eq. 0) goto 30
+30    IF (A.EQ.0) GOTO 30                                               0012
+c     if:
+      IF (B.EQ.0) THEN                                                  0014
+         GOTO 20
+      ELSE
+         GOTO 10
+      ENDIF
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      PROGRAM UNSTR
+      INTEGER A, B
+
+c     10 j = 3
+10    J = 3                                                             0005
+c     20   continue: could be fuse with node 30
+20    CONTINUE                                                          0008
+
+c     if (a .eq. 0) goto 30
+30    IF (A.EQ.0) GOTO 30                                               0012
+c     if:
+      IF (B.EQ.0) GOTO 20                                               0014
+      GOTO 10
+      END

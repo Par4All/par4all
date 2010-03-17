@@ -1,0 +1,71 @@
+
+Symbol table
+
+ndecl10
+
+Declarations for module "ndecl10" with type "char * -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> union m "
+	Declared entity "ndecl10!:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl10:*DYNAMIC*" with type "area" with size 24
+	Declared entity "ndecl10:*HEAP*" with type "area" with size 0
+	Declared entity "ndecl10:*STACK*" with type "area" with size 0
+	Declared entity "ndecl10:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl10:0`'m" with type "union" 
+	Declared entity "ndecl10:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "ndecl10:0`__func__" with type "variable" "char"
+	Declared entity "ndecl10:0`px" with type "variable" "union m  *"
+	Declared entity "ndecl10:0`x" with type "variable" "union m "
+	Declared entity "ndecl10:dir" with type "variable" "char *"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable ndecl10:dir	offset = 1
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl10!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl10:*DYNAMIC*" of size 24:
+	Variable "ndecl10:0`x"	offset = 16	size = 4
+	Variable "ndecl10:0`px"	offset = 20	size = 4
+	Variable "ndecl10:0`__func__"	offset = 0	size = 8
+	Variable "ndecl10:0`__FUNCTION__"	offset = 8	size = 8
+
+
+Layout for memory area "ndecl10:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl10:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl10:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module ndecl10
+
+
+Parsed printed file
+
+void ndecl10(char *dir)
+{
+   /* Well, x is a union of name m: x declaration disappears... */
+   union m {                                                            /*0008*/
+      int a;
+      float b;
+   } x, *px, foo();
+}

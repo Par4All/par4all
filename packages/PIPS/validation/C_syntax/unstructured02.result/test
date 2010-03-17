@@ -1,0 +1,118 @@
+
+Parsed printed file
+
+int unstructured02()
+{
+   int a1,  a2,  i,  b,  lambda,  n;
+
+   for (i = 1;i<=n;i++) {
+      while (a2!=0) {
+         for (i = 0;i<n;i++)
+            if (a2==a1)
+               goto SKIP;
+
+         if (lambda==0.) {
+            if (1>a2)
+               goto SKIP;
+            if (1>b)
+               goto SKIP;
+         }
+         else {
+            if (1>a2)
+               goto SKIP;
+            if (1>b)
+               goto SKIP;
+         }
+SKIP:         if (a2==a1)
+            goto break_2;
+         a2 = a1;
+      }
+break_2:      ;
+   }
+   return 1;
+}
+
+Printed file
+
+int unstructured02()
+{
+   int a1,  a2,  i,  b,  lambda,  n;
+   i = 1;
+l99995:   ;
+
+   if (!(i<=n)) goto l99999;
+l99996:   ;
+   if (!(a2!=0)) goto break_2;
+   i = 0;
+l99997:   ;
+   if (!(i<n)) goto l99998;
+   if (a2==a1) goto SKIP;
+   i++;
+   goto l99997;
+SKIP:   if (a2==a1) goto break_2;
+   a2 = a1;
+   goto l99996;
+break_2:   ;
+   i++;
+   goto l99995;
+l99998:   ;
+
+   if (lambda==0.) goto l99994;
+   if (1>a2) goto SKIP;
+   if (1>b) {
+      goto SKIP;
+   }
+   else {
+      goto SKIP;
+   }
+l99994:   ;
+   if (1>a2) goto SKIP;
+   if (1>b) {
+      goto SKIP;
+   }
+   else {
+      goto SKIP;
+   }
+l99999:   ;
+   return 1;
+}
+Try more aggressive restructuring:
+
+printed file after RESTRUCTURE_CONTROL
+
+int unstructured02()
+{
+   int a1,  a2,  i,  b,  lambda,  n;
+   i = 1;
+l99998:   ;
+
+   if (!(i<=n)) goto l99999;
+l99995:   ;
+   if (!(a2!=0)) goto break_2;
+   i = 0;
+l99996:   ;
+   if (!(i<n)) goto l99997;
+   if (a2==a1) goto SKIP;
+   i++;
+   goto l99996;
+SKIP:   if (a2==a1) goto break_2;
+   a2 = a1;
+   goto l99995;
+l99997:   ;
+
+   if (lambda==0.)
+      if (1>a2)
+         ;
+      else if (1>b)
+         ;
+   else if (1>a2)
+      ;
+   else if (1>b)
+      ;
+   goto SKIP;
+break_2:   ;
+   i++;
+   goto l99998;
+l99999:   ;
+   return 1;
+}

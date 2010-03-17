@@ -1,0 +1,31 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+delete use_def_unstructured
+create use_def_unstructured use_def_unstructured.f
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+set PRETTYPRINT_INTERNAL_RETURN TRUE
+set PRETTYPRINT_ALL_LABELS TRUE
+set PRETTYPRINT_EMPTY_BLOCKS TRUE
+set PRETTYPRINT_UNSTRUCTURED TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+#
+module USE_DEF_UNSTRUCTURED
+display PRINTED_FILE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+
+close
+delete use_def_unstructured
+quit
+EOF
+
+exit $?

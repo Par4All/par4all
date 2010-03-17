@@ -1,0 +1,28 @@
+--- Preconditions for LOOPEXIT6
+
+C  P() {}
+
+      PROGRAM LOOPEXIT6
+
+c     Check non-unit increments, the loop may be entered or not
+
+      REAL T(10)
+
+C  P() {}
+
+
+      DO I = 1, N, 2                                                    0007
+
+C  P(I) {1<=I, I<=N}
+
+         T(I) = 0.                                                      0008
+      ENDDO
+
+C  P(I) {1<=I, N+1<=I}
+
+
+C     Expected precondition:
+C     P(I) {N+1<=I} 
+      PRINT *, I                                                        0013
+
+      END

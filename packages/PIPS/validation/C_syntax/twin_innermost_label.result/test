@@ -1,0 +1,56 @@
+
+parsed printed file
+
+void comment(void)
+{
+   // BEGIN BLOCK
+   // BEGIN BLOCK
+   // A bara label
+bara:   ;
+   // A gwin label
+   // This goto gwin should not disappear:
+gwin:   goto gwin;
+   // END BLOCK
+   // END BLOCK
+}
+void miam(void)
+{
+   // BEGIN BLOCK
+   // BEGIN BLOCK
+bara:   ;
+gwin:   goto gwin;
+   // END BLOCK
+   // END BLOCK
+}
+// BEGIN BLOCK
+extern void miam(void);
+
+extern void comment(void);
+// END BLOCK
+
+printed file
+
+void comment(void)
+{
+   // BEGIN BLOCK
+   // A bara label
+bara:   ;
+   // A gwin label
+   // This goto gwin should not disappear:
+gwin:   ;
+   goto gwin;
+   // END BLOCK
+}
+void miam(void)
+{
+   // BEGIN BLOCK
+bara:   ;
+gwin:   ;
+   goto gwin;
+   // END BLOCK
+}
+// BEGIN BLOCK
+extern void miam(void);
+
+extern void comment(void);
+// END BLOCK

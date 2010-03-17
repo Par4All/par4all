@@ -1,0 +1,9 @@
+set[2] {
+	SIMD_SETW: 2,HI_REF HI_REF ,-1;
+	SIMD_SETD: 4,QI_REF QI_REF ,-3;
+}
+
+set: = REFERENCE = REFERENCE ;
+set: = REFERENCE = CONSTANT ;
+set: = REFERENCE REFERENCE : ,,0 ;
+

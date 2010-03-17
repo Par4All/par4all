@@ -1,0 +1,88 @@
+
+C  T() {}
+
+      PROGRAM STR
+      INTEGER I
+      REAL R
+      CHARACTER*20 S
+
+C  T(I) {I==12}
+
+
+      I = 12                                                            0006
+
+C  T(R) {1.0D0==R}
+
+      R = 1.0D0                                                         0007
+
+C  T(S) {'hi'==S}
+
+      S = 'hi'                                                          0008
+
+C  T() {}
+
+      PRINT *, I, R, S                                                  0009
+
+C  T(S) {'hello world'==S}
+
+
+      S = 'hello world'                                                 0011
+
+C  T() {}
+
+      PRINT *, S                                                        0012
+
+C  T(S) {' ( hi ! ) '==S}
+
+
+      S = ' ( hi ! ) '                                                  0014
+
+C  T() {}
+
+      PRINT *, S                                                        0015
+
+      END
+
+C  P() {}
+
+      PROGRAM STR
+      INTEGER I
+      REAL R
+      CHARACTER*20 S
+
+C  P() {}
+
+
+      I = 12                                                            0006
+
+C  P(I) {I==12}
+
+      R = 1.0D0                                                         0007
+
+C  P(I,R) {1.0D0==R, I==12}
+
+      S = 'hi'                                                          0008
+
+C  P(I,R,S) {'hi'==S, 1.0D0==R, I==12}
+
+      PRINT *, I, R, S                                                  0009
+
+C  P(I,R,S) {'hi'==S, 1.0D0==R, I==12}
+
+
+      S = 'hello world'                                                 0011
+
+C  P(I,R,S) {'hello world'==S, 1.0D0==R, I==12}
+
+      PRINT *, S                                                        0012
+
+C  P(I,R,S) {'hello world'==S, 1.0D0==R, I==12}
+
+
+      S = ' ( hi ! ) '                                                  0014
+
+C  P(I,R,S) {' ( hi ! ) '==S, 1.0D0==R, I==12}
+
+      PRINT *, S                                                        0015
+
+      END

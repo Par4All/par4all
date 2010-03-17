@@ -1,0 +1,14 @@
+delete callgraph06
+create callgraph06 callgraph06.f
+
+make CALLERS[%ALL]
+
+close
+open callgraph06
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+make CALLERS[%ALL]
+
+close
+delete callgraph06
+quit

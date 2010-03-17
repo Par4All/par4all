@@ -1,0 +1,50 @@
+C***********************************************************************
+      SUBROUTINE CHOLES(A,N,RL,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSEE DE CHOLESKI L*D*LT DE LA MATRICE A
+C  L ETANT STOCKEE PLEINE COMME A, LA DIAGONALE DE L ETANT EGALE A 1/D .
+C  LES MATRICES A ET RL PEUVENT ETRE CONFONDUES .
+      COMMON/TOTO/Z1(640),Z2(640),D(640)
+      DIMENSION A(N,N),RL(N,N),Z(N)
+C  CALCUL DE LA PREMIERE COLONNE DE RL .
+      Z1(1) = A(1,1)                                                    0010
+      D(1) = 1./Z1(1)                                                   0011
+      DOALL J = 2, N                                                    0012
+1        RL(J,1) = A(J,1)*D(1)                                          0013
+      ENDDO
+C  CALCUL DES COLONNES 2 A N DE RL .
+      DOALL I = 2, N                                                    0015
+C  CALCUL DU TERME DIAGONAL .
+         Z1(I) = A(I,I)                                                 0017
+      ENDDO
+      DO I = 2, N                                                       0015
+         DOALL K = 1, I-1                                               0018
+5           Z2(K) = RL(I,K)*Z1(K)                                       0019
+         ENDDO
+         DO K = 1, I-1                                                  0020
+3           Z1(I) = Z1(I)-RL(I,K)*Z2(K)                                 0021
+         ENDDO
+         D(I) = 1./Z1(I)                                                0022
+         DOALL J = I+1, N                                               0024
+4           Z2(J) = A(J,I)                                              0025
+         ENDDO
+         DO K = 1, I-1                                                  0026
+            DOALL J = I+1, N                                            0028
+7              Z2(J) = Z2(J)-RL(J,K)*Z2(K)                              0029
+            ENDDO
+         ENDDO
+         DOALL J = I+1, N                                               0031
+8           RL(J,I) = Z2(J)*D(I)                                        0032
+         ENDDO
+      ENDDO
+C  RANGEMENT DE L'INVERSE DE LA DIAGONALE .
+      DO J = 1, N                                                       0035
+9        RL(J*(N+1)-N,1) = D(J)                                         0036
+      ENDDO
+C RANGEMENT PAR TRANSPOSITION DES TERMES TRIANGULAIRES SUPERIEURS DE L .
+      DOALL K = 2, N                                                    0038
+         DOALL J = 1, K-1                                               0040
+11          RL(J,K) = RL(K,J)                                           0041
+         ENDDO
+      ENDDO
+      END

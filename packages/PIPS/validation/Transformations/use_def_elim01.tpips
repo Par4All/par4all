@@ -1,0 +1,29 @@
+delete use_def_elim01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create use_def_elim01 use_def_elim01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[use_def_elim01]
+apply USE_DEF_ELIMINATION[use_def_elim01]
+display PRINTED_FILE[use_def_elim01]
+apply SPLIT_INITIALIZATIONS[use_def_elim01]
+apply USE_DEF_ELIMINATION[use_def_elim01]
+display PRINTED_FILE[use_def_elim01]
+apply CLEAN_DECLARATIONS[use_def_elim01]
+display PRINTED_FILE[use_def_elim01]
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[use_def_elim]
+
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[use_def_elim]
+close
+delete use_def_elim01
+quit
+

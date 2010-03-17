@@ -1,0 +1,35 @@
+* Example with Input/Output command 
+ 
+      PROGRAM IO
+      PARAMETER (N=10)
+      INTEGER T(N),X
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+
+      READ (UNIT=5,FMT=1000,END=990) T(1)                               0002
+1000  FORMAT(I5)                                                        0003
+
+      STOP 'ok'                                                         0004
+
+990   CONTINUE                                                          0005
+      STOP 'not enough data'                                            0005
+
+      END
+* Example with Input/Output command 
+ 
+      PROGRAM IO
+      PARAMETER (N=10)
+      INTEGER T(N),X
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+
+      READ (UNIT=5,FMT=1000,END=990) T(1)                               0002
+1000  FORMAT(I5)                                                        0003
+
+      STOP 'ok'                                                         0004
+
+990   CONTINUE                                                          0005
+      STOP 'not enough data'                                            0005
+
+      END
+

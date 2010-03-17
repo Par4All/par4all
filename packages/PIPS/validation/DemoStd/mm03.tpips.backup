@@ -1,0 +1,31 @@
+delete mm03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create mm03 mm03.f
+module MM03
+
+echo
+echo Effects for "MM03"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[MM03]
+
+echo
+echo Parallel code for "MM03"
+echo
+
+display PARALLELPRINTED_FILE[MM03]
+
+# Let's check open 
+close
+open mm03
+
+echo
+echo Parallel code for "SAXPY"
+echo
+
+display PARALLELPRINTED_FILE[SAXPY]
+quit
+

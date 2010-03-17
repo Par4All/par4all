@@ -1,0 +1,45 @@
+delete inlining28
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining28 inlining28.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[foo]
+display PRINTED_FILE[bar]
+
+echo
+echo Code after inlining
+echo
+
+# property not usefull here, but relevant for validation
+setproperty INLINING_CALLERS "bar"
+apply INLINING[foo]
+display PRINTED_FILE[bar]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+setenv DB=inlining28.database
+shell cc inlining28.c -lm -o $DB/inlining28
+shell ./$DB/inlining28 > $DB/inlining28.out
+shell cc $DB/Src/inlining28.c -lm -o  $DB/inlining28
+shell ./$DB/inlining28 > $DB/inlining28_new.out
+
+echo
+echo Diff, must be empty
+echo
+shell diff $DB/inlining28.out $DB/inlining28_new.out
+
+close
+delete inlining28
+quit
+

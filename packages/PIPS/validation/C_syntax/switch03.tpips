@@ -1,0 +1,41 @@
+delete switch03
+
+create switch03 switch03.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Parsed Printed file for "switch03"
+echo
+
+display PARSED_PRINTED_FILE[switch03]
+
+echo
+echo Parsed Printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Printed file for "switch03"
+echo
+
+display PRINTED_FILE[switch03]
+
+apply RESTRUCTURE_CONTROL[switch03]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[switch03]
+
+apply UNSPLIT[%PROGRAM]
+close
+
+#delete switch03
+
+quit

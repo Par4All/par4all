@@ -1,0 +1,89 @@
+
+Transformers for "TYPE26"
+
+
+C  T() {}
+
+      PROGRAM TYPE26
+
+C     Check multi-type initialization routine
+
+      CHARACTER*20 S
+
+C  T(S) {"Hello World!"==S}
+
+
+      S = "Hello World!"                                                0007
+
+C  T(X) {2.0==X}
+
+      X = 2.0                                                           0008
+
+C  T(I) {I==1}
+
+      I = 1                                                             0009
+
+C  T() {}
+
+
+      CALL INIPRINT(S, X, I)                                            0011
+
+      END
+
+Preconditions for "TYPE26" and "INIPRINT"
+
+
+C  P() {}
+
+      PROGRAM TYPE26
+
+C     Check multi-type initialization routine
+
+      CHARACTER*20 S
+
+C  P() {}
+
+
+      S = "Hello World!"                                                0007
+
+C  P(S) {"Hello World!"==S}
+
+      X = 2.0                                                           0008
+
+C  P(S,X) {"Hello World!"==S, 2.0==X}
+
+      I = 1                                                             0009
+
+C  P(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
+
+
+      CALL INIPRINT(S, X, I)                                            0011
+
+      END
+
+C  P() {"Hello World!"==FS, 2.0==FX, FI==1}
+
+
+      SUBROUTINE INIPRINT(FS, FX, FI)
+
+      CHARACTER*(*) FS
+      INTEGER FI
+
+C  P() {"Hello World!"==FS, 2.0==FX, FI==1}
+
+
+      PRINT *, FS, FX, FI                                               0007
+
+      END
+
+Partial evaluation for "INIPRINT": only integer scalar variables are substituted
+
+
+      SUBROUTINE INIPRINT(FS, FX, FI)
+
+      CHARACTER*(*) FS
+      INTEGER FI
+
+      PRINT *, FS, FX, 1                                                0007
+
+      END

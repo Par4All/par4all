@@ -1,0 +1,16 @@
+delete externalloc09
+create externalloc09 externalloc09/foo.c externalloc09/bar.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+activate C_PARSER
+display SYMBOL_TABLE_FILE[%ALL]
+display PARSED_PRINTED_FILE[%ALL]
+
+close
+delete externalloc09
+quit

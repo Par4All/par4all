@@ -1,0 +1,23 @@
+delete csplit05
+
+# Duplicate module name into two different C files: conflict!
+
+# setenv PIPS_CHECK_FORTRAN TRUE
+
+# setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
+
+# tpips does not exapnd filenames anymore
+# create csplit05 csplit05.src/*.c
+create csplit05 csplit05.src/foo1.c csplit05.src/foo2.c
+
+echo csplit must fail because of duplicate function name "foo"
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+# The creation is doomed on purpose, see source code.
+
+display PRINTED_FILE[%ALL]
+
+quit

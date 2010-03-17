@@ -1,0 +1,61 @@
+
+C  T(I) {I==I#init+1}
+
+
+      SUBROUTINE INCR(I)
+
+C  T(I) {I==I#init+1}
+
+      I = I+1                                                           0003
+      END
+
+C  T() {}
+
+      PROGRAM INTER03
+
+C     Check that equivalences are taken into account properly
+
+      EQUIVALENCE (X, J)
+
+C  T() {}
+
+
+      CALL INCR(J)                                                      0007
+
+C  T() {}
+
+
+      PRINT *, J                                                        0009
+
+      END
+
+C  P() {}
+
+
+      SUBROUTINE INCR(I)
+
+C  P() {}
+
+      I = I+1                                                           0003
+      END
+
+C  P() {}
+
+      PROGRAM INTER03
+
+C     Check that equivalences are taken into account properly
+
+      EQUIVALENCE (X, J)
+
+C  P() {}
+
+
+      CALL INCR(J)                                                      0007
+
+C  P() {}
+
+
+      PRINT *, J                                                        0009
+
+      END
+

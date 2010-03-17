@@ -1,0 +1,4 @@
+* validation
+- use only relative filenames: pb with expansion (create foo xxx/*.c)
+- must not rely on PIPS_* env directory variable to exists
+- may run in parallel? see ticket #148

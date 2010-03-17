@@ -1,0 +1,85 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
+Registering file nullincr2.f
+Splitting file    ./nullincr2.f
+  Module         NULLINCR2
+Workspace nullincr2 created and opened.
+Module NULLINCR2 selected
+Main module PROGRAM "NULLINCR2" selected.
+Module NULLINCR2 already active.
+Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
+Selecting rule: PRECONDITIONS_INTER_FULL
+Selecting rule: TRANSFORMERS_INTER_FULL
+echo Transformers
+Transformers
+echo
+
+Selecting rule: PRINT_CODE_TRANSFORMERS
+Module NULLINCR2 already active.
+Request: build resource PRINTED_FILE for module NULLINCR2.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(NULLINCR2)
+  PARSER                         building   PARSED_CODE(NULLINCR2)
+                                 building   CALLEES(NULLINCR2)
+  CONTROLIZER                    building   CODE(NULLINCR2)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(NULLINCR2)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(NULLINCR2)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(NULLINCR2)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(NULLINCR2)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(NULLINCR2)
+  PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(NULLINCR2)
+PRINTED_FILE made for NULLINCR2.
+
+C  T() {}
+
+      PROGRAM NULLINCR2
+
+c     This is Fortran compatible. But a user error should be raised.
+
+      REAL T(10)
+
+C  T(K) {K==0}
+
+
+      K = 0                                                             0007
+
+C  T(I) {}
+
+      DO I = 1, 10, K                                                   0008
+
+C  T() {}
+
+         T(I) = 0.                                                      0009
+      ENDDO
+
+      END
+echo
+
+echo Preconditions
+Preconditions
+echo
+
+Selecting rule: PRINT_CODE_PRECONDITIONS
+Module NULLINCR2 already active.
+Request: build resource PRINTED_FILE for module NULLINCR2.
+  CALLGRAPH                      building   CALLERS(NULLINCR2)
+                                 building   HEIGHT(NULLINCR2)
+                                 building   DEPTH(NULLINCR2)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(NULLINCR2)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(NULLINCR2)
+user error in add_index_range_conditions: Illegal null increment
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module NULLINCR2.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module NULLINCR2.
+Closing program.
+Closing workspace.
+Workspace nullincr2 closed.
+
+Workspace nullincr2 deleted.

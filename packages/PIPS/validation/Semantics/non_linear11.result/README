@@ -1,0 +1,1 @@
+For K10, on overflow, all inforamtion is lost whereas information about L1 and L2 should have been preserved.

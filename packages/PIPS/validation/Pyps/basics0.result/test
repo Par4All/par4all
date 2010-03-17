@@ -1,0 +1,113 @@
+int foo(int a)
+{
+   return a;
+}
+void bar(int *c)
+{
+   //PIPS generated variable
+   int _return0;
+
+   _return0 = 2;
+l99999:   ;
+   *c = _return0;
+}
+void malabar(int *c)
+{
+   *c = foo(3);
+}
+l99999
+void megablast(int n)
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0;
+   //PIPS generated variable
+   int LU_IB0;
+   //PIPS generated variable
+   int LU_IND0;
+l99999:   LU_NUB0 = (n-1-0+1)/1;
+   LU_IB0 = MOD(LU_NUB0, 2);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      j = foo(LU_IND0*1+0);
+l99998:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 2) {
+      j = foo((LU_IND0+0)*1+0);
+      j = foo((LU_IND0+1)*1+0);
+l99997:      ;
+   }
+   i = 0+MAX0(LU_NUB0, 0)*1;
+}
+int foo(int a)
+{
+   return a;
+}
+void bar(int *c)
+{
+   //PIPS generated variable
+   int _return0;
+
+   _return0 = 2;
+l99999:   ;
+   *c = _return0;
+}
+void megablast(int n)
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0;
+   //PIPS generated variable
+   int LU_IB0;
+   //PIPS generated variable
+   int LU_IND0;
+l99999:   LU_NUB0 = n;
+   LU_IB0 = MOD(LU_NUB0, 2);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      j = foo(LU_IND0*1+0);
+l99998:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 2) {
+      j = foo((LU_IND0+0)*1+0);
+      j = foo((LU_IND0+1)*1+0);
+l99997:      ;
+   }
+   i = MAX0(LU_NUB0, 0);
+}
+/*
+
+  $Id: test.c 15590 2009-10-20 13:56:39Z guelton $
+
+  Copyright 1989-2009 MINES ParisTech
+
+  This file is part of PIPS.
+
+  PIPS is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  any later version.
+
+  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.
+
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+extern int foo(int a);
+
+extern void bar(int *c);
+extern void malabar(int *c);
+
+extern void megablast(int n);
+extern int main();
+int main()
+{
+   return 1;
+}
+void malabar(int *c)
+{
+   *c = foo(3);
+}

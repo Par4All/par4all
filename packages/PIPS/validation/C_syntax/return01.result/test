@@ -1,0 +1,73 @@
+
+Symbol table for "return01"
+
+return01
+
+Declarations for module "return01" with type "int -> void *"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "return01!:*STATIC*" with type "area" with size 0
+	Declared entity "return01:*DYNAMIC*" with type "area" with size 18
+	Declared entity "return01:*HEAP*" with type "area" with size 0
+	Declared entity "return01:*STACK*" with type "area" with size 0
+	Declared entity "return01:*STATIC*" with type "area" with size 0
+	Declared entity "return01:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "return01:0`__func__" with type "variable" "char"
+	Declared entity "return01:i" with type "variable" "int"
+	Declared entity "return01:return01" with type "variable" "void *"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable return01:i	offset = 1
+
+Layout for return variable:
+
+	Variable "return01:return01"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "return01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "return01:*DYNAMIC*" of size 18:
+	Variable "return01:0`__func__"	offset = 0	size = 9
+	Variable "return01:0`__FUNCTION__"	offset = 9	size = 9
+
+
+Layout for memory area "return01:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "return01:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "return01:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module return01
+
+
+Parsed printed file
+
+void * return01(int i)
+{
+   return return01;
+}
+
+Printed file
+
+void * return01(int i)
+{
+   return return01;
+}

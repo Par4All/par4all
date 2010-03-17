@@ -1,0 +1,58 @@
+-- test with the property
+Registering file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+Checking Fortran syntax of ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f: In program `error':
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f:2: 
+         integer 'hello'
+                 ^
+Invalid form for type-declaration statement at (^)
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f:3: 
+         prin *, 'foo'
+         1    2
+Unrecognized statement name at (1) and invalid form for assignment or statement-function definition at (2)
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'g77 -c -Wall -Wimplicit ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f -o ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o ; test -f ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o && rm ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f!
+
+Splitting file    ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+  Module         ERROR
+Workspace syntax_error created and opened.
+Module ERROR selected
+Module ERROR selected
+Deletion of obsolete resources: none destroyed.
+Closing all modules.
+  Closing module ERROR.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+
+-- test from the environment
+Registering file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+Checking Fortran syntax of ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f: In program `error':
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f:2: 
+         integer 'hello'
+                 ^
+Invalid form for type-declaration statement at (^)
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f:3: 
+         prin *, 'foo'
+         1    2
+Unrecognized statement name at (1) and invalid form for assignment or statement-function definition at (2)
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'g77 -c -Wall -Wimplicit ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f -o ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o ; test -f ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o && rm ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f!
+
+Splitting file    ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+  Module         ERROR
+Workspace syntax_error created and opened.
+Module ERROR selected
+Module ERROR selected
+Deletion of obsolete resources: none destroyed.
+Closing all modules.
+  Closing module ERROR.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+

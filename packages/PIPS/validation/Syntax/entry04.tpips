@@ -1,0 +1,20 @@
+delete entry04
+create entry04 entry04.f
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Display code for subroutine ENTRY04
+echo
+
+display PRINTED_FILE[ENTRY04]
+
+echo
+echo Display code for entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+
+close
+delete entry04
+quit

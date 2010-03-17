@@ -1,0 +1,21 @@
+// OMP style
+      PROGRAM NO_PARALLEL2
+      INTEGER K
+
+      REAL*8 R2
+
+      R2 = 1500.0                                                       0006
+
+      DO WHILE (R2.GT.0.0D0)                                            0008
+         DO K = 1, 10                                                   0009
+            R2 = R2-5.0                                                 0010
+         ENDDO
+      ENDDO
+
+      DO K = 1, 10                                                      0014
+         R2 = R2+5.0                                                    0015
+      ENDDO
+
+      WRITE (10, *) 'result =', R2                                      0018
+
+      END

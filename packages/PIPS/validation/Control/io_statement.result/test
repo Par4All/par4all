@@ -1,0 +1,112 @@
+
+Printed file for "IO_STATEMENT"
+
+C     This program is written for testing module TYPING:
+C     * Verification the syntax of IO statements *
+C
+C     Many of these statements are not legal Fortran. f77 detects
+C     mistakes. But not PIPS parser.
+C
+C     Written by PHAM DINH Son - trainee 03/00-09/00.
+C     May, 30, 2000
+C
+      PROGRAM IO_STATEMENT
+      INTEGER I
+      CHARACTER CH
+      LOGICAL L
+
+1234  PRINT *, "1234 IS A LABEL STATEMENT"                              0015
+1235  PRINT *, "1235 IS A LABEL STATEMENT"                              0016
+
+C     UNIT specifier : Integer or character expression
+C     ================================================
+      READ (12345, 10)                                                  0020
+      READ ("STRING", 10)                                               0021
+      READ (I, 10)                                                      0022
+      READ (CH, 10)                                                     0023
+
+!ERROR: UNIT specifier must be an integer or character expression
+      READ (.TRUE., 10)                                                 0025
+!ERROR: UNIT specifier must be an integer or character expression
+      READ (L, 10)                                                      0026
+
+C     Specifier must be a label statement
+C     Like: ERR, END
+C     ===================================
+      READ (UNIT=12345,FMT=10,ERR=1234,END=1234)                        0031
+
+C     This is not compatible with the controlizer, which looks for labels after END= and ERR=
+c      READ(UNIT=12345, FMT=10, ERR=L, END=I)
+c      READ(UNIT=12345, FMT=10, ERR=1234, END=CH)
+
+C     Specifier must be a label statement, integer or character expression
+C     Like: FMT, REC
+C     ====================================================================
+      READ (UNIT=12345,FMT=1235,REC=0)                                  0040
+      READ (UNIT=12345,FMT=I,REC=CH)                                    0041
+      READ (UNIT=12345,FMT="STRING",REC=12345678)                       0042
+
+!ERROR: FORMAT specifier must be a label, an integer or character expression
+!ERROR: RECORD specifier must be a label, an integer or character expression
+      READ (UNIT=12345,FMT=L,REC=.TRUE.)                                0044
+
+C     Specifier must be a character expression
+C     Like: FILE, STATUS, ACCESS, FORM, BLANK
+C     ========================================
+      OPEN (UNIT=123,FILE="STRING",STATUS="OLD",ACCESS="SEQUENTIAL")    0049
+
+!ERROR: STATUS specifier must be a character expression
+!ERROR: ACCESS specifier must be a character expression
+!ERROR: FORM specifier must be a character expression
+      OPEN (UNIT=123,FILE=CH,STATUS=I,ACCESS=1234,FORM=L)               0051
+
+C     Specifier must be an integer expression
+C     Like: RECL
+C     ========================================
+      OPEN (UNIT=123,FILE="STRING",RECL=123)                            0056
+      OPEN (UNIT=123,FILE="STRING",RECL=I)                              0057
+
+!ERROR: RECL specifier must be an integer expression
+      OPEN (UNIT=123,FILE="STRING",RECL=CH)                             0059
+
+
+C     Specifier must be a LOGICAL variable or array element
+C     Like: EXIST, OPENED, NAMED
+C     =====================================================
+      INQUIRE (IOSTAT=I,OPENED=L,NAMED=L,EXIST=L)                       0065
+
+!ERROR: OPENED specifier must be a variable or an array element of LOGICAL*4
+!ERROR: NAMED specifier must be a variable or an array element of LOGICAL*4
+!ERROR: IOSTAT specifier must be a variable or an array element of LOGICAL*4
+      INQUIRE (IOSTAT=I,OPENED=.TRUE.,NAMED=I,EXIST=CH)                 0067
+
+C     Specifier must be an INTEGER variable or array element
+C     Like: IOSTAT, NUMBER, NEXTREC
+C     =====================================================
+      INQUIRE (IOSTAT=I,NUMBER=I,NEXTREC=I)                             0072
+
+!ERROR: IOSTAT specifier must be a variable or an array element of INTEGER*4
+!ERROR: NUMBER specifier must be a variable or an array element of INTEGER*4
+!ERROR: NEXTREC specifier must be a variable or an array element of INTEGER*4
+      INQUIRE (IOSTAT=12,NUMBER=12,NEXTREC=1234)                        0074
+!ERROR: IOSTAT specifier must be a variable or an array element of INTEGER*4
+!ERROR: NUMBER specifier must be a variable or an array element of INTEGER*4
+!ERROR: NEXTREC specifier must be a variable or an array element of INTEGER*4
+      INQUIRE (IOSTAT=12,NUMBER=L,NEXTREC=CH)                           0075
+
+C     Specifier must be a CHARACTER variable or array element
+C     Like: NAME, SEQUENTIAL, DIRECT, FORMATTED, UNFORMATTED
+C     ======================================================
+      INQUIRE (IOSTAT=I,NAME=CH,SEQUENTIAL=CH,DIRECT=CH)                0080
+
+!ERROR: NAME specifier must be a variable or an array element of STRING
+!ERROR: SEQUENTIAL specifier must be a variable or an array element of STRING
+!ERROR: DIRECT specifier must be a variable or an array element of STRING
+      INQUIRE (IOSTAT=I,NAME="STRING",SEQUENTIAL=12,DIRECT=I)           0082
+
+      END
+
+Summary:
+
+TYPE_CHECKER[IO_STATEMENT] (put_summary) summary of 'IO_STATEMENT': 20 errors, 0 convertions., 0 simplifications
+

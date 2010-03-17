@@ -1,0 +1,9 @@
+void foo(int a, double b)
+{
+}
+extern int main();
+
+extern void foo(int a, double b);
+main()
+{
+}

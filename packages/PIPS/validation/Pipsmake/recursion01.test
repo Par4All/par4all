@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# test behavior fo pipsmake when resources are touched by user
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed /db_check_time/d | sed '/file *\//d' ) <<EOF
+
+delete recursion01
+create recursion01 recursion01.f
+
+# display PRINTED_FILE[%ALL]
+
+display CALLGRAPH_FILE[%ALL]
+
+close
+delete recursion01
+quit
+EOF
+

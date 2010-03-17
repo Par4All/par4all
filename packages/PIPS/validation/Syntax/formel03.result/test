@@ -1,0 +1,91 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: formel03: No such workspace
+Registering file formel03.f
+Splitting file    ./formel03.f
+  Module         Q
+  Module         FOO
+  Module         FORMEL03
+Workspace formel03 created and opened.
+Main module PROGRAM "FORMEL03" selected.
+Module FORMEL03 selected
+echo
+
+echo Listing for FOO
+Listing for FOO
+echo
+
+Module FOO selected
+Request: build resource PRINTED_FILE for module FOO.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+user warning in SafeLocalToGlobal: Variable FOO:X is a formal functional parameter.
+They are not (yet) supported by PIPS.
+user warning in MakeExternalFunction: unsupported formal function FOO:X
+user warning in MakeCallInst: entity FOO:X is a formal functional parameter
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+      SUBROUTINE FOO(X)
+      EXTERNAL X
+      REAL Y(100)
+
+      DO 100 J = 1, 100                                                 0005
+         CALL X(I)                                                      0006
+         Y(I) = 0.                                                      0007
+100      CONTINUE                                                       0008
+      END
+echo
+
+echo Listing for FORMEL03
+Listing for FORMEL03
+echo
+
+Module FORMEL03 already active.
+Request: build resource PRINTED_FILE for module FORMEL03.
+  FILTER_FILE                    building   SOURCE_FILE(FORMEL03)
+  PARSER                         building   PARSED_CODE(FORMEL03)
+                                 building   CALLEES(FORMEL03)
+  CONTROLIZER                    building   CODE(FORMEL03)
+  PRINT_CODE                     building   PRINTED_FILE(FORMEL03)
+PRINTED_FILE made for FORMEL03.
+c     passage de procedure formelle
+C     abort "no source file for x"
+      PROGRAM FORMEL03
+      EXTERNAL Q
+
+C     Forbidden in Fortran 77:
+c      p = q
+
+      CALL FOO(Q)                                                       0009
+      END
+echo
+
+echo Listing for Q
+Listing for Q
+echo
+
+Module Q selected
+Request: build resource PRINTED_FILE for module Q.
+  FILTER_FILE                    building   SOURCE_FILE(Q)
+  PARSER                         building   PARSED_CODE(Q)
+                                 building   CALLEES(Q)
+  CONTROLIZER                    building   CODE(Q)
+  PRINT_CODE                     building   PRINTED_FILE(Q)
+PRINTED_FILE made for Q.
+      SUBROUTINE Q(I)
+      I = I+1                                                           0002
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module FOO.
+  Closing module FORMEL03.
+  Closing module Q.
+Closing program.
+Closing workspace.
+Workspace formel03 closed.
+
+Workspace formel03 deleted.

@@ -1,0 +1,24 @@
+
+Initial code
+
+int split_initializations06()
+{
+   int i = 1, l = 4;
+   int j = 2;
+   int k = 3;
+   i++;
+}
+
+Code after c89 split_initializations
+
+int split_initializations06()
+{
+   int i, l;
+   int j;
+   int k;
+   i = 1;
+   l = 4;
+   j = 2;
+   k = 3;
+   i++;
+}

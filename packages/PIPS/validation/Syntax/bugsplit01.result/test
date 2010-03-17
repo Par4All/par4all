@@ -1,0 +1,13 @@
+Should be:
+  Module         SPLIT01
+  Module         ENTRYFOO
+  Module         BLA
+  Module         FUNNY
+However because of fsplit bugs & hacks:
+  Module         FUN
+  Module         BLA
+  Module         BIL
+  Module         ENTRYFOO
+  Module         FOO
+  Module         MAIN000
+Too bad...

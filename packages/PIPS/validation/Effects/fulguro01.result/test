@@ -1,0 +1,264 @@
+End of property settings
+
+Code for all functions
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   for(j = 0; j <= length-1; j += 1) {
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+      result = flgr_defop_add_fgINT32(v1, v2);
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+   return;
+}
+FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   FLGR_Ret ret;
+   if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
+      fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK) 
+      return ret;
+   if ((ret = flgr2d_is_data_same_attributes(data2, data1))!=FLGR_RET_OK) 
+      return ret;
+
+   if (datdest->type==FLGR_BIT) {
+      flgr2d_arith_add_fgBIT(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_UINT8) {
+      flgr2d_arith_add_fgUINT8(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_UINT16) {
+      flgr2d_arith_add_fgUINT16(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_UINT32) {
+      flgr2d_arith_add_fgUINT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_INT8) {
+      flgr2d_arith_add_fgINT8(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_INT16) {
+      flgr2d_arith_add_fgINT16(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_INT32) {
+      flgr2d_arith_add_fgINT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_FLOAT32) {
+      flgr2d_arith_add_fgFLOAT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   if (datdest->type==FLGR_FLOAT64) {
+      flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+   fprintf(stderr, "ERROR: File %s, Line %d, Function : ""type <%s> unknown!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+   return FLGR_RET_TYPE_UNKNOWN;
+}
+void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   FLGR_Data1D **pdest = datdest->row;
+   FLGR_Data1D **p1 = data1->row;
+   FLGR_Data1D **p2 = data2->row;
+   int i;
+   i = 0;
+   while (i<data1->size_y) {
+      flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
+      i++, pdest++, p1++, p2++;
+   }
+   return;
+}
+static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
+{
+   return flgr_get_array_fgINT32(array, pos);
+}
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+   flgr_set_array_fgINT32(array, pos, value);
+}
+static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
+{
+   return a+b;
+}
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+   return array[pos];
+}
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+   array[pos] = value;
+}
+
+Call graph for "flgr2d_arith_add"
+
+ flgr2d_arith_add
+     flgr2d_is_data_same_attributes
+     flgr2d_arith_add_fgBIT
+     flgr2d_arith_add_fgUINT8
+     flgr2d_arith_add_fgUINT16
+     flgr2d_arith_add_fgUINT32
+     flgr2d_arith_add_fgINT8
+     flgr2d_arith_add_fgINT16
+     flgr2d_arith_add_fgINT32
+         flgr1d_arith_add_fgINT32
+             fulguro01!flgr1d_get_data_array_fgINT32
+                 fulguro01!flgr_get_array_fgINT32
+             fulguro01!flgr_defop_add_fgINT32
+             fulguro01!flgr1d_set_data_array_fgINT32
+                 fulguro01!flgr_set_array_fgINT32
+     flgr2d_arith_add_fgFLOAT32
+     flgr2d_arith_add_fgFLOAT64
+     flgr_get_type_string
+
+Proper and cumulated effects for all functions (this implies cumulated effects for callees)
+
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//               <must be read   >: array pos value
+//               <must be written>: array[pos]
+   array[pos] = value;
+}
+//               <may be written >: array[*]
+//               <must be read   >: array pos value
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//               <may be written >: array[*]
+//               <must be read   >: array pos value
+   array[pos] = value;
+}
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//               <may be written >: array[*]
+//               <must be read   >: array pos value
+   flgr_set_array_fgINT32(array, pos, value);
+}
+//               <may be written >: array[*]
+//               <must be read   >: array pos value
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//               <may be written >: array[*]
+//               <must be read   >: array pos value
+   flgr_set_array_fgINT32(array, pos, value);
+}
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+//               <must be read   >: array array[pos] pos
+   return array[pos];
+}
+//               <may be read    >: array[*]
+//               <must be read   >: array pos
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+//               <may be read    >: array[*]
+//               <must be read   >: array pos
+   return array[pos];
+}
+static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
+{
+//               <may be read    >: array[*]
+//               <must be read   >: array pos
+   return flgr_get_array_fgINT32(array, pos);
+}
+//               <may be read    >: array[*]
+//               <must be read   >: array pos
+static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
+{
+//               <may be read    >: array[*]
+//               <must be read   >: array pos
+   return flgr_get_array_fgINT32(array, pos);
+}
+static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
+{
+//               <must be read   >: a b
+   return a+b;
+}
+//               <must be read   >: a b
+static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
+{
+//               <must be read   >: a b
+   return a+b;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+//               <must be read   >: length
+//               <must be written>: j
+   for(j = 0; j <= length-1; j += 1) {
+//               <may be read    >: psrc1[*]
+//               <must be read   >: j length psrc1
+//               <must be written>: v1
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+//               <may be read    >: psrc2[*]
+//               <must be read   >: j length psrc2
+//               <must be written>: v2
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+//               <must be read   >: length v1 v2
+//               <must be written>: result
+      result = flgr_defop_add_fgINT32(v1, v2);
+//               <may be written >: pdest[*]
+//               <must be read   >: j length pdest result
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+   return;
+}
+//               <may be read    >: data1[0][1][*] data2[0][1][*]
+//               <may be written >: datdest[0][1][*]
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+//               <may be read    >: j pdest psrc1 psrc1[*] psrc2 
+//                                  psrc2[*] result v1 v2
+//               <may be written >: pdest[*] result v1 v2
+//               <must be read   >: length
+//               <must be written>: j
+   for(j = 0; j <= length-1; j += 1) {
+//               <may be read    >: psrc1[*]
+//               <must be read   >: j length psrc1
+//               <must be written>: v1
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+//               <may be read    >: psrc2[*]
+//               <must be read   >: j length psrc2
+//               <must be written>: v2
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+//               <must be read   >: length v1 v2
+//               <must be written>: result
+      result = flgr_defop_add_fgINT32(v1, v2);
+//               <may be written >: pdest[*]
+//               <must be read   >: j length pdest result
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+   return;
+}

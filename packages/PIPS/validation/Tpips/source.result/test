@@ -1,0 +1,47 @@
+! one 
+! sourcing...
+! tpips source...
+      PROGRAM SOURCE
+      PRINT *, 'source'                                                 0001
+      END
+! source done.
+! two
+! sourcing...
+! tpips source...
+      PROGRAM SOURCE
+      PRINT *, 'source'                                                 0001
+      END
+! source done.
+! sourcing 2...
+! tpips source...
+      PROGRAM SOURCE
+      PRINT *, 'source'                                                 0001
+      END
+! source done.
+! three
+! sourcing...
+! tpips source...
+      PROGRAM SOURCE
+      PRINT *, 'source'                                                 0001
+      END
+! source done.
+! sourcing 2...
+! tpips source...
+      PROGRAM SOURCE
+      PRINT *, 'source'                                                 0001
+      END
+! source done.
+! sourcing 3...
+! tpips source...
+      PROGRAM SOURCE
+      PRINT *, 'source'                                                 0001
+      END
+! source done.
+! already open
+! sourcing...
+! tpips source...
+      PROGRAM SOURCE
+      PRINT *, 'source'                                                 0001
+      END
+! source done.
+! done

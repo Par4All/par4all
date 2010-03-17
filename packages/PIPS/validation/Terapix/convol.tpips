@@ -1,0 +1,151 @@
+delete convol
+create convol convol.c 
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+# for scalarization
+#
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+#activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+#activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate C_PARSER
+module convol
+
+echo
+echo Inital code
+echo
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+display PRINTED_FILE[run_kernel]
+
+echo
+echo After Inlining
+echo
+
+apply UNFOLDING
+display PRINTED_FILE
+
+#echo
+#echo After tiling
+#echo
+#
+#apply FLAG_LOOPS
+#apply LOOP_INTERCHANGE
+#l99993
+#display PRINTED_FILE
+#apply LOOP_TILING
+#l99993
+#128 0
+#0 5
+#apply FLAG_LOOPS
+#display PRINTED_FILE
+
+echo
+echo after Kernelize
+echo
+
+apply FLAG_LOOPS
+setproperty LOOP_LABEL "l99993"
+setproperty KERNELIZE_NBNODES 128
+setproperty KERNELIZE_KERNEL_NAME "microcode"
+setproperty KERNELIZE_HOST_CALL_NAME "work"
+apply KERNELIZE
+display PRINTED_FILE[convol]
+display PRINTED_FILE[work]
+display PRINTED_FILE[microcode]
+#apply KERNEL_LOAD_STORE[convol]
+#display PRINTED_FILE[convol]
+
+module microcode
+
+module microcode
+apply PARTIAL_EVAL
+apply LOOP_NORMALIZE
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+
+#echo
+#echo Microcode After atomization
+#echo
+#
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+#apply SIMD_ATOMIZER
+#display PRINTED_FILE
+
+
+echo
+echo Microcode after scalarization
+echo
+
+apply SCALARIZATION
+display PRINTED_FILE
+
+echo
+echo Microcode After array conversion
+echo
+
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
+apply ARRAY_TO_POINTER
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+#echo
+#echo Microcode After ICM
+#echo
+#
+#apply INVARIANT_CODE_MOTION
+#display PRINTED_FILE
+
+echo
+echo Microcode after flattening
+echo
+
+apply FLATTEN_CODE
+apply PARTIAL_EVAL
+#apply USE_DEF_ELIMINATION
+apply SUPPRESS_DEAD_CODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+
+echo
+echo Microcode after CSE
+echo
+
+setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
+apply OPTIMIZE_EXPRESSIONS
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode after ICM
+echo
+
+setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+apply OPTIMIZE_EXPRESSIONS
+apply PARTIAL_EVAL
+apply SUPPRESS_DEAD_CODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode After atomization
+echo
+
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+
+close
+delete convol
+quit

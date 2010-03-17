@@ -1,0 +1,266 @@
+user warning in tp_parse: formals: No such workspace
+Registering file formals.f
+Splitting file    ./formals.f
+  Module         EXTEND
+  Module         EXTINT
+  Module         FPTRAK
+Workspace formals created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EXTEND selected
+Module EXTEND already active.
+Request: build resource PRINTED_FILE for module EXTEND.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EXTEND)
+  PARSER                         building   PARSED_CODE(EXTEND)
+                                 building   CALLEES(EXTEND)
+
+Declarations for module EXTEND with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity EXTEND:*DYNAMIC*	with type area with size 16
+Declared entity EXTEND:*HEAP*	with type area with size 0
+Declared entity EXTEND:*STACK*	with type area with size 0
+Declared entity EXTEND:*STATIC*	with type area with size 0
+Declared entity EXTEND:ALVERT	with type variable REAL*4
+Declared entity EXTEND:GATEF	with type variable REAL*4
+Declared entity EXTEND:GATVEL	with type variable REAL*4
+Declared entity EXTEND:ISTAT	with type variable INTEGER*4
+Declared entity EXTEND:NEQUIV	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable EXTEND:ISTAT,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 16:
+	Variable EXTEND:ALVERT,	offset = 0,	size = 4
+	Variable EXTEND:NEQUIV,	offset = 4,	size = 4
+	Variable EXTEND:GATVEL,	offset = 8,	size = 4
+	Variable EXTEND:GATEF,	offset = 12,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EXTEND
+
+user warning in control_graph: Some statements are unreachable
+  CONTROLIZER                    building   CODE(EXTEND)
+  PRINT_CODE                     building   PRINTED_FILE(EXTEND)
+PRINTED_FILE made for EXTEND.
+      SUBROUTINE EXTEND(ISTAT)
+      INTEGER ISTAT, NEQUIV
+      REAL*4 GATEF, GATVEL, ALVERT
+
+      ISTAT = 0                                                         0004
+
+99999 CONTINUE
+      GATEF = GATE1                                                     0007
+      GATVEL = GATE2                                                    0008
+      NEQUIV = NEQQ                                                     0009
+      ALVERT = ALVNEW                                                   0010
+      IF (IPRT.LT.1) THEN                                               0011
+      ENDIF
+
+      END
+Module FPTRAK selected
+Module FPTRAK already active.
+Request: build resource PRINTED_FILE for module FPTRAK.
+  FILTER_FILE                    building   SOURCE_FILE(FPTRAK)
+  PARSER                         building   PARSED_CODE(FPTRAK)
+                                 building   CALLEES(FPTRAK)
+
+Declarations for module FPTRAK with type INTEGER*4 x INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity FPTRAK:*DYNAMIC*	with type area with size 4
+Declared entity FPTRAK:*HEAP*	with type area with size 0
+Declared entity FPTRAK:*STACK*	with type area with size 0
+Declared entity FPTRAK:*STATIC*	with type area with size 0
+Declared entity FPTRAK:ISTAT	with type variable INTEGER*4
+Declared entity FPTRAK:JSTAT	with type variable INTEGER*4
+Declared entity FPTRAK:NNEW	with type variable INTEGER*4
+Declared entity TOP-LEVEL:EXTEND	with type functional INTEGER*4 ->  void
+
+Layouts for formal parameters:
+
+	Variable FPTRAK:ISTAT,	offset = 2
+	Variable FPTRAK:NNEW,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable FPTRAK:JSTAT,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module FPTRAK
+
+  CONTROLIZER                    building   CODE(FPTRAK)
+  PRINT_CODE                     building   PRINTED_FILE(FPTRAK)
+PRINTED_FILE made for FPTRAK.
+C     Bug with formal parameter lists with ENTRY (CA)
+
+      SUBROUTINE FPTRAK(NNEW,ISTAT)                                     
+
+      CALL EXTEND(JSTAT)                                                0005
+
+      END
+Module EXTINT selected
+Module EXTINT already active.
+Request: build resource PRINTED_FILE for module EXTINT.
+  PARSER                         building   PARSED_CODE(EXTINT)
+                                 building   CALLEES(EXTINT)
+
+Declarations for module EXTINT with type REAL*4 x REAL*4 x INTEGER*4 x REAL*4 x INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity EXTINT:*DYNAMIC*	with type area with size 16
+Declared entity EXTINT:*HEAP*	with type area with size 0
+Declared entity EXTINT:*STACK*	with type area with size 0
+Declared entity EXTINT:*STATIC*	with type area with size 0
+Declared entity EXTINT:ALVERT	with type variable REAL*4
+Declared entity EXTINT:ALVNEW	with type variable REAL*4
+Declared entity EXTINT:GATE1	with type variable REAL*4
+Declared entity EXTINT:GATE2	with type variable REAL*4
+Declared entity EXTINT:GATEF	with type variable REAL*4
+Declared entity EXTINT:GATVEL	with type variable REAL*4
+Declared entity EXTINT:IPRT	with type variable INTEGER*4
+Declared entity EXTINT:NEQQ	with type variable INTEGER*4
+Declared entity EXTINT:NEQUIV	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable EXTINT:ALVNEW,	offset = 4
+	Variable EXTINT:GATE1,	offset = 1
+	Variable EXTINT:GATE2,	offset = 2
+	Variable EXTINT:IPRT,	offset = 5
+	Variable EXTINT:NEQQ,	offset = 3
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 16:
+	Variable EXTINT:ALVERT,	offset = 0,	size = 4
+	Variable EXTINT:GATVEL,	offset = 4,	size = 4
+	Variable EXTINT:GATEF,	offset = 8,	size = 4
+	Variable EXTINT:NEQUIV,	offset = 12,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EXTINT
+
+  CONTROLIZER                    building   CODE(EXTINT)
+  PRINT_CODE                     building   PRINTED_FILE(EXTINT)
+PRINTED_FILE made for EXTINT.
+      SUBROUTINE EXTINT(GATE1, GATE2, NEQQ, ALVNEW, IPRT)
+      INTEGER NEQQ, IPRT, NEQUIV
+      REAL*4 GATE1, GATE2, ALVNEW, GATEF, GATVEL, ALVERT
+
+99999 CONTINUE                                                          0005
+      GATEF = GATE1                                                     0006
+      GATVEL = GATE2                                                    0007
+      NEQUIV = NEQQ                                                     0008
+      ALVERT = ALVNEW                                                   0009
+      IF (IPRT.LT.1) THEN                                               0010
+      ENDIF
+
+      END
+Selecting rule: PRINT_CODE_PROPER_EFFECTS
+Module EXTEND selected
+Request: build resource PRINTED_FILE for module EXTEND.
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(EXTEND)
+  PRINT_CODE_PROPER_EFFECTS      building   PRINTED_FILE(EXTEND)
+PRINTED_FILE made for EXTEND.
+      SUBROUTINE EXTEND(ISTAT)
+      INTEGER ISTAT, NEQUIV
+      REAL*4 GATEF, GATVEL, ALVERT
+C               <must be written>: ISTAT
+
+      ISTAT = 0                                                         0004
+
+99999 CONTINUE
+C               <must be read   >: GATE1
+C               <must be written>: GATEF
+      GATEF = GATE1                                                     0007
+C               <must be read   >: GATE2
+C               <must be written>: GATVEL
+      GATVEL = GATE2                                                    0008
+C               <must be read   >: NEQQ
+C               <must be written>: NEQUIV
+      NEQUIV = NEQQ                                                     0009
+C               <must be read   >: ALVNEW
+C               <must be written>: ALVERT
+      ALVERT = ALVNEW                                                   0010
+C               <must be read   >: IPRT
+      IF (IPRT.LT.1) THEN                                               0011
+      ENDIF
+
+      END
+Module FPTRAK selected
+Request: build resource PRINTED_FILE for module FPTRAK.
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(EXTEND)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(EXTEND)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(FPTRAK)
+  PRINT_CODE_PROPER_EFFECTS      building   PRINTED_FILE(FPTRAK)
+PRINTED_FILE made for FPTRAK.
+C     Bug with formal parameter lists with ENTRY (CA)
+
+      SUBROUTINE FPTRAK(NNEW,ISTAT)                                     
+C               <must be written>: JSTAT
+
+      CALL EXTEND(JSTAT)                                                0005
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EXTEND.
+  Closing module EXTINT.
+  Closing module FPTRAK.
+Closing program.
+Closing workspace.
+Workspace formals closed.
+
+Workspace formals deleted.

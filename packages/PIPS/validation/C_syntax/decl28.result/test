@@ -1,0 +1,12 @@
+
+Parsed printed file for "decl28!" and "decl28"
+
+/* From Ronan: to see how far we can go in keeping with input source */
+
+extern void decl28(int d);
+extern void decl28(int d);
+extern void decl28(int d);
+void decl28(int d)
+{
+   d = 1;
+}

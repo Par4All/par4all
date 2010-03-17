@@ -1,0 +1,15 @@
+      PROGRAM AJOUTOUTPUT
+      INTEGER A, C
+      READ *, C                                                         0003
+      CALL AJOUTOUTPUTFOO(A, A, C)                                      0004
+      PRINT *, A, C                                                     0005
+      END
+      SUBROUTINE AJOUTOUTPUTFOO(A, B, C)
+      INTEGER A, B, C
+      A = 2*C                                                           0003
+      C = 2                                                             0004
+C	Attention: impact alias MUST at (AJOUTOUTPUT:(0,3))  between B and A
+C	New output-dependence with statement
+C	A = 2*C
+      B = C*5                                                           0005
+      END

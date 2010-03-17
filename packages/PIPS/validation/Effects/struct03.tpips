@@ -1,0 +1,68 @@
+delete struct03
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create struct03 struct03.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Parsed printed file for "struct03"
+echo
+
+display PARSED_PRINTED_FILE[struct03]
+
+echo
+echo Proper effetcs for "struct03"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[struct03]
+
+echo
+echo Cumulated effetcs for "struct03"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[struct03]
+
+#quit
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+#display PRINTED_FILE[main]
+
+echo
+echo Printed files with regions
+echo
+
+# activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[struct03]
+
+# Should be useless
+# apply PRIVATIZE_MODULE
+
+echo
+echo Dependence graph for "struct07"
+echo
+
+display DG_FILE[struct03]
+
+echo
+echo Printed files after parallelization
+echo
+
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[struct03]
+
+close
+delete struct03
+quit

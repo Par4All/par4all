@@ -1,0 +1,18 @@
+# Check that tests are correctly used to generate transformers
+
+delete dummy
+create dummy dummy.f
+
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+
+module BAR
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+module DUMMY
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete dummy
+quit

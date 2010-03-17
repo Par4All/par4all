@@ -1,0 +1,9 @@
+
+C  P() {1<=J, J<=2}
+
+      SUBROUTINE FOO(J)
+
+C  P() {1<=J, J<=2}
+
+      J = J+1                                                           0002
+      END

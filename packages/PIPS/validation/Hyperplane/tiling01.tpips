@@ -1,0 +1,24 @@
+delete tiling01
+create tiling01 tiling01.f
+module TILING01
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+apply LOOP_TILING[TILING01]
+100
+5 0
+0 5
+
+echo
+echo After axis parallel tiling (5, 5)
+echo
+
+display PRINTED_FILE
+
+close
+delete tiling01
+quit

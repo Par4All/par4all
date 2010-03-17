@@ -1,0 +1,101 @@
+
+C  T(INC,K) {INC==K, INC==K#init+1}
+
+      FUNCTION INC(K)
+
+C  T(K) {K==K#init+1}
+
+      K = K+1                                                           0002
+
+C  T(INC) {INC==K}
+
+      INC = K                                                           0003
+      END
+
+C  T() {}
+
+      PROGRAM SIDE_EFFECTS01
+
+C  T(I) {I==2}
+
+
+      I = 2                                                             0003
+
+C  T(I,J) {I==I#init+1, 2I==J+1}
+
+      J = I+INC(I)                                                      0004
+
+C  T(I,K) {I==I#init+1, 2I==K}
+
+      K = INC(I)+I                                                      0005
+
+C  T() {}
+
+      PRINT *, J, K                                                     0006
+
+C  T(I) {I==I#init+1}
+
+      IF (I.EQ.INC(I)) THEN                                             0007
+
+C  T() {}
+
+         PRINT *, "An aggressive optimization option is used"           0008
+      ELSE
+
+C  T() {}
+
+         PRINT *, "An standard optimization option is used"             0010
+      ENDIF
+
+      END
+
+C  P() {2<=K, K<=4}
+
+      FUNCTION INC(K)
+
+C  P() {2<=K, K<=4}
+
+      K = K+1                                                           0002
+
+C  P(K) {K==K#init+1, 3<=K, K<=5}
+
+      INC = K                                                           0003
+      END
+
+C  P() {}
+
+      PROGRAM SIDE_EFFECTS01
+
+C  P() {}
+
+
+      I = 2                                                             0003
+
+C  P(I) {I==2}
+
+      J = I+INC(I)                                                      0004
+
+C  P(I,J) {I==3, J==5}
+
+      K = INC(I)+I                                                      0005
+
+C  P(I,J,K) {I==4, J==5, K==8}
+
+      PRINT *, J, K                                                     0006
+
+C  P(I,J,K) {I==4, J==5, K==8}
+
+      IF (I.EQ.INC(I)) THEN                                             0007
+
+C  P() {0==-1}
+
+         PRINT *, "An aggressive optimization option is used"           0008
+      ELSE
+
+C  P(I,J,K) {I==5, J==5, K==8}
+
+         PRINT *, "An standard optimization option is used"             0010
+      ENDIF
+
+      END
+

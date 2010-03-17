@@ -1,0 +1,64 @@
+::::::::::::::
+essai.database/ESSAI.icfg
+::::::::::::::
+ESSAI
+    P
+        R
+            T
+        S
+    P
+        R
+            T
+        S
+    Q
+        P
+            R
+                T
+            S
+    R
+        T
+::::::::::::::
+essai.database/ESSAI.icfgc
+::::::::::::::
+ESSAI
+    do I
+        if
+        then
+            P
+                R
+                    T
+                S
+        endif
+    enddo
+    P
+        R
+            T
+        S
+    Q
+        P
+            R
+                T
+            S
+    R
+        T
+::::::::::::::
+essai.database/ESSAI.icfgl
+::::::::::::::
+ESSAI
+    do I
+        P
+            R
+                T
+            S
+    enddo
+    P
+        R
+            T
+        S
+    Q
+        P
+            R
+                T
+            S
+    R
+        T

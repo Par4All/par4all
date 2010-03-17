@@ -1,0 +1,11 @@
+# delete pmat
+create pmat pmat.f
+activate PRINT_CODE_PRECONDITIONS
+activate TRANSFORMERS_INTER_FAST
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FAST
+module SDOT
+display PRINTED_FILE
+close 
+delete pmat
+quit

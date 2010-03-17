@@ -1,0 +1,30 @@
+bar!
+
+Declarations for module bar! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
+Declared entity TOP-LEVEL:a	with type variable INTEGER*4
+Declared entity bar!:*DYNAMIC*	with type area with size 0
+Declared entity bar!:*STACK*	with type area with size 0
+Declared entity bar!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
+	Variable TOP-LEVEL:a	offset = 0	size = 4
+
+
+Layout for common /bar!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /bar!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /bar!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module bar!
+

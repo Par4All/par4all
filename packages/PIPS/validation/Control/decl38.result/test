@@ -1,0 +1,121 @@
+
+Parsed printed file for "decl38"
+
+void decl38(int size)
+{
+// (statement ordering unavailable)
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   float x;                                                             /*0007*/
+// (statement ordering unavailable)
+
+   for (i = 1;(i<size);i++)                                             /*0009*/
+// (statement ordering unavailable)
+      ;                                                                 /*0010*/
+// (statement ordering unavailable)
+   // BEGIN BLOCK
+// (statement ordering unavailable)
+   
+   // if the switch is removed, the loop index declarations reappears
+   ;                                                                    /*0013*/
+// (statement ordering unavailable)
+   // BEGIN BLOCK
+// (statement ordering unavailable)
+   if ((0==0))
+// (statement ordering unavailable)
+      goto switch_2_case_0;                                             /*0014*/
+   else
+// (statement ordering unavailable)
+
+// (statement ordering unavailable)
+   goto break_2;                                                        /*0017*/
+   // END BLOCK
+// (statement ordering unavailable)
+switch_2_case_0:   ;
+// (statement ordering unavailable)
+   for (j = 1;(j<size);j++)                                             /*0015*/
+// (statement ordering unavailable)
+      ;                                                                 /*0016*/
+// (statement ordering unavailable)
+break_2:   ;
+   // END BLOCK
+// (statement ordering unavailable)
+
+   for (k = 1;(k<size);k++)                                             /*0019*/
+// (statement ordering unavailable)
+      ;                                                                 /*0020*/
+// (statement ordering unavailable)
+   x = 0;                                                               /*0021*/
+   // END BLOCK
+}
+
+Printed file for "decl38"
+
+void decl38(int size)
+{
+// (0,1)
+// (1,1)
+   // BEGIN BLOCK
+// (1,2)
+// (2,1)
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   float x;                                                             /*0007*/
+// (2,6)
+
+   for(i = 1; i <= (size-1); i += 1)
+// (2,7)
+      ;                                                                 /*0010*/
+   // END BLOCK
+// (3,1)
+
+// if the switch is removed, the loop index declarations reappears
+   if ((0==0)) goto l99999;
+// (10,1)
+
+// (9,1)
+
+// (8,1)
+   // BEGIN BLOCK
+// (8,2)
+
+// (8,3)
+
+   // END BLOCK
+// (6,1)
+   // BEGIN BLOCK
+// (6,2)
+break_2:   ;
+// (6,3)
+
+   for(k = 1; k <= (size-1); k += 1)
+// (6,4)
+      ;                                                                 /*0020*/
+// (6,5)
+   x = 0;                                                               /*0021*/
+   // END BLOCK
+   goto l99998;
+l99999:   ;
+// (4,1)
+
+// (5,1)
+   // BEGIN BLOCK
+// (5,2)
+
+// (5,3)
+switch_2_case_0:   ;
+// (5,4)
+   for(j = 1; j <= (size-1); j += 1)
+// (5,5)
+      ;                                                                 /*0016*/
+   // END BLOCK
+   goto break_2;
+l99998:   ;
+// (7,1)
+
+   // END BLOCK
+}

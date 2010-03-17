@@ -1,0 +1,16 @@
+delete fprintf01
+create fprintf01 fprintf01.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed fileSymbol table for "fprintf01!"
+echo
+
+display SYMBOL_TABLE_FILE[fprintf01!]
+close
+delete fprintf01
+quit

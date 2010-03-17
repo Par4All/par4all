@@ -1,0 +1,7 @@
+#!/bin/sh
+
+tpips tpips_filter.tpips
+
+Delete tpips_filter
+
+#that is all ...

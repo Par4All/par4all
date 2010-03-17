@@ -1,0 +1,12 @@
+#! /bin/sh
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+delete final
+create final final.f
+display CALLGRAPH_FILE
+close
+delete final
+quit
+EOF

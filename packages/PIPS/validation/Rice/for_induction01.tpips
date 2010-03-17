@@ -1,0 +1,68 @@
+delete for_induction01
+
+setproprety ABORT_ON_USER_ERROR TRUE
+
+create for_induction01 for_induction01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+
+echo
+echo Initial Code
+echo
+display PRINTED_FILE[for_induction01]
+
+
+
+# Compute the intraprocedural preconditions at the same time as
+# transformers and use them to improve the accuracy of expression
+# and statement transformers:
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+#setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+# Try to restructure the code for more precision:
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+
+# Induction substitution
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+apply INDUCTION_SUBSTITUTION[for_induction01]
+
+
+echo
+echo After substitution
+echo
+display PRINTED_FILE[for_induction01]
+
+
+# Select the most precise analyses:
+activate MAY_REGIONS
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+
+# Privatize scalar variables
+apply PRIVATIZE_MODULE[for_induction01]
+
+# Ask for the parallelization of "for_induction01"
+activate RICE_ALL_DEPENDENCE
+apply COARSE_GRAIN_PARALLELIZATION[for_induction01]
+
+echo
+echo After rice_all_dependence && coarse_grain_parallelization
+echo
+display PRINTED_FILE[for_induction01]
+
+close
+quit

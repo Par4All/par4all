@@ -1,0 +1,71 @@
+!!
+!! file for simple_hydro2d.f
+!!
+      PROGRAM MAIN
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL ADVNCE
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      
+      SUBROUTINE ADVNCE
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      COMMON /VAR1/   RO (MP,NP)
+      COMMON /VAR2/   RON(MP,NP)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      ALIAS_FLAG(1) = .TRUE.
+      CALL FCT(RON, RON, RO)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE FCT ( UNEW, UTRA, UOLD )
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      DIMENSION  UNEW(MP,NP), UTRA(MP,NP), UOLD(MP,NP)
+      COMMON /ADVC/   MQ, NQ
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      DO J = 1, NQ
+C (0,3)
+         DO I = 1, MQ
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+      IF (-403+I+402*J.GE.0.AND.-64722+I+402*J.LE.0.AND.ALIAS_FLAG(1)
+     &) STOP "Alias violation in module FCT: write on UTRA, aliased with
+     & UNEW by call path (ADVNCE:(0,2)) "
+            UTRA(I,J) = UTRA(I,J)+1
+C (0,6)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+      DO J = 1, NQ
+C (0,8)
+         DO I = 1, MQ
+C (0,9)
+C           BEGIN BLOCK
+C (0,10)
+      IF (-403+I+402*J.GE.0.AND.-64722+I+402*J.LE.0.AND.ALIAS_FLAG(1)
+     &) STOP "Alias violation in module FCT: write on UNEW, aliased with
+     & UTRA by call path (ADVNCE:(0,2)) "
+            UNEW(I,J) = UTRA(I,J)-1
+C (0,11)
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,12)
+      RETURN
+C     END BLOCK
+      END

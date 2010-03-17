@@ -1,0 +1,47 @@
+* This example has array bound violations !!!
+
+      SUBROUTINE TEST(X,N)
+      INTEGER X(N)
+      IF (11+N.LE.0) STOP "Bound violation:, READING,  array TEST:X, upp
+     &er bound, 1st dimension"
+      STOP "Bound violation:, READING,  array TEST:X, lower bound, 1st d
+     &imension"
+      IF (1.LE.N) STOP "Bound violation:, WRITING,  array TEST:X, upper 
+     &bound, 1st dimension"
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+
+
+      DO 100 I = 1, N                                                   0002
+
+         X(I+1) = 0                                                     0003
+
+100      CONTINUE                                                       0004
+
+      P = X(-10)+2                                                      0005
+
+      END
+* This example has array bound violations !!!
+
+      SUBROUTINE TEST(X,N)
+      INTEGER X(N)
+      IF (11+N.LE.0) STOP "Bound violation:, READING,  array TEST:X, upp
+     &er bound, 1st dimension"
+      STOP "Bound violation:, READING,  array TEST:X, lower bound, 1st d
+     &imension"
+      IF (1.LE.N) STOP "Bound violation:, WRITING,  array TEST:X, upper 
+     &bound, 1st dimension"
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+
+
+      DO 100 I = 1, N                                                   0002
+
+         X(I+1) = 0                                                     0003
+
+100      CONTINUE                                                       0004
+
+      P = X(-10)+2                                                      0005
+
+      END
+

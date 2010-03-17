@@ -1,0 +1,81 @@
+
+Source code for all modules, including block data modules
+
+
+      BLOCK DATA BLA
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I4 /4/
+      END
+
+      INTEGER FUNCTION BOO(I)
+      INTEGER I
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I5 /5/
+      BOO = I+I5                                                        0006
+      END
+
+! next line modified by fsplit() in pips
+      BLOCK DATA DATA000
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I3 /3/
+      END
+
+      SUBROUTINE FOO
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I2 /2/
+      PRINT *, 'foo'                                                    0005
+      END
+C     Check that the initial precondition is not used when the root
+C     of the call graph is not a main program
+
+      SUBROUTINE INITIAL3
+      PRINT *, 'initial3'                                               0005
+      CALL PC                                                           0006
+      END
+
+      SUBROUTINE PC
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I1 /1/
+      PRINT *, 'pc'                                                     0005
+      PRINT *, I1, I2, I3, I4, I5                                       0006
+      END
+
+Initial preconditions for each module
+
+
+C  P() {I4==4}
+
+
+C  P() {I5==5}
+
+
+C  P() {I3==3}
+
+
+C  P() {I2==2}
+
+
+C  P() {}
+
+
+C  P() {I1==1}
+
+
+Preconditions with initial precondition for program INITIAL3
+
+
+C  P() {}
+
+C     Check that the initial precondition is not used when the root
+C     of the call graph is not a main program
+
+      SUBROUTINE INITIAL3
+
+C  P() {}
+
+      PRINT *, 'initial3'                                               0005
+
+C  P() {}
+
+      CALL PC                                                           0006
+      END

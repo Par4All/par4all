@@ -1,0 +1,85 @@
+delete decl35
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create decl35 decl35.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+echo
+echo User FILE for "decl35"
+echo
+
+shell cat decl35.database/decl35/decl35.c
+
+echo
+echo PARSED PRINTED FILE for "decl35"
+echo
+
+display PARSED_PRINTED_FILE[decl35]
+
+# quit
+
+echo
+echo PRINTED FILE for "decl35"
+echo
+
+display PRINTED_FILE[decl35]
+
+# quit
+
+echo
+echo Effects for "decl35"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[decl35]
+
+echo
+echo Effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers for "decl35"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[decl35]
+
+echo
+echo Preconditions for "decl35"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[decl35]
+
+echo
+echo PRINTED Regions for "decl35"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[decl35]
+
+close
+
+delete decl35
+
+quit
+

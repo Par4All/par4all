@@ -1,0 +1,8 @@
+      FUNCTION GINT(R)
+      IMPLICIT REAL*8(A-H,O-Z)
+C
+C     INTEGER PART OR R.
+C
+      GINT = AINT(R)
+      RETURN
+      END

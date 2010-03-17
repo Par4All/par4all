@@ -1,0 +1,28 @@
+# $Id: anr999-pips.tpips 149 2009-08-25 06:31:20Z coelho $
+#
+
+delete inlining26
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining26 inlining26.c
+ 
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+make CALLGRAPH_FILE[gradient]
+
+setproperty INLINING_CALLERS "gradient"
+apply INLINING[dilate]
+apply INLINING[erode]
+
+display PRINTED_FILE[gradient]
+close
+delete inlining26
+quit

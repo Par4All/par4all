@@ -1,0 +1,17 @@
+delete comments4
+create comments4 comments4.f
+
+echo
+echo Sequential version:
+display PRINTED_FILE 
+
+echo
+echo Parallel version:
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE 
+
+display PARALLELPRINTED_FILE
+
+close
+delete comments4
+quit

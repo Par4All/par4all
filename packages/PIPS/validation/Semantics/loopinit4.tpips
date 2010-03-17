@@ -1,0 +1,24 @@
+delete loopinit4
+create loopinit4 loopinit4.f
+
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+echo # transformers
+module LOOPINIT4
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+# quit
+
+echo # preconditions
+module LOOPINIT4
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete loopinit4
+
+

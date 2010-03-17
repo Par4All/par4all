@@ -1,0 +1,38 @@
+!
+      PROGRAM REG
+      REAL A(10)
+
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+      CALL S1(A)                                                        0004
+      END
+
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+! here, the dimension declaration
+! must not be included in the region computation...
+      SUBROUTINE S1(X)
+      REAL X(1)
+
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+      CALL S2(X)                                                        0005
+      END
+
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+!
+      SUBROUTINE S2(Y)
+      REAL Y(1)
+      INTEGER I
+
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+      DO I = 1, 10                                                      0005
+
+C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
+
+         Y(I) = 1.0                                                     0006
+      ENDDO
+      END
+

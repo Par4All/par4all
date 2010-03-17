@@ -1,0 +1,50 @@
+delete IQIT_Residual_Norm
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create IQIT_Residual_Norm IQIT_Residual_Norm.c
+
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+echo
+echo PARSED PRINTED FILES
+echo
+
+display PARSED_PRINTED_FILE[%ALLFUNC]
+
+echo
+echo PRINTED FILES
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+delete IQIT_Residual_Norm
+
+quit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

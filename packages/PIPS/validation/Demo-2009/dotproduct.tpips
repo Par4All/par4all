@@ -1,0 +1,19 @@
+delete dotproduct
+create dotproduct dotproduct.f
+
+setproperty	PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+module DOTPRODUCT
+display PRINTED_FILE
+#
+apply NEW_ATOMIZER
+display PRINTED_FILE
+
+apply UNROLL
+100
+3
+
+display PRINTED_FILE
+
+close
+quit

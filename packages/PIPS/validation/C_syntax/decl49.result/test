@@ -1,0 +1,30 @@
+
+Parsed printed file for "safe_malloc"
+
+void * safe_malloc(int n)
+{
+   long i;                                                              /*0004*/
+
+   if (!i) {                                                            /*0006*/
+      void exit(int);                                                   /*0007*/
+      exit(2);                                                          /*0008*/
+      exit(4);                                                          /*0009*/
+   }
+   else
+      return (void *) i;                                                /*0012*/
+}
+
+Printed file for "safe_malloc"
+
+void * safe_malloc(int n)
+{
+   long i;                                                              /*0004*/
+
+   if (!i) {                                                            /*0006*/
+      void exit(int);                                                   /*0007*/
+      exit(2);                                                          /*0008*/
+      exit(4);                                                          /*0009*/
+   }
+   else
+      return (void *) i;                                                /*0012*/
+}

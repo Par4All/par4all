@@ -1,0 +1,21 @@
+
+C  P() {M<=N}
+
+
+      SUBROUTINE RUN(A,N,M)
+      INTEGER A(N)
+
+C  P() {M<=N}
+
+
+      DO 10 I = 1, M                                                    0005
+
+C  P(I) {1<=I, I<=M, M<=N}
+
+         A(I) = 1.                                                      0006
+
+C  P(I) {1<=I, I<=M, M<=N}
+
+10       CONTINUE                                                       0007
+
+      END

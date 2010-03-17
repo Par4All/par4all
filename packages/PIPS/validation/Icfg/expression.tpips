@@ -1,0 +1,22 @@
+delete expression
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create expression expression.f
+
+echo
+echo Basic ICFG file
+echo
+
+display ICFG_FILE
+
+echo
+echo ICFG file with loops
+echo
+
+activate PRINT_ICFG_WITH_CONTROL
+display ICFG_FILE
+
+close
+delete expression
+quit

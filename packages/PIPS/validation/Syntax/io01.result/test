@@ -1,0 +1,9 @@
+      PROGRAM IO01
+
+C     Check that bug discovered at EDF has been fixed
+
+      L = 3                                                             0005
+      WRITE (3+I, 1000) K                                               0006
+1000  FORMAT(I10)                                                       0007
+      WRITE (3+I, *) K                                                  0008
+      END

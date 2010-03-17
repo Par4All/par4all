@@ -1,0 +1,128 @@
+
+! initial function
+
+freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_subsat_const(o, i0, p0);                           /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_subsat_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 -s." [shape=trapezium,orientation=270];
+  "5 -s." -> "o";
+  "i0" -> "5 -s.";
+}
+// graph for dag "dag_cleaned_0" of module "my_subsat_const" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 -s." [shape=trapezium,orientation=270];
+  "5 -s." -> "o";
+  "i0" -> "5 -s.";
+}
+// graph for dag "my_subsat_const_helper_0_0" of module "my_subsat_const" in dot format
+digraph "my_subsat_const_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 -s." [shape=trapezium,orientation=270];
+  "5 -s." -> "o";
+  "i0" -> "5 -s.";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module my_subsat_const
+freia_status my_subsat_const_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i0 [0 input 0] -> [0 alu] 5 subsat_const
+  // nope
+  // alu 5 subsat_const stage 0
+  si.alu[0][0].op = SPOC_ALU_SUBSAT_IN0_CONST;
+  sp.alu[0][0].constant = cst0;
+
+
+  // output image o on 0
+  // o [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // o [0 output 0] -> [7 output 0] 0 null
+  // o [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // o [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // o [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // o [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // o [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // o [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // o [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
+! updated function
+
+freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_subsat_const_helper_0_0_0(o, i0, p0);                      /*0005*/
+}

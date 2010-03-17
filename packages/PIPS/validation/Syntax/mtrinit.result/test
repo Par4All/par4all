@@ -1,0 +1,56 @@
+
+EXTERNAL declaration parsed first
+
+      PROGRAM MTRINIT
+      EXTERNAL TRINIT
+      COMMON /CTRINIT/ I
+
+      PRINT *, I                                                        0005
+
+      END
+
+      BLOCKDATA TRINIT
+      COMMON /CTRINIT/ I
+      DATA I /3/
+      END
+
+C  P() {I==3}
+
+      PROGRAM MTRINIT
+      EXTERNAL TRINIT
+      COMMON /CTRINIT/ I
+
+C  P() {I==3}
+
+
+      PRINT *, I                                                        0005
+
+      END
+
+EXTERNAL declaration parsed second
+
+
+      BLOCKDATA TRINIT
+      COMMON /CTRINIT/ I
+      DATA I /3/
+      END
+      PROGRAM MTRINIT
+      EXTERNAL TRINIT
+      COMMON /CTRINIT/ I
+
+      PRINT *, I                                                        0005
+
+      END
+
+C  P() {I==3}
+
+      PROGRAM MTRINIT
+      EXTERNAL TRINIT
+      COMMON /CTRINIT/ I
+
+C  P() {I==3}
+
+
+      PRINT *, I                                                        0005
+
+      END

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Please, only detect common instances with really different sizes
+
+tpips=${tpips_version:-tpips}
+
+#
+# Conflict between declarations
+#
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+delete common_size01
+create common_size01 common_size01.f
+display PRINTED_FILE[REORDER]
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+display PRINTED_FILE[COMMON_SIZE01]
+close
+delete common_size01
+quit
+
+EOF
+

@@ -1,0 +1,108 @@
+
+Preconditions
+
+
+C  P() {}
+
+      PROGRAM CA
+      PARAMETER (MN=10)
+      DIMENSION A(MN)
+
+C  P() {}
+
+      IM = MN                                                           0004
+
+C  P(IM) {IM==10}
+
+      NMAX = 6                                                          0005
+
+C  P(IM,NMAX) {IM==10, NMAX==6}
+
+      DO 100 I = 1, NMAX                                                0006
+
+C  P(I,IM,NMAX) {IM==10, NMAX==6, 1<=I, I<=6}
+
+         CALL SUB(IM, A)                                                0007
+
+C  P(I,IM,NMAX) {IM==10, NMAX==6, 1<=I, I<=6}
+
+100      CONTINUE                                                       0008
+
+C  P(I,IM,NMAX) {I==7, IM==10, NMAX==6}
+
+      DO 101 I = 1, IM                                                  0009
+
+C  P(I,IM,NMAX) {IM==10, NMAX==6, 1<=I, I<=10}
+
+         PRINT *, A(I)                                                  0010
+
+C  P(I,IM,NMAX) {IM==10, NMAX==6, 1<=I, I<=10}
+
+101      CONTINUE                                                       0011
+      END
+
+C  P() {IMM==10}
+
+c
+      SUBROUTINE SUB(IMM,B)
+      DIMENSION B(IMM)
+
+C  P() {IMM==10}
+
+      MK = IMM-1                                                        0004
+
+C  P(MK) {IMM==10, MK==9}
+
+      MM = 2*MK                                                         0005
+
+C  P(MK,MM) {IMM==10, MK==9, MM==18}
+
+      DO 200 I = 1, MM                                                  0006
+
+C  P(I,MK,MM) {IMM==10, MK==9, MM==18, 1<=I, I<=18}
+
+         B(I) = B(I)+2.                                                 0007
+
+C  P(I,MK,MM) {IMM==10, MK==9, MM==18, 1<=I, I<=18}
+
+200      CONTINUE                                                       0008
+      END
+
+Complexities
+
+C                                                                  738 (SUMMARY)
+      PROGRAM CA
+      PARAMETER (MN=10)
+      DIMENSION A(MN)
+C                                                                    1 (STMT)
+      IM = MN                                                           0004
+C                                                                    1 (STMT)
+      NMAX = 6                                                          0005
+C                                                         117*NMAX + 2 (DO)
+      DO 100 I = 1, NMAX                                                0006
+C                                                                  116 (STMT)
+         CALL SUB(IM, A)                                                0007
+C                                                                    0 (STMT)
+100      CONTINUE                                                       0008
+C                                                             3*IM + 2 (DO)
+      DO 101 I = 1, IM                                                  0009
+C                                                                    2 (STMT)
+         PRINT *, A(I)                                                  0010
+C                                                                    0 (STMT)
+101      CONTINUE                                                       0011
+      END
+C                                                                  116 (SUMMARY)
+c
+      SUBROUTINE SUB(IMM,B)
+      DIMENSION B(IMM)
+C                                                                    3 (STMT)
+      MK = IMM-1                                                        0004
+C                                                                    3 (STMT)
+      MM = 2*MK                                                         0005
+C                                                             6*MM + 2 (DO)
+      DO 200 I = 1, MM                                                  0006
+C                                                                    5 (STMT)
+         B(I) = B(I)+2.                                                 0007
+C                                                                    0 (STMT)
+200      CONTINUE                                                       0008
+      END

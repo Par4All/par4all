@@ -1,0 +1,113 @@
+int main(void)
+{
+   int i;
+   unsigned int ui;
+
+   i = -1;
+   ui = i;
+
+   fprintf(stderr, "ui = %u\n", ui);
+}
+
+Transformers for "main"
+
+
+//  T() {}
+
+int main(void)
+{
+   int i;
+   unsigned int ui;
+
+//  T(i) {i==-1}
+
+
+   i = -1;
+
+//  T(ui) {i==ui}
+
+   ui = i;
+
+//  T() {}
+
+
+   fprintf(stderr, "ui = %u\n", ui);
+}
+
+Transformers for "foo"
+
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+   int i;
+   unsigned int ui;
+
+//  P() {}
+
+
+   i = -1;
+
+//  P(i) {i==-1}
+
+   ui = i;
+
+//  P(i,ui) {i==-1, ui==4294967295}
+
+
+   fprintf(stderr, "ui = %u\n", ui);
+}
+
+Transformers for "main" after transformer refining
+
+
+//  T() {}
+
+int main(void)
+{
+   int i;
+   unsigned int ui;
+
+//  T(i) {i==-1}
+
+
+   i = -1;
+
+//  T(ui) {i==-1, ui==-1}
+
+   ui = i;
+
+//  T() {i==-1, ui==-1}
+
+
+   fprintf(stderr, "ui = %u\n", ui);
+}
+
+Preconditions for "main" after transformer refining
+
+
+//  P() {}
+
+int main(void)
+{
+   int i;
+   unsigned int ui;
+
+//  P() {}
+
+
+   i = -1;
+
+//  P(i) {i==-1}
+
+   ui = i;
+
+//  P(i,ui) {i==-1, ui==-1}
+
+
+   fprintf(stderr, "ui = %u\n", ui);
+}

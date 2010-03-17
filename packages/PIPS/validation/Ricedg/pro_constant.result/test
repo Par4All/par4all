@@ -1,0 +1,15 @@
+      PROGRAM SUPFLOW
+      INTEGER A, C, D
+      READ *, A                                                         0003
+      CALL SUPFLOWFOO(A, A, C, D)                                       0004
+      PRINT *, A, C, D                                                  0005
+      END
+      SUBROUTINE SUPFLOWFOO(A, B, C, D)
+      INTEGER A, B, C, D
+      A = 2                                                             0003
+C	Attention: impact alias MUST at (SUPFLOW:(0,3))  between B and A
+C	New flow-dependence with statement
+C	A = 2
+      C = B*A                                                           0004
+      D = A+C                                                           0005
+      END

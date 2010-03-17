@@ -1,0 +1,4 @@
+      PROGRAM QUOTE
+      CHARACTER*10 A
+      A = '"'                                                           0003
+      END

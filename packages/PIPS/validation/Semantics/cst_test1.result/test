@@ -1,0 +1,64 @@
+
+Transformers
+
+
+C  T() {}
+
+      SUBROUTINE CST_TEST1
+
+C  T(LEIG) {LEIG==132097}
+
+
+      LEIG = 132097                                                     0003
+
+C  T() {}
+
+      IF (1.GT.1.AND.1.NE.1) THEN                                       0004
+
+C  T(LEIG) {LEIG+NWEIG==LPRESS}
+
+         LEIG = LPRESS-NWEIG                                            0005
+      ENDIF
+
+C  T(LE) {LE==1}
+
+      LE = 1                                                            0007
+
+C  T() {}
+
+
+      PRINT *, LEIG                                                     0009
+
+      END
+
+Preconditions
+
+
+C  P() {}
+
+      SUBROUTINE CST_TEST1
+
+C  P() {}
+
+
+      LEIG = 132097                                                     0003
+
+C  P(LEIG) {LEIG==132097}
+
+      IF (1.GT.1.AND.1.NE.1) THEN                                       0004
+
+C  P() {0==-1}
+
+         LEIG = LPRESS-NWEIG                                            0005
+      ENDIF
+
+C  P(LEIG) {LEIG==132097}
+
+      LE = 1                                                            0007
+
+C  P(LE,LEIG) {LE==1, LEIG==132097}
+
+
+      PRINT *, LEIG                                                     0009
+
+      END

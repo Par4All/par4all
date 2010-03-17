@@ -1,0 +1,166 @@
+user warning in tp_parse: equiv08: No such workspace
+Registering file equiv08.f
+Splitting file    ./equiv08.f
+  Module         SUBEQUIV08
+  Module         EQUIV08
+Workspace equiv08 created and opened.
+Main module PROGRAM "EQUIV08" selected.
+Module EQUIV08 selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV08 already active.
+Request: build resource PRINTED_FILE for module EQUIV08.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV08)
+  PARSER                         building   PARSED_CODE(EQUIV08)
+                                 building   CALLEES(EQUIV08)
+
+Declarations for module EQUIV08 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV08:*DYNAMIC*	with type area with size 4
+Declared entity EQUIV08:*HEAP*	with type area with size 0
+Declared entity EQUIV08:*STACK*	with type area with size 0
+Declared entity EQUIV08:*STATIC*	with type area with size 0
+Declared entity EQUIV08:A	with type variable REAL*8
+Declared entity EQUIV08:B	with type variable REAL*8
+Declared entity EQUIV08:I	with type variable INTEGER*4
+Declared entity EQUIV08:X	with type variable REAL*4
+Declared entity EQUIV08:Y	with type variable REAL*4
+Declared entity TOP-LEVEL:SUBEQUIV08	with type functional  () ->  void
+Declared entity TOP-LEVEL:~BAR	with type area with size 16
+Declared entity TOP-LEVEL:~FOO	with type area with size 400
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable EQUIV08:I,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /BAR/ of size 16:
+	Variable EQUIV08:A,	offset = 0,	size = 8
+	Variable EQUIV08:B,	offset = 8,	size = 8
+
+
+Layout for common /FOO/ of size 400:
+	Variable EQUIV08:X,	offset = 0,	size = 4
+	Variable EQUIV08:Y,	offset = 0,	size = 400
+
+End of declarations for module EQUIV08
+
+  CONTROLIZER                    building   CODE(EQUIV08)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV08)
+PRINTED_FILE made for EQUIV08.
+      PROGRAM EQUIV08
+
+C     Check that commons have right sizes
+
+      COMMON /FOO/X
+      REAL Y(100)
+      EQUIVALENCE (X, Y)
+
+      COMMON /BAR/A, B
+      DOUBLE PRECISION A, B
+
+      DO I = 2, 10                                                      0012
+         Y(I) = 0.                                                      0013
+      ENDDO
+
+      CALL SUBEQUIV08                                                   0016
+
+      END
+user warning in open_module: Module "SUBEQUIV08" selected instead of "subequiv08" which was not found
+Module SUBEQUIV08 selected
+Module SUBEQUIV08 already active.
+Request: build resource PRINTED_FILE for module SUBEQUIV08.
+  FILTER_FILE                    building   SOURCE_FILE(SUBEQUIV08)
+  PARSER                         building   PARSED_CODE(SUBEQUIV08)
+                                 building   CALLEES(SUBEQUIV08)
+
+Declarations for module SUBEQUIV08 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity SUBEQUIV08:*DYNAMIC*	with type area with size 0
+Declared entity SUBEQUIV08:*HEAP*	with type area with size 0
+Declared entity SUBEQUIV08:*STACK*	with type area with size 0
+Declared entity SUBEQUIV08:*STATIC*	with type area with size 0
+Declared entity SUBEQUIV08:A	with type variable REAL*8
+Declared entity SUBEQUIV08:B	with type variable REAL*8
+Declared entity SUBEQUIV08:X	with type variable REAL*4
+Declared entity SUBEQUIV08:Y	with type variable REAL*4
+Declared entity TOP-LEVEL:~BAR	with type area with size 16
+Declared entity TOP-LEVEL:~FOO	with type area with size 400
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /BAR/ of size 16:
+	Variable SUBEQUIV08:A,	offset = 0,	size = 8
+	Variable SUBEQUIV08:B,	offset = 8,	size = 8
+
+
+Layout for common /FOO/ of size 400:
+	Variable SUBEQUIV08:X,	offset = 0,	size = 4
+	Variable SUBEQUIV08:Y,	offset = 0,	size = 400
+
+End of declarations for module SUBEQUIV08
+
+  CONTROLIZER                    building   CODE(SUBEQUIV08)
+  PRINT_CODE                     building   PRINTED_FILE(SUBEQUIV08)
+PRINTED_FILE made for SUBEQUIV08.
+
+      SUBROUTINE SUBEQUIV08
+
+      REAL Y(100)
+      EQUIVALENCE (X, Y)
+      COMMON /FOO/X
+
+      DOUBLE PRECISION A, B
+      COMMON /BAR/A, B
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV08.
+  Closing module SUBEQUIV08.
+Closing program.
+Closing workspace.
+Workspace equiv08 closed.
+
+Workspace equiv08 deleted.

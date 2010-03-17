@@ -1,0 +1,40 @@
+      SUBROUTINE PRIV1(V, W, N)
+      INTEGER W, N, I
+      INTEGER WORK_P(1:100), V(1:N), WORK(1:100)
+      SAVE WORK
+
+      DO I = 1, N                                                       0007
+         WORK_P(I) = V(I)                                               0008
+      ENDDO
+      W = 0                                                             0010
+      DO I = 1, N                                                       0011
+         W = W+WORK_P(N-I+1)                                            0012
+      ENDDO
+      END
+      SUBROUTINE PRIV2(V, W, N)
+      INTEGER J_P, W, N, I, J
+      INTEGER WORK_P(1:100), V(1:N), WORK(1:100)
+      COMMON /TOTO/ WORK, J
+
+      DO I = 1, N                                                       0007
+         WORK_P(I) = V(I)                                               0008
+      ENDDO
+      W = 0                                                             0010
+      DO I = 1, N                                                       0011
+         J_P = N-I+1                                                    0012
+         W = W+WORK_P(J_P)                                              0013
+      ENDDO
+      END
+      PROGRAM LOOP
+      INTEGER I, N
+      INTEGER A(1:100), B(1:100)
+
+      DOALL I = 1, 100                                                  0004
+         A(I) = 0.0                                                     0005
+      ENDDO
+      DOALL I = 1, 100                                                  0007
+         PRIVATE B(1:100)
+         CALL PRIV1(A, B, I)                                            0008
+         CALL PRIV2(A, B, I)                                            0009
+      ENDDO
+      END

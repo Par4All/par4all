@@ -1,0 +1,214 @@
+
+Initial code
+
+void threshold(int data[128], int val)
+{
+   int i;
+   for(i = 0; i <= 127; i += 1)
+      if (data[i]>val)
+         data[i] = val;
+      else
+         data[i] = data[i];
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0;
+   for(i = 0; i <= 127; i += 1) {
+      I_0 = data[i]>val;
+#pragma PIPS IF_TO_CONVERT
+      if (I_0) 
+         data[i] = val;
+#pragma PIPS IF_TO_CONVERT
+      if (!I_0) 
+         data[i] = data[i];
+   }
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0;
+   for(i = 0; i <= 127; i += 1) {
+      I_0 = data[i]>val;
+      data[i] = I_0?val:data[i];
+      data[i] = !I_0?data[i]:data[i];
+   }
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0;
+   for(i = 0; i <= 127; i += 1) {
+      I_0 = data[i]>val;
+      data[i] = I_0?val:data[i];
+
+   }
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0;
+   for(i = 0; i <= 127; i += 1) {
+      I_0 = data[i]>10;
+      data[i] = I_0?10:data[i];
+
+   }
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = 128;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
+      //c SIMD_COMMENT_0
+      I_0 = data[LU_IND0]>10;
+      //c SIMD_COMMENT_1
+      data[LU_IND0] = I_0?10:data[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_0 = data[LU_IND0+1]>10;
+      //c SIMD_COMMENT_1
+      data[LU_IND0+1] = I_0?10:data[LU_IND0+1];
+   }
+   i = 128;
+   ;
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = 128;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
+      //c SIMD_COMMENT_0
+      I_0 = data[LU_IND0]>10;
+      //c SIMD_COMMENT_1
+      data[LU_IND0] = I_0?10:data[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_0 = data[LU_IND0+1]>10;
+      //c SIMD_COMMENT_1
+      data[LU_IND0+1] = I_0?10:data[LU_IND0+1];
+   }
+   i = 128;
+   ;
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0, I_00, I_01;
+   LU_NUB0 = 128;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
+      //c SIMD_COMMENT_0
+      I_0 = data[LU_IND0]>10;
+      //c SIMD_COMMENT_1
+      data[LU_IND0] = I_01?10:data[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_0 = data[LU_IND0+1]>10;
+      //c SIMD_COMMENT_1
+      data[LU_IND0+1] = I_00?10:data[LU_IND0+1];
+   }
+   i = 128;
+   ;
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0, I_00, I_01;
+   //PIPS:SAC generated int vector(s)
+   int v2si_vec0[1+1], v2si_vec1[1+1], v2si_vec2[1+1], v2si_vec3[1+1], v2si_vec4[1+1], v2si_vec5[1+1], v2si_vec6[1+1], v2si_vec7[1+1], v2si_vec8[1+1], v2si_vec9[1+1], v2si_vec10[1+1], v2si_vec11[1+1];
+   LU_NUB0 = 128;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
+      SIMD_LOAD_CONSTANT_V2SI(v2si_vec2, 10, 10);
+      SIMD_LOAD_V2SI(v2si_vec1, &data[LU_IND0]);
+      SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
+      SIMD_SAVE_GENERIC_V2SI(v2si_vec0, &I_0, &I_0);
+      SIMD_LOAD_GENERIC_V2SI(v2si_vec4, I_01, I_00);
+      SIMD_PHID(v2si_vec3, v2si_vec4, v2si_vec2, v2si_vec1);
+      SIMD_SAVE_V2SI(v2si_vec3, &data[LU_IND0]);
+   }
+   i = 128;
+   ;
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0, I_00, I_01;
+   //PIPS:SAC generated int vector(s)
+   int v2si_vec0[1+1], v2si_vec1[1+1], v2si_vec2[1+1], v2si_vec3[1+1], v2si_vec4[1+1], v2si_vec5[1+1], v2si_vec6[1+1], v2si_vec7[1+1], v2si_vec8[1+1], v2si_vec9[1+1], v2si_vec10[1+1], v2si_vec11[1+1];
+   LU_NUB0 = 128;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   SIMD_LOAD_CONSTANT_V2SI(v2si_vec2, 10, 10);
+   SIMD_LOAD_GENERIC_V2SI(v2si_vec4, I_01, I_00);
+   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
+      SIMD_LOAD_V2SI(v2si_vec1, &data[LU_IND0]);
+      SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
+      SIMD_PHID(v2si_vec3, v2si_vec4, v2si_vec2, v2si_vec1);
+      SIMD_SAVE_V2SI(v2si_vec3, &data[LU_IND0]);
+   }
+   SIMD_SAVE_GENERIC_V2SI(v2si_vec0, &I_0, &I_0);
+   i = 128;
+   ;
+}
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0, I_00, I_01;
+   //PIPS:SAC generated int vector(s)
+   int v2si_vec0[1+1], v2si_vec1[1+1], v2si_vec2[1+1], v2si_vec3[1+1], v2si_vec4[1+1];
+   LU_NUB0 = 128;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   SIMD_LOAD_CONSTANT_V2SI(v2si_vec2, 10, 10);
+   SIMD_LOAD_GENERIC_V2SI(v2si_vec4, I_01, I_00);
+   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
+      SIMD_LOAD_V2SI(v2si_vec1, &data[LU_IND0]);
+      SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
+      SIMD_PHID(v2si_vec3, v2si_vec4, v2si_vec2, v2si_vec1);
+      SIMD_SAVE_V2SI(v2si_vec3, &data[LU_IND0]);
+   }
+   SIMD_SAVE_GENERIC_V2SI(v2si_vec0, &I_0, &I_0);
+   i = 128;
+   ;
+}
+
+simdized code
+
+void threshold(int data[128], int val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0, I_00, I_01;
+   //PIPS:SAC generated int vector(s)
+   int v2si_vec0[1+1], v2si_vec1[1+1], v2si_vec2[1+1], v2si_vec3[1+1], v2si_vec4[1+1];
+   LU_NUB0 = 128;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   SIMD_LOAD_CONSTANT_V2SI(v2si_vec2, 10, 10);
+   SIMD_LOAD_GENERIC_V2SI(v2si_vec4, I_01, I_00);
+   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
+      SIMD_LOAD_V2SI(v2si_vec1, &data[LU_IND0]);
+      SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
+      SIMD_PHID(v2si_vec3, v2si_vec4, v2si_vec2, v2si_vec1);
+      SIMD_SAVE_V2SI(v2si_vec3, &data[LU_IND0]);
+   }
+   SIMD_SAVE_GENERIC_V2SI(v2si_vec0, &I_0, &I_0);
+   i = 128;
+   ;
+}

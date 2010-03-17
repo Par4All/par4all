@@ -1,0 +1,8 @@
+	INTEGER FUNCTION MINIMU(I,J)
+
+      IF (I.GT.J) THEN                                                  0003
+         MINIMU = J                                                     0004
+      ELSE
+         MINIMU = I                                                     0005
+      ENDIF
+      END

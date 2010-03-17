@@ -1,0 +1,20 @@
+#! /bin/sh
+
+# NOT PORTABLE AT ALL, DEPENDS ON THE FORTRAN COMPILER
+
+{
+echo "-- test with the property"
+${pips_version:-pips} \
+	-1 CHECK_FORTRAN_SYNTAX_BEFORE_PIPS \
+	-f syntax_errors.f \
+ 	syntax_error 
+
+echo "-- test from the environment"
+PIPS_CHECK_FORTRAN=yes
+export PIPS_CHECK_FORTRAN
+${pips_version:-pips} \
+	-f syntax_errors.f \
+ 	syntax_error 
+} 2>&1
+
+Delete syntax_error

@@ -1,0 +1,20 @@
+delete parentheses
+
+echo
+echo Minimize parentheses (default option)
+echo
+
+create parentheses parentheses.f
+display PRINTED_FILE
+close
+delete parentheses
+
+echo
+echo Keep parentheses (property PRETTYPRINT_ALL_PARENTHESES)
+echo
+
+create parentheses parentheses.f
+setproperty PRETTYPRINT_ALL_PARENTHESES TRUE
+display PRINTED_FILE
+close
+delete parentheses

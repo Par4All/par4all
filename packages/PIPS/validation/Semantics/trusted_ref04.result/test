@@ -1,0 +1,55 @@
+
+C  T() {1<=N}
+
+      SUBROUTINE TRUSTED_REF04(A, N, M)
+
+C     Check that initial condition are propagated upwards at tests
+
+      REAL A(N)
+
+C  T(I) {1<=N}
+
+C     BEGIN BLOCK
+
+C  T(I) {1<=N}
+
+
+      IF (X.GT.0) THEN                                                  0007
+
+C  T(I) {2<=I, M+1<=I, I<=N+2, 1<=N}
+
+C        BEGIN BLOCK
+
+C  T(I) {2<=I, 1<=N}
+
+         DO I = 2, M                                                    0008
+
+C  T() {2<=I, I<=M, I<=N+1}
+
+            IF (X.GT.EPS) THEN                                          0009
+
+C  T() {2<=I, I<=M, I<=N, 1<=N}
+
+               A(I) = 0.                                                0010
+            ELSE
+
+C  T() {2<=I, I<=M, I<=N+1, 1<=N}
+
+               A(I-1) = 1.                                              0012
+            ENDIF
+         ENDDO
+
+C  T() {2<=I, M+1<=I, I<=N+2, 1<=N}
+
+         PRINT *, I                                                     0015
+C        END BLOCK
+      ENDIF
+
+C  T() {1<=N}
+
+
+      PRINT *, M                                                        0018
+
+C     END BLOCK
+      END
+

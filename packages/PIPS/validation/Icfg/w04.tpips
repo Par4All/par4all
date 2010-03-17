@@ -1,0 +1,7 @@
+delete w
+create w w04.f
+# display PRINTED_FILE[%ALL]
+activate PRINT_ICFG_WITH_LOOPS
+display ICFG_FILE[W03]
+close
+delete w

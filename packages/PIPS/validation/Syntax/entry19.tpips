@@ -1,0 +1,17 @@
+delete entry19
+create entry19 entry19.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY19
+echo
+
+# display PARSED_PRINTED_FILE[ENTRY19]
+display PRINTED_FILE[ENTRY19]
+
+# The symbol table shows the bug: no need to go any further!
+
+close
+delete entry19
+quit

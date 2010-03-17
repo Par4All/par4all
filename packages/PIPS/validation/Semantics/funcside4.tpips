@@ -1,0 +1,12 @@
+# Check that preconditions are properly computed with user function calls
+# when the transformer is based on an interval.
+delete funcside4
+create funcside4 funcside4.f
+module funcside4
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete funcside4
+quit

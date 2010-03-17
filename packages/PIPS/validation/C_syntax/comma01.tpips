@@ -1,0 +1,19 @@
+delete comma01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create comma01 comma01.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PARSED_PRINTED_FILE[main]
+
+close
+
+delete comma01
+
+quit
+

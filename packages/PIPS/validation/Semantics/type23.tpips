@@ -1,0 +1,12 @@
+delete type23
+create type23 type23.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+close
+# delete type23
+delete type23

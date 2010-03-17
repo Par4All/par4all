@@ -1,0 +1,31 @@
+user warning in tp_parse: param05: No such workspace
+Registering file param05.f
+Splitting file    ./param05.f
+  Module         PARAM05
+Workspace param05 created and opened.
+Module PARAM05 selected
+Main module PROGRAM "PARAM05" selected.
+Module PARAM05 already active.
+Module PARAM05 already active.
+Module PARAM05 already active.
+Request: build resource PRINTED_FILE for module PARAM05.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(PARAM05)
+  PARSER                         building   PARSED_CODE(PARAM05)
+                                 building   CALLEES(PARAM05)
+user warning in MakeAssignInst: PARAMETER IFOO appears as lhs
+user error in MakeAssignInst: Parser error between lines 5 and 5
+Illegal lhs
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module PARAM05.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module PARAM05.
+Closing program.
+Closing workspace.
+Workspace param05 closed.
+
+Workspace param05 deleted.

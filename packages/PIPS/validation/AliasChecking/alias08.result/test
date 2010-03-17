@@ -1,0 +1,57 @@
+!!
+!! file for alias08.f
+!!
+C     The two array are overlapped ?
+
+      PROGRAM ALIAS
+      REAL A(10000)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      M = 50
+C (0,3)
+      CALL FOO(A, M)
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE FOO(X,N)
+      REAL X(N,N)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      L = 20
+C (0,3)
+      DO I = 1, L
+C (0,4)
+         DO J = 1, L
+C (0,5)
+            CALL TOTO(X(I,J), X(2*I,2*J), L)
+         ENDDO
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      
+      SUBROUTINE TOTO(V1,V2,L)
+      REAL V1(L,L),V2(L,L)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      DO I = 1, L
+C (0,3)
+         DO J = 1, L
+C (0,4)
+      CALL DYNAMIC_ALIAS_CHECK(
+     &"Alias violation in module TOTO: write on V1, aliased with V2"
+     &, V1, (2*I-J-1+(J+I-1)*L)*4, V2, (L*L-1)*4)
+            V1(2*I-J,J+I) = I+J
+         ENDDO
+      ENDDO
+C (0,5)
+      RETURN
+C     END BLOCK
+      END

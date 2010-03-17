@@ -1,0 +1,6 @@
+delete hollerith2
+create hollerith2 hollerith2.f
+display PRINTED_FILE(TEST2)
+close
+delete hollerith2
+quit

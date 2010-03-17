@@ -1,0 +1,6 @@
+# 1
+main()
+{
+  restrict int i;
+}
+extern main();

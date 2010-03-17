@@ -1,0 +1,17 @@
+
+C  T() {}
+
+      PROGRAM TYPE18
+
+C  T(KK) {ICAR==KK}
+
+
+      KK = ICAR                                                         0003
+
+C  T(ICAR) {ICAR==KK}
+
+
+      ICAR = KK                                                         0005
+
+      END
+

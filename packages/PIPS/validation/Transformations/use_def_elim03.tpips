@@ -1,0 +1,35 @@
+delete use_def_elim03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create use_def_elim03 use_def_elim03.f
+
+#activate C_PARSER
+#setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Code for "USE_DEF_ELIM03"
+echo
+
+display PRINTED_FILE[USE_DEF_ELIM03]
+
+echo
+echo Code with cumulated effects for "use_def_elim03"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[USE_DEF_ELIM03]
+
+echo
+echo Code for "use_def_elim03" after use-def elimination
+echo
+
+apply USE_DEF_ELIMINATION[USE_DEF_ELIM03]
+
+activate PRINT_CODE
+display PRINTED_FILE[USE_DEF_ELIM03]
+
+close
+delete use_def_elim03
+quit

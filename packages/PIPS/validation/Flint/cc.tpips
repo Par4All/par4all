@@ -1,0 +1,24 @@
+delete cc
+create cc cc.f
+echo ### initial file
+display PRINTED_FILE[%ALL]
+setproperty TYPE_CHECKER_ADD_SUMMARY TRUE
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION TRUE
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
+apply TYPE_CHECKER[%ALL]
+echo ### typed checked 1
+display PRINTED_FILE[%ALL]
+close
+
+delete cc
+create cc cc.f
+setproperty TYPE_CHECKER_ADD_SUMMARY TRUE
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION TRUE
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS TRUE
+apply TYPE_CHECKER[%ALL]
+echo ### typed checked 2
+display PRINTED_FILE[%ALL]
+close
+
+delete cc
+quit

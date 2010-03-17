@@ -1,0 +1,1605 @@
+
+C  T() {}
+
+      SUBROUTINE OAVITEL(IFM,JFM)
+C
+      PARAMETER(NFAC=49)
+      COMMON/OO/O(NFAC),VS(NFAC),PS(NFAC)
+      COMMON/PCP/XO(NFAC),YO(NFAC),ZO(NFAC)
+      COMMON/GRA/GRD(NFAC,3)
+      COMMON/CFN/FNX(NFAC),FNY(NFAC),FNZ(NFAC),AIRE(NFAC)
+
+C  T(IMFM1) {IFM==IMFM1+1}
+
+C
+C
+      IMFM1 = IFM-1                                                     0010
+
+C  T(JMFM1) {JFM==JMFM1+1}
+
+      JMFM1 = JFM-1                                                     0011
+
+C  T(JM1O2) {JMFM1<=2JM1O2+1, 2JM1O2<=JMFM1}
+
+      JM1O2 = JMFM1/2                                                   0012
+
+C  T(JM1O2M1) {JM1O2==JM1O2M1+1}
+
+      JM1O2M1 = JM1O2-1                                                 0013
+
+C  T(JM1O2P3) {JM1O2==JM1O2P3-3}
+
+      JM1O2P3 = JM1O2+3                                                 0014
+
+C  T(IFAC) {IFAC==1}
+
+C
+      IFAC = 1                                                          0016
+
+C  T() {}
+
+      R1 = 4.*XO(IFAC+JFM)-XO(IFAC+2*JFM)-3.*XO(IFAC)                   0017
+
+C  T() {}
+
+      R2 = XO(IFAC+1)-XO(IFAC)                                          0018
+
+C  T() {}
+
+      R4 = 4.*YO(IFAC+JFM)-YO(IFAC+2*JFM)-3.*YO(IFAC)                   0019
+
+C  T() {}
+
+      R5 = YO(IFAC+1)+YO(IFAC)                                          0020
+
+C  T() {}
+
+      R7 = 4.*ZO(IFAC+JFM)-ZO(IFAC+2*JFM)-3.*ZO(IFAC)                   0021
+
+C  T() {}
+
+      R8 = ZO(IFAC+1)-ZO(IFAC)                                          0022
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0024
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0024
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0026
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0027
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0028
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0029
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0030
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0031
+
+C  T() {}
+
+C
+      DM1 = 4.*O(IFAC+JFM)-O(IFAC+2*JFM)-3.*O(IFAC)                     0033
+
+C  T() {}
+
+      DM2 = O(IFAC+1)-O(IFAC)                                           0034
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0036
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0037
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0038
+
+C  T(IFAC,J) {IFAC#init+J==IFAC+2}
+
+C
+      DO 19 J = 2, JM1O2M1                                              0040
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+         IFAC = IFAC+1                                                  0041
+
+C  T() {}
+
+C
+         R1 = 4.*XO(IFAC+JFM)-XO(IFAC+2*JFM)-3.*XO(IFAC)                0043
+
+C  T() {}
+
+         R2 = XO(IFAC+1)-XO(IFAC-1)                                     0044
+
+C  T() {}
+
+         R4 = 4.*YO(IFAC+JFM)-YO(IFAC+2*JFM)-3.*YO(IFAC)                0045
+
+C  T() {}
+
+         R5 = YO(IFAC+1)-YO(IFAC-1)                                     0046
+
+C  T() {}
+
+         R7 = 4.*ZO(IFAC+JFM)-ZO(IFAC+2*JFM)-3.*ZO(IFAC)                0047
+
+C  T() {}
+
+         R8 = ZO(IFAC+1)-ZO(IFAC-1)                                     0048
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0050
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0050
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0052
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0053
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0054
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0055
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0056
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0057
+
+C  T() {}
+
+C
+         DM1 = 4.*O(IFAC+JFM)-O(IFAC+2*JFM)-3.*O(IFAC)                  0059
+
+C  T() {}
+
+         DM2 = O(IFAC+1)-O(IFAC-1)                                      0060
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0062
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0063
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0064
+
+C  T() {}
+
+19       CONTINUE                                                       0065
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0067
+
+C  T() {}
+
+      R1 = 4.*XO(IFAC+JFM)-XO(IFAC+2*JFM)-3.*XO(IFAC)                   0068
+
+C  T() {}
+
+      R2 = -4.*XO(IFAC-1)+XO(IFAC-2)+3.*XO(IFAC)                        0069
+
+C  T() {}
+
+      R4 = 4.*YO(IFAC+JFM)-YO(IFAC+2*JFM)-3.*YO(IFAC)                   0070
+
+C  T() {}
+
+      R5 = -4.*YO(IFAC-1)+YO(IFAC-2)+3.*YO(IFAC)                        0071
+
+C  T() {}
+
+      R7 = 4.*ZO(IFAC+JFM)-ZO(IFAC+2*JFM)-3.*ZO(IFAC)                   0072
+
+C  T() {}
+
+      R8 = -4.*ZO(IFAC-1)+ZO(IFAC-2)+3.*ZO(IFAC)                        0073
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0075
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0075
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0077
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0078
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0079
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0080
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0081
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0082
+
+C  T() {}
+
+C
+      DM1 = 4.*O(IFAC+JFM)-O(IFAC+2*JFM)-3.*O(IFAC)                     0084
+
+C  T() {}
+
+      DM2 = -4.*O(IFAC-1)+O(IFAC-2)+3.*O(IFAC)                          0085
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0087
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0088
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0089
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0091
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0093
+
+C  T() {}
+
+      R1 = 4.*XO(IFAC+JFM)-XO(IFAC+2*JFM)-3.*XO(IFAC)                   0094
+
+C  T() {}
+
+      R2 = 4.*XO(IFAC+1)-XO(IFAC+2)-3.*XO(IFAC)                         0095
+
+C  T() {}
+
+      R4 = 4.*YO(IFAC+JFM)-YO(IFAC+2*JFM)-3.*YO(IFAC)                   0096
+
+C  T() {}
+
+      R5 = 4.*YO(IFAC+1)-YO(IFAC+2)-3.*YO(IFAC)                         0097
+
+C  T() {}
+
+      R7 = 4.*ZO(IFAC+JFM)-ZO(IFAC+2*JFM)-3.*ZO(IFAC)                   0098
+
+C  T() {}
+
+      R8 = 4.*ZO(IFAC+1)-ZO(IFAC+2)-3.*ZO(IFAC)                         0099
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0101
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0101
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0103
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0104
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0105
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0106
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0107
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0108
+
+C  T() {}
+
+C
+      DM1 = 4.*O(IFAC+JFM)-O(IFAC+2*JFM)-3.*O(IFAC)                     0110
+
+C  T() {}
+
+      DM2 = 4.*O(IFAC+1)-O(IFAC+2)-3.*O(IFAC)                           0111
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0113
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0114
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0115
+
+C  T(IFAC,J) {IFAC+JM1O2P3==IFAC#init+J}
+
+C
+      DO 18 J = JM1O2P3, JMFM1                                          0117
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+         IFAC = IFAC+1                                                  0118
+
+C  T() {}
+
+C
+         R1 = 4.*XO(IFAC+JFM)-XO(IFAC+2*JFM)-3.*XO(IFAC)                0120
+
+C  T() {}
+
+         R2 = XO(IFAC+1)-XO(IFAC-1)                                     0121
+
+C  T() {}
+
+         R4 = 4.*YO(IFAC+JFM)-YO(IFAC+2*JFM)-3.*YO(IFAC)                0122
+
+C  T() {}
+
+         R5 = YO(IFAC+1)-YO(IFAC-1)                                     0123
+
+C  T() {}
+
+         R7 = 4.*ZO(IFAC+JFM)-ZO(IFAC+2*JFM)-3.*ZO(IFAC)                0124
+
+C  T() {}
+
+         R8 = ZO(IFAC+1)-ZO(IFAC-1)                                     0125
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0127
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0127
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0129
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0130
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0131
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0132
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0133
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0134
+
+C  T() {}
+
+C
+         DM1 = 4.*O(IFAC+JFM)-O(IFAC+2*JFM)-3.*O(IFAC)                  0136
+
+C  T() {}
+
+         DM2 = O(IFAC+1)-O(IFAC-1)                                      0137
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0139
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0140
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0141
+
+C  T() {}
+
+18       CONTINUE                                                       0142
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0144
+
+C  T() {}
+
+      R1 = 4.*XO(IFAC+JFM)-XO(IFAC+2*JFM)-3.*XO(IFAC)                   0145
+
+C  T() {}
+
+      R2 = -XO(IFAC-1)+XO(IFAC)                                         0146
+
+C  T() {}
+
+      R4 = 4.*YO(IFAC+JFM)-YO(IFAC+2*JFM)-3.*YO(IFAC)                   0147
+
+C  T() {}
+
+      R5 = -YO(IFAC-1)-YO(IFAC)                                         0148
+
+C  T() {}
+
+      R7 = 4.*ZO(IFAC+JFM)-ZO(IFAC+2*JFM)-3.*ZO(IFAC)                   0149
+
+C  T() {}
+
+      R8 = -ZO(IFAC-1)+ZO(IFAC)                                         0150
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0152
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0152
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0154
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0155
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0156
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0157
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0158
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0159
+
+C  T() {}
+
+C
+      DM1 = 4.*O(IFAC+JFM)-O(IFAC+2*JFM)-3.*O(IFAC)                     0161
+
+C  T() {}
+
+      DM2 = -O(IFAC-1)+O(IFAC)                                          0162
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0164
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0165
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0166
+
+C  T(I,IFAC,IM1,IP1,J,JM1,JP1) {}
+
+C
+      DO 39 I = 2, IMFM1                                                0168
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+         IFAC = IFAC+1                                                  0169
+
+C  T() {}
+
+C
+         R1 = XO(IFAC+JFM)-XO(IFAC-JFM)                                 0171
+
+C  T() {}
+
+         R2 = XO(IFAC+1)-XO(IFAC)                                       0172
+
+C  T() {}
+
+         R4 = YO(IFAC+JFM)-YO(IFAC-JFM)                                 0173
+
+C  T() {}
+
+         R5 = YO(IFAC+1)+YO(IFAC)                                       0174
+
+C  T() {}
+
+         R7 = ZO(IFAC+JFM)-ZO(IFAC-JFM)                                 0175
+
+C  T() {}
+
+         R8 = ZO(IFAC+1)-ZO(IFAC)                                       0176
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0178
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0178
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0180
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0181
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0182
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0183
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0184
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0185
+
+C  T() {}
+
+C
+         DM1 = O(IFAC+JFM)-O(IFAC-JFM)                                  0187
+
+C  T() {}
+
+         DM2 = O(IFAC+1)-O(IFAC)                                        0188
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0190
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0191
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0192
+
+C  T(IFAC,IM1,IP1,J,JM1,JP1) {IFAC#init+J==IFAC+2}
+
+C
+C POINT COURANT
+C
+         DO 29 J = 2, JM1O2M1                                           0196
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+            IFAC = IFAC+1                                               0197
+
+C  T(IP1) {IFAC+JFM==IP1}
+
+C
+            IP1 = IFAC+JFM                                              0199
+
+C  T(IM1) {IM1+JFM==IFAC}
+
+            IM1 = IFAC-JFM                                              0200
+
+C  T(JP1) {IFAC==JP1-1}
+
+            JP1 = IFAC+1                                                0201
+
+C  T(JM1) {IFAC==JM1+1}
+
+            JM1 = IFAC-1                                                0202
+
+C  T() {}
+
+            R1 = XO(IP1)-XO(IM1)                                        0203
+
+C  T() {}
+
+            R2 = XO(JP1)-XO(JM1)                                        0204
+
+C  T() {}
+
+            R4 = YO(IP1)-YO(IM1)                                        0205
+
+C  T() {}
+
+            R5 = YO(JP1)-YO(JM1)                                        0206
+
+C  T() {}
+
+            R7 = ZO(IP1)-ZO(IM1)                                        0207
+
+C  T() {}
+
+            R8 = ZO(JP1)-ZO(JM1)                                        0208
+
+C  T() {}
+
+C
+            D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1   0210
+     &      *FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                  0210
+
+C  T() {}
+
+            A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                          0212
+
+C  T() {}
+
+            A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                          0213
+
+C  T() {}
+
+            A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                          0214
+
+C  T() {}
+
+            A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                          0215
+
+C  T() {}
+
+            A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                          0216
+
+C  T() {}
+
+            A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                          0217
+
+C  T() {}
+
+C
+            DM1 = O(IP1)-O(IM1)                                         0219
+
+C  T() {}
+
+            DM2 = O(JP1)-O(JM1)                                         0220
+
+C  T() {}
+
+C
+            GRD(IFAC,1) = DM1*A1+DM2*A4                                 0222
+
+C  T() {}
+
+            GRD(IFAC,2) = DM1*A2+DM2*A5                                 0223
+
+C  T() {}
+
+            GRD(IFAC,3) = DM1*A3+DM2*A6                                 0224
+
+C  T() {}
+
+29          CONTINUE                                                    0225
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+         IFAC = IFAC+1                                                  0227
+
+C  T() {}
+
+         R1 = XO(IFAC+JFM)-XO(IFAC-JFM)                                 0228
+
+C  T() {}
+
+         R2 = -4.*XO(IFAC-1)+XO(IFAC-2)+3.*XO(IFAC)                     0229
+
+C  T() {}
+
+         R4 = YO(IFAC+JFM)-YO(IFAC-JFM)                                 0230
+
+C  T() {}
+
+         R5 = -4.*YO(IFAC-1)+YO(IFAC-2)+3.*YO(IFAC)                     0231
+
+C  T() {}
+
+         R7 = ZO(IFAC+JFM)-ZO(IFAC-JFM)                                 0232
+
+C  T() {}
+
+         R8 = -4.*ZO(IFAC-1)+ZO(IFAC-2)+3.*ZO(IFAC)                     0233
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0235
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0235
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0237
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0238
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0239
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0240
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0241
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0242
+
+C  T() {}
+
+C
+         DM1 = O(IFAC+JFM)-O(IFAC-JFM)                                  0244
+
+C  T() {}
+
+         DM2 = -4.*O(IFAC-1)+O(IFAC-2)+3.*O(IFAC)                       0245
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0247
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0248
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0249
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+         IFAC = IFAC+1                                                  0251
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+         IFAC = IFAC+1                                                  0253
+
+C  T() {}
+
+         R1 = XO(IFAC+JFM)-XO(IFAC-JFM)                                 0254
+
+C  T() {}
+
+         R2 = 4.*XO(IFAC+1)-XO(IFAC+2)-3.*XO(IFAC)                      0255
+
+C  T() {}
+
+         R4 = YO(IFAC+JFM)-YO(IFAC-JFM)                                 0256
+
+C  T() {}
+
+         R5 = 4.*YO(IFAC+1)-XO(IFAC+2)-3.*XO(IFAC)                      0257
+
+C  T() {}
+
+         R7 = ZO(IFAC+JFM)-ZO(IFAC-JFM)                                 0258
+
+C  T() {}
+
+         R8 = 4.*ZO(IFAC+1)-ZO(IFAC+2)-3.*ZO(IFAC)                      0259
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0261
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0261
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0263
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0264
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0265
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0266
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0267
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0268
+
+C  T() {}
+
+C
+         DM1 = O(IFAC+JFM)-O(IFAC-JFM)                                  0270
+
+C  T() {}
+
+         DM2 = 4.*O(IFAC+1)-O(IFAC+2)-3.*O(IFAC)                        0271
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0273
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0274
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0275
+
+C  T(IFAC,IM1,IP1,J,JM1,JP1) {IFAC+JM1O2P3==IFAC#init+J}
+
+C
+         DO 28 J = JM1O2P3, JMFM1                                       0277
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+            IFAC = IFAC+1                                               0278
+
+C  T(IP1) {IFAC+JFM==IP1}
+
+C
+            IP1 = IFAC+JFM                                              0280
+
+C  T(IM1) {IM1+JFM==IFAC}
+
+            IM1 = IFAC-JFM                                              0281
+
+C  T(JP1) {IFAC==JP1-1}
+
+            JP1 = IFAC+1                                                0282
+
+C  T(JM1) {IFAC==JM1+1}
+
+            JM1 = IFAC-1                                                0283
+
+C  T() {}
+
+            R1 = XO(IP1)-XO(IM1)                                        0284
+
+C  T() {}
+
+            R2 = XO(JP1)-XO(JM1)                                        0285
+
+C  T() {}
+
+            R4 = YO(IP1)-YO(IM1)                                        0286
+
+C  T() {}
+
+            R5 = YO(JP1)-YO(JM1)                                        0287
+
+C  T() {}
+
+            R7 = ZO(IP1)-ZO(IM1)                                        0288
+
+C  T() {}
+
+            R8 = ZO(JP1)-ZO(JM1)                                        0289
+
+C  T() {}
+
+C
+            D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1   0291
+     &      *FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                  0291
+
+C  T() {}
+
+            A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                          0293
+
+C  T() {}
+
+            A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                          0294
+
+C  T() {}
+
+            A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                          0295
+
+C  T() {}
+
+            A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                          0296
+
+C  T() {}
+
+            A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                          0297
+
+C  T() {}
+
+            A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                          0298
+
+C  T() {}
+
+C
+            DM1 = O(IP1)-O(IM1)                                         0300
+
+C  T() {}
+
+            DM2 = O(JP1)-O(JM1)                                         0301
+
+C  T() {}
+
+C
+            GRD(IFAC,1) = DM1*A1+DM2*A4                                 0303
+
+C  T() {}
+
+            GRD(IFAC,2) = DM1*A2+DM2*A5                                 0304
+
+C  T() {}
+
+            GRD(IFAC,3) = DM1*A3+DM2*A6                                 0305
+
+C  T() {}
+
+28          CONTINUE                                                    0306
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+         IFAC = IFAC+1                                                  0308
+
+C  T() {}
+
+C
+         R1 = XO(IFAC+JFM)-XO(IFAC-JFM)                                 0310
+
+C  T() {}
+
+         R2 = -XO(IFAC-1)+XO(IFAC)                                      0311
+
+C  T() {}
+
+         R4 = YO(IFAC+JFM)-YO(IFAC-JFM)                                 0312
+
+C  T() {}
+
+         R5 = -YO(IFAC-1)-YO(IFAC)                                      0313
+
+C  T() {}
+
+         R7 = ZO(IFAC+JFM)-ZO(IFAC-JFM)                                 0314
+
+C  T() {}
+
+         R8 = -ZO(IFAC-1)+ZO(IFAC)                                      0315
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0317
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0317
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0319
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0320
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0321
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0322
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0323
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0324
+
+C  T() {}
+
+C
+         DM1 = O(IFAC+JFM)-O(IFAC-JFM)                                  0326
+
+C  T() {}
+
+         DM2 = -O(IFAC-1)+O(IFAC)                                       0327
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0329
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0330
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0331
+
+C  T() {}
+
+39       CONTINUE                                                       0332
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0334
+
+C  T() {}
+
+      R1 = -4.*XO(IFAC-JFM)+XO(IFAC-2*JFM)+3.*XO(IFAC)                  0335
+
+C  T() {}
+
+      R2 = XO(IFAC+1)-XO(IFAC)                                          0336
+
+C  T() {}
+
+      R4 = -4.*YO(IFAC-JFM)+YO(IFAC-2*JFM)+3.*YO(IFAC)                  0337
+
+C  T() {}
+
+      R5 = YO(IFAC+1)+YO(IFAC)                                          0338
+
+C  T() {}
+
+      R7 = -4.*ZO(IFAC-JFM)+ZO(IFAC-2*JFM)+3.*ZO(IFAC)                  0339
+
+C  T() {}
+
+      R8 = ZO(IFAC+1)-ZO(IFAC)                                          0340
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0342
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0342
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0344
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0345
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0346
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0347
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0348
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0349
+
+C  T() {}
+
+C
+      DM1 = -4.*O(IFAC-JFM)+O(IFAC-2*JFM)+3.*O(IFAC)                    0351
+
+C  T() {}
+
+      DM2 = O(IFAC+1)-O(IFAC)                                           0352
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0354
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0355
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0356
+
+C  T(IFAC,J) {IFAC#init+J==IFAC+2}
+
+C
+      DO 49 J = 2, JM1O2M1                                              0358
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+         IFAC = IFAC+1                                                  0359
+
+C  T() {}
+
+C
+         R1 = -4.*XO(IFAC-JFM)+XO(IFAC-2*JFM)+3.*XO(IFAC)               0361
+
+C  T() {}
+
+         R2 = XO(IFAC+1)-XO(IFAC-1)                                     0362
+
+C  T() {}
+
+         R4 = -4.*YO(IFAC-JFM)+YO(IFAC-2*JFM)+3.*YO(IFAC)               0363
+
+C  T() {}
+
+         R5 = YO(IFAC+1)-YO(IFAC-1)                                     0364
+
+C  T() {}
+
+         R7 = -4.*ZO(IFAC-JFM)+ZO(IFAC-2*JFM)+3.*ZO(IFAC)               0365
+
+C  T() {}
+
+         R8 = ZO(IFAC+1)-ZO(IFAC-1)                                     0366
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0368
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0368
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0370
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0371
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0372
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0373
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0374
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0375
+
+C  T() {}
+
+C
+         DM1 = -4.*O(IFAC-JFM)+O(IFAC-2*JFM)+3.*O(IFAC)                 0377
+
+C  T() {}
+
+         DM2 = O(IFAC+1)-O(IFAC-1)                                      0378
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0380
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0381
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0382
+
+C  T() {}
+
+49       CONTINUE                                                       0383
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0385
+
+C  T() {}
+
+      R1 = -4.*XO(IFAC-JFM)+XO(IFAC-2*JFM)+3.*XO(IFAC)                  0386
+
+C  T() {}
+
+      R2 = -4.*XO(IFAC-1)+XO(IFAC-2)+3.*XO(IFAC)                        0387
+
+C  T() {}
+
+      R4 = -4.*YO(IFAC-JFM)+YO(IFAC-2*JFM)+3.*YO(IFAC)                  0388
+
+C  T() {}
+
+      R5 = -4.*YO(IFAC-1)+YO(IFAC-2)+3.*YO(IFAC)                        0389
+
+C  T() {}
+
+      R7 = -4.*ZO(IFAC-JFM)+ZO(IFAC-2*JFM)+3.*ZO(IFAC)                  0390
+
+C  T() {}
+
+      R8 = -4.*ZO(IFAC-1)+ZO(IFAC-2)+3.*ZO(IFAC)                        0391
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0393
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0393
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0395
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0396
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0397
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0398
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0399
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0400
+
+C  T() {}
+
+C
+      DM1 = -4.*O(IFAC-JFM)+O(IFAC-2*JFM)+3.*O(IFAC)                    0402
+
+C  T() {}
+
+      DM2 = -4.*O(IFAC-1)+O(IFAC-2)+3.*O(IFAC)                          0403
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0405
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0406
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0407
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0409
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0411
+
+C  T() {}
+
+      R1 = -4.*XO(IFAC-JFM)+XO(IFAC-2*JFM)+3.*XO(IFAC)                  0412
+
+C  T() {}
+
+      R2 = 4.*XO(IFAC+1)-XO(IFAC+2)-3.*XO(IFAC)                         0413
+
+C  T() {}
+
+      R4 = -4.*YO(IFAC-JFM)+YO(IFAC-2*JFM)+3.*YO(IFAC)                  0414
+
+C  T() {}
+
+      R5 = 4.*YO(IFAC+1)-YO(IFAC+2)-3.*YO(IFAC)                         0415
+
+C  T() {}
+
+      R7 = -4.*ZO(IFAC-JFM)+ZO(IFAC-2*JFM)+3.*ZO(IFAC)                  0416
+
+C  T() {}
+
+      R8 = 4.*ZO(IFAC+1)-ZO(IFAC+2)-3.*ZO(IFAC)                         0417
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0419
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0419
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0421
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0422
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0423
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0424
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0425
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0426
+
+C  T() {}
+
+C
+      DM1 = -4.*O(IFAC-JFM)+O(IFAC-2*JFM)+3.*O(IFAC)                    0428
+
+C  T() {}
+
+      DM2 = 4.*O(IFAC+1)-O(IFAC+2)-3.*O(IFAC)                           0429
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0431
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0432
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0433
+
+C  T(IFAC,J) {IFAC+JM1O2P3==IFAC#init+J}
+
+C
+      DO 48 J = JM1O2P3, JMFM1                                          0435
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+         IFAC = IFAC+1                                                  0436
+
+C  T() {}
+
+C
+         R1 = -4.*XO(IFAC-JFM)+XO(IFAC-2*JFM)+3.*XO(IFAC)               0438
+
+C  T() {}
+
+         R2 = XO(IFAC+1)-XO(IFAC-1)                                     0439
+
+C  T() {}
+
+         R4 = -4.*YO(IFAC-JFM)+YO(IFAC-2*JFM)+3.*YO(IFAC)               0440
+
+C  T() {}
+
+         R5 = YO(IFAC+1)-YO(IFAC-1)                                     0441
+
+C  T() {}
+
+         R7 = -4.*ZO(IFAC-JFM)+ZO(IFAC-2*JFM)+3.*ZO(IFAC)               0442
+
+C  T() {}
+
+         R8 = ZO(IFAC+1)-ZO(IFAC-1)                                     0443
+
+C  T() {}
+
+C
+         D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*     0445
+     &   FNY(IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                      0445
+
+C  T() {}
+
+         A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                             0447
+
+C  T() {}
+
+         A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                             0448
+
+C  T() {}
+
+         A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                             0449
+
+C  T() {}
+
+         A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0450
+
+C  T() {}
+
+         A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                             0451
+
+C  T() {}
+
+         A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                             0452
+
+C  T() {}
+
+C
+         DM1 = -4.*O(IFAC-JFM)+O(IFAC-2*JFM)+3.*O(IFAC)                 0454
+
+C  T() {}
+
+         DM2 = O(IFAC+1)-O(IFAC-1)                                      0455
+
+C  T() {}
+
+C
+         GRD(IFAC,1) = DM1*A1+DM2*A4                                    0457
+
+C  T() {}
+
+         GRD(IFAC,2) = DM1*A2+DM2*A5                                    0458
+
+C  T() {}
+
+         GRD(IFAC,3) = DM1*A3+DM2*A6                                    0459
+
+C  T() {}
+
+48       CONTINUE                                                       0460
+
+C  T(IFAC) {IFAC==IFAC#init+1}
+
+C
+      IFAC = IFAC+1                                                     0462
+
+C  T() {}
+
+      R1 = -4.*XO(IFAC-JFM)+XO(IFAC-2*JFM)+3.*XO(IFAC)                  0463
+
+C  T() {}
+
+      R2 = -XO(IFAC-1)+XO(IFAC)                                         0464
+
+C  T() {}
+
+      R4 = -4.*YO(IFAC-JFM)+YO(IFAC-2*JFM)+3.*YO(IFAC)                  0465
+
+C  T() {}
+
+      R5 = -YO(IFAC-1)-YO(IFAC)                                         0466
+
+C  T() {}
+
+      R7 = -4.*ZO(IFAC-JFM)+ZO(IFAC-2*JFM)+3.*ZO(IFAC)                  0467
+
+C  T() {}
+
+      R8 = -ZO(IFAC-1)+ZO(IFAC)                                         0468
+
+C  T() {}
+
+C
+      D = R1*R5*FNZ(IFAC)+R4*R8*FNX(IFAC)-R7*R5*FNX(IFAC)-R8*R1*FNY(    0470
+     &IFAC)+R2*R7*FNY(IFAC)-R2*R4*FNZ(IFAC)                             0470
+
+C  T() {}
+
+      A1 = (R5*FNZ(IFAC)-R8*FNY(IFAC))/D                                0472
+
+C  T() {}
+
+      A2 = (R8*FNX(IFAC)-R2*FNY(IFAC))/D                                0473
+
+C  T() {}
+
+      A3 = (R2*FNY(IFAC)-R5*FNX(IFAC))/D                                0474
+
+C  T() {}
+
+      A4 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0475
+
+C  T() {}
+
+      A5 = (R1*FNZ(IFAC)-R7*FNX(IFAC))/D                                0476
+
+C  T() {}
+
+      A6 = (R7*FNY(IFAC)-R4*FNZ(IFAC))/D                                0477
+
+C  T() {}
+
+C
+      DM1 = -4.*O(IFAC-JFM)+O(IFAC-2*JFM)+3.*O(IFAC)                    0479
+
+C  T() {}
+
+      DM2 = -O(IFAC-1)+O(IFAC)                                          0480
+
+C  T() {}
+
+C
+      GRD(IFAC,1) = DM1*A1+DM2*A4                                       0482
+
+C  T() {}
+
+      GRD(IFAC,2) = DM1*A2+DM2*A5                                       0483
+
+C  T() {}
+
+      GRD(IFAC,3) = DM1*A3+DM2*A6                                       0484
+C
+      END

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete save02
+create save02 save02.f
+display PRINTED_FILE 
+close
+delete save02
+quit
+EOF
+

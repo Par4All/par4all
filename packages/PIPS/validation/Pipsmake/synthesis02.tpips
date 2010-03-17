@@ -1,0 +1,32 @@
+delete synthesis02
+create synthesis02 synthesis02.f
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty PARSER_TYPE_CHECK_CALL_SITES TRUE
+
+echo
+echo User source code for SYNTHESIS02
+echo
+
+module SYNTHESIS02
+display PRINTED_FILE
+
+echo Call graph for synthesis02
+
+module SYNTHESIS02
+activate PRINT_CALL_GRAPH
+display CALLGRAPH_FILE
+
+echo Synthesized source code for subroutine FOO
+
+module FOO
+display PRINTED_FILE
+
+echo Synthesized source code for function BAR
+
+module BAR
+display PRINTED_FILE
+
+close
+delete synthesis02
+quit

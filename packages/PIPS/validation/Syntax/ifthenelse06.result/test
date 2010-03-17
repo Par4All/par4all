@@ -1,0 +1,69 @@
+
+PARSED PRINTED FILE
+
+      PROGRAM IFTHENELSE06
+
+C     Labelled else which leads the SUN f77 compiler to raise a user warning
+C     And initially to a user error for PIPS
+
+      READ *, I                                                         0006
+
+      IF (I.EQ.0) THEN                                                  0008
+         PRINT *, I                                                     0009
+         GOTO 1
+      ELSE
+         IF (I.EQ.1) THEN                                               0011
+            PRINT *, I+1                                                0012
+         ELSE
+1           CONTINUE                                                    0013
+            PRINT *, I-1                                                0014
+         ENDIF
+      ENDIF
+
+      END
+
+PRINTED FILE
+
+      PROGRAM IFTHENELSE06
+
+C     Labelled else which leads the SUN f77 compiler to raise a user warning
+C     And initially to a user error for PIPS
+
+      READ *, I                                                         0006
+
+      IF (I.EQ.0) GOTO 99999                                            0008
+      IF (I.EQ.1) GOTO 99998                                            0011
+1     CONTINUE                                                          0013
+      PRINT *, I-1                                                      0014
+      RETURN
+99998 CONTINUE
+      PRINT *, I+1                                                      0012
+      RETURN
+99999 CONTINUE
+      PRINT *, I                                                        0009
+      GOTO 1
+
+      END
+
+RESTRUCTURED FILE
+
+      PROGRAM IFTHENELSE06
+
+C     Labelled else which leads the SUN f77 compiler to raise a user warning
+C     And initially to a user error for PIPS
+
+      READ *, I                                                         0006
+
+      IF (I.EQ.0) GOTO 99999                                            0008
+      IF (I.EQ.1) GOTO 99998                                            0011
+1     CONTINUE                                                          0013
+      PRINT *, I-1                                                      0014
+      RETURN
+99998 CONTINUE
+      PRINT *, I+1                                                      0012
+      RETURN
+99999 CONTINUE
+      PRINT *, I                                                        0009
+      GOTO 1
+
+      END

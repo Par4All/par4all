@@ -1,0 +1,24 @@
+delete r
+
+create r reg2.f
+
+activate MUST_REGIONS
+#activate TRANSFORMERS_INTER_FULL
+#activate PRECONDITIONS_INTER_FULL
+
+make REGIONS[SUB3]
+
+#setenv REGION_TRANSLATION_DEBUG_LEVEL 9
+make REGIONS[SUB2]
+#setenv REGION_TRANSLATION_DEBUG_LEVEL 0
+
+make REGIONS[SUB1]
+make REGIONS[REG2]
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+
+close
+
+delete r
+quit

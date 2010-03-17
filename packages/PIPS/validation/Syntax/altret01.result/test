@@ -1,0 +1,59 @@
+
+Refuse alternate returns
+
+
+Ignore alternate returns and substitute STOP
+
+      SUBROUTINE ALTRET01(X, FORMAL_RETURN_LABEL_1)
+      INTEGER IY
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+      SAVE IY
+
+      DATA IY /1/
+
+C     Check different handlings of alternate return constructs
+
+      CALL FOO("*123")                                                  0007
+
+      CALL BAR(X, "*123")                                               0009
+
+      CALL BAR2("*123", X)                                              0011
+
+      IF (X.GT.FLOAT(IY)) RETURN                                        0013
+
+123   CONTINUE                                                          0015
+      STOP "1 in ALTRET01"                                              0016
+
+      END
+
+Replace alternate returns
+
+      SUBROUTINE ALTRET01(X, FORMAL_RETURN_LABEL_1, 
+     &I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_, IY
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+      SAVE IY
+
+      DATA IY /1/
+
+C     Check different handlings of alternate return constructs
+
+      CALL FOO("*123", I_PIPS_RETURN_CODE_)                             0007
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0007
+
+      CALL BAR(X, "*123", I_PIPS_RETURN_CODE_)                          0009
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0009
+
+      CALL BAR2("*123", X, I_PIPS_RETURN_CODE_)                         0011
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0011
+
+      IF (X.GT.FLOAT(IY)) GOTO 99999                                    0013
+
+123   CONTINUE                                                          0015
+      I_PIPS_RETURN_CODE_ = 1                                           0016
+      RETURN
+99999 CONTINUE
+      I_PIPS_RETURN_CODE_ = 0                                           0013
+      END

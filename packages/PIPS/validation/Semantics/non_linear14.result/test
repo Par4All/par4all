@@ -1,0 +1,51 @@
+
+C  T() {}
+
+      SUBROUTINE NON_LINEAR14
+
+C  T(I,J,L) {J==2K}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==2}
+
+C (0,2)
+
+      I = 2                                                             0003
+
+C  T(J) {I==2, J==2K}
+
+C (0,3)
+      J = K*I                                                           0004
+
+C  T(I,L) {J==2K}
+
+C (0,4)
+      IF (K.EQ.2) THEN                                                  0005
+
+C  T(I,L) {I#init==2, J==4, K==2, L==4M}
+
+C (0,5)
+C        BEGIN BLOCK
+
+C  T(I) {I#init==2, J==4, K==2}
+
+C (0,6)
+         READ *, I                                                      0006
+
+C  T() {J==4, K==2}
+
+C (0,7)
+         PRINT *, J                                                     0007
+
+C  T(L) {J==4, K==2, L==4M}
+
+C (0,8)
+         L = J*M                                                        0008
+C        END BLOCK
+      ENDIF
+
+C     END BLOCK
+      END
+

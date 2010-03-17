@@ -1,0 +1,404 @@
+user warning in tp_parse: entry18: No such workspace
+Registering file entry18.f
+Splitting file    ./entry18.f
+  Module         ENTRY18
+  Module         INCREMENT1
+  Module         INCREMENT2
+  Module         INCREMENT3
+  Module         INCREMENT4
+Workspace entry18 created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+echo
+
+echo Module ENTRY18
+Module ENTRY18
+echo
+
+Module ENTRY18 selected
+Request: build resource PRINTED_FILE for module ENTRY18.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENTRY18)
+  PARSER                         building   PARSED_CODE(ENTRY18)
+                                 building   CALLEES(ENTRY18)
+
+Declarations for module ENTRY18 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity ENTRY18:*DYNAMIC*	with type area with size 0
+Declared entity ENTRY18:*HEAP*	with type area with size 0
+Declared entity ENTRY18:*STACK*	with type area with size 0
+Declared entity ENTRY18:*STATIC*	with type area with size 48
+Declared entity ENTRY18:K	with type variable INTEGER*4
+Declared entity ENTRY18:L	with type variable INTEGER*4
+Declared entity ENTRY18:M	with type variable INTEGER*4
+Declared entity ENTRY18:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable ENTRY18:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 48:
+	Variable ENTRY18:L,	offset = 0,	size = 4
+	Variable ENTRY18:M,	offset = 4,	size = 40
+	Variable ENTRY18:K,	offset = 44,	size = 4
+
+End of declarations for module ENTRY18
+
+user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Some statements are unreachable
+  CONTROLIZER                    building   CODE(ENTRY18)
+user warning in control_graph: Some statements are unreachable
+  PRINT_CODE                     building   PRINTED_FILE(ENTRY18)
+PRINTED_FILE made for ENTRY18.
+      SUBROUTINE ENTRY18(N)
+      INTEGER N, K, L
+      INTEGER M(1:10)
+      COMMON /ENTRY_ENTRY18/ L, M, K
+
+C     Goal: check that multiple entries each have a proper entry common
+C     for multiple static variables (and a unique DATA, see also entry16.f)
+
+      DATA K /3/
+
+      PRINT *, M(1)+N, K+L                                              0010
+
+
+      END
+echo
+
+echo Entry INCREMENT1
+Entry INCREMENT1
+echo
+
+Module INCREMENT1 selected
+Request: build resource PRINTED_FILE for module INCREMENT1.
+  PARSER                         building   PARSED_CODE(INCREMENT1)
+                                 building   CALLEES(INCREMENT1)
+
+Declarations for module INCREMENT1 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity INCREMENT1:*DYNAMIC*	with type area with size 0
+Declared entity INCREMENT1:*HEAP*	with type area with size 0
+Declared entity INCREMENT1:*STACK*	with type area with size 0
+Declared entity INCREMENT1:*STATIC*	with type area with size 0
+Declared entity INCREMENT1:K	with type variable INTEGER*4
+Declared entity INCREMENT1:L	with type variable INTEGER*4
+Declared entity INCREMENT1:M	with type variable INTEGER*4
+Declared entity INCREMENT1:N	with type variable INTEGER*4
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
+
+Layouts for formal parameters:
+
+	Variable INCREMENT1:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /ENTRY_ENTRY18/ of size 48:
+	Variable INCREMENT1:L,	offset = 0,	size = 4
+	Variable INCREMENT1:M,	offset = 4,	size = 40
+	Variable INCREMENT1:K,	offset = 44,	size = 4
+
+End of declarations for module INCREMENT1
+
+  CONTROLIZER                    building   CODE(INCREMENT1)
+  PRINT_CODE                     building   PRINTED_FILE(INCREMENT1)
+PRINTED_FILE made for INCREMENT1.
+      SUBROUTINE INCREMENT1(N)
+      INTEGER N, K, L
+      INTEGER M(1:10)
+      COMMON /ENTRY_ENTRY18/ L, M, K
+
+99999 CONTINUE                                                          0006
+
+      M(1) = N+1                                                        0008
+
+99998 CONTINUE                                                          0010
+
+      M(2) = N+1                                                        0012
+
+99997 CONTINUE                                                          0014
+
+      M(3) = N+1                                                        0016
+
+99996 CONTINUE                                                          0018
+
+      M(4) = N+1                                                        0020
+
+      END
+echo
+
+echo Entry INCREMENT2
+Entry INCREMENT2
+echo
+
+Module INCREMENT2 selected
+Request: build resource PRINTED_FILE for module INCREMENT2.
+  PARSER                         building   PARSED_CODE(INCREMENT2)
+                                 building   CALLEES(INCREMENT2)
+
+Declarations for module INCREMENT2 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity INCREMENT2:*DYNAMIC*	with type area with size 0
+Declared entity INCREMENT2:*HEAP*	with type area with size 0
+Declared entity INCREMENT2:*STACK*	with type area with size 0
+Declared entity INCREMENT2:*STATIC*	with type area with size 0
+Declared entity INCREMENT2:K	with type variable INTEGER*4
+Declared entity INCREMENT2:L	with type variable INTEGER*4
+Declared entity INCREMENT2:M	with type variable INTEGER*4
+Declared entity INCREMENT2:N	with type variable INTEGER*4
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
+
+Layouts for formal parameters:
+
+	Variable INCREMENT2:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /ENTRY_ENTRY18/ of size 48:
+	Variable INCREMENT2:L,	offset = 0,	size = 4
+	Variable INCREMENT2:M,	offset = 4,	size = 40
+	Variable INCREMENT2:K,	offset = 44,	size = 4
+
+End of declarations for module INCREMENT2
+
+  CONTROLIZER                    building   CODE(INCREMENT2)
+  PRINT_CODE                     building   PRINTED_FILE(INCREMENT2)
+PRINTED_FILE made for INCREMENT2.
+      SUBROUTINE INCREMENT2(N)
+      INTEGER N, K, L
+      INTEGER M(1:10)
+      COMMON /ENTRY_ENTRY18/ L, M, K
+
+99998 CONTINUE                                                          0006
+
+      M(2) = N+1                                                        0008
+
+99997 CONTINUE                                                          0010
+
+      M(3) = N+1                                                        0012
+
+99996 CONTINUE                                                          0014
+
+      M(4) = N+1                                                        0016
+
+      END
+echo
+
+echo Entry INCREMENT3
+Entry INCREMENT3
+echo
+
+Module INCREMENT3 selected
+Request: build resource PRINTED_FILE for module INCREMENT3.
+  PARSER                         building   PARSED_CODE(INCREMENT3)
+                                 building   CALLEES(INCREMENT3)
+
+Declarations for module INCREMENT3 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity INCREMENT3:*DYNAMIC*	with type area with size 0
+Declared entity INCREMENT3:*HEAP*	with type area with size 0
+Declared entity INCREMENT3:*STACK*	with type area with size 0
+Declared entity INCREMENT3:*STATIC*	with type area with size 0
+Declared entity INCREMENT3:K	with type variable INTEGER*4
+Declared entity INCREMENT3:L	with type variable INTEGER*4
+Declared entity INCREMENT3:M	with type variable INTEGER*4
+Declared entity INCREMENT3:N	with type variable INTEGER*4
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
+
+Layouts for formal parameters:
+
+	Variable INCREMENT3:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /ENTRY_ENTRY18/ of size 48:
+	Variable INCREMENT3:L,	offset = 0,	size = 4
+	Variable INCREMENT3:M,	offset = 4,	size = 40
+	Variable INCREMENT3:K,	offset = 44,	size = 4
+
+End of declarations for module INCREMENT3
+
+  CONTROLIZER                    building   CODE(INCREMENT3)
+  PRINT_CODE                     building   PRINTED_FILE(INCREMENT3)
+PRINTED_FILE made for INCREMENT3.
+      SUBROUTINE INCREMENT3(N)
+      INTEGER N, K, L
+      INTEGER M(1:10)
+      COMMON /ENTRY_ENTRY18/ L, M, K
+
+99997 CONTINUE                                                          0006
+
+      M(3) = N+1                                                        0008
+
+99996 CONTINUE                                                          0010
+
+      M(4) = N+1                                                        0012
+
+      END
+echo
+
+echo Entry INCREMENT4
+Entry INCREMENT4
+echo
+
+Module INCREMENT4 selected
+Request: build resource PRINTED_FILE for module INCREMENT4.
+  PARSER                         building   PARSED_CODE(INCREMENT4)
+                                 building   CALLEES(INCREMENT4)
+
+Declarations for module INCREMENT4 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity INCREMENT4:*DYNAMIC*	with type area with size 0
+Declared entity INCREMENT4:*HEAP*	with type area with size 0
+Declared entity INCREMENT4:*STACK*	with type area with size 0
+Declared entity INCREMENT4:*STATIC*	with type area with size 0
+Declared entity INCREMENT4:K	with type variable INTEGER*4
+Declared entity INCREMENT4:L	with type variable INTEGER*4
+Declared entity INCREMENT4:M	with type variable INTEGER*4
+Declared entity INCREMENT4:N	with type variable INTEGER*4
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
+
+Layouts for formal parameters:
+
+	Variable INCREMENT4:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /ENTRY_ENTRY18/ of size 48:
+	Variable INCREMENT4:L,	offset = 0,	size = 4
+	Variable INCREMENT4:M,	offset = 4,	size = 40
+	Variable INCREMENT4:K,	offset = 44,	size = 4
+
+End of declarations for module INCREMENT4
+
+  CONTROLIZER                    building   CODE(INCREMENT4)
+  PRINT_CODE                     building   PRINTED_FILE(INCREMENT4)
+PRINTED_FILE made for INCREMENT4.
+      SUBROUTINE INCREMENT4(N)
+      INTEGER N, K, L
+      INTEGER M(1:10)
+      COMMON /ENTRY_ENTRY18/ L, M, K
+
+99996 CONTINUE                                                          0006
+
+      M(4) = N+1                                                        0008
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ENTRY18.
+  Closing module INCREMENT1.
+  Closing module INCREMENT2.
+  Closing module INCREMENT3.
+  Closing module INCREMENT4.
+Closing program.
+Closing workspace.
+Workspace entry18 closed.
+
+Workspace entry18 deleted.

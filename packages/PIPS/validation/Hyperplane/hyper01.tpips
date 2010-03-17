@@ -1,0 +1,56 @@
+delete hyper01
+create hyper01 hyper01.f
+module HYPER01
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+apply LOOP_HYPERPLANE[HYPER01]
+100
+1 1
+
+echo
+echo After hyperplanning (1, 1)
+echo
+
+display PRINTED_FILE
+
+close
+delete hyper01
+create hyper01 hyper01.f
+module HYPER01
+# display PRINTED_FILE
+
+apply LOOP_HYPERPLANE[HYPER01]
+100
+1 0
+
+echo
+echo After hyperplanning (1, 0)
+echo
+
+display PRINTED_FILE
+
+close
+delete hyper01
+
+create hyper01 hyper01.f
+module HYPER01
+# display PRINTED_FILE
+
+apply LOOP_HYPERPLANE[HYPER01]
+100
+0 1
+
+echo
+echo After hyperplanning (0, 1)
+echo
+
+display PRINTED_FILE
+
+close
+delete hyper01
+quit

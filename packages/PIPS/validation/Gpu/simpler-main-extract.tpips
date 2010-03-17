@@ -1,0 +1,130 @@
+setenv WKS gpu-extract
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS simpler-main-extract.c $P4A_DIR/p4a_stubs.c
+
+echo Select some options to deal with the C Language:
+echo Parse as C:
+activate C_PARSER
+echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+echo Do not display original number lines as comment:
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
+echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+echo Compute the intraprocedural preconditions at the same time as
+echo   transformers and use them to improve the accuracy of expression
+echo   and statement transformers:
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+echo Try to restructure the code for more precision:
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+
+# Loop normalize for the C language and GPU friendly
+setproperty LOOP_NORMALIZE_1_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 0
+# It is legal in the following by construction:
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+# If we do this here, the side effect at the end of a loop on the index
+# break paramemstorellelization. It would require to apply USE_DEF_ELIM...
+apply LOOP_NORMALIZE[%ALLFUNC]
+
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+#activate PRINT_CODE_REGIONS
+#display PRINTED_FILE[%ALLFUNC]
+
+# Should not coredump, neither prevent some parallelization
+#apply LOCALIZE_DECLARATION[main]
+
+#activate PRINT_CODE_PRECONDITIONS
+#display PRINTED_FILE[%ALLFUNC]
+
+activate PRINT_CODE
+
+
+
+#apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+apply COARSE_GRAIN_PARALLELIZATION[main]
+
+display PRINTED_FILE[main]
+
+apply GPU_IFY[%ALLFUNC]
+
+display PRINTED_FILE[%ALLFUNC]
+
+#setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_ACCEL_MALLOC"
+#setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_ACCEL_FREE"
+#setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_COPY_TO_ACCEL"
+#setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_COPY_FROM_ACCEL"
+# Should be automatic with pyps:
+apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4,p4a_kernel_launcher_5]
+#apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
+display PRINTED_FILE[%ALLFUNC]
+
+# Need pyps for automate this
+apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4,p4a_kernel_launcher_5]
+#apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
+
+# Inline back the kernel since CUDA can only deal with local functions if
+# they are in the same file as the caller (by inlining them, by the
+# way... :-) )
+#apply INLINING[p4a_kernel_0,p4a_kernel_1,p4a_kernel_2,p4a_kernel_3,p4a_kernel_4]
+apply INLINING[p4a_kernel_0]
+# Instead, do a global loop normalization above:
+#apply LOOP_NORMALIZE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
+#apply USE_DEF_ELIMINATION[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
+#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
+
+#apply SUPPRESS_DEAD_CODE
+#display PRINTED_FILE
+
+setproperty PREPEND_COMMENT "// Prepend here P4A_INIT_ACCEL"
+apply PREPEND_COMMENT[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+
+shell echo Generating P4A code:
+shell echo
+shell cd $WKS.database; $P4A_DIR/p4a_post_processor.py Src/*.c
+
+close
+#delete $WKS
+quit
+
+
+
+shell echo
+shell echo Compiling CUDA version
+shell cd $WKS.database/P4A; /usr/local/cuda/bin/nvcc   --compiler-options -fno-strict-aliasing  --ptxas-options=-v  -arch=sm_13 -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -DP4A_DEBUG -I/usr/local/cuda/include -I/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/inc -DUNIX -O2 -c *.cu ../../../../P4A_CUDA/p4a_accel.cu ; g++ -fPIC -o $WKS-cuda   *.o     -L/usr/local/cuda/lib64 -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../lib -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/lib/linux  -lcudart     -L/usr/local/cuda/lib64 -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../lib -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/lib/linux  -lcutil
+shell echo
+shell echo Running CUDA version
+shell cd $WKS.database/P4A; time ./$WKS-cuda  ../../Logo_HPC-Project-512x247-crop.pgm 2000 amplitude.pgm phase.pgm; diff amplitude.pgm ../../amplitude-ref.pgm; diff phase.pgm ../../phase-ref.pgm
+shell echo
+shell echo Compiling OpenMP version
+# -g -DP4A_DEBUG
+shell gcc -std=c99 -O3 -fopenmp -I../../P4A_CUDA -DP4A_ACCEL_OPENMP -DP4A_DEBUG -I/usr/local/cuda/include -I$HOME/NVIDIA_GPU_Computing_SDK/C/common/inc $WKS.database/P4A/*.c ../../P4A_CUDA/p4a_accel.c -o $WKS.database/P4A/$WKS -lm
+shell echo
+shell echo Running OpenMP version
+shell cd $WKS.database/P4A; time ./$WKS  ../../Logo_HPC-Project-512x247-crop.pgm 2000 amplitude.pgm phase.pgm; diff amplitude.pgm ../../amplitude-ref.pgm; diff phase.pgm ../../phase-ref.pgm
+#shell rm -rf $WKS.database/Src/kernelize.o
+
+close
+#delete $WKS
+quit

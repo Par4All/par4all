@@ -1,0 +1,49 @@
+
+C  T() {}
+
+      PROGRAM TOTAL05
+
+C  T() {N<=0}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T() {N<=0}
+
+C (0,2)
+
+      IF (N.GT.0) THEN                                                  0003
+
+C  T() {0==-1}
+
+C (0,3)
+         STOP                                                           0004
+      ENDIF
+
+C     END BLOCK
+      END
+
+C TP() {}
+
+      PROGRAM TOTAL05
+
+C TP() {N<=0}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {N<=0}
+
+C (0,2)
+
+      IF (N.GT.0) THEN                                                  0003
+
+C TP() {0==-1}
+
+C (0,3)
+         STOP                                                           0004
+      ENDIF
+
+C     END BLOCK
+      END
+

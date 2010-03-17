@@ -1,0 +1,17 @@
+delete function_declarators
+
+create function_declarators function_declarators.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+
+activate C_PARSER
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+display PRINTED_FILE[%ALL]
+close
+delete function_declarators

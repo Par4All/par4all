@@ -1,0 +1,112 @@
+delete terasm01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create terasm01 terasm01.c include/terasm.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+module microcode
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+echo
+echo Atomized code
+echo
+
+setproperty SIMD_ATOMIZER_ATOMIZE_REFERENCE TRUE
+setproperty SIMD_ATOMIZER_ATOMIZE_LHS TRUE
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+echo
+echo Tidy code
+echo
+
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
+apply OPTIMIZE_EXPRESSIONS
+apply FLATTEN_CODE
+setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+apply OPTIMIZE_EXPRESSIONS
+apply FLATTEN_CODE
+display PRINTED_FILE
+
+echo
+echo Code in a two adress fashion
+echo
+
+apply GENERATE_TWO_ADDRESSES_CODE
+display PRINTED_FILE
+
+echo
+echo Code after expression substitution
+echo
+
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "addf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "subf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "mulf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "divf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "paddf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "addi"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "subi"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "muli"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "divi"
+apply EXPRESSION_SUBSTITUTION
+
+display PRINTED_FILE
+
+
+echo
+echo Code after flattening
+echo
+
+apply FLATTEN_CODE
+display PRINTED_FILE
+
+echo
+echo Code after more expression substitution
+echo
+
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "seti"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "setf"
+apply EXPRESSION_SUBSTITUTION
+display PRINTED_FILE
+
+
+echo
+echo Code after some cleaning
+echo
+
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c terasm01.database/Src/terasm01.c  -o terasm01.database/Src/terasm.o
+shell rm -rf terasm01.database/Src/terasm.o
+
+close
+delete terasm01
+quit
+

@@ -1,0 +1,7 @@
+delete a
+create a args1.f
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete a
+quit

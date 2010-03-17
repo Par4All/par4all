@@ -1,0 +1,23 @@
+#!/bin/sh
+
+
+modules="COMM1 COMM1B COMM2 COMM2B COMM3 COMM3B COMM"
+
+Pips -f comm.f \
+	-w comm \
+	-m COMM \
+	-s pcinter -s tfinter -s mustreg -s prcr \
+	-b PF >&2
+
+echo "--- Regions for COMM"
+Display -l regi
+
+for module in $modules 
+do
+	Pips -m $module -s prcor -b PF >&2
+	echo "--- OUT Regions for $module"
+	Display -l outreg	
+done
+
+
+Delete comm

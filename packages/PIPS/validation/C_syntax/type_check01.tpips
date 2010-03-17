@@ -1,0 +1,30 @@
+delete type_check01
+
+# To check the warning in the database
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+create type_check01 type_check01.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Parsed code for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat type_check01.database/Warnings
+
+quit

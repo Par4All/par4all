@@ -1,0 +1,10 @@
+      PROGRAM CHARS
+      INTEGER I
+      CHARACTER LOOKUP(1:16)
+      SAVE LOOKUP
+      DATA LOOKUP /'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
+     &'K', 'L', 'M', 'N', 'O', 'P'/
+      DO I = 1, 16                                                      0006
+         PRINT *, LOOKUP(I)                                             0007
+      ENDDO
+      END

@@ -1,0 +1,11 @@
+delete fixpoint02
+create fixpoint02 fixpoint02.f
+module FIXPOINT02
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[FIXPOINT02]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[FIXPOINT02]
+close
+delete fixpoint02

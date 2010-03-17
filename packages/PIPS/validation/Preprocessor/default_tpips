@@ -1,0 +1,26 @@
+delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
+create ${WSPACE} ${FILE}
+
+# Display result of csplit, including for the compilation unit(s).
+
+# No static functions in validation files using default_tpips?
+
+# The semantics of %ALL has changed twice, including or not the
+# compilation unit.  Besides, these files include preprocessor
+# dependent information, which make it unsuitable for validation
+# display C_SOURCE_FILE[%ALL]
+
+# Get rid of preprocessed files
+shell rm -f ${WSPACE}.database/Tmp/*.c
+
+# Display all C files, including compilation units, but get rid of pragmas,
+# except the line number pragma to avoid dependencies on gcc and/or preprocessor version
+shell cat ${WSPACE}.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+
+close
+delete ${WSPACE}
+quit

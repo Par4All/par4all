@@ -1,0 +1,29 @@
+delete missing
+
+# do not abort on user error in this case
+
+create missing missing.f
+module callmissing
+
+echo
+echo Call graph (none, because of a failure)
+echo
+
+display CALLGRAPH_FILE
+
+echo
+echo Source code
+echo
+
+display PRINTED_FILE
+close
+
+echo
+echo Warnings
+echo
+
+shell cat missing.database/Warnings
+
+delete missing
+quit
+

@@ -1,0 +1,28 @@
+delete for_to_while01
+create for_to_while01 for_to_while01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+echo Do not display original number lines as comment:
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+display PARSED_PRINTED_FILE[main]
+display PRINTED_FILE[main]
+
+
+close
+
+quit
+
+
+
+

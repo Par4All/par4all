@@ -1,0 +1,97 @@
+
+Cumulated effects for "main"
+
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static02:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static02:0`i
+main()
+{
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static02:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static02:0`i
+   // BEGIN BLOCK
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static02:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static02:0`i
+   static02();
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static02:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static02:0`i
+   static02();
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static02:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static02:0`i
+   static02();
+   // END BLOCK
+}
+
+Transformers for "static02"
+
+
+//  T(i) {i==i#init+1}
+
+void static02()
+{
+
+//  T(i) {i==i#init+1}
+
+   // BEGIN BLOCK
+   static int i = 0.;
+
+//  T(i) {i==i#init+1}
+
+
+   i++;
+
+//  T() {}
+
+   printf("%d\n", i);
+   // END BLOCK
+}
+
+Transformers for "main"
+
+
+//  T(static02:0`i) {static02:0`i==static02:0`i#init+3}
+
+main()
+{
+
+//  T(static02:0`i) {static02:0`i==static02:0`i#init+3}
+
+   // BEGIN BLOCK
+
+//  T(static02:0`i) {static02:0`i==static02:0`i#init+1}
+
+   static02();
+
+//  T(static02:0`i) {static02:0`i==static02:0`i#init+1}
+
+   static02();
+
+//  T(static02:0`i) {static02:0`i==static02:0`i#init+1}
+
+   static02();
+   // END BLOCK
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+main()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   static02();
+
+//  P(static02:0`i) {static02:0`i==static02:0`i#init+1}
+
+   static02();
+
+//  P(static02:0`i) {static02:0`i==static02:0`i#init+2}
+
+   static02();
+   // END BLOCK
+}

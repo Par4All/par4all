@@ -1,0 +1,133 @@
+
+Preconditions computed for user code
+
+
+C  P() {}
+
+      PROGRAM DOUBLEIF
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+
+      J = 2                                                             0005
+
+C  P(J) {J==2}
+
+
+      IF (J.EQ.3) THEN                                                  0007
+
+C  P() {0==-1}
+
+         I = 5                                                          0008
+      ELSE
+
+C  P(J) {J==2}
+
+         I = 4                                                          0010
+      ENDIF
+
+C  P(I,J) {I==4, J==2}
+
+
+      IF (I.EQ.4) THEN                                                  0013
+
+C  P(I,J) {I==4, J==2}
+
+         J = 6                                                          0014
+      ELSE
+
+C  P() {0==-1}
+
+         J = 7                                                          0016
+      ENDIF
+
+C  P(I,J) {I==4, J==6}
+
+
+      PRINT *, J                                                        0019
+
+      END
+
+Preconditions computed for unspaghettified user code
+
+
+C  P() {}
+
+      PROGRAM DOUBLEIF
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+
+      J = 2                                                             0005
+
+C  P(J) {J==2}
+
+
+      IF (J.EQ.3) THEN                                                  0007
+
+C  P() {0==-1}
+
+         I = 5                                                          0008
+      ELSE
+
+C  P(J) {J==2}
+
+         I = 4                                                          0010
+      ENDIF
+
+C  P(I,J) {I==4, J==2}
+
+
+      IF (I.EQ.4) THEN                                                  0013
+
+C  P(I,J) {I==4, J==2}
+
+         J = 6                                                          0014
+      ELSE
+
+C  P() {0==-1}
+
+         J = 7                                                          0016
+      ENDIF
+
+C  P(I,J) {I==4, J==6}
+
+
+      PRINT *, J                                                        0019
+
+      END
+
+Preconditions computed after dead code elimination
+
+
+C  P() {}
+
+      PROGRAM DOUBLEIF
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+
+      J = 2                                                             0005
+
+C  P(J) {J==2}
+
+
+      I = 4                                                             0010
+
+C  P(I,J) {I==4, J==2}
+
+
+      J = 6                                                             0014
+
+C  P(I,J) {I==4, J==6}
+
+
+      PRINT *, J                                                        0019
+
+      END

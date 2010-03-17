@@ -1,0 +1,33 @@
+
+C  P() {}
+
+      SUBROUTINE ALL02(I)
+      INTEGER I
+      COMMON /FOO/ J
+      DATA J /1/
+
+C  P() {}
+
+      I = 2                                                             0005
+
+C  P(I) {I==2}
+
+      PRINT *, I, J                                                     0006
+
+C  P(I) {I==2}
+
+
+      CALL BLA2(I)                                                      0008
+      END
+
+C  P() {I==2}
+
+
+      SUBROUTINE BLA2(I)
+      INTEGER I
+
+C  P() {I==2}
+
+      PRINT *, I                                                        0004
+      END
+

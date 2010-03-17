@@ -1,0 +1,8 @@
+# the purpose is NOT to coredump.
+delete csplit12
+echo splitting csplit12...
+create csplit12 csplit12.c
+close
+delete csplit12
+echo done.
+quit

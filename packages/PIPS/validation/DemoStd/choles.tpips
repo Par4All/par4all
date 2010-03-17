@@ -1,0 +1,19 @@
+delete choles
+create choles choles.f
+module CHOLES
+echo
+echo Preconditions for "CHOLES"
+echo
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[CHOLES]
+activate RICE_FULL_DEPENDENCE_GRAPH
+apply PRIVATIZE_MODULE[CHOLES]
+display PARALLELPRINTED_FILE[CHOLES]
+activate RICE_FAST_DEPENDENCE_GRAPH
+display PARALLELPRINTED_FILE[CHOLES]
+activate RICE_FULL_DEPENDENCE_GRAPH
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE[CHOLES]
+close
+delete choles
+quit

@@ -1,0 +1,36 @@
+delete FULL_UNROLL
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create FULL_UNROLL full_unroll.c
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+echo End of property settings
+
+echo
+echo before unrolling
+echo
+
+display PRINTED_FILE[foo]
+
+
+echo
+echo after unfolding and unrolling
+echo
+
+setproperty INLINING_PURGE_LABELS FALSE
+apply UNFOLDING[foo]
+setproperty LOOP_LABEL "l1"
+apply FULL_UNROLL[foo]
+setproperty LOOP_LABEL "l0"
+apply FULL_UNROLL[foo]
+display PRINTED_FILE[foo]
+
+close
+delete FULL_UNROLL
+quit

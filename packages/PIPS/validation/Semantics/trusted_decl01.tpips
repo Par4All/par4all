@@ -1,0 +1,14 @@
+delete trusted_decl01
+create trusted_decl01 trusted_decl01.f
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[TRUSTED_DECL01]
+
+close
+delete trusted_decl01

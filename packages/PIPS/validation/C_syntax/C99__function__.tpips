@@ -1,0 +1,27 @@
+delete C99__function__
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create C99__function__ C99__function__.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+display SYMBOL_TABLE_FILE[foo]
+display PARSED_PRINTED_FILE[foo]
+
+display SYMBOL_TABLE_FILE[main]
+display PARSED_PRINTED_FILE[main]
+
+# setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE[main]
+
+close
+
+delete C99__function__
+
+quit

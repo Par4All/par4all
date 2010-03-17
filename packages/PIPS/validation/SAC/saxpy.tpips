@@ -1,0 +1,15 @@
+delete SAXPY
+
+create SAXPY kernels/SAXPY/SAXPY.f include/simd.f
+
+module SAXPY
+
+source include/benchmark.tpips.h
+
+apply PRINT_C_CODE[SAXPY]
+apply PRINT_C_CODE[SAXPYREF]
+apply PRINT_C_CODE[MAIN]
+
+display C_PRINTED_FILE
+
+close

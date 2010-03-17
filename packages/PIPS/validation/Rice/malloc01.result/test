@@ -1,0 +1,107 @@
+
+Controlizer output
+
+void malloc01()
+{
+   int *p = malloc(10*sizeof(int));
+   //int p[10];
+   int i;
+
+   for(i = 0; i <= 9; i += 1)
+      p[i] = (double) i;
+}
+
+Preconditions
+
+
+//  P() {}
+
+void malloc01()
+{
+   int *p = malloc(10*sizeof(int));
+   //int p[10];
+   int i;
+
+//  P() {}
+
+
+   for(i = 0; i <= 9; i += 1)
+
+//  P(i) {0<=i, i<=9}
+
+      p[i] = (double) i;
+}
+
+Proper effects
+
+void malloc01()
+{
+   int *p = malloc(10*sizeof(int));
+   //int p[10];
+   int i;
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <must be read   >: i p
+//               <must be written>: p[i]
+      p[i] = (double) i;
+}
+
+Cumulated effects
+
+void malloc01()
+{
+   int *p = malloc(10*sizeof(int));
+   //int p[10];
+   int i;
+//               <may be read    >: i p
+//               <may be written >: p[*]
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <may be written >: p[*]
+//               <must be read   >: i p
+      p[i] = (double) i;
+}
+
+Regions
+
+void malloc01()
+{
+   int *p = malloc(10*sizeof(int));
+   //int p[10];
+   int i;
+
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
+
+
+   for(i = 0; i <= 9; i += 1)
+
+//  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      p[i] = (double) i;
+}
+
+ **************** Effective Dependence Graph ****************
+
+
+****************** End of Dependence Graph ******************
+
+Parallelization
+
+void malloc01()
+{
+   int *p = malloc(10*sizeof(int));
+   //int p[10];
+   int i;
+
+
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      p[i] = (double) i;
+}

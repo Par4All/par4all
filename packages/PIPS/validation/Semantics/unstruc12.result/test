@@ -1,0 +1,430 @@
+
+Code:
+
+      PROGRAM UNSTRUC12
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 1                                                             0007
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99996 CONTINUE
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (I.GT.NIM1) GOTO 60                                            0007
+C (16,1)
+      J = 1                                                             0008
+99997 CONTINUE
+C (6,1)
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 99999                                         0008
+C (8,1)
+      IF (P(I,J,KM).EQ.0.) GOTO 31                                      0009
+C (9,1)
+      K = IINF                                                          0010
+99998 CONTINUE
+C (10,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0010
+C (14,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0011
+C (15,1)
+C     BEGIN BLOCK
+C (15,2)
+41    CONTINUE                                                          0012
+C (15,3)
+      K = K+1                                                           0010
+C     END BLOCK
+      GOTO 99998
+C (11,1)
+42    VOLUME = ZMOYEN                                                   0013
+C (12,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0014
+C (4,1)
+      IF (ABS(DIFFE).GE.ABS(SOMME)) GOTO 45                             0015
+C (5,1)
+C     BEGIN BLOCK
+C (5,2)
+31    CONTINUE                                                          0016
+C (5,3)
+      J = J+1                                                           0008
+C     END BLOCK
+      GOTO 99997
+C (3,1)
+45    IF (IMPC.EQ.1) THEN                                               0020
+C (3,2)
+         WRITE (6, *)                                                   0020
+      ELSE
+C (3,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+C (13,1)
+44    IF (IMPC.EQ.1) THEN                                               0018
+C (13,2)
+         WRITE (6, *) SOMME                                             0018
+      ELSE
+C (13,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+99999 CONTINUE
+C (7,1)
+      I = I+1                                                           0007
+      GOTO 99996
+C (2,1)
+60    CONTINUE                                                          0023
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+
+Transformers
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC12
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+
+C  T(I,J,K) {1<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==1}
+
+C (0,2)
+      I = 1                                                             0007
+
+C  T(I,J,K) {I#init<=I}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99996 CONTINUE
+
+C  T() {}
+
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (I.GT.NIM1) GOTO 60                                            0007
+
+C  T(J) {J==1}
+
+C (16,1)
+      J = 1                                                             0008
+99997 CONTINUE
+
+C  T() {}
+
+C (6,1)
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 99999                                         0008
+
+C  T() {}
+
+C (8,1)
+      IF (P(I,J,KM).EQ.0.) GOTO 31                                      0009
+
+C  T(K) {IINF==K}
+
+C (9,1)
+      K = IINF                                                          0010
+99998 CONTINUE
+
+C  T() {}
+
+C (10,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0010
+
+C  T() {}
+
+C (14,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0011
+
+C  T(K) {K==K#init+1}
+
+C (15,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (15,2)
+41    CONTINUE                                                          0012
+
+C  T(K) {K==K#init+1}
+
+C (15,3)
+      K = K+1                                                           0010
+C     END BLOCK
+      GOTO 99998
+
+C  T() {}
+
+C (11,1)
+42    VOLUME = ZMOYEN                                                   0013
+
+C  T() {}
+
+C (12,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0014
+
+C  T() {}
+
+C (4,1)
+      IF (ABS(DIFFE).GE.ABS(SOMME)) GOTO 45                             0015
+
+C  T(J) {J==J#init+1}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (5,2)
+31    CONTINUE                                                          0016
+
+C  T(J) {J==J#init+1}
+
+C (5,3)
+      J = J+1                                                           0008
+C     END BLOCK
+      GOTO 99997
+
+C  T() {}
+
+C (3,1)
+45    IF (IMPC.EQ.1) THEN                                               0020
+
+C  T() {}
+
+C (3,2)
+         WRITE (6, *)                                                   0020
+      ELSE
+
+C  T() {}
+
+C (3,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+
+C  T() {}
+
+C (13,1)
+44    IF (IMPC.EQ.1) THEN                                               0018
+
+C  T() {}
+
+C (13,2)
+         WRITE (6, *) SOMME                                             0018
+      ELSE
+
+C  T() {}
+
+C (13,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+99999 CONTINUE
+
+C  T(I) {I==I#init+1}
+
+C (7,1)
+      I = I+1                                                           0007
+      GOTO 99996
+
+C  T() {}
+
+C (2,1)
+60    CONTINUE                                                          0023
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+
+Preconditions
+
+
+C  P() {}
+
+      PROGRAM UNSTRUC12
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+      I = 1                                                             0007
+
+C  P(I) {I==1}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99996 CONTINUE
+
+C  P(I,J,K) {1<=I}
+
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (I.GT.NIM1) GOTO 60                                            0007
+
+C  P(I,J,K) {1<=I, I<=NIM1}
+
+C (16,1)
+      J = 1                                                             0008
+99997 CONTINUE
+
+C  P(I,J,K) {1<=I, I<=NIM1, 1<=J}
+
+C (6,1)
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 99999                                         0008
+
+C  P(I,J,K) {1<=I, I<=NIM1, 1<=J, J<=NJM1}
+
+C (8,1)
+      IF (P(I,J,KM).EQ.0.) GOTO 31                                      0009
+
+C  P(I,J,K) {1<=I, I<=NIM1, 1<=J, J<=NJM1}
+
+C (9,1)
+      K = IINF                                                          0010
+99998 CONTINUE
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (10,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0010
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (14,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0011
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (15,1)
+C     BEGIN BLOCK
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (15,2)
+41    CONTINUE                                                          0012
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
+
+C (15,3)
+      K = K+1                                                           0010
+C     END BLOCK
+      GOTO 99998
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (11,1)
+42    VOLUME = ZMOYEN                                                   0013
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (12,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0014
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (4,1)
+      IF (ABS(DIFFE).GE.ABS(SOMME)) GOTO 45                             0015
+
+C  P(I,J,K) {1<=I, I<=NIM1, 1<=J, J<=NJM1}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  P(I,J,K) {1<=I, I<=NIM1, 1<=J, J<=NJM1}
+
+C (5,2)
+31    CONTINUE                                                          0016
+
+C  P(I,J,K) {1<=I, I<=NIM1, 1<=J, J<=NJM1}
+
+C (5,3)
+      J = J+1                                                           0008
+C     END BLOCK
+      GOTO 99997
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (3,1)
+45    IF (IMPC.EQ.1) THEN                                               0020
+
+C  P(I,J,K) {IMPC==1, 1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (3,2)
+         WRITE (6, *)                                                   0020
+      ELSE
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (3,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (13,1)
+44    IF (IMPC.EQ.1) THEN                                               0018
+
+C  P(I,J,K) {IMPC==1, 1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (13,2)
+         WRITE (6, *) SOMME                                             0018
+      ELSE
+
+C  P(I,J,K) {1<=I, I<=NIM1, IINF<=K, 1<=J, J<=NJM1}
+
+C (13,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+99999 CONTINUE
+
+C  P(I,J,K) {J==NJM1+1, 1<=I, I<=NIM1, 2<=J}
+
+C (7,1)
+      I = I+1                                                           0007
+      GOTO 99996
+
+C  P(I,J,K) {1<=I}
+
+C (2,1)
+60    CONTINUE                                                          0023
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+

@@ -1,0 +1,43 @@
+delete main
+create main main.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+#make PARSED_CODE[main]
+
+
+#activate PRINT_CODE_TRANSFORMERS
+
+#activate PRINT_CODE_PRECONDITIONS 
+
+echo
+echo Symbol table for "main!"
+echo
+
+display SYMBOL_TABLE_FILE[main!]
+
+echo
+echo Parsed printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+quit
+echo
+echo Printed file for "main"
+echo
+
+display PRINTED_FILE[main]
+
+close
+
+# delete main
+
+quit

@@ -1,0 +1,31 @@
+delete flatten_code06
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create flatten_code06 flatten_code06.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER  TRUE
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[flatten_code06]
+
+echo
+echo Code after flatten_code
+echo
+apply FLATTEN_CODE[flatten_code06]
+activate PRINT_CODE
+display PRINTED_FILE[flatten_code06]
+
+close
+delete flatten_code06
+quit
+

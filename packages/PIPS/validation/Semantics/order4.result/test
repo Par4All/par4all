@@ -1,0 +1,34 @@
+
+C  P() {}
+
+      PROGRAM ORDER4
+c     to check the ordering used to  print preconditions and transformers
+      INTEGER F1, F2, F3, F4, F5
+
+C  P() {}
+
+
+      F1 = 67                                                           0005
+
+C  P(F1) {F1==67}
+
+      F2 = -3                                                           0006
+
+C  P(F1,F2) {F1==67, F2==-3}
+
+      F3 = 0                                                            0007
+
+C  P(F1,F2,F3) {F1==67, F2==-3, F3==0}
+
+      F4 = 2                                                            0008
+
+C  P(F1,F2,F3,F4) {F1==67, F2==-3, F3==0, F4==2}
+
+      F5 = 8                                                            0009
+
+C  P(F1,F2,F3,F4,F5) {F1==67, F2==-3, F3==0, F4==2, F5==8}
+
+
+      PRINT *, F1, F2, F3, F4, F5                                       0011
+
+      END

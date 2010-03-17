@@ -1,0 +1,49 @@
+--- Preconditions for LOOPINIT3
+
+C  P() {}
+
+      PROGRAM LOOPINIT3
+
+c     Check that loop index initialization is performed correctly: the initial
+c     value of i is preserved by the loop because the loop is never executed.
+
+c     Simplified version of loopinit2 because inc(j) appears in an assignment
+c     instead of a loop lower bound.
+
+      REAL T(10)
+
+C  P() {}
+
+
+      J = 2                                                             0011
+
+C  P(J) {J==2}
+
+
+      N = 0                                                             0013
+
+C  P(J,N) {J==2, N==0}
+
+
+      K = INC(J)                                                        0015
+
+C  P(J,K,N) {J==3, K==3, N==0}
+
+
+      DO I = K, N                                                       0017
+
+C  P() {0==-1}
+
+         T(I) = 0.                                                      0018
+
+C  P() {0==-1}
+
+         J = J+2                                                        0019
+      ENDDO
+
+C  P(I,J,K,N) {I==3, J==3, K==3, N==0}
+
+
+      PRINT *, I, J                                                     0022
+
+      END

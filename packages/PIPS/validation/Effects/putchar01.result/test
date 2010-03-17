@@ -1,0 +1,75 @@
+
+Parsed code for "putchar01"
+
+void putchar01()
+{
+   (int) putchar((int) 'a');
+   (int) putchar((int) 'b');
+   (int) putchar((int) 'c');
+}
+
+Code for "putchar01"
+
+void putchar01()
+{
+   (int) putchar((int) 'a');
+   (int) putchar((int) 'b');
+   (int) putchar((int) 'c');
+}
+
+Proper effects for "putchar01"
+
+void putchar01()
+{
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (int) putchar((int) 'a');
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (int) putchar((int) 'b');
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (int) putchar((int) 'c');
+}
+
+Cumulated effects for "putchar01"
+
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+void putchar01()
+{
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (int) putchar((int) 'a');
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (int) putchar((int) 'b');
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (int) putchar((int) 'c');
+}
+
+Regions for "putchar01"
+
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+void putchar01()
+{
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   (int) putchar((int) 'a');
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   (int) putchar((int) 'b');
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   (int) putchar((int) 'c');
+}

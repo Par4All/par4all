@@ -1,0 +1,13 @@
+# bug about parameter dependences in clean decls...
+delete d6
+create d6 decl6.f
+setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
+setproperty ABORT_ON_USER_ERROR
+echo # before cleaning declarations
+display PRINTED_FILE
+echo # after cleaning declarations (u and a6 dropped)
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+#apply UNSPLIT
+close
+delete d6

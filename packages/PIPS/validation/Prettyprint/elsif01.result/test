@@ -1,0 +1,10 @@
+      PROGRAM ELSIF01
+      INTEGER I
+      IF (I.EQ.1) THEN                                                  0003
+         I = I+1                                                        0004
+      ELSEIF (I.EQ.5) THEN                                              0003
+         I = I-1                                                        0006
+      ELSE
+         I = I-2                                                        0008
+      ENDIF
+      END

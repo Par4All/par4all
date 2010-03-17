@@ -1,0 +1,36 @@
+
+PRINTED FILE
+
+      PROGRAM IFTHENELSE04
+
+      READ *, I                                                         0003
+
+      IF (I.EQ.0) THEN                                                  0005
+      ELSE
+         GOTO 1
+      ENDIF
+      PRINT *, I                                                        0006
+1     CONTINUE                                                          0008
+      IF (I.EQ.1) THEN                                                  0008
+         PRINT *, I+1                                                   0009
+      ELSE
+         PRINT *, I-1                                                   0011
+      ENDIF
+
+      END
+
+RESTRUCTURED FILE
+
+      PROGRAM IFTHENELSE04
+
+      READ *, I                                                         0003
+
+      IF (I.EQ.0) PRINT *, I                                            0005
+1     CONTINUE                                                          0008
+      IF (I.EQ.1) THEN                                                  0008
+         PRINT *, I+1                                                   0009
+      ELSE
+         PRINT *, I-1                                                   0011
+      ENDIF
+
+      END

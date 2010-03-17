@@ -1,0 +1,29 @@
+delete while_break
+create while_break while_break.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# setproperty PRETTYPRINT_BLOCKS TRUE
+# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+#display SOURCE_FILE[%ALL]
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[main]
+
+close
+delete while_break
+
+quit

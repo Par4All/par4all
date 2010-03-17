@@ -1,0 +1,32 @@
+void c_est_pourtant_magnifique()
+{
+   int y, m, c, a;
+   int u[2];
+   for(y = 2; y <= 46; y += 8) {
+      m = y;
+      for(c = m; c <= y*2; c += 1) {
+         a = m*4;
+         u[0] = 2;
+      }
+      u[0] = a;
+   }
+}
+extern void c_est_pourtant_magnifique();
+void c_est_pourtant_magnifique()
+{
+   int y, m, c, a;
+   int u[2];
+#pragma omp DO private(a,c,m,y)
+   for(y = 2; y <= 46; y += 8) {
+      private(a,c,m,y)
+      m = y;
+#pragma omp DO private(c)
+      for(c = m; c <= y*2; c += 1) {
+         private(c)
+         a = m*4;
+         u[0] = 2;
+      }
+      u[0] = a;
+   }
+}
+extern void c_est_pourtant_magnifique();

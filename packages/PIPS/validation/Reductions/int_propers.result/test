@@ -1,0 +1,86 @@
+
+Print code with proper reductions
+
+      PROGRAM PROPERS
+      INTEGER P,I,J,K,L
+      S = 0                                                             0003
+      P = 1                                                             0004
+      I = 2                                                             0005
+      J = 3                                                             0006
+      K = 4                                                             0007
+      L = 5                                                             0008
+C  call prod[P],
+!
+      P = P*2                                                           0010
+C  call prod[P],
+      P = 2*P                                                           0011
+C  call prod[P],
+      P = 2*L*K*P                                                       0012
+C  call sum[S],
+!
+      S = S+1                                                           0014
+C  call sum[S],
+      S = 1+S                                                           0015
+C  call sum[S],
+      S = I+S+J                                                         0016
+C  call sum[S],
+      S = S+I+J                                                         0017
+C  call sum[S],
+      S = I+J+S                                                         0018
+C  call sum[S],
+      S = S-I                                                           0019
+C  call sum[S],
+      S = S+3-J                                                         0020
+C  call sum[S],
+      S = L+K+S+J                                                       0021
+C  call prod[P],
+!
+      P = 3*I*P/J                                                       0023
+      P = 2*I/P                                                         0024
+C  call prod[P],
+      P = P/L                                                           0025
+      S = K-S                                                           0026
+      END
+
+Print code with cumulated reductions
+
+      PROGRAM PROPERS
+      INTEGER P,I,J,K,L
+      S = 0                                                             0003
+      P = 1                                                             0004
+      I = 2                                                             0005
+      J = 3                                                             0006
+      K = 4                                                             0007
+      L = 5                                                             0008
+C  call prod[P],
+!
+      P = P*2                                                           0010
+C  call prod[P],
+      P = 2*P                                                           0011
+C  call prod[P],
+      P = 2*L*K*P                                                       0012
+C  call sum[S],
+!
+      S = S+1                                                           0014
+C  call sum[S],
+      S = 1+S                                                           0015
+C  call sum[S],
+      S = I+S+J                                                         0016
+C  call sum[S],
+      S = S+I+J                                                         0017
+C  call sum[S],
+      S = I+J+S                                                         0018
+C  call sum[S],
+      S = S-I                                                           0019
+C  call sum[S],
+      S = S+3-J                                                         0020
+C  call sum[S],
+      S = L+K+S+J                                                       0021
+C  call prod[P],
+!
+      P = 3*I*P/J                                                       0023
+      P = 2*I/P                                                         0024
+C  call prod[P],
+      P = P/L                                                           0025
+      S = K-S                                                           0026
+      END

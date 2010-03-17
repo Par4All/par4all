@@ -1,0 +1,9 @@
+delete ed
+create ed edited.f
+display PRINTED_FILE
+shell mv ed.database/EDITED/EDITED.f foo.f ; sleep 2 ; \
+	sed 's,!!,,' < foo.f > ed.database/EDITED/EDITED.f ; rm foo.f
+display PRINTED_FILE
+close
+delete ed
+quit

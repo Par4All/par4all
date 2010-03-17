@@ -1,0 +1,14 @@
+
+C  T() {}
+
+      PROGRAM TYPE19
+
+C  T(IEPI) {IEPI<=NEP}
+
+
+      IEPI = MIN0(NEP, 1+INT(EPIN/DEP))                                 0003
+
+c      IEPI = INT(EPIN/DEP)
+
+      END
+

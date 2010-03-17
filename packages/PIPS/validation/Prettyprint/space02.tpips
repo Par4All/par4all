@@ -1,0 +1,33 @@
+delete space02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create space02 space02.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Parsed printed file for "space02" and "main" with default spacing
+echo
+
+display PARSED_PRINTED_FILE[SPACE02]
+display PARSED_PRINTED_FILE[MAIN]
+
+close
+delete space02
+
+create space02 space02.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_LISTS_WITH_SPACES FALSE
+
+echo
+echo Parsed printed file for "space02" and "main" with minimal spacing
+echo
+
+display PARSED_PRINTED_FILE[SPACE02]
+display PARSED_PRINTED_FILE[MAIN]
+
+close
+delete space02
+quit

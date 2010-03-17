@@ -1,0 +1,71 @@
+
+Symbol table
+
+ndecl11
+
+Declarations for module "ndecl11" with type "char * -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> enum m "
+	Declared entity "ndecl11!:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl11:*DYNAMIC*" with type "area" with size 24
+	Declared entity "ndecl11:*HEAP*" with type "area" with size 0
+	Declared entity "ndecl11:*STACK*" with type "area" with size 0
+	Declared entity "ndecl11:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl11:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "ndecl11:0`__func__" with type "variable" "char"
+	Declared entity "ndecl11:0`px" with type "variable" "enum m  *"
+	Declared entity "ndecl11:0`x" with type "variable" "enum m "
+	Declared entity "ndecl11:dir" with type "variable" "char *"
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "ndecl11:0`?m"	kind = enum
+
+Layout for formal parameters:
+
+	Variable ndecl11:dir	offset = 1
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl11!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl11:*DYNAMIC*" of size 24:
+	Variable "ndecl11:0`x"	offset = 16	size = 4
+	Variable "ndecl11:0`px"	offset = 20	size = 4
+	Variable "ndecl11:0`__func__"	offset = 0	size = 8
+	Variable "ndecl11:0`__FUNCTION__"	offset = 8	size = 8
+
+
+Layout for memory area "ndecl11:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl11:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl11:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module ndecl11
+
+
+Parsed printed file
+
+void ndecl11(char *dir)
+{
+   /* Well, x is a enum of name m: x declaration disappears... */
+   enum m {A, B, C} x, *px, foo();                                      /*0005*/
+}

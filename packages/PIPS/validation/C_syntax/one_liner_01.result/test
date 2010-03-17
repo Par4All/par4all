@@ -1,0 +1,19 @@
+
+PARSED PRINTED FILE FOR MODULE one_liner_01
+
+void one_liner_01()
+{
+   int x,  y,  z;
+
+   if (x>0) 
+      y++;
+   if (x>0) {
+      y++;
+      z++;
+   }
+   if (x>0)
+      ;
+}
+
+Compile parsed file one_liner_01
+

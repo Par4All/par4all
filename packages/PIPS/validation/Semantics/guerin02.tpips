@@ -1,0 +1,21 @@
+delete guerin02
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty FSMIZE_WITH_GLOBAL_VARIABLE FALSE
+setproperty UNSPAGHETTIFY_IN_CONTROLIZER TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+create guerin02 guerin02.f
+apply FULL_SPAGHETTIFY
+display PRINTED_FILE
+apply FSM_GENERATION
+display PRINTED_FILE
+apply PARTIAL_EVAL
+close
+delete guerin02
+quit
+
+
+
+
+
+
+

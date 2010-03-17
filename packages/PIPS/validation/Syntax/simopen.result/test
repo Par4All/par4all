@@ -1,0 +1,8 @@
+      PROGRAM SIMOPEN
+
+C     Bug dans simula (sidolo package)
+
+      OPEN (UNIT=ISCA,FILE=FICHS,RECL=LONREC*(NSCAL+MAXVOBS+NSCAL2),    0005
+     &ACCESS='direct')                                                  0005
+
+      END

@@ -1,0 +1,44 @@
+delete function_name_conflict01
+
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+create function_name_conflict01 function_name_conflict01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+echo
+echo Parsed printed file for "rand"
+echo
+
+# This should fail
+display PARSED_PRINTED_FILE[rand]
+
+close
+open function_name_conflict01
+echo
+echo Warnings for "rand"
+echo
+
+shell cat function_name_conflict01.database/Warnings
+
+echo
+echo Parsed printed file for "function_name_conflict01"
+echo
+
+display PARSED_PRINTED_FILE[function_name_conflict01]
+
+display CALLGRAPH_FILE[function_name_conflict01]
+
+close
+
+# delete function_name_conflict01
+
+quit

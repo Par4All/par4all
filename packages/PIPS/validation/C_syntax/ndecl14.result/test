@@ -1,0 +1,4 @@
+union {
+   int buf;
+   struct {int x;} w;
+} adr;

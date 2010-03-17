@@ -1,0 +1,120 @@
+
+Symbol table for "pragma01"
+
+pragma01
+
+Declarations for module "pragma01" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "pragma01!:*STATIC*" with type "area" with size 0
+	Declared entity "pragma01:*DYNAMIC*" with type "area" with size 38
+	Declared entity "pragma01:*HEAP*" with type "area" with size 0
+	Declared entity "pragma01:*STACK*" with type "area" with size 0
+	Declared entity "pragma01:*STATIC*" with type "area" with size 0
+	Declared entity "pragma01:0`1`j" with type "variable" "int"
+	Declared entity "pragma01:0`2`j" with type "variable" "int"
+	Declared entity "pragma01:0`3`j" with type "variable" "int"
+	Declared entity "pragma01:0`4`j" with type "variable" "int"
+	Declared entity "pragma01:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "pragma01:0`__func__" with type "variable" "char"
+	Declared entity "pragma01:0`i" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma01:*DYNAMIC*" of size 38:
+	Variable "pragma01:0`i"	offset = 18	size = 4
+	Variable "pragma01:0`1`j"	offset = 22	size = 4
+	Variable "pragma01:0`2`j"	offset = 26	size = 4
+	Variable "pragma01:0`3`j"	offset = 30	size = 4
+	Variable "pragma01:0`4`j"	offset = 34	size = 4
+	Variable "pragma01:0`__func__"	offset = 0	size = 9
+	Variable "pragma01:0`__FUNCTION__"	offset = 9	size = 9
+
+
+Layout for memory area "pragma01:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma01:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma01:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module pragma01
+
+
+Parsed printed file
+
+void pragma01()
+{
+   int i;
+#pragma  omp parallel num_threads (16)
+   {
+      int j;
+
+      j = i;
+   }
+#pragma  omp parallel for
+
+   for (i = 0;i<10;i++) {
+      int j = i+1;
+   }
+#pragma  omp parallel for
+   /* Some comment */
+   
+   // And other
+   for (i = 0;i<10;i++) {
+      int j = i+1;
+   }
+#pragma  omp parallel for
+   
+   
+   for (i = 0;i<10;i++) {
+      int j = i+1;
+   }
+}
+
+Printed file
+
+void pragma01()
+{
+   int i;
+   {
+      int j;
+
+      j = i;
+   }
+#pragma  omp parallel for
+
+   for(i = 0; i <= 9; i += 1) {
+      int j = i+1;
+   }
+#pragma  omp parallel for
+   /* Some comment */
+   
+   // And other
+   for(i = 0; i <= 9; i += 1) {
+      int j = i+1;
+   }
+#pragma  omp parallel for
+   
+   
+   for(i = 0; i <= 9; i += 1) {
+      int j = i+1;
+   }
+}

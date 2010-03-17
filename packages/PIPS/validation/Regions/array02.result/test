@@ -1,0 +1,333 @@
+void compute(int maxcompute)
+{
+   int i, j;
+
+   for(i = 0; i <= maxcompute-1; i += 1)
+      for(j = 0; j <= maxcompute-1; j += 1) {
+         image[i][j].re = (i+j)*3.14159265358979323846;
+         image[i][j].im = 1.0e-37;
+      }
+}
+int main()
+{
+
+   int i, j;
+   int maxmain = 64/2;
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         image[i][j].re = 0.0;
+         image[i][j].im = 0.0;
+      }
+
+   compute(maxmain);
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1)
+         fprintf(stdout, "[%d][%d].re = %f\n", i, j, image[i][j].re);
+
+   return 0;
+}
+Select the most precise analysis:
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=31,
+//    0<=PHI2, PHI2<=31, 1<=PHI3, PHI3<=2, maxcompute==32}>
+
+void compute(int maxcompute)
+{
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=31,
+//    0<=PHI2, PHI2<=31, 1<=PHI3, PHI3<=2, maxcompute==32}>
+
+   // BEGIN BLOCK
+   int i, j;
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=31,
+//    0<=PHI2, PHI2<=31, 1<=PHI3, PHI3<=2, maxcompute==32}>
+
+
+   for(i = 0; i <= maxcompute-1; i += 1)
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, 0<=PHI2,
+//    PHI2<=31, 1<=PHI3, PHI3<=2, maxcompute==32, 0<=i, i<=31}>
+
+      for(j = 0; j <= maxcompute-1; j += 1) {
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    1<=PHI3, PHI3<=2, maxcompute==32, 0<=i, i<=31, 0<=j, j<=31}>
+
+         // BEGIN BLOCK
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==1, maxcompute==32, 0<=i, i<=31, 0<=j, j<=31}>
+
+         image[i][j].re = (i+j)*3.14159265358979323846;
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==2, maxcompute==32, 0<=i, i<=31, 0<=j, j<=31}>
+
+         image[i][j].im = 1.0e-37;
+         // END BLOCK
+      }
+   // END BLOCK
+}
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-R-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=63, 0<=PHI2, PHI2<=63}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=63,
+//    0<=PHI2, PHI2<=63, 1<=PHI3, PHI3<=2}>
+//  <TOP-LEVEL:stdout-R-EXACT-{}>
+//  <TOP-LEVEL:stdout[PHI1]-R-MAY-{}>
+//  <TOP-LEVEL:stdout[PHI1]-W-MAY-{}>
+
+int main()
+{
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-R-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=63, 0<=PHI2, PHI2<=63, maxmain==32}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=63,
+//    0<=PHI2, PHI2<=63, 1<=PHI3, PHI3<=2, maxmain==32}>
+//  <TOP-LEVEL:stdout-R-EXACT-{}>
+//  <TOP-LEVEL:stdout[PHI1]-R-MAY-{maxmain==32}>
+//  <TOP-LEVEL:stdout[PHI1]-W-MAY-{maxmain==32}>
+
+   // BEGIN BLOCK
+
+   int i, j;
+   int maxmain = 64/2;
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=63,
+//    0<=PHI2, PHI2<=63, 1<=PHI3, PHI3<=2, maxmain==32}>
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, 0<=PHI2,
+//    PHI2<=63, 1<=PHI3, PHI3<=2, maxmain==32, 0<=i, i<=63}>
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    1<=PHI3, PHI3<=2, maxmain==32, 0<=i, i<=63, 0<=j, j<=63}>
+
+         // BEGIN BLOCK
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==1, maxmain==32, 0<=i, i<=63, 0<=j, j<=63}>
+
+         image[i][j].re = 0.0;
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==2, maxmain==32, 0<=i, i<=63, 0<=j, j<=63}>
+
+         image[i][j].im = 0.0;
+         // END BLOCK
+      }
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=31,
+//    0<=PHI2, PHI2<=31, 1<=PHI3, PHI3<=2, maxmain==32}>
+
+
+   compute(maxmain);
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-R-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=63, 0<=PHI2, PHI2<=63, maxmain==32}>
+//  <TOP-LEVEL:stdout-R-EXACT-{}>
+//  <TOP-LEVEL:stdout[PHI1]-R-MAY-{maxmain==32}>
+//  <TOP-LEVEL:stdout[PHI1]-W-MAY-{maxmain==32}>
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==i, PHI3==1,
+//    0<=PHI2, PHI2<=63, maxmain==32, 0<=i, i<=63}>
+//  <TOP-LEVEL:stdout-R-EXACT-{}>
+//  <TOP-LEVEL:stdout[PHI1]-R-MAY-{maxmain==32, 0<=i, i<=63}>
+//  <TOP-LEVEL:stdout[PHI1]-W-MAY-{maxmain==32, 0<=i, i<=63}>
+
+      for(j = 0; j <= 63; j += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==1, maxmain==32, 0<=i, i<=63, 0<=j, j<=63}>
+//  <TOP-LEVEL:stdout-R-EXACT-{}>
+//  <TOP-LEVEL:stdout[PHI1]-R-MAY-{maxmain==32, 0<=i, i<=63, 0<=j,
+//    j<=63}>
+//  <TOP-LEVEL:stdout[PHI1]-W-MAY-{maxmain==32, 0<=i, i<=63, 0<=j,
+//    j<=63}>
+
+         fprintf(stdout, "[%d][%d].re = %f\n", i, j, image[i][j].re);
+
+   return 0;
+   // END BLOCK
+}
+void compute(int maxcompute)
+{
+   // BEGIN BLOCK
+   int i, j;
+
+   for(i = 0; i <= maxcompute-1; i += 1)
+      for(j = 0; j <= maxcompute-1; j += 1) {
+         // BEGIN BLOCK
+         image[i][j].re = (i+j)*3.14159265358979323846;
+         image[i][j].im = 1.0e-37;
+         // END BLOCK
+      }
+   // END BLOCK
+}
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
+
+int main()
+{
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{maxmain==32}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
+
+   // BEGIN BLOCK
+
+   int i, j;
+   int maxmain = 64/2;
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         // BEGIN BLOCK
+         image[i][j].re = 0.0;
+         image[i][j].im = 0.0;
+         // END BLOCK
+      }
+
+   compute(maxmain);
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-IN-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=63, 0<=PHI2, PHI2<=63, maxmain==32}>
+//  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{maxmain==32}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-IN-EXACT-{PHI1==i, PHI3==1,
+//    0<=PHI2, PHI2<=63, maxmain==32, 0<=i, i<=63}>
+//  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{maxmain==32, 0<=i, i<=63}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
+
+      for(j = 0; j <= 63; j += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-IN-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==1, maxmain==32, 0<=i, i<=63, 0<=j, j<=63}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
+//  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{maxmain==32, 0<=i, i<=63, 0<=j,
+//    j<=63}>
+
+         fprintf(stdout, "[%d][%d].re = %f\n", i, j, image[i][j].re);
+
+   return 0;
+   // END BLOCK
+}
+int main()
+{
+   // BEGIN BLOCK
+
+   int i, j;
+   int maxmain = 64/2;
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-MAY-{PHI3==1, 0<=PHI1,
+//    PHI1<=63, 0<=PHI2, PHI2<=63, 32<=PHI1+PHI2, maxmain==32}>
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-MAY-{i==PHI1, PHI3==1,
+//    0<=PHI2, PHI2<=63, 32<=PHI1+PHI2, maxmain==32, 0<=i, i<=63}>
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-MAY-{PHI1==i, PHI2==j,
+//    PHI3==1, 32<=PHI1+PHI2, maxmain==32, 0<=i, i<=63, 0<=j, j<=63}>
+
+         // BEGIN BLOCK
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-MAY-{i==PHI1, j==PHI2,
+//    PHI3==1, 32<=PHI1+PHI2, maxmain==32, 0<=i, i<=63, 0<=j, j<=63}>
+
+         image[i][j].re = 0.0;
+         image[i][j].im = 0.0;
+         // END BLOCK
+      }
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=31, 0<=PHI2, PHI2<=31, maxmain==32}>
+
+
+   compute(maxmain);
+
+   for(i = 0; i <= 63; i += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, i<=63}>
+//  <TOP-LEVEL:stdout[PHI1]-OUT-MAY-{maxmain==32, 0<=i, i<=62}>
+
+      for(j = 0; j <= 63; j += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=j, j<=63}>
+//  <TOP-LEVEL:stdout[PHI1]-OUT-MAY-{maxmain==32, 0<=i, i+j<=125,
+//    i<=63, 0<=j, j<=63}>
+
+         fprintf(stdout, "[%d][%d].re = %f\n", i, j, image[i][j].re);
+
+   return 0;
+   // END BLOCK
+}
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=31, 0<=PHI2, PHI2<=31, maxcompute==32}>
+
+void compute(int maxcompute)
+{
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=31, 0<=PHI2, PHI2<=31, maxcompute==32}>
+
+   // BEGIN BLOCK
+   int i, j;
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-EXACT-{PHI3==1, 0<=PHI1,
+//    PHI1<=31, 0<=PHI2, PHI2<=31, maxcompute==32}>
+
+
+   for(i = 0; i <= maxcompute-1; i += 1)
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-EXACT-{i==PHI1, PHI3==1,
+//    0<=PHI2, PHI2<=31, maxcompute==32, 0<=i, i<=31}>
+
+      for(j = 0; j <= maxcompute-1; j += 1) {
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==1, maxcompute==32, 0<=i, i<=31, 0<=j, j<=31}>
+
+         // BEGIN BLOCK
+
+//  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-OUT-EXACT-{i==PHI1, j==PHI2,
+//    PHI3==1, maxcompute==32, 0<=i, i<=31, 0<=j, j<=31}>
+
+         image[i][j].re = (i+j)*3.14159265358979323846;
+         image[i][j].im = 1.0e-37;
+         // END BLOCK
+      }
+   // END BLOCK
+}

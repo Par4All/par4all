@@ -1,0 +1,44 @@
+delete dw2w01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create dw2w01 dowhile_to_while01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after conversion
+echo
+
+apply DOWHILE_TO_WHILE[main]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+
+echo
+echo Run code
+echo
+
+shell gcc dowhile_to_while01.c
+shell ./a.out 
+shell gcc dw2w01.database/Src/dowhile_to_while01.c
+shell ./a.out 
+shell rm -f a.out
+
+close
+delete dw2w01
+quit
+
+

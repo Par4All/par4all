@@ -1,0 +1,44 @@
+delete adi
+
+create adi adi.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+# Handling of one liner statements guarded by a test:
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 4
+
+activate C_PARSER
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+#activate PRINT_CODE_TRANSFORMERS
+
+#display PRINTED_FILE[adi!]
+#display PRINTED_FILE[tridag]
+
+echo
+echo Unsplit adi
+echo
+
+# Added the next line to avoid pipddbm to fail in unsplit...
+# display PRINTED_FILE[adi!]
+
+apply UNSPLIT[%PROGRAM]
+shell cat adi.database/Src/adi.c
+shell cc -c adi.database/Src/adi.c
+shell rm -f adi.o
+
+close
+
+#delete adi
+
+quit
+
+
+
+

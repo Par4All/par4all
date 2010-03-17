@@ -1,0 +1,83 @@
+# Optimization by unrolling of loop 100 and 200,
+# and by repetitive partial evaluation
+
+delete convol-unroll
+#create convol-unroll ${PIPS_ROOT}/Validation/Transformations/convol-unroll.f
+create convol-unroll convol-unroll.f
+
+setproperty	PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# Show convolution function
+#
+module convol
+display PRINTED_FILE
+shell cp convol-unroll.database/CONVOL/CONVOL.pref CONVOL01.f
+
+# Show main program
+#
+module IMAGE_PROCESSING
+
+display PRINTED_FILE
+shell cp convol-unroll.database/IMAGE_PROCESSING/IMAGE_PROCESSING.pref CONVOL_MAIN.f
+
+# Show interprocedural preconditions for module convol
+#
+module convol
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL 
+activate TRANSFORMERS_INTER_FULL  
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE
+shell cp convol-unroll.database/CONVOL/CONVOL.prec CONVOL01P.f
+
+activate PRINT_CODE
+
+# Propagate constants (cloning could be used too)
+#
+apply PARTIAL_EVAL
+display PRINTED_FILE 
+shell cp convol-unroll.database/CONVOL/CONVOL.pref CONVOL02.f
+
+# Unroll internal loops
+#
+apply FULL_UNROLL
+100
+
+apply FULL_UNROLL
+200
+
+display PRINTED_FILE
+shell cp convol-unroll.database/CONVOL/CONVOL.pref CONVOL03.f
+
+# Eliminate useless variables
+#
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+shell cp convol-unroll.database/CONVOL/CONVOL.pref CONVOL04.f
+
+# Simplify subscript expressions
+#
+apply PARTIAL_EVAL
+display PRINTED_FILE 
+shell cp convol-unroll.database/CONVOL/CONVOL.pref CONVOL05.f
+
+# Increase locality
+#
+apply LOOP_INTERCHANGE
+400
+display PRINTED_FILE
+shell cp convol-unroll.database/CONVOL/CONVOL.pref CONVOL06.f
+
+# Reduce memory footprint
+#
+apply LOOP_TILING
+400
+10 0
+0 10
+display PRINTED_FILE[my]
+shell cp convol-unroll.database/CONVOL/CONVOL.pref CONVOL07.f
+
+quit

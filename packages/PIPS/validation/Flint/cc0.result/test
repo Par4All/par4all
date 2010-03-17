@@ -1,0 +1,13 @@
+### initial version
+      PROGRAM CC0
+      COMPLEX C
+      C = (1.0E0, 1.0E0)                                                0001
+      C = CMPLX(1.0E0, 1.0E0)                                           0002
+      END
+### after type checking
+!PIPS TYPER: 0 errors, 0 conversions, 0 simplifications
+      PROGRAM CC0
+      COMPLEX C
+      C = CMPLX(1.0E0, 1.0E0)                                           0001
+      C = CMPLX(1.0E0, 1.0E0)                                           0002
+      END

@@ -1,0 +1,10 @@
+delete extending02c
+create extending02c extending02.c
+
+set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+apply PREPEND_CALL
+display PRINTED_FILE
+display CALLGRAPH_FILE[extending02]
+close
+quit

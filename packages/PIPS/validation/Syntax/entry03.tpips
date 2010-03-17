@@ -1,0 +1,18 @@
+delete entry03
+create entry03 entry03.f
+
+echo
+echo Module ENTRY03
+echo
+
+display CALLGRAPH_FILE[ENTRY03]
+
+echo
+echo 'Call graph file ENTRY03 (with too many callees?)'
+echo
+
+display PRINTED_FILE[ENTRY03]
+
+close
+delete entry03
+quit

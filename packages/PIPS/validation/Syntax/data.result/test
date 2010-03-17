@@ -1,0 +1,42 @@
+      BLOCKDATA BLA
+      INTEGER I, J
+      COMMON /FOO/ I, J
+      DATA I /4/
+      END
+      BLOCKDATA DATA000
+      INTEGER I, J
+      COMMON /FOO/ I, J
+      DATA J /5/
+      END
+      PROGRAM MAIN000
+      INTEGER I, J
+      COMMON /FOO/ I, J
+      PRINT *, I, J                                                     0004
+      END
+
+C  P() {0==-1}
+
+      BLOCKDATA BLA
+      INTEGER I, J
+      COMMON /FOO/ I, J
+      DATA I /4/
+      END
+
+C  P() {0==-1}
+
+      BLOCKDATA DATA000
+      INTEGER I, J
+      COMMON /FOO/ I, J
+      DATA J /5/
+      END
+
+C  P() {I==4, J==5}
+
+      PROGRAM MAIN000
+      INTEGER I, J
+      COMMON /FOO/ I, J
+
+C  P() {I==4, J==5}
+
+      PRINT *, I, J                                                     0004
+      END

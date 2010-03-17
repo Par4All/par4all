@@ -1,0 +1,144 @@
+
+Parsed printed file for "update02"
+
+void update02()
+{
+   int i = 1;
+   int j;
+   
+   //i = (i+= 2);
+   j = i += 2;
+   j = i++;
+   j = i--;
+   j = ++i;
+   j = --i;
+   foo(j);
+}
+
+Proper effects for "update02"
+
+void update02()
+{
+   int i = 1;
+   int j;
+//               <must be read   >: i
+//               <must be written>: i j
+   
+   //i = (i+= 2);
+   j = i += 2;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = i++;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = i--;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = ++i;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = --i;
+//               <must be read   >: j
+   foo(j);
+}
+
+Cumulated effects for "update02"
+
+void update02()
+{
+   int i = 1;
+   int j;
+//               <must be read   >: i
+//               <must be written>: i j
+   
+   //i = (i+= 2);
+   j = i += 2;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = i++;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = i--;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = ++i;
+//               <must be read   >: i
+//               <must be written>: i j
+   j = --i;
+//               <must be read   >: j
+   foo(j);
+}
+
+Transformers for "update02"
+
+
+//  T() {}
+
+void update02()
+{
+   int i = 1;
+   int j;
+
+//  T(i,j) {i==i#init+2, i==j}
+
+   
+   //i = (i+= 2);
+   j = i += 2;
+
+//  T(i,j) {i==i#init+1, i==j+1}
+
+   j = i++;
+
+//  T(i,j) {i==i#init-1, i==j-1}
+
+   j = i--;
+
+//  T(i,j) {i==i#init+1, i==j}
+
+   j = ++i;
+
+//  T(i,j) {i==i#init-1, i==j}
+
+   j = --i;
+
+//  T() {}
+
+   foo(j);
+}
+
+Preconditions for "update02"
+
+
+//  P() {}
+
+void update02()
+{
+   int i = 1;
+   int j;
+
+//  P() {i==1}
+
+   
+   //i = (i+= 2);
+   j = i += 2;
+
+//  P(i,j) {i==3, j==3}
+
+   j = i++;
+
+//  P(i,j) {i==4, j==3}
+
+   j = i--;
+
+//  P(i,j) {i==3, j==4}
+
+   j = ++i;
+
+//  P(i,j) {i==4, j==4}
+
+   j = --i;
+
+//  P(i,j) {i==3, j==3}
+
+   foo(j);
+}

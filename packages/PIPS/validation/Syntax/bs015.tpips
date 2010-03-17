@@ -1,0 +1,6 @@
+delete bs015
+create bs015 bs015.f
+display PRINTED_FILE[BS015]
+close
+delete bs015
+

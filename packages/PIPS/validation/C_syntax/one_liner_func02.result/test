@@ -1,0 +1,122 @@
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
+float b(double c)
+{
+   return b;                                                            /*0003*/
+}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
+void f(void)
+{
+}
+extern void f(void);                                                    /*0001*/
+/* and a a */
+extern int a(char *b);                                                  /*0003*/
+extern float b(double c);                                               /*0004*/
+int i = 9;                                                              /*0005*/
+extern float c(int d);                                                  /*0006*/
+/**<nice!*/
+
+double zz;                                                              /*0009*/
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
+float b(double c)
+{
+   return b;                                                            /*0003*/
+}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
+void f(void)
+{
+}
+extern void f(void);                                                    /*0001*/
+/* and a a */
+extern int a(char *b);                                                  /*0003*/
+extern float b(double c);                                               /*0004*/
+int i = 9;                                                              /*0005*/
+extern float c(int d);                                                  /*0006*/
+/**<nice!*/
+
+double zz;                                                              /*0009*/
+/* Oh one f */void f (void) {} /* and a a */ int a(char * b){ fputs(b); }float b(double c) {
+  return b;}int i=9;float c(int d){return i+d;}/**<nice!*/
+
+double zz;
+
+/* The end! */
+# 1
+int a(char * b){ fputs(b); }
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
+# 1
+float b(double c) {
+  return b;}
+float b(double c)
+{
+   return b;                                                            /*0003*/
+}
+float b(double c)
+{
+   return b;                                                            /*0003*/
+}
+# 2
+float c(int d){return i+d;}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
+# 1
+/* Oh one f */void f (void) {}
+void f(void)
+{
+}
+void f(void)
+{
+}
+extern void f(void);
+ /* and a a */ 
+extern int a(char *b);
+extern float b(double c);
+int i=9;
+extern float c(int d);
+/**<nice!*/
+
+double zz;
+
+/* The end! */
+extern void f(void);                                                    /*0001*/
+/* and a a */
+extern int a(char *b);                                                  /*0003*/
+extern float b(double c);                                               /*0004*/
+int i = 9;                                                              /*0005*/
+extern float c(int d);                                                  /*0006*/
+/**<nice!*/
+
+double zz;                                                              /*0009*/
+extern void f(void);                                                    /*0001*/
+/* and a a */
+extern int a(char *b);                                                  /*0003*/
+extern float b(double c);                                               /*0004*/
+int i = 9;                                                              /*0005*/
+extern float c(int d);                                                  /*0006*/
+/**<nice!*/
+
+double zz;                                                              /*0009*/

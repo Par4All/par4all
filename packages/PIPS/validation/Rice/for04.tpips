@@ -1,0 +1,41 @@
+delete for04
+
+setproprety ABORT_ON_USER_ERROR TRUE
+
+create for04 for04.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+# Select the most precise analyses:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+# Compute the intraprocedural preconditions at the same time as
+# transformers and use them to improve the accuracy of expression
+# and statement transformers:
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+#setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+# Try to restructure the code for more precision:
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+
+# Privatize scalar variables
+apply PRIVATIZE_MODULE[for04]
+
+# Ask for the parallelization of "for04"
+activate RICE_ALL_DEPENDENCE
+apply COARSE_GRAIN_PARALLELIZATION[for04]
+display PRINTED_FILE[for04]
+
+close
+quit

@@ -1,0 +1,44 @@
+delete array_to_pointer01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create array_to_pointer01 array_to_pointer01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[duck]
+
+echo
+echo Code after array conversion
+echo
+
+apply ARRAY_TO_POINTER[duck]
+display PRINTED_FILE[duck]
+
+echo
+echo Code after partial eval
+echo
+
+apply PARTIAL_EVAL[duck]
+display PRINTED_FILE[duck]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc array_to_pointer01.c -o array_to_pointer
+shell gcc array_to_pointer01.database/Src/array_to_pointer01.c  -o array_to_pointer01.database/Src/array_to_pointer
+shell if test `array_to_pointer01.database/Src/array_to_pointer` = `./array_to_pointer`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf array_to_pointer01.database/Src/array_to_pointer array_to_pointer
+
+close
+delete array_to_pointer01
+quit
+

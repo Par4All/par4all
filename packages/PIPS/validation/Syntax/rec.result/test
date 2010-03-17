@@ -1,0 +1,30 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: rec: No such workspace
+Registering file rec.f
+Splitting file    ./rec.f
+  Module         REC
+Workspace rec created and opened.
+Module REC selected
+Module REC already active.
+Request: build resource PRINTED_FILE for module REC.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(REC)
+  PARSER                         building   PARSED_CODE(REC)
+                                 building   CALLEES(REC)
+user warning in update_called_modules: Recursive call from REC to REC
+user error in update_called_modules: Parser error between lines 6 and 6
+Recursive call are not supported
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module REC.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module REC.
+Closing program.
+Closing workspace.
+Workspace rec closed.
+
+Workspace rec deleted.

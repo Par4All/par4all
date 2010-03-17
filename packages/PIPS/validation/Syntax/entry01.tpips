@@ -1,0 +1,20 @@
+delete entry01
+create entry01 entry01.f
+
+echo
+echo Module ENTRY01
+echo
+
+# display PARSED_PRINTED_FILE[ENTRY01]
+display PRINTED_FILE[ENTRY01]
+
+# quit
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+close
+delete entry01
+quit

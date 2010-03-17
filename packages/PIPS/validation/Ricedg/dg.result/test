@@ -1,0 +1,17 @@
+
+First dependence graph for "IMPACT"
+
+6 7 W W <A> - <A> levels()
+5 6 W W <B> - <B> levels()
+4 6 W W <A> - <A> levels()
+
+First dependence graph for "FOO"
+
+7 9 W W <Y> - <Y> levels()
+4 6 W W <X> - <X> levels()
+
+First dependence graph for "FOO1"
+
+4 5 W R <X(1)> - <X(2)> levels()
+4 5 W W <X(1)> - <X(2)> levels()
+

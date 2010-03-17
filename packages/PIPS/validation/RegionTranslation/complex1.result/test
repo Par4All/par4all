@@ -1,0 +1,170 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+C     interprocedural translation: complex <-> real
+      PROGRAM TCOMP
+      REAL RA(10), RAB(5,2), RB(5,5,5), RC(10,5,5)
+
+C  <RA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+
+      CALL TCOMP1(RA)                                                   0001
+
+C  <RAB(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=2}>
+
+      CALL TCOMP1B(RAB)                                                 0002
+
+C  <RB(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5,
+C    PHI3<=5, 41<=PHI1+5PHI2+25PHI3}>
+
+
+      CALL TCOMP2(RB(1,3,1), 25)                                        0003
+
+C  <RB(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5,
+C    PHI3<=5, 32<=PHI1+5PHI2+25PHI3}>
+
+      CALL TCOMP2(RB(2,1,1), 25)                                        0004
+
+C  <RC(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=5,
+C    PHI3<=5, 8<=PHI2+5PHI3}>
+
+      CALL TCOMP2(RC(1,3,1), 25)                                        0005
+
+C  <RC(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=5,
+C    1<=PHI3, PHI3<=5}>
+
+      CALL TCOMP2(RC, 25)                                               0006
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <RA(PHI1)-R-EXACT-{}>
+
+
+      PRINT *, RA                                                       0007
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <RAB(PHI1,PHI2)-R-EXACT-{}>
+
+      PRINT *, RAB                                                      0008
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <RB(PHI1,PHI2,PHI3)-R-EXACT-{}>
+
+      PRINT *, RB                                                       0009
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <RC(PHI1,PHI2,PHI3)-R-EXACT-{}>
+
+      PRINT *, RC                                                       0010
+      END
+C     interprocedural translation: complex <-> real
+      PROGRAM TCOMP
+      REAL RA(10), RAB(5,2), RB(5,5,5), RC(10,5,5)
+
+C  <RA(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=10}>
+
+
+      CALL TCOMP1(RA)                                                   0001
+
+C  <RAB(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=2}>
+
+      CALL TCOMP1B(RAB)                                                 0002
+
+C  <RB(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5,
+C    PHI3<=5, 41<=PHI1+5PHI2+25PHI3}>
+
+
+      CALL TCOMP2(RB(1,3,1), 25)                                        0003
+
+C  <RB(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5,
+C    PHI3<=5, 32<=PHI1+5PHI2+25PHI3}>
+
+      CALL TCOMP2(RB(2,1,1), 25)                                        0004
+
+C  <RC(PHI1,PHI2,PHI3)-OUT-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=5,
+C    PHI3<=5, 8<=PHI2+5PHI3}>
+
+      CALL TCOMP2(RC(1,3,1), 25)                                        0005
+
+C  <RC(PHI1,PHI2,PHI3)-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=5,
+C    1<=PHI3, PHI3<=5}>
+
+      CALL TCOMP2(RC, 25)                                               0006
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+
+      PRINT *, RA                                                       0007
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+      PRINT *, RAB                                                      0008
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+      PRINT *, RB                                                       0009
+      PRINT *, RC                                                       0010
+      END
+
+C  <C(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+
+
+      SUBROUTINE TCOMP1(C)
+      COMPLEX C(5)
+
+C  <C(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+
+
+      DO I = 1, 5                                                       0001
+
+C  <C(PHI1)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=5}>
+
+         C(I) = CMPLX(0.0, 0.0)                                         0002
+      ENDDO
+      END
+
+C  <C(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+
+
+      SUBROUTINE TCOMP1B(C)
+      COMPLEX C(5)
+
+C  <C(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+
+
+      DO I = 1, 5                                                       0001
+
+C  <C(PHI1)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=5}>
+
+         C(I) = CMPLX(0.0, 0.0)                                         0002
+      ENDDO
+      END
+
+C  <C(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=25, N==25}>
+
+
+      SUBROUTINE TCOMP2(C, N)
+      COMPLEX C(5,*)
+
+C  <C(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=25, N==25}>
+
+
+      DO I = 1, 5                                                       0001
+
+C  <C(PHI1,PHI2)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=5, 1<=PHI2,
+C    PHI2<=25, N==25}>
+
+         DO J = 1, N                                                    0002
+
+C  <C(PHI1,PHI2)-OUT-MAY-{PHI1==I, J==PHI2, 1<=PHI2, N==25, 1<=I,
+C    I<=5, J<=25}>
+
+            C(I,J) = CMPLX(0.0, 0.0)                                    0003
+         ENDDO
+      ENDDO
+      END
+

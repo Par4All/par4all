@@ -1,0 +1,6 @@
+	PROGRAM FOO
+	INTEGER T(100)
+      DOALL I = 1, 100                                                  0001
+         T(I) = 0                                                       0002
+      ENDDO
+      END

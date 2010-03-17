@@ -1,0 +1,12 @@
+delete equiv06
+create equiv06 equiv06.f
+module EQUIV06
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+# display PRINTED_FILE
+# quit
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[EQUIV06]
+close
+delete equiv06

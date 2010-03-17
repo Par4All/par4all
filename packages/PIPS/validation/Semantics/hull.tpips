@@ -1,0 +1,11 @@
+# delete hull
+create hull hull.f
+activate PRINT_CODE_PRECONDITIONS
+activate TRANSFORMERS_INTER_FAST
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FAST
+module foo
+display PRINTED_FILE
+close 
+delete hull
+quit

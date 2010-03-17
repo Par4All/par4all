@@ -1,0 +1,181 @@
+# initial callgraph
+ C1
+     CLONEE
+# initial codes
+! trying clone transformations...
+      PROGRAM C1
+      INTEGER I
+! clone on a constant
+      CALL CLONEE(1)                                                    0005
+! comments
+! again
+! and more
+      CALL CLONEE(2)                                                    0009
+! cannot clone there
+      DO I = 1, 5                                                       0011
+         CALL CLONEE(I)                                                 0012
+      ENDDO
+! check reuse of corresponding clonee
+      CALL CLONEE(2)                                                    0015
+! clone with preconditions
+      I = 1                                                             0017
+      CALL CLONEE(I)                                                    0018
+      I = 3                                                             0019
+      CALL CLONEE(I)                                                    0020
+      END
+
+      SUBROUTINE CLONEE(I)
+      INTEGER I
+      PRINT *, I                                                        0004
+      END
+# applying clone_on_argument...
+# new callgraph
+ C1
+     CLONEE_0
+     CLONEE_1
+     CLONEE
+     CLONEE_2
+# new codes.
+! trying clone transformations...
+      PROGRAM C1
+      INTEGER I
+! clone on a constant
+      CALL CLONEE_0(1)                                                  0005
+! comments
+! again
+! and more
+      CALL CLONEE_1(2)                                                  0009
+! cannot clone there
+      DO I = 1, 5                                                       0011
+         CALL CLONEE(I)                                                 0012
+      ENDDO
+! check reuse of corresponding clonee
+      CALL CLONEE_1(2)                                                  0015
+! clone with preconditions
+      I = 1                                                             0017
+      CALL CLONEE_0(I)                                                  0018
+      I = 3                                                             0019
+      CALL CLONEE_2(I)                                                  0020
+      END
+
+      SUBROUTINE CLONEE(I)
+      INTEGER I
+      PRINT *, I                                                        0004
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_0(I)
+      INTEGER I
+!! PIPS: I is assumed a constant reaching value
+      IF (I.NE.1) STOP                                                  0013
+      PRINT *, I                                                        0016
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_1(I)
+      INTEGER I
+!! PIPS: I is assumed a constant reaching value
+      IF (I.NE.2) STOP                                                  0013
+      PRINT *, I                                                        0016
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_2(I)
+      INTEGER I
+!! PIPS: I is assumed a constant reaching value
+      IF (I.NE.3) STOP                                                  0013
+      PRINT *, I                                                        0016
+      END
+# applying partial evaluation...
+# applying dead code elimination...
+! trying clone transformations...
+      PROGRAM C1
+      INTEGER I
+! clone on a constant
+      CALL CLONEE_0(1)                                                  0005
+! comments
+! again
+! and more
+      CALL CLONEE_1(2)                                                  0009
+! cannot clone there
+      DO I = 1, 5                                                       0011
+         CALL CLONEE(I)                                                 0012
+      ENDDO
+! check reuse of corresponding clonee
+      CALL CLONEE_1(2)                                                  0015
+! clone with preconditions
+      I = 1                                                             0017
+      CALL CLONEE_0(1)                                                  0018
+      I = 3                                                             0019
+      CALL CLONEE_2(3)                                                  0020
+      END
+
+      SUBROUTINE CLONEE(I)
+      INTEGER I
+      PRINT *, I                                                        0004
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_0(I)
+      INTEGER I
+!! PIPS: I is assumed a constant reaching value
+      PRINT *, 1                                                        0016
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_1(I)
+      INTEGER I
+!! PIPS: I is assumed a constant reaching value
+      PRINT *, 2                                                        0016
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_2(I)
+      INTEGER I
+!! PIPS: I is assumed a constant reaching value
+      PRINT *, 3                                                        0016
+      END
+# done
+

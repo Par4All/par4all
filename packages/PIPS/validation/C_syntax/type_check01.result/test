@@ -1,0 +1,20 @@
+
+Parsed code for "main"
+
+int main(void)
+{
+   freia_data2d *imin;
+   int32_t measure_min, measure_vol;
+
+   freia_aipo_global_vol(imin, &measure_vol);
+
+   freia_aipo_global_min(imin, &measure_min);
+
+   return 0;
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
+C_PARSER[main] (check_C_function_type) Type updated for function "freia_aipo_global_vol"

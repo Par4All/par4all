@@ -1,0 +1,39 @@
+delete destroy
+
+shell echo
+shell echo First version: no array or real interference in module BAR
+shell echo
+
+create destroy destroy.f
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+
+module DESTROY
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete destroy
+
+delete destroy2
+
+shell echo
+shell echo Second version: array and real variable interference in module BAR
+shell echo
+
+shell rm -f destroy2.f
+shell sed s/cfirst// destroy.f >destroy2.f
+
+create destroy2 destroy2.f
+
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+
+module DESTROY
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete destroy2
+shell rm -f destroy2.f
+quit

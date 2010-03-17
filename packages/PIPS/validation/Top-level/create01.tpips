@@ -1,0 +1,13 @@
+delete create01
+# this one fails
+create create01 this_file_does_not_exist.c
+# this one fails
+create create01.c
+# this one succeeds
+create create01 create01.c
+display PRINTED_FILE
+close
+# useless: it seems that the file is recreated
+# shell cat create01.database/Warnings
+delete create01
+quit

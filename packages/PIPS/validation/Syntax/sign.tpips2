@@ -1,0 +1,7 @@
+# Preconditions appear only if the SAVE declaration is processed
+delete sign
+create sign sign.f
+display PRINTED_FILE 
+close
+delete sign
+quit

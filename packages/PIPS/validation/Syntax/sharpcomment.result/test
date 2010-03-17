@@ -1,0 +1,11 @@
+# let us say a # can start a comment line
+# so as to deal with cpp output directly...
+      PROGRAM SHARPCOMMENT
+
+# here is some output 
+! and a more usual comment
+      PRINT *, 'a sharp can start a comment '                           0007
+      PRINT *, 'for most Fortran compilers'                             0008
+
+# last comment.
+      END

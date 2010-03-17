@@ -1,0 +1,138 @@
+
+Parsed code for "call10"
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k,  l;
+
+   for (k = 0;k<i;k++)
+      x[i] = 0;
+   for (l = 0;l<j;l++)
+      y[i] = 0;
+}
+
+Code for "call10"
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k,  l;
+
+   for(k = 0; k <= i-1; k += 1)
+      x[i] = 0;
+   for(l = 0; l <= j-1; l += 1)
+      y[i] = 0;
+}
+
+Proper effects for "call10"
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k,  l;
+//               <must be read   >: i
+//               <must be written>: k
+
+   for(k = 0; k <= i-1; k += 1)
+//               <must be read   >: i
+//               <must be written>: x[i]
+      x[i] = 0;
+//               <must be read   >: j
+//               <must be written>: l
+   for(l = 0; l <= j-1; l += 1)
+//               <must be read   >: i j
+//               <must be written>: y[i]
+      y[i] = 0;
+}
+
+Cumulated effects for "call10"
+
+//               <may be written >: x[*] y[*]
+//               <must be read   >: i j
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k,  l;
+//               <may be written >: x[*]
+//               <must be read   >: i
+//               <must be written>: k
+
+   for(k = 0; k <= i-1; k += 1)
+//               <may be written >: x[*]
+//               <must be read   >: i
+      x[i] = 0;
+//               <may be read    >: i
+//               <may be written >: y[*]
+//               <must be read   >: j
+//               <must be written>: l
+   for(l = 0; l <= j-1; l += 1)
+//               <may be written >: y[*]
+//               <must be read   >: i j
+      y[i] = 0;
+}
+
+Proper effects for "main"
+
+main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+//               <may be written >: s[2][*] sp[0][2][*]
+//               <must be read   >: s[1] sp sp[0][1]
+
+   call10(s.one, s.two, sp->one, sp->two);
+}
+
+Cumulated effects for "main"
+
+main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+//               <may be written >: s[2][*] sp[0][2][*]
+//               <must be read   >: s[1] sp sp[0][1]
+
+   call10(s.one, s.two, sp->one, sp->two);
+}
+
+Regions for "call10"
+
+
+//  <x[PHI1]-W-EXACT-{PHI1==i, 1<=i}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, 1<=j}>
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k,  l;
+
+//  <x[PHI1]-W-EXACT-{PHI1==i, 1<=i}>
+
+
+   for(k = 0; k <= i-1; k += 1)
+
+//  <x[PHI1]-W-EXACT-{PHI1==i, 1+k<=i, 0<=k}>
+
+      x[i] = 0;
+
+//  <y[PHI1]-W-EXACT-{PHI1==i, i<=k, 1<=j, 0<=k}>
+
+   for(l = 0; l <= j-1; l += 1)
+
+//  <y[PHI1]-W-EXACT-{PHI1==i, i<=k, 1+l<=j, 0<=k, 0<=l}>
+
+      y[i] = 0;
+}
+
+Regions for "main"
+
+main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+
+//  <s[PHI1]-R-EXACT-{PHI1==1}>
+//  <s[PHI1][PHI2]-W-MAY-{PHI1==2, 1<=PHI2}>
+//  <sp[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==1}>
+//  <sp-R-EXACT-{}>
+//  <sp[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, PHI2==2}>
+
+
+   call10(s.one, s.two, sp->one, sp->two);
+}

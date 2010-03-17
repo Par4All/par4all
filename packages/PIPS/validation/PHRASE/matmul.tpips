@@ -1,0 +1,24 @@
+delete matmul
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create matmul matmul.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+# Since the for loops are not dealt yet:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+# Select the more precise regions to compute the communications:
+activate MUST_REGIONS
+
+echo Transform all the control flow in one finite state machine:
+apply PHRASE_DISTRIBUTOR[%ALL]
+apply PHRASE_DISTRIBUTOR_CONTROL_CODE[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete matmul
+quit

@@ -1,0 +1,25 @@
+
+Printed file
+
+      SUBROUTINE CREATE
+
+
+      IF (I.EQ.1) GOTO 9999                                             0004
+      IF (I.EQ.2) I = 3                                                 0006
+8888  CONTINUE
+      RETURN
+9999  I = 4                                                             0010
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      SUBROUTINE CREATE
+
+
+      IF (I.EQ.1) THEN                                                  0004
+9999     I = 4                                                          0010
+      ELSE
+         IF (I.EQ.2) I = 3                                              0006
+8888     CONTINUE
+      ENDIF
+      END

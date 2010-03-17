@@ -1,0 +1,19 @@
+delete impactunstructured
+create impactunstructured impactunstructured.f
+
+#setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PRETTYPRINT_BLOCKS FALSE
+#setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+#setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
+#setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+#setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete impactunstructured
+quit
+

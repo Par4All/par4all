@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# test pips on test7.f
+#
+Delete test7
+if Init -f test7.f test7 >&2
+then
+	Select -w test7 rfulldg>&2
+	if Display -w test7 -m test7
+	then
+		Delete test7
+	else
+		echo Parallelization failed
+		Delete test7
+		exit 2
+	fi
+else
+	echo Initialization failed
+	Delete test7 
+	exit 1
+fi
+
+
+
+
+ 

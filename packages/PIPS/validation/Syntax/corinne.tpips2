@@ -1,0 +1,68 @@
+#
+# Conflict name between common, subroutine and program
+#
+
+shell rm -f corinne1.f corinne2.f corinne3.f
+
+echo
+echo First try: detect extra ENDDO
+echo
+
+shell sed /cfirst/s/cfirst// corinne.f >corinne1.f
+shell sleep 1
+
+delete corinne
+create corinne corinne1.f
+display PRINTED_FILE
+close
+delete corinne
+shell rm corinne1.f
+
+echo
+echo Second try: detect wrong lhs
+echo
+
+shell sed /csecond/s/csecond// corinne.f >corinne2.f
+shell sleep 1
+
+create corinne corinne2.f
+display PRINTED_FILE
+close
+delete corinne
+shell rm corinne2.f
+
+echo
+echo Third try: detect extra ENDDIF
+echo
+
+shell sed /cthird/s/cthird// corinne.f >corinne3.f
+shell sleep 1
+
+create corinne corinne3.f
+display PRINTED_FILE
+close
+delete corinne
+
+shell rm corinne3.f
+
+echo
+echo Fourth try: detect IF/ENDDO pair
+echo
+
+create corinne corinne.f
+module IFENDDO
+display PRINTED_FILE
+close
+delete corinne
+
+echo
+echo Fifth try: detect DO/ENDIF pair
+echo
+
+create corinne corinne.f
+module DOENDIF
+display PRINTED_FILE
+close
+delete corinne
+
+quit

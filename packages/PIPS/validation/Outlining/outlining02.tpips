@@ -1,0 +1,40 @@
+delete outlining02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create outlining02 outlining02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after outlining
+echo
+
+setproperty OUTLINE_MODULE_NAME "outlined"
+setproperty OUTLINE_LABEL "l0"
+apply OUTLINE[main]
+display PRINTED_FILE[main]
+display PRINTED_FILE[outlined]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc outlining02.c -o outlining
+shell gcc outlining02.database/Src/outlining02.c outlining02.database/Src/outlined.c -o outlining02.database/Src/outlining
+shell if test `outlining02.database/Src/outlining` = `outlining`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf outlining02.database/Src/outlining outlining
+
+close
+delete outlining02
+quit
+

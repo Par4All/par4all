@@ -1,0 +1,110 @@
+# testing automatic checkpoint
+# second run, preconditions...
+
+C  P() {}
+
+
+      SUBROUTINE BLA
+      INTEGER K
+
+C  P() {}
+
+      K = 3                                                             0004
+
+C  P(K) {K==3}
+
+      PRINT *, 'bla', K                                                 0005
+      END
+
+C  P() {}
+
+      PROGRAM CHECKPOINT
+      INTEGER I
+
+C  P() {}
+
+      I = 1                                                             0003
+
+C  P(I) {I==1}
+
+      PRINT *, 'checkpoint', I                                          0004
+
+C  P(I) {I==1}
+
+      CALL FOO                                                          0005
+      END
+
+C  P() {}
+
+
+      SUBROUTINE FOO
+      INTEGER J
+
+C  P() {}
+
+      J = 2                                                             0004
+
+C  P(J) {J==2}
+
+      PRINT *, 'foo', J                                                 0005
+
+C  P(J) {J==2}
+
+      CALL BLA                                                          0006
+      END
+# partial eval
+# the display
+
+C  P() {}
+
+
+      SUBROUTINE BLA
+      INTEGER K
+
+C  P() {}
+
+      K = 3                                                             0004
+
+C  P(K) {K==3}
+
+      PRINT *, 'bla', 3                                                 0005
+      END
+
+C  P() {}
+
+      PROGRAM CHECKPOINT
+      INTEGER I
+
+C  P() {}
+
+      I = 1                                                             0003
+
+C  P(I) {I==1}
+
+      PRINT *, 'checkpoint', 1                                          0004
+
+C  P(I) {I==1}
+
+      CALL FOO                                                          0005
+      END
+
+C  P() {}
+
+
+      SUBROUTINE FOO
+      INTEGER J
+
+C  P() {}
+
+      J = 2                                                             0004
+
+C  P(J) {J==2}
+
+      PRINT *, 'foo', 2                                                 0005
+
+C  P(J) {J==2}
+
+      CALL BLA                                                          0006
+      END
+
+# done

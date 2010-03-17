@@ -1,0 +1,37 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{0==-1}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{0==-1}>
+
+      FUNCTION  LORDRE( L1 )
+      INTEGER L1, LORDRE, I
+      LORDRE = 0                                                        0001
+      I = 1                                                             0002
+99997 CONTINUE
+C     DO loop 10 with exit had to be desugared
+      IF (I.GT.L) GOTO 99998                                            0002
+      IF (L1.EQ.I) GOTO 15                                              0003
+10    CONTINUE                                                          0005
+      I = I+1                                                           0002
+      GOTO 99997
+99998 CONTINUE
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==0, LORDRE==0, 1+L<=I}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==0, LORDRE==0, 1+L<=I}>
+
+      STOP 100                                                          0006
+15    CONTINUE                                                          0007
+      LORDRE = I                                                        0007
+      END
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+! next line added by fsplit() in pips
+      PROGRAM MAIN000
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, LORDRE(0)                                                0001
+      END
+

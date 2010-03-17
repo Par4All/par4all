@@ -1,0 +1,109 @@
+foo
+
+Declarations for module "foo" with type "int -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 8
+	Declared entity "foo:*HEAP*" with type "area" with size 0
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:0`X" with type "variable" "int"
+	Declared entity "foo:0`Y" with type "variable" "int"
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "foo:a" with type "variable" "int"
+	Declared entity "foo:foo" with type "variable" "int"
+	Declared entity "sizeofArray03!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable foo:a	offset = 1
+
+Layout for return variable:
+
+	Variable "foo:foo"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*DYNAMIC*" of size 8:
+	Variable "foo:0`__func__"	offset = 0	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 4	size = 4
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STACK*" of size 0:
+	Dynamic Variable "foo:0`X"	offset = UNKNOWN, 	size = DYNAMIC
+	Dynamic Variable "foo:0`Y"	offset = UNKNOWN, 	size = DYNAMIC
+
+
+Layout for memory area "foo:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray03!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module foo
+
+sizeofArray03!
+
+Declarations for module "sizeofArray03!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> int"
+	Declared entity "sizeofArray03!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "sizeofArray03!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray03!:*STACK*" with type "area" with size 0
+	Declared entity "sizeofArray03!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray03!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray03!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray03!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sizeofArray03!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module sizeofArray03!
+
+
+Parsed code
+
+//Check Memory Allocation offsets of continuous local dynamic variables of dynamic size
+extern int foo(int a);
+int foo(int a)
+{
+   int X[a], Y[a];
+   return 0;
+}

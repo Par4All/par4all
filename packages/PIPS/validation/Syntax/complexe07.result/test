@@ -1,0 +1,16 @@
+      PROGRAM COMPLEXE07
+      COMPLEX A(10), B(10), C(10), D(10), E(10)
+
+      PRINT *, (A(I), I = 1, 10)                                        0004
+
+      PRINT *, (A(I), B(I), I = 1, 10)                                  0006
+
+      PRINT *, (A(I), B(I), C(I), I = 1, 10)                            0008
+
+      PRINT *, (A(I), B(I), C(I), D(I), I = 1, 10)                      0010
+
+      PRINT *, (A(I), B(I), C(I), D(I), E(I), I = 1, 10)                0012
+
+      PRINT *, (A(I), B(I), C(I), D(I), E(I), I, I = 1, 10)             0014
+
+      END

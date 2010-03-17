@@ -1,0 +1,44 @@
+delete control01
+create control01 control01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[control01]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[control01]
+
+apply RESTRUCTURE_CONTROL[control01]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[control01]
+
+echo Try more aggressive restructuring:
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL TRUE
+apply RESTRUCTURE_CONTROL[control01]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[control01]
+
+#display GRAPH_PRINTED_FILE[control01]
+
+close
+delete control01
+quit

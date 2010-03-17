@@ -1,0 +1,15 @@
+delete unstr3
+create unstr3 unstr3.f
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+set PRETTYPRINT_ALL_LABELS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+close
+delete unstr3
+quit

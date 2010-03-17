@@ -1,0 +1,27 @@
+delete while_for
+create while_for while_for.c
+
+activate C_PARSER
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#display PRINTED_FILE[main%c]
+
+display PRINTED_FILE[main]
+
+echo Try more aggressive restructuring:
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL TRUE
+apply RESTRUCTURE_CONTROL[main]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[main]
+
+
+close
+delete while_for

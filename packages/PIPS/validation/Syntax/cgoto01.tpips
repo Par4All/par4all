@@ -1,0 +1,10 @@
+delete cgoto01
+create cgoto01 cgoto01.f
+module CGOTO01
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[CGOTO01]
+close
+delete cgoto01
+quit

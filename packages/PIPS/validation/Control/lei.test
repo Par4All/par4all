@@ -1,0 +1,4 @@
+#! /bin/sh
+Init -f lei.f lei >&2
+Display -m FSTR2
+Delete lei

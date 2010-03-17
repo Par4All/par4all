@@ -1,0 +1,61 @@
+
+C  T() {}
+
+      PROGRAM TYPE06
+
+C     Goal: check the extension of the semantics analysis to string
+C     scalar variables in tests
+
+      CHARACTER*4 C1
+
+C  T(C1) {"TITI"==C1}
+
+
+      C1 = "TITI"                                                       0008
+
+C  T(C1) {}
+
+
+      IF (C1.EQ."TOTO") THEN                                            0010
+
+C  T(C1) {}
+
+         READ *, C1                                                     0011
+
+C  T() {}
+
+         PRINT *, C1                                                    0012
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE06
+
+C     Goal: check the extension of the semantics analysis to string
+C     scalar variables in tests
+
+      CHARACTER*4 C1
+
+C  P() {}
+
+
+      C1 = "TITI"                                                       0008
+
+C  P(C1) {"TITI"==C1}
+
+
+      IF (C1.EQ."TOTO") THEN                                            0010
+
+C  P() {0==-1}
+
+         READ *, C1                                                     0011
+
+C  P() {0==-1}
+
+         PRINT *, C1                                                    0012
+      ENDIF
+
+      END
+

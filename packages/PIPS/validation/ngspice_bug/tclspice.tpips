@@ -1,0 +1,33 @@
+delete tclspice
+
+create tclspice tclspice.c
+
+#some debug move to apply if needed
+#setenv RICE_DEBUG_LEVEL 9
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv UNSPLIT_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+#setenv REDUCTIONS_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+display PRINTED_FILE(get_mod_param)
+apply UNSPLIT(get_mod_param)
+
+close
+
+delete tclspice
+quit
+# EOF

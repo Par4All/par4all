@@ -1,0 +1,47 @@
+
+C  T(IS) {0<=IS+1, IS<=1}
+
+      SUBROUTINE NON_LINEAR13 (IS, M, U, X, Y, NQ)
+
+      IMPLICIT REAL*8 (A-H, O-Z)
+      PARAMETER (PI = 3.141592653589793238D0)
+      COMMON /COUNT/ KTTRANS(256)
+      DIMENSION U(1), X(1), Y(1)
+
+C  T(IS) {0<=IS+1, IS<=1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(IS) {0<=IS+1, IS<=1}
+
+C (0,2)
+
+      IF (X.GT.0) THEN                                                  0008
+
+C  T(IS) {IS==-1}
+
+C (0,3)
+         IS = -1                                                        0009
+      ELSE
+
+C  T(IS) {IS==1}
+
+C (0,4)
+         IS = 1                                                         0011
+      ENDIF
+
+C  T() {0<=IS+1, IS<=1}
+
+C (0,5)
+
+      IF (IS.NE.1.AND.IS.NE.-1) THEN                                    0014
+
+C  T() {IS==0}
+
+C (0,6)
+         PRINT *, IS                                                    0016
+      ENDIF
+C     END BLOCK
+      END
+

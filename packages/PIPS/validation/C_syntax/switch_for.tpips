@@ -1,0 +1,43 @@
+delete switch_for
+create switch_for switch_for.c
+
+activate C_PARSER
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+#setproperty  PRETTYPRINT_ALL_LABELS FALSE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#display PRINTED_FILE[main%c]
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE[gl_enable]
+
+echo
+echo PRINTED FILE
+echo
+
+display PRINTED_FILE[gl_enable]
+
+apply RESTRUCTURE_CONTROL[gl_enable]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[gl_enable]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+#delete switch_for
+
+quit

@@ -1,0 +1,24 @@
+
+C  <BAR:A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
+C  <BAR:A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+C  <BAR:B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+C     the problem is to have coherent effects or regions at foo 
+C     and bar call sites for variable /env/ a.
+      PROGRAM ENV_REG
+
+C  <BAR:A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+
+C     regions and environment
+
+      CALL FOO                                                          0007
+
+C  <BAR:A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
+C  <BAR:B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+
+      CALL BAR                                                          0009
+
+      END
+

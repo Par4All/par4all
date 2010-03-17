@@ -1,0 +1,18 @@
+delete struct02
+create struct02 struct02.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[struct02!]
+display PRINTED_FILE[struct02]
+
+close
+
+delete struct02
+
+quit

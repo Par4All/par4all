@@ -1,0 +1,417 @@
+C
+      PROGRAM OA118
+C
+C     ******************************************************************
+C     *
+C     *
+C     *    ONERA--DIRECTION DE L'AERODYNAMIQUE
+C     *
+C     *
+C     *               DIVISION OAT2
+C     *
+C     *
+C     *
+C     *    DEVELOPPED BY  T.H. LE    (PT.24-30)
+C     *
+C     *
+C     *    VECTORISED BY  H. BOILLOT    (PT.25-38)
+C     * non //
+C     *
+C     ******************************************************************
+C
+C     Modifications:
+C      - in OAMAT1, common CFN is shorter than in OAVITEL; since PIPS
+C     requires uniquely defined commons, it had to be extended with
+C     the array AIRE(NFAC); Francois Irigoin, December 1990
+C      - in OAMAT1 and OAVITEL common OO is shorter than in OA118; as
+C     mentionned above, it had to be extended; Francois Irigoin, December 1990
+C      - in SOLV, IF()GOTO replaced by IF THEN ENDIF; Francois Irigoin, 
+C     March 1991
+C      - in SOLV3, IF THEN GOTO 1 ENDIF replaced by ELSE; Francois Irigoin,
+C     April 1991
+C      - in PHWPAN, IF GOTO 6 replaced by IF THEN ENDIF; Francois Irigoin,
+C     April 1991
+C      - in PHWAK, IF GOTO 6 replaced by IF THEN ENDIF; Francois Irigoin,
+C     April 1991
+C      - in CLOCK, call to TIME commented out; Francois Irigoin, March 1993
+C
+      PARAMETER(NFAC=49,NKJ=3,NDOM=1,ALWAK=+2.,NSAU=1,
+     1          ORI=+0.0,CLO=1.000,ALPHA=02.0,DERI=+0.0,SREF=1./3.,
+     2            NDOW=1,DWAK=100.)
+      COMMON/OASET/PIO2
+      COMMON/EE/E11,E22,E33
+C
+      COMMON/GEF/XF(NFAC,0:4),YF(NFAC,0:4),ZF(NFAC,0:4)
+      COMMON/OO/O(NFAC),VS(NFAC),PS(NFAC)
+      COMMON/FX/FXX(NFAC),FXY(NFAC),FXZ(NFAC)
+      COMMON/FE/FEX(NFAC),FEY(NFAC),FEZ(NFAC)
+      COMMON/CFN/FNX(NFAC),FNY(NFAC),FNZ(NFAC),AIRE(NFAC)
+      COMMON/PCP/XO(NFAC),YO(NFAC),ZO(NFAC)
+      COMMON/OACOF/AA(NFAC,NFAC)
+      COMMON/GRA/GRD(NFAC,3)
+      COMMON/OT/SWX(4,NKJ),SWY(4,NKJ),SWZ(4,NKJ),OTXE(NKJ)
+      COMMON/OAWAK/PHW(NFAC)
+      DIMENSION IY(2),CPC(NFAC)
+      DIMENSION XLE(NKJ),CD(NKJ),JEX(NKJ),JIX(NKJ)
+      DIMENSION INE1(NDOW),INE2(NDOW),INI1(NDOW),INI2(NDOW)
+      DIMENSION IMD(NDOM),JMD(NDOM),IFA(NDOM)
+      DIMENSION R(NKJ),RL(NKJ),PSV(NKJ,NKJ)
+      DIMENSION CC0(NKJ),CC(NKJ,NKJ)
+      INTEGER*4 CLOCK,T1,T2,T3,T4,T
+
+
+102   FORMAT('1',53X,'DONNEES GEOMETRIQUES'//22X,'I',7X,'X',7X,'Y',9X,'Z
+     &',8X,'XO',7X,'YO',7X,'ZO',8X,'NX',6X,'NY',6X,'NZ'//)              0062
+104   FORMAT(2X,I5,3(1X,F12.6),1X,3(1X,F12.6),1X,3(1X,F12.6))           0065
+106   FORMAT(7X,3(1X,F12.6))                                            0066
+600   FORMAT(E12.5,5(1X,E12.5))                                         0067
+601   FORMAT(62X,'*INCIDENCE:ALPHA=*',F7.4,//)                          0068
+606   FORMAT('1',30X,'RESULTATS COMPLETS DU CALCUL',//,5X,'I',7X,'X',10X
+     &,'Y',10X,'Z',12X,'U',10X,'V',10X,'W',8X,'KP'/)                    0069
+607   FORMAT(40X,I3,5X,4(1X,I3),5X,4(1X,I3))                            0071
+608   FORMAT(1X,I5,1X,3(F12.6,1X),2X,3(F12.6,1X),2X,F12.6)              0072
+609   FORMAT(/,40X,'ORIGINE DU REPERE:X=',F10.4,8X,'*LONGUEUR DE REFEREN
+     &:C=',F10.4,//63X,'*NOMBRE DE FACETTES:*',I5)                      0073
+610   FORMAT(1X,'*CONTROLE*',2X,I5,5(E12.5,6X))                         0075
+613   FORMAT(//////64X,'*PARAMETRES DE CALCUL*',///)                    0076
+700   FORMAT(2I6,8(2X,E12.5))                                           0077
+731   FORMAT(2I6,8E12.5)                                                0078
+732   FORMAT(3I5,8E12.5)                                                0079
+733   FORMAT(1X,10(2X,I5))                                              0080
+      OPEN (UNIT=2,FILE='oares')                                        0081
+C
+C     ******************************************************************
+C     ***PARAMETRES DE CALCUL*******************************************
+C     ******************************************************************
+C
+      T1 = CLOCK()                                                      0087
+      PI = 4.*ATAN(1.)                                                  0088
+      PIO2 = 2.*PI                                                      0089
+      PIO4 = 4.*PI                                                      0090
+      RPIO4 = 1./PIO4                                                   0091
+      IY(1) = 1                                                         0092
+      IY(2) = -1                                                        0093
+C
+      ALFA = ALPHA*PI/180.                                              0095
+      BETTA = DERI*PI/180.                                              0096
+      AMWAK = ALWAK*PI/180.                                             0097
+      UINFI = COS(ALFA)*COS(BETTA)                                      0098
+      VINFI = SIN(BETTA)*COS(ALFA)                                      0099
+      WINFI = SIN(ALFA)                                                 0100
+C
+      INE1(1) = 43                                                      0102
+      INE2(1) = 45                                                      0103
+      INI1(1) = 47                                                      0104
+      INI2(1) = 49                                                      0105
+C
+      IN = 0                                                            0107
+      DO N = 1, NDOW                                                    0108
+         IN1 = INE1(N)                                                  0109
+         IN2 = INE2(N)                                                  0110
+         DO I = 1, IN2-IN1+1                                            0111
+            IN = IN+1                                                   0112
+            JEX(IN) = IN1+I-1                                           0113
+         ENDDO
+      ENDDO
+C
+      IN = 0                                                            0117
+      DO N = 1, NDOW                                                    0118
+         IN1 = INI1(N)                                                  0119
+         IN2 = INI2(N)                                                  0120
+         DO I = 1, IN2-IN1+1                                            0121
+            IN = IN+1                                                   0122
+            JIX(IN) = IN2-I+1                                           0123
+         ENDDO
+      ENDDO
+C#       WRITE(100,733)(JEX(N),N=1,NKJ)
+C#       WRITE(100,733)(JIX(N),N=1,NKJ)
+C
+C
+C     ******************************************************************
+C     ***DISCRETISATION DE L OBSTACLE EN FACETTES***********************
+C     ******************************************************************
+C
+      T1 = CLOCK()                                                      0134
+      CALL OAMET                                                        0135
+      T2 = CLOCK()                                                      0136
+      T = T2-T1                                                         0137
+      WRITE (100, *) ' OAMET :', T                                      0138
+C
+C#      READ(2,*) (IMD(I),I=1,NDOM)
+C#      READ(2,*) (JMD(I),I=1,NDOM)
+      IFA(1) = 0                                                        0142
+      DOALL N = 2, NDOM                                                 0143
+         IFA(N) = IFA(N-1)+IMD(N-1)*JMD(N-1)                            0144
+      ENDDO
+C
+      WRITE (*, 102)                                                    0147
+      DO I = 1, NFAC                                                    0148
+         WRITE (100, 104) I, XF(I,1), YF(I,1), ZF(I,1), XO(I), YO(I)    0149
+     &   , ZO(I), FNX(I), FNY(I), FNZ(I)                                0149
+         DO K = 2, 4                                                    0151
+            WRITE (100, 106) XF(I,K), YF(I,K), ZF(I,K)                  0152
+         ENDDO
+      ENDDO
+C
+      WRITE (100, 613)                                                  0156
+      WRITE (100, 601) ALPHA                                            0157
+      WRITE (100, 609) ORI, CLO, NFAC                                   0158
+C
+      DOALL I = 1, NFAC                                                 0160
+         VS(I) = FNX(I)*UINFI+FNY(I)*VINFI+FNZ(I)*WINFI                 0161
+      ENDDO
+C
+C
+C
+C DEFINITION DES NAPPES
+C
+      E11 = COS(AMWAK)                                                  0168
+      E22 = 0.                                                          0169
+      E33 = SIN(AMWAK)                                                  0170
+C
+      DOALL N = 1, NKJ                                                  0172
+         XLE(N) = 0.5*(XF(N,1)+XF(N,4))                                 0187
+      ENDDO
+      DO N = 1, NKJ                                                     0172
+         IP = JEX(N)                                                    0173
+         SWX(1,N) = XF(IP,2)                                            0175
+         SWX(2,N) = XF(IP,2)+DWAK*E11                                   0176
+         SWX(3,N) = XF(IP,3)+DWAK*E11                                   0177
+         SWX(4,N) = XF(IP,3)                                            0178
+         SWY(1,N) = YF(IP,2)                                            0179
+         SWY(2,N) = YF(IP,2)+DWAK*E22                                   0180
+         SWY(3,N) = YF(IP,3)+DWAK*E22                                   0181
+         SWY(4,N) = YF(IP,3)                                            0182
+         SWZ(1,N) = ZF(IP,2)                                            0183
+         SWZ(2,N) = ZF(IP,2)+DWAK*E33                                   0184
+         SWZ(3,N) = ZF(IP,3)+DWAK*E33                                   0185
+         SWZ(4,N) = ZF(IP,3)                                            0186
+         CD(N) = 0.5*(XF(IP,2)+XF(IP,3))-XLE(N)                         0188
+         IQ = JIX(N)                                                    0174
+         WRITE (100, 732) N, IP, IQ, SWX(1,N), SWX(2,N), SWY(1,N),      0189
+     &   SWY(2,N), SWZ(1,N), SWZ(2,N)                                   0189
+      ENDDO
+C
+C     ******************************************************************
+C     ***COEFFICIENTS DE LA MATRICE****************************
+C     ******************************************************************
+C
+      T2 = CLOCK()                                                      0197
+C
+      CALL OAMAT1                                                       0199
+C
+      T3 = CLOCK()                                                      0201
+      T = T3-T2                                                         0202
+      WRITE (100, *) ' TEMPS OAMAT1 :', T                               0203
+      DO I = 1, NFAC                                                    0204
+         WRITE (100, *) I                                               0205
+      ENDDO
+
+C#      WRITE(100,*)(O(I),I=1,NFAC)
+C
+      DOALL I = 1, NFAC                                                 0211
+         PS(I) = O(I)                                                   0212
+      ENDDO
+C
+C
+C     ******************************************************************
+C     ***CALCUL DE MU0**************************
+C
+C     ************** RESOLUTION PAR M.G. ********
+      T3 = CLOCK()                                                      0220
+      CALL GRAD1(PS, O)                                                 0221
+      T4 = CLOCK()                                                      0222
+      T = T4-T3                                                         0223
+      WRITE (100, *) ' TEMPS RESOLUTION MU0 PAR M.G.= ', T              0224
+C
+      DO I = 1, NKJ                                                     0226
+         JE = JEX(I)                                                    0227
+         JI = JIX(I)                                                    0228
+         CC0(I) = O(JE)-O(JI)                                           0229
+      ENDDO
+C
+C*******CALCUL DES NKJ CHAMPS CIRCULATOIRES *********************
+      DO J = 1, NKJ                                                     0233
+C
+         CALL PHWAK(J)                                                  0235
+         CALL GRAD1(PHW, O)                                             0244
+         DO I = 1, NKJ                                                  0249
+            JE = JEX(I)                                                 0250
+            JI = JIX(I)                                                 0251
+            CC(J,I) = O(JE)-O(JI)                                       0252
+         ENDDO
+C
+C
+C     ******************************************************************
+C     ***CALCUL DE MUJ**************************
+C
+C     ************** RESOLUTION PAR M.G. ********
+C
+         T3 = CLOCK()                                                   0243
+         T4 = CLOCK()                                                   0245
+         T = T4-T3                                                      0246
+         WRITE (100, *) ' TEMPS RESOLUTION MUW', J, ' PAR M.G.= ', T    0247
+      ENDDO
+C
+C  ****CALCUL MUW, K.J. CONTINUITE DES MU********
+C
+C
+      DOALL J = 1, NKJ                                                  0259
+         DOALL JJ = 1, NKJ                                              0260
+            PSV(J,JJ) = CC(JJ,J)                                        0261
+         ENDDO
+      ENDDO
+      DOALL J = 1, NKJ                                                  0264
+         PSV(J,J) = PSV(J,J)-1                                          0265
+      ENDDO
+C
+      DOALL J = 1, NKJ                                                  0268
+69       RL(J) = -CC0(J)                                                0269
+      ENDDO
+C
+      CALL SOLV(NKJ, PSV, RL)                                           0271
+C
+      DOALL J = 1, NKJ                                                  0273
+         OTXE(J) = RL(J)                                                0274
+      ENDDO
+C
+      CALL PHWPAN                                                       0277
+C
+      DOALL I = 1, NFAC                                                 0279
+222      PS(I) = PS(I)+PHW(I)                                           0280
+      ENDDO
+C
+C     ******************************************************************
+C     ***CALCUL DE MU***************************
+C
+C     ************** RESOLUTION PAR M.G. ********
+C
+      T3 = CLOCK()                                                      0287
+      CALL GRAD1(PS, O)                                                 0288
+      T4 = CLOCK()                                                      0289
+      T = T4-T3                                                         0290
+      WRITE (100, *) ' TEMPS RESOLUTION MU PAR M.G.= ', T               0291
+C*
+      DO I = 1, NKJ                                                     0293
+         JE = JEX(I)                                                    0294
+         JI = JIX(I)                                                    0295
+         OOO = OTXE(I)-O(JE)+O(JI)                                      0296
+         WRITE (100, 610) I, OTXE(I), O(JE), O(JI), OOO                 0297
+      ENDDO
+C
+C     ******************************************************************
+C     ***CALCUL DU GRADIENT DE MU******************************
+C     ******************************************************************
+C
+      DO N = 1, NDOM                                                    0304
+         IFAC0 = IFA(N)                                                 0307
+      ENDDO
+      DO N = 1, NDOM                                                    0304
+         IM = IMD(N)                                                    0305
+         JM = JMD(N)                                                    0306
+         CALL OAVITEL(IM, JM)                                           0309
+      ENDDO
+      DO N = 1, NDOM                                                    0304
+         T3 = CLOCK()                                                   0308
+         T4 = CLOCK()                                                   0310
+         T = T4-T3                                                      0311
+         WRITE (100, *) ' TEMPS OAVITEL.= ', T                          0312
+      ENDDO
+C
+C     ******************************************************************
+C     ***VITESSE ET PRESSION AUX POINTS DE CONTROLE*********************
+C     ******************************************************************
+C
+      DOALL I = 1, NFAC                                                 0320
+         GRD(I,1) = -GRD(I,1)-FNX(I)*VS(I)+UINFI                        0321
+      ENDDO
+      DOALL I = 1, NFAC                                                 0320
+         GRD(I,2) = -GRD(I,2)-FNY(I)*VS(I)+VINFI                        0322
+      ENDDO
+      DOALL I = 1, NFAC                                                 0320
+         GRD(I,3) = -GRD(I,3)-FNZ(I)*VS(I)+WINFI                        0323
+      ENDDO
+      DO I = 1, NFAC                                                    0320
+C     GRD(I,1)=-GRD(I,1)
+C     GRD(I,2)=-GRD(I,2)
+C     GRD(I,3)=-GRD(I,3)
+         V2 = GRD(I,1)*GRD(I,1)+GRD(I,2)*GRD(I,2)+GRD(I,3)*GRD(I,3)     0327
+         CPC(I) = 1.-V2                                                 0328
+      ENDDO
+C
+C
+      CX = 0.                                                           0333
+      CY = 0.                                                           0334
+      CZ = 0.                                                           0335
+      DO I = 1, NFAC                                                    0336
+C     CX=CX+CPC(I)*FNX(I)*AIRE(I)
+         CX = CX+AIRE(I)                                                0338
+      ENDDO
+      DO I = 1, NFAC                                                    0336
+C     CY=CY+CPC(I)*FNY(I)*AIRE(I)
+         CZ = CZ+CPC(I)*FNZ(I)*AIRE(I)                                  0340
+      ENDDO
+      CY = CZ/SREF                                                      0342
+      WRITE (100, 610) IDT, CX, CY, CZ                                  0343
+      WRITE (100, 606)                                                  0344
+      REWIND (11)                                                       0345
+      AMACH = CY                                                        0346
+      WRITE (11, 730) AMACH, ALPHA                                      0347
+      DO I = 1, NFAC                                                    0348
+         XR = XO(I)-ORI                                                 0349
+         YR = YO(I)                                                     0350
+         ZR = ZO(I)                                                     0351
+         OR = O(I)                                                      0352
+         WRITE (11, 730) XR, YR, ZR, GRD(I,1), GRD(I,2), GRD(I,3),      0353
+     &   CPC(I), OR                                                     0353
+      ENDDO
+      DO I = 1, NFAC                                                    0348
+         WRITE (100, 608) I, XO(I), YO(I), ZO(I), GRD(I,1), GRD(I,2)    0354
+     &   , GRD(I,3), CPC(I)                                             0354
+      ENDDO
+      REWIND (11)                                                       0357
+730   FORMAT(8F10.5)                                                    0358
+      REWIND (12)                                                       0359
+      JF = JMD(1)                                                       0360
+      NS = (JF-NSAU)/2                                                  0361
+      NPE = NFAC/JF                                                     0362
+      NPI = NPE                                                         0363
+      NPOL = 1                                                          0364
+      AMACH = CY                                                        0365
+      RE = 999.                                                         0366
+      WRITE (12, 731) NS, NPOL, AMACH, ALPHA, RE, RE                    0367
+C
+      DO J = 1, NS                                                      0369
+         YR = YO(J)                                                     0370
+         WRITE (12, 731) NPE, NPI, YR                                   0373
+         CLN = 0.                                                       0371
+         CLA = 0.                                                       0372
+         DO I = 1, NPE                                                  0374
+            IR = JF*(I-1)+J                                             0375
+            XR = XO(IR)/CD(J)-XLE(J)/CD(J)                              0376
+            ZR = ZO(IR)/CD(J)                                           0377
+            WRITE (12, 731) J, I, ZR, XR, CPC(IR), O(IR)                0382
+            CLNI = -CPC(IR)*FNZ(IR)*AIRE(IR)                            0378
+            CLN = CLN+CLNI                                              0380
+            CLAI = CPC(IR)*FNX(IR)*AIRE(IR)                             0379
+            CLA = CLA+CLAI                                              0381
+         ENDDO
+         DO I = 1, NPE                                                  0384
+            IR = JF*I-J+1                                               0385
+            XR = XO(IR)/CD(J)-XLE(J)/CD(J)                              0386
+            ZR = ZO(IR)/CD(J)                                           0387
+            WRITE (12, 731) J, I, ZR, XR, CPC(IR), O(IR)                0392
+            CLNI = -CPC(IR)*FNZ(IR)*AIRE(IR)                            0388
+            CLN = CLN+CLNI                                              0390
+            CLAI = CPC(IR)*FNX(IR)*AIRE(IR)                             0389
+            CLA = CLA+CLAI                                              0391
+         ENDDO
+         CLA = CLA/(YF(J,4)-YF(J,1))/CD(J)                              0395
+         CLN = CLN/(YF(J,4)-YF(J,1))/CD(J)                              0394
+         CLL = CLN*UINFI-CLA*WINFI                                      0396
+         WRITE (*, 104) J, YR, CLN, CLA, CLL                            0397
+      ENDDO
+      REWIND (12)                                                       0399
+C
+      STOP                                                              0401
+      END

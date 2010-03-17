@@ -1,0 +1,10 @@
+main()
+{
+  union x
+  {
+    int a;
+    float b;
+  };
+
+  union x y;
+}

@@ -1,0 +1,31 @@
+--- Preconditions for ANDNE
+
+C  P() {}
+
+      SUBROUTINE ANDNE(KPRESS, LMAPP, LEIG, LPRESS)
+
+C  P() {}
+
+
+      KPRESS = 1                                                        0003
+
+C  P(KPRESS) {KPRESS==1}
+
+      LMAPP = 1                                                         0004
+
+C  P(KPRESS,LMAPP) {KPRESS==1, LMAPP==1}
+
+
+      IF (KPRESS.GT.1.AND.LMAPP.NE.1) THEN                              0006
+
+C  P() {0==-1}
+
+         LEIG = LPRESS-NWEIG                                            0007
+      ENDIF
+
+C  P(KPRESS,LMAPP) {KPRESS==1, LMAPP==1}
+
+
+      PRINT *, KPRESS, LMAPP, LEIG, LPRESS                              0010
+
+      END

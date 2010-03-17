@@ -1,0 +1,85 @@
+
+C  P() {}
+
+      PROGRAM ORDER
+
+C  P() {}
+
+c     to check the ordering used to  print preconditions and transformers
+
+      IF (N.GT.1) THEN                                                  0004
+
+C  P() {2<=N}
+
+         I = 2                                                          0005
+
+C  P(I) {I==2, 2<=N}
+
+         J = 3                                                          0006
+      ENDIF
+
+C  P(I,J) {}
+
+
+      IF (N.LE.1) THEN                                                  0009
+
+C  P(I,J) {N<=1}
+
+         J = 3                                                          0010
+
+C  P(I,J) {J==3, N<=1}
+
+         I = 2                                                          0011
+      ENDIF
+
+C  P(I,J) {}
+
+
+      I = 2                                                             0014
+
+C  P(I,J) {I==2}
+
+      J = 3                                                             0015
+
+C  P(I,J) {I==2, J==3}
+
+      J = 3                                                             0016
+
+C  P(I,J) {I==2, J==3}
+
+      I = 2                                                             0017
+
+C  P(I,J) {I==2, J==3}
+
+
+      X = 1.                                                            0019
+
+C  P(I,J) {I==2, J==3}
+
+      Y = 2.                                                            0020
+
+C  P(I,J) {I==2, J==3}
+
+
+      K = J+M-I                                                         0022
+
+C  P(I,J,K) {I==2, J==3, K==M+1}
+
+
+      IF (K-J.GT.I-2) THEN                                              0024
+
+C  P(I,J,K) {I==2, J==3, K==M+1, 4<=K}
+
+         M = -5                                                         0025
+
+C  P(I,J,K,M) {I==2, J==3, M==-5, 4<=K}
+
+         PRINT *, M                                                     0026
+      ENDIF
+
+C  P(I,J,K,M) {I==2, J==3, M+1<=K, M<=2}
+
+
+      PRINT *, I, J, K, M                                               0029
+
+      END

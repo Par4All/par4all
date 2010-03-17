@@ -1,0 +1,13 @@
+delete while05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create while05 while05.f
+
+activate PRINT_ICFG_WITH_LOOPS
+display ICFG_FILE
+
+close
+delete while05
+quit
+

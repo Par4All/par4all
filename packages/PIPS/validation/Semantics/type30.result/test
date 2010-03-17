@@ -1,0 +1,51 @@
+
+C  T() {}
+
+      PROGRAM TYPE30
+
+C     Check proper subtring operation in string assignment
+
+      CHARACTER*4 S1
+      CHARACTER*2 S2
+
+C  T(S1) {"Hell"==S1}
+
+
+      S1 = "Hello!"                                                     0008
+
+C  T(S2) {'He'==S2}
+
+      S2 = 'Hello!'                                                     0009
+
+C  T() {}
+
+
+      PRINT *, S1, S2                                                   0011
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE30
+
+C     Check proper subtring operation in string assignment
+
+      CHARACTER*4 S1
+      CHARACTER*2 S2
+
+C  P() {}
+
+
+      S1 = "Hello!"                                                     0008
+
+C  P(S1) {"Hell"==S1}
+
+      S2 = 'Hello!'                                                     0009
+
+C  P(S1,S2) {"Hell"==S1, 'He'==S2}
+
+
+      PRINT *, S1, S2                                                   0011
+
+      END
+

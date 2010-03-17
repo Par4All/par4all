@@ -1,0 +1,65 @@
+
+Symbol table for "decl09"
+
+decl09!
+
+Declarations for module "decl09!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:decl09" with type "functional" "int x (char x (char x (char -> void) * -> void) * -> void) * -> void"
+	Declared entity "TOP-LEVEL:decl09b" with type "functional" "int x (char x (char x (char -> void) * -> void) * -> void) * -> void"
+	Declared entity "decl09!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl09!:*HEAP*" with type "area" with size 0
+	Declared entity "decl09!:*STACK*" with type "area" with size 0
+	Declared entity "decl09!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl09!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl09!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl09!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl09!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl09!
+
+
+Parsed printed file
+
+/* This is fully ANSI compatible because the scopes are different for
+   each a and for each f */
+
+/* Example by Ronan */
+void decl09(int a, void (*f)(char a, void (*f)(char a, void (*f)(char a))));
+
+/* Early output by PIPS: */
+void decl09b(int, void (*)(char, void (*)(char, void (*)(char))));
+
+Printed file
+
+/* This is fully ANSI compatible because the scopes are different for
+   each a and for each f */
+
+/* Example by Ronan */
+void decl09(int a, void (*f)(char a, void (*f)(char a, void (*f)(char a))));
+
+/* Early output by PIPS: */
+void decl09b(int, void (*)(char, void (*)(char, void (*)(char))));

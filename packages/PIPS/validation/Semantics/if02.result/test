@@ -1,0 +1,112 @@
+
+Transformers for "if02"
+
+
+C  T() {}
+
+void if02()
+{
+   int j = -1;
+   int n = 2;
+   int i = 0;
+
+//  T() {i==0, j==-1, n==2}
+
+
+   if (n)
+
+//  T() {i==0, j==-1, n==2}
+
+      printf("n == true\n");
+   else
+
+//  T() {0==-1}
+
+      printf("n == true\n");
+
+//  T() {i==0, j==-1, n==2}
+
+   /* no */
+   
+   if (i)
+
+//  T() {0==-1}
+
+      printf("i == true\n");
+   else
+
+//  T() {i==0, j==-1, n==2}
+
+      printf("n == true\n");
+
+//  T() {i==0, j==-1, n==2}
+
+   /* yes */
+   
+   if (j)
+
+//  T() {i==0, j==-1, n==2}
+
+      printf("j == true\n");
+   else
+
+//  T() {0==-1}
+
+      printf("n == true\n");
+}
+
+Preconditions for "if02"
+
+
+//  P() {}
+
+void if02()
+{
+   int j = -1;
+   int n = 2;
+   int i = 0;
+
+//  P() {i==0, j==-1, n==2}
+
+
+   if (n)
+
+//  P() {i==0, j==-1, n==2}
+
+      printf("n == true\n");
+   else
+
+//  P() {0==-1}
+
+      printf("n == true\n");
+
+//  P() {i==0, j==-1, n==2}
+
+   /* no */
+   
+   if (i)
+
+//  P() {0==-1}
+
+      printf("i == true\n");
+   else
+
+//  P() {i==0, j==-1, n==2}
+
+      printf("n == true\n");
+
+//  P() {i==0, j==-1, n==2}
+
+   /* yes */
+   
+   if (j)
+
+//  P() {i==0, j==-1, n==2}
+
+      printf("j == true\n");
+   else
+
+//  P() {0==-1}
+
+      printf("n == true\n");
+}

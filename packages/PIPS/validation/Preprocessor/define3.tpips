@@ -1,0 +1,20 @@
+delete define3
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create define3 define3.c
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE(main)
+
+apply UNSPLIT(%ALL)
+
+close
+shell cc define3.database/Src/define3.c
+
+delete define3
+quit

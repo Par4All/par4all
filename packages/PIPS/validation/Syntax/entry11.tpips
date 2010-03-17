@@ -1,0 +1,19 @@
+delete entry11
+create entry11 entry11.f
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+# display PRINTED_FILE[ENTRY11]
+
+# The code for the entry can be displayed although the module has not yet been parser
+# Check also that undelcared formal arguments are properly handled
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+
+close
+delete entry11
+quit

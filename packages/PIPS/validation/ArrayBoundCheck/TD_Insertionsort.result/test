@@ -1,0 +1,72 @@
+* Example from the C source of Andreas Podelski 
+*
+* In case : I = K -1, there are no bound violations, 
+* but we have to set at least :
+* setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+* activate TRANSFORMERS_INTER_FULL
+* #activate PRECONDITIONS_INTER_FULL
+* so that PIPS can prove it
+* 
+* In case : I = K, there are bound violations
+
+      SUBROUTINE INSERTIONSORT(A, N)
+      REAL A(0:N-1), X
+      INTEGER N
+      
+      INTEGER I,K   
+
+      DO 100 K = 1, N-1                                                 0001
+         X = A(K)                                                       0002
+         I = K                                                          0003
+C         I = K-1
+         DO WHILE (I.GE.0.AND.A(I).GT.X)                                0004
+            IF (N.LE.1+I.AND.0.LE.I.AND.1.LE.K.AND.1+K.LE.N) STOP "Bound
+     & violation:, WRITING,  array INSERTIONSORT:A, upper bound, 1st dim
+     &ension"
+            IF (N.LE.I.AND.0.LE.I.AND.1.LE.K.AND.1+K.LE.N) STOP "Bound v
+     &iolation:, READING,  array INSERTIONSORT:A, upper bound, 1st dimen
+     &sion"
+            A(I+1) = A(I)                                               0005
+            I = I-1                                                     0006
+         ENDDO
+         IF (N.LE.1+I.AND.1.LE.K.AND.1+K.LE.N.AND.0.LE.1+I) STOP "Bound 
+     &violation:, WRITING,  array INSERTIONSORT:A, upper bound, 1st dime
+     &nsion"
+         A(I+1) = X                                                     0007
+100      CONTINUE                                                       0008
+
+      END
+* Example from the C source of Andreas Podelski 
+*
+* In case : I = K -1, there are no bound violations, 
+* but we have to set at least :
+* setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+* activate TRANSFORMERS_INTER_FULL
+* #activate PRECONDITIONS_INTER_FULL
+* so that PIPS can prove it
+* 
+* In case : I = K, there are bound violations
+
+      SUBROUTINE INSERTIONSORT(A, N)
+      REAL A(0:N-1), X
+      INTEGER N
+      
+      INTEGER I,K   
+
+      DO 100 K = 1, N-1                                                 0001
+         X = A(K)                                                       0002
+         I = K                                                          0003
+C         I = K-1
+         DO WHILE (A(I).GT.X)                                           0004
+            IF (N.LE.1+I) STOP "Bound violation:, WRITING,  array INSERT
+     &IONSORT:A, upper bound, 1st dimension"
+            A(I+1) = A(I)                                               0005
+            I = I-1                                                     0006
+         ENDDO
+         IF (N.LE.1+I) STOP "Bound violation:, WRITING,  array INSERTION
+     &SORT:A, upper bound, 1st dimension"
+         A(I+1) = X                                                     0007
+100      CONTINUE                                                       0008
+
+      END
+

@@ -1,0 +1,110 @@
+!!
+!! file for simple_mgrid.f
+!!
+      PROGRAM MG3XDEMO 
+      INTEGER LM, NM, NV, NR, NIT
+      PARAMETER( LM=6 )
+      PARAMETER( NM=2+2**LM, NV=NM**3 )
+      PARAMETER( NR = (8*(NM**3+NM**2+5*NM-23+7*LM))/7 )
+      COMMON /X/ U, V, R, A, C, IR, MM
+      REAL*8 U(NR),V(NV),R(NR),A(0:3),C(0:3)
+      REAL*8 RNM2, RNMU, OLD2, OLDU
+      REAL*8 XX
+      INTEGER IR(LM), MM(LM)
+      INTEGER IT, N
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 20
+      DO IT = 1, NIT
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         CALL MG3P(U, V, R, N, A, C, NV, NR, IR, MM, LMI)
+C (0,5)
+20       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE MG3P(U,V,R,N,A,C,NV,NR,IR,MM,LM)
+      INTEGER N,NV,NR,LM
+      REAL*8 U(NR),V(NV),R(NR)
+      REAL*8 A(0:3),C(0:3)
+      INTEGER IR(LM), MM(LM)
+      INTEGER K, J
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      K = 1
+C (0,3)
+      CALL PSINV(R(IR(K)), U(IR(K)), MM(K), C)
+C (0,4)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+      IF (LM.EQ.2) GOTO 200
+C (3,1)
+!     INITIALLY: DO 100
+      DO K = 2, LM-1
+C (3,2)
+C        BEGIN BLOCK
+C (3,3)
+         J = K-1
+C (3,4)
+         CALL PSINV(R(IR(K)), U(IR(K)), MM(K), C)
+C (3,5)
+100      CONTINUE
+C        END BLOCK
+      ENDDO
+C (2,1)
+200   CONTINUE
+C     END UNSTRUCTURED
+C (0,5)
+      J = LM-1
+C (0,6)
+      K = LM
+C (0,7)
+      CALL PSINV(R, U, N, C)
+C (0,8)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE PSINV(R,U,N,C)
+      INTEGER N
+      REAL*8 U(N,N,N),R(N,N,N),C(0:3)
+      INTEGER I3, I2, I1
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL COMM3(U, N)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE COMM3(U,N)
+      INTEGER N
+      REAL*8 U(N,N,N)
+      INTEGER I3, I2, I1
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 100
+      DO I3 = 2, N-1
+C (0,3)
+!     INITIALLY: DO 100
+         DO I2 = 2, N-1
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+            U(1,I2,I3) = U(N-1,I2,I3)
+C (0,6)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+      RETURN
+C     END BLOCK
+      END

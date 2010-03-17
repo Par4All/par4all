@@ -1,0 +1,9 @@
+delete data01
+create data01 data01.f
+
+# setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
+display PRINTED_FILE[DATA01]
+
+close
+delete data01
+quit

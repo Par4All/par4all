@@ -1,0 +1,19 @@
+extr.f
+
+Fonction issue de aile.f (onera)
+
+Montre 	- l'utilisation des predicats (preconditions)
+	- la privatisation
+
+> Calcul des preconditions fast_inter
+
+Display -m extr prec 
+
+> privatisation
+Perform priv
+Demande explicite
+
+> parallelisation utilisant dg avec preconditions
+Pips -s rsdg -b PPF
+Display -l 
+	-> options sont utiles

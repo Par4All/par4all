@@ -1,0 +1,6 @@
+C     HOW ABOUT TRANSFORMER ON COMMON VARIABLES?
+      PROGRAM CBL
+      COMMON /FOO/ K
+      K = 1                                                             0001
+      CALL INCR                                                         0002
+      END

@@ -1,0 +1,18 @@
+
+Module ENTRY03
+
+ ENTRY03
+     FOO
+     BAR
+
+Call graph file ENTRY03 (with too many callees?)
+
+      SUBROUTINE ENTRY03(X, N)
+      INTEGER N
+      COMPLEX*8 X(1:N)
+
+      CALL FOO                                                          0008
+      PRINT *, X                                                        0009
+
+
+      END

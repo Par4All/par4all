@@ -1,0 +1,6 @@
+delete bughexa
+create bughexa bughexa.f
+display PRINTED_FILE 
+close
+delete bughexa
+quit

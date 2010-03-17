@@ -1,0 +1,145 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: inter02: No such workspace
+Registering file inter02.f
+Splitting file    ./inter02.f
+  Module         INCR
+  Module         INTER02
+Workspace inter02 created and opened.
+Main module PROGRAM "INTER02" selected.
+Module INTER02 selected
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+user warning, property SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES redefined
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+Selecting rule: TRANSFORMERS_INTER_FULL
+Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
+Selecting rule: PRECONDITIONS_INTER_FULL
+Selecting rule: PRINT_CODE_TRANSFORMERS
+Module INCR selected
+Request: build resource PRINTED_FILE for module INCR.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(INCR)
+  PARSER                         building   PARSED_CODE(INCR)
+                                 building   CALLEES(INCR)
+  CONTROLIZER                    building   CODE(INCR)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(INCR)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INCR)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INCR)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INCR)
+  FILTER_FILE                    building   SOURCE_FILE(INTER02)
+  PARSER                         building   PARSED_CODE(INTER02)
+                                 building   CALLEES(INTER02)
+  CONTROLIZER                    building   CODE(INTER02)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(INTER02)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INTER02)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INTER02)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INTER02)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INCR)
+  PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INCR)
+PRINTED_FILE made for INCR.
+Module INTER02 selected
+Request: build resource PRINTED_FILE for module INTER02.
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INTER02)
+user warning in fortran_user_call_to_transformer: Type incompatibility
+(formal INTEGER*4/actual REAL*4)
+for formal parameter I (rank 1)
+in call to INCR from INTER02
+  PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INTER02)
+PRINTED_FILE made for INTER02.
+
+C  T(I) {I==I#init+1}
+
+
+      SUBROUTINE INCR(I)
+
+C  T(I) {I==I#init+1}
+
+      I = I+1                                                           0003
+      END
+
+C  T() {}
+
+      PROGRAM INTER02
+
+C  T(X) {0.==X}
+
+
+C     Check that type mismatches are detected and do not cause core dumps
+
+      X = 0.                                                            0005
+
+C  T(X) {}
+
+
+      CALL INCR(X)                                                      0007
+
+C  T() {}
+
+
+      PRINT *, X                                                        0009
+
+      END
+Selecting rule: PRINT_CODE_PRECONDITIONS
+Module INCR selected
+Request: build resource PRINTED_FILE for module INCR.
+  CALLGRAPH                      building   CALLERS(INCR)
+                                 building   CALLERS(INTER02)
+                                 building   HEIGHT(INCR)
+                                 building   HEIGHT(INTER02)
+                                 building   DEPTH(INCR)
+                                 building   DEPTH(INTER02)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INTER02)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INTER02)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INCR)
+user warning in any_user_call_site_to_transformer: Type incompatibility between call site and declaration for argument "I" (rank 1) of function "INCR" called from function "INTER02": INTEGER*4/REAL*4
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INCR)
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INCR)
+PRINTED_FILE made for INCR.
+Module INTER02 selected
+Request: build resource PRINTED_FILE for module INTER02.
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INTER02)
+PRINTED_FILE made for INTER02.
+
+C  P() {}
+
+
+      SUBROUTINE INCR(I)
+
+C  P() {}
+
+      I = I+1                                                           0003
+      END
+
+C  P() {}
+
+      PROGRAM INTER02
+
+C  P() {}
+
+
+C     Check that type mismatches are detected and do not cause core dumps
+
+      X = 0.                                                            0005
+
+C  P(X) {0.==X}
+
+
+      CALL INCR(X)                                                      0007
+
+C  P(X) {}
+
+
+      PRINT *, X                                                        0009
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module INCR.
+  Closing module INTER02.
+Closing program.
+Closing workspace.
+Workspace inter02 closed.
+
+Workspace inter02 deleted.

@@ -1,0 +1,12 @@
+      PROGRAM FORMEL05
+
+      INTEGER UN
+      PARAMETER (UN=1)
+
+      J = UN                                                            0006
+      I = C(UN)                                                         0007
+c      I = C(1)
+      CALL FOO(C)                                                       0009
+
+      END
+

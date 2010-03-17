@@ -1,0 +1,4 @@
+#! /bin/sh
+Init -f rffti1.f rffti1 >&2
+Display -m RFFTI1
+Delete rffti1

@@ -1,0 +1,24 @@
+#
+# testing various transformations...
+#
+delete d
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+create d decls_1.f
+echo # initial codes
+display PRINTED_FILE[%ALL]
+echo # partial evaluation...
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+apply PARTIAL_EVAL[%ALL]
+echo # cleaning declarations...
+setproperty PRETTYPRINT_COMMONS "include"
+apply CLEAN_DECLARATIONS[%ALL]
+echo # new codes
+display PRINTED_FILE[%ALL]
+echo # unsplitting files...
+apply UNSPLIT[%PROGRAM]
+shell cat d.database/Src/*
+close
+delete d

@@ -1,0 +1,115 @@
+      SUBROUTINE  FONT3(F1 , F2)
+      INTEGER IC, JC, KC
+      COMMON/IJKC/ IC,JC,KC
+      INTEGER IM1, JM1, KM1
+      COMMON/LI/ IM1,JM1,KM1
+      REAL    F1, F2
+      DIMENSION F1(IC,JC,1),F2(IC,JC,1)
+      INTEGER I, J
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+!     INITIALLY: DO 15
+      DO I = 1, IC
+C (0,3)
+!     INITIALLY: DO 15
+         DO J = 1, JC
+C (0,4)
+!     INITIALLY: DO 15
+            DO K = 1, 1
+C (0,5)
+C              BEGIN BLOCK
+C (0,6)
+               F2(I,J,K) = F1(I,J,K)
+C (0,7)
+15             CONTINUE
+C              END BLOCK
+            ENDDO
+         ENDDO
+      ENDDO
+C (0,8)
+      RETURN
+C     END BLOCK
+      END
+      PROGRAM MAIN
+      INTEGER IC, JC, KC
+      COMMON/IJKC/ IC,JC,KC
+      INTEGER IM1, JM1, KM1
+      COMMON/LI/ IM1,JM1,KM1
+      REAL F1(10),F2(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      IC = 3
+C (0,3)
+      JC = 3
+C (0,4)
+      KC = 3
+C (0,5)
+      CALL FONT3(F1, F2)
+C (0,6)
+      PRINT *, "What ?"
+C (0,7)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for adn07.f
+!!
+      PROGRAM MAIN
+      INTEGER IC, JC, KC
+      COMMON/IJKC/ IC,JC,KC
+      INTEGER IM1, JM1, KM1
+      COMMON/LI/ IM1,JM1,KM1
+      REAL F1(10),F2(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      IC = 3
+C (0,3)
+      JC = 3
+C (0,4)
+      KC = 3
+C (0,5)
+      CALL FONT3(F1, F2)
+C (0,6)
+      PRINT *, "What ?"
+C (0,7)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE  FONT3(F1 , F2)
+      INTEGER IC, JC, KC
+      COMMON/IJKC/ IC,JC,KC
+      INTEGER IM1, JM1, KM1
+      COMMON/LI/ IM1,JM1,KM1
+      REAL    F1, F2
+      DIMENSION F1(IC,JC,10/(IC*JC)),F2(IC,JC,10/(IC*JC))
+      INTEGER I, J
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+!     INITIALLY: DO 15
+      DO I = 1, IC
+C (0,3)
+!     INITIALLY: DO 15
+         DO J = 1, JC
+C (0,4)
+!     INITIALLY: DO 15
+            DO K = 1, 1
+C (0,5)
+C              BEGIN BLOCK
+C (0,6)
+               F2(I,J,K) = F1(I,J,K)
+C (0,7)
+15             CONTINUE
+C              END BLOCK
+            ENDDO
+         ENDDO
+      ENDDO
+C (0,8)
+      RETURN
+C     END BLOCK
+      END

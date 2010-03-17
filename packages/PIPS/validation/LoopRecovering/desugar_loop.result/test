@@ -1,0 +1,135 @@
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+
+   while (j<i) {                                                        /*0006*/
+      j = j+1;                                                          /*0007*/
+// This test should be structured at the end:
+      if (j>100) goto loop_end_1;                                       /*0009*/
+      j += i;                                                           /*0011*/
+loop_end_1:      ;
+   }
+l99999:   ;
+   if (!(j<i)) goto break_2;                                            /*0018*/
+   j = j+1;                                                             /*0014*/
+   if (j>100) goto break_2;                                             /*0015*/
+   j += i;                                                              /*0017*/
+   goto l99999;
+break_2:   ;
+l99998:   ;
+
+   if (!(j<i)) goto break_3;                                            /*0027*/
+   j = j+1;                                                             /*0021*/
+   if (j>100) goto break_3;                                             /*0022*/
+   if (j>50) goto loop_end_3;                                           /*0024*/
+   j += i;                                                              /*0026*/
+loop_end_3:   ;
+   goto l99998;
+break_3:   ;
+   return i;                                                            /*0028*/
+}
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+
+   while (j<i) {                                                        /*0006*/
+      j = j+1;                                                          /*0007*/
+      // This test should be structured at the end:
+      if (j>100)                                                        /*0009*/
+         ;
+      else
+         j += i;                                                        /*0011*/
+loop_end_1:      ;
+   }
+l99999:   ;
+   if (!(j<i)) goto break_2;                                            /*0018*/
+   j = j+1;                                                             /*0014*/
+   if (j>100) goto break_2;                                             /*0015*/
+   j += i;                                                              /*0017*/
+   goto l99999;
+break_2:   ;
+l99997:   ;
+
+   if (!(j<i)) goto l99998;                                             /*0027*/
+   j = j+1;                                                             /*0021*/
+   if (j>100) goto l99998;                                              /*0022*/
+   if (j>50)                                                            /*0024*/
+      ;
+   else
+      j += i;                                                           /*0026*/
+loop_end_3:   ;
+   goto l99997;
+l99998:   ;
+break_3:   ;
+   return i;                                                            /*0028*/
+}
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+
+   while (j<i) {                                                        /*0006*/
+      j = j+1;                                                          /*0007*/
+      // This test should be structured at the end:
+      if (j>100)                                                        /*0009*/
+         ;
+      else
+         j += i;                                                        /*0011*/
+loop_end_1:      ;
+   }
+l99999:   ;
+   if (!(j<i)) goto break_2;                                            /*0018*/
+   j = j+1;                                                             /*0014*/
+   if (j>100) goto break_2;                                             /*0015*/
+   j += i;                                                              /*0017*/
+   goto l99999;
+break_2:   ;
+l99997:   ;
+
+   if (!(j<i)) goto l99998;                                             /*0027*/
+   j = j+1;                                                             /*0021*/
+   if (j>100) goto l99998;                                              /*0022*/
+   if (j>50)                                                            /*0024*/
+      ;
+   else
+      j += i;                                                           /*0026*/
+loop_end_3:   ;
+   goto l99997;
+l99998:   ;
+break_3:   ;
+   return i;                                                            /*0028*/
+}
+int desugar_loop(int i)
+{
+   int j = 0;                                                           /*0004*/
+
+   while (j<i) {                                                        /*0006*/
+      j = j+1;                                                          /*0007*/
+      // This test should be structured at the end:
+      if (j>100)                                                        /*0009*/
+         ;
+      else
+         j += i;                                                        /*0011*/
+loop_end_1:      ;
+   }
+l99999:   ;
+   if (!(j<i)) goto break_2;                                            /*0018*/
+   j = j+1;                                                             /*0014*/
+   if (j>100) goto break_2;                                             /*0015*/
+   j += i;                                                              /*0017*/
+   goto l99999;
+break_2:   ;
+l99997:   ;
+
+   if (!(j<i)) goto l99998;                                             /*0027*/
+   j = j+1;                                                             /*0021*/
+   if (j>100) goto l99998;                                              /*0022*/
+   if (j>50)                                                            /*0024*/
+      ;
+   else
+      j += i;                                                           /*0026*/
+loop_end_3:   ;
+   goto l99997;
+l99998:   ;
+break_3:   ;
+   return i;                                                            /*0028*/
+}

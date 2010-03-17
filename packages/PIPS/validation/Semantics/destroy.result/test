@@ -1,0 +1,82 @@
+
+First version: no array or real interference in module BAR
+
+
+C  P() {}
+
+      SUBROUTINE DESTROY
+
+c     Check transformer for called user routine. It's not possible
+c     to neglect effect and to use only the callee's transformer
+
+      COMMON /FOO/I,J,K,L
+
+C  P() {}
+
+
+      I = I+1                                                           0008
+
+C  P(I) {I==I#init+1}
+
+      J = J+2                                                           0009
+
+C  P(I,J) {I==I#init+1, J==J#init+2}
+
+      K = K+3                                                           0010
+
+C  P(I,J,K) {I==I#init+1, J==J#init+2, K==K#init+3}
+
+      L = L+4                                                           0011
+
+C  P(I,J,K,L) {I==I#init+1, J==J#init+2, K==K#init+3, L==L#init+4}
+
+
+      CALL BAR                                                          0013
+
+C  P(I,J,K,L) {I==I#init+1, J==J#init+2, K==K#init+3, L==L#init+4}
+
+
+      PRINT *, I, J, K, L                                               0015
+
+      END
+
+Second version: array and real variable interference in module BAR
+
+
+C  P() {}
+
+      SUBROUTINE DESTROY
+
+c     Check transformer for called user routine. It's not possible
+c     to neglect effect and to use only the callee's transformer
+
+      COMMON /FOO/I,J,K,L
+
+C  P() {}
+
+
+      I = I+1                                                           0008
+
+C  P(I) {I==I#init+1}
+
+      J = J+2                                                           0009
+
+C  P(I,J) {I==I#init+1, J==J#init+2}
+
+      K = K+3                                                           0010
+
+C  P(I,J,K) {I==I#init+1, J==J#init+2, K==K#init+3}
+
+      L = L+4                                                           0011
+
+C  P(I,J,K,L) {I==I#init+1, J==J#init+2, K==K#init+3, L==L#init+4}
+
+
+      CALL BAR                                                          0013
+
+C  P(I,J,K,L) {I==I#init+1}
+
+
+      PRINT *, I, J, K, L                                               0015
+
+      END

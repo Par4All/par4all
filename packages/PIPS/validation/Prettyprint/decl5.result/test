@@ -1,0 +1,23 @@
+# initial version
+      PROGRAM DECL5
+      REAL*4 A, B, C, D(1:3), A1, A2, A3, B1, B2, B3, C1(1:10), C2(1:
+     &5), C3(1:2)
+      COMMON /BLA/ A1, A2, A3
+      COMMON /FOO/ A, B, C
+      EQUIVALENCE (C1(4), C3),  (C1(5), C2)
+      EQUIVALENCE (A3, B3)
+      EQUIVALENCE (A2, B2)
+      EQUIVALENCE (A1, B1)
+      EQUIVALENCE (D, A)
+! use
+      PRINT *, B, B3, C2(2), C3(2)                                      0018
+      END
+# after cleaning declarations...
+      PROGRAM DECL5
+      REAL*4 B, B3, C2(1:5), C3(1:2)
+      COMMON /BLA/ A1, A2, A3
+      COMMON /FOO/ A, B, C
+      EQUIVALENCE (C3(2), C2)
+! use
+      PRINT *, B, B3, C2(2), C3(2)                                      0018
+      END

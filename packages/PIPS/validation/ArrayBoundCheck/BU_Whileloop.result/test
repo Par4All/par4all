@@ -1,0 +1,47 @@
+* Example with array references in the condition of while loop
+    
+      PROGRAM WHILELOOP
+      PARAMETER (NUM=10)
+      REAL TOSORT(NUM),TEMP
+      INTEGER I,J,NUM
+
+      DO 100 I = 1, NUM-1                                               0001
+         DO 100 J = I, 1, -1                                            0002
+            IF (J+1.LT.1.OR.J+1.GT.NUM) STOP 
+     &      "Bound violation:array WHILELOOP:TOSORT, 1st dimension"
+            IF (J.LT.1.OR.J.GT.NUM) STOP 
+     &      "Bound violation:array WHILELOOP:TOSORT, 1st dimension"
+            DO WHILE (TOSORT(J).GT.TOSORT(J+1))                         0003
+               IF (J.LT.1.OR.J.GT.NUM) STOP "Bound violation:array WHILE
+     &LOOP:TOSORT, 1st dimension"
+               TEMP = TOSORT(J)                                         0004
+               IF (J+1.LT.1.OR.J+1.GT.NUM) STOP "Bound violation:array W
+     &HILELOOP:TOSORT, 1st dimension"
+               IF (J.LT.1.OR.J.GT.NUM) STOP "Bound violation:array WHILE
+     &LOOP:TOSORT, 1st dimension"
+               TOSORT(J) = TOSORT(J+1)                                  0005
+               IF (J+1.LT.1.OR.J+1.GT.NUM) STOP "Bound violation:array W
+     &HILELOOP:TOSORT, 1st dimension"
+               TOSORT(J+1) = TEMP                                       0006
+            ENDDO
+
+100         CONTINUE                                                    0007
+      END
+* Example with array references in the condition of while loop
+    
+      PROGRAM WHILELOOP
+      PARAMETER (NUM=10)
+      REAL TOSORT(NUM),TEMP
+      INTEGER I,J,NUM
+
+      DO 100 I = 1, NUM-1                                               0001
+         DO 100 J = I, 1, -1                                            0002
+            DO WHILE (TOSORT(J).GT.TOSORT(J+1))                         0003
+               TEMP = TOSORT(J)                                         0004
+               TOSORT(J) = TOSORT(J+1)                                  0005
+               TOSORT(J+1) = TEMP                                       0006
+            ENDDO
+
+100         CONTINUE                                                    0007
+      END
+

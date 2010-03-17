@@ -1,0 +1,50 @@
+delete loop_tiling01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_tiling01 loop_tiling01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# We use the winning combination, except TRANSFORMERS_IN_CONTEXT
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Initial source code
+echo
+
+display PRINTED_FILE[loop_tiling01]
+
+echo
+echo Source code after loop tiling
+echo
+
+apply LOOP_TILING
+l1
+10  0
+0  10
+display PRINTED_FILE[loop_tiling01]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat loop_tiling01.database/Warnings
+
+quit

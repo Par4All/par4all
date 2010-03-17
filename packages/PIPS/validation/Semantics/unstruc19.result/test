@@ -1,0 +1,186 @@
+
+Before transformer computation
+
+C     Simplified version of AXIAL, used to expose a bug in
+C     transformers_inter_full, most likely linked to bourdoncle
+C     restructuration.
+
+                      SUBROUTINE  UNSTRUC19
+     * ( DIRR, NUMIRR , NUMMAT , IBUR)
+      LOGICAL FINDMO
+      REAL XIR (1)
+C (0,1)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+
+2     FINDMO = .FALSE.                                                  0010
+C (2,1)
+
+4     IF (FINDMO) THEN                                                  0012
+      ELSE
+         RETURN
+      ENDIF
+C (3,1)
+C     BEGIN BLOCK
+C (3,2)
+      IR = IRINF                                                        0013
+C (3,3)
+C     BEGIN UNSTRUCTURED
+C (4,1)
+5     CONTINUE                                                          0014
+C (5,1)
+      IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0015
+      ELSE
+         GOTO 99999
+      ENDIF
+C (6,1)
+C     BEGIN BLOCK
+C (6,2)
+      XIR(IR) = AFLOT                                                   0016
+C (6,3)
+      IR = IR+1                                                         0017
+C     END BLOCK
+      GOTO 5
+99999 CONTINUE
+
+C     END UNSTRUCTURED
+C     END BLOCK
+      GOTO 2
+
+C     END UNSTRUCTURED
+      END
+
+After transformer computation, which seems to destroy the internal representation
+
+C     Simplified version of AXIAL, used to expose a bug in
+C     transformers_inter_full, most likely linked to bourdoncle
+C     restructuration.
+
+                      SUBROUTINE  UNSTRUC19
+     * ( DIRR, NUMIRR , NUMMAT , IBUR)
+      LOGICAL FINDMO
+      REAL XIR (1)
+C (0,1)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+
+2     FINDMO = .FALSE.                                                  0010
+C (2,1)
+
+4     IF (FINDMO) THEN                                                  0012
+      ELSE
+         RETURN
+      ENDIF
+C (3,1)
+C     BEGIN BLOCK
+C (3,2)
+      IR = IRINF                                                        0013
+C (3,3)
+C     BEGIN UNSTRUCTURED
+C (4,1)
+5     CONTINUE                                                          0014
+C (5,1)
+      IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0015
+      ELSE
+         GOTO 99998
+      ENDIF
+C (6,1)
+C     BEGIN BLOCK
+C (6,2)
+      XIR(IR) = AFLOT                                                   0016
+C (6,3)
+      IR = IR+1                                                         0017
+C     END BLOCK
+      GOTO 5
+99998 CONTINUE
+
+C     END UNSTRUCTURED
+C     END BLOCK
+      GOTO 2
+
+C     END UNSTRUCTURED
+      END
+
+C  T() {}
+
+C     Simplified version of AXIAL, used to expose a bug in
+C     transformers_inter_full, most likely linked to bourdoncle
+C     restructuration.
+
+                      SUBROUTINE  UNSTRUC19
+     * ( DIRR, NUMIRR , NUMMAT , IBUR)
+      LOGICAL FINDMO
+      REAL XIR (1)
+
+C  T(IR) {}
+
+C (0,1)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+
+2     FINDMO = .FALSE.                                                  0010
+
+C  T() {}
+
+C (2,1)
+
+4     IF (FINDMO) THEN                                                  0012
+      ELSE
+         RETURN
+      ENDIF
+
+C  T(IR) {IRINF<=IR}
+
+C (3,1)
+C     BEGIN BLOCK
+
+C  T(IR) {IR==IRINF}
+
+C (3,2)
+      IR = IRINF                                                        0013
+
+C  T(IR) {IR#init<=IR}
+
+C (3,3)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (4,1)
+5     CONTINUE                                                          0014
+
+C  T() {}
+
+C (5,1)
+      IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0015
+      ELSE
+         GOTO 99998
+      ENDIF
+
+C  T(IR) {IR==IR#init+1}
+
+C (6,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (6,2)
+      XIR(IR) = AFLOT                                                   0016
+
+C  T(IR) {IR==IR#init+1}
+
+C (6,3)
+      IR = IR+1                                                         0017
+C     END BLOCK
+      GOTO 5
+99998 CONTINUE
+
+C     END UNSTRUCTURED
+C     END BLOCK
+      GOTO 2
+
+C     END UNSTRUCTURED
+      END

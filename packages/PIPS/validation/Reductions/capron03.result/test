@@ -1,0 +1,51 @@
+
+Print code with proper reductions
+
+      PROGRAM CAPRON03
+
+      LOGICAL A(10)
+      INTEGER C
+
+      READ *, A                                                         0006
+
+      C = 0                                                             0008
+      DO I = 1, N                                                       0009
+C  call sum[C],
+         C = C+A(I)                                                     0010
+      ENDDO
+
+      PRINT *, C                                                        0013
+      END
+
+Print code with cumulated reductions
+
+      PROGRAM CAPRON03
+
+      LOGICAL A(10)
+      INTEGER C
+
+      READ *, A                                                         0006
+
+      C = 0                                                             0008
+C  loop sum[C],
+      DO I = 1, N                                                       0009
+C  call sum[C],
+         C = C+A(I)                                                     0010
+      ENDDO
+
+      PRINT *, C                                                        0013
+      END
+      PROGRAM CAPRON03
+
+      LOGICAL A(10)
+      INTEGER C
+
+      READ *, A                                                         0006
+
+      C = 0                                                             0008
+      DO I = 1, N                                                       0009
+         C = C+A(I)                                                     0010
+      ENDDO
+
+      PRINT *, C                                                        0013
+      END

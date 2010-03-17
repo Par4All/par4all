@@ -1,0 +1,6 @@
+delete t
+create t typage_intrinsic.f
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete t

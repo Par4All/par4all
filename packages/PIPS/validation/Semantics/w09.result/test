@@ -1,0 +1,285 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W09
+
+C     Test de l'arret de la voiture propose par Nicolas Halbwachs, 15
+C     mars 2005
+
+      INTEGER MS, S, M
+
+C  T(M,MS,S) {0<=M, M<=11}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(MS) {MS==0}
+
+C (0,2)
+
+      MS = 0                                                            0008
+
+C  T(S) {MS==0, S==0}
+
+C (0,3)
+      S = 0                                                             0009
+
+C  T(M) {M==0, MS==0, S==0}
+
+C (0,4)
+      M = 0                                                             0010
+
+C  T(M,MS,S) {M#init==0, MS#init==0, S#init==0, 0<=M, MS<=3M,
+C    MS<=2M+2S, M<=MS+2S, MS<=2, 0<=MS+3S, 0<=S, S<=4}
+
+C (0,5)
+
+      DO WHILE (MS.LE.2.AND.S.LE.4)                                     0012
+
+C  T(M,MS,S) {M+S==M#init+S#init+1, MS#init+3S#init+1<=MS+3S,
+C    MS+3S<=3S#init+3, S#init<=S, S<=S#init+1, S#init<=4}
+
+C (0,6)
+         IF (X.GT.0.) THEN                                              0013
+
+C  T(MS,S) {MS==0, S==S#init+1, MS#init<=2, S<=5}
+
+C (0,7)
+C           BEGIN BLOCK
+
+C  T(S) {S==S#init+1, MS<=2, S<=5}
+
+C (0,8)
+            S = S+1                                                     0014
+
+C  T(MS) {MS==0, MS#init<=2, S<=5}
+
+C (0,9)
+            MS = 0                                                      0015
+C           END BLOCK
+         ELSE
+
+C  T(M,MS) {M==M#init+1, MS==MS#init+1, MS<=3, S<=4}
+
+C (0,10)
+C           BEGIN BLOCK
+
+C  T(M) {M==M#init+1, MS<=2, S<=4}
+
+C (0,11)
+            M = M+1                                                     0017
+
+C  T(MS) {MS==MS#init+1, MS<=3, S<=4}
+
+C (0,12)
+            MS = MS+1                                                   0018
+C           END BLOCK
+         ENDIF
+      ENDDO
+
+C  T() {0<=M, MS<=3M, M<=MS+2S, 5<=5M+S, 2<=2M+5S, 1<=M+4S, 1<=M+S,
+C    M<=2S+3, M+S<=15, MS<=3, 15<=5MS+13S, 1<=MS+3S, MS+3S<=15, 0<=S,
+C    S<=5}
+
+C (0,13)
+
+      PRINT *, MS, S, M                                                 0022
+
+C  T(MS,S) {0<=M, MS#init<=3M, M<=MS#init+2S#init, 5<=5M+S#init,
+C    2<=2M+5S#init, 1<=M+4S#init, 1<=M+S#init, M<=2S#init+3,
+C    M+S#init<=15, MS#init<=3, 15<=5MS#init+13S#init,
+C    1<=MS#init+3S#init, MS#init+3S#init<=15, 0<=S#init, S#init<=5}
+
+C (0,14)
+      READ *, S, MS                                                     0023
+
+C  T() {0<=M, M<=11}
+
+C (0,15)
+
+      IF (M.LE.11) THEN                                                 0025
+
+C  T() {0<=M, M<=11}
+
+C (0,16)
+         PRINT *, "healthy"                                             0026
+      ELSE
+
+C  T() {0==-1}
+
+C (0,17)
+         PRINT *, "crashed!"                                            0028
+      ENDIF
+
+C     END BLOCK
+      END
+
+PRECONDITIONS
+
+
+C  P() {}
+
+      PROGRAM W09
+
+C     Test de l'arret de la voiture propose par Nicolas Halbwachs, 15
+C     mars 2005
+
+      INTEGER MS, S, M
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      MS = 0                                                            0008
+
+C  P(MS) {MS==0}
+
+C (0,3)
+      S = 0                                                             0009
+
+C  P(MS,S) {MS==0, S==0}
+
+C (0,4)
+      M = 0                                                             0010
+
+C  P(M,MS,S) {M==0, MS==0, S==0}
+
+C (0,5)
+
+      DO WHILE (MS.LE.2.AND.S.LE.4)                                     0012
+
+C  P(M,MS,S) {0<=M, MS<=3M, MS<=2M+2S, M<=MS+2S, MS<=2, 0<=S, S<=4}
+
+C (0,6)
+         IF (X.GT.0.) THEN                                              0013
+
+C  P(M,MS,S) {0<=M, MS<=3M, MS<=2M+2S, M<=MS+2S, MS<=2, 0<=S, S<=4}
+
+C (0,7)
+C           BEGIN BLOCK
+
+C  P(M,MS,S) {0<=M, MS<=3M, MS<=2M+2S, M<=MS+2S, MS<=2, 0<=S, S<=4}
+
+C (0,8)
+            S = S+1                                                     0014
+
+C  P(M,MS,S) {0<=M, MS<=3M, MS+2<=2M+2S, M+2<=MS+2S, MS<=2, 1<=S,
+C    S<=5}
+
+C (0,9)
+            MS = 0                                                      0015
+C           END BLOCK
+         ELSE
+
+C  P(M,MS,S) {0<=M, MS<=3M, MS<=2M+2S, M<=MS+2S, MS<=2, 0<=S, S<=4}
+
+C (0,10)
+C           BEGIN BLOCK
+
+C  P(M,MS,S) {0<=M, MS<=3M, MS<=2M+2S, M<=MS+2S, MS<=2, 0<=S, S<=4}
+
+C (0,11)
+            M = M+1                                                     0017
+
+C  P(M,MS,S) {1<=M, MS+3<=3M, MS+2<=2M+2S, M<=MS+2S+1, MS<=2, 0<=S,
+C    S<=4}
+
+C (0,12)
+            MS = MS+1                                                   0018
+C           END BLOCK
+         ENDIF
+      ENDDO
+
+C  P(M,MS,S) {MS<=3M, M<=MS+2S, 5<=5M+S, MS<=3, 15<=5MS+13S,
+C    MS+3S<=15, S<=5}
+
+C (0,13)
+
+      PRINT *, MS, S, M                                                 0022
+
+C  P(M,MS,S) {0<=M, MS<=3M, M<=MS+2S, 5<=5M+S, 2<=2M+5S, 1<=M+4S,
+C    1<=M+S, M<=2S+3, M+S<=15, MS<=3, 15<=5MS+13S, 1<=MS+3S,
+C    MS+3S<=15, 0<=S, S<=5}
+
+C (0,14)
+      READ *, S, MS                                                     0023
+
+C  P(M,MS,S) {0<=M, M<=11}
+
+C (0,15)
+
+      IF (M.LE.11) THEN                                                 0025
+
+C  P(M,MS,S) {0<=M, M<=11}
+
+C (0,16)
+         PRINT *, "healthy"                                             0026
+      ELSE
+
+C  P() {0==-1}
+
+C (0,17)
+         PRINT *, "crashed!"                                            0028
+      ENDIF
+
+C     END BLOCK
+      END
+
+AFTER DEAD CODE ELIMINATION
+
+      PROGRAM W09
+
+C     Test de l'arret de la voiture propose par Nicolas Halbwachs, 15
+C     mars 2005
+
+      INTEGER MS, S, M
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      MS = 0                                                            0008
+C (0,3)
+      S = 0                                                             0009
+C (0,4)
+      M = 0                                                             0010
+C (0,5)
+
+      DO WHILE (MS.LE.2.AND.S.LE.4)                                     0012
+C (0,6)
+         IF (X.GT.0.) THEN                                              0013
+C (0,7)
+C           BEGIN BLOCK
+C (0,8)
+            S = S+1                                                     0014
+C (0,9)
+            MS = 0                                                      0015
+C           END BLOCK
+         ELSE
+C (0,10)
+C           BEGIN BLOCK
+C (0,11)
+            M = M+1                                                     0017
+C (0,12)
+            MS = MS+1                                                   0018
+C           END BLOCK
+         ENDIF
+      ENDDO
+C (0,13)
+
+      PRINT *, MS, S, M                                                 0022
+C (0,14)
+      READ *, S, MS                                                     0023
+C (0,15)
+
+      PRINT *, "healthy"                                                0026
+
+C     END BLOCK
+      END

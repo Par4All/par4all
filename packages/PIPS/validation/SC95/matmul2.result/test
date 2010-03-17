@@ -1,0 +1,70 @@
+      PROGRAM MATMUL
+      INTEGER*4 N
+      PARAMETER (N = 10)
+      INTEGER S80p0,S80p1,S80t0,S80q0,S60p0,S60p1,S20p0,S20p1,S30p0,
+     &S30p1,S0t0,S80t1,S80flag0
+      REAL*8 INS_80(0:1,1:10,1:10),INS_60(1:10,1:10),INS_20(1:10,1:10
+     &),INS_30(1:10,1:10)
+CDIR$ SHARED INS_80(:, :BLOCK, :BLOCK)
+CDIR$ SHARED INS_60(:BLOCK, :BLOCK)
+CDIR$ SHARED INS_20(:BLOCK, :BLOCK)
+CDIR$ SHARED INS_30(:BLOCK, :BLOCK)
+      S80t0 = 2
+      S80t1 = 1
+      S80q0 = 0
+      S80flag0 = 0
+      DO S0t0 = 0, MAX(10)
+         IF (S0t0.EQ.S80t1) THEN
+CDIR$ DOSHARED(S80p0, S80p1) ON INS_80(S80q0,S80p0,S80p1)
+            DO S80p0 = 1, 10
+               DO S80p1 = 1, 10
+                  INS_80(MOD(S80q0, 2),S80p0,S80p1) = INS_60(S80p0,
+     &            S80p1)+INS_20(S80p0,1+S80q0)*INS_30(0,S80p1)
+               ENDDO
+            ENDDO
+            S80t1 = S80t1+1
+            IF (S80t1.GT.1) S80t1 = -1
+            S80flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S80t0) THEN
+CDIR$ DOSHARED(S80p0, S80p1) ON INS_80(S80q0,S80p0,S80p1)
+            DO S80p0 = 1, 10
+               DO S80p1 = 1, 10
+                  INS_80(MOD(S80q0, 2),S80p0,S80p1) = INS_80(MOD(-1+
+     &            S80q0, 2),S80p0,S80p1)+INS_20(S80p0,1+S80q0)*INS_30
+     &            (0,S80p1)
+               ENDDO
+            ENDDO
+            S80t0 = S80t0+1
+            IF (S80t0.GT.10) S80t0 = -1
+            S80flag0 = 1
+         ENDIF
+         IF (S80flag0.EQ.1) S80q0 = S80q0+1
+         S80flag0 = 0
+         IF (S0t0.EQ.0) THEN
+CDIR$ DOSHARED(S60p0, S60p1) ON INS_60(S60p0,S60p1)
+            DO S60p0 = 1, 10
+               DO S60p1 = 1, 10
+                  INS_60(S60p0,S60p1) = 0.
+               ENDDO
+            ENDDO
+         ENDIF
+         IF (S0t0.EQ.0) THEN
+CDIR$ DOSHARED(S20p0, S20p1) ON INS_20(S20p0,S20p1)
+            DO S20p0 = 1, 10
+               DO S20p1 = 1, 10
+                  INS_20(S20p0,S20p1) = REAL(S20p0-N/2)/REAL(S20p1)
+               ENDDO
+            ENDDO
+         ENDIF
+         IF (S0t0.EQ.0) THEN
+CDIR$ DOSHARED(S30p0, S30p1) ON INS_30(0,S30p1)
+            DO S30p0 = 1, 10
+               DO S30p1 = 1, 10
+                  INS_30(0,S30p1) = REAL(S30p1-3)/REAL(S30p0)
+               ENDDO
+            ENDDO
+         ENDIF
+      ENDDO
+      END
+

@@ -1,0 +1,223 @@
+user warning in tp_parse: implchar: No such workspace
+Registering file implchar.f
+Splitting file    ./implchar.f
+  Module         DANCE
+  Module         DUMMY
+  Module         IMPLCHAR
+Workspace implchar created and opened.
+Main module PROGRAM "IMPLCHAR" selected.
+Module IMPLCHAR selected
+setproperty PARSER_DUMP_SYMBOL_TABLE=TRUE 
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module DUMMY selected
+Module DUMMY already active.
+Request: build resource PRINTED_FILE for module DUMMY.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(DUMMY)
+  PARSER                         building   PARSED_CODE(DUMMY)
+                                 building   CALLEES(DUMMY)
+
+Declarations for module DUMMY with type INTEGER*4 x INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity DUMMY:*DYNAMIC*	with type area with size 0
+Declared entity DUMMY:*HEAP*	with type area with size 0
+Declared entity DUMMY:*STACK*	with type area with size 0
+Declared entity DUMMY:*STATIC*	with type area with size 0
+Declared entity DUMMY:I	with type variable INTEGER*4
+Declared entity DUMMY:J	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable DUMMY:I,	offset = 1
+	Variable DUMMY:J,	offset = 2
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module DUMMY
+
+  CONTROLIZER                    building   CODE(DUMMY)
+  PRINT_CODE                     building   PRINTED_FILE(DUMMY)
+PRINTED_FILE made for DUMMY.
+
+      SUBROUTINE DUMMY(I, J)
+      PRINT *, I+J                                                      0003
+      END
+Module DANCE selected
+Module DANCE already active.
+Request: build resource PRINTED_FILE for module DANCE.
+  FILTER_FILE                    building   SOURCE_FILE(DANCE)
+  PARSER                         building   PARSED_CODE(DANCE)
+                                 building   CALLEES(DANCE)
+
+Declarations for module DANCE with type INTEGER*4 x INTEGER*4 x INTEGER*4 ->  CHARACTER*8
+
+
+Variable list:
+
+
+Declared entity DANCE:*DYNAMIC*	with type area with size 0
+Declared entity DANCE:*HEAP*	with type area with size 0
+Declared entity DANCE:*STACK*	with type area with size 0
+Declared entity DANCE:*STATIC*	with type area with size 0
+Declared entity DANCE:DANCE	with type variable CHARACTER*8
+Declared entity DANCE:I	with type variable INTEGER*4
+Declared entity DANCE:J	with type variable INTEGER*4
+Declared entity DANCE:K	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable DANCE:I,	offset = 1
+	Variable DANCE:J,	offset = 2
+	Variable DANCE:K,	offset = 3
+
+Layout for return variable:
+
+	Variable DANCE:DANCE,	size = 8
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module DANCE
+
+  CONTROLIZER                    building   CODE(DANCE)
+  PRINT_CODE                     building   PRINTED_FILE(DANCE)
+PRINTED_FILE made for DANCE.
+
+      CHARACTER*8 FUNCTION DANCE(I, J, K)
+      DANCE = 'Bye!'                                                    0003
+      END
+Module IMPLCHAR selected
+Module IMPLCHAR already active.
+Request: build resource PRINTED_FILE for module IMPLCHAR.
+  FILTER_FILE                    building   SOURCE_FILE(IMPLCHAR)
+  PARSER                         building   PARSED_CODE(IMPLCHAR)
+                                 building   CALLEES(IMPLCHAR)
+
+Declarations for module IMPLCHAR with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity IMPLCHAR:*DYNAMIC*	with type area with size 72
+Declared entity IMPLCHAR:*HEAP*	with type area with size 0
+Declared entity IMPLCHAR:*STACK*	with type area with size 0
+Declared entity IMPLCHAR:*STATIC*	with type area with size 0
+Declared entity IMPLCHAR:DE	with type variable CHARACTER*8
+Declared entity IMPLCHAR:DO	with type variable CHARACTER*8
+Declared entity IMPLCHAR:ERREUR	with type variable REAL*4
+Declared entity IMPLCHAR:I	with type variable INTEGER*4
+Declared entity IMPLCHAR:J	with type variable INTEGER*4
+Declared entity IMPLCHAR:K	with type variable INTEGER*4
+Declared entity IMPLCHAR:M	with type functional  () ->  INTEGER*4
+Declared entity IMPLCHAR:T	with type variable REAL*4
+Declared entity TOP-LEVEL:DANCE	with type functional INTEGER*4 x INTEGER*4 x INTEGER*4 ->  CHARACTER*8
+Declared entity TOP-LEVEL:DUMMY	with type functional INTEGER*4 x INTEGER*4 ->  void
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 72:
+	Variable IMPLCHAR:K,	offset = 0,	size = 4
+	Variable IMPLCHAR:ERREUR,	offset = 4,	size = 4
+	Variable IMPLCHAR:J,	offset = 8,	size = 4
+	Variable IMPLCHAR:I,	offset = 12,	size = 4
+	Variable IMPLCHAR:DE,	offset = 16,	size = 8
+	Variable IMPLCHAR:DO,	offset = 24,	size = 8
+	Variable IMPLCHAR:T,	offset = 32,	size = 40
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module IMPLCHAR
+
+  CONTROLIZER                    building   CODE(IMPLCHAR)
+  PRINT_CODE                     building   PRINTED_FILE(IMPLCHAR)
+PRINTED_FILE made for IMPLCHAR.
+      PROGRAM IMPLCHAR
+c      subroutine implchar
+
+C     Extention of PIPS Fortran required by Nicky Preston-Williams
+C     Cachan bug 11: handling of character type in implicit
+
+      PARAMETER (M=10)
+
+      IMPLICIT CHARACTER*8 (D)
+      IMPLICIT COMPLEX*8 (Z)
+
+c     This is forbidden by the standard:
+c      implicit character*m (e)
+
+c      save
+      REAL T(M)
+c      common /foo/do, de, t
+c
+      DO = 'Hello'                                                      0019
+
+      DE = 'world!'                                                     0021
+
+c     Type clash, detected by g77, not by f77
+c      erreur = 'rate!'
+
+      T(1) = 1.                                                         0026
+
+      CALL DUMMY(I, J)                                                  0028
+
+      PRINT *, DO, DE, ERREUR, T(1), DANCE(I, J, K)                     0030
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module DANCE.
+  Closing module DUMMY.
+  Closing module IMPLCHAR.
+Closing program.
+Closing workspace.
+Workspace implchar closed.
+
+Workspace implchar deleted.

@@ -1,0 +1,49 @@
+setenv WKS jacobi01
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c include/load.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+display PRINTED_FILE[%ALLFUNC]
+
+
+setproperty LOOP_LABEL "kernel1"
+setproperty KERNELIZE_NBNODES 10
+setproperty KERNELIZE_KERNEL_NAME "kernel1"
+setproperty KERNELIZE_HOST_CALL_NAME "launch_kernel1"
+
+apply KERNELIZE[compute]
+
+display PRINTED_FILE[%ALLFUNC]
+apply KERNEL_LOAD_STORE[compute]
+display PRINTED_FILE[compute]
+
+echo
+echo Code after cleanup
+echo
+
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+
+# I was not very inspired about this... :-)
+shell (echo  1i; echo '#define MIN(a,b) (a < b ? a : b )'; echo .; echo w; echo q) | ed $WKS.database/Src/kernel1.c
+shell gcc $WKS.database/Src/*.c  -o $WKS.database/Src/$WKS
+shell cd $WKS.database/Src; ./$WKS  ../../input.pgm; diff output.pgm ../../output-ref.pgm
+#shell rm -rf $WKS.database/Src/kernelize.o
+
+close
+#delete $WKS
+quit
+

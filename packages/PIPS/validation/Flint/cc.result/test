@@ -1,0 +1,272 @@
+### initial file
+! test complex constants
+      PROGRAM CC
+      COMPLEX C
+      DOUBLE COMPLEX DC
+! simple complex conversions
+      C = 1                                                             0001
+      C = 1.0                                                           0002
+      C = 1.0E0                                                         0003
+      C = 1.0D0                                                         0004
+! implicit complex
+      C = (1, 1)                                                        0005
+      C = (1.0, 1.0)                                                    0006
+      C = (1.0E0, 1.0E0)                                                0007
+      C = (1.0D0, 1.0D0)                                                0008
+! mixed complex cases
+      C = (1.0, 1)                                                      0009
+      C = (1.0E0, 1)                                                    0010
+      C = (1.0D0, 1)                                                    0011
+      C = (1, 1.0)                                                      0012
+      C = (1.0E0, 1.0)                                                  0013
+      C = (1.0D0, 1.0)                                                  0014
+      C = (1, 1.0E0)                                                    0015
+      C = (1.0, 1.0E0)                                                  0016
+      C = (1.0D0, 1.0E0)                                                0017
+      C = (1, 1.0D0)                                                    0018
+      C = (1.0, 1.0D0)                                                  0019
+      C = (1.0E0, 1.0D0)                                                0020
+! explicit complex
+      C = CMPLX(1, 1)                                                   0021
+      C = CMPLX(1.0, 1.0)                                               0022
+      C = CMPLX(1.0E0, 1.0E0)                                           0023
+      C = CMPLX(1.0D0, 1.0D0)                                           0024
+! mixed complex cases
+      C = CMPLX(1.0, 1)                                                 0025
+      C = CMPLX(1.0E0, 1)                                               0026
+      C = CMPLX(1.0D0, 1)                                               0027
+      C = CMPLX(1, 1.0)                                                 0028
+      C = CMPLX(1.0E0, 1.0)                                             0029
+      C = CMPLX(1.0D0, 1.0)                                             0030
+      C = CMPLX(1, 1.0E0)                                               0031
+      C = CMPLX(1.0, 1.0E0)                                             0032
+      C = CMPLX(1.0D0, 1.0E0)                                           0033
+      C = CMPLX(1, 1.0D0)                                               0034
+      C = CMPLX(1.0, 1.0D0)                                             0035
+      C = CMPLX(1.0E0, 1.0D0)                                           0036
+! simple dcomplex conversions
+      DC = 1                                                            0037
+      DC = 1.0                                                          0038
+      DC = 1.0E0                                                        0039
+      DC = 1.0D0                                                        0040
+! implicit dcomplex
+      DC = (1, 1)                                                       0041
+      DC = (1.0, 1.0)                                                   0042
+      DC = (1.0E0, 1.0E0)                                               0043
+      DC = (1.0D0, 1.0D0)                                               0044
+! mixed dcomplex cases
+      DC = (1.0, 1)                                                     0045
+      DC = (1.0E0, 1)                                                   0046
+      DC = (1.0D0, 1)                                                   0047
+      DC = (1, 1.0)                                                     0048
+      DC = (1.0E0, 1.0)                                                 0049
+      DC = (1.0D0, 1.0)                                                 0050
+      DC = (1, 1.0E0)                                                   0051
+      DC = (1.0, 1.0E0)                                                 0052
+      DC = (1.0D0, 1.0E0)                                               0053
+      DC = (1, 1.0D0)                                                   0054
+      DC = (1.0, 1.0D0)                                                 0055
+      DC = (1.0E0, 1.0D0)                                               0056
+! explicit dcomplex
+      DC = DCMPLX(1, 1)                                                 0057
+      DC = DCMPLX(1.0, 1.0)                                             0058
+      DC = DCMPLX(1.0E0, 1.0E0)                                         0059
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0060
+! mixed dcomplex cases
+      DC = DCMPLX(1.0, 1)                                               0061
+      DC = DCMPLX(1.0E0, 1)                                             0062
+      DC = DCMPLX(1.0D0, 1)                                             0063
+      DC = DCMPLX(1, 1.0)                                               0064
+      DC = DCMPLX(1.0E0, 1.0)                                           0065
+      DC = DCMPLX(1.0D0, 1.0)                                           0066
+      DC = DCMPLX(1, 1.0E0)                                             0067
+      DC = DCMPLX(1.0, 1.0E0)                                           0068
+      DC = DCMPLX(1.0D0, 1.0E0)                                         0069
+      DC = DCMPLX(1, 1.0D0)                                             0070
+      DC = DCMPLX(1.0, 1.0D0)                                           0071
+      DC = DCMPLX(1.0E0, 1.0D0)                                         0072
+
+      PRINT *, C, DC                                                    0073
+      END
+### typed checked 1
+!PIPS TYPER: 0 errors, 0 conversions, 104 simplifications
+! test complex constants
+      PROGRAM CC
+      COMPLEX C
+      DOUBLE COMPLEX DC
+! simple complex conversions
+      C = (1.0E0, 0.0E0)                                                0001
+      C = (1.0, 0.0E0)                                                  0002
+      C = (1.0E0, 0.0E0)                                                0003
+      C = (1.0E0, 0.0E0)                                                0004
+! implicit complex
+      C = (1.0E0, 1.0E0)                                                0005
+      C = (1.0, 1.0)                                                    0006
+      C = (1.0E0, 1.0E0)                                                0007
+      C = (1.0E0, 1.0E0)                                                0008
+! mixed complex cases
+      C = (1.0, 1.0E0)                                                  0009
+      C = (1.0E0, 1.0E0)                                                0010
+      C = (1.0E0, 1.0E0)                                                0011
+      C = (1.0E0, 1.0)                                                  0012
+      C = (1.0E0, 1.0)                                                  0013
+      C = (1.0E0, 1.0E0)                                                0014
+      C = (1.0E0, 1.0E0)                                                0015
+      C = (1.0, 1.0E0)                                                  0016
+      C = (1.0E0, 1.0E0)                                                0017
+      C = (1.0E0, 1.0E0)                                                0018
+      C = (1.0E0, 1.0E0)                                                0019
+      C = (1.0E0, 1.0E0)                                                0020
+! explicit complex
+      C = CMPLX(1.0E0, 1.0E0)                                           0021
+      C = CMPLX(1.0, 1.0)                                               0022
+      C = CMPLX(1.0E0, 1.0E0)                                           0023
+      C = CMPLX(1.0E0, 1.0E0)                                           0024
+! mixed complex cases
+      C = CMPLX(1.0, 1.0E0)                                             0025
+      C = CMPLX(1.0E0, 1.0E0)                                           0026
+      C = CMPLX(1.0E0, 1.0E0)                                           0027
+      C = CMPLX(1.0E0, 1.0)                                             0028
+      C = CMPLX(1.0E0, 1.0)                                             0029
+      C = CMPLX(1.0E0, 1.0)                                             0030
+      C = CMPLX(1.0E0, 1.0E0)                                           0031
+      C = CMPLX(1.0, 1.0E0)                                             0032
+      C = CMPLX(1.0E0, 1.0E0)                                           0033
+      C = CMPLX(1.0E0, 1.0E0)                                           0034
+      C = CMPLX(1.0, 1.0E0)                                             0035
+      C = CMPLX(1.0E0, 1.0E0)                                           0036
+! simple dcomplex conversions
+      DC = (1.0D0, 0.0D0)                                               0037
+      DC = (1.0D0, 0.0D0)                                               0038
+      DC = (1.0D0, 0.0D0)                                               0039
+      DC = (1.0D0, 0.0D0)                                               0040
+! implicit dcomplex
+      DC = (1.0D0, 1.0D0)                                               0041
+      DC = (1.0D0, 1.0D0)                                               0042
+      DC = (1.0D0, 1.0D0)                                               0043
+      DC = (1.0D0, 1.0D0)                                               0044
+! mixed dcomplex cases
+      DC = (1.0D0, 1.0D0)                                               0045
+      DC = (1.0D0, 1.0D0)                                               0046
+      DC = (1.0D0, 1.0D0)                                               0047
+      DC = (1.0D0, 1.0D0)                                               0048
+      DC = (1.0D0, 1.0D0)                                               0049
+      DC = (1.0D0, 1.0D0)                                               0050
+      DC = (1.0D0, 1.0D0)                                               0051
+      DC = (1.0D0, 1.0D0)                                               0052
+      DC = (1.0D0, 1.0D0)                                               0053
+      DC = (1.0D0, 1.0D0)                                               0054
+      DC = (1.0D0, 1.0D0)                                               0055
+      DC = (1.0D0, 1.0D0)                                               0056
+! explicit dcomplex
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0057
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0058
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0059
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0060
+! mixed dcomplex cases
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0061
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0062
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0063
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0064
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0065
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0066
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0067
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0068
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0069
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0070
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0071
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0072
+
+      PRINT *, C, DC                                                    0073
+      END
+### typed checked 2
+!PIPS TYPER: 0 errors, 0 conversions, 104 simplifications
+! test complex constants
+      PROGRAM CC
+      COMPLEX C
+      DOUBLE COMPLEX DC
+! simple complex conversions
+      C = CMPLX(1.0E0, 0.0E0)                                           0001
+      C = CMPLX(1.0, 0.0E0)                                             0002
+      C = CMPLX(1.0E0, 0.0E0)                                           0003
+      C = CMPLX(1.0E0, 0.0E0)                                           0004
+! implicit complex
+      C = CMPLX(1.0E0, 1.0E0)                                           0005
+      C = CMPLX(1.0, 1.0)                                               0006
+      C = CMPLX(1.0E0, 1.0E0)                                           0007
+      C = CMPLX(1.0E0, 1.0E0)                                           0008
+! mixed complex cases
+      C = CMPLX(1.0, 1.0E0)                                             0009
+      C = CMPLX(1.0E0, 1.0E0)                                           0010
+      C = CMPLX(1.0E0, 1.0E0)                                           0011
+      C = CMPLX(1.0E0, 1.0)                                             0012
+      C = CMPLX(1.0E0, 1.0)                                             0013
+      C = CMPLX(1.0E0, 1.0E0)                                           0014
+      C = CMPLX(1.0E0, 1.0E0)                                           0015
+      C = CMPLX(1.0, 1.0E0)                                             0016
+      C = CMPLX(1.0E0, 1.0E0)                                           0017
+      C = CMPLX(1.0E0, 1.0E0)                                           0018
+      C = CMPLX(1.0E0, 1.0E0)                                           0019
+      C = CMPLX(1.0E0, 1.0E0)                                           0020
+! explicit complex
+      C = CMPLX(1.0E0, 1.0E0)                                           0021
+      C = CMPLX(1.0, 1.0)                                               0022
+      C = CMPLX(1.0E0, 1.0E0)                                           0023
+      C = CMPLX(1.0E0, 1.0E0)                                           0024
+! mixed complex cases
+      C = CMPLX(1.0, 1.0E0)                                             0025
+      C = CMPLX(1.0E0, 1.0E0)                                           0026
+      C = CMPLX(1.0E0, 1.0E0)                                           0027
+      C = CMPLX(1.0E0, 1.0)                                             0028
+      C = CMPLX(1.0E0, 1.0)                                             0029
+      C = CMPLX(1.0E0, 1.0)                                             0030
+      C = CMPLX(1.0E0, 1.0E0)                                           0031
+      C = CMPLX(1.0, 1.0E0)                                             0032
+      C = CMPLX(1.0E0, 1.0E0)                                           0033
+      C = CMPLX(1.0E0, 1.0E0)                                           0034
+      C = CMPLX(1.0, 1.0E0)                                             0035
+      C = CMPLX(1.0E0, 1.0E0)                                           0036
+! simple dcomplex conversions
+      DC = DCMPLX(1.0D0, 0.0D0)                                         0037
+      DC = DCMPLX(1.0D0, 0.0D0)                                         0038
+      DC = DCMPLX(1.0D0, 0.0D0)                                         0039
+      DC = DCMPLX(1.0D0, 0.0D0)                                         0040
+! implicit dcomplex
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0041
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0042
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0043
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0044
+! mixed dcomplex cases
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0045
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0046
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0047
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0048
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0049
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0050
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0051
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0052
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0053
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0054
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0055
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0056
+! explicit dcomplex
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0057
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0058
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0059
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0060
+! mixed dcomplex cases
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0061
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0062
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0063
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0064
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0065
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0066
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0067
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0068
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0069
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0070
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0071
+      DC = DCMPLX(1.0D0, 1.0D0)                                         0072
+
+      PRINT *, C, DC                                                    0073
+      END

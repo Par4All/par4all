@@ -1,0 +1,57 @@
+user warning in tp_parse: equiv02: No such workspace
+Registering file equiv02.f
+Splitting file    ./equiv02.f
+  Module         EQUIV02
+Workspace equiv02 created and opened.
+Module EQUIV02 selected
+Main module PROGRAM "EQUIV02" selected.
+Module EQUIV02 already active.
+Module EQUIV02 already active.
+Request: build resource PARALLELPRINTED_FILE for module EQUIV02.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV02)
+  PARSER                         building   PARSED_CODE(EQUIV02)
+                                 building   CALLEES(EQUIV02)
+  CONTROLIZER                    building   CODE(EQUIV02)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(EQUIV02)
+  ATOMIC_CHAINS                  building   CHAINS(EQUIV02)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(EQUIV02)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(EQUIV02)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(EQUIV02)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(EQUIV02)
+  CALLGRAPH                      building   CALLERS(EQUIV02)
+                                 building   HEIGHT(EQUIV02)
+                                 building   DEPTH(EQUIV02)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(EQUIV02)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(EQUIV02)
+  RICE_SEMANTICS_DEPENDENCE_GRAPH building   DG(EQUIV02)
+dep 11 (<U(I-1)-R-MUST>) --> 11 (<T(I)-W-MUST>) 
+user warning in TestCoupleOfReferences: Dependence between differents variables: U and T
+Dependence assumed
+  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(EQUIV02)
+  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(EQUIV02)
+PARALLELPRINTED_FILE made for EQUIV02.
+      PROGRAM EQUIV02
+
+C     Check that the loop is not parallelized because of aliasing
+C     between T and U
+
+      REAL T(10), U(10)
+      COMMON /C_U/U
+      EQUIVALENCE (T(1),U(1))
+
+      DO I = 2, 10                                                      0010
+         T(I) = U(I-1)                                                  0011
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV02.
+Closing program.
+Closing workspace.
+Workspace equiv02 closed.
+
+Workspace equiv02 deleted.

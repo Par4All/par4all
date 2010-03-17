@@ -1,0 +1,49 @@
+
+C  P() {}
+
+      PROGRAM UNSTRUC07
+
+C     Check that desugared loop might be handled
+
+      REAL A(100)
+
+C  P() {}
+
+
+      READ *, N                                                         0007
+
+C  P(N) {}
+
+      I = 1                                                             0009
+99999 CONTINUE
+
+C  P(I,N) {1<=I}
+
+
+C     DO loop  with exit had to be desugared
+      IF (I.GT.N) GOTO 200                                              0009
+
+C  P(I,N) {1<=I, I<=N}
+
+      A(I) = 0.                                                         0010
+
+C  P(I,N) {1<=I, I<=N}
+
+      IF (A(I).LT.A(I-1)) GOTO 200                                      0011
+
+C  P(I,N) {1<=I, I<=N}
+
+      I = I+1                                                           0009
+      GOTO 99999
+
+C  P(I,N) {1<=I}
+
+
+200   CONTINUE                                                          0014
+
+C  P(I,N) {1<=I}
+
+      PRINT *, I, N                                                     0015
+
+      END
+

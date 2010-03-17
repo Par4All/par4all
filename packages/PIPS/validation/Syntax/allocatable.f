@@ -1,0 +1,10 @@
+      SUBROUTINE ALLOCATABLE ()
+
+      ALLOCATABLE UBAR(:), RBAR(:)
+
+      ALLOCATE(UBAR(JMAX-1), RBAR(JMAX-1))
+      UBAR=0D0
+      RBAR=0D0
+
+      RETURN
+      END

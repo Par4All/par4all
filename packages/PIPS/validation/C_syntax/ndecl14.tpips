@@ -1,0 +1,18 @@
+delete ndecl14
+create ndecl14 ndecl14.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv  PRETTYPRINT_DEBUG_LEVEL 9
+
+display PARSED_PRINTED_FILE[ndecl14!]
+
+close
+#delete ndecl14
+
+quit

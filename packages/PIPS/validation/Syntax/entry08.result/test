@@ -1,0 +1,29 @@
+
+Module ENTRY01
+
+      SUBROUTINE ENTRY08(X, N)
+      INTEGER N, L
+      REAL*4 W, U
+      COMPLEX*8 X(1:N)
+      COMMON /ENTRY_ENTRY08/ L
+
+      PRINT *, X(1), W                                                  0010
+
+
+      END
+
+Entry INCREMENT
+
+      SUBROUTINE INCREMENT(Y, M)
+      INTEGER M, L
+      REAL*4 W, U
+      CHARACTER Y(1:M)
+      COMMON /ENTRY_ENTRY08/ L
+
+99999 CONTINUE                                                          0007
+
+      PRINT *, Y(2), U                                                  0009
+
+      M = M+1                                                           0011
+
+      END

@@ -1,0 +1,31 @@
+void foo()
+{
+   int i;
+   int j = i <<= 2;
+
+   i *= 1;
+   i += 1;
+   i /= 1;
+   i *= 1;
+   i >>= 1;
+   i |= 1;
+   i &= 1;
+   i ^= 1;
+}
+extern void foo();
+void foo()
+{
+   int i;
+   int j = i = i<<2;
+
+   i = i*1;
+   i = i+1;
+   i = i/1;
+   i = i*1;
+   i = i>>1;
+   i = i|1;
+   i = i&1;
+   i = i^1;
+}
+extern void foo();
+

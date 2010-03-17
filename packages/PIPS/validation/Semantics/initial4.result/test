@@ -1,0 +1,52 @@
+
+Source code for all modules, including block data modules
+
+
+      BLOCKDATA BAR1
+      COMMON /FOO/I
+      DATA I /1/
+      END
+
+      BLOCKDATA BAR2
+      COMMON /FOO/I
+      DATA I /2/
+      END
+      PROGRAM INITIAL4
+
+C     See what happens with conflicting initial values
+
+      COMMON /FOO/I
+
+      PRINT *, I                                                        0007
+
+      END
+
+Initial preconditions for each module
+
+
+C  P() {I==1}
+
+
+C  P() {I==2}
+
+
+C  P() {}
+
+
+Preconditions with initial precondition for program INITIAL4
+
+
+C  P() {0==-1}
+
+      PROGRAM INITIAL4
+
+C     See what happens with conflicting initial values
+
+      COMMON /FOO/I
+
+C  P() {0==-1}
+
+
+      PRINT *, I                                                        0007
+
+      END

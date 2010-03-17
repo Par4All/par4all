@@ -1,0 +1,29 @@
+delete onetriploop02
+create onetriploop02 onetriploop02.f
+# display PRINTED_FILE[onetriploop02]
+# capply SUPPRESS_DEAD_CODE[onetriploop02]
+# display PRINTED_FILE[onetriploop02]
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo Initial code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+echo
+echo Code after one trip loop detection and simplification
+echo
+
+activate PRINT_CODE
+capply SUPPRESS_DEAD_CODE[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete onetriploop02
+quit

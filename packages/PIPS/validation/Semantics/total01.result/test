@@ -1,0 +1,27 @@
+
+C TP() {}
+
+      PROGRAM TOTAL01
+
+      REAL A(10)
+
+C TP() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {}
+
+C (0,2)
+
+      READ *, N                                                         0005
+
+C TP() {1<=N, N<=10}
+
+C (0,3)
+
+      A(N) = 0.                                                         0007
+
+C     END BLOCK
+      END
+

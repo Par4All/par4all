@@ -1,0 +1,13 @@
+delete external_static
+create external_static external_static.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[%ALL]
+
+
+close
+delete external_static

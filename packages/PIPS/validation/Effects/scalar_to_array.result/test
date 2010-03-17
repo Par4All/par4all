@@ -1,0 +1,9 @@
+      PROGRAM PROG
+      REAL A(100), B(2:5,6:8)
+C               <must be written>: A(1)
+      CALL TOTO(A)                                                      0003
+C               <must be written>: B(2,6)
+      CALL TOTO(B)                                                      0004
+C               <must be written>: B(3,7)
+      CALL TOTO(B(3,7))                                                 0005
+      END

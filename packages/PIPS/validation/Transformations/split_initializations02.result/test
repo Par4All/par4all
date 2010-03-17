@@ -1,0 +1,26 @@
+
+Initial code
+
+void split_initializations02(void)
+{
+   int k[] = {1, 2, 3};
+   {
+      int k[] = {1, 2, 3};
+   }
+   if (1) {
+      int k[] = {1, 2, 3};
+   }
+}
+
+Code after split_initializations
+
+void split_initializations02(void)
+{
+   int k[] = {1, 2, 3};
+   {
+      int k[] = {1, 2, 3};
+   }
+   if (1) {
+      int k[] = {1, 2, 3};
+   }
+}

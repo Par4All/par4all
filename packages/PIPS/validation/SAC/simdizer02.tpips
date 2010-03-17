@@ -1,0 +1,19 @@
+activate MUST_REGIONS
+activate REGION_CHAINS
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+
+delete simdizer02
+create simdizer02 simdizer02.c include/SIMD.c
+
+make PRINTED_FILE[%ALL]
+
+module foo_l
+display PRINTED_FILE 
+display DG_FILE 
+
+apply SIMDIZER
+
+display PRINTED_FILE
+
+close
+delete simdizer02

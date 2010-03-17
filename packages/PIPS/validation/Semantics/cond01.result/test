@@ -1,0 +1,38 @@
+
+C  P() {}
+
+      PROGRAM COND01
+
+      REAL X(10)
+
+C  P() {}
+
+
+      IF (I.GT.N.AND.X(I).GT.Z) THEN                                    0005
+
+C  P() {N+1<=I}
+
+         PRINT *, I                                                     0006
+      ELSE
+
+C  P() {}
+
+         PRINT *, I                                                     0008
+      ENDIF
+
+C  P() {}
+
+
+      IF (I.GT.N.OR.X(I).GT.Z) THEN                                     0011
+
+C  P() {}
+
+         PRINT *, I                                                     0012
+      ELSE
+
+C  P() {I<=N}
+
+         PRINT *, I                                                     0014
+      ENDIF
+
+      END

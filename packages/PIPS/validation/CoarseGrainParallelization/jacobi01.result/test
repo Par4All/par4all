@@ -1,0 +1,112 @@
+Create the workspace from the files to parallelize
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+void compute()
+{
+   int i;
+   int j;
+
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 62; i += 1)
+#pragma omp parallel for 
+      for(j = 1; j <= 62; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 62; i += 1)
+#pragma omp parallel for 
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+void get_data(char filename[])
+{
+   int i;
+   int j;
+   int nx;
+   int ny;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "r"))==(void *) 0) {
+      perror("Error loading file");
+      exit(0);
+   }
+   
+   /* Get *.pgm file type */
+   c = fgetc(fp);
+   c = fgetc(fp);
+   do {
+      while ((c = fgetc(fp))!='\n') 
+         ;
+   }
+   while ((c = fgetc(fp))=='#');
+   
+   /* Put back good char */
+   ungetc(c, fp);
+   
+   /* Get image dimensions */
+   fscanf(fp, "%d %d\n", &nx, &ny);
+   /* Get grey levels */
+   fscanf(fp, "%d", &i);
+   /* Get ONE carriage return */
+   fgetc(fp);
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
+   
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         c = fgetc(fp);
+         space[i][j] = c;
+      }
+
+   fclose(fp);
+}
+int main(int argc, char *argv[])
+{
+   int t;
+
+   get_data("input.pgm");
+
+#pragma omp parallel for 
+   for(t = 0; t <= 63; t += 1)
+      compute();
+
+   write_data("output.pgm");
+
+   return 0;
+}
+void write_data(char filename[])
+{
+   int i;
+   int j;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "w"))==(void *) 0) {
+      perror("Error opening file");
+      exit(0);
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 64, 64);
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         c = space[i][j];
+         fputc(c, fp);
+      }
+   fclose(fp);
+}
+Regenerate the sources from the PIPS transformed code:
+

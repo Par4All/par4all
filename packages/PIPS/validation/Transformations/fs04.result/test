@@ -1,0 +1,52 @@
+!! Initial file
+      PROGRAM FS04
+      INTEGER I
+      REAL S
+      DOUBLE PRECISION D
+      COMPLEX C
+      COMPLEX*16 DC, DC2
+      I = 145                                                           0007
+      S = I+1                                                           0008
+      D = S*5321.1212                                                   0009
+      C = D+3.12                                                        0010
+      DC = C+(1.00, 2.00)                                               0011
+      I = D                                                             0012
+      DC2 = C+I                                                         0013
+      PRINT *, DC, DC2                                                  0014
+      END
+!! After forward substitution
+      PROGRAM FS04
+      INTEGER I
+      REAL S
+      DOUBLE PRECISION D
+      COMPLEX C
+      COMPLEX*16 DC, DC2
+      I = 145                                                           0007
+      S = 145+1                                                         0008
+      D = REAL(145+1)*5321.1212                                         0009
+      C = DBLE(REAL(145+1)*5321.1212)+3.12                              0010
+      DC = CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+(1.00, 2.00)         0011
+      I = DBLE(REAL(145+1)*5321.1212)                                   0012
+      DC2 = CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+INT(DBLE(REAL(145   0013
+     &+1)*5321.1212))                                                   0013
+      PRINT *, DCMPLX(CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+(1.00,    0014
+     &2.00)), DCMPLX(CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+INT(DBLE   0014
+     &(REAL(145+1)*5321.1212)))                                         0014
+      END
+!! After use-def elimination
+      PROGRAM FS04
+      INTEGER I
+      REAL S
+      DOUBLE PRECISION D
+      COMPLEX C
+      COMPLEX*16 DC, DC2
+      PRINT *, DCMPLX(CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+(1.00,    0014
+     &2.00)), DCMPLX(CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+INT(DBLE   0014
+     &(REAL(145+1)*5321.1212)))                                         0014
+      END
+!! After cleaning declarations
+      PROGRAM FS04
+      PRINT *, DCMPLX(CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+(1.00,    0014
+     &2.00)), DCMPLX(CMPLX(DBLE(REAL(145+1)*5321.1212)+3.12)+INT(DBLE   0014
+     &(REAL(145+1)*5321.1212)))                                         0014
+      END

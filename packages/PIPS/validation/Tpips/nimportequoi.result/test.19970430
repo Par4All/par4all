@@ -1,0 +1,11 @@
+trying file nimportequoi.f
+trying another file
+      PROGRAM TEST
+      PRINT *, "coucou"                                                 0001
+      END
+trying file nimportequoi.f again
+the other databasse should still be there
+      PROGRAM TEST
+      PRINT *, "coucou"                                                 0001
+      END
+

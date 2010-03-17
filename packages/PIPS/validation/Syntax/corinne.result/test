@@ -1,0 +1,200 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+shell rm -f corinne1.f corinne2.f corinne3.f
+echo
+
+echo First try: detect extra ENDDO
+First try: detect extra ENDDO
+echo
+
+shell sed /cfirst/s/cfirst// corinne.f >corinne1.f
+shell sleep 1
+user warning in tp_parse: corinne: No such workspace
+Registering file corinne1.f
+Splitting file    ./corinne1.f
+  Module         IFENDDO
+  Module         DOENDIF
+  Module         CORINNE
+Workspace corinne created and opened.
+Main module PROGRAM "CORINNE" selected.
+Module CORINNE selected
+Module CORINNE already active.
+Request: build resource PRINTED_FILE for module CORINNE.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CORINNE)
+  PARSER                         building   PARSED_CODE(CORINNE)
+                                 building   CALLEES(CORINNE)
+user error in MakeEnddoInst: Parser error between lines 18 and 18
+Unexpected ENDDO statement
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module CORINNE.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CORINNE.
+  Closing module DOENDIF.
+  Closing module IFENDDO.
+Closing program.
+Closing workspace.
+Workspace corinne closed.
+
+Workspace corinne deleted.
+shell rm corinne1.f
+echo
+
+echo Second try: detect wrong lhs
+Second try: detect wrong lhs
+echo
+
+shell sed /csecond/s/csecond// corinne.f >corinne2.f
+shell sleep 1
+Registering file corinne2.f
+Splitting file    ./corinne2.f
+  Module         IFENDDO
+  Module         DOENDIF
+  Module         CORINNE
+Workspace corinne created and opened.
+Main module PROGRAM "CORINNE" selected.
+Module CORINNE selected
+Module CORINNE already active.
+Request: build resource PRINTED_FILE for module CORINNE.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CORINNE)
+  PARSER                         building   PARSED_CODE(CORINNE)
+                                 building   CALLEES(CORINNE)
+user error in MakeEndifInst: Parser error between lines 24 and 24
+block if statement badly nested
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module CORINNE.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CORINNE.
+  Closing module DOENDIF.
+  Closing module IFENDDO.
+Closing program.
+Closing workspace.
+Workspace corinne closed.
+
+Workspace corinne deleted.
+shell rm corinne2.f
+echo
+
+echo Third try: detect extra ENDDIF
+Third try: detect extra ENDDIF
+echo
+
+shell sed /cthird/s/cthird// corinne.f >corinne3.f
+shell sleep 1
+Registering file corinne3.f
+Splitting file    ./corinne3.f
+  Module         IFENDDO
+  Module         DOENDIF
+  Module         CORINNE
+Workspace corinne created and opened.
+Main module PROGRAM "CORINNE" selected.
+Module CORINNE selected
+Module CORINNE already active.
+Request: build resource PRINTED_FILE for module CORINNE.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CORINNE)
+  PARSER                         building   PARSED_CODE(CORINNE)
+                                 building   CALLEES(CORINNE)
+user error in MakeEndifInst: Parser error between lines 24 and 24
+block if statement badly nested
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module CORINNE.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CORINNE.
+  Closing module DOENDIF.
+  Closing module IFENDDO.
+Closing program.
+Closing workspace.
+Workspace corinne closed.
+
+Workspace corinne deleted.
+shell rm corinne3.f
+echo
+
+echo Fourth try: detect IF/ENDDO pair
+Fourth try: detect IF/ENDDO pair
+echo
+
+Registering file corinne.f
+Splitting file    ./corinne.f
+  Module         IFENDDO
+  Module         DOENDIF
+  Module         CORINNE
+Workspace corinne created and opened.
+Main module PROGRAM "CORINNE" selected.
+Module CORINNE selected
+Module IFENDDO selected
+Module IFENDDO already active.
+Request: build resource PRINTED_FILE for module IFENDDO.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(IFENDDO)
+  PARSER                         building   PARSED_CODE(IFENDDO)
+                                 building   CALLEES(IFENDDO)
+user error in MakeEnddoInst: Parser error between lines 7 and 7
+block do statement badly nested
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module IFENDDO.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CORINNE.
+  Closing module DOENDIF.
+  Closing module IFENDDO.
+Closing program.
+Closing workspace.
+Workspace corinne closed.
+
+Workspace corinne deleted.
+echo
+
+echo Fifth try: detect DO/ENDIF pair
+Fifth try: detect DO/ENDIF pair
+echo
+
+Registering file corinne.f
+Splitting file    ./corinne.f
+  Module         IFENDDO
+  Module         DOENDIF
+  Module         CORINNE
+Workspace corinne created and opened.
+Main module PROGRAM "CORINNE" selected.
+Module CORINNE selected
+Module DOENDIF selected
+Module DOENDIF already active.
+Request: build resource PRINTED_FILE for module DOENDIF.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(DOENDIF)
+  PARSER                         building   PARSED_CODE(DOENDIF)
+                                 building   CALLEES(DOENDIF)
+user error in MakeEndifInst: Parser error between lines 7 and 7
+block if statement badly nested
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module DOENDIF.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CORINNE.
+  Closing module DOENDIF.
+  Closing module IFENDDO.
+Closing program.
+Closing workspace.
+Workspace corinne closed.
+
+Workspace corinne deleted.

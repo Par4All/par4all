@@ -1,0 +1,39 @@
+echo
+
+echo The message should be: workspace protected_workspace: Permission denied
+The message should be: workspace protected_workspace: Permission denied
+echo
+
+  Module         PROTECTED_WORKSPACE
+Workspace protected_workspace created and opened.
+Module PROTECTED_WORKSPACE selected
+Main module PROGRAM "PROTECTED_WORKSPACE" selected.
+Module PROTECTED_WORKSPACE already active.
+Module PROTECTED_WORKSPACE already active.
+Request: build resource PRINTED_FILE for module PROTECTED_WORKSPACE.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(PROTECTED_WORKSPACE)
+  PARSER                         building   PARSED_CODE(PROTECTED_WORKSPACE)
+                                 building   CALLEES(PROTECTED_WORKSPACE)
+  CONTROLIZER                    building   CODE(PROTECTED_WORKSPACE)
+  PRINT_CODE                     building   PRINTED_FILE(PROTECTED_WORKSPACE)
+PRINTED_FILE made for PROTECTED_WORKSPACE.
+	PROGRAM PROTECTED_WORKSPACE
+
+C       Check that tpips reacts properly when a non-accessible
+C       workspace is open
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module PROTECTED_WORKSPACE.
+Closing program.
+Closing workspace.
+Workspace protected_workspace closed.
+
+shell chmod u-rwx protected_workspace.database
+user error in open_workspace: Workspace protected_workspace not readable!
+user error in perform: Open or create a workspace first!
+shell chmod u+rwx protected_workspace.database
+Workspace protected_workspace deleted.

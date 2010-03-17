@@ -1,0 +1,51 @@
+      SUBROUTINE DESUGAR01(X, Y, *, *)
+
+      READ *, I, N                                                      0003
+
+c     forward reference to 100
+      IF (I.LT.0) GOTO 100                                              0006
+c     forward reference to 200
+      IF (I.LT.0) GOTO 200                                              0008
+c     forward reference to 300
+      IF (I.LT.0) GOTO 300                                              0010
+c     forward reference to 400
+      IF (I.LT.0) GOTO 400                                              0012
+
+c     assign statement
+      NEXT = 200                                                        0015
+
+c     labelled logical if with alternate return
+100   IF (X.GT.0.) GOTO 99999                                           0018
+
+c     labelled logical if with computed go to
+200   IF (X.EQ.0.) GOTO 99998                                           0021
+
+c     labelled logical if with assigned go to
+300   IF (X.LT.0.) GOTO 99997                                           0024
+
+c     labelled loop
+400   CONTINUE
+
+      DO 500 I = 1, N                                                   0029
+         PRINT *, I                                                     0030
+500      CONTINUE                                                       0031
+
+      I_PIPS_RETURN_CODE_ = 0                                           0033
+      RETURN
+99997 CONTINUE
+      IF (NEXT.EQ.100) GOTO 100                                         0024
+      IF (NEXT.EQ.200) GOTO 200                                         0024
+      IF (NEXT.EQ.300) GOTO 300                                         0024
+      STOP                                                              0024
+99998 CONTINUE
+      IF (I.EQ.1) GOTO 100                                              0021
+      IF (I.EQ.2) GOTO 200                                              0021
+      IF (I.EQ.3) THEN                                                  0021
+         GOTO 300
+      ELSE
+         GOTO 300
+      ENDIF
+99999 CONTINUE
+      I_PIPS_RETURN_CODE_ = 2                                           0018
+      END
+

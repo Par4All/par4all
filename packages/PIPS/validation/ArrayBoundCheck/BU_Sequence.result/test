@@ -1,0 +1,55 @@
+* Example with sequence and unstructured
+
+      PROGRAM SEQUENCE
+      REAL X(500), Y(500)
+      READ *, A, B                                                      0001
+      N = 0                                                             0002
+100   IF (A.GT.0.0) THEN                                                0003
+      ELSE
+         GOTO 99998
+      ENDIF
+      N = N+1                                                           0004
+      IF (N.LT.1.OR.N.GT.500) STOP 
+     &"Bound violation:array SEQUENCE:X, 1st dimension"
+      X(N) = A                                                          0005
+      IF (N.LT.1.OR.N.GT.500) STOP 
+     &"Bound violation:array SEQUENCE:Y, 1st dimension"
+      Y(N) = B                                                          0006
+      READ *, A, B                                                      0007
+      GOTO 100
+99998 CONTINUE
+      S = 0.0                                                           0008
+      DO 200 I = 1, N                                                   0009
+         IF (N.LT.1.OR.N.GT.500) STOP 
+     &   "Bound violation:array SEQUENCE:Y, 1st dimension"
+         IF (I.LT.1.OR.I.GT.500) STOP 
+     &   "Bound violation:array SEQUENCE:X, 1st dimension"
+         S = S+X(I)*Y(N)                                                0010
+200      CONTINUE                                                       0011
+      WRITE (*, '("b",F15.5)') S                                        0012
+      END
+* Example with sequence and unstructured
+
+      PROGRAM SEQUENCE
+      REAL X(500), Y(500)
+      READ *, A, B                                                      0001
+      N = 0                                                             0002
+100   IF (A.GT.0.0) THEN                                                0003
+      ELSE
+         GOTO 99997
+      ENDIF
+      N = N+1                                                           0004
+      IF (N.GT.500) STOP 
+     &"Bound violation:array SEQUENCE:X, 1st dimension"
+      X(N) = A                                                          0005
+      Y(N) = B                                                          0006
+      READ *, A, B                                                      0007
+      GOTO 100
+99997 CONTINUE
+      S = 0.0                                                           0008
+      DO 200 I = 1, N                                                   0009
+         S = S+X(I)*Y(N)                                                0010
+200      CONTINUE                                                       0011
+      WRITE (*, '("b",F15.5)') S                                        0012
+      END
+

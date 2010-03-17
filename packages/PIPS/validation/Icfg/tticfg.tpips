@@ -1,0 +1,10 @@
+delete tticfg
+create tticfg tticfg.f
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL 
+activate TRANSFORMERS_INTER_FULL 
+activate PRINT_ICFG_WITH_PRECONDITIONS
+display ICFG_FILE
+close
+delete tticfg
+quit

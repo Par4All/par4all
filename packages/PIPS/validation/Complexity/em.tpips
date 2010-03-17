@@ -1,0 +1,22 @@
+#
+# Script to test comoplexity estimation on em.f
+#
+# Complexity estimation before and after
+# partial evaluation
+delete em
+create em em.f
+module em
+activate PRINT_CODE_COMPLEXITIES
+echo --- Without interprocedural transformers and preconditions
+echo --- An unknown upper bound variable appears because of N
+display PRINTED_FILE
+activate TRANSFORMERS_INTER_FULL
+echo --- With interprocedural transformers (intraprocedural
+echo --- preconditions are sufficient to analyze a main)
+display PRINTED_FILE
+echo --- Keep N1 and N2 unevaluated
+set COMPLEXITY_PARAMETERS "N1 N2"
+display PRINTED_FILE
+close
+delete em
+quit

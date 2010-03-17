@@ -1,0 +1,82 @@
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize variables on all the modules of the program:
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI(NVAR,NXM,NYM), PHI1(NVAR,NXM,NYM)
+       REAL XCOEF(NXM,NYM)
+
+      NX = 101                                                          0006
+      NY = 101                                                          0007
+
+      UNORM = 0.                                                        0009
+! This loop nest should be distributed,
+! the reduction on unorm output as OpenMP
+! and the 2 resulting loop nests parallelized.
+      DO J = 1, NY                                                      0013
+         DO I = 1, NX                                                   0014
+C  call sum[UNORM],
+            UNORM = UNORM+(PHI1(1,I,J)-PHI(1,I,J))**2+(PHI1(2,I,J)-     0015
+     &      PHI(2,I,J))**2                                              0015
+            DO IV = 1, NVAR                                             0017
+               PHI(IV,I,J) = PHI1(IV,I,J)                               0018
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI(NVAR,NXM,NYM), PHI1(NVAR,NXM,NYM)
+       REAL XCOEF(NXM,NYM)
+
+      NX = 101                                                          0006
+      NY = 101                                                          0007
+
+      UNORM = 0.                                                        0009
+C  loop sum[UNORM],
+! This loop nest should be distributed,
+! the reduction on unorm output as OpenMP
+! and the 2 resulting loop nests parallelized.
+      DO J = 1, NY                                                      0013
+C  loop sum[UNORM],
+         DO I = 1, NX                                                   0014
+C  call sum[UNORM],
+            UNORM = UNORM+(PHI1(1,I,J)-PHI(1,I,J))**2+(PHI1(2,I,J)-     0015
+     &      PHI(2,I,J))**2                                              0015
+            DO IV = 1, NVAR                                             0017
+               PHI(IV,I,J) = PHI1(IV,I,J)                               0018
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI(NVAR,NXM,NYM), PHI1(NVAR,NXM,NYM)
+       REAL XCOEF(NXM,NYM)
+
+      NX = 101                                                          0006
+      NY = 101                                                          0007
+
+      UNORM = 0.                                                        0009
+C  loop sum[UNORM],
+! This loop nest should be distributed,
+! the reduction on unorm output as OpenMP
+! and the 2 resulting loop nests parallelized.
+      DO J = 1, NY                                                      0013
+C  loop sum[UNORM],
+         DO I = 1, NX                                                   0014
+C  call sum[UNORM],
+            UNORM = UNORM+(PHI1(1,I,J)-PHI(1,I,J))**2+(PHI1(2,I,J)-     0015
+     &      PHI(2,I,J))**2                                              0015
+            DO IV = 1, NVAR                                             0017
+               PHI(IV,I,J) = PHI1(IV,I,J)                               0018
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+Regenerate the sources from the PIPS transformed code:

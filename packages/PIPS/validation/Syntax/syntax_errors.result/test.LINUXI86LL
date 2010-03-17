@@ -1,0 +1,54 @@
+-- test with the property
+Registering file syntax_errors.f
+Checking Fortran syntax of ${VDIR}/syntax_errors.f
+${VDIR}/syntax_errors.f: In program `error':
+${VDIR}/syntax_errors.f:2: 
+         integer 'hello'
+                 ^
+Invalid form for type-declaration statement at (^)
+${VDIR}/syntax_errors.f:3: 
+         prin *, 'foo'
+         1    2
+Unrecognized statement name at (1) and invalid form for assignment or statement-function definition at (2)
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'g77 -c -Wall -Wimplicit ${VDIR}/syntax_errors.f -o ${VDIR}/syntax_errors.f.pips.o ; test -f ${VDIR}/syntax_errors.f.pips.o && rm ${VDIR}/syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ${VDIR}/syntax_errors.f!
+
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+
+user warning in close_processed_include_cache: no 'processed include cache' to close, skipping...
+pips error in reset_entity_to_size: hash table should have been allocated
+${VDIR}/syntax_errors.test: line 17: 12195 Aborted                 ${pips_version:-pips} -1 CHECK_FORTRAN_SYNTAX_BEFORE_PIPS -f syntax_errors.f syntax_error
+-- test from the environment
+Registering file syntax_errors.f
+Checking Fortran syntax of ${VDIR}/syntax_errors.f
+${VDIR}/syntax_errors.f: In program `error':
+${VDIR}/syntax_errors.f:2: 
+         integer 'hello'
+                 ^
+Invalid form for type-declaration statement at (^)
+${VDIR}/syntax_errors.f:3: 
+         prin *, 'foo'
+         1    2
+Unrecognized statement name at (1) and invalid form for assignment or statement-function definition at (2)
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'g77 -c -Wall -Wimplicit ${VDIR}/syntax_errors.f -o ${VDIR}/syntax_errors.f.pips.o ; test -f ${VDIR}/syntax_errors.f.pips.o && rm ${VDIR}/syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ${VDIR}/syntax_errors.f!
+
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+
+user warning in close_processed_include_cache: no 'processed include cache' to close, skipping...
+pips error in reset_entity_to_size: hash table should have been allocated
+${VDIR}/syntax_errors.test: line 17: 12203 Aborted                 ${pips_version:-pips} -f syntax_errors.f syntax_error

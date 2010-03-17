@@ -1,0 +1,51 @@
+
+Parsed printed file
+
+      PROGRAM IBCLR01
+
+      INTEGER I
+      INTEGER K
+
+      I = 1                                                             0006
+      K = IBCLR(I, 3)                                                   0007
+      PRINT *, 'K = ', K                                                0008
+
+      END
+
+Proper effects
+
+      PROGRAM IBCLR01
+
+      INTEGER I
+      INTEGER K
+C               <must be written>: I
+
+      I = 1                                                             0006
+C               <must be read   >: I
+C               <must be written>: K
+      K = IBCLR(I, 3)                                                   0007
+C               <must be read   >: K __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'K = ', K                                                0008
+
+      END
+
+Cumulated effetcs
+
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM IBCLR01
+
+      INTEGER I
+      INTEGER K
+C               <must be written>: I
+
+      I = 1                                                             0006
+C               <must be read   >: I
+C               <must be written>: K
+      K = IBCLR(I, 3)                                                   0007
+C               <must be read   >: K __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'K = ', K                                                0008
+
+      END

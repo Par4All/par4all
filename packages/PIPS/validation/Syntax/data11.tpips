@@ -1,0 +1,9 @@
+delete data11
+create data11 data11.f
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
+display PRINTED_FILE[DATA11]
+
+close
+delete data11
+quit

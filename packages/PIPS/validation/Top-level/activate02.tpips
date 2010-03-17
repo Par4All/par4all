@@ -1,0 +1,18 @@
+delete activate02
+
+# See what happens with an unknown phase, here PRECONDITIONS_INTER
+
+setproperty ACTIVE_PHASES "PRINT_PARALLELIZEDOMP_CODE TRANSFORMERS_INTER_FULL INTERPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTER ATOMIC_CHAINS RICE_SEMANTICS_DEPENDENCE_GRAPH MUST_REGIONS"
+
+create activate02 activate02.c
+
+display PARALLELPRINTED_FILE
+close
+
+echo
+echo Warnings
+echo
+
+shell cat activate02.database/Warnings
+# delete activate02
+quit

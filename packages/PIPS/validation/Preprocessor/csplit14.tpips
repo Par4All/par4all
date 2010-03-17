@@ -1,0 +1,19 @@
+delete csplit14
+
+
+# Two source files with the same name and different functions
+
+create csplit14 csplit14.src-a/*.c \
+	csplit14.src-b/*.c 
+close
+delete csplit14
+quit
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display PRINTED_FILE[main]
+
+close
+delete csplit14
+quit

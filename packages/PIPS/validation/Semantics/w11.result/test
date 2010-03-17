@@ -1,0 +1,142 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W11
+
+C     Assignments in body: check that the initial condition I=0 and the
+C     body exit condition 0<=I<=1 are merged as entry condition for the
+C     loop body before the fixpoint is computed.
+
+C     Since I may be increasing or decreasing, no information about I is
+C     derived in the loop transformer T*
+
+      INTEGER I
+
+C  T(I) {0<=I, I<=1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0012
+
+C  T(I) {I#init==0, 0<=I, I<=1}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0014
+
+C  T(I) {0<=I, I<=1}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T() {}
+
+C (0,5)
+         READ *, Y                                                      0015
+
+C  T(I) {0<=I, I<=1}
+
+C (0,6)
+         IF (Y.GT.0.) THEN                                              0016
+
+C  T(I) {I==0}
+
+C (0,7)
+            I = 0                                                       0017
+         ELSE
+
+C  T(I) {I==1}
+
+C (0,8)
+            I = 1                                                       0019
+         ENDIF
+C        END BLOCK
+      ENDDO
+
+C  T() {0<=I, I<=1}
+
+C (0,9)
+
+      PRINT *, I                                                        0023
+
+C     END BLOCK
+      END
+
+PRECONDITIONS
+
+
+C  P() {}
+
+      PROGRAM W11
+
+C     Assignments in body: check that the initial condition I=0 and the
+C     body exit condition 0<=I<=1 are merged as entry condition for the
+C     loop body before the fixpoint is computed.
+
+C     Since I may be increasing or decreasing, no information about I is
+C     derived in the loop transformer T*
+
+      INTEGER I
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      I = 0                                                             0012
+
+C  P(I) {I==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0014
+
+C  P(I) {0<=I, I<=1}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  P(I) {0<=I, I<=1}
+
+C (0,5)
+         READ *, Y                                                      0015
+
+C  P(I) {0<=I, I<=1}
+
+C (0,6)
+         IF (Y.GT.0.) THEN                                              0016
+
+C  P(I) {0<=I, I<=1}
+
+C (0,7)
+            I = 0                                                       0017
+         ELSE
+
+C  P(I) {0<=I, I<=1}
+
+C (0,8)
+            I = 1                                                       0019
+         ENDIF
+C        END BLOCK
+      ENDDO
+
+C  P(I) {0<=I, I<=1}
+
+C (0,9)
+
+      PRINT *, I                                                        0023
+
+C     END BLOCK
+      END

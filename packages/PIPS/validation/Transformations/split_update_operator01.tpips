@@ -1,0 +1,9 @@
+delete split_update_operator01
+create split_update_operator01 split_update_operator01.c
+
+display PRINTED_FILE[%ALL]
+apply SPLIT_UPDATE_OPERATOR[%ALL]
+display PRINTED_FILE[%ALL]
+
+close split_update_operator01
+delete split_update_operator01

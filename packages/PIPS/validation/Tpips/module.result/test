@@ -1,0 +1,44 @@
+
+Select a wrong module name before the worskpace is created
+
+
+In spite of the generate command, the main program, MODULE, should be selected
+
+!
+! what if module name is wrong.
+!
+      PROGRAM MODULE
+      WRITE (*, 'module')                                               0001
+      END
+
+Select a wrong module name after the creation of the worskpace
+
+
+What is the current module? Still the previous one, MODULE,
+since TOTO could not be generated
+
+!
+! what if module name is wrong.
+!
+      PROGRAM MODULE
+      WRITE (*, 'module')                                               0001
+      END
+
+Select the main program as module
+
+!
+! what if module name is wrong.
+!
+      PROGRAM MODULE
+      WRITE (*, 'module')                                               0001
+      END
+
+Select MODULE as current module
+
+!
+! what if module name is wrong.
+!
+      PROGRAM MODULE
+      WRITE (*, 'module')                                               0001
+      END
+

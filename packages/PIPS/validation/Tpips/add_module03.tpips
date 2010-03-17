@@ -1,0 +1,25 @@
+# Check tpips behavior when a module is requested but not defined in the
+# user specified file
+
+delete add_module03
+create add_module03 add_module03.f
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
+
+echo 
+echo Print a new module, which does not exist: there should be no
+echo output
+echo
+
+display PRINTED_FILE[ADDED_MODULE]
+add_module03.src/added_modules.f
+quit
+
+echo
+echo Print all known modules known to pipsmake: there should be three anyway,
+echo but not added_module which does not exist
+echo
+
+display PRINTED_FILE[%ALL]
+close
+delete add_module03
+quit

@@ -1,0 +1,7 @@
+delete cplch
+create cplch cplch.f
+module CPLCH
+
+display PRINTED_FILE[CPLCH]
+close
+delete cplch

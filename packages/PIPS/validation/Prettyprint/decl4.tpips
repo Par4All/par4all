@@ -1,0 +1,21 @@
+delete d
+create d decl4.f
+
+echo # Usual declarations
+setproperty PRETTYPRINT_ALL_DECLARATIONS FALSE
+display PRINTED_FILE
+remove PRINTED_FILE
+
+echo # dimensions in type
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty PRETTYPRINT_VARIABLE_DIMENSIONS "type"
+display PRINTED_FILE
+remove PRINTED_FILE
+
+echo # dimensions in common
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty PRETTYPRINT_VARIABLE_DIMENSIONS "common"
+display PRINTED_FILE
+
+close
+delete d

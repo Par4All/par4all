@@ -1,0 +1,16 @@
+#! /bin/sh
+# Init -f grandg.f grandg >&2
+# Display -m GRANDG
+# Delete grandg
+
+delete grandg
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create grandg grandg.f
+
+display PRINTED_FILE
+
+close
+delete grandg
+quit

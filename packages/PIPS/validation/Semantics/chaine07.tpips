@@ -1,0 +1,30 @@
+# echo 'initial exec'
+# shell ${PIPS_F77:-f77} chaine07.f && ./a.out
+# shell rm a.out
+
+delete chaine07
+create chaine07 chaine07.f
+setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+
+# activate PRINT_CODE_TRANSFORMERS
+# display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE
+#apply PARTIAL_EVAL[%ALL]
+# apply SUPPRESS_DEAD_CODE[%ALL]
+
+# display PRINTED_FILE[%ALL]
+
+# apply UNSPLIT
+
+close
+
+# echo 'optimized exec'
+# shell ${PIPS_F77:-f77} chaine07.database/Src/chaine07.f && ./a.out
+# shell rm a.out
+
+delete chaine07
+

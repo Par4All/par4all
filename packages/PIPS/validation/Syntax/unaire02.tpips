@@ -1,0 +1,11 @@
+delete unaire02
+
+# Check print out for unary minus
+
+create unaire02 unaire02.f
+
+display PRINTED_FILE[UNAIRE02]
+close
+delete unaire02
+quit
+

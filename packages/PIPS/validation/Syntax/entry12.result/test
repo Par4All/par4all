@@ -1,0 +1,125 @@
+some entries
+      SUBROUTINE FUN1
+99999 CONTINUE                                                          0002
+      PRINT *, 'entry fun1 - return'                                    0003
+      END
+      SUBROUTINE BLA2
+99998 CONTINUE                                                          0002
+      PRINT *, 'entry bla2 - return'                                    0003
+      END
+      SUBROUTINE FOO4
+99996 CONTINUE                                                          0002
+      PRINT *, 'entry foo4 - return'                                    0003
+      END
+all modules
+      SUBROUTINE BLA
+      PRINT *, 'sub bla'                                                0003
+99999 CONTINUE
+      PRINT *, 'entry bla1'                                             0005
+99998 CONTINUE
+      PRINT *, 'entry bla2 - return'                                    0007
+      END
+      SUBROUTINE BLA1
+99999 CONTINUE                                                          0002
+      PRINT *, 'entry bla1'                                             0003
+99998 CONTINUE                                                          0004
+      PRINT *, 'entry bla2 - return'                                    0005
+      END
+      SUBROUTINE BLA2
+99998 CONTINUE                                                          0002
+      PRINT *, 'entry bla2 - return'                                    0003
+      END
+      SUBROUTINE BLA3
+99997 CONTINUE                                                          0002
+      PRINT *, 'entry bla3'                                             0003
+99996 CONTINUE                                                          0004
+      PRINT *, 'entry bla4'                                             0005
+      END
+      SUBROUTINE BLA4
+99996 CONTINUE                                                          0002
+      PRINT *, 'entry bla4'                                             0003
+      END
+! ENTRIES...
+      PROGRAM ENTRIES
+      PRINT *, 'some entries'                                           0003
+      CALL FUN1                                                         0004
+      CALL BLA2                                                         0005
+      CALL FOO4                                                         0006
+      PRINT *, 'done'                                                   0007
+      CALL LEE                                                          0008
+      END
+      SUBROUTINE FOO
+      PRINT *, 'sub foo'                                                0003
+99999 CONTINUE
+      PRINT *, 'entry foo1'                                             0005
+99998 CONTINUE
+      PRINT *, 'entry foo2'                                             0007
+99997 CONTINUE
+      PRINT *, 'entry foo3'                                             0009
+99996 CONTINUE
+      PRINT *, 'entry foo4 - return'                                    0011
+      END
+      SUBROUTINE FOO1
+99999 CONTINUE                                                          0002
+      PRINT *, 'entry foo1'                                             0003
+99998 CONTINUE                                                          0004
+      PRINT *, 'entry foo2'                                             0005
+99997 CONTINUE                                                          0006
+      PRINT *, 'entry foo3'                                             0007
+99996 CONTINUE                                                          0008
+      PRINT *, 'entry foo4 - return'                                    0009
+      END
+      SUBROUTINE FOO2
+99998 CONTINUE                                                          0002
+      PRINT *, 'entry foo2'                                             0003
+99997 CONTINUE                                                          0004
+      PRINT *, 'entry foo3'                                             0005
+99996 CONTINUE                                                          0006
+      PRINT *, 'entry foo4 - return'                                    0007
+      END
+      SUBROUTINE FOO3
+99997 CONTINUE                                                          0002
+      PRINT *, 'entry foo3'                                             0003
+99996 CONTINUE                                                          0004
+      PRINT *, 'entry foo4 - return'                                    0005
+      END
+      SUBROUTINE FOO4
+99996 CONTINUE                                                          0002
+      PRINT *, 'entry foo4 - return'                                    0003
+      END
+      SUBROUTINE FUN
+      PRINT *, 'sub fun'                                                0003
+99999 CONTINUE
+      PRINT *, 'entry fun1 - return'                                    0005
+      END
+      SUBROUTINE FUN1
+99999 CONTINUE                                                          0002
+      PRINT *, 'entry fun1 - return'                                    0003
+      END
+      SUBROUTINE FUN2
+99998 CONTINUE                                                          0002
+      PRINT *, 'entry fun2'                                             0003
+99997 CONTINUE                                                          0004
+      PRINT *, 'entry fun3'                                             0005
+99996 CONTINUE                                                          0006
+      PRINT *, 'entry fun4'                                             0007
+      END
+      SUBROUTINE FUN3
+99997 CONTINUE                                                          0002
+      PRINT *, 'entry fun3'                                             0003
+99996 CONTINUE                                                          0004
+      PRINT *, 'entry fun4'                                             0005
+      END
+      SUBROUTINE FUN4
+99996 CONTINUE                                                          0002
+      PRINT *, 'entry fun4'                                             0003
+      END
+! LEE
+      SUBROUTINE LEE
+      PRINT *, 'lee entries'                                            0003
+      CALL BLA3                                                         0004
+      CALL FOO1                                                         0005
+      CALL FUN                                                          0006
+      PRINT *, 'end'                                                    0007
+      END
+

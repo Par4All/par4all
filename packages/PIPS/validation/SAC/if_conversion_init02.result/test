@@ -1,0 +1,28 @@
+void foo()
+{
+   int i, j;
+   if (j>2)
+      for(i = 0; i <= 0; i += 1)
+         j++;
+   if (j>2)
+      for(i = 0; i <= 29; i += 1)
+         j++;
+}
+extern void foo();
+void foo()
+{
+   int i, j;
+   //PIPS generated variable
+   int I_0;
+   I_0 = j>2;
+#pragma PIPS IF_TO_CONVERT
+   if (I_0)
+      for(i = 0; i <= 0; i += 1)
+         j++;
+   ;
+   if (j>2)
+      for(i = 0; i <= 29; i += 1)
+         j++;
+}
+extern void foo();
+

@@ -1,0 +1,14 @@
+#!/bin/sh
+# test pips on oa118.f
+#
+Delete oa118
+if Pips -f oa118.f -w oa118 -m oa118 -s rfulldg -b PF >&2
+then 
+	Display -l code
+	Delete oa118 >&2
+else 
+    	echo Parser failed for oa118.f
+	Delete oa118 >&2
+	exit 1
+fi
+ 

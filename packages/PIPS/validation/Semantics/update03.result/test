@@ -1,0 +1,94 @@
+
+Parsed printed file for "update03"
+
+void update03()
+{
+   int i = 1;
+   
+   /* This does not make much sense, just like "i = i;". */
+   i = i += 2;
+   i = (i += 2)+1;
+   foo(i);
+}
+
+Proper effects for "update03"
+
+void update03()
+{
+   int i = 1;
+//               <must be read   >: i
+//               <must be written>: i
+   
+   /* This does not make much sense, just like "i = i;". */
+   i = i += 2;
+//               <must be read   >: i
+//               <must be written>: i
+   i = (i += 2)+1;
+//               <must be read   >: i
+   foo(i);
+}
+
+Cumulated effects for "update03"
+
+void update03()
+{
+   int i = 1;
+//               <must be read   >: i
+//               <must be written>: i
+   
+   /* This does not make much sense, just like "i = i;". */
+   i = i += 2;
+//               <must be read   >: i
+//               <must be written>: i
+   i = (i += 2)+1;
+//               <must be read   >: i
+   foo(i);
+}
+
+Transformers for "update03"
+
+
+//  T() {}
+
+void update03()
+{
+   int i = 1;
+
+//  T(i) {i==i#init+2}
+
+   
+   /* This does not make much sense, just like "i = i;". */
+   i = i += 2;
+
+//  T(i) {i==i#init+3}
+
+   i = (i += 2)+1;
+
+//  T() {}
+
+   foo(i);
+}
+
+Preconditions for "update03"
+
+
+//  P() {}
+
+void update03()
+{
+   int i = 1;
+
+//  P() {i==1}
+
+   
+   /* This does not make much sense, just like "i = i;". */
+   i = i += 2;
+
+//  P(i) {i==3}
+
+   i = (i += 2)+1;
+
+//  P(i) {i==6}
+
+   foo(i);
+}

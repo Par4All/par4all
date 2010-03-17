@@ -1,0 +1,24 @@
+
+Print a new module, which does not exist: there should be no
+output
+
+
+Print all known modules known to pipsmake: there should be three anyway,
+but not added_module which does not exist
+
+      SUBROUTINE ADDED_MODULES
+
+      PRINT *, 'added_modules'                                          0001
+
+      END
+C     Check that tpips survives looking for an unexistant file
+
+      PROGRAM ADD_MODULE03
+
+      END
+
+      SUBROUTINE ANOTHER_ADDED_MODULE
+
+      PRINT *, 'another_added_module'                                   0001
+
+      END

@@ -1,0 +1,5 @@
+      SUBROUTINE BS015
+10    PRINT *, 'continuation'                                           0002
+      IF (.TRUE.) GOTO 10                                               0004
+      END
+

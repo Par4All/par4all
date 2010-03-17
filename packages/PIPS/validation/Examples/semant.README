@@ -1,0 +1,24 @@
+semant.f
+
+-----------------------------------
+analyse semantique interprocedurale
+-----------------------------------
+a. module SEMANT
+SEMANT appelle SWAP. Donc nous voulons montrer pour SEMANT l'utilite de
+l'analyse montante: preconditions 
+Selectionner Props > Sequential View > Stat. & Precond.
+Appeler Sequential View -> les preconditions sont perdues apres l'appel
+a swap
+
+b. module SWAP
+selectionner SWAP
+Props > Transformers > Quick Inter-procedural
+Props > Sequential View > Stat. & Transformers
+Appeler Sequential View
+
+c. module SEMANT
+selectionner SEMANT
+Props > Sequential View > Stat. & Precond.
+Appeler Sequential View -> les preconditions sont propagees apres l'appel
+a swap
+

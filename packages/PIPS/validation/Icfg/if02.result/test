@@ -1,0 +1,12 @@
+if02
+    if () {
+        bla
+    } else if () {
+        bla
+    } else if () {
+        bla
+    } else if () {
+        bla
+    } else {
+        bla
+    }

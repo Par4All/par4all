@@ -1,0 +1,37 @@
+
+C  T() {}
+
+      PROGRAM TRUSTED_REF17
+
+C     Check that non-executable loop bodies generate conditions for loop bounds
+
+      REAL A(1)
+
+C  T(I) {I==1, N<=0}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==1}
+
+C (0,2)
+
+c      read *, n
+
+      DO I = 1, N                                                       0009
+
+C  T() {0==-1}
+
+C (0,3)
+         A(2) = 0.                                                      0010
+      ENDDO
+
+C  T() {I==1, N<=0}
+
+C (0,4)
+
+      PRINT *, N                                                        0014
+
+C     END BLOCK
+      END
+

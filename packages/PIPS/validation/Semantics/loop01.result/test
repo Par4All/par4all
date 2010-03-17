@@ -1,0 +1,81 @@
+
+C  T() {}
+
+      SUBROUTINE LOOP01(T, L)
+
+C     Check loop entrance condition
+
+      REAL T(L)
+
+C  T(I) {1<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==2}
+
+C (0,2)
+
+      I = 2                                                             0007
+
+C  T(I) {1<=I}
+
+C (0,3)
+
+      DO I = 1, M*M+2                                                   0009
+
+C  T() {1<=I, I<=L}
+
+C (0,4)
+         T(I) = 0.                                                      0010
+      ENDDO
+
+C  T() {}
+
+C (0,5)
+
+      PRINT *, I                                                        0013
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE LOOP01(T, L)
+
+C     Check loop entrance condition
+
+      REAL T(L)
+
+C  P() {1<=L}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {1<=L}
+
+C (0,2)
+
+      I = 2                                                             0007
+
+C  P(I) {I==2, 1<=L}
+
+C (0,3)
+
+      DO I = 1, M*M+2                                                   0009
+
+C  P(I) {1<=I, I<=L, 1<=L}
+
+C (0,4)
+         T(I) = 0.                                                      0010
+      ENDDO
+
+C  P(I) {1<=I, I<=L+1, 1<=L}
+
+C (0,5)
+
+      PRINT *, I                                                        0013
+
+C     END BLOCK
+      END
+

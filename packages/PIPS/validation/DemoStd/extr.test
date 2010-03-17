@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# extr.f test script
+#
+Pips -f extr.f -w extr -m extr -p prcp >&2
+exit_code=$?
+echo "--- Preconditions for EXTR"
+Display -l prec
+echo "--- Parallel version"
+Pips -s rsdg -p priv -b PPF >&2
+Display -l 
+Delete extr
+exit $exit_code

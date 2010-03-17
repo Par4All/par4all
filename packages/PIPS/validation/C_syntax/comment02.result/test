@@ -1,0 +1,41 @@
+
+PARSED PRINTED FILE FOR MODULE comment02!
+
+/* Derived from rsp05.c to debug the parser when comments are used */
+/* #include <stdio.h> */
+
+
+/* Comment of a function declaration */
+extern int filter(int x);
+
+/* Comment of a function body*/
+extern int main();
+
+extern int filter(int x);
+
+PARSED PRINTED FILE FOR MODULE main
+
+int main()
+{
+   /* Declaration comment */
+   int i;
+   int j;
+
+   j = filter(i);
+   // Function call comment
+   i = j;
+}
+
+PARSED PRINTED FILE FOR MODULE filter
+
+int filter(int x)
+{
+   int y;
+   int res;
+   
+   
+   y = x;
+   /* Assignment comment */
+   
+   return res;
+}

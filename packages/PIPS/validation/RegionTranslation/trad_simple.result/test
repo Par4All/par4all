@@ -1,0 +1,12 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==5}>
+
+
+      PROGRAM TRADM
+      INTEGER B, M
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==5}>
+
+      IF (.TRUE.) CALL TRAD(B)                                          0001
+      END
+

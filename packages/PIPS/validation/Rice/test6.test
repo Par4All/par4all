@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# test pips on test6.f
+#
+Delete test6>&2
+if Init -f test6.f test6 >&2
+then
+	Select -w test6 rfulldg>&2
+	if Display -m test6
+	then
+		Delete test6
+	else
+		echo Parallelization faileds
+		Delete test6
+		exit 2
+	fi
+else 
+    	echo Parallelization failed 
+	Delete test6
+	exit 1
+fi

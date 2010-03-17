@@ -1,0 +1,23 @@
+# Check that summary preconditions are re-evaluated correctly
+# after a code modification, such as a partial eval
+#
+# This used not to work because summary preconditions were
+# never reset. They were re-used although obsolete. Fixed
+# by Guillaume Oget.
+
+delete precprec
+create precprec precprec.f
+module PRECPREC
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+apply PARTIAL_EVAL 
+display PRINTED_FILE
+
+close
+delete precprec
+quit
+EOF
+

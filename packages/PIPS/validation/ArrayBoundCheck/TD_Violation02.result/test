@@ -1,0 +1,27 @@
+      PROGRAM TEST
+
+      REAL T(4)
+      STOP "Bound violation:, WRITING,  array TEST:T, upper bound, 1st d
+     &imension"
+
+      DO I = 1, 5                                                       0001
+         T(I) = 0.                                                      0002
+      ENDDO
+
+      PRINT *, T(2)                                                     0003
+
+      END
+      PROGRAM TEST
+
+      REAL T(4)
+      STOP "Bound violation:, WRITING,  array TEST:T, upper bound, 1st d
+     &imension"
+
+      DO I = 1, 5                                                       0001
+         T(I) = 0.                                                      0002
+      ENDDO
+
+      PRINT *, T(2)                                                     0003
+
+      END
+

@@ -1,0 +1,12 @@
+! des commentaires en fin de ligne... partout
+! voici le programme !
+      PROGRAM BANG 
+! un entier
+      INTEGER I   
+! une entree
+      READ *, I                                                         0001
+! une sortie
+      PRINT *, I                                                        0002
+! et c'est tout
+      END
+

@@ -1,0 +1,10 @@
+delete linpackd
+create linpackd linpackd.f
+module DGESL
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+close
+delete linpackd
+

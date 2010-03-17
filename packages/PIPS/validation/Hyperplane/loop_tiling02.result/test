@@ -1,0 +1,41 @@
+
+Initial source code
+
+void loop_tiling02(int ni, int nj, int nk)
+{
+   float x[n][n][n];
+   int i,  j,  k;
+
+l1:
+   for(i = 0; i <= ni-1; i += 1)
+l2:
+      for(j = 0; j <= nj-1; j += 1)
+l3:
+         for(k = 0; k <= nk-1; k += 1)
+            x[i][j][k] = 0.;
+}
+
+Source code after loop tiling
+
+void loop_tiling02(int ni, int nj, int nk)
+{
+   float x[n][n][n];
+   int i,  j,  k;
+   //PIPS generated variable
+   int j_t;
+   //PIPS generated variable
+   int k_t;
+
+l1:
+   for(i = 0; i <= ni-1; i += 1)
+l2:
+      for(j_t = 0; j_t <= (-1+nj)/10; j_t += 1)
+         for(k_t = 0; k_t <= (-1+nk)/10; k_t += 1)
+            for(j = 10*j_t; j <= MIN(-1+nj, 9+10*j_t); j += 1)
+               for(k = 10*k_t; k <= MIN(9+10*k_t, -1+nk); k += 1)
+                  x[i][j][k] = 0.;
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active

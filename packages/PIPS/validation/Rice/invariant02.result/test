@@ -1,0 +1,36 @@
+
+Initial source code
+
+void invariant02(int ni, int nj)
+{
+   int n = 10;
+   float y[n];
+   int i, j;
+   float s, a, b;
+
+   for(i = 0; i <= ni-1; i += 1) {
+      s = a*b;
+      y[i] = s;
+   }
+}
+
+Source code after invariant code motion
+
+void invariant02(int ni, int nj)
+{
+   int n = 10;
+   float y[n];
+   int i, j;
+   float s, a, b;
+
+
+   i = MAX(INT(ni), 0);
+   s = a*b;
+#pragma omp parallel for 
+   for(i = 0; i <= ni-1; i += 1)
+      y[i] = s;
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active

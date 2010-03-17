@@ -1,0 +1,39 @@
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+      PROGRAM NS
+      PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+      REAL PHI(NVAR,NXM,NYM)
+      NCONT = 0                                                         0004
+      NX = 101                                                          0005
+      NY = 101                                                          0006
+
+      OPEN (UNIT=1,FILE='stokes.ini',STATUS='old')                      0008
+      IF (NCONT.EQ.1) THEN                                              0009
+
+!$OMP    PARALLEL DO PRIVATE(I)
+         DO J = 1, NY                                                   0010
+
+!$OMP       PARALLEL DO PRIVATE(Y,X,UNO,IV,DIVU)
+            DO I = 1, NX                                                0011
+               READ (1, *) X, Y, (PHI(IV,I,J), IV = 1, NVAR), DIVU,     0012
+     &         UNO                                                      0012
+            ENDDO
+         ENDDO
+      ELSE
+         DO J = 1, NY                                                   0016
+            DO I = 1, NX                                                0017
+               READ (1, *) X, Y, (PHI(IV,I,J), IV = 1, NVAR), DIVU,     0018
+     &         UNO                                                      0018
+            ENDDO
+         ENDDO
+      ENDIF
+      CLOSE (1)                                                         0022
+      END
+Consider the generated parallel as the sequential code now:
+Regenerate the sources from the PIPS transformed code:

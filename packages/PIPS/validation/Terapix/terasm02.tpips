@@ -1,0 +1,176 @@
+delete terasm02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create terasm02 terasm02.c include/terasm.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+# for scalarization
+#
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+
+
+module microcode
+
+echo
+echo Initial code
+echo
+
+setproperty LOOP_NORMALIZE_1_INCREMENT TRUE
+apply LOOP_NORMALIZE
+display PRINTED_FILE
+
+echo
+echo After flattening
+echo
+
+apply FLATTEN_CODE
+display PRINTED_FILE
+
+echo
+echo Microcode after scalarization
+echo
+
+apply SCALARIZATION
+display PRINTED_FILE
+
+echo
+echo Microcode After array conversion
+echo
+
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
+apply ARRAY_TO_POINTER
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+echo
+echo Microcode after CSE
+echo
+
+setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
+apply OPTIMIZE_EXPRESSIONS
+apply SUPPRESS_DEAD_CODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode after ICM
+echo
+
+setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+apply OPTIMIZE_EXPRESSIONS
+apply PARTIAL_EVAL
+apply SUPPRESS_DEAD_CODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode After atomization
+echo
+
+setproperty SIMD_ATOMIZER_ATOMIZE_LHS TRUE
+setproperty SIMD_ATOMIZER_ATOMIZE_REFERENCE TRUE
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+
+echo
+echo Atomized code
+echo
+
+setproperty SIMD_ATOMIZER_ATOMIZE_REFERENCE TRUE
+setproperty SIMD_ATOMIZER_ATOMIZE_LHS TRUE
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+echo
+echo Tidy code
+echo
+
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
+apply OPTIMIZE_EXPRESSIONS
+setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+apply OPTIMIZE_EXPRESSIONS
+display PRINTED_FILE
+
+echo
+echo Code in a two adress fashion
+echo
+
+apply GENERATE_TWO_ADDRESSES_CODE
+display PRINTED_FILE
+
+
+
+echo
+echo Code after flattening
+echo
+
+apply FLATTEN_CODE
+display PRINTED_FILE
+
+echo
+echo Code after some cleaning
+echo
+
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode after normalization
+echo
+apply NORMALIZE_MICROCODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Code after expression substitution
+echo
+
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "addf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "subf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "mulf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "divf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "paddf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "addi"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "subi"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "muli"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "divi"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "seti"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "setf"
+apply EXPRESSION_SUBSTITUTION
+
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c terasm02.database/Src/terasm02.c  -o terasm02.database/Src/terasm.o
+shell rm -rf terasm02.database/Src/terasm.o
+
+close
+delete terasm02
+quit
+

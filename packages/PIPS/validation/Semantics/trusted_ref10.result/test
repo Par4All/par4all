@@ -1,0 +1,29 @@
+
+C  T() {1<=N}
+
+      SUBROUTINE TRUSTED_REF10(A, N)
+
+      REAL A(N, N)
+
+C  T(I,J) {I==J, I==N+1, 2<=I}
+
+C     BEGIN BLOCK
+
+C  T(I,J) {1<=I, 1<=N}
+
+
+      DO I = 1, N                                                       0005
+
+C  T(J) {1<=I, I<=N, 1<=J, 1<=N}
+
+         DO J = 1, N                                                    0006
+
+C  T() {1<=I, I<=N, 1<=J, J<=N, 1<=N}
+
+            A(I,J) = 0                                                  0007
+         ENDDO
+      ENDDO
+
+C     END BLOCK
+      END
+

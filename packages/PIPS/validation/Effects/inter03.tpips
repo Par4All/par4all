@@ -1,0 +1,63 @@
+delete inter03
+create inter03 inter03.c
+
+#echo Select some options to deal with the C Language:
+#echo Parse as C:
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+#echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+#echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+
+activate PRINT_CODE_PROPER_EFFECTS
+
+echo
+echo Proper effects for "foo"
+echo
+display PRINTED_FILE[foo]
+
+echo
+echo Proper effects for "main"
+echo
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_REGIONS
+
+echo
+echo Regions for "foo"
+echo
+display PRINTED_FILE[foo]
+
+
+echo
+echo Regions for "main"
+echo
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_OUT_REGIONS
+#setenv OUT_EFFECTS_DEBUG_LEVEL 8
+
+echo
+echo out regions for "main"
+echo
+display PRINTED_FILE[main]
+
+echo
+echo out regions for "foo"
+echo
+display PRINTED_FILE[foo]
+
+
+
+close
+delete inter03
+quit

@@ -1,0 +1,49 @@
+externalloc01!
+
+Declarations for module "externalloc01!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "TOP-LEVEL:c" with type "variable" "int"
+	Declared entity "externalloc01!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "externalloc01!:*HEAP*" with type "area" with size 0
+	Declared entity "externalloc01!:*STACK*" with type "area" with size 0
+	Declared entity "externalloc01!:*STATIC*" with type "area" with size 4
+	Declared entity "externalloc01!:b" with type "variable" "int"
+	Declared entity "externalloc01!:externalloc01!foo" with type "functional" "() -> int"
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:a"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	External Variable "TOP-LEVEL:a"	offset = UNKNOWN,	size = 4
+	Variable "TOP-LEVEL:c"	offset = 0	size = 4
+
+
+Layout for memory area "externalloc01!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "externalloc01!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "externalloc01!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "externalloc01!:*STATIC*" of size 4:
+	Variable "externalloc01!:b"	offset = 0	size = 4
+
+End of declarations for module externalloc01!
+
+//Checks Memory allocation offsets for one global external variable declared globally: offsets is not known and static and global variable of known size.
+extern int a;
+static int b;
+int c;
+static int foo();

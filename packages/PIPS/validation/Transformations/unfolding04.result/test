@@ -1,0 +1,111 @@
+End of property settings
+void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   FLGR_Data1D **pdest = datdest->row;                                  /*0080*/
+   FLGR_Data1D **p1 = data1->row;                                       /*0081*/
+   FLGR_Data1D **p2 = data2->row;                                       /*0082*/
+   int i;                                                               /*0083*/
+   i = 0;                                                               /*0084*/
+   while (i<data1->size_y) {                                            /*0085*/
+      flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);                       /*0086*/
+      i++, pdest++, p1++, p2++;                                         /*0087*/
+   }
+   return;                                                              /*0089*/
+}
+void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   FLGR_Data1D **pdest = datdest->row;                                  /*0003*/
+   /*0003*/
+   /*0003*/
+   /*0080*/
+   FLGR_Data1D **p1 = data1->row;                                       /*0006*/
+   /*0005*/
+   /*0004*/
+   /*0081*/
+   FLGR_Data1D **p2 = data2->row;                                       /*0009*/
+   /*0007*/
+   /*0005*/
+   /*0082*/
+   int i;                                                               /*0012*/
+   /*0009*/
+   /*0006*/
+   /*0083*/
+   //PIPS generated variable
+   FLGR_Data1D *P_0 = *pdest, *P_1 = *p1, *P_2 = *p2;                   /*0016*/
+   /*0012*/
+   /*0008*/
+   //PIPS generated variable
+   int _return0, _return1, _return2;                                    /*0019*/
+   /*0014*/
+   //PIPS generated variable
+   int _return3, _return4;                                              /*0021*/
+   i = 0;                                                               /*0022*/
+   /*0015*/
+   /*0009*/
+   /*0084*/
+   while (i<data1->size_y) {                                            /*0025*/
+      {
+         int j;                                                         /*0027*/
+         /*0019*/
+         /*0012*/
+         /*0060*/
+         fgINT32 *psrc1 = (fgINT32 *) P_1->array;                       /*0030*/
+         /*0021*/
+         /*0013*/
+         /*0061*/
+         fgINT32 *psrc2 = (fgINT32 *) P_2->array;                       /*0033*/
+         /*0023*/
+         /*0014*/
+         /*0062*/
+         fgINT32 *pdest = (fgINT32 *) P_0->array;                       /*0036*/
+         /*0025*/
+         /*0015*/
+         /*0063*/
+         fgINT32 v1;                                                    /*0039*/
+         /*0027*/
+         /*0016*/
+         /*0064*/
+         fgINT32 v2;                                                    /*0042*/
+         /*0029*/
+         /*0017*/
+         /*0065*/
+         fgINT32 result;                                                /*0045*/
+         /*0031*/
+         /*0018*/
+         /*0066*/
+         int spp = P_0->spp;                                            /*0048*/
+         /*0033*/
+         /*0019*/
+         /*0067*/
+         int length = P_0->length*spp;                                  /*0051*/
+         /*0035*/
+         /*0020*/
+         /*0068*/
+         for(j = 0; j <= length-1; j += 1) {
+            _return3 = psrc1[j];                                        /*0055*/
+            _return0 = _return3;                                        /*0058*/
+            v1 = _return0;                                              /*0059*/
+            /*0041*/
+            /*0070*/
+            _return4 = psrc2[j];                                        /*0062*/
+            _return1 = _return4;                                        /*0065*/
+            v2 = _return1;                                              /*0066*/
+            /*0047*/
+            /*0071*/
+            _return2 = v1+v2;                                           /*0068*/
+            /*0050*/
+            result = _return2;                                          /*0069*/
+            /*0053*/
+            /*0072*/
+            pdest[j] = result;                                          /*0072*/
+            /*0034*/
+            /*0039*/
+            ;
+         }
+         /*0075*/
+         ;
+      }
+      i++, pdest++, p1++, p2++;
+   }
+   return;                                                              /*0082*/
+}

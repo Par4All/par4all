@@ -1,0 +1,45 @@
+C                                     6*L.M.N + 3*M.N + 3*L + 3*M + 78 (SUMMARY)
+      PROGRAM UNKNOWN
+
+c     See how unknown variable names are generated
+c     for DO/ENDDO loops without a label:more than
+c     one unknown upper bound should generated!
+
+      REAL T(100), U(100,100,100)
+C                                                              3*L + 2 (DO)
+
+      DO I = 1, L                                                       0009
+C                                                                    3 (STMT)
+         T(I) = 0.                                                      0010
+      ENDDO
+C                                                              3*M + 2 (DO)
+
+      DO J = 1, M                                                       0013
+C                                                                    3 (STMT)
+         T(J) = 0.                                                      0014
+      ENDDO
+C                                                            -3*N + 35 (DO)
+
+      DO K = N, 10                                                      0017
+C                                                                    3 (STMT)
+         T(K) = 0.                                                      0018
+      ENDDO
+C                                                                   37 (DO)
+
+      DO L = N, N+10                                                    0021
+C                                                                    3 (STMT)
+         T(L) = 0.                                                      0022
+      ENDDO
+C                                            6*L.M.N + 3*M.N + 3*N + 2 (DO)
+
+      DO 100 I = 1, N                                                   0025
+C                                                      6*L.M + 3*M + 3 (DO)
+         DO 100 J = 1, M                                                0026
+C                                                              6*L + 3 (DO)
+            DO 100 K = 1, L                                             0027
+C                                                                    5 (STMT)
+               U(I,J,K) = 0.                                            0028
+C                                                                    0 (STMT)
+100            CONTINUE                                                 0029
+
+      END

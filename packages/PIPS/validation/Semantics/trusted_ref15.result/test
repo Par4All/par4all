@@ -1,0 +1,34 @@
+
+C  T(M1) {M1==M1#init+1, 2<=M1}
+
+      SUBROUTINE TRUSTED_REF15(M1)
+
+C  T(M1) {M1==M1#init+1, 2<=M1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T() {1<=M1}
+
+C (0,2)
+
+C     Check that STOP statements are really used to generate information
+C     for later transformers
+
+      IF (M1.LT.1) STOP                                                 0006
+
+C  T() {1<=M1}
+
+C (0,5)
+
+      PRINT *, M1                                                       0008
+
+C  T(M1) {M1==M1#init+1, 2<=M1}
+
+C (0,6)
+
+      M1 = M1+1                                                         0010
+
+C     END BLOCK
+      END
+

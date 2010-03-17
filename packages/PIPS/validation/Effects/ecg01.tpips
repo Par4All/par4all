@@ -1,0 +1,19 @@
+delete ecg01
+create ecg01 ecg01.f
+
+echo
+echo Proper effects for "FFT1"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE(FFT1)
+
+echo
+echo Cumulated effects for "FFT1"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE(FFT1)
+close
+delete ecg01
+quit

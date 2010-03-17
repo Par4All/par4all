@@ -1,0 +1,241 @@
+
+Code structure:
+
+      PROGRAM UNSTRUC08
+
+C     Check that certainly entered desugared loop might be handled
+
+      REAL A(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      READ *, N                                                         0007
+C (0,3)
+
+      IF (N.LT.1) THEN                                                  0009
+C (0,4)
+         STOP                                                           0009
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+      I = 1                                                             0011
+C (0,7)
+C     BEGIN UNSTRUCTURED
+99999 CONTINUE
+C (1,1)
+
+C     DO loop  with exit had to be desugared
+      IF (I.GT.N) GOTO 200                                              0011
+C (5,1)
+      A(I) = 0.                                                         0012
+C (3,1)
+      IF (A(I).LT.A(I-1)) GOTO 200                                      0013
+C (4,1)
+      I = I+1                                                           0011
+      GOTO 99999
+C (2,1)
+
+200   CONTINUE                                                          0016
+C     END UNSTRUCTURED
+C (0,8)
+      PRINT *, I, N                                                     0017
+C (0,9)
+
+      RETURN
+C     END BLOCK
+      END
+
+Transformers:
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC08
+
+C     Check that certainly entered desugared loop might be handled
+
+      REAL A(100)
+
+C  T(I,N) {1<=I, 1<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(N) {}
+
+C (0,2)
+
+      READ *, N                                                         0007
+
+C  T() {1<=N}
+
+C (0,3)
+
+      IF (N.LT.1) THEN                                                  0009
+
+C  T() {0==-1}
+
+C (0,4)
+         STOP                                                           0009
+      ELSE
+
+C  T() {}
+
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  T(I) {I==1}
+
+C (0,6)
+      I = 1                                                             0011
+
+C  T(I) {I#init<=I}
+
+C (0,7)
+C     BEGIN UNSTRUCTURED
+99999 CONTINUE
+
+C  T() {}
+
+C (1,1)
+
+C     DO loop  with exit had to be desugared
+      IF (I.GT.N) GOTO 200                                              0011
+
+C  T() {}
+
+C (5,1)
+      A(I) = 0.                                                         0012
+
+C  T() {}
+
+C (3,1)
+      IF (A(I).LT.A(I-1)) GOTO 200                                      0013
+
+C  T(I) {I==I#init+1}
+
+C (4,1)
+      I = I+1                                                           0011
+      GOTO 99999
+
+C  T() {}
+
+C (2,1)
+
+200   CONTINUE                                                          0016
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,8)
+      PRINT *, I, N                                                     0017
+
+C  T() {}
+
+C (0,9)
+
+      RETURN
+C     END BLOCK
+      END
+
+Preconditions:
+
+
+C  P() {}
+
+      PROGRAM UNSTRUC08
+
+C     Check that certainly entered desugared loop might be handled
+
+      REAL A(100)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      READ *, N                                                         0007
+
+C  P(N) {}
+
+C (0,3)
+
+      IF (N.LT.1) THEN                                                  0009
+
+C  P(N) {N<=0}
+
+C (0,4)
+         STOP                                                           0009
+      ELSE
+
+C  P(N) {1<=N}
+
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  P(N) {1<=N}
+
+C (0,6)
+      I = 1                                                             0011
+
+C  P(I,N) {I==1, 1<=N}
+
+C (0,7)
+C     BEGIN UNSTRUCTURED
+99999 CONTINUE
+
+C  P(I,N) {1<=I, I<=N+1, 1<=N}
+
+C (1,1)
+
+C     DO loop  with exit had to be desugared
+      IF (I.GT.N) GOTO 200                                              0011
+
+C  P(I,N) {1<=I, I<=N, 1<=N}
+
+C (5,1)
+      A(I) = 0.                                                         0012
+
+C  P(I,N) {1<=I, I<=N, 1<=N}
+
+C (3,1)
+      IF (A(I).LT.A(I-1)) GOTO 200                                      0013
+
+C  P(I,N) {1<=I, I<=N, 1<=N}
+
+C (4,1)
+      I = I+1                                                           0011
+      GOTO 99999
+
+C  P(I,N) {1<=I, I<=N+1, 1<=N}
+
+C (2,1)
+
+200   CONTINUE                                                          0016
+C     END UNSTRUCTURED
+
+C  P(I,N) {1<=I, I<=N+1, 1<=N}
+
+C (0,8)
+      PRINT *, I, N                                                     0017
+
+C  P(I,N) {1<=I, I<=N+1, 1<=N}
+
+C (0,9)
+
+      RETURN
+C     END BLOCK
+      END
+

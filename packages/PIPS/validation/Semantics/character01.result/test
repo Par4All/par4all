@@ -1,0 +1,54 @@
+
+Transformers for "character01"
+
+
+C  T(character01) {character01<=c+1, c<=character01}
+
+unsigned char character01(unsigned char c)
+{
+
+//  T(c,character01) {c==character01, c#init<=c, c<=c#init+1}
+
+   // BEGIN BLOCK
+
+//  T(c) {c#init<=c, c<=c#init+1}
+
+   if (c=='#') 
+
+//  T(c) {c==36, c#init==35}
+
+      c++;
+
+//  T(character01) {c==character01}
+
+
+   return c;
+   // END BLOCK
+}
+
+Preconditions for "character01"
+
+
+//  P() {}
+
+unsigned char character01(unsigned char c)
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   if (c=='#') 
+
+//  P() {c==35}
+
+      c++;
+
+//  P(c) {}
+
+
+   return c;
+   // END BLOCK
+}

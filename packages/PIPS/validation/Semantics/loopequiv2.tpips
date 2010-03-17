@@ -1,0 +1,10 @@
+# Check that meaningless preconditions do not appear about
+# loop indices
+delete loopequiv2
+create loopequiv2 loopequiv2.f
+module loopequiv2
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete loopequiv2
+quit

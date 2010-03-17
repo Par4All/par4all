@@ -1,0 +1,15 @@
+delete mdg
+# coredump in emacs attachments.
+create mdg \
+	${PIPS_ROOT}/Validation/Perfect/SRC/cputim.f \
+	${PIPS_ROOT}/Validation/Perfect/SRC/elapse.f \
+	${PIPS_ROOT}/Validation/Perfect/mdg.f
+# some necessary props 
+setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES=TRUE
+setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS=TRUE
+# hop...
+module MDG
+display PRINTED_FILE(MDG)
+# never get there.
+echo # ok!!!
+quit

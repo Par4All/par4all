@@ -1,0 +1,17 @@
+delete externalloc11
+create externalloc11 externalloc11/bar.c externalloc11/foo.c externalloc11/foobar.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+display SYMBOL_TABLE_FILE[%ALL]
+display PARSED_PRINTED_FILE[%ALL]
+
+close
+delete externalloc11
+quit

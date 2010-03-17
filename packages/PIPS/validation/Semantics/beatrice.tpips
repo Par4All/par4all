@@ -1,0 +1,35 @@
+
+# Bug found when writing paper about interprocedural analyses
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+
+delete beatrice
+create beatrice beatrice.f
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+
+echo
+echo Initial bug
+echo
+
+module BEATRICE
+display PRINTED_FILE(BEATRICE)
+
+echo
+echo First variation
+echo
+
+module BEATRICE2
+display PRINTED_FILE(BEATRICE2)
+
+echo
+echo Second variation
+echo
+
+module BEATRICE3
+display PRINTED_FILE(BEATRICE3)
+
+close
+delete beatrice
+quit

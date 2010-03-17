@@ -1,0 +1,23 @@
+delete matmul
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create matmul matmul.f
+
+# Select the more precise regions to compute the communications:
+activate MUST_REGIONS
+
+echo Transform all the control flow in one finite state machine:
+
+# %ALL is OK because this is Fortran code
+
+apply PHRASE_DISTRIBUTOR[%ALL]
+display PRINTED_FILE[MATMUL]
+display PRINTED_FILE[MATMULHRE]
+
+apply PHRASE_DISTRIBUTOR_CONTROL_CODE[%ALL]
+display PRINTED_FILE[MATMUL]
+display PRINTED_FILE[MATMULHRE]
+
+close
+delete matmul

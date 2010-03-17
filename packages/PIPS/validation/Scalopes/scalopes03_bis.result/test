@@ -1,0 +1,64 @@
+int main(int *argc, char **argv)
+{
+   int i, j, k, l;
+   int a[100];
+
+   for(i = 0; i <= 99; i += 1)
+      for(j = 0; j <= 99; j += 1)
+         for(k = 0; k <= 99; k += 1)
+            a[j] += 1;
+
+   for(i = 0; i <= 99; i += 1)
+      for(j = 0; j <= 99; j += 1)
+         for(k = 0; k <= 99; k += 1)
+            for(l = 0; l <= 99; l += 1)
+               a[j] += 1;
+
+   for(i = 0; i <= 99; i += 1)
+      for(j = 0; j <= 99; j += 1)
+         a[j] += 1;
+
+   return 0;
+}
+int main(int *argc, char **argv)
+{
+   int a[100];
+
+   task_0(a);
+
+   task_1(a);
+
+   task_2(a);
+
+   return 0;
+}
+void task_0(int a[100])
+{
+   //PIPS generated variable
+   int i, j, k;
+
+   for(i = 0; i <= 99; i += 1)
+      for(j = 0; j <= 99; j += 1)
+         for(k = 0; k <= 99; k += 1)
+            a[j] += 1;
+}
+void task_1(int a[100])
+{
+   //PIPS generated variable
+   int i, j, k, l;
+
+   for(i = 0; i <= 99; i += 1)
+      for(j = 0; j <= 99; j += 1)
+         for(k = 0; k <= 99; k += 1)
+            for(l = 0; l <= 99; l += 1)
+               a[j] += 1;
+}
+void task_2(int a[100])
+{
+   //PIPS generated variable
+   int i, j;
+
+   for(i = 0; i <= 99; i += 1)
+      for(j = 0; j <= 99; j += 1)
+         a[j] += 1;
+}

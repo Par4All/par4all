@@ -1,0 +1,22 @@
+## phase 1
+! hello bla!
+      SUBROUTINE BLA
+      PRINT *, 'bla'                                                    0001
+      END
+! foo and bla as usual...
+      PROGRAM FOO
+      PRINT *, 'foo'                                                    0001
+      CALL BLA                                                          0002
+      END
+## ls...
+BLA/
+FOO/
+Logfile
+Src/
+Warnings
+## phase 2
+! hello bla!
+      SUBROUTINE BLA
+      PRINT *, 'bla'                                                    0001
+      END
+## done

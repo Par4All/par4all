@@ -1,0 +1,15 @@
+#
+# test about non-called subroutines... FI: I guess Fabien wanted to make sure that
+# called subroutines were properly handled and that a subroutine not called was
+# considered called if there were no main program.
+#
+delete all02
+create all02 all02.f
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+close
+delete all02
+

@@ -1,0 +1,16 @@
+delete externalloc04
+create externalloc04 externalloc04.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+activate C_PARSER
+
+display PARSED_PRINTED_FILE[foo]
+
+delete externalloc04
+close
+

@@ -1,0 +1,40 @@
+
+Initial code for "partial_eval03"
+
+void partial_eval03()
+{
+   foo size = 2;
+   foo i;
+
+   i = size;
+}
+
+Code with preconditions for "partial_eval03"
+
+
+//  P() {}
+
+void partial_eval03()
+{
+   foo size = 2;
+   foo i;
+
+//  P() {size==2}
+
+
+   i = size;
+}
+
+Code after partial evaluation for "partial_eval03"
+
+void partial_eval03()
+{
+   foo size = 2;
+   foo i;
+
+   i = 2;
+}
+
+Unsplit resulting code
+
+ok

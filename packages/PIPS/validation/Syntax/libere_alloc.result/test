@@ -1,0 +1,134 @@
+      SUBROUTINE LIBERE_ALLOC(IT_ALLOC,T_PTR)
+C
+C***********************************************************************
+C
+C  PROGICIEL : COCCINELLE      AU   9/9/99  PAR E.LEMOINE (SIMULOG)
+C
+C***********************************************************************
+C
+C  FONCTION : PROGRAMME DE LIBERATION DE L'ARCHIVAGE DES ALLOCATIONS
+C
+C-----------------------------------------------------------------------
+C                         ARGUMENTS
+C .________________.____.______________________________________________.
+C ^    NOM         ^MODE^                     ROLE                     ^
+C ^________________^____^______________________________________________^
+C ^                ^    ^                                              ^
+C ^ - IT_ALLOC     ^ -->^ TYPE D'ALLOCATION                            ^
+C ^                ^    ^                                              ^
+C ^ - T_PTR        ^ -->^ POINTEUR                                     ^
+C ^                ^    ^                                              ^
+C ^________________^____^______________________________________________^
+C  MODE: -->(DONNEE NON MODIFIEE).<--(RESULTAT).<-->(DONNEE MODIFIEE)
+C
+C-----------------------------------------------------------------------
+C%
+C  SOUS-PROGRAMMES APPELES   :
+C  SOUS-PROGRAMMES APPELANTS : LIBERE
+C%
+C***********************************************************************
+C
+! include "malloc.h"
+c 
+c.. Parameters .. 
+      INTEGER*4 NB_TYPE,NB_ALMAX
+      PARAMETER (NB_ALMAX = 300, NB_TYPE = 1)
+c 
+c.. Common Blocks .. 
+c 
+c.. Common Block of Size  3 (words)  ... 
+c 
+c... Variables in Common Block /tab1/ ... 
+      INTEGER*4 NB_ALLOC(NB_TYPE)
+      COMMON /TAB1/ NB_ALLOC
+c 
+c.. Common Block of Size  900 (words)  ... 
+c 
+c... Variables in Common Block /tab2/ ... 
+      INTEGER*4 TAB_ALLOC(NB_ALMAX,NB_TYPE)
+      COMMON /TAB2/ TAB_ALLOC
+c 
+c.. Common Block of Size  900 (words)  ... 
+c 
+c... Variables in Common Block /tab3/ ... 
+      INTEGER*4 SIZ_ALLOC(NB_ALMAX,NB_TYPE)
+      COMMON /TAB3/ SIZ_ALLOC
+c 
+c.. Common Block of Size  1800 (words)  ... 
+c 
+c... Variables in Common Block /tab4/ ... 
+      CHARACTER NOM_ALLOC(NB_ALMAX,NB_TYPE)*10
+      COMMON /TAB4/ NOM_ALLOC
+c 
+c.. Common Block of Size  9 (words)  ... 
+c 
+c... Variables in Common Block /tab5/ ... 
+      INTEGER*4 ITO_ALLOC(NB_TYPE),MAX_ALLOC(NB_TYPE),MAX_NBELT(NB_TYPE)
+      COMMON /TAB5/ ITO_ALLOC,MAX_ALLOC,MAX_NBELT
+! end include "malloc.h"
+!       include 'malloc.h'
+c 
+c.. Formal Arguments .. 
+      INTEGER*4 IT_ALLOC
+      POINTER (T_PTR,A)
+      REAL A(*)
+c 
+c.. Local Scalars .. 
+      INTEGER*4 I,J,NB
+      LOGICAL*4 TROUVE
+c 
+c.. External Calls .. 
+      EXTERNAL ARRET, FINALLOC
+c 
+c ... Executable Statements ...
+c 
+      TROUVE = .FALSE.                                                  0085
+c---
+c 1. Liberation de l'archivage 
+c---
+c
+c  allocation entiers     :  IT_ALLOC = 1
+c  allocation reel simple :  IT_ALLOC = 2
+c  allocation reel double :  IT_ALLOC = 3
+c
+c
+c --> Si le pointeur est nul
+c
+      IF (T_PTR.EQ.0) THEN                                              0097
+         WRITE (6, 1010)                                                0098
+         CALL FINALLOC                                                  0099
+         CALL ARRET(198)                                                0100
+         STOP                                                           0101
+      ENDIF
+      IF (IT_ALLOC.GE.1.AND.IT_ALLOC.LE.3) THEN                         0103
+         NB = NB_ALLOC(IT_ALLOC)                                        0104
+         DO 10 I = 1, NB                                                0105
+c
+c --------> Le pointeur est retrouve dans la table
+c
+            IF (T_PTR.EQ.TAB_ALLOC(I,IT_ALLOC)) THEN                    0109
+               TROUVE = .TRUE.                                          0110
+               ITO_ALLOC(IT_ALLOC) = ITO_ALLOC(IT_ALLOC)-SIZ_ALLOC(I,   0111
+     &         IT_ALLOC)                                                0111
+               DO 20 J = I, NB-1                                        0113
+                  TAB_ALLOC(J,IT_ALLOC) = TAB_ALLOC(J+1,IT_ALLOC)       0114
+                  SIZ_ALLOC(J,IT_ALLOC) = SIZ_ALLOC(J+1,IT_ALLOC)       0115
+                  NOM_ALLOC(J,IT_ALLOC) = NOM_ALLOC(J+1,IT_ALLOC)       0116
+20                CONTINUE                                              0117
+c               TAB_ALLOC(NB,IT_ALLOC) = 0
+c               SIZ_ALLOC(NB,IT_ALLOC) = 0
+c               NOM_ALLOC(NB,IT_ALLOC) = ''
+               NB_ALLOC(IT_ALLOC) = NB_ALLOC(IT_ALLOC)-1                0121
+            ENDIF
+10          CONTINUE                                                    0123
+      ENDIF
+c
+c --> Le pointeur n'a pas ete retrouve dans la table
+c
+      IF (.NOT.TROUVE) THEN                                             0128
+         WRITE (6, 1020) T_PTR                                          0129
+         CALL FINALLOC                                                  0130
+         STOP                                                           0131
+      ENDIF
+      END
+

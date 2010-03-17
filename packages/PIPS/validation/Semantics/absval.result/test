@@ -1,0 +1,19 @@
+
+C  P() {}
+
+      INTEGER FUNCTION ABSVAL(N)
+
+C  P() {}
+
+      IF (N.LT.0) THEN                                                  0002
+
+C  P() {N+1<=0}
+
+         ABSVAL = -N                                                    0003
+      ELSE
+
+C  P() {0<=N}
+
+         ABSVAL = N                                                     0005
+      ENDIF
+      END

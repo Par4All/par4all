@@ -1,0 +1,38 @@
+
+      SUBROUTINE FOO(X,Y)
+      COMMON /COM/ T
+      X = 0                                                             0004
+      IF (T.GT.0) THEN                                                  0005
+         X = 1                                                          0006
+      ELSE
+C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
+C	New output-dependence with statement
+C	X = 0
+         Y = 2                                                          0008
+      ENDIF
+C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
+C	New output-dependence with statement
+C	X = 1
+C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
+C	New output-dependence with statement
+C	X = 0
+      Y = 3                                                             0010
+      END
+
+      SUBROUTINE FOO1(X, Y)
+      INTEGER X(4), Y(3)
+      X(1) = 1                                                          0004
+      X(2) = X(2)+T                                                     0005
+      Y(1) = Y(1)+T                                                     0006
+      END
+      PROGRAM IMPACT
+      COMMON /COM/ T
+      INTEGER A, B, C(5)
+      A = 0                                                             0004
+      B = 1                                                             0005
+      CALL FOO(A, B)                                                    0006
+      CALL FOO(A, A)                                                    0007
+C      CALL FOO(T,A)
+C      CALL FOO(A,T)
+C      CALL FOO1(C(1), C(2))
+      END

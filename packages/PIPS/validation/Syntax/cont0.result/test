@@ -1,0 +1,4 @@
+      PROGRAM CONT0
+C     Bug: 0 in the continuation column does not mean a continuation line
+      I = 1                                                             0003
+      END

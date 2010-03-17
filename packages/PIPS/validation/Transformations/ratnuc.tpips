@@ -1,0 +1,14 @@
+delete ratnuc
+create ratnuc ratnuc.f
+
+module RATNUC
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+apply ARRAY_PRIVATIZER
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE
+
+close
+delete ratnuc
+quit

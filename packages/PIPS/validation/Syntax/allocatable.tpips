@@ -1,0 +1,7 @@
+create allocatable allocatable.f
+
+display PRINTED_FILE(allocatable)
+
+close
+delete allocatable
+quit

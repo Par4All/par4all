@@ -1,0 +1,257 @@
+
+Initial code
+
+void carto(float towns[100][100], float result[100][100])
+{
+   int i;
+   int j;
+   int k;
+   int l;
+l0:
+   for(i = 0; i <= 99; i += 1)
+l1:
+      for(j = 0; j <= 99; j += 1) {
+         result[i][j] = towns[i][j];
+l2:
+         for(k = 0; k <= 99; k += 1)
+l3:
+            for(l = 0; l <= 99; l += 1)
+               if (i!=k&&j!=l) 
+                  result[i][j] += towns[k][l]/dist(i, j, k, l);
+      }
+}
+
+Code after first index set splitting
+
+void carto(float towns[100][100], float result[100][100])
+{
+   int i;
+   int j;
+   int k;
+   int l;
+   //PIPS generated variable
+   int I_0;
+l0:
+   for(i = 0; i <= 99; i += 1)
+l1:
+      for(j = 0; j <= 99; j += 1) {
+         result[i][j] = towns[i][j];
+l2:
+         for(k = 0; k <= 99; k += 1) {
+l3:
+            for(l = 0; l <= j-1; l += 1)
+               if (i!=k&&j!=l) 
+                  result[i][j] += towns[k][l]/dist(i, j, k, l);
+l99999:
+            for(I_0 = j; I_0 <= 99; I_0 += 1)
+               if (i!=k&&j!=I_0) 
+                  result[i][j] += towns[k][I_0]/dist(i, j, k, I_0);
+         }
+      }
+}
+void carto(float towns[100][100], float result[100][100])
+{
+   int i;
+   int j;
+   int k;
+   int l;
+   //PIPS generated variable
+   int I_0, I_1;
+l0:
+   for(i = 0; i <= 99; i += 1)
+l1:
+      for(j = 0; j <= 99; j += 1) {
+         result[i][j] = towns[i][j];
+l2:
+         for(k = 0; k <= 99; k += 1) {
+l3:
+            for(l = 0; l <= j-1; l += 1)
+               if (i!=k&&j!=l) 
+                  result[i][j] += towns[k][l]/dist(i, j, k, l);
+l99999:
+            for(I_0 = j; I_0 <= j; I_0 += 1)
+               if (i!=k&&j!=I_0) 
+                  result[i][j] += towns[k][I_0]/dist(i, j, k, I_0);
+l99997:
+            for(I_1 = j+1; I_1 <= 99; I_1 += 1)
+               if (i!=k&&j!=I_1) 
+                  result[i][j] += towns[k][I_1]/dist(i, j, k, I_1);
+         }
+      }
+}
+
+Code after dead code elimination
+
+void carto(float towns[100][100], float result[100][100])
+{
+   int i;
+   int j;
+   int k;
+   int l;
+   //PIPS generated variable
+   int I_0, I_1;
+l0:
+   for(i = 0; i <= 99; i += 1)
+l1:
+      for(j = 0; j <= 99; j += 1) {
+         result[i][j] = towns[i][j];
+l2:
+         for(k = 0; k <= 99; k += 1) {
+l3:
+            for(l = 0; l <= j-1; l += 1)
+               if (i!=k&&j!=l) 
+                  result[i][j] += towns[k][l]/dist(i, j, k, l);
+            I_0 = j;
+l99997:
+            for(I_1 = j+1; I_1 <= 99; I_1 += 1)
+               if (i!=k&&j!=I_1) 
+                  result[i][j] += towns[k][I_1]/dist(i, j, k, I_1);
+         }
+      }
+   ;
+}
+
+Code after second  index set splitting
+
+void carto(float towns[100][100], float result[100][100])
+{
+   int i;
+   int j;
+   int k;
+   int l;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4;
+l0:
+   for(i = 0; i <= 99; i += 1)
+l1:
+      for(j = 0; j <= 99; j += 1) {
+         result[i][j] = towns[i][j];
+l2:
+         for(k = 0; k <= i-1; k += 1) {
+l3:
+            for(l = 0; l <= j-1; l += 1)
+               if (i!=k&&j!=l) 
+                  result[i][j] += towns[k][l]/dist(i, j, k, l);
+            I_0 = j;
+l99997:
+            for(I_1 = j+1; I_1 <= 99; I_1 += 1)
+               if (i!=k&&j!=I_1) 
+                  result[i][j] += towns[k][I_1]/dist(i, j, k, I_1);
+         }
+l99995:
+         for(I_2 = i; I_2 <= 99; I_2 += 1) {
+l99993:
+            for(I_3 = 0; I_3 <= j-1; I_3 += 1)
+               if (i!=I_2&&j!=I_3) 
+                  result[i][j] += towns[I_2][I_3]/dist(i, j, I_2, I_3);
+            I_0 = j;
+l99991:
+            for(I_4 = j+1; I_4 <= 99; I_4 += 1)
+               if (i!=I_2&&j!=I_4) 
+                  result[i][j] += towns[I_2][I_4]/dist(i, j, I_2, I_4);
+         }
+      }
+   ;
+}
+void carto(float towns[100][100], float result[100][100])
+{
+   int i;
+   int j;
+   int k;
+   int l;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7;
+l0:
+   for(i = 0; i <= 99; i += 1)
+l1:
+      for(j = 0; j <= 99; j += 1) {
+         result[i][j] = towns[i][j];
+l2:
+         for(k = 0; k <= i-1; k += 1) {
+l3:
+            for(l = 0; l <= j-1; l += 1)
+               if (i!=k&&j!=l) 
+                  result[i][j] += towns[k][l]/dist(i, j, k, l);
+            I_0 = j;
+l99997:
+            for(I_1 = j+1; I_1 <= 99; I_1 += 1)
+               if (i!=k&&j!=I_1) 
+                  result[i][j] += towns[k][I_1]/dist(i, j, k, I_1);
+         }
+l99995:
+         for(I_2 = i; I_2 <= i; I_2 += 1) {
+l99993:
+            for(I_3 = 0; I_3 <= j-1; I_3 += 1)
+               if (i!=I_2&&j!=I_3) 
+                  result[i][j] += towns[I_2][I_3]/dist(i, j, I_2, I_3);
+            I_0 = j;
+l99991:
+            for(I_4 = j+1; I_4 <= 99; I_4 += 1)
+               if (i!=I_2&&j!=I_4) 
+                  result[i][j] += towns[I_2][I_4]/dist(i, j, I_2, I_4);
+         }
+l99989:
+         for(I_5 = i+1; I_5 <= 99; I_5 += 1) {
+l99987:
+            for(I_6 = 0; I_6 <= j-1; I_6 += 1)
+               if (i!=I_5&&j!=I_6) 
+                  result[i][j] += towns[I_5][I_6]/dist(i, j, I_5, I_6);
+            I_0 = j;
+l99985:
+            for(I_7 = j+1; I_7 <= 99; I_7 += 1)
+               if (i!=I_5&&j!=I_7) 
+                  result[i][j] += towns[I_5][I_7]/dist(i, j, I_5, I_7);
+         }
+      }
+   ;
+}
+
+Code after dead code elimination
+
+void carto(float towns[100][100], float result[100][100])
+{
+   int i;
+   int j;
+   int k;
+   int l;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7;
+l0:
+   for(i = 0; i <= 99; i += 1)
+l1:
+      for(j = 0; j <= 99; j += 1) {
+         result[i][j] = towns[i][j];
+l2:
+         for(k = 0; k <= i-1; k += 1) {
+l3:
+            for(l = 0; l <= j-1; l += 1)
+               result[i][j] += towns[k][l]/dist(i, j, k, l);
+            I_0 = j;
+l99997:
+            for(I_1 = j+1; I_1 <= 99; I_1 += 1)
+               result[i][j] += towns[k][I_1]/dist(i, j, k, I_1);
+         }
+         I_2 = i;
+l99993:
+         for(I_3 = 0; I_3 <= j-1; I_3 += 1)
+            ;
+         I_0 = j;
+l99991:
+         for(I_4 = j+1; I_4 <= 99; I_4 += 1)
+            ;
+l99989:
+         for(I_5 = i+1; I_5 <= 99; I_5 += 1) {
+l99987:
+            for(I_6 = 0; I_6 <= j-1; I_6 += 1)
+               result[i][j] += towns[I_5][I_6]/dist(i, j, I_5, I_6);
+            I_0 = j;
+l99985:
+            for(I_7 = j+1; I_7 <= 99; I_7 += 1)
+               result[i][j] += towns[I_5][I_7]/dist(i, j, I_5, I_7);
+         }
+      }
+   ;
+}
+
+Diff, must be empty
+

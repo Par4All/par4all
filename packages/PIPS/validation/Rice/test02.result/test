@@ -1,0 +1,264 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Select the most precise analyses:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Check the proper effects
+int main(int argc, char **argv)
+{
+   int a_d1, a_d2;
+   int i, j;
+   double *toto;
+//               <must be written>: a_d1 a_d2
+
+   a_d1 = a_d2 = 5;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ toto
+   toto = malloc(sizeof(*toto)*a_d1*a_d2);
+//               <must be read   >: a_d1
+//               <must be written>: i
+
+   for(i = 0; i <= a_d1-1; i += 1)
+//               <must be read   >: a_d1 a_d2
+//               <must be written>: j
+      for(j = 0; j <= a_d2-1; j += 1)
+//               <must be read   >: a_d1 a_d2 i j toto
+//               <must be written>: toto[i+j*a_d1]
+         toto[i+j*a_d1] = i+j*a_d2;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ toto
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+
+   free(toto);
+//               <must be written>: a_d1 a_d2
+   
+   
+   a_d1 = a_d2 = 10;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ toto
+   toto = malloc(sizeof(*toto)*a_d1*a_d2);
+//               <must be read   >: a_d1
+//               <must be written>: i
+
+   for(i = 0; i <= a_d1-1; i += 1)
+//               <must be read   >: a_d1 a_d2
+//               <must be written>: j
+      for(j = 0; j <= a_d2-1; j += 1)
+//               <must be read   >: a_d1 a_d2 i j toto
+//               <must be written>: toto[i+j*a_d1]
+         toto[i+j*a_d1] = i+j*a_d2;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ toto
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+
+   free(toto);
+   
+   
+   return 0;
+}
+
+//  T(main) {main==0}
+
+int main(int argc, char **argv)
+{
+   int a_d1, a_d2;
+   int i, j;
+   double *toto;
+
+//  T(a_d1,a_d2) {a_d1==5, a_d2==5}
+
+
+   a_d1 = a_d2 = 5;
+
+//  T() {a_d1==5, a_d2==5}
+
+   toto = malloc(sizeof(*toto)*a_d1*a_d2);
+
+//  T(i,j) {a_d1==5, a_d2==5, 0<=i}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  T(j) {a_d1==5, a_d2==5, 0<=i, i<=4, 0<=j}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  T() {a_d1==5, a_d2==5, 0<=i, i<=4, 0<=j, j<=4}
+
+         toto[i+j*a_d1] = i+j*a_d2;
+
+//  T() {a_d1==5, a_d2==5, i==5, j==5}
+
+
+   free(toto);
+
+//  T(a_d1,a_d2) {a_d1==10, a_d1#init==5, a_d2==10, a_d2#init==5,
+//    i==5, j==5}
+
+   
+   
+   a_d1 = a_d2 = 10;
+
+//  T() {a_d1==10, a_d2==10, i==5, j==5}
+
+   toto = malloc(sizeof(*toto)*a_d1*a_d2);
+
+//  T(i,j) {a_d1==10, a_d2==10, i#init==5, j#init==5, 0<=i}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  T(j) {a_d1==10, a_d2==10, 0<=i, i<=9, 0<=j}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  T() {a_d1==10, a_d2==10, 0<=i, i<=9, 0<=j, j<=9}
+
+         toto[i+j*a_d1] = i+j*a_d2;
+
+//  T() {a_d1==10, a_d2==10, i==10, j==10}
+
+
+   free(toto);
+
+//  T(main) {a_d1==10, a_d2==10, i==10, j==10, main==0}
+
+   
+   
+   return 0;
+}
+
+//  P() {}
+
+int main(int argc, char **argv)
+{
+   int a_d1, a_d2;
+   int i, j;
+   double *toto;
+
+//  P() {}
+
+
+   a_d1 = a_d2 = 5;
+
+//  P(a_d1,a_d2) {a_d1==5, a_d2==5}
+
+   toto = malloc(sizeof(*toto)*a_d1*a_d2);
+
+//  P(a_d1,a_d2) {a_d1==5, a_d2==5}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  P(a_d1,a_d2,i,j) {a_d1==5, a_d2==5, 0<=i, i<=4}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  P(a_d1,a_d2,i,j) {a_d1==5, a_d2==5, 0<=i, i<=4, 0<=j, j<=4}
+
+         toto[i+j*a_d1] = i+j*a_d2;
+
+//  P(a_d1,a_d2,i,j) {a_d1==5, a_d2==5, i==5, j==5}
+
+
+   free(toto);
+
+//  P(a_d1,a_d2,i,j) {a_d1==5, a_d2==5, i==5, j==5}
+
+   
+   
+   a_d1 = a_d2 = 10;
+
+//  P(a_d1,a_d2,i,j) {a_d1==10, a_d2==10, i==5, j==5}
+
+   toto = malloc(sizeof(*toto)*a_d1*a_d2);
+
+//  P(a_d1,a_d2,i,j) {a_d1==10, a_d2==10, i==5, j==5}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  P(a_d1,a_d2,i,j) {a_d1==10, a_d2==10, 0<=i, i<=9}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  P(a_d1,a_d2,i,j) {a_d1==10, a_d2==10, 0<=i, i<=9, 0<=j, j<=9}
+
+         toto[i+j*a_d1] = i+j*a_d2;
+
+//  P(a_d1,a_d2,i,j) {a_d1==10, a_d2==10, i==10, j==10}
+
+
+   free(toto);
+
+//  P(a_d1,a_d2,i,j) {a_d1==10, a_d2==10, i==10, j==10}
+
+   
+   
+   return 0;
+}
+int main(int argc, char **argv)
+{
+   int a_d1, a_d2;
+   int i, j;
+   double *toto;
+
+   a_d1 = a_d2 = 5;
+   toto = malloc(25*sizeof(*toto));
+
+   for(i = 0; i <= 4; i += 1)
+      for(j = 0; j <= 4; j += 1)
+         toto[i+5*j] = i+5*j;
+
+   free(toto);
+   
+   
+   a_d1 = a_d2 = 10;
+   toto = malloc(100*sizeof(*toto));
+
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         toto[i+10*j] = i+10*j;
+
+   free(toto);
+   
+   
+   return 0;
+}
+int main(int argc, char **argv)
+{
+   int a_d1, a_d2;
+   int i, j;
+   double *toto;
+
+   a_d1 = a_d2 = 5;
+   toto = malloc(25*sizeof(*toto));
+
+
+#pragma omp parallel for 
+   for(i = 0; i <= 4; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 4; j += 1)
+         toto[i+5*j] = i+5*j;
+
+   free(toto);
+   
+   
+   a_d1 = a_d2 = 10;
+   toto = malloc(100*sizeof(*toto));
+
+
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 9; j += 1)
+         toto[i+10*j] = i+10*j;
+
+   free(toto);
+   
+   
+   return 0;
+}

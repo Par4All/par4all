@@ -1,0 +1,37 @@
+# $Id$
+# the default validation includes the following subdirectories
+Syntax
+Control
+Preprocessor
+C_syntax
+Effects
+Semantics
+RegionPrivatization
+Complexity
+Regions
+Reductions
+Hpfc
+Rice
+Ricedg
+CoarseGrainParallelization
+SAC
+PHRASE
+Callgraph
+Transformations
+DemoStd
+Hyperplane
+Icfg
+Pipsmake
+Examples
+Prettyprint
+LoopRecovering
+OpenMP
+Outlining
+# ngspice_bug:
+Step
+Bootstrap
+HardwareAccelerator
+Privatizing
+Terapix
+TutorialPPoPP2010
+Scalopes

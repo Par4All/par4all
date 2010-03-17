@@ -1,0 +1,26 @@
+#
+# test pips on test8.f
+#
+# if Pips -f test8.f -w test8 -m test8 -s rfulldg -b PPF >&2
+# then 
+# 	Display -l para77
+# 	Delete test8>&2
+# else 
+#     	echo Parallelization failed 
+# 	Delete test8>&2
+# 	exit 1
+# fi
+
+delete test8
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create test8 test8.f
+
+activate RICE_FULL_DEPENDENCE_GRAPH
+
+display PARALLELPRINTED_FILE[TEST8]
+
+close
+delete test8
+quit

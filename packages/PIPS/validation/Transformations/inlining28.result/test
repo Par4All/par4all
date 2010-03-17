@@ -1,0 +1,30 @@
+
+Initial code
+
+void foo(struct a *_)
+{
+   _->b = 1;
+}
+void bar()
+{
+   struct a A = {0};
+   foo(&A);
+   printf("%d\n", A.b);
+}
+
+Code after inlining
+
+void bar()
+{
+   struct a A = {0};
+   //PIPS generated variable
+   struct a *P_0 = &A;
+   P_0->b = 1;
+   printf("%d\n", A.b);
+}
+
+Unsplit resulting code
+
+
+Diff, must be empty
+

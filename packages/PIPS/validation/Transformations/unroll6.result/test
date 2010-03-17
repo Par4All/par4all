@@ -1,0 +1,48 @@
+      PROGRAM UNROLL6
+C
+      PARAMETER (N=4)
+      REAL T(N)
+C     First: pragma inside a comment; Second: just the pragma; third:
+C     nor pragma at all
+C
+Cxxx
+      DO 10 I = 1, N                                                    0009
+         T(I) = -2*I                                                    0010
+10       CONTINUE                                                       0011
+Cxxx
+      DO 20 I = 1, N                                                    0013
+         T(I) = -2*I                                                    0014
+20       CONTINUE                                                       0015
+C
+      DO 30 I = 1, N                                                    0017
+         T(I) = -4*I                                                    0018
+30       CONTINUE                                                       0019
+C
+      END
+      PROGRAM UNROLL6
+C
+      PARAMETER (N=4)
+      REAL T(N)
+C     First: pragma inside a comment; Second: just the pragma; third:
+C     nor pragma at all
+C
+Cxxx
+      T(1) = -2*1                                                       0010
+      T(2) = -2*2                                                       0010
+      T(3) = -2*3                                                       0010
+      T(4) = -2*4                                                       0010
+10    CONTINUE
+      I = 5
+Cxxx
+      T(1) = -2*1                                                       0014
+      T(2) = -2*2                                                       0014
+      T(3) = -2*3                                                       0014
+      T(4) = -2*4                                                       0014
+20    CONTINUE
+      I = 5
+C
+      DO 30 I = 1, N                                                    0017
+         T(I) = -4*I                                                    0018
+30       CONTINUE                                                       0019
+C
+      END

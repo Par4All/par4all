@@ -1,0 +1,19 @@
+delete SGEMM
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+create SGEMM kernels/SGEMM/SGEMM.f include/simd.f
+
+module SGEMM
+
+source include/benchmark.tpips.h
+
+apply PRINT_C_CODE[SGEMM]
+apply PRINT_C_CODE[SGEMMREF]
+apply PRINT_C_CODE[MAIN]
+
+#shell ./compileC.sh SGEMM
+
+display C_PRINTED_FILE
+
+close

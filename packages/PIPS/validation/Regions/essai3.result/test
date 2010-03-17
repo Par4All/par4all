@@ -1,0 +1,88 @@
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
+
+C
+C
+      SUBROUTINE ESSAI3(N, A, B, X, Y)
+      INTEGER N
+      REAL A(N,N), B(N), X(N), Y(N)
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
+
+C
+      DO K = 1, 10                                                      0007
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1<=N, 1<=PHI2, PHI2<=PHI1, 1<=K, K<=10}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=K, K<=10}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=K, K<=10}>
+
+         DO I = 1, N                                                    0008
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=I, I<=N, 1<=K,
+C    K<=10}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=K, K<=10}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=K, K<=10}>
+
+            DO J = 1, I                                                 0009
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, J<=I, I<=N, 1<=J, 1<=K,
+C    K<=10}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
+
+               Y(I) = Y(I)+A(I,J)                                       0010
+            ENDDO
+         ENDDO
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, 1<=PHI2, PHI2<=N, PHI1+1<=PHI2,
+C    1+N<=I, 1<=I, 1<=K, K<=10}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N, 1+N<=I, 1<=I, 1<=K, K<=10}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N, 1+N<=I, 1<=I, 1<=K, K<=10}>
+
+C
+         CALL FUNC(N, X, A)                                             0014
+      ENDDO
+C
+      END
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI2<=N, PHI1+1<=PHI2}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+
+C
+C
+C
+      SUBROUTINE FUNC(N, Y, A)
+      INTEGER N
+      REAL A(N, N), Y(N)
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI2<=N, PHI1+1<=PHI2}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+
+C
+      DO I = 1, N                                                       0008
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1+I<=PHI2, PHI2<=N, 1<=I}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, 1+I<=N}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, 1+I<=N}>
+
+         DO J = I+1, N                                                  0009
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=I, 1+I<=J, J<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, 1+I<=J, J<=N}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, 1+I<=J, J<=N}>
+
+            Y(I) = Y(I)+A(I,J)                                          0010
+         ENDDO
+      ENDDO
+C
+      END

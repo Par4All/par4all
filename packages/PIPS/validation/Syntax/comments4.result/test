@@ -1,0 +1,57 @@
+
+Sequential version:
+      SUBROUTINE COMMENTS4(T,N)
+      REAL T(N)
+
+c     Do we lose comments in front of an ENDIF?
+
+C     No, but there is a bug when the user view is displayed: 
+C     a useless ELSE appears
+
+      DO I = 1, N                                                       0009
+         IF (T(I).LT.0.) THEN                                           0010
+            T(I) = 0.                                                   0011
+c     this comment might be lost!
+         ENDIF
+c     And how about this one?
+      ENDDO
+
+      END
+
+Parallel version:
+      SUBROUTINE COMMENTS4(T,N)
+      REAL T(N)
+
+c     Do we lose comments in front of an ENDIF?
+
+C     No, but there is a bug when the user view is displayed: 
+C     a useless ELSE appears
+
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0009
+         IF (T(I).LT.0.) THEN                                           0010
+            T(I) = 0.                                                   0011
+c     this comment might be lost!
+         ENDIF
+c     And how about this one?
+      ENDDO
+
+      END
+      SUBROUTINE COMMENTS4(T,N)
+      REAL T(N)
+
+c     Do we lose comments in front of an ENDIF?
+
+C     No, but there is a bug when the user view is displayed: 
+C     a useless ELSE appears
+
+      DOALL I = 1, N                                                    0009
+         IF (T(I).LT.0.) THEN                                           0010
+            T(I) = 0.                                                   0011
+c     this comment might be lost!
+         ENDIF
+c     And how about this one?
+      ENDDO
+
+      END

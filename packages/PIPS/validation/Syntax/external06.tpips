@@ -1,0 +1,11 @@
+delete external06
+create external06 external06.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+
+display PRINTED_FILE[EXTERNAL06]
+
+close
+delete external06
+quit

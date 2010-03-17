@@ -1,0 +1,26 @@
+setenv WSPC decl47
+setenv MAIN $WSPC.c
+delete $WSPC
+create $WSPC $MAIN
+activate C_PARSER
+activate C_SYMBOL_TABLE
+activate PRINT_CODE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Code for "decl47a"
+echo
+
+display PRINTED_FILE[decl47a]
+
+echo
+echo Code for "decl47b"
+echo
+
+display PRINTED_FILE[decl47b]
+
+close
+delete $WSPC
+quit

@@ -1,0 +1,170 @@
+
+Parsed code for "call02"
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+   y[i] = 0;
+   p->one = 1;
+   (p->two)[j] = 2.;
+   *q[i] = 3;
+}
+
+Code for "call02"
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+   y[i] = 0;
+   p->one = 1;
+   (p->two)[j] = 2.;
+   *q[i] = 3;
+}
+
+Proper effects for "call02"
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+//               <must be read   >: j
+//               <must be written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+//               <must be read   >: i
+//               <must be written>: y[i]
+   y[i] = 0;
+//               <must be read   >: p
+//               <must be written>: p[0][1]
+   p->one = 1;
+//               <must be read   >: j p
+//               <must be written>: p[0][2][j]
+   (p->two)[j] = 2.;
+//               <must be read   >: i q[i]
+//               <must be written>: q[i][0]
+   *q[i] = 3;
+}
+
+Cumulated effects for "call02"
+
+//               <may be read    >: q[*]
+//               <may be written >: p[0][2][*] q[*][0] y[*]
+//               <must be read   >: i j p
+//               <must be written>: p[0][1]
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+//               <must be read   >: j
+//               <must be written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+//               <may be written >: y[*]
+//               <must be read   >: i
+   y[i] = 0;
+//               <must be read   >: p
+//               <must be written>: p[0][1]
+   p->one = 1;
+//               <may be written >: p[0][2][*]
+//               <must be read   >: j p
+   (p->two)[j] = 2.;
+//               <may be read    >: q[*]
+//               <may be written >: q[*][0]
+//               <must be read   >: i
+   *q[i] = 3;
+}
+
+Cumulated effects for "main"
+
+main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+   tf_t *sp = &s;
+//               <may be read    >: ap[*]
+//               <may be written >: ap[*][0] sp[0][2][*] x[*]
+//               <must be read   >: a b sp
+//               <must be written>: sp[0][1]
+
+   call02(a, b, x, ap, sp);
+}
+
+Regions for "main"
+
+main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+   tf_t *sp = &s;
+
+//  <a-R-EXACT-{}>
+//  <ap[PHI1]-R-EXACT-{PHI1==b+1}>
+//  <ap[PHI1][PHI2]-W-EXACT-{PHI1==b+1, PHI2==0}>
+//  <b-R-EXACT-{}>
+//  <sp-R-EXACT-{}>
+//  <sp[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <sp[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, b==PHI3}>
+//  <x[PHI1]-W-EXACT-{PHI1==b+1}>
+
+
+   call02(a, b, x, ap, sp);
+}
+
+Regions for "call02"
+
+
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <p[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==j}>
+//  <q[PHI1]-R-EXACT-{PHI1==j+1}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==j+1, PHI2==0}>
+//  <y[PHI1]-W-EXACT-{PHI1==j+1}>
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+
+//  <i-R-EXACT-{}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, i==j+1}>
+
+   y[i] = 0;
+
+//  <p-R-EXACT-{}>
+//  <p[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1, i==j+1}>
+
+   p->one = 1;
+
+//  <j-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==j, i==j+1}>
+
+   (p->two)[j] = 2.;
+
+//  <i-R-EXACT-{}>
+//  <q[PHI1]-R-EXACT-{PHI1==i, i==j+1}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==0, i==j+1}>
+
+   *q[i] = 3;
+}

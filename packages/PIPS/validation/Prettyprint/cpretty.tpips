@@ -1,0 +1,7 @@
+delete c
+create c cpretty.f
+display PRINTED_FILE[%ALL]
+make CROUGH[%ALL]
+display C_PRINTED_FILE[%ALL]
+close
+delete c

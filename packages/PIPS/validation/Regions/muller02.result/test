@@ -1,0 +1,27 @@
+      PROGRAM MULLER02
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER V(0:0)
+
+C  <V(PHI1)-R-MAY-{PHI1==0}>
+
+
+      CALL SUB(V)                                                       0006
+
+      END
+
+C  <V(PHI1)-R-MAY-{PHI1==0}>
+
+
+
+      SUBROUTINE SUB(V)
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER A,V(0:0)
+
+C  <V(PHI1)-R-EXACT-{PHI1==0}>
+
+
+      A = V(0)                                                          0008
+
+      END

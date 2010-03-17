@@ -1,0 +1,33 @@
+delete external07
+create external07 external07.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+setproperty PARSER_TYPE_CHECK_CALL_SITES
+
+echo
+echo Main parsed first
+echo
+
+display PRINTED_FILE[EXTERNAL07]
+display PRINTED_FILE[F]
+
+close
+delete external07
+create external07 external07.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+setproperty PARSER_TYPE_CHECK_CALL_SITES
+
+echo
+echo Main parsed last
+echo
+
+display PRINTED_FILE[H]
+display PRINTED_FILE[F]
+display PRINTED_FILE[EXTERNAL07]
+
+close
+delete external07
+quit

@@ -1,0 +1,25 @@
+
+parsed printed file
+
+int control02(int *in, int *val)
+{
+
+   for (;;)
+      goto break_1;
+break_1:   ;
+   if (val)
+      *val = *in;
+   return 0;
+}
+
+printed file
+
+int control02(int *in, int *val)
+{
+   if (!1) {
+   }
+break_1:   ;
+   if (val) 
+      *val = *in;
+   return 0;
+}

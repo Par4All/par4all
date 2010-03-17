@@ -1,0 +1,60 @@
+
+      BLOCK DATA BLA
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I4 /4/
+      END
+
+      INTEGER FUNCTION BOO(I)
+      INTEGER I
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I5 /5/
+      BOO = I+I5                                                        0006
+      END
+
+! next line modified by fsplit() in pips
+      BLOCK DATA DATA000
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I3 /3/
+      END
+
+      SUBROUTINE FOO
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I2 /2/
+      PRINT *, 'foo'                                                    0005
+      END
+      PROGRAM INITIAL
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I1 /1/
+      PRINT *, 'initial'                                                0004
+      PRINT *, I1, I2, I3, I4, I5                                       0005
+      END
+
+C  P() {I4==4}
+
+
+C  P() {I5==5}
+
+
+C  P() {I3==3}
+
+
+C  P() {I2==2}
+
+
+C  P() {I1==1}
+
+
+C  P() {I1==1, I2==2, I3==3, I4==4, I5==5}
+
+      PROGRAM INITIAL
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I1 /1/
+
+C  P() {I1==1, I2==2, I3==3, I4==4, I5==5}
+
+      PRINT *, 'initial'                                                0004
+
+C  P() {I1==1, I2==2, I3==3, I4==4, I5==5}
+
+      PRINT *, I1, I2, I3, I4, I5                                       0005
+      END

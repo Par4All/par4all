@@ -1,0 +1,27 @@
+
+Ignore alternate returns
+
+
+Ignore alternate returns and substitute STOP
+
+      SUBROUTINE ALTRET03(FORMAL_RETURN_LABEL_1)
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+C     Check that the implicit return is properly processed
+
+      PRINT *, "altret03 was called"                                    0005
+
+      END
+
+Replace alternate returns
+
+      SUBROUTINE ALTRET03(FORMAL_RETURN_LABEL_1, I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+C     Check that the implicit return is properly processed
+
+      PRINT *, "altret03 was called"                                    0005
+
+      I_PIPS_RETURN_CODE_ = 0                                           0007
+      END

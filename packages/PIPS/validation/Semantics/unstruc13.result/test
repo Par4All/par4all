@@ -1,0 +1,101 @@
+      PROGRAM UNSTRUC13
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL Z(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      K = IINF                                                          0007
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99999 CONTINUE
+C (1,1)
+
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0007
+C (3,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0008
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+41    CONTINUE                                                          0009
+C (4,3)
+      K = K+1                                                           0007
+C     END BLOCK
+      GOTO 99999
+C (2,1)
+42    CONTINUE                                                          0010
+C     END UNSTRUCTURED
+C (0,4)
+      VOLUME = ZMOYEN                                                   0010
+
+C     END BLOCK
+      END
+
+C  T() {}
+
+      PROGRAM UNSTRUC13
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL Z(10)
+
+C  T(K) {IINF<=K}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(K) {IINF==K}
+
+C (0,2)
+      K = IINF                                                          0007
+
+C  T(K) {K#init<=K}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99999 CONTINUE
+
+C  T() {}
+
+C (1,1)
+
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0007
+
+C  T() {}
+
+C (3,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0008
+
+C  T(K) {K==K#init+1}
+
+C (4,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (4,2)
+41    CONTINUE                                                          0009
+
+C  T(K) {K==K#init+1}
+
+C (4,3)
+      K = K+1                                                           0007
+C     END BLOCK
+      GOTO 99999
+
+C  T() {}
+
+C (2,1)
+42    CONTINUE                                                          0010
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,4)
+      VOLUME = ZMOYEN                                                   0010
+
+C     END BLOCK
+      END

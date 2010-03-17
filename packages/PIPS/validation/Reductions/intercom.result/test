@@ -1,0 +1,85 @@
+
+Print code with proper reductions
+
+      SUBROUTINE INC
+      COMMON /SUM/ S
+C  call sum[S],
+      S = S+1                                                           0003
+      END
+      PROGRAM INTERCOM
+      COMMON /SUM/ S
+      INTEGER S, I, J
+      S = 5                                                             0004
+      CALL ZERO                                                         0005
+      DO I = 1, 10                                                      0006
+         DO J = 1, I                                                    0007
+C  call sum[S],
+            S = S+I                                                     0008
+         ENDDO
+      ENDDO
+      DO I = 1, 10                                                      0011
+         DO J = 1, I                                                    0012
+C  call sum[S],
+            S = S+I                                                     0013
+C  call sum[S],
+            CALL INC                                                    0014
+         ENDDO
+      ENDDO
+      DO I = 1, 10                                                      0017
+         DO J = 1, I                                                    0018
+C  call sum[S],
+            S = S+I                                                     0019
+            CALL ZERO                                                   0020
+         ENDDO
+      ENDDO
+      PRINT *, S                                                        0023
+      END
+      SUBROUTINE ZERO
+      COMMON /SUM/ S
+      S = 0                                                             0003
+      END
+
+Print code with cumulated reductions
+
+C  summary sum[S],
+      SUBROUTINE INC
+      COMMON /SUM/ S
+C  call sum[S],
+      S = S+1                                                           0003
+      END
+      PROGRAM INTERCOM
+      COMMON /SUM/ S
+      INTEGER S, I, J
+      S = 5                                                             0004
+      CALL ZERO                                                         0005
+C  loop sum[S],
+      DO I = 1, 10                                                      0006
+C  loop sum[S],
+         DO J = 1, I                                                    0007
+C  call sum[S],
+            S = S+I                                                     0008
+         ENDDO
+      ENDDO
+C  loop sum[S],
+      DO I = 1, 10                                                      0011
+C  loop sum[S],
+         DO J = 1, I                                                    0012
+C  call sum[S],
+            S = S+I                                                     0013
+C  call sum[S],
+            CALL INC                                                    0014
+         ENDDO
+      ENDDO
+      DO I = 1, 10                                                      0017
+         DO J = 1, I                                                    0018
+C  call sum[S],
+            S = S+I                                                     0019
+            CALL ZERO                                                   0020
+         ENDDO
+      ENDDO
+      PRINT *, S                                                        0023
+      END
+      SUBROUTINE ZERO
+      COMMON /SUM/ S
+      S = 0                                                             0003
+      END

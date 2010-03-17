@@ -1,0 +1,11 @@
+# Be sure to declare variables in the right order when there are dependencies between them
+
+delete muller03
+create muller03 muller03.f
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+display PRINTED_FILE
+close
+delete muller03
+quit

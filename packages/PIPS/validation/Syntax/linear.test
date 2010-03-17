@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Detect functional formal parameters
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete linear
+create linear linear.f
+# This make is going to fail with user error in PARSER
+make CODE[RELAX]
+# But the second call to PARSER should work (and fail again) anyway!
+display PRINTED_FILE[RELAX]
+close
+delete linear
+quit
+EOF
+

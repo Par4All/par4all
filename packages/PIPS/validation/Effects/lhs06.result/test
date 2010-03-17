@@ -1,0 +1,69 @@
+
+Parsed printed file for "lhs06"
+
+int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
+{
+   int nbout;
+   int col = 0;
+   int indent = 0;
+   int ui32;
+   int i32;
+   static char buffer[2000];
+
+   if (!my_fputc) 
+      return 0;
+
+   nbout = 0;
+
+   *va_arg(pa, int *) = col;
+}
+
+Proper effects for "lhs06"
+
+int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
+{
+   int nbout;
+   int col = 0;
+   int indent = 0;
+   int ui32;
+   int i32;
+   static char buffer[2000];
+//               <must be read   >: my_fputc
+
+   if (!my_fputc) 
+      return 0;
+//               <must be written>: nbout
+
+   nbout = 0;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: col
+//               <must be written>: pa
+
+   *va_arg(pa, int *) = col;
+}
+
+Cumulated effects for "lhs06"
+
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: my_fputc
+int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
+{
+   int nbout;
+   int col = 0;
+   int indent = 0;
+   int ui32;
+   int i32;
+   static char buffer[2000];
+//               <must be read   >: my_fputc
+
+   if (!my_fputc) 
+      return 0;
+//               <must be written>: nbout
+
+   nbout = 0;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: col
+//               <must be written>: pa
+
+   *va_arg(pa, int *) = col;
+}

@@ -1,0 +1,64 @@
+### initial code
+      PROGRAM DCE
+      LOGICAL L1, L2, L3, L4
+C     BEGIN BLOCK
+      READ *, L1, L2, L3, L4                                            0003
+C     BEGIN UNSTRUCTURED
+
+      IF (L1) GOTO 99999                                                0005
+      PRINT *, 1                                                        0008
+10    CONTINUE                                                          0010
+
+      IF (L2) GOTO 99998                                                0012
+      PRINT *, 2                                                        0015
+20    CONTINUE                                                          0017
+
+      IF (L3) GOTO 99997                                                0019
+      PRINT *, 3                                                        0022
+      GOTO 30
+99997 CONTINUE
+      IF (L4) THEN                                                      0020
+         GOTO 30
+      ELSE
+         GOTO 30
+      ENDIF
+99998 CONTINUE
+      IF (.TRUE.) THEN                                                  0013
+         GOTO 20
+      ELSE
+         GOTO 20
+      ENDIF
+99999 CONTINUE
+      IF (.FALSE.) THEN                                                 0006
+         GOTO 10
+      ELSE
+         GOTO 10
+      ENDIF
+30    CONTINUE                                                          0024
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+### suppress dead code
+      PROGRAM DCE
+      LOGICAL L1, L2, L3, L4
+C     BEGIN BLOCK
+      READ *, L1, L2, L3, L4                                            0003
+C     BEGIN UNSTRUCTURED
+
+      IF (L1) GOTO 10                                                   0005
+      PRINT *, 1                                                        0008
+10    CONTINUE                                                          0010
+
+      IF (L2) GOTO 20                                                   0012
+      PRINT *, 2                                                        0015
+20    CONTINUE                                                          0017
+
+      IF (L3) GOTO 30                                                   0019
+      PRINT *, 3                                                        0022
+30    CONTINUE                                                          0024
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+

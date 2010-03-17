@@ -1,0 +1,11 @@
+
+Parsed printed file
+
+void ndecl07(char *dir)
+{
+   /* Well, this is a union... */
+   union m {                                                            /*0008*/
+      int a;
+      float b;
+   };
+}

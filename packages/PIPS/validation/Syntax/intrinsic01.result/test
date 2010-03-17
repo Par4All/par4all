@@ -1,0 +1,72 @@
+user warning in tp_parse: intrinsic01: No such workspace
+Registering file intrinsic01.f
+Splitting file    ./intrinsic01.f
+  Module         INTRINSIC01
+Workspace intrinsic01 created and opened.
+Module INTRINSIC01 selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module INTRINSIC01 already active.
+Request: build resource PRINTED_FILE for module INTRINSIC01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(INTRINSIC01)
+  PARSER                         building   PARSED_CODE(INTRINSIC01)
+                                 building   CALLEES(INTRINSIC01)
+
+Declarations for module INTRINSIC01 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity INTRINSIC01:*DYNAMIC*	with type area with size 4
+Declared entity INTRINSIC01:*HEAP*	with type area with size 0
+Declared entity INTRINSIC01:*STACK*	with type area with size 0
+Declared entity INTRINSIC01:*STATIC*	with type area with size 0
+Declared entity INTRINSIC01:X	with type variable REAL*4
+Declared entity TOP-LEVEL:ABS	with type functional REAL*4 ->  REAL*4
+Declared entity TOP-LEVEL:EXP	with type functional OVERLOADED ->  OVERLOADED
+Declared entity TOP-LEVEL:SQRT	with type functional OVERLOADED ->  OVERLOADED
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable INTRINSIC01:X,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module INTRINSIC01
+
+  CONTROLIZER                    building   CODE(INTRINSIC01)
+  PRINT_CODE                     building   PRINTED_FILE(INTRINSIC01)
+PRINTED_FILE made for INTRINSIC01.
+      SUBROUTINE  INTRINSIC01
+
+      INTRINSIC ABS,EXP,SQRT
+
+      READ *, X                                                         0005
+
+      PRINT *, ABS(SQRT(X))                                             0007
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module INTRINSIC01.
+Closing program.
+Closing workspace.
+Workspace intrinsic01 closed.
+
+Workspace intrinsic01 deleted.
+

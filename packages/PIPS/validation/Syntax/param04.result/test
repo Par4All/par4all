@@ -1,0 +1,8 @@
+      PROGRAM PARAM04
+
+      PARAMETER (Y=5.)
+      PARAMETER (X=2*Y+3.)
+
+      PRINT *, X+Y                                                      0006
+
+      END

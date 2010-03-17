@@ -1,0 +1,39 @@
+      SUBROUTINE CPLCH(MODE,TI,TF,I,NOM_VAR,LEN,N,VAR_CHAINE,INFOCA)
+c     **********
+c
+c
+c.. Formal Arguments ..
+      INTEGER MODE
+      REAL TI
+      REAL TF
+      INTEGER I
+      CHARACTER*(*) NOM_VAR
+      INTEGER LEN
+      INTEGER N
+      CHARACTER*(*) VAR_CHAINE
+      INTEGER INFOCA
+c
+c.. Local Scalars ..
+      INTEGER IOS
+      CHARACTER LIGNE*80
+c
+c ... Executable Statements ...
+c
+c
+c Traitement
+c
+      WRITE (6, 1020) NOM_VAR                                           0025
+      READ (UNIT=10,FMT=*,ERR=9000,END=9001,IOSTAT=IOS) LIGNE           0026
+      READ (UNIT=10,FMT=*,ERR=9000,END=9001,IOSTAT=IOS) VAR_CHAINE      0027
+      N = LEN                                                           0028
+      INFOCA = CPOK                                                     0029
+      RETURN
+c
+9000  WRITE (6, 1000) LIGNE                                             0032
+      WRITE (6, *) VAR_CHAINE                                           0033
+      INFOCA = CPSTOP                                                   0034
+      RETURN
+9001  WRITE (6, 1010) LIGNE                                             0036
+      INFOCA = CPSTOP                                                   0037
+      END
+

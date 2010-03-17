@@ -1,0 +1,43 @@
+
+C  P() {}
+
+C CODE FROM THE PAPER "ARRAY PRIVATIZATION FOR PARALLEL
+C EXECUTION OF LOOPS" FROM Z. LI, ICS'92.
+
+      SUBROUTINE LI921(A,N)
+      INTEGER N, A(N), M
+
+C  P() {}
+
+
+      A(1) = 0                                                          0007
+
+C  P() {}
+
+      DO I = 1, N                                                       0008
+
+C  P(I,J,K,M) {1<=I, I<=N}
+
+         DO J = 1, N                                                    0009
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N}
+
+            DO K = 2, N                                                 0010
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               A(K) = 0                                                 0011
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               M = A(K-1)                                               0012
+            ENDDO
+         ENDDO
+      ENDDO
+
+C  P(I,J,K,M) {1<=I, N+1<=I}
+
+
+      PRINT *, I, J, K, M                                               0017
+
+      END

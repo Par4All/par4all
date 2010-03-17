@@ -1,0 +1,32 @@
+
+Printed file
+
+      PROGRAM UNSTR
+
+c     test of entry and exit node extraction by Ronan's restructurer
+c     plus unstructured decomposition
+
+200   CONTINUE                                                          0006
+      J = 3                                                             0007
+      PRINT *, J                                                        0008
+      IF (J.LT.3) GOTO 200                                              0009
+
+      PRINT *, J                                                        0011
+
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      PROGRAM UNSTR
+
+c     test of entry and exit node extraction by Ronan's restructurer
+c     plus unstructured decomposition
+
+200   CONTINUE                                                          0006
+      J = 3                                                             0007
+      PRINT *, J                                                        0008
+      IF (J.LT.3) GOTO 200                                              0009
+
+      PRINT *, J                                                        0011
+
+      END

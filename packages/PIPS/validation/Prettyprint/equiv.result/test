@@ -1,0 +1,40 @@
+      SUBROUTINE EQUIV1
+      INTEGER*4 NX
+      PARAMETER (NX = 128)
+      INTEGER*4 NY
+      PARAMETER (NY = 128)
+      INTEGER*4 NA1
+      PARAMETER (NA1 = 2*(NY+1))
+      INTEGER*4 NA2
+      PARAMETER (NA2 = NX/2)
+      INTEGER*4 NE
+      PARAMETER (NE = NY-1)
+      INTEGER*4 NW1
+      PARAMETER (NW1 = NY+1)
+      INTEGER*4 NW2
+      PARAMETER (NW2 = 128)
+      INTEGER*4 NEX
+      PARAMETER (NEX = 256)
+      INTEGER*4 NI
+      PARAMETER (NI = 2*NY-1)
+      INTEGER*4 NEQ
+      PARAMETER (NEQ = 3*NY-2)
+      INTEGER*4 NCW2
+      PARAMETER (NCW2 = 2*NW1+1)
+      INTEGER*4 NCW3
+      PARAMETER (NCW3 = 4*NW1+1)
+      REAL*4 A(1:NA1, 1:NA2), E(1:NE, 1:NE), WORK(1:NW1*NW2), EVAL(1:
+     &NE), IR(1:NE), IC(1:NE)
+      COMPLEX*8 CA(1:NW1, 1:NA2), CWORK(1:NW1), CWORK2(1:NW1), CWORK3
+     &(1:NW1)
+      EQUIVALENCE (WORK, CWORK),  (WORK(259), CWORK2),  (WORK(517), 
+     &CWORK3)
+      EQUIVALENCE (A, CA),  (A, EVAL),  (A(128, 1), IR),  (A(255, 1)
+     &, IC),  (A(124, 2), E)
+
+      END
+      SUBROUTINE EQUIV2
+      REAL*4 A(1:5), B(1:10), C(1:10), D(1:5), E(1:10), F(1:5)
+      EQUIVALENCE (D(2), E),  (E(8), F)
+      EQUIVALENCE (B, A),  (B(6), C)
+      END

@@ -1,0 +1,19 @@
+delete main_hello_world
+create main_hello_world main_hello_world.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+
+activate C_PARSER
+
+display PARSED_PRINTED_FILE[main_hello_world!]
+display PARSED_PRINTED_FILE[main]
+
+close
+
+delete main_hello_world
+
+quit

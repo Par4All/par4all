@@ -1,0 +1,50 @@
+delete unstructured02
+create unstructured02 unstructured02.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+#make PARSED_CODE[unstructured02]
+
+
+#activate PRINT_CODE_TRANSFORMERS
+
+#activate PRINT_CODE_PRECONDITIONS 
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[unstructured02]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[unstructured02]
+
+echo Try more aggressive restructuring:
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL TRUE
+apply RESTRUCTURE_CONTROL[unstructured02]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[unstructured02]
+
+close
+
+delete unstructured02
+
+quit
+
+
+
+

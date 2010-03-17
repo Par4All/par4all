@@ -1,0 +1,10 @@
+delete recursion01
+create recursion01 recursion01.f
+
+# display PRINTED_FILE[%ALL]
+
+display CALLGRAPH_FILE[%ALL]
+
+close
+delete recursion01
+quit

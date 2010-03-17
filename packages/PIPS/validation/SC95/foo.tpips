@@ -1,0 +1,17 @@
+delete foo
+create foo aile_excerpt.f
+module AILE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate PRINT_CODE_CUMULATED_EFFECTS[AILE]
+
+make TRANSFORMERS[%ALL]
+
+setenv SEMANTICS_DEBUG_LEVEL 8
+
+display SUMMARY_PRECONDITION[AILE]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[AILE]
+close
+quit

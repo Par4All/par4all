@@ -1,0 +1,23 @@
+
+C  T() {}
+
+      PROGRAM NGA08
+
+C  T(I) {I==1}
+
+
+C     To address Nga concern about using useless float and string
+C     constants when analyzing integer variables
+
+      I = 1                                                             0006
+
+C  T(I) {}
+
+      IF (X.GT.1.5) I = 2                                               0007
+
+C  T() {}
+
+
+      PRINT *, I                                                        0011
+
+      END

@@ -1,0 +1,85 @@
+
+Source code with proper effects
+
+int call05(int i)
+{
+//               <must be read   >: i
+   return i;                                                            /*0004*/
+}
+
+Source code with cumulated effects
+
+//               <must be read   >: i
+int call05(int i)
+{
+//               <must be read   >: i
+   return i;                                                            /*0004*/
+}
+
+Source code with transformers for "call05"
+
+
+//  T(call05) {call05==i}
+
+int call05(int i)
+{
+
+//  T(call05) {call05==i}
+
+   return i;                                                            /*0004*/
+}
+
+Source code with transformers for "main"
+
+
+//  T() {}
+
+main()
+{
+   int ai;                                                              /*0004*/
+
+//  T(ai) {ai==2}
+
+
+   ai = call05(2);                                                      /*0006*/
+}
+
+Source code with preconditions for "call05"
+
+
+//  P() {i==2}
+
+int call05(int i)
+{
+
+//  P() {i==2}
+
+   return i;                                                            /*0004*/
+}
+
+Source code with preconditions for "main"
+
+
+//  P() {}
+
+main()
+{
+   int ai;                                                              /*0004*/
+
+//  P() {}
+
+
+   ai = call05(2);                                                      /*0006*/
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[call05] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[call05] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[call05] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+PRECONDITIONS_INTER_FULL[call05] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[call05] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call05!] (ordinary_summary_precondition) empty precondition to call05! because not in call tree from main.

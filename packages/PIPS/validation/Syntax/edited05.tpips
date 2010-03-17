@@ -1,0 +1,30 @@
+# Similar to edited04, but check that update times does not impose useless
+# reparsing
+
+delete edited05
+create edited05 edited05.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[EDITED05]
+display PRINTED_FILE[BAR]
+close
+
+echo
+echo New version of BAR with x as real[10]
+echo
+
+shell mv edited05.database/BAR/BAR.initial.f foo.f ; sleep 2 ; \
+	sed 's,!%,,' < foo.f > edited05.database/BAR/BAR.initial.f ; rm foo.f
+open edited05
+display PRINTED_FILE[BAR]
+
+echo
+echo Same version of BAR with x as real[10] again
+echo
+
+display PRINTED_FILE[BAR]
+
+close
+delete edited05
+quit

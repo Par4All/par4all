@@ -1,0 +1,14 @@
+
+Printed file for "formal_function!"
+
+extern int verlet(int (*forces[])());
+
+Unsplit formal_function
+
+/*
+ * file for formal_function.c
+ */
+extern int verlet(int (*forces[])());
+int verlet(int (*forces[])())
+{
+}

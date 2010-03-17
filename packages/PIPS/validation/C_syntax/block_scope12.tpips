@@ -1,0 +1,55 @@
+delete block_scope12
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create block_scope12 block_scope12.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Symbol table for block_scope12
+echo
+
+display SYMBOL_TABLE_FILE[block_scope12!block_scope12]
+# quit
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[block_scope12!block_scope12]
+# quit
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[block_scope12!block_scope12]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[block_scope12!block_scope12]
+
+
+echo
+echo Check warnings
+echo
+
+# The warnins are not fully accessible before the database is closed:
+close
+
+shell /bin/cat block_scope12.database/Warnings
+
+#delete block_scope12
+
+quit

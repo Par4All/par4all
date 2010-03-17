@@ -1,0 +1,214 @@
+      PROGRAM UNSTRUC05
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+C     Check that scc's are found
+
+      READ *, I                                                         0005
+C (0,3)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+
+      IF (I.LE.5) GOTO 100                                              0007
+C (7,1)
+      J = 6                                                             0008
+C (4,1)
+200   CONTINUE                                                          0013
+C (5,1)
+      IF (I.LE.2) THEN                                                  0014
+      ELSE
+         GOTO 99999
+      ENDIF
+C (3,1)
+C     BEGIN BLOCK
+C (3,2)
+300   CONTINUE                                                          0011
+C (3,3)
+      I = 4                                                             0012
+C     END BLOCK
+      GOTO 200
+C (2,1)
+100   J = 7                                                             0010
+      GOTO 300
+99999 CONTINUE
+
+C     END UNSTRUCTURED
+C (0,4)
+      PRINT *, I, J                                                     0016
+C (0,5)
+
+      RETURN
+C     END BLOCK
+      END
+
+C  T() {}
+
+      PROGRAM UNSTRUC05
+
+C  T(I,J) {18<=I+2J, 6<=J, J<=7}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {}
+
+C (0,2)
+
+C     Check that scc's are found
+
+      READ *, I                                                         0005
+
+C  T(I,J) {I#init+6<=I+J, 18<=I+2J, 6<=J, J<=7}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+
+      IF (I.LE.5) GOTO 100                                              0007
+
+C  T(J) {J==6}
+
+C (7,1)
+      J = 6                                                             0008
+
+C  T() {}
+
+C (4,1)
+200   CONTINUE                                                          0013
+
+C  T() {}
+
+C (5,1)
+      IF (I.LE.2) THEN                                                  0014
+      ELSE
+         GOTO 99999
+      ENDIF
+
+C  T(I) {I==4}
+
+C (3,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (3,2)
+300   CONTINUE                                                          0011
+
+C  T(I) {I==4}
+
+C (3,3)
+      I = 4                                                             0012
+C     END BLOCK
+      GOTO 200
+
+C  T(J) {J==7}
+
+C (2,1)
+100   J = 7                                                             0010
+      GOTO 300
+99999 CONTINUE
+
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,4)
+      PRINT *, I, J                                                     0016
+
+C  T() {}
+
+C (0,5)
+
+      RETURN
+C     END BLOCK
+      END
+
+C  P() {}
+
+      PROGRAM UNSTRUC05
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     Check that scc's are found
+
+      READ *, I                                                         0005
+
+C  P(I) {}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+
+C  P(I) {}
+
+C (1,1)
+
+      IF (I.LE.5) GOTO 100                                              0007
+
+C  P(I) {6<=I}
+
+C (7,1)
+      J = 6                                                             0008
+
+C  P(I,J) {18<=I+2J, 6<=J, J<=7}
+
+C (4,1)
+200   CONTINUE                                                          0013
+
+C  P(I,J) {18<=I+2J, 6<=J, J<=7}
+
+C (5,1)
+      IF (I.LE.2) THEN                                                  0014
+      ELSE
+         GOTO 99999
+      ENDIF
+
+C  P(I,J) {J==7, I<=5}
+
+C (3,1)
+C     BEGIN BLOCK
+
+C  P(I,J) {J==7, I<=5}
+
+C (3,2)
+300   CONTINUE                                                          0011
+
+C  P(I,J) {J==7, I<=5}
+
+C (3,3)
+      I = 4                                                             0012
+C     END BLOCK
+      GOTO 200
+
+C  P(I) {I<=5}
+
+C (2,1)
+100   J = 7                                                             0010
+      GOTO 300
+99999 CONTINUE
+
+C     END UNSTRUCTURED
+
+C  P(I,J) {18<=I+2J, 6<=J, J<=7}
+
+C (0,4)
+      PRINT *, I, J                                                     0016
+
+C  P(I,J) {18<=I+2J, 6<=J, J<=7}
+
+C (0,5)
+
+      RETURN
+C     END BLOCK
+      END
+

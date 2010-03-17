@@ -1,0 +1,83 @@
+user warning in tp_parse: entry20: No such workspace
+Registering file entry20.f
+Splitting file    ./entry20.f
+  Module         ENTRY20
+  Module         INCREMENT
+Workspace entry20 created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+echo
+
+echo Module ENTRY20
+Module ENTRY20
+echo
+
+Module ENTRY20 selected
+Request: build resource PRINTED_FILE for module ENTRY20.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENTRY20)
+  PARSER                         building   PARSED_CODE(ENTRY20)
+                                 building   CALLEES(ENTRY20)
+user warning in MakeEntry: Variable M seems to be used before it is declared as a formal parameter for entry ENTRY20:INCREMENT. It is legal if it only appears in a type statement.
+user warning in MakeEntry: Variable K seems to be used before it is declared as a formal parameter for entry ENTRY20:INCREMENT. It is legal if it only appears in a type statement.
+
+Declarations for module ENTRY20 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity ENTRY20:*DYNAMIC*	with type area with size 0
+Declared entity ENTRY20:*HEAP*	with type area with size 0
+Declared entity ENTRY20:*STACK*	with type area with size 0
+Declared entity ENTRY20:*STATIC*	with type area with size 0
+Declared entity ENTRY20:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable ENTRY20:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module ENTRY20
+
+user warning in control_graph: Some statements are unreachable
+  CONTROLIZER                    building   CODE(ENTRY20)
+user warning in control_graph: Some statements are unreachable
+  PRINT_CODE                     building   PRINTED_FILE(ENTRY20)
+PRINTED_FILE made for ENTRY20.
+      SUBROUTINE ENTRY20(N)
+      INTEGER N
+
+      M = 0                                                             0013
+
+      PRINT *, N                                                        0015
+
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ENTRY20.
+  Closing module INCREMENT.
+Closing program.
+Closing workspace.
+Workspace entry20 closed.
+
+Workspace entry20 deleted.

@@ -1,0 +1,42 @@
+delete w18
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create w18 w18.f
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
+setproperty PRETTYPRINT_ALL_LABELS TRUE
+
+# This property is stronger than the next one
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+# This property does not work for WHILE loops on Jan. 29, 2007
+# setproperty SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+echo
+echo Transformers for "W18"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[W18]
+
+echo
+echo Preconditions for "W18"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[W18]
+
+close
+delete w18
+quit

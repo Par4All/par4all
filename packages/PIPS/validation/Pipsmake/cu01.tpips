@@ -1,0 +1,49 @@
+delete cu01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
+create cu01 cu01.c
+
+# check that the compilation unit can be parser specially
+
+# shell for i in cu01.database/[#a-z_]*[a-z_0-9'!']/*.c; do echo;echo Module `basename $i .c` before parsing;echo; \
+# 	cat $i; done
+
+# Get rid of preprocessed files
+# shell rm -f cu01.database/Tmp/*.c
+
+# Display all C files, including compilation units, but get rid of pragams,
+# except the line number pragma to avoid dependencies on gcc and/or preprocessor version
+# shell cat cu01.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+
+echo
+echo Module cu01! before parsing
+echo
+
+shell cat cu01.database/cu01!/cu01!.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+
+echo
+echo Module cu01 before parsing
+echo
+
+shell cat cu01.database/cu01/cu01.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+
+# quit
+
+close
+open cu01
+
+
+echo
+echo Module cu01 prettyprinted
+echo
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[cu01]
+close
+delete cu01
+quit

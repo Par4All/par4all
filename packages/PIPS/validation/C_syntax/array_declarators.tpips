@@ -1,0 +1,31 @@
+delete array_declarators
+
+create array_declarators array_declarators.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+echo
+echo Printed file for array_declarators!
+echo
+
+display PRINTED_FILE[array_declarators!]
+
+echo
+echo Unsplit array_declarators
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat array_declarators.database/Src/array_declarators.c
+close
+
+#delete array_declarators
+
+quit

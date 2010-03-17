@@ -1,0 +1,17 @@
+delete test01
+create test01 test01.f
+module TEST01
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[TEST01]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[TEST01]
+
+close
+delete test01

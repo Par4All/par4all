@@ -1,0 +1,136 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W17
+
+C     Check refined transformer for while loop with anded condition
+
+      INTEGER I
+
+C  T(I) {0<=I+5, I<=5}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0007
+
+C  T(I) {I#init==0, 0<=I+5, I<=5}
+
+C (0,3)
+
+      IF (.TRUE.) THEN                                                  0009
+
+C  T(I) {I#init==0, 0<=I+4, I<=4}
+
+C (0,4)
+         DO WHILE (I.GT.-5.AND.I.LT.5)                                  0010
+
+C  T(I) {I#init<=I+1, I<=I#init+1, 0<=I#init+4, I#init<=4}
+
+C (0,5)
+            IF (Y.GT.0.) THEN                                           0011
+
+C  T(I) {I==I#init+1, 0<=I+3, I<=5}
+
+C (0,6)
+               I = I+1                                                  0012
+            ELSE
+
+C  T(I) {I==I#init-1, 0<=I+5, I<=3}
+
+C (0,7)
+               I = I-1                                                  0014
+            ENDIF
+         ENDDO
+      ELSE
+
+C  T() {}
+
+C (0,8)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  T() {0<=I+5, I<=5}
+
+C (0,9)
+
+      PRINT *, I                                                        0019
+
+C     END BLOCK
+      END
+
+PRECONDITIONS
+
+
+C  P() {}
+
+      PROGRAM W17
+
+C     Check refined transformer for while loop with anded condition
+
+      INTEGER I
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      I = 0                                                             0007
+
+C  P(I) {I==0}
+
+C (0,3)
+
+      IF (.TRUE.) THEN                                                  0009
+
+C  P(I) {I==0}
+
+C (0,4)
+         DO WHILE (I.GT.-5.AND.I.LT.5)                                  0010
+
+C  P(I) {0<=I+4, I<=4}
+
+C (0,5)
+            IF (Y.GT.0.) THEN                                           0011
+
+C  P(I) {0<=I+4, I<=4}
+
+C (0,6)
+               I = I+1                                                  0012
+            ELSE
+
+C  P(I) {0<=I+4, I<=4}
+
+C (0,7)
+               I = I-1                                                  0014
+            ENDIF
+         ENDDO
+      ELSE
+
+C  P() {0==-1}
+
+C (0,8)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  P(I) {0<=I+5, I<=5}
+
+C (0,9)
+
+      PRINT *, I                                                        0019
+
+C     END BLOCK
+      END

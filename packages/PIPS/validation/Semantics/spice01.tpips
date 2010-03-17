@@ -1,0 +1,11 @@
+delete spice01
+create spice01 spice01.f
+module SPICE01
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[SPICE01]
+close
+delete spice01
+quit
+

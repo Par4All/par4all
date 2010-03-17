@@ -1,0 +1,232 @@
+--- Preconditions for module FOUR1
+
+C  P() {}
+
+C     Bug (?): the index  I for loop 12 was not constrained by the loop bounds because
+C     of the symbolic increment. This was changed because the precondition implies that
+C     ISTEP is positive here.
+
+*****|******************************************************************|
+      SUBROUTINE FOUR1(DATA,N,IX)
+*****|******************************************************************|
+*     Replaces DATA by its discrete Fourier transform
+*     IX      : >0 Fourier Analysis
+*               <0 Fourier Synthesis
+*     DATA    : Complex array of length N.
+*               N must be an integer power of 2 (non verifie)
+*-----------------------------------------------------------------------|
+      INTEGER  N,IX
+      REAL DATA(2*N)
+*
+      INTEGER  I,J,IXX,NN,M,MMAX,ISTEP
+      REAL     TEMPI,TEMPR
+      DOUBLE PRECISION WR,WI,WPR,WPI,WTEMP,THETA
+
+C  P() {}
+
+*-----------------------------------------------------------------------|
+      IXX = ISIGN(1, IX)                                                0021
+
+C  P(IXX) {}
+
+      NN = 2*N                                                          0022
+
+C  P(IXX,NN) {2N==NN}
+
+*
+*     Bit reversal
+*     ------------
+      J = 1                                                             0026
+
+C  P(IXX,J,NN) {J==1, 2N==NN}
+
+      DO 11 I = 1, NN, 2                                                0027
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N}
+
+         IF (J.GT.I) THEN                                               0028
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+            TEMPR = DATA(J)                                             0029
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+            TEMPI = DATA(J+1)                                           0030
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+            DATA(J) = DATA(I)                                           0031
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+            DATA(J+1) = DATA(I+1)                                       0032
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+            DATA(I) = TEMPR                                             0033
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+            DATA(I+1) = TEMPI                                           0034
+         ENDIF
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N}
+
+         M = NN/2                                                       0036
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=M, M<=N}
+
+1        IF (M.GE.2.AND.J.GT.M) THEN                                    0037
+         ELSE
+            GOTO 99999
+         ENDIF
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, M+1<=J, 2<=M, M<=N}
+
+         J = J-M                                                        0038
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=J, 2<=M, M<=N}
+
+         M = M/2                                                        0039
+         GOTO 1
+99999    CONTINUE
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=M, M<=N}
+
+         J = J+M                                                        0042
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=M, M<=N}
+
+11       CONTINUE                                                       0043
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, 2N+1<=I}
+
+*
+*     Danielson-Lanczos algorithm
+*     ---------------------------
+      MMAX = 2                                                          0047
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN, 2<=MMAX}
+
+2     IF (NN.GT.MMAX) THEN                                              0048
+      ELSE
+         RETURN
+      ENDIF
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN, 2<=MMAX, MMAX+1<=2N}
+
+      IF (NN.GT.MMAX.AND.MMAX.GE.2) THEN                                0049
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN, 2<=MMAX, MMAX+1<=2N}
+
+         ISTEP = 2*MMAX                                                 0050
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 2<=MMAX,
+C    MMAX+1<=2N}
+
+         THETA = 6.28318530717959D0/(IXX*MMAX)                          0051
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 2<=MMAX,
+C    MMAX+1<=2N}
+
+         WPR = -2.D0*DSIN(0.5D0*THETA)**2                               0052
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 2<=MMAX,
+C    MMAX+1<=2N}
+
+         WPI = DSIN(THETA)                                              0053
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 2<=MMAX,
+C    MMAX+1<=2N}
+
+         WR = 1.D0                                                      0054
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 2<=MMAX,
+C    MMAX+1<=2N}
+
+         WI = 0.D0                                                      0055
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 2<=MMAX,
+C    MMAX+1<=2N}
+
+         DO 13 M = 1, MMAX, 2                                           0056
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 1<=M, M<=MMAX,
+C    2<=MMAX, MMAX+1<=2N}
+
+            DO 12 I = M, NN, ISTEP                                      0057
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, M<=I, I<=2N,
+C    1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+               J = I+MMAX                                               0058
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+               TEMPR = SNGL(WR)*DATA(J)-SNGL(WI)*DATA(J+1)              0059
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+               TEMPI = SNGL(WR)*DATA(J+1)+SNGL(WI)*DATA(J)              0060
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+               DATA(J) = DATA(I)-TEMPR                                  0061
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+               DATA(J+1) = DATA(I+1)-TEMPI                              0062
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+               DATA(I) = DATA(I)+TEMPR                                  0063
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+               DATA(I+1) = DATA(I+1)+TEMPI                              0064
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N}
+
+12             CONTINUE                                                 0065
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
+C    MMAX+1<=2N}
+
+            WTEMP = WR                                                  0066
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
+C    MMAX+1<=2N}
+
+            WR = WR*WPR-WI*WPI+WR                                       0067
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
+C    MMAX+1<=2N}
+
+            WI = WI*WPR+WTEMP*WPI+WI                                    0068
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
+C    MMAX+1<=2N}
+
+13          CONTINUE                                                    0069
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I+2, I<=2MMAX+2N, 2N+1<=I, 3<=M, MMAX+1<=M, M<=MMAX+2,
+C    2<=MMAX, MMAX+1<=2N}
+
+         MMAX = ISTEP                                                   0070
+      ENDIF
+      GOTO 2
+*
+      END

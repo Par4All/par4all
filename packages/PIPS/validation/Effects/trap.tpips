@@ -1,0 +1,27 @@
+delete trap
+create trap trap.f
+
+echo
+echo Proper effects for "TRAP"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[TRAP]
+
+echo
+echo Cumulated effects for "TRAP"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[TRAP]
+
+echo
+echo Proper effects for "PTRAP"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[PTRAP]
+
+close
+delete trap
+quit

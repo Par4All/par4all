@@ -1,0 +1,22 @@
+      SUBROUTINE COMMENTS
+C  ' <- failure from SPEC2006
+      I = 1
+C  "
+      I = 2
+      END
+
+Sequential version:
+      SUBROUTINE COMMENTS
+C  ' <- failure from SPEC2006
+      I = 1                                                             0003
+C  "
+      I = 2                                                             0005
+      END
+
+Parallel version:
+      SUBROUTINE COMMENTS
+C  ' <- failure from SPEC2006
+      I = 1                                                             0003
+C  "
+      I = 2                                                             0005
+      END

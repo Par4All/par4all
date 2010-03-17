@@ -1,0 +1,183 @@
+      SUBROUTINE FOO
+      COMMON /W/ W(1)
+      COMMON /V/ V(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      T = .TRUE.
+C (0,3)
+      IF (T) THEN
+C (0,4)
+         A = W(1)
+      ELSE
+C (0,5)
+         B = V(1)
+      ENDIF
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      PROGRAM MAIN
+      COMMON /W/ W(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      C = .TRUE.
+C (0,3)
+      IF (C) THEN
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         X = W(1)
+C (0,6)
+         CALL P
+C        END BLOCK
+      ELSE
+C (0,7)
+         CALL Q
+      ENDIF
+C (0,8)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE P
+      COMMON /V/ V(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      T = .TRUE.
+C (0,3)
+      IF (T) THEN
+C (0,4)
+         V(1) = 4
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+      CALL R
+C (0,7)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE Q
+      COMMON /W/ W(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      PRINT *, W(1)
+C (0,3)
+      CALL R
+C (0,4)
+      CALL S
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE R
+      COMMON /V/ V(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      T = .TRUE.
+C (0,3)
+      IF (T) THEN
+C (0,4)
+c         l = v(1)
+         CALL FOO
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE S
+      COMMON /W/ W(1)
+      COMMON /V/ V(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      T = .TRUE.
+C (0,3)
+      IF (T) THEN
+C (0,4)
+         A = W(1)
+      ELSE
+C (0,5)
+         B = V(1)
+      ENDIF
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for common05.f
+!!
+      PROGRAM MAIN
+      COMMON /W/ W(1)
+      STOP "Variable W is used before set"
+      CALL PIPS_INITIALIZE(V)
+      C = .TRUE.
+      IF (C) THEN
+         X = W(1)
+         CALL P
+      ELSE
+         CALL Q
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE P
+      COMMON /V/ V(1)
+      T = .TRUE.
+      IF (T) THEN
+         V(1) = 4
+      ELSE
+      ENDIF
+      CALL R
+      RETURN
+      END
+      SUBROUTINE Q
+      COMMON /W/ W(1)
+      PRINT *, W(1)
+      CALL R
+      CALL S
+      RETURN
+      END
+      SUBROUTINE R
+      COMMON /V/ V(1)
+      T = .TRUE.
+      IF (T) THEN
+c         l = v(1)
+         CALL FOO
+      ELSE
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE S
+      COMMON /W/ W(1)
+      COMMON /V/ V(1)
+      T = .TRUE.
+      IF (T) THEN
+         A = W(1)
+      ELSE
+      CALL PIPS_VERIFY(V)
+         B = V(1)
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE FOO
+      COMMON /W/ W(1)
+      COMMON /V/ V(1)
+      T = .TRUE.
+      IF (T) THEN
+         A = W(1)
+      ELSE
+      CALL PIPS_VERIFY(V)
+         B = V(1)
+      ENDIF
+      RETURN
+      END

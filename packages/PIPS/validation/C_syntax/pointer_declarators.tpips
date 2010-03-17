@@ -1,0 +1,17 @@
+delete pointer_declarators
+
+create pointer_declarators pointer_declarators.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+display PRINTED_FILE[main]
+close
+delete pointer_declarators

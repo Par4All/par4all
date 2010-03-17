@@ -1,0 +1,10 @@
+delete save06
+create save06 save06.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[SAVE06]
+
+close
+delete save06
+quit

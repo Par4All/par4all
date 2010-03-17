@@ -1,0 +1,18 @@
+      PROGRAM IFTHENELSE02
+
+C     Bug EDF: comment before a labelled elseif
+
+      READ *, I                                                         0005
+
+      IF (I.EQ.0) THEN                                                  0007
+         PRINT *, I                                                     0008
+
+      ELSE
+1        IF (I.EQ.1) THEN                                               0010
+            PRINT *, I+1                                                0011
+         ELSE
+            PRINT *, I-1                                                0013
+         ENDIF
+      ENDIF
+
+      END

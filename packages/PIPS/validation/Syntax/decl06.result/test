@@ -1,0 +1,12 @@
+
+      SUBROUTINE FOO(X, Y, Z, W, N, M)
+      INTEGER N, M
+      REAL X(N+1)
+      REAL Y(N+1.0)
+      REAL Z(N*1.5)
+      REAL W(N*M)
+      INTEGER I
+      DO 10 I = 1, N+1                                                  0009
+         X(I) = 1                                                       0010
+10       CONTINUE                                                       0011
+      END

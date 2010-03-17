@@ -1,0 +1,9 @@
+      PROGRAM AA03
+
+      REAL X(10), Y(10), Z(10), U(10,10)
+
+      DO I = 1, 10                                                      0005
+         U(I,I) = 0.                                                    0006
+      ENDDO
+
+      END

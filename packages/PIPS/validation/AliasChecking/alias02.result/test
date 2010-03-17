@@ -1,0 +1,31 @@
+!!
+!! file for alias02.f
+!!
+C NN small example about alias 1 caller
+
+      PROGRAM ALIAS
+      COMMON /FOO/ X
+      EQUIVALENCE (Z,X)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL FOO1(C, C)
+C (0,3)
+      CALL FOO2(Z)
+C (0,4)
+      CALL FOO2(X)
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE FOO1(A,B)
+C (0,1)
+      RETURN
+      END
+
+      SUBROUTINE FOO2(V)
+      COMMON /FOO/ Y
+C (0,1)
+      RETURN
+      END

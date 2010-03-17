@@ -1,0 +1,27 @@
+
+Parsed printed file for "point_to03"
+
+void point_to03()
+{
+   typedef double a_t[10][20];
+   a_t a;
+   a_t *p;
+
+   p = &a;
+   ((*p)[2])[3] = 1.5;
+}
+
+Proper effetcs for "point_to03"
+
+void point_to03()
+{
+   typedef double a_t[10][20];
+   a_t a;
+   a_t *p;
+//               <must be written>: p
+
+   p = &a;
+//               <must be read   >: p
+//               <must be written>: p[0][2][3]
+   ((*p)[2])[3] = 1.5;
+}

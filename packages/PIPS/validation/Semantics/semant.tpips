@@ -1,0 +1,19 @@
+delete semant
+create semant semant.f
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+# display PRINTED_FILE[SEMANT]
+# quit
+
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+
+echo --- Preconditions for module SEMANT
+display PRINTED_FILE[SEMANT]
+
+close
+delete semant
+quit

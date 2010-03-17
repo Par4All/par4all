@@ -1,0 +1,189 @@
+Transform all the control flow in hierarchical finite state machines:
+int ex2(int argc, char *args)
+{
+   int U[101][101];
+   int V[101][101];
+   int i;
+   int j;
+   FSM2_STATE = 1;
+   while (FSM2_STATE!=0) 
+      if (FSM2_STATE==1) {
+         DO2_BEGIN = 0;
+         DO2_END = 99;
+         DO2_INCREMENT = 1;
+         DO2_INDEX = DO2_BEGIN;
+         FSM2_STATE = 2;
+      }
+      else if (FSM2_STATE==2)
+         if (DO2_INDEX<=DO2_END) {
+            ;
+            FSM2_STATE = 3;
+         }
+         else {
+            ;
+            FSM2_STATE = 8;
+         }
+      else if (FSM2_STATE==3) {
+         i = DO2_INDEX;
+         FSM196611_STATE = 4;
+         while (FSM196611_STATE!=0) 
+            if (FSM196611_STATE==4) {
+               DO3_BEGIN = 0;
+               DO3_END = 99;
+               DO3_INCREMENT = 1;
+               DO3_INDEX = DO3_BEGIN;
+               FSM196611_STATE = 5;
+            }
+            else if (FSM196611_STATE==5)
+               if (DO3_INDEX<=DO3_END) {
+                  ;
+                  FSM196611_STATE = 6;
+               }
+               else {
+                  ;
+                  FSM196611_STATE = 7;
+               }
+            else if (FSM196611_STATE==6) {
+               j = DO3_INDEX;
+               U[i+1][j] = V[i][j]+U[i][j];
+
+               V[i][j+1] = U[i+1][j];
+               DO3_INDEX = DO3_INDEX+DO3_INCREMENT;
+               FSM196611_STATE = 5;
+            }
+            else if (FSM196611_STATE==7) {
+               ;
+               FSM196611_STATE = 0;
+            }
+         DO2_INDEX = DO2_INDEX+DO2_INCREMENT;
+         FSM2_STATE = 2;
+      }
+      else if (FSM2_STATE==8) {
+         ;
+         FSM2_STATE = 0;
+      }
+   return 0;
+}
+For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
+/* SMALLTALK pretty print for module ex2. */
+ex2 with:argc with:args 
+"Automatically generated with PIPS"
+
+"FSM196611_STATE,int "
+"FSM2_STATE,int "
+"DO3_INCREMENT,int "
+"DO3_END,int "
+"DO3_BEGIN,int "
+"DO3_INDEX,int "
+"DO2_INCREMENT,int "
+"DO2_END,int "
+"DO2_BEGIN,int "
+"DO2_INDEX,int "
+"0`__func__,char "
+"0`__FUNCTION__,char "
+"result,int "
+"0`U,int , 2 dimensions"
+"0`V,int , 2 dimensions"
+"0`i,int "
+"0`j,int "
+
+|FSM196611_STATE FSM2_STATE DO3_INCREMENT DO3_END DO3_BEGIN DO3_INDEX DO2_INCREMENT DO2_END DO2_BEGIN DO2_INDEX 0`__func__ 0`__FUNCTION__ result 0`U 0`V 0`i 0`j |
+
+
+FSM196611_STATE FSM2_STATE DO3_INCREMENT DO3_END DO3_BEGIN DO3_INDEX DO2_INCREMENT DO2_END DO2_BEGIN DO2_INDEX 0`__func__ 0`__FUNCTION__ result 0`U 0`V 0`i 0`j .
+FSM196611_STATE FSM2_STATE DO3_INCREMENT DO3_END DO3_BEGIN DO3_INDEX DO2_INCREMENT DO2_END DO2_BEGIN DO2_INDEX 0`__func__ 0`__FUNCTION__ result 0`U 0`V 0`i 0`j .
+.
+0`U := Array2D width: 101 height: 101.
+0`V := Array2D width: 101 height: 101.
+
+0`U.
+0`V.
+0`i.
+0`j.
+FSM2_STATE := 1.
+[FSM2_STATE != 0] whileTrue: [
+(FSM2_STATE == 1)
+ifTrue: [
+DO2_BEGIN := 0.
+DO2_END := 99.
+DO2_INCREMENT := 1.
+DO2_INDEX := DO2_BEGIN.
+FSM2_STATE := 2.
+]
+ifFalse: [
+(FSM2_STATE == 2)
+ifTrue: [
+(DO2_INDEX <= DO2_END)
+ifTrue: [
+DO2_INDEX <= DO2_ENDFSM2_STATE := 3.
+]
+ifFalse: [
+DO2_INDEX <= DO2_ENDFSM2_STATE := 3.
+FSM2_STATE := 8.
+].
+]
+ifFalse: [
+(FSM2_STATE == 3)
+ifTrue: [
+0`i := DO2_INDEX.
+FSM196611_STATE := 4.
+[FSM196611_STATE != 0] whileTrue: [
+(FSM196611_STATE == 4)
+ifTrue: [
+DO3_BEGIN := 0.
+DO3_END := 99.
+DO3_INCREMENT := 1.
+DO3_INDEX := DO3_BEGIN.
+FSM196611_STATE := 5.
+]
+ifFalse: [
+(FSM196611_STATE == 5)
+ifTrue: [
+(DO3_INDEX <= DO3_END)
+ifTrue: [
+DO3_INDEX <= DO3_ENDFSM196611_STATE := 6.
+]
+ifFalse: [
+DO3_INDEX <= DO3_ENDFSM196611_STATE := 6.
+FSM196611_STATE := 7.
+].
+]
+ifFalse: [
+(FSM196611_STATE == 6)
+ifTrue: [
+0`j := DO3_INDEX.
+0`U at: (0`i + 1-0) at: 0`j-0 put: ((0`V at: 0`i-0 at: 0`j-0) + (0`U at: 0`i-0 at: 0`j-0)).
+0`V at: 0`i-0 at: (0`j + 1-0) put: (0`U at: (0`i + 1-0) at: 0`j-0).
+DO3_INDEX := (DO3_INDEX + DO3_INCREMENT).
+FSM196611_STATE := 5.
+]
+ifFalse: [
+(FSM196611_STATE == 7)
+ifTrue: [
+FSM196611_STATE == 7FSM196611_STATE := 0.
+]
+ifFalse: [
+FSM196611_STATE == 7FSM196611_STATE := 0.
+].
+].
+].
+].
+].
+DO2_INDEX := (DO2_INDEX + DO2_INCREMENT).
+FSM2_STATE := 2.
+]
+ifFalse: [
+(FSM2_STATE == 8)
+ifTrue: [
+FSM2_STATE == 8FSM2_STATE := 0.
+]
+ifFalse: [
+FSM2_STATE == 8FSM2_STATE := 0.
+].
+].
+].
+].
+].
+return(0).
+
+

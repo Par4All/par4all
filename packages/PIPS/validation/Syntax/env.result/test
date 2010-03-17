@@ -1,0 +1,371 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+echo
+
+echo First try: detect conflict between common and program 
+First try: detect conflict between common and program 
+echo when finding the common name
+when finding the common name
+echo
+
+shell sed /program/s/c// env.f >env1.f
+user warning in tp_parse: env: No such workspace
+Registering file env1.f
+Splitting file    ./env1.f
+  Module         BAR
+  Module         FOO
+  Module         ENV
+Workspace env created and opened.
+Main module PROGRAM "ENV" selected.
+Module ENV selected
+Module ENV already active.
+Module ENV already active.
+Request: build resource PRINTED_FILE for module ENV.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENV)
+  PARSER                         building   PARSED_CODE(ENV)
+                                 building   CALLEES(ENV)
+  CONTROLIZER                    building   CODE(ENV)
+  PRINT_CODE                     building   PRINTED_FILE(ENV)
+PRINTED_FILE made for ENV.
+      PROGRAM ENV
+c      subroutine env
+
+C     Name conflicts between subroutines, functions, main and commons
+
+      CALL FOO                                                          0006
+
+      CALL BAR                                                          0008
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module BAR.
+  Closing module ENV.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace env closed.
+
+Workspace env deleted.
+shell rm env1.f
+echo
+
+echo Second try: detect conflict between common and subroutine
+Second try: detect conflict between common and subroutine
+echo when finding the common name
+when finding the common name
+echo
+
+shell sed /subroutine/s/c// env.f >env2.f
+Registering file env2.f
+Splitting file    ./env2.f
+  Module         BAR
+  Module         FOO
+  Module         ENV
+Workspace env created and opened.
+Module ENV selected
+Module ENV already active.
+Request: build resource PRINTED_FILE for module ENV.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENV)
+  PARSER                         building   PARSED_CODE(ENV)
+                                 building   CALLEES(ENV)
+  CONTROLIZER                    building   CODE(ENV)
+  PRINT_CODE                     building   PRINTED_FILE(ENV)
+PRINTED_FILE made for ENV.
+c      program env
+      SUBROUTINE ENV
+
+C     Name onflicts between subroutines, functions, main and commons
+
+      CALL FOO                                                          0006
+
+      CALL BAR                                                          0008
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module BAR.
+  Closing module ENV.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace env closed.
+
+Workspace env deleted.
+shell rm env2.f
+echo
+
+echo Third try: create the common and detect the conflict 
+Third try: create the common and detect the conflict 
+echo when parsing the program
+when parsing the program
+echo
+
+shell sed /program/s/c// env.f >env3.f
+Registering file env3.f
+Splitting file    ./env3.f
+  Module         BAR
+  Module         FOO
+  Module         ENV
+Workspace env created and opened.
+Main module PROGRAM "ENV" selected.
+Module ENV selected
+Request: build resource CALLERS for module BAR.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(BAR)
+  PARSER                         building   PARSED_CODE(BAR)
+                                 building   CALLEES(BAR)
+  FILTER_FILE                    building   SOURCE_FILE(ENV)
+  PARSER                         building   PARSED_CODE(ENV)
+                                 building   CALLEES(ENV)
+user warning in MakeCurrentFunction: global name ENV used for a module and for a common
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+user warning in NameToCommon: Identifier ENV used for a common and for a main
+user warning in NameToCommon: Identifier BAR used for a common and for a function or subroutine
+  CALLGRAPH                      building   CALLERS(BAR)
+                                 building   CALLERS(ENV)
+                                 building   CALLERS(FOO)
+                                 building   HEIGHT(BAR)
+                                 building   HEIGHT(ENV)
+                                 building   HEIGHT(FOO)
+                                 building   DEPTH(BAR)
+                                 building   DEPTH(ENV)
+                                 building   DEPTH(FOO)
+CALLERS made for BAR.
+Request: build resource CALLERS for module ENV.
+CALLERS made for ENV.
+Request: build resource CALLERS for module FOO.
+CALLERS made for FOO.
+Module FOO selected
+Module FOO already active.
+Request: build resource PRINTED_FILE for module FOO.
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+
+      SUBROUTINE FOO
+      COMMON /ENV/ A(10), B(10)
+      COMMON /BAR/ X, Y
+
+      DO I = 1, 10                                                      0006
+         A(I) = 0.                                                      0007
+      ENDDO
+
+      END
+Module ENV selected
+Selecting rule: MUST_REGIONS
+Selecting rule: PRINT_CODE_REGIONS
+Module ENV already active.
+Request: build resource PRINTED_FILE for module ENV.
+  CONTROLIZER                    building   CODE(ENV)
+  CONTROLIZER                    building   CODE(BAR)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(BAR)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(BAR)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(BAR)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(FOO)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(FOO)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(FOO)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(ENV)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(ENV)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(ENV)
+  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(ENV)
+user warning in transformers_intra_fast: Property SEMANTICS_FLOW_SENSITIVE is ignored
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(ENV)
+  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(ENV)
+  PRECONDITIONS_INTRA            building   PRECONDITIONS(ENV)
+  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(BAR)
+user warning in transformers_intra_fast: Property SEMANTICS_FIX_POINT is ignored
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(BAR)
+  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(BAR)
+  PRECONDITIONS_INTRA            building   PRECONDITIONS(BAR)
+  MUST_REGIONS                   building   REGIONS(BAR)
+                                 building   PROPER_REGIONS(BAR)
+                                 building   INV_REGIONS(BAR)
+  SUMMARY_REGIONS                building   SUMMARY_REGIONS(BAR)
+  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(FOO)
+user warning in transformers_intra_fast: Property SEMANTICS_FIX_POINT is ignored
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(FOO)
+  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(FOO)
+  PRECONDITIONS_INTRA            building   PRECONDITIONS(FOO)
+  MUST_REGIONS                   building   REGIONS(FOO)
+                                 building   PROPER_REGIONS(FOO)
+                                 building   INV_REGIONS(FOO)
+  SUMMARY_REGIONS                building   SUMMARY_REGIONS(FOO)
+  MUST_REGIONS                   building   REGIONS(ENV)
+                                 building   PROPER_REGIONS(ENV)
+                                 building   INV_REGIONS(ENV)
+  SUMMARY_REGIONS                building   SUMMARY_REGIONS(ENV)
+  PRINT_CODE_REGIONS             building   PRINTED_FILE(ENV)
+PRINTED_FILE made for ENV.
+
+C  <BAR:A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
+C  <BAR:A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+C  <BAR:B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+      PROGRAM ENV
+
+C  <BAR:A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+c      subroutine env
+
+C     Name conflicts between subroutines, functions, main and commons
+
+      CALL FOO                                                          0006
+
+C  <BAR:A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
+C  <BAR:B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+
+      CALL BAR                                                          0008
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module BAR.
+  Closing module ENV.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace env closed.
+
+Workspace env deleted.
+shell rm env3.f
+echo
+
+echo Fourth try: conflict between a common and a subroutine name
+Fourth try: conflict between a common and a subroutine name
+echo
+
+shell sed /program/s/c// env.f >env4.f
+Registering file env4.f
+Splitting file    ./env4.f
+  Module         BAR
+  Module         FOO
+  Module         ENV
+Workspace env created and opened.
+Main module PROGRAM "ENV" selected.
+Module ENV selected
+Module BAR selected
+Module BAR already active.
+Request: build resource PRINTED_FILE for module BAR.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(BAR)
+  PARSER                         building   PARSED_CODE(BAR)
+                                 building   CALLEES(BAR)
+  CONTROLIZER                    building   CODE(BAR)
+  PRINT_CODE                     building   PRINTED_FILE(BAR)
+PRINTED_FILE made for BAR.
+
+      SUBROUTINE BAR
+      COMMON /ENV/A(10), B(10)
+
+      DO I = 1, 10                                                      0005
+         B(I) = A(I)                                                    0006
+      ENDDO
+
+      END
+Module FOO selected
+Module FOO already active.
+Request: build resource PRINTED_FILE for module FOO.
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+user warning in NameToCommon: Identifier BAR used for a common and for a function or subroutine
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+
+      SUBROUTINE FOO
+      COMMON /ENV/ A(10), B(10)
+      COMMON /BAR/ X, Y
+
+      DO I = 1, 10                                                      0006
+         A(I) = 0.                                                      0007
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module BAR.
+  Closing module ENV.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace env closed.
+
+Workspace env deleted.
+shell rm env4.f
+echo
+
+echo Fifth try: conflict between a subroutine and a common name
+Fifth try: conflict between a subroutine and a common name
+echo
+
+shell sed /program/s/c// env.f >env5.f
+Registering file env5.f
+Splitting file    ./env5.f
+  Module         BAR
+  Module         FOO
+  Module         ENV
+Workspace env created and opened.
+Main module PROGRAM "ENV" selected.
+Module ENV selected
+Module FOO selected
+Module FOO already active.
+Request: build resource PRINTED_FILE for module FOO.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+
+      SUBROUTINE FOO
+      COMMON /ENV/ A(10), B(10)
+      COMMON /BAR/ X, Y
+
+      DO I = 1, 10                                                      0006
+         A(I) = 0.                                                      0007
+      ENDDO
+
+      END
+Module BAR selected
+Module BAR already active.
+Request: build resource PRINTED_FILE for module BAR.
+  FILTER_FILE                    building   SOURCE_FILE(BAR)
+  PARSER                         building   PARSED_CODE(BAR)
+                                 building   CALLEES(BAR)
+user warning in MakeCurrentFunction: global name BAR used for a module and for a common
+  CONTROLIZER                    building   CODE(BAR)
+  PRINT_CODE                     building   PRINTED_FILE(BAR)
+PRINTED_FILE made for BAR.
+
+      SUBROUTINE BAR
+      COMMON /ENV/A(10), B(10)
+
+      DO I = 1, 10                                                      0005
+         B(I) = A(I)                                                    0006
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module BAR.
+  Closing module ENV.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace env closed.
+
+Workspace env deleted.
+shell rm env5.f

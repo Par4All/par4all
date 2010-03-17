@@ -1,0 +1,28 @@
+delete cse01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create cse01 cse01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[cse01]
+
+echo
+echo Code after CSE
+echo
+apply COMMON_SUBEXPRESSION_ELIMINATION[cse01]
+apply RESTRUCTURE_CONTROL[cse01]
+activate PRINT_CODE
+display PRINTED_FILE[cse01]
+
+close
+delete cse01
+quit
+

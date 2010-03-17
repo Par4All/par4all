@@ -1,0 +1,31 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: complexe05: No such workspace
+Registering file complexe05.f
+Splitting file    ./complexe05.f
+  Module         COMPLEXE05
+Workspace complexe05 created and opened.
+Module COMPLEXE05 selected
+Main module PROGRAM "COMPLEXE05" selected.
+Module COMPLEXE05 already active.
+Module COMPLEXE05 already active.
+Request: build resource PRINTED_FILE for module COMPLEXE05.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(COMPLEXE05)
+  PARSER                         building   PARSED_CODE(COMPLEXE05)
+                                 building   CALLEES(COMPLEXE05)
+user error in MakeFortranBinaryCall: Parser error between lines 6 and 6
+Unexpected implied DO
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module COMPLEXE05.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module COMPLEXE05.
+Closing program.
+Closing workspace.
+Workspace complexe05 closed.
+
+Workspace complexe05 deleted.

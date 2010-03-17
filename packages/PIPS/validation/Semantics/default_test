@@ -1,0 +1,18 @@
+#!/bin/sh
+
+Delete $WSPACE
+# ??? bad idea for // valid
+echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" > properties.rc
+if Pips -f $FILE -w $WSPACE -m $NAME \
+	-s pcinterfull -s tfinterfull \
+	-s prcp -b PF >&2
+then
+	echo "--- Preconditions for $NAME"
+	Display -l prec
+	exit_status=$?
+else
+	exit_status=1
+fi
+Delete $WSPACE
+rm properties.rc
+exit $exit_status

@@ -1,0 +1,25 @@
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+C  <B(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+
+      SUBROUTINE EXACT(A,B,N,M,J)
+
+      INTEGER N, A(N,N), B(N,N), M, J
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+C  <B(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+
+
+      DO I = 1, N                                                       0005
+         J = J+I                                                        0006
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=N}>
+
+         A(I,J) = 0                                                     0007
+         J = J+1                                                        0008
+
+C  <B(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=N}>
+
+         B(I,J) = 0                                                     0009
+      ENDDO
+      END

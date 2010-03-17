@@ -1,0 +1,33 @@
+      PROGRAM EDITED02
+
+C     The parser must be able to process the same routine several times
+C     after user edition steps
+
+!!      integer x(3)
+!%      real x(10)
+
+      PRINT *, X                                                        0009
+
+      END
+      PROGRAM EDITED02
+
+C     The parser must be able to process the same routine several times
+C     after user edition steps
+
+!!      integer x(3)
+      REAL X(10)
+
+      PRINT *, X                                                        0009
+
+      END
+      PROGRAM EDITED02
+
+C     The parser must be able to process the same routine several times
+C     after user edition steps
+
+!!      integer x(3)
+      INTEGER X(3)
+
+      PRINT *, X                                                        0009
+
+      END

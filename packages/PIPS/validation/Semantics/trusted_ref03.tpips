@@ -1,0 +1,17 @@
+delete trusted_ref03
+create trusted_ref03 trusted_ref03.f
+
+# setenv SEMANTICS_DEBUG_LEVEL 8
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[TRUSTED_REF03]
+
+close
+delete trusted_ref03

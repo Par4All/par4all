@@ -1,0 +1,28 @@
+!!
+!! file for alias01.f
+!!
+      PROGRAM MAIN
+      REAL WORK(2000)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      READ *, N
+C (0,3)
+      CALL RUN(WORK, WORK(N+1), N)
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN(X,Y,N)
+      REAL X(N),Y(N)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, N
+C (0,3)
+         X(I) = Y(I)
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

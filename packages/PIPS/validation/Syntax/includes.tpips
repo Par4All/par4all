@@ -1,0 +1,9 @@
+delete i
+create i includes.f
+display CALLGRAPH_FILE(INCLUSIONS)
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty PRETTYPRINT_COMMONS "include"
+display PRINTED_FILE($ALL)
+shell cat i.database/Src/*.h
+close
+delete i

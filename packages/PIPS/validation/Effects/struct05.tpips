@@ -1,0 +1,76 @@
+delete struct05
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create struct05 struct05.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Parsed printed file for "struct05"
+echo
+
+display PARSED_PRINTED_FILE[struct05]
+
+echo
+echo Proper effetcs for "struct05"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[struct05]
+
+echo
+echo Cumulated effetcs for "struct05"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[struct05]
+
+# quit
+
+echo
+echo Transformers for "main"
+echo
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[struct05]
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[struct05]
+# quit
+echo
+echo Printed files with regions
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[struct05]
+
+# Should be useless
+# apply PRIVATIZE_MODULE
+
+echo
+echo Printed files after parallelization
+echo
+
+apply COARSE_GRAIN_PARALLELIZATION[struct05]
+display PRINTED_FILE[struct05]
+
+close
+delete struct05
+quit

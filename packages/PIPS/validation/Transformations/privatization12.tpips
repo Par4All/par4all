@@ -1,0 +1,59 @@
+delete privatization12
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create privatization12 privatization12.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after privatize_module
+echo
+
+apply PRIVATIZE_MODULE[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after privatization12
+echo
+
+apply LOCALIZE_DECLARATION[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after declaration cleaning
+echo
+
+apply CLEAN_DECLARATIONS[main]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+
+echo
+echo Run code
+echo
+
+shell cc privatization12.database/Tmp/privatization12.cpp_processed.c
+shell ./a.out 
+shell cc privatization12.database/Src/privatization12.c
+shell ./a.out 
+shell rm -f a.out
+
+close
+delete privatization12
+quit
+
+

@@ -1,0 +1,10 @@
+# delete cbl
+create cbl cbl.f
+activate PRINT_CODE_PRECONDITIONS
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+module CBL
+display PRINTED_FILE
+close 
+delete cbl
+quit

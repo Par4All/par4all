@@ -1,0 +1,47 @@
+/* C pretty print for module D. */
+float
+d (int j, int k, int jp, int kp, float t[60][21][52], int l)
+{
+  float result;
+
+  result =
+    sqrt ((pow (t[l - 1][k - 1][j - 1] - t[l - 1][kp - 1][jp - 1], 2) +
+	   pow (t[(l + 1) - 1][k - 1][j - 1] - t[(l + 1) - 1][kp - 1][jp - 1],
+		2)) + pow (t[(l + 2) - 1][k - 1][j - 1] - t[(l + 2) - 1][kp -
+									 1][jp
+									    -
+									    1],
+			   2));
+  return result;
+}
+/* C pretty print for module EXTR. */
+void
+extr (int ni, int nc, float t[60][21][52], int j1, int ja, int k1)
+{
+  int l;
+  int k;
+  int j;
+  float s1;
+  float s2;
+  float s3;
+  int jh;
+  int j2;
+
+  l = ni;
+  k = k1;
+  for (j = j1; j <= ja; j++)
+    {
+      s1 = d (j, k, j, k + 1);
+      s2 = (d (j, k + 1, j, k + 2) + s1);
+      s3 = (d (j, k + 2, j, k + 3) + s2);
+      t[(nc + 3) - 1][0][j - 1] = ((s2 * s3) / ((s1 - s2) * (s1 - s3)));
+      t[(nc + 4) - 1][0][j - 1] = ((s3 * s1) / ((s2 - s3) * (s2 - s1)));
+      t[(nc + 5) - 1][0][j - 1] = ((s1 * s2) / ((s3 - s1) * (s3 - s2)));
+      jh = ((j1 + j2) - j);
+      t[(nc + 3) - 1][0][jh - 1] = t[(nc + 3) - 1][0][j - 1];
+      t[(nc + 4) - 1][0][jh - 1] = t[(nc + 4) - 1][0][j - 1];
+      t[(nc + 5) - 1][0][jh - 1] = t[(nc + 5) - 1][0][j - 1];
+      continue;
+    }
+  return;
+}

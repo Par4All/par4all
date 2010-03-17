@@ -1,0 +1,161 @@
+int main()
+{
+// (0,1)
+//:   BEGIN UNSTRUCTURED
+// (1,1)
+   // BEGIN BLOCK
+// (1,2)
+//:   BEGIN UNSTRUCTURED
+// (2,1)
+   // BEGIN BLOCK
+   int i = 5;                                                           /*0003*/
+// (2,3)
+   printf("Begin\n");                                                   /*0004*/
+   // END BLOCK
+// (3,1)
+   // BEGIN BLOCK
+// (3,2)
+   
+   /* The a label */
+a:   printf("a\n");                                                       /*0008*/
+// (3,3)
+   /* Oh, go to b... */
+   ;                                                                    /*0010*/
+// (3,4)
+
+// (3,5)
+   /* The b label */
+b:   printf("b\n");
+   // END BLOCK
+// (4,1)
+   /* Oh, go to a... */
+   ;                                                                    /*0015*/
+   goto a;
+//:   END UNSTRUCTURED
+   // END BLOCK
+//:   END UNSTRUCTURED
+}
+
+//  P() {i==5}
+
+int main()
+{
+
+//  P() {i==5}
+
+// (0,1)
+//:   BEGIN UNSTRUCTURED
+
+//  P() {i==5}
+
+// (1,1)
+   // BEGIN BLOCK
+
+//  P() {i==5}
+
+// (1,2)
+//:   BEGIN UNSTRUCTURED
+
+//  P() {i==5}
+
+// (2,1)
+   // BEGIN BLOCK
+   int i = 5;                                                           /*0003*/
+
+//  P() {i==5}
+
+// (2,3)
+   printf("Begin\n");                                                   /*0004*/
+   // END BLOCK
+
+//  P() {i==5}
+
+// (3,1)
+   // BEGIN BLOCK
+
+//  P() {i==5}
+
+// (3,2)
+   
+   /* The a label */
+a:   printf("a\n");                                                       /*0008*/
+
+//  P() {i==5}
+
+// (3,3)
+   /* Oh, go to b... */
+   ;                                                                    /*0010*/
+
+//  P() {i==5}
+
+// (3,4)
+
+
+//  P() {i==5}
+
+// (3,5)
+   /* The b label */
+b:   printf("b\n");
+   // END BLOCK
+
+//  P() {i==5}
+
+// (4,1)
+   /* Oh, go to a... */
+   ;                                                                    /*0015*/
+   goto a;
+//:   END UNSTRUCTURED
+   // END BLOCK
+//:   END UNSTRUCTURED
+}
+
+//  P() {i==5}
+
+int main()
+{
+
+//  P() {i==5}
+
+// (0,1)
+   // BEGIN BLOCK
+   int i = 5;                                                           /*0003*/
+
+//  P() {i==5}
+
+// (0,3)
+   printf("Begin\n");                                                   /*0004*/
+
+//  P() {i==5}
+
+// (0,4)
+//:   BEGIN UNSTRUCTURED
+
+//  P() {i==5}
+
+// (1,1)
+   // BEGIN BLOCK
+
+//  P() {i==5}
+
+// (1,2)
+   
+   /* The a label */
+a:   printf("a\n");                                                       /*0008*/
+
+//  P() {i==5}
+
+// (1,3)
+   /* Oh, go to b... */
+   /* The b label */
+b:   printf("b\n");
+
+//  P() {i==5}
+
+// (1,4)
+   /* Oh, go to a... */
+   ;
+   // END BLOCK
+   goto a;
+//:   END UNSTRUCTURED
+   // END BLOCK
+}

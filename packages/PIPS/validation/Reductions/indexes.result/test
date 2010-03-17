@@ -1,0 +1,49 @@
+
+Print code with proper reductions
+
+      PROGRAM INDEXES
+      INTEGER I,J
+      INTEGER S(10)
+      DO I = 1, 10                                                      0004
+         DO J = 1, 10                                                   0005
+C  call sum[S(J)],
+            S(J) = S(J)+I                                               0006
+         ENDDO
+C  call sum[S(I)],
+         S(I) = S(I)+2                                                  0008
+      ENDDO
+      DO I = 1, 10                                                      0010
+C  call sum[S(3)],
+         S(3) = S(3)+I+J                                                0011
+C  call sum[S(5)],
+         S(5) = I+S(5)+J                                                0012
+C  call sum[S(7)],
+         S(7) = I+J+S(7)                                                0013
+      ENDDO
+      END
+
+Print code with cumulated reductions
+
+      PROGRAM INDEXES
+      INTEGER I,J
+      INTEGER S(10)
+C  loop sum[S],
+      DO I = 1, 10                                                      0004
+C  loop sum[S(*)],
+         DO J = 1, 10                                                   0005
+C  call sum[S(J)],
+            S(J) = S(J)+I                                               0006
+         ENDDO
+C  call sum[S(I)],
+         S(I) = S(I)+2                                                  0008
+      ENDDO
+C  loop sum[S],
+      DO I = 1, 10                                                      0010
+C  call sum[S(3)],
+         S(3) = S(3)+I+J                                                0011
+C  call sum[S(5)],
+         S(5) = I+S(5)+J                                                0012
+C  call sum[S(7)],
+         S(7) = I+J+S(7)                                                0013
+      ENDDO
+      END

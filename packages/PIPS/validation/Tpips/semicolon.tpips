@@ -1,0 +1,6 @@
+# a tpips file with ;
+delete semicolon ; create semicolon semicolon.f ;
+activate PRINT_CODE_PRECONDITIONS ; display PRINTED_FILE 
+close ; delete semicolon 
+quit
+# that is all

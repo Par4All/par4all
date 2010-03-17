@@ -1,0 +1,17 @@
+# Check that preconditions are properly computed with user function calls
+# when intraprocedural options are chosen
+
+delete hpftest54
+create hpftest54 hpftest54.f
+# create hpftest54 hpftest54.f
+module hpftest54
+# Use default options
+# activate TRANSFORMERS_INTRA_FULL
+# activate PRECONDITIONS_INTRA_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete hpftest54
+quit
+

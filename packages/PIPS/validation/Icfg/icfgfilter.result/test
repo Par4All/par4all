@@ -1,0 +1,27 @@
+MAIN
+    A
+    C               <must be written>: KMAX
+    KMAX = KMAX+2
+        B
+        C               <must be written>: KT
+        KT = KT+3
+            C1
+            C               <must be written>: KMAX
+            CALL INC(KMAX)
+            C2
+            C               <must be written>: KT
+            CALL INC(KT)
+        C3
+        C               <must be written>: TT
+        CALL INC(TT)
+    C               <must be written>: KMAX KT
+    CALL B(KMAX)
+        B
+        C               <must be written>: KT
+        KT = KT+3
+            C1
+            C               <must be written>: KMAX
+            CALL INC(KMAX)
+            C2
+            C               <must be written>: KT
+            CALL INC(KT)

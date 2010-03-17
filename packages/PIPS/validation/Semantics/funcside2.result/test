@@ -1,0 +1,21 @@
+
+C  P() {}
+
+      PROGRAM FUNCSIDE2
+
+C  P() {}
+
+
+      I2 = 20                                                           0003
+
+C  P(I2) {I2==20}
+
+
+      I2 = FOO2(I2)                                                     0005
+
+C  P(I2) {}
+
+
+      PRINT *, I2                                                       0007
+
+      END

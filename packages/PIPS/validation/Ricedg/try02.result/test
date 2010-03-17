@@ -1,0 +1,13 @@
+
+First dependence graph
+
+12 12 R W <S(I)> - <S(I)> levels(2,3) ddv(=,<=,*)
+12 12 W R <S(I)> - <S(I)> levels(2,3) ddv(=,<=,*)
+12 12 W W <S(I)> - <S(I)> levels(2,3) ddv(=,<=,*)
+12 11 R W <K> - <K> levels(1,2) 
+12 10 R W <J> - <J> levels(1) 
+11 11 W W <K> - <K> levels(1,2) 
+10 10 W W <J> - <J> levels(1) 
+9 12 W R <S(I)> - <S(I)> levels(2) 
+9 12 W W <S(I)> - <S(I)> levels(2) 
+

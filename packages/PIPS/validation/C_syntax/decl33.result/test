@@ -1,0 +1,99 @@
+
+Splitted file for "decl33!"
+
+# 1 "./decl33.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "./decl33.c"
+extern int decl33();
+int decl33(int, int);
+extern int decl33();
+
+extern main();
+
+extern int decl33();
+
+Parsed printed file for "main"
+
+main()
+{
+   int k = decl33(2, 3);
+}
+
+Parsed printed file for "decl33"
+
+int decl33(int i, int j)
+{
+   return i+j;
+}
+
+Parsed printed file for "decl33!"
+
+extern int decl33(int i, int j);
+extern int decl33(int i, int j);
+extern int decl33(int i, int j);
+
+extern  main();
+
+extern int decl33(int i, int j);
+
+Symbol table for "decl33"
+
+decl33
+
+Declarations for module "decl33" with type "int x int -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl33!:*STATIC*" with type "area" with size 0
+	Declared entity "decl33:*DYNAMIC*" with type "area" with size 14
+	Declared entity "decl33:*HEAP*" with type "area" with size 0
+	Declared entity "decl33:*STACK*" with type "area" with size 0
+	Declared entity "decl33:*STATIC*" with type "area" with size 0
+	Declared entity "decl33:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "decl33:0`__func__" with type "variable" "char"
+	Declared entity "decl33:decl33" with type "variable" "int"
+	Declared entity "decl33:i" with type "variable" "int"
+	Declared entity "decl33:j" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable decl33:i	offset = 1
+	Variable decl33:j	offset = 2
+
+Layout for return variable:
+
+	Variable "decl33:decl33"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl33!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl33:*DYNAMIC*" of size 14:
+	Variable "decl33:0`__func__"	offset = 0	size = 7
+	Variable "decl33:0`__FUNCTION__"	offset = 7	size = 7
+
+
+Layout for memory area "decl33:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl33:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl33:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl33
+

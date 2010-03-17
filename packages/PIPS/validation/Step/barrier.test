@@ -1,0 +1,4 @@
+run_step.script -f -g src barrier.f
+for f in barrier/src/* ; do echo "###################### $f ######################"; cat $f; done
+rm -rf barrier
+exit 0;

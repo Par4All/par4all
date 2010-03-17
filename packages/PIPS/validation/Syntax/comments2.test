@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Validation of the comment buffer overflow. Over a certain size, the
+# comments are skipped, and a user warning is displayed.
+#
+# comments2.f comes from the PerfectClub SPICE code.
+#
+
+Init -d -f comments2.f comments2 >/dev/null 2>/dev/null
+Display -v -m rffti code
+exit_code=$?
+Delete comments2 2>/dev/null
+exit $exit_code

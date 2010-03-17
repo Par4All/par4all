@@ -1,0 +1,44 @@
+
+      SUBROUTINE FOO01(Y)
+
+      CALL FOO02(X)                                                     0004
+      CALL FOO03(X)                                                     0005
+
+      END
+
+      SUBROUTINE FOO02(Y)
+
+      CALL FOO03(X)                                                     0004
+      CALL FOO01(X)                                                     0005
+
+      END
+
+      SUBROUTINE FOO03(Y)
+
+      CALL FOO01(X)                                                     0004
+      CALL FOO02(X)                                                     0005
+
+
+      END
+
+      SUBROUTINE FOO04(Y)
+
+      CALL FOO05(X)                                                     0004
+
+      END
+
+      SUBROUTINE FOO05(Y)
+
+      CALL FOO04(X)                                                     0004
+
+      END
+      PROGRAM RECURSION03
+
+C     Goal: Make sure that pipsmake remove required resources
+
+      CALL FOO01(X)                                                     0005
+      CALL FOO01(X)                                                     0006
+      CALL FOO01(X)                                                     0007
+      CALL FOO01(X)                                                     0008
+
+      END

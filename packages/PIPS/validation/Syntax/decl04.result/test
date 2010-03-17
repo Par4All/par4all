@@ -1,0 +1,11 @@
+      PROGRAM P
+      INTEGER I
+      COMPLEX*16 DC1, DC2(1:3), DC3
+      DC1 = (1.0D0, 1.0D0)                                              0008
+      DC3 = 0                                                           0009
+      DO 10 I = 1, 3                                                    0010
+         DC2(I) = DC1+I                                                 0011
+         DC3 = DC3+DC2(I)                                               0012
+10       CONTINUE                                                       0013
+      PRINT *, DC3                                                      0014
+      END

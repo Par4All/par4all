@@ -1,0 +1,153 @@
+
+User FILE for convold1
+
+# 1
+int convold1(int X[13][13],int coeff[6],int i,int j)
+{
+  int m, res;
+
+  /* for  (m = 0; m<= 5; m++) */
+
+  res = 0;
+  for (m = 0; m<= 5; m++)
+    res = res + coeff[m]* X[i+m][j];
+
+  return res;
+}
+
+PARSED PRINTED FILE for convold1
+
+int convold1(int X[13][13], int coeff[6], int i, int j)
+{
+   int m,  res;
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
+   res = 0;
+   for (m = 0;m<=5;m++)
+      res = res+coeff[m]*X[i+m][j];
+
+   return res;
+}
+
+PRINTED FILE for convold1
+
+int convold1(int X[13][13], int coeff[6], int i, int j)
+{
+   int m,  res;
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
+   res = 0;
+   for(m = 0; m <= 5; m += 1)
+      res = res+coeff[m]*X[i+m][j];
+
+   return res;
+}
+
+Effects for convold1
+
+int convold1(int X[13][13], int coeff[6], int i, int j)
+{
+   int m,  res;
+//               <must be written>: res
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
+   res = 0;
+//               <must be written>: m
+   for(m = 0; m <= 5; m += 1)
+//               <must be read   >: X[i+m][j] coeff[m] i j m res
+//               <must be written>: res
+      res = res+coeff[m]*X[i+m][j];
+//               <must be read   >: res
+
+   return res;
+}
+
+Transformers for convold1
+
+
+//  T(convold1) {}
+
+int convold1(int X[13][13], int coeff[6], int i, int j)
+{
+   int m,  res;
+
+//  T(res) {res==0}
+
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
+   res = 0;
+
+//  T(m,res) {res#init==0, 0<=m}
+
+   for(m = 0; m <= 5; m += 1)
+
+//  T(res) {0<=m, m<=5}
+
+      res = res+coeff[m]*X[i+m][j];
+
+//  T(convold1) {convold1==res, m==6}
+
+
+   return res;
+}
+
+Preconditions for convold1
+
+
+//  P() {}
+
+int convold1(int X[13][13], int coeff[6], int i, int j)
+{
+   int m,  res;
+
+//  P() {}
+
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
+   res = 0;
+
+//  P(res) {res==0}
+
+   for(m = 0; m <= 5; m += 1)
+
+//  P(m,res) {0<=m, m<=5}
+
+      res = res+coeff[m]*X[i+m][j];
+
+//  P(m,res) {m==6}
+
+
+   return res;
+}
+
+PRINTED Regions for convold1
+
+
+//  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=5+i}>
+//  <coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=5}>
+
+int convold1(int X[13][13], int coeff[6], int i, int j)
+{
+   int m,  res;
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
+   res = 0;
+
+//  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=5+i}>
+//  <coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=5}>
+
+   for(m = 0; m <= 5; m += 1)
+
+//  <X[PHI1][PHI2]-R-EXACT-{i+m==PHI1, PHI2==j, 0<=m, m<=5}>
+//  <coeff[PHI1]-R-EXACT-{PHI1==m, 0<=m, m<=5}>
+
+      res = res+coeff[m]*X[i+m][j];
+
+   return res;
+}

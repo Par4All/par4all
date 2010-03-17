@@ -1,0 +1,6 @@
+extern main();
+# 1
+main()
+{
+  int i = 1;
+}

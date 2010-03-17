@@ -1,0 +1,714 @@
+
+C  T() {}
+
+      SUBROUTINE INIMOD
+
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,   NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+*
+*
+      PARAMETER  ( XLZ =       30.0D0 )
+      PARAMETER  ( XLR =        8.0D0 )
+*
+C     PARAMETER  ( XCZ =       30.0D0 )
+      PARAMETER  ( XCZ =       15.0D0 )
+      PARAMETER  ( XSZ =       30.0D0 )
+*
+      PARAMETER  ( RO0 =        1.0D0 )
+      PARAMETER  ( PR0 =        0.6D0 )
+*
+      PARAMETER  ( XLJET =      1.0D0 )
+      PARAMETER  ( ROJET =      0.1D0 )
+      PARAMETER  ( PRJET =      0.6D0 )
+      PARAMETER  (  VJET =    18.97D0 )
+
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+
+C  T(I,J,MPCON,MPSTR,NPJET) {3<=I, 803<=I+400J, 2I+5J<=811,
+C    NPJET+1<=J, MPCON<=401}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (0,2)
+*
+*
+***********************************************************************
+*     OPEN MODEL INPUT
+***********************************************************************
+      OPEN (UNIT=11,FILE='HYDRO2D.MODEL',STATUS='OLD')                  0039
+
+C  T() {}
+
+C (0,3)
+***********************************************************************
+*     SET BASIC PARAMETERS
+***********************************************************************
+*
+*
+      GAM = DBLE(5.0D0)/DBLE(3.0D0)                                     0045
+
+C  T() {}
+
+C (0,4)
+*
+      TZ = XLZ/(MP-2)                                                   0047
+
+C  T() {}
+
+C (0,5)
+      TR = XLR/NP                                                       0048
+
+C  T() {}
+
+C (0,6)
+      FTZ = DBLE(-2.0D0)*TZ                                             0049
+
+C  T() {}
+
+C (0,7)
+      FTR = 0.0D0                                                       0050
+
+C  T() {}
+
+C (0,8)
+      BSZ = 1.0D0                                                       0051
+
+C  T() {}
+
+C (0,9)
+      BSR = 1.0D0                                                       0052
+
+C  T() {}
+
+C (0,10)
+      QTZ = 1.0D0                                                       0053
+
+C  T() {}
+
+C (0,11)
+      QTR = 1.0D0                                                       0054
+
+C  T() {}
+
+C (0,12)
+*
+*
+***********************************************************************
+*     SET VARIABLES
+***********************************************************************
+*
+*
+      CON = GAM-1.0D0                                                   0062
+
+C  T() {}
+
+C (0,13)
+      EN0 = PR0/CON                                                     0063
+
+C  T(MPCON) {}
+
+C (0,14)
+*
+      MPCON = NINT(MP*XCZ/XLZ)                                          0065
+
+C  T(MPSTR) {}
+
+C (0,15)
+      MPSTR = NINT(MP*XSZ/XLZ)                                          0066
+
+C  T(J) {J==1}
+
+C (0,16)
+      J = 1                                                             0068
+C (0,17)
+99996 CONTINUE
+
+C  T() {}
+
+C (1,1)
+*
+C     DO loop 5 with exit had to be desugared
+      IF (J.GT.NP) GOTO 99999                                           0068
+
+C  T(I) {I==1, J<=160}
+
+C (10,1)
+      I = 1                                                             0069
+99997 CONTINUE
+
+C  T() {J<=160}
+
+C (7,1)
+C     DO loop 5 with exit had to be desugared
+      IF (I.GT.MP) GOTO 99998                                           0069
+
+C  T() {1<=I, I<=402, 1<=J, J<=160}
+
+C (9,1)
+      READ (UNIT=11,FMT=1000,END=99) RO(I,J)                            0070
+
+C  T(I) {I==I#init+1, 2<=I, I<=403, 1<=J, J<=160}
+
+C (6,1)
+C     BEGIN BLOCK
+
+C  T() {1<=I, I<=402, 1<=J, J<=160}
+
+C (6,2)
+5     CONTINUE                                                          0071
+
+C  T(I) {I==I#init+1, 2<=I, I<=403, 1<=J, J<=160}
+
+C (6,3)
+      I = I+1                                                           0069
+C     END BLOCK
+      GOTO 99997
+
+C  T() {0==-1}
+
+C (4,1)
+C     BEGIN BLOCK
+
+C  T() {1<=I, I<=402, 1<=J, J<=160}
+
+C (4,2)
+99    WRITE (6, 1099)                                                   0107
+
+C  T() {0==-1}
+
+C (4,3)
+      STOP                                                              0108
+
+C  T() {0==-1}
+
+C (4,4)
+1000  FORMAT(E20.14)                                                    0109
+
+C  T() {0==-1}
+
+C (4,5)
+1099  FORMAT(' NO FURTHER MODEL DATA AVAILABLE, STOP')                  0110
+C     END BLOCK
+99998 CONTINUE
+
+C  T(J) {I==403, J==J#init+1, J<=161}
+
+C (8,1)
+      J = J+1                                                           0068
+      GOTO 99996
+99999 CONTINUE
+
+C  T(I,J,NPJET) {J#init==161, 3<=I, 803<=I+400J, 2I+5J<=811,
+C    NPJET+1<=J, MPCON<=401}
+
+C (2,1)
+C     BEGIN BLOCK
+
+C  T(I,J) {J#init==161, 1<=J}
+
+C (2,2)
+      DO 10 J = 1, NP                                                   0072
+
+C  T(I) {1<=I, 1<=J, J<=160}
+
+C (2,3)
+         DO 10 I = 1, MPCON                                             0073
+
+C  T() {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,4)
+C           BEGIN BLOCK
+
+C  T() {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,5)
+C        RO(I,J) =  RO0
+            EN(I,J) = EN0                                               0075
+
+C  T() {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,6)
+            GZ(I,J) = 0.0D0                                             0076
+
+C  T() {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,7)
+            GR(I,J) = 0.0D0                                             0077
+
+C  T() {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,8)
+10          CONTINUE                                                    0078
+C           END BLOCK
+
+C  T(I,J) {J#init==161, 2<=I#init, I#init<=403, MPCON+1<=I#init, 1<=J}
+
+C (2,9)
+*
+      DO 12 J = 1, NP                                                   0080
+
+C  T(I) {MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+
+C (2,10)
+         DO 12 I = MPCON+1, MP                                          0081
+
+C  T() {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+
+C (2,11)
+C           BEGIN BLOCK
+
+C  T() {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+
+C (2,12)
+*        RO(I,J) =  RO0  *  10 ** ( REAL(MPCON-I) / REAL(MPSTR) )
+C        RO(I,J) =  RO0  *  10 ** ( DBLE(MPCON-I) / DBLE(MPSTR) )
+            EN(I,J) = EN0                                               0084
+
+C  T() {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+
+C (2,13)
+            GZ(I,J) = 0.0D0                                             0085
+
+C  T() {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+
+C (2,14)
+            GR(I,J) = 0.0D0                                             0086
+
+C  T() {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+
+C (2,15)
+12          CONTINUE                                                    0087
+C           END BLOCK
+
+C  T() {I==403, J==161, MPCON<=401}
+
+C (2,16)
+*
+*
+      ENJET = PRJET/CON+0.5D0*ROJET*VJET**2                             0090
+
+C  T() {I==403, J==161, MPCON<=401}
+
+C (2,17)
+      GZJET = ROJET*VJET                                                0091
+
+C  T(NPJET) {I==403, J==161, MPCON<=401}
+
+C (2,18)
+*
+      NPJET = NINT(NP*XLJET/XLR)                                        0093
+
+C  T(I,J) {I#init==403, J#init==161, 1<=J, MPCON<=401}
+
+C (2,19)
+*
+      DO 20 J = 1, NPJET                                                0095
+
+C  T(I) {1<=I, 1<=J, J<=NPJET, MPCON<=401}
+
+C (2,20)
+         DO 20 I = 1, 2                                                 0096
+
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+
+C (2,21)
+C           BEGIN BLOCK
+
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+
+C (2,22)
+C        RO(I,J) =  ROJET
+            EN(I,J) = ENJET                                             0098
+
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+
+C (2,23)
+            GZ(I,J) = GZJET                                             0099
+
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+
+C (2,24)
+20          CONTINUE                                                    0100
+C           END BLOCK
+*
+*
+***********************************************************************
+*
+*
+C     END BLOCK
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE INIMOD
+
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,   NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+*
+*
+      PARAMETER  ( XLZ =       30.0D0 )
+      PARAMETER  ( XLR =        8.0D0 )
+*
+C     PARAMETER  ( XCZ =       30.0D0 )
+      PARAMETER  ( XCZ =       15.0D0 )
+      PARAMETER  ( XSZ =       30.0D0 )
+*
+      PARAMETER  ( RO0 =        1.0D0 )
+      PARAMETER  ( PR0 =        0.6D0 )
+*
+      PARAMETER  ( XLJET =      1.0D0 )
+      PARAMETER  ( ROJET =      0.1D0 )
+      PARAMETER  ( PRJET =      0.6D0 )
+      PARAMETER  (  VJET =    18.97D0 )
+
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+*
+*
+***********************************************************************
+*     OPEN MODEL INPUT
+***********************************************************************
+      OPEN (UNIT=11,FILE='HYDRO2D.MODEL',STATUS='OLD')                  0039
+
+C  P() {}
+
+C (0,3)
+***********************************************************************
+*     SET BASIC PARAMETERS
+***********************************************************************
+*
+*
+      GAM = DBLE(5.0D0)/DBLE(3.0D0)                                     0045
+
+C  P() {}
+
+C (0,4)
+*
+      TZ = XLZ/(MP-2)                                                   0047
+
+C  P() {}
+
+C (0,5)
+      TR = XLR/NP                                                       0048
+
+C  P() {}
+
+C (0,6)
+      FTZ = DBLE(-2.0D0)*TZ                                             0049
+
+C  P() {}
+
+C (0,7)
+      FTR = 0.0D0                                                       0050
+
+C  P() {}
+
+C (0,8)
+      BSZ = 1.0D0                                                       0051
+
+C  P() {}
+
+C (0,9)
+      BSR = 1.0D0                                                       0052
+
+C  P() {}
+
+C (0,10)
+      QTZ = 1.0D0                                                       0053
+
+C  P() {}
+
+C (0,11)
+      QTR = 1.0D0                                                       0054
+
+C  P() {}
+
+C (0,12)
+*
+*
+***********************************************************************
+*     SET VARIABLES
+***********************************************************************
+*
+*
+      CON = GAM-1.0D0                                                   0062
+
+C  P() {}
+
+C (0,13)
+      EN0 = PR0/CON                                                     0063
+
+C  P() {}
+
+C (0,14)
+*
+      MPCON = NINT(MP*XCZ/XLZ)                                          0065
+
+C  P(MPCON) {}
+
+C (0,15)
+      MPSTR = NINT(MP*XSZ/XLZ)                                          0066
+
+C  P(MPCON,MPSTR) {}
+
+C (0,16)
+      J = 1                                                             0068
+C (0,17)
+99996 CONTINUE
+
+C  P(I,J,MPCON,MPSTR) {1<=J, J<=161}
+
+C (1,1)
+*
+C     DO loop 5 with exit had to be desugared
+      IF (J.GT.NP) GOTO 99999                                           0068
+
+C  P(I,J,MPCON,MPSTR) {1<=J, J<=160}
+
+C (10,1)
+      I = 1                                                             0069
+99997 CONTINUE
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=403, 1<=J, J<=160}
+
+C (7,1)
+C     DO loop 5 with exit had to be desugared
+      IF (I.GT.MP) GOTO 99998                                           0069
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
+
+C (9,1)
+      READ (UNIT=11,FMT=1000,END=99) RO(I,J)                            0070
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
+
+C (6,1)
+C     BEGIN BLOCK
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
+
+C (6,2)
+5     CONTINUE                                                          0071
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
+
+C (6,3)
+      I = I+1                                                           0069
+C     END BLOCK
+      GOTO 99997
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
+
+C (4,1)
+C     BEGIN BLOCK
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
+
+C (4,2)
+99    WRITE (6, 1099)                                                   0107
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
+
+C (4,3)
+      STOP                                                              0108
+
+C  P() {0==-1}
+
+C (4,4)
+1000  FORMAT(E20.14)                                                    0109
+
+C  P() {0==-1}
+
+C (4,5)
+1099  FORMAT(' NO FURTHER MODEL DATA AVAILABLE, STOP')                  0110
+C     END BLOCK
+99998 CONTINUE
+
+C  P(I,J,MPCON,MPSTR) {I==403, 1<=J, J<=160}
+
+C (8,1)
+      J = J+1                                                           0068
+      GOTO 99996
+99999 CONTINUE
+
+C  P(I,J,MPCON,MPSTR) {J==161}
+
+C (2,1)
+C     BEGIN BLOCK
+
+C  P(I,J,MPCON,MPSTR) {J==161}
+
+C (2,2)
+      DO 10 J = 1, NP                                                   0072
+
+C  P(I,J,MPCON,MPSTR) {1<=J, J<=160}
+
+C (2,3)
+         DO 10 I = 1, MPCON                                             0073
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=MPCON, 1<=J, J<=160}
+
+C (2,4)
+C           BEGIN BLOCK
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,5)
+C        RO(I,J) =  RO0
+            EN(I,J) = EN0                                               0075
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,6)
+            GZ(I,J) = 0.0D0                                             0076
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,7)
+            GR(I,J) = 0.0D0                                             0077
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+
+C (2,8)
+10          CONTINUE                                                    0078
+C           END BLOCK
+
+C  P(I,J,MPCON,MPSTR) {J==161, 1<=I, I<=403, MPCON+1<=I}
+
+C (2,9)
+*
+      DO 12 J = 1, NP                                                   0080
+
+C  P(I,J,MPCON,MPSTR) {1<=J, J<=160, MPCON<=402}
+
+C (2,10)
+         DO 12 I = MPCON+1, MP                                          0081
+
+C  P(I,J,MPCON,MPSTR) {I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+
+C (2,11)
+C           BEGIN BLOCK
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160,
+C    MPCON<=402}
+
+C (2,12)
+*        RO(I,J) =  RO0  *  10 ** ( REAL(MPCON-I) / REAL(MPSTR) )
+C        RO(I,J) =  RO0  *  10 ** ( DBLE(MPCON-I) / DBLE(MPSTR) )
+            EN(I,J) = EN0                                               0084
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160,
+C    MPCON<=402}
+
+C (2,13)
+            GZ(I,J) = 0.0D0                                             0085
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160,
+C    MPCON<=402}
+
+C (2,14)
+            GR(I,J) = 0.0D0                                             0086
+
+C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160,
+C    MPCON<=402}
+
+C (2,15)
+12          CONTINUE                                                    0087
+C           END BLOCK
+
+C  P(I,J,MPCON,MPSTR) {I==403, J==161, MPCON<=402}
+
+C (2,16)
+*
+*
+      ENJET = PRJET/CON+0.5D0*ROJET*VJET**2                             0090
+
+C  P(I,J,MPCON,MPSTR) {I==403, J==161, MPCON<=401}
+
+C (2,17)
+      GZJET = ROJET*VJET                                                0091
+
+C  P(I,J,MPCON,MPSTR) {I==403, J==161, MPCON<=401}
+
+C (2,18)
+*
+      NPJET = NINT(NP*XLJET/XLR)                                        0093
+
+C  P(I,J,MPCON,MPSTR,NPJET) {I==403, J==161, MPCON<=401}
+
+C (2,19)
+*
+      DO 20 J = 1, NPJET                                                0095
+
+C  P(I,J,MPCON,MPSTR,NPJET) {1<=J, J<=NPJET, MPCON<=401}
+
+C (2,20)
+         DO 20 I = 1, 2                                                 0096
+
+C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=NPJET, MPCON<=401}
+
+C (2,21)
+C           BEGIN BLOCK
+
+C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
+C    MPCON<=401}
+
+C (2,22)
+C        RO(I,J) =  ROJET
+            EN(I,J) = ENJET                                             0098
+
+C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
+C    MPCON<=401}
+
+C (2,23)
+            GZ(I,J) = GZJET                                             0099
+
+C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
+C    MPCON<=401}
+
+C (2,24)
+20          CONTINUE                                                    0100
+C           END BLOCK
+*
+*
+***********************************************************************
+*
+*
+C     END BLOCK
+C     END BLOCK
+      END
+

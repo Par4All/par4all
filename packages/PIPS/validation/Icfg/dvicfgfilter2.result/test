@@ -1,0 +1,10 @@
+[
+l("MAIN",n("",[a("OBJECT","MAIN\n                <must be read   >: KMAX\n                <must be written>: KMAX\nCALL A(I)\n")],[
+  l("",e("",[],r("A")))])),
+l("A",n("",[a("OBJECT","A\n                <must be read   >: KMAX\n                <must be written>: KMAX\nKMAX = KMAX+2\n                <must be read   >: KMAX\n                <must be written>: KMAX\nCALL B(I)\n                <must be read   >: KMAX\n                <must be written>: KMAX\nCALL B(KMAX)\n")],[
+  l("",e("",[],r("B")))])),
+l("B",n("",[a("OBJECT","B\n                <must be read   >: KMAX\n                <must be written>: KMAX\nCALL C1(I)\n")],[
+  l("",e("",[],r("C1")))])),
+l("C1",n("",[a("OBJECT","C1\n                <must be read   >: KMAX\n                <must be written>: KMAX\nCALL INC(KMAX)\n")],[
+]))
+]

@@ -1,0 +1,13 @@
+      SUBROUTINE FOO
+
+C     8 d1 is parsed as real constant 8d1
+
+      REAL*8 D1
+      REAL*8 E2
+      REAL*4 D5
+      COMPLEX*16 D2
+      CHARACTER*80 E12
+      LOGICAL*4 D8
+      INTEGER*4 D3
+
+      END

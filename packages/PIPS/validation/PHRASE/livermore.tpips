@@ -1,0 +1,24 @@
+delete livermore
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create livermore livermore.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+# Since the for loops are not dealt yet:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+# Select the more precise regions to compute the communications:
+activate MUST_REGIONS
+
+echo Transform all the control flow in one finite state machine:
+apply PHRASE_DISTRIBUTOR[livermore]
+apply PHRASE_DISTRIBUTOR_CONTROL_CODE[livermore]
+display PRINTED_FILE[livermore]
+
+close
+delete livermore
+quit

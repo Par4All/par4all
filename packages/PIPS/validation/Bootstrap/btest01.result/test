@@ -1,0 +1,41 @@
+
+Parsed printed file
+
+      PROGRAM BTEST01
+
+      LOGICAL LOG
+
+      LOG = BTEST(8, 3)                                                 0005
+      PRINT *, 'log = ', LOG                                            0006
+
+      END
+
+Proper effects
+
+      PROGRAM BTEST01
+
+      LOGICAL LOG
+C               <must be written>: LOG
+
+      LOG = BTEST(8, 3)                                                 0005
+C               <must be read   >: LOG __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'log = ', LOG                                            0006
+
+      END
+
+Cumulated effetcs
+
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM BTEST01
+
+      LOGICAL LOG
+C               <must be written>: LOG
+
+      LOG = BTEST(8, 3)                                                 0005
+C               <must be read   >: LOG __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'log = ', LOG                                            0006
+
+      END

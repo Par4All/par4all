@@ -1,0 +1,87 @@
+
+C  P() {K==3}
+
+C     Check that all static initialization are taken into account:
+C     k==3 in OUTPUT
+
+C     Check also that dead paths in the call graph are not used: 
+C     l==1 in OUTPUT
+
+      PROGRAM ALL01
+      COMMON /BAR/ K
+
+C  P() {K==3}
+
+      CALL FOO1(I)                                                      0009
+
+C  P(I) {I==1, K==3}
+
+      PRINT *, I, K                                                     0010
+      END
+
+C  P() {ALL01:K==3}
+
+
+      SUBROUTINE FOO1(J)
+
+C  P() {ALL01:K==3}
+
+      J = 1                                                             0003
+
+C  P(J) {ALL01:K==3, J==1}
+
+      CALL OUTPUT(J)                                                    0004
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE FOO2(J)
+      COMMON /BAR/ K
+      DATA K /3/
+
+C  P() {0==-1}
+
+      J = 2                                                             0005
+
+C  P() {0==-1}
+
+      CALL OUTPUT(J)                                                    0006
+      END
+
+C  P() {K==3, L==1}
+
+
+      SUBROUTINE OUTPUT(L)
+      COMMON /BAR/ K
+
+C  P() {K==3, L==1}
+
+      PRINT *, L, K                                                     0004
+      END
+C     Check that all static initialization are taken into account:
+C     k==3 in OUTPUT
+
+C     Check also that dead paths in the call graph are not used: 
+C     l==1 in OUTPUT
+
+      PROGRAM ALL01
+      COMMON /BAR/ K
+      CALL FOO1(I)                                                      0009
+      PRINT *, 1, 3                                                     0010
+      END
+
+      SUBROUTINE FOO1(J)
+      J = 1                                                             0003
+      CALL OUTPUT(1)                                                    0004
+      END
+
+      SUBROUTINE FOO2(J)
+      COMMON /BAR/ K
+      DATA K /3/
+      END
+
+      SUBROUTINE OUTPUT(L)
+      COMMON /BAR/ K
+      PRINT *, 1, 3                                                     0004
+      END

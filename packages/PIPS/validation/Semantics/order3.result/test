@@ -1,0 +1,27 @@
+
+C  P() {}
+
+      PROGRAM ORDER3
+
+C  P() {}
+
+c     to check the ordering used to  print preconditions and transformers
+
+      IF (I.EQ.1) THEN                                                  0004
+
+C  P() {I==1}
+
+         IF (I.EQ.3) THEN                                               0005
+
+C  P() {0==-1}
+
+            IF (I.EQ.2) THEN                                            0006
+
+C  P() {0==-1}
+
+               PRINT *, I                                               0007
+            ENDIF
+         ENDIF
+      ENDIF
+
+      END

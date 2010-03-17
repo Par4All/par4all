@@ -1,0 +1,17 @@
+# before cleaning declarations
+      INTEGER*4 FUNCTION FUNTYPE(I)
+      INTEGER I, J
+      FUNTYPE = I*I                                                     0004
+      END
+      CHARACTER*8 FUNCTION STRTYPE()
+      STRTYPE = 'foo'                                                   0003
+      END
+# after cleaning declarations
+      INTEGER*4 FUNCTION FUNTYPE(I)
+      INTEGER I
+      FUNTYPE = I*I                                                     0004
+      END
+      CHARACTER*8 FUNCTION STRTYPE()
+      STRTYPE = 'foo'                                                   0003
+      END
+

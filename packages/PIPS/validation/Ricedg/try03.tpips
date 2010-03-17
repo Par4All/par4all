@@ -1,0 +1,14 @@
+delete try03
+create try03 try03.f
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
+setproperty CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS FALSE
+
+echo 
+echo First dependence graph
+echo
+
+display DG_FILE
+close
+
+delete try03

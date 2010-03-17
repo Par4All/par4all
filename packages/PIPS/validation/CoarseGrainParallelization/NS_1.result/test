@@ -1,0 +1,29 @@
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI(NVAR,NXM,NYM)
+      NX = 101                                                          0004
+      NY = 101                                                          0005
+
+!     The loop on j should be parallelized and i privatized :
+
+!$OMP PARALLEL DO PRIVATE(I)
+      DO J = 1, NY                                                      0008
+
+!$OMP    PARALLEL DO 
+         DO I = 1, NX                                                   0009
+            PHI(1,I,J) = 0.                                             0010
+            PHI(2,I,J) = 0.                                             0011
+            PHI(3,I,J) = 0.                                             0012
+         ENDDO
+      ENDDO
+
+      END
+Regenerate the sources from the PIPS transformed code:

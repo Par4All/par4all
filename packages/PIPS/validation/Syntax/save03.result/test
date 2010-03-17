@@ -1,0 +1,31 @@
+user warning in tp_parse: save03: No such workspace
+Registering file save03.f
+Splitting file    ./save03.f
+  Module         FOO
+  Module         SAVE03
+Workspace save03 created and opened.
+Main module PROGRAM "SAVE03" selected.
+Module SAVE03 selected
+Module SAVE03 already active.
+Request: build resource PRINTED_FILE for module SAVE03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(SAVE03)
+  PARSER                         building   PARSED_CODE(SAVE03)
+                                 building   CALLEES(SAVE03)
+user warning in parser: Variable FOO cannot be declared static be cause of its storage class (tag=3)
+user error in parser: Parser error between lines 9 and 9
+SAVE statement incompatible with previous declaration (e.g. EXTERNAL).
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module SAVE03.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module FOO.
+  Closing module SAVE03.
+Closing program.
+Closing workspace.
+Workspace save03 closed.
+
+Workspace save03 deleted.

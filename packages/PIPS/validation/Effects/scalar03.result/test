@@ -1,0 +1,13 @@
+C       Uninitialized scalar variables
+	PROGRAM SCALAR03
+	INTEGER X,Y
+C               <must be exported>: X
+      CALL SUB(X, Y)                                                    0004
+      PRINT *, X, Y                                                     0005
+      END
+C               <may be exported >: X
+        SUBROUTINE SUB(X,Y)
+	INTEGER X,Y
+C               <must be exported>: X
+      X = Y                                                             0003
+      END

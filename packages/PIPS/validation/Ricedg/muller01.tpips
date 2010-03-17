@@ -1,0 +1,19 @@
+# To see if the region_chains is really as accurate as it could be for ARRAY...
+
+delete muller01
+create muller01 muller01.f
+
+activate MUST_REGIONS
+activate REGION_CHAINS
+
+apply RICE_REGIONS_DEPENDENCE_GRAPH [%ALL]
+
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+display PRINTED_FILE[SCALAR]
+display DG_FILE [SCALAR]
+display PRINTED_FILE[ARRAY]
+display DG_FILE [ARRAY]
+
+close
+# delete muller01
+quit

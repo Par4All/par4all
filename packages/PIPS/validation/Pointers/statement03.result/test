@@ -1,0 +1,39 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *x, *y, k[5], h;
+   k = 1;
+//               <must be written>: h
+   h = 2;
+//               <must be written>: x
+
+   x = &k[2];
+//               <must be written>: y
+   y = &h;
+//               <must be read   >: y
+//               <must be written>: x
+
+   x = y;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   int *x, *y, k[5], h;
+   k = 1;
+   h = 2;
+
+   x = &k[2];
+//  points to = {(x,k[2],E)}
+   y = &h;
+//  points to = {(y,h,E)(x,k[2],E)}
+
+   x = y;
+//  points to = {(y,h,E)(x,h,E)}
+
+   return 0;
+   // END BLOCK
+}

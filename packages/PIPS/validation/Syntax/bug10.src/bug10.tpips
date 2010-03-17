@@ -1,0 +1,18 @@
+delete un
+delete deux
+#
+# Il y a effectivement une erreur dans test1.f
+#
+create un test1.f
+module COURC4
+display CALLGRAPH_FILE(COURC4)
+close
+#
+# Mais pas dans test.f. Le parser n'est pas bien reinitialise.
+#
+create deux test.f
+module COURC4
+display CALLGRAPH_FILE(COURC4)
+close
+quit
+# EOF

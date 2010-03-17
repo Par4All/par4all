@@ -1,0 +1,40 @@
+delete inlining01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining01 inlining01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[inlining01!pmax]
+display PRINTED_FILE[main]
+
+echo
+echo Code after inlining
+echo
+
+# property not usefull here, but relevant for validation
+setproperty INLINING_CALLERS "main"
+apply INLINING[inlining01!pmax]
+apply RESTRUCTURE_CONTROL[main]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+# shell $(PIPS_CC) -c inlining01.database/Src/inlining01.c
+shell cc -c inlining01.database/Src/inlining01.c
+shell rm -f inlining01.o
+
+close
+delete inlining01
+quit
+

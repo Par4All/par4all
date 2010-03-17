@@ -1,0 +1,35 @@
+delete callgraph07
+create callgraph07 callgraph07.f
+
+make HEIGHT[%ALL]
+
+close
+
+open callgraph07
+
+make DEPTH[%ALL]
+
+close
+
+echo
+echo HEIGHT for CALLGRAPH07:
+shell cat callgraph07.database/CALLGRAPH07/HEIGHT
+echo HEIGHT for FOO:
+shell cat callgraph07.database/FOO/HEIGHT
+echo HEIGHT for BAR1:
+shell cat callgraph07.database/BAR1/HEIGHT
+echo HEIGHT for BAR2:
+shell cat callgraph07.database/BAR2/HEIGHT
+
+echo
+echo DEPTH for CALLGRAPH07:
+shell cat callgraph07.database/CALLGRAPH07/DEPTH
+echo DEPTH for FOO:
+shell cat callgraph07.database/FOO/DEPTH
+echo DEPTH for BAR1:
+shell cat callgraph07.database/BAR1/DEPTH
+echo DEPTH for BAR2:
+shell cat callgraph07.database/BAR2/DEPTH
+
+delete callgraph07
+quit

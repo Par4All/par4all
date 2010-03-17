@@ -1,0 +1,69 @@
+
+C  T() {}
+
+      PROGRAM LOOPEXIT9
+
+C     Check than n < 1 after the loop if no array overflow occurs
+
+      REAL U(1)
+
+C  T(I) {I==1, N<=0}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==1}
+
+C (0,2)
+
+      DO I = 1, N                                                       0007
+
+C  T() {0==-1}
+
+C (0,3)
+         U(I+1) = 0.                                                    0008
+      ENDDO
+
+C  T() {I==1, N<=0}
+
+C (0,4)
+
+      PRINT *, N                                                        0011
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      PROGRAM LOOPEXIT9
+
+C     Check than n < 1 after the loop if no array overflow occurs
+
+      REAL U(1)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      DO I = 1, N                                                       0007
+
+C  P() {0==-1}
+
+C (0,3)
+         U(I+1) = 0.                                                    0008
+      ENDDO
+
+C  P(I) {I==1, N<=0}
+
+C (0,4)
+
+      PRINT *, N                                                        0011
+
+C     END BLOCK
+      END
+

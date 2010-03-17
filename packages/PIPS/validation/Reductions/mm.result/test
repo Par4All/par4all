@@ -1,0 +1,100 @@
+
+Print code with proper reductions
+
+c square matrix multiplication
+      PROGRAM MATMUL
+      INTEGER N
+      PARAMETER (N=10)
+      REAL*8 A(N,N), B(N,N), C(N,N)
+      INTEGER I, J, K
+      DO J = 1, N                                                       0007
+         DO I = 1, N                                                    0008
+            A(I,J) = REAL(I-N/2)/REAL(J)                                0009
+            B(I,J) = REAL(J-3)/REAL(I)                                  0010
+         ENDDO
+      ENDDO
+c
+c matrix multiply: C=A*B
+c
+      DO J = 1, N                                                       0016
+         DO I = 1, N                                                    0017
+            C(I,J) = 0.                                                 0018
+            DO K = 1, N                                                 0019
+C  call sum[C(I,J)],
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0020
+            ENDDO
+         ENDDO
+      ENDDO
+c
+c again..
+c
+      DO J = 1, N                                                       0027
+         DO I = 1, N                                                    0028
+            C(I,J) = 0.                                                 0029
+         ENDDO
+      ENDDO
+      DO K = 1, N                                                       0032
+         DO J = 1, N                                                    0033
+            DO I = 1, N                                                 0034
+C  call sum[C(I,J)],
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0035
+            ENDDO
+         ENDDO
+      ENDDO
+c
+c output of the result
+c
+      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0042
+      END
+
+Print code with cumulated reductions
+
+c square matrix multiplication
+      PROGRAM MATMUL
+      INTEGER N
+      PARAMETER (N=10)
+      REAL*8 A(N,N), B(N,N), C(N,N)
+      INTEGER I, J, K
+      DO J = 1, N                                                       0007
+         DO I = 1, N                                                    0008
+            A(I,J) = REAL(I-N/2)/REAL(J)                                0009
+            B(I,J) = REAL(J-3)/REAL(I)                                  0010
+         ENDDO
+      ENDDO
+c
+c matrix multiply: C=A*B
+c
+      DO J = 1, N                                                       0016
+         DO I = 1, N                                                    0017
+            C(I,J) = 0.                                                 0018
+C  loop sum[C(I,J)],
+            DO K = 1, N                                                 0019
+C  call sum[C(I,J)],
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0020
+            ENDDO
+         ENDDO
+      ENDDO
+c
+c again..
+c
+      DO J = 1, N                                                       0027
+         DO I = 1, N                                                    0028
+            C(I,J) = 0.                                                 0029
+         ENDDO
+      ENDDO
+C  loop sum[C(*,*)],
+      DO K = 1, N                                                       0032
+C  loop sum[C(*,*)],
+         DO J = 1, N                                                    0033
+C  loop sum[C(*,J)],
+            DO I = 1, N                                                 0034
+C  call sum[C(I,J)],
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0035
+            ENDDO
+         ENDDO
+      ENDDO
+c
+c output of the result
+c
+      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0042
+      END

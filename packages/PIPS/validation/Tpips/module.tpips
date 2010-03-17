@@ -1,0 +1,44 @@
+delete m
+
+echo
+echo Select a wrong module name before the worskpace is created
+echo
+
+module TOTO
+
+create m module.f
+set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo In spite of the generate command, the main program, MODULE, should be selected
+echo
+
+display PRINTED_FILE
+
+echo
+echo Select a wrong module name after the creation of the worskpace
+echo
+
+module TOTO
+
+echo
+echo What is the current module? Still the previous one, MODULE, 
+echo since TOTO could not be generated
+echo
+
+display PRINTED_FILE
+
+echo
+echo Select the main program as module
+echo
+
+display PRINTED_FILE[%MAIN]
+
+echo
+echo Select MODULE as current module
+echo
+
+module MODULE
+display PRINTED_FILE
+close
+delete m

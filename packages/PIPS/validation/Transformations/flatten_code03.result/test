@@ -1,0 +1,50 @@
+
+Initial code
+
+int flatten_code03()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   int j;
+   i++;
+   {
+      // BEGIN BLOCK
+      int i = 2;
+      i++;
+      j = 1;
+      // END BLOCK
+   }
+   {
+      // BEGIN BLOCK
+      int i = 3;
+      i++;
+      j = 1;
+      // END BLOCK
+   }
+   i = j;
+
+   printf("%d %d\n", i, j);
+   // END BLOCK
+}
+
+Code after flatten_code
+
+int flatten_code03()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   int j;
+   //PIPS generated variable
+   int i_0 = 2;
+   //PIPS generated variable
+   int i_1 = 3;
+   i++;
+   i_0++;
+   j = 1;
+   i_1++;
+   j = 1;
+   i = j;
+
+   printf("%d %d\n", i, j);
+   // END BLOCK
+}

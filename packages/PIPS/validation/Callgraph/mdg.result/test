@@ -1,0 +1,88 @@
+
+C  T() {0==-1}
+
+ MDG
+    
+C      T(NATOMS) {NATOMS==3}
+    
+     CNSTNT
+    
+C      T(NATMO,NATMO3,NMOL1) {3NATMO==NATMO3, NMOL==NMOL1+1}
+    
+     SYSCNS
+    
+C      T() {}
+    
+     KINETI
+    
+C      T() {}
+    
+     NRMLKT
+    
+C      T(RAND:I2,RAND:IW) {}
+    
+     INITIA
+        
+C          T(I2,IW) {}
+        
+         RAND
+    
+C      T() {}
+    
+     INTRAF
+    
+C      T() {}
+    
+     INTERF
+        
+C          T() {}
+        
+         CSHIFT
+    
+C      T() {}
+    
+     MDMAIN
+        
+C          T() {}
+        
+         PREDIC
+        
+C          T() {}
+        
+         INTRAF
+        
+C          T() {}
+        
+         INTERF
+            
+C              T() {}
+            
+             CSHIFT
+        
+C          T() {}
+        
+         CORREC
+        
+C          T() {}
+        
+         BNDRY
+        
+C          T() {}
+        
+         KINETI
+        
+C          T() {}
+        
+         POTENG
+            
+C              T() {}
+            
+             CSHIFT
+        
+C          T() {}
+        
+         SAVEDT
+        
+C          T() {}
+        
+         NRMLKT

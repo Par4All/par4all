@@ -1,0 +1,22 @@
+      FUNCTION D(X)
+      D = X                                                             0002
+      END
+      FUNCTION E(X)
+      D = X                                                             0002
+      E = D                                                             0003
+      END
+C     Declaration bug observed in aile.f: a conflict MAY occur if a local
+C     variable has the same name as a function (may be also true for
+C     other global variables, subroutines and commons);
+C
+C     A conflict ALWAYS occurs if a COMMON and a FUNCTION or a SUBROUTINE
+C     have the same name
+C
+C     If function d is parsed BEFORE function e, e cannot be parsed; e.d seems
+C     to be identified with top-level:d
+C
+C     Francois Irigoin, April 91
+      PROGRAM FUNVAR
+      X = D(5)                                                          0013
+      Y = E(6)                                                          0014
+      END

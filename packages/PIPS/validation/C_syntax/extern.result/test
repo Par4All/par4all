@@ -1,0 +1,21 @@
+extern void sc_to_matrices();
+extern int a[10];
+extern struct foo {
+   int mem;
+} x;
+
+extern struct foo y;
+
+
+extern int (*potentials[10])(), (*forces[10])(), nused;
+
+extern int foo();
+int foo()
+{
+   extern int i;
+   /* Yes, a function may be declared inside itself... */
+   int foo();
+   extern int (*p)();
+   extern int (*f)();
+   extern int b[20];
+}

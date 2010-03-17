@@ -1,0 +1,83 @@
+## DOALL style
+      PROGRAM P
+      REAL A(10,10,10,10,10)
+      DOALL M = 2, 5                                                    0003
+         PRIVATE L
+         DOALL L = 5, 7                                                 0004
+            PRIVATE K
+            DOALL K = 1, 2                                              0005
+               PRIVATE J
+               DOALL J = 1, 2                                           0006
+                  PRIVATE I
+                  DOALL I = 1, 10                                       0007
+                     PRIVATE Z,Y,X,W
+                     X = 2.3                                            0008
+                     Y = 5.3+X                                          0009
+                     Z = 2.32+Y                                         0010
+                     W = 1.2+Z                                          0011
+                     A(I,J,K,L,M) = X*X+X+Z                             0012
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+## HPF style
+      PROGRAM P
+      REAL A(10,10,10,10,10)
+
+!HPF$ INDEPENDENT, NEW(L)
+      DO M = 2, 5                                                       0003
+
+!HPF$    INDEPENDENT, NEW(K)
+         DO L = 5, 7                                                    0004
+
+!HPF$       INDEPENDENT, NEW(J)
+            DO K = 1, 2                                                 0005
+
+!HPF$          INDEPENDENT, NEW(I)
+               DO J = 1, 2                                              0006
+
+!HPF$             INDEPENDENT, NEW(Z,Y,X,W)
+                  DO I = 1, 10                                          0007
+                     X = 2.3                                            0008
+                     Y = 5.3+X                                          0009
+                     Z = 2.32+Y                                         0010
+                     W = 1.2+Z                                          0011
+                     A(I,J,K,L,M) = X*X+X+Z                             0012
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+## OMP style
+      PROGRAM P
+      REAL A(10,10,10,10,10)
+
+!$OMP PARALLEL DO PRIVATE(L)
+      DO M = 2, 5                                                       0003
+
+!$OMP    PARALLEL DO PRIVATE(K)
+         DO L = 5, 7                                                    0004
+
+!$OMP       PARALLEL DO PRIVATE(J)
+            DO K = 1, 2                                                 0005
+
+!$OMP          PARALLEL DO PRIVATE(I)
+               DO J = 1, 2                                              0006
+
+!$OMP             PARALLEL DO PRIVATE(Z,Y,X,W)
+                  DO I = 1, 10                                          0007
+                     X = 2.3                                            0008
+                     Y = 5.3+X                                          0009
+                     Z = 2.32+Y                                         0010
+                     W = 1.2+Z                                          0011
+                     A(I,J,K,L,M) = X*X+X+Z                             0012
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+## done

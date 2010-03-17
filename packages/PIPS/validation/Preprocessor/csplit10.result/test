@@ -1,0 +1,10 @@
+/* See what happens with old style declarations. */
+
+extern int csplit10();
+# 3
+int csplit10(i, pj)
+     int i;
+     int * pj;
+{
+  *pj = i;
+}

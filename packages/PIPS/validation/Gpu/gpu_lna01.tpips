@@ -1,0 +1,21 @@
+delete gpu_lna01
+create gpu_lna01 gpu_lna01.c
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+module p4a_kernel_launcher_1
+display PRINTED_FILE
+apply GPU_LOOP_NEST_ANNOTATE
+
+display PRINTED_FILE
+
+close
+delete gpu_lna01
+quit

@@ -1,0 +1,22 @@
+delete t
+
+setproperty ABORT_ON_USER_ERROR FALSE
+
+create t io_statement.f
+
+# Type checking
+apply TYPE_CHECKER[IO_STATEMENT]
+
+echo
+echo Printed file for "IO_STATEMENT"
+echo
+
+display PRINTED_FILE
+
+echo
+echo Summary:
+echo
+
+close
+shell cat t.database/Warnings
+delete t

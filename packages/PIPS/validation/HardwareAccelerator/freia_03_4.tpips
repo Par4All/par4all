@@ -1,0 +1,5 @@
+setproperty HWAC_SPOC_DEPTH 4
+setenv WSPACE freia_03_4
+setenv FILE $WSPACE.c
+setenv NAME freia_03
+source default_tpips

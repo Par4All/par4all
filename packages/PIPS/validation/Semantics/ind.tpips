@@ -1,0 +1,18 @@
+delete ind
+create ind ind.f
+
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRINT_CODE_PRECONDITIONS
+
+echo --- Preconditions for module DATAST
+display PRINTED_FILE[DATAST]
+
+# quit
+
+echo --- Preconditions for module IND
+display PRINTED_FILE[IND]
+close
+#delete ind
+quit

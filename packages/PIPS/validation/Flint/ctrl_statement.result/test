@@ -1,0 +1,27 @@
+C     This program is written for testing module TYPING:
+C     * Verification the syntax of control statement *
+C
+C     Written by PHAM DINH Son - trainee 03/00-09/00
+C     May, 30, 2000
+C
+      PROGRAM CTRL_STATEMENT
+      INTEGER I
+
+C     Without arguments
+C     =================
+
+C     At most one argument: 
+C        * Integer constant with not more than 5 digits
+C        * Character constant
+C     =======================
+      STOP                                                              0002
+      STOP 12345                                                        0003
+      STOP "STRING"                                                     0004
+
+!ERROR: Argument must be an integer of at most 5 digits (instead of '10')
+      STOP 1234567890                                                   0005
+!ERROR: Argument #1 of 'STOP' must be an integer or character constant
+      STOP I                                                            0006
+
+      END
+

@@ -1,0 +1,137 @@
+
+Transformers for "W18"
+
+
+C  T() {}
+
+      PROGRAM W18
+
+C     Check refined transformer for while loop with unknownn entry condition
+
+      INTEGER T, L, X
+      EXTERNAL ALEA
+      LOGICAL ALEA
+
+C  T(L,T,X) {L+T#init==L#init+T, T+X#init==T#init+X, T#init<=T}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(L,T,X) {L+T#init==L#init+T, T+X#init==T#init+X, T#init<=T}
+
+C (0,2)
+
+      IF (.TRUE.) THEN                                                  0009
+
+C  T(L,T,X) {L+X#init==L#init+X, T+X#init==T#init+X, T#init<=T, X<=9,
+C    X#init<=9}
+
+C (0,3)
+         DO WHILE (X.LE.9.AND.ALEA())                                   0010
+
+C  T(L,T,X) {L==L#init+1, T==T#init+1, X==X#init+1, X<=10}
+
+C (0,4)
+C           BEGIN BLOCK
+
+C  T(T) {T==T#init+1, X<=9}
+
+C (0,5)
+            T = T+1                                                     0011
+
+C  T(L) {L==L#init+1, X<=9}
+
+C (0,6)
+            L = L+1                                                     0012
+
+C  T(X) {X==X#init+1, X<=10}
+
+C (0,7)
+            X = X+1                                                     0013
+C           END BLOCK
+         ENDDO
+      ELSE
+
+C  T() {}
+
+C (0,8)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  T() {}
+
+C (0,9)
+
+      PRINT *, I                                                        0017
+
+C     END BLOCK
+      END
+
+Preconditions for "W18"
+
+
+C  P() {}
+
+      PROGRAM W18
+
+C     Check refined transformer for while loop with unknownn entry condition
+
+      INTEGER T, L, X
+      EXTERNAL ALEA
+      LOGICAL ALEA
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      IF (.TRUE.) THEN                                                  0009
+
+C  P() {}
+
+C (0,3)
+         DO WHILE (X.LE.9.AND.ALEA())                                   0010
+
+C  P(L,T,X) {X<=9}
+
+C (0,4)
+C           BEGIN BLOCK
+
+C  P(L,T,X) {X<=9}
+
+C (0,5)
+            T = T+1                                                     0011
+
+C  P(L,T,X) {X<=9}
+
+C (0,6)
+            L = L+1                                                     0012
+
+C  P(L,T,X) {X<=9}
+
+C (0,7)
+            X = X+1                                                     0013
+C           END BLOCK
+         ENDDO
+      ELSE
+
+C  P() {0==-1}
+
+C (0,8)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  P(L,T,X) {}
+
+C (0,9)
+
+      PRINT *, I                                                        0017
+
+C     END BLOCK
+      END

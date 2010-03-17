@@ -1,0 +1,24 @@
+delete adn09
+create adn09 adn09.f
+
+#display PRINTED_FILE[%ALL]
+
+make NEW_DECLARATIONS[%ALL]
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+display PRINTED_FILE[%ALL]
+apply UNSPLIT
+
+shell /users/cri/nguyen/Experiment/Script/array_resizing_instrument.pl < adn09.database/TD_instrument.out
+
+shell cat adn09.database/Src/adn09.f
+quit
+

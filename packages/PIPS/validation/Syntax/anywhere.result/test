@@ -1,0 +1,8 @@
+      PROGRAM ANYWHERE
+      INTEGER I
+      DATA I /1/
+! moved up...
+      DATA J/2/
+      PRINT *, I                                                        0004
+      PRINT *, J                                                        0007
+      END

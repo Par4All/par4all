@@ -1,0 +1,381 @@
+--- Preconditions for module VALIDATION_DEAD_CODE
+
+C  P() {}
+
+      PROGRAM VALIDATION_DEAD_CODE
+      INTEGER A, B
+
+C  P() {}
+
+
+      J = 3                                                             0004
+
+C  P(J) {J==3}
+
+
+c     if inutile qui doit disparai^tre No 1 (vide de`s le source) :
+      IF (B.GE.A) THEN                                                  0007
+      ELSE
+      ENDIF
+
+C  P(J) {J==3}
+
+
+c     if inutile qui doit disparai^tre No 2 (devient vide par e'limination ) :
+      IF (B.GE.A) THEN                                                  0012
+
+C  P(J) {J==3, A<=B}
+
+c     if faux :
+         IF (1.EQ.0) THEN                                               0014
+
+C  P() {0==-1}
+
+            I = 1                                                       0015
+         ELSE
+         ENDIF
+      ELSE
+
+C  P(J) {J==3, B+1<=A}
+
+c     if faux :
+         IF (J.EQ.5) THEN                                               0019
+
+C  P() {0==-1}
+
+            I = 1                                                       0020
+         ELSE
+         ENDIF
+
+C  P(J) {J==3, B+1<=A}
+
+
+         CONTINUE
+      ENDIF
+
+C  P(J) {J==3}
+
+
+c     Teste les optimisations imbrique'es
+c     Doit e^tre re'e'crit :
+c     i = -9 (devrait i = 1 et i = -9)
+      IF (J.NE.5) THEN                                                  0028
+
+C  P(J) {J==3}
+
+         DO I = 1, 0                                                    0029
+
+C  P() {0==-1}
+
+            RIEN = J+0                                                  0030
+         ENDDO
+
+C  P(I,J) {I==1, J==3}
+
+         IF (J.EQ.6) THEN                                               0032
+
+C  P() {0==-1}
+
+            I = -8                                                      0033
+         ELSE
+
+C  P(I,J) {I==1, J==3}
+
+            I = -9                                                      0035
+         ENDIF
+      ELSE
+
+C  P() {0==-1}
+
+         J = 6                                                          0038
+      ENDIF
+
+C  P(I,J) {I==-9, J==3}
+
+
+      DO I = 1, 0                                                       0041
+
+C  P() {0==-1}
+
+         J = J+0                                                        0042
+      ENDDO
+
+C  P(I,J) {I==1, J==3}
+
+c     Bizarre : la pre'condition sur j est ici impre'cise !
+c     Devrait avoir i = -2 car j = 3...
+      IF (J.EQ.6) THEN                                                  0046
+
+C  P() {0==-1}
+
+         I = -1                                                         0047
+      ELSE
+
+C  P(I,J) {I==1, J==3}
+
+         I = -2                                                         0049
+      ENDIF
+
+C  P(I,J) {I==-2, J==3}
+
+
+c     doit e^tre re'e'crit :
+c     j = j + 2
+      IF (A.GT.10.AND.A.LT.10) THEN                                     0054
+
+C  P() {0==-1}
+
+         J = J+1                                                        0055
+
+C  P() {0==-1}
+
+c Si je veux compliquer :-)
+c         goto 18
+         CONTINUE
+      ELSE
+
+C  P(I,J) {I==-2, J==3}
+
+         J = J+2                                                        0059
+      ENDIF
+
+C  P(I,J) {I==-2, J==5}
+
+
+      IF (A.GT.3.AND.B.EQ.5) THEN                                       0062
+
+C  P(I,J) {B==5, I==-2, J==5, 4<=A}
+
+         RIEN = 2                                                       0063
+      ELSE
+
+C  P(I,J) {I==-2, J==5}
+
+         RIEN = 3                                                       0065
+      ENDIF
+
+C  P(I,J) {I==-2, J==5}
+
+      PRINT *, J                                                        0067
+
+C  P(I,J) {I==-2, J==5}
+
+
+c     devrait e^tre re'e'crit :
+c     rien = rien + 1
+c     i = 1
+      DO 40 I = 0, 1                                                    0072
+
+C  P(I,J) {J==5, 0<=I, I<=1}
+
+         RIEN = RIEN+1                                                  0073
+
+C  P(I,J) {J==5, 0<=I, I<=1}
+
+40       CONTINUE                                                       0074
+
+C  P(I,J) {I==2, J==5}
+
+
+c     devrait e^tre supprime' :
+      DO 20 J = I, 0, 2                                                 0077
+
+C  P() {0==-1}
+
+         RIEN = RIEN+1                                                  0078
+
+C  P() {0==-1}
+
+20       CONTINUE                                                       0079
+
+C  P(I,J) {I==2, J==2}
+
+
+18    I = 2                                                             0081
+
+C  P(I,J) {I==2, J==2}
+
+
+c     doit e^tre re'e'crit :
+c19   i = j + 1
+19    DO 30 I = J+1, J, 5                                               0085
+
+C  P() {0==-1}
+
+c     commentaire sur un goto :
+10       CONTINUE                                                       0090
+
+C  P() {0==-1}
+
+30       CONTINUE                                                       0091
+
+C  P(I,J) {I==3, J==2}
+
+
+c     doit e^tre re'e'crit :
+c     j = 1
+      IF (I.EQ.J+1) THEN                                                0095
+
+C  P(I,J) {I==3, J==2}
+
+         J = 1                                                          0096
+      ELSE
+
+C  P() {0==-1}
+
+         J = 2                                                          0098
+      ENDIF
+
+C  P(I,J) {I==3, J==1}
+
+      PRINT *, J                                                        0100
+
+C  P(I,J) {I==3, J==1}
+
+
+c     doit e^tre supprime' :
+      DO J = 3, 2                                                       0103
+
+C  P() {0==-1}
+
+         RIEN = RIEN+1                                                  0104
+
+C  P() {0==-1}
+
+         I = 3                                                          0105
+      ENDDO
+
+C  P(I,J) {I==3, J==3}
+
+
+c     doit e^tre supprime' :
+      DO J = 2, 7, -5                                                   0109
+
+C  P() {0==-1}
+
+         RIEN = RIEN+1                                                  0110
+
+C  P() {0==-1}
+
+         I = 7                                                          0111
+      ENDDO
+
+C  P(I,J) {I==3, J==2}
+
+
+c     inchange' :
+      I = 4                                                             0115
+
+C  P(I,J) {I==4, J==2}
+
+c     doit e^tre re'e'crit :
+c     j = 4
+      IF (I.EQ.5) THEN                                                  0118
+
+C  P() {0==-1}
+
+         J = 3                                                          0119
+      ELSE
+
+C  P(I,J) {I==4, J==2}
+
+         J = 4                                                          0121
+      ENDIF
+
+C  P(I,J) {I==4, J==4}
+
+
+c     doit e^tre re'e'crit :
+c     j = 5
+      IF (.NOT.I.EQ.5) THEN                                             0126
+
+C  P(I,J) {I==4, J==4}
+
+         J = 5                                                          0127
+      ELSE
+
+C  P() {0==-1}
+
+         J = 6                                                          0129
+      ENDIF
+
+C  P(I,J) {I==4, J==5}
+
+C     BEGIN UNSTRUCTURED
+
+C  P(A,I,J,K) {I==4}
+
+
+      IF (I.EQ.5) GOTO 31                                               0132
+
+C  P(I,J) {I==4, J==5}
+
+      PRINT *, 'salut'                                                  0133
+
+C  P(I,J) {I==4, J==5}
+
+31    A = 9                                                             0134
+
+C  P(A,I,J) {A==9, I==4, J==5}
+
+
+c     Ce test est en soit infaisable :
+c     doit e^tre re'e'crit :
+c     j = 8
+      IF (I.GT.5.AND.3.GT.I) THEN                                       0139
+
+C  P() {0==-1}
+
+         J = 7                                                          0140
+      ELSE
+
+C  P(A,I,J) {A==9, I==4, J==5}
+
+         J = 8                                                          0142
+      ENDIF
+
+C  P(I,J) {I==4, J==5}
+
+
+c     de'pendance sur ce qui pre'ce`de :
+c     doit e^tre re'e'crit :
+c     k = 1
+c     goto 100
+      IF (J.GE.3) GOTO 99999                                            0149
+
+C  P() {0==-1}
+
+      K = 1                                                             0153
+      GOTO 100
+99999 CONTINUE
+
+C  P(I,J) {I==4, J==5}
+
+      K = 3                                                             0150
+
+C  P(I,J) {I==4, J==5}
+
+c     doit e^tre conserve' :
+100   CONTINUE                                                          0170
+C     END UNSTRUCTURED
+
+C  P(I,J) {I==4, J==5}
+
+      I = I+1                                                           0170
+
+C  P(I,J) {I==5, J==5}
+
+
+      STOP                                                              0172
+
+C  P() {0==-1}
+
+
+c     doit e^tre supprime' :
+      J = A                                                             0175
+
+C  P() {0==-1}
+
+
+      RETURN
+      END

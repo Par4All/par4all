@@ -1,0 +1,50 @@
+Code after loop normalize
+
+C     
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C     
+C     DATA FLOW INTERPROCEDURAL ANALYSIS
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C     
+      SUBROUTINE MM03(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C     
+      DO NLC1 = 1, N                                                    0002
+         DO NLC2 = 1, N                                                 0004
+            C(NLC1,NLC2) = 0.0                                          0005
+         ENDDO
+         J = MAX(N, 0)+1
+      ENDDO
+      I = MAX(N, 0)+1
+C     
+      DO NLC3 = 1, N                                                    0007
+         DO NLC4 = 1, N                                                 0009
+            CALL SAXPY(N, C(1,NLC3), A(1,NLC4), B(NLC4,NLC3))           0010
+         ENDDO
+         K = MAX(N, 0)+1
+      ENDDO
+      J = MAX(N, 0)+1
+C
+      END
+Code after atomizer
+
+      SUBROUTINE MM03(N,A,B,C)
+      INTEGER N,I,J,K,ITMP1
+      REAL*8 A(1:N,1:N),B(1:N,1:N),C(1:N,1:N),XAUX(0:127)
+      ITMP1 = N                                                         0002
+      DO NLC1 = 1, ITMP1
+         DO NLC2 = 1, ITMP1                                             0004
+            C(NLC1,NLC2) = 0.0                                          0005
+         ENDDO
+      ENDDO
+C     
+      DO NLC3 = 1, ITMP1                                                0007
+         DO NLC4 = 1, ITMP1                                             0009
+            CALL SAXPY(N, C(1,NLC3), A(1,NLC4), B(NLC4,NLC3))           0010
+         ENDDO
+      ENDDO
+C
+      END
+

@@ -1,0 +1,100 @@
+
+Flinted file
+
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"T" used but not initialized.
+	"L" used but not initialized.
+	"KP" used but not initialized.
+	"JP" used but not initialized.
+	"T" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"T" used but not initialized.
+	"T" used but not initialized.
+	"T" used but not initialized.
+	"T" used but not initialized.
+
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+number of messages from flint for D : 15
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"NXYZ" used but not initialized.
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 2 (0.3):
+	"NXYZ" used but not initialized.
+In statement number 8 (0.10):
+	"NI" used but not initialized.
+In statement number 11 (0.14):
+	"J" used but not initialized.
+In statement number 12 (0.15):
+	"J" used but not initialized.
+In statement number 13 (0.16):
+	"J" used but not initialized.
+In statement number 14 (0.17):
+	"NC" used but not initialized.
+	"J" used but not initialized.
+In statement number 15 (0.18):
+	"NC" used but not initialized.
+	"J" used but not initialized.
+In statement number 16 (0.19):
+	"NC" used but not initialized.
+	"J" used but not initialized.
+In statement number 17 (0.20):
+	"NC" used but not initialized.
+	"J" used but not initialized.
+In statement number 18 (0.21):
+	"NC" used but not initialized.
+	"J" used but not initialized.
+In statement number 19 (0.22):
+	"NC" used but not initialized.
+	"J" used but not initialized.
+
+flint message from check_call: WARNING, in module EXTR, in statement (0.14), number 11
+may be incompatible basic type, 4th arg in call to TOP-LEVEL:D
+flint message from check_call: WARNING, in module EXTR, in statement (0.15), number 12
+may be incompatible basic type, 2th arg in call to TOP-LEVEL:D
+flint message from check_call: WARNING, in module EXTR, in statement (0.15), number 12
+may be incompatible basic type, 4th arg in call to TOP-LEVEL:D
+flint message from check_call: WARNING, in module EXTR, in statement (0.16), number 13
+may be incompatible basic type, 2th arg in call to TOP-LEVEL:D
+flint message from check_call: WARNING, in module EXTR, in statement (0.16), number 13
+may be incompatible basic type, 4th arg in call to TOP-LEVEL:D
+flint message from check reference: WARNING, in module EXTR, in statement (0.17), number 14
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.18), number 15
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.19), number 16
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.20), number 17
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.20), number 17
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.20), number 17
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.21), number 18
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.21), number 18
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.21), number 18
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.22), number 19
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.22), number 19
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module EXTR, in statement (0.22), number 19
+the 3th index may not be a mere integer
+number of messages from flint for EXTR : 36

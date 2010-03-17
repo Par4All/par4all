@@ -1,0 +1,23 @@
+delete muller06
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create muller06 muller06.f
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+echo
+echo Source code
+echo
+
+display PRINTED_FILE
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat muller06.database/Warnings
+
+quit

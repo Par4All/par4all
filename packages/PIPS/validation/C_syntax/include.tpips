@@ -1,0 +1,25 @@
+delete include
+create include include.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5 
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+display PRINTED_FILE[include!]
+display PRINTED_FILE[main]
+
+#make TRANSFORMERS[%ALL]
+
+#setenv SEMANTICS_DEBUG_LEVEL 8
+#make PRECONDITIONS[%ALL]
+
+close
+
+delete include
+
+quit

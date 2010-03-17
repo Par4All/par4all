@@ -1,0 +1,27 @@
+
+C  T() {}
+
+      PROGRAM NON_LINEAR02
+
+C  T(K) {I==2}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T() {I==2}
+
+C (0,2)
+
+C     Check non-linear expression handling
+
+      IF (I.NE.2) STOP                                                  0005
+
+C  T(K) {}
+
+C (0,5)
+
+      K = I*(J-3)                                                       0007
+
+C     END BLOCK
+      END
+

@@ -1,0 +1,28 @@
+delete FULGURO_01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create FULGURO_01 kernels/fulguro/fulguro01.c include/SIMD.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[flgr1d_arith_add_fgINT32]
+
+source include/benchmark.tpips.h
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE[flgr1d_arith_add_fgINT32]
+
+close
+quit

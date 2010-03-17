@@ -1,0 +1,12 @@
+
+Printed file
+
+      SUBROUTINE CAMAT ()
+1     CONTINUE
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      SUBROUTINE CAMAT ()
+1     CONTINUE
+      END

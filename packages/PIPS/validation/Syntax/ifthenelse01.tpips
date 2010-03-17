@@ -1,0 +1,6 @@
+delete ifthenelse01
+create ifthenelse01 ifthenelse01.f
+display PRINTED_FILE
+close
+delete ifthenelse01
+quit

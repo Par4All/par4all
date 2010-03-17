@@ -1,0 +1,28 @@
+delete icm01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS  TRUE
+
+create icm01 icm01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE            TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER  TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[icm01]
+
+echo
+echo Code after Invariant Code Motion
+echo
+apply ICM[icm01]
+activate PRINT_CODE
+display PRINTED_FILE[icm01]
+
+close
+delete icm01
+quit
+

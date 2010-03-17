@@ -1,0 +1,27 @@
+setenv WSPACE inlining22
+delete ${WSPACE}
+setenv MAIN $WSPACE.database/main
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} inlining22.src/inlining22.c inlining22.src/inlining22-foo.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+display CALLGRAPH_FILE[main]
+
+activate PRINT_CODE
+display PRINTED_FILE[foo]
+display PRINTED_FILE[main]
+
+apply INLINING[foo]
+display PRINTED_FILE[main]
+
+close
+delete inlining22
+quit

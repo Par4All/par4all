@@ -1,0 +1,26 @@
+c     Should not fade away the final return
+      SUBROUTINE FOO
+      PRINT *, 'live'                                                   0003
+      STOP                                                              0004
+      PRINT *, 'dead'                                                   0005
+      RETURN
+      END
+c     Should not fade away the final return
+      SUBROUTINE FOO
+      PRINT *, 'live'                                                   0003
+      STOP                                                              0004
+      PRINT *, 'dead'                                                   0005
+      RETURN
+      END
+c     Should not fade away the final return
+      SUBROUTINE FOO
+      PRINT *, 'live'                                                   0003
+      STOP                                                              0004
+      RETURN
+      END
+c     Should not fade away the final return
+      SUBROUTINE FOO
+      PRINT *, 'live'                                                   0003
+      STOP                                                              0004
+      RETURN
+      END

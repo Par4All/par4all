@@ -1,0 +1,142 @@
+user warning in tp_parse: entry21: No such workspace
+Registering file entry21.f
+Splitting file    ./entry21.f
+  Module         ENTRY21
+  Module         INCREMENT
+Workspace entry21 created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+echo
+
+echo Module ENTRY21
+Module ENTRY21
+echo
+
+Module ENTRY21 selected
+Request: build resource PRINTED_FILE for module ENTRY21.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENTRY21)
+  PARSER                         building   PARSED_CODE(ENTRY21)
+                                 building   CALLEES(ENTRY21)
+
+Declarations for module ENTRY21 with type INTEGER*4 x INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity ENTRY21:*DYNAMIC*	with type area with size 4
+Declared entity ENTRY21:*HEAP*	with type area with size 0
+Declared entity ENTRY21:*STACK*	with type area with size 0
+Declared entity ENTRY21:*STATIC*	with type area with size 0
+Declared entity ENTRY21:K	with type variable INTEGER*4
+Declared entity ENTRY21:M	with type variable INTEGER*4
+Declared entity ENTRY21:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable ENTRY21:K,	offset = 1
+	Variable ENTRY21:M,	offset = 2
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable ENTRY21:N,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module ENTRY21
+
+user warning in control_graph: Some statements are unreachable
+  CONTROLIZER                    building   CODE(ENTRY21)
+user warning in control_graph: Some statements are unreachable
+  PRINT_CODE                     building   PRINTED_FILE(ENTRY21)
+PRINTED_FILE made for ENTRY21.
+      SUBROUTINE ENTRY21(K, M)
+      INTEGER K, M, N
+      PRINT *, N                                                        0005
+
+
+      END
+echo
+
+echo Entry INCREMENT
+Entry INCREMENT
+echo
+
+Module INCREMENT selected
+Request: build resource PRINTED_FILE for module INCREMENT.
+  PARSER                         building   PARSED_CODE(INCREMENT)
+                                 building   CALLEES(INCREMENT)
+
+Declarations for module INCREMENT with type INTEGER*4 x INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity INCREMENT:*DYNAMIC*	with type area with size 4
+Declared entity INCREMENT:*HEAP*	with type area with size 0
+Declared entity INCREMENT:*STACK*	with type area with size 0
+Declared entity INCREMENT:*STATIC*	with type area with size 0
+Declared entity INCREMENT:K	with type variable INTEGER*4
+Declared entity INCREMENT:M	with type variable INTEGER*4
+Declared entity INCREMENT:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable INCREMENT:K,	offset = 2
+	Variable INCREMENT:M,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable INCREMENT:N,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module INCREMENT
+
+  CONTROLIZER                    building   CODE(INCREMENT)
+  PRINT_CODE                     building   PRINTED_FILE(INCREMENT)
+PRINTED_FILE made for INCREMENT.
+      SUBROUTINE INCREMENT(M, K)
+      INTEGER M, K, N
+
+99999 CONTINUE                                                          0004
+
+      M = K+1                                                           0006
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ENTRY21.
+  Closing module INCREMENT.
+Closing program.
+Closing workspace.
+Workspace entry21 closed.
+
+Workspace entry21 deleted.

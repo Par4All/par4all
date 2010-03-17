@@ -1,0 +1,79 @@
+user warning in tp_parse: entry19: No such workspace
+Registering file entry19.f
+Splitting file    ./entry19.f
+  Module         ENTRY19
+  Module         INCREMENT
+Workspace entry19 created and opened.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+echo
+
+echo Module ENTRY19
+Module ENTRY19
+echo
+
+Module ENTRY19 selected
+Request: build resource PRINTED_FILE for module ENTRY19.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ENTRY19)
+  PARSER                         building   PARSED_CODE(ENTRY19)
+                                 building   CALLEES(ENTRY19)
+
+Declarations for module ENTRY19 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity ENTRY19:*DYNAMIC*	with type area with size 0
+Declared entity ENTRY19:*HEAP*	with type area with size 0
+Declared entity ENTRY19:*STACK*	with type area with size 0
+Declared entity ENTRY19:*STATIC*	with type area with size 0
+Declared entity ENTRY19:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable ENTRY19:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module ENTRY19
+
+user warning in control_graph: Some statements are unreachable
+  CONTROLIZER                    building   CODE(ENTRY19)
+user warning in control_graph: Some statements are unreachable
+  PRINT_CODE                     building   PRINTED_FILE(ENTRY19)
+PRINTED_FILE made for ENTRY19.
+      SUBROUTINE ENTRY19(N)
+      INTEGER N
+
+      PRINT *, N                                                        0005
+
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ENTRY19.
+  Closing module INCREMENT.
+Closing program.
+Closing workspace.
+Workspace entry19 closed.
+
+Workspace entry19 deleted.

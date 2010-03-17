@@ -1,0 +1,8 @@
+delete static01
+create static01 static01.f
+module STATIC01
+display PRINTED_FILE[STATIC01]
+close
+delete static01
+quit
+

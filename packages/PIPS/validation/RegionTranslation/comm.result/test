@@ -1,0 +1,308 @@
+--- Regions for COMM
+
+C  <AA(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <AA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <AB(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <AB(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <AC(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <AC(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <BA(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5}>
+C  <BA(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5}>
+C  <CA(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <CA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <CB(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=4}>
+C  <CB(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=3}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+C     interprocedural propagation of regions concerning global 
+C     arrays
+      PROGRAM COMM
+      COMMON /CA/ AA(5), AB(5), AC(5)
+      COMMON /CB/ BA(5,5)
+      COMMON /CC/ CA(5), CB(5,4)
+
+C  <AA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <AB(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <AC(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+
+
+      CALL COMM1                                                        0001
+
+C  <AA(PHI1)-W-EXACT-{2<=PHI1, PHI1<=5}>
+C  <AB(PHI1)-W-MAY-{1<=PHI1, PHI1<=5}>
+C  <AC(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+
+      CALL COMM1B                                                       0002
+
+C  <BA(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5}>
+
+      CALL COMM2                                                        0003
+
+C  <BA(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5}>
+
+      CALL COMM2B                                                       0004
+
+C  <CA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <CB(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=3}>
+
+      CALL COMM3                                                        0005
+
+C  <CB(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=3}>
+
+      CALL COMM3B                                                       0006
+
+C  <AA(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+
+      PRINT *, (AA(I), I = 1, 5)                                        0007
+
+C  <AB(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, (AB(I), I = 1, 5)                                        0008
+
+C  <AC(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, (AC(I), I = 1, 5)                                        0009
+
+C  <BA(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, ((BA(I,J), I = 1, 5), J = 1, 5)                          0010
+
+C  <CA(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, (CA(I), I = 1, 5)                                        0011
+
+C  <CB(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=4}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, ((CB(I,J), I = 1, 5), J = 1, 4)                          0012
+      END
+--- OUT Regions for COMM1
+
+C  <AD(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=7}>
+C  <AE(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=3}>
+
+
+      SUBROUTINE COMM1()
+      COMMON /CA/ AD(7), AE(6), AF(2)      
+
+C  <AD(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=7}>
+
+      DO I = 1, 7                                                       0001
+
+C  <AD(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=7}>
+
+         AD(I) = I                                                      0002
+      ENDDO
+
+C  <AE(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=3}>
+
+      DO I = 1, 6                                                       0003
+
+C  <AE(PHI1)-OUT-MAY-{I==PHI1, 1<=PHI1, PHI1<=3}>
+
+         AE(I) = I                                                      0004
+      ENDDO
+      DO I = 1, 2                                                       0005
+         AF(I) = I                                                      0006
+      ENDDO
+      END
+--- OUT Regions for COMM1B
+
+C  <AD(PHI1)-OUT-MAY-{2<=PHI1, PHI1<=7}>
+C  <AE(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=6}>
+C  <AF(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=2}>
+
+
+      SUBROUTINE COMM1B()
+      COMMON /CA/ AD(7), AE(6), AF(2)      
+
+C  <AD(PHI1)-OUT-MAY-{2<=PHI1, PHI1<=6}>
+
+      DO I = 2, 6                                                       0001
+
+C  <AD(PHI1)-OUT-MAY-{I==PHI1, 2<=PHI1, PHI1<=6}>
+
+         AD(I) = I                                                      0002
+      ENDDO
+
+C  <AE(PHI1)-OUT-MAY-{2<=PHI1, PHI1<=6}>
+
+      DO I = 2, 6                                                       0003
+
+C  <AE(PHI1)-OUT-MAY-{I==PHI1, 2<=PHI1, PHI1<=6}>
+
+         AE(I) = I                                                      0004
+      ENDDO
+
+C  <AF(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=2}>
+
+      DO I = 1, 2                                                       0005
+
+C  <AF(PHI1)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=2}>
+
+         AF(I) = I                                                      0006
+      ENDDO
+      END
+--- OUT Regions for COMM2
+
+      SUBROUTINE COMM2()
+      COMMON /CB/ BB(5),BC(4,5)
+      DO I = 1, 5                                                       0001
+         BB(I) = I                                                      0002
+      ENDDO
+      DO I = 1, 4                                                       0003
+         DO J = 1, 5                                                    0004
+            BC(I,J) = I+J                                               0005
+         ENDDO
+      ENDDO
+      END
+--- OUT Regions for COMM2B
+
+C  <BD(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+C  <BE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=4}>
+
+
+      SUBROUTINE COMM2B()
+      COMMON /CB/ BD(5),BE(5,4)
+
+C  <BD(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+
+      DO I = 1, 5                                                       0001
+
+C  <BD(PHI1)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=5}>
+
+         BD(I) = I                                                      0002
+      ENDDO
+
+C  <BE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=4}>
+
+      DO I = 1, 5                                                       0003
+
+C  <BE(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=5, 1<=PHI2,
+C    PHI2<=4}>
+
+         DO J = 1, 4                                                    0004
+
+C  <BE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 1<=PHI2, PHI2<=4, 1<=I,
+C    I<=5}>
+
+            BE(I,J) = I+J                                               0005
+         ENDDO
+      ENDDO
+      END
+--- OUT Regions for COMM3
+
+C  <CD(PHI1,PHI2)-OUT-EXACT-{PHI2==1, 1<=PHI1, PHI1<=5}>
+
+
+      SUBROUTINE COMM3()
+      COMMON /CC/ CD(5,5)
+
+C  <CD(PHI1,PHI2)-OUT-EXACT-{PHI2==1, 1<=PHI1, PHI1<=5}>
+
+
+      DO I = 1, 5                                                       0001
+
+C  <CD(PHI1,PHI2)-OUT-EXACT-{I==PHI1, PHI2==1, 1<=PHI1, PHI1<=5}>
+
+         DO J = 1, 4                                                    0002
+
+C  <CD(PHI1,PHI2)-OUT-EXACT-{PHI1==I, PHI2==J, PHI2==1, 1<=I, I<=5}>
+
+            CD(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+--- OUT Regions for COMM3B
+
+C  <CE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=4}>
+
+
+      SUBROUTINE COMM3B()
+      COMMON /CC/ CE(5,5)
+
+C  <CE(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 2<=PHI2, PHI2<=4}>
+
+
+      DO I = 1, 5                                                       0001
+
+C  <CE(PHI1,PHI2)-OUT-EXACT-{I==PHI1, 1<=PHI1, PHI1<=5, 2<=PHI2,
+C    PHI2<=4}>
+
+         DO J = 2, 4                                                    0002
+
+C  <CE(PHI1,PHI2)-OUT-EXACT-{PHI1==I, J==PHI2, 2<=PHI2, PHI2<=4, 1<=I,
+C    I<=5}>
+
+            CE(I,J) = I+J                                               0003
+         ENDDO
+      ENDDO
+      END
+--- OUT Regions for COMM
+C     interprocedural propagation of regions concerning global 
+C     arrays
+      PROGRAM COMM
+      COMMON /CA/ AA(5), AB(5), AC(5)
+      COMMON /CB/ BA(5,5)
+      COMMON /CC/ CA(5), CB(5,4)
+
+C  <AA(PHI1)-OUT-EXACT-{PHI1==1}>
+C  <AB(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=5}>
+
+
+      CALL COMM1                                                        0001
+
+C  <AA(PHI1)-OUT-EXACT-{2<=PHI1, PHI1<=5}>
+C  <AB(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=5}>
+C  <AC(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+
+      CALL COMM1B                                                       0002
+      CALL COMM2                                                        0003
+
+C  <BA(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=5}>
+
+      CALL COMM2B                                                       0004
+
+C  <CA(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=5}>
+
+      CALL COMM3                                                        0005
+
+C  <CB(PHI1,PHI2)-OUT-EXACT-{1<=PHI1, PHI1<=5, 1<=PHI2, PHI2<=3}>
+
+      CALL COMM3B                                                       0006
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+
+      PRINT *, (AA(I), I = 1, 5)                                        0007
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+      PRINT *, (AB(I), I = 1, 5)                                        0008
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+      PRINT *, (AC(I), I = 1, 5)                                        0009
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+      PRINT *, ((BA(I,J), I = 1, 5), J = 1, 5)                          0010
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6}>
+
+      PRINT *, (CA(I), I = 1, 5)                                        0011
+      PRINT *, ((CB(I,J), I = 1, 5), J = 1, 4)                          0012
+      END

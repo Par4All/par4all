@@ -1,0 +1,56 @@
+-- test with the property
+Registering file syntax_errors.f
+Checking Fortran syntax of ./syntax_errors.f
+./syntax_errors.f:2.15:
+
+      integer 'hello'                                                   
+              1
+Error: Invalid character in name at (1)
+./syntax_errors.f:3.6:
+
+      prin *, 'foo'                                                     
+     1
+Error: Unclassifiable statement at (1)
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'gfortran -c  ./syntax_errors.f -o ./syntax_errors.f.pips.o ; test -f ./syntax_errors.f.pips.o && rm ./syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ./syntax_errors.f!
+
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+
+user warning in close_processed_include_cache: no 'processed include cache' to close, skipping...
+pips error in reset_entity_to_size: hash table should have been allocated
+Aborted
+-- test from the environment
+Registering file syntax_errors.f
+Checking Fortran syntax of ./syntax_errors.f
+./syntax_errors.f:2.15:
+
+      integer 'hello'                                                   
+              1
+Error: Invalid character in name at (1)
+./syntax_errors.f:3.6:
+
+      prin *, 'foo'                                                     
+     1
+Error: Unclassifiable statement at (1)
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'gfortran -c  ./syntax_errors.f -o ./syntax_errors.f.pips.o ; test -f ./syntax_errors.f.pips.o && rm ./syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ./syntax_errors.f!
+
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+
+user warning in close_processed_include_cache: no 'processed include cache' to close, skipping...
+pips error in reset_entity_to_size: hash table should have been allocated
+Aborted

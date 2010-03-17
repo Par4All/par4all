@@ -1,0 +1,36 @@
+
+parsed printed file
+
+
+List of callees:
+
+List of callees:
+void miam(void)
+{
+   // BEGIN BLOCK
+   // BEGIN BLOCK
+bara:   ;
+gwin:   goto bara;
+   // END BLOCK
+   // This goto should not disappear:
+   goto gwin;
+   // BEGIN BLOCK
+
+gwen:   ;
+   // BEGIN BLOCK
+ruz:   goto gwen;
+   // END BLOCK
+   // END BLOCK
+   // END BLOCK
+}
+
+printed file
+
+void miam(void)
+{
+   // BEGIN BLOCK
+bara:   ;
+gwin:   ;
+   // END BLOCK
+   goto bara;
+}

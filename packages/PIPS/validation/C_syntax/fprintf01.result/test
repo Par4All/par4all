@@ -1,0 +1,43 @@
+
+parsed printed fileSymbol table for "fprintf01!"
+
+fprintf01!
+
+Declarations for module "fprintf01!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:fprintf01" with type "functional" "char * x varargs:overloaded -> int"
+	Declared entity "fprintf01!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "fprintf01!:*HEAP*" with type "area" with size 0
+	Declared entity "fprintf01!:*STACK*" with type "area" with size 0
+	Declared entity "fprintf01!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:fprintf01"	with type "functional" "char * x varargs:overloaded -> int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fprintf01!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fprintf01!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fprintf01!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fprintf01!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module fprintf01!
+

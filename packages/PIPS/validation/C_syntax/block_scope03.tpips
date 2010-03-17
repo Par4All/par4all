@@ -1,0 +1,37 @@
+delete block_scope03
+create block_scope03 block_scope03.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Symbol table for "main"
+echo
+
+display SYMBOL_TABLE_FILE[main]
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[block_scope03!]
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete block_scope03
+
+

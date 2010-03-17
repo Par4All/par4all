@@ -1,0 +1,53 @@
+# delete checkreturn
+create checkreturn checkreturn.f
+
+module CHECKRETURN
+
+echo Test prettyprint options for final and internal returns
+echo -------------------------------------------------------
+echo
+
+echo Default options (FALSE/TRUE)
+echo ----------------------------
+
+display PRINTED_FILE
+
+echo FALSE/FALSE options
+echo -------------------
+
+set PRETTYPRINT_FINAL_RETURN FALSE
+set PRETTYPRINT_INTERNAL_RETURN FALSE
+shell sleep 1; touch checkreturn.database/CHECKRETURN/CHECKRETURN.f
+
+display PRINTED_FILE
+
+echo FALSE/TRUE options (i.e. default)
+echo ---------------------------------
+
+set PRETTYPRINT_FINAL_RETURN FALSE
+set PRETTYPRINT_INTERNAL_RETURN TRUE
+shell sleep 1; touch checkreturn.database/CHECKRETURN/CHECKRETURN.f
+
+display PRINTED_FILE
+
+echo TRUE/FALSE options
+echo ------------------
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+set PRETTYPRINT_INTERNAL_RETURN FALSE
+shell sleep 1; touch checkreturn.database/CHECKRETURN/CHECKRETURN.f
+
+display PRINTED_FILE
+
+echo TRUE/TRUE options
+echo -----------------
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+set PRETTYPRINT_INTERNAL_RETURN TRUE
+shell sleep 1; touch checkreturn.database/CHECKRETURN/CHECKRETURN.f
+
+display PRINTED_FILE
+
+close
+delete checkreturn
+quit

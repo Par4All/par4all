@@ -1,0 +1,17 @@
+# before cleaning code
+      PROGRAM EE
+      INTEGER I1, I2, I3, I4, I5
+      INTEGER I(1:5)
+      COMMON /FOO/ I1, I2, I3, I4, I5
+      EQUIVALENCE (I, I1),  (I(5), I5)
+      READ *, I2, I4                                                    0006
+      PRINT *, I2                                                       0007
+      END
+# after cleaning code
+      PROGRAM EE
+      INTEGER I2, I4
+      COMMON /FOO/ I1, I2, I3, I4, I5
+      READ *, I2, I4                                                    0006
+      PRINT *, I2                                                       0007
+      END
+

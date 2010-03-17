@@ -1,0 +1,13 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete param05
+create param05 param05.f
+module PARAM05
+display PRINTED_FILE[PARAM05]
+close
+delete param05
+quit
+EOF

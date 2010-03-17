@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Typing inconsistency for FOO
+
+tpips=${tpips_version:-tpips}
+
+Delete synthesis09
+
+( $tpips 2>&1 | sed '/file *\//d' ) <<EOF
+create synthesis09 synthesis09.f
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty PARSER_TYPE_CHECK_CALL_SITES TRUE
+
+echo
+echo User source code for SYNTHESIS09
+echo
+
+module SYNTHESIS09
+display PRINTED_FILE
+
+echo
+echo Call graph for synthesis09
+echo
+
+module SYNTHESIS09
+activate PRINT_CALL_GRAPH
+display CALLGRAPH_FILE
+
+echo
+echo Synthesized source code for HIDENH
+echo
+
+module HIDENH
+display PRINTED_FILE
+
+close
+delete synthesis09
+quit
+EOF

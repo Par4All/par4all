@@ -1,0 +1,9 @@
+delete parsererror
+create parsererror parsererror.f
+module parsererror1
+display PRINTED_FILE
+module parsererror2
+display PRINTED_FILE
+close
+delete parsererror
+quit

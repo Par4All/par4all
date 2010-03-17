@@ -1,0 +1,87 @@
+
+C  T() {0==-1}
+
+      SUBROUTINE INIMOD2
+
+      PARAMETER  ( MP = 402, NP = 160 )
+      REAL RO(MP,NP)
+
+C  T() {0==-1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(J) {J==1}
+
+C (0,2)
+      J = 1                                                             0006
+C (0,3)
+99996 CONTINUE
+
+C  T() {}
+
+C (1,1)
+
+C     DO loop 5 with exit had to be desugared
+      IF (J.GT.NP) GOTO 99999                                           0006
+
+C  T(I) {I==1, J<=160}
+
+C (9,1)
+      I = 1                                                             0007
+99997 CONTINUE
+
+C  T() {J<=160}
+
+C (6,1)
+C     DO loop 5 with exit had to be desugared
+      IF (I.GT.MP) GOTO 99998                                           0007
+
+C  T() {1<=I, I<=402, 1<=J, J<=160}
+
+C (8,1)
+      READ (UNIT=11,FMT=1000,END=99) RO(I,J)                            0008
+
+C  T(I) {I==I#init+1, 2<=I, I<=403, 1<=J, J<=160}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  T() {1<=I, I<=402, 1<=J, J<=160}
+
+C (5,2)
+5     CONTINUE                                                          0009
+
+C  T(I) {I==I#init+1, 2<=I, I<=403, 1<=J, J<=160}
+
+C (5,3)
+      I = I+1                                                           0007
+C     END BLOCK
+      GOTO 99997
+99998 CONTINUE
+
+C  T(J) {I==403, J==J#init+1, J<=161}
+
+C (7,1)
+      J = J+1                                                           0006
+      GOTO 99996
+99999 CONTINUE
+
+C  T() {J==161}
+
+C (2,1)
+
+      PRINT *, I                                                        0011
+
+C  T() {1<=J, J<=161}
+
+C (3,1)
+99    CONTINUE                                                          0012
+
+C  T() {0==-1}
+
+C (0,4)
+      STOP                                                              0012
+C     END BLOCK
+      END
+

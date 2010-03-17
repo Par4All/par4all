@@ -1,0 +1,385 @@
+  Module         SAXPY
+  Module         MM
+Workspace foo created and opened.
+Module MM selected
+Module MM already active.
+Request: build resource PRINTED_FILE for module MM.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(MM)
+  PARSER                         building   PARSED_CODE(MM)
+                                 building   CALLEES(MM)
+  CONTROLIZER                    building   CODE(MM)
+  PRINT_CODE                     building   PRINTED_FILE(MM)
+PRINTED_FILE made for MM.
+C     
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C     
+C     DATA FLOW INTERPROCEDURAL ANALYSIS
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C     
+      SUBROUTINE MM(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C     
+      DO I = 1, N                                                       0001
+         DO J = 1, N                                                    0002
+            C(I,J) = 0.0                                                0003
+         ENDDO
+      ENDDO
+C     
+      DO J = 1, N                                                       0004
+         DO K = 1, N                                                    0005
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0006
+         ENDDO
+      ENDDO
+C
+      END
+Module MM already active.
+Request: build resource PARALLELPRINTED_FILE for module MM.
+  FILTER_FILE                    building   SOURCE_FILE(SAXPY)
+  PARSER                         building   PARSED_CODE(SAXPY)
+                                 building   CALLEES(SAXPY)
+  CONTROLIZER                    building   CODE(SAXPY)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(SAXPY)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(SAXPY)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(SAXPY)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(MM)
+  ATOMIC_CHAINS                  building   CHAINS(MM)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(MM)
+  RICE_FAST_DEPENDENCE_GRAPH     building   DG(MM)
+  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(MM)
+  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(MM)
+PARALLELPRINTED_FILE made for MM.
+C     
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C     
+C     DATA FLOW INTERPROCEDURAL ANALYSIS
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C     
+      SUBROUTINE MM(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C     
+      DOALL I = 1, N                                                    0001
+         DOALL J = 1, N                                                 0002
+            C(I,J) = 0.0                                                0003
+         ENDDO
+      ENDDO
+C     
+      DOALL J = 1, N                                                    0004
+         DO K = 1, N                                                    0005
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0006
+         ENDDO
+      ENDDO
+C
+      END
+Selecting rule: PRINT_CODE_PROPER_EFFECTS
+Selecting rule: PRINT_CODE_PROPER_EFFECTS
+user warning in activate: Rule `PRINT_CODE_PROPER_EFFECTS' already active
+Module MM already active.
+Request: build resource PRINTED_FILE for module MM.
+  PRINT_CODE_PROPER_EFFECTS      building   PRINTED_FILE(MM)
+PRINTED_FILE made for MM.
+C     
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C     
+C     DATA FLOW INTERPROCEDURAL ANALYSIS
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C     
+      SUBROUTINE MM(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C               <must be read   >: N
+C               <must be written>: I
+C     
+      DO I = 1, N                                                       0001
+C               <must be read   >: N
+C               <must be written>: J
+         DO J = 1, N                                                    0002
+C               <must be read   >: I J N
+C               <must be written>: C(I,J)
+            C(I,J) = 0.0                                                0003
+         ENDDO
+      ENDDO
+C               <must be read   >: N
+C               <must be written>: J
+C     
+      DO J = 1, N                                                       0004
+C               <must be read   >: N
+C               <must be written>: K
+         DO K = 1, N                                                    0005
+C               <may be read    >: A((/ (I,I=1,N) /),K) B(K,J)
+C                                  C((/ (I,I=1,N) /),J)
+C               <may be written >: C((/ (I,I=1,N) /),J)
+C               <must be read   >: N
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0006
+         ENDDO
+      ENDDO
+C
+      END
+Selecting rule: MUST_REGIONS
+Selecting rule: PRINT_CODE_REGIONS
+Module MM already active.
+Request: build resource PRINTED_FILE for module MM.
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(MM)
+  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(MM)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(MM)
+  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(MM)
+  PRECONDITIONS_INTRA            building   PRECONDITIONS(MM)
+  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(SAXPY)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(SAXPY)
+  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(SAXPY)
+  PRECONDITIONS_INTRA            building   PRECONDITIONS(SAXPY)
+  MUST_REGIONS                   building   REGIONS(SAXPY)
+                                 building   PROPER_REGIONS(SAXPY)
+                                 building   INV_REGIONS(SAXPY)
+  SUMMARY_REGIONS                building   SUMMARY_REGIONS(SAXPY)
+  MUST_REGIONS                   building   REGIONS(MM)
+                                 building   PROPER_REGIONS(MM)
+                                 building   INV_REGIONS(MM)
+  SUMMARY_REGIONS                building   SUMMARY_REGIONS(MM)
+  PRINT_CODE_REGIONS             building   PRINTED_FILE(MM)
+PRINTED_FILE made for MM.
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+
+C     
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C     
+C     DATA FLOW INTERPROCEDURAL ANALYSIS
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C     
+      SUBROUTINE MM(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+
+C     
+      DO I = 1, N                                                       0001
+
+C  <C(PHI1,PHI2)-W-EXACT-{PHI1==I, 1<=PHI2, PHI2<=N, 1<=I, I<=N}>
+
+         DO J = 1, N                                                    0002
+
+C  <C(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=N, 1<=J, J<=N}>
+
+            C(I,J) = 0.0                                                0003
+         ENDDO
+      ENDDO
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1+N<=I}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1+N<=I}>
+C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1+N<=I}>
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1+N<=I}>
+
+C     
+      DO J = 1, N                                                       0004
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1+N<=I,
+C    1<=J, J<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
+C    1+N<=I}>
+C  <C(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
+C    1+N<=I}>
+C  <C(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
+C    1+N<=I}>
+
+         DO K = 1, N                                                    0005
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
+C    1+N<=I, 1<=J, J<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2,
+C    PHI2<=N, 1+N<=I}>
+C  <C(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
+C    1+N<=I, 1<=K, K<=N}>
+C  <C(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
+C    1+N<=I, 1<=K, K<=N}>
+
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0006
+         ENDDO
+      ENDDO
+C
+      END
+Module SAXPY selected
+Module SAXPY already active.
+Request: build resource PRINTED_FILE for module SAXPY.
+  PRINT_CODE_REGIONS             building   PRINTED_FILE(SAXPY)
+PRINTED_FILE made for SAXPY.
+
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+
+C     
+      DO 10 I = 1, N                                                    0001
+
+C  <X(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
+C  <X(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
+
+         X(I) = X(I)+S*Y(I)                                             0002
+10       CONTINUE                                                       0003
+C
+      END
+Selecting rule: PRINT_CODE
+Module SAXPY already active.
+Request: build resource PRINTED_FILE for module SAXPY.
+  PRINT_CODE                     building   PRINTED_FILE(SAXPY)
+PRINTED_FILE made for SAXPY.
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C     
+      DO 10 I = 1, N                                                    0001
+         X(I) = X(I)+S*Y(I)                                             0002
+10       CONTINUE                                                       0003
+C
+      END
+Selecting rule: PRINT_CODE_TRANSFORMERS
+Selecting rule: PRINT_CODE
+Selecting rule: PRINT_CODE
+user warning in activate: Rule `PRINT_CODE' already active
+Module SAXPY already active.
+Request: build resource PRINTED_FILE for module SAXPY.
+  PRINT_CODE                     building   PRINTED_FILE(SAXPY)
+PRINTED_FILE made for SAXPY.
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C     
+      DO 10 I = 1, N                                                    0001
+         X(I) = X(I)+S*Y(I)                                             0002
+10       CONTINUE                                                       0003
+C
+      END
+Selecting rule: PRINT_CODE_COMPLEXITIES
+Module SAXPY already active.
+Request: build resource PRINTED_FILE for module SAXPY.
+  UNIFORM_COMPLEXITIES           building   COMPLEXITIES(SAXPY)
+  SUMMARY_COMPLEXITY             building   SUMMARY_COMPLEXITY(SAXPY)
+  PRINT_CODE_COMPLEXITIES        building   PRINTED_FILE(SAXPY)
+PRINTED_FILE made for SAXPY.
+C                                                             10*N + 2 (SUMMARY)
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C                                                             10*N + 2 (DO)   
+C     
+      DO 10 I = 1, N                                                    0001
+C                                                                    9 (STMT) 
+         X(I) = X(I)+S*Y(I)                                             0002
+C                                                                    0 (STMT) 
+10       CONTINUE                                                       0003
+C
+      END
+Module MM selected
+Module MM already active.
+Request: build resource PRINTED_FILE for module MM.
+  UNIFORM_COMPLEXITIES           building   COMPLEXITIES(MM)
+  SUMMARY_COMPLEXITY             building   SUMMARY_COMPLEXITY(MM)
+  PRINT_CODE_COMPLEXITIES        building   PRINTED_FILE(MM)
+PRINTED_FILE made for MM.
+C                                             10*N^3 + 8*N^2 + 6*N + 4 (SUMMARY)
+C     
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C     
+C     DATA FLOW INTERPROCEDURAL ANALYSIS
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C     
+      SUBROUTINE MM(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C                                                      5*N^2 + 3*N + 2 (DO)   
+C     
+      DO I = 1, N                                                       0001
+C                                                              5*N + 3 (DO)   
+         DO J = 1, N                                                    0002
+C                                                                    5 (STMT) 
+            C(I,J) = 0.0                                                0003
+         ENDDO
+      ENDDO
+C                                             10*N^3 + 3*N^2 + 3*N + 2 (DO)   
+C     
+      DO J = 1, N                                                       0004
+C                                                     10*N^2 + 3*N + 3 (DO)   
+         DO K = 1, N                                                    0005
+C                                                             10*N + 3 (STMT) 
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0006
+         ENDDO
+      ENDDO
+C
+      END
+Module SAXPY selected
+Module SAXPY already active.
+Request: build resource PRINTED_FILE for module SAXPY.
+PRINTED_FILE made for SAXPY.
+C                                                             10*N + 2 (SUMMARY)
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C                                                             10*N + 2 (DO)   
+C     
+      DO 10 I = 1, N                                                    0001
+C                                                                    9 (STMT) 
+         X(I) = X(I)+S*Y(I)                                             0002
+C                                                                    0 (STMT) 
+10       CONTINUE                                                       0003
+C
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module MM.
+  Closing module SAXPY.
+Closing program.
+Closing workspace.
+Workspace foo closed.
+
+Workspace foo deleted.

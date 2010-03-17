@@ -1,0 +1,27 @@
+delete flatten_code04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create flatten_code04 flatten_code04.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[flatten_code04]
+
+echo
+echo Code after flatten_code
+echo
+apply FLATTEN_CODE[flatten_code04]
+activate PRINT_CODE
+display PRINTED_FILE[flatten_code04]
+
+close
+delete flatten_code04
+quit
+

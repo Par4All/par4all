@@ -1,0 +1,127 @@
+
+C  T() {}
+
+
+!
+! inegalites sur les flottants
+!
+
+      PROGRAM INEGFLOAT03
+      REAL R
+
+C  T(R) {}
+
+
+! unknown
+
+      READ *, R                                                         0011
+
+C  T() {}
+
+
+! float ge le
+
+      IF (R.GE.0.0.AND.R.LE.1.0) THEN                                   0015
+
+C  T() {}
+
+         PRINT *, 'float ge le float'                                   0016
+
+C  T() {}
+
+         PRINT *, R                                                     0017
+      ENDIF
+
+C  T(R) {0.5==R}
+
+
+! known-in
+
+      R = 0.5                                                           0022
+
+C  T() {}
+
+
+! float ge le
+
+      IF (R.GE.0.0.AND.R.LE.1.0) THEN                                   0026
+
+C  T() {}
+
+         PRINT *, 'float ge le float'                                   0027
+
+C  T() {}
+
+         PRINT *, R                                                     0028
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I, R, D                                                  0031
+
+      END
+
+C  P() {}
+
+
+!
+! inegalites sur les flottants
+!
+
+      PROGRAM INEGFLOAT03
+      REAL R
+
+C  P() {}
+
+
+! unknown
+
+      READ *, R                                                         0011
+
+C  P(R) {}
+
+
+! float ge le
+
+      IF (R.GE.0.0.AND.R.LE.1.0) THEN                                   0015
+
+C  P(R) {0.0<=R, R<=1.0}
+
+         PRINT *, 'float ge le float'                                   0016
+
+C  P(R) {0.0<=R, R<=1.0}
+
+         PRINT *, R                                                     0017
+      ENDIF
+
+C  P(R) {}
+
+
+! known-in
+
+      R = 0.5                                                           0022
+
+C  P(R) {0.5==R}
+
+
+! float ge le
+
+      IF (R.GE.0.0.AND.R.LE.1.0) THEN                                   0026
+
+C  P(R) {0.5==R, 0.0<=R, R<=1.0}
+
+         PRINT *, 'float ge le float'                                   0027
+
+C  P(R) {0.5==R, 0.0<=R, R<=1.0}
+
+         PRINT *, R                                                     0028
+      ENDIF
+
+C  P(R) {0.5==R}
+
+
+      PRINT *, I, R, D                                                  0031
+
+      END
+

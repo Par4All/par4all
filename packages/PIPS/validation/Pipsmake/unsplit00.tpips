@@ -1,0 +1,5 @@
+create u00 unsplit00.f
+apply UNSPLIT[ONE]
+shell cat u00.database/Src/unsplit00.f
+close
+delete u00

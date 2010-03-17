@@ -1,0 +1,67 @@
+
+C  T(KK) {}
+
+      PROGRAM TYPE31
+
+C     Check that string values are not used when strings are not
+C     analyzed even when they are stored in integer variable
+
+      DATA KK /'('/
+
+C  T() {}
+
+
+      IF (KK.EQ.')') THEN                                               0008
+
+C  T() {}
+
+C     Is kk's value known although strings are not analyzed?
+         PRINT *, KK                                                    0010
+      ENDIF
+
+C  T(KK) {}
+
+
+C     This assignment is not ANSI compatible
+      KK = '?'                                                          0014
+
+C  T() {}
+
+
+      PRINT *, KK                                                       0016
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE31
+
+C     Check that string values are not used when strings are not
+C     analyzed even when they are stored in integer variable
+
+      DATA KK /'('/
+
+C  P() {}
+
+
+      IF (KK.EQ.')') THEN                                               0008
+
+C  P() {}
+
+C     Is kk's value known although strings are not analyzed?
+         PRINT *, KK                                                    0010
+      ENDIF
+
+C  P() {}
+
+
+C     This assignment is not ANSI compatible
+      KK = '?'                                                          0014
+
+C  P(KK) {}
+
+
+      PRINT *, KK                                                       0016
+
+      END
+

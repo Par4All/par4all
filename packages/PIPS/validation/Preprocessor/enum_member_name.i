@@ -1,0 +1,7 @@
+main()
+{
+  enum hue {node,nide};
+  enum hue1 {node1,nide1};
+  enum hue x;
+  int hue;
+}

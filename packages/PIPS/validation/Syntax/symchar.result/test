@@ -1,0 +1,13 @@
+      PROGRAM SYMCHAR
+
+C     Bug trouve dans Scilab, matops.f
+
+      INTEGER BUFSIZE
+      PARAMETER (BUFSIZE=4096)
+      CHARACTER BUFFER*(BUFSIZE)
+
+      BUFFER = 'Hello world!'                                           0009
+
+      PRINT *, BUFFER                                                   0011
+
+      END

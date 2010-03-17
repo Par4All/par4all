@@ -1,0 +1,23 @@
+#!/bin/sh
+
+echo "trying sg without prior selection"
+
+tpips <<EOF
+
+create no_select no_select.f
+
+# no module is selected. Trying to make, display or apply something
+# anyway.
+
+display PRINTED_FILE
+make PRINTED_FILE
+apply PRIVATIZE_MODULE
+
+close
+delete no_select
+quit
+
+EOF
+
+echo "done ($?)"
+

@@ -1,0 +1,76 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analyses:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Check the proper effects, especially for variable fp and call to fgetc()
+void getimage(void)
+{
+   int i, j;
+   unsigned char c;
+   FILE *fp;
+//               <must be written>: fp
+   
+   /* To try to avoid fp privatization */
+   fp = (void *) 0;
+//               <must be written>: i
+   
+   /* This loops should not be distributed.  On 2009/05/26, if the main()
+        is removed, this bug too... */
+   for(i = 0; i <= 63; i += 1)
+//               <must be written>: j
+      for(j = 0; j <= 63; j += 1) {
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+//               <must be written>: c
+         c = fgetc(fp);
+//               <must be read   >: c i j
+//               <must be written>: TOP-LEVEL:imagein_re[i][j]
+         imagein_re[i][j] = c==0?0.0:1.0;
+//               <must be read   >: i j
+//               <must be written>: TOP-LEVEL:imagein_im[i][j]
+         imagein_im[i][j] = 0.0;
+      }
+}
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+void getimage(void)
+{
+   int i, j;
+   unsigned char c;
+   FILE *fp;
+   
+   /* To try to avoid fp privatization */
+   fp = (void *) 0;
+   
+   /* This loops should not be distributed.  On 2009/05/26, if the main()
+        is removed, this bug too... */
+   ;
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1)
+         c = fgetc(fp);
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for private(c)
+      for(j = 0; j <= 63; j += 1)
+         imagein_re[i][j] = c==0?0.0:1.0;
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1)
+         imagein_im[i][j] = 0.0;
+}
+int main(int argc, char *argv[])
+{
+   return 0;
+}
+Consider the generated parallel as the sequential code now:
+Regenerate the sources from the PIPS transformed code:

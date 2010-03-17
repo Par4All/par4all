@@ -1,0 +1,11 @@
+      PROGRAM POINTER02
+
+C     Check the syntactic analysis of pointers
+
+      POINTER (I, X(1))
+
+      I = MALLOC(10)                                                    0007
+
+      PRINT *, X(1)                                                     0009
+
+      END

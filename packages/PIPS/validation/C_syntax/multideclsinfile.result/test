@@ -1,0 +1,89 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: multideclsinfile: No such workspace
+Registering file multideclsinfile.c
+Preprocessing file ./multideclsinfile.c
+Splitting file    ./multideclsinfile.database/Tmp/multideclsinfile.cpp_processed.c
+  Module         multideclsinfile!
+Workspace multideclsinfile created and opened.
+Module multideclsinfile! selected
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Selecting rule: C_SYMBOL_TABLE
+user warning in activate_phase: Rule `C_SYMBOL_TABLE' already active
+Selecting rule: C_PARSER
+user warning in activate_phase: Rule `C_PARSER' already active
+echo
+
+echo Error duplicate variable declaration for a 
+Error duplicate variable declaration for a 
+echo
+
+Module multideclsinfile! already active.
+Request: build resource PARSED_PRINTED_FILE for module multideclsinfile!.
+  BOOTSTRAP                      building   ENTITIES()
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(multideclsinfile!)
+user warning in UpdateEntity: Multiple declarations of variable a in file
+
+Declarations for module multideclsinfile! with type  () ->  unknown
+
+
+Variable list:
+
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 8
+Declared entity TOP-LEVEL:a	with type variable INTEGER*4
+Declared entity TOP-LEVEL:k	with type variable INTEGER*4
+Declared entity multideclsinfile!:*DYNAMIC*	with type area with size 0
+Declared entity multideclsinfile!:*HEAP*	with type area with size 0
+Declared entity multideclsinfile!:*STACK*	with type area with size 0
+Declared entity multideclsinfile!:*STATIC*	with type area with size 0
+* empty external declaration list *
+
+
+
+Layouts for areas (commons):
+
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8: 
+	Variable TOP-LEVEL:a,	offset = 0,	size = 4
+	Variable TOP-LEVEL:k,	offset = 4,	size = 4
+
+
+Layout for memory area "multideclsinfile!:*DYNAMIC*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*HEAP*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*STACK*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*STATIC*" of size 0: 
+	* empty area *
+
+End of declarations for module multideclsinfile!
+
+  PRINT_SOURCE                   building   PARSED_PRINTED_FILE(multideclsinfile!)
+PARSED_PRINTED_FILE made for multideclsinfile!.
+/* Multiple declarations of global variables check in one file */
+
+/* but this is OK with C... */
+
+int a;
+int k;
+int a;
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module multideclsinfile!.
+Closing program.
+Closing workspace.
+Workspace multideclsinfile closed.
+
+Workspace multideclsinfile deleted.

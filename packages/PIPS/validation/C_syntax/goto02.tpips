@@ -1,0 +1,32 @@
+delete goto02
+create goto02 goto02.c
+
+#setenv CONTROL_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo PRINTED FILE (after controlization)
+echo
+
+display PRINTED_FILE[main]
+
+
+close
+
+# delete goto02
+
+quit

@@ -1,0 +1,19 @@
+# Bug found by Corinne for pattern fix-point
+
+delete oavitel
+create oavitel oavitel.f
+#setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+#setproperty SEMANTICS_FIX_POINT_OPERATOR "transfer"
+setproperty SEMANTICS_FIX_POINT_OPERATOR "pattern"
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+#activate PRINT_CODE_TRANSFORMERS
+#display PRINTED_FILE[SDOT]
+#apply PARTIAL_EVAL[SDOT]
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[OAVITEL]
+#activate PRINT_CODE_PRECONDITIONS
+#display PRINTED_FILE[SDOT]
+close
+delete oavitel
+quit

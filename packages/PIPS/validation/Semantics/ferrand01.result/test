@@ -1,0 +1,33 @@
+
+C  T() {}
+
+      PROGRAM FERRAND01
+      INTEGER I
+      INTEGER*1 A( 200 )
+      INTEGER*1 B( 200 )
+      INTEGER*1 C( 200 )
+      INTEGER*1 BI
+      INTEGER*1 CI
+
+C  T(BI,CI,I) {}
+
+
+      DO 20 I = 0, 199                                                  0009
+
+C  T(BI) {}
+
+         BI = B(I)                                                      0010
+
+C  T(CI) {}
+
+         CI = C(I)                                                      0011
+
+C  T() {}
+
+         A(I) = BI+CI                                                   0012
+
+C  T() {}
+
+20       CONTINUE                                                       0013
+
+      END

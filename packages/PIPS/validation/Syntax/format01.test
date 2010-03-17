@@ -1,0 +1,13 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete format01
+create format01 format01.f
+display PRINTED_FILE 
+close
+delete format01
+quit
+EOF
+

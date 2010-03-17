@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Preconditions appear only if the SAVE declaration is processed
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete save03
+create save03 save03.f
+display PRINTED_FILE 
+close
+delete save03
+quit
+EOF
+

@@ -1,0 +1,44 @@
+delete DOTPROD_C
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create DOTPROD_C kernels/DOTPROD/DOTPROD.c include/SIMD.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Initial code
+echo
+
+module dotprod
+display PRINTED_FILE
+apply SPLIT_UPDATE_OPERATOR
+
+source include/benchmark.tpips.h
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE
+
+apply UNSPLIT
+
+shell cc kernels/DOTPROD/DOTPROD.c include/SIMD.c -o dotprod0
+shell sed -i -e '1 i #include "SIMD.h"' DOTPROD_C.database/Src/DOTPROD.c
+shell cc -Iinclude DOTPROD_C.database/Src/DOTPROD.c include/SIMD.c -o dotprod1
+shell sed -i -e '1 d' DOTPROD_C.database/Src/DOTPROD.c
+shell if test "`./dotprod0`" = "`./dotprod1`" ; then echo seq-ok ; else echo seq-ko ; fi
+
+shell ./compileC.sh DOTPROD_C DOTPROD.c dotprod-sse.c
+shell cc -O3 -I. -march=native dotprod-sse.c -o dotprod2
+shell if test "`./dotprod0`" = "`./dotprod2`" ; then echo sse-ok ; else echo sse-ko ; fi
+shell rm -f dotprod[012] dotprod-sse.c
+
+close
+delete DOTPROD_C
+quit

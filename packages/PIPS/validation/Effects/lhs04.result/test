@@ -1,0 +1,33 @@
+
+Parsed printed file for "lhs04"
+
+void lhs04()
+{
+   float x;
+
+   *(int *) &x &= 0x7fffffff;
+}
+
+Proper effects for "lhs04"
+
+void lhs04()
+{
+   float x;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+
+   *(int *) &x &= 0x7fffffff;
+}
+
+Cumulated effects for "lhs04"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+void lhs04()
+{
+   float x;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+
+   *(int *) &x &= 0x7fffffff;
+}

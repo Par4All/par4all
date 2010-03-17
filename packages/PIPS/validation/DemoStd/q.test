@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# q.f test program
+#
+rm -f properties.rc
+echo "COMPLEXITY_EARLY_EVALUATION TRUE" >properties.rc
+Pips -f q.f -w q -m sub -p prcc >&2
+exit_code=$?
+echo "--- Complexity for module SUB"
+Display -m sub -l comp
+echo "--- Complexity for module Q"
+Display -m q comp
+Delete q >&2
+rm -f properties.rc
+exit $exit_code

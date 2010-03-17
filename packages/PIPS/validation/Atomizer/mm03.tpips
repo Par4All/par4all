@@ -1,0 +1,29 @@
+# Could be useful to force semantic analysis of complex loop bounds in
+# the past. Supposed to be useless with recent versions of Semantics
+# (post 2005?)
+
+delete wmm03
+
+set ABORT_ON_USER_ERROR TRUE
+
+create wmm03 mm03.f
+module MM03
+
+apply LOOP_NORMALIZE
+
+echo
+echo Code after loop normalize
+echo
+
+display PRINTED_FILE
+
+apply ATOMIZER
+
+echo
+echo Code after atomizer
+echo
+
+display PRINTED_FILE
+close
+delete wmm03
+quit

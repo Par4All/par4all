@@ -1,0 +1,6 @@
+delete while04
+create while04 while04.f
+display PRINTED_FILE
+close
+delete while04
+quit

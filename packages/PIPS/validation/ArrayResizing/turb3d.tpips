@@ -1,0 +1,26 @@
+delete turb3d
+create turb3d turb3d.f 
+
+setproperty GATHER_FORMATS_AT_BEGINNING TRUE
+
+make NEW_DECLARATIONS[%ALL]
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+make PRINTED_FILE[%ALL]
+apply UNSPLIT
+
+shell /users/cri/nguyen/Experiment/Script/array_resizing_instrument.pl < turb3d.database/TD_instrument.out
+
+shell cat turb3d.database/Src/turb3d.f
+
+quit
+
+

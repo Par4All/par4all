@@ -1,0 +1,63 @@
+delete comma07
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create comma07 comma07.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+echo
+echo Parsed printed file for "comma07"
+echo
+
+display PARSED_PRINTED_FILE[comma07]
+
+echo
+echo Code for "comma07"
+echo
+
+display PRINTED_FILE[comma07]
+
+# quit
+
+echo
+echo Proper effects for "comma07"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[comma07]
+
+echo
+echo Transformers for "comma07"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[comma07]
+quit
+echo
+echo Preconditions for "comma07"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[comma07]
+
+close
+
+delete comma07
+
+quit
+

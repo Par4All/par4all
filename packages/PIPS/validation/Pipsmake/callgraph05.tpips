@@ -1,0 +1,8 @@
+delete callgraph05
+create callgraph05 callgraph05.f
+
+make CALLERS[%ALL]
+
+close
+delete callgraph05
+quit

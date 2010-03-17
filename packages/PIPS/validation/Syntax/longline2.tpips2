@@ -1,0 +1,18 @@
+# Check parser property PARSER_WARN_FOR_COLUMNS_73_80
+# Check handling of long comments and long lines of instruction
+delete longline2
+create longline2 longline2.f
+set PARSER_WARN_FOR_COLUMNS_73_80 TRUE
+display PRINTED_FILE[%ALL]
+close
+
+# Cannot be used because time changes all the time:
+# shell touch longline2.database/longline2.f
+
+delete longline2
+create longline2 longline2.f
+set PARSER_WARN_FOR_COLUMNS_73_80 FALSE
+display PRINTED_FILE[%ALL]
+close
+delete longline2
+quit

@@ -1,0 +1,47 @@
+echo
+echo Refuse alternate returns
+echo
+
+create altret04 altret04.f
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
+display PRINTED_FILE(ALTRET04)
+display PRINTED_FILE(BAR2)
+close
+delete altret04
+
+echo
+echo Ignore alternate returns and substitute STOP
+echo
+
+create altret04 altret04.f
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+display PRINTED_FILE(ALTRET04)
+display PRINTED_FILE(BAR2)
+close
+delete altret04
+
+echo
+echo Replace alternate returns (Parsed printed file)
+echo
+
+create altret04 altret04.f
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "RC"
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+display PARSED_PRINTED_FILE(ALTRET04)
+
+echo
+echo Replace alternate returns (Printed file)
+echo
+
+display PRINTED_FILE(ALTRET04)
+
+echo
+echo Replace alternate returns and restructure (Printed file)
+echo
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE(ALTRET04)
+close
+delete altret04
+quit

@@ -1,0 +1,18 @@
+delete unsigned01
+create unsigned01 unsigned01.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PARSED_PRINTED_FILE[main]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+
+delete unsigned01
+
+quit

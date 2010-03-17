@@ -1,0 +1,19 @@
+delete equiv15
+create equiv15 equiv15.f
+module EQUIV15
+
+echo
+echo Symbol table for module EQUIV15
+echo
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+make PARSED_CODE
+
+echo
+echo Symbol table for module EQUIV15
+echo
+
+display PRINTED_FILE[EQUIV15]
+close
+delete equiv15
+quit

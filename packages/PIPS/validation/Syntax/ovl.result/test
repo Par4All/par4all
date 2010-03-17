@@ -1,0 +1,78 @@
+user warning in tp_parse: ovl: No such workspace
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Registering file ovl.f
+Splitting file    ./ovl.f
+  Module         OVL
+Workspace ovl created and opened.
+Module OVL selected
+Module OVL already active.
+Request: build resource PRINTED_FILE for module OVL.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(OVL)
+  PARSER                         building   PARSED_CODE(OVL)
+                                 building   CALLEES(OVL)
+
+Declarations for module OVL with type REAL*8 x REAL*8 ->  REAL*8
+
+
+Variable list:
+
+
+Declared entity OVL:*DYNAMIC*	with type area with size 8
+Declared entity OVL:*HEAP*	with type area with size 0
+Declared entity OVL:*STACK*	with type area with size 0
+Declared entity OVL:*STATIC*	with type area with size 0
+Declared entity OVL:BETA	with type variable REAL*8
+Declared entity OVL:OVL	with type variable REAL*8
+Declared entity OVL:XL	with type variable REAL*8
+Declared entity OVL:Z0	with type variable REAL*8
+Declared entity TOP-LEVEL:MIN	with type functional  varargs:OVERLOADED ->  OVERLOADED
+
+Layouts for formal parameters:
+
+	Variable OVL:BETA,	offset = 1
+	Variable OVL:Z0,	offset = 2
+
+Layout for return variable:
+
+	Variable OVL:OVL,	size = 8
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 8:
+	Variable OVL:XL,	offset = 0,	size = 8
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module OVL
+
+  CONTROLIZER                    building   CODE(OVL)
+  PRINT_CODE                     building   PRINTED_FILE(OVL)
+PRINTED_FILE made for OVL.
+C     Make sure that DIM is declared in OVL's scope as an intrinsic
+
+      FUNCTION OVL(BETA,Z0)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      OVL = MIN(XL, -0.003D0)                                           0005
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module OVL.
+Closing program.
+Closing workspace.
+Workspace ovl closed.
+
+Workspace ovl deleted.

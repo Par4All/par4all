@@ -1,0 +1,59 @@
+# Check user views
+#
+
+delete gotoc
+create gotoc gotoc.f
+module GOTOC
+
+echo
+echo Userview
+echo
+
+display PARSED_PRINTED_FILE(GOTOC)
+
+echo
+echo Userview with proper effects
+echo
+
+activate PRINT_SOURCE_PROPER_EFFECTS
+display PARSED_PRINTED_FILE(GOTOC)
+
+echo
+echo Userview with cumulated effects
+echo
+
+activate PRINT_SOURCE_CUMULATED_EFFECTS
+display PARSED_PRINTED_FILE(GOTOC)
+
+echo
+echo Userview with transformers
+echo
+
+activate PRINT_SOURCE_TRANSFORMERS
+display PARSED_PRINTED_FILE(GOTOC)
+
+echo
+echo Userview with preconditions
+echo
+
+activate PRINT_SOURCE_PRECONDITIONS
+display PARSED_PRINTED_FILE(GOTOC)
+
+echo
+echo Userview with regions
+echo
+
+activate PRINT_SOURCE_REGIONS
+display PARSED_PRINTED_FILE(GOTOC)
+
+echo
+echo Userview with complexities
+echo
+
+activate PRINT_SOURCE_COMPLEXITIES
+display PARSED_PRINTED_FILE(GOTOC)
+
+close
+delete gotoc
+quit
+# EOF

@@ -1,0 +1,4 @@
+main()
+{
+  restrict int i;
+}

@@ -1,0 +1,15 @@
+delete type19
+create type19 type19.f
+
+# setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+# setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE[%ALL]
+
+close
+# delete type19
+delete type19

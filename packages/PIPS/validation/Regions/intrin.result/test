@@ -1,0 +1,49 @@
+
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <B(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+
+C
+C
+      SUBROUTINE INTRIN(A,B)
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION A(5)
+      DIMENSION B(5)
+
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <B(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+
+C
+      DO I = 1, 5                                                       0009
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+C  <B(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+         A(I) = SIN(B(I))                                               0010
+      ENDDO
+C
+      END
+C
+      PROGRAM INTRP
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION AA(5)
+      DIMENSION BB(5)
+
+C  <BB(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+
+C     
+      DO I = 1, 5                                                       0008
+
+C  <BB(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+         BB(I) = I                                                      0009
+      ENDDO
+
+C  <AA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5, I==6}>
+C  <BB(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5, I==6}>
+
+C
+      CALL INTRIN(AA, BB)                                               0012
+C
+      END

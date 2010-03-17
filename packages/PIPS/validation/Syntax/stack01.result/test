@@ -1,0 +1,71 @@
+user warning in tp_parse: stack01: No such workspace
+Registering file stack01.f
+Splitting file    ./stack01.f
+  Module         STACK01
+Workspace stack01 created and opened.
+Module STACK01 selected
+Module STACK01 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module STACK01 already active.
+Request: build resource PRINTED_FILE for module STACK01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(STACK01)
+  PARSER                         building   PARSED_CODE(STACK01)
+                                 building   CALLEES(STACK01)
+
+Declarations for module STACK01 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity STACK01:*DYNAMIC*	with type area with size 0
+Declared entity STACK01:*HEAP*	with type area with size 0
+Declared entity STACK01:*STACK*	with type area with size 0
+Declared entity STACK01:*STATIC*	with type area with size 0
+Declared entity STACK01:A	with type variable REAL*4
+Declared entity STACK01:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable STACK01:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	Variable STACK01:A,	offset = -1,	size = -1
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module STACK01
+
+  CONTROLIZER                    building   CODE(STACK01)
+  PRINT_CODE                     building   PRINTED_FILE(STACK01)
+PRINTED_FILE made for STACK01.
+      SUBROUTINE STACK01(N)
+      REAL A(N)
+
+      PRINT *, A                                                        0004
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module STACK01.
+Closing program.
+Closing workspace.
+Workspace stack01 closed.
+
+Workspace stack01 deleted.

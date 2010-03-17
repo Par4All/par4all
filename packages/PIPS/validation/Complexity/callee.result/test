@@ -1,0 +1,16 @@
+C                                                      3*M + 3*N + 370 (SUMMARY)
+      PROGRAM CALLEE
+C                                                             3*N + 10 (STMT)
+
+      CALL P(N)                                                         0003
+C                                                             3*M + 10 (STMT)
+
+      CALL P(M)                                                         0005
+C                                                                   40 (STMT)
+
+      CALL P(10)                                                        0007
+C                                                                  310 (STMT)
+
+      CALL P(100)                                                       0009
+
+      END

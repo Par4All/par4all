@@ -1,0 +1,82 @@
+
+Basic call graph
+
+ DECOR01
+     B
+
+Call graph with complexities
+
+C                                                                   10 (SUMMARY)
+ DECOR01
+C                                                                        7 (SUMMARY)
+     B
+
+Call graph with transformers
+
+
+C  T() {}
+
+ DECOR01
+    
+C      T(N) {N==N#init+1}
+    
+     B
+
+Call graph with preconditions
+
+
+C  P() {}
+
+ DECOR01
+    
+C      P() {N==0}
+    
+     B
+
+Call graph with proper effects
+
+ DECOR01
+     B
+
+Call graph with cumulated effects
+
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+ DECOR01
+C                   <may be read    >: __IO_EFFECTS:LUNS(*)
+C                   <may be written >: __IO_EFFECTS:LUNS(*)
+C                   <must be read   >: N X Y
+C                   <must be written>: N Z
+     B
+
+Call graph with RW regions
+
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{}>
+
+ DECOR01
+    
+C      <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{}>
+C      <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{}>
+    
+     B
+
+Call graph with IN regions
+
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{}>
+
+ DECOR01
+    
+C      <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{}>
+    
+     B
+
+Call graph with OUT regions
+
+ DECOR01
+    
+C      <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{N==0}>
+    
+     B

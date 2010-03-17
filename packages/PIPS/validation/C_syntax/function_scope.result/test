@@ -1,0 +1,31 @@
+
+Parser output
+
+static void foo(int x);
+
+extern void main();
+static void foo(int x)
+{
+   printf("%d\n", x);
+}
+void main()
+{
+   void foo();
+   int j;
+}
+
+Controlizer output
+
+static void foo(int x);
+
+extern void main();
+static void foo(int x)
+{
+   printf("%d\n", x);
+}
+void main()
+{
+   void foo();
+   int j;
+}
+

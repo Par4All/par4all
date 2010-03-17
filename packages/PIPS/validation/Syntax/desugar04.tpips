@@ -1,0 +1,8 @@
+delete desugar04
+setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO TRUE
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "RC"
+setproperty PARSER_SIMPLIFY_LABELLED_LOOPS TRUE
+create desugar04 desugar04.f
+display PRINTED_FILE[DESUGAR04]
+close
+delete desugar04

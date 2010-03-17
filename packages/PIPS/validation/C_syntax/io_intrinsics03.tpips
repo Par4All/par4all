@@ -1,0 +1,37 @@
+delete io_intrinsics03
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create io_intrinsics03 io_intrinsics03.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+
+module main
+
+echo
+echo Parsed printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE
+quit
+echo
+echo Printed file for "main"
+echo
+
+display PRINTED_FILE
+
+echo
+echo Call graph for "main"
+
+display CALLGRAPH_FILE[main]
+
+close
+#delete io_intrinsics03
+quit

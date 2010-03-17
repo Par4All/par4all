@@ -1,0 +1,50 @@
+
+Symbol table for "decl04!"
+
+decl04!
+
+Declarations for module "decl04!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 24
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "decl04!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl04!:*HEAP*" with type "area" with size 0
+	Declared entity "decl04!:*STACK*" with type "area" with size 0
+	Declared entity "decl04!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 24:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 24
+
+
+Layout for memory area "decl04!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl04!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl04!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl04!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl04!
+
+
+Parsed printed file
+
+int a[][3] = {{1, 2, 3}, {4, 5, 6}};                                    /*0001*/
+
+Printed file
+
+int a[][3] = {{1, 2, 3}, {4, 5, 6}};                                    /*0001*/

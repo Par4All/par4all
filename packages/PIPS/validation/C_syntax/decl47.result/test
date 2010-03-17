@@ -1,0 +1,20 @@
+
+Code for "decl47a"
+
+void decl47a()
+{
+   int foo(void);                                                       /*0004*/
+   int i;                                                               /*0005*/
+
+   i = foo();                                                           /*0007*/
+}
+
+Code for "decl47b"
+
+void decl47b()
+{
+   int foo(void);                                                       /*0014*/
+   int i;                                                               /*0015*/
+
+   i = foo();                                                           /*0017*/
+}

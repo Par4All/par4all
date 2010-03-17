@@ -1,0 +1,7 @@
+delete substr02
+create substr02 substr02.f
+module SUBSTR02
+display PRINTED_FILE[SUBSTR02]
+close
+delete substr02
+quit

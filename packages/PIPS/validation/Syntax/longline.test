@@ -1,0 +1,3 @@
+Init -d -f  longline.f longline 2>/dev/null >/dev/null
+Display -v -m longline 2>&1 | grep "user warning in GetChar"
+Delete longline 2>/dev/null

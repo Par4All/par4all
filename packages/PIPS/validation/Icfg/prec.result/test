@@ -1,0 +1,28 @@
+
+Icfg with preconditions
+
+GO
+
+C  P() {B==5}
+
+    S1
+
+C  P() {6<=B, B<=10}
+
+    S1
+
+Code of S1 with preconditions
+
+
+C  P() {5<=B, B<=10}
+
+
+      SUBROUTINE S1(B)
+      INTEGER B
+
+C  P() {5<=B, B<=10}
+
+
+
+      PRINT *, B                                                        0006
+      END

@@ -1,0 +1,34 @@
+delete TD_Whileloop
+create TD_Whileloop TD_Whileloop.f
+
+activate MUST_REGIONS
+
+apply ARRAY_BOUND_CHECK_TOP_DOWN[%ALL]
+display PRINTED_FILE[%ALL]
+
+apply PARTIAL_REDUNDANCY_ELIMINATION[%ALL]
+display PRINTED_FILE[%ALL]
+
+close TD_Whileloop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

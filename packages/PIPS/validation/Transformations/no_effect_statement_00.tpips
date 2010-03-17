@@ -1,0 +1,22 @@
+setenv WSPC no_effect_statement_00
+delete $WSPC
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPC} ${WSPC}.c
+ 
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+apply SUPPRESS_DEAD_CODE[%ALLFUNC]
+
+display PRINTED_FILE[%ALLFUNC]
+close
+delete ${WSPC}
+quit

@@ -1,0 +1,137 @@
+delete case1
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create case1 case1.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INT_VARIABLES TRUE
+setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
+# Let's repeat if to overcome the property parser weaknesses...
+setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
+
+echo
+echo Parsed printed file for "func1"
+echo
+
+display PARSED_PRINTED_FILE[func1]
+
+echo
+echo Proper effetcs for "func1"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[func1]
+shell cp case1.database/func1/func1.prop.c case1.database/Src/func1.prop
+
+echo
+echo Cumulated effetcs for "func1"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[func1]
+shell cp case1.database/func1/func1.cumu.c case1.database/Src/func1.cumu
+
+echo
+echo Proper effetcs for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+shell cp case1.database/main/main.prop.c case1.database/Src/main.prop
+
+echo
+echo Cumulated effetcs for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+shell cp case1.database/main/main.cumu.c case1.database/Src/main.cumu
+
+
+# quit
+
+echo
+echo Transformers for "main"
+echo
+
+#setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES TRUE
+
+#setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[func1]
+#quit
+display PRINTED_FILE[main]
+
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+display PRINTED_FILE[func1]
+shell cp case1.database/func1/func1.prec.c case1.database/Src/func1.prec
+shell cp case1.database/main/main.prec.c case1.database/Src/main.prec
+
+# quit
+echo
+echo Printed files with regions
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[func1]
+
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[func1]
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE[func1]
+display PRINTED_FILE[main]
+
+shell cp case1.database/func1/func1.reg.c case1.database/Src/func1.reg
+shell cp case1.database/func1/func1.inreg.c case1.database/Src/func1.inreg
+shell cp case1.database/func1/func1.outreg.c case1.database/Src/func1.outreg
+#shell cp case1.database/main/main.prec.c case1.database/Src/main.prec
+
+
+activate PRINT_CODE_COMPLEXITIES # Statements & Complexities
+display PRINTED_FILE[func1]
+display PRINTED_FILE[main]
+shell cp case1.database/func1/func1.comp case1.database/Src/func1.comp
+
+apply PARTIAL_EVAL[main]
+apply PARTIAL_EVAL[func1]
+
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+display PRINTED_FILE[func1]
+# Should be useless
+# apply PRIVATIZE_MODULE
+
+
+
+echo
+echo Printed files after parallelization
+echo
+
+apply COARSE_GRAIN_PARALLELIZATION[func1]
+display PARALLELPRINTED_FILE[func1]
+
+close
+quit

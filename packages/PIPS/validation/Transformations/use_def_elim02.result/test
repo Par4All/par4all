@@ -1,0 +1,45 @@
+
+Code for "use_def_elim02"
+
+int use_def_elim02(int i)
+{
+   int j;
+   int k;
+
+   j = i+1;
+   i = 2;
+   k = 3;
+   return j;
+}
+
+Code with cumulated effects for "use_def_elim02"
+
+//               <must be read   >: i
+int use_def_elim02(int i)
+{
+   int j;
+   int k;
+//               <must be read   >: i
+//               <must be written>: j
+
+   j = i+1;
+//               <must be written>: i
+   i = 2;
+//               <must be written>: k
+   k = 3;
+//               <must be read   >: j
+   return j;
+}
+
+Code for "use_def_elim02" after use-def elimination
+
+int use_def_elim02(int i)
+{
+   int j;
+   int k;
+
+   j = i+1;
+   ;
+   ;
+   return j;
+}

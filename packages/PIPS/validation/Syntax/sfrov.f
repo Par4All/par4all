@@ -1,0 +1,7 @@
+      SUBROUTINE  SFROV
+
+      INTRINSIC ABS,EXP,SQRT
+ 
+      FRO0(IC)=FRO(IC,1)
+
+      END
