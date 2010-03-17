@@ -1,0 +1,43 @@
+Polyhedral Library Test
+
+
+a =4 4
+   1    0    1   -1 
+   1   -1    0    6 
+   1    0   -1    7 
+   1    1    0   -2 
+
+b =4 4
+   1    1    0   -1 
+   1   -1    0    3 
+   1    0   -1    5 
+   1    0    1   -2 
+
+C = A and B =POLYHEDRON Dimension:2
+           Constraints:4  Equations:0  Rays:4  Lines:0
+Constraints 4 4
+Inequality: [   1    0   -2  ]
+Inequality: [  -1    0    3  ]
+Inequality: [   0   -1    5  ]
+Inequality: [   0    1   -2  ]
+Rays 4 4
+Vertex: [   3    5  ]/1
+Vertex: [   2    5  ]/1
+Vertex: [   2    2  ]/1
+Vertex: [   3    2  ]/1
+
+D = transformed C =POLYHEDRON Dimension:2
+           Constraints:4  Equations:0  Rays:4  Lines:0
+Constraints 4 4
+Inequality: [   0    1   -2  ]
+Inequality: [   0   -1    3  ]
+Inequality: [  -1    0    5  ]
+Inequality: [   1    0   -2  ]
+Rays 4 4
+Vertex: [   5    3  ]/1
+Vertex: [   5    2  ]/1
+Vertex: [   2    2  ]/1
+Vertex: [   2    3  ]/1
+
+We expected A to cover C since C = A intersect B
+and C does not cover B...
