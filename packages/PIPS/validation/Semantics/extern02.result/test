@@ -2,11 +2,11 @@
 Cumulated effects for "main"
 
 //               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
-main()
+int main()
 {
-//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2 i
-//               <must be written>: i
+//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
    // BEGIN BLOCK
+//               <must be written>: i
    int i = 0;
 //               <must be read   >: TOP-LEVEL:delta i
 //               <must be written>: i
@@ -23,12 +23,15 @@ Transformers for "main"
 
 //  T() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
 
-main()
+int main()
 {
 
 //  T() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
 
    // BEGIN BLOCK
+
+//  T(i) {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3, i==0}
+
    int i = 0;
 
 //  T(i) {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3, i==1, i#init==0}
@@ -47,12 +50,15 @@ Preconditions for "main"
 
 //  P() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
 
-main()
+int main()
 {
 
 //  P() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
 
    // BEGIN BLOCK
+
+//  P() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
+
    int i = 0;
 
 //  P() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3, i==0}

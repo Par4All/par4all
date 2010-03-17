@@ -1,0 +1,20 @@
+delete conflict01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING TRUE
+create conflict01 conflict01.c conflict01.src/conflict01.c
+
+#close
+#delete conflict01
+#quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+display PRINTED_FILE[conflict01]
+
+apply UNSPLIT
+
+close
+#delete conflict01
+quit

@@ -17,11 +17,26 @@ C  P() {}
 
 void main()
 {
+
+//  P() {}
+
    int n = 10000;
+
+//  P() {n==10000}
+
    int loops = 10;
 
+
+//  P() {loops==10, n==10000}
+
    float h_A[n*n];
+
+//  P() {loops==10, n==10000}
+
    float h_C[n*n];
+
+
+//  P() {loops==10, n==10000}
 
    int i, j;
 

@@ -1,0 +1,6 @@
+delete register
+create register register.c
+display PRINTED_FILE[%ALLFUNC]
+close
+delete register
+quit

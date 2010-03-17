@@ -1,0 +1,30 @@
+raw file with loop flagged and privated variables scanned
+int pop(int pop)
+{
+   int i, j;
+#pragma omp for private(i,j)
+l99999:
+   for(i = i; i <= op-1; i += 1) {
+      j = i*2;
+      printf("%d", j);
+   }
+}
+after loop expansion
+int pop(int pop)
+{
+   int i, j;
+   //PIPS generated variable
+   int I_0;
+   // PIPS test to adjust loop size to required loop expansion parameter
+   if (MOD(-i+op, 128)==0)
+      I_0 = op-1;
+   else
+      I_0 = op-1+128-MOD(-i+op, 128);
+#pragma omp for private(i,j)
+l99999:
+   for(i = i; i <= I_0; i += 1) {
+      j = i*2;
+      if (i>=i&&i<=op-1) 
+         printf("%d", j);
+   }
+}

@@ -23,7 +23,7 @@ echo Code after inlining
 echo
 
 apply INLINING[foo]
-display PRINTED_FILE[inlining19]
+display PRINTED_FILE[%ALL]
 
 
 echo
@@ -31,7 +31,7 @@ echo Code after flattening
 echo
 
 apply FLATTEN_CODE[inlining19]
-display PRINTED_FILE[inlining19]
+display PRINTED_FILE[%ALL]
 
 echo
 echo Unsplit resulting code

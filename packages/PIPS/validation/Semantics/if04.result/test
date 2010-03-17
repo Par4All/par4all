@@ -6,7 +6,10 @@ C  T(if04) {0<=if04+1, if04<=1}
 
 int if04()
 {
-   int i,  n;
+
+//  T() {}
+
+   int i, n;
 
 //  T(i) {i==0}
 
@@ -51,7 +54,10 @@ Preconditions for "if04"
 
 int if04()
 {
-   int i,  n;
+
+//  P() {}
+
+   int i, n;
 
 //  P() {}
 

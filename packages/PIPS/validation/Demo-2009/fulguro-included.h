@@ -1,8 +1,202 @@
-#include <flgrCoreDispatch.h>
-#include <flgrCoreSlideWindow.h>
+#define POST_ERROR(chaine,...)    fprintf(stderr,"ERROR: File %s, Line %d, Function %s: "chaine, \
+                              __FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__); flgr_backtrace_print()
+
+  //! Print a warning in console
+#define POST_WARNING(chaine,...)  fprintf(stderr,"WARNING: File %s, Line %d, Function %s: "chaine, \ 
+                      __FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__); flgr_backtrace_print()
+  //! Print an information in console
+#define POST_INFO(chaine,...)     fprintf(stderr,"INFO: %s: "chaine,__FUNCTION__,##__VA_ARGS__)
+#define EPRINTF(...)              fprintf(stderr,__VA_ARGS__);flgr_backtrace_print()
+#define WPRINTF(...)              fprintf(stderr,__VA_ARGS__);flgr_backtrace_print()
+#define IPRINTF(...)              fprintf(stderr,__VA_ARGS__);
+  /*!
+   *  Data Types flags definition
+   */
+  typedef enum {      
+    FLGR_BIT,         /*!< Flag for BIT type (one value is stored in one bit) */
+    FLGR_UINT8,       /*!< Flag for UINT8 type */
+    FLGR_UINT16,      /*!< Flag for UINT16 type */
+    FLGR_UINT32,      /*!< Flag for UINT32 type */
+    FLGR_UINT64,      /*!< Flag for UINT64 type */
+    FLGR_INT8,        /*!< Flag for INT8 type */
+    FLGR_INT16,       /*!< Flag for INT16 type */
+    FLGR_INT32,       /*!< Flag for INT32 type */
+    FLGR_INT64,       /*!< Flag for INT64 type */
+    FLGR_FLOAT32,     /*!< Flag for FLOAT32 type */
+    FLGR_FLOAT64     /*!< Flag for FLOAT64 type */
+  }FLGR_Type;
+
+  typedef enum { 
+    /*! Function worked correctly */ 
+    FLGR_RET_OK                    = 0, 
+    /*! Data type specified is not recoginzed in the function */ 
+    FLGR_RET_TYPE_UNKNOWN          = -1, 
+    /*! Function could not work with images with different data types */ 
+    FLGR_RET_TYPE_DIFFERENT        = -2, 
+    /*! Function could not work with images with different sizes */ 
+    FLGR_RET_SIZE_ERROR            = -3, 
+    /*! Memory could not be allocated */ 
+    FLGR_RET_ALLOCATION_ERROR      = -4, 
+    /*! Connexity specified is not recognized by the function */ 
+    FLGR_RET_CONNEXITY_UNKNOWN     = -5, 
+    /*! The parameter is not known */ 
+    FLGR_RET_PARAM_UNKNOWN         = -6, 
+    /*! The function is not implemented */ 
+    FLGR_RET_NOT_IMPLEMENTED       = -7, 
+    /*! For all others*/ 
+    FLGR_RET_UNDEFINED_ERROR       = -8, 
+    /*  Non-initialized objects are used */ 
+    FLGR_RET_NULL_OBJECT           = -9, 
+    /*  Sample per pixel (spp) different */ 
+    FLGR_RET_VECTOR_SIZE_DIFFERENT = -10, 
+    /*  Vector size is not valid */ 
+    FLGR_RET_VECTOR_SIZE_ERROR     = -11, 
+    /*  function parameter is not valid */ 
+    FLGR_RET_PARAM_ERROR           = -12, 
+ 
+  }FLGR_Ret; 
+
+
+/*! 
+ *    * Vector structure
+ *       */
+typedef struct {
+    int spp;           //!< Number of elements
+    int bps;           //!< Number of bits per pixels
+    FLGR_Type type;    //!< Data type of elements
+    void *array;       //!< Array of elements
+} FLGR_Vector;
+
+  /*! 
+   * Neighborhood Box 2D
+   */
+  typedef struct {
+    /*! type of the data in the extracted neighborhood */
+    FLGR_Type type;
+    /*! Sample per Pixel */
+    int spp;
+    /*! Row Coordinate in the image of the pixel considered as the center of the neighborhood */
+    int center_coord_y;
+    /*! Column Coordinate in the image of the pixel considered as the center of the neighborhood */
+    int center_coord_x;
+    /*! value of the center of the extracted image box */
+    FLGR_Vector *center_data_val;
+    /*! value of the center of nhb */
+    FLGR_Vector *center_nhb_val;
+    /*! Y size of the nhb used to extract values */
+    int nhb_size_y;
+    /*! X size of the nhb used to extract values */
+    int nhb_size_x;
+    /*! Y coordinates list of pixel extracted */
+    int **list_coord_y;
+    /*! X coordinates list of pixel extracted */
+    int **list_coord_x;
+    /*! list of pixels values extracted in the image */
+    void **list_data_val;
+    /*! list of Neighborhood values corresponding to extracted pixels in the image */
+    void **list_nhb_val;
+    /*! size of the pixel list */
+    int *size;
+  }FLGR_NhbBox2D;
+
+  typedef unsigned long long    fgUINT64;
+  typedef long long             fgINT64;
+    
+  //types for tdata2d values
+  typedef unsigned char         fgUINT8;   //!< 8 bits unsigned
+  typedef unsigned short int    fgUINT16;  //!< 16 bits unsigned
+  typedef unsigned int          fgUINT32;  //!< 32 bits unsigned
+  typedef signed char           fgINT8;    //!< 8 bits signed
+  typedef signed short int      fgINT16;   //!< 16 bits signed
+  typedef signed int            fgINT32;   //!< 32 bits signed
+  typedef float                 fgFLOAT32; //!< Simple Float
+  typedef double                fgFLOAT64; //!< Double Float
+
+  /*!
+   *  Shape flags definition
+   */
+  typedef enum {
+    FLGR_LINE,       /*!< 1D Shape*/
+    FLGR_RECT,       /*!< 2D, Filled Rectangle */
+    FLGR_HEX,        /*!< 2D, Hexagon */
+    FLGR_DISC,       /*!< 2D, Disc */
+    FLGR_ELLIPSE,    /*!< 2D, Filled Ellipse */
+    FLGR_CROSS,      /*!< 2D, Cross + */
+    FLGR_CROSSX,     /*!< 2D, Cross X */
+    FLGR_SLASH,      /*!< 2D, line / */
+    FLGR_BSLASH,     /*!< 2D, line \\ */
+    FLGR_DIAMOND,    /*!< 2D, Diamond */
+    FLGR_OCTAGON,    /*!< 2D, Octagon */
+    FLGR_USER_SHAPE, /*!< User shape */
+    FLGR_NO_SHAPE,   /*!< Shape not applicable */
+  }FLGR_Shape;
+
+
+
+  /*!
+   *  Connexity Mesh flags definition
+   */
+  typedef enum {
+    FLGR_4_CONNEX  = 4, /*!< Flag for 4-connex operation (2D) */
+    FLGR_6_CONNEX  = 6, /*!< Flag for 6-connex operation (2D) */
+    FLGR_8_CONNEX  = 8, /*!< Flag for 8-connex operation (2D) */
+    FLGR_NO_CONNEX = 0 /*!< Flag No Connexity applicable */
+  }FLGR_Connexity;
+
+#define FLGR_TRUE  1          
+#define FLGR_FALSE 0
+
+  /*!
+   *  Symetrize Neighborhood flags definition
+   */
+  typedef enum {              
+    /*! Neihborhood Definition Symetrization Flag */
+    FLGR_NHB_SYM              = 0,
+    /*! Neihborhood Definition No Symetrization Flag */
+    FLGR_NHB_NO_SYM           = 1,
+  }FLGR_Sym;
+
+  /*! 
+   *  Data 1D array structure
+   */
+  typedef struct {   
+    int dim;                  /*!< Dimension */
+    int size_struct;          /*!< Size of the structure  */
+    int bps;                  /*!< Number of bits per sample  */
+    int spp;                  /*!< Number of samples per pixel */
+    int ref2d;                /*!< Value will be != -1 if the array correspond to a specific FLGR_Data2D's row */
+    FLGR_Type type;           /*!< Type of a sample*/
+    FLGR_Shape shape;         /*!< Shape if applicable*/
+    int length;               /*!< length of the array */
+    void *array;              /*!< Virtual Start of row elements */
+    void *array_phantom;      /*!< Physical Start of row elements (array = array_phantom+32)*/
+  }FLGR_Data1D;
+
+  /*! 
+   *  Data2D array structure
+   */
+  typedef struct {
+    int dim;                  /*!< Dimension */
+    int size_struct;          /*!< Size of the structure  */
+    int link_overlap;         /*!< Set sup>=0 if rows are linked to another FLGR_Data2D, else set to -1 */
+    int link_position;        /*!< which part of the image is used as link from the original image, else -1*/
+    int link_number;          /*!< number ofy position where the link starts in the source image, else -1 */
+    int bps;                  /*!< Number of bits per sample  */
+    int spp;                  /*!< Number of samples per pixel */
+    int ref3d;                /*!< Value will be != -1 if the array correspond to a specific FLGR_Data3D's plan */
+    FLGR_Type type;           /*!< Type of a sample */
+    FLGR_Shape shape;         /*!< Shape if applicable drawed in the matrix*/
+    FLGR_Connexity connexity; /*!< Connexity if applicable of the matrix*/
+    int size_y;               /*!< Number of line */
+    int size_x;               /*!< Number of column */
+    FLGR_Data1D **row;        /*!< FLGR_Data1D row pointer array*/
+    void **array;             /*!< fast access to 2d array values */
+  }FLGR_Data2D;
+
+ typedef fgUINT32              fgBIT;
 
 #define flgr_free_align flgr_free
-#define flgr_malloc_align flgr_malloc
+#define flgr_malloc_align(a,b) flgr_malloc(a)
 #define FLGR_MACRO_RASTER_SLIDE_WINDOW_2D(dtype,get_nhb_op)	\
   int i,j,w,h,spp = imgsrc->spp;				\
   dtype *vector_array;						\
@@ -791,12 +985,15 @@
 								\
   return
 
-void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *extr) {
-  FLGR_MACRO_GET_NHB_CONV_2D(fgUINT16);
-}
 
+  fgUINT16 flgr_get_array_fgUINT16(fgUINT16* array, int pos) {
+    return array[pos];
+  }
   fgUINT16 flgr2d_get_data_array_fgUINT16(fgUINT16** array, int row, int col) {
     return flgr_get_array_fgUINT16(array[row],col);
+  }
+  void flgr_set_array_fgUINT16(fgUINT16* array, int pos, fgUINT16 value) {
+    array[pos]=value;
   }
   void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_array, int spp, int pos) {
     register fgUINT16 val;
@@ -807,12 +1004,9 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
       flgr_set_array_fgUINT16(vector_array,k,val);
     }
   }
-  fgUINT16 flgr_get_array_fgUINT16(fgUINT16* array, int pos) {
-    return array[pos];
-  }
-  void flgr_set_array_fgUINT16(fgUINT16* array, int pos, fgUINT16 value) {
-    array[pos]=value;
-  }
+static __inline__ void flgr2d_set_data_array_fgUINT16(fgUINT16** array, int row, int col, fgUINT16 value) {
+    flgr_set_array_fgUINT16(array[row],col,value);
+}
 
   void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_array, int spp, int pos) {
     register fgUINT16 val;
@@ -823,6 +1017,7 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
       flgr_set_array_fgUINT16(data_array,i,val);
     }
   }
+#if 0
  void *memcpy(void *dest, const void *src, size_t n)
 {
 	size_t i;
@@ -841,6 +1036,7 @@ void *memset(void *s, int c, size_t n)
 	return s;
 
 }
+#endif
   static __inline__ fgUINT16 flgr_defop_sup_fgUINT16(fgUINT16 a,fgUINT16 b) {
     return (a<b?b:a);
   }
@@ -905,6 +1101,18 @@ FLGR_Ret flgr_is_vector_type_valid(FLGR_Type type) {
     return FLGR_RET_OK;
   }else return FLGR_RET_TYPE_UNKNOWN;
 }
+void *flgr_malloc(size_t size) {
+  void *tmp = malloc(size);
+
+  
+
+  if(tmp==NULL) {
+    POST_ERROR("Could not allocate data, returning NULL pointer !\n");
+    return NULL;
+  }
+
+  return tmp;
+}
 FLGR_Vector *flgr_vector_create(int spp, FLGR_Type type){
   FLGR_Vector *vct;
 
@@ -965,18 +1173,6 @@ int flgr_normalize_coordinate(int axis_coord, int axis_length) {
 
   return axis_coord;
 }
-void *flgr_malloc(size_t size) {
-  void *tmp = malloc(size);
-
-  
-
-  if(tmp==NULL) {
-    POST_ERROR("Could not allocate data, returning NULL pointer !\n");
-    return NULL;
-  }
-
-  return tmp;
-}
 FLGR_Ret flgr_is_data_type_valid(FLGR_Type type) {
   
 
@@ -1017,6 +1213,9 @@ FLGR_Type flgr_get_type_from_string(char *type) {
 
   POST_ERROR("Unknown type %s\n",type);
   return FLGR_UINT8;
+}
+FLGR_Data1D *flgr1d_create_fgUINT16(int length, int spp, FLGR_Shape shape) {
+  FLGR_MACRO_CREATE1D(fgUINT16, FLGR_UINT16);
 }
 int flgr_get_bps_from_type(FLGR_Type type) {
   
@@ -1061,6 +1260,26 @@ void flgr_backtrace_print(void) {
   free(strings);
 #endif
   return;
+}
+FLGR_Data2D *flgr2d_create_fgUINT16(int size_y, int size_x, int spp, FLGR_Shape shape, FLGR_Connexity connexity) {
+  FLGR_MACRO_CREATE2D(fgUINT16, FLGR_UINT16);
+}
+FLGR_Data2D *flgr2d_create(int size_y, int size_x, int spp, FLGR_Type type, FLGR_Shape shape, FLGR_Connexity connexity) {
+  
+
+  if(type==FLGR_UINT16)  return flgr2d_create_fgUINT16(size_y, size_x, spp, shape, connexity);
+  POST_ERROR("Type unknown!\n");
+  return NULL;
+
+}
+FLGR_Data2D *flgr2d_create_from(FLGR_Data2D *datsrc) {
+  
+
+  if(datsrc==NULL) {
+    POST_ERROR("Null objects!\n");
+    return NULL;
+  }
+  return flgr2d_create(datsrc->size_y,datsrc->size_x,datsrc->spp,datsrc->type,datsrc->shape,datsrc->connexity);
 }
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct) {
   FLGR_MACRO_SET_DATA2D_VECTOR(fgUINT16);
@@ -1366,15 +1585,6 @@ void flgr2d_draw_filled_ellipse_fgUINT16(FLGR_Data2D *dat, int cx, int cy, int a
 void flgr2d_draw_disc_fgUINT16(FLGR_Data2D *dat, int cx, int cy, int radius, FLGR_Vector *color) {
   FLGR_MACRO_DRAW_2D_2D_DISC(fgUINT16);
 }
-FLGR_Data2D *flgr2d_create_from(FLGR_Data2D *datsrc) {
-  
-
-  if(datsrc==NULL) {
-    POST_ERROR("Null objects!\n");
-    return NULL;
-  }
-  return flgr2d_create(datsrc->size_y,datsrc->size_x,datsrc->spp,datsrc->type,datsrc->shape,datsrc->connexity);
-}
 void flgr1d_copy_fgUINT16_fgUINT16(FLGR_Data1D *datdest, FLGR_Data1D *datsrc) {
   FLGR_MACRO_COPY1D_SAME_TYPE;
 }
@@ -1634,34 +1844,6 @@ FLGR_Data2D *flgr2d_create_pixmap(int size_y, int size_x, int spp, FLGR_Type typ
 
   return flgr2d_create(size_y, size_x, spp, type, FLGR_NO_SHAPE, FLGR_NO_CONNEX);
 }
-
-FLGR_Data2D *flgr2d_create_neighborhood_from(FLGR_Data2D *nhbsrc) {
-  
-
-  if(nhbsrc==NULL) {
-    POST_ERROR("Null objects!\n");
-    return NULL;
-  }
-  return flgr2d_create_neighborhood(nhbsrc->size_y, nhbsrc->size_x, nhbsrc->spp,
-				    nhbsrc->type, nhbsrc->shape, nhbsrc->connexity);
-}
-
-FLGR_Data1D *flgr1d_create_fgUINT16(int length, int spp, FLGR_Shape shape) {
-  FLGR_MACRO_CREATE1D(fgUINT16, FLGR_UINT16);
-}
-
-FLGR_Data2D *flgr2d_create_fgUINT16(int size_y, int size_x, int spp, FLGR_Shape shape, FLGR_Connexity connexity) {
-  FLGR_MACRO_CREATE2D(fgUINT16, FLGR_UINT16);
-}
-
-FLGR_Data2D *flgr2d_create(int size_y, int size_x, int spp, FLGR_Type type, FLGR_Shape shape, FLGR_Connexity connexity) {
-  
-
-  if(type==FLGR_UINT16)  return flgr2d_create_fgUINT16(size_y, size_x, spp, shape, connexity);
-  POST_ERROR("Type unknown!\n");
-  return NULL;
-
-}
 FLGR_Data2D *flgr2d_create_neighborhood(int size_y, int size_x, int spp, FLGR_Type type,
 					FLGR_Shape shape, FLGR_Connexity connexity) {
   FLGR_Data2D *nhb;
@@ -1692,6 +1874,20 @@ FLGR_Data2D *flgr2d_create_neighborhood(int size_y, int size_x, int spp, FLGR_Ty
   return nhb;
 
 }
+
+FLGR_Data2D *flgr2d_create_neighborhood_from(FLGR_Data2D *nhbsrc) {
+  
+
+  if(nhbsrc==NULL) {
+    POST_ERROR("Null objects!\n");
+    return NULL;
+  }
+  return flgr2d_create_neighborhood(nhbsrc->size_y, nhbsrc->size_x, nhbsrc->spp,
+				    nhbsrc->type, nhbsrc->shape, nhbsrc->connexity);
+}
+
+
+
 int flgr_get_sizeof(FLGR_Type type) {
   
 
@@ -1771,9 +1967,15 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb) {
   FLGR_APPLY_RASTER_SCAN_METHOD_2D(fgUINT16);
 }
 
+  //! pointer to a function doing computation over an extracted neighborhood
+  typedef void (*FLGR_ComputeNhb2D)    (FLGR_Vector *result, FLGR_NhbBox2D *extr);
+
 void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgsrc, FLGR_Data2D *nhb, int nhb_sym,
 					  FLGR_ComputeNhb2D computeNhb) {
   FLGR_MACRO_RASTER_SLIDE_WINDOW_2D(fgUINT16,flgr2d_get_neighborhood);
+}
+void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *extr) {
+  FLGR_MACRO_GET_NHB_CONV_2D(fgUINT16);
 }
 void flgr2d_convolution_fgUINT16(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data2D *nhb) {
   

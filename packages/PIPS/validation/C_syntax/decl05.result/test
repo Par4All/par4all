@@ -47,3 +47,44 @@ Layout for memory area "decl05!:*STATIC*" of size 0:
 
 End of declarations for module decl05!
 
+
+Source code for "decl05!"
+
+
+/* fonction ou s'est produite l'erreur */
+//char file [500]; /* fichier ou s'est produite l'erreur  */
+//char description [500]; /* texte personalise de l'erreur eventuellement */
+//STD_uint32 line; /* ligne dans le code ou on a generer l'erreur */
+//ERR_code code; /* le code de l'erreur generee */
+struct _err_error {
+   char function[500];
+};
+
+/* gestion pile */
+
+//const ERR_code code,
+//const STD_uint32 line,
+//const char * file,
+
+//void (* pop)(struct _err_manager * _this);
+//ERR_error * (* top)(const struct _err_manager * _this);
+//STD_int32 (* occured)(const struct _err_manager * _this);
+//STD_int32 (* top_is)(const struct _err_manager * _this,const ERR_code code);
+//void (* format_message)(struct _err_manager * _this/*, const ERR_error * error*/);
+//char message[500];
+//HDL_stream * message_stream;
+struct _err_manager {
+   char function[500];
+   struct _err_pile {struct _err_error *pile;} pile;
+   void (*push)(struct _err_manager *_this, const char *function);
+};
+
+
+//ERR_mgr * mgr,
+//HDL_stream * message_stream,
+//const STD_uint32 line,
+
+void ERR_mgr_ctor(const char *file, const char *function);
+
+/*ERR_mgr * emgr*/
+void ERR_mgr_dtor();

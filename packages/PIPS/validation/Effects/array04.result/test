@@ -3,49 +3,49 @@ Proper effects for "main"
 
 int main()
 {
-   int t[100][10][3];                                                   /*0003*/
+   int t[100][10][3];                                                   /*0007*/
 
-   int (*p)[3];                                                         /*0005*/
-   int *pu;                                                             /*0006*/
+   int (*p)[3];                                                         /*0009*/
+   int *pu;                                                             /*0010*/
 
-   int (*q)[10][3];                                                     /*0008*/
-   int (*qu)[3];                                                        /*0009*/
+   int (*q)[10][3];                                                     /*0012*/
+   int (*qu)[3];                                                        /*0013*/
 
-   int (*r)[100][10][3];                                                /*0011*/
-   int (*ru)[10][3];                                                    /*0012*/
+   int (*r)[100][10][3];                                                /*0015*/
+   int (*ru)[10][3];                                                    /*0016*/
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
-   printf("sizeof(t) = %zd\n", sizeof(t));                              /*0014*/
+   printf("sizeof(t) = %zd\n", sizeof(t));                              /*0018*/
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
-   printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0015*/
+   printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0019*/
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
-   printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0016*/
+   printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0020*/
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
-   printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0017*/
+   printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0021*/
 //               <must be written>: p
 
-   p = &t[1][2];                                                        /*0019*/
+   p = &t[1][2];                                                        /*0023*/
 //               <must be written>: pu
-   pu = t[1][2];                                                        /*0020*/
+   pu = t[1][2];                                                        /*0024*/
 //               <must be written>: pu
-   pu = &t[1][2][0];                                                    /*0021*/
+   pu = &t[1][2][0];                                                    /*0025*/
 //               <must be written>: q
 
-   q = &t[1];                                                           /*0023*/
+   q = &t[1];                                                           /*0027*/
 //               <must be written>: qu
-   qu = t[1];                                                           /*0024*/
+   qu = t[1];                                                           /*0028*/
 //               <must be written>: qu
-   qu = &t[1][0];                                                       /*0025*/
+   qu = &t[1][0];                                                       /*0029*/
 //               <must be written>: r
 
-   r = &t;                                                              /*0027*/
+   r = &t;                                                              /*0031*/
 //               <must be written>: ru
-   ru = t;                                                              /*0028*/
+   ru = t;                                                              /*0032*/
 //               <must be written>: ru
-   ru = &t[0];                                                          /*0029*/
-   return 0;                                                            /*0030*/
+   ru = &t[0];                                                          /*0033*/
+   return 0;                                                            /*0034*/
 }

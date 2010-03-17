@@ -12,8 +12,8 @@ Variable list:
 	Declared entity "decl44:*HEAP*" with type "area" with size 0
 	Declared entity "decl44:*STACK*" with type "area" with size 0
 	Declared entity "decl44:*STATIC*" with type "area" with size 0
-	Declared entity "decl44:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl44:0`__func__" with type "variable" "char"
+	Declared entity "decl44:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "decl44:0`__func__" with type "variable" "char *"
 
 External variable list:
 
@@ -50,6 +50,6 @@ End of declarations for module decl44
 
 void decl44()
 {
-   extern int m[3];                                                     /*0004*/
-   foo(m);                                                              /*0005*/
+   extern int m[3];                                                     /*0005*/
+   foo(m);                                                              /*0006*/
 }

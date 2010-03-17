@@ -31,6 +31,9 @@ echo
 
 display PRINTED_FILE[initialization04]
 
+apply UNSPLIT
+shell cc -c initialization04.database/Src/initialization04.c
+
 close
 delete initialization04
 

@@ -6,6 +6,9 @@ C  T() {0==-1}
 
 void while10()
 {
+
+//  T(i) {i==1}
+
    int i = 1;
 
 //  T(i) {i==2}
@@ -35,6 +38,9 @@ Preconditions for "while10"
 
 void while10()
 {
+
+//  P() {}
+
    int i = 1;
 
 //  P() {i==1}

@@ -7,24 +7,24 @@ void boom()
 {
    /* Stress a bug found by Johan Gall while analyzing PERL from the
       SPEC2006. */
-   f("\\");                                                             /*0005*/
-   f("abc");                                                            /*0006*/
    f("\\");                                                             /*0007*/
    f("abc");                                                            /*0008*/
    f("\\");                                                             /*0009*/
-   f("\\");                                                             /*0010*/
-   f("abc");                                                            /*0011*/
-   f("abc");                                                            /*0012*/
+   f("abc");                                                            /*0010*/
+   f("\\");                                                             /*0011*/
+   f("\\");                                                             /*0012*/
+   f("abc");                                                            /*0013*/
+   f("abc");                                                            /*0014*/
    
    /* Note this was a special cas in the parser, but according to the C norm
         (WG14/N1256 Committee Draft - Septermber 7, 2007 ISO/IEC 9899:TC3,
         Annex 1.1.6) I think it should not. It is indead the concatenation of
         2 empty strings. RK. */
-   f("""");                                                             /*0018*/
-   f("""");                                                             /*0019*/
+   f("""");                                                             /*0020*/
+   f("""");                                                             /*0021*/
    /* But I wonder what is the meaning of this: the concatenation of a
         wide-char string with a normal-char string. I guess it should not be
         legal...  */
-   f(""L"");                                                            /*0023*/
-   f(""L"");                                                            /*0024*/
+   f(""L"");                                                            /*0025*/
+   f(""L"");                                                            /*0026*/
 }

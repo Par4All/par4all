@@ -3,34 +3,36 @@ Initial code
 
 void access_counter(unsigned int *hi, unsigned int *lo)
 {
+   /*
+   asm ("rdtsc; movl %%edx,%0; movl %%eax,%1"
+   : "=r" (*hi), "=r" (*lo)
+   :
+   : "%edx", "%eax");
+     */
+   ;
 }
 void copy(int w, int h, unsigned char *bytes, unsigned char *dest)
 {
-   int i;
-   int j;
+   int i, j;
 
-   for (i = 0;i<w;i++)
-      for (j = 0;j<h;j++)
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1)
          dest[j*w+i] = bytes[j*w+i];
 }
 void curve(int w, int h, unsigned char *bytes, unsigned char *lut)
 {
-   int i;
-   int j;
+   int i, j;
 
-   for (i = 0;i<w;i++)
-      for (j = 0;j<h;j++) {
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1) {
          unsigned char current = bytes[j*w+i];
          bytes[j*w+i] = lut[current];
       }
 }
 double get_counter()
 {
-   unsigned int ncyc_hi;
-   unsigned int ncyc_lo;
-   unsigned int hi;
-   unsigned int lo;
-   unsigned int borrow;
+   unsigned int ncyc_hi, ncyc_lo;
+   unsigned int hi, lo, borrow;
 
    access_counter(&ncyc_hi, &ncyc_lo);
 
@@ -41,13 +43,12 @@ double get_counter()
 }
 void light(int w, int h, unsigned char *bytes, unsigned char val)
 {
-   int i;
-   int j;
+   int i, j;
 
-   for (i = 0;i<w;i++)
-      for (j = 0;j<h;j++) {
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1) {
          unsigned char current = bytes[j*w+i];
-         bytes[j*w+i] = ((int) current+val>255?255:current+val);
+         bytes[j*w+i] = (int) current+val>255?255:current+val;
       }
 }
 int main(int ac, char *av[])
@@ -64,8 +65,7 @@ int main(int ac, char *av[])
    char c1;
    char c2;
    double t;
-   long i;
-   long size;
+   long i, size;
 
    if (ac!=4) {
       printf("Usage: light infile.pgm mapfile.amp outfile.pgm\n");
@@ -125,7 +125,7 @@ int main(int ac, char *av[])
    }
 
    fseek(in, 1, 1);
-   for (i = 0;i<size;i++)
+   for(i = 0; i <= size-1; i += 1)
       if (fread(bytes+i, 1, 1, in)==0) {
          perror("fread");
          exit(1);
@@ -137,7 +137,7 @@ int main(int ac, char *av[])
    t = get_counter();
    printf("%f clock cycles.\n", t);
    
-
+   
    out = fopen(av[3], "w");
    if (out==(void *) 0) {
       perror("fopen");
@@ -146,7 +146,7 @@ int main(int ac, char *av[])
    fprintf(out, "P5\n");
    fprintf(out, "%d %d\n", height, width);
    fprintf(out, "%d\n", maxval);
-   for (i = 0;i<size;i++)
+   for(i = 0; i <= size-1; i += 1)
       if (fwrite(dest+i, 1, 1, out)==-1) {
          perror("fwrite");
          exit(1);
@@ -166,6 +166,242 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
 
 Code after transformations to come...
 
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1)
+            dest[j*w+i] = bytes[j*w+i];
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current = dest[j*w+i];
+            dest[j*w+i] = lut[current];
+         }
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current = dest[j*w+i];
+            dest[j*w+i] = (int) current+val>255?255:current+val;
+         }
+   }
+}
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1)
+            dest[j*w+i] = bytes[j*w+i];
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            current = dest[j*w+i];
+            dest[j*w+i] = lut[current];
+         }
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            current = dest[j*w+i];
+            dest[j*w+i] = (int) current+val>255?255:current+val;
+         }
+   }
+}
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
+   //PIPS generated variable
+   int I_0, I_1, I_2;
+   //PIPS generated variable
+   unsigned char I_3, I_4;
+   //PIPS generated variable
+   int I_5, I_6;
+   //PIPS generated variable
+   unsigned char I_7;
+   //PIPS generated variable
+   int I_8, I_9;
+   //PIPS generated variable
+   char I_10;
+   //PIPS generated variable
+   int I_11;
+   I_0 = w-1;
+   int i, j;
+
+   for(i = 0; i <= I_0; i += 1)
+      for(j = 0; j <= h-1; j += 1)
+         dest[j*w+i] = bytes[j*w+i];
+   {
+      int i, j;
+
+      for(i = 0; i <= I_0; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            I_2 = j*w+i;
+            current = dest[I_2];
+            dest[I_2] = lut[current];
+         }
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= I_0; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            I_6 = j*w+i;
+            current = dest[I_6];
+            dest[I_6] = (int) current+val>255?255:current+val;
+         }
+   }
+}
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
+   //PIPS generated variable
+   int I_0, I_1, I_2;
+   //PIPS generated variable
+   unsigned char I_3, I_4;
+   //PIPS generated variable
+   int I_5, I_6;
+   //PIPS generated variable
+   unsigned char I_7;
+   //PIPS generated variable
+   int I_8, I_9;
+   //PIPS generated variable
+   char I_10;
+   //PIPS generated variable
+   int I_11;
+   I_0 = w-1;
+   int i, j;
+
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1)
+         dest[j*w+i] = bytes[j*w+i];
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            I_2 = j*w+i;
+            current = dest[j*w+i];
+            dest[j*w+i] = lut[dest[j*w+i]];
+         }
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            I_6 = j*w+i;
+            current = dest[j*w+i];
+            dest[j*w+i] = (int) dest[j*w+i]+val>255?255:dest[j*w+i]+val;
+         }
+   }
+}
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
+   //PIPS generated variable
+   int I_0, I_1, I_2;
+   //PIPS generated variable
+   unsigned char I_3, I_4;
+   //PIPS generated variable
+   int I_5, I_6;
+   //PIPS generated variable
+   unsigned char I_7;
+   //PIPS generated variable
+   int I_8, I_9;
+   //PIPS generated variable
+   char I_10;
+   //PIPS generated variable
+   int I_11;
+   I_0 = w-1;
+   int i, j;
+
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1)
+         dest[j*w+i] = bytes[j*w+i];
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            I_2 = j*w+i;
+            current = dest[j*w+i];
+            dest[j*w+i] = lut[dest[j*w+i]];
+         }
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            I_6 = j*w+i;
+            current = dest[j*w+i];
+            dest[j*w+i] = (int) dest[j*w+i]+val>255?255:dest[j*w+i]+val;
+         }
+   }
+}
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
+   //PIPS generated variable
+   int I_0, I_1, I_2;
+   //PIPS generated variable
+   unsigned char I_3, I_4;
+   //PIPS generated variable
+   int I_5, I_6;
+   //PIPS generated variable
+   unsigned char I_7;
+   //PIPS generated variable
+   int I_8, I_9;
+   //PIPS generated variable
+   char I_10;
+   //PIPS generated variable
+   int I_11, i_0, j_0;
+   //PIPS generated variable
+   unsigned char current_0, current_1;
+   //PIPS generated variable
+   int i_1, j_1;
+   //PIPS generated variable
+   unsigned char current_2, current_3;
+   I_0 = w-1;
+   int i, j;
+
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1)
+         dest[j*w+i] = bytes[j*w+i];
+
+   for(i_0 = 0; i_0 <= w-1; i_0 += 1)
+      for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
+         I_2 = j_0*w+i_0;
+         current_1 = dest[j_0*w+i_0];
+         dest[j_0*w+i_0] = lut[dest[j_0*w+i_0]];
+      }
+
+   for(i_1 = 0; i_1 <= w-1; i_1 += 1)
+      for(j_1 = 0; j_1 <= h-1; j_1 += 1) {
+         I_6 = j_1*w+i_1;
+         current_3 = dest[j_1*w+i_1];
+         dest[j_1*w+i_1] = (int) dest[j_1*w+i_1]+val>255?255:dest[j_1*w+i_1]+val;
+      }
+}
 
 Unsplit resulting code
 

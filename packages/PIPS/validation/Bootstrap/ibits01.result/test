@@ -8,9 +8,9 @@ Parsed printed file
       INTEGER K
       INTEGER H
 
-      I = 1                                                             0008
-      J = 3                                                             0009
-      K = 14                                                            0010
+      I = 1.0                                                           0008
+      J = 3.0                                                           0009
+      K = 14.0                                                          0010
       H = IBITS(K, I, J)                                                0011
       PRINT *, 'H = ', H                                                0012
 
@@ -26,11 +26,11 @@ Proper effects
       INTEGER H
 C               <must be written>: I
 
-      I = 1                                                             0008
+      I = 1.0                                                           0008
 C               <must be written>: J
-      J = 3                                                             0009
+      J = 3.0                                                           0009
 C               <must be written>: K
-      K = 14                                                            0010
+      K = 14.0                                                          0010
 C               <must be read   >: I J K
 C               <must be written>: H
       H = IBITS(K, I, J)                                                0011
@@ -52,11 +52,11 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
       INTEGER H
 C               <must be written>: I
 
-      I = 1                                                             0008
+      I = 1.0                                                           0008
 C               <must be written>: J
-      J = 3                                                             0009
+      J = 3.0                                                           0009
 C               <must be written>: K
-      K = 14                                                            0010
+      K = 14.0                                                          0010
 C               <must be read   >: I J K
 C               <must be written>: H
       H = IBITS(K, I, J)                                                0011

@@ -85,7 +85,7 @@ void inter01()
 
 Proper effects for "main"
 
-main()
+int main()
 {
 //               <may be written >: TOP-LEVEL:i TOP-LEVEL:j inter01!:k
 //                                  inter01:0`l

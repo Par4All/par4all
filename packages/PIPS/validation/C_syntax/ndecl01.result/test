@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "ndecl01:*HEAP*" with type "area" with size 0
 	Declared entity "ndecl01:*STACK*" with type "area" with size 0
 	Declared entity "ndecl01:*STATIC*" with type "area" with size 0
-	Declared entity "ndecl01:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "ndecl01:0`__func__" with type "variable" "char"
+	Declared entity "ndecl01:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "ndecl01:0`__func__" with type "variable" "char *"
 	Declared entity "ndecl01:0`i" with type "variable" "int"
 	Declared entity "ndecl01:0`j" with type "variable" "int"
 	Declared entity "ndecl01:0`k" with type "variable" "int"
@@ -64,11 +64,11 @@ Parsed printed file
 void ndecl01(char *dir)
 {
    /* One variable declared alone */
-   int i;                                                               /*0005*/
+   int i;                                                               /*0007*/
    /* Two variables declared together */
-   int j,  k;                                                           /*0007*/
+   int j, k;                                                            /*0009*/
    /* A C continue statement */
-   ;                                                                    /*0009*/
+   ;                                                                    /*0011*/
    /* An assignment*/
-   i = 1;                                                               /*0011*/
+   i = 1;                                                               /*0013*/
 }

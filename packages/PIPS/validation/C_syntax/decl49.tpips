@@ -18,6 +18,10 @@ echo Printed file for "safe_malloc"
 echo
 
 display PRINTED_FILE[safe_malloc]
+
+apply UNSPLIT
+shell cc -c decl49.database/Src/decl49.c
+
 close
 #delete $WSPC
 quit

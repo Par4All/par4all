@@ -1,3 +1,5 @@
+/* Include for malloc is missing, at least for some gcc distribution */
+
 #include <stdlib.h>
 void *safe_malloc(size_t n)
 {

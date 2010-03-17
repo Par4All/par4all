@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "block_scope08:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope08:*STACK*" with type "area" with size 0
 	Declared entity "block_scope08:*STATIC*" with type "area" with size 0
-	Declared entity "block_scope08:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "block_scope08:0`__func__" with type "variable" "char"
+	Declared entity "block_scope08:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "block_scope08:0`__func__" with type "variable" "char *"
 	Declared entity "block_scope08:0`k" with type "variable" "int"
 	Declared entity "block_scope08:block_scope08" with type "variable" "int"
 	Declared entity "block_scope08:x" with type "variable" "int"

@@ -76,7 +76,9 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 void conv_cpu(float a[10000*10000], float c[10000*10000], float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
    int i, j;
+#pragma omp parallel for private(j)
    for(i = 0; i <= 9999; i += 1) {
+#pragma omp parallel for 
       for(j = 0; j <= 9999; j += 1) {
          int idx = i*10000+j;
 

@@ -23,8 +23,9 @@ echo simdized code
 echo
 
 display PRINTED_FILE
+apply UNSPLIT
 
-shell ./compileC.sh accumulate accumulate test.c
+shell ./compileC.sh accumulate accumulate.c test.c
 shell gcc -O3 -I. -march=native -c test.c
 shell rm test.c test.o
 

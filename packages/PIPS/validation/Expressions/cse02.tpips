@@ -1,0 +1,25 @@
+delete cse02
+create cse02 cse02.c
+module foo
+
+echo
+echo original code
+echo
+display PRINTED_FILE
+apply COMMON_SUBEXPRESSION_ELIMINATION
+echo
+echo code after cse
+echo
+display PRINTED_FILE
+close
+
+delete cse02
+create cse02 cse02.c
+module foo
+echo
+echo code after cse, lhs not skipped
+echo
+setproperty COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS FALSE
+apply COMMON_SUBEXPRESSION_ELIMINATION
+display PRINTED_FILE
+close

@@ -4,10 +4,10 @@ int find_while(int i)
 begin2:   ;
 
 begin:   if (i<9) {
-      i++;                                                              /*0009*/
-      goto begin;                                                       /*0010*/
+      i++;                                                              /*0008*/
+      goto begin;                                                       /*0009*/
    }
-   return i;                                                            /*0012*/
+   return i;                                                            /*0011*/
 }
 int find_while(int i)
 {
@@ -19,10 +19,10 @@ begin:   if (i<9) {
    else {
       goto l99999;
    }
-   i++;                                                                 /*0009*/
+   i++;                                                                 /*0008*/
    goto begin;
 l99999:   ;
-   return i;                                                            /*0012*/
+   return i;                                                            /*0011*/
 }
 int find_while(int i)
 {
@@ -35,10 +35,10 @@ begin:   if (i<9)
       ;
 ƒUnstructured Successor -> c_2_1 c_3_1
 ‚Unstructured Item c_2_1
-   i++;                                                                 /*0009*/
+   i++;                                                                 /*0008*/
 ƒUnstructured Successor -> c_1_1
 ‚Unstructured Item c_3_1
-   return i;                                                            /*0012*/
+   return i;                                                            /*0011*/
 ƒUnstructured Successor ->
 Unstructured End c_1_1 end: c_3_1
 }
@@ -46,23 +46,23 @@ int find_while(int i)
 {
 
 begin2:   ;
-   while (i<9)                                                          /*0009*/
-      i++;                                                              /*0009*/
-   return i;                                                            /*0012*/
+   while (i<9)                                                          /*0008*/
+      i++;                                                              /*0008*/
+   return i;                                                            /*0011*/
 }
 int find_while(int i)
 {
 
 begin2:   ;
-   while (i<9)                                                          /*0009*/
-      i++;                                                              /*0009*/
-   return i;                                                            /*0012*/
+   while (i<9)                                                          /*0008*/
+      i++;                                                              /*0008*/
+   return i;                                                            /*0011*/
 }
 int find_while(int i)
 {
 
 begin2:   ;
-   while (i<9)                                                          /*0009*/
-      i++;                                                              /*0009*/
-   return i;                                                            /*0012*/
+   while (i<9)                                                          /*0008*/
+      i++;                                                              /*0008*/
+   return i;                                                            /*0011*/
 }

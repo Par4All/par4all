@@ -1,7 +1,7 @@
 delete inc
 create inc include.f
 setenv LC_ALL=C
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALL]
 close
 delete inc
 quit

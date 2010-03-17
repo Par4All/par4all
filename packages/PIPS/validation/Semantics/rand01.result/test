@@ -43,8 +43,17 @@ Transformers for main
 
 int main()
 {
+
+//  T() {}
+
    int entier;
+
+//  T() {}
+
    int graine;
+
+//  T() {}
+
    double virgule;
 
 //  T(graine) {graine==50}

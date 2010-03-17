@@ -1,0 +1,22 @@
+# To debug defaut_tpips
+
+setenv WSPACE=privatize01
+setenv FILE=privatize01.c
+delete $WSPACE
+create $WSPACE $FILE
+setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+
+display PRINTED_FILE[%ALL]
+
+apply PRIVATIZE_MODULE
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT
+shell gcc -fopenmp -c $WSPACE.database/Src/$FILE
+shell rm *.o
+
+close
+# delete $WSPACE
+
+quit

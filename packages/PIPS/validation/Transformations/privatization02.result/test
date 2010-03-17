@@ -6,12 +6,10 @@ Check that J is privatized in the outermost loop
 
 !$OMP DO PRIVATE(I,J,K)
       DO I = 1, 10                                                      0006
-         PRIVATE(I,J,K)
          J = 0                                                          0007
 
 !$OMP    DO PRIVATE(K)
          DO K = 1, 10                                                   0008
-            PRIVATE(K)
             J = J+1                                                     0009
          ENDDO
          A(I) = J                                                       0011

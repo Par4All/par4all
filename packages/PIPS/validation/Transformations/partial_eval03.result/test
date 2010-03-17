@@ -16,7 +16,13 @@ Code with preconditions for "partial_eval03"
 
 void partial_eval03()
 {
+
+//  P() {}
+
    foo size = 2;
+
+//  P() {size==2}
+
    foo i;
 
 //  P() {size==2}

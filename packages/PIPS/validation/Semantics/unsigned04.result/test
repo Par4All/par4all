@@ -16,7 +16,13 @@ Transformers for "main"
 
 int main(void)
 {
+
+//  T() {}
+
    int i;
+
+//  T() {}
+
    unsigned int ui;
 
 //  T(i) {i==-1}
@@ -44,7 +50,13 @@ Preconditions for "main"
 
 int main(void)
 {
+
+//  P() {}
+
    int i;
+
+//  P() {}
+
    unsigned int ui;
 
 //  P() {}
@@ -69,7 +81,13 @@ Transformers for "main" after transformer refining
 
 int main(void)
 {
+
+//  T() {}
+
    int i;
+
+//  T() {}
+
    unsigned int ui;
 
 //  T(i) {i==-1}
@@ -94,7 +112,13 @@ Preconditions for "main" after transformer refining
 
 int main(void)
 {
+
+//  P() {}
+
    int i;
+
+//  P() {}
+
    unsigned int ui;
 
 //  P() {}

@@ -98,9 +98,9 @@ shell cc -Iinclude threshold.database/Src/threshold.c include/SIMD.c -o threshol
 shell sed -i -e '1 d' threshold.database/Src/threshold.c
 shell if test "`./threshold0`" = "`./threshold1`" ; then echo seq-ok ; else echo seq-ko ; fi
 
-shell ./compileC.sh threshold threshold.c threshold-sse.c
-shell cc -O3 -I. -march=native threshold-sse.c -o threshold2
-shell if test "`./threshold0`" = "`./threshold2`" ; then echo sse-ok ; else echo sse-ko ; fi
+#shell ./compileC.sh threshold threshold.c threshold-sse.c
+#shell cc -O3 -I. -march=native threshold-sse.c -o threshold2
+#shell if test "`./threshold0`" = "`./threshold2`" ; then echo sse-ok ; else echo sse-ko ; fi
 shell rm -f threshold[012] threshold-sse.c
 
 close

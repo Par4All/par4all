@@ -1,5 +1,0 @@
-      PROGRAM COMPLEX
-      COMPLEX CMPLX2
-      CMPLX2 = (0.1,0.)                                                 0001
-      RETURN
-      END

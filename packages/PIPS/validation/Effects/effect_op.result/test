@@ -1,6 +1,8 @@
 int main()
 {
+//               <must be written>: b
    int b = 1;
+//               <must be written>: i
    int i = 10;
 //               <must be read   >: b i
 //               <must be written>: b

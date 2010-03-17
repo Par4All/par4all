@@ -4,7 +4,7 @@ Parsed printed file
 void ndecl08(char *dir)
 {
    /* Well, this is a struct called m */
-   struct m {                                                           /*0005*/
+   struct m {                                                           /*0006*/
       int a;
       float b;
    };

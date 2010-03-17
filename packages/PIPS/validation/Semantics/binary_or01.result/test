@@ -1,8 +1,9 @@
 
 Source code with proper effects
 
-binary_or01()
+int binary_or01()
 {
+//               <must be written>: ret
    int ret = 1;                                                         /*0014*/
 //               <may be read    >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
@@ -29,8 +30,9 @@ Source code with cumulated effects
 //               <may be written >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: TOP-LEVEL:stderr
-binary_or01()
+int binary_or01()
 {
+//               <must be written>: ret
    int ret = 1;                                                         /*0014*/
 //               <may be read    >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
@@ -55,8 +57,11 @@ Source code with transformers for "binary_or01"
 
 //  T() {}
 
-binary_or01()
+int binary_or01()
 {
+
+//  T(ret) {ret==1}
+
    int ret = 1;                                                         /*0014*/
 
 //  T(ret) {}
@@ -75,8 +80,11 @@ Source code with preconditions for "binary_or01"
 
 //  P() {}
 
-binary_or01()
+int binary_or01()
 {
+
+//  P() {}
+
    int ret = 1;                                                         /*0014*/
 
 //  P() {ret==1}
@@ -93,8 +101,15 @@ binary_or01()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[binary_or01] (add_or_kill_equivalenced_variables) storage return
 INITIAL_PRECONDITION[foo] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning binary_or01 instead
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[foo] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[binary_or01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[binary_or01] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[binary_or01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[binary_or01] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[foo] (add_or_kill_equivalenced_variables) storage return
 PRECONDITIONS_INTER_FULL[foo] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[foo] (add_or_kill_equivalenced_variables) storage return

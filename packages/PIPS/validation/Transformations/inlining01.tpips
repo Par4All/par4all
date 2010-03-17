@@ -23,7 +23,7 @@ echo
 setproperty INLINING_CALLERS "main"
 apply INLINING[inlining01!pmax]
 apply RESTRUCTURE_CONTROL[main]
-display PRINTED_FILE[main]
+display PRINTED_FILE[inlining01!,main]
 
 echo
 echo Unsplit resulting code

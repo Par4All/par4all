@@ -1,0 +1,39 @@
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+
+
+!$OMP PARALLEL DO PRIVATE(J)
+      DO I = 1, M                                                       0008
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0009
+            CALL P4A_KERNEL_0(M, N, B, C, I, J)
+         ENDDO
+      ENDDO
+
+
+!$OMP PARALLEL DO PRIVATE(J)
+      DO I = 1, M                                                       0015
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0016
+            CALL P4A_KERNEL_1(M, N, A, B, C, I, J)                      0017
+         ENDDO
+      ENDDO
+
+      END
+      SUBROUTINE P4A_KERNEL_0(M, N, B, C, I, J)
+      INTEGER M, N, I, J
+      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+      B(I,J) = I                                                        0004
+      C(I,J) = J                                                        0005
+      END
+      SUBROUTINE P4A_KERNEL_1(M, N, A, B, C, I, J)
+      INTEGER M, N, I, J
+      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+      A(I,J) = B(I,J)+C(I,J)                                            0004
+      END

@@ -1,6 +1,6 @@
 delete fulguro-convol-3x3
 
-setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG -I/home/serge/sources/fulguro/fulguro/trunk/include "
+setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG"
 
 create fulguro-convol-3x3 fulguro_convol_3x3.c
 

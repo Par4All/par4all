@@ -19,7 +19,13 @@ Check transformers on strip-mined loop
 
 int comma01(int *in, int *val)
 {
+
+//  T() {}
+
    int i;
+
+//  T() {}
+
    int j;
 
 //  T(i,j) {i==0, j==0}

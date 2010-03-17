@@ -1,0 +1,26 @@
+/home/local/fabien/PIPS/prod/pips/bin/pips -f $VDIR/gauss.f gauss
+C
+C     GAUSS METHOD
+C
+C     DEPENDENCE COMPUTAION WITH AND WITHOUT EXECUTION CONTEXT
+C     PRIVATIZATION
+C
+      SUBROUTINE GAUSS(A, N)
+C     
+      INTEGER N
+      REAL A(N,N)
+C     
+      DO L = 1, N-1                                                     0012
+         XAUX = A(L,L)                                                  0013
+         DOALL J = L+1, N                                               0014
+            A(L,J) = A(L,J)/XAUX                                        0015
+         ENDDO
+         DO I = L+1, N                                                  0017
+            XAUX = A(I,L)                                               0018
+            DOALL K = L+1, N                                            0019
+               A(I,K) = A(I,K)-XAUX*A(L,K)                              0020
+            ENDDO
+         ENDDO
+      ENDDO
+C     
+      END

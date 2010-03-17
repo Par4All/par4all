@@ -3,15 +3,20 @@ delete $WSPC
 delete ${WSPC}_2
 
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_BLOCKS TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
 
 create $WSPC $WSPC.c
 
 activate C_PARSER
 activate PRINT_CODE
 setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+# Makes the generated code unreadable, especially when it is parsed a
+# second time as is the case below
+
+# setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+# setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 echo
@@ -49,8 +54,12 @@ create ${WSPC}_2 $WSPC.database/Src/$WSPC.c
 activate C_PARSER
 activate PRINT_CODE
 setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+# Because the code is parsed twice, these two options make the results
+# quite unreadable
+
+# setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+# setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 display PRINTED_FILE[$WSPC]

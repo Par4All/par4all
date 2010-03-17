@@ -3,13 +3,14 @@ Source code with proper effects
 
 double call11(void)
 {
-   double x = 3.;                                                       /*0004*/
+//               <must be written>: x
+   double x = 3.;                                                       /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 //               <must be read   >: x
 
-   return x;                                                            /*0007*/
+   return x;                                                            /*0010*/
 }
 
 Source code with cumulated effects
@@ -18,13 +19,14 @@ Source code with cumulated effects
 //               <must be written>: TOP-LEVEL:j
 double call11(void)
 {
-   double x = 3.;                                                       /*0004*/
+//               <must be written>: x
+   double x = 3.;                                                       /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 //               <must be read   >: x
 
-   return x;                                                            /*0007*/
+   return x;                                                            /*0010*/
 }
 
 Source code with transformers for "call11"
@@ -34,16 +36,19 @@ Source code with transformers for "call11"
 
 double call11(void)
 {
-   double x = 3.;                                                       /*0004*/
+
+//  T() {}
+
+   double x = 3.;                                                       /*0007*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 
 //  T() {}
 
 
-   return x;                                                            /*0007*/
+   return x;                                                            /*0010*/
 }
 
 Source code with transformers for "main"
@@ -51,8 +56,11 @@ Source code with transformers for "main"
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
-main()
+int main()
 {
+
+//  T(ai) {ai==3}
+
    int ai = 3;                                                          /*0015*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
@@ -73,16 +81,19 @@ Source code with preconditions for "call11"
 
 double call11(void)
 {
-   double x = 3.;                                                       /*0004*/
 
 //  P() {TOP-LEVEL:j==0}
 
-   j++;                                                                 /*0005*/
+   double x = 3.;                                                       /*0007*/
+
+//  P() {TOP-LEVEL:j==0}
+
+   j++;                                                                 /*0008*/
 
 //  P(TOP-LEVEL:j) {TOP-LEVEL:j==1, j#init==0}
 
 
-   return x;                                                            /*0007*/
+   return x;                                                            /*0010*/
 }
 
 Source code with preconditions for "main"
@@ -90,8 +101,11 @@ Source code with preconditions for "main"
 
 //  P() {TOP-LEVEL:j==0}
 
-main()
+int main()
 {
+
+//  P() {TOP-LEVEL:j==0}
+
    int ai = 3;                                                          /*0015*/
 
 //  P() {TOP-LEVEL:j==0, ai==3}
@@ -108,7 +122,14 @@ main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call11" ignored.
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call11] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call11!] (ordinary_summary_precondition) empty precondition to call11! because not in call tree from main.

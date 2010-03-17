@@ -5,8 +5,8 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
    // o = i - i
-   freia_aipo_sub(o, i, i);                                             /*0007*/
-   return FREIA_OK;                                                     /*0008*/
+   freia_aipo_sub(o, i, i);                                             /*0008*/
+   return FREIA_OK;                                                     /*0009*/
 }
 
 ! graphs
@@ -20,10 +20,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "o";
-  "i" -> "7 -";
-  "i" -> "7 -";
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
 }
 // graph for dag "dag_cleaned_0" of module "freia_11" in dot format
 digraph "dag_cleaned_0" {
@@ -34,10 +34,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "o";
-  "i" -> "7 -";
-  "i" -> "7 -";
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
 }
 // graph for dag "freia_11_helper_0_0" of module "freia_11" in dot format
 digraph "freia_11_helper_0_0" {
@@ -48,10 +48,10 @@ digraph "freia_11_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "o";
-  "i" -> "7 -";
-  "i" -> "7 -";
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
 }
 
 ! acceleration function
@@ -79,11 +79,11 @@ freia_status freia_11_helper_0_0_0(freia_data2d * o0, freia_data2d * i0)
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 alu] 7 sub
+  // i [0 input 0] -> [0 alu] 8 sub
   // nope
-  // i [0 input 1] -> [0 alu] 7 sub
+  // i [0 input 1] -> [0 alu] 8 sub
   // nope
-  // alu 7 sub stage 0 flipped
+  // alu 8 sub stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_SUB_IN1_IN0;
 
 
@@ -133,6 +133,6 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
    // o = i - i
-   freia_11_helper_0_0_0(o, i);                                         /*0007*/
-   return FREIA_OK;                                                     /*0008*/
+   freia_11_helper_0_0_0(o, i);                                         /*0008*/
+   return FREIA_OK;                                                     /*0009*/
 }

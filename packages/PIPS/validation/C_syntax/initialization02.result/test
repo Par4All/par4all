@@ -1,4 +1,4 @@
-main()
+int main()
 {
    int a[2] = {1};
    printf("a[0] = %d\n", a[0]);

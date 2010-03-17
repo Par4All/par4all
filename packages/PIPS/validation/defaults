@@ -5,7 +5,10 @@ Control
 Preprocessor
 C_syntax
 Effects
+# Preconditions and transformers, using PIPS initial default options
 Semantics
+# Same, but using the 2010 default options
+Semantics-New
 RegionPrivatization
 Complexity
 Regions
@@ -35,3 +38,5 @@ Privatizing
 Terapix
 TutorialPPoPP2010
 Scalopes
+Benchmarks
+Expressions

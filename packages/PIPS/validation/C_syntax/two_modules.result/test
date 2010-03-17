@@ -4,7 +4,7 @@ void foo()
    while (c>0) 
       c -= 1;
 }
-main()
+int main()
 {
    typedef int myint;
    typedef myint MYINT;
@@ -16,4 +16,4 @@ int g;
 
 extern void foo();
 
-extern  main();
+extern int main();

@@ -3,7 +3,7 @@ Parsed code for "call04"
 
 void call04(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 
    for (i = 0;i<n;i++)
       for (j = 0;j<m;j++)
@@ -14,7 +14,7 @@ Code for "call04"
 
 void call04(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= m-1; j += 1)
@@ -25,7 +25,7 @@ Proper effects for "call04"
 
 void call04(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 //               <must be read   >: n
 //               <must be written>: i
 
@@ -44,7 +44,7 @@ Cumulated effects for "call04"
 //               <must be read   >: m n
 void call04(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 //               <may be read    >: i j m
 //               <may be written >: j x[*][*]
 //               <must be read   >: n
@@ -63,9 +63,11 @@ void call04(int n, int m, int x[n][m])
 
 Proper effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 10;
+//               <must be written>: d2
    int d2 = 10;
    int y[d1][d2];
 //               <may be written >: y[*][*]
@@ -76,9 +78,11 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 10;
+//               <must be written>: d2
    int d2 = 10;
    int y[d1][d2];
 //               <may be written >: y[*][*]
@@ -97,7 +101,7 @@ Regions for "call04"
 
 void call04(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
@@ -133,9 +137,15 @@ void call04(int n, int m, int x[n][m])
 
 Regions for "main"
 
-main()
+int main()
 {
+
+//  <d1-W-EXACT-{}>
+
    int d1 = 10;
+
+//  <d2-W-EXACT-{}>
+
    int d2 = 10;
    int y[d1][d2];
 

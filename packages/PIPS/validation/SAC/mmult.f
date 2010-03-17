@@ -1,9 +1,9 @@
       SUBROUTINE MMUL(a,b,c)
-      INTEGER*2 SIZE
-      PARAMETER (SIZE=2)
+      INTEGER*4 SIZE
+      PARAMETER (SIZE=4)
 
 
-      INTEGER*2 a(SIZE,SIZE), b(SIZE,SIZE), c(SIZE,SIZE)
+      INTEGER*4 a(SIZE,SIZE), b(SIZE,SIZE), c(SIZE,SIZE)
       INTEGER i, j,k
 
       DO 10  i=1, SIZE

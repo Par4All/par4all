@@ -3,7 +3,7 @@ Parsed code for "call12"
 
 void call12(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 
    for (i = 0;i<n;i++)
       for (j = 0;j<m;j++)
@@ -14,7 +14,7 @@ Code for "call12"
 
 void call12(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= m-1; j += 1)
@@ -25,7 +25,7 @@ Proper effects for "call12"
 
 void call12(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 //               <must be read   >: n
 //               <must be written>: i
 
@@ -44,7 +44,7 @@ Cumulated effects for "call12"
 //               <must be read   >: m n
 void call12(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 //               <may be read    >: i j m
 //               <may be written >: j x[*][*]
 //               <must be read   >: n
@@ -63,14 +63,18 @@ void call12(int n, int m, int x[n][m])
 
 Proper effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 10;
+//               <must be written>: d2
    int d2 = 10;
+//               <must be written>: d3
    int d3 = 10;
+//               <must be written>: d4
    int d4 = 10;
    int y[d1][d2][d3][d4];
-   int i,  j;
+   int i, j;
 //               <must be read   >: d1
 //               <must be written>: i
 
@@ -85,14 +89,18 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: d1
    int d1 = 10;
+//               <must be written>: d2
    int d2 = 10;
+//               <must be written>: d3
    int d3 = 10;
+//               <must be written>: d4
    int d4 = 10;
    int y[d1][d2][d3][d4];
-   int i,  j;
+   int i, j;
 //               <may be read    >: d2 d3 d4 i j
 //               <may be written >: j y[*][*][*][*]
 //               <must be read   >: d1
@@ -116,7 +124,7 @@ Regions for "call12"
 
 void call12(int n, int m, int x[n][m])
 {
-   int i,  j;
+   int i, j;
 
 //  <x[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=m}>
 
@@ -136,14 +144,14 @@ void call12(int n, int m, int x[n][m])
 
 Regions for "main"
 
-main()
+int main()
 {
    int d1 = 10;
    int d2 = 10;
    int d3 = 10;
    int d4 = 10;
    int y[d1][d2][d3][d4];
-   int i,  j;
+   int i, j;
 
 //  <y[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{0<=PHI3, PHI3+1<=d3, 0<=PHI4,
 //    PHI4+1<=d4}>

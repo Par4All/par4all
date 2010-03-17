@@ -20,6 +20,9 @@ int bar(int a, int b)
 
 Code after inlining
 
+extern int bar(int a, int b);
+
+extern int foo(int argc, char **argv);
 int foo(int argc, char **argv)
 {
    int c;
@@ -27,9 +30,11 @@ int foo(int argc, char **argv)
    int _return0;
    {
       int n;
-      int j = 0;
+      int j;
+      j = 0;
       for (n = 0;n<argc;n++) {
-         int c = argc;
+         int c;
+         c = argc;
          j += 2*c;
       }
       _return0 = j;

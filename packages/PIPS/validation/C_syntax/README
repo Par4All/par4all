@@ -1,0 +1,39 @@
+Steps to prettyprint derived types as type declarations, "struct s {}"
+or type references, "struct s"
+
+struct02            OK
+struct03            OK  internal type declaration to preserve
+struct04            OK  same, simplified for debugging
+struct05            OK  internal derived type use
+struct06                not standard conformant
+struct07                not standard conformant
+struct08            OK  two unions with same name, but in different scopes
+struct09            OK  conflict internal to a union declaration
+struct10            OK  reference to a type declaration located in the c.u.
+struct11                gcc warning, PIPS parser core dumps
+                        union declaration within a function declaration
+struct12            OK  for compilation unit, like struct05
+                        PIPS parser core dumps on the function itself
+struct13                not standard conformant
+struct14            OK  test inside a cast
+struct15            OK  test inside a sizeof
+struct16            OK  easiest case, used to debug the SVN merge between SG and FI
+struct17	    OK	simple tree recursive data structure
+struct18	    NOK like struct04, but within a function instead of a compilation unit
+struct19	    OK	same as struct04, but with two struct nested
+struct20	    OK  simple list recursive data structure
+struct21	    NOK bug in PIPS parser
+struct22	    OK	make sure simple cases are handled in a simple usual way
+
+enum06		    OK	reference to an enum in a declaration
+enum07		    OK  same as above + definition of an enum within a declaration
+enum08		    OK  enum declaration and reference nested within a struct
+enum09		    OK  enum declaration and reference nested within a union
+enum10		    OK  simplified version of enum09, used for debugging
+enum11		    OK	deeper nesting
+
+generate07.c	    NOK	use a local type to type an external function (stupid but legal)
+generate13.c	    NOK	same as generate07.c, but simplified to expose the issue
+
+Note FI: I cannot deal with non-standard conformant C code because
+PIPS does not generate an error log file

@@ -29,6 +29,10 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 display PRINTED_FILE(PARALLEL_DO)
 
+apply UNSPLIT
+shell gfortran -fopenmp -c parallel_do2.database/Src/parallel_do.f
+shell rm *.o
+
 close
 delete parallel_do2
 quit

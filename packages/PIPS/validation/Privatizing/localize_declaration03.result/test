@@ -35,7 +35,7 @@ void getimage(char *filename)
    FILE *fp;                                                            /*0028*/
    {
       //PIPS generated variable
-      int i1, j1;
+      int i1;
       
       /* Erase the memory, in case the image is not big enough: */
       for(i1 = 0; i1 <= 63; i1 += 1) {
@@ -51,7 +51,7 @@ void getimage(char *filename)
 void getimage(char *)
 {
    //PIPS generated variable
-   int i1, j1;
+   int i1;
    
    /* Erase the memory, in case the image is not big enough: */
    for(i1 = 0; i1 <= 63; i1 += 1) {
@@ -66,7 +66,7 @@ void getimage(char *)
 void getimage(char *)
 {
    //PIPS generated variable
-   int i1, j1;
+   int i1;
    
    /* Erase the memory, in case the image is not big enough: */
    for(i1 = 0; i1 <= 63; i1 += 1) {

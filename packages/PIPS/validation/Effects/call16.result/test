@@ -47,7 +47,7 @@ void dotprod(int *a, int *b, int *c)
 //               <must be read   >: a b c i
       call16(i, a, b, c);
    
-
+   
    return;
 }
 
@@ -106,6 +106,6 @@ void dotprod(int *a, int *b, int *c)
 
       call16(i, a, b, c);
    
-
+   
    return;
 }

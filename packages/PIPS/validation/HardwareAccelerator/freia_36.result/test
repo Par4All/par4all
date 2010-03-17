@@ -3,13 +3,13 @@
 
 freia_status freia_36(freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0005*/
-   int32_t min;                                                         /*0006*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   int32_t min;                                                         /*0007*/
    // should t be extracted?
-   freia_aipo_add(t, i0, i1);                                           /*0008*/
-   freia_aipo_global_min(t, &min);                                      /*0009*/
-   freia_common_destruct_data(t);                                       /*0010*/
-   return FREIA_OK;                                                     /*0011*/
+   freia_aipo_add(t, i0, i1);                                           /*0009*/
+   freia_aipo_global_min(t, &min);                                      /*0010*/
+   freia_common_destruct_data(t);                                       /*0011*/
+   return FREIA_OK;                                                     /*0012*/
 }
 
 ! graphs
@@ -24,12 +24,12 @@ digraph "dag_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "9 min" [shape=diamond];
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "9 min" [label="t"];
-  "8 +" -> "t";
-  "i1" -> "8 +";
-  "i0" -> "8 +";
+  "10 min" [shape=diamond];
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "10 min" [label="t"];
+  "9 +" -> "t";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_36" in dot format
 digraph "dag_cleaned_0" {
@@ -41,12 +41,12 @@ digraph "dag_cleaned_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "9 min" [shape=diamond];
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "9 min" [label="t"];
-  "8 +" -> "t";
-  "i1" -> "8 +";
-  "i0" -> "8 +";
+  "10 min" [shape=diamond];
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "10 min" [label="t"];
+  "9 +" -> "t";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 // graph for dag "freia_36_helper_0_0" of module "freia_36" in dot format
 digraph "freia_36_helper_0_0" {
@@ -58,12 +58,12 @@ digraph "freia_36_helper_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "9 min" [shape=diamond];
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "9 min" [label="t"];
-  "8 +" -> "t";
-  "i1" -> "8 +";
-  "i0" -> "8 +";
+  "10 min" [shape=diamond];
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "10 min" [label="t"];
+  "9 +" -> "t";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 
 ! acceleration function
@@ -91,14 +91,14 @@ freia_status freia_36_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 8 add
+  // i0 [0 input 0] -> [0 alu] 9 add
   // nope
-  // i1 [0 input 1] -> [0 alu] 8 add
+  // i1 [0 input 1] -> [0 alu] 9 add
   // nope
-  // alu 8 add stage 0
+  // alu 9 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
-  // 0`t [0 alu] -> [0 measure 0] 8 add
+  // 0`t [0 alu] -> [0 measure 0] 9 add
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
@@ -142,7 +142,7 @@ freia_status freia_36_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
-  // measure 9 global_min stage 0 side 0
+  // measure 10 global_min stage 0 side 0
   *red0 = (int32_t) reduc.measure[0][0].minimum;
 
   return ret;
@@ -152,10 +152,10 @@ freia_status freia_36_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 freia_status freia_36(freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0005*/
-   int32_t min;                                                         /*0006*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   int32_t min;                                                         /*0007*/
    // should t be extracted?
-   freia_36_helper_0_0_0(t, i0, i1, &min);                              /*0008*/
-   freia_common_destruct_data(t);                                       /*0010*/
-   return FREIA_OK;                                                     /*0011*/
+   freia_36_helper_0_0_0(t, i0, i1, &min);                              /*0009*/
+   freia_common_destruct_data(t);                                       /*0011*/
+   return FREIA_OK;                                                     /*0012*/
 }

@@ -64,8 +64,17 @@ int main(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+
+//  T() {}
+
    int a_d1, a_d2;
+
+//  T() {}
+
    int i, j;
+
+//  T() {}
+
    void *toto;
 
 //  T(a_d1,a_d2) {a_d1==5, a_d2==5}
@@ -135,8 +144,17 @@ int main(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+
+//  P() {}
+
    int a_d1, a_d2;
+
+//  P() {}
+
    int i, j;
+
+//  P() {}
+
    void *toto;
 
 //  P() {}

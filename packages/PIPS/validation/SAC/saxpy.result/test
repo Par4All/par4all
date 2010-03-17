@@ -303,10 +303,10 @@ c      PRINT *, 'aft'
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY, M, MP1
-      REAL*4 v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), 
-     &v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3)
-     &, v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE)
-     &, SY(1:SIZE), SA
+      REAL*4 v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), 
+     &v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3)
+     &, v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_02, 
+     &F_01, F_00, F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
       SA = 3                                                            0017
       INCX = 1                                                          0018
@@ -345,10 +345,10 @@ c      PRINT *, 'aft'
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY, M, MP1
-      REAL*4 v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), 
-     &v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3)
-     &, v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE)
-     &, SY(1:SIZE), SA
+      REAL*4 v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), 
+     &v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3)
+     &, v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_02, 
+     &F_01, F_00, F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
       SA = 3                                                            0017
       INCX = 1                                                          0018
@@ -489,15 +489,13 @@ nsucc = 1
 nsucc = 1 
 nsucc = 0 
 /* C pretty print for module SAXPY. */
-#define size 1000
-
 void
-saxpy (float sx[1000], float sy[1000])
+saxpy (float sx[size - 1 + 1], float sy[size - 1 + 1])
 {
-  float v4sf_vec3[4];
-  float v4sf_vec2[4];
-  float v4sf_vec1[4];
-  float v4sf_vec0[4];
+  float v4sf_vec3[3 - 0 + 1];
+  float v4sf_vec2[3 - 0 + 1];
+  float v4sf_vec1[3 - 0 + 1];
+  float v4sf_vec0[3 - 0 + 1];
   float f_03;
   float f_02;
   float f_01;
@@ -505,6 +503,8 @@ saxpy (float sx[1000], float sy[1000])
   int lu_ind0;
   int lu_ib0;
   int lu_nub0;
+  static const float size = 1000;
+  ;
   float sa;
   int i;
   int incx;

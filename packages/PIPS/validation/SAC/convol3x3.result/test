@@ -129,9 +129,13 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float RED0[2+1];
 
+
+
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
+
+
 
 l400:
    for(i = 1; i <= isi-2; i += 1)
@@ -169,9 +173,13 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float RED0[2+1], F_0, F_1, F_2, F_3, F_4;
 
+
+
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
+
+
 
 l400:
    for(i = 1; i <= isi-2; i += 1)
@@ -213,11 +221,13 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int i, j, ki, kj;
    //PIPS generated variable
    float RED0[2+1], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
-
+   
+   
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-
+   
+   
 l400:
    for(i = 1; i <= isi-2; i += 1)
 l300:
@@ -262,11 +272,13 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    overloaded PADDING_VALUE;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
-
+   
+   
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-
+   
+   
 l400:
    for(i = 1; i <= isi-2; i += 1)
 l300:
@@ -306,11 +318,16 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    overloaded PADDING_VALUE;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
-
+   
+   
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-
+   
+   
+   ;
+   
+   
 l400:
    for(i = 1; i <= isi-2; i += 1)
 l300:
@@ -350,11 +367,16 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    overloaded PADDING_VALUE;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
-
+   
+   
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-
+   
+   
+   ;
+   
+   
 l400:
    for(i = 1; i <= isi-2; i += 1)
 l300:

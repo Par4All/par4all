@@ -1,13 +1,13 @@
-main()
+int main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
    for(i = 1; i <= 4; i += 1)
       a[i] = i;
 }
-main()
+int main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
 //               <must be written>: i
    for(i = 1; i <= 4; i += 1)
@@ -18,9 +18,15 @@ main()
 
 //  T() {}
 
-main()
+int main()
 {
-   int i,  j;
+
+//  T() {}
+
+   int i, j;
+
+//  T() {}
+
    int a[5];
 
 //  T(i) {1<=i}
@@ -34,9 +40,15 @@ main()
 
 //  P() {}
 
-main()
+int main()
 {
-   int i,  j;
+
+//  P() {}
+
+   int i, j;
+
+//  P() {}
+
    int a[5];
 
 //  P() {}
@@ -47,9 +59,9 @@ main()
 
       a[i] = i;
 }
-main()
+int main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
 
 //  <a[PHI1]-W-MAY-{1<=PHI1, PHI1<=4}>

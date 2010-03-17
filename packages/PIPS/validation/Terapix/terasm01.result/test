@@ -173,27 +173,27 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    //PIPS generated variable
    int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7;
+   float F_0, F_1, F_2, F_3;
    //PIPS generated variable
    int I_25;
    //PIPS generated variable
-   float F_8, F_18, F_19, F_20;
+   float F_4, F_5;
    //PIPS generated variable
    int I_26, I_27, I_28;
    //PIPS generated variable
-   float F_21, F_22, F_23, F_24, F_25, F_26, F_27, F_28;
+   float F_6, F_7, F_8, F_18;
    //PIPS generated variable
    int I_29;
    //PIPS generated variable
-   float F_29, F_30, F_31, F_32;
+   float F_19, F_20;
    //PIPS generated variable
    int I_30, I_31, I_32, I_33;
    //PIPS generated variable
-   float F_33, F_34, F_35, F_36, F_37, F_38, F_39, F_40;
+   float F_21, F_22, F_23, F_24;
    //PIPS generated variable
    int I_34;
    //PIPS generated variable
-   float F_41, F_42, F_43, F_44, F_45;
+   float F_25, F_26, F_27;
    //PIPS generated variable
    int I_35, I_36, I_37, I_38;
    I_17 = isj-2;
@@ -279,27 +279,27 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    //PIPS generated variable
    int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7;
+   float F_0, F_1, F_2, F_3;
    //PIPS generated variable
    int I_25;
    //PIPS generated variable
-   float F_8, F_18, F_19, F_20;
+   float F_4, F_5;
    //PIPS generated variable
    int I_26, I_27, I_28;
    //PIPS generated variable
-   float F_21, F_22, F_23, F_24, F_25, F_26, F_27, F_28;
+   float F_6, F_7, F_8, F_18;
    //PIPS generated variable
    int I_29;
    //PIPS generated variable
-   float F_29, F_30, F_31, F_32;
+   float F_19, F_20;
    //PIPS generated variable
    int I_30, I_31, I_32, I_33;
    //PIPS generated variable
-   float F_33, F_34, F_35, F_36, F_37, F_38, F_39, F_40;
+   float F_21, F_22, F_23, F_24;
    //PIPS generated variable
    int I_34;
    //PIPS generated variable
-   float F_41, F_42, F_43, F_44, F_45;
+   float F_25, F_26, F_27;
    //PIPS generated variable
    int I_35, I_36, I_37, I_38;
    I_17 = isj;
@@ -410,27 +410,27 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    //PIPS generated variable
    int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7;
+   float F_0, F_1, F_2, F_3;
    //PIPS generated variable
    int I_25;
    //PIPS generated variable
-   float F_8, F_18, F_19, F_20;
+   float F_4, F_5;
    //PIPS generated variable
    int I_26, I_27, I_28;
    //PIPS generated variable
-   float F_21, F_22, F_23, F_24, F_25, F_26, F_27, F_28;
+   float F_6, F_7, F_8, F_18;
    //PIPS generated variable
    int I_29;
    //PIPS generated variable
-   float F_29, F_30, F_31, F_32;
+   float F_19, F_20;
    //PIPS generated variable
    int I_30, I_31, I_32, I_33;
    //PIPS generated variable
-   float F_33, F_34, F_35, F_36, F_37, F_38, F_39, F_40;
+   float F_21, F_22, F_23, F_24;
    //PIPS generated variable
    int I_34;
    //PIPS generated variable
-   float F_41, F_42, F_43, F_44, F_45;
+   float F_25, F_26, F_27;
    //PIPS generated variable
    int I_35, I_36, I_37, I_38;
    I_17 = isj;
@@ -541,27 +541,27 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    //PIPS generated variable
    int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7;
+   float F_0, F_1, F_2, F_3;
    //PIPS generated variable
    int I_25;
    //PIPS generated variable
-   float F_8, F_18, F_19, F_20;
+   float F_4, F_5;
    //PIPS generated variable
    int I_26, I_27, I_28;
    //PIPS generated variable
-   float F_21, F_22, F_23, F_24, F_25, F_26, F_27, F_28;
+   float F_6, F_7, F_8, F_18;
    //PIPS generated variable
    int I_29;
    //PIPS generated variable
-   float F_29, F_30, F_31, F_32;
+   float F_19, F_20;
    //PIPS generated variable
    int I_30, I_31, I_32, I_33;
    //PIPS generated variable
-   float F_33, F_34, F_35, F_36, F_37, F_38, F_39, F_40;
+   float F_21, F_22, F_23, F_24;
    //PIPS generated variable
    int I_34;
    //PIPS generated variable
-   float F_41, F_42, F_43, F_44, F_45;
+   float F_25, F_26, F_27;
    //PIPS generated variable
    int I_35, I_36, I_37, I_38;
    I_17 = isj;
@@ -672,27 +672,27 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    //PIPS generated variable
    int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7;
+   float F_0, F_1, F_2, F_3;
    //PIPS generated variable
    int I_25;
    //PIPS generated variable
-   float F_8, F_18, F_19, F_20;
+   float F_4, F_5;
    //PIPS generated variable
    int I_26, I_27, I_28;
    //PIPS generated variable
-   float F_21, F_22, F_23, F_24, F_25, F_26, F_27, F_28;
+   float F_6, F_7, F_8, F_18;
    //PIPS generated variable
    int I_29;
    //PIPS generated variable
-   float F_29, F_30, F_31, F_32;
+   float F_19, F_20;
    //PIPS generated variable
    int I_30, I_31, I_32, I_33;
    //PIPS generated variable
-   float F_33, F_34, F_35, F_36, F_37, F_38, F_39, F_40;
+   float F_21, F_22, F_23, F_24;
    //PIPS generated variable
    int I_34;
    //PIPS generated variable
-   float F_41, F_42, F_43, F_44, F_45;
+   float F_25, F_26, F_27;
    //PIPS generated variable
    int I_35, I_36, I_37, I_38;
    seti(I_17, isj);

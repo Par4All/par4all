@@ -7,7 +7,7 @@ Declarations for module "initialization04!" with type "() -> unknown"
 
 Variable list:
 
-	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 48
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 84
 	Declared entity "TOP-LEVEL:dec" with type "variable" "f_t"
 	Declared entity "TOP-LEVEL:inc" with type "variable" "f_t"
 	Declared entity "TOP-LEVEL:ini" with type "variable" "f_t"
@@ -37,8 +37,8 @@ Typedef entities:
 
 Layouts for memory areas:
 
-Layout for memory area "TOP-LEVEL:*STATIC*" of size 48:
-	Variable "TOP-LEVEL:tab"	offset = 0	size = 48
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 84:
+	Variable "TOP-LEVEL:tab"	offset = 0	size = 84
 
 
 Layout for memory area "initialization04!:*DYNAMIC*" of size 0:
@@ -67,14 +67,14 @@ Declarations for module "initialization04" with type "() -> void"
 
 Variable list:
 
-	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 48
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 84
 	Declared entity "initialization04!:*STATIC*" with type "area" with size 0
-	Declared entity "initialization04:*DYNAMIC*" with type "area" with size 66
+	Declared entity "initialization04:*DYNAMIC*" with type "area" with size 90
 	Declared entity "initialization04:*HEAP*" with type "area" with size 0
 	Declared entity "initialization04:*STACK*" with type "area" with size 0
 	Declared entity "initialization04:*STATIC*" with type "area" with size 0
-	Declared entity "initialization04:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "initialization04:0`__func__" with type "variable" "char"
+	Declared entity "initialization04:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "initialization04:0`__func__" with type "variable" "char *"
 	Declared entity "initialization04:0`tab2" with type "variable" "si_t"
 	Declared entity "initialization04:0`tab3" with type "variable" "si_t"
 
@@ -83,17 +83,17 @@ Variable list:
 
 Layouts for memory areas:
 
-Layout for memory area "TOP-LEVEL:*STATIC*" of size 48:
-	Variable "TOP-LEVEL:tab"	offset = 0	size = 48
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 84:
+	Variable "TOP-LEVEL:tab"	offset = 0	size = 84
 
 
 Layout for memory area "initialization04!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "initialization04:*DYNAMIC*" of size 66:
-	Variable "initialization04:0`tab2"	offset = 34	size = 16
-	Variable "initialization04:0`tab3"	offset = 50	size = 16
+Layout for memory area "initialization04:*DYNAMIC*" of size 90:
+	Variable "initialization04:0`tab2"	offset = 34	size = 28
+	Variable "initialization04:0`tab3"	offset = 62	size = 28
 	Variable "initialization04:0`__func__"	offset = 0	size = 17
 	Variable "initialization04:0`__FUNCTION__"	offset = 17	size = 17
 
@@ -124,7 +124,7 @@ typedef a_t *p_t;
 typedef p_t f_t();
 typedef struct si {
    int i;
-   struct f functions;
+   struct f {f_t *init; f_t *incr; f_t *decr;} functions;
 } si_t;
 
 f_t ini;

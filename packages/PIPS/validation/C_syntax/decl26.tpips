@@ -18,6 +18,9 @@ echo
 
 display PARSED_PRINTED_FILE[decl26!]
 
+apply UNSPLIT
+shell cc -c decl26.database/Src/decl26.c
+
 close
 #delete decl26
 

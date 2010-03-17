@@ -20,7 +20,7 @@ display PRINTED_FILE[foo]
 display PRINTED_FILE[main]
 
 apply INLINING[foo]
-display PRINTED_FILE[main]
+display PRINTED_FILE[inlining22!,main]
 
 close
 delete inlining22

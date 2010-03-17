@@ -1,4 +1,4 @@
-main()
+int main()
 {
    typedef int myint;
    typedef myint MYINT;

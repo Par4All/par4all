@@ -1,4 +1,4 @@
-foo()
+int foo()
 {
    int i;
    int j;
@@ -61,12 +61,12 @@ typedef struct foo {
 
 static int foo_a(int k);
 
-extern  foo();
+extern int foo();
 static int foo_a(int k)
 {
    return k+1;
 }
-foo()
+int foo()
 {
    int i;
    int j;

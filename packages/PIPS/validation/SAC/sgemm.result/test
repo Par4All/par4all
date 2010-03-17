@@ -1,3 +1,3887 @@
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
+     &NROWB
+      REAL*4 ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:
+     &SIZE, 1:SIZE), TEMP, ONE, ZERO
+      LOGICAL L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB = LSAME(TRANSB, 'N')                                         0043
+!$PIPS IF_TO_CONVERT
+      IF (NOTA) THEN
+         NROWA = M                                                      0045
+         NCOLA = K                                                      0046
+      ENDIF
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+      IF (.NOT.NOTA) THEN
+         NROWA = K                                                      0048
+         NCOLA = M                                                      0049
+      ENDIF
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+      IF (NOTB) NROWB = K
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+      IF (.NOT.NOTB) NROWB = N
+!$omp end parallel do
+*
+*     Test the input parameters.
+*
+      INFO = 0                                                          0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_6 = .NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(
+     &   TRANSB, 'T')
+!$PIPS IF_TO_CONVERT
+         IF (L_6) INFO = 2
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6) L_5 = M.LT.0
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND.L_5) INFO = 3
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5) L_4 = N.LT.0
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND.L_4) INFO = 4
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4) L_3 = K.LT.0
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND.L_3) INFO = 5
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3) L_2 = 
+     &   LDA.LT.MAX(1, NROWA)
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.L_2
+     &   ) INFO = 8
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2) L_1 = LDB.LT.MAX(1, NROWB)
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND.L_1) INFO = 10
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND..NOT.L_1) L_0 = LDC.LT.MAX(1, M)
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND..NOT.L_1.AND.L_0) INFO = 13
+!$omp end parallel do
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  DO 50 I = 1, M                                        0120
+                     C(I,J) = ZERO                                      0121
+50                   CONTINUE                                           0122
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  DO 60 I = 1, M                                        0124
+                     C(I,J) = BETA*C(I,J)                               0125
+60                   CONTINUE                                           0126
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP = ALPHA*B(L,J)                                0130
+                     DO 70 I = 1, M                                     0131
+                        C(I,J) = C(I,J)+TEMP*A(I,L)                     0132
+70                      CONTINUE                                        0133
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP = ZERO                                           0143
+                  DO 100 L = 1, K                                       0144
+                     TEMP = TEMP+A(L,I)*B(L,J)                          0145
+100                  CONTINUE                                           0146
+                  L_7 = BETA.EQ.ZERO
+!$PIPS IF_TO_CONVERT
+                  IF (L_7) C(I,J) = ALPHA*TEMP
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+                  IF (.NOT.L_7) C(I,J) = ALPHA*TEMP+BETA*C(I,J)
+!$omp end parallel do
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               DO 130 I = 1, M                                          0162
+                  C(I,J) = ZERO                                         0163
+130               CONTINUE                                              0164
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               DO 140 I = 1, M                                          0166
+                  C(I,J) = BETA*C(I,J)                                  0167
+140               CONTINUE                                              0168
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP = ALPHA*B(J,L)                                   0172
+                  DO 150 I = 1, M                                       0173
+                     C(I,J) = C(I,J)+TEMP*A(I,L)                        0174
+150                  CONTINUE                                           0175
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP = ZERO                                              0185
+               DO 180 L = 1, K                                          0186
+                  TEMP = TEMP+A(L,I)*B(J,L)                             0187
+180               CONTINUE                                              0188
+               L_8 = BETA.EQ.ZERO
+!$PIPS IF_TO_CONVERT
+               IF (L_8) C(I,J) = ALPHA*TEMP
+!$omp end parallel do
+!$PIPS IF_TO_CONVERT
+               IF (.NOT.L_8) C(I,J) = ALPHA*TEMP+BETA*C(I,J)
+!$omp end parallel do
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            DO 10 I = 1, M                                              0097
+               C(I,J) = ZERO                                            0098
+10             CONTINUE                                                 0099
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            DO 30 I = 1, M                                              0103
+               C(I,J) = BETA*C(I,J)                                     0104
+30             CONTINUE                                                 0105
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
+     &NROWB
+      REAL*4 C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:
+     &SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
+      LOGICAL L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, L_5
+     &, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NROWA = NOTA?M:NROWA
+      NCOLA = NOTA?K:NCOLA
+      NROWA = .NOT.NOTA?K:NROWA
+      NCOLA = .NOT.NOTA?M:NCOLA
+      NROWB = NOTB?K:NROWB
+      NROWB = .NOT.NOTB?N:NROWB
+*
+*     Test the input parameters.
+*
+      INFO = 0                                                          0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_6 = .NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(
+     &   TRANSB, 'T')
+         INFO = L_6?2:INFO
+         L_50 = M.LT.0
+         L_5 = .NOT.L_6?L_50:L_5
+         INFO = .NOT.L_6.AND.L_5?3:INFO
+         L_40 = N.LT.0
+         L_4 = .NOT.L_6.AND..NOT.L_5?L_40:L_4
+         INFO = .NOT.L_6.AND..NOT.L_5.AND.L_4?4:INFO
+         L_30 = K.LT.0
+         L_3 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4?L_30:L_3
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND.L_3?5:INFO
+         L_20 = LDA.LT.MAX(1, NROWA)
+         L_2 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3?L_20:
+     &   L_2
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   L_2?8:INFO
+         L_10 = LDB.LT.MAX(1, NROWB)
+         L_1 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2?L_10:L_1
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND.L_1?10:INFO
+         L_00 = LDC.LT.MAX(1, M)
+         L_0 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND..NOT.L_1?L_00:L_0
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND..NOT.L_1.AND.L_0?13:INFO
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  DO 50 I = 1, M                                        0120
+                     C(I,J) = ZERO                                      0121
+50                   CONTINUE                                           0122
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  DO 60 I = 1, M                                        0124
+                     C(I,J) = BETA*C(I,J)                               0125
+60                   CONTINUE                                           0126
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP = ALPHA*B(L,J)                                0130
+                     DO 70 I = 1, M                                     0131
+                        C(I,J) = C(I,J)+TEMP*A(I,L)                     0132
+70                      CONTINUE                                        0133
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP = ZERO                                           0143
+                  DO 100 L = 1, K                                       0144
+                     TEMP = TEMP+A(L,I)*B(L,J)                          0145
+100                  CONTINUE                                           0146
+                  L_7 = BETA.EQ.ZERO
+                  C0 = ALPHA*TEMP
+                  C(I,J) = L_7?C0:C(I,J)
+                  C1 = ALPHA*TEMP+BETA*C(I,J)
+                  C(I,J) = .NOT.L_7?C1:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               DO 130 I = 1, M                                          0162
+                  C(I,J) = ZERO                                         0163
+130               CONTINUE                                              0164
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               DO 140 I = 1, M                                          0166
+                  C(I,J) = BETA*C(I,J)                                  0167
+140               CONTINUE                                              0168
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP = ALPHA*B(J,L)                                   0172
+                  DO 150 I = 1, M                                       0173
+                     C(I,J) = C(I,J)+TEMP*A(I,L)                        0174
+150                  CONTINUE                                           0175
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP = ZERO                                              0185
+               DO 180 L = 1, K                                          0186
+                  TEMP = TEMP+A(L,I)*B(J,L)                             0187
+180               CONTINUE                                              0188
+               L_8 = BETA.EQ.ZERO
+               C2 = ALPHA*TEMP
+               C(I,J) = L_8?C2:C(I,J)
+               C3 = ALPHA*TEMP+BETA*C(I,J)
+               C(I,J) = .NOT.L_8?C3:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            DO 10 I = 1, M                                              0097
+               C(I,J) = ZERO                                            0098
+10             CONTINUE                                                 0099
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            DO 30 I = 1, M                                              0103
+               C(I,J) = BETA*C(I,J)                                     0104
+30             CONTINUE                                                 0105
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
+     &NROWB
+      REAL*4 C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:
+     &SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
+      LOGICAL L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, L_5
+     &, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NROWA = NOTA?M:NROWA
+      NCOLA = NOTA?K:NCOLA
+      NROWA = .NOT.NOTA?K:NROWA
+      NCOLA = .NOT.NOTA?M:NCOLA
+      NROWB = NOTB?K:N
+*
+*     Test the input parameters.
+*
+      INFO = 0                                                          0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_6 = .NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(
+     &   TRANSB, 'T')
+         INFO = L_6?2:INFO
+         L_50 = M.LT.0
+         L_5 = .NOT.L_6?L_50:L_5
+         INFO = .NOT.L_6.AND.L_5?3:INFO
+         L_40 = N.LT.0
+         L_4 = .NOT.L_6.AND..NOT.L_5?L_40:L_4
+         INFO = .NOT.L_6.AND..NOT.L_5.AND.L_4?4:INFO
+         L_30 = K.LT.0
+         L_3 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4?L_30:L_3
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND.L_3?5:INFO
+         L_20 = LDA.LT.MAX(1, NROWA)
+         L_2 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3?L_20:
+     &   L_2
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   L_2?8:INFO
+         L_10 = LDB.LT.MAX(1, NROWB)
+         L_1 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2?L_10:L_1
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND.L_1?10:INFO
+         L_00 = LDC.LT.MAX(1, M)
+         L_0 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND..NOT.L_1?L_00:L_0
+         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
+     &   .NOT.L_2.AND..NOT.L_1.AND.L_0?13:INFO
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  DO 50 I = 1, M                                        0120
+                     C(I,J) = ZERO                                      0121
+50                   CONTINUE                                           0122
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  DO 60 I = 1, M                                        0124
+                     C(I,J) = BETA*C(I,J)                               0125
+60                   CONTINUE                                           0126
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP = ALPHA*B(L,J)                                0130
+                     DO 70 I = 1, M                                     0131
+                        C(I,J) = C(I,J)+TEMP*A(I,L)                     0132
+70                      CONTINUE                                        0133
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP = ZERO                                           0143
+                  DO 100 L = 1, K                                       0144
+                     TEMP = TEMP+A(L,I)*B(L,J)                          0145
+100                  CONTINUE                                           0146
+                  L_7 = BETA.EQ.ZERO
+                  C0 = ALPHA*TEMP
+                  C(I,J) = L_7?C0:C(I,J)
+                  C1 = ALPHA*TEMP+BETA*C(I,J)
+                  C(I,J) = .NOT.L_7?C1:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               DO 130 I = 1, M                                          0162
+                  C(I,J) = ZERO                                         0163
+130               CONTINUE                                              0164
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               DO 140 I = 1, M                                          0166
+                  C(I,J) = BETA*C(I,J)                                  0167
+140               CONTINUE                                              0168
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP = ALPHA*B(J,L)                                   0172
+                  DO 150 I = 1, M                                       0173
+                     C(I,J) = C(I,J)+TEMP*A(I,L)                        0174
+150                  CONTINUE                                           0175
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP = ZERO                                              0185
+               DO 180 L = 1, K                                          0186
+                  TEMP = TEMP+A(L,I)*B(J,L)                             0187
+180               CONTINUE                                              0188
+               L_8 = BETA.EQ.ZERO
+               C2 = ALPHA*TEMP
+               C(I,J) = L_8?C2:C(I,J)
+               C3 = ALPHA*TEMP+BETA*C(I,J)
+               C(I,J) = .NOT.L_8?C3:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            DO 10 I = 1, M                                              0097
+               C(I,J) = ZERO                                            0098
+10             CONTINUE                                                 0099
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            DO 30 I = 1, M                                              0103
+               C(I,J) = BETA*C(I,J)                                     0104
+30             CONTINUE                                                 0105
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, 
+     &NCOLA, NROWA, NROWB
+      REAL*4 F_7, F_6, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, 
+     &ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:
+     &SIZE), TEMP, ONE, ZERO
+      LOGICAL L_101, L_100, L_99, L_98, L_97, L_96, L_95, L_94, L_93
+     &, L_92, L_91, L_90, L_89, L_88, L_87, L_86, L_85, L_84, L_83, 
+     &L_82, L_81, L_80, L_79, L_78, L_77, L_76, L_75, L_74, L_73, 
+     &L_72, L_71, L_70, L_69, L_68, L_67, L_66, L_65, L_64, L_63, 
+     &L_62, L_61, L_60, L_59, L_58, L_57, L_56, L_55, L_54, L_53, 
+     &L_52, L_51, L_49, L_48, L_47, L_46, L_45, L_44, L_43, L_42, 
+     &L_41, L_39, L_38, L_37, L_36, L_35, L_34, L_33, L_32, L_31, 
+     &L_29, L_28, L_27, L_26, L_25, L_24, L_23, L_22, L_21, L_19, 
+     &L_18, L_17, L_16, L_15, L_14, L_13, L_12, L_11, L_9, L_00, L_10
+     &, L_20, L_30, L_40, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, 
+     &L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NROWA = NOTA?M:NROWA
+      NCOLA = NOTA?K:NCOLA
+      L_9 = .NOT.NOTA
+      NROWA = L_9?K:NROWA
+      L_11 = .NOT.NOTA
+      NCOLA = L_11?M:NCOLA
+      NROWB = NOTB?K:N
+*
+*     Test the input parameters.
+*
+      INFO = 0                                                          0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_12 = .NOT.NOTB
+         L_13 = LSAME(TRANSB, 'C')
+         L_14 = .NOT.L_13
+         L_15 = L_12.AND.L_14
+         L_16 = LSAME(TRANSB, 'T')
+         L_17 = .NOT.L_16
+         L_6 = L_15.AND.L_17
+         INFO = L_6?2:INFO
+         L_50 = M.LT.0
+         L_18 = .NOT.L_6
+         L_5 = L_18?L_50:L_5
+         L_19 = .NOT.L_6
+         L_21 = L_19.AND.L_5
+         INFO = L_21?3:INFO
+         L_40 = N.LT.0
+         L_22 = .NOT.L_6
+         L_23 = .NOT.L_5
+         L_24 = L_22.AND.L_23
+         L_4 = L_24?L_40:L_4
+         L_25 = .NOT.L_6
+         L_26 = .NOT.L_5
+         L_27 = L_26.AND.L_4
+         L_28 = L_25.AND.L_27
+         INFO = L_28?4:INFO
+         L_30 = K.LT.0
+         L_29 = .NOT.L_6
+         L_31 = .NOT.L_5
+         L_32 = .NOT.L_4
+         L_33 = L_31.AND.L_32
+         L_34 = L_29.AND.L_33
+         L_3 = L_34?L_30:L_3
+         L_35 = .NOT.L_6
+         L_36 = .NOT.L_5
+         L_37 = .NOT.L_4
+         L_38 = L_37.AND.L_3
+         L_39 = L_36.AND.L_38
+         L_41 = L_35.AND.L_39
+         INFO = L_41?5:INFO
+         I_0 = MAX(1, NROWA)
+         L_20 = LDA.LT.I_0
+         L_42 = .NOT.L_6
+         L_43 = .NOT.L_5
+         L_44 = .NOT.L_4
+         L_45 = .NOT.L_3
+         L_46 = L_44.AND.L_45
+         L_47 = L_43.AND.L_46
+         L_48 = L_42.AND.L_47
+         L_2 = L_48?L_20:L_2
+         L_49 = .NOT.L_6
+         L_51 = .NOT.L_5
+         L_52 = .NOT.L_4
+         L_53 = .NOT.L_3
+         L_54 = L_53.AND.L_2
+         L_55 = L_52.AND.L_54
+         L_56 = L_51.AND.L_55
+         L_57 = L_49.AND.L_56
+         INFO = L_57?8:INFO
+         I_1 = MAX(1, NROWB)
+         L_10 = LDB.LT.I_1
+         L_58 = .NOT.L_6
+         L_59 = .NOT.L_5
+         L_60 = .NOT.L_4
+         L_61 = .NOT.L_3
+         L_62 = .NOT.L_2
+         L_63 = L_61.AND.L_62
+         L_64 = L_60.AND.L_63
+         L_65 = L_59.AND.L_64
+         L_66 = L_58.AND.L_65
+         L_1 = L_66?L_10:L_1
+         L_67 = .NOT.L_6
+         L_68 = .NOT.L_5
+         L_69 = .NOT.L_4
+         L_70 = .NOT.L_3
+         L_71 = .NOT.L_2
+         L_72 = L_71.AND.L_1
+         L_73 = L_70.AND.L_72
+         L_74 = L_69.AND.L_73
+         L_75 = L_68.AND.L_74
+         L_76 = L_67.AND.L_75
+         INFO = L_76?10:INFO
+         I_2 = MAX(1, M)
+         L_00 = LDC.LT.I_2
+         L_77 = .NOT.L_6
+         L_78 = .NOT.L_5
+         L_79 = .NOT.L_4
+         L_80 = .NOT.L_3
+         L_81 = .NOT.L_2
+         L_82 = .NOT.L_1
+         L_83 = L_81.AND.L_82
+         L_84 = L_80.AND.L_83
+         L_85 = L_79.AND.L_84
+         L_86 = L_78.AND.L_85
+         L_87 = L_77.AND.L_86
+         L_0 = L_87?L_00:L_0
+         L_88 = .NOT.L_6
+         L_89 = .NOT.L_5
+         L_90 = .NOT.L_4
+         L_91 = .NOT.L_3
+         L_92 = .NOT.L_2
+         L_93 = .NOT.L_1
+         L_94 = L_93.AND.L_0
+         L_95 = L_92.AND.L_94
+         L_96 = L_91.AND.L_95
+         L_97 = L_90.AND.L_96
+         L_98 = L_89.AND.L_97
+         L_99 = L_88.AND.L_98
+         INFO = L_99?13:INFO
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  DO 50 I = 1, M                                        0120
+                     C(I,J) = ZERO                                      0121
+50                   CONTINUE                                           0122
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  DO 60 I = 1, M                                        0124
+                     C(I,J) = BETA*C(I,J)                               0125
+60                   CONTINUE                                           0126
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP = ALPHA*B(L,J)                                0130
+                     DO 70 I = 1, M                                     0131
+                        F_0 = TEMP*A(I,L)
+                        C(I,J) = C(I,J)+F_0                             0132
+70                      CONTINUE                                        0133
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP = ZERO                                           0143
+                  DO 100 L = 1, K                                       0144
+                     F_1 = A(L,I)*B(L,J)
+                     TEMP = TEMP+F_1                                    0145
+100                  CONTINUE                                           0146
+                  L_7 = BETA.EQ.ZERO
+                  C0 = ALPHA*TEMP
+                  C(I,J) = L_7?C0:C(I,J)
+                  F_2 = ALPHA*TEMP
+                  F_3 = BETA*C(I,J)
+                  C1 = F_2+F_3
+                  L_100 = .NOT.L_7
+                  C(I,J) = L_100?C1:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               DO 130 I = 1, M                                          0162
+                  C(I,J) = ZERO                                         0163
+130               CONTINUE                                              0164
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               DO 140 I = 1, M                                          0166
+                  C(I,J) = BETA*C(I,J)                                  0167
+140               CONTINUE                                              0168
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP = ALPHA*B(J,L)                                   0172
+                  DO 150 I = 1, M                                       0173
+                     F_4 = TEMP*A(I,L)
+                     C(I,J) = C(I,J)+F_4                                0174
+150                  CONTINUE                                           0175
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP = ZERO                                              0185
+               DO 180 L = 1, K                                          0186
+                  F_5 = A(L,I)*B(J,L)
+                  TEMP = TEMP+F_5                                       0187
+180               CONTINUE                                              0188
+               L_8 = BETA.EQ.ZERO
+               C2 = ALPHA*TEMP
+               C(I,J) = L_8?C2:C(I,J)
+               F_6 = ALPHA*TEMP
+               F_7 = BETA*C(I,J)
+               C3 = F_6+F_7
+               L_101 = .NOT.L_8
+               C(I,J) = L_101?C3:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            DO 10 I = 1, M                                              0097
+               C(I,J) = ZERO                                            0098
+10             CONTINUE                                                 0099
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            DO 30 I = 1, M                                              0103
+               C(I,J) = BETA*C(I,J)                                     0104
+30             CONTINUE                                                 0105
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, 
+     &LU_IND7, LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, 
+     &LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, 
+     &LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC
+     &, I, INFO, J, L, NCOLA, NROWA, NROWB
+      REAL*4 F_7, F_6, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, 
+     &ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:
+     &SIZE), TEMP, ONE, ZERO
+      LOGICAL L_101, L_100, L_99, L_98, L_97, L_96, L_95, L_94, L_93
+     &, L_92, L_91, L_90, L_89, L_88, L_87, L_86, L_85, L_84, L_83, 
+     &L_82, L_81, L_80, L_79, L_78, L_77, L_76, L_75, L_74, L_73, 
+     &L_72, L_71, L_70, L_69, L_68, L_67, L_66, L_65, L_64, L_63, 
+     &L_62, L_61, L_60, L_59, L_58, L_57, L_56, L_55, L_54, L_53, 
+     &L_52, L_51, L_49, L_48, L_47, L_46, L_45, L_44, L_43, L_42, 
+     &L_41, L_39, L_38, L_37, L_36, L_35, L_34, L_33, L_32, L_31, 
+     &L_29, L_28, L_27, L_26, L_25, L_24, L_23, L_22, L_21, L_19, 
+     &L_18, L_17, L_16, L_15, L_14, L_13, L_12, L_11, L_9, L_00, L_10
+     &, L_20, L_30, L_40, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, 
+     &L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NROWA = NOTA?M:NROWA
+      NCOLA = NOTA?K:NCOLA
+      L_9 = .NOT.NOTA
+      NROWA = L_9?K:NROWA
+      L_11 = .NOT.NOTA
+      NCOLA = L_11?M:NCOLA
+      NROWB = NOTB?K:N
+*
+*     Test the input parameters.
+*
+      INFO = 0                                                          0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_12 = .NOT.NOTB
+         L_13 = LSAME(TRANSB, 'C')
+         L_14 = .NOT.L_13
+         L_15 = L_12.AND.L_14
+         L_16 = LSAME(TRANSB, 'T')
+         L_17 = .NOT.L_16
+         L_6 = L_15.AND.L_17
+         INFO = L_6?2:INFO
+         L_50 = M.LT.0
+         L_18 = .NOT.L_6
+         L_5 = L_18?L_50:L_5
+         L_19 = .NOT.L_6
+         L_21 = L_19.AND.L_5
+         INFO = L_21?3:INFO
+         L_40 = N.LT.0
+         L_22 = .NOT.L_6
+         L_23 = .NOT.L_5
+         L_24 = L_22.AND.L_23
+         L_4 = L_24?L_40:L_4
+         L_25 = .NOT.L_6
+         L_26 = .NOT.L_5
+         L_27 = L_26.AND.L_4
+         L_28 = L_25.AND.L_27
+         INFO = L_28?4:INFO
+         L_30 = K.LT.0
+         L_29 = .NOT.L_6
+         L_31 = .NOT.L_5
+         L_32 = .NOT.L_4
+         L_33 = L_31.AND.L_32
+         L_34 = L_29.AND.L_33
+         L_3 = L_34?L_30:L_3
+         L_35 = .NOT.L_6
+         L_36 = .NOT.L_5
+         L_37 = .NOT.L_4
+         L_38 = L_37.AND.L_3
+         L_39 = L_36.AND.L_38
+         L_41 = L_35.AND.L_39
+         INFO = L_41?5:INFO
+         I_0 = MAX(1, NROWA)
+         L_20 = LDA.LT.I_0
+         L_42 = .NOT.L_6
+         L_43 = .NOT.L_5
+         L_44 = .NOT.L_4
+         L_45 = .NOT.L_3
+         L_46 = L_44.AND.L_45
+         L_47 = L_43.AND.L_46
+         L_48 = L_42.AND.L_47
+         L_2 = L_48?L_20:L_2
+         L_49 = .NOT.L_6
+         L_51 = .NOT.L_5
+         L_52 = .NOT.L_4
+         L_53 = .NOT.L_3
+         L_54 = L_53.AND.L_2
+         L_55 = L_52.AND.L_54
+         L_56 = L_51.AND.L_55
+         L_57 = L_49.AND.L_56
+         INFO = L_57?8:INFO
+         I_1 = MAX(1, NROWB)
+         L_10 = LDB.LT.I_1
+         L_58 = .NOT.L_6
+         L_59 = .NOT.L_5
+         L_60 = .NOT.L_4
+         L_61 = .NOT.L_3
+         L_62 = .NOT.L_2
+         L_63 = L_61.AND.L_62
+         L_64 = L_60.AND.L_63
+         L_65 = L_59.AND.L_64
+         L_66 = L_58.AND.L_65
+         L_1 = L_66?L_10:L_1
+         L_67 = .NOT.L_6
+         L_68 = .NOT.L_5
+         L_69 = .NOT.L_4
+         L_70 = .NOT.L_3
+         L_71 = .NOT.L_2
+         L_72 = L_71.AND.L_1
+         L_73 = L_70.AND.L_72
+         L_74 = L_69.AND.L_73
+         L_75 = L_68.AND.L_74
+         L_76 = L_67.AND.L_75
+         INFO = L_76?10:INFO
+         I_2 = MAX(1, M)
+         L_00 = LDC.LT.I_2
+         L_77 = .NOT.L_6
+         L_78 = .NOT.L_5
+         L_79 = .NOT.L_4
+         L_80 = .NOT.L_3
+         L_81 = .NOT.L_2
+         L_82 = .NOT.L_1
+         L_83 = L_81.AND.L_82
+         L_84 = L_80.AND.L_83
+         L_85 = L_79.AND.L_84
+         L_86 = L_78.AND.L_85
+         L_87 = L_77.AND.L_86
+         L_0 = L_87?L_00:L_0
+         L_88 = .NOT.L_6
+         L_89 = .NOT.L_5
+         L_90 = .NOT.L_4
+         L_91 = .NOT.L_3
+         L_92 = .NOT.L_2
+         L_93 = .NOT.L_1
+         L_94 = L_93.AND.L_0
+         L_95 = L_92.AND.L_94
+         L_96 = L_91.AND.L_95
+         L_97 = L_90.AND.L_96
+         L_98 = L_89.AND.L_97
+         L_99 = L_88.AND.L_98
+         INFO = L_99?13:INFO
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  LU_NUB0 = M
+                  LU_IB0 = MOD(LU_NUB0, 4)
+                  DO 99997 LU_IND0 = 0, LU_IB0-1
+                     C(LU_IND0+1,J) = ZERO                              0121
+99997                CONTINUE
+                  DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
+99996                CONTINUE
+                  I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+2,J) = BETA*C(LU_IND1+2,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)               0125
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP = ALPHA*B(L,J)                                0130
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_0 = TEMP*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+1,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+2,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+2,J) = C(LU_IND2+2,J)+F_0             0132
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+3,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+3,J) = C(LU_IND2+3,J)+F_0             0132
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+4,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+4,J) = C(LU_IND2+4,J)+F_0             0132
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP = ZERO                                           0143
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+                     TEMP = TEMP+F_1                                    0145
+99991                CONTINUE
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+c SIMD_COMMENT_1
+                     TEMP = TEMP+F_1                                    0145
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+2,I)*B(LU_IND3+2,J)
+c SIMD_COMMENT_1
+                     TEMP = TEMP+F_1                                    0145
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+3,I)*B(LU_IND3+3,J)
+c SIMD_COMMENT_1
+                     TEMP = TEMP+F_1                                    0145
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+4,I)*B(LU_IND3+4,J)
+c SIMD_COMMENT_1
+                     TEMP = TEMP+F_1                                    0145
+99990                CONTINUE
+                  L = MAX0(LU_NUB3, 0)+1
+                  L_7 = BETA.EQ.ZERO
+                  C0 = ALPHA*TEMP
+                  C(I,J) = L_7?C0:C(I,J)
+                  F_2 = ALPHA*TEMP
+                  F_3 = BETA*C(I,J)
+                  C1 = F_2+F_3
+                  L_100 = .NOT.L_7
+                  C(I,J) = L_100?C1:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+2,J) = BETA*C(LU_IND5+2,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+3,J) = BETA*C(LU_IND5+3,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+4,J) = BETA*C(LU_IND5+4,J)                  0167
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP = ALPHA*B(J,L)                                   0172
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_4 = TEMP*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+1,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+2,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+2,J) = C(LU_IND6+2,J)+F_4                0174
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+3,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+3,J) = C(LU_IND6+3,J)+F_4                0174
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+4,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+4,J) = C(LU_IND6+4,J)+F_4                0174
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP = ZERO                                              0185
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+                  TEMP = TEMP+F_5                                       0187
+99983             CONTINUE
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+c SIMD_COMMENT_1
+                  TEMP = TEMP+F_5                                       0187
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+2,I)*B(J,LU_IND7+2)
+c SIMD_COMMENT_1
+                  TEMP = TEMP+F_5                                       0187
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+3,I)*B(J,LU_IND7+3)
+c SIMD_COMMENT_1
+                  TEMP = TEMP+F_5                                       0187
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+4,I)*B(J,LU_IND7+4)
+c SIMD_COMMENT_1
+                  TEMP = TEMP+F_5                                       0187
+99982             CONTINUE
+               L = MAX0(LU_NUB7, 0)+1
+               L_8 = BETA.EQ.ZERO
+               C2 = ALPHA*TEMP
+               C(I,J) = L_8?C2:C(I,J)
+               F_6 = ALPHA*TEMP
+               F_7 = BETA*C(I,J)
+               C3 = F_6+F_7
+               L_101 = .NOT.L_8
+               C(I,J) = L_101?C3:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+2,J) = BETA*C(LU_IND9+2,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+3,J) = BETA*C(LU_IND9+3,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+4,J) = BETA*C(LU_IND9+4,J)                     0104
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, 
+     &LU_IND7, LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, 
+     &LU_IB5, LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, 
+     &LU_NUB3, LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC
+     &, I, INFO, J, L, NCOLA, NROWA, NROWB
+      REAL*4 RED3(0:3), RED2(0:0), RED1(0:3), RED0(0:0), F_7, F_6, 
+     &F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 
+     &1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE
+     &, ZERO
+      LOGICAL L_101, L_100, L_99, L_98, L_97, L_96, L_95, L_94, L_93
+     &, L_92, L_91, L_90, L_89, L_88, L_87, L_86, L_85, L_84, L_83, 
+     &L_82, L_81, L_80, L_79, L_78, L_77, L_76, L_75, L_74, L_73, 
+     &L_72, L_71, L_70, L_69, L_68, L_67, L_66, L_65, L_64, L_63, 
+     &L_62, L_61, L_60, L_59, L_58, L_57, L_56, L_55, L_54, L_53, 
+     &L_52, L_51, L_49, L_48, L_47, L_46, L_45, L_44, L_43, L_42, 
+     &L_41, L_39, L_38, L_37, L_36, L_35, L_34, L_33, L_32, L_31, 
+     &L_29, L_28, L_27, L_26, L_25, L_24, L_23, L_22, L_21, L_19, 
+     &L_18, L_17, L_16, L_15, L_14, L_13, L_12, L_11, L_9, L_00, L_10
+     &, L_20, L_30, L_40, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, 
+     &L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NROWA = NOTA?M:NROWA
+      NCOLA = NOTA?K:NCOLA
+      L_9 = .NOT.NOTA
+      NROWA = L_9?K:NROWA
+      L_11 = .NOT.NOTA
+      NCOLA = L_11?M:NCOLA
+      NROWB = NOTB?K:N
+*
+*     Test the input parameters.
+*
+      INFO = 0                                                          0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_12 = .NOT.NOTB
+         L_13 = LSAME(TRANSB, 'C')
+         L_14 = .NOT.L_13
+         L_15 = L_12.AND.L_14
+         L_16 = LSAME(TRANSB, 'T')
+         L_17 = .NOT.L_16
+         L_6 = L_15.AND.L_17
+         INFO = L_6?2:INFO
+         L_50 = M.LT.0
+         L_18 = .NOT.L_6
+         L_5 = L_18?L_50:L_5
+         L_19 = .NOT.L_6
+         L_21 = L_19.AND.L_5
+         INFO = L_21?3:INFO
+         L_40 = N.LT.0
+         L_22 = .NOT.L_6
+         L_23 = .NOT.L_5
+         L_24 = L_22.AND.L_23
+         L_4 = L_24?L_40:L_4
+         L_25 = .NOT.L_6
+         L_26 = .NOT.L_5
+         L_27 = L_26.AND.L_4
+         L_28 = L_25.AND.L_27
+         INFO = L_28?4:INFO
+         L_30 = K.LT.0
+         L_29 = .NOT.L_6
+         L_31 = .NOT.L_5
+         L_32 = .NOT.L_4
+         L_33 = L_31.AND.L_32
+         L_34 = L_29.AND.L_33
+         L_3 = L_34?L_30:L_3
+         L_35 = .NOT.L_6
+         L_36 = .NOT.L_5
+         L_37 = .NOT.L_4
+         L_38 = L_37.AND.L_3
+         L_39 = L_36.AND.L_38
+         L_41 = L_35.AND.L_39
+         INFO = L_41?5:INFO
+         I_0 = MAX(1, NROWA)
+         L_20 = LDA.LT.I_0
+         L_42 = .NOT.L_6
+         L_43 = .NOT.L_5
+         L_44 = .NOT.L_4
+         L_45 = .NOT.L_3
+         L_46 = L_44.AND.L_45
+         L_47 = L_43.AND.L_46
+         L_48 = L_42.AND.L_47
+         L_2 = L_48?L_20:L_2
+         L_49 = .NOT.L_6
+         L_51 = .NOT.L_5
+         L_52 = .NOT.L_4
+         L_53 = .NOT.L_3
+         L_54 = L_53.AND.L_2
+         L_55 = L_52.AND.L_54
+         L_56 = L_51.AND.L_55
+         L_57 = L_49.AND.L_56
+         INFO = L_57?8:INFO
+         I_1 = MAX(1, NROWB)
+         L_10 = LDB.LT.I_1
+         L_58 = .NOT.L_6
+         L_59 = .NOT.L_5
+         L_60 = .NOT.L_4
+         L_61 = .NOT.L_3
+         L_62 = .NOT.L_2
+         L_63 = L_61.AND.L_62
+         L_64 = L_60.AND.L_63
+         L_65 = L_59.AND.L_64
+         L_66 = L_58.AND.L_65
+         L_1 = L_66?L_10:L_1
+         L_67 = .NOT.L_6
+         L_68 = .NOT.L_5
+         L_69 = .NOT.L_4
+         L_70 = .NOT.L_3
+         L_71 = .NOT.L_2
+         L_72 = L_71.AND.L_1
+         L_73 = L_70.AND.L_72
+         L_74 = L_69.AND.L_73
+         L_75 = L_68.AND.L_74
+         L_76 = L_67.AND.L_75
+         INFO = L_76?10:INFO
+         I_2 = MAX(1, M)
+         L_00 = LDC.LT.I_2
+         L_77 = .NOT.L_6
+         L_78 = .NOT.L_5
+         L_79 = .NOT.L_4
+         L_80 = .NOT.L_3
+         L_81 = .NOT.L_2
+         L_82 = .NOT.L_1
+         L_83 = L_81.AND.L_82
+         L_84 = L_80.AND.L_83
+         L_85 = L_79.AND.L_84
+         L_86 = L_78.AND.L_85
+         L_87 = L_77.AND.L_86
+         L_0 = L_87?L_00:L_0
+         L_88 = .NOT.L_6
+         L_89 = .NOT.L_5
+         L_90 = .NOT.L_4
+         L_91 = .NOT.L_3
+         L_92 = .NOT.L_2
+         L_93 = .NOT.L_1
+         L_94 = L_93.AND.L_0
+         L_95 = L_92.AND.L_94
+         L_96 = L_91.AND.L_95
+         L_97 = L_90.AND.L_96
+         L_98 = L_89.AND.L_97
+         L_99 = L_88.AND.L_98
+         INFO = L_99?13:INFO
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  LU_NUB0 = M
+                  LU_IB0 = MOD(LU_NUB0, 4)
+                  DO 99997 LU_IND0 = 0, LU_IB0-1
+                     C(LU_IND0+1,J) = ZERO                              0121
+99997                CONTINUE
+                  DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
+99996                CONTINUE
+                  I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+2,J) = BETA*C(LU_IND1+2,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)               0125
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP = ALPHA*B(L,J)                                0130
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_0 = TEMP*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+1,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_0             0132
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+2,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+2,J) = C(LU_IND2+2,J)+F_0             0132
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+3,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+3,J) = C(LU_IND2+3,J)+F_0             0132
+c SIMD_COMMENT_0
+                        F_0 = TEMP*A(LU_IND2+4,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+4,J) = C(LU_IND2+4,J)+F_0             0132
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP = ZERO                                           0143
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
+                  RED0(0) = 0.000000
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+                     RED0(0) = RED0(0)+F_1                              0145
+99991                CONTINUE
+                  TEMP = RED0(0)+TEMP
+                  RED1(0) = 0.000000
+                  RED1(1) = 0.000000
+                  RED1(2) = 0.000000
+                  RED1(3) = 0.000000
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+c SIMD_COMMENT_1
+                     RED1(0) = RED1(0)+F_1                              0145
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+2,I)*B(LU_IND3+2,J)
+c SIMD_COMMENT_1
+                     RED1(1) = RED1(1)+F_1                              0145
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+3,I)*B(LU_IND3+3,J)
+c SIMD_COMMENT_1
+                     RED1(2) = RED1(2)+F_1                              0145
+c SIMD_COMMENT_0
+                     F_1 = A(LU_IND3+4,I)*B(LU_IND3+4,J)
+c SIMD_COMMENT_1
+                     RED1(3) = RED1(3)+F_1                              0145
+99990                CONTINUE
+                  TEMP = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP
+                  L = MAX0(LU_NUB3, 0)+1
+                  L_7 = BETA.EQ.ZERO
+                  C0 = ALPHA*TEMP
+                  C(I,J) = L_7?C0:C(I,J)
+                  F_2 = ALPHA*TEMP
+                  F_3 = BETA*C(I,J)
+                  C1 = F_2+F_3
+                  L_100 = .NOT.L_7
+                  C(I,J) = L_100?C1:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+2,J) = BETA*C(LU_IND5+2,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+3,J) = BETA*C(LU_IND5+3,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+4,J) = BETA*C(LU_IND5+4,J)                  0167
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP = ALPHA*B(J,L)                                   0172
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_4 = TEMP*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+1,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_4                0174
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+2,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+2,J) = C(LU_IND6+2,J)+F_4                0174
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+3,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+3,J) = C(LU_IND6+3,J)+F_4                0174
+c SIMD_COMMENT_0
+                     F_4 = TEMP*A(LU_IND6+4,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+4,J) = C(LU_IND6+4,J)+F_4                0174
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP = ZERO                                              0185
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
+               RED2(0) = 0.000000
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+                  RED2(0) = RED2(0)+F_5                                 0187
+99983             CONTINUE
+               TEMP = RED2(0)+TEMP
+               RED3(0) = 0.000000
+               RED3(1) = 0.000000
+               RED3(2) = 0.000000
+               RED3(3) = 0.000000
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+c SIMD_COMMENT_1
+                  RED3(0) = RED3(0)+F_5                                 0187
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+2,I)*B(J,LU_IND7+2)
+c SIMD_COMMENT_1
+                  RED3(1) = RED3(1)+F_5                                 0187
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+3,I)*B(J,LU_IND7+3)
+c SIMD_COMMENT_1
+                  RED3(2) = RED3(2)+F_5                                 0187
+c SIMD_COMMENT_0
+                  F_5 = A(LU_IND7+4,I)*B(J,LU_IND7+4)
+c SIMD_COMMENT_1
+                  RED3(3) = RED3(3)+F_5                                 0187
+99982             CONTINUE
+               TEMP = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP
+               L = MAX0(LU_NUB7, 0)+1
+               L_8 = BETA.EQ.ZERO
+               C2 = ALPHA*TEMP
+               C(I,J) = L_8?C2:C(I,J)
+               F_6 = ALPHA*TEMP
+               F_7 = BETA*C(I,J)
+               C3 = F_6+F_7
+               L_101 = .NOT.L_8
+               C(I,J) = L_101?C3:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+2,J) = BETA*C(LU_IND9+2,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+3,J) = BETA*C(LU_IND9+3,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+4,J) = BETA*C(LU_IND9+4,J)                     0104
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, 
+     &I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, 
+     &NROWA, NROWB
+      REAL*4 TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, F_14, TEMP5
+     &, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, C10, TEMP3, 
+     &F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, F_53, F_52, 
+     &F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3), RED2(0:0), 
+     &RED1(0:3), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2, F_1, F_0, 
+     &C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE), 
+     &BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
+      LOGICAL NOTB0, L_911, L_111, L_120, L_130, L_140, L_150, L_160
+     &, L_170, L_611, L_500, L_180, L_511, L_190, L_211, L_400, L_220
+     &, L_230, L_240, L_411, L_250, L_260, L_270, L_280, L_300, L_290
+     &, L_311, L_320, L_330, L_340, L_310, L_350, L_360, L_370, L_380
+     &, L_390, L_410, L_200, L_420, L_430, L_440, L_450, L_460, L_470
+     &, L_480, L_210, L_490, L_510, L_520, L_530, L_540, L_550, L_560
+     &, L_570, L_102, L_580, L_590, L_600, L_610, L_620, L_630, L_640
+     &, L_650, L_660, L_110, L_670, L_680, L_690, L_700, L_711, L_720
+     &, L_730, L_740, L_750, L_760, L_000, L_770, L_780, L_790, L_800
+     &, L_811, L_820, L_830, L_840, L_850, L_860, L_870, L_01, L_880
+     &, L_890, L_900, L_910, L_920, L_930, L_940, L_950, L_960, L_970
+     &, L_980, L_990, L_710, L_1000, L_810, L_1010, L_101, L_100, 
+     &L_99, L_98, L_97, L_96, L_95, L_94, L_93, L_92, L_91, L_90, 
+     &L_89, L_88, L_87, L_86, L_85, L_84, L_83, L_82, L_81, L_80, 
+     &L_79, L_78, L_77, L_76, L_75, L_74, L_73, L_72, L_71, L_70, 
+     &L_69, L_68, L_67, L_66, L_65, L_64, L_63, L_62, L_61, L_60, 
+     &L_59, L_58, L_57, L_56, L_55, L_54, L_53, L_52, L_51, L_49, 
+     &L_48, L_47, L_46, L_45, L_44, L_43, L_42, L_41, L_39, L_38, 
+     &L_37, L_36, L_35, L_34, L_33, L_32, L_31, L_29, L_28, L_27, 
+     &L_26, L_25, L_24, L_23, L_22, L_21, L_19, L_18, L_17, L_16, 
+     &L_15, L_14, L_13, L_12, L_11, L_9, L_00, L_10, L_20, L_30, L_40
+     &, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB0 = LSAME(TRANSB, 'N')                                        0043
+      NROWA1 = NOTA?M:NROWA
+      NCOLA0 = NOTA?K:NCOLA
+      L_911 = .NOT.NOTA
+      NROWA0 = L_911?K:NROWA1
+      L_111 = .NOT.NOTA
+      NCOLA = L_111?M:NCOLA0
+      NROWB0 = NOTB0?K:N
+*
+*     Test the input parameters.
+*
+      INFO6 = 0                                                         0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_120 = .NOT.NOTB0
+         L_130 = LSAME(TRANSB, 'C')
+         L_140 = .NOT.L_130
+         L_150 = L_120.AND.L_140
+         L_160 = LSAME(TRANSB, 'T')
+         L_170 = .NOT.L_160
+         L_611 = L_150.AND.L_170
+         INFO5 = L_611?2:INFO6
+         L_500 = M.LT.0
+         L_180 = .NOT.L_611
+         L_511 = L_180?L_500:L_5
+         L_190 = .NOT.L_611
+         L_211 = L_190.AND.L_511
+         INFO4 = L_211?3:INFO5
+         L_400 = N.LT.0
+         L_220 = .NOT.L_611
+         L_230 = .NOT.L_511
+         L_240 = L_220.AND.L_230
+         L_411 = L_240?L_400:L_4
+         L_250 = .NOT.L_611
+         L_260 = .NOT.L_511
+         L_270 = L_260.AND.L_411
+         L_280 = L_250.AND.L_270
+         INFO3 = L_280?4:INFO4
+         L_300 = K.LT.0
+         L_290 = .NOT.L_611
+         L_311 = .NOT.L_511
+         L_320 = .NOT.L_411
+         L_330 = L_311.AND.L_320
+         L_340 = L_290.AND.L_330
+         L_310 = L_340?L_300:L_3
+         L_350 = .NOT.L_611
+         L_360 = .NOT.L_511
+         L_370 = .NOT.L_411
+         L_380 = L_370.AND.L_310
+         L_390 = L_360.AND.L_380
+         L_410 = L_350.AND.L_390
+         INFO2 = L_410?5:INFO3
+         I_00 = MAX(1, NROWA0)
+         L_200 = LDA.LT.I_00
+         L_420 = .NOT.L_611
+         L_430 = .NOT.L_511
+         L_440 = .NOT.L_411
+         L_450 = .NOT.L_310
+         L_460 = L_440.AND.L_450
+         L_470 = L_430.AND.L_460
+         L_480 = L_420.AND.L_470
+         L_210 = L_480?L_200:L_2
+         L_490 = .NOT.L_611
+         L_510 = .NOT.L_511
+         L_520 = .NOT.L_411
+         L_530 = .NOT.L_310
+         L_540 = L_530.AND.L_210
+         L_550 = L_520.AND.L_540
+         L_560 = L_510.AND.L_550
+         L_570 = L_490.AND.L_560
+         INFO1 = L_570?8:INFO2
+         I_10 = MAX(1, NROWB0)
+         L_102 = LDB.LT.I_10
+         L_580 = .NOT.L_611
+         L_590 = .NOT.L_511
+         L_600 = .NOT.L_411
+         L_610 = .NOT.L_310
+         L_620 = .NOT.L_210
+         L_630 = L_610.AND.L_620
+         L_640 = L_600.AND.L_630
+         L_650 = L_590.AND.L_640
+         L_660 = L_580.AND.L_650
+         L_110 = L_660?L_102:L_1
+         L_670 = .NOT.L_611
+         L_680 = .NOT.L_511
+         L_690 = .NOT.L_411
+         L_700 = .NOT.L_310
+         L_711 = .NOT.L_210
+         L_720 = L_711.AND.L_110
+         L_730 = L_700.AND.L_720
+         L_740 = L_690.AND.L_730
+         L_750 = L_680.AND.L_740
+         L_760 = L_670.AND.L_750
+         INFO0 = L_760?10:INFO1
+         I_20 = MAX(1, M)
+         L_000 = LDC.LT.I_20
+         L_770 = .NOT.L_611
+         L_780 = .NOT.L_511
+         L_790 = .NOT.L_411
+         L_800 = .NOT.L_310
+         L_811 = .NOT.L_210
+         L_820 = .NOT.L_110
+         L_830 = L_811.AND.L_820
+         L_840 = L_800.AND.L_830
+         L_850 = L_790.AND.L_840
+         L_860 = L_780.AND.L_850
+         L_870 = L_770.AND.L_860
+         L_01 = L_870?L_000:L_0
+         L_880 = .NOT.L_611
+         L_890 = .NOT.L_511
+         L_900 = .NOT.L_411
+         L_910 = .NOT.L_310
+         L_920 = .NOT.L_210
+         L_930 = .NOT.L_110
+         L_940 = L_930.AND.L_01
+         L_950 = L_920.AND.L_940
+         L_960 = L_910.AND.L_950
+         L_970 = L_900.AND.L_960
+         L_980 = L_890.AND.L_970
+         L_990 = L_880.AND.L_980
+         INFO = L_990?13:INFO0
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  LU_NUB0 = M
+                  LU_IB0 = MOD(LU_NUB0, 4)
+                  DO 99997 LU_IND0 = 0, LU_IB0-1
+                     C(LU_IND0+1,J) = ZERO                              0121
+99997                CONTINUE
+                  DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
+99996                CONTINUE
+                  I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+2,J) = BETA*C(LU_IND1+2,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)               0125
+c SIMD_COMMENT_0
+                     C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)               0125
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP7 = ALPHA*B(L,J)                               0130
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+c SIMD_COMMENT_0
+                        F_03 = TEMP7*A(LU_IND2+1,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_03            0132
+c SIMD_COMMENT_0
+                        F_02 = TEMP7*A(LU_IND2+2,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+2,J) = C(LU_IND2+2,J)+F_02            0132
+c SIMD_COMMENT_0
+                        F_01 = TEMP7*A(LU_IND2+3,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+3,J) = C(LU_IND2+3,J)+F_01            0132
+c SIMD_COMMENT_0
+                        F_00 = TEMP7*A(LU_IND2+4,L)
+c SIMD_COMMENT_1
+                        C(LU_IND2+4,J) = C(LU_IND2+4,J)+F_00            0132
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP6 = ZERO                                          0143
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
+                  RED0(0) = 0.000000
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+                     RED0(0) = RED0(0)+F_14                             0145
+99991                CONTINUE
+                  TEMP5 = RED0(0)+TEMP6
+                  RED1(0) = 0.000000
+                  RED1(1) = 0.000000
+                  RED1(2) = 0.000000
+                  RED1(3) = 0.000000
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+c SIMD_COMMENT_0
+                     F_13 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+c SIMD_COMMENT_1
+                     RED1(0) = RED1(0)+F_13                             0145
+c SIMD_COMMENT_0
+                     F_12 = A(LU_IND3+2,I)*B(LU_IND3+2,J)
+c SIMD_COMMENT_1
+                     RED1(1) = RED1(1)+F_12                             0145
+c SIMD_COMMENT_0
+                     F_11 = A(LU_IND3+3,I)*B(LU_IND3+3,J)
+c SIMD_COMMENT_1
+                     RED1(2) = RED1(2)+F_11                             0145
+c SIMD_COMMENT_0
+                     F_10 = A(LU_IND3+4,I)*B(LU_IND3+4,J)
+c SIMD_COMMENT_1
+                     RED1(3) = RED1(3)+F_10                             0145
+99990                CONTINUE
+                  TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
+                  L = MAX0(LU_NUB3, 0)+1
+                  L_710 = BETA.EQ.ZERO
+                  C00 = ALPHA*TEMP4
+                  C(I,J) = L_710?C00:C(I,J)
+                  F_20 = ALPHA*TEMP4
+                  F_30 = BETA*C(I,J)
+                  C10 = F_20+F_30
+                  L_1000 = .NOT.L_710
+                  C(I,J) = L_1000?C10:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+2,J) = BETA*C(LU_IND5+2,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+3,J) = BETA*C(LU_IND5+3,J)                  0167
+c SIMD_COMMENT_0
+                  C(LU_IND5+4,J) = BETA*C(LU_IND5+4,J)                  0167
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP3 = ALPHA*B(J,L)                                  0172
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+c SIMD_COMMENT_0
+                     F_43 = TEMP3*A(LU_IND6+1,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_43               0174
+c SIMD_COMMENT_0
+                     F_42 = TEMP3*A(LU_IND6+2,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+2,J) = C(LU_IND6+2,J)+F_42               0174
+c SIMD_COMMENT_0
+                     F_41 = TEMP3*A(LU_IND6+3,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+3,J) = C(LU_IND6+3,J)+F_41               0174
+c SIMD_COMMENT_0
+                     F_40 = TEMP3*A(LU_IND6+4,L)
+c SIMD_COMMENT_1
+                     C(LU_IND6+4,J) = C(LU_IND6+4,J)+F_40               0174
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP2 = ZERO                                             0185
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
+               RED2(0) = 0.000000
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+                  RED2(0) = RED2(0)+F_54                                0187
+99983             CONTINUE
+               TEMP1 = RED2(0)+TEMP2
+               RED3(0) = 0.000000
+               RED3(1) = 0.000000
+               RED3(2) = 0.000000
+               RED3(3) = 0.000000
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+c SIMD_COMMENT_0
+                  F_53 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+c SIMD_COMMENT_1
+                  RED3(0) = RED3(0)+F_53                                0187
+c SIMD_COMMENT_0
+                  F_52 = A(LU_IND7+2,I)*B(J,LU_IND7+2)
+c SIMD_COMMENT_1
+                  RED3(1) = RED3(1)+F_52                                0187
+c SIMD_COMMENT_0
+                  F_51 = A(LU_IND7+3,I)*B(J,LU_IND7+3)
+c SIMD_COMMENT_1
+                  RED3(2) = RED3(2)+F_51                                0187
+c SIMD_COMMENT_0
+                  F_50 = A(LU_IND7+4,I)*B(J,LU_IND7+4)
+c SIMD_COMMENT_1
+                  RED3(3) = RED3(3)+F_50                                0187
+99982             CONTINUE
+               TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
+               L = MAX0(LU_NUB7, 0)+1
+               L_810 = BETA.EQ.ZERO
+               C20 = ALPHA*TEMP0
+               C(I,J) = L_810?C20:C(I,J)
+               F_60 = ALPHA*TEMP0
+               F_70 = BETA*C(I,J)
+               C30 = F_60+F_70
+               L_1010 = .NOT.L_810
+               C(I,J) = L_1010?C30:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+2,J) = BETA*C(LU_IND9+2,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+3,J) = BETA*C(LU_IND9+3,J)                     0104
+c SIMD_COMMENT_0
+               C(LU_IND9+4,J) = BETA*C(LU_IND9+4,J)                     0104
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, 
+     &I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, 
+     &NROWA, NROWB
+      REAL*4 v4sf_vec57(0:3), v4sf_vec56(0:3), v4sf_vec55(0:3), 
+     &v4sf_vec54(0:3), v4sf_vec50(0:3), v4sf_vec49(0:3), v4sf_vec48(0
+     &:3), v4sf_vec47(0:3), v4sf_vec46(0:3), v4sf_vec45(0:3), 
+     &v4sf_vec44(0:3), v4sf_vec43(0:3), v4sf_vec42(0:3), v4sf_vec41(0
+     &:3), v4sf_vec40(0:3), v4sf_vec39(0:3), v4sf_vec38(0:3), 
+     &v4sf_vec37(0:3), v4sf_vec36(0:3), v4sf_vec35(0:3), v4sf_vec34(0
+     &:3), v4sf_vec33(0:3), v4sf_vec32(0:3), v4sf_vec31(0:3), 
+     &v4sf_vec30(0:3), v4sf_vec29(0:3), v4sf_vec28(0:3), v4sf_vec27(0
+     &:3), v4sf_vec23(0:3), v4sf_vec22(0:3), v4sf_vec21(0:3), 
+     &v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), v4sf_vec17(0
+     &:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0:3), 
+     &v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), v4sf_vec10(0
+     &:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec6(
+     &0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2
+     &(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), TEMP7, F_04, F_03, F_02
+     &, F_01, F_00, TEMP6, F_14, TEMP5, F_13, F_12, F_11, F_10, TEMP4
+     &, C00, F_20, F_30, C10, TEMP3, F_44, F_43, F_42, F_41, F_40, 
+     &TEMP2, F_54, TEMP1, F_53, F_52, F_51, F_50, TEMP0, C20, F_60, 
+     &F_70, C30, RED3(0:3), RED2(0:0), RED1(0:3), RED0(0:0), F_7, F_6
+     &, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE
+     &, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, 
+     &ONE, ZERO
+      REAL*8 v2df_vec53(0:1), v2df_vec52(0:1), v2df_vec51(0:1), 
+     &v2df_vec26(0:1), v2df_vec25(0:1), v2df_vec24(0:1)
+      LOGICAL NOTB0, L_911, L_111, L_120, L_130, L_140, L_150, L_160
+     &, L_170, L_611, L_500, L_180, L_511, L_190, L_211, L_400, L_220
+     &, L_230, L_240, L_411, L_250, L_260, L_270, L_280, L_300, L_290
+     &, L_311, L_320, L_330, L_340, L_310, L_350, L_360, L_370, L_380
+     &, L_390, L_410, L_200, L_420, L_430, L_440, L_450, L_460, L_470
+     &, L_480, L_210, L_490, L_510, L_520, L_530, L_540, L_550, L_560
+     &, L_570, L_102, L_580, L_590, L_600, L_610, L_620, L_630, L_640
+     &, L_650, L_660, L_110, L_670, L_680, L_690, L_700, L_711, L_720
+     &, L_730, L_740, L_750, L_760, L_000, L_770, L_780, L_790, L_800
+     &, L_811, L_820, L_830, L_840, L_850, L_860, L_870, L_01, L_880
+     &, L_890, L_900, L_910, L_920, L_930, L_940, L_950, L_960, L_970
+     &, L_980, L_990, L_710, L_1000, L_810, L_1010, L_101, L_100, 
+     &L_99, L_98, L_97, L_96, L_95, L_94, L_93, L_92, L_91, L_90, 
+     &L_89, L_88, L_87, L_86, L_85, L_84, L_83, L_82, L_81, L_80, 
+     &L_79, L_78, L_77, L_76, L_75, L_74, L_73, L_72, L_71, L_70, 
+     &L_69, L_68, L_67, L_66, L_65, L_64, L_63, L_62, L_61, L_60, 
+     &L_59, L_58, L_57, L_56, L_55, L_54, L_53, L_52, L_51, L_49, 
+     &L_48, L_47, L_46, L_45, L_44, L_43, L_42, L_41, L_39, L_38, 
+     &L_37, L_36, L_35, L_34, L_33, L_32, L_31, L_29, L_28, L_27, 
+     &L_26, L_25, L_24, L_23, L_22, L_21, L_19, L_18, L_17, L_16, 
+     &L_15, L_14, L_13, L_12, L_11, L_9, L_00, L_10, L_20, L_30, L_40
+     &, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB0 = LSAME(TRANSB, 'N')                                        0043
+      NROWA1 = NOTA?M:NROWA
+      NCOLA0 = NOTA?K:NCOLA
+      L_911 = .NOT.NOTA
+      NROWA0 = L_911?K:NROWA1
+      L_111 = .NOT.NOTA
+      NCOLA = L_111?M:NCOLA0
+      NROWB0 = NOTB0?K:N
+*
+*     Test the input parameters.
+*
+      INFO6 = 0                                                         0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_120 = .NOT.NOTB0
+         L_130 = LSAME(TRANSB, 'C')
+         L_140 = .NOT.L_130
+         L_150 = L_120.AND.L_140
+         L_160 = LSAME(TRANSB, 'T')
+         L_170 = .NOT.L_160
+         L_611 = L_150.AND.L_170
+         INFO5 = L_611?2:INFO6
+         L_500 = M.LT.0
+         L_180 = .NOT.L_611
+         L_511 = L_180?L_500:L_5
+         L_190 = .NOT.L_611
+         L_211 = L_190.AND.L_511
+         INFO4 = L_211?3:INFO5
+         L_400 = N.LT.0
+         L_220 = .NOT.L_611
+         L_230 = .NOT.L_511
+         L_240 = L_220.AND.L_230
+         L_411 = L_240?L_400:L_4
+         L_250 = .NOT.L_611
+         L_260 = .NOT.L_511
+         L_270 = L_260.AND.L_411
+         L_280 = L_250.AND.L_270
+         INFO3 = L_280?4:INFO4
+         L_300 = K.LT.0
+         L_290 = .NOT.L_611
+         L_311 = .NOT.L_511
+         L_320 = .NOT.L_411
+         L_330 = L_311.AND.L_320
+         L_340 = L_290.AND.L_330
+         L_310 = L_340?L_300:L_3
+         L_350 = .NOT.L_611
+         L_360 = .NOT.L_511
+         L_370 = .NOT.L_411
+         L_380 = L_370.AND.L_310
+         L_390 = L_360.AND.L_380
+         L_410 = L_350.AND.L_390
+         INFO2 = L_410?5:INFO3
+         I_00 = MAX(1, NROWA0)
+         L_200 = LDA.LT.I_00
+         L_420 = .NOT.L_611
+         L_430 = .NOT.L_511
+         L_440 = .NOT.L_411
+         L_450 = .NOT.L_310
+         L_460 = L_440.AND.L_450
+         L_470 = L_430.AND.L_460
+         L_480 = L_420.AND.L_470
+         L_210 = L_480?L_200:L_2
+         L_490 = .NOT.L_611
+         L_510 = .NOT.L_511
+         L_520 = .NOT.L_411
+         L_530 = .NOT.L_310
+         L_540 = L_530.AND.L_210
+         L_550 = L_520.AND.L_540
+         L_560 = L_510.AND.L_550
+         L_570 = L_490.AND.L_560
+         INFO1 = L_570?8:INFO2
+         I_10 = MAX(1, NROWB0)
+         L_102 = LDB.LT.I_10
+         L_580 = .NOT.L_611
+         L_590 = .NOT.L_511
+         L_600 = .NOT.L_411
+         L_610 = .NOT.L_310
+         L_620 = .NOT.L_210
+         L_630 = L_610.AND.L_620
+         L_640 = L_600.AND.L_630
+         L_650 = L_590.AND.L_640
+         L_660 = L_580.AND.L_650
+         L_110 = L_660?L_102:L_1
+         L_670 = .NOT.L_611
+         L_680 = .NOT.L_511
+         L_690 = .NOT.L_411
+         L_700 = .NOT.L_310
+         L_711 = .NOT.L_210
+         L_720 = L_711.AND.L_110
+         L_730 = L_700.AND.L_720
+         L_740 = L_690.AND.L_730
+         L_750 = L_680.AND.L_740
+         L_760 = L_670.AND.L_750
+         INFO0 = L_760?10:INFO1
+         I_20 = MAX(1, M)
+         L_000 = LDC.LT.I_20
+         L_770 = .NOT.L_611
+         L_780 = .NOT.L_511
+         L_790 = .NOT.L_411
+         L_800 = .NOT.L_310
+         L_811 = .NOT.L_210
+         L_820 = .NOT.L_110
+         L_830 = L_811.AND.L_820
+         L_840 = L_800.AND.L_830
+         L_850 = L_790.AND.L_840
+         L_860 = L_780.AND.L_850
+         L_870 = L_770.AND.L_860
+         L_01 = L_870?L_000:L_0
+         L_880 = .NOT.L_611
+         L_890 = .NOT.L_511
+         L_900 = .NOT.L_411
+         L_910 = .NOT.L_310
+         L_920 = .NOT.L_210
+         L_930 = .NOT.L_110
+         L_940 = L_930.AND.L_01
+         L_950 = L_920.AND.L_940
+         L_960 = L_910.AND.L_950
+         L_970 = L_900.AND.L_960
+         L_980 = L_890.AND.L_970
+         L_990 = L_880.AND.L_980
+         INFO = L_990?13:INFO0
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  LU_NUB0 = M
+                  LU_IB0 = MOD(LU_NUB0, 4)
+                  DO 99997 LU_IND0 = 0, LU_IB0-1
+                     C(LU_IND0+1,J) = ZERO                              0121
+99997                CONTINUE
+                  DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
+99996                CONTINUE
+                  I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, 
+     &               BETA, BETA, BETA)
+                     CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP7 = ALPHA*B(L,J)                               0130
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                        CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec6, A(
+     &                  LU_IND2+1,L), A(LU_IND2+2,L), A(LU_IND2+3,L)
+     &                  , A(LU_IND2+4,L))
+                        CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec5, TEMP7
+     &                  , TEMP7, TEMP7, TEMP7)
+                        CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5, 
+     &                  v4sf_vec6)
+                        CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec4, F_03, 
+     &                  F_02, F_01, F_00)
+                        CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec7, C(
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+                        CALL SIMD_ADDPS(v4sf_vec7, v4sf_vec7, 
+     &                  v4sf_vec4)
+                        CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec7, C(
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+99992                   CONTINUE
+                     I = MAX0(LU_NUB2, 0)+1
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               DO 110 I = 1, M                                          0142
+                  TEMP6 = ZERO                                          0143
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
+                  RED0(0) = 0.000000
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+                     RED0(0) = RED0(0)+F_14                             0145
+99991                CONTINUE
+                  TEMP5 = RED0(0)+TEMP6
+                  RED1(0) = 0.000000
+                  RED1(1) = 0.000000
+                  RED1(2) = 0.000000
+                  RED1(3) = 0.000000
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec16, B(
+     &               LU_IND3+1,J), B(LU_IND3+2,J), B(LU_IND3+3,J), B(
+     &               LU_IND3+4,J))
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec15, A(
+     &               LU_IND3+1,I), A(LU_IND3+2,I), A(LU_IND3+3,I), A(
+     &               LU_IND3+4,I))
+                     CALL SIMD_MULPS(v4sf_vec14, v4sf_vec15, 
+     &               v4sf_vec16)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec14, F_13, 
+     &               F_12, F_11, F_10)
+                     CALL SIMD_LOAD_V4SF(v4sf_vec17, RED1(0))
+                     CALL SIMD_ADDPS(v4sf_vec17, v4sf_vec17, 
+     &               v4sf_vec14)
+                     CALL SIMD_SAVE_V4SF(v4sf_vec17, RED1(0))
+99990                CONTINUE
+                  TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
+                  L = MAX0(LU_NUB3, 0)+1
+                  L_710 = BETA.EQ.ZERO
+                  CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec26, TEMP4, 
+     &            TEMP4)
+                  CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec25, ALPHA, 
+     &            ALPHA)
+                  CALL SIMD_MULPD(v2df_vec24, v2df_vec25, v2df_vec26)
+                  CALL SIMD_SAVE_GENERIC_V2DF(v2df_vec24, C00, F_20)
+                  C(I,J) = L_710?C00:C(I,J)
+                  F_30 = BETA*C(I,J)
+                  C10 = F_20+F_30
+                  L_1000 = .NOT.L_710
+                  C(I,J) = L_1000?C10:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
+     &            )
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec28, BETA, BETA
+     &            , BETA, BETA)
+                  CALL SIMD_MULPS(v4sf_vec27, v4sf_vec28, v4sf_vec27)
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
+     &            )
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP3 = ALPHA*B(J,L)                                  0172
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec33, A(
+     &               LU_IND6+1,L), A(LU_IND6+2,L), A(LU_IND6+3,L), A(
+     &               LU_IND6+4,L))
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec32, TEMP3, 
+     &               TEMP3, TEMP3, TEMP3)
+                     CALL SIMD_MULPS(v4sf_vec31, v4sf_vec32, 
+     &               v4sf_vec33)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec31, F_43, 
+     &               F_42, F_41, F_40)
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec34, C(
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+                     CALL SIMD_ADDPS(v4sf_vec34, v4sf_vec34, 
+     &               v4sf_vec31)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec34, C(
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+99984                CONTINUE
+                  I = MAX0(LU_NUB6, 0)+1
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            DO 190 I = 1, M                                             0184
+               TEMP2 = ZERO                                             0185
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
+               RED2(0) = 0.000000
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+                  RED2(0) = RED2(0)+F_54                                0187
+99983             CONTINUE
+               TEMP1 = RED2(0)+TEMP2
+               RED3(0) = 0.000000
+               RED3(1) = 0.000000
+               RED3(2) = 0.000000
+               RED3(3) = 0.000000
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND7+1))
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND7+1
+     &            ,I), A(LU_IND7+2,I), A(LU_IND7+3,I), A(LU_IND7+4,I)
+     &            )
+                  CALL SIMD_MULPS(v4sf_vec41, v4sf_vec42, v4sf_vec43)
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec41, F_53, F_52
+     &            , F_51, F_50)
+                  CALL SIMD_LOAD_V4SF(v4sf_vec44, RED3(0))
+                  CALL SIMD_ADDPS(v4sf_vec44, v4sf_vec44, v4sf_vec41)
+                  CALL SIMD_SAVE_V4SF(v4sf_vec44, RED3(0))
+99982             CONTINUE
+               TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
+               L = MAX0(LU_NUB7, 0)+1
+               L_810 = BETA.EQ.ZERO
+               CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec53, TEMP0, TEMP0)
+               CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec52, ALPHA, ALPHA)
+               CALL SIMD_MULPD(v2df_vec51, v2df_vec52, v2df_vec53)
+               CALL SIMD_SAVE_GENERIC_V2DF(v2df_vec51, C20, F_60)
+               C(I,J) = L_810?C20:C(I,J)
+               F_70 = BETA*C(I,J)
+               C30 = F_60+F_70
+               L_1010 = .NOT.L_810
+               C(I,J) = L_1010?C30:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec55, BETA, BETA, 
+     &         BETA, BETA)
+               CALL SIMD_MULPS(v4sf_vec54, v4sf_vec55, v4sf_vec54)
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 XERBLA
+      EXTERNAL XERBLA
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, 
+     &I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, 
+     &NROWA, NROWB
+      REAL*4 v4sf_vec57(0:3), v4sf_vec56(0:3), v4sf_vec55(0:3), 
+     &v4sf_vec54(0:3), v4sf_vec50(0:3), v4sf_vec49(0:3), v4sf_vec48(0
+     &:3), v4sf_vec47(0:3), v4sf_vec46(0:3), v4sf_vec45(0:3), 
+     &v4sf_vec44(0:3), v4sf_vec43(0:3), v4sf_vec42(0:3), v4sf_vec41(0
+     &:3), v4sf_vec40(0:3), v4sf_vec39(0:3), v4sf_vec38(0:3), 
+     &v4sf_vec37(0:3), v4sf_vec36(0:3), v4sf_vec35(0:3), v4sf_vec34(0
+     &:3), v4sf_vec33(0:3), v4sf_vec32(0:3), v4sf_vec31(0:3), 
+     &v4sf_vec30(0:3), v4sf_vec29(0:3), v4sf_vec28(0:3), v4sf_vec27(0
+     &:3), v4sf_vec23(0:3), v4sf_vec22(0:3), v4sf_vec21(0:3), 
+     &v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), v4sf_vec17(0
+     &:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0:3), 
+     &v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), v4sf_vec10(0
+     &:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec6(
+     &0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2
+     &(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), TEMP7, F_04, F_03, F_02
+     &, F_01, F_00, TEMP6, F_14, TEMP5, F_13, F_12, F_11, F_10, TEMP4
+     &, C00, F_20, F_30, C10, TEMP3, F_44, F_43, F_42, F_41, F_40, 
+     &TEMP2, F_54, TEMP1, F_53, F_52, F_51, F_50, TEMP0, C20, F_60, 
+     &F_70, C30, RED3(0:3), RED2(0:0), RED1(0:3), RED0(0:0), F_7, F_6
+     &, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE
+     &, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, 
+     &ONE, ZERO
+      REAL*8 v2df_vec53(0:1), v2df_vec52(0:1), v2df_vec51(0:1), 
+     &v2df_vec26(0:1), v2df_vec25(0:1), v2df_vec24(0:1)
+      LOGICAL NOTB0, L_911, L_111, L_120, L_130, L_140, L_150, L_160
+     &, L_170, L_611, L_500, L_180, L_511, L_190, L_211, L_400, L_220
+     &, L_230, L_240, L_411, L_250, L_260, L_270, L_280, L_300, L_290
+     &, L_311, L_320, L_330, L_340, L_310, L_350, L_360, L_370, L_380
+     &, L_390, L_410, L_200, L_420, L_430, L_440, L_450, L_460, L_470
+     &, L_480, L_210, L_490, L_510, L_520, L_530, L_540, L_550, L_560
+     &, L_570, L_102, L_580, L_590, L_600, L_610, L_620, L_630, L_640
+     &, L_650, L_660, L_110, L_670, L_680, L_690, L_700, L_711, L_720
+     &, L_730, L_740, L_750, L_760, L_000, L_770, L_780, L_790, L_800
+     &, L_811, L_820, L_830, L_840, L_850, L_860, L_870, L_01, L_880
+     &, L_890, L_900, L_910, L_920, L_930, L_940, L_950, L_960, L_970
+     &, L_980, L_990, L_710, L_1000, L_810, L_1010, L_101, L_100, 
+     &L_99, L_98, L_97, L_96, L_95, L_94, L_93, L_92, L_91, L_90, 
+     &L_89, L_88, L_87, L_86, L_85, L_84, L_83, L_82, L_81, L_80, 
+     &L_79, L_78, L_77, L_76, L_75, L_74, L_73, L_72, L_71, L_70, 
+     &L_69, L_68, L_67, L_66, L_65, L_64, L_63, L_62, L_61, L_60, 
+     &L_59, L_58, L_57, L_56, L_55, L_54, L_53, L_52, L_51, L_49, 
+     &L_48, L_47, L_46, L_45, L_44, L_43, L_42, L_41, L_39, L_38, 
+     &L_37, L_36, L_35, L_34, L_33, L_32, L_31, L_29, L_28, L_27, 
+     &L_26, L_25, L_24, L_23, L_22, L_21, L_19, L_18, L_17, L_16, 
+     &L_15, L_14, L_13, L_12, L_11, L_9, L_00, L_10, L_20, L_30, L_40
+     &, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB0 = LSAME(TRANSB, 'N')                                        0043
+      NROWA1 = NOTA?M:NROWA
+      NCOLA0 = NOTA?K:NCOLA
+      L_911 = .NOT.NOTA
+      NROWA0 = L_911?K:NROWA1
+      L_111 = .NOT.NOTA
+      NCOLA = L_111?M:NCOLA0
+      NROWB0 = NOTB0?K:N
+*
+*     Test the input parameters.
+*
+      INFO6 = 0                                                         0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_120 = .NOT.NOTB0
+         L_130 = LSAME(TRANSB, 'C')
+         L_140 = .NOT.L_130
+         L_150 = L_120.AND.L_140
+         L_160 = LSAME(TRANSB, 'T')
+         L_170 = .NOT.L_160
+         L_611 = L_150.AND.L_170
+         INFO5 = L_611?2:INFO6
+         L_500 = M.LT.0
+         L_180 = .NOT.L_611
+         L_511 = L_180?L_500:L_5
+         L_190 = .NOT.L_611
+         L_211 = L_190.AND.L_511
+         INFO4 = L_211?3:INFO5
+         L_400 = N.LT.0
+         L_220 = .NOT.L_611
+         L_230 = .NOT.L_511
+         L_240 = L_220.AND.L_230
+         L_411 = L_240?L_400:L_4
+         L_250 = .NOT.L_611
+         L_260 = .NOT.L_511
+         L_270 = L_260.AND.L_411
+         L_280 = L_250.AND.L_270
+         INFO3 = L_280?4:INFO4
+         L_300 = K.LT.0
+         L_290 = .NOT.L_611
+         L_311 = .NOT.L_511
+         L_320 = .NOT.L_411
+         L_330 = L_311.AND.L_320
+         L_340 = L_290.AND.L_330
+         L_310 = L_340?L_300:L_3
+         L_350 = .NOT.L_611
+         L_360 = .NOT.L_511
+         L_370 = .NOT.L_411
+         L_380 = L_370.AND.L_310
+         L_390 = L_360.AND.L_380
+         L_410 = L_350.AND.L_390
+         INFO2 = L_410?5:INFO3
+         I_00 = MAX(1, NROWA0)
+         L_200 = LDA.LT.I_00
+         L_420 = .NOT.L_611
+         L_430 = .NOT.L_511
+         L_440 = .NOT.L_411
+         L_450 = .NOT.L_310
+         L_460 = L_440.AND.L_450
+         L_470 = L_430.AND.L_460
+         L_480 = L_420.AND.L_470
+         L_210 = L_480?L_200:L_2
+         L_490 = .NOT.L_611
+         L_510 = .NOT.L_511
+         L_520 = .NOT.L_411
+         L_530 = .NOT.L_310
+         L_540 = L_530.AND.L_210
+         L_550 = L_520.AND.L_540
+         L_560 = L_510.AND.L_550
+         L_570 = L_490.AND.L_560
+         INFO1 = L_570?8:INFO2
+         I_10 = MAX(1, NROWB0)
+         L_102 = LDB.LT.I_10
+         L_580 = .NOT.L_611
+         L_590 = .NOT.L_511
+         L_600 = .NOT.L_411
+         L_610 = .NOT.L_310
+         L_620 = .NOT.L_210
+         L_630 = L_610.AND.L_620
+         L_640 = L_600.AND.L_630
+         L_650 = L_590.AND.L_640
+         L_660 = L_580.AND.L_650
+         L_110 = L_660?L_102:L_1
+         L_670 = .NOT.L_611
+         L_680 = .NOT.L_511
+         L_690 = .NOT.L_411
+         L_700 = .NOT.L_310
+         L_711 = .NOT.L_210
+         L_720 = L_711.AND.L_110
+         L_730 = L_700.AND.L_720
+         L_740 = L_690.AND.L_730
+         L_750 = L_680.AND.L_740
+         L_760 = L_670.AND.L_750
+         INFO0 = L_760?10:INFO1
+         I_20 = MAX(1, M)
+         L_000 = LDC.LT.I_20
+         L_770 = .NOT.L_611
+         L_780 = .NOT.L_511
+         L_790 = .NOT.L_411
+         L_800 = .NOT.L_310
+         L_811 = .NOT.L_210
+         L_820 = .NOT.L_110
+         L_830 = L_811.AND.L_820
+         L_840 = L_800.AND.L_830
+         L_850 = L_790.AND.L_840
+         L_860 = L_780.AND.L_850
+         L_870 = L_770.AND.L_860
+         L_01 = L_870?L_000:L_0
+         L_880 = .NOT.L_611
+         L_890 = .NOT.L_511
+         L_900 = .NOT.L_411
+         L_910 = .NOT.L_310
+         L_920 = .NOT.L_210
+         L_930 = .NOT.L_110
+         L_940 = L_930.AND.L_01
+         L_950 = L_920.AND.L_940
+         L_960 = L_910.AND.L_950
+         L_970 = L_900.AND.L_960
+         L_980 = L_890.AND.L_970
+         L_990 = L_880.AND.L_980
+         INFO = L_990?13:INFO0
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  LU_NUB0 = M
+                  LU_IB0 = MOD(LU_NUB0, 4)
+                  DO 99997 LU_IND0 = 0, LU_IB0-1
+                     C(LU_IND0+1,J) = ZERO                              0121
+99997                CONTINUE
+                  DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
+99996                CONTINUE
+                  I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, BETA, 
+     &            BETA, BETA)
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+                     CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP7 = ALPHA*B(L,J)                               0130
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec5, TEMP7, 
+     &               TEMP7, TEMP7, TEMP7)
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                        CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec6, A(
+     &                  LU_IND2+1,L), A(LU_IND2+2,L), A(LU_IND2+3,L)
+     &                  , A(LU_IND2+4,L))
+                        CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5, 
+     &                  v4sf_vec6)
+                        CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec7, C(
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+                        CALL SIMD_ADDPS(v4sf_vec7, v4sf_vec7, 
+     &                  v4sf_vec4)
+                        CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec7, C(
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+99992                   CONTINUE
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec4, F_03, 
+     &               F_02, F_01, F_00)
+                     I = MAX0(LU_NUB2, 0)+1
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec25, ALPHA, ALPHA)
+               DO 110 I = 1, M                                          0142
+                  TEMP6 = ZERO                                          0143
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
+                  RED0(0) = 0.000000
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+                     RED0(0) = RED0(0)+F_14                             0145
+99991                CONTINUE
+                  TEMP5 = RED0(0)+TEMP6
+                  RED1(0) = 0.000000
+                  RED1(1) = 0.000000
+                  RED1(2) = 0.000000
+                  RED1(3) = 0.000000
+                  CALL SIMD_LOAD_V4SF(v4sf_vec17, RED1(0))
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec16, B(
+     &               LU_IND3+1,J), B(LU_IND3+2,J), B(LU_IND3+3,J), B(
+     &               LU_IND3+4,J))
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec15, A(
+     &               LU_IND3+1,I), A(LU_IND3+2,I), A(LU_IND3+3,I), A(
+     &               LU_IND3+4,I))
+                     CALL SIMD_MULPS(v4sf_vec14, v4sf_vec15, 
+     &               v4sf_vec16)
+                     CALL SIMD_ADDPS(v4sf_vec17, v4sf_vec17, 
+     &               v4sf_vec14)
+99990                CONTINUE
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec14, F_13, F_12
+     &            , F_11, F_10)
+                  CALL SIMD_SAVE_V4SF(v4sf_vec17, RED1(0))
+                  TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
+                  L = MAX0(LU_NUB3, 0)+1
+                  L_710 = BETA.EQ.ZERO
+                  CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec26, TEMP4, 
+     &            TEMP4)
+                  CALL SIMD_MULPD(v2df_vec24, v2df_vec25, v2df_vec26)
+                  CALL SIMD_SAVE_GENERIC_V2DF(v2df_vec24, C00, F_20)
+                  C(I,J) = L_710?C00:C(I,J)
+                  F_30 = BETA*C(I,J)
+                  C10 = F_20+F_30
+                  L_1000 = .NOT.L_710
+                  C(I,J) = L_1000?C10:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec28, BETA, BETA, 
+     &         BETA, BETA)
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
+     &            )
+                  CALL SIMD_MULPS(v4sf_vec27, v4sf_vec28, v4sf_vec27)
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
+     &            )
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP3 = ALPHA*B(J,L)                                  0172
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec32, TEMP3, 
+     &            TEMP3, TEMP3, TEMP3)
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec33, A(
+     &               LU_IND6+1,L), A(LU_IND6+2,L), A(LU_IND6+3,L), A(
+     &               LU_IND6+4,L))
+                     CALL SIMD_MULPS(v4sf_vec31, v4sf_vec32, 
+     &               v4sf_vec33)
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec34, C(
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+                     CALL SIMD_ADDPS(v4sf_vec34, v4sf_vec34, 
+     &               v4sf_vec31)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec34, C(
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+99984                CONTINUE
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec31, F_43, F_42
+     &            , F_41, F_40)
+                  I = MAX0(LU_NUB6, 0)+1
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec52, ALPHA, ALPHA)
+            DO 190 I = 1, M                                             0184
+               TEMP2 = ZERO                                             0185
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
+               RED2(0) = 0.000000
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+                  RED2(0) = RED2(0)+F_54                                0187
+99983             CONTINUE
+               TEMP1 = RED2(0)+TEMP2
+               RED3(0) = 0.000000
+               RED3(1) = 0.000000
+               RED3(2) = 0.000000
+               RED3(3) = 0.000000
+               CALL SIMD_LOAD_V4SF(v4sf_vec44, RED3(0))
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND7+1))
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND7+1
+     &            ,I), A(LU_IND7+2,I), A(LU_IND7+3,I), A(LU_IND7+4,I)
+     &            )
+                  CALL SIMD_MULPS(v4sf_vec41, v4sf_vec42, v4sf_vec43)
+                  CALL SIMD_ADDPS(v4sf_vec44, v4sf_vec44, v4sf_vec41)
+99982             CONTINUE
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec41, F_53, F_52, 
+     &         F_51, F_50)
+               CALL SIMD_SAVE_V4SF(v4sf_vec44, RED3(0))
+               TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
+               L = MAX0(LU_NUB7, 0)+1
+               L_810 = BETA.EQ.ZERO
+               CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec53, TEMP0, TEMP0)
+               CALL SIMD_MULPD(v2df_vec51, v2df_vec52, v2df_vec53)
+               CALL SIMD_SAVE_GENERIC_V2DF(v2df_vec51, C20, F_60)
+               C(I,J) = L_810?C20:C(I,J)
+               F_70 = BETA*C(I,J)
+               C30 = F_60+F_70
+               L_1010 = .NOT.L_810
+               C(I,J) = L_1010?C30:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec55, BETA, BETA, BETA
+     &      , BETA)
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+               CALL SIMD_MULPS(v4sf_vec54, v4sf_vec55, v4sf_vec54)
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
+      SUBROUTINE SGEMM(TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB
+     &, BETA, C, LDC)
+      LOGICAL*4 LSAME
+      EXTERNAL LSAME
+      REAL*4 SIZE
+      PARAMETER (SIZE = 10)
+      INTEGER NROWA1, NCOLA0, NROWA0, NROWB0, INFO6, INFO5, INFO4, 
+     &INFO3, INFO2, I_00, INFO1, I_10, INFO0, I_20, LU_IND9, LU_IB9, 
+     &LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, LU_NUB7, 
+     &LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, LU_IND4, 
+     &LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, LU_IB2, 
+     &LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, M
+     &, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA
+      REAL*4 v4sf_vec55(0:3), v4sf_vec54(0:3), v4sf_vec44(0:3), 
+     &v4sf_vec43(0:3), v4sf_vec42(0:3), v4sf_vec41(0:3), v4sf_vec34(0
+     &:3), v4sf_vec33(0:3), v4sf_vec32(0:3), v4sf_vec31(0:3), 
+     &v4sf_vec28(0:3), v4sf_vec27(0:3), v4sf_vec17(0:3), v4sf_vec16(0
+     &:3), v4sf_vec15(0:3), v4sf_vec14(0:3), v4sf_vec7(0:3), 
+     &v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec1(0:3)
+     &, v4sf_vec0(0:3), TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, 
+     &F_14, TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, 
+     &C10, TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, 
+     &F_53, F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3)
+     &, RED2(0:0), RED1(0:3), RED0(0:0), ALPHA, A(1:SIZE, 1:SIZE), B(
+     &1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), ONE, ZERO
+      REAL*8 v2df_vec53(0:1), v2df_vec52(0:1), v2df_vec51(0:1), 
+     &v2df_vec26(0:1), v2df_vec25(0:1), v2df_vec24(0:1)
+      LOGICAL NOTB0, L_911, L_111, L_120, L_130, L_140, L_150, L_160
+     &, L_170, L_611, L_500, L_180, L_511, L_190, L_211, L_400, L_220
+     &, L_230, L_240, L_411, L_250, L_260, L_270, L_280, L_300, L_290
+     &, L_311, L_320, L_330, L_340, L_310, L_350, L_360, L_370, L_380
+     &, L_390, L_410, L_200, L_420, L_430, L_440, L_450, L_460, L_470
+     &, L_480, L_210, L_490, L_510, L_520, L_530, L_540, L_550, L_560
+     &, L_570, L_102, L_580, L_590, L_600, L_610, L_620, L_630, L_640
+     &, L_650, L_660, L_110, L_670, L_680, L_690, L_700, L_711, L_720
+     &, L_730, L_740, L_750, L_760, L_000, L_770, L_780, L_790, L_800
+     &, L_811, L_820, L_830, L_840, L_850, L_860, L_870, L_01, L_880
+     &, L_890, L_900, L_910, L_920, L_930, L_940, L_950, L_960, L_970
+     &, L_980, L_990, L_710, L_1000, L_810, L_1010, L_5, L_4, L_3, 
+     &L_2, L_1, L_0, NOTA, NOTB
+      CHARACTER TRANSA, TRANSB
+      ONE = 1.0E+0                                                      0033
+      ZERO = 0.0E+0                                                     0034
+*     ..
+*     .. Executable Statements ..
+*
+*     Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not
+*     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
+*     and  columns of  A  and the  number of  rows  of  B  respectively.
+*
+      NOTA = LSAME(TRANSA, 'N')                                         0042
+      NOTB0 = LSAME(TRANSB, 'N')                                        0043
+      NROWA1 = NOTA?M:NROWA
+      NCOLA0 = NOTA?K:NCOLA
+      L_911 = .NOT.NOTA
+      NROWA0 = L_911?K:NROWA1
+      L_111 = .NOT.NOTA
+      NCOLA = L_111?M:NCOLA0
+      NROWB0 = NOTB0?K:N
+*
+*     Test the input parameters.
+*
+      INFO6 = 0                                                         0059
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
+     &, 'T')) THEN                                                      0060
+         INFO = 1                                                       0063
+      ELSE
+         L_120 = .NOT.NOTB0
+         L_130 = LSAME(TRANSB, 'C')
+         L_140 = .NOT.L_130
+         L_150 = L_120.AND.L_140
+         L_160 = LSAME(TRANSB, 'T')
+         L_170 = .NOT.L_160
+         L_611 = L_150.AND.L_170
+         INFO5 = L_611?2:INFO6
+         L_500 = M.LT.0
+         L_180 = .NOT.L_611
+         L_511 = L_180?L_500:L_5
+         L_190 = .NOT.L_611
+         L_211 = L_190.AND.L_511
+         INFO4 = L_211?3:INFO5
+         L_400 = N.LT.0
+         L_220 = .NOT.L_611
+         L_230 = .NOT.L_511
+         L_240 = L_220.AND.L_230
+         L_411 = L_240?L_400:L_4
+         L_250 = .NOT.L_611
+         L_260 = .NOT.L_511
+         L_270 = L_260.AND.L_411
+         L_280 = L_250.AND.L_270
+         INFO3 = L_280?4:INFO4
+         L_300 = K.LT.0
+         L_290 = .NOT.L_611
+         L_311 = .NOT.L_511
+         L_320 = .NOT.L_411
+         L_330 = L_311.AND.L_320
+         L_340 = L_290.AND.L_330
+         L_310 = L_340?L_300:L_3
+         L_350 = .NOT.L_611
+         L_360 = .NOT.L_511
+         L_370 = .NOT.L_411
+         L_380 = L_370.AND.L_310
+         L_390 = L_360.AND.L_380
+         L_410 = L_350.AND.L_390
+         INFO2 = L_410?5:INFO3
+         I_00 = MAX(1, NROWA0)
+         L_200 = LDA.LT.I_00
+         L_420 = .NOT.L_611
+         L_430 = .NOT.L_511
+         L_440 = .NOT.L_411
+         L_450 = .NOT.L_310
+         L_460 = L_440.AND.L_450
+         L_470 = L_430.AND.L_460
+         L_480 = L_420.AND.L_470
+         L_210 = L_480?L_200:L_2
+         L_490 = .NOT.L_611
+         L_510 = .NOT.L_511
+         L_520 = .NOT.L_411
+         L_530 = .NOT.L_310
+         L_540 = L_530.AND.L_210
+         L_550 = L_520.AND.L_540
+         L_560 = L_510.AND.L_550
+         L_570 = L_490.AND.L_560
+         INFO1 = L_570?8:INFO2
+         I_10 = MAX(1, NROWB0)
+         L_102 = LDB.LT.I_10
+         L_580 = .NOT.L_611
+         L_590 = .NOT.L_511
+         L_600 = .NOT.L_411
+         L_610 = .NOT.L_310
+         L_620 = .NOT.L_210
+         L_630 = L_610.AND.L_620
+         L_640 = L_600.AND.L_630
+         L_650 = L_590.AND.L_640
+         L_660 = L_580.AND.L_650
+         L_110 = L_660?L_102:L_1
+         L_670 = .NOT.L_611
+         L_680 = .NOT.L_511
+         L_690 = .NOT.L_411
+         L_700 = .NOT.L_310
+         L_711 = .NOT.L_210
+         L_720 = L_711.AND.L_110
+         L_730 = L_700.AND.L_720
+         L_740 = L_690.AND.L_730
+         L_750 = L_680.AND.L_740
+         L_760 = L_670.AND.L_750
+         INFO0 = L_760?10:INFO1
+         I_20 = MAX(1, M)
+         L_000 = LDC.LT.I_20
+         L_770 = .NOT.L_611
+         L_780 = .NOT.L_511
+         L_790 = .NOT.L_411
+         L_800 = .NOT.L_310
+         L_811 = .NOT.L_210
+         L_820 = .NOT.L_110
+         L_830 = L_811.AND.L_820
+         L_840 = L_800.AND.L_830
+         L_850 = L_790.AND.L_840
+         L_860 = L_780.AND.L_850
+         L_870 = L_770.AND.L_860
+         L_01 = L_870?L_000:L_0
+         L_880 = .NOT.L_611
+         L_890 = .NOT.L_511
+         L_900 = .NOT.L_411
+         L_910 = .NOT.L_310
+         L_920 = .NOT.L_210
+         L_930 = .NOT.L_110
+         L_940 = L_930.AND.L_01
+         L_950 = L_920.AND.L_940
+         L_960 = L_910.AND.L_950
+         L_970 = L_900.AND.L_960
+         L_980 = L_890.AND.L_970
+         L_990 = L_880.AND.L_980
+         INFO = L_990?13:INFO0
+      ENDIF
+      IF (INFO.NE.0) GOTO 99999                                         0081
+*
+*     Quick return if possible.
+*
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
+     &ONE) RETURN                                                       0088
+*
+*     And if  alpha.eq.zero.
+*
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+*
+*     Start the operations.
+*
+      IF (NOTB) THEN                                                    0113
+         IF (NOTA) THEN                                                 0114
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+*
+*           Form  C := alpha*A*B + beta*C.
+*
+            DO 90 J = 1, N                                              0118
+               IF (BETA.EQ.ZERO) THEN                                   0119
+                  LU_NUB0 = M
+                  LU_IB0 = MOD(LU_NUB0, 4)
+                  DO 99997 LU_IND0 = 0, LU_IB0-1
+                     C(LU_IND0+1,J) = ZERO                              0121
+99997                CONTINUE
+                  DO 99996 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+                     C(LU_IND0+1,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+2,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+3,J) = ZERO                              0121
+c SIMD_COMMENT_0
+                     C(LU_IND0+4,J) = ZERO                              0121
+99996                CONTINUE
+                  I = MAX0(LU_NUB0, 0)+1
+               ELSEIF (BETA.NE.ONE) THEN                                0119
+                  LU_NUB1 = M
+                  LU_IB1 = MOD(LU_NUB1, 4)
+                  DO 99995 LU_IND1 = 0, LU_IB1-1
+                     C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)               0125
+99995                CONTINUE
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, BETA, BETA, 
+     &            BETA, BETA)
+                  DO 99994 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+                     CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec0)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, C(LU_IND1
+     &               +1,J), C(LU_IND1+2,J), C(LU_IND1+3,J), C(LU_IND1
+     &               +4,J))
+99994                CONTINUE
+                  I = MAX0(LU_NUB1, 0)+1
+               ENDIF
+               DO 80 L = 1, K                                           0128
+                  IF (B(L,J).NE.ZERO) THEN                              0129
+                     TEMP7 = ALPHA*B(L,J)                               0130
+                     LU_NUB2 = M
+                     LU_IB2 = MOD(LU_NUB2, 4)
+                     DO 99993 LU_IND2 = 0, LU_IB2-1
+                        F_04 = TEMP7*A(LU_IND2+1,L)
+                        C(LU_IND2+1,J) = C(LU_IND2+1,J)+F_04            0132
+99993                   CONTINUE
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec5, TEMP7, 
+     &               TEMP7, TEMP7, TEMP7)
+                     DO 99992 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                        CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec6, A(
+     &                  LU_IND2+1,L), A(LU_IND2+2,L), A(LU_IND2+3,L)
+     &                  , A(LU_IND2+4,L))
+                        CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5, 
+     &                  v4sf_vec6)
+                        CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec7, C(
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+                        CALL SIMD_ADDPS(v4sf_vec7, v4sf_vec7, 
+     &                  v4sf_vec4)
+                        CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec7, C(
+     &                  LU_IND2+1,J), C(LU_IND2+2,J), C(LU_IND2+3,J)
+     &                  , C(LU_IND2+4,J))
+99992                   CONTINUE
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec4, F_03, 
+     &               F_02, F_01, F_00)
+                     I = MAX0(LU_NUB2, 0)+1
+                  ENDIF
+80                CONTINUE                                              0135
+90             CONTINUE                                                 0136
+         ELSE
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+*
+*           Form  C := alpha*A'*B + beta*C
+*
+            DO 120 J = 1, N                                             0141
+               CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec25, ALPHA, ALPHA)
+               DO 110 I = 1, M                                          0142
+                  TEMP6 = ZERO                                          0143
+                  LU_NUB3 = K
+                  LU_IB3 = MOD(LU_NUB3, 4)
+                  RED0(0) = 0.000000
+                  DO 99991 LU_IND3 = 0, LU_IB3-1
+                     F_14 = A(LU_IND3+1,I)*B(LU_IND3+1,J)
+                     RED0(0) = RED0(0)+F_14                             0145
+99991                CONTINUE
+                  TEMP5 = RED0(0)+TEMP6
+                  RED1(0) = 0.000000
+                  RED1(1) = 0.000000
+                  RED1(2) = 0.000000
+                  RED1(3) = 0.000000
+                  CALL SIMD_LOAD_V4SF(v4sf_vec17, RED1(0))
+                  DO 99990 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec16, B(
+     &               LU_IND3+1,J), B(LU_IND3+2,J), B(LU_IND3+3,J), B(
+     &               LU_IND3+4,J))
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec15, A(
+     &               LU_IND3+1,I), A(LU_IND3+2,I), A(LU_IND3+3,I), A(
+     &               LU_IND3+4,I))
+                     CALL SIMD_MULPS(v4sf_vec14, v4sf_vec15, 
+     &               v4sf_vec16)
+                     CALL SIMD_ADDPS(v4sf_vec17, v4sf_vec17, 
+     &               v4sf_vec14)
+99990                CONTINUE
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec14, F_13, F_12
+     &            , F_11, F_10)
+                  CALL SIMD_SAVE_V4SF(v4sf_vec17, RED1(0))
+                  TEMP4 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+TEMP5
+                  L = MAX0(LU_NUB3, 0)+1
+                  L_710 = BETA.EQ.ZERO
+                  CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec26, TEMP4, 
+     &            TEMP4)
+                  CALL SIMD_MULPD(v2df_vec24, v2df_vec25, v2df_vec26)
+                  CALL SIMD_SAVE_GENERIC_V2DF(v2df_vec24, C00, F_20)
+                  C(I,J) = L_710?C00:C(I,J)
+                  F_30 = BETA*C(I,J)
+                  C10 = F_20+F_30
+                  L_1000 = .NOT.L_710
+                  C(I,J) = L_1000?C10:C(I,J)
+110               CONTINUE                                              0152
+120            CONTINUE                                                 0153
+         ENDIF
+      ELSEIF (NOTA) THEN                                                0113
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+*
+*           Form  C := alpha*A*B' + beta*C
+*
+         DO 170 J = 1, N                                                0160
+            IF (BETA.EQ.ZERO) THEN                                      0161
+               LU_NUB4 = M
+               LU_IB4 = MOD(LU_NUB4, 4)
+               DO 99989 LU_IND4 = 0, LU_IB4-1
+                  C(LU_IND4+1,J) = ZERO                                 0163
+99989             CONTINUE
+               DO 99988 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+c SIMD_COMMENT_0
+                  C(LU_IND4+1,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+2,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+3,J) = ZERO                                 0163
+c SIMD_COMMENT_0
+                  C(LU_IND4+4,J) = ZERO                                 0163
+99988             CONTINUE
+               I = MAX0(LU_NUB4, 0)+1
+            ELSEIF (BETA.NE.ONE) THEN                                   0161
+               LU_NUB5 = M
+               LU_IB5 = MOD(LU_NUB5, 4)
+               DO 99987 LU_IND5 = 0, LU_IB5-1
+                  C(LU_IND5+1,J) = BETA*C(LU_IND5+1,J)                  0167
+99987             CONTINUE
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec28, BETA, BETA, 
+     &         BETA, BETA)
+               DO 99986 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
+     &            )
+                  CALL SIMD_MULPS(v4sf_vec27, v4sf_vec28, v4sf_vec27)
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, C(LU_IND5+1
+     &            ,J), C(LU_IND5+2,J), C(LU_IND5+3,J), C(LU_IND5+4,J)
+     &            )
+99986             CONTINUE
+               I = MAX0(LU_NUB5, 0)+1
+            ENDIF
+            DO 160 L = 1, K                                             0170
+               IF (B(J,L).NE.ZERO) THEN                                 0171
+                  TEMP3 = ALPHA*B(J,L)                                  0172
+                  LU_NUB6 = M
+                  LU_IB6 = MOD(LU_NUB6, 4)
+                  DO 99985 LU_IND6 = 0, LU_IB6-1
+                     F_44 = TEMP3*A(LU_IND6+1,L)
+                     C(LU_IND6+1,J) = C(LU_IND6+1,J)+F_44               0174
+99985                CONTINUE
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec32, TEMP3, 
+     &            TEMP3, TEMP3, TEMP3)
+                  DO 99984 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec33, A(
+     &               LU_IND6+1,L), A(LU_IND6+2,L), A(LU_IND6+3,L), A(
+     &               LU_IND6+4,L))
+                     CALL SIMD_MULPS(v4sf_vec31, v4sf_vec32, 
+     &               v4sf_vec33)
+                     CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec34, C(
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+                     CALL SIMD_ADDPS(v4sf_vec34, v4sf_vec34, 
+     &               v4sf_vec31)
+                     CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec34, C(
+     &               LU_IND6+1,J), C(LU_IND6+2,J), C(LU_IND6+3,J), C(
+     &               LU_IND6+4,J))
+99984                CONTINUE
+                  CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec31, F_43, F_42
+     &            , F_41, F_40)
+                  I = MAX0(LU_NUB6, 0)+1
+               ENDIF
+160            CONTINUE                                                 0177
+170         CONTINUE                                                    0178
+      ELSE
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+*
+*           Form  C := alpha*A'*B' + beta*C
+*
+         DO 200 J = 1, N                                                0183
+            CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec52, ALPHA, ALPHA)
+            DO 190 I = 1, M                                             0184
+               TEMP2 = ZERO                                             0185
+               LU_NUB7 = K
+               LU_IB7 = MOD(LU_NUB7, 4)
+               RED2(0) = 0.000000
+               DO 99983 LU_IND7 = 0, LU_IB7-1
+                  F_54 = A(LU_IND7+1,I)*B(J,LU_IND7+1)
+                  RED2(0) = RED2(0)+F_54                                0187
+99983             CONTINUE
+               TEMP1 = RED2(0)+TEMP2
+               RED3(0) = 0.000000
+               RED3(1) = 0.000000
+               RED3(2) = 0.000000
+               RED3(3) = 0.000000
+               CALL SIMD_LOAD_V4SF(v4sf_vec44, RED3(0))
+               DO 99982 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+                  CALL SIMD_LOAD_V4SF(v4sf_vec43, B(J,LU_IND7+1))
+                  CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec42, A(LU_IND7+1
+     &            ,I), A(LU_IND7+2,I), A(LU_IND7+3,I), A(LU_IND7+4,I)
+     &            )
+                  CALL SIMD_MULPS(v4sf_vec41, v4sf_vec42, v4sf_vec43)
+                  CALL SIMD_ADDPS(v4sf_vec44, v4sf_vec44, v4sf_vec41)
+99982             CONTINUE
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec41, F_53, F_52, 
+     &         F_51, F_50)
+               CALL SIMD_SAVE_V4SF(v4sf_vec44, RED3(0))
+               TEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+TEMP1
+               L = MAX0(LU_NUB7, 0)+1
+               L_810 = BETA.EQ.ZERO
+               CALL SIMD_LOAD_GENERIC_V2DF(v2df_vec53, TEMP0, TEMP0)
+               CALL SIMD_MULPD(v2df_vec51, v2df_vec52, v2df_vec53)
+               CALL SIMD_SAVE_GENERIC_V2DF(v2df_vec51, C20, F_60)
+               C(I,J) = L_810?C20:C(I,J)
+               F_70 = BETA*C(I,J)
+               C30 = F_60+F_70
+               L_1010 = .NOT.L_810
+               C(I,J) = L_1010?C30:C(I,J)
+190            CONTINUE                                                 0194
+200         CONTINUE                                                    0195
+      ENDIF
+*
+      RETURN
+99998 CONTINUE
+      IF (BETA.EQ.ZERO) THEN                                            0095
+         DO 20 J = 1, N                                                 0096
+            LU_NUB8 = M
+            LU_IB8 = MOD(LU_NUB8, 4)
+            DO 99981 LU_IND8 = 0, LU_IB8-1
+               C(LU_IND8+1,J) = ZERO                                    0098
+99981          CONTINUE
+            DO 99980 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+c SIMD_COMMENT_0
+               C(LU_IND8+1,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+2,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+3,J) = ZERO                                    0098
+c SIMD_COMMENT_0
+               C(LU_IND8+4,J) = ZERO                                    0098
+99980          CONTINUE
+            I = MAX0(LU_NUB8, 0)+1
+20          CONTINUE                                                    0100
+      ELSE
+         DO 40 J = 1, N                                                 0102
+            LU_NUB9 = M
+            LU_IB9 = MOD(LU_NUB9, 4)
+            DO 99979 LU_IND9 = 0, LU_IB9-1
+               C(LU_IND9+1,J) = BETA*C(LU_IND9+1,J)                     0104
+99979          CONTINUE
+            CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec55, BETA, BETA, BETA
+     &      , BETA)
+            DO 99978 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+               CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+               CALL SIMD_MULPS(v4sf_vec54, v4sf_vec55, v4sf_vec54)
+               CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec54, C(LU_IND9+1,J)
+     &         , C(LU_IND9+2,J), C(LU_IND9+3,J), C(LU_IND9+4,J))
+99978          CONTINUE
+            I = MAX0(LU_NUB9, 0)+1
+40          CONTINUE                                                    0106
+      ENDIF
+      RETURN
+99999 CONTINUE
+*         CALL XERBLA( 'SGEMM ', INFO )
+*
+*     End of SGEMM .
+*
+      END
 nsucc = 2 
 Result = if (info != 0) {
 
@@ -181,13 +4065,236 @@ nsucc = 1
 nsucc = 1 
 nsucc = 0 
 /* C pretty print for module SGEMM. */
-#define size 10
-
 void
 sgemm (char transa, char transb, int m, int n, int k, float alpha,
-       float a[10][10], int lda, float b[10][10], int ldb, float beta,
-       float c[10][10], int ldc)
+       float a[size - 1 + 1][size - 1 + 1], int lda,
+       float b[size - 1 + 1][size - 1 + 1], int ldb, float beta,
+       float c[size - 1 + 1][size - 1 + 1], int ldc)
 {
+  float v4sf_vec55[3 - 0 + 1];
+  float v4sf_vec54[3 - 0 + 1];
+  double v2df_vec53[1 - 0 + 1];
+  double v2df_vec52[1 - 0 + 1];
+  double v2df_vec51[1 - 0 + 1];
+  float v4sf_vec44[3 - 0 + 1];
+  float v4sf_vec43[3 - 0 + 1];
+  float v4sf_vec42[3 - 0 + 1];
+  float v4sf_vec41[3 - 0 + 1];
+  float v4sf_vec34[3 - 0 + 1];
+  float v4sf_vec33[3 - 0 + 1];
+  float v4sf_vec32[3 - 0 + 1];
+  float v4sf_vec31[3 - 0 + 1];
+  float v4sf_vec28[3 - 0 + 1];
+  float v4sf_vec27[3 - 0 + 1];
+  double v2df_vec26[1 - 0 + 1];
+  double v2df_vec25[1 - 0 + 1];
+  double v2df_vec24[1 - 0 + 1];
+  float v4sf_vec17[3 - 0 + 1];
+  float v4sf_vec16[3 - 0 + 1];
+  float v4sf_vec15[3 - 0 + 1];
+  float v4sf_vec14[3 - 0 + 1];
+  float v4sf_vec7[3 - 0 + 1];
+  float v4sf_vec6[3 - 0 + 1];
+  float v4sf_vec5[3 - 0 + 1];
+  float v4sf_vec4[3 - 0 + 1];
+  float v4sf_vec1[3 - 0 + 1];
+  float v4sf_vec0[3 - 0 + 1];
+  int notb0;
+  int nrowa1;
+  int ncola0;
+  int l_911;
+  int nrowa0;
+  int l_111;
+  int nrowb0;
+  int info6;
+  int l_120;
+  int l_130;
+  int l_140;
+  int l_150;
+  int l_160;
+  int l_170;
+  int l_611;
+  int info5;
+  int l_500;
+  int l_180;
+  int l_511;
+  int l_190;
+  int l_211;
+  int info4;
+  int l_400;
+  int l_220;
+  int l_230;
+  int l_240;
+  int l_411;
+  int l_250;
+  int l_260;
+  int l_270;
+  int l_280;
+  int info3;
+  int l_300;
+  int l_290;
+  int l_311;
+  int l_320;
+  int l_330;
+  int l_340;
+  int l_310;
+  int l_350;
+  int l_360;
+  int l_370;
+  int l_380;
+  int l_390;
+  int l_410;
+  int info2;
+  int i_00;
+  int l_200;
+  int l_420;
+  int l_430;
+  int l_440;
+  int l_450;
+  int l_460;
+  int l_470;
+  int l_480;
+  int l_210;
+  int l_490;
+  int l_510;
+  int l_520;
+  int l_530;
+  int l_540;
+  int l_550;
+  int l_560;
+  int l_570;
+  int info1;
+  int i_10;
+  int l_102;
+  int l_580;
+  int l_590;
+  int l_600;
+  int l_610;
+  int l_620;
+  int l_630;
+  int l_640;
+  int l_650;
+  int l_660;
+  int l_110;
+  int l_670;
+  int l_680;
+  int l_690;
+  int l_700;
+  int l_711;
+  int l_720;
+  int l_730;
+  int l_740;
+  int l_750;
+  int l_760;
+  int info0;
+  int i_20;
+  int l_000;
+  int l_770;
+  int l_780;
+  int l_790;
+  int l_800;
+  int l_811;
+  int l_820;
+  int l_830;
+  int l_840;
+  int l_850;
+  int l_860;
+  int l_870;
+  int l_01;
+  int l_880;
+  int l_890;
+  int l_900;
+  int l_910;
+  int l_920;
+  int l_930;
+  int l_940;
+  int l_950;
+  int l_960;
+  int l_970;
+  int l_980;
+  int l_990;
+  float temp7;
+  float f_04;
+  float f_03;
+  float f_02;
+  float f_01;
+  float f_00;
+  float temp6;
+  float f_14;
+  float temp5;
+  float f_13;
+  float f_12;
+  float f_11;
+  float f_10;
+  float temp4;
+  int l_710;
+  float c00;
+  float f_20;
+  float f_30;
+  float c10;
+  int l_1000;
+  float temp3;
+  float f_44;
+  float f_43;
+  float f_42;
+  float f_41;
+  float f_40;
+  float temp2;
+  float f_54;
+  float temp1;
+  float f_53;
+  float f_52;
+  float f_51;
+  float f_50;
+  float temp0;
+  int l_810;
+  float c20;
+  float f_60;
+  float f_70;
+  float c30;
+  int l_1010;
+  float red3[3 - 0 + 1];
+  float red2[0 - 0 + 1];
+  float red1[3 - 0 + 1];
+  float red0[0 - 0 + 1];
+  int lu_ind9;
+  int lu_ib9;
+  int lu_nub9;
+  int lu_ind8;
+  int lu_ib8;
+  int lu_nub8;
+  int lu_ind7;
+  int lu_ib7;
+  int lu_nub7;
+  int lu_ind6;
+  int lu_ib6;
+  int lu_nub6;
+  int lu_ind5;
+  int lu_ib5;
+  int lu_nub5;
+  int lu_ind4;
+  int lu_ib4;
+  int lu_nub4;
+  int lu_ind3;
+  int lu_ib3;
+  int lu_nub3;
+  int lu_ind2;
+  int lu_ib2;
+  int lu_nub2;
+  int lu_ind1;
+  int lu_ib1;
+  int lu_nub1;
+  int lu_ind0;
+  int lu_ib0;
+  int lu_nub0;
+  int l_5;
+  int l_4;
+  int l_3;
+  int l_2;
+  int l_1;
+  int l_0;
+  static const float size = 10;
+  ;
   int nota;
   int notb;
   int i;
@@ -196,86 +4303,134 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int l;
   int ncola;
   int nrowa;
-  int nrowb;
-  float temp;
   float one;
   float zero;
 
   one = 1.0e+0;
   zero = 0.0e+0;
   nota = lsame (transa, 'n');
-  notb = lsame (transb, 'n');
-  if (nota)
-    {
-      nrowa = m;
-      ncola = k;
-    }
-  else
-    {
-      nrowa = k;
-      ncola = m;
-    }
-  if (notb)
-    {
-      nrowb = k;
-    }
-  else
-    {
-      nrowb = n;
-    }
-  info = 0;
+  notb0 = lsame (transb, 'n');
+  nrowa1 = __c - conditional__ (nota, m, nrowa);
+  ncola0 = __c - conditional__ (nota, k, ncola);
+  l_911 = !nota;
+  nrowa0 = __c - conditional__ (l_911, k, nrowa1);
+  l_111 = !nota;
+  ncola = __c - conditional__ (l_111, m, ncola0);
+  nrowb0 = __c - conditional__ (notb0, k, n);
+  info6 = 0;
   if ((!nota && !lsame (transa, 'c')) && !lsame (transa, 't'))
     {
       info = 1;
     }
   else
     {
-      if ((!notb && !lsame (transb, 'c')) && !lsame (transb, 't'))
-	{
-	  info = 2;
-	}
-      else
-	{
-	  if (m < 0)
-	    {
-	      info = 3;
-	    }
-	  else
-	    {
-	      if (n < 0)
-		{
-		  info = 4;
-		}
-	      else
-		{
-		  if (k < 0)
-		    {
-		      info = 5;
-		    }
-		  else
-		    {
-		      if (lda < max (1, nrowa))
-			{
-			  info = 8;
-			}
-		      else
-			{
-			  if (ldb < max (1, nrowb))
-			    {
-			      info = 10;
-			    }
-			  else
-			    {
-			      if (ldc < max (1, m))
-				{
-				  info = 13;
-				}
-			    }
-			}
-		    }
-		}
-	    }
-	}
+      l_120 = !notb0;
+      l_130 = lsame (transb, 'c');
+      l_140 = !l_130;
+      l_150 = (l_120 && l_140);
+      l_160 = lsame (transb, 't');
+      l_170 = !l_160;
+      l_611 = (l_150 && l_170);
+      info5 = __c - conditional__ (l_611, 2, info6);
+      l_500 = (m < 0);
+      l_180 = !l_611;
+      l_511 = __c - conditional__ (l_180, l_500, l_5);
+      l_190 = !l_611;
+      l_211 = (l_190 && l_511);
+      info4 = __c - conditional__ (l_211, 3, info5);
+      l_400 = (n < 0);
+      l_220 = !l_611;
+      l_230 = !l_511;
+      l_240 = (l_220 && l_230);
+      l_411 = __c - conditional__ (l_240, l_400, l_4);
+      l_250 = !l_611;
+      l_260 = !l_511;
+      l_270 = (l_260 && l_411);
+      l_280 = (l_250 && l_270);
+      info3 = __c - conditional__ (l_280, 4, info4);
+      l_300 = (k < 0);
+      l_290 = !l_611;
+      l_311 = !l_511;
+      l_320 = !l_411;
+      l_330 = (l_311 && l_320);
+      l_340 = (l_290 && l_330);
+      l_310 = __c - conditional__ (l_340, l_300, l_3);
+      l_350 = !l_611;
+      l_360 = !l_511;
+      l_370 = !l_411;
+      l_380 = (l_370 && l_310);
+      l_390 = (l_360 && l_380);
+      l_410 = (l_350 && l_390);
+      info2 = __c - conditional__ (l_410, 5, info3);
+      i_00 = max (1, nrowa0);
+      l_200 = (lda < i_00);
+      l_420 = !l_611;
+      l_430 = !l_511;
+      l_440 = !l_411;
+      l_450 = !l_310;
+      l_460 = (l_440 && l_450);
+      l_470 = (l_430 && l_460);
+      l_480 = (l_420 && l_470);
+      l_210 = __c - conditional__ (l_480, l_200, l_2);
+      l_490 = !l_611;
+      l_510 = !l_511;
+      l_520 = !l_411;
+      l_530 = !l_310;
+      l_540 = (l_530 && l_210);
+      l_550 = (l_520 && l_540);
+      l_560 = (l_510 && l_550);
+      l_570 = (l_490 && l_560);
+      info1 = __c - conditional__ (l_570, 8, info2);
+      i_10 = max (1, nrowb0);
+      l_102 = (ldb < i_10);
+      l_580 = !l_611;
+      l_590 = !l_511;
+      l_600 = !l_411;
+      l_610 = !l_310;
+      l_620 = !l_210;
+      l_630 = (l_610 && l_620);
+      l_640 = (l_600 && l_630);
+      l_650 = (l_590 && l_640);
+      l_660 = (l_580 && l_650);
+      l_110 = __c - conditional__ (l_660, l_102, l_1);
+      l_670 = !l_611;
+      l_680 = !l_511;
+      l_690 = !l_411;
+      l_700 = !l_310;
+      l_711 = !l_210;
+      l_720 = (l_711 && l_110);
+      l_730 = (l_700 && l_720);
+      l_740 = (l_690 && l_730);
+      l_750 = (l_680 && l_740);
+      l_760 = (l_670 && l_750);
+      info0 = __c - conditional__ (l_760, 10, info1);
+      i_20 = max (1, m);
+      l_000 = (ldc < i_20);
+      l_770 = !l_611;
+      l_780 = !l_511;
+      l_790 = !l_411;
+      l_800 = !l_310;
+      l_811 = !l_210;
+      l_820 = !l_110;
+      l_830 = (l_811 && l_820);
+      l_840 = (l_800 && l_830);
+      l_850 = (l_790 && l_840);
+      l_860 = (l_780 && l_850);
+      l_870 = (l_770 && l_860);
+      l_01 = __c - conditional__ (l_870, l_000, l_0);
+      l_880 = !l_611;
+      l_890 = !l_511;
+      l_900 = !l_411;
+      l_910 = !l_310;
+      l_920 = !l_210;
+      l_930 = !l_110;
+      l_940 = (l_930 && l_01);
+      l_950 = (l_920 && l_940);
+      l_960 = (l_910 && l_950);
+      l_970 = (l_900 && l_960);
+      l_980 = (l_890 && l_970);
+      l_990 = (l_880 && l_980);
+      info = __c - conditional__ (l_990, 13, info0);
     }
   if (info != 0)
     {
@@ -294,37 +4449,107 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       if (nota)
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
 	      if (beta == zero)
 		{
-		  for (i = 1; i <= m; i++)
+		  lu_nub0 = m;
+		  lu_ib0 = mod (lu_nub0, 4);
+		  for (lu_ind0 = 0; lu_ind0 <= lu_ib0 - 1; lu_ind0++)
 		    {
-		      c[j][i] = zero;
+		      c[j - 1][(lu_ind0 + 1) - 1] = zero;
 		      continue;
 		    }
+		  for (lu_ind0 = lu_ib0; lu_ind0 <= lu_nub0 - 1; lu_ind0 += 4)
+		    {
+		      c[j - 1][(lu_ind0 + 1) - 1] = zero;
+		      c[j - 1][(lu_ind0 + 2) - 1] = zero;
+		      c[j - 1][(lu_ind0 + 3) - 1] = zero;
+		      c[j - 1][(lu_ind0 + 4) - 1] = zero;
+		      continue;
+		    }
+		  i = (max0 (lu_nub0, 0) + 1);
 		}
 	      else
 		{
 		  if (beta != one)
 		    {
-		      for (i = 1; i <= m; i++)
+		      lu_nub1 = m;
+		      lu_ib1 = mod (lu_nub1, 4);
+		      for (lu_ind1 = 0; lu_ind1 <= lu_ib1 - 1; lu_ind1++)
 			{
-			  c[j][i] = (beta * c[j][i]);
+			  c[j - 1][(lu_ind1 + 1) - 1] =
+			    (beta * c[j - 1][(lu_ind1 + 1) - 1]);
 			  continue;
 			}
+		      simd_load_generic_v4sf (v4sf_vec1, beta, beta, beta,
+					      beta);
+		      for (lu_ind1 = lu_ib1; lu_ind1 <= lu_nub1 - 1;
+			   lu_ind1 += 4)
+			{
+			  simd_load_generic_v4sf (v4sf_vec0,
+						  c[j - 1][(lu_ind1 + 1) - 1],
+						  c[j - 1][(lu_ind1 + 2) - 1],
+						  c[j - 1][(lu_ind1 + 3) - 1],
+						  c[j - 1][(lu_ind1 + 4) -
+							   1]);
+			  simd_mulps (v4sf_vec0, v4sf_vec1, v4sf_vec0);
+			  simd_save_generic_v4sf (v4sf_vec0,
+						  c[j - 1][(lu_ind1 + 1) - 1],
+						  c[j - 1][(lu_ind1 + 2) - 1],
+						  c[j - 1][(lu_ind1 + 3) - 1],
+						  c[j - 1][(lu_ind1 + 4) -
+							   1]);
+			  continue;
+			}
+		      i = (max0 (lu_nub1, 0) + 1);
 		    }
 		}
 	      for (l = 1; l <= k; l++)
 		{
-		  if (b[j][l] != zero)
+		  if (b[j - 1][l - 1] != zero)
 		    {
-		      temp = (alpha * b[j][l]);
-		      for (i = 1; i <= m; i++)
+		      temp7 = (alpha * b[j - 1][l - 1]);
+		      lu_nub2 = m;
+		      lu_ib2 = mod (lu_nub2, 4);
+		      for (lu_ind2 = 0; lu_ind2 <= lu_ib2 - 1; lu_ind2++)
 			{
-			  c[j][i] = (c[j][i] + (temp * a[l][i]));
+			  f_04 = (temp7 * a[l - 1][(lu_ind2 + 1) - 1]);
+			  c[j - 1][(lu_ind2 + 1) - 1] =
+			    (c[j - 1][(lu_ind2 + 1) - 1] + f_04);
 			  continue;
 			}
+		      simd_load_generic_v4sf (v4sf_vec5, temp7, temp7, temp7,
+					      temp7);
+		      for (lu_ind2 = lu_ib2; lu_ind2 <= lu_nub2 - 1;
+			   lu_ind2 += 4)
+			{
+			  simd_load_generic_v4sf (v4sf_vec6,
+						  a[l - 1][(lu_ind2 + 1) - 1],
+						  a[l - 1][(lu_ind2 + 2) - 1],
+						  a[l - 1][(lu_ind2 + 3) - 1],
+						  a[l - 1][(lu_ind2 + 4) -
+							   1]);
+			  simd_mulps (v4sf_vec4, v4sf_vec5, v4sf_vec6);
+			  simd_load_generic_v4sf (v4sf_vec7,
+						  c[j - 1][(lu_ind2 + 1) - 1],
+						  c[j - 1][(lu_ind2 + 2) - 1],
+						  c[j - 1][(lu_ind2 + 3) - 1],
+						  c[j - 1][(lu_ind2 + 4) -
+							   1]);
+			  simd_addps (v4sf_vec7, v4sf_vec7, v4sf_vec4);
+			  simd_save_generic_v4sf (v4sf_vec7,
+						  c[j - 1][(lu_ind2 + 1) - 1],
+						  c[j - 1][(lu_ind2 + 2) - 1],
+						  c[j - 1][(lu_ind2 + 3) - 1],
+						  c[j - 1][(lu_ind2 + 4) -
+							   1]);
+			  continue;
+			}
+		      simd_save_generic_v4sf (v4sf_vec4, f_03, f_02, f_01,
+					      f_00);
+		      i = (max0 (lu_nub2, 0) + 1);
 		    }
 		  continue;
 		}
@@ -333,24 +4558,62 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	}
       else
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
+	      simd_load_generic_v2df (v2df_vec25, alpha, alpha);
 	      for (i = 1; i <= m; i++)
 		{
-		  temp = zero;
-		  for (l = 1; l <= k; l++)
+		  temp6 = zero;
+		  lu_nub3 = k;
+		  lu_ib3 = mod (lu_nub3, 4);
+		  red0[0] = 0.000000;
+		  for (lu_ind3 = 0; lu_ind3 <= lu_ib3 - 1; lu_ind3++)
 		    {
-		      temp = (temp + (a[i][l] * b[j][l]));
+		      f_14 =
+			(a[i - 1][(lu_ind3 + 1) - 1] *
+			 b[j - 1][(lu_ind3 + 1) - 1]);
+		      red0[0] = (red0[0] + f_14);
 		      continue;
 		    }
-		  if (beta == zero)
+		  temp5 = (red0[0] + temp6);
+		  red1[0] = 0.000000;
+		  red1[1] = 0.000000;
+		  red1[2] = 0.000000;
+		  red1[3] = 0.000000;
+		  simd_load_v4sf (v4sf_vec17, red1[0]);
+		  for (lu_ind3 = lu_ib3; lu_ind3 <= lu_nub3 - 1; lu_ind3 += 4)
 		    {
-		      c[j][i] = (alpha * temp);
+		      simd_load_generic_v4sf (v4sf_vec16,
+					      b[j - 1][(lu_ind3 + 1) - 1],
+					      b[j - 1][(lu_ind3 + 2) - 1],
+					      b[j - 1][(lu_ind3 + 3) - 1],
+					      b[j - 1][(lu_ind3 + 4) - 1]);
+		      simd_load_generic_v4sf (v4sf_vec15,
+					      a[i - 1][(lu_ind3 + 1) - 1],
+					      a[i - 1][(lu_ind3 + 2) - 1],
+					      a[i - 1][(lu_ind3 + 3) - 1],
+					      a[i - 1][(lu_ind3 + 4) - 1]);
+		      simd_mulps (v4sf_vec14, v4sf_vec15, v4sf_vec16);
+		      simd_addps (v4sf_vec17, v4sf_vec17, v4sf_vec14);
+		      continue;
 		    }
-		  else
-		    {
-		      c[j][i] = ((alpha * temp) + (beta * c[j][i]));
-		    }
+		  simd_save_generic_v4sf (v4sf_vec14, f_13, f_12, f_11, f_10);
+		  simd_save_v4sf (v4sf_vec17, red1[0]);
+		  temp4 =
+		    (red1[3] + (red1[2] + (red1[1] + (red1[0] + temp5))));
+		  l = (max0 (lu_nub3, 0) + 1);
+		  l_710 = (beta == zero);
+		  simd_load_generic_v2df (v2df_vec26, temp4, temp4);
+		  simd_mulpd (v2df_vec24, v2df_vec25, v2df_vec26);
+		  simd_save_generic_v2df (v2df_vec24, c00, f_20);
+		  c[j - 1][i - 1] =
+		    __c - conditional__ (l_710, c00, c[j - 1][i - 1]);
+		  f_30 = (beta * c[j - 1][i - 1]);
+		  c10 = (f_20 + f_30);
+		  l_1000 = !l_710;
+		  c[j - 1][i - 1] =
+		    __c - conditional__ (l_1000, c10, c[j - 1][i - 1]);
 		  continue;
 		}
 	      continue;
@@ -361,37 +4624,107 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       if (nota)
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
 	      if (beta == zero)
 		{
-		  for (i = 1; i <= m; i++)
+		  lu_nub4 = m;
+		  lu_ib4 = mod (lu_nub4, 4);
+		  for (lu_ind4 = 0; lu_ind4 <= lu_ib4 - 1; lu_ind4++)
 		    {
-		      c[j][i] = zero;
+		      c[j - 1][(lu_ind4 + 1) - 1] = zero;
 		      continue;
 		    }
+		  for (lu_ind4 = lu_ib4; lu_ind4 <= lu_nub4 - 1; lu_ind4 += 4)
+		    {
+		      c[j - 1][(lu_ind4 + 1) - 1] = zero;
+		      c[j - 1][(lu_ind4 + 2) - 1] = zero;
+		      c[j - 1][(lu_ind4 + 3) - 1] = zero;
+		      c[j - 1][(lu_ind4 + 4) - 1] = zero;
+		      continue;
+		    }
+		  i = (max0 (lu_nub4, 0) + 1);
 		}
 	      else
 		{
 		  if (beta != one)
 		    {
-		      for (i = 1; i <= m; i++)
+		      lu_nub5 = m;
+		      lu_ib5 = mod (lu_nub5, 4);
+		      for (lu_ind5 = 0; lu_ind5 <= lu_ib5 - 1; lu_ind5++)
 			{
-			  c[j][i] = (beta * c[j][i]);
+			  c[j - 1][(lu_ind5 + 1) - 1] =
+			    (beta * c[j - 1][(lu_ind5 + 1) - 1]);
 			  continue;
 			}
+		      simd_load_generic_v4sf (v4sf_vec28, beta, beta, beta,
+					      beta);
+		      for (lu_ind5 = lu_ib5; lu_ind5 <= lu_nub5 - 1;
+			   lu_ind5 += 4)
+			{
+			  simd_load_generic_v4sf (v4sf_vec27,
+						  c[j - 1][(lu_ind5 + 1) - 1],
+						  c[j - 1][(lu_ind5 + 2) - 1],
+						  c[j - 1][(lu_ind5 + 3) - 1],
+						  c[j - 1][(lu_ind5 + 4) -
+							   1]);
+			  simd_mulps (v4sf_vec27, v4sf_vec28, v4sf_vec27);
+			  simd_save_generic_v4sf (v4sf_vec27,
+						  c[j - 1][(lu_ind5 + 1) - 1],
+						  c[j - 1][(lu_ind5 + 2) - 1],
+						  c[j - 1][(lu_ind5 + 3) - 1],
+						  c[j - 1][(lu_ind5 + 4) -
+							   1]);
+			  continue;
+			}
+		      i = (max0 (lu_nub5, 0) + 1);
 		    }
 		}
 	      for (l = 1; l <= k; l++)
 		{
-		  if (b[l][j] != zero)
+		  if (b[l - 1][j - 1] != zero)
 		    {
-		      temp = (alpha * b[l][j]);
-		      for (i = 1; i <= m; i++)
+		      temp3 = (alpha * b[l - 1][j - 1]);
+		      lu_nub6 = m;
+		      lu_ib6 = mod (lu_nub6, 4);
+		      for (lu_ind6 = 0; lu_ind6 <= lu_ib6 - 1; lu_ind6++)
 			{
-			  c[j][i] = (c[j][i] + (temp * a[l][i]));
+			  f_44 = (temp3 * a[l - 1][(lu_ind6 + 1) - 1]);
+			  c[j - 1][(lu_ind6 + 1) - 1] =
+			    (c[j - 1][(lu_ind6 + 1) - 1] + f_44);
 			  continue;
 			}
+		      simd_load_generic_v4sf (v4sf_vec32, temp3, temp3, temp3,
+					      temp3);
+		      for (lu_ind6 = lu_ib6; lu_ind6 <= lu_nub6 - 1;
+			   lu_ind6 += 4)
+			{
+			  simd_load_generic_v4sf (v4sf_vec33,
+						  a[l - 1][(lu_ind6 + 1) - 1],
+						  a[l - 1][(lu_ind6 + 2) - 1],
+						  a[l - 1][(lu_ind6 + 3) - 1],
+						  a[l - 1][(lu_ind6 + 4) -
+							   1]);
+			  simd_mulps (v4sf_vec31, v4sf_vec32, v4sf_vec33);
+			  simd_load_generic_v4sf (v4sf_vec34,
+						  c[j - 1][(lu_ind6 + 1) - 1],
+						  c[j - 1][(lu_ind6 + 2) - 1],
+						  c[j - 1][(lu_ind6 + 3) - 1],
+						  c[j - 1][(lu_ind6 + 4) -
+							   1]);
+			  simd_addps (v4sf_vec34, v4sf_vec34, v4sf_vec31);
+			  simd_save_generic_v4sf (v4sf_vec34,
+						  c[j - 1][(lu_ind6 + 1) - 1],
+						  c[j - 1][(lu_ind6 + 2) - 1],
+						  c[j - 1][(lu_ind6 + 3) - 1],
+						  c[j - 1][(lu_ind6 + 4) -
+							   1]);
+			  continue;
+			}
+		      simd_save_generic_v4sf (v4sf_vec31, f_43, f_42, f_41,
+					      f_40);
+		      i = (max0 (lu_nub6, 0) + 1);
 		    }
 		  continue;
 		}
@@ -400,24 +4733,59 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	}
       else
 	{
+	  ;
 	  for (j = 1; j <= n; j++)
 	    {
+	      simd_load_generic_v2df (v2df_vec52, alpha, alpha);
 	      for (i = 1; i <= m; i++)
 		{
-		  temp = zero;
-		  for (l = 1; l <= k; l++)
+		  temp2 = zero;
+		  lu_nub7 = k;
+		  lu_ib7 = mod (lu_nub7, 4);
+		  red2[0] = 0.000000;
+		  for (lu_ind7 = 0; lu_ind7 <= lu_ib7 - 1; lu_ind7++)
 		    {
-		      temp = (temp + (a[i][l] * b[l][j]));
+		      f_54 =
+			(a[i - 1][(lu_ind7 + 1) - 1] *
+			 b[(lu_ind7 + 1) - 1][j - 1]);
+		      red2[0] = (red2[0] + f_54);
 		      continue;
 		    }
-		  if (beta == zero)
+		  temp1 = (red2[0] + temp2);
+		  red3[0] = 0.000000;
+		  red3[1] = 0.000000;
+		  red3[2] = 0.000000;
+		  red3[3] = 0.000000;
+		  simd_load_v4sf (v4sf_vec44, red3[0]);
+		  for (lu_ind7 = lu_ib7; lu_ind7 <= lu_nub7 - 1; lu_ind7 += 4)
 		    {
-		      c[j][i] = (alpha * temp);
+		      simd_load_v4sf (v4sf_vec43,
+				      b[(lu_ind7 + 1) - 1][j - 1]);
+		      simd_load_generic_v4sf (v4sf_vec42,
+					      a[i - 1][(lu_ind7 + 1) - 1],
+					      a[i - 1][(lu_ind7 + 2) - 1],
+					      a[i - 1][(lu_ind7 + 3) - 1],
+					      a[i - 1][(lu_ind7 + 4) - 1]);
+		      simd_mulps (v4sf_vec41, v4sf_vec42, v4sf_vec43);
+		      simd_addps (v4sf_vec44, v4sf_vec44, v4sf_vec41);
+		      continue;
 		    }
-		  else
-		    {
-		      c[j][i] = ((alpha * temp) + (beta * c[j][i]));
-		    }
+		  simd_save_generic_v4sf (v4sf_vec41, f_53, f_52, f_51, f_50);
+		  simd_save_v4sf (v4sf_vec44, red3[0]);
+		  temp0 =
+		    (red3[3] + (red3[2] + (red3[1] + (red3[0] + temp1))));
+		  l = (max0 (lu_nub7, 0) + 1);
+		  l_810 = (beta == zero);
+		  simd_load_generic_v2df (v2df_vec53, temp0, temp0);
+		  simd_mulpd (v2df_vec51, v2df_vec52, v2df_vec53);
+		  simd_save_generic_v2df (v2df_vec51, c20, f_60);
+		  c[j - 1][i - 1] =
+		    __c - conditional__ (l_810, c20, c[j - 1][i - 1]);
+		  f_70 = (beta * c[j - 1][i - 1]);
+		  c30 = (f_60 + f_70);
+		  l_1010 = !l_810;
+		  c[j - 1][i - 1] =
+		    __c - conditional__ (l_1010, c30, c[j - 1][i - 1]);
 		  continue;
 		}
 	      continue;
@@ -430,11 +4798,22 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       for (j = 1; j <= n; j++)
 	{
-	  for (i = 1; i <= m; i++)
+	  lu_nub8 = m;
+	  lu_ib8 = mod (lu_nub8, 4);
+	  for (lu_ind8 = 0; lu_ind8 <= lu_ib8 - 1; lu_ind8++)
 	    {
-	      c[j][i] = zero;
+	      c[j - 1][(lu_ind8 + 1) - 1] = zero;
 	      continue;
 	    }
+	  for (lu_ind8 = lu_ib8; lu_ind8 <= lu_nub8 - 1; lu_ind8 += 4)
+	    {
+	      c[j - 1][(lu_ind8 + 1) - 1] = zero;
+	      c[j - 1][(lu_ind8 + 2) - 1] = zero;
+	      c[j - 1][(lu_ind8 + 3) - 1] = zero;
+	      c[j - 1][(lu_ind8 + 4) - 1] = zero;
+	      continue;
+	    }
+	  i = (max0 (lu_nub8, 0) + 1);
 	  continue;
 	}
     }
@@ -442,11 +4821,29 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       for (j = 1; j <= n; j++)
 	{
-	  for (i = 1; i <= m; i++)
+	  lu_nub9 = m;
+	  lu_ib9 = mod (lu_nub9, 4);
+	  for (lu_ind9 = 0; lu_ind9 <= lu_ib9 - 1; lu_ind9++)
 	    {
-	      c[j][i] = (beta * c[j][i]);
+	      c[j - 1][(lu_ind9 + 1) - 1] =
+		(beta * c[j - 1][(lu_ind9 + 1) - 1]);
 	      continue;
 	    }
+	  simd_load_generic_v4sf (v4sf_vec55, beta, beta, beta, beta);
+	  for (lu_ind9 = lu_ib9; lu_ind9 <= lu_nub9 - 1; lu_ind9 += 4)
+	    {
+	      simd_load_generic_v4sf (v4sf_vec54, c[j - 1][(lu_ind9 + 1) - 1],
+				      c[j - 1][(lu_ind9 + 2) - 1],
+				      c[j - 1][(lu_ind9 + 3) - 1],
+				      c[j - 1][(lu_ind9 + 4) - 1]);
+	      simd_mulps (v4sf_vec54, v4sf_vec55, v4sf_vec54);
+	      simd_save_generic_v4sf (v4sf_vec54, c[j - 1][(lu_ind9 + 1) - 1],
+				      c[j - 1][(lu_ind9 + 2) - 1],
+				      c[j - 1][(lu_ind9 + 3) - 1],
+				      c[j - 1][(lu_ind9 + 4) - 1]);
+	      continue;
+	    }
+	  i = (max0 (lu_nub9, 0) + 1);
 	  continue;
 	}
     }

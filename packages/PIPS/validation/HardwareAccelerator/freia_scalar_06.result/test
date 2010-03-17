@@ -9,38 +9,38 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    
-   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tC3 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0011*/
-   int32_t sA, sA2, sB;                                                 /*0012*/
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tC3 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0012*/
+   int32_t sA, sA2, sB;                                                 /*0013*/
    
    // look for order issues when reusing a temporary image
    // A
-   freia_aipo_global_max(i, &sA);                                       /*0016*/
+   freia_aipo_global_max(i, &sA);                                       /*0017*/
    // B
-   freia_aipo_threshold(tB, i, sA-10, sA-1, false);                     /*0018*/
+   freia_aipo_threshold(tB, i, sA-10, sA-1, false);                     /*0019*/
    // A
-   freia_aipo_erode_8c(X, i, k);                                        /*0020*/
+   freia_aipo_erode_8c(X, i, k);                                        /*0021*/
    // A
-   freia_aipo_global_min(X, &sA2);                                      /*0022*/
+   freia_aipo_global_min(X, &sA2);                                      /*0023*/
    // C with X from A
-   freia_aipo_threshold(tC, X, sA2-10, sA2-1, false);                   /*0024*/
+   freia_aipo_threshold(tC, X, sA2-10, sA2-1, false);                   /*0025*/
    // C
-   freia_aipo_dilate_6c(tC2, tC, k);                                    /*0026*/
+   freia_aipo_dilate_6c(tC2, tC, k);                                    /*0027*/
    // C
-   freia_aipo_add(tC3, tC, tC2);                                        /*0028*/
+   freia_aipo_add(tC3, tC, tC2);                                        /*0029*/
    // B
-   freia_aipo_dilate_8c(X, tB, k);                                      /*0030*/
+   freia_aipo_dilate_8c(X, tB, k);                                      /*0031*/
    // B
-   freia_aipo_global_vol(X, &sB);                                       /*0032*/
+   freia_aipo_global_vol(X, &sB);                                       /*0033*/
    // D with X from B
-   freia_aipo_threshold(tD, X, sB-10, sB-1, false);                     /*0034*/
+   freia_aipo_threshold(tD, X, sB-10, sB-1, false);                     /*0035*/
    // D
-   freia_aipo_add(o, tC3, tD);                                          /*0036*/
+   freia_aipo_add(o, tC3, tD);                                          /*0037*/
 
-   freia_common_destruct_data(X);                                       /*0038*/
-   freia_common_destruct_data(tB);                                      /*0039*/
-   freia_common_destruct_data(tC);                                      /*0040*/
-   freia_common_destruct_data(tD);                                      /*0041*/
-   return FREIA_OK;                                                     /*0042*/
+   freia_common_destruct_data(X);                                       /*0039*/
+   freia_common_destruct_data(tB);                                      /*0040*/
+   freia_common_destruct_data(tC);                                      /*0041*/
+   freia_common_destruct_data(tD);                                      /*0042*/
+   return FREIA_OK;                                                     /*0043*/
 }
 
 ! graphs
@@ -54,34 +54,34 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "36 +" [shape=trapezium,orientation=270];
-  "36 +" -> "o";
-  "34 thr" [shape=parallelogram];
-  "34 thr" -> "36 +" [label="tD"];
-  "32 vol" [shape=diamond];
-  "32 vol" -> "34 thr" [arrowhead=empty,label="sB"];
-  "30 D8" [shape=box];
-  "30 D8" -> "34 thr" [label="X"];
-  "30 D8" -> "32 vol" [label="X"];
-  "28 +" [shape=trapezium,orientation=270];
-  "28 +" -> "36 +" [label="tC3"];
-  "26 D6" [shape=box];
-  "26 D6" -> "28 +" [label="tC2"];
-  "24 thr" [shape=parallelogram];
-  "24 thr" -> "28 +" [label="tC"];
-  "24 thr" -> "26 D6" [label="tC"];
-  "22 min" [shape=diamond];
-  "22 min" -> "24 thr" [arrowhead=empty,label="sA2"];
-  "20 E8" [shape=box];
-  "20 E8" -> "24 thr" [label="X"];
-  "20 E8" -> "22 min" [label="X"];
-  "18 thr" [shape=parallelogram];
-  "18 thr" -> "30 D8" [label="tB"];
-  "16 max" [shape=diamond];
-  "16 max" -> "18 thr" [arrowhead=empty,label="sA"];
-  "i" -> "20 E8";
-  "i" -> "18 thr";
-  "i" -> "16 max";
+  "37 +" [shape=trapezium,orientation=270];
+  "37 +" -> "o";
+  "35 thr" [shape=parallelogram];
+  "35 thr" -> "37 +" [label="tD"];
+  "33 vol" [shape=diamond];
+  "33 vol" -> "35 thr" [arrowhead=empty,label="sB"];
+  "31 D8" [shape=box];
+  "31 D8" -> "35 thr" [label="X"];
+  "31 D8" -> "33 vol" [label="X"];
+  "29 +" [shape=trapezium,orientation=270];
+  "29 +" -> "37 +" [label="tC3"];
+  "27 D6" [shape=box];
+  "27 D6" -> "29 +" [label="tC2"];
+  "25 thr" [shape=parallelogram];
+  "25 thr" -> "29 +" [label="tC"];
+  "25 thr" -> "27 D6" [label="tC"];
+  "23 min" [shape=diamond];
+  "23 min" -> "25 thr" [arrowhead=empty,label="sA2"];
+  "21 E8" [shape=box];
+  "21 E8" -> "25 thr" [label="X"];
+  "21 E8" -> "23 min" [label="X"];
+  "19 thr" [shape=parallelogram];
+  "19 thr" -> "31 D8" [label="tB"];
+  "17 max" [shape=diamond];
+  "17 max" -> "19 thr" [arrowhead=empty,label="sA"];
+  "i" -> "21 E8";
+  "i" -> "19 thr";
+  "i" -> "17 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_scalar_06" in dot format
 digraph "dag_cleaned_0" {
@@ -92,34 +92,34 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "36 +" [shape=trapezium,orientation=270];
-  "36 +" -> "o";
-  "34 thr" [shape=parallelogram];
-  "34 thr" -> "36 +" [label="tD"];
-  "32 vol" [shape=diamond];
-  "32 vol" -> "34 thr" [arrowhead=empty,label="sB"];
-  "30 D8" [shape=box];
-  "30 D8" -> "34 thr" [label="X"];
-  "30 D8" -> "32 vol" [label="X"];
-  "28 +" [shape=trapezium,orientation=270];
-  "28 +" -> "36 +" [label="tC3"];
-  "26 D6" [shape=box];
-  "26 D6" -> "28 +" [label="tC2"];
-  "24 thr" [shape=parallelogram];
-  "24 thr" -> "28 +" [label="tC"];
-  "24 thr" -> "26 D6" [label="tC"];
-  "22 min" [shape=diamond];
-  "22 min" -> "24 thr" [arrowhead=empty,label="sA2"];
-  "20 E8" [shape=box];
-  "20 E8" -> "24 thr" [label="X"];
-  "20 E8" -> "22 min" [label="X"];
-  "18 thr" [shape=parallelogram];
-  "18 thr" -> "30 D8" [label="tB"];
-  "16 max" [shape=diamond];
-  "16 max" -> "18 thr" [arrowhead=empty,label="sA"];
-  "i" -> "20 E8";
-  "i" -> "18 thr";
-  "i" -> "16 max";
+  "37 +" [shape=trapezium,orientation=270];
+  "37 +" -> "o";
+  "35 thr" [shape=parallelogram];
+  "35 thr" -> "37 +" [label="tD"];
+  "33 vol" [shape=diamond];
+  "33 vol" -> "35 thr" [arrowhead=empty,label="sB"];
+  "31 D8" [shape=box];
+  "31 D8" -> "35 thr" [label="X"];
+  "31 D8" -> "33 vol" [label="X"];
+  "29 +" [shape=trapezium,orientation=270];
+  "29 +" -> "37 +" [label="tC3"];
+  "27 D6" [shape=box];
+  "27 D6" -> "29 +" [label="tC2"];
+  "25 thr" [shape=parallelogram];
+  "25 thr" -> "29 +" [label="tC"];
+  "25 thr" -> "27 D6" [label="tC"];
+  "23 min" [shape=diamond];
+  "23 min" -> "25 thr" [arrowhead=empty,label="sA2"];
+  "21 E8" [shape=box];
+  "21 E8" -> "25 thr" [label="X"];
+  "21 E8" -> "23 min" [label="X"];
+  "19 thr" [shape=parallelogram];
+  "19 thr" -> "31 D8" [label="tB"];
+  "17 max" [shape=diamond];
+  "17 max" -> "19 thr" [arrowhead=empty,label="sA"];
+  "i" -> "21 E8";
+  "i" -> "19 thr";
+  "i" -> "17 max";
 }
 // graph for dag "freia_scalar_06_helper_0_0" of module "freia_scalar_06" in dot format
 digraph "freia_scalar_06_helper_0_0" {
@@ -130,13 +130,13 @@ digraph "freia_scalar_06_helper_0_0" {
   "X" [shape=circle];
 
   // computation vertices
-  "22 min" [shape=diamond];
-  "20 E8" [shape=box];
-  "20 E8" -> "22 min" [label="X"];
-  "20 E8" -> "X";
-  "16 max" [shape=diamond];
-  "i" -> "20 E8";
-  "i" -> "16 max";
+  "23 min" [shape=diamond];
+  "21 E8" [shape=box];
+  "21 E8" -> "23 min" [label="X"];
+  "21 E8" -> "X";
+  "17 max" [shape=diamond];
+  "i" -> "21 E8";
+  "i" -> "17 max";
 }
 // graph for dag "freia_scalar_06_helper_0_1" of module "freia_scalar_06" in dot format
 digraph "freia_scalar_06_helper_0_1" {
@@ -147,15 +147,15 @@ digraph "freia_scalar_06_helper_0_1" {
   "tC" [shape=circle];
 
   // computation vertices
-  "24 thr" [shape=parallelogram];
-  "24 thr" -> "tC";
-  "32 vol" [shape=diamond];
-  "30 D8" [shape=box];
-  "30 D8" -> "24 thr" [label="X"];
-  "30 D8" -> "32 vol" [label="X"];
-  "18 thr" [shape=parallelogram];
-  "18 thr" -> "30 D8" [label="tB"];
-  "i" -> "18 thr";
+  "25 thr" [shape=parallelogram];
+  "25 thr" -> "tC";
+  "33 vol" [shape=diamond];
+  "31 D8" [shape=box];
+  "31 D8" -> "25 thr" [label="X"];
+  "31 D8" -> "33 vol" [label="X"];
+  "19 thr" [shape=parallelogram];
+  "19 thr" -> "31 D8" [label="tB"];
+  "i" -> "19 thr";
 }
 // graph for dag "freia_scalar_06_helper_0_2" of module "freia_scalar_06" in dot format
 digraph "freia_scalar_06_helper_0_2" {
@@ -166,12 +166,12 @@ digraph "freia_scalar_06_helper_0_2" {
   "tC3" [shape=circle];
 
   // computation vertices
-  "28 +" [shape=trapezium,orientation=270];
-  "28 +" -> "tC3";
-  "26 D6" [shape=box];
-  "26 D6" -> "28 +" [label="tC2"];
-  "tC" -> "28 +";
-  "tC" -> "26 D6";
+  "29 +" [shape=trapezium,orientation=270];
+  "29 +" -> "tC3";
+  "27 D6" [shape=box];
+  "27 D6" -> "29 +" [label="tC2"];
+  "tC" -> "29 +";
+  "tC" -> "27 D6";
 }
 // graph for dag "freia_scalar_06_helper_0_3" of module "freia_scalar_06" in dot format
 digraph "freia_scalar_06_helper_0_3" {
@@ -183,12 +183,12 @@ digraph "freia_scalar_06_helper_0_3" {
   "o" [shape=circle];
 
   // computation vertices
-  "36 +" [shape=trapezium,orientation=270];
-  "36 +" -> "o";
-  "tC3" -> "36 +";
-  "34 thr" [shape=parallelogram];
-  "34 thr" -> "36 +" [label="tD"];
-  "X" -> "34 thr";
+  "37 +" [shape=trapezium,orientation=270];
+  "37 +" -> "o";
+  "tC3" -> "37 +";
+  "35 thr" [shape=parallelogram];
+  "35 thr" -> "37 +" [label="tD"];
+  "X" -> "35 thr";
 }
 
 ! acceleration function
@@ -221,16 +221,16 @@ freia_status freia_scalar_06_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
 
 
   // STAGE 1
-  // i [0 measure 0] -> [1 poc 0] 20 erode_8c
-  // i [1 input 0] -> [1 poc 0] 20 erode_8c
+  // i [0 measure 0] -> [1 poc 0] 21 erode_8c
+  // i [1 input 0] -> [1 poc 0] 21 erode_8c
   // nope
-  // poc 20 erode_8c stage 1 side 0
+  // poc 21 erode_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = kern1[i];
 
-  // 0`X [1 poc 0] -> [1 measure 0] 20 erode_8c
+  // 0`X [1 poc 0] -> [1 measure 0] 21 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
 
 
@@ -271,10 +271,10 @@ freia_status freia_scalar_06_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
-  // measure 16 global_max stage 0 side 0
+  // measure 17 global_max stage 0 side 0
   *red0 = (int32_t) reduc.measure[0][0].maximum;
 
-  // measure 22 global_min stage 1 side 0
+  // measure 23 global_min stage 1 side 0
   *red2 = (int32_t) reduc.measure[1][0].minimum;
 
   return ret;
@@ -299,33 +299,33 @@ freia_status freia_scalar_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 threshold 0] 18 threshold
+  // i [0 input 0] -> [0 threshold 0] 19 threshold
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // threshold 18 threshold stage 0 side 0
+  // threshold 19 threshold stage 0 side 0
   si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
   sp.th[0][0].boundmin = inf0;
   sp.th[0][0].boundmax = sup1;
 
 
   // STAGE 1
-  // 0`tB [0 threshold 0] -> [1 poc 0] 30 dilate_8c
-  // 0`tB [1 input 0] -> [1 poc 0] 30 dilate_8c
+  // 0`tB [0 threshold 0] -> [1 poc 0] 31 dilate_8c
+  // 0`tB [1 input 0] -> [1 poc 0] 31 dilate_8c
   // nope
-  // poc 30 dilate_8c stage 1 side 0
+  // poc 31 dilate_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = kern3[i];
 
-  // 0`X [1 poc 0] -> [1 measure 0] 30 dilate_8c
+  // 0`X [1 poc 0] -> [1 measure 0] 31 dilate_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
 
 
   // STAGE 2
-  // 0`X [1 measure 0] -> [2 threshold 0] 24 threshold
-  // 0`X [2 input 0] -> [2 threshold 0] 24 threshold
+  // 0`X [1 measure 0] -> [2 threshold 0] 25 threshold
+  // 0`X [2 input 0] -> [2 threshold 0] 25 threshold
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // threshold 24 threshold stage 2 side 0
+  // threshold 25 threshold stage 2 side 0
   si.th[2][0].op = bin7? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
   sp.th[2][0].boundmin = inf5;
   sp.th[2][0].boundmax = sup6;
@@ -366,7 +366,7 @@ freia_status freia_scalar_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
-  // measure 32 global_vol stage 1 side 0
+  // measure 33 global_vol stage 1 side 0
   *red4 = (int32_t) reduc.measure[1][0].volume;
 
   return ret;
@@ -391,19 +391,19 @@ freia_status freia_scalar_06_helper_0_2_0(freia_data2d * o0, freia_data2d * i0, 
 
 
   // STAGE 0
-  // 0`tC [0 input 0] -> [0 poc 0] 26 dilate_6c
+  // 0`tC [0 input 0] -> [0 poc 0] 27 dilate_6c
   // nope
-  // poc 26 dilate_6c stage 0 side 0
+  // poc 27 dilate_6c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
-  // 0`tC2 [0 poc 0] -> [0 alu] 28 add
+  // 0`tC2 [0 poc 0] -> [0 alu] 29 add
   // nope
-  // 0`tC [0 input 1] -> [0 alu] 28 add
+  // 0`tC [0 input 1] -> [0 alu] 29 add
   // nope
-  // alu 28 add stage 0
+  // alu 29 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
@@ -466,23 +466,23 @@ freia_status freia_scalar_06_helper_0_3_0(freia_data2d * o0, freia_data2d * i0, 
 
 
   // STAGE 0
-  // 0`X [0 input 0] -> [0 threshold 0] 34 threshold
+  // 0`X [0 input 0] -> [0 threshold 0] 35 threshold
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // threshold 34 threshold stage 0 side 0
+  // threshold 35 threshold stage 0 side 0
   si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
   sp.th[0][0].boundmin = inf0;
   sp.th[0][0].boundmax = sup1;
 
 
   // STAGE 1
-  // 0`tD [0 threshold 0] -> [1 alu] 36 add
-  // 0`tD [1 input 0] -> [1 alu] 36 add
+  // 0`tD [0 threshold 0] -> [1 alu] 37 add
+  // 0`tD [1 input 0] -> [1 alu] 37 add
   // nope
-  // 0`tC3 [0 input 1] -> [1 alu] 36 add
+  // 0`tC3 [0 input 1] -> [1 alu] 37 add
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // 0`tC3 [1 input 1] -> [1 alu] 36 add
+  // 0`tC3 [1 input 1] -> [1 alu] 37 add
   // nope
-  // alu 36 add stage 1
+  // alu 37 add stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
@@ -534,27 +534,27 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    
-   freia_data2d *X = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC3 = freia_common_create_data(16, 128, 128);         /*0011*/
-   int32_t sA, sA2, sB;                                                 /*0012*/
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC3 = freia_common_create_data(16, 128, 128);         /*0012*/
+   int32_t sA, sA2, sB;                                                 /*0013*/
    
    // look for order issues when reusing a temporary image
    // A
-   freia_scalar_06_helper_0_0_0(X, i, &sA, k, &sA2);                    /*0016*/
+   freia_scalar_06_helper_0_0_0(X, i, &sA, k, &sA2);                    /*0017*/
    // B
-   freia_scalar_06_helper_0_1_0(tC, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);             /*0018*/
+   freia_scalar_06_helper_0_1_0(tC, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);             /*0019*/
    // A
    // A
    // C with X from A
    // C
-   freia_scalar_06_helper_0_2_0(tC3, tC, k);                            /*0026*/
+   freia_scalar_06_helper_0_2_0(tC3, tC, k);                            /*0027*/
    // C
    // B
    // B
    // D with X from B
-   freia_scalar_06_helper_0_3_0(o, X, tC3, sB-10, sB-1, false);         /*0034*/
+   freia_scalar_06_helper_0_3_0(o, X, tC3, sB-10, sB-1, false);         /*0035*/
    // D
    
-   freia_common_destruct_data(X);                                       /*0038*/
-   freia_common_destruct_data(tC);                                      /*0040*/
-   return FREIA_OK;                                                     /*0042*/
+   freia_common_destruct_data(X);                                       /*0039*/
+   freia_common_destruct_data(tC);                                      /*0041*/
+   return FREIA_OK;                                                     /*0043*/
 }

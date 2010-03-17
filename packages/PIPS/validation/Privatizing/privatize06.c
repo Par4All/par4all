@@ -13,6 +13,4 @@ int erminable (char isme)
         ce=luke;
         luke=ce;
     }
-
-
-
+}

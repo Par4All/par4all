@@ -24,6 +24,7 @@ int struct05()
       int first;
       int second;
    } x[10];
+//               <must be written>: i
    int i = 0;
 //               <must be written>: i
 
@@ -46,6 +47,7 @@ int struct05()
       int first;
       int second;
    } x[10];
+//               <must be written>: i
    int i = 0;
 //               <may be read    >: i x[*][1] x[*][2]
 //               <may be written >: x[*][1] x[*][2]
@@ -74,10 +76,16 @@ Transformers for "main"
 
 int struct05()
 {
+
+//  T() {}
+
    struct two {
       int first;
       int second;
    } x[10];
+
+//  T(i) {i==0}
+
    int i = 0;
 
 //  T(i) {i#init==0, 0<=i}
@@ -106,10 +114,16 @@ Preconditions for "main"
 
 int struct05()
 {
+
+//  P() {}
+
    struct two {
       int first;
       int second;
    } x[10];
+
+//  P() {}
+
    int i = 0;
 
 //  P() {i==0}

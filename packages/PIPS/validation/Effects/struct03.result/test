@@ -31,6 +31,7 @@ int struct03()
       struct three un;
       struct three deux;
    } x[10];
+//               <must be written>: i
    int i = 0;
 //               <must be written>: i
 
@@ -56,6 +57,7 @@ int struct03()
       struct three un;
       struct three deux;
    } x[10];
+//               <must be written>: i
    int i = 0;
 //               <may be read    >: i
 //               <may be written >: x[*][1][1] x[*][2][2]

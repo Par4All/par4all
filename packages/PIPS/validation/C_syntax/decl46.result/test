@@ -58,8 +58,8 @@ Variable list:
 	Declared entity "decl46:*HEAP*" with type "area" with size 0
 	Declared entity "decl46:*STACK*" with type "area" with size 0
 	Declared entity "decl46:*STATIC*" with type "area" with size 0
-	Declared entity "decl46:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl46:0`__func__" with type "variable" "char"
+	Declared entity "decl46:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "decl46:0`__func__" with type "variable" "char *"
 	Declared entity "decl46:0`x" with type "variable" "double"
 	Declared entity "decl46:a" with type "variable" "double"
 
@@ -104,9 +104,9 @@ Code for "decl46"
 
 void decl46(double a)
 {
-   double x;                                                            /*0004*/
+   double x;                                                            /*0010*/
 
-   x = sqrt(a);                                                         /*0006*/
+   x = sqrt(a);                                                         /*0012*/
 }
 
 Call graph for "decl46"

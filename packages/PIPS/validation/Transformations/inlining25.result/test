@@ -1,8 +1,8 @@
 int bla(foo *i)
 {
-   foo *j;                                                              /*0003*/
-   j = allo(i->bpp);                                                    /*0004*/
-   return 0;                                                            /*0005*/
+   foo *j;                                                              /*0008*/
+   j = allo(i->bpp);                                                    /*0009*/
+   return 0;                                                            /*0010*/
 }
 int main(void)
 {
@@ -13,16 +13,18 @@ int main(void)
 int main(void)
 {
    foo *m;                                                              /*0003*/
-   /*0014*/
+   /*0003*/
    //PIPS generated variable
    int _return0;                                                        /*0005*/
    {
-      foo *j;                                                           /*0007*/
-      /*0003*/
-      j = allo(m->bpp);                                                 /*0008*/
-      /*0004*/
-      _return0 = 0;                                                     /*0009*/
+      /*0014*/
+      foo *j;                                                           /*0009*/
+      /*0008*/
+      j = allo(m->bpp);                                                 /*0010*/
+      /*0009*/
+      _return0 = 0;                                                     /*0011*/
    }
-   _return0;                                                            /*0013*/
-   return 0;                                                            /*0014*/
+   _return0;                                                            /*0015*/
+   /*0015*/
+   return 0;                                                            /*0017*/
 }

@@ -82,13 +82,16 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 
 Cumulated effects for "main"
 
-main()
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+int main()
 {
    int a;
    int b;
    int x[10];
    int *ap[10];
    tf_t s;
+//               <must be written>: sp
    tf_t *sp = &s;
 //               <may be read    >: ap[*]
 //               <may be written >: ap[*][0] sp[0][2][*] x[*]
@@ -100,13 +103,20 @@ main()
 
 Regions for "main"
 
-main()
+
+//  <TOP-LEVEL:*MEMORY*-R-MAY-{}>
+//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
+
+int main()
 {
    int a;
    int b;
    int x[10];
    int *ap[10];
    tf_t s;
+
+//  <sp-W-EXACT-{}>
+
    tf_t *sp = &s;
 
 //  <a-R-EXACT-{}>

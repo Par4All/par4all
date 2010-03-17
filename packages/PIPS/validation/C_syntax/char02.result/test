@@ -1,12 +1,12 @@
 
 Printed file for main
 
-main()
+int main()
 {
    char c1;
    unsigned char c2;
    signed char c3;
-   int i1,  i2,  i3,  r;
+   int i1, i2, i3, r;
 
    c1 = '\\';
    c2 = '\'';
@@ -24,12 +24,24 @@ Preconditions for main
 
 //  P() {}
 
-main()
+int main()
 {
+
+//  P() {}
+
    char c1;
+
+//  P() {}
+
    unsigned char c2;
+
+//  P() {}
+
    signed char c3;
-   int i1,  i2,  i3,  r;
+
+//  P() {}
+
+   int i1, i2, i3, r;
 
 //  P() {}
 

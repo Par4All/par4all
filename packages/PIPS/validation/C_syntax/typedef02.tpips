@@ -11,6 +11,10 @@ activate C_PARSER
 
 display PRINTED_FILE[main]
 
+apply UNSPLIT
+#shell $(PIPS_CC) -c $WS.database/Src/$WS.c
+shell cc -c typedef02.database/Src/typedef02.c
+
 close
 
 delete typedef02

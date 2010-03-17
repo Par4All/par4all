@@ -1,4 +1,3 @@
-#include<stdio.h>
 static int pmax(int a, int b)
 {
     int argc =a > b ? a : b;

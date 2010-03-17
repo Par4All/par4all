@@ -1,4 +1,4 @@
-main()
+int main()
 {
    x++;
 }
@@ -10,8 +10,8 @@ Unsplit stati_declaration
  */
 static int x = 2;
 
-extern  main();
-main()
+extern int main();
+int main()
 {
    x++;
 }

@@ -22,7 +22,7 @@ display PRINTED_FILE[main]
 display PRINTED_FILE[bla]
 
 apply INLINING[bla]
-display PRINTED_FILE[main]
+display PRINTED_FILE[inlining23!,main]
 
 echo
 echo Unsplit resulting code

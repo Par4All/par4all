@@ -30,6 +30,8 @@ echo
 
 display PRINTED_FILE[decl09!]
 
+apply UNSPLIT
+shell cc -c decl09.database/Src/decl09.c
 
 close
 delete decl09

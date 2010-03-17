@@ -14,11 +14,14 @@ echo Checking that typedef types are properly prettyprinted
 echo (because of a problem in main_hello_world.c)
 
 echo
-echo Printed file for "typedef04"
+echo Printed file for "typedef04!" and "typedef04" 
 echo
 
 display PARSED_PRINTED_FILE[typedef04!]
 display PARSED_PRINTED_FILE[typedef04]
+
+apply UNSPLIT
+shell cc -c typedef04.database/Src/typedef04.c
 
 close
 delete typedef04

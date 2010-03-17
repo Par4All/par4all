@@ -1,10 +1,11 @@
-delete fulguro-convol-3x3
+delete fulguro_convol_3x3
 
-setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG -I/home/serge/sources/fulguro/fulguro/trunk/include "
+setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG -Iinclude/fulguro"
 
-create fulguro-convol-3x3 fulguro_convol_3x3.c
+create fulguro_convol_3x3 fulguro_convol_3x3.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty C89_CODE_GENERATION TRUE
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
@@ -13,26 +14,44 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 activate C_PARSER
 
-display PRINTED_FILE[main]
+apply SIMPLIFY_SUBSCRIPTS[%ALL]
+display PRINTED_FILE[%ALL]
+
+apply INLINING_SIMPLE[flgr2d_convolution_fgUINT16]
 display PRINTED_FILE[flgr2d_convolution]
-apply INLINING[flgr2d_convolution_fgUINT16]
-display PRINTED_FILE[flgr2d_convolution]
 
-#apply UNFOLDING[flgr_get_array_fgUINT16]
-#apply INLINING[flgr_set_data_array_vector_fgUINT16]
-#apply INLINING[flgr_get_array_fgUINT16]
-#apply INLINING[flgr_set_array_fgUINT16]
-#apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
-#apply INLINING[flgr2d_get_data_array_fgUINT16]
-#apply INLINING_SIMPLE[flgr_get_data_array_vector_fgUINT16]
-#display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
-#display PRINTED_FILE[flgr2d_get_nhb_convolution_fgUINT16]
+apply UNFOLDING[fulguro_convol_3x3!flgr_get_array_fgUINT16]
+display PRINTED_FILE[fulguro_convol_3x3!flgr_get_array_fgUINT16]
+apply INLINING[fulguro_convol_3x3!flgr_set_data_array_vector_fgUINT16]
+apply INLINING[fulguro_convol_3x3!flgr_get_array_fgUINT16]
+apply INLINING[fulguro_convol_3x3!flgr_set_array_fgUINT16]
 
-#apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
-#display PRINTED_FILE[flgr2d_convolution]
-#apply PARTIAL_EVAL[flgr2d_raster_slide_window_fgUINT16]
-#display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
+apply INLINING[flgr2d_get_neighborhood_fgUINT16]
+#setproperty INLINING_CALLERS "flgr2d_get_neighborhood_fgUINT16"
+#apply INLINING[flgr2d_get_neighborhood_fgUINT16]
+#setproperty INLINING_CALLERS "flgr2d_native_dilate_6_connexity_fgUINT16"
+#apply INLINING[flgr2d_get_neighborhood_fgUINT16]
+#setproperty INLINING_CALLERS "flgr2d_native_dilate_4_connexity_fgUINT16"
+#apply INLINING[flgr2d_get_neighborhood_fgUINT16]
+#setproperty INLINING_CALLERS "flgr2d_native_dilate_8_connexity_fgUINT16"
+#apply INLINING[flgr2d_get_neighborhood_fgUINT16]
 
+display PRINTED_FILE[flgr2d_native_dilate_4_connexity_fgUINT16]
+apply INLINING[fulguro_convol_3x3!flgr2d_get_data_array_fgUINT16]
+display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
+apply INLINING[fulguro_convol_3x3!flgr_get_data_array_vector_fgUINT16]
+display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
+display PRINTED_FILE[flgr2d_get_nhb_convolution_fgUINT16]
+
+apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
+
+module flgr2d_convolution
+display PRINTED_FILE
+apply FLAG_LOOPS
+setproperty OUTLINE_MODULE_NAME "flgr2d_convolution_kernel"
+setproperty OUTLINE_LABEL "l99996"
+apply OUTLINE
+display PRINTED_FILE
 
 quit
 

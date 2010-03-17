@@ -1,0 +1,17 @@
+delete pe01
+create pe01 partialeval01.c
+display PRINTED_FILE(%ALLFUNC)
+apply PARTIAL_EVAL(%ALLFUNC)
+display PRINTED_FILE(%ALLFUNC)
+close
+delete pe01
+
+create pe01 partialeval01.c
+display PRINTED_FILE(%ALLFUNC)
+setproperty PARTIAL_EVAL_ALWAYS_SIMPLIFY TRUE
+apply PARTIAL_EVAL(%ALLFUNC)
+display PRINTED_FILE(%ALLFUNC)
+close
+delete pe01
+quit
+

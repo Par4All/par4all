@@ -1,4 +1,4 @@
-#include <stdlib.h>
+typedef unsigned int size_t;
 void vector_product(size_t n, double a[n][n],double b[n],double c[n])
 {
     size_t i,j;

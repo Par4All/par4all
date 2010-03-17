@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 static unsigned cyc_hi = 0;
 static unsigned cyc_lo = 0;

@@ -1,0 +1,15 @@
+delete summary_precondition03
+
+create summary_precondition03 summary_precondition03.c
+
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE(main)
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE(main)
+display PRINTED_FILE(foo)
+
+close
+delete summary_precondition03
+quit

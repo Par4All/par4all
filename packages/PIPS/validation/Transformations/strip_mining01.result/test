@@ -37,9 +37,18 @@ Check preconditions on strip-mined loop
 
 int strip_mining01(int *in, int *val)
 {
+
+//  P() {}
+
    int x[512];
+
+//  P() {}
+
    int i;
    //PIPS generated variable
+
+//  P() {}
+
    int i_1;
 
 //  P() {}

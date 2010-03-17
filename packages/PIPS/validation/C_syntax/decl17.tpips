@@ -34,6 +34,9 @@ echo
 
 display PARSED_PRINTED_FILE[decl17]
 
+apply UNSPLIT
+shell cc -c decl17.database/Src/decl17.c
+
 close
 delete decl17
 

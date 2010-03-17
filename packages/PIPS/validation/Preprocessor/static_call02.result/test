@@ -38,7 +38,6 @@ int main()
 }
 
 
-
 extern int main();
 
 Printed file for all
@@ -80,7 +79,6 @@ int main()
 }
 
 
-
 extern int main();
 
 Symbole tables for all
@@ -97,8 +95,8 @@ Variable list:
 	Declared entity "bar:*HEAP*" with type "area" with size 0
 	Declared entity "bar:*STACK*" with type "area" with size 0
 	Declared entity "bar:*STATIC*" with type "area" with size 0
-	Declared entity "bar:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "bar:0`__func__" with type "variable" "char"
+	Declared entity "bar:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "bar:0`__func__" with type "variable" "char *"
 	Declared entity "bar:i" with type "variable" "int"
 	Declared entity "foo!:*STATIC*" with type "area" with size 0
 
@@ -189,8 +187,8 @@ Variable list:
 	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "foo:0`__func__" with type "variable" "char *"
 	Declared entity "foo:i" with type "variable" "int"
 
 * empty extern declaration list *
@@ -277,15 +275,15 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "foo!:*STATIC*" with type "area" with size 0
-	Declared entity "foo!foo:*DYNAMIC*" with type "area" with size 16
+	Declared entity "foo!foo:*DYNAMIC*" with type "area" with size 20
 	Declared entity "foo!foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo!foo:*STACK*" with type "area" with size 0
 	Declared entity "foo!foo:*STATIC*" with type "area" with size 0
 	Declared entity "foo!foo:0`foo" with type "variable" "int"
 	Declared entity "foo!foo:0`p" with type "variable" "void *"
 	Declared entity "foo!foo:i" with type "variable" "int"
-	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "foo:0`__func__" with type "variable" "char *"
 
 * empty extern declaration list *
 
@@ -304,9 +302,9 @@ Layout for memory area "foo!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "foo!foo:*DYNAMIC*" of size 16:
+Layout for memory area "foo!foo:*DYNAMIC*" of size 20:
 	Variable "foo!foo:0`foo"	offset = 8	size = 4
-	Variable "foo!foo:0`p"	offset = 12	size = 4
+	Variable "foo!foo:0`p"	offset = 12	size = 8
 	Variable "foo:0`__func__"	offset = 0	size = 4
 	Variable "foo:0`__FUNCTION__"	offset = 4	size = 4
 
@@ -337,8 +335,8 @@ Variable list:
 	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "main:main" with type "variable" "int"
 	Declared entity "static_call02!:*STATIC*" with type "area" with size 0
 

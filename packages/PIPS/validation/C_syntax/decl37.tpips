@@ -22,11 +22,9 @@ echo
 
 display PRINTED_FILE[decl37!]
 
-quit
+apply UNSPLIT
+shell cc -c decl37.database/Src/decl37.c
 
 close
 
 delete decl37
-
-quit
-

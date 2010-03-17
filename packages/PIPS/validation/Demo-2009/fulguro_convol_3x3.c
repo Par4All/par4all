@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include <flgrCoreData.h>
-#include <flgrCoreDataIO.h>
-#include <flgrCoreCopy.h>
-#include <flgrCoreNhbManage.h>
-#include <flgrLinearConvolution.h>
-#include <flgrLinearCorrelation.h>
+//#include <flgrCoreData.h>
+//#include <flgrCoreDataIO.h>
+//#include <flgrCoreCopy.h>
+//#include <flgrCoreNhbManage.h>
+//#include <flgrLinearConvolution.h>
+//#include <flgrLinearCorrelation.h>
 
 #include "fulguro-included.h"
 

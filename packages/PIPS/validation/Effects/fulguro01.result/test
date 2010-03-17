@@ -198,13 +198,23 @@ static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;
+//               <must be read   >: data1 data1[0][1]
+//               <must be written>: psrc1
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
+//               <must be read   >: data2 data2[0][1]
+//               <must be written>: psrc2
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
+//               <must be read   >: datdest datdest[0][1]
+//               <must be written>: pdest
    fgINT32 *pdest = (fgINT32 *) datdest->array;
    fgINT32 v1;
    fgINT32 v2;
    fgINT32 result;
+//               <must be read   >: datdest datdest[0][2]
+//               <must be written>: spp
    int spp = datdest->spp;
+//               <must be read   >: datdest datdest[0][3] spp
+//               <must be written>: length
    int length = datdest->length*spp;
 //               <must be read   >: length
 //               <must be written>: j
@@ -228,16 +238,29 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 }
 //               <may be read    >: data1[0][1][*] data2[0][1][*]
 //               <may be written >: datdest[0][1][*]
+//               <must be read   >: data1 data1[0][1] data2 
+//                                  data2[0][1] datdest datdest[0][1] 
+//                                  datdest[0][2] datdest[0][3]
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;
+//               <must be read   >: data1 data1[0][1]
+//               <must be written>: psrc1
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
+//               <must be read   >: data2 data2[0][1]
+//               <must be written>: psrc2
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
+//               <must be read   >: datdest datdest[0][1]
+//               <must be written>: pdest
    fgINT32 *pdest = (fgINT32 *) datdest->array;
    fgINT32 v1;
    fgINT32 v2;
    fgINT32 result;
+//               <must be read   >: datdest datdest[0][2]
+//               <must be written>: spp
    int spp = datdest->spp;
+//               <must be read   >: datdest datdest[0][3] spp
+//               <must be written>: length
    int length = datdest->length*spp;
 //               <may be read    >: j pdest psrc1 psrc1[*] psrc2 
 //                                  psrc2[*] result v1 v2

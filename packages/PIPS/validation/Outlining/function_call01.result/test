@@ -1,0 +1,75 @@
+
+Initial code
+
+void a()
+{
+   int i, j;
+   j = 0;
+kernel:
+   for(i = 0; i <= 255; i += 1)
+      j += b(i);
+}
+int b(int i)
+{
+   return i*2;
+}
+/* An example to show that b should be declared in the function generated */
+
+extern int b(int i);
+
+extern void a();
+
+Code after outlining
+
+void a()
+{
+   int i, j;
+   j = 0;
+kernel:   kernel(&j);
+}
+int b(int i)
+{
+   return i*2;
+}
+/* An example to show that b should be declared in the function generated */
+
+extern int b(int i);
+
+extern void a();
+void kernel(int *j)
+{
+   //PIPS generated variable
+   int i;
+kernel:
+   for(i = 0; i <= 255; i += 1)
+      *j += b(i);
+}
+
+unsplit
+
+/*
+ * file for function_call01.c
+ */
+/* An example to show that b should be declared in the function generated */
+
+extern int b(int i);
+
+extern void a();
+void kernel(int *j)
+{
+   //PIPS generated variable
+   int i;
+kernel:
+   for(i = 0; i <= 255; i += 1)
+      *j += b(i);
+}
+int b(int i)
+{
+   return i*2;
+}
+void a()
+{
+   int i, j;
+   j = 0;
+kernel:   kernel(&j);
+}

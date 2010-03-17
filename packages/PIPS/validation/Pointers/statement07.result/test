@@ -20,9 +20,9 @@ int main()
    int *x, *a, i;
    i = 1;
    a = &i;
-//  points to = {(a,i,E)}
+//  points to = {(a,i,-Exact-)}
    x = a;
-//  points to = {(x,i,E)(a,i,E)}
+//  points to = {(x,i,-Exact-);(a,i,-Exact-)}
 
    return 0;
    // END BLOCK

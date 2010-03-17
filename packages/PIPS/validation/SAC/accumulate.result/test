@@ -40,16 +40,12 @@ short accumulate(size_t n, short a[n], short seed)
 {
    size_t i;
    //PIPS generated variable
-   size_t LU_NUB0;
-   //PIPS generated variable
-   size_t LU_IB0;
-   //PIPS generated variable
-   size_t LU_IND0;
+   size_t LU_NUB0, LU_IB0, LU_IND0;
    LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
+   LU_IB0 = MOD(LU_NUB0, 8);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       seed = seed+a[LU_IND0];
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
       //c SIMD_COMMENT_0
       seed = seed+a[LU_IND0];
       //c SIMD_COMMENT_0
@@ -58,6 +54,14 @@ short accumulate(size_t n, short a[n], short seed)
       seed = seed+a[LU_IND0+2];
       //c SIMD_COMMENT_0
       seed = seed+a[LU_IND0+3];
+      //c SIMD_COMMENT_0
+      seed = seed+a[LU_IND0+4];
+      //c SIMD_COMMENT_0
+      seed = seed+a[LU_IND0+5];
+      //c SIMD_COMMENT_0
+      seed = seed+a[LU_IND0+6];
+      //c SIMD_COMMENT_0
+      seed = seed+a[LU_IND0+7];
    }
    i = MAX0(LU_NUB0, 0);
    return seed;
@@ -66,17 +70,11 @@ short accumulate(size_t n, short a[n], short seed)
 {
    size_t i;
    //PIPS generated variable
-   size_t LU_NUB0;
+   size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   size_t LU_IB0;
-   //PIPS generated variable
-   size_t LU_IND0;
-   //PIPS generated variable
-   short RED0[0+1];
-   //PIPS generated variable
-   short RED1[3+1];
+   short RED0[0+1], RED1[7+1];
    LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
+   LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
@@ -85,7 +83,11 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[1] = 0;
    RED1[2] = 0;
    RED1[3] = 0;
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+   RED1[4] = 0;
+   RED1[5] = 0;
+   RED1[6] = 0;
+   RED1[7] = 0;
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
       //c SIMD_COMMENT_0
       RED1[0] = RED1[0]+a[LU_IND0];
       //c SIMD_COMMENT_0
@@ -94,8 +96,16 @@ short accumulate(size_t n, short a[n], short seed)
       RED1[2] = RED1[2]+a[LU_IND0+2];
       //c SIMD_COMMENT_0
       RED1[3] = RED1[3]+a[LU_IND0+3];
+      //c SIMD_COMMENT_0
+      RED1[4] = RED1[4]+a[LU_IND0+4];
+      //c SIMD_COMMENT_0
+      RED1[5] = RED1[5]+a[LU_IND0+5];
+      //c SIMD_COMMENT_0
+      RED1[6] = RED1[6]+a[LU_IND0+6];
+      //c SIMD_COMMENT_0
+      RED1[7] = RED1[7]+a[LU_IND0+7];
    }
-   seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed;
+   seed = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed;
    i = MAX0(LU_NUB0, 0);
    return seed;
 }
@@ -103,19 +113,11 @@ short accumulate(size_t n, short a[n], short seed)
 {
    size_t i;
    //PIPS generated variable
-   size_t LU_NUB0;
+   size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   size_t LU_IB0;
-   //PIPS generated variable
-   size_t LU_IND0;
-   //PIPS generated variable
-   short RED0[0+1];
-   //PIPS generated variable
-   short RED1[3+1];
-   //PIPS generated variable
-   short seed0;
+   short RED0[0+1], RED1[7+1], seed0;
    LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
+   LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
@@ -124,7 +126,11 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[1] = 0;
    RED1[2] = 0;
    RED1[3] = 0;
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+   RED1[4] = 0;
+   RED1[5] = 0;
+   RED1[6] = 0;
+   RED1[7] = 0;
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
       //c SIMD_COMMENT_0
       RED1[0] = RED1[0]+a[LU_IND0];
       //c SIMD_COMMENT_0
@@ -133,8 +139,16 @@ short accumulate(size_t n, short a[n], short seed)
       RED1[2] = RED1[2]+a[LU_IND0+2];
       //c SIMD_COMMENT_0
       RED1[3] = RED1[3]+a[LU_IND0+3];
+      //c SIMD_COMMENT_0
+      RED1[4] = RED1[4]+a[LU_IND0+4];
+      //c SIMD_COMMENT_0
+      RED1[5] = RED1[5]+a[LU_IND0+5];
+      //c SIMD_COMMENT_0
+      RED1[6] = RED1[6]+a[LU_IND0+6];
+      //c SIMD_COMMENT_0
+      RED1[7] = RED1[7]+a[LU_IND0+7];
    }
-   seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
+   seed = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
    i = MAX0(LU_NUB0, 0);
    return seed;
 }
@@ -142,27 +156,13 @@ short accumulate(size_t n, short a[n], short seed)
 {
    size_t i;
    //PIPS generated variable
-   size_t LU_NUB0;
+   size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   size_t LU_IB0;
-   //PIPS generated variable
-   size_t LU_IND0;
-   //PIPS generated variable
-   short RED0[0+1];
-   //PIPS generated variable
-   short RED1[3+1];
-   //PIPS generated variable
-   short seed0;
-   //PIPS generated variable
-   short v4hi_vec0[3+1];
-   //PIPS generated variable
-   short v4hi_vec1[3+1];
-   //PIPS generated variable
-   int v2si_vec2[1+1];
-   //PIPS generated variable
-   int v2si_vec3[1+1];
+   short RED0[0+1], RED1[7+1], seed0;
+   //PIPS:SAC generated short vector(s)
+   short v8hi_vec0[7+1], v8hi_vec1[7+1], v8hi_vec2[7+1], v8hi_vec3[7+1];
    LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
+   LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
@@ -171,13 +171,17 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[1] = 0;
    RED1[2] = 0;
    RED1[3] = 0;
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4HI(v4hi_vec1, &a[LU_IND0]);
-      SIMD_LOAD_V4HI(v4hi_vec0, &RED1[0]);
-      SIMD_ADDW(v4hi_vec0, v4hi_vec0, v4hi_vec1);
-      SIMD_SAVE_V4HI(v4hi_vec0, &RED1[0]);
+   RED1[4] = 0;
+   RED1[5] = 0;
+   RED1[6] = 0;
+   RED1[7] = 0;
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      SIMD_LOAD_V8HI(v8hi_vec1, &a[LU_IND0]);
+      SIMD_LOAD_V8HI(v8hi_vec0, &RED1[0]);
+      SIMD_ADDW(v8hi_vec0, v8hi_vec0, v8hi_vec1);
+      SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
    }
-   seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
+   seed = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
    i = MAX0(LU_NUB0, 0);
    return seed;
 }
@@ -185,27 +189,13 @@ short accumulate(size_t n, short a[n], short seed)
 {
    size_t i;
    //PIPS generated variable
-   size_t LU_NUB0;
+   size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   size_t LU_IB0;
-   //PIPS generated variable
-   size_t LU_IND0;
-   //PIPS generated variable
-   short RED0[0+1];
-   //PIPS generated variable
-   short RED1[3+1];
-   //PIPS generated variable
-   short seed0;
-   //PIPS generated variable
-   short v4hi_vec0[3+1];
-   //PIPS generated variable
-   short v4hi_vec1[3+1];
-   //PIPS generated variable
-   int v2si_vec2[1+1];
-   //PIPS generated variable
-   int v2si_vec3[1+1];
+   short RED0[0+1], RED1[7+1], seed0;
+   //PIPS:SAC generated short vector(s)
+   short v8hi_vec0[7+1], v8hi_vec1[7+1], v8hi_vec2[7+1], v8hi_vec3[7+1];
    LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
+   LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
@@ -214,13 +204,17 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[1] = 0;
    RED1[2] = 0;
    RED1[3] = 0;
-   SIMD_LOAD_V4HI(v4hi_vec0, &RED1[0]);
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4HI(v4hi_vec1, &a[LU_IND0]);
-      SIMD_ADDW(v4hi_vec0, v4hi_vec0, v4hi_vec1);
+   RED1[4] = 0;
+   RED1[5] = 0;
+   RED1[6] = 0;
+   RED1[7] = 0;
+   SIMD_LOAD_V8HI(v8hi_vec0, &RED1[0]);
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      SIMD_LOAD_V8HI(v8hi_vec1, &a[LU_IND0]);
+      SIMD_ADDW(v8hi_vec0, v8hi_vec0, v8hi_vec1);
    }
-   SIMD_SAVE_V4HI(v4hi_vec0, &RED1[0]);
-   seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
+   SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
+   seed = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
    i = MAX0(LU_NUB0, 0);
    return seed;
 }
@@ -228,27 +222,13 @@ short accumulate(size_t n, short a[n], short seed)
 {
    size_t i;
    //PIPS generated variable
-   size_t LU_NUB0;
+   size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   size_t LU_IB0;
-   //PIPS generated variable
-   size_t LU_IND0;
-   //PIPS generated variable
-   short RED0[0+1];
-   //PIPS generated variable
-   short RED1[3+1];
-   //PIPS generated variable
-   short seed0;
-   //PIPS generated variable
-   short v4hi_vec0[3+1];
-   //PIPS generated variable
-   short v4hi_vec1[3+1];
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
+   short RED0[0+1], RED1[7+1], seed0;
+   //PIPS:SAC generated short vector(s)
+   short v8hi_vec0[7+1], v8hi_vec1[7+1];
    LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
+   LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
@@ -257,13 +237,17 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[1] = 0;
    RED1[2] = 0;
    RED1[3] = 0;
-   SIMD_LOAD_V4HI(v4hi_vec0, &RED1[0]);
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4HI(v4hi_vec1, &a[LU_IND0]);
-      SIMD_ADDW(v4hi_vec0, v4hi_vec0, v4hi_vec1);
+   RED1[4] = 0;
+   RED1[5] = 0;
+   RED1[6] = 0;
+   RED1[7] = 0;
+   SIMD_LOAD_V8HI(v8hi_vec0, &RED1[0]);
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      SIMD_LOAD_V8HI(v8hi_vec1, &a[LU_IND0]);
+      SIMD_ADDW(v8hi_vec0, v8hi_vec0, v8hi_vec1);
    }
-   SIMD_SAVE_V4HI(v4hi_vec0, &RED1[0]);
-   seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
+   SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
+   seed = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
    i = MAX0(LU_NUB0, 0);
    return seed;
 }
@@ -274,27 +258,13 @@ short accumulate(size_t n, short a[n], short seed)
 {
    size_t i;
    //PIPS generated variable
-   size_t LU_NUB0;
+   size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   size_t LU_IB0;
-   //PIPS generated variable
-   size_t LU_IND0;
-   //PIPS generated variable
-   short RED0[0+1];
-   //PIPS generated variable
-   short RED1[3+1];
-   //PIPS generated variable
-   short seed0;
-   //PIPS generated variable
-   short v4hi_vec0[3+1];
-   //PIPS generated variable
-   short v4hi_vec1[3+1];
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
+   short RED0[0+1], RED1[7+1], seed0;
+   //PIPS:SAC generated short vector(s)
+   short v8hi_vec0[7+1], v8hi_vec1[7+1];
    LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
+   LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
@@ -303,13 +273,17 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[1] = 0;
    RED1[2] = 0;
    RED1[3] = 0;
-   SIMD_LOAD_V4HI(v4hi_vec0, &RED1[0]);
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4HI(v4hi_vec1, &a[LU_IND0]);
-      SIMD_ADDW(v4hi_vec0, v4hi_vec0, v4hi_vec1);
+   RED1[4] = 0;
+   RED1[5] = 0;
+   RED1[6] = 0;
+   RED1[7] = 0;
+   SIMD_LOAD_V8HI(v8hi_vec0, &RED1[0]);
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      SIMD_LOAD_V8HI(v8hi_vec1, &a[LU_IND0]);
+      SIMD_ADDW(v8hi_vec0, v8hi_vec0, v8hi_vec1);
    }
-   SIMD_SAVE_V4HI(v4hi_vec0, &RED1[0]);
-   seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
+   SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
+   seed = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;
    i = MAX0(LU_NUB0, 0);
    return seed;
 }

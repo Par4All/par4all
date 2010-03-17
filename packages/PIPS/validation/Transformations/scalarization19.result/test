@@ -22,6 +22,9 @@ void scalarization19(double B[SIZE][SIZE])
 //  P() {TOP-LEVEL:SIZE==10}
 
    // BEGIN BLOCK
+
+//  P() {TOP-LEVEL:SIZE==10}
+
    int i, j;
 
 //  P() {TOP-LEVEL:SIZE==10}

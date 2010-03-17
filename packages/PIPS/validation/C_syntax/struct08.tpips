@@ -1,0 +1,26 @@
+setenv WS=struct08
+delete $WS
+create $WS $WS.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PARSED_PRINTED_FILE[struct08]
+
+apply UNSPLIT
+
+echo
+echo Compilation of the prettyprinted code
+echo
+
+# shell $(PIPS_CC) -c $WS.database/Src/$WS.c
+shell cc -c $WS.database/Src/$WS.c
+close
+
+delete $WS
+
+quit

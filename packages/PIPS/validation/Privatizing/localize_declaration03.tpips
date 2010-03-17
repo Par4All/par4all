@@ -29,6 +29,9 @@ display PRINTED_FILE[%ALLFUNC]
 apply CLEAN_DECLARATIONS[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 
+apply UNSPLIT
+cc -c $WKS.database/Src/$WKS.c -o /dev/null
+
 close
 delete $WKS
 

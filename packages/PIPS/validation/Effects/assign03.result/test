@@ -3,7 +3,7 @@ Parsed printed file for "assign03"
 
 void assign03()
 {
-   extern char *malloc(int);
+   char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 
@@ -14,8 +14,11 @@ Proper effetcs for "assign03"
 
 void assign03()
 {
-   extern char *malloc(int);
+   char *malloc(int);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    double *p = (double *) malloc(10*sizeof(double));
+//               <must be written>: j
    int j = 2;
 //               <must be read   >: j p
 //               <must be written>: p[j]
@@ -25,10 +28,15 @@ void assign03()
 
 Cumulated effetcs for "assign03"
 
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 void assign03()
 {
-   extern char *malloc(int);
+   char *malloc(int);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    double *p = (double *) malloc(10*sizeof(double));
+//               <must be written>: j
    int j = 2;
 //               <may be written >: p[*]
 //               <must be read   >: j p
@@ -40,12 +48,18 @@ Proper effetcs for "foo"
 
 void foo()
 {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    assign03();
 }
 
 Cumulated effetcs for "foo"
 
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 void foo()
 {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    assign03();
 }

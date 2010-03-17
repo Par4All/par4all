@@ -6,7 +6,10 @@ C  T(while06) {while06==10}
 
 int while06()
 {
-   int i,  n;
+
+//  T() {}
+
+   int i, n;
 
 //  T(i) {i==0}
 
@@ -43,7 +46,10 @@ Preconditions for "while06"
 
 int while06()
 {
-   int i,  n;
+
+//  P() {}
+
+   int i, n;
 
 //  P() {}
 

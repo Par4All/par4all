@@ -34,9 +34,10 @@ void call09(int i, int j)
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    tf_t s;
+//               <must be written>: sp
    tf_t *sp = &s;
 //               <must be read   >: s[1] sp sp[0][1]
 
@@ -52,9 +53,12 @@ void call09(int i, int j)
 
 Regions for "main"
 
-main()
+int main()
 {
    tf_t s;
+
+//  <sp-W-EXACT-{}>
+
    tf_t *sp = &s;
 
 //  <s[PHI1]-R-EXACT-{PHI1==1}>

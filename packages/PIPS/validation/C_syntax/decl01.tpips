@@ -30,8 +30,10 @@ echo
 
 display PRINTED_FILE[decl01]
 
+apply UNSPLIT
+shell cc -c decl01.database/Src/decl01.c
 
 close
-delete decl01
+#delete decl01
 
 quit

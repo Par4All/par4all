@@ -5,14 +5,31 @@ activate TRANSFORMERS_INTER_FULL
 setproperty RICEDG_STATISTICS_ALL_ARRAYS TRUE
 activate RICE_SEMANTICS_DEPENDENCE_GRAPH
 
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 setproperty SIMD_FORTRAN_MEM_ORGANISATION=FALSE
-setproperty SAC_SIMD_REGISTER_WIDTH = 64
+setproperty SAC_SIMD_REGISTER_WIDTH = 128
 setproperty SIMD_AUTO_UNROLL_SIMPLE_CALCULATION FALSE
 setproperty SIMD_AUTO_UNROLL_MINIMIZE_UNROLL FALSE
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 
 
+display PRINTED_FILE
+
+# Apply some aggressive restructuring:
+setproperty UNSPAGHETTIFY_WHILE_RECOVER TRUE
+apply RESTRUCTURE_CONTROL
+apply RECOVER_FOR_LOOP
+# To view the control graph:
+display GRAPH_PRINTED_FILE
+# and use something like:
+# pips_graph_display dot ddot.database/DDOT/DDOT.pre.f-graph
+# to display it.
+
+display PRINTED_FILE
+
+
 apply IF_CONVERSION_INIT
+display PRINTED_FILE
 apply UNSPAGHETTIFY
 
 display PRINTED_FILE

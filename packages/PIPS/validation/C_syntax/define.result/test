@@ -1,4 +1,4 @@
-main()
+int main()
 {
    int i = 1;
 }
@@ -9,9 +9,8 @@ Unsplit define
  * file for define.c
  */
 
-
-extern  main();
-main()
+extern int main();
+int main()
 {
    int i = 1;
 }

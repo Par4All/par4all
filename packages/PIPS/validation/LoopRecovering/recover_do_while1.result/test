@@ -1,28 +1,28 @@
 int find_do_while(int i)
 {
 
-begin:   i = 8*i;                                                             /*0006*/
-   if (i++) goto begin;                                                 /*0007*/
-   i--;                                                                 /*0011*/
+begin:   i = 8*i;                                                             /*0005*/
+   if (i++) goto begin;                                                 /*0006*/
+   i--;                                                                 /*0010*/
 
-begin2:   i = 9+i;                                                             /*0014*/
-   if (i<9) goto begin2;                                                /*0015*/
+begin2:   i = 9+i;                                                             /*0013*/
+   if (i<9) goto begin2;                                                /*0014*/
 
-   return i;                                                            /*0018*/
+   return i;                                                            /*0017*/
 }
 int find_do_while(int i)
 {
-   do {                                                                 /*0007*/
+   do {                                                                 /*0006*/
 
-begin:      i = 8*i;                                                          /*0006*/
+begin:      i = 8*i;                                                          /*0005*/
    }
-   while (i++);                                                         /*0007*/
-   i--;                                                                 /*0011*/
-   do {                                                                 /*0015*/
+   while (i++);                                                         /*0006*/
+   i--;                                                                 /*0010*/
+   do {                                                                 /*0014*/
 
-begin2:      i = 9+i;                                                          /*0014*/
+begin2:      i = 9+i;                                                          /*0013*/
    }
-   while (i<9);                                                         /*0015*/
+   while (i<9);                                                         /*0014*/
 
-   return i;                                                            /*0018*/
+   return i;                                                            /*0017*/
 }

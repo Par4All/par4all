@@ -5,9 +5,9 @@ int call06(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0005*/
 //               <must be read   >: i
-   return i;                                                            /*0005*/
+   return i;                                                            /*0006*/
 }
 
 Source code with cumulated effects
@@ -17,9 +17,9 @@ int call06(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0005*/
 //               <must be read   >: i
-   return i;                                                            /*0005*/
+   return i;                                                            /*0006*/
 }
 
 Source code with transformers for "call06"
@@ -32,11 +32,11 @@ int call06(int i)
 
 //  T(i) {i==i#init+1}
 
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0005*/
 
 //  T(call06) {call06==i}
 
-   return i;                                                            /*0005*/
+   return i;                                                            /*0006*/
 }
 
 Source code with transformers for "main"
@@ -44,14 +44,17 @@ Source code with transformers for "main"
 
 //  T() {}
 
-main()
+int main()
 {
-   int ai;                                                              /*0004*/
+
+//  T() {}
+
+   int ai;                                                              /*0011*/
 
 //  T(ai) {ai==3}
 
 
-   ai = call06(2);                                                      /*0006*/
+   ai = call06(2);                                                      /*0013*/
 }
 
 Source code with preconditions for "call06"
@@ -64,11 +67,11 @@ int call06(int i)
 
 //  P() {i==2}
 
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0005*/
 
 //  P(i) {i==3}
 
-   return i;                                                            /*0005*/
+   return i;                                                            /*0006*/
 }
 
 Source code with preconditions for "main"
@@ -76,24 +79,34 @@ Source code with preconditions for "main"
 
 //  P() {}
 
-main()
+int main()
 {
-   int ai;                                                              /*0004*/
+
+//  P() {}
+
+   int ai;                                                              /*0011*/
 
 //  P() {}
 
 
-   ai = call06(2);                                                      /*0006*/
+   ai = call06(2);                                                      /*0013*/
 }
 
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call06] (add_or_kill_equivalenced_variables) storage return
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call06] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_TRANSFORMERS[call06] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call06] (add_or_kill_equivalenced_variables) storage return
 PRECONDITIONS_INTER_FULL[call06] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call06] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call06!] (ordinary_summary_precondition) empty precondition to call06! because not in call tree from main.

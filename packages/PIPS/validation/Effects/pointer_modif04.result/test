@@ -4,7 +4,6 @@ Proper effects for "init_s"
 void init_s(s_t s, int max)
 {
    // BEGIN BLOCK
-   extern char *malloc(int);
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
 
@@ -24,7 +23,6 @@ void init_s(s_t s, int max)
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
    // BEGIN BLOCK
-   extern char *malloc(int);
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
 

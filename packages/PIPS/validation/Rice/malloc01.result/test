@@ -18,8 +18,14 @@ Preconditions
 
 void malloc01()
 {
+
+//  P() {}
+
    int *p = malloc(10*sizeof(int));
    //int p[10];
+
+//  P() {}
+
    int i;
 
 //  P() {}
@@ -36,6 +42,8 @@ Proper effects
 
 void malloc01()
 {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;
@@ -49,8 +57,12 @@ void malloc01()
 
 Cumulated effects
 
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 void malloc01()
 {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;
@@ -66,8 +78,17 @@ void malloc01()
 
 Regions
 
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
 void malloc01()
 {
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <p-W-EXACT-{}>
+
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;

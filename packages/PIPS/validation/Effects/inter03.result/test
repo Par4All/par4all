@@ -3,14 +3,14 @@ Proper effects for "foo"
 
 void foo(int *p)
 {
-   int i;                                                               /*0004*/
+   int i;                                                               /*0011*/
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
 //               <must be read   >: i p
 //               <must be written>: p[i]
-      p[i] = i;                                                         /*0007*/
-   return;                                                              /*0008*/
+      p[i] = i;                                                         /*0014*/
+   return;                                                              /*0015*/
 }
 
 Proper effects for "main"
@@ -91,7 +91,7 @@ Regions for "foo"
 
 void foo(int *p)
 {
-   int i;                                                               /*0004*/
+   int i;                                                               /*0011*/
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
@@ -105,13 +105,15 @@ void foo(int *p)
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
-      p[i] = i;                                                         /*0007*/
-   return;                                                              /*0008*/
+      p[i] = i;                                                         /*0014*/
+   return;                                                              /*0015*/
 }
 
 Regions for "main"
 
 
+//  <TOP-LEVEL:*MEMORY*-R-MAY-{}>
+//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
@@ -321,7 +323,7 @@ out regions for "foo"
 
 void foo(int *p)
 {
-   int i;                                                               /*0004*/
+   int i;                                                               /*0011*/
 
 //  <p[PHI1]-OUT-EXACT-{0<=PHI1, PHI1<=9}>
 
@@ -330,6 +332,6 @@ void foo(int *p)
 
 //  <p[PHI1]-OUT-EXACT-{i==PHI1, 0<=i, i<=9}>
 
-      p[i] = i;                                                         /*0007*/
-   return;                                                              /*0008*/
+      p[i] = i;                                                         /*0014*/
+   return;                                                              /*0015*/
 }

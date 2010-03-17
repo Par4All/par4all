@@ -1,0 +1,10 @@
+setenv WS=subscript00
+delete $WS
+create $WS $WS.c
+display PRINTED_FILE[%ALL]
+apply SIMPLIFY_SUBSCRIPTS[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete $WS
+quit
+

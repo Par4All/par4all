@@ -1,0 +1,63 @@
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+
+      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C)                            0008
+
+      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)                         0015
+
+      END
+      SUBROUTINE P4A_KERNEL_0(M, N, B, C, I, J)
+      INTEGER M, N, I, J
+      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+      B(I,J) = I                                                        0004
+      C(I,J) = J                                                        0005
+      END
+      SUBROUTINE P4A_KERNEL_1(M, N, A, B, C, I, J)
+      INTEGER M, N, I, J
+      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+      A(I,J) = B(I,J)+C(I,J)                                            0004
+      END
+      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C)
+      INTEGER J, I, M, N
+      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+C PIPS generated variable
+
+      DO I = 1, M                                                       0006
+         DO J = 1, N                                                    0007
+C To be assigned to a call to P4A_vp_0: I
+C To be assigned to a call to P4A_vp_1: J
+            CALL P4A_KERNEL_WRAPPER_0(M, N, B, C, I, J)                 0010
+         ENDDO
+      ENDDO
+      END
+      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
+      INTEGER J, I, M, N
+      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+C PIPS generated variable
+
+      DO I = 1, M                                                       0006
+         DO J = 1, N                                                    0007
+C To be assigned to a call to P4A_vp_0: I
+C To be assigned to a call to P4A_vp_1: J
+            CALL P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)              0010
+         ENDDO
+      ENDDO
+      END
+      SUBROUTINE P4A_KERNEL_WRAPPER_0(M, N, B, C, I, J)
+      INTEGER M, N, I, J
+      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+C To be assigned to a call to P4A_vp_0: I
+C To be assigned to a call to P4A_vp_1: J
+      CALL P4A_KERNEL_0(M, N, B, C, I, J)                               0006
+      END
+      SUBROUTINE P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)
+      INTEGER M, N, I, J
+      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+C To be assigned to a call to P4A_vp_0: I
+C To be assigned to a call to P4A_vp_1: J
+      CALL P4A_KERNEL_1(M, N, A, B, C, I, J)                            0006
+      END

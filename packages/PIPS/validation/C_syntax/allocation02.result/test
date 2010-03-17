@@ -58,8 +58,8 @@ Variable list:
 	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "foo:0`__func__" with type "variable" "char *"
 	Declared entity "foo:0`m" with type "variable" "int"
 
 * empty extern declaration list *
@@ -107,8 +107,8 @@ Variable list:
 	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "main:0`k" with type "variable" "int"
 	Declared entity "main:main" with type "variable" "int"
 

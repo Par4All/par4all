@@ -58,8 +58,8 @@ Variable list:
 	Declared entity "block_scope09:*STACK*" with type "area" with size 0
 	Declared entity "block_scope09:*STATIC*" with type "area" with size 0
 	Declared entity "block_scope09:0`1`x" with type "variable" "int"
-	Declared entity "block_scope09:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "block_scope09:0`__func__" with type "variable" "char"
+	Declared entity "block_scope09:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "block_scope09:0`__func__" with type "variable" "char *"
 	Declared entity "block_scope09:0`k" with type "variable" "int"
 	Declared entity "block_scope09:block_scope09" with type "variable" "int"
 	Declared entity "block_scope09:x" with type "variable" "int"

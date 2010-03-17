@@ -20,7 +20,7 @@ echo
 
 apply INLINING[farray_set]
 apply INLINING[farray_get]
-display PRINTED_FILE[main]
+display PRINTED_FILE[inlining29!,main]
 
 echo
 echo Unsplit resulting code

@@ -22,10 +22,14 @@ Proper effetcs for "dereferencing02"
 
 void dereferencing02()
 {
+//               <must be written>: x
    double x = 1.;
+//               <must be written>: p
    double *p = &x;
+//               <must be written>: q
    double **q = &p;
    double **w;
+//               <must be written>: i
    int i = 1;
 //               <must be read   >: q q[0]
 //               <must be written>: q[0][0]
@@ -55,10 +59,14 @@ Cumulated effetcs for "dereferencing02"
 //               <may be written >: TOP-LEVEL:*MEMORY*
 void dereferencing02()
 {
+//               <must be written>: x
    double x = 1.;
+//               <must be written>: p
    double *p = &x;
+//               <must be written>: q
    double **q = &p;
    double **w;
+//               <must be written>: i
    int i = 1;
 //               <must be read   >: q q[0]
 //               <must be written>: q[0][0]

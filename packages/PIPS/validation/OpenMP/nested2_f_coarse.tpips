@@ -1,0 +1,28 @@
+delete nested2_f_coarse
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create nested2_f_coarse nested2_f.f
+
+setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply PRIVATIZE_MODULE(NESTED)
+apply COARSE_GRAIN_PARALLELIZATION(NESTED)
+apply OMPIFY_CODE(NESTED)
+
+echo
+echo Open MP version
+echo
+
+display PRINTED_FILE(NESTED)
+
+apply UNSPLIT
+shell gfortran -fopenmp -c nested2_f_coarse.database/Src/nested2_f.f
+shell rm *.o
+
+close
+delete nested2_f_coarse
+quit
+# EOF
