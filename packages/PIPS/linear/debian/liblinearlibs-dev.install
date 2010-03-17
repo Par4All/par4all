@@ -15,5 +15,7 @@ usr/include/polyedre.h
 usr/include/polynome.h
 usr/include/boolean.h
 
-usr/lib/*.a
-usr/lib/*.so
+usr/lib/lib*.a
+usr/lib/lib*.so
+usr/lib/lib*.la
+usr/lib/pkgconfig/*

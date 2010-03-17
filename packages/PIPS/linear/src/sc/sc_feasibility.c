@@ -22,12 +22,12 @@
 
 */
 
-/* 
- * This file provides functions to test the feasibility of a system 
- * of constraints. 
+/*
+ * This file provides functions to test the feasibility of a system of
+ * constraints.
  *
  * Arguments of these functions :
- * 
+ *
  * - s or sc is the system of constraints.
  * - ofl_ctrl is the way overflow errors are handled
  *     ofl_ctrl == NO_OFL_CTRL
@@ -53,7 +53,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-#include <malloc.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -215,7 +214,7 @@ chose_variable_to_project_for_feasability(Psysteme s, Pbase b, boolean ineq)
 	  if ((value_notzero_p(minval) && value_lt(val,minval))
 	      || value_zero_p(minval)) 
 	    minval = val, minvar = var;
-		     
+
 	  if (value_one_p(minval)) return minvar;
 	}
       }
@@ -225,7 +224,7 @@ chose_variable_to_project_for_feasability(Psysteme s, Pbase b, boolean ineq)
     /* assert(minvar!=TCST); */
     var = minvar;
   }
-  
+
   if (!var && ineq)
   {
     /* only inequalities, reduce the explosion
@@ -247,16 +246,16 @@ chose_variable_to_project_for_feasability(Psysteme s, Pbase b, boolean ineq)
     {
       for (v = contrainte_vecteur(c); v; v=v->succ)
       {
-	var = var_of(v); 
+	var = var_of(v);
 	if (var!=TCST)
 	{
-	  ifscdebug(9) 
+	  ifscdebug(9)
 	    fprintf(stderr, "%s\n", default_variable_to_string(var));
 
-	  for (i=0, tmp=b; tmp && var_of(tmp)!=var; 
+	  for (i=0, tmp=b; tmp && var_of(tmp)!=var;
 	       i++, tmp=tmp->succ);
 	  assert(tmp);
-		    
+
 	  t[i][value_posz_p(val_of(v))]++;
 	}
       }

@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -57,7 +56,7 @@ Value b1, b2; /* element du vecteur colonne du systeme donne par l'analyse*/
 Pcontrainte eq;   /* pointeur sur l'egalite ou l'inegalite
                                 courante */
    
-Pvecteur cp ;   /* pointeur sur le membre courant             */ 
+extern Pvecteur cp ;   /* pointeur sur le membre courant             */ 
 
 short int operat;    /* dernier operateur rencontre                 */
 
