@@ -8,11 +8,12 @@
 PIPS_MODULES="linear newgen nlpmake pips validation"
 #PIPS_MODULES=nlpmake
 
-# Set variables pointing to various Par4All parts:
+# Set variables pointing to various Par4All parts if not already set:
 # Where to get the git-svn instances from:
-P4A_CRI_GIT_SVN=$P4A_TOP/CRI-git-svn
-P4A_ROOT=$P4A_TOP/par4all
-P4A_PRIV_ROOT=$P4A_TOP/par4all-priv
+${P4A_CRI_GIT_SVN:=$P4A_TOP/CRI-git-svn}
+# Can be overridden with the --root option:
+${P4A_ROOT:=$P4A_TOP/par4all}
+${P4A_PRIV_ROOT:=$P4A_TOP/par4all-priv}
 
 script=${0/*\//}
 
@@ -94,14 +95,16 @@ function do_fetch_remote_git() {
     verb 1 "Entering do_fetch_remote_git"
     enforce_P4A_TOP
     stop_on_error
-    cd $P4A_ROOT
-    echo Assume the correct remotes are set in this par4all git copy:
-    for i in $PIPS_MODULES; do
-	echo Fetching CRI/$i...
-	git fetch CRI/$i
-    done
-    echo Fetching ICPS/polylib...
-    git fetch ICPS/polylib
+    (
+	cd $P4A_ROOT
+	echo Assume the correct remotes are set in this par4all git copy:
+	for i in $PIPS_MODULES; do
+	    echo Fetching CRI/$i...
+	    git fetch CRI/$i
+	done
+	echo Fetching ICPS/polylib...
+	git fetch ICPS/polylib
+    )
 }
 
 
@@ -130,19 +133,21 @@ function do_pull_remote_git() {
     verb 1 "Entering do_pull_remote_git"
     enforce_P4A_TOP
     stop_on_error
-    cd $P4A_ROOT
-    # Get the current branch to come back into later:
-    get_current_git_branch
+    (
+	cd $P4A_ROOT
+        # Get the current branch to come back into later:
+	get_current_git_branch
 
-    echo Assuming the correct remotes are set in this par4all git copy...
-    for i in $PIPS_MODULES; do
-	pull_remote_1_git p4a-$i CRI-$i CRI/$i
-    done
-    # Same for the polylib:
-    pull_remote_1_git p4a-polylib ICPS-polylib ICPS/polylib
+	echo Assuming the correct remotes are set in this par4all git copy...
+	for i in $PIPS_MODULES; do
+	    pull_remote_1_git p4a-$i CRI-$i CRI/$i
+	done
+        # Same for the polylib:
+        pull_remote_1_git p4a-polylib ICPS-polylib ICPS/polylib
 
-    # Revert back into the branch we were at the beginning:
-    git checkout $current_branch
+        # Revert back into the branch we were at the beginning:
+        git checkout $current_branch
+    )
 }
 
 
@@ -151,16 +156,17 @@ function do_merge_remote_git() {
     verb 1 "Entering do_merge_remote_git"
     enforce_P4A_TOP
     stop_on_error
-    cd $P4A_ROOT
-    for i in $PIPS_MODULES; do
-	# Merge into the current branch the branch that buffers the remote
-	# PIPS git svn gateway that should have been populated by a
-	# previous do_pull_remote_git:
-	git merge --log p4a-$i
-
-    done
-    # Same for the polylib:
-    git merge --log p4a-polylib
+    (
+	cd $P4A_ROOT
+	for i in $PIPS_MODULES; do
+	    # Merge into the current branch the branch that buffers the remote
+	    # PIPS git svn gateway that should have been populated by a
+	    # previous do_pull_remote_git:
+	    git merge --log p4a-$i
+	done
+        # Same for the polylib:
+	git merge --log p4a-polylib
+    )
 }
 
 

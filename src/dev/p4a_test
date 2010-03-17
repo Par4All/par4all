@@ -1,5 +1,7 @@
 #! /bin/bash -vx
-# Test case of the script to build the infrastructure up:
+
+# Test case of the bootstraping script to build the infrastructure up into
+  a p3 git from an older and less well organized version:
 
 # Stop on error:
 set -o errexit
@@ -41,9 +43,9 @@ git merge p4a-own-0.1-alpha
 # This will be also the p4a-0.1-alpha branch:
 git branch p4a-0.1-alpha
 
-# Get the last package versions:
-p4a_git -p
-p4a_git -m
+# Get the last package versions here:
+p4a_git  --root . -p
+p4a_git  --root . -m
 
 # Integrate them in the package branch:
 git checkout p4a-packages
@@ -54,6 +56,7 @@ for i in $ALL_MODULES; do
 done
 # This will be also the p4a-packages-0.2-alpha branch:
 git branch p4a-packages-0.2-alpha
+git branch p4a-own-0.2-alpha p4a-own
 
 # Integrate all:
 git checkout p4a

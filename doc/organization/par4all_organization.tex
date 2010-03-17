@@ -217,7 +217,7 @@ The \verb|p4a_git| options come into short and long form:
   script. For example, if used twice, the script enters into command
   tracing mode;
 \item[\texttt{-u} or \texttt{--update-git-svn}] update the \Apips
-  \Agit-\Asvn gateways that are into \verb|$P4A_TOP/CRI-git-svn|;
+  \Agit-\Asvn gateways that are into \verb|$P4A_TOP/CRI-git-svn|;%$
 \item[\texttt{-g} or \texttt{--recursive-git-svn}] apply a \Agit command
   to all the git working copies inside the current directory. If no argument
   is given, a \texttt{git svn rebase} is done;
@@ -227,7 +227,9 @@ The \verb|p4a_git| options come into short and long form:
 \item[\texttt{-p} or \texttt{--pull-remote-git}] pull the objects from the
   remote \Agit repositories into their respective branches;
 \item[\texttt{-m} or \texttt{--merge-remote-git}] merge the branches that
-  buffer the remote git repositories into the current branch.
+  buffer the remote git repositories into the current branch;
+\item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
+  change the git repository to work on.
 \end{description}
 
 
@@ -241,7 +243,7 @@ feature we want to have into the \texttt{packages/polylib} of \Apfa.
 The script \verb|p4a_git| is used to automate the management of the
 workflow.
 
-\verb|p4a_git --pull-remote-git| pull the \Apolylib into the
+\verb|p4a_git --pull-remote-git| pulls the \Apolylib into the
 \texttt{polylib} branch so that you can apply global modifications there
 if needed and later \texttt{git merge} it into your working branch. In
 this way global modifications are persistent and available to everybody.
@@ -557,8 +559,9 @@ defined branches:
   version of a given version snapshot;
 \item[\texttt{p4a-\emph{numerical}-beta}] a branch corresponding to an beta
   version of a given version snapshot;
-\item[{p4a}] is the branch to get the full latest \Apfa version with all
-  the different packages here;
+\item[\texttt{p4a}] is the branch to get the full latest \Apfa version
+  with all the different components, that is the merge of the branches
+  \texttt{p4a-own} and \texttt{p4a-packages};
 \item[\texttt{p4a-linear}] points to the import of \Apips \texttt{linear}
   part. Thus this branch should contain only the files from
   \texttt{package/PIPS/linear} and used to merge from when you want to use
@@ -571,6 +574,8 @@ defined branches:
   \texttt{package/PIPS/nlpmake};
 \item[\texttt{p4a-own}] points to the last development of the \Apfa own files,
   without packages, etc;
+\item[\texttt{p4a-packages}] points to the last merge of all the \Apfa
+  package components;
 \item[\texttt{p4a-pips}] points to the import of \Apips \texttt{pips}
   par. Thus this branch should contain only the files from
   \texttt{package/PIPS/pips} and used to merge from when you want to use
@@ -587,6 +592,12 @@ defined branches:
 \item[\texttt{pips-gfc-4.4.1}] points to the original developments of
   Raphaël in \Agcc in \texttt{package/pips-gfc}.
 \end{description}
+
+
+Of course, for a better tractability, there are also branches that point
+to specific versions of conceptual branches such as
+\texttt{p4a-0.2-alpha-nlpmake}, \texttt{p4a-own-0.1} or
+\texttt{p4a-packages-0.2-beta}.
 
 
 \section{Making releases}

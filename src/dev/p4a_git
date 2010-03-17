@@ -27,7 +27,9 @@ function usage()
 	"  -p|--pull-remote-git: pull the objects from the remote git\n" \
 	"     repositories into their respective branches\n" \
 	"  -m|--merge-remote-git: merge the branches that buffer the remote\n" \
-	"      git repositories into the current branch\n"
+	"      git repositories into the current branch\n" \
+	"  -r|--root <directory-name>: create a git repository of this name\n" \
+	"     instead of 'par4all'"
   fi
   exit ${status:-1}
 }
@@ -51,7 +53,9 @@ EOF
 	exit 1
     fi
 
-    # To be change when the global installation infrastructure is more stable:
+    # To be changed when the global installation infrastructure is more
+    # stable. Be aware that enforce_P4A_TOP may be called more than once
+    # and thus this source too...
     source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
 }
 
@@ -78,6 +82,7 @@ while [ "$1" ] ; do
       -f|--fetch-remote-git) fetch_remote_git=1 ;;
       -p|--pull-remote-git) pull_remote_git=1 ;;
       -m|--merge-remote-git) merge_remote_git=1 ;;
+      -r|--root) P4A_ROOT=$1 ; shift ;;
       # error
       *) usage 1 "unexpected option: $opt"
   esac
