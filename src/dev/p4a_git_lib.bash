@@ -10,10 +10,10 @@ PIPS_MODULES="linear newgen nlpmake pips validation"
 
 # Set variables pointing to various Par4All parts if not already set:
 # Where to get the git-svn instances from:
-${P4A_CRI_GIT_SVN:=$P4A_TOP/CRI-git-svn}
+P4A_CRI_GIT_SVN=${P4A_CRI_GIT_SVN:-$P4A_TOP/CRI-git-svn}
 # Can be overridden with the --root option:
-${P4A_ROOT:=$P4A_TOP/par4all}
-${P4A_PRIV_ROOT:=$P4A_TOP/par4all-priv}
+P4A_ROOT=${P4A_ROOT:-$P4A_TOP/par4all}
+P4A_PRIV_ROOT=${P4A_PRIV_ROOT:-$P4A_TOP/par4all-priv}
 
 script=${0/*\//}
 
