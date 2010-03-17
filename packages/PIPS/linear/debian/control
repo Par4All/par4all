@@ -1,0 +1,26 @@
+Source: linear
+Priority: extra
+Maintainer: serge guelton <serge.guelton@enst-bretagne.fr>
+Build-Depends: debhelper (>= 7), libpolylib-dev, flex, bison, cproto
+Standards-Version: 3.8.3
+Section: libs
+Homepage: http://freia.enstb.org/pips
+
+Package: liblinearlibs-dev
+Section: libdevel
+Architecture: any
+Depends: liblinearlibs0 (= ${binary:Version})
+Replaces: liblinear-dev
+Conflicts: liblinear-dev
+Description: development headers for linear library
+ additional files required to develop using liblinear
+
+Package: liblinearlibs0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: liblinear0
+Conflicts: liblinear0
+Description: linear algebra library
+ a linear algebra library developed in Ecoles des Mines
+ de Paris

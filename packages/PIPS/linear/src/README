@@ -1,0 +1,65 @@
+# README version 1.4
+# 96/07/13, 18:53:54
+# - Fabien COELHO 1996
+
+
+C3/LINEAR LIBRARY FOR LINEAR INTEGER PROGRAMMING
+------------------------------------------------
+
+contributors: [linear@cri.ensmp.fr]
+
+Corinne Ancourt, Neil Butler, Malik Imadache, Francois Irigoin,
+Yi-qing Yang, Béatrice Creusillet, Fabien Coelho.
+
+
+BUILDING THE LIBRARIES
+----------------------
+
+- for building these libraries, use gmake (GNU Make)
+- environment variables of interest for building the linear libraries
+
+directories:
+  LINEAR_DIR=/projects/C3/Linear # for instance
+  LINEAR_PRODDIR=$(LINEAR_DIR)/Production
+  LINEAR_INCDIR=$(LINEAR_PRODDIR)/Include (old: INCLUDEDIR)
+  LINEAR_SHRDIR=${LINEAR_PRODDIR}/Share   (old in /Include)
+  LINEAR_LIBDIR=$(LINEAR_PRODDIR)/Lib
+  LINEAR_SRCDIR=$(LINEAR_PRODDIR)/Src
+
+the order in which libraires should be built:
+  LINEAR_ORDERED_LIBS="arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union"
+
+architecture:
+  PIPS_ARCH=.
+
+compilers and options:
+  see ${LINEAR_INCDIR}/makefile_macros.${PIPS_ARCH}
+  you can define your own file.
+
+- then gmake LIBS=${LINEAR_ORDERED_LIBS} recompile
+
+
+USING THE LIBRARY
+-----------------
+
+  include the needed headers stored in $LINEAR_INCLUDEDIR
+  links to the libraries stored in $LINEAR_LIBDIR/$PIPS_ARCH
+
+
+DATA TYPES HIERARCHY
+--------------------
+
+  arithmetique: 
+  vecteur[arithmetique]: vectors 
+  contrainte[vecteur]: constraints 
+  sc[contrainte,vecteur]: systems (equalities and inequalities) 
+  matrice: rational dense matrices
+  ray_dte: 
+  sommet[ray_dte,vecteur]: for constraints, systems and functions (?)
+  plint[sommet,matrice,sc]: integer linear programming
+  sparse_sc[matrice,sc]: sparse systems
+  sg[sommet,ray_dte]: generating systems
+  polyedre[sg,sc]: polyhedrons
+
+# end of README
+#
