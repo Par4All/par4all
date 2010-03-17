@@ -1,0 +1,8 @@
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.log
+*~
+auto/
+build/

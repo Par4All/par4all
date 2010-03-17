@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+WDIR="$1"
+
+# default config, nicer for new users
+cp config.mk $WDIR/makes/
+
+sed -i -e 's,/$(ARCH),,g' \
+	$WDIR/makes/flags.mk

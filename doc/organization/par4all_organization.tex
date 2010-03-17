@@ -1,0 +1,497 @@
+\documentclass[a4paper]{article}
+\usepackage[latin9]{inputenc}
+\usepackage{url}
+\usepackage{abbrev_reactive}
+\let\OldRightarrow=\Rightarrow
+\RequirePackage{marvosym}
+\let\MarvosymRightarrow=\Rightarrow
+\let\Rightarrow=\OldRightarrow
+\RequirePackage{wasysym}
+\let\Lightning\UnTrucIndefini% Car conflit entre ifsym et marvosym
+\let\Sun\UnTrucIndefini%
+\RequirePackage[weather]{ifsym}
+
+
+\sloppy
+
+\begin{document}
+
+\title{Par4All organization\\
+  \textsc{draft}\\
+  ---\\
+  HPC Project}
+
+\author{Serge \textsc{Guelton} \and Ronan \textsc{Keryell} \and Grégoire
+  \textsc{Péan} \and Claire \textsc{Seguin} \and Mickaël \textsc{Thievent}
+  \and Pierre \textsc{Villalon}}
+
+\maketitle
+
+\section{Introduction}
+\label{sec:introduction}
+
+\Apfa is a platform that merges various open source developments
+to aim at achieving the migration of software to multicore and other
+parallel processors.
+
+It is mainly developed by \Ahpcp, MINES ParisTech/CRI, Institut
+Télécom/Télécom Bretagne and others.
+
+This document describes the internal organization of \Apfa and how its
+construction relies on \Agit repositories, \Asvn repositories and other
+projects.
+
+Since it relies on other tool projects, the documentation of these other
+projects should also be taken into account.
+
+Before using PIPS, once it is installed, you should do, according to your
+shell, a
+\begin{verbatim}
+source build/etc/par4all-rc.sh
+\end{verbatim}
+or a
+\begin{verbatim}
+source build/etc/par4all-rc.csh
+\end{verbatim}
+
+
+\section{Collaborative repositories}
+\label{sec:coll-repos}
+
+\subsection{Public repositories}
+\label{sec:public-repositories}
+
+There are few \Agit repositories used by the project.
+
+To have access without authentication and only for reading/cloning, you
+can use the \texttt{git:} prefix instead of \texttt{ssh:}.
+
+The main repository for the project is:
+\url{ssh://git.hpc-project.com/git/par4all.git}
+
+It can be seen with a \Awww browser at
+\url{https://git.hpc-project.com/cgit/par4all}
+
+To get directly involved into the project with full commit right in the
+repositories, ask \Ahpcp.
+
+There are also ancillary \Agit repositories to offer a \Agit interface to
+the trunk of the \Asvn repositories for the \Apips components from \Acri:
+\begin{itemize}
+\item \url{ssh://git.hpc-project.com/git/svn-linear.git}
+\item \url{ssh://git.hpc-project.com/git/svn-newgen.git}
+\item \url{ssh://git.hpc-project.com/git/svn-nlpmake.git} is a top-level
+  repository with \texttt{trunk}, \texttt{branch} and \texttt{tag} because
+  it started without this standard layout that was added later around
+  revision 750;
+\item \url{ssh://git.hpc-project.com/git/svn-pips.git}
+\item \url{ssh://git.hpc-project.com/git/svn-validation.git}
+\end{itemize}
+These ancillary gateways only include the \texttt{trunk} history since at
+CRI branches are not public.
+
+
+\subsection{Private repositories}
+\label{sec:private-repositories}
+
+There is a private directory shared between core developers used mainly
+for validation of the project on non public codes, benchmarks, demos, for
+developing private reports, phases, scripts and so on:
+\url{ssh://git.hpc-project.com/git/par4all-private.git}
+
+For \Ahpcp-confidential information,
+\url{ssh://git.hpc-project.com/git/par4all-private-hpc.git} is used.
+
+According to the evolving private collaborations, other repositories can
+be created and used on demand.
+
+
+\section{Packages}
+\label{sec:packages}
+
+\Apfa integrate different tools from different projects. Right now \Apfa
+is composed by \Apips, \Apipsgfc, \Apolylib, with some extensions. Each
+project is included in \Apfa as a package and is placed in a directory
+inside the \texttt{package} top-level directory.
+
+
+\section{Directory organization}
+\label{sec:direct-organ}
+
+\begin{description}
+\item[\texttt{build}] is the directory created with the various productions
+  of the compilation of all the \Apfa packages: binaries, header files,
+  documentation;
+  \marginpar{Right now it is still mainly in \texttt{package/PIPS} since
+    I'm waiting for the new \Apips compilation infrastructure. RK}
+  \begin{description}
+  \item[\texttt{bin}] contains the executable programs from \Apfa;
+  \item[\texttt{doc}] is the generated documentation for the \Apfa
+    infrastructure;
+  \item[\texttt{etc}] contains some generated configuration files;
+  \item[\texttt{include}] contains the include files used for the
+    compilation of \Apfa;
+  \item[\texttt{lib}] owns the libraries used to run \Apfa;
+  \item[\texttt{share}] contains shared files for run-time and
+    configuration files
+
+    \marginpar{what is the difference of this \texttt{pipsrc.sh} and the one in
+      \texttt{etc}? \texttt{RK->FC}}
+
+  \item[\texttt{utils}] gathers various utility programs used by \Apfa
+    infrastructure (validation...) and other internal tools;
+  \end{description}
+\item[\texttt{doc}] are the sources of the \Apfa infrastructure;
+\item[\texttt{examples}] comes with some examples to exercise \Apfa;
+\item[\texttt{packages}] contains the different components of \Apfa; of
+  all the \Apfa packages: binaries, header files, documentation;
+  \begin{description}
+  \item[\texttt{PIPS}] contains the components of \Apips framework itself
+    with
+    \begin{description}
+    \item[\texttt{linear}] is the \Apips linear library of \Apips;
+    \item[\texttt{newgen}] is the object management infrastructure used by
+      \Apips;
+    \item[\texttt{nlpmake}] is the makefile common infrastructure used by
+      all the \Apips components
+    \item[\texttt{pips}] is the \Apips core;
+    \item[\texttt{validation}] is the validation of \Apips
+    \end{description}
+  \item[\texttt{pips-gfc}] contains a \Agcc 4.4 source patched to be
+    compiled and linked with \Apips to add a Fortran 95+ parser to \Apips;
+  \item[\texttt{polylib}] contains the \Apolylib library source
+  \end{description}
+\item[\texttt{src}] contains source of tools used for the internal
+  organization of \Apfa itself, such as repository and product management,
+  publication process.
+\end{description}
+
+
+\section{Repositories and work-flow}
+\label{sec:repos-workfl}
+
+For history tracking and collaborative development, \Apfa relies on a main
+\Agit repository that is accessed by \Apfa developers, users, integrators
+and the product and quality team.
+
+Since \Apfa intimately extends some tools such as \Apips, their are some
+ancillary repositories to ease the impedance matching between \Apfa and
+those other project.
+
+Since \Apolylib is already a \Agit repository, it is simply fetched as a
+remote \Agit into the \Apfa at the right place.
+
+But this is far more complex with \Apips which is a project split in 5
+independent \Asvn repositories, so its organization needs more massage to
+be presented in a coherent way, with some \Asvn-\Agit gateways. We can
+take advantage of these gateways to offer more free developments with
+light branches stored into a common \Agit view of the \Apips{} \Asvn
+repositories that can be pushed back into the \Apips{} \Asvn .
+
+
+\subsection{PolyLib work-flow}
+\label{sec:polylib-workflow}
+
+The basic workflow for \Apolylib is to develop new features into the
+original \Apolylib{} \Agit, to fetch it into the \Apfa{} \Agit and select what
+feature we want to have into the \texttt{packages/polylib} of \Apfa.
+
+Since the \Apolylib is already in a \Agit, the \texttt{polylib} is simply
+a remote in the \Apfa{} \Agit.
+
+So to import the latest \Apolylib development into the \Apfa{} \Agit for
+inspection, choice for inclusion, you fetch \Apolylib with:
+\begin{verbatim}
+git fetch polylib
+\end{verbatim}
+This command is also done by a \verb|p4a_fetch_all| that fetches also the
+\Apips parts.
+
+You can then merge the feature you want with
+\begin{verbatim}
+git merge -s subtree remotes/polylib/master
+\end{verbatim}
+or from any tree
+identifier. The \texttt{-s subtree} is necessary since in \Apfa the
+\Apolylib files are not at the top-level directory.
+
+
+\subsection{PIPS work-flow}
+\label{sec:pips-workflow}
+
+The work-flow related to \Apips is quite more complex since we must
+consolidate data from 5 different \Asvn repositories.
+
+The basic \Apips work-flow is to develop into the 5 original \Apips{}
+\Asvn repositories at MINES ParisTech/CRI and to import the selected
+developments into the \Apfa{} \Agit.
+
+For this, we use 5 \Agit repositories that are gateways with these \Asvn
+repositories. For technical reasons, it is better that this kind of subtle
+gateway exists in only one place and this is currently done on the laptop
+of Ronan \textsc{Keryell}. Then these 5 gateways are used as remotes into
+the \Apfa{} \Agit. To synchronize these gateways to the latest version of
+the \Apips{} \Asvn repositories, use a \verb|pips_git| in the directory
+owning these \Agit-\Asvn repositories.
+
+But since we have then a \Agit interface of the original \Apips{} \Asvn
+repositories and \Agit is quite more powerful than \Asvn, some people may
+want to develop into \Apips with \Agit by using these gateways. For
+example they may want to develop with common branches easily and when they
+are right with them push them back into the \Apips{} \Asvn trunk. To have
+a public interface for them, these \Agit gateways are pushed to public
+\Agit repository programmers can play with. Regularly these public
+gateways are synchronized manually with the \Apips{} \Asvn. Nevertheless,
+\Asvn may not be credited with the right owner of the commit but with the
+one running the gateway, which is not fair. So the preferred way is to
+directly develop in the original \Apips \Asvn repository (eventually with
+her own \Agit-\Asvn gateway).
+
+The 5 public gateway \Agit repositories are also defined as 5 remotes into
+the \Apfa{} \Agit:
+\begin{description}
+\item[\texttt{remotes/CRI/linear}]
+\item[\texttt{remotes/CRI/newgen}]
+\item[\texttt{remotes/CRI/nlpmake}]
+\item[\texttt{remotes/CRI/pips}]
+\item[\texttt{remotes/CRI/validation}]
+\end{description}
+
+These remote repositories are merged into \Apfa in the following
+respective directories:
+\begin{description}
+\item[\texttt{packages/PIPS/linear}]
+\item[\texttt{packages/PIPS/newgen}]
+\item[\texttt{packages/PIPS/nlpmake}]
+\item[\texttt{packages/PIPS/pips}]
+\item[\texttt{packages/PIPS/validation}]
+\end{description}
+
+To import the latest \Apips development into the \Apfa{} \Agit for
+inspection, choice for inclusion, you fetch the repositories you want
+with:
+\begin{verbatim}
+git fetch CRI/linear
+git fetch CRI/newgen
+git fetch CRI/nlpmake
+git fetch CRI/pips
+git fetch CRI/validation
+\end{verbatim}
+These commands are also done by a \verb|p4a_fetch_all| that fetches also the
+\Apolylib part.
+
+You can then merge the feature you want with a \texttt{git merge -s
+  subtree} from \texttt{remotes/CRI/.../master} as:
+\begin{verbatim}
+git merge -strategy=subtree remotes/CRI/linear/master
+git merge -strategy=subtree remotes/CRI/newgen/master
+git merge -strategy=subtree remotes/CRI/nlpmake/master
+git merge -strategy=subtree remotes/CRI/pips/master
+git merge -strategy=subtree remotes/CRI/validation/master
+\end{verbatim}
+or from any tree identifier to do more precise version selection. The
+\texttt{-s subtree} is necessary since in \Apfa the \Apips files are not
+at the top-level directory and you do not want them to appear at the
+top-level directory.
+
+To pull everything at one for testing, this is done with the
+\verb|p4a_pull_all|. It may useful to create a branch with a \texttt{git
+  checkout -b} before to test it, so the branch can be deleted for an easy
+rollback.
+
+
+\subsection{PIPS-GFC extension workflow}
+\label{sec:pips-gfc-workflow}
+
+This part is into the \texttt{package/pips-gfc} directory. It contains
+plain \Agcc core and Fortran 4.4.1 distribution, pointed by the branch
+\texttt{gcc-4.4.1}
+
+The development of \Apipsgfc should be done in the branch
+\texttt{pips-gfc-4.4.1} and this branch should be merged with the
+branch \texttt{gcc-4.4.1} into a branch \texttt{pips-gfc+gcc-4.4.1} with a
+more global name \texttt{pips-gfc+gcc} tracking which version is to be
+merged into the global \texttt{master} branch.
+
+So in \texttt{pips-gfc-4.4.1} there should be only files different from
+the \Agcc distribution. In this way, if we want to have more subtle
+construction methods, later, it will be clearer how to get the real
+content.
+
+There is the same variation in branches for version 4.4.2.
+
+So to develop and test the \Apipsgfc extension, you get into for example
+\texttt{pips-gfc-4.4.1} with
+\begin{verbatim}
+git checkout pips-gfc-4.4.1
+\end{verbatim}
+and develop your code in this branch.
+
+To test, you commit and change to the \texttt{pips-gfc+gcc-4.4.1} branch with
+\begin{verbatim}
+git checkout pips-gfc+gcc-4.4.1
+\end{verbatim}
+where you merge with a
+\begin{verbatim}
+git merge pips-gfc-4.4.1
+\end{verbatim}
+and compile. If you are happy, you commit or you revert and then go back
+into branch \texttt{pips-gfc-4.4.1}.
+
+If you want to avoid spoiling the branches \texttt{pips-gfc-4.4.1} and
+\texttt{pips-gfc+gcc-4.4.1}, you can create sub-branches of them, commit in
+them and merge this work in the former one back (with the \verb|--slashed|
+if you want to be modest about your gory hesitations \smiley{} and delete
+these branches).
+
+
+\subsection{Setting and running the infrastructure up}
+\label{sec:setup}
+
+The installation has been tested on Ubuntu/Linux 9.10 and you need to have
+at least these packages installed:
+MICKAEL !
+
+
+There are scripts to ease the developer and user life.
+
+
+\subsubsection{Scripts for an everyday work}
+\label{sec:an-everyday-work}
+
+
+\begin{itemize}
+\item to pull everything at one for testing, this is done with the
+  \verb|p4a_pull_all|. It may useful to create a branch with a \texttt{git
+    checkout -b} before to test it, so the branch can be deleted for an
+  easy rollback;
+\item \verb|p4a_setup| is used to compile all the \Apfa infrastructure and
+  setting up many things. It should be used at least for the first
+  compilation.
+\end{itemize}
+
+
+\subsubsection{Scripts used to setup the infrastructure}
+\label{sec:scripts-used-setup}
+
+
+Some scripts used to setup the infrastructure are located in
+\texttt{src/dev}, that should be used in this order:
+\begin{itemize}
+\item \verb/p4a_create_CRI_git_svn/ is used once to create the \Apips
+  \Asvn-\Agit gateways. This script is here to show how it can be done but
+  also to keep track of the exact parameters used to create them in the
+  case we loose them and want to recreate them with exactly with the same
+  identifiers (that depends from the creation parameters);
+\item \verb/p4a_import_external_gits/ imports all the external \Agit
+  repositories into the \Apfa \Agit repository. It should be used only
+  once but are included as example for other projects or to help adding
+  other repositories later;
+\item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
+  files to fit the \Apfa architecture. It should be used only once, after
+  external \Agit import;
+\end{itemize}
+
+
+\subsubsection{Scripts for debugging}
+\label{sec:scripts-debugging}
+
+\begin{itemize}
+\item \verb|p4a_valgrind| launch a command with Valgrind with a memory
+  checker in paranoid mode, mainly with the options described in the
+  \Apips development guide.
+\end{itemize}
+
+
+\section{Examples and demos}
+\label{sec:examples-demos}
+
+The \texttt{examples} directory comes with examples to show some aspects
+of \Apfa. Of course there are far more examples in the validation of \Apfa
+(\S~\ref{sec:validation}) but it is often less pedagogical.
+
+\section{Compilation}
+\label{sec:compilation}
+
+Once you have an image of the main \Agit repository content, \Apfa is
+compiled and configured by running \verb|src/dev/p4a_setup|.
+
+To be sure you do not break the compilation process, you should compile
+your work before committing it on the central repositories. By a nice side
+effect, it allows you to test your code. \smiley
+
+More seriously, it is not obvious that it may compile on your account but
+not for other people. For example because you forgot to commit some files.
+
+A nice feature of \Agit over \Asvn is that since you split the commit from
+the publication, you can test your own committed state before it hurts the
+team.
+
+For example, you can create a light\footnote{Because the objects are
+  shared with symbolic links and not copied since we did not use the
+  \texttt{file://} syntax.} clone with a
+\begin{verbatim}
+git clone par4all par4all-compile
+\end{verbatim}
+and after you have tested and committed your modifications inside the
+\texttt{par4all} working copy, you do the same into the
+\texttt{par4all-compile} working copy after a \texttt{git pull}.
+If some files are lacking from the commit, it will be detected.
+
+Afterwards you can do a \texttt{git push} into the central \Apfa
+repository with less risks.
+
+
+\section{Validation}
+\label{sec:validation}
+
+
+Validation of \Apfa is done inside the \texttt{validation} directory with
+\texttt{make validate}.\marginpar{ Right now it is still mostly in the
+  \texttt{package/PIPS/validation} directory. RK}
+
+
+\section{Branches}
+\label{sec:branches}
+
+Since there are restrictions on the use of \texttt{/} in branch names, we
+prefer to use \texttt{-} to add hierarchy.
+
+To ease the developments and the organization, there are some already
+defined branches:
+\begin{description}
+\item[\texttt{gcc-4.4.1}] is the original \Agcc 4.4.1 core \& Fortran in
+  \texttt{package/pips-gfc};
+\item[\texttt{gcc-4.4.2}] is the original \Agcc 4.4.2 core \& Fortran in
+  \texttt{package/pips-gfc};
+\item[\texttt{linear}] points to the import of \Apips \texttt{linear} part;
+\item[\texttt{master}] is the branch for the main latest developments in
+  \Apfa;
+\item[\texttt{newgen}] points to the import of \Apips \texttt{newgen}
+  part;
+\item[\texttt{nlpmake}] points to the import of \Apips \texttt{nlpnake}
+  part;
+\item[\texttt{pips}] points to the import of \Apips \texttt{pips} part;
+\item[\texttt{pips-gfc+gcc}] points to a working \Apipsgfc implementation
+  of the Fortran 95 extension for \Apips in \texttt{package/pips-gfc};
+\item[\texttt{pips-gfc-4.4.1}] points to the original developments of
+  Raphaël in \Agcc in \texttt{package/pips-gfc};
+\item[\texttt{validation}] points to the import of \Apips
+  \texttt{validation} part.
+\end{description}
+
+
+\section{Making releases}
+\label{sec:releases}
+
+After validating, a release is done by making some branch at a given state
+a tag.
+
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% ispell-local-dictionary: "american"
+%%% End: 

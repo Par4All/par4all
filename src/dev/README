@@ -1,0 +1,30 @@
+This directory contains some script used to build and manage the Par4All
+framework itself.
+
+p4a_setup : compile and setup the whole Par4All infrastructure
+
+
+Some scripts to be used only once, but that are here because it was subtle
+to set up and that can be used to add other parts to Par4All and may be
+useful for other projects:
+
+p4a_create_CRI_git_svn : build a git svn copy of the PIPS svn.
+
+p4a_import_external_gits : add the external git repositories to Pa4All,
+such as PIPS, polylib...
+
+p4a_apply_pips_patches : used to patch the original PIPS files to fit the
+  Par4All architecture. It should be used only once, after external GIT
+  import
+
+p4a_fetch_all : fetch all the remote git repository. For sanity reason,
+the programmer is responsible to do the merge.
+
+
+
+Ronan Keryell.
+
+%%% Local Variables:
+%%% mode: text
+%%% ispell-local-dictionary: "american"
+%%% End:

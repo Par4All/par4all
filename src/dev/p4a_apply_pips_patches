@@ -1,0 +1,30 @@
+#! /bin/bash -vx
+
+# Apply some patches from Serge Guelton to simplify the PIPS architecture
+# for GNU/Linux/Debian (at least)
+
+if [[ -z $P4A_ROOT ]]; then
+    echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory"
+    exit
+fi
+
+PIPS_DIR=$P4A_ROOT/packages/PIPS
+BUILD_SCRIPT_DIR=$P4A_ROOT/src/dev/patch_pips
+
+cd $BUILD_SCRIPT_DIR
+
+PIPS_COMPONENTS="linear newgen pips"
+
+# To follow the conventions of the patch scripts:
+for i in $PIPS_COMPONENTS; do
+    ln -s $PIPS_DIR/$i $i-svn
+done
+
+for i in $PIPS_COMPONENTS; do
+    bash -vx ./$i.patch $i-svn
+done
+
+# Some cleaning:
+for i in $PIPS_COMPONENTS; do
+    rm $i-svn
+done

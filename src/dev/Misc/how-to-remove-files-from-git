@@ -1,0 +1,30 @@
+For example Raphaël Roosz commited more files than expected in the
+pips-gfc branch of the PIPS svn.
+
+So before importing it into the Par4All git, the files were to be removed,
+because it complexify later merge with the unchanged files of GCC.
+
+We work into the git repository constructed with a git-clone of the git
+repository produced by a git-svn of his branch.
+
+Construct the diff from his work against the gcc/fortran directory of gcc
+4.4.1:
+
+diff -q -w -r . ~/projets/Wild_Systems/Par4All/p4a.copie/packages/pips-gfc/gcc/fortran > ../gcc-diff
+
+Construct the list of files in his branch:
+
+ls >../ls-gfc
+
+Construct a file files-to-remove with a list of files that should not be
+into his branch by inspecting the files gcc-diff and ls-gfc
+
+A=`cat ../files-to-remove | tr '\n' ' '`
+git filter-branch --index-filter "git rm --cached --ignore-unmatch $A" HEAD
+
+Ronan Keryell, 19/01/2010.
+
+%%% Local Variables: 
+%%% mode: text
+%%% ispell-local-dictionary: "american"
+%%% End: 

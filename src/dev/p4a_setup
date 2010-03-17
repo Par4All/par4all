@@ -1,0 +1,188 @@
+#! /bin/bash -vx
+#
+# Inspired from setup_pips.sh
+#
+
+if [[ -z $P4A_ROOT ]]; then
+    echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory"
+    exit
+fi
+
+# Where everything is built:
+P4A_BUILD=$P4A_ROOT/build
+mkdir -p $P4A_BUILD
+
+P4A_ETC=$P4A_BUILD/etc
+
+cd $P4A_ROOT
+
+PIPS_COMPONENTS="linear newgen pips"
+PIPS_DIR=$P4A_ROOT/packages/PIPS
+# clean environment so as not to interfere with another installation
+PIPS_ARCH=`$PIPS_DIR/nlpmake/makes/arch.sh`
+export PIPS_ARCH
+
+# The config files to source later:
+P4A_RC_SH=$P4A_ETC/par4all-rc.sh
+P4A_RC_CSH=$P4A_ETC/par4all-rc.csh
+
+
+error()
+{
+  echo "$@" >&2
+  exit 1
+}
+
+warn()
+{
+  {
+    echo
+    echo "WARNING"
+    for msg in "$@" ; do
+      echo $msg ;
+    done
+    echo "Type return to continue"
+  } >&2
+  read
+}
+
+#gih(){
+# Compile and install the polyLib:
+(
+    cd $P4A_ROOT/packages/polylib
+    ./autogen.sh
+    ./configure --prefix=$P4A_BUILD --libdir=$P4A_BUILD/lib/$PIPS_ARCH
+    make
+    make install
+    cd $P4A_BUILD/lib/$PIPS_ARCH
+    ln -s libpolylib64.a libpolylib.a
+)
+#}
+
+
+echo
+echo "### creating `basename $P4A_RC_SH`"
+mkdir -p  $P4A_ETC
+cat <<EOF > $P4A_RC_SH
+# minimum rc file for sh-compatible shells
+
+# default architecture
+export PIPS_ARCH=$PIPS_ARCH
+# software roots
+export EXTERN_ROOT=$P4A_BUILD
+export NEWGEN_ROOT=$P4A_BUILD
+#export NEWGEN_ROOT=$PIPS_DIR/newgen
+unset NEWGEN_ROOT
+#export LINEAR_ROOT=$P4A_BUILD
+#export LINEAR_ROOT=$PIPS_DIR/linear
+unset LINEAR_ROOT
+#export PIPS_ROOT=$P4A_BUILD
+export PIPS_ROOT=$PIPS_DIR/pips
+# Hack to have access to makefiles...
+#export ROOT=$P4A_ROOT/packages/PIPS
+
+# For pyps:
+export PIPS_NO_PYPS=1
+#export PYTHONPATH=$P4A_BUILD/lib
+
+#export INSTALL_DIR=$P4A_BUILD
+
+# Mainly to avoid the non working libraries.make:
+unset WITH_DYNAMIC_LIBRARIES
+
+# fix path
+#PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
+PATH=$PIPS_DIR/pips/bin:$PIPS_DIR/pips/utils:$PIPS_DIR/newgen/bin:$PIPS_DIR/newgen/bin/$PIPS_ARCH:$P4A_BUILD/bin:$P4A_BUILD/bin/$PIPS_ARCH:\$PATH
+
+# Some hack to have p4a_recover_includes working. DIrectory to move
+# somewhere else later...
+export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
+export PYTHONPATH=/usr/share/pyshared
+EOF
+
+# Find the Fortran compiler:
+type gfortran && export PIPS_F77=gfortran
+type g77 && export PIPS_F77=g77
+
+
+if [ -n "$PIPS_F77" ]; then
+    echo >> $P4A_RC_SH
+    echo "# The Fortran compiler to use:" >> $P4A_RC_SH
+    echo "export PIPS_F77=$PIPS_F77" >> $P4A_RC_SH
+fi
+
+# Source the just generated environment to be able to compile PIPS later:
+source $P4A_RC_SH
+
+# Make links PIPS makefile infrastructure:
+for i in $PIPS_COMPONENTS; do
+    ln -s ../nlpmake/makes $PIPS_DIR/$i/makes
+done
+
+echo
+echo "### checking some needed softwares"
+for exe in make cproto flex bison gcc perl sed tr
+do
+  type $exe || error "no such executable, please install: $exe"
+done
+
+# check cproto version... 4.6 is still available on many distributions
+[[ $(cproto -V 2>&1) = 4.7* ]] || \
+  error "Pips compilation requires at least cproto 4.7c"
+
+#unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
+
+echo
+echo "### testing special commands for config.mk"
+config=$PIPS_DIR/nlpmake/makes/config.mk
+# Save an old config file if we run again this script:
+[ -f $config ] && mv $config $config.old
+
+type javac && echo '_HAS_JDK_ = 1' >> $config
+type latex && echo '_HAS_LATEX_ = 1' >> $config
+type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
+type emacs && echo '_HAS_EMACS_ = 1' >> $config
+type pkg-config && has_pkgconfig=1
+
+if [ "$has_pkgconfig" ]
+then
+  echo '_HAS_PKGCONFIG_ = 1' >> $config
+  if pkg-config --exists gtk+-2.0
+  then
+    echo '_HAS_GTK2_ = 1' >> $config
+ else
+    echo 'PIPS_NO_GPIPS = 1' >> $config
+  fi
+else
+  echo 'PIPS_NO_GPIPS = 1' >> $config
+fi
+
+# whether to build the documentation depends on latex and htlatex
+target=compile
+type latex && target=build
+type htlatex && target=full-build
+
+
+echo
+echo "### generating csh environment"
+$PIPS_DIR/pips/src/Scripts/env/sh2csh.pl \
+    < $P4A_RC_SH \
+    > $P4A_ETC/par4all-rc.csh
+
+#env
+warn "cproto header generation results in many cpp warnings..."
+#make -C $PIPS_DIR clean
+make -C $PIPS_DIR $target
+#make -C $PIPS_DIR/newgen clean
+#make -C $PIPS_DIR/newgen
+
+echo
+echo "### checking useful softwares"
+for exe in bash m4 wish latex htlatex javac emacs
+do
+  type $exe || echo "no such executable, consider installing: $exe"
+done
+
+echo To compile PIPS in a casual way, try a make into $PIPS_DIR or evan $PIPS_DIR/pips
+
+echo To use Par4All you should source $P4A_BUILD/etc/`basename $P4A_RC_SH` or $P4A_BUILD/etc/`basename $P4A_RC_CSH` according to your shell flavour

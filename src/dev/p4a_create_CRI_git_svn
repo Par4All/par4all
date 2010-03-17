@@ -1,0 +1,53 @@
+#! /bin/bash -vx
+
+# Create git-svn instances of the SVN PIPS-related repositories from Mines
+# ParisTech/CRI
+
+# Where to create this git-svn instances:
+GIT_SVN_DIR=CRI-git-svn
+# Prefix to appear in the remote svn in git
+# For example for refs/remotes/CRI/newgen/git-svn:
+GIT_SVN_PREFIX=CRI/
+# List of repositories
+SVN_REPOSITORIES="linear newgen nlpmake pips validation"
+
+# Create a git-svn instance from an svn trunk.
+# Do not pick the branch and tags since its not clear where they are in
+# PIPS and some branches are not public.
+
+# But there is an issue with the nlpmake that was not in a trunk up to
+# version 749 and then had it moved in a trunk, so keep all the repository
+# for it...
+create_git_svn() {
+  if [[ $1 == nlpmake ]]; then
+      # all the repository for nlpmake
+      TRUNK=
+  else
+      TRUNK=/trunk
+  fi
+  git svn clone --prefix=$GIT_SVN_PREFIX$1/ http://svn.cri.ensmp.fr/svn/$1$TRUNK $1
+}
+
+
+mkdir -p $GIT_SVN_DIR
+cd $GIT_SVN_DIR
+for i in $SVN_REPOSITORIES; do
+    # It is so slow that we slurp them in parallel...
+    create_git_svn $i &
+done
+
+# Wait for all the git-svn to finish:
+wait
+
+for i in $SVN_REPOSITORIES; do
+    (
+        cd $i
+        # Add the reference svn-git gateways for PIPS:
+        git remote add origin ssh://git.hpc-project.com/git/svn-$i.git
+        # Declare the master branch to be pushed on this remote git:
+        git config branch.master.remote origin
+        git config branch.master.merge refs/heads/master
+        git config push.default matching
+	#git config -l
+    )
+done
