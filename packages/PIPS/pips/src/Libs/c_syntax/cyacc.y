@@ -50,6 +50,9 @@
    * does not resemble Hugues's original one at all  *)*/
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* C declarations */
 #include <stdio.h>
 #include <string.h>
@@ -70,10 +73,17 @@
 
 #include "c_syntax.h"
 
-#include "cyacc.tab.h"
-#include "clexer.h"
+#include "cyacc.h"
+extern int c_lineno;
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
+
+/* Increase the parser stack to have SPEC2006/445.gobmk/owl_defendpat.c
+   going through without a:
+
+   user warning in splitc_error: C memory exhausted near "0" at preprocessed line 13459 (user line 8732)
+*/
+#define YYMAXDEPTH 1000000
 
 extern void discard_comments(void);
 
@@ -89,9 +99,11 @@ static int abstract_counter = 1; /**< to create temporary entities for abstract 
 extern int loop_counter; /**< Global counter */
 extern int derived_counter;
 
-/* The following structures must be stacks because all the related entities are in recursive structures.
-   Since there are not stacks with basic types such as integer or logical domain, I used basic_domain
-   to avoid creating special stacks for FormalStack, OffsetStack, ... */
+/* The following structures must be stacks because all the related
+   entities are in recursive structures.  Since there are not stacks
+   with basic types such as integer or logical domain, I used
+   basic_domain to avoid creating special stacks for FormalStack,
+   OffsetStack, ... */
 
 extern stack LoopStack;
 extern stack SwitchControllerStack;
@@ -353,6 +365,11 @@ void EnterScope()
 	     c_parser_context_scope(nc), nc);
 }
 
+int ScopeStackSize()
+{
+  return stack_size(ContextStack);
+}
+
 string GetScope()
 {
   string s = "";
@@ -362,6 +379,19 @@ string GetScope()
      parser */
   if(!stack_empty_p(ContextStack)) {
     c_parser_context c = (c_parser_context) stack_head(ContextStack);
+
+    s = c_parser_context_scope(c);
+  }
+
+  return s;
+}
+
+string GetParentScope()
+{
+  string s = "";
+
+  if(!stack_empty_p(ContextStack) && stack_size(ContextStack)>=2) {
+    c_parser_context c = (c_parser_context) stack_nth(ContextStack,2);
 
     s = c_parser_context_scope(c);
   }
@@ -455,6 +485,39 @@ c_parser_context GetContextCopy()
   return cc;
 }
 
+/* When struct and union declarations are nested, the rules cannot
+   return information about the internal declarations because they
+   must return type information. Hence internal declarations must be
+   recorded and re-used when the final continue/declaration statement
+   is generated. In order not to confuse the prettyprinter, they must
+   appear first in the declaration list, that is in the innermost to
+   outermost order. */
+
+static list internal_derived_entity_declarations = NIL;
+
+static void RecordDerivedEntityDeclaration(entity de)
+{
+  internal_derived_entity_declarations
+    = gen_nconc(internal_derived_entity_declarations,
+		CONS(ENTITY, de, NIL));
+}
+
+static list GetDerivedEntityDeclarations()
+{
+  list l = internal_derived_entity_declarations;
+  /* The list spine is going to be reused by the caller. No need to
+     free. */
+  internal_derived_entity_declarations = NIL;
+  return l;
+}
+
+static void ResetDerivedEntityDeclarations()
+{
+  if(!ENDP(internal_derived_entity_declarations)) {
+    gen_free_list(internal_derived_entity_declarations);
+    internal_derived_entity_declarations = NIL;
+  }
+}
 %}
 
 /* Bison declarations */
@@ -588,7 +651,7 @@ c_parser_context GetContextCopy()
 %type <void> function_def
 %type <void> function_def_start
 %type <type> type_name
-%type <statement> block
+%type <statement> block statements_inside_block
 %type <liste> local_labels local_label_names
 %type <liste> old_parameter_list_ne
 %type <liste> old_pardef_list
@@ -791,7 +854,9 @@ declaration         {/* discard_C_comment();*/ ;}
 			  //retrieve all comments
 			  //discard_C_comment();
 			}
-/* Old style function prototype, but without any arguments */
+/* Old style function prototype, but without any arguments
+
+ Not used because of conflicts...
 |   TK_IDENT TK_LPAREN TK_RPAREN TK_SEMICOLON
                         {
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
@@ -813,6 +878,7 @@ declaration         {/* discard_C_comment();*/ ;}
 			  //retrieve all comments
 			  //discard_C_comment();
 			}
+*/
 /* transformer for a toplevel construct */
 |   TK_AT_TRANSFORM TK_LBRACE global TK_RBRACE TK_IDENT /*to*/ TK_LBRACE globals TK_RBRACE
                         {
@@ -1337,16 +1403,40 @@ bracket_comma_expression:
 ;
 
 /*** statements ***/
-block: /* ISO 6.8.2 */
+
+statements_inside_block:
     TK_LBRACE
-                        { EnterScope(); discard_C_comment();}
-    local_labels block_attrs declaration_list statement_list TK_RBRACE
+                        { EnterScope(); discard_C_comment(); }
+    local_labels block_attrs declaration_list statement_list
                         {
 			  $$ = MakeBlock($5,$6);
 			  ExitScope();
 			}
+
+block: /* ISO 6.8.2 */
+    statements_inside_block TK_RBRACE
+                        {
+			  $$ = $1;
+			}
+|   statements_inside_block pragmas TK_RBRACE
+                        {
+			  /* Since pragmas cannot be attached to nothing,
+			     add a CONTINUE to attach them: */
+			  statement nop = make_plain_continue_statement();
+			  add_pragma_strings_to_statement(nop, $2, FALSE /* Do not reallocate the strings*/);
+			  /* Free the pragma list structure: */
+			  gen_free_list($2);
+			  /* Since we can also attach a comment, try to
+			     save one if any: */
+			  add_comment_and_line_number(nop,
+						      get_current_C_comment(),
+						      get_current_C_line_number());
+			  /* Add the pragmaifyed nop at the end of the block: */
+			  append_a_statement($1, nop);
+			  $$ = $1;
+			}
 |   error location TK_RBRACE
-                        { CParserError("Parse error: error location TK_RBRACE \n"); }
+{ abort();CParserError("Parse error: error location TK_RBRACE \n"); }
 ;
 
 block_attrs:
@@ -1412,7 +1502,7 @@ pragma:
 
 
 pragmas:
-pragma { /* To  No pragma... The common case, return the empty list */
+pragma { /* No pragma... The common case, return the empty list */
   pips_debug(1, "No longer pragma\n");
   $$ = CONS(STRING, $1, NIL);
 }
@@ -1707,15 +1797,21 @@ declaration:                               /* ISO 6.7.*/
 				      continue_statements_p(sl1));
 			  pips_assert("el2 is an entity list", entities_p(el2));
 			  if(ENDP(sl1)) {
+			    list el0 = GetDerivedEntityDeclarations();
 			    string sc = get_current_C_comment();
 			    int sn = get_current_C_line_number();
 			    s =
 			      make_continue_statement(entity_empty_label());
+			    FOREACH(ENTITY, e, el0) {
+			      if(!gen_in_list_p(e, el2))
+				el2 = CONS(ENTITY, e, el2);
+			    }
 			    statement_declarations(s) = el2;
 			    s = add_comment_and_line_number(s, sc, sn);
 			    $$ = CONS(STATEMENT,s, NIL);
 			    el12 = el2;
 			    el1 = NIL;
+
 			    ifdebug(8) {
 			      pips_debug(8, "New continue statement for entities: ");
 			      print_entities(el2);
@@ -1723,9 +1819,14 @@ declaration:                               /* ISO 6.7.*/
 			    }
 			  }
 			  else if(gen_length(sl1)==1){
+			    list el0 = GetDerivedEntityDeclarations();
+			    list el012 = NIL;
 			    s = STATEMENT(CAR(sl1));
 			    el1 = statement_declarations(s);
 			    ifdebug(8) {
+			      pips_debug(8, "Recorded derived entities: ");
+			      print_entities(el0);
+			      fprintf(stderr, "\n");
 			      pips_debug(8, "Previous continue statement for entities: ");
 			      print_entities(el1);
 			      fprintf(stderr, "\n");
@@ -1734,7 +1835,19 @@ declaration:                               /* ISO 6.7.*/
 			      fprintf(stderr, "\n");
 			    }
 			    el12 = gen_nconc(statement_declarations(s), el2);
-			    statement_declarations(s) = el12;
+			    // This could introduce duplicate declarations
+			    //el012 = gen_nconc(el0, el12);
+			    //el012 = el12;
+			    el0 = gen_nreverse(el0);
+			    el012 = el12;
+			    FOREACH(ENTITY, e, el0) {
+			      if(!gen_in_list_p(e, el012))
+				el012 = CONS(ENTITY, e, el012);
+			    }
+			    pips_assert("no duplicate declaration",
+					gen_once_p(el012));
+			    gen_free_list(el0);
+			    statement_declarations(s) = el012;
 			  }
 			  else {
 			    pips_internal_error("Unexpected case");
@@ -1754,6 +1867,7 @@ declaration:                               /* ISO 6.7.*/
                         {
 			  //stack_pop(ContextStack);
 			  PopContext();
+			  ResetDerivedEntityDeclarations();
 			  $$ = $1;
 			}
 ;
@@ -1897,8 +2011,8 @@ my_decl_spec_list:                         /* ISO 6.7 */
                                         /* ISO 6.7.2 */
 |   type_spec decl_spec_list_opt_no_named
                         {
-			  list el = $1;
-			  list sl = $2;
+			  list el = $1; // entity list
+			  list sl = $2; // statement list
 			  list rl = list_undefined;
 			  pips_assert("el contains an entity list", entities_p(el));
 			  //pips_assert("CONTINUE for declarations", continue_statements_p(el));
@@ -2124,13 +2238,17 @@ type_spec:   /* ISO 6.7.2 */
                         {
 			  /* Create the struct entity */
 			  entity ent = MakeDerivedEntity($2,$5,is_external,is_type_struct);
+			  /* Record the declaration of the struct
+			     entity */
+			  RecordDerivedEntityDeclaration(ent);
 			  /* Specify the type of the variable that follows this declaration specifier*/
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $5 the struct/union entities */
 			  list le = TakeDerivedEntities($5);
-			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
+			  list rl = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
+			  $$ = rl;
 			}
 |   TK_STRUCT TK_LBRACE
                         {
@@ -2197,6 +2315,7 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Create the union entity with unique name */
 			  string s = code_decls_text((code) stack_head(StructNameStack));
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_union);
+			  RecordDerivedEntityDeclaration(ent);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
 			  (void)TakeDerivedEntities($4);
@@ -2234,6 +2353,7 @@ type_spec:   /* ISO 6.7.2 */
                         {
                           /* Create the enum entity */
 			  entity ent = MakeDerivedEntity($2,$4,is_external,is_type_enum);
+			  RecordDerivedEntityDeclaration(ent);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 
 			  InitializeEnumMemberValues($4);
@@ -2760,10 +2880,12 @@ direct_old_proto_decl:
 			  (void) UpdateFunctionEntity(e, paras);
 			  $$ = e;
 			}
+/* Never used because of conflict
 |   direct_decl TK_LPAREN TK_RPAREN
                         {
                           (void) UpdateFunctionEntity($1,NIL);
 			}
+*/
 ;
 
 old_parameter_list_ne:
@@ -2998,10 +3120,17 @@ function_def_start:  /* (* ISO 6.9.1 *) */
     rest_par_list TK_RPAREN
                         {
 			  /* Functional type is unknown or int (by default) or void ?*/
-			  functional f = make_functional($4,make_type_unknown());
+			  //functional f = make_functional($4,make_type_unknown());
+			  functional f = make_functional($4,MakeIntegerResult());
 			  entity e = GetFunction();
 			  entity_type(e) = make_type_functional(f);
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
+			  // Too late for full UpdateEntity() but at
+			  //least the return value and the formal
+			  //parameters should be properly defined
+			  //UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,
+			  //FALSE);
+			  UpdateEntity2(e, FormalStack, OffsetStack);
 			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
@@ -3031,10 +3160,12 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  StackPop(OffsetStack);
 			}
 /* (* No return type and no parameters *) */
+/* Never used because of conflict
+
 |   TK_IDENT TK_LPAREN TK_RPAREN
                         {
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
-			  /* Functional type is unknown or int (by default) or void ?*/
+			  /* Functional type is unknown or int (by default) or void ?* /
 			  functional f = make_functional(NIL,make_type_unknown());
 			  entity_type(e) = make_type_functional(f);
 			  pips_debug(2,"Create current module %s with no return type and no parameters\n",$1);
@@ -3042,7 +3173,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  clear_C_comment();
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
 			}
-;
+*/;
 
 /*** GCC attributes ***/
 attributes:
@@ -3174,7 +3305,10 @@ attr:
 ;
 
 attr_list_ne:
-|   attr
+/* Never used because of conflict
+|
+*/
+    attr
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 |   attr TK_COMMA attr_list_ne
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
@@ -3246,4 +3380,3 @@ asmcloberlst_ne:
 ;
 
 %%
-

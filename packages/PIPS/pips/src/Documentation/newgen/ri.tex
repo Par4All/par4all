@@ -283,62 +283,57 @@ accessed by name.
 
 \domain{tabulated entity = name:string x type x storage x initial:value}
 
-Any named object in a Fortran program is represented by an object of
-type \texttt{entity}. Such object could be a module (function or subroutine
-or program), a variable, a common, an operator, an
-intrinsic\index{Intrinsic}, a constant, a label\ldots Field \texttt{name}
-contains the name of the object, more or less as it appears in the
-source code, concatenated to a prefix string and a special one-character
-separator, \verb/MODULE_SEP_STRING/.  The prefix string is the name of
-the package defining the scope of the object. The package name may be a
-module name, the reserved name \texttt{TOP-LEVEL} for global objects, or
-some other reserved names for objects specific to some analysis,
-e.g. \verb+*SEMANTICS*+ for value names used in the semantics
-analysis. Note the use of star, \verb+*+, to avoid name collision with
-user defined name.
+Any named object in a Fortran or C program is represented by an object
+of type \texttt{entity}. Such object could be a module (function or
+subroutine or program), a variable, a common, an operator, an
+intrinsic\index{Intrinsic}, a constant, a label, a type, a derived
+type (struct, union and enum), a member\ldots Field \texttt{name}
+contains the global name of the object, more or less as it appears in
+the source code, but concatenated to a prefix string and a special
+one-character separator, \verb/MODULE_SEP_STRING/.  The prefix string
+is the name of the package defining the functional scope of the
+object. The package name may be a module name, the reserved name
+\texttt{TOP-LEVEL} for global objects, or some other reserved names
+for objects specific to some analysis, e.g. \verb+*SEMANTICS*+ for
+value names used in the semantics analysis. Note the use of star,
+\verb+*+, to avoid name collision with user defined name.
 
-To sum up, an entity name is unique and known internally as a 
-\emph{global} name. It is made of a \emph{local} name and a \emph{module} name.
+To sum up, an entity name is unique whithin an application and known
+internally as a \emph{global} name. It is made of a \emph{local} name
+and a \emph{module} name. The local name contains the user source name.
 
-Several other tricks are used to store information in names. To spot
+Several other tricks are used to store information in local names. To spot
 main modules which cannot be distinguished from subroutines by the
 typing information, their local names are prefixed by a constant
 character, \verb/MAIN_PREFIX/. Local names of labels\index{Label} also
 are prefixed by one character, \verb/LABEL_PREFIX/. Two special label
-entities are used and defined by two special names: 
-\verb/EMPTY_LABEL_NAME/, which is used for statements with no label (see
-Function \texttt{empty\_label\_p()}), and
-\verb/RETURN_LABEL_NAME/ which is used to define the unique return point
-of a module. Every \texttt{RETURN} statement is translated into a jump to
-this artificial return point.
+entities are used and defined by two special names:
+\verb/EMPTY_LABEL_NAME/, which is used for statements with no label
+(see Function \texttt{empty\_label\_p()}), and
+\verb/RETURN_LABEL_NAME/ which is used to define the unique return
+point of a module. Every \texttt{RETURN} statement is translated into
+a jump to this artificial return point. In the same way, PIPS-specific
+prefixes and separators are used to dsitinguish special entities such
+as struct, union, enum and their members. Finally, the scope
+information also is stored in the local name.
 
 As expected, field \texttt{type} specifies the type of the object (see
 Section~\ref{subsection-type}), field \texttt{storage} defines the memory
 allocation class (see Section~\ref{subsection-storage}) for the object
 (e.g. dynamic, static,...).
 
-The last field, \texttt{initial}, contains the initial \texttt{value} of the
-object, it is known. A value can be anything that makes sense. For
-instance, the value of a module is its \texttt{code}.
-
-\begin{comment}
-Tout objet ayant un nom dans un programme Fortran est représenté par
-une \verb/entity/. Un tel objet peut être un module, une variable, un
-common, un opérateur, une constante, un label, etc... Pour chaque objet,
-le sous-domaine \verb/name/ de l'entité donne le nom de l'objet tel
-qu'il apparaît dans le texte source du programme préfixé par le nom du
-package dans lequel l'entité est déclarée, le sous-domaine
-\verb/type/ donne le type de l'entité, le sous-domaine \verb/storage/
-le genre d'allocation mémoire utilisé pour l'entité, et finalement,
-le sous-domaine \verb/initial/ donne la valeur initiale, si elle est
-connue, de l'entité. Le terme valeur initiale a ici un sens assez
-large, puisqu'il s'agit par exemple du code pour les entités
-représentant des modules.
-\end{comment}
+The last field, \texttt{initial}, contains the initial \texttt{value}
+of the object, if it is known. A value can be anything that makes
+sense. For instance, the value of a module is its
+\texttt{code}\footnote{The field \texttt{code} does not lead to the
+  code internal representation. The PIPS database must be queried for
+  resource \texttt{DBR\_CODE}.}. When the value is unknown, it is
+stored as unknown, not as undefined.
 
 Functions mostly dealing with entities are grouped in
-\verb/ri-util/entity.c/ and \verb/ri-util/variable.c/ for entities used
-to represent program variables.
+\verb|ri-util/entity.c| and \verb|ri-util/variable.c| for entities
+used to represent program variables. Functions using list to encode a
+small set of entities are grouped in \verb|ri-util/arguments.c|.
 
 Note the \emph{tabulated} attribute. It means that NewGen keeps track
 implicitly of all entities allocated. All entities (and objects of other
@@ -351,6 +346,17 @@ This domain is used to map entities towards integer. Any interpretation
 of this integer is possible. It could be the value of a scalar integer
 variable, the offset of a variable in a common, the lengths of commons,
 etc.
+
+% FI->FC: the set data structures is not anymore integrated into
+% Newgen than the list data structure. Declaring a set of entities
+% does not help much compared to a simple set declaration, except for
+% type checking. The API dealing with set has to be rewritten as an
+% API dealing with entities.
+%
+% I understand better the comment in PIPS tutorial about sets not
+% being well integrated into Newgen.
+
+% \domain{entities = entity\{\}}
 
 \subsection{Type}
 \label{subsection-type}

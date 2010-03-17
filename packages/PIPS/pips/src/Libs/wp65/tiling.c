@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Code Generation for Distributed Memory Machines
   *
   * Functions to decide a specific tiling for a loop nest
@@ -35,8 +38,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
-#include <values.h>
+#include <stdlib.h>
+#include <limits.h>
 #include "genC.h"
 #include "misc.h"
 #include "linear.h"

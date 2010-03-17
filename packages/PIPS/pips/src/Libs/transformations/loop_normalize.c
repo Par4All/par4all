@@ -21,8 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Name     :   loop_normalize.c
- * Package  : 	loop_normalize
+ * Package  :	loop_normalize
  * Author   :   Arnauld LESERVOT & Alexis PLATONOFF
  * Date     :	27 04 93
  * Modified :   moved to Lib/transformations, AP, sep 95

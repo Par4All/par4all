@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /* Name     : utils.c
  * Package  : paf-util
@@ -97,6 +100,7 @@ typedef dfg_vertex_label vertex_label;
 				    (strcmp(s,MINUS_OPERATOR_NAME) == 0) || \
 				    (strcmp(s,MULTIPLY_OPERATOR_NAME) == 0) || \
 				    (strcmp(s,DIVIDE_OPERATOR_NAME) == 0) )
+#define ENTITY_FOUR_OPERATION_P(s) (ENTITY_PLUS_P(s) || ENTITY_MINUS_P(s) || ENTITY_MULTIPLY_P(s) || ENTITY_DIVIDE_P(s))
 
 /* Global variables	*/
 
@@ -841,7 +845,7 @@ list exp_l;
     else
       {
        printf("\nNon linear expression :");
-       printf(" %s\n", words_to_string(words_expression(exp)));
+       printf(" %s\n", words_to_string(words_expression(exp,NIL)));
       }
    }
 
@@ -941,7 +945,7 @@ Psysteme make_expression_equalities(list le)
     else
       {
        printf("\nNon linear expression :");
-       printf(" %s\n", words_to_string(words_expression(exp)));
+       printf(" %s\n", words_to_string(words_expression(exp,NIL)));
       }
    }
  sc_creer_base(new_sc);
@@ -1716,25 +1720,6 @@ boolean single_var_vecteur_p(Pvecteur pv)
  return(vect_size(pv) == 1);
 }
 
-/*============================================================================*/
-/* Pbase list_to_base(list l): returns the Pbase that contains the variables
- * of list "l", of entities, in the same order.
- *
- * FI: should be moved to the interface between ri and
- * linear. Probably useful in many places.
- */
-Pbase list_to_base(list l)
-{
- Pbase new_b = NULL;
- list el_l;
-
- for(el_l = l ; el_l != NIL; el_l = CDR(el_l))
-   vect_add_elem((Pvecteur *) &new_b, (char *) ENTITY(CAR(el_l)), VALUE_ONE);
-
- new_b = base_reversal(new_b);
- return(new_b);
-}
-
 
 /*============================================================================*/
 /* list vecteur_to_list(Pvecteur v): translates a Pvecteur into a list of
@@ -1756,20 +1741,6 @@ list vecteur_to_list(Pvecteur v)
 }
 
 
-/*============================================================================*/
-/* list base_to_list(Pbase v): translates a Pbase into a list of entities, in
- * the same order.
- */
-/* FI: to be moved like functions above */
-list base_to_list(Pbase b)
-{
- list l = NIL;
-
- for( ; b != NULL; b = b->succ)
-   l = gen_nconc(l, CONS(ENTITY, (entity) b->var, NIL));
-
- return(l);
-}
 
 
 /*============================================================================*/
@@ -2016,9 +1987,9 @@ expression rational_op_exp(string op_name, expression exp1, expression exp2)
 		       entity_domain);
 
   pips_debug(5, "begin OP EXP : %s  %s  %s\n",
-	     words_to_string(words_expression(exp1)),
+	     words_to_string(words_expression(exp1,NIL)),
 	     op_name,
-	     words_to_string(words_expression(exp2)));
+	     words_to_string(words_expression(exp2,NIL)));
 
   if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
     user_error("rational_op_exp", "operation must be : +, -, * or /");
@@ -2089,7 +2060,7 @@ expression rational_op_exp(string op_name, expression exp1, expression exp2)
     result_exp = MakeBinaryCall(op_ent, exp1, exp2);
 
   pips_debug(5, "end   OP EXP : %s\n",
-	     words_to_string(words_expression(result_exp)));
+	     words_to_string(words_expression(result_exp,NIL)));
 
   return (result_exp);
 }

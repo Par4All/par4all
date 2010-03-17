@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
 This file contains functions to generate the HRE code if we want to have only 
 one process on the HRE
@@ -377,6 +380,7 @@ static void generate_scalar_variables()
 	entity new_ent = make_new_scalar_variable_with_prefix(name,
 							      get_current_module_entity(),
 							      bas);
+    AddEntityToCurrentModule(new_ent);
 
 	hash_put(gRefToHREVar, curRef, new_ent);
 

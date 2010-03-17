@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* 
 
 This file contains a set of functions to evaluate integer constant
@@ -50,20 +53,19 @@ range: a range is not evaluated.
 #include "misc.h"
 
 #include "ri-util.h"
+#include "properties.h"
 
 #include "operator.h"
 
-value 
-EvalExpression(expression e)
+value EvalExpression(expression e)
 {
     return EvalSyntax(expression_syntax(e));
 }
 
-value 
-EvalSyntax(syntax s)
+value EvalSyntax(syntax s)
 {
   value v;
-  
+
   switch (syntax_tag(s)) {
   case is_syntax_reference:
   case is_syntax_range:
@@ -118,7 +120,10 @@ EvalCall(call c)
 	break;
       case is_value_symbolic:
     /* SG: it may be better not to evaluate symbolic and keep their symbolic name */
-	vout = EvalConstant((symbolic_constant(value_symbolic(vin))));
+    if(get_bool_property("EVAL_SYMBOLIC_CONSTANT"))
+	    vout = EvalConstant((symbolic_constant(value_symbolic(vin))));
+    else
+        vout = make_value_unknown();
 	break;
       case is_value_unknown:
 	/* it might be an intrinsic function */

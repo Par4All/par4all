@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* package convex effects :  Be'atrice Creusillet 5/97
  *
  * File: utils.c
@@ -31,7 +34,7 @@
  *
  *
  * Actually this is the mere inclusion of the old utils.c of regions.
- * Maybe it should be cleaned a little bit. 
+ * Maybe it should be cleaned a little bit.
  */
 
 /*
@@ -1119,7 +1122,7 @@ effect make_reference_region(reference ref, tag tac)
   ifdebug(3)
     {
       pips_debug(3, "Reference : \"%s\"",
-		 words_to_string(words_reference(ref)));
+		 words_to_string(words_reference(ref, NIL)));
       fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
       pips_debug(3,"effect type depth is %d\n", d);
     }
@@ -1176,7 +1179,7 @@ effect make_reference_region(reference ref, tag tac)
 		pips_debug(3, "unbounded dimension PHI%d\n",idim);
 	      else
 		pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
-			   idim, words_to_string(words_expression(exp_ind)));
+			   idim, words_to_string(words_expression(exp_ind, NIL)));
 	    }
 
 	  if (unbounded_p)
@@ -1293,7 +1296,7 @@ effect reference_whole_region(reference ref, tag tac)
     ifdebug(3)
       {
 	pips_debug(3, "Reference : \"%s\"",
-		   words_to_string(words_reference(ref)));
+		   words_to_string(words_reference(ref, NIL)));
 	fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
 	pips_debug(3,"type depth is %d\n", d);
       }
@@ -1338,7 +1341,8 @@ effect reference_whole_region(reference ref, tag tac)
 		  pips_debug(3, "unbounded dimension PHI%d\n",idim);
 		else
 		  pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
-			   idim, words_to_string(words_expression(exp_ind)));
+			     idim,
+			     words_to_string(words_expression(exp_ind, NIL)));
 	      }
 
 	    if (unbounded_p)
@@ -2575,7 +2579,7 @@ Psysteme entity_declaration_sc(entity e)
 	ifdebug(8) {
 	    debug(8, "entity_declaration_sc",
 		  "addition of inequality :\n%s - PHI%d <= 0\n",
-		  words_to_string(words_expression(dl)), dim);
+		  words_to_string(words_expression(dl, NIL)), dim);
 	}
 	(void) sc_add_phi_equation(&sc, dl, dim, NOT_EG, NOT_PHI_FIRST);
 
@@ -2583,7 +2587,7 @@ Psysteme entity_declaration_sc(entity e)
 	ifdebug(8) {
 	    debug(8, "entity_declaration_sc",
 		  "addition of inequality :\nPHI%d - %s <= 0\n",
-		  dim, words_to_string(words_expression(du)));
+		  dim, words_to_string(words_expression(du, NIL)));
 	}
 	(void) sc_add_phi_equation(&sc, du, dim, NOT_EG, PHI_FIRST);
 

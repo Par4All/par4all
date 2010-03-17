@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* package continuation :  Be'atrice Creusillet, 1996
  *
  * This File contains the functions computing continuation conditions 

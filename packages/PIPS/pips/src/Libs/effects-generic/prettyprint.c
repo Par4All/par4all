@@ -21,12 +21,15 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* package generic effects :  Beatrice Creusillet 5/97
  *
  * File: prettyprint.c
  * ~~~~~~~~~~~~~~~~~~~
  *
- * This File contains the generic functions necessary for the prettyprint of 
+ * This File contains the generic functions necessary for the prettyprint of
  * all types of effects.
  *
  */
@@ -410,11 +413,11 @@ list /* of string */ effect_words_reference(reference obj)
   list pc = NIL;
   string begin_attachment;
   entity e = reference_variable(obj);
-   
-  if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")  
+
+  if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")
       && entity_in_common_p(e)) {
     pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
-  } else 
+  } else
     pc = CHAIN_SWORD(pc, entity_minimal_name(e));
 
   begin_attachment = STRING(CAR(pc));
@@ -426,7 +429,7 @@ list /* of string */ effect_words_reference(reference obj)
 
     pc = CHAIN_SWORD(pc,beg);
     MAPL(pi, {
-	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pi))));
+	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pi)),NIL));
 	if (CDR(pi) != NIL)
 	  pc = CHAIN_SWORD(pc,mid);
       }, reference_indices(obj));
@@ -437,7 +440,7 @@ list /* of string */ effect_words_reference(reference obj)
   attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
 				obj);
 
-  return(pc);  
+  return(pc);
 }
 
 

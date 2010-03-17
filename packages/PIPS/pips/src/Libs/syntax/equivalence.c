@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Support and resolve equivalence chains. Allocate addresses in commons
  * and in the static area and in the dynamic area. The heap area is left
  * aside.

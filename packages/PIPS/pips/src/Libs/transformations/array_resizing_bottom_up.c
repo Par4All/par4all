@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /******************************************************************
  *
  *		     BOTTOM UP ARRAY RESIZING
@@ -463,16 +466,16 @@ static void new_array_declaration_from_region(region reg, entity e, Psysteme pre
       if (sc_min_max_of_variable(ps, (Variable) phi, pre, &min, &max))
 	upper = Pvecteur_to_expression(max);
       sc_rm(ps);
-    }      
+    }
   if (expression_undefined_p(upper))
-    upper = make_unbounded_expression();   
+    upper = make_unbounded_expression();
   if (!unbounded_expression_p(upper))
     {
       number_of_right_array_declarations++;
-      fprintf(instrument_file,"%s\t%s\t%s\t%s\t%d\t%s\t%s\n",PREFIX,file_name, 
+      fprintf(instrument_file,"%s\t%s\t%s\t%s\t%d\t%s\t%s\n",PREFIX,file_name,
 	      current_mod,entity_local_name(e),length,
-	      words_to_string(words_expression(dimension_upper(last_dim))),
-	      words_to_string(words_expression(upper)));  
+	      words_to_string(words_expression(dimension_upper(last_dim), NIL)),
+	      words_to_string(words_expression(upper, NIL)));
     }
   dimension_upper(last_dim) = upper;
 }
@@ -486,7 +489,7 @@ static region find_union_regions(list l_regions,entity e)
     {
       region re = REGION(CAR(l_regions));
       reference ref = effect_any_reference(re);
-      entity array = reference_variable(ref); 
+      entity array = reference_variable(ref);
       if (same_entity_lname_p(array,e))
 	{
 	  if (region_undefined_p(reg))

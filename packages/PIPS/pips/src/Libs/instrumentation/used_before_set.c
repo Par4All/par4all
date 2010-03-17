@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -168,12 +171,12 @@ static void display_used_before_set_statistics()
   user_log("\n Number of uninitialized array variables : %d", 
 	   number_of_uninitialized_array_variables);
   user_log("\n Number of may uninitialized scalar variables : %d", 
-	   number_of_may_uninitialized_scalar_variables); 
-  user_log("\n Number of may uninitialized array variables : %d", 
-	   number_of_may_uninitialized_array_variables); 
-  user_log("\n Number of added verifications : %d", 
+	   number_of_may_uninitialized_scalar_variables);
+  user_log("\n Number of may uninitialized array variables : %d",
+	   number_of_may_uninitialized_array_variables);
+  user_log("\n Number of added verifications : %d",
 	   number_of_added_verifications);
-  user_log("\n Number of processed modules : %d\n", 
+  user_log("\n Number of processed modules : %d\n",
 	   number_of_processed_modules);
 }
 
@@ -190,7 +193,7 @@ static list entities_to_expressions(list l_ent)
 static string print_list_of_entities(list l)
 {
   string retour = "";
-  MAP(ENTITY, e, 
+  MAP(ENTITY, e,
   {
     retour = strdup(concatenate(retour,",",entity_local_name(e),NULL));
   }, l);
@@ -200,9 +203,9 @@ static string print_list_of_entities(list l)
 static string print_list_of_expressions(list l)
 {
   string retour = "";
-  MAP(EXPRESSION, exp, 
+  MAP(EXPRESSION, exp,
   {
-    retour = strdup(concatenate(retour,",",words_to_string(words_expression(exp)),NULL));
+    retour = strdup(concatenate(retour,",",words_to_string(words_expression(exp,NIL)),NULL));
   }, l);
   return retour;
 }
@@ -211,7 +214,7 @@ static bool common_variable_in_module_scope_p(entity ent,entity mod)
 {
   /* Check if a common variable, i.e SUB1:COM1, declared in a common block BLOCK1
      is visible in a module SUB2 or not */
-  list d = code_declarations(value_code(entity_initial(mod))); 
+  list d = code_declarations(value_code(entity_initial(mod)));
   MAP(ENTITY,e,
   {
     if (strcmp(entity_local_name(e),entity_local_name(ent)) == 0)
@@ -245,7 +248,7 @@ static bool initialized_by_equivalent_variable_p(entity ent)
 
 static Psysteme remove_temporal_variables_from_system(Psysteme ps)
 {
-  /* Project all #init variables from the system ps, 
+  /* Project all #init variables from the system ps,
      there are 2 cases :
      1. The result is not sure , there are over flow
         Return the SC_UNDEFINED 
@@ -353,7 +356,7 @@ static expression make_test_condition(expression exp, entity ent)
 static void initialize_scalar_variable(entity ent)
 {
   statement s = make_assign_statement(entity_to_expression(ent),make_special_value(ent));  
-  print_text(out, text_statement(entity_undefined,0,s));
+  print_text(out, text_statement(entity_undefined,0,s,NIL));
 }
 
 /* This function generates code that initializes every array element in the array region
@@ -391,7 +394,7 @@ static void initialize_array_variable(entity ent)
   Psysteme row_echelon = entity_declaration_sc(ent);
   /* The assumed-size case cannot happen, because formal variables are not initialized*/
   smt = systeme_to_loop_nest(row_echelon,l_phi,smt,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-  print_text(out,text_statement(entity_undefined,0,smt));
+  print_text(out,text_statement(entity_undefined,0,smt,NIL));
 }
 
 static void verify_scalar_variable(entity ent)
@@ -418,7 +421,7 @@ static void verify_scalar_variable(entity ent)
     smt = make_stop_statement(message); 
   t = make_test(cond,smt,make_block_statement(NIL));
   smt = test_to_statement(t);
-  print_text(out, text_statement(entity_undefined,0,smt));
+  print_text(out, text_statement(entity_undefined,0,smt,NIL));
   free(message), message = NULL;
 }
 
@@ -459,7 +462,7 @@ static void verify_array_element(entity ent, expression exp)
       fprintf(stderr,"\nGenerated statement:");
       print_statement(smt);
     }
-  print_text(out,text_statement(entity_undefined,0,smt));
+  print_text(out,text_statement(entity_undefined,0,smt,NIL));
   free(print_message), print_message = NULL;
   free(stop_message), stop_message = NULL;
 }
@@ -532,7 +535,7 @@ static void verify_array_variable(entity ent, region reg)
       fprintf(stderr,"\nGenerated statement:");
       print_statement(smt);
     }
-  print_text(out,text_statement(entity_undefined,0,smt));
+  print_text(out,text_statement(entity_undefined,0,smt,NIL));
   free(print_message), print_message = NULL;
   free(stop_message), stop_message = NULL;
 }
@@ -775,7 +778,7 @@ static void verify_formal_and_common_variables(entity ent,list l_callers)
 		    }
 		}
 	    }
-	  else 
+	  else
 	    {
 	      if (entity_conflict_p(e,ent))
 		{
@@ -799,7 +802,7 @@ static void verify_formal_and_common_variables(entity ent,list l_callers)
 /* This function prints a common variable with its numerical size, because
    we do not want to generate the PARAMETER declarations
      PARAMETER (NX=50)
-     COMMON W(5*NX) 
+     COMMON W(5*NX)
   => COMMON W(250)*/
 
 static list words_numerical_dimension(dimension obj)
@@ -818,15 +821,15 @@ static list words_numerical_dimension(dimension obj)
 	  pc = CHAIN_SWORD(pc,":");
 	}
     }
-  else 
+  else
     {
-      pc = words_expression(low_exp);
+      pc = words_expression(low_exp,NIL);
       pc = CHAIN_SWORD(pc,":");
     }
   if (EvalNormalized(n_up,&up))
     pc = CHAIN_SWORD(pc,i2a(up));
   else
-    pc = gen_nconc(pc, words_expression(up_exp));
+    pc = gen_nconc(pc, words_expression(up_exp,NIL));
   return(pc);
 }
 
@@ -836,11 +839,11 @@ static list words_common_variable(entity e)
   pl = CHAIN_SWORD(pl, entity_local_name(e));
   if (type_variable_p(entity_type(e)))
     {
-      if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
+      if (variable_dimensions(type_variable(entity_type(e))) != NIL)
 	{
 	  list dims = variable_dimensions(type_variable(entity_type(e)));
 	  pl = CHAIN_SWORD(pl, "(");
-	  MAPL(pd, 
+	  MAPL(pd,
 	  {
 	    pl = gen_nconc(pl, words_numerical_dimension(DIMENSION(CAR(pd))));
 	    if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");

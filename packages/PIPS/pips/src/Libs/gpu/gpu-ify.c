@@ -2,9 +2,11 @@
 
    Ronan.Keryell@hpc-project.com
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 // To have asprintf:
-#define _GNU_SOURCE
 #include <stdio.h>
 
 #include "genC.h"
@@ -21,11 +23,12 @@
 #include "resources.h"
 #include "properties.h"
 #include "bootstrap.h"
+#include "preprocessor.h"
 
 /** Store the loop nests found that meet the spec to be executed on a
     GPU. Use a list and not a set or hash_map to have always the same
     order */
-list loop_nests_to_outline;
+static list loop_nests_to_outline;
 
 
 #if 0
@@ -82,6 +85,9 @@ mark_loop_to_outline(const statement s) {
    @param depth is the number of loop in the loop nest to be taken out as
    the GPU iterators
 
+   Several properties can be used to change the behviour of this function,
+   as explained in pipsmake-rc
+
    For example is depth = 2 and s is:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
@@ -122,20 +128,24 @@ gpu_ify_statement(statement s, int depth) {
   // Get the statement inside the loop-nest:
   statement inner = perfectly_nested_loop_to_body_at_depth(s, depth);
 
-  /* First outline the innermost code (the kernel itself) to avoid
-     spoiling its memory effects if we start with the outermost code
-     first. The kernel name with a prefix defined in the
-     GPU_KERNEL_PREFIX property: */
-  list sk = CONS(STATEMENT, inner, NIL);
-  outliner(build_new_top_level_module_name(get_string_property("GPU_KERNEL_PREFIX")),
-     sk);
-  //insert_comments_to_statement(inner, "// Call the compute kernel:");
+  /* If we want to oultine a kernel: */
+  if (get_bool_property("GPU_USE_KERNEL")) {
+    /* First outline the innermost code (the kernel itself) to avoid
+       spoiling its memory effects if we start with the outermost code
+       first. The kernel name with a prefix defined in the
+       GPU_KERNEL_PREFIX property: */
+    list sk = CONS(STATEMENT, inner, NIL);
+    outliner(build_new_top_level_module_name(get_string_property("GPU_KERNEL_PREFIX")),
+	     sk);
+    //insert_comments_to_statement(inner, "// Call the compute kernel:");
+  }
 
   /* Do we need to insert a wrapper phase to reconstruct iteration
      coordinates from hardware intrinsics? */
   if (get_bool_property("GPU_USE_WRAPPER")) {
     /* Add index initialization from GPU coordinates, in the reverse order
-       since we use insert_a_statement() */
+       since we use insert_comments_to_statement() to avoid furthering the
+       first statement from its original comment: */
     for(int i = depth - 1; i >= 0; i--) {
       entity index = perfectly_nested_loop_index_at_depth(s, i);
       // Get the iteration coordinate intrinsic, for example P4A_vp_1:
@@ -153,34 +163,45 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
      entity_to_expression(index)));
      So keep simple right now
       */
-      statement assign = make_assign_statement(entity_to_expression(index),
-					       entity_to_expression(index));
+
       /* Add a comment to know what to do later: */
       string comment;
       string intrinsic_name;
       asprintf(&intrinsic_name,
 	       get_string_property("GPU_COORDINATE_INTRINSICS_FORMAT"),
 	       i);
-      asprintf(&comment, "%s To be replaced with a call to %s",c_module_p(get_current_module_entity())?"//":"C", intrinsic_name);
-      free(intrinsic_name);
-      put_a_comment_on_a_statement(assign, comment);
+      /* Add a comment in the form of
 
-      insert_a_statement(inner, assign);
+	 To be replaced with a call to P4A_vp_1: j
+
+	 that may replaced by a post-processor later by
+
+	 j = P4A_vp_1();
+	 or whatever according to the target accelerator
+      */
+      asprintf(&comment, "%s To be assigned to a call to %s: %s\n",
+	       c_module_p(get_current_module_entity()) ? "//" : "C",
+	       intrinsic_name,
+	       entity_user_name(index));
+      free(intrinsic_name);
+      insert_comments_to_statement(inner, comment);
     }
 
     /* Then outline the innermost code again (the kernel wrapper) that owns
        the kernel call. The kernel wrapper name with a prefix defined in the
        GPU_WRAPPER_PREFIX property: */
-    sk = CONS(STATEMENT, inner, NIL);
+    list sk = CONS(STATEMENT, inner, NIL);
     outliner(build_new_top_level_module_name(get_string_property("GPU_WRAPPER_PREFIX")), sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel wrapper:");
   }
 
-  /* Outline the kernel launcher with a prefix defined in the
-     GPU_LAUNCHER_PREFIX property: */
-  list sl = CONS(STATEMENT, s, NIL);
-  outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX")), sl);
-  //insert_comments_to_statement(inner, "// Call the compute kernel launcher:");
+  if (get_bool_property("GPU_USE_LAUNCHER")) {
+    /* Outline the kernel launcher with a prefix defined in the
+       GPU_LAUNCHER_PREFIX property: */
+    list sl = CONS(STATEMENT, s, NIL);
+    outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX")), sl);
+    //insert_comments_to_statement(inner, "// Call the compute kernel launcher:");
+  }
 }
 
 
@@ -218,6 +239,5 @@ bool gpu_ify(const string module_name) {
 
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
-
-  return TRUE;
+  // The macro above does a "return TRUE" indeed.
 }

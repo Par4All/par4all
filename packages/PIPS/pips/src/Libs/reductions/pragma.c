@@ -21,6 +21,9 @@ static bool all_reduction = FALSE;
 ///@brief reset the all_reduction flag
 static void reset_all_reduction (void) {
   all_reduction = TRUE;
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 }
 
 ///@return TRUE if the statement is a reduction
@@ -211,7 +214,7 @@ static string reduction_as_str (reduction r)
                                                     OMP_PRAGMA_FOR_HEADER_C;
   str = concatenate (header, " ", REDUCTION_KEYWORD,
 		     "(", omp_operator_str (reduction_op(r)), ":",
-		     words_to_string(words_reference(reduction_reference(r))),
+		     words_to_string(words_reference(reduction_reference(r),NIL)),
 		     ")", NULL);
   pips_debug(5, "finish with string: %s\n", str);
   return strdup (str);

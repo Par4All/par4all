@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * Integer constants calculated by preconditions are replaced by their value.
  * Expressions are evaluated to (ICOEF*SUBEXPR + ISHIFT) in order to perform
@@ -1073,7 +1076,7 @@ eformat_t partial_eval_binary_operator_old(entity func,
   if (strcmp(entity_local_name(func), DIVIDE_OPERATOR_NAME) == 0) {
     token = PERFORM_DIVISION;
   }
-  if (strcmp(entity_local_name(func), "MOD") == 0) {
+  if (strcmp(entity_local_name(func), MODULO_OPERATOR_NAME) == 0) {
     token = PERFORM_MODULO;
   }
 
@@ -1264,10 +1267,10 @@ void regenerate_expression(eformat_t *efp, expression *ep)
   if(eformat_equivalent_p(*efp,eformat_undefined)) {
     /* nothing to do because expressions are the same */
   }
-  else if(!efp->simpler) {
+  else if(!get_bool_property("PARTIAL_EVAL_ALWAYS_SIMPLIFY") && !efp->simpler) {
     /* simply free efp->expr */
-    /* ?? ******commented out for debug******* */
-    /*free_expression(efp->expr);*/
+    /* ******commented out for debug******* */
+    //free_expression(efp->expr);
     efp->expr= expression_undefined; /* useless */
   }
   else {
@@ -1368,7 +1371,7 @@ void partial_eval_statement(statement stmt)
 					     stmt_prec(stmt),
 					     stmt_to_fx(stmt,fx_map));
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
@@ -1394,7 +1397,7 @@ void partial_eval_statement(statement stmt)
       rm_live_loop_index(loop_index(l));
 
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
@@ -1417,7 +1420,7 @@ void partial_eval_statement(statement stmt)
       //rm_live_loop_index(loop_index(l));
 
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert(__func__, statement_consistent_p(stmt));
       }
     } break;
@@ -1437,7 +1440,7 @@ void partial_eval_statement(statement stmt)
       */
 
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* -- defs_elim.c
  *
  * package atomizer :  Alexis Platonoff, aout 91
@@ -163,7 +166,7 @@ graph dg;
 	pips_error("defs_elim_of_assign_call", "Call must be an ASSIGN");
 
     pips_debug(5, "begin ASSIGN : %s\n",
-	       words_to_string(words_call(assign_call, 0, TRUE, TRUE)));
+	       words_to_string(words_call(assign_call, 0, TRUE, TRUE, NIL)));
 
     lhs_exp = EXPRESSION(CAR(call_arguments(assign_call)));
     if(syntax_tag(expression_syntax(lhs_exp)) != is_syntax_reference)

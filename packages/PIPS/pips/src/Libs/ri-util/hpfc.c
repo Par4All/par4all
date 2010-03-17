@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * functions to test hpfc-related special entities. needed by syntax.
  * moved here from hpfc to break a cyclic dependence hpfc -> syntax.

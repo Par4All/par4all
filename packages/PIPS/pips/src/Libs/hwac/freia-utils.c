@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -608,7 +611,8 @@ static void set_add_scalars(set s, statement stat, bool written)
 
   FOREACH(effect, e, effects_effects(efs))
   {
-    if ((written && effect_write_p(e)) || (!written && effect_read_p(e)))
+    if (!malloc_effect_p(e) &&
+        ((written && effect_write_p(e)) || (!written && effect_read_p(e))))
     {
       entity var = reference_variable(effect_any_reference(e));
       if (entity_variable_p(var) && entity_scalar_p(var) &&

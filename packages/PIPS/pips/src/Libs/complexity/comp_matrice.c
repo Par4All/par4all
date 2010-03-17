@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* comp_matrice.c
  *
  * matrice inversion for floating point. 20 Oct. 92 L. Zhou

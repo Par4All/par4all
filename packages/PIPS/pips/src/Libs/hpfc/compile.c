@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* HPFC by Fabien Coelho, May 1993 and later...
  */
 
@@ -631,7 +634,9 @@ static bool hpfc_decision(reference r, expression e)
 
 entity hpfc_new_variable(entity module, basic b)
 {
-    return make_new_scalar_variable(module, copy_basic(b));
+    entity new_ent =  make_new_scalar_variable(module, copy_basic(b));
+    AddEntityToCurrentModule(new_ent);
+    return new_ent;
 }
 
 

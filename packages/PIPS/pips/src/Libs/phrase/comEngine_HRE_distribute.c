@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
 This file contains the functions to generate the HRE code using several
 processes on the HRE
@@ -158,6 +161,7 @@ static void generate_scalar_variables_from_list(list lRef)
 	entity new_ent = make_new_scalar_variable_with_prefix(name,
 							      get_current_module_entity(),
 							      bas);
+    AddEntityToCurrentModule(new_ent);
 
 	//printf("%s\n", entity_user_name(new_ent));
 
@@ -205,6 +209,7 @@ static entity find_or_create_newInd(entity ind, bool bIsInd)
     make_new_scalar_variable_with_prefix(entity_local_name(ind),
 					 get_current_module_entity(),
 					 copy_basic(entity_basic(ind)));
+  AddEntityToCurrentModule(new_ent);
 
   statement loopStat = STATEMENT(CAR(glCurLoop));
 
@@ -749,6 +754,7 @@ static void create_loop_HRE_module()
       make_new_scalar_variable_with_prefix(entity_local_name(oldInd),
 					   get_current_module_entity(),
 					   copy_basic(entity_basic(oldInd)));
+      AddEntityToCurrentModule(newInd);
 
     statement readStat = generate_ind_fifo_stat2(oldInd, newInd, TRUE);
 

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* xPOMP --- Run time use to display arrays graphically in PIPS/HPFC.
 
    It is mainly the Nicolas Paris pompx code from the POMP/POMPC project.
@@ -37,7 +40,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <malloc.h>
+#include <stdlib.h>
 /* Some silly AIX stuff: */
 #if defined(_AIX)
 #define _NO_PROTO

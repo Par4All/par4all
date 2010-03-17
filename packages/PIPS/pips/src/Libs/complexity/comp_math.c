@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* comp_math.c
  *
  * "mathematical" operations on complexities
@@ -105,6 +108,7 @@ complexity clower, cupper;
 		(UNKNOWN_RANGE_NAME,
 		 get_current_module_entity(),
 		 MakeBasic(is_basic_int));
+        AddEntityToCurrentModule(ur);
 	    ppsum = make_polynome(1.0, (Variable) ur, VALUE_ONE);
 	    cresult = polynome_to_new_complexity(ppsum); /*stats*/
 	    complexity_mult(&cresult, comp);

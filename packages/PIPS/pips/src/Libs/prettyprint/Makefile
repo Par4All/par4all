@@ -26,6 +26,7 @@ LIB_CFILES = \
 	print_code_as_a_graph.c \
 	cprettyprinter.c \
 	xml_prettyprinter.c \
+	html_prettyprinter.c \
 	claire_prettyprinter.c \
 	symbol_table.c
 

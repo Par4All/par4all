@@ -1881,9 +1881,9 @@ but other options are described in the manual, especially in the section
 \verb|~/.valgrindrc| or the \verb|VALGRIND_OPTS| environment variable.
 For a power user, some interesting options to begin with:
 \begin{verbatim}
---malloc-fill=a55a --free-fill=e11e --freelist-vol=1000000000
+--malloc-fill=a5 --free-fill=e1 --freelist-vol=1000000000
          --track-origins=yes --leak-resolution=high
-         --num-callers=100 --leak-check=full
+         --num-callers=50 --leak-check=full
 \end{verbatim}
 
 Electric fence (\texttt{libefence}) also proves to be usefull when you

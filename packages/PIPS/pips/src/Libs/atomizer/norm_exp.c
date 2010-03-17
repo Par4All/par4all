@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* -- norm_exp.c
  *
  * package atomizer :  Alexis Platonoff, aout 91
@@ -78,8 +81,8 @@ if(syntax_tag(sy) == is_syntax_call)
     expression_normalized(exp) = NORMALIZE_EXPRESSION(exp);
     if(normalized_tag(expression_normalized(exp)) == is_normalized_linear)
       {
-      debug(5, "normal_expression_of_expression", "Expression Linear : %s\n",
-	       words_to_string(words_expression(exp)));
+      pips_debug(5, "Expression Linear : %s\n",
+	    words_to_string(words_expression(exp, NIL)));
 
       reconfig_expression(exp);
       }
@@ -87,11 +90,11 @@ if(syntax_tag(sy) == is_syntax_call)
       {
       list args = call_arguments(c);
 
-      debug(5, "normal_expression_of_expression", "Expression Complex : %s\n",
-	       words_to_string(words_expression(exp)));
+      pips_debug(5, "Expression Complex : %s\n",
+		 words_to_string(words_expression(exp, NIL)));
 
       for(; args != NIL; args = CDR(args))
-        normal_expression_of_expression(EXPRESSION(CAR(args)));
+	normal_expression_of_expression(EXPRESSION(CAR(args)));
       }
     expression_normalized(exp) = normalized_undefined;
     }
@@ -105,8 +108,8 @@ else if(syntax_tag(sy) == is_syntax_reference)
   }
 else if(syntax_tag(sy) == is_syntax_range)
   {
-   debug(6, "normal_expression_of_expression", "Expression Range : %s\n",
-	 words_to_string(words_expression(exp)));
+   pips_debug(6, "Expression Range : %s\n",
+	      words_to_string(words_expression(exp, NIL)));
   }
 else
   pips_error("normal_expression_of_expression", "Bad expression tag");

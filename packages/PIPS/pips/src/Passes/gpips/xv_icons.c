@@ -21,8 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>

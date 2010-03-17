@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -149,6 +152,7 @@ process_true_call_stat(expression cond, statement stat)
                 entity newVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
                         get_current_module_entity(),
                         newBas);
+                AddEntityToCurrentModule(newVar);
 
                 syntax_reference(expression_syntax(binary_call_lhs(c))) = make_reference(newVar, NIL);
                 ref=reference_to_expression(make_reference(newVar,NIL));
@@ -198,7 +202,8 @@ static void process_true_stat(statement parent, expression cond, statement stat)
     // It must have been verified in the if_conversion_init phase
     pips_assert("stat is a call or a sequence statement", 
             (instruction_call_p(statement_instruction(stat)) ||
-             instruction_sequence_p(statement_instruction(stat))));
+             instruction_sequence_p(statement_instruction(stat)) ||
+             statement_loop_p(stat)));
 
     // If stat is a call statement, ...
     if(instruction_call_p(statement_instruction(stat)))
@@ -212,18 +217,27 @@ static void process_true_stat(statement parent, expression cond, statement stat)
         }
 
     }
+    // recurse for for loops
+    else if( statement_loop_p(stat))
+        process_true_stat(stat,cond,loop_body(statement_loop(stat)));
+
     // If stat is a sequence statement, ...
-    else if(instruction_sequence_p(statement_instruction(stat)))
+    else if(statement_block_p(stat))
     {
         // first split initalizations
         statement_split_initializations(stat);
 
         // then do the processing
         bool something_bad_p=false;
-        FOREACH(STATEMENT,st,statement_block(stat))
+        if(statement_block_p(stat))
         {
-            something_bad_p|=!process_true_call_stat(cond, st);
+            FOREACH(STATEMENT,st,statement_block(stat))
+            {
+                something_bad_p|=!process_true_call_stat(cond, st);
+            }
         }
+        else
+            something_bad_p|=!process_true_call_stat(cond, stat);
         if(!something_bad_p)
         {
             statement_instruction(parent)=instruction_undefined;

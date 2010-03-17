@@ -21,3 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include "points_to_private.h"
+#define SEQUENTIAL_POINTS_TO_SETS_SUFFIX ".pt"
+#define USER_POINTS_TO_SETS_SUFFIX ".upt"

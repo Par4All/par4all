@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* 
  * scan the Abstract Syntax Tree of a program to count operations
  */
@@ -504,28 +507,26 @@ list effects_list;
 				    precond, effects_list, 
 				    KEEP_SYMBOLS, MINIMUM_VALUE);
     if ( complexity_unknown_p(clower) ) {
-	/*
-	clower = make_single_var_complexity(1.0,
-                 (Variable)FindOrCreateEntity(mod_name, sl));
-		 */
-	clower = make_single_var_complexity(1.0,
-                 (Variable)make_new_scalar_variable_with_prefix(sl,
-								get_current_module_entity(),
-								MakeBasic(is_basic_int)));
+        /*
+           clower = make_single_var_complexity(1.0,
+           (Variable)FindOrCreateEntity(mod_name, sl));
+           */
+        Variable var = (Variable)make_new_scalar_variable_with_prefix(sl, get_current_module_entity(),MakeBasic(is_basic_int));
+        AddEntityToCurrentModule((entity)var);
+        clower = make_single_var_complexity(1.0,var);
     }
 
     cupper = expression_to_polynome(range_upper(rng),
 				    precond, effects_list, 
 				    KEEP_SYMBOLS, MAXIMUM_VALUE);
     if ( complexity_unknown_p(cupper) ) {
-	/*
-	cupper = make_single_var_complexity(1.0,
-                 (Variable)FindOrCreateEntity(mod_name, su));
-		 */
-	cupper = make_single_var_complexity(1.0,
-                 (Variable)make_new_scalar_variable_with_prefix(su,
-								get_current_module_entity(),
-								MakeBasic(is_basic_int)));
+        /*
+           cupper = make_single_var_complexity(1.0,
+           (Variable)FindOrCreateEntity(mod_name, su));
+           */
+        Variable var = (Variable)make_new_scalar_variable_with_prefix(su, get_current_module_entity(),MakeBasic(is_basic_int));
+        AddEntityToCurrentModule((entity)var);
+        cupper = make_single_var_complexity(1.0,var);
     }
 
     cincr  = expression_to_polynome(range_increment(rng),
@@ -586,16 +587,15 @@ list effects_list;
     */
 
     if(!complexity_constant_p(cincr)) {
-	if(complexity_is_monomial_p(cincr) && complexity_degree(cincr)==1) {
-	    complexity_div(&comp, cincr);
-	}
-	else {
-	    free_complexity(cincr);
-	    cincr = make_single_var_complexity(1.0,
-					       (Variable)make_new_scalar_variable_with_prefix(si,
-								get_current_module_entity(),
-								MakeBasic(is_basic_int)));
-	}
+        if(complexity_is_monomial_p(cincr) && complexity_degree(cincr)==1) {
+            complexity_div(&comp, cincr);
+        }
+        else {
+            free_complexity(cincr);
+            Variable var = (Variable)make_new_scalar_variable_with_prefix(si, get_current_module_entity(),MakeBasic(is_basic_int));
+            AddEntityToCurrentModule((entity)var);
+            cincr = make_single_var_complexity(1.0,var);
+        }
     }
 
     if ( complexity_constant_p(comp) && complexity_TCST(comp) < 0 )

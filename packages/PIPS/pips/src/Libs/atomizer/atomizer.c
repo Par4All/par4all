@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* -- atomizer.c
  *
  * package atomizer :  Alexis Platonoff, juin 91
@@ -153,7 +156,7 @@ static boolean  indirection_test(reference ref, expression expr)
 void normalize_wp65_code(statement stat)
 {
     normalize_all_expressions_of(stat);
-    atomize_as_required(stat, 
+    atomize_as_required(stat,
 			indirection_test,    /* reference test */
 			gen_false,           /* function call test */
 			gen_false,           /* test condition test */
@@ -168,23 +171,23 @@ static void rm_db_block(statement stat)
     if ( instruction_block_p(inst1)) {
 	list lt =  instruction_block(inst1);
 	list newl = NIL;
-	MAPL (lt2, { 
+	MAPL (lt2, {
 	    if (instruction_block_p(statement_instruction(STATEMENT(CAR(lt2)))))
 	    {
 		MAPL(lt3, {
 		    newl=gen_nconc(newl,CONS(STATEMENT,STATEMENT(CAR(lt3)),NIL));
-		}, 
+		},
 		     instruction_block(statement_instruction(STATEMENT(CAR(lt2)))));
 	    }
 	    else newl = gen_nconc(newl,CONS(STATEMENT,STATEMENT(CAR(lt2)),NIL));
 	},
 	      lt);
-	instruction_block(inst1) = newl; 
-	ifdebug(8) {  
+	instruction_block(inst1) = newl;
+	ifdebug(8) {
 	    entity module =get_current_module_entity();
 	    fprintf(stderr,"statement without db blocks \n");
 	    print_text(stderr,
-		       text_statement(module,0,stat));
+		       text_statement(module,0,stat,NIL));
 	}
     }
 }
@@ -197,7 +200,7 @@ static statement rm_block_block_statement(statement stat)
 }
 
 
- 
+
 /*============================================================================*/
 /* void atomizer(char *module_name): computes the translation of Fortran
  * instructions into Three Adresses Code instructions.
@@ -672,7 +675,7 @@ Block *cb;
     case is_value_symbolic: break;
     case is_value_constant: break;
     case is_value_unknown:
-	    pips_error("atomizer_of_call", "unknown function %s\n", n); 
+	    pips_error("atomizer_of_call", "unknown function %s\n", n);
 	    break;
     default: pips_error("atomizer_of_call", "unknown tag %d\n", t);
     }
@@ -701,8 +704,8 @@ Block *cb;
 	rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
 
 	debug(4, "atomizer_of_intrinsic", "ASSIGN CALL: %s = %s\n",
-	      words_to_string(words_expression(lhs)),
-	      words_to_string(words_expression(rhs)));
+	      words_to_string(words_expression(lhs, NIL)),
+	      words_to_string(words_expression(rhs, NIL)));
 
 	/* If the rhs expression is integer linear and exclusively composed of NLC
 	 * variables, it is considered like a constant, ie not translated.
@@ -847,7 +850,7 @@ int mem_var;
     bool IS_NLC_LINEAR = FALSE;
 
     debug(5, "atomizer_of_expression", "begin : %s\n",
-	  words_to_string(words_expression(exp)));
+	  words_to_string(words_expression(exp, NIL)));
 
     /* An expression that is integer linear and is exclusively composed of NLCs
      * is considered like a constant, ie not translated.
@@ -906,7 +909,7 @@ int mem_var;
     default : pips_error("atomizer_of_expression", "Bad syntax tag");
     }
     debug(5, "atomizer_of_expression", "end   : %s\n",
-	  words_to_string(words_expression(ret_exp)));
+	  words_to_string(words_expression(ret_exp, NIL)));
 
     return(ret_exp);
 }
@@ -928,11 +931,11 @@ Block *cb;
     list inds = reference_indices(array_ref);
 
     debug(6, "atomizer_of_array_indices", "begin : %s\n",
-	  words_to_string(words_expression(exp)));
+	  words_to_string(words_expression(exp, NIL)));
 
     /* We translate all the indices expressions. */
     reference_indices(array_ref) = atomizer_of_expressions(inds, cb);
 
     debug(6, "atomizer_of_array_indices", "end : %s\n",
-	  words_to_string(words_expression(exp)));
+	  words_to_string(words_expression(exp, NIL)));
 }

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* package semantics
  */
 
@@ -72,7 +75,7 @@
  * These steps cannot be performed in the caller because the callee's
  * value mappings are unknown.
  *
- * Memory management: 
+ * Memory management:
  *  - transformers stored by add_module_call_site_precondition()
  * are copies or modified copies of the precondition argument ;
  *  - transformers returned as module preconditions are not duplicated;
@@ -125,7 +128,7 @@ transformer p;
   list ef = load_summary_effects(m);
 
   pips_assert("add_module_call_site_precondition",entity_module_p(m));
-  pips_assert("add_module_call_site_precondition", 
+  pips_assert("add_module_call_site_precondition",
 	      p != transformer_undefined);
 
   ifdebug(8) {
@@ -155,29 +158,32 @@ transformer p;
       dump_transformer(mp);
     }
     else
-      pips_debug(8, "old module precondition undefined\n"); 
+      pips_debug(8, "old module precondition undefined\n");
   }
 
   translate_global_values(get_current_module_entity(), p);
 
   pips_debug(8, "new module precondition in current frame:\n");
   ifdebug(8) dump_transformer(p);
-    
+
   if (!transformer_undefined_p(mp)) {
 
-    /* convert global variables in the summary precondition in the local frame
-     * as defined by value mappings (FI, 1 February 1994) */
+    /* convert global variables in the summary precondition in the
+     * local frame as defined by value mappings (FI, 1 February
+     * 1994) */
 
-    /* p is returned in the callee's frame; there is no need for a translation;
-     * the caller's frame should always contain the callee's frame by definition
-     * of effects;unfortunately, I do not remember *why* I added this translation;
-     * it was linked to a problem encountered with transformer and "invisible"
-     * variables, i.e. global variables which are indirectly changed by a procedure
-     * which does not see them; such variables receive an arbitrary existing 
-     * global name; they may receive different names in different context, because
-     * there is no canonical name; each time, summary_precondition and summary_transformer
-     * are used, they must be converted in a unique frame, which can only be the
-     * frame of the current module.
+    /* p is returned in the callee's frame; there is no need for a
+     * translation; the caller's frame should always contain the
+     * callee's frame by definition of effects;unfortunately, I do not
+     * remember *why* I added this translation; it was linked to a
+     * problem encountered with transformer and "invisible" variables,
+     * i.e. global variables which are indirectly changed by a
+     * procedure which does not see them; such variables receive an
+     * arbitrary existing global name; they may receive different
+     * names in different context, because there is no canonical name;
+     * each time, summary_precondition and summary_transformer are
+     * used, they must be converted in a unique frame, which can only
+     * be the frame of the current module.
      *
      * FI, 9 February 1994
      */
@@ -194,9 +200,9 @@ transformer p;
       transformer_free(p);
       new_mp = mp;
     }
-    else	    
+    else
       new_mp = transformer_convex_hull(mp, p);
-	
+
   }
   else {
     /* the former precondition is undefined. The new precondition
@@ -205,12 +211,12 @@ transformer p;
      */
     new_mp = p;
   }
-	
+
   pips_debug(8, "new module precondition in current frame:\n");
   ifdebug(8) dump_transformer(new_mp);
 
-  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
-			 strdup(module_local_name(m)), 
+  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION,
+			 strdup(module_local_name(m)),
 			 (char*) new_mp );
 
   pips_debug(8, "end\n");
@@ -242,17 +248,17 @@ list module_to_formal_analyzable_parameters(entity f)
   return formals;
 }
 
-boolean 
+boolean
 same_analyzable_type_scalar_entity_list_p(list l)
 {
   boolean result = TRUE;
 
-  if (!ENDP(l)) { 
+  if (!ENDP(l)) {
     entity e1 = ENTITY(CAR(l));
     type t1 = entity_type(e1);
     result = analyzable_scalar_entity_p(e1);
 
-    MAP(ENTITY,el, { 
+    MAP(ENTITY,el, {
       if (result) {
 	type t = entity_type(el);
 	result = result && analyzable_scalar_entity_p(el)
@@ -261,14 +267,14 @@ same_analyzable_type_scalar_entity_list_p(list l)
     },
 	CDR(l));
   }
-  return result; 
+  return result;
 }
 
 /* add_formal_to_actual_bindings(call c, transformer pre, entity caller):
  *
  * pre := pre  U  {f  = expr }
  *                  i       i
- * for all i such that formal f_i is an analyzable scalar variable and 
+ * for all i such that formal f_i is an analyzable scalar variable and
  * as far as expression expr_i is analyzable and of the same type
  */
 transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller)
@@ -282,9 +288,9 @@ transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller
 	     module_local_name(f), module_local_name(caller), pre);
   ifdebug(6) dump_transformer(pre);
 
-  pips_assert("f is a module", 
+  pips_assert("f is a module",
 	      entity_module_p(f));
-  pips_assert("The precondition pre is defined", 
+  pips_assert("The precondition pre is defined",
 	      pre != transformer_undefined);
 
   /* let's start a long, long, long MAPL, so long that MAPL is a pain */
@@ -356,7 +362,7 @@ transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller
  *
  * pre := (t(expr )...(t_expr ))(pre)  U  {f  = expr }
  *               n           1              i       i
- * for all i such that formal f_i is an analyzable scalar variable and 
+ * for all i such that formal f_i is an analyzable scalar variable and
  * as far as expression expr_i is analyzable and of the same type.
  *
  * The algorithmic structure has to be different from the previous one.
@@ -394,12 +400,12 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
   Pbase b;
   cons * ca;
 
-  ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+  ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER)
     {
       pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
-	    "begin for call to %s\nwith precondition:\n", 
+	    "begin for call to %s\nwith precondition:\n",
 	    module_local_name(callee));
-      /* precondition cannot be printed because equations linking formal 
+      /* precondition cannot be printed because equations linking formal
        * parameters have been added to the real precondition
        */
       dump_transformer(pre);
@@ -408,13 +414,13 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
   r = (Psysteme) predicate_system(transformer_relation(pre));
 
   /* make sure you do not export a (potentially) meaningless old value */
-  for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) 
+  for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) )
     {
       entity e = ENTITY(CAR(ca));
       entity e_old;
 
       /* Thru DATA statements, old values of other modules may appear */
-      if(!same_string_p(entity_module_name(e), 
+      if(!same_string_p(entity_module_name(e),
 			module_local_name(get_current_module_entity()))) {
 	pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 	      "entitiy %s not belonging to module %s\n",
@@ -423,13 +429,13 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
       }
 
       e_old  = entity_to_old_value(e);
-	
+
       if(base_contains_variable_p(sc_base(r), (Variable) e_old))
 	lost_values = arguments_add_entity(lost_values,
 					   e_old);
     }
 
-  ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+  ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER)
     {
       pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 	    "meaningless old value(s):\n");
@@ -442,7 +448,7 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
 
   gen_free_list(lost_values);
 
-    
+
   translate_global_values(callee, pre);
 
   /* get rid of pre's variables that do not appear in effects le */
@@ -453,11 +459,11 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
   for(b = r->base; b != NULL; b = b->succ) {
     entity v = (entity) vecteur_var(b);
 
-    if(!entity_constant_p(v)) 
+    if(!entity_constant_p(v))
       values = arguments_add_entity(values, v);
   }
 
-  /* build a list of arguments to suppress; 
+  /* build a list of arguments to suppress;
      get rid of variables that are not referenced, directly or indirectly,
      by the callee; translate what you can */
   pips_debug(9, "Module effect list:");
@@ -469,7 +475,7 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
     /* For clarity, all cases are presented */
     if (ENDP(l_callee)) {   /* no conflicts */
       lost_values = arguments_add_entity(lost_values, e);
-      pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+      pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 	    "value %s lost according to effect list\n",
 	    entity_name(e));
     }
@@ -482,11 +488,11 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
 	if (analyzable_scalar_entity_p(e_callee)) {
 	  if(e_callee != e) {
 	    if(type_equal_p(entity_type(e_callee), entity_type(e))) {
-	      pre = transformer_value_substitute(pre, 
+	      pre = transformer_value_substitute(pre,
 						 e, e_callee);
 	      ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
-		pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-		      "value %s substituted by %s according to effect list le:\n", 
+		pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
+		      "value %s substituted by %s according to effect list le:\n",
 		      entity_name(e), entity_name(e_callee));
 		dump_arguments(lost_values);
 	      }
@@ -494,46 +500,46 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
 	    else {
 	      /* Type mismatch */
 	      lost_values = arguments_add_entity(lost_values, e);
-	      pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+	      pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 		    "value %s lost because non analyzable scalar entity\n",
 		    entity_name(e));
 	    }
 	  }
 	}
 	/* case 1.22: one conflicting non analyzable scalar entity*/
-	else { 
+	else {
 	  lost_values = arguments_add_entity(lost_values, e);
-	  pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+	  pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 		"value %s lost because non analyzable scalar entity\n",
 		entity_name(e));
 	}
-      }   
+      }
       else  { /* case 2: at least 2 conflicting entities */
 	if (same_analyzable_type_scalar_entity_list_p(l_callee)) {
-	  /* case 2.1: all entities have the same type, 
-	     according to mapping_values the subtitution 
+	  /* case 2.1: all entities have the same type,
+	     according to mapping_values the subtitution
 	     is made with the first list element e_callee*/
 	  if(e_callee != e) {
-	    pre = transformer_value_substitute(pre, 
+	    pre = transformer_value_substitute(pre,
 					       e, e_callee);
 	    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
-	      pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-		    "value %s substituted by %s the first element list according to effect list le:\n", 
+	      pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
+		    "value %s substituted by %s the first element list according to effect list le:\n",
 		    entity_name(e), entity_name(e_callee));
 	      dump_arguments(lost_values);
 	    }
 	  }
 	}
-		
-	else { /* case 2.2:all entities do not have the same type*/ 
+
+	else { /* case 2.2:all entities do not have the same type*/
 	  lost_values = arguments_add_entity(lost_values, e);
-	  pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+	  pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 		"value %s lost - list of conflicting entities with different types\n",
 		entity_name(e));
 	}
       }
     }
-	
+
   }
 
   preserved_values = arguments_difference(values, lost_values);
@@ -572,7 +578,7 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
     pre = transformer_projection_with_redundancy_elimination
       (pre, lost_values, /* sc_elim_redund */ /* no_elim */ sc_safe_normalize);
   }
-    
+
   /* free the temporary list of entities */
   gen_free_list(preserved_values);
   gen_free_list(lost_values);
@@ -593,9 +599,7 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
   return pre;
 }
 
-void translate_global_values(m, tf)
-entity m;
-transformer tf;
+void translate_global_values(entity m, transformer tf)
 {
     Psysteme s = (Psysteme) predicate_system(transformer_relation(tf));
     /* a copy of sc_base(s) is needed because translate_global_value()
@@ -687,15 +691,15 @@ entity v;
 
   if(!storage_ram_p(store)) {
     if(storage_rom_p(store)) {
-      pips_debug(7, "%s is not translatable: store tag %td\n",
+      pips_debug(7, "%s is not translatable: store tag %d\n",
 		 entity_name(v), storage_tag(store));
-      /* Should it be projected? No, this should occur later for xxxx#init
-       * variables when the xxxx is translated. Or before if xxxx has been
-       * translated 
+      /* Should it be projected? No, this should occur later for
+       * xxxx#init variables when the xxxx is translated. Or before if
+       * xxxx has been translated
        */
       return;
     }
-    else 
+    else
       if(storage_formal_p(store)) {
 	pips_debug(7, "formal %s is not translatable\n",
 		   entity_name(v));
@@ -799,7 +803,7 @@ entity v;
       return;
      }
 
-    sc = (Psysteme) 
+    sc = (Psysteme)
       predicate_system(transformer_relation(tf));
     b = sc_base(sc);
     if(base_contains_variable_p(b, (Variable) e)) {
@@ -846,7 +850,7 @@ entity v;
       }
 
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
-	transformer_arguments(tf) = 
+	transformer_arguments(tf) =
 	  arguments_add_entity(transformer_arguments(tf), e);
       }
 
@@ -883,7 +887,7 @@ entity v;
 	   by v_init existence must have been passed
 	   upwards and must have led to the creation
 	   of e_init */
-	/* this should not happen when a caller 
+	/* this should not happen when a caller
 	   precondition at a call site is transformed
 	   into a piece of a summary precondition for
 	   the callee because v_init becomes meaningless;
@@ -891,7 +895,7 @@ entity v;
 	   e == e_init; v_init should have been projected
 	   before
 	*/
-	Psysteme r = 
+	Psysteme r =
 	  (Psysteme) predicate_system(transformer_relation(tf));
 
 	if(base_contains_variable_p(sc_base(r), (Variable) v_init))
@@ -930,59 +934,6 @@ entity v;
   else {
     /* this value does not need to be translated */
   }
-}
-
-/* FI: to be transferred into ri-util (should be used for effect translation
-   as well) */
-bool same_scalar_location_p(e1, e2)
-entity e1;
-entity e2;
-{
-  storage st1 = entity_storage(e1);
-  storage st2 = entity_storage(e2);
-  entity s1 = entity_undefined;
-  entity s2 = entity_undefined;
-  ram r1 = ram_undefined;
-  ram r2 = ram_undefined;
-  bool same = FALSE;
-
-  /* e1 or e2 may be a formal parameter as shown by the benchmark m from CEA
-   * and the call to SOURCE by the MAIN, parameter NPBF (FI, 13/1/93)
-   *
-   * I do not understand why I should return FALSE since they actually have
-   * the same location for this call site. However, there is no need for
-   * a translate_global_value() since the usual formal/actual binding
-   * must be enough.
-   */
-  /*
-   * pips_assert("same_scalar_location_p", storage_ram_p(st1) && storage_ram_p(st2));
-   */
-  if(!(storage_ram_p(st1) && storage_ram_p(st2)))
-    return FALSE;
-
-  r1 = storage_ram(entity_storage(e1));
-  s1 = ram_section(r1);
-  r2 = storage_ram(entity_storage(e2));
-  s2 = ram_section(r2);
-
-  if(s1 == s2) {
-    if(ram_offset(r1) == ram_offset(r2))
-      same = TRUE;
-    else {
-      pips_debug(7,
-		 "Different offsets %td for %s in section %s and %td for %s in section %s\n",
-		 ram_offset(r1), entity_name(e1), entity_name(s1),
-		 ram_offset(r2), entity_name(e2), entity_name(s2));
-    }
-  }
-  else {
-    pips_debug(7,
-	       "Disjoint entitites %s in section %s and %s in section %s\n",
-	       entity_name(e1), entity_name(s1),
-	       entity_name(e2), entity_name(s2));
-  }
-
-  return same;
 }
 
 void expressions_to_summary_precondition(pre, le)
@@ -1024,7 +975,7 @@ call c;
   case is_value_intrinsic:
     pips_debug(5, "intrinsic function %s\n",
 	       entity_name(e));
-    /* propagate precondition pre as summary precondition 
+    /* propagate precondition pre as summary precondition
        of user functions */
     expressions_to_summary_precondition(pre, args);
     break;
@@ -1033,23 +984,23 @@ call c;
     pips_debug(5, "external function %s\n",
 	       entity_name(e));
     pre_callee = transformer_dup(pre);
-    pre_callee = 
+    pre_callee =
       add_formal_to_actual_bindings(c, pre_callee, get_current_module_entity());
     add_module_call_site_precondition(e, pre_callee);
-    /* propagate precondition pre as summary precondition 
+    /* propagate precondition pre as summary precondition
        of user functions */
     expressions_to_summary_precondition(pre, args);
     break;
 
   case is_value_symbolic:
-    /* user_warning("call_to_summary_precondition", 
+    /* user_warning("call_to_summary_precondition",
        "call to symbolic %s\n",
        entity_name(e)); */
     break;
 
   case is_value_constant:
     break;
-    user_warning("call_to_summary_precondition", 
+    user_warning("call_to_summary_precondition",
 		 "call to constant %s\n",
 		 entity_name(e));
 
@@ -1066,13 +1017,13 @@ call c;
 
 }
 
-/* This function does everything needed. 
+/* This function does everything needed.
  * Called by ICFG with many different contexts.
  */
 text
 call_site_to_module_precondition_text(
-    entity caller, 
-    entity callee, 
+    entity caller,
+    entity callee,
     statement s,
     call c)
 {
@@ -1083,7 +1034,7 @@ call_site_to_module_precondition_text(
   transformer caller_prec = transformer_undefined;
   /* callee preconditions */
   transformer call_site_prec = transformer_undefined;
-	    
+
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource
 			   (DBR_CUMULATED_EFFECTS,
@@ -1121,7 +1072,7 @@ call_site_to_module_precondition_text(
   set_current_module_entity(callee);
   /* Set the htable with its variables because now we work
      in this frame */
-  module_to_value_mappings(callee);  
+  module_to_value_mappings(callee);
 
   result = text_for_a_transformer(call_site_prec, FALSE);
 
@@ -1154,7 +1105,8 @@ int get_call_site_number()
     return number_of_call_sites;
 }
 
-static bool memorize_precondition(statement s)
+/* Each time a statement is entered, its precondition is memorized*/
+static bool memorize_precondition_for_summary_precondition(statement s)
 {
   bool go_down = FALSE;
 
@@ -1179,11 +1131,18 @@ static bool memorize_precondition(statement s)
     go_down = FALSE;
   }
 
+  if(go_down && declaration_statement_p(s)) {
+    list dl = statement_declarations(s);
+    void update_summary_precondition_in_declaration(expression e, transformer pre);
+    current_precondition =
+      propagate_preconditions_in_declarations(dl, current_precondition, update_summary_precondition_in_declaration);
+  }
+
   return go_down;
 }
 
 /* Update the current_summary_precondition, if necessary */
-static bool process_call(call c)
+static bool process_call_for_summary_precondition(call c)
 {
 #define PROCESS_CALL_DEBUG_LEVEL 5
 
@@ -1232,11 +1191,11 @@ static bool process_call(call c)
 
   /* transform the preconditions to make sense for the callee */
   /* Beware: call_site_prec and caller_prec are synonymous */
-  call_site_prec = 
+  call_site_prec =
     precondition_intra_to_inter(current_callee,
 				caller_prec,
 				summary_effects_of_callee);
-    
+
   ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
     pips_debug(PROCESS_CALL_DEBUG_LEVEL,
 	       "call site precondition with filtered actual parameters:\n");
@@ -1246,11 +1205,11 @@ static bool process_call(call c)
   translate_global_values(current_caller, call_site_prec);
 
   ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
-    debug(PROCESS_CALL_DEBUG_LEVEL,"process_call",
+    pips_debug(PROCESS_CALL_DEBUG_LEVEL,
 	  "new call site precondition in caller's frame:\n");
     dump_transformer(call_site_prec);
   }
-    
+
   /* Provoque initialization with an undefined transformer... */
   /*pips_assert("process_call", !transformer_undefined_p(call_site_prec)); */
 
@@ -1260,27 +1219,27 @@ static bool process_call(call c)
      * caller's frame as defined by value mappings (FI, 1 February 1994)
      */
 
-    /* p is returned in the callee's frame; there is no need for 
-     * a translation; the caller's frame should always contain 
-     * the callee's frame by definition of effects;
+    /* p is returned in the callee's frame; there is no need for a
+     * translation; the caller's frame should always contain the
+     * callee's frame by definition of effects;
      *
-     * Unfortunately, I do not remember *why* I added this translation;
-     * It was linked to a problem encountered with transformer
-     * and "invisible" variables, i.e. global variables which
-     * are indirectly changed by a procedure which does not see them;
-     * such variables receive an arbitrary existing 
-     * global name; they may receive different names in different context,
-     * because there is no canonical name; each time, summary_precondition
-     * and summary_transformer are used, they must be converted in a 
-     * unique frame, which can only be the frame of the current module.
-     * In other words, you have to be in the same environment to
-     * be allowed to combine preconditions.
+     * Unfortunately, I do not remember *why* I added this
+     * translation; It was linked to a problem encountered with
+     * transformer and "invisible" variables, i.e. global variables
+     * which are indirectly changed by a procedure which does not see
+     * them; such variables receive an arbitrary existing global name;
+     * they may receive different names in different context, because
+     * there is no canonical name; each time, summary_precondition and
+     * summary_transformer are used, they must be converted in a
+     * unique frame, which can only be the frame of the current
+     * module.  In other words, you have to be in the same environment
+     * to be allowed to combine preconditions.
      *
      * FI, 9 February 1994
      *
      * This may be now useless...
      */
-    translate_global_values(current_caller, 
+    translate_global_values(current_caller,
 			    current_summary_precondition);
     ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
       pips_debug(PROCESS_CALL_DEBUG_LEVEL,
@@ -1288,7 +1247,6 @@ static bool process_call(call c)
 	    current_summary_precondition);
       dump_transformer(current_summary_precondition);
     }
-	
 
     if(transformer_identity_p(current_summary_precondition)) {
       /* the former precondition represents the entire space :
@@ -1297,17 +1255,17 @@ static bool process_call(call c)
        */
       transformer_free(call_site_prec);
     }
-    else { 
-      transformer new_current_summary_precondition = 
+    else {
+      transformer new_current_summary_precondition =
 	transformer_undefined;
-      pips_assert("process_call", 
+      pips_assert("A new transformer is allocated",
 		  current_summary_precondition != call_site_prec);
-      new_current_summary_precondition = 
+      new_current_summary_precondition =
 	transformer_convex_hull(current_summary_precondition,
 				call_site_prec);
       transformer_free(current_summary_precondition);
       current_summary_precondition = new_current_summary_precondition;
-	
+
     }
   }
   else {
@@ -1317,7 +1275,7 @@ static bool process_call(call c)
      */
     current_summary_precondition = call_site_prec;
   }
-	
+
   ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
     pips_debug(PROCESS_CALL_DEBUG_LEVEL,
 	  "new current summary precondition for module %s in current frame, %p:\n",
@@ -1333,14 +1291,31 @@ static bool process_call(call c)
    * have to be translated in callee's frame when used.
    */
   /*
-    translate_global_values(current_callee, 
+    translate_global_values(current_callee,
     current_summary_precondition);
   */
 
   return TRUE;
 }
 
-transformer update_precondition_with_call_site_preconditions(transformer t, 
+/* This function is called to deal with call sites located in
+   initialization expressions carried by declarations. */
+void update_summary_precondition_in_declaration(expression e,
+						       transformer pre)
+{
+  current_precondition = pre;
+  gen_recurse(e,
+	      call_domain,
+	      (bool (*)(void *)) process_call_for_summary_precondition,
+	      gen_null);
+}
+
+/* Update precondition t for callee with preconditions of call sites
+   to callee in caller. Call sites are found in the statement of
+   caller, but also in its declarations. Return the updated
+   precondition t.
+*/
+transformer update_precondition_with_call_site_preconditions(transformer t,
 							     entity caller,
 							     entity callee)
 {
@@ -1363,7 +1338,7 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   current_summary_precondition = t;
   current_caller = caller;
   current_callee = callee;
-	    
+
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource
 			   (DBR_CUMULATED_EFFECTS,
@@ -1378,8 +1353,8 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   module_to_value_mappings(caller);
 
   gen_multi_recurse(caller_statement,
-		    statement_domain, memorize_precondition, gen_null,
-		    call_domain, process_call, gen_null,
+		    statement_domain, memorize_precondition_for_summary_precondition, gen_null,
+		    call_domain, process_call_for_summary_precondition, gen_null,
 		    NULL);
 
   free_value_mappings();

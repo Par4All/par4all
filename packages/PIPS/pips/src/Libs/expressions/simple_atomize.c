@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -184,14 +187,33 @@ statement atomize_this_expression(entity (*create)(entity, basic),
     if(!basic_undefined_p(bofe)) {
         if (!basic_overloaded_p(bofe))
         {
-            entity newvar = (*create)(get_current_module_entity(), bofe);
-            expression rhs = make_expression(expression_syntax(e), normalized_undefined);
-            normalize_all_expressions_of(rhs);
+            bool skip_this_expression = false;
+            if( get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT") && expression_call_p(e) )
+            {
+                call c = expression_call(e);
+                entity op = call_function(c);
+                if(ENTITY_PLUS_P(op) || ENTITY_PLUS_C_P(op) || ENTITY_PLUS_UPDATE_P(op))
+                {
+                    FOREACH(EXPRESSION,arg,call_arguments(c))
+                        skip_this_expression|=expression_constant_p(arg);
+                }
 
-            syntax ref = make_syntax_reference(make_reference(newvar, NIL));
+            }
 
-            out = make_assign_statement(make_expression(copy_syntax(ref), normalized_undefined), rhs);
-            expression_syntax(e) = ref;
+            if(!skip_this_expression) {
+                ifdebug(1) {
+                    pips_debug(1,"atomizing expression:\n");
+                    print_expression(e);
+                }
+                entity newvar = (*create)(get_current_module_entity(), bofe);
+                expression rhs = make_expression(expression_syntax(e), normalized_undefined);
+                normalize_all_expressions_of(rhs);
+
+                syntax ref = make_syntax_reference(make_reference(newvar, NIL));
+
+                out = make_assign_statement(make_expression(copy_syntax(ref), normalized_undefined), rhs);
+                expression_syntax(e) = ref;
+            }
         }
     }
     free_basic(bofe);

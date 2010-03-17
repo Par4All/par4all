@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <values.h>
+#include <float.h>
 #include <ctype.h>
 #include <string.h>
 

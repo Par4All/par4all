@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +41,7 @@
 #include "syntax.h" /* FI: To dump the symbol table. move in ri-util? */
 #include "text-util.h"
 
-#include "cyacc.tab.h"
+#include "cyacc.h"
 
 #include "resources.h"
 #include "database.h"
@@ -751,6 +754,34 @@ entity FindOrCreateEntityFromLocalNameAndPrefixAndScope(string name,
   return e;
 }
 
+/* The parameter "scope" is potentially destroyed. */
+entity FindEntityFromLocalNameAndPrefixAndScope(string name, string prefix, string scope)
+{
+  entity ent = entity_undefined;
+
+  if (!entity_undefined_p(get_current_module_entity())) {
+    string global_name = string_undefined;
+    /* Add block scope case here */
+    do {
+      if (static_module_p(get_current_module_entity()))
+	global_name = (concatenate(/*compilation_unit_name,*/
+					 get_current_module_name(),MODULE_SEP_STRING,
+					 scope,prefix,name,NULL));
+      else
+	global_name = (concatenate(get_current_module_name(),MODULE_SEP_STRING,
+					 scope,prefix,name,NULL));
+      ent = gen_find_tabulated(global_name,entity_domain);
+      /* return values are not C variables... but they are entities. */
+      if(!entity_undefined_p(ent)
+	 && !storage_undefined_p(entity_storage(ent))
+	 && storage_return_p(entity_storage(ent))) {
+	ent = entity_undefined;
+      }
+    } while(entity_undefined_p(ent) && (scope = pop_block_scope(scope))!=NULL);
+  }
+  return ent;
+}
+
 entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 {
   /* Find an entity from its local name and prefix.
@@ -779,25 +810,8 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   pips_assert("Scope is a block scope", string_block_scope_p(scope));
   free(scope);
 
-  if (!entity_undefined_p(get_current_module_entity())) {
-    /* Add block scope case here */
-    do {
-      if (static_module_p(get_current_module_entity()))
-	global_name = (concatenate(/*compilation_unit_name,*/
-					 get_current_module_name(),MODULE_SEP_STRING,
-					 ls,prefix,name,NULL));
-      else
-	global_name = (concatenate(get_current_module_name(),MODULE_SEP_STRING,
-					 ls,prefix,name,NULL));
-      ent = gen_find_tabulated(global_name,entity_domain);
-      /* return values are not C variables... but they are entities. */
-      if(!entity_undefined_p(ent)
-	 && !storage_undefined_p(entity_storage(ent))
-	 && storage_return_p(entity_storage(ent))) {
-	ent = entity_undefined;
-      }
-    } while(entity_undefined_p(ent) && (ls = pop_block_scope(ls))!=NULL);
-  }
+  /* First, look up the surrounding scopes */
+  ent = FindEntityFromLocalNameAndPrefixAndScope(name, prefix, ls);
 
   /* Is it a formal parameter not yet converted in the function frame? */
   if(entity_undefined_p(ent)) {
@@ -826,6 +840,13 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
     ent = gen_find_tabulated(global_name,entity_domain);
   }
 
+  /* Is it a local type used within a function declaration? */
+  if(entity_undefined_p(ent) && strcmp(ls, "")==0 && ScopeStackSize()>=2) {
+    string lls = strdup(scope_to_block_scope(GetParentScope()));
+    ent = FindEntityFromLocalNameAndPrefixAndScope(name, prefix, lls);
+    free(lls);
+  }
+
   if(entity_undefined_p(ent)) {
     pips_debug(8, "Cannot find entity with local name \"%s\" with prefix \"%s\" at line %d\n",
 	       name, prefix, get_current_C_line_number());
@@ -834,7 +855,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
        typedef struct foo foo; */
     /* CParserError("Variable appears to be undefined\n"); */
   } else
-    pips_debug(5,"Entity global name is %s\n",global_name);
+    pips_debug(5,"Entity global name is %s\n",entity_name(ent));
   //free(global_name);
   free(ls_head);
   return ent;
@@ -1214,7 +1235,7 @@ void UpdatePointerEntity(entity e, type pt, list lq)
 {
   type t = entity_type(e);
   pips_debug(3,"Update pointer entity %s with type pt=\"%s\"\n",
-	     entity_name(e), list_to_string(c_words_entity(pt, NIL)));
+	     entity_name(e), list_to_string(c_words_entity(pt, NIL, NIL)));
   if (type_undefined_p(t))
     {
       pips_debug(3,"Undefined entity type\n");
@@ -1256,7 +1277,8 @@ void UpdatePointerEntity(entity e, type pt, list lq)
 	  /* Make e a function returns a pointer */
 	  functional f = type_functional(t);
 	  pips_debug(3,"Function returns a pointer \n");
-	  entity_type(e) = make_type_functional(make_functional(functional_parameters(f),pt));
+	  entity_type(e) =
+	    make_type_functional(make_functional(functional_parameters(f),pt));
 	  break;
 	}
       default:
@@ -1266,7 +1288,8 @@ void UpdatePointerEntity(entity e, type pt, list lq)
       }
     }
   pips_debug(3,"Ends with type \"%s\" for entity %s\n",
-	     list_to_string(c_words_entity(entity_type(e), NIL)), entity_name(e));
+	     list_to_string(c_words_entity(entity_type(e), NIL, NIL)),
+	     entity_name(e));
 }
 
 void UpdateArrayEntity(entity e, list lq, list le)
@@ -1979,8 +2002,81 @@ void RemoveDummyArguments(entity f, list refs)
   }
 }
 
-  /* Update the entity with final type, storage and initial value;
-     and also (sometimes?) declare it at the module level */
+/* If necessary, create the return entity, which is a hidden variable
+   used in PIPS internal representation to carry the value returned by
+   a function. */
+void CreateReturnEntity(entity f)
+{
+  type ft = ultimate_type(entity_type(f));
+
+  if(type_functional_p(ft)) {
+      type rt = functional_result(type_functional(ft));
+
+      if(!type_void_p(rt)) {
+	/* Create the return value */
+	string fn = entity_local_name(f);
+	entity re = FindOrCreateEntity(fn,fn);
+	if(type_undefined_p(entity_type(re))) {
+	  entity_type(re) = copy_type(rt);
+	  entity_storage(re) = make_storage_return(f);
+	  entity_initial(re) = make_value_unknown();
+	  AddToDeclarations(re, f);
+	}
+      }
+  }
+  else
+    pips_internal_error("This function should only be called with a function entity\n");
+}
+
+/* A subset of UpdateEntity, used when the function entity is already
+   more defined because the return type is implicit. See call site
+   cyacc.y
+
+   The return value is created when needed.
+
+   The dummy parameters are used to create the formal parameters.
+ */
+void UpdateEntity2(entity f,
+		   stack FormalStack __attribute__ ((__unused__)),
+		   stack OffsetStack __attribute__ ((__unused__)))
+{
+  type ft = ultimate_type(entity_type(f));
+  list dl = code_declarations(value_code(entity_initial(f)));
+  list cl = list_undefined;
+  int rank = 1; // formal parameter offset
+
+  pips_assert("f has a functional type", type_functional_p(ft));
+
+  CreateReturnEntity(f);
+
+  for(cl = dl; !ENDP(cl); POP(cl)) {
+    entity v = ENTITY(CAR(cl));
+    if(dummy_parameter_entity_p(v)) {
+      string ln = entity_user_name(v);
+      string mn = entity_local_name(f);
+      entity fp = global_name_to_entity(ln, mn);
+      if(entity_undefined_p(fp)) {
+	fp = FindOrCreateEntity(ln, mn);
+	entity_type(fp) = copy_type(entity_type(v));
+	entity_initial(fp) = make_value_unknown();
+	entity_storage(fp) = make_storage_formal(make_formal(f, rank));
+	rank++;
+	ENTITY_(CAR(cl)) = fp; // substitute v by fp in the declaration list
+      }
+    }
+  }
+
+}
+
+/* Update the entity with final type, storage and initial value;
+   and also (sometimes?) declare it at the module level
+
+   Replace dummy arguments by formal arguments for functions
+
+   Generate the return variables for functions returning a result
+
+   And probably much more...
+ */
 
 void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack FunctionStack,
 		  stack OffsetStack, bool is_external, bool is_declaration)
@@ -2032,17 +2128,32 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     entity_type(e) = t2;
   }
 
+  /* FI: it might be a good idea to use the type "unknown" or a
+     future type "default" to improve the prettyprinting by not
+     adding implicit "int" declarations. */
   if(type_undefined_p(entity_type(e))) {
     /* The default type is int */
     entity_type(e) =
       make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
   }
+  /* FI: This elseif  branch is apparently useless because the
+     probleme must be dealt with later in the parser */
+  else if(type_functional_p(entity_type(e))) {
+    functional f = type_functional(entity_type(e));
+    type rt = functional_result(f);
+    if(type_undefined_p(rt)) {
+      /* The default return type is int */
+      functional_result(f) =
+	make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
+    }
+  }
   pips_assert("the entity type is defined", !type_undefined_p(entity_type(e)));
 
   /************************* STORAGE PART *******************************************/
 
-  /* FI: no longer true, I believe "this field is always pre-defined. It is temporarilly used to
-     store a type. See cyacc.y rule direct-decl:" */
+  /* FI: no longer true, I believe "this field is always
+     pre-defined. It is temporarilly used to store a type. See cyacc.y
+     rule direct-decl:" */
 
 
   if (!storage_undefined_p(c_parser_context_storage(context))) {
@@ -2118,19 +2229,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       AddToDeclarations(e, get_current_module_entity());
     else if(!intrinsic_entity_p(e)) {
       /* We are defining the current module entity */
-      type rt = functional_result(type_functional(ultimate_type(entity_type(e))));
-
-      if(!type_void_p(rt)) {
-	/* Create the return value */
-	string fn = entity_local_name(e);
-	entity re = FindOrCreateEntity(fn,fn);
-	if(type_undefined_p(entity_type(re))) {
-	  entity_type(re) = copy_type(rt);
-	  entity_storage(re) = make_storage_return(e);
-	  entity_initial(re) = make_value_unknown();
-	  AddToDeclarations(re, e);
-	}
-      }
+      CreateReturnEntity(e);
     }
     else {
       /* Test case C_syntax/function_name_conflict01.c */
@@ -2232,10 +2331,11 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 void UpdateEntities(list le, stack ContextStack, stack FormalStack, stack FunctionStack,
 		    stack OffsetStack, bool is_external, bool is_declaration)
 {
-  MAP(ENTITY, e,
-  {
-    UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,is_declaration);
-  },le);
+  FOREACH(ENTITY, e, le) {
+    if(!derived_entity_p(e))
+      UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,
+		   is_external,is_declaration);
+  }
 }
 
 entity CleanUpEntity(entity e)
