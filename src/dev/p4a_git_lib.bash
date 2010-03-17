@@ -169,6 +169,29 @@ function do_merge_remote_git() {
     )
 }
 
+# Pull into the par4all git all the parts from the remote git associated:
+function do_add_remotes() {
+    verb 1 "Entering add_svn_remote_path"
+    enforce_P4A_TOP
+    stop_on_error
+    (
+	cd $P4A_ROOT
+	for i in $PIPS_MODULES; do
+	    TRACKING_BRANCH=CRI-$i
+	    REMOTE_NAME=CRI/$i
+	    REMOTE_GIT_URL=$P4A_CRI_GIT_SVN/$i
+	    # Add the git svn as remote git repository:
+	    git remote add $REMOTE_NAME $REMOTE_GIT_URL
+            # Fetch the history:
+	    git fetch $REMOTE_NAME
+	    # Create the tracking branch:
+	    git branch $TRACKING_BRANCH $REMOTE_NAME/master
+	done
+	git remote add ICPS/polylib git://repo.or.cz/polylib.git packages/polylib
+	git fetch ICPS/polylib
+	git branch ICPS-polylib ICPS/polylib/master
+    )
+}
 
 # Some Emacs stuff:
 ### Local Variables:

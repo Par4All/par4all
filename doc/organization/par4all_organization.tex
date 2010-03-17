@@ -66,7 +66,8 @@ source build/etc/par4all-rc.csh
 There are few \Agit repositories used by the project.
 
 To have access without authentication and only for reading/cloning, you
-can use the \texttt{git:} prefix instead of \texttt{ssh:}.
+can use the \texttt{git:} prefix instead of \texttt{ssh:}, such as
+\url{git://git.hpc-project.com/git/par4all.git}.
 
 The main repository for the project is:
 \url{ssh://git.hpc-project.com/git/par4all.git}
@@ -222,12 +223,14 @@ The \verb|p4a_git| options come into short and long form:
   to all the git working copies inside the current directory. If no argument
   is given, a \texttt{git svn rebase} is done;
 \item[\texttt{-f} or \texttt{--fetch-remote-git}] fetch the objects from
-  the remote \Agit repositories (the \Apips \Agit-\Asvn gateways and the
-  \Apolylib \Agit);
+  the remote \Agit repositories (the \Apips{} \Agit-\Asvn gateways and the
+  \Apolylib{} \Agit);
 \item[\texttt{-p} or \texttt{--pull-remote-git}] pull the objects from the
   remote \Agit repositories into their respective branches;
 \item[\texttt{-m} or \texttt{--merge-remote-git}] merge the branches that
   buffer the remote git repositories into the current branch;
+\item[\texttt{-a} or \texttt{|--add-remotes}] create the remotes pointing
+  into \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
 \item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
   change the git repository to work on.
 \end{description}

@@ -28,6 +28,8 @@ function usage()
 	"     repositories into their respective branches\n" \
 	"  -m|--merge-remote-git: merge the branches that buffer the remote\n" \
 	"      git repositories into the current branch\n" \
+	"  -a|--add-remotes: create the remotes pointing\n" \
+	"      into $P4A_CRI_GIT_SVN and on the polylib" \
 	"  -r|--root <directory-name>: create a git repository of this name\n" \
 	"     instead of 'par4all'"
   fi
@@ -82,6 +84,7 @@ while [ "$1" ] ; do
       -f|--fetch-remote-git) fetch_remote_git=1 ;;
       -p|--pull-remote-git) pull_remote_git=1 ;;
       -m|--merge-remote-git) merge_remote_git=1 ;;
+      -a|--add-remotes) add_remotes=1 ;;
       -r|--root) P4A_ROOT=$1 ; shift ;;
       # error
       *) usage 1 "unexpected option: $opt"
@@ -112,6 +115,12 @@ fi
 if [[ $merge_remote_git ]]; then
     do_merge_remote_git
 fi
+
+if [[ $add_remotes ]]; then
+    do_add_remotes
+fi
+
+
 
 # Some Emacs stuff:
 ### Local Variables:
