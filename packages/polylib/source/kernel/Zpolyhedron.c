@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <polylib/polylib.h> 
 #include <stdlib.h>
 
@@ -8,7 +25,7 @@ static ZPolyhedron * ZPolyhedronDifference(ZPolyhedron *, ZPolyhedron *);
 static ZPolyhedron * ZPolyhedronImage(ZPolyhedron *, Matrix *);
 static ZPolyhedron * ZPolyhedronPreimage(ZPolyhedron *, Matrix *);
 static ZPolyhedron *AddZPolytoZDomain(ZPolyhedron *A, ZPolyhedron *Head);
-static void ZPolyhedronPrint(FILE *fp, char *format, ZPolyhedron *A);
+static void ZPolyhedronPrint(FILE *fp, const char *format, ZPolyhedron *A);
 
 typedef struct forsimplify {
   Polyhedron *Pol;
@@ -318,8 +335,8 @@ Bool ZPolyhedronIncludes(ZPolyhedron *A, ZPolyhedron *B) {
 /*
  * Print the contents of a Z-domain 'A' 
  */
-void ZDomainPrint(FILE *fp,char *format,ZPolyhedron *A) {
-  
+void ZDomainPrint(FILE *fp, const char *format, ZPolyhedron *A)
+{
 #ifdef DOMDEBUG
   FILE *fp1;
   fp1 = fopen("_debug", "a");
@@ -338,8 +355,8 @@ void ZDomainPrint(FILE *fp,char *format,ZPolyhedron *A) {
 /*
  * Print the contents of a ZPolyhderon 'A'
  */
-static void ZPolyhedronPrint (FILE *fp, char *format, ZPolyhedron *A) {
-  
+static void ZPolyhedronPrint (FILE *fp, const char *format, ZPolyhedron *A)
+{
   if (A == NULL)
     return ;
   fprintf(fp,"\nZPOLYHEDRON: Dimension %d \n",A->Lat->NbRows-1);
@@ -426,9 +443,9 @@ ZPolyhedron *ZDomainDifference(ZPolyhedron  *A, ZPolyhedron *B) {
 #endif
   
   if (A->Lat->NbRows != B->Lat->NbRows) {
-    fprintf(stderr, "In ZDomainDifference : The Input ZDomains");
-    fprintf(stderr, "Do not have the compatible dimensions\n");
-    fprintf(stderr, "ZDomainDiffernce not performed\n");
+    fprintf(stderr, "In ZDomainDifference : the input ZDomains ");
+    fprintf(stderr, "do not have compatible dimensions\n");
+    fprintf(stderr, "ZDomainDifference not performed\n");
     return NULL;
   }
   
@@ -439,7 +456,6 @@ ZPolyhedron *ZDomainDifference(ZPolyhedron  *A, ZPolyhedron *B) {
     for(tempB = B; tempB != NULL; tempB = tempB->next) {
       templist = NULL; res = NULL;
       for(i = temp; i != NULL; i = i->next) {
-	i=temp;
 	res = ZPolyhedronDifference(i,tempB);
 	for (j = res; j != NULL; j = j->next )
 	  templist = AddZPoly2ZDomain(j,templist);

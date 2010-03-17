@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /* header file built by cproto */
 #ifndef arithmetique_header_included
 #define arithmetique_header_included
@@ -323,6 +340,7 @@ typedef cln::cl_I Value;
 #define value_sub_int(ref,val1,val2) 	((ref) = (val1)-(val2))
 #define value_decrement(ref,val) 	((ref) = (val)-1)
 #define value_division(ref,val1,val2)   ((ref) = cln::truncate1(val1,val2))
+#define value_divexact(ref,val1,val2)   ((ref) = cln::exquo(val1,val2))
 #define value_modulus(ref,val1,val2)    ((ref) = cln::truncate2(val1,val2).remainder)
 #define value_pdivision(ref,val1,val2)  ((ref) = cln::floor1(val1,val2))
 #define value_pmodulus(ref,val1,val2)   ((ref) = cln::floor2(val1,val2).remainder)
@@ -330,6 +348,8 @@ typedef cln::cl_I Value;
 #define value_absolute(ref,val)		((ref) = cln::abs(val))
 #define value_minimum(ref,val1,val2)	((ref) = cln::min((val1),(val2)))
 #define value_maximum(ref,val1,val2)	((ref) = cln::max((val1),(val2)))
+#define value_gcd(ref,val1,val2)	((ref) = cln::gcd((val1),(val2)))
+#define value_lcm(ref,val1,val2)	((ref) = cln::lcm((val1),(val2)))
 #define value_orto(ref,val1,val2)	((ref) = (val1)|(val2))
 #define value_andto(ref,val1,val2)	((ref) = (val1)&(val2))
 
@@ -357,8 +377,9 @@ typedef cln::cl_I Value;
 #define value_set_double(val,d)(mpz_set_d((val),(d)))
 #define value_clear(val)       (mpz_clear((val)))
 #define value_read(val,str)    (mpz_set_str((val),(str),10))
+typedef void (*value_print_gmp_free_t)(void *, size_t);
 #define value_print(Dst,fmt,val)  {char *str; \
-				void (*gmp_free) (void *, size_t); \
+				value_print_gmp_free_t gmp_free; \
 				str = mpz_get_str(0,10,(val)); \
 				fprintf((Dst),(fmt),str); \
 				mp_get_memory_functions(NULL, NULL, &gmp_free); \
@@ -398,6 +419,7 @@ typedef cln::cl_I Value;
 #define value_sub_int(ref,val,vint)     (mpz_sub_ui((ref),(val),(long)(vint)))
 #define value_decrement(ref,val)       (mpz_sub_ui((ref),(val),1))
 #define value_division(ref,val1,val2)  (mpz_tdiv_q((ref),(val1),(val2)))
+#define value_divexact(ref,val1,val2)  (mpz_divexact((ref),(val1),(val2)))
 #define value_modulus(ref,val1,val2)   (mpz_tdiv_r((ref),(val1),(val2)))
 #define value_pdivision(ref,val1,val2) (mpz_fdiv_q((ref),(val1),(val2)))
 #define value_pmodulus(ref,val1,val2)  (mpz_fdiv_r((ref),(val1),(val2)))
@@ -409,6 +431,8 @@ typedef cln::cl_I Value;
 #define value_maximum(ref,val1,val2)   (value_ge((val1),(val2)) ?  \
                                         mpz_set((ref),(val1)) :    \
                                         mpz_set((ref),(val2)))  
+#define value_gcd(ref,val1,val2)	(mpz_gcd(ref,val1,val2))
+#define value_lcm(ref,val1,val2)	(mpz_lcm(ref,val1,val2))
 #define value_orto(ref,val1,val2)      (mpz_ior((ref),(val1),(val2)))
 #define value_andto(ref,val1,val2)     (mpz_and((ref),(val1),(val2)))
 
@@ -497,6 +521,7 @@ typedef cln::cl_I Value;
 #define value_sub_int(ref,val,vint)     ((ref) = (val)-(Value)(vint))
 #define value_decrement(ref,val) 	((ref) = (val)-VALUE_ONE)
 #define value_division(ref,val1,val2) 	((ref) = (val1)/(val2))
+#define value_divexact(ref,val1,val2) 	((ref) = (val1)/(val2))
 #define value_modulus(ref,val1,val2) 	((ref) = (val1)%(val2))
 #define value_pdivision(ref,val1,val2)	((ref) = value_pdiv((val1),(val2)))
 #define value_pmodulus(ref,val1,val2)	((ref) = value_pmod((val1),(val2)))
@@ -504,6 +529,8 @@ typedef cln::cl_I Value;
 #define value_absolute(ref,val)		((ref) = value_abs((val)))
 #define value_minimum(ref,val1,val2)	((ref) = value_min((val1),(val2)))
 #define value_maximum(ref,val1,val2)	((ref) = value_max((val1),(val2)))
+#define value_gcd(ref,val1,val2)	Gcd((val1),(val2),&(ref))
+#define value_lcm(ref,val1,val2)	Lcm3((val1),(val2),&(ref))
 #define value_orto(ref,val1,val2)	((ref) = (val1)|(val2))
 #define value_andto(ref,val1,val2)	((ref) = (val1)&(val2))
 
@@ -644,6 +671,8 @@ typedef cln::cl_I Value;
 #define value_modulus(v1,v2) value_addto(v1,v2)
 #undef value_division
 #define value_division(v1,v2) value_addto(v1,v2)
+#undef value_divexact
+#define value_divexact(v1,v2) value_addto(v1,v2)
 #undef value_increment
 #define value_increment(v) value_addto(v,VALUE_ONE)
 #undef value_decrement

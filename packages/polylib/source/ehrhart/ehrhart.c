@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /***********************************************************************/
 /*                Ehrhart V4.20                                        */
 /*                copyright 1997, Doran Wilde                          */
@@ -172,8 +189,8 @@ enode *ecopy(enode *e) {
 @param pname array of strings, name of the parameters
 
 */
-void print_evalue(FILE *DST,evalue *e,char **pname) {
-  
+void print_evalue(FILE *DST, evalue *e, const char **pname)
+{
   if(value_notzero_p(e->d)) {    
     if(value_notone_p(e->d)) {
       value_print(DST,VALUE_FMT,e->x.n);
@@ -196,8 +213,8 @@ void print_evalue(FILE *DST,evalue *e,char **pname) {
 @param pname array of strings, name of the parameters
 
 */
-void print_enode(FILE *DST,enode *p,char **pname) {
-  
+void print_enode(FILE *DST, enode *p, const char **pname)
+{
   int i;
   
   if (!p) {
@@ -365,10 +382,10 @@ static void emul (evalue *e1,evalue *e2,evalue *res) {
         /* Product of two rational numbers */
         value_multiply(res->d,e1->d,e2->d);
         value_multiply(res->x.n,e1->x.n,e2->x.n );
-        Gcd(res->x.n, res->d,&g);
+        value_gcd(g, res->x.n, res->d);
         if (value_notone_p(g)) {
-            value_division(res->d,res->d,g);
-            value_division(res->x.n,res->x.n,g);
+            value_divexact(res->d, res->d, g);
+            value_divexact(res->x.n, res->x.n, g);
         }
     }
     else { /* e1 is an expression */    
@@ -406,10 +423,10 @@ void eadd(evalue *e1,evalue *res) {
     value_multiply(m2,res->x.n,e1->d);
     value_addto(res->x.n,m1,m2);
     value_multiply(res->d,e1->d,res->d);  
-    Gcd(res->x.n,res->d,&g);
+    value_gcd(g, res->x.n, res->d);
     if (value_notone_p(g)) {  
-      value_division(res->d,res->d,g);
-      value_division(res->x.n,res->x.n,g);
+      value_divexact(res->d, res->d, g);
+      value_divexact(res->x.n, res->x.n, g);
     }
     value_clear(g); value_clear(m1); value_clear(m2);
     return;
@@ -1090,9 +1107,9 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,
                 value_absolute(abs_b,b);
 
                 /* Create new constraint: b*UB-a*LB >= a*b*size */
-                Gcd(abs_a,abs_b,&g);
-                value_division(a1,a,g);
-                value_division(b1,b,g);
+                value_gcd(g, abs_a, abs_b);
+                value_divexact(a1, a, g);
+                value_divexact(b1, b, g);
                 value_set_si(M->p[newi][0],1);
                 value_oppose(abs_a,a1);           /* abs_a = -a1 */
                 Vector_Combine(&(C[ub][1]),&(C[lb][1]),&(M->p[newi][1]),
@@ -1227,8 +1244,8 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
 /* A recursive procedure.                                            */
 /*-------------------------------------------------------------------*/
 static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,
-		     int nb_param,int dim,Value *lcm,char **param_name) {
-
+		     int nb_param,int dim,Value *lcm, const char **param_name)
+{
   enode *res,*B,*C;
   int hdim,i,j,rank,flag;
   Value n,g,nLB,nUB,nlcm,noff,nexp,k1,nm,hdv,k,lcm_copy;
@@ -1564,11 +1581,11 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,
       
       /* Set up coefficient vector C from i-th row of inverted matrix */
       for (j=0; j<rank; j++) {
-	Gcd(A->p[i][i+1],A->p[i][j+1+hdim],&g);
+	value_gcd(g, A->p[i][i+1], A->p[i][j+1+hdim]);
 	value_init(C->arr[j].d);
-	value_division(C->arr[j].d,A->p[i][i+1],g);
+	value_divexact(C->arr[j].d, A->p[i][i+1], g);
 	value_init(C->arr[j].x.n);
-	value_division(C->arr[j].x.n,A->p[i][j+1+hdim],g);
+	value_divexact(C->arr[j].x.n, A->p[i][j+1+hdim], g);
       }
       
 #ifdef EDEBUG
@@ -1641,7 +1658,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,
 /*    param_name : name of the parameters                         */
 /*----------------------------------------------------------------*/
 static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
-   Value *lcm, int nbp, char **param_name )
+   Value *lcm, int nbp, const char **param_name)
 {
   Param_Vertices *V;
   int i, j, ix, l, np;
@@ -1680,16 +1697,16 @@ static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
 	  {
 	    if( value_notzero_p(V->Vertex->p[j][l]) )
 	      {
-		Gcd(V->Vertex->p[j][V->Vertex->NbColumns-1],
-		    V->Vertex->p[j][l],&m1);
-		value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],m1);
+		value_gcd(m1, V->Vertex->p[j][V->Vertex->NbColumns-1],
+			  V->Vertex->p[j][l]);
+		value_divexact(k, V->Vertex->p[j][V->Vertex->NbColumns-1], m1);
 		if( value_notzero_p(lcm[l]) )
 		  {
 		    /* lcm[l] = lcm[l] * k / gcd(k,lcm[l]) */
 		    if (value_notzero_p(k) && value_notone_p(k))
 		      {
-			Gcd(lcm[l],k,&m1);
-			value_division(k,k,m1);
+			value_gcd(m1, lcm[l], k);
+			value_divexact(k, k, m1);
 			value_multiply(lcm[l],lcm[l],k);
 		      }
 		  }
@@ -1720,8 +1737,8 @@ Procedure to count points in a non-parameterized polytope.
 */
 Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,
 				    Matrix *CT,Polyhedron *CEq,
-				    unsigned MAXRAYS,char **param_name) {
-  
+				    unsigned MAXRAYS, const char **param_name)
+{
     Polyhedron *L;
     Enumeration *res;
     Value *context;
@@ -1841,7 +1858,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,
 
 */
 Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,
-				  unsigned MAXRAYS,char **param_name)
+				  unsigned MAXRAYS, const char **param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P, *Ph = NULL;
   Matrix *CT;
@@ -2236,10 +2253,10 @@ void evalue_div(evalue * e, Value n) {
   else {
     value_multiply(e->d, e->d, n);
     /* simplify the new rational if needed */
-    Gcd(e->x.n, e->d, &gc);
-    if (value_notone_p(gc)&&(value_notzero_p(gc))) {
-      value_division(e->d, e->d, gc);
-      value_division(e->x.n, e->x.n, gc);
+    value_gcd(gc, e->x.n, e->d);
+    if (value_notone_p(gc)) {
+      value_divexact(e->d, e->d, gc);
+      value_divexact(e->x.n, e->x.n, gc);
     }
   }
   value_clear(gc);
@@ -2262,7 +2279,7 @@ Deals with the full-dimensional case.
 
 */
 Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
-					unsigned MAXRAYS, char ** param_name)
+					unsigned MAXRAYS, const char **param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
   Matrix *CT;
@@ -2689,12 +2706,13 @@ Enumeration *Constraints_EhrhartQuickApx(Matrix const * M, Matrix const * C,
  * <p> Note: does not copy the parameters names themselves. </p>
  * @param nbParms the initial number of parameters
 */
-char ** parmsWithoutElim(char const ** parmNames, 
-			       unsigned int const * elimParms, 
-			       unsigned int nbParms) {
+const char **parmsWithoutElim(char const **parmNames, 
+			      unsigned int const *elimParms, 
+			      unsigned int nbParms)
+{
   int i=0, j=0,k;
   int newParmNb = nbParms - elimParms[0];
-  char ** newParmNames = (char **)malloc (newParmNb * sizeof(char *));
+  const char **newParmNames = (const char **)malloc(newParmNb * sizeof(char *));
   for (k=1; k<= elimParms[0]; k++) {
     while (i!=elimParms[k]) {
       newParmNames[i-k+1] = parmNames[i];

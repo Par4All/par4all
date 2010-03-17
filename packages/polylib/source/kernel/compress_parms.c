@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /** 
  * $Id: compress_parms.c,v 1.32 2006/11/03 17:34:26 skimo Exp $
  *
@@ -540,9 +557,9 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
   }
   for (i=0; i<M->NbRows; i++) {
     for (j=0; j< M->NbColumns; j++) {
-      Gcd(d->p[i][0], M->p[i][j], &tmp);
-      value_division(tmp, d->p[i][0], tmp);
-      Lcm3(periods[j], tmp, &(periods[j]));
+      value_gcd(tmp, d->p[i][0], M->p[i][j]);
+      value_divexact(tmp, d->p[i][0], tmp);
+      value_lcm(periods[j], periods[j], tmp);
      }
   }
   value_clear(tmp);

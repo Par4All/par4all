@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdlib.h>
 #include <polylib/polylib.h>
 
@@ -481,7 +498,7 @@ Lattice *LatticeIntersection(Lattice *X, Lattice *Y) {
   }
   
   if (Y->NbRows != X->NbRows) {
-    fprintf (stderr, "\nIn LatticeIntersection : The Input Lattices X and Y are of incompatible dimensions\n");
+    fprintf (stderr, "\nIn LatticeIntersection : the input lattices X and Y are of incompatible dimensions\n");
     return EmptyLattice(X->NbRows);
   }
   
@@ -667,7 +684,7 @@ LatticeUnion *Lattice2LatticeUnion(Lattice *X,Lattice *Y)
 
   Intersection = LatticeIntersection(X,Y);
   if (isEmptyLattice(Intersection) == True) {
-    fprintf(stderr,"\nIn Lattice2LatticeUnion : The Input Lattices X and Y does not have any common part\n");
+    fprintf(stderr,"\nIn Lattice2LatticeUnion : the input lattices X and Y do not have any common part\n");
     return NULL;
   }  
 
@@ -1016,7 +1033,7 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
     if ((value_notzero_p(A->Ray[i][0])) && value_notzero_p(A->Ray[i][A->Dimension+1])) {
       for(j = 1; j < A->Dimension+2; j++) 
 	value_assign(vert->p[vercount][j-1],A->Ray[i][j]);
-      Lcm3(lcm, A->Ray[i][j-1], &lcm);
+      value_lcm(lcm, lcm, A->Ray[i][j-1]);
       vercount++;
     }
     else {

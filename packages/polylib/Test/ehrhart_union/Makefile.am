@@ -32,3 +32,4 @@ tests:
 	else \
 	        echo "Test ehrhart_union works correctly"; \
         fi
+CLEANFILES=xyz

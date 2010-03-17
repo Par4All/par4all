@@ -1,3 +1,20 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /* types-polylib.h
      COPYRIGHT
           Both this software and its documentation are
@@ -114,7 +131,9 @@ typedef struct interval {
 } Interval;
 
 /* Test whether P is an empty polyhedron */
-#define emptyQ(P) (P->NbRays==0)
+#define emptyQ(P)							\
+	((F_ISSET(P, POL_INEQUALITIES) && P->NbEq > P->Dimension) ||	\
+	 (F_ISSET(P, POL_POINTS) && P->NbRays == 0))
 
 /* Test whether P is a universe polyheron */
 #define universeQ(P) (P->Dimension==P->NbBid)
@@ -125,6 +144,7 @@ typedef struct _Param_Vertex {
 	          /* parameters. The (m+1)th value is the constant, the */
 	          /* The (m+2)th value is the common denominator.       */
   Matrix *Domain; /* Constraints on parameters (in Polyhedral format)   */
+  unsigned *Facets; /* Bit array of facets defining the vertex.		*/
   struct _Param_Vertex *next;          /* Pointer to the next structure */
 } Param_Vertices;
 
@@ -138,6 +158,8 @@ typedef struct _Param_Polyhedron {
 	int nbV;	    /* Number of parameterized vertices            */
 	Param_Vertices *V;  /* Pointer to the list of parameteric vertices */
 	Param_Domain *D;    /* Pointer to the list of validity domains     */
+	Matrix *Constraints;/* Constraints referred to by V->Facets	   */
+	Matrix *Rays;        /* Lines/rays (non parametric)                 */
 } Param_Polyhedron;
 
 #define FORALL_PVertex_in_ParamPolyhedron(_V, _D, _P)   \
@@ -227,15 +249,3 @@ typedef struct ZPolyhedron {
 #endif
 
 #endif /* _types_polylib_h_ */
-
-
-
-
-
-
-
-
-
-
-
-

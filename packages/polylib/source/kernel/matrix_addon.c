@@ -1,5 +1,22 @@
+/*
+    This file is part of PolyLib.
+
+    PolyLib is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PolyLib is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /** 
- * $Id: matrix_addon.c,v 1.16 2006/11/07 19:18:23 skimo Exp $
+ * $Id: matrix_addon.c,v 1.17 2007/03/18 18:49:08 skimo Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -120,7 +137,7 @@ void mtransformation_inverse(Matrix * transf, Matrix ** inverse, Value * g) {
   /* b - as it is rational, put it to the same denominator*/
   (*inverse) = Matrix_Alloc(transf->NbRows, transf->NbRows);
   for (i=0; i< inv->NbRows; i++) 
-    Lcm3(*g, inv->p[i][inv->NbColumns-1],g);
+    value_lcm(*g, *g, inv->p[i][inv->NbColumns-1]);
   for (i=0; i< inv->NbRows; i++) {
     value_division(factor, *g, inv->p[i][inv->NbColumns-1]);
     for (j=0; j< (*inverse)->NbColumns; j++) 
@@ -157,13 +174,10 @@ void mpolyhedron_simplify(Matrix * polyh) {
   Value cur_gcd;
   value_init(cur_gcd);
   for (i=0; i< polyh->NbRows; i++) {
-    value_set_si(cur_gcd, 0);
-    for (j=1; j< polyh->NbColumns; j++) 
-      Gcd(cur_gcd, polyh->p[i][j], &cur_gcd);
+    Vector_Gcd(polyh->p[i]+1, polyh->NbColumns-1, &cur_gcd);
     printf(" gcd[%d] = ", i); 
     value_print(stdout, VALUE_FMT, cur_gcd);printf("\n");
-    for (j=1; j< polyh->NbColumns; j++) 
-      value_division(polyh->p[i][j], polyh->p[i][j], cur_gcd);
+    Vector_AntiScale(polyh->p[i]+1, polyh->p[i]+1, cur_gcd, polyh->NbColumns-1);
   }
   value_clear(cur_gcd);
 } /* mpolyhedron_simplify */
@@ -182,8 +196,8 @@ void mpolyhedron_inflate(Matrix * polyh, unsigned int nb_parms) {
   for (i=0; i< polyh->NbRows; i++) {
     value_set_si(infl, 0);
     for (j=0; j< nb_vars; j++) {
-      if (value_sign(polyh->p[i][j])<0)
-	value_addto(infl, infl, polyh->p[i][j]);
+      if (value_neg_p(polyh->p[i][1+j]))
+	value_addto(infl, infl, polyh->p[i][1+j]);
     }
     /* here, we subtract a negative value */
     value_subtract(polyh->p[i][polyh->NbColumns-1], 
@@ -205,8 +219,8 @@ void mpolyhedron_deflate(Matrix * polyh, unsigned int nb_parms) {
   for (i=0; i< polyh->NbRows; i++) {
     value_set_si(defl, 0);
     for (j=0; j< nb_vars; j++) {
-      if (value_sign(polyh->p[i][j])>0)
-	value_addto(defl, defl, polyh->p[i][j]);
+      if (value_pos_p(polyh->p[i][1+j]))
+	value_addto(defl, defl, polyh->p[i][1+j]);
     }
     /* here, we substract a negative value */
     value_subtract(polyh->p[i][polyh->NbColumns-1], 
@@ -239,8 +253,8 @@ void eliminate_var_with_constr(Matrix * Eliminator,
   value_init(tmp2);
   /* if the victim coefficient is not zero */
   if (value_notzero_p(Victim->p[victim_row][var_to_elim+1])) {
-    Lcm3(Eliminator->p[eliminator_row][var_to_elim+1], 
-	 Victim->p[victim_row][var_to_elim+1], &cur_lcm);
+    value_lcm(cur_lcm, Eliminator->p[eliminator_row][var_to_elim+1], 
+	      Victim->p[victim_row][var_to_elim+1]);
     /* multiplication factors */
     value_division(mul_a, cur_lcm, 
 		   Eliminator->p[eliminator_row][var_to_elim+1]);
@@ -357,8 +371,8 @@ void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc,
 
 
 /**
- * Cloning funciton. Similar to Matrix_Copy() but allocates the target matrix
- * if it is set to NULL 
+ * Cloning function. Similar to Matrix_Copy() but allocates the target matrix
+ * if it is set to NULL.
  */
 void Matrix_clone(Matrix * M, Matrix ** Cl) {
   Matrix_subMatrix(M, 0,0, M->NbRows, M->NbColumns, Cl);

@@ -6,7 +6,14 @@ OBJ_DIR = $(top_builddir)
 
 PP =  \
 	c6.in \
-	c7.in
+	c7.in \
+	salvatore.in \
+	salvatore_new1.in \
+	salvatore_new2.in \
+	xavi.in \
+	ray1.in \
+	ray2.in \
+	ray3.in
 
 #	c5.in \
 #	c4.in \
@@ -35,3 +42,4 @@ tests:
 	else \
 	        echo "Test pp works correctly"; \
         fi
+CLEANFILES=xyz

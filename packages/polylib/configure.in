@@ -2,6 +2,21 @@ dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run to configure the
 dnl	Makefile in this directory.
 
+#    This file is part of PolyLib.                                                         
+#
+#    PolyLib is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or   
+#    (at your option) any later version.                                 
+#
+#    PolyLib is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+#    GNU General Public License for more details.                  
+#
+#    You should have received a copy of the GNU General Public License
+#    along with PolyLib.  If not, see <http://www.gnu.org/licenses/>.
+
 # Authors: Bart Kienhuis, Vincent Loechner, T. Risset
 # Copyright (c) 2000 The Regents of the University of California.
 # All rights reserved.
@@ -30,14 +45,15 @@ dnl	Makefile in this directory.
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(polylib, 5.22.3)
-AM_INIT_AUTOMAKE
+AC_INIT(polylib, 5.22.5)
+AM_INIT_AUTOMAKE([gnu])
 AC_CONFIG_SRCDIR(include/polylib/polylib.h.in)
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_PREREQ(2.60)
 
 AC_SUBST(versioninfo)
-versioninfo=7:0:0
+versioninfo=9:0:1
 
 if test "x$prefix" != "xNONE"; then
     prefix_wd=`cd $prefix && pwd`
@@ -56,6 +72,7 @@ AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
+AM_PROG_CC_C_O
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -86,13 +103,13 @@ for type in long_long_int long_int int; do
 	long_int)
 	    bits=`expr $ac_cv_sizeof_long_int \* 8`
 	    defs="#define LINEAR_VALUE_IS_LONG
-		   #define LINEAR_VALUE_PROTECT_MULTIPLY"
+#define LINEAR_VALUE_PROTECT_MULTIPLY"
 	    ;;
 	long_long_int)
 	    bits=`expr $ac_cv_sizeof_long_long_int \* 8`
 	    defs="#define LINEAR_VALUE_IS_LONGLONG
-		   #define LINEAR_VALUE_PROTECT_MULTIPLY
-		   #define LINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+#define LINEAR_VALUE_PROTECT_MULTIPLY
+#define LINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 	    ;;
     esac
     case "$bits" in
@@ -108,11 +125,6 @@ for type in long_long_int long_int int; do
     esac
 done
 
-dnl extra indirection to avoid automake getting confused
-AC_SUBST(multi_bin_programs)
-AC_SUBST(multi_noinst_programs)
-multi_bin_programs="\$(multi_bin_programs)"
-multi_noinst_programs="\$(multi_noinst_programs)"
 
 AC_SUBST(polylibs)
 AC_SUBST(ALL_BITS)
@@ -214,6 +226,14 @@ esac
 
 AC_SUBST(polylib)
 polylib="libpolylib$BITS.la"
+
+dnl extra indirection to avoid automake getting confused
+AC_SUBST(multi_bin_programs)
+AC_SUBST(multi_noinst_programs)
+for pl_bit in $ALL_BITS ; do
+	multi_bin_programs="$multi_bin_programs \$(multi_bin_programs_${pl_bit})"
+	multi_noinst_programs="$multi_noinst_programs \$(no_inst_programs_${pl_bit})"
+done
 
 dnl /*****************************************************************************/
 AC_ARG_ENABLE(extra-suffix,
