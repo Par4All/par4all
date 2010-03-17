@@ -357,9 +357,9 @@ void hash_put(hash_table htp, const void * key, const void * val)
   if (htp->n_entry+1 >= (htp->limit))
     hash_enlarge_table(htp);
 
-  message_assert("illegal input key",
+  message_assert("legal input key",
 		 key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
-  message_assert("illegal input value", val!=HASH_UNDEFINED_VALUE);
+  message_assert("input value must be defined", val!=HASH_UNDEFINED_VALUE);
 
   htp->n_put++;
   hep = hash_find_entry(htp, key, &rank, &htp->n_put_iter);
