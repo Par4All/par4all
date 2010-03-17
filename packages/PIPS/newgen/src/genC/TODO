@@ -1,0 +1,7 @@
+Verify int printf formats in build.c
+
+hash.c:778: attention : déréférencement du pointeur type-punned brisera les strictes d'aliases
+???
+
+générer des "MONTYPE_equals_p" automatiquement ?
+problème de comparaison de graphe non trivial...

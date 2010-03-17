@@ -1,0 +1,250 @@
+#!/bin/sh
+#
+# Newgen script shell
+#
+# P. Jouvelot (06/01/88)
+#
+# $Id$
+#
+# should be rewriten, for instance in perl...
+#
+
+VERSION='undefined'
+LISP=-lisp
+C=-c
+
+# CPP="/lib/cpp"
+CPP='gcc -E -P'
+
+define_base()
+{
+	base=$1
+	include=$2
+
+	(case $VERSION in
+	 $LISP )
+		echo "(lisp:defparameter newgen::*gen-${base}-start* $start)" ;;
+	 $C )
+		echo "#ifndef _newgen_${base}_included"
+		echo "#define _newgen_${base}_included"
+		echo "#define _gen_${base}_start $start" ;;
+	 esac) >> $include
+}
+
+pattern()
+{
+	case $VERSION in
+	$LISP )
+		echo '(lisp:defconstant \1)' ;;
+	$C )
+		echo '\#define \1' ;;
+	esac
+}
+
+enter_package()
+{
+	base=$1
+	include=$2
+
+	(case $VERSION in
+	 $LISP )
+		echo \
+"(lisp:provide :$base)
+(lisp:in-package :$base :use '())
+(lisp:use-package :$base)" ;;
+	 $C )
+		;;
+	 esac) >> $include
+}
+
+exit_package()
+{
+	include=$1 
+	ubase=`echo $2 | tr -cd '[_A-Za-z]'`
+
+	(case $VERSION in
+	 $LISP )
+		echo \
+"(lisp:do-symbols (symbol)
+ (lisp:multiple-value-bind 
+  (val how) (lisp:intern (lisp:string symbol))
+  (lisp:declare (lisp:ignore val))
+  (lisp:cond ((lisp:member how '(:inherited :external) :test #'lisp:eq))
+             ((lisp:eq how :internal) 
+	      (lisp:if (lisp:and (lisp:or (lisp:fboundp symbol)
+					  (lisp:boundp symbol))
+			         (lisp:string/= (lisp:string symbol) 
+						\"COPY-\"
+				      :end1 (lisp:length \"COPY-\")))
+			(lisp:export symbol)
+			(lisp:unintern symbol)))
+	     (lisp:t (lisp:error \"Newgen bug: please report\")))))" ;;
+	 $C )
+		echo "#define ${ubase}_spec \"\\" 
+	        sed 's/$/\\n\\/; s/"/\\"/g' $2.spec
+		echo "\""
+		echo "#endif"
+		;;
+	 esac) >> $include
+}
+
+update_first()
+{
+	start=$1
+	first=`basename $2 .newgen`$3
+
+	# INIT_OFFSET takes into accounts the intrinsic domains + Tabulated_bp
+	# to compute initial domain number offsets.
+	
+	#INIT_OFFSET=7
+	#start=`expr $start + $INIT_OFFSET`
+	
+	case $VERSION in
+	$LISP )
+		ed -s $first <<!
+0r $DEP
+0a
+(lisp:in-package :newgen :use '())
+(lisp:defvar *gen-tabulated-alloc*)
+(lisp:setf *gen-tabulated-alloc*
+	(lisp:make-array '($start) :initial-element -1))
+
+(lisp:defvar *gen-tabulated-index*)
+(lisp:setf *gen-tabulated-index*
+	(lisp:make-array '($start) :initial-element -1))
+
+(lisp:defvar *tag-names*)
+(lisp:setf *tag-names* (lisp:list))
+
+(lisp:defun gen-read-spec ()
+ (lisp:setf *gen-tabulated-names*
+	(lisp:make-hash-table :test #'lisp:equal))
+ (lisp:setf *gen-tabulated*
+	 (lisp:make-array max-tabulated :initial-element lisp:nil))
+ (lisp:do ((i 0 (lisp:+ i 1)))
+	  ((lisp:= i $start))
+	(lisp:when (lisp:> (lisp:svref *gen-tabulated-index* i) -1)
+	   (lisp:setf (lisp:svref *gen-tabulated-alloc* i) 1)
+	   (lisp:setf (lisp:svref *gen-tabulated* 
+			(lisp:svref *gen-tabulated-index* i) )
+		(lisp:make-array max-tabulated-elements
+					 :initial-element lisp:nil)))))
+
+.
+w
+q
+!
+		;;
+	$C )
+		;;
+	esac
+}
+
+go () {
+	NEWGEN=$1
+	ORDER_NAME=$2
+	POSTFIX=$3
+
+	DEP=/tmp/dep$$
+	ORDER=/tmp/order$$
+	OK=/tmp/result$$
+
+	# should it be ahead instead?
+	PATH=$PATH:$NEWGEN_ROOT/bin/$NEWGEN_ARCH:$NEWGEN_ROOT/bin/$PIPS_ARCH
+
+	shift 3
+
+	# level 1 transitive closure...
+	for i in `{ echo $* | tr ' ' '\012' ; 
+          sed -n 's/^import .* from "\(.*\)".*$/\1/p;' $*; } | sort -u`
+	do
+	    include=`basename $i .newgen`$POSTFIX
+	    echo "$i $i" >> $DEP
+	    sed -n "s/^import .* from \"\(.*\)\".*/\1 $i/p" $i >> $DEP
+	    # should I count imports??? I guess I could not...
+	    # however it depends on newgen renumerotation
+	    # so as to keep the synchronization right?
+	    # Let's try without...
+	    dom=`egrep '^([a-zA-Z_ ]* =|external)' $i | wc -l | tr -cd '[0-9]'`
+	    echo "$dom" > $include
+	done
+
+	tsort $DEP 1>$ORDER 2>$OK
+	
+	if [ -s $OK ] ; then
+	  echo "newgen: Cannot sort dependencies"; cat $OK $DEP
+	  echo "(possible misuse of keywords)"
+	  exit 1
+	fi
+	
+	# INITIAL NEWGEN OFFSET...
+	start=7
+	
+	echo -n "" > $DEP
+	
+	echo "$ORDER_NAME order:"
+	
+	for i in `cat $ORDER`
+	do
+	  base=`basename $i .newgen`
+	  include=$base$POSTFIX
+	  rm -f $base.spec
+	  echo ${base}_spec
+	  read domains < $include
+	  rm $include
+	  touch $include
+	  define_base $base $include
+	  pat=`pattern`
+	  sed -n "/^#define/{s/#define\(.*\)\$/$pat/p;q;}" $i >> $include
+
+	  enter_package $base $include
+	  {
+	    echo "--NEWGEN-START $start";
+	    cat $i;
+	   } | ${CPP} - | $NEWGEN $base $base.spec >> $include
+
+	  if [ $? != 0 ] ; then
+	     echo "newgen: Error in specification"
+	     exit 1
+	  fi
+
+	  ed -s $base.spec <<!
+0a
+--NEWGEN-START $start
+.
+w
+q
+!
+	    #echo "$start $domains" >&2
+	    exit_package $include $base
+	    start=`expr $start + $domains`
+	done
+	
+	update_first $start `head -1 $ORDER` $POSTFIX
+	rm -f $DEP $ORDER $OK
+}
+
+if [ $# -lt 2 ] ; then
+	echo "Usage: newgen [-lisp|-c] file.newgen ..."
+	exit 1
+fi
+
+VERSION=$1
+
+case $VERSION in
+$LISP )
+	NEWGEN=newLisp
+	ORDER_NAME=REQUIRE
+	POSTFIX=.cl ;;
+$C )
+	NEWGEN=newC
+	ORDER_NAME=GEN_READ_SPEC
+	POSTFIX=.h ;;
+* )
+	echo "newgen: Only C and Lisp versions are available"
+	exit 2 ;;
+esac
+
+shift
+
+go $NEWGEN $ORDER_NAME $POSTFIX $*

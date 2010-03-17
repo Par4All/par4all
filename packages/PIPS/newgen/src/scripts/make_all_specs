@@ -1,0 +1,13 @@
+#!/bin/sh
+
+read line
+
+echo "#define ALL_SPECS \\"
+
+while read line ; do
+	echo "$line , \\"
+done 
+
+echo "(char *)0" 
+
+# rm $file
