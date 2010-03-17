@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "genC.h"
 #include "linear.h"
@@ -127,7 +130,7 @@ static bool simple_simd_unroll_loop_filter(statement s)
             compute_variable_size);
 
     /* Decide between min and max unroll factor */
-    if (get_bool_property("SIMD_AUTO_UNROLL_MINIMIZE_UNROLL"))
+    if (get_bool_property("SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL"))
         varwidth = varwidths.max;
     else
         varwidth = varwidths.min;
@@ -201,7 +204,7 @@ static bool full_simd_unroll_loop_filter(statement s)
 
 
     /* Decide between min and max unroll factor, and unroll */
-    int unroll_rate = get_bool_property("SIMD_AUTO_UNROLL_MINIMIZE_UNROLL") ? factor.min : factor.max;
+    int unroll_rate = get_bool_property("SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL") ? factor.min : factor.max;
     simd_loop_unroll(s, unroll_rate);
 
     /* Do not recursively analyse the loop */
@@ -211,7 +214,7 @@ static bool full_simd_unroll_loop_filter(statement s)
 void simd_unroll_as_needed(statement module_stmt)
 {
     /* Choose algorithm to use, and use it */
-    if (get_bool_property("SIMD_AUTO_UNROLL_SIMPLE_CALCULATION"))
+    if (get_bool_property("SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION"))
     {
         gen_recurse(module_stmt, statement_domain, 
                 simple_simd_unroll_loop_filter, gen_null);
@@ -255,4 +258,37 @@ bool simdizer_auto_unroll(char * mod_name)
     debug_off();
 
     return TRUE;
+}
+
+
+static void addSimdCommentToStat(statement s, int num)
+{
+
+    char comment[sizeof("c " SIMD_COMMENT) + 8*sizeof(int) ];
+
+    sprintf(comment, "c " SIMD_COMMENT "%d\n", num);
+
+    insert_comments_to_statement(s, comment);
+}
+
+static void addSimdCommentToStats(statement s)
+{
+    if(instruction_sequence_p(statement_instruction(s)))
+    {
+        sequence seq = instruction_sequence(statement_instruction(s));
+        int num = 0;
+        FOREACH(STATEMENT, curStat, sequence_statements(seq) )
+        {
+            addSimdCommentToStat(curStat, num++);
+        }
+    }
+    else
+    {
+        addSimdCommentToStat(s, 0);
+    }
+}
+
+void simd_loop_unroll(statement loop_statement, int rate)
+{
+    do_loop_unroll(loop_statement,rate,addSimdCommentToStats);
 }

@@ -6,6 +6,9 @@ The program is distributed under the terms of the GNU General Public
 License.
 */
 
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /*
 
@@ -15,11 +18,9 @@ regroupement de la majorité des includes
 
 */
 // includes C standard
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <values.h>
 #include <ctype.h>
 #include <string.h>
 

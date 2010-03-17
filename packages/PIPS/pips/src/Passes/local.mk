@@ -55,7 +55,7 @@ ifndef PIPS_NO_GPIPS
 	FWD_DIRS	+= gpips
 endif
 
-ifndef PIPS_NO_PYPS
+ifdef PIPS_ENABLE_PYPS
 	FWD_DIRS	+= pypips
 endif
 

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #ifndef lint
 char vcid_xv_edit2[] = "%A% ($Date: 1998/04/16 14:45:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";

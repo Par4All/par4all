@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /******************************************************************
  *
  *		     ALIAS VERIFICATION
@@ -379,14 +382,14 @@ static expression array_size_stride(entity ent)
    
 *****************************************************************************/
 
-static void insert_test_before_statement(expression flags, expression condition, 
+static void insert_test_before_statement(expression flags, expression condition,
 					 statement s, entity e1, entity e2,list path)
 {
   expression cond;
   statement smt;
   int order = statement_ordering(s);
-  string message = strdup(concatenate("\'Alias violation in module ", 
-				      module_local_name(current_mod),": write on ", 
+  string message = strdup(concatenate("\'Alias violation in module ",
+				      module_local_name(current_mod),": write on ",
 				      entity_local_name(e1),", aliased with ",
 				      entity_local_name(e2)," by call path ",
 				      print_call_path(path),"\'", NULL));
@@ -406,7 +409,7 @@ static void insert_test_before_statement(expression flags, expression condition,
 				      make_block_statement(NIL)));
   fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
 	  ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-  print_text(out, text_statement(entity_undefined,0,smt));
+  print_text(out, text_statement(entity_undefined,0,smt,NIL));
   fprintf(out,"%s\n",PREFIX2);
   number_of_tests++;
   free(file_name), file_name = NULL;
@@ -415,9 +418,9 @@ static void insert_test_before_statement(expression flags, expression condition,
 
 /*****************************************************************************
 
-   This function inserts a flag before each call site in call path : 
+   This function inserts a flag before each call site in call path :
    ALIAS_FLAG(i) = .TRUE.
-   
+
 *****************************************************************************/
 
 static void insert_flag_before_call_site(list flags,list path)
@@ -435,7 +438,7 @@ static void insert_flag_before_call_site(list flags,list path)
       string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
       fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(caller),
 	      ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-      print_text(out,text_statement(entity_undefined,0,s_flag));
+      print_text(out,text_statement(entity_undefined,0,s_flag,NIL));
       fprintf(out, "%s\n",PREFIX2);
       path = CDR(path);
       flags = CDR(flags);
@@ -460,7 +463,7 @@ static void insert_test_before_caller(expression condition, expression e_flag)
     {
       fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_caller),
 	      ORDERING_NUMBER(current_ordering),ORDERING_STATEMENT(current_ordering));
-      print_text(out,text_statement(entity_undefined,0,s_flag));
+      print_text(out,text_statement(entity_undefined,0,s_flag,NIL));
       fprintf(out,"%s\n",PREFIX2);
     }
   else
@@ -469,7 +472,7 @@ static void insert_test_before_caller(expression condition, expression e_flag)
 						  make_block_statement(NIL)));
       fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_caller),
 	      ORDERING_NUMBER(current_ordering),ORDERING_STATEMENT(current_ordering));
-      print_text(out, text_statement(entity_undefined,0,smt));
+      print_text(out, text_statement(entity_undefined,0,smt,NIL));
       fprintf(out,"%s\n",PREFIX2);
       number_of_tests++;
     }
@@ -559,8 +562,8 @@ static void insert_check_alias_before_statement(entity e1, expression subval,
 						entity e2, expression size,
 						statement s)
 {
-  string message = strdup(concatenate("\'Alias violation in module ", 
-				      module_local_name(current_mod),": write on ", 
+  string message = strdup(concatenate("\'Alias violation in module ",
+				      module_local_name(current_mod),": write on ",
 				      entity_local_name(e1),", aliased with ",
 				      entity_local_name(e2),"\'", NULL));
   list l = CONS(EXPRESSION,size,NIL);
@@ -577,20 +580,20 @@ static void insert_check_alias_before_statement(entity e1, expression subval,
   smt = call_to_statement(make_call(alias_function,l));
   fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
 	  ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-  print_text(out, text_statement(entity_undefined,0,smt));
+  print_text(out, text_statement(entity_undefined,0,smt,NIL));
   fprintf(out,"%s\n",PREFIX2);
-  number_of_calls++; 
+  number_of_calls++;
   free(file_name), file_name = NULL;
 }
 
 /*****************************************************************************
 
- This function generates a CALL ALIAS_CHECK(e1,ref1,e2,size2) before each write on 
- a may be aliased variable e1. checkalias() is a C function that takes the addresses of 
- e1 and e2, writing reference ref1 and offset size2 as input, returns if there is 
- alias violation on this writing or not. 
+ This function generates a CALL ALIAS_CHECK(e1,ref1,e2,size2) before each write on
+ a may be aliased variable e1. checkalias() is a C function that takes the addresses of
+ e1 and e2, writing reference ref1 and offset size2 as input, returns if there is
+ alias violation on this writing or not.
 
- This type of dynamic checking is expensive, because we do not use information from 
+ This type of dynamic checking is expensive, because we do not use information from
  static analysese => use it only when we can do nothing else.
  
 *****************************************************************************/

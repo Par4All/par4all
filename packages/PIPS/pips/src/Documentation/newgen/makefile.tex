@@ -26,8 +26,8 @@
 
 %%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
-\title{PIPS: Mécanisme de gestion de la cohérence et d'enchaînement
-automatique des phases (pipsmake)}
+\title{PIPS: Mechanism for the automated management of the coherence and the 
+successive manifestations of phases(pipsmake)}
 \author{François Irigoin \\
     Pierre Jouvelot \\
     Rémi Triolet\\
@@ -40,163 +40,162 @@ automatique des phases (pipsmake)}
 
 \section*{Introduction}
 
-L'interprocéduralité et l'interactivité de PIPS rendent nécessaire
-la gestion d'informations partielles, liées à un module particulier
-et à une phase particulière, qui peuvent être réutilisées dans
-différents calculs et lors de plusieurs sessions successives.
+The interprocedural and interoperative nature of PIPS make necessary 
+the management of partial information, linked to a particular module 
+and phase, which may be reused 
+when different calculations of successive sessions occur. 
 
-L'enchaînement des calculs de ces informations et les tests de cohérence
-auraient pu être réparties dans chacune des phases et analyses de PIPS.
-Il a semblé préférable de centraliser dans une bibliothèque la gestion
-des dépendances entre phases et le maintien de la cohérence entre
-informations.
+The successive manifestations of the calculation of these informations and the coherence tests 
+could have been spread out in each of the phases and analysis of PIPS.
+It seamed preferable to centralize in one library the management 
+of dependency between phases and the maintenance of the coherence between 
+different information.
 
-La bibliothèque {\tt pipsmake} offre deux points d'entr'e principaux:
-{\tt make} et {\tt apply}. Le premier permet d'obtenir une information
-particulière sans avoir à se préoccuper de calculer toutes les
-informations qui sont nécessaires à son calcul. Le second permet
-l'évaluation d'une règle particulière.
+The library {\tt pipsmake} offers two principal points of entry:
+{\tt make} and {\tt apply}. The first permits the one to maintain the particular information
+without having to worr about the calculation of all the
+different information which is necessairy for its calculation. The second permits
+the evaluation of a particular rule.
 
-Quand plusieurs règles permettent de calculer un objet particulier,
-un mécanisme d'activation permet de définir celle qui doit être
-utilisée. Ceci est indispensable pour pouvoir traiter les appels
-récursifs qu'entraînent les enchaînements de règles sans avoir à
-demander trop d'informations de paramétrage à l'utilisateur.
+When several rules allow the calculation of a particular objet, 
+an activation mechanism allows the definition of that which needs to be used. 
+This is indispensible to be able to treat the recursive calls 
+produced by the succesive manifestation of rules without having to 
+request too much information concerning user partameters. 
 
-Un jeu de règles et de ressources particulières peuvent être définis
-statiquement dans un fichier de nom {\tt pipsmake.rc}. La bibliothèque
-{\tt pipsmake} contient des modules permettant de lire un tel fichier
-pour initialiser un ensemble de règles en mémoire et d'écrire sur
-disque un ensemble de règles dans un format compatible avec leur
-relecture.
+A set of rules and particular resources may be statically defined 
+in a file of name {\tt pipsmake.rc}. The library 
+{\tt pipsmake} contains the modules which permit the readiong of such a file 
+to initialize a a set of rules in memory and to write to
+disc a set of rules in a format compatible with their future
+read. 
 
-Par défault, la première r`egle produisant une ressource quelconque
-est activée. Lorsque plusieurs r`egles sont disponibles pour produire
-une même ressource, il faut que cette ressource soit l'unique produite
-par cette règle. Ainsi est-il cohérent de changer dynamiquement de
-règles actives.
+By default, the first rule producing a particular resource 
+is activated. When several rules are available to produce 
+the same resource, this resource must be the only one produced
+by this rule. In this manner it is coherent to dynamically change 
+active rules.
 
-Ceci est automatiquement rendu possible par certains interfaces
-interactifs  de pips, à condition que les règles disponibles comme
-alternatives ainsi que leur ressource produite aient un nom d'alias.
+This is automatiocally rendered possible by certain interactive pips interfaces,
+on condition that the available alternative rules 
+as well as the resource they produce have an alias name.
 
-Nous présentons successivement les structures de données utilisées
-pour stocker en m'emoire un ensemble de régles
-de dérivation, des régles de dérivation, des ressources virtuelles
-et des ressources réelles.
+We present successively the structures of the data used 
+to store in memory a set of derivation rules, virtual resources 
+and real resources.  
 
-\section{Ensemble des règles de dérivation}
+\section{Set of derivation rules}
 
 \domain{Makefile = rules:rule* x active\_phases:string*}
-{Le domaine {\tt makefile} est utilisé par le driver de haut niveau
-pour décrire les dépendances entre les différentes phases de Pips. Un
-{\tt Makefile} est une liste de règles ({\tt rule}), chaque règle
-décrivant une des phases de Pips. En outre, le {\tt Makefile} donne la
-liste des phases qui sont actives à l'instant présent {\tt
-active\_phases}. Rappelons que chaque type de ressources peut
-éventuellement être produit par différentes phases, mais qu'une seule
-phase est utilisable à un instant donné.
+{The domaine {\tt makefile} is used by the high-level driver 
+to describe between the different Pips phases. A
+{\tt Makefile} is a list of rules ({\tt rule}), each rule 
+describing one of the Pips phases. In other words, the {\tt Makefile} gives the 
+list of phases active at the present instant {\tt
+active\_phases}. Remember that each type of resource may 
+possibly be produced by different phases, but that only one 
+phase is usable at any given instant. 
 
-Attention, les nouvelles fonctionalités de production de resources
-multiples impliquent une ambiguité sur la notion de règle active;
-les règles actives pouvant être actives pour un sous-ensemble des
-règles qu'elles produisent (en particulier dans le cas de règles
-partiellement cycliques). }
+Note, the new fonctionalities for multiple resource production 
+imply an ambiguity concerning the notion of active rule; 
+active nature of the active rules being possible for a subset of 
+rules which they produce (in particular in the case of patially cyclical
+rules). }
 
-\section{Définition d'une règle particulière}
+\section{Definition of a particular rule}
 
 \domain{Rule = phase:string x required:virtual\_resource* x produced:virtual\_resource* x preserved:virtual\_resource* x modified:virtual\_resource* x pre\_transformation:virtual\_resource*}
-{Le domaine {\tt rule} permet de décrire les actions des phases de
-  Pips sur les ressources gérées par pips-db. Chaque phase
-  nécessite que certaines ressources soient disponibles ({\tt
-    required}), elle commence par effectuer d'éventuelles
-  transformations ({\tt pre\_transformation}), puis produit une ou
-  plusieurs ressources ({\tt produced}), et en modifie d'autres ({\tt
-    modified}). La différence entre les ressources produites et
-  celles modifiées permet au driver d'enchainer les phases dans le
-  bon ordre.
+{The domain {\tt rule} permits the description of the actions of the phases of
+  Pips on the resources managed by pips-db. Each phase
+  requires that certain resources by available disponibles ({\tt
+  required}), it begins by executing potential 
+  transformations ({\tt pre\_transformation}), then produces one or 
+  several resources ({\tt produced}), and modifies others ({\tt
+  modified}). The difference between the resources produced and 
+  and those modified permit the driver to successively manifest the phases on the 
+  correct order. 
 
-Les phases de transformation agissent sur le code des modules ce qui
-implique généralement que les informations qui décorent ce module
-sont perdues. Pourtant, certaines d'entre-elles font des transformations
-si mineures que certaines décorations sont préservées ({\tt
-preserved}). C'est notamment le cas de la privatisation qui préservent
-toutes les décorations. Voici la liste des phases de Pips.
+The transformation phases act on the code of the modules, which 
+generally implies that the information which describe this module
+are lost. Yet, certain among them do transformations
+which are so minor that certain descriptions are preserved ({\tt
+preserved}). This is notably the case of the privatization which 
+all these descriptions preserved. Here is a list of the Pips phases.
 \begin{description}
-\item[parser] analyse syntaxique et calcul du graphe de contrôle,
-\item[linker] édition des liens,
-\item[proper-effects] calculs des effets propres des instructions,
-\item[cumulated-effects] calculs des effets cumulés des instructions,
-\item[usedef] calcul des used-def chains et des def-use chains,
-\item[privatizer] privatisation des variables,
-\item[dgkennedy] calcul du graphe de dépendances avec les {\em niveaux de
+\item[parser] syntaxic and calculation analysis of the control graph,
+\item[linker] editing of links,
+\item[proper-effects] calculation of the proper effects of the instructions,
+\item[cumulated-effects] calculation of the cumulated effects of the instructions, 
+\item[usedef] calculation of the used-def chains and the def-use chains,
+\item[privatizer] variable privatization ,
+\item[dgkennedy] calculation of the dependency graph with the {\em niveaux de
 Kennedy}, 
-\item[dgwolfe] calcul du graphe de dépendances avec les {\em vecteurs
+\item[dgwolfe] calculation of the dependency graph with the {\em vecteurs
 de direction de Wolfe},
 \end{description}
 }
 
 \section{Définition d'une ressource virtuelle}
 
-Les ressources virtuelles sont des variables pouvant être instantiées
-en une ressource réelle ou en une liste de ressource réelle.
+The virtual resources are the variables which may be instantiated 
+in a real resource or in a list of real resources.
 
 \domain{Virtual\_resource = name:string x owner }
-{Le domaine {\tt virtual\_resource} permet de désigner une ressource
-lue ou modifiée par une phase en précisant en plus de la nature de la
-ressource ({\tt datum}) si la ressource accédée est celle attachée au
-module, au programme, aux modules appelés par le module auquel la phase
-est appliquée ou à celui qui l'appelle ({\tt owner}). Voici la liste
-de toutes les ressources calculables par Pips.
+{The domain {\tt virtual\_resource} permits the designation of a resource
+read or modifie'd by a phase descibing precicely in addition to the nature of the 
+resource ({\tt datum}) if the resource accessed is that which is attatched to the 
+module, a program, to the modules accessed by the module to which the phase 
+is apples or that which called it ({\tt owner}). Here is the list
+of all the resources which Pips may be able to calculate.
 \begin{description}
-\item[source] fichier source Fortran d'un module; résultat de
-l`initialisation;
-\item[code] code d'un module avec graphe de contrôle structuré;
-résultat du controlizer et du parser;
-\item[entities] entites du programme; résultat de l`initialisation, du
-parser et du linker;
-\item[callees] modules appelés directement par un module; résultat du
-linker; 
-\item[proper-effects] effets propres des instructions pour un module; le
-terme {\em propre} signifie que les effets des blocs des instructions
-composées (boucles, tests, ...) ne sont pas comptabilisés; résultat
-de proper-effects; 
-\item[cumulated-effects] effets cumulés des instructions pour un
-module; le terme {\em cumulé} signifie que les effets des blocs des
-instructions composées (boucles, tests, ...) sont comptabilisés;
-résultat de cumulated-effects; 
-\item[sdfi] {\em summary data flow information} d'un module; c'est un
-résumé des effets cumulés de l'instruction bloc du module; résumer
-les effets consiste à éliminer les effets sur les variables locales du
-module et, dans le cas des tableaux, à globaliser chaque effet en y
-supprimant les expressions d'indices; résultat de cumulated-effects;
-\item[chains] {\em use-def} et {\em def-use chains} d'un module;
-résultat de usedef;
-\item[dgkennedy] graphe de dépendances avec les {\em niveaux de
+\item[source] file source of a module Fortran; result of 
+the initialization;
+\item[code] module code with structured control graph; 
+result of the control and parsing action;
+\item[entities] program entites; resultat of the initialisation, of
+the parser and the linker;
+\item[callees] modules callede directely by a module; result of
+the linker; 
+\item[proper-effects] proper effect of the instructions for a module; the
+term {\em propre} signifies that thg effets of the instruction blocs 
+produced (loops, tests, ...) are not taken into account; result
+of proper-effects; 
+\item[cumulated-effects] cumulated effect of the instructions for a 
+module; the term {\em cumulé} signifies that the effects of the instruction blocs 
+prodiced (loops, tests, ...) are taken into account; 
+result ofe cumulated-effects; 
+\item[sdfi] {\em summary data flow information} of a module; it is an
+abstract of the cumlulated effets of the module's instruction bloc; produce an abstraction of
+the effets consist of the elimination of the effets of the local variables of 
+the module and, in th ecase of tables, the globalization of each effect 
+erasing the expressions of indices in the process; the result of cumulated-effects;
+\item[chains] {\em use-def} and {\em def-use chains} of a module;
+result of usedef;
+\item[dgkennedy] dependancy graph with the {\em niveaux de
 Kennedy}; 
-\item[dgwolfe] graphe de dépendances avec les {\em vecteurs de direction de
+\item[dgwolfe] dependancy graph with the {\em vecteurs de direction de
 Wolfe};
 \end{description}
 }
 
 \domain{Owner = \{ program , module , main , callees , callers , all ,  select , compilation_unit \}}
-{Le domaine {\tt owner} permet de préciser dans une règle de
-dépendances a quels modules sont rattachées les ressources lues,
-écrites, produites ou préservées. Ce peut être le module lui-même
-({\tt module}), les modules appelés par le module auquel la phase est
-appliquée ({\tt callees}) ou à ceux qui l'appelle ({\tt caller}), ou
-bien tous les modules du programme considéré ({\tt all}). Le programme
-({\tt program}) lui-même caractèrise en fait un espace de travail
-particulier et donc indirectement l'ensemble des modules sur lesquels on
-souhaite travailler. Le nom d'un programme n'est généralement pas
-dérivé automatiquement du code source parce qu'on peut très bien
-souhaiter dériver plusieurs versions d'un même code séquentiel
-original et donner à chaque version un nom différent.
+{The domain {\tt owner} permits the precise description of the dependency rule
+concerning which modules are attached, the ressources read,
+written, produced or preserved. This could be the module itself
+({\tt module}), the modules called by the module to which the phase is
+applied ({\tt callees}) or which it calls {\tt caller}), or
+all the modules of the programme in question({\tt all}). The program
+({\tt program}) itself in fact caracterizes a particular workspace
+an so indirecty the set of modules no which we wish to perform work. 
+The name of a pogram is generally not
+automatically derived from the code source because we can easily 
+wish to derive several versions of the same sequential
+original code and give a different name to each different version.
 
-Cet attribut supplémentaire des dépendances
-permet au top-level driver de gérer les appels multiples rendus
-nécessaires par l'interprocéduralité de Pips et d'éliminer
-l'auto-récursion du gestionnaire de la base de données.
+This supplementary attribute of the dependancies
+allows the top-level driver to manage multiple calls made necessary
+by the interprocedural nature of Pips and the elimination
+of the auto-recursion of the database manager. 
 
 \texttt{select} is a fake owner, to be used to select (or activate) rules
 from other pipsmake rules. Should only be used with the bang rules?
@@ -204,17 +203,16 @@ from other pipsmake rules. Should only be used with the bang rules?
 
 \section{Ressources réelles}
 
-Les ressources réelles correspondent à un ensemble de données particulier
-qui a été produit pour un module ou un programme particulier par une
-phase particulière. Les ressources virtuelles prennent leurs valeurs
-parmi ces ressources réelles, mais les règles de dérivation de
-pipsmake sont toujours génériques et donc toujours définies en terme
-de ressources virtuelles.
+The real resources correspond to a particular set of data 
+produced by a module or a particular program by a particular
+phase. The virtual resources take their value among these 
+real resources, but these derivation rules of pipsmake are still generic and therefore still defined in terms of
+de virtual resources. 
 
 \domain{Real\_resource = resource\_name:string x owner\_name:string}
-{Le domaine {\tt real\_resource} est un domaine privé pour pipsmake qui
-sert à concrétiser un ensemble de ressources virtuelles pour un
-programme et un module donnés.}
+{The domain {\tt real\_resource} is a private domain for pipsmake which 
+serves to enable the manifestation of a set of virtual resources for a 
+given program and a module.} 
 
 \end{document}
 \end

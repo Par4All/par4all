@@ -21,7 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-#define _GNU_SOURCE
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
@@ -45,7 +47,7 @@ typedef dg_vertex_label vertex_label;
 #include "graph.h"
 
 #include "sac.h"
-#include "patterns.tab.h"
+#include "patterns.h"
 
 #include "properties.h"
 #include "locality.h"
@@ -327,7 +329,8 @@ entity get_function_entity(string name)
     entity e = local_name_to_top_level_entity(name); 
     if ( entity_undefined_p( e ) )
     {
-        pips_user_warning("entity %s not defined, please load the appropriate definition source file\n",name);
+        pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
+                "Please feed pips with its definition and source\n",name);
     }
 
     return e;

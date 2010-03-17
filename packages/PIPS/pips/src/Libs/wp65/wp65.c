@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* Code Generation for Distributed Memory Machines
   *
   * Higher level functions
@@ -427,7 +430,7 @@ hash_table v_to_esv;
 	  fputs("\t->\t",fd);
 	  for(; !ENDP(lcrl); POP(lcrl)) {
 	      reference r = REFERENCE(CAR(lcrl));
-	      print_words(fd, words_reference(r));
+	      print_words(fd, words_reference(r, NIL));
 	      if(ENDP(CDR(lcrl)))
 		  (void) putc('\n', fd);
 	      else
@@ -440,7 +443,7 @@ hash_table v_to_esv;
 	  fd);
     HASH_MAP(r, llv,
 	 {  list llvl=(list) llv;
-	     print_words(fd, words_reference((reference) r));
+	   print_words(fd, words_reference((reference) r, NIL));
 	     fputs("\t->\t",fd);
 	     for(; !ENDP(llvl); POP(llvl)) {
 		 entity lv = ENTITY(CAR(llvl));
@@ -481,7 +484,7 @@ hash_table v_to_esv;
     fputs("\nMapping r_to_ud from references to use-def:\n", fd);
     HASH_MAP(r, use_def,
 	 {
-	     print_words(fd, words_reference((reference) r));
+	   print_words(fd, words_reference((reference) r, NIL));
 	     fputs("\t->\t",fd);
 	     fputs(((tag) use_def == is_action_read) ? "use\n" : "def\n", fd);
        },

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * Perform forward substitution when possible.
  *
@@ -471,14 +474,18 @@ fs_filter(statement stat, graph dg)
                     /* scan following statements and substitute while no conflicts.
                     */
                     struct s_p_s param = { subs, successors,false};
+                    bool once = false;
                     FOREACH(STATEMENT,next,CDR(ls))
                     {
                         param.stop=false;
                         gen_context_recurse(next,&param,statement_domain,do_substitute,gen_null);
                         if(param.stop) break;
+                        else once=true;
                     }
 
                     free_substitution(subs);
+                    if(once && get_bool_property("FORWARD_SUBSTITUTE_OPTIMISTIC_CLEAN"))
+                        update_statement_instruction(first,make_instruction_block(NIL));
                 }
             }
         }

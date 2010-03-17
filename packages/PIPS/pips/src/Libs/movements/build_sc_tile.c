@@ -21,19 +21,22 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* PACKAGE MOVEMENTS
   *
   * Corinne Ancourt  - septembre 1991
   */
 
 #include <stdio.h>
+#include <limits.h>
 
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
-#include <values.h>
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"

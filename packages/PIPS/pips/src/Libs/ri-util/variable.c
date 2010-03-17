@@ -21,12 +21,14 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Handling of entity as program variables
  * (see also entity.c for generic entities)
  */
 
 // To have asprintf:
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -99,19 +101,22 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
 {
     if(!ENDP(entity_declarations(module)))
         gen_remove(&entity_declarations(module), e);
-    if(!ENDP(statement_declarations(s)))
-        gen_remove(&statement_declarations(s), e);
-    if(statement_block_p(s))
+    if(!statement_undefined_p(s))
     {
-        FOREACH(STATEMENT,stat,statement_block(s))
+        if(!ENDP(statement_declarations(s)))
+            gen_remove(&statement_declarations(s), e);
+        if(statement_block_p(s))
         {
-            bool decl_stat = declaration_statement_p(stat);
-            RemoveLocalEntityFromDeclarations(e,module,stat);
-            /* this take care of removind useless declaration statements*/
-            if(ENDP(statement_declarations(stat)) && decl_stat)
+            FOREACH(STATEMENT,stat,statement_block(s))
             {
-                gen_remove_once(&instruction_block(statement_instruction(s)),stat);
-                free_statement(stat);
+                bool decl_stat = declaration_statement_p(stat);
+                RemoveLocalEntityFromDeclarations(e,module,stat);
+                /* this take care of removind useless declaration statements*/
+                if(ENDP(statement_declarations(stat)) && decl_stat)
+                {
+                    gen_remove_once(&instruction_block(statement_instruction(s)),stat);
+                    free_statement(stat);
+                }
             }
         }
     }
@@ -415,8 +420,6 @@ entity make_new_scalar_variable_with_prefix(string prefix,
   pips_debug(9, "var %s, tag %d\n", variable_name, basic_tag(b));
 
   e = make_scalar_entity(variable_name, module_name, b);
-  // Add a global variable:
-  AddEntityToCurrentModule(e);
   free(variable_name);
 
   return e;
@@ -1315,9 +1318,13 @@ bool implicit_c_variable_p(entity v)
 }
 
 
-/* Returns a copy of the initial expression of variable v. If v's
-   inital value is a constants or a code block, it is converted to the
-   corresponding expression.
+/* Returns a copy of the initial (i.e. initialization) expression of
+   variable v. If v's inital value is a constants or a code block, it
+   is converted to the corresponding expression.
+
+   Could have been called entity_to_initialization_expression(), or
+   entity_to_initial_expression(), but it only makes sense for
+   variables.
 */
 expression variable_initial_expression(entity v)
 {
@@ -1385,4 +1392,55 @@ bool self_initialization_p(entity v)
     gen_free_list(lr);
   }
   return self_p;
+}
+
+/* FI: transferred from semantics (should be used for effect translation
+   as well) */
+bool same_scalar_location_p(entity e1, entity e2)
+{
+  storage st1 = entity_storage(e1);
+  storage st2 = entity_storage(e2);
+  entity s1 = entity_undefined;
+  entity s2 = entity_undefined;
+  ram r1 = ram_undefined;
+  ram r2 = ram_undefined;
+  bool same = FALSE;
+
+  /* e1 or e2 may be a formal parameter as shown by the benchmark m from CEA
+   * and the call to SOURCE by the MAIN, parameter NPBF (FI, 13/1/93)
+   *
+   * I do not understand why I should return FALSE since they actually have
+   * the same location for this call site. However, there is no need for
+   * a translate_global_value() since the usual formal/actual binding
+   * must be enough.
+   */
+  /*
+   * pips_assert("same_scalar_location_p", storage_ram_p(st1) && storage_ram_p(st2));
+   */
+  if(!(storage_ram_p(st1) && storage_ram_p(st2)))
+    return FALSE;
+
+  r1 = storage_ram(entity_storage(e1));
+  s1 = ram_section(r1);
+  r2 = storage_ram(entity_storage(e2));
+  s2 = ram_section(r2);
+
+  if(s1 == s2) {
+    if(ram_offset(r1) == ram_offset(r2))
+      same = TRUE;
+    else {
+      pips_debug(7,
+		 "Different offsets %td for %s in section %s and %td for %s in section %s\n",
+		 ram_offset(r1), entity_name(e1), entity_name(s1),
+		 ram_offset(r2), entity_name(e2), entity_name(s2));
+    }
+  }
+  else {
+    pips_debug(7,
+	       "Disjoint entitites %s in section %s and %s in section %s\n",
+	       entity_name(e1), entity_name(s1),
+	       entity_name(e2), entity_name(s2));
+  }
+
+  return same;
 }

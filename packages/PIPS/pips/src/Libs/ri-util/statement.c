@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /*
     Function for statement, and its subtypes:
      - instruction
@@ -32,7 +35,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdarg.h>
 
 #include "linear.h"
@@ -335,15 +338,21 @@ bool nop_statement_p(statement s)
    have side effects. See C_syntax/block01.c.
 
    FI: same issue with CONTINUE.
+
+   If there is an extension on it (such as a pragma) return false since
+   this statement may be useful/
  */
 bool empty_statement_or_labelless_continue_p(statement st)
 {
   instruction i;
 
-  if (!entity_empty_label_p(statement_label(st)))
+  if (!entity_empty_label_p(statement_label(st))
+      || !empty_extensions_p(statement_extensions(st)))
     return FALSE;
+
   if (continue_statement_p(st))
     return ENDP(statement_declarations(st));
+
   i = statement_instruction(st);
   if (instruction_block_p(i) && ENDP(statement_declarations(st))) {
     MAP(STATEMENT, s,
@@ -772,6 +781,17 @@ statement make_continue_statement(entity l)
 			       empty_comments);
 }
 
+
+/* Make a simple continue statement to be used as a NOP or ";" in C
+
+   @return the statement
+*/
+statement make_plain_continue_statement()
+{
+    return make_continue_statement(entity_empty_label());
+}
+
+
 /* To preserve declaration lines and comments, declaration statements
    are used. */
 statement make_declaration_statement(entity v, int sn, string cs)
@@ -961,7 +981,7 @@ void print_statement(statement s)
   bool previous_is_fortran_p = get_prettyprint_is_fortran();
   /* Prettyprint in the correct language: */
   set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
-  text txt = text_statement(entity_undefined, 0, s);
+  text txt = text_statement(entity_undefined, 0, s, NIL);
   print_text(stderr, txt);
   free_text(txt);
   /* Put back the previous prettyprint language: */
@@ -1000,7 +1020,7 @@ text statement_to_text(statement s)
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
   set_alternate_return_set();
   reset_label_counter();
-  t = text_statement(entity_undefined, 0, s);
+  t = text_statement(entity_undefined, 0, s, NIL);
   reset_alternate_return_set();
   debug_off();
 
@@ -2167,19 +2187,17 @@ void insert_statement(statement s,
   else
     {
       statement s2 = copy_statement(s);
+      /* SG: s still holds the label
+       * we would like to move the label to s2 and to clear s
+       * however this would lead to incoherency*/
+      statement_label(s)=entity_empty_label();
       if (before)
 	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else
 	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s1,NIL));
 
-      statement_comments(s) = empty_comments;
-      statement_label(s)= entity_empty_label();
-      statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-      statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-
-      /* free_instruction(statement_instruction(s));*/
-      statement_instruction(s) = make_instruction(is_instruction_sequence,
-						  make_sequence(ls));
+      statement_instruction(s)=instruction_undefined;/* SG: this is important*/
+      update_statement_instruction(s, make_instruction_sequence(make_sequence(ls)));
     }
 }
 
@@ -2318,37 +2336,40 @@ statement add_declaration_statement(statement s, entity e)
 
 statement update_statement_instruction(statement s,instruction i)
 {
-  list seq = NIL;
-  statement cs = statement_undefined;
+    /* reset numbering and ordering */
+    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+    statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
 
-
-  statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-  statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-
-  if (instruction_sequence_p(i) &&
-      ((!statement_with_empty_comment_p(s)) || (!unlabelled_statement_p(s))))
+    /* try hard to keep comments and label when relevant */
+    if (instruction_sequence_p(i) && (
+                !statement_with_empty_comment_p(s) ||
+                (!unlabelled_statement_p(s) && !entity_return_label_p(statement_label(s))) /*SG:note the special returnèlabel case */
+                ) )
     {
-      cs = make_call_statement(CONTINUE_FUNCTION_NAME,
-			       NIL,
-			       statement_label(s),
-			       statement_comments(s));
+        statement cs = make_continue_statement(statement_label(s));
+        statement_comments(cs)= statement_comments(s);
+        statement_comments(s) = empty_comments;
+        statement_label(s)=entity_empty_label();
 
-      statement_comments(s) = empty_comments;
-      statement_label(s)= entity_empty_label();
+        /* add the CONTINUE statement before the sequence instruction i */
+        list seq = make_statement_list(cs,instruction_to_statement(i));
 
-      /* add the CONTINUE statement before the sequence instruction i */
-      seq = CONS(STATEMENT, cs, CONS(STATEMENT,instruction_to_statement(i),NIL));
-
-      free_instruction(statement_instruction(s));
-      statement_instruction(s) =  make_instruction(is_instruction_sequence,make_sequence(seq));
+        free_instruction(statement_instruction(s));
+        statement_instruction(s) =  make_instruction_sequence(make_sequence(seq));
     }
 
-  else
+    else
     {
-      free_instruction(statement_instruction(s));
-      statement_instruction(s) = i;
+        if(entity_return_label_p(statement_label(s)) && !return_statement_p(s))
+            statement_label(s)=entity_empty_label();
+        free_instruction(statement_instruction(s));
+        statement_instruction(s) = i;
+        /* SG: if the old statement had declarations, they are removed
+         * maybe we should regenerate the new one if any to keep global coherency ?*/
+        gen_free_list(statement_declarations(s));
+        statement_declarations(s)=NIL;
     }
-  return s;
+    return s;
 }
 
 /* Assume that statement rs appears in statement as and replaced it
@@ -2948,8 +2969,13 @@ static void statement_clean_declarations_statement_walker(statement s, set re)
  */
 set get_referenced_entities(void* elem)
 {
-  /* gather entities from s*/
   set referenced_entities = set_make(set_pointer);
+
+  /* if s is an entity it self, add it */
+  if(INSTANCE_OF(entity,(gen_chunkp)elem))
+      set_add_element(referenced_entities,referenced_entities,elem);
+
+  /* gather entities from s*/
   gen_context_multi_recurse(elem,referenced_entities,
 			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
 			    reference_domain,gen_true,statement_clean_declarations_reference_walker,

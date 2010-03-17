@@ -1,4 +1,4 @@
-/* Some generic methods about loops.
+/* Some generic methods about loops and list of loops.
 
    There are many things elsewher that should be factored out into here
    (static controlize...).
@@ -28,6 +28,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 
 #include "linear.h"
@@ -329,12 +332,25 @@ list loop_private_variables_as_entites (loop obj, bool local, bool index) {
   // locals field of the loop.
   list result = gen_copy_seq (loop_locals(obj));
 
+  ifdebug(9) {
+    pips_debug (9, "private entites to the loop:\n");
+    print_entities (result);
+    fprintf (stderr, "\n");
+  }
+
   if (local == TRUE) {
     // List of localy declared entities that are stored in loop body
     list decl_var = statement_declarations (loop_body (obj));
+    ifdebug(9) {
+      pips_debug (9, "localy declaed entites:\n");
+      print_entities (decl_var);
+      fprintf (stderr, "\n");
+    }
     gen_list_and_not (&result, decl_var);
   }
+
   if (index == TRUE) {
+    pips_debug (9, "loop_indexl to remove : %s\n", entity_name (loop_index(obj)));
     gen_remove (&result, loop_index(obj));
   }
 
@@ -658,4 +674,12 @@ void print_parallelization_statistics(
       fprintf(stderr, "%s %s parallelization statistics", module, msg);
       print_number_of_loop_statistics(stderr, "", s);
     }
+}
+
+/* Duplicate a loop list. */
+list copy_loops(list ll)
+{
+  list nll = gen_full_copy_list(ll);
+
+  return nll;
 }

@@ -21,15 +21,18 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #ifndef lint
 char vcid_scheduling_sccdfg[] = "$Id$";
 #endif /* lint */
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
-#include <values.h>
+#include <limits.h>
 
 #include "genC.h"
 

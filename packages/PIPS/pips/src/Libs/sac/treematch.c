@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
@@ -40,7 +43,7 @@ typedef dg_vertex_label vertex_label;
 #include "graph.h"
 
 #include "sac.h"
-#include "patterns.tab.h"
+#include "patterns.h"
 #include <errno.h>
 
 
@@ -291,7 +294,6 @@ void insert_pattern(char * s, list tokens, list args)
 
     matchTree_patterns(m) = CONS(PATTERNX, p, matchTree_patterns(m));
 }
-
 extern void patterns_yyparse();
 extern FILE * patterns_yyin;
 

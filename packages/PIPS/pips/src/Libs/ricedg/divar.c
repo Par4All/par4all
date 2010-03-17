@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 statement_mapping contexts_mapping_of_nest(stat, ce_map)
 statement stat;
 statement_mapping ce_map;

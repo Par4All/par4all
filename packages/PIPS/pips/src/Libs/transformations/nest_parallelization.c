@@ -21,13 +21,15 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* loop nest parallelization */
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
-/* #include <values.h> */
 #include <limits.h>
 
 #include "genC.h"
@@ -319,7 +321,7 @@ statement one_loop_parallelization(statement s)
 
     debug(9,"one_loop_parallelization", "begin - input loop\n");
     if(get_debug_level()>=9) {
-	print_text(stderr,text_statement(entity_undefined,0,s));
+      print_text(stderr,text_statement(entity_undefined,0,s,NIL));
 	pips_assert("one_loop_parallelization", statement_consistent_p(s));
     }
 
@@ -340,10 +342,9 @@ statement one_loop_parallelization(statement s)
 	    break;
 
     if(size>LARGE_LOOP_COUNT) {
-	pips_error("one_loop_parallelization", 
-		   "cannot find a transformation strategy"
-		   " for kind %d and count %d\n",
-		   kind, c);
+	pips_internal_error("cannot find a transformation strategy"
+			    " for kind %d and count %d\n",
+			    kind, c);
     }
     else {
 	    debug(9, "one_loop_parallelization",
@@ -355,10 +356,10 @@ statement one_loop_parallelization(statement s)
 
 
     ifdebug(9) {
-	debug(9,"one_loop_parallelization", "output loop\n");
-	print_text(stderr,text_statement(entity_undefined,0,s));
+	pips_debug(9, "output loop\n");
+	print_text(stderr,text_statement(entity_undefined,0,s,NIL));
 	pips_assert("one_loop_parallelization", statement_consistent_p(s));
-	debug(9,"one_loop_parallelization", "end\n");
+	pips_debug(9, "end\n");
     }
 
     return new_s;

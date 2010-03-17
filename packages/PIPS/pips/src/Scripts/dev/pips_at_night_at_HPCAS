@@ -34,6 +34,9 @@ umask 022
 ulimit -v 2000000
 ulimit -d 2000000
 
+# Do not try to use PYPS since it does not work with old build infrastructure:
+export PIPS_NO_PYPS=1
+
 #email=pips-validation@cri.ensmp.fr
 email=pips-by-night@enstb.org
 target=~/PIPS

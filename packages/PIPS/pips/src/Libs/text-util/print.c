@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -202,8 +205,8 @@ void print_text(fd, t)
 FILE *fd;
 text t;
 {
-    MAPL(cs, 
-	 print_sentence(fd, SENTENCE(CAR(cs))), 
+    MAPL(cs,
+	 print_sentence(fd, SENTENCE(CAR(cs))),
 	 text_sentences(t));
 }
 

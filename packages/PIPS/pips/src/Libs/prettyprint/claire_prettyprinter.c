@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
 
    Try to prettyprint the RI in CLAIRE.
@@ -211,8 +214,8 @@ static string claire_expression(expression e)
   return result;
 }
 
-gen_array_t array_names;
-gen_array_t array_dims;
+static gen_array_t array_names;
+static gen_array_t array_dims;
 
 #define ITEM_NOT_IN_ARRAY -1
 
@@ -1333,22 +1336,22 @@ static void claire_loop(stack st, string_buffer result)
   string_buffer_append(result, "exLoopNest = LOOPNEST(deep = ");
   string_buffer_append(result, concatenate(i2a(stack_size(st)),",",NULL));
 
-  STACK_MAP_X(s, statement, 
-  {   
+  STACK_MAP_X(s, statement,
+  {
     loop l = instruction_loop(statement_instruction(s));
-    expression el =range_lower(loop_range(l));  
+    expression el =range_lower(loop_range(l));
     expression eu =range_upper(loop_range(l));
     expression new_eu= expression_plusplus(eu);
 
   string_buffer_append(buffer_lower,
 		       concatenate(comma_needed? ",": "",
 				   "vartype!(",
-				   words_to_string(words_expression(el)),
+				   words_to_string(words_expression(el,NIL)),
 				   ")",NULL));
   string_buffer_append(buffer_upper,
 		       concatenate(comma_needed? ",": "",
 				   "vartype!(",
-				   words_to_string(words_expression(new_eu)),
+				   words_to_string(words_expression(new_eu,NIL)),
 				   ")",NULL));
   string_buffer_append(buffer_names,
 		       concatenate(comma_needed? ",": "",

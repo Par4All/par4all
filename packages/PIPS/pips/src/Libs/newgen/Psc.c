@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* NewGen interface with C3 type Psysteme for PIPS project 
   *
   * Systems of linear equalities and inequalities are stored as a triplet,

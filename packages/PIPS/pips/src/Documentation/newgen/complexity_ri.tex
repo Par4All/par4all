@@ -20,103 +20,104 @@
 %% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 %%
 \documentclass[a4]{article}
-
+ 
 \usepackage[latin1]{inputenc}
 \usepackage{newgen_domain}
 \usepackage[backref,pagebackref]{hyperref}
-
+ 
 \begin{document}
-\section*{Structure de donnée complexité }
+\section*{Data Structure for Complexity Models }
 \today
-
+ 
 \domain{Import statement from "ri.newgen"}
 {
 \paragraph{}
-(Evite les conflits de numéros de type avec ceux définis par la RI)
+(Avoids conflicts between number types and types defined by the RI)
 }
 \domain{External Ppolynome}
 {
 \paragraph{}
-Le domaine {\bf Ppolynome} est utilisé pour représenter les
-complexités des {\bf statement} en fonction de paramètres,
-de variables et des indices de boucles englobantes.
-Un Ppolynome est une liste de monômes, chaque monôme étant constitué
-d'un coefficient flottant et d'un Pvecteur représentant le produit
-des variables avec leurs puissances.
-}
-
+The domain {\bf Ppolynome} is used to represent the complexities of
+the {\bf statement} as function of parameters, variables and indices
+of loops with lobal coverage.  A Ppolynome is a list of monomials,
+each monomial being constited of a floating coefficient and a Pvecteur
+representing the product of variables with their expopents.  }
+ 
 \domain{Complexity = eval:Ppolynome x varcount x rangecount x ifcount}
 {
 \paragraph{}
-Au cours de l'évaluation, un champ {\bf complexité} est associée à
-chaque {\bf statement}. Le sous-domaine {\bf eval} contient un polynôme
-approchant la complexité du statement. Les sous-domaines
-{\bf varcount}, {\bf rangecount} et {\bf ifcount} donnent des informations
-statistiques sur la façon dont s'est déroulé l'évaluation de la
-complexité, donc aussi sur la complexité elle-même. Ils comptent
-en les classant les différents types de variables/boucles/tests 
-rencontrés au cours de l'évaluation de la complexité.
-}
-
-\domain{Varcount = symbolic:int x guessed:int x bounded:int x unknown:int} 
+In the course of the evaluation, a field {\bf complexity} is
+associated with each {\bf statement}. The sub-domain {\bf eval}
+contains a polynome Approching the complexity of the statement. The
+sub-domains {\bf varcount}, {\bf rangecount} and {\bf ifcount} give
+the information statistics concerning the mnner in which the
+evaluation of the complexity took place, therefore also of the
+complexity itself. They count and in so doing classify the different
+types of variables/loops/tests encountered in the course of the
+complexity's evaluation.  }
+ 
+\domain{Varcount = symbolic:int x guessed:int x bounded:int x unknown:int}
 {
 \begin{itemize}
-\item	{\bf symbolic} = nombre de variables qu'on voulait voir
-	apparaitre en symbolique dans l'expression de la complexité
-	("parameters" Fortran, indices de boucles, paramètres formels
-	d'une subroutine). Cela donne des résultats faux si ce type de
-	variable est modifiée au cours de l'exécution.
 
-\item	{\bf guessed} = nombre de variables dont on a deviné la valeur
-	grâce à l'analyse sémantique
+\item {\bf symbolic} = the number of variables which we would like to
+  see appear in symbolic form in the expression of the complexity
+  ("parameters" Fortran, loop indices, formal parameters of a
+  subroutine). This gives false resultats of thois type of variable is
+  modified in the course of execution.
 
-\item	{\bf bounded} = nombre de variables qu'on a majoré ou minoré
-	grâce à l'analyse sémantique
-
-\item	{\bf unknown} = nombre de variables sur lesquelles on n'a trouvé aucune
-	information, et que l'utilisateur n'a pas demandé de voir apparaitre
-	dans la complexité. Ces variables sont toutes remplacées par la
-	pseudo-variable UNKNOWN\_VARIABLE, qui prend à la fin de l'évaluation
-	une valeur par défaut.
+\item {\bf guessed} = the number of variables the values of which
+  which we have guessed thanks to semantic analysis.
+    
+\item {\bf bounded} = the number of variables for whih we have
+  determined a maximum or minimum thanks to semantic analysis.
+ 
+\item {\bf unknown} = the number of for which e have found no
+  information, and which the user has not asked to se displayed in the
+  complexity. These variables are all replaced by the pseudo-variable
+  UNKNOWN\_VARIABLE, which takes at the end of the evaluation a
+  default value.
 \end{itemize}
 }
-
-\domain{Rangecount = profiled:int x guessed:int x bounded:int x unknown:int} 
+ 
+\domain{Rangecount = profiled:int x guessed:int x bounded:int x unknown:int}
 {
 \begin{itemize}
-\item	{\bf profiled} = nombre de boucles dont les bornes ont ete
-	mesurées au moyen de profiling
 
-\item	{\bf guessed} = nombre de boucles dont les bornes étaient au
-	pire des polynômes de variables du type {\bf symbolic} ou
-	{\bf guessed}
-
-\item	{\bf bounded} = nombre de boucles dont les bornes ont été
-	minorées/majorées grâce à l'analyse sémantique
-
-\item	{\bf unknown} = nombre de boucles dont le nombre de tours n'a pu
-	être découvert. Forcément nul après une passe
-	de profiling. Tous ces nombres sont remplacés par la
-	pseudo-variable: UNKNOWN\_RANGE, qui prendra à la fin de
-	l'évaluation une valeur par défaut.
+\item {\bf profiled} = the number of loops for which the limits have
+  been measured by means of profiling.
+ 
+\item {\bf guessed} = the number of loops for which the limits were at
+  worst variable polynomes of type {\bf symbolic} or {\bf guessed}
+ 
+\item {\bf bounded} = the number of loops for which the min./max
+  limits were deterlined thanks to semantic analysis.
+ 
+\item {\bf unknown} = the number of loops for which the number of
+  loops could not be discovered. In consequence 0 after profiling
+  pass. All these numbers are replaced by the pseudo-variable:
+  UNKNOWN\_RANGE, which will be given a default value at the end.
 \end{itemize}
 }
-
-\domain{Ifcount = profiled:int x computed:int x halfhalf:int} 
+ 
+\domain{Ifcount = profiled:int x computed:int x halfhalf:int}
 {
 \begin{itemize}
-\item	{\bf profiled} = nombre de tests dont la probabilité a ete
-	mesurée par du profiling
 
-\item	{\bf computed} = nombre de tests dont la probabilité a été
-	calculée. En particulier dans le cas où l'expression
-	booléenne ne dépend que des indices des boucles englobantes
-	et que leurs {\bf range}s sont du type {\bf guessed}.
-
-\item	{\bf halfhalf} = nombre de tests dont la probabilité a ete
-	prise égale a $\frac{1}{2}$ par défaut.
+\item {\bf profiled} = the number of tests for which the probability
+  was messured by mens of profiling .
+ 
+\item {\bf computed} = the number of tests for which the probability
+  the probability was calculated. In particular in this case where the
+  boolean expression depends only on the indices of those loops whose
+  coverage global and whose {\bf range}s are of type {\bf guessed}.
+ 
+\item {\bf halfhalf} = the number of tests the probability of which
+  was determined to be equal to a $\frac{1}{2}$ by defaut.
 \end{itemize}
-
+ 
 }
-
+ 
 \end{document}
+ 
+

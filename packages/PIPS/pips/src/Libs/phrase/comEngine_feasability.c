@@ -21,8 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
-This file is used to analyze the code that we want to export to the 
+This file is used to analyze the code that we want to export to the
 HRE.
  */
 
@@ -935,7 +938,7 @@ static bool attach_ref_to_loop(reference callRef, statement inStat,
 	if(gIfCount != 0)
 	  {
 	    pips_error("", "conflict with reference: %s\n",
-		       words_to_string(words_reference(callRef)));
+		       words_to_string(words_reference(callRef, NIL)));
 
 	    return FALSE;
 	  }
@@ -984,7 +987,7 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 			   reference_variable(callRef)))
 	    {
 	      pips_error("", "loop index must not vary in the code: %s\n",
-			 words_to_string(words_reference(callRef)));
+			 words_to_string(words_reference(callRef, NIL)));
 
 	      return FALSE;
 	    }
@@ -1020,7 +1023,7 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 
     MAP(REFERENCE, indRef,
     {
-      // If one reference contained in callRef indices is an 
+      // If one reference contained in callRef indices is an
       // array reference or that the reference is written in
       // the code to compile, then the compilation is impossible
       if((gen_length(reference_indices(indRef)) != 0) ||
@@ -1029,7 +1032,7 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 	  gen_free_list(lIndRef);
 
 	  pips_error("", "%s is not a valid reference\n",
-		     words_to_string(words_reference(callRef)));
+		     words_to_string(words_reference(callRef, NIL)));
 
 	  return FALSE;
 	}

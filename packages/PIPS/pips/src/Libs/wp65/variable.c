@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* Code Generation for Distributed Memory Machines
   *
   * Define and allocate local variables as well as emulated shared variables
@@ -38,7 +41,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-/* #include <values.h> */
 #include <limits.h>
 #include <string.h>
 
@@ -277,7 +279,7 @@ int ls;
     AddEntityToDeclarations(esv,memory_module);
 
     debug(8,"make_emulated_shared_variable", "esv_name=%s\n", entity_name(esv));
-    ifdebug(8) print_sentence(stderr,sentence_variable(esv));
+    ifdebug(8) print_sentence(stderr,sentence_variable(esv, NIL));
     debug(8,"make_emulated_shared_variable", "end\n");
 
     return(esv);
@@ -423,7 +425,7 @@ hash_table r_to_ud;
     ifdebug(8) {
 	(void) fprintf(stderr, "reference %p to %s:", 
 		       r, entity_local_name(rv));
-	print_words(stderr, words_reference(r));
+	print_words(stderr, words_reference(r, NIL));
 	(void) putc('\n', stderr);
     }
 
@@ -449,7 +451,7 @@ hash_table r_to_ud;
 	    ifdebug(8) {
 		(void) fprintf(stderr, "conflict_p with reference %p to %s:",
 			       r2, entity_local_name(rv2));
-		print_words(stderr, words_reference(r2));
+		print_words(stderr, words_reference(r2, NIL));
 		(void) putc('\n', stderr);
 	    }
 
@@ -527,9 +529,9 @@ graph dg;
     debug(8,"reference_conflicting_p","begin\n");
     ifdebug(8) {
 	(void) fprintf(stderr,"Reference 1 %p: ", r1);
-	print_words(stderr, words_reference(r1));
+	print_words(stderr, words_reference(r1, NIL));
 	(void) fprintf(stderr,"\nReference 2 %p: ", r2);
-	print_words(stderr, words_reference(r2));
+	print_words(stderr, words_reference(r2, NIL));
 	(void) fputc('\n',stderr);
     }
 
@@ -553,14 +555,14 @@ graph dg;
 
 		ifdebug(8) {
 		    (void) fprintf(stderr,"Test with reference 1 %p: ", r1);
-		    print_words(stderr, words_reference(r1));
+		    print_words(stderr, words_reference(r1, NIL));
 		    (void) fprintf(stderr," and reference 2 %p: ", r2);
-		    print_words(stderr, words_reference(r2));
+		    print_words(stderr, words_reference(r2, NIL));
 		    (void) fputc('\n',stderr);
 		    (void) fprintf(stderr,"Test with reference 11 %p: ", r11);
-		    print_words(stderr, words_reference(r11));
+		    print_words(stderr, words_reference(r11, NIL));
 		    (void) fprintf(stderr," and reference 21 %p: ", r21);
-		    print_words(stderr, words_reference(r21));
+		    print_words(stderr, words_reference(r21, NIL));
 		    (void) fputc('\n',stderr);
 		    (void) fputc('\n',stderr);
 		}
@@ -828,7 +830,7 @@ int dimn;
 	MAPL(clv, 
 	 {
 	     entity lv = ENTITY(CAR(clv));
-	     print_sentence(stderr,sentence_variable(lv));
+	     print_sentence(stderr,sentence_variable(lv, NIL));
 	 },
 	     llv);
     }

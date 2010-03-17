@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Package generation (for the hyperplane transformation?)
  */
 
@@ -61,7 +64,7 @@ void look_for_nested_loop_statements(statement s,
     cons *list_loop_statement;
     test tt;
     statement true_s, false_s;
-	
+
     i = statement_instruction(s);
     switch (instruction_tag(i)) {
     case is_instruction_loop:
@@ -72,24 +75,22 @@ void look_for_nested_loop_statements(statement s,
 	    list_loop_statement = CONS (STATEMENT,s,NIL);
 
 	    ifdebug(9) {
-		debug(9, "look_for_nested_loop_statements",
-		      "Before transformation:\n");
+		pips_debug(9, "Before transformation:\n");
 		debug_on("ZERO_DEBUG_LEVEL");
-		print_text(stderr,text_statement(entity_undefined, 0, s));
+		print_text(stderr,text_statement(entity_undefined, 0, s, NIL));
 		debug_off();
 	    }
 
 	    new_s = look_for_inner_loops(l,
 					 list_loop_statement,
-					 loop_transformation, 
+					 loop_transformation,
 					 loop_predicate);
-	    
+
 	    ifdebug(9) {
-		debug(9, "look_for_nested_loop_statements",
-		      "After transformation:\n");
+		pips_debug(9, "After transformation:\n");
 		pips_assert("look_for_nested_loop_statement", statement_consistent_p(new_s));
 		debug_on("ZERO_DEBUG_LEVEL");
-		print_text(stderr,text_statement(entity_undefined,0,new_s));
+		print_text(stderr,text_statement(entity_undefined,0,new_s, NIL));
 		debug_off();
 	    }
 	    if (new_s != statement_undefined) {
@@ -285,7 +286,7 @@ cons *sl;
 {
     MAPL(cl, {
 	loop l = LOOP(CAR(cl));
-	text t = text_loop(mod, entity_name(loop_label(l)), 2, l, 0);
+	text t = text_loop(mod, entity_name(loop_label(l)), 2, l, 0, NIL);
 	print_text(stderr,t); },
 	 sl);
 }

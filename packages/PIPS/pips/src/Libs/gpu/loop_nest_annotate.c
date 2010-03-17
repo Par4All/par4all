@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /* loop nests transformation phase for par4all :
 
@@ -160,8 +163,9 @@ static void loop_annotate(loop l)
 				     CONS(EXPRESSION, c_number_iter_exp, NIL));
 	}
       
+      /* FI: how about an expression_to_string() */
       pips_debug(2, "guard expression : %s\n",
-		 words_to_string(words_expression(guard_exp)));
+		 words_to_string(words_expression(guard_exp, NIL)));
 
       guard_s = test_to_statement(make_test(guard_exp,
 					    loop_body(l),
@@ -180,23 +184,28 @@ static void loop_annotate(loop l)
   if (gen_length(l_enclosing_loops) == 1)
     {
       statement current_stat = p4a_private_current_stmt_head();
-      string outer_s = "// Loop nest P4A begin,";      
-
-      outer_s = strdup(concatenate(outer_s, i2a(loop_nest_depth),
-			     "D", OPENPAREN,  NULL));
+#define LOOP_NEST_P4A_BEGIN "// Loop nest P4A begin,"
+      string outer_s;
+      asprintf(&outer_s, LOOP_NEST_P4A_BEGIN "%dD" OPENPAREN , loop_nest_depth);
 
       FOREACH(EXPRESSION, upper_exp, l_number_iter_exp)
 	{
-	  outer_s = strdup(concatenate(outer_s, 
-				 words_to_string(words_expression(upper_exp)),
-				 NULL));
+        string buf,
+	  buf1=words_to_string(words_expression(upper_exp, NIL));
+        asprintf(&buf,"%s%s",outer_s,buf1);
+        free(outer_s);free(buf1);
+        outer_s=buf;
 	  loop_nest_depth --;	  
 	  if (loop_nest_depth > 0)
-	    outer_s = strdup(concatenate(outer_s, COMMA));
+      {
+          asprintf(&buf,"%s"COMMA,outer_s);
+          free(outer_s);
+          outer_s=buf;
+      }
 	}
 
-      outer_s = strdup(concatenate(outer_s, CLOSEPAREN, "\n", NULL)); 
-      statement_comments(current_stat) = outer_s;
+      asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
+      free(outer_s);
 
       /* clean up things for another loop nest */
       inner_reached = FALSE;

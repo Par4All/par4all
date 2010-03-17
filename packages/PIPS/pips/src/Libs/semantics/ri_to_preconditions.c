@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* semantical analysis
   *
   * phasis 2: propagate preconditions from statement to sub-statement,
@@ -681,7 +684,7 @@ transformer statement_to_postcondition(
 	list non_initial_values =
 	    arguments_difference(transformer_arguments(pre),
 				 get_module_global_arguments());
-	list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
+	list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
 
 	/* FI: OK, to be fixed when the declaration representation is
 	   frozen. */
@@ -705,18 +708,32 @@ transformer statement_to_postcondition(
 	    precondition_add_reference_information(pre, s);
 	}
 
-	if(!ENDP(dl)) {
-	  list vl = variables_to_values(dl);
+	/* Add information from declarations when useful */
+	if(declaration_statement_p(s) && !ENDP(dl)) {
+	  /* FI: it might be better to have another function,
+	     declarations_to_postconditions(), which might be
+	     slightly more accurate? Note that
+	     declarations_to_transformer() does compute the
+	     postcondition, but free it before returning the transformer */
 	  transformer dt = declarations_to_transformer(dl, pre);
 	  transformer dpre = transformer_apply(dt, pre);
 
-	  post = instruction_to_postcondition(dpre, i, tf);
-	  if(!ENDP(vl))
-	    post = safe_transformer_projection(post, vl);
-	  free_transformer(dpre);
+	  //post = instruction_to_postcondition(dpre, i, tf);
+	  //free_transformer(dpre);
+	  // FI: Let's assume that declaration statement do not
+	  //require further analysis
+	  post = dpre;
 	}
 	else {
 	  post = instruction_to_postcondition(pre, i, tf);
+	}
+
+	/* Remove information when leaving a block */
+	if(statement_block_p(s) && !ENDP(statement_declarations(s))) {
+	  list vl = variables_to_values(statement_declarations(s));
+
+	  if(!ENDP(vl))
+	    post = safe_transformer_projection(post, vl);
 	}
 
 	/* add equivalence equalities */
@@ -759,8 +776,8 @@ transformer statement_to_postcondition(
 	    pips_internal_error("Non-consistent precondition after update\n");
 	}
 
-	/* Do not keep too many initial variables in the preconditions: not so smart? 
-	 * 
+	/* Do not keep too many initial variables in the preconditions: not so smart?
+	 *
 	 * See character01.c, but other counter examples above about
 	 * non_initial_values.
 	 */
@@ -802,4 +819,82 @@ transformer statement_to_postcondition(
     debug(1,"statement_to_postcondition","end\n");
 
     return post;
+}
+
+/* This function is mostly copied from
+   declarations_to_transformer(). It is used to recompute
+   intermediate preconditions and to process the initialization
+   expressions with the proper precondition. For instance, in:
+
+   int i = 10, j = i+1, a[i], k = foo(i);
+
+   you need to collect information about i's value to initialize j,
+   dimension a and compute the summary precondition of function foo().
+
+   We assume that the precondition does not change within the
+   expression as in:
+
+   int k = i++ + foo(i);
+
+   I do not remember if the standard prohibits this or not, but it may
+   well forbid such expressions or state that the result is undefined.
+*/
+transformer propagate_preconditions_in_declarations(list dl,
+						    transformer pre,
+						    void (*process)(expression, transformer))
+{
+  //entity v = entity_undefined;
+  //transformer btf = transformer_undefined;
+  //transformer stf = transformer_undefined;
+  transformer post = transformer_undefined;
+  list l = dl;
+
+  pips_debug(8,"begin\n");
+
+  if(ENDP(l))
+    post = copy_transformer(pre);
+  else {
+    entity v = ENTITY(CAR(l));
+    expression ie = variable_initial_expression(v);
+    transformer stf = declaration_to_transformer(v, pre);
+    transformer btf = transformer_dup(stf);
+    transformer next_pre = transformer_undefined;
+
+    if(!expression_undefined_p(ie)) {
+      (*process)(ie, pre);
+      free_expression(ie);
+    }
+
+    post = transformer_safe_apply(stf, pre);
+    post = transformer_safe_normalize(post, 4);
+
+    for (POP(l) ; !ENDP(l); POP(l)) {
+      v = ENTITY(CAR(l));
+      ie = variable_initial_expression(v);
+      if(!expression_undefined_p(ie)) {
+	(*process)(ie, post);
+	free_expression(ie);
+      }
+
+      if(!transformer_undefined_p(next_pre))
+	free_transformer(next_pre);
+      next_pre = post;
+      stf = declaration_to_transformer(v, next_pre);
+      post = transformer_safe_apply(stf, next_pre);
+      post = transformer_safe_normalize(post, 4);
+      btf = transformer_combine(btf, stf);
+      btf = transformer_normalize(btf, 4);
+
+      ifdebug(1)
+	pips_assert("btf is a consistent transformer",
+		    transformer_consistency_p(btf));
+	pips_assert("post is a consistent transformer if pre is defined",
+		    transformer_undefined_p(pre)
+		    || transformer_consistency_p(post));
+    }
+    free_transformer(btf);
+  }
+
+  pips_debug(8, "end\n");
+  return post;
 }

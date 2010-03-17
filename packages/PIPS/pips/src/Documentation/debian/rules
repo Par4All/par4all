@@ -13,28 +13,39 @@
 
 PYVERS=$(shell pyversions -vr)
 
-configure: configure-stamp
-configure-stamp:
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+CROSS= --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+else
+CROSS= --build $(DEB_BUILD_GNU_TYPE)
+endif
+
+
+build: build-stamp
+
+config.status: configure
 	dh_testdir
 	# Add here commands to configure the package.
-	touch configure-stamp
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess config.guess
+endif
+	./configure $(CROSS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --sysconfdir=/etc/pips \
+		CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs" \
+		--enable-pyps --enable-hpfc
 
 
-build: build-stamp $(PYVERS:%=build-python%)
-
-build-python%:
-	cd $(CURDIR)/src/Passes/pypips && python$* setup.py build
-	touch $@
-
-
-MAKE_OPT=COPT='-g -O0' WITH_DYNAMIC_LIBRARIES=1 NEWGEN_ROOT=/usr LINEAR_ROOT=/usr
-build-stamp: configure-stamp
+build: build-stamp
+build-stamp:  config.status 
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE) $(MAKE_OPT) CONFIG_DIR=/etc build
-	$(MAKE) $(MAKE_OPT) -C $(CURDIR)/src/Passes/pypips setup.py
-	#docbook-to-man debian/pips.sgml > pips.1
+	$(MAKE)
 
 	touch $@
 
@@ -43,14 +54,14 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp $(CURDIR)/debian/pyps.install $(CURDIR)/debian/pyps.dirs
 
-	$(MAKE) unbuild
+	# Add here commands to clean up after the build process.
+	[ ! -f Makefile ] || $(MAKE) distclean
+	rm -f config.sub config.guess
 
 	dh_clean 
 
-install: build pre-install $(PYVERS:%=install-python%)
-	$(MAKE) $(MAKE_OPT) \
-		INSTALL_DIR=$(CURDIR)/debian/tmp/usr ETC.d=$(CURDIR)/debian/tmp/etc \
-		install
+install: build pre-install 
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
 	# Add here commands to install the package into debian/pips.
 
 pre-install:
@@ -59,9 +70,6 @@ pre-install:
 	dh_clean 
 	dh_installdirs
 
-
-install-python%:
-	cd $(CURDIR)/src/Passes/pypips && python$* setup.py install --no-compile --root $(CURDIR)/debian/python-pips
 
 # Build architecture-independent files here.
 binary-indep: build install

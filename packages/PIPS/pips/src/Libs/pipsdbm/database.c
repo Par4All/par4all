@@ -21,10 +21,13 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * Here is the database!
  *
- * Here are just the internals. 
+ * Here are just the internals.
  * They rely on pipsdbm private data structures, which are not exported!
  * all exported functions should check that DB_OK.
  */
@@ -46,7 +49,7 @@ extern bool compilation_unit_p(string); /* alas in c_syntax.h */
         db_status_loaded_and_stored_p(db_resource_db_status(r))
 
 /* Module names must use some characters.
- * Upper case letters and underscore for Fortran, 
+ * Upper case letters and underscore for Fortran,
  * but also lower case letters and the FILE_SEP_STRING
  * "#" added for C compilation unit FC 12/08/2003
  *
@@ -64,7 +67,7 @@ extern bool compilation_unit_p(string); /* alas in c_syntax.h */
   ( "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
     "0123456789" \
     "abcdefghijklmnopqrstuvwxyz" \
-    FILE_SEP_STRING MODULE_SEP_STRING "_#-" )
+    FILE_SEP_STRING MODULE_SEP_STRING "_#-." )
 
 static bool simple_name_p(const string name)
 {
@@ -74,7 +77,7 @@ static bool simple_name_p(const string name)
 static db_symbol find_or_create_db_symbol(const string name)
 {
     db_symbol s = gen_find_tabulated(name, db_symbol_domain);
-    if (!simple_name_p(name)) 
+    if (!simple_name_p(name))
       pips_user_warning("strange name \"%s\"\n", name);
     return db_symbol_undefined_p(s)? make_db_symbol(strdup(name)): s;
 }
@@ -108,15 +111,15 @@ static void db_clean_db_resources();
 bool db_open_pips_database(FILE * fd)
 {
     db_resources rs;
-    DB_UNDEF; 
+    DB_UNDEF;
     rs = read_db_resources(fd);
     if (db_resources_undefined_p(rs)) return FALSE;
-    set_pips_database(rs); 
+    set_pips_database(rs);
 
     /* coredump in copy if done on save in next function ???. */
     db_clean_db_resources();
 
-    ifdebug(1) 
+    ifdebug(1)
       dump_all_db_resource_status(stderr, "db_open_pips_database");
 
     DB_OK;
@@ -126,7 +129,7 @@ bool db_open_pips_database(FILE * fd)
 void db_save_pips_database(FILE * fd)
 {
   /* db_resources dbres; */
-  DB_OK; 
+  DB_OK;
   /* ??? check for required resources left over? */
 
   /* save a cleaned COPY with status artificially set as STORED... */
@@ -155,11 +158,11 @@ static string db_status_string(db_status s)
     return "undefined";
   switch (db_status_tag(s))
   {
-  case is_db_status_stored: 
+  case is_db_status_stored:
     return "stored";
-  case is_db_status_loaded: 
+  case is_db_status_loaded:
     return "loaded";
-  case is_db_status_required: 
+  case is_db_status_required:
     return "required";
   case is_db_status_loaded_and_stored:
     return "loaded&stored";
@@ -171,12 +174,12 @@ static string db_status_string(db_status s)
 
 static void dump_db_resource(string rname, string oname, db_resource r)
 {
-  ifdebug(1) 
+  ifdebug(1)
   {
     pips_debug(1, "rname=%s, oname=%s, r=%p\n", rname, oname, r);
     if (!db_resource_undefined_p(r)) {
       db_status s = db_resource_db_status(r);
-      pips_debug(1, "pointer=%p, status=%s, time=%td, file_time=%td\n", 
+      pips_debug(1, "pointer=%p, status=%s, time=%td, file_time=%td\n",
 		 db_resource_pointer(r), db_status_string(s),
 		 db_resource_time(r), db_resource_file_time(r));
     }
@@ -194,8 +197,8 @@ void dump_all_db_resource_status(FILE * file, string where)
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
       fprintf(file, "resource %s[%s] status '%s' since %td (%td) 0x%p\n",
-	      rn, on, 
-	      db_status_string(db_resource_db_status(r)), 
+	      rn, on,
+	      db_status_string(db_resource_db_status(r)),
 	      db_resource_time(r),
 	      db_resource_file_time(r),
 	      db_resource_pointer(r));
@@ -203,7 +206,7 @@ void dump_all_db_resource_status(FILE * file, string where)
 			   or);
   },
 		   get_pips_database());
-  
+
 }
 
 #define debug_db_resource(l, r, o, p) ifdebug(l) { dump_db_resource(r, o, p);}
@@ -219,7 +222,7 @@ static void init_owned_resources_if_necessary(string name)
 static db_owned_resources get_db_owned_resources(string oname)
 {
     db_symbol o = find_or_create_db_symbol(oname);
-    return bound_pips_database_p(o)? 
+    return bound_pips_database_p(o)?
 	load_pips_database(o): db_owned_resources_undefined;
 }
 
@@ -266,7 +269,7 @@ static db_resource find_or_create_db_resource(string rname, string oname)
     r = get_resource(rname, or);
     if (db_resource_undefined_p(r))
     { /* create it */
-	db_symbol rs = find_or_create_db_symbol(rname); 
+	db_symbol rs = find_or_create_db_symbol(rname);
 	r = make_db_resource(NULL, db_status_undefined, 0, 0);
 	extend_db_owned_resources(or, rs, r);
     }
@@ -309,7 +312,7 @@ static void db_clean_db_resources()
 	lr = CONS(STRING, rn, lr);
 	lo = CONS(STRING, on, lo);
       }
-      else if (db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) 
+      else if (db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r))
       {
 	pips_debug(1, "resource %s[%s] set as stored\n", rn, on);
 	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
@@ -329,7 +332,7 @@ static void db_clean_db_resources()
     dump_db_resource(rn, on, r);
     db_delete_resource(rn, on);
   }
-  
+
   gen_free_list(lr_init);
   gen_free_list(lo_init);
 
@@ -348,10 +351,10 @@ void db_delete_resource(string rname, string oname)
     pips_assert("valid owned resources", !db_owned_resources_undefined_p(or));
     r = get_resource(rname, or);
     if (!db_resource_undefined_p(r))
-    { 
+    {
       /* let us do it! */
       db_symbol rs = find_or_create_db_symbol(rname);
-      if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
+      if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) &&
 	  db_resource_pointer(r))
       {
 	dbll_free_resource(rname, oname, db_resource_pointer(r));
@@ -373,16 +376,16 @@ bool db_update_time(string rname, string oname)
   r = get_real_db_resource(rname, oname);
   db_resource_time(r) = db_get_logical_time();
   db_resource_file_time(r) =
-    dbll_stat_local_file((char*) db_resource_pointer(r), FALSE); 
+    dbll_stat_local_file((char*) db_resource_pointer(r), FALSE);
   /*dbll_stat_resource_file(rname, oname, TRUE); */
   return TRUE;
 }
 
 /* FI wants a sort... so here it is, FC. */
-typedef struct 
+typedef struct
 {
-  int time; 
-  string owner_name; 
+  int time;
+  string owner_name;
   string res_name;
 } t_tmp_result, * p_tmp_result;
 
@@ -417,11 +420,11 @@ void db_print_all_required_resources(FILE * file)
     {
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
-      pips_debug(8, "resource %s[%s] is %s\n", 
+      pips_debug(8, "resource %s[%s] is %s\n",
 		 rn, on, db_status_string(db_resource_db_status(r)));
 
       if (db_resource_required_p(r)) {
-	lres = CONS(DB_VOID,  
+	lres = CONS(DB_VOID,
 		    make_tmp_result(db_resource_time(r), on, rn),
 		    lres);
       }
@@ -436,8 +439,8 @@ void db_print_all_required_resources(FILE * file)
   MAPL(l,
   {
     p_tmp_result p = (p_tmp_result) CAR(l).e;
-    fprintf(file, 
-	    "resource %s[%s] is in 'required' status since %d\n", 
+    fprintf(file,
+	    "resource %s[%s] is in 'required' status since %d\n",
 	    p->res_name, p->owner_name, p->time);
     free(p);
   },
@@ -1012,7 +1015,7 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
  * As FI points out to me (FC), it just means that the
  * name has been used by some-one, some-where, some-time...
  *
- * It just checks that an non empty resource table is associated to 
+ * It just checks that an non empty resource table is associated to
  * this name. The table may be created when resources are marked as
  * required by pipsmake, and is never destroyed?
  */
@@ -1051,22 +1054,36 @@ gen_array_t db_get_module_list_initial_order(void)
   ls = gen_filter_tabulated(gen_true, db_symbol_domain);
   a = gen_array_make(0);
   dbr = get_pips_database();
-  
-  MAP(DB_SYMBOL, symbol, 
-  {
-    string name = db_symbol_name(symbol);
 
-    /* if it is a module, append... */
-    if (!string_undefined_p(name) &&
-	!same_string_p(name, "") && 
-	/* I should check that some actual resources is stored? */
-	bound_db_resources_p(dbr, symbol))
-      gen_array_dupappend(a, name);
-  },
-      ls);
+
+  FOREACH(DB_SYMBOL, symbol, ls)
+  {
+      string name = db_symbol_name(symbol);
+      /* if it is a module, append... */
+      if (!string_undefined_p(name) &&
+              !same_string_p(name, "") &&
+              /* I should check that some actual resources is stored? */
+              bound_db_resources_p(dbr, symbol) &&
+              compilation_unit_p(name)
+      )
+          gen_array_dupappend(a, name);
+  }
+  FOREACH(DB_SYMBOL, symbol, ls)
+  {
+      string name = db_symbol_name(symbol);
+      /* if it is a module, append... */
+      if (!string_undefined_p(name) &&
+              !same_string_p(name, "") &&
+              /* I should check that some actual resources is stored? */
+              bound_db_resources_p(dbr, symbol) &&
+              !compilation_unit_p(name)
+      )
+          gen_array_dupappend(a, name);
+  }
+
 
   gen_free_list(ls);
-  return a;  
+  return a;
 }
 
 
@@ -1077,7 +1094,7 @@ gen_array_t db_get_module_list_initial_order(void)
 
 /* Returns an allocated array a with the sorted list of modules.
  *
- * strings are duplicated.  
+ * strings are duplicated.
  *
  * Compilation units were not added because Fabien Coelho wanted to
  * avoid them in validation files: they do depend on include files
@@ -1096,8 +1113,8 @@ gen_array_t db_get_module_or_function_list(bool module_p)
     gen_array_t a = gen_array_make(0);
     DB_OK;
 
-    DB_RESOURCES_MAP(os, or, 
-    {     
+    DB_RESOURCES_MAP(os, or,
+    {
 	string on = db_symbol_name(os);
 	pips_assert("some symbol name", on);
 	pips_debug(9, "considering %s -> %p\n", on, or);

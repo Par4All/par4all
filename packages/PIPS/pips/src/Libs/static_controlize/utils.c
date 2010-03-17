@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Name     :	utils.c
  * Package  :	static_controlize.c
  * Author   :	Arnauld LESERVOT
@@ -33,7 +36,7 @@
 /* Ansi includes 	*/
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* Newgen includes	*/
@@ -268,7 +271,7 @@ list *ell;
 	list args;
 
 	pips_debug(7, "exp : %s\n",
-			words_to_string( words_expression( exp ) ));
+		   words_to_string( words_expression( exp, NIL ) ));
 	if (syntax_tag(s) != is_syntax_call) return( FALSE );
 	c = syntax_call( s );
 	if (!ENTITY_GREATER_OR_EQUAL_P(call_function( c ))) return( FALSE );
@@ -295,7 +298,7 @@ list ndf_normalized_test(expression exp, list *ell)
 		return( list_undefined );
 	}
 	pips_debug(7, "input exp : %s\n",
-			words_to_string(words_expression( exp )) );
+		   words_to_string(words_expression( exp, NIL )) );
 
 	fun = call_function(syntax_call(expression_syntax( exp )));
 	args = call_arguments(syntax_call(expression_syntax( exp )));
@@ -433,7 +436,7 @@ list *ell;
 
 	if (exp == expression_undefined) return( exp );
 	pips_debug(7, "exp : %s\n",
-			words_to_string(words_expression( exp )) );
+		   words_to_string(words_expression( exp, NIL )) );
 	if (syntax_tag( s ) != is_syntax_call) return( ret_exp );
 
 	if (ENTITY_NOT_P( fun )) {
@@ -445,7 +448,7 @@ list *ell;
 
 		ret_exp = MakeUnaryCall(ENTITY_NOT, exp1 );
 		pips_debug(7, "returning : %s\n",
-			words_to_string(words_expression( ret_exp )) );
+			   words_to_string(words_expression( ret_exp, NIL )) );
 		return( ret_exp );
 	}
 
@@ -486,7 +489,7 @@ list *ell;
 		call_arguments(syntax_call( s )) = new_args;
 		ret_exp = copy_expression( exp );
 		pips_debug(7, "returning : %s\n",
-			words_to_string(words_expression( ret_exp )) );
+			   words_to_string(words_expression( ret_exp, NIL )) );
 		return( ret_exp );
 	}
 	else if (	ENTITY_RELATIONAL_OPERATOR_P( fun ) &&
@@ -558,7 +561,7 @@ list *ell;
 
 	pips_debug(7, "returning : %s\n",
 		((ret_exp == expression_undefined)?"expression_undefined":\
-			words_to_string(words_expression( ret_exp ))) );
+		 words_to_string(words_expression( ret_exp, NIL ))) );
 	return( ret_exp );
 }
 			
@@ -575,7 +578,7 @@ expression sc_conditional(expression exp, list *ell)
 	list		ndf_list;
 
 	pips_debug(7, "exp : %s\n",
-				words_to_string(words_expression(exp)));
+		   words_to_string(words_expression(exp, NIL)));
 
 	if ( syntax_tag(s) != is_syntax_call ) return( ret_exp );
 	e = normalize_test_leaves(exp, ell);
@@ -592,7 +595,7 @@ expression sc_conditional(expression exp, list *ell)
 
 	pips_debug(7, "returning : %s\n",
 		((ret_exp == expression_undefined)?"expression_undefined":
-		words_to_string(words_expression( ret_exp ))) );
+		 words_to_string(words_expression( ret_exp, NIL ))) );
 	return( ret_exp );
 }			
 				
@@ -626,7 +629,7 @@ bool splc_linear_expression_p(expression exp, list *ell)
   bool         ONLY_SPLC;
 
   pips_debug(7, "exp : %s\n",
-	words_to_string(words_expression(exp)));
+	     words_to_string(words_expression(exp, NIL)));
 
   if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
     ONLY_SPLC = FALSE;
@@ -750,7 +753,7 @@ list sc_list_of_entity_dup(list l)
 
 /*=================================================================*/
 /* list sc_list_of_loop_dup( (list) l )				AL 04/93
- * Duplicates a list of loops.
+ * Duplicates a list of loops. See Newgen gen_copy_seq()?
  */
 list sc_list_of_loop_dup(list l)
 {
@@ -767,14 +770,15 @@ list sc_list_of_loop_dup(list l)
 
 /*=================================================================*/
 /* list sc_loop_dup( (list) l )					AL 04/93
- * Duplicates a loop.
+ * Duplicates a loop with sharing of the loop_body and sharing of the
+ * loop locals.
  */
 loop sc_loop_dup(loop l)
 {
 	loop new_loop;
 
 	pips_debug( 7, "doing\n");
-	new_loop = make_loop(loop_index(l), range_dup(loop_range(l)),
+	new_loop = make_loop(loop_index(l), copy_range(loop_range(l)),
 			loop_body(l), loop_label(l), loop_execution(l),
 			loop_locals(l));
 
@@ -793,14 +797,20 @@ list make_undefined_list()
 	list the_list = NIL;
 
 	pips_debug(7, "doing\n");
+	/*
 	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
 	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
+	*/
+	ADD_ELEMENT_TO_LIST( the_list, STATEMENT,
+			     make_continue_statement(entity_empty_label()));
+	ADD_ELEMENT_TO_LIST( the_list, STATEMENT,
+			     make_continue_statement(entity_empty_label()));
 	return the_list;
 }
 
 
 /*=================================================================*/
-/* int in_forward_defined( (entity) ent ) 			AL 30/08/93
+/* int in_forward_defined( (entity) ent )			AL 30/08/93
  * Returns the number of entities ent in the list Gscalar_written_forward.
  */
 int in_forward_defined(entity ent, list *swfl)
@@ -831,28 +841,6 @@ bool in_forward_defined_p(entity ent, list * swfl)
 	pips_debug(9, "scalar written_forward = %s\n",
 			print_structurals(*swfl) );
 	return( ch != entity_undefined );
-}
-
-/*=================================================================*/
-/* bool undefined_statement_list_p( (list) l )			AL 04/93
- * Returns TRUE if l is made of 2 undefined_statement.
- *
- * FI: to be modifed to deal with other kinds of "undefined" statements
- */
-bool undefined_statement_list_p(list l)
-{
-	bool		local_bool;
-	statement	first, second;
-
-	pips_debug(7,"doing\n");
-	if ( (l == NIL) || (gen_length(l) != 2) )
-		return( FALSE );
-
-	first = STATEMENT(CAR( l ));
-	second = STATEMENT(CAR(CDR( l )));
-	local_bool = ( first == statement_undefined )
-		     && ( second == statement_undefined );
-	return( local_bool );
 }
 
 /*=================================================================*/
@@ -913,75 +901,6 @@ entity f;
 }
 
 /*=================================================================*/
-/* entity scalar_assign_call((call) c)
- * Detects if the call is an assignement
- * and if the value assigned is a scalar. If it is so, it
- * returns this scalar.
- */
-entity scalar_assign_call(call c)
-{
-  entity ent = entity_undefined;
-
-  pips_debug( 7, "doing \n");
-  if (ENTITY_ASSIGN_P(call_function(c)))
-    {
-      expression lhs;
-
-      lhs = EXPRESSION(CAR(call_arguments(c)));
-      ent = expression_int_scalar( lhs );
-    }
-  pips_debug( 7, "returning : %s \n",
-	 ((ent == entity_undefined)?"entity_undefined":
-	  entity_name(ent)) );
-  return( ent );
-}
-
-/*=================================================================*/
-/* scalar_written_in_call((call) the_call)
- * Detects and puts a scalar written in an assignement call,
- * in the global list Gscalar_written_forward if Genclosing_loops
- * or Genclosing_tests are not empty.
- */
-void scalar_written_in_call(call the_call, list * ell, list * etl, list * swfl)
-{
-   entity ent;
-
-   pips_debug(7, "doing\n");
-   if (    ((ent = scalar_assign_call(the_call)) != entity_undefined)
-        && ( (*ell != NIL) || (*etl != NIL) )
-	&& entity_integer_scalar_p( ent ) )
-
-	ADD_ELEMENT_TO_LIST(*swfl, ENTITY, ent);
-}
-
-/*=================================================================*/
-/* entity  expression_int_scalar((expression) exp)
- * Returns the scalar entity if this expression is a scalar.
- */
-entity expression_int_scalar(expression exp)
-{
-        syntax  s = expression_syntax( exp );
-        tag     t = syntax_tag( s );
-        entity	ent = entity_undefined;
-
-	pips_debug(7, "doing \n");
-        switch( t ) {
-                case is_syntax_reference: {
-			entity local;
-                        local = reference_variable(syntax_reference(s));
-                        if (entity_integer_scalar_p(local)) ent = local;
-                        break;
-                }
-                default: break;
-        }
-	pips_debug(7,
-		 "returning : %s\n",
-		 ((ent == entity_undefined)?"entity_undefined":
-			entity_local_name( ent )) );
-        return( ent );
-}
-
-/*=================================================================*/
 /* bool sp_linear_expression_p( (expression) exp)
  * Returns TRUE if the expression is a linear combinaison of
  * structural parameters.
@@ -992,7 +911,7 @@ bool sp_linear_expression_p(expression exp)
    bool         ONLY_SP;
 
    pips_debug(7, "exp : %s\n",
-	      words_to_string(words_expression(exp)));
+	      words_to_string(words_expression(exp, NIL)));
 
    if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
         ONLY_SP = FALSE;
@@ -1028,7 +947,7 @@ bool splc_feautrier_expression_p(expression exp, list * ell)
 
 	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
-			words_to_string( words_expression( exp ) ) ));
+		 words_to_string( words_expression( exp, NIL ) ) ));
 
 	if (splc_linear_expression_p(exp, ell)) return( TRUE );
 	if ( syntax_tag( s ) == is_syntax_call ) {
@@ -1061,7 +980,7 @@ bool sp_feautrier_expression_p(expression exp)
 
 	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
-			words_to_string( words_expression( exp ) ) ));
+		 words_to_string( words_expression( exp, NIL ) ) ));
 
 	if (sp_linear_expression_p( exp )) return( TRUE );
 	if ( syntax_tag( s ) == is_syntax_call ) {
@@ -1120,26 +1039,27 @@ call c;
 hash_table fst; /* forward substitute table */
 list *swfl;
 {
-   entity 	lhs_ent, ent;
+   entity	lhs_ent, ent;
    bool		ret_bool = FALSE;
 
    pips_debug(7, "begin\n");
+   /*FI: not too sure about the FALSE parameter... */
    pips_debug(9, "input call : %s \n",
-			words_to_string(words_regular_call( c )));
+	      words_to_string(words_regular_call( c, FALSE, NIL )));
    pips_debug(9, "struct param. before : %s \n",
 			print_structurals( Gstructure_parameters ));
-	
+
    if (ENTITY_READ_P( call_function(c) )) {
         list the_arg = call_arguments( c );
 
         MAPL( exp_ptr,
-          {
+	      {
 	  expression exp = EXPRESSION(CAR( exp_ptr ));
 	  ent = expression_int_scalar( (expression) exp );
-          if ((ent != entity_undefined)  && !in_forward_defined_p(ent, swfl))
+	  if ((ent != entity_undefined)  && !in_forward_defined_p(ent, swfl))
 		ADD_ELEMENT_TO_LIST( Gstructure_parameters, ENTITY, ent );
           },
-          the_arg);
+	      the_arg);
    }
 
    if (    ((lhs_ent = sp_feautrier_scalar_assign_call(c)) != entity_undefined)
@@ -1153,7 +1073,7 @@ list *swfl;
 	}
 	else {
 	        nsp_ent = make_nsp_entity();
-	        nsp_exp = make_entity_expression( nsp_ent, NIL );
+		nsp_exp = make_entity_expression( nsp_ent, NIL );
 		hash_put(fst, (char*) lhs_ent, (char*) nsp_exp  );
 		ADD_ELEMENT_TO_LIST( Gstructure_parameters, ENTITY, nsp_ent );
 		ret_bool = TRUE;
@@ -1168,199 +1088,86 @@ list *swfl;
    return( ret_bool );
 }
 
+
+/* rewriting of forward_substitute_in_exp, in_loop,...
+ *
+ * FI: what was the initial semantics? Substitute the left hand sides
+ * only?
+ *
+ * see transformations/induction_substitution.c
+ *
+ * It's a simple case because the loop indices cannot be written
+ * within the loop bounds
+*/
 
-/*=================================================================*/
-/* expression make_max_exp(entity ent, expression exp1, expression exp2)
- * computes MAX( exp1, exp2 ) if exp1 and exp2 are constant expressions.
- * If it is not the case, it returns MAX( exp1, exp2 )
- */
-expression make_max_exp(entity ent, expression exp1, expression exp2)
+static void substitute_variable_by_expression(expression e, hash_table fst)
 {
-	expression rexp;
+  syntax s = expression_syntax(e);
+  if(syntax_reference_p(s)) {
+    entity v = reference_variable(syntax_reference(s));
+    expression ne = hash_get(fst, (void *) v);
 
-	pips_debug(7, "doing MAX( %s, %s ) \n",
-		words_to_string(words_expression( exp1 )),
-		words_to_string(words_expression( exp2 )) );
-	if (expression_constant_p( exp1 ) && expression_constant_p( exp2 )) {
-		int val1 = expression_to_int( exp1 );
-		int val2 = expression_to_int( exp2 );
-		if (val1 > val2) rexp = make_integer_constant_expression(val1);
-		else rexp = make_integer_constant_expression( val2 );
-	}
-	else rexp = MakeBinaryCall( ent, exp1, exp2 );
-
-	return rexp ;
-}
-
-
-/*=================================================================*/
-/* entity make_nlc_entity(int *Gcount_nlc):
- *
- * Returns a new entity. Its local name is "NLC#", where '#' represents
- * the value of "Gcount_nlc". This variable counts the number of NLCs
- * variables.
- *
- * These entities have a special full name. The first part of it is the
- * concatenation of the define constant STATIC_CONTROLIZE_MODULE_NAME and
- * the local name of the current module.
- *
- * The type ("basic") of these variables is INTEGER.
- *
- * These variables are local to the current module, so they have a
- * "storage_ram" with DYNAMIC "area".
- *
- * NLC means Normalized Loop Counter.
- */
-entity make_nlc_entity(Gcount_nlc)
-int *Gcount_nlc;
-{
-	entity 	new_ent, mod_ent;
-	char 	*name, *num;
-	entity  dynamic_area;
-	ram	new_dynamic_ram;
-
-	pips_debug(7, "doing\n");
-	(*Gcount_nlc)++;
-    num=i2a(*Gcount_nlc);
-
-	mod_ent = get_current_module_entity();
-
-	name = strdup(concatenate(STATIC_CONTROLIZE_MODULE_NAME,
-                          entity_local_name(mod_ent),
-                          MODULE_SEP_STRING, NLC_PREFIX, num, (char *) NULL));
-    free(num);
-
-	new_ent = make_entity(name,
-                      make_type(is_type_variable,
-				make_variable(make_basic_int(4),
-					      NIL, NIL)),
-                      make_storage(is_storage_ram, ram_undefined),
-                      make_value(is_value_unknown, UU));
-
-	dynamic_area = FindOrCreateEntity( module_local_name(mod_ent),
-                                  DYNAMIC_AREA_LOCAL_NAME);
-
-	new_dynamic_ram = make_ram(mod_ent,
-                           dynamic_area,
-                           CurrentOffsetOfArea(dynamic_area, new_ent),
-                           NIL);
-
-	storage_ram(entity_storage(new_ent)) = new_dynamic_ram;
-
-	return(new_ent);
-}
-
-/*=================================================================*/
-/* entity  make_nsp_entity()
- * Makes a new NSP (for New Structural Parameter) .
- *
- * FI: Should use a function located in ri-util library
- *
- * FI: Won't work for C as a declarataion statement is not generated.
- */
-entity make_nsp_entity()
-{
-  extern  int Gcount_nsp; // FI: oops...
-	entity  new_ent, mod_ent;
-	char    *name, *num;
-	entity  dynamic_area;
-	ram	new_dynamic_ram;
-
-	pips_debug(7, "doing\n");
-	Gcount_nsp++;
-    num=i2a(Gcount_nsp);
-
-	mod_ent = get_current_module_entity();
-
-	name = strdup(concatenate(STATIC_CONTROLIZE_MODULE_NAME,
-                          entity_local_name(mod_ent),
-                          MODULE_SEP_STRING, NSP_PREFIX, num, (char *) NULL));
-    free(num);
-
-        new_ent = make_entity(name,
-			      make_type(is_type_variable,
-					make_variable(make_basic_int(4),
-						      NIL, NIL)),
-			      make_storage(is_storage_ram, ram_undefined),
-			      make_value_unknown());
-
-        dynamic_area = FindOrCreateEntity( module_local_name(mod_ent),
-                                  DYNAMIC_AREA_LOCAL_NAME);
-
-        new_dynamic_ram = make_ram(mod_ent,
-                           dynamic_area,
-                           CurrentOffsetOfArea(dynamic_area, new_ent),
-                           NIL);
-
-        storage_ram(entity_storage(new_ent)) = new_dynamic_ram;
-
-	return new_ent;
-}
-
-/*=================================================================*/
-/* entity  make_nub_entity()
- * Makes a new NUB (for New Upper Bound) .
- *
- * FI: same problems as with nsb
- */
-entity make_nub_entity()
-{
-	extern  int Gcount_nub;
-	entity  new_ent, mod_ent;
-	char    *name, *num;
-	entity	dynamic_area;
-	ram	new_dynamic_ram;
-
-
-	pips_debug( 7, "doing\n");
-	Gcount_nub++;
-    num=i2a(Gcount_nub);
-
-	mod_ent = get_current_module_entity();
-
-	name = strdup(concatenate(STATIC_CONTROLIZE_MODULE_NAME,
-                          entity_local_name(mod_ent),
-                          MODULE_SEP_STRING, NUB_PREFIX, num, (char *) NULL));
-
-        new_ent =
-	  make_entity(name,
-		      make_type_variable(
-					 make_variable(make_basic_int(4),
-						       NIL, NIL)),
-		      make_storage(is_storage_ram, ram_undefined),
-		      make_value(is_value_unknown, UU));
-
-        dynamic_area = FindOrCreateEntity( module_local_name(mod_ent),
-                                  DYNAMIC_AREA_LOCAL_NAME);
-
-        new_dynamic_ram = make_ram(mod_ent,
-                           dynamic_area,
-                           CurrentOffsetOfArea(dynamic_area, new_ent),
-                           NIL);
-
-        storage_ram(entity_storage(new_ent)) = new_dynamic_ram;
-
-	return new_ent;
-}
-
-/*=================================================================*/
-/* entity current_module(entity mod): returns the current module entity,
- * that is the entity of the module in which we are working currently.
- * If the entity "mod" is undefined, it returns the static entity already known;
- * Else, the static entity is updated to the entity "mod".
- *
- * FI: should be replaced by standard get_current_module_entity()
- */
-entity current_module(entity mod)
-{
-    static entity current_mod;
-
-    pips_debug(7, "doing\n");
-    if (mod != entity_undefined) {
-	pips_assert("current_module_entity", entity_module_p(mod));
-	current_mod = mod;
+    if(!expression_undefined_p(ne)) {
+      /* FI: let's take care of memory leaks later...
+       *
+       * The hash_table could contain syntax objects...
+       */
+      expression_syntax(e) = expression_syntax(ne);
     }
-    return(current_mod);
+  }
 }
 
-/*=================================================================*/
+void forward_substitute_in_loop(loop *pl, hash_table fst)
+{
+  /* Would it be better to loop over with HASH_MAP or to check every
+     reference? */
+  gen_context_multi_recurse(*pl, fst,
+			    expression_domain, gen_true, substitute_variable_by_expression,
+			    NULL);
+}
+
+void forward_substitute_in_exp(expression * pe, hash_table fst)
+{
+  /* Would it be better to loop over with HASH_MAP or to check every
+     reference? */
+  gen_context_multi_recurse(*pe, fst,
+			    expression_domain, gen_true, substitute_variable_by_expression,
+			    NULL);
+}
+
+void forward_substitute_in_call(call * pc, hash_table fst)
+{
+  pips_assert("call c is consistent_p\n", call_consistent_p(*pc));
+
+  /* Would it be better to loop over with HASH_MAP or to check every
+     reference? */
+  gen_context_multi_recurse(*pc, fst,
+			    expression_domain, gen_true, substitute_variable_by_expression,
+			    NULL);
+}
+
+
+/* bool normalizable_loop_p(loop l)
+ * Returns TRUE if "l" has a constant step.
+ */
+bool normalizable_loop_p(loop l)
+{
+  pips_debug(7, "doing\n");
+  return(expression_constant_p(range_increment(loop_range(l))));
+}
+
+
+/* Code retrieved from revision 14476,
+   transformations/loop_normalize.c */
+
+/* Code to be retrieved: I suppose you need a constant increment? */
+bool normalizable_loop_p_retrieved(loop l)
+{
+  bool ok = FALSE;
+  entity i = loop_index(l);
+  range r = loop_range(l);
+
+  ok = normalizable_and_linear_loop_p(i, r);
+
+  return ok;
+}

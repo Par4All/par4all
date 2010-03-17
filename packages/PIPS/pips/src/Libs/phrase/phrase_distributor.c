@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <ctype.h>
 
@@ -63,6 +66,7 @@ typedef dg_vertex_label vertex_label;
 #include "effects-convex.h"
 
 #include "phrase_distribution.h"
+#include "preprocessor.h"
 
 static entity create_module_with_statement (statement stat, 
 					    string new_module_name,
@@ -768,7 +772,7 @@ static entity create_module_with_statement (statement stat,
   init_prettyprint(empty_text);
   make_text_resource(new_module_name,
 		     DBR_INITIAL_FILE, 
-		     ".f_initial",
+		     FORTRAN_INITIAL_FILE_SUFFIX,
 		     text_code);
   close_prettyprint();
 

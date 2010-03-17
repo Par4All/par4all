@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* 
  *
  * This phase is used for PHRASE project. 
@@ -135,7 +138,7 @@ static string st_brace_expression_as_string(expression exp)
     if (brace_expression_p(e))
       result = strdup(concatenate(result,first?"":",",st_brace_expression_as_string(e),NULL));
     else
-      result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e)),NULL));
+      result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e, NIL)),NULL));
     first = FALSE;
   },args);
   result = strdup(concatenate(result,CLOSEBRACKET,NULL));
@@ -510,7 +513,7 @@ static string st_declaration_init(entity var)
 	}
       break;
     }
-  default: 
+  default:
     break;
   }
   switch (type_tag(t)) {
@@ -531,14 +534,14 @@ static string st_declaration_init(entity var)
 
 	if (!value_undefined_p(val)) {
 	  if (value_expression_p(val)) {
-	    /* This variable must be initialized 
-	     * Anyway, i don't know how to initialize a variable 
+	    /* This variable must be initialized
+	     * Anyway, i don't know how to initialize a variable
 	     * at declaration in Fortran !!! */
 	    expression exp = value_expression(val);
 	    if (brace_expression_p(exp))
 	      result = strdup(concatenate(result,SETVALUE,st_brace_expression_as_string(exp),NULL));
-	    else 
-	      result = strdup(concatenate(result,SETVALUE,words_to_string(words_expression(exp)),NULL));
+	    else
+	      result = strdup(concatenate(result,SETVALUE,words_to_string(words_expression(exp, NIL)),NULL));
 	  }
 	}
       }
@@ -567,7 +570,7 @@ static string st_declaration_init(entity var)
     }
   case is_type_enum:
     {
-      result = "undefined ENUM in SMALLTALK";      
+      result = "undefined ENUM in SMALLTALK";
       break;
     }
   default:

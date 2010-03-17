@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * (pretty)print of reductions.
  *
@@ -115,7 +118,7 @@ static list /* of string */ words_reduction(reduction r)
 {
     return CONS(STRING, reduction_operator_name(reduction_op(r)),
 	   CONS(STRING, strdup("["),
-             gen_nconc( words_reference(reduction_reference(r)),
+		gen_nconc( words_reference(reduction_reference(r),NIL),
 	   CONS(STRING, strdup("],"), NIL))));
 }
 

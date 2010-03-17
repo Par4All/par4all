@@ -32,7 +32,10 @@ shopt -s extglob
 something=
 
 # what is the current arch?
-arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
+if [ -n "${PIPS_ARCH}" -o -x $PIPS_ROOT/makes/arch.sh ]
+then
+	arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
+fi
 
 function handle_out_file()
 {

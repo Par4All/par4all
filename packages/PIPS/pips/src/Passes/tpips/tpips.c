@@ -67,9 +67,6 @@ static bool use_readline = FALSE;
 static FILE * logfile;
 static FILE * current_file; /* current file being processed */
 
-extern char * soft_revisions;
-extern char * soft_date;
-extern char * cc_version;
 extern int tgetnum();
 extern void tp_restart( FILE * ); /* tp_lex.c */
 

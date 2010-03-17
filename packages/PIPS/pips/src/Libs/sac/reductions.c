@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "genC.h"
 #include "linear.h"
@@ -94,6 +97,10 @@ expression make_float_constant_expression(float c)
                 make_call(ce,NIL)), 
             normalized_undefined);
     return (ex_cons);
+}
+expression make_complex_constant_expression(float re, float im)
+{
+    return MakeComplexConstantExpression(make_float_constant_expression(re),make_float_constant_expression(im));
 }
 
 static entity make_reduction_vector_entity(reduction r)
@@ -209,14 +216,21 @@ static bool reduction_in_statement_p(reduction red, statement stat)
    to do the reduction. */
 static void rename_statement_reductions(statement s, list * reductions_info, list reductions)
 {
+    ifdebug(3) {
+        pips_debug(3,"considering statement:\n");
+        print_statement(s);
+    }
     FOREACH(REDUCTION, r, reductions)
     {
-        pips_debug(3,"red bas\n");
-        print_reference(reduction_reference(r));
-        pips_debug(3,"\n");
+        ifdebug(3) {
+            pips_debug(3,"considering reduction:\n");
+            print_reference(reduction_reference(r));
+            fprintf(stderr,"\n");
+        }
 
         if(reduction_in_statement_p(r,s))
         {
+            pips_debug(3,"found in the statement ! rewriting ...\n");
             basic b = basic_of_reference(reduction_reference(r));
             if(!basic_undefined_p(b))
             {
@@ -226,6 +240,8 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
                     gen_context_recurse(s,ri,expression_domain,gen_true,rename_reduction_ref_walker);
             }
         }
+        else
+            pips_debug(3,"not found in the statement ! skipping ...\n");
     }
 }
 
@@ -287,8 +303,11 @@ static expression make_0val_expression(basic b)
         case is_basic_int:
             return make_integer_constant_expression(0);
 
+        case is_basic_complex:
+            return make_complex_constant_expression(0,0);
+
         default:
-            return expression_undefined;
+            pips_internal_error("function not implemented for this basic \n");
     }
 }
 
@@ -305,6 +324,9 @@ static expression make_1val_expression(basic b)
 
         case is_basic_int:
             return make_integer_constant_expression(1);
+
+        case is_basic_complex:
+            return make_complex_constant_expression(0,1);
 
         default:
             return expression_undefined;
@@ -356,6 +378,7 @@ static statement generate_prelude(reductionInfo ri)
 
     // For each reductionInfo_vector reference, make an initialization
     // assign statement and add it to the prelude
+    // do nothing if no init val exist
     for(i=0; i<reductionInfo_count(ri); i++)
     {
         instruction is;
@@ -472,6 +495,11 @@ static void reductions_rewrite(statement s)
             body = forloop_body(instruction_forloop(i));
             break;
 
+        case is_instruction_call:
+            if(get_bool_property("SIMD_REMOVE_REDUCTIONS_ONLY_IN_LOOP")) return;
+            else body = s;
+            break;
+
         default:
             return;
     }
@@ -483,6 +511,13 @@ static void reductions_rewrite(statement s)
 
         //Compute the reductions list for the loop
         list reductions = reductions_list(load_cumulated_reductions(s));
+        ifdebug(2) {
+            if(!ENDP(reductions))
+                pips_debug(2,"found reductions for loop:\n");
+            else
+                pips_debug(2,"no reduction for loop:\n");
+            print_statement(s);
+        }
 
         //Lookup the reductions in the loop's body, and change the loop body accordingly
         instruction ibody = statement_instruction(body);
@@ -518,17 +553,13 @@ static void reductions_rewrite(statement s)
         gen_full_free_list(reductions_info);
 
         // Replace the old statement instruction by the new one
-        statement_instruction(s) = make_instruction_sequence(make_sequence(
-                    gen_concatenate(preludes, 
-                        CONS(STATEMENT, copy_statement(s),
-                            compacts))));
-
-        statement_label(s) = entity_empty_label();
-        statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-        statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-        statement_comments(s) = empty_comments;
-        statement_declarations(s) = NIL;
-        statement_decls_text(s) = string_undefined;
+        statement scp = copy_statement(s);
+        statement_label(s)=entity_empty_label();
+        sequence seq = make_sequence(
+                gen_concatenate(
+                    preludes,
+                    CONS(STATEMENT, scp,compacts)));
+        update_statement_instruction(s,make_instruction_sequence(seq));
     }
 }
 

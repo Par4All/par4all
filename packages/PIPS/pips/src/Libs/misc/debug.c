@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Debugging functions
  *
  * Modifications:
@@ -36,7 +39,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-/* #include <malloc.h> in genC.h */
+/* #include <stdlib.h> in genC.h */
 	
 #include "genC.h"
 #include "misc.h"

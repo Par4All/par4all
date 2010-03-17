@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #define DEBUG_XML 1
 
@@ -231,8 +234,8 @@ static string xml_expression(expression e)
   return result;
 }
 
-gen_array_t array_names;
-gen_array_t array_dims;
+static gen_array_t array_names;
+static gen_array_t array_dims;
 
 #define ITEM_NOT_IN_ARRAY -1
 
@@ -1357,9 +1360,9 @@ STACK_MAP_X(s, statement,
   string_buffer_append(result,
 		       concatenate(TAB,SPACE,SPACE,SPACE,SPACE,OPENANGLE,"bound idx =",QUOTE,entity_user_name(loop_index(l)),QUOTE,NULL));
   string_buffer_append(result,
-		       concatenate(SPACE, "lower =",QUOTE, words_to_string(words_expression(el)),QUOTE,NULL));
+		       concatenate(SPACE, "lower =",QUOTE, words_to_string(words_expression(el,NIL)),QUOTE,NULL));
   string_buffer_append(result,
-		       concatenate(SPACE, "upper =", QUOTE, words_to_string(words_expression(new_eu)),QUOTE, SLASH, CLOSEANGLE,NL,NULL));
+		       concatenate(SPACE, "upper =", QUOTE, words_to_string(words_expression(new_eu,NIL)),QUOTE, SLASH, CLOSEANGLE,NL,NULL));
   },
 	      st, 0);
 
@@ -1905,21 +1908,21 @@ bool print_xml_code(string module_name)
 
 
 static string vect_to_string(Pvecteur pv) {
-  return  words_to_string(words_syntax(expression_syntax(make_vecteur_expression(pv))));
+  return  words_to_string(words_syntax(expression_syntax(make_vecteur_expression(pv)),NIL));
 }
 
 boolean vect_one_p(Pvecteur v) {
-  return  (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && vect_coeff(TCST, v) ==1); 
+  return  (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && vect_coeff(TCST, v) ==1);
 }
 
 boolean vect_zero_p(Pvecteur v) {
-  return  (VECTEUR_NUL_P(v) || 
-	   (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && value_zero_p(vect_coeff(TCST, v)))); 
+  return  (VECTEUR_NUL_P(v) ||
+	   (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && value_zero_p(vect_coeff(TCST, v))));
 }
 
 static void type_and_size_of_var(entity var, char ** datatype, int *size)
 {
-  // type t = ultimate_type(entity_type(var)); 
+  // type t = ultimate_type(entity_type(var));
   type t = entity_type(var);
   if (type_variable_p(t)) {
     basic b = variable_basic(type_variable(t));
@@ -2529,7 +2532,7 @@ boolean  eval_linear_expression(expression exp, Psysteme ps, int *val)
   boolean result = TRUE;
   *val = 0;
 
-  // fprintf(stdout,"Expression a evaluer : %s",words_to_string(words_expression(exp)));
+  // fprintf(stdout,"Expression a evaluer : %s",words_to_string(words_expression(exp,NIL)));
   
   if (expression_normalized(exp) == normalized_undefined) 
     expression_normalized(exp)= NormalizeExpression(exp); 
@@ -2570,21 +2573,21 @@ static void xml_Bounds(expression elow, expression eup,Psysteme prec, string_buf
   /* Print XML Array LOWER BOUND */
   string_buffer_append_word("LowerBound",sb_result);
   global_margin++;
-  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(elow))),
-				sb_result);     
-  if (expression_integer_value(elow, &low))  
+  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(elow),NIL)),
+				sb_result);
+  if (expression_integer_value(elow, &low))
     string_buffer_append_numeric(i2a(low),sb_result);
   else if (eval_linear_expression(elow,prec,&valr))
     string_buffer_append_numeric(i2a(valr),sb_result);
-  
+
   global_margin--;
   string_buffer_append_word("/LowerBound",sb_result);
-    
+
   /* Print XML Array UPPER BOUND */
   string_buffer_append_word("UpperBound",sb_result);
   global_margin++;
-  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(eup))),
-				sb_result);     
+  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(eup),NIL)),
+				sb_result);
   if (expression_integer_value(eup, &up))  
     string_buffer_append_numeric(i2a(up),sb_result);
   else if (eval_linear_expression(eup,prec,&valr))
@@ -2592,9 +2595,9 @@ static void xml_Bounds(expression elow, expression eup,Psysteme prec, string_buf
 
   global_margin--;
   string_buffer_append_word("/UpperBound",sb_result);
-  
+
 }
-static void xml_Bounds_and_Stride(expression elow, expression eup, expression stride, 
+static void xml_Bounds_and_Stride(expression elow, expression eup, expression stride,
 				  Psysteme prec, string_buffer sb_result)
 {
   int inc;
@@ -2602,20 +2605,20 @@ static void xml_Bounds_and_Stride(expression elow, expression eup, expression st
   xml_Bounds(elow, eup,prec,sb_result);
   string_buffer_append_word("Stride",sb_result);
   global_margin++;
-  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(stride))),
-				sb_result);     
-  if (expression_integer_value(stride, &inc))  
+  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(stride),NIL)),
+				sb_result);
+  if (expression_integer_value(stride, &inc))
     string_buffer_append_numeric(i2a(inc),sb_result);
   else if (eval_linear_expression(stride,prec,&valr))
      string_buffer_append_numeric(i2a(valr),sb_result);
- 
+
   global_margin--;
   string_buffer_append_word("/Stride",sb_result);
-    
+
 }
 
 static void find_memory_comment_on_array(statement s)
-{ 
+{
   string comm = statement_comments(s);
   string result = NULL;
  
@@ -2702,34 +2705,34 @@ static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
       global_margin++;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   concatenate(OPENANGLE, 
-					      "Dimension", 
-					      CLOSEANGLE, 
-					      NL, NULL));
+			   concatenate(OPENANGLE,
+				       "Dimension",
+				       CLOSEANGLE,
+				       NL, NULL));
       /* Print XML Array Bound */
       global_margin++;
       xml_Bounds(elow,eup,prec,sb_result);
       global_margin--;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   concatenate(OPENANGLE, 
-					      "/Dimension", 
-					      CLOSEANGLE, 
-					      NL, NULL));
+			   concatenate(OPENANGLE,
+				       "/Dimension",
+				       CLOSEANGLE,
+				       NL, NULL));
       global_margin--;
-      layout_low[no_dim] = words_to_string(words_syntax(expression_syntax(elow)));
-      layout_up[no_dim] = words_to_string(words_syntax(expression_syntax(eup)));
+      layout_low[no_dim] = words_to_string(words_syntax(expression_syntax(elow),NIL));
+      layout_up[no_dim] = words_to_string(words_syntax(expression_syntax(eup),NIL));
       no_dim++;
     }
-  }   
- 
+  }
+
   string_buffer_append_word("/Dimensions",sb_result);
 
   /* Print XML Array LAYOUT */
   string_buffer_append_word("Layout",sb_result);
   global_margin++;
   for (i =0; i<= no_dim-1; i++) {
-    string_buffer_append_word("DimLayout",sb_result); 
+    string_buffer_append_word("DimLayout",sb_result);
     global_margin++;
     string_buffer_append_word("Symbolic",sb_result);
     if (i==no_dim-1) {
@@ -3224,7 +3227,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
     }
      else {
       // Actual Parameter could be  an expression
-      aan = words_to_string(words_syntax(sr));
+       aan = words_to_string(words_syntax(sr,NIL));
       rw_ef = 1;
 
     }
@@ -3233,24 +3236,24 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
       global_margin++;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   concatenate(OPENANGLE, 
-					      "ScalarArgument ActualName=", 
-					      QUOTE,
-					      aan,
-					      QUOTE,BL,
-					      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
-					      "AccessMode=",QUOTE,(rw_ef>=2)? "DEF": "USE", QUOTE,CLOSEANGLE,
+			   concatenate(OPENANGLE,
+				       "ScalarArgument ActualName=",
+				       QUOTE,
+				       aan,
+				       QUOTE,BL,
+				       "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
+				       "AccessMode=",QUOTE,(rw_ef>=2)? "DEF": "USE", QUOTE,CLOSEANGLE,
 					      NL, NULL));
-      
-      if (expression_integer_value(exp, &iexp))  
+
+      if (expression_integer_value(exp, &iexp))
 	string_buffer_append_numeric(i2a(iexp),sb_result);
       else if (value_constant_p(EvalExpression(exp))) {
-	string exps = words_to_string(words_expression(exp));
+	string exps = words_to_string(words_expression(exp,NIL));
 	string_buffer_append_numeric(exps,sb_result);
       }
       else if (eval_linear_expression(exp,prec,&valr))
-    	string_buffer_append_numeric(i2a(valr),sb_result);
-      string_buffer_append_word("/ScalarArgument",sb_result);    
+	string_buffer_append_numeric(i2a(valr),sb_result);
+      string_buffer_append_word("/ScalarArgument",sb_result);
       global_margin--;
     }
     else { /* Array Argument */

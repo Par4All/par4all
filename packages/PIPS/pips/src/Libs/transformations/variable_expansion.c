@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* transformation package :  Francois Irigoin, October 2005
  *
  * variable_expansion.c
@@ -149,6 +152,7 @@ bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
         insert_statement(parent,
                 make_assign_statement(entity_to_expression(I),copy_expression(range_lower(r))),true);
         init=entity_to_expression(I);
+#if 0
         list peffects = proper_effects_of_expression(range_lower(r));
         if(!effects_write_at_least_once_p(peffects))
         {
@@ -157,6 +161,7 @@ bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
                 loop_locals(ll)=CONS(ENTITY,I,loop_locals(ll));
         }
         gen_full_free_list(peffects);
+#endif
 
 
     }
@@ -419,7 +424,7 @@ bool reduction_variable_expansion(char *module_name) {
                 instruction do_the_assignment = make_instruction_loop(
                         make_loop(
                             loop_index(theloop),
-                            copy_range(loop_range(theloop)),
+                            make_range(copy_expression(dimension_lower(thedim)),copy_expression(dimension_upper(thedim)),make_expression_1()),
                             make_assign_statement(
                                 reference_to_expression(make_reference(new_entity,make_expression_list(make_expression_from_entity(loop_index(theloop))))),
                                 entity_to_expression(operator_neutral_element(reduction_operator_entity(reduction_op(red))))),
@@ -439,7 +444,14 @@ bool reduction_variable_expansion(char *module_name) {
                                 MakeBinaryCall(
                                     reduction_operator_entity(reduction_op(red)),
                                     reference_to_expression(copy_reference(reduction_reference(red))),
-                                    reference_to_expression(make_reference(new_entity,CONS(EXPRESSION,entity_to_expression(loop_index(theloop)),NIL)))
+                                    reference_to_expression(make_reference(new_entity,
+                                            CONS(EXPRESSION,
+                                                make_op_exp("-",
+                                                    make_op_exp("/",entity_to_expression(loop_index(theloop)),copy_expression(range_increment(loop_range(theloop)))),
+                                                    copy_expression(range_lower(loop_range(theloop)))
+                                                    )
+
+                                                ,NIL)))
                                     )
                                 ),
                             entity_empty_label(),

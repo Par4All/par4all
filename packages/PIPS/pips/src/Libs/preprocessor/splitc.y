@@ -50,6 +50,9 @@
    * does not resemble Hugues's original one at all  *)*/
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* C declarations */
 #include <stdio.h>
 #include <string.h>
@@ -67,6 +70,13 @@
 #include "splitc.h"
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
+
+/* Increase the parser stack to have SPEC2006/445.gobmk/owl_defendpat.c
+   going through without a:
+
+   user warning in splitc_error: C memory exhausted near "0" at preprocessed line 13459 (user line 8732)
+*/
+#define YYMAXDEPTH 1000000
 
 extern int splitc_lex(void);
 extern void splitc_error(char *);
@@ -110,6 +120,7 @@ int csplit_is_function = 0; /* to know if this is the declaration of a function 
 			      a static variable and a static function */
 /* Shared with the lexical analyzer */
 string csplit_current_function_name = string_undefined;
+string csplit_current_function_name2 = string_undefined;
 string csplit_definite_function_name = string_undefined;
 string csplit_definite_function_signature = string_undefined;
 
@@ -2057,6 +2068,13 @@ function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator
                         {
 			  pips_debug(5, "decl_spec_list declarator->function_def_start\n");
+			  /* let's use a pretty limited stack... */
+			  if(string_undefined_p(csplit_current_function_name)) {
+			    csplit_current_function_name =
+			      csplit_current_function_name2;
+			    csplit_current_function_name2 = string_undefined;
+			  }
+
 			  pips_assert("A temptative function name is available",
 				      !string_undefined_p(csplit_current_function_name));
 			  pips_assert("No definite function name is available",

@@ -21,10 +21,12 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Functions closely related to the entity class, constructors, predicates,...
  */
 // To have strndup():
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,6 +34,7 @@
 #include "linear.h"
 
 #include "genC.h"
+#include "newgen_set.h"
 #include "misc.h"
 #include "ri.h"
 
@@ -39,9 +42,17 @@
 
 void print_entities(list l)
 {
-  MAP(ENTITY, e, {
+  FOREACH(ENTITY, e, l) {
     fprintf(stderr, "%s ", entity_name(e));
-  }, l);
+  }
+}
+
+void print_entity_set(set s)
+{
+  /* For some reason, here entity is not capitalized. */
+  SET_FOREACH(entity, e, s) {
+    fprintf(stderr, "%s ", entity_name(e));
+  }
 }
 
 bool unbounded_expression_p(expression e)
@@ -285,6 +296,7 @@ string safe_entity_name(entity e)
   return sn;
 }
 
+
 /* entity_local_name modified so that it does not core when used in
  * vect_fprint, since someone thought that it was pertinent to remove the
  * special care of constants there. So I added something here, to deal
@@ -301,6 +313,7 @@ entity_local_name(const entity e)
   return e==NULL ? null_name : local_name(entity_name(e));
 }
 
+
 /* Used instead of the macro to pass as formal argument */
 string entity_global_name(entity e)
 {
@@ -308,6 +321,69 @@ string entity_global_name(entity e)
   pips_assert("entity is defined", !entity_undefined_p(e));
   return entity_name(e);
 }
+
+/* Since entity_local_name may contain PIPS special characters such as
+   prefixes (label, common, struct, union, typedef, ...), this
+   entity_user_name function is created to return the initial
+   entity/variable name, as viewed by the user in his code.
+
+   In addition, all possible seperators (file, module, block, member)
+   are taken into account.
+
+   Function strstr locates the occurence of the last special character
+   which can appear just before the initial name, so the order of test
+   is important.
+
+   01/08/2003 Nga Nguyen -
+
+   @return pointer to the the user name (not newly allocated!)
+*/
+string entity_user_name(entity e)
+{
+  string gn = entity_name(e);
+  string un = global_name_to_user_name(gn);
+  return un;
+}
+
+
+/* allocates a new string */
+string entity_name_without_scope(entity e)
+{
+  string en = entity_name(e);
+  string mn = entity_module_name(e);
+  string ns = strrchr(en, BLOCK_SEP_CHAR);
+  string enws = string_undefined;
+
+  if(ns==NULL)
+    enws = strdup(en);
+  else
+    enws = strdup(concatenate(mn, MODULE_SEP_STRING, ns+1, NULL));
+
+  pips_debug(9, "entity name = \"%s\", without scope: \"%s\"\n",
+	     en, enws);
+
+  return enws;
+}
+
+
+/* allocates a new string */
+string local_name_to_scope(string ln)
+{
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  string s = string_undefined;
+  extern string empty_scope(void);
+
+  if(ns==NULL)
+    s = empty_scope();
+  else
+    s = strndup(ln, ns-ln+1);
+
+  pips_debug(8, "local name = \"%s\",  scope: \"%s\"\n",
+	     ln, s);
+
+  return s;
+}
+
 
 /* Returns the module local user name
  * SG: should return a const pointer
@@ -570,7 +646,14 @@ int entity_field_rank(entity f)
 
 bool entity_enum_p(entity e)
 {
-  return type_enum_p(entity_type(e));
+  /* Base the predicate on the entity name as for struct and union.*/
+  //return type_enum_p(entity_type(e));
+  string ln = entity_local_name(e);
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  bool struct_p = (ns==NULL && *ln==ENUM_PREFIX_CHAR)
+    || (ns!=NULL && *(ns+1)==ENUM_PREFIX_CHAR)
+    || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)!=NULL);
+  return struct_p;
 }
 
 bool entity_enum_member_p(entity e)
@@ -588,7 +671,9 @@ bool entity_enum_member_p(entity e)
 bool entity_struct_p(entity e)
 {
   string ln = entity_local_name(e);
-  bool struct_p = (*ln==STRUCT_PREFIX_CHAR)
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  bool struct_p = (ns==NULL && *ln==STRUCT_PREFIX_CHAR)
+    || (ns!=NULL && *(ns+1)==STRUCT_PREFIX_CHAR)
     || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)!=NULL);
   return struct_p;
 }
@@ -596,7 +681,9 @@ bool entity_struct_p(entity e)
 bool entity_union_p(entity e)
 {
   string ln = entity_local_name(e);
-  bool union_p = (*ln==UNION_PREFIX_CHAR)
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  bool union_p = (ns==NULL && *ln==UNION_PREFIX_CHAR)
+    || (ns!=NULL && *(ns+1)==UNION_PREFIX_CHAR)
     || (strstr(entity_name(e),DUMMY_UNION_PREFIX)!=NULL);
   return union_p;
 }
@@ -994,7 +1081,7 @@ entity FindOrCreateTopLevelEntity(string name)
 /*entity find_entity_module(name)
 string name;
 {
-    string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
+    string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
 				   MODULE_SEP_STRING, name, NULL);
     entity e = gen_find_tabulated(full_name, entity_domain);
 
@@ -1168,6 +1255,64 @@ bool check_common_inclusion(entity common)
   return ok;
 }
 
+/* This function creates a common for a given name in a given module.
+   This is an entity with the following fields :
+   Example:  SUBROUTINE SUB1
+             COMMON /FOO/ W1,V1
+
+   name = top_level:~name (TOP-LEVEL:~FOO)
+   type = area
+          with size = 8 [2*8], layout = NIL [SUB1:W,SUB1:V]
+   storage = ram
+          with function = module (TOP-LEVEL:SUB1) (first occurence ? SUB2,SUB3,..)
+               section = TOP-LEVEL:~FOO  (recursive ???)
+               offset = undefined
+               shared = NIL
+  initial = unknown
+
+  The area size and area layout must be updated each time when
+  a common variable is added to this common */
+
+entity make_new_common(string name, entity mod)
+{
+  string common_global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING
+             COMMON_PREFIX,name,NULL));
+  type common_type = make_type(is_type_area, make_area(8, NIL));
+  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
+  storage common_storage = make_storage(is_storage_ram,
+          (make_ram(mod,StaticArea, 0, NIL)));
+  value common_value = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL, make_language_unknown()));
+  return  make_entity(common_global_name,common_type,common_storage,common_value);
+}
+
+/* This function creates a common variable in a given common in a given module.
+   This is an entity with the following fields :
+   name = module_name:name (SUB1:W1)
+   type = variable
+          with basic = int, dimension = NIL
+   storage = ram
+          with function = module (TOP-LEVEL:SUB1)
+               section = common (TOP-LEVEL:~FOO)
+               offset = 0
+               shared =
+  initial = unknown
+
+  The common must be updated with new area size and area layout */
+
+entity make_new_integer_scalar_common_variable(string name, entity mod, entity com)
+{
+  string var_global_name = strdup(concatenate(module_local_name(mod),MODULE_SEP_STRING,
+                name,NULL));
+  type var_type = make_type(is_type_variable, make_variable(make_basic_int(8), NIL,NIL));
+  storage var_storage = make_storage(is_storage_ram,
+             (make_ram(mod,com,0,NIL)));
+  value var_value = make_value_unknown();
+  entity e = make_entity(var_global_name,var_type,var_storage,var_value);
+  //area_layout(type_area(entity_type(com))) = CONS(ENTITY,e,NIL);
+  return e;
+}
+
+
 #define declaration_formal_p(E) storage_formal_p(entity_storage(E))
 #define entity_to_offset(E) formal_offset(storage_formal(entity_storage(E)))
 
@@ -1227,66 +1372,6 @@ list /* of entity */ string_to_entity_list(string module, string names)
       if (next_comma) *next_comma = ',';
     }
   return le;
-}
-
-/* 01/08/2003 Nga Nguyen -
-
-   Since entity_local_name may contain PIPS special characters such as
-   prefixes (label, common, struct, union, typedef, ...), this
-   entity_user_name function is created to return the initial
-   entity/variable name, as viewed by the user in his code.
-
-   In addition, all possible seperators (file, module, block, member)
-   are taken into account.
-
-   Function strstr locates the occurence of the last special character
-   which can appear just before the initial name, so the order of test
-   is important.
-
-   @return pointer to the the user name (not newly allocated!)
-*/
-string entity_user_name(entity e)
-{
-  string gn = entity_name(e);
-  string un = global_name_to_user_name(gn);
-  return un;
-}
-
-/* allocates a new string */
-string entity_name_without_scope(entity e)
-{
-  string en = entity_name(e);
-  string mn = entity_module_name(e);
-  string ns = strrchr(en, BLOCK_SEP_CHAR);
-  string enws = string_undefined;
-
-  if(ns==NULL)
-    enws = strdup(en);
-  else
-    enws = strdup(concatenate(mn, MODULE_SEP_STRING, ns+1, NULL));
-
-  pips_debug(9, "entity name = \"%s\", without scope: \"%s\"\n",
-	     en, enws);
-
-  return enws;
-}
-
-/* allocates a new string */
-string local_name_to_scope(string ln)
-{
-  string ns = strrchr(ln, BLOCK_SEP_CHAR);
-  string s = string_undefined;
-  extern string empty_scope(void);
-
-  if(ns==NULL)
-    s = empty_scope();
-  else
-    s = strndup(ln, ns-ln+1);
-
-  pips_debug(8, "local name = \"%s\",  scope: \"%s\"\n",
-	     ln, s);
-
-  return s;
 }
 
 bool typedef_entity_p(entity e)
@@ -1557,7 +1642,7 @@ entity update_operator_to_regular_operator(entity op)
   if(ENTITY_PLUS_UPDATE_P(op))
     sop = entity_intrinsic(PLUS_C_OPERATOR_NAME);
   else if(ENTITY_MINUS_UPDATE_P(op))
-    sop = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+    sop = entity_intrinsic(MINUS_C_OPERATOR_NAME);
   else if(ENTITY_MULTIPLY_UPDATE_P(op))
     sop = entity_intrinsic(MULTIPLY_OPERATOR_NAME);
   else if(ENTITY_DIVIDE_UPDATE_P(op))

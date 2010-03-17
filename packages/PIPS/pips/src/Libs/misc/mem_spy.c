@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* MEM_SPY : Package to track memory usage.
  * Beatrice Creusillet - August 1995 
  */
@@ -62,7 +65,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <assert.h>
 
 /* this is **not** portable */

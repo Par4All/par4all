@@ -21,13 +21,16 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * package semantics - prettyprint interface
  */
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "genC.h"
@@ -615,15 +618,19 @@ make_pred_commentary_sentence(str_pred, comment_prefix)
 string str_pred;
 string comment_prefix;
 {
+  /*
   char str_tmp[MAX_PRED_COMMENTARY_STRLEN + 1];
-  sentence sent_pred;
 
   str_tmp[0] = '\0';
   (void) strcat(str_tmp, comment_prefix);
   (void) strcat(str_tmp, "  ");
   (void) strcat(str_tmp, str_pred);
   (void) strcat(str_tmp, "\n");
+  */
+  char * str_tmp = NULL;
+  sentence sent_pred = sentence_undefined;
 
-  sent_pred = make_sentence(is_sentence_formatted, strdup(str_tmp));
+  str_tmp = strdup(concatenate(comment_prefix, "  ", str_pred, "\n", NULL));
+  sent_pred = make_sentence_formatted(str_tmp);
   return(sent_pred);
 }

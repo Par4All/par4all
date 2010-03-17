@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 
@@ -186,7 +189,10 @@ static text stub_text(entity module, bool is_fortran)
 
     ifdebug(8) {
       if(!is_fortran) {
-	text txt = c_text_entity(entity_undefined, module, 0);
+	/* FI: The result should be good because pdl wil be set to
+	   NIL and the types used for the parameter will simply be
+	   declared but not defined */
+	text txt = c_text_entity_simple(entity_undefined, module, 0);
 	print_text(stderr, txt);
       }
     }
@@ -222,9 +228,11 @@ static text stub_text(entity module, bool is_fortran)
 						     CONS(STRING, strdup("{}"), NIL)));
 	string name = entity_user_name(module);
 	type t = entity_type(module);
-	list pc = generic_c_words_entity(t, CHAIN_SWORD(NIL,name), FALSE, TRUE);
+	/* FI: I do not know what to use to initialize pdl usefully */
+	list pdl = NIL; // each type supporting entity is declared independently
+	list pc = generic_c_words_entity(t, CHAIN_SWORD(NIL,name), FALSE, TRUE, pdl);
 
-	// st = c_text_entity(entity_undefined, module, 0);
+	// st = c_text_entity_simple(entity_undefined, module, 0);
 	st = make_text(NIL);
 	ADD_SENTENCE_TO_TEXT(st, make_sentence(is_sentence_unformatted,
 					       make_unformatted(NULL, 0, 0, pc)));
@@ -257,6 +265,8 @@ static text compilation_unit_text(entity cu, entity module)
     // The text output of the compilation unit:
     text cut = make_text(NIL);
     //entity e = entity_undefined;
+    list pdl = NIL; // Let's hope it works; else pdl should contain
+		    // each type to declare except for the module
 
     pips_assert("We must be in a C prettyprinter environment", !get_prettyprint_is_fortran());
 
@@ -269,7 +279,6 @@ static text compilation_unit_text(entity cu, entity module)
     warning = make_sentence(is_sentence_formatted, strdup(C_FILE_WARNING));
     ADD_SENTENCE_TO_TEXT(cut, warning);
 
-    md = c_text_entity(cu, module, 0);
     sel = functional_type_supporting_entities(sel, type_functional(t));
 
     ifdebug(8) {
@@ -298,7 +307,7 @@ static text compilation_unit_text(entity cu, entity module)
 
     pips_assert("Each entity appears only once", gen_once_p(nsel));
 
-    MAP(ENTITY, se, {
+    FOREACH(ENTITY, se, nsel) {
       string n = entity_user_name(se);
 
       /* Do not declare dummy structures, unions and enumerations,
@@ -307,7 +316,7 @@ static text compilation_unit_text(entity cu, entity module)
       if((strstr(n,DUMMY_ENUM_PREFIX)==NULL) &&
 	 (strstr(n,DUMMY_STRUCT_PREFIX)==NULL) &&
 	 (strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
-	text se_text = c_text_entity(module, se, 0);
+	text se_text = c_text_entity(module, se, 0, pdl);
 
 	ifdebug(8) {
 	  pips_debug(8, "Add declaration of entity \"\%s\"\n", entity_name(se));
@@ -317,8 +326,9 @@ static text compilation_unit_text(entity cu, entity module)
 	MERGE_TEXTS(cut, se_text);
       }
       //free(n);
-    }, nsel);
+    }
 
+    md = c_text_entity(cu, module, 0, pdl);
     MERGE_TEXTS(cut, md);
 
     gen_free_list(nsel);
@@ -332,7 +342,7 @@ static text compilation_unit_text(entity cu, entity module)
 
    The idea is to prettyprint the module to some file resources and to
    parse it later in order to have a full-fledge module with all the PIPS
-   structured up-to-date.
+   data structures up-to-date.
 
    Useful for code generation, out-lining, stub generation...
 
@@ -342,8 +352,8 @@ static text compilation_unit_text(entity cu, entity module)
 bool
 add_new_module_from_text(string module_name,
 			 text code_text,
-			 bool is_fortran/*,
-					    text heading*/) {
+			 bool is_fortran,
+					    string compilation_unit_name) {
     boolean success_p = TRUE;
     entity m = local_name_to_top_level_entity(module_name);
     string file_name, dir_name, src_name, full_name, init_name, finit_name;
@@ -364,55 +374,61 @@ add_new_module_from_text(string module_name,
     }
 
     // Build the coresponding compilation unit for C code
-    if(!is_fortran) {
+    if(string_undefined_p(compilation_unit_name) ) {
       // Function defined in pipsmake
       extern string compilation_unit_of_module(string);
       cun = compilation_unit_of_module(module_name);
 
       if(string_undefined_p(cun)) {
-	cun = strdup(concatenate(module_name, FILE_SEP_STRING, NULL));
-	cu = MakeCompilationUnitEntity(cun);
+          cun = strdup(concatenate(module_name, FILE_SEP_STRING, NULL));
+          cu = MakeCompilationUnitEntity(cun);
       }
     }
+    else
+        cun=strdup(compilation_unit_name);
 
     /* pips' current directory is just above the workspace
      */
-    file_name = strdup(concatenate(module_name, is_fortran? FORTRAN_FILE_SUFFIX : PP_C_ED, NULL));
-    //file_name = strlower(file_name, file_name);
+    {
+        string cu_real = strdup(cun);
+        cu_real[strlen(cu_real)-1]=0;
+        asprintf(&file_name,"%s%s",cu_real,is_fortran?FORTRAN_FILE_SUFFIX:PP_C_ED);
+        free(cu_real);
+    }
     dir_name = db_get_current_workspace_directory();
-    src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, NULL));
-    full_name = strdup(concatenate(dir_name, "/", src_name, NULL));
+    asprintf(&src_name,WORKSPACE_TMP_SPACE "/%s",file_name);
+    asprintf(&full_name,"%s/%s",dir_name,src_name);
     init_name =
-      db_build_file_resource_name(res, module_name, is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
-    finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
+      db_build_file_resource_name(res, entity_local_name(m), is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
+    asprintf(&finit_name,"%s/%s" ,dir_name,init_name);
 
     /* Put the code text in the temporary source file */
     db_make_subdirectory(WORKSPACE_TMP_SPACE);
-    f = safe_fopen(full_name, "w");
+    f = safe_fopen(finit_name, "w");
     print_text(f, code_text);
-    safe_fclose(f, full_name);
+    safe_fclose(f, finit_name);
     /* A PIPS database may be partly incoherent after a core dump but
        still usable (Cathare 2, FI). So delete a previously finit_name
        file. */
-    if(file_exists_p(finit_name))
-      safe_unlink(finit_name);
+    if(file_exists_p(full_name))
+      safe_unlink(full_name);
     /* The initial file is linked to the newly generated temporary file: */
-    safe_link(finit_name, full_name);
+    safe_link(full_name, finit_name);
 
     /* Add the new generated file as a file resource with its local
      * name...  should only put a new user file, I guess?
      */
-    user_log("Registering synthesized file %s\n", file_name);
-    DB_PUT_FILE_RESOURCE(res, module_name, init_name);
+    user_log("Registering synthesized file %s\n", file_name );
+    DB_PUT_FILE_RESOURCE(res, module_name, strdup(init_name));
     /* The user file dwells in the WORKSPACE_TMP_SPACE */
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, src_name);
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, strdup(string_undefined_p(compilation_unit_name)?src_name:full_name));
 
-    if(!is_fortran) { // C is assumed
+    if(!is_fortran && string_undefined_p(compilation_unit_name) ) { // C is assumed
       /* Add the compilation unit files */
       pips_assert("The compilation unit name is defined", !string_undefined_p(cun));
       user_log("Registering synthesized compilation unit %s\n", file_name);
 
-      init_name = db_build_file_resource_name(res, cun, C_FILE_SUFFIX);
+      init_name = db_build_file_resource_name(res, cun, is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
       finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
 
       /* Builds the compilation unit stub: it can be empty or include
@@ -447,7 +463,7 @@ add_new_module_from_text(string module_name,
    There is still some redundancy with module_name, module and stat
 */
 bool
-add_new_module(string module_name, 
+add_new_module(string module_name,
 	       entity module,
 	       statement stat,
 	       bool is_fortran/*,
@@ -456,15 +472,15 @@ add_new_module(string module_name,
   text code_text = text_module(module, stat);
   return add_new_module_from_text(module_name,
 				  code_text,
-				  is_fortran);
+				  is_fortran,string_undefined);
 
 }
 
 
 /* Generate a source file for a module, if none available.
  */
-static bool 
-missing_file_initializer(string module_name, bool is_fortran) {
+static bool missing_file_initializer(string module_name, bool is_fortran)
+{
   entity m = local_name_to_top_level_entity(module_name);
   text stub = text_undefined;
 
@@ -482,7 +498,7 @@ missing_file_initializer(string module_name, bool is_fortran) {
   stub = stub_text(m, is_fortran);
   return add_new_module_from_text(module_name,
 				  stub,
-				  is_fortran);
+				  is_fortran,string_undefined);
 }
 
 

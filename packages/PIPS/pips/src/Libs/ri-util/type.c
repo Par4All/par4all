@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 
 #include "linear.h"
@@ -115,60 +118,49 @@ int the_tag;
 
 /* functions on types */
 
-type 
-MakeTypeArray(b, ld)
-basic b;
-cons * ld;
+type MakeTypeArray(basic b, cons * ld)
 {
     return(make_type(is_type_variable, make_variable(b, ld,NIL)));
 }
 
-parameter 
-MakeOverloadedParameter()
+parameter MakeOverloadedParameter()
 {
     return MakeAnyScalarParameter(is_basic_overloaded, 0);
 }
 
-parameter 
-MakeIntegerParameter()
+parameter MakeIntegerParameter()
 {
   return MakeAnyScalarParameter(is_basic_int, DEFAULT_REAL_TYPE_SIZE);
 }
 
-parameter 
-MakeRealParameter()
+parameter MakeRealParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
 }
 
-parameter 
-MakeDoubleprecisionParameter()
+parameter MakeDoubleprecisionParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
 }
 
-parameter 
-MakeLogicalParameter()
+parameter MakeLogicalParameter()
 {
   return MakeAnyScalarParameter(is_basic_logical, DEFAULT_LOGICAL_TYPE_SIZE);
 }
 
-parameter 
-MakeComplexParameter()
+parameter MakeComplexParameter()
 {
   return MakeAnyScalarParameter(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
 }
 
-parameter 
-MakeDoublecomplexParameter()
+parameter MakeDoublecomplexParameter()
 {
   return MakeAnyScalarParameter(is_basic_complex, DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
 }
 
-parameter 
-MakeCharacterParameter()
+parameter MakeCharacterParameter()
 {
-  return make_parameter(MakeTypeArray(make_basic(is_basic_string, 
+  return make_parameter(MakeTypeArray(make_basic(is_basic_string,
 	 make_value(is_value_constant,
 		    make_constant(is_constant_int,
 				  UUINT(DEFAULT_CHARACTER_TYPE_SIZE)))),
@@ -178,8 +170,7 @@ MakeCharacterParameter()
 }
 
 /* For Fortran */
-parameter 
-MakeAnyScalarParameter(tag t, _int size)
+parameter MakeAnyScalarParameter(tag t, _int size)
 {
   return make_parameter(MakeTypeArray(make_basic(t, UUINT(size)), NIL),
 			make_mode_reference(),
@@ -462,6 +453,10 @@ bool basic_equal_strict_p(basic b1, basic b2)
     */
     /* could be a star or an expression; a value_equal_p() is needed! */
     return TRUE;
+  case is_basic_typedef:
+    /* FI->BC (?): suffixes _p should be removed */
+    return basic_typedef_p(b2)
+      && same_entity_p(basic_typedef_p(b1),basic_typedef_p(b2));
   default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
   }
   return FALSE; /* just to avoid a warning */
@@ -741,7 +736,7 @@ string safe_type_to_string(type t)
  string basic_to_string(basic b)
 {
   /* Nga Nguyen, 19/09/2003: To not rewrite the same thing, I use the words_basic() function*/
-  return list_to_string(words_basic(b));
+  return list_to_string(words_basic(b, NIL));
 }
 
 
@@ -808,13 +803,13 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 
 	      for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim))
 		{
-		  b = make_basic(is_basic_pointer, make_type(is_type_variable, make_variable(b, NIL, NIL)));
+		  b = make_basic_pointer(make_type_variable(make_variable(b, NIL, NIL)));
 		}
 	    }
 	  else if(type_functional_p(exp_type))
 	    {
 	      /* A reference to a function returns a pointer to a function of the very same time */
-	      b = make_basic(is_basic_pointer, copy_type(exp_type));
+	      b = make_basic_pointer(copy_type(exp_type));
 	    }
 	  else
 	    {
@@ -830,9 +825,11 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 	  {
 	    if(basic_pointer_p(b))
 	      {
-		basic bt = copy_basic(variable_basic(type_variable(basic_pointer(b))));
-		free_basic(b);
-		b=bt;
+              type t = basic_pointer(b);
+              basic bt = copy_basic(variable_basic(type_variable(
+                              ultimate_p?ultimate_type(t):t)));
+		      free_basic(b);
+		      b=bt;
 	      }
 	    else
 	      {
@@ -1497,7 +1494,7 @@ type intrinsic_call_to_type(call c)
 
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
 	     module_local_name(f),
-	     words_to_string(words_type(rt)));
+	     words_to_string(words_type(rt, NIL)));
 
   if(basic_overloaded_p(rb))
     {
@@ -1536,6 +1533,10 @@ type intrinsic_call_to_type(call c)
 		  pips_assert("The pointed type is consistent",
 			      type_consistent_p(t));
 		  free_type(ct);
+		}
+	      else if(basic_string_p(cb))
+		{
+		  t = make_type_variable(make_variable(make_basic_int(DEFAULT_CHARACTER_TYPE_SIZE), NIL, NIL));
 		}
 	      else
 		{
@@ -1626,7 +1627,7 @@ type intrinsic_call_to_type(call c)
 
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
 	     module_local_name(f),
-	     words_to_string(words_type(t)));
+	     words_to_string(words_type(t, NIL)));
 
   return t;
 }
@@ -1696,7 +1697,7 @@ type reference_to_type(reference ref)
 	  
 	  ifdebug(7) {
 	    pips_debug(7, "new iteration : current type : %s\n",
-		       words_to_string(words_type(ct)));
+		       words_to_string(words_type(ct, NIL)));
 	    pips_debug(7, "current list of indices: \n");
 	    print_expressions(l_inds);
 	  }
@@ -1879,7 +1880,7 @@ type expression_to_type(expression exp)
       /* Never go there... */
     }
 
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
 
   return t;
 }
@@ -3255,14 +3256,14 @@ bool check_C_function_type(entity f, list args)
 
 	pips_user_warning("Type updated for function \"%s\"\n", entity_user_name(f));
 	ifdebug(8) {
-	  text txt = c_text_entity(get_current_module_entity(), f, 0);
+	  text txt = c_text_entity(get_current_module_entity(), f, 0, NIL);
 	  print_text(stderr, txt);
 	}
       }
       else {
 	/* Must be a typedef or a pointer to a function. No need to refine the type*/
 	ifdebug(8) {
-	  text txt = c_text_entity(get_current_module_entity(), f, 0);
+	  text txt = c_text_entity(get_current_module_entity(), f, 0, NIL);
 	  pips_debug(8, "Type not updated for function \"%s\"\n", entity_user_name(f));
 	  print_text(stderr, txt);
 	}
@@ -3485,7 +3486,7 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
-  list wl = words_type(t);
+  list wl = words_type(t, NIL);
   dump_words(wl);
 }
 
@@ -3701,6 +3702,36 @@ type type_to_pointer_type(type t)
   pips_assert("pt is consistent", type_consistent_p(pt));
 
   return pt;
+}
+
+/* returns t if t is not a pointer type, and the pointed type if t is
+   a pointer type. Type definitions are replaced. */
+type type_to_pointed_type(type t)
+{
+  type ut = ultimate_type(t);
+  type pt = ut;
+  type upt = type_undefined;
+
+  if(pointer_type_p(ut))
+    pt = basic_pointer(variable_basic(type_variable(ut)));
+
+  upt = ultimate_type(pt);
+
+  return upt;
+}
+
+/* returns t if t is not a pointer type, and the first indirectly
+   pointed type that is not a pointer if t is
+   a pointer type. Type definitions are replaced. */
+type type_to_final_pointed_type(type t)
+{
+  type ut = ultimate_type(t);
+  type pt = ut;
+
+  while(pointer_type_p(ut)) {
+    ut = type_to_pointed_type(ut);
+  }
+  return ut;
 }
 /*
  *  that is all

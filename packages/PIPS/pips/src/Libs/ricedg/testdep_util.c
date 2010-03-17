@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* here is a collection of function intended to create and manipulate di
  variables and test of dependence. di variables are pseudo variables created
  by pips and not accessible to the user that represent the distance between 
@@ -360,7 +363,7 @@ cons *n1, *n2;
 
 /* Management of loop counters */
 
-#define ILCMAX 10000
+#define ILCMAX 100000
 
 static int ilc = ILCMAX;
 

@@ -25,14 +25,14 @@ TARGET	= c_syntax
 # many other parsers in PIPS:
 #YOPT	= --defines --locations --name-prefix=c_
 #LOPT	= --bison-bridge --bison-location --prefix=c_
-YOPT	= --defines --name-prefix=c_ --report=state
+YOPT	= --defines --name-prefix=c_ --report=state --debug --verbose
 LOPT	= --prefix=c_
 
 INC_CFILES =	c_parser.c \
 		statement.c \
 		util.c
 
-DERIVED_HEADERS = cyacc.tab.h clexer.h
+DERIVED_HEADERS = cyacc.h clexer.h
 DERIVED_CFILES	= cyacc.tab.c clexer.c
 
 LIB_CFILES = 	$(INC_CFILES) $(DERIVED_CFILES)
@@ -59,13 +59,14 @@ YY2C	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/C_/g;s/yy/c_/g'
 
 cyacc.tab.c : cyacc.y
 	$(BISON) $(YOPT) `pwd`/cyacc.y
+	mv  cyacc.tab.h cyacc.h
 	#$(YY2C) y.tab.c > cyacc.c
 	#$(YY2C) y.tab.h > cyacc.h
 	#$(RM) y.tab.c y.tab.h
 
-cyacc.tab.h: cyacc.tab.c
+cyacc.h: cyacc.tab.c
 
-clexer.c: clex.l cyacc.tab.h
+clexer.c: clex.l cyacc.h
 	$(FLEX) $(LFLAGS) $(LOPT) --header-file=clexer.h --outfile=`pwd`/$@ `pwd`/clex.l
 
 clexer.h: clexer.c

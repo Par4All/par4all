@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * Cloning of a subroutine.
  * debug: CLONE_DEBUG_LEVEL
@@ -151,7 +154,8 @@ entity build_a_clone_for(
       comment_prefix,"\n", NULL));
     text_sentences(t) = 
 	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments), text_sentences(t));
-    add_new_module_from_text(new_name,t,fortran_module_p(cloned));
+    extern string compilation_unit_of_module(string);
+    add_new_module_from_text(new_name,t,fortran_module_p(cloned),compilation_unit_of_module(get_current_module_name()));
 
     /* should fix the declarations ...*/
     entity_initial(new_fun)=make_value(is_value_code,

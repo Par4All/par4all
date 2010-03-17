@@ -1,0 +1,75 @@
+%%
+%% $Id: alias_private.tex 14503 2009-07-10 15:11:52Z mensi $
+%%
+%% Copyright 1989-2009 MINES ParisTech
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass{article}
+
+\usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
+
+\title{Points\_to Analysis}
+\author{Amira Mensi}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\domain{import cell from "ri.newgen"}
+{}
+\domain{import descriptor from "ri.newgen"}
+{}
+\domain{import approximation from "ri.newgen"}
+{}
+\domain{import statement from "ri.newgen"}
+{}
+% These newgen data structure are used to propagate interprocedural points_to
+% information. A points_to relation involved two entities :source and
+% sink and an approximation of their relation.  
+ 
+
+
+ 
+The domains points-to indicates that an abstract memory location
+called {\em source} points to another abstract memory location called
+{\em sink}. The arc between the two locations may either always exist,
+and the approximation is EXACT, or possibly exist, and the
+approximation is MAY. The abstract memory locations may contain
+program variables or PIPS entities in their subscript expressions, and
+their values are constrained by the {\em descriptor}.
+
+\domain{points\_to = source:cell x sink:cell x approximation x descriptor}
+{}
+Note: the domains {\em approximation} and {\em descriptor} are
+documented in ri.tex.
+
+% \domain{access = referencing:points\_to\_path + addressing:points\_to\_path + dereferencing:points\_to\_path}{}
+%\domain{points\_to\_path = reference}{}
+%\domain{points\_to\_graph = arcs:points\_to*}{}
+
+The points-to information is a list of points-to relations:
+\domain{points\_to\_list = list : points\_to*}
+{}
+
+This domain is used to associate its points-to information to each statement:
+\domain{statement\_points\_to = persistant statement -> points\_to\_list}
+{}
+
+\end{document}

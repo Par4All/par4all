@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
   Symbol table initialization with Fortran operators, commands and
   intrinsics
@@ -45,7 +48,6 @@
 
 #include <stdio.h>
 #include <string.h>
-/* #include <values.h> */
 #include <limits.h>
 #include <stdlib.h>
 
@@ -4454,6 +4456,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},
   {ATOI_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ATOL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ATOQ_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
   {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {DIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
@@ -4523,7 +4527,6 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ISATTY_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {MEMALIGN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {TTYNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {LLABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {LLDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {LLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},

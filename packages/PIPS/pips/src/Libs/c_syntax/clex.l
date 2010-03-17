@@ -52,12 +52,10 @@
 ** 2.0  George Necula 12/12/00: Many extensions
 *)*/
 
-%top{
-  /* To have strndup(), put this at the top of the generated file since : */
-#define _GNU_SOURCE
- }
-
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -70,14 +68,14 @@
 #include "misc.h"
 
 #include "c_syntax.h"
-#include "cyacc.tab.h"
+#include "cyacc.h"
 
 #define FIRST_C_LINE_NUMBER (1)
 #define UNDEFINED_C_LINE_NUMBER (-1)
 
 static int C_line_number = UNDEFINED_C_LINE_NUMBER;
 
-DEFINE_LOCAL_STACK(line_number, intptr_t)
+DEFINE_LOCAL_STACK(line_number, int)
 
 /* Count the number of c in s. */
 unsigned int character_occurences_in_string(string s, char c)
@@ -142,8 +140,8 @@ void error_reset_current_C_line_number()
 
 /* Comment management:
 
-   - comments in declarations are lost (because there is no corresponding
-     attachment point)
+   - comments within declarations are misplaced (because there is no
+     corresponding attachment point)
 
    - comments for structured control structures such as "for", "switch",
      "while",... are stacked;
@@ -162,7 +160,8 @@ void error_reset_current_C_line_number()
      is generated to carry them yet)
 
    - linefeed and comments inside a statement are collected as a comment
-     before statement (some weird impact on print-out may occur);
+     before statement (some weird impact on print-out may occur); same as
+     for declaration statements, but less frequent
 
    - some comments are still ignored, although available (to be implemented)
 
@@ -172,8 +171,10 @@ static string C_current_comment = string_undefined;
 
 DEFINE_LOCAL_STACK(comments, string)
 
-/* Return the current comment as a string to be freed (if not undefined)
-   by the caller and reset the current comment. */
+/* Return the current comment as a string to be freed    by the caller
+   and reset the current comment. If the current comment is undefined,
+   returns a copy of the empty string, "".
+ */
 string get_current_C_comment()
 {
   string cc = C_current_comment;
@@ -206,9 +207,11 @@ string get_current_C_comment()
 	/* It is a trailing new-line: just get rid of it: */
 	//last_newline[0] = '\0';
 	;
-}
+      }
     }
   }
+  else
+    cc = strdup("");
   /* pips_debug(3, "get_current_C_comment comment \"%s\"\n",
      cc); */
   return cc;
@@ -403,7 +406,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 	       }
 
 
-("/*"([^*]|("*"+[^/*]))*"*"+"/")|("//"("\\\n"|[^\n])*"\n"?)	{
+("/*"([^*]|("*"+[^/*]))*"*"+"/")|("//"("\\\n"|[^\n])*"\n"?)	{ //  */
                                 pips_debug(9,"Comment %s\n",yytext);
                                 C_line_number += character_occurences_in_string(yytext, '\n');
                                 update_C_comment(yytext);
@@ -419,7 +422,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 		 BEGIN(the_end_of_pragma);
 		 }
 
-^"#"[ \t]*{decdigit}+[^\n]*             {
+^"#"[ \t]*{decdigit}+[^\n]*"\n"             {
                                 // \n is not part of the pragma
                                 // The line count is correct but empty lines
                                 // seem to be inserted at the beginning of
@@ -431,17 +434,13 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                    int initial_C_line_number = -1;
                                    int items = sscanf(yytext+1, "%d", &initial_C_line_number);
                                    if(items==1) {
-                                      /* Get rid of the pragma LF itself */
-                                      C_line_number = initial_C_line_number-1;
+                                      C_line_number = initial_C_line_number;
                                    }
                                    else {
                                       pips_user_warning("No line number after a #: \"%s\".\n", yytext);
                                       CParserError("Ill. formated # pragma\n");
                                    }
                                 }
-                                /* Current comments cannot be related to
-                                   something happening after a pragma .*/
-                                discard_C_comment();
                         }
 
 \n                      {

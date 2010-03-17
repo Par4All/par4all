@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /*******************  STATEMENTS *******************/
 
@@ -28,10 +31,9 @@
    statement in Fortran (make_continue_statement means make_null_statement)*/
 
 // To have strndup(), asprintf()...:
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "genC.h"
@@ -494,7 +496,7 @@ statement MakeCaseStatement(expression e)
            xxx is unique from LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab ;
-  string estr = words_to_string(words_expression(e));
+  string estr = words_to_string(words_expression(e, NIL));
   asprintf(&lab,"switch_%d_case_%s",i,estr);
   free(estr);
   statement s = MakeLabeledStatement(lab,

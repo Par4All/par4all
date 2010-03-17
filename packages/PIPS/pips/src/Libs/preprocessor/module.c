@@ -21,9 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 // strndup are GNU extensions...
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 
@@ -303,6 +305,7 @@ recompile_module(char* module)
 
     /* build and register textual representation */
     text t = text_module(get_current_module_entity(), modified_module_statement);
+    //add_new_module_from_text(module,t,fortran_module_p(modified_module),compilation_unit_of_module(module));
     string dirname = db_get_current_workspace_directory();
     string res = fortran_module_p(modified_module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
     string filename = db_get_file_resource(res,module,TRUE);
@@ -317,7 +320,7 @@ recompile_module(char* module)
         list p = NIL;
         FOREACH(ENTITY, e, entity_declarations(modified_module))
         {
-            if( same_string_p(entity_module_name(e),module) && !entity_area_p(e) )
+            if( same_string_p(entity_module_name(e),module) && !entity_area_p(e) && !entity_label_p(e) )
                 gen_clear_tabulated_element((gen_chunk*)e);
 
             else
@@ -331,7 +334,7 @@ recompile_module(char* module)
     reset_current_module_statement();
 
     /* the ugliest glue ever produced by SG 
-     * needed to get all the declarations etc right : we must call unsplit before
+     * needed to get all the declarations etc right
      * unfortunetly we do it without calling pipsmake, so handle it by hand
      * signed: SG
      */
@@ -344,10 +347,9 @@ recompile_module(char* module)
             string m = gen_array_item(modules, i);
             if(!db_resource_required_or_available_p(DBR_CODE,m))
                 controlizer(m);
-            if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
-                print_code(m);
+//            if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
+//                print_code(m);
         }
-        unsplit(cu);
     }
 
     bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);

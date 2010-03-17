@@ -57,6 +57,9 @@
 %type <tag>		dir
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,10 +73,10 @@
 #include "top-level.h"
 #include "pipsmake.h"
 
-#include "malloc.h"
+#include "stdlib.h"
 
 extern void add_rule(rule);
-extern int yyerror(char *);
+extern void yyerror(char *);
 extern int yylex(void);
 
 extern FILE * yyin; 
@@ -199,14 +202,13 @@ resource:	NAME
 %%
 
 void yyerror_lex_part(char *);
-int yyerror(char * s)
+void yyerror(char * s)
 {
     int c;
     yyerror_lex_part(s);
     fprintf(stderr, "[readmakefile] unparsed text:\n");
     while ((c = getc(yyin)) != EOF) putc(c, stderr);
-    exit(1);
-    return 1;
+    exit(EXIT_FAILURE);
 }
 
 void 

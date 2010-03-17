@@ -21,13 +21,16 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* transformer package - basic routines
   *
   * Francois Irigoin
   */
 
 #include <stdio.h>
-#include <malloc.h> 
+#include <stdlib.h> 
 
 #include "boolean.h"
 #include "vecteur.h"

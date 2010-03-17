@@ -57,7 +57,8 @@ LIB_CFILES =	\
 		scalarization.c \
 		flatten_code.c \
 		terapixify.c \
-		induction_substitution.c
+		induction_substitution.c \
+		loop_expansion.c
 
 INC_TARGET =    $(TARGET).h
 

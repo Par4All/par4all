@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* -----------------------------------------------------------------
  *
  *                 BOTTOM-UP ARRAY BOUND CHECK VERSION
@@ -828,8 +831,8 @@ string print_variables(expression e)
   case is_syntax_reference:
     {
       reference ref = syntax_reference(s);
-      retour = strdup(concatenate(retour,", \', ",words_to_string(words_reference(ref))," =\',",
-				  words_to_string(words_reference(ref)),NULL));
+      retour = strdup(concatenate(retour,", \', ",words_to_string(words_reference(ref,NIL))," =\',",
+				  words_to_string(words_reference(ref,NIL)),NULL));
       break;
     }
   default:
@@ -878,7 +881,7 @@ static statement make_bottom_up_abc_tests(array_dimension_bound_test adt)
 	strdup(concatenate(string_delimiter,
 			   "BV array \"",entity_user_name(a),"\", ",
 			   int_to_dimension(d),bool_to_bound(b),"with ",
-			   words_to_string(words_syntax(expression_syntax(e))),
+			   words_to_string(words_syntax(expression_syntax(e),NIL)),
 			   string_delimiter,
 			   print_variables(e), NULL));
       statement smt = statement_undefined;
