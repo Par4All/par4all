@@ -1,0 +1,69 @@
+#! /bin/bash -vx
+
+# Test case of the bootstraping script to build the infrastructure up into
+  a p3 git from an older and less well organized version:
+
+# Stop on error:
+set -o errexit
+
+ALL_MODULES="polylib linear newgen nlpmake validation pips"
+
+# Get a clean repository:
+git init p3
+cd p3
+#false && {
+# Get stuff from the old one:
+git remote add par4all ../par4all
+# Create the tracking branches:
+git pull par4all own:p4a-own
+git pull par4all own-0.1-alpha:p4a-own-0.1-alpha
+git pull par4all master
+# Point to the top of the repository:
+git branch initial ecd50e4a9fa1e04a9f07d6f5f892b8f7ed4a21a9
+
+# Import the branches of the packages here:
+../par4all/src/dev/p4a_import_external_gits --root .
+#}
+# Create the branch to integrate the packages:
+git branch p4a-packages initial
+git checkout p4a-packages
+
+# Merge into it the packages:
+for i in $ALL_MODULES; do
+    git merge p4a-$i
+done
+# This will be also the p4a-packages-0.1-alpha branch:
+git branch p4a-packages-0.1-alpha
+
+# Create the branch to integrate Par4All:
+git branch p4a initial
+git checkout p4a
+git merge p4a-packages
+git merge p4a-own-0.1-alpha
+# This will be also the p4a-0.1-alpha branch:
+git branch p4a-0.1-alpha
+
+# Get the last package versions here:
+p4a_git  --root . -p
+p4a_git  --root . -m
+
+# Integrate them in the package branch:
+git checkout p4a-packages
+
+for i in $ALL_MODULES; do
+    git branch p4a-0.2-alpha-$i p4a-$i
+    git merge p4a-0.2-alpha-$i
+done
+# This will be also the p4a-packages-0.2-alpha branch:
+git branch p4a-packages-0.2-alpha
+git branch p4a-own-0.2-alpha p4a-own
+
+# Integrate all:
+git checkout p4a
+git merge p4a-own
+git merge p4a-packages
+# This will be also the p4a-0.2-alpha branch:
+git branch p4a-0.2-alpha
+
+# Have a look to the world creation:
+gitk&

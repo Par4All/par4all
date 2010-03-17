@@ -1,0 +1,121 @@
+#! /bin/bash
+
+# Script to deal with Par4All repositories
+
+# Display help
+function usage()
+{
+  local status=$1 msg=$2
+  if [[ $msg ]]
+  then
+    echo -e "message: $msg\n" >&2
+  fi
+  if [[ $status == 0 || $status == 1 ]]
+  then
+    echo -e \
+      "$script [options] ...\n" \
+	"options (displayed in a logical sequential order to apply):\n" \
+	"  -h|--help: display the usual help message\n" \
+	"  -v|--verbose: be verbose (repeat for more, over 2 is debug)\n" \
+	"  -u|--update-git-svn: update the PIPS git-svn gateways that are\n" \
+	"     into \$P4A_TOP/CRI-git-svn\n" \
+	"  -g|--recursive-git-svn ...: apply a git command to all the git\n" \
+	"     working copies inside the current directory. If no argument is\n" \
+	"     given, a git svn rebase is done\n" \
+	"  -f|--fetch-remote-git: fetch the objects from the remote git\n" \
+	"     repositories (the PIPS git-svn gateways and the polylib git)\n" \
+	"  -p|--pull-remote-git: pull the objects from the remote git\n" \
+	"     repositories into their respective branches\n" \
+	"  -m|--merge-remote-git: merge the branches that buffer the remote\n" \
+	"      git repositories into the current branch\n" \
+	"  -r|--root <directory-name>: create a git repository of this name\n" \
+	"     instead of 'par4all'"
+  fi
+  exit ${status:-1}
+}
+
+
+function enforce_P4A_TOP() {
+    if [[ -z "$P4A_TOP" ]] ; then
+	cat <<EOF
+The P4A_TOP variable is not set.
+It should contain the directory name with the Par4All git repository
+working copies in it:
+- par4all at least
+and according to what you want to do, also:
+- par4all-priv
+- CRI-git-svn/linear
+- CRI-git-svn/newgen
+- CRI-git-svn/nlpmake
+- CRI-git-svn/pips
+- CRI-git-svn/validation
+EOF
+	exit 1
+    fi
+
+    # To be changed when the global installation infrastructure is more
+    # stable. Be aware that enforce_P4A_TOP may be called more than once
+    # and thus this source too...
+    source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
+}
+
+enforce_P4A_TOP
+
+if [ $# == 0 ]; then
+    usage 1 "You should specify an option"
+fi
+
+# Get options:
+while [ "$1" ] ; do
+  opt=$1
+  case $opt in
+      --) shift ; break ;; # end of option
+      -*) shift ;; # one option, processed by next "case"
+      *) break ;; # must be an argument, stop option processing...
+  esac
+
+  case $opt in
+      -h|--help) usage 0 ;;
+      -v|--verbose) let verb++ ;;
+      -u|--update-git-svn) update_git_svn=1 ;;
+      -g|--recursive-git-svn) recursive_git_action=1 ;;
+      -f|--fetch-remote-git) fetch_remote_git=1 ;;
+      -p|--pull-remote-git) pull_remote_git=1 ;;
+      -m|--merge-remote-git) merge_remote_git=1 ;;
+      -r|--root) P4A_ROOT=$1 ; shift ;;
+      # error
+      *) usage 1 "unexpected option: $opt"
+  esac
+done
+
+if (( $verb >= 2 )) ; then
+    # Put shell tracing on:
+    set -vx
+fi
+
+if [[ $update_git_svn ]]; then
+    do_update_CRI_git_svn
+fi
+
+if [[ $recursive_git_action ]]; then
+    do_recursive_git $@
+fi
+
+if [[ $fetch_remote_git ]]; then
+    do_fetch_remote_git
+fi
+
+if [[ $pull_remote_git ]]; then
+    do_pull_remote_git
+fi
+
+if [[ $merge_remote_git ]]; then
+    do_merge_remote_git
+fi
+
+# Some Emacs stuff:
+### Local Variables:
+### mode: sh
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:

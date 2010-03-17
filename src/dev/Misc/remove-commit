@@ -1,0 +1,7 @@
+git filter-branch --commit-filter '
+			  if [ "$GIT_COMMIT" = d4dc64e171f130ab8e27af05e159168621750304 ];
+			  then
+					skip_commit "$@";
+			  else
+					git commit-tree "$@";
+			  fi' HEAD

@@ -1,0 +1,11 @@
+# Take as parameter the name of a file containing commit id to remove:
+
+file_name=$1
+# Exclude the commit if it is found in the file:
+git filter-branch --commit-filter '
+			  if grep -q "$GIT_COMMIT" '$file_name' ;
+			  then
+			  		skip_commit "$@";
+			  else
+					git commit-tree "$@";
+			  fi' HEAD
