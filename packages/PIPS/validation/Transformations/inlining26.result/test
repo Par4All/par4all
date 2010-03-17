@@ -18,6 +18,11 @@ int gradient(void)
    erode();
    return 0;
 }
+extern int erode(void);
+
+extern int dilate(void);
+
+extern int gradient(void);
 int gradient(void)
 {
    //PIPS generated variable

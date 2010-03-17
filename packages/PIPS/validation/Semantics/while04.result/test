@@ -10,7 +10,10 @@ int while04(int n)
 //  T(while04) {2n==while04+1, 2<=n}
 
    // BEGIN BLOCK
-   int i,  j;
+
+//  T() {}
+
+   int i, j;
 
 //  T(i) {i==0}
 
@@ -34,6 +37,9 @@ int while04(int n)
 //  T(i,j) {i==j-1, i==n-1, i#init==0, j#init==1, 1<=i}
 
       // BEGIN BLOCK
+
+//  T() {i==0, j==1, 2<=n}
+
       int k;
 
 //  T(i,j) {i==j-1, i#init==0, j#init==1, 0<=i, i+2<=n, 2<=n}
@@ -74,7 +80,10 @@ int while04(int n)
 //  P() {}
 
    // BEGIN BLOCK
-   int i,  j;
+
+//  P() {}
+
+   int i, j;
 
 //  P() {}
 
@@ -98,6 +107,9 @@ int while04(int n)
 //  P(i,j) {i==0, j==1, 2<=n}
 
       // BEGIN BLOCK
+
+//  P(i,j) {i==0, j==1, 2<=n}
+
       int k;
 
 //  P(i,j) {i==0, j==1, 2<=n}
@@ -133,7 +145,7 @@ only is used to evaluate the loop condition
 int while04(int n)
 {
    // BEGIN BLOCK
-   int i,  j;
+   int i, j;
 
    i = 0;
    j = 1;

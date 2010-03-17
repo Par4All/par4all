@@ -6,9 +6,9 @@ freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two pipeline calls are necessary
    // o0 = i0 * i1
    // o1 = i0 & i1
-   freia_aipo_mul(o0, i0, i1);                                          /*0009*/
-   freia_aipo_and(o1, i0, i1);                                          /*0010*/
-   return FREIA_OK;                                                     /*0011*/
+   freia_aipo_mul(o0, i0, i1);                                          /*0011*/
+   freia_aipo_and(o1, i0, i1);                                          /*0012*/
+   return FREIA_OK;                                                     /*0013*/
 }
 
 ! graphs
@@ -24,14 +24,14 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "10 &" [shape=trapezium,orientation=270];
-  "10 &" -> "o1";
-  "9 *" [shape=trapezium,orientation=270];
-  "9 *" -> "o0";
-  "i1" -> "10 &";
-  "i1" -> "9 *";
-  "i0" -> "10 &";
-  "i0" -> "9 *";
+  "12 &" [shape=trapezium,orientation=270];
+  "12 &" -> "o1";
+  "11 *" [shape=trapezium,orientation=270];
+  "11 *" -> "o0";
+  "i1" -> "12 &";
+  "i1" -> "11 *";
+  "i0" -> "12 &";
+  "i0" -> "11 *";
 }
 // graph for dag "dag_cleaned_0" of module "freia_05" in dot format
 digraph "dag_cleaned_0" {
@@ -44,14 +44,14 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "10 &" [shape=trapezium,orientation=270];
-  "10 &" -> "o1";
-  "9 *" [shape=trapezium,orientation=270];
-  "9 *" -> "o0";
-  "i1" -> "10 &";
-  "i1" -> "9 *";
-  "i0" -> "10 &";
-  "i0" -> "9 *";
+  "12 &" [shape=trapezium,orientation=270];
+  "12 &" -> "o1";
+  "11 *" [shape=trapezium,orientation=270];
+  "11 *" -> "o0";
+  "i1" -> "12 &";
+  "i1" -> "11 *";
+  "i0" -> "12 &";
+  "i0" -> "11 *";
 }
 // graph for dag "freia_05_helper_0_0" of module "freia_05" in dot format
 digraph "freia_05_helper_0_0" {
@@ -63,10 +63,10 @@ digraph "freia_05_helper_0_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 *" [shape=trapezium,orientation=270];
-  "9 *" -> "o0";
-  "i1" -> "9 *";
-  "i0" -> "9 *";
+  "11 *" [shape=trapezium,orientation=270];
+  "11 *" -> "o0";
+  "i1" -> "11 *";
+  "i0" -> "11 *";
 }
 // graph for dag "freia_05_helper_0_1" of module "freia_05" in dot format
 digraph "freia_05_helper_0_1" {
@@ -78,10 +78,10 @@ digraph "freia_05_helper_0_1" {
   "o1" [shape=circle];
 
   // computation vertices
-  "10 &" [shape=trapezium,orientation=270];
-  "10 &" -> "o1";
-  "i1" -> "10 &";
-  "i0" -> "10 &";
+  "12 &" [shape=trapezium,orientation=270];
+  "12 &" -> "o1";
+  "i1" -> "12 &";
+  "i0" -> "12 &";
 }
 
 ! acceleration function
@@ -109,11 +109,11 @@ freia_status freia_05_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 9 mul
+  // i0 [0 input 0] -> [0 alu] 11 mul
   // nope
-  // i1 [0 input 1] -> [0 alu] 9 mul
+  // i1 [0 input 1] -> [0 alu] 11 mul
   // nope
-  // alu 9 mul stage 0
+  // alu 11 mul stage 0
   si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
 
 
@@ -176,11 +176,11 @@ freia_status freia_05_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 10 and
+  // i0 [0 input 0] -> [0 alu] 12 and
   // nope
-  // i1 [0 input 1] -> [0 alu] 10 and
+  // i1 [0 input 1] -> [0 alu] 12 and
   // nope
-  // alu 10 and stage 0
+  // alu 12 and stage 0
   si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
 
 
@@ -231,7 +231,7 @@ freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two pipeline calls are necessary
    // o0 = i0 * i1
    // o1 = i0 & i1
-   freia_05_helper_0_0_0(o0, i0, i1);                                   /*0009*/
-   freia_05_helper_0_1_0(o1, i0, i1);                                   /*0010*/
-   return FREIA_OK;                                                     /*0011*/
+   freia_05_helper_0_0_0(o0, i0, i1);                                   /*0011*/
+   freia_05_helper_0_1_0(o1, i0, i1);                                   /*0012*/
+   return FREIA_OK;                                                     /*0013*/
 }

@@ -6,9 +6,9 @@ freia_status freia_32(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // test 2 independent alu operations
    // o0 = i0 +. 10
    // o1 = i1 ^. 123
-   freia_aipo_add_const(o0, i0, 10);                                    /*0008*/
-   freia_aipo_xor_const(o1, i1, 123);                                   /*0009*/
-   return FREIA_OK;                                                     /*0010*/
+   freia_aipo_add_const(o0, i0, 10);                                    /*0009*/
+   freia_aipo_xor_const(o1, i1, 123);                                   /*0010*/
+   return FREIA_OK;                                                     /*0011*/
 }
 
 ! graphs
@@ -24,12 +24,12 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "o1";
-  "i1" -> "9 ^.";
-  "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o0";
-  "i0" -> "8 +.";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "o1";
+  "i1" -> "10 ^.";
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i0" -> "9 +.";
 }
 // graph for dag "dag_cleaned_0" of module "freia_32" in dot format
 digraph "dag_cleaned_0" {
@@ -42,12 +42,12 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "o1";
-  "i1" -> "9 ^.";
-  "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o0";
-  "i0" -> "8 +.";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "o1";
+  "i1" -> "10 ^.";
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i0" -> "9 +.";
 }
 // graph for dag "freia_32_helper_0_0" of module "freia_32" in dot format
 digraph "freia_32_helper_0_0" {
@@ -60,12 +60,12 @@ digraph "freia_32_helper_0_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "o1";
-  "i1" -> "9 ^.";
-  "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o0";
-  "i0" -> "8 +.";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "o1";
+  "i1" -> "10 ^.";
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i0" -> "9 +.";
 }
 
 ! acceleration function
@@ -93,19 +93,19 @@ freia_status freia_32_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 8 add_const
+  // i0 [0 input 0] -> [0 alu] 9 add_const
   // nope
-  // alu 8 add_const stage 0
+  // alu 9 add_const stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_CONST;
   sp.alu[0][0].constant = cst0;
 
 
   // STAGE 1
-  // i1 [0 input 1] -> [1 alu] 9 xor_const
+  // i1 [0 input 1] -> [1 alu] 10 xor_const
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // i1 [1 input 1] -> [1 alu] 9 xor_const
+  // i1 [1 input 1] -> [1 alu] 10 xor_const
   // nope
-  // alu 9 xor_const stage 1 flipped
+  // alu 10 xor_const stage 1 flipped
   si.alu[1][0].op = SPOC_ALU_XOR_IN1_CONST;
   sp.alu[1][0].constant = cst1;
 
@@ -176,6 +176,6 @@ freia_status freia_32(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // test 2 independent alu operations
    // o0 = i0 +. 10
    // o1 = i1 ^. 123
-   freia_32_helper_0_0_0(o0, o1, i0, i1, 10, 123);                      /*0008*/
-   return FREIA_OK;                                                     /*0010*/
+   freia_32_helper_0_0_0(o0, o1, i0, i1, 10, 123);                      /*0009*/
+   return FREIA_OK;                                                     /*0011*/
 }

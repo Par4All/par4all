@@ -1,0 +1,54 @@
+/home/local/fabien/PIPS/prod/pips/bin/pips -f $VDIR/mm03.f mm03
+C     
+C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
+C     
+C     DATA FLOW INTERPROCEDURAL ANALYSIS
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     PARALLELIZATION OF LOOPS INCLUDING CALLS TO PROCEDURE
+C     
+      SUBROUTINE MM03(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C     
+      DOALL I = 1, N                                                    0012
+         DOALL J = 1, N                                                 0013
+            C(I,J) = 0.0                                                0014
+         ENDDO
+      ENDDO
+C     
+      DOALL J = 1, N                                                    0018
+         DO K = 1, N                                                    0019
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0020
+         ENDDO
+      ENDDO
+C
+      END
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C     
+      M = MOD(N, 4)                                                     0011
+      DOALL I = 1, M                                                    0012
+         X(I) = X(I)+S*Y(I)                                             0013
+      ENDDO
+C     
+      DOALL I = M+1, N, 4                                               0016
+         X(I) = X(I)+S*Y(I)                                             0017
+      ENDDO
+      DOALL I = M+1, N, 4                                               0016
+         X(I+1) = X(I+1)+S*Y(I+1)                                       0018
+      ENDDO
+      DOALL I = M+1, N, 4                                               0016
+         X(I+2) = X(I+2)+S*Y(I+2)                                       0019
+      ENDDO
+      DOALL I = M+1, N, 4                                               0016
+         X(I+3) = X(I+3)+S*Y(I+3)                                       0020
+      ENDDO
+C
+      END

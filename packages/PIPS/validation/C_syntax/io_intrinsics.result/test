@@ -37,7 +37,7 @@ int main(char *fmt1, ...)
    (void) printf(fmt2, i_name, i);
 
    va_start(vl, fmt1);
-   (void) vfscanf(fmt1, vl);
+   (void) vscanf(fmt1, vl);
    va_end(vl);
    va_start(vl, fmt1);
    (void) vprintf(fmt1, vl);

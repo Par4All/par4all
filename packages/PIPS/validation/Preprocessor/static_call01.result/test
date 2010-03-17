@@ -4,7 +4,6 @@ int main()
 }
 
 
-
 static void foo(int i);
 
 extern int main();
@@ -16,7 +15,6 @@ int main()
 {
    foo(3);
 }
-
 
 
 static void foo(int i);

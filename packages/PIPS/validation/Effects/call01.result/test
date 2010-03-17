@@ -67,7 +67,7 @@ void call01(int *pi, tf_t *q)
 
 Proper effects for "main"
 
-main()
+int main()
 {
    int i;
    tf_t s;
@@ -78,7 +78,7 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    int i;
    tf_t s;
@@ -125,7 +125,7 @@ void call01(int *pi, tf_t *q)
 
 Regions for "main"
 
-main()
+int main()
 {
    int i;
    tf_t s;

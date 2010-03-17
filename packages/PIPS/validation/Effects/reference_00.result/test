@@ -1,24 +1,26 @@
 void reference_00(void)
 {
-   int i = 0;                                                           /*0004*/
-   int a[10];                                                           /*0005*/
+   int i = 0;                                                           /*0003*/
+   int a[10];                                                           /*0004*/
    // effects on empty references...
-   i;                                                                   /*0007*/
-   a[i];                                                                /*0008*/
+   i;                                                                   /*0006*/
+   a[i];                                                                /*0007*/
 }
 void reference_00(void)
 {
-   int i = 0;                                                           /*0004*/
-   int a[10];                                                           /*0005*/
+//               <must be written>: i
+   int i = 0;                                                           /*0003*/
+   int a[10];                                                           /*0004*/
    // effects on empty references...
-   i;                                                                   /*0007*/
-   a[i];                                                                /*0008*/
+   i;                                                                   /*0006*/
+   a[i];                                                                /*0007*/
 }
 void reference_00(void)
 {
-   int i = 0;                                                           /*0004*/
-   int a[10];                                                           /*0005*/
+//               <must be written>: i
+   int i = 0;                                                           /*0003*/
+   int a[10];                                                           /*0004*/
    // effects on empty references...
-   i;                                                                   /*0007*/
-   a[i];                                                                /*0008*/
+   i;                                                                   /*0006*/
+   a[i];                                                                /*0007*/
 }

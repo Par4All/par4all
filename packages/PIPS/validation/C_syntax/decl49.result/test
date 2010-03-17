@@ -3,28 +3,28 @@ Parsed printed file for "safe_malloc"
 
 void * safe_malloc(int n)
 {
-   long i;                                                              /*0004*/
+   long i;                                                              /*0009*/
 
-   if (!i) {                                                            /*0006*/
-      void exit(int);                                                   /*0007*/
-      exit(2);                                                          /*0008*/
-      exit(4);                                                          /*0009*/
+   if (!i) {                                                            /*0011*/
+      void exit(int);                                                   /*0012*/
+      exit(2);                                                          /*0013*/
+      exit(4);                                                          /*0014*/
    }
    else
-      return (void *) i;                                                /*0012*/
+      return (void *) i;                                                /*0017*/
 }
 
 Printed file for "safe_malloc"
 
 void * safe_malloc(int n)
 {
-   long i;                                                              /*0004*/
+   long i;                                                              /*0009*/
 
-   if (!i) {                                                            /*0006*/
-      void exit(int);                                                   /*0007*/
-      exit(2);                                                          /*0008*/
-      exit(4);                                                          /*0009*/
+   if (!i) {                                                            /*0011*/
+      void exit(int);                                                   /*0012*/
+      exit(2);                                                          /*0013*/
+      exit(4);                                                          /*0014*/
    }
    else
-      return (void *) i;                                                /*0012*/
+      return (void *) i;                                                /*0017*/
 }

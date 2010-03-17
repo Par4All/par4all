@@ -5,9 +5,13 @@ int flatten_code06()
 {
 // (0,1)
    // BEGIN BLOCK
+// (0,2)
    int i = 1;                                                           /*0015*/
+// (0,3)
    int j;                                                               /*0016*/
+// (0,4)
    int k;                                                               /*0017*/
+// (0,5)
    float a[3];                                                          /*0018*/
 // (0,6)
    i++;                                                                 /*0019*/
@@ -15,6 +19,7 @@ int flatten_code06()
    for(k = 0; k <= 2; k += 1) {
 // (0,8)
       // BEGIN BLOCK
+// (0,9)
       int i = 2;                                                        /*0022*/
 // (0,10)
       i++;                                                              /*0023*/
@@ -38,11 +43,16 @@ int flatten_code06()
 {
 // (0,1)
    // BEGIN BLOCK
+// (0,2)
    int i = 1;                                                           /*0015*/
+// (0,3)
    int j;                                                               /*0016*/
+// (0,4)
    int k;                                                               /*0017*/
+// (0,5)
    float a[3];                                                          /*0018*/
    //PIPS generated variable
+// (0,6)
    int i_0;
 // (0,7)
    i++;                                                                 /*0019*/

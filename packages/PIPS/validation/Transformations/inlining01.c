@@ -1,4 +1,3 @@
-#include<stdio.h>
 static void pmax(int a, int b)
 {
     if( a > b )

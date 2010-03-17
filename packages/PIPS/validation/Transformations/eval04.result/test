@@ -6,7 +6,13 @@ C  T() {}
 
 void eval04()
 {
+
+//  T() {}
+
    int i;
+
+//  T() {}
+
    int j;
 
 //  T(i) {i==7}
@@ -31,7 +37,13 @@ Preconditions for "eval04" (useless)
 
 void eval04()
 {
+
+//  P() {}
+
    int i;
+
+//  P() {}
+
    int j;
 
 //  P() {}

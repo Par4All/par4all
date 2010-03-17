@@ -1,4 +1,5 @@
 delete $WSPACE
+setproperty ABORT_ON_USER_ERROR=TRUE
 create $WSPACE $FILE
 setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
 
@@ -7,6 +8,10 @@ display PRINTED_FILE[%ALL]
 apply PRIVATIZE_MODULE
 
 display PRINTED_FILE[%ALL]
+
+apply UNSPLIT
+shell gcc -fopenmp -c $WSPACE.database/Src/`basename $FILE`
+shell rm *.o
 
 close
  delete $WSPACE

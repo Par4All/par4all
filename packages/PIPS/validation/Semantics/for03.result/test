@@ -22,8 +22,17 @@ Check transformers on strip-mined loop
 
 int for03()
 {
+
+//  T() {}
+
    int x[512];
+
+//  T() {}
+
    int i;
+
+//  T() {}
+
    int j;
 
 //  T(i,j) {i==128j, 0<=j, j<=3}

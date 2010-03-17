@@ -1,0 +1,851 @@
+
+Initial code
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   for(j = 0; j <= length-1; j += 1) {
+      I_3 = psrc1[j];
+      I_1 = I_3;
+      v1 = I_1;
+      I_4 = psrc2[j];
+      I_2 = I_4;
+      v2 = I_2;
+      I_0 = v1+v2;
+      result = I_0;
+      pdest[j] = result;
+   }
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   for(j = 0; j <= length-1; j += 1) {
+      I_3 = psrc1[j];
+      I_1 = I_3;
+      v1 = I_1;
+      I_4 = psrc2[j];
+      I_2 = I_4;
+      v2 = I_2;
+      I_0 = v1+v2;
+      result = I_0;
+      pdest[j] = result;
+   }
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   for(j = 0; j <= length-1; j += 1) {
+      I_3 = psrc1[j];
+      I_1 = I_3;
+      v1 = I_1;
+      I_4 = psrc2[j];
+      I_2 = I_4;
+      v2 = I_2;
+      I_0 = v1+v2;
+      result = I_0;
+      pdest[j] = result;
+   }
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   for(j = 0; j <= length-1; j += 1) {
+      I_3 = psrc1[j];
+      I_1 = I_3;
+      v1 = I_1;
+      I_4 = psrc2[j];
+      I_2 = I_4;
+      v2 = I_2;
+      I_0 = v1+v2;
+      result = I_0;
+      pdest[j] = result;
+   }
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   for(j = 0; j <= length-1; j += 1) {
+      I_3 = psrc1[j];
+      I_1 = I_3;
+      v1 = I_1;
+      I_4 = psrc2[j];
+      I_2 = I_4;
+      v2 = I_2;
+      I_0 = v1+v2;
+      result = I_0;
+      pdest[j] = result;
+   }
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = length;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      I_3 = psrc1[LU_IND0];
+      I_1 = I_3;
+      v1 = I_1;
+      I_4 = psrc2[LU_IND0];
+      I_2 = I_4;
+      v2 = I_2;
+      I_0 = v1+v2;
+      result = I_0;
+      pdest[LU_IND0] = result;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0] = result;
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+1] = result;
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+2] = result;
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+3] = result;
+   }
+   j = MAX0(LU_NUB0, 0);
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = length;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      I_3 = psrc1[LU_IND0];
+      I_1 = I_3;
+      v1 = I_1;
+      I_4 = psrc2[LU_IND0];
+      I_2 = I_4;
+      v2 = I_2;
+      I_0 = v1+v2;
+      result = I_0;
+      pdest[LU_IND0] = result;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0] = result;
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+1] = result;
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+2] = result;
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_1
+      I_1 = I_3;
+      //c SIMD_COMMENT_2
+      v1 = I_1;
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_4
+      I_2 = I_4;
+      //c SIMD_COMMENT_5
+      v2 = I_2;
+      //c SIMD_COMMENT_6
+      I_0 = v1+v2;
+      //c SIMD_COMMENT_7
+      result = I_0;
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+3] = result;
+   }
+   j = MAX0(LU_NUB0, 0);
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = length;
+   LU_IB0 = MOD(length, 4);
+   for(LU_IND0 = 0; LU_IND0 <= MOD(length, 4)-1; LU_IND0 += 1) {
+      I_3 = psrc1[LU_IND0];
+      I_1 = psrc1[LU_IND0];
+      v1 = psrc1[LU_IND0];
+      I_4 = psrc2[LU_IND0];
+      I_2 = psrc2[LU_IND0];
+      v2 = psrc2[LU_IND0];
+      I_0 = psrc1[LU_IND0]+psrc2[LU_IND0];
+      result = psrc1[LU_IND0]+psrc2[LU_IND0];
+      pdest[LU_IND0] = psrc1[LU_IND0]+psrc2[LU_IND0];
+   }
+   for(LU_IND0 = MOD(length, 4); LU_IND0 <= length-1; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_6
+      I_0 = psrc1[LU_IND0]+psrc2[LU_IND0];
+      //c SIMD_COMMENT_7
+      result = psrc1[LU_IND0]+psrc2[LU_IND0];
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0] = psrc1[LU_IND0]+psrc2[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_6
+      I_0 = psrc1[LU_IND0+1]+psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_7
+      result = psrc1[LU_IND0+1]+psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+1] = psrc1[LU_IND0+1]+psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_6
+      I_0 = psrc1[LU_IND0+2]+psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_7
+      result = psrc1[LU_IND0+2]+psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+2] = psrc1[LU_IND0+2]+psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_6
+      I_0 = psrc1[LU_IND0+3]+psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_7
+      result = psrc1[LU_IND0+3]+psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_8
+      pdest[LU_IND0+3] = psrc1[LU_IND0+3]+psrc2[LU_IND0+3];
+   }
+   j = MAX0(length, 0);
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec4[3+1], v4si_vec5[3+1], v4si_vec6[3+1], v4si_vec7[3+1], v4si_vec8[3+1], v4si_vec9[3+1], v4si_vec10[3+1], v4si_vec11[3+1], v4si_vec12[3+1], v4si_vec13[3+1], v4si_vec14[3+1], v4si_vec15[3+1], v4si_vec16[3+1], v4si_vec17[3+1];
+   LU_NUB0 = length;
+   LU_IB0 = MOD(length, 4);
+   for(LU_IND0 = 0; LU_IND0 <= MOD(length, 4)-1; LU_IND0 += 1) {
+      I_3 = psrc1[LU_IND0];
+      I_1 = psrc1[LU_IND0];
+      v1 = psrc1[LU_IND0];
+      I_4 = psrc2[LU_IND0];
+      I_2 = psrc2[LU_IND0];
+      v2 = psrc2[LU_IND0];
+      I_0 = psrc1[LU_IND0]+psrc2[LU_IND0];
+      result = psrc1[LU_IND0]+psrc2[LU_IND0];
+      pdest[LU_IND0] = psrc1[LU_IND0]+psrc2[LU_IND0];
+   }
+   for(LU_IND0 = MOD(length, 4); LU_IND0 <= length-1; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+3];
+      SIMD_LOAD_V4SI(v4si_vec2, &psrc2[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &psrc1[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_GENERIC_V4SI(v4si_vec0, &I_0, &I_0, &I_0, &I_0);
+      SIMD_ADDD(v4si_vec3, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_GENERIC_V4SI(v4si_vec3, &result, &result, &result, &result);
+      SIMD_ADDD(v4si_vec6, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec6, &pdest[LU_IND0]);
+   }
+   j = MAX0(length, 0);
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec4[3+1], v4si_vec5[3+1], v4si_vec6[3+1], v4si_vec7[3+1], v4si_vec8[3+1], v4si_vec9[3+1], v4si_vec10[3+1], v4si_vec11[3+1], v4si_vec12[3+1], v4si_vec13[3+1], v4si_vec14[3+1], v4si_vec15[3+1], v4si_vec16[3+1], v4si_vec17[3+1];
+   LU_NUB0 = length;
+   LU_IB0 = MOD(length, 4);
+   for(LU_IND0 = 0; LU_IND0 <= MOD(length, 4)-1; LU_IND0 += 1) {
+      I_3 = psrc1[LU_IND0];
+      I_1 = psrc1[LU_IND0];
+      v1 = psrc1[LU_IND0];
+      I_4 = psrc2[LU_IND0];
+      I_2 = psrc2[LU_IND0];
+      v2 = psrc2[LU_IND0];
+      I_0 = psrc1[LU_IND0]+psrc2[LU_IND0];
+      result = psrc1[LU_IND0]+psrc2[LU_IND0];
+      pdest[LU_IND0] = psrc1[LU_IND0]+psrc2[LU_IND0];
+   }
+   for(LU_IND0 = MOD(length, 4); LU_IND0 <= length-1; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+3];
+      SIMD_LOAD_V4SI(v4si_vec2, &psrc2[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &psrc1[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_ADDD(v4si_vec3, v4si_vec1, v4si_vec2);
+      SIMD_ADDD(v4si_vec6, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec6, &pdest[LU_IND0]);
+   }
+   SIMD_SAVE_GENERIC_V4SI(v4si_vec0, &I_0, &I_0, &I_0, &I_0);
+   SIMD_SAVE_GENERIC_V4SI(v4si_vec3, &result, &result, &result, &result);
+   j = MAX0(length, 0);
+   return;
+}
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec6[3+1];
+   LU_NUB0 = length;
+   LU_IB0 = MOD(length, 4);
+   for(LU_IND0 = 0; LU_IND0 <= MOD(length, 4)-1; LU_IND0 += 1) {
+      I_3 = psrc1[LU_IND0];
+      I_1 = psrc1[LU_IND0];
+      v1 = psrc1[LU_IND0];
+      I_4 = psrc2[LU_IND0];
+      I_2 = psrc2[LU_IND0];
+      v2 = psrc2[LU_IND0];
+      I_0 = psrc1[LU_IND0]+psrc2[LU_IND0];
+      result = psrc1[LU_IND0]+psrc2[LU_IND0];
+      pdest[LU_IND0] = psrc1[LU_IND0]+psrc2[LU_IND0];
+   }
+   for(LU_IND0 = MOD(length, 4); LU_IND0 <= length-1; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+3];
+      SIMD_LOAD_V4SI(v4si_vec2, &psrc2[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &psrc1[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_ADDD(v4si_vec3, v4si_vec1, v4si_vec2);
+      SIMD_ADDD(v4si_vec6, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec6, &pdest[LU_IND0]);
+   }
+   SIMD_SAVE_GENERIC_V4SI(v4si_vec0, &I_0, &I_0, &I_0, &I_0);
+   SIMD_SAVE_GENERIC_V4SI(v4si_vec3, &result, &result, &result, &result);
+   j = MAX0(length, 0);
+   return;
+}
+
+simdized code
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int I_4;
+   int I_3;
+   int I_2;
+   int I_1;
+   int I_0;
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec6[3+1];
+   LU_NUB0 = length;
+   LU_IB0 = MOD(length, 4);
+   for(LU_IND0 = 0; LU_IND0 <= MOD(length, 4)-1; LU_IND0 += 1) {
+      I_3 = psrc1[LU_IND0];
+      I_1 = psrc1[LU_IND0];
+      v1 = psrc1[LU_IND0];
+      I_4 = psrc2[LU_IND0];
+      I_2 = psrc2[LU_IND0];
+      v2 = psrc2[LU_IND0];
+      I_0 = psrc1[LU_IND0]+psrc2[LU_IND0];
+      result = psrc1[LU_IND0]+psrc2[LU_IND0];
+      pdest[LU_IND0] = psrc1[LU_IND0]+psrc2[LU_IND0];
+   }
+   for(LU_IND0 = MOD(length, 4); LU_IND0 <= length-1; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      I_3 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_1
+      I_1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+1];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+2];
+      //c SIMD_COMMENT_2
+      v1 = psrc1[LU_IND0+3];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_3
+      I_4 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_4
+      I_2 = psrc2[LU_IND0+3];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+1];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+2];
+      //c SIMD_COMMENT_5
+      v2 = psrc2[LU_IND0+3];
+      SIMD_LOAD_V4SI(v4si_vec2, &psrc2[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &psrc1[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_ADDD(v4si_vec3, v4si_vec1, v4si_vec2);
+      SIMD_ADDD(v4si_vec6, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec6, &pdest[LU_IND0]);
+   }
+   SIMD_SAVE_GENERIC_V4SI(v4si_vec0, &I_0, &I_0, &I_0, &I_0);
+   SIMD_SAVE_GENERIC_V4SI(v4si_vec3, &result, &result, &result, &result);
+   j = MAX0(length, 0);
+   return;
+}

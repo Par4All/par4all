@@ -1,25 +1,6 @@
 freia_status freia_aipo_absdiff(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
-   o->stuff = i0->stuff|i1->stuff;                                      /*0075*/
+   o->stuff = i0->stuff|i1->stuff;                                      /*0159*/
    return FREIA_OK;                                                     /*0159*/
 }
 freia_status freia_aipo_absdiff_const(freia_data2d *o, const freia_data2d *i, int32_t c)
@@ -241,9 +222,9 @@ freia_status freia_common_close_output(freia_dataio *n)
 }
 freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 {
-   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0004*/
-   img->stuff = (int32_t) x&y&z;                                        /*0005*/
-   return img;                                                          /*0006*/
+   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0009*/
+   img->stuff = (int32_t) x&y&z;                                        /*0010*/
+   return img;                                                          /*0011*/
 }
 freia_status freia_common_destruct_data(freia_data2d *img)
 {
@@ -274,26 +255,7 @@ freia_status freia_aipo_absdiff(freia_data2d *o, const freia_data2d *i0, const f
 {
 //               <must be read   >: i0 i0[0][4] i1 i1[0][4] o
 //               <must be written>: o[0][4]
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
-   o->stuff = i0->stuff|i1->stuff;                                      /*0075*/
+   o->stuff = i0->stuff|i1->stuff;                                      /*0159*/
    return FREIA_OK;                                                     /*0159*/
 }
 //               <must be read   >: c i i[0][4] o
@@ -687,15 +649,18 @@ freia_status freia_common_close_output(freia_dataio *n)
 {
    return FREIA_OK;                                                     /*0050*/
 }
-//               <must be read   >: x y z
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ x y z
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 {
-   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0004*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ img
+   freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));   /*0009*/
 //               <must be read   >: img x y z
 //               <must be written>: img[0][4]
-   img->stuff = (int32_t) x&y&z;                                        /*0005*/
+   img->stuff = (int32_t) x&y&z;                                        /*0010*/
 //               <must be read   >: img
-   return img;                                                          /*0006*/
+   return img;                                                          /*0011*/
 }
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ img
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_

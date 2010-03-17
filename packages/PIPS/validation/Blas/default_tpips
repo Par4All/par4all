@@ -1,0 +1,12 @@
+delete $WSPACE
+create $WSPACE $FILE include/simd.f include/scabs1.f include/xerbla.f
+
+apply SIMPLIFY_COMPLEX[%ALL]
+
+module `echo $WSPACE | tr '[:lower:]' '[:upper:]'`
+
+source include/sac.tpips
+
+close
+delete $WSPACE
+quit

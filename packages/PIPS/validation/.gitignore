@@ -1,2 +1,6 @@
 /RESULTS
 /SUMMARY_Archive
+*.database
+out
+*.o
+

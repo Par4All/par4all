@@ -6,7 +6,10 @@ C  T(while03) {4<=while03}
 
 int while03()
 {
-   int i,  j,  n;
+
+//  T() {}
+
+   int i, j, n;
 
 //  T(i) {i==0}
 
@@ -52,7 +55,10 @@ Preconditions for "while03"
 
 int while03()
 {
-   int i,  j,  n;
+
+//  P() {}
+
+   int i, j, n;
 
 //  P() {}
 

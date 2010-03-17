@@ -3,8 +3,8 @@ Parsed code for "call13"
 
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
-   int i,  j1,  j2,  k1,  k2;
-   float R,  I;
+   int i, j1, j2, k1, k2;
+   float R, I;
 
    R = 0.0;
    I = 0.0;
@@ -26,8 +26,8 @@ Code for "call13"
 
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
-   int i,  j1,  j2,  k1,  k2;
-   float R,  I;
+   int i, j1, j2, k1, k2;
+   float R, I;
 
    R = 0.0;
    I = 0.0;
@@ -49,8 +49,8 @@ Proper effects for "call13"
 
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
-   int i,  j1,  j2,  k1,  k2;
-   float R,  I;
+   int i, j1, j2, k1, k2;
+   float R, I;
 //               <must be written>: R
 
    R = 0.0;
@@ -104,8 +104,8 @@ Cumulated effects for "call13"
 //               <must be read   >: nrec nsa ntt
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
-   int i,  j1,  j2,  k1,  k2;
-   float R,  I;
+   int i, j1, j2, k1, k2;
+   float R, I;
 //               <must be written>: R
 
    R = 0.0;
@@ -178,8 +178,8 @@ Regions for "call13"
 
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
-   int i,  j1,  j2,  k1,  k2;
-   float R,  I;
+   int i, j1, j2, k1, k2;
+   float R, I;
 
    R = 0.0;
    I = 0.0;

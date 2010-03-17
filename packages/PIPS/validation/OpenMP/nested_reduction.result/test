@@ -1,0 +1,37 @@
+// OMP style
+int main(void)
+{
+   int k, i;                                                            /*0004*/
+   k = 0;
+   i = 0;
+   int sum;                                                             /*0005*/
+   sum = 0;
+
+
+   for(k = 0; k <= 99; k += 1)
+      for(i = 0; i <= 99; i += 1)
+         sum += i+k;                                                    /*0009*/
+
+   printf("sum: %d\n", sum);                                            /*0013*/
+
+   return 0;                                                            /*0015*/
+}
+int main(void)
+{
+   int k, i;                                                            /*0004*/
+   k = 0;
+   i = 0;
+   int sum;                                                             /*0005*/
+   sum = 0;
+
+
+#pragma omp parallel for reduction(+:sum) private(i)
+   for(k = 0; k <= 99; k += 1)
+#pragma omp parallel for reduction(+:sum)
+      for(i = 0; i <= 99; i += 1)
+         sum += i+k;                                                    /*0009*/
+
+   printf("sum: %d\n", sum);                                            /*0013*/
+
+   return 0;                                                            /*0015*/
+}

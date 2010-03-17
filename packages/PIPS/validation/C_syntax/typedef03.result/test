@@ -3,7 +3,7 @@ Checking that typedef types are properly prettyprinted
 
 Printed file for "main"
 
-main()
+int main()
 {
    size_t i;
 

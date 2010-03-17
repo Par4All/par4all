@@ -27,12 +27,12 @@ int main()
    h = 2;
 
    x = &k[2];
-//  points to = {(x,k[2],E)}
+//  points to = {(x,k[2],-Exact-)}
    y = &h;
-//  points to = {(y,h,E)(x,k[2],E)}
+//  points to = {(y,h,-Exact-);(x,k[2],-Exact-)}
 
    x = y;
-//  points to = {(y,h,E)(x,h,E)}
+//  points to = {(y,h,-Exact-);(x,h,-Exact-)}
 
    return 0;
    // END BLOCK

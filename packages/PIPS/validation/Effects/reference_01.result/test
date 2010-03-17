@@ -1,29 +1,123 @@
+
+Code for "reference01"
+
 int reference_01(void)
 {
-   int i = 0;
-   int j = 1;
+   int i = 0;                                                           /*0006*/
+   int j = 1;                                                           /*0007*/
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
    // effects on empty references...
-   j/i;                                                                 /*0007*/
-   (void) j/i;                                                          /*0008*/
-   return i/j;                                                          /*0009*/
+   j/i;                                                                 /*0012*/
+   (void) j/i;                                                          /*0013*/
+   return i/j;                                                          /*0014*/
 }
+
+Code for "reference01"
+
 int reference_01(void)
 {
-   int i = 0;
-   int j = 1;
+//               <must be written>: i
+   int i = 0;                                                           /*0006*/
+//               <must be written>: j
+   int j = 1;                                                           /*0007*/
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
    // effects on empty references...
-   j/i;                                                                 /*0007*/
-   (void) j/i;                                                          /*0008*/
+   j/i;                                                                 /*0012*/
+   (void) j/i;                                                          /*0013*/
 //               <must be read   >: i j
-   return i/j;                                                          /*0009*/
+   return i/j;                                                          /*0014*/
 }
+
+Code with cumulated effects for "reference01"
+
 int reference_01(void)
 {
-   int i = 0;
-   int j = 1;
+//               <must be written>: i
+   int i = 0;                                                           /*0006*/
+//               <must be written>: j
+   int j = 1;                                                           /*0007*/
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
    // effects on empty references...
-   j/i;                                                                 /*0007*/
-   (void) j/i;                                                          /*0008*/
+   j/i;                                                                 /*0012*/
+   (void) j/i;                                                          /*0013*/
 //               <must be read   >: i j
-   return i/j;                                                          /*0009*/
+   return i/j;                                                          /*0014*/
+}
+
+Code with transformers for "reference01"
+
+
+//  T(reference_01) {}
+
+int reference_01(void)
+{
+
+//  T(i) {i==0}
+
+   int i = 0;                                                           /*0006*/
+
+//  T(j) {j==1}
+
+   int j = 1;                                                           /*0007*/
+
+//  T() {}
+
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
+
+//  T() {}
+
+   // effects on empty references...
+   j/i;                                                                 /*0012*/
+
+//  T() {}
+
+   (void) j/i;                                                          /*0013*/
+
+//  T(reference_01) {}
+
+   return i/j;                                                          /*0014*/
+}
+
+Code with preconditions for "reference01"
+
+
+//  P() {}
+
+int reference_01(void)
+{
+
+//  P() {}
+
+   int i = 0;                                                           /*0006*/
+
+//  P() {i==0}
+
+   int j = 1;                                                           /*0007*/
+
+//  P() {i==0, j==1}
+
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
+
+//  P() {i==0, j==1}
+
+   // effects on empty references...
+   j/i;                                                                 /*0012*/
+
+//  P() {i==0, j==1}
+
+   (void) j/i;                                                          /*0013*/
+
+//  P() {i==0, j==1}
+
+   return i/j;                                                          /*0014*/
 }

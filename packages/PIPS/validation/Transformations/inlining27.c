@@ -1,4 +1,3 @@
-#include <stdio.h>
 int foo(int i)
 {
     int i__=3;

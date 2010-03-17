@@ -1,0 +1,114 @@
+      PROGRAM NESTED
+
+      INTEGER K,I,J,SIZE
+      PARAMETER (SIZE=100)
+      REAL ARRAY(SIZE,SIZE)
+      REAL ARRAY2(SIZE,SIZE,SIZE)
+
+
+!$OMP PARALLEL DO PRIVATE(J, K)
+      DO I = 1, SIZE                                                    0008
+         DO J = 1, SIZE                                                 0009
+
+!$OMP       PARALLEL DO 
+            DO K = 1, SIZE                                              0010
+               ARRAY(K,I) = I+K+J                                       0011
+            ENDDO
+         ENDDO
+      ENDDO
+
+
+!$OMP PARALLEL DO PRIVATE(J,K)
+      DO I = 1, SIZE                                                    0016
+
+!$OMP    PARALLEL DO PRIVATE(K)
+         DO J = 1, SIZE                                                 0017
+
+!$OMP       PARALLEL DO 
+            DO K = 1, SIZE                                              0018
+               ARRAY2(K,J,I) = I+K+J                                    0019
+            ENDDO
+         ENDDO
+      ENDDO
+
+      PRINT *, ARRAY                                                    0024
+      PRINT *, ARRAY2                                                   0025
+      END
+
+Parallelized code
+
+      PROGRAM NESTED
+
+      INTEGER K,I,J,SIZE
+      PARAMETER (SIZE=100)
+      REAL ARRAY(SIZE,SIZE)
+      REAL ARRAY2(SIZE,SIZE,SIZE)
+
+
+!$OMP PARALLEL DO PRIVATE(J, K)
+      DO I = 1, SIZE                                                    0008
+         DO J = 1, SIZE                                                 0009
+
+!$OMP       PARALLEL DO 
+            DO K = 1, SIZE                                              0010
+               ARRAY(K,I) = I+K+J                                       0011
+            ENDDO
+         ENDDO
+      ENDDO
+
+
+!$OMP PARALLEL DO PRIVATE(J, K)
+      DO I = 1, SIZE                                                    0016
+
+!$OMP    PARALLEL DO PRIVATE(K)
+         DO J = 1, SIZE                                                 0017
+
+!$OMP       PARALLEL DO 
+            DO K = 1, SIZE                                              0018
+               ARRAY2(K,J,I) = I+K+J                                    0019
+            ENDDO
+         ENDDO
+      ENDDO
+
+      PRINT *, ARRAY                                                    0024
+      PRINT *, ARRAY2                                                   0025
+      END
+
+Open MP version
+
+      PROGRAM NESTED
+
+      INTEGER K,I,J,SIZE
+      PARAMETER (SIZE=100)
+      REAL ARRAY(SIZE,SIZE)
+      REAL ARRAY2(SIZE,SIZE,SIZE)
+
+!$omp parallel do private(J, K)
+      DO I = 1, SIZE                                                    0008
+         DO J = 1, SIZE                                                 0009
+!$omp parallel do
+            DO K = 1, SIZE                                              0010
+               ARRAY(K,I) = I+K+J                                       0011
+            ENDDO
+!$omp end parallel do
+         ENDDO
+      ENDDO
+!$omp end parallel do
+
+!$omp parallel do private(J, K)
+      DO I = 1, SIZE                                                    0016
+!$omp parallel do private(K)
+         DO J = 1, SIZE                                                 0017
+!$omp parallel do
+            DO K = 1, SIZE                                              0018
+               ARRAY2(K,J,I) = I+K+J                                    0019
+            ENDDO
+!$omp end parallel do
+         ENDDO
+!$omp end parallel do
+      ENDDO
+!$omp end parallel do
+
+      PRINT *, ARRAY                                                    0024
+      PRINT *, ARRAY2                                                   0025
+      END

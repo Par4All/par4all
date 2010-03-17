@@ -1,0 +1,318 @@
+void upscale_chrominance(type_yuv_frame *frame_in, type_yuv_frame *frame_out)
+{
+   int i, j;
+   for(i = 0; i <= frame_in->sizeChrW-1; i += 1)
+      for(j = 0; j <= frame_in->sizeChrH-1; j += 1) {
+         (frame_out->u)[frame_out->sizeChrW*2*j+2*i] = (frame_in->u)[frame_in->sizeChrW*j+i];
+         (frame_out->u)[frame_out->sizeChrW*(2*j+1)+2*i] = (frame_in->u)[frame_in->sizeChrW*j+i];
+         (frame_out->u)[frame_out->sizeChrW*2*j+2*i+1] = (frame_in->u)[frame_in->sizeChrW*j+i];
+         (frame_out->u)[frame_out->sizeChrW*(2*j+1)+2*i+1] = (frame_in->u)[frame_in->sizeChrW*j+i];
+         (frame_out->v)[frame_out->sizeChrW*2*j+2*i] = (frame_in->v)[frame_in->sizeChrW*j+i];
+         (frame_out->v)[frame_out->sizeChrW*(2*j+1)+2*i] = (frame_in->v)[frame_in->sizeChrW*j+i];
+         (frame_out->v)[frame_out->sizeChrW*2*j+2*i+1] = (frame_in->v)[frame_in->sizeChrW*j+i];
+         (frame_out->v)[frame_out->sizeChrW*(2*j+1)+2*i+1] = (frame_in->v)[frame_in->sizeChrW*j+i];
+      }
+}
+void upscale_chrominance(type_yuv_frame *frame_in, type_yuv_frame *frame_out)
+{
+   int i, j;
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   uint8 *P_0;
+   //PIPS generated variable
+   int I_2, I_3, I_4, I_5, I_6;
+   //PIPS generated variable
+   uint8 *P_1;
+   //PIPS generated variable
+   int I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16;
+   //PIPS generated variable
+   uint8 *P_2, *P_3;
+   //PIPS generated variable
+   int I_17, I_18;
+   for(i = 0; i <= frame_in->sizeChrW-1; i += 1)
+      for(j = 0; j <= frame_in->sizeChrH-1; j += 1) {
+         P_0 = frame_out->u;
+         I_2 = frame_out->sizeChrW;
+         I_3 = 2*j;
+         I_4 = I_2*I_3;
+         I_5 = 2*i;
+         I_6 = I_4+I_5;
+         P_1 = frame_in->u;
+         I_9 = frame_in->sizeChrW*j+i;
+         P_0[I_6] = P_1[I_9];
+         P_0[I_2*(I_3+1)+I_5] = P_1[I_9];
+         P_0[I_4+I_5+1] = P_1[I_9];
+         I_15 = I_2*(I_3+1);
+         I_16 = I_15+I_5+1;
+         P_0[I_16] = P_1[I_9];
+         P_2 = frame_out->v;
+         P_3 = frame_in->v;
+         P_2[I_6] = P_3[I_9];
+         P_2[I_15+I_5] = P_3[I_9];
+         P_2[I_4+I_5+1] = P_3[I_9];
+         P_2[I_16] = P_3[I_9];
+      }
+}
+void upscale_chrominance(type_yuv_frame *frame_in, type_yuv_frame *frame_out)
+{
+   int i, j;
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   uint8 *P_0;
+   //PIPS generated variable
+   int I_2, I_3, I_4, I_5, I_6;
+   //PIPS generated variable
+   uint8 *P_1;
+   //PIPS generated variable
+   int I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16;
+   //PIPS generated variable
+   uint8 *P_2, *P_3;
+   //PIPS generated variable
+   int I_17, I_18, I_19, I_20;
+   //PIPS generated variable
+   uint8 *P_4;
+   //PIPS generated variable
+   int I_21, I_22, I_23, I_24, I_25;
+   //PIPS generated variable
+   uint8 *P_5;
+   //PIPS generated variable
+   int I_26, I_27, I_28;
+   //PIPS generated variable
+   uint8 I_29;
+   //PIPS generated variable
+   int I_30, I_31, I_32, I_33, I_34, I_35;
+   //PIPS generated variable
+   uint8 *P_6, *P_7;
+   //PIPS generated variable
+   uint8 I_36;
+   //PIPS generated variable
+   int I_37;
+   for(i = 0; i <= frame_in->sizeChrW-1; i += 1)
+      for(j = 0; j <= frame_in->sizeChrH-1; j += 1) {
+         P_0 = frame_out->u;
+         I_2 = frame_out->sizeChrW;
+         I_3 = 2*j;
+         I_4 = I_2*I_3;
+         I_5 = 2*i;
+         I_6 = I_4+I_5;
+         P_1 = frame_in->u;
+         I_9 = frame_in->sizeChrW*j+i;
+         I_29 = P_1[I_9];
+         P_0[I_6] = I_29;
+         //1
+         I_30 = I_3+1;
+         //2
+         I_31 = I_2*I_30;
+         //1
+         I_32 = I_31+I_5;
+         P_0[I_32] = I_29;
+         //2
+         I_33 = I_5+1;
+         //2
+         I_34 = I_4+I_33;
+         P_0[I_34] = I_29;
+         I_15 = I_31;
+         I_16 = I_15+I_33;
+         P_0[I_16] = I_29;
+         P_2 = frame_out->v;
+         P_3 = frame_in->v;
+         I_36 = P_3[I_9];
+         P_2[I_6] = I_36;
+         //1
+         I_37 = I_15+I_5;
+         P_2[I_37] = I_36;
+         P_2[I_34] = I_36;
+         P_2[I_16] = I_36;
+      }
+}
+void upscale_chrominance(type_yuv_frame *frame_in, type_yuv_frame *frame_out)
+{
+   int i, j;
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   uint8 *P_0;
+   //PIPS generated variable
+   int I_2, I_3, I_4, I_5, I_6;
+   //PIPS generated variable
+   uint8 *P_1;
+   //PIPS generated variable
+   int I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16;
+   //PIPS generated variable
+   uint8 *P_2, *P_3;
+   //PIPS generated variable
+   int I_17, I_18, I_19, I_20;
+   //PIPS generated variable
+   uint8 *P_4;
+   //PIPS generated variable
+   int I_21, I_22, I_23, I_24, I_25;
+   //PIPS generated variable
+   uint8 *P_5;
+   //PIPS generated variable
+   int I_26, I_27, I_28;
+   //PIPS generated variable
+   uint8 I_29;
+   //PIPS generated variable
+   int I_30, I_31, I_32, I_33, I_34, I_35;
+   //PIPS generated variable
+   uint8 *P_6, *P_7;
+   //PIPS generated variable
+   uint8 I_36;
+   //PIPS generated variable
+   int I_37;
+   //PIPS generated variable
+   uint8 *P_8;
+   //PIPS generated variable
+   int I_38, I_39;
+   //PIPS generated variable
+   uint8 *P_9;
+   //PIPS generated variable
+   int I_40;
+   //PIPS generated variable
+   uint8 *P_10, *P_11;
+   //PIPS generated variable
+   int I_41;
+   P_8 = frame_out->u;
+   I_38 = frame_out->sizeChrW;
+   P_9 = frame_in->u;
+   I_40 = frame_in->sizeChrW;
+   P_10 = frame_out->v;
+   P_11 = frame_in->v;
+   I_41 = frame_in->sizeChrH-1;
+   for(i = 0; i <= frame_in->sizeChrW-1; i += 1) {
+      I_39 = 2*i;
+      for(j = 0; j <= I_41; j += 1) {
+         P_0 = P_8;
+         I_2 = I_38;
+         I_3 = 2*j;
+         I_4 = I_2*I_3;
+         I_5 = I_39;
+         I_6 = I_4+I_5;
+         P_1 = P_9;
+         I_9 = I_40*j+i;
+         I_29 = P_1[I_9];
+         P_0[I_6] = I_29;
+         //1
+         I_30 = I_3+1;
+         //2
+         I_31 = I_2*I_30;
+         //1
+         I_32 = I_31+I_5;
+         P_0[I_32] = I_29;
+         //2
+         I_33 = I_5+1;
+         //2
+         I_34 = I_4+I_33;
+         P_0[I_34] = I_29;
+         I_15 = I_31;
+         I_16 = I_15+I_33;
+         P_0[I_16] = I_29;
+         P_2 = P_10;
+         P_3 = P_11;
+         I_36 = P_3[I_9];
+         P_2[I_6] = I_36;
+         //1
+         I_37 = I_15+I_5;
+         P_2[I_37] = I_36;
+         P_2[I_34] = I_36;
+         P_2[I_16] = I_36;
+      }
+   }
+}
+void upscale_chrominance(type_yuv_frame *frame_in, type_yuv_frame *frame_out)
+{
+   int i, j;
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   uint8 *P_0;
+   //PIPS generated variable
+   int I_2, I_3, I_4, I_5, I_6;
+   //PIPS generated variable
+   uint8 *P_1;
+   //PIPS generated variable
+   int I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16;
+   //PIPS generated variable
+   uint8 *P_2, *P_3;
+   //PIPS generated variable
+   int I_17, I_18, I_19, I_20;
+   //PIPS generated variable
+   uint8 *P_4;
+   //PIPS generated variable
+   int I_21, I_22, I_23, I_24, I_25;
+   //PIPS generated variable
+   uint8 *P_5;
+   //PIPS generated variable
+   int I_26, I_27, I_28;
+   //PIPS generated variable
+   uint8 I_29;
+   //PIPS generated variable
+   int I_30, I_31, I_32, I_33, I_34, I_35;
+   //PIPS generated variable
+   uint8 *P_6, *P_7;
+   //PIPS generated variable
+   uint8 I_36;
+   //PIPS generated variable
+   int I_37;
+   //PIPS generated variable
+   uint8 *P_8;
+   //PIPS generated variable
+   int I_38, I_39;
+   //PIPS generated variable
+   uint8 *P_9;
+   //PIPS generated variable
+   int I_40;
+   //PIPS generated variable
+   uint8 *P_10, *P_11;
+   //PIPS generated variable
+   int I_41;
+   P_8 = frame_out->u;
+   I_38 = frame_out->sizeChrW;
+   P_9 = frame_in->u;
+   I_40 = frame_in->sizeChrW;
+   P_10 = frame_out->v;
+   P_11 = frame_in->v;
+   I_41 = frame_in->sizeChrH-1;
+   for(i = 0; i <= frame_in->sizeChrW-1; i += 1) {
+      I_39 = 2*i;
+      for(j = 0; j <= frame_in->sizeChrH-1; j += 1) {
+         P_0 = frame_out->u;
+         I_2 = frame_out->sizeChrW;
+         I_3 = 2*j;
+         I_4 = frame_out->sizeChrW*2*j;
+         I_5 = 2*i;
+         I_6 = frame_out->sizeChrW*2*j+2*i;
+         P_1 = frame_in->u;
+         I_9 = frame_in->sizeChrW*j+i;
+         I_29 = P_1[frame_in->sizeChrW*j+i];
+         P_0[frame_out->sizeChrW*2*j+2*i] = P_1[frame_in->sizeChrW*j+i];
+         //1
+         I_30 = 2*j+1;
+         //2
+         I_31 = frame_out->sizeChrW*(2*j+1);
+         //1
+         I_32 = frame_out->sizeChrW*(2*j+1)+2*i;
+         P_0[frame_out->sizeChrW*(2*j+1)+2*i] = P_1[frame_in->sizeChrW*j+i];
+         //2
+         I_33 = 2*i+1;
+         //2
+         I_34 = frame_out->sizeChrW*2*j+2*i+1;
+         P_0[frame_out->sizeChrW*2*j+2*i+1] = P_1[frame_in->sizeChrW*j+i];
+         I_15 = frame_out->sizeChrW*(2*j+1);
+         I_16 = frame_out->sizeChrW*(2*j+1)+2*i+1;
+         P_0[frame_out->sizeChrW*(2*j+1)+2*i+1] = P_1[frame_in->sizeChrW*j+i];
+         P_2 = frame_out->v;
+         P_3 = frame_in->v;
+         I_36 = P_3[frame_in->sizeChrW*j+i];
+         P_2[frame_out->sizeChrW*2*j+2*i] = P_3[frame_in->sizeChrW*j+i];
+         //1
+         I_37 = frame_out->sizeChrW*(2*j+1)+2*i;
+         P_2[frame_out->sizeChrW*(2*j+1)+2*i] = P_3[frame_in->sizeChrW*j+i];
+         P_2[frame_out->sizeChrW*2*j+2*i+1] = P_3[frame_in->sizeChrW*j+i];
+         P_2[frame_out->sizeChrW*(2*j+1)+2*i+1] = P_3[frame_in->sizeChrW*j+i];
+      }
+   }
+}
+

@@ -1,0 +1,35 @@
+delete struct03
+create struct03 struct03.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[struct03]
+
+
+
+
+
+
+
+
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[struct03]
+
+
+close
+delete struct03
+quit
+

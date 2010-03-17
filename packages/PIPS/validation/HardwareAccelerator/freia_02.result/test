@@ -5,20 +5,20 @@ freia_status freia_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    
    
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0007*/
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0008*/
    
    // 1 pipeline call is enough
    // t1 = i1 / i0
    // t2 = t1 + i0
    // o  = t2 ^ i0
-   freia_aipo_div(t1, i1, i0);                                          /*0013*/
-   freia_aipo_add(t2, t1, i0);                                          /*0014*/
-   freia_aipo_xor(o, t2, i0);                                           /*0015*/
+   freia_aipo_div(t1, i1, i0);                                          /*0014*/
+   freia_aipo_add(t2, t1, i0);                                          /*0015*/
+   freia_aipo_xor(o, t2, i0);                                           /*0016*/
 
-   freia_common_destruct_data(t1);                                      /*0017*/
-   freia_common_destruct_data(t2);                                      /*0018*/
+   freia_common_destruct_data(t1);                                      /*0018*/
+   freia_common_destruct_data(t2);                                      /*0019*/
 
-   return FREIA_OK;                                                     /*0020*/
+   return FREIA_OK;                                                     /*0021*/
 }
 
 ! graphs
@@ -33,16 +33,16 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "15 ^" [shape=trapezium,orientation=270];
-  "15 ^" -> "o";
-  "14 +" [shape=trapezium,orientation=270];
-  "14 +" -> "15 ^" [label="t2"];
-  "13 /" [shape=trapezium,orientation=270];
-  "13 /" -> "14 +" [label="t1"];
-  "i0" -> "15 ^";
-  "i0" -> "14 +";
-  "i0" -> "13 /";
-  "i1" -> "13 /";
+  "16 ^" [shape=trapezium,orientation=270];
+  "16 ^" -> "o";
+  "15 +" [shape=trapezium,orientation=270];
+  "15 +" -> "16 ^" [label="t2"];
+  "14 /" [shape=trapezium,orientation=270];
+  "14 /" -> "15 +" [label="t1"];
+  "i0" -> "16 ^";
+  "i0" -> "15 +";
+  "i0" -> "14 /";
+  "i1" -> "14 /";
 }
 // graph for dag "dag_cleaned_0" of module "freia_02" in dot format
 digraph "dag_cleaned_0" {
@@ -54,16 +54,16 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "15 ^" [shape=trapezium,orientation=270];
-  "15 ^" -> "o";
-  "14 +" [shape=trapezium,orientation=270];
-  "14 +" -> "15 ^" [label="t2"];
-  "13 /" [shape=trapezium,orientation=270];
-  "13 /" -> "14 +" [label="t1"];
-  "i0" -> "15 ^";
-  "i0" -> "14 +";
-  "i0" -> "13 /";
-  "i1" -> "13 /";
+  "16 ^" [shape=trapezium,orientation=270];
+  "16 ^" -> "o";
+  "15 +" [shape=trapezium,orientation=270];
+  "15 +" -> "16 ^" [label="t2"];
+  "14 /" [shape=trapezium,orientation=270];
+  "14 /" -> "15 +" [label="t1"];
+  "i0" -> "16 ^";
+  "i0" -> "15 +";
+  "i0" -> "14 /";
+  "i1" -> "14 /";
 }
 // graph for dag "freia_02_helper_0_0" of module "freia_02" in dot format
 digraph "freia_02_helper_0_0" {
@@ -75,16 +75,16 @@ digraph "freia_02_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "15 ^" [shape=trapezium,orientation=270];
-  "15 ^" -> "o";
-  "14 +" [shape=trapezium,orientation=270];
-  "14 +" -> "15 ^" [label="t2"];
-  "13 /" [shape=trapezium,orientation=270];
-  "13 /" -> "14 +" [label="t1"];
-  "i0" -> "15 ^";
-  "i0" -> "14 +";
-  "i0" -> "13 /";
-  "i1" -> "13 /";
+  "16 ^" [shape=trapezium,orientation=270];
+  "16 ^" -> "o";
+  "15 +" [shape=trapezium,orientation=270];
+  "15 +" -> "16 ^" [label="t2"];
+  "14 /" [shape=trapezium,orientation=270];
+  "14 /" -> "15 +" [label="t1"];
+  "i0" -> "16 ^";
+  "i0" -> "15 +";
+  "i0" -> "14 /";
+  "i1" -> "14 /";
 }
 
 ! acceleration function
@@ -112,39 +112,39 @@ freia_status freia_02_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 13 div
+  // i0 [0 input 0] -> [0 alu] 14 div
   // nope
-  // i1 [0 input 1] -> [0 alu] 13 div
+  // i1 [0 input 1] -> [0 alu] 14 div
   // nope
-  // alu 13 div stage 0 flipped
+  // alu 14 div stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_DIV_IN1_IN0;
 
 
   // STAGE 1
-  // i0 [0 input 0] -> [1 alu] 14 add
+  // i0 [0 input 0] -> [1 alu] 15 add
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // i0 [1 input 0] -> [1 alu] 14 add
+  // i0 [1 input 0] -> [1 alu] 15 add
   // nope
-  // 0`t1 [0 alu] -> [1 alu] 14 add
+  // 0`t1 [0 alu] -> [1 alu] 15 add
   si.mux[0][1].op = SPOC_MUX_IN1;
   si.mux[0][3].op = SPOC_MUX_IN0;
-  // 0`t1 [1 input 1] -> [1 alu] 14 add
+  // 0`t1 [1 input 1] -> [1 alu] 15 add
   // nope
-  // alu 14 add stage 1
+  // alu 15 add stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
   // STAGE 2
-  // i0 [1 poc 0] -> [2 alu] 15 xor
+  // i0 [1 poc 0] -> [2 alu] 16 xor
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // i0 [2 input 0] -> [2 alu] 15 xor
+  // i0 [2 input 0] -> [2 alu] 16 xor
   // nope
-  // 0`t2 [1 alu] -> [2 alu] 15 xor
+  // 0`t2 [1 alu] -> [2 alu] 16 xor
   si.mux[1][1].op = SPOC_MUX_IN1;
   si.mux[1][3].op = SPOC_MUX_IN0;
-  // 0`t2 [2 input 1] -> [2 alu] 15 xor
+  // 0`t2 [2 input 1] -> [2 alu] 16 xor
   // nope
-  // alu 15 xor stage 2
+  // alu 16 xor stage 2
   si.alu[2][0].op = SPOC_ALU_XOR_IN0_IN1;
 
 
@@ -195,8 +195,8 @@ freia_status freia_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // t1 = i1 / i0
    // t2 = t1 + i0
    // o  = t2 ^ i0
-   freia_02_helper_0_0_0(o, i0, i1);                                    /*0013*/
+   freia_02_helper_0_0_0(o, i0, i1);                                    /*0014*/
    
    
-   return FREIA_OK;                                                     /*0020*/
+   return FREIA_OK;                                                     /*0021*/
 }

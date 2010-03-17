@@ -1,0 +1,37 @@
+delete decl04
+create decl04 decl04.c
+
+#echo Select some options to deal with the C Language:
+#echo Parse as C:
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+#echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+#echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+activate PRINT_CODE_PROPER_EFFECTS
+
+echo
+echo Proper effects
+echo
+display PRINTED_FILE[decl04]
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+
+echo
+echo Cumulated effects 
+echo
+display PRINTED_FILE[decl04]
+
+
+close
+delete decl04
+quit

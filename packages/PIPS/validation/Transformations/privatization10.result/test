@@ -10,7 +10,6 @@ C     See also privatization01, 07, 08, 09 and 10
 
 !$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0010
-         PRIVATE(I)
          J = J+1                                                        0011
          A(I) = J                                                       0012
       ENDDO
@@ -18,7 +17,6 @@ C     See also privatization01, 07, 08, 09 and 10
 
 !$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0015
-         PRIVATE(I)
          J = 1                                                          0016
          A(I) = J                                                       0017
       ENDDO

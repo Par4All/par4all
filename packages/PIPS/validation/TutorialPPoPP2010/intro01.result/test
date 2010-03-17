@@ -1,0 +1,13 @@
+/*
+ * file for intro01.c
+ */
+int temp;
+extern int main(void);
+int main(void)
+{
+   int i, j, c, a[100];
+   c = 2;
+   /* a simple parallel loop */
+   for(i = 0; i <= 99; i += 1)
+      a[i] = c*a[i]+a[i]-1;
+}

@@ -1,0 +1,7 @@
+#! /bin/sh
+Delete $WSPACE 2> /dev/null 1>&2 # ignore delete failure...
+Init -f $FILE -d $WSPACE ; status=$?
+while read module ; do
+  Display -m $module -w $WSPACE ; status=$?
+done < $WSPACE.database/modules
+Delete $WSPACE 2> /dev/null 1>&2 # ignore delete failure...

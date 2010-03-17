@@ -15,8 +15,11 @@ Proper effetcs for "dereferencing01"
 
 void dereferencing01()
 {
+//               <must be written>: x
    double x = 1.;
+//               <must be written>: p
    double *p = &x;
+//               <must be written>: q
    double *q = 0;
 //               <must be read   >: p
 //               <must be written>: q
@@ -31,8 +34,11 @@ Cumulated effetcs for "dereferencing01"
 
 void dereferencing01()
 {
+//               <must be written>: x
    double x = 1.;
+//               <must be written>: p
    double *p = &x;
+//               <must be written>: q
    double *q = 0;
 //               <must be read   >: p
 //               <must be written>: q

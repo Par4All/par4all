@@ -15,8 +15,7 @@ Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
 void compute()
 {
-   int i;
-   int j;
+   int i, j;
 
 #pragma omp parallel for private(j)
    for(i = 1; i <= 62; i += 1)
@@ -33,10 +32,7 @@ void compute()
 }
 void get_data(char filename[])
 {
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
    if ((fp = fopen(filename, "r"))==(void *) 0) {
@@ -64,7 +60,7 @@ void get_data(char filename[])
    fgetc(fp);
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
    
-
+   
    for(i = 0; i <= 63; i += 1)
       for(j = 0; j <= 63; j += 1) {
          c = fgetc(fp);
@@ -79,7 +75,6 @@ int main(int argc, char *argv[])
 
    get_data("input.pgm");
 
-#pragma omp parallel for 
    for(t = 0; t <= 63; t += 1)
       compute();
 
@@ -89,8 +84,7 @@ int main(int argc, char *argv[])
 }
 void write_data(char filename[])
 {
-   int i;
-   int j;
+   int i, j;
    unsigned char c;
    FILE *fp;
    if ((fp = fopen(filename, "w"))==(void *) 0) {

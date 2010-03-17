@@ -13,6 +13,7 @@ void flatten_code12(void)
 {
 // (0,1)
    // BEGIN BLOCK
+// (0,2)
    int i = (int) foo_0;                                                 /*0015*/
 // (0,3)
 
@@ -22,6 +23,7 @@ void flatten_code12(void)
    for(i = i; i <= 6; i += 1) {
 // (0,5)
       // BEGIN BLOCK
+// (0,6)
       static int foo = 0;                                               /*0020*/
 // (0,7)
 
@@ -42,8 +44,10 @@ void flatten_code12(void)
 {
 // (0,1)
    // BEGIN BLOCK
+// (0,2)
    int i = (int) foo_0;                                                 /*0015*/
    //PIPS generated variable
+// (0,3)
    static int foo_1 = 0;
 // (0,4)
 

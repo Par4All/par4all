@@ -10,12 +10,15 @@ echo parsed printed file
 echo
 
 display PARSED_PRINTED_FILE[io01!]
-quit
-echo
-echo printed file
-echo
 
-display PRINTED_FILE[io01!]
+#echo
+#echo printed file
+#echo
+#
+#display PRINTED_FILE[io01!]
+
+apply UNSPLIT
+shell cc -c io01.database/Src/io01.c
 
 close
 #delete io01

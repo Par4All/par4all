@@ -1,7 +1,7 @@
 Checking that typedef types are properly prettyprinted
 (because of a problem in main_hello_world.c)
 
-Printed file for "typedef04"
+Printed file for "typedef04!" and "typedef04" 
 
 typedef double mydouble;
 struct s {

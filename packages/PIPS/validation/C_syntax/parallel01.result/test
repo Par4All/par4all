@@ -28,7 +28,13 @@ Preconditions
 
 void parallel01()
 {
+
+//  P() {}
+
    double x[10];
+
+//  P() {}
+
    int i;
 
 //  P() {}

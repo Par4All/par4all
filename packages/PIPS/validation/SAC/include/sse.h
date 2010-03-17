@@ -19,3 +19,6 @@ do { \
     float v[4] = { v0,v1,v2,v3 };\
     SIMD_LOAD_V4SF(vec,&v[0]); \
 } while(0)
+
+/* handle padded value, this is a very bad implementation ... */
+#define SIMD_MASKED_SAVE_V4SF(vec,arr) do { float tmp[4] ; SIMD_SAVE_V4SF(vec,&tmp[0]); (arr)[0]=tmp[0];(arr)[1]=tmp[1];(arr)[2]=tmp[2]; } while(0)

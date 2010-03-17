@@ -13,10 +13,13 @@ void call18(int i, ...)
 
 Proper effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: i
    int i = 1;
+//               <must be written>: j
    int j = 2;
+//               <must be written>: k
    int k = 3;
 //               <must be read   >: i j k
 
@@ -25,10 +28,13 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
+//               <must be written>: i
    int i = 1;
+//               <must be written>: j
    int j = 2;
+//               <must be written>: k
    int k = 3;
 //               <must be read   >: i j k
 

@@ -1,9 +1,9 @@
 
 PARSED PRINTED FILE for main
 
-main()
+int main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
    for (i = 1, j = 2;i<5;i++, j += 2)
       a[i] = i;
@@ -11,9 +11,9 @@ main()
 
 PRINTED FILE for main
 
-main()
+int main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
    i = 1, j = 2;
    while (i<5) {
@@ -24,9 +24,9 @@ main()
 
 PRINTED FILE with effects for main
 
-main()
+int main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
 //               <must be written>: i j
    i = 1, j = 2;
@@ -46,9 +46,15 @@ PRINTED FILE with transformers for main
 
 //  T() {}
 
-main()
+int main()
 {
-   int i,  j;
+
+//  T() {}
+
+   int i, j;
+
+//  T() {}
+
    int a[5];
 
 //  T(i,j) {i==1, j==2}

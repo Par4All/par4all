@@ -16,6 +16,7 @@ Code after array conversion
 
 int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
+//               <must be written>: zaza
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: size zaza zaza[1]
@@ -24,6 +25,7 @@ int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 }
 int duck2(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
+//               <must be written>: zaza
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 //               <must be read   >: 
 //                                  loulou[3+(6-1-0+1)*(0+(size-1-0+1)

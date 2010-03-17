@@ -32,8 +32,17 @@ Preconditions
 
 void constants03()
 {
+
+//  P() {}
+
    int i = 0xff000000;
+
+//  P() {i==-16777216}
+
    int j = 0xffffffff;
+
+//  P() {i==-16777216, j==-1}
+
    int t;
 
 //  P() {i==-16777216, j==-1}

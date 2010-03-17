@@ -21,12 +21,12 @@ Variable list:
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:foo" with type "functional" "double * -> double"
 	Declared entity "decl30!:*STATIC*" with type "area" with size 0
-	Declared entity "decl30:*DYNAMIC*" with type "area" with size 26
+	Declared entity "decl30:*DYNAMIC*" with type "area" with size 30
 	Declared entity "decl30:*HEAP*" with type "area" with size 0
 	Declared entity "decl30:*STACK*" with type "area" with size 0
 	Declared entity "decl30:*STATIC*" with type "area" with size 0
-	Declared entity "decl30:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl30:0`__func__" with type "variable" "char"
+	Declared entity "decl30:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "decl30:0`__func__" with type "variable" "char *"
 	Declared entity "decl30:0`x" with type "variable" "double[] *"
 	Declared entity "decl30:0`z" with type "variable" "double"
 
@@ -43,9 +43,9 @@ Layout for memory area "decl30!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl30:*DYNAMIC*" of size 26:
-	Variable "decl30:0`x"	offset = 14	size = 4
-	Variable "decl30:0`z"	offset = 18	size = 8
+Layout for memory area "decl30:*DYNAMIC*" of size 30:
+	Variable "decl30:0`x"	offset = 14	size = 8
+	Variable "decl30:0`z"	offset = 22	size = 8
 	Variable "decl30:0`__func__"	offset = 0	size = 7
 	Variable "decl30:0`__FUNCTION__"	offset = 7	size = 7
 

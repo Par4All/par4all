@@ -17,18 +17,21 @@ echo Parsed printed file for "decl32!"
 echo
 
 display PARSED_PRINTED_FILE[decl32!]
-quit
-echo
-echo Parsed printed file for "decl32"
-echo
 
-display PARSED_PRINTED_FILE[decl32]
-quit
-echo
-echo Symbol table for "decl32"
-echo
+#echo
+#echo Parsed printed file for "decl32"
+#echo
 
-display SYMBOL_TABLE_FILE[decl32]
+#display PARSED_PRINTED_FILE[decl32]
+
+#echo
+#echo Symbol table for "decl32"
+#echo
+#
+#display SYMBOL_TABLE_FILE[decl32]
+
+apply UNSPLIT
+shell cc -c decl32.database/Src/decl32.c
 
 close
 # delete decl32

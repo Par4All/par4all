@@ -8,7 +8,6 @@ C     privatization fine as the output is undefined.
 
 !$OMP DO PRIVATE(I,J)
       DO I = 1, 10                                                      0008
-         PRIVATE(I,J)
          J = J+1                                                        0009
          A(I) = J                                                       0010
       ENDDO

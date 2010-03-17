@@ -6,7 +6,13 @@ Transformers for "generate01"
 
 int generate01()
 {
+
+//  T(i) {i==1}
+
    int i = 1;
+
+//  T() {}
+
    float x = 0.5;
 
 //  T(generate01) {}
@@ -22,7 +28,13 @@ Preconditions for "generate01"
 
 int generate01()
 {
+
+//  P() {}
+
    int i = 1;
+
+//  P() {i==1}
+
    float x = 0.5;
 
 //  P() {i==1}

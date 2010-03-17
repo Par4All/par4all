@@ -1,4 +1,4 @@
-main()
+int main()
 {
    char c1;
    unsigned char c2;

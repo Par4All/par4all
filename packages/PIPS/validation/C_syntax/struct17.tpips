@@ -1,0 +1,23 @@
+setenv WS=struct17
+delete $WS
+create $WS $WS.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PARSED_PRINTED_FILE[$WS!]
+
+#display PARSED_PRINTED_FILE[$WS]
+
+apply UNSPLIT
+#shell $(PIPS_CC) -c $WS.database/Src/$WS.c
+shell cc -c $WS.database/Src/$WS.c
+close
+
+#delete $WS
+
+quit

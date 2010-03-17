@@ -68,6 +68,18 @@ int main(int argc, char *argv[])
 
 Code after inlining
 
+typedef struct farray_t *farray;
+
+farray farray_new(unsigned int n);
+void farray_delete(farray a);
+float farray_get(farray a, unsigned int i);
+void farray_set(farray a, unsigned int i, float f);
+extern int main(int argc, char *argv[]);
+//PIPS generated variable
+struct farray_t {
+   unsigned int size;
+   float *data;
+};
 int main(int argc, char *argv[])
 {
    int i, n = atoi(argv[1]);

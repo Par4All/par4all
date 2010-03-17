@@ -3,10 +3,10 @@ Parsed printed file
 
       PROGRAM ISHFTC01
 
-      INTEGER I
-      INTEGER J
-      INTEGER K
-      INTEGER H
+      REAL I
+      REAL J
+      REAL K
+      REAL H
 
       I = 2                                                             0008
       J = 3                                                             0009
@@ -20,10 +20,10 @@ Proper effects
 
       PROGRAM ISHFTC01
 
-      INTEGER I
-      INTEGER J
-      INTEGER K
-      INTEGER H
+      REAL I
+      REAL J
+      REAL K
+      REAL H
 C               <must be written>: I
 
       I = 2                                                             0008
@@ -46,10 +46,10 @@ C               <must be read   >: __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
       PROGRAM ISHFTC01
 
-      INTEGER I
-      INTEGER J
-      INTEGER K
-      INTEGER H
+      REAL I
+      REAL J
+      REAL K
+      REAL H
 C               <must be written>: I
 
       I = 2                                                             0008

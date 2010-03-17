@@ -9,7 +9,9 @@ int main()
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
+//               <must be written>: i
    int i = 5;
+//               <must be written>: j
    int j = 6;
    float x;
 //               <must be read   >: __IO_EFFECTS:LUNS[1] i j x

@@ -10,13 +10,12 @@ Variable list:
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> struct m "
 	Declared entity "ndecl09!:*STATIC*" with type "area" with size 0
-	Declared entity "ndecl09:*DYNAMIC*" with type "area" with size 32
+	Declared entity "ndecl09:*DYNAMIC*" with type "area" with size 40
 	Declared entity "ndecl09:*HEAP*" with type "area" with size 0
 	Declared entity "ndecl09:*STACK*" with type "area" with size 0
 	Declared entity "ndecl09:*STATIC*" with type "area" with size 0
-	Declared entity "ndecl09:0`#m" with type "struct" 
-	Declared entity "ndecl09:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "ndecl09:0`__func__" with type "variable" "char"
+	Declared entity "ndecl09:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "ndecl09:0`__func__" with type "variable" "char *"
 	Declared entity "ndecl09:0`bar" with type "variable" "(() -> struct m ) *"
 	Declared entity "ndecl09:0`px" with type "variable" "struct m  *"
 	Declared entity "ndecl09:0`x" with type "variable" "struct m "
@@ -24,6 +23,10 @@ Variable list:
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable "ndecl09:0`#m"	kind = struct
 
 Layout for formal parameters:
 
@@ -39,10 +42,10 @@ Layout for memory area "ndecl09!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "ndecl09:*DYNAMIC*" of size 32:
+Layout for memory area "ndecl09:*DYNAMIC*" of size 40:
 	Variable "ndecl09:0`x"	offset = 16	size = 8
-	Variable "ndecl09:0`px"	offset = 24	size = 4
-	Variable "ndecl09:0`bar"	offset = 28	size = 4
+	Variable "ndecl09:0`px"	offset = 24	size = 8
+	Variable "ndecl09:0`bar"	offset = 32	size = 8
 	Variable "ndecl09:0`__func__"	offset = 0	size = 8
 	Variable "ndecl09:0`__FUNCTION__"	offset = 8	size = 8
 
@@ -66,7 +69,7 @@ Parsed printed file
 void ndecl09(char *dir)
 {
    /* Well, x is a struct of name m: x declaration disappears... */
-   struct m {                                                           /*0008*/
+   struct m {                                                           /*0009*/
       int a;
       float b;
    } x, *px, foo(), (*bar)();

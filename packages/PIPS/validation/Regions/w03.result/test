@@ -120,7 +120,7 @@ C  T(I) {I==1}
 
       I = 1                                                             0007
 
-C  T(I) {I#init<=I}
+C  T(I) {I<=10, I#init<=I, I#init<=10}
 
 
       DO WHILE (I.LE.10)                                                0009
@@ -139,7 +139,7 @@ C  T(I) {I==2}
 
       I = 2                                                             0014
 
-C  T(I) {I#init<=I}
+C  T(I) {I<=9, I#init<=I, I#init<=9}
 
 
       DO WHILE (I.LT.N)                                                 0016
@@ -308,7 +308,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, I==10}>
 
       I = 1                                                             0007
 
-C  <A(PHI1)-OUT-MAY-{I<=PHI1, 1<=PHI1, PHI1<=8}>
+C  <A(PHI1)-OUT-MAY-{I<=PHI1, 1<=PHI1, PHI1<=8, I<=10}>
 
 
       DO WHILE (I.LE.10)                                                0009
@@ -320,9 +320,6 @@ C  <A(PHI1)-OUT-MAY-{PHI1==I, 1<=I, I<=10}>
       ENDDO
 
       I = 2                                                             0014
-
-C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, I<=9}>
-
 
       DO WHILE (I.LT.N)                                                 0016
 

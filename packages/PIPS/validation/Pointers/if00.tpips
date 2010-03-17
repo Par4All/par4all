@@ -1,5 +1,5 @@
-delete if0007
-create if0007 if0007.c
+delete if00
+create if00 if00.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_C_CODE TRUE

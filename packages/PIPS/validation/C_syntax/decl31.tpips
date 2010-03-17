@@ -17,18 +17,21 @@ echo Parsed printed file for "decl31!"
 echo
 
 display PARSED_PRINTED_FILE[decl31!]
-quit
-echo
-echo Parsed printed file for "decl31"
-echo
 
-display PARSED_PRINTED_FILE[decl31]
-quit
-echo
-echo Symbol table for "decl31"
-echo
+#echo
+#echo Parsed printed file for "decl31"
+#echo
+#
+#display PARSED_PRINTED_FILE[decl31]
 
-display SYMBOL_TABLE_FILE[decl31]
+#echo
+#echo Symbol table for "decl31"
+#echo
+#
+#display SYMBOL_TABLE_FILE[decl31]
+
+apply UNSPLIT
+shell cc -c decl31.database/Src/decl31.c
 
 close
 # delete decl31

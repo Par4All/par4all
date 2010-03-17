@@ -23,6 +23,9 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 #echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
+display PARSED_PRINTED_FILE(tclspice!_tcl_dispatch)
+quit
+
 display PRINTED_FILE(get_mod_param)
 apply UNSPLIT(get_mod_param)
 

@@ -14,8 +14,8 @@ Variable list:
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:0`1`i" with type "variable" "int"
-	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "main:0`k" with type "variable" "int"
 	Declared entity "main:main" with type "variable" "int"
 

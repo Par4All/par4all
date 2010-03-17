@@ -3,14 +3,14 @@
 
 void freia_skip_05(freia_data2d *o, freia_data2d *i)
 {
-   int32_t seuil;                                                       /*0004*/
-   freia_data2d *t;                                                     /*0005*/
+   int32_t seuil;                                                       /*0005*/
+   freia_data2d *t;                                                     /*0006*/
    // allocation in the middle of the stream
-   freia_aipo_sub(i, i, i);                                             /*0007*/
-   t = freia_common_create_data(16, 128, 128);                          /*0008*/
-   freia_aipo_xor_const(t, i, 111);                                     /*0009*/
-   freia_aipo_threshold(o, t, 8, 100, true);                            /*0010*/
-   freia_common_destruct_data(t);                                       /*0011*/
+   freia_aipo_sub(i, i, i);                                             /*0008*/
+   t = freia_common_create_data(16, 128, 128);                          /*0009*/
+   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
+   freia_common_destruct_data(t);                                       /*0012*/
 }
 
 ! graphs
@@ -25,16 +25,16 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 thr" [shape=parallelogram];
-  "10 thr" -> "o";
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "10 thr" [label="t"];
-  "8 ?" [shape=none];
-  "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "9 ^." [label="i"];
-  "7 -" -> "i";
-  "i" -> "7 -";
-  "i" -> "7 -";
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "9 ?" [shape=none];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_05" in dot format
 digraph "dag_cleaned_0" {
@@ -46,16 +46,16 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 thr" [shape=parallelogram];
-  "10 thr" -> "o";
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "10 thr" [label="t"];
-  "8 ?" [shape=none];
-  "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "9 ^." [label="i"];
-  "7 -" -> "i";
-  "i" -> "7 -";
-  "i" -> "7 -";
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "9 ?" [shape=none];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
 }
 // graph for dag "freia_skip_05_helper_0_0" of module "freia_skip_05" in dot format
 digraph "freia_skip_05_helper_0_0" {
@@ -67,15 +67,15 @@ digraph "freia_skip_05_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 thr" [shape=parallelogram];
-  "10 thr" -> "o";
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "10 thr" [label="t"];
-  "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "9 ^." [label="i"];
-  "7 -" -> "i";
-  "i" -> "7 -";
-  "i" -> "7 -";
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
 }
 
 ! acceleration function
@@ -103,28 +103,28 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 alu] 7 sub
+  // i [0 input 0] -> [0 alu] 8 sub
   // nope
-  // i [0 input 1] -> [0 alu] 7 sub
+  // i [0 input 1] -> [0 alu] 8 sub
   // nope
-  // alu 7 sub stage 0 flipped
+  // alu 8 sub stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_SUB_IN1_IN0;
 
 
   // STAGE 1
-  // i [0 alu] -> [1 alu] 9 xor_const
+  // i [0 alu] -> [1 alu] 10 xor_const
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // i [1 input 0] -> [1 alu] 9 xor_const
+  // i [1 input 0] -> [1 alu] 10 xor_const
   // nope
-  // alu 9 xor_const stage 1
+  // alu 10 xor_const stage 1
   si.alu[1][0].op = SPOC_ALU_XOR_IN0_CONST;
   sp.alu[1][0].constant = cst0;
 
-  // 0`t [1 alu] -> [1 threshold 0] 10 threshold
+  // 0`t [1 alu] -> [1 threshold 0] 11 threshold
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
-  // threshold 10 threshold stage 1 side 0
+  // threshold 11 threshold stage 1 side 0
   si.th[1][0].op = bin3? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
   sp.th[1][0].boundmin = inf1;
   sp.th[1][0].boundmax = sup2;
@@ -191,5 +191,5 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 void freia_skip_05(freia_data2d *o, freia_data2d *i)
 {
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0007*/
+   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0008*/
 }

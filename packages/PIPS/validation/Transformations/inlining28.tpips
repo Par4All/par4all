@@ -21,7 +21,7 @@ echo
 # property not usefull here, but relevant for validation
 setproperty INLINING_CALLERS "bar"
 apply INLINING[foo]
-display PRINTED_FILE[bar]
+display PRINTED_FILE[inlining28!,bar]
 
 echo
 echo Unsplit resulting code

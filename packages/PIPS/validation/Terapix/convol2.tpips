@@ -1,0 +1,95 @@
+delete convol2
+create convol2 convol.c include/load.c
+
+echo
+echo Inital code
+echo
+module convol
+apply PARTIAL_EVAL
+display PRINTED_FILE
+display PRINTED_FILE[run_kernel]
+
+echo
+echo After Inlining
+echo
+apply UNFOLDING
+display PRINTED_FILE
+
+echo
+echo After scalarization
+echo
+apply SCALARIZATION
+display PRINTED_FILE
+
+echo
+echo After privatization + loop expansion
+echo
+apply FLAG_LOOPS
+apply PRIVATIZE_MODULE
+setproperty LOOP_LABEL "l99993"
+setproperty LOOP_EXPANSION_SIZE 126
+apply LOOP_EXPANSION
+display PRINTED_FILE
+
+echo
+echo After tiling
+echo
+setproperty LOOP_LABEL ""
+apply LOOP_TILING
+l99993
+126 0
+0 5
+display PRINTED_FILE
+
+echo
+echo After loop normalization
+echo
+apply FLAG_LOOPS
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+apply LOOP_NORMALIZE
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+echo
+echo loop expansion again
+echo
+setproperty LOOP_LABEL "l99991"
+setproperty LOOP_EXPANSION_SIZE 128
+setproperty LOOP_EXPANSION_OFFSET 1
+apply PRIVATIZE_MODULE
+apply LOOP_EXPANSION
+display PRINTED_FILE
+
+apply IF_CONVERSION_INIT
+apply IF_CONVERSION
+display PRINTED_FILE
+
+echo
+echo After Double Outlining and load - store generation
+echo
+setproperty OUTLINE_LABEL "l99991"
+setproperty OUTLINE_MODULE_NAME "microcode_launcher"
+apply OUTLINE
+
+module microcode_launcher
+display PRINTED_FILE
+
+setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
+setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
+setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "memalloc"
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "memfree"
+apply KERNEL_LOAD_STORE
+display PRINTED_FILE[convol]
+
+setproperty OUTLINE_LABEL "l99992"
+setproperty OUTLINE_MODULE_NAME "convol_microcode"
+apply OUTLINE
+display PRINTED_FILE
+
+module convol_microcode
+display PRINTED_FILE
+
+close
+delete convol2
+quit

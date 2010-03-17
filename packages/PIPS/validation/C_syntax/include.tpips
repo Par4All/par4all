@@ -18,6 +18,9 @@ display PRINTED_FILE[main]
 #setenv SEMANTICS_DEBUG_LEVEL 8
 #make PRECONDITIONS[%ALL]
 
+apply UNSPLIT
+shell cc -c include.database/Src/include.c
+
 close
 
 delete include

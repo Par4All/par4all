@@ -14,6 +14,9 @@ Transformers for "main"
 
 int main(void)
 {
+
+//  T() {}
+
    int j;
 
 //  T(j) {j==7}
@@ -47,6 +50,9 @@ Preconditions for "main"
 
 int main(void)
 {
+
+//  P() {}
+
    int j;
 
 //  P() {}
@@ -77,6 +83,9 @@ Transformers for "main" after transformer refining
 
 int main(void)
 {
+
+//  T() {}
+
    int j;
 
 //  T(j) {j==7}
@@ -97,6 +106,9 @@ Preconditions for "main" after transformer refining
 
 int main(void)
 {
+
+//  P() {}
+
    int j;
 
 //  P() {}

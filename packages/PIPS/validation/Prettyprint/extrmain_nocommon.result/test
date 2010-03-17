@@ -1,6 +1,7 @@
 /* C pretty print for module D. */
 float
-d (int j, int k, int jp, int kp, float t[60][21][52], int l)
+d (int j, int k, int jp, int kp, float t[60 - 1 + 1][21 - 1 + 1][52 - 1 + 1],
+   int l)
 {
   float result;
 
@@ -16,7 +17,8 @@ d (int j, int k, int jp, int kp, float t[60][21][52], int l)
 }
 /* C pretty print for module EXTR. */
 void
-extr (int ni, int nc, float t[60][21][52], int j1, int ja, int k1)
+extr (int ni, int nc, float t[60 - 1 + 1][21 - 1 + 1][52 - 1 + 1], int j1,
+      int ja, int k1)
 {
   int l;
   int k;

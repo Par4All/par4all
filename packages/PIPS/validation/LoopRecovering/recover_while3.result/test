@@ -1,26 +1,26 @@
 int find_while(int i)
 {
 
-begin2:   if (i++<9)                                                           /*0006*/
-      goto end2;                                                        /*0007*/
-   goto begin2;                                                         /*0008*/
+begin2:   if (i++<9)                                                           /*0005*/
+      goto end2;                                                        /*0006*/
+   goto begin2;                                                         /*0007*/
    
    // Just verify it works with 2 consecutive labels:
 end2:   ;
 
-begin:   if (i<9) {                                                           /*0014*/
-      i++;                                                              /*0015*/
-      goto the_end;                                                     /*0016*/
+begin:   if (i<9) {                                                           /*0013*/
+      i++;                                                              /*0014*/
+      goto the_end;                                                     /*0015*/
    }
-   i = 8*i;                                                             /*0018*/
-   goto begin;                                                          /*0019*/
+   i = 8*i;                                                             /*0017*/
+   goto begin;                                                          /*0018*/
 
 the_end:   return i;
 }
 int find_while(int i)
 {
 
-begin2:   if (i++<9) {                                                         /*0006*/
+begin2:   if (i++<9) {                                                         /*0005*/
    }
    else {
       goto begin2;
@@ -29,12 +29,12 @@ begin2:   if (i++<9) {                                                         /
    // Just verify it works with 2 consecutive labels:
 end2:   ;
 
-begin:   if (i<9) goto l99999;                                                /*0014*/
-   i = 8*i;                                                             /*0018*/
+begin:   if (i<9) goto l99999;                                                /*0013*/
+   i = 8*i;                                                             /*0017*/
    goto begin;
 l99999:   ;
 
-   i++;                                                                 /*0015*/
+   i++;                                                                 /*0014*/
 
 the_end:   return i;
 }
@@ -43,7 +43,7 @@ int find_while(int i)
 ÄUnstructured c_1_1 end: c_4_1
 ÇUnstructured Item c_1_1
 
-begin2:   if (i++<9)                                                           /*0006*/
+begin2:   if (i++<9)                                                           /*0005*/
       ;
 ÉUnstructured Successor -> c_2_1 c_1_1
 ÇUnstructured Item c_2_1
@@ -53,17 +53,17 @@ end2:   ;
 ÉUnstructured Successor -> c_3_1
 ÇUnstructured Item c_3_1
 
-begin:   if (i<9)                                                             /*0014*/
+begin:   if (i<9)                                                             /*0013*/
       ;
 ÉUnstructured Successor -> c_4_1 c_5_1
 ÇUnstructured Item c_4_1
 
 ÉUnstructured Successor ->
 ÇUnstructured Item c_5_1
-   i = 8*i;                                                             /*0018*/
+   i = 8*i;                                                             /*0017*/
 ÉUnstructured Successor -> c_3_1
 ÅUnstructured End c_1_1 end: c_4_1
-   i++;                                                                 /*0015*/
+   i++;                                                                 /*0014*/
 
 the_end:   return i;
 }
@@ -75,8 +75,8 @@ int find_while(int i)
    // Just verify it works with 2 consecutive labels:
 end2:   ;
    while (!(i<9)) 
-      i = 8*i;                                                          /*0018*/
-   i++;                                                                 /*0015*/
+      i = 8*i;                                                          /*0017*/
+   i++;                                                                 /*0014*/
 
 the_end:   return i;
 }
@@ -88,8 +88,8 @@ int find_while(int i)
    // Just verify it works with 2 consecutive labels:
 end2:   ;
    while (!(i<9)) 
-      i = 8*i;                                                          /*0018*/
-   i++;                                                                 /*0015*/
+      i = 8*i;                                                          /*0017*/
+   i++;                                                                 /*0014*/
 
 the_end:   return i;
 }
@@ -101,8 +101,8 @@ int find_while(int i)
    // Just verify it works with 2 consecutive labels:
 end2:   ;
    while (!(i<9)) 
-      i = 8*i;                                                          /*0018*/
-   i++;                                                                 /*0015*/
+      i = 8*i;                                                          /*0017*/
+   i++;                                                                 /*0014*/
 
 the_end:   return i;
 }

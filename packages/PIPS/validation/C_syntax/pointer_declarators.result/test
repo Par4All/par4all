@@ -1,4 +1,4 @@
-main()
+int main()
 {
    const int *ptr_to_constant;
    int *const constant_ptr;

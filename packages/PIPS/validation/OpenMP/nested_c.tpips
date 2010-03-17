@@ -1,6 +1,8 @@
 #
 delete nested_c
 
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create nested_c nested_c.c
@@ -13,7 +15,7 @@ create nested_c nested_c.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setenv SEMANTICS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
-setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setenv OPMIFY_CODE_DEBUG_LEVEL 9
 
 #SELECT C LANGUAGE
 activate C_PARSER
@@ -26,21 +28,22 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 
+apply SPLIT_INITIALIZATIONS(main)
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(main)
-#build PARALLELPRINTED_FILE(main)
 apply INTERNALIZE_PARALLEL_CODE
-#display PRINTED_FILE(main)
 apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
-#activate PRINT_CODE_CUMULATED_REDUCTIONS
-#display PRINTED_FILE(main)
+apply UNSPLIT
+shell gcc -fopenmp -c nested_c.database/Src/nested_c.c
+shell rm *.o
 
 close
-#delete nested_c
+delete nested_c
 quit
 # EOF

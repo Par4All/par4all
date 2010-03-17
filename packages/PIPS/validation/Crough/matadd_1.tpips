@@ -1,0 +1,13 @@
+setenv WKS matadd_1
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.f
+
+display PRINTED_FILE[%ALLFUNC]
+display C_PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WKS
+quit

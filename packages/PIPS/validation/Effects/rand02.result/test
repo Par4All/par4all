@@ -3,8 +3,8 @@ PRINT CODE for AddNoise
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
-   int ix,  iy;
-   double u,  A,  v,  B;
+   int ix, iy;
+   double u, A, v, B;
    
    // MOTIF 
    u = 0;
@@ -36,8 +36,8 @@ PRINT CUMULATED EFFECTS for AddNoise
 //               <must be read   >: nx ny
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
-   int ix,  iy;
-   double u,  A,  v,  B;
+   int ix, iy;
+   double u, A, v, B;
 //               <must be written>: u
    
    // MOTIF 
@@ -115,8 +115,8 @@ PRINT REGIONS for AddNoise
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
-   int ix,  iy;
-   double u,  A,  v,  B;
+   int ix, iy;
+   double u, A, v, B;
 
 //  <u-W-EXACT-{}>
 

@@ -53,8 +53,11 @@ Preconditions for "main"
 
 //  P() {}
 
-main()
+int main()
 {
+
+//  P() {}
+
    int i = 4;
 
 //  P() {i==4}

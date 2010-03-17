@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "allocation09:*HEAP*" with type "area" with size 0
 	Declared entity "allocation09:*STACK*" with type "area" with size 0
 	Declared entity "allocation09:*STATIC*" with type "area" with size 0
-	Declared entity "allocation09:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "allocation09:0`__func__" with type "variable" "char"
+	Declared entity "allocation09:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "allocation09:0`__func__" with type "variable" "char *"
 	Declared entity "allocation09:0`a" with type "variable" "char"
 	Declared entity "allocation09:0`b" with type "variable" "short"
 	Declared entity "allocation09:0`c" with type "variable" "int"

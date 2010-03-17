@@ -72,7 +72,6 @@ display PRINTED_FILE
 #apply USE_DEF_ELIMINATION
 apply CLEAN_DECLARATIONS
 display PRINTED_FILE
-apply FORWARD_SUBSTITUTE
 #setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
 #apply OPTIMIZE_EXPRESSIONS
 #apply CLEAN_DECLARATIONS
@@ -88,10 +87,18 @@ echo simdized code
 echo
 
 display PRINTED_FILE
+apply UNSPLIT
 
-shell ./compileC.sh filtre filtre test.c
-shell gcc -O3 -I. -march=native -c test.c
-shell rm test.c test.o
+shell cc filtre.c include/SIMD.c -o filtre0
+shell sed -i -e '1 i #include "SIMD.h"' filtre.database/Src/filtre.c
+shell cc -Iinclude filtre.database/Src/filtre.c include/SIMD.c -o filtre1
+shell sed -i -e '1 d' filtre.database/Src/filtre.c
+shell if test "`./filtre0`" = "`./filtre1`" ; then echo seq-ok ; else echo seq-ko ; fi
+
+#shell ./compileC.sh filtre filtre.c filtre-sse.c
+#shell cc -O3 -I. -march=native filtre-sse.c -o filtre2
+#shell if test "`./filtre0`" = "`./filtre2`" ; then echo sse-ok ; else echo sse-ko ; fi
+#shell rm -f filtre[012] filtre-sse.c
 
 close
 delete filtre

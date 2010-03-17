@@ -8,7 +8,7 @@ int space01(int x, int y, double z)
    else
       return x-y;
 }
-main()
+int main()
 {
    int j = 2+3;
    int *p = &j;
@@ -27,7 +27,7 @@ int space01(int x,int y,double z)
    else
       return x-y;
 }
-main()
+int main()
 {
    int j = 2+3;
    int *p = &j;

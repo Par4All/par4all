@@ -5,57 +5,57 @@ Prettyprint the source as C, of course
 Select the most precise analysis:
 int main(int argc, char *argv[])
 {
-   int i,  j;                                                           /*0003*/
-   int *a[64];                                                          /*0004*/
+   int i, j;                                                            /*0008*/
+   int *a[64];                                                          /*0009*/
 
-   for (i = 0;i<64;i++) {                                               /*0006*/
-      a[i] = malloc(64*sizeof(float));                                  /*0007*/
-      for (j = 0;j<64;j++)                                              /*0008*/
-         a[i][j] = 0.;                                                  /*0009*/
+   for (i = 0;i<64;i++) {                                               /*0011*/
+      a[i] = malloc(64*sizeof(float));                                  /*0012*/
+      for (j = 0;j<64;j++)                                              /*0013*/
+         a[i][j] = 0.;                                                  /*0014*/
    }
 
-   return 0;                                                            /*0013*/
+   return 0;                                                            /*0018*/
 }
 int main(int argc, char *argv[])
 {
-   int i,  j;                                                           /*0003*/
-   int *a[64];                                                          /*0004*/
+   int i, j;                                                            /*0008*/
+   int *a[64];                                                          /*0009*/
 
    for(i = 0; i <= 63; i += 1) {
-      a[i] = malloc(64*sizeof(float));                                  /*0007*/
+      a[i] = malloc(64*sizeof(float));                                  /*0012*/
       for(j = 0; j <= 63; j += 1)
-         a[i][j] = 0.;                                                  /*0009*/
+         a[i][j] = 0.;                                                  /*0014*/
    }
 
-   return 0;                                                            /*0013*/
+   return 0;                                                            /*0018*/
 }
 int main(int argc, char *argv[])
 {
-   int i,  j;                                                           /*0003*/
-   int *a[64];                                                          /*0004*/
+   int i, j;                                                            /*0008*/
+   int *a[64];                                                          /*0009*/
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= 63; i += 1) {
-      a[i] = malloc(64*sizeof(float));                                  /*0007*/
+      a[i] = malloc(64*sizeof(float));                                  /*0012*/
 #pragma omp parallel for 
       for(j = 0; j <= 63; j += 1)
-         a[i][j] = 0.;                                                  /*0009*/
+         a[i][j] = 0.;                                                  /*0014*/
    }
 
-   return 0;                                                            /*0013*/
+   return 0;                                                            /*0018*/
 }
 int main(int argc, char *argv[])
 {
-   int i,  j;                                                           /*0003*/
-   int *a[64];                                                          /*0004*/
+   int i, j;                                                            /*0008*/
+   int *a[64];                                                          /*0009*/
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= 63; i += 1) {
-      a[i] = malloc(64*sizeof(float));                                  /*0007*/
+      a[i] = malloc(64*sizeof(float));                                  /*0012*/
 #pragma omp parallel for 
       for(j = 0; j <= 63; j += 1)
-         a[i][j] = 0.;                                                  /*0009*/
+         a[i][j] = 0.;                                                  /*0014*/
    }
 
-   return 0;                                                            /*0013*/
+   return 0;                                                            /*0018*/
 }

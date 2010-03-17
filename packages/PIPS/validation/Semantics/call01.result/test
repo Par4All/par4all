@@ -5,10 +5,10 @@ void call01(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 }
 
 Source code with cumulated effects
@@ -19,10 +19,10 @@ void call01(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0007*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 }
 
 Source code with transformers
@@ -35,11 +35,11 @@ void call01(int i)
 
 //  T(i) {i==i#init+1}
 
-   i++;                                                                 /*0004*/
+   i++;                                                                 /*0007*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
-   j++;                                                                 /*0005*/
+   j++;                                                                 /*0008*/
 }
 
 Warnings

@@ -1,7 +1,7 @@
 
 Printed file for main
 
-main()
+int main()
 {
    int a[10];
    int nga;
@@ -16,8 +16,8 @@ Unsplit array
 /*
  * file for array.c
  */
-extern  main();
-main()
+extern int main();
+int main()
 {
    int a[10];
    int nga;

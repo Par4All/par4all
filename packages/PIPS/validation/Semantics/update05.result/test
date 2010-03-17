@@ -6,9 +6,18 @@ C  T() {}
 
 void update05()
 {
+
+//  T(i) {i==1}
+
    int i = 1;
+
+//  T() {i==1}
+
    int j;
-   int k1 = 0,  k2 = 0;
+
+//  T(k1,k2) {i==1, k1==0, k2==0}
+
+   int k1 = 0, k2 = 0;
 
 //  T(i,j) {i==3, i#init==1, j==3, k1==0, k2==0}
 
@@ -71,9 +80,18 @@ Preconditions for "update05"
 
 void update05()
 {
+
+//  P() {}
+
    int i = 1;
+
+//  P() {i==1}
+
    int j;
-   int k1 = 0,  k2 = 0;
+
+//  P() {i==1}
+
+   int k1 = 0, k2 = 0;
 
 //  P() {i==1, k1==0, k2==0}
 

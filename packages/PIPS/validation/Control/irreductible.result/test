@@ -26,53 +26,56 @@ l99999:   ;
 
 int main()
 {
+
+//  P() {i==5}
+
    int i = 5;
 
 //  P() {i==5}
 
    printf("Begin\n");
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    if ((rand()&1)==0) goto l99999;
 
-//  P() {i==5}
+//  P(i) {i==5}
 
 
 
-//  P() {i==5}
+//  P(i) {i==5}
 
 
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    
    /* The a label */
    
 a:   printf("a\n");
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    /* The b label */
    ;
 
-//  P() {i==5}
+//  P(i) {i==5}
 
 
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    /* The b label */
 b:   printf("b\n");
 
-//  P() {i==5}
+//  P(i) {i==5}
 
    /* Oh, go to a... */
    ;
    goto a;
 l99999:   ;
 
-//  P() {i==5}
+//  P(i) {i==5}
 
 
    goto b;
@@ -82,6 +85,9 @@ l99999:   ;
 
 int main()
 {
+
+//  P() {i==5}
+
    int i = 5;
 
 //  P() {i==5}

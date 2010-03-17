@@ -148,7 +148,9 @@ Transformers for "main"
 //  T() {}
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
+//  T() {}
    float x;
+//  T() {}
    int i, j;
 //  T(i,j,x) {1<=i}
    for(i = 1; i <= n; i += 1)
@@ -163,7 +165,9 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 //  T() {}
 int main()
 {
+//  T() {}
    float a[10][10], b[10][10], h;
+//  T() {}
    int i, j;
 //  T(i,j) {1<=i}
    for(i = 1; i <= 10; i += 1)
@@ -188,7 +192,9 @@ Preconditions for "main"
 //  P() {}
 int main()
 {
+//  P() {}
    float a[10][10], b[10][10], h;
+//  P() {}
    int i, j;
 //  P() {}
    for(i = 1; i <= 10; i += 1)
@@ -210,7 +216,9 @@ int main()
 //  P() {2.0==h, m==10, n==10}
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
+//  P() {2.0==h, m==10, n==10}
    float x;
+//  P() {2.0==h, m==10, n==10}
    int i, j;
 //  P() {2.0==h, m==10, n==10}
    for(i = 1; i <= n; i += 1)
@@ -396,7 +404,9 @@ int main()
 //                                                     17*m.n + 3*n + 2 (SUMMARY)
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
+//                                                                    0 (STMT)
    float x;
+//                                                                    0 (STMT)
    int i, j;
 //                                                     17*m.n + 3*n + 2 (DO)
    for(i = 1; i <= n; i += 1)
@@ -411,7 +421,9 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 //                                                                 3075 (SUMMARY)
 int main()
 {
+//                                                                    0 (STMT)
    float a[10][10], b[10][10], h;
+//                                                                    0 (STMT)
    int i, j;
 //                                                                  521 (DO)
    for(i = 1; i <= 10; i += 1)
@@ -433,7 +445,9 @@ int main()
 //  P() {}
 int main()
 {
+//  P() {}
    float a[10][10], b[10][10], h;
+//  P() {}
    int i, j;
 //  P() {}
    for(i = 1; i <= 10; i += 1)
@@ -455,7 +469,9 @@ int main()
 //  P() {2.0==h, m==10, n==10}
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
+//  P() {2.0==h, m==10, n==10}
    float x;
+//  P() {2.0==h, m==10, n==10}
    int i, j;
 //  P() {2.0==h, m==10, n==10}
    for(i = 1; i <= 10; i += 1)

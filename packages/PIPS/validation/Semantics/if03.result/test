@@ -6,6 +6,9 @@ C  T() {}
 
 void if03()
 {
+
+//  T(n) {n==0}
+
    int n = 0;
 
 //  T(n) {n==0, n#init==0}
@@ -30,7 +33,7 @@ void if03()
 //  T(n) {n==2, n#init==1}
 
    /* yes */
-
+   
    if (n++)
 
 //  T() {n==2}
@@ -50,6 +53,9 @@ Preconditions for "if03"
 
 void if03()
 {
+
+//  P() {}
+
    int n = 0;
 
 //  P() {n==0}
@@ -74,7 +80,7 @@ void if03()
 //  P(n) {n==1}
 
    /* yes */
-
+   
    if (n++)
 
 //  P(n) {n==2}

@@ -5,18 +5,21 @@ void flatten_code07(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int k[] = {1, 2, 3};                                                 /*0004*/
+// (0,2)
+   int k[] = {1, 2, 3};                                                 /*0003*/
    {
 // (0,3)
       // BEGIN BLOCK
-      int k[] = {1, 2, 3};                                              /*0006*/
+// (0,4)
+      int k[] = {1, 2, 3};                                              /*0005*/
       // END BLOCK
    }
 // (0,5)
-   if (1) {                                                             /*0008*/
+   if (1) {                                                             /*0007*/
 // (0,6)
       // BEGIN BLOCK
-      int k[] = {1, 2, 3};                                              /*0010*/
+// (0,7)
+      int k[] = {1, 2, 3};                                              /*0009*/
       // END BLOCK
    }
    // END BLOCK
@@ -28,13 +31,13 @@ void flatten_code07(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int k[] = {1, 2, 3};                                                 /*0004*/
+// (0,2)
+   int k[] = {1, 2, 3};                                                 /*0003*/
    //PIPS generated variable
-   int k_0[] = {1, 2, 3};
-   //PIPS generated variable
-   int k_1[] = {1, 2, 3};
-// (0,5)
-   if (1)                                                               /*0008*/
+// (0,3)
+   int k_0[] = {1, 2, 3}, k_1[] = {1, 2, 3};
+// (0,4)
+   if (1)                                                               /*0007*/
       ;
    // END BLOCK
 }

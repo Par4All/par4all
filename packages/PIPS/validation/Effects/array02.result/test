@@ -47,7 +47,13 @@ Transformers for "main"
 
 void array02()
 {
+
+//  T() {}
+
    float x[11][2];
+
+//  T() {}
+
    int i;
 
 //  T(i) {1<=i}
@@ -67,7 +73,13 @@ Preconditions for "main"
 
 void array02()
 {
+
+//  P() {}
+
    float x[11][2];
+
+//  P() {}
+
    int i;
 
 //  P() {}

@@ -21,3 +21,4 @@ extern void decl36(int i);
 extern int main();
 
 extern void decl36(int i);
+

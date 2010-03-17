@@ -1,0 +1,64 @@
+delete ammp01
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ammp01 ammp01.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Symbole table for "activate"
+echo
+
+display SYMBOL_TABLE_FILE[activate]
+quit
+echo
+echo Parsed printed file for "a_m_serial"
+echo
+
+display PARSED_PRINTED_FILE[a_m_serial]
+
+echo
+echo Proper effects for "a_m_serial"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[a_m_serial]
+
+echo
+echo Cumulated effects for "a_m_serial"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[a_m_serial]
+
+echo
+echo Parsed printed file for "activate"
+echo
+
+display PARSED_PRINTED_FILE[activate]
+
+echo
+echo Proper effects for "activate"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[activate]
+
+echo
+echo Cumulated effects for "activate"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[activate]
+
+close
+delete ammp01
+quit

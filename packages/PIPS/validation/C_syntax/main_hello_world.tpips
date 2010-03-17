@@ -12,6 +12,9 @@ activate C_PARSER
 display PARSED_PRINTED_FILE[main_hello_world!]
 display PARSED_PRINTED_FILE[main]
 
+apply UNSPLIT
+shell cc -c main_hello_world.database/Src/main_hello_world.c
+
 close
 
 delete main_hello_world

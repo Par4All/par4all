@@ -16,6 +16,9 @@ int main(int argc, char **argv)
 
 Code after inlining
 
+static void pmax(int a, int b);
+
+extern int main(int argc, char **argv);
 int main(int argc, char **argv)
 {
    int d = 0;

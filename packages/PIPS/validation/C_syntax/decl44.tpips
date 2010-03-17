@@ -9,6 +9,10 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 display SYMBOL_TABLE_FILE[decl44]
 display PRINTED_FILE[decl44]
+
+apply UNSPLIT
+shell cc -c decl44.database/Src/decl44.c
+
 close
 delete $WSPC
 quit

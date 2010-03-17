@@ -1,0 +1,4 @@
+/home/local/fabien/PIPS/prod/pips/bin/pips -f $VDIR/test.f test
+	PROGRAM TEST
+      I = 3                                                             0002
+      END

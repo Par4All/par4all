@@ -29,6 +29,10 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 display PRINTED_FILE(SPLIT_PRAGMA)
 
+apply UNSPLIT
+shell gfortran -fopenmp -c split_pragma.database/Src/split_pragma.f
+shell rm *.o
+
 close
 delete split_pragma
 quit

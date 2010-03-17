@@ -1,0 +1,42 @@
+# This script should always fail because the input code is not legal C
+# variable n is undeclared
+
+delete loop_tiling02
+
+# No such abort since we know it is designed to fail
+#setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_tiling02 loop_tiling02.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# We use the winning combination, except TRANSFORMERS_IN_CONTEXT
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Initial source code
+echo
+
+display PARSED_PRINTED_FILE[loop_tiling02]
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat loop_tiling02.database/Warnings
+
+quit
