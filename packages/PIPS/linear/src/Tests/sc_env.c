@@ -22,18 +22,17 @@
 
 */
 
- /* Test de l'enveloppe convexe de deux systemes. L'enveloppe 
- * convexe est faite par traduction des systemes lineaires en 
- * systemes generateurs (par chernikova), puis par union des 
- * systemes generateurs, enfin par la traduction du systeme generateur 
- * resultant en systeme lineaire (toujours par chernikovva). 
- * Cette fonction utilise la bibliotheque fournie par l'IRISA. 
- * On suppose que les deux systemes fournis en entree ont la 
- * meme base
+ /* Test de l'enveloppe convexe de deux systemes. L'enveloppe convexe
+ * est faite par traduction des systemes lineaires en systemes
+ * generateurs (par chernikova), puis par union des systemes
+ * generateurs, enfin par la traduction du systeme generateur
+ * resultant en systeme lineaire (toujours par chernikovva).  Cette
+ * fonction utilise la bibliotheque fournie par l'IRISA.  On suppose
+ * que les deux systemes fournis en entree ont la meme base
  */
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 extern int fprintf();
 extern int printf();
 extern char * strdup();

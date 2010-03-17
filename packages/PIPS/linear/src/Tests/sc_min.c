@@ -30,7 +30,7 @@
  */
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 extern int fprintf();
 extern int printf();
 extern char * strdup();

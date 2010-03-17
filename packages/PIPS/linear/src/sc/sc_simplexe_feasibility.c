@@ -22,7 +22,7 @@
 
 */
 
-/* test du simplex : 
+/* test du simplex :
  * Si on compile grace a` "make simp" dans le repertoire
  * /projects/C3/Linear/Development/polyedre/Tests
  * alors on peut tester l'execution dans le meme directory
@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <malloc.h>
 #include <string.h>
 #include <limits.h>
 
