@@ -1,0 +1,13 @@
+setenv WS=stap_bench_trans
+delete $WS
+
+create $WS $WS.c
+display PRINTED_FILE[%ALL]
+apply UNSPLIT
+close
+
+shell cc $WS.database/Src/$WS.c -lm -o $WS
+shell ./$WS
+shell rm -f $WS PlotsOut.txt
+
+delete $WS
