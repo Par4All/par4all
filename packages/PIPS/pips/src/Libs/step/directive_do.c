@@ -6,6 +6,9 @@ The program is distributed under the terms of the GNU General Public
 License.
 */
 
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include "defines-local.h"
 
 #define RANGENAME_LOW_SUFFIX "_L"

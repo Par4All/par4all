@@ -21,12 +21,14 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
    icfg_scan.c
    module_to_icfg(0, mod) recursively to_icfgs module "mod" and its callees
    and writes its icfg in indented form
 */
-#define _GNU_SOURCE // for asprintf used here...
 #include <stdio.h>
 #include <string.h>
 

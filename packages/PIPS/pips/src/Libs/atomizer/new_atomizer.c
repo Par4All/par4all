@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* An atomizer that uses the one made by Fabien Coelho for HPFC.
 
    Ronan Keryell, 17/5/1995. 

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Name     : ps_max_to_min.c
  * Package  : pip
  * Author   : F. Dumontet
@@ -33,7 +36,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <setjmp.h>
 #include <string.h>
 #include <errno.h>

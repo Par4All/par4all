@@ -27,6 +27,9 @@
  *   1- add an OpenMP if clause
  */
 
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include "genC.h"
 #include "misc.h"
 #include "linear.h"

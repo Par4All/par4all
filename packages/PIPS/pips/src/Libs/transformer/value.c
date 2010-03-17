@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* VARIABLE VALUE MANAGEMENT PACKAGE FOR TRANSFORMERS
   *
   * Values of variables could be a new data structure or a special kind of
@@ -186,7 +189,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "genC.h"

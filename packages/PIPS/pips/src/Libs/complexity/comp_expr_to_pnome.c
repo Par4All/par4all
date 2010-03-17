@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* comp_expr_to_pnome.c */
 /* scan a ri expression and try to make a polynomial of it */
 
@@ -31,8 +34,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-//#include <malloc.h>
-/* #include <values.h>   */ 
 #include <limits.h>
 #include <string.h>
 
@@ -758,6 +759,7 @@ Variable var;
 		    (v_prefix,
 		     get_current_module_entity(),
 		     MakeBasic (is_basic_int));
+        AddEntityToCurrentModule((entity)v);
 	    free(v_prefix);
 	    comp = make_single_var_complexity(1.0, v); 
 	}

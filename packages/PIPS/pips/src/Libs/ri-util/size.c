@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -287,6 +290,17 @@ _int SizeOfElements(basic b)
   switch (basic_tag(b)) {
   case is_basic_int:
     {
+      /* Some of these values are target architecture dependent:
+	 e == 1 character
+	 e == 2 short int
+	 e == 4 int
+	 e == 6 long int
+	 e == 8 long long int
+	 They are defined in ri-util-local.h
+	 To be consistent with the machine compiling and executing
+	 PIPS, we could use a switch(e) and the corresponding sizeof().
+       */
+
     e = basic_int(b);
     e = e % 10;
     if(e==DEFAULT_LONG_INTEGER_TYPE_SIZE)

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* This phase computes the number of pointer-type A(1) and assumed-size A(*) array declarators 
    in one program. There are two cases: these unnormalized declarations are formal array 
    parameters or not */

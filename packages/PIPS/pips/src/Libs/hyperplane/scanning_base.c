@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* 
  * package hyperplane.
  *
@@ -28,9 +31,9 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 /* #include <sys/stdtypes.h> */ /* for debug with dbmalloc */
-/* #include "malloc.h" */
+/* #include "stdlib.h" */
 
 #include "genC.h"
 #include "linear.h"

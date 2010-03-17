@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <ctype.h>
 
@@ -291,6 +294,7 @@ static void regenerate_toggles(statement stat, statement newStat,
     entity newTog =
       comEngine_make_new_scalar_variable(strdup("toggle"),
 					 make_basic(is_basic_int, (void *)4));
+      AddEntityToCurrentModule(newTog);
 
     comEngine_replace_reference_in_stat(tempStat,
 					make_reference(oldTog, NIL),

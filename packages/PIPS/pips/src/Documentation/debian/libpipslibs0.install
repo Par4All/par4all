@@ -7,9 +7,9 @@ usr/bin/Perform
 usr/bin/Pips
 usr/bin/Select
 
-etc/patterns.def
-etc/complexity_cost_tables
-etc/complexity_cost_tables/*
-etc/complexity_cost_tables/*/*
-etc/properties.rc
-etc/pipsmake.rc
+etc/pips/patterns.def
+etc/pips/complexity_cost_tables
+etc/pips/complexity_cost_tables/*
+etc/pips/complexity_cost_tables/*/*
+etc/pips/properties*.rc
+etc/pips/pipsmake.rc

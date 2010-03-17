@@ -32,6 +32,9 @@
  * @author pierre villalon <pierre.villalon@hpc-project.com>
  * @date 2009-05-24
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "genC.h"
 #include "misc.h"
@@ -50,6 +53,21 @@
 
 /////////////////////////////////////////////////////PRAGMA AS EXPRESSION
 
+///
+///@return the new pragma
+///@param l, the loop to analyze for omp reduction
+///@param exprs, the pragma as a list of expression
+list append_private_clause (loop l, list exprs) {
+  // the private variables as a list of entites
+  list private = loop_private_variables_as_entites (l, TRUE, TRUE);
+  // add private clause if needed
+  if (gen_length (private) != 0) {
+    expression expr_private  = pragma_private_as_expr (private);
+    exprs = gen_expression_cons (expr_private, exprs);
+  }
+  return exprs;
+}
+
 /// @brief generate pragma for a reduction as a list of expressions
 /// @return void
 /// @param l, the loop to analyze for omp reduction
@@ -60,6 +78,7 @@ static void pragma_expr_for_reduction (loop l, statement stmt) {
   exprs = reductions_get_omp_pragma_expr (l, stmt);
   // insert the pragma (if any) as an expression to the current statement
   if (exprs != NULL) {
+    exprs = append_private_clause (l, exprs);
     add_pragma_expr_to_statement (stmt, exprs);
     pips_debug (5, "new reduction pragma as an extension added\n");
   }
@@ -75,13 +94,7 @@ static void pragma_expr_for (loop l, statement stmt) {
     // the list of expression to generate initialized with
     // pragma "omp parallel for"
     list exprs = pragma_omp_parallel_for_as_exprs ();
-    // the private variables as a list of entites
-    list private = loop_private_variables_as_entites (l, TRUE, TRUE);
-    // add private clause if needed
-    if (gen_length (private) != 0) {
-      expression expr_private  = pragma_private_as_expr (private);
-      exprs = gen_expression_cons (expr_private, exprs);
-    }
+    exprs = append_private_clause (l, exprs);
     // insert the pragma as an expression to the current statement
     add_pragma_expr_to_statement (stmt, exprs);
     pips_debug (5, "new reduction pragma as an extension added\n");

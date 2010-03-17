@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /*
   * Functions for the expressions
   *
@@ -1091,12 +1094,12 @@ void print_syntax_expressions(list le)
 
 void print_syntax(syntax s)
 {
-    print_words(stderr,words_syntax(s));
+  print_words(stderr,words_syntax(s, NIL));
 }
 
 void print_reference(reference r)
 {
-    print_words(stderr,words_reference(r));
+  print_words(stderr,words_reference(r, NIL));
 }
 
 void print_reference_list(list lr)
@@ -1778,13 +1781,13 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 					    UNARY_MINUS_OPERATOR_NAME),
 		       entity_domain);
 
-  debug(5, "make_op_exp", "begin OP EXP : %s  %s  %s\n",
-	words_to_string(words_expression(exp1)),
+  pips_debug(5, "begin OP EXP : %s  %s  %s\n",
+	words_to_string(words_expression(exp1, NIL)),
 	op_name,
-	words_to_string(words_expression(exp2)));
+	words_to_string(words_expression(exp2, NIL)));
 
-  if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
-    user_error("make_op_exp", "operation must be : +, -, * or /");
+  if( ! ENTITY_FIVE_OPERATION_P(op_ent) )
+    user_error("make_op_exp", "operation must be : +, -, *, MOD, or /");
 
   int val1, val2;
   if( expression_integer_value(exp1,&val1) && expression_integer_value(exp2,&val2) )
@@ -1798,6 +1801,8 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 	result_exp = make_integer_constant_expression(val1 - val2);
       else if(ENTITY_MULTIPLY_P(op_ent))
 	result_exp = make_integer_constant_expression(val1 * val2);
+      else if(ENTITY_MODULO_P(op_ent))
+          result_exp = make_integer_constant_expression(val1 % val2);
       else /* ENTITY_DIVIDE_P(op_ent) */
 	/* we compute here as FORTRAN would do */
 	result_exp = make_integer_constant_expression((int) (val1 / val2));
@@ -1854,8 +1859,8 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
   if(result_exp == expression_undefined)
     result_exp = MakeBinaryCall(op_ent, exp1, exp2);
 
-  debug(5, "make_op_exp", "end   OP EXP : %s\n",
-	words_to_string(words_expression(result_exp)));
+  pips_debug(5, "end   OP EXP : %s\n",
+	words_to_string(words_expression(result_exp, NIL)));
 
   return (result_exp);
 }
@@ -2357,7 +2362,12 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 
 /* Replace C operators "+C" and "-C" which can handle pointers by
    arithmetic operators "+" and "-" when it is safe to do so, i.e. when no
-   pointer arithmetic is involved. */
+   pointer arithmetic is involved.
+
+   FI: Also, it might be useful to normalize the expression in order
+   not to leave an undefined field in it. But this is a recursive
+   function and probably not the right place to cope with this.
+ */
 bool simplify_C_expression(expression e)
 {
   syntax s = expression_syntax(e);
@@ -2689,6 +2699,11 @@ static bool _expression_similar_p(expression target, expression pattern,hash_tab
     {
         pips_user_warning("cast ignored\n");
         return _expression_similar_p(target, cast_expression(syntax_cast(spattern)),symbols);
+    }
+    if( syntax_cast_p( starget ) )
+    {
+        pips_user_warning("cast ignored\n");
+        return _expression_similar_p(cast_expression(syntax_cast(starget)), pattern,symbols);
     }
 
     switch(syntax_tag(spattern) )

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* static bool rule_multi_produced_consistent_p(rule mp_rule, makefile make_file)
  * input    : a rule that produces more than one resource and a the current makefile
  * output   : TRUE if the others rules of the make file that produce at least

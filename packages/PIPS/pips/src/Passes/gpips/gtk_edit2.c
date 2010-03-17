@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* 	%A% ($Date: 1998/04/16 14:45:19 $, ) version $Revision: 12279 $, got on %D%, %T% [%P%].\n Copyright (c) �cole des Mines de Paris Proprietary.	 */
 
 #ifndef lint

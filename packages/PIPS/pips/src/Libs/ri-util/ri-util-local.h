@@ -63,13 +63,16 @@
 /* Scope separator */
 #define BLOCK_SEP_STRING                "`"
 #define BLOCK_SEP_CHAR                  '`'
+
 #define MEMBER_SEP_STRING               "^"
 #define MEMBER_SEP_CHAR                 '^'
+
 #define STRUCT_PREFIX                   "#" // Conflict with value naming in transformer
 #define STRUCT_PREFIX_CHAR              '#'
 #define UNION_PREFIX                    "'" /* Conflict with C character constants */
 #define UNION_PREFIX_CHAR               '\''
 #define ENUM_PREFIX                     "?"
+#define ENUM_PREFIX_CHAR                '?'
 #define TYPEDEF_PREFIX                  "$"
 #define TYPEDEF_PREFIX_CHAR             '$'
 
@@ -460,6 +463,8 @@
 #define ATOF_FUNCTION_NAME              "atof"
 #define ATOI_FUNCTION_NAME              "atoi"
 #define ATOL_FUNCTION_NAME              "atol"
+#define ATOLL_FUNCTION_NAME             "atoll"
+#define ATOQ_FUNCTION_NAME              "atoq"
 #define BSEARCH_FUNCTION_NAME           "bsearch"
 #define CALLOC_FUNCTION_NAME            "calloc"
 #define DIV_FUNCTION_NAME               "div"
@@ -526,7 +531,6 @@
 #define ISATTY_FUNCTION_NAME            "isatty"
 #define MEMALIGN_FUNCTION_NAME          "memalign"
 #define TTYNAME_FUNCTION_NAME           "ttyname"
-#define ATOLL_FUNCTION_NAME             "atoll"
 #define LLABS_FUNCTION_NAME             "llabs"
 #define LLDIV_FUNCTION_NAME             "lldiv"
 #define LLTOSTR_FUNCTION_NAME           "lltostr"
@@ -1159,10 +1163,11 @@
 #define ENTITY_VA_COPY_P(e)  ENTITY_NAME_P(e, BUILTIN_VA_COPY)
 
 
-#define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
+#define ENTITY_FIVE_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
                                      ENTITY_MINUS_P(e) || \
                                      ENTITY_UNARY_MINUS_P(e) || \
                                      ENTITY_MULTIPLY_P(e) || \
+                                     ENTITY_MODULO_P(e) ||\
                                      ENTITY_DIVIDE_P(e) )
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
@@ -1442,9 +1447,9 @@ entity get_ith_##lname##_prime(int i)\
 #define DEFAULT_LONG_INTEGER_TYPE_SIZE (6)
 #define DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE (8)
 
-#define DEFAULT_POINTER_TYPE_SIZE (4) // could be 4 or 8
-#define DEFAULT_UNSIGNED_TYPE_SIZE (1)
-#define DEFAULT_SIGNED_TYPE_SIZE (2)
+#define DEFAULT_POINTER_TYPE_SIZE (sizeof(void *)) // could be 4 or 8 or sizeof(pointer)
+#define DEFAULT_UNSIGNED_TYPE_SIZE (1) // type_size/10==1
+#define DEFAULT_SIGNED_TYPE_SIZE (2) // type_size/10=2
 
 /* The standard C integer types are represented as follow
 char                   = 1
@@ -1474,7 +1479,8 @@ the variable is unsigned, signed or not */
 #define DEFAULT_DOUBLECOMPLEX_TYPE_SIZE (16)
 #define DEFAULT_LOGICAL_TYPE_SIZE (4)
 
-#define DEFAULT_POINTER_TYPE_SIZE (4)
+/* Already defined */
+//#define DEFAULT_POINTER_TYPE_SIZE (4)
 
 /* Implicit variables to handle IO effetcs */
 

@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * STRIP_MINING()
  *
@@ -72,16 +75,16 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     
     debug(9, "loop_strip_mine", "begin: chunk_size = %d,chunk_number = %d\n",
 	  chunk_size, chunk_number);
-    pips_assert("loop_strip_mine", ( chunk_size > 1 && chunk_number == -1 ) 
+    pips_assert("loop_strip_mine", ( chunk_size > 1 && chunk_number == -1 )
 		||
 		(chunk_size == -1 && chunk_number > 1) );
 
     if(loop_increment_value(l) != 1)
-	user_error("loop_strip_mine", 
+	user_error("loop_strip_mine",
 		   "Loop increment has to be one for strip-mining!\n");
 
     if(get_debug_level()>=9) {
-	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
+      print_text(stderr,text_statement(entity_undefined,0,loop_statement,NIL));
 	pips_assert("loop_strip_mine", statement_consistent_p(loop_statement));
     }
 
@@ -89,12 +92,12 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     if(chunk_size==-1) {
 	expression e_number = int_to_expression(chunk_number);
 
-	size = make_op_exp(MINUS_OPERATOR_NAME, 
+	size = make_op_exp(MINUS_OPERATOR_NAME,
 			      copy_expression(ub), copy_expression(lb));
 	size = make_op_exp(PLUS_OPERATOR_NAME, size, e_number);
-	size = make_op_exp(DIVIDE_OPERATOR_NAME, 
+	size = make_op_exp(DIVIDE_OPERATOR_NAME,
 			      size, copy_expression(e_number));
-	sizem1 = make_op_exp(MINUS_OPERATOR_NAME, 
+	sizem1 = make_op_exp(MINUS_OPERATOR_NAME,
 				copy_expression(size), int_to_expression(1));
     }
     else {
@@ -121,7 +124,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     expression snd_min_parameter=copy_expression(ub);
     expression min_exp = 
         MakeBinaryCall(entity_intrinsic(MIN_OPERATOR_NAME),fst_min_param,snd_min_parameter);
-    new_l = make_loop(index, 
+    new_l = make_loop(index,
 		      make_range(entity_to_expression(new_index),
                   min_exp,
 				 int_to_expression(1)),
@@ -137,10 +140,10 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     ifdebug(8) {
       pips_debug(8, "new inner loop:");
       print_statement(new_s);
-      /* print_text(stderr,text_statement(entity_undefined,0,new_s)); */
+      /* print_text(stderr,text_statement(entity_undefined,0,new_s,NIL)); */
       pips_assert("loop_strip_mine", statement_consistent_p(new_s));
     }
-    
+
     /* update the outer loop */
     loop_index(l) = new_index;
     range_increment(loop_range(l)) = copy_expression(size);

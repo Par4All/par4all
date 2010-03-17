@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
    Global code motion and Common subexpression elimination for nested
    sequences (a sort of perfect loop nest).
@@ -55,7 +58,7 @@
 #include "expressions.h"
 
 #include "eole_private.h"
-#define expression_scalar_p(e) (expression_reference_p((e)) && entity_scalar_p(reference_variable(expression_reference((e)))))
+#define expression_scalar_p(e) (expression_reference_p((e)) && reference_scalar_p(expression_reference((e))))
 
 /******************************************************************* FLATTEN */
 
@@ -925,7 +928,7 @@ static bool cse_call_flt(call c, __attribute__((unused))list* inserted)
   if(ENTITY_ASSIGN_P(call_function(c)))
   {
       expression lhs = binary_call_lhs(c);
-      if(expression_scalar_p(lhs))
+      if(get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS") || expression_scalar_p(lhs))
           gen_recurse_stop(lhs);
   }
   /* Go down! */
@@ -1138,7 +1141,7 @@ static bool expr_cse_flt(expression e,__attribute__((unused))list *skip_list)
         case is_syntax_call:
             return !IO_CALL_P(syntax_call(s));
         case is_syntax_reference:
-            return entity_scalar_p(reference_variable(syntax_reference(s)));
+            //return entity_scalar_p(reference_variable(syntax_reference(s)));
         case is_syntax_subscript:
             return true;
         default:
@@ -1426,24 +1429,6 @@ list_diff(list l1, list l2)
   return diff;
 }
 
-static bool simple_reference_p(expression e)
-{
-  syntax s = expression_syntax(e);
-  return syntax_reference_p(s) && !reference_indices(syntax_reference(s));
-}
-
-static bool is_expression_constant_p(expression e)
-{
-  syntax s = expression_syntax(e);
-  if(syntax_call_p(s))
-  {
-    call c = syntax_call(s);
-    entity en = call_function(c);
-    return entity_constant_p(en);
-  }
-  return FALSE;
-}
-
 static bool call_unary_minus_p(expression e)
 {
   syntax s = expression_syntax(e);
@@ -1493,17 +1478,6 @@ static void atom_cse_expression(expression e,list * skip_list)
                 case is_syntax_call:
                     {
                         call c = syntax_call(s);
-                        if(
-                                get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT") &&
-                                (
-                                 same_entity_p(call_function(c),entity_intrinsic(PLUS_OPERATOR_NAME)) ||
-                                 same_entity_p(call_function(c),entity_intrinsic(PLUS_C_OPERATOR_NAME)) 
-                                )
-                          )
-                        {
-                            FOREACH(EXPRESSION,arg,call_arguments(c))
-                                if(expression_constant_p(arg)) return ;
-                        }
                         if (quality==MAX_SIMILARITY)
                         {
                             /* identicals, just make a reference to the scalar.
@@ -1629,8 +1603,8 @@ static void atom_cse_expression(expression e,list * skip_list)
      *   - constant (ex: 2.6 , 5)
      *   - Unary minus (ex: -a , -5)
      */
-    if (!simple_reference_p(e) &&
-            !is_expression_constant_p(e) &&
+    if (!expression_scalar_p(e) &&
+            !expression_constant_p(e) &&
             !call_unary_minus_p(e))
     {
         expression exp = NULL;
@@ -1745,7 +1719,8 @@ static bool cse_atom_call_flt(call c,list *skip_list)
   if (ENTITY_ASSIGN_P(called))
   {
       expression lhs = binary_call_lhs(c);
-      if(!syntax_subscript_p(expression_syntax(lhs)))
+      if(get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS")) gen_recurse_stop(lhs);
+      else if(!syntax_subscript_p(expression_syntax(lhs)))
       {
           *skip_list=CONS(EXPRESSION,lhs,*skip_list);
           expression var_defined =

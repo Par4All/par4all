@@ -23,6 +23,9 @@
 */
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /* UICON and ICON must be distinguished from RCON and DCON:
       REAL*8 D1

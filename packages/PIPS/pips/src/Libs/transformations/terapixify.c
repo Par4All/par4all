@@ -25,8 +25,10 @@
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
  * @date 2009-07-01
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
-#define _GNU_SOURCE
 
 #include "genC.h"
 #include "linear.h"
@@ -213,10 +215,7 @@ entity make_temporary_pointer_to_array_entity(entity efrom,
 					pointer);
   /* Set its initial */
   entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
-    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),from)),normalized_undefined));
-  /* Add it to decl */
-  AddLocalEntityToDeclarations(new, get_current_module_entity(),
-			       c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),copy_expression(from))),normalized_undefined));
   return new;
 }
 
@@ -375,7 +374,7 @@ bool do_kernelize(statement s, entity loop_label)
       cumulated_effects(module_local_name(cme));
       set_current_module_entity(cme);
       set_current_module_statement(cms);
-      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, get_current_module_name(), TRUE));
+      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), TRUE));
       /* outline the work and kernel parts*/
       outliner(kernel_name,make_statement_list(loop_body(l)));
       (void)outliner(host_call_name,make_statement_list(s));
@@ -552,7 +551,7 @@ bool can_terapixify_expression_p(expression e, bool *can_terapixify)
 
     if(!basic_int_p(b) && ! basic_overloaded_p(b))
     {
-        list ewords = words_expression(e);
+      list ewords = words_expression(e,NIL);
         string estring = words_to_string(ewords);
         string bstring = basic_to_string(b);
         printf("found invalid expression %s of basic %s\n",estring, bstring);

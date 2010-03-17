@@ -108,8 +108,11 @@ fi
 
 if [ ! "$PIPS_ARCH" ]
 then
-  PIPS_ARCH=`$PIPS_ROOT/makes/arch.sh`
-  export PIPS_ARCH
+	if [ -x $PIPS_ROOT/makes/arch.sh ]
+	then
+		PIPS_ARCH=`$PIPS_ROOT/makes/arch.sh`
+		export PIPS_ARCH
+	fi
 fi
 
 # Get PGM

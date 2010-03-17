@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /**
  * The spaghettifier is used in context of PHRASE project while
  * creating "Finite State Machine"-like code portions in order to synthetise

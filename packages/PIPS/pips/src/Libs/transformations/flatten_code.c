@@ -21,13 +21,15 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /* Flatten code
 
    Francois Irigoin, Fabien Coelho, Laurent Daverio.
 
  */
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -174,6 +176,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
       else { /* C99*/
 	statement_instruction(s) =
 	  make_instruction_sequence(make_sequence(inits));
+    statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
 	if(!statement_with_empty_comment_p(s)) {
 	  string c = statement_comments(s);
 	  statement fs = STATEMENT(CAR(inits));
@@ -492,6 +495,29 @@ static bool unroll_loops_in_statement(statement s) {
   return TRUE;
 }
 
+static void statement_purge_declarations_walker(sequence seq)
+{
+    statement block = (statement)gen_get_ancestor(statement_domain,seq);
+    list decls = gen_copy_seq(statement_declarations(block));
+    FOREACH(ENTITY,e,decls)
+    {
+        bool decl_stat_found = false;
+        FOREACH(STATEMENT,s,sequence_statements(seq))
+        {
+            if(( decl_stat_found = ( declaration_statement_p(s) && !gen_chunk_undefined_p(gen_find_eq(e,statement_declarations(s))) ) ) )
+                break;
+        }
+        if(!decl_stat_found)
+            gen_remove_once(&statement_declarations(block),e);
+    }
+    gen_free_list(decls);
+}
+
+static void statement_purge_declarations(statement s)
+{
+    gen_recurse(s,sequence_domain,gen_true,statement_purge_declarations_walker);
+}
+
 
 /* Pipsmake 'flatten_code' phase.
 
@@ -532,14 +558,18 @@ bool flatten_code(string module_name)
 
   /* Step 1 and 2: flatten declarations and clean up sequences */
   statement_flatten_declarations(module_stat);
+  statement_purge_declarations(module_stat);
     // call sequence flattening as some declarations may have been
     // moved up
   clean_up_sequences(module_stat);
 
   /* Step 3 and 4: unroll loops and clean up sequences */
-  gen_recurse( module_stat,
-	       statement_domain, gen_true, unroll_loops_in_statement
-	       );
+  if(get_bool_property("FLATTEN_CODE_UNROLL"))
+  {
+      gen_recurse( module_stat,
+              statement_domain, gen_true, unroll_loops_in_statement
+              );
+  }
   clean_up_sequences(module_stat); // again
 
   // This might not really be necessary, probably thanks to clean_up_sequences
@@ -606,8 +636,8 @@ static void split_initializations_in_statement(statement s)
 
 	FOREACH(ENTITY, var, decls) {
 	  string mn  = module_name(entity_name(var));
-	  string cmn = entity_user_name(get_current_module_entity());
-	  if ( strcmp(mn,cmn) == 0
+	  string cmn =get_current_module_name();
+	  if ( same_string_p(mn,cmn) 
 	       && !value_unknown_p(entity_initial(var))
 	       ) {
 	    expression ie = variable_initial_expression(var);
@@ -712,13 +742,9 @@ static void split_initializations_in_statement(statement s)
 */
 void statement_split_initializations(statement s)
 {
-  if (statement_block_p(s)) {
     gen_recurse(s, statement_domain, gen_true, split_initializations_in_statement);
     /* Is it still useful? */
     clean_up_sequences(s);
-  }
-  else
-    pips_internal_error("Input assumptions not met: not a block statement.\n");
 }
 
 /* Pipsmake 'split_initializations' phase

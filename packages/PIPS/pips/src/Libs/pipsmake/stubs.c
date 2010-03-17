@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * Stub functions for old passes that have been moved out.
  */
@@ -30,13 +33,13 @@
 #include "misc.h"
 
 #define STUB(p)								     \
-bool p(string module) 							     \
+bool p(string module)							     \
 {									     \
     pips_user_warning("pass on %s no more implemented or linked\n", module); \
     return FALSE;							     \
 }
 
-/* 
+/*
  * PAF-related stuff, moved out 16/04/1998 by FC.
  * No problem to move it back in! Just port to new newgen;-)
  */
@@ -49,5 +52,7 @@ STUB(print_plc)
 STUB(reindexing)
 STUB(print_parallelizedCMF_code)
 STUB(print_parallelizedCRAFT_code)
+/* FI: needed
 STUB(static_controlize)
 STUB(print_code_static_control)
+*/

@@ -25,9 +25,6 @@ clean: local-clean
 build: local-clean
 compile: local-clean
 
-recompile: local-clean
-	$(MAKE) -C src
-
 # set ARCH macro
 MAKE.d	= ./makes
 include $(MAKE.d)/arch.mk

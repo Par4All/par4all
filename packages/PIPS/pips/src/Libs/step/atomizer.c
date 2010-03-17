@@ -5,6 +5,9 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 /* An atomizer that uses the one made by Fabien Coelho for HPFC.
    based on Ronan Keryell atomizer

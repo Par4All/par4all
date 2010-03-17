@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
  /* semantical analysis
   *
   * phasis 1: compute transformers from statements and statements effects
@@ -1054,9 +1057,9 @@ transformer fortran_user_call_to_transformer(entity f,
   t_callee = load_summary_transformer(f);
 
   ifdebug(8) {
-    Psysteme s = 
+    Psysteme s =
       (Psysteme) predicate_system(transformer_relation(t_callee));
-    pips_debug(8, "Transformer for callee %s:\n", 
+    pips_debug(8, "Transformer for callee %s:\n",
 	       entity_local_name(f));
     dump_transformer(t_callee);
     sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
@@ -1482,7 +1485,7 @@ transformer any_scalar_assign_to_transformer(entity v,
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
 	/* Is it standard compliant? The assigned variable is modified by the rhs. */
 	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
-	string s = words_to_string(words_syntax(expression_syntax(rhs)));
+	string s = words_to_string(words_syntax(expression_syntax(rhs),NIL));
 
 	pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
 			  entity_local_name(v), s);
@@ -1808,7 +1811,7 @@ transformer statement_to_transformer(
   if (transformer_undefined_p(ot)
       || get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
     //list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
-    list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
+    list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
 
     /* FI: OK, we will have to switch to the new declaration
        representation some day, but the old representation is still
@@ -1833,9 +1836,38 @@ transformer statement_to_transformer(
 	print_transformer(ipre);
       }
 
-      it = instruction_to_transformer(i, ipre, e);
-      nt = transformer_combine(dt, it);
-      free_transformer(it);
+      /* FI: how do we want to handle declarations:
+      *
+      * int i = 1; => T() {i==1}
+      *
+      * or
+      *
+      * int i = 1; => T(i) {i==1}
+      *
+      * What is the impact of this choice? BC prefers the second one
+      * because it it consistent for convec effect computation.
+      *
+      * Note: this issue could be dealt with earlier in
+      * declarations_to_transformer()
+      */
+      /* FI: the code below might be useful again when declarations
+	 are carried by any kind of statement */
+      //it = instruction_to_transformer(i, ipre, e);
+      //nt = transformer_combine(dt, it);
+      //free_transformer(it);
+      if(FALSE) {
+	/* Option 1 */
+	nt = dt;
+      }
+      else {
+	/* Option 2, currently bugged */
+	/* Currently, the preconditions is useless as only the
+	   effects will be used to compute the CONTINUE transformer. */
+	it = instruction_to_transformer(i, pre, e);
+	nt = transformer_image_intersection(it, dt);
+	free_transformer(it);
+	free_transformer(dt);
+      }
       free_transformer(post);
       // free_transformer(ipre);
     }
@@ -1848,8 +1880,11 @@ transformer statement_to_transformer(
       transformer_add_reference_information(nt, s);
       /* nt = transformer_normalize(nt, 0); */
     }
-    if(!ENDP(dl)) {
-      /* Get rid of the non static variables declared in this statement. */
+
+    /* When we leave a block the local stack allocated variables
+       disappear */
+    if(statement_block_p(s) && !ENDP(dl=statement_declarations(s))) {
+      /* Get rid of the non static variables declared in this block statement. */
       list vl = dynamic_variables_to_values(dl);
       if(!ENDP(vl))
 	nt = safe_transformer_projection(nt, vl);

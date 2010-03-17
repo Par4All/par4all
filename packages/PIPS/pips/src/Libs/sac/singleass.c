@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "genC.h"
 #include "linear.h"
@@ -50,7 +53,7 @@ typedef dg_vertex_label vertex_label;
 //Creates a new entity to replace the given one
 static entity make_replacement_entity(entity e)
 {
-    entity new_ent = make_new_scalar_variable_with_prefix(entity_local_name(e),
+    entity new_ent = make_new_scalar_variable_with_prefix(entity_user_name(e),
             get_current_module_entity(),
             entity_basic(e));
     AddLocalEntityToDeclarations(new_ent,get_current_module_entity(),

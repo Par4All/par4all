@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* HPFC module by Fabien COELHO
  *
  * generates a remapping code. 
@@ -1207,7 +1210,7 @@ protected_text_statement(statement s)
 {
     text t;
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
-    t = text_statement(entity_undefined, 0, s);
+    t = text_statement(entity_undefined, 0, s, NIL);
     debug_off();
     return t;
 }
@@ -1228,7 +1231,7 @@ generate_hpf_remapping_file(renaming r)
     /* generates the remapping code and text
      * !!! generated between similar arrays...
      */
-    remap = hpf_remapping(load_similar_mapping(src), 
+    remap = hpf_remapping(load_similar_mapping(src),
 			  load_similar_mapping(trg));
     update_object_for_module(remap, node_module);
     t = protected_text_statement(remap);

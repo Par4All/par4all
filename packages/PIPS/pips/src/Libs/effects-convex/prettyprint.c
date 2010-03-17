@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* package convex effects :  Be'atrice Creusillet 5/97
  *
  * File: prettyprint.c
@@ -32,7 +35,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <values.h>
+#include <limits.h>
 
 #include "linear.h"
 
@@ -141,7 +144,7 @@ text_region(effect reg)
     /* REFERENCE
      */
     r = effect_any_reference(reg);
-    ls = foresys? words_reference(r): effect_words_reference(r);
+    ls = foresys? words_reference(r, NIL): effect_words_reference(r);
 
     MAP(STRING, s, append(s), ls);
     gen_free_string_list(ls); ls = NIL;
@@ -212,7 +215,7 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
 	FOREACH(EFFECT, reg, l_reg)
 	{
 	    entity ent = effect_entity(reg);
-	    if ( get_bool_property("PRETTYPRINT_SCALAR_REGIONS") ||
+	    if (  anywhere_effect_p(reg) || malloc_effect_p(reg) || get_bool_property("PRETTYPRINT_SCALAR_REGIONS") ||
 		! entity_non_pointer_scalar_p(ent))
 	    {
 		if (loose_p && !one_p )

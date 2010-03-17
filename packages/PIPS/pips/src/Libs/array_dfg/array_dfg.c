@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Name     :	array_dfg.c
  * Package  :	array_dfg
  * Author   : 	Arnauld LESERVOT

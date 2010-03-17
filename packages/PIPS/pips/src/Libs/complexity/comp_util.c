@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* comp_util.c
  *
  * useful routines for evaluation of the complexity of a program
@@ -54,7 +57,6 @@
 */
 
 /* To have strndup(): */
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>      /* getenv */
@@ -254,7 +256,7 @@ entity module;
 statement stat;
 hash_table hash_statement_to_complexity;
 {
-    text t = text_statement(module, 0, stat);
+  text t = text_statement(module, 0, stat, NIL);
     complexity comp;
 
     comp = ((complexity) hash_get(hash_statement_to_complexity,(char *)stat));

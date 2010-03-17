@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* -- utils.c
  *
  * package atomizer :  Alexis Platonoff, juillet 91
@@ -48,7 +51,7 @@ instruction inst;
 list l;
 {
 bool not_found = TRUE;
- 
+
 while((not_found) && (l != NIL))
   {
   instruction current_inst = INSTRUCTION(CAR(l));
@@ -56,7 +59,7 @@ while((not_found) && (l != NIL))
     not_found = FALSE;
   else
     l = CDR(l);
-  }   
+  }
 return (! not_found);
 }
 
@@ -77,8 +80,7 @@ expression exp;
 Pvecteur vect;
 bool ONLY_NLCs;
 
-debug(7, "nlc_linear_expression_p", "exp : %s\n",
-      words_to_string(words_expression(exp)));
+pips_debug(7, "exp : %s\n", words_to_string(words_expression(exp, NIL)));
 
 if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
   ONLY_NLCs = FALSE;
@@ -93,7 +95,7 @@ else
 
     if( ! term_cst(vect) )
       if( ! (ENTITY_NLC_P(var)) )
-        ONLY_NLCs = FALSE;
+	ONLY_NLCs = FALSE;
     }
   }
 

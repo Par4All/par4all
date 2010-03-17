@@ -21,9 +21,12 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <string.h>
-#include <values.h>
+#include <limits.h>
 
 #include "linear.h"
 
@@ -32,6 +35,7 @@
 #include "misc.h"
 
 #include "ri-util.h"
+#include "properties.h"
 
 #include "operator.h"
 
@@ -101,7 +105,10 @@ normalized NormalizeCall(call c)
 	n = NormalizeConstant((value_constant(v)));
 	break;
       case is_value_symbolic:
-	n = NormalizeConstant((symbolic_constant(value_symbolic(v))));
+    if(get_bool_property("EVAL_SYMBOLIC_CONSTANT"))
+        n = NormalizeConstant((symbolic_constant(value_symbolic(v))));
+    else
+        n= make_normalized_complex();
 	break;
       case is_value_unknown:
       case is_value_code:
@@ -117,9 +124,8 @@ normalized NormalizeCall(call c)
 normalized NormalizeConstant(constant c)
 {
     return((constant_int_p(c)) ?
-	   make_normalized(is_normalized_linear, 
-			   vect_new(TCST, constant_int(c))) :
-	   make_normalized(is_normalized_complex, UU));
+	   make_normalized_linear(vect_new(TCST, constant_int(c))) :
+	   make_normalized_complex());
 }
 
 normalized NormalizeReference(reference r)
@@ -132,7 +138,14 @@ normalized NormalizeReference(reference r)
 	      entity_domain_number(e)==entity_domain);
 
   if (!type_variable_p(t)) {
-    pips_error("NormalizeReference", "should be a variable !");
+    if(type_functional_p(t))
+      pips_user_warning("Reference to function \"%s\" cannot be normalized.\n"
+			"Is it an undeclared variable?\n",
+			entity_user_name(e));
+    else
+      pips_user_warning("Reference to entity \"%s\" cannot be normalized because of its type tag %d\n",
+			entity_name(e), type_tag(t));
+    pips_user_error("Referenced entity should be a variable!\n");
   }
   else {
     Variable v = (Variable) e;

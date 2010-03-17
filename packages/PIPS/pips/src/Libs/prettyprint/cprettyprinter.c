@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
 
    Try to prettyprint the RI in C.
@@ -293,6 +296,9 @@ static string c_basic_string(basic b)
                 allocated=true;
                 break;
             }
+        case is_basic_complex:
+            result = "_Complex" SPACE; /* c99 style */
+            break;
         default:
             pips_internal_error("unhandled case\n");
     }
@@ -304,7 +310,7 @@ static string c_dim_string(list ldim)
     string result = "";
     if (ldim != NIL )
     {
-        MAP(DIMENSION, dim,
+        FOREACH(DIMENSION, dim,ldim)
         {
             expression elow = dimension_lower(dim);
             expression eup = dimension_upper(dim);
@@ -317,7 +323,7 @@ static string c_dim_string(list ldim)
                we only need to print (upper dimension + 1)
                but in order to handle Fortran code, we check all other possibilities
                and print (upper - lower + 1). Problem : the order of dimensions is reversed !!!! */
-
+#if 0
             if (expression_integer_value(elow, &low))
             {
                 if (low == 0)
@@ -328,7 +334,7 @@ static string c_dim_string(list ldim)
                         /* to be refined here to make more beautiful expression */
                         result = strdup(concatenate(OPENBRACKET,
                                     words_to_string(words_expression(MakeBinaryCall(CreateIntrinsic("+"),
-                                                eup,int_to_expression(1)))),
+										    eup,int_to_expression(1)), NIL)),
                                     CLOSEBRACKET,result,NULL));
                 }
                 else
@@ -337,21 +343,22 @@ static string c_dim_string(list ldim)
                         result = strdup(concatenate(OPENBRACKET,i2a(up-low+1),CLOSEBRACKET,result,NULL));
                     else
                     {
-                        sup = words_to_string(words_expression(eup));
+		      sup = words_to_string(words_expression(eup, NIL));
                         result = strdup(concatenate(OPENBRACKET,sup,"-",i2a(low-1),CLOSEBRACKET,result,NULL));
                         free(sup);
                     }
                 }
             }
             else
+#endif
             {
-                slow = words_to_string(words_expression(elow));
-                sup = words_to_string(words_expression(eup));
+                slow = c_expression(elow,false);
+                sup = c_expression(eup,false);
                 result = strdup(concatenate(OPENBRACKET,sup,"-",slow,"+ 1",CLOSEBRACKET,result,NULL));
                 free(slow);
                 free(sup);
             }
-        }, ldim);
+        }
     }
     /* otherwise the list is empty, no dimension to declare */
     return result;
@@ -394,7 +401,7 @@ static string c_brace_expression_string(expression exp)
         if (brace_expression_p(e))
             result = strdup(concatenate(result,first?"":",",c_brace_expression_string(e),NULL));
         else
-            result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e)),NULL));
+	  result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e, NIL)),NULL));
         first = FALSE;
     },args);
     result = strdup(concatenate(result,"}",NULL));
@@ -437,10 +444,14 @@ static string this_entity_cdeclaration(entity var)
                         {
                             string sval = i2a(constant_int(c));
                             string svar = c_entity_local_name(var);
-                            result = strdup(concatenate(SHARPDEF, SPACE, svar,
-                                        SPACE, sval, NL, NULL));
+                            bool old = get_prettyprint_is_fortran();
+                            reset_prettyprint_is_fortran();
+                            string sbasic = basic_to_string(entity_basic(var));
+                            if(old) set_prettyprint_is_fortran();
+                            asprintf(&result,"static const %s %s = %s;\n",sbasic,svar,sval);
                             free(sval);
                             free(svar);
+                            free(sbasic);
                             return result;
                         }
                         /*What about real, double, string, ... ?*/
@@ -482,17 +493,17 @@ static string this_entity_cdeclaration(entity var)
                         if (brace_expression_p(exp))
                             result = strdup(concatenate(result,"=",c_brace_expression_string(exp),NULL));
                         else
-                            result = strdup(concatenate(result,"=",words_to_string(words_expression(exp)),NULL));
+			  result = strdup(concatenate(result,"=",words_to_string(words_expression(exp, NIL)),NULL));
                     }
                 }
                 if (basic_bit_p(variable_basic(v)))
                 {
-		  /* It is an expression... */
-		  _int i = (_int) basic_bit(variable_basic(v));
-		  pips_debug(2,"Basic bit %td",i);
-		  result = strdup(concatenate(result,":",i2a(i),NULL));
-		  user_error("this_entity_cdeclaration",
-			     "Bitfield to be finished...");
+                    /* It is an expression... */
+                    _int i = (_int) basic_bit(variable_basic(v));
+                    pips_debug(2,"Basic bit %td",i);
+                    result = strdup(concatenate(result,":",i2a(i),NULL));
+                    user_error("this_entity_cdeclaration",
+                            "Bitfield to be finished...");
                 }
                 free(st);
                 //free(sd);
@@ -506,11 +517,11 @@ static string this_entity_cdeclaration(entity var)
                 result = strdup(concatenate("struct ",tmp, "{", NL,NULL));
                 free(tmp);
                 MAP(ENTITY,ent,
-                {
-                    string s = this_entity_cdeclaration(ent);	
-                    result = strdup(concatenate(result, s, SEMICOLON, NULL));
-                    free(s);
-                },l);
+                        {
+                        string s = this_entity_cdeclaration(ent);	
+                        result = strdup(concatenate(result, s, SEMICOLON, NULL));
+                        free(s);
+                        },l);
                 result = strdup(concatenate(result,"}", NULL));
                 break;
             }
@@ -522,11 +533,11 @@ static string this_entity_cdeclaration(entity var)
                 result = strdup(concatenate("union ",tmp, "{", NL,NULL));
                 free(tmp);
                 MAP(ENTITY,ent,
-                {
-                    string s = this_entity_cdeclaration(ent);	
-                    result = strdup(concatenate(result, s, SEMICOLON, NULL));
-                    free(s);
-                },l);
+                        {
+                        string s = this_entity_cdeclaration(ent);	
+                        result = strdup(concatenate(result, s, SEMICOLON, NULL));
+                        free(s);
+                        },l);
                 result = strdup(concatenate(result,"}", NULL));
                 break;
             }
@@ -539,12 +550,12 @@ static string this_entity_cdeclaration(entity var)
                 result = strdup(concatenate("enum ", tmp, " {",NULL));
                 free(tmp);
                 MAP(ENTITY,ent,
-                {
-                    tmp = c_entity_local_name(ent);
-                    result = strdup(concatenate(result,first?"":",",tmp,NULL));
-                    free(tmp);
-                    first = FALSE;
-                },l);
+                        {
+                        tmp = c_entity_local_name(ent);
+                        result = strdup(concatenate(result,first?"":",",tmp,NULL));
+                        free(tmp);
+                        first = FALSE;
+                        },l);
                 result = strdup(concatenate(result,"}", NULL));
                 break;
             }
@@ -570,6 +581,11 @@ static bool variable_p(entity e)
         (storage_ram_p(s) || storage_return_p(s));
 }
 
+static bool parameter_or_variable_p(entity e)
+{
+    return parameter_p(e) || variable_p(e);
+}
+
 static bool argument_p(entity e)
 {
     /* Formal variables */
@@ -591,7 +607,7 @@ static string c_declarations(
     pips_assert("it is a code", value_code_p(entity_initial(module)));
 
     c = value_code(entity_initial(module));
-    MAP(ENTITY, var,
+    FOREACH(ENTITY, var,code_declarations(c))
     {
         string tmp = NULL;
         tmp = c_entity_local_name(var);
@@ -607,7 +623,7 @@ static string c_declarations(
             free(old);
             first = FALSE;
         }
-    },code_declarations(c));
+    }
     return result;
 }
 
@@ -1326,7 +1342,7 @@ static string c_statement(statement s, bool breakable)
 
 static string c_code_string(entity module, statement stat)
 {
-    string before_head, head, decls, body, result;
+    string head, decls, body, result;
 
     /* What about declarations that are external a module scope ?
        Consider a source file as a module entity, put all declarations in it
@@ -1341,16 +1357,15 @@ static string c_code_string(entity module, statement stat)
         print_entities(statement_declarations(stat));
     }
 
-    before_head = c_declarations(module, parameter_p, NL, TRUE);
+    //before_head = c_declarations(module, parameter_p, NL, TRUE);
     head        = c_head(module);
     /* What about declarations associated to statements */
-    decls       = c_declarations(module, variable_p, SEMICOLON, TRUE);
+    decls       = c_declarations(module, parameter_or_variable_p, SEMICOLON, TRUE);
     body        = c_statement(stat, false);
 
-    result = concatenate(before_head, head, OPENBRACE, NL,
+    result = concatenate(/*before_head,*/ head, OPENBRACE, NL,
             decls, NL, body, CLOSEBRACE, NL, NULL);
 
-    free(before_head);
     free(head);
     free(decls);
     free(body);

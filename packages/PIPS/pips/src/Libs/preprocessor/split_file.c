@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * adapted from what can be seen by FC 31/12/96
  * 
@@ -184,7 +187,7 @@ static int current_line_number = 0;
 
 /* getline does not handle continuations...
  */
-static int getline()
+static int GetLine()
 {
   register char *ptr;
   
@@ -495,7 +498,7 @@ char * fsplit(char * dir_name, char * file_name, FILE * out)
 	newname = 0;
 	someentry = 0;
 
-	while (getline() > 0)
+	while (GetLine() > 0)
 	{
 	  char * error = hollerith_and_bangcomments(buf); /* FC */
 	  if (error) {
@@ -819,7 +822,7 @@ char * process_bang_comments_and_hollerith(FILE * in, FILE * out)
   char * error;
   ifp = in;
   current_line_number = 0;
-  while (getline()>0) 
+  while (GetLine()>0) 
   {
     error = hollerith_and_bangcomments(buf);
     if (error) return error;

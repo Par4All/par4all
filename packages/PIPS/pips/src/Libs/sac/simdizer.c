@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "genC.h"
 #include "linear.h"
@@ -197,6 +200,11 @@ static bool successor_p(statement s1, statement s2, bool nonGroupStat)
                     if((effect_write_p(conflict_source(c)) && 
                                 effect_read_p(conflict_sink(c))))
                     {
+                        ifdebug(4) {
+                            pips_debug(4,"write read conflict between:\n");
+                            print_effect(conflict_source(c));
+                            print_effect(conflict_sink(c));
+                        }
                         return TRUE;
                     }
 
@@ -212,6 +220,11 @@ static bool successor_p(statement s1, statement s2, bool nonGroupStat)
                     {
                         if(nonGroupStat)
                         {
+                            ifdebug(4) {
+                                pips_debug(4,"read write conflict between:\n");
+                                print_effect(conflict_source(c));
+                                print_effect(conflict_sink(c));
+                            }
                             return TRUE;
                         }
                     }

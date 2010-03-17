@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Name      :	prettyprint.c
  * package   :	static_controlize
  * Author    :	Arnauld LESERVOT
@@ -34,7 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <values.h>
+#include <limits.h>
 
 /* Newgen includes	*/
 #include "genC.h"
@@ -204,7 +207,7 @@ list obj;
                 expression	exp = EXPRESSION(CAR(exp_ptr));
 
                 pc = CHAIN_SWORD(pc, strdup( before_string ));
-                pc = gen_nconc(pc, words_expression(exp));
+		pc = gen_nconc(pc, words_expression(exp, NIL));
                 pc = CHAIN_SWORD(pc,"\n") ;
                 ret_cons = gen_nconc(ret_cons, gen_copy_seq(pc));
 		before_string = blank_string;
@@ -233,11 +236,11 @@ list obj;
 		expression low  = range_lower(loop_range( l ));
 		expression up   = range_upper(loop_range( l ));
 		pc = CHAIN_SWORD(pc, strdup( before_string ));
-		pc = gen_nconc(pc, words_expression(low));
+		pc = gen_nconc(pc, words_expression(low, NIL));
 		pc = CHAIN_SWORD(pc," <= ");
 		pc = CHAIN_SWORD(pc, entity_local_name(ind));
 		pc = CHAIN_SWORD(pc," <= ");
-		pc = gen_nconc(pc, words_expression(up));
+		pc = gen_nconc(pc, words_expression(up, NIL));
 		pc = CHAIN_SWORD(pc,"\n") ;
 		ret_cons = gen_nconc(ret_cons, gen_copy_seq(pc));
 		before_string = blank_string;

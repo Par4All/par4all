@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /****************************************************************** *
  *
  *		     TOP DOWN ARRAY RESIZING
@@ -164,63 +167,6 @@ static void display_array_resizing_top_down_statistics()
 	   number_of_array_size_assignments);
   user_log("\n Number of processed modules: %d \n"
 	   ,number_of_processed_modules); 
-}
-
-/* This function creates a common for a given name in a given module. 
-   This is an entity with the following fields :
-   Example:  SUBROUTINE SUB1
-             COMMON /FOO/ W1,V1 
-
-   name = top_level:~name (TOP-LEVEL:~FOO)
-   type = area 
-          with size = 8 [2*8], layout = NIL [SUB1:W,SUB1:V] 
-   storage = ram 
-          with function = module (TOP-LEVEL:SUB1) (first occurence ? SUB2,SUB3,..)
-               section = TOP-LEVEL:~FOO  (recursive ???)
-               offset = undefined
-               shared = NIL
-  initial = unknown 
-
-  The area size and area layout must be updated each time when 
-  a common variable is added to this common */
-
-entity make_new_common(string name, entity mod)
-{
-  string common_global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING
-						 COMMON_PREFIX,name,NULL)); 
-  type common_type = make_type(is_type_area, make_area(8, NIL));
-  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
-  storage common_storage = make_storage(is_storage_ram,
-					(make_ram(mod,StaticArea, 0, NIL)));
-  value common_value = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL, make_language_unknown()));
-  return  make_entity(common_global_name,common_type,common_storage,common_value);
-}
-
-/* This function creates a common variable in a given common in a given module. 
-   This is an entity with the following fields :
-   name = module_name:name (SUB1:W1)
-   type = variable 
-          with basic = int, dimension = NIL
-   storage = ram 
-          with function = module (TOP-LEVEL:SUB1)
-               section = common (TOP-LEVEL:~FOO)
-               offset = 0
-               shared = 
-  initial = unknown 
-
-  The common must be updated with new area size and area layout */
-
-entity make_new_integer_scalar_common_variable(string name, entity mod, entity com)
-{
-  string var_global_name = strdup(concatenate(module_local_name(mod),MODULE_SEP_STRING,
-					      name,NULL)); 
-  type var_type = make_type(is_type_variable, make_variable(make_basic_int(8), NIL,NIL));
-  storage var_storage = make_storage(is_storage_ram,
-				     (make_ram(mod,com,0,NIL)));
-  value var_value = make_value_unknown();
-  entity e = make_entity(var_global_name,var_type,var_storage,var_value);
-  //area_layout(type_area(entity_type(com))) = CONS(ENTITY,e,NIL);
-  return e;
 }
 
 bool array_entity_p(entity e)
@@ -1376,8 +1322,8 @@ static void instrument_call_rwt(call c)
 		}
 	      /* As we can not modify ALL.code, we cannot use a function like :
 		 insert_statement(stmt,new_s,TRUE).
-		 Instead, we have to stock the assignment as weel as the ordering 
-		 of the call site in a special file, named TD_instrument.out, and 
+		 Instead, we have to stock the assignment as weel as the ordering
+		 of the call site in a special file, named TD_instrument.out, and
 		 then use a script to insert the assignment before the call site.*/
 	      ifdebug(2)
 		{
@@ -1387,12 +1333,12 @@ static void instrument_call_rwt(call c)
 		}
 	      fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,
 		      module_local_name(current_caller),ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-	      print_text(instrument_file, text_statement(entity_undefined,0,new_s));
+	      print_text(instrument_file, text_statement(entity_undefined,0,new_s,NIL));
 	      fprintf(instrument_file,"%s\n",PREFIX3);
 	      number_of_array_size_assignments++;
 	    }
 	}
-      else 
+      else
 	/* Abnormal case*/
 	pips_user_warning("Actual argument is an undefined expression\n");
     }
@@ -1603,7 +1549,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 		  fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,caller_name,0,1);
 		  fprintf(instrument_file, new_decl);
 		  fprintf(instrument_file, "%s\n",PREFIX3);
-		  
+
 		  /* insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call site*/
 		  instrument_caller_array();
 		  current_variable_caller = entity_undefined;
@@ -1617,23 +1563,23 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	}
       fprintf(instrument_file,"%s\t%s\t%s\t%s\t%d\t%s\t%s\n",PREFIX1,file_name,
 	      callee_name,entity_local_name(current_dummy_array),length,
-	      words_to_string(words_expression(dimension_upper(last_dim))),
-	      words_to_string(words_expression(new_value)));
+	      words_to_string(words_expression(dimension_upper(last_dim),NIL)),
+	      words_to_string(words_expression(new_value,NIL)));
       dimension_upper(last_dim) = new_value;
       l_arrays = CDR(l_arrays);
     }
   free(file_name), file_name = NULL;
 }
 
-/* The rule in pipsmake permits a top-down analysis  
-     
+/* The rule in pipsmake permits a top-down analysis
+
 array_resizing_top_down         > MODULE.new_declarations
                                 > PROGRAM.entities
         < PROGRAM.entities
         < CALLERS.code
 	< CALLERS.new_declarations
 
-Algorithm : For each module that is called by the main program 
+Algorithm : For each module that is called by the main program
 - Take the declaration list. 
 - Take list of unnormalized array declarations   
   - For each unnormalized array that is formal variable. 

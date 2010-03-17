@@ -21,13 +21,15 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* comp_prettyprint.c */
 
 /* Modif:
   -- entity_local_name is replaced by module_local_name. LZ 230993
 */
 
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

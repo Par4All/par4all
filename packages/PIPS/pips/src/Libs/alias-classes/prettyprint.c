@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,9 +94,9 @@ text_region_no_action(effect reg)
     if(effect_undefined_p(reg))
     {
 	user_log("[text_region] unexpected effect undefined\n");
-	return 
+	return
 	  make_text(CONS(SENTENCE, make_sentence(is_sentence_formatted,
-	    strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", NULL))), 
+	    strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", NULL))),
 			 NIL));
     }
     /* else the effect is defined...
@@ -108,7 +111,7 @@ text_region_no_action(effect reg)
     /* REFERENCE
      */
     r = effect_any_reference(reg);
-    ls = foresys? words_reference(r): effect_words_reference(r);
+    ls = foresys? words_reference(r, NIL): effect_words_reference(r);
 
     MAP(STRING, s, append(s), ls);
     gen_map(free, ls); gen_free_list(ls); ls = NIL;

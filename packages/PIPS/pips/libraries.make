@@ -59,7 +59,8 @@ endif
 # prgm_mapping scheduling reindexing array_dfg paf-util static_controlize pip
 
 pipslibs.libs	= \
-	top-level pipsmake wp65 hpfc hyperplane to_begin_with \
+	top-level pipsmake static_controlize paf-util \
+	wp65 hpfc hyperplane to_begin_with \
 	instrumentation locality expressions transformations hwac \
 	movements bootstrap callgraph icfg chains complexity \
 	conversion prettyprint atomizer syntax c_syntax \

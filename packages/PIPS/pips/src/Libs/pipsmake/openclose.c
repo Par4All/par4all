@@ -21,6 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /* Some modifications are made to save the current makefile (s.a. files
  * pipsmake/readmakefile.y openclose.h )
  * They only occure between following tags: 
@@ -30,7 +33,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
 /* Some modifications are made to save the current makefile (s.a. files
@@ -54,9 +57,6 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 #include "misc.h"
-
-extern makefile open_makefile(string);
-extern void save_makefile(void);
 
 /* returns the program makefile file name
  */
@@ -140,6 +140,6 @@ void checkpoint_workspace(void)
 	db_checkpoint_workspace();
 	pips_debug(3, "\tproperties and makefile...\n");
 	save_properties();
-	save_makefile();
+	save_makefile(db_get_current_workspace_name());
     }
 }
