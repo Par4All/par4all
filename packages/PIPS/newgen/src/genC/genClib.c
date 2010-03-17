@@ -2920,7 +2920,7 @@ union domain *dp;
 }
 
 static void
-initialize_DirectDomainsTable()
+initialize_DirectDomainsTable(void)
 {
     int i,j;
 
@@ -3041,6 +3041,9 @@ struct multi_recurse
 {
   // what objects where already visited, with a record of their "ancestor"
   hash_table             seen;
+  // hmmm... whether to ignore decision tables and always recurse
+  // (just a quick and dirty "full" recurse implementation...)
+  bool always_recurse;
   // domain to be visited
   GenDecisionTableType * domains;
   // possibly intelligent decision tables, domains to recurse in
@@ -3097,7 +3100,8 @@ quick_multi_recurse_obj_in(gen_chunk * obj,
   //
   // FI told me that only persistant edges shouldn't be followed.
   // it may mean that tabulated elements are always persistent?
-  if (IS_TABULATED(&Domains[quick_domain_index(obj)]))
+  if (!current_mrc->always_recurse &&
+      IS_TABULATED(&Domains[quick_domain_index(obj)]))
     return !GO;
 
   // filter case, tell whether to apply rewrite
@@ -3106,7 +3110,7 @@ quick_multi_recurse_obj_in(gen_chunk * obj,
     go = (*((*(current_mrc->filters))[dom]))(obj, current_mrc->context);
   else
     // else, here is the *maybe* intelligent decision to be made.
-    go = (*(current_mrc->decisions))[dom];
+    go = current_mrc->always_recurse || (*(current_mrc->decisions))[dom];
 
   // else push current object before continuing the recursion downwards
   if (go) stack_push(obj, current_mrc->upwards);
@@ -3142,14 +3146,16 @@ static int
 quick_multi_recurse_simple_in(gen_chunk * obj, union domain * dp)
 {
   int t;
-  return ((*(current_mrc->decisions))[dp->se.element-Domains] ||
-	  (*(current_mrc->domains))[dp->se.element-Domains]) &&
-         (!dp->se.persistant) &&               // stay at a given level
-	 ((t=dp->ba.type)==BASIS_DT ? true :
-	  t==LIST_DT               ? obj->l != list_undefined :
-	  t==SET_DT                ? obj->t != set_undefined :
-	  t==ARRAY_DT              ? obj->p != array_undefined :
-	  (fatal("persistant_simple_in: unknown type %s\n",
+  return
+    (current_mrc->always_recurse ||
+     (*(current_mrc->decisions))[dp->se.element-Domains] ||
+     (*(current_mrc->domains))[dp->se.element-Domains]) &&
+    (current_mrc->always_recurse || !dp->se.persistant) && // stay at level
+    ((t=dp->ba.type)==BASIS_DT ? true :
+     t==LIST_DT                ? obj->l != list_undefined :
+     t==SET_DT                 ? obj->t != set_undefined :
+     t==ARRAY_DT               ? obj->p != array_undefined :
+     (fatal("persistant_simple_in: unknown type %s\n",
 		 itoa(dp->ba.type)), false));
 }
 
@@ -3182,7 +3188,11 @@ void gen_recurse_stop(void * obj)
      Beware that the function is reentrant.
 */
 static void
-gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
+gen_internal_context_multi_recurse
+  (void * o,       // starting point
+   void * context, // context passed to decision and rewrite functions
+   bool gointabs,  // whether to recurse within tabulated domains
+   va_list pvar)   // domain, decision (down) and rewrite (up) functions
 {
   gen_chunk * obj = (gen_chunk*) o;
   int i, domain;
@@ -3191,6 +3201,8 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
   GenDecisionTableType new_decision_table, new_domain_table, *p_table;
   struct multi_recurse *saved_mrc, new_mrc;
   struct driver dr;
+
+  message_assert("tabulated domain recursion is not implemented", !gointabs);
 
   check_read_spec_performed();
 
@@ -3222,6 +3234,7 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
 
   // initialize multi recurse stuff
   new_mrc.seen      = hash_table_make(hash_pointer, 0),
+  new_mrc.always_recurse = gointabs, // quick and dirty...
   new_mrc.domains   = &new_domain_table,
   new_mrc.decisions = &new_decision_table,
   new_mrc.filters   = &new_filter_table,
@@ -3275,15 +3288,42 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
 
     Newgen persistant fields are not visited.
 
-    Bug : you can't visit domain number 0 if any... The good news is that
-    there is no NewGen object of domain number 0, since it seems that to
-    start at 7 for user domains...
+    You can't visit domain number 0, but there are none...
 */
 void gen_context_multi_recurse(void * o, void * context, ...)
 {
     va_list pvar;
     va_start(pvar, context);
-    gen_internal_context_multi_recurse(o, context, pvar);
+    gen_internal_context_multi_recurse(o, context, false, pvar);
+    va_end(pvar);
+}
+
+/** Full multi-recursion with context function visitor
+
+    gen_full_recurse(obj, context,
+                     [domain, filter, rewrite,]*
+                     NULL);
+
+    recurse from object obj (in a top-down way), applies filter_i on
+    encountered domain_i objects with the context, if true, recurses
+    down from the domain_i object, and applies rewrite_i on exit from
+    the object (in a bottom-up way).
+
+    Newgen persistant fields and their contents ARE VISITED.
+
+    The current implementation does not try to be intelligent, thus
+    will recurse anywhere until stopped by a decision or an object was
+    already visited. Beware, if you do not take extra care, this mean
+    visiting all entities and their contents when visiting from a
+    statement in pips.
+
+    You can't visit domain number 0, but there are none.
+*/
+void gen_full_recurse(void * o, void * context, ...)
+{
+    va_list pvar;
+    va_start(pvar, context);
+    gen_internal_context_multi_recurse(o, context, true, pvar);
     va_end(pvar);
 }
 
@@ -3309,13 +3349,9 @@ void gen_multi_recurse(void * o, ...)
 {
     va_list pvar;
     va_start(pvar, o);
-    gen_internal_context_multi_recurse(o, NULL, pvar);
+    gen_internal_context_multi_recurse(o, NULL, false, pvar);
     va_end(pvar);
 }
-
-#ifdef gen_recurse
-#undef gen_recurse
-#endif
 
 /** Visit all the objects from a given types found in an object.
 
@@ -3335,15 +3371,11 @@ void gen_multi_recurse(void * o, ...)
 void gen_recurse(
     void * obj, /**< starting point */
     int domain,
-    bool (*filter)(gen_chunk * encountered_object),
-    void (*rewrite)(gen_chunk * encountered_object))
+    bool (*filter)(void * encountered),
+    void (*rewrite)(void * encountered_object))
 {
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
 }
-
-#ifdef gen_context_recurse
-#undef gen_context_recurse
-#endif
 
 /** Visit all the objects from a given types found in an object with a context.
 
@@ -3371,8 +3403,8 @@ void gen_context_recurse(
     void * obj, /**< starting point */
     void * context,
     int domain,
-    bool (*filter)(gen_chunk * encountered_object, void * context),
-    void (*rewrite)(gen_chunk * encountered_object, void * context))
+    bool (*filter)(void * encountered_object, void * context),
+    void (*rewrite)(void * encountered_object, void * context))
 {
     gen_context_multi_recurse(obj, context, domain, filter, rewrite, NULL);
 }
