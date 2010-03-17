@@ -1,0 +1,32 @@
+
+      SUBROUTINE BLA()
+C     This call should not be handled by transformer analysis
+C     because o the implicit type conversion
+      I = FOO()                                                         0005
+      END
+
+      FUNCTION FOO()
+      FOO = 0                                                           0003
+      END
+
+C  T() {}
+
+
+      FUNCTION FOO()
+
+C  T() {}
+
+      FOO = 0                                                           0003
+      END
+
+C  T() {}
+
+
+      SUBROUTINE BLA()
+
+C  T(I) {}
+
+C     This call should not be handled by transformer analysis
+C     because o the implicit type conversion
+      I = FOO()                                                         0005
+      END

@@ -1,0 +1,40 @@
+
+Code for "USE_DEF_ELIM03"
+
+      INTEGER FUNCTION USE_DEF_ELIM03( I)
+      INTEGER I, J, K
+
+      J = I+1
+      I = 2
+      K = 3
+      USE_DEF_ELIM03 = J
+      END
+
+Code with cumulated effects for "use_def_elim03"
+
+C               <must be read   >: I
+C               <must be written>: I
+      INTEGER FUNCTION USE_DEF_ELIM03( I)
+      INTEGER I, J, K
+C               <must be read   >: I
+C               <must be written>: J
+
+      J = I+1
+C               <must be written>: I
+      I = 2
+C               <must be written>: K
+      K = 3
+C               <must be read   >: J
+C               <must be written>: USE_DEF_ELIM03
+      USE_DEF_ELIM03 = J
+      END
+
+Code for "use_def_elim03" after use-def elimination
+
+      INTEGER FUNCTION USE_DEF_ELIM03( I)
+      INTEGER I, J, K
+
+      J = I+1
+      I = 2
+      USE_DEF_ELIM03 = J
+      END

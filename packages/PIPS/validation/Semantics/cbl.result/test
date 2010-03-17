@@ -1,0 +1,19 @@
+
+C  P() {}
+
+C     How about transformer on common variables?
+      PROGRAM CBL
+      COMMON /FOO/ K
+
+C  P() {}
+
+      K = 1                                                             0004
+
+C  P(K) {K==1}
+
+      CALL INCR                                                         0005
+
+C  P(K) {K==2}
+
+      PRINT *, K                                                        0006
+      END

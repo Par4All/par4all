@@ -1,0 +1,20 @@
+delete entry22
+create entry22 entry22.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY22
+echo
+
+display PRINTED_FILE[ENTRY22]
+
+echo
+echo Entry INIBND
+echo
+
+display PRINTED_FILE[INIBND]
+
+close
+delete entry22
+quit

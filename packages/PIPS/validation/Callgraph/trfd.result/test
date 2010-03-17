@@ -1,0 +1,47 @@
+
+TRFD with intraprocedural preconditions
+
+
+C  P() {MAX==1000000}
+
+ TRFD
+    
+C      P() {}
+    
+     INTGRL
+    
+C      P() {}
+    
+     TRFPRT
+        
+C          P() {}
+        
+         TRFOUT
+    
+C      P() {}
+    
+     OLDA
+
+TRFD with interprocedural preconditions
+
+
+C  P() {MAX==1000000}
+
+ TRFD
+    
+C      P() {10<=NP, NP<=40}
+    
+     INTGRL
+    
+C      P() {IW==6, 0<=JFLAG, JFLAG<=1, 10<=NORB, NORB<=40}
+    
+     TRFPRT
+        
+C          P() {IW==6, NCALL==0, I<=40, J<=I, 38K+1<=38I+J, 8K<=8I+J+29,
+C            38K+L<=38I+J, 8K+L<=8I+J+30, K<=I, 1<=J, 1<=K, L<=K, 1<=L}
+        
+         TRFOUT
+    
+C      P() {MORB==NDIM, MORB==NUM, 10<=MORB, MORB<=40}
+    
+     OLDA

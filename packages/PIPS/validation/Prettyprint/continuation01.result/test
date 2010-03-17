@@ -1,0 +1,8 @@
+      PROGRAM CONTINUATION01
+
+      DO I = 1, 2                                                       0003
+         WRITE (6, 263) I                                               0004
+263      FORMAT('0INITIAL ESTIMATE OF THETA(',I2,') IS NOT GIVEN'/' BUT 
+     &THE CORRESPONDING LOWER AND/OR UPPER BOUND IS ','INAPPROPRIATE')  0005
+      ENDDO
+      END

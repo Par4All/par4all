@@ -1,0 +1,13 @@
+#!/bin/sh
+# test pips on rinput.f
+#
+if Pips -f rinput.f -w rinput -m rinput -b PF >&2
+then 
+	Display -l code
+	Delete rinput >&2
+else 
+    	echo Parser failed for rinput.f
+	Delete rinput >&2
+	exit 1
+fi
+ 

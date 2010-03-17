@@ -1,0 +1,37 @@
+# Check what happens with blockdata declared in an EXTERNAL statement
+# (Spec-CFP95)
+
+delete mtrinit
+
+echo
+echo EXTERNAL declaration parsed first
+echo
+
+create mtrinit mtrinit.f
+display PRINTED_FILE[MTRINIT]
+display PRINTED_FILE[TRINIT]
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[MTRINIT]
+close
+delete mtrinit
+
+echo
+echo EXTERNAL declaration parsed second
+echo
+
+create mtrinit mtrinit.f
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+display PRINTED_FILE[TRINIT]
+display PRINTED_FILE[MTRINIT]
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[MTRINIT]
+close
+delete mtrinit
+quit
+

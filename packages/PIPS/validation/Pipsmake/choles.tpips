@@ -1,0 +1,8 @@
+delete choles
+create choles choles.f
+
+make CALLERS[%ALL]
+
+close
+delete choles
+quit

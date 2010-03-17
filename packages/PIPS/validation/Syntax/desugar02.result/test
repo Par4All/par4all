@@ -1,0 +1,13 @@
+      SUBROUTINE DESUGAR02(X, Y, *, *)
+400   CONTINUE
+
+C     Check desugaring of labelled DO loops
+
+c     labelled loop
+      DO 500 I = 1, N                                                   0006
+         PRINT *, I                                                     0007
+500      CONTINUE                                                       0008
+
+      I_PIPS_RETURN_CODE_ = 0                                           0010
+      END
+

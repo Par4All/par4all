@@ -1,0 +1,10 @@
+# 1
+struct s
+{
+  int i;
+}
+foo ()
+{
+  struct s x;
+}
+extern bstruct s { int i; } foo();

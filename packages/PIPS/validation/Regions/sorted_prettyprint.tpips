@@ -1,0 +1,13 @@
+delete sorted_prettyprint
+create sorted_prettyprint sorted_prettyprint.f
+
+set PRETTYPRINT_STATEMENT_NUMBER FALSE
+activate MUST_REGIONS
+
+module PP
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+close
+delete sorted_prettyprint
+

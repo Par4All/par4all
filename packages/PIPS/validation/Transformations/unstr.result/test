@@ -1,0 +1,109 @@
+
+C  P() {}
+
+      PROGRAM UNSTR
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+
+      J = 2                                                             0005
+
+C  P(J) {J==2}
+
+
+100   CONTINUE                                                          0007
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0008
+
+C  P(J) {J==2}
+
+      IF (J.LT.2) GOTO 100                                              0009
+
+C  P(J) {J==2}
+
+
+      CONTINUE                                                          0011
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0011
+
+C  P(J) {J==2}
+
+
+      RETURN
+      END
+
+C  P() {}
+
+      PROGRAM UNSTR
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+
+      J = 2                                                             0005
+
+C  P(J) {J==2}
+
+
+100   CONTINUE                                                          0007
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0008
+
+C  P(J) {J==2}
+
+      IF (J.LT.2) GOTO 100                                              0009
+
+C  P(J) {J==2}
+
+
+      CONTINUE                                                          0011
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0011
+
+C  P(J) {J==2}
+
+
+      RETURN
+      END
+
+C  P() {}
+
+      PROGRAM UNSTR
+
+C  P() {}
+
+
+c     test of entry and exit node extraction by Ronan's restructurer
+
+      J = 2                                                             0005
+
+C  P(J) {J==2}
+
+
+100   CONTINUE                                                          0007
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0008
+
+C  P(J) {J==2}
+
+
+      PRINT *, J                                                        0011
+
+C  P(J) {J==2}
+
+
+      RETURN
+      END

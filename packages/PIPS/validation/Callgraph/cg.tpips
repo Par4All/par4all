@@ -1,0 +1,5 @@
+delete cg
+create cg cg.f
+display CALLGRAPH_FILE[%ALL]
+close
+delete cg

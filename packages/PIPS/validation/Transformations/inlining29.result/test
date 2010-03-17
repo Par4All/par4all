@@ -1,0 +1,93 @@
+
+Initial code
+
+typedef struct farray_t *farray;
+
+extern farray farray_new(unsigned int n);
+extern void farray_delete(farray a);
+extern float farray_get(farray a, unsigned int i);
+extern void farray_set(farray a, unsigned int i, float f);
+struct farray_t {
+   unsigned int size;
+   float *data;
+};
+
+extern farray farray_new(unsigned int n);
+
+extern void farray_delete(farray a);
+
+extern float farray_get(farray a, unsigned int i);
+extern void farray_set(farray a, unsigned int i, float f);
+void farray_delete(farray a)
+{
+   free(a->data);
+   free(a);
+}
+float farray_get(farray a, unsigned int i)
+{
+   return (a->data)[i];
+}
+farray farray_new(unsigned int n)
+{
+   farray a;
+   a = (farray) malloc(sizeof(*a));
+   if (a) {
+      a->size = n;
+      a->data = (float *) malloc(n*sizeof(*a->data));
+      if (a->data)
+         return a;
+      else
+         free(a);
+   }
+   return 0;
+}
+void farray_set(farray a, unsigned int i, float f)
+{
+   (a->data)[i] = f;
+}
+typedef struct farray_t *farray;
+
+farray farray_new(unsigned int n);
+void farray_delete(farray a);
+float farray_get(farray a, unsigned int i);
+void farray_set(farray a, unsigned int i, float f);
+extern int main(int argc, char *argv[]);
+int main(int argc, char *argv[])
+{
+   int i, n = atoi(argv[1]);
+   float sum;
+   farray a = farray_new(n);
+   for(i = 0; i <= n-1; i += 1)
+      farray_set(a, i, (float) i);
+   sum = 0;
+   for(i = 0; i <= n-1; i += 1)
+      sum += farray_get(a, i);
+   printf("%f\n", sum/n);
+   return 0;
+}
+
+Code after inlining
+
+int main(int argc, char *argv[])
+{
+   int i, n = atoi(argv[1]);
+   float sum;
+   farray a = farray_new(n);
+   //PIPS generated variable
+   float _return0;
+   for(i = 0; i <= n-1; i += 1)
+      (a->data)[i] = i;
+   sum = 0;
+   for(i = 0; i <= n-1; i += 1) {
+      _return0 = (a->data)[i];
+      sum += _return0;
+   }
+   printf("%f\n", sum/n);
+   return 0;
+}
+
+Unsplit resulting code
+
+
+Diff, must be empty
+

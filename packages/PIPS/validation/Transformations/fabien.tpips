@@ -1,0 +1,70 @@
+set ABORT_ON_USER_ERROR TRUE
+
+# Check evaluation of constant expressions for parameters (eval.c),
+# linearization of expressions with constant subexpressions (normalize.c)
+# and partial evaluation of expressions with intrinsics
+
+echo
+echo Check that parameters are well evaluated
+echo ----------------------------------------
+
+shell sed 's/cfirst//' fabien.f > fabien1.f
+
+echo
+echo Preconditions when using Fortran parameters
+echo
+
+delete fabien
+create fabien fabien1.f
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo
+echo Code after partial evaluation elimination when using Fortran parameters
+echo
+
+apply PARTIAL_EVAL
+activate PRINT_CODE
+display PRINTED_FILE
+
+# waiting for Ronan's use-def based dead code elimination
+
+close
+delete fabien
+
+shell rm -f fabien1.f
+
+echo
+echo Check that variables are well evaluated
+echo ----------------------------------------
+
+shell sed 's/csecond//' fabien.f > fabien2.f
+
+echo
+echo Preconditions when using Fortran variables
+echo
+
+delete fabien
+create fabien fabien2.f
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo
+echo Code after partial evaluation when using Fortran variables
+echo
+
+apply PARTIAL_EVAL
+# A second partial evaluation is required to propagate non-affine
+# expressions up to the final print statement
+apply PARTIAL_EVAL
+activate PRINT_CODE
+display PRINTED_FILE
+
+# waiting for Ronan's use-def based dead code elimination
+
+close
+delete fabien
+
+shell rm -f fabien2.f
+
+quit

@@ -1,0 +1,8 @@
+delete r
+create r nonlinear.f
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+close
+delete r
+quit

@@ -1,0 +1,18 @@
+delete ifunc03
+create ifunc03 ifunc03.f
+module IFUNC03
+activate TRANSFORMERS_INTER_FULL
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+module BLA
+display PRINTED_FILE[BLA]
+module FOO
+display PRINTED_FILE[FOO]
+activate PRINT_CODE_TRANSFORMERS
+module FOO
+display PRINTED_FILE[FOO]
+module BLA
+display PRINTED_FILE[BLA]
+close
+delete ifunc03
+quit
+# EOF

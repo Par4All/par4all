@@ -1,0 +1,28 @@
+#
+# testing source
+#
+delete source
+
+set ABORT_ON_USER_ERROR TRUE
+
+create source source.f
+close
+# sourcing
+echo ! one 
+source  sourced.include/sourced.tpips
+echo ! two
+source  sourced.include/sourced.tpips \
+	sourced.include/sourced2.tpips
+echo ! three
+source  sourced.include/sourced.tpips \
+	sourced.include/sourced2.tpips \
+	sourced.include/sourced3.tpips
+echo ! already open
+open source
+source  sourced.include/sourced.tpips
+# echo # delete all
+# setproperty PIPSDBM_RESOURCES_TO_DELETE="all"
+# source sourced.tpips
+shell echo ! done
+delete source
+quit

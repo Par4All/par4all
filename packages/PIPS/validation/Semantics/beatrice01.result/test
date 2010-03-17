@@ -1,0 +1,104 @@
+
+Transformers for "beatrice01"
+
+
+C  T() {}
+
+void beatrice01()
+{
+
+//  T() {}
+
+   // BEGIN BLOCK
+   int i,  j;
+
+//  T(i,j) {0<=i}
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  T(j) {0<=i, i<=63, 0<=j}
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         // BEGIN BLOCK
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 0.0;
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_im[i][j] = 0.0;
+         // END BLOCK
+      }
+
+//  T(i,j) {i#init==64, j#init==64, 0<=i}
+
+
+outline_compute:
+   for(i = 0; i <= 63; i += 1)
+
+//  T(j) {0<=i, i<=63, 0<=j}
+
+      for(j = 0; j <= 63; j += 1)
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 1+imagein_im[i][j];
+   // END BLOCK
+}
+
+Preconditions for "beatrice01"
+
+
+//  P() {}
+
+void beatrice01()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   int i,  j;
+
+//  P() {}
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  P(i,j) {0<=i, i<=63}
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         // BEGIN BLOCK
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 0.0;
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_im[i][j] = 0.0;
+         // END BLOCK
+      }
+
+//  P(i,j) {i==64, j==64}
+
+
+outline_compute:
+   for(i = 0; i <= 63; i += 1)
+
+//  P(i,j) {0<=i, i<=63}
+
+      for(j = 0; j <= 63; j += 1)
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 1+imagein_im[i][j];
+   // END BLOCK
+}

@@ -1,0 +1,9 @@
+delete convgfm
+create convgfm convgfm.f
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+close
+delete convgfm
+quit

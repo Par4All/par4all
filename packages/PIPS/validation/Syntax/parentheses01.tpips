@@ -1,0 +1,7 @@
+delete parentheses01
+create parentheses01 parentheses01.f
+display PRINTED_FILE(PARENTHESES01)
+
+close
+delete parentheses01
+quit

@@ -1,0 +1,14 @@
+delete nga08
+create nga08 nga08.f
+
+activate TRANSFORMERS_INTER_FULL
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate PRINT_CODE_TRANSFORMERS
+
+display PRINTED_FILE
+
+close
+delete nga08
+quit

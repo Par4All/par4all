@@ -1,0 +1,40 @@
+delete space01
+
+setenv PIPS_CPP="cpp"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create space01 space01.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Parsed printed file for "space01" and "main" with default spacing
+echo
+
+display PARSED_PRINTED_FILE[space01]
+display PARSED_PRINTED_FILE[main]
+
+close
+delete space01
+
+create space01 space01.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_LISTS_WITH_SPACES FALSE
+
+echo
+echo Parsed printed file for "space01" and "main" with minimal spacing
+echo
+
+display PARSED_PRINTED_FILE[space01]
+display PARSED_PRINTED_FILE[main]
+
+close
+delete space01
+quit

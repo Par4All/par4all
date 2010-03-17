@@ -1,0 +1,54 @@
+--- Preconditions for LOOPSEQ
+
+C  P() {}
+
+      PROGRAM LOOPSEQ
+
+C     Check exit condition from first loop onto second loop
+
+C     Bug: the second loop on I is not properly analyzed.
+C     It cannot be shown to be dead code
+
+C     Fixed on June 22, 1997
+
+      REAL T(100)
+
+C  P() {}
+
+
+      IF (N.GE.1) THEN                                                  0012
+
+C  P() {1<=N}
+
+
+         DO I = 1, N                                                    0014
+
+C  P(I) {1<=I, I<=N, 1<=N}
+
+            T(I) = 0.                                                   0015
+         ENDDO
+
+C  P(I) {I==N+1, 2<=I}
+
+
+C     This loops leads to i <= i <= n and fortunately the
+C     left part disappears as a trivial constraint. But it should
+C     never have been built in the first place!
+
+C     Bug fixed on June 22, 1997
+
+         DO I = I, N                                                    0024
+
+C  P() {0==-1}
+
+            T(I) = 0.                                                   0025
+         ENDDO
+
+C  P(I) {I==N+1, 2<=I}
+
+
+         PRINT *, I                                                     0028
+
+      ENDIF
+
+      END

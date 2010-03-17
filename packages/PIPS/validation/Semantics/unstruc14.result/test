@@ -1,0 +1,286 @@
+      PROGRAM UNSTRUC14
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+C     Triplication of a cycle: it does not work because Bourdoncle's
+C     procedure happens to break both cycles with node "j=j+1"
+
+      READ *, N                                                         0006
+C (0,3)
+      I = 1                                                             0007
+C (0,4)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+      IF (N.GT.0) GOTO 99999                                            0008
+C (9,1)
+C     BEGIN BLOCK
+C (9,2)
+100   CONTINUE                                                          0012
+C (9,3)
+      J = 1                                                             0013
+C     END BLOCK
+C (3,1)
+200   CONTINUE                                                          0014
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+300   CONTINUE                                                          0015
+C (4,3)
+      J = J+1                                                           0016
+C     END BLOCK
+C (5,1)
+      IF (J.LT.10) GOTO 300                                             0017
+C (6,1)
+      IF (I+J.GT.105) GOTO 400                                          0018
+C (10,1)
+      I = I+1                                                           0019
+C (8,1)
+      IF (I.LT.100) THEN                                                0020
+         GOTO 100
+      ELSE
+         GOTO 400
+      ENDIF
+99999 CONTINUE
+C (2,1)
+      J = 2                                                             0009
+      GOTO 200
+C (7,1)
+400   CONTINUE                                                          0021
+C     END UNSTRUCTURED
+C (0,5)
+      PRINT *, I, J                                                     0022
+
+C     END BLOCK
+      END
+
+C  T() {}
+
+      PROGRAM UNSTRUC14
+
+C  T(I,J,N) {J==10, 96<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(N) {}
+
+C (0,2)
+
+C     Triplication of a cycle: it does not work because Bourdoncle's
+C     procedure happens to break both cycles with node "j=j+1"
+
+      READ *, N                                                         0006
+
+C  T(I) {I==1}
+
+C (0,3)
+      I = 1                                                             0007
+
+C  T(I,J) {J==10, 96<=I, I#init<=I}
+
+C (0,4)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+      IF (N.GT.0) GOTO 99999                                            0008
+
+C  T(J) {J==1}
+
+C (9,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (9,2)
+100   CONTINUE                                                          0012
+
+C  T(J) {J==1}
+
+C (9,3)
+      J = 1                                                             0013
+C     END BLOCK
+
+C  T() {}
+
+C (3,1)
+200   CONTINUE                                                          0014
+
+C  T(J) {J==J#init+1}
+
+C (4,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (4,2)
+300   CONTINUE                                                          0015
+
+C  T(J) {J==J#init+1}
+
+C (4,3)
+      J = J+1                                                           0016
+C     END BLOCK
+
+C  T() {}
+
+C (5,1)
+      IF (J.LT.10) GOTO 300                                             0017
+
+C  T() {}
+
+C (6,1)
+      IF (I+J.GT.105) GOTO 400                                          0018
+
+C  T(I) {I==I#init+1}
+
+C (10,1)
+      I = I+1                                                           0019
+
+C  T() {}
+
+C (8,1)
+      IF (I.LT.100) THEN                                                0020
+         GOTO 100
+      ELSE
+         GOTO 400
+      ENDIF
+99999 CONTINUE
+
+C  T(J) {J==2}
+
+C (2,1)
+      J = 2                                                             0009
+      GOTO 200
+
+C  T() {}
+
+C (7,1)
+400   CONTINUE                                                          0021
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,5)
+      PRINT *, I, J                                                     0022
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      PROGRAM UNSTRUC14
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     Triplication of a cycle: it does not work because Bourdoncle's
+C     procedure happens to break both cycles with node "j=j+1"
+
+      READ *, N                                                         0006
+
+C  P(N) {}
+
+C (0,3)
+      I = 1                                                             0007
+
+C  P(I,N) {I==1}
+
+C (0,4)
+C     BEGIN UNSTRUCTURED
+
+C  P(I,N) {I==1}
+
+C (1,1)
+      IF (N.GT.0) GOTO 99999                                            0008
+
+C  P(I,J,N) {1<=I, I<=96}
+
+C (9,1)
+C     BEGIN BLOCK
+
+C  P(I,J,N) {1<=I, I<=96}
+
+C (9,2)
+100   CONTINUE                                                          0012
+
+C  P(I,J,N) {1<=I, I<=96}
+
+C (9,3)
+      J = 1                                                             0013
+C     END BLOCK
+
+C  P(I,J,N) {1<=I, I+95J<=191, 1<=J}
+
+C (3,1)
+200   CONTINUE                                                          0014
+
+C  P(I,J,N) {1<=I, I<=96, 1<=J, J<=9}
+
+C (4,1)
+C     BEGIN BLOCK
+
+C  P(I,J,N) {1<=I, I<=96, 1<=J, J<=9}
+
+C (4,2)
+300   CONTINUE                                                          0015
+
+C  P(I,J,N) {1<=I, I<=96, 1<=J, J<=9}
+
+C (4,3)
+      J = J+1                                                           0016
+C     END BLOCK
+
+C  P(I,J,N) {1<=I, I<=96, 2<=J, J<=10}
+
+C (5,1)
+      IF (J.LT.10) GOTO 300                                             0017
+
+C  P(I,J,N) {J==10, 1<=I, I<=96}
+
+C (6,1)
+      IF (I+J.GT.105) GOTO 400                                          0018
+
+C  P(I,J,N) {J==10, 1<=I, I<=95}
+
+C (10,1)
+      I = I+1                                                           0019
+
+C  P(I,J,N) {J==10, 2<=I, I<=96}
+
+C (8,1)
+      IF (I.LT.100) THEN                                                0020
+         GOTO 100
+      ELSE
+         GOTO 400
+      ENDIF
+99999 CONTINUE
+
+C  P(I,N) {I==1, 1<=N}
+
+C (2,1)
+      J = 2                                                             0009
+      GOTO 200
+
+C  P(I,J,N) {I==96, J==10}
+
+C (7,1)
+400   CONTINUE                                                          0021
+C     END UNSTRUCTURED
+
+C  P(I,J,N) {I==96, J==10}
+
+C (0,5)
+      PRINT *, I, J                                                     0022
+
+C     END BLOCK
+      END
+

@@ -1,0 +1,7 @@
+delete sfrov
+create sfrov Tests/sfrov.f
+module SFROV
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+display PRINTED_FILE[SFROV]
+quit
+

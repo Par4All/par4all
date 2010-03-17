@@ -1,0 +1,40 @@
+
+Parsed code for "decl04"
+
+void decl04()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   {
+      // BEGIN BLOCK
+      int j = i;
+
+      i = i+1;
+
+      foo(j);
+      // END BLOCK
+   }
+
+   foo(i);
+   // END BLOCK
+}
+
+Controlized code for "decl04"
+
+void decl04()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   {
+      // BEGIN BLOCK
+      int j = i;
+
+      i = i+1;
+
+      foo(j);
+      // END BLOCK
+   }
+
+   foo(i);
+   // END BLOCK
+}

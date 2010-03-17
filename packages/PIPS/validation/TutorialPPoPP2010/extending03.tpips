@@ -1,0 +1,12 @@
+delete extending03
+create extending03 extending03.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+activate MUST_REGIONS
+
+apply SCALARIZATION[SCALARIZATION]
+apply CLEAN_DECLARATIONS[SCALARIZATION]
+display PRINTED_FILE[SCALARIZATION]
+
+close
+quit

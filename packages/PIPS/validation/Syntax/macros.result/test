@@ -1,0 +1,44 @@
+Code...
+
+      INTEGER FUNCTION BLA(I)
+      INTEGER I, COUNT
+      DATA COUNT /0/
+      COUNT = COUNT+1                                                   0005
+      BLA = COUNT                                                       0006
+      END
+! trying macros...
+      PROGRAM MACRO
+      INTEGER J
+      EXTERNAL BLA
+      INTEGER BLA
+
+! let us deal with macros...
+C$PIPS STATEMENT FUNCTION SUCC SUBSTITUTED
+
+      J = 0                                                             0010
+
+! hey, here it is used...      
+      PRINT *, J+1                                                      0013
+      PRINT *, BLA(3)+1                                                 0014
+
+! another macro
+C$PIPS STATEMENT FUNCTION FOO SUBSTITUTED
+
+      PRINT *, 2+3-2                                                    0019
+      PRINT *, BLA(1)+3-2                                               0020
+      PRINT *, 1+BLA(4)+5-2                                             0021
+
+! a third one
+C$PIPS STATEMENT FUNCTION NEXT SUBSTITUTED
+
+      PRINT *, J*J*J-J*J*J                                              0026
+      PRINT *, BLA(J)*BLA(J)*BLA(J)-BLA(2)*BLA(2)*BLA(2)                0027
+      PRINT *, BLA(K)*BLA(K)*BLA(K)-BLA(2)*BLA(2)*BLA(2)                0028
+
+      PRINT *, (I+1)*(I+1)*(I+1)-(1+2-2)*(1+2-2)*(1+2-2)                0030
+
+      END
+Callgraph...
+ BLA
+ MACRO
+     BLA

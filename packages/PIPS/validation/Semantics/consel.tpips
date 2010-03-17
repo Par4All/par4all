@@ -1,0 +1,26 @@
+delete consel
+create consel consel.f
+
+# setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+# setproperty PRETTYPRINT_BLOCKS TRUE
+
+# setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+# setproperty PRETTYPRINT_ALL_LABELS TRUE
+
+# setproperty PRETTYPRINT_INTERNAL_RETURN FALSE
+
+# setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+# setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[XDR_SEND]
+close
+delete consel
+quit

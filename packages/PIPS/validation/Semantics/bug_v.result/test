@@ -1,0 +1,69 @@
+Transformers:
+-------------
+
+
+C  T(GAMA:N) {}
+
+      PROGRAM BUG_V
+
+C  T(GAMA:N,N) {}
+
+
+C     Bug found in CEA's benchv
+
+C     Double occurence of the same variable in a 
+C     precondition argument list
+
+      IF (X.GT.0.) THEN                                                 0008
+
+C  T(GAMA:N) {}
+
+         Y = GAMA(XX, IER)                                              0009
+      ELSE
+
+C  T(N) {N==3}
+
+         N = 3                                                          0011
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, Y, N                                                     0014
+
+      END
+
+Preconditions:
+--------------
+
+
+C  P() {}
+
+      PROGRAM BUG_V
+
+C  P() {}
+
+
+C     Bug found in CEA's benchv
+
+C     Double occurence of the same variable in a 
+C     precondition argument list
+
+      IF (X.GT.0.) THEN                                                 0008
+
+C  P() {}
+
+         Y = GAMA(XX, IER)                                              0009
+      ELSE
+
+C  P() {}
+
+         N = 3                                                          0011
+      ENDIF
+
+C  P(GAMA:N,N) {}
+
+
+      PRINT *, Y, N                                                     0014
+
+      END

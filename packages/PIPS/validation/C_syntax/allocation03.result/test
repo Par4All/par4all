@@ -1,0 +1,121 @@
+foo
+
+Declarations for module "foo" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "allocation03!:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 12
+	Declared entity "foo:*HEAP*" with type "area" with size 0
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 4
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "foo:0`k" with type "variable" "int"
+	Declared entity "foo:0`l" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 4
+
+
+Layout for memory area "allocation03!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*DYNAMIC*" of size 12:
+	Variable "foo:0`k"	offset = 8	size = 4
+	Variable "foo:0`__func__"	offset = 0	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 4	size = 4
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STATIC*" of size 4:
+	Variable "foo:0`l"	offset = 0	size = 4
+
+End of declarations for module foo
+
+main
+
+Declarations for module "main" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "allocation03!:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 98
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 4
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:0`array" with type "variable" "float"
+	Declared entity "main:0`fooi" with type "variable" "int"
+	Declared entity "main:0`i" with type "variable" "int"
+	Declared entity "main:0`j" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 4
+
+
+Layout for memory area "allocation03!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 98:
+	Variable "main:0`i"	offset = 10	size = 4
+	Variable "main:0`fooi"	offset = 14	size = 4
+	Variable "main:0`array"	offset = 18	size = 80
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 4:
+	Variable "main:0`j"	offset = 0	size = 4
+
+End of declarations for module main
+
+void foo()
+{
+   int k;
+   static int l;
+}
+int main()
+{
+   int i;
+   int fooi;
+   float array[20];
+   static int j;
+   foo();
+   return 0;
+}

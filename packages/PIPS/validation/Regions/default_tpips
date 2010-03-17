@@ -1,0 +1,10 @@
+delete $WSPACE
+create $WSPACE $FILE
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+close
+delete $WSPACE
+quit

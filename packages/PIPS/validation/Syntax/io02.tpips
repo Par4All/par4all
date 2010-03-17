@@ -1,0 +1,8 @@
+delete io02
+create io02 io02.f
+module IO02
+display PRINTED_FILE[IO02]
+close
+delete io02
+quit
+

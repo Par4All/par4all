@@ -1,0 +1,34 @@
+C     Check that j is privatized
+
+      SUBROUTINE PRIVATIZATION05
+      INTEGER A(10, 10)
+
+
+!$OMP DO PRIVATE(I,J,K)
+      DO I = 1, 10                                                      0006
+
+!$OMP    DO PRIVATE(J,K)
+         DO K = 1, 10                                                   0007
+         PRIVATE(I,J,K)
+            PRIVATE(J,K)
+            J = 0                                                       0008
+            J = J+1                                                     0009
+            A(I,K) = J                                                  0010
+         ENDDO
+      ENDDO
+      END
+C     Check that j is privatized
+
+      SUBROUTINE PRIVATIZATION05
+      INTEGER A(10, 10)
+
+      DOALL I = 1, 10                                                   0006
+         PRIVATE K,I
+         DOALL K = 1, 10                                                0007
+            PRIVATE K,J
+            J = 0                                                       0008
+            J = J+1                                                     0009
+            A(I,K) = J                                                  0010
+         ENDDO
+      ENDDO
+      END

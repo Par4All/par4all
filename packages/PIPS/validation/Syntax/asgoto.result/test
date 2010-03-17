@@ -1,0 +1,91 @@
+
+Output of the parser
+
+      PROGRAM ASGOTO
+
+C     Check desugaring of assigned go to's and elimination of carriage returns
+
+      I = 100                                                           0005
+
+      I = 200                                                           0007
+
+      GOTO 600
+
+      IF (I.EQ.100) THEN                                                0011
+         GOTO 100
+      ENDIF
+      IF (I.EQ.300) THEN                                                0011
+         GOTO 300
+      ELSE
+         STOP                                                           0011
+      ENDIF
+
+600   IF (I.EQ.400) THEN                                                0013
+         GOTO 400
+      ELSE
+         STOP                                                           0013
+      ENDIF
+
+500   IF (I.EQ.100) THEN                                                0015
+         GOTO 100
+      ENDIF
+      IF (I.EQ.300) THEN                                                0015
+         GOTO 300
+      ENDIF
+      IF (I.EQ.400) THEN                                                0015
+         GOTO 400
+      ELSE
+         STOP                                                           0015
+      ENDIF
+
+100   CONTINUE                                                          0017
+      PRINT *, 'I reach 100'                                            0018
+      PRINT *, I                                                        0019
+
+      STOP                                                              0021
+300   CONTINUE                                                          0022
+      PRINT *, 'I reach 300'                                            0023
+      STOP                                                              0024
+200   CONTINUE                                                          0025
+      PRINT *, 'I reach 200'                                            0026
+      STOP                                                              0027
+400   CONTINUE                                                          0028
+      PRINT *, 'I reach 400'                                            0029
+      GOTO 500
+      END
+
+Output of the controlizer
+
+      PROGRAM ASGOTO
+
+C     Check desugaring of assigned go to's and elimination of carriage returns
+
+      I = 100                                                           0005
+
+      I = 200                                                           0007
+
+
+600   IF (I.EQ.400) GOTO 400                                            0013
+      STOP                                                              0013
+
+500   IF (I.EQ.100) GOTO 100                                            0015
+      IF (I.EQ.300) GOTO 300                                            0015
+      IF (I.EQ.400) GOTO 400                                            0015
+      STOP                                                              0015
+
+100   CONTINUE                                                          0017
+      PRINT *, 'I reach 100'                                            0018
+      PRINT *, I                                                        0019
+
+      STOP                                                              0021
+300   CONTINUE                                                          0022
+      PRINT *, 'I reach 300'                                            0023
+      STOP                                                              0024
+200   CONTINUE                                                          0025
+      PRINT *, 'I reach 200'                                            0026
+      STOP                                                              0027
+400   CONTINUE                                                          0028
+      PRINT *, 'I reach 400'                                            0029
+      GOTO 500
+      END
+

@@ -1,0 +1,29 @@
+C     Check that j is not privatized in the first loop, but privatized
+C     in the second one... However, j is not initialized before its use
+C     in the first loop, the value of j does not matter and hence j can
+C     be privatized in both loops. But j is statically initialized by a
+C     DATA and allocated in the STATIC area, which makes it non eligible
+C     for privatization.
+
+C     See also privatization01, 07, 08, 09 and 10
+
+      SUBROUTINE PRIVATIZATION11
+      INTEGER A(10)
+      DATA J/0/
+
+
+!$OMP DO PRIVATE(I)
+      DO I = 1, 10                                                      0014
+         PRIVATE(I)
+         J = J+1                                                        0015
+         A(I) = J                                                       0016
+      ENDDO
+
+
+!$OMP DO PRIVATE(I)
+      DO I = 1, 10                                                      0019
+         PRIVATE(I)
+         J = 1                                                          0020
+         A(I) = J                                                       0021
+      ENDDO
+      END

@@ -1,0 +1,10 @@
+      FUNCTION GREAL(C)
+C
+C     REAL PART OF COMPLEX NUMBER.
+C
+      REAL*8 GREAL
+      COMPLEX*16 C
+C
+      GREAL = DBLE(C)
+      RETURN
+      END

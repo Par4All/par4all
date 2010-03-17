@@ -1,0 +1,24 @@
+
+C  T() {}
+
+      PROGRAM TYPE22
+
+C     Variable and constant lengths must be taken into account and substring applied
+
+      CHARACTER*3 S1
+      CHARACTER*5 S2
+
+C  T(S1) {"Hel"==S1}
+
+
+C     Should be truncated
+      S1 = "Hello World!"                                               0009
+
+C  T(S2) {"Z"==S2}
+
+
+C     Should be (implictly) SPACE padded
+      S2 = "Z"                                                          0012
+
+      END
+

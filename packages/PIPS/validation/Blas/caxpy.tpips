@@ -1,0 +1,9 @@
+setenv WS = caxpy
+delete $WS
+create $WS $WS.f include/simd.f scabs1.f
+
+module `echo $WS | tr '[:lower:]' '[:upper:]'`
+
+source include/sac.tpips
+
+close

@@ -1,0 +1,16 @@
+delete A
+create A tiling-numeric.f
+#create A tiling.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+activate MUST_REGIONS
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+close
+

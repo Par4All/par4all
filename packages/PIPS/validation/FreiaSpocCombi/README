@@ -1,0 +1,11 @@
+Combinatorial tests of freia spoc scheduler and wiring.
+1005 cases are considered, reduced from 6912 thanks to
+symmetries and the constraint that temporaries are used.
+
+To run this validation:
+
+  sh> make generate
+  # generate 1005 files
+  sh> make validate
+  # there should be no coredumps, i.e. no remaining databases
+  sh> make full-clean   

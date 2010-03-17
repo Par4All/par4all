@@ -1,0 +1,23 @@
+delete scalopes03
+create scalopes03 scalopes03.c
+
+setenv SCALOPIFY_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+
+display PRINTED_FILE[main]
+
+apply SCALOPIFY[main]
+
+display PRINTED_FILE[%ALL]
+
+close
+delete scalopes03
+quit

@@ -1,0 +1,10 @@
+delete stack02
+create stack02 stack02.f
+module STACK02
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[STACK02]
+close
+delete stack02
+quit

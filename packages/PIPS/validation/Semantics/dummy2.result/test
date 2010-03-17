@@ -1,0 +1,22 @@
+
+C  P() {}
+
+      SUBROUTINE DUMMY2
+
+c     Check translation mechanism when variables are not visible in the
+c     current procedure.
+
+      COMMON /FOO/NDUMMY(2),K,L,M,N
+      REAL N
+
+C  P() {}
+
+
+      CALL BAR                                                          0009
+
+C  P(K,L,M) {K==3, L==5, M==4}
+
+
+      PRINT *, K, L, M, N                                               0011
+
+      END

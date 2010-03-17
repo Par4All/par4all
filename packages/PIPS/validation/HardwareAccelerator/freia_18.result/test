@@ -1,0 +1,361 @@
+
+! initial function
+
+freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   
+   
+   
+   freia_data2d *u0 = freia_common_create_data(16, 128, 128), *u1 = freia_common_create_data(16, 128, 128), *u2 = freia_common_create_data(16, 128, 128), *u3 = freia_common_create_data(16, 128, 128), *t0 = freia_common_create_data(16, 128, 128);       /*0010*/
+   
+   // useless computations
+   // u0 = i0 + i1
+   // u1 = u0
+   // u2 = u1 - i0
+   // t0 = i0 & i1
+   // o = t0 ^ i1
+   // u3 = o | i1
+   freia_aipo_add(u0, i0, i1);                                          /*0019*/
+   freia_aipo_copy(u1, u0);                                             /*0020*/
+   freia_aipo_sub(u2, u1, i0);                                          /*0021*/
+   freia_aipo_and(t0, i0, i1);                                          /*0022*/
+   freia_aipo_xor(o, t0, i1);                                           /*0023*/
+   freia_aipo_or(u3, o, i1);                                            /*0024*/
+
+   freia_common_destruct_data(u0);                                      /*0026*/
+   freia_common_destruct_data(u1);                                      /*0027*/
+   freia_common_destruct_data(u2);                                      /*0028*/
+   freia_common_destruct_data(u3);                                      /*0029*/
+   freia_common_destruct_data(t0);                                      /*0030*/
+
+   return FREIA_OK;                                                     /*0032*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_18" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "u2" [shape=circle];
+  "o" [shape=circle];
+  "u3" [shape=circle];
+
+  // computation vertices
+  "24 |" [shape=trapezium,orientation=270];
+  "24 |" -> "u3";
+  "23 ^" [shape=trapezium,orientation=270];
+  "23 ^" -> "24 |" [label="o"];
+  "23 ^" -> "o";
+  "22 &" [shape=trapezium,orientation=270];
+  "22 &" -> "23 ^" [label="t0"];
+  "21 -" [shape=trapezium,orientation=270];
+  "21 -" -> "u2";
+  "20 =" [shape=circle];
+  "20 =" -> "21 -" [label="u1"];
+  "19 +" [shape=trapezium,orientation=270];
+  "19 +" -> "20 =" [label="u0"];
+  "i1" -> "24 |";
+  "i1" -> "23 ^";
+  "i1" -> "22 &";
+  "i1" -> "19 +";
+  "i0" -> "22 &";
+  "i0" -> "21 -";
+  "i0" -> "19 +";
+}
+// graph for dag "dag_cleaned_0" of module "freia_18" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "u2" [shape=circle];
+  "o" [shape=circle];
+  "u3" [shape=circle];
+
+  // computation vertices
+  "24 |" [shape=trapezium,orientation=270];
+  "24 |" -> "u3";
+  "23 ^" [shape=trapezium,orientation=270];
+  "23 ^" -> "24 |" [label="o"];
+  "23 ^" -> "o";
+  "22 &" [shape=trapezium,orientation=270];
+  "22 &" -> "23 ^" [label="t0"];
+  "21 -" [shape=trapezium,orientation=270];
+  "21 -" -> "u2";
+  "19 +" [shape=trapezium,orientation=270];
+  "19 +" -> "21 -" [label="u0"];
+  "i1" -> "24 |";
+  "i1" -> "23 ^";
+  "i1" -> "22 &";
+  "i1" -> "19 +";
+  "i0" -> "22 &";
+  "i0" -> "21 -";
+  "i0" -> "19 +";
+}
+// graph for dag "freia_18_helper_0_0" of module "freia_18" in dot format
+digraph "freia_18_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "u2" [shape=circle];
+
+  // computation vertices
+  "21 -" [shape=trapezium,orientation=270];
+  "21 -" -> "u2";
+  "19 +" [shape=trapezium,orientation=270];
+  "19 +" -> "21 -" [label="u0"];
+  "i1" -> "19 +";
+  "i0" -> "21 -";
+  "i0" -> "19 +";
+}
+// graph for dag "freia_18_helper_0_1" of module "freia_18" in dot format
+digraph "freia_18_helper_0_1" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+  "u3" [shape=circle];
+
+  // computation vertices
+  "24 |" [shape=trapezium,orientation=270];
+  "24 |" -> "u3";
+  "23 ^" [shape=trapezium,orientation=270];
+  "23 ^" -> "24 |" [label="o"];
+  "23 ^" -> "o";
+  "22 &" [shape=trapezium,orientation=270];
+  "22 &" -> "23 ^" [label="t0"];
+  "i1" -> "24 |";
+  "i1" -> "23 ^";
+  "i1" -> "22 &";
+  "i0" -> "22 &";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_18
+freia_status freia_18_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i0 [0 input 0] -> [0 alu] 19 add
+  // nope
+  // i1 [0 input 1] -> [0 alu] 19 add
+  // nope
+  // alu 19 add stage 0
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+
+
+  // STAGE 1
+  // i0 [0 input 0] -> [1 alu] 21 sub
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // i0 [1 input 0] -> [1 alu] 21 sub
+  // nope
+  // 0`u0 [0 alu] -> [1 alu] 21 sub
+  si.mux[0][1].op = SPOC_MUX_IN1;
+  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`u0 [1 input 1] -> [1 alu] 21 sub
+  // nope
+  // alu 21 sub stage 1 flipped
+  si.alu[1][0].op = SPOC_ALU_SUB_IN1_IN0;
+
+
+  // output image 0`u2 on 0
+  // 0`u2 [1 alu] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`u2 [1 output 0] -> [7 output 0] 0 null
+  // 0`u2 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`u2 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`u2 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`u2 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`u2 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`u2 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_18
+freia_status freia_18_helper_0_1_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i0 [0 input 0] -> [0 alu] 22 and
+  // nope
+  // i1 [0 input 1] -> [0 alu] 22 and
+  // nope
+  // alu 22 and stage 0
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
+
+
+  // STAGE 1
+  // 0`t0 [0 alu] -> [1 alu] 23 xor
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`t0 [1 input 0] -> [1 alu] 23 xor
+  // nope
+  // i1 [0 input 1] -> [1 alu] 23 xor
+  si.mux[0][3].op = SPOC_MUX_IN1;
+  // i1 [1 input 1] -> [1 alu] 23 xor
+  // nope
+  // alu 23 xor stage 1
+  si.alu[1][0].op = SPOC_ALU_XOR_IN0_IN1;
+
+
+  // STAGE 2
+  // o [1 alu] -> [2 alu] 24 or
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+  // o [2 input 0] -> [2 alu] 24 or
+  // nope
+  // i1 [1 poc 1] -> [2 alu] 24 or
+  si.mux[1][3].op = SPOC_MUX_IN1;
+  // i1 [2 input 1] -> [2 alu] 24 or
+  // nope
+  // alu 24 or stage 2
+  si.alu[2][0].op = SPOC_ALU_OR_IN0_IN1;
+
+
+  // output image o on 0 and image 0`u3 on 1
+  // o [2 poc 0] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // o [2 output 0] -> [7 output 0] 0 null
+  // o [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // o [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // o [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // o [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // o [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  // 0`u3 [2 alu] -> [2 output 1] 0 null
+  si.mux[2][1].op = SPOC_MUX_IN1;
+  si.mux[2][3].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`u3 [2 output 1] -> [7 output 1] 0 null
+  // 0`u3 [3 input 1] -> [7 output 1] 0 null
+  si.mux[3][3].op = SPOC_MUX_IN1;
+  // 0`u3 [4 input 1] -> [7 output 1] 0 null
+  si.mux[4][3].op = SPOC_MUX_IN1;
+  // 0`u3 [5 input 1] -> [7 output 1] 0 null
+  si.mux[5][3].op = SPOC_MUX_IN1;
+  // 0`u3 [6 input 1] -> [7 output 1] 0 null
+  si.mux[6][3].op = SPOC_MUX_IN1;
+  // 0`u3 [7 input 1] -> [7 output 1] 0 null
+  si.mux[7][3].op = SPOC_MUX_IN1;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
+
+  return ret;
+}
+
+! updated function
+
+freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   
+   
+   
+   freia_data2d *u2 = freia_common_create_data(16, 128, 128), *u3 = freia_common_create_data(16, 128, 128);          /*0010*/
+   
+   // useless computations
+   // u0 = i0 + i1
+   // u1 = u0
+   // u2 = u1 - i0
+   // t0 = i0 & i1
+   // o = t0 ^ i1
+   // u3 = o | i1
+   freia_18_helper_0_0_0(u2, i0, i1);                                   /*0019*/
+   freia_18_helper_0_1_0(o, u3, i0, i1);                                /*0022*/
+
+   freia_common_destruct_data(u2);                                      /*0028*/
+   freia_common_destruct_data(u3);                                      /*0029*/
+
+   return FREIA_OK;                                                     /*0032*/
+}

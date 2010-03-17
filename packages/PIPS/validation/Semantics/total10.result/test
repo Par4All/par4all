@@ -1,0 +1,73 @@
+
+C  T() {1<=N}
+
+      SUBROUTINE TOTAL10(A, N)
+
+C     Check that may be executed loops are proprely handled and that
+C     total postcondition is generated for subroutines in the
+C     intraprocedural case
+
+      REAL A(N)
+
+C  T(I,M) {1<=I, M+1<=I, I<=N+1, 1<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(M) {1<=N}
+
+C (0,2)
+
+      READ *, M                                                         0009
+
+C  T(I) {1<=I, 1<=N}
+
+C (0,3)
+
+      DO I = 1, M                                                       0011
+
+C  T() {1<=I, I<=M, I<=N, 1<=N}
+
+C (0,4)
+         A(I) = 0.                                                      0012
+      ENDDO
+
+C     END BLOCK
+      END
+
+C TP() {1<=N}
+
+      SUBROUTINE TOTAL10(A, N)
+
+C     Check that may be executed loops are proprely handled and that
+C     total postcondition is generated for subroutines in the
+C     intraprocedural case
+
+      REAL A(N)
+
+C TP() {1<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {1<=N}
+
+C (0,2)
+
+      READ *, M                                                         0009
+
+C TP() {M<=N, 1<=N}
+
+C (0,3)
+
+      DO I = 1, M                                                       0011
+
+C TP() {1<=I, I<=M, I<=N, 0<=M, M<=N, 1<=N}
+
+C (0,4)
+         A(I) = 0.                                                      0012
+      ENDDO
+
+C     END BLOCK
+      END
+

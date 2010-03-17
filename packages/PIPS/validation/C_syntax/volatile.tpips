@@ -1,0 +1,19 @@
+
+
+delete volatile
+
+create volatile volatile.c
+
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[main]
+
+close
+
+delete volatile
+
+quit

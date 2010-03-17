@@ -1,0 +1,14 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
+setproperty PRETTYPRINT_COMMONS "include"
+
+delete d7
+create d7 decl7.f
+
+apply CLEAN_DECLARATIONS[%ALL]
+apply UNSPLIT
+
+close
+
+shell cat d7.database/Src/*
+# delete d7

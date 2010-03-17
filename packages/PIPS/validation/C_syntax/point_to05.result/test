@@ -1,0 +1,11 @@
+
+parsed printed file
+
+void point_to05()
+{
+   f_t *g;
+   ((*g)()+2)->foo = 1;
+   ((*g)()+(int) 2.)->foo = 1;
+   (2+(*g)())->foo = 1;
+   ((*g)()-2)->foo = 1;
+}

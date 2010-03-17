@@ -1,0 +1,22 @@
+create $WKS jacobi.c p4a_stubs.c
+
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 0
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+apply LOOP_NORMALIZE[%ALLFUNC]
+
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALLFUNC]
+
+activate PRINT_CODE
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+display PRINTED_FILE[compute]
+
+apply GPU_IFY[%ALLFUNC]
+apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0, p4a_kernel_launcher_1, p4a_kernel_launcher_2, p4a_kernel_launcher_3, p4a_kernel_launcher_4]
+apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0, p4a_kernel_launcher_1, p4a_kernel_launcher_2, p4a_kernel_launcher_3, p4a_kernel_launcher_4]
+
+apply INLINING[p4a_kernel_0, p4a_kernel_1, p4a_kernel_2, p4a_kernel_3, p4a_kernel_4]
+...

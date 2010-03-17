@@ -1,0 +1,13 @@
+echo testing syntax errors...
+open open open.f
+close foo
+create 
+create hello
+getenv FOO FOOF
+setenv FOO
+setenv FOO FOO FOO
+getproperty A A
+delete open open 
+module
+module FOO fOO
+echo done...

@@ -1,0 +1,52 @@
+
+Parser output
+
+void constants03()
+{
+   int i = 0xff000000;
+   int j = 0xffffffff;
+   int t;
+
+   i = 0xff000000;
+   j = 0xffffffff;
+   t = i+j;
+}
+
+Controlizer output
+
+void constants03()
+{
+   int i = 0xff000000;
+   int j = 0xffffffff;
+   int t;
+
+   i = 0xff000000;
+   j = 0xffffffff;
+   t = i+j;
+}
+
+Preconditions
+
+
+//  P() {}
+
+void constants03()
+{
+   int i = 0xff000000;
+   int j = 0xffffffff;
+   int t;
+
+//  P() {i==-16777216, j==-1}
+
+
+   i = 0xff000000;
+
+//  P(i) {i==-16777216, j==-1}
+
+   j = 0xffffffff;
+
+//  P(i,j) {i==-16777216, j==-1}
+
+   t = i+j;
+}
+

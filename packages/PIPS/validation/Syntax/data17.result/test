@@ -1,0 +1,24 @@
+
+C  P() {}
+
+      SUBROUTINE DATA17
+
+C     Use parameters in DATA statements
+
+      PARAMETER (M=10)
+
+      INTEGER TAB(M)
+
+      DATA TAB,I/M*M,M/
+
+C  P() {}
+
+
+      J = M                                                             0011
+
+C  P(J) {J==10}
+
+
+      PRINT *, I, J                                                     0013
+
+      END

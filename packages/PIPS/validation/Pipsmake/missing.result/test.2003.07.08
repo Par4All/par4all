@@ -1,0 +1,40 @@
+  Module         CALLMISSING
+Workspace missing created and opened.
+Module CALLMISSING selected
+Main module PROGRAM "CALLMISSING" selected.
+Module CALLMISSING already active.
+Module CALLMISSING already active.
+Module CALLMISSING already active.
+Request: build resource CALLGRAPH_FILE for module CALLMISSING.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CALLMISSING)
+  PARSER                         building   PARSED_CODE(CALLMISSING)
+                                 building   CALLEES(CALLMISSING)
+  CONTROLIZER                    building   CODE(CALLMISSING)
+  INITIALIZER                    building   USER_FILE(MISSING)
+                                 building   INITIAL_FILE(MISSING)
+user error in initializer: no source file for MISSING (might be an ENTRY point)
+set PREPROCESSOR_MISSING_FILE_HANDLING to "query" or "generate"...
+user error in build_real_resources: unable to build callees for MISSING
+Some source code probably is missing!
+user warning in safe_do_something: Request aborted in pipsmake: build resource CALLGRAPH_FILE for module CALLMISSING.
+user error in display_a_resource: Cannot build view file CALLGRAPH_FILE
+Module CALLMISSING already active.
+Request: build resource PRINTED_FILE for module CALLMISSING.
+  PRINT_CODE                     building   PRINTED_FILE(CALLMISSING)
+PRINTED_FILE made for CALLMISSING.
+      PROGRAM CALLMISSING
+
+      CALL MISSING(3)                                                   0001
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CALLMISSING.
+  Closing module MISSING.
+Closing program.
+Closing workspace.
+Workspace missing closed.
+
+Workspace missing deleted.

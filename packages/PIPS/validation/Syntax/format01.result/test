@@ -1,0 +1,29 @@
+user warning in tp_parse: format01: No such workspace
+Registering file format01.f
+Splitting file    ./format01.f
+  Module         FORMAT01
+Workspace format01 created and opened.
+Module FORMAT01 selected
+Main module PROGRAM "FORMAT01" selected.
+Module FORMAT01 already active.
+Module FORMAT01 already active.
+Request: build resource PRINTED_FILE for module FORMAT01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(FORMAT01)
+  PARSER                         building   PARSED_CODE(FORMAT01)
+                                 building   CALLEES(FORMAT01)
+user warning in check_in_declarations: FORMAT statement within declarations. In order to analyze this code, please set property PRETTYPRINT_ALL_DECLARATIONS or move this FORMAT down in executable code.
+user error in Syntax: Parser error between lines 8 and 8
+Source cannot be parsed with current properties
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module FORMAT01.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module FORMAT01.
+Closing program.
+Closing workspace.
+Workspace format01 closed.
+
+Workspace format01 deleted.

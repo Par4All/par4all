@@ -1,0 +1,30 @@
+int main()
+{
+   float a[10];
+   float b[10][10][10][10][10];
+   int m = 0;
+   int n = 0;
+   int o = 2;
+
+   for(m = 0; m <= 9; m += 1) {
+//  call sum[n],
+      n = n+1;
+      a[m] = n;
+   }
+//  loop sum[o],
+
+   for(m = 0; m <= 9; m += 1) {
+//  call sum[n],
+      // comments 4
+      n = n+1;
+//  call sum[o],
+      o = 2+o;
+//  call sum[o],
+      o = 2+o;
+//  call sum[n],
+      n = n+5;
+      b[0][0][1][m][0] = n;
+   }
+
+   return o;
+}

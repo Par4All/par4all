@@ -1,0 +1,53 @@
+      SUBROUTINE FOO(X,Y)
+      INTEGER Y
+      REAL X(*)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 10
+C (0,3)
+         X(I) = 1.
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+      PROGRAM MAIN
+      PARAMETER (N=10)
+      REAL A(N)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL FOO(A, N)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for adn04.f
+!!
+      PROGRAM MAIN
+      PARAMETER (N=10)
+      REAL A(N)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL FOO(A, N)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE FOO(X,Y)
+      INTEGER Y
+      REAL X(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 10
+C (0,3)
+         X(I) = 1.
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

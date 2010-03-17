@@ -1,0 +1,43 @@
+# Check effect translation problems destroy semantics information
+
+echo
+echo First version: masking
+echo
+
+shell rm -f mask1.f
+shell sed s/cfirst// mask.f >mask1.f
+
+delete mask
+create mask mask1.f
+
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+
+module MASK
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete mask
+shell rm -f mask1.f
+
+echo
+echo Second version: no masking
+echo
+
+shell rm -f mask2.f
+shell sed s/csecond// mask.f >mask2.f
+
+create mask mask2.f
+
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+
+module MASK
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete mask
+shell rm -f mask2.f
+quit

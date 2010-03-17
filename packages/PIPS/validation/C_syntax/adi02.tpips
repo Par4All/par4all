@@ -1,0 +1,23 @@
+delete adi02
+create adi02 adi02.c
+
+# echo cat adi02.database/[a-z_]*[a-z_]/*.c
+# shell for i in adi.database/[a-z_]*[a-z_]/*.c; do echo;echo Module `basename $i .c`;echo; \
+# 	cat $i; done
+
+# close
+# delete adi
+# quit
+
+# How can you guess whether it is a C file or a Fortran file?
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+display PRINTED_FILE[adi02]
+
+close
+# delete adi
+quit

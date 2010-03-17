@@ -1,0 +1,97 @@
+user warning in tp_parse: save07: No such workspace
+Registering file save07.f
+Splitting file    ./save07.f
+  Module         SAVE07
+Workspace save07 created and opened.
+Module SAVE07 selected
+Main module PROGRAM "SAVE07" selected.
+Module SAVE07 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module SAVE07 already active.
+Request: build resource PRINTED_FILE for module SAVE07.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(SAVE07)
+  PARSER                         building   PARSED_CODE(SAVE07)
+                                 building   CALLEES(SAVE07)
+
+Declarations for module SAVE07 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity SAVE07:*DYNAMIC*	with type area with size 0
+Declared entity SAVE07:*HEAP*	with type area with size 0
+Declared entity SAVE07:*STACK*	with type area with size 0
+Declared entity SAVE07:*STATIC*	with type area with size 904
+Declared entity SAVE07:U	with type variable REAL*4
+Declared entity SAVE07:V	with type variable REAL*4
+Declared entity SAVE07:W	with type variable REAL*4
+Declared entity SAVE07:X	with type variable REAL*4
+Declared entity SAVE07:Y	with type variable REAL*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 904:
+	Variable SAVE07:Y,	offset = 0,	size = 200
+	Variable SAVE07:W,	offset = 500,	size = 400
+	Variable SAVE07:V,	offset = 900,	size = 4
+	Variable SAVE07:X,	offset = 100,	size = 200
+	Variable SAVE07:U,	offset = 300,	size = 400
+
+End of declarations for module SAVE07
+
+  CONTROLIZER                    building   CODE(SAVE07)
+  PRINT_CODE                     building   PRINTED_FILE(SAVE07)
+PRINTED_FILE made for SAVE07.
+      PROGRAM SAVE07
+
+C     Check that offsets in the static area are correct regardless of 
+C     equivalences. Variable v is not equivalenced on purpose: it should
+C     be allocated *after* the equivalenced variables in the static area.
+
+C     Size of static area: 904, 300 for the (x,y) chain and 600 for the (u,w) chain, 4 for v
+C     offsets for u=300 (after the (x,y) chain)
+C     offsets for v=900 (added at the end of area, after equivalenced variables)
+C     offsets for w=500 (located from u(50))
+C     offsets for x=100
+C     offsets for y=0
+      SAVE U
+      SAVE V
+      SAVE W
+      SAVE X
+      SAVE Y
+
+      REAL X(50), Y(50), U(100), W(100)
+
+      EQUIVALENCE (X(25),Y(50))
+      EQUIVALENCE (U(100), W(50))
+
+      X(1) = Y+W(10)                                                    0024
+
+      PRINT *, U, Y                                                     0026
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module SAVE07.
+Closing program.
+Closing workspace.
+Workspace save07 closed.
+
+Workspace save07 deleted.

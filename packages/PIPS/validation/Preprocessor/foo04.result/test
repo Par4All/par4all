@@ -1,0 +1,12 @@
+
+Printed file
+
+
+
+      PROGRAM FOO4
+
+C Check that preprocessed files are removed from Tmp
+
+      PRINT *, "foo4"                                                   0007
+
+      END

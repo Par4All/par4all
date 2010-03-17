@@ -1,0 +1,19 @@
+delete csplit19
+create csplit19 csplit19.c
+
+# check... what?
+
+# quit
+
+# This has nothing to do with the preprocessing
+
+close
+open csplit19
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display PRINTED_FILE[csplit19]
+close
+delete csplit19
+quit

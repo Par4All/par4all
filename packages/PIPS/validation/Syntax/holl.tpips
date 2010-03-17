@@ -1,0 +1,7 @@
+delete h
+echo try too large hollerith constants...
+create h holl.f
+echo must have failed...
+close
+delete h
+quit

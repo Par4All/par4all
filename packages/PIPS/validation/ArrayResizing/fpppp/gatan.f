@@ -1,0 +1,9 @@
+      FUNCTION GATAN (ARG)
+C
+C     ARC TANGENT
+C
+      REAL*8 GATAN,DATAN,ARG
+C
+      GATAN = DATAN (ARG)
+      RETURN
+      END

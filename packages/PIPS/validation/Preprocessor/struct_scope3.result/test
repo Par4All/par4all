@@ -1,0 +1,11 @@
+# 1
+struct toto
+{
+  int i;
+}
+
+foo()
+{
+  struct toto x;
+}
+extern bstruct toto { int i; } foo();

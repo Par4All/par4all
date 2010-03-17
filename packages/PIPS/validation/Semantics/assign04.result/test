@@ -1,0 +1,74 @@
+
+Source code with proper effects
+
+void assign04()
+{
+   int i;                                                               /*0004*/
+//               <must be written>: i
+   
+   // This assignment works fine with transformers
+   i = (i = 2)+1;                                                       /*0007*/
+//               <must be written>: i
+   
+   // Go around the problem with user_call_to_transformer()
+   foo(i = (i = 2)+1);                                                  /*0010*/
+//               <must be written>: i
+   
+   // As in:
+   i = (i = 2)+1;                                                       /*0013*/
+//               <must be read   >: i
+   foo(i);                                                              /*0014*/
+}
+
+Source code with cumulated effects
+
+void assign04()
+{
+   int i;                                                               /*0004*/
+//               <must be written>: i
+   
+   // This assignment works fine with transformers
+   i = (i = 2)+1;                                                       /*0007*/
+//               <must be written>: i
+   
+   // Go around the problem with user_call_to_transformer()
+   foo(i = (i = 2)+1);                                                  /*0010*/
+//               <must be written>: i
+   
+   // As in:
+   i = (i = 2)+1;                                                       /*0013*/
+//               <must be read   >: i
+   foo(i);                                                              /*0014*/
+}
+
+Source code with transformers
+
+
+//  T() {}
+
+void assign04()
+{
+   int i;                                                               /*0004*/
+
+//  T(i) {i==3}
+
+   
+   // This assignment works fine with transformers
+   i = (i = 2)+1;                                                       /*0007*/
+
+//  T(i) {i==3}
+
+   
+   // Go around the problem with user_call_to_transformer()
+   foo(i = (i = 2)+1);                                                  /*0010*/
+
+//  T(i) {i==3}
+
+   
+   // As in:
+   i = (i = 2)+1;                                                       /*0013*/
+
+//  T() {}
+
+   foo(i);                                                              /*0014*/
+}

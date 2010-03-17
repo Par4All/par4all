@@ -1,0 +1,46 @@
+
+Source code for all modules, including block data modules
+
+
+      BLOCKDATA BAR1
+      COMMON /FOO/J
+      DATA J /1/
+      END
+      PROGRAM INITIAL5
+
+C     See what happens with aliases: it should not work
+C     but it *does* work. Why?
+
+      COMMON /FOO/I
+
+      PRINT *, I                                                        0008
+
+      END
+
+Initial preconditions for each module
+
+
+C  P() {J==1}
+
+
+C  P() {}
+
+
+Preconditions with initial precondition for program INITIAL5
+
+
+C  P() {I==1}
+
+      PROGRAM INITIAL5
+
+C     See what happens with aliases: it should not work
+C     but it *does* work. Why?
+
+      COMMON /FOO/I
+
+C  P() {I==1}
+
+
+      PRINT *, I                                                        0008
+
+      END

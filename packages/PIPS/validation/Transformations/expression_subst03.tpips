@@ -1,0 +1,17 @@
+delete expression_subst03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create expression_subst03 expression_subst03.c include/patterns.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[test]
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "selfadd"
+apply EXPRESSION_SUBSTITUTION
+display PRINTED_FILE[test]
+
+close expression_subst03
+delete expression_subst03

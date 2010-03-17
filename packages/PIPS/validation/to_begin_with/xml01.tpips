@@ -1,0 +1,15 @@
+setenv WKS xml01
+delete $WKS
+create $WKS $WKS.c
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display PRINTED_FILE[%ALLFUNC]
+apply SIMPLE_XPATH_TEST[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WKS
+
+quit

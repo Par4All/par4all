@@ -1,0 +1,22 @@
+c
+      SUBROUTINE CHAR_(CH,IERR0,IERR1)
+      IMPLICIT REAL*4 (A-H,O-Z)
+      CHARACTER*16 STRING0
+      CHARACTER*75 STRING1
+      CHARACTER*1 CH
+      DATA STRING0/'+,.eE-1234567890'/ 
+      DATA STRING1(1:25)/'abcdfghijklmnopqrstuvwxyz'/
+      DATA STRING1(26:50)/'ABCDFGHIJKLMNOPQRSTUVWXYZ'/
+      DATA STRING1(51:75)/'!@#$%^&*()_=[]{}:;"|\\~`/?'/
+      SAVE STRING0,STRING1
+      IERR0 = 1                                                         0012
+      IERR1 = 0                                                         0013
+      DO 1 K = 1, 16                                                    0014
+         IF (CH.EQ.STRING0(K:K)) IERR0 = 0                              0015
+1        CONTINUE                                                       0016
+      IF (IERR0.EQ.1) THEN                                              0017
+         DO 2 K = 1, 75                                                 0018
+            IF (CH.EQ.STRING1(K:K)) IERR1 = 1                           0019
+2           CONTINUE                                                    0022
+      ENDIF
+      END

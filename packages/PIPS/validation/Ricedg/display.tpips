@@ -1,0 +1,30 @@
+delete display
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create display impactmaymust1.f
+module FOO
+
+echo
+echo Printed file for "IMPACTMAYMUST"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Printed file with cumulated effects for "IMPACTMAYMUST"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Whole dependence graph for "IMPACTMAYMUST"
+echo
+
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+display DG_FILE
+close
+delete display
+quit

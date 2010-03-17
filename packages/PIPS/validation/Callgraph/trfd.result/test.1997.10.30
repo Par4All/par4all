@@ -1,0 +1,21 @@
+
+C  P() {}
+
+ TRFD
+    
+C      P() {10<=NP, NP<=40}
+    
+     INTGRL
+    
+C      P() {IW==6, 0<=JFLAG, JFLAG<=1, 10<=NORB, NORB<=40}
+    
+     TRFPRT
+        
+C          P() {NCALL==0, J<=I, K<=I, 1<=J, 1<=K, L<=K, 1<=L}
+        
+         TRFOUT
+    
+C      P() {MORB==NUM, 10<=NUM, NUM<=40}
+    
+     OLDA
+

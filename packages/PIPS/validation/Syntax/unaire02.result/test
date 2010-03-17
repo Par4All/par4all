@@ -1,0 +1,8 @@
+      PROGRAM UNAIRE02
+
+C     Priority for unary minus
+
+c     print *, -1+(-1)
+      PRINT *, -1+(-1)                                                  0006
+
+      END

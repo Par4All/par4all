@@ -1,0 +1,17 @@
+!
+! fichier non vide.
+!
+      PROGRAM NONVIDE
+      PRINT *, 'pas vide'                                               0005
+      END
+v.database/Src/nonvide.f
+!!
+!! file for nonvide.f
+!!
+!
+! fichier non vide.
+!
+      PROGRAM NONVIDE
+      PRINT *, 'pas vide'                                               0005
+      END
+

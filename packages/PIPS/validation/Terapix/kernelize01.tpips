@@ -1,0 +1,59 @@
+delete kernelize01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create kernelize01 kernelize01.c include/load.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+display PRINTED_FILE[memload]
+module foo
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+echo
+echo Code after kernelization
+echo
+
+setproperty LOOP_LABEL "kernel"
+setproperty KERNELIZE_NBNODES 10
+setproperty KERNELIZE_KERNEL_NAME "kernel"
+setproperty KERNELIZE_HOST_CALL_NAME "run_kernel"
+apply KERNELIZE
+display PRINTED_FILE[foo]
+display PRINTED_FILE[run_kernel]
+display PRINTED_FILE[kernel]
+
+setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
+setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
+setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "memalloc"
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "memfree"
+apply KERNEL_LOAD_STORE[run_kernel]
+display PRINTED_FILE
+
+echo
+echo Code after cleanup
+echo
+
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c kernelize01.database/Src/kernelize01.c  -o kernelize01.database/Src/kernelize.o
+shell rm -rf kernelize01.database/Src/kernelize.o
+
+close
+delete kernelize01
+quit
+

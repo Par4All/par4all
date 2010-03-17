@@ -1,0 +1,21 @@
+delete nga09
+create nga09 nga09.f
+
+activate TRANSFORMERS_INTER_FULL
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate PRINT_CODE_TRANSFORMERS
+
+display PRINTED_FILE
+
+# activate PRINT_CODE_PRECONDITIONS
+
+# display PRINTED_FILE
+
+close
+delete nga09
+
+
+
+

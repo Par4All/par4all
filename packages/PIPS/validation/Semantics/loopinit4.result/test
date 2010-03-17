@@ -1,0 +1,105 @@
+# transformers
+
+C  T() {}
+
+      PROGRAM LOOPINIT4
+
+C     Like loopinit2, but computing transformer in context
+
+c     Check that loop index initialization is performed correctly: the initial
+c     value of i is preserved by the loop
+
+c Not handled properly by PIPS: inc(j) is evaluated when the initial value 
+c of index i is computed (this is an assignment and the user call is detected), 
+c but it is not evaluated when the loop range is c computed (because only affine
+c ranges are taken into account)!
+
+C     A fix: add an intermediate value and use it to call inc(j), use it as a
+c     lower loop bound.
+
+      REAL T(10)
+
+C  T(J) {J==2}
+
+
+      J = 2                                                             0018
+
+C  T(N) {J==2, N==0}
+
+
+      N = 0                                                             0020
+
+C  T(I,J) {J#init==1, N==0}
+
+
+      DO I = INC(J), N                                                  0022
+
+C  T(J) {N==0, I<=0}
+
+         T(I) = 0.                                                      0023
+
+C  T(J) {J==J#init+2, N==0, I<=0}
+
+         J = J+2                                                        0024
+      ENDDO
+
+C  T() {I==3, N==0}
+
+
+c     The precondition should be: i==3, j==3
+      PRINT *, I, J                                                     0028
+
+      END
+# preconditions
+
+C  P() {}
+
+      PROGRAM LOOPINIT4
+
+C     Like loopinit2, but computing transformer in context
+
+c     Check that loop index initialization is performed correctly: the initial
+c     value of i is preserved by the loop
+
+c Not handled properly by PIPS: inc(j) is evaluated when the initial value 
+c of index i is computed (this is an assignment and the user call is detected), 
+c but it is not evaluated when the loop range is c computed (because only affine
+c ranges are taken into account)!
+
+C     A fix: add an intermediate value and use it to call inc(j), use it as a
+c     lower loop bound.
+
+      REAL T(10)
+
+C  P() {}
+
+
+      J = 2                                                             0018
+
+C  P(J) {J==2}
+
+
+      N = 0                                                             0020
+
+C  P(J,N) {J==2, N==0}
+
+
+      DO I = INC(J), N                                                  0022
+
+C  P() {0==-1}
+
+         T(I) = 0.                                                      0023
+
+C  P() {0==-1}
+
+         J = J+2                                                        0024
+      ENDDO
+
+C  P(I,J,N) {I==4, J==4, N==0}
+
+
+c     The precondition should be: i==3, j==3
+      PRINT *, I, J                                                     0028
+
+      END
+

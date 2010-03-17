@@ -1,0 +1,147 @@
+ STF
+STF
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (1.1):
+	"I" used but not initialized.
+
+number of messages from flint for STF : 1
+
+C  P() {}
+
+C
+C
+      PROGRAM STF
+C
+      INTEGER I
+      INTEGER J
+
+C  P() {}
+
+C
+      IF (I.EQ.1) GOTO 100                                              0001
+
+C  P() {}
+
+      J = 2                                                             0003
+      GOTO 200
+
+C  P() {I==1}
+
+
+100   CONTINUE                                                          0004
+
+C  P() {I==1}
+
+      J = 3                                                             0005
+
+C  P(J) {2<=J, J<=3}
+
+
+200   CONTINUE                                                          0006
+      END
+
+C  P() {}
+
+C
+C
+      PROGRAM STF
+C
+      INTEGER I
+      INTEGER J
+
+C  P() {}
+
+C
+      IF (I.EQ.1) GOTO 100                                              0001
+
+C  P() {}
+
+      J = 2                                                             0003
+      GOTO 200
+
+C  P() {I==1}
+
+
+100   CONTINUE                                                          0004
+
+C  P() {I==1}
+
+      J = 3                                                             0005
+
+C  P(J) {2<=J, J<=3}
+
+
+200   CONTINUE                                                          0006
+      END
+
+C  P() {}
+
+C
+C
+      PROGRAM STF
+C
+      INTEGER I
+      INTEGER J
+
+C  P() {}
+
+C
+      IF (I.EQ.1) GOTO 100                                              0001
+
+C  P() {}
+
+      J = 2                                                             0003
+      GOTO 200
+
+C  P() {I==1}
+
+
+100   CONTINUE                                                          0004
+
+C  P() {I==1}
+
+      J = 3                                                             0005
+
+C  P(J) {2<=J, J<=3}
+
+
+200   CONTINUE                                                          0006
+      END
+
+C  P() {}
+
+C
+C
+      PROGRAM STF
+C
+      INTEGER I
+      INTEGER J
+
+C  P() {}
+
+C
+      IF (I.EQ.1) GOTO 100                                              0001
+
+C  P() {}
+
+      J = 2                                                             0003
+      GOTO 200
+
+C  P() {I==1}
+
+
+100   CONTINUE                                                          0004
+
+C  P() {I==1}
+
+      J = 3                                                             0005
+
+C  P(J) {2<=J, J<=3}
+
+
+200   CONTINUE                                                          0006
+      END
+

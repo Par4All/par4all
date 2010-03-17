@@ -1,0 +1,42 @@
+
+Printed file
+
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0003
+
+c     An asymetrical then test
+      IF (J.GE.3) GOTO 99999                                            0006
+100   PRINT *, J                                                        0010
+
+c     A null test
+      IF (K.GT.27) THEN                                                 0013
+         GOTO 200
+      ELSE
+         GOTO 200
+      ENDIF
+99999 CONTINUE
+      I = 3                                                             0007
+      GOTO 100
+200   CONTINUE                                                          0014
+      PRINT *, K                                                        0014
+
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0003
+
+c     An asymetrical then test
+      IF (J.GE.3) I = 3                                                 0006
+100   PRINT *, J                                                        0010
+
+c     A null test
+      IF (K.GT.27) THEN                                                 0013
+      ENDIF
+200   CONTINUE                                                          0014
+      PRINT *, K                                                        0014
+
+      END

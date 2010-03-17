@@ -1,0 +1,28 @@
+
+Print a new module
+
+      SUBROUTINE ADDED_MODULES
+
+      PRINT *, 'added_modules'                                          0001
+
+      END
+
+Print all known modules known to pipsmake: there should be three
+
+      SUBROUTINE ADDED_MODULES
+
+      PRINT *, 'added_modules'                                          0001
+
+      END
+C     Check that a several new modules can be added to a workspace
+C     when one of them is named in tpips
+
+      PROGRAM ADD_MODULE02
+
+      END
+
+      SUBROUTINE ANOTHER_ADDED_MODULE
+
+      PRINT *, 'another_added_module'                                   0001
+
+      END

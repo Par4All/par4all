@@ -1,0 +1,41 @@
+      PROGRAM TEST1
+
+      INTEGER I,J,NC,JC
+C      parameter (NC=100)
+      REAL  ZG,V(100),W(100),G(100,100),GAMAI(100)
+
+      NC = 50                                                           0007
+      JC = 30                                                           0008
+      DO 320 I = 1, NC                                                  0009
+         V(I) = 0.                                                      0010
+         W(I) = 0.                                                      0011
+         IF (I.GT.10) THEN                                              0012
+         ELSE
+            DO J = 1, JC                                                0014
+               W(I) = W(I)/V(I)                                         0015
+               GAMAI(I) = W(I)+G(I,J)                                   0016
+            ENDDO
+         ENDIF
+320      CONTINUE                                                       0019
+
+      END
+      PROGRAM TEST1
+
+      INTEGER I,J,NC,JC
+C      parameter (NC=100)
+      REAL  ZG,V(100),W(100),G(100,100),GAMAI(100)
+
+      NC = 50                                                           0007
+      JC = 30                                                           0008
+      DO 320 I = 1, NC                                                  0009
+         V(I) = 0.                                                      0010
+         W(I) = 0.                                                      0011
+         IF (I.LE.10) THEN                                              0012
+            DO J = 1, JC                                                0014
+               W(I) = W(I)/V(I)                                         0015
+               GAMAI(I) = W(I)+G(I,J)                                   0016
+            ENDDO
+         ENDIF
+320      CONTINUE                                                       0019
+
+      END

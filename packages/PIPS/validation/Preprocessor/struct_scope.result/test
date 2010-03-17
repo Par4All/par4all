@@ -1,0 +1,48 @@
+# 23
+int foo()
+{
+  struct key
+  {
+    int node;
+  };
+  return 1;
+}
+# 6
+main()
+{
+  int i = 1;
+  struct key
+  {
+    int node;
+  };
+  if (i>1)
+    {
+      struct key
+      {
+        float node;
+      };
+    }
+  printf("Test\n");
+}
+struct key
+  {
+    int node;
+  };
+
+extern main();
+
+extern int foo();
+
+extern int toto();
+# 32
+int toto()
+{
+  int i = 1;
+  if (i>0)
+    {
+      struct test
+      {
+        float a;
+      };
+    }
+}

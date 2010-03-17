@@ -1,0 +1,74 @@
+
+Initial source code
+
+int strip_mining01(int *in, int *val)
+{
+   int x[512];
+   int i;
+
+l1:
+   for(i = 0; i <= 511; i += 1)
+      x[i] = 0;
+
+   return 0;
+}
+
+Source code after strip mining
+
+int strip_mining01(int *in, int *val)
+{
+   int x[512];
+   int i;
+   //PIPS generated variable
+   int i_1;
+
+l1:
+   for(i_1 = 0; i_1 <= 511; i_1 += 128)
+      for(i = i_1; i <= MIN(i_1+127, 511); i += 1)
+         x[i] = 0;
+
+   return 0;
+}
+
+Check preconditions on strip-mined loop
+
+
+//  P() {}
+
+int strip_mining01(int *in, int *val)
+{
+   int x[512];
+   int i;
+   //PIPS generated variable
+   int i_1;
+
+//  P() {}
+
+
+l1:
+   for(i_1 = 0; i_1 <= 511; i_1 += 128)
+
+//  P(i,i_1) {0<=i_1, i_1<=511}
+
+      for(i = i_1; i <= MIN(i_1+127, 511); i += 1)
+
+//  P(i,i_1) {i_1<=i, 0<=i_1, i_1<=511}
+
+         x[i] = 0;
+
+//  P(i,i_1) {i_1<=i+128, 512<=i_1, i_1<=639}
+
+
+   return 0;
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[strip_mining01] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning strip_mining01 instead
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[strip_mining01] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[strip_mining01] (NormalizeExpression) expression is already normalized
+PRECONDITIONS_INTER_FULL[strip_mining01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[strip_mining01] (add_or_kill_equivalenced_variables) storage return

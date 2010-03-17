@@ -1,0 +1,34 @@
+delete edited03
+create edited03 edited03.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[EDITED03]
+display PRINTED_FILE[BAR]
+display PRINTED_FILE[IBAR]
+
+# CleanLocalEntities() should not be called up to here
+
+# quit
+
+# Check for subroutines
+
+shell mv edited03.database/BAR/BAR.f foo.f ; sleep 2 ; \
+	sed 's,!%,,' < foo.f > edited03.database/BAR/BAR.f ; rm foo.f
+display PRINTED_FILE[BAR]
+shell mv edited03.database/BAR/BAR.f foo.f ; sleep 2 ; \
+	sed 's,real,integer,;s,10,3,' < foo.f > edited03.database/BAR/BAR.f ; 
+display PRINTED_FILE[BAR]
+
+# Check for functions
+
+shell mv edited03.database/IBAR/IBAR.f foo.f ; sleep 2 ; \
+	sed 's,!%,,' < foo.f > edited03.database/IBAR/IBAR.f ; rm foo.f
+display PRINTED_FILE[IBAR]
+shell mv edited03.database/IBAR/IBAR.f foo.f ; sleep 2 ; \
+	sed 's,real,integer,;s,10,3,' < foo.f > edited03.database/IBAR/IBAR.f ; 
+display PRINTED_FILE[IBAR]
+
+close
+delete edited03
+quit

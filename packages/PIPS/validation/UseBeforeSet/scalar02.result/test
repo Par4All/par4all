@@ -1,0 +1,30 @@
+C       Uninitialized scalar variables
+	PROGRAM SCALAR02
+	INTEGER X,Y,A,B
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      X = Y
+C (0,3)
+      A = B
+C (0,4)
+      PRINT *, X, A
+C (0,5)
+      B = 1
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for scalar02.f
+!!
+	PROGRAM SCALAR02
+	INTEGER X,Y,A,B
+      STOP "Variable Y is used before set"
+      STOP "Variable B is used before set"
+      X = Y
+      A = B
+      PRINT *, X, A
+      B = 1
+      RETURN
+      END

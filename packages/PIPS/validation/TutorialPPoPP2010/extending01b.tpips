@@ -1,0 +1,11 @@
+delete extending01b
+create extending01b extending01b.c
+
+setproperty PREPEND_COMMENT " PPoPP Bangalore"
+
+apply PREPEND_COMMENT[%ALLFUNC]
+
+apply UNSPLIT[extending01b]
+
+close
+quit

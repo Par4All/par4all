@@ -1,0 +1,30 @@
+user warning in tp_parse: equiv23: No such workspace
+Registering file equiv23.f
+Splitting file    ./equiv23.f
+  Module         EQUIV23
+Workspace equiv23 created and opened.
+Module EQUIV23 selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV23 already active.
+Request: build resource PRINTED_FILE for module EQUIV23.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV23)
+  PARSER                         building   PARSED_CODE(EQUIV23)
+                                 building   CALLEES(EQUIV23)
+user warning in MakeEquivAtom: Adjustable array A appears in EQUIVALENCE declaration
+user error in MakeEquivAtom: Parser error between lines 11 and 11
+Adjustable array in equivalence chain
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV23.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV23.
+Closing program.
+Closing workspace.
+Workspace equiv23 closed.
+
+Workspace equiv23 deleted.

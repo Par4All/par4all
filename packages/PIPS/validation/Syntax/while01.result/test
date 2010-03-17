@@ -1,0 +1,11 @@
+      PROGRAM WHILE01
+
+      REAL X(100)
+
+      I = 100                                                           0005
+      DO 100 WHILE (I.GT.1)                                             0006
+         X(I) = 0.                                                      0007
+         I = I-1                                                        0008
+100      CONTINUE                                                       0009
+
+      END

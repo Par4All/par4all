@@ -1,0 +1,129 @@
+
+C  T() {}
+
+      PROGRAM NGA01
+C
+  
+      REAL WLOOP(13,13)
+      INTEGER R,T,RMIN,RMAX,TMIN(13),TMAX(13),WHICH(13,13)
+ 
+      REAL FC(2)
+
+C  T(R,T) {1<=R}
+
+
+      DO 2 R = 1, 13                                                    0009
+
+C  T(T) {1<=T}
+
+         DO 2 T = 1, 13                                                 0010
+
+C  T() {}
+
+            WHICH(R,T) = 0                                              0011
+
+C  T() {}
+
+2           CONTINUE                                                    0012
+
+C  T(R,T) {RMIN<=R}
+
+
+      DO 3 R = RMIN, RMAX                                               0014
+
+C  T(T) {1<=T}
+
+         DO 3 T = 1, 13                                                 0015
+
+C  T() {}
+
+            IF (T.GE.TMIN(R+1).AND.T.LE.TMAX(R+1)) WHICH(R+1,T+1) = 1   0016
+
+C  T() {}
+
+3           CONTINUE                                                    0019
+
+C  T(R,T) {RMIN<=R}
+
+
+      DO 4 R = RMIN, RMAX                                               0021
+
+C  T(T) {}
+
+         DO 4 T = TMIN(R+1), TMAX(R+1)                                  0022
+
+C  T() {}
+
+            FC(2) = WLOOP(R+1,T+1)                                      0023
+
+C  T() {}
+
+
+4           CONTINUE                                                    0025
+C     
+      END
+
+C  P() {}
+
+      PROGRAM NGA01
+C
+  
+      REAL WLOOP(13,13)
+      INTEGER R,T,RMIN,RMAX,TMIN(13),TMAX(13),WHICH(13,13)
+ 
+      REAL FC(2)
+
+C  P() {}
+
+
+      DO 2 R = 1, 13                                                    0009
+
+C  P(R,T) {1<=R, R<=13}
+
+         DO 2 T = 1, 13                                                 0010
+
+C  P(R,T) {1<=R, R<=13, 1<=T, T<=13}
+
+            WHICH(R,T) = 0                                              0011
+
+C  P(R,T) {1<=R, R<=13, 1<=T, T<=13}
+
+2           CONTINUE                                                    0012
+
+C  P(R,T) {R==14, T==14}
+
+
+      DO 3 R = RMIN, RMAX                                               0014
+
+C  P(R,T) {R<=RMAX, RMIN<=R}
+
+         DO 3 T = 1, 13                                                 0015
+
+C  P(R,T) {R<=RMAX, RMIN<=R, 1<=T, T<=13}
+
+            IF (T.GE.TMIN(R+1).AND.T.LE.TMAX(R+1)) WHICH(R+1,T+1) = 1   0016
+
+C  P(R,T) {R<=RMAX, RMIN<=R, 1<=T, T<=13}
+
+3           CONTINUE                                                    0019
+
+C  P(R,T) {T==14, RMAX+1<=R, RMIN<=R}
+
+
+      DO 4 R = RMIN, RMAX                                               0021
+
+C  P(R,T) {R<=RMAX, RMIN<=R}
+
+         DO 4 T = TMIN(R+1), TMAX(R+1)                                  0022
+
+C  P(R,T) {R<=RMAX, RMIN<=R}
+
+            FC(2) = WLOOP(R+1,T+1)                                      0023
+
+C  P(R,T) {R<=RMAX, RMIN<=R}
+
+
+4           CONTINUE                                                    0025
+C     
+      END
+

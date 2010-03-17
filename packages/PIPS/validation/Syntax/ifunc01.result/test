@@ -1,0 +1,42 @@
+
+      SUBROUTINE BLA()
+      INTEGER FOO
+      I = FOO()                                                         0004
+      END
+
+! fonctionne avec
+!      INTEGER FUNCTION FOO()
+!
+! fonctionne si on renomme FOO en BLA et BLA en FOO
+!
+      FUNCTION FOO()
+      INTEGER FOO
+      FOO = 0                                                           0009
+      END
+
+C  T(FOO) {FOO==0}
+
+
+! fonctionne avec
+!      INTEGER FUNCTION FOO()
+!
+! fonctionne si on renomme FOO en BLA et BLA en FOO
+!
+      FUNCTION FOO()
+      INTEGER FOO
+
+C  T(FOO) {FOO==0}
+
+      FOO = 0                                                           0009
+      END
+
+C  T() {}
+
+
+      SUBROUTINE BLA()
+      INTEGER FOO
+
+C  T(I) {I==0}
+
+      I = FOO()                                                         0004
+      END

@@ -1,0 +1,25 @@
+C
+C     GAUSS METHOD
+C
+C     DEPENDENCE COMPUTAION WITH AND WITHOUT EXECUTION CONTEXT
+C     PRIVATIZATION
+C
+      SUBROUTINE GAUSS(A, N)
+C     
+      INTEGER N
+      REAL A(N,N)
+C     
+      DO L = 1, N-1                                                     0001
+         XAUX = A(L,L)                                                  0002
+         DOALL J = L+1, N                                               0003
+            A(L,J) = A(L,J)/XAUX                                        0004
+         ENDDO
+         DO I = L+1, N                                                  0005
+            XAUX = A(I,L)                                               0006
+            DOALL K = L+1, N                                            0007
+               A(I,K) = A(I,K)-XAUX*A(L,K)                              0008
+            ENDDO
+         ENDDO
+      ENDDO
+C     
+      END

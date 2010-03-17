@@ -1,0 +1,56 @@
+
+Cumulated effects for "main"
+
+//               <must be read   >: TOP-LEVEL:delta
+main()
+{
+//               <must be read   >: TOP-LEVEL:delta i
+//               <must be written>: i
+   // BEGIN BLOCK
+   int i = 0;
+//               <must be read   >: TOP-LEVEL:delta i
+//               <must be written>: i
+
+   i = i+delta;
+   // END BLOCK
+}
+
+Transformers for "main"
+
+
+//  T() {TOP-LEVEL:delta==1}
+
+main()
+{
+
+//  T() {TOP-LEVEL:delta==1}
+
+   // BEGIN BLOCK
+   int i = 0;
+
+//  T(i) {TOP-LEVEL:delta==1, i==1, i#init==0}
+
+
+   i = i+delta;
+   // END BLOCK
+}
+
+Preconditions for "main"
+
+
+//  P() {TOP-LEVEL:delta==1}
+
+main()
+{
+
+//  P() {TOP-LEVEL:delta==1}
+
+   // BEGIN BLOCK
+   int i = 0;
+
+//  P() {TOP-LEVEL:delta==1, i==0}
+
+
+   i = i+delta;
+   // END BLOCK
+}

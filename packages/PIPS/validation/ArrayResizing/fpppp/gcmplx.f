@@ -1,0 +1,6 @@
+      FUNCTION GCMPLX(X,Y)
+      REAL*8 X, Y
+      COMPLEX*16 GCMPLX, CMPLX
+      GCMPLX = CMPLX(X,Y)
+      RETURN
+      END

@@ -1,0 +1,15 @@
+delete aa02
+create aa02 aa02.f
+
+# Interprocedural parallelism canot be expressed in Fortran 90
+# activate REGION_CHAINS
+
+activate PRINT_PARALLELIZED90_CODE
+
+display PARALLELPRINTED_FILE
+close
+shell cp aa02.database/AA02/AA02.parf foo.f
+shell gfortran foo.f
+shell rm foo.f a.out
+delete aa02
+quit

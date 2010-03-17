@@ -1,0 +1,19 @@
+C     BUG: missing comments
+C
+C     Corrected by Francois Irigoin, 10 March 1991
+C
+      PROGRAM COMM
+C     first comment
+      X = 1                                                             0007
+C     second comment 1
+C     second comment 2
+      X = 2                                                             0010
+C     third comment 1
+C     third comment 2
+C     third comment 3
+      X = 3                                                             0014
+C     fourth comment
+      IF (X.EQ.3) RETURN                                                0016
+C     fifth comment
+C     sixth comment
+      END

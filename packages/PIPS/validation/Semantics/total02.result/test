@@ -1,0 +1,65 @@
+
+C  T() {}
+
+      PROGRAM TOTAL02
+
+      REAL A(10)
+
+C  T(N) {1<=N, N<=9}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(N) {}
+
+C (0,2)
+
+      READ *, N                                                         0005
+
+C  T() {1<=N, N<=10}
+
+C (0,3)
+
+      A(N) = 0.                                                         0007
+
+C  T() {0<=N, N<=9}
+
+C (0,4)
+
+      A(N+1) = 0.                                                       0009
+
+C     END BLOCK
+      END
+
+C TP() {}
+
+      PROGRAM TOTAL02
+
+      REAL A(10)
+
+C TP() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {}
+
+C (0,2)
+
+      READ *, N                                                         0005
+
+C TP() {1<=N, N<=9}
+
+C (0,3)
+
+      A(N) = 0.                                                         0007
+
+C TP() {0<=N, N<=9}
+
+C (0,4)
+
+      A(N+1) = 0.                                                       0009
+
+C     END BLOCK
+      END
+

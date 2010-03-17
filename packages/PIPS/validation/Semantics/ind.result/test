@@ -1,0 +1,46 @@
+--- Preconditions for module DATAST
+
+C  P() {OUT:COUNT==0}
+
+
+      SUBROUTINE DATAST
+
+C  P() {OUT:COUNT==0}
+
+
+      CALL OUT                                                          0004
+
+C  P(OUT:COUNT) {OUT:COUNT==1, OUT:COUNT#init==0}
+
+      J = 2                                                             0005
+
+      END
+--- Preconditions for module IND
+
+C  P() {COUNT==0}
+
+C     bug: information maltraitee quand elle porte sur une variable non visible
+C     sur un sous-programme intermediaire, ici datast; cet exemple est tire de ocean.f
+
+C     C'est un choix explicite de semantics, implemente dans translate_global_value()
+C     Ca conduit a des erreurs puisqu'une modif de variable globale passe inapercue.
+C     J'hesite quand meme a modifier quelque chose d'aussi fondamental tout de suite,
+C     dans la mesure ou des ajouts de declaration de COMMONs permettent de contourner
+C     le probleme. Le seul cas de coincement vient de la presence de deux variables
+C     dans deux COMMONs differents, portant le meme nom.
+
+      PROGRAM IND
+      INTEGER COUNT
+      COMMON /FOO/ COUNT
+      DATA COUNT /0/
+
+C  P() {COUNT==0}
+
+
+      CALL DATAST                                                       0016
+
+C  P(COUNT) {COUNT==1, COUNT#init==0}
+
+      I = 1                                                             0017
+
+      END

@@ -1,0 +1,43 @@
+      SUBROUTINE NON_LINEAR05
+
+C     Excerpt from init in wave5_data.f
+
+      PARAMETER (NBB=512)
+      PARAMETER(NC1 = 78885)
+      PARAMETER (N1D=5000)
+
+      COMMON  PBUF(NBB,5),Q(NC1),TEMP(2*N1D),TBUF(5,NBB)
+
+      PARAMETER (NNS=25)
+      PARAMETER ( NNS1 = NNS + 1, NNS2 = NNS * 2 )
+
+      COMMON/PARAM/IT,NC,NB,NP,IMPSW,NRAND,KJSMTH,KQSMTH,
+     *    KEI,KEE,KSP,NPTIME,
+     *    NSP,NPX(NNS),NPY(NNS),NSPEC(NNS),IDNX(NNS1),IDNY(NNS1),
+     *    IBCNDL(NNS),IBCNDR(NNS),IBCNDT(NNS),IBCNDB(NNS),
+     *    LOADED(NNS),LOSTL(NNS),LOSTR(NNS),INJL(NNS),INJR(NNS)
+
+      NX1=NX+1
+      NX2=NX+2
+      NY1=NY+1
+      NY2=NY+2
+      NX2NY2=NX2*NY2
+
+      DO 210 I=2,NX1
+      Q1=0.D0
+      DO 200 J=2,NY1
+      XX=(I-1.5D0)*HX
+      YY=(J-1.5D0)*HY
+      L=I+(J-1)*NX2
+      DO 200 KSP=1,NSP
+c      TM=DENS(XX,YY)*DSIGN(1.0D0,QSPEC(KSP))
+      IF (NPX(KSP)*NPY(KSP).EQ.0) TM=0.D0
+      Q(L) = Q(L) - TM
+      Q1=Q1+TM
+  200 CONTINUE
+      QAV=QAV-Q1
+  210 CONTINUE
+      WRITE (9,280) QAV
+  280 FORMAT (' NET CHARGE IN SYSTEM = ',E15.5)
+
+      END

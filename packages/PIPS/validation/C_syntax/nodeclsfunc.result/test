@@ -1,0 +1,93 @@
+nodecls
+
+Declarations for module "nodecls" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> int"
+	Declared entity "nodecls:*DYNAMIC*" with type "area" with size 16
+	Declared entity "nodecls:*HEAP*" with type "area" with size 0
+	Declared entity "nodecls:*STACK*" with type "area" with size 0
+	Declared entity "nodecls:*STATIC*" with type "area" with size 0
+	Declared entity "nodecls:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "nodecls:0`__func__" with type "variable" "char"
+	Declared entity "nodeclsfunc!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodecls:*DYNAMIC*" of size 16:
+	Variable "nodecls:0`__func__"	offset = 0	size = 8
+	Variable "nodecls:0`__FUNCTION__"	offset = 8	size = 8
+
+
+Layout for memory area "nodecls:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodecls:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodecls:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodeclsfunc!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module nodecls
+
+nodeclsfunc!
+
+Declarations for module "nodeclsfunc!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:nodecls" with type "functional" "() -> void"
+	Declared entity "nodeclsfunc!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "nodeclsfunc!:*HEAP*" with type "area" with size 0
+	Declared entity "nodeclsfunc!:*STACK*" with type "area" with size 0
+	Declared entity "nodeclsfunc!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:nodecls"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodeclsfunc!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodeclsfunc!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodeclsfunc!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "nodeclsfunc!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module nodeclsfunc!
+
+void nodecls()
+{
+   foo();
+}
+//Checks for No declaration of function
+extern void nodecls();

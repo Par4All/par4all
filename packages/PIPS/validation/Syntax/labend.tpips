@@ -1,0 +1,6 @@
+delete labend
+create labend labend.f
+display PRINTED_FILE[%ALL]
+close
+delete labend
+quit

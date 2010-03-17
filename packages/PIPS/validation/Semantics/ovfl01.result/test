@@ -1,0 +1,99 @@
+
+C  T() {}
+
+      PROGRAM OVFL01
+
+C  T(I) {I==1073741824}
+
+
+      I = 2**30                                                         0003
+
+C  T(J) {I==J+1}
+
+      J = I-1                                                           0004
+
+C  T(K) {I+J==K}
+
+      K = I+J                                                           0005
+
+C  T(L) {K==L-1}
+
+      L = K+1                                                           0006
+
+C  T() {}
+
+      PRINT *, L                                                        0007
+
+C  T() {}
+
+
+      IF (L.GE.0) THEN                                                  0009
+
+C  T() {}
+
+         PRINT *, 'l is positive'                                       0010
+      ELSE
+
+C  T() {}
+
+         PRINT *, 'l is strictly negative'                              0012
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM OVFL01
+
+C  P() {}
+
+
+      I = 2**30                                                         0003
+
+C  P(I) {I==1073741824}
+
+      J = I-1                                                           0004
+
+C  P(I,J) {I==1073741824, J==1073741823}
+
+      K = I+J                                                           0005
+
+C  P(I,J,K) {I==1073741824, J==1073741823, K==2147483647}
+
+      L = K+1                                                           0006
+
+C  P(I,J,K,L) {I==1073741824, J==1073741823, K==2147483647,
+C    L==2147483648}
+
+      PRINT *, L                                                        0007
+
+C  P(I,J,K,L) {I==1073741824, J==1073741823, K==2147483647,
+C    L==2147483648}
+
+
+      IF (L.GE.0) THEN                                                  0009
+
+C  P(I,J,K,L) {I==1073741824, J==1073741823, K==2147483647,
+C    L==2147483648}
+
+         PRINT *, 'l is positive'                                       0010
+      ELSE
+
+C  P() {0==-1}
+
+         PRINT *, 'l is strictly negative'                              0012
+      ENDIF
+
+      END
+      PROGRAM OVFL01
+
+      I = 2**30                                                         0003
+      J = I-1                                                           0004
+      K = I+J                                                           0005
+      L = K+1                                                           0006
+      PRINT *, L                                                        0007
+
+      PRINT *, 'l is positive'                                          0010
+
+      END
+

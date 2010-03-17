@@ -1,0 +1,7 @@
+delete complexe08
+create complexe08 complexe08.f
+module COMPLEXE08
+display PRINTED_FILE[COMPLEXE08]
+close
+delete complexe08
+quit

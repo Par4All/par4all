@@ -1,0 +1,6 @@
+delete verify
+create verify verify.f
+display PRINTED_FILE 
+close
+delete verify
+quit

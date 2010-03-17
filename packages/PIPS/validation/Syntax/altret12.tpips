@@ -1,0 +1,14 @@
+delete altret12
+create altret12 altret12.f
+
+# Make sure that the parser cleans up the data structures when restarted
+
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
+
+display PRINTED_FILE[ALTRET12]
+shell sleep 2; touch altret12.database/ALTRET12/ALTRET12.initial.f
+display PRINTED_FILE[ALTRET12]
+close
+delete altret12
+quit

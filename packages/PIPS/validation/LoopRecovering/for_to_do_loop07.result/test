@@ -1,0 +1,12 @@
+
+Initial code with converted loop
+
+main()
+{
+   int i, j, k;
+   i = 0;
+   while (i<k) {
+      k++;
+      i += 2;
+   }
+}

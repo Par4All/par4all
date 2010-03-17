@@ -1,0 +1,35 @@
+
+Initial source code
+
+int comma01(int *in, int *val)
+{
+   int i;
+   int j;
+   i = 0, j = 0;
+   
+   
+   
+   return 0;
+}
+
+Check transformers on strip-mined loop
+
+
+//  T(comma01) {comma01==0}
+
+int comma01(int *in, int *val)
+{
+   int i;
+   int j;
+
+//  T(i,j) {i==0, j==0}
+
+   i = 0, j = 0;
+
+//  T(comma01) {comma01==0, i==0, j==0}
+
+   
+   
+   
+   return 0;
+}

@@ -1,0 +1,56 @@
+C               <must be read   >: I
+
+      INTEGER FUNCTION INTER10(I)
+C               <must be read   >: I
+C               <must be written>: INTER10
+      INTER10 = I+1                                                     0003
+      END
+
+C  T(INTER10) {I==INTER10-1}
+
+
+      INTEGER FUNCTION INTER10(I)
+
+C  T(INTER10) {I==INTER10-1}
+
+      INTER10 = I+1                                                     0003
+      END
+
+C  P() {}
+
+C     Since i is not used by foo, the precondition i==5 will not be
+C     displayed as it is rightly assumed to be useless. Uncomment the
+C     "print *, i" to see the precondition.
+
+C     It is not clear if this feature is helpful, or too surprising for
+C     a standard PIPS user who will assume an internal error in PIPS
+C     when not seeing information about i.
+      SUBROUTINE FOO(I)
+C      print *, i
+      END
+
+C  P() {I==4}
+
+
+      INTEGER FUNCTION INTER10(I)
+
+C  P() {I==4}
+
+      INTER10 = I+1                                                     0003
+      END
+
+C  P() {I==4}
+
+
+      PROGRAM MAIN
+      INTEGER I
+      DATA I/4/
+
+C  P() {I==4}
+
+      I = INTER10(I)                                                    0005
+
+C  P(I) {I==5, I#init==4}
+
+      CALL FOO(I)                                                       0006
+      END

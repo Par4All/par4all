@@ -1,0 +1,15 @@
+delete csplit04
+
+# Duplicate module name into two different Fortran files
+
+# setenv PIPS_CHECK_FORTRAN TRUE
+
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
+
+create csplit04 csplit04.src/*.f
+
+# The creation is doomed on purpose, see source code.
+
+display PRINTED_FILE[%ALL]
+
+quit

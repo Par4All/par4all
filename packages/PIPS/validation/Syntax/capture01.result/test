@@ -1,0 +1,33 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: capture01: No such workspace
+Registering file capture01.f
+Splitting file    ./capture01.f
+  Module         CAPTURE01
+Workspace capture01 created and opened.
+Module CAPTURE01 selected
+Main module PROGRAM "CAPTURE01" selected.
+Module CAPTURE01 already active.
+Module CAPTURE01 already active.
+Request: build resource PRINTED_FILE for module CAPTURE01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CAPTURE01)
+  PARSER                         building   PARSED_CODE(CAPTURE01)
+                                 building   CALLEES(CAPTURE01)
+  CONTROLIZER                    building   CODE(CAPTURE01)
+  PRINT_CODE                     building   PRINTED_FILE(CAPTURE01)
+PRINTED_FILE made for CAPTURE01.
+C     test de la (non) capture des intrinsics, e.g. DIM
+      PROGRAM CAPTURE01
+      DIM = 1                                                           0003
+      IF (DIM.LT.0.) PRINT *, DIM                                       0004
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CAPTURE01.
+Closing program.
+Closing workspace.
+Workspace capture01 closed.
+
+Workspace capture01 deleted.

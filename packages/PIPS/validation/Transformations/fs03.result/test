@@ -1,0 +1,84 @@
+!! Initial file
+!
+! forward substitution example 
+!
+      PROGRAM FS03
+
+      INTEGER N, I
+      PARAMETER (N=100)
+
+      REAL A(N), X
+
+      DO I = 1, N                                                       0011
+         X = A(I)*A(I)                                                  0012
+         A(I) = X+X                                                     0013
+      ENDDO
+
+      X = A(4)                                                          0016
+      A(I-3) = X+X                                                      0017
+      A(I-2) = X-X                                                      0018
+
+      PRINT *, A(5)                                                     0020
+
+      END
+!! After forward substitution
+!
+! forward substitution example 
+!
+      PROGRAM FS03
+
+      INTEGER N, I
+      PARAMETER (N=100)
+
+      REAL A(N), X
+
+      DO I = 1, N                                                       0011
+         X = A(I)*A(I)                                                  0012
+         A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
+      ENDDO
+
+      X = A(4)                                                          0016
+      A(I-3) = A(4)+A(4)                                                0017
+      A(I-2) = A(4)-A(4)                                                0018
+
+      PRINT *, A(5)                                                     0020
+
+      END
+!! After use-def elimination
+!
+! forward substitution example 
+!
+      PROGRAM FS03
+
+      INTEGER N, I
+      PARAMETER (N=100)
+
+      REAL A(N), X
+
+      DO I = 1, N                                                       0011
+         A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
+      ENDDO
+
+      A(I-3) = A(4)+A(4)                                                0017
+      A(I-2) = A(4)-A(4)                                                0018
+
+      PRINT *, A(5)                                                     0020
+
+      END
+!! After cleaning declarations
+      PROGRAM FS03
+      INTEGER*4 N
+      PARAMETER (N = 100)
+      INTEGER I
+      REAL*4 A(1:N)
+
+      DO I = 1, N                                                       0011
+         A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
+      ENDDO
+
+      A(I-3) = A(4)+A(4)                                                0017
+      A(I-2) = A(4)-A(4)                                                0018
+
+      PRINT *, A(5)                                                     0020
+
+      END

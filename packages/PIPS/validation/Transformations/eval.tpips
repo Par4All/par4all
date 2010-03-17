@@ -1,0 +1,21 @@
+#
+# eval.f test script
+#
+# Pips -f eval.f -w eval -m eval -p partial_eval -b PF >&2
+# echo "--- Partialy evaluated code for EVAL"
+# Display -l code
+# Delete eval
+
+delete eval
+create eval eval.f
+
+echo
+echo Partialy evaluated code for EVAL
+echo
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+close
+delete eval
+quit
+

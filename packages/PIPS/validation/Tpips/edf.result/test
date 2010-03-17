@@ -1,0 +1,232 @@
+c
+CC*********************************************************************
+CC
+CC    PROGRAMME PRINCIPAL 
+CC
+CC---------------------------------------------------------------------
+CC
+CC    appel des sous-programmes :
+CC          --> LEGO12	:	constitution de la topologie du modele
+CC	    --> LEG334	:	resolution de l'etat permanent
+CC	    --> LEGO45	:	resolution de l'etat transitoire
+CC 
+CC---------------------------------------------------------------------
+CC
+CC    MAIN     Appelle...    GARGZZ   LEGO12   LEG334   LEGO45
+CC
+CC*********************************************************************
+c
+c
+! next line added by fsplit() in pips
+      PROGRAM MAIN000
+! MIL-STD-1753 Fortran extension not in PIPS
+!       IMPLICIT NONE
+! include "edf.h"
+c     PARAMETER.h
+c
+      INTEGER N000,N001,N002,N003,N004,N005,N006,N007,N008
+      INTEGER NR00,MAXPER
+      INTEGER L000,L001,L002,L022,L003,L005,L006,L007
+      INTEGER M001,M002,M003,M004,M006,M007,M008,M009,M010
+      INTEGER MXCOL, MXROW
+      INTEGER NZMAX
+c 
+c     ----------------------------------
+c     dimensions maximales du systeme  |
+c     ----------------------------------
+c
+! facteur multiplicatif
+      PARAMETER ( N000 = 20)           
+! nombre max de modules
+      PARAMETER ( N001 = N000*10)      
+! nombre max de blocs
+      PARAMETER ( N002 = N000*25)      
+! nombre max etats+algebr.=ordre max syst.
+      PARAMETER ( N003 = N000*90)      
+! = nombre equations
+                                       
+! nombre max entrees vraies
+      PARAMETER ( N004 = N000*25)      
+! nombre max de variables
+      PARAMETER ( N005 = N000*100)     
+! nombre max de variables dans un bloc
+      PARAMETER ( N006 =  2000)          
+cmodeb loic
+c      PARAMETER ( n007 = n000*500)     ! nombre max de donnees
+! nombre max de donnees
+      PARAMETER ( N007 = N000*500+1)   
+cmofin loic
+! nombre maxi d'equations par module
+      PARAMETER ( N008 =  1800)          
+c
+! nombre max total d'entrees
+      PARAMETER ( M001 = N005 - N003 ) 
+c                        m001 - n004   ! nombre max d'entrees connectees
+c
+! 
+      PARAMETER ( M002 = N002 + 1 )    
+! 
+      PARAMETER ( M003 = N003 + 1 )    
+! 
+      PARAMETER ( M004 = N004 + 1 )    
+c
+c     ----------------------------------------------------
+c     dimensions maximales pour la resolution du systeme |
+c     ----------------------------------------------------
+c
+! nombre max termes <>0 ds chque equation
+      PARAMETER ( NR00 = N006/2 )      
+! nombre max termes <>0 du jacobien
+      PARAMETER ( M006 = N003 * NR00 ) 
+cnag  PARAMETER ( m007 = 110000 )      ! nombre max termes <>0 jacobien factorise
+cnag m007 mis a 110000 pour HARWELL NAG
+! nombre max termes <>0 jacobien factorise
+      PARAMETER ( M007 = M006 * 2 )    
+! dimension de ikma28,iwma28 (harwell)
+      PARAMETER ( M008 = N003 * 5 )    
+! dimension de iw (resolution harwell)
+      PARAMETER ( M009 = N003 * 8 )    
+! pour ma28a (dimension LICN)
+      PARAMETER (MXCOL = M006)         
+! pour ma28a (dimension LIRN)
+      PARAMETER (MXROW = M006)         
+! nombre de termes non nuls du vecteur jacobien
+      PARAMETER (NZMAX = M006)         
+c
+c     -------------------------------------------------------
+c     dimensions maximales des regulations et perturbations |
+c     -------------------------------------------------------
+c
+! facteur multiplicatif
+      PARAMETER ( L000 = 1 )           
+! nombre max de modules de regulation
+      PARAMETER ( L001 = L000 * 15)    
+! nombre max de blocs de regulation
+      PARAMETER ( L002 = L001 * 3 )    
+! 
+      PARAMETER ( L022 = L001 * 3+1)   
+! nombre max sort., sort. int.,entrees reg  
+      PARAMETER ( L003 = L002 * 10)    
+! nombre max var. regulation total 
+      PARAMETER ( L005 = L003)         
+! (entrees+sorties+sorties internes) 
+                                       
+! nombre max variables d'un bloc de regul. 
+      PARAMETER ( L006 = L002)         
+! nombre max de data par regulation
+      PARAMETER ( L007 = 500)          
+! (update PN.10:DARE08 rentre ds le rang)
+                                       
+! nombre max de perturbations
+      PARAMETER ( MAXPER = 5000 )      
+c
+! nombre var ds vecteur resultats
+      PARAMETER ( M010 = N003 + N004 + L003 ) 
+! end include "edf.h"
+!       include 'edf.h'
+c
+c
+! numero de l'etape
+      INTEGER IETAPE            
+! argument de GARGZZ (numero de l'etape)
+      REAL ETAPE                
+! tableau des noms des blocs
+      CHARACTER*8 NOBLC(N002)   
+! index des modules des blocs (INDICE)
+      INTEGER ISLB(N002)        
+! nombre variables etat par bloc (apres ORDTOP)
+      INTEGER NUSTA(N002)       
+
+! nombre variables algebriques par bloc (ORDTOP)
+      INTEGER NUSCI(N002)       
+
+! nombre total d'entrees
+      INTEGER NINGR(N002)       
+
+! nom variables de sortie (algebrique puis etat)
+      CHARACTER*8 SIVAR(N003)   
+
+! libelle long des variables de sortie
+      CHARACTER*40 LIBLSI(N003) 
+
+! unite des variables de sortie
+      CHARACTER*10 UNITSI(N003) 
+
+! nom des variables d'entree
+      CHARACTER*8 VARI(N004)    
+
+! libelle long des variables d'entree
+      CHARACTER*40 LIBLRI(N004) 
+
+! unite des variables d'entree
+      CHARACTER*10 UNITRI(N004) 
+
+! valeurs des variables de sortie
+      REAL*8 XY(N003)           
+
+! valeur des variables d'entree du modele
+      REAL*8 UU(N004)           
+
+! valeurs des variables par bloc
+      REAL*8 XYU(N005)          
+
+! constantes de normalisation des XYU
+      REAL*8 CNXYU(N005)        
+
+! tolerances pour chaque equation
+      REAL*8 TOLL(N003)         
+
+! donnees blocs (modifiables par  modules)
+      REAL*8 DATI(N007)         
+
+! pointeur des donnees des blocs dans DATI
+      INTEGER IPDATI(M002)      
+
+! pointeur des blocs dans XYU 
+      INTEGER IP(M002)          
+
+! pointeur des variables dans SIVAR et VARI
+      INTEGER IPVRS(N005)       
+
+! [ips(i+1)-1]-ips(i)=nmbre connections sortie i
+      INTEGER IPS(M003)         
+
+! pointe les sorties dans le vecteur VAR
+      INTEGER IPVRT(N005)       
+
+! [ipi(i+1)-1]-ipi(i)=nmbre connections entree i
+      INTEGER IPI(M004)         
+
+! pointe les entrees dans le vecteur VAR
+      INTEGER IPVRI(M001)       
+
+c
+c===========================
+c     CORPS DU PROGRAMME
+c===========================
+c
+c  on recupere le parametre de la ligne de commande
+      CALL GARGZZ(1, ETAPE)                                             0001
+      IETAPE = INT(ETAPE)                                               0002
+c
+c     appel etape 12
+c
+      IF (IETAPE.EQ.12) THEN                                            0003
+         CALL LEGO12                                                    0004
+c
+c     appel etape 334
+c
+      ELSEIF (IETAPE.EQ.334) THEN                                       0003
+         CALL LEG334(NOBLC, ISLB, NUSTA, NUSCI, NINGR, SIVAR, LIBLSI    0006
+     &   , UNITSI, VARI, LIBLRI, UNITRI, XY, UU, XYU, CNXYU, TOLL,      0006
+     &   DATI, IPDATI, IP, IPVRS, IPS, IPVRT, IPI, IPVRI)               0006
+c
+c     appel etape 45
+c
+      ELSEIF (IETAPE.EQ.45) THEN                                        0003
+         CALL LEGO45(NOBLC, ISLB, NUSTA, NUSCI, NINGR, SIVAR, LIBLSI    0008
+     &   , UNITSI, VARI, LIBLRI, UNITRI, XY, UU, XYU, CNXYU, TOLL,      0008
+     &   DATI, IPDATI, IP, IPVRS, IPS, IPVRT, IPI, IPVRI)               0008
+      ENDIF
+      END
+

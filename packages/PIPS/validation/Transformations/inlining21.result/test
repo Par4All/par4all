@@ -1,0 +1,36 @@
+ main
+     foo
+         bla
+
+before inlining
+
+int foo(void)
+{
+   bla(kernel);                                                         /*0004*/
+   return 0;                                                            /*0005*/
+}
+int main(void)
+{
+   foo();                                                               /*0003*/
+   return 0;                                                            /*0004*/
+}
+
+after inlining
+
+int main(void)
+{
+   //PIPS generated variable
+   int _return0;                                                        /*0004*/
+   {
+      //PIPS generated variable
+      extern const  int kernel[3];                                      /*0007*/
+      bla(kernel);                                                      /*0008*/
+      /*0004*/
+      _return0 = 0;                                                     /*0009*/
+   }
+   _return0;                                                            /*0013*/
+   return 0;                                                            /*0014*/
+}
+
+Unsplit resulting code
+

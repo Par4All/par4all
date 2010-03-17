@@ -1,0 +1,30 @@
+setenv WSPACE io_4
+setenv FILE $WSPACE.f
+#
+# obscure issue if PRETTYPRINT_IO_EFFECTS
+# is not set to FALSE in hpfc.c
+#
+delete $WSPACE
+create $WSPACE $FILE
+setproperty ABORT_ON_USER_LEVEL TRUE
+apply HPFC_STATIC_DIRECTIVES[PRINT_RESULT]
+setproperty PRETTYPRINT_IO_EFFECTS TRUE
+echo
+echo code
+echo
+activate PRINT_CODE
+display PRINTED_FILE[%ALL]
+echo 
+echo cumulated effects
+echo
+setproperty PRETTYPRINT_IO_EFFECTS TRUE
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[PRINT_RESULT]
+echo
+echo proper effects
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%MAIN]
+close
+delete $WSPACE
+quit

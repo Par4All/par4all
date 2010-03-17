@@ -1,0 +1,68 @@
+delete decor01
+create decor01 decor01.f
+
+echo
+echo Basic call graph
+echo
+
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with complexities
+echo
+
+activate PRINT_CALL_GRAPH_WITH_COMPLEXITIES
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with transformers
+echo
+
+activate PRINT_CALL_GRAPH_WITH_TRANSFORMERS
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with intraprocedural preconditions
+echo
+
+activate PRINT_CALL_GRAPH_WITH_PRECONDITIONS
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with proper effects
+echo
+
+activate PRINT_CALL_GRAPH_WITH_PROPER_EFFECTS
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with cumulated effects
+echo
+
+activate PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with RW regions
+echo
+
+activate PRINT_CALL_GRAPH_WITH_REGIONS
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with IN regions
+echo
+
+activate PRINT_CALL_GRAPH_WITH_IN_REGIONS
+display CALLGRAPH_FILE
+
+echo
+echo Call graph with OUT regions
+echo
+
+activate PRINT_CALL_GRAPH_WITH_OUT_REGIONS
+display CALLGRAPH_FILE
+
+close
+delete decor01
+quit

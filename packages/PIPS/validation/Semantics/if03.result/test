@@ -1,0 +1,88 @@
+
+Transformers for "if03"
+
+
+C  T() {}
+
+void if03()
+{
+   int n = 0;
+
+//  T(n) {n==0, n#init==0}
+
+
+   n = 0;
+
+//  T(n) {n==1, n#init==0}
+
+
+   if (n++)
+
+//  T() {0==-1}
+
+      printf("n == true\n");
+   else
+
+//  T() {n==1}
+
+      printf("n == true\n");
+
+//  T(n) {n==2, n#init==1}
+
+   /* yes */
+
+   if (n++)
+
+//  T() {n==2}
+
+      printf("n == true\n");
+   else
+
+//  T() {0==-1}
+
+      printf("n == true\n");
+}
+
+Preconditions for "if03"
+
+
+//  P() {}
+
+void if03()
+{
+   int n = 0;
+
+//  P() {n==0}
+
+
+   n = 0;
+
+//  P(n) {n==0}
+
+
+   if (n++)
+
+//  P() {0==-1}
+
+      printf("n == true\n");
+   else
+
+//  P(n) {n==1}
+
+      printf("n == true\n");
+
+//  P(n) {n==1}
+
+   /* yes */
+
+   if (n++)
+
+//  P(n) {n==2}
+
+      printf("n == true\n");
+   else
+
+//  P() {0==-1}
+
+      printf("n == true\n");
+}

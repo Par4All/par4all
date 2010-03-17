@@ -1,0 +1,95 @@
+delete convol2-sg1-C
+create convol2-sg1-C convol-unroll.c external.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+# for scalarization
+#
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+
+activate C_PARSER
+module main
+module convol
+
+echo
+echo Inital code
+echo
+
+display PRINTED_FILE[convol]
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+echo
+echo After partial evaluation:
+echo
+apply PARTIAL_EVAL[convol]
+display PRINTED_FILE[convol]
+
+echo
+echo after privatization
+echo
+
+#apply LOCALIZE_DECLARATION[convol]
+#apply CLEAN_DECLARATIONS[convol]
+#display PRINTED_FILE[convol]
+
+echo
+echo after paralellization
+echo
+
+setproperty LOOP_LABEL "l400"
+setproperty OUTLINE_MODULE_NAME "microcode"
+apply TERAPIXIFY[convol]
+
+display PRINTED_FILE[convol]
+
+apply PARTIAL_EVAL[microcode]
+apply LOOP_NORMALIZE[microcode]
+apply SUPPRESS_DEAD_CODE[microcode]
+display PRINTED_FILE[microcode]
+
+
+echo
+echo After double unrolling
+echo
+setproperty LOOP_UNROLL_MERGE TRUE
+apply FULL_UNROLL[microcode]
+l100
+apply FULL_UNROLL[microcode]
+l200
+
+echo
+echo after code cleaning
+echo
+display PRINTED_FILE[microcode]
+apply PARTIAL_EVAL[microcode]
+apply SUPPRESS_DEAD_CODE[microcode]
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE[microcode]
+
+echo
+echo After atomization
+echo
+setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+apply SIMD_ATOMIZER[microcode]
+display PRINTED_FILE[microcode]
+
+# should be applied but fails
+#apply SCALARIZATION
+
+# probably useless for terapix microcode
+#apply INVARIANT_CODE_MOTION
+apply ARRAY_TO_POINTER[microcode]
+display PRINTED_FILE[microcode]
+apply PARTIAL_EVAL[microcode]
+display PRINTED_FILE[microcode]
+
+close
+quit
+# EOF

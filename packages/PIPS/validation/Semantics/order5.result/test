@@ -1,0 +1,25 @@
+
+C  P() {}
+
+      PROGRAM ORDER5
+
+C  P() {}
+
+c     to check the ordering used to  print preconditions and transformers
+
+      I = J+1                                                           0004
+
+C  P(I) {I==J+1}
+
+      I = J-1                                                           0005
+
+C  P(I) {I==J-1}
+
+      I = J                                                             0006
+
+C  P(I) {I==J}
+
+
+      PRINT *, I                                                        0008
+
+      END

@@ -1,0 +1,15 @@
+delete muller05
+
+create muller05 muller05.f
+
+display PRINTED_FILE [MULLER05]
+
+close
+
+echo
+echo Compilation warnings (I miss the errors!)
+echo
+
+shell cat muller05.database/Warnings
+
+quit

@@ -1,0 +1,9 @@
+delete intro_example01
+create intro_example01 \
+    intro_example01.c
+
+apply UNSPLIT
+
+close
+quit
+

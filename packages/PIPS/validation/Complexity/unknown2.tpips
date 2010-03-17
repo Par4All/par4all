@@ -1,0 +1,16 @@
+# Script to test unknown variable name generation :
+# 1 DO/ENDDO with unknown.f
+# 1 several nested loops with same label
+# 2 early or late evaluation (apparently not implemented)
+# 3 non evaluatable parameters
+delete unknown2
+set ABORT_ON_USER_ERROR TRUE
+create unknown2 unknown2.f
+module unknown
+activate PRINT_CODE_COMPLEXITIES
+# set COMPLEXITY_INTERMEDIATES TRUE
+set COMPLEXITY_EARLY_EVALUATION FALSE
+display PRINTED_FILE
+close
+delete unknown2
+quit

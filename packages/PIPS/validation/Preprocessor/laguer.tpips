@@ -1,0 +1,27 @@
+delete laguer
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create laguer laguer.c
+
+# This file cannot be preprocessed because "complex.h" is not available
+
+shell cc -C -E laguer.database/Tmp/laguer.cpp_processed.c
+
+# echo cat laguer.database/[a-z_]*[a-z_]/*.c
+display C_SOURCE_FILE[%ALL]
+
+# delete laguer
+
+# How can you guess whether it is a C file or a Fortran file?
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+display PRINTED_FILE[laguer]
+
+close
+# delete laguer
+quit

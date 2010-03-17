@@ -1,0 +1,6 @@
+      PROGRAM HULL
+      I = 1                                                             0001
+      CALL FOO(I)                                                       0002
+      I = 2                                                             0003
+      CALL FOO(I)                                                       0004
+      END

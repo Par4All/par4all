@@ -1,0 +1,16 @@
+delete equiv
+create equiv equiv.f
+
+set PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+module EQUIV1
+activate PRINT_CODE
+display PRINTED_FILE
+
+module EQUIV2
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete equiv
+quit

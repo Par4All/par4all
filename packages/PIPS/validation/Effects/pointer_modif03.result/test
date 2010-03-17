@@ -1,0 +1,114 @@
+
+Proper effects for "make_s"
+
+s_t make_s(int i, float x)
+{
+   // BEGIN BLOCK
+   s_t *p;
+   extern char *malloc(int);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+
+   p = (s_t *) malloc(sizeof(s_t));
+//               <must be read   >: i p
+//               <must be written>: p[0][1]
+   p->entier = i;
+//               <must be read   >: p x
+//               <must be written>: p[0][2]
+   p->reel = x;
+//               <must be read   >: p p[0]
+   return *p;
+   // END BLOCK
+}
+
+Cumulated effects for "make_s"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+s_t make_s(int i, float x)
+{
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+   // BEGIN BLOCK
+   s_t *p;
+   extern char *malloc(int);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+
+   p = (s_t *) malloc(sizeof(s_t));
+//               <must be read   >: i p
+//               <must be written>: p[0][1]
+   p->entier = i;
+//               <must be read   >: p x
+//               <must be written>: p[0][2]
+   p->reel = x;
+//               <must be read   >: p p[0]
+   return *p;
+   // END BLOCK
+}
+
+Proper effects for "main"
+
+int main()
+{
+   // BEGIN BLOCK
+   s_t s;
+   int j;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s
+
+   s = make_s(1, 2.);
+//               <must be written>: s[1]
+   s.entier = 4;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+
+   j = make_s(1, 2.).entier;
+//               <must be read   >: j
+
+   return j;
+   // END BLOCK
+}
+
+Cumulated effects for "main"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+   // BEGIN BLOCK
+   s_t s;
+   int j;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s
+
+   s = make_s(1, 2.);
+//               <must be written>: s[1]
+   s.entier = 4;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+
+   j = make_s(1, 2.).entier;
+//               <must be read   >: j
+
+   return j;
+   // END BLOCK
+}

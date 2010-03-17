@@ -1,0 +1,56 @@
+
+Print code with proper reductions
+
+C Check optimization for code generated in Guuillaume Capron's PhD dissertation
+
+      PROGRAM CAPRON02
+
+      LOGICAL A(10)
+      INTEGER C
+
+      READ *, A                                                         0008
+
+      C = 0                                                             0010
+      DO I = 1, N                                                       0011
+         IF (A(I)) C = C+1                                              0012
+      ENDDO
+
+      PRINT *, C                                                        0017
+      END
+
+Print code with cumulated reductions
+
+C Check optimization for code generated in Guuillaume Capron's PhD dissertation
+
+      PROGRAM CAPRON02
+
+      LOGICAL A(10)
+      INTEGER C
+
+      READ *, A                                                         0008
+
+      C = 0                                                             0010
+C  loop sum[C],
+      DO I = 1, N                                                       0011
+C  test sum[C],
+         IF (A(I)) C = C+1                                              0012
+      ENDDO
+
+      PRINT *, C                                                        0017
+      END
+C Check optimization for code generated in Guuillaume Capron's PhD dissertation
+
+      PROGRAM CAPRON02
+
+      LOGICAL A(10)
+      INTEGER C
+
+      READ *, A                                                         0008
+
+      C = 0                                                             0010
+      DO I = 1, N                                                       0011
+         IF (A(I)) C = C+1                                              0012
+      ENDDO
+
+      PRINT *, C                                                        0017
+      END

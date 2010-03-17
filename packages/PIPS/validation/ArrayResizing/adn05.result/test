@@ -1,0 +1,37 @@
+      PROGRAM PSET
+      REAL WORK(1200000)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      LC = 1
+C (0,3)
+      CALL RUN(WORK(LC))
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN(C)
+      DIMENSION C(*)
+C (0,1)
+      RETURN
+      END
+!!
+!! file for adn05.f
+!!
+      PROGRAM PSET
+      REAL WORK(1200000)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      LC = 1
+C (0,3)
+      CALL RUN(WORK(LC))
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN(C)
+      DIMENSION C(1200000)
+C (0,1)
+      RETURN
+      END

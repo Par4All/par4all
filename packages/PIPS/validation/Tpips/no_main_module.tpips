@@ -1,0 +1,8 @@
+delete no_main_module
+create no_main_module no_main_module.f
+display PRINTED_FILE
+apply UNSPLIT
+close
+delete no_main_module
+quit
+

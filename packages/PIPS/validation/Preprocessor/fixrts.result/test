@@ -1,0 +1,131 @@
+# 1 "fixrts.database/Tmp/fixrts.cpp_processed.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "fixrts.database/Tmp/fixrts.cpp_processed.c"
+# 1 "./fixrts.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "./fixrts.c"
+// #include <math.h>
+// #include "complex.h"
+
+
+
+
+
+void fixrts(d,npoles)
+float d[];
+int npoles;
+{
+  typedef struct {float r; float i;} fcomplex;
+  extern fcomplex Complex(float, float);
+  extern fcomplex Cdiv(fcomplex, fcomplex);
+  extern fcomplex Csub(fcomplex, fcomplex);
+  extern fcomplex Cmul(fcomplex, fcomplex);
+  extern fcomplex Conjg(fcomplex);
+  extern float Cabs(fcomplex);
+ int i,j,polish;
+ fcomplex a[100],roots[100];
+ void zroots();
+
+ a[npoles]=Complex(1.0,0.0);
+ for (j=npoles-1;j>=0;j--)
+  a[j]=Complex(-d[npoles-j],0.0);
+ polish=1;
+ zroots(a,npoles,roots,polish);
+ for (j=1;j<=npoles;j++)
+  if (Cabs(roots[j]) > 1.0)
+   roots[j]=Cdiv(Complex(1.0,0.0),Conjg(roots[j]));
+ a[0]=Csub(Complex(0.0,0.0),roots[1]);
+ a[1]=Complex(1.0,0.0);
+ for (j=2;j<=npoles;j++) {
+  a[j]=Complex(1.0,0.0);
+  for (i=j;i>=2;i--)
+   a[i-1]=Csub(a[i-2],Cmul(roots[j],a[i-1]));
+  a[0]=Csub(Complex(0.0,0.0),Cmul(roots[j],a[0]));
+ }
+ for (j=0;j<=npoles-1;j++)
+  d[npoles-j] = -a[j].r;
+}
+# 8
+void fixrts(d,npoles)
+float d[];
+int npoles;
+{
+  typedef struct {float r; float i;} fcomplex;
+  extern fcomplex Complex(float, float);
+  extern fcomplex Cdiv(fcomplex, fcomplex);
+  extern fcomplex Csub(fcomplex, fcomplex);
+  extern fcomplex Cmul(fcomplex, fcomplex);
+  extern fcomplex Conjg(fcomplex);
+  extern float Cabs(fcomplex);
+ int i,j,polish;
+ fcomplex a[100],roots[100];
+ void zroots();
+
+ a[npoles]=Complex(1.0,0.0);
+ for (j=npoles-1;j>=0;j--)
+  a[j]=Complex(-d[npoles-j],0.0);
+ polish=1;
+ zroots(a,npoles,roots,polish);
+ for (j=1;j<=npoles;j++)
+  if (Cabs(roots[j]) > 1.0)
+   roots[j]=Cdiv(Complex(1.0,0.0),Conjg(roots[j]));
+ a[0]=Csub(Complex(0.0,0.0),roots[1]);
+ a[1]=Complex(1.0,0.0);
+ for (j=2;j<=npoles;j++) {
+  a[j]=Complex(1.0,0.0);
+  for (i=j;i>=2;i--)
+   a[i-1]=Csub(a[i-2],Cmul(roots[j],a[i-1]));
+  a[0]=Csub(Complex(0.0,0.0),Cmul(roots[j],a[0]));
+ }
+ for (j=0;j<=npoles-1;j++)
+  d[npoles-j] = -a[j].r;
+}
+# 1 "./fixrts.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "./fixrts.c"
+// #include <math.h>
+// #include "complex.h"
+
+
+
+
+
+extern void fixrts();
+void fixrts(float d[], int npoles)
+{
+   typedef struct {
+      float r;
+      float i;
+   } fcomplex;
+   fcomplex Complex(float, float);
+   fcomplex Cdiv(fcomplex, fcomplex);
+   fcomplex Csub(fcomplex, fcomplex);
+   fcomplex Cmul(fcomplex, fcomplex);
+   fcomplex Conjg(fcomplex);
+   float Cabs(fcomplex);
+   int i, j, polish;
+   fcomplex a[100], roots[100];
+   void zroots(fcomplex *, int, fcomplex *, int);
+
+   a[npoles] = Complex(1.0, 0.0);
+   for (j = npoles-1;j>=0;j--)
+      a[j] = Complex(-d[npoles-j], 0.0);
+   polish = 1;
+   zroots(a, npoles, roots, polish);
+   for (j = 1;j<=npoles;j++)
+      if (Cabs(roots[j])>1.0) 
+         roots[j] = Cdiv(Complex(1.0, 0.0), Conjg(roots[j]));
+   a[0] = Csub(Complex(0.0, 0.0), roots[1]);
+   a[1] = Complex(1.0, 0.0);
+   for (j = 2;j<=npoles;j++) {
+      a[j] = Complex(1.0, 0.0);
+      for (i = j;i>=2;i--)
+         a[i-1] = Csub(a[i-2], Cmul(roots[j], a[i-1]));
+      a[0] = Csub(Complex(0.0, 0.0), Cmul(roots[j], a[0]));
+   }
+   for (j = 0;j<=npoles-1;j++)
+      d[npoles-j] = -a[j].r;
+}

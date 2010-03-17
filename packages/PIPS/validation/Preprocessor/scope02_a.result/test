@@ -1,0 +1,20 @@
+# 13
+void foo()
+{
+  printf("%d\n",i);
+}
+# 5
+main()
+{
+  // printf("%d\n",i);
+  foo();
+}
+extern int i;
+
+void foo();
+
+extern main();
+
+static int i = 2;
+
+extern void foo();

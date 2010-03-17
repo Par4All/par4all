@@ -1,0 +1,25 @@
+
+Code after scalarization
+
+int scalarization15(int n)
+{
+   // BEGIN BLOCK
+   int x[100], y[100][100], t[100];
+   int i, j;
+   //PIPS generated variable
+   int __scalar__0, __scalar__1;
+
+   for(i = 0; i <= 99; i += 1) {
+      // BEGIN BLOCK
+      __scalar__0 = i;
+      for(j = 0; j <= 99; j += 1) {
+         // BEGIN BLOCK
+         __scalar__1 = __scalar__0;
+         y[i][j] = __scalar__0+j;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   return y[n][n]+y[0][0]+y[0][n]+y[n][0];
+   // END BLOCK
+}

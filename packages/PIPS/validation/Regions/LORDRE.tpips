@@ -1,0 +1,7 @@
+delete f
+create f LORDRE.f
+activate PRINT_CODE_REGIONS
+activate MUST_REGIONS
+display PRINTED_FILE[%ALL]
+close
+delete f

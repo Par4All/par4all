@@ -1,0 +1,6 @@
+      PROGRAM CONTFORMAT
+
+100   FORMAT(//50X'points de la surface libre'//' indice'6X'abscisse'7X'
+     &ordonnee'8X'charge'10X'ecart'/)                                   0003
+
+      END

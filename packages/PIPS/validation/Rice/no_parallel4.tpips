@@ -1,0 +1,22 @@
+delete no_parallel4
+create no_parallel4 no_parallel2.f
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICE_DEBUG_LEVEL 9
+setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(%ALL)
+
+close
+
+delete no_parallel4
+quit
+# EOF

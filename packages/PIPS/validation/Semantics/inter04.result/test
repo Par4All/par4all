@@ -1,0 +1,71 @@
+
+C  T(I,X) {2.==X, I==I#init+1}
+
+
+      SUBROUTINE INCR(I)
+      COMMON /FOO/ X
+
+C  T(X) {2.==X}
+
+      X = 2.                                                            0004
+
+C  T(I) {I==I#init+1}
+
+      I = I+1                                                           0005
+      END
+
+C  T(J) {}
+
+      PROGRAM INTER03
+
+C     Check that aliases do not cause core dumps
+
+      COMMON /FOO/ J
+
+C  T(J) {}
+
+
+      CALL INCR(J)                                                      0007
+
+C  T() {}
+
+
+      PRINT *, J                                                        0009
+
+      END
+
+C  P() {}
+
+
+      SUBROUTINE INCR(I)
+      COMMON /FOO/ X
+
+C  P() {}
+
+      X = 2.                                                            0004
+
+C  P(X) {2.==X}
+
+      I = I+1                                                           0005
+      END
+
+C  P() {}
+
+      PROGRAM INTER03
+
+C     Check that aliases do not cause core dumps
+
+      COMMON /FOO/ J
+
+C  P() {}
+
+
+      CALL INCR(J)                                                      0007
+
+C  P(J) {}
+
+
+      PRINT *, J                                                        0009
+
+      END
+

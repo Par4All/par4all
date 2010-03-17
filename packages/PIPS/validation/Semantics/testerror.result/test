@@ -1,0 +1,29 @@
+
+C  T(NCALL) {NCALL==NCALL#init+1, NERROR<=0}
+
+C     how is STOP handled? The proper transformer increments call
+
+      SUBROUTINE TESTERROR
+      COMMON /ERROR/ NERROR
+      SAVE NCALL
+
+C  T(NCALL) {NCALL==NCALL#init+1, NERROR<=0}
+
+
+      IF (NERROR.GT.0) THEN                                             0007
+
+C  T() {}
+
+         PRINT *, NERROR                                                0008
+
+C  T() {0==-1}
+
+         STOP                                                           0009
+      ELSE
+
+C  T(NCALL) {NCALL==NCALL#init+1}
+
+         NCALL = NCALL+1                                                0011
+      ENDIF
+
+      END

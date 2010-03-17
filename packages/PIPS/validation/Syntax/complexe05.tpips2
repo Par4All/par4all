@@ -1,0 +1,6 @@
+delete complexe05
+create complexe05 complexe05.f
+display PRINTED_FILE 
+close
+delete complexe05
+quit

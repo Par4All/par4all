@@ -1,0 +1,6 @@
+delete t
+create t typage.f
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete t

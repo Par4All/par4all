@@ -1,0 +1,17 @@
+delete aileclcoupk
+create aileclcoupk aile_clcoupk.f
+
+apply PRIVATIZE_MODULE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate MUST_REGIONS
+
+activate REGION_CHAINS
+display PARALLELPRINTED_FILE
+
+close
+delete aileclcoupk
+quit

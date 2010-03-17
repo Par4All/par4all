@@ -1,0 +1,148 @@
+--- Preconditions for LOOPEXIT2
+
+C  P() {}
+
+      PROGRAM LOOPEXIT2
+
+c     Is it possible to say something about the exit value of 
+C     loop indices
+
+      REAL T(10)
+
+C  P() {}
+
+
+      IF (N.GE.1) THEN                                                  0008
+
+C  P() {1<=N}
+
+
+         J = 0                                                          0010
+
+C  P(J) {J==0, 1<=N}
+
+         DO I = 1, N                                                    0011
+
+C  P(I,J) {2I==J+2, 1<=I, I<=N, 1<=N}
+
+            T(I) = 0.                                                   0012
+
+C  P(I,J) {2I==J+2, 1<=I, I<=N, 1<=N}
+
+            J = J+2                                                     0013
+         ENDDO
+
+C  P(I,J) {2I==J+2, I==N+1, 2<=I}
+
+
+         PRINT *, I, J                                                  0016
+
+C  P(I,J) {2I==J+2, I==N+1, 2<=I}
+
+
+         J = 0                                                          0018
+
+C  P(I,J) {I==N+1, J==0, 2<=I}
+
+         DO I = 1, N, -1                                                0019
+
+C  P(I,J) {2I+J==2, I<=1, N<=I, 1<=N}
+
+            T(I) = 0.                                                   0020
+
+C  P(I,J) {2I+J==2, I<=1, N<=I, 1<=N}
+
+            J = J+2                                                     0021
+         ENDDO
+
+C  P(I,J) {2I+J==2, 0<=I, I<=1, I+1<=N}
+
+
+         PRINT *, I, J                                                  0024
+
+      ENDIF
+
+C  P(I,J) {}
+
+
+      IF (N.GE.0) THEN                                                  0028
+
+C  P(I,J) {0<=N}
+
+
+         J = 0                                                          0030
+
+C  P(I,J) {J==0, 0<=N}
+
+         DO I = 1, N                                                    0031
+
+C  P(I,J) {2I==J+2, 1<=I, I<=N, 0<=N}
+
+            T(I) = 0.                                                   0032
+
+C  P(I,J) {2I==J+2, 1<=I, I<=N, 0<=N}
+
+            J = J+2                                                     0033
+         ENDDO
+
+C  P(I,J) {2I==J+2, I==N+1, 1<=I}
+
+
+         PRINT *, I, J                                                  0036
+
+      ENDIF
+
+C  P(I,J) {}
+
+
+      IF (N.LT.1) THEN                                                  0040
+
+C  P(I,J) {N<=0}
+
+
+         J = 0                                                          0042
+
+C  P(I,J) {J==0, N<=0}
+
+         DO I = 1, N                                                    0043
+
+C  P() {0==-1}
+
+            T(I) = 0.                                                   0044
+
+C  P() {0==-1}
+
+            J = J+2                                                     0045
+         ENDDO
+
+C  P(I,J) {I==1, J==0, N<=0}
+
+
+         PRINT *, I, J                                                  0048
+
+      ENDIF
+
+C  P(I,J) {}
+
+
+      J = 0                                                             0052
+
+C  P(I,J) {J==0}
+
+      DO I = 1, N                                                       0053
+
+C  P(I,J) {2I==J+2, 1<=I, I<=N}
+
+         T(I) = 0.                                                      0054
+
+C  P(I,J) {2I==J+2, 1<=I, I<=N}
+
+         J = J+2                                                        0055
+      ENDDO
+
+C  P(I,J) {2I==J+2, 1<=I, N+1<=I}
+
+
+      PRINT *, I, J                                                     0058
+
+      END

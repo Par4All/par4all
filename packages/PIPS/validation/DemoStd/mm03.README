@@ -1,0 +1,53 @@
+mm03.f
+Utiliser cet exemple comme premiere demonstration.
+C'est un produit de matrice avec appel a SAXPY 
+NB: SAXPY utilise dans l'elimination gaussienne
+	algorithme comparable dans le coeur de QuickSort
+
+Cas simple de parallelisation interprocedurale
+Montre	- le calcul des effets
+	- le mecanisme de calcul a la demande (demand-driven), qui
+	conduit les algorithmes interproceduraux.
+
+> Editer SAXPY 
+Montrer que la boucle a ete deroulee (unrolled) 4 fois dans le source (a
+la main).
+
+> Paralleliser directement 
+Tres parallele
+
+
+> Editer MM03
+
+> Visualiser le calcul des effets 
+Remarquer l'expression des effets de bord de l'appel a SAXPY: lignes de
+tableau
+      DO J = 1,N,1                                                      0047
+C               < MAY BE READ   >: K
+C               <MUST BE READ   >: N
+C               <MUST BE WRITTEN>: K
+         DO K = 1,N,1                                                   0049
+C               < MAY BE READ   >: C((/I,I=1,N,1/),J) A((/I,I=1,N,1/),K)
+C                                  B(K,J)
+C               < MAY BE WRITTEN>: C((/I,I=1,N,1/),J)
+C               <MUST BE READ   >: N
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0050
+         ENDDO
+      ENDDO
+
+> Paralleliser directement 
+Boucle externe parallele, englobant l'appel a SAXPY. 
+	-> algorithme simple peut suffir.
+
+
+#
+# mm03.f
+#
+mm03 () {
+Init -f mm03.f mm03
+Display -m saxpy
+Display -m mm03 prop
+Display 
+
+Delete m3
+}

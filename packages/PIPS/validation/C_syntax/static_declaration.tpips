@@ -1,0 +1,23 @@
+delete static_declaration
+
+create static_declaration static_declaration.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit stati_declaration
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat static_declaration.database/Src/static_declaration.c
+
+close
+
+ delete static_declaration
+
+quit

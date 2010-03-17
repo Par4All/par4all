@@ -1,0 +1,55 @@
+End of property settings
+
+before unfolding
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   for(j = 0; j <= length-1; j += 1) {
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+      result = flgr_defop_add_fgINT32(v1, v2);
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+   return;
+}
+
+after unfolding
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int j;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+   int spp = datdest->spp;
+   int length = datdest->length*spp;
+   //PIPS generated variable
+   int _return0, _return1, _return2, _return3, _return4;
+   for(j = 0; j <= length-1; j += 1) {
+      _return3 = psrc1[j];
+      _return0 = _return3;
+      v1 = _return0;
+      _return4 = psrc2[j];
+      _return1 = _return4;
+      v2 = _return1;
+      _return2 = v1+v2;
+      result = _return2;
+      pdest[j] = result;
+   }
+   return;
+}
+
+Unsplit resulting code
+

@@ -1,0 +1,25 @@
+delete goto01
+create goto01 goto01.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[main]
+
+close
+
+delete goto01
+
+quit

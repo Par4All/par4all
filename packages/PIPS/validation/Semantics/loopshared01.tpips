@@ -1,0 +1,17 @@
+delete loopshared01
+create loopshared01 loopshared01.f
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate PRINT_CODE_TRANSFORMERS
+
+display PRINTED_FILE
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE
+
+close
+delete loopshared01

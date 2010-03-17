@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Module parsererror1 is bugged but module parsererror2 is OK
+# If PIPS handles user errors properly, it can analyze the
+# second module
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f parsererror.result/test
+# tpips >parsererror.result/test <<EOF
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete parsererror
+create parsererror parsererror.f
+module parsererror1
+display PRINTED_FILE
+module parsererror2
+display PRINTED_FILE
+close
+delete parsererror
+quit
+EOF
+

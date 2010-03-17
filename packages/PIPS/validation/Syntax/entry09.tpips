@@ -1,0 +1,23 @@
+delete entry09
+create entry09 entry09.f
+
+# Check that static variables (and implicitly DATA) are taken into account
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY01
+echo
+
+display PRINTED_FILE[ENTRY09]
+
+# Then, the code for the entry can be displayed
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+close
+delete entry09
+quit

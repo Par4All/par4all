@@ -1,0 +1,70 @@
+      PROGRAM EDITED03
+
+C     The parser must be able to process the same routine several times
+C     after user edition steps
+
+      CALL BAR(Y)                                                       0006
+
+      PRINT *, IBAR(Z)                                                  0008
+
+      END
+
+      SUBROUTINE BAR(Y)
+
+!!      integer x(3)
+!%      real x(10)
+
+      PRINT *, X                                                        0007
+
+      END
+
+      FUNCTION IBAR(Y)
+
+!!      integer x(3)
+!%      real x(10)
+
+      PRINT *, X                                                        0007
+
+      IBAR = 1                                                          0009
+
+      END
+
+      SUBROUTINE BAR(Y)
+
+!!      integer x(3)
+      REAL X(10)
+
+      PRINT *, X                                                        0007
+
+      END
+
+      SUBROUTINE BAR(Y)
+
+!!      integer x(3)
+      INTEGER X(3)
+
+      PRINT *, X                                                        0007
+
+      END
+
+      FUNCTION IBAR(Y)
+
+!!      integer x(3)
+      REAL X(10)
+
+      PRINT *, X                                                        0007
+
+      IBAR = 1                                                          0009
+
+      END
+
+      FUNCTION IBAR(Y)
+
+!!      integer x(3)
+      INTEGER X(3)
+
+      PRINT *, X                                                        0007
+
+      IBAR = 1                                                          0009
+
+      END

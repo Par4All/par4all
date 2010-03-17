@@ -1,0 +1,7 @@
+delete param04
+create param04 param04.f
+module PARAM04
+display PRINTED_FILE[PARAM04]
+close
+delete param04
+quit

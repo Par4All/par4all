@@ -1,0 +1,39 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Select the most precise analyses:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Check the proper effects
+void for01(int n)
+{
+   int i, j;
+   float x[100];
+//               <must be read   >: i n
+//               <must be written>: i
+
+   for(i = i; i <= n-1; i += 1)
+//               <must be read   >: i n
+//               <must be written>: j
+      for(j = 0; j <= 99; j += 1)
+//               <must be read   >: i j n
+//               <must be written>: x[j]
+         x[j] = 0.;
+}
+Privatize scalar variables
+Ask for some statistics about the job to be done:
+Ask for the parallelization of "for01"
+void for01(int n)
+{
+   int i, j;
+   float x[100];
+
+   for(i = i; i <= n-1; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 99; j += 1)
+         x[j] = 0.;
+}

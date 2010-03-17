@@ -1,0 +1,78 @@
+# demo Parallelization-1
+
+delete seq
+create seq seq.f
+module SEQ
+
+# Discuss the sequence of calls, present the demonstration
+
+display PRINTED_FILE[SEQ]
+
+# Easy parallelization
+
+module MATMUL
+display PARALLELPRINTED_FILE[MATMUL]
+# Why do I have a sequential internal loop?
+display DG_FILE[MATMUL]
+
+# Slightly more difficule, privatization is needed
+
+module SMATMUL
+display PARALLELPRINTED_FILE[SMATMUL]
+# Well, it did not work, let's look at the dependence graph
+display DG_FILE[SMATMUL]
+# Scalar S is the problem! Privatize it
+apply PRIVATIZE_MODULE[SMATMUL]
+# And now it's parallel!
+display PARALLELPRINTED_FILE[SMATMUL]
+# The only left dependence are now at level 3: the loop body must be
+# executed sequentially, of course..
+display DG_FILE[SMATMUL]
+
+# Loop bounds are sometimes necessary
+
+module TRANSPOSE
+# No hope for simple parallelization
+display PARALLELPRINTED_FILE[TRANSPOSE]
+# Let's see what's wrong: Scalar T and X[I,J] vs X[J,I]
+display DG_FILE[TRANSPOSE]
+# Fix the two problems
+# Information available in loop bounds
+activate RICE_FULL_DEPENDENCE_GRAPH # Loop Bounds Used
+apply PRIVATIZE_MODULE[TRANSPOSE]
+display PARALLELPRINTED_FILE[TRANSPOSE]
+# Only non-loop-carried dependences
+display DG_FILE[TRANSPOSE]
+
+# Preconditions needed
+
+module FLIPFLOP
+display PRINTED_FILE[FLIPFLOP]
+display PARALLELPRINTED_FILE[FLIPFLOP]
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH # Preconditions Used
+activate PRINT_CODE_PRECONDITIONS # Statements & Preconditions
+display PRINTED_FILE[FLIPFLOP]
+display PARALLELPRINTED_FILE[FLIPFLOP]
+
+# And now, some interprocedural stuff
+ 
+module DIGITALIZE
+activate PRINT_CODE
+display PRINTED_FILE[DIGITALIZE]
+apply PRIVATIZE_MODULE[DIGITALIZE]
+display PARALLELPRINTED_FILE[DIGITALIZE]
+# Well, that's not enough. Information about 
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH # Preconditions Used
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL # Full Inter-Procedural Analysis
+activate TRANSFORMERS_INTER_FULL # Full Inter-Procedural Computation
+# Let's have a look at the information gathered 
+activate PRINT_CODE_PRECONDITIONS # Statements & Preconditions
+display PRINTED_FILE[DIGITALIZE]
+# And here we are: two parallel loops eventually
+display PARALLELPRINTED_FILE[DIGITALIZE]
+
+# Applause:-)
+close
+delete seq
+quit

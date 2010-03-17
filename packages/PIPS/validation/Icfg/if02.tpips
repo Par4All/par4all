@@ -1,0 +1,10 @@
+delete if02
+create if02 if02.c
+activate C_PARSER
+activate PRINT_ICFG_WITH_CONTROL
+setproperty ICFG_IFs=TRUE
+display ICFG_FILE[if02]
+close
+delete if02
+quit
+

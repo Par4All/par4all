@@ -1,0 +1,43 @@
+* Example with indirection's  array reference 
+
+      PROGRAM INDIRECTION
+      REAL X(500),Y(500)
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+      N = 10                                                            0002
+      S = 0.0                                                           0003
+      DO 100 I = 1, N-1                                                 0004
+         IF (500.LT.Y(I)) STOP "Bound violation:, READING,  array INDIRE
+     &CTION:X, upper bound, 1st dimension"
+         IF (Y(I).LT.1) STOP "Bound violation:, READING,  array INDIRECT
+     &ION:X, lower bound, 1st dimension"
+         IF (500.LT.X(N-I)) STOP "Bound violation:, READING,  array INDI
+     &RECTION:Y, upper bound, 1st dimension"
+         IF (X(N-I).LT.1) STOP "Bound violation:, READING,  array INDIRE
+     &CTION:Y, lower bound, 1st dimension"
+         S = S+X(Y(I))*Y(X(N-I))                                        0005
+100      CONTINUE                                                       0006
+      WRITE (*, '("b",F15.5)') S                                        0007
+      END
+* Example with indirection's  array reference 
+
+      PROGRAM INDIRECTION
+      REAL X(500),Y(500)
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+      N = 10                                                            0002
+      S = 0.0                                                           0003
+      DO 100 I = 1, N-1                                                 0004
+         IF (500.LT.Y(I)) STOP "Bound violation:, READING,  array INDIRE
+     &CTION:X, upper bound, 1st dimension"
+         IF (Y(I).LT.1) STOP "Bound violation:, READING,  array INDIRECT
+     &ION:X, lower bound, 1st dimension"
+         IF (500.LT.X(N-I)) STOP "Bound violation:, READING,  array INDI
+     &RECTION:Y, upper bound, 1st dimension"
+         IF (X(N-I).LT.1) STOP "Bound violation:, READING,  array INDIRE
+     &CTION:Y, lower bound, 1st dimension"
+         S = S+X(Y(I))*Y(X(N-I))                                        0005
+100      CONTINUE                                                       0006
+      WRITE (*, '("b",F15.5)') S                                        0007
+      END
+

@@ -1,0 +1,134 @@
+
+C  T() {}
+
+      SUBROUTINE VRFVAL ()
+ 
+C     Bug found by Corinne on 4 October 2002 (not reproduced)
+
+      REAL*8 X,Y,I      
+
+C  T(I) {}
+
+
+      IF (MAX(ABS(X), ABS(Y)).GT.1.) I = 1                              0007
+
+C  T(Z) {0<=X+Z, X<=Z}
+
+
+      Z = ABS(X)                                                        0009
+
+C  T(U) {0<=U+Y, Y<=U}
+
+      U = ABS(Y)                                                        0010
+
+C  T(V) {U<=V, Z<=V}
+
+      V = AMAX1(Z, U)                                                   0011
+
+C  T(U,V,Z) {}
+
+
+      IF (V.GT.1.) THEN                                                 0013
+
+C  T() {}
+
+C     Let's see what information is generated:
+         PRINT *, X, Y, Z, U, V                                         0015
+
+C  T(U,V,Z) {}
+
+C     And what's left about X and Y? Nothing!
+         READ *, Z, U, V                                                0017
+
+C  T() {}
+
+         PRINT *, X, Y                                                  0018
+      ELSE
+
+C  T() {}
+
+C     Let's see again what information is generated:
+         PRINT *, X, Y, Z, U, V                                         0021
+
+C  T(U,V,Z) {}
+
+C     And what's left about X and Y? Something!
+         READ *, Z, U, V                                                0023
+
+C  T() {}
+
+         PRINT *, X, Y                                                  0024
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, X, Y, Z, U, V                                            0027
+      END
+
+C  P() {}
+
+      SUBROUTINE VRFVAL ()
+ 
+C     Bug found by Corinne on 4 October 2002 (not reproduced)
+
+      REAL*8 X,Y,I      
+
+C  P() {}
+
+
+      IF (MAX(ABS(X), ABS(Y)).GT.1.) I = 1                              0007
+
+C  P(I) {}
+
+
+      Z = ABS(X)                                                        0009
+
+C  P(I,Z) {0<=X+Z, X<=Z}
+
+      U = ABS(Y)                                                        0010
+
+C  P(I,U,Z) {0<=U+Y, Y<=U, 0<=X+Z, X<=Z}
+
+      V = AMAX1(Z, U)                                                   0011
+
+C  P(I,U,V,Z) {U<=V, 0<=U+Y, Y<=U, Z<=V, 0<=X+Z, X<=Z}
+
+
+      IF (V.GT.1.) THEN                                                 0013
+
+C  P(I,U,V,Z) {1.<=V, U<=V, 0<=U+Y, Y<=U, Z<=V, 0<=X+Z, X<=Z}
+
+C     Let's see what information is generated:
+         PRINT *, X, Y, Z, U, V                                         0015
+
+C  P(I,U,V,Z) {1.<=V, U<=V, 0<=U+Y, Y<=U, Z<=V, 0<=X+Z, X<=Z}
+
+C     And what's left about X and Y? Nothing!
+         READ *, Z, U, V                                                0017
+
+C  P(I,U,V,Z) {}
+
+         PRINT *, X, Y                                                  0018
+      ELSE
+
+C  P(I,U,V,Z) {V<=1., U<=V, 0<=U+Y, Y<=U, Z<=V, 0<=X+Z, X<=Z}
+
+C     Let's see again what information is generated:
+         PRINT *, X, Y, Z, U, V                                         0021
+
+C  P(I,U,V,Z) {V<=1., U<=V, 0<=U+Y, Y<=U, Z<=V, 0<=X+Z, X<=Z}
+
+C     And what's left about X and Y? Something!
+         READ *, Z, U, V                                                0023
+
+C  P(I,U,V,Z) {0<=1.+X, X<=1., 0<=1.+Y, Y<=1.}
+
+         PRINT *, X, Y                                                  0024
+      ENDIF
+
+C  P(I,U,V,Z) {}
+
+
+      PRINT *, X, Y, Z, U, V                                            0027
+      END

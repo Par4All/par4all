@@ -1,0 +1,48 @@
+
+Initial source code
+
+int for04()
+{
+   int x[512];
+   int i;
+   int j;
+   
+   /*, j = 0*/
+   for (i = 0;i<500;i += 128)
+      /*, j++*/
+      x[i] = 0;
+   
+   //printf("%d, %d\n", i, j);
+
+   return 0;
+}
+
+Check transformers on strip-mined loop
+
+
+//  T(for04) {for04==0}
+
+int for04()
+{
+   int x[512];
+   int i;
+   int j;
+
+//  T(i) {0<=i, i<=499}
+
+   
+   /*, j = 0*/
+   for (i = 0;i<500;i += 128)
+
+//  T() {0<=i, i<=499}
+
+      /*, j++*/
+      x[i] = 0;
+
+//  T(for04) {for04==0, 500<=i, i<=627}
+
+   
+   //printf("%d, %d\n", i, j);
+
+   return 0;
+}

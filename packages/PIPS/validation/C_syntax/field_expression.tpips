@@ -1,0 +1,17 @@
+delete field_expression
+create field_expression field_expression.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+
+delete field_expression
+
+quit

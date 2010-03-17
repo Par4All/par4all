@@ -1,0 +1,15 @@
+      PROGRAM EMPTIF
+
+c     Comments in the empty true branch of a test are printed out
+c     in the false branch
+
+c     this is the comment about the test
+      IF (I.GT.1) THEN                                                  0007
+         I = 1                                                          0008
+c     this is part of the true branch
+      ELSE
+         I = 2                                                          0011
+c     this is part of the false branch
+      ENDIF
+c     this is the end of the test
+      END

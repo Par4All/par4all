@@ -1,0 +1,137 @@
+
+Symbol table for "decl19!"
+
+decl19!
+
+Declarations for module "decl19!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:decl19" with type "functional" "int -> int"
+	Declared entity "decl19!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl19!:*HEAP*" with type "area" with size 0
+	Declared entity "decl19!:*STACK*" with type "area" with size 0
+	Declared entity "decl19!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:decl19"	with type "functional" "int -> int"
+
+Typedef entities:
+
+	Typedef "decl19!:$f"	with type "functional" "int -> int"
+	Typedef "decl19!:$g"	with type "variable" "(int -> int) *"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl19!
+
+
+Symbol table for "decl19"
+
+decl19
+
+Declarations for module "decl19" with type "int -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl19!:*STATIC*" with type "area" with size 0
+	Declared entity "decl19:*DYNAMIC*" with type "area" with size 18
+	Declared entity "decl19:*HEAP*" with type "area" with size 0
+	Declared entity "decl19:*STACK*" with type "area" with size 0
+	Declared entity "decl19:*STATIC*" with type "area" with size 0
+	Declared entity "decl19:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "decl19:0`__func__" with type "variable" "char"
+	Declared entity "decl19:0`x" with type "variable" "g"
+	Declared entity "decl19:cookie" with type "variable" "int"
+	Declared entity "decl19:decl19" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable decl19:cookie	offset = 1
+
+Layout for return variable:
+
+	Variable "decl19:decl19"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19:*DYNAMIC*" of size 18:
+	Variable "decl19:0`x"	offset = 14	size = 4
+	Variable "decl19:0`__func__"	offset = 0	size = 7
+	Variable "decl19:0`__FUNCTION__"	offset = 7	size = 7
+
+
+Layout for memory area "decl19:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl19:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl19
+
+
+Parsed printed file for "decl19!" and "decl19"
+
+/* Example by Ronan keryell */
+typedef int f(int cookie);
+
+typedef int (*g)(int);
+
+extern int decl19(int cookie);
+
+extern int decl19(int cookie);
+
+int decl19(int cookie)
+{
+   g x;
+   x = decl19;
+   //x = &main;
+   /* This is not possible :-)
+        x = &&&&&main; */
+   if (cookie<10)
+      return x(cookie+1);
+   else if (cookie<20)
+      return (*x)(cookie+1);
+   else if (cookie<30) {
+      /* Fun for my student :-) */
+      (*****************x)(cookie+1);
+   }
+}

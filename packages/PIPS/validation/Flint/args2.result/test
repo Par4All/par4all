@@ -1,0 +1,9 @@
+
+Flinted file
+
+flint message from check call, in module ARGS2, in statement (0.2), number 1
+too many arguments (2) in call to TOP-LEVEL:FOO (1)
+number of messages from flint for ARGS2 : 1
+flint message from check_call, in module FOO, in statement (0.2), number 1
+incompatible basic type, 0th arg in call to TOP-LEVEL:=, int>float
+number of messages from flint for FOO : 1

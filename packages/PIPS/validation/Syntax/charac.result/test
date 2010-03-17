@@ -1,0 +1,8 @@
+C     Check for character declarations
+C
+C     Problem with modifiers
+      PROGRAM CHARAC
+      CHARACTER*4 X, Y*8, Z(10)*100
+      REAL*4 U, V*8
+      U = 0.                                                            0007
+      END

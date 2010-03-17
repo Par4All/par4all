@@ -1,0 +1,117 @@
+
+Initial code
+
+int main(int argc, char **argv)
+{
+   // BEGIN BLOCK
+   int i, n = 100;
+   int *x, *y, *t;
+
+   x = (int *) malloc(sizeof(int));
+   y = (int *) malloc(sizeof(int));
+   t = (int *) malloc(sizeof(int));
+
+   for(i = 0; i <= n-1; i += 1)
+      scanf("%d %d", &x[i], &y[i]);
+
+   for(i = 0; i <= n-1; i += 1) {
+      // BEGIN BLOCK
+      t[i] = x[i];
+      x[i] = y[i];
+      y[i] = t[i];
+      // END BLOCK
+   }
+   printf("%d %d", x[n], y[n]);
+   // END BLOCK
+}
+
+RW regions
+
+int main(int argc, char **argv)
+{
+   // BEGIN BLOCK
+   int i, n = 100;
+   int *x, *y, *t;
+
+//  <x-W-EXACT-{}>
+
+
+   x = (int *) malloc(sizeof(int));
+
+//  <y-W-EXACT-{}>
+
+   y = (int *) malloc(sizeof(int));
+
+//  <t-W-EXACT-{}>
+
+   t = (int *) malloc(sizeof(int));
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <x[PHI1]-W-MAY-{n==100, 0<=i, i<=99}>
+//  <y[PHI1]-W-MAY-{n==100, 0<=i, i<=99}>
+
+      scanf("%d %d", &x[i], &y[i]);
+
+   for(i = 0; i <= n-1; i += 1) {
+      // BEGIN BLOCK
+
+//  <t-R-EXACT-{}>
+//  <t[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
+      t[i] = x[i];
+
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+//  <y-R-EXACT-{}>
+//  <y[PHI1]-R-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
+      x[i] = y[i];
+
+//  <t-R-EXACT-{}>
+//  <t[PHI1]-R-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+//  <y-R-EXACT-{}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
+      y[i] = t[i];
+      // END BLOCK
+   }
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{PHI1==n, i==100, n==100}>
+//  <y-R-EXACT-{}>
+//  <y[PHI1]-R-EXACT-{PHI1==n, i==100, n==100}>
+
+   printf("%d %d", x[n], y[n]);
+   // END BLOCK
+}
+
+Code after scalarization
+
+int main(int argc, char **argv)
+{
+   // BEGIN BLOCK
+   int i, n = 100;
+   int *x, *y, *t;
+
+   x = (int *) malloc(sizeof(int));
+   y = (int *) malloc(sizeof(int));
+   t = (int *) malloc(sizeof(int));
+
+   for(i = 0; i <= n-1; i += 1)
+      scanf("%d %d", &x[i], &y[i]);
+
+   for(i = 0; i <= n-1; i += 1) {
+      // BEGIN BLOCK
+      t[i] = x[i];
+      x[i] = y[i];
+      y[i] = t[i];
+      // END BLOCK
+   }
+   printf("%d %d", x[n], y[n]);
+   // END BLOCK
+}

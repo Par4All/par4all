@@ -1,0 +1,26 @@
+#!/bin/sh
+# test pips on oa118.f (Proprietary code from ONERA)
+#
+# if Pips -f oa118.f -w oa118 -m oa118 -s rfulldg -b PPF >&2
+# then 
+# 	Display -l para77
+# 	Delete oa118>&2
+# else 
+#     	echo Parallelization failed 
+# 	Delete oa118>&2
+# 	exit 1
+# fi
+
+delete oa118
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create oa118 oa118.f
+
+activate RICE_FULL_DEPENDENCE_GRAPH
+
+display PARALLELPRINTED_FILE[OA118]
+
+close
+delete oa118
+quit

@@ -1,0 +1,64 @@
+
+Symbol table for "decl10"
+
+decl10!
+
+Declarations for module "decl10!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl10!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl10!:*HEAP*" with type "area" with size 0
+	Declared entity "decl10!:*STACK*" with type "area" with size 0
+	Declared entity "decl10!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "decl10!:#_PIPS_STRUCT_1"	kind = struct
+	Variable "decl10!:'_PIPS_UNION_2"	kind = union
+	Variable "decl10!:?_PIPS_ENUM_3"	kind = enum
+
+Typedef entities:
+
+	Typedef "decl10!:$A"	with type "variable" "struct {int a;}"
+	Typedef "decl10!:$B"	with type "variable" "union {int a; double b;}"
+	Typedef "decl10!:$C"	with type "variable" "enum {x1, x2}"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl10!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl10!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl10!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl10!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl10!
+
+
+Parsed printed file
+
+typedef struct {
+   int a;
+} A;
+typedef union {
+   int a;
+   double b;
+} B;
+typedef enum {x1, x2} C;

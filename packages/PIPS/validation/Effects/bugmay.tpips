@@ -1,0 +1,9 @@
+create bugmay bugmay.f
+module BUGMAY
+activate PRINT_CODE
+display PRINTED_FILE(BUGMAY)
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE(BUGMAY)
+close
+delete bugmay
+quit

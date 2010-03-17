@@ -1,0 +1,124 @@
+Transform all the control flow in hierarchical finite state machines:
+extern int ex3(int argc, char *args);
+int ex3(int argc, char *args)
+{
+   int x[100];
+   int u[100];
+   int z[100];
+   int y[100];
+   int k;
+   int r;
+   int t;
+   FSM2_STATE = 1;
+   while (FSM2_STATE!=0) 
+      if (FSM2_STATE==1) {
+         (k = 3, r = 2);
+         FSM2_STATE = 2;
+      }
+      else if (FSM2_STATE==2)
+         if (k<90&&r>3) {
+            ;
+            FSM2_STATE = 3;
+         }
+         else {
+            ;
+            FSM2_STATE = 5;
+         }
+      else if (FSM2_STATE==3) {
+         x[k] = x[k-2]+x[k+3];
+         FSM2_STATE = 4;
+      }
+      else if (FSM2_STATE==4) {
+         (k++, r--);
+         FSM2_STATE = 2;
+      }
+      else if (FSM2_STATE==5) {
+         ;
+         FSM2_STATE = 0;
+      }
+   /* END_FPGA_TEST */
+
+   return 0;
+}
+For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
+/* SMALLTALK pretty print for module ex3. */
+ex3 with:argc with:args 
+"Automatically generated with PIPS"
+
+"FSM2_STATE,int "
+"0`__func__,char "
+"0`__FUNCTION__,char "
+"result,int "
+"0`x,int , 1 dimension"
+"0`u,int , 1 dimension"
+"0`z,int , 1 dimension"
+"0`y,int , 1 dimension"
+"0`k,int "
+"0`r,int "
+"0`t,int "
+
+|FSM2_STATE 0`__func__ 0`__FUNCTION__ result 0`x 0`u 0`z 0`y 0`k 0`r 0`t |
+
+
+FSM2_STATE 0`__func__ 0`__FUNCTION__ result 0`x 0`u 0`z 0`y 0`k 0`r 0`t .
+FSM2_STATE 0`__func__ 0`__FUNCTION__ result 0`x 0`u 0`z 0`y 0`k 0`r 0`t .
+.
+0`x := Array new: 100.
+0`u := Array new: 100.
+0`z := Array new: 100.
+0`y := Array new: 100.
+
+0`x.
+0`u.
+0`z.
+0`y.
+0`k.
+0`r.
+0`t.
+FSM2_STATE := 1.
+[FSM2_STATE != 0] whileTrue: [
+(FSM2_STATE == 1)
+ifTrue: [
+,(0`k := 3, 0`r := 2).
+FSM2_STATE := 2.
+]
+ifFalse: [
+(FSM2_STATE == 2)
+ifTrue: [
+(__C-and__(0`k < 90, 0`r > 3))
+ifTrue: [
+__C-and__(0`k < 90, 0`r > 3)FSM2_STATE := 3.
+]
+ifFalse: [
+__C-and__(0`k < 90, 0`r > 3)FSM2_STATE := 3.
+FSM2_STATE := 5.
+].
+]
+ifFalse: [
+(FSM2_STATE == 3)
+ifTrue: [
+0`x at: 0`k-0 put: ((0`x at: (0`k - 2-0)) + (0`x at: (0`k + 3-0))).
+FSM2_STATE := 4.
+]
+ifFalse: [
+(FSM2_STATE == 4)
+ifTrue: [
+,(0`k ++, 0`r --).
+FSM2_STATE := 2.
+]
+ifFalse: [
+(FSM2_STATE == 5)
+ifTrue: [
+FSM2_STATE == 5FSM2_STATE := 0.
+]
+ifFalse: [
+FSM2_STATE == 5FSM2_STATE := 0.
+].
+].
+].
+].
+].
+].
+return(0).
+
+

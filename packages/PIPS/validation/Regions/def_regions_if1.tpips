@@ -1,0 +1,16 @@
+delete if1
+create if1 def_regions_if1.f
+set PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+module TEST
+display PRINTED_FILE
+module IF1
+display PRINTED_FILE
+activate RICE_FAST_DEPENDENCE_GRAPH
+activate REGION_CHAINS
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+close
+delete if1
+quit

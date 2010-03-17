@@ -1,0 +1,14 @@
+delete array
+create array array.c
+
+close
+delete array
+quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+delete array
+quit

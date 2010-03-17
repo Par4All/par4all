@@ -1,0 +1,9 @@
+delete bouclevide1
+create bouclevide1 bouclevide1.f
+module TEST1
+display PRINTED_FILE[TEST1]
+apply SUPPRESS_TRIVIAL_TEST[TEST1]
+display PRINTED_FILE[TEST1]
+close
+delete bouclevide1
+quit

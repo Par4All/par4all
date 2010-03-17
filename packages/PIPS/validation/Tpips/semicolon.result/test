@@ -1,0 +1,18 @@
+
+C  P() {}
+
+! 
+      PROGRAM SEMICOLON
+
+C  P() {}
+
+      PRINT *, 'hello'                                                  0001
+
+C  P() {}
+
+      I = 1                                                             0002
+
+C  P(I) {I==1}
+
+      PRINT *, 'bye'                                                    0003
+      END

@@ -1,0 +1,131 @@
+
+Source code with proper effects
+
+double call10(int i)
+{
+   double x = 3.;                                                       /*0004*/
+//               <must be read   >: i
+//               <must be written>: i
+   i += 10;                                                             /*0005*/
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0006*/
+//               <must be read   >: x
+
+   return x;                                                            /*0008*/
+}
+
+Source code with cumulated effects
+
+//               <must be read   >: TOP-LEVEL:j i
+//               <must be written>: TOP-LEVEL:j
+double call10(int i)
+{
+   double x = 3.;                                                       /*0004*/
+//               <must be read   >: i
+//               <must be written>: i
+   i += 10;                                                             /*0005*/
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0006*/
+//               <must be read   >: x
+
+   return x;                                                            /*0008*/
+}
+
+Source code with transformers for "call10"
+
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+double call10(int i)
+{
+   double x = 3.;                                                       /*0004*/
+
+//  T(i) {i==i#init+10}
+
+   i += 10;                                                             /*0005*/
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+   j++;                                                                 /*0006*/
+
+//  T() {}
+
+
+   return x;                                                            /*0008*/
+}
+
+Source code with transformers for "main"
+
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+main()
+{
+   int ai = 3;                                                          /*0018*/
+
+//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==j#init+1, ai==ai#init+1}
+
+
+   call10(++ai);                                                        /*0020*/
+
+//  T(ai) {ai==0}
+
+
+   ai = 0;                                                              /*0022*/
+}
+
+Source code with preconditions for "call10"
+
+
+//  P() {TOP-LEVEL:j==0, i==4}
+
+double call10(int i)
+{
+   double x = 3.;                                                       /*0004*/
+
+//  P() {TOP-LEVEL:j==0, i==4}
+
+   i += 10;                                                             /*0005*/
+
+//  P(i) {TOP-LEVEL:j==0, i==14}
+
+   j++;                                                                 /*0006*/
+
+//  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==14, j#init==0}
+
+
+   return x;                                                            /*0008*/
+}
+
+Source code with preconditions for "main"
+
+
+//  P() {TOP-LEVEL:j==0}
+
+main()
+{
+   int ai = 3;                                                          /*0018*/
+
+//  P() {TOP-LEVEL:j==0, ai==3}
+
+
+   call10(++ai);                                                        /*0020*/
+
+//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==1, ai==4, j#init==0}
+
+
+   ai = 0;                                                              /*0022*/
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+TRANSFORMERS_INTER_FULL[call10] (NormalizeExpression) expression is already normalized
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
+TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call10" ignored.
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call10] (NormalizeExpression) expression is already normalized
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call10!] (ordinary_summary_precondition) empty precondition to call10! because not in call tree from main.

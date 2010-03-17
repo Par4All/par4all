@@ -1,0 +1,11 @@
+# delete mouse2
+create mouse2 mouse2.f
+activate PRINT_CODE_PRECONDITIONS
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+module mouse2
+display PRINTED_FILE
+close 
+delete mouse2
+quit

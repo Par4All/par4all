@@ -1,0 +1,31 @@
+user warning in tp_parse: data05: No such workspace
+Registering file data05.f
+Splitting file    ./data05.f
+  Module         DATA05
+Workspace data05 created and opened.
+Module DATA05 selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+Module DATA05 already active.
+Request: build resource PRINTED_FILE for module DATA05.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(DATA05)
+  PARSER                         building   PARSED_CODE(DATA05)
+                                 building   CALLEES(DATA05)
+user warning in fix_storage: DATA for variable M declared in COMMON *BLANK*: not standard compliant, use a BLOCKDATA
+user error in fix_storage: Parser error between lines 11 and 11
+Improper DATA declaration, use a BLOCKDATA or set property PARSER_ACCEPT_ANSI_EXTENSIONS
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module DATA05.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module DATA05.
+Closing program.
+Closing workspace.
+Workspace data05 closed.
+
+Workspace data05 deleted.

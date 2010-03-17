@@ -1,0 +1,31 @@
+#this is the validation script to test omp reduction pragma prettyprinting in
+#fortran when handling pragma as expression as set by the PRAGMA_TYPE property
+
+delete reduction_op_f2
+create reduction_op_f2 reduction_op_f.f
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv RICE_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv PIPSDBM_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv REDUCTIONS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+
+
+apply PRIVATIZE_MODULE(PARALLEL)
+setproperty PRAGMA_TYPE "expr"
+apply OMPIFY_CODE(PARALLEL)
+display PRINTED_FILE(PARALLEL)
+
+close
+delete reduction_op_f2
+quit
+# EOF

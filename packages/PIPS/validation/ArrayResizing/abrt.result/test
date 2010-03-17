@@ -1,0 +1,77 @@
+
+      SUBROUTINE ABRT(MESS,NC)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      CHARACTER MESS(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      NW = (NC+9)/10
+C (0,3)
+      WRITE (*, 99) (MESS(I), I = 1, NW)
+C (0,4)
+99    FORMAT(1X,8A10)
+C (0,5)
+      STOP 'SOLVE'
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE GEN(N)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      COMMON/FFT00/C(65),S(65),EIG(512)
+      DATA NA/0/
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      IF (N.GT.512.OR.N.LT.8) THEN
+C (0,3)
+         CALL ABRT('GEN--N OUT OF RANGE', 19)
+      ELSE
+C (0,4)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for abrt.f
+!!
+      SUBROUTINE GEN(N)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      COMMON/FFT00/C(65),S(65),EIG(512)
+      DATA NA/0/
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      IF (N.GT.512.OR.N.LT.8) THEN
+C (0,3)
+         CALL ABRT('GEN--N OUT OF RANGE', 19)
+      ELSE
+C (0,4)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE ABRT(MESS,NC)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      CHARACTER MESS(19)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      NW = (NC+9)/10
+C (0,3)
+      WRITE (*, 99) (MESS(I), I = 1, NW)
+C (0,4)
+99    FORMAT(1X,8A10)
+C (0,5)
+      STOP 'SOLVE'
+C (0,6)
+      RETURN
+C     END BLOCK
+      END

@@ -1,0 +1,69 @@
+echo
+echo Check syntactic analysis of large constants
+echo
+
+delete large01
+create large01 large01.f
+
+echo
+echo First case
+echo
+
+display PRINTED_FILE(LARGE01)
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE(LARGE01)
+
+echo
+echo Second case
+echo
+
+display PRINTED_FILE(LARGE012
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE(LARGE03)
+
+echo
+echo Third case
+echo
+
+display PRINTED_FILE(LARGE03)
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE(LARGE03)
+
+echo
+echo Fourth case
+echo
+
+display PRINTED_FILE(LARGE04)
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE(LARGE04)
+
+echo
+echo Fifth case
+echo
+
+display PRINTED_FILE(LARGE05)
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE(LARGE05)
+
+echo
+echo Sixth case
+echo
+
+display PRINTED_FILE(LARGE06)
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE(LARGE06)
+
+close
+quit

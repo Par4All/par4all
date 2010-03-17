@@ -1,0 +1,43 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W10
+
+C     Side effects in while loop condition
+
+      INTEGER MS
+
+C  T(MS) {MS==3}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(MS) {MS==0}
+
+C (0,2)
+
+      MS = 0                                                            0007
+
+C  T(MS) {MS#init==0, 1<=MS, MS<=2}
+
+C (0,3)
+
+      DO WHILE (INC(MS).LE.2)                                           0009
+
+C  T() {1<=MS, MS<=2}
+
+C (0,4)
+         PRINT *, MS                                                    0010
+      ENDDO
+
+C  T() {MS==3}
+
+C (0,5)
+
+      PRINT *, MS                                                       0013
+
+C     END BLOCK
+      END

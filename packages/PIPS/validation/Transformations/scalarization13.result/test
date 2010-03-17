@@ -1,0 +1,15 @@
+
+Code after scalarization
+
+C     Expected result: nothing needs to be scalarized
+C
+C     NOTE: scalarization takes place all the same
+
+      SUBROUTINE SCALARIZATION13(X,Y,N)
+      REAL X(N), Y(N)      
+C     BEGIN BLOCK
+      DO I = 1, N                                                       0007
+         X(I) = Y(I)                                                    0008
+      ENDDO
+C     END BLOCK
+      END

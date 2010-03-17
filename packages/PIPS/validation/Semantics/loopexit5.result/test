@@ -1,0 +1,39 @@
+--- Preconditions for LOOPEXIT5
+
+C  P() {}
+
+      PROGRAM LOOPEXIT5
+
+C     Propagate information although it is not known if the loop is executed
+C     or not:
+C     this Requires a convex hull of the loop entered and 
+C     the loop non entered cases
+
+      REAL T(10)
+
+C  P() {}
+
+
+      I = 0                                                             0010
+
+C  P(I) {I==0}
+
+      DO I = N, 1, -1                                                   0011
+
+C  P(I) {1<=I, I<=N}
+
+         T(I) = 0.                                                      0012
+      ENDDO
+
+C  P(I) {I<=0, I<=N}
+
+
+C     Expected but not found because FALSE precondition:
+C     P(I) {I==0} 
+C     Effective precondition because initialization of i is useless
+C     and because n's value is unknown:
+C     P(I) {I<=0}
+
+      PRINT *, I                                                        0021
+
+      END

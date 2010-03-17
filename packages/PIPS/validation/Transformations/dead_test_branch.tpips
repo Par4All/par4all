@@ -1,0 +1,17 @@
+delete d
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+create d dead_test_branch.f
+
+echo ### initial code
+display PRINTED_FILE
+
+echo ### suppress dead code
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+close
+
+delete d

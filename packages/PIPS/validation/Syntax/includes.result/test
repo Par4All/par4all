@@ -1,0 +1,85 @@
+ INCLUSIONS
+     PFOO
+     PFOOBLA
+     PBLANK
+     PEQUIV
+     PDIFF
+     PDIFFE
+      PROGRAM INCLUSIONS
+      include 'FOO.h'
+      include 'BLA.h'
+      include 'blank.h'
+      include 'EQUIV.h'
+      REAL*4 D1, D2, D3
+      COMMON /DIFF/ D1, D2, D3
+      INTEGER E(1:3)
+      REAL*4 E1, E2, E3
+      COMMON /DIFFE/ E1, E2, E3
+      EQUIVALENCE (E, E1)
+! some code
+      A = 1                                                             0015
+      X = 2                                                             0016
+      Q = 3                                                             0017
+      I = 4                                                             0018
+      D1 = 5                                                            0019
+      E1 = 6                                                            0020
+      CALL PFOO                                                         0021
+      CALL PFOOBLA                                                      0022
+      CALL PBLANK                                                       0023
+      CALL PEQUIV                                                       0024
+      CALL PDIFF                                                        0025
+      CALL PDIFFE                                                       0026
+      END
+      SUBROUTINE PBLANK
+      include 'blank.h'
+      PRINT *, Q, W, T                                                  0004
+      END
+      SUBROUTINE PDIFF
+      REAL*4 D1, D2, DD
+      COMMON /DIFF/ D1, D2, DD
+      PRINT *, D1, D2, DD                                               0004
+      END
+      SUBROUTINE PDIFFE
+      INTEGER E(1:3)
+      REAL*4 E1, E2, EE
+      COMMON /DIFFE/ E1, E2, EE
+      EQUIVALENCE (E, E1)
+      PRINT *, E1, E2, EE                                               0006
+      END
+      SUBROUTINE PEQUIV
+      include 'EQUIV.h'
+      PRINT *, I, J, K                                                  0006
+      END
+      SUBROUTINE PFOO
+      include 'FOO.h'
+      PRINT *, A, B, C                                                  0004
+      END
+      SUBROUTINE PFOOBLA
+      include 'FOO.h'
+      include 'BLA.h'
+      PRINT *, A, B, C                                                  0005
+      PRINT *, X, Y, Z                                                  0006
+      END
+!!
+!! pips: include file for common BLA
+!!
+      REAL*4 X, Y, Z
+      COMMON /BLA/ X, Y, Z
+!!
+!! pips: include file for common EQUIV
+!!
+      INTEGER I, J, K
+      INTEGER L(1:3)
+      COMMON /EQUIV/ I, J, K
+      EQUIVALENCE (L, I)
+!!
+!! pips: include file for common FOO
+!!
+      REAL*4 A, B, C
+      COMMON /FOO/ A, B, C
+!!
+!! pips: include file for common blank
+!!
+      REAL*4 Q, W, T
+      COMMON Q, W, T
+

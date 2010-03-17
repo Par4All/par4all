@@ -1,0 +1,14 @@
+delete pro_constant
+create pro_constant pro_constant.f
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+
+#setproperty EFFECTS_FILTER_ON_VARIABLE "FOO:X,FOO:Y,FOO:T,FOO:ZZ"
+#activate PRINT_WHOLE_DEPENDENCE_DAVINCI_GRAPHE
+#display DVDG_FILE[FOO]
+
+close
+delete pro_constant
+quit
+

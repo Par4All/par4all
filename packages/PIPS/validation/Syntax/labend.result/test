@@ -1,0 +1,12 @@
+
+      SUBROUTINE FOOEND
+
+      PRINT *, 'Hello!'                                                 0004
+
+      END
+      SUBROUTINE LABEND
+
+      CALL FOOEND                                                       0003
+
+10    CONTINUE                                                          0006
+      END

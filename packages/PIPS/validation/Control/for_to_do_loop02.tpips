@@ -1,0 +1,20 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ftdl02 for_to_do_loop02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+
+echo
+echo Initial code with converted loop
+echo
+
+module main
+display PRINTED_FILE
+
+close
+delete ftdl02
+quit

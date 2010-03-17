@@ -1,0 +1,35 @@
+C
+      PROGRAM ESSBOP
+C
+      INTEGER AA(25)
+
+C  <AA(PHI1)-W-MAY-{1<=PHI1, PHI1<=25}>
+
+C      
+
+      CALL ESSBOU(AA)                                                   0007
+C
+      END
+
+C  <A(PHI1)-W-MAY-{}>
+
+C
+C
+      SUBROUTINE ESSBOU(A)
+C
+      INTEGER A(25)
+C
+      K = 0                                                             0007
+
+C  <A(PHI1)-W-MAY-{}>
+
+
+      DO I = 1, 5                                                       0009
+
+C  <A(PHI1)-W-EXACT-{PHI1==K, 1<=I, I<=5}>
+
+         A(K) = 0                                                       0010
+         K = K*K                                                        0011
+      ENDDO
+C
+      END

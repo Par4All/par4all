@@ -1,0 +1,6 @@
+delete cpp
+create cpp cpp_test.F
+display PRINTED_FILE[%ALL]
+close
+delete cpp
+quit

@@ -1,0 +1,72 @@
+
+PRINT CODE for main
+
+int main()
+{
+   int entier;
+   int graine;
+   double virgule;
+   graine = 50;
+   srandom(graine);
+   /* generator initialization */
+   virgule = (double) rand()/(2147483647+1);
+   entier = 1+rand();
+}
+
+PRINT CUMULATED EFFECTS for main
+
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+int main()
+{
+   int entier;
+   int graine;
+   double virgule;
+//               <must be written>: graine
+   graine = 50;
+//               <must be read   >: graine
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+   srandom(graine);
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED virgule
+   /* generator initialization */
+   virgule = (double) rand()/(2147483647+1);
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED entier
+   entier = 1+rand();
+}
+
+PRINT REGIONS for main
+
+
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
+
+int main()
+{
+   int entier;
+   int graine;
+   double virgule;
+
+//  <graine-W-EXACT-{}>
+
+   graine = 50;
+
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
+//  <graine-R-EXACT-{}>
+
+   srandom(graine);
+
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
+//  <virgule-W-EXACT-{}>
+
+   /* generator initialization */
+   virgule = (double) rand()/(2147483647+1);
+
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
+//  <entier-W-EXACT-{}>
+
+   entier = 1+rand();
+}

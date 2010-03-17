@@ -1,0 +1,276 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W15
+
+C     Derived from w12 and w13. ELSE removed to obtain unfeasible paths
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  T(I) {0<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  T(I) {I#init==0, 0<=I}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+C (0,5)
+         IF (I.EQ.0) THEN                                               0012
+
+C  T(I) {I==1, I#init==0}
+
+C (0,6)
+            I = 1                                                       0013
+         ELSE
+
+C  T() {}
+
+C (0,7)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  T() {}
+
+C (0,8)
+         READ *, X                                                      0015
+C        END BLOCK
+      ENDDO
+
+C  T() {0<=I}
+
+C (0,9)
+
+      PRINT *, I                                                        0018
+
+C     END BLOCK
+      END
+
+PRECONDITIONS 
+
+
+C  P() {}
+
+      PROGRAM W15
+
+C     Derived from w12 and w13. ELSE removed to obtain unfeasible paths
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  P(I) {I==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  P(I) {0<=I}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  P(I) {0<=I}
+
+C (0,5)
+         IF (I.EQ.0) THEN                                               0012
+
+C  P(I) {I==0}
+
+C (0,6)
+            I = 1                                                       0013
+         ELSE
+
+C  P(I) {1<=I}
+
+C (0,7)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  P(I) {1<=I}
+
+C (0,8)
+         READ *, X                                                      0015
+C        END BLOCK
+      ENDDO
+
+C  P(I) {0<=I}
+
+C (0,9)
+
+      PRINT *, I                                                        0018
+
+C     END BLOCK
+      END
+
+REFINED TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W15
+
+C     Derived from w12 and w13. ELSE removed to obtain unfeasible paths
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  T(I) {0<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  T(I) {I#init==0, 0<=I}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  T(I) {1<=I, I#init<=I, I<=I#init+1}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T(I) {1<=I, I#init<=I, I<=I#init+1}
+
+C (0,5)
+         IF (I.EQ.0) THEN                                               0012
+
+C  T(I) {I==1, I#init==0}
+
+C (0,6)
+            I = 1                                                       0013
+         ELSE
+
+C  T() {}
+
+C (0,7)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  T() {1<=I}
+
+C (0,8)
+         READ *, X                                                      0015
+C        END BLOCK
+      ENDDO
+
+C  T() {0<=I}
+
+C (0,9)
+
+      PRINT *, I                                                        0018
+
+C     END BLOCK
+      END
+
+PRECONDITIONS WITH REFINED TRANSFORMERS
+
+
+C  P() {}
+
+      PROGRAM W15
+
+C     Derived from w12 and w13. ELSE removed to obtain unfeasible paths
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  P(I) {I==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  P(I) {0<=I}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  P(I) {0<=I}
+
+C (0,5)
+         IF (I.EQ.0) THEN                                               0012
+
+C  P(I) {I==0}
+
+C (0,6)
+            I = 1                                                       0013
+         ELSE
+
+C  P(I) {1<=I}
+
+C (0,7)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  P(I) {1<=I}
+
+C (0,8)
+         READ *, X                                                      0015
+C        END BLOCK
+      ENDDO
+
+C  P(I) {0<=I}
+
+C (0,9)
+
+      PRINT *, I                                                        0018
+
+C     END BLOCK
+      END

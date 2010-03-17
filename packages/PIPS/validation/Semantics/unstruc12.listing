@@ -1,0 +1,2667 @@
+champeaux% cd $PIPS_DEVEDIR/Libs/semantics/
+champeaux% gdb GNUSOL2LL/tpips 
+GNU gdb 5.1.1
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "sparc-sun-solaris2.8"...
+(gdb) list unstructured_to_transformers
+208       return btf;
+209     }
+210     ^L
+211     static void 
+212     unstructured_to_transformers(unstructured u, transformer pre)
+213     {
+214       list blocs = NIL ;
+215       control ct = unstructured_control(u) ;
+216       hash_table ancestor_map = hash_table_undefined;
+217       hash_table scc_map = hash_table_undefined;
+(gdb) 
+218       
+219       (void) bourdoncle_partition(u, &ancestor_map, &scc_map);
+220
+221       pips_debug(5,"begin\n");
+222       
+223       /* There is no need to compute transformers for unreachable code,
+224        * using CONTROL_MAP, but this may create storage and prettyprinter
+225        * problems because of the data structure inconsistency.
+226        */
+227       CONTROL_MAP(c, {
+(gdb) break 219
+Breakpoint 1 at 0x170264: file ri_to_transformers.c, line 219.
+(gdb) break 221
+Breakpoint 2 at 0x170270: file ri_to_transformers.c, line 221.
+(gdb) set environment CONTROL_DEBUG_LEVEL 3
+(gdb) r Validation/unstruc12.tpips
+Starting program: /projects/Pips/Development/Libs/semantics/GNUSOL2LL/tpips Validation/unstruc12.tpips
+fpips (ARCH=GNUSOL2LL)
+  running as /projects/Pips/Development/Libs/semantics/GNUSOL2LL/tpips
+
+  (c) 1988-2000 Centre de Recherche en Informatique,
+                École des mines de Paris, France.
+
+  URL: http://www.cri.ensmp.fr/pips/
+  E-MAIL: pipsgroup@cri.ensmp.fr
+
+  This software is provided as is, under the terms of the GPL.
+  It includes software from GNU (readline, rx) and Berkeley (fsplit).
+
+Workspace unstruc12 deleted.
+Registering file /projects/Pips/Production/Validation/Semantics/unstruc12.f
+Splitting file    /projects/Pips/Production/Validation/Semantics/unstruc12.f
+  Module         UNSTRUC12
+Workspace unstruc12 created and opened.
+Module UNSTRUC12 selected
+Main module PROGRAM "UNSTRUC12" selected.
+Module UNSTRUC12 already active.
+Module UNSTRUC12 already active.
+setenv CONTROL_DEBUG_LEVEL "0"
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+user warning, property PRETTYPRINT_STATEMENT_ORDERING redefined
+setproperty PRETTYPRINT_BLOCKS TRUE
+user warning, property PRETTYPRINT_BLOCKS redefined
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+user warning, property PRETTYPRINT_UNSTRUCTURED redefined
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+user warning, property PRETTYPRINT_EMPTY_BLOCKS redefined
+Module UNSTRUC12 already active.
+Request: build resource PRINTED_FILE for module UNSTRUC12.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(UNSTRUC12)
+  PARSER                         building   PARSED_CODE(UNSTRUC12)
+                                 building   CALLEES(UNSTRUC12)
+  CONTROLIZER                    building   CODE(UNSTRUC12)
+user warning in control_graph: Some statements are unreachable
+  PRINT_CODE                     building   PRINTED_FILE(UNSTRUC12)
+PRINTED_FILE made for UNSTRUC12.
+      PROGRAM UNSTRUC12
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 1                                                             0001
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99995 CONTINUE
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (I.GT.NIM1) GOTO 60                                            0001
+C (16,1)
+      J = 1                                                             0002
+99996 CONTINUE
+C (6,1)
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 99998                                         0002
+C (8,1)
+      IF (P(I,J,KM).EQ.0.) GOTO 31                                      0003
+C (9,1)
+      K = IINF                                                          0005
+99997 CONTINUE
+C (10,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0005
+C (14,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0006
+C (15,1)
+C     BEGIN BLOCK
+C (15,2)
+41    CONTINUE                                                          0008
+C (15,3)
+      K = K+1                                                           0005
+C     END BLOCK
+      GOTO 99997
+C (11,1)
+42    VOLUME = ZMOYEN                                                   0009
+C (12,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0010
+C (4,1)
+      IF (ABS(DIFFE).GE.ABS(SOMME)) GOTO 45                             0012
+C (5,1)
+C     BEGIN BLOCK
+C (5,2)
+31    CONTINUE                                                          0014
+C (5,3)
+      J = J+1                                                           0002
+C     END BLOCK
+      GOTO 99996
+C (3,1)
+45    IF (IMPC.EQ.1) THEN                                               0017
+C (3,2)
+         WRITE (6, *)                                                   0018
+      ELSE
+C (3,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+C (13,1)
+44    IF (IMPC.EQ.1) THEN                                               0015
+C (13,2)
+         WRITE (6, *) SOMME                                             0016
+      ELSE
+C (13,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+99998 CONTINUE
+C (7,1)
+      I = I+1                                                           0001
+      GOTO 99995
+C (2,1)
+60    CONTINUE                                                          0021
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+setenv CONTROL_DEBUG_LEVEL "3"
+Selecting rule: TRANSFORMERS_INTER_FULL
+Selecting rule: PRINT_CODE_TRANSFORMERS
+Module UNSTRUC12 already active.
+Request: build resource PRINTED_FILE for module UNSTRUC12.
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(UNSTRUC12)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(UNSTRUC12)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(UNSTRUC12)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(UNSTRUC12)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(UNSTRUC12)
+
+Breakpoint 1, unstructured_to_transformers (u=0x390830, pre=0xfffffff0)
+    at ri_to_transformers.c:219
+219       (void) bourdoncle_partition(u, &ancestor_map, &scc_map);
+(gdb) c
+Continuing.
+
+Breakpoint 2, unstructured_to_transformers (u=0x3708c0, pre=0xfffffff0)
+    at ri_to_transformers.c:221
+221       pips_debug(5,"begin\n");
+(gdb) set environment CONTROL_DEBUG_LEVEL=8
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /projects/Pips/Development/Libs/semantics/GNUSOL2LL/tpips Validation/unstruc12.tpips
+fpips (ARCH=GNUSOL2LL)
+  running as /projects/Pips/Development/Libs/semantics/GNUSOL2LL/tpips
+
+  (c) 1988-2000 Centre de Recherche en Informatique,
+                École des mines de Paris, France.
+
+  URL: http://www.cri.ensmp.fr/pips/
+  E-MAIL: pipsgroup@cri.ensmp.fr
+
+  This software is provided as is, under the terms of the GPL.
+  It includes software from GNU (readline, rx) and Berkeley (fsplit).
+
+Workspace unstruc12 deleted.
+Registering file /projects/Pips/Production/Validation/Semantics/unstruc12.f
+Splitting file    /projects/Pips/Production/Validation/Semantics/unstruc12.f
+  Module         UNSTRUC12
+Workspace unstruc12 created and opened.
+Module UNSTRUC12 selected
+Main module PROGRAM "UNSTRUC12" selected.
+Module UNSTRUC12 already active.
+Module UNSTRUC12 already active.
+setenv CONTROL_DEBUG_LEVEL "0"
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+user warning, property PRETTYPRINT_STATEMENT_ORDERING redefined
+setproperty PRETTYPRINT_BLOCKS TRUE
+user warning, property PRETTYPRINT_BLOCKS redefined
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+user warning, property PRETTYPRINT_UNSTRUCTURED redefined
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+user warning, property PRETTYPRINT_EMPTY_BLOCKS redefined
+Module UNSTRUC12 already active.
+Request: build resource PRINTED_FILE for module UNSTRUC12.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(UNSTRUC12)
+  PARSER                         building   PARSED_CODE(UNSTRUC12)
+                                 building   CALLEES(UNSTRUC12)
+  CONTROLIZER                    building   CODE(UNSTRUC12)
+user warning in control_graph: Some statements are unreachable
+  PRINT_CODE                     building   PRINTED_FILE(UNSTRUC12)
+PRINTED_FILE made for UNSTRUC12.
+      PROGRAM UNSTRUC12
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 1                                                             0001
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99995 CONTINUE
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (I.GT.NIM1) GOTO 60                                            0001
+C (16,1)
+      J = 1                                                             0002
+99996 CONTINUE
+C (6,1)
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 99998                                         0002
+C (8,1)
+      IF (P(I,J,KM).EQ.0.) GOTO 31                                      0003
+C (9,1)
+      K = IINF                                                          0005
+99997 CONTINUE
+C (10,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0005
+C (14,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0006
+C (15,1)
+C     BEGIN BLOCK
+C (15,2)
+41    CONTINUE                                                          0008
+C (15,3)
+      K = K+1                                                           0005
+C     END BLOCK
+      GOTO 99997
+C (11,1)
+42    VOLUME = ZMOYEN                                                   0009
+C (12,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0010
+C (4,1)
+      IF (ABS(DIFFE).GE.ABS(SOMME)) GOTO 45                             0012
+C (5,1)
+C     BEGIN BLOCK
+C (5,2)
+31    CONTINUE                                                          0014
+C (5,3)
+      J = J+1                                                           0002
+C     END BLOCK
+      GOTO 99996
+C (3,1)
+45    IF (IMPC.EQ.1) THEN                                               0017
+C (3,2)
+         WRITE (6, *)                                                   0018
+      ELSE
+C (3,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+C (13,1)
+44    IF (IMPC.EQ.1) THEN                                               0015
+C (13,2)
+         WRITE (6, *) SOMME                                             0016
+      ELSE
+C (13,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+99998 CONTINUE
+C (7,1)
+      I = I+1                                                           0001
+      GOTO 99995
+C (2,1)
+60    CONTINUE                                                          0021
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+setenv CONTROL_DEBUG_LEVEL "3"
+Selecting rule: TRANSFORMERS_INTER_FULL
+Selecting rule: PRINT_CODE_TRANSFORMERS
+Module UNSTRUC12 already active.
+Request: build resource PRINTED_FILE for module UNSTRUC12.
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(UNSTRUC12)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(UNSTRUC12)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(UNSTRUC12)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(UNSTRUC12)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(UNSTRUC12)
+
+Breakpoint 1, unstructured_to_transformers (u=0x390830, pre=0xfffffff0)
+    at ri_to_transformers.c:219
+219       (void) bourdoncle_partition(u, &ancestor_map, &scc_map);
+(gdb) c
+Continuing.
+
+Breakpoint 2, unstructured_to_transformers (u=0x3708c0, pre=0xfffffff0)
+    at ri_to_transformers.c:221
+221       pips_debug(5,"begin\n");
+(gdb) set environment SEMANTICS_DEBUG_LEVEL=3
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /projects/Pips/Development/Libs/semantics/GNUSOL2LL/tpips Validation/unstruc12.tpips
+fpips (ARCH=GNUSOL2LL)
+  running as /projects/Pips/Development/Libs/semantics/GNUSOL2LL/tpips
+
+  (c) 1988-2000 Centre de Recherche en Informatique,
+                École des mines de Paris, France.
+
+  URL: http://www.cri.ensmp.fr/pips/
+  E-MAIL: pipsgroup@cri.ensmp.fr
+
+  This software is provided as is, under the terms of the GPL.
+  It includes software from GNU (readline, rx) and Berkeley (fsplit).
+
+Workspace unstruc12 deleted.
+Registering file /projects/Pips/Production/Validation/Semantics/unstruc12.f
+Splitting file    /projects/Pips/Production/Validation/Semantics/unstruc12.f
+  Module         UNSTRUC12
+Workspace unstruc12 created and opened.
+Module UNSTRUC12 selected
+Main module PROGRAM "UNSTRUC12" selected.
+Module UNSTRUC12 already active.
+Module UNSTRUC12 already active.
+setenv CONTROL_DEBUG_LEVEL "0"
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+user warning, property PRETTYPRINT_STATEMENT_ORDERING redefined
+setproperty PRETTYPRINT_BLOCKS TRUE
+user warning, property PRETTYPRINT_BLOCKS redefined
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+user warning, property PRETTYPRINT_UNSTRUCTURED redefined
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+user warning, property PRETTYPRINT_EMPTY_BLOCKS redefined
+Module UNSTRUC12 already active.
+Request: build resource PRINTED_FILE for module UNSTRUC12.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(UNSTRUC12)
+  PARSER                         building   PARSED_CODE(UNSTRUC12)
+                                 building   CALLEES(UNSTRUC12)
+  CONTROLIZER                    building   CODE(UNSTRUC12)
+user warning in control_graph: Some statements are unreachable
+  PRINT_CODE                     building   PRINTED_FILE(UNSTRUC12)
+PRINTED_FILE made for UNSTRUC12.
+      PROGRAM UNSTRUC12
+
+C     Excerpt from calao.f in SemanticsPrivate
+
+      REAL P(10,10,10), Z(10), AO(10,10,10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 1                                                             0001
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99995 CONTINUE
+C (1,1)
+
+C     DO loop 31 with exit had to be desugared
+      IF (I.GT.NIM1) GOTO 60                                            0001
+C (16,1)
+      J = 1                                                             0002
+99996 CONTINUE
+C (6,1)
+C     DO loop 31 with exit had to be desugared
+      IF (J.GT.NJM1) GOTO 99998                                         0002
+C (8,1)
+      IF (P(I,J,KM).EQ.0.) GOTO 31                                      0003
+C (9,1)
+      K = IINF                                                          0005
+99997 CONTINUE
+C (10,1)
+C     DO loop 41 with exit had to be desugared
+      IF (K.GT.ISUP) GOTO 42                                            0005
+C (14,1)
+      IF (Z(K).GT.ZMOYEN) GOTO 42                                       0006
+C (15,1)
+C     BEGIN BLOCK
+C (15,2)
+41    CONTINUE                                                          0008
+C (15,3)
+      K = K+1                                                           0005
+C     END BLOCK
+      GOTO 99997
+C (11,1)
+42    VOLUME = ZMOYEN                                                   0009
+C (12,1)
+      IF (SOMME.EQ.0.) GOTO 44                                          0010
+C (4,1)
+      IF (ABS(DIFFE).GE.ABS(SOMME)) GOTO 45                             0012
+C (5,1)
+C     BEGIN BLOCK
+C (5,2)
+31    CONTINUE                                                          0014
+C (5,3)
+      J = J+1                                                           0002
+C     END BLOCK
+      GOTO 99996
+C (3,1)
+45    IF (IMPC.EQ.1) THEN                                               0017
+C (3,2)
+         WRITE (6, *)                                                   0018
+      ELSE
+C (3,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+C (13,1)
+44    IF (IMPC.EQ.1) THEN                                               0015
+C (13,2)
+         WRITE (6, *) SOMME                                             0016
+      ELSE
+C (13,3)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+      GOTO 60
+99998 CONTINUE
+C (7,1)
+      I = I+1                                                           0001
+      GOTO 99995
+C (2,1)
+60    CONTINUE                                                          0021
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+setenv CONTROL_DEBUG_LEVEL "3"
+Selecting rule: TRANSFORMERS_INTER_FULL
+Selecting rule: PRINT_CODE_TRANSFORMERS
+Module UNSTRUC12 already active.
+Request: build resource PRINTED_FILE for module UNSTRUC12.
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(UNSTRUC12)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(UNSTRUC12)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(UNSTRUC12)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(UNSTRUC12)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+[program_precondition] considering program "" with main "UNSTRUC12"
+[program_precondition] considering module UNSTRUC12
+[program_precondition] current: t =
+arguments:(nil)
+relation: 
+ { 
+ } 
+[program_precondition] to be added: tm =
+arguments:(nil)
+relation: 
+ { 
+ } 
+[program_precondition] to be added after translation:
+arguments:(nil)
+relation: 
+ { 
+ } 
+[program_precondition] to be added after filtering:
+arguments:(nil)
+relation: 
+ { 
+ } 
+[program_precondition] resulting program precondition:
+arguments:(nil)
+relation: 
+ { 
+ } 
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(UNSTRUC12)
+statement 001 (0,2), transformer 385400:
+arguments:I
+relation:VAR I#new 
+ { 
+  I#new  == 1 ,
+ } 
+
+Breakpoint 1, unstructured_to_transformers (u=0x390a98, pre=0xfffffff0)
+    at ri_to_transformers.c:219
+219       (void) bourdoncle_partition(u, &ancestor_map, &scc_map);
+(gdb) c
+Continuing.
+[bourdoncle_partition] Begin with unstructured:
+[print_unstructured] Unstructured 390a98 with nodes:
+ctr 390bd0, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                38f5e8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                390c60 1 (1, 1) at 3911a0: TEST 
+
+ctr 390c78, 1 preds, 2 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                390550 -1 (5, 1) at 391220: BLOCK 
+                38f810 5 (9, 1) at 384300: ASSIGN 
+        predecessors:
+                38f5e8 2 (6, 1) at 391100: TEST 
+
+ctr 38f810, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                38f8b8 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                390c78 3 (8, 1) at 38de88: TEST 
+
+ctr 38f828, 1 preds, 2 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                3901c0 9 (11, 1) at 384320: ASSIGN 
+                38fac8 -1 (15, 1) at 391460: BLOCK 
+        predecessors:
+                38f8b8 5 (10, 1) at 3840c0: TEST 
+
+ctr 38fac8, 1 preds, 1 succs: -1 (15, 1) at 391460: BLOCK 
+        successors:
+                38f8b8 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                38f828 6 (14, 1) at 38df48: TEST 
+
+ctr 38f8b8, 2 preds, 2 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3901c0 9 (11, 1) at 384320: ASSIGN 
+                38f828 6 (14, 1) at 38df48: TEST 
+        predecessors:
+                38f810 5 (9, 1) at 384300: ASSIGN 
+                38fac8 -1 (15, 1) at 391460: BLOCK 
+
+ctr 3901c0, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                3901d8 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                38f8b8 5 (10, 1) at 3840c0: TEST 
+                38f828 6 (14, 1) at 38df48: TEST 
+
+ctr 392420, 1 preds, 1 succs: 17 (3, 1) at 3914a0: TEST 
+        successors:
+                390a08 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                3901f0 12 (4, 1) at 38e0a8: TEST 
+
+ctr 390a08, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                392420 17 (3, 1) at 3914a0: TEST 
+                391e78 15 (13, 1) at 391480: TEST 
+                390c60 1 (1, 1) at 3911a0: TEST 
+
+ctr 391e78, 1 preds, 1 succs: 15 (13, 1) at 391480: TEST 
+        successors:
+                390a08 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                3901d8 10 (12, 1) at 38dfe8: TEST 
+
+ctr 3901d8, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                391e78 15 (13, 1) at 391480: TEST 
+                3901f0 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                3901c0 9 (11, 1) at 384320: ASSIGN 
+
+ctr 3901f0, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                392420 17 (3, 1) at 3914a0: TEST 
+                390550 -1 (5, 1) at 391220: BLOCK 
+        predecessors:
+                3901d8 10 (12, 1) at 38dfe8: TEST 
+
+ctr 390550, 2 preds, 1 succs: -1 (5, 1) at 391220: BLOCK 
+        successors:
+                38f5e8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                3901f0 12 (4, 1) at 38e0a8: TEST 
+                390c78 3 (8, 1) at 38de88: TEST 
+
+ctr 38f5e8, 2 preds, 2 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                390c18 1 (7, 1) at 3911c0: ASSIGN 
+                390c78 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                390bd0 2 (16, 1) at 391140: ASSIGN 
+                390550 -1 (5, 1) at 391220: BLOCK 
+
+ctr 390c18, 1 preds, 1 succs: 1 (7, 1) at 3911c0: ASSIGN 
+        successors:
+                390c60 1 (1, 1) at 3911a0: TEST 
+        predecessors:
+                38f5e8 2 (6, 1) at 391100: TEST 
+
+ctr 390c60, 1 preds, 2 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                390a08 21 (2, 1) at 383b80: CONTINUE 
+                390bd0 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+                390c18 1 (7, 1) at 3911c0: ASSIGN 
+
+[print_unstructured] With entry nodes
+ctr 390c60, 1 preds, 2 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                390a08 21 (2, 1) at 383b80: CONTINUE 
+                390bd0 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+                390c18 1 (7, 1) at 3911c0: ASSIGN 
+
+[print_unstructured] And exit node
+ctr 390a08, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                392420 17 (3, 1) at 3914a0: TEST 
+                391e78 15 (13, 1) at 391480: TEST 
+                390c60 1 (1, 1) at 3911a0: TEST 
+
+Dump of replicate_map:
+Old 390c60 -> New 370908
+Old 38f5e8 -> New 3708d8
+Old 390c78 -> New 399f28
+Old 38f828 -> New 3707e8
+Old 390a08 -> New 370860
+Old 38f8b8 -> New 370818
+Old 390c18 -> New 3708f0
+Old 3901f0 -> New 3708a8
+Old 390bd0 -> New 399e20
+Old 3901d8 -> New 370890
+Old 391e78 -> New 370878
+Old 38fac8 -> New 370800
+Old 392420 -> New 370848
+Old 390550 -> New 3708c0
+Old 38f810 -> New 3707d0
+Old 3901c0 -> New 370830
+
+[bourdoncle_partition] Copied unstructured new_u:
+[print_unstructured] Unstructured 370920 with nodes:
+ctr 399e20, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 399f28, 1 preds, 2 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 3707d0, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                370818 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 3707e8, 1 preds, 2 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                370800 -1 (15, 1) at 391460: BLOCK 
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 370800, 1 preds, 1 succs: -1 (15, 1) at 391460: BLOCK 
+        successors:
+                370818 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 370818, 2 preds, 2 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                3707e8 6 (14, 1) at 38df48: TEST 
+        predecessors:
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+ctr 370830, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 370848, 1 preds, 1 succs: 17 (3, 1) at 3914a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370860, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370878 15 (13, 1) at 391480: TEST 
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 370878, 1 preds, 1 succs: 15 (13, 1) at 391480: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370890, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370878 15 (13, 1) at 391480: TEST 
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+
+ctr 3708a8, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 3708c0, 2 preds, 1 succs: -1 (5, 1) at 391220: BLOCK 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 3708d8, 2 preds, 2 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                399f28 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+ctr 3708f0, 1 preds, 1 succs: 1 (7, 1) at 3911c0: ASSIGN 
+        successors:
+                370908 1 (1, 1) at 3911a0: TEST 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 370908, 1 preds, 2 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                399e20 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[print_unstructured] With entry nodes
+ctr 370908, 1 preds, 2 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                399e20 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[print_unstructured] And exit node
+ctr 370860, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370878 15 (13, 1) at 391480: TEST 
+                370908 1 (1, 1) at 3911a0: TEST 
+
+[bourdoncle_component] Begin for node: 
+ctr 370908, 1 preds, 2 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                399e20 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[bourdoncle_component] Begin for node: 
+ctr 3708d8, 2 preds, 2 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                399f28 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+[bourdoncle_component] Begin for node: 
+ctr 370818, 2 preds, 2 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                3707e8 6 (14, 1) at 38df48: TEST 
+        predecessors:
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+[update_partition] Begin for partition:
+370818, 5 (10, 1) at 3840c0: TEST 
+3707e8, 6 (14, 1) at 38df48: TEST 
+370800, -1 (15, 1) at 391460: BLOCK 
+
+[update_partition] No renaming
+[update_partition] End with same partition (no renaming, no elimination)
+[scc_to_dag] Begin for vertex 370818 and partition:
+370818, 5 (10, 1) at 3840c0: TEST 
+3707e8, 6 (14, 1) at 38df48: TEST 
+370800, -1 (15, 1) at 391460: BLOCK 
+
+[scc_to_dag] Nodes linked to root=370818
+ctr 370818, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                3709c8 undefined statement
+                370980 undefined statement
+                370938 6 (14, 1) at 38df48: TEST 
+        predecessors:
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+
+370818, 5 (10, 1) at 3840c0: TEST 
+370980, undefined statement
+3709c8, undefined statement
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+399f28, 3 (8, 1) at 38de88: TEST 
+3708d8, 2 (6, 1) at 391100: TEST 
+399e20, 2 (16, 1) at 391140: ASSIGN 
+370908, 1 (1, 1) at 3911a0: TEST 
+370860, 21 (2, 1) at 383b80: CONTINUE 
+370848, 17 (3, 1) at 3914a0: TEST 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+370890, 10 (12, 1) at 38dfe8: TEST 
+370878, 15 (13, 1) at 391480: TEST 
+370830, 9 (11, 1) at 384320: ASSIGN 
+370938, 6 (14, 1) at 38df48: TEST 
+370950, undefined statement
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+
+[scc_to_dag] Nodes linked to new_root=370998
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+370998, 5 (10, 1) at 3840c0: TEST 
+370a10, undefined statement
+3709f8, undefined statement
+3709e0, undefined statement
+370800, -1 (15, 1) at 391460: BLOCK 
+3707e8, 6 (14, 1) at 38df48: TEST 
+370968, undefined statement
+
+[scc_to_dag] Final embedding graph after replication and cycle removal
+[print_embedding_graph] Embedding graph for vertex 370818:
+ctr 3708f0, 1 preds, 1 succs: 1 (7, 1) at 3911c0: ASSIGN 
+        successors:
+                370908 1 (1, 1) at 3911a0: TEST 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 370950, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370938, 1 preds, 2 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                370950 undefined statement
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 370830, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370878, 1 preds, 1 succs: 15 (13, 1) at 391480: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370890, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370878 15 (13, 1) at 391480: TEST 
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+
+ctr 3708c0, 2 preds, 1 succs: -1 (5, 1) at 391220: BLOCK 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 3708a8, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370848, 1 preds, 1 succs: 17 (3, 1) at 3914a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370860, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370878 15 (13, 1) at 391480: TEST 
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 370908, 1 preds, 2 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                399e20 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+ctr 399e20, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 3708d8, 2 preds, 2 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                399f28 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+ctr 399f28, 1 preds, 2 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 3707d0, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                370818 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 3709c8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 370980, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 370818, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                3709c8 undefined statement
+                370980 undefined statement
+                370938 6 (14, 1) at 38df48: TEST 
+        predecessors:
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+
+[print_embedding_graph] End: the embedding graph for vertex 370818 is consistent.
+[scc_to_dag] End of final embedding graph after replication and cycle removal
+[scc_to_dag] Final cycle graph
+[print_embedding_graph] Embedding graph for vertex 370998:
+ctr 370968, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 3707e8, 1 preds, 2 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370968 undefined statement
+                370800 -1 (15, 1) at 391460: BLOCK 
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370800, 1 preds, 1 succs: -1 (15, 1) at 391460: BLOCK 
+        successors:
+                370998 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 3709e0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 3709f8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370a10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+[print_embedding_graph] End: the embedding graph for vertex 370998 is consistent.
+[scc_to_dag] End of final cycle graph
+[scc_to_dag] End with 1 replicated control nodes:
+
+replicated_output_controls
+3707e8 -> 370938
+
+[bourdoncle_component] End with partition: 370818, 5 (10, 1) at 3840c0: TEST 
+3707e8, 6 (14, 1) at 38df48: TEST 
+370800, -1 (15, 1) at 391460: BLOCK 
+
+[bourdoncle_component] End with new nodes:
+ctr 370968, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 3707e8, 1 preds, 2 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370968 undefined statement
+                370800 -1 (15, 1) at 391460: BLOCK 
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370800, 1 preds, 1 succs: -1 (15, 1) at 391460: BLOCK 
+        successors:
+                370998 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 3709e0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 3709f8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370a10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+[bourdoncle_component] With entry nodes
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+[bourdoncle_component] And exit node
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+[bourdoncle_component] End.
+[update_partition] Begin for partition:
+3708d8, 2 (6, 1) at 391100: TEST 
+399f28, 3 (8, 1) at 38de88: TEST 
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+370818, 5 (10, 1) at 3840c0: TEST 
+3707e8, 6 (14, 1) at 38df48: TEST 
+370800, -1 (15, 1) at 391460: BLOCK 
+370830, 9 (11, 1) at 384320: ASSIGN 
+370890, 10 (12, 1) at 38dfe8: TEST 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+
+[update_partition] After renaming, new partition:
+3708d8, 2 (6, 1) at 391100: TEST 
+399f28, 3 (8, 1) at 38de88: TEST 
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+370818, 5 (10, 1) at 3840c0: TEST 
+370938, 6 (14, 1) at 38df48: TEST 
+370800, -1 (15, 1) at 391460: BLOCK 
+370830, 9 (11, 1) at 384320: ASSIGN 
+370890, 10 (12, 1) at 38dfe8: TEST 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+
+[update_partition] Untranslatable control(s) to be eliminated from partition:
+370800, -1 (15, 1) at 391460: BLOCK 
+
+[update_partition] Untranslatable and unreachable control(s) to be eliminated from partition:
+370800, -1 (15, 1) at 391460: BLOCK 
+370800, -1 (15, 1) at 391460: BLOCK 
+
+[update_partition] End with new partition (2 renamings, 1 eliminations):
+3708d8, 2 (6, 1) at 391100: TEST 
+399f28, 3 (8, 1) at 38de88: TEST 
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+370818, 5 (10, 1) at 3840c0: TEST 
+370938, 6 (14, 1) at 38df48: TEST 
+370830, 9 (11, 1) at 384320: ASSIGN 
+370890, 10 (12, 1) at 38dfe8: TEST 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+
+[scc_to_dag] Begin for vertex 3708d8 and partition:
+3708d8, 2 (6, 1) at 391100: TEST 
+399f28, 3 (8, 1) at 38de88: TEST 
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+370818, 5 (10, 1) at 3840c0: TEST 
+370938, 6 (14, 1) at 38df48: TEST 
+370830, 9 (11, 1) at 384320: ASSIGN 
+370890, 10 (12, 1) at 38dfe8: TEST 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+
+[update_successor_in_copy] Free meaningless control node 370a40
+[update_successor_in_copy] Free meaningless control node 39fc20
+[scc_to_dag] Nodes linked to root=3708d8
+ctr 3708d8, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                39fdb8 undefined statement
+                39fd70 undefined statement
+                39fcf8 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+
+3708d8, 2 (6, 1) at 391100: TEST 
+39fd70, undefined statement
+39fdb8, undefined statement
+399e20, 2 (16, 1) at 391140: ASSIGN 
+370908, 1 (1, 1) at 3911a0: TEST 
+370860, 21 (2, 1) at 383b80: CONTINUE 
+370848, 17 (3, 1) at 3914a0: TEST 
+370a70, 12 (4, 1) at 38e0a8: TEST 
+370a88, undefined statement
+370a28, 10 (12, 1) at 38dfe8: TEST 
+370878, 15 (13, 1) at 391480: TEST 
+370a40, 9 (11, 1) at 384320: ASSIGN 
+39fbf0, 5 (10, 1) at 3840c0: TEST 
+39fc80, 6 (14, 1) at 38df48: TEST 
+370950, undefined statement
+39fc98, undefined statement
+370980, undefined statement
+3709c8, undefined statement
+39fc08, undefined statement
+39fc20, 5 (9, 1) at 384300: ASSIGN 
+39fcf8, 3 (8, 1) at 38de88: TEST 
+39fce0, undefined statement
+39fd28, undefined statement
+39fd10, undefined statement
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+
+[scc_to_dag] Nodes linked to new_root=39fd88
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+39fd88, 2 (6, 1) at 391100: TEST 
+39fe00, undefined statement
+39fde8, undefined statement
+39fdd0, undefined statement
+3708c0, -1 (5, 1) at 391220: BLOCK 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+39fbd8, undefined statement
+370890, 10 (12, 1) at 38dfe8: TEST 
+370a58, undefined statement
+370830, 9 (11, 1) at 384320: ASSIGN 
+370818, 5 (10, 1) at 3840c0: TEST 
+39fc68, undefined statement
+370938, 6 (14, 1) at 38df48: TEST 
+39fcc8, undefined statement
+39fcb0, undefined statement
+39fc50, undefined statement
+39fc38, undefined statement
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+399f28, 3 (8, 1) at 38de88: TEST 
+39fd58, undefined statement
+39fd40, undefined statement
+
+[scc_to_dag] Final embedding graph after replication and cycle removal
+[print_embedding_graph] Embedding graph for vertex 3708d8:
+ctr 3708f0, 1 preds, 1 succs: 1 (7, 1) at 3911c0: ASSIGN 
+        successors:
+                370908 1 (1, 1) at 3911a0: TEST 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fd10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fd28, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fce0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fcf8, 1 preds, 4 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                39fd10 undefined statement
+                39fd28 undefined statement
+                39fce0 undefined statement
+                39fc20 5 (9, 1) at 384300: ASSIGN 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fc20, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fc08, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 3709c8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 370980, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc98, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 370950, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 39fc80, 1 preds, 3 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                39fc98 undefined statement
+                370950 undefined statement
+                370a40 9 (11, 1) at 384320: ASSIGN 
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fbf0, 1 preds, 5 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                39fc08 undefined statement
+                3709c8 undefined statement
+                370980 undefined statement
+                39fc80 6 (14, 1) at 38df48: TEST 
+                370a40 9 (11, 1) at 384320: ASSIGN 
+        predecessors:
+                39fc20 5 (9, 1) at 384300: ASSIGN 
+
+ctr 370a40, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 370878, 1 preds, 1 succs: 15 (13, 1) at 391480: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370a28, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370878 15 (13, 1) at 391480: TEST 
+                370a70 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370a40 9 (11, 1) at 384320: ASSIGN 
+
+ctr 370a88, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370a70 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370a70, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370a88 undefined statement
+        predecessors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370848, 1 preds, 1 succs: 17 (3, 1) at 3914a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370a70 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370860, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370878 15 (13, 1) at 391480: TEST 
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 370908, 1 preds, 2 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                399e20 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+ctr 399e20, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fdb8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fd70, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 3708d8, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                39fdb8 undefined statement
+                39fd70 undefined statement
+                39fcf8 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+
+[print_embedding_graph] End: the embedding graph for vertex 3708d8 is consistent.
+[scc_to_dag] End of final embedding graph after replication and cycle removal
+[scc_to_dag] Final cycle graph
+[print_embedding_graph] Embedding graph for vertex 39fd88:
+ctr 39fd40, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fd58, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 399f28, 1 preds, 4 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+                39fd40 undefined statement
+                39fd58 undefined statement
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 3707d0, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                370818 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fc38, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc50, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fcb0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 39fcc8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370938, 1 preds, 3 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                39fcb0 undefined statement
+                39fcc8 undefined statement
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc68, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 370818, 1 preds, 5 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                39fc38 undefined statement
+                39fc50 undefined statement
+                370938 6 (14, 1) at 38df48: TEST 
+                39fc68 undefined statement
+        predecessors:
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+
+ctr 370830, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370a58, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370890, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370a58 undefined statement
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+
+ctr 39fbd8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+
+ctr 3708a8, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                39fbd8 undefined statement
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 3708c0, 2 preds, 1 succs: -1 (5, 1) at 391220: BLOCK 
+        successors:
+                39fd88 2 (6, 1) at 391100: TEST 
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fdd0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fde8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fe00, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+[print_embedding_graph] End: the embedding graph for vertex 39fd88 is consistent.
+[scc_to_dag] End of final cycle graph
+[scc_to_dag] End with 7 replicated control nodes:
+
+replicated_output_controls
+370938 -> 39fc80
+370818 -> 39fbf0
+370890 -> 370a28
+399f28 -> 39fcf8
+370830 -> 370a40
+3708a8 -> 370a70
+3707d0 -> 39fc20
+
+[bourdoncle_component] End with partition: 3708d8, 2 (6, 1) at 391100: TEST 
+399f28, 3 (8, 1) at 38de88: TEST 
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+370818, 5 (10, 1) at 3840c0: TEST 
+370938, 6 (14, 1) at 38df48: TEST 
+370830, 9 (11, 1) at 384320: ASSIGN 
+370890, 10 (12, 1) at 38dfe8: TEST 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+
+[bourdoncle_component] End with new nodes:
+ctr 39fd40, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fd58, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 399f28, 1 preds, 4 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+                39fd40 undefined statement
+                39fd58 undefined statement
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 3707d0, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                370818 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fc38, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc50, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fcb0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 39fcc8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370938, 1 preds, 3 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                39fcb0 undefined statement
+                39fcc8 undefined statement
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc68, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 370818, 1 preds, 5 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                39fc38 undefined statement
+                39fc50 undefined statement
+                370938 6 (14, 1) at 38df48: TEST 
+                39fc68 undefined statement
+        predecessors:
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+
+ctr 370830, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370a58, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370890, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370a58 undefined statement
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+
+ctr 39fbd8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+
+ctr 3708a8, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                39fbd8 undefined statement
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 3708c0, 2 preds, 1 succs: -1 (5, 1) at 391220: BLOCK 
+        successors:
+                39fd88 2 (6, 1) at 391100: TEST 
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fdd0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fde8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fe00, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+[bourdoncle_component] With entry nodes
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+[bourdoncle_component] And exit node
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+[bourdoncle_component] End.
+[update_partition] Begin for partition:
+370908, 1 (1, 1) at 3911a0: TEST 
+399e20, 2 (16, 1) at 391140: ASSIGN 
+3708d8, 2 (6, 1) at 391100: TEST 
+399f28, 3 (8, 1) at 38de88: TEST 
+3707d0, 5 (9, 1) at 384300: ASSIGN 
+370818, 5 (10, 1) at 3840c0: TEST 
+370938, 6 (14, 1) at 38df48: TEST 
+370830, 9 (11, 1) at 384320: ASSIGN 
+370890, 10 (12, 1) at 38dfe8: TEST 
+3708a8, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+
+[update_partition] After renaming, new partition:
+370908, 1 (1, 1) at 3911a0: TEST 
+399e20, 2 (16, 1) at 391140: ASSIGN 
+3708d8, 2 (6, 1) at 391100: TEST 
+39fcf8, 3 (8, 1) at 38de88: TEST 
+39fc20, 5 (9, 1) at 384300: ASSIGN 
+39fbf0, 5 (10, 1) at 3840c0: TEST 
+39fc80, 6 (14, 1) at 38df48: TEST 
+370a40, 9 (11, 1) at 384320: ASSIGN 
+370a28, 10 (12, 1) at 38dfe8: TEST 
+370a70, 12 (4, 1) at 38e0a8: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+
+[update_partition] Untranslatable control(s) to be eliminated from partition:
+3708c0, -1 (5, 1) at 391220: BLOCK 
+
+[update_partition] Untranslatable and unreachable control(s) to be eliminated from partition:
+3708c0, -1 (5, 1) at 391220: BLOCK 
+370a70, 12 (4, 1) at 38e0a8: TEST 
+370a28, 10 (12, 1) at 38dfe8: TEST 
+370a40, 9 (11, 1) at 384320: ASSIGN 
+39fc80, 6 (14, 1) at 38df48: TEST 
+39fbf0, 5 (10, 1) at 3840c0: TEST 
+39fc20, 5 (9, 1) at 384300: ASSIGN 
+39fcf8, 3 (8, 1) at 38de88: TEST 
+3708c0, -1 (5, 1) at 391220: BLOCK 
+
+[update_partition] End with new partition (8 renamings, 1 eliminations):
+370908, 1 (1, 1) at 3911a0: TEST 
+399e20, 2 (16, 1) at 391140: ASSIGN 
+3708d8, 2 (6, 1) at 391100: TEST 
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+
+[scc_to_dag] Begin for vertex 370908 and partition:
+370908, 1 (1, 1) at 3911a0: TEST 
+399e20, 2 (16, 1) at 391140: ASSIGN 
+3708d8, 2 (6, 1) at 391100: TEST 
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+
+[scc_to_dag] Nodes linked to root=370908
+ctr 370908, 0 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                39fef0 undefined statement
+                39fea8 undefined statement
+                39fe90 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+
+370908, 1 (1, 1) at 3911a0: TEST 
+39fea8, undefined statement
+39fef0, undefined statement
+370860, 21 (2, 1) at 383b80: CONTINUE 
+370848, 17 (3, 1) at 3914a0: TEST 
+370a70, 12 (4, 1) at 38e0a8: TEST 
+370a88, undefined statement
+370a28, 10 (12, 1) at 38dfe8: TEST 
+370878, 15 (13, 1) at 391480: TEST 
+370a40, 9 (11, 1) at 384320: ASSIGN 
+39fbf0, 5 (10, 1) at 3840c0: TEST 
+39fc80, 6 (14, 1) at 38df48: TEST 
+370950, undefined statement
+39fc98, undefined statement
+370980, undefined statement
+3709c8, undefined statement
+39fc08, undefined statement
+39fc20, 5 (9, 1) at 384300: ASSIGN 
+39fcf8, 3 (8, 1) at 38de88: TEST 
+39fce0, undefined statement
+39fd28, undefined statement
+39fd10, undefined statement
+39fe18, 2 (6, 1) at 391100: TEST 
+39fd70, undefined statement
+39fdb8, undefined statement
+39fe30, undefined statement
+39fe90, 2 (16, 1) at 391140: ASSIGN 
+
+[scc_to_dag] Nodes linked to new_root=39fec0
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+39fec0, 1 (1, 1) at 3911a0: TEST 
+39ff38, undefined statement
+39ff20, undefined statement
+39ff08, undefined statement
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+3708d8, 2 (6, 1) at 391100: TEST 
+39fe78, undefined statement
+39fe60, undefined statement
+39fe48, undefined statement
+399e20, 2 (16, 1) at 391140: ASSIGN 
+
+[scc_to_dag] Final embedding graph after replication and cycle removal
+[print_embedding_graph] Embedding graph for vertex 370908:
+ctr 39fe90, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                39fe18 2 (6, 1) at 391100: TEST 
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fe30, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fdb8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fd70, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fe18, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fe30 undefined statement
+                39fdb8 undefined statement
+                39fd70 undefined statement
+                39fcf8 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                39fe90 2 (16, 1) at 391140: ASSIGN 
+
+ctr 39fd10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fd28, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fce0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fcf8, 1 preds, 4 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                39fd10 undefined statement
+                39fd28 undefined statement
+                39fce0 undefined statement
+                39fc20 5 (9, 1) at 384300: ASSIGN 
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fc20, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fc08, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 3709c8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 370980, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc98, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 370950, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 39fc80, 1 preds, 3 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                39fc98 undefined statement
+                370950 undefined statement
+                370a40 9 (11, 1) at 384320: ASSIGN 
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fbf0, 1 preds, 5 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                39fc08 undefined statement
+                3709c8 undefined statement
+                370980 undefined statement
+                39fc80 6 (14, 1) at 38df48: TEST 
+                370a40 9 (11, 1) at 384320: ASSIGN 
+        predecessors:
+                39fc20 5 (9, 1) at 384300: ASSIGN 
+
+ctr 370a40, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 370878, 1 preds, 1 succs: 15 (13, 1) at 391480: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370a28, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370878 15 (13, 1) at 391480: TEST 
+                370a70 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370a40 9 (11, 1) at 384320: ASSIGN 
+
+ctr 370a88, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370a70 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370a70, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370a88 undefined statement
+        predecessors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370848, 1 preds, 1 succs: 17 (3, 1) at 3914a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370a70 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370860, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370878 15 (13, 1) at 391480: TEST 
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fef0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fea8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 370908, 0 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                39fef0 undefined statement
+                39fea8 undefined statement
+                39fe90 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+
+[print_embedding_graph] End: the embedding graph for vertex 370908 is consistent.
+[scc_to_dag] End of final embedding graph after replication and cycle removal
+[scc_to_dag] Final cycle graph
+[print_embedding_graph] Embedding graph for vertex 39fec0:
+ctr 399e20, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fe48, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fe60, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fe78, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 3708d8, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                39fe48 undefined statement
+                39fe60 undefined statement
+                39fe78 undefined statement
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+
+ctr 3708f0, 1 preds, 1 succs: 1 (7, 1) at 3911c0: ASSIGN 
+        successors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39ff08, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39ff20, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39ff38, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[print_embedding_graph] End: the embedding graph for vertex 39fec0 is consistent.
+[scc_to_dag] End of final cycle graph
+[scc_to_dag] End with 2 replicated control nodes:
+
+replicated_output_controls
+3708d8 -> 39fe18
+399e20 -> 39fe90
+
+[bourdoncle_component] End with partition: 370908, 1 (1, 1) at 3911a0: TEST 
+399e20, 2 (16, 1) at 391140: ASSIGN 
+3708d8, 2 (6, 1) at 391100: TEST 
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+
+[bourdoncle_component] End with new nodes:
+ctr 399e20, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fe48, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fe60, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fe78, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 3708d8, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                39fe48 undefined statement
+                39fe60 undefined statement
+                39fe78 undefined statement
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+
+ctr 3708f0, 1 preds, 1 succs: 1 (7, 1) at 3911c0: ASSIGN 
+        successors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39ff08, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39ff20, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39ff38, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[bourdoncle_component] With entry nodes
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[bourdoncle_component] And exit node
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[bourdoncle_component] End.
+[bourdoncle_partition] End with partition:370908, 1 (1, 1) at 3911a0: TEST 
+399e20, 2 (16, 1) at 391140: ASSIGN 
+3708d8, 2 (6, 1) at 391100: TEST 
+3708f0, 1 (7, 1) at 3911c0: ASSIGN 
+370848, 17 (3, 1) at 3914a0: TEST 
+370878, 15 (13, 1) at 391480: TEST 
+370860, 21 (2, 1) at 383b80: CONTINUE 
+
+[bourdoncle_partition] End with scc_map:
+head=38f8b8 with unstructured=3709b0
+head=38f5e8 with unstructured=39fda0
+head=390c60 with unstructured=39fed8
+[bourdoncle_partition] End with 3 fix points
+[bourdoncle_partition] 
+Control nodes associated to a fix point via a sub-unstructured:
+head=3708d8 copy of 38f5e8 with unstructured=39fda0
+head=370818 copy of 38f8b8 with unstructured=3709b0
+head=39fd88 copy of 38f5e8 with unstructured=39fda0
+head=39fe18 copy of 38f5e8 with unstructured=39fda0
+head=39fbf0 copy of 38f8b8 with unstructured=3709b0
+head=370908 copy of 390c60 with unstructured=39fed8
+head=39fec0 copy of 390c60 with unstructured=39fed8
+head=370998 copy of 38f8b8 with unstructured=3709b0
+[bourdoncle_partition] End with 3 sets of cycles:
+Cycles associated to head=38f8b8 with unstructured=3709b0 (fix point 1)
+[print_unstructured] Unstructured 3709b0 with nodes:
+ctr 370968, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 3707e8, 1 preds, 2 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370968 undefined statement
+                370800 -1 (15, 1) at 391460: BLOCK 
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370800, 1 preds, 1 succs: -1 (15, 1) at 391460: BLOCK 
+        successors:
+                370998 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                3707e8 6 (14, 1) at 38df48: TEST 
+
+ctr 3709e0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 3709f8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370a10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370998 5 (10, 1) at 3840c0: TEST 
+
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+[print_unstructured] With entry nodes
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+[print_unstructured] And exit node
+ctr 370998, 1 preds, 4 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                3709e0 undefined statement
+                3707e8 6 (14, 1) at 38df48: TEST 
+                3709f8 undefined statement
+                370a10 undefined statement
+        predecessors:
+                370800 -1 (15, 1) at 391460: BLOCK 
+
+
+Cycles associated to head=38f5e8 with unstructured=39fda0 (fix point 2)
+[print_unstructured] Unstructured 39fda0 with nodes:
+ctr 39fd40, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fd58, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 399f28, 1 preds, 4 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+                39fd40 undefined statement
+                39fd58 undefined statement
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 3707d0, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                370818 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fc38, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc50, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fcb0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 39fcc8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370938, 1 preds, 3 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                39fcb0 undefined statement
+                39fcc8 undefined statement
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc68, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+
+ctr 370818, 1 preds, 5 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+                39fc38 undefined statement
+                39fc50 undefined statement
+                370938 6 (14, 1) at 38df48: TEST 
+                39fc68 undefined statement
+        predecessors:
+                3707d0 5 (9, 1) at 384300: ASSIGN 
+
+ctr 370830, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                370818 5 (10, 1) at 3840c0: TEST 
+                370938 6 (14, 1) at 38df48: TEST 
+
+ctr 370a58, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370890, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370a58 undefined statement
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370830 9 (11, 1) at 384320: ASSIGN 
+
+ctr 39fbd8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+
+ctr 3708a8, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                39fbd8 undefined statement
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+        predecessors:
+                370890 10 (12, 1) at 38dfe8: TEST 
+
+ctr 3708c0, 2 preds, 1 succs: -1 (5, 1) at 391220: BLOCK 
+        successors:
+                39fd88 2 (6, 1) at 391100: TEST 
+        predecessors:
+                3708a8 12 (4, 1) at 38e0a8: TEST 
+                399f28 3 (8, 1) at 38de88: TEST 
+
+ctr 39fdd0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fde8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fe00, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fd88 2 (6, 1) at 391100: TEST 
+
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+[print_unstructured] With entry nodes
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+[print_unstructured] And exit node
+ctr 39fd88, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fdd0 undefined statement
+                399f28 3 (8, 1) at 38de88: TEST 
+                39fde8 undefined statement
+                39fe00 undefined statement
+        predecessors:
+                3708c0 -1 (5, 1) at 391220: BLOCK 
+
+
+Cycles associated to head=390c60 with unstructured=39fed8 (fix point 3)
+[print_unstructured] Unstructured 39fed8 with nodes:
+ctr 399e20, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                3708d8 2 (6, 1) at 391100: TEST 
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fe48, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fe60, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39fe78, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 3708d8, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+                39fe48 undefined statement
+                39fe60 undefined statement
+                39fe78 undefined statement
+        predecessors:
+                399e20 2 (16, 1) at 391140: ASSIGN 
+
+ctr 3708f0, 1 preds, 1 succs: 1 (7, 1) at 3911c0: ASSIGN 
+        successors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+        predecessors:
+                3708d8 2 (6, 1) at 391100: TEST 
+
+ctr 39ff08, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39ff20, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39ff38, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fec0 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[print_unstructured] With entry nodes
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+[print_unstructured] And exit node
+ctr 39fec0, 1 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                39ff08 undefined statement
+                399e20 2 (16, 1) at 391140: ASSIGN 
+                39ff20 undefined statement
+                39ff38 undefined statement
+        predecessors:
+                3708f0 1 (7, 1) at 3911c0: ASSIGN 
+
+
+[bourdoncle_partition] Final embedding graph:
+[print_unstructured] Unstructured 370920 with nodes:
+ctr 39fe90, 1 preds, 1 succs: 2 (16, 1) at 391140: ASSIGN 
+        successors:
+                39fe18 2 (6, 1) at 391100: TEST 
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fe30, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fdb8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fd70, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fe18, 1 preds, 4 succs: 2 (6, 1) at 391100: TEST 
+        successors:
+                39fe30 undefined statement
+                39fdb8 undefined statement
+                39fd70 undefined statement
+                39fcf8 3 (8, 1) at 38de88: TEST 
+        predecessors:
+                39fe90 2 (16, 1) at 391140: ASSIGN 
+
+ctr 39fd10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fd28, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fce0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fcf8, 1 preds, 4 succs: 3 (8, 1) at 38de88: TEST 
+        successors:
+                39fd10 undefined statement
+                39fd28 undefined statement
+                39fce0 undefined statement
+                39fc20 5 (9, 1) at 384300: ASSIGN 
+        predecessors:
+                39fe18 2 (6, 1) at 391100: TEST 
+
+ctr 39fc20, 1 preds, 1 succs: 5 (9, 1) at 384300: ASSIGN 
+        successors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+        predecessors:
+                39fcf8 3 (8, 1) at 38de88: TEST 
+
+ctr 39fc08, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 3709c8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 370980, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fc98, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 370950, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 39fc80, 1 preds, 3 succs: 6 (14, 1) at 38df48: TEST 
+        successors:
+                39fc98 undefined statement
+                370950 undefined statement
+                370a40 9 (11, 1) at 384320: ASSIGN 
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+
+ctr 39fbf0, 1 preds, 5 succs: 5 (10, 1) at 3840c0: TEST 
+        successors:
+                39fc08 undefined statement
+                3709c8 undefined statement
+                370980 undefined statement
+                39fc80 6 (14, 1) at 38df48: TEST 
+                370a40 9 (11, 1) at 384320: ASSIGN 
+        predecessors:
+                39fc20 5 (9, 1) at 384300: ASSIGN 
+
+ctr 370a40, 2 preds, 1 succs: 9 (11, 1) at 384320: ASSIGN 
+        successors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+        predecessors:
+                39fbf0 5 (10, 1) at 3840c0: TEST 
+                39fc80 6 (14, 1) at 38df48: TEST 
+
+ctr 370878, 1 preds, 1 succs: 15 (13, 1) at 391480: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370a28, 1 preds, 2 succs: 10 (12, 1) at 38dfe8: TEST 
+        successors:
+                370878 15 (13, 1) at 391480: TEST 
+                370a70 12 (4, 1) at 38e0a8: TEST 
+        predecessors:
+                370a40 9 (11, 1) at 384320: ASSIGN 
+
+ctr 370a88, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370a70 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370a70, 1 preds, 2 succs: 12 (4, 1) at 38e0a8: TEST 
+        successors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370a88 undefined statement
+        predecessors:
+                370a28 10 (12, 1) at 38dfe8: TEST 
+
+ctr 370848, 1 preds, 1 succs: 17 (3, 1) at 3914a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+        predecessors:
+                370a70 12 (4, 1) at 38e0a8: TEST 
+
+ctr 370860, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370878 15 (13, 1) at 391480: TEST 
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fef0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 39fea8, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                370908 1 (1, 1) at 3911a0: TEST 
+
+ctr 370908, 0 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                39fef0 undefined statement
+                39fea8 undefined statement
+                39fe90 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+
+[print_unstructured] With entry nodes
+ctr 370908, 0 preds, 4 succs: 1 (1, 1) at 3911a0: TEST 
+        successors:
+                370860 21 (2, 1) at 383b80: CONTINUE 
+                39fef0 undefined statement
+                39fea8 undefined statement
+                39fe90 2 (16, 1) at 391140: ASSIGN 
+        predecessors:
+
+[print_unstructured] And exit node
+ctr 370860, 3 preds, 0 succs: 21 (2, 1) at 383b80: CONTINUE 
+        successors:
+        predecessors:
+                370848 17 (3, 1) at 3914a0: TEST 
+                370878 15 (13, 1) at 391480: TEST 
+                370908 1 (1, 1) at 3911a0: TEST 
+
+[bourdoncle_partition] End. 
+
+Breakpoint 2, unstructured_to_transformers (u=0x370920, pre=0xfffffff0)
+    at ri_to_transformers.c:221
+221       pips_debug(5,"begin\n");
+

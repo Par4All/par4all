@@ -1,0 +1,7 @@
+validation_dead_code.f was especially written by Ronan Keryell to check
+dead code elimination. Preconditions are not as clean as they could be.
+Results could be improved by using a stronger normalization when entering
+a loop nest. I chose not to do it because I consider this to be useful
+unlikely.
+
+ - Francois Irigoin

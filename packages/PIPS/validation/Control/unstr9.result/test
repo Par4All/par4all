@@ -1,0 +1,47 @@
+Try more aggressive restructuring:
+
+Printed file
+
+c     This is a test to verify that the comments 
+c     are kept through unspaghettify 
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0005
+      I = 4                                                             0006
+
+      IF (I.GE.34) THEN                                                 0008
+      ENDIF
+c     else goto 150
+c     then goto 150
+150   CONTINUE                                                          0015
+      PRINT *, J                                                        0015
+
+c     goto 200
+c     goto 300
+200   CONTINUE                                                          0020
+c     stop
+300   STOP                                                              0022
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+c     This is a test to verify that the comments 
+c     are kept through unspaghettify 
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0005
+      I = 4                                                             0006
+
+      IF (I.GE.34) THEN                                                 0008
+      ENDIF
+c     else goto 150
+c     then goto 150
+150   CONTINUE                                                          0015
+      PRINT *, J                                                        0015
+
+c     goto 200
+c     goto 300
+200   CONTINUE                                                          0020
+c     stop
+300   STOP                                                              0022
+      END

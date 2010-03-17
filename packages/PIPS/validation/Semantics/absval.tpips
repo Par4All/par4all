@@ -1,0 +1,8 @@
+delete absval
+create absval absval.f
+activate PRINT_CODE_PRECONDITIONS
+module ABSVAL
+display PRINTED_FILE
+close 
+delete absval
+quit

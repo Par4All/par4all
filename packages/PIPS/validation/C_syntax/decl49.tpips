@@ -1,0 +1,23 @@
+setenv WSPC decl49
+setenv MAIN $WSPC.c
+delete $WSPC
+create $WSPC $MAIN
+activate C_PARSER
+activate PRINT_CODE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo
+echo Parsed printed file for "safe_malloc"
+echo
+
+display PARSED_PRINTED_FILE[safe_malloc]
+
+echo
+echo Printed file for "safe_malloc"
+echo
+
+display PRINTED_FILE[safe_malloc]
+close
+#delete $WSPC
+quit

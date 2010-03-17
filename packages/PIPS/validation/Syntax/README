@@ -1,0 +1,6 @@
+complex.f.bug:	complex constants are not recognized anymore
+
+Execution time on "rhune": 154.97u 115.57s 7:55.76 56.8%
+Execution time on "deauville", 23 September 1998: 247.57u 143.48s 8:36.34 75.7%
+
+Execution time on rhune, 23 September 1998: 158.00u 115.02s 6:50.25 66.5%

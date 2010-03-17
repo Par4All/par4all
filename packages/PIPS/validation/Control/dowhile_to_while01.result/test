@@ -1,0 +1,46 @@
+
+Initial code
+
+int main(int argc, char *argv[])
+{
+   int i = 0;
+   do {
+      int j = 0;
+      j = i++;
+      printf("%d", j);
+   }
+   while (i<10);
+   printf("\n");
+   return 0;
+}
+
+Code after conversion
+
+int main(int argc, char *argv[])
+{
+   int i = 0;
+   //PIPS generated variable
+   int I_0;
+   {
+      I_0 = 0;
+      I_0 = 0;
+
+      I_0 = i++;
+      printf("%d", I_0);
+   }
+   while (i<10) {
+      int j = 0;
+      j = i++;
+      printf("%d", j);
+   }
+   printf("\n");
+   return 0;
+}
+
+Unsplit resulting code
+
+
+Run code
+
+0123456789
+0123456789

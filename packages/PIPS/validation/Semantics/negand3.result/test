@@ -1,0 +1,27 @@
+
+C  P() {}
+
+C     to test negation of and conditions: subset of negand2
+      
+      SUBROUTINE NEGAND3
+
+C  P() {}
+
+
+      L = 3                                                             0005
+
+C  P(L) {L==3}
+
+      IF (K.EQ.1.OR.K.EQ.2) THEN                                        0006
+
+C  P(L) {L==3, 1<=K, K<=2}
+
+         L = K                                                          0007
+      ENDIF
+
+C  P(L) {1<=L, L<=3}
+
+
+      PRINT *, K, L                                                     0010
+
+      END

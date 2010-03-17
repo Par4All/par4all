@@ -1,0 +1,177 @@
+
+Compile initial code
+
+
+Initial code
+
+int flatten_code14(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i1;
+   int i2;
+// (0,2)
+   i1 = foo1();                                                         /*0016*/
+// (0,3)
+   i2 = foo2();                                                         /*0017*/
+// (0,4)
+   return i1+i2;                                                        /*0018*/
+   // END BLOCK
+}
+int foo1(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   extern int bla(int);
+// (0,2)
+   return bla(3);                                                       /*0005*/
+   // END BLOCK
+}
+int foo2(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   extern int bla(int);
+// (0,2)
+   return bla(7);                                                       /*0005*/
+   // END BLOCK
+}
+ flatten_code14
+     foo1
+         bla
+     foo2
+         bla
+int flatten_code14(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i1;
+   int i2;
+   int _return0;
+   int _return1;
+   {
+// (0,2)
+      // BEGIN BLOCK
+      extern int bla(int f1);
+// (0,3)
+      // (0,3)
+      // (0,2)
+      // BEGIN BLOCK
+      // (statement ordering unavailable)
+      _return0 = bla(3);                                                /*0017*/
+      // END BLOCK
+   }
+// (0,4)
+   // (0,5)
+   // (statement ordering unavailable)
+   i1 = _return0;                                                       /*0025*/
+   {
+// (0,5)
+      // BEGIN BLOCK
+      extern int bla(int f1);
+// (0,6)
+      // (0,2)
+      // BEGIN BLOCK
+      // (statement ordering unavailable)
+      _return1 = bla(7);                                                /*0035*/
+      // (statement ordering unavailable)
+      // END BLOCK
+      // (statement ordering unavailable)
+      // END BLOCK
+   }
+// (0,8)
+   // (statement ordering unavailable)
+   i2 = _return1;                                                       /*0044*/
+// (0,9)
+   // END BLOCK
+   // (0,7)
+   /*0017*/
+   // (0,4)
+   return i1+i2;                                                        /*0049*/
+   // END BLOCK
+}
+int flatten_code14(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i1;
+   int i2;
+   int _return0;
+   int _return1;
+   extern int bla(int f1);
+// (0,2)
+   // (0,3)
+   // (0,2)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return0 = bla(3);                                                   /*0017*/
+// (0,3)
+   // (0,5)
+   // (statement ordering unavailable)
+   i1 = _return0;                                                       /*0025*/
+// (0,4)
+   // (0,2)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return1 = bla(7);                                                   /*0035*/
+// (0,5)
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (statement ordering unavailable)
+   // (statement ordering unavailable)
+   i2 = _return1;                                                       /*0044*/
+// (0,6)
+   // END BLOCK
+   // (0,7)
+   /*0017*/
+   // (0,4)
+   return i1+i2;                                                        /*0049*/
+   // END BLOCK
+}
+int flatten_code14(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i1;
+   int i2;
+   int _return0;
+   int _return1;
+   extern int bla(int f1);
+// (0,2)
+   // (0,2)
+   // (0,3)
+   // (0,2)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return0 = bla(3);                                                   /*0039*/
+// (0,3)
+   /*0017*/
+   // (0,3)
+   // (0,5)
+   // (statement ordering unavailable)
+   i1 = _return0;                                                       /*0043*/
+// (0,4)
+   /*0025*/
+   // (0,4)
+   // (0,2)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return1 = bla(7);                                                   /*0048*/
+// (0,5)
+   /*0035*/
+   // (0,5)
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (statement ordering unavailable)
+   // (statement ordering unavailable)
+   i2 = _return1;                                                       /*0054*/
+// (0,6)
+   /*0044*/
+   // (0,6)
+   // END BLOCK
+   // (0,7)
+   /*0017*/
+   // (0,4)
+   return i1+i2;                                                        /*0060*/
+   // END BLOCK
+}

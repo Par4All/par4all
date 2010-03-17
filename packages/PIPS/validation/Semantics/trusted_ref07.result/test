@@ -1,0 +1,23 @@
+
+C  T() {1<=M, M<=N, 2<=N}
+
+      SUBROUTINE TRUSTED_REF07(A, N, M)
+
+      REAL A(N)
+
+C  T() {1<=M, M<=N, 2<=N}
+
+C     BEGIN BLOCK
+
+C  T() {2<=N}
+
+
+      A(2) = 0.                                                         0005
+
+C  T() {1<=M, M<=N, 2<=N}
+
+      A(M) = 0.                                                         0006
+
+C     END BLOCK
+      END
+

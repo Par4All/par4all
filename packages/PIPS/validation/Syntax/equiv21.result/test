@@ -1,0 +1,16 @@
+      PROGRAM EQUIV21
+
+C     Bug EDF: DATA sur une variable en equivalence avec une autre
+C     declaree dans un common
+
+      DATA N/3/
+      COMMON /NM/M
+      EQUIVALENCE (N,M)
+
+      COMMON /NMP/MP
+      DATA NP/4/
+      EQUIVALENCE (NP,MP)
+
+      PRINT *, M, MP                                                    0014
+
+      END

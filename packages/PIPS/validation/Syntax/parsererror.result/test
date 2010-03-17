@@ -1,0 +1,45 @@
+user warning in tp_parse: parsererror: No such workspace
+Registering file parsererror.f
+Splitting file    ./parsererror.f
+  Module         PARSERERROR2
+  Module         PARSERERROR1
+Workspace parsererror created and opened.
+user warning in open_module: Module "PARSERERROR1" selected instead of "parsererror1" which was not found
+Module PARSERERROR1 selected
+Module PARSERERROR1 already active.
+Request: build resource PRINTED_FILE for module PARSERERROR1.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(PARSERERROR1)
+  PARSER                         building   PARSED_CODE(PARSERERROR1)
+                                 building   CALLEES(PARSERERROR1)
+user error in MakeEndifInst: Parser error between lines 7 and 7
+block if statement badly nested
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module PARSERERROR1.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+user warning in open_module: Module "PARSERERROR2" selected instead of "parsererror2" which was not found
+Module PARSERERROR2 selected
+Module PARSERERROR2 already active.
+Request: build resource PRINTED_FILE for module PARSERERROR2.
+  FILTER_FILE                    building   SOURCE_FILE(PARSERERROR2)
+  PARSER                         building   PARSED_CODE(PARSERERROR2)
+                                 building   CALLEES(PARSERERROR2)
+  CONTROLIZER                    building   CODE(PARSERERROR2)
+  PRINT_CODE                     building   PRINTED_FILE(PARSERERROR2)
+PRINTED_FILE made for PARSERERROR2.
+      SUBROUTINE PARSERERROR2
+
+      IF (I.GT.1) J = 2                                                 0003
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module PARSERERROR1.
+  Closing module PARSERERROR2.
+Closing program.
+Closing workspace.
+Workspace parsererror closed.
+
+Workspace parsererror deleted.

@@ -1,0 +1,113 @@
+# proper effects
+      
+      INTEGER FUNCTION INC(K)
+C               <must be read   >: K
+C               <must be written>: K
+      K = K+1                                                           0003
+C               <must be read   >: K
+C               <must be written>: INC
+      INC = K                                                           0004
+      END
+      PROGRAM LOOPINIT
+
+c     Check that loop index initialization is performed correctly
+
+      REAL T(10)
+C               <must be written>: J
+
+      J = 2                                                             0007
+C               <must be read   >: J N
+C               <must be written>: I J
+
+      DO I = INC(J), N                                                  0009
+C               <must be read   >: I J N
+C               <must be written>: J T(I)
+         T(I) = 0.                                                      0010
+C               <must be read   >: J N
+C               <must be written>: J
+         J = J+2                                                        0011
+      ENDDO
+C               <must be read   >: I J __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+
+      PRINT *, I, J                                                     0014
+
+      END
+# cumulated effects
+C               <must be read   >: K
+C               <must be written>: K
+      
+      INTEGER FUNCTION INC(K)
+C               <must be read   >: K
+C               <must be written>: K
+      K = K+1                                                           0003
+C               <must be read   >: K
+C               <must be written>: INC
+      INC = K                                                           0004
+      END
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM LOOPINIT
+
+c     Check that loop index initialization is performed correctly
+
+      REAL T(10)
+C               <must be written>: J
+
+      J = 2                                                             0007
+C               <may be read    >: I
+C               <may be written >: T(*)
+C               <must be read   >: J N
+C               <must be written>: I J
+
+      DO I = INC(J), N                                                  0009
+C               <may be written >: T(*)
+C               <must be read   >: I J N
+C               <must be written>: J
+         T(I) = 0.                                                      0010
+C               <must be read   >: J N
+C               <must be written>: J
+         J = J+2                                                        0011
+      ENDDO
+C               <must be read   >: I J __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+
+      PRINT *, I, J                                                     0014
+
+      END
+# preconditions
+
+C  P() {}
+
+      PROGRAM LOOPINIT
+
+c     Check that loop index initialization is performed correctly
+
+      REAL T(10)
+
+C  P() {}
+
+
+      J = 2                                                             0007
+
+C  P(J) {J==2}
+
+
+      DO I = INC(J), N                                                  0009
+
+C  P(I,J) {I<=N}
+
+         T(I) = 0.                                                      0010
+
+C  P(I,J) {I<=N}
+
+         J = J+2                                                        0011
+      ENDDO
+
+C  P(I,J) {}
+
+
+      PRINT *, I, J                                                     0014
+
+      END
+

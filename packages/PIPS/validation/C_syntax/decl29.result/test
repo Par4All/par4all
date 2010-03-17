@@ -1,0 +1,7 @@
+
+Parsed printed file for "decl29"
+
+void decl29(void)
+{
+   int i = 0,  j = i;
+}

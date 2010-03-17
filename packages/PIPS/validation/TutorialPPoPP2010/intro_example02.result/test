@@ -1,0 +1,14 @@
+int foo(void)
+{
+   int i;
+   double t, s = 0., a[100];
+#pragma omp parallel for private(t)
+   for(i = 0; i <= 49; i += 1) {
+      t = a[i];
+      a[i+50] = t+(a[i]+a[i+50])/2.0;
+   }
+#pragma omp parallel for reduction(+:s)
+   for(i = 0; i <= 49; i += 1)
+      s = s+2*a[i];
+   return s;
+}

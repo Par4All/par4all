@@ -1,0 +1,25 @@
+
+Parser output
+
+main()
+{
+   char c1,  c2,  c3,  c4,  c5;
+   c1 = '\n';
+   c2 = '\t';
+   c3 = '\\';
+   c4 = '\'';
+   c5 = '\0';
+}
+
+Controlizer output
+
+main()
+{
+   char c1,  c2,  c3,  c4,  c5;
+   c1 = '\n';
+   c2 = '\t';
+   c3 = '\\';
+   c4 = '\'';
+   c5 = '\0';
+}
+

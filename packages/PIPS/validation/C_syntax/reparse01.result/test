@@ -1,0 +1,20 @@
+
+Parsed printed file for "reparse01"
+
+void reparse01(int x)
+{
+   float y;
+
+   y = 1.;
+   x = 0;
+}
+
+Reparsed printed file for "reparse01"
+
+void reparse01(int x)
+{
+   float y;
+
+   y = 1.;
+   x = 0;
+}

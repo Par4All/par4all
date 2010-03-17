@@ -1,0 +1,42 @@
+Ah oui, ce n'est pas evident, quand j'ai re-ouvert le .database qui a posé
+problème, le problème a disparu!
+
+Le problème semble être du à une suite particulière de commandes!!!
+
+Alors je vous envoie
+
+1) la version originale du fichier contenant cette ligne (test1)
+
+2) la version avec premiere version du commentaire (test)
+
+3) la version avec deuxième version du commentaire (courc4).
+
+J'ai pu reproduire le bug comme suite:
+
+1) Je crée un premier workspace qui ne contient
+que ce fichier en version originale. Je demande le Callgraph View et
+j'ai le premier message d'erreur.
+
+2) Je ferme ce premier workspace.
+
+3) Je crée un deuxième workspace qui ne contient que ce fichier
+avec le commentaire. Je demande le Callgraph View et
+j'ai encore le même message d'erreur.
+
+4) Je ferme ce deuxième workspace.
+
+5) J'ouvre à nouveau ce deuxième workspace.
+
+6) Je demande le Callgraph View et j'ai encore le même message d'erreur.
+
+7) Je crée un troisième workspace qui ne contient que le fichier avec
+deuxième version du commentaire. Je demande le Callgraph View - le 
+problème a disparu (j'ai un message d'erreur différent).
+
+8) Je reviens au deuxième workspace et demande le Callgraph View - le 
+problème a disparu!
+
+En espérant que vous arrivez à le reproduire cette fois!
+
+Nicky
+

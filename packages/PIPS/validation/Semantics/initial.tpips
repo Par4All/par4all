@@ -1,0 +1,13 @@
+delete initial
+create initial initial.f
+display PRINTED_FILE[%ALL]
+activate PRINT_INITIAL_PRECONDITION
+display PRINTED_FILE[%ALL]
+# activate PRINT_PROGRAM_PRECONDITION
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE(INITIAL)
+close
+delete initial
+quit

@@ -1,0 +1,36 @@
+      PROGRAM SUB02
+      EXTERNAL SUB2
+      INTEGER SUB2
+      INTEGER I
+      CALL SUB1                                                         0001
+      I = SUB2()+1                                                      0002
+      PRINT *, I                                                        0003
+      END
+
+      INTEGER FUNCTION SUB1()
+      PRINT *, 'hello from sub1'                                        0001
+      SUB1 = 0                                                          0002
+      END
+
+      SUBROUTINE SUB2
+      PRINT *, 'hello from sub2'                                        0001
+      END
+      PROGRAM SUB02
+      EXTERNAL SUB2
+      INTEGER SUB2
+      INTEGER I
+!ERROR: Ignored INTEGER*4 value returned by 'SUB1'
+      CALL SUB1()                                                       0001
+!ERROR: not typed 'SUB2' used as a function.
+      I = INT(SUB2()+1)                                                 0002
+      PRINT *, I                                                        0003
+      END
+
+      INTEGER FUNCTION SUB1()
+      PRINT *, 'hello from sub1'                                        0001
+      SUB1 = 0                                                          0002
+      END
+
+      SUBROUTINE SUB2
+      PRINT *, 'hello from sub2'                                        0001
+      END

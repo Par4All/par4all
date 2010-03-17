@@ -1,0 +1,17 @@
+# $Id$
+# hpfc validate $FILE include/stub.f
+delete $WSPACE
+# ensure ls sort determinism?
+setenv LANG C
+setenv LC_ALL C
+setenv LC_COLLATE C
+create $WSPACE $FILE include/hpfc_stubs.direct.f include/stub.f
+setproperty ABORT_ON_USER_LEVEL TRUE
+# what about other interprocedural options?
+activate MUST_REGIONS
+apply HPFC_INSTALL[%PROGRAM]
+# display results
+close
+shell cat $WSPACE.database/Src/*.[fh]
+delete $WSPACE
+quit

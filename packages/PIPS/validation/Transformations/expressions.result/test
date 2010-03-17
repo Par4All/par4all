@@ -1,0 +1,57 @@
+      PROGRAM TEST1
+
+      INTEGER I
+      REAL  X(100)
+
+C     AND expression
+
+      DO 100 I = 1, N                                                   0008
+         IF (I.LT.1.AND.I.LE.50) THEN                                   0009
+         ELSE
+            X(I) = 1                                                    0011
+         ENDIF
+100      CONTINUE                                                       0013
+
+C     OR expression
+
+      DO 200 I = 1, N                                                   0017
+         IF (1.LE.I.OR.I.LE.50) THEN                                    0018
+         ELSE
+            X(I) = 1                                                    0020
+         ENDIF
+200      CONTINUE                                                       0022
+
+C     NOT expression
+
+      DO 300 I = 2, 10                                                  0026
+         IF (.NOT.I.GT.1) THEN                                          0027
+         ELSE
+            X(I) = 0                                                    0029
+         ENDIF
+300      CONTINUE                                                       0031
+
+      END
+      PROGRAM TEST1
+
+      INTEGER I
+      REAL  X(100)
+
+C     AND expression
+
+      DO 100 I = 1, N                                                   0008
+         IF (I.GE.1.OR.I.GT.50) X(I) = 1                                0009
+100      CONTINUE                                                       0013
+
+C     OR expression
+
+      DO 200 I = 1, N                                                   0017
+         IF (1.GT.I.AND.I.GT.50) X(I) = 1                               0018
+200      CONTINUE                                                       0022
+
+C     NOT expression
+
+      DO 300 I = 2, 10                                                  0026
+         IF (I.GT.1) X(I) = 0                                           0027
+300      CONTINUE                                                       0031
+
+      END

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d' | sed '/^shell/d') <<EOF
+
+delete equiv16
+create equiv16 equiv16.f
+display PRINTED_FILE[EQUIV16]
+# try again to check that the error is well recovered
+display PRINTED_FILE[EQUIV16]
+close
+delete equiv16
+quit
+
+EOF

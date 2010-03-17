@@ -1,0 +1,28 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *i, j, k;
+//               <must be written>: k
+   k = 0;
+//               <must be read   >: k
+//               <must be written>: j
+   j = k;
+//               <must be written>: i
+   i = &j;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   int *i, j, k;
+   k = 0;
+   j = k;
+   i = &j;
+//  points to = {(i,j,E)}
+
+   return 0;
+   // END BLOCK
+}

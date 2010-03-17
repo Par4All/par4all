@@ -1,0 +1,7 @@
+delete v
+create v nonvide.f src/vide.f src/tresvide.f
+display PRINTED_FILE[%ALL]
+apply UNSPLIT[%PROGRAM]
+shell ls v.database/Src/*.f ; cat v.database/Src/*.f
+close
+delete v

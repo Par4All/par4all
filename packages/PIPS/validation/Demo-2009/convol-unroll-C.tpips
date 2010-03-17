@@ -1,0 +1,96 @@
+delete convol2-sg1-C
+create convol2-sg1-C convol-unroll.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+# for scalarization
+#
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+
+activate C_PARSER
+module main
+module convol
+
+echo
+echo Inital code
+echo
+
+display PRINTED_FILE[convol]
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+echo
+echo After strip mining and partial eval
+echo
+apply PARTIAL_EVAL[convol]
+display PRINTED_FILE[convol]
+apply PRIVATIZE_MODULE[convol]
+setproperty INDEX_SET_SPLITTING_BOUND "384"
+setproperty LOOP_LABEL "l400"
+apply INDEX_SET_SPLITTING[convol]
+display PRINTED_FILE[convol]
+#apply LOOP_TILING[convol]
+#l400
+#128 0
+#0 128
+apply STRIP_MINE[convol]
+l400
+0
+128
+#apply LOOP_NORMALIZE[convol]
+#apply PARTIAL_EVAL[convol]
+#apply SUPPRESS_DEAD_CODE[convol]
+#activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[convol]
+##
+##echo
+##echo After double unrolling
+##echo
+##apply FULL_UNROLL[convol]
+##l100
+##apply FULL_UNROLL[convol]
+##l200
+##
+##apply PARTIAL_EVAL
+##apply USE_DEF_ELIMINATION
+##display PRINTED_FILE[convol]
+##
+###apply DECLARATIONS_PRIVATIZER[convol]
+##apply PRIVATIZE_MODULE[convol]
+##display PRINTED_FILE[convol]
+##echo
+##echo After atomization
+##echo
+##setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+##apply SIMD_ATOMIZER[convol]
+##display PRINTED_FILE[convol]
+##
+### should be applied but fails
+##apply SCALARIZATION
+##display PRINTED_FILE[convol]
+##
+### probably useless for terapix microcode
+###apply INVARIANT_CODE_MOTION
+##
+###echo
+###echo detect // loops
+###echo
+###
+###activate PRINT_PARALLELIZEDOMP_CODE
+###display PARALLELPRINTED_FILE[convol]
+##
+##
+###apply PRIVATIZE_MODULE[convol]
+###display PARALLELPRINTED_FILE[convol]
+##
+###apply VARIABLE_EXPANSION[convol]
+###display PARALLELPRINTED_FILE[convol]
+##close
+##quit
+### EOF

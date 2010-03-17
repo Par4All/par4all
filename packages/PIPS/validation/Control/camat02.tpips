@@ -1,0 +1,19 @@
+delete camat02
+create camat02 camat.f
+module CAMAT
+
+echo
+echo Printed file for "CAMAT"
+echo
+
+display PRINTED_FILE[CAMAT]
+
+echo
+echo Graph printed file for "CAMAT"
+echo
+
+display GRAPH_PRINTED_FILE[CAMAT]
+
+close
+delete camat02
+quit

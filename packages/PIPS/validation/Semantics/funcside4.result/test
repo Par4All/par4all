@@ -1,0 +1,21 @@
+
+C  P() {}
+
+      PROGRAM FUNCSIDE4
+
+C  P() {}
+
+
+      I4 = 10                                                           0003
+
+C  P(I4) {I4==10}
+
+
+      I4 = FOO4(I4)                                                     0005
+
+C  P(I4) {0<=I4, I4<=2}
+
+
+      PRINT *, I4                                                       0007
+
+      END

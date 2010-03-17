@@ -1,0 +1,7 @@
+      SUBROUTINE TOP(I)
+
+C     Bug in top_level_entity_p()
+
+      J = 2                                                             0005
+
+      END

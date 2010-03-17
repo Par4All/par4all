@@ -1,0 +1,63 @@
+user warning in tp_parse: user_error03: No such workspace
+Registering file user_error03.f
+Splitting file    ./user_error03.f
+  Module         B
+  Module         USER_ERROR03
+Workspace user_error03 created and opened.
+Main module PROGRAM "USER_ERROR03" selected.
+Module USER_ERROR03 selected
+Selecting rule: RICE_FAST_DEPENDENCE_GRAPH
+Selecting rule: PRINT_CODE_CUMULATED_EFFECTS
+Module USER_ERROR03 already active.
+Request: build resource PRINTED_FILE for module USER_ERROR03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(USER_ERROR03)
+  PARSER                         building   PARSED_CODE(USER_ERROR03)
+                                 building   CALLEES(USER_ERROR03)
+  CONTROLIZER                    building   CODE(USER_ERROR03)
+  FILTER_FILE                    building   SOURCE_FILE(B)
+  PARSER                         building   PARSED_CODE(B)
+                                 building   CALLEES(B)
+  CONTROLIZER                    building   CODE(B)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(B)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(B)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(B)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(USER_ERROR03)
+2 formal arguments for module B:
+B:Y, B:X
+1 actual arguments:
+syntax = X
+normalized = NORMALIZED UNDEFINED
+user error in check_user_call_site: 
+Call to module B: insufficient number of actual arguments.
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module USER_ERROR03.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Module B selected
+Request: build resource PARALLELPRINTED_FILE for module B.
+  ATOMIC_CHAINS                  building   CHAINS(B)
+  RICE_FAST_DEPENDENCE_GRAPH     building   DG(B)
+  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(B)
+  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(B)
+PARALLELPRINTED_FILE made for B.
+
+      SUBROUTINE B(X, Y)
+      REAL U(10)
+
+      DOALL I = 1, 10                                                   0005
+         U(I) = 0.                                                      0006
+      ENDDO
+
+      PRINT *, X+Y                                                      0009
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module B.
+  Closing module USER_ERROR03.
+Closing program.
+Closing workspace.
+Workspace user_error03 closed.
+
+Workspace user_error03 deleted.

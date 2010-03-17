@@ -1,0 +1,126 @@
+Transform all the control flow in one finite state machine:
+int ex2(int argc,char *args)
+{
+   int U[101][101];
+   int V[101][101];
+   int i;
+   int j;
+   int FSM3_STATE;
+   i = 0;
+   FSM3_STATE = 1;
+   while (FSM3_STATE!=0) 
+      if (FSM3_STATE==1)
+         if (i<100) {
+            ;
+            FSM3_STATE = 2;
+         }
+         else {
+            ;
+            FSM3_STATE = 6;
+         }
+      else if (FSM3_STATE==2) {
+         j = 0;
+         FSM3_STATE = 3;
+      }
+      else if (FSM3_STATE==3)
+         if (j<100) {
+            ;
+            FSM3_STATE = 4;
+         }
+         else {
+            ;
+            FSM3_STATE = 5;
+         }
+      else if (FSM3_STATE==4) {
+         U[i+1][j] = V[i][j]+U[i][j];
+
+         V[i][j+1] = U[i+1][j];
+         j++;
+         FSM3_STATE = 3;
+      }
+      else if (FSM3_STATE==5) {
+         i++;
+         FSM3_STATE = 1;
+      }
+      else if (FSM3_STATE==6) {
+         return 0;
+         FSM3_STATE = 0;
+      }
+}
+For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
+/* SMALLTALK pretty print for module ex2. */
+ex2 with:argc with:args 
+"Automatically generated with PIPS"
+
+"0`U,int , 2 dimensions"
+"0`V,int , 2 dimensions"
+"0`i,int "
+"0`j,int "
+"FSM3_STATE,int "
+
+|0`U 0`V 0`i 0`j FSM3_STATE |
+
+
+0`U := Array2D width: 101 height: 101.
+0`V := Array2D width: 101 height: 101.
+
+0`i := 0.
+FSM3_STATE := 1.
+[FSM3_STATE != 0] whileTrue: [
+(FSM3_STATE == 1)
+ifTrue: [
+(0`i < 100)
+ifTrue: [
+FSM3_STATE := 2.
+]
+ifFalse: [
+FSM3_STATE := 6.
+].
+]
+ifFalse: [
+(FSM3_STATE == 2)
+ifTrue: [
+0`j := 0.
+FSM3_STATE := 3.
+]
+ifFalse: [
+(FSM3_STATE == 3)
+ifTrue: [
+(0`j < 100)
+ifTrue: [
+FSM3_STATE := 4.
+]
+ifFalse: [
+FSM3_STATE := 5.
+].
+]
+ifFalse: [
+(FSM3_STATE == 4)
+ifTrue: [
+0`U at: (0`i + 1-0) at: 0`j-0 put: ((0`V at: 0`i-0 at: 0`j-0) + (0`U at: 0`i-0 at: 0`j-0)).
+0`V at: 0`i-0 at: (0`j + 1-0) put: (0`U at: (0`i + 1-0) at: 0`j-0).
+0`j ++.
+FSM3_STATE := 3.
+]
+ifFalse: [
+(FSM3_STATE == 5)
+ifTrue: [
+0`i ++.
+FSM3_STATE := 1.
+]
+ifFalse: [
+(FSM3_STATE == 6)
+ifTrue: [
+^ result.
+FSM3_STATE := 0.
+]
+ifFalse: [
+].
+].
+].
+].
+].
+].
+].
+
+

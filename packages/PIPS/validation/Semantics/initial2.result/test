@@ -1,0 +1,90 @@
+
+      BLOCK DATA BLA
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I4 /4/
+      END
+
+      INTEGER FUNCTION BOO(I)
+      INTEGER I
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I5 /5/
+      BOO = I+I5                                                        0006
+      BOO = BOO+1                                                       0007
+      END
+
+! next line modified by fsplit() in pips
+      BLOCK DATA DATA000
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I3 /3/
+      END
+
+      SUBROUTINE FOO
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I2 /2/
+      PRINT *, 'foo'                                                    0005
+      END
+      PROGRAM INITIAL2
+      PRINT *, 'initial'                                                0002
+      CALL PC                                                           0003
+      END
+
+      SUBROUTINE PC
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I1 /1/
+      PRINT *, 'pc'                                                     0005
+      PRINT *, I1, I2, I3, I4, I5                                       0006
+      END
+
+C  P() {I4==4}
+
+
+C  P() {I5==5}
+
+
+C  P() {I3==3}
+
+
+C  P() {I2==2}
+
+
+C  P() {}
+
+
+C  P() {I1==1}
+
+
+Transformers for function "BOO"
+
+
+C  T(BOO) {I+I5==BOO-1}
+
+
+      INTEGER FUNCTION BOO(I)
+      INTEGER I
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I5 /5/
+
+C  T(BOO) {I+I5==BOO}
+
+      BOO = I+I5                                                        0006
+
+C  T(BOO) {BOO==BOO#init+1}
+
+      BOO = BOO+1                                                       0007
+      END
+
+Preconditions with initial precondition for program INITIAL2
+
+
+C  P() {BLA:I1==1, BLA:I2==2, BLA:I3==3, BLA:I4==4, BLA:I5==5}
+
+      PROGRAM INITIAL2
+
+C  P() {BLA:I1==1, BLA:I2==2, BLA:I3==3, BLA:I4==4, BLA:I5==5}
+
+      PRINT *, 'initial'                                                0002
+
+C  P() {BLA:I1==1, BLA:I2==2, BLA:I3==3, BLA:I4==4, BLA:I5==5}
+
+      CALL PC                                                           0003
+      END

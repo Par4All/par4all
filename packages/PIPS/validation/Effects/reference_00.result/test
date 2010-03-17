@@ -1,0 +1,24 @@
+void reference_00(void)
+{
+   int i = 0;                                                           /*0004*/
+   int a[10];                                                           /*0005*/
+   // effects on empty references...
+   i;                                                                   /*0007*/
+   a[i];                                                                /*0008*/
+}
+void reference_00(void)
+{
+   int i = 0;                                                           /*0004*/
+   int a[10];                                                           /*0005*/
+   // effects on empty references...
+   i;                                                                   /*0007*/
+   a[i];                                                                /*0008*/
+}
+void reference_00(void)
+{
+   int i = 0;                                                           /*0004*/
+   int a[10];                                                           /*0005*/
+   // effects on empty references...
+   i;                                                                   /*0007*/
+   a[i];                                                                /*0008*/
+}

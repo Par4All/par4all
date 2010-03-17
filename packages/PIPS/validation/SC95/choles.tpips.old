@@ -1,0 +1,22 @@
+#
+# choles.f test script
+#
+# Code generation in CRAFT Fortran for the Cray-T3D using the polyhedric
+# method. Intermediate results such as the initial code with the static
+# control informations, the array data flow graph (ADFG),
+# the scheduling (BDT) and the placement (PLC) are also given.
+#
+delete wcholes
+set ABORT_ON_USER_ERROR TRUE
+create wcholes choles.f
+module CHOLES
+activate PRINT_CODE_STATIC_CONTROL # Statements & Static Controls
+display PRINTED_FILE[CHOLES]
+display ADFG_FILE[CHOLES]
+display BDT_FILE[CHOLES]
+display PLC_FILE[CHOLES]
+activate PRINT_PARALLELIZEDCRAFT_CODE # CRAFT Fortran
+display PARALLELPRINTED_FILE[CHOLES]
+close
+delete wcholes
+quit

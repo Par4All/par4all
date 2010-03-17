@@ -1,0 +1,31 @@
+delete call17
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create call17 call17.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[call17]
+
+echo
+echo Proper effects for "call17"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[call17]
+
+echo
+echo Cumulated effects for "call17"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[call17]
+
+#apply USE_DEF_ELIMINATION[use_def_elim]
+#display PRINTED_FILE[use_def_elim]
+close
+delete call17
+quit

@@ -1,0 +1,10 @@
+delete ajoutoutput
+create ajoutoutput ajoutoutput.f
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete ajoutoutput
+quit
+

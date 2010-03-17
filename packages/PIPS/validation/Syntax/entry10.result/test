@@ -1,0 +1,29 @@
+
+Module ENTRY10
+
+      INTEGER*4 FUNCTION ENTRY10(X, N)
+      INTEGER N, INCREMENT
+      COMPLEX*8 X(1:N)
+
+      PRINT *, X(1)                                                     0008
+
+99999 CONTINUE
+
+
+      END
+
+Entry INCREMENT
+
+      INTEGER*4 FUNCTION INCREMENT(Y, M)
+      INTEGER M, INCREMENT
+      CHARACTER Y(1:M)
+
+99998 CONTINUE                                                          0005
+
+      PRINT *, Y(2)                                                     0007
+
+      M = M+1                                                           0009
+
+      INCREMENT = 4                                                     0011
+
+      END

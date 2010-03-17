@@ -1,0 +1,22 @@
+delete varargs02
+create varargs02 varargs02.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[varargs02]
+
+close
+
+delete varargs02
+quit

@@ -1,0 +1,11 @@
+      PROGRAM SUBSTR
+      CHARACTER*10 F
+      DATA F /'abcdefghij'/
+
+      PRINT *, F                                                        0005
+      PRINT *, F(1:10)                                                  0006
+      PRINT *, F(1:9)                                                   0007
+      PRINT *, F(2:10)                                                  0008
+      PRINT *, F(2:9)                                                   0009
+
+      END

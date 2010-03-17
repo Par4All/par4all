@@ -1,0 +1,10 @@
+      PROGRAM DABSTEST
+
+c     problem with intrinsic declaration because intrinsic are predeclared in PIPS
+
+      DOUBLE PRECISION DABS
+      DOUBLE PRECISION X,Y
+      READ *, Y                                                         0007
+      X = DABS(Y)                                                       0008
+      PRINT *, X                                                        0009
+      END

@@ -1,0 +1,10 @@
+delete equiv18
+create equiv18 equiv18.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[EQUIV18]
+
+close
+delete equiv18
+quit

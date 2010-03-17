@@ -1,0 +1,28 @@
+      PROGRAM LENDDO
+
+      REAL X(100), Y(100)
+
+      DO I = 1, 100                                                     0005
+         IF (Y(J).LT.0.) GOTO 1                                         0006
+         X(I) = 0.                                                      0007
+1        CONTINUE                                                       0008
+      ENDDO
+
+      DO 2 I = 1, 99                                                    0010
+         X(I) = 1.                                                      0011
+2        CONTINUE                                                       0012
+
+      DO I = 1, 98                                                      0014
+         X(I) = 2.                                                      0015
+      ENDDO
+
+c      do i = 1, 100
+c         x(i) = 3.
+c 4    continue
+
+      DO 5 J = 1, 99                                                    0022
+         DO 5 I = 1, 99                                                 0023
+            X(I) = 1.+REAL(J)                                           0024
+5           CONTINUE                                                    0025
+
+      END

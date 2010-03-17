@@ -1,0 +1,13 @@
+delete one_liner_func02
+setproperty ABORT_ON_USER_ERROR TRUE
+create one_liner_func02 one_liner_func02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+display PARSED_PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALL]
+
+shell cat one_liner_func02.database/*/*.c | sed -e '/^# 1[^0-9][^0-9]*/d'
+
+quit

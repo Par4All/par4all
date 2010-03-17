@@ -1,0 +1,12 @@
+delete muller02
+create muller02 muller02.f
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#apply MUST_REGIONS
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+
+close
+delete muller02
+quit

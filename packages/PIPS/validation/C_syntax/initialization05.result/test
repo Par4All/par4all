@@ -1,0 +1,60 @@
+
+Printed file for "initialization05"
+
+int initialization05()
+{
+   int a = a;
+   int i;
+
+   i = a+1;
+   a = 2;
+   return i;
+}
+
+Transformers for "initialization05"
+
+
+//  T(initialization05) {}
+
+int initialization05()
+{
+   int a = a;
+   int i;
+
+//  T(i) {a==i-1}
+
+
+   i = a+1;
+
+//  T(a) {a==2, a#init==i-1}
+
+   a = 2;
+
+//  T(initialization05) {a==2, i==initialization05}
+
+   return i;
+}
+
+Preconditions for "initialization05"
+
+
+//  P() {}
+
+int initialization05()
+{
+   int a = a;
+   int i;
+
+//  P() {}
+
+
+   i = a+1;
+
+//  P(i) {a==i-1}
+
+   a = 2;
+
+//  P(a,i) {a==2}
+
+   return i;
+}

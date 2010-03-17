@@ -1,0 +1,20 @@
+delete define2
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create define2 define2.c
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE(main)
+
+apply UNSPLIT(%ALL)
+
+close
+shell cc define2.database/Src/define2.c
+
+delete define2
+quit

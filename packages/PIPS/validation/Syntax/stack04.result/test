@@ -1,0 +1,31 @@
+user warning in tp_parse: stack04: No such workspace
+Registering file stack04.f
+Splitting file    ./stack04.f
+  Module         STACK04
+Workspace stack04 created and opened.
+Module STACK04 selected
+Module STACK04 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module STACK04 already active.
+Request: build resource PRINTED_FILE for module STACK04.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(STACK04)
+  PARSER                         building   PARSED_CODE(STACK04)
+                                 building   CALLEES(STACK04)
+user warning in MakeEquivAtom: A function call to A has been identified by the parser in an EQUIVALENCE statement. Maybe an array declaration should be moved up ahead of the EQUIVALENCE
+user error in MakeEquivAtom: Parser error between lines 2 and 2
+function call in equivalence chain
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module STACK04.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module STACK04.
+Closing program.
+Closing workspace.
+Workspace stack04 closed.
+
+Workspace stack04 deleted.

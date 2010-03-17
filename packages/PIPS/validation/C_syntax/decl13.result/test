@@ -1,0 +1,103 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: decl13: No such workspace
+Registering file decl13.c
+Preprocessing file ./decl13.c
+Splitting file    ./decl13.database/Tmp/decl13.cpp_processed.c
+  Module         decl13
+  Module         decl13!
+Workspace decl13 created and opened.
+Module decl13 selected
+Selecting rule: C_PARSER
+user warning in activate_phase: Rule `C_PARSER' already active
+Selecting rule: C_SYMBOL_TABLE
+user warning in activate_phase: Rule `C_SYMBOL_TABLE' already active
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+echo
+
+echo Symbol table for "decl13!"
+Symbol table for "decl13!"
+echo
+
+Module decl13! selected
+Request: build resource SYMBOL_TABLE_FILE for module decl13!.
+  BOOTSTRAP                      building   ENTITIES()
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl13!)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+ at line -1 (1)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource SYMBOL_TABLE_FILE for module decl13!.
+user error in display_a_resource: Cannot build view file SYMBOL_TABLE_FILE
+echo
+
+echo Symbol table for "decl13"
+Symbol table for "decl13"
+echo
+
+Module decl13 selected
+Request: build resource SYMBOL_TABLE_FILE for module decl13.
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl13!)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+ at line -1 (1)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource SYMBOL_TABLE_FILE for module decl13.
+user error in display_a_resource: Cannot build view file SYMBOL_TABLE_FILE
+echo
+
+echo Parsed printed file for "decl13!"
+Parsed printed file for "decl13!"
+echo
+
+Module decl13! selected
+Request: build resource PARSED_PRINTED_FILE for module decl13!.
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl13!)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+ at line -1 (1)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module decl13!.
+user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
+echo
+
+echo Parsed rinted file for "decl13"
+Parsed rinted file for "decl13"
+echo
+
+Module decl13 selected
+Request: build resource PARSED_PRINTED_FILE for module decl13.
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl13!)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+ at line -1 (1)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module decl13.
+user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module decl13.
+  Closing module decl13!.
+Closing program.
+Closing workspace.
+Workspace decl13 closed.
+
+Workspace decl13 deleted.

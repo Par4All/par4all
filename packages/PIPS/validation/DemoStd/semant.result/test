@@ -1,0 +1,55 @@
+--- Preconditions for module SEMANT
+
+C  P() {}
+
+      SUBROUTINE SEMANT(A, N)
+      PARAMETER (MAXSIZ = 10)
+      DATA M /6/
+      REAL A(N)
+      EQUIVALENCE (I, J)
+
+C  P() {I==J}
+
+
+C     You cannot be sure that M==6 because there may be several calls to SEMANT
+
+      IF (N.GE.MAXSIZ) THEN                                             0009
+
+C  P() {I==J, 10<=N}
+
+         N = MAXSIZ                                                     0010
+      ENDIF
+
+C  P(N) {I==J, N<=10, N<=N#init}
+
+
+C     This loop can be parallelized
+
+      DO 1 I = 1, N, 2                                                  0015
+
+C  P(I,N) {I==J, 1<=I, I<=N, N<=10, N<=N#init}
+
+         A(I) = 0.                                                      0016
+
+C  P(I,N) {I==J, 1<=I, I<=N, N<=10, N<=N#init}
+
+         A(J+1) = 0.                                                    0017
+
+C  P(I,N) {I==J, 1<=I, I<=N, N<=10, N<=N#init}
+
+1        CONTINUE                                                       0018
+
+C  P(I,N) {I==J, 1<=I, I<=12, N+1<=I, N<=10, N<=N#init}
+
+
+C     M is a static variable because of the DATA statement
+C     Its value is inherited from one call to the next and
+C     pretty much unknown. Although it looks as if it were
+C     uninitialized, it is at least initialized by DATA.
+
+      CALL SWAP(N, M)                                                   0025
+
+C  P(I,M,N) {I==J, M#init==N, 1<=I, I<=12, M+1<=I, M<=10, M<=N#init}
+
+      PRINT *, N, M                                                     0026
+      END

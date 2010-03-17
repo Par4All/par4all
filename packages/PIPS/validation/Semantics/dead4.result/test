@@ -1,0 +1,71 @@
+
+C  T() {}
+
+      PROGRAM DEAD4
+
+C  T(I) {I==1}
+
+
+C     Check that negation are properly interpreted
+
+      I = 1                                                             0005
+
+C  T(J) {J==1}
+
+      J = 1                                                             0006
+
+C  T(K) {2<=K, K<=4}
+
+      IF (I.EQ.J) THEN                                                  0007
+
+C  T(K) {K==2}
+
+         K = 2                                                          0008
+      ELSE
+
+C  T(K) {K==4}
+
+         K = 4                                                          0010
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I, J, K                                                  0013
+      END
+
+C  P() {}
+
+      PROGRAM DEAD4
+
+C  P() {}
+
+
+C     Check that negation are properly interpreted
+
+      I = 1                                                             0005
+
+C  P(I) {I==1}
+
+      J = 1                                                             0006
+
+C  P(I,J) {I==1, J==1}
+
+      IF (I.EQ.J) THEN                                                  0007
+
+C  P(I,J) {I==1, J==1}
+
+         K = 2                                                          0008
+      ELSE
+
+C  P() {0==-1}
+
+         K = 4                                                          0010
+      ENDIF
+
+C  P(I,J,K) {I==1, J==1, K==2}
+
+
+      PRINT *, I, J, K                                                  0013
+      END
+

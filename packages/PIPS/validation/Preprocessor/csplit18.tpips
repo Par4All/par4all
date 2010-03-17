@@ -1,0 +1,17 @@
+delete csplit18
+create csplit18 csplit18.c
+
+# check signatures with parameter names are parsed (about csplit16.c)
+# This has nothing to do with the preprocessing
+
+close
+open csplit18
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+display PRINTED_FILE[csplit18]
+close
+delete csplit18
+quit

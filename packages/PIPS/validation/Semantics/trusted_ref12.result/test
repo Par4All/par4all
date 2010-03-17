@@ -1,0 +1,40 @@
+
+C  T() {1<=N1, 1<=N2}
+
+      SUBROUTINE TRUSTED_REF12(A, N1, N2, M1, M2)
+
+C     Check that nested loops are properly analyzed: since you are not
+C     sure to enter the i loop, you cannot use any information from the
+C     j loop and you end up with nothing
+
+      REAL A(N1, N2)
+
+C  T(I,J) {1<=I, M1+1<=I, 1<=N1, 1<=N2}
+
+C     BEGIN BLOCK
+
+C  T(I,J) {1<=I, 1<=N1, 1<=N2}
+
+
+      DO I = 1, M1                                                      0009
+
+C  T(J) {1<=I, I<=M1, 1<=J, M2+1<=J, J<=N2+1, 1<=N1, 1<=N2}
+
+C        BEGIN BLOCK
+
+C  T(J) {1<=I, I<=M1, 1<=J, 1<=N1, 1<=N2}
+
+         DO J = 1, M2                                                   0010
+
+C  T() {1<=I, I<=M1, I<=N1, 1<=J, J<=M2, J<=N2, 1<=N1, 1<=N2}
+
+            A(I,J) = 0                                                  0011
+         ENDDO
+C     a comment to have an inner block and see the inner loop
+C     transformer
+C        END BLOCK
+      ENDDO
+
+C     END BLOCK
+      END
+

@@ -1,0 +1,28 @@
+delete trfd
+create trfd trfd.f
+module TRFD
+
+echo
+echo TRFD with intraprocedural preconditions
+echo
+
+activate PRINT_CALL_GRAPH_WITH_PRECONDITIONS
+display CALLGRAPH_FILE
+close
+delete trfd
+
+create trfd trfd.f
+module TRFD
+
+echo
+echo TRFD with interprocedural preconditions
+echo
+
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CALL_GRAPH_WITH_PRECONDITIONS
+display CALLGRAPH_FILE
+close
+delete trfd
+quit

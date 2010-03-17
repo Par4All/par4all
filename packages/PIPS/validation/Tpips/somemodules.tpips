@@ -1,0 +1,46 @@
+delete sm
+create sm somemodules.f
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Source code for default MAIN, although TOTO is selected
+echo but inexistant in the workspace sm
+echo
+
+module TOTO
+display PRINTED_FILE
+
+echo
+echo Source code for FOO, although FOO does not exist yet in the workspace
+echo
+
+display PRINTED_FILE[FOO]
+
+echo
+echo No source code for BOOM, which does not exist,
+echo although BLA is selected just before
+echo
+
+module BLA
+display PRINTED_FILE[BOOM]
+
+echo
+echo Source code for MAIN
+echo
+
+display PRINTED_FILE[MAIN]
+
+echo
+echo Source code for FOO
+echo
+
+module FOO
+display PRINTED_FILE
+
+echo
+echo Source code for the main program
+echo
+
+display PRINTED_FILE[%MAIN]
+close
+delete sm

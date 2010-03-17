@@ -1,0 +1,25 @@
+delete hook
+create hook hook.f
+
+module HOOK
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Default options: no decoration for end
+echo --------------------------------------
+
+display PRINTED_FILE
+
+echo
+echo Decoration for end
+echo ------------------
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+shell sleep 1
+shell touch hook.database/HOOK/HOOK.f
+
+display PRINTED_FILE
+
+close
+delete hook
+quit

@@ -1,0 +1,27 @@
+
+C  T() {}
+
+      PROGRAM NON_LINEAR01
+
+C  T(K) {I==1, 0<=K}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T() {I==1}
+
+C (0,2)
+
+C     Check
+
+      IF (I.NE.1) STOP                                                  0005
+
+C  T(K) {0<=K}
+
+C (0,5)
+
+      K = I*I                                                           0007
+
+C     END BLOCK
+      END
+

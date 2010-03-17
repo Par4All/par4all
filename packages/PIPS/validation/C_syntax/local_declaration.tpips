@@ -1,0 +1,18 @@
+delete local_declaration
+
+create local_declaration local_declaration.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+setenv PRETTYPRINT_DEBUG_LEVEL 5 
+
+display PRINTED_FILE[do_elem]
+
+close
+
+delete local_declaration
+
+quit

@@ -1,0 +1,8 @@
+echo Testing direct .tpips validation
+delete t
+create t test.f
+display PARALLELPRINTED_FILE
+close
+delete t
+echo Done
+quit

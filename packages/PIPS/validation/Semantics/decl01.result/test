@@ -1,0 +1,28 @@
+
+C  P() {}
+
+      SUBROUTINE DECL01(X,N)
+
+C     Check that declaration information is used in preconditions.
+C     If it is used, i == n+1 && n >= 1 before the print.
+C     If not, i >= 1 && i >=n+1.
+
+      REAL X(N)
+
+C  P() {1<=N}
+
+
+      DO I = 1, N                                                       0009
+
+C  P(I) {1<=I, I<=N, 1<=N}
+
+         X(I) = 0.                                                      0010
+      ENDDO
+
+C  P(I) {I==N+1, 2<=I}
+
+
+      PRINT *, I                                                        0013
+
+      END
+

@@ -1,0 +1,51 @@
+# Check that the signature of decl33 is not "damaged" when decl33! is
+# parsed in spite of the old style declaration of decl33
+
+delete decl33
+create decl33 decl33.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+echo
+echo Splitted file for "decl33!"
+echo
+
+shell cat decl33.database/decl33!/decl33!.c
+
+echo
+echo Parsed printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Parsed printed file for "decl33"
+echo
+
+display PARSED_PRINTED_FILE[decl33]
+
+echo
+echo Parsed printed file for "decl33!"
+echo
+
+display PARSED_PRINTED_FILE[decl33!]
+
+echo
+echo Symbol table for "decl33"
+echo
+
+display SYMBOL_TABLE_FILE[decl33]
+
+close
+# delete decl33
+
+quit

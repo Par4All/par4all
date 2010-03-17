@@ -1,0 +1,48 @@
+user warning in tp_parse: recursion02: No such workspace
+Registering file recursion02.f
+Splitting file    ./recursion02.f
+  Module         FOO05
+  Module         FOO04
+  Module         FOO03
+  Module         FOO02
+  Module         FOO01
+  Module         RECURSION02
+Workspace recursion02 created and opened.
+Main module PROGRAM "RECURSION02" selected.
+Module RECURSION02 selected
+Module FOO01 selected
+Request: build resource CALLGRAPH_FILE for module FOO01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(FOO01)
+  PARSER                         building   PARSED_CODE(FOO01)
+                                 building   CALLEES(FOO01)
+  CONTROLIZER                    building   CODE(FOO01)
+  FILTER_FILE                    building   SOURCE_FILE(FOO03)
+  PARSER                         building   PARSED_CODE(FOO03)
+                                 building   CALLEES(FOO03)
+  CONTROLIZER                    building   CODE(FOO03)
+  FILTER_FILE                    building   SOURCE_FILE(FOO02)
+  PARSER                         building   PARSED_CODE(FOO02)
+                                 building   CALLEES(FOO02)
+  CONTROLIZER                    building   CODE(FOO02)
+resource CALLGRAPH_FILE[FOO01] is in 'required' status since 1
+resource CALLGRAPH_FILE[FOO03] is in 'required' status since 5
+resource CALLGRAPH_FILE[FOO02] is in 'required' status since 8
+user error in rmake: recursion on resource CALLGRAPH_FILE of FOO01
+user warning in safe_do_something: Request aborted in pipsmake: build resource CALLGRAPH_FILE for module FOO01.
+user error in display_a_resource: Cannot build view file CALLGRAPH_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module FOO01.
+  Closing module FOO02.
+  Closing module FOO03.
+  Closing module FOO04.
+  Closing module FOO05.
+  Closing module RECURSION02.
+Closing program.
+Closing workspace.
+Workspace recursion02 closed.
+
+user error in perform: Open or create a workspace first!
+Workspace recursion02 deleted.

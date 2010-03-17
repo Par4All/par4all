@@ -1,0 +1,19 @@
+Checking that typedef types are properly prettyprinted
+(because of a problem in main_hello_world.c)
+
+Printed file for "typedef04"
+
+typedef double mydouble;
+struct s {
+   int dim;
+};
+
+extern void typedef04(int n, struct s d, struct s *pd);
+void typedef04(int n, struct s d, struct s *pd)
+{
+   typedef int narray_t[n+2];
+   typedef int darray_t[d.dim];
+   typedef int parray_t[pd->dim];
+   narray_t a1;
+   darray_t a2;
+}

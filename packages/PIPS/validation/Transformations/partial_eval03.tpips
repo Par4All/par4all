@@ -1,0 +1,52 @@
+delete partial_eval03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval03 partial_eval03.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Initial code for "partial_eval03"
+echo
+
+display PRINTED_FILE[partial_eval03]
+
+echo
+echo Code with preconditions for "partial_eval03"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[partial_eval03]
+
+echo
+echo Code after partial evaluation for "partial_eval03"
+echo
+
+apply PARTIAL_EVAL[partial_eval03]
+activate PRINT_CODE
+display PRINTED_FILE[partial_eval03]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -c partial_eval03.c -o partial_eval
+shell cc -c partial_eval03.database/Src/partial_eval03.c
+shell if test `partial_eval03.database/Src/partial_eval` = `partial_eval`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf partial_eval03.database/Src/partial_eval partial_eval
+
+close
+# delete partial_eval03
+quit
+

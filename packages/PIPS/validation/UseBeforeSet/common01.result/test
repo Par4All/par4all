@@ -1,0 +1,23 @@
+!!
+!! file for common01.f
+!!
+      PROGRAM MAIN     
+      CALL PIPS_INITIALIZE(W)
+      CALL P
+      RETURN
+      END
+      SUBROUTINE P
+      COMMON W
+      T = .TRUE.
+      IF (T) THEN
+      CALL PIPS_VERIFY(W)
+         CALL Q
+      ELSE
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE Q
+      COMMON V
+      PRINT *, V
+      RETURN
+      END

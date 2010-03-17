@@ -1,0 +1,9 @@
+
+parsed printed file
+
+int bool02()
+{
+   _Bool i;
+
+   i = 1;
+}

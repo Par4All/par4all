@@ -1,0 +1,21 @@
+delete strdata01
+create strdata01 strdata01.f
+display PRINTED_FILE
+
+setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+
+activate PRINT_INITIAL_PRECONDITION
+display PRINTED_FILE
+
+activate PRINT_PROGRAM_PRECONDITION
+display PRINTED_FILE[%PROGRAM]
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete strdata01
+quit

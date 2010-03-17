@@ -1,0 +1,30 @@
+create ambiguous01 ambiguous01.f
+module BAR
+make PARSED_CODE
+activate PRINT_CODE_CUMULATED_EFFECTS
+module AMBIGUOUS01
+
+echo
+echo Effects for AMBIGUOUS01 are first expressed in BAR scope
+echo
+
+display PRINTED_FILE
+
+close
+delete ambiguous01
+
+create ambiguous01 ambiguous01.f
+module FOO
+make PARSED_CODE
+activate PRINT_CODE_CUMULATED_EFFECTS
+module AMBIGUOUS01
+
+echo
+echo Effects for AMBIGUOUS01 are now expressed in FOO scope
+echo
+
+display PRINTED_FILE
+
+close
+delete ambiguous01
+quit

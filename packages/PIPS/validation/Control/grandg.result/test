@@ -1,0 +1,153 @@
+com ===================================================================
+      SUBROUTINE GRANDG(IFSIM)
+com ===================================================================
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+C ##### include: siddimension.h #####
+com =======Header siddimension.h===============================                 
+com Definition des dimensions du probleme                                       
+c -------------------------------------------------------------------+          
+      PARAMETER (MAXCOEF=  20)
+      PARAMETER (MAXCARA=  2)
+      PARAMETER (MAXVOBS=  5)
+      PARAMETER (MAXVINT=  28100)
+      PARAMETER (MAXVAUX=  4)
+c -------------------------------------------------------------------+          
+      PARAMETER (MAXTEST=  10)
+      PARAMETER (MAXSEQ =  200)
+      PARAMETER (MAXCHAR=  7)
+      PARAMETER (MAXPEXP=  100)
+      PARAMETER (MAXPSIM=  100)
+      PARAMETER (MAXCCHA=  4)
+      PARAMETER (MAXWIND=  3)
+c -------------------------------------------------------------------+                
+com   maxcoef = nombre de coefficients dans cet executable                            
+com   maxcara = nombre de caracteristiques experimentales                             
+com                          (option caracteristique de *essai)                       
+com   maxvobs= nombre de variables "observees"                                        
+com   maxvint= nombre de variables a integrer                                         
+com   maxvaux= nombre de variables auxiliaires a evaluer en sortie                    
+com   maxtest = nombre max d essais possibles pour cet executable                     
+com   Dans le cas ou on definit le chargement dans un fichier :                       
+com  -maxseq  = nombre de max de sequences (segments de droite pour                   
+com             definir le chargement)                                                
+com  -maxchar= nombre de colonnes du fichier chargement                               
+com   maxpexp= nombre  maxi d observations experimentales                             
+com   maxpsim= nombre de points a retenir pour la simulation                          
+com   maxccha= nombre max de variables pour la description du chargement              
+com            par une formule                                                        
+com   maxwind= nombre max de fenetres (intervalles d integration) pour                
+com            lesquelles on peut effectuer des sorties pour un essai                 
+c ============End of siddimension.h======================================               
+C ##### end include #####
+C ##### include: sidvar.h #####
+com =======Common sidvar.h==============================================
+com -------------------------------------------------------------------+
+      COMMON/COCOEF/
+     .  YOUNG,POISS,GRCMAC,GRDMAC,
+     .  GRCGRA,GRDGRA,
+     .  XN,XK,RAYVI,GRANQ,PETIB,PETIC0,PETIC1,PETID,
+     .  HCFC1,HCFC2,HCFC3,HCFC4,HCFC5,HCFC6
+      COMMON/COCARA/
+     .  DIAMEXT,DIAMINT
+      COMMON/VAROBS/
+     .  TEMPS,FORCE,COUPLE,ETO11,ETO12,NUL1,NUL2
+      COMMON/VARAUX/
+     .  SIGMI,SIGTR,EVIMI,EVITR
+      COMMON/VARINT/
+     .  SIG11,SIG22,SIG33,SIG12,SIG23,SIG13,
+     .  EVI11,EVI22,EVI33,EVI12,EVI23,EVI13,
+     .  BET11,BET22,BET33,BET12,BET23,BET13,
+     .  EVCUM,GAMET,
+     .  BETGR(5616),
+     .  GVCUM(11232),ALMIC(11232)
+      COMMON/DVARINT/
+     .  DSIG11,DSIG22,DSIG33,DSIG12,DSIG23,DSIG13,
+     .  DEVI11,DEVI22,DEVI33,DEVI12,DEVI23,DEVI13,
+     .  DBET11,DBET22,DBET33,DBET12,DBET23,DBET13,
+     .  DEVCUM,DGAMET,
+     .  DBETGR(5616),
+     .  DGVCUM(11232),DALMIC(11232)
+c   =====End of sidvar.h===============================================
+C ##### end include #####
+C ##### include: sidcristal.h #####
+com =======Header sidcristal.h===============================  
+
+c on stocke les tenseurs d orientation de 
+c tous les grains*tous les systemes >> ngrain*nbsys*ntens valeurs
+c
+      COMMON /ICRISTAL/NBSYS,NGRAIN,NTOTDIR
+      COMMON /RCRISTAL/HCFC(12,12),XM(6,12,1000)
+
+c  ==========End of sidcristal.h==============================
+C ##### end include #####
+C ##### include: sidcalc.h #####
+com ==Common sidcalc.h===================================================
+
+com Common contenant quelques petites variables tres critiques
+com -------------------------------------------------------------------+
+      COMMON/ICALCUL/I1FOIS,ITEST,NPT,NCTRL,JCHOLD,NUMITE,MAXFUN,
+     . IFPAUTO,IFSIMUL,IFVERIF,IFFORMU(MAXTEST),IFFENETRE(MAXTEST),
+     . NTEST,NSCAL,NVECT,NSCAL2,NVECT2
+      COMMON/RCALCUL/CHAR2(MAXCCHA,MAXVOBS),HH,DMAX,ACC
+      COMMON/CCALCUL/VARKO(MAXCHAR)
+      CHARACTER*8 VARKO
+c   -------------------------------------------------------------------+
+com A completer
+c   =====End of sidcalc.h=================================================
+C ##### end include #####
+C ##### include: sidinout.h #####
+com =======Common sidinout.h============================================
+com Common des entrees-sorties
+com -------------------------------------------------------------------+
+      COMMON/CHOISOR/NSSCAL,NSVECT,LRSSCAL(MAXVINT),LRSVECT(MAXVINT),
+     .              LSVECT(100)
+      COMMON/INOUT/IECRAN,ICLAVI,LONREC,IUTI,IDAT,ISCA,IVEC,IAUX,
+     . IEXP,ILST,ITRJ,ITRA,ICOF,IPRINT,IFSORAUTO,LONFICH
+      COMMON/CINOUT/FICHNOM,FICHEXP,FICHS,FICHTEST,FICHTRJ,FICHCOF,
+     .              TITRE,AUTEUR,REPERE
+      CHARACTER*16 FICHS,FICHNOM,FICHEXP(MAXTEST),FICHTEST(MAXTEST),
+     .             FICHTRJ,FICHCOF
+      CHARACTER*80 TITRE,AUTEUR,REPERE
+c   -------------------------------------------------------------------+
+com A completer 
+c   ========End of sidinout.h============================================
+C ##### end include #####
+      CHARACTER*16 FILSYS
+c=========================================================
+      DATA ZE/0.0D0/ UN/1.0D0/ DE/2.0D0/ TR/3.0D0/ QU/4.0D0/
+      DATA PI4/0.785398163D0/ CT/1.0D0/
+      DE2 = DIAMEXT*DIAMEXT                                             0119
+      DI2 = DIAMINT*DIAMINT                                             0120
+      AIR = PI4*(DE2-DI2)                                               0121
+      BIR = PI4*(DE2*DIAMEXT-DI2*DIAMINT)/TR                            0122
+      FORCE = AIR*SIG11                                                 0123
+      IF (TEMPS.LT.1200.0) THEN                                         0124
+         COUPLE = BIR*SIG12                                             0125
+      ELSE
+         COUPLE = ZE                                                    0127
+      ENDIF
+      ETO11 = (SIG11/YOUNG+EVI11)*CT                                    0129
+      DMOY = (DIAMINT+DIAMEXT)/DE                                       0130
+      ETO12 = (SIG12*(UN+POISS)/YOUNG+EVI12)*CT*DIAMEXT/DMOY            0131
+      IF (IFSIM.NE.1) RETURN                                            0132
+      SIGMI = DSQRT(SIG11*SIG11+TR*SIG12*SIG12)                         0133
+      SIGTR = DSQRT(SIG11*SIG11+QU*SIG12*SIG12)                         0134
+      EVIMI = DSQRT(EVI11*EVI11+QU*EVI12*EVI12/TR)                      0135
+      EVITR = DSQRT(EVI11*EVI11+QU*QU*EVI12*EVI12/TR/TR)                0136
+      WRITE (6, '(5(2x,e13.5))') TEMPS, SIG11, SIG12, ETO11, ETO12      0137
+      IF (NPT.GE.MAXPSIM-1) THEN                                        0138
+         LONFICH = INDEX(FICHTEST(ITEST), ' ')-1                        0139
+C*        filsys=fichtest(itest)(1:lonfich)//'.sys'
+C*        filsys=fichtest(itest)(1:lonfich)
+         OPEN (UNIT=56,FILE=FILSYS)                                     0142
+         DO 910 IGRAIN = 1, NGRAIN                                      0143
+            ISYS = 12*(IGRAIN-1)                                        0144
+            WRITE (56, *) 'grain ', IGRAIN                              0145
+            WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+1, ISYS+   0146
+     &      6)                                                          0146
+            WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+7, ISYS+   0147
+     &      12)                                                         0147
+910         CONTINUE                                                    0148
+         CLOSE (56)                                                     0149
+      ENDIF
+      END

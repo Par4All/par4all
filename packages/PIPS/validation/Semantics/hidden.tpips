@@ -1,0 +1,10 @@
+# delete hidden
+create hidden hidden.f
+activate PRINT_CODE_TRANSFORMERS
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+module hidden
+display PRINTED_FILE
+close 
+delete hidden
+quit

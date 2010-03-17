@@ -1,0 +1,23 @@
+delete comment04
+
+echo This code is not compatible with "cpp -ansi"
+setenv PIPS_CPP "cpp -C -P"
+#setenv PIPS_CPP "cpp -ansi"
+
+create comment04 comment04.c
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE FOR MODULE comment04!
+echo
+
+display PARSED_PRINTED_FILE[comment04!]
+
+close
+
+delete comment04  
+
+quit

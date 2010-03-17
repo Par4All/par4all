@@ -1,0 +1,32 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: array01: No such workspace
+Registering file array01.f
+Splitting file    ./array01.f
+  Module         ARRAY01
+Workspace array01 created and opened.
+Module ARRAY01 selected
+Main module PROGRAM "ARRAY01" selected.
+Module ARRAY01 already active.
+Module ARRAY01 already active.
+Module ARRAY01 already active.
+Request: build resource PRINTED_FILE for module ARRAY01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ARRAY01)
+  PARSER                         building   PARSED_CODE(ARRAY01)
+                                 building   CALLEES(ARRAY01)
+user error in MakeAtom: Parser error between lines 7 and 7
+Substring operations can only be applied to strings in Fortran 77
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module ARRAY01.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ARRAY01.
+Closing program.
+Closing workspace.
+Workspace array01 closed.
+
+Workspace array01 deleted.

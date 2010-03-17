@@ -1,0 +1,47 @@
+if03
+    if () {
+        bla
+            if () {
+                foo
+            } else if () {
+                foo
+            } else {
+                foo
+            }
+    } else if () {
+        bla
+            if () {
+                foo
+            } else if () {
+                foo
+            } else {
+                foo
+            }
+    } else if () {
+        bla
+            if () {
+                foo
+            } else if () {
+                foo
+            } else {
+                foo
+            }
+    } else if () {
+        bla
+            if () {
+                foo
+            } else if () {
+                foo
+            } else {
+                foo
+            }
+    } else {
+        bla
+            if () {
+                foo
+            } else if () {
+                foo
+            } else {
+                foo
+            }
+    }

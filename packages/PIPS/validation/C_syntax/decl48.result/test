@@ -1,0 +1,70 @@
+
+Symbol table
+
+decl48!flat_color_z_triangle
+
+Declarations for module "decl48!flat_color_z_triangle" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl48!:*STATIC*" with type "area" with size 0
+	Declared entity "decl48!flat_color_z_triangle:*DYNAMIC*" with type "area" with size 48
+	Declared entity "decl48!flat_color_z_triangle:*HEAP*" with type "area" with size 0
+	Declared entity "decl48!flat_color_z_triangle:*STACK*" with type "area" with size 0
+	Declared entity "decl48!flat_color_z_triangle:*STATIC*" with type "area" with size 0
+	Declared entity "decl48!flat_color_z_triangle:0`1`eMaj" with type "variable" "EdgeT"
+	Declared entity "flat_color_z_triangle:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "flat_color_z_triangle:0`__func__" with type "variable" "char"
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "decl48!flat_color_z_triangle:0`1`#_PIPS_STRUCT_1"	kind = struct
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl48!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl48!flat_color_z_triangle:*DYNAMIC*" of size 48:
+	Variable "decl48!flat_color_z_triangle:0`1`eMaj"	offset = 44	size = 4
+	Variable "flat_color_z_triangle:0`__func__"	offset = 0	size = 22
+	Variable "flat_color_z_triangle:0`__FUNCTION__"	offset = 22	size = 22
+
+
+Layout for memory area "decl48!flat_color_z_triangle:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl48!flat_color_z_triangle:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl48!flat_color_z_triangle:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl48!flat_color_z_triangle
+
+
+Code
+
+static void flat_color_z_triangle()
+{
+   {
+      typedef struct {                                                  /*0007*/
+         int v0;
+      } EdgeT;
+
+      EdgeT eMaj;                                                       /*0009*/
+
+      eMaj.v0 = 1;                                                      /*0011*/
+   }
+}

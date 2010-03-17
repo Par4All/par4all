@@ -1,0 +1,37 @@
+      PROGRAM DOWHILE
+      
+      INTEGER I, WHILE
+      REAL DO WHILE
+
+c      i=3
+c      do , while (i.gt.0)
+c         print *, i
+c         i = i - 1
+c      end do
+
+      I = 4                                                             0012
+      DO WHILE (I.GT.1)                                                 0013
+         PRINT *, I+2                                                   0014
+         I = I-2                                                        0015
+      ENDDO
+
+      I = 5                                                             0018
+      DO 10 WHILE (I.GT.2)                                              0019
+         PRINT *, I+3                                                   0020
+         I = I-3                                                        0021
+10       CONTINUE                                                       0022
+
+c      i=2
+c      do 20 , while (i.gt.3)
+c         print *, i+4
+c         i = i - 4
+c 20   continue
+
+      DO WHILE = 1, 3                                                   0030
+         PRINT *, WHILE                                                 0031
+      ENDDO
+
+      DOWHILE = 1.2                                                     0034
+      PRINT *, DOWHILE                                                  0035
+
+      END

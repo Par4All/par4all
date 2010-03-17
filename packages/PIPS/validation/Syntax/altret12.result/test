@@ -1,0 +1,18 @@
+      SUBROUTINE ALTRET12(*, N)
+
+C     Bug dans la reprise du parser
+
+      LOGICAL B
+
+      PRINT *, B                                                        0007
+
+      END
+      SUBROUTINE ALTRET12(*, N)
+
+C     Bug dans la reprise du parser
+
+      LOGICAL B
+
+      PRINT *, B                                                        0007
+
+      END

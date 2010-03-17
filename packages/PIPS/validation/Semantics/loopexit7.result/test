@@ -1,0 +1,35 @@
+--- Preconditions for LOOPEXIT7
+
+C  P() {}
+
+      PROGRAM LOOPEXIT7
+
+c     Check non-unit increments:
+C     the loop is entered, increment is not 1
+
+      REAL T(10)
+
+C  P() {}
+
+
+      IF (N.GE.1) THEN                                                  0008
+
+C  P() {1<=N}
+
+         DO I = 1, N, 2                                                 0009
+
+C  P(I) {1<=I, I<=N, 1<=N}
+
+            T(I) = 0.                                                   0010
+         ENDDO
+
+C  P(I) {3<=I, N+1<=I, I<=N+2, 1<=N}
+
+
+C        Expected precondition:
+C        P(I) {N+1<=I, I<=N+2, 1<=N} 
+         PRINT *, I                                                     0015
+
+      ENDIF
+
+      END

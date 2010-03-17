@@ -1,0 +1,18 @@
+      PROGRAM CLOSE56
+
+c     Problems with IO statements
+
+c     This one is not f77 compatible
+c     print 56, i
+      PRINT *, I                                                        0007
+
+      WRITE (56) I                                                      0009
+
+      CLOSE (56)                                                        0011
+
+c     This one should be ok
+c      close((56))
+
+      CLOSE (I*J)                                                       0016
+
+      END

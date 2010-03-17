@@ -1,0 +1,33 @@
+
+Initial source code
+
+void loop_hyperplane01(int n, int ni, int nj)
+{
+   float x[n][n];
+   int i, j;
+
+l1:
+   for(i = 0; i <= ni-1; i += 1)
+l2:
+      for(j = 0; j <= nj-1; j += 1)
+         x[i][j] = 0.;
+}
+
+Source code after loop hyperplane
+
+void loop_hyperplane01(int n, int ni, int nj)
+{
+   float x[n][n];
+   int i, j;
+   //PIPS generated variable
+   int ip, jp;
+
+l1:
+   for(ip = 0; ip <= -2+ni+nj; ip += 1)
+      for(jp = MAX(-ip, 1-ni); jp <= MIN(-1-ip+nj, 0); jp += 1)
+         x[-jp][ip+jp] = 0.;
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active

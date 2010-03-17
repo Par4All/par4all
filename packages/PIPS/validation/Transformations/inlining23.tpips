@@ -1,0 +1,39 @@
+setenv WSPACE inlining23
+delete ${WSPACE}
+setenv MAIN $WSPACE.database/main
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} inlining23.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+display CALLGRAPH_FILE[main]
+
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+apply INLINING[foo]
+display PRINTED_FILE[main]
+display PRINTED_FILE[bla]
+
+apply INLINING[bla]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc ${WSPACE}.database/Src/inlining23.c -o ${WSPACE}.database/Src/inlining
+shell cc inlining23.c -o inlining
+shell if test `${WSPACE}.database/Src/inlining` = `./inlining`; then echo "ok"; else echo "ko" ; fi
+shell rm -f inlining ${WSPACE}.database/Src/inlining
+
+close
+delete ${WSPACE}
+quit

@@ -1,0 +1,1214 @@
+[bourdoncle_partition] Begin with unstructured:
+[print_unstructured] Unstructured 437508 with nodes:
+ctr 396f18, 1 preds, 1 succs: 2 (16, 1) at 3cf5e0: ASSIGN 
+        successors:
+                398948 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                396fa8 1 (1, 1) at 3d2770: TEST 
+
+ctr 3988b8, 1 preds, 2 succs: 3 (8, 1) at 38d4c8: TEST 
+        successors:
+                3c0ff0 -1 (5, 1) at 3db508: BLOCK 
+                39f5b0 5 (9, 1) at 3c9400: ASSIGN 
+        predecessors:
+                398948 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 39f5b0, 1 preds, 1 succs: 5 (9, 1) at 3c9400: ASSIGN 
+        successors:
+                3a1c50 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                3988b8 3 (8, 1) at 38d4c8: TEST 
+
+ctr 3a1bc0, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                3aab00 9 (11, 1) at 3c9420: ASSIGN 
+                3a5bf0 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                3a1c50 5 (10, 1) at 3a90c0: TEST 
+
+ctr 3a5bf0, 1 preds, 1 succs: -1 (15, 1) at 42fc98: BLOCK 
+        successors:
+                3a1c50 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                3a1bc0 6 (14, 1) at 38d588: TEST 
+
+ctr 3a1c50, 2 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                3aab00 9 (11, 1) at 3c9420: ASSIGN 
+                3a1bc0 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                39f5b0 5 (9, 1) at 3c9400: ASSIGN 
+                3a5bf0 -1 (15, 1) at 42fc98: BLOCK 
+
+ctr 3aab00, 2 preds, 1 succs: 9 (11, 1) at 3c9420: ASSIGN 
+        successors:
+                3aab18 10 (12, 1) at 38d628: TEST 
+        predecessors:
+                3a1c50 5 (10, 1) at 3a90c0: TEST 
+                3a1bc0 6 (14, 1) at 38d588: TEST 
+
+ctr 3f4580, 1 preds, 1 succs: 17 (3, 1) at 42fcd8: TEST 
+        successors:
+                38fd70 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                3acbd0 12 (4, 1) at 38d6e8: TEST 
+
+ctr 38fd70, 3 preds, 0 succs: 21 (2, 1) at 382d60: CONTINUE 
+        successors:
+        predecessors:
+                3f4580 17 (3, 1) at 42fcd8: TEST 
+                3dd328 15 (13, 1) at 42fcb8: TEST 
+                396fa8 1 (1, 1) at 3d2770: TEST 
+
+ctr 3dd328, 1 preds, 1 succs: 15 (13, 1) at 42fcb8: TEST 
+        successors:
+                38fd70 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                3aab18 10 (12, 1) at 38d628: TEST 
+
+ctr 3aab18, 1 preds, 2 succs: 10 (12, 1) at 38d628: TEST 
+        successors:
+                3dd328 15 (13, 1) at 42fcb8: TEST 
+                3acbd0 12 (4, 1) at 38d6e8: TEST 
+        predecessors:
+                3aab00 9 (11, 1) at 3c9420: ASSIGN 
+
+ctr 3acbd0, 1 preds, 2 succs: 12 (4, 1) at 38d6e8: TEST 
+        successors:
+                3f4580 17 (3, 1) at 42fcd8: TEST 
+                3c0ff0 -1 (5, 1) at 3db508: BLOCK 
+        predecessors:
+                3aab18 10 (12, 1) at 38d628: TEST 
+
+ctr 3c0ff0, 2 preds, 1 succs: -1 (5, 1) at 3db508: BLOCK 
+        successors:
+                398948 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                3acbd0 12 (4, 1) at 38d6e8: TEST 
+                3988b8 3 (8, 1) at 38d4c8: TEST 
+
+ctr 398948, 2 preds, 2 succs: 2 (6, 1) at 3cf5a0: TEST 
+        successors:
+                396f60 1 (7, 1) at 3d2790: ASSIGN 
+                3988b8 3 (8, 1) at 38d4c8: TEST 
+        predecessors:
+                396f18 2 (16, 1) at 3cf5e0: ASSIGN 
+                3c0ff0 -1 (5, 1) at 3db508: BLOCK 
+
+ctr 396f60, 1 preds, 1 succs: 1 (7, 1) at 3d2790: ASSIGN 
+        successors:
+                396fa8 1 (1, 1) at 3d2770: TEST 
+        predecessors:
+                398948 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 396fa8, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                38fd70 21 (2, 1) at 382d60: CONTINUE 
+                396f18 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                396f60 1 (7, 1) at 3d2790: ASSIGN 
+
+[print_unstructured] With entry nodes
+ctr 396fa8, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                38fd70 21 (2, 1) at 382d60: CONTINUE 
+                396f18 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                396f60 1 (7, 1) at 3d2790: ASSIGN 
+
+[print_unstructured] And exit node
+ctr 38fd70, 3 preds, 0 succs: 21 (2, 1) at 382d60: CONTINUE 
+        successors:
+        predecessors:
+                3f4580 17 (3, 1) at 42fcd8: TEST 
+                3dd328 15 (13, 1) at 42fcb8: TEST 
+                396fa8 1 (1, 1) at 3d2770: TEST 
+
+Dump of replicate_map:
+Old 3a1c50 -> New 45a948
+Old 3a1bc0 -> New 45a918
+Old 38fd70 -> New 45a990
+Old 3f4580 -> New 45a978
+Old 3a5bf0 -> New 45a930
+Old 3aab00 -> New 45a960
+Old 3acbd0 -> New 45a9d8
+Old 396fa8 -> New 45aa38
+Old 396f60 -> New 45aa20
+Old 396f18 -> New 459628
+Old 3dd328 -> New 45a9a8
+Old 398948 -> New 45aa08
+Old 39f5b0 -> New 45a900
+Old 3988b8 -> New 4592b0
+Old 3c0ff0 -> New 45a9f0
+Old 3aab18 -> New 45a9c0
+
+[bourdoncle_partition] Copied unstructured new_u:
+[print_unstructured] Unstructured 45aa50 with nodes:
+ctr 459628, 1 preds, 1 succs: 2 (16, 1) at 3cf5e0: ASSIGN 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 4592b0, 1 preds, 2 succs: 3 (8, 1) at 38d4c8: TEST 
+        successors:
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45a900, 1 preds, 1 succs: 5 (9, 1) at 3c9400: ASSIGN 
+        successors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45a918, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a930, 1 preds, 1 succs: -1 (15, 1) at 42fc98: BLOCK 
+        successors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45a948, 2 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+ctr 45a960, 2 preds, 1 succs: 9 (11, 1) at 3c9420: ASSIGN 
+        successors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45a978, 1 preds, 1 succs: 17 (3, 1) at 42fcd8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+
+ctr 45a990, 3 preds, 0 succs: 21 (2, 1) at 382d60: CONTINUE 
+        successors:
+        predecessors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 45a9a8, 1 preds, 1 succs: 15 (13, 1) at 42fcb8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a9c0, 1 preds, 2 succs: 10 (12, 1) at 38d628: TEST 
+        successors:
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+        predecessors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+
+ctr 45a9d8, 1 preds, 2 succs: 12 (4, 1) at 38d6e8: TEST 
+        successors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a9f0, 2 preds, 1 succs: -1 (5, 1) at 3db508: BLOCK 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45aa08, 2 preds, 2 succs: 2 (6, 1) at 3cf5a0: TEST 
+        successors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+        predecessors:
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+
+ctr 45aa20, 1 preds, 1 succs: 1 (7, 1) at 3d2790: ASSIGN 
+        successors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45aa38, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+
+[print_unstructured] With entry nodes
+ctr 45aa38, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+
+[print_unstructured] And exit node
+ctr 45a990, 3 preds, 0 succs: 21 (2, 1) at 382d60: CONTINUE 
+        successors:
+        predecessors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+[bourdoncle_component] Begin for node: 
+ctr 45aa38, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+
+[bourdoncle_component] Begin for node: 
+ctr 45aa08, 2 preds, 2 succs: 2 (6, 1) at 3cf5a0: TEST 
+        successors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+        predecessors:
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+
+[bourdoncle_component] Begin for node: 
+ctr 45a948, 2 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+[node_to_linked_nodes] Linked nodes for vertex 45a948:
+[node_to_linked_nodes] End with list:
+45a948, 5 (10, 1) at 3a90c0: TEST 
+45a900, 5 (9, 1) at 3c9400: ASSIGN 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+459628, 2 (16, 1) at 3cf5e0: ASSIGN 
+45aa38, 1 (1, 1) at 3d2770: TEST 
+45a990, 21 (2, 1) at 382d60: CONTINUE 
+45a978, 17 (3, 1) at 42fcd8: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9a8, 15 (13, 1) at 42fcb8: TEST 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45a918, 6 (14, 1) at 38d588: TEST 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+45aa20, 1 (7, 1) at 3d2790: ASSIGN 
+
+[update_partition] Begin for partition:
+45a948, 5 (10, 1) at 3a90c0: TEST 
+45a918, 6 (14, 1) at 38d588: TEST 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+
+[update_partition] No renaming
+[partition_successor_p] Begin with b=45a948 abd e=45a948
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a948
+[partition_successor_p]                 succ=45a960
+[partition_successor_p]                 succ=45a918
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45a918
+[partition_successor_p]                 succ=45a960
+[partition_successor_p]                 succ=45a930
+[partition_successor_p] Iteration 3
+[partition_successor_p]         pred=45a930
+[partition_successor_p]                 succ=45a948
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45a918 abd e=45a948
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a918
+[partition_successor_p]                 succ=45a960
+[partition_successor_p]                 succ=45a930
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45a930
+[partition_successor_p]                 succ=45a948
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45a930 abd e=45a948
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a930
+[partition_successor_p]                 succ=45a948
+[partition_successor_p] End: path_p=TRUE
+[update_partition] End with same partition (no renaming, no elimination)
+[scc_to_dag] Begin for vertex 45a948 and partition:
+45a948, 5 (10, 1) at 3a90c0: TEST 
+45a918, 6 (14, 1) at 38d588: TEST 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+
+[make_call_statement] cs is
+[scc_to_dag] Continue with updated vertex 45aa98 and partition:
+45aa98, -1 (-1, 65535) at 36fe40: CONTINUE 
+45a948, 5 (10, 1) at 3a90c0: TEST 
+45a918, 6 (14, 1) at 38d588: TEST 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+
+[scc_to_dag] No new input control node at iteration 1
+[scc_to_dag] Allocate new output control node new_c2=45aab0 as a copy of node 45a948
+[scc_to_dag] Allocate new output control node new_c2=45aaf8 as a copy of node 45a918
+[update_successor_in_copy] Begin for new_pred=45aab0, pred=45a948, c=45a918, new_c=45aaf8
+ctr 45aab0, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45aac8 undefined statement
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45a948, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45aae0 undefined statement
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45a918, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45ab28 undefined statement
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45aaf8, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45ab10 undefined statement
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+[update_successor_in_copy] Free meaningless control node 45aac8
+[update_successor_in_copy] End with new_pred=45aab0, pred=45a948, c=45a918, new_c=45aaf8
+ctr 45aab0, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45aaf8 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45a948, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45aae0 undefined statement
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45a918, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45ab28 undefined statement
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45aaf8, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45ab10 undefined statement
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+[scc_to_dag] Embedding graph after replication of output control nodes at iteration 1:
+[print_embedding_graph] Embedding graph for vertex 45aa98:
+ctr 45aa20, 1 preds, 1 succs: 1 (7, 1) at 3d2790: ASSIGN 
+        successors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45ab10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45aaf8 6 (14, 1) at 38d588: TEST 
+
+ctr 45aaf8, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45ab10 undefined statement
+        predecessors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45aab0, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45aaf8 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45a960, 2 preds, 1 succs: 9 (11, 1) at 3c9420: ASSIGN 
+        successors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+        predecessors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+                45aaf8 6 (14, 1) at 38d588: TEST 
+
+ctr 45a9a8, 1 preds, 1 succs: 15 (13, 1) at 42fcb8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a9c0, 1 preds, 2 succs: 10 (12, 1) at 38d628: TEST 
+        successors:
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+        predecessors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+
+ctr 45a9f0, 2 preds, 1 succs: -1 (5, 1) at 3db508: BLOCK 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45a9d8, 1 preds, 2 succs: 12 (4, 1) at 38d6e8: TEST 
+        successors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a978, 1 preds, 1 succs: 17 (3, 1) at 42fcd8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+
+ctr 45a990, 3 preds, 0 succs: 21 (2, 1) at 382d60: CONTINUE 
+        successors:
+        predecessors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 45aa38, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+
+ctr 459628, 1 preds, 1 succs: 2 (16, 1) at 3cf5e0: ASSIGN 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 45aa08, 2 preds, 2 succs: 2 (6, 1) at 3cf5a0: TEST 
+        successors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+        predecessors:
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+
+ctr 4592b0, 1 preds, 2 succs: 3 (8, 1) at 38d4c8: TEST 
+        successors:
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45a900, 1 preds, 1 succs: 5 (9, 1) at 3c9400: ASSIGN 
+        successors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+        predecessors:
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45aae0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a948, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45aae0 undefined statement
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45ab28, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45a918, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45ab28 undefined statement
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a930, 1 preds, 1 succs: -1 (15, 1) at 42fc98: BLOCK 
+        successors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45aa98, 2 preds, 2 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+[print_embedding_graph] End: the embedding graph for vertex 45aa98 is consistent.
+[scc_to_dag] End of embedding graph after replication of output control nodes
+[scc_to_dag] No new input control node at iteration 2
+[scc_to_dag] No new output control node at iteration 2
+[scc_to_dag] Final embedding graph after replication of all input and output paths (2 iterations)
+[print_embedding_graph] Embedding graph for vertex 45aa98:
+ctr 45aa20, 1 preds, 1 succs: 1 (7, 1) at 3d2790: ASSIGN 
+        successors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45ab10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45aaf8 6 (14, 1) at 38d588: TEST 
+
+ctr 45aaf8, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45ab10 undefined statement
+        predecessors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45aab0, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45aaf8 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45a960, 2 preds, 1 succs: 9 (11, 1) at 3c9420: ASSIGN 
+        successors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+        predecessors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+                45aaf8 6 (14, 1) at 38d588: TEST 
+
+ctr 45a9a8, 1 preds, 1 succs: 15 (13, 1) at 42fcb8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a9c0, 1 preds, 2 succs: 10 (12, 1) at 38d628: TEST 
+        successors:
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+        predecessors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+
+ctr 45a9f0, 2 preds, 1 succs: -1 (5, 1) at 3db508: BLOCK 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45a9d8, 1 preds, 2 succs: 12 (4, 1) at 38d6e8: TEST 
+        successors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a978, 1 preds, 1 succs: 17 (3, 1) at 42fcd8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+
+ctr 45a990, 3 preds, 0 succs: 21 (2, 1) at 382d60: CONTINUE 
+        successors:
+        predecessors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 45aa38, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+
+ctr 459628, 1 preds, 1 succs: 2 (16, 1) at 3cf5e0: ASSIGN 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 45aa08, 2 preds, 2 succs: 2 (6, 1) at 3cf5a0: TEST 
+        successors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+        predecessors:
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+
+ctr 4592b0, 1 preds, 2 succs: 3 (8, 1) at 38d4c8: TEST 
+        successors:
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45a900, 1 preds, 1 succs: 5 (9, 1) at 3c9400: ASSIGN 
+        successors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+        predecessors:
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45aae0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a948, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45aae0 undefined statement
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45ab28, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45a918, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45ab28 undefined statement
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a930, 1 preds, 1 succs: -1 (15, 1) at 42fc98: BLOCK 
+        successors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45aa98, 2 preds, 2 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+[print_embedding_graph] End: the embedding graph for vertex 45aa98 is consistent.
+[scc_to_dag] End of final embedding graph after replication of all input and output paths
+[node_to_linked_nodes] Linked nodes for vertex 45aa98:
+[node_to_linked_nodes] End with list:
+45aa98, -1 (-1, 65535) at 36fe40: CONTINUE 
+45a900, 5 (9, 1) at 3c9400: ASSIGN 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+459628, 2 (16, 1) at 3cf5e0: ASSIGN 
+45aa38, 1 (1, 1) at 3d2770: TEST 
+45a990, 21 (2, 1) at 382d60: CONTINUE 
+45a978, 17 (3, 1) at 42fcd8: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9a8, 15 (13, 1) at 42fcb8: TEST 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45aab0, 5 (10, 1) at 3a90c0: TEST 
+45aaf8, 6 (14, 1) at 38d588: TEST 
+45ab10, undefined statement
+45aa20, 1 (7, 1) at 3d2790: ASSIGN 
+
+[node_to_linked_nodes] Linked nodes for vertex 45aac8:
+[node_to_linked_nodes] End with list:
+45aac8, -1 (-1, 65535) at 36fe40: CONTINUE 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+45a918, 6 (14, 1) at 38d588: TEST 
+45ab28, undefined statement
+45a948, 5 (10, 1) at 3a90c0: TEST 
+45aae0, undefined statement
+
+[scc_to_dag] Nodes linked to root=45aa98
+ctr 45aa98, 1 preds, 1 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+
+45aa98, -1 (-1, 65535) at 36fe40: CONTINUE 
+45a900, 5 (9, 1) at 3c9400: ASSIGN 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+459628, 2 (16, 1) at 3cf5e0: ASSIGN 
+45aa38, 1 (1, 1) at 3d2770: TEST 
+45a990, 21 (2, 1) at 382d60: CONTINUE 
+45a978, 17 (3, 1) at 42fcd8: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9a8, 15 (13, 1) at 42fcb8: TEST 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45aab0, 5 (10, 1) at 3a90c0: TEST 
+45aaf8, 6 (14, 1) at 38d588: TEST 
+45ab10, undefined statement
+45aa20, 1 (7, 1) at 3d2790: ASSIGN 
+
+[scc_to_dag] Nodes linked to new_root=45aac8
+ctr 45aac8, 1 preds, 1 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+45aac8, -1 (-1, 65535) at 36fe40: CONTINUE 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+45a918, 6 (14, 1) at 38d588: TEST 
+45ab28, undefined statement
+45a948, 5 (10, 1) at 3a90c0: TEST 
+45aae0, undefined statement
+
+[scc_to_dag] Final embedding graph after replication and cycle removal
+[print_embedding_graph] Embedding graph for vertex 45aa98:
+ctr 45aa20, 1 preds, 1 succs: 1 (7, 1) at 3d2790: ASSIGN 
+        successors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45ab10, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45aaf8 6 (14, 1) at 38d588: TEST 
+
+ctr 45aaf8, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45ab10 undefined statement
+        predecessors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45aab0, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+                45aaf8 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45a960, 2 preds, 1 succs: 9 (11, 1) at 3c9420: ASSIGN 
+        successors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+        predecessors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+                45aaf8 6 (14, 1) at 38d588: TEST 
+
+ctr 45a9a8, 1 preds, 1 succs: 15 (13, 1) at 42fcb8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a9c0, 1 preds, 2 succs: 10 (12, 1) at 38d628: TEST 
+        successors:
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+        predecessors:
+                45a960 9 (11, 1) at 3c9420: ASSIGN 
+
+ctr 45a9f0, 2 preds, 1 succs: -1 (5, 1) at 3db508: BLOCK 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45a9d8, 1 preds, 2 succs: 12 (4, 1) at 38d6e8: TEST 
+        successors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+        predecessors:
+                45a9c0 10 (12, 1) at 38d628: TEST 
+
+ctr 45a978, 1 preds, 1 succs: 17 (3, 1) at 42fcd8: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+        predecessors:
+                45a9d8 12 (4, 1) at 38d6e8: TEST 
+
+ctr 45a990, 3 preds, 0 succs: 21 (2, 1) at 382d60: CONTINUE 
+        successors:
+        predecessors:
+                45a978 17 (3, 1) at 42fcd8: TEST 
+                45a9a8 15 (13, 1) at 42fcb8: TEST 
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 45aa38, 1 preds, 2 succs: 1 (1, 1) at 3d2770: TEST 
+        successors:
+                45a990 21 (2, 1) at 382d60: CONTINUE 
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+        predecessors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+
+ctr 459628, 1 preds, 1 succs: 2 (16, 1) at 3cf5e0: ASSIGN 
+        successors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+        predecessors:
+                45aa38 1 (1, 1) at 3d2770: TEST 
+
+ctr 45aa08, 2 preds, 2 succs: 2 (6, 1) at 3cf5a0: TEST 
+        successors:
+                45aa20 1 (7, 1) at 3d2790: ASSIGN 
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+        predecessors:
+                459628 2 (16, 1) at 3cf5e0: ASSIGN 
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+
+ctr 4592b0, 1 preds, 2 succs: 3 (8, 1) at 38d4c8: TEST 
+        successors:
+                45a9f0 -1 (5, 1) at 3db508: BLOCK 
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+        predecessors:
+                45aa08 2 (6, 1) at 3cf5a0: TEST 
+
+ctr 45a900, 1 preds, 1 succs: 5 (9, 1) at 3c9400: ASSIGN 
+        successors:
+                45aa98 -1 (-1, 65535) at 36fe40: CONTINUE 
+        predecessors:
+                4592b0 3 (8, 1) at 38d4c8: TEST 
+
+ctr 45aa98, 1 preds, 1 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45aab0 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a900 5 (9, 1) at 3c9400: ASSIGN 
+
+[print_embedding_graph] End: the embedding graph for vertex 45aa98 is consistent.
+[scc_to_dag] End of final embedding graph after replication and cycle removal
+[scc_to_dag] Final cycle graph
+[print_embedding_graph] Embedding graph for vertex 45aac8:
+ctr 45aae0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a948, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45aae0 undefined statement
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aac8 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45ab28, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45a918, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45ab28 undefined statement
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a930, 1 preds, 1 succs: -1 (15, 1) at 42fc98: BLOCK 
+        successors:
+                45aac8 -1 (-1, 65535) at 36fe40: CONTINUE 
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45aac8, 1 preds, 1 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+[print_embedding_graph] End: the embedding graph for vertex 45aac8 is consistent.
+[scc_to_dag] End of final cycle graph
+[scc_to_dag] End with 2 replicated control nodes:
+
+replicated_output_controls
+45a948 -> 45aab0
+45a918 -> 45aaf8
+
+[bourdoncle_component] End with partition: 45a948, 5 (10, 1) at 3a90c0: TEST 
+45a918, 6 (14, 1) at 38d588: TEST 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+
+[bourdoncle_component] End with new nodes:
+ctr 45aae0, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a948, 1 preds, 2 succs: 5 (10, 1) at 3a90c0: TEST 
+        successors:
+                45aae0 undefined statement
+                45a918 6 (14, 1) at 38d588: TEST 
+        predecessors:
+                45aac8 -1 (-1, 65535) at 36fe40: CONTINUE 
+
+ctr 45ab28, 1 preds, 0 succs: undefined statement
+        successors:
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45a918, 1 preds, 2 succs: 6 (14, 1) at 38d588: TEST 
+        successors:
+                45ab28 undefined statement
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+        predecessors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+
+ctr 45a930, 1 preds, 1 succs: -1 (15, 1) at 42fc98: BLOCK 
+        successors:
+                45aac8 -1 (-1, 65535) at 36fe40: CONTINUE 
+        predecessors:
+                45a918 6 (14, 1) at 38d588: TEST 
+
+ctr 45aac8, 1 preds, 1 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+[bourdoncle_component] With entry nodes
+ctr 45aac8, 1 preds, 1 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+[bourdoncle_component] And exit node
+ctr 45aac8, 1 preds, 1 succs: -1 (-1, 65535) at 36fe40: CONTINUE 
+        successors:
+                45a948 5 (10, 1) at 3a90c0: TEST 
+        predecessors:
+                45a930 -1 (15, 1) at 42fc98: BLOCK 
+
+[bourdoncle_component] End.
+[node_to_linked_nodes] Linked nodes for vertex 45aa08:
+[node_to_linked_nodes] End with list:
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+459628, 2 (16, 1) at 3cf5e0: ASSIGN 
+45aa38, 1 (1, 1) at 3d2770: TEST 
+45a990, 21 (2, 1) at 382d60: CONTINUE 
+45a978, 17 (3, 1) at 42fcd8: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9a8, 15 (13, 1) at 42fcb8: TEST 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45aab0, 5 (10, 1) at 3a90c0: TEST 
+45aaf8, 6 (14, 1) at 38d588: TEST 
+45ab10, undefined statement
+45aa98, -1 (-1, 65535) at 36fe40: CONTINUE 
+45a900, 5 (9, 1) at 3c9400: ASSIGN 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+45aa20, 1 (7, 1) at 3d2790: ASSIGN 
+
+[update_partition] Begin for partition:
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45a900, 5 (9, 1) at 3c9400: ASSIGN 
+45a948, 5 (10, 1) at 3a90c0: TEST 
+45a918, 6 (14, 1) at 38d588: TEST 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+
+[update_partition] After renaming, new partition:
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45a900, 5 (9, 1) at 3c9400: ASSIGN 
+45aab0, 5 (10, 1) at 3a90c0: TEST 
+45aaf8, 6 (14, 1) at 38d588: TEST 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+
+[update_partition] Untranslatable control(s) to be eliminated from partition:
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+
+[partition_successor_p] Begin with b=45aa08 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45aa08
+[partition_successor_p]                 succ=45aa20
+[partition_successor_p]                 succ=4592b0
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=4592b0
+[partition_successor_p]                 succ=45a9f0
+[partition_successor_p]                 succ=45a900
+[partition_successor_p] Iteration 3
+[partition_successor_p]         pred=45a900
+[partition_successor_p]                 succ=45aa98
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=4592b0 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=4592b0
+[partition_successor_p]                 succ=45a9f0
+[partition_successor_p]                 succ=45a900
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45a900
+[partition_successor_p]                 succ=45aa98
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45a900 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a900
+[partition_successor_p]                 succ=45aa98
+[partition_successor_p] End: path_p=FALSE
+[partition_successor_p] Begin with b=45aab0 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45aab0
+[partition_successor_p]                 succ=45a960
+[partition_successor_p]                 succ=45aaf8
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45aaf8
+[partition_successor_p]                 succ=45a960
+[partition_successor_p]                 succ=45ab10
+[partition_successor_p]         pred=45a960
+[partition_successor_p]                 succ=45a9c0
+[partition_successor_p] Iteration 3
+[partition_successor_p]         pred=45a9c0
+[partition_successor_p]                 succ=45a9a8
+[partition_successor_p]                 succ=45a9d8
+[partition_successor_p] Iteration 4
+[partition_successor_p]         pred=45a9d8
+[partition_successor_p]                 succ=45a978
+[partition_successor_p]                 succ=45a9f0
+[partition_successor_p] Iteration 5
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45aaf8 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45aaf8
+[partition_successor_p]                 succ=45a960
+[partition_successor_p]                 succ=45ab10
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45a960
+[partition_successor_p]                 succ=45a9c0
+[partition_successor_p] Iteration 3
+[partition_successor_p]         pred=45a9c0
+[partition_successor_p]                 succ=45a9a8
+[partition_successor_p]                 succ=45a9d8
+[partition_successor_p] Iteration 4
+[partition_successor_p]         pred=45a9d8
+[partition_successor_p]                 succ=45a978
+[partition_successor_p]                 succ=45a9f0
+[partition_successor_p] Iteration 5
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45a930 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a930
+[partition_successor_p]                 succ=45aac8
+[partition_successor_p] End: path_p=FALSE
+[partition_successor_p] Begin with b=45a960 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a960
+[partition_successor_p]                 succ=45a9c0
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45a9c0
+[partition_successor_p]                 succ=45a9a8
+[partition_successor_p]                 succ=45a9d8
+[partition_successor_p] Iteration 3
+[partition_successor_p]         pred=45a9d8
+[partition_successor_p]                 succ=45a978
+[partition_successor_p]                 succ=45a9f0
+[partition_successor_p] Iteration 4
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45a9c0 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a9c0
+[partition_successor_p]                 succ=45a9a8
+[partition_successor_p]                 succ=45a9d8
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45a9d8
+[partition_successor_p]                 succ=45a978
+[partition_successor_p]                 succ=45a9f0
+[partition_successor_p] Iteration 3
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45a9d8 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a9d8
+[partition_successor_p]                 succ=45a978
+[partition_successor_p]                 succ=45a9f0
+[partition_successor_p] Iteration 2
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[partition_successor_p] Begin with b=45a9f0 abd e=45aa08
+[partition_successor_p] Iteration 1
+[partition_successor_p]         pred=45a9f0
+[partition_successor_p]                 succ=45aa08
+[partition_successor_p] End: path_p=TRUE
+[update_partition] Untranslatable and unreachable control(s) to be eliminated from partition:
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+45a900, 5 (9, 1) at 3c9400: ASSIGN 
+45a930, -1 (15, 1) at 42fc98: BLOCK 
+
+[update_partition] End with new partition (3 renamings, 1 eliminations):
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45aab0, 5 (10, 1) at 3a90c0: TEST 
+45aaf8, 6 (14, 1) at 38d588: TEST 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+
+[scc_to_dag] Begin for vertex 45aa08 and partition:
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45aab0, 5 (10, 1) at 3a90c0: TEST 
+45aaf8, 6 (14, 1) at 38d588: TEST 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+
+[make_call_statement] cs is
+[scc_to_dag] Continue with updated vertex 45ab88 and partition:
+45ab88, -1 (-1, 65535) at 36fe60: CONTINUE 
+45aa08, 2 (6, 1) at 3cf5a0: TEST 
+4592b0, 3 (8, 1) at 38d4c8: TEST 
+45aab0, 5 (10, 1) at 3a90c0: TEST 
+45aaf8, 6 (14, 1) at 38d588: TEST 
+45a960, 9 (11, 1) at 3c9420: ASSIGN 
+45a9c0, 10 (12, 1) at 38d628: TEST 
+45a9d8, 12 (4, 1) at 38d6e8: TEST 
+45a9f0, -1 (5, 1) at 3db508: BLOCK 
+
+pips error in copy_dfn: (bourdoncle.c:74) No dfn value for control 45aab0

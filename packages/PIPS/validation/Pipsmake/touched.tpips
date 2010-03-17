@@ -1,0 +1,10 @@
+delete touched
+create touched touched.f
+display PRINTED_FILE
+shell sleep 1 ; touch touched.f
+display PRINTED_FILE
+shell sleep 1 ; touch touched.database/MAIN000/MAIN000.f_initial
+display PRINTED_FILE
+close
+delete touched
+quit

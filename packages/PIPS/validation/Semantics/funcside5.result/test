@@ -1,0 +1,36 @@
+
+C  T() {}
+
+      PROGRAM FUNCSIDE5
+      INTEGER FOO5
+      EXTERNAL FOO5
+
+C  T(I1) {I1==10}
+
+
+C     Non compliant: definition of a variable in an expression using
+C     this variable
+
+      I1 = 10                                                           0008
+
+C  T(I1) {I1==I1#init+2}
+
+
+      I1 = I1+FOO5(I1)                                                  0010
+
+C  T() {}
+
+
+      PRINT *, I1                                                       0012
+
+C  T(I1) {I1==I1#init+3}
+
+
+      I1 = FOO5(I1)+I1                                                  0014
+
+C  T() {}
+
+
+      PRINT *, I1                                                       0016
+
+      END

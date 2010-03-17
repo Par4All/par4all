@@ -1,0 +1,8 @@
+      SUBROUTINE LOOP_NORMALIZE(A,N,I)
+      REAL A(N)
+
+      DO J = 1, N, I                                                    0004
+         A(I) = 0.                                                      0005
+      ENDDO
+
+      END

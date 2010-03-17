@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Type check the max operators
+
+tpips=${tpips_version:-tpips}
+
+# ($tpips 2>&1 | grep "user warning") <<EOF
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete capture03
+create capture03 capture03.f
+module CAPTURE03
+display PRINTED_FILE[CAPTURE03]
+display PRINTED_FILE[FOO]
+display PRINTED_FILE[MIN]
+close
+delete capture03
+quit
+EOF

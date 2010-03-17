@@ -1,0 +1,76 @@
+
+C  P() {J2==2JA-1, 2<=J1, 2<=K1}
+
+      SUBROUTINE EXTR(NI,NC)
+C********************************************************
+C     CALCULE LES COEFFICIENTS D EXTRAPOLATION
+C     SUR LA SURFACE DE L AILE  (K=K1)
+C********************************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+
+C  P() {J2==2JA-1, 2<=J1, 2<=K1}
+
+      L = NI                                                            0012
+
+C  P(L) {J2==2JA-1, L==NI, 2<=J1, 2<=K1}
+
+      K = K1                                                            0013
+
+C  P(K,L) {J2==2JA-1, K==K1, L==NI, 2<=J1, 2<=K}
+
+      DO 300 J = J1, JA                                                 0014
+
+C  P(J,JH,K,L) {J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}
+
+         S1 = D(J, K, J, K+1)                                           0015
+
+C  P(J,JH,K,L) {J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}
+
+         S2 = D(J, K+1, J, K+2)+S1                                      0016
+
+C  P(J,JH,K,L) {J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}
+
+         S3 = D(J, K+2, J, K+3)+S2                                      0017
+
+C  P(J,JH,K,L) {J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}
+
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0018
+
+C  P(J,JH,K,L) {J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}
+
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0019
+
+C  P(J,JH,K,L) {J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}
+
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0020
+
+C  P(J,JH,K,L) {J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}
+
+         JH = J1+J2-J                                                   0021
+
+C  P(J,JH,K,L) {J+JH==J1+2JA-1, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA,
+C    2<=J1, 2<=K}
+
+         T(JH,1,NC+3) = T(J,1,NC+3)                                     0022
+
+C  P(J,JH,K,L) {J+JH==J1+2JA-1, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA,
+C    2<=J1, 2<=K}
+
+         T(JH,1,NC+4) = T(J,1,NC+4)                                     0023
+
+C  P(J,JH,K,L) {J+JH==J1+2JA-1, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA,
+C    2<=J1, 2<=K}
+
+         T(JH,1,NC+5) = T(J,1,NC+5)                                     0024
+
+C  P(J,JH,K,L) {J+JH==J1+2JA-1, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA,
+C    2<=J1, 2<=K}
+
+300      CONTINUE                                                       0025
+
+      END

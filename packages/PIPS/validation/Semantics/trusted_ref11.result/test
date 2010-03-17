@@ -1,0 +1,91 @@
+
+C  T() {1<=N}
+
+      SUBROUTINE TRUSTED_REF11(A, N)
+
+C     Check that the inner loop is analyzed as always entered since the
+C     outer loop implies m>=1
+
+      REAL A(N, N)
+
+C  T(I,J,M) {1<=I, M+1<=I, I<=N+1, 1<=N}
+
+C     BEGIN BLOCK
+
+C  T(M) {1<=N}
+
+
+      READ *, M                                                         0008
+
+C  T(I,J) {1<=I, 1<=N}
+
+
+      DO I = 1, M                                                       0010
+
+C  T(J) {J==M+1, 1<=I, I+1<=J, I<=N, 2<=J, J<=N+1, 1<=N}
+
+C        BEGIN BLOCK
+
+C  T(J) {1<=I, I<=M, 1<=J, 1<=N}
+
+         DO J = 1, M                                                    0011
+
+C  T() {1<=I, I<=M, I<=N, 1<=J, J<=M, J<=N, 1<=N}
+
+            A(I,J) = 0                                                  0012
+         ENDDO
+
+C  T() {J==M+1, 1<=I, I+1<=J, I<=N, 2<=J, J<=N+1, 1<=N}
+
+         PRINT *, J                                                     0014
+C        END BLOCK
+      ENDDO
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE TRUSTED_REF11(A, N)
+
+C     Check that the inner loop is analyzed as always entered since the
+C     outer loop implies m>=1
+
+      REAL A(N, N)
+
+C  P() {1<=N}
+
+C     BEGIN BLOCK
+
+C  P() {1<=N}
+
+
+      READ *, M                                                         0008
+
+C  P(M) {1<=N}
+
+
+      DO I = 1, M                                                       0010
+
+C  P(I,J,M) {1<=I, I<=M, 1<=N}
+
+C        BEGIN BLOCK
+
+C  P(I,J,M) {1<=I, I<=M, 1<=N}
+
+         DO J = 1, M                                                    0011
+
+C  P(I,J,M) {1<=I, I<=M, I<=N, 1<=J, J<=M, J<=N, 1<=N}
+
+            A(I,J) = 0                                                  0012
+         ENDDO
+
+C  P(I,J,M) {J==M+1, 1<=I, I+1<=J, I<=N, 2<=J, J<=N+1, 1<=N}
+
+         PRINT *, J                                                     0014
+C        END BLOCK
+      ENDDO
+
+C     END BLOCK
+      END
+

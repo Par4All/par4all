@@ -1,0 +1,39 @@
+delete hind02
+create hind02 hind02.f
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Preconditions for main HIND02
+echo
+
+display PRINTED_FILE[HIND02]
+
+echo
+echo Preconditions for SUB1
+echo
+
+display PRINTED_FILE[SUB1]
+
+echo
+echo Preconditions for SUB2
+echo
+
+display PRINTED_FILE[SUB2]
+
+echo
+echo Preconditions for SUB3
+echo
+
+display PRINTED_FILE[SUB3]
+
+echo
+echo Preconditions for SUB4
+echo
+
+display PRINTED_FILE[SUB4]
+close
+delete hind02
+

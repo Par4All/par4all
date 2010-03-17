@@ -1,0 +1,23 @@
+! module / file
+UNSPLIT: ./unsplit.database/Src/unsplit.f
+CALLEE: ./unsplit.database/Src/unsplit.f
+OTHER: ./unsplit.database/Src/unsplit.f
+!!
+!! file for unsplit.f
+!!
+!
+! testing unsplit with one file
+!
+      PROGRAM UNSPLIT
+      CALL CALLEE                                                       0005
+      CALL OTHER                                                        0006
+      END
+
+      SUBROUTINE CALLEE
+      PRINT *, 'callee'                                                 0003
+      END
+
+      SUBROUTINE OTHER
+      PRINT *, 'other'                                                  0003
+      END
+

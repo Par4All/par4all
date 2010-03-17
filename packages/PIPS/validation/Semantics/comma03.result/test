@@ -1,0 +1,39 @@
+
+Initial source code
+
+void comma03()
+{
+   int i;
+   int j;
+   int k;
+   float x;
+
+   i = (j = 1, k = 2, x = 3.5);
+   
+   //printf("%d %d %d\n", i, j, k);
+   i = 0;
+}
+
+Check transformers on strip-mined loop
+
+
+//  T() {}
+
+void comma03()
+{
+   int i;
+   int j;
+   int k;
+   float x;
+
+//  T(i,j,k) {j==1, k==2}
+
+
+   i = (j = 1, k = 2, x = 3.5);
+
+//  T(i) {i==0, j==1, k==2}
+
+   
+   //printf("%d %d %d\n", i, j, k);
+   i = 0;
+}

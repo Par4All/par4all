@@ -1,0 +1,87 @@
+
+First unsplit
+
+!!
+!! file for unsplit03.f
+!!
+! 1
+      PROGRAM UNSPLIT03
+      INTEGER I, THREE
+      EXTERNAL THREE
+      PRINT *, 'one'                                                    0005
+      CALL TWO                                                          0006
+      I = TREE()                                                        0007
+      CALL FOUR                                                         0008
+      CALL SEVEN                                                        0009
+      END
+! 2
+      SUBROUTINE TWO
+      PRINT *, 'two'                                                    0003
+      END
+! 3
+      INTEGER FUNCTION THREE
+      PRINT *, 'three'                                                  0003
+      THREE = 3                                                         0004
+      END
+! 4
+      SUBROUTINE FOUR
+      PRINT *, 'four'                                                   0003
+      CALL FIVE                                                         0004
+      END
+! 5
+      SUBROUTINE FIVE
+      PRINT *, 'five'                                                   0003
+      END
+! 6
+      SUBROUTINE SIX
+      PRINT *, 'six'                                                    0003
+      END
+! 7
+      SUBROUTINE SEVEN
+      CALL SIX                                                          0003
+      PRINT *, 'seven'                                                  0004
+      END
+
+Second unsplit
+
+!!
+!! file for unsplit03.f
+!!
+! 1
+      PROGRAM UNSPLIT03
+      INTEGER I, THREE
+      EXTERNAL THREE
+      PRINT *, 'one'                                                    0005
+      CALL TWO                                                          0006
+      I = TREE()                                                        0007
+      CALL FOUR                                                         0008
+      CALL SEVEN                                                        0009
+      END
+! 2
+      SUBROUTINE TWO
+      PRINT *, 'two'                                                    0003
+      END
+! 3
+      INTEGER FUNCTION THREE
+      PRINT *, 'three'                                                  0003
+      THREE = 3                                                         0004
+      END
+! 4
+      SUBROUTINE FOUR
+      PRINT *, 'four'                                                   0003
+      CALL FIVE                                                         0004
+      END
+! 5
+      SUBROUTINE FIVE
+      PRINT *, 'five'                                                   0003
+      END
+! 6
+      SUBROUTINE SIX
+      PRINT *, 'six'                                                    0003
+      END
+! 7
+      SUBROUTINE SEVEN
+      CALL SIX                                                          0003
+      PRINT *, 'seven'                                                  0004
+      END
+

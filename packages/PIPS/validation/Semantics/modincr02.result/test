@@ -1,0 +1,54 @@
+
+C  P() {}
+
+      PROGRAM MODINCR02
+
+c     This is Fortran compatible. But the loop range cannot be
+c     used in the precondition
+
+      REAL T(10)
+
+C  P() {}
+
+
+      DO I = 1, N, K                                                    0008
+
+C  P(I,N) {1<=I, I<=10}
+
+         T(I) = 0.                                                      0009
+
+C  P(I,N) {1<=I, I<=10}
+
+         N = N+1                                                        0010
+      ENDDO
+
+C  P(I,N) {}
+
+
+      DO I = 1, N                                                       0013
+
+C  P(I,N) {1<=I, I<=10}
+
+         T(I) = 0.                                                      0014
+
+C  P(I,N) {1<=I, I<=10}
+
+         N = N+1                                                        0015
+      ENDDO
+
+C  P(I,N) {1<=I, I<=11}
+
+
+      DO I = 1, N, -1                                                   0018
+
+C  P(I,N) {I==1}
+
+         T(I) = 0.                                                      0019
+
+C  P(I,N) {I==1}
+
+         N = N+1                                                        0020
+      ENDDO
+
+      END
+

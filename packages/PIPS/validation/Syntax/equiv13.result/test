@@ -1,0 +1,85 @@
+user warning in tp_parse: equiv13: No such workspace
+Registering file equiv13.f
+Splitting file    ./equiv13.f
+  Module         EQUIV13
+Workspace equiv13 created and opened.
+Module EQUIV13 selected
+Main module PROGRAM "EQUIV13" selected.
+Module EQUIV13 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV13 already active.
+Request: build resource PRINTED_FILE for module EQUIV13.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV13)
+  PARSER                         building   PARSED_CODE(EQUIV13)
+                                 building   CALLEES(EQUIV13)
+
+Declarations for module EQUIV13 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV13:*DYNAMIC*	with type area with size 800
+Declared entity EQUIV13:*HEAP*	with type area with size 0
+Declared entity EQUIV13:*STACK*	with type area with size 0
+Declared entity EQUIV13:*STATIC*	with type area with size 0
+Declared entity EQUIV13:I	with type variable INTEGER*4
+Declared entity EQUIV13:J	with type variable INTEGER*4
+Declared entity EQUIV13:X	with type variable REAL*4
+Declared entity EQUIV13:Y	with type variable REAL*4
+Declared entity EQUIV13:Z	with type variable REAL*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 800:
+	Variable EQUIV13:Z,	offset = 392,	size = 400
+	Variable EQUIV13:J,	offset = 792,	size = 4
+	Variable EQUIV13:I,	offset = 796,	size = 4
+	Variable EQUIV13:Y,	offset = 196,	size = 400
+	Variable EQUIV13:X,	offset = 0,	size = 400
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EQUIV13
+
+  CONTROLIZER                    building   CODE(EQUIV13)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV13)
+PRINTED_FILE made for EQUIV13.
+      PROGRAM EQUIV13
+
+C     Check that chains of undeclared arrays are correctly processed: in fact PIPS
+C     does not handle this
+
+      REAL X(100), Y(100), Z(100)
+      EQUIVALENCE (X(50), Y), (Y(50), Z)
+c      real x(100), y(100), z(100)
+
+      DO I = 2, 10                                                      0010
+         Y(I) = 0.                                                      0011
+      ENDDO
+
+      PRINT *, I, J                                                     0014
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV13.
+Closing program.
+Closing workspace.
+Workspace equiv13 closed.
+
+Workspace equiv13 deleted.

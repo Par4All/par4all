@@ -1,0 +1,12 @@
+      PROGRAM CPLX
+      COMPLEX A, B, C
+      INTEGER L
+      L = 10                                                            0004
+10    A = (10, 20)                                                      0005
+      L = 20                                                            0006
+20    B = (20, 10)                                                      0007
+30    IF (L.EQ.10) GOTO 10                                              0008
+      IF (L.EQ.20) GOTO 20                                              0008
+      STOP                                                              0008
+      END
+

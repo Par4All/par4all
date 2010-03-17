@@ -1,0 +1,26 @@
+
+C  T() {I==2}
+
+      PROGRAM NON_LINEAR16
+
+      DATA I /2/
+
+C  T(J) {I==2, J==2K}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(J) {I==2, J==2K}
+
+C (0,2)
+
+      J = K*I                                                           0005
+c      if(k.eq.3) then
+c         read *, i
+c         l = j*m
+c         print *, l
+c      endif
+
+C     END BLOCK
+      END
+

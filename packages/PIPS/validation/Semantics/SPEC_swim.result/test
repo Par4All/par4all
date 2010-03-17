@@ -1,0 +1,680 @@
+
+C  T() {0==-1}
+
+C ** Version modified for SPEC Benchmark suite - see Comments below
+C ***
+      PROGRAM SHALOW 
+C     BENCHMARK WEATHER PREDICTION PROGRAM FOR COMPARING THE
+C     PREFORMANCE OF CURRENT SUPERCOMPUTERS. THE MODEL IS
+C     BASED OF THE PAPER - THE DYNAMICS OF FINITE-DIFFERENCE
+C     MODELS OF THE SHALLOW-WATER EQUATIONS, BY ROBERT SADOURNY
+C     J. ATM. SCIENCES, VOL 32, NO 4, APRIL 1975.
+C
+C     CODE BY PAUL N. SWARZTRAUBER, NATIONAL CENTER FOR
+C     ATMOSPHERIC RESEARCH, BOULDER, CO,  OCTOBER 1984.
+C
+C     MODIFIED BY R. K. SATO, NCAR, APRIL 7, 1986 FOR MULTITASKING.
+C     MODIFIED FOR SPEC to run longer: ITMAX inCremented from 120 to
+C                                      1200 - J.Lo 7/19/90
+C     Modified by Bodo Parady for the SPECpar suite.  Various
+C     compilation sizes added.  Iterations reduced to orginal
+C     problem, but size increased 4x in each dimension.
+C
+C     Further modified by Reinhold Weicker (Siemens Nixdorf) for the
+C     SPEC CFP95 suite:
+C     Changed back to the form with PARAMETER statements for
+C     N1 and N2, set N1 = N2 = 513.
+C     The execution time is determined by these values and the
+C     variable ITMAX (number of iterations) read from the input file.
+C     Execution time is linear in ITMAX.
+
+      IMPLICIT INTEGER	(I-N)
+      IMPLICIT REAL	(A-H, O-Z)
+
+      PARAMETER (N1=513, N2=513)
+
+      COMMON  U(N1,N2), V(N1,N2), P(N1,N2),
+     *        UNEW(N1,N2), VNEW(N1,N2),
+     *        PNEW(N1,N2), UOLD(N1,N2),
+     *        VOLD(N1,N2), POLD(N1,N2),
+     *        CU(N1,N2), CV(N1,N2),
+     *        Z(N1,N2), H(N1,N2), PSI(N1,N2)
+C
+      COMMON /CONS/ DT,TDT,DX,DY,A,ALPHA,ITMAX,MPRINT,M,N,MP1,
+     1              NP1,EL,PI,TPI,DI,DJ,PCF
+
+C  T() {0==-1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (0,2)
+
+C
+
+      WRITE (6, *) 'SPEC benchmark 102.swim'
+
+C  T() {}
+
+C (0,3)
+
+      WRITE (6, *) ' '
+
+C  T(ITMAX,M,MP1,MPRINT,N,NP1) {}
+
+C (0,4)
+
+C       REQUEST PROCESSORS FOR MICROTASKING
+C SPEC removed CMIC$ GETCPUS 4
+C
+C
+C       INITIALIZE CONSTANTS AND ARRAYS
+C
+      CALL INITAL
+
+C  T() {}
+
+C (0,5)
+C
+C     PRINT INITIAL VALUES
+C
+      WRITE (6, 390) N, M, DX, DY, DT, ALPHA, ITMAX
+
+C  T() {}
+
+C (0,6)
+390   FORMAT(' NUMBER OF POINTS IN THE X DIRECTION',I8/' NUMBER OF POINT
+     &S IN THE Y DIRECTION',I8/' GRID SPACING IN THE X DIRECTION    ',F8
+     &.0/' GRID SPACING IN THE Y DIRECTION    ',F8.0/' TIME STEP        
+     &                  ',F8.0/' TIME FILTER PARAMETER              ',F8
+     &.3/' NUMBER OF ITERATIONS               ',I8)
+
+C  T(MNMIN) {MNMIN<=M, MNMIN<=N}
+
+C (0,7)
+      MNMIN = MIN0(M, N)
+
+C  T() {}
+
+C (0,8)
+C initial data writes removed for SPEC
+C      WRITE(6,391) (POLD(I,I),I=1,MNMIN)
+C  391 FORMAT(/' INITIAL DIAGONAL ELEMENTS OF P ', //(8E15.7))
+C      WRITE(6,392) (UOLD(I,I),I=1,MNMIN)
+C  392 FORMAT(/' INITIAL DIAGONAL ELEMENTS OF U ', //(8E15.7))
+C      WRITE(6,393) (VOLD(I,I),I=1,MNMIN)
+C  393 FORMAT(/' INITIAL DIAGONAL ELEMENTS OF V ', //(8E15.7))
+C        DETERMINE OVERHEAD OF TIMING CALLS
+
+C  6/22/95 for SPEC: JWR: Initialization of TIME
+
+      TIME = 0
+
+C  T(NCYCLE) {NCYCLE==0}
+
+C (0,9)
+      NCYCLE = 0
+
+C  T() {0==-1}
+
+C (0,10)
+C     BEGIN UNSTRUCTURED
+
+C  T(ICHECK,JCHECK,NCYCLE) {NCYCLE==NCYCLE#init+1, NCYCLE+1<=ITMAX}
+
+C (1,1)
+C     BEGIN BLOCK
+
+C  T(NCYCLE) {NCYCLE==NCYCLE#init+1}
+
+C (1,2)
+90    NCYCLE = NCYCLE+1
+
+C  T() {}
+
+C (1,3)
+C
+C     COMPUTE CAPITAL  U, CAPITAL V, Z AND H
+C
+      CALL CALC1
+
+C  T() {}
+
+C (1,4)
+C
+C     COMPUTE NEW VALUES U,V AND P
+C
+      CALL CALC2
+
+C  T() {}
+
+C (1,5)
+C
+      TIME = TIME+DT
+
+C  T(ICHECK,JCHECK) {}
+
+C (1,6)
+      IF (MOD(NCYCLE, MPRINT).NE.0) THEN
+
+C  T() {}
+
+C (1,7)
+C        BEGIN BLOCK
+C        END BLOCK
+      ELSE
+
+C  T(ICHECK,JCHECK) {1<=ICHECK, MNMIN+1<=ICHECK}
+
+C (1,8)
+C        BEGIN BLOCK
+
+C  T() {}
+
+C (1,9)
+         PTIME = TIME/3600.
+
+C  T() {}
+
+C (1,10)
+C
+C *** modified for SPEC results verification
+C *** We want to ensure that all calculations were done
+C *** so we "use" all of the computed results.
+C ***
+C *** Since all of the comparisons of the individual diagnal terms
+C *** often differ in the smaller values, the check we have selected
+C *** is to add the absolute values of all terms and print these results
+C
+         WRITE (6, 350) NCYCLE, PTIME
+
+C  T() {}
+
+C (1,11)
+350      FORMAT(/' CYCLE NUMBER',I5,' MODEL TIME IN  HOURS',F6.2)
+
+C  T() {}
+
+C (1,12)
+C      WRITE(6,355) (PNEW(I,I),I=1,MNMIN)
+C  355 FORMAT(/' DIAGONAL ELEMENTS OF P ', //(8E15.7))
+C      WRITE(6,360) (UNEW(I,I),I=1,MNMIN)
+C  360 FORMAT(/' DIAGONAL ELEMENTS OF U ', //(8E15.7))
+C      WRITE(6,365) (VNEW(I,I),I=1,MNMIN)
+C  365 FORMAT(/' DIAGONAL ELEMENTS OF V ', //(8E15.7))
+C ***
+         PCHECK = 0.0
+
+C  T() {}
+
+C (1,13)
+         UCHECK = 0.0
+
+C  T() {}
+
+C (1,14)
+         VCHECK = 0.0
+
+C  T(ICHECK,JCHECK) {1<=ICHECK}
+
+C (1,15)
+
+         DO 3500 ICHECK = 1, MNMIN
+
+C  T(JCHECK) {1<=JCHECK}
+
+C (1,16)
+            DO 3500 JCHECK = 1, MNMIN
+
+C  T() {}
+
+C (1,17)
+C              BEGIN BLOCK
+
+C  T() {}
+
+C (1,18)
+               PCHECK = PCHECK+ABS(PNEW(ICHECK,JCHECK))
+
+C  T() {}
+
+C (1,19)
+               UCHECK = UCHECK+ABS(UNEW(ICHECK,JCHECK))
+
+C  T() {}
+
+C (1,20)
+               VCHECK = VCHECK+ABS(VNEW(ICHECK,JCHECK))
+
+C  T() {}
+
+C (1,21)
+3500           CONTINUE
+C              END BLOCK
+
+C  T() {}
+
+C (1,22)
+C ***
+C ***
+         WRITE (6, 366) PCHECK, UCHECK, VCHECK
+
+C  T() {}
+
+C (1,23)
+366      FORMAT(/,' Pcheck = ',E12.4,/,' Ucheck = ',E12.4,/,' Vcheck = '
+     &,E12.4,/)
+C        END BLOCK
+      ENDIF
+
+C  T() {}
+
+C (1,24)
+
+370   CONTINUE
+
+C  T() {NCYCLE+1<=ITMAX}
+
+C (1,25)
+C        TEST FOR END OF RUN
+      IF (NCYCLE.GE.ITMAX) THEN
+
+C  T() {0==-1}
+
+C (1,26)
+         STOP
+      ELSE
+
+C  T() {}
+
+C (1,27)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  T() {}
+
+C (1,28)
+C
+C     TIME SMOOTHING AND UPDATE FOR NEXT CYCLE
+C
+
+      IF (NCYCLE.LE.1) THEN
+
+C  T() {}
+
+C (1,29)
+         CALL CALC3Z
+      ELSE
+
+C  T() {}
+
+C (1,30)
+         CALL CALC3
+      ENDIF
+C
+C     END BLOCK
+      GOTO 90
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+
+C  P() {}
+
+C ** Version modified for SPEC Benchmark suite - see Comments below
+C ***
+      PROGRAM SHALOW 
+C     BENCHMARK WEATHER PREDICTION PROGRAM FOR COMPARING THE
+C     PREFORMANCE OF CURRENT SUPERCOMPUTERS. THE MODEL IS
+C     BASED OF THE PAPER - THE DYNAMICS OF FINITE-DIFFERENCE
+C     MODELS OF THE SHALLOW-WATER EQUATIONS, BY ROBERT SADOURNY
+C     J. ATM. SCIENCES, VOL 32, NO 4, APRIL 1975.
+C
+C     CODE BY PAUL N. SWARZTRAUBER, NATIONAL CENTER FOR
+C     ATMOSPHERIC RESEARCH, BOULDER, CO,  OCTOBER 1984.
+C
+C     MODIFIED BY R. K. SATO, NCAR, APRIL 7, 1986 FOR MULTITASKING.
+C     MODIFIED FOR SPEC to run longer: ITMAX inCremented from 120 to
+C                                      1200 - J.Lo 7/19/90
+C     Modified by Bodo Parady for the SPECpar suite.  Various
+C     compilation sizes added.  Iterations reduced to orginal
+C     problem, but size increased 4x in each dimension.
+C
+C     Further modified by Reinhold Weicker (Siemens Nixdorf) for the
+C     SPEC CFP95 suite:
+C     Changed back to the form with PARAMETER statements for
+C     N1 and N2, set N1 = N2 = 513.
+C     The execution time is determined by these values and the
+C     variable ITMAX (number of iterations) read from the input file.
+C     Execution time is linear in ITMAX.
+
+      IMPLICIT INTEGER	(I-N)
+      IMPLICIT REAL	(A-H, O-Z)
+
+      PARAMETER (N1=513, N2=513)
+
+      COMMON  U(N1,N2), V(N1,N2), P(N1,N2),
+     *        UNEW(N1,N2), VNEW(N1,N2),
+     *        PNEW(N1,N2), UOLD(N1,N2),
+     *        VOLD(N1,N2), POLD(N1,N2),
+     *        CU(N1,N2), CV(N1,N2),
+     *        Z(N1,N2), H(N1,N2), PSI(N1,N2)
+C
+      COMMON /CONS/ DT,TDT,DX,DY,A,ALPHA,ITMAX,MPRINT,M,N,MP1,
+     1              NP1,EL,PI,TPI,DI,DJ,PCF
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C
+
+      WRITE (6, *) 'SPEC benchmark 102.swim'
+
+C  P() {}
+
+C (0,3)
+
+      WRITE (6, *) ' '
+
+C  P() {}
+
+C (0,4)
+
+C       REQUEST PROCESSORS FOR MICROTASKING
+C SPEC removed CMIC$ GETCPUS 4
+C
+C
+C       INITIALIZE CONSTANTS AND ARRAYS
+C
+      CALL INITAL
+
+C  P(ITMAX,M,MP1,MPRINT,N,NP1) {}
+
+C (0,5)
+C
+C     PRINT INITIAL VALUES
+C
+      WRITE (6, 390) N, M, DX, DY, DT, ALPHA, ITMAX
+
+C  P(ITMAX,M,MP1,MPRINT,N,NP1) {}
+
+C (0,6)
+390   FORMAT(' NUMBER OF POINTS IN THE X DIRECTION',I8/' NUMBER OF POINT
+     &S IN THE Y DIRECTION',I8/' GRID SPACING IN THE X DIRECTION    ',F8
+     &.0/' GRID SPACING IN THE Y DIRECTION    ',F8.0/' TIME STEP        
+     &                  ',F8.0/' TIME FILTER PARAMETER              ',F8
+     &.3/' NUMBER OF ITERATIONS               ',I8)
+
+C  P(ITMAX,M,MP1,MPRINT,N,NP1) {}
+
+C (0,7)
+      MNMIN = MIN0(M, N)
+
+C  P(ITMAX,M,MNMIN,MP1,MPRINT,N,NP1) {MNMIN<=M, MNMIN<=N}
+
+C (0,8)
+C initial data writes removed for SPEC
+C      WRITE(6,391) (POLD(I,I),I=1,MNMIN)
+C  391 FORMAT(/' INITIAL DIAGONAL ELEMENTS OF P ', //(8E15.7))
+C      WRITE(6,392) (UOLD(I,I),I=1,MNMIN)
+C  392 FORMAT(/' INITIAL DIAGONAL ELEMENTS OF U ', //(8E15.7))
+C      WRITE(6,393) (VOLD(I,I),I=1,MNMIN)
+C  393 FORMAT(/' INITIAL DIAGONAL ELEMENTS OF V ', //(8E15.7))
+C        DETERMINE OVERHEAD OF TIMING CALLS
+
+C  6/22/95 for SPEC: JWR: Initialization of TIME
+
+      TIME = 0
+
+C  P(ITMAX,M,MNMIN,MP1,MPRINT,N,NP1) {MNMIN<=M, MNMIN<=N}
+
+C (0,9)
+      NCYCLE = 0
+
+C  P(ITMAX,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {NCYCLE==0, MNMIN<=M,
+C    MNMIN<=N}
+
+C (0,10)
+C     BEGIN UNSTRUCTURED
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 0<=NCYCLE}
+
+C (1,1)
+C     BEGIN BLOCK
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 0<=NCYCLE}
+
+C (1,2)
+90    NCYCLE = NCYCLE+1
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,3)
+C
+C     COMPUTE CAPITAL  U, CAPITAL V, Z AND H
+C
+      CALL CALC1
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,4)
+C
+C     COMPUTE NEW VALUES U,V AND P
+C
+      CALL CALC2
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,5)
+C
+      TIME = TIME+DT
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,6)
+      IF (MOD(NCYCLE, MPRINT).NE.0) THEN
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,7)
+C        BEGIN BLOCK
+C        END BLOCK
+      ELSE
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,8)
+C        BEGIN BLOCK
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,9)
+         PTIME = TIME/3600.
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,10)
+C
+C *** modified for SPEC results verification
+C *** We want to ensure that all calculations were done
+C *** so we "use" all of the computed results.
+C ***
+C *** Since all of the comparisons of the individual diagnal terms
+C *** often differ in the smaller values, the check we have selected
+C *** is to add the absolute values of all terms and print these results
+C
+         WRITE (6, 350) NCYCLE, PTIME
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,11)
+350      FORMAT(/' CYCLE NUMBER',I5,' MODEL TIME IN  HOURS',F6.2)
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,12)
+C      WRITE(6,355) (PNEW(I,I),I=1,MNMIN)
+C  355 FORMAT(/' DIAGONAL ELEMENTS OF P ', //(8E15.7))
+C      WRITE(6,360) (UNEW(I,I),I=1,MNMIN)
+C  360 FORMAT(/' DIAGONAL ELEMENTS OF U ', //(8E15.7))
+C      WRITE(6,365) (VNEW(I,I),I=1,MNMIN)
+C  365 FORMAT(/' DIAGONAL ELEMENTS OF V ', //(8E15.7))
+C ***
+         PCHECK = 0.0
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,13)
+         UCHECK = 0.0
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,14)
+         VCHECK = 0.0
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,15)
+
+         DO 3500 ICHECK = 1, MNMIN
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    ICHECK<=MNMIN, MNMIN<=M, MNMIN<=N, 1<=NCYCLE}
+
+C (1,16)
+            DO 3500 JCHECK = 1, MNMIN
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    ICHECK<=MNMIN, 1<=JCHECK, JCHECK<=MNMIN, MNMIN<=M, MNMIN<=N,
+C    1<=NCYCLE}
+
+C (1,17)
+C              BEGIN BLOCK
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    ICHECK<=MNMIN, 1<=JCHECK, JCHECK<=MNMIN, MNMIN<=M, MNMIN<=N,
+C    1<=NCYCLE}
+
+C (1,18)
+               PCHECK = PCHECK+ABS(PNEW(ICHECK,JCHECK))
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    ICHECK<=MNMIN, 1<=JCHECK, JCHECK<=MNMIN, MNMIN<=M, MNMIN<=N,
+C    1<=NCYCLE}
+
+C (1,19)
+               UCHECK = UCHECK+ABS(UNEW(ICHECK,JCHECK))
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    ICHECK<=MNMIN, 1<=JCHECK, JCHECK<=MNMIN, MNMIN<=M, MNMIN<=N,
+C    1<=NCYCLE}
+
+C (1,20)
+               VCHECK = VCHECK+ABS(VNEW(ICHECK,JCHECK))
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    ICHECK<=MNMIN, 1<=JCHECK, JCHECK<=MNMIN, MNMIN<=M, MNMIN<=N,
+C    1<=NCYCLE}
+
+C (1,21)
+3500           CONTINUE
+C              END BLOCK
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    MNMIN+1<=ICHECK, MNMIN<=M, MNMIN<=N, 1<=NCYCLE}
+
+C (1,22)
+C ***
+C ***
+         WRITE (6, 366) PCHECK, UCHECK, VCHECK
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {1<=ICHECK,
+C    MNMIN+1<=ICHECK, MNMIN<=M, MNMIN<=N, 1<=NCYCLE}
+
+C (1,23)
+366      FORMAT(/,' Pcheck = ',E12.4,/,' Ucheck = ',E12.4,/,' Vcheck = '
+     &,E12.4,/)
+C        END BLOCK
+      ENDIF
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,24)
+
+370   CONTINUE
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {MNMIN<=M,
+C    MNMIN<=N, 1<=NCYCLE}
+
+C (1,25)
+C        TEST FOR END OF RUN
+      IF (NCYCLE.GE.ITMAX) THEN
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1)
+C    {ITMAX<=NCYCLE, MNMIN<=M, MNMIN<=N, 1<=NCYCLE}
+
+C (1,26)
+         STOP
+      ELSE
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1)
+C    {NCYCLE+1<=ITMAX, MNMIN<=M, MNMIN<=N, 1<=NCYCLE}
+
+C (1,27)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1)
+C    {NCYCLE+1<=ITMAX, MNMIN<=M, MNMIN<=N, 1<=NCYCLE}
+
+C (1,28)
+C
+C     TIME SMOOTHING AND UPDATE FOR NEXT CYCLE
+C
+
+      IF (NCYCLE.LE.1) THEN
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1) {NCYCLE==1,
+C    2<=ITMAX, MNMIN<=M, MNMIN<=N}
+
+C (1,29)
+         CALL CALC3Z
+      ELSE
+
+C  P(ICHECK,ITMAX,JCHECK,M,MNMIN,MP1,MPRINT,N,NCYCLE,NP1)
+C    {NCYCLE+1<=ITMAX, MNMIN<=M, MNMIN<=N, 2<=NCYCLE}
+
+C (1,30)
+         CALL CALC3
+      ENDIF
+C
+C     END BLOCK
+      GOTO 90
+C     END UNSTRUCTURED
+C     END BLOCK
+      END

@@ -1,0 +1,125 @@
+
+C  T(INCR,K) {INCR==K, INCR==K#init+1}
+
+
+      INTEGER FUNCTION INCR(K)
+      SAVE X
+
+C  T() {}
+
+      X = X+1.                                                          0004
+
+C  T(K) {K==K#init+1}
+
+      K = K+1                                                           0005
+
+C  T(INCR) {INCR==K}
+
+      INCR = K                                                          0006
+      END
+
+C  T() {}
+
+      PROGRAM SIDE_EFFECT01
+
+C  T(I) {I==4}
+
+
+C     Check handling of side effects in tests
+
+      I = 4                                                             0005
+
+C  T(J) {J==0}
+
+      J = 0                                                             0006
+
+C  T(I,J) {I==I#init+1, 8<=J, J<=9}
+
+
+      IF (INCR(I).GE.4) THEN                                            0008
+
+C  T(J) {J==8}
+
+         J = 8                                                          0009
+      ELSE
+
+C  T(J) {J==9}
+
+         J = 9                                                          0011
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I, J                                                     0014
+
+c      if(4.lt.incr(i)) then
+c         j = 8
+c      endif
+c
+c      print *, i, j
+
+      END
+
+C  P() {K==4}
+
+
+      INTEGER FUNCTION INCR(K)
+      SAVE X
+
+C  P() {K==4}
+
+      X = X+1.                                                          0004
+
+C  P() {K==4}
+
+      K = K+1                                                           0005
+
+C  P(K) {K==5, K#init==4}
+
+      INCR = K                                                          0006
+      END
+
+C  P() {}
+
+      PROGRAM SIDE_EFFECT01
+
+C  P() {}
+
+
+C     Check handling of side effects in tests
+
+      I = 4                                                             0005
+
+C  P(I) {I==4}
+
+      J = 0                                                             0006
+
+C  P(I,J) {I==4, J==0}
+
+
+      IF (INCR(I).GE.4) THEN                                            0008
+
+C  P(I,J) {I==5, J==0}
+
+         J = 8                                                          0009
+      ELSE
+
+C  P() {0==-1}
+
+         J = 9                                                          0011
+      ENDIF
+
+C  P(I,J) {I==5, J==8}
+
+
+      PRINT *, I, J                                                     0014
+
+c      if(4.lt.incr(i)) then
+c         j = 8
+c      endif
+c
+c      print *, i, j
+
+      END
+

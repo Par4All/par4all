@@ -1,0 +1,51 @@
+
+Parsed printed file for "assign03"
+
+void assign03()
+{
+   extern char *malloc(int);
+   double *p = (double *) malloc(10*sizeof(double));
+   int j = 2;
+
+   p[j] = 1.;
+}
+
+Proper effetcs for "assign03"
+
+void assign03()
+{
+   extern char *malloc(int);
+   double *p = (double *) malloc(10*sizeof(double));
+   int j = 2;
+//               <must be read   >: j p
+//               <must be written>: p[j]
+
+   p[j] = 1.;
+}
+
+Cumulated effetcs for "assign03"
+
+void assign03()
+{
+   extern char *malloc(int);
+   double *p = (double *) malloc(10*sizeof(double));
+   int j = 2;
+//               <may be written >: p[*]
+//               <must be read   >: j p
+
+   p[j] = 1.;
+}
+
+Proper effetcs for "foo"
+
+void foo()
+{
+   assign03();
+}
+
+Cumulated effetcs for "foo"
+
+void foo()
+{
+   assign03();
+}

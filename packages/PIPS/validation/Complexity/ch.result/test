@@ -1,0 +1,62 @@
+C --- Complexity with early evaluation
+C      -14*U_J_0.U_N_2 + 7*U_N_0.U_N_2 + 14*U_N_1.U_N_2 + 26*U_N_2 + 2 (SUMMARY)
+       PROGRAM CH
+       REAL A(1:100,1:100)
+       REAL B(1:100)
+       INTEGER N
+C      -14*U_J_0.U_N_2 + 7*U_N_0.U_N_2 + 14*U_N_1.U_N_2 + 26*U_N_2 + 2 (DO)
+      DO 10 J = 1, N                                                    0005
+C                                                         7*U_N_0 + 12 (DO)
+cvd$    concur
+         DO 20 I = MAX(1+1, J), N                                       0007
+C                                                                    6 (DO)
+            DO 30 K = 1, MIN(J-1, I-1)                                  0008
+C                                                                   18 (STMT)
+               A(I,J) = A(I,J)-A(I,K)*A(J,K)                            0009
+C                                                                    0 (STMT)
+30             CONTINUE                                                 0010
+C                                                                    0 (STMT)
+20          CONTINUE                                                    0011
+C                                                                    9 (STMT)
+         A(J,J) = SQRT(A(J,J))                                          0012
+C                                             -14*U_J_0 + 14*U_N_1 + 4 (DO)
+cvd$    concur
+         DO 40 I = J+1, N                                               0014
+C                                                                   13 (STMT)
+            A(I,J) = A(I,J)/A(J,J)                                      0015
+C                                                                    0 (STMT)
+40          CONTINUE                                                    0016
+C                                                                    0 (STMT)
+10       CONTINUE                                                       0017
+      END
+C --- Complexity with late evaluation
+C                                                    14*N^2 + 19*N + 2 (SUMMARY)
+       PROGRAM CH
+       REAL A(1:100,1:100)
+       REAL B(1:100)
+       INTEGER N
+C                                                    14*N^2 + 19*N + 2 (DO)
+      DO 10 J = 1, N                                                    0005
+C                                                             7*N + 12 (DO)
+cvd$    concur
+         DO 20 I = MAX(1+1, J), N                                       0007
+C                                                                    6 (DO)
+            DO 30 K = 1, MIN(J-1, I-1)                                  0008
+C                                                                   18 (STMT)
+               A(I,J) = A(I,J)-A(I,K)*A(J,K)                            0009
+C                                                                    0 (STMT)
+30             CONTINUE                                                 0010
+C                                                                    0 (STMT)
+20          CONTINUE                                                    0011
+C                                                                    9 (STMT)
+         A(J,J) = SQRT(A(J,J))                                          0012
+C                                                     -14*J + 14*N + 4 (DO)
+cvd$    concur
+         DO 40 I = J+1, N                                               0014
+C                                                                   13 (STMT)
+            A(I,J) = A(I,J)/A(J,J)                                      0015
+C                                                                    0 (STMT)
+40          CONTINUE                                                    0016
+C                                                                    0 (STMT)
+10       CONTINUE                                                       0017
+      END

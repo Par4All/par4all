@@ -1,0 +1,11 @@
+
+Code after scalarization
+
+void scalarization23(double A[SIZE], double B[SIZE])
+{
+   // BEGIN BLOCK
+   int i, j;
+   for(i = 0; i <= SIZE-1; i += 1)
+      A[i] = B[i]+A[i]*A[i]+get(A, i);
+   // END BLOCK
+}

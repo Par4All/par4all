@@ -1,0 +1,44 @@
+setenv WSPACE inlining21
+delete ${WSPACE}
+setenv MAIN $WSPACE.database/main
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} inlining21.src/inlining21.c inlining21.src/inlining21-foo.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+display CALLGRAPH_FILE[main]
+
+activate PRINT_CODE
+
+echo
+echo before inlining
+echo
+
+display PRINTED_FILE[foo]
+display PRINTED_FILE[main]
+
+echo
+echo after inlining
+echo
+
+apply INLINING[foo]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -c inlining21.database/Src/inlining21.c inlining21.database/Src/inlining21-foo.c
+shell rm -f inlining21.o inlining21-foo.o
+
+close
+delete inlining21
+quit

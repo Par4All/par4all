@@ -1,0 +1,16 @@
+[
+l("MAIN",n("",[a("OBJECT","MAIN\n")],[
+  l("",e("",[],r("A")))])),
+l("A",n("",[a("OBJECT","A\n                <must be written>: KMAX\nKMAX = KMAX+2\n                <must be written>: KMAX KT\nCALL B(KMAX)\n")],[
+  l("",e("",[],r("B"))),
+  l("",e("",[],r("C3")))])),
+l("B",n("",[a("OBJECT","B\n                <must be written>: KT\nKT = KT+3\n")],[
+  l("",e("",[],r("C1"))),
+  l("",e("",[],r("C2")))])),
+l("C1",n("",[a("OBJECT","C1\n                <must be written>: KMAX\nCALL INC(KMAX)\n")],[
+])),
+l("C2",n("",[a("OBJECT","C2\n                <must be written>: KT\nCALL INC(KT)\n")],[
+])),
+l("C3",n("",[a("OBJECT","C3\n                <must be written>: TT\nCALL INC(TT)\n")],[
+]))
+]

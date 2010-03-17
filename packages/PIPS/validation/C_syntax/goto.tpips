@@ -1,0 +1,31 @@
+delete goto
+create goto goto.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo PRINTED FILE (after controlization)
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit goto
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat goto.database/Src/goto.c
+close
+
+#delete goto
+
+quit

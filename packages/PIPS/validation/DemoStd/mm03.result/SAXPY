@@ -1,0 +1,29 @@
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+C     
+      M = MOD(N, 4)                                                     0001
+      DOALL I = 1, M                                                    0002
+         X(I) = X(I)+S*Y(I)                                             0003
+      ENDDO
+C     
+      DOALL I = M+1, N, 4                                               0004
+         X(I) = X(I)+S*Y(I)                                             0005
+      ENDDO
+      DOALL I = M+1, N, 4                                               0004
+         X(I+1) = X(I+1)+S*Y(I+1)                                       0006
+      ENDDO
+      DOALL I = M+1, N, 4                                               0004
+         X(I+2) = X(I+2)+S*Y(I+2)                                       0007
+      ENDDO
+      DOALL I = M+1, N, 4                                               0004
+         X(I+3) = X(I+3)+S*Y(I+3)                                       0008
+      ENDDO
+C
+      END

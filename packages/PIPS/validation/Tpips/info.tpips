@@ -1,0 +1,14 @@
+delete i
+info workspace
+info module
+info modules
+# info directory
+echo 'info directory' cannot be validated...
+create i info.f
+info workspace
+info module
+info modules
+# info directory
+echo 'info directory' cannot be validated...
+close
+delete i

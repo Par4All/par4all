@@ -1,0 +1,6 @@
+main()
+{
+  int i,n,nr;
+  int k = (++i,0);
+  i = nr?1:n+1;
+}

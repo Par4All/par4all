@@ -1,0 +1,25 @@
+delete main03
+create main03 main03.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+#make PARSED_CODE[main]
+
+display PRINTED_FILE[main]
+
+close
+
+# delete main03
+
+quit
+
+
+
+

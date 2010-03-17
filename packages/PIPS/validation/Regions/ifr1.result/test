@@ -1,0 +1,59 @@
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+
+C
+C
+      SUBROUTINE IFR1(A)
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION A(5)
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+
+C
+      DO I = 1, 5                                                       0008
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+         IF (A(I).GT.2) THEN                                            0009
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+            A(I) = A(I)-1                                               0010
+         ELSE
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+            A(I) = A(I)+1                                               0012
+         ENDIF
+      ENDDO
+C
+      END
+C
+      PROGRAM IFR1P
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION AA(5)
+
+C  <AA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+
+C     
+      DO I = 1, 5                                                       0007
+
+C  <AA(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+         AA(I) = I                                                      0008
+      ENDDO
+
+C  <AA(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5, I==6}>
+C  <AA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5, I==6}>
+
+
+      CALL IFR1(AA)                                                     0011
+C
+      END

@@ -1,0 +1,28 @@
+delete initial2
+create initial2 initial2.f
+display PRINTED_FILE($ALL)
+
+activate PRINT_INITIAL_PRECONDITION
+display PRINTED_FILE($ALL)
+# activate PRINT_PROGRAM_PRECONDITION
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+echo 
+echo Transformers for function "BOO"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE(BOO)
+
+echo 
+echo Preconditions with initial precondition for program INITIAL2
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE(INITIAL2)
+close
+# delete initial2
+quit

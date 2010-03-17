@@ -1,0 +1,84 @@
+
+Code:
+
+C     Check labelling by text_unstructured()
+
+      SUBROUTINE UNSTRUC01(X, X0)
+      REAL X(10)
+      I = 1                                                             0006
+99998 CONTINUE
+
+C     DO loop  with exit had to be desugared
+      IF (I.GT.10) GOTO 99999                                           0006
+      IF (X(I).GT.X0) GOTO 100                                          0007
+      I = I+1                                                           0006
+      GOTO 99998
+100   PRINT *, "criterion met"                                          0012
+      RETURN
+99999 CONTINUE
+
+      PRINT *, "criterion not met"                                      0010
+      END
+
+Proper effects:
+
+C     Check labelling by text_unstructured()
+
+      SUBROUTINE UNSTRUC01(X, X0)
+      REAL X(10)
+C               <must be written>: I
+      I = 1                                                             0006
+99998 CONTINUE
+C               <must be read   >: I
+
+C     DO loop  with exit had to be desugared
+      IF (I.GT.10) GOTO 99999                                           0006
+C               <must be read   >: I X(I) X0
+      IF (X(I).GT.X0) GOTO 100                                          0007
+C               <must be read   >: I
+C               <must be written>: I
+      I = I+1                                                           0006
+      GOTO 99998
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+100   PRINT *, "criterion met"                                          0012
+      RETURN
+99999 CONTINUE
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+
+      PRINT *, "criterion not met"                                      0010
+      END
+
+Cumulated effects:
+
+C               <may be read    >: X(*) X0 __IO_EFFECTS:LUNS(6)
+C               <may be written >: __IO_EFFECTS:LUNS(6)
+C     Check labelling by text_unstructured()
+
+      SUBROUTINE UNSTRUC01(X, X0)
+      REAL X(10)
+C               <must be written>: I
+      I = 1                                                             0006
+99998 CONTINUE
+C               <must be read   >: I
+
+C     DO loop  with exit had to be desugared
+      IF (I.GT.10) GOTO 99999                                           0006
+C               <may be read    >: X(*)
+C               <must be read   >: I X0
+      IF (X(I).GT.X0) GOTO 100                                          0007
+C               <must be read   >: I
+C               <must be written>: I
+      I = I+1                                                           0006
+      GOTO 99998
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+100   PRINT *, "criterion met"                                          0012
+      RETURN
+99999 CONTINUE
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+
+      PRINT *, "criterion not met"                                      0010
+      END

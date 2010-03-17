@@ -1,0 +1,36 @@
+enum {a=sizeof(int), b};
+
+extern int main();
+
+Preconditions derived from enum
+
+
+//  P() {}
+
+enum {a=sizeof(int), b};
+
+extern int main();
+
+
+//  P() {}
+
+main()
+{
+   int ia;
+   int ib;
+   int t;
+
+//  P() {}
+
+
+   ia = a;
+
+//  P(ia) {ia==4}
+
+   ib = b;
+
+//  P(ia,ib) {ia==4, ib==5}
+
+
+   t = ia+ib;
+}

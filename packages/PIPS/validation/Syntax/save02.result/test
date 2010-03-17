@@ -1,0 +1,30 @@
+user warning in tp_parse: save02: No such workspace
+Registering file save02.f
+Splitting file    ./save02.f
+  Module         SAVE02
+Workspace save02 created and opened.
+Module SAVE02 selected
+Main module PROGRAM "SAVE02" selected.
+Module SAVE02 already active.
+Module SAVE02 already active.
+Request: build resource PRINTED_FILE for module SAVE02.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(SAVE02)
+  PARSER                         building   PARSED_CODE(SAVE02)
+                                 building   CALLEES(SAVE02)
+user warning in ProcessSave: Variable I has already been declared static by appearing in Common FOO
+user error in parser: Parser error between lines 7 and 7
+SAVE statement incompatible with previous COMMON declaration
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module SAVE02.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module SAVE02.
+Closing program.
+Closing workspace.
+Workspace save02 closed.
+
+Workspace save02 deleted.

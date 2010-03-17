@@ -1,0 +1,63 @@
+
+C  T() {}
+
+      PROGRAM TYPE10
+
+C  T(I) {}
+
+
+C     Check integer behavior after extensions to non-integer types
+
+      READ *, I                                                         0005
+
+C  T() {}
+
+
+      IF (I.GT.0.AND.I.LT.1) THEN                                       0007
+
+C  T() {}
+
+         PRINT *, I                                                     0008
+c      else
+c         print *, i
+      ENDIF
+
+c      if (i.gt.0.or.i.lt.1) then
+c         print *, i
+c      else
+c         print *, i
+c      endif
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE10
+
+C  P() {}
+
+
+C     Check integer behavior after extensions to non-integer types
+
+      READ *, I                                                         0005
+
+C  P(I) {}
+
+
+      IF (I.GT.0.AND.I.LT.1) THEN                                       0007
+
+C  P() {0==-1}
+
+         PRINT *, I                                                     0008
+c      else
+c         print *, i
+      ENDIF
+
+c      if (i.gt.0.or.i.lt.1) then
+c         print *, i
+c      else
+c         print *, i
+c      endif
+
+      END
+

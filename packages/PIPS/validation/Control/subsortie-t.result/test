@@ -1,0 +1,16 @@
+
+Printed file
+
+      SUBROUTINE SUBSORTIE()
+383   READ (UNIT=IUT,FMT='(a80)',END=384) TABLE                         0002
+      GOTO 383
+384   CONTINUE                                                          0004
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      SUBROUTINE SUBSORTIE()
+383   READ (UNIT=IUT,FMT='(a80)',END=384) TABLE                         0002
+      GOTO 383
+384   CONTINUE                                                          0004
+      END

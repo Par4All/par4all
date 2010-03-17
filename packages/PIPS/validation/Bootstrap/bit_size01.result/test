@@ -1,0 +1,51 @@
+
+Parsed printed file
+
+      PROGRAM BIT_SIZE01
+
+      INTEGER I
+      INTEGER J
+
+      I = 2                                                             0006
+      J = BIT_SIZE(I)                                                   0007
+      PRINT *, 'J = ', J                                                0008
+
+      END
+
+Proper effects
+
+      PROGRAM BIT_SIZE01
+
+      INTEGER I
+      INTEGER J
+C               <must be written>: I
+
+      I = 2                                                             0006
+C               <must be read   >: I
+C               <must be written>: J
+      J = BIT_SIZE(I)                                                   0007
+C               <must be read   >: J __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'J = ', J                                                0008
+
+      END
+
+Cumulated effetcs
+
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM BIT_SIZE01
+
+      INTEGER I
+      INTEGER J
+C               <must be written>: I
+
+      I = 2                                                             0006
+C               <must be read   >: I
+C               <must be written>: J
+      J = BIT_SIZE(I)                                                   0007
+C               <must be read   >: J __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'J = ', J                                                0008
+
+      END

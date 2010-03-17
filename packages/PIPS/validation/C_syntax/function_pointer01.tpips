@@ -1,0 +1,15 @@
+delete function_pointer01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create function_pointer01 function_pointer01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[fp]
+close
+delete function_pointer01
+quit
+

@@ -1,0 +1,188 @@
+
+After parsing
+
+C     Derived from POSCAL, but simplified
+
+      SUBROUTINE POSCAL03 (NFICAL,NAMECA,NAMECB,FINCAL,                           
+     *     LNAMEA,LNAMEB,ITABLE,IARRET,IRETOU,NFDIAG)             
+
+      LOGICAL         LABSOL
+      COMMON /REDCOM/ FLOTAN,FL0TAN,INTEGR,INTEGS,ITYPLU,ITYPLV,NCARLU
+     *     ,NCARLV,IENDFI,ILECSF(99,3),NREPET,NFILEC,IOPERA,NOTRLC
+     *     ,IOPANT,NBOUKL,FACTOR,ICARES,LABSOL,NBOUPA
+
+      CHARACTER * 132  TEXTLU,TITRE,LIGNE,TXLIGN,TEXTLV
+      COMMON  /REDTEX/ TEXTLU,TITRE,LIGNE,TXLIGN(99),TEXTLV
+
+      LOGICAL         IMPTES, LTESTM                                            
+      CHARACTER *  80 FINCAL, NAMECA, NAMECB                                    
+      CHARACTER * 132 TITREC                                                    
+C (statement ordering unavailable)
+C     BEGIN BLOCK
+C (statement ordering unavailable)
+C     BEGIN BLOCK
+C (statement ordering unavailable)
+
+c     5             if the next line is commented out, the controlizer bug disappears...
+C     Same thing if the other READ is commented out
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0020
+C (statement ordering unavailable)
+      IF (END_LUNS(NFICAL)) THEN
+C (statement ordering unavailable)
+         GOTO 9999
+      ELSE
+C (statement ordering unavailable)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+C (statement ordering unavailable)
+      DO WHILE (TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0021
+     &'*')                                                              0021
+C (statement ordering unavailable)
+C        BEGIN BLOCK
+C (statement ordering unavailable)
+C        BEGIN BLOCK
+C (statement ordering unavailable)
+         READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)           0023
+C (statement ordering unavailable)
+         IF (END_LUNS(NFICAL)) THEN
+C (statement ordering unavailable)
+            GOTO 9999
+         ELSE
+C (statement ordering unavailable)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C        END BLOCK
+C (statement ordering unavailable)
+         CONTINUE                                                       0024
+C        END BLOCK
+      ENDDO
+C (statement ordering unavailable)
+9999  IRETOU = 1                                                        0025
+C (statement ordering unavailable)
+      RETURN
+C     END BLOCK
+      END
+
+After controlizing
+
+C     Derived from POSCAL, but simplified
+
+      SUBROUTINE POSCAL03 (NFICAL,NAMECA,NAMECB,FINCAL,                           
+     *     LNAMEA,LNAMEB,ITABLE,IARRET,IRETOU,NFDIAG)             
+
+      LOGICAL         LABSOL
+      COMMON /REDCOM/ FLOTAN,FL0TAN,INTEGR,INTEGS,ITYPLU,ITYPLV,NCARLU
+     *     ,NCARLV,IENDFI,ILECSF(99,3),NREPET,NFILEC,IOPERA,NOTRLC
+     *     ,IOPANT,NBOUKL,FACTOR,ICARES,LABSOL,NBOUPA
+
+      CHARACTER * 132  TEXTLU,TITRE,LIGNE,TXLIGN,TEXTLV
+      COMMON  /REDTEX/ TEXTLU,TITRE,LIGNE,TXLIGN(99),TEXTLV
+
+      LOGICAL         IMPTES, LTESTM                                            
+      CHARACTER *  80 FINCAL, NAMECA, NAMECB                                    
+      CHARACTER * 132 TITREC                                                    
+C (0,1)
+C (1,1)
+
+c     5             if the next line is commented out, the controlizer bug disappears...
+C     Same thing if the other READ is commented out
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0020
+C (2,1)
+      IF (END_LUNS(NFICAL)) GOTO 99999
+C (16,1)
+C     BEGIN BLOCK
+C     END BLOCK
+C (15,1)
+      CONTINUE
+C (14,1)
+      CONTINUE
+99997 CONTINUE
+C (6,1)
+C     DO WHILE loop with GO TO exit had to be desugared
+      IF (.NOT.(TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0021
+     &'*')) GOTO 9999                                                   0021
+C (7,1)
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0023
+C (8,1)
+      IF (END_LUNS(NFICAL)) GOTO 99998
+C (10,1)
+C     BEGIN BLOCK
+C     END BLOCK
+C (11,1)
+      CONTINUE
+C (12,1)
+      CONTINUE
+C (13,1)
+      CONTINUE
+      GOTO 99997
+99998 CONTINUE
+C (9,1)
+      CONTINUE
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+      CONTINUE
+C (4,3)
+9999  IRETOU = 1                                                        0025
+C (4,4)
+      RETURN
+C     END BLOCK
+99999 CONTINUE
+C (3,1)
+      CONTINUE
+      GOTO 9999
+C (5,1)
+      CONTINUE
+      END
+
+After unspaghettifying
+
+C     Derived from POSCAL, but simplified
+
+      SUBROUTINE POSCAL03 (NFICAL,NAMECA,NAMECB,FINCAL,                           
+     *     LNAMEA,LNAMEB,ITABLE,IARRET,IRETOU,NFDIAG)             
+
+      LOGICAL         LABSOL
+      COMMON /REDCOM/ FLOTAN,FL0TAN,INTEGR,INTEGS,ITYPLU,ITYPLV,NCARLU
+     *     ,NCARLV,IENDFI,ILECSF(99,3),NREPET,NFILEC,IOPERA,NOTRLC
+     *     ,IOPANT,NBOUKL,FACTOR,ICARES,LABSOL,NBOUPA
+
+      CHARACTER * 132  TEXTLU,TITRE,LIGNE,TXLIGN,TEXTLV
+      COMMON  /REDTEX/ TEXTLU,TITRE,LIGNE,TXLIGN(99),TEXTLV
+
+      LOGICAL         IMPTES, LTESTM                                            
+      CHARACTER *  80 FINCAL, NAMECA, NAMECB                                    
+      CHARACTER * 132 TITREC                                                    
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+c     5             if the next line is commented out, the controlizer bug disappears...
+C     Same thing if the other READ is commented out
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0020
+C (0,3)
+C (1,1)
+      IF (END_LUNS(NFICAL)) GOTO 9999
+99999 CONTINUE
+C (3,1)
+C     DO WHILE loop with GO TO exit had to be desugared
+      IF (.NOT.(TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0021
+     &'*')) GOTO 9999                                                   0021
+C (4,1)
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0023
+C (5,1)
+      IF (END_LUNS(NFICAL)) THEN
+      ELSE
+         GOTO 99999
+      ENDIF
+C (2,1)
+9999  CONTINUE                                                          0025
+C (0,4)
+      IRETOU = 1                                                        0025
+C (0,5)
+      RETURN
+C     END BLOCK
+      END

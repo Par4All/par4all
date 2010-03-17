@@ -1,0 +1,16 @@
+delete externalloc08
+create externalloc08 externalloc08.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+activate C_PARSER
+display SYMBOL_TABLE_FILE[externalloc08!]
+display PARSED_PRINTED_FILE[externalloc08!]
+
+close
+delete externalloc08
+quit

@@ -1,0 +1,20 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+/* Example that appear in an application from a company with:
+
+* To have M_PI: *
+#define _GNU_SOURCE
+#include <math.h>
+ */
+
+/* Support for various different standard error handling behaviors.  */
+
+
+/* According to IEEE 754/IEEE 854.  */
+/* According to System V, release 4.  */
+/* Nowadays also Unix98.  */
+
+/* Actually this is ISO C99.  */
+typedef enum {_IEEE_=-1, _SVID_, _XOPEN_, _POSIX_, _ISOC_} _LIB_VERSION_TYPE;

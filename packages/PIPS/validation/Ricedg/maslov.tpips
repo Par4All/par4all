@@ -1,0 +1,8 @@
+delete maslov
+create maslov maslov.f
+module MASLOV
+activate RICE_FULL_DEPENDENCE_GRAPH
+display PARALLELPRINTED_FILE
+close
+delete maslov
+quit

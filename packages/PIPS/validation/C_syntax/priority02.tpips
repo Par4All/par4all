@@ -1,0 +1,26 @@
+delete priority02
+create priority02 priority02.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_ALL_PARENTHESES TRUE
+
+echo
+echo Parsed printed file for "priority02"
+echo
+
+display PARSED_PRINTED_FILE[priority02]
+
+close
+delete priority02
+
+quit

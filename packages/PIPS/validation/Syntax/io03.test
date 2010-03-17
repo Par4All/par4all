@@ -1,0 +1,14 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete io03
+create io03 io03.f
+module IO03
+display PRINTED_FILE[IO03]
+close
+delete io03
+quit
+EOF
+

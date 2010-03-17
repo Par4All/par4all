@@ -1,0 +1,6 @@
+Selecting rule: PRINT_CODE_PROPER_EFFECTS
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(TWOARG)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(TWOARG)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(TWOARG)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(ARGMIS)
+Call to module TWOARG: insufficient number of actual arguments.

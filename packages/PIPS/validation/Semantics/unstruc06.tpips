@@ -1,0 +1,20 @@
+delete unstruc06
+create unstruc06 unstruc06.f
+module UNSTRUC06
+# display PRINTED_FILE[UNSTRUC06]
+
+# useless option:
+# setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate TRANSFORMERS_INTER_FULL
+# activate PRINT_CODE_TRANSFORMERS
+# display PRINTED_FILE[UNSTRUC06]
+
+# setenv SEMANTICS_DEBUG_LEVEL 5
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[UNSTRUC06]
+close
+delete unstruc06

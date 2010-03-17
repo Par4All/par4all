@@ -1,0 +1,16 @@
+delete fprintf02
+create fprintf02 fprintf02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[fprintf02]
+
+close
+delete fprintf02
+quit

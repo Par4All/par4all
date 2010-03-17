@@ -1,0 +1,13 @@
+
+Flinted file
+
+
+
+Non-initialized variables:
+--------------------------
+In statement number 6 (0.7):
+	"W" used but not initialized.
+
+flint message from check reference, in module CHECK_INTRINSICS, in statement (0.2), number 1
+the 1th index is not a mere integer
+number of messages from flint for CHECK_INTRINSICS : 2

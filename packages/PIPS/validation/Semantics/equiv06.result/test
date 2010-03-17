@@ -1,0 +1,62 @@
+
+C  P() {}
+
+      PROGRAM EQUIV06
+
+C     Check that triplets of equivalenced variables are properly processed
+
+      EQUIVALENCE (I1, I2)
+      EQUIVALENCE (I1, I3)
+
+      EQUIVALENCE (J3, J2)
+      EQUIVALENCE (J1, J3)
+
+      EQUIVALENCE (K3, K2)
+      EQUIVALENCE (K2, K1)
+
+C  P() {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+
+      READ *, I1                                                        0014
+
+C  P(I1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+      READ *, I2                                                        0015
+
+C  P(I1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+      READ *, I3                                                        0016
+
+C  P(I1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+
+      READ *, J3                                                        0018
+
+C  P(I1,J1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+      READ *, J2                                                        0019
+
+C  P(I1,J1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+      READ *, J1                                                        0020
+
+C  P(I1,J1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+
+      READ *, K2                                                        0022
+
+C  P(I1,J1,K1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+      READ *, K3                                                        0023
+
+C  P(I1,J1,K1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+      READ *, K1                                                        0024
+
+C  P(I1,J1,K1) {I1==I2, I1==I3, J1==J2, J1==J3, K1==K2, K1==K3}
+
+
+      PRINT *, I3, J2, K1                                               0026
+
+      END
+

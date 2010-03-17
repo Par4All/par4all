@@ -1,0 +1,15 @@
+void foo_l(int a[4], int b[4], int c[4])
+{
+   a[0] = b[0]+c[0];
+   a[1] = b[1]+c[1];
+   a[2] = b[2]+c[2];
+   a[3] = b[3]+c[3];
+}
+void foo_l(int a[4], int b[4], int c[4])
+{
+   SIMD_LOAD_V4SI(v4si_vec2, &c[0]);
+   SIMD_LOAD_V4SI(v4si_vec1, &b[0]);
+   SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+   SIMD_SAVE_V4SI(v4si_vec0, &a[0]);
+}
+

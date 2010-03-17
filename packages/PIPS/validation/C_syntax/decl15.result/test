@@ -1,0 +1,60 @@
+
+Symbol table for "decl15!"
+
+decl15!
+
+Declarations for module "decl15!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl15!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl15!:*HEAP*" with type "area" with size 0
+	Declared entity "decl15!:*STACK*" with type "area" with size 0
+	Declared entity "decl15!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "decl15!:#_PIPS_STRUCT_1"	kind = struct
+	Variable "decl15!:'_PIPS_UNION_2"	kind = union
+
+Typedef entities:
+
+	Typedef "decl15!:$__mbstate_t"	with type "variable" "struct {int __count; union {wint_t __wch; char __wchb[4];} __value;}"
+	Typedef "decl15!:$wint_t"	with type "variable" "unsigned int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl15!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl15!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl15!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl15!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl15!
+
+
+Parsed printed file for "decl15!"
+
+typedef unsigned int wint_t;
+/* Value so far.  */
+typedef struct {
+   int __count;
+   union {wint_t __wch; char __wchb[4];} __value;
+} __mbstate_t;

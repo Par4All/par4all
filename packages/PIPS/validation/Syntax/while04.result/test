@@ -1,0 +1,18 @@
+      PROGRAM WHILE04
+
+C     Check the controlizer
+
+      REAL X(100)
+
+      I = 100                                                           0007
+99999 CONTINUE
+C     DO WHILE loop with GO TO exit had to be desugared
+      IF (.NOT.I.GT.1) GOTO 200                                         0008
+      IF (X(I).GT.10.) GOTO 200                                         0009
+      X(I) = 0.                                                         0010
+      I = I-1                                                           0011
+      GOTO 99999
+
+200   CONTINUE                                                          0014
+
+      END

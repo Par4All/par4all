@@ -1,0 +1,89 @@
+
+Initial code
+
+void foo(char *f, int a)
+{
+}
+void onetriploop03(int n)
+{
+   int i;
+   int m;
+
+   m = n;
+
+   for(i = n; i <= m; i += 1)
+      foo("i = %d\n", i);
+   printf("i = %d\n", i);
+}
+int main()
+{
+   onetriploop03(10);
+}
+
+Initial code with preconditions
+
+
+//  P() {}
+
+void foo(char *f, int a)
+{
+}
+
+//  P() {}
+
+void onetriploop03(int n)
+{
+   int i;
+   int m;
+
+//  P() {}
+
+
+   m = n;
+
+//  P(m) {m==n}
+
+
+   for(i = n; i <= m; i += 1)
+
+//  P(i,m) {i==m, i==n}
+
+      foo("i = %d\n", i);
+
+//  P(i,m) {i==m+1, i==n+1}
+
+   printf("i = %d\n", i);
+}
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   onetriploop03(10);
+}
+
+Code after one trip loop detection and simplification
+
+void foo(char *f, int a)
+{
+}
+void onetriploop03(int n)
+{
+   int i;
+   int m;
+
+   m = n;
+
+   i = n;
+   foo("i = %d\n", i);
+   printf("i = %d\n", i);
+   ;
+}
+int main()
+{
+   onetriploop03(10);
+}
+

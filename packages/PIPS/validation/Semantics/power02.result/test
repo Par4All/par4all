@@ -1,0 +1,46 @@
+
+C  T() {}
+
+      PROGRAM POWER02
+
+C  T(N) {}
+
+
+C     Check the interpretation of the power operator
+
+      READ *, N                                                         0005
+
+C  T(I) {I<=N, I+N<=0}
+
+
+      I = -N**2                                                         0007
+
+C  T() {}
+
+
+      PRINT *, I                                                        0009
+
+      END
+
+C  P() {}
+
+      PROGRAM POWER02
+
+C  P() {}
+
+
+C     Check the interpretation of the power operator
+
+      READ *, N                                                         0005
+
+C  P(N) {}
+
+
+      I = -N**2                                                         0007
+
+C  P(I,N) {I<=N, I+N<=0}
+
+
+      PRINT *, I                                                        0009
+
+      END

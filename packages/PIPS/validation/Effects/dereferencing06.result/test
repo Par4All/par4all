@@ -1,0 +1,67 @@
+
+Parsed printed file for "dereferencing06"
+
+void dereferencing06()
+{
+   double x = 1.;
+   double *p = &x;
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+   *p++ = 1;
+}
+
+Proper effetcs for "dereferencing06"
+
+void dereferencing06()
+{
+   double x = 1.;
+   double *p = &x;
+//               <must be read   >: p p[0]
+//               <must be written>: p
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+//               <must be read   >: p
+//               <must be written>: p p[0]
+   *p++ = 1;
+}
+
+Cumulated effects for "dereferencing06"
+
+//               <may be written >: TOP-LEVEL:*MEMORY*
+void dereferencing06()
+{
+   double x = 1.;
+   double *p = &x;
+//               <must be read   >: p p[0]
+//               <must be written>: p
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+//               <must be read   >: p
+//               <must be written>: p p[0]
+   *p++ = 1;
+}
+
+Regions for "dereferencing06"
+
+void dereferencing06()
+{
+   double x = 1.;
+   double *p = &x;
+
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
+//  <p-R-EXACT-{}>
+//  <p-W-EXACT-{}>
+
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+
+//  <p-R-EXACT-{}>
+//  <p-W-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{PHI1==0}>
+
+   *p++ = 1;
+}

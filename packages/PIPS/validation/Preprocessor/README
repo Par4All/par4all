@@ -1,0 +1,2 @@
+xxx.i contains the initial source file
+xxx.c contains its expanded version to be portable across gcc versions

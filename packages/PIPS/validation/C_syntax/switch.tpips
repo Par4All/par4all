@@ -1,0 +1,38 @@
+delete switch
+
+create switch switch.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Parsed printed file for main
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Printed file for main
+echo
+
+display PRINTED_FILE[main]
+
+echo Try more aggressive restructuring:
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL TRUE
+apply RESTRUCTURE_CONTROL[main]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[main]
+
+
+capply UNSPLIT[%PROGRAM]
+close
+
+delete switch
+
+quit

@@ -1,0 +1,20 @@
+delete entry21
+create entry21 entry21.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY21
+echo
+
+display PRINTED_FILE[ENTRY21]
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+
+close
+delete entry21
+quit

@@ -1,0 +1,10 @@
+delete unroll8
+create unroll8 unroll8.f
+module UNROLL8
+display PRINTED_FILE[UNROLL8]
+apply FULL_UNROLL_PRAGMA[UNROLL8]
+display PRINTED_FILE[UNROLL8]
+close
+delete unroll8
+quit
+# EOF

@@ -1,0 +1,14 @@
+delete parpot
+create parpot parpot.f
+set PRINT_DEPENDENCE_GRAPH TRUE
+module PARPOT
+activate PRECONDITIONS_INTER_FULL 
+activate TRANSFORMERS_INTRA_FULL 
+activate MUST_REGIONS 
+apply PRIVATIZE_MODULE
+activate REGION_CHAINS 
+display DG_FILE
+display PARALLELPRINTED_FILE 
+close
+delete parpot
+quit

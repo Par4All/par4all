@@ -1,0 +1,36 @@
+delete saman
+
+create saman saman.f
+
+module SAMAN
+
+activate PRINT_CODE
+echo saman code
+display PRINTED_FILE
+
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+echo saman RW must regions
+display PRINTED_FILE
+
+activate PRINT_CODE_IN_REGIONS
+echo saman in regions
+display PRINTED_FILE
+
+activate PRINT_CODE_OUT_REGIONS
+echo saman out regions
+display PRINTED_FILE
+
+activate ARRAY_SECTION_PRIVATIZER
+activate PRINT_CODE_PRIVATIZED_REGIONS
+echo saman privatized regions
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
+display PRINTED_FILE
+
+close
+delete saman
+quit

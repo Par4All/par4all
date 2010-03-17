@@ -1,0 +1,56 @@
+
+Parser output
+
+void parallel01()
+{
+   double x[10];
+   int i;
+
+   for (i = 0;i<10;i++)
+      x[i] = 0.;
+}
+
+Controlizer output
+
+void parallel01()
+{
+   double x[10];
+   int i;
+
+   for(i = 0; i <= 9; i += 1)
+      x[i] = 0.;
+}
+
+Preconditions
+
+
+//  P() {}
+
+void parallel01()
+{
+   double x[10];
+   int i;
+
+//  P() {}
+
+
+   for(i = 0; i <= 9; i += 1)
+
+//  P(i) {0<=i, i<=9}
+
+      x[i] = 0.;
+}
+
+Parallelization
+
+void parallel01()
+{
+   double x[10];
+   int i;
+
+
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      x[i] = 0.;
+}
+

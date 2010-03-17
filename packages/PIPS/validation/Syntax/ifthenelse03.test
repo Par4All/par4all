@@ -1,0 +1,12 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete ifthenelse03
+create ifthenelse03 ifthenelse03.f
+display PRINTED_FILE
+close
+delete ifthenelse03
+quit
+EOF

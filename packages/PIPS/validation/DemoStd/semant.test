@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Script to test pips on the semant program
+#
+# Use of the rule transformers_inter_fast
+
+if [ -f properties.rc ]
+then
+    echo Incompatible with a local properties.rc file >&2
+    exit 2
+fi
+
+echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" >properties.rc
+
+Pips -f semant.f -w semant -m semant -s pcinter -s tfinter -p prcp >&2
+exit_code=$?
+echo "--- Preconditions for module SEMANT"
+Display -l prec
+Delete semant >&2
+rm properties.rc
+exit $exit_code
+

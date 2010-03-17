@@ -1,0 +1,28 @@
+delete initial4
+create initial4 initial4.f
+
+echo 
+echo Source code for all modules, including block data modules
+echo
+
+display PRINTED_FILE[%ALL]
+
+echo 
+echo Initial preconditions for each module
+echo
+
+activate PRINT_INITIAL_PRECONDITION
+display PRINTED_FILE[%ALL]
+# activate PRINT_PROGRAM_PRECONDITION
+
+echo 
+echo Preconditions with initial precondition for program INITIAL4
+echo
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[INITIAL4]
+close
+delete initial4
+quit

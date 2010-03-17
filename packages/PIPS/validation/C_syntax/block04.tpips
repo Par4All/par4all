@@ -1,0 +1,30 @@
+delete block04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create block04 block04.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# For debugging
+#setproperty PRETTYPRINT_BLOCKS          TRUE
+#setproperty PRETTYPRINT_EMPTY_BLOCKS    TRUE
+setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[block04]
+
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[block04]
+
+close
+#delete block04
+quit

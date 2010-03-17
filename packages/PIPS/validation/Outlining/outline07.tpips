@@ -1,0 +1,37 @@
+# this example shows usage of OUTLINE_ALLOW_GLOBALS property
+delete outline07
+
+setproperty ABORT_ON_USER_ERROR TRUE
+create outline07 outline07.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+
+echo
+echo Code after outlining
+echo
+
+setproperty OUTLINE_MODULE_NAME "kernel"
+setproperty OUTLINE_LABEL "pas_trop"
+apply OUTLINE[foo]
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT[%ALL]
+
+close
+delete outline07
+quit

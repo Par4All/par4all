@@ -1,0 +1,324 @@
+
+Preconditions computed for user code
+
+
+C  P() {}
+
+      PROGRAM UNSTR6
+c     This program should be reduced to the empty program
+      INTEGER A, B
+
+C  P() {}
+
+
+c     inchange' :
+      I = 4                                                             0006
+
+C  P(I) {I==4}
+
+c     doit e^tre re'e'crit :
+c     j = 4
+      IF (I.EQ.5) THEN                                                  0009
+
+C  P() {0==-1}
+
+         J = 3                                                          0010
+      ELSE
+
+C  P(I) {I==4}
+
+         J = 4                                                          0012
+      ENDIF
+
+C  P(I,J) {I==4, J==4}
+
+
+c     doit e^tre re'e'crit :
+c     j = 5
+      IF (.NOT.I.EQ.5) THEN                                             0017
+
+C  P(I,J) {I==4, J==4}
+
+         J = 5                                                          0018
+      ELSE
+
+C  P() {0==-1}
+
+         J = 6                                                          0020
+      ENDIF
+
+C  P(I,J) {I==4, J==5}
+
+
+      IF (I.EQ.5) GOTO 31                                               0023
+
+C  P(I,J) {I==4, J==5}
+
+      PRINT *, 'salut'                                                  0024
+
+C  P(I,J) {I==4, J==5}
+
+31    A = 9                                                             0025
+
+C  P(A,I,J) {A==9, I==4, J==5}
+
+
+c     Ce test est en soit infaisable :
+c     doit e^tre re'e'crit :
+c     j = 8
+      IF (I.GT.5.AND.3.GT.I) THEN                                       0030
+
+C  P() {0==-1}
+
+         J = 7                                                          0031
+      ELSE
+
+C  P(A,I,J) {A==9, I==4, J==5}
+
+         J = 8                                                          0033
+      ENDIF
+
+C  P(A,I,J) {A==9, I==4, J==8}
+
+
+c     de'pendance sur ce qui pre'ce`de :
+c     doit e^tre re'e'crit :
+c     k = 1
+c     goto 100
+      IF (J.GE.3) GOTO 99999                                            0040
+
+C  P() {0==-1}
+
+      K = 1                                                             0044
+      GOTO 100
+99999 CONTINUE
+
+C  P(A,I,J) {A==9, I==4, J==8}
+
+      K = 3                                                             0041
+
+C  P(A,I,J,K) {A==9, I==4, J==8, K==3}
+
+c     doit e^tre conserve' :
+100   CONTINUE                                                          0061
+
+C  P(A,I,J,K) {A==9, I==4, J==8, K==3}
+
+      I = I+1                                                           0061
+
+C  P(A,I,J,K) {A==9, I==5, J==8, K==3}
+
+
+      STOP                                                              0063
+
+C  P() {0==-1}
+
+
+c     doit e^tre supprime' :
+      J = A                                                             0066
+
+C  P() {0==-1}
+
+
+      RETURN
+      END
+
+Preconditions computed for unspaghettified user code
+
+
+C  P() {}
+
+      PROGRAM UNSTR6
+c     This program should be reduced to the empty program
+      INTEGER A, B
+
+C  P() {}
+
+
+c     inchange' :
+      I = 4                                                             0006
+
+C  P(I) {I==4}
+
+c     doit e^tre re'e'crit :
+c     j = 4
+      IF (I.EQ.5) THEN                                                  0009
+
+C  P() {0==-1}
+
+         J = 3                                                          0010
+      ELSE
+
+C  P(I) {I==4}
+
+         J = 4                                                          0012
+      ENDIF
+
+C  P(I,J) {I==4, J==4}
+
+
+c     doit e^tre re'e'crit :
+c     j = 5
+      IF (.NOT.I.EQ.5) THEN                                             0017
+
+C  P(I,J) {I==4, J==4}
+
+         J = 5                                                          0018
+      ELSE
+
+C  P() {0==-1}
+
+         J = 6                                                          0020
+      ENDIF
+
+C  P(I,J) {I==4, J==5}
+
+
+      IF (I.EQ.5) GOTO 31                                               0023
+
+C  P(I,J) {I==4, J==5}
+
+      PRINT *, 'salut'                                                  0024
+
+C  P(I,J) {I==4, J==5}
+
+31    A = 9                                                             0025
+
+C  P(A,I,J) {A==9, I==4, J==5}
+
+
+c     Ce test est en soit infaisable :
+c     doit e^tre re'e'crit :
+c     j = 8
+      IF (I.GT.5.AND.3.GT.I) THEN                                       0030
+
+C  P() {0==-1}
+
+         J = 7                                                          0031
+      ELSE
+
+C  P(A,I,J) {A==9, I==4, J==5}
+
+         J = 8                                                          0033
+      ENDIF
+
+C  P(A,I,J) {A==9, I==4, J==8}
+
+
+c     de'pendance sur ce qui pre'ce`de :
+c     doit e^tre re'e'crit :
+c     k = 1
+c     goto 100
+      IF (J.GE.3) GOTO 99999                                            0040
+
+C  P() {0==-1}
+
+      K = 1                                                             0044
+      GOTO 100
+99999 CONTINUE
+
+C  P(A,I,J) {A==9, I==4, J==8}
+
+      K = 3                                                             0041
+
+C  P(A,I,J,K) {A==9, I==4, J==8, K==3}
+
+c     doit e^tre conserve' :
+100   CONTINUE                                                          0061
+
+C  P(A,I,J,K) {A==9, I==4, J==8, K==3}
+
+      I = I+1                                                           0061
+
+C  P(A,I,J,K) {A==9, I==5, J==8, K==3}
+
+
+      STOP                                                              0063
+
+C  P() {0==-1}
+
+
+c     doit e^tre supprime' :
+      J = A                                                             0066
+
+C  P() {0==-1}
+
+
+      RETURN
+      END
+
+Preconditions computed after dead code elimination
+
+
+C  P() {}
+
+      PROGRAM UNSTR6
+c     This program should be reduced to the empty program
+      INTEGER A, B
+
+C  P() {}
+
+
+c     inchange' :
+      I = 4                                                             0006
+
+C  P(I) {I==4}
+
+c     doit e^tre re'e'crit :
+c     j = 4
+      J = 4                                                             0012
+
+C  P(I,J) {I==4, J==4}
+
+
+c     doit e^tre re'e'crit :
+c     j = 5
+      J = 5                                                             0018
+
+C  P(I,J) {I==4, J==5}
+
+
+      PRINT *, 'salut'                                                  0024
+
+C  P(I,J) {I==4, J==5}
+
+31    A = 9                                                             0025
+
+C  P(A,I,J) {A==9, I==4, J==5}
+
+
+c     Ce test est en soit infaisable :
+c     doit e^tre re'e'crit :
+c     j = 8
+      J = 8                                                             0033
+
+C  P(A,I,J) {A==9, I==4, J==8}
+
+
+c     de'pendance sur ce qui pre'ce`de :
+c     doit e^tre re'e'crit :
+c     k = 1
+c     goto 100
+      K = 3                                                             0041
+
+C  P(A,I,J,K) {A==9, I==4, J==8, K==3}
+
+c     doit e^tre conserve' :
+100   CONTINUE                                                          0061
+
+C  P(A,I,J,K) {A==9, I==4, J==8, K==3}
+
+      I = I+1                                                           0061
+
+C  P(A,I,J,K) {A==9, I==5, J==8, K==3}
+
+
+      STOP                                                              0063
+
+C  P() {0==-1}
+
+
+c     doit e^tre supprime' :
+
+      RETURN
+      END

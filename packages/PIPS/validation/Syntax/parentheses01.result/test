@@ -1,0 +1,11 @@
+      PROGRAM PARENTHESES01
+
+      READ *, KS                                                        0003
+
+      J = 4*(KS/2)                                                      0005
+
+      K = 4*KS/2                                                        0007
+
+      PRINT *, J, K                                                     0009
+
+      END

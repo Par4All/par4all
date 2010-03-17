@@ -1,0 +1,42 @@
+delete keryell01
+create keryell01 keryell01.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE for keryell01
+echo
+
+display PARSED_PRINTED_FILE[keryell01]
+
+echo
+echo PRINTED FILE for keryell01
+echo
+
+display PRINTED_FILE[keryell01]
+
+echo
+echo PRINTED FILE with effects for keryell01
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[keryell01]
+
+echo
+echo PRINTED FILE with transformers for keryell01
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[keryell01]
+
+close
+
+delete keryell01
+
+quit
+

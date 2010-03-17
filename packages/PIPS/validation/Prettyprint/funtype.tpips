@@ -1,0 +1,13 @@
+#
+# cleaning declarations of functions.
+#
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+delete ft
+create ft funtype.f
+echo # before cleaning declarations
+display PRINTED_FILE[%ALL]
+apply CLEAN_DECLARATIONS[%ALL]
+echo # after cleaning declarations
+display PRINTED_FILE[%ALL]
+close
+delete ft

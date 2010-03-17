@@ -1,0 +1,3 @@
+flint message from check_call, in module WTYPE2, in statement (0.2), number 1
+incompatible dim, 1th arg in call to TOP-LEVEL:FOO, (1<10)
+number of messages from flint for WTYPE2 : 1

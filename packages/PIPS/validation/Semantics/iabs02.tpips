@@ -1,0 +1,8 @@
+delete iabs02
+create iabs02 iabs02.f
+module IABS02
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[IABS02]
+close
+delete iabs02

@@ -1,0 +1,150 @@
+user warning in tp_parse: data09: No such workspace
+Registering file data09.f
+Splitting file    ./data09.f
+  Module         INIT2
+  Module         INIT1
+  Module         DATA09
+Workspace data09 created and opened.
+Main module PROGRAM "DATA09" selected.
+Module DATA09 selected
+Module DATA09 already active.
+Request: build resource PRINTED_FILE for module DATA09.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(DATA09)
+  PARSER                         building   PARSED_CODE(DATA09)
+                                 building   CALLEES(DATA09)
+  CONTROLIZER                    building   CODE(DATA09)
+  PRINT_CODE                     building   PRINTED_FILE(DATA09)
+PRINTED_FILE made for DATA09.
+      PROGRAM DATA09
+
+C     Detect data bug (or ANSI extension...)
+
+      COMMON M
+
+      CALL INIT1                                                        0007
+      CALL INIT2                                                        0008
+
+      PRINT *, M                                                        0010
+
+      END
+Selecting rule: TRANSFORMERS_INTER_FULL
+user warning in activate_phase: Rule `TRANSFORMERS_INTER_FULL' already active
+Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
+user warning in activate_phase: Rule `INTERPROCEDURAL_SUMMARY_PRECONDITION' already active
+Selecting rule: PRECONDITIONS_INTER_FULL
+user warning in activate_phase: Rule `PRECONDITIONS_INTER_FULL' already active
+Selecting rule: PRINT_CODE_PRECONDITIONS
+Module DATA09 already active.
+Request: build resource PRINTED_FILE for module DATA09.
+  FILTER_FILE                    building   SOURCE_FILE(INIT2)
+  PARSER                         building   PARSED_CODE(INIT2)
+                                 building   CALLEES(INIT2)
+user warning in fix_storage: DATA for variable M declared in COMMON *BLANK*: not standard compliant, use a BLOCKDATA
+  CONTROLIZER                    building   CODE(INIT2)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(INIT2)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INIT2)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INIT2)
+  FILTER_FILE                    building   SOURCE_FILE(INIT1)
+  PARSER                         building   PARSED_CODE(INIT1)
+                                 building   CALLEES(INIT1)
+user warning in fix_storage: DATA for variable M declared in COMMON *BLANK*: not standard compliant, use a BLOCKDATA
+  CONTROLIZER                    building   CODE(INIT1)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(INIT1)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INIT1)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INIT1)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(DATA09)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(DATA09)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(DATA09)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(DATA09)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INIT1)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INIT2)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INIT2)
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INIT1)
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(DATA09)
+  CALLGRAPH                      building   CALLERS(DATA09)
+                                 building   CALLERS(INIT1)
+                                 building   CALLERS(INIT2)
+                                 building   HEIGHT(DATA09)
+                                 building   HEIGHT(INIT1)
+                                 building   HEIGHT(INIT2)
+                                 building   DEPTH(DATA09)
+                                 building   DEPTH(INIT1)
+                                 building   DEPTH(INIT2)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(DATA09)
+user warning in main_summary_precondition: Initial preconditions are not consistent.
+ The Fortran standard rules about variable initialization with DATA statements are likely to be violated.
+set property PARSER_ACCEPT_ANSI_EXTENSIONS to false
+and CHECK_FORTRAN_SYNTAX_BEFORE_PIPS to true.
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(DATA09)
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(DATA09)
+PRINTED_FILE made for DATA09.
+
+C  P() {0==-1}
+
+      PROGRAM DATA09
+
+C     Detect data bug (or ANSI extension...)
+
+      COMMON M
+
+C  P() {0==-1}
+
+
+      CALL INIT1                                                        0007
+
+C  P() {0==-1}
+
+      CALL INIT2                                                        0008
+
+C  P() {0==-1}
+
+
+      PRINT *, M                                                        0010
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module DATA09.
+  Closing module INIT1.
+  Closing module INIT2.
+Closing program.
+Closing workspace.
+Workspace data09 closed.
+
+Workspace data09 deleted.
+Registering file data09.f
+Splitting file    ./data09.f
+  Module         INIT2
+  Module         INIT1
+  Module         DATA09
+Workspace data09 created and opened.
+Main module PROGRAM "DATA09" selected.
+Module DATA09 selected
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+Module INIT1 selected
+Request: build resource PRINTED_FILE for module INIT1.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(INIT1)
+  PARSER                         building   PARSED_CODE(INIT1)
+                                 building   CALLEES(INIT1)
+user warning in fix_storage: DATA for variable M declared in COMMON *BLANK*: not standard compliant, use a BLOCKDATA
+user error in fix_storage: Parser error between lines 8 and 8
+Improper DATA declaration, use a BLOCKDATA or set property PARSER_ACCEPT_ANSI_EXTENSIONS
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module INIT1.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module DATA09.
+  Closing module INIT1.
+  Closing module INIT2.
+Closing program.
+Closing workspace.
+Workspace data09 closed.
+
+Workspace data09 deleted.

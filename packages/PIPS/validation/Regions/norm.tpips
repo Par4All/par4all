@@ -1,0 +1,12 @@
+delete norm
+create norm norm.f
+setproperty ABORT_ON_USER_ERROR TRUE
+module NORM
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+activate MUST_REGIONS
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[NORM]
+close
+delete norm
+quit

@@ -1,0 +1,10 @@
+# discrepancy between declarations of common /TOTO/
+
+delete common2
+create common2 common2.f
+display PRINTED_FILE[COMMON2]
+display PRINTED_FILE[FOO]
+close
+delete common2
+quit
+

@@ -1,0 +1,29 @@
+delete redlec
+
+create redlec redlec.f
+
+setproperty PRETTYPRINT_BLOCKS FALSE
+# setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+# setproperty PRETTYPRINT_ALL_LABELS TRUE
+# setproperty PRETTYPRINT_CHECK_IO_STATEMENTS TRUE
+# setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
+# setproperty PRETTYPRINT_FINAL_RETURN TRUE
+# setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+echo
+echo Output of the parser
+echo
+
+display PARSED_PRINTED_FILE[REDLEC]
+
+echo
+echo Output of the controlizer
+echo
+
+display PRINTED_FILE[REDLEC]
+
+apply UNSPLIT
+shell f77 -c redlec.database/Src/redlec.f
+close
+# delete redlec

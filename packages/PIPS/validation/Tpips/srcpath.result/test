@@ -1,0 +1,21 @@
+! looking for one file in one dir
+!
+! tpips must look for the source thu PIPS_SRCPATH
+!
+      PROGRAM SRCPATH
+      PRINT *, 'found!'                                                 0001
+      END
+! looking in two dirs...
+!
+! tpips must look for the source thu PIPS_SRCPATH
+!
+      PROGRAM SRCPATH
+      PRINT *, 'found!'                                                 0001
+      END
+      SUBROUTINE SUB1
+      PRINT *, 'sub1'                                                   0001
+      END
+      SUBROUTINE SUB2
+      PRINT *, 'sub2'                                                   0001
+      END
+

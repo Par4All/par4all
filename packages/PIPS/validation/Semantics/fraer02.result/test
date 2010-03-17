@@ -1,0 +1,117 @@
+
+Transformers for FRAER02 (integer division)
+
+
+C  T(Q,R) {0<=Q, Q+R<=X, 0<=R, R+1<=Y, 0<=X, 1<=Y}
+
+      SUBROUTINE FRAER02(X, Y, Q, R)
+
+c     Example on Page 30, Fraer's PhD
+
+c     We cannot get that r is decreasing because the transformer for the
+c     while loop is computed withtout precondition information
+
+c     We do not get r >= 0 at the print because the while loop
+c     precondition computation probably does not execute a last
+c     iteration under the proper conditions (as has been added for DO
+c     loops)
+
+      INTEGER X, Y, Q, R
+
+C  T(Q,R) {0<=Q, Q+R<=X, 0<=R, R+1<=Y, 0<=X, 1<=Y}
+
+
+      IF (X.LT.0.OR.Y.LE.0) THEN                                        0015
+
+C  T() {0==-1}
+
+         STOP                                                           0016
+      ELSE
+
+C  T(Q) {Q==0, 0<=X, 1<=Y}
+
+         Q = 0                                                          0018
+
+C  T(R) {Q==0, R==X, 0<=R, 1<=Y}
+
+         R = X                                                          0019
+
+C  T(Q,R) {Q#init==0, R#init==X, 0<=Q, Q+R<=R#init, Y<=R, 0<=R#init,
+C    Y<=R#init, 1<=Y}
+
+         DO WHILE (R.GE.Y)                                              0020
+
+C  T(Q) {Q==Q#init+1, Y<=R, Y<=X, 1<=Y}
+
+            Q = Q+1                                                     0021
+
+C  T(R) {R+Y==R#init, Y<=R#init, Y<=X, 1<=Y}
+
+            R = R-Y                                                     0022
+         ENDDO
+      ENDIF
+
+C  T() {0<=Q, Q+R<=X, 0<=R, R+1<=Y, 0<=X, 1<=Y}
+
+
+      PRINT *, X, Y, Q, R                                               0026
+
+      END
+
+Preconditions for FRAER02 (integer division)
+
+
+C  P() {}
+
+      SUBROUTINE FRAER02(X, Y, Q, R)
+
+c     Example on Page 30, Fraer's PhD
+
+c     We cannot get that r is decreasing because the transformer for the
+c     while loop is computed withtout precondition information
+
+c     We do not get r >= 0 at the print because the while loop
+c     precondition computation probably does not execute a last
+c     iteration under the proper conditions (as has been added for DO
+c     loops)
+
+      INTEGER X, Y, Q, R
+
+C  P() {}
+
+
+      IF (X.LT.0.OR.Y.LE.0) THEN                                        0015
+
+C  P() {}
+
+         STOP                                                           0016
+      ELSE
+
+C  P() {0<=X, 1<=Y}
+
+         Q = 0                                                          0018
+
+C  P(Q) {Q==0, 0<=X, 1<=Y}
+
+         R = X                                                          0019
+
+C  P(Q,R) {Q==0, R==X, 0<=R, 1<=Y}
+
+         DO WHILE (R.GE.Y)                                              0020
+
+C  P(Q,R) {0<=Q, Q+R<=X, Y<=R, 1<=Y}
+
+            Q = Q+1                                                     0021
+
+C  P(Q,R) {1<=Q, Q+R<=X+1, Y<=R, Y<=X, 1<=Y}
+
+            R = R-Y                                                     0022
+         ENDDO
+      ENDIF
+
+C  P(Q,R) {0<=Q, Q+R<=X, 0<=R, R+1<=Y}
+
+
+      PRINT *, X, Y, Q, R                                               0026
+
+      END

@@ -1,0 +1,17 @@
+#
+delete omp
+create omp omp.f
+apply PRIVATIZE_MODULE(P)
+echo ## DOALL style
+display PARALLELPRINTED_FILE(P)
+echo ## HPF style
+activate PRINT_PARALLELIZEDHPF_CODE
+display PARALLELPRINTED_FILE(P)
+echo ## OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(P)
+echo ## done
+close
+delete omp
+quit
+# EOF

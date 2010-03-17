@@ -1,0 +1,51 @@
+
+Parsed printed file
+
+      PROGRAM IBSET01
+
+      INTEGER I
+      INTEGER J
+
+      I = 4                                                             0006
+      J = IBSET(I, 5)                                                   0007
+      PRINT *, 'J = ', J                                                0008
+
+      END
+
+Proper effects
+
+      PROGRAM IBSET01
+
+      INTEGER I
+      INTEGER J
+C               <must be written>: I
+
+      I = 4                                                             0006
+C               <must be read   >: I
+C               <must be written>: J
+      J = IBSET(I, 5)                                                   0007
+C               <must be read   >: J __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'J = ', J                                                0008
+
+      END
+
+Cumulated effetcs
+
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM IBSET01
+
+      INTEGER I
+      INTEGER J
+C               <must be written>: I
+
+      I = 4                                                             0006
+C               <must be read   >: I
+C               <must be written>: J
+      J = IBSET(I, 5)                                                   0007
+C               <must be read   >: J __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'J = ', J                                                0008
+
+      END

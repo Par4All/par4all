@@ -1,0 +1,28 @@
+C Une suite de if ... else if ... else if .... endif ne parse pas
+C
+      SUBROUTINE ELSEIF
+      IF (I.LE.0) THEN                                                  0004
+         J = 11                                                         0005
+         IF (I.LT.2) THEN                                               0006
+            J = 12                                                      0007
+         ELSEIF (I.LT.3) THEN                                           0006
+            J = 13                                                      0010
+         ENDIF
+         DO 10 I = 1, 10                                                0013
+            IF (X.GE.TPRIME) THEN                                       0014
+               J = 5                                                    0015
+               IF (KMODELE.EQ.1) THEN                                   0016
+                  J = 6                                                 0017
+               ELSEIF (KMODELE.EQ.0) THEN                               0016
+                  J = 7                                                 0020
+               ELSE
+                  STOP                                                  0022
+               ENDIF
+            ELSE
+               J = 9                                                    0026
+            ENDIF
+10          CONTINUE                                                    0028
+      ELSE
+         J = 10                                                         0030
+      ENDIF
+      END

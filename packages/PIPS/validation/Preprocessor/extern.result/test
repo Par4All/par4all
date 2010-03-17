@@ -1,0 +1,7 @@
+extern int foo(int i);
+extern main();
+# 2
+main()
+{
+  extern int i,j;
+}

@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# test pips on ctrl.f
+#
+#if Pips -f ctrl.f -w ctrl -m ctrl -s rfulldg -p priv -b PPF >&2
+#then 
+#	Delete ctrl>&2
+if Init -f ctrl.f ctrl >&2
+then
+	Select -w ctrl rfulldg>&2
+	Perform -m ctrl priv>&2
+	if Display -m ctrl
+	then 
+		Delete ctrl
+	else
+		echo Parallelization faileds
+		Delete ctrl
+		exit 2
+	fi
+else 
+    	echo Parallelization failed 
+	Delete ctrl
+	exit 1
+fi

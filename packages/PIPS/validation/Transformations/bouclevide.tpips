@@ -1,0 +1,37 @@
+delete bouclevide
+
+# setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
+# setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+create bouclevide bouclevide.f
+module TEST1
+
+echo ## Code Initial
+display PRINTED_FILE[TEST1]
+
+
+apply RESTRUCTURE_CONTROL
+echo ## apres restructuration
+display PRINTED_FILE[TEST1]
+
+apply UNSPAGHETTIFY
+echo ## apres unspaghettify
+display PRINTED_FILE[TEST1]
+
+
+apply SUPPRESS_DEAD_CODE[TEST1]
+echo ## apres DeadCode
+display PRINTED_FILE[TEST1]
+
+
+apply SUPPRESS_TRIVIAL_TEST[TEST1]
+echo ## apres DeadTestElim
+display PRINTED_FILE[TEST1]
+close
+delete bouclevide
+quit
+
+
+
+

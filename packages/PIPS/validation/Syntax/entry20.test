@@ -1,0 +1,31 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete entry20
+create entry20 entry20.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY20
+echo
+
+# display PARSED_PRINTED_FILE[ENTRY20]
+display PRINTED_FILE[ENTRY20]
+
+close
+delete entry20
+quit
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+
+close
+delete entry20
+quit
+EOF

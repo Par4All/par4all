@@ -1,0 +1,55 @@
+// OMP style
+int main()
+{
+   int b[size];                                                         /*0003*/
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   i = 0;                                                               /*0006*/
+   j = 0;                                                               /*0007*/
+
+
+#pragma omp parallel for 
+   for(i = 0; i <= size-1; i += 1)
+      b[i] = 0;                                                         /*0010*/
+
+
+#pragma omp parallel for private(i)
+   for(j = 0; j <= size-1; j += 1)
+      for(i = 0; i <= 99; i += 1)
+         b[j] = b[j]+i;                                                 /*0015*/
+
+
+   for(i = 0; i <= 99; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= size-1; j += 1)
+         b[j] = b[j]+i;                                                 /*0021*/
+
+   return 0;                                                            /*0025*/
+}
+int main()
+{
+   int b[size];                                                         /*0003*/
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   i = 0;                                                               /*0006*/
+   j = 0;                                                               /*0007*/
+
+
+#pragma omp parallel for
+   for(i = 0; i <= size-1; i += 1)
+      b[i] = 0;                                                         /*0010*/
+
+
+#pragma omp parallel for private(i)
+   for(j = 0; j <= size-1; j += 1)
+      for(i = 0; i <= 99; i += 1)
+         b[j] = b[j]+i;                                                 /*0015*/
+
+
+   for(i = 0; i <= 99; i += 1)
+#pragma omp parallel for
+      for(j = 0; j <= size-1; j += 1)
+         b[j] = b[j]+i;                                                 /*0021*/
+
+   return 0;                                                            /*0025*/
+}

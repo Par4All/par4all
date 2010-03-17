@@ -1,0 +1,36 @@
+C                                     2.17*N^3 + 8.50*N^2 + 7.33*N + 2 (SUMMARY)
+C
+C     CHOLESKI METHOD - VERSION 1
+C
+C     PRIVATIZATION
+C     DEPENDENCE COMPUTATION WITH AND WITHOUT EXECUTION CONTEXT
+C
+      SUBROUTINE CHOLES(A, P, N)
+      REAL X, A(N,N), P(N)
+C                                     2.17*N^3 + 8.50*N^2 + 7.33*N + 2 (DO)
+C
+      DO I = 1, N                                                       0010
+C                                                                    5 (STMT)
+         X = A(I,I)                                                     0011
+C                                                            13*I - 10 (DO)
+         DO K = 1, I-1                                                  0012
+C                                                                   13 (STMT)
+            X = X-A(I,K)*A(I,K)                                         0013
+         ENDDO
+C                                                                    5 (STMT)
+         P(I) = 1.0/SQRT(X)                                             0015
+C                                     -13*I^2 + 13*I.N - 4*I + 4*N + 4 (DO)
+         DO J = I+1, N                                                  0016
+C                                                                    5 (STMT)
+            X = A(I,J)                                                  0017
+C                                                            13*I - 10 (DO)
+            DO KK = 1, I-1                                              0018
+C                                                                   13 (STMT)
+               X = X-A(I,J)*A(I,KK)                                     0019
+            ENDDO
+C                                                                    8 (STMT)
+            A(J,I) = X*P(I)                                             0021
+         ENDDO
+      ENDDO
+C
+      END

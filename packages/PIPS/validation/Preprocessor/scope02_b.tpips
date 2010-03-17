@@ -1,0 +1,28 @@
+delete scope02_b
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
+create scope02_b scope02_b.c
+
+# This file does not contain any function. It is an empty compilation
+# unit. Hence the compilation unit must be used in the resulting "test" file.
+# A % percent sign is added to the selection rule below, as well as a #.
+# display C_SOURCE_FILE[%ALL]
+
+# Get rid of preprocessed files
+shell rm -f scope02_b.database/Tmp/*.c
+shell cat scope02_b.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+
+close
+delete scope02_b
+quit
+
+# How can you guess whether it is a C file or a Fortran file?
+activate C_PARSER
+
+display PRINTED_FILE
+
+close
+delete scope02_b
+quit

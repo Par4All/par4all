@@ -1,0 +1,7 @@
+delete chars
+create chars chars.f
+setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
+display PRINTED_FILE
+close
+delete chars
+quit

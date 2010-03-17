@@ -1,0 +1,31 @@
+user warning in tp_parse: param03: No such workspace
+Registering file param03.f
+Splitting file    ./param03.f
+  Module         PARAM03
+Workspace param03 created and opened.
+Module PARAM03 selected
+Main module PROGRAM "PARAM03" selected.
+Module PARAM03 already active.
+Module PARAM03 already active.
+Module PARAM03 already active.
+Request: build resource PRINTED_FILE for module PARAM03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(PARAM03)
+  PARSER                         building   PARSED_CODE(PARAM03)
+                                 building   CALLEES(PARAM03)
+user warning in MakeParameter: Symbol FOO redefined as parameter
+user error in MakeParameter: Parser error between lines 6 and 6
+A symbol cannot be redefined as a parameter
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module PARAM03.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module PARAM03.
+Closing program.
+Closing workspace.
+Workspace param03 closed.
+
+Workspace param03 deleted.

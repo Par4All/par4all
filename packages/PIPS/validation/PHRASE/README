@@ -1,0 +1,37 @@
+These are some files to validate the old PHRASE project.
+
+PHRASE (Parallel Heterogeneous Reconfigurable Achitectures and SystEms)
+Document Actions
+
+    * Send this page to somebody
+    * Print this page
+
+PHRASE uses advanced compilation techniques to ease the design and the programmation of high performance SoC with heterogeneous parallelism and (re)configurable hardware.
+
+It is implemented with PIPS and has a back-end for the MADEO tool from UBO/AS to run on reconfigurable resources.
+Description
+
+    * some code marked by the user in the high level algorithm written in Fortran or C is transformed to a call to an hardware function with equivalent function
+    * source to source transformations seen as hardware synthesis to investigate, optimize,... the application to run on various resources
+    * use the PIPS array regions to compute the operand transfers from and to the hardware operators
+    * control flow graph is flatten to generate the finite state machine equivalent code directly executable in hardware. The control flow graph hierarchy can be used to build a hierarchical finite state machine if asked
+    * deal with multiple instance of the same hardware operator to use operator parallelism
+    * a SmallTalk prettyprinter has been added to PIPS to link the internal representation to the MADEO tool that deal with the concrete hardware generation for reconfigurable hardware
+    * since PIPS is a source-to-source compiler, the PHRASE output can still be done in C or Fortran to have a functional equivalent program seen as a soft simulator of the target architecture. It is quite useful for debugging or hardware/software performance comparison
+    * software/hardware pipelining not finished yet.
+
+Collaborations
+
+CoMap
+Members
+
+Sylvain Guérin, Ronan Keryell, Bernt Weber
+
+
+http://enstb.org/~keryell/publications/rapports/2004/PHRASE/toReconfig/
+http://enstb.org/~keryell/publications/conf/2005/ReCoSoC/
+https://info.enstb.org/projets/phrase
+
+This project is going on with CoMap, SAFESCALE and FREIA :
+https://comap.enstb.org/
+https://freia.enstb.org/

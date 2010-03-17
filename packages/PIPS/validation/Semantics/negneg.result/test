@@ -1,0 +1,28 @@
+
+C  P() {}
+
+C     Test of .NE. handling in the false branch
+
+      SUBROUTINE NEGNEG(I,J)
+
+C  P() {}
+
+
+      IF (I.NE.J) THEN                                                  0005
+
+C  P() {}
+
+         I = J                                                          0006
+      ELSE
+
+C  P() {I==J}
+
+         K = 3                                                          0008
+      ENDIF
+
+C  P(I,K) {I==J}
+
+
+      PRINT *, I, J, K                                                  0011
+
+      END

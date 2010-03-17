@@ -1,0 +1,29 @@
+delete formal_function
+create formal_function formal_function.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv  PRETTYPRINT_DEBUG_LEVEL 7
+
+echo
+echo Printed file for "formal_function!"
+echo
+
+display PRINTED_FILE[formal_function!]
+
+echo
+echo Unsplit formal_function
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat formal_function.database/Src/formal_function.c
+
+close
+delete formal_function
+
+quit

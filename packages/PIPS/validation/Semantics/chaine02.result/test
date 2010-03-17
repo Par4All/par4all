@@ -1,0 +1,472 @@
+'initial exec'
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -bye-hi -
+ s1 != s2
+ s1 <  s2
+ s1 <= s2
+ -hi -bye-
+ s1 != s2
+ s1 >  s2
+ s1 >= s2
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -   -   -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+
+C  T() {}
+
+      PROGRAM CHAINE02
+      CHARACTER*3 S1, S2
+
+C  T(S1) {'hi'==S1}
+
+!
+      S1 = 'hi'                                                         0004
+
+C  T(S2) {'hi '==S2}
+
+      S2 = 'hi '                                                        0005
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0006
+
+C  T() {}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0007
+
+C  T() {}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0010
+
+C  T() {}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0013
+
+C  T() {}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0016
+
+C  T() {}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0019
+
+C  T() {}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0022
+
+C  T(S1) {'bye'==S1}
+
+!
+      S1 = 'bye'                                                        0026
+
+C  T(S2) {'hi'==S2}
+
+      S2 = 'hi'                                                         0027
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0028
+
+C  T() {}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0029
+
+C  T() {}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0032
+
+C  T() {}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0035
+
+C  T() {}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0038
+
+C  T() {}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0041
+
+C  T() {}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0044
+
+C  T(S1) {'hi'==S1}
+
+!
+      S1 = 'hi'                                                         0048
+
+C  T(S2) {'bye'==S2}
+
+      S2 = 'bye'                                                        0049
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0050
+
+C  T() {}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0051
+
+C  T() {}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0054
+
+C  T() {}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0057
+
+C  T() {}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0060
+
+C  T() {}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0063
+
+C  T() {}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0066
+
+C  T(S1) {'hi '==S1}
+
+!
+      S1 = 'hi world'                                                   0070
+
+C  T(S2) {'hi'==S2}
+
+      S2 = 'hi'                                                         0071
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0072
+
+C  T() {}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0073
+
+C  T() {}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0076
+
+C  T() {}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0079
+
+C  T() {}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0082
+
+C  T() {}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0085
+
+C  T() {}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0088
+
+C  T(S1) {'   '==S1}
+
+!
+      S1 = '   '                                                        0092
+
+C  T(S2) {' '==S2}
+
+      S2 = ' '                                                          0093
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0094
+
+C  T() {}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0095
+
+C  T() {}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0098
+
+C  T() {}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0101
+
+C  T() {}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0104
+
+C  T() {}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0107
+
+C  T() {}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0110
+      END
+
+C  P() {}
+
+      PROGRAM CHAINE02
+      CHARACTER*3 S1, S2
+
+C  P() {}
+
+!
+      S1 = 'hi'                                                         0004
+
+C  P(S1) {'hi'==S1}
+
+      S2 = 'hi '                                                        0005
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0006
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0007
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0010
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0013
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0016
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0019
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0022
+
+C  P(S1,S2) {'hi '==S2, 'hi'==S1}
+
+!
+      S1 = 'bye'                                                        0026
+
+C  P(S1,S2) {'bye'==S1, 'hi '==S2}
+
+      S2 = 'hi'                                                         0027
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0028
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0029
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0032
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0035
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0038
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0041
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0044
+
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+
+!
+      S1 = 'hi'                                                         0048
+
+C  P(S1,S2) {'hi'==S1, S1==S2, 'bye'<=S1}
+
+      S2 = 'bye'                                                        0049
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0050
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0051
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0054
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0057
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0060
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0063
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0066
+
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+
+!
+      S1 = 'hi world'                                                   0070
+
+C  P(S1,S2) {'bye'==S2, 'hi '==S1, S2<='hi'}
+
+      S2 = 'hi'                                                         0071
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0072
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0073
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0076
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0079
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0082
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0085
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0088
+
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+
+!
+      S1 = '   '                                                        0092
+
+C  P(S1,S2) {'   '==S1, 'hi'==S2, 'bye'<=S2}
+
+      S2 = ' '                                                          0093
+
+C  P(S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi'}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0094
+
+C  P(S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi'}
+
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0095
+
+C  P(S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi'}
+
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0098
+
+C  P(S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi'}
+
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0101
+
+C  P(S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi'}
+
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0104
+
+C  P(S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi'}
+
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0107
+
+C  P(S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi'}
+
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0110
+      END
+      PROGRAM CHAINE02
+      CHARACTER*3 S1, S2
+!
+      S1 = 'hi'                                                         0004
+      S2 = 'hi '                                                        0005
+      PRINT *, '-', S1, '-', S2, '-'                                    0006
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0007
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0010
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0013
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0016
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0019
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0022
+!
+      S1 = 'bye'                                                        0026
+      S2 = 'hi'                                                         0027
+      PRINT *, '-', S1, '-', S2, '-'                                    0028
+      PRINT *, 's1 != s2'                                               0033
+      PRINT *, 's1 <  s2'                                               0036
+      PRINT *, 's1 <= s2'                                               0042
+!
+      S1 = 'hi'                                                         0048
+      S2 = 'bye'                                                        0049
+      PRINT *, '-', S1, '-', S2, '-'                                    0050
+      PRINT *, 's1 != s2'                                               0055
+      PRINT *, 's1 >  s2'                                               0061
+      PRINT *, 's1 >= s2'                                               0067
+!
+      S1 = 'hi world'                                                   0070
+      S2 = 'hi'                                                         0071
+      PRINT *, '-', S1, '-', S2, '-'                                    0072
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0073
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0076
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0079
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0082
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0085
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0088
+!
+      S1 = '   '                                                        0092
+      S2 = ' '                                                          0093
+      PRINT *, '-', S1, '-', S2, '-'                                    0094
+      IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0095
+      IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0098
+      IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0101
+      IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0104
+      IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0107
+      IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0110
+      END
+'optimized exec'
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -bye-hi -
+ s1 != s2
+ s1 <  s2
+ s1 <= s2
+ -hi -bye-
+ s1 != s2
+ s1 >  s2
+ s1 >= s2
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -   -   -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+

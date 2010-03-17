@@ -1,0 +1,12 @@
+#! /bin/sh
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+delete stagf1
+create stagf1 stagf1.f
+display PRINTED_FILE
+close
+delete stagf1
+quit
+EOF

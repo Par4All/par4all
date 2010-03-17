@@ -1,0 +1,34 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+create double_if double_if.f
+set DEAD_CODE_DISPLAY_STATISTICS TRUE
+
+echo
+echo Preconditions computed for user code
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo
+echo Preconditions computed for unspaghettified user code
+echo
+
+apply UNSPAGHETTIFY 
+display PRINTED_FILE
+
+echo
+echo Preconditions computed after dead code elimination
+echo
+
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+close
+delete double_if
+quit
+EOF
+
+exit $?

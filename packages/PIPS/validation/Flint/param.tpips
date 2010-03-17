@@ -1,0 +1,18 @@
+delete p
+create p param.f
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+echo #### before type checking
+display PRINTED_FILE[%ALL]
+apply TYPE_CHECKER[%ALL]
+echo #### after type checking
+display PRINTED_FILE[%ALL]
+apply UNSPLIT
+close
+
+echo run resulting code
+! f77 -o p.out p.database/Src/param.f
+! ./p.out
+! rm ./p.out
+
+delete p
+quit

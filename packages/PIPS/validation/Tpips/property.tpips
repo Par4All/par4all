@@ -1,0 +1,48 @@
+#
+# properties and user errors...
+#
+delete property
+echo ! testing properties errors and persistance with tpips!
+echo ! initial values
+getproperty COMPLEXITY_PRINT_STATISTICS
+getproperty COMPUTE_ALL_DEPENDENCES 
+echo ! new values
+setproperty COMPLEXITY_PRINT_STATISTICS 1
+setproperty COMPUTE_ALL_DEPENDENCES TRUE
+getproperty COMPLEXITY_PRINT_STATISTICS
+getproperty COMPUTE_ALL_DEPENDENCES
+#
+# syntax errors.
+#
+setproperty ABORT_ON_USER_ERROR
+setproperty f ifjh fk fhds f sfdhaskd f
+setproperty 47239 nbf48yfhcnw4w c492jfkjldu48329xmdri[cxn2rc 8950cmc[m " 
+#
+# now with a workspace
+#
+create property property.f
+#
+# more syntax errors.
+#
+setproperty here is another not wellcomed!
+getproperty FOOF OOOF OF O F OFOFOFOFOF 
+getproperty FOO
+setproperty PRETTY=2
+getproperty PRETTY 
+echo ! if this message appear, we get through many user errors;-)
+#
+# get one real now!
+#
+getproperty ABORT_ON_USER_ERROR
+close
+#
+# check that properties were indeed saved in the database.
+#
+open property
+echo ! saved values
+getproperty COMPLEXITY_PRINT_STATISTICS
+getproperty COMPUTE_ALL_DEPENDENCES
+close
+delete property
+echo ! done
+quit

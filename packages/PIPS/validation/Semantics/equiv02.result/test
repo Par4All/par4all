@@ -1,0 +1,51 @@
+
+C  T(I) {}
+
+      PROGRAM EQUIV02
+
+C     Check alias detection
+
+      COMMON I
+
+C  T(I) {I==0}
+
+
+      I = 0                                                             0007
+
+C  T(I) {}
+
+
+      CALL FOO                                                          0009
+
+C  T() {}
+
+
+      PRINT *, I                                                        0011
+
+      END
+
+C  P() {}
+
+      PROGRAM EQUIV02
+
+C     Check alias detection
+
+      COMMON I
+
+C  P() {}
+
+
+      I = 0                                                             0007
+
+C  P(I) {I==0}
+
+
+      CALL FOO                                                          0009
+
+C  P(I) {}
+
+
+      PRINT *, I                                                        0011
+
+      END
+

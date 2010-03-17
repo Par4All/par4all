@@ -1,0 +1,12 @@
+delete trusted_ref01
+create trusted_ref01 trusted_ref01.f
+module TRUSTED_REF01
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[TRUSTED_REF01]
+
+close
+delete trusted_ref01

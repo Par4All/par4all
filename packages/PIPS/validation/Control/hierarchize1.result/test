@@ -1,0 +1,53 @@
+      PROGRAM HIERARCHIZE1
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      PRINT *, 1                                                        0003
+C (0,3)
+
+      IF (A.EQ.0) THEN                                                  0005
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C (0,6)
+
+         PRINT *, 2                                                     0007
+C (0,7)
+C        BEGIN UNSTRUCTURED
+C (1,1)
+
+3        PRINT *, 3                                                     0009
+C (2,1)
+
+         IF (B.EQ.0) GOTO 5                                             0011
+C (7,1)
+
+4        PRINT *, 4                                                     0013
+         GOTO 3
+C (3,1)
+
+5        PRINT *, 5                                                     0016
+C (4,1)
+         IF (C.EQ.0) GOTO 7                                             0017
+C (6,1)
+
+6        PRINT *, 6                                                     0019
+         GOTO 4
+C (5,1)
+
+7        CONTINUE                                                       0022
+C        END UNSTRUCTURED
+C (0,8)
+         PRINT *, 7                                                     0022
+C        END BLOCK
+      ENDIF
+C (0,9)
+
+9     CONTINUE                                                          0024
+C (0,10)
+      PRINT *, 9                                                        0024
+
+C     END BLOCK
+      END
+

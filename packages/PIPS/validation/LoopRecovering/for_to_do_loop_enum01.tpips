@@ -1,0 +1,41 @@
+delete for_to_do_loop_enum01
+create for_to_do_loop_enum01 for_to_do_loop_enum01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+#activate REGION_CHAINS
+# Compute the intraprocedural preconditions at the same time as
+#   transformers and use them to improve the accuracy of expression
+#   and statement transformers:
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+# Use the more precise fix point operator to cope with while loops:
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+display PRINTED_FILE[main]
+
+apply FOR_LOOP_TO_DO_LOOP
+
+display PRINTED_FILE[main]
+
+
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE
+
+apply UNSPLIT[%PROGRAM]
+
+close
+delete for_to_do_loop_enum01
+
+quit

@@ -1,0 +1,54 @@
+
+Main parsed first
+
+      PROGRAM EXTERNAL07
+
+C     Check the type consistency check option: PARSER_TYPE_CHECK_CALL_SITES
+C     (it does not seem to work)
+C     Check two parsing orders: F before or after EXTERNAL07
+C     When F is called first, MakeAtom understands "call g(f)" as call "g(f())"
+
+      EXTERNAL F
+
+      CALL G(F)                                                         0010
+
+      CALL F(I, J)                                                      0012
+
+      CALL H                                                            0014
+
+      END
+
+      SUBROUTINE F(I)
+
+      PRINT *, I                                                        0004
+
+      END
+
+Main parsed last
+
+
+      SUBROUTINE H
+      STOP                                                              0003
+      END
+
+      SUBROUTINE F(I)
+
+      PRINT *, I                                                        0004
+
+      END
+      PROGRAM EXTERNAL07
+
+C     Check the type consistency check option: PARSER_TYPE_CHECK_CALL_SITES
+C     (it does not seem to work)
+C     Check two parsing orders: F before or after EXTERNAL07
+C     When F is called first, MakeAtom understands "call g(f)" as call "g(f())"
+
+      EXTERNAL F
+
+      CALL G(F)                                                         0010
+
+      CALL F(I, J)                                                      0012
+
+      CALL H                                                            0014
+
+      END

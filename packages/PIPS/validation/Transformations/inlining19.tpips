@@ -1,0 +1,46 @@
+delete inlining19
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining19 inlining19.src/inlining19.c inlining19.src/inlining19-foo.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+activate C_PARSER
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[foo]
+display PRINTED_FILE[inlining19]
+
+
+echo
+echo Code after flattening
+echo
+
+apply FLATTEN_CODE[inlining19]
+display PRINTED_FILE[inlining19]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -c inlining19.database/Src/inlining19.c inlining19.database/Src/inlining19-foo.c
+shell rm -f inlining19.o inlining19-foo.o
+
+close
+delete inlining19
+quit

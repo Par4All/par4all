@@ -1,0 +1,85 @@
+!! Initial file
+!
+! forward substitution example 
+!
+      PROGRAM FS02
+
+      INTEGER N, I, J
+      PARAMETER (N=100)
+
+      REAL A(N,N), B(N)
+      REAL X1, X2, X3
+
+      DO I = 1, N                                                       0012
+         X1 = B(I)                                                      0013
+         X2 = X1*X1+X1                                                  0014
+         DO J = 1, N                                                    0015
+            X3 = X1+X2                                                  0016
+            A(I,J) = A(I,J)*X3+X2-1                                     0017
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,20)                                                  0021
+
+      END
+!! After forward substitution
+!
+! forward substitution example 
+!
+      PROGRAM FS02
+
+      INTEGER N, I, J
+      PARAMETER (N=100)
+
+      REAL A(N,N), B(N)
+      REAL X1, X2, X3
+
+      DO I = 1, N                                                       0012
+         X1 = B(I)                                                      0013
+         X2 = B(I)*B(I)+B(I)                                            0014
+         DO J = 1, N                                                    0015
+            X3 = B(I)+B(I)*B(I)+B(I)                                    0016
+            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,20)                                                  0021
+
+      END
+!! After use-def elimination
+!
+! forward substitution example 
+!
+      PROGRAM FS02
+
+      INTEGER N, I, J
+      PARAMETER (N=100)
+
+      REAL A(N,N), B(N)
+      REAL X1, X2, X3
+
+      DO I = 1, N                                                       0012
+         DO J = 1, N                                                    0015
+            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,20)                                                  0021
+
+      END
+!! After cleaning declarations
+      PROGRAM FS02
+      INTEGER*4 N
+      PARAMETER (N = 100)
+      INTEGER I, J
+      REAL*4 A(1:N, 1:N), B(1:N)
+
+      DO I = 1, N                                                       0012
+         DO J = 1, N                                                    0015
+            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,20)                                                  0021
+
+      END

@@ -1,0 +1,147 @@
+      SUBROUTINE WP65(PROC_ID)
+      INTEGER*4 idiv
+      EXTERNAL idiv
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J,K_0,L_K,L_I_1,L_I_2
+     &,L_K_1,L_K_2
+      REAL*4 L_A_0_0(0:24,0:24),L_B_0_0(0:24,0:99),L_C_0_0(0:99,0:24)
+
+C     WP65 DISTRIBUTED CODE FOR MATMUL
+
+C     To scan the tile set for WP65
+      DO 99973 I_0 = PROC_ID, 3, 4
+         DO 99974 J_0 = 0, 3
+            DOALL BANK_ID = 0, 3
+               DO 99995 L_J = 0, 24
+                  DO 99996 L = MAX(0, idiv(3-BANK_ID+25*J_0+L_J, 4))
+     &            , MIN(24, idiv(-BANK_ID+25*J_0+L_J, 4))
+                     L_I_1 = 0
+                     L_I_2 = 24
+                     IF (L_I_1.LE.L_I_2) THEN
+                        CALL WP65_RECEIVE_4(BANK_ID, L_A_0_0(L_I_1,
+     &                  L_J), L_I_2-L_I_1+1)
+                     ENDIF
+99996                CONTINUE
+99995             CONTINUE
+99994          CONTINUE
+            ENDDO
+            DOALL BANK_ID = 0, 3
+               DO 99990 L_K = 0, 99
+                  DO 99991 L = MAX(0, idiv(3-BANK_ID+L_K, 4)), MIN(24
+     &            , idiv(-BANK_ID+L_K, 4))
+                     L_I_1 = 0
+                     L_I_2 = 24
+                     IF (L_I_1.LE.L_I_2) THEN
+                        CALL WP65_RECEIVE_4(BANK_ID, L_B_0_0(L_I_1,
+     &                  L_K), L_I_2-L_I_1+1)
+                     ENDIF
+99991                CONTINUE
+99990             CONTINUE
+99989          CONTINUE
+            ENDDO
+            DOALL BANK_ID = 0, 3
+               DO 99985 L_J = 0, 24
+                  DO 99986 L = MAX(0, idiv(3-BANK_ID+25*J_0+L_J, 4))
+     &            , MIN(24, idiv(-BANK_ID+25*J_0+L_J, 4))
+                     L_K_1 = 0
+                     L_K_2 = 99
+                     IF (L_K_1.LE.L_K_2) THEN
+                        CALL WP65_RECEIVE_4(BANK_ID, L_C_0_0(L_K_1,
+     &                  L_J), L_K_2-L_K_1+1)
+                     ENDIF
+99986                CONTINUE
+99985             CONTINUE
+99984          CONTINUE
+            ENDDO
+C           To scan each iteration of the current tile
+            DO 99975 L_I = 0, 24
+               DO 99976 L_J = 0, 24
+                  DO 99977 L_K = 0, 99
+                     L_A_0_0(L_I,L_J) = L_A_0_0(L_I,L_J)+L_B_0_0(L_I,
+     &               L_K)*L_C_0_0(L_K,L_J)
+100                  CONTINUE
+99977                CONTINUE
+99976             CONTINUE
+99975          CONTINUE
+            DOALL BANK_ID = 0, 3
+               DO 99979 L_J = 0, 24
+                  DO 99980 L = MAX(0, idiv(3-BANK_ID+25*J_0+L_J, 4))
+     &            , MIN(24, idiv(-BANK_ID+25*J_0+L_J, 4))
+                     L_I_1 = 0
+                     L_I_2 = 24
+                     IF (L_I_1.LE.L_I_2) THEN
+                        CALL WP65_SEND_4(BANK_ID, L_A_0_0(L_I_1,L_J)
+     &                  , L_I_2-L_I_1+1)
+                     ENDIF
+99980                CONTINUE
+99979             CONTINUE
+99978          CONTINUE
+            ENDDO
+99974       CONTINUE
+99973    CONTINUE
+      END
+      SUBROUTINE BANK(BANK_ID)
+      INTEGER*4 idiv
+      EXTERNAL idiv
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J,K_0,L_K,O_1,O_2
+      REAL*4 ES_A(0:99,0:25),ES_B(0:99,0:25),ES_C(0:99,0:25)
+
+C     BANK DISTRIBUTED CODE FOR MATMUL
+
+C     To scan the tile set for BANK
+      DO 99971 I_0 = 0, 3
+         PROC_ID = MOD(I_0, 4)
+         DO 99972 J_0 = 0, 3
+            DO 99997 L_J = 0, 24
+               DO 99998 L = 0, 24
+                  O_1 = MAX(0, -100*BANK_ID+25*I_0+2500*J_0-400*L+100
+     &            *L_J, -100*BANK_ID+25*I_0-400*L)
+                  O_2 = MIN(99, 24-100*BANK_ID+25*I_0+2500*J_0-400*L+
+     &            100*L_J, 9924-100*BANK_ID+25*I_0-400*L)
+                  IF (O_1.LE.O_2) THEN
+                     CALL BANK_SEND_4(PROC_ID, ES_A(O_1,L), O_2-O_1+1
+     &               )
+                  ENDIF
+99998             CONTINUE
+99997          CONTINUE
+            DO 99992 L_K = 0, 99
+               DO 99993 L = 0, 24
+                  O_1 = MAX(0, -100*BANK_ID+25*I_0-400*L+100*L_K)
+                  O_2 = MIN(99, 24-100*BANK_ID+25*I_0-400*L+100*L_K)
+                  IF (O_1.LE.O_2) THEN
+                     CALL BANK_SEND_4(PROC_ID, ES_B(O_1,L), O_2-O_1+1
+     &               )
+                  ENDIF
+99993             CONTINUE
+99992          CONTINUE
+            DO 99987 L_J = 0, 24
+               DO 99988 L = 0, 24
+                  O_1 = MAX(0, -100*BANK_ID+2500*J_0-400*L+100*L_J, 
+     &            -100*BANK_ID-400*L)
+                  O_2 = MIN(99, 99-100*BANK_ID+2500*J_0-400*L+100*L_J
+     &            , 9999-100*BANK_ID-400*L)
+                  IF (O_1.LE.O_2) THEN
+                     CALL BANK_SEND_4(PROC_ID, ES_C(O_1,L), O_2-O_1+1
+     &               )
+                  ENDIF
+99988             CONTINUE
+99987          CONTINUE
+            DO 99981 L_J = 0, 24
+               DO 99982 L = 0, 24
+                  DO 99983 O = MAX(0, -100*BANK_ID+25*I_0-400*L, -100
+     &            *BANK_ID+25*I_0+2500*J_0-400*L+100*L_J), MIN(99, 
+     &            9924-100*BANK_ID+25*I_0-400*L, 24-100*BANK_ID+25*
+     &            I_0+2500*J_0-400*L+100*L_J)
+                     IF (idiv(175+100*BANK_ID-25*I_0+400*L+O, 100)
+     &               .LE.idiv(100+100*BANK_ID-25*I_0+400*L+O, 100)
+     &               .AND.idiv(175+100*BANK_ID-25*I_0+400*L+O, 100)
+     &               .LE.idiv(100+100*BANK_ID+400*L+O, 100).AND.idiv(
+     &               100+100*BANK_ID+400*L+O, 100).LE.idiv(100+100*
+     &               BANK_ID-25*I_0+400*L+O, 100)) THEN
+                        CALL BANK_RECEIVE_4(PROC_ID, ES_A(O,L), 1)
+                     ENDIF
+99983                CONTINUE
+99982             CONTINUE
+99981          CONTINUE
+99972       CONTINUE
+99971    CONTINUE
+      END

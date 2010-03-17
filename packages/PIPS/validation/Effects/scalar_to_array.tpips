@@ -1,0 +1,9 @@
+delete scalar_to_array
+create scalar_to_array scalar_to_array.f
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+close
+delete scalar_to_array
+quit

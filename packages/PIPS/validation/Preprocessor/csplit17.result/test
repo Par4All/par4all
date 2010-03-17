@@ -1,0 +1,16 @@
+/* See what happens with specific parsing for compilation units */
+
+extern int csplit17(int i, int * pj, int k, int * * pl);
+
+extern int csplit17(int i, int *pj, int k, int **pl);
+# 5
+int csplit17(int i, int * pj, int k, int * * pl)
+{
+  *pj = i;
+  **pl = k;
+}
+int csplit17(int i, int *pj, int k, int **pl)
+{
+   *pj = i;
+   **pl = k;
+}

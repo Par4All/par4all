@@ -1,0 +1,46 @@
+user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: altret11: No such workspace
+Registering file altret11.f
+Splitting file    ./altret11.f
+  Module         ALTRET11
+Workspace altret11 created and opened.
+Module ALTRET11 selected
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+user warning, property PARSER_SUBSTITUTE_ALTERNATE_RETURNS redefined
+setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
+user warning, property PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS redefined
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+user warning, property PRETTYPRINT_ALL_DECLARATIONS redefined
+Module ALTRET11 already active.
+Request: build resource PRINTED_FILE for module ALTRET11.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ALTRET11)
+  PARSER                         building   PARSED_CODE(ALTRET11)
+                                 building   CALLEES(ALTRET11)
+  CONTROLIZER                    building   CODE(ALTRET11)
+  PRINT_CODE                     building   PRINTED_FILE(ALTRET11)
+PRINTED_FILE made for ALTRET11.
+      SUBROUTINE ALTRET11(*, N)
+      INTEGER N
+      LOGICAL B
+90000 FORMAT(' @(#) altret11.f #_cp1s_# 4.1 01/18/99 ')                 0004
+
+      PRINT *, B                                                        0007
+
+      END
+Request: build phase/rule UNSPLIT for module ALTRET11.
+  UNSPLIT                        building   USER_FILE()
+UNSPLIT made for ALTRET11.
+shell ${PIPS_F77:-f77} -c altret11.database/Src/altret11.f
+shell ls altret11.o
+altret11.o
+shell rm altret11.o
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ALTRET11.
+Closing program.
+Closing workspace.
+Workspace altret11 closed.
+

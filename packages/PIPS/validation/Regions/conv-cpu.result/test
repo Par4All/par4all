@@ -1,0 +1,152 @@
+Select some options to deal with th C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+
+Preconditions for "main"
+
+
+C  P() {}
+
+void main()
+{
+   int n = 10000;
+   int loops = 10;
+
+   float h_A[n*n];
+   float h_C[n*n];
+
+   int i, j;
+
+//  P() {loops==10, n==10000}
+
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  P(i,j) {loops==10, n==10000, 0<=i, i<=9999}
+
+      for(j = 0; j <= n-1; j += 1) {
+
+//  P(i,j) {loops==10, n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
+
+         h_A[i*n+j] = 1;
+
+//  P(i,j) {loops==10, n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
+
+         h_C[i*n+j] = 0;
+      }
+}
+
+Regions for "main"
+
+void main()
+{
+   int n = 10000;
+   int loops = 10;
+
+   float h_A[n*n];
+   float h_C[n*n];
+
+   int i, j;
+
+//  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
+//  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
+
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+
+      for(j = 0; j <= n-1; j += 1) {
+
+//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
+//    j<=9999}>
+
+         h_A[i*n+j] = 1;
+
+//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
+//    j<=9999}>
+
+         h_C[i*n+j] = 0;
+      }
+}
+
+MUST Regions for "main"
+
+void main()
+{
+   int n = 10000;
+   int loops = 10;
+
+   float h_A[n*n];
+   float h_C[n*n];
+
+   int i, j;
+
+//  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
+//  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
+
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+
+      for(j = 0; j <= n-1; j += 1) {
+
+//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
+//    j<=9999}>
+
+         h_A[i*n+j] = 1;
+
+//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
+//    j<=9999}>
+
+         h_C[i*n+j] = 0;
+      }
+}
+Privatize scalar variables on all the modules of the program:
+void main()
+{
+   int n = 10000;
+   int loops = 10;
+
+   float h_A[n*n];
+   float h_C[n*n];
+
+   int i, j;
+
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1) {
+         h_A[i*n+j] = 1;
+         h_C[i*n+j] = 0;
+      }
+}
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+void main()
+{
+   int n = 10000;
+   int loops = 10;
+
+   float h_A[n*n];
+   float h_C[n*n];
+
+   int i, j;
+
+
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         h_A[i*n+j] = 1;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         h_C[i*n+j] = 0;
+}

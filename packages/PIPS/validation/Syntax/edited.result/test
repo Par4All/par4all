@@ -1,0 +1,10 @@
+      PROGRAM EDITED
+
+!!      print *, "ajout!"
+
+      END
+      PROGRAM EDITED
+
+      PRINT *, "ajout!"                                                 0003
+
+      END

@@ -1,0 +1,12 @@
+delete ireal01
+create ireal01 ireal01.f
+module IREAL01
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[IREAL01]
+
+close
+delete ireal01
+quit

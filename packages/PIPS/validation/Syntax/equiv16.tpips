@@ -1,0 +1,8 @@
+delete equiv16
+create equiv16 equiv16.f
+display PRINTED_FILE[EQUIV16]
+# try again to check that the error is well recovered
+display PRINTED_FILE[EQUIV16]
+close
+delete equiv16
+quit

@@ -1,0 +1,32 @@
+delete decl36
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create decl36 decl36.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+echo
+echo PRINTED FILE for "decl36"
+echo
+
+display PRINTED_FILE[decl36]
+
+echo
+echo PRINTED FILE for "decl36!"
+echo
+
+display PRINTED_FILE[decl36!]
+
+quit
+
+close
+
+delete decl36
+
+quit
+

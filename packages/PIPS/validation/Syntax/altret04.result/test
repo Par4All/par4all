@@ -1,0 +1,134 @@
+
+Refuse alternate returns
+
+
+Ignore alternate returns and substitute STOP
+
+      SUBROUTINE ALTRET04(X, FORMAL_RETURN_LABEL_1)
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+C     Check that the block returned for the call with implicit return
+C     is properly handled in spite of the logical IF
+
+      IF (X.GT.0.) CALL BAR2("*123", X, "*234")                         0006
+
+
+      END
+      SUBROUTINE BAR2(FORMAL_RETURN_LABEL_1, X, FORMAL_RETURN_LABEL_2
+     &)
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+      CHARACTER*(*) FORMAL_RETURN_LABEL_2
+
+      X = X+1.                                                          0004
+
+      IF (X.LT.0) GOTO 99999                                            0006
+      IF (X.GT.0.) THEN                                                 0008
+      ELSE
+         RETURN
+      ENDIF
+      STOP "2 in BAR2"                                                  0009
+99999 CONTINUE
+      STOP "1 in BAR2"                                                  0007
+
+      END
+
+Replace alternate returns (Parsed printed file)
+
+      SUBROUTINE ALTRET04(X, FORMAL_RETURN_LABEL_1, 
+     &I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+C     Check that the block returned for the call with implicit return
+C     is properly handled in spite of the logical IF
+
+      IF (X.GT.0.) THEN                                                 0006
+         CALL BAR2("*123", X, "*234", I_PIPS_RETURN_CODE_)              0006
+         IF (I_PIPS_RETURN_CODE_.EQ.1) THEN                             0006
+            GOTO 123
+         ENDIF
+         IF (I_PIPS_RETURN_CODE_.EQ.2) THEN                             0006
+            GOTO 234
+         ENDIF
+      ENDIF
+
+      I_PIPS_RETURN_CODE_ = 0                                           0008
+      RETURN                                                            0008
+
+123   CONTINUE                                                          0010
+      I_PIPS_RETURN_CODE_ = 1                                           0011
+      RETURN                                                            0011
+
+c     Second return
+234   I_PIPS_RETURN_CODE_ = 2                                           0014
+      RETURN                                                            0014
+
+      I_PIPS_RETURN_CODE_ = 0                                           0016
+      END
+
+Replace alternate returns (Printed file)
+
+      SUBROUTINE ALTRET04(X, FORMAL_RETURN_LABEL_1, 
+     &I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+C     Check that the block returned for the call with implicit return
+C     is properly handled in spite of the logical IF
+
+      IF (X.GT.0.) GOTO 99999                                           0006
+99998 CONTINUE
+
+      I_PIPS_RETURN_CODE_ = 0                                           0008
+      RETURN
+99999 CONTINUE
+      CALL BAR2("*123", X, "*234", I_PIPS_RETURN_CODE_)                 0006
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0006
+      IF (I_PIPS_RETURN_CODE_.EQ.2) THEN                                0006
+      ELSE
+         GOTO 99998
+      ENDIF
+
+c     Second return
+234   I_PIPS_RETURN_CODE_ = 2                                           0014
+      RETURN
+
+123   CONTINUE                                                          0010
+      I_PIPS_RETURN_CODE_ = 1                                           0011
+      END
+
+Replace alternate returns and restructure (Printed file)
+
+      SUBROUTINE ALTRET04(X, FORMAL_RETURN_LABEL_1, 
+     &I_PIPS_RETURN_CODE_)
+      INTEGER I_PIPS_RETURN_CODE_
+      REAL*4 X
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+
+C     Check that the block returned for the call with implicit return
+C     is properly handled in spite of the logical IF
+
+      IF (X.GT.0.) GOTO 99999                                           0006
+99998 CONTINUE
+
+      I_PIPS_RETURN_CODE_ = 0                                           0008
+      RETURN
+99999 CONTINUE
+      CALL BAR2("*123", X, "*234", I_PIPS_RETURN_CODE_)                 0006
+      IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0006
+      IF (I_PIPS_RETURN_CODE_.EQ.2) THEN                                0006
+      ELSE
+         GOTO 99998
+      ENDIF
+
+c     Second return
+234   I_PIPS_RETURN_CODE_ = 2                                           0014
+      RETURN
+
+123   CONTINUE                                                          0010
+      I_PIPS_RETURN_CODE_ = 1                                           0011
+      END

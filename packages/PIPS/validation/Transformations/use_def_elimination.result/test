@@ -1,0 +1,814 @@
+
+C  P() {}
+
+      PROGRAM TEST IF 1
+      INTEGER A, B, J
+
+C  P() {}
+
+
+
+C     Added to avoid empty summary preconditions
+      IF (.FALSE.) THEN                                                 0006
+
+C  P() {0==-1}
+
+         CALL TESTIF2(B)                                                0007
+
+C  P() {0==-1}
+
+         CALL TESTIF3(B)                                                0008
+
+C  P() {0==-1}
+
+         CALL TESTIF4(B)                                                0009
+
+C  P() {0==-1}
+
+         CALL TESTIF5(B)                                                0010
+      ELSE
+      ENDIF
+
+C  P() {}
+
+
+
+      J = 3                                                             0014
+
+C  P(J) {J==3}
+
+C     BEGIN UNSTRUCTURED
+
+C  P(J) {J==3}
+
+
+
+      IF (J.EQ.5) GOTO 31                                               0017
+
+C  P(J) {J==3}
+
+      WRITE (*, 9001) 'salut'                                           0018
+
+C  P(J) {J==3}
+
+9001  FORMAT('j = ',I3)                                                 0019
+
+C  P(J) {J==3}
+
+31    A = 9                                                             0020
+
+C  P(A,J) {A==9, J==3}
+
+
+      IF (J.EQ.3) GOTO 1                                                0022
+
+C  P() {0==-1}
+
+2     PRINT *, 'Faux 2'                                                 0027
+
+C  P(A,J) {A==9, J==3}
+
+1     PRINT *, 'Vrai 1'                                                 0028
+
+C  P(A,J) {A==9, J==3}
+
+      IF (J.EQ.4) GOTO 3                                                0029
+
+C  P(A,J) {A==9, J==3}
+
+      PRINT *, 'Vrai'                                                   0032
+
+C  P(A,J) {A==9, J==3}
+
+
+3     PRINT *, 'Faux 3'                                                 0035
+
+C  P(A,J) {A==9, J==3}
+
+      IF (J.EQ.3) THEN                                                  0036
+         GOTO 3
+      ELSE
+         GOTO 2
+      ENDIF
+C     END UNSTRUCTURED
+      END
+
+C  P() {}
+
+      PROGRAM TEST IF 1
+      INTEGER A, B, J
+
+C  P() {}
+
+
+
+C     Added to avoid empty summary preconditions
+      IF (.FALSE.) THEN                                                 0006
+
+C  P() {0==-1}
+
+         CALL TESTIF2(B)                                                0007
+
+C  P() {0==-1}
+
+         CALL TESTIF3(B)                                                0008
+
+C  P() {0==-1}
+
+         CALL TESTIF4(B)                                                0009
+
+C  P() {0==-1}
+
+         CALL TESTIF5(B)                                                0010
+      ELSE
+      ENDIF
+
+C  P() {}
+
+
+
+      J = 3                                                             0014
+
+C  P(J) {J==3}
+
+C     BEGIN UNSTRUCTURED
+
+C  P(J) {J==3}
+
+
+
+      IF (J.EQ.5) GOTO 31                                               0017
+
+C  P(J) {J==3}
+
+      WRITE (*, 9001) 'salut'                                           0018
+
+C  P(J) {J==3}
+
+9001  FORMAT('j = ',I3)                                                 0019
+
+C  P(J) {J==3}
+
+31    A = 9                                                             0020
+
+C  P(A,J) {A==9, J==3}
+
+
+      IF (J.EQ.3) GOTO 1                                                0022
+
+C  P() {0==-1}
+
+2     PRINT *, 'Faux 2'                                                 0027
+
+C  P(A,J) {A==9, J==3}
+
+1     PRINT *, 'Vrai 1'                                                 0028
+
+C  P(A,J) {A==9, J==3}
+
+      IF (J.EQ.4) GOTO 3                                                0029
+
+C  P(A,J) {A==9, J==3}
+
+      PRINT *, 'Vrai'                                                   0032
+
+C  P(A,J) {A==9, J==3}
+
+
+3     PRINT *, 'Faux 3'                                                 0035
+
+C  P(A,J) {A==9, J==3}
+
+      IF (J.EQ.3) THEN                                                  0036
+         GOTO 3
+      ELSE
+         GOTO 2
+      ENDIF
+C     END UNSTRUCTURED
+      END
+
+C  P() {}
+
+      PROGRAM TEST IF 1
+      INTEGER A, B, J
+
+C  P() {}
+
+
+
+C     Added to avoid empty summary preconditions
+
+
+      J = 3                                                             0014
+
+C  P(J) {J==3}
+
+
+
+      WRITE (*, 9001) 'salut'                                           0018
+
+C  P(J) {J==3}
+
+9001  FORMAT('j = ',I3)                                                 0019
+
+C  P(J) {J==3}
+
+31    A = 9                                                             0020
+
+C  P(A,J) {A==9, J==3}
+
+
+1     PRINT *, 'Vrai 1'                                                 0028
+
+C  P(A,J) {A==9, J==3}
+
+      PRINT *, 'Vrai'                                                   0032
+
+C  P(A,J) {A==9, J==3}
+
+C     BEGIN UNSTRUCTURED
+
+C  P(A,J) {A==9, J==3}
+
+
+3     PRINT *, 'Faux 3'                                                 0035
+      GOTO 3
+C     END UNSTRUCTURED
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {}
+
+      PROGRAM TEST IF 1
+      INTEGER A, B, J
+
+C  P() {}
+
+
+
+C     Added to avoid empty summary preconditions
+
+
+      CONTINUE                                                          0014
+
+C  P() {}
+
+
+
+      WRITE (*, 9001) 'salut'                                           0018
+
+C  P() {}
+
+9001  FORMAT('j = ',I3)                                                 0019
+
+C  P() {}
+
+31    CONTINUE                                                          0020
+
+C  P() {}
+
+
+1     PRINT *, 'Vrai 1'                                                 0028
+
+C  P() {}
+
+      PRINT *, 'Vrai'                                                   0032
+
+C  P() {}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {}
+
+
+3     PRINT *, 'Faux 3'                                                 0035
+      GOTO 3
+C     END UNSTRUCTURED
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+      SUBROUTINE TEST IF 2(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+
+      J = 3                                                             0004
+
+C  P() {0==-1}
+
+
+      B = J                                                             0006
+
+C  P() {0==-1}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {0==-1}
+
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0009
+
+C  P() {0==-1}
+
+      PRINT *, 'salut'                                                  0010
+
+C  P() {0==-1}
+
+31    CONTINUE                                                          0011
+C     END UNSTRUCTURED
+
+C  P() {0==-1}
+
+      A = 9                                                             0011
+
+C  P() {0==-1}
+
+
+c      endif
+
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+      SUBROUTINE TEST IF 2(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+
+      J = 3                                                             0004
+
+C  P() {0==-1}
+
+
+      B = J                                                             0006
+
+C  P() {0==-1}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {0==-1}
+
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0009
+
+C  P() {0==-1}
+
+      PRINT *, 'salut'                                                  0010
+
+C  P() {0==-1}
+
+31    CONTINUE                                                          0011
+C     END UNSTRUCTURED
+
+C  P() {0==-1}
+
+      A = 9                                                             0011
+
+C  P() {0==-1}
+
+
+c      endif
+
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+      SUBROUTINE TEST IF 2(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+      SUBROUTINE TEST IF 2(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 3(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+
+      J = 3                                                             0005
+
+C  P() {0==-1}
+
+
+      B = J                                                             0007
+
+C  P() {0==-1}
+
+      AVIRER = J                                                        0008
+
+C  P() {0==-1}
+
+
+      DO I = 3, 10                                                      0010
+
+C  P() {0==-1}
+
+         PRINT *, 'une boucle !'                                        0011
+      ENDDO
+
+C  P() {0==-1}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {0==-1}
+
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0015
+
+C  P() {0==-1}
+
+      PRINT *, 'salut'                                                  0016
+
+C  P() {0==-1}
+
+31    A = 9                                                             0017
+
+C  P() {0==-1}
+
+
+c      endif
+      AVIRERENCORE = B                                                  0020
+
+C  P() {0==-1}
+
+
+      IF (A.EQ.I) THEN                                                  0022
+
+C  P() {0==-1}
+
+         PRINT *, 'vrai'                                                0023
+      ELSE
+
+C  P() {0==-1}
+
+         PRINT *, 'faux'                                                0025
+      ENDIF
+
+C  P() {0==-1}
+
+
+100   CONTINUE
+
+C  P() {0==-1}
+
+200   CONTINUE                                                          0029
+      GOTO 100
+C     END UNSTRUCTURED
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 3(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+
+      J = 3                                                             0005
+
+C  P() {0==-1}
+
+
+      B = J                                                             0007
+
+C  P() {0==-1}
+
+      AVIRER = J                                                        0008
+
+C  P() {0==-1}
+
+
+      DO I = 3, 10                                                      0010
+
+C  P() {0==-1}
+
+         PRINT *, 'une boucle !'                                        0011
+      ENDDO
+
+C  P() {0==-1}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {0==-1}
+
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0015
+
+C  P() {0==-1}
+
+      PRINT *, 'salut'                                                  0016
+
+C  P() {0==-1}
+
+31    A = 9                                                             0017
+
+C  P() {0==-1}
+
+
+c      endif
+      AVIRERENCORE = B                                                  0020
+
+C  P() {0==-1}
+
+
+      IF (A.EQ.I) THEN                                                  0022
+
+C  P() {0==-1}
+
+         PRINT *, 'vrai'                                                0023
+      ELSE
+
+C  P() {0==-1}
+
+         PRINT *, 'faux'                                                0025
+      ENDIF
+
+C  P() {0==-1}
+
+
+100   CONTINUE
+
+C  P() {0==-1}
+
+200   CONTINUE                                                          0029
+      GOTO 100
+C     END UNSTRUCTURED
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 3(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 3(B)
+      INTEGER A, B, J
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+
+      J = 5                                                             0006
+
+C  P() {0==-1}
+
+      B = J                                                             0007
+
+C  P() {0==-1}
+
+      X(1) = Y(2)                                                       0008
+
+C  P() {0==-1}
+
+      Y(2) = B                                                          0009
+
+C  P() {0==-1}
+
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+
+      J = 5                                                             0006
+
+C  P() {0==-1}
+
+      B = J                                                             0007
+
+C  P() {0==-1}
+
+      X(1) = Y(2)                                                       0008
+
+C  P() {0==-1}
+
+      Y(2) = B                                                          0009
+
+C  P() {0==-1}
+
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+
+      J = 5                                                             0007
+
+C  P() {0==-1}
+
+100   B = J                                                             0009
+
+C  P() {0==-1}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {0==-1}
+
+      IF (A.NE.0) GOTO 200                                              0010
+
+C  P() {0==-1}
+
+      PRINT *, 'Well...'                                                0011
+
+C  P() {0==-1}
+
+200   CONTINUE                                                          0012
+C     END UNSTRUCTURED
+
+C  P() {0==-1}
+
+      TOBEDISCARDED = 1                                                 0012
+
+C  P() {0==-1}
+
+      YACCTOO = 2                                                       0013
+
+C  P() {0==-1}
+
+      X(1) = Y(2)                                                       0014
+
+C  P() {0==-1}
+
+      Y(2) = B                                                          0015
+
+C  P() {0==-1}
+
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+
+      J = 5                                                             0007
+
+C  P() {0==-1}
+
+100   B = J                                                             0009
+
+C  P() {0==-1}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {0==-1}
+
+      IF (A.NE.0) GOTO 200                                              0010
+
+C  P() {0==-1}
+
+      PRINT *, 'Well...'                                                0011
+
+C  P() {0==-1}
+
+200   CONTINUE                                                          0012
+C     END UNSTRUCTURED
+
+C  P() {0==-1}
+
+      TOBEDISCARDED = 1                                                 0012
+
+C  P() {0==-1}
+
+      YACCTOO = 2                                                       0013
+
+C  P() {0==-1}
+
+      X(1) = Y(2)                                                       0014
+
+C  P() {0==-1}
+
+      Y(2) = B                                                          0015
+
+C  P() {0==-1}
+
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+      RETURN
+      END
+
+C  P() {0==-1}
+
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+C  P() {0==-1}
+
+      RETURN
+      END

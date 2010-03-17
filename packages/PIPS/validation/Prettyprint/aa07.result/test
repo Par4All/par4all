@@ -1,0 +1,13 @@
+      PROGRAM AA07
+
+C     The vector expression is not prettyprinted because PIPS does not manage to
+C     parallelize such a loop. Strict monotonicity of power over positive number
+C     is not taken into account.
+
+      REAL X(10), Y(10), Z(10), U(10,10)
+
+      DO I = 1, 3                                                       0009
+         X(I**2+1) = 0.                                                 0010
+      ENDDO
+
+      END

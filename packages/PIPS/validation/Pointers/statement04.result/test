@@ -1,0 +1,35 @@
+int main()
+{
+   // BEGIN BLOCK
+   int **x, *y, k, h;
+//               <must be written>: k
+   k = 1;
+//               <must be written>: h
+   h = 2;
+//               <must be written>: y
+   y = &h;
+//               <must be read   >: x y
+//               <must be written>: x[0]
+   *x = y;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] x
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("x = %p \n", x);
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   int **x, *y, k, h;
+   k = 1;
+   h = 2;
+   y = &h;
+//  points to = {(y,h,E)}
+   *x = y;
+//  points to = {(y,h,E)}
+   printf("x = %p \n", x);
+//  points to = {(y,h,E)}
+   return 0;
+   // END BLOCK
+}

@@ -1,0 +1,62 @@
+
+Print code with proper reductions
+
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI1(NVAR,NXM,NYM)
+
+      NX = 101                                                          0005
+      NY = 101                                                          0006
+
+! Should be parallelized with an OpenMP reduction:
+      PRESMOY = 0.                                                      0009
+      DO I = 1, NX                                                      0010
+         DO J = 1, NY                                                   0011
+C  call sum[PRESMOY],
+            PRESMOY = PRESMOY+PHI1(3,I,J)                               0012
+         ENDDO
+      ENDDO
+C  call prod[PRESMOY],
+      PRESMOY = PRESMOY/(NX*NY)                                         0015
+! Should be parallelized on the "do i" and j should be privatized:
+      DO I = 1, NX                                                      0017
+         DO J = 1, NY                                                   0018
+C  call sum[PHI1(3,I,J)],
+            PHI1(3,I,J) = PHI1(3,I,J)-PRESMOY                           0019
+         ENDDO
+      ENDDO
+
+      END
+
+Print code with cumulated reductions
+
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI1(NVAR,NXM,NYM)
+
+      NX = 101                                                          0005
+      NY = 101                                                          0006
+
+! Should be parallelized with an OpenMP reduction:
+      PRESMOY = 0.                                                      0009
+C  loop sum[PRESMOY],
+      DO I = 1, NX                                                      0010
+C  loop sum[PRESMOY],
+         DO J = 1, NY                                                   0011
+C  call sum[PRESMOY],
+            PRESMOY = PRESMOY+PHI1(3,I,J)                               0012
+         ENDDO
+      ENDDO
+C  call prod[PRESMOY],
+      PRESMOY = PRESMOY/(NX*NY)                                         0015
+C  loop sum[PHI1(3,*,*)],
+! Should be parallelized on the "do i" and j should be privatized:
+      DO I = 1, NX                                                      0017
+C  loop sum[PHI1(3,I,*)],
+         DO J = 1, NY                                                   0018
+C  call sum[PHI1(3,I,J)],
+            PHI1(3,I,J) = PHI1(3,I,J)-PRESMOY                           0019
+         ENDDO
+      ENDDO
+
+      END

@@ -1,0 +1,24 @@
+
+C  P() {}
+
+      PROGRAM DATA02
+
+C  P() {}
+
+
+C     Variable I is initialized in foo but is not visible
+C     in data02. Its value should be eliminated from the
+C     initial precondition.
+
+      CALL FOO                                                          0007
+
+C  P() {}
+
+
+      J = 2                                                             0009
+
+C  P(J) {J==2}
+
+      PRINT *, J                                                        0010
+
+      END

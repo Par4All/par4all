@@ -1,0 +1,9 @@
+delete equiv01
+create equiv01 equiv01.f
+module EQUIV01
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[EQUIV01]
+close
+delete equiv01

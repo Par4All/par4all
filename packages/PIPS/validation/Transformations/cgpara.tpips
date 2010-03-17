@@ -1,0 +1,21 @@
+delete cgpara
+create cgpara cgpara.f
+module TEST1
+apply COARSE_GRAIN_PARALLELIZATION # Coarse Grain Parallelization
+display PRINTED_FILE(TEST1)
+module TEST2
+apply COARSE_GRAIN_PARALLELIZATION # Coarse Grain Parallelization
+display PRINTED_FILE(TEST2)
+module TEST3
+apply COARSE_GRAIN_PARALLELIZATION # Coarse Grain Parallelization
+display PRINTED_FILE(TEST3)
+apply PRIVATIZE_MODULE(TEST3)
+apply COARSE_GRAIN_PARALLELIZATION # Coarse Grain Parallelization
+display PRINTED_FILE(TEST3)
+module TEST4
+apply COARSE_GRAIN_PARALLELIZATION # Coarse Grain Parallelization
+display PRINTED_FILE(TEST4)
+close
+delete cgpara
+
+

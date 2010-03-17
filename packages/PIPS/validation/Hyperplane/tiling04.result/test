@@ -1,0 +1,42 @@
+
+Initial code
+
+      PROGRAM TILING04
+
+C     Check tiling: use integer lower loop bounds and symbolic upper bounds
+
+      REAL X(0:15, 0:10)
+
+      DO 100 I = M1, M2                                                 0007
+         DO 200 J = N1, N2                                              0008
+            X(I,J) = FLOAT(I+J)                                         0009
+200         CONTINUE                                                    0010
+100      CONTINUE                                                       0011
+
+      PRINT *, X                                                        0013
+
+      END
+
+After axis parallel tiling (5, 5)
+
+      PROGRAM TILING04
+
+C     Check tiling: use integer lower loop bounds and symbolic upper bounds
+
+      REAL X(0:15, 0:10)
+
+      DO I_t = M1/5, M2/5                                               0007
+         DO J_t = N1/5, N2/5
+
+            DO I = MAX(M1, 5*I_t), MIN(M2, 4+5*I_t)                     0007
+               DO J = MAX(5*J_t, N1), MIN(4+5*J_t, N2)                  0008
+                  X(I,J) = FLOAT(I+J)                                   0009
+200               CONTINUE                                              0010
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+      PRINT *, X                                                        0013
+
+      END

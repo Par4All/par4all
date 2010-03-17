@@ -1,0 +1,23 @@
+
+C  P() {}
+
+      PROGRAM FUNCSIDE1
+      INTEGER FOO1
+      EXTERNAL FOO1
+
+C  P() {}
+
+
+      I1 = 10                                                           0005
+
+C  P(I1) {I1==10}
+
+
+      I1 = FOO1(I1)                                                     0007
+
+C  P(I1) {I1==2}
+
+
+      PRINT *, I1                                                       0009
+
+      END

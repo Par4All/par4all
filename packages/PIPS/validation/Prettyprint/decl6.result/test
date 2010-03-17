@@ -1,0 +1,107 @@
+# before cleaning declarations
+      PROGRAM DECL6
+      INTEGER*4 A
+      PARAMETER (A = 1)
+      INTEGER*4 B
+      PARAMETER (B = 10)
+      INTEGER*4 C
+      PARAMETER (C = 12)
+      INTEGER*4 D
+      PARAMETER (D = 14)
+      INTEGER*4 E
+      PARAMETER (E = 15)
+      INTEGER*4 O
+      PARAMETER (O = A+4)
+      INTEGER*4 P
+      PARAMETER (P = O)
+      INTEGER*4 N
+      PARAMETER (N = O+P)
+      INTEGER*4 M
+      PARAMETER (M = N+5)
+      INTEGER*4 X
+      PARAMETER (X = 2)
+      INTEGER*4 Y
+      PARAMETER (Y = 3)
+      INTEGER*4 Z
+      PARAMETER (Z = Y+X)
+      INTEGER*4 U
+      PARAMETER (U = 120)
+      INTEGER*4 A1
+      PARAMETER (A1 = 1)
+      INTEGER*4 A2
+      PARAMETER (A2 = A1)
+      INTEGER*4 A3
+      PARAMETER (A3 = A2)
+      INTEGER*4 A4
+      PARAMETER (A4 = A3)
+      INTEGER*4 A5
+      PARAMETER (A5 = A4)
+      INTEGER*4 A6
+      PARAMETER (A6 = A7)
+      INTEGER*4 A7
+      PARAMETER (A7 = A8)
+      INTEGER*4 A8
+      PARAMETER (A8 = 8)
+      INTEGER*4 I1
+      PARAMETER (I1 = 1)
+      INTEGER*4 I2
+      PARAMETER (I2 = I1)
+      INTEGER*4 I3
+      PARAMETER (I3 = I2)
+      INTEGER*4 I4
+      PARAMETER (I4 = I3)
+      INTEGER*4 I5
+      PARAMETER (I5 = I4)
+      INTEGER*4 I6
+      PARAMETER (I6 = I5)
+      INTEGER I
+      INTEGER T(1:M)
+      DO I = 1, 5                                                       0011
+         T(I) = B+C+D+E+Z+I6                                            0012
+      ENDDO
+      PRINT *, A5, A7                                                   0014
+      END
+# after cleaning declarations (u and a6 dropped)
+      PROGRAM DECL6
+      INTEGER*4 A3
+      PARAMETER (A3 = A2)
+      INTEGER*4 I4
+      PARAMETER (I4 = I3)
+      INTEGER*4 N
+      PARAMETER (N = O+P)
+      INTEGER*4 B
+      PARAMETER (B = 10)
+      INTEGER*4 C
+      PARAMETER (C = 12)
+      INTEGER*4 D
+      PARAMETER (D = 14)
+      INTEGER*4 E
+      PARAMETER (E = 15)
+      INTEGER*4 M
+      PARAMETER (M = N+5)
+      INTEGER*4 X
+      PARAMETER (X = 2)
+      INTEGER*4 Y
+      PARAMETER (Y = 3)
+      INTEGER*4 Z
+      PARAMETER (Z = Y+X)
+      INTEGER*4 A4
+      PARAMETER (A4 = A3)
+      INTEGER*4 A5
+      PARAMETER (A5 = A4)
+      INTEGER*4 A7
+      PARAMETER (A7 = A8)
+      INTEGER*4 A8
+      PARAMETER (A8 = 8)
+      INTEGER*4 I5
+      PARAMETER (I5 = I4)
+      INTEGER*4 I6
+      PARAMETER (I6 = I5)
+      INTEGER I
+      INTEGER T(1:M)
+      DO I = 1, 5                                                       0011
+         T(I) = B+C+D+E+Z+I6                                            0012
+      ENDDO
+      PRINT *, A5, A7                                                   0014
+      END
+

@@ -1,0 +1,88 @@
+#
+# norm.f : from aile.f (ONERA). 
+#
+
+delete norm
+
+#
+# 1- Create Workspace
+#
+create norm norm.f
+
+#
+# 2- Show NORM (Retain)
+#
+#  The references to array T do not induce loop-carried dependences.
+#  Furthermore, there are only read-read dependences on S.
+#  However, notice that array TI is a real argument in the call to
+#  PVNMUT, and that there are 3 read references to array TI.
+#  This induces potential dependences.
+#  
+module NORM
+activate PRINT_CODE
+display PRINTED_FILE
+
+
+#
+# 3- Show PVNMUT
+#
+#  In PVNMUT, TI is called C. And the 3 elements of C are written, but not read
+#  
+module PVNMUT
+activate PRINT_CODE
+display PRINTED_FILE
+
+#
+# 4- Show NORM with regions
+#
+#  If we now come back to NORM, and display the set of array elements that are 
+#  read and written by each instruction, we get..
+#  Since each iteration of loops K and J read and write to the same memory 
+#  locations of array TI, there are loop-carried dependences, and the loop 
+#  cannot be parallelized. 
+#
+# (MUST means that the region exactly represents the set of read or written
+#  array elements).
+#
+module NORM
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+
+#
+# 5- Show NORM with IN regions
+#
+#  But in fact, these dependences are false dependences, because if we allocate 
+#  a copy of array TI to each iteration (in fact to each processor), there are
+#  no more dependences. This is what is called array privatization.
+#  In order to privatize an array, we must be sure that, in each iteration
+#  no element is read before being written in the same iteration. Thus,
+#  there are no loop-carried producer-consumer dependences.
+#  In PIPS, we could verify this easily by computing IN regions. IN regions
+#  represent the set of array elements that are read before being written.
+#  In our case, we must verify that no elements of TI belong to the IN regions.
+#
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+
+#
+# 6- Show NORM with OUT regions
+#
+#  We must also be sure that no element of TI that is initialized by a single
+#  iteration is used in the subsequent iterations or after the loops.
+#  This information is provided in PIPS by the OUT regions. They represent
+#  the set of live array elements, that is to say those that are used in
+#  the continuation.
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+#
+# 7- Conclusion
+#
+#  Array privatization is not yet available in PIPS, but IN and OUT regions
+#  already provide the information needed for this transformation.
+close
+delete norm
+quit

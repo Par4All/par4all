@@ -1,0 +1,22 @@
+delete io01
+create io01 io01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[io01!]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[io01!]
+
+close
+#delete io01
+quit

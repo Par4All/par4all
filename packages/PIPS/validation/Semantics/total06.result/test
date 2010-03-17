@@ -1,0 +1,103 @@
+
+Transformers for "total06"
+
+
+C  T() {}
+
+      PROGRAM TOTAL06
+
+C     Check that not executed loops are proprely handled: no condition
+C     on N should be found
+
+      REAL A(10)
+
+C  T(I) {I==10}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {10<=I}
+
+C (0,2)
+
+      DO I = 10, 1                                                      0008
+
+C  T() {1<=N, N<=10}
+
+C (0,3)
+         A(N) = 0.                                                      0009
+      ENDDO
+
+c      a(i) = 1.
+
+C     END BLOCK
+      END
+
+Preconditions for "total06"
+
+
+C  P() {}
+
+      PROGRAM TOTAL06
+
+C     Check that not executed loops are proprely handled: no condition
+C     on N should be found
+
+      REAL A(10)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      DO I = 10, 1                                                      0008
+
+C  P() {0==-1}
+
+C (0,3)
+         A(N) = 0.                                                      0009
+      ENDDO
+
+c      a(i) = 1.
+
+C     END BLOCK
+      END
+
+Total preconditions for "total06"
+
+
+C TP() {}
+
+      PROGRAM TOTAL06
+
+C     Check that not executed loops are proprely handled: no condition
+C     on N should be found
+
+      REAL A(10)
+
+C TP() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {}
+
+C (0,2)
+
+      DO I = 10, 1                                                      0008
+
+C TP() {0==-1}
+
+C (0,3)
+         A(N) = 0.                                                      0009
+      ENDDO
+
+c      a(i) = 1.
+
+C     END BLOCK
+      END
+

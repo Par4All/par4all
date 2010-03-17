@@ -1,0 +1,8 @@
+
+parsed printed file
+
+void string02()
+{
+   int i;
+   printf("string02", i);
+}

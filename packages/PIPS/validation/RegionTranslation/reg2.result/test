@@ -1,0 +1,99 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      PROGRAM REG2
+      COMMON /T/ S1
+      COMMON /U/ S2
+      INTEGER S1, S2
+      REAL A(1000)
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      READ *, S1                                                        0001
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      READ *, S2                                                        0002
+
+C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=1000, 1<=S1, 1<=S2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      CALL SUB1(A)                                                      0003
+      END
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=S1, 1<=PHI2, PHI2<=S2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+
+      SUBROUTINE SUB1(A)
+      COMMON /T/ S1
+      COMMON /U/ S2
+      INTEGER S1, S2
+      REAL A(S1, S2)
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=S1, 1<=PHI2, PHI2<=S2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      CALL SUB2(A)                                                      0001
+      END
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=S1, 1<=PHI2, PHI2<=SUB3:S2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+
+      SUBROUTINE SUB2(A)
+      COMMON /T/ S1
+      INTEGER S1
+      REAL A(S1, 1)
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=S1, 1<=PHI2, PHI2<=SUB3:S2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      CALL SUB3(A)                                                      0001
+      END
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=S1, 1<=PHI2, PHI2<=S2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      
+      SUBROUTINE SUB3(A)
+      COMMON /T/ S1
+      COMMON /U/ S2
+      INTEGER S1, S2
+      INTEGER J, K
+      REAL A(S1, 1)
+      LOGICAL Q
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+      READ *, Q                                                         0001
+
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=S1, 1<=PHI2, PHI2<=S2}>
+
+      IF (Q) THEN                                                       0002
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=S1, 1<=PHI2, PHI2<=S2}>
+
+         DO J = 1, S1                                                   0003
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==J, 1<=PHI2, PHI2<=S2, 1<=J, J<=S1}>
+
+            DO K = 1, S2                                                0004
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=J, J<=S1, 1<=K, K<=S2}>
+
+               A(J,K) = 1.0                                             0005
+            ENDDO
+         ENDDO
+      ENDIF
+      END

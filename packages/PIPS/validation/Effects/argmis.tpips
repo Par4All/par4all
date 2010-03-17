@@ -1,0 +1,9 @@
+create argmis argmis.f
+module ARGMIS
+activate PRINT_CODE
+display PRINTED_FILE(ARGMIS)
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE(ARGMIS)
+close
+delete argmis
+quit

@@ -1,0 +1,15 @@
+delete pause01
+create pause01 pause01.f
+module PAUSE01
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[PAUSE01]
+apply USE_DEF_ELIMINATION
+
+echo
+echo PAUSE must not be use-def eliminated
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE[PAUSE01]
+close
+delete pause01

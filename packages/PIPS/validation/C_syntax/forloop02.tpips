@@ -1,0 +1,44 @@
+delete forloop02
+create forloop02 forloop02.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+# for to do loop conversion has been improved
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE for main
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo PRINTED FILE for main
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo PRINTED FILE with effects for main
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo PRINTED FILE with transformers for main
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+close
+
+delete forloop02
+
+quit
+

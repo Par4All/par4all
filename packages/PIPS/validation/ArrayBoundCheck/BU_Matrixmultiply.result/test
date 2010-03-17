@@ -1,0 +1,93 @@
+C     Matrix multiplicaiton, version with call to MATMUL
+
+      PROGRAM MAIN   
+      PARAMETER (L=200, M=200, N=200)
+      REAL Z(L,N), X(L,M), Y(M,N)
+
+C     Initialization
+
+      DO I = 1, L                                                       0001
+         DO J = 1, M                                                    0002
+            IF (J.LT.1.OR.J.GT.M) STOP 
+     &      "Bound violation:array MAIN:X, 2nd dimension"
+            IF (I.LT.1.OR.I.GT.L) STOP 
+     &      "Bound violation:array MAIN:X, 1st dimension"
+            X(I,J) = I                                                  0003
+         ENDDO
+      ENDDO
+
+      DO J = 1, M                                                       0004
+         DO K = 1, N                                                    0005
+            IF (K.LT.1.OR.K.GT.N) STOP 
+     &      "Bound violation:array MAIN:Y, 2nd dimension"
+            IF (J.LT.1.OR.J.GT.M) STOP 
+     &      "Bound violation:array MAIN:Y, 1st dimension"
+            Y(J,K) = J                                                  0006
+         ENDDO
+      ENDDO
+
+      CALL MATMUL(Z, X, Y, L, M, N)                                     0007
+
+      END
+
+      SUBROUTINE MATMUL(Z,X,Y,L,M,N)
+      REAL Z(L,N), X(L,M), Y(M,N)
+
+
+      DO I = 1, L                                                       0001
+         DO K = 1, N                                                    0002
+            IF (K.LT.1.OR.K.GT.N) STOP 
+     &      "Bound violation:array MATMUL:Z, 2nd dimension"
+            IF (I.LT.1.OR.I.GT.L) STOP 
+     &      "Bound violation:array MATMUL:Z, 1st dimension"
+            Z(I,K) = 0.                                                 0003
+            DO J = 1, M                                                 0004
+               IF (J.LT.1.OR.J.GT.M) STOP 
+     &         "Bound violation:array MATMUL:X, 2nd dimension"
+               IF (K.LT.1.OR.K.GT.N) STOP 
+     &         "Bound violation:array MATMUL:Z, 2nd dimension"
+               IF (I.LT.1.OR.I.GT.L) STOP 
+     &         "Bound violation:array MATMUL:Z, 1st dimension"
+               Z(I,K) = Z(I,K)+X(I,J)*Y(J,K)                            0005
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+C     Matrix multiplicaiton, version with call to MATMUL
+
+      PROGRAM MAIN   
+      PARAMETER (L=200, M=200, N=200)
+      REAL Z(L,N), X(L,M), Y(M,N)
+
+C     Initialization
+
+      DO I = 1, L                                                       0001
+         DO J = 1, M                                                    0002
+            X(I,J) = I                                                  0003
+         ENDDO
+      ENDDO
+
+      DO J = 1, M                                                       0004
+         DO K = 1, N                                                    0005
+            Y(J,K) = J                                                  0006
+         ENDDO
+      ENDDO
+
+      CALL MATMUL(Z, X, Y, L, M, N)                                     0007
+
+      END
+
+      SUBROUTINE MATMUL(Z,X,Y,L,M,N)
+      REAL Z(L,N), X(L,M), Y(M,N)
+
+
+      DO I = 1, L                                                       0001
+         DO K = 1, N                                                    0002
+            Z(I,K) = 0.                                                 0003
+            DO J = 1, M                                                 0004
+               Z(I,K) = Z(I,K)+X(I,J)*Y(J,K)                            0005
+            ENDDO
+         ENDDO
+      ENDDO
+      END
+

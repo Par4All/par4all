@@ -1,0 +1,22 @@
+
+Printed file
+
+      SUBROUTINE SUBSORTIE()
+383   A = 3                                                             0002
+      IF (A.EQ.B) THEN                                                  0003
+      ELSE
+         GOTO 383
+      ENDIF
+384   CONTINUE                                                          0005
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+      SUBROUTINE SUBSORTIE()
+383   A = 3                                                             0002
+      IF (A.EQ.B) THEN                                                  0003
+      ELSE
+         GOTO 383
+      ENDIF
+384   CONTINUE                                                          0005
+      END

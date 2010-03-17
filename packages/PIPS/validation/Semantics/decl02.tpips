@@ -1,0 +1,16 @@
+delete decl02
+create decl02 decl02.f
+
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+
+display PRINTED_FILE
+
+activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE
+
+close
+delete decl02

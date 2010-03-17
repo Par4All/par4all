@@ -1,0 +1,21 @@
+delete nga04
+create nga04 nga04.f
+module NGA04
+
+# activate TRANSFORMERS_INTRA_FULL
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+
+# activate PRINT_CODE_TRANSFORMERS
+# display PRINTED_FILE[NGA04]
+
+# setenv SEMANTICS_DEBUG_LEVEL 9
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[NGA04]
+close
+delete nga04
+quit
+

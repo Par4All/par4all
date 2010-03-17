@@ -1,0 +1,14 @@
+      SUBROUTINE SUBSTR02 (TEXTE,I,R,C,ITYPE,LONG)
+
+C     Bug for substring without an upper bound and without a full
+C     declaration
+
+      CHARACTER * (*) TEXTE, C
+      CHARACTER*2 FORMAI
+      DATA FORMAI /'i4'/
+
+      JTYPE = 1                                                         0010
+
+      WRITE (TEXTE(IPOS+1:), FORMAI) JTYPE                              0012
+
+      END

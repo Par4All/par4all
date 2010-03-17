@@ -1,0 +1,7 @@
+delete cmplx01
+create cmplx01 cmplx01.f
+display PRINTED_FILE
+display PRINTED_FILE[FOO]
+close
+delete cmplx01
+quit

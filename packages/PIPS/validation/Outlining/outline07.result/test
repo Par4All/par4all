@@ -1,0 +1,53 @@
+
+Initial code
+
+int foo(int c)
+{
+   int force;
+   struct a of = {{c}};
+pas_trop:
+   for(force = 1; force <= 17; force += 2)
+      of.the.jedi += force;
+   return of.the.jedi;
+}
+struct b {
+   int jedi;
+};
+struct a {
+   struct b the;
+};
+extern int foo(int c);
+
+Code after outlining
+
+int foo(int c)
+{
+   int force;
+   struct a of = {{c}};
+pas_trop:   kernel(c, of);
+   return of.the.jedi;
+}
+void kernel(int c, struct a of)
+{
+   int force;
+pas_trop:
+   for(force = 1; force <= 17; force += 2)
+      of.the.jedi += force;
+}
+struct b {
+   int jedi;
+};
+struct a {
+   struct b the;
+};
+void kernel(int c, struct a of);
+struct b {
+   int jedi;
+};
+struct a {
+   struct b the;
+};
+extern int foo(int c);
+
+unsplit
+

@@ -1,0 +1,34 @@
+delete ecg
+create ecg ecg.f
+
+echo
+echo Proper effects for "FFT1"
+echo
+
+activate PRINT_CODE_PROPER_REFERENCES
+display PRINTED_FILE(FFT1)
+
+echo
+echo Cumulated effects for "FFT1"
+echo
+
+activate PRINT_CODE_CUMULATED_REFERENCES
+display PRINTED_FILE(FFT1)
+
+echo
+echo Proper effects for "PROCESS"
+echo
+
+activate PRINT_CODE_PROPER_REFERENCES
+display PRINTED_FILE(PROCESS)
+
+echo
+echo Cumulated effects for "PROCESS"
+echo
+
+activate PRINT_CODE_CUMULATED_REFERENCES
+display PRINTED_FILE(PROCESS)
+
+close
+delete ecg
+quit

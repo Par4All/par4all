@@ -1,0 +1,263 @@
+
+Parsed printed file for "main"
+
+int main()
+{
+   int i, j, n, BlockEnd = 3;
+
+   for (i = 1;i<16;i <<= 2) {
+      for (j = i, n = 0;n<BlockEnd;j++, n++) {
+         int k, l;
+         k = foo((j, n));
+         l = k;
+         printf("%d\n", l);
+      }
+   }
+}
+
+Parsed printed file for "foo"
+
+int foo(int i)
+{
+   /* Default type is int */
+   static int l;
+   l = i;
+   return i;
+}
+
+Printed file for "main"
+
+int main()
+{
+   int i, j, n, BlockEnd = 3;
+
+   i = 1;
+   while (i<16) {
+      {
+         j = i;
+         for(n = 0; n <= BlockEnd-1; n += 1) {
+            int k, l;
+            k = foo((j, n));
+            l = k;
+            printf("%d\n", l);
+            j++;
+         }
+      }
+      i <<= 2;
+   }
+}
+
+Printed file with proper effects for "foo"
+
+int foo(int i)
+{
+   /* Default type is int */
+   static int l;
+//               <must be read   >: i
+//               <must be written>: l
+   l = i;
+//               <must be read   >: i
+   return i;
+}
+
+Printed file with cumulated effects for "foo"
+
+//               <must be read   >: i
+//               <must be written>: l
+int foo(int i)
+{
+   /* Default type is int */
+   static int l;
+//               <must be read   >: i
+//               <must be written>: l
+   l = i;
+//               <must be read   >: i
+   return i;
+}
+
+Printed file with proper effects for "main"
+
+int main()
+{
+   int i, j, n, BlockEnd = 3;
+//               <must be written>: i
+
+   i = 1;
+//               <must be read   >: i
+   while (i<16) {
+      {
+//               <must be read   >: i
+//               <must be written>: j
+         j = i;
+//               <must be read   >: BlockEnd
+//               <must be written>: n
+         for(n = 0; n <= BlockEnd-1; n += 1) {
+            int k, l;
+//               <must be read   >: BlockEnd j n
+//               <must be written>: foo:0`l k
+            k = foo((j, n));
+//               <must be read   >: BlockEnd k
+//               <must be written>: l
+            l = k;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] BlockEnd l
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+            printf("%d\n", l);
+//               <must be read   >: BlockEnd j
+//               <must be written>: j
+            j++;
+         }
+      }
+//               <must be read   >: i
+//               <must be written>: i
+      i <<= 2;
+   }
+}
+
+Printed file with transformers for "foo"
+
+
+//  T(foo,l) {foo==i, foo==l}
+
+int foo(int i)
+{
+   /* Default type is int */
+   static int l;
+
+//  T(l) {i==l}
+
+   l = i;
+
+//  T(foo) {foo==i, foo==l}
+
+   return i;
+}
+
+Printed file with transformers for "main"
+
+
+//  T(foo:0`l) {foo:0`l==2}
+
+int main()
+{
+   int i, j, n, BlockEnd = 3;
+
+//  T(i) {BlockEnd==3, i==1}
+
+
+   i = 1;
+
+//  T(foo:0`l,i,j,n) {BlockEnd==3, i#init==1, i<=15}
+
+   while (i<16) {
+      {
+
+//  T(j) {BlockEnd==3, i==j, i<=15}
+
+         j = i;
+
+//  T(foo:0`l,j,n) {BlockEnd==3, i+n==j, i==j#init, i<=15, i<=j}
+
+         for(n = 0; n <= BlockEnd-1; n += 1) {
+            int k, l;
+
+//  T(foo:0`l,k) {BlockEnd==3, foo:0`l==k, foo:0`l==n, 0<=foo:0`l,
+//    foo:0`l<=2, i<=15}
+
+            k = foo((j, n));
+
+//  T(l) {BlockEnd==3, foo:0`l==k, foo:0`l==l, foo:0`l==n, 0<=foo:0`l,
+//    foo:0`l<=2, i<=15}
+
+            l = k;
+
+//  T() {BlockEnd==3, foo:0`l==k, foo:0`l==l, foo:0`l==n, 0<=foo:0`l,
+//    foo:0`l<=2, i<=15}
+
+            printf("%d\n", l);
+
+//  T(j) {BlockEnd==3, foo:0`l==k, foo:0`l==l, foo:0`l==n,
+//    j==j#init+1, 0<=foo:0`l, foo:0`l<=2, i<=15}
+
+            j++;
+         }
+      }
+
+//  T(i) {}
+
+      i <<= 2;
+   }
+}
+
+Printed file preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+   int i, j, n, BlockEnd = 3;
+
+//  P() {BlockEnd==3}
+
+
+   i = 1;
+
+//  P(i) {BlockEnd==3, i==1}
+
+   while (i<16) {
+      {
+
+//  P(foo:0`l,i,j,n) {BlockEnd==3, i<=15}
+
+         j = i;
+
+//  P(foo:0`l,i,j,n) {BlockEnd==3, i==j, i<=15}
+
+         for(n = 0; n <= BlockEnd-1; n += 1) {
+            int k, l;
+
+//  P(foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, i<=j, 0<=n, n<=2}
+
+            k = foo((j, n));
+
+//  P(foo:0`l,i,j,k,n) {BlockEnd==3, foo:0`l+i==j, foo:0`l==k,
+//    foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, i<=15, i<=j}
+
+            l = k;
+
+//  P(foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j, foo:0`l==k,
+//    foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, i<=15, i<=j}
+
+            printf("%d\n", l);
+
+//  P(foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j, foo:0`l==k,
+//    foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, i<=15, i<=j}
+
+            j++;
+         }
+      }
+
+//  P(foo:0`l,i,j,n) {BlockEnd==3, foo:0`l==2, i==j-3, n==3, i<=15}
+
+      i <<= 2;
+   }
+}
+
+Printed file with preconditions for "for"
+
+
+//  P() {0<=i, i<=2}
+
+int foo(int i)
+{
+   /* Default type is int */
+   static int l;
+
+//  P() {0<=i, i<=2}
+
+   l = i;
+
+//  P(l) {i==l, 0<=i, i<=2}
+
+   return i;
+}

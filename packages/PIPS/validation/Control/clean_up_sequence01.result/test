@@ -1,0 +1,24 @@
+Try to restructure the code for more precision:
+// (0,1)
+// BEGIN BLOCK
+extern int main(int argc, char *argv[]);                                /*0001*/
+// END BLOCK
+int main(int argc, char *argv[])
+{
+// (0,1)
+// (1,1)
+   // BEGIN BLOCK
+   {
+// (1,2)
+      // BEGIN BLOCK
+      int i;                                                            /*0004*/
+// (1,4)
+      i = 3;                                                            /*0006*/
+// (1,5)
+      i = 4;                                                            /*0009*/
+      // END BLOCK
+   }
+// (1,6)
+   return 0;                                                            /*0012*/
+   // END BLOCK
+}

@@ -1,0 +1,66 @@
+delete generate03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create generate03 generate03.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Parsed printed file for generate 03
+echo
+
+display PARSED_PRINTED_FILE[generate03]
+
+echo
+echo Parsed printed file for func
+echo
+
+display PARSED_PRINTED_FILE[func]
+
+echo
+echo Printed synthesized file "func!"
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE[func!]
+
+echo
+echo Compile the generated code
+echo
+
+setenv DB generate03.database
+shell cat $DB/func!/func!.c $DB/func/func.c > $DB/func.c
+shell cat $DB/func.c
+shell cc -c $DB/func.c -o $DB/func.o
+
+close
+delete generate03
+quit
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Printed file generate03 with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[generate03]
+
+echo
+echo Printed file func with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[func]
+
+close
+#delete generate03
+quit

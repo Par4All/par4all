@@ -1,0 +1,36 @@
+
+C  P() {}
+
+      SUBROUTINE TRUSTED_REF03(X, N1, N2, M1, M2)
+
+      REAL X(N1, N2)
+
+C  P() {1<=N1, 1<=N2}
+
+
+      IF (M1.LT.1.OR.M2.LT.1) STOP 'illegal parameter'                  0005
+
+C  P() {1<=M1, 1<=M2, 1<=N1, 1<=N2}
+
+
+      DO I = 1, M1                                                      0007
+
+C  P(I,J) {1<=I, I<=M1, 1<=M1, 1<=M2, 1<=N1, 1<=N2}
+
+         DO J = 1, M2                                                   0008
+
+C  P(I,J) {1<=I, I<=M1, I<=N1, 1<=J, J<=M2, J<=N2, 1<=M1, 1<=M2,
+C    1<=N1, 1<=N2}
+
+            X(I,J) = 0.                                                 0009
+         ENDDO
+      ENDDO
+
+C  P(I,J) {I==M1+1, J==M2+1, 2<=I, I<=N1+1, 2<=J, J<=N2+1, 1<=N1,
+C    1<=N2}
+
+
+      PRINT *, N1, N2, M1, M2                                           0013
+
+      END
+

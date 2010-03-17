@@ -1,0 +1,3 @@
+Init -d -f  common2.f common2 2>/dev/null >/dev/null
+Display -v -m common2 2>&1 | grep "user warning"
+Delete common2 2>/dev/null

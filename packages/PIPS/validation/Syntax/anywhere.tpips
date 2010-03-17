@@ -1,0 +1,9 @@
+#
+# data can be anywhere...
+#
+delete anywhere
+create anywhere anywhere.f
+display PRINTED_FILE
+close
+delete anywhere
+quit

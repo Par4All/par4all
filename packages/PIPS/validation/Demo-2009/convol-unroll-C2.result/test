@@ -1,0 +1,391 @@
+
+Inital code
+
+void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
+{
+   int i;
+   int j;
+   int ki;
+   int kj;
+
+   for(i = 0; i <= isi-1; i += 1)
+      for(j = 0; j <= isj-1; j += 1)
+         new_image[i][j] = image[i][j];
+
+l400:
+   for(i = ksi/2; i <= isi-ksi/2-1; i += 1)
+l300:
+      for(j = ksj/2; j <= isj-ksj/2-1; j += 1) {
+         new_image[i][j] = 0.;
+l200:
+         for(ki = 0; ki <= ksi-1; ki += 1)
+l100:
+            for(kj = 0; kj <= ksj-1; kj += 1)
+               
+
+               new_image[i][j] = new_image[i][j]+image[i+ki-ksi/2][j+kj-ksj/2]*kernel[ki][kj];
+         new_image[i][j] = new_image[i][j]/(ksi*ksj);
+      }
+}
+
+After partial evaluation:
+
+void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
+{
+   int i;
+   int j;
+   int ki;
+   int kj;
+
+   for(i = 0; i <= 511; i += 1)
+      for(j = 0; j <= 511; j += 1)
+         new_image[i][j] = image[i][j];
+
+l400:
+   for(i = 1; i <= 510; i += 1)
+l300:
+      for(j = 1; j <= 510; j += 1) {
+         new_image[i][j] = 0.;
+l200:
+         for(ki = 0; ki <= 2; ki += 1)
+l100:
+            for(kj = 0; kj <= 2; kj += 1)
+               
+
+               new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
+         new_image[i][j] = new_image[i][j]/9;
+      }
+}
+
+After strip mining and partial eval
+
+void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
+{
+   int i;
+   int j;
+   int ki;
+   int kj;
+
+   for(i = 0; i <= 511; i += 1)
+      for(j = 0; j <= 511; j += 1)
+         new_image[i][j] = image[i][j];
+
+l400:
+   for(i = 1; i <= 510; i += 1)
+l300:
+      for(j_1 = 1; j_1 <= 510; j_1 += 128)
+         for(j = j_1; j <= MIN(j_1+127, 510); j += 1) {
+            new_image[i][j] = 0.;
+l200:
+            for(ki = 0; ki <= 2; ki += 1)
+l100:
+               for(kj = 0; kj <= 2; kj += 1)
+                  
+
+                  new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
+            new_image[i][j] = new_image[i][j]/9;
+         }
+}
+
+after outlining
+
+void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
+{
+   int i;
+   int j;
+   int ki;
+   int kj;
+
+   for(i = 0; i <= 511; i += 1)
+      for(j = 0; j <= 511; j += 1)
+         new_image[i][j] = image[i][j];
+
+l400:
+   for(i = 1; i <= 510; i += 1)
+l300:
+      for(j_1 = 1; j_1 <= 510; j_1 += 128)
+         for(j = j_1; j <= MIN(j_1+127, 510); j += 1)
+            macro_instruction(image, kernel, new_image, &i, &j);
+}
+void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+{
+   int kj;
+   int ki;
+   new_image[*i][*j] = 0.;
+l200:
+   for(ki = 0; ki <= 2; ki += 1)
+l100:
+      for(kj = 0; kj <= 2; kj += 1)
+         
+
+         new_image[*i][*j] = new_image[*i][*j]+image[*i+ki-1][*j+kj-1]*kernel[ki][kj];
+   new_image[*i][*j] = new_image[*i][*j]/9;
+}
+
+After double unrolling
+
+void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+{
+   int kj;
+   int ki;
+   new_image[*i][*j] = 0.;
+l200:   ;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+0-1]*kernel[0][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+1-1]*kernel[0][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+2-1]*kernel[0][2];
+   kj = 3;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+0-1]*kernel[1][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+1-1]*kernel[1][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+2-1]*kernel[1][2];
+   kj = 3;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+0-1]*kernel[2][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+1-1]*kernel[2][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+2-1]*kernel[2][2];
+   kj = 3;
+   ki = 3;
+   new_image[*i][*j] = new_image[*i][*j]/9;
+}
+void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+{
+   int kj;
+   int ki;
+   new_image[*i][*j] = 0.;
+l200:   ;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+0-1]*kernel[0][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+1-1]*kernel[0][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+2-1]*kernel[0][2];
+   kj = 3;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+0-1]*kernel[1][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+1-1]*kernel[1][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+2-1]*kernel[1][2];
+   kj = 3;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+0-1]*kernel[2][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+1-1]*kernel[2][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+2-1]*kernel[2][2];
+   kj = 3;
+   ki = 3;
+   new_image[*i][*j] = new_image[*i][*j]/9;
+}
+void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+{
+   int kj;
+   int ki;
+   new_image[*i][*j] = 0.;
+l200:   ;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+0-1]*kernel[0][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+1-1]*kernel[0][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+2-1]*kernel[0][2];
+   kj = 3;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+0-1]*kernel[1][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+1-1]*kernel[1][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+2-1]*kernel[1][2];
+   kj = 3;
+   ;
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+0-1]*kernel[2][0];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+1-1]*kernel[2][1];
+   
+
+   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+2-1]*kernel[2][2];
+   kj = 3;
+   ki = 3;
+   new_image[*i][*j] = new_image[*i][*j]/9;
+}
+
+After atomization
+
+void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+{
+   float F_46;
+   float F_45;
+   float F_44;
+   float F_43;
+   float F_42;
+   float F_41;
+   float F_40;
+   float F_39;
+   float F_38;
+   float F_37;
+   float F_36;
+   float F_35;
+   float F_34;
+   float F_33;
+   float F_32;
+   float F_31;
+   float F_30;
+   float F_29;
+   float F_28;
+   float F_27;
+   float F_26;
+   float F_25;
+   float F_24;
+   float F_23;
+   float F_22;
+   float F_21;
+   float F_20;
+   float F_19;
+   float F_18;
+   float F_17;
+   float F_16;
+   float F_15;
+   float F_14;
+   float F_13;
+   float F_12;
+   float F_11;
+   float F_10;
+   float F_9;
+   float F_8;
+   float F_7;
+   float F_6;
+   float F_5;
+   float F_4;
+   float F_3;
+   float F_2;
+   float F_1;
+   float F_0;
+   int kj;
+   int ki;
+   new_image[*i][*j] = 0.;
+l200:   ;
+   ;
+   F_0 = new_image[*i][*j];
+   F_1 = image[*i+0-1][*j+0-1];
+   F_2 = kernel[0][0];
+   F_3 = F_1*F_2;
+   F_4 = F_0+F_3;
+   
+
+   new_image[*i][*j] = F_4;
+   F_5 = new_image[*i][*j];
+   F_6 = image[*i+0-1][*j+1-1];
+   F_7 = kernel[0][1];
+   F_8 = F_6*F_7;
+   F_9 = F_5+F_8;
+   
+
+   new_image[*i][*j] = F_9;
+   F_10 = new_image[*i][*j];
+   F_11 = image[*i+0-1][*j+2-1];
+   F_12 = kernel[0][2];
+   F_13 = F_11*F_12;
+   F_14 = F_10+F_13;
+   
+
+   new_image[*i][*j] = F_14;
+   kj = 3;
+   ;
+   F_15 = new_image[*i][*j];
+   F_16 = image[*i+1-1][*j+0-1];
+   F_17 = kernel[1][0];
+   F_18 = F_16*F_17;
+   F_19 = F_15+F_18;
+   
+
+   new_image[*i][*j] = F_19;
+   F_20 = new_image[*i][*j];
+   F_21 = image[*i+1-1][*j+1-1];
+   F_22 = kernel[1][1];
+   F_23 = F_21*F_22;
+   F_24 = F_20+F_23;
+   
+
+   new_image[*i][*j] = F_24;
+   F_25 = new_image[*i][*j];
+   F_26 = image[*i+1-1][*j+2-1];
+   F_27 = kernel[1][2];
+   F_28 = F_26*F_27;
+   F_29 = F_25+F_28;
+   
+
+   new_image[*i][*j] = F_29;
+   kj = 3;
+   ;
+   F_30 = new_image[*i][*j];
+   F_31 = image[*i+2-1][*j+0-1];
+   F_32 = kernel[2][0];
+   F_33 = F_31*F_32;
+   F_34 = F_30+F_33;
+   
+
+   new_image[*i][*j] = F_34;
+   F_35 = new_image[*i][*j];
+   F_36 = image[*i+2-1][*j+1-1];
+   F_37 = kernel[2][1];
+   F_38 = F_36*F_37;
+   F_39 = F_35+F_38;
+   
+
+   new_image[*i][*j] = F_39;
+   F_40 = new_image[*i][*j];
+   F_41 = image[*i+2-1][*j+2-1];
+   F_42 = kernel[2][2];
+   F_43 = F_41*F_42;
+   F_44 = F_40+F_43;
+   
+
+   new_image[*i][*j] = F_44;
+   kj = 3;
+   ki = 3;
+   F_45 = new_image[*i][*j];
+   F_46 = F_45/9;
+   new_image[*i][*j] = F_46;
+}

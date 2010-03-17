@@ -1,0 +1,49 @@
+delete empty_blocks2
+
+setproperty ABORT_ON_USER_ERROR FALSE
+
+create empty_blocks2 empty_blocks2.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER TRUE
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+echo
+echo Code with cumulated effects
+echo
+
+apply PRIVATIZE_MODULE(%ALL)
+
+
+# activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Parallelized code
+echo
+
+activate PRINT_PARALLELIZEDOMP_CODE
+setproperty PARALLELIZATION_STATISTICS TRUE
+display PARALLELPRINTED_FILE[main]
+
+echo
+echo Parallelized code seen as sequential
+echo
+
+apply INTERNALIZE_PARALLEL_CODE
+display PRINTED_FILE[main]
+
+echo
+echo Parallelized code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+delete empty_blocks2

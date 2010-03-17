@@ -1,0 +1,12 @@
+delete unroll9
+create unroll9 unroll9.f
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+apply FULL_UNROLL
+10
+display PRINTED_FILE
+
+close
+delete unroll9
+quit

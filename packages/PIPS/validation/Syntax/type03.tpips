@@ -1,0 +1,9 @@
+delete type03
+create type03 type03.f
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+display PRINTED_FILE[TYPE03]
+display PRINTED_FILE[SDOT]
+close
+delete type03
+quit

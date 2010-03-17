@@ -1,0 +1,32 @@
+! cloning on any constant...
+      PROGRAM C3
+      INTEGER I, N, M
+      PARAMETER (N=5, M = N + 1 - 2 + 1)
+      I = 4                                                             0005
+      I = I+1                                                           0006
+      CALL CLONEE_0(I)                                                  0007
+      CALL CLONEE_0(N)                                                  0008
+      CALL CLONEE_0(M)                                                  0009
+      CALL CLONEE_0(5)                                                  0010
+      CALL CLONEE(5+N-M)                                                0011
+      END
+
+      SUBROUTINE CLONEE(I)
+      INTEGER I
+      IF (I.EQ.5) PRINT *, 'ok'                                         0004
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_0(I)
+      INTEGER I
+!! PIPS: I is assumed a constant reaching value
+      IF (I.NE.5) STOP                                                  0013
+      PRINT *, 'ok'                                                     0016
+      END

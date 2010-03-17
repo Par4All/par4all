@@ -1,0 +1,50 @@
+Test prettyprint options for final and internal returns
+-------------------------------------------------------
+
+Default options (FALSE/TRUE)
+----------------------------
+      SUBROUTINE CHECKRETURN(N)
+C     Bug: an explicit RETURN is added by the prettyprinter; PIPS output
+C     are not PIPS compatible as input in some cases (WP65)
+      N = 1                                                             0004
+      IF (N.NE.1) RETURN                                                0005
+      N = 3                                                             0008
+      END
+FALSE/FALSE options
+-------------------
+      SUBROUTINE CHECKRETURN(N)
+C     Bug: an explicit RETURN is added by the prettyprinter; PIPS output
+C     are not PIPS compatible as input in some cases (WP65)
+      N = 1                                                             0004
+      IF (N.NE.1) RETURN                                                0005
+      N = 3                                                             0008
+      END
+FALSE/TRUE options (i.e. default)
+---------------------------------
+      SUBROUTINE CHECKRETURN(N)
+C     Bug: an explicit RETURN is added by the prettyprinter; PIPS output
+C     are not PIPS compatible as input in some cases (WP65)
+      N = 1                                                             0004
+      IF (N.NE.1) RETURN                                                0005
+      N = 3                                                             0008
+      END
+TRUE/FALSE options
+------------------
+      SUBROUTINE CHECKRETURN(N)
+C     Bug: an explicit RETURN is added by the prettyprinter; PIPS output
+C     are not PIPS compatible as input in some cases (WP65)
+      N = 1                                                             0004
+      IF (N.NE.1) RETURN                                                0005
+      N = 3                                                             0008
+      RETURN
+      END
+TRUE/TRUE options
+-----------------
+      SUBROUTINE CHECKRETURN(N)
+C     Bug: an explicit RETURN is added by the prettyprinter; PIPS output
+C     are not PIPS compatible as input in some cases (WP65)
+      N = 1                                                             0004
+      IF (N.NE.1) RETURN                                                0005
+      N = 3                                                             0008
+      RETURN
+      END

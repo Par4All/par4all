@@ -1,0 +1,33 @@
+delete switch02
+
+create switch02 switch02.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Parsed Printed file for "switch02"
+echo
+
+display PARSED_PRINTED_FILE[switch02]
+
+echo
+echo Parsed Printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Printed file for "switch02"
+echo
+
+display PRINTED_FILE[switch02]
+
+apply UNSPLIT[%PROGRAM]
+close
+
+#delete switch02
+
+quit

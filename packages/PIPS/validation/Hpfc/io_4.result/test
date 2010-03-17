@@ -1,0 +1,29 @@
+
+code
+
+      PROGRAM IO
+      EXTERNAL PRINT_RESULT
+      CALL PRINT_RESULT                                                 0003
+      END
+      SUBROUTINE PRINT_RESULT
+      PRINT *, 'result is: '                                            0002
+      END
+
+cumulated effects
+
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      SUBROUTINE PRINT_RESULT
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'result is: '                                            0002
+      END
+
+proper effects
+
+      PROGRAM IO
+      EXTERNAL PRINT_RESULT
+C               <may be read    >: __IO_EFFECTS:LUNS
+C               <may be written >: __IO_EFFECTS:LUNS
+      CALL PRINT_RESULT                                                 0003
+      END

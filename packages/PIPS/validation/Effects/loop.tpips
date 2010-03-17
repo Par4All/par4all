@@ -1,0 +1,9 @@
+delete loop
+create loop loop.f
+module LOOP
+apply PRIVATIZE_MODULE
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+display PARALLELPRINTED_FILE
+close
+delete loop
+quit

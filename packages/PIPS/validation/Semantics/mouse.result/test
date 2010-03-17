@@ -1,0 +1,24 @@
+
+C  P() {ENTRY==0}
+
+      PROGRAM MOUSE
+      INTEGER ENTRY
+      COMMON /CENTRY/ ENTRY
+      DATA ENTRY / 0 /
+
+C  P() {ENTRY==0}
+
+      MODE = 0                                                          0005
+
+C  P(MODE) {ENTRY==0, MODE==0}
+
+      CALL TRAP(MODE)                                                   0006
+
+C  P(ENTRY,MODE) {ENTRY#init==0, MODE==0, 1<=ENTRY}
+
+      MODE = 1                                                          0007
+
+C  P(ENTRY,MODE) {ENTRY#init==0, MODE==1, 1<=ENTRY}
+
+      CALL TRAP(MODE)                                                   0008
+      END

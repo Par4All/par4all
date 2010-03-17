@@ -1,0 +1,63 @@
+
+Parsed printed file for "point_to04"
+
+void point_to04()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+
+   p = &c;
+
+   p->d = p->a;
+   p->d = p->a = 4;
+}
+
+Proper effetcs for "point_to04"
+
+void point_to04()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//               <must be written>: p
+
+   p = &c;
+//               <must be read   >: p p[0][1]
+//               <must be written>: p[0][4]
+
+   p->d = p->a;
+//               <must be read   >: p
+//               <must be written>: p[0][1] p[0][4]
+   p->d = p->a = 4;
+}
+
+Cumulated effetcs for "point_to04"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+void point_to04()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//               <must be written>: p
+
+   p = &c;
+//               <must be read   >: p p[0][1]
+//               <must be written>: p[0][4]
+
+   p->d = p->a;
+//               <must be read   >: p
+//               <must be written>: p[0][1] p[0][4]
+   p->d = p->a = 4;
+}

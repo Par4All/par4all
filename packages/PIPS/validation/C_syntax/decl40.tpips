@@ -1,0 +1,12 @@
+setenv WSPC decl40
+setenv MAIN $WSPC.c
+delete $WSPC
+create $WSPC $MAIN
+activate C_PARSER
+activate PRINT_CODE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+display PRINTED_FILE[foo]
+close
+delete $WSPC
+quit

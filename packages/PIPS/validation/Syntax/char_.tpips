@@ -1,0 +1,7 @@
+delete char_
+create char_ char_.f
+module CHAR_
+display PRINTED_FILE[CHAR_]
+close
+delete char_
+quit

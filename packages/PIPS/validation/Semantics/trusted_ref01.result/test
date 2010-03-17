@@ -1,0 +1,24 @@
+
+C  P() {}
+
+      SUBROUTINE TRUSTED_REF01(X, N, M)
+
+      REAL X(N)
+
+C  P() {1<=N}
+
+
+      DO I = 1, M                                                       0005
+
+C  P(I) {1<=I, I<=M, I<=N, 1<=N}
+
+         X(I) = 0.                                                      0006
+      ENDDO
+
+C  P(I) {1<=I, M+1<=I, I<=N+1, 1<=N}
+
+
+      PRINT *, N, M                                                     0009
+
+      END
+

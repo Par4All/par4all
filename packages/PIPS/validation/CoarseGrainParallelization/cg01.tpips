@@ -1,0 +1,27 @@
+delete cg01
+create cg01 cg01.c
+echo Select some options to deal with the C Language:
+echo Parse as C:
+activate C_PARSER
+echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+#activate REGION_CHAINS
+
+display PARSED_PRINTED_FILE[main]
+display PRINTED_FILE[main]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+display PRINTED_FILE[main]
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[%ALL]
+close
+quit

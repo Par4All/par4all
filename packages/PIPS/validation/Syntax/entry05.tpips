@@ -1,0 +1,28 @@
+delete entry05
+create entry05 entry05.f
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module FOO
+echo
+
+# Force the parsing of FOO to make sure BAR is known when requested
+display PRINTED_FILE[FOO]
+
+echo
+echo Call graph for ENTRY05
+echo
+
+display CALLGRAPH_FILE[ENTRY05]
+
+echo
+echo Entry BAR
+echo
+
+# For fun
+display PRINTED_FILE[BAR]
+
+close
+delete entry05
+quit

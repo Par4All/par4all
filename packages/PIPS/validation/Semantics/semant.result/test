@@ -1,0 +1,48 @@
+--- Preconditions for module SEMANT
+
+C  P() {M==6}
+
+
+      SUBROUTINE SEMANT(A, N)
+      PARAMETER (MAXSIZ = 10)
+      DATA M /6/
+      REAL A(N)
+      EQUIVALENCE (I, J)
+
+C  P() {I==J, M==6}
+
+
+      IF (N.GE.MAXSIZ) THEN                                             0008
+
+C  P() {I==J, M==6, 10<=N}
+
+         N = MAXSIZ                                                     0009
+      ENDIF
+
+C  P(N) {I==J, M==6, N<=10, N<=N#init}
+
+
+      DO 1 I = 1, N, 2                                                  0012
+
+C  P(I,N) {I==J, M==6, 1<=I, I<=N, N<=10, N<=N#init}
+
+         A(I) = 0.                                                      0013
+
+C  P(I,N) {I==J, M==6, 1<=I, I<=N, N<=10, N<=N#init}
+
+         A(J+1) = 0.                                                    0014
+
+C  P(I,N) {I==J, M==6, 1<=I, I<=N, N<=10, N<=N#init}
+
+1        CONTINUE                                                       0015
+
+C  P(I,N) {I==J, M==6, 1<=I, I<=12, N+1<=I, N<=10, N<=N#init}
+
+
+      CALL SWAP(N, M)                                                   0017
+
+C  P(I,M,N) {I==J, M#init==6, N==6, 1<=I, I<=12, M+1<=I, M<=10,
+C    M<=N#init}
+
+      PRINT *, M, N                                                     0018
+      END

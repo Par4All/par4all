@@ -1,0 +1,15 @@
+delete ${WSPACE}
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+setenv MODULE=`basename $FILE .f`
+create ${WSPACE} ${FILE}
+activate RICE_FULL_DEPENDENCE_GRAPH
+setproperty WP65_MODEL_FILE "\"${MODULE}.rc\""
+# WP65_COMPUTE_MODULE
+apply WP65
+shell cat \
+  ${WSPACE}.database/${MODULE}/${MODULE}.wp65 \
+  ${WSPACE}.database/${MODULE}/${MODULE}.bank
+close
+delete ${WSPACE}
+quit

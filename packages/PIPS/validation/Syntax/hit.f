@@ -1,0 +1,56 @@
+C     Bug: yacc stack overflow with the data list for PSTR
+C     Modification: calls were eliminated to avoid increasing the source file
+
+      SUBROUTINE HIT(COORD,ORIGIN,DIR)
+      INTEGER COORD(4),DIR,ORIGIN
+C
+      INTEGER DIMS
+      PARAMETER (DIMS=4)
+      PARAMETER ( L1=12, L2=12, L3=12, L4=12 )
+      PARAMETER ( MBAR=18*L1*L2*L3 )
+      INTEGER UMAX
+      PARAMETER ( UMAX=72*L1*L2*L3*L4 )
+      INTEGER LATT(DIMS),LATT1(DIMS),MOV(DIMS),ROT(DIMS),WHICH(13,13)
+      REAL WLOOP(13,13),RES(13,13,6),BETA,LEGS(MBAR)
+      COMMON /COMSYS/ BETA,WLOOP,RES,LEGS,LATT,LATT1,MOV,ROT,WHICH
+C
+      REAL U1(UMAX)
+      COMMON /COMU1/ U1
+C
+      INTEGER OTHEND,SITE,CNT
+      INTEGER PU
+      REAL ST(18,6)
+      INTEGER PTEMP(24)
+C
+      INTEGER PSTR(24,4)
+      SAVE PSTR
+C
+      DATA PSTR/ 2,5,6,14,6,5,2,14,3,5,7,14,7,5,3,14,4,5,8,14,8,5,4,14,
+     .           1,6,5,14,5,6,1,14,3,6,7,14,7,6,3,14,4,6,8,14,8,6,4,14,
+     .           1,7,5,14,5,7,1,14,2,7,6,14,6,7,2,14,4,7,8,14,8,7,4,14,
+     .           1,8,5,14,5,8,1,14,2,8,6,14,6,8,2,14,3,8,7,14,7,8,3,14 /
+C
+C      CALL CPYMAT(PTEMP,PSTR(1,DIR+1),24) LPOINTER 4-3-89
+C      CALL ICPYMT(PTEMP,PSTR(1,DIR+1),24)
+C
+      IF(COORD(DIR+1).EQ.LATT1(DIR+1)) THEN
+        OTHEND = 0
+      ELSE
+        OTHEND = COORD(DIR+1)+1
+      ENDIF
+C
+      COORD(DIR+1) = OTHEND
+      SITE = COORD(1)*MOV(1)+COORD(2)*MOV(2)+COORD(3)*MOV(3)+
+     .           COORD(4)*MOV(4)
+      CNT = 1
+      DO 1 J=1,6
+        COORD(DIR+1) = OTHEND
+C        CALL SYSLOP(COORD,SITE,PTEMP(CNT),ST(1,J),NCHAR)
+        CNT = NCHAR+CNT
+    1 CONTINUE
+C
+      PU = ORIGIN+ROT(DIR+1)
+C      CALL CHOOS(ST(1,1),U1(PU+1))
+C
+      RETURN
+      END

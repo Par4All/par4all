@@ -1,0 +1,100 @@
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+int main()
+{
+   // BEGIN BLOCK
+   int a[100];
+   int i, j;
+   
+   /* Test with incomplete for: */
+   i = 2;
+   for (;i<=50;i++)
+      for (j = 2;j<100;j *= 2)
+         a[j] = 2;
+
+   for (i = 2;i<=50;) {
+      // BEGIN BLOCK
+      i++;
+      for (j = 2;j<100;j *= 2)
+         a[j] = 2;
+      // END BLOCK
+   }
+
+   for (i = 2;;i++)
+      for (j = 2;j<100;j *= 2)
+         a[j] = 2;
+   
+   /* Unreachable from here... */
+   for (;;)
+      for (j = 2;j<100;j *= 2)
+         a[j] = 2;
+
+   return 0;
+   // END BLOCK
+}
+int main()
+{
+   // BEGIN BLOCK
+   int a[100];
+   int i, j;
+   
+   /* Test with incomplete for: */
+   i = 2;
+   for(i = i; i <= 50; i += 1) {
+      // BEGIN BLOCK
+      j = 2;
+      while (j<100) {
+         // BEGIN BLOCK
+         a[j] = 2;
+         j *= 2;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+   i = 2;
+   while (i<=50) {
+      // BEGIN BLOCK
+      i++;
+      j = 2;
+      while (j<100) {
+         // BEGIN BLOCK
+         a[j] = 2;
+         j *= 2;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+   i = 2;
+   while (1) {
+      // BEGIN BLOCK
+      j = 2;
+      while (j<100) {
+         // BEGIN BLOCK
+         a[j] = 2;
+         j *= 2;
+         // END BLOCK
+      }
+      i++;
+      // END BLOCK
+   }
+   
+   /* Unreachable from here... */
+   while (1) {
+      // BEGIN BLOCK
+      j = 2;
+      while (j<100) {
+         // BEGIN BLOCK
+         a[j] = 2;
+         j *= 2;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+   return 0;
+   // END BLOCK
+}

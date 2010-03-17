@@ -1,0 +1,20 @@
+
+
+! test le preprocessing cpp de pips
+      PROGRAM CPP
+
+! ccp test header
+
+
+      PRINT *, '__PIPS__ est defini'                                    0009
+
+
+
+
+
+      PRINT *, '__HPFC__ est defini'                                    0015
+
+
+
+
+      END

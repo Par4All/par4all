@@ -1,0 +1,19 @@
+delete unsplit03
+create unsplit03 unsplit03.src/unsplit03.f unsplit03.src/unsplit03b.f
+
+echo
+echo First unsplit
+echo
+
+apply UNSPLIT[ONE]
+shell cat unsplit03.database/Src/unsplit03.f
+
+echo
+echo Second unsplit
+echo
+
+apply UNSPLIT[ONE]
+shell cat unsplit03.database/Src/unsplit03.f
+
+close
+delete unsplit03

@@ -1,0 +1,182 @@
+
+! initial function
+
+freia_status freia_30(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses (similar to freia_27)
+   // o0 = f(i)
+   // o1 = i | i
+   freia_aipo_threshold(o0, i, 10, 20, true);                           /*0008*/
+   freia_aipo_or(o1, i, i);                                             /*0009*/
+
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_30" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "9 |" [shape=trapezium,orientation=270];
+  "9 |" -> "o1";
+  "8 thr" [shape=parallelogram];
+  "8 thr" -> "o0";
+  "i" -> "9 |";
+  "i" -> "9 |";
+  "i" -> "8 thr";
+}
+// graph for dag "dag_cleaned_0" of module "freia_30" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "9 |" [shape=trapezium,orientation=270];
+  "9 |" -> "o1";
+  "8 thr" [shape=parallelogram];
+  "8 thr" -> "o0";
+  "i" -> "9 |";
+  "i" -> "9 |";
+  "i" -> "8 thr";
+}
+// graph for dag "freia_30_helper_0_0" of module "freia_30" in dot format
+digraph "freia_30_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "8 thr" [shape=parallelogram];
+  "8 thr" -> "o0";
+  "9 |" [shape=trapezium,orientation=270];
+  "9 |" -> "o1";
+  "i" -> "8 thr";
+  "i" -> "9 |";
+  "i" -> "9 |";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_30
+freia_status freia_30_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i [0 input 0] -> [0 alu] 9 or
+  // nope
+  // i [0 input 1] -> [0 alu] 9 or
+  // nope
+  // alu 9 or stage 0
+  si.alu[0][0].op = SPOC_ALU_OR_IN0_IN1;
+
+  // i [0 input 1] -> [0 threshold 1] 8 threshold
+  si.mux[0][3].op = SPOC_MUX_IN1;
+  // threshold 8 threshold stage 0 side 1
+  si.th[0][1].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][1].boundmin = inf0;
+  sp.th[0][1].boundmax = sup1;
+
+
+  // output image o0 on 1 and image o1 on 0
+  // o0 [0 threshold 1] -> [0 output 1] 0 null
+  // nope
+
+  // fill in to the end...
+  // o0 [0 output 1] -> [7 output 1] 0 null
+  // o0 [1 input 1] -> [7 output 1] 0 null
+  si.mux[1][3].op = SPOC_MUX_IN1;
+  // o0 [2 input 1] -> [7 output 1] 0 null
+  si.mux[2][3].op = SPOC_MUX_IN1;
+  // o0 [3 input 1] -> [7 output 1] 0 null
+  si.mux[3][3].op = SPOC_MUX_IN1;
+  // o0 [4 input 1] -> [7 output 1] 0 null
+  si.mux[4][3].op = SPOC_MUX_IN1;
+  // o0 [5 input 1] -> [7 output 1] 0 null
+  si.mux[5][3].op = SPOC_MUX_IN1;
+  // o0 [6 input 1] -> [7 output 1] 0 null
+  si.mux[6][3].op = SPOC_MUX_IN1;
+  // o0 [7 input 1] -> [7 output 1] 0 null
+  si.mux[7][3].op = SPOC_MUX_IN1;
+
+  // o1 [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // o1 [0 output 0] -> [7 output 0] 0 null
+  // o1 [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // o1 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // o1 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // o1 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // o1 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // o1 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // o1 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, i0);
+
+  return ret;
+}
+
+! updated function
+
+freia_status freia_30(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses (similar to freia_27)
+   // o0 = f(i)
+   // o1 = i | i
+   freia_30_helper_0_0_0(o0, o1, i, 10, 20, true);                      /*0008*/
+
+   return FREIA_OK;                                                     /*0011*/
+}

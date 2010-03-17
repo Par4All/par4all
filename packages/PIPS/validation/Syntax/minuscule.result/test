@@ -1,0 +1,10 @@
+      PROGRAM MINUSCULE
+      INTEGER TAB(100), TOB(200)
+      INTEGER TIB(100), TUB(200)
+C     lower case comment
+      PRINT *, 'foo'                                                    0005
+c     another lower case comment
+C     AND A LINE OF UPPER CASE LETTERS!
+      I = 0                                                             0008
+      J = 1                                                             0009
+      END

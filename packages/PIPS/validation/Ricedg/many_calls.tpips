@@ -1,0 +1,75 @@
+#
+# Script to test call to two different DG one after the other
+# using many_calls.f
+#
+# 
+# tpips=${tpips_version:-tpips}
+# 
+# Initialization:
+# rm -f many_calls.result/test
+# many_calls.test >many_calls.result/test
+# 
+
+delete many_calls
+
+create many_calls many_calls.f
+
+echo
+echo Five different views of the dependence graph
+echo
+
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+
+echo
+echo Whole dependence graph, preconditions and loop bounds ignored (1)
+echo
+
+activate RICE_FAST_DEPENDENCE_GRAPH # Preconditions Ignored
+
+display DG_FILE
+
+echo
+echo Whole dependence graph, preconditions ignored, loop bounds used (2)
+echo
+
+activate RICE_FULL_DEPENDENCE_GRAPH # Loop Bounds Used
+
+display DG_FILE
+
+echo
+echo Whole dependence graph, preconditions (and loop bounds) used (3)
+echo
+
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH # Preconditions Used
+
+display DG_FILE
+
+close
+
+open many_calls
+
+echo
+echo Effective dependence graph print-outs
+echo
+
+activate PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+
+echo
+echo Effective dependence graph, preconditions (and loop bounds) used (1b)
+echo
+
+activate RICE_FAST_DEPENDENCE_GRAPH
+
+display DG_FILE
+
+echo
+echo Effective dependence graph, preconditions ignored, loop bounds used (2b)
+echo
+
+activate RICE_FULL_DEPENDENCE_GRAPH
+activate PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+
+display DG_FILE
+close
+delete many_calls
+

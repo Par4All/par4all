@@ -1,0 +1,74 @@
+delete MMULT
+create MMULT mmult.c include/SIMD.c
+
+echo
+echo Initial code
+echo
+module Matrix_Mult
+
+display PRINTED_FILE
+
+#setproperty SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE TRUE
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+setproperty SAC_SIMD_REGISTER_WIDTH 128
+setproperty SIMD_FORTRAN_MEM_ORGANISATION=FALSE
+
+activate MUST_REGIONS
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+setproperty RICEDG_STATISTICS_ALL_ARRAYS TRUE
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+setproperty LOOP_LABEL "loop2"
+apply REDUCTION_VARIABLE_EXPANSION
+display PRINTED_FILE
+apply FORWARD_SUBSTITUTE
+display PRINTED_FILE
+setproperty LOOP_LABEL "loop2"
+apply FULL_UNROLL
+setproperty LOOP_LABEL "loop1"
+apply FULL_UNROLL
+display PRINTED_FILE
+
+#setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+#setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
+#apply ARRAY_TO_POINTER
+#display PRINTED_FILE
+
+apply PARTIAL_EVAL 
+display PRINTED_FILE
+
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+apply SINGLE_ASSIGNMENT
+display PRINTED_FILE
+
+echo
+echo simdized code
+echo
+apply SIMDIZER
+display PRINTED_FILE
+
+apply SIMD_LOOP_CONST_ELIM
+display PRINTED_FILE
+
+
+
+apply UNSPLIT
+
+shell cc mmult.c include/SIMD.c -o mmult0
+shell sed -i -e '1 i #include "SIMD.h"' MMULT.database/Src/mmult.c
+shell cc -Iinclude MMULT.database/Src/mmult.c include/SIMD.c -o mmult1
+shell sed -i -e '1 d' MMULT.database/Src/mmult.c
+shell if test "`./mmult0`" = "`./mmult1`" ; then echo seq-ok ; else echo seq-ko ; fi
+
+shell ./compileC.sh MMULT mmult.c mmult-sse.c
+shell cc -O3 -I. -march=native mmult-sse.c -o mmult2
+shell if test "`./mmult0`" = "`./mmult2`" ; then echo sse-ok ; else echo sse-ko ; fi
+shell rm -f mmult[012] mmult-sse.c
+
+close
+delete MMULT
+quit

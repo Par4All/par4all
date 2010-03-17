@@ -1,0 +1,88 @@
+
+Source code with proper effects
+
+int call07(int i)
+{
+//               <must be read   >: i
+//               <must be written>: i
+   return i++;                                                          /*0004*/
+}
+
+Source code with cumulated effects
+
+//               <must be read   >: i
+int call07(int i)
+{
+//               <must be read   >: i
+//               <must be written>: i
+   return i++;                                                          /*0004*/
+}
+
+Source code with transformers for "call07"
+
+
+//  T(call07) {call07==i}
+
+int call07(int i)
+{
+
+//  T(call07,i) {call07==i-1, call07==i#init}
+
+   return i++;                                                          /*0004*/
+}
+
+Source code with transformers for "main"
+
+
+//  T() {}
+
+main()
+{
+   int ai;                                                              /*0004*/
+
+//  T(ai) {ai==2}
+
+
+   ai = call07(2);                                                      /*0006*/
+}
+
+Source code with preconditions for "call07"
+
+
+//  P() {i==2}
+
+int call07(int i)
+{
+
+//  P() {i==2}
+
+   return i++;                                                          /*0004*/
+}
+
+Source code with preconditions for "main"
+
+
+//  P() {}
+
+main()
+{
+   int ai;                                                              /*0004*/
+
+//  P() {}
+
+
+   ai = call07(2);                                                      /*0006*/
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+INITIAL_PRECONDITION[call07] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[call07] (NormalizeExpression) expression is already normalized
+PRINT_CODE_TRANSFORMERS[call07] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
+PRECONDITIONS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[call07] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call07!] (ordinary_summary_precondition) empty precondition to call07! because not in call tree from main.

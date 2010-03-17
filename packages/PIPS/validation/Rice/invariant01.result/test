@@ -1,0 +1,76 @@
+
+Initial source code
+
+void invariant01(int n, int ni, int nj)
+{
+   // BEGIN BLOCK
+   float x[n][n];
+   float y[n];
+   int i;
+   int j;
+   float s;
+
+   for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
+      for(j = 0; j <= nj-1; j += 1) {                                   /*0009*/
+         // BEGIN BLOCK
+         s = y[i];                                                      /*0010*/
+         x[i][j] = s;                                                   /*0011*/
+         // END BLOCK
+      }
+   // END BLOCK
+}
+
+Parallelized code
+
+void invariant01(int n, int ni, int nj)
+{
+   // BEGIN BLOCK
+   float x[n][n];
+   float y[n];
+   int i;
+   int j;
+   float s;
+   // BEGIN BLOCK
+
+   for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
+      // BEGIN BLOCK
+      for(j = 0; j <= nj-1; j += 1) {                                   /*0009*/
+         // BEGIN BLOCK
+         s = y[i];                                                      /*0010*/
+         x[i][j] = s;                                                   /*0011*/
+         // END BLOCK
+      }
+      // END BLOCK
+   // END BLOCK
+   // END BLOCK
+}
+
+Source code after invariant code motion
+
+void invariant01(int n, int ni, int nj)
+{
+   // BEGIN BLOCK
+   float x[n][n];
+   float y[n];
+   int i;
+   int j;
+   float s;
+   // BEGIN BLOCK
+
+   for(i = 0; i <= ni-1; i += 1) {                                      /*0008*/
+      // BEGIN BLOCK
+      // BEGIN BLOCK                                                    /*0010*/
+      j = MAX(INT(nj), 0);
+      s = y[i];                                                         /*0010*/
+      // END BLOCK                                                      /*0010*/
+#pragma omp parallel for 
+      for(j = 0; j <= nj-1; j += 1)                                     /*0009*/
+         x[i][j] = s;                                                   /*0011*/
+      // END BLOCK
+   }
+   // END BLOCK
+   // END BLOCK
+}
+
+Warnings
+

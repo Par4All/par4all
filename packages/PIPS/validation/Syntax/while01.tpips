@@ -1,0 +1,6 @@
+delete while01
+create while01 while01.f
+display PRINTED_FILE
+close
+delete while01
+quit

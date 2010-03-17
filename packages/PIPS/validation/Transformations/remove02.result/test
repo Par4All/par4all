@@ -1,0 +1,75 @@
+
+Initial code
+
+int main()
+{
+   float a[10];
+   float b[10][10][10][10][10];
+   int m = 0;
+   int n = 0;
+   int o = 2;
+
+l0:
+   for(m = 0; m <= 9; m += 1) {
+//  call sum[n],
+      n = n+1;
+      a[m] = n;
+   }
+//  loop sum[o],
+
+l1:
+   for(m = 0; m <= 9; m += 1) {
+//  call sum[n],
+      // comments 4
+      n = n+1;
+//  call sum[o],
+      o = 2+o;
+//  call sum[o],
+      o = 2+o;
+//  call sum[n],
+      n = n+5;
+      b[0][0][1][m][0] = n;
+   }
+   printf("%d\n", o);
+
+   return 0;
+}
+
+after removing reductions
+
+int main()
+{
+   float a[10];
+   float b[10][10][10][10][10];
+   int m = 0;
+   int n = 0;
+   int o = 2;
+   //PIPS generated variable
+   int RED[9+1];
+
+l0:
+   for(m = 0; m <= 9; m += 1) {
+      n = n+1;
+      a[m] = n;
+   }
+   for(m = 0; m <= 9; m += 1)
+      RED[m] = 0;
+
+l1:
+   for(m = 0; m <= 9; m += 1) {
+      // comments 4
+      n = n+1;
+      RED[m] = 2+RED[m];
+      RED[m] = 2+RED[m];
+      n = n+5;
+      b[0][0][1][m][0] = n;
+   }
+   for(m = 0; m <= 9; m += 1)
+      o = o+RED[m];
+   printf("%d\n", o);
+
+   return 0;
+}
+
+Unsplit resulting code
+

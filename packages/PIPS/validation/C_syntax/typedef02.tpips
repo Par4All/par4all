@@ -1,0 +1,18 @@
+delete typedef02
+create typedef02 typedef02.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+
+delete typedef02
+
+quit

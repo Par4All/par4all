@@ -1,0 +1,32 @@
+delete enum02
+create enum02 enum02.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+echo
+echo Parsed printed file for "enum02!"
+echo
+
+display PARSED_PRINTED_FILE[enum02!]
+
+echo
+echo Printed file for "enum02!"
+echo
+
+display PRINTED_FILE[enum02!]
+
+echo
+echo Printed file with precoditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+
+delete enum02
+
+quit

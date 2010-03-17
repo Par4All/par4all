@@ -1,0 +1,37 @@
+setenv WSPC decl46
+setenv MAIN $WSPC.c
+delete $WSPC
+create $WSPC $MAIN
+activate C_PARSER
+activate C_SYMBOL_TABLE
+activate PRINT_CODE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Symbol table for "decl46!"
+echo
+
+display SYMBOL_TABLE_FILE[decl46!]
+
+echo
+echo Symbol table for "decl46"
+echo
+
+display SYMBOL_TABLE_FILE[decl46]
+
+echo
+echo Code for "decl46"
+echo
+
+display PRINTED_FILE[decl46]
+
+echo
+echo Call graph for "decl46"
+echo
+
+display CALLGRAPH_FILE[decl46]
+close
+delete $WSPC
+quit

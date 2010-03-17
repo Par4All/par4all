@@ -1,0 +1,9 @@
+delete ajoutflow
+create ajoutflow ajoutflow.f
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete ajoutflow
+quit
+

@@ -1,0 +1,28 @@
+delete enum04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create enum04 enum04.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PARSED_PRINTED_FILE[enum04!]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Preconditions derived from enum
+echo
+
+display PRINTED_FILE[enum04!]
+echo
+display PRINTED_FILE[main]
+
+close
+
+delete enum04
+
+quit

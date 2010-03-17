@@ -1,0 +1,10 @@
+delete dc
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty PRETTYPRINT_HEADER_COMMENTS TRUE
+setproperty PRETTYPRINT_COMMONS "include"
+create dc data_common.f
+apply CLEAN_DECLARATIONS($ALL)
+display PRINTED_FILE($ALL)
+close
+delete dc

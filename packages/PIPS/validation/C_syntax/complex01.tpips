@@ -1,0 +1,22 @@
+delete complex01
+create complex01 complex01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[complex01]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[complex01]
+
+close
+#delete complex01
+quit

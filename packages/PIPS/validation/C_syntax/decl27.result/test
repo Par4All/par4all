@@ -1,0 +1,56 @@
+
+Symbol table for "decl27!"
+
+decl27!
+
+Declarations for module "decl27!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 18
+	Declared entity "TOP-LEVEL:i1" with type "variable" "long long"
+	Declared entity "TOP-LEVEL:i2" with type "variable" "long"
+	Declared entity "TOP-LEVEL:i3" with type "variable" "int"
+	Declared entity "TOP-LEVEL:i4" with type "variable" "short"
+	Declared entity "decl27!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl27!:*HEAP*" with type "area" with size 0
+	Declared entity "decl27!:*STACK*" with type "area" with size 0
+	Declared entity "decl27!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 18:
+	Variable "TOP-LEVEL:i1"	offset = 0	size = 8
+	Variable "TOP-LEVEL:i2"	offset = 8	size = 4
+	Variable "TOP-LEVEL:i3"	offset = 12	size = 4
+	Variable "TOP-LEVEL:i4"	offset = 16	size = 2
+
+
+Layout for memory area "decl27!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl27!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl27!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl27!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl27!
+
+
+Parsed printed file for "decl27!"
+
+/* Check PIPS size of different integers */
+long long i1;
+long i2;
+int i3;
+short i4;

@@ -1,0 +1,51 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *a, *b, c, d;
+//               <must be written>: c
+   c = 0;
+//               <must be written>: d
+   d = 1;
+//               <must be written>: b
+   b = &c;
+//               <must be read   >: c
+
+   while (c>0) {
+      // BEGIN BLOCK
+//               <must be read   >: b
+//               <must be written>: a
+
+      a = b;
+//               <must be written>: b
+      b = &d;
+      // END BLOCK
+   }
+//               <must be written>: b
+   b = &c;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   int *a, *b, c, d;
+   c = 0;
+   d = 1;
+   b = &c;
+//  points to = {(b,c,E)}
+
+   while (c>0) {
+//  points to = {(a,d,M)({,c,M)(a,c,M)(b,d,M)}
+      // BEGIN BLOCK
+
+      a = b;
+      b = &d;
+      // END BLOCK
+   }
+//  points to = {(a,d,M)(b,c,M)(a,c,M)(b,d,M)}
+   b = &c;
+//  points to = {(a,d,M)(b,c,E)(a,c,M)}
+   return 0;
+   // END BLOCK
+}

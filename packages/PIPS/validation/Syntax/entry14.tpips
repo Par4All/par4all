@@ -1,0 +1,5 @@
+delete e14
+create e14 entry14.f
+display PRINTED_FILE[%ALL]
+close
+delete e14

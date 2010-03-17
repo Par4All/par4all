@@ -1,0 +1,36 @@
+delete constants03
+create constants03 constants03.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[constants03]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[constants03]
+
+echo
+echo Preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[constants03]
+
+close
+
+delete constants03
+
+

@@ -1,0 +1,46 @@
+externalloc07!
+
+Declarations for module "externalloc07!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
+	Declared entity "TOP-LEVEL:j" with type "variable" "int"
+	Declared entity "externalloc07!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "externalloc07!:*HEAP*" with type "area" with size 0
+	Declared entity "externalloc07!:*STACK*" with type "area" with size 0
+	Declared entity "externalloc07!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:i"	with type "variable" "int"
+	Declared external entity "TOP-LEVEL:j"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:i"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:j"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "externalloc07!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "externalloc07!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "externalloc07!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "externalloc07!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module externalloc07!
+
+//Checks Memory allocation offsets for two continuous global external variable 
+extern int i;
+extern int j;

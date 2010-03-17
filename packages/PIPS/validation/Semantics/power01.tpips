@@ -1,0 +1,10 @@
+delete power01
+create power01 power01.f
+module POWER01
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[POWER01]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[POWER01]
+close
+delete power01
+quit

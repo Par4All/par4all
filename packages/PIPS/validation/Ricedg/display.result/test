@@ -1,0 +1,113 @@
+
+Printed file for "IMPACTMAYMUST"
+
+
+      SUBROUTINE FOO(X,Y,Z,ZZ)
+      COMMON /COM/ T
+      INTEGER X, Y, Z(5), ZZ, I
+C               <must be read   >: X
+C               <must be written>: X
+      X = X+1                                                           0005
+C               <must be read   >: Y
+C               <must be written>: T
+      T = Y                                                             0006
+C               <must be written>: I
+      I = 6                                                             0007
+C               <must be read   >: I
+      DO WHILE (I.LT.5)                                                 0008
+C               <must be read   >: I Z(I) ZZ
+C               <must be written>: Z(I)
+         Z(I) = ZZ*Z(I)                                                 0009
+      ENDDO
+C               <must be written>: Y
+      Y = 2                                                             0011
+C               <must be read   >: Y
+C               <must be written>: I
+      DO I = 1, Y                                                       0012
+C               <must be read   >: X Y
+C               <must be written>: X
+         X = X+2                                                        0013
+      ENDDO
+      END
+
+Printed file with cumulated effects for "IMPACTMAYMUST"
+
+C               <may be read    >: Z(*)
+C               <may be written >: Z(*)
+C               <must be read   >: X Y ZZ
+C               <must be written>: T X Y
+
+      SUBROUTINE FOO(X,Y,Z,ZZ)
+      COMMON /COM/ T
+      INTEGER X, Y, Z(5), ZZ, I
+C               <must be read   >: X
+C               <must be written>: X
+      X = X+1                                                           0005
+C               <must be read   >: Y
+C               <must be written>: T
+      T = Y                                                             0006
+C               <must be written>: I
+      I = 6                                                             0007
+C               <may be read    >: Z(*)
+C               <may be written >: Z(*)
+C               <must be read   >: I ZZ
+      DO WHILE (I.LT.5)                                                 0008
+C               <may be read    >: Z(*)
+C               <may be written >: Z(*)
+C               <must be read   >: I ZZ
+         Z(I) = ZZ*Z(I)                                                 0009
+      ENDDO
+C               <must be written>: Y
+      Y = 2                                                             0011
+C               <may be read    >: X
+C               <may be written >: X
+C               <must be read   >: Y
+C               <must be written>: I
+      DO I = 1, Y                                                       0012
+C               <must be read   >: X Y
+C               <must be written>: X
+         X = X+2                                                        0013
+      ENDDO
+      END
+
+Whole dependence graph for "IMPACTMAYMUST"
+
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	13 --> 13 with conflicts
+		from <X-R-MUST> to <X-W-MUST> at levels  1
+
+	13 --> 13 with conflicts
+		from <X-W-MUST> to <X-R-MUST> at levels  1
+
+		from <X-W-MUST> to <X-W-MUST> at levels  1
+
+	11 --> 13 with conflicts
+		from <Y-W-MUST> to <Y-R-MUST>
+	11 --> 12 with conflicts
+		from <Y-W-MUST> to <Y-R-MUST>
+	09 --> 12 with conflicts
+		from <I-R-MUST> to <I-W-MUST>
+	09 --> 09 with conflicts
+		from <Z(I)-R-MUST> to <Z(I)-W-MUST>
+	09 --> 09 with conflicts
+		from <Z(I)-W-MUST> to <Z(I)-R-MUST>
+		from <Z(I)-W-MUST> to <Z(I)-W-MUST>
+	08 --> 12 with conflicts
+		from <I-R-MUST> to <I-W-MUST>
+	07 --> 12 with conflicts
+		from <I-W-MUST> to <I-W-MUST>
+	07 --> 09 with conflicts
+		from <I-W-MUST> to <I-R-MUST>
+	07 --> 08 with conflicts
+		from <I-W-MUST> to <I-R-MUST>
+	06 --> 11 with conflicts
+		from <Y-R-MUST> to <Y-W-MUST>
+	05 --> 13 with conflicts
+		from <X-R-MUST> to <X-W-MUST>
+	05 --> 13 with conflicts
+		from <X-W-MUST> to <X-R-MUST>
+		from <X-W-MUST> to <X-W-MUST>
+
+****************** End of Dependence Graph ******************

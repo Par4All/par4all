@@ -1,0 +1,69 @@
+*
+* Call with many array references
+*
+      SUBROUTINE RESID(U,V,R,N,A)
+      INTEGER N
+      REAL*8 U(N,N,N),V(N,N,N),R(N,N,N),A(0:3)
+      INTEGER I3, I2, I1
+C
+      DO 600 I3 = 2, N-1                                                0001
+         DO 600 I2 = 2, N-1                                             0002
+            DO 600 I1 = 2, N-1                                          0003
+               IF (I3+1.LT.1.OR.I3+1.GT.N) STOP 
+     &         "Bound violation:array RESID:U, 3rd dimension"
+               IF (I3-1.LT.1.OR.I3-1.GT.N) STOP 
+     &         "Bound violation:array RESID:U, 3rd dimension"
+               IF (I2+1.LT.1.OR.I2+1.GT.N) STOP 
+     &         "Bound violation:array RESID:U, 2nd dimension"
+               IF (I2-1.LT.1.OR.I2-1.GT.N) STOP 
+     &         "Bound violation:array RESID:U, 2nd dimension"
+               IF (I1+1.LT.1.OR.I1+1.GT.N) STOP 
+     &         "Bound violation:array RESID:U, 1st dimension"
+               IF (I1-1.LT.1.OR.I1-1.GT.N) STOP 
+     &         "Bound violation:array RESID:U, 1st dimension"
+               IF (I3.LT.1.OR.I3.GT.N) STOP 
+     &         "Bound violation:array RESID:R, 3rd dimension"
+               IF (I2.LT.1.OR.I2.GT.N) STOP 
+     &         "Bound violation:array RESID:R, 2nd dimension"
+               IF (I1.LT.1.OR.I1.GT.N) STOP 
+     &         "Bound violation:array RESID:R, 1st dimension"
+               R(I1,I2,I3) = V(I1,I2,I3)-A(0)*U(I1,I2,I3)-A(1)*(U(I1-   0004
+     &         1,I2,I3)+U(I1+1,I2,I3)+U(I1,I2-1,I3)+U(I1,I2+1,I3)+U(    0004
+     &         I1,I2,I3-1)+U(I1,I2,I3+1))-A(2)*(U(I1-1,I2-1,I3)+U(I1+   0004
+     &         1,I2-1,I3)+U(I1-1,I2+1,I3)+U(I1+1,I2+1,I3)+U(I1,I2-1,    0004
+     &         I3-1)+U(I1,I2+1,I3-1)+U(I1,I2-1,I3+1)+U(I1,I2+1,I3+1)+   0004
+     &         U(I1-1,I2,I3-1)+U(I1-1,I2,I3+1)+U(I1+1,I2,I3-1)+U(I1+1   0004
+     &         ,I2,I3+1))-A(3)*(U(I1-1,I2-1,I3-1)+U(I1+1,I2-1,I3-1)+U   0004
+     &         (I1-1,I2+1,I3-1)+U(I1+1,I2+1,I3-1)+U(I1-1,I2-1,I3+1)+U   0004
+     &         (I1+1,I2-1,I3+1)+U(I1-1,I2+1,I3+1)+U(I1+1,I2+1,I3+1))    0004
+
+600            CONTINUE                                                 0005
+C
+C
+      END
+*
+* Call with many array references
+*
+      SUBROUTINE RESID(U,V,R,N,A)
+      INTEGER N
+      REAL*8 U(N,N,N),V(N,N,N),R(N,N,N),A(0:3)
+      INTEGER I3, I2, I1
+C
+      DO 600 I3 = 2, N-1                                                0001
+         DO 600 I2 = 2, N-1                                             0002
+            DO 600 I1 = 2, N-1                                          0003
+               R(I1,I2,I3) = V(I1,I2,I3)-A(0)*U(I1,I2,I3)-A(1)*(U(I1-   0004
+     &         1,I2,I3)+U(I1+1,I2,I3)+U(I1,I2-1,I3)+U(I1,I2+1,I3)+U(    0004
+     &         I1,I2,I3-1)+U(I1,I2,I3+1))-A(2)*(U(I1-1,I2-1,I3)+U(I1+   0004
+     &         1,I2-1,I3)+U(I1-1,I2+1,I3)+U(I1+1,I2+1,I3)+U(I1,I2-1,    0004
+     &         I3-1)+U(I1,I2+1,I3-1)+U(I1,I2-1,I3+1)+U(I1,I2+1,I3+1)+   0004
+     &         U(I1-1,I2,I3-1)+U(I1-1,I2,I3+1)+U(I1+1,I2,I3-1)+U(I1+1   0004
+     &         ,I2,I3+1))-A(3)*(U(I1-1,I2-1,I3-1)+U(I1+1,I2-1,I3-1)+U   0004
+     &         (I1-1,I2+1,I3-1)+U(I1+1,I2+1,I3-1)+U(I1-1,I2-1,I3+1)+U   0004
+     &         (I1+1,I2-1,I3+1)+U(I1-1,I2+1,I3+1)+U(I1+1,I2+1,I3+1))    0004
+
+600            CONTINUE                                                 0005
+C
+C
+      END
+

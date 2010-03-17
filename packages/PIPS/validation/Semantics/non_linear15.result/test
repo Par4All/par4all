@@ -1,0 +1,151 @@
+
+C  T(I,J) {}
+
+
+      SUBROUTINE FOO(I, J, K)
+
+C  T(I,J,L) {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(J) {}
+
+C (0,2)
+      J = K*I                                                           0003
+
+C  T(I,L) {}
+
+C (0,3)
+      IF (K.EQ.2) THEN                                                  0004
+
+C  T(I,L) {K==2}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T(I) {K==2}
+
+C (0,5)
+         READ *, I                                                      0005
+
+C  T(L) {K==2}
+
+C (0,6)
+         L = J*M                                                        0006
+
+C  T() {K==2}
+
+C (0,7)
+         PRINT *, L                                                     0007
+C        END BLOCK
+      ENDIF
+
+C     END BLOCK
+      END
+
+C  P() {I==2}
+
+
+      SUBROUTINE FOO(I, J, K)
+
+C  P() {I==2}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {I==2}
+
+C (0,2)
+      J = K*I                                                           0003
+
+C  P(J) {I==2, J==2K}
+
+C (0,3)
+      IF (K.EQ.2) THEN                                                  0004
+
+C  P(J) {I==2, J==4, K==2}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  P(J) {I==2, J==4, K==2}
+
+C (0,5)
+         READ *, I                                                      0005
+
+C  P(I,J) {I#init==2, J==4, K==2}
+
+C (0,6)
+         L = J*M                                                        0006
+
+C  P(I,J,L) {I#init==2, J==4, K==2, L==4M}
+
+C (0,7)
+         PRINT *, L                                                     0007
+C        END BLOCK
+      ENDIF
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR15
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     Check REFINE_TRANSFORMERS
+
+      I = 2                                                             0005
+
+C  P(I) {I==2}
+
+C (0,3)
+      CALL FOO(I, J, K)                                                 0006
+
+C  P(I,J) {}
+
+C (0,4)
+      PRINT *, J                                                        0007
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR15
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     Check REFINE_TRANSFORMERS
+
+      I = 2                                                             0005
+
+C  P(I) {I==2}
+
+C (0,3)
+      CALL FOO(I, J, K)                                                 0006
+
+C  P(I,J) {J==2K}
+
+C (0,4)
+      PRINT *, J                                                        0007
+
+C     END BLOCK
+      END
+

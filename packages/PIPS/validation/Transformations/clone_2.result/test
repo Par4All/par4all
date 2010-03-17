@@ -1,0 +1,89 @@
+# initial callgraph
+ C2
+     CLONEE
+# initial codes
+! trying clone transformations...
+      PROGRAM C2
+      CALL CLONEE(1, 1)                                                 0003
+      CALL CLONEE(2, 3)                                                 0004
+      CALL CLONEE(2, 2)                                                 0005
+      END
+
+      SUBROUTINE CLONEE(I, J)
+      INTEGER I, J
+      IF (I.EQ.J) THEN                                                  0004
+         PRINT *, 'both arguments are equal'                            0005
+      ELSE
+         PRINT *, 'the arguments are different'                         0007
+      ENDIF
+      PRINT *, I, J                                                     0009
+      END
+# applying clone...
+# new callgraph
+ C2
+     CLONEE_0
+     CLONEE
+# new codes.
+! trying clone transformations...
+      PROGRAM C2
+      CALL CLONEE_0(1, 1)                                               0003
+      CALL CLONEE(2, 3)                                                 0004
+      CALL CLONEE_0(2, 2)                                               0005
+      END
+
+      SUBROUTINE CLONEE(I, J)
+      INTEGER I, J
+      IF (I.EQ.J) THEN                                                  0004
+         PRINT *, 'both arguments are equal'                            0005
+      ELSE
+         PRINT *, 'the arguments are different'                         0007
+      ENDIF
+      PRINT *, I, J                                                     0009
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_0(I, J)
+      INTEGER I, J
+      IF (I.EQ.J) THEN                                                  0012
+         PRINT *, 'both arguments are equal'                            0013
+      ELSE
+         PRINT *, 'the arguments are different'                         0015
+      ENDIF
+      PRINT *, I, J                                                     0017
+      END
+# applying dead code elimination...
+! trying clone transformations...
+      PROGRAM C2
+      CALL CLONEE_0(1, 1)                                               0003
+      CALL CLONEE(2, 3)                                                 0004
+      CALL CLONEE_0(2, 2)                                               0005
+      END
+
+      SUBROUTINE CLONEE(I, J)
+      INTEGER I, J
+      PRINT *, 'the arguments are different'                            0007
+      PRINT *, I, J                                                     0009
+      END
+!!
+!! PIPS: please caution!
+!!
+!! this routine has been generated as a clone of CLONEE
+!! the code may change significantly with respect to the original
+!! version, especially after program transformations such as dead
+!! code elimination and partial evaluation, hence the function may
+!! not have the initial behavior, if called under some other context.
+!!
+      SUBROUTINE CLONEE_0(I, J)
+      INTEGER I, J
+      PRINT *, 'both arguments are equal'                               0013
+      PRINT *, I, J                                                     0017
+      END
+# done
+

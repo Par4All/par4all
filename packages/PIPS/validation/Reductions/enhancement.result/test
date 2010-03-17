@@ -1,0 +1,917 @@
+typedef unsigned int size_t;
+
+/* Convenience types.  */
+typedef unsigned char __u_char;
+typedef unsigned short __u_short;
+typedef unsigned int __u_int;
+typedef unsigned long __u_long;
+
+/* Fixed-size types, underlying types depend on word size and compiler.  */
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef signed short __int16_t;
+typedef unsigned short __uint16_t;
+typedef signed int __int32_t;
+typedef unsigned int __uint32_t;
+/* quad_t is also 64 bits.  */
+typedef struct {
+   long __val[2];
+} __quad_t;
+typedef struct {
+   __u_long __val[2];
+} __u_quad_t;
+
+
+typedef __u_quad_t __dev_t;
+/* Type of device numbers.  */
+typedef unsigned int __uid_t;
+/* Type of user identifications.  */
+typedef unsigned int __gid_t;
+/* Type of group identifications.  */
+typedef unsigned long __ino_t;
+/* Type of file serial numbers.  */
+typedef __u_quad_t __ino64_t;
+/* Type of file serial numbers (LFS).*/
+typedef unsigned int __mode_t;
+/* Type of file attribute bitmasks.  */
+typedef unsigned int __nlink_t;
+/* Type of file link counts.  */
+typedef long __off_t;
+/* Type of file sizes and offsets.  */
+typedef __quad_t __off64_t;
+/* Type of file sizes and offsets (LFS).  */
+typedef int __pid_t;
+/* Type of process identifications.  */
+typedef struct {
+   int __val[2];
+} __fsid_t;
+/* Type of file system IDs.  */
+typedef long __clock_t;
+/* Type of CPU usage counts.  */
+typedef unsigned long __rlim_t;
+/* Type for resource measurement.  */
+typedef __u_quad_t __rlim64_t;
+/* Type for resource measurement (LFS).  */
+typedef unsigned int __id_t;
+/* General type for IDs.  */
+typedef long __time_t;
+/* Seconds since the Epoch.  */
+typedef unsigned int __useconds_t;
+/* Count of microseconds.  */
+typedef long __suseconds_t;
+/* Signed count of microseconds.  */
+
+typedef int __daddr_t;
+/* The type of a disk address.  */
+typedef long __swblk_t;
+/* Type of a swap block maybe?  */
+typedef int __key_t;
+/* Type of an IPC key.  */
+
+/* Clock ID used in clock and timer functions.  */
+typedef int __clockid_t;
+
+/* Timer ID returned by `timer_create'.  */
+typedef void *__timer_t;
+
+/* Type to represent block size.  */
+typedef long __blksize_t;
+
+/* Types from the Large File Support interface.  */
+
+/* Type to count number of disk blocks.  */
+typedef long __blkcnt_t;
+typedef __quad_t __blkcnt64_t;
+
+/* Type to count file system blocks.  */
+typedef unsigned long __fsblkcnt_t;
+typedef __u_quad_t __fsblkcnt64_t;
+
+/* Type to count file system nodes.  */
+typedef unsigned long __fsfilcnt_t;
+typedef __u_quad_t __fsfilcnt64_t;
+
+typedef int __ssize_t;
+/* Type of a byte count, or error.  */
+
+/* These few don't really vary by system, they always correspond
+   to one of the other defined types.  */
+typedef __off64_t __loff_t;
+/* Type of file sizes and offsets (LFS).  */
+typedef __quad_t *__qaddr_t;
+typedef char *__caddr_t;
+
+/* Duplicates info from stdint.h but this is used in unistd.h.  */
+typedef int __intptr_t;
+
+/* Duplicate info from sys/socket.h.  */
+typedef unsigned int __socklen_t;
+
+
+
+
+
+
+
+/* Define outside of namespace so the C++ is happy.  */
+
+
+
+/* The opaque type of streams.  This is the definition used elsewhere.  */
+typedef struct _IO_FILE FILE;
+/* The opaque type of streams.  This is the definition used elsewhere.  */
+typedef struct _IO_FILE __FILE;
+/* Value so far.  */
+typedef struct {
+   int __count;
+   union {unsigned int __wch; char __wchb[4];} __value;
+} __mbstate_t;
+typedef struct {
+   __off_t __pos;
+   __mbstate_t __state;
+} _G_fpos_t;
+typedef struct {
+   __off64_t __pos;
+   __mbstate_t __state;
+} _G_fpos64_t;
+typedef int _G_int16_t;
+typedef int _G_int32_t;
+typedef unsigned int _G_uint16_t;
+typedef unsigned int _G_uint32_t;
+/* Define __gnuc_va_list.  */
+
+
+
+typedef __builtin_va_list __gnuc_va_list;
+
+
+/* Handle lock.  */
+
+
+
+
+
+
+
+typedef void _IO_lock_t;
+struct _IO_marker {
+   struct _IO_marker *_next;
+   struct _IO_FILE *_sbuf;
+   int _pos;
+};
+
+/* This is the structure from the libstdc++ codecvt class.  */
+enum __codecvt_result {__codecvt_ok, __codecvt_partial, __codecvt_error, __codecvt_noconv};
+
+
+
+
+
+
+
+/* Make sure we don't get into trouble again.  */
+struct _IO_FILE {
+   int _flags;
+   char *_IO_read_ptr;
+   char *_IO_read_end;
+   char *_IO_read_base;
+   char *_IO_write_base;
+   char *_IO_write_ptr;
+   char *_IO_write_end;
+   char *_IO_buf_base;
+   char *_IO_buf_end;
+   char *_IO_save_base;
+   char *_IO_backup_base;
+   char *_IO_save_end;
+   struct _IO_marker *_markers;
+   struct _IO_FILE *_chain;
+   int _fileno;
+   int _flags2;
+   __off_t _old_offset;
+   unsigned short _cur_column;
+   signed char _vtable_offset;
+   char _shortbuf[1];
+   _IO_lock_t *_lock;
+   __off64_t _offset;
+   void *__pad1;
+   void *__pad2;
+   void *__pad3;
+   void *__pad4;
+   size_t __pad5;
+   int _mode;
+   char _unused2[15*sizeof(int)-4*sizeof(void *)-sizeof(size_t)];
+};
+
+
+typedef struct _IO_FILE _IO_FILE;
+
+
+
+
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+extern struct _IO_FILE_plus _IO_2_1_stdout_;
+extern struct _IO_FILE_plus _IO_2_1_stderr_;
+/* Functions to do I/O and file management for a stream.  */
+
+/* Read NBYTES bytes from COOKIE into a buffer pointed to by BUF.
+   Return number of bytes read.  */
+typedef __ssize_t __io_read_fn(void *__cookie, char *__buf, size_t __nbytes);
+
+/* Write N bytes pointed to by BUF to COOKIE.  Write all N bytes
+   unless there is an error.  Return number of bytes written, or -1 if
+   there is an error without writing anything.  If the file has been
+   opened for append (__mode.__append set), then set the file pointer
+   to the end of the file and then do the write; if not, just write at
+   the current file pointer.  */
+
+typedef __ssize_t __io_write_fn(void *__cookie, const char *__buf, size_t __n);
+
+/* Move COOKIE's file position to *POS bytes from the
+   beginning of the file (if W is SEEK_SET),
+   the current position (if W is SEEK_CUR),
+   or the end of the file (if W is SEEK_END).
+   Set *POS to the new file position.
+   Returns zero if successful, nonzero if not.  */
+typedef int __io_seek_fn(void *__cookie, __off64_t *__pos, int __w);
+
+/* Close COOKIE.  */
+typedef int __io_close_fn(void *__cookie);
+extern int __underflow(_IO_FILE *);
+extern int __uflow(_IO_FILE *);
+extern int __overflow(_IO_FILE *, int);
+extern int _IO_getc(_IO_FILE *__fp);
+extern int _IO_putc(int __c, _IO_FILE *__fp);
+extern int _IO_feof(_IO_FILE *__fp);
+extern int _IO_ferror(_IO_FILE *__fp);
+
+extern int _IO_peekc_locked(_IO_FILE *__fp);
+
+/* This one is for Emacs. */
+
+
+
+extern void _IO_flockfile(_IO_FILE *);
+extern void _IO_funlockfile(_IO_FILE *);
+extern int _IO_ftrylockfile(_IO_FILE *);
+
+extern int _IO_vfscanf(_IO_FILE *, const char *, __gnuc_va_list, int *);
+
+extern int _IO_vfprintf(_IO_FILE *, const char *, __gnuc_va_list);
+extern __ssize_t _IO_padn(_IO_FILE *, int, __ssize_t);
+extern size_t _IO_sgetn(_IO_FILE *, void *, size_t);
+
+extern __off64_t _IO_seekoff(_IO_FILE *, __off64_t, int, int);
+extern __off64_t _IO_seekpos(_IO_FILE *, __off64_t, int);
+
+extern void _IO_free_backup_area(_IO_FILE *);
+/* The type of the second argument to `fgetpos' and `fsetpos'.  */
+
+
+typedef _G_fpos_t fpos_t;
+
+
+/* Standard streams.  */
+extern struct _IO_FILE *stdin;
+/* Standard input stream.  */
+extern struct _IO_FILE *stdout;
+/* Standard output stream.  */
+extern struct _IO_FILE *stderr;
+/* Standard error output stream.  */
+/* C89/C99 say they're macros.  Make them happy.  */
+
+
+
+
+
+/* Remove file FILENAME.  */
+extern int remove(const char *__filename);
+/* Rename file OLD to NEW.  */
+extern int rename(const char *__old, const char *__new);
+
+
+
+/* Rename file OLD relative to OLDFD to NEW relative to NEWFD.  */
+
+extern int renameat(int __oldfd, const char *__old, int __newfd, const char *__new);
+
+
+
+/* Create a temporary file and open it read/write.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+
+extern FILE *tmpfile(void);
+/* Generate a temporary filename.  */
+extern char *tmpnam(char *__s);
+
+
+
+/* This is the reentrant variant of `tmpnam'.  The only difference is
+   that it does not allow S to be NULL.  */
+extern char *tmpnam_r(char *__s);
+
+
+
+
+/* Generate a unique temporary filename using up to five characters of PFX
+   if it is not NULL.  The directory to put this file in is searched for
+   as follows: First the environment variable "TMPDIR" is checked.
+   If it contains the name of a writable directory, that directory is used.
+   If not and if DIR is not NULL, that value is checked.  If that fails,
+   P_tmpdir is tried and finally "/tmp".  The storage for the filename
+   is allocated by `malloc'.  */
+
+extern char *tempnam(const char *__dir, const char *__pfx);
+
+
+
+
+/* Close STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fclose(FILE *__stream);
+/* Flush STREAM, or all streams if STREAM is NULL.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fflush(FILE *__stream);
+
+
+
+/* Faster versions when locking is not required.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fflush_unlocked(FILE *__stream);
+
+
+/* Open a file and create a new stream for it.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern FILE *fopen(const char *__filename, const char *__modes);
+/* Open a file, replacing an existing stream with it.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+
+extern FILE *freopen(const char *__filename, const char *__modes, FILE *__stream);
+/* Create a new stream that refers to an existing system file descriptor.  */
+extern FILE *fdopen(int __fd, const char *__modes);
+/* Create a new stream that refers to a memory buffer.  */
+
+extern FILE *fmemopen(void *__s, size_t __len, const char *__modes);
+
+/* Open a stream that writes into a malloc'd buffer that is expanded as
+   necessary.  *BUFLOC and *SIZELOC are updated with the buffer's location
+   and the number of characters written on fflush or fclose.  */
+extern FILE *open_memstream(char **__bufloc, size_t *__sizeloc);
+
+
+
+
+/* If BUF is NULL, make STREAM unbuffered.
+   Else make it use buffer BUF, of size BUFSIZ.  */
+extern void setbuf(FILE *__stream, char *__buf);
+/* Make STREAM use buffering mode MODE.
+   If BUF is not NULL, use N bytes of it for buffering;
+   else allocate an internal buffer N bytes long.  */
+
+extern int setvbuf(FILE *__stream, char *__buf, int __modes, size_t __n);
+
+
+
+/* If BUF is NULL, make STREAM unbuffered.
+   Else make it use SIZE bytes of BUF for buffering.  */
+
+extern void setbuffer(FILE *__stream, char *__buf, size_t __size);
+
+/* Make STREAM line-buffered.  */
+extern void setlinebuf(FILE *__stream);
+
+
+
+
+/* Write formatted output to STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int fprintf(FILE *__stream, const char *__format, ...);
+/* Write formatted output to stdout.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int printf(const char *__format, ...);
+/* Write formatted output to S.  */
+
+extern int sprintf(char *__s, const char *__format, ...);
+
+/* Write formatted output to S from argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int vfprintf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+/* Write formatted output to stdout from argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int vprintf(const char *__format, __gnuc_va_list __arg);
+/* Write formatted output to S from argument list ARG.  */
+
+extern int vsprintf(char *__s, const char *__format, __gnuc_va_list __arg);
+
+
+
+
+/* Maximum chars of output to write in MAXLEN.  */
+
+
+extern int snprintf(char *__s, size_t __maxlen, const char *__format, ...);
+
+
+
+extern int vsnprintf(char *__s, size_t __maxlen, const char *__format, __gnuc_va_list __arg);
+/* Write formatted output to a file descriptor.
+
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+
+
+extern int vdprintf(int __fd, const char *__fmt, __gnuc_va_list __arg);
+
+extern int dprintf(int __fd, const char *__fmt, ...);
+
+
+
+
+/* Read formatted input from STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int fscanf(FILE *__stream, const char *__format, ...);
+/* Read formatted input from stdin.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int scanf(const char *__format, ...);
+/* Read formatted input from S.  */
+
+extern int sscanf(const char *__s, const char *__format, ...);
+
+extern int __isoc99_fscanf(FILE *__stream, const char *__format, ...);
+extern int __isoc99_scanf(const char *__format, ...);
+
+extern int __isoc99_sscanf(const char *__s, const char *__format, ...);
+
+
+
+
+
+
+
+
+
+
+/* Read formatted input from S into argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+
+extern int vfscanf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+
+/* Read formatted input from stdin into argument list ARG.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern int vscanf(const char *__format, __gnuc_va_list __arg);
+
+/* Read formatted input from S into argument list ARG.  */
+
+
+extern int vsscanf(const char *__s, const char *__format, __gnuc_va_list __arg);
+
+
+extern int __isoc99_vfscanf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+
+extern int __isoc99_vscanf(const char *__format, __gnuc_va_list __arg);
+
+
+extern int __isoc99_vsscanf(const char *__s, const char *__format, __gnuc_va_list __arg);
+
+
+
+
+
+
+
+
+
+
+
+/* Read a character from STREAM.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int fgetc(FILE *__stream);
+extern int getc(FILE *__stream);
+
+/* Read a character from stdin.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int getchar(void);
+
+
+/* The C standard explicitly says this is a macro, so we always do the
+   optimization for it.  */
+
+
+
+/* These are defined in POSIX.1:1996.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int getc_unlocked(FILE *__stream);
+extern int getchar_unlocked(void);
+
+
+
+/* Faster version when locking is not necessary.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fgetc_unlocked(FILE *__stream);
+
+
+
+
+/* Write a character to STREAM.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.
+
+   These functions is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fputc(int __c, FILE *__stream);
+extern int putc(int __c, FILE *__stream);
+
+/* Write a character to stdout.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int putchar(int __c);
+
+
+/* The C standard explicitly says this can be a macro,
+   so we always do the optimization for it.  */
+
+
+
+/* Faster version when locking is not necessary.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fputc_unlocked(int __c, FILE *__stream);
+
+
+
+/* These are defined in POSIX.1:1996.
+
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int putc_unlocked(int __c, FILE *__stream);
+extern int putchar_unlocked(int __c);
+
+
+
+
+
+/* Get a word (int) from STREAM.  */
+extern int getw(FILE *__stream);
+
+/* Write a word (int) to STREAM.  */
+extern int putw(int __w, FILE *__stream);
+
+
+
+
+/* Get a newline-terminated string of finite length from STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+
+extern char *fgets(char *__s, int __n, FILE *__stream);
+
+/* Get a newline-terminated string from stdin, removing the newline.
+   DO NOT USE THIS FUNCTION!!  There is no limit on how much it will read.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern char *gets(char *__s);
+/* Read up to (and including) a DELIMITER from STREAM into *LINEPTR
+   (and null-terminate it). *LINEPTR is a pointer returned from malloc (or
+   NULL), pointing to *N characters of space.  It is realloc'd as
+   necessary.  Returns the number of characters read (not including the
+   null terminator), or -1 on error or EOF.
+
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+
+
+extern __ssize_t __getdelim(char **__lineptr, size_t *__n, int __delimiter, FILE *__stream);
+
+
+extern __ssize_t getdelim(char **__lineptr, size_t *__n, int __delimiter, FILE *__stream);
+
+/* Like `getdelim', but reads up to a newline.
+
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+
+
+extern __ssize_t getline(char **__lineptr, size_t *__n, FILE *__stream);
+
+
+
+
+/* Write a string to STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int fputs(const char *__s, FILE *__stream);
+
+/* Write a string, followed by a newline, to stdout.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int puts(const char *__s);
+
+
+/* Push a character back onto the input buffer of STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int ungetc(int __c, FILE *__stream);
+
+
+/* Read chunks of generic data from STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+
+extern size_t fread(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+/* Write chunks of generic data to STREAM.
+
+   This function is a possible cancellation points and therefore not
+   marked with __THROW.  */
+
+extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
+/* Faster versions when locking is not necessary.
+
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+
+extern size_t fread_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+
+extern size_t fwrite_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+
+
+
+
+/* Seek to a certain position on STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fseek(FILE *__stream, long __off, int __whence);
+/* Return the current position of STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern long ftell(FILE *__stream);
+/* Rewind to the beginning of STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern void rewind(FILE *__stream);
+
+
+/* The Single Unix Specification, Version 2, specifies an alternative,
+   more adequate interface for the two functions above which deal with
+   file offset.  `long int' is not the right type.  These definitions
+   are originally defined in the Large File Support API.  */
+
+
+
+/* Seek to a certain position on STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fseeko(FILE *__stream, __off_t __off, int __whence);
+/* Return the current position of STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern __off_t ftello(FILE *__stream);
+
+
+/* Get STREAM's position.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fgetpos(FILE *__stream, fpos_t *__pos);
+/* Set STREAM's position.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fsetpos(FILE *__stream, const fpos_t *__pos);
+
+/* Clear the error and EOF indicators for STREAM.  */
+extern void clearerr(FILE *__stream);
+/* Return the EOF indicator for STREAM.  */
+extern int feof(FILE *__stream);
+/* Return the error indicator for STREAM.  */
+extern int ferror(FILE *__stream);
+
+
+
+/* Faster versions when locking is not required.  */
+extern void clearerr_unlocked(FILE *__stream);
+extern int feof_unlocked(FILE *__stream);
+extern int ferror_unlocked(FILE *__stream);
+
+
+
+
+/* Print a message describing the meaning of the value of errno.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern void perror(const char *__s);
+/* Declare sys_errlist and sys_nerr, or don't.  Compatibility (do) version.
+   Copyright (C) 2002 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+
+
+
+
+
+/* sys_errlist and sys_nerr are deprecated.  Use strerror instead.  */
+
+
+extern int sys_nerr;
+extern const char *sys_errlist[];
+
+
+
+/* Return the system file descriptor for STREAM.  */
+extern int fileno(FILE *__stream);
+
+
+
+/* Faster version when locking is not required.  */
+extern int fileno_unlocked(FILE *__stream);
+
+
+
+
+
+/* Create a new stream connected to a pipe running the given command.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern FILE *popen(const char *__command, const char *__modes);
+
+/* Close a stream opened by popen and return the status of its child.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int pclose(FILE *__stream);
+
+
+
+
+/* Return the name of the controlling terminal.  */
+extern char *ctermid(char *__s);
+/* These are defined in POSIX.1:1996.  */
+
+/* Acquire ownership of STREAM.  */
+extern void flockfile(FILE *__stream);
+
+/* Try to acquire ownership of STREAM but do not block if it is not
+   possible.  */
+extern int ftrylockfile(FILE *__stream);
+
+/* Relinquish the ownership granted for STREAM.  */
+extern void funlockfile(FILE *__stream);
+
+extern int foo1(int i, int j);
+
+extern void foo2(int *i, int j);
+
+extern int foo3(int i, int j);
+
+extern int foo4(int i, int j);
+
+extern int nontrivial(void);
+
+extern int main(void);
+//  summary sum[i],
+int foo1(int i, int j)
+{
+//  call sum[i],
+   return i += j;
+}
+void foo2(int *i, int j)
+{
+   *i += j;
+}
+int foo3(int i, int j)
+{
+   static int k = 0;
+//  call sum[i],
+   i += j;
+   return k = i;
+}
+int foo4(int i, int j)
+{
+   int k = 0;
+//  call sum[i],
+   i += j;
+   return k = i;
+}
+int main(void)
+{
+   int k = 0;
+   int sum1 = 0;
+   int sum2 = 0;
+   int sum3 = 0;
+   int sum4 = 0;
+   int sum5 = 0;
+
+   for(k = 0; k <= 99; k += 1)
+      sum1 = foo1(sum1, k);
+
+   for(k = 0; k <= 99; k += 1)
+      foo2(&sum2, k);
+
+   for(k = 0; k <= 99; k += 1)
+      sum3 = foo3(sum3, k);
+
+   for(k = 0; k <= 99; k += 1)
+      sum4 = foo4(sum4, k);
+//  loop sum[sum5],
+
+   for(k = 0; k <= 99; k += 1)
+//  call sum[sum5],
+      sum5 += k;
+   
+   
+   printf("sum1: %d\nsum2: %d\nsum3: %d\nsum4: %d\nsum5: %d\n", sum1, sum2, sum3, sum4, sum5);
+
+   return 0;
+}
+int nontrivial(void)
+{
+   int i = 0, b = 0;
+   for(i = 0; i <= 99; i += 1)
+      b = b+b+i;
+   return b;
+}

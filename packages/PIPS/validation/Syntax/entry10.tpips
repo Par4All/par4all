@@ -1,0 +1,23 @@
+delete entry10
+create entry10 entry10.f
+
+# Check that functions are handled
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY10
+echo
+
+display PRINTED_FILE[ENTRY10]
+
+# Then, the code for the entry can be displayed
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+close
+delete entry10
+quit

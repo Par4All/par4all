@@ -1,0 +1,9 @@
+setenv WS = ddot
+delete $WS
+create $WS $WS.f include/simd.f
+
+module `echo $WS | tr '[:lower:]' '[:upper:]'`
+
+source include/sac.tpips
+
+close

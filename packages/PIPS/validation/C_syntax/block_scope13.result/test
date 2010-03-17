@@ -1,0 +1,621 @@
+
+Symbol table for block_scope13
+
+block_scope13!
+
+Declarations for module "block_scope13!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:_IO_2_1_stderr_" with type "variable" "struct _IO_FILE_plus "
+	Declared entity "TOP-LEVEL:_IO_2_1_stdin_" with type "variable" "struct _IO_FILE_plus "
+	Declared entity "TOP-LEVEL:_IO_2_1_stdout_" with type "variable" "struct _IO_FILE_plus "
+	Declared entity "TOP-LEVEL:_IO_feof" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_ferror" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_flockfile" with type "functional" "_IO_FILE * -> void"
+	Declared entity "TOP-LEVEL:_IO_free_backup_area" with type "functional" "_IO_FILE * -> void"
+	Declared entity "TOP-LEVEL:_IO_ftrylockfile" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_funlockfile" with type "functional" "_IO_FILE * -> void"
+	Declared entity "TOP-LEVEL:_IO_getc" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_padn" with type "functional" "_IO_FILE * x int x __ssize_t -> __ssize_t"
+	Declared entity "TOP-LEVEL:_IO_peekc_locked" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_putc" with type "functional" "int x _IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_seekoff" with type "functional" "_IO_FILE * x __off64_t x int x int -> __off64_t"
+	Declared entity "TOP-LEVEL:_IO_seekpos" with type "functional" "_IO_FILE * x __off64_t x int -> __off64_t"
+	Declared entity "TOP-LEVEL:_IO_sgetn" with type "functional" "_IO_FILE * x void * x size_t -> size_t"
+	Declared entity "TOP-LEVEL:_IO_vfprintf" with type "functional" "_IO_FILE * x char * x __gnuc_va_list -> int"
+	Declared entity "TOP-LEVEL:_IO_vfscanf" with type "functional" "_IO_FILE * x char * x __gnuc_va_list x int * -> int"
+	Declared entity "TOP-LEVEL:__overflow" with type "functional" "_IO_FILE * x int -> int"
+	Declared entity "TOP-LEVEL:__uflow" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:__underflow" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:clearerr" with type "functional" "FILE * -> void"
+	Declared entity "TOP-LEVEL:fclose" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:feof" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:ferror" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:fflush" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:fgetc" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:fgetpos" with type "functional" "FILE * x fpos_t * -> int"
+	Declared entity "TOP-LEVEL:fgets" with type "functional" "char * x int x FILE * -> char *"
+	Declared entity "TOP-LEVEL:fopen" with type "functional" "char * x char * -> FILE *"
+	Declared entity "TOP-LEVEL:fprintf" with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:fputc" with type "functional" "int x FILE * -> int"
+	Declared entity "TOP-LEVEL:fputs" with type "functional" "char * x FILE * -> int"
+	Declared entity "TOP-LEVEL:fread" with type "functional" "void * x size_t x size_t x FILE * -> size_t"
+	Declared entity "TOP-LEVEL:freopen" with type "functional" "char * x char * x FILE * -> FILE *"
+	Declared entity "TOP-LEVEL:fscanf" with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:fseek" with type "functional" "FILE * x long x int -> int"
+	Declared entity "TOP-LEVEL:fsetpos" with type "functional" "FILE * x fpos_t * -> int"
+	Declared entity "TOP-LEVEL:ftell" with type "functional" "FILE * -> long"
+	Declared entity "TOP-LEVEL:fwrite" with type "functional" "void * x size_t x size_t x FILE * -> size_t"
+	Declared entity "TOP-LEVEL:getc" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:getchar" with type "functional" "void -> int"
+	Declared entity "TOP-LEVEL:gets" with type "functional" "char * -> char *"
+	Declared entity "TOP-LEVEL:perror" with type "functional" "char * -> void"
+	Declared entity "TOP-LEVEL:printf" with type "functional" "char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:putc" with type "functional" "int x FILE * -> int"
+	Declared entity "TOP-LEVEL:putchar" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:puts" with type "functional" "char * -> int"
+	Declared entity "TOP-LEVEL:remove" with type "functional" "char * -> int"
+	Declared entity "TOP-LEVEL:rename" with type "functional" "char * x char * -> int"
+	Declared entity "TOP-LEVEL:rewind" with type "functional" "FILE * -> void"
+	Declared entity "TOP-LEVEL:scanf" with type "functional" "char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:setbuf" with type "functional" "FILE * x char * -> void"
+	Declared entity "TOP-LEVEL:setvbuf" with type "functional" "FILE * x char * x int x size_t -> int"
+	Declared entity "TOP-LEVEL:sprintf" with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:sscanf" with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:stderr" with type "variable" "struct _IO_FILE  *"
+	Declared entity "TOP-LEVEL:stdin" with type "variable" "struct _IO_FILE  *"
+	Declared entity "TOP-LEVEL:stdout" with type "variable" "struct _IO_FILE  *"
+	Declared entity "TOP-LEVEL:tmpfile" with type "functional" "void -> FILE *"
+	Declared entity "TOP-LEVEL:tmpnam" with type "functional" "char * -> char *"
+	Declared entity "TOP-LEVEL:ungetc" with type "functional" "int x FILE * -> int"
+	Declared entity "TOP-LEVEL:vfprintf" with type "functional" "FILE * x char * x __gnuc_va_list -> int"
+	Declared entity "TOP-LEVEL:vprintf" with type "functional" "char * x __gnuc_va_list -> int"
+	Declared entity "TOP-LEVEL:vsprintf" with type "functional" "char * x char * x __gnuc_va_list -> int"
+	Declared entity "block_scope13!:#_IO_FILE" with type "struct" 
+	Declared entity "block_scope13!:#_IO_marker" with type "struct" 
+	Declared entity "block_scope13!:#_PIPS_STRUCT_1" with type "struct" 
+	Declared entity "block_scope13!:#_PIPS_STRUCT_2" with type "struct" 
+	Declared entity "block_scope13!:#_PIPS_STRUCT_3" with type "struct" 
+	Declared entity "block_scope13!:#_PIPS_STRUCT_4" with type "struct" 
+	Declared entity "block_scope13!:#_PIPS_STRUCT_6" with type "struct" 
+	Declared entity "block_scope13!:#_PIPS_STRUCT_7" with type "struct" 
+	Declared entity "block_scope13!:'_PIPS_UNION_5" with type "union" 
+	Declared entity "block_scope13!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "block_scope13!:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope13!:*STACK*" with type "area" with size 0
+	Declared entity "block_scope13!:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope13!:?__codecvt_result" with type "enum" 
+	Declared entity "block_scope13!:block_scope13!block_scope13" with type "functional" "() -> int"
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:_IO_2_1_stdin_"	with type "variable" "struct _IO_FILE_plus "
+	Declared external entity "TOP-LEVEL:_IO_2_1_stdout_"	with type "variable" "struct _IO_FILE_plus "
+	Declared external entity "TOP-LEVEL:_IO_2_1_stderr_"	with type "variable" "struct _IO_FILE_plus "
+	Declared external entity "TOP-LEVEL:__underflow"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:__uflow"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:__overflow"	with type "functional" "_IO_FILE * x int -> int"
+	Declared external entity "TOP-LEVEL:_IO_getc"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_putc"	with type "functional" "int x _IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_feof"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_ferror"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_peekc_locked"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_flockfile"	with type "functional" "_IO_FILE * -> void"
+	Declared external entity "TOP-LEVEL:_IO_funlockfile"	with type "functional" "_IO_FILE * -> void"
+	Declared external entity "TOP-LEVEL:_IO_ftrylockfile"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_vfscanf"	with type "functional" "_IO_FILE * x char * x __gnuc_va_list x int * -> int"
+	Declared external entity "TOP-LEVEL:_IO_vfprintf"	with type "functional" "_IO_FILE * x char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:_IO_padn"	with type "functional" "_IO_FILE * x int x __ssize_t -> __ssize_t"
+	Declared external entity "TOP-LEVEL:_IO_sgetn"	with type "functional" "_IO_FILE * x void * x size_t -> size_t"
+	Declared external entity "TOP-LEVEL:_IO_seekoff"	with type "functional" "_IO_FILE * x __off64_t x int x int -> __off64_t"
+	Declared external entity "TOP-LEVEL:_IO_seekpos"	with type "functional" "_IO_FILE * x __off64_t x int -> __off64_t"
+	Declared external entity "TOP-LEVEL:_IO_free_backup_area"	with type "functional" "_IO_FILE * -> void"
+	Declared external entity "TOP-LEVEL:stdin"	with type "variable" "struct _IO_FILE  *"
+	Declared external entity "TOP-LEVEL:stdout"	with type "variable" "struct _IO_FILE  *"
+	Declared external entity "TOP-LEVEL:stderr"	with type "variable" "struct _IO_FILE  *"
+	Declared external entity "TOP-LEVEL:remove"	with type "functional" "char * -> int"
+	Declared external entity "TOP-LEVEL:rename"	with type "functional" "char * x char * -> int"
+	Declared external entity "TOP-LEVEL:tmpfile"	with type "functional" "void -> FILE *"
+	Declared external entity "TOP-LEVEL:tmpnam"	with type "functional" "char * -> char *"
+	Declared external entity "TOP-LEVEL:fclose"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:fflush"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:fopen"	with type "functional" "char * x char * -> FILE *"
+	Declared external entity "TOP-LEVEL:freopen"	with type "functional" "char * x char * x FILE * -> FILE *"
+	Declared external entity "TOP-LEVEL:setbuf"	with type "functional" "FILE * x char * -> void"
+	Declared external entity "TOP-LEVEL:setvbuf"	with type "functional" "FILE * x char * x int x size_t -> int"
+	Declared external entity "TOP-LEVEL:fprintf"	with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:printf"	with type "functional" "char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:sprintf"	with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:vfprintf"	with type "functional" "FILE * x char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:vprintf"	with type "functional" "char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:vsprintf"	with type "functional" "char * x char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:fscanf"	with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:scanf"	with type "functional" "char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:sscanf"	with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:fgetc"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:getc"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:getchar"	with type "functional" "void -> int"
+	Declared external entity "TOP-LEVEL:fputc"	with type "functional" "int x FILE * -> int"
+	Declared external entity "TOP-LEVEL:putc"	with type "functional" "int x FILE * -> int"
+	Declared external entity "TOP-LEVEL:putchar"	with type "functional" "int -> int"
+	Declared external entity "TOP-LEVEL:fgets"	with type "functional" "char * x int x FILE * -> char *"
+	Declared external entity "TOP-LEVEL:gets"	with type "functional" "char * -> char *"
+	Declared external entity "TOP-LEVEL:fputs"	with type "functional" "char * x FILE * -> int"
+	Declared external entity "TOP-LEVEL:puts"	with type "functional" "char * -> int"
+	Declared external entity "TOP-LEVEL:ungetc"	with type "functional" "int x FILE * -> int"
+	Declared external entity "TOP-LEVEL:fread"	with type "functional" "void * x size_t x size_t x FILE * -> size_t"
+	Declared external entity "TOP-LEVEL:fwrite"	with type "functional" "void * x size_t x size_t x FILE * -> size_t"
+	Declared external entity "TOP-LEVEL:fseek"	with type "functional" "FILE * x long x int -> int"
+	Declared external entity "TOP-LEVEL:ftell"	with type "functional" "FILE * -> long"
+	Declared external entity "TOP-LEVEL:rewind"	with type "functional" "FILE * -> void"
+	Declared external entity "TOP-LEVEL:fgetpos"	with type "functional" "FILE * x fpos_t * -> int"
+	Declared external entity "TOP-LEVEL:fsetpos"	with type "functional" "FILE * x fpos_t * -> int"
+	Declared external entity "TOP-LEVEL:clearerr"	with type "functional" "FILE * -> void"
+	Declared external entity "TOP-LEVEL:feof"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:ferror"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:perror"	with type "functional" "char * -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = 0
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = 0
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = 0
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "block_scope13!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope13!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope13!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope13!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module block_scope13!
+
+
+block_scope13!block_scope13
+
+Declarations for module "block_scope13!block_scope13" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope13!:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope13!block_scope13:*DYNAMIC*" with type "area" with size 12
+	Declared entity "block_scope13!block_scope13:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope13!block_scope13:*STACK*" with type "area" with size 0
+	Declared entity "block_scope13!block_scope13:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope13!block_scope13:0`1`x" with type "variable" "int"
+	Declared entity "block_scope13!block_scope13:0`2`x" with type "variable" "int"
+	Declared entity "block_scope13!block_scope13:0`x" with type "variable" "int"
+	Declared entity "block_scope13!block_scope13:block_scope13!block_scope13" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "block_scope13!block_scope13:block_scope13!block_scope13"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = 0
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = 0
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = 0
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "block_scope13!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope13!block_scope13:*DYNAMIC*" of size 12:
+	Variable "block_scope13!block_scope13:0`x"	offset = 0	size = 4
+	Variable "block_scope13!block_scope13:0`1`x"	offset = 4	size = 4
+	Variable "block_scope13!block_scope13:0`2`x"	offset = 8	size = 4
+
+
+Layout for memory area "block_scope13!block_scope13:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope13!block_scope13:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope13!block_scope13:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module block_scope13!block_scope13
+
+
+Parser output
+
+typedef unsigned int size_t;
+typedef unsigned char __u_char;
+typedef unsigned short __u_short;
+typedef unsigned int __u_int;
+typedef unsigned long __u_long;
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef signed short __int16_t;
+typedef unsigned short __uint16_t;
+typedef signed int __int32_t;
+typedef unsigned int __uint32_t;
+typedef struct {long __val[2];} __quad_t;
+typedef struct {__u_long __val[2];} __u_quad_t;
+typedef __u_quad_t __dev_t;
+typedef unsigned int __uid_t;
+typedef unsigned int __gid_t;
+typedef unsigned long __ino_t;
+typedef __u_quad_t __ino64_t;
+typedef unsigned int __mode_t;
+typedef unsigned int __nlink_t;
+typedef long __off_t;
+typedef __quad_t __off64_t;
+typedef int __pid_t;
+typedef struct {int __val[2];} __fsid_t;
+typedef long __clock_t;
+typedef unsigned long __rlim_t;
+typedef __u_quad_t __rlim64_t;
+typedef unsigned int __id_t;
+typedef long __time_t;
+typedef unsigned int __useconds_t;
+typedef long __suseconds_t;
+typedef int __daddr_t;
+typedef long __swblk_t;
+typedef int __key_t;
+typedef int __clockid_t;
+typedef void *__timer_t;
+typedef long __blksize_t;
+typedef long __blkcnt_t;
+typedef __quad_t __blkcnt64_t;
+typedef unsigned long __fsblkcnt_t;
+typedef __u_quad_t __fsblkcnt64_t;
+typedef unsigned long __fsfilcnt_t;
+typedef __u_quad_t __fsfilcnt64_t;
+typedef int __ssize_t;
+typedef __off64_t __loff_t;
+typedef __quad_t *__qaddr_t;
+typedef char *__caddr_t;
+typedef int __intptr_t;
+typedef unsigned int __socklen_t;
+typedef struct _IO_FILE FILE;
+typedef struct _IO_FILE __FILE;
+typedef struct {int __count; union {unsigned int __wch; char __wchb[4];} __value;} __mbstate_t;
+typedef struct {__off_t __pos; __mbstate_t __state;} _G_fpos_t;
+typedef struct {__off64_t __pos; __mbstate_t __state;} _G_fpos64_t;
+typedef int _G_int16_t;
+typedef int _G_int32_t;
+typedef unsigned int _G_uint16_t;
+typedef unsigned int _G_uint32_t;
+typedef __builtin_va_list __gnuc_va_list;
+typedef void _IO_lock_t;
+struct _IO_marker {
+   struct _IO_marker *_next;
+   struct _IO_FILE *_sbuf;
+   int _pos;
+};
+enum __codecvt_result {__codecvt_ok, __codecvt_partial, __codecvt_error, __codecvt_noconv};
+struct _IO_FILE {
+   int _flags;
+   char *_IO_read_ptr;
+   char *_IO_read_end;
+   char *_IO_read_base;
+   char *_IO_write_base;
+   char *_IO_write_ptr;
+   char *_IO_write_end;
+   char *_IO_buf_base;
+   char *_IO_buf_end;
+   char *_IO_save_base;
+   char *_IO_backup_base;
+   char *_IO_save_end;
+   struct _IO_marker *_markers;
+   struct _IO_FILE *_chain;
+   int _fileno;
+   int _flags2;
+   __off_t _old_offset;
+   unsigned short _cur_column;
+   signed char _vtable_offset;
+   char _shortbuf[1];
+   _IO_lock_t *_lock;
+   __off64_t _offset;
+   void *__pad1;
+   void *__pad2;
+   void *__pad3;
+   void *__pad4;
+   size_t __pad5;
+   int _mode;
+   char _unused2[15*sizeof(int)-4*sizeof(void *)-sizeof(size_t)];
+};
+typedef struct _IO_FILE _IO_FILE;
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+extern struct _IO_FILE_plus _IO_2_1_stdout_;
+extern struct _IO_FILE_plus _IO_2_1_stderr_;
+typedef __ssize_t __io_read_fn(void *__cookie, char *__buf, size_t __nbytes);
+typedef __ssize_t __io_write_fn(void *__cookie, const char *__buf, size_t __n);
+typedef int __io_seek_fn(void *__cookie, __off64_t *__pos, int __w);
+typedef int __io_close_fn(void *__cookie);
+extern int __underflow(_IO_FILE *);
+extern int __uflow(_IO_FILE *);
+extern int __overflow(_IO_FILE *, int);
+extern int _IO_getc(_IO_FILE *__fp);
+extern int _IO_putc(int __c, _IO_FILE *__fp);
+extern int _IO_feof(_IO_FILE *__fp);
+extern int _IO_ferror(_IO_FILE *__fp);
+extern int _IO_peekc_locked(_IO_FILE *__fp);
+extern void _IO_flockfile(_IO_FILE *);
+extern void _IO_funlockfile(_IO_FILE *);
+extern int _IO_ftrylockfile(_IO_FILE *);
+extern int _IO_vfscanf(_IO_FILE *, const char *, __gnuc_va_list, int *);
+extern int _IO_vfprintf(_IO_FILE *, const char *, __gnuc_va_list);
+extern __ssize_t _IO_padn(_IO_FILE *, int, __ssize_t);
+extern size_t _IO_sgetn(_IO_FILE *, void *, size_t);
+extern __off64_t _IO_seekoff(_IO_FILE *, __off64_t, int, int);
+extern __off64_t _IO_seekpos(_IO_FILE *, __off64_t, int);
+extern void _IO_free_backup_area(_IO_FILE *);
+typedef _G_fpos_t fpos_t;
+extern struct _IO_FILE *stdin;
+extern struct _IO_FILE *stdout;
+extern struct _IO_FILE *stderr;
+extern int remove(const char *__filename);
+extern int rename(const char *__old, const char *__new);
+extern FILE *tmpfile(void);
+extern char *tmpnam(char *__s);
+extern int fclose(FILE *__stream);
+extern int fflush(FILE *__stream);
+extern FILE *fopen(const char *__filename, const char *__modes);
+extern FILE *freopen(const char *__filename, const char *__modes, FILE *__stream);
+extern void setbuf(FILE *__stream, char *__buf);
+extern int setvbuf(FILE *__stream, char *__buf, int __modes, size_t __n);
+extern int fprintf(FILE *__stream, const char *__format, ...);
+extern int printf(const char *__format, ...);
+extern int sprintf(char *__s, const char *__format, ...);
+extern int vfprintf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+extern int vprintf(const char *__format, __gnuc_va_list __arg);
+extern int vsprintf(char *__s, const char *__format, __gnuc_va_list __arg);
+extern int fscanf(FILE *__stream, const char *__format, ...);
+extern int scanf(const char *__format, ...);
+extern int sscanf(const char *__s, const char *__format, ...);
+extern int fgetc(FILE *__stream);
+extern int getc(FILE *__stream);
+extern int getchar(void);
+extern int fputc(int __c, FILE *__stream);
+extern int putc(int __c, FILE *__stream);
+extern int putchar(int __c);
+extern char *fgets(char *__s, int __n, FILE *__stream);
+extern char *gets(char *__s);
+extern int fputs(const char *__s, FILE *__stream);
+extern int puts(const char *__s);
+extern int ungetc(int __c, FILE *__stream);
+extern size_t fread(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
+extern int fseek(FILE *__stream, long __off, int __whence);
+extern long ftell(FILE *__stream);
+extern void rewind(FILE *__stream);
+extern int fgetpos(FILE *__stream, fpos_t *__pos);
+extern int fsetpos(FILE *__stream, const fpos_t *__pos);
+extern void clearerr(FILE *__stream);
+extern int feof(FILE *__stream);
+extern int ferror(FILE *__stream);
+extern void perror(const char *__s);
+static int block_scope13();
+
+static int block_scope13()
+{
+   int x = 6;
+   {
+      int x = 7;
+lab1:      fprintf(stderr, "%d\n", x);
+   }
+   {
+      int x = 8;
+      goto lab1;
+   }
+   return x;
+}
+
+Parser output
+
+typedef unsigned int size_t;
+typedef unsigned char __u_char;
+typedef unsigned short __u_short;
+typedef unsigned int __u_int;
+typedef unsigned long __u_long;
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef signed short __int16_t;
+typedef unsigned short __uint16_t;
+typedef signed int __int32_t;
+typedef unsigned int __uint32_t;
+typedef struct {long __val[2];} __quad_t;
+typedef struct {__u_long __val[2];} __u_quad_t;
+typedef __u_quad_t __dev_t;
+typedef unsigned int __uid_t;
+typedef unsigned int __gid_t;
+typedef unsigned long __ino_t;
+typedef __u_quad_t __ino64_t;
+typedef unsigned int __mode_t;
+typedef unsigned int __nlink_t;
+typedef long __off_t;
+typedef __quad_t __off64_t;
+typedef int __pid_t;
+typedef struct {int __val[2];} __fsid_t;
+typedef long __clock_t;
+typedef unsigned long __rlim_t;
+typedef __u_quad_t __rlim64_t;
+typedef unsigned int __id_t;
+typedef long __time_t;
+typedef unsigned int __useconds_t;
+typedef long __suseconds_t;
+typedef int __daddr_t;
+typedef long __swblk_t;
+typedef int __key_t;
+typedef int __clockid_t;
+typedef void *__timer_t;
+typedef long __blksize_t;
+typedef long __blkcnt_t;
+typedef __quad_t __blkcnt64_t;
+typedef unsigned long __fsblkcnt_t;
+typedef __u_quad_t __fsblkcnt64_t;
+typedef unsigned long __fsfilcnt_t;
+typedef __u_quad_t __fsfilcnt64_t;
+typedef int __ssize_t;
+typedef __off64_t __loff_t;
+typedef __quad_t *__qaddr_t;
+typedef char *__caddr_t;
+typedef int __intptr_t;
+typedef unsigned int __socklen_t;
+typedef struct _IO_FILE FILE;
+typedef struct _IO_FILE __FILE;
+typedef struct {int __count; union {unsigned int __wch; char __wchb[4];} __value;} __mbstate_t;
+typedef struct {__off_t __pos; __mbstate_t __state;} _G_fpos_t;
+typedef struct {__off64_t __pos; __mbstate_t __state;} _G_fpos64_t;
+typedef int _G_int16_t;
+typedef int _G_int32_t;
+typedef unsigned int _G_uint16_t;
+typedef unsigned int _G_uint32_t;
+typedef __builtin_va_list __gnuc_va_list;
+typedef void _IO_lock_t;
+struct _IO_marker {
+   struct _IO_marker *_next;
+   struct _IO_FILE *_sbuf;
+   int _pos;
+};
+enum __codecvt_result {__codecvt_ok, __codecvt_partial, __codecvt_error, __codecvt_noconv};
+struct _IO_FILE {
+   int _flags;
+   char *_IO_read_ptr;
+   char *_IO_read_end;
+   char *_IO_read_base;
+   char *_IO_write_base;
+   char *_IO_write_ptr;
+   char *_IO_write_end;
+   char *_IO_buf_base;
+   char *_IO_buf_end;
+   char *_IO_save_base;
+   char *_IO_backup_base;
+   char *_IO_save_end;
+   struct _IO_marker *_markers;
+   struct _IO_FILE *_chain;
+   int _fileno;
+   int _flags2;
+   __off_t _old_offset;
+   unsigned short _cur_column;
+   signed char _vtable_offset;
+   char _shortbuf[1];
+   _IO_lock_t *_lock;
+   __off64_t _offset;
+   void *__pad1;
+   void *__pad2;
+   void *__pad3;
+   void *__pad4;
+   size_t __pad5;
+   int _mode;
+   char _unused2[15*sizeof(int)-4*sizeof(void *)-sizeof(size_t)];
+};
+typedef struct _IO_FILE _IO_FILE;
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+extern struct _IO_FILE_plus _IO_2_1_stdout_;
+extern struct _IO_FILE_plus _IO_2_1_stderr_;
+typedef __ssize_t __io_read_fn(void *__cookie, char *__buf, size_t __nbytes);
+typedef __ssize_t __io_write_fn(void *__cookie, const char *__buf, size_t __n);
+typedef int __io_seek_fn(void *__cookie, __off64_t *__pos, int __w);
+typedef int __io_close_fn(void *__cookie);
+extern int __underflow(_IO_FILE *);
+extern int __uflow(_IO_FILE *);
+extern int __overflow(_IO_FILE *, int);
+extern int _IO_getc(_IO_FILE *__fp);
+extern int _IO_putc(int __c, _IO_FILE *__fp);
+extern int _IO_feof(_IO_FILE *__fp);
+extern int _IO_ferror(_IO_FILE *__fp);
+extern int _IO_peekc_locked(_IO_FILE *__fp);
+extern void _IO_flockfile(_IO_FILE *);
+extern void _IO_funlockfile(_IO_FILE *);
+extern int _IO_ftrylockfile(_IO_FILE *);
+extern int _IO_vfscanf(_IO_FILE *, const char *, __gnuc_va_list, int *);
+extern int _IO_vfprintf(_IO_FILE *, const char *, __gnuc_va_list);
+extern __ssize_t _IO_padn(_IO_FILE *, int, __ssize_t);
+extern size_t _IO_sgetn(_IO_FILE *, void *, size_t);
+extern __off64_t _IO_seekoff(_IO_FILE *, __off64_t, int, int);
+extern __off64_t _IO_seekpos(_IO_FILE *, __off64_t, int);
+extern void _IO_free_backup_area(_IO_FILE *);
+typedef _G_fpos_t fpos_t;
+extern struct _IO_FILE *stdin;
+extern struct _IO_FILE *stdout;
+extern struct _IO_FILE *stderr;
+extern int remove(const char *__filename);
+extern int rename(const char *__old, const char *__new);
+extern FILE *tmpfile(void);
+extern char *tmpnam(char *__s);
+extern int fclose(FILE *__stream);
+extern int fflush(FILE *__stream);
+extern FILE *fopen(const char *__filename, const char *__modes);
+extern FILE *freopen(const char *__filename, const char *__modes, FILE *__stream);
+extern void setbuf(FILE *__stream, char *__buf);
+extern int setvbuf(FILE *__stream, char *__buf, int __modes, size_t __n);
+extern int fprintf(FILE *__stream, const char *__format, ...);
+extern int printf(const char *__format, ...);
+extern int sprintf(char *__s, const char *__format, ...);
+extern int vfprintf(FILE *__s, const char *__format, __gnuc_va_list __arg);
+extern int vprintf(const char *__format, __gnuc_va_list __arg);
+extern int vsprintf(char *__s, const char *__format, __gnuc_va_list __arg);
+extern int fscanf(FILE *__stream, const char *__format, ...);
+extern int scanf(const char *__format, ...);
+extern int sscanf(const char *__s, const char *__format, ...);
+extern int fgetc(FILE *__stream);
+extern int getc(FILE *__stream);
+extern int getchar(void);
+extern int fputc(int __c, FILE *__stream);
+extern int putc(int __c, FILE *__stream);
+extern int putchar(int __c);
+extern char *fgets(char *__s, int __n, FILE *__stream);
+extern char *gets(char *__s);
+extern int fputs(const char *__s, FILE *__stream);
+extern int puts(const char *__s);
+extern int ungetc(int __c, FILE *__stream);
+extern size_t fread(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
+extern int fseek(FILE *__stream, long __off, int __whence);
+extern long ftell(FILE *__stream);
+extern void rewind(FILE *__stream);
+extern int fgetpos(FILE *__stream, fpos_t *__pos);
+extern int fsetpos(FILE *__stream, const fpos_t *__pos);
+extern void clearerr(FILE *__stream);
+extern int feof(FILE *__stream);
+extern int ferror(FILE *__stream);
+extern void perror(const char *__s);
+static int block_scope13();
+
+static int block_scope13()
+{
+   int x = 6;
+   {
+      int x = 7;
+lab1:      fprintf(stderr, "%d\n", x);
+   }
+   {
+      int x = 8;
+      goto lab1;
+   }
+   return x;
+}
+
+Controlizer output
+

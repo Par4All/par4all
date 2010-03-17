@@ -1,0 +1,44 @@
+      SUBROUTINE DESUGAR04(X, Y, *, *)
+
+c     Same as desugar01.f, but without forward references to labels
+
+      READ *, I, N                                                      0005
+
+c     assign statement
+      NEXT = 200                                                        0008
+
+c     labelled logical if with alternate return
+100   IF (X.GT.0.) GOTO 99999                                           0011
+
+c     labelled logical if with computed go to
+200   IF (X.EQ.0.) GOTO 99998                                           0014
+
+c     labelled logical if with assigned go to
+300   IF (X.LT.0.) GOTO 99997                                           0017
+
+c     labelled loop
+400   CONTINUE
+
+      DO 500 I = 1, N                                                   0022
+         PRINT *, I                                                     0023
+500      CONTINUE                                                       0024
+
+      I_PIPS_RETURN_CODE_ = 0                                           0026
+      RETURN
+99997 CONTINUE
+      IF (NEXT.EQ.100) GOTO 100                                         0017
+      IF (NEXT.EQ.200) GOTO 200                                         0017
+      IF (NEXT.EQ.300) GOTO 300                                         0017
+      STOP                                                              0017
+99998 CONTINUE
+      IF (I.EQ.1) GOTO 100                                              0014
+      IF (I.EQ.2) GOTO 200                                              0014
+      IF (I.EQ.3) THEN                                                  0014
+         GOTO 300
+      ELSE
+         GOTO 300
+      ENDIF
+99999 CONTINUE
+      I_PIPS_RETURN_CODE_ = 2                                           0011
+      END
+

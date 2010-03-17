@@ -1,0 +1,31 @@
+
+C  T() {}
+
+      PROGRAM SORT01
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+
+C     Check that proper values are retained from equations for
+C     substitution in inequalities
+
+      IF (I.LT.3) THEN                                                  0006
+
+C  T(I) {I==I#init+1, I<=3}
+
+C     you are not interested in i#init
+         I = I+1                                                        0008
+
+C  T() {I<=3}
+
+         PRINT *, I                                                     0009
+      ENDIF
+
+c      j = i
+c      if(j.lt.3) then
+C     You want the information on i
+c         print *, i
+c      endif
+
+      END
+

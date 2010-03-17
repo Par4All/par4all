@@ -1,0 +1,759 @@
+
+      SUBROUTINE UNSTRUC17
+     *  (AFLOT,NFIXE,ITYP,IERR,
+     *  TEXT,IUTI,INMUTI,IMP,NUT,NCNUT,JCNUT,IPARNUT)
+      INTEGER NFIXE,ITYP,IERR,IUTI,INMUTI,IMP,NUT,NCNUT,JCNUT,IPARNUT
+      REAL AFLOT
+      CHARACTER*8 TEXT
+C
+C     -VARIABLES LOCALES-
+      CHARACTER*1   A(136)
+      CHARACTER*136 AA
+      CHARACTER*16 T
+      LOGICAL TEST,NOMBRE,IEN,IED,DECI
+      INTEGER NFIX1, IM, IC, IS, ICC, ICAR, KK, K
+      REAL P(16),C1
+C
+      EQUIVALENCE (A(1),AA)
+      SAVE AA
+      DATA P/1.D01,1.D02,1.D03,1.D04,1.D05,1.D06,1.D07,1.D08,
+     *                  1.D09,1.D10,1.D11,1.D12,1.D13,1.D14,1.D15,1.D16/
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C
+C-----------------------------------
+C     --- DEBUT DES INSTRUCTIONS ---
+C-----------------------------------
+C     -PREPARATION DU DECODAGE-
+      IERR = 0                                                          0026
+C (0,3)
+      ITYP = 4                                                          0027
+C (0,4)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+      IF (IUTI.LE.INMUTI) GOTO 99999                                    0028
+C (22,1)
+C     BEGIN BLOCK
+C (22,2)
+3     IUTI = 0                                                          0032
+C (22,3)
+      JCNUT = JCNUT+1                                                   0033
+C (22,4)
+C
+C     -LECTURE D'UNE LIGNE DU FICHIER NUT-
+      READ (UNIT=NUT,FMT=101,END=7) AA(1:NCNUT)                         0036
+C     END BLOCK
+C (21,1)
+C     BEGIN BLOCK
+C (21,2)
+101   FORMAT(A)                                                         0037
+C (21,3)
+C
+C     -IMPRESSION EVENTUELLE DE LA LIGNE LUE-
+      IF (IMP.EQ.1) THEN                                                0040
+C (21,4)
+         WRITE (6, 102) AA(1:NCNUT)                                     0040
+      ELSE
+C (21,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (21,6)
+102   FORMAT(1X,A)                                                      0041
+C     END BLOCK
+C (3,1)
+C     BEGIN BLOCK
+C (3,2)
+1     AFLOT = 0.                                                        0056
+C (3,3)
+      C1 = 0.                                                           0057
+C (3,4)
+      NFIXE = 0                                                         0058
+C (3,5)
+      NFIX1 = 0                                                         0059
+C (3,6)
+      IM = 0                                                            0060
+C (3,7)
+      IC = 0                                                            0061
+C     END BLOCK
+C (4,1)
+C
+C     -DECODAGE DU CARACTERE COURANT-
+9     IUTI = IUTI+1                                                     0064
+C (5,1)
+      IF (IUTI.GT.INMUTI) GOTO 10                                       0065
+C (15,1)
+C
+C     -TRAITEMENT DES COMMENTAIRES-
+      IF (IPARNUT.GT.0) GOTO 99998                                      0068
+C (14,1)
+      IF (A(IUTI).NE.' ') GOTO 11                                       0073
+C (6,1)
+C
+C     -FIN DE LIGNE-
+10    IF (TEST) GOTO 99997                                              0076
+C (13,1)
+11    CONTINUE                                                          0080
+      RETURN
+99997 CONTINUE
+C (7,1)
+      ITYP = 0                                                          0077
+C (8,1)
+8     IF (IUTI.LE.INMUTI) GOTO 4                                        0043
+C (23,1)
+      IF (ITYP.EQ.4) GOTO 3                                             0044
+C (9,1)
+4     IF (IERR.EQ.0) GOTO 5                                             0045
+C (18,1)
+      IF (IMP.EQ.0) RETURN                                              0046
+C (17,1)
+C     BEGIN BLOCK
+C (17,2)
+      WRITE (6, 103) IUTI, JCNUT                                        0047
+C (17,3)
+103   FORMAT(//,' ERREUR DETECTEE PAR RIDLEV AU',I4,'EME CARACTERE DU ',
+     &I5,'EME ENREGISTREMENT LU.',//)                                   0048
+C     END BLOCK
+      RETURN
+C (10,1)
+5     CONTINUE                                                          0053
+C (11,1)
+6     TEXT = T(1:8)                                                     0054
+      RETURN
+99998 CONTINUE
+C (16,1)
+C     BEGIN BLOCK
+C (16,2)
+      IF (A(IUTI).EQ.'(') THEN                                          0069
+C (16,3)
+         IPARNUT = IPARNUT+1                                            0069
+      ELSE
+C (16,4)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (16,5)
+      IF (A(IUTI).EQ.')') THEN                                          0070
+C (16,6)
+         IPARNUT = IPARNUT-1                                            0070
+      ELSE
+C (16,7)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+      GOTO 9
+C (19,1)
+7     IERR = 2                                                          0051
+      GOTO 6
+99999 CONTINUE
+C (2,1)
+      IUTI = IUTI-1                                                     0029
+      GOTO 1
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+
+C  T(IERR,IPARNUT,ITYP,IUTI,JCNUT,NFIXE) {}
+
+
+      SUBROUTINE UNSTRUC17
+     *  (AFLOT,NFIXE,ITYP,IERR,
+     *  TEXT,IUTI,INMUTI,IMP,NUT,NCNUT,JCNUT,IPARNUT)
+      INTEGER NFIXE,ITYP,IERR,IUTI,INMUTI,IMP,NUT,NCNUT,JCNUT,IPARNUT
+      REAL AFLOT
+      CHARACTER*8 TEXT
+C
+C     -VARIABLES LOCALES-
+      CHARACTER*1   A(136)
+      CHARACTER*136 AA
+      CHARACTER*16 T
+      LOGICAL TEST,NOMBRE,IEN,IED,DECI
+      INTEGER NFIX1, IM, IC, IS, ICC, ICAR, KK, K
+      REAL P(16),C1
+C
+      EQUIVALENCE (A(1),AA)
+      SAVE AA
+      DATA P/1.D01,1.D02,1.D03,1.D04,1.D05,1.D06,1.D07,1.D08,
+     *                  1.D09,1.D10,1.D11,1.D12,1.D13,1.D14,1.D15,1.D16/
+
+C  T(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(IERR) {IERR==0}
+
+C (0,2)
+C
+C-----------------------------------
+C     --- DEBUT DES INSTRUCTIONS ---
+C-----------------------------------
+C     -PREPARATION DU DECODAGE-
+      IERR = 0                                                          0026
+
+C  T(ITYP) {ITYP==4}
+
+C (0,3)
+      ITYP = 4                                                          0027
+
+C  T(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (0,4)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+      IF (IUTI.LE.INMUTI) GOTO 99999                                    0028
+
+C  T(IUTI,JCNUT) {IUTI==0, JCNUT==JCNUT#init+1}
+
+C (22,1)
+C     BEGIN BLOCK
+
+C  T(IUTI) {IUTI==0}
+
+C (22,2)
+3     IUTI = 0                                                          0032
+
+C  T(JCNUT) {JCNUT==JCNUT#init+1}
+
+C (22,3)
+      JCNUT = JCNUT+1                                                   0033
+
+C  T() {}
+
+C (22,4)
+C
+C     -LECTURE D'UNE LIGNE DU FICHIER NUT-
+      READ (UNIT=NUT,FMT=101,END=7) AA(1:NCNUT)                         0036
+C     END BLOCK
+
+C  T() {}
+
+C (21,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (21,2)
+101   FORMAT(A)                                                         0037
+
+C  T() {}
+
+C (21,3)
+C
+C     -IMPRESSION EVENTUELLE DE LA LIGNE LUE-
+      IF (IMP.EQ.1) THEN                                                0040
+
+C  T() {}
+
+C (21,4)
+         WRITE (6, 102) AA(1:NCNUT)                                     0040
+      ELSE
+
+C  T() {}
+
+C (21,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  T() {}
+
+C (21,6)
+102   FORMAT(1X,A)                                                      0041
+C     END BLOCK
+
+C  T(IC,IM,NFIX1,NFIXE) {IC==0, IM==0, NFIX1==0, NFIXE==0}
+
+C (3,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (3,2)
+1     AFLOT = 0.                                                        0056
+
+C  T() {}
+
+C (3,3)
+      C1 = 0.                                                           0057
+
+C  T(NFIXE) {NFIXE==0}
+
+C (3,4)
+      NFIXE = 0                                                         0058
+
+C  T(NFIX1) {NFIX1==0}
+
+C (3,5)
+      NFIX1 = 0                                                         0059
+
+C  T(IM) {IM==0}
+
+C (3,6)
+      IM = 0                                                            0060
+
+C  T(IC) {IC==0}
+
+C (3,7)
+      IC = 0                                                            0061
+C     END BLOCK
+
+C  T(IUTI) {IUTI==IUTI#init+1}
+
+C (4,1)
+C
+C     -DECODAGE DU CARACTERE COURANT-
+9     IUTI = IUTI+1                                                     0064
+
+C  T() {}
+
+C (5,1)
+      IF (IUTI.GT.INMUTI) GOTO 10                                       0065
+
+C  T() {}
+
+C (15,1)
+C
+C     -TRAITEMENT DES COMMENTAIRES-
+      IF (IPARNUT.GT.0) GOTO 99998                                      0068
+
+C  T() {}
+
+C (14,1)
+      IF (A(IUTI).NE.' ') GOTO 11                                       0073
+
+C  T() {}
+
+C (6,1)
+C
+C     -FIN DE LIGNE-
+10    IF (TEST) GOTO 99997                                              0076
+
+C  T() {}
+
+C (13,1)
+11    CONTINUE                                                          0080
+      RETURN
+99997 CONTINUE
+
+C  T(ITYP) {ITYP==0}
+
+C (7,1)
+      ITYP = 0                                                          0077
+
+C  T() {}
+
+C (8,1)
+8     IF (IUTI.LE.INMUTI) GOTO 4                                        0043
+
+C  T() {}
+
+C (23,1)
+      IF (ITYP.EQ.4) GOTO 3                                             0044
+
+C  T() {}
+
+C (9,1)
+4     IF (IERR.EQ.0) GOTO 5                                             0045
+
+C  T() {}
+
+C (18,1)
+      IF (IMP.EQ.0) RETURN                                              0046
+
+C  T() {}
+
+C (17,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (17,2)
+      WRITE (6, 103) IUTI, JCNUT                                        0047
+
+C  T() {}
+
+C (17,3)
+103   FORMAT(//,' ERREUR DETECTEE PAR RIDLEV AU',I4,'EME CARACTERE DU ',
+     &I5,'EME ENREGISTREMENT LU.',//)                                   0048
+C     END BLOCK
+      RETURN
+
+C  T() {}
+
+C (10,1)
+5     CONTINUE                                                          0053
+
+C  T() {}
+
+C (11,1)
+6     TEXT = T(1:8)                                                     0054
+      RETURN
+99998 CONTINUE
+
+C  T(IPARNUT) {IPARNUT#init<=IPARNUT+1, IPARNUT<=IPARNUT#init+1}
+
+C (16,1)
+C     BEGIN BLOCK
+
+C  T(IPARNUT) {IPARNUT#init<=IPARNUT, IPARNUT<=IPARNUT#init+1}
+
+C (16,2)
+      IF (A(IUTI).EQ.'(') THEN                                          0069
+
+C  T(IPARNUT) {IPARNUT==IPARNUT#init+1}
+
+C (16,3)
+         IPARNUT = IPARNUT+1                                            0069
+      ELSE
+
+C  T() {}
+
+C (16,4)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  T(IPARNUT) {IPARNUT#init<=IPARNUT+1, IPARNUT<=IPARNUT#init}
+
+C (16,5)
+      IF (A(IUTI).EQ.')') THEN                                          0070
+
+C  T(IPARNUT) {IPARNUT==IPARNUT#init-1}
+
+C (16,6)
+         IPARNUT = IPARNUT-1                                            0070
+      ELSE
+
+C  T() {}
+
+C (16,7)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+      GOTO 9
+
+C  T(IERR) {IERR==2}
+
+C (19,1)
+7     IERR = 2                                                          0051
+      GOTO 6
+99999 CONTINUE
+
+C  T(IUTI) {IUTI==IUTI#init-1}
+
+C (2,1)
+      IUTI = IUTI-1                                                     0029
+      GOTO 1
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+
+C  P() {}
+
+
+      SUBROUTINE UNSTRUC17
+     *  (AFLOT,NFIXE,ITYP,IERR,
+     *  TEXT,IUTI,INMUTI,IMP,NUT,NCNUT,JCNUT,IPARNUT)
+      INTEGER NFIXE,ITYP,IERR,IUTI,INMUTI,IMP,NUT,NCNUT,JCNUT,IPARNUT
+      REAL AFLOT
+      CHARACTER*8 TEXT
+C
+C     -VARIABLES LOCALES-
+      CHARACTER*1   A(136)
+      CHARACTER*136 AA
+      CHARACTER*16 T
+      LOGICAL TEST,NOMBRE,IEN,IED,DECI
+      INTEGER NFIX1, IM, IC, IS, ICC, ICAR, KK, K
+      REAL P(16),C1
+C
+      EQUIVALENCE (A(1),AA)
+      SAVE AA
+      DATA P/1.D01,1.D02,1.D03,1.D04,1.D05,1.D06,1.D07,1.D08,
+     *                  1.D09,1.D10,1.D11,1.D12,1.D13,1.D14,1.D15,1.D16/
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+C
+C-----------------------------------
+C     --- DEBUT DES INSTRUCTIONS ---
+C-----------------------------------
+C     -PREPARATION DU DECODAGE-
+      IERR = 0                                                          0026
+
+C  P(IERR) {IERR==0}
+
+C (0,3)
+      ITYP = 4                                                          0027
+
+C  P(IERR,ITYP) {IERR==0, ITYP==4}
+
+C (0,4)
+C     BEGIN UNSTRUCTURED
+
+C  P(IERR,ITYP) {IERR==0, ITYP==4}
+
+C (1,1)
+      IF (IUTI.LE.INMUTI) GOTO 99999                                    0028
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (22,1)
+C     BEGIN BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (22,2)
+3     IUTI = 0                                                          0032
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IUTI==0}
+
+C (22,3)
+      JCNUT = JCNUT+1                                                   0033
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IUTI==0}
+
+C (22,4)
+C
+C     -LECTURE D'UNE LIGNE DU FICHIER NUT-
+      READ (UNIT=NUT,FMT=101,END=7) AA(1:NCNUT)                         0036
+C     END BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (21,1)
+C     BEGIN BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (21,2)
+101   FORMAT(A)                                                         0037
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (21,3)
+C
+C     -IMPRESSION EVENTUELLE DE LA LIGNE LUE-
+      IF (IMP.EQ.1) THEN                                                0040
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IMP==1}
+
+C (21,4)
+         WRITE (6, 102) AA(1:NCNUT)                                     0040
+      ELSE
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (21,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (21,6)
+102   FORMAT(1X,A)                                                      0041
+C     END BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (3,1)
+C     BEGIN BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (3,2)
+1     AFLOT = 0.                                                        0056
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (3,3)
+      C1 = 0.                                                           0057
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (3,4)
+      NFIXE = 0                                                         0058
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {NFIXE==0}
+
+C (3,5)
+      NFIX1 = 0                                                         0059
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {NFIX1==0,
+C    NFIXE==0}
+
+C (3,6)
+      IM = 0                                                            0060
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IM==0, NFIX1==0,
+C    NFIXE==0}
+
+C (3,7)
+      IC = 0                                                            0061
+C     END BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (4,1)
+C
+C     -DECODAGE DU CARACTERE COURANT-
+9     IUTI = IUTI+1                                                     0064
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (5,1)
+      IF (IUTI.GT.INMUTI) GOTO 10                                       0065
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IUTI<=INMUTI}
+
+C (15,1)
+C
+C     -TRAITEMENT DES COMMENTAIRES-
+      IF (IPARNUT.GT.0) GOTO 99998                                      0068
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IPARNUT<=0}
+
+C (14,1)
+      IF (A(IUTI).NE.' ') GOTO 11                                       0073
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (6,1)
+C
+C     -FIN DE LIGNE-
+10    IF (TEST) GOTO 99997                                              0076
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (13,1)
+11    CONTINUE                                                          0080
+      RETURN
+99997 CONTINUE
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (7,1)
+      ITYP = 0                                                          0077
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (8,1)
+8     IF (IUTI.LE.INMUTI) GOTO 4                                        0043
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {INMUTI+1<=IUTI}
+
+C (23,1)
+      IF (ITYP.EQ.4) GOTO 3                                             0044
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (9,1)
+4     IF (IERR.EQ.0) GOTO 5                                             0045
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (18,1)
+      IF (IMP.EQ.0) RETURN                                              0046
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (17,1)
+C     BEGIN BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (17,2)
+      WRITE (6, 103) IUTI, JCNUT                                        0047
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (17,3)
+103   FORMAT(//,' ERREUR DETECTEE PAR RIDLEV AU',I4,'EME CARACTERE DU ',
+     &I5,'EME ENREGISTREMENT LU.',//)                                   0048
+C     END BLOCK
+      RETURN
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IERR==0}
+
+C (10,1)
+5     CONTINUE                                                          0053
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (11,1)
+6     TEXT = T(1:8)                                                     0054
+      RETURN
+99998 CONTINUE
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {1<=IPARNUT}
+
+C (16,1)
+C     BEGIN BLOCK
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {1<=IPARNUT}
+
+C (16,2)
+      IF (A(IUTI).EQ.'(') THEN                                          0069
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {1<=IPARNUT}
+
+C (16,3)
+         IPARNUT = IPARNUT+1                                            0069
+      ELSE
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {1<=IPARNUT}
+
+C (16,4)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {1<=IPARNUT}
+
+C (16,5)
+      IF (A(IUTI).EQ.')') THEN                                          0070
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {1<=IPARNUT}
+
+C (16,6)
+         IPARNUT = IPARNUT-1                                            0070
+      ELSE
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {1<=IPARNUT}
+
+C (16,7)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+      GOTO 9
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {}
+
+C (19,1)
+7     IERR = 2                                                          0051
+      GOTO 6
+99999 CONTINUE
+
+C  P(IC,IERR,IM,IPARNUT,ITYP,IUTI,JCNUT,NFIX1,NFIXE) {IUTI<=INMUTI}
+
+C (2,1)
+      IUTI = IUTI-1                                                     0029
+      GOTO 1
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+

@@ -1,0 +1,11 @@
+delete extrmain
+create extrmain extrmain.f
+activate PRINT_CODE_PRECONDITIONS
+activate TRANSFORMERS_INTER_FAST
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FAST
+module EXTR
+display PRINTED_FILE
+close 
+delete extrmain
+quit

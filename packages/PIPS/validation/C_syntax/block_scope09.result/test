@@ -1,0 +1,147 @@
+
+Symbol table for block_scope09
+
+block_scope09!
+
+Declarations for module "block_scope09!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
+	Declared entity "TOP-LEVEL:block_scope09" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:x" with type "variable" "int"
+	Declared entity "TOP-LEVEL:y" with type "variable" "int"
+	Declared entity "block_scope09!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "block_scope09!:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope09!:*STACK*" with type "area" with size 0
+	Declared entity "block_scope09!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:block_scope09"	with type "functional" "int -> int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+	Variable "TOP-LEVEL:y"	offset = 4	size = 4
+
+
+Layout for memory area "block_scope09!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope09!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope09!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope09!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module block_scope09!
+
+
+block_scope09
+
+Declarations for module "block_scope09" with type "int -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
+	Declared entity "block_scope09!:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope09:*DYNAMIC*" with type "area" with size 36
+	Declared entity "block_scope09:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope09:*STACK*" with type "area" with size 0
+	Declared entity "block_scope09:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope09:0`1`x" with type "variable" "int"
+	Declared entity "block_scope09:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "block_scope09:0`__func__" with type "variable" "char"
+	Declared entity "block_scope09:0`k" with type "variable" "int"
+	Declared entity "block_scope09:block_scope09" with type "variable" "int"
+	Declared entity "block_scope09:x" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable block_scope09:x	offset = 1
+
+Layout for return variable:
+
+	Variable "block_scope09:block_scope09"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+	Variable "TOP-LEVEL:y"	offset = 4	size = 4
+
+
+Layout for memory area "block_scope09!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope09:*DYNAMIC*" of size 36:
+	Variable "block_scope09:0`k"	offset = 28	size = 4
+	Variable "block_scope09:0`1`x"	offset = 32	size = 4
+	Variable "block_scope09:0`__func__"	offset = 0	size = 14
+	Variable "block_scope09:0`__FUNCTION__"	offset = 14	size = 14
+
+
+Layout for memory area "block_scope09:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope09:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope09:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module block_scope09
+
+
+Parser output
+
+int x = 1;
+int y = 2;
+
+// The formal parameter hides the global x
+extern int block_scope09(int x);
+
+int block_scope09(int x)
+{
+   int k;
+   {
+      // This decaration hides the formal parameter
+      int x;
+
+      x = 2;
+   }
+
+   k = 1;
+   y++;
+}
+
+Controlizer output
+
+int block_scope09(int x)
+{
+   int k;
+   {
+      // This decaration hides the formal parameter
+      int x;
+
+      x = 2;
+   }
+
+   k = 1;
+   y++;
+}
+

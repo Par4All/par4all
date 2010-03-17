@@ -1,0 +1,12 @@
+delete ovl
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+create ovl ovl.f
+
+display PRINTED_FILE(OVL)
+close
+
+delete ovl
+
+quit
+

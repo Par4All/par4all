@@ -1,0 +1,40 @@
+!!
+!! file for alias.f
+!!
+      PROGRAM ALIAS
+      INTEGER I,A(5)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 5
+C (0,3)
+         A(I) = 2
+      ENDDO
+C (0,4)
+      PRINT *, 'BEFORE:', A
+C (0,5)
+      ALIAS_FLAG(1) = .TRUE.
+      CALL SUB(A, A(1))
+C (0,6)
+      PRINT *, 'AFTER: ', A
+C (0,7)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE SUB(X,Y)
+      INTEGER I,X(5),Y
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 5
+C (0,3)
+      IF (-I+1.EQ.0.AND.ALIAS_FLAG(1)) STOP "Alias violation in module S
+     &UB: write on X, aliased with Y by call path (ALIAS:(0,5)) "
+         X(I) = Y*X(I)
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

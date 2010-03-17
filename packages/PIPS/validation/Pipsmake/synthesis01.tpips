@@ -1,0 +1,31 @@
+delete synthesis01
+create synthesis01 synthesis01.f
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty PARSER_TYPE_CHECK_CALL_SITES TRUE
+
+echo
+echo User source code for SYNTHESIS01
+echo
+
+module SYNTHESIS01
+display PRINTED_FILE
+
+echo
+echo Call graph for synthesis01
+echo
+
+module SYNTHESIS01
+activate PRINT_CALL_GRAPH
+display CALLGRAPH_FILE
+
+echo
+echo Synthesized source code for FOO
+echo
+
+module FOO
+display PRINTED_FILE
+
+close
+delete synthesis01
+quit

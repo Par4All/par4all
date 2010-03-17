@@ -1,0 +1,16 @@
+delete main02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main02 main02.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE
+
+close
+delete main02
+quit

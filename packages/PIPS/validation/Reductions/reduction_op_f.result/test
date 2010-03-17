@@ -1,0 +1,62 @@
+! The goal of this test case is to check that all basic reduction operators
+! are well detected by pips. All the loops in the programm should be reduced.
+
+      PROGRAM PARALLEL
+      REAL X, Y
+      INTEGER J, K
+      LOGICAL M, O
+C  loop sum[S],
+      DO I = 1, N
+C  call sum[S],
+         S = S+1
+      ENDDO
+C  loop sum[S],
+      DO I = 1, N
+C  call sum[S],
+         S = S-1
+      ENDDO
+C  loop prod[S],
+      DO I = 1, N
+C  call prod[S],
+         S = S*2
+      ENDDO
+C  loop and[M],
+      DO I = 1, N
+C  call and[M],
+         M = M.AND.O
+      ENDDO
+C  loop or[M],
+      DO I = 1, N
+C  call or[M],
+         M = M.OR.O
+      ENDDO
+C  loop eqv[M],
+      DO I = 1, N
+C  call eqv[M],
+         M = M.EQV.O
+      ENDDO
+C  loop neqv[M],
+      DO I = 1, N
+C  call neqv[M],
+         M = M.NEQV.O
+      ENDDO
+C  loop max[Y],
+      DO I = 1, N
+C  call max[Y],
+         Y = MAX(Y, X)
+      ENDDO
+C  loop min[Y],
+      DO I = 1, N
+C  call min[Y],
+         Y = MIN(Y, X)
+      ENDDO
+!     do i = 1, n
+!     k = IAND(k,j)
+!     end do
+!     do i = 1, n
+!     k = IOR(k,j)
+!     end do
+!     do i = 1, n
+!     k = IEOR(k,j)
+!     end do
+      END

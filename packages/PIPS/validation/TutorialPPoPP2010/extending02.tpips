@@ -1,0 +1,8 @@
+delete extending02
+create extending02 extending02.c
+
+apply PREPEND_CALL
+display PRINTED_FILE
+
+close
+quit

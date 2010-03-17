@@ -1,0 +1,40 @@
+delete volume
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create volume volume.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+module volume
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+echo
+echo after removing reductions
+echo
+
+setproperty LOOP_LABEL "volume"
+apply REDUCTION_VARIABLE_EXPANSION
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c volume.database/Src/volume.c  -o volume.database/Src/v.o
+shell rm -rf volume.database/Src/v.o
+
+close
+delete volume
+quit
+
+

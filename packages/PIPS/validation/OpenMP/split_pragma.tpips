@@ -1,0 +1,35 @@
+delete split_pragma
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create split_pragma split_pragma.f
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PRAGMA_TYPE "expr"
+
+apply PRIVATIZE_MODULE(SPLIT_PRAGMA)
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(SPLIT_PRAGMA)
+
+#unset parallal printed of do loop to avoid pragma duplication
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+display PRINTED_FILE(SPLIT_PRAGMA)
+
+close
+delete split_pragma
+quit
+# EOF

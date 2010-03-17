@@ -1,0 +1,39 @@
+delete variable_expansion01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create variable_expansion01 variable_expansion01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[foo]
+display PRINTED_FILE[main]
+
+echo
+echo Code after variable_expansion
+echo
+
+apply VARIABLE_EXPANSION[foo]
+display PRINTED_FILE[foo]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc  variable_expansion01.c -o  ve
+shell cc  variable_expansion01.database/Src/variable_expansion01.c -o variable_expansion01.database/Src/ve
+shell if test `variable_expansion01.database/Src/ve` = `./ve` ; then echo "ok"; else echo "ko" ; fi
+shell rm -f variable_expansion01.database/Src/ve ve
+
+close
+delete variable_expansion01
+quit
+

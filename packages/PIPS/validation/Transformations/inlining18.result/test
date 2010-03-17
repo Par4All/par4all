@@ -1,0 +1,32 @@
+char * foo(void)
+{
+   const char *foo_fun = __FUNCTION__;
+   return (char *) foo_fun;                                             /*0005*/
+}
+int main(void)
+{
+   const char *fun;
+   const char *fun2;
+   const char *fun3;
+   fun = foo();                                                         /*0005*/
+   fun2 = __FUNCTION__;                                                 /*0006*/
+   fun3 = __func__;                                                     /*0007*/
+   return 0;                                                            /*0008*/
+}
+int main(void)
+{
+   const char *fun;
+   const char *fun2;
+   const char *fun3;
+   char *_return0;
+   {
+      const char *foo_fun = __FUNCTION__;
+      _return0 = (char *) foo_fun;                                      /*0009*/
+   }
+   fun = _return0;                                                      /*0013*/
+   fun2 = __FUNCTION__;                                                 /*0014*/
+   /*0006*/
+   fun3 = __func__;                                                     /*0015*/
+   /*0007*/
+   return 0;                                                            /*0016*/
+}

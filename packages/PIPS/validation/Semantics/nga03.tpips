@@ -1,0 +1,12 @@
+delete nga03
+create nga03 nga03.f
+activate TRANSFORMERS_INTRA_FULL
+# activate TRANSFORMERS_INTER_FULL
+# activate PRECONDITIONS_INTER_FULL
+# setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[SETBV]
+close
+delete nga03
+quit
+

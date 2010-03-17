@@ -1,0 +1,45 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *x, x1, **y, *y1, y2;
+//               <must be written>: x1
+
+   x1 = 0;
+//               <must be written>: y2
+   y2 = 1;
+//               <must be written>: x
+   x = &x1;
+//               <must be written>: y1
+   y1 = &y2;
+//               <must be written>: y
+   y = &y1;
+//               <must be read   >: y y[0]
+//               <must be written>: x
+   x = *y;
+//               <must be read   >: x y
+//               <must be written>: y[0]
+   *y = x;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   int *x, x1, **y, *y1, y2;
+
+   x1 = 0;
+   y2 = 1;
+   x = &x1;
+//  points to = {(x,x1,E)}
+   y1 = &y2;
+//  points to = {(y1,y2,E)(x,x1,E)}
+   y = &y1;
+//  points to = {(y,y1,E)(y1,y2,E)(x,x1,E)}
+   x = *y;
+//  points to = {(y,y1,E)(y1,y2,E)(x,y2,E)}
+   *y = x;
+//  points to = {(y,y1,E)(x,y2,E)(y1,y2,E)}
+   return 0;
+   // END BLOCK
+}

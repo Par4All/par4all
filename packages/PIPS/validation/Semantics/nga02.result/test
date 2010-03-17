@@ -1,0 +1,40 @@
+
+C  P() {}
+
+      PROGRAM NGA02
+
+C     Extraction de conditions de non-debordement: you want N<=33 before
+C     the print statement. It works with the derivative fix-point
+
+      REAL A(33)
+
+C  P() {}
+
+
+      READ *, N                                                         0008
+
+C  P(N) {}
+
+
+      IF (N.LT.5) STOP                                                  0010
+
+C  P(N) {5<=N}
+
+
+      DO I = 1, N                                                       0012
+
+C  P(I,N) {1<=I, I<=N, 5<=N}
+
+         IF (I.GT.33) STOP                                              0013
+
+C  P(I,N) {1<=I, I<=33, I<=N, 5<=N}
+
+         A(I) = 0.                                                      0014
+      ENDDO
+
+C  P(I,N) {I==N+1, 6<=I, I<=34}
+
+
+      PRINT *, A, N                                                     0017
+
+      END

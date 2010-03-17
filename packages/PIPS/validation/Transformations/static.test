@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# static.f test script
+#
+# Loop normalization of module STATIC
+#
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+#GO :delete wstatic
+set ABORT_ON_USER_ERROR TRUE
+create wstatic static.f
+module STATIC
+apply LOOP_NORMALIZE
+display PRINTED_FILE
+close
+delete wstatic
+EOF

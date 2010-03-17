@@ -1,0 +1,22 @@
+delete order01
+create order01 order01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[order01]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[order01]
+
+close
+#delete order01
+quit

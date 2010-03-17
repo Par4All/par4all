@@ -1,0 +1,44 @@
+
+PARSED PRINTED FILE FOR MODULE resp01!
+
+/* Derived from rsp05.c to debug the parser when a function is declared several time (here, filter) */
+/* #include <stdio.h> */
+
+
+extern int filter(int x);
+
+extern int main();
+
+extern int filter(int x);
+
+PARSED PRINTED FILE FOR MODULE main (undefined function "filtre")
+
+int main()
+{
+   int i;
+   int j;
+
+   j = filtre(i);
+}
+
+Symbol table for module "filter" (undefined variable "res")
+
+int filter(int x)
+{
+   int y;
+
+   y = x;
+
+   return res;
+}
+
+Parsed printed file for module "filter" (undefined variable "res")
+
+int filter(int x)
+{
+   int y;
+
+   y = x;
+
+   return res;
+}

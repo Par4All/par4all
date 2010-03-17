@@ -1,0 +1,25 @@
+# Check that old properties can override the current properties
+# defined in $PIPS_ROOT/etc/properties.rc
+
+# The old property file name is contained in local file
+# "old_properties".
+
+delete old_property01
+create old_property01 old_property01.c
+
+echo
+echo We should use the old default active phases
+echo
+
+getproperty ACTIVE_PHASES
+
+echo
+echo The loop should be distributed but not parallelized
+echo
+
+display PARALLELPRINTED_FILE[old_property01]
+
+close
+delete old_property01
+quit
+

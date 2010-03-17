@@ -1,0 +1,50 @@
+
+Parsed printed file for "space02" and "main" with default spacing
+
+! Check impact of spacing property
+
+      INTEGER FUNCTION SPACE02(X,Y,Z)
+      INTEGER X, Y
+      REAL*8 Z
+
+      IF (Z.GT.0.) THEN
+         SPACE02 = X+Y
+      ELSE
+         SPACE02 = X-Y
+      ENDIF
+      RETURN
+      END
+
+      PROGRAM MAIN
+      INTEGER J
+
+      J = 2+3
+
+      K = SPACE01(1, J, 3.)
+
+      END
+
+Parsed printed file for "space02" and "main" with minimal spacing
+
+! Check impact of spacing property
+
+      INTEGER FUNCTION SPACE02(X,Y,Z)
+      INTEGER X, Y
+      REAL*8 Z
+
+      IF (Z.GT.0.) THEN
+         SPACE02 = X+Y
+      ELSE
+         SPACE02 = X-Y
+      ENDIF
+      RETURN
+      END
+
+      PROGRAM MAIN
+      INTEGER J
+
+      J = 2+3
+
+      K = SPACE01(1,J,3.)
+
+      END

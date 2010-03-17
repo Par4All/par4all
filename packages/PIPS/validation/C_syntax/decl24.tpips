@@ -1,0 +1,53 @@
+delete decl24
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create decl24 decl24.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+display PARSED_PRINTED_FILE[%ALL]
+quit
+echo
+echo Parsed printed file for "decl24!"
+echo
+
+display PARSED_PRINTED_FILE[decl24!]
+
+echo
+echo Parsed printed file for "HDL_display"
+echo
+
+display PARSED_PRINTED_FILE[HDL_display]
+
+echo
+echo Parsed printed file for "HDL_progress_progress"
+echo
+
+display PARSED_PRINTED_FILE[HDL_progress_progress]
+
+echo
+echo Parsed printed file for "HDL_progress_end"
+echo
+
+display PARSED_PRINTED_FILE[HDL_progress_end]
+
+echo
+echo Parsed printed file for "HDL_progress_start_monitor"
+echo
+
+display PARSED_PRINTED_FILE[HDL_progress_start_monitor]
+
+close
+delete decl24
+
+quit

@@ -1,0 +1,19 @@
+!!
+!! file for common02.f
+!!
+      PROGRAM MAIN
+
+      CALL C1
+      CALL C2
+      RETURN
+      END
+      SUBROUTINE C1
+      COMMON W
+      W = 5
+      RETURN
+      END
+      SUBROUTINE C2
+      COMMON V
+      PRINT *, V
+      RETURN
+      END

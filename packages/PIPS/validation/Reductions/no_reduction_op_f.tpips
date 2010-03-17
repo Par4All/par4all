@@ -1,0 +1,28 @@
+#
+delete no_reduction_op_f
+create no_reduction_op_f no_reduction_op_f.f
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv RICE_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv PIPSDBM_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv REDUCTIONS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+
+
+#activate PRINT_CODE_PROPER_REDUCTIONS
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE(parallel)
+
+close
+delete no_reduction_op_f
+quit
+# EOF

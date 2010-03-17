@@ -1,0 +1,89 @@
+user warning in tp_parse: save05: No such workspace
+Registering file save05.f
+Splitting file    ./save05.f
+  Module         SAVE05
+Workspace save05 created and opened.
+Module SAVE05 selected
+Main module PROGRAM "SAVE05" selected.
+Module SAVE05 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module SAVE05 already active.
+Request: build resource PRINTED_FILE for module SAVE05.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(SAVE05)
+  PARSER                         building   PARSED_CODE(SAVE05)
+                                 building   CALLEES(SAVE05)
+
+Declarations for module SAVE05 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity SAVE05:*DYNAMIC*	with type area with size 8
+Declared entity SAVE05:*HEAP*	with type area with size 0
+Declared entity SAVE05:*STACK*	with type area with size 0
+Declared entity SAVE05:*STATIC*	with type area with size 8
+Declared entity SAVE05:U	with type variable REAL*4
+Declared entity SAVE05:W	with type variable REAL*4
+Declared entity SAVE05:W1	with type variable REAL*4
+Declared entity SAVE05:W2	with type variable REAL*4
+Declared entity SAVE05:X	with type variable REAL*4
+Declared entity SAVE05:Y	with type variable REAL*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 8:
+	Variable SAVE05:W2,	offset = 0,	size = 4
+	Variable SAVE05:W,	offset = 4,	size = 4
+	Variable SAVE05:W1,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 8:
+	Variable SAVE05:Y,	offset = 0,	size = 4
+	Variable SAVE05:U,	offset = 4,	size = 4
+	Variable SAVE05:X,	offset = 0,	size = 4
+
+End of declarations for module SAVE05
+
+  CONTROLIZER                    building   CODE(SAVE05)
+  PRINT_CODE                     building   PRINTED_FILE(SAVE05)
+PRINTED_FILE made for SAVE05.
+      PROGRAM SAVE05
+
+C     Check that offsets in the static area are correct regardless of 
+C     equivalences
+
+      REAL W
+
+      SAVE U
+      SAVE X
+      SAVE Y
+
+      EQUIVALENCE (X,Y)
+      EQUIVALENCE (W1, W2)
+
+      X = Y+W                                                           0015
+
+      PRINT *, U, W1, W2                                                0017
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module SAVE05.
+Closing program.
+Closing workspace.
+Workspace save05 closed.
+
+Workspace save05 deleted.

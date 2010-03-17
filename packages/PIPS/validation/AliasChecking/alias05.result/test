@@ -1,0 +1,67 @@
+!!
+!! file for alias05.f
+!!
+C     different calls from different callers
+
+      PROGRAM ALIAS
+      COMMON /TOTO/ W(50)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      ALIAS_FLAG(2) = .TRUE.
+      CALL FOO1(W(10))
+C (0,3)
+      CALL FOO2(A, B, C)
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+    
+      SUBROUTINE FOO1(X1)
+      COMMON /TOTO/ V(50)
+      COMMON /TITI/ U(50)
+      EQUIVALENCE (M,N)
+      REAL X1(40)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      ALIAS_FLAG(1) = .TRUE.
+      CALL FOO2(X1(10), M, N)
+C (0,3)
+      CALL FOO2(U, K, L)
+C (0,4)
+      CALL FOO2(T, K, K)
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE FOO2(Y1,Y2,Y3)
+      REAL Y1(20)
+      COMMON /TOTO/ W(50)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 20
+C (0,3)
+      IF (17+I.GE.0.AND.-32+I.LE.0.AND.ALIAS_FLAG(2).AND.ALIAS_FLAG(1
+     &)) STOP "Alias violation in module FOO2: write on Y1, aliased with
+     & W by call path (FOO1:(0,2)) (ALIAS:(0,2)) "
+         Y1(I) = I
+      ENDDO
+C (0,4)
+      CALL FOO3(Y1)
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      
+      SUBROUTINE FOO3(Z1)
+      COMMON /TOTO/ V(50)
+      COMMON /TITI/ U(50)
+C (0,1)
+      RETURN
+      END

@@ -1,0 +1,19 @@
+      PROGRAM STRINGS
+
+C     Parallelization of string manipulations
+
+      CHARACTER*80 TAB(10)
+
+      DOALL I = 1, 10                                                   0007
+         TAB(I) = 'Hello! '                                             0008
+      ENDDO
+
+      DO I = 2, 10                                                      0011
+         TAB(I) = TAB(I)(1:7)//TAB(I-1)(1:7*I-7)                        0012
+      ENDDO
+
+      DO I = 1, 10                                                      0015
+         PRINT *, TAB(I)                                                0016
+      ENDDO
+
+      END

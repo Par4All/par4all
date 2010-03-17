@@ -1,0 +1,51 @@
+
+Symbol table for "typedef10"
+
+typedef10!
+
+Declarations for module "typedef10!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:x" with type "variable" "int"
+	Declared entity "typedef10!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "typedef10!:*HEAP*" with type "area" with size 0
+	Declared entity "typedef10!:*STACK*" with type "area" with size 0
+	Declared entity "typedef10!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Typedef entities:
+
+	Typedef "typedef10!:$foo"	with type "void" "void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+
+
+Layout for memory area "typedef10!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef10!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef10!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef10!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module typedef10!
+
+
+Parsed code for "typedef10"
+
+typedef void foo;
+int x;

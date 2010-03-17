@@ -1,0 +1,12 @@
+delete cprec
+create cprec cprec.f
+module CPREC
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[VS]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[VS]
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[CPREC]
+close
+delete cprec
+quit

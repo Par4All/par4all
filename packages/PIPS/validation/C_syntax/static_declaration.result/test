@@ -1,0 +1,17 @@
+main()
+{
+   x++;
+}
+
+Unsplit stati_declaration
+
+/*
+ * file for static_declaration.c
+ */
+static int x = 2;
+
+extern  main();
+main()
+{
+   x++;
+}

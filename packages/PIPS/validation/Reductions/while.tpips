@@ -1,0 +1,29 @@
+delete while
+create while while.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv RICE_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv PIPSDBM_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv REDUCTIONS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+#activate PRINT_CODE_PROPER_REDUCTIONS
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE(main)
+
+close
+delete while
+quit
+# EOF

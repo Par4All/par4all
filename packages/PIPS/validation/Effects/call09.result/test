@@ -1,0 +1,66 @@
+
+Parsed code for "call09"
+
+void call09(int i, int j)
+{
+   i = i+j;
+}
+
+Code for "call09"
+
+void call09(int i, int j)
+{
+   i = i+j;
+}
+
+Proper effects for "call09"
+
+void call09(int i, int j)
+{
+//               <must be read   >: i j
+//               <must be written>: i
+   i = i+j;
+}
+
+Cumulated effects for "call09"
+
+//               <must be read   >: i j
+void call09(int i, int j)
+{
+//               <must be read   >: i j
+//               <must be written>: i
+   i = i+j;
+}
+
+Cumulated effects for "main"
+
+main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+//               <must be read   >: s[1] sp sp[0][1]
+
+   call09(s.one, sp->one);
+}
+
+Regions for "call09"
+
+void call09(int i, int j)
+{
+   i = i+j;
+}
+
+Regions for "main"
+
+main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+
+//  <s[PHI1]-R-EXACT-{PHI1==1}>
+//  <sp[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==1}>
+//  <sp-R-EXACT-{}>
+
+
+   call09(s.one, sp->one);
+}

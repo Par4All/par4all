@@ -1,0 +1,14 @@
+delete $WSPACE
+create $WSPACE $FILE
+setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+
+display PRINTED_FILE[%ALL]
+
+apply PRIVATIZE_MODULE
+
+display PRINTED_FILE[%ALL]
+
+close
+ delete $WSPACE
+
+quit

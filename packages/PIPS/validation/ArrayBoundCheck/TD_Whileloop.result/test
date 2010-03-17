@@ -1,0 +1,35 @@
+* Example with array references in the condition of while loop
+    
+      PROGRAM WHILELOOP
+      PARAMETER (NUM=10)
+      REAL TOSORT(NUM),TEMP
+      INTEGER I,J,NUM
+
+      DO 100 I = 1, NUM-1                                               0001
+         DO 100 J = I, 1, -1                                            0002
+            DO WHILE (TOSORT(J).GT.TOSORT(J+1))                         0003
+               TEMP = TOSORT(J)                                         0004
+               TOSORT(J) = TOSORT(J+1)                                  0005
+               TOSORT(J+1) = TEMP                                       0006
+            ENDDO
+
+100         CONTINUE                                                    0007
+      END
+* Example with array references in the condition of while loop
+    
+      PROGRAM WHILELOOP
+      PARAMETER (NUM=10)
+      REAL TOSORT(NUM),TEMP
+      INTEGER I,J,NUM
+
+      DO 100 I = 1, NUM-1                                               0001
+         DO 100 J = I, 1, -1                                            0002
+            DO WHILE (TOSORT(J).GT.TOSORT(J+1))                         0003
+               TEMP = TOSORT(J)                                         0004
+               TOSORT(J) = TOSORT(J+1)                                  0005
+               TOSORT(J+1) = TEMP                                       0006
+            ENDDO
+
+100         CONTINUE                                                    0007
+      END
+

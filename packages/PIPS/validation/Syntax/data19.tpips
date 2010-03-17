@@ -1,0 +1,32 @@
+delete data19
+create data19 data19.f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo DATA19 with user declarations
+echo
+
+display PRINTED_FILE 
+close
+
+# quit
+
+delete data19
+create data19 data19.f
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+echo
+echo DATA19 with PIPS regenerated declarations
+echo
+
+display PRINTED_FILE 
+
+apply UNSPLIT
+
+shell ${PIPS_F77:-f77} -c data19.database/Src/data19.f
+
+close
+delete data19
+quit

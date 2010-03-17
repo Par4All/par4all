@@ -1,0 +1,40 @@
+delete array05
+
+create array05 array05.f
+
+
+echo
+echo Parsed printed file for "ARRAY05"
+echo
+
+display PARSED_PRINTED_FILE[ARRAY05]
+
+echo
+echo Proper effetcs for "ARRAY05"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[ARRAY05]
+
+# quit
+echo
+echo Cumulated effetcs for "ARRAY05"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[ARRAY05]
+
+# quit
+
+echo
+echo Printed files with regions
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[ARRAY05]
+
+
+close
+delete array05
+quit

@@ -1,0 +1,19 @@
+delete ndecl07
+create ndecl07 ndecl07.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[ndecl07]
+
+close
+#delete ndecl07
+
+quit

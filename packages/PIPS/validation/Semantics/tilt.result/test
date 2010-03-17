@@ -1,0 +1,249 @@
+
+C  T() {}
+
+      SUBROUTINE  TILT(  )
+       INTEGER IM1, JM1, KM1
+
+C  T(I,J,K) {1<=K}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(K) {K==1}
+
+C (0,2)
+      K = 1                                                             0003
+
+C  T(I,J,K) {K#init<=K}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99996 CONTINUE
+
+C  T() {}
+
+C (1,1)
+C     DO loop 100 with exit had to be desugared
+      IF (K.GT.KM1) RETURN                                              0003
+
+C  T(J) {J==1}
+
+C (11,1)
+      J = 1                                                             0004
+99997 CONTINUE
+
+C  T() {}
+
+C (8,1)
+C     DO loop 200 with exit had to be desugared
+      IF (J.GT.JM1) GOTO 100                                            0004
+
+C  T(I) {I==1}
+
+C (10,1)
+      I = 1                                                             0005
+99998 CONTINUE
+
+C  T() {}
+
+C (6,1)
+C     DO loop 200 with exit had to be desugared
+      IF (I.GT.IM1) GOTO 99999                                          0005
+
+C  T() {}
+
+C (12,1)
+      IF (Z.NE.0) GOTO 300                                              0006
+
+C  T() {}
+
+C (13,1)
+      P = 1                                                             0007
+
+C  T(I) {I==I#init+1}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (5,2)
+C     
+200   CONTINUE                                                          0015
+
+C  T(I) {I==I#init+1}
+
+C (5,3)
+      I = I+1                                                           0005
+C     END BLOCK
+      GOTO 99998
+
+C  T() {}
+
+C (3,1)
+300   IF (Z2.NE.0) THEN                                                 0009
+      ELSE
+         RETURN
+      ENDIF
+
+C  T() {}
+
+C (4,1)
+      P = 2                                                             0010
+      GOTO 200
+99999 CONTINUE
+
+C  T(J) {J==J#init+1}
+
+C (7,1)
+      J = J+1                                                           0004
+      GOTO 99997
+
+C  T(K) {K==K#init+1}
+
+C (9,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (9,2)
+100   CONTINUE                                                          0016
+
+C  T(K) {K==K#init+1}
+
+C (9,3)
+      K = K+1                                                           0003
+C     END BLOCK
+      GOTO 99996
+C
+
+c        PRINT *, P
+
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE  TILT(  )
+       INTEGER IM1, JM1, KM1
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+      K = 1                                                             0003
+
+C  P(K) {K==1}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+99996 CONTINUE
+
+C  P(I,J,K) {1<=K}
+
+C (1,1)
+C     DO loop 100 with exit had to be desugared
+      IF (K.GT.KM1) RETURN                                              0003
+
+C  P(I,J,K) {1<=K, K<=KM1}
+
+C (11,1)
+      J = 1                                                             0004
+99997 CONTINUE
+
+C  P(I,J,K) {1<=J, 1<=K, K<=KM1}
+
+C (8,1)
+C     DO loop 200 with exit had to be desugared
+      IF (J.GT.JM1) GOTO 100                                            0004
+
+C  P(I,J,K) {1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (10,1)
+      I = 1                                                             0005
+99998 CONTINUE
+
+C  P(I,J,K) {1<=I, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (6,1)
+C     DO loop 200 with exit had to be desugared
+      IF (I.GT.IM1) GOTO 99999                                          0005
+
+C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (12,1)
+      IF (Z.NE.0) GOTO 300                                              0006
+
+C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (13,1)
+      P = 1                                                             0007
+
+C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (5,2)
+C     
+200   CONTINUE                                                          0015
+
+C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (5,3)
+      I = I+1                                                           0005
+C     END BLOCK
+      GOTO 99998
+
+C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (3,1)
+300   IF (Z2.NE.0) THEN                                                 0009
+      ELSE
+         RETURN
+      ENDIF
+
+C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (4,1)
+      P = 2                                                             0010
+      GOTO 200
+99999 CONTINUE
+
+C  P(I,J,K) {I==IM1+1, 2<=I, 1<=J, J<=JM1, 1<=K, K<=KM1}
+
+C (7,1)
+      J = J+1                                                           0004
+      GOTO 99997
+
+C  P(I,J,K) {J==JM1+1, 1<=I, IM1+1<=I, 2<=J, 1<=K, K<=KM1}
+
+C (9,1)
+C     BEGIN BLOCK
+
+C  P(I,J,K) {J==JM1+1, 1<=I, IM1+1<=I, 2<=J, 1<=K, K<=KM1}
+
+C (9,2)
+100   CONTINUE                                                          0016
+
+C  P(I,J,K) {J==JM1+1, 1<=I, IM1+1<=I, 2<=J, 1<=K, K<=KM1}
+
+C (9,3)
+      K = K+1                                                           0003
+C     END BLOCK
+      GOTO 99996
+C
+
+c        PRINT *, P
+
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+

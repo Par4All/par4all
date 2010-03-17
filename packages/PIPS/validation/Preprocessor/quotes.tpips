@@ -1,0 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete quotes
+create quotes quotes.F
+display USER_FILE
+display PRINTED_FILE
+close
+delete quotes

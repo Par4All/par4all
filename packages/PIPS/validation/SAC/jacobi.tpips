@@ -1,0 +1,9 @@
+delete jacobi
+create jacobi jacobi.c include/SIMD.c
+module compute
+
+source include/benchmark.tpips.h
+
+close 
+delete jacobi
+quit

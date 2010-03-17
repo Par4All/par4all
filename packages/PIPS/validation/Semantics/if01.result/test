@@ -1,0 +1,90 @@
+
+Transformers for "if01"
+
+
+C  T(if01) {0<=if01+1, if01<=1}
+
+int if01()
+{
+   int i,  n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(i,n) {i+n==i#init+n#init, n#init<=n+1, n<=n#init+1}
+
+   //n = 10;
+   
+   if (n) {
+
+//  T(i) {i==i#init+1}
+
+      i++;
+
+//  T(n) {n==n#init-1}
+
+      n--;
+   }
+   else {
+
+//  T(i) {i==i#init-1}
+
+      i--;
+
+//  T(n) {n==n#init+1}
+
+      n++;
+   }
+
+//  T(if01) {i==if01}
+
+
+   return i;
+}
+
+Preconditions for "if01"
+
+
+//  P() {}
+
+int if01()
+{
+   int i,  n;
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   //n = 10;
+   
+   if (n) {
+
+//  P(i) {i==0}
+
+      i++;
+
+//  P(i) {i==1}
+
+      n--;
+   }
+   else {
+
+//  P(i) {i==0, n==0}
+
+      i--;
+
+//  P(i) {i==-1, n==0}
+
+      n++;
+   }
+
+//  P(i,n) {0<=i+1, i<=1}
+
+
+   return i;
+}

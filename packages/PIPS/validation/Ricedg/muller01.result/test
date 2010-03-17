@@ -1,0 +1,46 @@
+
+      SUBROUTINE SCALAR
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER A,B
+      CALL SA0(A)                                                       0006
+      CALL SA1(A)                                                       0007
+      CALL SB(A, B)                                                     0008
+      PRINT *, B                                                        0009
+      END
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	08 --> 09 with conflicts
+		from <B-W-MUST> to <B-R-MUST>
+	07 --> 08 with conflicts
+		from <A-W-MUST> to <A-R-MUST>
+	06 --> 07 with conflicts
+		from <A-W-MUST> to <A-W-MUST>
+
+****************** End of Dependence Graph ******************
+
+      SUBROUTINE ARRAY
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER N
+      PARAMETER (N=1)
+      INTEGER A(N),B(N)
+      CALL AA0(N, A)                                                    0008
+      CALL AA1(N, A)                                                    0009
+      CALL AB(N, A, B)                                                  0010
+      PRINT *, B                                                        0011
+      END
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	10 --> 11 with conflicts
+		from <B(PHI1)-W-MUST> to <B(PHI1)-R-MUST>
+	09 --> 10 with conflicts
+		from <A(PHI1)-W-MUST> to <A(PHI1)-R-MUST>
+	08 --> 10 with conflicts
+		from <A(PHI1)-W-MUST> to <A(PHI1)-R-MUST>
+	08 --> 09 with conflicts
+		from <A(PHI1)-W-MUST> to <A(PHI1)-W-MUST>
+
+****************** End of Dependence Graph ******************

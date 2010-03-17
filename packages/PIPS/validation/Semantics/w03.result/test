@@ -1,0 +1,144 @@
+
+TRANSFORMERS
+
+
+C  T() {0==-1}
+
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+C  T() {0==-1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0007
+
+C  T() {0==-1}
+
+C (0,3)
+
+      DO WHILE (.FALSE.)                                                0009
+
+C  T(I) {I==I#init+1}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T(I) {I==I#init+1}
+
+C (0,5)
+         I = I+1                                                        0010
+
+C  T() {}
+
+C (0,6)
+         PRINT *, 'never'                                               0011
+C        END BLOCK
+      ENDDO
+
+C  T() {}
+
+C (0,7)
+
+      PRINT *, I                                                        0014
+
+C  T() {}
+
+C (0,8)
+
+      DO WHILE (.TRUE.)                                                 0016
+
+C  T() {}
+
+C (0,9)
+         PRINT *, 'always'                                              0017
+      ENDDO
+
+C  T() {}
+
+C (0,10)
+
+      PRINT *, 'never again', I                                         0020
+
+C     END BLOCK
+      END
+
+PRECONDITIONS
+
+
+C  P() {}
+
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      I = 0                                                             0007
+
+C  P(I) {I==0}
+
+C (0,3)
+
+      DO WHILE (.FALSE.)                                                0009
+
+C  P() {0==-1}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  P() {0==-1}
+
+C (0,5)
+         I = I+1                                                        0010
+
+C  P() {0==-1}
+
+C (0,6)
+         PRINT *, 'never'                                               0011
+C        END BLOCK
+      ENDDO
+
+C  P(I) {I==0}
+
+C (0,7)
+
+      PRINT *, I                                                        0014
+
+C  P(I) {I==0}
+
+C (0,8)
+
+      DO WHILE (.TRUE.)                                                 0016
+
+C  P(I) {I==0}
+
+C (0,9)
+         PRINT *, 'always'                                              0017
+      ENDDO
+
+C  P() {0==-1}
+
+C (0,10)
+
+      PRINT *, 'never again', I                                         0020
+
+C     END BLOCK
+      END

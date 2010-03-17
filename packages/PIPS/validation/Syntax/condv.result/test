@@ -1,0 +1,679 @@
+                    SUBROUTINE  CONDV
+C                   *****************
+C
+     * ( TR , DIM , IUO2 , IZ )
+C
+C***********************************************************************
+C
+C  PROGICIEL : COCCINELLE      AU   01/07/87  PAR F.BLANCHON (MMN)
+C                                                TEL : 47 65 41 46
+C
+C                    MODIFIE   AU   31/01/92  PAR S.MARGUET  (PHR)
+C                                                TEL : 47 65 40 08
+C                                   CORRECTIONS DES ERREURS DECRITES
+C                                   DANS LA NOTE MARGUET-BARON
+C                                   + FORMULATION PLUTONIUM
+C
+C
+C                    MODIFIE NOVEMBRE 1994 PAR E.ROYER (ADULIS)
+C
+C***********************************************************************
+C
+C  FONCTION : CALCULE L'INTEGRALE DE CONDUCTIVITE DU COMBUSTIBLE (UO2
+C             OU MOX)
+C
+C  CADRE    : MODE CRAYON PAR CRAYON
+C
+C-----------------------------------------------------------------------
+C                         ARGUMENTS
+C .____________.____.__________________________________________________.
+C ^    NOM     ^MODE^                     ROLE                         ^
+C ^____________^____^__________________________________________________^
+C ^            ^    ^                                                  ^
+C ^ TR         ^ -->^ VECTEUR DE TEMPERATURES EN   C                   ^
+C ^            ^    ^                                                  ^
+C ^ DIM        ^ -->^ NOMBRE D'INTEGRALES A EVALUER SUR TR EN RADIAL   ^
+C ^            ^    ^ SI DIM=1 UNE SEULE INTEGRALE EST EVALUEE POUR    ^
+C ^            ^    ^ CHACUN DES CRAYONS "ACTIF"                       ^
+C ^            ^    ^                                                  ^
+C ^ IUO2       ^<-- ^ VECTEUR RESULTAT INTEGRALE DE LA CONDUCTIBILITE  ^
+C ^            ^    ^                                                  ^
+C ^ IZ         ^ -> ^ MAILLE TERMO. AXIALE COURANTE                    ^
+C ^____________^____^__________________________________________________^
+C  MODE: -->(DONNEE NON MODIFIEE).<--(RESULTAT).<-->(DONNEE MODIFIEE)
+C-----------------------------------------------------------------------
+C%
+C  SOUS-PROGRAMMES APPELES   :
+C  SOUS-PROGRAMMES APPELANTS : TEMPV
+C%
+C-----------------------------------------------------------------------
+C            DECLARATION DES VARIABLES
+C-----------------------------------------------------------------------
+C  ZONES COMMUNES
+C  **************
+! include "cstmax.h"
+C   CONSTANTES DE DIMENSIONNEMENT ASSEMBLAGE
+C     NMARAD : NOMBRE MAXIMUM D'ASSEMBLAGES DANS LES DIRECTIONS I ET J
+C     NMARAD2: NOMBRE MAXIMUM D'ASSEMBLAGES DANS LA CONFIGURATION
+C     NASPA  : NOMBRE MAXIMUM D'ASSEMBLAGES ACTIFS DANS LA CONFIGURATION
+C   CONSTANTES DE DIMENSIONNEMENT NEUTRONIQUE
+C     NMNRAD : NOMBRE MAXIMUM DE MAILLES NEUTRONIQUES DANS LES
+C              DIRECTIONS I ET J
+C     NMNAX  : NOMBRE MAXIMUM DE MAILLES NEUTRONIQUES AXIALES
+C     NMNACR : NOMBRE COURANT DE MAILLES NEUTRONIQUES AXIALES
+C   CONSTANTES DE DIMENSIONNEMENT THERMOHYDRAULIQUE
+C     NTHERM : NOMBRE MAXIMUM DE MAILLES THERMOHYDRAULIQUES PAR
+C              ASSEMBLAGE DANS LES DIRECTIONS I ET J POUR UN MAILLAGE
+C              UNIFORME SUR UN COEUR COMPLET
+C     NMTRAD : NOMBRE MAXIMUM DE MAILLES THERMOHYDRAULIQUES DANS LES
+C              DIRECTIONS I ET J
+C     NPAMAX : NOMBRE MAXIMUM DE MAILLES THERMOHYDRAULIQUES RADIALES
+C              ACTIVES SUR LE COEUR COMPLET
+C     NMTRAC : NOMBRE MAXIMUM DE MAILLES THERMOHYDRAULIQUES DANS LES
+C              DIRECTIONS I ET J (POUR LES MAILLAGES CRAYON PAR CRAYON)
+C              AU MAXIMUM 5 MAILLES THERMOHYDRAULIQUES PAR ASSEMBLAGE
+C              (BLOTHER 5)
+C     NMTAX  : NOMBRE MAXIMUM DE MAILLES THERMOHYDRAULIQUES AXIALES
+C   CONSTANTES DE DIMENSIONNEMENT CRAYON
+C     NMCRA  : NOMBRE MAXIMUM DE CRAYONS PAR COTE DE GRILLE D'ASSEMBLAGE
+C     NMCRA1 : (NMCRA+1)*(NMCRA+1)
+C     NMCRA2 : NOMBRE MAXIMUM DE CRAYONS PAR ASSEMBLAGE (NMCRA*NMCRA)
+C     NMZRAC1: NOMBRE MAXIMUM DE MAILLES POUR LA THERMIQUE CRAYON
+      INTEGER NMARAD,
+     &        NMARAD2,
+     &        NASPA,
+     &        NTHERM,
+     &        NMTRAD,
+     &        NPAMAX,
+     &        NMTRAC,
+     &        NMTAX,
+     &        NMCRA,
+     &        NMCRA1,
+     &        NMCRA2,
+     &        NMNRAD,
+     &        NMNAX, NMZRAC, NMNACR, NMZRAC1
+      PARAMETER (NMARAD  = 23)
+      PARAMETER (NMARAD2 = NMARAD*NMARAD)
+      PARAMETER (NASPA   = 250)
+      PARAMETER (NTHERM  = 4)
+      PARAMETER (NMTRAD  = NTHERM*NMARAD)
+      PARAMETER (NPAMAX  = NTHERM*NTHERM*NASPA)
+      PARAMETER (NMTRAC  = 5*NMARAD)
+      PARAMETER (NMCRA   = 17)
+      PARAMETER (NMCRA1  = (NMCRA+1)*(NMCRA+1))
+      PARAMETER (NMCRA2  = NMCRA*NMCRA)
+      PARAMETER (NMNRAD  = NMCRA*17)
+      PARAMETER (NMZRAC1  = 15)
+C
+      COMMON /CSTMAX/ NMTAX, NMNACR, NMNAX,NMZRAC
+! end include "cstmax.h"
+!       INCLUDE "cstmax.h"
+! include "milpa.h"
+      INTEGER MILPA2,MILPAC2
+      INTEGER MILPA, NMCMAX, NBXREF
+      PARAMETER(MILPA=100)
+      PARAMETER (NMCMAX=50)
+      PARAMETER (NBXREF=50)
+
+      COMMON /MILPAI/ MILPA2,MILPAC2
+! end include "milpa.h"
+!       INCLUDE "milpa.h"
+! include "cxm.h"
+       INTEGER IXM
+       REAL    POROS
+      COMMON / CXM /  POROS,IXM
+! end include "cxm.h"
+!       INCLUDE "cxm.h"
+! include "ccond.h"
+       INTEGER ICOND
+      COMMON / CCOND /  ICOND
+! end include "ccond.h"
+!       INCLUDE "ccond.h"
+! include "thpin.h"
+C
+C CALCULS DE THERMIQUE DU CRAYON
+      INTEGER IPLUT,LMC
+      REAL TPU(MILPA),TENPU
+      POINTER (ENRU_PTR, ENRU)
+      REAL ENRU(NMCMAX,*)
+      POINTER (ENRPU_PTR, ENRPU)
+      REAL ENRPU(NMCMAX,*)
+      COMMON /THPIN/ IPLUT,TPU,TENPU,LMC
+      COMMON /THPIN_PTR/ ENRU_PTR,ENRPU_PTR
+
+
+
+
+! end include "thpin.h"
+!       INCLUDE "thpin.h"
+! include "unites.h"
+      REAL ZMCM, ZMMM, ZM2CM2, ZM3CM3,
+     $                ZKILO, ZBARPA, ZINCHM, ZPOISE,
+     $                ZHEURS, ZPCENT
+      COMMON /UNITES/ ZMCM, ZMMM, ZM2CM2, ZM3CM3,
+     $                ZKILO, ZBARPA, ZINCHM, ZPOISE,
+     $                ZHEURS, ZPCENT
+! end include "unites.h"
+!       INCLUDE "unites.h"
+! include "cinive.h"
+C     GRANDEURS MAJ DANS INIVEC ET UTILISEES DANS TEMPV :
+C     ***************************************************
+C     RN1I    : RAYON CORRESPONDANT AU POINT NP4-1
+C               =RC = RAYON EXTERNE DU COMBUSTIBLE
+C     RN1RGI  : RAYON CRAYON COMBUSTIBLE / RAYON EXTERNE GAINE
+C     RGGAPI  : VARIABLE INTERMEDIAIRE
+C     DROIC   : DELTA RO DANS LE CAS DES PASTILLES CREUSES
+C               =ROIC(I)-ROIC(I-1)
+C     DROI2C  : 2./DROIC
+C     DROI4C  : 4./DROIC
+C     DROIRC  : VARIABLE INTERMEDIAIRE
+C     ROIC(IR): RO AU PT RADIAL IR POUR LES PASTILLES CREUSES
+C               =(DISTANCE DU CENTRE AU POINT IR)**2 / 2
+C               =R(IR)**2 / 2
+C     DROIP   : DELTA RO DANS LE CAS DES PASTILLES PLEINES
+C               =ROIP(I)-ROIP(I-1)
+C     DROI2P  : 2./DROIP
+C     DROI4P  : 4./DROIP
+C     DROIRP  : VARIABLE INTERMEDIAIRE
+C     ROIP(IR): RO AU PT RADIAL IR POUR LES PASTILLES PLEINES
+C               =(DISTANCE DU CENTRE AU POINT IR)**2 / 2
+C               =R(IR)**2 / 2
+C     TCBI    : VARIABLE INTERMEDIAIRE UTILISEE DANS TEMPV
+C     TEMPIC(IR): IDEM
+C     TEMPIP(IR): IDEM
+C
+C     GRANDEURS MAJ DANS INIVEC ET UTILISEES DANS CONDV :
+C     ***************************************************
+C     TPOROS  : = (1.-POROS)/(1.+0.5*POROS)
+C               POROS DU COMMON /CXM/
+C
+      REAL RN1I,RN1RGI,RGGAPI,TCBI
+      REAL DROIC,DROI2C,DROI4C,DROIRC
+      REAL DROIP,DROI2P,DROI4P,DROIRP
+      REAL TPOROS
+      REAL ROIC(NMZRAC1),TEMPIC(NMZRAC1)
+      REAL ROIP(NMZRAC1),TEMPIP(NMZRAC1)
+      COMMON /CINIVE/ RN1I,RN1RGI,RGGAPI,TCBI,
+     .       DROIC,DROI2C,DROI4C,DROIRC,ROIC,TEMPIC,
+     .       DROIP,DROI2P,DROI4P,DROIRP,ROIP,TEMPIP,
+     &       TPOROS
+C
+! end include "cinive.h"
+!       INCLUDE "cinive.h"
+! include "cvecto.h"
+C CONSTANTES DE DIMENSIONNEMENT DES TABLEAUX EN CRAYON PAR CRAYON
+      INTEGER NCACV, NCACV2, MNACV
+      PARAMETER (NCACV=17)
+      PARAMETER (NCACV2=NCACV*NCACV)
+C
+c
+c.. Pointer Declarations ..
+      POINTER ( XRCV_PTR, XRCV )
+      REAL  XRCV(NCACV,NCACV,1)
+COLD
+COLD        real,pointer , XRCV
+COLD
+      POINTER ( QCV1_PTR, QCV1 )
+      REAL  QCV1(NCACV,NCACV,1)
+COLD
+COLD        real,pointer , QCV1
+COLD
+      POINTER ( HGAPCV_PTR, HGAPCV )
+      REAL  HGAPCV(NCACV,NCACV,1)
+COLD
+COLD        real,pointer , HGAPCV
+COLD
+      POINTER ( TCENCV_PTR, TCENCV )
+      REAL  TCENCV(NCACV,NCACV,1)
+COLD
+COLD        real,pointer , TCENCV
+COLD
+      POINTER ( ECV_PTR, ECV )
+      REAL  ECV(NCACV,1)
+COLD
+COLD        real,pointer , ECV
+COLD
+      POINTER ( TENPCV_PTR, TENPCV )
+      REAL  TENPCV(NCACV,1)
+COLD
+COLD        real,pointer , TENPCV
+COLD
+      POINTER ( TRE1CV_PTR, TRE1CV )
+      REAL  TRE1CV(NCACV,NCACV,NMZRAC,1)
+COLD
+COLD        real,pointer , TRE1CV
+COLD
+      POINTER ( HCONVV_PTR, HCONVV )
+      REAL  HCONVV(NCACV,NCACV,1)
+COLD
+COLD        real,pointer , HCONVV
+COLD
+      POINTER ( TFV_PTR, TFV )
+      REAL  TFV(NCACV,NCACV,1)
+COLD
+COLD        real,pointer , TFV
+COLD
+      POINTER ( ROMV_PTR, ROMV )
+      REAL  ROMV(NCACV,NCACV,1)
+COLD
+COLD        real,pointer , ROMV
+COLD
+      LOGICAL CDVECV(NCACV2)
+      LOGICAL CDCRAV(NCACV2)
+C
+      COMMON /CVECTO/ MNACV,CDCRAV,CDVECV
+      COMMON /CVECTO_PTR/ XRCV_PTR,QCV1_PTR,HGAPCV_PTR,
+     &                TCENCV_PTR,ECV_PTR,
+     &                TENPCV_PTR,TRE1CV_PTR,HCONVV_PTR,
+     &                TFV_PTR,ROMV_PTR
+
+! end include "cvecto.h"
+!       INCLUDE "cvecto.h"
+! include "validi.h"
+      INTEGER IHLP1, IHLP2, IHLT1, IDIPHA, ICONPU, IEBUL, IIRRAD
+      REAL    HMRD,HLRD,HGRD,PHCD
+      INTEGER IRD,JRD,KRD,ICD,JCD,KCD
+      COMMON /VALIDI/ IHLP1,IHLP2,IHLT1,IDIPHA,ICONPU,IEBUL,IIRRAD
+     &                ,HMRD,HLRD,HGRD,IRD,JRD,KRD,PHCD,ICD,JCD,KCD
+! end include "validi.h"
+!       INCLUDE "validi.h"
+! include "acsoir.h"
+       REAL    ZKELV, BOLTZM, TCK, T0K, XEMOY, XM
+      COMMON / ACSOIR / ZKELV,BOLTZM,TCK,T0K,XEMOY,XM
+! end include "acsoir.h"
+!       INCLUDE "acsoir.h"
+C
+C  ARGUMENTS
+C  *********
+      INTEGER DIM, IZ
+      REAL TR(NCACV2,MNACV),IUO2(NCACV2,DIM)
+C
+C  VARIABLES LOCALES
+C  *****************
+C  NPAS   : NOMBRE D'INTERVALLES POUR LA METHODE DES RECTANGLES (DONNE EN
+C  DT     : VALEUR DU PAS POUR LA METHODE DES RECTANGLES
+C  T2T1   : DIFFERENCE DE TEMPERATURE (T2-T1) EN CELCIUS
+C  TM     : VALEUR MOYENNE DE LA TEMPERATURE EN CELCIUS (CALCUL SANS INTE
+C  DTMIN  : ECART DE TEMPERATURE MINIMAL POUR CALCULER UNE INTEGRALE
+C           (EN CELCIUS)
+C  FPI    : FACTEUR CORRECTIF IRRADIATION
+C  FP, FP1, FP2 : FACTEUR CORRECTIF POROSITE
+C  HV1,HV2,HV3 : COEFFICIENTS DE LA FORMULE "HGAP VARIABLE 88"
+C  STORA1,STORA2,STORA3 : COEFFICIENTS DE LA FORMULE STORA
+C  CIRRA  : CONSTANTE DE CORRECTION POUR L'IRRADIATION
+C  HK1,HK2,HK4,HK5 : COEFFICIENTS DE LA FORMULE COMETHE
+C  WEST1,WEST2,WEST3,WEST4 : COEFFICIENTS DE LA FORMULE WESTINGHOUSE
+      INTEGER I, J, IC, NPAS
+      REAL DT, TM, DTMIN, T2T1
+      REAL TT, TMK
+      REAL TEMP, FTP, CINT, TTK
+      REAL FP, C1, C2
+      REAL HV1, HV2, HV3
+      REAL HK1, HK2, HK4, HK5
+      REAL WEST1, WEST2, WEST3, WEST4
+      REAL INVN, CIRRA
+      REAL STORA1, STORA2, STORA3
+      REAL FPI(NCACV2)
+      INTEGER ALLOUER
+      EXTERNAL ALLOUER
+      INTEGER IER
+      POINTER (T2T1I_PTR, T2T1I)
+      REAL T2T1I(NCACV2,NMZRAC)
+C
+C On affecte le pointeur sur XRCV a XRV
+C On affecte le pointeur sur TENPCV a TENPUV
+C
+      POINTER (XRCV_PTR, XRV)
+      REAL XRV (NCACV2,MNACV)
+      POINTER (TENPCV_PTR, TENPUV)
+      REAL TENPUV (NCACV2)
+C
+      PARAMETER ( WEST1 = 100./0.92683 , WEST2 = 1./495.8 ,
+     *            WEST3 = 42.017*WEST1 , WEST4 = 2.19375E-13*WEST1 )
+      PARAMETER ( HV1= 1.3324E-08 , HV2 = -4.3554E-05 ,
+     * HV3 = 5.8915E-02 )
+      PARAMETER ( HK1= 40.05 , HK2 = 129.4 , HK4 = 0.8 ,
+     * HK5 = 0.6416E-12 )
+      PARAMETER ( NPAS = 10 )
+      PARAMETER ( INVN = 1./NPAS )
+      PARAMETER ( CIRRA= 0.124E-02 )
+      PARAMETER ( STORA1=0.05693 , STORA2=0.2E-04 ,
+     *            STORA3=0.3997E-08 )
+C
+      REAL    A, A1, A2
+      DATA DTMIN /10./DT/0.0/
+C-----------------------------------------------------------------------
+C             CORPS DU SOUS-PROGRAMME
+C-----------------------------------------------------------------------
+C
+C
+C  ALLOCATION DYNAMIQUE
+C
+      T2T1I_PTR = ALLOUER(NCACV2*NMZRAC, 0, IER, "CONDV")               0352
+C
+C  SEQUENCE 1
+C  CALCUL DE COND EN FONCTION DU COMBUSTIBLE OU DE LA CORRELATION
+C***********************************************************************
+C
+      IF (ICOND.EQ.2) THEN                                              0358
+C
+C        CHOIX DE LA CORRELATION UO2 N0 2 : FORMULATION WESTINGHOUSE
+C
+C
+         DO 14 I = 1, DIM                                               0363
+            DO 13 IC = 1, NCACV2                                        0364
+               IF (CDVECV(IC)) THEN                                     0365
+                  T2T1 = TR(IC,I+1)-TR(IC,I)                            0366
+C
+                  IF (ABS(T2T1).GE.DTMIN) THEN                          0368
+C
+C                    CALCUL AVEC INTEGRALE
+C
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0372
+C
+C                       PAS DE PLUTONIUM : FORMULATION UO2
+C
+                        IUO2(IC,I) = (WEST3*ALOG((1.+TR(IC,I+1)*WEST2   0376
+     &                  )/(1.+TR(IC,I)*WEST2))+WEST4*(TR(IC,I+1)**4-    0376
+     &                  TR(IC,I)**4))*TPOROS/T2T1                       0376
+                     ELSE
+C
+C                       PLUTONIUM : FORMULATION MOX COMETHE
+C
+                        ICONPU = 1                                      0384
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0385
+                        DT = T2T1*INVN                                  0386
+                        TT = TR(IC,I)-DT*0.5                            0387
+                        CINT = 0.                                       0388
+                        DO 12 J = 1, NPAS                               0389
+                           TT = TT+DT                                   0390
+                           IF (TT.GT.1000.) THEN                        0391
+                              A = 2.                                    0392
+                           ELSE
+                              A = 2.58-0.58E-03*TT                      0394
+                           ENDIF
+                           FP = (1.-A*POROS)/(1.-A*0.05)                0396
+                           TTK = TT+ZKELV                               0397
+                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0398
+                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0399
+                           IF (TT.EQ.0.) THEN                           0400
+                              CINT = CINT+FTP                           0401
+                           ELSE
+                              CINT = CINT+1./(1./FTP+FPI(IC)/TT)        0403
+                           ENDIF
+12                         CONTINUE                                     0405
+                        IUO2(IC,I) = CINT*INVN                          0406
+C
+                     ENDIF
+C
+                  ELSE
+C
+C                    CALCUL AVEC LA VALEUR MOYENNE
+C
+                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0414
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0415
+C
+C                       PAS DE PLUTONIUM : FORMULATION UO2
+C
+                        IUO2(IC,I) = (1./(11.8+0.0238*TM)+8.775E-13*    0419
+     &                  TM**3)*WEST1*TPOROS                             0419
+C
+                     ELSE
+C
+C                       PLUTONIUM : FORMULATION MOX COMETHE
+C
+                        ICONPU = 1                                      0426
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0427
+                        IF (TM.GT.1000.) THEN                           0428
+                           A = 2.                                       0429
+                        ELSE
+                           A = 2.58-0.58E-03*TM                         0431
+                        ENDIF
+                        FP = (1.-A*POROS)/(1.-A*0.05)                   0433
+                        TMK = TM+ZKELV                                  0434
+                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0435
+                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0436
+                        IF (TM.EQ.0.) THEN                              0437
+                           IUO2(IC,I) = FTP                             0438
+                        ELSE
+                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0440
+                        ENDIF
+C
+                     ENDIF
+C
+                  ENDIF
+C
+               ENDIF
+13             CONTINUE                                                 0448
+14          CONTINUE                                                    0449
+C
+      ELSEIF (ICOND.EQ.1) THEN                                          0358
+C
+C           CHOIX DE LA CORRELATION UO2 N0 1 : FORMULATION STORA
+C
+         DO 24 I = 1, DIM                                               0455
+            DO 23 IC = 1, NCACV2                                        0456
+               IF (CDVECV(IC)) THEN                                     0457
+                  T2T1 = TR(IC,I+1)-TR(IC,I)                            0458
+                  IF (ABS(T2T1).GE.DTMIN) THEN                          0459
+C
+C                       CALCUL AVEC INTEGRALE
+C
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0463
+C
+C                          PAS DE PLUTONIUM : FORMULATION UO2
+C
+                        C1 = (STORA1-(STORA2-STORA3*TR(IC,I))*TR(IC,I   0467
+     &                  ))*TR(IC,I)                                     0467
+                        C2 = (STORA1-(STORA2-STORA3*TR(IC,I+1))*TR(IC   0469
+     &                  ,I+1))*TR(IC,I+1)                               0469
+                        IF (TR(IC,I).GT.1000.) THEN                     0471
+                           A1 = 2.                                      0472
+                        ELSE
+                           A1 = 2.58-0.58E-03*TR(IC,I)                  0474
+                        ENDIF
+                        IF (TR(IC,I+1).GT.1000.) THEN                   0476
+                           A2 = 2.                                      0477
+                        ELSE
+                           A2 = 2.58-0.58E-03*TR(IC,I+1)                0479
+                        ENDIF
+                        IUO2(IC,I) = ((1.-A2*POROS)/(1.-A2*0.036)*C2-   0481
+     &                  (1.-A1*POROS)/(1.-A1*0.036)*C1)*ZMCM/T2T1       0481
+                     ELSE
+C
+C                          PLUTONIUM : FORMULATION MOX COMETHE
+C
+                        ICONPU = 1                                      0488
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0489
+                        TT = TR(IC,I)-DT*0.5                            0490
+                        CINT = 0.                                       0491
+                        DO 22 J = 1, NPAS                               0492
+                           TT = TT+DT                                   0493
+                           IF (TT.GT.1000.) THEN                        0494
+                              A = 2.                                    0495
+                           ELSE
+                              A = 2.58-0.58E-03*TT                      0497
+                           ENDIF
+                           FP = (1.-A*POROS)/(1.-A*0.05)                0499
+                           TTK = TT+ZKELV                               0500
+                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0501
+                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0503
+                           IF (TT.EQ.0.) THEN                           0504
+                              CINT = CINT+FTP                           0505
+                           ELSE
+                              CINT = CINT+1./(1./FTP+FPI(IC)/TT)        0507
+                           ENDIF
+22                         CONTINUE                                     0509
+                        IUO2(IC,I) = CINT*INVN                          0510
+                     ENDIF
+C
+                  ELSE
+C
+C                       CALCUL AVEC LA VALEUR MOYENNE
+C
+                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0517
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0518
+C
+C                          PAS DE PLUTONIUM : FORMULATION UO2
+C
+                        IF (TM.GT.1000.) THEN                           0522
+                           A = 2.                                       0523
+                        ELSE
+                           A = 2.58-0.58E-03*TM                         0525
+                        ENDIF
+                        IUO2(IC,I) = (0.057-(0.4E-4-0.12E-7*TM)*TM)*(   0527
+     &                  1.-A*POROS)/(1.-A*0.036)*ZMCM                   0527
+                     ELSE
+C
+C                          PLUTONIUM : FORMULATION MOX COMETHE
+C
+                        ICONPU = 1                                      0533
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0534
+                        TMK = TM+ZKELV                                  0535
+                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0536
+                        IF (TM.GT.1000.) THEN                           0537
+                           A = 2.                                       0538
+                        ELSE
+                           A = 2.58-0.58E-03*TM                         0540
+                        ENDIF
+                        FP = (1.-A*POROS)/(1.-A*0.05)                   0542
+                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0543
+                        IF (TM.EQ.0.) THEN                              0544
+                           IUO2(IC,I) = FTP                             0545
+                        ELSE
+                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0547
+                        ENDIF
+                     ENDIF
+C
+                  ENDIF
+C
+               ENDIF
+C
+23             CONTINUE                                                 0555
+24          CONTINUE                                                    0556
+C
+      ELSE
+C
+C           CHOIX DE LA CORRELATION UO2 N0 3 : FORMULATION "HGAP VARIABLE
+C
+         DO 55 IC = 1, NCACV2                                           0562
+            IF (CDVECV(IC)) FPI(IC) = 0.124*XRV(IC,IZ-1)                0563
+55          CONTINUE                                                    0566
+         DO 57 I = 1, DIM                                               0567
+            DO 56 IC = 1, NCACV2                                        0568
+               IF (CDVECV(IC)) T2T1I(IC,I) = TR(IC,I+1)-TR(IC,I)        0569
+56             CONTINUE                                                 0572
+57          CONTINUE                                                    0573
+         DO 65 I = 1, DIM                                               0574
+            DO 64 IC = 1, NCACV2                                        0575
+               IF (CDVECV(IC)) THEN                                     0576
+                  IF (ABS(T2T1I(IC,I)).GE.DTMIN) THEN                   0577
+C
+C                       CALCUL AVEC INTEGRALE
+C
+                     DT = T2T1I(IC,I)*INVN                              0581
+                     TT = TR(IC,I)-DT*.5                                0582
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0583
+C
+C                          PAS DE PLUTONIUM : FORMULATION UO2
+C
+                        CINT = 0.                                       0587
+                        DO 62 J = 1, NPAS                               0588
+                           TT = TT+DT                                   0589
+                           IF (TT.GT.1000.) THEN                        0590
+                              A = 2.                                    0591
+                           ELSE
+                              A = 2.58-0.58E-03*TT                      0593
+                           ENDIF
+                           FP = (1.-A*POROS)/(1.-A*0.034)               0595
+                           TTK = TT+ZKELV                               0596
+                           IF (TT.EQ.0.) THEN                           0597
+                              CINT = CINT+ZMCM*FP*HV3                   0598
+                           ELSE
+                              CINT = CINT+ZMCM/(1./(FP*(HV3+(HV2+HV1*   0600
+     &                        TT)*TT))+FPI(IC)/TT)                      0600
+                           ENDIF
+62                         CONTINUE                                     0606
+                        IUO2(IC,I) = CINT*INVN                          0607
+C
+                     ELSE
+C
+C                          PLUTONIUM : FORMULATION MOX COMETHE
+C
+                        ICONPU = 1                                      0613
+                        CINT = 0.                                       0614
+                        DO 63 J = 1, NPAS                               0615
+                           TT = TT+DT                                   0616
+                           IF (TT.GT.1000.) THEN                        0617
+                              A = 2.                                    0618
+                           ELSE
+                              A = 2.58-0.58E-03*TT                      0620
+                           ENDIF
+                           FP = (1.-A*POROS)/(1.-A*0.05)                0622
+                           TTK = TT+ZKELV                               0623
+                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0624
+                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0626
+                           IF (TT.EQ.0.) THEN                           0627
+                              CINT = CINT+FTP                           0628
+                           ELSE
+                              CINT = CINT+1./(1./FTP+0.01*FPI(IC)/TT)   0630
+                           ENDIF
+63                         CONTINUE                                     0632
+                        IUO2(IC,I) = CINT*INVN                          0633
+                     ENDIF
+C
+                  ELSE
+C
+C                       CALCUL AVEC LA VALEUR MOYENNE
+C
+                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0640
+                     IF (TM.GT.1000.) THEN                              0641
+                        A = 2.                                          0642
+                     ELSE
+                        A = 2.58-0.58E-03*TM                            0644
+                     ENDIF
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0646
+C
+C                             PAS DE PLUTONIUM : FORMULATION UO2
+C
+                        TMK = TM+ZKELV                                  0650
+                        FP = (1.-A*POROS)/(1.-A*0.034)                  0651
+                        IF (TM.EQ.0.) THEN                              0652
+                           IUO2(IC,I) = ZMCM*FP*HV3                     0653
+                        ELSE
+                           IUO2(IC,I) = ZMCM/(1./(FP*(HV3+(HV2+HV1*TM   0655
+     &                     )*TM))+FPI(IC)/TM)                           0655
+                        ENDIF
+                     ELSE
+C
+C                          PLUTONIUM : FORMULATION MOX COMETHE
+C
+                        ICONPU = 1                                      0664
+                        FPI(IC) = FPI(IC)*1.E-02                        0665
+                        TMK = TM+ZKELV                                  0666
+                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0667
+                        FP = (1.-A*POROS)/(1.-A*0.05)                   0668
+                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0669
+                        IF (TM.EQ.0.) THEN                              0670
+                           IUO2(IC,I) = FTP                             0671
+                        ELSE
+                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0673
+                        ENDIF
+                     ENDIF
+C
+                  ENDIF
+C
+               ENDIF
+64             CONTINUE                                                 0680
+65          CONTINUE                                                    0681
+C
+      ENDIF
+C
+C***********************************************************************
+C
+C  LIBERATION
+C
+      CALL LIBERE(T2T1I_PTR)                                            0689
+C
+      END
+

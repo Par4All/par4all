@@ -1,0 +1,5 @@
+      PROGRAM MAIN
+      INTEGER I
+      COMMON /DIM/ I
+      I = DIM(2, 3)                                                     0004
+      END

@@ -1,0 +1,47 @@
+
+C  P() {}
+
+      SUBROUTINE INDUC1(N)
+
+C  P() {}
+
+
+      J = 0                                                             0003
+
+C  P(J) {J==0}
+
+
+      DO 100 I = 1, N                                                   0005
+
+C  P(I,J) {2I==J+2, 1<=I, I<=N}
+
+         J = J+2                                                        0006
+
+C  P(I,J) {2I==J, 1<=I, I<=N}
+
+100      CONTINUE                                                       0007
+
+C  P(I,J) {2I==J+2, 1<=I, N+1<=I}
+
+
+c     The precondition here about i and j, j==2i-2, is wrong because i
+c     was incremented one more time
+c
+c     No, it is wrong because you cannot prove that Loop 100
+c     is executed at least once! And anyway, i was incremented
+c     exactly as it should have! (FI, 04 June 1997)
+c
+c     We should end up with j >= 0 and i >= n + 1 using the convex
+c     hull of 0 trip and n trips.
+c
+c     No! If the loop is not entered, you end up with i == 1 and j == 0
+c     If the loop is entered, you end up with j==2i-2... which also
+c     stand for the previous case! For the same kind of reason, index I
+c     must end up greater than N+1.
+
+c     Expected precondition:
+C     P(I,J) {J==2I-2, N+1<=I}
+
+      PRINT *, I, J                                                     0027
+
+      END

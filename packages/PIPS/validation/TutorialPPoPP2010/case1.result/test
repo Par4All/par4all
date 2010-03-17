@@ -1,0 +1,482 @@
+
+Parsed printed file for "func1"
+
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+   for (i = 1;i<=n;i++)
+      for (j = 1;j<=m;j++) {
+         x = i*h+j;
+         a[i][j] = b[i][j]*x;
+      }
+}
+
+Proper effetcs for "func1"
+
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+//               <must be read   >: n
+//               <must be written>: i
+   for(i = 1; i <= n; i += 1)
+//               <must be read   >: m n
+//               <must be written>: j
+      for(j = 1; j <= m; j += 1) {
+//               <must be read   >: h i j m n
+//               <must be written>: x
+         x = i*h+j;
+//               <must be read   >: b[i][j] i j m n x
+//               <must be written>: a[i][j]
+         a[i][j] = b[i][j]*x;
+      }
+}
+
+Cumulated effetcs for "func1"
+
+//               <may be read    >: b[*][*] h
+//               <may be written >: a[*][*]
+//               <must be read   >: m n
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+//               <may be read    >: b[*][*] h i j m x
+//               <may be written >: a[*][*] j x
+//               <must be read   >: n
+//               <must be written>: i
+   for(i = 1; i <= n; i += 1)
+//               <may be read    >: b[*][*] h i j x
+//               <may be written >: a[*][*] x
+//               <must be read   >: m n
+//               <must be written>: j
+      for(j = 1; j <= m; j += 1) {
+//               <must be read   >: h i j m n
+//               <must be written>: x
+         x = i*h+j;
+//               <may be read    >: b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: i j m n x
+         a[i][j] = b[i][j]*x;
+      }
+}
+
+Proper effetcs for "main"
+
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+//               <must be written>: i
+   for(i = 1; i <= 10; i += 1)
+//               <must be written>: j
+      for(j = 1; j <= 10; j += 1)
+//               <must be read   >: i j
+//               <must be written>: b[i][j]
+         b[i][j] = 1.0;
+//               <must be written>: h
+   h = 2.0;
+//               <may be read    >: b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: h
+   func1(10, 10, a, b, h);
+//               <must be written>: i
+   for(i = 1; i <= 10; i += 1)
+//               <must be written>: j
+      for(j = 1; j <= 10; j += 1)
+//               <may be read    >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <may be written >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: TOP-LEVEL:stderr a[i][j] i j
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+
+Cumulated effetcs for "main"
+
+//               <may be read    >: TOP-LEVEL:stderr 
+//                                  TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <may be written >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+//               <may be read    >: i j
+//               <may be written >: b[*][*] j
+//               <must be written>: i
+   for(i = 1; i <= 10; i += 1)
+//               <may be read    >: i j
+//               <may be written >: b[*][*]
+//               <must be written>: j
+      for(j = 1; j <= 10; j += 1)
+//               <may be written >: b[*][*]
+//               <must be read   >: i j
+         b[i][j] = 1.0;
+//               <must be written>: h
+   h = 2.0;
+//               <may be read    >: b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: h
+   func1(10, 10, a, b, h);
+//               <may be read    >: TOP-LEVEL:stderr 
+//                                  TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*] a[*][*] i j
+//               <may be written >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*] j
+//               <must be written>: i
+   for(i = 1; i <= 10; i += 1)
+//               <may be read    >: TOP-LEVEL:stderr 
+//                                  TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*] a[*][*] i j
+//               <may be written >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be written>: j
+      for(j = 1; j <= 10; j += 1)
+//               <may be read    >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*] a[*][*]
+//               <may be written >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: TOP-LEVEL:stderr i j
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+
+Transformers for "main"
+
+//  T() {}
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+//  T(i,j,x) {1<=i}
+   for(i = 1; i <= n; i += 1)
+//  T(j,x) {1<=i, i<=n, 1<=j}
+      for(j = 1; j <= m; j += 1) {
+//  T(x) {1<=i, i<=n, 1<=j, j<=m}
+         x = i*h+j;
+//  T() {1<=i, i<=n, 1<=j, j<=m}
+         a[i][j] = b[i][j]*x;
+      }
+}
+//  T() {}
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+//  T(i,j) {1<=i}
+   for(i = 1; i <= 10; i += 1)
+//  T(j) {1<=i, i<=10, 1<=j}
+      for(j = 1; j <= 10; j += 1)
+//  T() {1<=i, i<=10, 1<=j, j<=10}
+         b[i][j] = 1.0;
+//  T(h) {2.0==h, i==11, j==11}
+   h = 2.0;
+//  T() {2.0==h, i==11, j==11}
+   func1(10, 10, a, b, h);
+//  T(i,j) {2.0==h, i#init==11, j#init==11, 1<=i}
+   for(i = 1; i <= 10; i += 1)
+//  T(j) {2.0==h, 1<=i, i<=10, 1<=j}
+      for(j = 1; j <= 10; j += 1)
+//  T() {2.0==h, 1<=i, i<=10, 1<=j, j<=10}
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+
+Preconditions for "main"
+
+//  P() {}
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+//  P() {}
+   for(i = 1; i <= 10; i += 1)
+//  P(i,j) {1<=i, i<=10}
+      for(j = 1; j <= 10; j += 1)
+//  P(i,j) {1<=i, i<=10, 1<=j, j<=10}
+         b[i][j] = 1.0;
+//  P(i,j) {i==11, j==11}
+   h = 2.0;
+//  P(h,i,j) {2.0==h, i==11, j==11}
+   func1(10, 10, a, b, h);
+//  P(h,i,j) {2.0==h, i==11, j==11}
+   for(i = 1; i <= 10; i += 1)
+//  P(h,i,j) {2.0==h, 1<=i, i<=10}
+      for(j = 1; j <= 10; j += 1)
+//  P(h,i,j) {2.0==h, 1<=i, i<=10, 1<=j, j<=10}
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+//  P() {2.0==h, m==10, n==10}
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+//  P() {2.0==h, m==10, n==10}
+   for(i = 1; i <= n; i += 1)
+//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10}
+      for(j = 1; j <= m; j += 1) {
+//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+         x = i*h+j;
+//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+         a[i][j] = b[i][j]*x;
+      }
+}
+
+Printed files with regions
+
+
+//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10}>
+
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+
+//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10}>
+
+   for(i = 1; i <= n; i += 1)
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=n}>
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=n}>
+
+      for(j = 1; j <= m; j += 1) {
+         x = i*h+j;
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h, m==10,
+//    n==10, 1<=i, i<=10, 1<=j, j<=10}>
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h, m==10,
+//    n==10, 1<=i, i<=10, 1<=j, j<=10}>
+
+         a[i][j] = b[i][j]*x;
+      }
+}
+
+//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10}>
+
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+
+//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10}>
+
+   for(i = 1; i <= n; i += 1)
+
+//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
+//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=n}>
+
+      for(j = 1; j <= m; j += 1) {
+         x = i*h+j;
+
+//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h,
+//    m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}>
+
+         a[i][j] = b[i][j]*x;
+      }
+}
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{*SEMANTICS*:o#0==11}>
+//  <TOP-LEVEL:stderr-IN-EXACT-{}>
+
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+   for(i = 1; i <= 10; i += 1)
+      for(j = 1; j <= 10; j += 1)
+         b[i][j] = 1.0;
+   h = 2.0;
+
+//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+
+   func1(10, 10, a, b, h);
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <a[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, j==11}>
+//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{*SEMANTICS*:o#0==11,
+//    TOP-LEVEL:2.0==h, j==11}>
+//  <TOP-LEVEL:stderr-IN-EXACT-{}>
+
+   for(i = 1; i <= 10; i += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10,
+//    TOP-LEVEL:2.0==h, 1<=i, i<=10}>
+//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{TOP-LEVEL:2.0==h, 1<=i, i<=10}>
+//  <TOP-LEVEL:stderr-IN-EXACT-{}>
+
+      for(j = 1; j <= 10; j += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h, 1<=i,
+//    i<=10, 1<=j, j<=10}>
+//  <TOP-LEVEL:stderr-IN-EXACT-{}>
+//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{TOP-LEVEL:2.0==h, 1<=i, i<=10,
+//    1<=j, j<=10}>
+
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, m==10, n==10}>
+
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, m==10, n==10}>
+
+   for(i = 1; i <= n; i += 1)
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
+//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, m==10, n==10, 1<=i,
+//    i<=n}>
+
+      for(j = 1; j <= m; j += 1) {
+         x = i*h+j;
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{i==PHI1, PHI2==j, *SEMANTICS*:o#0==11,
+//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}>
+
+         a[i][j] = b[i][j]*x;
+      }
+}
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+
+//  <b[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+
+   for(i = 1; i <= 10; i += 1)
+
+//  <b[PHI1][PHI2]-OUT-EXACT-{i==PHI1, 1<=PHI2, PHI2<=10, 1<=i,
+//    i<=10}>
+
+      for(j = 1; j <= 10; j += 1)
+
+//  <b[PHI1][PHI2]-OUT-EXACT-{PHI1==i, j==PHI2, 1<=i, i<=10, 1<=j,
+//    j<=10}>
+
+         b[i][j] = 1.0;
+   h = 2.0;
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, j==11}>
+
+   func1(10, 10, a, b, h);
+   for(i = 1; i <= 10; i += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{1<=i, i<=10}>
+//  <TOP-LEVEL:stderr[PHI1]-OUT-MAY-{TOP-LEVEL:2.0==h, 1<=i, i<=9}>
+
+      for(j = 1; j <= 10; j += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{1<=j, j<=10}>
+//  <TOP-LEVEL:stderr[PHI1]-OUT-MAY-{TOP-LEVEL:2.0==h, 1<=i, i+j<=19,
+//    i<=10, 1<=j, j<=10}>
+
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+//                                                     17*m.n + 3*n + 2 (SUMMARY)
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+//                                                     17*m.n + 3*n + 2 (DO)
+   for(i = 1; i <= n; i += 1)
+//                                                             17*m + 3 (DO)
+      for(j = 1; j <= m; j += 1) {
+//                                                                    6 (STMT)
+         x = i*h+j;
+//                                                                   10 (STMT)
+         a[i][j] = b[i][j]*x;
+      }
+}
+//                                                                 3075 (SUMMARY)
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+//                                                                  521 (DO)
+   for(i = 1; i <= 10; i += 1)
+//                                                                   52 (DO)
+      for(j = 1; j <= 10; j += 1)
+//                                                                    5 (STMT)
+         b[i][j] = 1.0;
+//                                                                    1 (STMT)
+   h = 2.0;
+//                                                                 1732 (STMT)
+   func1(10, 10, a, b, h);
+//                                                                  821 (DO)
+   for(i = 1; i <= 10; i += 1)
+//                                                                   82 (DO)
+      for(j = 1; j <= 10; j += 1)
+//                                                                    8 (STMT)
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+//  P() {}
+int main()
+{
+   float a[10][10], b[10][10], h;
+   int i, j;
+//  P() {}
+   for(i = 1; i <= 10; i += 1)
+//  P(i,j) {1<=i, i<=10}
+      for(j = 1; j <= 10; j += 1)
+//  P(i,j) {1<=i, i<=10, 1<=j, j<=10}
+         b[i][j] = 1.0;
+//  P(i,j) {i==11, j==11}
+   h = 2.0;
+//  P(h,i,j) {2.0==h, i==11, j==11}
+   func1(10, 10, a, b, h);
+//  P(h,i,j) {2.0==h, i==11, j==11}
+   for(i = 1; i <= 10; i += 1)
+//  P(h,i,j) {2.0==h, 1<=i, i<=10}
+      for(j = 1; j <= 10; j += 1)
+//  P(h,i,j) {2.0==h, 1<=i, i<=10, 1<=j, j<=10}
+         fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
+}
+//  P() {2.0==h, m==10, n==10}
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+//  P() {2.0==h, m==10, n==10}
+   for(i = 1; i <= 10; i += 1)
+//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10}
+      for(j = 1; j <= 10; j += 1) {
+//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+         x = i*h+j;
+//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+         a[i][j] = b[i][j]*x;
+      }
+}
+
+Printed files after parallelization
+
+void func1(int n, int m, float a[n][m], float b[n][m], float h)
+{
+   float x;
+   int i, j;
+   for(i = 1; i <= 10; i += 1)
+      for(j = 1; j <= 10; j += 1) {
+         x = i*h+j;
+         a[i][j] = b[i][j]*x;
+      }
+}

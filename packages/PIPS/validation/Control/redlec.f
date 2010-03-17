@@ -1,0 +1,13 @@
+      SUBROUTINE REDLEC
+      INTEGER NFILEC
+      CHARACTER*80 LIGNE
+
+      IF (IOPERA.LE.0) THEN
+         DO WHILE (IPOYNT.LE.LONGSF )
+            IF (IPOYNT.GT.LONGSF) THEN
+               READ (NFILEC,'(A)',END=1999,ERR=1999) LIGNE (:LONGSF)
+            ENDIF
+           ENDDO
+        ENDIF
+ 1999   RETURN
+        END

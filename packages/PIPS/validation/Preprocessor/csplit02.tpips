@@ -1,0 +1,17 @@
+delete csplit02
+create csplit02 csplit02.c
+
+# The creation is doomed on purpose, see source code.
+
+close
+delete csplit02
+quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+display PRINTED_FILE[print_hello_too]
+
+close
+delete csplit02
+quit

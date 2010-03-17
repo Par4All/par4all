@@ -1,0 +1,219 @@
+# preconditions...
+
+C  P() {}
+
+
+      SUBROUTINE FOO(X)
+
+C  P() {}
+
+C     BEGIN BLOCK
+
+C  P() {}
+
+      IF (X.LE.2.1) THEN                                                0003
+
+C  P() {}
+
+C        BEGIN BLOCK
+
+C  P() {}
+
+         PRINT *, 'bonjour'                                             0004
+
+C  P() {}
+
+         STOP                                                           0005
+C        END BLOCK
+      ELSE
+
+C  P() {}
+
+C        BEGIN BLOCK
+
+C  P() {}
+
+         PRINT *, 'hello'                                               0007
+
+C  P() {}
+
+         CALL NOEND                                                     0008
+C        END BLOCK
+      ENDIF
+
+C  P() {0==-1}
+
+      PRINT *, 'also dead'                                              0010
+C     END BLOCK
+      END
+
+C  P() {}
+
+
+      SUBROUTINE NOEND
+
+C  P() {}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {}
+
+1     CONTINUE                                                          0003
+      GOTO 1
+C     END UNSTRUCTURED
+      END
+
+C  P() {}
+
+! basic detection of unreachable code...
+      PROGRAM U1
+
+C  P() {}
+
+C     BEGIN BLOCK
+
+C  P() {}
+
+      PRINT *, 'hello'                                                  0003
+
+C  P() {}
+
+      CALL UNST(2.21)                                                   0004
+
+C  P() {}
+
+      CALL FOO(0.0)                                                     0005
+
+C  P() {0==-1}
+
+      PRINT *, 'dead, since foo stops'                                  0006
+
+C  P() {0==-1}
+
+      STOP                                                              0007
+
+C  P() {0==-1}
+
+      CALL FOO(1.1)                                                     0008
+
+C  P() {0==-1}
+
+      PRINT *, 'dead'                                                   0009
+C     END BLOCK
+      END
+
+C  P() {}
+
+      
+      SUBROUTINE UNST(X)
+      REAL X, Y
+
+C  P() {}
+
+C     BEGIN BLOCK
+
+C  P() {}
+
+      Y = 12.345                                                        0004
+
+C  P() {}
+
+      PRINT *, 'hello'                                                  0005
+
+C  P() {}
+
+      IF (X.GT.0.0) THEN                                                0006
+
+C  P() {}
+
+C        BEGIN UNSTRUCTURED
+
+C  P() {}
+
+C        BEGIN BLOCK
+
+C  P() {}
+
+10       PRINT *, 'live'                                                0007
+
+C  P() {}
+
+         STOP                                                           0008
+
+C  P() {0==-1}
+
+         PRINT *, 'dead'                                                0009
+C        END BLOCK
+
+C  P() {0==-1}
+
+         IF (X.LT.Y) GOTO 20                                            0010
+
+C  P() {0==-1}
+
+         PRINT *, 'dead 2'                                              0011
+
+C  P() {0==-1}
+
+20       CONTINUE                                                       0012
+         GOTO 10
+C        END UNSTRUCTURED
+      ENDIF
+
+C  P() {}
+
+      PRINT *, 'live 2'                                                 0015
+C     END BLOCK
+      END
+# dead code elimination...
+
+      SUBROUTINE FOO(X)
+C     BEGIN BLOCK
+      IF (X.LE.2.1) THEN                                                0003
+C        BEGIN BLOCK
+         PRINT *, 'bonjour'                                             0004
+         STOP                                                           0005
+C        END BLOCK
+      ELSE
+C        BEGIN BLOCK
+         PRINT *, 'hello'                                               0007
+         CALL NOEND                                                     0008
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+      END
+
+      SUBROUTINE NOEND
+C     BEGIN BLOCK
+C     BEGIN UNSTRUCTURED
+1     CONTINUE                                                          0003
+      GOTO 1
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+! basic detection of unreachable code...
+      PROGRAM U1
+C     BEGIN BLOCK
+      PRINT *, 'hello'                                                  0003
+      CALL UNST(2.21)                                                   0004
+      CALL FOO(0.0)                                                     0005
+C     END BLOCK
+      END
+      
+      SUBROUTINE UNST(X)
+      REAL X, Y
+C     BEGIN BLOCK
+      Y = 12.345                                                        0004
+      PRINT *, 'hello'                                                  0005
+      IF (X.GT.0.0) THEN                                                0006
+C        BEGIN UNSTRUCTURED
+C        BEGIN BLOCK
+10       PRINT *, 'live'                                                0007
+         STOP                                                           0008
+20       CONTINUE                                                       0012
+C        END BLOCK
+C        END UNSTRUCTURED
+      ENDIF
+      PRINT *, 'live 2'                                                 0015
+C     END BLOCK
+      END

@@ -1,0 +1,63 @@
+
+Parsed code for "decl05"
+
+void decl05()
+{
+   int i = 1;
+   int j = i+1;
+
+   foo(i);
+}
+
+Controlized code for "decl05"
+
+void decl05()
+{
+   int i = 1;
+   int j = i+1;
+
+   foo(i);
+}
+
+Cumulated effects for "decl05"
+
+void decl05()
+{
+   int i = 1;
+   int j = i+1;
+//               <must be read   >: i
+
+   foo(i);
+}
+
+Transformers for "decl05"
+
+
+//  T() {}
+
+void decl05()
+{
+   int i = 1;
+   int j = i+1;
+
+//  T() {}
+
+
+   foo(i);
+}
+
+Preconditions for "decl05"
+
+
+//  P() {}
+
+void decl05()
+{
+   int i = 1;
+   int j = i+1;
+
+//  P() {i==1, j==2}
+
+
+   foo(i);
+}

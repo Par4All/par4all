@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Bad error detection
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+echo
+echo The message should be: workspace noworkspace: No such file or directory
+echo
+
+open noworkspace
+quit
+EOF
+

@@ -1,0 +1,169 @@
+
+Source code with proper effects
+
+void complete05()
+{
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int n;                                                               /*0005*/
+   {
+      // BEGIN BLOCK
+      int j = 0;                                                        /*0009*/
+//               <must be read   >: i n
+//               <must be written>: i
+      for (i = 0;i<n;i++) {                                             /*0010*/
+         // BEGIN BLOCK
+//               <must be read   >: j
+//               <must be written>: j
+         j++;                                                           /*0011*/
+//               <must be read   >: i
+//               <must be written>: i
+         i--;                                                           /*0012*/
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+//               <must be read   >: i
+
+   foo(i);                                                              /*0016*/
+   // END BLOCK
+}
+
+Source code with cumulated effects
+
+void complete05()
+{
+//               <must be read   >: i j n
+//               <must be written>: i j
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int n;                                                               /*0005*/
+   {
+//               <must be read   >: i j n
+//               <must be written>: i j
+      // BEGIN BLOCK
+      int j = 0;                                                        /*0009*/
+//               <must be read   >: i j n
+//               <must be written>: i j
+      for (i = 0;i<n;i++) {                                             /*0010*/
+//               <must be read   >: i j
+//               <must be written>: i j
+         // BEGIN BLOCK
+//               <must be read   >: j
+//               <must be written>: j
+         j++;                                                           /*0011*/
+//               <must be read   >: i
+//               <must be written>: i
+         i--;                                                           /*0012*/
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+//               <must be read   >: i
+
+   foo(i);                                                              /*0016*/
+   // END BLOCK
+}
+
+Source code with transformers
+
+
+//  T() {}
+
+void complete05()
+{
+
+//  T() {}
+
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int n;                                                               /*0005*/
+   {
+
+//  T(i) {i==0, n<=0}
+
+      // BEGIN BLOCK
+      int j = 0;                                                        /*0009*/
+
+//  T(i,j) {i==0, j#init<=j, 1<=n}
+
+      for (i = 0;i<n;i++) {                                             /*0010*/
+
+//  T(i,j) {i==i#init-1, j==j#init+1}
+
+         // BEGIN BLOCK
+
+//  T(j) {j==j#init+1}
+
+         j++;                                                           /*0011*/
+
+//  T(i) {i==i#init-1}
+
+         i--;                                                           /*0012*/
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+//  T() {}
+
+
+   foo(i);                                                              /*0016*/
+   // END BLOCK
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+void complete05()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   int i;                                                               /*0004*/
+   int n;                                                               /*0005*/
+   {
+
+//  P() {j==0}
+
+      // BEGIN BLOCK
+      int j = 0;                                                        /*0009*/
+
+//  P() {j==0}
+
+      for (i = 0;i<n;i++) {                                             /*0010*/
+
+//  P(i,j) {i==0, 0<=j, 1<=n}
+
+         // BEGIN BLOCK
+
+//  P(i,j) {i==0, 0<=j, 1<=n}
+
+         j++;                                                           /*0011*/
+
+//  P(i,j) {i==0, 1<=j, 1<=n}
+
+         i--;                                                           /*0012*/
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+//  P(i) {i==0, n<=0}
+
+
+   foo(i);                                                              /*0016*/
+   // END BLOCK
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+CUMULATED_EFFECTS[complete05] (rw_effects_of_forloop) Ongoing implementation! Amira mensi
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning complete05 instead
+TRANSFORMERS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized
+TRANSFORMERS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized
+PRECONDITIONS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized

@@ -1,0 +1,14 @@
+delete flag_kernel01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+create flag_kernel01 flag_kernel01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+apply FLAG_KERNEL[bar]
+
+close
+delete flag_kernel01
+quit

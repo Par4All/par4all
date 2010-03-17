@@ -1,0 +1,27 @@
+delete split_initializations02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+create split_initializations02 split_initializations02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[split_initializations02]
+
+echo
+echo Code after split_initializations
+echo
+apply SPLIT_INITIALIZATIONS[split_initializations02]
+activate PRINT_CODE
+display PRINTED_FILE[split_initializations02]
+
+close
+delete split_initializations02
+quit
+

@@ -1,0 +1,27 @@
+delete muladd
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create muladd muladd.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+# Since the for loops are not dealt yet:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+# Select the more precise regions to compute the communications:
+activate MUST_REGIONS
+
+echo Transform all the control flow in one finite state machine:
+apply PHRASE_DISTRIBUTOR[muladd]
+apply PHRASE_DISTRIBUTOR[muladd_HRE]
+apply PHRASE_DISTRIBUTOR_CONTROL_CODE[muladd]
+apply PHRASE_DISTRIBUTOR_CONTROL_CODE[muladd_HRE]
+display PRINTED_FILE[muladd]
+display PRINTED_FILE[muladd_HRE]
+
+close
+delete muladd

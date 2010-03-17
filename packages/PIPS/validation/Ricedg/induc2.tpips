@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# Script to test pips on the simple program
+#
+# Use of the rule transformers_intra_full
+#
+# Pips -f induc2.f -w induc2 -m induc2 \
+# 	-s transformers_intra_full -s rsdg -b dg_file >&2
+# exit_code=$?
+# echo "--- Dependence graph for module INDUC2"
+# Display -l dg
+# Delete induc2 >&2
+# if [ $exit_code -eq 0 ]
+# then
+# Pips -f induc2.f -w induc2 -m induc2 \
+# 	-s preconditions_inter_full -s transformers_inter_full -s rsdg -b dg_file >&2
+# exit_code=$?
+# echo "--- Dependence graph for module INDUC2"
+# Display -l dg
+# Delete induc2 >&2
+# fi
+# exit $exit_code
+
+delete induc2
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create induc2 induc2.f
+
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+# activate preconditions_inter_full
+activate TRANSFORMERS_INTRA_FULL
+
+echo
+echo Dependence graph for module "INDUC2"
+echo
+
+display DG_FILE[INDUC2]
+
+close
+delete induc2
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create induc2 induc2.f
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+echo
+echo Dependence graph for module "INDUC2"
+echo
+
+display DG_FILE[INDUC2]
+
+close
+delete induc2
+quit

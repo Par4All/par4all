@@ -1,0 +1,5 @@
+C     capture des noms de variables par des noms de commons
+      PROGRAM DECL2
+      COMMON /X/X
+      X = 1.                                                            0004
+      END

@@ -1,0 +1,88 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W13
+
+C     Derived from w12. ELSEIF added to obtain unfeasible paths
+
+C     Assignments in body: check that the initial condition I=0 and the
+C     body exit condition 0<=I<=1 are merged as entry condition for the
+C     loop body before the fixpoint is computed.
+
+C     To obtain a precise loop transformer, the transformer for the
+C     entered loop and the transformer for the non-entered loop should
+C     be computed and their convex hull taken, but it is not useful,
+C     since the operation is performed when preconditions are computed.
+
+      INTEGER I
+
+C  T(I) {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0016
+
+C  T(I) {I#init==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0018
+
+C  T(I) {I#init<=I+1, I<=I#init+1}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T(I) {I#init<=I+1, I<=I#init+1}
+
+C (0,5)
+         IF (I.EQ.1) THEN                                               0019
+
+C  T(I) {I==0, I#init==1}
+
+C (0,6)
+            I = 0                                                       0020
+         ELSE
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+C (0,7)
+            IF (I.EQ.0) THEN                                            0021
+
+C  T(I) {I==1, I#init==0}
+
+C (0,8)
+               I = 1                                                    0022
+            ELSE
+
+C  T() {}
+
+C (0,9)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+         ENDIF
+
+C  T() {}
+
+C (0,10)
+         READ *, X                                                      0024
+C        END BLOCK
+      ENDDO
+
+C  T() {}
+
+C (0,11)
+
+      PRINT *, I                                                        0027
+
+C     END BLOCK
+      END

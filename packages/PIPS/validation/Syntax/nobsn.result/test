@@ -1,0 +1,5 @@
+! program with a last line without \n
+      PROGRAM NOBSN
+      PRINT *, 'no bsn'                                                 0003
+      END
+

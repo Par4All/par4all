@@ -1,0 +1,13 @@
+delete hpftest48
+create hpftest48 hpftest48.f
+module HPFTEST48
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FAST
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FAST
+activate PRINT_CODE_REGIONS
+echo --- Regions for HPFTEST48
+display PRINTED_FILE[HPFTEST48]
+close
+delete hpftest48
+quit

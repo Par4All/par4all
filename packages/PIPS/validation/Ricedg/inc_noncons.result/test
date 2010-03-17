@@ -1,0 +1,12 @@
+c     This is a test example for the case of loop increment 
+c     no constant 
+      SUBROUTINE INC(A,M,N,L)
+      INTEGER M,N,L
+      REAL*8 A(2*N)
+
+      DO I = M, N, L                                                    0007
+         DOALL J = 1, I+1                                               0008
+            A(2*J) = A(2*I+1)                                           0009
+         ENDDO
+      ENDDO
+      END

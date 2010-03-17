@@ -1,0 +1,11 @@
+# Check that preconditions are properly computed with user function calls
+
+delete funcside3
+create funcside3 funcside3.f
+module funcside3
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete funcside3
+quit

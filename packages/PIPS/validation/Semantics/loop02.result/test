@@ -1,0 +1,56 @@
+
+C  T() {}
+
+      PROGRAM LOOP02
+
+C     Bug on transformer: you cannot say anything about T's value after
+C     the loops. The loops seem to be supposed always entered and T's
+C     value to always be increased because the transformer syntactically
+C     associated to the loop is semantically associated to the loop
+C     body.
+  
+      REAL WLOOP(13,13)
+      INTEGER R,T,RMIN,RMAX,TMIN(13),TMAX(13),WHICH(13,13)
+ 
+      REAL FC(2)
+
+C  T(R,T) {RMIN<=R}
+
+
+      DO 4 R = RMIN, RMAX                                               0014
+
+C  T(T) {}
+
+         DO 4 T = TMIN(R+1), TMAX(R+1)                                  0015
+
+C  T() {}
+
+            FC(2) = WLOOP(R+1,T+1)                                      0016
+
+C  T() {}
+
+
+4           CONTINUE                                                    0018
+
+C  T(T) {1<=T}
+
+
+      DO T = 1, N                                                       0020
+
+C  T() {}
+
+         FC(I) = WLOOP(I,I)                                             0021
+      ENDDO
+
+C  T(T) {1<=T}
+
+
+      DO T = 1, 2                                                       0024
+
+C  T() {}
+
+         FC(I) = WLOOP(I,I)                                             0025
+      ENDDO
+C     
+      END
+

@@ -1,0 +1,218 @@
+
+C  P() {}
+
+C     excerpt from SPEC/CFP95/applu after array bound checking instrumentation
+
+C     Check for array bound check: information collected in the first
+C     loop can be propagated because you know all loops are entered
+C     (interprocedural information introduced here thru an artificial
+C     test)
+
+      SUBROUTINE SETBV
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+
+C  P() {}
+
+c
+
+      IF (NX.LT.5.OR.NY.LT.5.OR.NZ.LT.5) STOP                           0058
+
+C  P() {5<=NX, 5<=NY, 5<=NZ}
+
+
+c
+c***set the dependent variable values along the top and bottom faces
+c
+      DO J = 1, NY                                                      0063
+
+C  P(I,J) {1<=J, J<=NY, 5<=NX, 5<=NY, 5<=NZ}
+
+         DO I = 1, NX                                                   0064
+
+C  P(I,J) {1<=I, I<=NX, 1<=J, J<=NY, 5<=NX, 5<=NY, 5<=NZ}
+
+            IF (J.GT.33) STOP                                           0065
+     &      "Bound violation:array SETBV:U, 3rd dimension"              0065
+
+C  P(I,J) {1<=I, I<=NX, 1<=J, J<=33, J<=NY, 5<=NX, 5<=NY, 5<=NZ}
+
+            IF (I.GT.33) STOP                                           0067
+     &      "Bound violation:array SETBV:U, 2nd dimension"              0067
+
+C  P(I,J) {1<=I, I<=33, I<=NX, 1<=J, J<=33, J<=NY, 5<=NX, 5<=NY,
+C    5<=NZ}
+
+c
+            CALL EXACT(I, J, 1, U(1,I,J,1))                             0070
+
+C  P(I,J) {1<=I, I<=33, I<=NX, 1<=J, J<=33, J<=NY, 5<=NX, 5<=NY,
+C    5<=NZ}
+
+            IF (NZ.LT.1.OR.NZ.GT.33) STOP                               0071
+     &      "Bound violation:array SETBV:U, 4th dimension"              0071
+
+C  P(I,J) {1<=I, I<=33, I<=NX, 1<=J, J<=33, J<=NY, 5<=NX, 5<=NY,
+C    5<=NZ, NZ<=33}
+
+            CALL EXACT(I, J, NZ, U(1,I,J,NZ))                           0073
+c
+         ENDDO
+      ENDDO
+
+C  P(I,J) {I==NX+1, J==NY+1, 6<=I, I<=34, 6<=J, J<=34, 5<=NZ, NZ<=33}
+
+c
+c***set the dependent variable values along north and south faces
+c
+      DO K = 1, NZ                                                      0080
+
+C  P(I,J,K) {J==NY+1, 6<=J, J<=34, 1<=K, K<=NZ, 5<=NX, NX<=33, 5<=NZ,
+C    NZ<=33}
+
+         DO I = 1, NX                                                   0081
+
+C  P(I,J,K) {J==NY+1, 1<=I, I<=NX, 6<=J, J<=34, 1<=K, K<=NZ, 5<=NX,
+C    NX<=33, 5<=NZ, NZ<=33}
+
+            IF (K.GT.33) STOP                                           0082
+     &      "Bound violation:array SETBV:U, 4th dimension"              0082
+
+C  P(I,J,K) {J==NY+1, 1<=I, I<=NX, 6<=J, J<=34, 1<=K, K<=33, K<=NZ,
+C    5<=NX, NX<=33, 5<=NZ, NZ<=33}
+
+            IF (I.GT.33) STOP                                           0084
+     &      "Bound violation:array SETBV:U, 2nd dimension"              0084
+
+C  P(I,J,K) {J==NY+1, 1<=I, I<=33, I<=NX, 6<=J, J<=34, 1<=K, K<=33,
+C    K<=NZ, 5<=NX, NX<=33, 5<=NZ, NZ<=33}
+
+c
+            CALL EXACT(I, 1, K, U(1,I,1,K))                             0087
+
+C  P(I,J,K) {J==NY+1, 1<=I, I<=33, I<=NX, 6<=J, J<=34, 1<=K, K<=33,
+C    K<=NZ, 5<=NX, NX<=33, 5<=NZ, NZ<=33}
+
+            IF (NY.LT.1.OR.NY.GT.33) STOP                               0088
+     &      "Bound violation:array SETBV:U, 3rd dimension"              0088
+
+C  P(I,J,K) {J==NY+1, 1<=I, I<=33, I<=NX, 6<=J, J<=34, 1<=K, K<=33,
+C    K<=NZ, 5<=NX, NX<=33, 5<=NZ, NZ<=33}
+
+            CALL EXACT(I, NY, K, U(1,I,NY,K))                           0090
+c
+         ENDDO
+
+C  P(I,J,K) {I==NX+1, J==NY+1, 6<=I, I<=34, 6<=J, J<=34, 1<=K, K<=33,
+C    K<=NZ, 5<=NZ, NZ<=33}
+
+         PRINT *, NX, NY, NZ                                            0093
+      ENDDO
+
+C  P(I,J,K) {I==NX+1, J==NY+1, K==NZ+1, 6<=I, I<=34, 6<=J, J<=34,
+C    6<=K, K<=34}
+
+      PRINT *, NX, NY, NZ                                               0095
+
+C  P(I,J,K) {I==NX+1, J==NY+1, K==NZ+1, 6<=I, I<=34, 6<=J, J<=34,
+C    6<=K, K<=34}
+
+c
+c***set the dependent variable values along east and west faces
+c
+      DO K = 1, NZ                                                      0099
+
+C  P(I,J,K) {I==NX+1, 6<=I, I<=34, 1<=K, K<=NZ, 5<=NY, NY<=33, 5<=NZ,
+C    NZ<=33}
+
+         DO J = 1, NY                                                   0100
+
+C  P(I,J,K) {I==NX+1, 6<=I, I<=34, 1<=J, J<=NY, 1<=K, K<=NZ, 5<=NY,
+C    NY<=33, 5<=NZ, NZ<=33}
+
+            IF (K.GT.33) STOP                                           0101
+     &      "Bound violation:array SETBV:U, 4th dimension"              0101
+
+C  P(I,J,K) {I==NX+1, 6<=I, I<=34, 1<=J, J<=NY, 1<=K, K<=33, K<=NZ,
+C    5<=NY, NY<=33, 5<=NZ, NZ<=33}
+
+            IF (J.GT.33) STOP                                           0103
+     &      "Bound violation:array SETBV:U, 3rd dimension"              0103
+
+C  P(I,J,K) {I==NX+1, 6<=I, I<=34, 1<=J, J<=33, J<=NY, 1<=K, K<=33,
+C    K<=NZ, 5<=NY, NY<=33, 5<=NZ, NZ<=33}
+
+c
+            CALL EXACT(1, J, K, U(1,1,J,K))                             0106
+
+C  P(I,J,K) {I==NX+1, 6<=I, I<=34, 1<=J, J<=33, J<=NY, 1<=K, K<=33,
+C    K<=NZ, 5<=NY, NY<=33, 5<=NZ, NZ<=33}
+
+            IF (NX.LT.1.OR.NX.GT.33) STOP                               0107
+     &      "Bound violation:array SETBV:U, 2nd dimension"              0107
+
+C  P(I,J,K) {I==NX+1, 6<=I, I<=34, 1<=J, J<=33, J<=NY, 1<=K, K<=33,
+C    K<=NZ, 5<=NY, NY<=33, 5<=NZ, NZ<=33}
+
+            CALL EXACT(NX, J, K, U(1,NX,J,K))                           0109
+c
+         ENDDO
+
+C  P(I,J,K) {I==NX+1, J==NY+1, 6<=I, I<=34, 6<=J, J<=34, 1<=K, K<=33,
+C    K<=NZ, 5<=NZ, NZ<=33}
+
+         PRINT *, NX, NY, NZ                                            0112
+      ENDDO
+
+C  P(I,J,K) {I==NX+1, J==NY+1, K==NZ+1, 6<=I, I<=34, 6<=J, J<=34,
+C    6<=K, K<=34}
+
+
+      PRINT *, NX, NY, NZ                                               0115
+c
+      END

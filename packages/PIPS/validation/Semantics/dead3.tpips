@@ -1,0 +1,20 @@
+# Check that a dead call to PR does not impact PR's precondition
+# See dead1.f
+
+delete dead3
+create dead3 dead3.f
+module PR
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Without explicit dead code elimination:
+echo
+
+display PRINTED_FILE
+
+close
+delete dead3
+quit

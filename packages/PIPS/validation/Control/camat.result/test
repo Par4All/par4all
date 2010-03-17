@@ -1,0 +1,756 @@
+
+Printed file
+
+C -----------------------------------------------------------
+C	PREPARATION DES DONNEES POUR L'ACTIF OU LE REACTIF
+C -----------------------------------------------------------
+
+C     KER=11: DEBORDEMENT NOMBRE DE TELEMESURES
+C     KER=12: DEBORDEMENT NOMBRE DE TELEMESURES DANS LES IMJECTIONS
+C     KER=13: DEBORDEMENT NOMBRE D'ELEMENTS DU JACOBIEN
+
+      SUBROUTINE CAMAT (VCAL, NTM, ZIMP, NDTM, INTM, ADTR, ITMF_P,
+     +			NXUT_P, NA1, NX2, NX3, NX4, NX5, NX6,
+     +			M_GAIN, NA7)
+
+      IMPLICIT LOGICAL *1 (B)
+c
+c********************
+C       character*40 sccs_id/'@(#)camat.f 1.1 94/05/13\n'/
+c********************
+c
+
+C	en entree ;
+
+C     VCAL	TENSION DE CALCUL
+C     NTM	NOMBRE EFFECTIF DE T.M. POUR L EE
+C     ZIMP	CARACTERISTIQUES DES LIAISONS
+C     NDTM	TABLE DES NOEUDS ENTIEREMENT DEFINIS
+C     INTM	INDICATION POUR ASSURER L'OBSERVABILITE
+C     NA1	IPCO, IPCE, ICCO, ICCE, NRLO, NRLE, NRGR, NRCO, NRTJ,
+C     NA7	KZBY, NZBY
+
+C	en Sortie :
+
+C     ADTR	ADMITANCES ENTRE LES SOMMETS ET LA TERRE
+C     Nx2	IPTAI, NTAI
+C     Nx3	LHAC, NCHA, EHA
+C     Nx4	IVOL, IVEL, IVGR, IVCO, IVTM
+C     N5BIS	ITMF_P, NXUT_P
+C     Nx5	IVAC, LITA, ITMF, NXUT
+C     Nx6	MVOL, MVEL, MVGR, MVCO, MVTV
+C     M_GAIN	NS, NR, LF, LORD, IDEB, NONU, ISUI, INDL, ELM
+
+! include "parametre.inc"
+
+C	include de declaration des parametres de dimensionnement maximum
+C	des variables.
+        INTEGER*4 NTAZ
+        INTEGER*2  NMP,NMS,NML,NMG,NMC,NMT,
+     &             NMXJ,NBY1,IRDO,IRIN,IRDH,IRDG,
+     &             NTF,NBTMX,NBSX,
+     &             KCMM,NMVG,NNLX,NELX
+c
+c       sccs_id  @(#)parametre.inc 1.1 94/05/19
+c
+C	NMS  =  NOMBRE MAX DE SOMMETS
+C	NML  =  NOMBRE MAX DE LIAISONS
+C	NMG  =  NOMBRE MAX DE GROUPES
+C	NMC  =  NOMBRE MAX DE CONSOMMATIONS
+C	NMT  =  NOMBRE MAX DE CAPTEURS DE TENSION
+C	NBY1 =  NOMBRE MAX DE TM SAXBY
+C	NTF  =  NOMBRE MAX DE T.M. FAUSSES
+C       NMXJ =  NOMBRE DE TRONCONS DE JEU DE BARRE
+C       NMP  =  NOMBRE MAX DE POSTES                            
+C       NNLX  =  NOMBRE MAX D'ELEMENT DU JACOBIEN DANS FARA
+C       NELX  =  NOMBRE MAX D'ELEMENT DU JACOBIEN DANS LAMBDA
+C       NBTMX =  NOMBRE MAX DE TELEMESURE
+C       NBSX = NOMBRE MAX D'ENTREE DU FICHIER DE LOCALISATION DES SAXBY
+c     (2*NBY1)
+C	IRDO =  10 X REDONDANCE EN TELE INFORMATION
+C	IRIN =  10 X NB MOYEN DE T.M. POUR UNE INJECTION
+C	IRDH =  10 X NB MOYEN D'ELEMENT DE JACOBIEN PAR SOMMET
+C	IRDG =  10 X NB MOYEN D'ELEMENT DE LA MATRICE DE GAIN PAR SOMMET
+c       NTAZ =  45000    dimension de la table Z de FARA      
+
+C	Include parametre.inc
+
+	PARAMETER (NMP=500,  NMS=700, NML=1000, NMG=300, NMC=600,
+     $       NMT=800)
+	PARAMETER (NMXJ=1500, NBY1=50, IRDO=40, IRIN=15, IRDH=80,
+     $       IRDG=108)
+	PARAMETER (NTF=200,NBTMX=4200,NBSX=100,NTAZ=45000)
+        PARAMETER (KCMM=30, NMVG=800,NNLX=(2*NML+NMS),NELX=(4*NML+NMS))
+! end include "parametre.inc"
+! 	Include 'parametre.inc'
+! include "indice.inc"
+C	--- -----------------------------------------------------------
+C	--- Fichier d'include de declaration des "common" de la taille
+C	--- des zones memoires et des indices des tableaux dans 
+C	--- ces zones.						
+C	--- -----------------------------------------------------------
+
+C	--- -----------------------------------------------------------
+C	CARL	ZIMP, ATG, SUSO, SUSE
+C	Nx1	IPCO, IPCE, ICCO, ICCE, NRLO, NRLE, NRGR, NRCO, NRTJ
+C	NB1	NRLO, NRLE, NRTJ
+C	Nx2	IPTAI, NTAI
+C	Nx3	LHAC, NCHA, EHA
+C	Nx4	IVOL, IVEL, IVGR, IVCO, IVTM
+C	Nx5	IVAC, LITA, ITMF, NXUT
+C	Nx6	MVOL, MVEL, MVGR, MVCO, MVTV
+C	M_GAIN	LCHBG, LORD, IDEB, NONU, ISUI, INDL, ELM
+C	NA7	KZBY, NZBY
+C	--- -----------------------------------------------------------
+c
+c********************
+c       character*40 sccs_id/'@(#)indice.inc 1.1 94/05/13\n'/
+c********************
+c
+
+	INTEGER*4	I_ATG, I_SUSO, I_SUSE
+	INTEGER*4	I_IPCO, I_IPCE, I_ICCO, I_ICCE
+	INTEGER*4	I_NRLO, I_NRLE, I_NRGR, I_NRCO, I_NRTJ
+	INTEGER*4	IB_NRLO, IB_NRLE, IB_NRTJ
+	INTEGER*4	I_IPTAI, I_NTAI
+	INTEGER*4	I_LHAC, I_NCHA, I_EHA
+	INTEGER*4	I_IVOL, I_IVEL, I_IVGR, I_IVCO, I_IVTM
+	INTEGER*4 	I_LCHBG, I_LORD, I_IDEB, I_NONU, I_ISUI
+	INTEGER*4	I_INDL
+	INTEGER*4	I_ELM
+	INTEGER*4	I_IVAC, I_LITA, I_ITMF, I_NXUT, I_ITMF_P
+	INTEGER*4	I_NXUT_P
+	INTEGER*4	I_KZBY, I_NZBY
+	INTEGER*4	I_TENS
+
+	COMMON/I_CARL/	I_ATG, I_SUSO, I_SUSE
+	COMMON/I_ESWE/	I_IPCO, I_IPCE, I_ICCO, I_ICCE,
+     +			I_NRLO, I_NRLE, I_NRGR, I_NRCO, I_NRTJ
+	COMMON/I_ESWC/	IB_NRLO, IB_NRLE, IB_NRTJ
+	COMMON/I_ESWI/	I_IPTAI, I_NTAI
+	COMMON/I_ESWA/	I_LHAC, I_NCHA, I_EHA
+	COMMON/I_PTMA/	I_IVOL, I_IVEL, I_IVGR, I_IVCO, I_IVTM
+	COMMON/I_GAIN/	I_LCHBG, I_LORD, I_IDEB, I_NONU, I_ISUI,
+     +			I_INDL, I_ELM
+	COMMON/I_ESWL/	I_IVAC, I_LITA, I_ITMF, I_NXUT, I_ITMF_P,
+     +			I_NXUT_P
+	COMMON/I_LRD/	I_KZBY, I_NZBY
+	COMMON/I_STN/	I_TENS
+! end include "indice.inc"
+! 	Include	'indice.inc'
+
+      COMMON/COMSOL/	SPGM(2),KER,IBT,BF4L,B4TROP
+      COMMON/CTZRE/	TZEREA(2)
+      COMMON/DBUG/	BS,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,
+     +			B11,B12,B13,B14,B15
+      COMMON/DIME/	IRDIN(4,3)
+      COMMON/DMFX/	NXL,NL,NXP,NXJ,NT,NC,NG,NBY,NS,JOUR(5)
+      COMMON/EVOL/	NVLOBS
+      COMMON/IPAC/	SIGA,SIGR,NSO,NTMA,NTMR,LBLC(7,2),NFA,NBFA,NFR,
+     +			NBFR,NXU,BROB
+      COMMON/NUFIC/	KFB,KFR,KCR,KS
+
+      CHARACTER*6	ITLITA(2), ITMTMA(2), ITIJAE(2), ITIATE(2)
+      CHARACTER*6       ITIGAE(2), ITVATM(2)
+
+      DIMENSION ZIMP(*), INTM(*), NDTM(*), ADTR(*), NA1(*), NA7(*)
+      DIMENSION NX2(*), NX3(*), NX4(*), NX5(*), NX6(*), M_GAIN(*)
+	DIMENSION	ITMF_P(*), NXUT_P(*)
+
+      DATA ITLITA(1) /'ASESWL'/, ITLITA(2) /'ASESWM'/
+      DATA ITMTMA(1) /'ASMTMA'/, ITMTMA(2) /'ASMTMR'/
+      DATA ITIJAE(1) /'ASESWA'/, ITIJAE(2) /'ASESWB'/
+      DATA ITIATE(1) /'ASESWI'/, ITIATE(2) /'ASESWJ'/
+      DATA ITIGAE(1) /'ASESWG'/, ITIGAE(2) /'ASESWH'/
+      DATA ITVATM(1) /'ASPTMA'/, ITVATM(2) /'ASPTMR'/
+
+C -----------------------------------------------------------
+C                       Debut de CAMAT                  
+C -----------------------------------------------------------
+
+      KER = 0                                                           0168
+C      CALL MOVEK (SPGM, '*CAMAT *', 1, 1, 8)
+
+C -----------------------------------------------------------
+C       CONSTRUCTION DE LA TABLE DE DESCRIPTION DES T.M.
+C -----------------------------------------------------------
+
+C      IF (BS) WRITE(KS,1000) TZEREA(IBT)
+
+      IF (IBT.EQ.1) THEN                                                0177
+         LON = 2*NXL+NG+NC+NBY                                          0178
+      ELSE
+         LON = 2*NXL+NG+NC+NT                                           0180
+      ENDIF
+
+      CALL NLIRE(NX4, ITVATM(IBT), LON, KER)                            0183
+      IF (KER.NE.0) GOTO 1                                              0184
+
+      CALL NLIRE(NX6, ITMTMA(IBT), LON, KER)                            0186
+      IF (KER.NE.0) GOTO 1                                              0187
+
+C -----------------------------------------------------------
+C               REJET DES TM FAUSSES DE FTMERR          
+C -----------------------------------------------------------
+
+      CALL CATMFA(ITMF_P, NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVCO)    0193
+     &, NX4(I_IVTM), NDTM)                                              0193
+      IF (KER.NE.0) GOTO 1                                              0195
+
+      IF (IBT.EQ.1) THEN                                                0197
+         MAXNTM = IRDO*NMS/10                                           0198
+         IRDIN(1,3) = MAXNTM                                            0199
+         MAXMVA = IRIN*NMS/10                                           0200
+         IRDIN(2,3) = MAXMVA                                            0201
+         MAXNH = IRDH*NMS/10                                            0202
+         IRDIN(3,3) = MAXNH                                             0203
+
+         CALL CAISAX(NX6(I_IVTM), NX4(I_IVTM), NXUT_P, NA7, NA7(        0205
+     &   I_NZBY), NA1(I_NRLO), NA1(I_NRLE), INTM)                       0205
+      ENDIF
+
+      CALL CACONT(NTM, MVA, NH, NA1, NA1(I_NRLO), NA1(I_NRLE), NA1(     0209
+     &I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM   0209
+     &), NX6, NX6(I_IVEL), NX6(I_IVGR), NX6(I_IVTM), NX2(I_IPTAI),      0209
+     &NDTM, INTM)                                                       0209
+
+C      if (BS) then
+C         WRITE(KS,1001) NTM, MAXNTM
+C         WRITE(KS,1002) MVA, MAXMVA
+C         WRITE(KS,1003) NH, MAXNH
+C      end if
+
+10    IF (NTM.GT.MAXNTM) GOTO 900                                       0222
+      IF (MVA.GT.MAXMVA) GOTO 901                                       0223
+      IF (NH.GT.MAXNH) GOTO 902                                         0224
+
+      LON = 8                                                           0226
+      CALL MOVEK(NX2, I_IPTAI, 1, 1, LON)                               0227
+
+      I_LHAC = 7                                                        0229
+      I_NCHA = I_LHAC+NTM+1                                             0230
+      I_EHA = I_NCHA+NH                                                 0231
+      LON = 12                                                          0232
+      CALL MOVEK(NX3, I_LHAC, 1, 1, LON)                                0233
+
+      IF (IBT.EQ.1) THEN                                                0235
+         LGR = NFA+NBFA                                                 0236
+      ELSE
+         LGR = NFR+NBFR                                                 0238
+      ENDIF
+
+      I_IVAC = 9                                                        0241
+      I_LITA = I_IVAC+NTM                                               0242
+      I_ITMF = I_LITA+NTM                                               0243
+      I_NXUT = I_ITMF+LGR                                               0244
+
+      LON = 16                                                          0246
+      CALL MOVEK(NX5, I_IVAC, 1, 1, LON)                                0247
+
+C Compactage de ITMF ---
+C ------------------ ---
+
+      IF (LGR.GT.0) THEN                                                0252
+         DO I = 1, LGR                                                  0253
+C            Nx5(I_ITMF - 1 + I) = Nx5(I_ITMF_P -1 + I)
+            NX5(I_ITMF-1+I) = ITMF_P(I)                                 0255
+         ENDDO
+      ENDIF
+
+C Comptage de NXUT ---
+C ---------------- ---
+
+      IF (NXU.GT.0) THEN                                                0262
+         DO I = 1, NBY                                                  0263
+C            Nx5(I_NXUT - 1 + I) = Nx5(I_NXUT_P -1 + I)
+            NX5(I_NXUT-1+I) = NXUT_P(I)                                 0265
+         ENDDO
+      ENDIF
+
+C     CALL CADSTM (NTM, MVA, NRLO, NRLE, NRGC, NRTJ,
+C                  IVOL, IVEL, IVGC, IVTM
+C                  NXUT, IVAC, LITA,
+C                  IPTAI, NTAI, ZIMP, ADTR)
+      CALL CADSTM(NTM, MVA, NA1(I_NRLO), NA1(I_NRLE), NA1(I_NRGR),      0273
+     &NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM), NX5(     0273
+     &I_NXUT), NX5(I_IVAC), NX5(I_LITA), NX2(I_IPTAI), NX2(I_NTAI),     0273
+     &ZIMP, ADTR)                                                       0273
+      IF (KER.NE.0) GOTO 1                                              0278
+
+C -----------------------------------------------------------
+C       ECRITURE SUR DISQUE DES TABLEAUX D'ECRIVANT LES T.M.
+C -----------------------------------------------------------
+
+      LON = I_NTAI+MVA-1                                                0284
+      LBLC(2,IBT) = LON                                                 0285
+cc      CALL NECRIR (Nx2, ITIATE(IBT), LON, KER)        
+cc      IF (KER.NE.0) GOTO 1
+
+      LON = I_NXUT-1                                                    0289
+      IF (NXU.GE.0) LON = LON+NBY                                       0290
+      LBLC(5,IBT) = LON                                                 0291
+cc     CALL NECRIR (Nx5, ITLITA(IBT), LON, KER) 
+cc      IF (KER.NE.0) GOTO 1
+
+C -----------------------------------------------------------
+C                       ECRITURE DE LA TABLE ADTR       
+C -----------------------------------------------------------
+
+cc      if (IBT.EQ.2) then
+cc         LON = 2*NSO
+cc         CALL NECRIR (ADTR, 'ASESWC', LON, KER)
+cc         IF (KER.NE.0) GOTO 1
+cc      end if
+
+C -----------------------------------------------------------
+C                       CONSTRUCTION DU JACOBIEN        
+C -----------------------------------------------------------
+
+C     CALL CAJAC (NTM, NH, VCAL,
+C                 IPCO, IPCE, ICCO, ICCE,
+C                 NRLO, NRLE, NRGR, NRCO,
+C                 NRTJ, ZIMP,
+C                 NXUT, IVAC, LITA
+C                 LHAC, NCHA, EHA)
+
+      CALL CAJAC(NTM, NH, VCAL, NA1(I_IPCO), NA1(I_IPCE), NA1(I_ICCO)   0316
+     &, NA1(I_ICCE), NA1(I_NRLO), NA1(I_NRLE), NA1(I_NRGR), NA1(        0316
+     &I_NRCO), NA1(I_NRTJ), ZIMP, NX5(I_NXUT), NX5(I_IVAC), NX5(        0316
+     &I_LITA), NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA))                    0316
+
+C -----------------------------------------------------------
+C               ECRITURE DE LA MATRICE JACOBIEN         
+C -----------------------------------------------------------
+
+      LON = I_EHA+2*NH-1                                                0327
+      LBLC(3,IBT) = LON                                                 0328
+cc      CALL NECRIR (Nx3, ITIJAE(IBT), LON, KER)
+cc      IF (KER.NE.0) GOTO 1
+
+C -----------------------------------------------------------
+C               CONSTRUCTION DE LA MATRICE DE GAIN      
+C -----------------------------------------------------------
+
+C     CALL CAGAIN (NTM, INTM, LHAC, NCHA, EHA,
+C                  IVAC, M_GAIN)
+
+      CALL CAGAIN(NTM, INTM, NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA),      0339
+     &NX5(I_IVAC), M_GAIN)                                              0339
+      IF (KER.NE.0) GOTO 1                                              0341
+
+C -----------------------------------------------------------
+C               ECRITURE DE LA MATRICE DE GAIN SUR DISQUE
+C -----------------------------------------------------------
+
+      LON = LBLC(6,IBT)                                                 0347
+      GOTO 1
+
+C  902 IF(B9.AND..NOT.BS) WRITE(KS,1003) NH, MAXNH
+902   KER = 13                                                          0365
+      GOTO 1
+
+C  901 IF (B9.AND..NOT.BS) WRITE(KS,1002) MVA, MAXMVA
+901   KER = 12                                                          0361
+      GOTO 1
+
+C -----------------------------------------------------------
+C                       ERREURS DE DEBORDEMENT          
+C -----------------------------------------------------------
+
+C  900 IF (B9.AND..NOT.BS) WRITE(KS,1001) NTM, MAXNTM
+900   KER = 11                                                          0357
+
+C    1 IF (BS) WRITE(KS,1004) TZEREA(IBT), KER
+1     CONTINUE                                                          0350
+
+C 1000 FORMAT (///,1X,'* ENTREE DANS CAMAT , DEBUT DU TRAITEMENT ',
+C     +        'DES DONNEES EN ',A4)
+C 1001 FORMAT (3X,'NOMBRE DE TM: ',I5,' MAX: ',I5)
+C 1002 FORMAT (3X,'NOMBRE DE TM ENTRANT DANS LES INJECTIONS: ',I5,
+C     +       ' MAX: ' ,I5)
+C 1003 FORMAT(3X,'NOMBRE D''ELEMENTS DANS LE JACOBIEN: ',I5,' MAX: ',I5)
+C 1004 FORMAT (1X,'* FIN DE CAMAT ',A4,20X,'KER=',I6)
+      END
+
+Printed file after RESTUCTURE_CONTROL
+
+C -----------------------------------------------------------
+C	PREPARATION DES DONNEES POUR L'ACTIF OU LE REACTIF
+C -----------------------------------------------------------
+
+C     KER=11: DEBORDEMENT NOMBRE DE TELEMESURES
+C     KER=12: DEBORDEMENT NOMBRE DE TELEMESURES DANS LES IMJECTIONS
+C     KER=13: DEBORDEMENT NOMBRE D'ELEMENTS DU JACOBIEN
+
+      SUBROUTINE CAMAT (VCAL, NTM, ZIMP, NDTM, INTM, ADTR, ITMF_P,
+     +			NXUT_P, NA1, NX2, NX3, NX4, NX5, NX6,
+     +			M_GAIN, NA7)
+
+      IMPLICIT LOGICAL *1 (B)
+c
+c********************
+C       character*40 sccs_id/'@(#)camat.f 1.1 94/05/13\n'/
+c********************
+c
+
+C	en entree ;
+
+C     VCAL	TENSION DE CALCUL
+C     NTM	NOMBRE EFFECTIF DE T.M. POUR L EE
+C     ZIMP	CARACTERISTIQUES DES LIAISONS
+C     NDTM	TABLE DES NOEUDS ENTIEREMENT DEFINIS
+C     INTM	INDICATION POUR ASSURER L'OBSERVABILITE
+C     NA1	IPCO, IPCE, ICCO, ICCE, NRLO, NRLE, NRGR, NRCO, NRTJ,
+C     NA7	KZBY, NZBY
+
+C	en Sortie :
+
+C     ADTR	ADMITANCES ENTRE LES SOMMETS ET LA TERRE
+C     Nx2	IPTAI, NTAI
+C     Nx3	LHAC, NCHA, EHA
+C     Nx4	IVOL, IVEL, IVGR, IVCO, IVTM
+C     N5BIS	ITMF_P, NXUT_P
+C     Nx5	IVAC, LITA, ITMF, NXUT
+C     Nx6	MVOL, MVEL, MVGR, MVCO, MVTV
+C     M_GAIN	NS, NR, LF, LORD, IDEB, NONU, ISUI, INDL, ELM
+
+! include "parametre.inc"
+
+C	include de declaration des parametres de dimensionnement maximum
+C	des variables.
+        INTEGER*4 NTAZ
+        INTEGER*2  NMP,NMS,NML,NMG,NMC,NMT,
+     &             NMXJ,NBY1,IRDO,IRIN,IRDH,IRDG,
+     &             NTF,NBTMX,NBSX,
+     &             KCMM,NMVG,NNLX,NELX
+c
+c       sccs_id  @(#)parametre.inc 1.1 94/05/19
+c
+C	NMS  =  NOMBRE MAX DE SOMMETS
+C	NML  =  NOMBRE MAX DE LIAISONS
+C	NMG  =  NOMBRE MAX DE GROUPES
+C	NMC  =  NOMBRE MAX DE CONSOMMATIONS
+C	NMT  =  NOMBRE MAX DE CAPTEURS DE TENSION
+C	NBY1 =  NOMBRE MAX DE TM SAXBY
+C	NTF  =  NOMBRE MAX DE T.M. FAUSSES
+C       NMXJ =  NOMBRE DE TRONCONS DE JEU DE BARRE
+C       NMP  =  NOMBRE MAX DE POSTES                            
+C       NNLX  =  NOMBRE MAX D'ELEMENT DU JACOBIEN DANS FARA
+C       NELX  =  NOMBRE MAX D'ELEMENT DU JACOBIEN DANS LAMBDA
+C       NBTMX =  NOMBRE MAX DE TELEMESURE
+C       NBSX = NOMBRE MAX D'ENTREE DU FICHIER DE LOCALISATION DES SAXBY
+c     (2*NBY1)
+C	IRDO =  10 X REDONDANCE EN TELE INFORMATION
+C	IRIN =  10 X NB MOYEN DE T.M. POUR UNE INJECTION
+C	IRDH =  10 X NB MOYEN D'ELEMENT DE JACOBIEN PAR SOMMET
+C	IRDG =  10 X NB MOYEN D'ELEMENT DE LA MATRICE DE GAIN PAR SOMMET
+c       NTAZ =  45000    dimension de la table Z de FARA      
+
+C	Include parametre.inc
+
+	PARAMETER (NMP=500,  NMS=700, NML=1000, NMG=300, NMC=600,
+     $       NMT=800)
+	PARAMETER (NMXJ=1500, NBY1=50, IRDO=40, IRIN=15, IRDH=80,
+     $       IRDG=108)
+	PARAMETER (NTF=200,NBTMX=4200,NBSX=100,NTAZ=45000)
+        PARAMETER (KCMM=30, NMVG=800,NNLX=(2*NML+NMS),NELX=(4*NML+NMS))
+! end include "parametre.inc"
+! 	Include 'parametre.inc'
+! include "indice.inc"
+C	--- -----------------------------------------------------------
+C	--- Fichier d'include de declaration des "common" de la taille
+C	--- des zones memoires et des indices des tableaux dans 
+C	--- ces zones.						
+C	--- -----------------------------------------------------------
+
+C	--- -----------------------------------------------------------
+C	CARL	ZIMP, ATG, SUSO, SUSE
+C	Nx1	IPCO, IPCE, ICCO, ICCE, NRLO, NRLE, NRGR, NRCO, NRTJ
+C	NB1	NRLO, NRLE, NRTJ
+C	Nx2	IPTAI, NTAI
+C	Nx3	LHAC, NCHA, EHA
+C	Nx4	IVOL, IVEL, IVGR, IVCO, IVTM
+C	Nx5	IVAC, LITA, ITMF, NXUT
+C	Nx6	MVOL, MVEL, MVGR, MVCO, MVTV
+C	M_GAIN	LCHBG, LORD, IDEB, NONU, ISUI, INDL, ELM
+C	NA7	KZBY, NZBY
+C	--- -----------------------------------------------------------
+c
+c********************
+c       character*40 sccs_id/'@(#)indice.inc 1.1 94/05/13\n'/
+c********************
+c
+
+	INTEGER*4	I_ATG, I_SUSO, I_SUSE
+	INTEGER*4	I_IPCO, I_IPCE, I_ICCO, I_ICCE
+	INTEGER*4	I_NRLO, I_NRLE, I_NRGR, I_NRCO, I_NRTJ
+	INTEGER*4	IB_NRLO, IB_NRLE, IB_NRTJ
+	INTEGER*4	I_IPTAI, I_NTAI
+	INTEGER*4	I_LHAC, I_NCHA, I_EHA
+	INTEGER*4	I_IVOL, I_IVEL, I_IVGR, I_IVCO, I_IVTM
+	INTEGER*4 	I_LCHBG, I_LORD, I_IDEB, I_NONU, I_ISUI
+	INTEGER*4	I_INDL
+	INTEGER*4	I_ELM
+	INTEGER*4	I_IVAC, I_LITA, I_ITMF, I_NXUT, I_ITMF_P
+	INTEGER*4	I_NXUT_P
+	INTEGER*4	I_KZBY, I_NZBY
+	INTEGER*4	I_TENS
+
+	COMMON/I_CARL/	I_ATG, I_SUSO, I_SUSE
+	COMMON/I_ESWE/	I_IPCO, I_IPCE, I_ICCO, I_ICCE,
+     +			I_NRLO, I_NRLE, I_NRGR, I_NRCO, I_NRTJ
+	COMMON/I_ESWC/	IB_NRLO, IB_NRLE, IB_NRTJ
+	COMMON/I_ESWI/	I_IPTAI, I_NTAI
+	COMMON/I_ESWA/	I_LHAC, I_NCHA, I_EHA
+	COMMON/I_PTMA/	I_IVOL, I_IVEL, I_IVGR, I_IVCO, I_IVTM
+	COMMON/I_GAIN/	I_LCHBG, I_LORD, I_IDEB, I_NONU, I_ISUI,
+     +			I_INDL, I_ELM
+	COMMON/I_ESWL/	I_IVAC, I_LITA, I_ITMF, I_NXUT, I_ITMF_P,
+     +			I_NXUT_P
+	COMMON/I_LRD/	I_KZBY, I_NZBY
+	COMMON/I_STN/	I_TENS
+! end include "indice.inc"
+! 	Include	'indice.inc'
+
+      COMMON/COMSOL/	SPGM(2),KER,IBT,BF4L,B4TROP
+      COMMON/CTZRE/	TZEREA(2)
+      COMMON/DBUG/	BS,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,
+     +			B11,B12,B13,B14,B15
+      COMMON/DIME/	IRDIN(4,3)
+      COMMON/DMFX/	NXL,NL,NXP,NXJ,NT,NC,NG,NBY,NS,JOUR(5)
+      COMMON/EVOL/	NVLOBS
+      COMMON/IPAC/	SIGA,SIGR,NSO,NTMA,NTMR,LBLC(7,2),NFA,NBFA,NFR,
+     +			NBFR,NXU,BROB
+      COMMON/NUFIC/	KFB,KFR,KCR,KS
+
+      CHARACTER*6	ITLITA(2), ITMTMA(2), ITIJAE(2), ITIATE(2)
+      CHARACTER*6       ITIGAE(2), ITVATM(2)
+
+      DIMENSION ZIMP(*), INTM(*), NDTM(*), ADTR(*), NA1(*), NA7(*)
+      DIMENSION NX2(*), NX3(*), NX4(*), NX5(*), NX6(*), M_GAIN(*)
+	DIMENSION	ITMF_P(*), NXUT_P(*)
+
+      DATA ITLITA(1) /'ASESWL'/, ITLITA(2) /'ASESWM'/
+      DATA ITMTMA(1) /'ASMTMA'/, ITMTMA(2) /'ASMTMR'/
+      DATA ITIJAE(1) /'ASESWA'/, ITIJAE(2) /'ASESWB'/
+      DATA ITIATE(1) /'ASESWI'/, ITIATE(2) /'ASESWJ'/
+      DATA ITIGAE(1) /'ASESWG'/, ITIGAE(2) /'ASESWH'/
+      DATA ITVATM(1) /'ASPTMA'/, ITVATM(2) /'ASPTMR'/
+
+C -----------------------------------------------------------
+C                       Debut de CAMAT                  
+C -----------------------------------------------------------
+
+      KER = 0                                                           0168
+C      CALL MOVEK (SPGM, '*CAMAT *', 1, 1, 8)
+
+C -----------------------------------------------------------
+C       CONSTRUCTION DE LA TABLE DE DESCRIPTION DES T.M.
+C -----------------------------------------------------------
+
+C      IF (BS) WRITE(KS,1000) TZEREA(IBT)
+
+      IF (IBT.EQ.1) THEN                                                0177
+         LON = 2*NXL+NG+NC+NBY                                          0178
+      ELSE
+         LON = 2*NXL+NG+NC+NT                                           0180
+      ENDIF
+
+      CALL NLIRE(NX4, ITVATM(IBT), LON, KER)                            0183
+      IF (KER.NE.0) THEN                                                0184
+      ELSE
+
+         CALL NLIRE(NX6, ITMTMA(IBT), LON, KER)                         0186
+         IF (KER.NE.0) THEN                                             0187
+         ELSE
+
+C -----------------------------------------------------------
+C               REJET DES TM FAUSSES DE FTMERR          
+C -----------------------------------------------------------
+
+            CALL CATMFA(ITMF_P, NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(     0193
+     &      I_IVCO), NX4(I_IVTM), NDTM)                                 0193
+            IF (KER.NE.0) THEN                                          0195
+            ELSE
+
+               IF (IBT.EQ.1) THEN                                       0197
+                  MAXNTM = IRDO*NMS/10                                  0198
+                  IRDIN(1,3) = MAXNTM                                   0199
+                  MAXMVA = IRIN*NMS/10                                  0200
+                  IRDIN(2,3) = MAXMVA                                   0201
+                  MAXNH = IRDH*NMS/10                                   0202
+                  IRDIN(3,3) = MAXNH                                    0203
+
+                  CALL CAISAX(NX6(I_IVTM), NX4(I_IVTM), NXUT_P, NA7,    0205
+     &            NA7(I_NZBY), NA1(I_NRLO), NA1(I_NRLE), INTM)          0205
+               ENDIF
+
+               CALL CACONT(NTM, MVA, NH, NA1, NA1(I_NRLO), NA1(I_NRLE   0209
+     &         ), NA1(I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(      0209
+     &         I_IVGR), NX4(I_IVTM), NX6, NX6(I_IVEL), NX6(I_IVGR),     0209
+     &         NX6(I_IVTM), NX2(I_IPTAI), NDTM, INTM)                   0209
+
+C      if (BS) then
+C         WRITE(KS,1001) NTM, MAXNTM
+C         WRITE(KS,1002) MVA, MAXMVA
+C         WRITE(KS,1003) NH, MAXNH
+C      end if
+
+10             IF (NTM.GT.MAXNTM) THEN                                  0222
+
+C -----------------------------------------------------------
+C                       ERREURS DE DEBORDEMENT          
+C -----------------------------------------------------------
+
+C  900 IF (B9.AND..NOT.BS) WRITE(KS,1001) NTM, MAXNTM
+900               KER = 11                                              0357
+               ELSEIF (MVA.GT.MAXMVA) THEN                              0222
+
+C  901 IF (B9.AND..NOT.BS) WRITE(KS,1002) MVA, MAXMVA
+901               KER = 12                                              0361
+               ELSEIF (NH.GT.MAXNH) THEN                                0222
+
+C  902 IF(B9.AND..NOT.BS) WRITE(KS,1003) NH, MAXNH
+902               KER = 13                                              0365
+               ELSE
+
+                  LON = 8                                               0226
+                  CALL MOVEK(NX2, I_IPTAI, 1, 1, LON)                   0227
+
+                  I_LHAC = 7                                            0229
+                  I_NCHA = I_LHAC+NTM+1                                 0230
+                  I_EHA = I_NCHA+NH                                     0231
+                  LON = 12                                              0232
+                  CALL MOVEK(NX3, I_LHAC, 1, 1, LON)                    0233
+
+                  IF (IBT.EQ.1) THEN                                    0235
+                     LGR = NFA+NBFA                                     0236
+                  ELSE
+                     LGR = NFR+NBFR                                     0238
+                  ENDIF
+
+                  I_IVAC = 9                                            0241
+                  I_LITA = I_IVAC+NTM                                   0242
+                  I_ITMF = I_LITA+NTM                                   0243
+                  I_NXUT = I_ITMF+LGR                                   0244
+
+                  LON = 16                                              0246
+                  CALL MOVEK(NX5, I_IVAC, 1, 1, LON)                    0247
+
+C Compactage de ITMF ---
+C ------------------ ---
+
+                  IF (LGR.GT.0) THEN                                    0252
+                     DO I = 1, LGR                                      0253
+C            Nx5(I_ITMF - 1 + I) = Nx5(I_ITMF_P -1 + I)
+                        NX5(I_ITMF-1+I) = ITMF_P(I)                     0255
+                     ENDDO
+                  ENDIF
+
+C Comptage de NXUT ---
+C ---------------- ---
+
+                  IF (NXU.GT.0) THEN                                    0262
+                     DO I = 1, NBY                                      0263
+C            Nx5(I_NXUT - 1 + I) = Nx5(I_NXUT_P -1 + I)
+                        NX5(I_NXUT-1+I) = NXUT_P(I)                     0265
+                     ENDDO
+                  ENDIF
+
+C     CALL CADSTM (NTM, MVA, NRLO, NRLE, NRGC, NRTJ,
+C                  IVOL, IVEL, IVGC, IVTM
+C                  NXUT, IVAC, LITA,
+C                  IPTAI, NTAI, ZIMP, ADTR)
+                  CALL CADSTM(NTM, MVA, NA1(I_NRLO), NA1(I_NRLE), NA1   0273
+     &            (I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR   0273
+     &            ), NX4(I_IVTM), NX5(I_NXUT), NX5(I_IVAC), NX5(        0273
+     &            I_LITA), NX2(I_IPTAI), NX2(I_NTAI), ZIMP, ADTR)       0273
+                  IF (KER.NE.0) THEN                                    0278
+                  ELSE
+
+C -----------------------------------------------------------
+C       ECRITURE SUR DISQUE DES TABLEAUX D'ECRIVANT LES T.M.
+C -----------------------------------------------------------
+
+                     LON = I_NTAI+MVA-1                                 0284
+                     LBLC(2,IBT) = LON                                  0285
+cc      CALL NECRIR (Nx2, ITIATE(IBT), LON, KER)        
+cc      IF (KER.NE.0) GOTO 1
+
+                     LON = I_NXUT-1                                     0289
+                     IF (NXU.GE.0) LON = LON+NBY                        0290
+                     LBLC(5,IBT) = LON                                  0291
+cc     CALL NECRIR (Nx5, ITLITA(IBT), LON, KER) 
+cc      IF (KER.NE.0) GOTO 1
+
+C -----------------------------------------------------------
+C                       ECRITURE DE LA TABLE ADTR       
+C -----------------------------------------------------------
+
+cc      if (IBT.EQ.2) then
+cc         LON = 2*NSO
+cc         CALL NECRIR (ADTR, 'ASESWC', LON, KER)
+cc         IF (KER.NE.0) GOTO 1
+cc      end if
+
+C -----------------------------------------------------------
+C                       CONSTRUCTION DU JACOBIEN        
+C -----------------------------------------------------------
+
+C     CALL CAJAC (NTM, NH, VCAL,
+C                 IPCO, IPCE, ICCO, ICCE,
+C                 NRLO, NRLE, NRGR, NRCO,
+C                 NRTJ, ZIMP,
+C                 NXUT, IVAC, LITA
+C                 LHAC, NCHA, EHA)
+
+                     CALL CAJAC(NTM, NH, VCAL, NA1(I_IPCO), NA1(        0316
+     &               I_IPCE), NA1(I_ICCO), NA1(I_ICCE), NA1(I_NRLO),    0316
+     &               NA1(I_NRLE), NA1(I_NRGR), NA1(I_NRCO), NA1(        0316
+     &               I_NRTJ), ZIMP, NX5(I_NXUT), NX5(I_IVAC), NX5(      0316
+     &               I_LITA), NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA))     0316
+
+C -----------------------------------------------------------
+C               ECRITURE DE LA MATRICE JACOBIEN         
+C -----------------------------------------------------------
+
+                     LON = I_EHA+2*NH-1                                 0327
+                     LBLC(3,IBT) = LON                                  0328
+cc      CALL NECRIR (Nx3, ITIJAE(IBT), LON, KER)
+cc      IF (KER.NE.0) GOTO 1
+
+C -----------------------------------------------------------
+C               CONSTRUCTION DE LA MATRICE DE GAIN      
+C -----------------------------------------------------------
+
+C     CALL CAGAIN (NTM, INTM, LHAC, NCHA, EHA,
+C                  IVAC, M_GAIN)
+
+                     CALL CAGAIN(NTM, INTM, NX3(I_LHAC), NX3(I_NCHA)    0339
+     &               , NX3(I_EHA), NX5(I_IVAC), M_GAIN)                 0339
+                     IF (KER.NE.0) THEN                                 0341
+                     ELSE
+
+C -----------------------------------------------------------
+C               ECRITURE DE LA MATRICE DE GAIN SUR DISQUE
+C -----------------------------------------------------------
+
+                        LON = LBLC(6,IBT)                               0347
+                     ENDIF
+                  ENDIF
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDIF
+
+C    1 IF (BS) WRITE(KS,1004) TZEREA(IBT), KER
+1     CONTINUE                                                          0350
+
+C 1000 FORMAT (///,1X,'* ENTREE DANS CAMAT , DEBUT DU TRAITEMENT ',
+C     +        'DES DONNEES EN ',A4)
+C 1001 FORMAT (3X,'NOMBRE DE TM: ',I5,' MAX: ',I5)
+C 1002 FORMAT (3X,'NOMBRE DE TM ENTRANT DANS LES INJECTIONS: ',I5,
+C     +       ' MAX: ' ,I5)
+C 1003 FORMAT(3X,'NOMBRE D''ELEMENTS DANS LE JACOBIEN: ',I5,' MAX: ',I5)
+C 1004 FORMAT (1X,'* FIN DE CAMAT ',A4,20X,'KER=',I6)
+      END

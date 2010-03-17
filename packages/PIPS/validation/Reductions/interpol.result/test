@@ -1,0 +1,51 @@
+PROPER REDUCTIONS
+      SUBROUTINE ADDTO(X, J)
+C  call sum[X],
+      X = X+J                                                           0002
+      END
+      SUBROUTINE ADDTOS(I, J)
+      COMMON /SUM/ S(10)
+C  call sum[S(I)],
+      S(I) = S(I)+J                                                     0003
+      END
+      PROGRAM INTERPOL
+      COMMON /SUM/ S(10)
+      S = 2.0                                                           0003
+      DO J = 1, 10                                                      0004
+         DO I = 1, 10                                                   0005
+C  call sum[S(I)],
+            S(I) = S(I)+I                                               0006
+C  call sum[S(I)],
+            CALL ADDTO(S(I), J)                                         0007
+C  call sum[S(*)],
+            CALL ADDTOS(I, J)                                           0008
+         ENDDO
+      ENDDO
+      END
+C  summary sum[X],
+      SUBROUTINE ADDTO(X, J)
+C  call sum[X],
+      X = X+J                                                           0002
+      END
+C  summary sum[S(I)],
+      SUBROUTINE ADDTOS(I, J)
+      COMMON /SUM/ S(10)
+C  call sum[S(I)],
+      S(I) = S(I)+J                                                     0003
+      END
+      PROGRAM INTERPOL
+      COMMON /SUM/ S(10)
+      S = 2.0                                                           0003
+C  loop sum[S],
+      DO J = 1, 10                                                      0004
+C  loop sum[S],
+         DO I = 1, 10                                                   0005
+C  call sum[S(I)],
+            S(I) = S(I)+I                                               0006
+C  call sum[S(I)],
+            CALL ADDTO(S(I), J)                                         0007
+C  call sum[S(*)],
+            CALL ADDTOS(I, J)                                           0008
+         ENDDO
+      ENDDO
+      END

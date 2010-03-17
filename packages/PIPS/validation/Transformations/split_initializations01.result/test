@@ -1,0 +1,44 @@
+
+Initial code
+
+int split_initializations01()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   int j;
+   i++;
+   {
+      // BEGIN BLOCK
+      int i = 2;
+      i++;
+      j = 1;
+      // END BLOCK
+   }
+   i = j;
+
+   printf("%d %d\n", i, j);
+   // END BLOCK
+}
+
+Code after split_initializations
+
+int split_initializations01()
+{
+   // BEGIN BLOCK
+   int i;
+   i = 1;
+   int j;
+   i++;
+   {
+      // BEGIN BLOCK
+      int i;
+      i = 2;
+      i++;
+      j = 1;
+      // END BLOCK
+   }
+   i = j;
+
+   printf("%d %d\n", i, j);
+   // END BLOCK
+}

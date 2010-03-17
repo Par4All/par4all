@@ -1,0 +1,63 @@
+
+Parsed printed file for "comma07"
+
+int comma07()
+{
+   int i,  j;
+
+   i = (j = 1, 2);
+   i = 3, j = 4;
+
+   return i;
+}
+
+Code for "comma07"
+
+int comma07()
+{
+   int i,  j;
+
+   i = (j = 1, 2);
+   i = 3, j = 4;
+
+   return i;
+}
+
+Proper effects for "comma07"
+
+int comma07()
+{
+   int i,  j;
+//               <must be written>: i j
+
+   i = (j = 1, 2);
+//               <must be written>: i j
+   i = 3, j = 4;
+//               <must be read   >: i
+
+   return i;
+}
+
+Transformers for "comma07"
+
+
+//  T(comma07) {comma07==3}
+
+int comma07()
+{
+   int i,  j;
+
+//  T(i,j) {i==2, j==1}
+
+
+   i = (j = 1, 2);
+
+//  T(i,j) {i==3, i#init==2, j==4, j#init==1}
+
+   i = 3, j = 4;
+
+//  T(comma07) {comma07==3, i==3, j==4}
+
+
+   return i;
+}

@@ -1,0 +1,47 @@
+
+Parsed printed file for "lhs02"
+
+void lhs02()
+{
+   int i = 2;
+   int j = 2;
+
+   *(i>2?&i:&j) = 3;
+
+   j = i>2?i+1:j+2;
+}
+
+Proper effects for "lhs02"
+
+void lhs02()
+{
+   int i = 2;
+   int j = 2;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: i
+
+   *(i>2?&i:&j) = 3;
+//               <may be read    >: j
+//               <must be read   >: i
+//               <must be written>: j
+
+   j = i>2?i+1:j+2;
+}
+
+Cumulated effects for "lhs02"
+
+//               <may be written >: TOP-LEVEL:*MEMORY*
+void lhs02()
+{
+   int i = 2;
+   int j = 2;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: i
+
+   *(i>2?&i:&j) = 3;
+//               <may be read    >: j
+//               <must be read   >: i
+//               <must be written>: j
+
+   j = i>2?i+1:j+2;
+}

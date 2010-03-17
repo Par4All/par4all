@@ -1,0 +1,27 @@
+
+Display code for subroutine ENTRY04
+
+      SUBROUTINE ENTRY04(X, Y, N)
+      INTEGER N, M
+      COMPLEX*8 X(1:N)
+      CHARACTER Y(1:N)
+
+      PRINT *, X(1)                                                     0008
+
+
+      END
+
+Display code for entry INCREMENT
+
+      SUBROUTINE INCREMENT(Y, X, N)
+      INTEGER N, M
+      COMPLEX*8 X(1:N)
+      CHARACTER Y(1:N)
+
+99999 CONTINUE                                                          0006
+
+      PRINT *, Y(2)                                                     0008
+
+      M = M+1                                                           0010
+
+      END

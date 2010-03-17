@@ -1,0 +1,59 @@
+delete strip_mining01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create strip_mining01 strip_mining01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# We use the winning combination, including TRANSFORMERS_IN_CONTEXT
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+echo
+echo Initial source code
+echo
+
+display PRINTED_FILE[strip_mining01]
+
+echo
+echo Source code after strip mining
+echo
+
+apply STRIP_MINE
+l1
+0
+128
+display PRINTED_FILE[strip_mining01]
+
+echo
+echo Check preconditions on strip-mined loop
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+activate PRINT_CODE
+apply UNSPLIT[%PROGRAM]
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat strip_mining01.database/Warnings
+
+quit

@@ -1,0 +1,137 @@
+
+Preconditions for main HIND02
+
+
+C  P() {}
+
+      PROGRAM HIND02
+
+c     PLDI'95, Constant propagation, Figure 6
+
+c     The values of f1, f2, f3, f4, f5 and f6 are found as well as the
+c     values of sub1 and sub2. However, the value of sub1 is not
+c     returned to hind02 because the transformer of sub1 is used
+c     instead. The value of sub2 is returned, because the transformer of
+c     sub2 is exact.
+
+      INTEGER R1, SUB1
+
+C  P() {}
+
+
+      R1 = SUB1(0)                                                      0013
+
+C  P(R1) {0<=R1, R1<=1}
+
+
+      IF (R1.EQ.0) THEN                                                 0015
+
+C  P(R1) {R1==0}
+
+C     See if this is reachable
+         CALL SUB4                                                      0017
+      ENDIF
+
+      END
+
+Preconditions for SUB1
+
+
+C  P() {F1==0}
+
+
+      INTEGER FUNCTION SUB1(F1)
+      INTEGER F1
+      INTEGER X, Y, R2
+      INTEGER SUB2
+
+C  P() {F1==0}
+
+
+      X = 9                                                             0007
+
+C  P(X) {F1==0, X==9}
+
+
+      IF (F1.EQ.0) THEN                                                 0009
+
+C  P(X) {F1==0, X==9}
+
+         Y = 1                                                          0010
+      ELSE
+
+C  P() {0==-1}
+
+         Y = 0                                                          0012
+      ENDIF
+
+C  P(X,Y) {F1==0, X==9, Y==1}
+
+
+      R2 = SUB2(Y, 4, F1, X)                                            0015
+
+C  P(R2,X,Y) {F1==0, R2==14, X==9, Y==1}
+
+
+      CALL SUB3(R2)                                                     0017
+
+C  P(R2,X,Y) {F1==0, R2==14, X==9, Y==1}
+
+
+      IF (R2.GT.0) THEN                                                 0019
+
+C  P(R2,X,Y) {F1==0, R2==14, X==9, Y==1}
+
+         SUB1 = 1                                                       0020
+      ELSE
+
+C  P() {0==-1}
+
+         SUB1 = 0                                                       0022
+      ENDIF
+
+      END
+
+Preconditions for SUB2
+
+
+C  P() {F2==1, F3==4, F4==0, F5==9}
+
+
+      INTEGER FUNCTION SUB2(F2, F3, F4, F5)
+      INTEGER F2, F3, F4, F5
+
+C  P() {F2==1, F3==4, F4==0, F5==9}
+
+
+      SUB2 = F2+F3+F4+F5                                                0005
+
+      END
+
+Preconditions for SUB3
+
+
+C  P() {F6==14}
+
+
+      SUBROUTINE SUB3(F6)
+      INTEGER F6
+
+C  P() {F6==14}
+
+      PRINT *, F6                                                       0004
+      END
+
+Preconditions for SUB4
+
+
+C  P() {}
+
+
+      SUBROUTINE SUB4
+
+C  P() {}
+
+      PRINT *, 'sub4 is called'                                         0003
+      END
+

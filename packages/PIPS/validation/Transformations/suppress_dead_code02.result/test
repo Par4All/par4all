@@ -1,0 +1,50 @@
+
+Initial code for "suppress_dead_code02"
+
+void suppress_dead_code02()
+{
+   int i, j;
+   
+   /* Not dead code because of control effect */
+   while (i) {
+      j;
+   }
+}
+
+Initial code for "suppress_dead_code02" with proper effects
+
+void suppress_dead_code02()
+{
+   int i, j;
+//               <must be read   >: i
+   
+   /* Not dead code because of control effect */
+   while (i) {
+      j;
+   }
+}
+
+Initial code for "suppress_dead_code02" with cumulated effects
+
+void suppress_dead_code02()
+{
+   int i, j;
+//               <must be read   >: i
+   
+   /* Not dead code because of control effect */
+   while (i) {
+      j;
+   }
+}
+
+Code for "suppress_dead_code02" after dead code elimination
+
+void suppress_dead_code02()
+{
+   int i, j;
+   
+   /* Not dead code because of control effect */
+   while (i) 
+      ;
+   ;
+}

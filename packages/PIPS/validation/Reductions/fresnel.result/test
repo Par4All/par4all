@@ -1,0 +1,23 @@
+void output()
+{
+   double z, max, sum, squares;
+   int i, j;
+   float imageout_re[256][256];
+   max = 0.0;
+   sum = 0.0;
+   squares = 0.0;
+//  loop sum[squares],sum[sum],
+   for(i = 0; i <= 255; i += 1)
+//  loop sum[squares],sum[sum],
+      for(j = 0; j <= 255; j += 1) {
+         z = imageout_re[i][j];
+//  call sum[sum],
+         sum += z;
+//  call sum[squares],
+         squares += z*z;
+         if (z>max) 
+            max = z;
+      }
+
+   printf("Sum after=%f  Sumsquares after=%f\n", sum, squares);
+}

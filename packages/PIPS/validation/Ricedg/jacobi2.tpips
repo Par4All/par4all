@@ -1,0 +1,23 @@
+delete jacobi2
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create jacobi2 jacobi2.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate PRINT_PARALLELIZEDOMP_CODE
+
+
+setproperty PARALLELIZATION_STATISTICS TRUE
+
+apply PRIVATIZE_MODULE(jacobi2)
+
+display PARALLELPRINTED_FILE[jacobi2]
+
+
+close
+delete jacobi2

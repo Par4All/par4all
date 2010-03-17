@@ -1,0 +1,12 @@
+delete edited02
+create edited02 edited02.f
+display PRINTED_FILE
+shell mv edited02.database/EDITED02/EDITED02.f foo.f ; sleep 2 ; \
+	sed 's,!%,,' < foo.f > edited02.database/EDITED02/EDITED02.f ; rm foo.f
+display PRINTED_FILE
+shell mv edited02.database/EDITED02/EDITED02.f foo.f ; sleep 2 ; \
+	sed 's,real,integer,;s,10,3,' < foo.f > edited02.database/EDITED02/EDITED02.f ; 
+display PRINTED_FILE
+close
+delete edited02
+quit

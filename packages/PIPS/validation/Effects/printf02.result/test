@@ -1,0 +1,18 @@
+int main()
+{
+   int i = 5;
+   int j = 6;
+   float x;
+   printf("i=%d, %d, %f\n", i, i+j, x);
+}
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+   int i = 5;
+   int j = 6;
+   float x;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i j x
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("i=%d, %d, %f\n", i, i+j, x);
+}

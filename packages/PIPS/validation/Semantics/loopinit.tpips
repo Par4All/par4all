@@ -1,0 +1,24 @@
+
+delete loopinit
+create loopinit loopinit.f
+
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+
+echo # proper effects
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE($ALL)
+
+echo # cumulated effects
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE($ALL)
+
+echo # preconditions
+module LOOPINIT
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete loopinit
+
+

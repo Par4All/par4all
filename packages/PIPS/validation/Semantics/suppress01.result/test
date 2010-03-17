@@ -1,0 +1,94 @@
+
+C  T(X) {1.+X#init==X}
+
+
+      SUBROUTINE INCR(X)
+
+C  T(X) {1.+X#init==X}
+
+      X = X+1.                                                          0003
+      END
+
+C  T() {}
+
+      PROGRAM SUPPRESS01
+
+C  T(I) {I==0}
+
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0007
+
+C  T(I) {}
+
+
+      CALL INCR(I)                                                      0009
+
+C  T() {}
+
+
+      PRINT *, I                                                        0011
+
+      END
+
+C  P() {}
+
+
+      SUBROUTINE INCR(X)
+
+C  P() {}
+
+      X = X+1.                                                          0003
+      END
+
+C  P() {}
+
+      PROGRAM SUPPRESS01
+
+C  P() {}
+
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0007
+
+C  P(I) {I==0}
+
+
+      CALL INCR(I)                                                      0009
+
+C  P(I) {}
+
+
+      PRINT *, I                                                        0011
+
+      END
+
+Warning:
+
+TRANSFORMERS_INTER_FULL[SUPPRESS01] (fortran_user_call_to_transformer) Type incompatibility
+INTERPROCEDURAL_SUMMARY_PRECONDITION[INCR] (any_user_call_site_to_transformer) Type incompatibility between call site and declaration for argument "X" (rank 1) of function "INCR" called from function "SUPPRESS01": REAL*4/INTEGER*4
+
+
+      SUBROUTINE INCR(X)
+      X = X+1.                                                          0003
+      END
+      PROGRAM SUPPRESS01
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0007
+
+      CALL INCR(I)                                                      0009
+
+      PRINT *, I                                                        0011
+
+      END
+

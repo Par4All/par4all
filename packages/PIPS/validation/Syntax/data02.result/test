@@ -1,0 +1,6 @@
+      PROGRAM DATA02
+      INTEGER I
+      SAVE I
+      DATA I /4/
+      PRINT *, I                                                        0003
+      END

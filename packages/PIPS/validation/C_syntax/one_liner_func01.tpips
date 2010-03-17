@@ -1,0 +1,14 @@
+delete one_liner_func01
+setproperty ABORT_ON_USER_ERROR TRUE
+create one_liner_func01 one_liner_func01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+display PARSED_PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALL]
+
+
+close
+delete one_liner_func01
+quit

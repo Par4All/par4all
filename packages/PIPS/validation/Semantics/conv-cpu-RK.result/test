@@ -1,0 +1,69 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Check transformers for "conv_cpu"
+
+C  T() {}
+
+void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
+{
+   int i, j;
+
+//  T(i,j) {0<=i}
+
+   for(i = 0; i <= n-1; i += 1) {
+
+//  T(j) {0<=i, i+1<=n, j#init<=idx, 0<=j}
+
+      for(j = 0; j <= n-1; j += 1) {
+         int idx = i*n+j;
+
+         _Bool right = i>0;
+         _Bool left = i<n-1;
+         _Bool top = j>0;
+         _Bool bottom = j<n-1;
+
+//  T() {0<=i, i+1<=n, j<=idx, 0<=j, j+1<=n}
+
+         c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
+      }
+   }
+}
+Check preconditions for "conv_cpu"
+
+//  P() {n==10000}
+
+void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
+{
+   int i, j;
+
+//  P() {10000i+j==idx, n==10000}
+
+   for(i = 0; i <= n-1; i += 1) {
+
+//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000}
+
+      for(j = 0; j <= n-1; j += 1) {
+         int idx = i*n+j;
+
+         _Bool right = i>0;
+         _Bool left = i<n-1;
+         _Bool top = j>0;
+         _Bool bottom = j<n-1;
+
+//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
+//    j<=9999}
+
+         c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
+      }
+   }
+}
+Privatize scalar variables on all the modules of the program:

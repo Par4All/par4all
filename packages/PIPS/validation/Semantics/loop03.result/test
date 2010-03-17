@@ -1,0 +1,318 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+
+Transformers for "getimage" before privatization
+
+
+C  T() {}
+
+void getimage(char *filename)
+{
+   extern complex imagein[64][64], imageout[256][256];
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
+   unsigned char c;
+   FILE *fp;
+
+//  T(i,j) {0<=i}
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  T(j) {0<=i, i<=63, 0<=j}
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 0.0;
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_im[i][j] = 0.0;
+      }
+
+//  T(i,j) {i#init==64, j#init==64, 0<=i}
+
+
+   for(i = 0; i <= 255; i += 1)
+
+//  T(j) {0<=i, i<=255, 0<=j}
+
+      for(j = 0; j <= 255; j += 1) {
+
+//  T() {0<=i, i<=255, 0<=j, j<=255}
+
+         imageout_re[i][j] = 0.0;
+
+//  T() {0<=i, i<=255, 0<=j, j<=255}
+
+         imageout_im[i][j] = 0.0;
+      }
+
+//  T() {i==256, j==256}
+
+
+   fp = fopen(filename, "r");
+
+//  T() {i==256, j==256}
+
+   fclose(fp);
+}
+
+Preconditions for "getimage" before privatization
+
+
+//  P() {}
+
+void getimage(char *filename)
+{
+   extern complex imagein[64][64], imageout[256][256];
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
+   unsigned char c;
+   FILE *fp;
+
+//  P() {}
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  P(i,j) {0<=i, i<=63}
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 0.0;
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_im[i][j] = 0.0;
+      }
+
+//  P(i,j) {i==64, j==64}
+
+
+   for(i = 0; i <= 255; i += 1)
+
+//  P(i,j) {0<=i, i<=255}
+
+      for(j = 0; j <= 255; j += 1) {
+
+//  P(i,j) {0<=i, i<=255, 0<=j, j<=255}
+
+         imageout_re[i][j] = 0.0;
+
+//  P(i,j) {0<=i, i<=255, 0<=j, j<=255}
+
+         imageout_im[i][j] = 0.0;
+      }
+
+//  P(i,j) {i==256, j==256}
+
+
+   fp = fopen(filename, "r");
+
+//  P(i,j) {i==256, j==256}
+
+   fclose(fp);
+}
+
+Privatize scalar variables on all the modules of the program:
+
+
+Transformers for "getimage" after privatization
+
+
+//  T() {0==-1}
+
+void getimage(char *filename)
+{
+
+//  T() {0==-1}
+
+   // BEGIN BLOCK
+   extern complex imagein[64][64], imageout[256][256];
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
+   unsigned char c;
+   FILE *fp;
+
+//  T(i,j) {0<=i}
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  T(j) {0<=i, i<=63, 0<=j}
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         // BEGIN BLOCK
+      PRIVATE i,j
+         PRIVATE j
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 0.0;
+
+//  T() {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_im[i][j] = 0.0;
+         // END BLOCK
+      }
+
+//  T(i,j) {192i==j-64, i#init==64, j#init==64, 0<=i}
+
+
+   for(i = 0; i <= 255; i += 1)
+
+//  T(j) {j#init==64, 0<=i, i<=255, 0<=j}
+
+      for(j = 0; j <= 255; j += 1) {
+
+//  T() {0<=i, i<=255, 0<=j, j<=255}
+
+         // BEGIN BLOCK
+      PRIVATE i,j
+         PRIVATE j
+
+//  T() {0<=i, i<=255, 0<=j, j<=255}
+
+         imageout_re[i][j] = 0.0;
+
+//  T() {0<=i, i<=255, 0<=j, j<=255}
+
+         imageout_im[i][j] = 0.0;
+         // END BLOCK
+      }
+
+//  T() {0==-1}
+
+
+   fp = fopen(filename, "r");
+
+//  T() {0==-1}
+
+   fclose(fp);
+   // END BLOCK
+}
+
+Preconditions for "getimage" after privatization
+
+
+//  P() {}
+
+void getimage(char *filename)
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+   extern complex imagein[64][64], imageout[256][256];
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
+   unsigned char c;
+   FILE *fp;
+
+//  P() {}
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  P(i,j) {0<=i, i<=63}
+
+      for(j = 0; j <= 63; j += 1) {
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         // BEGIN BLOCK
+      PRIVATE i,j
+         PRIVATE j
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_re[i][j] = 0.0;
+
+//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+
+         imagein_im[i][j] = 0.0;
+         // END BLOCK
+      }
+
+//  P(i,j) {i==64, j==64}
+
+
+   for(i = 0; i <= 255; i += 1)
+
+//  P(i,j) {192i==j-64, 0<=i, i<=255}
+
+      for(j = 0; j <= 255; j += 1) {
+
+//  P(i,j) {i==0, 0<=j, j<=255}
+
+         // BEGIN BLOCK
+      PRIVATE i,j
+         PRIVATE j
+
+//  P(i,j) {i==0, 0<=j, j<=255}
+
+         imageout_re[i][j] = 0.0;
+
+//  P(i,j) {i==0, 0<=j, j<=255}
+
+         imageout_im[i][j] = 0.0;
+         // END BLOCK
+      }
+
+//  P() {0==-1}
+
+
+   fp = fopen(filename, "r");
+
+//  P() {0==-1}
+
+   fclose(fp);
+   // END BLOCK
+}
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+void getimage(char *filename)
+{
+   extern complex imagein[64][64], imageout[256][256];
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
+   unsigned char c;
+   FILE *fp;
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1) {
+         imagein_re[i][j] = 0.0;
+         imagein_im[i][j] = 0.0;
+      }
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 255; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 255; j += 1) {
+         imageout_re[i][j] = 0.0;
+         imageout_im[i][j] = 0.0;
+      }
+
+   fp = fopen(filename, "r");
+   fclose(fp);
+}
+Regenerate the sources from the PIPS transformed code:

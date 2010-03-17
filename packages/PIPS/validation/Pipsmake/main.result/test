@@ -1,0 +1,19 @@
+"%MAIN before parsing"
+      PROGRAM MONMAIN
+      PRINT *, 'monmain'                                                0002
+      CALL HELLO                                                        0003
+      END
+"%ALL"
+      SUBROUTINE HELLO
+      PRINT *, 'hello'                                                  0002
+      END
+      PROGRAM MONMAIN
+      PRINT *, 'monmain'                                                0002
+      CALL HELLO                                                        0003
+      END
+"%MAIN after parsing"
+      PROGRAM MONMAIN
+      PRINT *, 'monmain'                                                0002
+      CALL HELLO                                                        0003
+      END
+

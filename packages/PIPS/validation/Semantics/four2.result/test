@@ -1,0 +1,631 @@
+
+C  T() {}
+
+C     Modified version of four1.f to study behaviors of unstructured
+
+*****|******************************************************************|
+      SUBROUTINE FOUR2(DATA,N,IX)
+*****|******************************************************************|
+*     Replaces DATA by its discrete Fourier transform
+*     IX      : >0 Fourier Analysis
+*               <0 Fourier Synthesis
+*     DATA    : Complex array of length N.
+*               N must be an integer power of 2 (non verifie)
+*-----------------------------------------------------------------------|
+      INTEGER  N,IX
+      REAL DATA(2*N)
+*
+      INTEGER  I,J,IXX,NN,M,MMAX,ISTEP
+      REAL     TEMPI,TEMPR
+      DOUBLE PRECISION WR,WI,WPR,WPI,WTEMP,THETA
+
+C  T(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN, 2N<=MMAX}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(IXX) {}
+
+C (0,2)
+*-----------------------------------------------------------------------|
+      IXX = ISIGN(1, IX)                                                0019
+
+C  T(NN) {2N==NN}
+
+C (0,3)
+      NN = 2*N                                                          0020
+
+C  T(J) {J==1}
+
+C (0,4)
+*
+*     Bit reversal
+*     ------------
+      J = 1                                                             0024
+
+C  T(I,J,M) {1<=I}
+
+C (0,5)
+      DO 11 I = 1, NN, 2                                                0025
+
+C  T(J,M) {J<=J#init+M, J#init+3M<=J+NN, 3J+2NN<=3J#init+7M+2}
+
+C (0,6)
+C        BEGIN BLOCK
+
+C  T() {}
+
+C (0,7)
+         IF (J.GT.I) THEN                                               0026
+
+C  T() {}
+
+C (0,8)
+C           BEGIN BLOCK
+
+C  T() {}
+
+C (0,9)
+            TEMPR = DATA(J)                                             0027
+
+C  T() {}
+
+C (0,10)
+            TEMPI = DATA(J+1)                                           0028
+
+C  T() {}
+
+C (0,11)
+            DATA(J) = DATA(I)                                           0029
+
+C  T() {}
+
+C (0,12)
+            DATA(J+1) = DATA(I+1)                                       0030
+
+C  T() {}
+
+C (0,13)
+            DATA(I) = TEMPR                                             0031
+
+C  T() {}
+
+C (0,14)
+            DATA(I+1) = TEMPI                                           0032
+C           END BLOCK
+         ELSE
+
+C  T() {}
+
+C (0,15)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  T(M) {NN<=2M+1, 2M<=NN}
+
+C (0,16)
+         M = NN/2                                                       0034
+
+C  T(J,M) {J#init+2M<=J+2M#init, 3J+4M#init<=3J#init+4M}
+
+C (0,17)
+C        BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+1        IF (M.GE.2.AND.J.GT.M) THEN                                    0035
+         ELSE
+            GOTO 99999
+         ENDIF
+
+C  T(J,M) {J+M#init==J#init, M#init<=2M+1, 2M<=M#init}
+
+C (2,1)
+C        BEGIN BLOCK
+
+C  T(J) {J+M==J#init}
+
+C (2,2)
+         J = J-M                                                        0036
+
+C  T(M) {M#init<=2M+1, 2M<=M#init}
+
+C (2,3)
+         M = M/2                                                        0037
+C        END BLOCK
+         GOTO 1
+99999    CONTINUE
+C        END UNSTRUCTURED
+
+C  T(J) {J#init+M==J}
+
+C (0,18)
+         J = J+M                                                        0040
+
+C  T() {}
+
+C (0,19)
+11       CONTINUE                                                       0041
+C        END BLOCK
+
+C  T(MMAX) {MMAX==2}
+
+C (0,20)
+*
+*     Danielson-Lanczos algorithm
+*     ---------------------------
+      MMAX = 2                                                          0045
+
+C  T(I,ISTEP,J,M,MMAX) {NN<=MMAX}
+
+C (0,21)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (4,1)
+2     IF (NN.GT.MMAX) THEN                                              0046
+      ELSE
+         RETURN
+      ENDIF
+
+C  T(I,ISTEP,J,M,MMAX) {ISTEP==2MMAX#init, MMAX==2MMAX#init, 1<=M,
+C    MMAX#init+1<=M}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  T(ISTEP) {ISTEP==2MMAX}
+
+C (5,2)
+c         IF (NN.GT.MMAX.AND.MMAX.GE.2) THEN
+      ISTEP = 2*MMAX                                                    0048
+
+C  T() {}
+
+C (5,3)
+      THETA = 6.28318530717959D0/(IXX*MMAX)                             0049
+
+C  T() {}
+
+C (5,4)
+      WPR = -2.D0*DSIN(0.5D0*THETA)**2                                  0050
+
+C  T() {}
+
+C (5,5)
+      WPI = DSIN(THETA)                                                 0051
+
+C  T() {}
+
+C (5,6)
+      WR = 1.D0                                                         0052
+
+C  T() {}
+
+C (5,7)
+      WI = 0.D0                                                         0053
+
+C  T(I,J,M) {1<=M}
+
+C (5,8)
+      DO 13 M = 1, MMAX, 2                                              0054
+
+C  T(I,J) {}
+
+C (5,9)
+C        BEGIN BLOCK
+
+C  T(I,J) {}
+
+C (5,10)
+         DO 12 I = M, NN, ISTEP                                         0055
+
+C  T(J) {I+MMAX==J}
+
+C (5,11)
+C           BEGIN BLOCK
+
+C  T(J) {I+MMAX==J}
+
+C (5,12)
+            J = I+MMAX                                                  0056
+
+C  T() {}
+
+C (5,13)
+            TEMPR = SNGL(WR)*DATA(J)-SNGL(WI)*DATA(J+1)                 0057
+
+C  T() {}
+
+C (5,14)
+            TEMPI = SNGL(WR)*DATA(J+1)+SNGL(WI)*DATA(J)                 0058
+
+C  T() {}
+
+C (5,15)
+            DATA(J) = DATA(I)-TEMPR                                     0059
+
+C  T() {}
+
+C (5,16)
+            DATA(J+1) = DATA(I+1)-TEMPI                                 0060
+
+C  T() {}
+
+C (5,17)
+            DATA(I) = DATA(I)+TEMPR                                     0061
+
+C  T() {}
+
+C (5,18)
+            DATA(I+1) = DATA(I+1)+TEMPI                                 0062
+
+C  T() {}
+
+C (5,19)
+12          CONTINUE                                                    0063
+C           END BLOCK
+
+C  T() {}
+
+C (5,20)
+         WTEMP = WR                                                     0064
+
+C  T() {}
+
+C (5,21)
+         WR = WR*WPR-WI*WPI+WR                                          0065
+
+C  T() {}
+
+C (5,22)
+         WI = WI*WPR+WTEMP*WPI+WI                                       0066
+
+C  T() {}
+
+C (5,23)
+13       CONTINUE                                                       0067
+C        END BLOCK
+
+C  T(MMAX) {ISTEP==MMAX}
+
+C (5,24)
+      MMAX = ISTEP                                                      0068
+c        endif
+C     END BLOCK
+      GOTO 2
+
+C  T() {}
+
+C (6,1)
+*
+      RETURN
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+
+C  P() {}
+
+C     Modified version of four1.f to study behaviors of unstructured
+
+*****|******************************************************************|
+      SUBROUTINE FOUR2(DATA,N,IX)
+*****|******************************************************************|
+*     Replaces DATA by its discrete Fourier transform
+*     IX      : >0 Fourier Analysis
+*               <0 Fourier Synthesis
+*     DATA    : Complex array of length N.
+*               N must be an integer power of 2 (non verifie)
+*-----------------------------------------------------------------------|
+      INTEGER  N,IX
+      REAL DATA(2*N)
+*
+      INTEGER  I,J,IXX,NN,M,MMAX,ISTEP
+      REAL     TEMPI,TEMPR
+      DOUBLE PRECISION WR,WI,WPR,WPI,WTEMP,THETA
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+*-----------------------------------------------------------------------|
+      IXX = ISIGN(1, IX)                                                0019
+
+C  P(IXX) {}
+
+C (0,3)
+      NN = 2*N                                                          0020
+
+C  P(IXX,NN) {2N==NN}
+
+C (0,4)
+*
+*     Bit reversal
+*     ------------
+      J = 1                                                             0024
+
+C  P(IXX,J,NN) {J==1, 2N==NN}
+
+C (0,5)
+      DO 11 I = 1, NN, 2                                                0025
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N}
+
+C (0,6)
+C        BEGIN BLOCK
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N}
+
+C (0,7)
+         IF (J.GT.I) THEN                                               0026
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+C (0,8)
+C           BEGIN BLOCK
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+C (0,9)
+            TEMPR = DATA(J)                                             0027
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+C (0,10)
+            TEMPI = DATA(J+1)                                           0028
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+C (0,11)
+            DATA(J) = DATA(I)                                           0029
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+C (0,12)
+            DATA(J+1) = DATA(I+1)                                       0030
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+C (0,13)
+            DATA(I) = TEMPR                                             0031
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I+1<=J, I<=2N}
+
+C (0,14)
+            DATA(I+1) = TEMPI                                           0032
+C           END BLOCK
+         ELSE
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, J<=I, I<=2N}
+
+C (0,15)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N}
+
+C (0,16)
+         M = NN/2                                                       0034
+
+C  P(I,IXX,J,M,NN) {M==N, 2M==NN, 1<=I, I<=2M}
+
+C (0,17)
+C        BEGIN UNSTRUCTURED
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=M, M<=N}
+
+C (1,1)
+1        IF (M.GE.2.AND.J.GT.M) THEN                                    0035
+         ELSE
+            GOTO 99999
+         ENDIF
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, M+1<=J, 2<=M, M<=N}
+
+C (2,1)
+C        BEGIN BLOCK
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, M+1<=J, 2<=M, M<=N}
+
+C (2,2)
+         J = J-M                                                        0036
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=J, 2<=M, M<=N}
+
+C (2,3)
+         M = M/2                                                        0037
+C        END BLOCK
+         GOTO 1
+99999    CONTINUE
+C        END UNSTRUCTURED
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=M, M<=N}
+
+C (0,18)
+         J = J+M                                                        0040
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, I<=2N, 1<=M, M<=N}
+
+C (0,19)
+11       CONTINUE                                                       0041
+C        END BLOCK
+
+C  P(I,IXX,J,M,NN) {2N==NN, 1<=I, 2N+1<=I}
+
+C (0,20)
+*
+*     Danielson-Lanczos algorithm
+*     ---------------------------
+      MMAX = 2                                                          0045
+
+C  P(I,IXX,J,M,MMAX,NN) {MMAX==2, 2N==NN, 1<=I, 2N+1<=I}
+
+C (0,21)
+C     BEGIN UNSTRUCTURED
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN}
+
+C (4,1)
+2     IF (NN.GT.MMAX) THEN                                              0046
+      ELSE
+         RETURN
+      ENDIF
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN, MMAX+1<=2N}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN, MMAX+1<=2N}
+
+C (5,2)
+c         IF (NN.GT.MMAX.AND.MMAX.GE.2) THEN
+      ISTEP = 2*MMAX                                                    0048
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, MMAX+1<=2N}
+
+C (5,3)
+      THETA = 6.28318530717959D0/(IXX*MMAX)                             0049
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, MMAX+1<=2N}
+
+C (5,4)
+      WPR = -2.D0*DSIN(0.5D0*THETA)**2                                  0050
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, MMAX+1<=2N}
+
+C (5,5)
+      WPI = DSIN(THETA)                                                 0051
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, MMAX+1<=2N}
+
+C (5,6)
+      WR = 1.D0                                                         0052
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, MMAX+1<=2N}
+
+C (5,7)
+      WI = 0.D0                                                         0053
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, MMAX+1<=2N}
+
+C (5,8)
+      DO 13 M = 1, MMAX, 2                                              0054
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 1<=M, M<=MMAX,
+C    MMAX+1<=2N}
+
+C (5,9)
+C        BEGIN BLOCK
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 1<=M, M<=MMAX,
+C    MMAX+1<=2N}
+
+C (5,10)
+         DO 12 I = M, NN, ISTEP                                         0055
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, M<=I, I<=2N,
+C    1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,11)
+C           BEGIN BLOCK
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, M<=I, I<=2N,
+C    1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,12)
+            J = I+MMAX                                                  0056
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,13)
+            TEMPR = SNGL(WR)*DATA(J)-SNGL(WI)*DATA(J+1)                 0057
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,14)
+            TEMPI = SNGL(WR)*DATA(J+1)+SNGL(WI)*DATA(J)                 0058
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,15)
+            DATA(J) = DATA(I)-TEMPR                                     0059
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,16)
+            DATA(J+1) = DATA(I+1)-TEMPI                                 0060
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,17)
+            DATA(I) = DATA(I)+TEMPR                                     0061
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,18)
+            DATA(I+1) = DATA(I+1)+TEMPI                                 0062
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C    I<=2N, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,19)
+12          CONTINUE                                                    0063
+C           END BLOCK
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,20)
+         WTEMP = WR                                                     0064
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,21)
+         WR = WR*WPR-WI*WPI+WR                                          0065
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,22)
+         WI = WI*WPR+WTEMP*WPI+WI                                       0066
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, MMAX+1<=2N}
+
+C (5,23)
+13       CONTINUE                                                       0067
+C        END BLOCK
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP==2MMAX, 2N==NN, 1<=M, MMAX+1<=M,
+C    MMAX+1<=2N}
+
+C (5,24)
+      MMAX = ISTEP                                                      0068
+c        endif
+C     END BLOCK
+      GOTO 2
+
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2N==NN, 2N<=MMAX}
+
+C (6,1)
+*
+      RETURN
+C     END UNSTRUCTURED
+C     END BLOCK
+      END

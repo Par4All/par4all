@@ -1,0 +1,9 @@
+delete altret05
+create altret05 altret05.f
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+display PRINTED_FILE(ALTRET05)
+display PRINTED_FILE(FOO)
+close
+delete altret05
+quit

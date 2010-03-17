@@ -1,0 +1,7 @@
+delete scalar03
+create scalar03 scalar03.f
+activate PRINT_CODE_OUT_EFFECTS
+display PRINTED_FILE[%ALL]
+close
+delete scalar03
+quit

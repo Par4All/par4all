@@ -1,0 +1,12 @@
+C               <must be imported>: __IO_EFFECTS:LUNS(5)
+C     Bug with IN regions, there is no IN region for NDIM
+
+      PROGRAM IOEFFECT
+
+      COMMON/PAR1/NDIM,LSIZE(4)
+C               <must be imported>: __IO_EFFECTS:LUNS(5)
+
+      READ (5, *) NDIM, (LSIZE(N), N = 1, NDIM)                         0007
+
+      END
+

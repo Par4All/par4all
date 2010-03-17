@@ -1,0 +1,25 @@
+
+C  T() {}
+
+      PROGRAM TYPE14
+      REAL A, B
+
+C  T(I) {I<=16, I<=I#init}
+
+
+c      read *, a, b, i
+
+      I = MIN(I, 16)                                                    0006
+
+C  T(A) {1.+A#init<=A, 4.<=A, 5.<=A}
+
+
+      A = AMAX1(A+1., 4., 5.)                                           0008
+
+C  T() {}
+
+
+      PRINT *, I, A                                                     0010
+
+      END
+

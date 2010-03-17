@@ -1,0 +1,22 @@
+delete for_to_while06
+create for_to_while06 for_to_while06.c
+module main
+echo Select some options to deal with the C Language:
+echo Parse as C:
+activate C_PARSER
+echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+echo Do not display original number lines as comment:
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
+
+module main
+display PRINTED_FILE[main]
+
+close
+#delete for_to_while06
+quit
+

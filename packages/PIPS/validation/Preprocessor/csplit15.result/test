@@ -1,0 +1,12 @@
+/* Make sure that the signature is parseable */
+
+extern int main();
+# 3
+int main(argc,argv)
+int argc;
+char *argv[];
+{
+  int k;
+
+  k = 1;
+}

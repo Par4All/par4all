@@ -1,0 +1,21 @@
+
+C  P() {TRAP:ENTRY==0}
+
+      PROGRAM MOUSE2
+
+C  P() {TRAP:ENTRY==0}
+
+      MODE = 0                                                          0002
+
+C  P(MODE) {MODE==0, TRAP:ENTRY==0}
+
+      CALL TRAP(MODE)                                                   0003
+
+C  P(MODE,TRAP:ENTRY) {MODE==0, TRAP:ENTRY#init==0, 1<=TRAP:ENTRY}
+
+      MODE = 1                                                          0004
+
+C  P(MODE,TRAP:ENTRY) {MODE==1, TRAP:ENTRY#init==0, 1<=TRAP:ENTRY}
+
+      CALL TRAP(MODE)                                                   0005
+      END

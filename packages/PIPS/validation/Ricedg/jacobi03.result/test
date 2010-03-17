@@ -1,0 +1,53 @@
+Select some options to deal with the C Language:
+Parse as C:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Prettyprint the source as C, of course
+Select the most precise analysis:
+void compute()
+{
+   int i, j;                                                            /*0076*/
+
+   for (i = 1;i<64-1;i++)                                               /*0078*/
+      for (j = 1;j<64-1;j++)                                            /*0079*/
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0081*/
+   for (i = 1;i<64-1;i++)                                               /*0083*/
+      for (j = 1;j<64-1;j++)                                            /*0084*/
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0086*/
+}
+void compute()
+{
+   int i, j;                                                            /*0076*/
+
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0081*/
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0086*/
+}
+
+ **************** Effective Dependence Graph ****************
+
+
+****************** End of Dependence Graph ******************
+void compute()
+{
+   int i, j;                                                            /*0076*/
+
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 62; i += 1)
+#pragma omp parallel for 
+      for(j = 1; j <= 62; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0081*/
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 62; i += 1)
+#pragma omp parallel for 
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0086*/
+}

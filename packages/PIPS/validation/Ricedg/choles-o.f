@@ -1,0 +1,44 @@
+C***********************************************************************
+      SUBROUTINE CHOLES(A,N,RL,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSEE DE CHOLESKI L*D*LT DE LA MATRICE A
+C  L ETANT STOCKEE PLEINE COMME A, LA DIAGONALE DE L ETANT EGALE A 1/D .
+C  LES MATRICES A ET RL PEUVENT ETRE CONFONDUES .
+      COMMON/TOTO/Z1(640),Z2(640),D(640)
+      DIMENSION A(N,N),RL(N,N),Z(N)
+C  CALCUL DE LA PREMIERE COLONNE DE RL .
+      Z1(1)=A(1,1)
+      D(1)=1./Z1(1)
+      DO 1 J=2,N
+1     RL(J,1)=A(J,1)*D(1)
+C  CALCUL DES COLONNES 2 A N DE RL .
+      DO 2 I=2,N
+C  CALCUL DU TERME DIAGONAL .
+      Z1(I)=A(I,I)
+        DO 5 K=1,I-1
+ 5      Z2(K)=RL(I,K)*Z1(K)
+        DO 3 K=1,I-1
+ 3      Z1(I)=Z1(I)-RL(I,K)*Z2(K)
+      D(I)=1./Z1(I)
+C  CALCUL DE LA COLONNE .
+        DO 4 J=I+1,N
+ 4      Z2(J)=A(J,I)
+        DO 6 K=1,I-1
+CDIR$ IVDEP
+          DO 7 J=I+1,N
+  7       Z2(J)=Z2(J)-RL(J,K)*Z2(K)
+ 6      CONTINUE
+        DO 8 J=I+1,N
+ 8      RL(J,I)=Z2(J)*D(I)
+2     CONTINUE
+C  RANGEMENT DE L'INVERSE DE LA DIAGONALE .
+      DO 9 J=1,N
+9     RL(J*(N+1)-N,1)=D(J)
+C RANGEMENT PAR TRANSPOSITION DES TERMES TRIANGULAIRES SUPERIEURS DE L .
+      DO 10 K=2,N
+CDIR$ IVDEP
+        DO 11 J=1,K-1
+ 11     RL(J,K)=RL(K,J)
+10    CONTINUE
+      RETURN
+      END

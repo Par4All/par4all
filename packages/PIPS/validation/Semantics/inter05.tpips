@@ -1,0 +1,18 @@
+delete inter05
+create inter05 inter05.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+close
+# delete inter05
+delete inter05

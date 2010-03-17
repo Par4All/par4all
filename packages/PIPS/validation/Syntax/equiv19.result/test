@@ -1,0 +1,78 @@
+user warning in tp_parse: equiv19: No such workspace
+Registering file equiv19.f
+Splitting file    ./equiv19.f
+  Module         EQUIV19
+Workspace equiv19 created and opened.
+Module EQUIV19 selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV19 already active.
+Request: build resource PRINTED_FILE for module EQUIV19.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV19)
+  PARSER                         building   PARSED_CODE(EQUIV19)
+                                 building   CALLEES(EQUIV19)
+
+Declarations for module EQUIV19 with type INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV19:*DYNAMIC*	with type area with size 0
+Declared entity EQUIV19:*HEAP*	with type area with size 0
+Declared entity EQUIV19:*STACK*	with type area with size 0
+Declared entity EQUIV19:*STATIC*	with type area with size 4
+Declared entity EQUIV19:K	with type variable INTEGER*4
+Declared entity EQUIV19:M	with type variable INTEGER*4
+Declared entity EQUIV19:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable EQUIV19:N,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 4:
+	Variable EQUIV19:K,	offset = 0,	size = 4
+	Variable EQUIV19:M,	offset = 0,	size = 4
+
+End of declarations for module EQUIV19
+
+  CONTROLIZER                    building   CODE(EQUIV19)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV19)
+PRINTED_FILE made for EQUIV19.
+      SUBROUTINE EQUIV19(N)
+
+C     Goal: check that an equivalence between static variables
+C     is properly handled.
+
+      DATA K /3/
+      SAVE M
+      EQUIVALENCE (M,K)
+
+      PRINT *, N                                                        0010
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV19.
+Closing program.
+Closing workspace.
+Workspace equiv19 closed.
+
+Workspace equiv19 deleted.

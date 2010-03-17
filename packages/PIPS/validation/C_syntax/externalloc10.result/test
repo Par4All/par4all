@@ -1,0 +1,84 @@
+bar!
+
+Declarations for module "bar!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
+	Declared entity "bar!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "bar!:*HEAP*" with type "area" with size 0
+	Declared entity "bar!:*STACK*" with type "area" with size 0
+	Declared entity "bar!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:i"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:i"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "bar!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module bar!
+
+foo!
+
+Declarations for module "foo!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
+	Declared entity "foo!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "foo!:*HEAP*" with type "area" with size 0
+	Declared entity "foo!:*STACK*" with type "area" with size 0
+	Declared entity "foo!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:i"	offset = 0	size = 4
+
+
+Layout for memory area "foo!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module foo!
+
+//Checks the memory allocation offset for extern variables in 2 files
+//bar.c: global extern variable declaration
+extern int i;
+//foo.c global variable declaration
+int i = 2;

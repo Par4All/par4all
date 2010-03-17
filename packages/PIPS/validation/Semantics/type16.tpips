@@ -1,0 +1,21 @@
+delete type16
+create type16 type16.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE
+# apply PARTIAL_EVAL[%ALL]
+apply SUPPRESS_DEAD_CODE[TYPE16]
+
+display PRINTED_FILE[%ALL]
+
+close
+# delete type16
+delete type16

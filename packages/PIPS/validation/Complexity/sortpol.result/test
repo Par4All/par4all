@@ -1,0 +1,153 @@
+C     3*L^3 + 3*L^2.M + 3*L^2.N + 3*L.M^2 + 3*L.M.N + 3*L.N^2 + 3*M^3 + 3*M^2.N + 3*M.N^2 + 3*N^3 + 3*L^2 + 3/2*L.M + 4.50*L.N + 3/2*M^2 + 3/2*M.N + 3*N^2 + 10.50*L + 4.50*M + 4.50*N + 17 (SUMMARY)
+      SUBROUTINE SORTPOL(L,M,N)
+
+c     Check that polynomes and monomes are printed in an
+c     orderly fashion
+
+      REAL T(100), U(100,100,100)
+C                                            3/2*L + 3/2*M + 3/2*N + 5 (TEST)
+
+c     check for linear complexity, expected: l + m + n + ...
+      IF (N.GT.M) THEN                                                  0009
+C                                                              3*L + 2 (DO)
+         DO I = 1, L                                                    0010
+C                                                                    3 (STMT)
+            T(I) = 0.                                                   0011
+         ENDDO
+C                                                              3*N + 2 (DO)
+         DO K = 1, N                                                    0013
+C                                                                    3 (STMT)
+            T(K) = 0.                                                   0014
+         ENDDO
+C                                                              3*M + 2 (DO)
+         DO J = 1, M                                                    0016
+C                                                                    3 (STMT)
+            T(J) = 0.                                                   0017
+         ENDDO
+      ENDIF
+C     3*L^3 + 3*L^2.M + 3*L^2.N + 3*L.M^2 + 3*L.M.N + 3*L.N^2 + 3*M^3 + 3*M^2.N + 3*M.N^2 + 3*N^3 + 3*L^2 + 3/2*L.M + 4.50*L.N + 3/2*M^2 + 3/2*M.N + 3*N^2 + 9*L + 3*M + 3*N + 12 (TEST)
+
+c     check for global correctness for all thrid degree terms, expected:
+c     l^3 + l^2*m + l^2*n +
+      IF (N.GT.M) THEN                                                  0023
+C                                            6*L.M.N + 3*L.N + 3*L + 2 (DO)
+c     check for monome sort, expected: l*m*n
+         DO I = 1, L                                                    0025
+C                                                      6*M.N + 3*N + 3 (DO)
+            DO K = 1, N                                                 0026
+C                                                              6*M + 3 (DO)
+               DO J = 1, M                                              0027
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0028
+               ENDDO
+            ENDDO
+         ENDDO
+C                                              6*L^3 + 3*L^2 + 3*L + 2 (DO)
+c     three power of 3
+         DO I = 1, L                                                    0033
+C                                                      6*L^2 + 3*L + 3 (DO)
+            DO K = 1, L                                                 0034
+C                                                              6*L + 3 (DO)
+               DO J = 1, L                                              0035
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0036
+               ENDDO
+            ENDDO
+         ENDDO
+C                                              6*N^3 + 3*N^2 + 3*N + 2 (DO)
+         DO I = 1, N                                                    0040
+C                                                      6*N^2 + 3*N + 3 (DO)
+            DO K = 1, N                                                 0041
+C                                                              6*N + 3 (DO)
+               DO J = 1, N                                              0042
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0043
+               ENDDO
+            ENDDO
+         ENDDO
+C                                              6*M^3 + 3*M^2 + 3*M + 2 (DO)
+         DO I = 1, M                                                    0047
+C                                                      6*M^2 + 3*M + 3 (DO)
+            DO K = 1, M                                                 0048
+C                                                              6*M + 3 (DO)
+               DO J = 1, M                                              0049
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0050
+               ENDDO
+            ENDDO
+         ENDDO
+C                                            6*L^2.M + 3*L^2 + 3*L + 2 (DO)
+
+c     six third degree terms with one power of 2
+
+         DO I = 1, L                                                    0057
+C                                                      6*L.M + 3*L + 3 (DO)
+            DO K = 1, L                                                 0058
+C                                                              6*M + 3 (DO)
+               DO J = 1, M                                              0059
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0060
+               ENDDO
+            ENDDO
+         ENDDO
+C                                            6*L^2.N + 3*L.N + 3*L + 2 (DO)
+         DO I = 1, L                                                    0064
+C                                                      6*L.N + 3*N + 3 (DO)
+            DO K = 1, N                                                 0065
+C                                                              6*L + 3 (DO)
+               DO J = 1, L                                              0066
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0067
+               ENDDO
+            ENDDO
+         ENDDO
+C                                            6*M.N^2 + 3*N^2 + 3*N + 2 (DO)
+
+         DO I = 1, N                                                    0072
+C                                                      6*M.N + 3*N + 3 (DO)
+            DO K = 1, N                                                 0073
+C                                                              6*M + 3 (DO)
+               DO J = 1, M                                              0074
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0075
+               ENDDO
+            ENDDO
+         ENDDO
+C                                            6*L.N^2 + 3*L.N + 3*L + 2 (DO)
+         DO I = 1, L                                                    0079
+C                                                      6*N^2 + 3*N + 3 (DO)
+            DO K = 1, N                                                 0080
+C                                                              6*N + 3 (DO)
+               DO J = 1, N                                              0081
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0082
+               ENDDO
+            ENDDO
+         ENDDO
+C                                            6*M^2.N + 3*M.N + 3*M + 2 (DO)
+
+         DO I = 1, M                                                    0087
+C                                                      6*M.N + 3*N + 3 (DO)
+            DO K = 1, N                                                 0088
+C                                                              6*M + 3 (DO)
+               DO J = 1, M                                              0089
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0090
+               ENDDO
+            ENDDO
+         ENDDO
+C                                            6*L.M^2 + 3*L.M + 3*L + 2 (DO)
+         DO I = 1, L                                                    0094
+C                                                      6*M^2 + 3*M + 3 (DO)
+            DO K = 1, M                                                 0095
+C                                                              6*M + 3 (DO)
+               DO J = 1, M                                              0096
+C                                                                    6 (STMT)
+                  U(I,J,K) = 0.                                         0097
+               ENDDO
+            ENDDO
+         ENDDO
+
+      ENDIF
+
+      END

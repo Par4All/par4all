@@ -1,0 +1,14 @@
+C     the problem is to have coherent effects or regions at foo 
+C     and bar call sites for variable /env/ a.
+      PROGRAM ENV_REG
+C               <may be written >: BAR:A(*)
+
+C     regions and environment
+
+      CALL FOO                                                          0007
+C               <may be read    >: BAR:A(*)
+C               <may be written >: BAR:B(*)
+
+      CALL BAR                                                          0009
+
+      END

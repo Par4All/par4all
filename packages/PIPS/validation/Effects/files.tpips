@@ -1,0 +1,9 @@
+delete files
+create files files.f
+module FILES
+activate PRINT_CODE_PROPER_EFFECTS 
+display PRINTED_FILE 
+display PARALLELPRINTED_FILE
+close
+delete files
+quit

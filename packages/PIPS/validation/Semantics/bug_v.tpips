@@ -1,0 +1,27 @@
+# Check that variables with same name but in different modules
+# are called differently
+
+delete bug_v
+create bug_v bug_v.f
+module BUG_V
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+echo Transformers:
+echo -------------
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions:
+echo --------------
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete bug_v
+quit

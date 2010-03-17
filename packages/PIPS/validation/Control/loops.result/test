@@ -1,0 +1,9 @@
+	PROGRAM BAR
+        REAL T(100,10)
+      X = 2                                                             0003
+      DOALL I = 1, 10                                                   0004
+         DOALL J = 1, 10, 2                                             0005
+            T(I,J) = T(I,J)+1                                           0006
+         ENDDO
+      ENDDO
+      END

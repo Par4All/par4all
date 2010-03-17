@@ -1,0 +1,67 @@
+
+Initial code
+
+      SUBROUTINE HYPER01(X, N, M)
+
+      REAL X(N, M)
+
+      DO 100 I = 1, N                                                   0005
+         DO 200 J = 1, M                                                0006
+            X(I,J) = FLOAT(I+J)                                         0007
+200         CONTINUE                                                    0008
+100      CONTINUE                                                       0009
+
+      PRINT *, X                                                        0011
+
+      END
+
+After hyperplanning (1, 1)
+
+      SUBROUTINE HYPER01(X, N, M)
+
+      REAL X(N, M)
+
+      DO Ip = 2, M+N                                                    0005
+         DO Jp = MAX(1-Ip, -N), MIN(-Ip+M, -1)                          0006
+            X(-Jp,Ip+Jp) = FLOAT(Ip)                                    0007
+200         CONTINUE                                                    0008
+         ENDDO
+      ENDDO
+
+      PRINT *, X                                                        0011
+
+      END
+
+After hyperplanning (1, 0)
+
+      SUBROUTINE HYPER01(X, N, M)
+
+      REAL X(N, M)
+
+      DO Ip = 1, N                                                      0005
+         DO Jp = 1, M                                                   0006
+            X(Ip,Jp) = FLOAT(Ip+Jp)                                     0007
+200         CONTINUE                                                    0008
+         ENDDO
+      ENDDO
+
+      PRINT *, X                                                        0011
+
+      END
+
+After hyperplanning (0, 1)
+
+      SUBROUTINE HYPER01(X, N, M)
+
+      REAL X(N, M)
+
+      DO Ip = 1, M                                                      0005
+         DO Jp = 1, N                                                   0006
+            X(Jp,Ip) = FLOAT(Ip+Jp)                                     0007
+200         CONTINUE                                                    0008
+         ENDDO
+      ENDDO
+
+      PRINT *, X                                                        0011
+
+      END

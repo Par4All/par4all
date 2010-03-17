@@ -1,0 +1,26 @@
+delete dvicfgfilter2
+create dvicfgfilter2 dvicfgfilter2.f
+
+setproperty RW_FILTERED_EFFECTS 2
+setproperty EFFECTS_FILTER_ON_VARIABLE "MAIN:KMAX"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate PRINT_DVICFG_WITH_FILTERED_PROPER_EFFECTS
+#activate PRINT_ICFG_WITH_FILTERED_PROPER_EFFECTS
+
+#setproperty ICFG_DOs TRUE
+#setproperty ICFG_IFs TRUE
+#setproperty ICFG_DV TRUE
+
+display DVICFG_FILE
+#display ICFG_FILE
+
+close
+delete dvicfgfilter2
+quit
+
+
+
+
+
+

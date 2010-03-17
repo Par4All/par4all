@@ -1,0 +1,9 @@
+#
+# accept # char as a comment start
+#
+delete sc
+create sc sharpcomment.f
+display PRINTED_FILE
+close
+delete sc
+quit

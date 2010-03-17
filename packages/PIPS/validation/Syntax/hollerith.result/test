@@ -1,0 +1,71 @@
+      PROGRAM HOLLERITH
+     
+! this is not an hollerith;-) 
+      REAL*8 HOLLERITH
+
+      PRINT *, '"2hab"', '''"', "'2h  '"                                0006
+
+      PRINT *, ' 2 45 78 0'                                             0008
+      PRINT *, '1 3456789 '                                             0009
+      PRINT *, '12 45678  '                                             0010
+      PRINT *, '123 567   '                                             0011
+      PRINT *, '1234 6    '                                             0012
+      PRINT *, ' 2 45     '                                             0013
+      PRINT *, '1  4      '                                             0014
+      PRINT *, '  3       '                                             0015
+      PRINT *, ' 2        '                                             0016
+      PRINT *, '1         '                                             0017
+      PRINT *, '          '                                             0018
+
+      PRINT *, 'FAB', 'bien', '  '                                      0020
+
+      PRINT *, '''    abcde'                                            0022
+
+      PRINT *, '''1''2'' ''4''5'                                        0024
+
+      PRINT *, 'foo', 'a', ' ', 'x x'                                   0026
+
+      A2H = B                                                           0028
+
+      PRINT *, 'foo a la ligne ', 'oui'                                 0030
+
+
+      PRINT *, 'foo fin ', 'oui'                                        0033
+
+! comments
+      PRINT *, 'foo fin 2-', 'oui'                                      0037
+
+
+      PRINT *, 'foo fin 3-', 'oui'                                      0041
+
+
+      PRINT *, 'foo fin 4-', 'oui'                                      0045
+
+      PRINT *, 'FAB', "-", 'bien'                                       0049
+
+      PRINT *, 'abcdefghij          uvwxyz'                             0051
+
+      PRINT *, "2ha b", '  ', '2ha b', 'a b'                            0053
+
+      PRINT *, '0''''''''5''''''''0''''''''5''''''''0''''''''5''''''''0'
+     &'''''''5''''''''0''''''''5''''''''0'''''''                        0055
+
+! worst case dilatation
+      PRINT *, '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+     &''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+     &'''''                                                             0059
+
+      PRINT *, "padding", '          ', 'ten blanks!'                   0063
+
+! bang comments...
+
+! mais la oui !
+      PRINT *, '! pas un commentaire !'                                 0069
+
+! hop !
+      PRINT *, "! et avec ca aussi !"                                   0072
+
+! c est tout !
+      PRINT *, '!123456789'                                             0075
+
+      END

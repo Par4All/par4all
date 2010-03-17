@@ -1,0 +1,17 @@
+delete formals
+create formals Tests/formals.f 
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty GATHER_FORMATS_AT_BEGINNING TRUE
+module EXTEND
+display PRINTED_FILE
+module FPTRAK
+display PRINTED_FILE
+module EXTINT
+display PRINTED_FILE
+activate PRINT_CODE_PROPER_EFFECTS 
+display PRINTED_FILE[EXTEND]
+display PRINTED_FILE[FPTRAK]
+close
+quit
+

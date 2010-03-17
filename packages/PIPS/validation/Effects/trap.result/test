@@ -1,0 +1,64 @@
+
+Proper effects for "TRAP"
+
+
+
+      SUBROUTINE TRAP(B, N)
+
+      INTEGER N, B(N), C
+
+      SAVE C
+
+      DATA C /0/
+C               <must be read   >: C
+C               <must be written>: C
+
+      C = C+1                                                           0011
+C               <must be read   >: C
+C               <must be written>: B(C)
+
+      B(C) = C                                                          0013
+
+      END
+
+Cumulated effects for "TRAP"
+
+C               <may be written >: B(*)
+C               <must be read   >: C N
+C               <must be written>: C
+
+
+      SUBROUTINE TRAP(B, N)
+
+      INTEGER N, B(N), C
+
+      SAVE C
+
+      DATA C /0/
+C               <must be read   >: C
+C               <must be written>: C
+
+      C = C+1                                                           0011
+C               <may be written >: B(*)
+C               <must be read   >: C
+
+      B(C) = C                                                          0013
+
+      END
+
+Proper effects for "PTRAP"
+
+      PROGRAM PTRAP
+
+      INTEGER A(10)
+C               <may be written >: A(*)
+C               <must be read   >: TRAP:C
+C               <must be written>: TRAP:C
+
+      CALL TRAP(A, 10)                                                  0005
+C               <may be written >: A(*)
+C               <must be read   >: TRAP:C
+C               <must be written>: TRAP:C
+      CALL TRAP(A, 10)                                                  0006
+
+      END

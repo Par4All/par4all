@@ -1,0 +1,13 @@
+# 2
+foo()
+{
+  i = 2;
+}
+int i;
+extern foo();
+
+extern main();
+# 7
+main()
+{
+}

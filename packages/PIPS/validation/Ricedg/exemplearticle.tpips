@@ -1,0 +1,10 @@
+delete exemplearticle 
+create exemplearticle exemplearticle.f
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete exemplearticle
+quit
+

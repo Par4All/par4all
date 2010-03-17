@@ -1,0 +1,24 @@
+delete ifthenelse06
+create ifthenelse06 ifthenelse06.f
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE
+
+echo
+echo PRINTED FILE
+echo
+
+display PRINTED_FILE
+
+echo
+echo RESTRUCTURED FILE
+echo
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+close
+delete ifthenelse06
+quit

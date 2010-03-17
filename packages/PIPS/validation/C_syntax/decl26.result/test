@@ -1,0 +1,7 @@
+
+Parsed printed file for "decl26!"
+
+union {
+   int buf;
+   struct {int empty:32-(7+9); int y:7; int x:9;} w;
+} adr;

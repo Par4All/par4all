@@ -1,0 +1,13 @@
+delete foo03
+create foo03 foo03.c
+activate C_PARSER
+# quit
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[main]
+
+close
+delete foo03
+quit

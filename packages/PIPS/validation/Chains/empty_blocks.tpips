@@ -1,0 +1,29 @@
+delete empty_blocks
+
+setproperty ABORT_ON_USER_ERROR FALSE
+
+create empty_blocks empty_blocks.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER TRUE
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+echo
+echo Source code after privatization
+echo
+
+apply PRIVATIZE_MODULE(%ALL)
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions after privatization
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+delete empty_blocks

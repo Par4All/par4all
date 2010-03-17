@@ -1,0 +1,269 @@
+
+Code:
+
+      PROGRAM UNSTRUC11
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+C     Check a scc which is path coverable but not a cycle
+
+      K = 0                                                             0005
+C (0,3)
+      I = 0                                                             0006
+C (0,4)
+      J = 0                                                             0007
+C (0,5)
+      L = 0                                                             0008
+C (0,6)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+
+100   CONTINUE                                                          0010
+C (2,1)
+      IF (X.GT.0.) GOTO 300                                             0011
+C (4,1)
+      L = L+4                                                           0012
+C (5,1)
+C     BEGIN BLOCK
+C (5,2)
+200   CONTINUE                                                          0013
+C (5,3)
+      K = K+3                                                           0014
+C (5,4)
+      I = I+1                                                           0015
+C     END BLOCK
+C (6,1)
+      IF (Y.GT.0.) GOTO 100                                             0016
+C (7,1)
+      J = J+2                                                           0017
+      GOTO 200
+C (3,1)
+
+300   CONTINUE                                                          0020
+C     END UNSTRUCTURED
+C (0,7)
+      PRINT *, I, J, K, L                                               0021
+C (0,8)
+
+      RETURN
+C     END BLOCK
+      END
+
+Transformers:
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC11
+
+C  T(I,J,K,L) {2J+L==4I, 3I==K, L<=4I, 0<=L}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(K) {K==0}
+
+C (0,2)
+
+C     Check a scc which is path coverable but not a cycle
+
+      K = 0                                                             0005
+
+C  T(I) {I==0}
+
+C (0,3)
+      I = 0                                                             0006
+
+C  T(J) {J==0}
+
+C (0,4)
+      J = 0                                                             0007
+
+C  T(L) {L==0}
+
+C (0,5)
+      L = 0                                                             0008
+
+C  T(I,J,K,L) {3I+K#init==3I#init+K,
+C    6J+4K#init+3L==6J#init+4K+3L#init, 4K#init+3L<=4K+3L#init,
+C    L#init<=L}
+
+C (0,6)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+
+100   CONTINUE                                                          0010
+
+C  T() {}
+
+C (2,1)
+      IF (X.GT.0.) GOTO 300                                             0011
+
+C  T(L) {L==L#init+4}
+
+C (4,1)
+      L = L+4                                                           0012
+
+C  T(I,K) {I==I#init+1, K==K#init+3}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  T() {}
+
+C (5,2)
+200   CONTINUE                                                          0013
+
+C  T(K) {K==K#init+3}
+
+C (5,3)
+      K = K+3                                                           0014
+
+C  T(I) {I==I#init+1}
+
+C (5,4)
+      I = I+1                                                           0015
+C     END BLOCK
+
+C  T() {}
+
+C (6,1)
+      IF (Y.GT.0.) GOTO 100                                             0016
+
+C  T(J) {J==J#init+2}
+
+C (7,1)
+      J = J+2                                                           0017
+      GOTO 200
+
+C  T() {}
+
+C (3,1)
+
+300   CONTINUE                                                          0020
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,7)
+      PRINT *, I, J, K, L                                               0021
+
+C  T() {}
+
+C (0,8)
+
+      RETURN
+C     END BLOCK
+      END
+
+Preconditions:
+
+
+C  P() {}
+
+      PROGRAM UNSTRUC11
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     Check a scc which is path coverable but not a cycle
+
+      K = 0                                                             0005
+
+C  P(K) {K==0}
+
+C (0,3)
+      I = 0                                                             0006
+
+C  P(I,K) {I==0, K==0}
+
+C (0,4)
+      J = 0                                                             0007
+
+C  P(I,J,K) {I==0, J==0, K==0}
+
+C (0,5)
+      L = 0                                                             0008
+
+C  P(I,J,K,L) {I==0, J==0, K==0, L==0}
+
+C (0,6)
+C     BEGIN UNSTRUCTURED
+
+C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+
+C (1,1)
+
+100   CONTINUE                                                          0010
+
+C  P(I,J,K,L) {2J+L==4I, 3I==K, J<=2I, 0<=J}
+
+C (2,1)
+      IF (X.GT.0.) GOTO 300                                             0011
+
+C  P(I,J,K,L) {2J+L==4I, 3I==K, J<=2I, 0<=J}
+
+C (4,1)
+      L = L+4                                                           0012
+
+C  P(I,J,K,L) {2J+L==4I+4, 3I==K, J<=2I, 0<=J}
+
+C (5,1)
+C     BEGIN BLOCK
+
+C  P(I,J,K,L) {2J+L==4I+4, 3I==K, J<=2I, 0<=J}
+
+C (5,2)
+200   CONTINUE                                                          0013
+
+C  P(I,J,K,L) {2J+L==4I+4, 3I==K, J<=2I, 0<=J}
+
+C (5,3)
+      K = K+3                                                           0014
+
+C  P(I,J,K,L) {2J+L==4I+4, 3I==K-3, J<=2I, 0<=J}
+
+C (5,4)
+      I = I+1                                                           0015
+C     END BLOCK
+
+C  P(I,J,K,L) {2J+L==4I, 3I==K, J+2<=2I, 0<=J}
+
+C (6,1)
+      IF (Y.GT.0.) GOTO 100                                             0016
+
+C  P(I,J,K,L) {2J+L==4I, 3I==K, J+2<=2I, 0<=J}
+
+C (7,1)
+      J = J+2                                                           0017
+      GOTO 200
+
+C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+
+C (3,1)
+
+300   CONTINUE                                                          0020
+C     END UNSTRUCTURED
+
+C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+
+C (0,7)
+      PRINT *, I, J, K, L                                               0021
+
+C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+
+C (0,8)
+
+      RETURN
+C     END BLOCK
+      END

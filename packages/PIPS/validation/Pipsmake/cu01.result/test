@@ -1,0 +1,23 @@
+
+Module cu01! before parsing
+
+/* See what happens with specific parsing for compilation units */
+
+extern int cu01(int i, int *pj, int k, int *pl);
+
+Module cu01 before parsing
+
+# 3
+int cu01(int i, int * pj, int k, int * pl)
+{
+  *pj = i;
+  *pl = k;
+}
+
+Module cu01 prettyprinted
+
+int cu01(int i, int *pj, int k, int *pl)
+{
+   *pj = i;
+   *pl = k;
+}

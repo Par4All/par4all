@@ -1,0 +1,92 @@
+Select some options to deal with th C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+void calc(int n)
+{
+   float h_A[n][n];
+
+   int i, j;
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI2+1<=n, PHI1<=PHI2}>
+
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, i<=PHI2, PHI2+1<=n, 0<=i}>
+
+      for(j = i; j <= n-1; j += 1)
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, 1+j<=n}>
+
+         h_A[i][j] = 1;
+}
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+void calc(int n)
+{
+   float h_A[n][n];
+
+   int i, j;
+
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= n-1; i += 1)
+#pragma omp parallel for 
+      for(j = i; j <= n-1; j += 1)
+         h_A[i][j] = 1;
+}
+Bug 1: Regions should not prevent displaying OpenMP
+void calc(int n)
+{
+   float h_A[n][n];
+
+   int i, j;
+
+
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI2+1<=n, PHI1<=PHI2}>
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= n-1; i += 1)
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, i<=PHI2, PHI2+1<=n, 0<=i}>
+
+#pragma omp parallel for 
+      for(j = i; j <= n-1; j += 1)
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, 1+j<=n}>
+
+         h_A[i][j] = 1;
+}
+Bug 2: Where is the OpenMP output?
+void calc(int n)
+{
+   float h_A[n][n];
+
+   int i, j;
+
+
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI2+1<=n, PHI1<=PHI2}>
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= n-1; i += 1)
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, i<=PHI2, PHI2+1<=n, 0<=i}>
+
+#pragma omp parallel for 
+      for(j = i; j <= n-1; j += 1)
+
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, 1+j<=n}>
+
+         h_A[i][j] = 1;
+}

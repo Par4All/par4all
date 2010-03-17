@@ -1,0 +1,7 @@
+	INTEGER FUNCTION ABSVAL(N)
+      IF (N.LT.0) THEN                                                  0003
+         ABSVAL = -N                                                    0004
+      ELSE
+         ABSVAL = N                                                     0005
+      ENDIF
+      END

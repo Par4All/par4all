@@ -1,0 +1,61 @@
+      PROGRAM UNSTRUC04
+C     BEGIN UNSTRUCTURED
+
+C     Check special case of loop with a unique controle node
+
+      I = 0                                                             0005
+1     IF (INC(I).LT.10) GOTO 99999                                      0006
+C     BEGIN BLOCK
+C     END BLOCK
+C     BEGIN BLOCK
+      PRINT *, I                                                        0007
+      RETURN
+C     END BLOCK
+99999 CONTINUE
+      GOTO 1
+C     END UNSTRUCTURED
+      END
+
+Try Bourdoncle's restructuring...
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC04
+
+C  T(I) {10<=I, I<=11}
+
+C     BEGIN UNSTRUCTURED
+
+C  T(I) {I==0}
+
+
+C     Check special case of loop with a unique controle node
+
+      I = 0                                                             0005
+
+C  T(I) {I==I#init+1}
+
+1     IF (INC(I).LT.10) GOTO 99999                                      0006
+
+C  T() {}
+
+C     BEGIN BLOCK
+C     END BLOCK
+
+C  T() {}
+
+C     BEGIN BLOCK
+
+C  T() {}
+
+      PRINT *, I                                                        0007
+
+C  T() {}
+
+      RETURN
+C     END BLOCK
+99999 CONTINUE
+      GOTO 1
+C     END UNSTRUCTURED
+      END

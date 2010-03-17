@@ -1,0 +1,10 @@
+      SUBROUTINE COMPUTE_INDEXMAP_PARDO1(K, K_L, K_U, KK, NZ, KK2, J
+     &, DIMS, JJ, NY, KJ2, I, II, NX, D, AINDEXMAP)
+      INTEGER K, K_L, K_U, KK, NZ, KK2, J, JJ, NY, KJ2, I, II, NX, 
+     &NEW
+      INTEGER DIMS(1:3), D(1:3), AINDEXMAP(1:D(1)+1, 1:D(2), 1:D(3))
+
+! Check that i declaration is added
+      NEW = 1                                                           0009
+
+      END

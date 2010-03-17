@@ -1,0 +1,4 @@
+      PROGRAM ZERO
+      PRINT *, 03                                                       0002
+      PRINT *, 00                                                       0003
+      END

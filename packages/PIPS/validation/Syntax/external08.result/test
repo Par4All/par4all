@@ -1,0 +1,82 @@
+user warning in tp_parse: external08: No such workspace
+Registering file external08.f
+Splitting file    ./external08.f
+  Module         EXTERNAL08
+Workspace external08 created and opened.
+Module EXTERNAL08 selected
+Main module PROGRAM "EXTERNAL08" selected.
+Module EXTERNAL08 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+Module EXTERNAL08 already active.
+Request: build resource PRINTED_FILE for module EXTERNAL08.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EXTERNAL08)
+  PARSER                         building   PARSED_CODE(EXTERNAL08)
+                                 building   CALLEES(EXTERNAL08)
+user warning in update_functional_type_with_actual_arguments: Functional actual argument F found.
+Functional arguments are not yet suported by PIPS
+
+Declarations for module EXTERNAL08 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EXTERNAL08:*DYNAMIC*	with type area with size 8
+Declared entity EXTERNAL08:*HEAP*	with type area with size 0
+Declared entity EXTERNAL08:*STACK*	with type area with size 0
+Declared entity EXTERNAL08:*STATIC*	with type area with size 0
+Declared entity EXTERNAL08:I	with type variable INTEGER*4
+Declared entity EXTERNAL08:J	with type variable INTEGER*4
+Declared entity TOP-LEVEL:F	with type functional INTEGER*4 x INTEGER*4 ->  void
+Declared entity TOP-LEVEL:G	with type functional (INTEGER*4 x INTEGER*4 ->  void
+) ->  void
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 8:
+	Variable EXTERNAL08:J,	offset = 0,	size = 4
+	Variable EXTERNAL08:I,	offset = 4,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EXTERNAL08
+
+  CONTROLIZER                    building   CODE(EXTERNAL08)
+  PRINT_CODE                     building   PRINTED_FILE(EXTERNAL08)
+PRINTED_FILE made for EXTERNAL08.
+      PROGRAM EXTERNAL08
+
+C     check the impact of signature refinment: since it comes earlier, g
+C     signature should be OK. Variation of external06.f
+
+      EXTERNAL F
+
+      CALL F(I, J)                                                      0008
+
+      CALL G(F)                                                         0010
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EXTERNAL08.
+Closing program.
+Closing workspace.
+Workspace external08 closed.
+
+Workspace external08 deleted.

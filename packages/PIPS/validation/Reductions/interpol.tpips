@@ -1,0 +1,27 @@
+delete interpol
+create interpol interpol.f
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv RICE_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv PIPSDBM_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+setenv REDUCTIONS_DEBUG_LEVEL 5
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo PROPER REDUCTIONS
+activate PRINT_CODE_PROPER_REDUCTIONS
+display PRINTED_FILE[%ALL]
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE[%ALL]
+
+close
+delete interpol
+quit
+# EOF

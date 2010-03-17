@@ -1,0 +1,61 @@
+# Same as edited03, but check the impact of open/close on update
+# detections
+
+delete edited04
+create edited04 edited04.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[EDITED04]
+display PRINTED_FILE[BAR]
+display PRINTED_FILE[IBAR]
+
+# CleanLocalEntities() should not be called up to here
+
+# quit
+
+close
+
+echo
+echo New version of BAR with x as real[10]
+echo
+
+shell mv edited04.database/BAR/BAR.f foo.f ; sleep 2 ; \
+	sed 's,!%,,' < foo.f > edited04.database/BAR/BAR.f ; rm foo.f
+open edited04 
+display PRINTED_FILE[BAR]
+close
+
+echo
+echo New version of BAR with x as integer[3]
+echo
+
+shell mv edited04.database/BAR/BAR.f foo.f ; sleep 2 ; \
+	sed 's,real,integer,;s,10,3,' < foo.f > edited04.database/BAR/BAR.f ; 
+open edited04
+display PRINTED_FILE[BAR]
+
+close
+
+echo
+echo New version of IBAR with x as real[10]
+echo
+
+shell mv edited04.database/IBAR/IBAR.f foo.f ; sleep 2 ; \
+	sed 's,!%,,' < foo.f > edited04.database/IBAR/IBAR.f ; rm foo.f
+open edited04 
+display PRINTED_FILE[IBAR]
+close
+
+echo
+echo New version of IBAR with x as integer[3]
+echo
+
+shell mv edited04.database/IBAR/IBAR.f foo.f ; sleep 2 ; \
+	sed 's,real,integer,;s,10,3,' < foo.f > edited04.database/IBAR/IBAR.f ; 
+open edited04
+display PRINTED_FILE[IBAR]
+
+close
+delete edited04
+quit

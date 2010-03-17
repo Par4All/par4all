@@ -1,0 +1,31 @@
+void foo_l(int a[4], int b[4], int c[4])
+{
+   int tmp[4];
+   tmp[0] = b[0]*c[0];
+   tmp[1] = b[1]*c[2];
+   a[0] = tmp[0]+tmp[1];
+
+   tmp[2] = b[0]*c[1];
+   tmp[3] = b[1]*c[3];
+   a[1] = tmp[2]+tmp[3];
+}
+
+ **************** Effective Dependence Graph ****************
+
+
+****************** End of Dependence Graph ******************
+void foo_l(int a[4], int b[4], int c[4])
+{
+   int tmp[4];
+   SIMD_LOAD_GENERIC_V2SI(v2si_vec2, c[0], c[2]);
+   SIMD_LOAD_V2SI(v2si_vec1, &b[0]);
+   SIMD_MULD(v2si_vec0, v2si_vec1, v2si_vec2);
+   SIMD_SAVE_V2SI(v2si_vec0, &tmp[0]);
+   a[0] = tmp[0]+tmp[1];
+   SIMD_LOAD_GENERIC_V2SI(v2si_vec5, c[1], c[3]);
+   SIMD_LOAD_V2SI(v2si_vec4, &b[0]);
+   SIMD_MULD(v2si_vec3, v2si_vec4, v2si_vec5);
+   SIMD_SAVE_V2SI(v2si_vec3, &tmp[2]);
+   a[1] = tmp[2]+tmp[3];
+}
+

@@ -1,0 +1,35 @@
+void for04()
+{
+   int i, k, l, m = 0, n = 0;
+   float x[100];
+   
+   /* k is not initialized before the loop */
+#pragma omp parallel for private(k)
+   for(i = 0; i <= 99; i += 1) {
+      k = i;
+      x[k] = 0.;
+   }
+   
+   /* same loop but l is initialized before the loop */
+   l = 0;
+#pragma omp parallel for private(l)
+   for(i = 0; i <= 99; i += 1) {
+      l = i;
+      x[l] = 0.;
+   }
+   
+   /* same loop but m is initialized before the loop and was intialized at the declaration */
+   m = 0;
+#pragma omp parallel for private(m)
+   for(i = 0; i <= 99; i += 1) {
+      m = i;
+      x[m] = 0.;
+   }
+   
+   /* same loop but n is initialized only at the declaration */
+#pragma omp parallel for private(n)
+   for(i = 0; i <= 99; i += 1) {
+      n = i;
+      x[n] = 0.;
+   }
+}

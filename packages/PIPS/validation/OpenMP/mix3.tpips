@@ -1,0 +1,40 @@
+#
+delete mix3
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create mix3 mix.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty PRAGMA_TYPE "expr"
+
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(main)
+
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+display PRINTED_FILE(main)
+
+close
+delete mix3
+quit
+# EOF

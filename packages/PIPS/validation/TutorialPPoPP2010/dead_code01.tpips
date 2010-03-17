@@ -1,0 +1,64 @@
+delete dead_code01
+create dead_code01 dead_code01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+#setproperty PPRETTYPRINT_BLOCKS FALSE TRUE
+#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty SEMANTICS_FLOW_SENSITIVE TRUE
+setproperty COMPUTE_ALL_DEPENDENCES TRUE
+setproperty SEMANTICS_FIX_POINT TRUE
+
+# We do not want to use the winning combination for the loop postcondition
+# activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+# activate TRANSFORMERS_INTER_FULL
+# activate PRECONDITIONS_INTER_FULL
+# setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+quit
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[dead_code01]
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+shell cp dead_code01.database/main/main.prec.c dead_code01.database/main/main.prec-1.c
+
+setproperty TRANSFORMATION_CLONE_ON_ARGUMENT 2
+apply CLONE_ON_ARGUMENT[dead_code01]
+
+echo # new callgraph
+display CALLGRAPH_FILE[%MAIN]
+echo # new codes.
+display PRINTED_FILE[%ALLFUNC]
+echo # applying partial evaluation...
+apply PARTIAL_EVAL[%ALLFUNC]
+echo # applying dead code elimination...
+apply SUPPRESS_DEAD_CODE[%ALL]
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+quit
+apply UNSPLIT[%PROGRAM]
+
+close
+
+quit

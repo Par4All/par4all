@@ -1,0 +1,16 @@
+
+csplit must not fail because the scopes of the two C foo functions are different
+
+void foo()
+{
+   /* This is the first foo function */
+   ;
+}
+extern void foo();
+static void foo();
+static void foo()
+{
+   /* This is the second foo function, but it should not conflict with the
+        other foo function because they are not in the same file */
+   ;
+}

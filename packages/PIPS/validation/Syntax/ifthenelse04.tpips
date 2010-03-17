@@ -1,0 +1,18 @@
+delete ifthenelse04
+create ifthenelse04 ifthenelse04.f
+
+echo
+echo PRINTED FILE
+echo
+
+display PRINTED_FILE
+
+echo
+echo RESTRUCTURED FILE
+echo
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+close
+delete ifthenelse04
+quit

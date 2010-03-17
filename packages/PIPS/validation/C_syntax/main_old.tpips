@@ -1,0 +1,18 @@
+delete main_old
+create main_old main_old.c
+
+echo Select some options to deal with the C Language:
+echo Parse as C:
+activate C_PARSER
+echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+echo Do not display original number lines as comment:
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[main]
+
+close
+
+delete main_old
+
+quit

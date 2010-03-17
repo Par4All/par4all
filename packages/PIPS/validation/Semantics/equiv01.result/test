@@ -1,0 +1,63 @@
+
+C  P() {}
+
+      PROGRAM EQUIV01
+
+C     Check that unusable information is not used
+
+      EQUIVALENCE (I,J), (K,X)
+
+C  P() {I==J}
+
+
+      READ *, I, J, K, X                                                0007
+
+C  P(I) {I==J}
+
+
+      IF (I.GT.N) THEN                                                  0009
+
+C  P(I) {I==J, N+1<=I}
+
+         I = I-1                                                        0010
+
+C  P(I) {I==J, N<=I}
+
+         PRINT *, I                                                     0011
+      ENDIF
+
+C  P(I) {I==J}
+
+
+      IF (J.GT.N) THEN                                                  0014
+
+C  P(I) {I==J, N+1<=I}
+
+         J = J-1                                                        0015
+
+C  P(I) {I==J, N<=I}
+
+         PRINT *, J                                                     0016
+      ENDIF
+
+C  P(I) {I==J}
+
+
+      IF (K.GT.N) THEN                                                  0019
+
+C  P(I) {I==J}
+
+         K = K-1                                                        0020
+
+C  P(I) {I==J}
+
+         PRINT *, K                                                     0021
+      ENDIF
+
+C  P(I) {I==J}
+
+
+      PRINT *, I, J, K, X                                               0024
+
+      END
+

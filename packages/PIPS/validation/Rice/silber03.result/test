@@ -1,0 +1,15 @@
+      SUBROUTINE SILBER03(A, B, N)
+
+C     Check what happens with coarse grain parallelization on Georges' examples
+C     presented at CPC'98
+
+      REAL A(N), B(N)
+
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0008
+         IF (A(I).GE.0.) B(I) = 0.                                      0009
+         A(I) = 1.                                                      0012
+      ENDDO
+
+      END

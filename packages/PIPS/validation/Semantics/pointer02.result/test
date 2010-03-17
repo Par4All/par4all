@@ -1,0 +1,64 @@
+!!
+!! file for pointer02.f
+!!
+
+C  P() {}
+
+C Dynamic allocation of arrays.
+C The size might well be some large number,say, 10000. Once that's allocated,
+C the subroutines perform their tasks, not knowing that the array was dynamically allocated
+
+      PROGRAM MAIN
+      REAL X
+      POINTER (P,X)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+      READ *, NSIZE
+
+C  P(NSIZE) {}
+
+C (0,3)
+c      P = MALLOC(NSIZE)
+      CALL CALC(X, NSIZE)
+
+C  P(NSIZE) {}
+
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE CALC(A,N)
+      REAL A(N)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+      DO I = 1, N
+
+C  P(I) {1<=I, I<=N}
+
+C (0,3)
+         A(I) = I
+      ENDDO
+
+C  P(I) {1<=I, N+1<=I}
+
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

@@ -1,0 +1,111 @@
+
+Parsed code for "call16"
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Code for "call16"
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Proper effects for "call16"
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+//               <must be read   >: _a _b _b[_i] _c _c[_i] _i
+//               <must be written>: _a[_i]
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Cumulated effects for "call16"
+
+//               <may be read    >: _b[*] _c[*]
+//               <may be written >: _a[*]
+//               <must be read   >: _a _b _c _i
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+//               <may be read    >: _b[*] _c[*]
+//               <may be written >: _a[*]
+//               <must be read   >: _a _b _c _i
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Proper effects for "dotprod"
+
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+//               <must be written>: i
+   for(i = 0; i <= 999999; i += 1)
+//               <may be read    >: b[*] c[*]
+//               <may be written >: a[*]
+//               <must be read   >: a b c i
+      call16(i, a, b, c);
+   
+
+   return;
+}
+
+Regions for "call16"
+
+
+//  <_a-R-EXACT-{}>
+//  <_a[PHI1]-W-EXACT-{PHI1==_i}>
+//  <_b-R-EXACT-{}>
+//  <_b[PHI1]-R-EXACT-{PHI1==_i}>
+//  <_c-R-EXACT-{}>
+//  <_c[PHI1]-R-EXACT-{PHI1==_i}>
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+
+//  <_a-R-EXACT-{}>
+//  <_a[PHI1]-W-EXACT-{PHI1==_i}>
+//  <_b-R-EXACT-{}>
+//  <_b[PHI1]-R-EXACT-{PHI1==_i}>
+//  <_c-R-EXACT-{}>
+//  <_c[PHI1]-R-EXACT-{PHI1==_i}>
+
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Regions for "dotprod"
+
+
+//  <a-R-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{}>
+//  <b[PHI1]-R-EXACT-{}>
+//  <b-R-EXACT-{}>
+//  <c[PHI1]-R-EXACT-{}>
+//  <c-R-EXACT-{}>
+
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+
+//  <a-R-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{}>
+//  <b[PHI1]-R-EXACT-{}>
+//  <b-R-EXACT-{}>
+//  <c[PHI1]-R-EXACT-{}>
+//  <c-R-EXACT-{}>
+
+   for(i = 0; i <= 999999; i += 1)
+
+//  <a-R-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{i==PHI1}>
+//  <b[PHI1]-R-EXACT-{i==PHI1}>
+//  <b-R-EXACT-{}>
+//  <c[PHI1]-R-EXACT-{i==PHI1}>
+//  <c-R-EXACT-{}>
+
+      call16(i, a, b, c);
+   
+
+   return;
+}

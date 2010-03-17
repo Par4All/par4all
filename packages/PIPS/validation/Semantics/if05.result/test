@@ -1,0 +1,92 @@
+
+Transformers for "if05"
+
+
+C  T() {}
+
+!     Explicit boolean in Fortran test condition
+
+      INTEGER FUNCTION IF05()
+
+      INTEGER I, N
+
+C  T(I) {I==0}
+
+
+      I = 0
+
+C  T(I,N) {I+N==I#init+N#init, N#init<=N+1, N<=N#init+1}
+
+
+      IF (N.GT.0) THEN
+
+C  T(I) {I==I#init+1}
+
+         I = I+1
+
+C  T(N) {N==N#init-1}
+
+         N = N-1
+      ELSE
+
+C  T(I) {I==I#init-1}
+
+         I = I-1
+
+C  T(N) {N==N#init+1}
+
+         N = N+1
+      ENDIF
+
+C  T(IF04) {I==IF04}
+
+
+      IF04 = I
+
+      END
+
+Preconditions for "if05"
+
+
+C  P() {}
+
+!     Explicit boolean in Fortran test condition
+
+      INTEGER FUNCTION IF05()
+
+      INTEGER I, N
+
+C  P() {}
+
+
+      I = 0
+
+C  P(I) {I==0}
+
+
+      IF (N.GT.0) THEN
+
+C  P(I) {I==0, 1<=N}
+
+         I = I+1
+
+C  P(I) {I==1, 1<=N}
+
+         N = N-1
+      ELSE
+
+C  P(I) {I==0, N<=0}
+
+         I = I-1
+
+C  P(I) {I==-1, N<=0}
+
+         N = N+1
+      ENDIF
+
+C  P(I,N) {0<=I+1, I<=1}
+
+
+      IF04 = I
+
+      END

@@ -1,0 +1,75 @@
+
+C  T() {}
+
+      PROGRAM TYPE15
+      REAL A, B
+
+C  T(A) {}
+
+
+      READ *, A                                                         0004
+
+C  T(A) {1.+A#init<=A, 4.<=A, 5.<=A}
+
+
+      A = AMAX1(A+1., 4., 5.)                                           0006
+
+C  T() {}
+
+
+      IF (A.LT.3.) THEN                                                 0008
+
+C  T() {}
+
+         PRINT *, 'impossible'                                          0009
+      ELSE
+
+C  T() {}
+
+         PRINT *, 'of course'                                           0011
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE15
+      REAL A, B
+
+C  P() {}
+
+
+      READ *, A                                                         0004
+
+C  P(A) {}
+
+
+      A = AMAX1(A+1., 4., 5.)                                           0006
+
+C  P(A) {4.<=A, 5.<=A}
+
+
+      IF (A.LT.3.) THEN                                                 0008
+
+C  P() {0==-1}
+
+         PRINT *, 'impossible'                                          0009
+      ELSE
+
+C  P(A) {3.<=A, 4.<=A, 5.<=A}
+
+         PRINT *, 'of course'                                           0011
+      ENDIF
+
+      END
+      PROGRAM TYPE15
+      REAL A, B
+
+      READ *, A                                                         0004
+
+      A = AMAX1(A+1., 4., 5.)                                           0006
+
+      PRINT *, 'of course'                                              0011
+
+      END
+

@@ -1,0 +1,296 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W16
+
+C     Derived from w15: remove I from the condition
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  T(I) {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  T(I) {I#init==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  T(I) {}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T() {}
+
+C (0,5)
+         READ *, Y                                                      0012
+
+C  T(I) {}
+
+C (0,6)
+         IF (Y.GT.0.) THEN                                              0013
+
+C  T(I) {I==1}
+
+C (0,7)
+            I = 1                                                       0014
+         ELSE
+
+C  T() {}
+
+C (0,8)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  T() {}
+
+C (0,9)
+         READ *, X                                                      0016
+C        END BLOCK
+      ENDDO
+
+C  T() {}
+
+C (0,10)
+
+      PRINT *, I                                                        0019
+
+C     END BLOCK
+      END
+
+PRECONDITIONS 
+
+
+C  P() {}
+
+      PROGRAM W16
+
+C     Derived from w15: remove I from the condition
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  P(I) {I==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  P(I) {}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  P(I) {}
+
+C (0,5)
+         READ *, Y                                                      0012
+
+C  P(I) {}
+
+C (0,6)
+         IF (Y.GT.0.) THEN                                              0013
+
+C  P(I) {}
+
+C (0,7)
+            I = 1                                                       0014
+         ELSE
+
+C  P(I) {}
+
+C (0,8)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  P(I) {}
+
+C (0,9)
+         READ *, X                                                      0016
+C        END BLOCK
+      ENDDO
+
+C  P(I) {}
+
+C (0,10)
+
+      PRINT *, I                                                        0019
+
+C     END BLOCK
+      END
+
+REFINED TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W16
+
+C     Derived from w15: remove I from the condition
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  T(I) {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {I==0}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  T(I) {I#init==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  T(I) {}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  T() {}
+
+C (0,5)
+         READ *, Y                                                      0012
+
+C  T(I) {}
+
+C (0,6)
+         IF (Y.GT.0.) THEN                                              0013
+
+C  T(I) {I==1}
+
+C (0,7)
+            I = 1                                                       0014
+         ELSE
+
+C  T() {}
+
+C (0,8)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  T() {}
+
+C (0,9)
+         READ *, X                                                      0016
+C        END BLOCK
+      ENDDO
+
+C  T() {}
+
+C (0,10)
+
+      PRINT *, I                                                        0019
+
+C     END BLOCK
+      END
+
+PRECONDITIONS WITH REFINED TRANSFORMERS
+
+
+C  P() {}
+
+      PROGRAM W16
+
+C     Derived from w15: remove I from the condition
+
+C     Assignments in body:
+
+      INTEGER I
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      I = 0                                                             0009
+
+C  P(I) {I==0}
+
+C (0,3)
+
+      DO WHILE (X.GT.0.)                                                0011
+
+C  P(I) {}
+
+C (0,4)
+C        BEGIN BLOCK
+
+C  P(I) {}
+
+C (0,5)
+         READ *, Y                                                      0012
+
+C  P(I) {}
+
+C (0,6)
+         IF (Y.GT.0.) THEN                                              0013
+
+C  P(I) {}
+
+C (0,7)
+            I = 1                                                       0014
+         ELSE
+
+C  P(I) {}
+
+C (0,8)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+
+C  P(I) {}
+
+C (0,9)
+         READ *, X                                                      0016
+C        END BLOCK
+      ENDDO
+
+C  P(I) {}
+
+C (0,10)
+
+      PRINT *, I                                                        0019
+
+C     END BLOCK
+      END

@@ -1,0 +1,155 @@
+C     Bug: implicit DO in IO list not recognized
+C
+      SUBROUTINE EDITION(NFICH,KPRINT)
+C*********************************************************
+C     EDITION DU FICHIER  NFICH
+C     PAR PLANS  K=CSTE
+C     LES TABLEAUX IL,JL,KL SERVENT A PRECISER
+C     LES INDICES DES NOEUDS QUI SERONT REPRESENTES
+C*********************************************************
+      DIMENSION IL(71),JL(36),KL(22),JD(2),JF(2),TIT(2,7)
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+      COMMON/CTI/TITXYZ(8),TITRE0(8),IT0,TITRE(8),IT
+
+c     COMMON/CT/TI(52,21,5),TK(57,52)
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      DIMENSION TI(52,21,5),TK(57,52)      
+      EQUIVALENCE (T(1,1,1),TI(1,1,1)), (T(1,1,6),TK(1,1))
+
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/GAMMA/GAM,GAM1,GAM2,GAM3,GAM4,GAM5,GAM6,GAM7,GAM8,GAM9
+      DATA TIT/'        MA','CH        ',
+     1         '      ENTR','OPIE      ',
+     2         '  PRESSION',' STATIQUE ',
+     3         '         R','O         ',
+     4         '    ANGLE ','(OX,OY)   ',
+     5         '    ANGLE ','(OX,OZ)   ',
+     6         ' PAS DE TE','MPS X 1000'/
+      DATA NT,JPM,JPP,JPMAX,KPMAX/7,18,19,36,5/
+      DATA JD/1,19/,JF/18,36/
+C
+      RADDEG = 45./ATAN(1.)                                             0034
+      PA0 = GAM1*(GAM7*0.5)**GAM5                                       0035
+C
+C     DEFINITION DES TABLEAUX DE TRI
+C
+      DO 10 I = I1, I2                                                  0039
+10       IL(I) = I                                                      0040
+      DO 20 JP = 1, 3                                                   0041
+20       JL(JP) = JP                                                    0042
+      JL(4) = 6                                                         0043
+      JL(5) = 9                                                         0044
+      JL(6) = 12                                                        0045
+      JL(7) = 14                                                        0046
+      DO 21 JP = 8, JPM                                                 0047
+21       JL(JP) = 7+JP                                                  0048
+      DO 25 JP = 1, JPM                                                 0049
+25       JL(JP+JPM) = JMAX-1-JL(JP)                                     0050
+      DO 30 KP = 1, 4                                                   0051
+30       KL(KP) = KP                                                    0052
+      KL(5) = KMAX-2                                                    0053
+C
+c     BUFFER IN (NFICH,0) (TITRE(1),IT)
+      IF (UNIT(NFICH).LT.0) GOTO 40                                     0056
+9999  CONTINUE                                                          0128
+      STOP 7                                                            0129
+40    CONTINUE                                                          0057
+      WRITE (IMP, 1000) IT                                              0058
+      REWIND (NFICH)                                                    0059
+      N = 1                                                             0061
+99995 CONTINUE
+C
+C     DO loop 100 with exit had to be desugared
+      IF (N.GT.NT) GOTO 99999                                           0061
+      ICHIF = KPRINT/(10**(NT-N))-10*(KPRINT/(10**(NT-N+1)))            0062
+      IF (ICHIF.EQ.0) GOTO 100                                          0063
+      KP = 1                                                            0064
+99996 CONTINUE
+C     DO loop 200 with exit had to be desugared
+      IF (KP.GT.KPMAX) GOTO 100                                         0064
+c     BUFFER IN (NFICH,0) (TITRE(1),IT)
+      IF (UNIT(NFICH).LT.0) THEN                                        0066
+      ELSE
+         GOTO 9999
+      ENDIF
+41    CONTINUE                                                          0067
+      II = I1                                                           0068
+99997 CONTINUE
+C     DO loop 210 with exit had to be desugared
+      IF (II.GT.I2) GOTO 99998                                          0068
+c     BUFFER IN (NFICH,0) (TI(1,1,1),TI(JMAX,KMAX,5))
+      IF (UNIT(NFICH).LT.0) THEN                                        0070
+      ELSE
+         GOTO 9999
+      ENDIF
+42    CONTINUE                                                          0071
+      I = I1+I2-II                                                      0072
+      IP = IL(I)                                                        0073
+      IF (IP.EQ.0) GOTO 210                                             0074
+      K = KL(KP)                                                        0075
+      DO 220 JP = 1, JPMAX                                              0076
+         J = JL(JP)                                                     0077
+         RO = TI(J+1,K+1,1)                                             0078
+         ROU = TI(J+1,K+1,2)                                            0079
+         ROV = TI(J+1,K+1,3)                                            0080
+         ROW = TI(J+1,K+1,4)                                            0081
+         IF (ROU**2+ROV**2.LT.1.E-12) ROV = 1.E-6                       0082
+         IF (ROU**2+ROW**2.LT.1.E-12) ROW = 1.E-6                       0083
+         QQ = (ROU*ROU+ROV*ROV+ROW*ROW)/(RO*RO)                         0084
+         P = RO*(GAM1-GAM2*QQ)                                          0085
+         IF (N.EQ.1) TTT = SQRT(RO*QQ/(GAM*P))                          0086
+         IF (N.EQ.2) TTT = RO**GAM/(GAM*P)                              0087
+         IF (N.EQ.3) TTT = P/PA0                                        0088
+         IF (N.EQ.4) TTT = RO                                           0089
+         IF (N.EQ.5) TTT = ATAN2(ROV, ROU)*RADDEG                       0090
+         IF (N.EQ.6) TTT = ATAN2(ROW, ROU)*RADDEG                       0091
+         IF (N.EQ.7) TTT = TI(J+1,K+1,5)*1000.                          0092
+         TK(IP,JP) = TTT                                                0093
+220      CONTINUE                                                       0094
+210   CONTINUE                                                          0095
+      II = II+1                                                         0068
+      GOTO 99997
+99998 CONTINUE
+C
+      DO 230 KAS = 1, 2                                                 0097
+         JDEB = JD(KAS)                                                 0098
+         JFIN = JF(KAS)                                                 0099
+         WRITE (IMP, 2000) K, (TIT(L,N), L = 1, 2)                      0100
+         WRITE (IMP, 2500) (JL(JP), JP = JDEB, JFIN)                    0101
+         WRITE (IMP, 2501)                                              0102
+C
+         DO 230 I = I1, I2                                              0104
+            IP = IL(I)                                                  0105
+            IF (IP.EQ.0) GOTO 230                                       0106
+            IF (N.GE.5) GOTO 231                                        0107
+            WRITE (IMP, 2001) I, (TK(IP,JP), JP = JDEB, JFIN)           0108
+            GOTO 230
+231         CONTINUE                                                    0110
+            WRITE (IMP, 2002) I, (TK(IP,JP), JP = JDEB, JFIN)           0111
+230         CONTINUE                                                    0112
+      REWIND (NFICH)                                                    0113
+200   CONTINUE                                                          0114
+      KP = KP+1                                                         0064
+      GOTO 99996
+100   CONTINUE                                                          0115
+      N = N+1                                                           0061
+      GOTO 99995
+99999 CONTINUE
+C
+C*******************************************************************
+1000  FORMAT(///,' NOMBRE D ITERATIONS EFFECTUEES',I5/,' ---------------
+     &--------------------')                                            0118
+2500  FORMAT(2X,'J',18(5X,I2))                                          0120
+2501  FORMAT(1X,130('-'))                                               0121
+2001  FORMAT(I3,2X,18F7.4)                                              0122
+2002  FORMAT(I3,2X,18F7.2)                                              0123
+2000  FORMAT('1',44X,'   K=',I2,2A10,/,45X,'----------------------------
+     &--',/)                                                            0124
+C
+      END
+      FUNCTION UNIT(I)
+      UNIT = I                                                          0002
+      END

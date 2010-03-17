@@ -1,0 +1,12 @@
+delete mdg_open
+# coredump in emacs attachments.
+create mdg_open ${PIPS_ROOT}/Validation/Epips/mdg_open.f
+# some necessary props 
+setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES=TRUE
+setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS=TRUE
+# hop...
+module MDG
+display PRINTED_FILE(MDG)
+# never get there.
+echo # ok!!!
+quit

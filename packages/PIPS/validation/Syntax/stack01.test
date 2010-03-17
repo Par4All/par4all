@@ -1,0 +1,16 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete stack01
+create stack01 stack01.f
+module STACK01
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[STACK01]
+close
+delete stack01
+quit
+EOF

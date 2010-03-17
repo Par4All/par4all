@@ -1,0 +1,530 @@
+      PROGRAM GAUSS
+      INTEGER N
+      PARAMETER (N=10)
+      REAL*8 A(N,N), X(N), S, F
+      INTEGER I, J, K
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   >
+C		<   tests   >
+      DO I = 1, N-1
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N-1
+C		<   tests   >
+         DO J = I+1, N                                                  0001
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N-1
+C                             I+1 <= J <= N
+C		<   tests   >
+5           F = A(J,I)/A(I,I)                                           0002
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N-1
+C                             I+1 <= J <= N
+C		<   tests   >
+            DO K = I+1, N                                               0003
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N-1
+C                             I+1 <= J <= N
+C                             I+1 <= K <= N
+C		<   tests   >
+3              A(J,K) = A(J,K)-F*A(I,K)                                 0004
+            ENDDO
+         ENDDO
+      ENDDO
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   >
+C		<   tests   >
+      DO I = 1, N                                                       0005
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N
+C		<   tests   >
+2        S = 0.                                                         0006
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N
+C		<   tests   >
+         DO J = 1, I-1                                                  0007
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N
+C                             1 <= J <= I-1
+C		<   tests   >
+1           S = S+A(N-I+1,N-J+1)*X(N-J+1)                               0008
+         ENDDO
+C		< is static > TRUE
+C		< parameter > 
+C		<   loops   > 1 <= I <= N
+C		<   tests   >
+4        X(N-I+1) = (A(N-I+1,N+1)-S)/A(N-I+1,N-I+1)                     0009
+      ENDDO
+      END
+
+ Array Data Flow Graph:
+=======================
+
+ENTRY:
+******
+ Execution Domain for 0: Nil
+
+ ---Def-Use---> ins_80:
+  Reference: A(N-I+1,N-J+1)
+  Transformation: []
+  Governing predicate:
+{
+- I + 10 <= 0 ,
+} 
+  Execution Domain for 80:
+{
+- I + J + 1 <= 0 ,
+- J + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_40:
+  Reference: A(J,K)
+  Transformation: []
+  Governing predicate:
+{
+  I - 1 <= 0 ,
+} 
+ ---Def-Use---> ins_40:
+  Reference: A(I,K)
+  Transformation: []
+  Governing predicate:
+{
+  I - 1 <= 0 ,
+} 
+  Execution Domain for 40:
+{
+  K - 10 <= 0 ,
+- K + I + 1 <= 0 ,
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 9 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_90:
+  Reference: A(N-I+1,N+1)
+  Transformation: []
+  Governing predicate:
+ { nil }
+ ---Def-Use---> ins_90:
+  Reference: A(N-I+1,N-I+1)
+  Transformation: []
+  Governing predicate:
+{
+- I + 10 <= 0 ,
+} 
+  Execution Domain for 90:
+{
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_20:
+  Reference: A(J,I)
+  Transformation: []
+  Governing predicate:
+{
+  I - 1 <= 0 ,
+} 
+ ---Def-Use---> ins_20:
+  Reference: A(I,I)
+  Transformation: []
+  Governing predicate:
+{
+  I - 1 <= 0 ,
+} 
+  Execution Domain for 20:
+{
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 9 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+
+INS_80:
+********
+ Execution Domain for 80:
+{
+- I + J + 1 <= 0 ,
+- J + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_80:
+  Reference: S
+  Transformation: [I,-1+J]
+  Governing predicate:
+{
+- J + 2 <= 0 ,
+} 
+
+ ---Def-Use---> ins_90:
+  Reference: S
+  Transformation: [I,-1+I]
+  Governing predicate:
+{
+- I + 2 <= 0 ,
+} 
+  Execution Domain for 90:
+{
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+
+INS_60:
+********
+ Execution Domain for 60:
+{
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_80:
+  Reference: S
+  Transformation: [I]
+  Governing predicate:
+{
+  J - 1 <= 0 ,
+} 
+  Execution Domain for 80:
+{
+- I + J + 1 <= 0 ,
+- J + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_90:
+  Reference: S
+  Transformation: [I]
+  Governing predicate:
+{
+  I - 1 <= 0 ,
+} 
+  Execution Domain for 90:
+{
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+
+INS_40:
+********
+ Execution Domain for 40:
+{
+  K - 10 <= 0 ,
+- K + I + 1 <= 0 ,
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 9 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_80:
+  Reference: A(N-I+1,N-J+1)
+  Transformation: [10-I,11-I,11-J]
+  Governing predicate:
+{
+  I - 9 <= 0 ,
+} 
+  Execution Domain for 80:
+{
+- I + J + 1 <= 0 ,
+- J + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_40:
+  Reference: A(J,K)
+  Transformation: [-1+I,J,K]
+  Governing predicate:
+{
+- I + 2 <= 0 ,
+} 
+ ---Def-Use---> ins_40:
+  Reference: A(I,K)
+  Transformation: [-1+I,I,K]
+  Governing predicate:
+{
+- I + 2 <= 0 ,
+} 
+
+ ---Def-Use---> ins_90:
+  Reference: A(N-I+1,N-I+1)
+  Transformation: [10-I,11-I,11-I]
+  Governing predicate:
+{
+  I - 9 <= 0 ,
+} 
+  Execution Domain for 90:
+{
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_20:
+  Reference: A(J,I)
+  Transformation: [-1+I,J,I]
+  Governing predicate:
+{
+- I + 2 <= 0 ,
+} 
+ ---Def-Use---> ins_20:
+  Reference: A(I,I)
+  Transformation: [-1+I,I,I]
+  Governing predicate:
+{
+- I + 2 <= 0 ,
+} 
+  Execution Domain for 20:
+{
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 9 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+
+INS_90:
+********
+ Execution Domain for 90:
+{
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_80:
+  Reference: X(N-J+1)
+  Transformation: [J]
+  Governing predicate:
+ { nil }
+  Execution Domain for 80:
+{
+- I + J + 1 <= 0 ,
+- J + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+
+INS_20:
+********
+ Execution Domain for 20:
+{
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 9 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+ ---Def-Use---> ins_40:
+  Reference: F
+  Transformation: [I,J]
+  Governing predicate:
+ { nil }
+  Execution Domain for 40:
+{
+  K - 10 <= 0 ,
+- K + I + 1 <= 0 ,
+  J - 10 <= 0 ,
+- J + I + 1 <= 0 ,
+  I - 9 <= 0 ,
+- I + 1 <= 0 ,
+} 
+
+
+ Scheduling:
+============
+ins_60:
+	 pred: TRUE
+	 dims: 0
+ins_20:
+	 pred: TRUE
+	 dims: -2+2*I
+ins_40:
+	 pred: TRUE
+	 dims: -1+2*I
+ins_90:
+	 pred: TRUE
+	 dims: 16+2*I
+ins_80:
+	 pred: TRUE
+	 dims: 17+2*J
+
+PROGRAM MAPPING :
+================= 
+Ins_40 :J-1 , K
+Ins_20 :J-1 , 0
+Ins_80 :-I+10 , 11
+Ins_90 :-I+10 , 11
+Ins_60 :-I+10 , 11
+
+      PROGRAM GAUSS
+      INTEGER*4 N
+      PARAMETER (N = 10)
+      INTEGER S80p0,S80t0,S80q0,S40p0,S40p1,S40t0,S40q0,S90t0,S90q0,
+     &S20p0,S20t0,S20q0,S60p0,S0t0,S80t1,S80t2,S80t3,S80flag0,S40t1,
+     &S40flag0,S90t1,S90t2,S90flag0,S20t1,S20flag0
+      REAL*8 A(1:N,1:N),INS_80(0:1,0:8),INS_60(0:9),INS_40(0:8,1:9,2:
+     &10),INS_90(0:0),INS_20(0:0,1:9)
+CDIR$ SHARED INS_80(:, :BLOCK)
+CDIR$ SHARED INS_90(:)
+CDIR$ SHARED INS_60(:BLOCK)
+CDIR$ SHARED INS_40(:, :BLOCK, :BLOCK)
+CDIR$ SHARED INS_20(:, :BLOCK)
+      S80t0 = 21
+      S80t1 = 21
+      S80t2 = 19
+      S80t3 = 19
+      S80q0 = 0
+      S80flag0 = 0
+      S40t0 = 1
+      S40t1 = 3
+      S40q0 = 0
+      S40flag0 = 0
+      S90t0 = 36
+      S90t1 = 20
+      S90t2 = 18
+      S90q0 = 0
+      S90flag0 = 0
+      S20t0 = 0
+      S20t1 = 2
+      S20q0 = 0
+      S20flag0 = 0
+      DO S0t0 = 0, MAX(36)
+         IF (S0t0.EQ.S80t3) THEN
+CDIR$ DOSHARED(S80p0) ON INS_80(S80q0,S80p0)
+            DO S80p0 = 1, 8-S80q0
+               INS_80(MOD(S80q0, 2),S80p0) = INS_60(S80p0)+INS_40(-1+
+     &         S80p0,S80p0,10-S80q0)*INS_90(0)
+            ENDDO
+            S80t3 = S80t3+2
+            IF (S80t3.GT.19) S80t3 = -1
+            S80flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S80t2) THEN
+CDIR$ DOSHARED(S80p0) ON INS_80(S80q0,S80p0)
+            DO S80p0 = 0, 0
+               INS_80(MOD(S80q0, 2),S80p0) = INS_60(S80p0)+A(S80p0+1,
+     &         -S80q0+10)*INS_90(0)
+            ENDDO
+            S80t2 = S80t2+2
+            IF (S80t2.GT.19) S80t2 = -1
+            S80flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S80t1) THEN
+CDIR$ DOSHARED(S80p0) ON INS_80(S80q0,S80p0)
+            DO S80p0 = 1, 8-S80q0
+               INS_80(MOD(S80q0, 2),S80p0) = INS_80(MOD(-1+S80q0, 2),
+     &         S80p0)+INS_40(-1+S80p0,S80p0,10-S80q0)*INS_90(0)
+            ENDDO
+            S80t1 = S80t1+2
+            IF (S80t1.GT.33) S80t1 = -1
+            S80flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S80t0) THEN
+CDIR$ DOSHARED(S80p0) ON INS_80(S80q0,S80p0)
+            DO S80p0 = 0, 0
+               INS_80(MOD(S80q0, 2),S80p0) = INS_80(MOD(-1+S80q0, 2),
+     &         S80p0)+A(S80p0+1,-S80q0+10)*INS_90(0)
+            ENDDO
+            S80t0 = S80t0+2
+            IF (S80t0.GT.35) S80t0 = -1
+            S80flag0 = 1
+         ENDIF
+         IF (S80flag0.EQ.1) S80q0 = S80q0+1
+         S80flag0 = 0
+         IF (S0t0.EQ.S40t1) THEN
+CDIR$ DOSHARED(S40p0, S40p1) ON INS_40(S40q0,S40p0,S40p1)
+            DO S40p0 = 1+S40q0, 9
+               DO S40p1 = 2+S40q0, 10
+                  INS_40(S40q0,S40p0,S40p1) = INS_40(-1+S40q0,S40p0,
+     &            S40p1)-INS_20(0,S40p0)*INS_40(-1+S40q0,S40q0,S40p1)
+               ENDDO
+            ENDDO
+            S40t1 = S40t1+2
+            IF (S40t1.GT.17) S40t1 = -1
+            S40flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S40t0) THEN
+CDIR$ DOSHARED(S40p0, S40p1) ON INS_40(S40q0,S40p0,S40p1)
+            DO S40p0 = 1+S40q0, 9
+               DO S40p1 = 2+S40q0, 10
+                  INS_40(S40q0,S40p0,S40p1) = A(1+S40p0,S40p1)-INS_20
+     &            (0,S40p0)*A(1+S40q0,S40p1)
+               ENDDO
+            ENDDO
+            S40t0 = S40t0+2
+            IF (S40t0.GT.1) S40t0 = -1
+            S40flag0 = 1
+         ENDIF
+         IF (S40flag0.EQ.1) S40q0 = S40q0+1
+         S40flag0 = 0
+         IF (S0t0.EQ.S90t2) THEN
+            INS_90(0) = (A(-S90q0+10,11)-INS_60(9-S90q0))/INS_40(8-
+     &      S90q0,9-S90q0,10-S90q0)
+            S90t2 = S90t2+2
+            IF (S90t2.GT.18) S90t2 = -1
+            S90flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S90t0) THEN
+            INS_90(0) = (A(-S90q0+10,11)-INS_80(MOD(-1+S90q0, 2),9-
+     &      S90q0))/A(-S90q0+10,-S90q0+10)
+            S90t0 = S90t0+2
+            IF (S90t0.GT.36) S90t0 = -1
+            S90flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S90t1) THEN
+            INS_90(0) = (A(-S90q0+10,11)-INS_80(MOD(-1+S90q0, 2),9-
+     &      S90q0))/INS_40(8-S90q0,9-S90q0,10-S90q0)
+            S90t1 = S90t1+2
+            IF (S90t1.GT.34) S90t1 = -1
+            S90flag0 = 1
+         ENDIF
+         IF (S90flag0.EQ.1) S90q0 = S90q0+1
+         S90flag0 = 0
+         IF (S0t0.EQ.S20t1) THEN
+CDIR$ DOSHARED(S20p0) ON INS_20(0,S20p0)
+            DO S20p0 = 1+S20q0, 9
+               INS_20(0,S20p0) = INS_40(-1+S20q0,S20p0,1+S20q0)/
+     &         INS_40(-1+S20q0,S20q0,1+S20q0)
+            ENDDO
+            S20t1 = S20t1+2
+            IF (S20t1.GT.16) S20t1 = -1
+            S20flag0 = 1
+         ENDIF
+         IF (S0t0.EQ.S20t0) THEN
+CDIR$ DOSHARED(S20p0) ON INS_20(0,S20p0)
+            DO S20p0 = 1+S20q0, 9
+               INS_20(0,S20p0) = A(1+S20p0,1+S20q0)/A(1+S20q0,1+S20q0
+     &         )
+            ENDDO
+            S20t0 = S20t0+2
+            IF (S20t0.GT.0) S20t0 = -1
+            S20flag0 = 1
+         ENDIF
+         IF (S20flag0.EQ.1) S20q0 = S20q0+1
+         S20flag0 = 0
+         IF (S0t0.EQ.0) THEN
+CDIR$ DOSHARED(S60p0) ON INS_60(S60p0)
+            DO S60p0 = 0, 9
+               INS_60(S60p0) = 0.
+            ENDDO
+         ENDIF
+      ENDDO
+      END
+

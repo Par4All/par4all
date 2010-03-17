@@ -1,0 +1,43 @@
+Select some options to deal with th C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+void empty_for()
+{
+   //  int n = 10000;
+   int loops = 10;
+   
+   //int numBytes = n * n * sizeof(float);
+   /*
+     float* h_A = (float *) malloc(numBytes);
+     float* h_C = (float *) malloc(numBytes);
+     */
+   float h_A[10000*10000];
+   float h_C[10000*10000];
+
+   int i, j;
+
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9999; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 9999; j += 1)
+         h_A[i*10000+j] = 1;
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9999; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 9999; j += 1)
+         h_C[i*10000+j] = 0;
+
+
+}

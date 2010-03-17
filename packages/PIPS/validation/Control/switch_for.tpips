@@ -1,0 +1,20 @@
+delete switch_for
+create switch_for switch_for.c
+
+activate C_PARSER
+
+# setenv C_SYNTAX_DEBUG_LEVEL 7
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+#display PRINTED_FILE[main%c]
+
+# display PRINTED_FILE[%ALL]
+
+display PRINTED_FILE[gl_enable]
+
+close
+delete switch_for
+
+quit

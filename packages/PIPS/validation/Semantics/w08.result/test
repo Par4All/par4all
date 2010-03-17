@@ -1,0 +1,118 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM W08
+
+C     The evolution of ms cannot be tracked because there are no other
+C     variables? The loop transformer is not precise because dms.ge.-2
+C     is inconclusive about dms evolution (it may be increasing at any
+C     rate or decreasing no faster than -2 per iteration), but the
+C     preconditions are precise in the loop and at loop exit.
+
+      INTEGER MS
+
+C  T(MS) {MS==3}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(MS) {MS==0}
+
+C (0,2)
+
+      MS = 0                                                            0011
+
+C  T(MS) {MS#init==0, MS<=2}
+
+C (0,3)
+
+      DO WHILE (MS.LE.2)                                                0013
+
+C  T(MS) {MS<=3, MS#init<=MS+2, MS#init<=2}
+
+C (0,4)
+         IF (X.GT.0.) THEN                                              0014
+
+C  T(MS) {MS==0, MS#init<=2}
+
+C (0,5)
+            MS = 0                                                      0015
+         ELSE
+
+C  T(MS) {MS==MS#init+1, MS<=3}
+
+C (0,6)
+            MS = MS+1                                                   0017
+         ENDIF
+      ENDDO
+
+C  T() {MS==3}
+
+C (0,7)
+
+      PRINT *, MS                                                       0021
+
+C     END BLOCK
+      END
+
+PRECONDITIONS
+
+
+C  P() {}
+
+      PROGRAM W08
+
+C     The evolution of ms cannot be tracked because there are no other
+C     variables? The loop transformer is not precise because dms.ge.-2
+C     is inconclusive about dms evolution (it may be increasing at any
+C     rate or decreasing no faster than -2 per iteration), but the
+C     preconditions are precise in the loop and at loop exit.
+
+      INTEGER MS
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      MS = 0                                                            0011
+
+C  P(MS) {MS==0}
+
+C (0,3)
+
+      DO WHILE (MS.LE.2)                                                0013
+
+C  P(MS) {MS<=2}
+
+C (0,4)
+         IF (X.GT.0.) THEN                                              0014
+
+C  P(MS) {MS<=2}
+
+C (0,5)
+            MS = 0                                                      0015
+         ELSE
+
+C  P(MS) {MS<=2}
+
+C (0,6)
+            MS = MS+1                                                   0017
+         ENDIF
+      ENDDO
+
+C  P(MS) {MS==3}
+
+C (0,7)
+
+      PRINT *, MS                                                       0021
+
+C     END BLOCK
+      END

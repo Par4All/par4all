@@ -1,0 +1,18 @@
+#
+# check that source files are put in subdirectories...
+#
+delete split
+create split split.f
+close
+open split
+close
+
+# sleep 2 is too short for loreto
+shell sleep 30
+# sort behavior depends on LC_ALL (see man sort)
+setenv LC_ALL=C
+shell find split.database -type f -print | sort
+# shell sleep 5; find split.database -print | sort
+
+delete split
+quit

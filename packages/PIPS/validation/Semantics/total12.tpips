@@ -1,0 +1,11 @@
+delete total12
+create total12 total12.f
+
+setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+
+activate PRINT_CODE_TOTAL_PRECONDITIONS
+display PRINTED_FILE
+close
+delete total12
+quit
+

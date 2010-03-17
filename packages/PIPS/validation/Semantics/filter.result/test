@@ -1,0 +1,33 @@
+
+C  P() {}
+
+      PROGRAM FILTER
+
+C  P() {}
+
+
+C     Goal: check the property SEMANTICS_FILTERED_PRECONDITIONS
+
+      I = 1                                                             0005
+
+C  P() {}
+
+
+      J = 2                                                             0007
+
+C  P(I) {I==1}
+
+
+      K = I                                                             0009
+
+C  P(J) {J==2}
+
+
+      L = J                                                             0011
+
+C  P(I,J,K,L) {I==1, J==2, K==1, L==2}
+
+
+      PRINT *, I, J, K, L                                               0013
+
+      END

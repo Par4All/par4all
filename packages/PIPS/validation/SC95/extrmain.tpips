@@ -1,0 +1,102 @@
+#
+# AILE: source code from the ONERA, slightly modified to test input
+#	values (the programmer SHOULD have tested these input values)
+# EXTRMAIN is an excerpt from AILE that avoid the cost of interprocedural
+# propagation on several levels. 
+
+#
+# 1- Creation of the workspace.
+#
+delete extrmain
+create extrmain extrmain.f
+
+#
+# 2- Show EXTRMAIN. 
+#
+# Notice the initialization of interger variables, and the three calls to 
+# EXTR.
+#
+module EXTRMAIN
+display PRINTED_FILE
+
+
+#
+# 3- Show EXTR. (Retain)
+#
+#  Notice that array T is a global variable. Several read and write references.
+#  This induces dependences that cannot be disproved if we don't know the 
+#  relations between index expressions. These expressions include variables
+#  that are initialized in the main module; hence the need for interprocedural
+#  information, as we will see later.
+#  S1, S2, S3 and JH must be privatized in order to remove spurious loop carried
+#  dependences.
+#  3 calls to the function D.
+#
+module EXTR
+display PRINTED_FILE
+apply PRIVATIZE_MODULE
+
+#
+# 4- Show D.
+#
+#  There are 6 read references to the array T. The index expressions are not
+#  trivially related to each other. So, we must assume that all the array
+#  is potentially read. This induces dependences in EXTR between the call 
+#  sites of D and the other instructions
+#
+module D
+display PRINTED_FILE
+
+#
+# 5- Show parallel version of EXTR.
+#
+#  We don't have enough information to parallelize the loop.
+#
+module EXTR
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+
+#
+# 6- Show D with regions
+#
+#  We could try to represent the set of elements read in D, and use it at the
+#  call sites in EXTR. These sorts of sets are called "regions" in PIPS.
+#  But here, we have only information on the third dimension of T, not on the 
+#  others, because we don't have information on the relations between J and JH
+#  or K and KP. In fact, it is an over-approximation of the set of elements; 
+#  we call that a MAY region.
+#
+module D
+activate MUST_REGIONS         # to show that this really is a MAY region.
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+#
+# 7- Show D with MUST regions 
+#
+#  This time, using interprocedural relations between the
+#  values of variable, the regions in D exactly represent the elements that 
+#  are read. And if we use these regions for the dependence analysis, 
+#  we can parallelize the code.  
+#
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+display PRINTED_FILE
+
+
+#
+# 8- Show EXTR parallelized with interprocedural information
+#    
+#  Notice the privatized variables, and the two parallel loops.
+
+module EXTR
+activate REGION_CHAINS
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE
+
+# Conclusion:
+close
+delete extrmain
+quit

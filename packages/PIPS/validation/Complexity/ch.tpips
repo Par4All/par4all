@@ -1,0 +1,27 @@
+# Script to test Cholesky
+
+delete ch
+
+set ABORT_ON_USER_ERROR TRUE
+
+create ch ch.f
+module ch
+activate PRINT_CODE_COMPLEXITIES
+set COMPLEXITY_EARLY_EVALUATION TRUE
+echo C --- Complexity with early evaluation
+display PRINTED_FILE
+close
+delete ch
+
+# The workspace must be deleted because pipsmake doesn't
+# know about property changes
+create ch ch.f
+module ch
+activate PRINT_CODE_COMPLEXITIES
+echo C --- Complexity with late evaluation
+# set COMPLEXITY_INTERMEDIATES TRUE
+set COMPLEXITY_EARLY_EVALUATION FALSE
+display PRINTED_FILE
+close
+delete ch
+quit

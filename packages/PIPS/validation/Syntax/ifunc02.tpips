@@ -1,0 +1,6 @@
+delete ifunc02
+create ifunc02 ifunc02.f
+display PRINTED_FILE[FOO]
+close
+delete ifunc02
+quit

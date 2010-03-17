@@ -1,0 +1,62 @@
+C     Bug with data variable and value lists
+      SUBROUTINE RFFTI1 (N,WA,IFAC)
+      DIMENSION       WA(*)      ,IFAC(*)    ,NTRYH(4)
+      SAVE NTRYH
+      DATA NTRYH(1),NTRYH(2),NTRYH(3),NTRYH(4)/4,2,3,5/
+      NL = N                                                            0006
+      NF = 0                                                            0007
+      J = 0                                                             0008
+101   J = J+1                                                           0009
+      IF (J-4.LE.0) GOTO 102                                            0010
+103   NTRY = NTRY+2                                                     0013
+104   NQ = NL/NTRY                                                      0014
+      NR = NL-NTRY*NQ                                                   0015
+      IF (NR.EQ.0) THEN                                                 0016
+      ELSE
+         GOTO 101
+      ENDIF
+105   NF = NF+1                                                         0017
+      IFAC(NF+2) = NTRY                                                 0018
+      NL = NQ                                                           0019
+      IF (NTRY.NE.2) GOTO 107                                           0020
+      IF (NF.EQ.1) GOTO 107                                             0021
+      DO I = 2, NF                                                      0022
+         IB = NF-I+2                                                    0023
+         IFAC(IB+2) = IFAC(IB+1)                                        0024
+      ENDDO
+      IFAC(3) = 2                                                       0026
+107   IF (NL.NE.1) GOTO 104                                             0027
+      IFAC(1) = N                                                       0028
+      IFAC(2) = NF                                                      0029
+      TPI = 6.28318530717959                                            0030
+      ARGH = TPI/FLOAT(N)                                               0031
+      IS = 0                                                            0032
+      NFM1 = NF-1                                                       0033
+      L1 = 1                                                            0034
+      IF (NFM1.EQ.0) RETURN                                             0035
+      DO K1 = 1, NFM1                                                   0036
+         IP = IFAC(K1+2)                                                0037
+         L2 = L1*IP                                                     0039
+         IDO = N/L2                                                     0040
+         IPM = IP-1                                                     0041
+         LD = 0                                                         0038
+         DO J = 1, IPM                                                  0042
+            LD = LD+L1                                                  0043
+            ARGLD = FLOAT(LD)*ARGH                                      0045
+            I = IS                                                      0044
+            IS = IS+IDO                                                 0054
+            FI = 0.                                                     0046
+            DO II = 3, IDO, 2                                           0047
+               I = I+2                                                  0048
+               FI = FI+1.                                               0049
+               ARG = FI*ARGLD                                           0050
+               WA(I-1) = COS(ARG)                                       0051
+               WA(I) = SIN(ARG)                                         0052
+            ENDDO
+         ENDDO
+         L1 = L2                                                        0056
+      ENDDO
+      RETURN
+102   NTRY = NTRYH(J)                                                   0011
+      GOTO 104
+      END

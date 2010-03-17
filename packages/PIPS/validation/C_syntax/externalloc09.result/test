@@ -1,0 +1,142 @@
+bar!
+
+Declarations for module "bar!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int"
+	Declared entity "bar!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "bar!:*HEAP*" with type "area" with size 0
+	Declared entity "bar!:*STACK*" with type "area" with size 0
+	Declared entity "bar!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module bar!
+
+foo!
+
+Declarations for module "foo!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
+	Declared entity "foo!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "foo!:*HEAP*" with type "area" with size 0
+	Declared entity "foo!:*STACK*" with type "area" with size 0
+	Declared entity "foo!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:i"	offset = 0	size = 4
+
+
+Layout for memory area "foo!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module foo!
+
+main
+
+Declarations for module "main" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
+	Declared entity "bar!:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 10
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:main" with type "variable" "int"
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:i"	with type "variable" "int"
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:i"	offset = 0	size = 4
+
+
+Layout for memory area "bar!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 10:
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
+//Checks memory allocation offsets for extern variables in 2 files:
+// bar.c extern variable declared in a function
+extern int main();
+//foo.c local variable declaration
+int i = 2;
+int main()
+{
+   extern int i;
+   return 0;
+}

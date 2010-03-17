@@ -1,0 +1,13 @@
+delete csplit07
+create csplit07 csplit07.c
+
+# Bug: the workspace should not be created, an error code is not returned
+# somewhere. The same bug does not exist for Fortran files.
+
+# quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+quit

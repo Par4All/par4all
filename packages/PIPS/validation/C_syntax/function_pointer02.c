@@ -1,0 +1,8 @@
+void fp(int x)
+{
+    void (*f)(int);
+    void (*g)(int);
+    f = fp;
+    f(x);
+    g(x);
+} 

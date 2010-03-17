@@ -1,0 +1,54 @@
+
+C  P() {}
+
+      PROGRAM IABS02
+
+C  P() {}
+
+
+C     Non trivial and non-linear expressions
+
+      READ *, N                                                         0005
+
+C  P(N) {}
+
+
+      I = IABS(N+M/2)                                                   0007
+
+C  P(I,N) {0<=I, 0<=2I+M+2N, M+2N<=2I+1}
+
+
+      PRINT *, I                                                        0009
+
+C  P(I,N) {0<=I, 0<=2I+M+2N, M+2N<=2I+1}
+
+
+      READ *, J                                                         0011
+
+C  P(I,J,N) {0<=I, 0<=2I+M+2N, M+2N<=2I+1}
+
+
+      J = IABS(I*(I+1))                                                 0013
+
+C  P(I,J,N) {0<=I, 0<=2I+M+2N, M+2N<=2I+1, 0<=J}
+
+
+      PRINT *, J                                                        0015
+
+C  P(I,J,N) {0<=I, 0<=2I+M+2N, M+2N<=2I+1, 0<=J}
+
+
+      IF (J.NE.3) STOP                                                  0017
+
+C  P(I,J,N) {J==3, 0<=I, 0<=2I+M+2N, M+2N<=2I+1}
+
+
+      K = IABS(J*(I+1))                                                 0019
+
+C  P(I,J,K,N) {J==3, 0<=I, 0<=3I+K+3, 3I+3<=K, 0<=2I+M+2N, M+2N<=2I+1}
+
+
+      PRINT *, K                                                        0021
+
+      END
+

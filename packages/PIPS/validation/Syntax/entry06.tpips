@@ -1,0 +1,30 @@
+delete entry06
+create entry06 entry06.f
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY06
+echo
+
+display PRINTED_FILE[ENTRY06]
+
+# Then, the code for the first entry can be displayed
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+
+# And finally the code for the second entry can be displayed
+
+echo
+echo Entry DECREMENT
+echo
+
+display PRINTED_FILE[DECREMENT]
+
+close
+delete entry06
+quit

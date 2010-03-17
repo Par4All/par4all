@@ -1,0 +1,37 @@
+delete hind
+create hind hind.f
+
+#setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
+# setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+# setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+# setproperty PRETTYPRINT_FINAL_RETURN TRUE
+# setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+# apply RESTRUCTURE_CONTROL[HIND]
+
+# setenv SEMANTICS_DEBUG_LEVEL 8
+
+# New processing of unstructured
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+# activate PRINT_CODE_TRANSFORMERS
+# display PRINTED_FILE[HIND]
+
+activate PRINT_CODE_PRECONDITIONS
+echo --- Preconditions for module HIND
+display PRINTED_FILE[HIND]
+echo --- Preconditions for module SUB1
+display PRINTED_FILE[SUB1]
+echo --- Preconditions for module SUB2
+display PRINTED_FILE[SUB2]
+
+close
+delete hind
+quit
+# EOF

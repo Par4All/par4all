@@ -1,0 +1,161 @@
+!!
+!! file for alias10.f
+!!
+      PROGRAM ALIAS
+      PARAMETER (N=10)
+      INTEGER N, M
+      REAL*4 A(N), C
+      COMMON /ESSAI/ C(100)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      PRINT *, 'detection des alias dynamiques'
+C (0,3)
+
+      PRINT *, 'pas ok'
+C (0,4)
+      ALIAS_FLAG(1) = .TRUE.
+      CALL SUB(A, A, N, 4*N, 4*N, 4)
+C (0,5)
+
+      PRINT *, 'ok'
+C (0,6)
+! comment connait-on la taille? regions? ou declaration...
+      M = 5
+C (0,7)
+      CALL SUB(A(1), A(M+1), M, 4*M, 4*M, 4)
+C (0,8)
+
+      PRINT *, 'pas ok'
+C (0,9)
+      M = 3
+C (0,10)
+      ALIAS_FLAG(2) = .TRUE.
+      CALL SUB(A(1), A(M), M, 4*M, 4*M, 4)
+C (0,11)
+
+      PRINT *, 'pas ok'
+C (0,12)
+      ALIAS_FLAG(3) = .TRUE.
+      ALIAS_FLAG(4) = .TRUE.
+      ALIAS_FLAG(5) = .TRUE.
+      ALIAS_FLAG(6) = .TRUE.
+      CALL SUB(C(1), C(11), 10, 4*10, 4*10, 4)
+C (0,13)
+
+      PRINT *, 'ok'
+C (0,14)
+      ALIAS_FLAG(7) = .TRUE.
+      ALIAS_FLAG(8) = .TRUE.
+      ALIAS_FLAG(9) = .TRUE.
+      ALIAS_FLAG(10) = .TRUE.
+      CALL SUB(C(11), C(21), 10, 4*10, 4*10, 4)
+C (0,15)
+
+      PRINT *, 'fin'
+C (0,16)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE SUB(A, B, M, SA, SB, SM)
+      COMMON /ESSAI/ C(100)
+      REAL*4 C
+      INTEGER M, I
+      REAL*4 A(M), B(M)
+      INTEGER SA, SB, SM
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+
+! W-MUST a(1:m) b(1:m) c(1:m)
+! R a b c m
+c      call checkalias('ab\0', a, min(sa,4*m), b, min(sb,4*m))
+c      call checkalias('ac\0', a, min(sa,4*m), c, min(4*100,4*m))
+c      call checkalias('am\0', a, min(sa,4*m), m, min(sm,4))
+c      call checkalias('bc\0', b, min(sb,4*m), c, min(4*100,4*m))
+c      call checkalias('bm\0', b, min(sb,4*m), m, min(sm,4))
+c      call checkalias('cm\0', c, min(4*100,4*m), m, min(sm,4))
+
+      DO I = 1, M
+C (0,3)
+      IF (I-1.GE.0.AND.-M+I.LE.0.AND.ALIAS_FLAG(1)) STOP "Alias violatio
+     &n in module SUB: write on A, aliased with B by call path (ALIAS:(0
+     &,4)) "
+      IF (-M+I.GE.0.AND.-2*M+I+1.LE.0.AND.ALIAS_FLAG(2)) STOP "Alias vio
+     &lation in module SUB: write on A, aliased with B by call path (ALI
+     &AS:(0,10)) "
+      IF (I-11.GE.0.AND.-M+I-10.LE.0.AND.ALIAS_FLAG(3)) STOP "Alias viol
+     &ation in module SUB: write on A, aliased with B by call path (ALIA
+     &S:(0,12)) "
+      IF (I-11.GE.0.AND.-M+I-10.LE.0.AND.ALIAS_FLAG(4)) STOP "Alias viol
+     &ation in module SUB: write on A, aliased with B by call path (ALIA
+     &S:(0,12)) "
+      IF (I-1.GE.0.AND.I-100.LE.0.AND.ALIAS_FLAG(5)) STOP "Alias violati
+     &on in module SUB: write on A, aliased with C by call path (ALIAS:(
+     &0,12)) "
+      IF (-11+I.GE.0.AND.-M-10+I.LE.0.AND.ALIAS_FLAG(7)) STOP "Alias vio
+     &lation in module SUB: write on A, aliased with B by call path (ALI
+     &AS:(0,14)) "
+      IF (-11+I.GE.0.AND.-M-10+I.LE.0.AND.ALIAS_FLAG(8)) STOP "Alias vio
+     &lation in module SUB: write on A, aliased with B by call path (ALI
+     &AS:(0,14)) "
+      IF (9+I.GE.0.AND.-90+I.LE.0.AND.ALIAS_FLAG(9)) STOP "Alias violati
+     &on in module SUB: write on A, aliased with C by call path (ALIAS:(
+     &0,14)) "
+         A(I) = I
+      ENDDO
+C (0,4)
+
+      DO I = 1, M
+C (0,5)
+      IF (I-1.GE.0.AND.-M+I.LE.0.AND.ALIAS_FLAG(1)) STOP "Alias violatio
+     &n in module SUB: write on B, aliased with A by call path (ALIAS:(0
+     &,4)) "
+      IF (-2+M+I.GE.0.AND.-1+I.LE.0.AND.ALIAS_FLAG(2)) STOP "Alias viola
+     &tion in module SUB: write on B, aliased with A by call path (ALIAS
+     &:(0,10)) "
+      IF (9+I.GE.0.AND.-M+10+I.LE.0.AND.ALIAS_FLAG(3)) STOP "Alias viola
+     &tion in module SUB: write on B, aliased with A by call path (ALIAS
+     &:(0,12)) "
+      IF (9+I.GE.0.AND.-M+10+I.LE.0.AND.ALIAS_FLAG(4)) STOP "Alias viola
+     &tion in module SUB: write on B, aliased with A by call path (ALIAS
+     &:(0,12)) "
+      IF (9+I.GE.0.AND.-90+I.LE.0.AND.ALIAS_FLAG(6)) STOP "Alias violati
+     &on in module SUB: write on B, aliased with C by call path (ALIAS:(
+     &0,12)) "
+      IF (9+I.GE.0.AND.-M+10+I.LE.0.AND.ALIAS_FLAG(7)) STOP "Alias viola
+     &tion in module SUB: write on B, aliased with A by call path (ALIAS
+     &:(0,14)) "
+      IF (9+I.GE.0.AND.-M+10+I.LE.0.AND.ALIAS_FLAG(8)) STOP "Alias viola
+     &tion in module SUB: write on B, aliased with A by call path (ALIAS
+     &:(0,14)) "
+      IF (19+I.GE.0.AND.-80+I.LE.0.AND.ALIAS_FLAG(10)) STOP "Alias viola
+     &tion in module SUB: write on B, aliased with C by call path (ALIAS
+     &:(0,14)) "
+         B(I) = A(I)+3
+      ENDDO
+C (0,6)
+
+      DO I = 1, M
+C (0,7)
+      IF (I-1.GE.0.AND.-M+I.LE.0.AND.ALIAS_FLAG(5)) STOP "Alias violatio
+     &n in module SUB: write on C, aliased with A by call path (ALIAS:(0
+     &,12)) "
+      IF (I-11.GE.0.AND.-M+I-10.LE.0.AND.ALIAS_FLAG(6)) STOP "Alias viol
+     &ation in module SUB: write on C, aliased with B by call path (ALIA
+     &S:(0,12)) "
+      IF (I-11.GE.0.AND.-M+I-10.LE.0.AND.ALIAS_FLAG(9)) STOP "Alias viol
+     &ation in module SUB: write on C, aliased with A by call path (ALIA
+     &S:(0,14)) "
+      IF (I-21.GE.0.AND.-M+I-20.LE.0.AND.ALIAS_FLAG(10)) STOP "Alias vio
+     &lation in module SUB: write on C, aliased with B by call path (ALI
+     &AS:(0,14)) "
+         C(I) = C(I)+B(I)
+      ENDDO
+C (0,8)
+      RETURN
+C     END BLOCK
+      END

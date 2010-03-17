@@ -1,0 +1,12 @@
+delete formel06
+create formel06 formel06.f
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+display PRINTED_FILE
+# Let's try again to see if the parser is still consistent after a close
+close
+open formel06
+display PRINTED_FILE
+# Let's try again to see if the parser is still consistent without a close
+display PRINTED_FILE
+close
+delete formel06

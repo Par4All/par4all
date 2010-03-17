@@ -1,0 +1,12 @@
+delete privatization01
+create privatization01 privatization01.f
+apply PRIVATIZE_MODULE[PRIVATIZATION01]
+setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+display PRINTED_FILE
+quit
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE[PRIVATIZATION01]
+close
+delete privatization01
+quit

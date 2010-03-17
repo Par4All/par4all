@@ -1,0 +1,28 @@
+delete entry16
+create entry16 entry16.f
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
+# setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+# setproperty PRETTYPRINT_ALL_EFFECTS TRUE
+# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+# setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+# setproperty PRETTYPRINT_ALL_LABELS TRUE
+
+echo
+echo Module ENTRY16
+echo
+
+# display PARSED_PRINTED_FILE[ENTRY16]
+display PRINTED_FILE[ENTRY16]
+
+# quit
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+close
+delete entry16
+quit

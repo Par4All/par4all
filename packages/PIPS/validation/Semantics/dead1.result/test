@@ -1,0 +1,30 @@
+
+Without explicit dead code elimination:
+
+
+C  P() {I==1}
+
+
+      SUBROUTINE PR(I)
+
+C  P() {I==1}
+
+
+      PRINT *, I                                                        0004
+
+      END
+
+After dead code elimination:
+
+
+C  P() {I==1}
+
+
+      SUBROUTINE PR(I)
+
+C  P() {I==1}
+
+
+      PRINT *, I                                                        0004
+
+      END

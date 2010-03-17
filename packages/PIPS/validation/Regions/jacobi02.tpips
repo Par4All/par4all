@@ -1,0 +1,105 @@
+setenv WKS jacobi02
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+display PRINTED_FILE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+
+echo
+echo REGIONS for all modules
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALLFUNC]
+
+# Should not coredump...
+#apply LOCALIZE_DECLARATION[main]
+
+#activate PRINT_CODE_PRECONDITIONS
+#display PRINTED_FILE[%ALLFUNC]
+
+activate PRINT_CODE
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+echo
+echo CODE for all modules after coarse_grain_parallelization
+echo
+display PRINTED_FILE[compute]
+
+
+#apply GPU_IFY[compute]
+apply GPU_IFY[%ALLFUNC]
+
+echo
+echo CODE for all modules after gpu_ify
+echo
+display PRINTED_FILE[%ALLFUNC]
+
+
+# Study the regions to look at what is interesting:
+echo
+echo REGIONS for compute and get_data
+echo
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[compute,get_data]
+
+echo
+echo Proper REGIONS for compute and get_data
+echo
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[compute,get_data]
+
+echo
+echo IN REGIONS for compute and get_data
+echo
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[compute,get_data]
+
+echo
+echo OUT REGIONS for compute and get_data
+echo
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE[compute,get_data]
+
+echo
+echo Privatized REGIONS for compute and get_data
+echo
+activate PRINT_CODE_PRIVATIZED_REGIONS
+display PRINTED_FILE[compute,get_data]
+
+
+# Need pyps for automate this:
+#apply LOOP_NORMALIZE[kernel_launcher_0]
+#apply LOOP_NORMALIZE[kernel_launcher_1]
+#apply LOOP_NORMALIZE[kernel_launcher_2]
+
+#display PRINTED_FILE[kernel_launcher_0,kernel_launcher_1,kernel_launcher_2]
+
+#apply SUPPRESS_DEAD_CODE
+#display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+
+
+close
+#delete $WKS
+quit

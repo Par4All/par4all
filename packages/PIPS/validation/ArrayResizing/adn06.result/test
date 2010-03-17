@@ -1,0 +1,121 @@
+      FUNCTION FOO(I)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      FOO = I
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      PROGRAM INTER_REGION
+      REAL WORK(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 2
+C (0,3)
+      N = 2+FOO(5)
+C (0,4)
+      K = 1
+C (0,5)
+      M = 2
+C (0,6)
+      CALL RUN(WORK)
+C (0,7)
+      L = 1
+C (0,8)
+      IF (K.GT.FOO(4)) THEN
+C (0,9)
+         CALL RUN(WORK)
+      ELSE
+C (0,10)
+         M = FOO(3)
+      ENDIF
+C (0,11)
+
+      H = 1
+C (0,12)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN(C)
+      REAL C(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 10
+      DO I = 1, 20
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         C(I) = 0.
+C (0,5)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for adn06.f
+!!
+      PROGRAM INTER_REGION
+      REAL WORK(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 2
+C (0,3)
+      N = 2+FOO(5)
+C (0,4)
+      K = 1
+C (0,5)
+      M = 2
+C (0,6)
+      CALL RUN(WORK)
+C (0,7)
+      L = 1
+C (0,8)
+      IF (K.GT.FOO(4)) THEN
+C (0,9)
+         CALL RUN(WORK)
+      ELSE
+C (0,10)
+         M = FOO(3)
+      ENDIF
+C (0,11)
+
+      H = 1
+C (0,12)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN(C)
+      REAL C(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 10
+      DO I = 1, 20
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         C(I) = 0.
+C (0,5)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      FUNCTION FOO(I)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      FOO = I
+C (0,3)
+      RETURN
+C     END BLOCK
+      END

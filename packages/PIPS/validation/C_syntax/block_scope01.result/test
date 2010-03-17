@@ -1,0 +1,230 @@
+
+Symbol tables
+
+Possible bug in CCOmpilationUnitMemoryAllocation() for "block_scope01!"
+block_scope01!
+
+Declarations for module "block_scope01!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
+	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int"
+	Declared entity "TOP-LEVEL:x" with type "variable" "int"
+	Declared entity "block_scope01!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "block_scope01!:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope01!:*STACK*" with type "area" with size 0
+	Declared entity "block_scope01!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+
+
+Layout for memory area "block_scope01!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope01!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope01!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "block_scope01!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module block_scope01!
+
+main
+
+Declarations for module "main" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "block_scope01!:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 18
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`1`x" with type "variable" "int"
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:0`x" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+
+
+Layout for memory area "block_scope01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 18:
+	Variable "main:0`x"	offset = 10	size = 4
+	Variable "main:0`1`x"	offset = 14	size = 4
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
+foo
+
+Declarations for module "foo" with type "int -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "block_scope01!:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 32
+	Declared entity "foo:*HEAP*" with type "area" with size 0
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:0`1`x" with type "variable" "int"
+	Declared entity "foo:0`2`x" with type "variable" "int"
+	Declared entity "foo:0`3`x" with type "variable" "int"
+	Declared entity "foo:0`4`y" with type "variable" "int"
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "foo:0`x" with type "variable" "int"
+	Declared entity "foo:0`y" with type "variable" "int"
+	Declared entity "foo:x" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable foo:x	offset = 1
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+
+
+Layout for memory area "block_scope01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*DYNAMIC*" of size 32:
+	Variable "foo:0`x"	offset = 8	size = 4
+	Variable "foo:0`y"	offset = 12	size = 4
+	Variable "foo:0`1`x"	offset = 16	size = 4
+	Variable "foo:0`2`x"	offset = 20	size = 4
+	Variable "foo:0`3`x"	offset = 24	size = 4
+	Variable "foo:0`4`y"	offset = 28	size = 4
+	Variable "foo:0`__func__"	offset = 0	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 4	size = 4
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module foo
+
+
+Parsed printed files
+
+extern int main();
+
+int x = 1;
+
+extern void foo(int x);
+int main()
+{
+   int x = 6;
+   {
+      int x = 7;
+   }
+   return x;
+}
+void foo(int x)
+{
+   int x, y;
+   if (x>1) {
+      int x;
+   }
+   else {
+      int x;
+   }
+   if (y>1) {
+      int x;
+   }
+   else {
+      int y;
+   }
+}
+
+Printed files
+
+extern int main();
+
+int x = 1;
+
+extern void foo(int x);
+int main()
+{
+   int x = 6;
+   {
+      int x = 7;
+   }
+   return x;
+}
+void foo(int x)
+{
+   int x, y;
+   if (x>1) {
+      int x;
+   }
+   else {
+      int x;
+   }
+   if (y>1) {
+      int x;
+   }
+   else {
+      int y;
+   }
+}
+
