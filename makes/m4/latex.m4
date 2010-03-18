@@ -107,6 +107,6 @@ dnl define AX_MSG(package-name) and AX_WITH(package-name)
 
 AC_DEFUN([AX_LATEX_PACKAGE],[
 	AC_LATEX_PACKAGE([$1],[article],[AX_WITH([$1])])
-	AS_IF([AX_HAS($1)],[],[AX_MSG([$1])="$1 not found"])
+	AS_IF([AX_HAS($1)],[],[AX_MSG([$1])="latex package $1 not found"])
 ])
 

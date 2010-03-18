@@ -1,10 +1,16 @@
-SUFFIXES=.tex .pdf
+SUFFIXES=.tex .pdf .eps .idraw 
+
+.eps.pdf:
+	$(EPSTOPDF) --outfile=$@ $<
+
+.idraw.pdf:
+	$(EPSTOPDF) --outfile=$@ $<
 
 .tex.pdf:
-	$(PDFLATEX) $<
-	$(PDFLATEX) $<
-	$(PDFLATEX) $<
+	TEXINPUTS=`$(KPSEPATH) tex`:$(builddir):$(srcdir) $(PDFLATEX) $<
+	TEXINPUTS=`$(KPSEPATH) tex`:$(builddir):$(srcdir) $(PDFLATEX) $<
+	TEXINPUTS=`$(KPSEPATH) tex`:$(builddir):$(srcdir) $(PDFLATEX) $<
 
 clean-local:
-	$(RM) *.aux  *.idx  *.log  *.out *.toc
+	$(RM) *.aux  *.idx  *.log  *.out *.toc *.brf
 DISTCLEANFILES=$(doc_DATA)
