@@ -19,6 +19,6 @@
 #
 
 docdir=$(datadir)/doc
-dist_noinst_DATA=developer_guide.tex
-doc_DATA=developer_guide.pdf
+dist_noinst_DATA=user-guide.tex
+doc_DATA=user-guide.pdf
 include $(top_srcdir)/makes/latex.mk

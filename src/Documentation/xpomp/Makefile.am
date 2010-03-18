@@ -19,6 +19,6 @@
 #
 
 docdir=$(datadir)/doc
-dist_noinst_DATA=developer_guide.tex
-doc_DATA=developer_guide.pdf
+dist_noinst_DATA=xpomp_manual.tex xPOMP_window_explained.eps
+doc_DATA=xpomp_manual.pdf
 include $(top_srcdir)/makes/latex.mk

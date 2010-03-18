@@ -1,5 +1,24 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 AC_PREREQ(2.61)
 AC_INIT([pips],[0.1],[pipsdev@cri.ensmp.fr])
@@ -69,8 +88,12 @@ AX_ARG_ENABLE([doc],
 			  [no],
 			  [
 			   AX_CHECK_PROG([pdflatex])
-			   AX_LATEX_PACKAGE([pstricks])
-			   AX_DEPENDS([doc],[pdflatex pstricks])
+			   AX_CHECK_PROG([kpsepath])
+			   AX_CHECK_PROG([epstopdf])
+			   AX_LATEX_PACKAGE([listings])
+			   AX_LATEX_PACKAGE([tikz])
+			   AX_LATEX_PACKAGE([html])
+			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf listings tikz html])
 			  ]
 )
 AM_CONDITIONAL([WITH_DOC],[AX_HAS([doc])])
@@ -198,9 +221,19 @@ AC_CONFIG_FILES([Makefile
                  src/Scripts/simple_tools/Makefile
                  src/Scripts/simple_tools/pips_c2openmp
                  src/Scripts/simple_tools/pips_f2openmp
-
                  src/Documentation/dev_guide/Makefile
+                 src/Documentation/tpips-user-manual/Makefile
+				 src/Documentation/linear/Makefile
+				 src/Documentation/bugs_and_wishes/Makefile
+				 src/Documentation/faq/Makefile
+				 src/Documentation/xpomp/Makefile
+				 src/Documentation/manl/Makefile
 ])
+				
+				 #src/Documentation/doxygen/Makefile
+				 #src/Documentation/logo/Makefile
+                 #src/Documentation/web/Makefile
+
                  #src/Libs/pip/Makefile
                  #src/Libs/prgm_mapping/Makefile
                  #src/Libs/reindexing/Makefile
@@ -225,12 +258,7 @@ AC_CONFIG_FILES([Makefile
 #                 src/Scripts/step/Makefile
 #                 src/Scripts/stf/Makefile
 #                 src/Scripts/validation/Makefile
-                 #src/Documentation/dev_guide/Makefile
-                 #src/Documentation/doxygen/Makefile
-                 #src/Documentation/logo/Makefile
-                 #src/Documentation/manl/Makefile
-                 #src/Documentation/tpips-user-manual/Makefile
-                 #src/Documentation/web/Makefile
+                 
 
 AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 

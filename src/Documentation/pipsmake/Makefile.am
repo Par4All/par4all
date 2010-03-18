@@ -1,7 +1,34 @@
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+docdir=$(datadir)/doc
+doc_DATA=pipsmake-rc.pdf
+include $(top_srcdir)/makes/latex.mk
+
+# Convert idraw/eps files.
+pipsmake-rc.pdf:user-and-source-files.pdf
+
 dist_noinst_SCRIPTS=make-pips-menu make-builder-map generate_all_menu_documentation pipspassdep.pl
 
 sysconf_DATA=pipsmake.rc properties.rc pipsdep.rc wpips.rc properties-2009-10-31.rc 
-dist_noinst_DATA=pipsmake.sed pipsmake-rc.tex properties-2009-10-31.rc.model resources.sed
+dist_noinst_DATA=pipsmake.sed pipsmake-rc.tex properties-2009-10-31.rc.model resources.sed user-and-source-files.idraw
 
 BUILT_SOURCES=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
 include_HEADERS=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
@@ -46,4 +73,4 @@ builder_map.h: pipsmake.rc $(srcdir)/make-builder-map
 epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex generate_all_menu_documentation
 	$(srcdir)/generate_all_menu_documentation -layout < $(srcdir)/pipsmake-rc.tex
 
-CLEANFILES=$(nodist_include_HEADERS) $(sysconf_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el
+CLEANFILES=$(nodist_include_HEADERS) $(sysconf_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el user-and-source-files.pdf
