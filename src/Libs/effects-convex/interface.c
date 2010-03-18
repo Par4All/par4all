@@ -62,6 +62,17 @@
 
 /******************************************************* CONVEX R/W REGIONS */
 
+bool 
+summary_pointer_regions(char *module_name)
+{
+    bool res;
+    set_methods_for_convex_rw_pointer_effects();
+    res = summary_rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return res;
+}
+
+
 /* bool summary_regions(char *module_name): computes the global
  * regions of a module : global regions only use formal or common variables.
  */
@@ -73,6 +84,23 @@ summary_regions(char *module_name)
     res = summary_rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return res;
+}
+
+
+bool 
+may_pointer_regions(char *module_name)
+{
+  bool res1, res2;
+  set_bool_property("MUST_REGIONS", FALSE);
+  
+  set_methods_for_convex_rw_pointer_effects();
+  res1 = proper_effects_engine(module_name);
+  generic_effects_reset_all_methods();
+  
+  set_methods_for_convex_rw_pointer_effects();
+  res2 = rw_effects_engine(module_name);
+  generic_effects_reset_all_methods();
+  return res1 && res2;
 }
 
 /* bool may_regions(char *module_name) 
@@ -91,11 +119,32 @@ may_regions(char *module_name)
     set_methods_for_convex_rw_effects();
 
     res1 = proper_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+
+    set_methods_for_convex_rw_effects();
     res2 = rw_effects_engine(module_name);
 
     generic_effects_reset_all_methods();
    
     return res1 && res2;
+}
+
+
+bool 
+must_pointer_regions(char *module_name)
+{
+  bool res1, res2;
+  set_bool_property("MUST_REGIONS", TRUE);
+  
+  set_methods_for_convex_rw_pointer_effects();
+  res1 = proper_effects_engine(module_name);
+  generic_effects_reset_all_methods();
+  
+  set_methods_for_convex_rw_pointer_effects();
+  res2 = rw_effects_engine(module_name);
+ 
+  generic_effects_reset_all_methods();
+  return res1 && res2;
 }
 
 
@@ -225,6 +274,27 @@ print_code_any_regions(
 
     generic_effects_reset_all_methods();
     return ok;
+}
+
+bool
+print_code_proper_pointer_regions(string module_name)
+{
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+			  DBR_PROPER_POINTER_REGIONS, string_undefined, ".preg");
+}
+
+bool
+print_code_pointer_regions(string module_name)
+{
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+			  DBR_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
+}
+
+bool
+print_code_inv_pointer_regions(string module_name)
+{
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+			  DBR_INV_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
 }
 
 bool

@@ -148,6 +148,7 @@ effect (*proper_to_summary_effect_func)(effect);
 void (*effects_descriptor_normalize_func)(list /* of effects */);
 
 /* getting/putting resources from/to pipsdbm */
+
 statement_effects (*db_get_proper_rw_effects_func)(char *);
 void (*db_put_proper_rw_effects_func)(char *, statement_effects);
 
