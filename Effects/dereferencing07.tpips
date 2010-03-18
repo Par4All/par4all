@@ -17,6 +17,24 @@ activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
 activate REGION_CHAINS
 
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+
+echo
+echo Proper pointer effects for "foo"
+echo
+display PRINTED_FILE[foo]
+
+echo
+echo Proper pointer effects for "main"
+echo
+display PRINTED_FILE[main]
+
+echo
+echo Proper regions for "main"
+echo
+activate PRINT_CODE_PROPER_POINTER_REGIONS
+display PRINTED_FILE[main]
+
 activate PRINT_CODE_PROPER_EFFECTS
 
 echo

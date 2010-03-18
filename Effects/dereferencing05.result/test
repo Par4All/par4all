@@ -12,7 +12,7 @@ void dereferencing05()
    *--p = 0.;
 }
 
-Proper effetcs for "dereferencing05"
+Proper pointer effects for "dereferencing05"
 
 void dereferencing05()
 {
@@ -33,7 +33,7 @@ void dereferencing05()
    *--p = 0.;
 }
 
-Cumulated effetcs for "dereferencing05"
+Cumulated pointer effects for "dereferencing05"
 
 //               <may be written >: TOP-LEVEL:*MEMORY*
 void dereferencing05()
@@ -52,5 +52,48 @@ void dereferencing05()
    *++p = 0.;
 //               <must be read   >: p
 //               <must be written>: p p[-1]
+   *--p = 0.;
+}
+
+Proper effects for "dereferencing05"
+
+void dereferencing05()
+{
+   double *p;
+   int i;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+
+   *p++ = 0.;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+   *p-- = 0.;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+   *++p = 0.;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+   *--p = 0.;
+}
+
+Cumulated effects for "dereferencing05"
+
+//               <may be written >: TOP-LEVEL:*MEMORY*
+void dereferencing05()
+{
+   double *p;
+   int i;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+
+   *p++ = 0.;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+   *p-- = 0.;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+   *++p = 0.;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
    *--p = 0.;
 }

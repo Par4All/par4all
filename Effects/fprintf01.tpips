@@ -20,7 +20,7 @@ echo
 echo Code with proper effects for "fprintf01"
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[main]
 close
 delete fprintf01

@@ -12,7 +12,7 @@ void point_to02()
    (p->b)[2] = 3;
 }
 
-Cumulated effetcs for "point_to02"
+Cumulated pointer effects for "point_to02"
 
 //               <may be written >: TOP-LEVEL:*MEMORY*
 void point_to02()

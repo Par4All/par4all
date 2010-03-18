@@ -9,7 +9,7 @@ void dereferencing04()
    *(p+q-r) = 0.;
 }
 
-Proper effetcs for "dereferencing04"
+Proper pointer effects for "dereferencing04"
 
 void dereferencing04()
 {
@@ -21,7 +21,7 @@ void dereferencing04()
    *(p+q-r) = 0.;
 }
 
-Cumulated effetcs for "dereferencing04"
+Cumulated pointer effects for "dereferencing04"
 
 //               <may be written >: TOP-LEVEL:*MEMORY*
 void dereferencing04()
@@ -30,6 +30,31 @@ void dereferencing04()
    double *q;
    double *r;
 //               <may be written >: p[*]
+//               <must be read   >: p q r
+   *(p+q-r) = 0.;
+}
+
+Proper effects for "dereferencing04"
+
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p q r
+   *(p+q-r) = 0.;
+}
+
+Cumulated effects for "dereferencing04"
+
+//               <may be written >: TOP-LEVEL:*MEMORY*
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: p q r
    *(p+q-r) = 0.;
 }

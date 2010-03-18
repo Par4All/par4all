@@ -17,7 +17,7 @@ activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
 activate REGION_CHAINS
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 
 echo
 echo Proper effects for "foo"
@@ -35,7 +35,7 @@ echo
 display PRINTED_FILE[foo3]
 
 
-activate PRINT_CODE_PROPER_REGIONS
+activate PRINT_CODE_PROPER_POINTER_REGIONS
 
 echo
 echo Proper regions for "foo"

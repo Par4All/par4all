@@ -16,7 +16,7 @@ void point_to04()
    p->d = p->a = 4;
 }
 
-Proper effetcs for "point_to04"
+Proper pointer effects for "point_to04"
 
 void point_to04()
 {
@@ -38,7 +38,7 @@ void point_to04()
    p->d = p->a = 4;
 }
 
-Cumulated effetcs for "point_to04"
+Cumulated pointer effects for "point_to04"
 
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
@@ -59,5 +59,51 @@ void point_to04()
    p->d = p->a;
 //               <must be read   >: p
 //               <must be written>: p[0][1] p[0][4]
+   p->d = p->a = 4;
+}
+
+Proper effects for "point_to04"
+
+void point_to04()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//               <must be written>: p
+
+   p = &c;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+
+   p->d = p->a;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+   p->d = p->a = 4;
+}
+
+Cumulated effects for "point_to04"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+void point_to04()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//               <must be written>: p
+
+   p = &c;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+
+   p->d = p->a;
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
    p->d = p->a = 4;
 }

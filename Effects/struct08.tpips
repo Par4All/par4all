@@ -23,7 +23,7 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 
 #setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 
 
 echo
@@ -43,13 +43,13 @@ echo Proper effects for "init4"
 echo
 display PRINTED_FILE[init4]
 
-#activate PRINT_CODE_CUMULATED_EFFECTS
+#activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 #display PRINTED_FILE[init]
 #display PRINTED_FILE[init2]
 #display PRINTED_FILE[init3]
 #display PRINTED_FILE[init4]
 
-activate PRINT_CODE_PROPER_REGIONS
+activate PRINT_CODE_PROPER_POINTER_REGIONS
 
 
 echo
