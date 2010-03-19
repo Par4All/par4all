@@ -1,6 +1,7 @@
 setenv WS = average_power
 delete $WS
 create $WS $WS.c include/SIMD.c
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
 module average_power
 
