@@ -396,45 +396,36 @@ static expression reference_distance(const reference r0, const reference r1)
            e1 = reference_variable(r1);
     if(same_entity_p(e0,e1))
     {
-        expression offset0 = reference_offset(r0),
-                   offset1 = reference_offset(r1);
-        expression distance =  make_op_exp(MINUS_OPERATOR_NAME,offset1,offset0);
-        /* try to simplify it if possible, that is if we cannot get an int, try an other approach */
-        int dummy;
-        if(!expression_integer_value(distance,&dummy))
+        list indices0 = gen_full_copy_list(reference_indices(r0)),
+             indices1 = gen_full_copy_list(reference_indices(r1));
+        if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
         {
-            list indices0 = gen_full_copy_list(reference_indices(r0)),
-                 indices1 = gen_full_copy_list(reference_indices(r1));
-            if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-            {
-                indices0=gen_nreverse(indices0);
-                indices1=gen_nreverse(indices1);
-            }
-            while(!ENDP(indices0) && !ENDP(indices1))
-            {
-                expression i0 = EXPRESSION(CAR(indices0)),
-                           i1 = EXPRESSION(CAR(indices1));
-                if(!same_expression_p(i0,i1))
-                    break;
-                POP(indices0);
-                POP(indices1);
-            }
-            if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-            {
-                indices0=gen_nreverse(indices0);
-                indices1=gen_nreverse(indices1);
-            }
-            reference fake0 = make_reference(e0,indices0),
-                      fake1 = make_reference(e1,indices1);
-            free_expression(distance);
-            distance = reference_distance(fake0,fake1);
-            free_reference(fake0);
-            free_reference(fake1);
-
+            indices0=gen_nreverse(indices0);
+            indices1=gen_nreverse(indices1);
         }
+        while(!ENDP(indices0) && !ENDP(indices1))
+        {
+            expression i0 = EXPRESSION(CAR(indices0)),
+                       i1 = EXPRESSION(CAR(indices1));
+            if(!same_expression_p(i0,i1))
+                break;
+            POP(indices0);
+            POP(indices1);
+        }
+        if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+        {
+            indices0=gen_nreverse(indices0);
+            indices1=gen_nreverse(indices1);
+        }
+        reference fake0 = make_reference(e0,indices0),
+                  fake1 = make_reference(e1,indices1);
+        expression offset0 = reference_offset(fake0),
+                   offset1 = reference_offset(fake1);
+        expression distance =  make_op_exp(MINUS_OPERATOR_NAME,offset1,offset0);
+        free_reference(fake0);
+        free_reference(fake1);
+
         return distance;
-
-
     }
     return expression_undefined;
 }
