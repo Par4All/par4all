@@ -145,7 +145,7 @@
 
 /* Resource for points to analysis */
 { DBR_POINTS_TO_LIST,           STATEMENT_FUNCTION_METHODS },
-{ DBR_INTRAPROCEDURAL_SUMMARY_POINTS_TO_LIST,		NEWGEN_METHODS },
+{ DBR_SUMMARY_POINTS_TO_LIST,		NEWGEN_METHODS },
 
 /* Resource for used before set analysis */
 { DBR_UBS,			NEWGEN_METHODS },

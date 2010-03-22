@@ -4563,27 +4563,35 @@ alias_classes > MODULE.alias_classes
 points\_to\_analysis phase.
 
 This function is being implemented by Amira \textsc{Mensi}.
-
+The \PipsPassRef{points_to_analysis} is implemented in order to
+compute points-to relations, based on Emami algorithm. Emami algorithm
+is a top-down analysis which calcules the points-to relations by
+applying specific rules to each assignement pattern identified.
+This phase requires another resource which
+is\PipsPassRef{Intraprocedural Summary Points To Analysis}.  
 \begin{PipsMake}
 alias points_to_analysis  'Points To Analysis'
 
 points_to_analysis > MODULE.points_to_list
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.summary_points_to_list
 
 \end{PipsMake}
+
 \subsection{Intraprocedural Summary Points to Analysis}
-This phase will handle the interprocedural part of the points-to
-analysis. At the beginning summary points\_to should be an empty set,
-especially if we have a function that is never called.
+This phase will handle computing points-to relations for formal
+parameters. It will create fictious sinks for formal parameters and
+provide a set of points-to to the \PipsPassRef{points_to_analysis}. 
 \begin{PipsMake}
 alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Points To Analysis'
 
-intraprocedural_summary_points_to_analysis > MODULE.intraprocedural_summary_points_to_list
+intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
            < PROGRAM.entities
            < MODULE.code
-           < MODULE.points_to_list
+           
 \end{PipsMake}
+
 \subsection{Points to  Properties}
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.
@@ -9587,6 +9595,7 @@ alias print_code_proper_references 'Statements & Proper References'
 alias print_code_cumulated_references 'Statements & Cumulated References'
 alias print_initial_precondition 'Initial Preconditions'
 alias print_code_points_to_list 'Statements & Points To'
+
 \end{PipsMake}
 
 \subsection{Standard Sequential View}
@@ -10039,6 +10048,7 @@ print_code_points_to_list      > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
+        < MODULE.summary_points_to_list
         < MODULE.points_to_list
 \end{PipsMake}
 

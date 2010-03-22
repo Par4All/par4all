@@ -62,11 +62,12 @@
 
 #define PT_TO_SUFFIX ".points_to"
 #define PT_TO_DECO "points to = "
-
+#define SUMMARY_PT_TO_SUFFIX ".summary_points_to"
+#define SUMMARY_PT_TO_DECO "summary points to = "
 
 /****************************************************** STATIC INFORMATION */
 GENERIC_GLOBAL_FUNCTION(printed_points_to_list, statement_points_to)
-
+points_to_list summary_pts_to = NIL;
 /************************************************************* BASIC WORDS */
 /*Already exist in cprettyprint but in mode static. To be removed later.*/
 static bool variable_p(entity e)
@@ -108,7 +109,7 @@ list word_points_to(points_to pt)
 	  l2 = words_reference(copy_reference(r2),NIL);
 
   l1 = words_reference(copy_reference(r1), NIL);
- 
+
   rlt1 = gen_nconc((CONS(STRING,strdup("("), NIL)),l1);
   rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(","), NIL)));
 
@@ -116,26 +117,28 @@ list word_points_to(points_to pt)
   rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(","), NIL)));
   rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(l3), NIL)));
   rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(")"), NIL)));
-  rlt1 = gen_nconc(rlt1,(CONS(STRING,strdup(";"), NIL)));
   return rlt1;
 }
 
 //extern void print_points_to(
-list words_points_to_list( string note, points_to_list s)
+list words_points_to_list(string note, points_to_list s)
 {
 	list l = NIL;
+	int i = 0;
 
 	FOREACH (POINTS_TO, j,points_to_list_list(s))
 	{
-		l = gen_nconc(l,word_points_to(j));
+	  if(i>0)
+	    l = gen_nconc(l, (CONS(STRING,strdup(";"), NIL)));
+	  else
+	    i++;
+	  l = gen_nconc(l,word_points_to(j));
 	}
-	l = gen_nconc((CONS(STRING,strdup("{"), NIL)),l);
-	l = gen_list_head(&l,gen_length(l)-1);
+	l = CONS(STRING,strdup("{"), l);
 	l = gen_nconc(l,(CONS(STRING,strdup("}"), NIL)));
-	
-	return l? CONS(STRING, strdup(note), l): NIL;
-}
 
+  return l;
+}
 
 text text_points_to(entity module,int margin, statement s)
 {
@@ -153,27 +156,33 @@ text text_points_to(entity module,int margin, statement s)
 
  text text_code_points_to(statement s)
 {
- text t;
- debug_on("PRETTYPRINT_DEBUG_LEVEL");
- init_prettyprint(text_points_to);
- t = text_module(get_current_module_entity(), s);
- close_prettyprint();
- debug_off();
- return t;
+  text t;
+  debug_on("PRETTYPRINT_DEBUG_LEVEL");
+  init_prettyprint(text_points_to);
+  t = text_module(get_current_module_entity(), s);
+  close_prettyprint();
+  debug_off();
+  return t;
 }
 
-
- bool
- print_code_points_to(string module_name,
+bool print_code_points_to(string module_name,
 		      string resource_name,
 		      string file_suffix)
 {
- text t;
+  points_to_list summary_pts_to =
+    db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
+  list wl = words_points_to_list(SUMMARY_PT_TO_SUFFIX, summary_pts_to);
+  text t, st;
+  bool res;
 
  debug_on("POINTS_TO_DEBUG_LEVEL");
  pips_debug(1, "considering module %s \n",
 			module_name);
  set_current_module_entity(local_name_to_top_level_entity(module_name));
+
+ /*  FI: just for debugging */
+ // check_abstract_locations();
+
  set_proper_rw_effects((statement_effects)
 		       db_get_memory_resource(DBR_PROPER_EFFECTS,
 					      module_name, TRUE));
@@ -185,10 +194,14 @@ text text_points_to(entity module,int margin, statement s)
 			      db_get_memory_resource(DBR_CODE,
 						     module_name,
 						     TRUE));
+ // FI: should be language neutral...
+ st = words_predicate_to_commentary(wl, PIPS_COMMENT_SENTINEL);
  t = text_code_points_to(get_current_module_statement());
 // print_text(stderr,t);
- bool res= make_text_resource_and_free(module_name, DBR_PRINTED_FILE,
-				file_suffix, t);
+ //st = text_code_summary_points_to(get_current_module_statement());
+ MERGE_TEXTS(st, t);
+ res= make_text_resource_and_free(module_name, DBR_PRINTED_FILE,
+				file_suffix, st);
 
  reset_current_module_entity();
  reset_current_module_statement();
@@ -199,8 +212,7 @@ text text_points_to(entity module,int margin, statement s)
 //Handlers for PIPSMAKE
 bool print_code_points_to_list(string module_name)
 {
- return print_code_points_to(module_name,
-			     DBR_POINTS_TO_LIST,
-			     PT_TO_SUFFIX);
+	return print_code_points_to(module_name,
+				    DBR_POINTS_TO_LIST,
+				    PT_TO_SUFFIX);
 }
-
