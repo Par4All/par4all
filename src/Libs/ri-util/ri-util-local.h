@@ -83,7 +83,10 @@
 #define STATIC_AREA_LOCAL_NAME          "*STATIC*"
 #define HEAP_AREA_LOCAL_NAME            "*HEAP*"
 #define STACK_AREA_LOCAL_NAME           "*STACK*"
-/* The set of all memory areas */
+/* The set of all memory areas. FI: this macro is now obsolete and
+   should be removed when a new version of alias-classes is
+   introduced. Too bad ri-util/effects.c is going to depend on
+   alias-classes*/
 #define ALL_MEMORY_ENTITY_NAME          "TOP-LEVEL:*MEMORY*"
 
 /* For enum and struct and union without names (see c_syntax/cyacc.y) */

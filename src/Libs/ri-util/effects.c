@@ -129,6 +129,9 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
  */
 effect anywhere_effect(action ac)
 {
+  /* This function should be rewritten using anywhere =
+     entity_all_locations(); */
+  /* ALL_MEMORY_ENTITY_NAME should not be used any longer*/
   entity anywhere = gen_find_tabulated(ALL_MEMORY_ENTITY_NAME, entity_domain);
   effect any = effect_undefined;
 
