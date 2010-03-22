@@ -322,6 +322,11 @@ call expression_call(expression e)
   return(syntax_call(expression_syntax(e)));
 }
 
+bool expression_field_p(expression e)
+{
+    return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
+}
+
 
 /* Test if an expression is a reference.
  */
