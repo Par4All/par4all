@@ -1,6 +1,7 @@
 \documentclass[a4paper]{article}
 \usepackage[latin9]{inputenc}
 \usepackage{url}
+\usepackage{alltt}
 \usepackage{abbrev_reactive}
 \let\OldRightarrow=\Rightarrow
 \RequirePackage{marvosym}
@@ -48,12 +49,55 @@ projects should also be taken into account.
 Before using \Apips, once it is installed, you should do, according to your
 shell, a
 \begin{verbatim}
-source build/etc/par4all-rc.sh
+source run/etc/par4all-rc.sh
 \end{verbatim}
 or a
 \begin{verbatim}
-source build/etc/par4all-rc.csh
+source run/etc/par4all-rc.csh
 \end{verbatim}
+
+
+\section{Compilation}
+\label{sec:compilation}
+
+Once you have an image of the main \Agit repository content, \Apfa is
+compiled and configured by running \verb|src/dev/p4a_setup|.
+
+If you want to download \Apfa from the \Agit and compile it, try:
+\begin{alltt}
+  export P4A_ROOT=\emph{some-dir}
+  git clone git://git.hpc-project.com/git/par4all.git $P4A_ROOT
+  cd $P4A_ROOT
+  git checkout -b p4a remotes/origin/p4a
+  src/dev/p4a_setup
+\end{alltt}%$
+Everything is built into \verb|$P4A_ROOT/build| and installed into
+\verb|$P4A_ROOT/run|.
+
+To be sure you do not break the compilation process, you should compile
+your work before committing it on the central repositories. By a nice side
+effect, it allows you to test your code. \smiley
+
+More seriously, it is not obvious that it may compile on your account but
+not for other people. For example because you forgot to commit some files.
+
+A nice feature of \Agit over \Asvn is that since you split the commit from
+the publication, you can test your own committed state before it hurts the
+team when you push it on the global server.
+
+For example, you can create a light\footnote{Because the objects are
+  shared with symbolic links and not copied since we did not use the
+  \texttt{file://} syntax.} clone with a
+\begin{verbatim}
+git clone par4all par4all-compile
+\end{verbatim}
+and after you have tested and committed your modifications inside the
+\texttt{par4all} working copy, you do the same into the
+\texttt{par4all-compile} working copy after a \texttt{git pull}.
+If some files are lacking from the commit, it will be detected.
+
+Afterwards you can do a \texttt{git push} into the central \Apfa
+repository with less risks.
 
 
 \section{Collaborative repositories}
@@ -66,7 +110,8 @@ source build/etc/par4all-rc.csh
 There are few \Agit repositories used by the project.
 
 To have access without authentication and only for reading/cloning, you
-can use the \texttt{git:} prefix instead of \texttt{ssh:}.
+can use the \texttt{git:} prefix instead of \texttt{ssh:}, such as
+\url{git://git.hpc-project.com/git/par4all.git}.
 
 The main repository for the project is:
 \url{ssh://git.hpc-project.com/git/par4all.git}
@@ -82,15 +127,18 @@ the trunk of the \Asvn repositories for the \Apips components from \Acri:
 \begin{itemize}
 \item \url{ssh://git.hpc-project.com/git/svn-linear.git}
 \item \url{ssh://git.hpc-project.com/git/svn-newgen.git}
-\item \url{ssh://git.hpc-project.com/git/svn-nlpmake.git} is a top-level
-  repository with \texttt{trunk}, \texttt{branch} and \texttt{tag} because
-  it started without this standard layout that was added later around
-  revision 750;
+\item \url{ssh://git.hpc-project.com/git/svn-nlpmake.git}
 \item \url{ssh://git.hpc-project.com/git/svn-pips.git}
 \item \url{ssh://git.hpc-project.com/git/svn-validation.git}
 \end{itemize}
 These ancillary gateways only include the \texttt{trunk} history since at
 \Acri branches are not public.
+
+In the case of \texttt{nlpmake}, another \Agit{} \Asvn gateway of the top
+level has been used for the integration (but is not published in a public
+git because it is old history) with \texttt{trunk}, \texttt{branch} and
+\texttt{tag} because \texttt{nlpmake} started without this standard
+layout, that was added later around revision 750.
 
 
 \subsection{Private repositories}
@@ -216,21 +264,69 @@ The \verb|p4a_git| options come into short and long form:
 \item[\texttt{-v} or \texttt{--verbose}] increase the verbosity of the
   script. For example, if used twice, the script enters into command
   tracing mode;
-\item[\texttt{-u} or \texttt{--update-git-svn}] update the \Apips
+\item[\texttt{-u} or \texttt{--update-git-svn}] update the \Apips{}
   \Agit-\Asvn gateways that are into \verb|$P4A_TOP/CRI-git-svn|;%$
 \item[\texttt{-g} or \texttt{--recursive-git-svn}] apply a \Agit command
-  to all the git working copies inside the current directory. If no argument
-  is given, a \texttt{git svn rebase} is done;
+  to all the git working copies inside the current directory
+  recursively. If no argument is given, a \texttt{git svn rebase} is done;
 \item[\texttt{-f} or \texttt{--fetch-remote-git}] fetch the objects from
-  the remote \Agit repositories (the \Apips \Agit-\Asvn gateways and the
-  \Apolylib \Agit);
+  the remote \Agit repositories (the \Apips{} \Agit-\Asvn gateways and the
+  \Apolylib{} \Agit);
 \item[\texttt{-p} or \texttt{--pull-remote-git}] pull the objects from the
-  remote \Agit repositories into their respective branches;
-\item[\texttt{-m} or \texttt{--merge-remote-git}] merge the branches that
-  buffer the remote git repositories into the current branch;
+  remote \Agit repositories into their respective branches and update the
+  \texttt{p4a} branch hierarchy to point to the last version of \Apfa;
+\item[\texttt{-m} or \texttt{--merge-remote-branches}
+  \texttt{\emph{<to-prefix>}} \texttt{\emph{[<origin-prefix>]}}] merge all
+  the \texttt{p4a} branch infrastructure into the
+  \texttt{\emph{<to-prefix>}} branch architecture. If the
+  \texttt{\emph{<to-prefix>}} branch infrastructure does not exist, it is
+  created from the \texttt{\emph{<origin-prefix>}} branch infrastructure
+  if provided, else from the \texttt{p4a} branch architecture;
+\item[\texttt{-b} or \texttt{--branch-action} \texttt{\emph{args+}}] apply
+  the \texttt{\emph{args+}} shell-script to a branch hierarchy, with the
+  branch suffix available to the \texttt{\emph{args+}} script in the
+  \verb|$suffix| variable;
+\item[\texttt{-a} or \texttt{--add-remotes}] create the remotes pointing
+  into \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
 \item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
   change the git repository to work on.
 \end{description}
+
+A typical example to have a \Apfa with the last \Apips version into a very
+personal \verb|p4a-very-personal| branch infrastructure:
+\begin{verbatim}
+p4a_git --update-git-svn
+p4a_git --fetch-remote-git
+p4a_git --pull-remote-git
+\end{verbatim}
+Then you have all \Apfa into the \verb|p4a| branch infrastructure.
+
+If you want to begin from this \texttt{p4a} your own branch infrastructure
+\verb|p4a-very-personal|, with \verb|p4a-very-personal-pips| for the
+\Apips, \verb|p4a-very-personal-polylib| for the \Apolylib and so on,
+attached to the main \verb|p4a|-prefixed branch infrastructure, you have
+to do a:
+\begin{verbatim}
+p4a_git --merge-prefix-branches p4a-very-personal
+\end{verbatim}
+
+If you want to start from the \texttt{p4a-0.2-alpha}, use a
+\begin{verbatim}
+p4a_git --merge-prefix-branches p4a-very-personal p4a-0.2-alpha
+\end{verbatim}
+
+When you are happy with this version, you can push these branches for
+sharing or merge them into the main \Apfa \texttt{p4a} with
+\begin{verbatim}
+p4a_git --branch-action git push origin p4a-very-personal\$suffix
+\end{verbatim}
+
+An example to set up all the tracking branches for version
+\texttt{p4a-0.2-alpha} before you can use them:
+\begin{verbatim}
+p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
+        remotes/origin/p4a-0.2-alpha\$suffix
+\end{verbatim}
 
 
 \subsection{PolyLib work-flow}
@@ -471,38 +567,6 @@ of \Apfa. Of course there are far more examples in the validation of \Apfa
 (\S~\ref{sec:validation}) but it is often less pedagogical.
 
 
-\section{Compilation}
-\label{sec:compilation}
-
-Once you have an image of the main \Agit repository content, \Apfa is
-compiled and configured by running \verb|src/dev/p4a_setup|.
-
-To be sure you do not break the compilation process, you should compile
-your work before committing it on the central repositories. By a nice side
-effect, it allows you to test your code. \smiley
-
-More seriously, it is not obvious that it may compile on your account but
-not for other people. For example because you forgot to commit some files.
-
-A nice feature of \Agit over \Asvn is that since you split the commit from
-the publication, you can test your own committed state before it hurts the
-team.
-
-For example, you can create a light\footnote{Because the objects are
-  shared with symbolic links and not copied since we did not use the
-  \texttt{file://} syntax.} clone with a
-\begin{verbatim}
-git clone par4all par4all-compile
-\end{verbatim}
-and after you have tested and committed your modifications inside the
-\texttt{par4all} working copy, you do the same into the
-\texttt{par4all-compile} working copy after a \texttt{git pull}.
-If some files are lacking from the commit, it will be detected.
-
-Afterwards you can do a \texttt{git push} into the central \Apfa
-repository with less risks.
-
-
 \section{Validation}
 \label{sec:validation}
 
@@ -613,4 +677,5 @@ a tag.
 %%% Local Variables: 
 %%% mode: latex
 %%% ispell-local-dictionary: "american"
-%%% End: 
+%%% End:
+

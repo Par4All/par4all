@@ -80,18 +80,35 @@ class ValidationClass:
     changed_re = re.compile("^> changed: (.*)$", re.MULTILINE)
 
 
-    def __init__(self, diff_string):
+    #def __init__(self, *diff_file, *diff_string):
+    def __init__(self, vc = Null):
         # The set of validation elements of this class:
         self.elements = set()
 
-        # Find all the changes:
-        #print(diff_string)
-        for m in ValidationClass.changed_re.finditer(diff_string):
-            changed = m.group(1)
-            if verbose:
-                print(changed)
-            # Add the change to the current set:
-            self.elements.add(changed)
+
+    def add_changed_from_diff(self, file_name = None, string = None):
+        """Add difference lines as elements"""
+        if verbose:
+            print('add_changed_from_diff from string', string)
+            print('add_changed_from_diff from file_name', file_name)
+        if string:
+            # A string is given to this method:
+            for m in ValidationClass.changed_re.finditer(string):
+                changed = m.group(1)
+                if verbose:
+                    print(changed)
+                # Add the change to the current set:
+                self.elements.add(changed)
+        if file_name:
+            # A file name is given to this method, so open the file:
+            f = open(file_name)
+            # slurp all the file in a string:
+            content = f.read()
+            f.close()
+            # Call again this method with the read string:
+            self.add_changed_from_diff(string = content)
+        # To ease chaining of operations:
+        return self
 
 
     def __str__(self):
@@ -156,28 +173,27 @@ class ValidationClass:
         self.elements -= to_remove
 
 
-def validation_class_from_diff_file(file_name):
-    """Build a class from a changed-file"""
-
-    f = open(file_name)
-    # slurp all the file in a string:
-    content = f.read()
-    f.close()
-
-    c = ValidationClass(content)
-
-    #c.re_filter("^Control")
-
-    #print(c)
-
-    return c
-
-
 def main():
     global verbose
 
     parser = optparse.OptionParser(usage = "usage: %prog [options] [<files>]",
                                    version = "$Id")
+
+    parser.add_option("--file", dest="simple_file_name",
+                      help = "Initialize a validation class from a plain line-oriented file of validation case names",
+                      metavar="FILE")
+
+    parser.add_option("--changed-file", dest="changed_file_name",
+                      help = "Initialize a validation class from the 'changed' found in a validation output file",
+                      metavar="FILE")
+
+    parser.add_option("--failed-file", dest="failed_file_name",
+                      help = "Initialize a validation class from the 'failed' found in a validation output file",
+                      metavar="FILE")
+
+    parser.add_option("--skipped-file", dest="skipped_file_name",
+                      help = "Initialize a validation class from the 'skipped' found in a validation output file",
+                      metavar="FILE")
 
     parser.add_option("-d",  "--diff-file", dest="diff_file_name",
                       help = "Initialize a validation class from a new difference found in a validation diff file",
@@ -215,8 +231,21 @@ def main():
 
     verbose = options.verbose
 
+    if options.simple_file_name:
+        vc = validation_class_from_file(options.simple_file_name)
+
+    if options.changed_file_name:
+        vc = validation_class_from_file(options.changed_file_name, 'changed')
+
+    if options.failed_file_name:
+        vc = validation_class_from_file(options.failed_file_name, 'failed')
+
+    if options.skipped_file_name:
+        vc = validation_class_from_file(options.skipped_file_name, 'skipped')
+
     if options.diff_file_name:
-        vc = validation_class_from_diff_file(options.diff_file_name)
+        vc = ValidationClass(vc = vc).add_changed_from_diff(file_name = options.diff_file_name)
+        #vc = ValidationClass(diff_file = options.diff_file_name)
 
     if options.filter:
         vc.re_filter(options.filter)
@@ -234,3 +263,10 @@ def main():
 # If this programm is independent it is executed:
 if __name__ == "__main__":
     main()
+
+# Some Emacs stuff:
+### Local Variables:
+### mode: python
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:

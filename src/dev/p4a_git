@@ -20,14 +20,23 @@ function usage()
 	"  -u|--update-git-svn: update the PIPS git-svn gateways that are\n" \
 	"     into \$P4A_TOP/CRI-git-svn\n" \
 	"  -g|--recursive-git-svn ...: apply a git command to all the git\n" \
-	"     working copies inside the current directory. If no argument is\n" \
-	"     given, a git svn rebase is done\n" \
+	"     working copies inside the current directory. If no argument\n" \
+	"     is given, a git svn rebase is done\n" \
 	"  -f|--fetch-remote-git: fetch the objects from the remote git\n" \
 	"     repositories (the PIPS git-svn gateways and the polylib git)\n" \
 	"  -p|--pull-remote-git: pull the objects from the remote git\n" \
-	"     repositories into their respective branches\n" \
-	"  -m|--merge-remote-git: merge the branches that buffer the remote\n" \
-	"      git repositories into the current branch\n" \
+	"     repositories into their respective branches and update the\n" \
+	"     p4a branch infrastructure\n" \
+        "  -m|--merge-remote-branches <to-prefix> [<origin-prefix>] : merge\n" \
+	"     all the p4a branch infrastructure into the <to-prefix> branch\n" \
+	"     architecture. If the <to-prefix> branch infrastructure does\n" \
+	"     not exist, it is created from the <origin-prefix> branch\n" \
+	"     infrastructure if provided, else from the p4a branch\n" \
+	"     architecture\n" \
+	"  -b|--branch-action args+: apply a shell-script to a branch\n" \
+	"     hierarchy, with the branch suffix available in \$suffix\n" \
+	"  -a|--add-remotes: create the remotes pointing\n" \
+	"      into $P4A_CRI_GIT_SVN and on the polylib" \
 	"  -r|--root <directory-name>: create a git repository of this name\n" \
 	"     instead of 'par4all'"
   fi
@@ -81,7 +90,9 @@ while [ "$1" ] ; do
       -g|--recursive-git-svn) recursive_git_action=1 ;;
       -f|--fetch-remote-git) fetch_remote_git=1 ;;
       -p|--pull-remote-git) pull_remote_git=1 ;;
-      -m|--merge-remote-git) merge_remote_git=1 ;;
+      -m|--merge-remote-branches) merge_to_prefix_branches=$1 ; shift ; merge_remote_git_prefix=$1 ; shift ;;
+      -b|--branch-action) branch_action="$@"; break;;
+      -a|--add-remotes) add_remotes=1 ;;
       -r|--root) P4A_ROOT=$1 ; shift ;;
       # error
       *) usage 1 "unexpected option: $opt"
@@ -109,9 +120,19 @@ if [[ $pull_remote_git ]]; then
     do_pull_remote_git
 fi
 
-if [[ $merge_remote_git ]]; then
-    do_merge_remote_git
+if [[ -n $merge_to_prefix_branches ]]; then
+    do_merge_remote_branches $merge_to_prefix_branches $merge_from_prefix_branches
 fi
+
+if [[ -n $branch_action ]]; then
+    do_branch_action "$branch_action"
+fi
+
+if [[ $add_remotes ]]; then
+    do_add_remotes
+fi
+
+
 
 # Some Emacs stuff:
 ### Local Variables:

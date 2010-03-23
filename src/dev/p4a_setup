@@ -1,7 +1,12 @@
 #! /bin/bash -vx
 #
-# Inspired from setup_pips.sh and get-pips4u.sh
+# Inspired from setup_pips.sh from Fabien Coelho and get-pips4u.sh from
+# Sebastien Varrette <Sebastien.Varrette@uni.lu> and Serge Guelton
+# <Serge.Guelton@telecom-bretagne.eu>
 #
+
+# Stop on error, since going on after errors may lead to havoc
+set -o errexit
 
 if [[ -z $P4A_ROOT ]]; then
     echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory"
@@ -10,100 +15,71 @@ fi
 
 # Where everything is built:
 P4A_BUILD=$P4A_ROOT/build
+# Where things are installed
+P4A_INSTALL_PREFIX=$P4A_ROOT/run
 
 P4A_ETC=$P4A_BUILD/etc
 
-pips4u_configure_common_flags="--disable-static"
 if test -z "$INSTALL_PREFIX" ; then
-	INSTALL_PREFIX=$P4A_BUILD
+    # install prefix passed by --prefix to the configure script
+    INSTALL_PREFIX=$P4A_INSTALL_PREFIX
 fi
+mkdir -p $INSTALL_PREFIX
 
-if test -z "$SRCDIR" ; then
-	SRCDIR=$PWD/pips4u/src
-fi
+# default flags for the configure script
+PIPS_CONFIGURE_COMMON_FLAGS=" --disable-static"
 
-pips4u_configure_prefix="--prefix=$INSTALL_PREFIX"
 cd $P4A_ROOT
 
 PIPS_COMPONENTS="linear newgen pips"
 PIPS_DIR=$P4A_ROOT/packages/PIPS
-# clean environment so as not to interfere with another installation
-PIPS_ARCH=`$PIPS_DIR/nlpmake/makes/arch.sh`
-export PIPS_ARCH
 
 # The config files to source later:
 P4A_RC_SH=$P4A_ETC/par4all-rc.sh
 P4A_RC_CSH=$P4A_ETC/par4all-rc.csh
 
-
-error()
-{
-  echo "$@" >&2
-  exit 1
+# Build the package of name $1 that is to be found into directory $2:
+function build_package() {
+    local package=$1
+    local dir=$2
+    (
+	cd $dir
+	dir=`pwd`
+	# There are lacking files in the Polylib that autoreconf do not
+	# want to create :-(
+	touch NEWS README AUTHORS ChangeLog
+	autoreconf --install
+	mkdir -p $P4A_BUILD/$package
+	cd $P4A_BUILD/$package
+	$dir/configure ${PIPS_CONFIGURE_COMMON_FLAGS}
+	make
+	make install
+    )
 }
 
-warn()
-{
-  {
-    echo
-    echo "WARNING"
-    for msg in "$@" ; do
-      echo $msg ;
-    done
-    echo "Type return to continue"
-  } >&2
-  read
+# Add a potentially missing link to the PIPS make infrastructure for a
+# given component:
+function add_link_to_make_infrastructure () {
+    local package=$1
+    ln -s -f ../nlpmake/makes $P4A_ROOT/packages/PIPS/$package/makes
 }
 
+PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} --prefix=${INSTALL_PREFIX}"
 
-echo "- building polylib ..."
-(
-    cd $P4A_ROOT/packages/polylib
-    autoreconf -i
-    mkdir -p _build
-    cd _build
-    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix
-    make
-    make install
-)
+build_package polylib packages/polylib
 
+add_link_to_make_infrastructure newgen
+build_package newgen packages/PIPS/newgen
 
-echo "- building newgen ..."
-(
-    cd $PIPS_DIR/newgen
-    autoreconf -i
-    mkdir -p _build
-    cd _build
-    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix
-    make
-    make install
-)
+PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH"
 
+add_link_to_make_infrastructure linear
+build_package linear packages/PIPS/linear
 
-echo "- building linear ..."
-(
-    cd $PIPS_DIR/linear
-    autoreconf -i
-    mkdir -p _build
-    cd _build
-    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix PKG_CONFIG_PATH="$INSTALL_PREFIX"/lib/pkgconfig:$PKG_CONFIG_PATH
-    make
-    make install
-)
+PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} ${PIPS_CONFIG} PATH=${INSTALL_PREFIX}/bin:$PATH "
 
-
-echo "- building pips ..."
-(
-    cd $PIPS_DIR/pips
-    autoreconf -vi
-    mkdir -p _build
-    cd _build
-    ../configure $pips4u_configure_common_flags $pips4u_configure_prefix PKG_CONFIG_PATH="$INSTALL_PREFIX"/lib/pkgconfig:$PKG_CONFIG_PATH PATH="$INSTALL_PREFIX"/bin:$PATH $PIPS_CONFIG
-    make
-    make install
-)
-
-rm -f $pips4u_log
+add_link_to_make_infrastructure pips
+build_package pips packages/PIPS/pips
 
 # that's all folks
 cat << EOF
@@ -115,7 +91,7 @@ all sources are available from $SRCDIR
 you should consider add the following lines
 to your .bashrc or whatever:
 
-export PATH=$INSTALL_PREFIX/bin:$PATH
+export PATH=$INSTALL_PREFIX/bin:\$PATH
 export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib
 export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib/pkgconfig
 export PYTHONPATH=$INSTALL_PREFIX/lib/python2.6/site-packages/pips
@@ -124,130 +100,3 @@ export PYTHONPATH=$INSTALL_PREFIX/lib/python2.6/site-packages/pips
 EOF
 
 exit 0
-
-echo
-echo "### creating `basename $P4A_RC_SH`"
-mkdir -p  $P4A_ETC
-cat <<EOF > $P4A_RC_SH
-# minimum rc file for sh-compatible shells
-
-# default architecture
-export PIPS_ARCH=$PIPS_ARCH
-# software roots
-export EXTERN_ROOT=$P4A_BUILD
-export NEWGEN_ROOT=$P4A_BUILD
-#export NEWGEN_ROOT=$PIPS_DIR/newgen
-unset NEWGEN_ROOT
-#export LINEAR_ROOT=$P4A_BUILD
-#export LINEAR_ROOT=$PIPS_DIR/linear
-unset LINEAR_ROOT
-#export PIPS_ROOT=$P4A_BUILD
-export PIPS_ROOT=$PIPS_DIR/pips
-# Hack to have access to makefiles...
-#export ROOT=$P4A_ROOT/packages/PIPS
-
-# For pyps:
-export PIPS_NO_PYPS=1
-#export PYTHONPATH=$P4A_BUILD/lib
-
-#export INSTALL_DIR=$P4A_BUILD
-
-# Mainly to avoid the non working libraries.make:
-unset WITH_DYNAMIC_LIBRARIES
-
-# fix path
-#PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
-PATH=$PIPS_DIR/pips/bin:$PIPS_DIR/pips/utils:$PIPS_DIR/newgen/bin:$PIPS_DIR/newgen/bin/$PIPS_ARCH:$P4A_BUILD/bin:$P4A_BUILD/bin/$PIPS_ARCH:\$PATH
-
-# Some hack to have p4a_recover_includes working. DIrectory to move
-# somewhere else later...
-export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
-export PYTHONPATH=/usr/share/pyshared
-EOF
-
-# Find the Fortran compiler:
-type gfortran && export PIPS_F77=gfortran
-type g77 && export PIPS_F77=g77
-
-
-if [ -n "$PIPS_F77" ]; then
-    echo >> $P4A_RC_SH
-    echo "# The Fortran compiler to use:" >> $P4A_RC_SH
-    echo "export PIPS_F77=$PIPS_F77" >> $P4A_RC_SH
-fi
-
-# Source the just generated environment to be able to compile PIPS later:
-source $P4A_RC_SH
-
-# Make links PIPS makefile infrastructure:
-for i in $PIPS_COMPONENTS; do
-    ln -s ../nlpmake/makes $PIPS_DIR/$i/makes
-done
-
-echo
-echo "### checking some needed softwares"
-for exe in make cproto flex bison gcc perl sed tr
-do
-  type $exe || error "no such executable, please install: $exe"
-done
-
-# check cproto version... 4.6 is still available on many distributions
-[[ $(cproto -V 2>&1) = 4.7* ]] || \
-  error "Pips compilation requires at least cproto 4.7c"
-
-#unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
-
-echo
-echo "### testing special commands for config.mk"
-config=$PIPS_DIR/nlpmake/makes/config.mk
-# Save an old config file if we run again this script:
-[ -f $config ] && mv $config $config.old
-
-type javac && echo '_HAS_JDK_ = 1' >> $config
-type latex && echo '_HAS_LATEX_ = 1' >> $config
-type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
-type emacs && echo '_HAS_EMACS_ = 1' >> $config
-type pkg-config && has_pkgconfig=1
-
-if [ "$has_pkgconfig" ]
-then
-  echo '_HAS_PKGCONFIG_ = 1' >> $config
-  if pkg-config --exists gtk+-2.0
-  then
-    echo '_HAS_GTK2_ = 1' >> $config
- else
-    echo 'PIPS_NO_GPIPS = 1' >> $config
-  fi
-else
-  echo 'PIPS_NO_GPIPS = 1' >> $config
-fi
-
-# whether to build the documentation depends on latex and htlatex
-target=compile
-type latex && target=build
-type htlatex && target=full-build
-
-
-echo
-echo "### generating csh environment"
-$PIPS_DIR/pips/src/Scripts/env/sh2csh.pl \
-    < $P4A_RC_SH \
-    > $P4A_ETC/par4all-rc.csh
-
-#env
-warn "cproto header generation results in many cpp warnings..."
-#make -C $PIPS_DIR clean
-make -C $PIPS_DIR $target
-#make -C $PIPS_DIR/newgen clean
-#make -C $PIPS_DIR/newgen
-
-echo
-echo "### checking useful softwares"
-for exe in bash m4 wish latex htlatex javac emacs
-do
-  type $exe || echo "no such executable, consider installing: $exe"
-done
-
-echo To compile PIPS in a casual way, try a make into $PIPS_DIR or evan $PIPS_DIR/pips
-
-echo To use Par4All you should source $P4A_BUILD/etc/`basename $P4A_RC_SH` or $P4A_BUILD/etc/`basename $P4A_RC_CSH` according to your shell flavour
