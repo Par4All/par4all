@@ -49,6 +49,7 @@
 
 #include "effects-generic.h"
 #include "effects-convex.h"
+#include "alias-classes.h"
 
 
 /********************************************************************* MISC */
@@ -650,24 +651,14 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
 effect make_anywhere_effect(tag act)
 {
  
-  entity anywhere_ent = gen_find_tabulated(ALL_MEMORY_ENTITY_NAME, 
-					   entity_domain);
+  entity anywhere_ent = entity_all_locations();
   effect anywhere_eff = effect_undefined;
-
-  if(entity_undefined_p(anywhere_ent)) 
-    {
-      area a = make_area(0,NIL); /* Size and layout are unknown */
-      type t = make_type_area(a);
-      anywhere_ent = make_entity(strdup(ALL_MEMORY_ENTITY_NAME),
-				 t, make_storage_rom(), make_value_unknown());
-    }
-  
+ 
   anywhere_eff = (*reference_to_effect_func)
     (make_reference(anywhere_ent, NIL),
      act, false);
   effect_to_may_effect(anywhere_eff);
   return anywhere_eff;
-  
 }
 
 /**
@@ -1460,6 +1451,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		    POP(l_fields);
 		    if (tmp_result > 0)
 		      result = result < 0 ? tmp_result : (tmp_result <= result ? tmp_result : result);
+		    free_type(current_type);
 		  }
 		
 		*exact_p = (result < 0);
@@ -1471,6 +1463,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		current_type = basic_concrete_type(entity_type(current_field_entity));
 		result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
 		if (result >=0) result++; // do not forget the field index ! 
+		free_type(current_type);
 	      }
 	  }
 	break;
@@ -1500,18 +1493,20 @@ int effect_reference_first_pointer_dimension_rank(reference ref, bool *exact_p)
 {
   entity ent = reference_variable(ref);
   list current_l_ind = reference_indices(ref);
-  type current_type = basic_concrete_type(entity_type(ent));
+  type ent_type = entity_type(ent);
   int result;
 
   pips_debug(8, "input reference : %s\n", words_to_string(effect_words_reference(ref)));
   
-  if (!type_variable_p(current_type))
+  if (!type_variable_p(ent_type))
     {
       result = -1;
     }
   else
     {
+      type current_type = basic_concrete_type(ent_type);
       result = effect_indices_first_pointer_dimension_rank(current_l_ind, current_type, exact_p);
+      free_type(current_type);
     }
 
   return result;

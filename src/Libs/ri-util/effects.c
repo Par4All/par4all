@@ -129,18 +129,8 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
  */
 effect anywhere_effect(action ac)
 {
-  /* This function should be rewritten using anywhere =
-     entity_all_locations(); */
-  /* ALL_MEMORY_ENTITY_NAME should not be used any longer*/
-  entity anywhere = gen_find_tabulated(ALL_MEMORY_ENTITY_NAME, entity_domain);
+  entity anywhere = entity_all_locations();
   effect any = effect_undefined;
-
-  if(entity_undefined_p(anywhere)) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
-    anywhere = make_entity(strdup(ALL_MEMORY_ENTITY_NAME),
-			   t, make_storage_rom(), make_value_unknown());
-  }
 
   any = make_effect(make_cell_reference(make_reference(anywhere, NIL)),
 		    ac,
@@ -157,7 +147,7 @@ bool anywhere_effect_p(effect e)
   reference r = effect_any_reference(e);
   entity v = reference_variable(r);
 
-  anywhere_p = same_string_p(entity_name(v), ALL_MEMORY_ENTITY_NAME);
+  anywhere_p =  entity_all_locations_p(v);
 
   return anywhere_p;
 }

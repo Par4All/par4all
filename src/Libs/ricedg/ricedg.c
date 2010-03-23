@@ -1002,8 +1002,8 @@ TestCoupleOfReferences(
      * gen_length(b1)==gen_length(b2).
      */
     if (e1 == e2
-	&& ! entity_all_module_locations_p(e1)
-	&& ! entity_all_module_locations_p(e2)
+	&& ! entity_all_locations_p(e1)
+	&& ! entity_all_locations_p(e2)
 	&& (!entity_atomic_reference_p(e1)
 	    || (pointer_type_p(t1) && gen_length(b1)>0)))
     {
@@ -2516,7 +2516,7 @@ statement stat;
 
     FOREACH (EFFECT, ef, load_cumulated_rw_effects_list(stat)) {
       entity en = effect_entity(ef) ;
-      if( action_write_p( effect_action( ef )) && ! entity_all_module_locations_p(en) && entity_integer_scalar_p( en ))
+      if( action_write_p( effect_action( ef )) && ! entity_all_locations_p(en) && entity_integer_scalar_p( en ))
 	lv = gen_nconc(lv, CONS(ENTITY, en, NIL));
     }
     l = statement_loop(stat);

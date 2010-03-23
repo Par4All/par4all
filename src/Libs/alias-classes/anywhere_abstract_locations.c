@@ -67,7 +67,7 @@ entity entity_all_locations()
 				       MODULE_SEP_STRING,
 				       ANYWHERE_LOCATION,
 				       NULL));
-  anywhere = find_or_create_entity(any_name);
+  anywhere = gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(anywhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
@@ -99,7 +99,7 @@ entity entity_nowhere_locations()
 				       MODULE_SEP_STRING,
 				       NOWHERE_LOCATION,
 				       NULL));
-  nowhere = find_or_create_entity(any_name);
+  nowhere =  gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(nowhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
@@ -129,7 +129,7 @@ entity entity_null_locations()
 				       MODULE_SEP_STRING,
 				       NULL_POINTER_NAME,
 				       NULL));
-  null_pointer = find_or_create_entity(any_name);
+  null_pointer = gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(null_pointer)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
@@ -167,7 +167,7 @@ entity entity_all_module_locations(entity m)
 				       ANYWHERE_LOCATION,
 				       NULL));
 
-  anywhere = find_or_create_entity(any_name);
+  anywhere = gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(anywhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
@@ -198,7 +198,7 @@ entity entity_all_module_xxx_locations(entity m, string xxx)
 				       xxx,
 				       ANYWHERE_LOCATION,
 				       NULL));
-  dynamic = find_or_create_entity(any_name);
+  dynamic = gen_find_tabulated(any_name, entity_domain);
   if(storage_undefined_p(entity_storage(dynamic))) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
@@ -235,7 +235,7 @@ entity entity_all_xxx_locations(string xxx)
 				       xxx,
 				       ANYWHERE_LOCATION,
 				       NULL));
-  dynamic = find_or_create_entity(any_name);
+  dynamic = gen_find_tabulated(any_name, entity_domain);
   if(storage_undefined_p(entity_storage(dynamic))) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
