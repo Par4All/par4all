@@ -15,14 +15,14 @@ activate C_PARSER
 
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[main]
+display PRINTED_FILE[formal_parameter00]
 
-#apply POINTS_TO_ANALYSIS[main]
-#display PRINTED_FILE[main]
+#apply POINTS_TO_ANALYSIS[formal_parameter00]
+#display PRINTED_FILE[formal_parameter00]
 
 echo POINTS TO
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[main]
+display PRINTED_FILE[formal_parameter00]
 
 
 close

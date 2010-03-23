@@ -1,31 +1,48 @@
 Content of the validation suite
 
 C99__function__     OK  check that implicit variable __function__ is defined
+
 address_of01	    NOK C parser/prettyprinter error: 
 		    	formal parameter names garbled
+
 block_scope13	    NOK bug in controlizer
+
 complex03.c	    NOK use symbol I, not recognized by PIPS preprocessor
 		        moved to C_syntax_enhancement
+
 decl24.c	    NOK either a C parser or a prettyprinter bug;
 		        attribute const is moved from field display_data
-	 		to the typedef itself
+	 		to the typedef itself; see decl50 and decl51
+decl50.c	    OK  check the parsing and prettyprinting of the const 
+		    	qualifier for pointer
+decl51.c	    OK  check the parsing and prettyprinting of the const 
+		    	qualifier for pointer and typedef
+
 dereference.c	    NOK the source code is not easy to compile with gcc, even 
 		    	using the options available in the tpips script
 			Seems to work with tpips
-extension02	    NOK	__attribute__ not parser by PIPS preprocessor
+
+extension02	    NOK	__attribute__ not parsed by PIPS preprocessor
 		        Moved to C_syntax_enhancements
+
 function_name_conflict01
 		    NOK bug in parser for function rand
+
 initialization06    NOK problem with summary transformer or precondition
 		    	variable name conflict detected by gcc: error
+
 initialization07    NOK C99 source code
+
 parallel03	    NOK C code should be prettyprinted in Fortran
 		    	Does not work anymore
+
 pips		    NOK the tpips file expansion scheme does not work as
 		    	might be expected by a casual user
+
 rsp05		    NOK because of convex array regions
                         tpips to be simplified for C_syntax
-			full script copies into Regions
+			full script copied into Regions
+
 struct11	    NOK not compatible with gcc
 		    	fixed version core dumps the parser
 			Since there is a warning, move to C_syntax_enhancements

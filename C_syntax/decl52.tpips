@@ -1,8 +1,8 @@
-delete decl24
+delete decl52
 
 #setproperty ABORT_ON_USER_ERROR TRUE
 
-create decl24 decl24.c
+create decl52 decl52.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
 
@@ -21,10 +21,10 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 # display PARSED_PRINTED_FILE[%ALL]
 
 echo
-echo Parsed printed file for "decl24!"
+echo Parsed printed file for "decl52!"
 echo
 
-display PARSED_PRINTED_FILE[decl24!]
+display PARSED_PRINTED_FILE[decl52!]
 
 #echo
 #echo Parsed printed file for "HDL_progress_display"
@@ -51,9 +51,9 @@ display PARSED_PRINTED_FILE[decl24!]
 #display PARSED_PRINTED_FILE[HDL_progress_start_monitor]
 
 apply UNSPLIT
-shell cc -c decl24.database/Src/decl24.c
+shell cc -c decl52.database/Src/decl52.c
 
 close
-#delete decl24
+#delete decl52
 
 quit
