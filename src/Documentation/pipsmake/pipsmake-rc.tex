@@ -4558,6 +4558,29 @@ alias_classes > MODULE.alias_classes
         < PROGRAM.entities
         < MODULE.alias_lists
 \end{PipsMake}
+
+\subsection{Intraprocedural Summary Points to Analysis}
+
+This phase generates synthetic points-to relations for formal
+parameters. It creates synthetic sinks, i.e. stubs, for formal
+parameters and provides an initial set of points-to to the
+\PipsPassRef{points_to_analysis}.
+
+Currently, it assumes that no sharing exists between the formal
+parameters and within the data structures pointed to by the formal
+parameters. Two properties should control this behavior,
+\PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} and
+\PipsPropRef{ALIASING_ACROSS_TYPES}. The first one supersedes the
+property \PipsPropRef{ALIASING_INSIDE_DATA_STRUCTURE}.
+\begin{PipsMake}
+alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Points To Analysis'
+
+intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
+           < PROGRAM.entities
+           < MODULE.code
+           
+\end{PipsMake}
+
 \subsection{Points to Analysis}
 
 points\_to\_analysis phase.
@@ -4579,20 +4602,8 @@ points_to_analysis > MODULE.points_to_list
 
 \end{PipsMake}
 
-\subsection{Intraprocedural Summary Points to Analysis}
-This phase will handle computing points-to relations for formal
-parameters. It will create fictious sinks for formal parameters and
-provide a set of points-to to the \PipsPassRef{points_to_analysis}. 
-\begin{PipsMake}
-alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Points To Analysis'
+\subsection{Points-to  Properties}
 
-intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
-           < PROGRAM.entities
-           < MODULE.code
-           
-\end{PipsMake}
-
-\subsection{Points to  Properties}
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.
 The property \PipsPropRef{ALIASING_ACROSS_TYPES} specifies that two
@@ -4600,25 +4611,27 @@ pointers of different effective types can be aliased. The default
 value it is set to TRUE, when it is turned to false two pointers of
 different types are never aliased.
 \begin{PipsProp}{ALIASING_ACROSS_TYPES}
-ALIASING_ACROSS_TYPES TRUE
+ALIASING_ACROSS_TYPES FALSE
 \end{PipsProp}
+
 The property \PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} is used
-to handle the aliasing between formel parameters and global
-variables of pointer type. When it is set to TRUE two formels parameters or a formal
-one and a global pointer or two global pointers can be aliased. If it
-is turned to FALSE, such pointers are assumed to be unaliased for
-intraprocedural analysis and generally for root module(i.e. modules
-without callers).
+to handle the aliasing between formel parameters and global variables
+of pointer type. When it is set to TRUE two formels parameters or a
+formal one and a global pointer or two global pointers can be
+aliased. If it is turned to FALSE, such pointers are assumed to be
+unaliased for intraprocedural analysis and generally for root
+module(i.e. modules without callers).
 \begin{PipsProp}{ALIASING_ACROSS_FORMAL_PARAMETERS}
-ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
+ALIASING_ACROSS_FORMAL_PARAMETERS FALSE
 \end{PipsProp}
-This property specifies that one data structure can recursively
+
+The nest property specifies that one data structure can recursively
 contain two pointers pointing to the same location. If it is turned to
 FALSE, it is assumed that two different not included
- memory access paths cannot point to the same memory locations. The safe default value is TRUE.
+ memory access paths cannot point to the same memory locations. The safe value is TRUE.
 
 \begin{PipsProp}{ALIASING_INSIDE_DATA_STRUCTURE}
-ALIASING_INSIDE_DATA_STRUCTURE TRUE
+ALIASING_INSIDE_DATA_STRUCTURE FALSE
 \end{PipsProp}
 
 The following string property defines the lattice of maximal elements

@@ -451,9 +451,9 @@ static type void_to_void_type(int n __attribute__ ((unused)))
   type t = type_undefined;
   functional ft = functional_undefined;
 
-  ft = make_functional(NIL, make_type_void());
+  ft = make_functional(NIL, make_type_void(NIL));
   functional_parameters(ft) =
-    CONS(PARAMETER, make_parameter(make_type_void(),
+    CONS(PARAMETER, make_parameter(make_type_void(NIL),
 				   make_mode_value(), // not
 						      // significant
 						      // for void...
@@ -3733,7 +3733,7 @@ integer_to_void_type(int n)
   type t = type_undefined;
   functional ft = functional_undefined;
 
-  ft = make_functional(NIL, make_type_void());
+  ft = make_functional(NIL, make_type_void(NIL));
   t = make_type(is_type_functional, ft);
 
   functional_parameters(ft) =

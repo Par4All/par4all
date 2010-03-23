@@ -2850,40 +2850,40 @@ set points_to_sequence(sequence seq, set pt_in, bool store)
 
 /* compute the points-to set for intrinsic-call*/
 set points_to_intrinsic(statement s,
-						entity e,
-						list pc,
-						set pt_in)
+			entity e,
+			list pc,
+			set pt_in)
 {
   set pt_out = set_generic_make(set_private,
-								points_to_equal_p, points_to_rank);
+				points_to_equal_p, points_to_rank);
 
   pips_debug(8, "begin\n");
   if(ENTITY_ASSIGN_P(e)){
-	expression lhs = EXPRESSION(CAR(pc));
-	expression rhs = EXPRESSION(CAR(CDR(pc)));
-	pt_out = points_to_assignment(s, copy_expression(lhs), copy_expression(rhs), pt_in);
+    expression lhs = EXPRESSION(CAR(pc));
+    expression rhs = EXPRESSION(CAR(CDR(pc)));
+    pt_out = points_to_assignment(s, copy_expression(lhs), copy_expression(rhs), pt_in);
   }
   else if(ENTITY_PLUS_UPDATE_P(e) || ENTITY_MINUS_UPDATE_P(e)
-		  || ENTITY_MULTIPLY_UPDATE_P(e) || ENTITY_DIVIDE_UPDATE_P(e)
-		  || ENTITY_MODULO_UPDATE_P(e) || ENTITY_LEFT_SHIFT_UPDATE_P(e)
-		  || ENTITY_RIGHT_SHIFT_UPDATE_P(e) || ENTITY_BITWISE_AND_UPDATE_P(e)
-		  || ENTITY_BITWISE_XOR_UPDATE_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e)){
-	pt_out = set_assign(pt_out, pt_in);
+	  || ENTITY_MULTIPLY_UPDATE_P(e) || ENTITY_DIVIDE_UPDATE_P(e)
+	  || ENTITY_MODULO_UPDATE_P(e) || ENTITY_LEFT_SHIFT_UPDATE_P(e)
+	  || ENTITY_RIGHT_SHIFT_UPDATE_P(e) || ENTITY_BITWISE_AND_UPDATE_P(e)
+	  || ENTITY_BITWISE_XOR_UPDATE_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e)){
+    pt_out = set_assign(pt_out, pt_in);
   }
   else if(ENTITY_POST_INCREMENT_P(e) || ENTITY_POST_DECREMENT_P(e)
-		  || ENTITY_PRE_INCREMENT_P(e) || ENTITY_PRE_DECREMENT_P(e)) {
-	pt_out = set_assign(pt_out, pt_in);
+	  || ENTITY_PRE_INCREMENT_P(e) || ENTITY_PRE_DECREMENT_P(e)) {
+    pt_out = set_assign(pt_out, pt_in);
   }
   else if(ENTITY_C_RETURN_P(e)) {
-	pt_out = set_assign(pt_out, pt_in);
+    pt_out = set_assign(pt_out, pt_in);
   }
   else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e))
-	pt_out = set_assign(pt_out, pt_in);
+    pt_out = set_assign(pt_out, pt_in);
   else if(ENTITY_COMMA_P(e)) {
-	pt_out = set_assign(pt_out, pt_in);
+    pt_out = set_assign(pt_out, pt_in);
   }
   else
-	pt_out =  set_assign(pt_out, pt_in);
+    pt_out =  set_assign(pt_out, pt_in);
   pips_debug(8, "end\n");
   return pt_out;
 }
@@ -3007,28 +3007,31 @@ set points_to_call(statement s,
   tag tt;
 
   set pt_out = set_generic_make(set_private,
-								points_to_equal_p, points_to_rank);
+				points_to_equal_p, points_to_rank);
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_code:
-	/* call to an external function; preliminary version*/
-	pt_out = set_assign(pt_out, pt_in);
-	break;
+    /* call to an external function; preliminary version*/
+    pips_user_warning("The function call to \"%s\" is ignored\n"
+		      "On going implementation...\n",
+		      entity_user_name(e));
+    pt_out = set_assign(pt_out, pt_in);
+    break;
   case is_value_symbolic:
-	pt_out = set_assign(pt_out, pt_in);
-	break;
+    pt_out = set_assign(pt_out, pt_in);
+    break;
   case is_value_constant:
-	pt_out = set_assign(pt_out, pt_in);
-	break;
+    pt_out = set_assign(pt_out, pt_in);
+    break;
   case is_value_unknown:
-	pips_internal_error("function %s has an unknown value\n", entity_name(e));
-	break;
+    pips_internal_error("function %s has an unknown value\n", entity_name(e));
+    break;
   case is_value_intrinsic:{
-	pips_debug(5, "intrinsic function %s\n", entity_name(e));
-	pt_out = set_assign(pt_out, points_to_intrinsic(s, e, pc, pt_in));
-	break;
+    pips_debug(5, "intrinsic function %s\n", entity_name(e));
+    pt_out = set_assign(pt_out, points_to_intrinsic(s, e, pc, pt_in));
+    break;
   }
   default:
-	pips_internal_error("unknown tag %d\n", tt);
+    pips_internal_error("unknown tag %d\n", tt);
   }
   return pt_out;
 }
@@ -3037,28 +3040,30 @@ set points_to_call(statement s,
 set points_to_expression(expression e, set pt_in, bool store)
 {
   set pt_out = set_generic_make(set_private,
-								points_to_equal_p, points_to_rank);
+				points_to_equal_p, points_to_rank);
   call c = call_undefined;
   statement st = statement_undefined;
   syntax s = expression_syntax(copy_expression(e));
   switch (syntax_tag(s)){
   case is_syntax_call:{
-	c = syntax_call(s);
-	st = make_expression_statement(e);
-	pt_out = set_assign(pt_out,points_to_call(st, c, pt_in, store));
-	break;
+    c = syntax_call(s);
+    st = make_expression_statement(e);
+    pt_out = set_assign(pt_out,points_to_call(st, c, pt_in, store));
+    break;
   }
   case is_syntax_cast:{
-	cast ct = cast_undefined;
-	expression e = expression_undefined;
-	ct = syntax_cast(s);
-	e = cast_expression(ct);
-	st = make_expression_statement(e);
-	pt_out = set_assign(pt_out,points_to_expression(e, pt_in, store));
-	break;
+    /* The cast is ignored, although it may generate aliases across
+       types */
+    cast ct = cast_undefined;
+    expression e = expression_undefined;
+    ct = syntax_cast(s);
+    e = cast_expression(ct);
+    st = make_expression_statement(e);
+    pt_out = set_assign(pt_out,points_to_expression(e, pt_in, store));
+    break;
   }
   default:
-	pips_internal_error("unexpected syntax tag (%d)", syntax_tag(s));
+    pips_internal_error("unexpected syntax tag (%d)", syntax_tag(s));
   }
   return pt_out;
 }
@@ -3073,58 +3078,58 @@ set points_to_expression(expression e, set pt_in, bool store)
 set recursive_points_to_statement(statement current, set pt_in, bool store)
 {
   set pt_out = set_generic_make(set_private,
-								points_to_equal_p, points_to_rank);
+				points_to_equal_p, points_to_rank);
   pt_out = set_assign(pt_out, pt_in);
   instruction i = statement_instruction(current);
-/*  Convert the pt_in set into a sorted list for storage */
-/*  Store the current points-to list */
+  /*  Convert the pt_in set into a sorted list for storage */
+  /*  Store the current points-to list */
   points_to_storage(pt_in, current, store);
   ifdebug(1)  print_statement(current);
 
   switch(instruction_tag(i)) {
-	/* instruction = sequence + test + loop + whileloop +
-	   goto:statement +
-	   call + unstructured + multitest + forloop  + expression ;*/
+    /* instruction = sequence + test + loop + whileloop +
+       goto:statement +
+       call + unstructured + multitest + forloop  + expression ;*/
 
   case is_instruction_call:{
-	pt_out = set_assign(pt_out,
-						points_to_call(current,instruction_call(i),
-									   pt_in, store));
-	break;
+    pt_out = set_assign(pt_out,
+			points_to_call(current,instruction_call(i),
+				       pt_in, store));
+    break;
   }
   case is_instruction_sequence:{
-	pt_out = set_assign(pt_out,
-						points_to_sequence(instruction_sequence(i),
-										   pt_in, store));
-	break;
+    pt_out = set_assign(pt_out,
+			points_to_sequence(instruction_sequence(i),
+					   pt_in, store));
+    break;
   }
   case is_instruction_test:{
-	pt_out = set_assign(pt_out,points_to_test(instruction_test(i),
-											  pt_in, store));
-	break;
+    pt_out = set_assign(pt_out,points_to_test(instruction_test(i),
+					      pt_in, store));
+    break;
   }
   case is_instruction_whileloop:{
-	store = false;
-	if(evaluation_tag(whileloop_evaluation(instruction_whileloop(i))) == 0){
-	  pt_out = set_assign(pt_out,
-						  points_to_whileloop(instruction_whileloop(i),
-											  pt_in, false));
-	}else
-	  pt_out = set_assign(pt_out,
-						  points_to_do_whileloop(instruction_whileloop(i),
-												 pt_in, false));
+    store = false;
+    if(evaluation_tag(whileloop_evaluation(instruction_whileloop(i))) == 0){
+      pt_out = set_assign(pt_out,
+			  points_to_whileloop(instruction_whileloop(i),
+					      pt_in, false));
+    }else
+      pt_out = set_assign(pt_out,
+			  points_to_do_whileloop(instruction_whileloop(i),
+						 pt_in, false));
 
-	break;
+    break;
   }
   case is_instruction_forloop:{
-	store = false;
-	pt_out = set_assign(pt_out,
-						points_to_forloop(instruction_forloop(i),
-										  pt_in, store));
-	break;
+    store = false;
+    pt_out = set_assign(pt_out,
+			points_to_forloop(instruction_forloop(i),
+					  pt_in, store));
+    break;
   }
   default:
-	pips_internal_error("Unexpected instruction tag %d\n", instruction_tag(i));
+    pips_internal_error("Unexpected instruction tag %d\n", instruction_tag(i));
   }
   return pt_out;
 }
@@ -3143,7 +3148,7 @@ bool points_to_analysis(char * module_name)
   entity module;
   statement module_stat;
   set pt_in = set_generic_make(set_private,
-							   points_to_equal_p,points_to_rank);
+			       points_to_equal_p,points_to_rank);
   list pts_to_list = NIL;
   init_pt_to_list();
 
@@ -3154,26 +3159,27 @@ bool points_to_analysis(char * module_name)
   (*effects_computation_init_func)(module_name);
 
   debug_on("POINTS_TO_DEBUG_LEVEL");
+
   pips_debug(1, "considering module %s\n", module_name);
   set_current_module_statement( (statement)
-								db_get_memory_resource(DBR_CODE,
-													   module_name, TRUE) );
+				db_get_memory_resource(DBR_CODE,
+						       module_name, TRUE) );
   module_stat = get_current_module_statement();
   init_proper_rw_effects();
-/* Get the summary_intraprocedural_points_to resource.*/
+  /* Get the summary_intraprocedural_points_to resource.*/
   points_to_list summary_pts_to_list = (points_to_list) db_get_memory_resource
-	(DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
-/* Transform the list of summary_points_to in set of points-to.*/
+    (DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
+  /* Transform the list of summary_points_to in set of points-to.*/
   points_to_list_consistent_p(summary_pts_to_list);
   //pts_to_list = gen_points_to_list_cons(summary_pts_to_list, pts_to_list);
   pts_to_list = gen_full_copy_list(points_to_list_list(summary_pts_to_list));
   pt_in = set_assign_list(pt_in, pts_to_list);
-/* Compute the points-to relations using the summary_points_to as input.*/
+  /* Compute the points-to relations using the summary_points_to as input.*/
   points_to_statement(module_stat, pt_in);
 	 
   statement_points_to_consistent_p(get_pt_to_list());
   DB_PUT_MEMORY_RESOURCE
-	(DBR_POINTS_TO_LIST, module_name, get_pt_to_list());
+    (DBR_POINTS_TO_LIST, module_name, get_pt_to_list());
 
   reset_pt_to_list();
   reset_current_module_entity();

@@ -2133,7 +2133,7 @@ decl_spec_list_opt_no_named:
 type_spec:   /* ISO 6.7.2 */
     TK_VOID
                         {
-			  c_parser_context_type(ycontext) = make_type_void();
+			  c_parser_context_type(ycontext) = make_type_void(NIL);
 			  $$ = NIL;
                         }
 |   TK_CHAR
@@ -2937,8 +2937,15 @@ old_pardef:
 
 pointer: /* (* ISO 6.7.5 *) */
     TK_STAR attributes pointer_opt
-                        {
-			  $$ = make_type_variable(make_variable(make_basic_pointer($3),NIL,$2));
+                        { /* decl24.c, decl50.c, decl51.c, decl52.c,
+			     decl53.c :
+			     const attribute lost or misplaced for pointers */
+			  list al = $2;
+			  type t = $3;
+			  //c_parser_context_qualifiers(ycontext) =
+			  //  gen_nconc(c_parser_context_qualifiers(ycontext), al);
+			  $$ = make_type_variable(make_variable(make_basic_pointer(t), NIL, al));
+			  //c_parser_context_qualifiers(ycontext) = NIL;
 			}
 ;
 

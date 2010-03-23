@@ -204,36 +204,54 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 bool intraprocedural_summary_points_to_analysis(char * module_name)
 {
   entity module;
+  type t;
   statement module_stat;
   list pt_list = NIL;
   list dcl = NIL;
   list params = NIL;
   set pts_to_set = set_generic_make(set_private,
 				    points_to_equal_p,points_to_rank);
-	
+
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
 
-  debug_on("POINTS_TO_DEBUG_LEVEL");
-  pips_debug(1, "considering module %s\n", module_name);
   set_current_module_statement( (statement)
 				db_get_memory_resource(DBR_CODE,
 						       module_name, TRUE));
   module_stat = get_current_module_statement();
-  type t = entity_type(module);
+  t = entity_type(module);
+
+  debug_on("POINTS_TO_DEBUG_LEVEL");
+
+  pips_debug(1, "considering module %s\n", module_name);
+
+  /* Properties */
+  if(get_bool_property("ALIASING_ACROSS_FORMAL_PARAMETERS"))
+    pips_user_warning("Property ALIASING_ACROSS_FORMAL_PARAMETERS"
+		      " is ignored\n");
+  if(get_bool_property("ALIASING_ACROSS_TYPES"))
+    pips_user_warning("Property ALIASING_ACROSS_TYPES"
+		      " is ignored\n");
+  if(get_bool_property("ALIASING_INSIDE_DATA_STRUCTURE"))
+    pips_user_warning("Property ALIASING_INSIDE_DATA_STRUCTURE"
+		      " is ignored\n");
+
   if(type_functional_p(t)){
     functional f = type_functional(t);
     params = functional_parameters(f);
     FOREACH(PARAMETER, p, params){
       dummy d = parameter_dummy(p);
       if(dummy_identifier_p(d)){
-		  entity e = dummy_identifier(d);
-		  reference r = make_reference(e, NIL);
-		  cell c = make_cell_reference(r);
-		  pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
-	  }
-	}
+	entity e = dummy_identifier(d);
+	reference r = make_reference(e, NIL);
+	cell c = make_cell_reference(r);
+	pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
+      }
+    }
   }
+  else
+    pips_user_warning("The module %s is not a function\n", module_name);
+
   pt_list = set_to_sorted_list(pts_to_set,
 			       (int(*)
 				(const void*,const void*))
