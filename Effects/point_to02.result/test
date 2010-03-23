@@ -14,7 +14,7 @@ void point_to02()
 
 Cumulated pointer effects for "point_to02"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void point_to02()
 {
    struct s {

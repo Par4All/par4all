@@ -36,7 +36,7 @@ void point_to03()
 //               <must be written>: p
 
    p = &a;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    ((*p)[2])[3] = 1.5;
 }

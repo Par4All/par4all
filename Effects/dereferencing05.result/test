@@ -35,7 +35,7 @@ void dereferencing05()
 
 Cumulated pointer effects for "dereferencing05"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing05()
 {
    double *p;
@@ -61,39 +61,39 @@ void dereferencing05()
 {
    double *p;
    int i;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
 
    *p++ = 0.;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *p-- = 0.;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *++p = 0.;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *--p = 0.;
 }
 
 Cumulated effects for "dereferencing05"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing05()
 {
    double *p;
    int i;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
 
    *p++ = 0.;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *p-- = 0.;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *++p = 0.;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *--p = 0.;
 }

@@ -83,32 +83,32 @@ void dereferencing06()
    double x = 1.;
 //               <must be written>: p
    double *p = &x;
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *p++ = 1;
 }
 
 Cumulated effects for "dereferencing06"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing06()
 {
 //               <must be written>: x
    double x = 1.;
 //               <must be written>: p
    double *p = &x;
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
    *p++ = 1;
 }
@@ -116,8 +116,8 @@ void dereferencing06()
 Regions for "dereferencing06"
 
 
-//  <TOP-LEVEL:*MEMORY*-R-MAY-{}>
-//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
 void dereferencing06()
 {
@@ -130,14 +130,14 @@ void dereferencing06()
 
    double *p = &x;
 
-//  <TOP-LEVEL:*MEMORY*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <p-W-EXACT-{}>
 
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
 
-//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <p-R-EXACT-{}>
 
    *p++ = 1;

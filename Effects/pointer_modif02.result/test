@@ -22,12 +22,12 @@ int main()
 
 Cumulated pointer effects for "main"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 int main()
 {
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
    // BEGIN BLOCK
    int *p, *q;
 //               <must be read   >: p
@@ -51,15 +51,15 @@ int main()
 {
    // BEGIN BLOCK
    int *p, *q;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
 
    *p = 1;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
 
    foo(&q, p);
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: q
    *q = 2;
    return 0;
@@ -68,21 +68,21 @@ int main()
 
 Cumulated effects for "main"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 int main()
 {
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
    // BEGIN BLOCK
    int *p, *q;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
 
    *p = 1;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
 
    foo(&q, p);
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: q
    *q = 2;
    return 0;

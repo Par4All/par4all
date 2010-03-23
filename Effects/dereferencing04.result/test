@@ -23,7 +23,7 @@ void dereferencing04()
 
 Cumulated pointer effects for "dereferencing04"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing04()
 {
    double *p;
@@ -41,20 +41,20 @@ void dereferencing04()
    double *p;
    double *q;
    double *r;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p q r
    *(p+q-r) = 0.;
 }
 
 Cumulated effects for "dereferencing04"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing04()
 {
    double *p;
    double *q;
    double *r;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p q r
    *(p+q-r) = 0.;
 }

@@ -36,7 +36,7 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
    }
 }
 //               <may be read    >: dat[0][1][*] vct[0][3][*]
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: col dat dat[0][1] row vct 
 //                                  vct[0][1] vct[0][3]
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)

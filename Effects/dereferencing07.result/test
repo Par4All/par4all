@@ -57,7 +57,7 @@ Proper effects for "foo"
 
 void foo(int *col)
 {
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be written>: col
    *col++;                                                              /*0009*/
 
@@ -75,7 +75,7 @@ int main()
 //               <must be read   >: x
 //               <must be written>: x
    x += 3;                                                              /*0018*/
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p tab1[tab2[x]] tab2[x] x
    *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
    return 1;                                                            /*0020*/
@@ -97,7 +97,7 @@ int main()
 
    x += 3;                                                              /*0018*/
 
-//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <p-R-EXACT-{}>
 //  <tab1[PHI1]-R-MAY-{}>
 //  <tab2[PHI1]-R-EXACT-{PHI1==x}>
