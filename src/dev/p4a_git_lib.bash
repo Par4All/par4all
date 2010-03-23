@@ -7,6 +7,10 @@
 # The PIPS modules:
 PIPS_MODULES="linear newgen nlpmake pips validation"
 #PIPS_MODULES=nlpmake
+P4A_PACKAGES="$PIPS_MODULES polylib"
+
+# All the suffix to have a standard branch infrastructure:
+P4A_BRANCH_SUFFIX="$P4A_PACKAGES packages own"
 
 # Set variables pointing to various Par4All parts if not already set:
 # Where to get the git-svn instances from:
@@ -51,6 +55,26 @@ function get_current_git_branch() {
 function revert_current_git_branch() {
     verb 1 "Reverting to the current branch"
     git checkout $branch
+}
+
+
+# Check if a branch exist:
+function check_branch() {
+    local branch=$1
+    local find=`git branch | cut -c 3- | grep '^'$branch'$'`
+    # The return status:
+    [[ $branch = $find ]]
+}
+
+
+# Create a branch if it does not already exist:
+function create_branch_if_needed() {
+    local branch=$1
+    local parent=$2
+    if ! check_branch $branch; then
+	# Create the branch if it does not exist:
+	git branch $branch $parent
+    fi
 }
 
 
@@ -145,29 +169,73 @@ function do_pull_remote_git() {
         # Same for the polylib:
         pull_remote_1_git p4a-polylib ICPS-polylib ICPS/polylib
 
+	echo Update the global p4a hierarchy to keep in sync:
+	do_merge_remote_branches p4a
+
         # Revert back into the branch we were at the beginning:
         git checkout $current_branch
     )
 }
 
 
-# Pull into the par4all git all the parts from the remote git associated:
-function do_merge_remote_git() {
+# Pull into the given branch hierarchy all the parts from the p4a remote
+# git hierarchy:
+function do_merge_remote_branches() {
     verb 1 "Entering do_merge_remote_git"
     enforce_P4A_TOP
     stop_on_error
+    local merge_to_prefix_branches=$1
+    local merge_origin_branch_prefix=$2
+    if [[ -z $merge_origin_branch_prefix ]]; then
+	# If we do not have $merge_origin_branch_prefix defined,
+	# we use the standard reference branch:
+	merge_origin_branch_prefix=p4a
+    fi
+    # Create target branches if needed:
+    create_branch_if_needed $merge_to_prefix_branches $merge_origin_branch_prefix
+    create_branch_if_needed $merge_to_prefix_branches-packages $merge_origin_branch_prefix-packages
     (
 	cd $P4A_ROOT
-	for i in $PIPS_MODULES; do
+        # Funny loop distribution to factorize out the checkout of the
+        # package branch :-)
+	for i in $P4A_PACKAGES; do
+	    # Start the branch from the origin one:
+	    create_branch_if_needed $merge_to_prefix_branches-$i $merge_origin_branch_prefix-$i
+	    git checkout $merge_to_prefix_branches-$i
 	    # Merge into the current branch the branch that buffers the remote
 	    # PIPS git svn gateway that should have been populated by a
 	    # previous do_pull_remote_git:
 	    git merge --log p4a-$i
 	done
-        # Same for the polylib:
-	git merge --log p4a-polylib
+	git checkout $merge_to_prefix_branches-packages
+	for i in $P4A_PACKAGES; do
+	    # The merge into packages branch:
+	    git merge --log $merge_to_prefix_branches-$i
+	done
+	# And finish with the own branch:
+        create_branch_if_needed $merge_to_prefix_branches-own $merge_origin_branch_prefix-own
+	git checkout $merge_to_prefix_branches
+	# Then merge into main branch the 2 subsidiary branches:
+	git merge --log $merge_to_prefix_branches-packages
+	git merge --log $merge_to_prefix_branches-own
     )
 }
+
+
+# Pull into the par4all git all the parts from the remote git associated:
+function do_branch_action() {
+    verb 1 "Entering do_branch_action"
+    enforce_P4A_TOP
+    stop_on_error
+    action="$@"
+    for b in $P4A_BRANCH_SUFFIX; do
+	suffix=-$b
+	eval $action
+    done
+    suffix=
+    eval $action
+}
+
 
 # Pull into the par4all git all the parts from the remote git associated:
 function do_add_remotes() {

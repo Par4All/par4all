@@ -49,11 +49,11 @@ projects should also be taken into account.
 Before using \Apips, once it is installed, you should do, according to your
 shell, a
 \begin{verbatim}
-source build/etc/par4all-rc.sh
+source run/etc/par4all-rc.sh
 \end{verbatim}
 or a
 \begin{verbatim}
-source build/etc/par4all-rc.csh
+source run/etc/par4all-rc.csh
 \end{verbatim}
 
 
@@ -264,23 +264,69 @@ The \verb|p4a_git| options come into short and long form:
 \item[\texttt{-v} or \texttt{--verbose}] increase the verbosity of the
   script. For example, if used twice, the script enters into command
   tracing mode;
-\item[\texttt{-u} or \texttt{--update-git-svn}] update the \Apips
+\item[\texttt{-u} or \texttt{--update-git-svn}] update the \Apips{}
   \Agit-\Asvn gateways that are into \verb|$P4A_TOP/CRI-git-svn|;%$
 \item[\texttt{-g} or \texttt{--recursive-git-svn}] apply a \Agit command
-  to all the git working copies inside the current directory. If no argument
-  is given, a \texttt{git svn rebase} is done;
+  to all the git working copies inside the current directory
+  recursively. If no argument is given, a \texttt{git svn rebase} is done;
 \item[\texttt{-f} or \texttt{--fetch-remote-git}] fetch the objects from
   the remote \Agit repositories (the \Apips{} \Agit-\Asvn gateways and the
   \Apolylib{} \Agit);
 \item[\texttt{-p} or \texttt{--pull-remote-git}] pull the objects from the
-  remote \Agit repositories into their respective branches;
-\item[\texttt{-m} or \texttt{--merge-remote-git}] merge the branches that
-  buffer the remote git repositories into the current branch;
-\item[\texttt{-a} or \texttt{|--add-remotes}] create the remotes pointing
+  remote \Agit repositories into their respective branches and update the
+  \texttt{p4a} branch hierarchy to point to the last version of \Apfa;
+\item[\texttt{-m} or \texttt{--merge-remote-branches}
+  \texttt{\emph{<to-prefix>}} \texttt{\emph{[<origin-prefix>]}}] merge all
+  the \texttt{p4a} branch infrastructure into the
+  \texttt{\emph{<to-prefix>}} branch architecture. If the
+  \texttt{\emph{<to-prefix>}} branch infrastructure does not exist, it is
+  created from the \texttt{\emph{<origin-prefix>}} branch infrastructure
+  if provided, else from the \texttt{p4a} branch architecture;
+\item[\texttt{-b} or \texttt{--branch-action} \texttt{\emph{args+}}] apply
+  the \texttt{\emph{args+}} shell-script to a branch hierarchy, with the
+  branch suffix available to the \texttt{\emph{args+}} script in the
+  \verb|$suffix| variable;
+\item[\texttt{-a} or \texttt{--add-remotes}] create the remotes pointing
   into \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
 \item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
   change the git repository to work on.
 \end{description}
+
+A typical example to have a \Apfa with the last \Apips version into a very
+personal \verb|p4a-very-personal| branch infrastructure:
+\begin{verbatim}
+p4a_git --update-git-svn
+p4a_git --fetch-remote-git
+p4a_git --pull-remote-git
+\end{verbatim}
+Then you have all \Apfa into the \verb|p4a| branch infrastructure.
+
+If you want to begin from this \texttt{p4a} your own branch infrastructure
+\verb|p4a-very-personal|, with \verb|p4a-very-personal-pips| for the
+\Apips, \verb|p4a-very-personal-polylib| for the \Apolylib and so on,
+attached to the main \verb|p4a|-prefixed branch infrastructure, you have
+to do a:
+\begin{verbatim}
+p4a_git --merge-prefix-branches p4a-very-personal
+\end{verbatim}
+
+If you want to start from the \texttt{p4a-0.2-alpha}, use a
+\begin{verbatim}
+p4a_git --merge-prefix-branches p4a-very-personal p4a-0.2-alpha
+\end{verbatim}
+
+When you are happy with this version, you can push these branches for
+sharing or merge them into the main \Apfa \texttt{p4a} with
+\begin{verbatim}
+p4a_git --branch-action git push origin p4a-very-personal\$suffix
+\end{verbatim}
+
+An example to set up all the tracking branches for version
+\texttt{p4a-0.2-alpha} before you can use them:
+\begin{verbatim}
+p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
+        remotes/origin/p4a-0.2-alpha\$suffix
+\end{verbatim}
 
 
 \subsection{PolyLib work-flow}
