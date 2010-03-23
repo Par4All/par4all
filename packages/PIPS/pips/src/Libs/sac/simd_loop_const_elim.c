@@ -57,7 +57,6 @@ typedef dg_vertex_label vertex_label;
 static graph dependence_graph;
 
 
-#define same_stringn_p(a,b,c) (!strncmp((a),(b),(c)))
 #define SIZEOFSTRING(s) (sizeof((s))-1)
 
 

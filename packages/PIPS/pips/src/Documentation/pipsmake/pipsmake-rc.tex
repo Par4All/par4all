@@ -1977,6 +1977,13 @@ false branches of a test statement, control nodes in an unstructured
 statement ... are ignored to compute the proper effects of a loop, a
 test or an unstructured.
 
+Two families of effects are computed : {\tt pointer\_effects} are
+effects in which intermediary access paths may refer to different
+memory locations at different program points; regular {\tt effects}
+are constant path effects, which means that their intermediary access
+paths all refer to unique memory locations. The same distinction holds
+for regions (see section~\ref{subsection-array-regions}).
+
 Summary effects (see
 Section~\ref{subsubection-summary-data-flow-information}) of a called
 module are used to compute the proper effects at the corresponding
@@ -1992,7 +1999,14 @@ formal parameter with no actual counterpart\marginpar{This is
 implemented for calls by reference as in Fortran. The call-by-value
 implementation is on-going. See Amira Mensi.}.
 
-Variables private to loop are handled like regular variable.
+Variables private to loops are handled like regular variable.
+
+\begin{PipsMake}
+proper_pointer_effects                  > MODULE.proper_pointer_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLEES.summary_pointer_effects
+\end{PipsMake}
 
 \begin{PipsMake}
 proper_effects                  > MODULE.proper_effects
@@ -2034,6 +2048,13 @@ statements such as a loop body or a test branch.
 \end{PipsPass}
 
 \begin{PipsMake}
+cumulated_pointer_effects               > MODULE.cumulated_pointer_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_pointer_effects
+\end{PipsMake}
+
+\begin{PipsMake}
 cumulated_effects               > MODULE.cumulated_effects
         < PROGRAM.entities
         < MODULE.code
@@ -2063,6 +2084,13 @@ http://pages.cs.wisc.edu/~reps}) and subscript expressions of remaining
 effects are eliminated.
 \end{PipsPass}
 
+
+\begin{PipsMake}
+summary_pointer_effects                 > MODULE.summary_pointer_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_pointer_effects
+\end{PipsMake}
 
 \begin{PipsMake}
 summary_effects                 > MODULE.summary_effects
@@ -2167,10 +2195,28 @@ EFFECTS_FILTER_ON_VARIABLE ""
 \end{PipsProp}
 
 
-When set to {\tt TRUE}, \PipsPropRef{EFFECTS_POINTER_MODIFICATION_CHECKING} enables pointer modification checking during the computation of cumulated effects and/or RW regions. Since this is still at experimentation level, it's default value is FALSE. This property should disappear when pointer modification analyses are more mature.
+When set to {\tt TRUE},
+\PipsPropRef{EFFECTS_POINTER_MODIFICATION_CHECKING} enables pointer
+modification checking during the computation of cumulated effects
+and/or RW regions. Since this is still at experimentation level, it's
+default value is FALSE. This property should disappear when pointer
+modification analyses are more mature.
 
 \begin{PipsProp}{EFFECTS_POINTER_MODIFICATION_CHECKING}
 EFFECTS_POINTER_MODIFICATION_CHECKING FALSE
+\end{PipsProp}
+
+The default (and correct) behaviour for the computation of effects is
+to transform dereferencing paths into constant paths. When property
+\PipsPropRef{CONSTANT_PATH_EFFECTS} is set to {\tt FALSE}, the latter
+transformation is skipped. Effects are then equivalent to
+pointer\_effects. This property is available for backward compatibility
+and experimental purpose. It must be borne in mind that analyses and
+transformations using the resulting effects may yield uncorrect
+results. This property also affects the computation of regions.
+
+\begin{PipsProp}{CONSTANT_PATH_EFFECTS}
+CONSTANT_PATH_EFFECTS TRUE
 \end{PipsProp}
 
  
@@ -4203,12 +4249,28 @@ alias must_regions 'EXACT or MAY regions'
 \label{subsubsection-may-regions}
 \index{MAY Region}
 
+\begin{PipsPass}{may_pointer_regions}
+This function computes the \verb|MAY| pointer regions in a module.
+\end{PipsPass}
+\begin{PipsMake}
+may_pointer_regions             > MODULE.proper_pointer_regions
+                                > MODULE.pointer_regions
+                                > MODULE.inv_pointer_regions
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.transformers
+        < MODULE.preconditions   
+        < CALLEES.summary_pointer_regions
+\end{PipsMake}
+
 \begin{PipsPass}{may_regions}
 This function computes the \verb|MAY| regions in a module.
 \end{PipsPass}
+
 \begin{PipsMake}
-may_regions                     > MODULE.regions
-                                > MODULE.proper_regions
+may_regions                     > MODULE.proper_regions
+                                > MODULE.regions
                                 > MODULE.inv_regions
         < PROGRAM.entities
         < MODULE.code
@@ -4222,12 +4284,28 @@ may_regions                     > MODULE.regions
 \label{subsubsection-must-regions}
 \index{MUST Region}
 
+\begin{PipsPass}{must_pointer_regions}
+This function computes the \verb|MUST| regions in a module.
+\end{PipsPass}
+
+\begin{PipsMake}
+must_pointer_regions            > MODULE.proper_pointer_regions
+                                > MODULE.pointer_regions
+                                > MODULE.inv_pointer_regions
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.transformers
+        < MODULE.preconditions 
+        < CALLEES.summary_pointer_regions
+\end{PipsMake}
+
 \begin{PipsPass}{must_regions}
 This function computes the \verb|MUST| regions in a module.
 \end{PipsPass}
 \begin{PipsMake}
-must_regions                    > MODULE.regions
-                                > MODULE.proper_regions
+must_regions                    > MODULE.proper_regions
+                                > MODULE.regions
                                 > MODULE.inv_regions
         < PROGRAM.entities
         < MODULE.code
@@ -4246,6 +4324,12 @@ Module summary regions provides an approximation of the effects it's
 execution has on its callers variables as well as on global and
 static variables of its callees.
 
+\begin{PipsMake}
+summary_pointer_regions                 > MODULE.summary_pointer_regions
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.pointer_regions  
+\end{PipsMake}
 \begin{PipsMake}
 summary_regions                 > MODULE.summary_regions
         < PROGRAM.entities
@@ -4474,33 +4558,52 @@ alias_classes > MODULE.alias_classes
         < PROGRAM.entities
         < MODULE.alias_lists
 \end{PipsMake}
+
+\subsection{Intraprocedural Summary Points to Analysis}
+
+This phase generates synthetic points-to relations for formal
+parameters. It creates synthetic sinks, i.e. stubs, for formal
+parameters and provides an initial set of points-to to the
+\PipsPassRef{points_to_analysis}.
+
+Currently, it assumes that no sharing exists between the formal
+parameters and within the data structures pointed to by the formal
+parameters. Two properties should control this behavior,
+\PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} and
+\PipsPropRef{ALIASING_ACROSS_TYPES}. The first one supersedes the
+property \PipsPropRef{ALIASING_INSIDE_DATA_STRUCTURE}.
+\begin{PipsMake}
+alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Points To Analysis'
+
+intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
+           < PROGRAM.entities
+           < MODULE.code
+           
+\end{PipsMake}
+
 \subsection{Points to Analysis}
 
 points\_to\_analysis phase.
 
 This function is being implemented by Amira \textsc{Mensi}.
-
+The \PipsPassRef{points_to_analysis} is implemented in order to
+compute points-to relations, based on Emami algorithm. Emami algorithm
+is a top-down analysis which calcules the points-to relations by
+applying specific rules to each assignement pattern identified.
+This phase requires another resource which
+is\PipsPassRef{Intraprocedural Summary Points To Analysis}.  
 \begin{PipsMake}
 alias points_to_analysis  'Points To Analysis'
 
 points_to_analysis > MODULE.points_to_list
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.summary_points_to_list
 
 \end{PipsMake}
-\subsection{Intraprocedural Summary Points to Analysis}
-This phase will handle the interprocedural part of the points-to
-analysis. At the beginning summary points\_to should be an empty set,
-especially if we have a function that is never called.
-\begin{PipsMake}
-alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Points To Analysis'
 
-intraprocedural_summary_points_to_analysis > MODULE.intraprocedural_summary_points_to_list
-           < PROGRAM.entities
-           < MODULE.code
-           < MODULE.points_to_list
-\end{PipsMake}
-\subsection{Points to  Properties}
+\subsection{Points-to  Properties}
+
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.
 The property \PipsPropRef{ALIASING_ACROSS_TYPES} specifies that two
@@ -4508,25 +4611,27 @@ pointers of different effective types can be aliased. The default
 value it is set to TRUE, when it is turned to false two pointers of
 different types are never aliased.
 \begin{PipsProp}{ALIASING_ACROSS_TYPES}
-ALIASING_ACROSS_TYPES TRUE
+ALIASING_ACROSS_TYPES FALSE
 \end{PipsProp}
+
 The property \PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} is used
-to handle the aliasing between formel parameters and global
-variables of pointer type. When it is set to TRUE two formels parameters or a formal
-one and a global pointer or two global pointers can be aliased. If it
-is turned to FALSE, such pointers are assumed to be unaliased for
-intraprocedural analysis and generally for root module(i.e. modules
-without callers).
+to handle the aliasing between formel parameters and global variables
+of pointer type. When it is set to TRUE two formels parameters or a
+formal one and a global pointer or two global pointers can be
+aliased. If it is turned to FALSE, such pointers are assumed to be
+unaliased for intraprocedural analysis and generally for root
+module(i.e. modules without callers).
 \begin{PipsProp}{ALIASING_ACROSS_FORMAL_PARAMETERS}
-ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
+ALIASING_ACROSS_FORMAL_PARAMETERS FALSE
 \end{PipsProp}
-This property specifies that one data structure can recursively
+
+The nest property specifies that one data structure can recursively
 contain two pointers pointing to the same location. If it is turned to
 FALSE, it is assumed that two different not included
- memory access paths cannot point to the same memory locations. The safe default value is TRUE.
+ memory access paths cannot point to the same memory locations. The safe value is TRUE.
 
 \begin{PipsProp}{ALIASING_INSIDE_DATA_STRUCTURE}
-ALIASING_INSIDE_DATA_STRUCTURE TRUE
+ALIASING_INSIDE_DATA_STRUCTURE FALSE
 \end{PipsProp}
 
 The following string property defines the lattice of maximal elements
@@ -7602,6 +7707,11 @@ to TRUE in order to force distribution, even when it does not seem profitable
 PARTIAL_EVAL_ALWAYS_SIMPLIFY FALSE
 \end{PipsProp}
 
+Likewise, one can turn following property to true if he wants to use hard-coded value for size of types
+\begin{PipsProp}{EVAL_SIZEOF}
+EVAL_SIZEOF FALSE
+\end{PipsProp}
+
 This function was implemented initially by Bruno \textsc{Baron}.
 
 
@@ -9503,6 +9613,7 @@ alias print_code_proper_references 'Statements & Proper References'
 alias print_code_cumulated_references 'Statements & Cumulated References'
 alias print_initial_precondition 'Initial Preconditions'
 alias print_code_points_to_list 'Statements & Points To'
+
 \end{PipsMake}
 
 \subsection{Standard Sequential View}
@@ -9627,6 +9738,61 @@ print_code_continuation_conditions   > MODULE.printed_file
 
 
 \subsection{Sequential view with regions}
+\subsection{Sequential view with regions}
+
+\subsubsection{Sequential view with plain pointer regions}
+\label{sec:plain-regions}
+
+\begin{PipsPass}{print_code_pointer_regions}
+Display the code decorated with the pointer regions.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_pointer_regions              > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.pointer_regions
+        < MODULE.summary_pointer_regions
+        < MODULE.preconditions
+        < MODULE.transformers
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+\subsubsection{Sequential view with proper pointer regions}
+
+\begin{PipsPass}{print_code_proper_pointer_regions}
+Display the code decorated with the proper pointer regions.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_proper_pointer_regions          > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_pointer_regions
+        < MODULE.summary_pointer_regions
+        < MODULE.preconditions
+        < MODULE.transformers
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+
+\subsubsection{Sequential view with invariant pointer regions}
+
+\begin{PipsPass}{print_code_inv_regions}
+Display the code decorated with the invariant read/write pointer regions.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_inv_pointer_regions              > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.inv_pointer_regions
+        < MODULE.summary_pointer_regions
+        < MODULE.preconditions
+        < MODULE.transformers
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
 
 \subsubsection{Sequential view with plain regions}
 \label{sec:plain-regions}
@@ -9751,6 +9917,17 @@ print_code_complementary_sections > MODULE.printed_file
 
 \subsection{Sequential View with Proper Effects}
 
+\begin{PipsPass}{print_code_proper_pointer_effects}
+Display the code decorated with the proper pointer effects.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_proper_pointer_effects       > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_pointer_effects
+\end{PipsMake}
+
 \begin{PipsPass}{print_code_proper_effects}
 Display the code decorated with the proper effects.
 \end{PipsPass}
@@ -9774,6 +9951,18 @@ print_code_proper_references       > MODULE.printed_file
 \end{PipsMake}
 
 \subsection{Sequential View with Cumulated Effects}
+
+\begin{PipsPass}{print_code_cumulated_pointer_effects}
+Display the code decorated with the cumulated effects.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_cumulated_pointer_effects    > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_pointer_effects
+        < MODULE.summary_pointer_effects
+\end{PipsMake}
 
 \begin{PipsPass}{print_code_cumulated_effects}
 Display the code decorated with the cumulated effects.
@@ -9877,6 +10066,7 @@ print_code_points_to_list      > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
+        < MODULE.summary_points_to_list
         < MODULE.points_to_list
 \end{PipsMake}
 

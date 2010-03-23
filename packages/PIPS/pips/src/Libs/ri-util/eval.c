@@ -78,9 +78,11 @@ value EvalSyntax(syntax s)
     v = make_value_unknown();
     break;
   case is_syntax_sizeofexpression:
-    v = make_value_unknown();
-    /* SG: sizeof is architecture dependant, it is better not to evaluate it 
-    v = EvalSizeofexpression((syntax_sizeofexpression(s)));*/
+    /* SG: sizeof is architecture dependant, it is better not to evaluate it */
+    if(get_bool_property("EVAL_SIZEOF"))
+        v = EvalSizeofexpression((syntax_sizeofexpression(s)));
+    else
+        v = make_value_unknown();
     break;
   case is_syntax_subscript:
   case is_syntax_application:

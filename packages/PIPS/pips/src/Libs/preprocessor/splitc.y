@@ -67,7 +67,6 @@
 
 #include "c_syntax.h"
 #include "preprocessor.h"
-#include "splitc.h"
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
@@ -89,16 +88,6 @@ extern int csplit_line_number;
 extern string splitc_text;
 extern int get_user_current_beginning();
 
-extern hash_table keyword_typedef_table;
-
-void keep_track_of_typedef(string type_name)
-{
-  hash_put(keyword_typedef_table, type_name,(void *) TK_NAMED_TYPE);
-  pips_debug(2,"Add typedef name %s to hash table\n", type_name);
-  if(strcmp(type_name, "v1")==0) {
-    pips_debug(1, "v1 added as typedef\n");
-  }
-}
 
 /* The following global variables are used to store the information such as
    the scope, type and storage of an entity, given by the decl_spec_list,

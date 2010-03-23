@@ -3733,6 +3733,34 @@ type type_to_final_pointed_type(type t)
   }
   return ut;
 }
+
+/**
+ @param t is the entity_type of a basic_derived
+ @return the list of fields of the input type
+ */
+list derived_type_fields(type t)
+{
+  list l=NIL;
+  
+  switch (type_tag(t))
+    {
+    case is_type_struct: 
+      l = type_struct(t);
+      break;
+    case is_type_union:
+      l = type_union(t);
+      break;
+    case is_type_enum:
+      l = type_enum(t);
+      break;
+    default:
+      pips_assert("input type is a struct union, or enum\n", type_struct_p(t) || type_union_p(t) || type_enum_p(t) );
+      
+    }
+  return l;
+}
+
+
 /*
  *  that is all
  */

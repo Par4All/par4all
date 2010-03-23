@@ -61,8 +61,13 @@ bool locations_equal_p(cell acc1, cell acc2)
 {
   reference r1 = cell_to_reference(acc1);
   reference r2 = cell_to_reference(acc2);
-
-  return reference_equal_p(r1,r2);
+  entity e1 = reference_variable(r1);
+  entity e2 = reference_variable(r2);
+  //return reference_equal_p(r1,r2);
+  if(strcmp(entity_user_name(e1), entity_user_name(e2))== 0)
+    return true;
+  else 
+    return false;
 }
 
 /* returns true if two relations are equals. (maybe added to ri-util later)*/

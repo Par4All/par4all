@@ -2102,9 +2102,12 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       /* tc must have variable type, add lq to its qualifiers */
       if (!type_undefined_p(tc) && type_variable_p(tc))
 	variable_qualifiers(type_variable(tc)) = lq;
+      else if(type_void_p(tc))
+	type_void(tc) = lq;
       /*else
 	const void, void is not of type variable, store const where ?????????
 	CParserError("Entity has qualifier but no type or is not variable type in the context?\n");*/
+      c_parser_context_qualifiers(context) = NIL;
     }
 
   /************************* TYPE PART *******************************************/
@@ -2530,6 +2533,7 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
       c_parser_context context = stack_head(ContextStack);
       type tc = c_parser_context_type(context);
       type t1,t2;
+      list ql = c_parser_context_qualifiers(context);
 
       /* what about context qualifiers ? */
       t2 = UpdateType(t,tc);
@@ -2540,11 +2544,24 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
 	  t2 = UpdateType(t1,t2);
 	}
       entity_type(e) = t2;
+
+      if(!ENDP(ql)) {
+	if(type_void_p(t2)) {
+	  type_void(t2) = ql;
+	}
+	else if(type_variable_p(t2)) {
+	  variable_qualifiers(type_variable(t2)) = ql;
+	}
+	else
+	  pips_internal_error("unexpected type\n");
+
+	c_parser_context_qualifiers(context) = NIL;
+      }
     }
   entity_storage(e) = make_storage_rom();
 
   /* Temporally put the list of struct/union entities defined in
-     decl_psec_list to initial value of ent*/
+     decl_psec_list to initial value of ent */
   entity_initial(e) = (value) ld;
 
 }
@@ -2611,11 +2628,11 @@ list TakeDerivedEntities(list le)
     ifdebug(8) {
       pips_debug(0, "Output entity list: ");
       if(ENDP(lres)) {
-      fprintf(stderr, "NIL\n");
+	fprintf(stderr, "NIL\n");
       }
       else {
-      print_entities(lres);
-      fprintf(stderr, "\n");
+	print_entities(lres);
+	fprintf(stderr, "\n");
       }
     }
 
