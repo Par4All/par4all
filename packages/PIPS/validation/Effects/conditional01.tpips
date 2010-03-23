@@ -36,16 +36,16 @@ echo
 echo Proper effects for "conditional01"
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[conditional01]
 echo
 echo Cumulated effects for "conditional01"
 echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[conditional01]
 
-activate PRINT_CODE_REGIONS
+activate PRINT_CODE_POINTER_REGIONS
 display PRINTED_FILE[conditional01]
 
 close

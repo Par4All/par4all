@@ -4,9 +4,9 @@
    work. The problem may occurs within the parser because a is
    declared before the initialization expression is parsed.  */
 
-int initialization06(int a)
+int initialization06(int af)
 {
-  int a = a;
+  int a = af;
   int i;
 
   i = a+1;

@@ -46,6 +46,9 @@ display PRINTED_FILE[main]
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
+quit
+
+# The parser is not responsible for these functionalities
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE[main]
 

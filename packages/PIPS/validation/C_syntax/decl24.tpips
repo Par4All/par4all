@@ -1,6 +1,6 @@
 delete decl24
 
-setproperty ABORT_ON_USER_ERROR TRUE
+#setproperty ABORT_ON_USER_ERROR TRUE
 
 create decl24 decl24.c
 

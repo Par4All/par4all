@@ -96,7 +96,8 @@ echo
 setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
 setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
 apply ARRAY_TO_POINTER
-apply PARTIAL_EVAL
+# sg: not applying partial eval, because effects are not capable of handling the conversion required by array_to_pointer types ...
+#apply PARTIAL_EVAL
 display PRINTED_FILE
 
 #echo

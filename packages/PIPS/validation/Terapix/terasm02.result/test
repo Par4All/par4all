@@ -3,14 +3,14 @@ Initial code
 
 void microcode(short image[512][512], short kernel[3][3], short new_image[512][512], short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    for(i = 0; i <= iter1-1; i += 1)
       for(j = 0; j <= iter2-1; j += 1) {
-         new_image[i][j] = 0;                                           /*0009*/
+         new_image[i][j] = 0;                                           /*0010*/
          for(k = 0; k <= 2; k += 1)
             for(l = 0; l <= 2; l += 1)
-               new_image[i][j] = new_image[i][j]+image[i+k][j+l]+kernel[k][l];         /*0012*/
-         new_image[i][j] = new_image[i][j]/9;                           /*0013*/
+               new_image[i][j] = new_image[i][j]+image[i+k][j+l]+kernel[k][l];         /*0013*/
+         new_image[i][j] = new_image[i][j]/9;                           /*0014*/
       }
 }
 
@@ -18,24 +18,24 @@ After flattening
 
 void microcode(short image[512][512], short kernel[3][3], short new_image[512][512], short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    for(i = 0; i <= iter1-1; i += 1)
       for(j = 0; j <= iter2-1; j += 1) {
-         new_image[i][j] = 0;                                           /*0009*/
-         new_image[i][j] = new_image[i][j]+image[i+0][j+0]+kernel[0][0];               /*0012*/
-         new_image[i][j] = new_image[i][j]+image[i+0][j+1]+kernel[0][1];               /*0012*/
-         new_image[i][j] = new_image[i][j]+image[i+0][j+2]+kernel[0][2];               /*0012*/
+         new_image[i][j] = 0;                                           /*0010*/
+         new_image[i][j] = new_image[i][j]+image[i+0][j+0]+kernel[0][0];               /*0013*/
+         new_image[i][j] = new_image[i][j]+image[i+0][j+1]+kernel[0][1];               /*0013*/
+         new_image[i][j] = new_image[i][j]+image[i+0][j+2]+kernel[0][2];               /*0013*/
          l = 3;
-         new_image[i][j] = new_image[i][j]+image[i+1][j+0]+kernel[1][0];               /*0012*/
-         new_image[i][j] = new_image[i][j]+image[i+1][j+1]+kernel[1][1];               /*0012*/
-         new_image[i][j] = new_image[i][j]+image[i+1][j+2]+kernel[1][2];               /*0012*/
+         new_image[i][j] = new_image[i][j]+image[i+1][j+0]+kernel[1][0];               /*0013*/
+         new_image[i][j] = new_image[i][j]+image[i+1][j+1]+kernel[1][1];               /*0013*/
+         new_image[i][j] = new_image[i][j]+image[i+1][j+2]+kernel[1][2];               /*0013*/
          l = 3;
-         new_image[i][j] = new_image[i][j]+image[i+2][j+0]+kernel[2][0];               /*0012*/
-         new_image[i][j] = new_image[i][j]+image[i+2][j+1]+kernel[2][1];               /*0012*/
-         new_image[i][j] = new_image[i][j]+image[i+2][j+2]+kernel[2][2];               /*0012*/
+         new_image[i][j] = new_image[i][j]+image[i+2][j+0]+kernel[2][0];               /*0013*/
+         new_image[i][j] = new_image[i][j]+image[i+2][j+1]+kernel[2][1];               /*0013*/
+         new_image[i][j] = new_image[i][j]+image[i+2][j+2]+kernel[2][2];               /*0013*/
          l = 3;
          k = 3;
-         new_image[i][j] = new_image[i][j]/9;                           /*0013*/
+         new_image[i][j] = new_image[i][j]/9;                           /*0014*/
       }
 }
 
@@ -43,26 +43,26 @@ Microcode after scalarization
 
 void microcode(short image[512][512], short kernel[3][3], short new_image[512][512], short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    for(i = 0; i <= iter1-1; i += 1)
       for(j = 0; j <= iter2-1; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
-         __scalar__0 = __scalar__0+image[i+0][j+0]+kernel[0][0];        /*0012*/
-         __scalar__0 = __scalar__0+image[i+0][j+1]+kernel[0][1];        /*0012*/
-         __scalar__0 = __scalar__0+image[i+0][j+2]+kernel[0][2];        /*0012*/
+         __scalar__0 = 0;                                               /*0010*/
+         __scalar__0 = __scalar__0+image[i+0][j+0]+kernel[0][0];        /*0013*/
+         __scalar__0 = __scalar__0+image[i+0][j+1]+kernel[0][1];        /*0013*/
+         __scalar__0 = __scalar__0+image[i+0][j+2]+kernel[0][2];        /*0013*/
          l = 3;
-         __scalar__0 = __scalar__0+image[i+1][j+0]+kernel[1][0];        /*0012*/
-         __scalar__0 = __scalar__0+image[i+1][j+1]+kernel[1][1];        /*0012*/
-         __scalar__0 = __scalar__0+image[i+1][j+2]+kernel[1][2];        /*0012*/
+         __scalar__0 = __scalar__0+image[i+1][j+0]+kernel[1][0];        /*0013*/
+         __scalar__0 = __scalar__0+image[i+1][j+1]+kernel[1][1];        /*0013*/
+         __scalar__0 = __scalar__0+image[i+1][j+2]+kernel[1][2];        /*0013*/
          l = 3;
-         __scalar__0 = __scalar__0+image[i+2][j+0]+kernel[2][0];        /*0012*/
-         __scalar__0 = __scalar__0+image[i+2][j+1]+kernel[2][1];        /*0012*/
-         __scalar__0 = __scalar__0+image[i+2][j+2]+kernel[2][2];        /*0012*/
+         __scalar__0 = __scalar__0+image[i+2][j+0]+kernel[2][0];        /*0013*/
+         __scalar__0 = __scalar__0+image[i+2][j+1]+kernel[2][1];        /*0013*/
+         __scalar__0 = __scalar__0+image[i+2][j+2]+kernel[2][2];        /*0013*/
          l = 3;
          k = 3;
-         __scalar__0 = __scalar__0/9;                                   /*0013*/
+         __scalar__0 = __scalar__0/9;                                   /*0014*/
          new_image[i][j] = __scalar__0;
       }
 }
@@ -71,26 +71,26 @@ Microcode After array conversion
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    for(i = 0; i <= iter1-1; i += 1)
       for(j = 0; j <= iter2-1; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
-         __scalar__0 = __scalar__0+image[512*i+j]+kernel[0];            /*0012*/
-         __scalar__0 = __scalar__0+image[512*i+j+1]+kernel[1];          /*0012*/
-         __scalar__0 = __scalar__0+image[512*i+j+2]+kernel[2];          /*0012*/
+         __scalar__0 = 0;                                               /*0010*/
+         __scalar__0 = __scalar__0+image[512*i+j]+kernel[0];            /*0013*/
+         __scalar__0 = __scalar__0+image[512*i+j+1]+kernel[1];          /*0013*/
+         __scalar__0 = __scalar__0+image[512*i+j+2]+kernel[2];          /*0013*/
          l = 3;
-         __scalar__0 = __scalar__0+image[512*i+512+j]+kernel[3];        /*0012*/
-         __scalar__0 = __scalar__0+image[512*i+j+513]+kernel[4];        /*0012*/
-         __scalar__0 = __scalar__0+image[512*i+j+514]+kernel[5];        /*0012*/
+         __scalar__0 = __scalar__0+image[512*i+512+j]+kernel[3];        /*0013*/
+         __scalar__0 = __scalar__0+image[512*i+j+513]+kernel[4];        /*0013*/
+         __scalar__0 = __scalar__0+image[512*i+j+514]+kernel[5];        /*0013*/
          l = 3;
-         __scalar__0 = __scalar__0+image[512*i+1024+j]+kernel[6];       /*0012*/
-         __scalar__0 = __scalar__0+image[512*i+j+1025]+kernel[7];       /*0012*/
-         __scalar__0 = __scalar__0+image[512*i+j+1026]+kernel[8];       /*0012*/
+         __scalar__0 = __scalar__0+image[512*i+1024+j]+kernel[6];       /*0013*/
+         __scalar__0 = __scalar__0+image[512*i+j+1025]+kernel[7];       /*0013*/
+         __scalar__0 = __scalar__0+image[512*i+j+1026]+kernel[8];       /*0013*/
          l = 3;
          k = 3;
-         __scalar__0 = __scalar__0/9;                                   /*0013*/
+         __scalar__0 = __scalar__0/9;                                   /*0014*/
          new_image[512*i+j] = __scalar__0;
       }
 }
@@ -99,14 +99,14 @@ Microcode after CSE
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
    int I_1, I_2;
    for(i = 0; i <= iter1-1; i += 1)
       for(j = 0; j <= iter2-1; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = 512*i;
          I_2 = I_1+j;
          __scalar__0 = __scalar__0+image[I_2]+kernel[0];
@@ -123,7 +123,7 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         new_image[512*i+j] = __scalar__0;
       }
    ;
 }
@@ -132,7 +132,7 @@ Microcode after ICM
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
@@ -141,7 +141,7 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    for(i = 0; i <= iter1-1; i += 1) {
       I_50 = 512*i;
       for(j = 0; j <= I_51; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = I_50;
          I_2 = I_1+j;
          __scalar__0 = __scalar__0+image[I_2]+kernel[0];
@@ -158,7 +158,7 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         new_image[512*i+j] = __scalar__0;
       }
    }
    ;
@@ -168,7 +168,7 @@ Microcode After atomization
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
@@ -207,11 +207,13 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    int I_69;
    //PIPS generated variable
    short I_70;
+   //PIPS generated variable
+   int I_71, I_72;
    I_51 = iter2-1;
    for(i = 0; i <= iter1-1; i += 1) {
       I_50 = 512*i;
       for(j = 0; j <= I_51; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = I_50;
          I_2 = I_1+j;
          I_52 = __scalar__0+image[I_2];
@@ -247,7 +249,9 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         I_71 = 512*i;
+         I_72 = I_71+j;
+         new_image[I_72] = __scalar__0;
       }
    }
    ;
@@ -257,7 +261,7 @@ Atomized code
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
@@ -296,11 +300,13 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    int I_69;
    //PIPS generated variable
    short I_70;
+   //PIPS generated variable
+   int I_71, I_72;
    I_51 = iter2-1;
    for(i = 0; i <= iter1-1; i += 1) {
       I_50 = 512*i;
       for(j = 0; j <= I_51; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = I_50;
          I_2 = I_1+j;
          I_52 = __scalar__0+image[I_2];
@@ -336,7 +342,9 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         I_71 = 512*i;
+         I_72 = I_71+j;
+         new_image[I_72] = __scalar__0;
       }
    }
    ;
@@ -346,7 +354,7 @@ Tidy code
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
@@ -386,48 +394,49 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    //PIPS generated variable
    short I_70;
    //PIPS generated variable
-   int I_71, I_72, I_73, I_74;
+   int I_71, I_72, I_73, I_74, I_75, I_76;
    //PIPS generated variable
-   short I_75, I_76, I_77, I_78;
+   short I_77, I_78, I_79, I_80;
    //PIPS generated variable
-   int I_79;
+   int I_81;
    //PIPS generated variable
-   short I_80, I_81, I_82, I_83;
+   short I_82, I_83, I_84, I_85;
    //PIPS generated variable
-   int I_84;
+   int I_86;
    //PIPS generated variable
-   short I_85, I_86, I_87, I_88;
+   short I_87, I_88, I_89, I_90;
    //PIPS generated variable
-   int I_89, I_90;
+   int I_91, I_92;
    //PIPS generated variable
-   short I_91, I_92, I_93, I_94;
+   short I_93, I_94, I_95, I_96;
    //PIPS generated variable
-   int I_95;
+   int I_97;
    //PIPS generated variable
-   short I_96, I_97, I_98, I_99;
+   short I_98, I_99, I_100, I_101;
    //PIPS generated variable
-   int I_100;
+   int I_102;
    //PIPS generated variable
-   short I_101, I_102, I_103, I_104;
+   short I_103, I_104, I_105, I_106;
    //PIPS generated variable
-   int I_105, I_106;
+   int I_107, I_108;
    //PIPS generated variable
-   short I_107, I_108, I_109, I_110;
+   short I_109, I_110, I_111, I_112;
    //PIPS generated variable
-   int I_111;
+   int I_113;
    //PIPS generated variable
-   short I_112, I_113, I_114, I_115;
+   short I_114, I_115, I_116, I_117;
    //PIPS generated variable
-   int I_116;
+   int I_118;
    //PIPS generated variable
-   short I_117, I_118, I_119, I_120;
+   short I_119, I_120, I_121, I_122;
    //PIPS generated variable
-   int I_121;
+   int I_123, I_124, I_125, I_126;
    I_51 = iter2-1;
    for(i = 0; i <= iter1-1; i += 1) {
       I_50 = 512*i;
+      I_126 = 512*i;
       for(j = 0; j <= I_51; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = I_50;
          I_2 = I_1+j;
          I_52 = __scalar__0+image[I_2];
@@ -463,7 +472,9 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         I_71 = I_126;
+         I_72 = I_71+j;
+         new_image[I_72] = __scalar__0;
       }
    }
    ;
@@ -473,7 +484,7 @@ Code in a two adress fashion
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
@@ -513,50 +524,52 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    //PIPS generated variable
    short I_70;
    //PIPS generated variable
-   int I_71, I_72, I_73, I_74;
+   int I_71, I_72, I_73, I_74, I_75, I_76;
    //PIPS generated variable
-   short I_75, I_76, I_77, I_78;
+   short I_77, I_78, I_79, I_80;
    //PIPS generated variable
-   int I_79;
+   int I_81;
    //PIPS generated variable
-   short I_80, I_81, I_82, I_83;
+   short I_82, I_83, I_84, I_85;
    //PIPS generated variable
-   int I_84;
+   int I_86;
    //PIPS generated variable
-   short I_85, I_86, I_87, I_88;
+   short I_87, I_88, I_89, I_90;
    //PIPS generated variable
-   int I_89, I_90;
+   int I_91, I_92;
    //PIPS generated variable
-   short I_91, I_92, I_93, I_94;
+   short I_93, I_94, I_95, I_96;
    //PIPS generated variable
-   int I_95;
+   int I_97;
    //PIPS generated variable
-   short I_96, I_97, I_98, I_99;
+   short I_98, I_99, I_100, I_101;
    //PIPS generated variable
-   int I_100;
+   int I_102;
    //PIPS generated variable
-   short I_101, I_102, I_103, I_104;
+   short I_103, I_104, I_105, I_106;
    //PIPS generated variable
-   int I_105, I_106;
+   int I_107, I_108;
    //PIPS generated variable
-   short I_107, I_108, I_109, I_110;
+   short I_109, I_110, I_111, I_112;
    //PIPS generated variable
-   int I_111;
+   int I_113;
    //PIPS generated variable
-   short I_112, I_113, I_114, I_115;
+   short I_114, I_115, I_116, I_117;
    //PIPS generated variable
-   int I_116;
+   int I_118;
    //PIPS generated variable
-   short I_117, I_118, I_119, I_120;
+   short I_119, I_120, I_121, I_122;
    //PIPS generated variable
-   int I_121;
+   int I_123, I_124, I_125, I_126;
    I_51 = iter2;
    I_51 = I_51-1;
    for(i = 0; i <= iter1-1; i += 1) {
       I_50 = 512;
       I_50 = I_50*i;
+      I_126 = 512;
+      I_126 = I_126*i;
       for(j = 0; j <= I_51; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = I_50;
          I_2 = I_1;
          I_2 = I_2+j;
@@ -621,7 +634,10 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         I_71 = I_126;
+         I_72 = I_71;
+         I_72 = I_72+j;
+         new_image[I_72] = __scalar__0;
       }
    }
    ;
@@ -631,7 +647,7 @@ Code after flattening
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
@@ -671,50 +687,52 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    //PIPS generated variable
    short I_70;
    //PIPS generated variable
-   int I_71, I_72, I_73, I_74;
+   int I_71, I_72, I_73, I_74, I_75, I_76;
    //PIPS generated variable
-   short I_75, I_76, I_77, I_78;
+   short I_77, I_78, I_79, I_80;
    //PIPS generated variable
-   int I_79;
+   int I_81;
    //PIPS generated variable
-   short I_80, I_81, I_82, I_83;
+   short I_82, I_83, I_84, I_85;
    //PIPS generated variable
-   int I_84;
+   int I_86;
    //PIPS generated variable
-   short I_85, I_86, I_87, I_88;
+   short I_87, I_88, I_89, I_90;
    //PIPS generated variable
-   int I_89, I_90;
+   int I_91, I_92;
    //PIPS generated variable
-   short I_91, I_92, I_93, I_94;
+   short I_93, I_94, I_95, I_96;
    //PIPS generated variable
-   int I_95;
+   int I_97;
    //PIPS generated variable
-   short I_96, I_97, I_98, I_99;
+   short I_98, I_99, I_100, I_101;
    //PIPS generated variable
-   int I_100;
+   int I_102;
    //PIPS generated variable
-   short I_101, I_102, I_103, I_104;
+   short I_103, I_104, I_105, I_106;
    //PIPS generated variable
-   int I_105, I_106;
+   int I_107, I_108;
    //PIPS generated variable
-   short I_107, I_108, I_109, I_110;
+   short I_109, I_110, I_111, I_112;
    //PIPS generated variable
-   int I_111;
+   int I_113;
    //PIPS generated variable
-   short I_112, I_113, I_114, I_115;
+   short I_114, I_115, I_116, I_117;
    //PIPS generated variable
-   int I_116;
+   int I_118;
    //PIPS generated variable
-   short I_117, I_118, I_119, I_120;
+   short I_119, I_120, I_121, I_122;
    //PIPS generated variable
-   int I_121;
+   int I_123, I_124, I_125, I_126;
    I_51 = iter2;
    I_51 = I_51-1;
    for(i = 0; i <= iter1-1; i += 1) {
       I_50 = 512;
       I_50 = I_50*i;
+      I_126 = 512;
+      I_126 = I_126*i;
       for(j = 0; j <= I_51; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = I_50;
          I_2 = I_1;
          I_2 = I_2+j;
@@ -779,7 +797,10 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         I_71 = I_126;
+         I_72 = I_71;
+         I_72 = I_72+j;
+         new_image[I_72] = __scalar__0;
       }
    }
    ;
@@ -789,7 +810,7 @@ Code after some cleaning
 
 void microcode(short *image, short *kernel, short *new_image, short iter1, short iter2)
 {
-   short i, j, k, l;                                                    /*0004*/
+   short i, j, k, l;                                                    /*0005*/
    //PIPS generated variable
    short __scalar__0;
    //PIPS generated variable
@@ -828,13 +849,19 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    int I_69;
    //PIPS generated variable
    short I_70;
+   //PIPS generated variable
+   int I_71, I_72;
+   //PIPS generated variable
+   int I_126;
    I_51 = iter2;
    I_51 = I_51-1;
    for(i = 0; i <= iter1-1; i += 1) {
       I_50 = 512;
       I_50 = I_50*i;
+      I_126 = 512;
+      I_126 = I_126*i;
       for(j = 0; j <= I_51; j += 1) {
-         __scalar__0 = 0;                                               /*0009*/
+         __scalar__0 = 0;                                               /*0010*/
          I_1 = I_50;
          I_2 = I_1;
          I_2 = I_2+j;
@@ -899,7 +926,10 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
          l = 3;
          k = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[I_2] = __scalar__0;
+         I_71 = I_126;
+         I_72 = I_71;
+         I_72 = I_72+j;
+         new_image[I_72] = __scalar__0;
       }
    }
    ;
@@ -912,264 +942,274 @@ kernel seems a mask
 new_image seems a mask
 iter1 belongs to a loop bound
 parameter iter2 is not valid
-void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short iter1, short iter2)
+void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short N1, short N0)
 {
    //PIPS generated variable
-   short re0;
+   int re0, re1, re2;
    //PIPS generated variable
-   int re1;
+   short re3;
    //PIPS generated variable
-   short re2;
+   int re4;
    //PIPS generated variable
-   int re3;
+   short re5;
    //PIPS generated variable
-   short re4;
-   //PIPS generated variable
-   int re5, re6;
+   int re6;
    //PIPS generated variable
    short re7;
    //PIPS generated variable
-   int re8;
+   int re8, re9;
    //PIPS generated variable
-   short re9;
+   short re10;
    //PIPS generated variable
-   int re10;
+   int re11;
    //PIPS generated variable
-   short re11;
+   short re12;
    //PIPS generated variable
-   int re12, re13;
+   int re13;
    //PIPS generated variable
    short re14;
    //PIPS generated variable
-   int re15;
+   int re15, re16;
    //PIPS generated variable
-   short re16;
+   short re17;
    //PIPS generated variable
-   int re17;
+   int re18;
    //PIPS generated variable
-   short re18;
+   short re19;
    //PIPS generated variable
-   int re19, re20, re21, re22;
+   int re20;
    //PIPS generated variable
-   short re23;
+   short re21;
    //PIPS generated variable
-   short re24, re25, re26, re27;
+   int re22, re23, re24, re25;
    //PIPS generated variable
-   short *im3, *im5, *im7;
+   short re26;
    //PIPS generated variable
-   int N0 = iter2, N1 = iter1;
-   im7 = FIFO2;
-   im5 = FIFO1;
-   im3 = FIFO0;
-   re19 = iter2;
-   re19 = re19-1;
-   re24 = 1;
-   while (re24<=N1) {
-      re20 = 512;
-      re20 = re20*re24;
-      re25 = 1;
-      while (re25<=N0) {
-         re23 = 0;                                                      /*0009*/
-         re22 = re20;
-         re21 = re22;
-         re21 = re21+re25;
-         re18 = re23;
-         re18 = re18+im3[re21];
-         re23 = re18;
-         re23 = re23+im5[0];
-         re17 = re21;
-         re17 = re17+1;
-         re16 = re23;
-         re16 = re16+im3[re17];
-         re23 = re16;
-         re23 = re23+im5[1];
-         re15 = re21;
-         re15 = re15+2;
-         re14 = re23;
-         re14 = re14+im3[re15];
-         re23 = re14;
-         re23 = re23+im5[2];
-         re27 = 3;
-         re13 = re22;
-         re13 = re13+512;
-         re12 = re13;
-         re12 = re12+re25;
-         re11 = re23;
-         re11 = re11+im3[re12];
-         re23 = re11;
-         re23 = re23+im5[3];
-         re10 = re21;
-         re10 = re10+513;
-         re9 = re23;
-         re9 = re9+im3[re10];
-         re23 = re9;
-         re23 = re23+im5[4];
-         re8 = re21;
-         re8 = re8+514;
-         re7 = re23;
-         re7 = re7+im3[re8];
-         re23 = re7;
-         re23 = re23+im5[5];
-         re27 = 3;
-         re6 = re22;
-         re6 = re6+1024;
-         re5 = re6;
-         re5 = re5+re25;
-         re4 = re23;
-         re4 = re4+im3[re5];
-         re23 = re4;
-         re23 = re23+im5[6];
-         re3 = re21;
-         re3 = re3+1025;
-         re2 = re23;
-         re2 = re2+im3[re3];
-         re23 = re2;
-         re23 = re23+im5[7];
-         re1 = re21;
-         re1 = re1+1026;
-         re0 = re23;
-         re0 = re0+im3[re1];
-         re23 = re0;
-         re23 = re23+im5[8];
-         re27 = 3;
-         re26 = 3;
-         re23 = re23/9;
-         im7[re21] = re23;
-         re25 = 1+re25;
+   short re27, re28, re29, re30;
+   //PIPS generated variable
+   short *im0, *im1, *im2;
+   im2 = FIFO2;
+   im1 = FIFO1;
+   im0 = FIFO0;
+   re22 = N0;
+   re22 = re22-1;
+   re27 = 1;
+   while (re27<=N1) {
+      re23 = 512;
+      re23 = re23*re27;
+      re0 = 512;
+      re0 = re0*re27;
+      re28 = 1;
+      while (re28<=N0) {
+         re26 = 0;                                                      /*0010*/
+         re25 = re23;
+         re24 = re25;
+         re24 = re24+re28;
+         re21 = re26;
+         re21 = re21+im0[re24];
+         re26 = re21;
+         re26 = re26+im1[0];
+         re20 = re24;
+         re20 = re20+1;
+         re19 = re26;
+         re19 = re19+im0[re20];
+         re26 = re19;
+         re26 = re26+im1[1];
+         re18 = re24;
+         re18 = re18+2;
+         re17 = re26;
+         re17 = re17+im0[re18];
+         re26 = re17;
+         re26 = re26+im1[2];
+         re30 = 3;
+         re16 = re25;
+         re16 = re16+512;
+         re15 = re16;
+         re15 = re15+re28;
+         re14 = re26;
+         re14 = re14+im0[re15];
+         re26 = re14;
+         re26 = re26+im1[3];
+         re13 = re24;
+         re13 = re13+513;
+         re12 = re26;
+         re12 = re12+im0[re13];
+         re26 = re12;
+         re26 = re26+im1[4];
+         re11 = re24;
+         re11 = re11+514;
+         re10 = re26;
+         re10 = re10+im0[re11];
+         re26 = re10;
+         re26 = re26+im1[5];
+         re30 = 3;
+         re9 = re25;
+         re9 = re9+1024;
+         re8 = re9;
+         re8 = re8+re28;
+         re7 = re26;
+         re7 = re7+im0[re8];
+         re26 = re7;
+         re26 = re26+im1[6];
+         re6 = re24;
+         re6 = re6+1025;
+         re5 = re26;
+         re5 = re5+im0[re6];
+         re26 = re5;
+         re26 = re26+im1[7];
+         re4 = re24;
+         re4 = re4+1026;
+         re3 = re26;
+         re3 = re3+im0[re4];
+         re26 = re3;
+         re26 = re26+im1[8];
+         re30 = 3;
+         re29 = 3;
+         re26 = re26/9;
+         re2 = re0;
+         re1 = re2;
+         re1 = re1+re28;
+         im2[re1] = re26;
+         re28 = 1+re28;
       }
-      re24 = 1+re24;
+      re27 = 1+re27;
    }
    ;
 }
 
 Code after expression substitution
 
-void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short iter1, short iter2)
+void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short N1, short N0)
 {
    //PIPS generated variable
-   short re0;
+   int re0, re1, re2;
    //PIPS generated variable
-   int re1;
+   short re3;
    //PIPS generated variable
-   short re2;
+   int re4;
    //PIPS generated variable
-   int re3;
+   short re5;
    //PIPS generated variable
-   short re4;
-   //PIPS generated variable
-   int re5, re6;
+   int re6;
    //PIPS generated variable
    short re7;
    //PIPS generated variable
-   int re8;
+   int re8, re9;
    //PIPS generated variable
-   short re9;
+   short re10;
    //PIPS generated variable
-   int re10;
+   int re11;
    //PIPS generated variable
-   short re11;
+   short re12;
    //PIPS generated variable
-   int re12, re13;
+   int re13;
    //PIPS generated variable
    short re14;
    //PIPS generated variable
-   int re15;
+   int re15, re16;
    //PIPS generated variable
-   short re16;
+   short re17;
    //PIPS generated variable
-   int re17;
+   int re18;
    //PIPS generated variable
-   short re18;
+   short re19;
    //PIPS generated variable
-   int re19, re20, re21, re22;
+   int re20;
    //PIPS generated variable
-   short re23;
+   short re21;
    //PIPS generated variable
-   short re24, re25, re26, re27;
+   int re22, re23, re24, re25;
    //PIPS generated variable
-   short *im3, *im5, *im7;
+   short re26;
    //PIPS generated variable
-   int N0 = iter2, N1 = iter1;
-   seti(im7, FIFO2);
-   seti(im5, FIFO1);
-   seti(im3, FIFO0);
-   seti(re19, iter2);
-   subf(re19, 1);
-   seti(re24, 1);
-   while (re24<=N1) {
-      seti(re20, 512);
-      mulf(re20, re24);
-      seti(re25, 1);
-      while (re25<=N0) {
-         seti(re23, 0);                                                 /*0009*/
-         seti(re22, re20);
-         seti(re21, re22);
-         addf(re21, re25);
-         seti(re18, re23);
-         addf(re18, im3[re21]);
-         seti(re23, re18);
-         addf(re23, im5[0]);
-         seti(re17, re21);
-         addf(re17, 1);
-         seti(re16, re23);
-         addf(re16, im3[re17]);
-         seti(re23, re16);
-         addf(re23, im5[1]);
-         seti(re15, re21);
-         addf(re15, 2);
-         seti(re14, re23);
-         addf(re14, im3[re15]);
-         seti(re23, re14);
-         addf(re23, im5[2]);
-         seti(re27, 3);
-         seti(re13, re22);
-         addf(re13, 512);
-         seti(re12, re13);
-         addf(re12, re25);
-         seti(re11, re23);
-         addf(re11, im3[re12]);
-         seti(re23, re11);
-         addf(re23, im5[3]);
-         seti(re10, re21);
-         addf(re10, 513);
-         seti(re9, re23);
-         addf(re9, im3[re10]);
-         seti(re23, re9);
-         addf(re23, im5[4]);
-         seti(re8, re21);
-         addf(re8, 514);
-         seti(re7, re23);
-         addf(re7, im3[re8]);
-         seti(re23, re7);
-         addf(re23, im5[5]);
-         seti(re27, 3);
-         seti(re6, re22);
-         addf(re6, 1024);
-         seti(re5, re6);
-         addf(re5, re25);
-         seti(re4, re23);
-         addf(re4, im3[re5]);
-         seti(re23, re4);
-         addf(re23, im5[6]);
-         seti(re3, re21);
-         addf(re3, 1025);
-         seti(re2, re23);
-         addf(re2, im3[re3]);
-         seti(re23, re2);
-         addf(re23, im5[7]);
-         seti(re1, re21);
-         addf(re1, 1026);
-         seti(re0, re23);
-         addf(re0, im3[re1]);
-         seti(re23, re0);
-         addf(re23, im5[8]);
-         seti(re27, 3);
-         seti(re26, 3);
-         divf(re23, 9);
-         seti(im7[re21], re23);
-         re25 = 1+re25;
+   short re27, re28, re29, re30;
+   //PIPS generated variable
+   short *im0, *im1, *im2;
+   seti(im2, FIFO2);
+   seti(im1, FIFO1);
+   seti(im0, FIFO0);
+   seti(re22, N0);
+   subf(re22, 1);
+   seti(re27, 1);
+   while (re27<=N1) {
+      seti(re23, 512);
+      mulf(re23, re27);
+      seti(re0, 512);
+      mulf(re0, re27);
+      seti(re28, 1);
+      while (re28<=N0) {
+         seti(re26, 0);                                                 /*0010*/
+         seti(re25, re23);
+         seti(re24, re25);
+         addf(re24, re28);
+         seti(re21, re26);
+         addf(re21, im0[re24]);
+         seti(re26, re21);
+         addf(re26, im1[0]);
+         seti(re20, re24);
+         addf(re20, 1);
+         seti(re19, re26);
+         addf(re19, im0[re20]);
+         seti(re26, re19);
+         addf(re26, im1[1]);
+         seti(re18, re24);
+         addf(re18, 2);
+         seti(re17, re26);
+         addf(re17, im0[re18]);
+         seti(re26, re17);
+         addf(re26, im1[2]);
+         seti(re30, 3);
+         seti(re16, re25);
+         addf(re16, 512);
+         seti(re15, re16);
+         addf(re15, re28);
+         seti(re14, re26);
+         addf(re14, im0[re15]);
+         seti(re26, re14);
+         addf(re26, im1[3]);
+         seti(re13, re24);
+         addf(re13, 513);
+         seti(re12, re26);
+         addf(re12, im0[re13]);
+         seti(re26, re12);
+         addf(re26, im1[4]);
+         seti(re11, re24);
+         addf(re11, 514);
+         seti(re10, re26);
+         addf(re10, im0[re11]);
+         seti(re26, re10);
+         addf(re26, im1[5]);
+         seti(re30, 3);
+         seti(re9, re25);
+         addf(re9, 1024);
+         seti(re8, re9);
+         addf(re8, re28);
+         seti(re7, re26);
+         addf(re7, im0[re8]);
+         seti(re26, re7);
+         addf(re26, im1[6]);
+         seti(re6, re24);
+         addf(re6, 1025);
+         seti(re5, re26);
+         addf(re5, im0[re6]);
+         seti(re26, re5);
+         addf(re26, im1[7]);
+         seti(re4, re24);
+         addf(re4, 1026);
+         seti(re3, re26);
+         addf(re3, im0[re4]);
+         seti(re26, re3);
+         addf(re26, im1[8]);
+         seti(re30, 3);
+         seti(re29, 3);
+         divf(re26, 9);
+         seti(re2, re0);
+         seti(re1, re2);
+         addf(re1, re28);
+         seti(im2[re1], re26);
+         re28 = 1+re28;
       }
-      re24 = 1+re24;
+      re27 = 1+re27;
    }
    ;
 }

@@ -13,16 +13,17 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 echo
 echo Initial code
 echo
+module dotprod
 
-display PRINTED_FILE[dotprod]
+display PRINTED_FILE
 
-apply INLINING[inner_loop]
+apply UNFOLDING
 
 echo
-echo After Inlining
+echo After Unfolding
 echo
 
-display PRINTED_FILE[dotprod]
+display PRINTED_FILE
 
 source include/benchmark.tpips.h
 
@@ -32,7 +33,7 @@ echo
 echo simdized code
 echo
 
-display PRINTED_FILE[dotprod]
+display PRINTED_FILE
 
 close
 quit

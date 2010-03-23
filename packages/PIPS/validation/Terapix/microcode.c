@@ -1,5 +1,5 @@
 /* le test de la mort !*/
-void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short iter1, short iter2)
+void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short N0, short N1)
 {
    int re0;
    int re1;
@@ -21,7 +21,6 @@ void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short iter1, short iter
    short re17;
    int re18;
    short re19;
-   int re20;
    int re21;
    int re22;
    short re23;
@@ -32,13 +31,9 @@ void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short iter1, short iter
    short *im3;
    short *im5;
    short *im7;
-   int N0 = iter2;
-   int N1 = iter1;
    seti(im7, FIFO2);
    seti(im5, FIFO1);
    seti(im3, FIFO0);
-   seti(re20, iter2);
-   subf(re20, 1);
    seti(re30, 1);
    while (re30<=N1) {
       seti(re21, 512);

@@ -37,7 +37,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 //               <must be written>: nbout
 
    nbout = 0;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: col
 //               <must be written>: pa
 
@@ -46,7 +46,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 
 Cumulated effects for "lhs06"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: my_fputc
 int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
 {
@@ -65,7 +65,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 //               <must be written>: nbout
 
    nbout = 0;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: col
 //               <must be written>: pa
 
