@@ -1,3 +1,4 @@
+# $Id: Makefile 15925 2010-01-07 15:03:43Z coelho $
 #
 # Copyright 1989-2010 MINES ParisTech
 #
@@ -18,4 +19,14 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include_HEADERS=constants.h
+dist_man1_MANS=Build.l \
+	Delete.l \
+	Display.l \
+	Init.l \
+	Perform.l \
+	Pips.l \
+	Select.l \
+	epips.l \
+	pips-cmd.l \
+	tpips.l \
+	wpips.l

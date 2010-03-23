@@ -41,6 +41,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "preprocessor.h"
+#include "splitc.h"
 
 
 /* Kind of useless since a file is used to mimic fsplit */
@@ -436,6 +437,15 @@ void csplit_copy(string module_name,
 
 extern void reset_keyword_typedef_table(void);
 extern void reset_csplit_line_number(void);
+extern hash_table keyword_typedef_table;
+void keep_track_of_typedef(string type_name)
+{
+  hash_put(keyword_typedef_table, type_name,(void *) TK_NAMED_TYPE);
+  pips_debug(2,"Add typedef name %s to hash table\n", type_name);
+  if(strcmp(type_name, "v1")==0) {
+    pips_debug(1, "v1 added as typedef\n");
+  }
+}
 
 /* Close open files and reset variables */
 void csplit_error_handler()

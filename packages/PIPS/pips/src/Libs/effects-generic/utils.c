@@ -48,9 +48,26 @@
 #include "preprocessor.h"
 
 #include "effects-generic.h"
+#include "effects-convex.h"
+#include "alias-classes.h"
 
 
 /********************************************************************* MISC */
+
+static bool constant_paths_p = FALSE;
+
+void 
+set_constant_paths_p(bool b)
+{
+  constant_paths_p = b;
+}
+
+bool
+get_constant_paths_p()
+{
+  return constant_paths_p;
+}
+
 
 /* Statement stack to walk on control flow representation */
 DEFINE_GLOBAL_STACK(effects_private_current_stmt, statement)
@@ -634,24 +651,14 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
 effect make_anywhere_effect(tag act)
 {
  
-  entity anywhere_ent = gen_find_tabulated(ALL_MEMORY_ENTITY_NAME, 
-					   entity_domain);
+  entity anywhere_ent = entity_all_locations();
   effect anywhere_eff = effect_undefined;
-
-  if(entity_undefined_p(anywhere_ent)) 
-    {
-      area a = make_area(0,NIL); /* Size and layout are unknown */
-      type t = make_type_area(a);
-      anywhere_ent = make_entity(strdup(ALL_MEMORY_ENTITY_NAME),
-				 t, make_storage_rom(), make_value_unknown());
-    }
-  
+ 
   anywhere_eff = (*reference_to_effect_func)
     (make_reference(anywhere_ent, NIL),
      act, false);
   effect_to_may_effect(anywhere_eff);
   return anywhere_eff;
-  
 }
 
 /**
@@ -880,7 +887,7 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 
 /******************************************************************/
 
-static list type_fields(type t)
+list type_fields(type t)
 {
   list l_res = NIL;
 
@@ -1362,28 +1369,12 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 
 
 /***************************************/
-list derived_type_fields(type t)
-{
-  list l=NIL;
-  
-  switch (type_tag(t))
-    {
-    case is_type_struct: 
-      l = type_struct(t);
-      break;
-    case is_type_union:
-      l = type_union(t);
-      break;
-    case is_type_enum:
-      l = type_enum(t);
-      break;
-    default:
-      pips_assert("input type is a struct union, or enum\n", type_struct_p(t) || type_union_p(t) || type_enum_p(t) );
-      
-    }
-  return l;
-}
 
+/**
+   @param exp is an effect index expression which is either the rank or an entity corresponding to a struct, union or enum field
+   @param l_fields is the list of fields of the corresponding struct, union or enum
+   @return the entity corresponding to the field.
+ */
 entity effect_field_dimension_entity(expression exp, list l_fields)
 {
   if(expression_constant_p(exp))
@@ -1397,77 +1388,218 @@ entity effect_field_dimension_entity(expression exp, list l_fields)
     }
 }
 
-static bool effect_indices_contain_pointer_dimension_p(list current_l_ind, type current_type, bool *exact_p)
+/**
+   @brief recursively walks thru current_l_ind and current_type in parallel until a pointer dimension is found.
+   @param current_l_ind is a list of effect reference indices.
+   @param current_type is the corresponding type in the original entity type arborescence 
+   @param exact_p is a pointer to a bool, which is set to true if the result is not an approximation.
+   @return -1 if no index corresponds to a pointer dimension in current_l_ind, the rank of the least index that may correspond to
+      a pointer dimension in current_l_ind otherwise. If this information is exact, *exact_p is set to true.
+ */
+static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type current_type, bool *exact_p)
 {
-  bool result = false; /*assume there is no pointer */
+  int result = -1; /*assume there is no pointer */
   basic current_basic = variable_basic(type_variable(current_type));
   size_t current_nb_dim = gen_length(variable_dimensions(type_variable(current_type)));
 
-  pips_assert("there should be no effect on variable names\n", gen_length(current_l_ind) >= current_nb_dim);
-
-  
   pips_debug(8, "input type : %s\n", type_to_string(current_type));
+  pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
+
+  pips_assert("there should be no effect on variable names\n", gen_length(current_l_ind) >= current_nb_dim);
+  
 
   switch (basic_tag(current_basic)) 
     {
     case is_basic_pointer:
       {
-	result = true;
+	// no need to test if gen_length(current_l_ind) >= current_nb_dim because of previous assert
+	result = (int) current_nb_dim;
 	*exact_p = true;
 	break;
       }
     case is_basic_derived:
       {
 	int i;
-	/*first skip array dimensions if any*/
-	for(i=0; i< (int) current_nb_dim; i++, POP(current_l_ind));
-	pips_assert("there must be at least one index left for the field\n", gen_length(current_l_ind) > 0);
-
 	current_type = entity_type(basic_derived(current_basic));
-	list l_fields = derived_type_fields(current_type);
 	
-	entity current_field_entity = effect_field_dimension_entity(EXPRESSION(CAR(current_l_ind)), l_fields);
-
-	if (same_string_p(entity_local_name(current_field_entity), UNBOUNDED_DIMENSION_NAME))
-	  {
-	    while (!ENDP(l_fields) && result == false)
-	      {
-		current_field_entity = ENTITY(CAR(l_fields));
-		current_type =  basic_concrete_type(entity_type(current_field_entity));
-		result = effect_indices_contain_pointer_dimension_p(CDR(current_l_ind), current_type, exact_p);
-		POP(l_fields);
-	      }
-	    *exact_p = !result;
-	  }
+	if (type_enum_p(current_type))
+	  result = -1;
 	else
 	  {
-	    current_type = basic_concrete_type(entity_type(current_field_entity));
+	    
+	    /*first skip array dimensions if any*/
+	    for(i=0; i< (int) current_nb_dim; i++, POP(current_l_ind));
+	    pips_assert("there must be at least one index left for the field\n", gen_length(current_l_ind) > 0);
+	    
+	    list l_fields = derived_type_fields(current_type);
+	    
+	    entity current_field_entity = effect_field_dimension_entity(EXPRESSION(CAR(current_l_ind)), l_fields);
+	    
+	    if (variable_phi_p(current_field_entity) || same_string_p(entity_local_name(current_field_entity), UNBOUNDED_DIMENSION_NAME))
+	      {
+		while (!ENDP(l_fields))
+		  {
+		    int tmp_result = -1;
+		    entity current_field_entity = ENTITY(CAR(l_fields));
+		    type current_type =  basic_concrete_type(entity_type(current_field_entity));
+		    size_t current_nb_dim = gen_length(variable_dimensions(type_variable(current_type)));
+		    
+		    if (gen_length(CDR(current_l_ind)) >= current_nb_dim)
+		      // consider this field only if it can be an effect on this field
+		      tmp_result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
+		    
+		    POP(l_fields);
+		    if (tmp_result > 0)
+		      result = result < 0 ? tmp_result : (tmp_result <= result ? tmp_result : result);
+		    free_type(current_type);
+		  }
+		
+		*exact_p = (result < 0);
+		if (result >= 0) result ++; // do not forget the field index !
+	      }
+	    else
+	      {
+		
+		current_type = basic_concrete_type(entity_type(current_field_entity));
+		result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
+		if (result >=0) result++; // do not forget the field index ! 
+		free_type(current_type);
+	      }
 	  }
-
 	break;
       }
     default:
       {
-	result = false;
+	result = -1;
 	*exact_p = true;
 	break;
       }
     }
   
+  pips_debug(8, "returning %d\n", result);
   return result;
   
 }
 
-bool effect_reference_contains_pointer_dimension_p(reference ref, bool *exact_p)
+
+/**
+   @brief walks thru ref indices and ref entity type arborescence in parallel until a pointer dimension is found.
+   @param ref is an effect reference
+   @param exact_p is a pointer to a bool, which is set to true if the result is not an approximation.
+   @return -1 if no index corresponds to a pointer dimension, the rank of the least index that may correspond to
+      a pointer dimension in current_l_ind otherwise. If this information is exact, *exact_p is set to true.
+ */
+int effect_reference_first_pointer_dimension_rank(reference ref, bool *exact_p)
 {
   entity ent = reference_variable(ref);
   list current_l_ind = reference_indices(ref);
-  type current_type = basic_concrete_type(entity_type(ent));
-
-  pips_assert("the initial type must be variable\n", type_variable_p(current_type));
+  type ent_type = entity_type(ent);
+  int result;
 
   pips_debug(8, "input reference : %s\n", words_to_string(effect_words_reference(ref)));
+  
+  if (!type_variable_p(ent_type))
+    {
+      result = -1;
+    }
+  else
+    {
+      type current_type = basic_concrete_type(ent_type);
+      result = effect_indices_first_pointer_dimension_rank(current_l_ind, current_type, exact_p);
+      free_type(current_type);
+    }
 
-  return effect_indices_contain_pointer_dimension_p(current_l_ind, current_type, exact_p);
+  return result;
 
+}
+
+/**
+   @param ref is an effect reference
+   @param exact_p is a pointer to a bool, which is set to true if the result is not an approximation.
+   @return false if no index corresponds to a pointer dimension, false if any index may correspond to
+      a pointer dimension. If this information is exact, *exact_p is set to true.
+ */
+bool effect_reference_contains_pointer_dimension_p(reference ref, bool *exact_p)
+{
+  int pointer_rank;
+  pointer_rank = effect_reference_first_pointer_dimension_rank(ref, exact_p);
+  return (pointer_rank >= 0);
+}
+
+
+/**
+   @param ref is an effect reference
+   @param exact_p is a pointer to a bool, which is set to true if the result is not an approximation.
+   @return true if the effect reference may dereference a pointer, false otherwise.
+ */
+bool effect_reference_dereferencing_p(reference ref, bool * exact_p)
+{
+  entity ent = reference_variable(ref);
+  list l_ind = reference_indices(ref);
+  bool result;
+  int p_rank;
+
+  p_rank = effect_reference_first_pointer_dimension_rank(ref, exact_p);
+  
+
+  if (p_rank == -1)
+    result = false;
+  else
+    result = p_rank < (int) gen_length(l_ind);
+  return result;
+}
+
+/**
+   @param l_pointer_eff is a list of effects that may involve access paths dereferencing pointers.
+   @return a list of effects with no access paths dereferencing pointers.
+ */
+list pointer_effects_to_constant_path_effects(list l_pointer_eff)
+{
+  bool read_dereferencing_p = false;
+  bool write_dereferencing_p = false;
+  list l = l_pointer_eff;
+
+  pips_debug_effects(8, "input effects : \n", l_pointer_eff);
+
+  while (!ENDP(l) && !(read_dereferencing_p && write_dereferencing_p)) 
+    {
+      bool exact_p;
+      effect eff = EFFECT(CAR(l));
+      reference ref = effect_any_reference(eff);
+
+      if (effect_reference_dereferencing_p(ref, &exact_p))
+	{
+	  if (effect_read_p(eff)) read_dereferencing_p = true;
+	  else write_dereferencing_p = true;
+	}
+      POP(l);      
+    }
+  l = NIL;
+	
+  if (write_dereferencing_p)
+    l = CONS(EFFECT, make_anywhere_effect(is_action_write), NIL);
+  if (read_dereferencing_p)
+    l = gen_nconc(l,CONS(EFFECT, make_anywhere_effect(is_action_read), NIL)); 
+    
+  if (!write_dereferencing_p)
+    if (!read_dereferencing_p)
+      l = effects_dup(l_pointer_eff);
+    else
+      {
+	list l_write = effects_write_effects(l_pointer_eff);
+	l = gen_nconc(l, effects_dup(l_write));
+	gen_free_list(l_write);
+      }
+  else
+    {
+      if (!read_dereferencing_p)
+	{
+	  list l_read = effects_read_effects(l_pointer_eff);
+	  l = gen_nconc(l, effects_dup(l_read));
+	  gen_free_list(l_read);
+	}
+    }
+  pips_debug_effects(8, "ouput effects : \n", l);
+	
+  return l;
 }

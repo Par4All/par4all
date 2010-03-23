@@ -1,3 +1,23 @@
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
 F_c=ri.c \
 	dg.c \
 	compsec.c \
@@ -64,12 +84,86 @@ F_h=ri.h \
 	step_private.h \
 	points_to_private.h \
 	freia_spoc_private.h
+# this duplication cannot be avoided
+# for bsd-make compatibility ...
+F_tex=ri.tex \
+	dg.tex \
+	compsec.tex \
+	word_attachment.tex \
+	reductions_private.tex \
+	interval_graph.tex \
+	pipsdbm_private.tex \
+	eole_private.tex \
+	abc_private.tex \
+	alias_private.tex \
+	ubs_private.tex \
+	c_parser_private.tex \
+	complexity_ri.tex \
+	database.tex \
+	paf_ri.tex \
+	tiling.tex \
+	graph.tex \
+	parser_private.tex \
+	hpf_private.tex \
+	property.tex \
+	makefile.tex \
+	reduction.tex \
+	message.tex \
+	text.tex \
+	hpf.tex \
+	sac_private.tex \
+	ri_C.tex \
+	cloning.tex \
+	outlining_private.tex \
+	step_private.tex \
+	points_to_private.tex \
+	freia_spoc_private.tex
+# this duplication cannot be avoided
+# for bsd-make compatibility ...
+F_pdf=ri.pdf \
+	dg.pdf \
+	compsec.pdf \
+	word_attachment.pdf \
+	reductions_private.pdf \
+	interval_graph.pdf \
+	pipsdbm_private.pdf \
+	eole_private.pdf \
+	abc_private.pdf \
+	alias_private.pdf \
+	ubs_private.pdf \
+	c_parser_private.pdf \
+	complexity_ri.pdf \
+	database.pdf \
+	paf_ri.pdf \
+	tiling.pdf \
+	graph.pdf \
+	parser_private.pdf \
+	hpf_private.pdf \
+	property.pdf \
+	makefile.pdf \
+	reduction.pdf \
+	message.pdf \
+	text.pdf \
+	hpf.pdf \
+	sac_private.pdf \
+	ri_C.pdf \
+	cloning.pdf \
+	outlining_private.pdf \
+	step_private.pdf \
+	points_to_private.pdf \
+	freia_spoc_private.pdf
+
+docdir=$(datadir)/doc
+dist_noinst_DATA=$(F_tex) unstructured.idraw newgen_domain.sty
+doc_DATA=$(F_pdf)
 
 dist_noinst_SCRIPTS=remove-latex-comments
 noinst_LTLIBRARIES=libnewgenaux.la
 libnewgenaux_la_SOURCES=$(F_c)
 BUILT_SOURCES=specs.h $(F_c)
-SUFFIXES=.newgen .tex
+include $(top_srcdir)/makes/latex.mk
+SUFFIXES+=.newgen 
+
 AM_CPPFLAGS=$(NEWGENLIBS_CFLAGS)
 
 include_HEADERS=all_newgen_headers.h specs.h $(F_h)
@@ -84,11 +178,9 @@ specs.h $(F_spec):Makefile $(srcdir)/*.tex
 .tex.newgen:
 	$(srcdir)/remove-latex-comments $<
 
-# this is a work-around for the lack of support for patsubst in automake
-# for portability reasons
-dist-hook:
-	cp $(srcdir)/*.tex $(distdir)
+# Convert idraw/eps files.
+ri.pdf:unstructured.pdf
 
 
-CLEANFILES=$(F_c) $(include_HEADERS) *.newgen $(F_h) *.spec
+CLEANFILES=$(F_c) $(include_HEADERS) *.newgen $(F_h) *.spec $(F_pdf) unstructured.pdf
 

@@ -50,6 +50,7 @@
 
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "alias-classes.h"
 
 
 
@@ -76,7 +77,7 @@ effect reference_to_simple_effect(reference ref, tag act,
   pips_debug(8, "Begins for reference: \"%s\"\n",
 	     words_to_string(words_reference(ref,NIL)));
 
-  if (same_string_p(entity_name(ent), ALL_MEMORY_ENTITY_NAME))
+  if (entity_all_locations_p(ent))
     {
       /* anywhere effect */
       eff = make_effect(make_cell_reference(ref),
