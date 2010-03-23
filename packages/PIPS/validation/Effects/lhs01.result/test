@@ -45,7 +45,7 @@ void lhs01()
    int j = 2;
 //               <must be written>: k
    int k = 2;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: i
    
    /* This is a deprecated construct which is accepted by PIPS parser */
@@ -91,7 +91,7 @@ void lhs01()
 
 Cumulated effects for "lhs01"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void lhs01()
 {
 //               <must be written>: i
@@ -100,7 +100,7 @@ void lhs01()
    int j = 2;
 //               <must be written>: k
    int k = 2;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: i
    
    /* This is a deprecated construct which is accepted by PIPS parser */

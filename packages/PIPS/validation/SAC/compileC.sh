@@ -25,6 +25,10 @@ TARGET=$PROJECT_NAME.database/Src/$MODULE_NAME
 
 {
     cat $RCDIR/include/sse.h
+	cat << EOF
+	#define MOD(a,b) ((a)%(b))
+	#define MAX0(a,b) (a>b?a:b)
+EOF
 	sed -r  -e 's/float (v4sf_[^[]+)/__m128 \1/g' \
 			-e 's/float (v4si_[^[]+)/__m128i \1/g' \
             -e 's/v4s[if]_([^,[]+)\[[^]]*\]/\1/g' \

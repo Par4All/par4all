@@ -52,35 +52,36 @@ echo
 echo Proper and cumulated effects for all functions (this implies cumulated effects for callees)
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr_set_array_fgINT32]
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr_set_array_fgINT32]
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr1d_set_data_array_fgINT32]
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr1d_set_data_array_fgINT32]
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr_get_array_fgINT32]
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr_get_array_fgINT32]
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr1d_get_data_array_fgINT32]
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr1d_get_data_array_fgINT32]
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr_defop_add_fgINT32]
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[fulguro01!flgr_defop_add_fgINT32]
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
+
 
 close
 delete fulguro01

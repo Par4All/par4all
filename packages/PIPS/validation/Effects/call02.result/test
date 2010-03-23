@@ -82,8 +82,8 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 
 Cumulated effects for "main"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 int main()
 {
    int a;
@@ -104,8 +104,8 @@ int main()
 Regions for "main"
 
 
-//  <TOP-LEVEL:*MEMORY*-R-MAY-{}>
-//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
 int main()
 {

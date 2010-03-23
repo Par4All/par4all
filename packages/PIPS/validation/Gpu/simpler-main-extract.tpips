@@ -33,7 +33,7 @@ setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 
 
 # Loop normalize for the C language and GPU friendly
-setproperty LOOP_NORMALIZE_1_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
 setproperty LOOP_NORMALIZE_LOWER_BOUND 0
 # It is legal in the following by construction:
 setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE

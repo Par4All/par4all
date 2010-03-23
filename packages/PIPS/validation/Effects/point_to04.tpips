@@ -19,14 +19,28 @@ echo
 display PARSED_PRINTED_FILE[point_to04]
 
 echo
-echo Proper effetcs for "point_to04"
+echo Proper pointer effects for "point_to04"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[point_to04]
+
+echo
+echo Cumulated pointer effects for "point_to04"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[point_to04]
+
+echo
+echo Proper effects for "point_to04"
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[point_to04]
 
 echo
-echo Cumulated effetcs for "point_to04"
+echo Cumulated effects for "point_to04"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
