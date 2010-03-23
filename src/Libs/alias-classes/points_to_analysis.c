@@ -248,7 +248,7 @@ int compare_points_to_location(void * vpt1 , void * vpt2 )
 	entity e1 = reference_variable(r1);
 	entity e2 = reference_variable(r2);
 	//return reference_equal_p(r1, r2);
-	return compare_entities_without_scope(e1, e2);
+	return compare_entities_without_scope(&e1, &e2);
   }
 }
 
@@ -1697,8 +1697,8 @@ set basic_deref_field(set pts_to_set,
 
 /* one basic case of Emami: < m.x = y->a > */
 set basic_field_ptr_to_field(set pts_to_set,
-							 expression lhs,
-							 expression rhs)
+			     expression lhs __attribute__ ((__unused__)),
+			     expression rhs __attribute__ ((__unused__)))
 {
   return pts_to_set;
 }
@@ -2164,8 +2164,8 @@ set basic_ptr_to_field_field(set pts_to_set,
 
 /* one basic case of Emami: < m->x = m > */
 set basic_ptr_to_field_struct(set pts_to_set,
-							  expression lhs,
-							  expression rhs)
+			      expression lhs __attribute__ ((__unused__)),
+			      expression rhs __attribute__ ((__unused__)))
 {
   return pts_to_set;
 }
@@ -2173,21 +2173,21 @@ set basic_ptr_to_field_struct(set pts_to_set,
 
 /* one basic case of Emami: < m->x = *y > */
 set basic_ptr_to_field_deref(set pts_to_set,
-							 expression lhs,
-							 expression rhs)
+			     expression lhs __attribute__ ((__unused__)),
+			     expression rhs __attribute__ ((__unused__)))
 {
   return pts_to_set;
 }
 
 /* one basic case of Emami: < m->x = y > */
 set basic_ptr_to_field_ref(set pts_to_set,
-						   expression lhs,
-						   expression rhs)
+			   expression lhs,
+			   expression rhs)
 {
-  set gen_pts_to =set_generic_make(set_private,
-								   points_to_equal_p,points_to_rank);
+  set gen_pts_to  =set_generic_make(set_private,
+				    points_to_equal_p,points_to_rank);
   set written_pts_to = set_generic_make(set_private,
-										points_to_equal_p,points_to_rank);
+					points_to_equal_p,points_to_rank);
   points_to pt_to = points_to_undefined;
   syntax syn1=expression_syntax(lhs);
   syntax syn2=expression_syntax(rhs);
@@ -2199,89 +2199,89 @@ set basic_ptr_to_field_ref(set pts_to_set,
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
   expression lhs_tmp = expression_undefined;
-  expression rhs_tmp = expression_undefined;
+  //expression rhs_tmp = expression_undefined;
   ifdebug(1) printf("\n cas m->x = y \n");
   if(syntax_call_p(syn1)){
-	call c1 = expression_call(lhs);
-	if(entity_an_operator_p(call_function(c1), POINT_TO)){
-	  list l = call_arguments(c1);
-	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
-	  syn1=expression_syntax(lhs_tmp);
-	}
+    call c1 = expression_call(lhs);
+    if(entity_an_operator_p(call_function(c1), POINT_TO)){
+      list l = call_arguments(c1);
+      lhs_tmp = EXPRESSION (CAR(CDR(l)));
+      syn1=expression_syntax(lhs_tmp);
+    }
   }else{
-	lhs_tmp = copy_expression(lhs);
+    lhs_tmp = copy_expression(lhs);
   }
   if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
-	ref2 = syntax_reference(syn2);
-	ent2=reference_variable(ref2);
-	if((type_pointer_p(lhs_tmp)&&(type_pointer_p(rhs) || array_entity_p(ent2))) ||
-	   (type_double_pointer_p(lhs_tmp)&& type_double_pointer_p(rhs))){
-	  // creation of the source
-	  effect e1 = effect_undefined, e2 = effect_undefined;
-	  set_methods_for_proper_simple_effects();
-	  list l1 = generic_proper_effects_of_complex_address_expression(lhs,
-																	 &e1,
-																	 true);
-	  list l2 = generic_proper_effects_of_complex_address_expression(rhs,
-																	 &e2,
-																	 false);
-	  effects_free(l1);
-	  effects_free(l2);
-	  generic_effects_reset_all_methods();
-	  ref1 = effect_any_reference(e1);
-	  source = make_cell_reference(ref1);
+    ref2 = syntax_reference(syn2);
+    ent2=reference_variable(ref2);
+    if((type_pointer_p(lhs_tmp)&&(type_pointer_p(rhs) || array_entity_p(ent2))) ||
+       (type_double_pointer_p(lhs_tmp)&& type_double_pointer_p(rhs))){
+      // creation of the source
+      effect e1 = effect_undefined, e2 = effect_undefined;
+      set_methods_for_proper_simple_effects();
+      list l1 = generic_proper_effects_of_complex_address_expression(lhs,
+								     &e1,
+								     true);
+      list l2 = generic_proper_effects_of_complex_address_expression(rhs,
+								     &e2,
+								     false);
+      effects_free(l1);
+      effects_free(l2);
+      generic_effects_reset_all_methods();
+      ref1 = effect_any_reference(e1);
+      source = make_cell_reference(ref1);
 
-	  // add the points_to relation to the set generated
-	  // by this assignement
-	  ref2 = effect_any_reference(e2);
-	  sink = make_cell_reference(ref2);
-	  set s = set_generic_make(set_private,
-							   points_to_equal_p,points_to_rank);
-	  SET_FOREACH(points_to, i, pts_to_set){
-		if(locations_equal_p(points_to_source(i), sink))
-		  s = set_add_element(s, s, (void*)i);
-	  }
-	  SET_FOREACH(points_to, j, s){
-		new_sink = copy_cell(points_to_sink(j));
-		// locations new_source = copy_access(source);
-		rel = points_to_approximation(j);
-		pt_to = make_points_to(source, new_sink, rel,
-							   make_descriptor_none());
-		gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
-									 (void*) pt_to );
-	  }
-	  /* in case x = y[i]*/
-	  if(array_entity_p(ent2)){
-		new_sink = make_cell_reference(copy_reference(ref2));
-		// access new_source = copy_access(source);
-		rel = make_approximation_exact();
-		pt_to = make_points_to(source, new_sink, rel,
-							   make_descriptor_none());
-		gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
-									 (void*) pt_to );
-	  }
+      // add the points_to relation to the set generated
+      // by this assignement
+      ref2 = effect_any_reference(e2);
+      sink = make_cell_reference(ref2);
+      set s = set_generic_make(set_private,
+			       points_to_equal_p,points_to_rank);
+      SET_FOREACH(points_to, i, pts_to_set){
+	if(locations_equal_p(points_to_source(i), sink))
+	  s = set_add_element(s, s, (void*)i);
+      }
+      SET_FOREACH(points_to, j, s){
+	new_sink = copy_cell(points_to_sink(j));
+	// locations new_source = copy_access(source);
+	rel = points_to_approximation(j);
+	pt_to = make_points_to(source, new_sink, rel,
+			       make_descriptor_none());
+	gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
+				     (void*) pt_to );
+      }
+      /* in case x = y[i]*/
+      if(array_entity_p(ent2)){
+	new_sink = make_cell_reference(copy_reference(ref2));
+	// access new_source = copy_access(source);
+	rel = make_approximation_exact();
+	pt_to = make_points_to(source, new_sink, rel,
+			       make_descriptor_none());
+	gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
+				     (void*) pt_to );
+      }
 
-	  // creation of the written set
-	  // search of all the points_to relations in the
-	  // alias set where the source is equal to the lhs
-	  SET_FOREACH(points_to, k, pts_to_set){
-		if(locations_equal_p(points_to_source(k), source))
-		  written_pts_to = set_add_element(written_pts_to,
-										   written_pts_to, (void *)k);
-	  }
-	  pts_to_set = set_difference(pts_to_set,
-								  pts_to_set,
-								  written_pts_to);
-	  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
-	  ifdebug(1)
-		print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
-							pts_to_set);
-	}
+      // creation of the written set
+      // search of all the points_to relations in the
+      // alias set where the source is equal to the lhs
+      SET_FOREACH(points_to, k, pts_to_set){
+	if(locations_equal_p(points_to_source(k), source))
+	  written_pts_to = set_add_element(written_pts_to,
+					   written_pts_to, (void *)k);
+      }
+      pts_to_set = set_difference(pts_to_set,
+				  pts_to_set,
+				  written_pts_to);
+      pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
+      ifdebug(1)
+	print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+			    pts_to_set);
+    }
   }
   else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
+    ifdebug(1) {
+      pips_debug(1, "Neither variable is a pointer\n");
+    }
   }
   return pts_to_set;
 }
@@ -2508,53 +2508,53 @@ set basic_ref_heap(set pts_to_set,
   }
 
   if(type_pointer_p(lhs)){
-	// creation of the source
-	effect e1 = effect_undefined;
-	set_methods_for_proper_simple_effects();
-	set_methods_for_proper_references();
-	list  l1 = generic_proper_effects_of_complex_address_expression(lhs,
-																	&e1,
-																	true);
-	effects_free(l1);
-	generic_effects_reset_all_methods();
-	ref1 = effect_any_reference(e1);
-	ref2 =  malloc_to_abstract_location(ref1, type_undefined,
-										type_undefined, expression_undefined,
-										entity_undefined,
-										statement_number(current));
+    // creation of the source
+    effect e1 = effect_undefined;
+    set_methods_for_proper_simple_effects();
+    set_methods_for_proper_references();
+    list  l1 = generic_proper_effects_of_complex_address_expression(lhs,
+								    &e1,
+								    true);
+    effects_free(l1);
+    generic_effects_reset_all_methods();
+    ref1 = effect_any_reference(e1);
+    ref2 =  malloc_to_abstract_location(ref1, type_undefined,
+					type_undefined, expression_undefined,
+					entity_undefined,
+					statement_number(current));
 
-	source = make_cell_reference(ref1);
+    source = make_cell_reference(ref1);
 
-	// creation of the sink
-	sink = make_cell_reference(ref2);
-	// fetch the points to relations
-	// where source = source 1
-	// creation of the written set
-	// search of all the points_to relations in the
-	// alias set where the source is equal to the lhs
-	SET_FOREACH(points_to, elt, pts_to_set)
-	{
-	  if(locations_equal_p(points_to_source(elt),
-						   source))
-		written_pts_to = set_add_element(written_pts_to,
-										 written_pts_to,(void*)elt);
-	}
+    // creation of the sink
+    sink = make_cell_reference(ref2);
+    // fetch the points to relations
+    // where source = source 1
+    // creation of the written set
+    // search of all the points_to relations in the
+    // alias set where the source is equal to the lhs
+    SET_FOREACH(points_to, elt, pts_to_set)
+      {
+	if(locations_equal_p(points_to_source(elt),
+			     source))
+	  written_pts_to = set_add_element(written_pts_to,
+					   written_pts_to,(void*)elt);
+      }
 
-	rel = make_approximation_may();
-	pt_to = make_points_to(source,sink, rel,
-						   make_descriptor_none());
-	gen_pts_to = set_add_element(gen_pts_to, gen_pts_to,
-								 (void *) pt_to );
+    rel = make_approximation_may();
+    pt_to = make_points_to(source,sink, rel,
+			   make_descriptor_none());
+    gen_pts_to = set_add_element(gen_pts_to, gen_pts_to,
+				 (void *) pt_to );
 
 
 
-	pts_to_set = set_difference(pts_to_set, pts_to_set,written_pts_to);
-	pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
-	ifdebug(1){
-	  print_points_to_set(stderr,
-						  "Points To pour le cas 3 <x ==()malloc(sizeof()) > \n",
-						  pts_to_set);
-	}
+    pts_to_set = set_difference(pts_to_set, pts_to_set,written_pts_to);
+    pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
+    ifdebug(1){
+      print_points_to_set(stderr,
+			  "Points To pour le cas 3 <x ==()malloc(sizeof()) > \n",
+			  pts_to_set);
+    }
   }
   else{
 	ifdebug(1) {
@@ -2568,269 +2568,276 @@ set basic_ref_heap(set pts_to_set,
 
 
 
-/* Compute the new points-to set for any assignment lhs = rhs */
+/* Using pt_in, compute the new points-to set for any assignment lhs =
+   rhs.
+
+   If the assignment cannot be analyzed, returns a set undefined.
+ */
 set points_to_assignment(statement current,
-						 expression lhs,
-						 expression rhs,
-						 set pt_in)
+			 expression lhs,
+			 expression rhs,
+			 set pt_in)
 {
   set pt_out = set_generic_make(set_private,
-								points_to_equal_p,points_to_rank);
+				points_to_equal_p,points_to_rank);
   pt_out = set_assign(pt_out,pt_in);
   int rlt1=0;
   int rlt2=0;
+
   if(instruction_expression_p(statement_instruction(current))){
-	expression   e = instruction_expression(statement_instruction(current));
+    //expression e = instruction_expression(statement_instruction(current));
+    ;
   }
   // FI: lhs qnd rhs qre going to be much more general than simple references...
+
   rlt1 = emami_expression_type(lhs);
   rlt2 = emami_expression_type(rhs);
   switch (rlt1){
-	/* cas x = y
-	   write = {(x, x1, rel)|(x, x1, rel) in input}
-	   gen  = {(x, y1, rel)|(y, y1, rel) in input }
-	   pts_to=gen+(input - kill)
-	*/
+    /* cas x = y
+       write = {(x, x1, rel)|(x, x1, rel) in input}
+       gen  = {(x, y1, rel)|(y, y1, rel) in input }
+       pts_to=gen+(input - kill)
+    */
   case EMAMI_NEUTRAL :
-	switch(rlt2){
-	case EMAMI_NEUTRAL :{
-	  // cas x = y
-	  /* if(! set_empty_p( basic_ref_ref(effects, pt_in, lhs, rhs))) */
-	  pt_out = set_assign(pt_out,
-						  basic_ref_ref(pt_in, copy_expression(lhs),
-										copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_ADDRESS_OF:{
-	  // cas x = &y
-	  if(! set_empty_p(basic_ref_addr(pt_in,copy_expression(lhs),
-									  copy_expression(rhs))))
-		pt_out = set_assign(pt_out,
-							basic_ref_addr(pt_in,
-										   copy_expression(lhs),
-										   copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_DEREFERENCING:{
-	  // cas x = *y
-	  /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
-	  pt_out = set_assign(pt_out,
-						  basic_ref_deref(pt_in,
-										  copy_expression(lhs),
-										  copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_HEAP:{
-	  // cas x = *y
-	  /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
-	  pt_out = set_assign(pt_out,
-						  basic_ref_heap( pt_in,
-										  copy_expression(lhs),
-										  copy_expression(rhs),
-										  current));
-	  break;
-	}
-	case EMAMI_FIELD:{
-	  // cas x = *y
-	  /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
-	  pt_out = set_assign(pt_out,
-						  basic_ref_field(pt_in,
-										  copy_expression(lhs),
-										  copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_POINT_TO:{
-	  // cas x = *y
-	  /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
-	  pt_out = set_assign(pt_out,
-						  basic_ref_ptr_to_field(pt_in,
-												 copy_expression(lhs),
-												 copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_STRUCT :
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  // should we add a function that just return the same input set ?
-	  break;
-	case EMAMI_ARRAY :{
-	  pt_out = set_assign(pt_out,
-						  basic_ref_array(pt_in,
-										  copy_expression(lhs),
-										  copy_expression(rhs)));
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	}
-	default:
-	  ifdebug(1) fprintf(stderr,"\n aucun pattern defini \n");
-	  break;
-	}
-	break;
+    switch(rlt2){
+    case EMAMI_NEUTRAL :{
+      // cas x = y
+      /* if(! set_empty_p( basic_ref_ref(effects, pt_in, lhs, rhs))) */
+      pt_out = set_assign(pt_out,
+			  basic_ref_ref(pt_in, copy_expression(lhs),
+					copy_expression(rhs)));
+      break;
+    }
+    case EMAMI_ADDRESS_OF:{
+      // cas x = &y
+      if(! set_empty_p(basic_ref_addr(pt_in,copy_expression(lhs),
+				      copy_expression(rhs))))
+	pt_out = set_assign(pt_out,
+			    basic_ref_addr(pt_in,
+					   copy_expression(lhs),
+					   copy_expression(rhs)));
+      break;
+    }
+    case EMAMI_DEREFERENCING:{
+      // cas x = *y
+      /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
+      pt_out = set_assign(pt_out,
+			  basic_ref_deref(pt_in,
+					  copy_expression(lhs),
+					  copy_expression(rhs)));
+      break;
+    }
+    case EMAMI_HEAP:{
+      // cas x = *y
+      /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
+      pt_out = set_assign(pt_out,
+			  basic_ref_heap( pt_in,
+					  copy_expression(lhs),
+					  copy_expression(rhs),
+					  current));
+      break;
+    }
+    case EMAMI_FIELD:{
+      // cas x = *y
+      /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
+      pt_out = set_assign(pt_out,
+			  basic_ref_field(pt_in,
+					  copy_expression(lhs),
+					  copy_expression(rhs)));
+      break;
+    }
+    case EMAMI_POINT_TO:{
+      // cas x = *y
+      /*  if(! set_empty_p(basic_ref_deref(effects, pt_in, lhs, rhs))) */
+      pt_out = set_assign(pt_out,
+			  basic_ref_ptr_to_field(pt_in,
+						 copy_expression(lhs),
+						 copy_expression(rhs)));
+      break;
+    }
+    case EMAMI_STRUCT :
+      ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+      // should we add a function that just return the same input set ?
+      break;
+    case EMAMI_ARRAY :{
+      pt_out = set_assign(pt_out,
+			  basic_ref_array(pt_in,
+					  copy_expression(lhs),
+					  copy_expression(rhs)));
+      ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+      break;
+    }
+    default:
+      ifdebug(1) fprintf(stderr,"\n aucun pattern defini \n");
+      break;
+    }
+    break;
   case EMAMI_ADDRESS_OF:
-	ifdebug(1) fprintf(stderr," \n aucun pattern defini \n");
-	break;
+    ifdebug(1) fprintf(stderr," \n aucun pattern defini \n");
+    break;
   case EMAMI_DEREFERENCING:
-	switch(rlt2)
-	{
-	case EMAMI_NEUTRAL:{
-	  // cas *x = y
-	  /* if(! set_empty_p(basic_deref_ref(effects, pt_in, lhs, rhs))) */
-	  pt_out = set_assign(pt_out, basic_deref_ref(pt_in,
-												  copy_expression(lhs),
-												  copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_ADDRESS_OF:
-	  // cas *x = &y
-	  pt_out = set_assign(pt_out,
-						  basic_deref_addr(pt_in,
-										   copy_expression(lhs),
-										   copy_expression(rhs)));
-	  break;
-	case EMAMI_DEREFERENCING:{
-	  //cas *x = *y
-	  /* if(! set_empty_p(basic_deref_deref(effects, pt_in, lhs, rhs))) */
-	  pt_out = set_assign(pt_out,
-						  basic_deref_deref(pt_in,
-											copy_expression(lhs),
-											copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_FIELD :
-	  pt_out = set_assign(pt_out,
-						  basic_deref_field(pt_in,
-											copy_expression(lhs),
-											copy_expression(rhs)));
-	  break;
-	case EMAMI_POINT_TO:{
-	  pt_out = set_assign(pt_out,
-						  basic_deref_ptr_to_field(pt_in,
-												   copy_expression(lhs),
-												   copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_STRUCT :
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	case EMAMI_ARRAY :
-
-	  break;
-	default:
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	}
+    switch(rlt2)
+      {
+      case EMAMI_NEUTRAL:{
+	// cas *x = y
+	/* if(! set_empty_p(basic_deref_ref(effects, pt_in, lhs, rhs))) */
+	pt_out = set_assign(pt_out, basic_deref_ref(pt_in,
+						    copy_expression(lhs),
+						    copy_expression(rhs)));
 	break;
+      }
+      case EMAMI_ADDRESS_OF:
+	// cas *x = &y
+	pt_out = set_assign(pt_out,
+			    basic_deref_addr(pt_in,
+					     copy_expression(lhs),
+					     copy_expression(rhs)));
+	break;
+      case EMAMI_DEREFERENCING:{
+	//cas *x = *y
+	/* if(! set_empty_p(basic_deref_deref(effects, pt_in, lhs, rhs))) */
+	pt_out = set_assign(pt_out,
+			    basic_deref_deref(pt_in,
+					      copy_expression(lhs),
+					      copy_expression(rhs)));
+	break;
+      }
+      case EMAMI_FIELD :
+	pt_out = set_assign(pt_out,
+			    basic_deref_field(pt_in,
+					      copy_expression(lhs),
+					      copy_expression(rhs)));
+	break;
+      case EMAMI_POINT_TO:{
+	pt_out = set_assign(pt_out,
+			    basic_deref_ptr_to_field(pt_in,
+						     copy_expression(lhs),
+						     copy_expression(rhs)));
+	break;
+      }
+      case EMAMI_STRUCT :
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      case EMAMI_ARRAY :
+
+	break;
+      default:
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      }
+    break;
   case EMAMI_FIELD:
-	switch(rlt2)
-	{
-	case EMAMI_NEUTRAL:{
-	  // cas x.a = y
-	  /* if(! set_empty_p(basic_deref_ref(effects, pt_in, lhs, rhs))) */
-	  //pt_out = set_assign(pt_out, basic_field_ref(effects, pt_in, lhs, rhs));
-	  break;
-	}
-	case EMAMI_ADDRESS_OF:
-	  // cas x.a = &y
-	  pt_out = set_assign(pt_out,
-						  basic_field_addr(pt_in,
-										   copy_expression(lhs),
-										   copy_expression(rhs)));
-	  break;
-	case EMAMI_DEREFERENCING:{
-	  //cas *(x.a) = *y
-	  break;
-	}
-	case EMAMI_FIELD :
-	  pt_out = set_assign(pt_out,
-						  basic_ref_ref(pt_in,
-										copy_expression(lhs),
-										copy_expression(rhs)));
-	  break;
-	case EMAMI_POINT_TO:{
-	  pt_out = set_assign(pt_out,
-						  basic_field_ptr_to_field(pt_in,
-												   copy_expression(lhs),
-												   copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_STRUCT :
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	default:
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	}
-  case EMAMI_STRUCT:
-	switch(rlt2)
-	{
-	case EMAMI_NEUTRAL:{
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	}
-	case EMAMI_ADDRESS_OF:
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	case EMAMI_DEREFERENCING:
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	case EMAMI_FIELD :
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	case EMAMI_STRUCT :
-	  pt_out = struct_decomposition(lhs, rhs, pt_in);
-	  break;
-	default:
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	}
-  default:
-  {
-	ifdebug(1)
-	  fprintf(stderr,"\n  aucun pattern defini\n ");
+    switch(rlt2)
+      {
+      case EMAMI_NEUTRAL:{
+	// cas x.a = y
+	/* if(! set_empty_p(basic_deref_ref(effects, pt_in, lhs, rhs))) */
+	//pt_out = set_assign(pt_out, basic_field_ref(effects, pt_in, lhs, rhs));
 	break;
-  }
+      }
+      case EMAMI_ADDRESS_OF:
+	// cas x.a = &y
+	pt_out = set_assign(pt_out,
+			    basic_field_addr(pt_in,
+					     copy_expression(lhs),
+					     copy_expression(rhs)));
+	break;
+      case EMAMI_DEREFERENCING:{
+	//cas *(x.a) = *y
+	break;
+      }
+      case EMAMI_FIELD :
+	pt_out = set_assign(pt_out,
+			    basic_ref_ref(pt_in,
+					  copy_expression(lhs),
+					  copy_expression(rhs)));
+	break;
+      case EMAMI_POINT_TO:{
+	pt_out = set_assign(pt_out,
+			    basic_field_ptr_to_field(pt_in,
+						     copy_expression(lhs),
+						     copy_expression(rhs)));
+	break;
+      }
+      case EMAMI_STRUCT :
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      default:
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      }
+  case EMAMI_STRUCT:
+    switch(rlt2)
+      {
+      case EMAMI_NEUTRAL:{
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      }
+      case EMAMI_ADDRESS_OF:
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      case EMAMI_DEREFERENCING:
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      case EMAMI_FIELD :
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      case EMAMI_STRUCT :
+	pt_out = struct_decomposition(lhs, rhs, pt_in);
+	break;
+      default:
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      }
+  default:
+    {
+      ifdebug(1)
+	fprintf(stderr,"\n  aucun pattern defini\n ");
+      break;
+    }
   case EMAMI_POINT_TO:
-	switch(rlt2)
-	{
-	case EMAMI_NEUTRAL:{
-	  pt_out = set_assign(pt_out,
-						  basic_ptr_to_field_ref(pt_in,
-												 copy_expression(lhs),
-												 copy_expression(rhs)));
-	  break;
-	}
-	case EMAMI_ADDRESS_OF:
-	  pt_out = set_assign(pt_out,
-						  basic_ptr_to_field_addr(pt_in,
-												  copy_expression(lhs),
-												  copy_expression(rhs)));
-	  break;
-	case EMAMI_DEREFERENCING:
-	  pt_out = set_assign(pt_out,
-						  basic_ptr_to_field_deref(pt_in, copy_expression(lhs),
-												   copy_expression(rhs)));
-	  break;
-		
-	case EMAMI_FIELD :
-	  pt_out = set_assign(pt_out,
-						  basic_ptr_to_field_field(pt_in, copy_expression(lhs),
-												   copy_expression(rhs)));
-	  break;
-	case EMAMI_STRUCT :
-	  pt_out = set_assign(pt_out,
-						  basic_ptr_to_field_struct(pt_in, copy_expression(lhs),
-													copy_expression(rhs)));
+    switch(rlt2)
+      {
+      case EMAMI_NEUTRAL:{
+	pt_out = set_assign(pt_out,
+			    basic_ptr_to_field_ref(pt_in,
+						   copy_expression(lhs),
+						   copy_expression(rhs)));
+	break;
+      }
+      case EMAMI_ADDRESS_OF:
+	pt_out = set_assign(pt_out,
+			    basic_ptr_to_field_addr(pt_in,
+						    copy_expression(lhs),
+						    copy_expression(rhs)));
+	break;
+      case EMAMI_DEREFERENCING:
+	pt_out = set_assign(pt_out,
+			    basic_ptr_to_field_deref(pt_in, copy_expression(lhs),
+						     copy_expression(rhs)));
+	break;
 
-	  break;
-	case EMAMI_POINT_TO:{
-	  pt_out = set_assign(pt_out,
-						  basic_ptr_to_field_ptr_to_field( pt_in, copy_expression(lhs),
-														   copy_expression(rhs)));
-	  break;
-	}
-	default:
-	  ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
-	  break;
-	}
+      case EMAMI_FIELD :
+	pt_out = set_assign(pt_out,
+			    basic_ptr_to_field_field(pt_in, copy_expression(lhs),
+						     copy_expression(rhs)));
+	break;
+      case EMAMI_STRUCT :
+	pt_out = set_assign(pt_out,
+			    basic_ptr_to_field_struct(pt_in, copy_expression(lhs),
+						      copy_expression(rhs)));
+
+	break;
+      case EMAMI_POINT_TO:{
+	pt_out = set_assign(pt_out,
+			    basic_ptr_to_field_ptr_to_field( pt_in, copy_expression(lhs),
+							     copy_expression(rhs)));
+	break;
+      }
+      default:
+	ifdebug(1)	fprintf(stderr,"\n aucun pattern defini\n ");
+	break;
+      }
 
   }
 
@@ -2848,7 +2855,7 @@ set points_to_sequence(sequence seq, set pt_in, bool store)
   return pt_out;
 }
 
-/* compute the points-to set for intrinsic-call*/
+/* compute the points-to set for an intrinsic call */
 set points_to_intrinsic(statement s,
 			entity e,
 			list pc,
@@ -2856,34 +2863,69 @@ set points_to_intrinsic(statement s,
 {
   set pt_out = set_generic_make(set_private,
 				points_to_equal_p, points_to_rank);
+  set pt_cur = set_generic_make(set_private,
+				points_to_equal_p, points_to_rank);
 
   pips_debug(8, "begin\n");
+
+  /* Recursive descent on subexpressions for cases such as "p=q=t=u;" */
+  pt_cur = set_assign(pt_cur, pt_in);
+  FOREACH(EXPRESSION, exp, pc) {
+    pt_cur = set_union(pt_cur, pt_cur, points_to_expression(exp, pt_cur, TRUE));
+  }
+
   if(ENTITY_ASSIGN_P(e)){
     expression lhs = EXPRESSION(CAR(pc));
     expression rhs = EXPRESSION(CAR(CDR(pc)));
-    pt_out = points_to_assignment(s, copy_expression(lhs), copy_expression(rhs), pt_in);
+    pt_out = points_to_assignment(s, lhs, rhs, pt_cur);
+    if(set_undefined_p(pt_out)){
+      /* Use effects to remove broken points-to relations and to link
+	 broken pointers towards default sinks.
+	 pt_out = points_to_filter_with_expression_effects(e, pt_cur);
+      */
+      pips_internal_error("Not implemented yet\n");
+    }
   }
   else if(ENTITY_PLUS_UPDATE_P(e) || ENTITY_MINUS_UPDATE_P(e)
 	  || ENTITY_MULTIPLY_UPDATE_P(e) || ENTITY_DIVIDE_UPDATE_P(e)
 	  || ENTITY_MODULO_UPDATE_P(e) || ENTITY_LEFT_SHIFT_UPDATE_P(e)
 	  || ENTITY_RIGHT_SHIFT_UPDATE_P(e) || ENTITY_BITWISE_AND_UPDATE_P(e)
 	  || ENTITY_BITWISE_XOR_UPDATE_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e)){
-    pt_out = set_assign(pt_out, pt_in);
+    /* Look at the lhs with
+       generic_proper_effects_of_complex_address_expression(). If the
+       main effect is an effect on a pointer, occurences of this
+       pointer must be removed from pt_cur to build pt_out.
+
+       points_to_filter_pointer()
+ */
+    pips_internal_error("Not implemented yet\n");
   }
   else if(ENTITY_POST_INCREMENT_P(e) || ENTITY_POST_DECREMENT_P(e)
 	  || ENTITY_PRE_INCREMENT_P(e) || ENTITY_PRE_DECREMENT_P(e)) {
-    pt_out = set_assign(pt_out, pt_in);
+    /* same */
+    pips_internal_error("Not implemented yet\n");
   }
   else if(ENTITY_C_RETURN_P(e)) {
+    /* Should probably be handled like stop or exit*/
     pt_out = set_assign(pt_out, pt_in);
   }
-  else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e))
-    pt_out = set_assign(pt_out, pt_in);
+  else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e)) {
+    /* The call is never returned from. No information is available
+       for the dead code that follows. pt_out is already set to the
+       empty set. */
+    ;
+  }
   else if(ENTITY_COMMA_P(e)) {
-    pt_out = set_assign(pt_out, pt_in);
+    /* FOREACH on the expression list, points_to_expressions() */
+    pips_internal_error("Not implemented yet\n");
   }
-  else
-    pt_out =  set_assign(pt_out, pt_in);
+  else {
+    /*By default, use the expression effects to filter cur_pt
+	 pt_out = points_to_filter_with_expression_effects(e, pt_cur);
+     */
+    pips_internal_error("Not implemented yet");
+    }
+  /* if pt_out != pt_cur, do not forget to free pt_cur... */
   pips_debug(8, "end\n");
   return pt_out;
 }
@@ -2893,7 +2935,9 @@ set points_to_intrinsic(statement s,
 /* compputing the points-to set of a while loop by iterating over its
    body until reaching a fixed-point. For the moment without taking
    into account the condition's side effect. */
-set points_to_whileloop(whileloop wl, set pt_in, bool store)
+set points_to_whileloop(whileloop wl,
+			set pt_in,
+			bool store __attribute__ ((__unused__)))
 {
   /* get the condition,to used laterly to refine the points-to set
 	 expression cond = whileloop_condition(wl);*/
@@ -2998,9 +3042,9 @@ set points_to_test(test test_stmt, set pt_in, bool store)
 
 /* computing the poinst to of a call, user_functions not yet implemented. */
 set points_to_call(statement s,
-				   call c,
-				   set pt_in,
-				   bool store)
+		   call c,
+		   set pt_in,
+		   bool store __attribute__ ((__unused__)))
 {
   entity e = call_function(c);
   cons *pc = call_arguments(c);
@@ -3152,10 +3196,11 @@ bool points_to_analysis(char * module_name)
   list pts_to_list = NIL;
   init_pt_to_list();
 
-  set_current_module_entity(module_name_to_entity(module_name));
-  set_methods_for_proper_simple_effects();
-  module = get_current_module_entity();
+  module = module_name_to_entity(module_name);
+  set_current_module_entity(module);
 
+  /* Initialize the effect driver to obtain pointer effects */
+  set_methods_for_proper_simple_effects();
   (*effects_computation_init_func)(module_name);
 
   debug_on("POINTS_TO_DEBUG_LEVEL");
