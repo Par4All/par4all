@@ -104,7 +104,6 @@ points_to create_stub_points_to(cell c, type t)
 	r = cell_reference(copy_cell(c));
 	e = reference_variable(r);
 	string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
-	//	fprintf(stderr,"entity %s =",s);
 	string formal_name = strdup(concatenate(POINTS_TO_MODULE_NAME,MODULE_SEP_STRING, s, NULL));
 	entity formal_parameter = gen_find_entity(formal_name);
 	if(entity_undefined_p(formal_parameter)) {
@@ -116,14 +115,17 @@ points_to create_stub_points_to(cell c, type t)
 	rel = make_approximation_exact();
 	pt_to = make_points_to(copy_cell(c), sink, rel,
 			       make_descriptor_none());
-	points_to_consistent_p(pt_to);
-	print_points_to(stderr,(void*)pt_to);
 	pointer_index ++;
 	return pt_to;
 }
 
 
-/* */
+/* Input : a formal parameter which is a pointer and its type.
+   output : a set of points-to where sinks are stub points-to.
+   we descent recursively until reaching a basic type, then we call
+   create_stub_points_to()to generate the adequate points-to.
+   
+*/
 set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 {
   reference r = reference_undefined;
@@ -210,7 +212,6 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
 				    points_to_equal_p,points_to_rank);
 	
   set_current_module_entity(module_name_to_entity(module_name));
-  //set_methods_for_proper_simple_effects();
   module = get_current_module_entity();
 
   debug_on("POINTS_TO_DEBUG_LEVEL");
@@ -226,14 +227,12 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
     FOREACH(PARAMETER, p, params){
       dummy d = parameter_dummy(p);
       if(dummy_identifier_p(d)){
-	entity e = dummy_identifier(d);
-	//entity tt = entity_type(e);
-	reference r = make_reference(e, NIL);
-	print_reference(r);
-	cell c = make_cell_reference(r);
-	pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
-      }
-    }
+		  entity e = dummy_identifier(d);
+		  reference r = make_reference(e, NIL);
+		  cell c = make_cell_reference(r);
+		  pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
+	  }
+	}
   }
   pt_list = set_to_sorted_list(pts_to_set,
 			       (int(*)
