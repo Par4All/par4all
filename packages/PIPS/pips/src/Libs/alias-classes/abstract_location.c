@@ -46,12 +46,12 @@ reference malloc_to_abstract_location(reference lhs,type var_t, type cast_t, exp
   }
   /* in case the property ABSTRACT_HEAP_LOCATIONS is set to "insensitive"*/
   if(strcmp(get_string_property("ABSTRACT_HEAP_LOCATIONS"),"insensitive")==0){
-	e = entity_all_module_heap_locations();
+    e = entity_all_module_heap_locations(get_current_module_entity());
 	r = make_reference(e , NIL);
   }
   /* in case the property ABSTRACT_HEAP_LOCATIONS is set to "flow-sensitive"*/
   if(strcmp(get_string_property("ABSTRACT_HEAP_LOCATIONS"),"flow-sensitive")==0){
-	e = entity_all_module_heap_locations();
+	e = entity_all_module_heap_locations(get_current_module_entity());
 	st = itoa(stmt_number);
   s = strdup(concatenate(entity_name(e),"[", st, "]",NIL));
 	entity ee = find_or_create_entity(s);
@@ -69,7 +69,7 @@ reference malloc_to_abstract_location(reference lhs,type var_t, type cast_t, exp
 /* in case the property ABSTRACT_HEAP_LOCATIONS is set to "context-sensitive"*/
   if(strcmp(get_string_property("ABSTRACT_HEAP_LOCATIONS"),"context-sensitive")==0){
 
-		e = entity_all_module_heap_locations();
+		e = entity_all_module_heap_locations(get_current_module_entity());
 		st = itoa(stmt_number);
 		s = strdup(concatenate(entity_name(e),"[", st,"]",NIL));
 		entity ee = find_or_create_entity(strdup(s));

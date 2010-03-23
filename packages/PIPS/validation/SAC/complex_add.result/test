@@ -1,0 +1,145 @@
+void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
+{
+   int i, j;
+   for(i = 0; i <= dim1-1; i += 1)
+      for(j = 0; j <= dim2-1; j += 1) {
+         b[i][j].re += a[i][j].re;
+         b[i][j].im += a[i][j].im;
+      }
+}
+void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
+{
+   int i, j;
+   for(i = 0; i <= dim1-1; i += 1)
+      for(j = 0; j <= dim2-1; j += 1) {
+         b[i][j].re += a[i][j].re;
+         b[i][j].im += a[i][j].im;
+      }
+}
+void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   for(i = 0; i <= dim1-1; i += 1) {
+      LU_NUB0 = dim2;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         b[i][LU_IND0].re += a[i][LU_IND0].re;
+         b[i][LU_IND0].im += a[i][LU_IND0].im;
+      }
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0].re += a[i][LU_IND0].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0].im += a[i][LU_IND0].im;
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0+1].re += a[i][LU_IND0+1].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0+1].im += a[i][LU_IND0+1].im;
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0+2].re += a[i][LU_IND0+2].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0+2].im += a[i][LU_IND0+2].im;
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0+3].re += a[i][LU_IND0+3].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0+3].im += a[i][LU_IND0+3].im;
+      }
+      j = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   for(i = 0; i <= dim1-1; i += 1) {
+      LU_NUB0 = dim2;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         b[i][LU_IND0].re += a[i][LU_IND0].re;
+         b[i][LU_IND0].im += a[i][LU_IND0].im;
+      }
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0].re = b[i][LU_IND0].re+a[i][LU_IND0].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0].im = b[i][LU_IND0].im+a[i][LU_IND0].im;
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0+1].re = b[i][LU_IND0+1].re+a[i][LU_IND0+1].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0+1].im = b[i][LU_IND0+1].im+a[i][LU_IND0+1].im;
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0+2].re = b[i][LU_IND0+2].re+a[i][LU_IND0+2].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0+2].im = b[i][LU_IND0+2].im+a[i][LU_IND0+2].im;
+         //c SIMD_COMMENT_0
+         b[i][LU_IND0+3].re = b[i][LU_IND0+3].re+a[i][LU_IND0+3].re;
+         //c SIMD_COMMENT_1
+         b[i][LU_IND0+3].im = b[i][LU_IND0+3].im+a[i][LU_IND0+3].im;
+      }
+      j = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   //PIPS:SAC generated short vector(s)
+   short v8hi_vec4[7+1], v8hi_vec5[7+1];
+   for(i = 0; i <= dim1-1; i += 1) {
+      LU_NUB0 = dim2;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         b[i][LU_IND0].re += a[i][LU_IND0].re;
+         b[i][LU_IND0].im += a[i][LU_IND0].im;
+      }
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, a[i][LU_IND0].re, a[i][LU_IND0+1].re, a[i][LU_IND0+2].re, a[i][LU_IND0+3].re);
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, b[i][LU_IND0].re, b[i][LU_IND0+1].re, b[i][LU_IND0+2].re, b[i][LU_IND0+3].re);
+         SIMD_ADDPS(v4sf_vec0, v4sf_vec0, v4sf_vec1);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &b[i][LU_IND0].re, &b[i][LU_IND0+1].re, &b[i][LU_IND0+2].re, &b[i][LU_IND0+3].re);
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec3, a[i][LU_IND0].im, a[i][LU_IND0+1].im, a[i][LU_IND0+2].im, a[i][LU_IND0+3].im);
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec2, b[i][LU_IND0].im, b[i][LU_IND0+1].im, b[i][LU_IND0+2].im, b[i][LU_IND0+3].im);
+         SIMD_ADDPS(v4sf_vec2, v4sf_vec2, v4sf_vec3);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec2, &b[i][LU_IND0].im, &b[i][LU_IND0+1].im, &b[i][LU_IND0+2].im, &b[i][LU_IND0+3].im);
+      }
+      j = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   for(i = 0; i <= dim1-1; i += 1) {
+      LU_NUB0 = dim2;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         b[i][LU_IND0].re += a[i][LU_IND0].re;
+         b[i][LU_IND0].im += a[i][LU_IND0].im;
+      }
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, a[i][LU_IND0].re, a[i][LU_IND0+1].re, a[i][LU_IND0+2].re, a[i][LU_IND0+3].re);
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, b[i][LU_IND0].re, b[i][LU_IND0+1].re, b[i][LU_IND0+2].re, b[i][LU_IND0+3].re);
+         SIMD_ADDPS(v4sf_vec0, v4sf_vec0, v4sf_vec1);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &b[i][LU_IND0].re, &b[i][LU_IND0+1].re, &b[i][LU_IND0+2].re, &b[i][LU_IND0+3].re);
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec3, a[i][LU_IND0].im, a[i][LU_IND0+1].im, a[i][LU_IND0+2].im, a[i][LU_IND0+3].im);
+         SIMD_LOAD_GENERIC_V4SF(v4sf_vec2, b[i][LU_IND0].im, b[i][LU_IND0+1].im, b[i][LU_IND0+2].im, b[i][LU_IND0+3].im);
+         SIMD_ADDPS(v4sf_vec2, v4sf_vec2, v4sf_vec3);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec2, &b[i][LU_IND0].im, &b[i][LU_IND0+1].im, &b[i][LU_IND0+2].im, &b[i][LU_IND0+3].im);
+      }
+      j = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+

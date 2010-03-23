@@ -43,7 +43,10 @@ GENERIC_GLOBAL_FUNCTION(proper_references, statement_effects)
 GENERIC_GLOBAL_FUNCTION(cumulated_references, statement_effects)
 
 /* READ AND WRITE EFFECTS */
+GENERIC_GLOBAL_FUNCTION(proper_rw_pointer_effects, statement_effects)
 GENERIC_GLOBAL_FUNCTION(proper_rw_effects, statement_effects)
+GENERIC_GLOBAL_FUNCTION(rw_pointer_effects, statement_effects)
+GENERIC_GLOBAL_FUNCTION(invariant_rw_pointer_effects, statement_effects)
 GENERIC_GLOBAL_FUNCTION(rw_effects, statement_effects)
 GENERIC_GLOBAL_FUNCTION(invariant_rw_effects, statement_effects)
 /* for external use - identical to rw_effects */
@@ -52,6 +55,28 @@ GENERIC_GLOBAL_FUNCTION(cumulated_rw_effects, statement_effects)
 /* PROPER RW EFFECTS associated to expressions
  */
 GENERIC_GLOBAL_FUNCTION(expr_prw_effects, persistant_expression_to_effects)
+
+list 
+load_proper_rw_pointer_effects_list(statement s)
+{
+  effects e = load_proper_rw_pointer_effects(s);
+  ifdebug(8) pips_assert("proper rw pointer effects loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
+}
+
+void store_proper_rw_pointer_effects_list(statement s, list l_eff)
+{
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("proper rw pointer effects to store are consistent", effects_consistent_p(e));
+  store_proper_rw_pointer_effects(s, e);
+}
+
+void update_proper_rw_pointer_effects_list(statement s, list l_eff)
+{
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("proper rw pointer effects to update are consistent", effects_consistent_p(e));
+  update_proper_rw_pointer_effects(s, e);
+}
 
 list 
 load_proper_rw_effects_list(statement s)
@@ -77,6 +102,30 @@ void update_proper_rw_effects_list(statement s, list l_eff)
 
 
 list 
+load_rw_pointer_effects_list(statement s)
+{
+  effects e = load_rw_pointer_effects(s);
+  ifdebug(8) pips_assert("rw pointer effects loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
+}
+
+void
+store_rw_pointer_effects_list(statement s, list l_eff)
+{
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("rw pointer effects to store are consistent", effects_consistent_p(e));
+  store_rw_pointer_effects(s, e);
+}
+
+void
+update_rw_pointer_effects_list(statement s, list l_eff)
+{
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("rw pointer effects to update are consistent", effects_consistent_p(e));
+  update_rw_pointer_effects(s, e);
+}
+
+list 
 load_rw_effects_list(statement s)
 {
   effects e = load_rw_effects(s);
@@ -98,6 +147,30 @@ update_rw_effects_list(statement s, list l_eff)
   effects e = make_effects(l_eff);
   ifdebug(8) pips_assert("rw effects to update are consistent", effects_consistent_p(e));
   update_rw_effects(s, e);
+}
+
+list 
+load_invariant_rw_pointer_effects_list(statement s)
+{
+  effects e = load_invariant_rw_pointer_effects(s);
+  ifdebug(8) pips_assert("invariant rw pointer effects loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
+}
+
+void
+store_invariant_rw_pointer_effects_list(statement s, list l_eff)
+{
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("invariant rw pointer effects to store are consistent", effects_consistent_p(e));
+  store_invariant_rw_pointer_effects(s, make_effects(l_eff));
+}
+
+void
+update_invariant_rw_pointer_effects_list(statement s, list l_eff)
+{
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("invariant rw pointer effects to update are consistent", effects_consistent_p(e));
+  update_invariant_rw_pointer_effects(s, e);
 }
 
 list 

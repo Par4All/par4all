@@ -89,6 +89,7 @@ set_contracted_proper_effects(bool b)
 {
     contract_p = b;
 }
+ 
 
 /**************************************** LOCAL STACK FOR LOOP RANGE EFFECTS */
 
@@ -1332,6 +1333,13 @@ proper_effects_of_call(call c)
 	  l_proper = NIL;
 	}
 
+	if (get_constant_paths_p())
+	  {
+	    list l_tmp = l_proper;
+	    l_proper = pointer_effects_to_constant_path_effects(l_proper);
+	    effects_free(l_tmp);
+	  }
+	
 	store_proper_rw_effects_list(current_stat, l_proper);
     }
 }
@@ -1440,6 +1448,12 @@ static void proper_effects_of_expression_instruction(instruction i)
       gen_full_free_list(l_proper);
       l_proper = NIL;
     }
+    if (get_constant_paths_p())
+      {
+	list l_tmp = l_proper;
+	l_proper = pointer_effects_to_constant_path_effects(l_proper);
+	effects_free(l_tmp);
+      }
     store_proper_rw_effects_list(current_stat, l_proper);
   }
 }
@@ -1518,6 +1532,12 @@ static void proper_effects_of_loop(loop l)
     if (contract_p)
 	l_proper = proper_effects_contract(l_proper);
 
+    if (get_constant_paths_p())
+      {
+	list l_tmp = l_proper;
+	l_proper = pointer_effects_to_constant_path_effects(l_proper);
+	effects_free(l_tmp);
+      }
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
@@ -1564,6 +1584,12 @@ static void proper_effects_of_forloop(forloop l)
     if (contract_p)
 	l_proper = proper_effects_contract(l_proper);
 
+    if (get_constant_paths_p())
+      {
+	list l_tmp = l_proper;
+	l_proper = pointer_effects_to_constant_path_effects(l_proper);
+	effects_free(l_tmp);
+      }
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
@@ -1572,6 +1598,13 @@ static void proper_effects_of_while(whileloop w)
     statement current_stat = effects_private_current_stmt_head();
     list /* of effect */ l_proper =
 	generic_proper_effects_of_expression(whileloop_condition(w));
+    if (get_constant_paths_p())
+      {
+	list l_tmp = l_proper;
+	l_proper = pointer_effects_to_constant_path_effects(l_proper);
+	effects_free(l_tmp);
+      }
+
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
@@ -1598,6 +1631,13 @@ static void proper_effects_of_test(test t)
 
     if (contract_p)
 	l_proper = proper_effects_contract(l_proper);
+    if (get_constant_paths_p())
+      {
+	list l_tmp = l_proper;
+	l_proper = pointer_effects_to_constant_path_effects(l_proper);
+	effects_free(l_tmp);
+      }
+    
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
@@ -1691,6 +1731,13 @@ static void proper_effects_of_statement(statement s)
 	{
 	  l_eff = gen_nconc(l_eff,generic_proper_effects_of_declaration(e));
 	}
+      if (get_constant_paths_p())
+	{
+	  list l_tmp = l_eff;
+	  l_eff = pointer_effects_to_constant_path_effects(l_eff);
+	  effects_free(l_tmp);
+	}      
+
       if(bound_proper_rw_effects_p(s))
 	{
 	  l_eff = gen_nconc(l_eff,
@@ -1719,6 +1766,10 @@ void proper_effects_of_module_statement(statement module_stat)
     make_effects_private_current_context_stack();
     make_current_downward_cumulated_range_effects_stack();
     pips_debug(1,"begin\n");
+
+    /* for backward compatibility and experimental purposes */
+    if (! c_module_p(get_current_module_entity()) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
 
     gen_multi_recurse
 	(module_stat, 
@@ -1774,6 +1825,9 @@ bool proper_effects_engine(char *module_name)
     
     return(TRUE);
 }
+
+
+
 
 /* compute proper effects for both expressions and statements
    WARNING: the functions are set as a side effect.

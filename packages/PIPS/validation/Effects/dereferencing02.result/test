@@ -18,7 +18,7 @@ void dereferencing02()
    *q++;
 }
 
-Proper effetcs for "dereferencing02"
+Proper pointer effects for "dereferencing02"
 
 void dereferencing02()
 {
@@ -53,10 +53,10 @@ void dereferencing02()
    *q++;
 }
 
-Cumulated effetcs for "dereferencing02"
+Cumulated pointer effects for "dereferencing02"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing02()
 {
 //               <must be written>: x
@@ -86,6 +86,78 @@ void dereferencing02()
 //               <must be written>: q
    q++;
 //               <must be read   >: q q[0]
+//               <must be written>: q
+   *q++;
+}
+
+Proper effects for "dereferencing02"
+
+void dereferencing02()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <must be written>: q
+   double **q = &p;
+   double **w;
+//               <must be written>: i
+   int i = 1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   
+   
+   **q = 2.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   **(q+(i = 0)) = 3.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   **(w+(i = 2)) = 4.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: x
+   x = **q;
+//               <must be read   >: q
+//               <must be written>: q
+   q++;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: q
+   *q++;
+}
+
+Cumulated effects for "dereferencing02"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+void dereferencing02()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <must be written>: q
+   double **q = &p;
+   double **w;
+//               <must be written>: i
+   int i = 1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   
+   
+   **q = 2.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   **(q+(i = 0)) = 3.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   **(w+(i = 2)) = 4.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: x
+   x = **q;
+//               <must be read   >: q
+//               <must be written>: q
+   q++;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be written>: q
    *q++;
 }

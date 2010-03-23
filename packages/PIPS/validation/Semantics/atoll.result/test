@@ -1522,7 +1522,7 @@ extern size_t fread(void *__ptr, size_t __size, size_t __n, FILE *__stream);
    This function is a possible cancellation points and therefore not
    marked with __THROW.  */
 
-extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
+extern size_t fwrite(const void *__ptr, size_t __size, size_t __n, FILE *__s);
 
 /* Faster versions when locking is not necessary.
 
@@ -1533,7 +1533,7 @@ extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
 
 extern size_t fread_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
 
-extern size_t fwrite_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+extern size_t fwrite_unlocked(const void *__ptr, size_t __size, size_t __n, FILE *__stream);
 
 
 
@@ -3349,7 +3349,7 @@ typedef int (*__compar_fn_t)(void *, void *);
    of SIZE bytes each, using COMPAR to perform the comparisons.  */
 
 
-extern void *bsearch(void *__key, void *__base, size_t __nmemb, size_t __size, __compar_fn_t __compar);
+extern void *bsearch(const void *__key, const void *__base, size_t __nmemb, size_t __size, __compar_fn_t __compar);
 
 /* Sort NMEMB elements of BASE, of SIZE bytes each,
    using COMPAR to perform the comparisons.  */

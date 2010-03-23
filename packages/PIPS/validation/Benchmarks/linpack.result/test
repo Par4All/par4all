@@ -540,9 +540,9 @@ void main(void)
    int arsize;
    long arsize2d, memreq, nreps;
    size_t malloc_arg;
-l99998:   ;
+l99999:   ;
 
-   if (!1) goto l99999;
+   if (!1) goto break_1;
    printf("Enter array size (q to quit) [200]:  ");
    fgets(buf, 79, stdin);
    if (buf[0]=='q'||buf[0]=='Q') goto break_1;
@@ -576,10 +576,8 @@ l99998:   ;
       }
    }
 loop_end_1:   ;
-   goto l99998;
+   goto l99999;
 break_1:   ;
-l99999:   ;
-
 }
 int clock()
 {
@@ -1123,9 +1121,9 @@ void main(void)
    int arsize;
    long arsize2d, memreq, nreps;
    size_t malloc_arg;
-l99998:   ;
+l99999:   ;
 
-   if (!1) goto l99999;
+   if (!1) goto break_1;
    printf("Enter array size (q to quit) [200]:  ");
    fgets(buf, 79, stdin);
    if (buf[0]=='q'||buf[0]=='Q') goto break_1;
@@ -1159,10 +1157,8 @@ l99998:   ;
       }
    }
 loop_end_1:   ;
-   goto l99998;
+   goto l99999;
 break_1:   ;
-l99999:   ;
-
 }
 int clock()
 {
@@ -1741,9 +1737,9 @@ void main(void)
    int arsize;
    long arsize2d, memreq, nreps;
    size_t malloc_arg;
-l99998:   ;
+l99999:   ;
 
-   if (!1) goto l99999;
+   if (!1) goto break_1;
    printf("Enter array size (q to quit) [200]:  ");
    fgets(buf, 79, stdin);
    if (buf[0]=='q'||buf[0]=='Q') goto break_1;
@@ -1777,10 +1773,8 @@ l99998:   ;
       }
    }
 loop_end_1:   ;
-   goto l99998;
+   goto l99999;
 break_1:   ;
-l99999:   ;
-
 }
 int clock()
 {
@@ -2359,9 +2353,9 @@ void main(void)
    int arsize;
    long arsize2d, memreq, nreps;
    size_t malloc_arg;
-l99998:   ;
+l99999:   ;
 
-   if (!1) goto l99999;
+   if (!1) goto break_1;
    printf("Enter array size (q to quit) [200]:  ");
    fgets(buf, 79, stdin);
    if (buf[0]=='q'||buf[0]=='Q') goto break_1;
@@ -2395,8 +2389,6 @@ l99998:   ;
       }
    }
 loop_end_1:   ;
-   goto l99998;
+   goto l99999;
 break_1:   ;
-l99999:   ;
-
 }

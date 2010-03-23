@@ -1,3 +1,53 @@
+Content of the validation suite
+
+C99__function__     OK  check that implicit variable __function__ is defined
+
+address_of01	    NOK C parser/prettyprinter error: 
+		    	formal parameter names garbled
+
+block_scope13	    NOK bug in controlizer
+
+complex03.c	    NOK use symbol I, not recognized by PIPS preprocessor
+		        moved to C_syntax_enhancement
+
+decl24.c	    NOK either a C parser or a prettyprinter bug;
+		        attribute const is moved from field display_data
+	 		to the typedef itself; see decl50 and decl51
+decl50.c	    OK  check the parsing and prettyprinting of the const 
+		    	qualifier for pointer
+decl51.c	    OK  check the parsing and prettyprinting of the const 
+		    	qualifier for pointer and typedef
+
+dereference.c	    NOK the source code is not easy to compile with gcc, even 
+		    	using the options available in the tpips script
+			Seems to work with tpips
+
+extension02	    NOK	__attribute__ not parsed by PIPS preprocessor
+		        Moved to C_syntax_enhancements
+
+function_name_conflict01
+		    NOK bug in parser for function rand
+
+initialization06    NOK problem with summary transformer or precondition
+		    	variable name conflict detected by gcc: error
+
+initialization07    NOK C99 source code
+
+parallel03	    NOK C code should be prettyprinted in Fortran
+		    	Does not work anymore
+
+pips		    NOK the tpips file expansion scheme does not work as
+		    	might be expected by a casual user
+
+rsp05		    NOK because of convex array regions
+                        tpips to be simplified for C_syntax
+			full script copied into Regions
+
+struct11	    NOK not compatible with gcc
+		    	fixed version core dumps the parser
+			Since there is a warning, move to C_syntax_enhancements
+
+
 Steps to prettyprint derived types as type declarations, "struct s {}"
 or type references, "struct s"
 
@@ -18,22 +68,22 @@ struct13                not standard conformant
 struct14            OK  test inside a cast
 struct15            OK  test inside a sizeof
 struct16            OK  easiest case, used to debug the SVN merge between SG and FI
-struct17	    OK	simple tree recursive data structure
-struct18	    NOK like struct04, but within a function instead of a compilation unit
-struct19	    OK	same as struct04, but with two struct nested
-struct20	    OK  simple list recursive data structure
-struct21	    NOK bug in PIPS parser
-struct22	    OK	make sure simple cases are handled in a simple usual way
+struct17            OK  simple tree recursive data structure
+struct18            NOK like struct04, but within a function instead of a compilation unit
+struct19            OK  same as struct04, but with two struct nested
+struct20            OK  simple list recursive data structure
+struct21            OK  struct declared in a cast
+struct22            OK  make sure simple cases are handled in a simple usual way
 
-enum06		    OK	reference to an enum in a declaration
-enum07		    OK  same as above + definition of an enum within a declaration
-enum08		    OK  enum declaration and reference nested within a struct
-enum09		    OK  enum declaration and reference nested within a union
-enum10		    OK  simplified version of enum09, used for debugging
-enum11		    OK	deeper nesting
+enum06              OK  reference to an enum in a declaration
+enum07              OK  same as above + definition of an enum within a declaration
+enum08              OK  enum declaration and reference nested within a struct
+enum09              OK  enum declaration and reference nested within a union
+enum10              OK  simplified version of enum09, used for debugging
+enum11              OK  deeper nesting
 
-generate07.c	    NOK	use a local type to type an external function (stupid but legal)
-generate13.c	    NOK	same as generate07.c, but simplified to expose the issue
+generate07.c        NOK use a local type to type an external function (stupid but legal)
+generate13.c        NOK same as generate07.c, but simplified to expose the issue
 
 Note FI: I cannot deal with non-standard conformant C code because
 PIPS does not generate an error log file

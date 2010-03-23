@@ -1,18 +1,27 @@
-void inner_loop(int _i, int *_a, int*_b, int *_c)
+float inner_loop(int _i, float *_b, float *_c)
 {
-    _a[_i] = _b[_i] + _c[_i];
+    return _b[_i] + _c[_i];
 }
 
-void dotprod(int* a, int *b, int *c)
+float dotprod(int n, float b[n], float c[n])
 {
+    float a;
     int i;
-    for(i=0;i<1000000;++i)
+    for(i=0;i<n;++i)
     {
-        inner_loop(i,a,b,c);
+        a+=inner_loop(i,b,c);
     }
 
 
-    return;
+    return a;
+}
+int main(int argc, char **argv)
+{
+    int n=atoi(argv[1]);
+    {
+        float B[n],C[n];
+        return (int)dotprod(n,B,C);
+    }
 }
 
 

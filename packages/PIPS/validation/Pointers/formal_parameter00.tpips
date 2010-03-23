@@ -1,0 +1,30 @@
+delete formal_parameter00
+create formal_parameter00 formal_parameter00.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[formal_parameter00]
+
+#apply POINTS_TO_ANALYSIS[formal_parameter00]
+#display PRINTED_FILE[formal_parameter00]
+
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[formal_parameter00]
+
+
+close
+delete formal_parameter00
+quit

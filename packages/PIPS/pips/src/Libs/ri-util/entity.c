@@ -678,6 +678,17 @@ bool entity_struct_p(entity e)
   return struct_p;
 }
 
+bool same_struct_entity_p(const entity e0, const entity e1)
+{
+    if( entity_struct_p(e0) && entity_struct_p(e1) )
+    {
+        string s0 = strrchr(entity_name(e0),MEMBER_SEP_CHAR),
+               s1 = strrchr(entity_name(e1),MEMBER_SEP_CHAR);
+        return s0 && s1 && ((s0-entity_name(e0)) == ( s1-entity_name(e1) ) ) &&
+            same_stringn_p(entity_name(e0),entity_name(e1),s0-entity_name(e0));
+    }
+}
+
 bool entity_union_p(entity e)
 {
   string ln = entity_local_name(e);
@@ -718,6 +729,7 @@ string entity_module_name(entity e)
 {
   return module_name(entity_name(e));
 }
+
 
 code entity_code(entity e)
 {

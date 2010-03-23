@@ -121,7 +121,7 @@ short accumulate(size_t n, short a[n], short seed)
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
-   seed0 = RED0[0]+seed;
+   seed0 = RED0[0]+seed0;
    RED1[0] = 0;
    RED1[1] = 0;
    RED1[2] = 0;
@@ -166,7 +166,7 @@ short accumulate(size_t n, short a[n], short seed)
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
-   seed0 = RED0[0]+seed;
+   seed0 = RED0[0]+seed0;
    RED1[0] = 0;
    RED1[1] = 0;
    RED1[2] = 0;
@@ -199,7 +199,7 @@ short accumulate(size_t n, short a[n], short seed)
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
-   seed0 = RED0[0]+seed;
+   seed0 = RED0[0]+seed0;
    RED1[0] = 0;
    RED1[1] = 0;
    RED1[2] = 0;
@@ -232,7 +232,7 @@ short accumulate(size_t n, short a[n], short seed)
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
-   seed0 = RED0[0]+seed;
+   seed0 = RED0[0]+seed0;
    RED1[0] = 0;
    RED1[1] = 0;
    RED1[2] = 0;
@@ -268,7 +268,7 @@ short accumulate(size_t n, short a[n], short seed)
    RED0[0] = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
-   seed0 = RED0[0]+seed;
+   seed0 = RED0[0]+seed0;
    RED1[0] = 0;
    RED1[1] = 0;
    RED1[2] = 0;
