@@ -1,0 +1,20 @@
+void global01()
+{
+   // BEGIN BLOCK
+//               <must be written>: TOP-LEVEL:i
+   i = &k;
+//               <must be read   >: TOP-LEVEL:i
+//               <must be written>: TOP-LEVEL:j
+   j = i;
+   // END BLOCK
+}
+POINTS TO
+//  {stubs for global pointters missing}
+void global01()
+{
+   // BEGIN BLOCK
+   i = &k;
+//  {(i,k,-Exact-)}
+   j = i;
+   // END BLOCK
+}
