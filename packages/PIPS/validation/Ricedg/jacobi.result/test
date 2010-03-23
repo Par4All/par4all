@@ -37,9 +37,9 @@ int jacobi(int nb, int **a, int **b)
 
 Cumulated effects for function "main"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY* 
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
 //                                  _MALLOC_EFFECTS:_MALLOC_
-//               <may be written >: TOP-LEVEL:*MEMORY* 
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
 //                                  _MALLOC_EFFECTS:_MALLOC_
 int main(int argc, char *argv[])
 {

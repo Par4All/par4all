@@ -11,7 +11,7 @@ void point_to03()
    ((*p)[2])[3] = 1.5;
 }
 
-Proper effetcs for "point_to03"
+Proper pointer effects for "point_to03"
 
 void point_to03()
 {
@@ -23,5 +23,20 @@ void point_to03()
    p = &a;
 //               <must be read   >: p
 //               <must be written>: p[0][2][3]
+   ((*p)[2])[3] = 1.5;
+}
+
+Proper effects for "point_to03"
+
+void point_to03()
+{
+   typedef double a_t[10][20];
+   a_t a;
+   a_t *p;
+//               <must be written>: p
+
+   p = &a;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
    ((*p)[2])[3] = 1.5;
 }

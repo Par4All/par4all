@@ -1,0 +1,28 @@
+void exit01()
+{
+   // BEGIN BLOCK
+   int i;
+   int *j;
+//               <must be written>: j
+
+   j = &i;
+   exit(0);
+//               <must be written>: i
+   i = 2;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+void exit01()
+{
+   // BEGIN BLOCK
+   int i;
+   int *j;
+
+   j = &i;
+//  {(j,i,-Exact-)}
+   exit(0);
+//
+   i = 2;
+   // END BLOCK
+}

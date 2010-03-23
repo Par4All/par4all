@@ -25,13 +25,14 @@ void dereferencing01()
 //               <must be written>: q
 
    q = p;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
-//               <must be written>: p[0]
    *p = 2.;
 }
 
 Cumulated effetcs for "dereferencing01"
 
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing01()
 {
 //               <must be written>: x
@@ -44,7 +45,7 @@ void dereferencing01()
 //               <must be written>: q
 
    q = p;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p
-//               <must be written>: p[0]
    *p = 2.;
 }

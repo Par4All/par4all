@@ -47,11 +47,6 @@ apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
 
 module flgr2d_convolution
 display PRINTED_FILE
-apply FLAG_LOOPS
-setproperty OUTLINE_MODULE_NAME "flgr2d_convolution_kernel"
-setproperty OUTLINE_LABEL "l99996"
-apply OUTLINE
-display PRINTED_FILE
 
 quit
 

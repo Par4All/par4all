@@ -381,7 +381,7 @@ static bool actual_c_parser(string module_name,
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
       type va_list_t =
 	make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
-      basic void_star_b = make_basic(is_basic_pointer, make_type_void());
+      basic void_star_b = make_basic(is_basic_pointer, make_type_void(NIL));
       type void_start_t =
 	make_type(is_type_variable, make_variable(void_star_b, NIL, NIL));
       entity_storage(built_in_va_start) = make_storage_rom();

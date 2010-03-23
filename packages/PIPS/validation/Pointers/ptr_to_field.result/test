@@ -1,0 +1,65 @@
+int ptr_to_field()
+{
+   // BEGIN BLOCK
+   typedef struct {
+      int *q;
+      int *p;
+   } my_str;
+
+   my_str *m, *n;
+//               <must be written>: i j
+   int i = 0, j = 1;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m
+   m = (my_str *) malloc(sizeof(my_str));
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ n
+   n = (my_str *) malloc(sizeof(my_str));
+//               <must be read   >: m
+//               <must be written>: m[0][1]
+   m->q = &i;
+//               <must be read   >: m
+//               <must be written>: m[0][2]
+   m->p = &j;
+//               <must be read   >: m m[0][2] n
+//               <must be written>: n[0][1]
+   n->q = m->p;
+//               <must be read   >: m m[0][1] n
+//               <must be written>: n[0][2]
+   n->p = m->q;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int ptr_to_field()
+{
+   // BEGIN BLOCK
+   typedef struct {
+      int *q;
+      int *p;
+   } my_str;
+
+   my_str *m, *n;
+   int i = 0, j = 1;
+   m = (my_str *) malloc(sizeof(my_str));
+//  points to = {(m,*ANYWHERE*,-MAY-)}
+   n = (my_str *) malloc(sizeof(my_str));
+//  points to = {(m,*ANYWHERE*,-MAY-);(n,*ANYWHERE*,-MAY-)}
+   m->q = &i;
+//  points to = {(m[0][1],i,-Exact-);(m,*ANYWHERE*,-MAY-);(n,
+//   *ANYWHERE*,-MAY-)}
+   m->p = &j;
+//  points to = {(m[0][2],j,-Exact-);(m[0][1],i,-Exact-);(m,
+//   *ANYWHERE*,-MAY-);(n,*ANYWHERE*,-MAY-)}
+   n->q = m->p;
+//  points to = {(n[0][1],j,-Exact-);(m[0][2],j,-Exact-);(m[0][1],i,
+//   -Exact-);(m,*ANYWHERE*,-MAY-);(n,*ANYWHERE*,-MAY-)}
+   n->p = m->q;
+//  points to = {(n[0][2],i,-Exact-);(n[0][1],j,-Exact-);(m[0][2],j,
+//   -Exact-);(m[0][1],i,-Exact-);(m,*ANYWHERE*,-MAY-);(n,*ANYWHERE*,
+//   -MAY-)}
+
+   return 0;
+   // END BLOCK
+}

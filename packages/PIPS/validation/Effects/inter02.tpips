@@ -10,6 +10,8 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 #echo Select the most precise analysis:
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL

@@ -89,7 +89,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    (*nbout)++;
 }
 
-Proper effects for "fpointer01"
+Proper pointer effects for "fpointer01"
 
 void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
 {
@@ -127,7 +127,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    (*nbout)++;
 }
 
-Cumulated effects for "fpointer01"
+Cumulated pointer effects for "fpointer01"
 
 //               <may be read    >: col[0] indent
 //               <must be read   >: c col nbout nbout[0]
@@ -169,5 +169,85 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    my_fputc(c, _stream);
 //               <must be read   >: nbout nbout[0]
 //               <must be written>: nbout[0]
+   (*nbout)++;
+}
+
+Proper effects for "fpointer01"
+
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//               <must be read   >: c
+   if (c=='\n'||c=='\r')
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: col
+      /* on change de ligne */
+      
+      *col = 0;
+   else {
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+      /* indentation ok ? */
+      
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+         (*nbout)++;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+         (*col)++;
+      }
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+
+      (*col)++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+   
+   my_fputc(c, _stream);
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   (*nbout)++;
+}
+
+Cumulated effects for "fpointer01"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   if (c=='\n'||c=='\r')
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: col
+      /* on change de ligne */
+      
+      *col = 0;
+   else {
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+      /* indentation ok ? */
+      
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+         (*nbout)++;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+         (*col)++;
+      }
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+
+      (*col)++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+   
+   my_fputc(c, _stream);
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
    (*nbout)++;
 }

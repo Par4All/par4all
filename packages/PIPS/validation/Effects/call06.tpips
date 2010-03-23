@@ -11,7 +11,7 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-activate MUST_REGIONS
+activate MUST_POINTER_REGIONS
 
 # setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
@@ -37,21 +37,21 @@ echo
 echo Proper effects for "call06"
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[call06]
 
 echo
 echo Cumulated effects for "call06"
 echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[call06]
 #quit
 echo
 echo Proper effects for "main"
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[main]
 #quit
 
@@ -59,7 +59,7 @@ echo
 echo Cumulated effects for "main"
 echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[main]
 
 echo
@@ -67,7 +67,7 @@ echo Regions for "call06"
 echo
 
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
-activate PRINT_CODE_REGIONS
+activate PRINT_CODE_POINTER_REGIONS
 display PRINTED_FILE[call06]
 
 echo
@@ -75,7 +75,7 @@ echo Regions for "main"
 echo
 
 setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-activate PRINT_CODE_REGIONS
+activate PRINT_CODE_POINTER_REGIONS
 display PRINTED_FILE[main]
 
 close

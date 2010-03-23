@@ -123,6 +123,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 /* FI:need to breakpoint while inlining is available */
 /* #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)*/
 #define same_string_p(s1, s2) function_same_string_p(s1,s2)
+#define same_stringn_p(a,b,c) (!strncmp((a),(b),(c)))
 
 /* MAXPATHLEN is defined in <sys/param.h> for SunOS... but not for all OS! */
 #ifndef MAXPATHLEN

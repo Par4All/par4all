@@ -1,5 +1,9 @@
 #include <xmmintrin.h>
 
+/* extras */
+#define MOD(a,b) ((a)%(b))
+#define MAX0(a,b) ((a)>(b)?(a):(b))
+
 /* float */
 #define SIMD_LOAD_V4SF(vec,arr) vec=_mm_loadu_ps(arr)
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)

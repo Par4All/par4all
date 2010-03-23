@@ -1,0 +1,37 @@
+delete decl51
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create decl51 decl51.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+# The source code is not available, but pointers to functions are
+# defined and initialized with function names
+
+# display PARSED_PRINTED_FILE[%ALL]
+
+echo
+echo Parsed printed file for "decl51!"
+echo
+
+display PARSED_PRINTED_FILE[decl51!]
+
+#quit
+
+apply UNSPLIT
+shell cc -c decl51.database/Src/decl51.c
+
+close
+#delete decl51
+
+quit

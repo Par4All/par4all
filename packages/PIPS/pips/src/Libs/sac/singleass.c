@@ -1,24 +1,24 @@
 /*
 
-  $Id$
+   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+   Copyright 1989-2010 MINES ParisTech
 
-  This file is part of PIPS.
+   This file is part of PIPS.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  any later version.
+   PIPS is free software: you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE.
+   PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+   See the GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 #ifdef HAVE_CONFIG_H
@@ -85,6 +85,7 @@ static void single_assign_statement(graph dg) {
                 if (nbRef == (_int) HASH_UNDEFINED_VALUE)
                     nbRef = 0;
                 nbRef++;
+                pips_debug(1,"increasing the number of reference to %s to %d\n",words_to_string(words_reference(r, NIL)),nbRef);
                 hash_put(nbPred, r, (void*)(_int)nbRef);
             }
         }
@@ -92,6 +93,7 @@ static void single_assign_statement(graph dg) {
     //Then, for each reference which does never stem from more than one Def,
     //change the variable name
     FOREACH(VERTEX, a_vertex, graph_vertices(dg)) {
+        statement currStat= vertex_to_statement(a_vertex);
         hash_table toBeDone = hash_table_make(hash_pointer, 0);
         hash_table hashSuc = hash_table_make(hash_pointer, 0);
         bool var_created = FALSE;
@@ -162,10 +164,13 @@ static void single_assign_statement(graph dg) {
             }
         }
 
-        HASH_MAP(r, l, {
-                list lSuc = hash_get(hashSuc, r);
-                list lCurSuc = lSuc;
-                FOREACH(CONFLICT, c, (list)l) {
+
+        void *hash_iter=NULL,*r,*l;
+        while( (hash_iter = hash_table_scan(toBeDone,hash_iter,&r,&l)) )
+        {
+            list lSuc = hash_get(hashSuc, r);
+            list lCurSuc = lSuc;
+            FOREACH(CONFLICT, c, (list)l) {
                 entity ne;
                 reference rSource;
                 reference rSink;
@@ -191,7 +196,9 @@ static void single_assign_statement(graph dg) {
                     ne = make_replacement_entity(eSource);
 
                     // Replace the source by the created variable
-                    reference_variable(rSource) = ne;
+                    pips_debug(1,"replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(rSource)),entity_user_name(ne));
+                    ifdebug(1) { print_statement(currStat); }
+                    replace_reference(currStat,rSource,ne);
 
                     pips_debug(1, "ref created %s\n",
                             entity_local_name(effect_entity(conflict_source(c))));
@@ -208,28 +215,35 @@ static void single_assign_statement(graph dg) {
                     if(action_write_p(effect_action(f)) && same_entity_p(eSink, effEnt))
                     {
                         actionWrite = TRUE;
+                        break;
                     }
                 }
+
 
                 expression exp2 = EXPRESSION(CAR(call_arguments(instruction_call(statement_instruction(stat2)))));
 
                 if(!actionWrite)
                 {
+                    pips_debug(1,"replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(rSink)),entity_user_name(se));
+                    ifdebug(1) { print_statement(stat2); }
                     replace_reference(exp2,rSink,se);
+                }
+                else {
+                    pips_debug(1,"not replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(rSink)),entity_user_name(se));
+                    ifdebug(1) { print_statement(stat2); }
                 }
 
                 exp2 = EXPRESSION(CAR(CDR(call_arguments(instruction_call(statement_instruction(stat2))))));
                 replace_reference(exp2,rSink,se);
 
                 lCurSuc = CDR(lCurSuc);
-                }
+            }
 
-                var_created = FALSE;
+            var_created = FALSE;
 
-                gen_free_list(l);
-                gen_free_list(lSuc);
-        },
-            toBeDone);
+            gen_free_list(l);
+            gen_free_list(lSuc);
+        }
 
         hash_table_free(toBeDone);
         hash_table_free(hashSuc);

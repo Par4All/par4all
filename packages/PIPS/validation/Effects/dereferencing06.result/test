@@ -11,7 +11,7 @@ void dereferencing06()
    *p++ = 1;
 }
 
-Proper effetcs for "dereferencing06"
+Proper effects for "dereferencing06"
 
 void dereferencing06()
 {
@@ -47,7 +47,7 @@ void dereferencing06()
    *p++ = 1;
 }
 
-Regions for "dereferencing06"
+Pointer Regions for "dereferencing06"
 
 void dereferencing06()
 {
@@ -71,6 +71,74 @@ void dereferencing06()
 //  <p-R-EXACT-{}>
 //  <p-W-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==0}>
+
+   *p++ = 1;
+}
+
+Proper effects for "dereferencing06"
+
+void dereferencing06()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: p
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+   *p++ = 1;
+}
+
+Cumulated effects for "dereferencing06"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+void dereferencing06()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: p
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+   *p++ = 1;
+}
+
+Regions for "dereferencing06"
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+void dereferencing06()
+{
+
+//  <x-W-EXACT-{}>
+
+   double x = 1.;
+
+//  <p-W-EXACT-{}>
+
+   double *p = &x;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <p-W-EXACT-{}>
+
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <p-R-EXACT-{}>
 
    *p++ = 1;
 }

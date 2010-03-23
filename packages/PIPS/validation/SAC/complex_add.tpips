@@ -1,0 +1,56 @@
+setenv WS = complex_add
+delete $WS
+create $WS $WS.c include/SIMD.c
+
+module cadd
+
+display PRINTED_FILE
+
+activate MUST_REGIONS
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+setproperty RICEDG_STATISTICS_ALL_ARRAYS TRUE
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+setproperty SIMD_FORTRAN_MEM_ORGANISATION=FALSE
+setproperty SAC_SIMD_REGISTER_WIDTH = 128
+setproperty SIMD_AUTO_UNROLL_SIMPLE_CALCULATION FALSE
+setproperty SIMD_AUTO_UNROLL_MINIMIZE_UNROLL FALSE
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+apply PARTIAL_EVAL
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+apply SIMDIZER_AUTO_UNROLL
+apply PARTIAL_EVAL
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+apply SINGLE_ASSIGNMENT
+
+display PRINTED_FILE
+
+apply SIMDIZER
+
+display PRINTED_FILE
+
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+apply UNSPLIT
+close
+
+#shell cc $WS.c include/SIMD.c -o ${WS}0
+#shell sed -i -e '1 i #include "SIMD.h"\n#define MAX0(a,b) (a>b?a:b)\n#define MOD(a,b) a%b\n' $WS.database/Src/$WS.c
+#shell cc -Iinclude $WS.database/Src/$WS.c include/SIMD.c -o ${WS}1
+#shell sed -i -e '1 d' $WS.database/Src/$WS.c
+#shell if test "`./${WS}0`" = "`./${WS}1`" ; then echo seq-ok ; else echo seq-ko ; fi
+#
+#shell ./compileC.sh $WS $WS.c ${WS}-sse.c
+#shell cc -O3 -I. -march=native ${WS}-sse.c -o ${WS}2
+#shell if test "`./${WS}0`" = "`./${WS}2`" ; then echo sse-ok ; else echo sse-ko ; fi
+#shell rm -f ${WS}[012] $WS-sse.c
+
+delete $WS

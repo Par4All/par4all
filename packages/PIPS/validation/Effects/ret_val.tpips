@@ -6,9 +6,12 @@ create ret_val ret_val.c
 
 setproperty PRAGMA_TYPE "expr"
 activate PRINT_CODE_PROPER_REFERENCES
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
 display PRINTED_FILE(get_result)
 display PRINTED_FILE(main)
 
+activate PRINT_CODE_CUMULATED_REFERENCES
+display PRINTED_FILE(get_result)
 close
 delete ret_val
 quit

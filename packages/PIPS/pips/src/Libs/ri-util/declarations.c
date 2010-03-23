@@ -489,8 +489,9 @@ sentence sentence_head(entity e, list pdl)
 		  pc = CHAIN_SWORD(pc,"SUBROUTINE ");
 	      }
 	  }
-	else
+	else {
 	  pc = CHAIN_SWORD(pc,"void ");
+	}
 	break;
       }
     case is_type_variable:
@@ -2051,6 +2052,10 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       && type_variable_p(t)
       && variable_qualifiers(type_variable(t)) != NIL)
     pc = words_qualifier(variable_qualifiers(type_variable(t)));
+  else if (( is_first || in_type_declaration )
+      && type_void_p(t)
+      && type_void(t) != NIL)
+    pc = words_qualifier(type_void(t));
 
   if (basic_type_p(t)) {
       string sname = list_to_string(name);

@@ -13,10 +13,22 @@ setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty EFFECTS_POINTER_MODIFICATION_CHECKING TRUE
 
 echo
-echo Proper effects for "main"
+echo Proper pointer effects for "main"
 echo
 
-#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated pointer effects for "main"
+echo
+#setenv EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Proper effects for "main"
+echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]

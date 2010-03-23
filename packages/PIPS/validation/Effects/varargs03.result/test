@@ -18,9 +18,9 @@ int main()
 //               <must be read   >: r
    return r;                                                            /*0030*/
 }
-//               <may be read    >: TOP-LEVEL:*MEMORY* 
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
 //                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: TOP-LEVEL:*MEMORY* 
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
 //                                  __IO_EFFECTS:LUNS[*]
 int main()
 {

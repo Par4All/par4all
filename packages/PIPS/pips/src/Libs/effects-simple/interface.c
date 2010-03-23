@@ -72,6 +72,37 @@ proper_references(string module_name)
     return ok;
 }
 
+
+bool
+proper_pointer_effects(string module_name)
+{
+    bool ok;
+    set_methods_for_proper_simple_pointer_effects();
+    ok = proper_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool 
+summary_pointer_effects(string module_name)
+{
+    bool ok;
+    set_methods_for_simple_pointer_effects();
+    ok = summary_rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool 
+cumulated_pointer_effects(string module_name)
+{
+    bool ok;
+    set_methods_for_simple_pointer_effects();
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
 bool 
 proper_effects(string module_name)
 {
@@ -177,6 +208,20 @@ print_code_effects(
 }
 
 bool
+print_code_proper_pointer_effects(string module_name)
+{
+    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+			      DBR_PROPER_POINTER_EFFECTS, string_undefined, ".prop");
+}
+
+bool
+print_code_cumulated_pointer_effects(string module_name)
+{
+    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+		      DBR_CUMULATED_POINTER_EFFECTS, DBR_SUMMARY_POINTER_EFFECTS, ".cumu");
+}
+
+bool
 print_code_proper_effects(string module_name)
 {
     return print_code_effects(module_name, TRUE, FALSE, TRUE, 
@@ -249,6 +294,36 @@ print_source_out_effects(string module_name)
 
 
 /********************************************************** OTHER FUNCTIONS */
+
+text
+get_text_proper_pointer_effects(string module_name)
+{
+    text t;
+
+    set_is_user_view_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(module_name);
+    t = get_any_effect_type_text(module_name,
+				 DBR_PROPER_POINTER_EFFECTS,
+				 string_undefined,
+				 FALSE);
+    reset_methods_for_effects_prettyprint(module_name);
+    return t;
+}
+
+text
+get_text_cumulated_pointer_effects(string module_name)
+{
+    text t;
+
+    set_is_user_view_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(module_name);
+    t = get_any_effect_type_text(module_name,
+				 DBR_CUMULATED_POINTER_EFFECTS,
+				 DBR_SUMMARY_POINTER_EFFECTS,
+				 FALSE);
+    reset_methods_for_effects_prettyprint(module_name);
+    return t;
+}
 
 text
 get_text_proper_effects(string module_name)

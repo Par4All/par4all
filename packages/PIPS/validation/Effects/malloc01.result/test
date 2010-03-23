@@ -3,6 +3,7 @@ Parse as C:
 If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 Prettyprint the source as C, of course
 Select the most precise analysis:
+warning: CONSTANT_PATH_EFFECTS set to FALSE
 int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0008*/

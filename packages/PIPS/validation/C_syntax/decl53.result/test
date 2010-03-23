@@ -1,0 +1,16 @@
+
+Parsed printed file for "decl53!"
+
+/* Management of "const" attribute */
+
+/* pointer to a constant */
+const int *x;
+/* constant pointer */
+int *const y;
+/* another pointer to a constant */
+const void *z;
+
+// constant pointer to a constant: Well, this is forbidden!
+// const * int const u;
+
+extern void foo();

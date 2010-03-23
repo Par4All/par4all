@@ -24,3 +24,10 @@
 #include "points_to_private.h"
 #define SEQUENTIAL_POINTS_TO_SETS_SUFFIX ".pt"
 #define USER_POINTS_TO_SETS_SUFFIX ".upt"
+
+/* The definition of *ANYWHERE*:*ANYWHERE* should be removed from
+   ri-util-local.h */
+#define ANY_MODULE_NAME "*ANY_MODULE*"
+#define ANYWHERE_LOCATION "*ANYWHERE*"
+#define NOWHERE_LOCATION "*NOWHERE*"
+#define NULL_POINTER_NAME "*NULL_POINTER*"
