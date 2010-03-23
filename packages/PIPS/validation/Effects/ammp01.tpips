@@ -22,14 +22,14 @@ echo
 echo Proper effects for "a_m_serial"
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[a_m_serial]
 
 echo
 echo Cumulated effects for "a_m_serial"
 echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[a_m_serial]
 
 echo
@@ -42,14 +42,14 @@ echo
 echo Proper effects for "activate"
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[activate]
 
 echo
 echo Cumulated effects for "activate"
 echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[activate]
 
 close

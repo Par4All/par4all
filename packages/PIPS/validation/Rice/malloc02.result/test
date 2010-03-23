@@ -64,7 +64,7 @@ void malloc02()
 Cumulated effects
 
 //               <may be read    >: _MALLOC_EFFECTS:_MALLOC_
-//               <may be written >: TOP-LEVEL:*MEMORY* 
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
 //                                  _MALLOC_EFFECTS:_MALLOC_
 void malloc02()
 {
@@ -88,7 +88,7 @@ void malloc02()
 Regions
 
 
-//  <TOP-LEVEL:*MEMORY*-W-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 

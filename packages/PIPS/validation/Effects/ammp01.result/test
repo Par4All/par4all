@@ -45,7 +45,7 @@ ATOM * a_m_serial(int serial)
    int i, n, a_number();
 //               <must be read   >: TOP-LEVEL:atomUPDATE
    if (atomUPDATE)
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE
 //               <must be written>: n
@@ -104,7 +104,7 @@ ATOM * a_m_serial(int serial)
 
 Cumulated effects for "a_m_serial"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE lastmatched
 //               <must be written>: ap
@@ -115,12 +115,12 @@ ATOM * a_m_serial(int serial)
 //               <may be written >: lastmatched
    static ATOM *lastmatched = (void *) 0;
    int i, n, a_number();
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE
 //               <must be written>: n
    if (atomUPDATE)
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE
 //               <must be written>: n
@@ -227,7 +227,7 @@ int activate(int i1, int i2)
 //               <must be read   >: i2
 
    if (i2==0) {
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE 
 //                                  a_m_serial:0`lastmatched
@@ -257,7 +257,7 @@ int activate(int i1, int i2)
 //               <must be written>: upper
       upper = i1;
    }
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE
 //               <must be written>: numatm
@@ -283,14 +283,14 @@ int activate(int i1, int i2)
 
 Cumulated effects for "activate"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 int activate(int i1, int i2)
 {
    int upper, lower;
    ATOM *ap, *a_m_serial(int), *a_next(int flag);
    int i, numatm, a_number();
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE 
 //                                  a_m_serial:0`ap 
@@ -298,7 +298,7 @@ int activate(int i1, int i2)
 //                                  ap[0][2]
 
    if (i2==0) {
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE 
 //                                  a_m_serial:0`lastmatched
@@ -330,7 +330,7 @@ int activate(int i1, int i2)
 //               <must be written>: upper
       upper = i1;
    }
-//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE
 //               <must be written>: numatm

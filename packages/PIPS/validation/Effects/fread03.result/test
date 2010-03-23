@@ -136,9 +136,9 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
 Cumulated effects for "LoadPGM_bmatrix"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY* 
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
 //                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: TOP-LEVEL:*MEMORY* 
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_

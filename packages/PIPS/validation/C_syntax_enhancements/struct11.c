@@ -4,6 +4,9 @@
 
    Furthermore, the PIPS parser detect a conflict between the member i
    and the parameter i!
+
+   A newer version of gcc detects an error because of the double
+   definition of j. Second one changed into j2.
    */
 
 struct s
@@ -18,6 +21,6 @@ void struct11(union u_u
   int i;
 } u, int /* i */ j)
 {
-  int j = sizeof(union u_u);
+  int j2 = sizeof(union u_u);
   union u_u u2;
 }

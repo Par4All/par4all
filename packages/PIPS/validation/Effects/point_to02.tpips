@@ -19,10 +19,10 @@ echo
 display PARSED_PRINTED_FILE[point_to02]
 
 echo
-echo Cumulated effetcs for "point_to02"
+echo Cumulated pointer effects for "point_to02"
 echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[point_to02]
 
 close

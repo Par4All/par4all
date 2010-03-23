@@ -9,10 +9,10 @@ int main()
       printf("fread failed");
    fclose(fp);
 }
-//               <may be read    >: TOP-LEVEL:*MEMORY* 
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
 //                                  __IO_EFFECTS:LUNS[1] 
 //                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: TOP-LEVEL:*MEMORY* 
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
 //                                  __IO_EFFECTS:LUNS[1] 
 //                                  __IO_EFFECTS:LUNS[*]
 int main()

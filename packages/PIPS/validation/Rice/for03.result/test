@@ -26,8 +26,8 @@ void for03(int n)
 //               <must be read   >: j
 //               <must be written>: e1[1][j]
       (e1.x)[j] = 0.;
+//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: e1[2] j
-//               <must be written>: e1[2][0][1][j]
       (e1.next->x)[j] = 1.;
    }
 }

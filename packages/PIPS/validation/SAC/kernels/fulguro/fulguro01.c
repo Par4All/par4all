@@ -53,3 +53,12 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    }
    return;
 }
+
+int test()
+{
+    FLGR_Data1D d1={0,sizeof(fgINT32),10},d2={0,sizeof(fgINT32),10},dest={0,sizeof(fgINT32),10};
+    d1.array=malloc(10*sizeof(fgINT32));
+    d2.array=malloc(10*sizeof(fgINT32));
+    dest.array=malloc(10*sizeof(fgINT32));
+    flgr1d_arith_add_fgINT32(&dest,&d1,&d2);
+}

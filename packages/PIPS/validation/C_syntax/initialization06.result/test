@@ -1,9 +1,9 @@
 
 Printed file for "initialization06"
 
-int initialization06(int a)
+int initialization06(int af)
 {
-   int a = a;
+   int a = af;
    int i;
 
    i = a+1;
@@ -14,23 +14,29 @@ int initialization06(int a)
 Transformers for "initialization06"
 
 
-//  T(initialization06) {initialization06==a+1}
+//  T(initialization06) {af==initialization06-1}
 
-int initialization06(int a)
+int initialization06(int af)
 {
-   int a = a;
+
+//  T(a) {a==af}
+
+   int a = af;
+
+//  T() {a==af}
+
    int i;
 
-//  T(i) {0`a==i-1}
+//  T(i) {a==af, a==i-1}
 
 
    i = a+1;
 
-//  T(0`a) {0`a==2, a#init==i-1}
+//  T(a) {a==2, a#init==af, a#init==i-1}
 
    a = 2;
 
-//  T(initialization06) {0`a==2, i==initialization06}
+//  T(initialization06) {a==2, af==i-1, af==initialization06-1}
 
    return i;
 }
@@ -40,21 +46,27 @@ Preconditions for "initialization06"
 
 //  P() {}
 
-int initialization06(int a)
+int initialization06(int af)
 {
-   int a = a;
-   int i;
 
 //  P() {}
+
+   int a = af;
+
+//  P() {a==af}
+
+   int i;
+
+//  P() {a==af}
 
 
    i = a+1;
 
-//  P(i) {0`a==i-1}
+//  P(i) {a==af, a==i-1}
 
    a = 2;
 
-//  P(0`a,i) {0`a==2}
+//  P(a,i) {a==2, af==i-1}
 
    return i;
 }

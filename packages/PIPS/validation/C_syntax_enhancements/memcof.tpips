@@ -9,11 +9,12 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 
 activate C_PARSER
 
-echo
-echo Printed file for 'memcof!' 
-echo
-
-display PRINTED_FILE[memcof!]
+# Removed till the #include are restored by the prettyprinter
+#echo
+#echo Printed file for 'memcof!' 
+#echo
+#
+#display PRINTED_FILE[memcof!]
 
 echo
 echo Unsplit 

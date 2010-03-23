@@ -6,7 +6,7 @@ create SGEMM kernels/SGEMM/SGEMM.f include/simd.f
 
 module SGEMM
 
-source include/benchmark.tpips.h
+source include/fortran.tpips
 
 apply PRINT_C_CODE[SGEMM]
 apply PRINT_C_CODE[SGEMMREF]

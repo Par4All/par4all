@@ -1,13 +1,9 @@
 
 * le test de la mort !
 sub microcode
-int N0 = iter2
-int N1 = iter1
       im,im7=FIFO2      ||                        ||                        ||                        ||                        
       im,im5=FIFO1      ||                        ||                        ||                        ||                        
       im,im3=FIFO0      ||                        ||                        ||                        ||                        
-seti(re20, iter2)
-                        ||                        ||   P,re(20)=re(20)-1    ||                        ||                        
                         ||                        ||       P,re(30)=1       ||                        ||                        
                         ||                        ||                        ||         do_N1          ||                        
                         ||                        ||      P,re(21)=512      ||                        ||                        

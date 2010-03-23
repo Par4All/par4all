@@ -13,18 +13,18 @@ Proper effects for "lhs05"
 void lhs05()
 {
    int x;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 
    *&x = 1;
 }
 
 Cumulated effects for "lhs05"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void lhs05()
 {
    int x;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 
    *&x = 1;
 }
