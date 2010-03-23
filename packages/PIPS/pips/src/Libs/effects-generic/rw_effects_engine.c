@@ -790,7 +790,13 @@ static list r_rw_effects_of_sequence(list l_inst)
 
 	/* then take care of declarations if any */
 	rb_lrw = rw_effects_of_declarations(rb_lrw, l_decl);
-
+	if (get_constant_paths_p())
+	  {
+	    list l_tmp = rb_lrw;
+	    rb_lrw = pointer_effects_to_constant_path_effects(rb_lrw);
+	    effects_free(l_tmp);
+	  }
+	
 	ifdebug(5){
 	    pips_debug(5, "R/W effects of remaining sequence "
 		       "after taking declarations into account: \n");
@@ -809,6 +815,12 @@ static list r_rw_effects_of_sequence(list l_inst)
     else 
     {
       l_rw = rw_effects_of_declarations(s1_lrw, l_decl);
+      if (get_constant_paths_p())
+	  {
+	    list l_tmp = l_rw;
+	    l_rw = pointer_effects_to_constant_path_effects(l_rw);
+	    effects_free(l_tmp);
+	  }
     }
     
 
@@ -872,6 +884,9 @@ void rw_effects_of_module_statement(statement module_stat)
     make_effects_private_current_stmt_stack();
     make_effects_private_current_context_stack();
     pips_debug(1,"begin\n");
+    /* for backward compatibility and experimental purposes */
+    if (! c_module_p(get_current_module_entity()) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
     
     gen_multi_recurse
 	(module_stat, 
@@ -932,3 +947,5 @@ bool rw_effects_engine(char * module_name)
     
     return(TRUE);
 }
+
+

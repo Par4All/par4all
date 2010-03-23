@@ -83,6 +83,10 @@ entity get_padding_entity() {
     return _padding_entity_;
 }
 
+static bool expression_reference_or_field_p(expression e)
+{
+    return expression_reference_p(e) || expression_field_p(e);
+}
 
 /* expression is an simd vector
  * if it is a reference array
@@ -279,7 +283,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
             FOREACH(EXPRESSION,arg,args[i])
             {
 
-                if (!expression_reference_p(arg))
+                if (!expression_reference_or_field_p(arg))
                 {
                     count++;
                     continue;
@@ -336,335 +340,174 @@ entity get_function_entity(string name)
     return e;
 }
 
-/* 
-   This function aims to fill the referenceInfo i from the reference r. 
-   referenceInfo is used later to detect consecutive reference in a
-   simd_load parameter list.
-   This function returns TRUE if successful.
-   */
-bool analyse_reference(reference r, referenceInfo i)
+
+/** 
+ * computes the offset between an entity and its reference
+ * 
+ * @param r 
+ * 
+ * @return an expression of the offset, in octets
+ */
+static
+expression reference_offset(const reference r)
 {
-    syntax s;
-
-    // Fill the two first fields of referenceInfo
-    referenceInfo_reference(i) = r;
-    referenceInfo_nbDimensions(i) = gen_length(reference_indices(r));
-
-    // If r is not an array, then FALSE is returned
-    if (referenceInfo_nbDimensions(i) == 0)
-        return FALSE;
-
-    //Initialization of the two list of referenceInfo
-    referenceInfo_lExp(i) = NIL;
-    referenceInfo_lOffset(i) = NIL;
-
-    // For each indices of r
-    FOREACH(EXPRESSION, exp,reference_indices(r))
-    {
-        s = expression_syntax(exp);
-        switch(syntax_tag(s))
-        {
-            // exp is a call expression
-            case is_syntax_call:
-                {
-                    call c = syntax_call(s);
-
-                    // r is for exemple A(2)
-                    if (call_constant_p(c))
-                    {
-                        constant cn;
-
-                        cn = value_constant(entity_initial(call_function(c)));
-
-                        if (constant_int_p(cn))
-                            referenceInfo_lOffset(i) = CONS(INT, constant_int(cn), referenceInfo_lOffset(i));
-                        else
-                            return FALSE;
-                        /* use gen_cons instead of CONS here to bypass type check */
-                        referenceInfo_lExp(i) = gen_cons(expression_undefined, referenceInfo_lExp(i));
-                    }
-                    // r is for exemple A(EXP + 3)(it is supported)
-                    // or A(EXP1 + EXP2)(it's not supported)
-                    else if (ENTITY_PLUS_P(call_function(c)))
-                    {
-                        cons * arg = call_arguments(c);
-
-                        syntax e;
-
-                        // Strange error
-                        if ((arg == NIL) || (CDR(arg) == NIL))
-                            return FALSE;
-
-                        e = expression_syntax(EXPRESSION(CAR(CDR(arg))));
-                        // If r is A(EXP + 3), e should contain 3
-                        // If r is A(EXP1 + EXP2), e should contain EXP2
-                        switch(syntax_tag(e))
-                        {
-                            // Fill referenceInfo in the following situation:
-                            // "If r is A(EXP + 3), e should contain 3"
-                            case is_syntax_call:
-                                {
-                                    referenceInfo_lExp(i) = gen_cons(EXPRESSION(CAR(arg)), referenceInfo_lExp(i));//SG gen_cons by passes type check
-
-                                    call cc = syntax_call(e);
-
-                                    if(!call_constant_p(cc))
-                                        return FALSE;
-
-                                    constant ccn = value_constant(entity_initial(call_function(cc)));
-
-                                    if (constant_int_p(ccn))
-                                        referenceInfo_lOffset(i) = CONS(INT, constant_int(ccn), referenceInfo_lOffset(i));
-                                    else
-                                        return FALSE;
-                                    break;
-                                }
-
-                                // Fill referenceInfo in the following situation:
-                                // "If r is A(EXP1 + EXP2), e should contain EXP2"
-                            case is_syntax_reference:
-                                {
-                                    referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
-                                    referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
-                                    break;
-                                }
-
-                            default:
-                            case is_syntax_range:
-                                return FALSE;
-                        }	    
-                    }
-                    // Same comments as for ENTITY_MINUS_P(call_function(c))
-                    else if (ENTITY_MINUS_P(call_function(c)))
-                    {
-                        cons * arg = call_arguments(c);
-
-                        syntax e;
-
-                        if ((arg == NIL) || (CDR(arg) == NIL))
-                            return FALSE;
-
-                        e = expression_syntax(EXPRESSION(CAR(CDR(arg))));
-                        switch(syntax_tag(e))
-                        {
-                            case is_syntax_call:
-                                {
-                                    referenceInfo_lExp(i) = gen_cons( EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
-
-                                    call cc = syntax_call(e);
-
-                                    if(!call_constant_p(cc))
-                                        return FALSE;
-
-                                    constant ccn = value_constant(entity_initial(call_function(cc)));
-
-                                    if (constant_int_p(ccn))
-                                        referenceInfo_lOffset(i) = CONS(INT, -constant_int(ccn), referenceInfo_lOffset(i));
-                                    else
-                                        return FALSE;
-                                    break;
-                                }
-
-                            case is_syntax_reference:
-                                {
-                                    referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
-                                    referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
-                                    break;
-                                }
-
-                            default:
-                            case is_syntax_range:
-                                return FALSE;
-                        }	    
-                    }
-                    // If nothing special has been detected
-                    else
-                    {
-                        referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
-                        referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
-                    }
-                    break;
-                }
-
-                // If nothing special has been detected
-            case is_syntax_reference:
-                referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
-                referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
-                break;
-
-            default:
-                return FALSE;
+    if( ENDP(reference_indices(r)) ) return int_to_expression(0);
+    else {
+        expression offset = 
+            copy_expression(
+                    get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION") ?
+                    EXPRESSION(CAR(reference_indices(r))):
+                    EXPRESSION(CAR(gen_last(reference_indices(r)))));
+        list dims = get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION") ?
+            CDR(variable_dimensions(type_variable(entity_type(reference_variable(r))))):
+            variable_dimensions(type_variable(entity_type(reference_variable(r))));
+        list indices = NIL;
+        if( get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+            indices=gen_copy_seq(CDR(reference_indices(r)));
+        else {
+            /* list without last element */
+            indices=gen_copy_seq(reference_indices(r));
+            gen_remove(&indices,EXPRESSION(CAR(gen_last(indices))));
         }
+        FOREACH(EXPRESSION,exp,indices)
+        {
+            dimension d = DIMENSION(CAR(dims));
+            expression d_exp = SizeOfDimension(d);
+            offset = make_op_exp(PLUS_OPERATOR_NAME,
+                    make_op_exp(MULTIPLY_OPERATOR_NAME,
+                        copy_expression(exp),
+                        d_exp),
+                    offset
+                    );
+        }
+        gen_free_list(indices);
+        basic b = basic_of_reference(r);
+        expression result = make_op_exp(MULTIPLY_OPERATOR_NAME,
+                int_to_expression(SizeOfElements(b)),
+                offset);
+        free_basic(b);
+        return result;
     }
-
-    return TRUE;
 }
 
-/*
-   This function returns the expression of the index that corresponds
-   to the "consecutive index" according to the memory disposition of
-   arrays.
-
-   For instance:
-   In a fortran program, let's define A[I][J][K],
-   then the "consecutive index" is I.
-   In a C program, let's define A[I][J][K],
-   then the "consecutive index" is K.
-   */
-static expression get_consec_exp(referenceInfo refInfo)
+static expression offset_of_struct(entity e)
 {
-    if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-    {
-        return EXPRESSION(CAR(gen_last(referenceInfo_lExp(refInfo))));
-    }
 
-    return EXPRESSION(CAR(referenceInfo_lExp(refInfo)));
+    entity parent_struct = entity_field_to_entity_struct(e);
+    list fields = type_struct(entity_type(parent_struct));
+    expression offset = int_to_expression(0);
+    FOREACH(ENTITY,field,fields)
+        if(same_entity_p(field,e)) break;
+        else {
+            offset=make_op_exp(PLUS_OPERATOR_NAME,copy_expression(offset),
+                        make_expression(
+                            make_syntax_sizeofexpression(make_sizeofexpression_type(copy_type(entity_type(field)))),
+                            normalized_undefined)
+                    );
+        }
+    return offset;
 }
 
-/*
-   This function returns the int of the index that corresponds
-   to the "consecutive index" according to the memory disposition of
-   arrays.
-
-   See above.
-   */
-static int get_consec_offset(referenceInfo refInfo)
+static expression distance_between_entity(const entity e0, const entity e1)
 {
-    if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-    {
-        return INT(CAR(gen_last(referenceInfo_lOffset(refInfo))));
-    }
-
-    return INT(CAR(referenceInfo_lOffset(refInfo)));
-}
-
-/*
-   This function returns the position of the index that corresponds
-   to the "consecutive index" according to the memory disposition of
-   arrays.
-
-   See above.
-   */
-static int get_consec_ind_number(referenceInfo refInfo)
-{
-    if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-    {
-        return gen_length(referenceInfo_lOffset(refInfo));
-    }
-
-    return 1;
-}
-
-/*
-   This function returns TRUE if firstRef and cRef have consecutive 
-   memory locations.
-   */
-static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, referenceInfo cRef)
-{
-    bool bIndEq = TRUE;
-    bool bConsIndEq = FALSE;
-    int counter = 0;
-
-    // If firstRef and cRef don't have the same dimension,
-    // then they are not consecutive references.
-    if(referenceInfo_nbDimensions(firstRef) != referenceInfo_nbDimensions(cRef))
-        return FALSE;
-
-    list lOff1 = referenceInfo_lOffset(firstRef);
-    list lOff2 = referenceInfo_lOffset(cRef);
-    list lInd2 = referenceInfo_lExp(cRef);
-
-
-    // Let's look at each index of the references
-    FOREACH(EXPRESSION, ind1,referenceInfo_lExp(firstRef))
-    {
-        int off1,off2;
-        expression ind2;
-        counter++;
-
-        // If TRUE, it means that ind1 corresponds to
-        // the "consecutive index" (See get_consec_ind_number()
-        // comments for further information), so let's not
-        // check ind1 right now.
-        if(counter == get_consec_ind_number(firstRef))
-        {
-            POP(lOff1);
-            POP(lOff2);
-            POP(lInd2);
-            continue;
-        }
-
-        ind2 = EXPRESSION(CAR(lInd2));
-        off1 = INT(CAR(lOff1));
-        off2 = INT(CAR(lOff2));
-
-        // If TRUE, it means that the two indices are different, so return FALSE.
-        if(( expression_undefined_p(ind1) && !expression_undefined_p(ind2)) ||
-           (!expression_undefined_p(ind1) &&  expression_undefined_p(ind2)) 
-          )
-        {
-            bIndEq = FALSE;
-        }
-        // If TRUE, it means that the two indices can be identical, 
-        // let's check the offsets.
-        else if(expression_undefined_p(ind1) && expression_undefined_p(ind2))
-        {
-            // If TRUE, it means that the two indices are different, so return FALSE.
-            if(off1 != off2)
-                bIndEq = FALSE;
-        }
-        else
-        {
-            // If TRUE, it means that the two indices are identical
-            if(!(same_expression_p(ind1, ind2) && (off1 == off2)))
-                bIndEq = FALSE;
-        }
-
-        POP(lOff1);
-        POP(lOff2);
-        POP(lInd2);
-
-    }
-
-    // This if-elseif-else statement checks if get_consec_exp(firstRef)
-    // and get_consec_exp(cRef) are identical
-    if(expression_undefined_p(get_consec_exp(firstRef)) &&
-       expression_undefined_p(get_consec_exp(cRef)))
-    {
-        bConsIndEq = TRUE;
-    }
-    else if(expression_undefined_p(get_consec_exp(firstRef)) ||
-            expression_undefined_p(get_consec_exp(cRef)) )
-    {
-        bConsIndEq = FALSE;
-    }
+    if(same_entity_p(e0,e1))
+        return int_to_expression(0);
+    else if( same_struct_entity_p(e0,e1) )
+        return make_op_exp(MINUS_OPERATOR_NAME,offset_of_struct(e1),offset_of_struct(e0));
     else
+        return expression_undefined;
+}
+
+/** 
+ * computes the distance betwwen two expression
+ * 
+ * @return expression_undefined if not comparable, an expression of the distance otherwise
+ */
+static expression distance_between_expression(const expression exp0, const expression exp1)
+{
+    bool eval_sizeof = get_bool_property("EVAL_SIZEOF");
+    set_bool_property("EVAL_SIZEOF",true);
+    expression result = expression_undefined;
+    if( expression_reference_p(exp0) && expression_reference_p(exp1))
     {
-        bConsIndEq = same_expression_p(get_consec_exp(firstRef), get_consec_exp(cRef));
+        reference r0 = expression_reference(exp0),
+                  r1 = expression_reference(exp1);
+
+        /* reference with different variables have an infinite distance */
+        entity e0 = reference_variable(r0),
+               e1 = reference_variable(r1);
+        expression edistance = distance_between_entity(e0,e1);
+        if(!expression_undefined_p(edistance))
+        {
+            list indices0 = gen_full_copy_list(reference_indices(r0)),
+                 indices1 = gen_full_copy_list(reference_indices(r1));
+            if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+            {
+                indices0=gen_nreverse(indices0);
+                indices1=gen_nreverse(indices1);
+            }
+            while(!ENDP(indices0) && !ENDP(indices1))
+            {
+                expression i0 = EXPRESSION(CAR(indices0)),
+                           i1 = EXPRESSION(CAR(indices1));
+                if(!same_expression_p(i0,i1))
+                    break;
+                POP(indices0);
+                POP(indices1);
+            }
+            if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+            {
+                indices0=gen_nreverse(indices0);
+                indices1=gen_nreverse(indices1);
+            }
+            reference fake0 = make_reference(e0,indices0),
+                      fake1 = make_reference(e1,indices1);
+            expression offset0 = reference_offset(fake0),
+                       offset1 = reference_offset(fake1);
+            expression distance =  make_op_exp(MINUS_OPERATOR_NAME,offset1,offset0);
+            free_reference(fake0);
+            free_reference(fake1);
+
+            result= make_op_exp(PLUS_OPERATOR_NAME,distance,edistance);
+        }
     }
-
-    return     bConsIndEq
-            && same_entity_p(reference_variable(referenceInfo_reference(firstRef)),reference_variable(referenceInfo_reference(cRef)))
-            && (referenceInfo_nbDimensions(firstRef) == referenceInfo_nbDimensions(cRef))
-            && (lastOffset + 1 == get_consec_offset(cRef))
-            && bIndEq;
+    else if (expression_field_p(exp0) && expression_field_p(exp1))
+    {
+        expression str0 = binary_call_lhs(expression_call(exp0)),
+                   str1 = binary_call_lhs(expression_call(exp1));
+        expression lhs_distance = distance_between_expression(str0,str1);
+        expression rhs_distance = distance_between_expression(binary_call_rhs(expression_call(exp1)),binary_call_rhs(expression_call(exp0)));
+        result = make_op_exp(MINUS_OPERATOR_NAME,lhs_distance,rhs_distance);
+    }
+    set_bool_property("EVAL_SIZEOF",eval_sizeof);
+    return result;
 }
 
-referenceInfo make_empty_referenceInfo()
+/*
+   This function returns TRUE if e0 and e1 have a distance of 1 + lastOffset
+   */
+static bool consecutive_expression_p(expression e0, int lastOffset, expression e1)
 {
-    return make_referenceInfo(reference_undefined, 0, NIL, NIL, NIL);
-}
-
-void free_empty_referenceInfo(referenceInfo ri)
-{
-    referenceInfo_reference(ri) = reference_undefined;
-    gen_free_list(referenceInfo_lExp(ri));
-    gen_free_list(referenceInfo_lIndex(ri));
-    gen_free_list(referenceInfo_lOffset(ri));
-    referenceInfo_lExp(ri) = NIL;
-    referenceInfo_lIndex(ri) = NIL;
-    referenceInfo_lOffset(ri) = NIL;
-    free_referenceInfo(ri);
+    bool result=false;
+    basic b = basic_of_expression(e0);
+    int ref_offset = SizeOfElements(b);
+    free_basic(b);
+    expression distance = distance_between_expression(e0,e1);
+    if( !expression_undefined_p(distance) )
+    {
+        int idistance;
+        NORMALIZE_EXPRESSION(distance);
+        if(result=expression_integer_value(distance,&idistance))
+        {
+            pips_debug(3,"distance between %s and %s is %d\n",words_to_string(words_expression(e0,NIL)),words_to_string(words_expression(e1,NIL)),idistance);
+            result= idistance == ref_offset+ref_offset*lastOffset;
+        }
+        else {
+            pips_debug(3,"distance between %s and %s is too complexd\n",words_to_string(words_expression(e0,NIL)),words_to_string(words_expression(e1,NIL)));
+        }
+        free_expression(distance);
+    }
+    return result;
 }
 
 /*
@@ -683,7 +526,7 @@ static string get_simd_vector_type(list lExp)
 
         if(type_variable_p(t))
         {
-    //        basic bas = variable_basic(type_variable(t));
+            //        basic bas = variable_basic(type_variable(t));
 
             result = strdup(entity_name(
                         reference_variable(syntax_reference(expression_syntax(exp)))
@@ -794,6 +637,7 @@ statement make_exec_statement_from_opcode(opcode oc, list args)
 }
 
 
+
 static statement make_loadsave_statement(int argc, list args, bool isLoad, list padded)
 {
     enum {
@@ -808,8 +652,6 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         { SIMD_CONS_SAVE_NAME"_",       SIMD_CONS_LOAD_NAME"_"},
         { SIMD_GEN_SAVE_NAME"_",        SIMD_GEN_LOAD_NAME"_"}
     };
-    referenceInfo firstRef = make_empty_referenceInfo();
-    referenceInfo cRef = make_empty_referenceInfo();
     int lastOffset = 0;
     char *functionName;
 
@@ -824,6 +666,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
      *    - all constant
      *    - or any other situation
      */
+    expression fstExp = expression_undefined;
 
     /* classify according to the second element
      * (first one should be the SIMD vector) */
@@ -833,11 +676,10 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         argsType = CONSTANT;
     }
     // If e is a reference expression, let's analyse this reference
-    else if ( (expression_reference_p(exp)) &&
-            (analyse_reference(expression_reference(exp), firstRef)) )
+    else if (expression_reference_or_field_p(exp))
     {
-        lastOffset = get_consec_offset(firstRef);
         argsType = CONSEC_REFS;
+        fstExp = exp;
     }
     else
         argsType = OTHER;
@@ -861,11 +703,10 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         {
             // If e is a reference expression, let's analyse this reference
             // and see if e is consecutive to the previous references
-            if ( (expression_reference_p(e)) &&
-                    (analyse_reference(expression_reference(e), cRef)) &&
-                    (consecutive_refs_p(firstRef, lastOffset, cRef)) )
+            if ( (expression_reference_or_field_p(e)) &&
+                    (consecutive_expression_p(fstExp, lastOffset, e)) )
             {
-                lastOffset = get_consec_offset(cRef);
+                ++lastOffset;
             }
             /* if all arguments are padded, we cas safely load an additionnal reference,
              * it will not be used anyway */
@@ -904,13 +745,12 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                 {
                     args = gen_make_list( expression_domain, 
                             EXPRESSION(CAR(args)),
-                            reference_to_expression(referenceInfo_reference(firstRef)),
+                            fstExp,
                             NULL);
                 }
                 else
                 {
-                    //expression addr = MakeUnaryCall(CreateIntrinsic("&"), reference_to_expression(referenceInfo_reference(firstRef)));
-                    expression addr = reference_to_expression(referenceInfo_reference(firstRef));
+                    expression addr = fstExp;
                     args = make_expression_list( EXPRESSION(CAR(args)), addr);
                 }
 
@@ -930,9 +770,6 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         default:
             break;
     }
-
-    free_empty_referenceInfo(firstRef);
-    free_empty_referenceInfo(cRef);
 
     asprintf(&functionName, "%s%s", funcNames[argsType][isLoad], lsType);
     statement es = make_exec_statement_from_name(functionName, args);

@@ -18,4 +18,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include_HEADERS=constants.h
+docdir=$(datadir)/doc
+dist_noinst_DATA=faq.tex faq.ind
+doc_DATA=faq.pdf
+include $(top_srcdir)/makes/latex.mk

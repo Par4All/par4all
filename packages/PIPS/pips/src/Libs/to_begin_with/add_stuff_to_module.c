@@ -75,7 +75,7 @@ bool prepend_comment(char * module_name) {
     it either.
  */
 bool prepend_call(string mn) {
-  type rt = make_type_void();
+  type rt = make_type_void(NIL);
   functional ft = make_functional(NIL, rt);
   type t = make_type_functional(ft);
   storage st = make_storage_rom();

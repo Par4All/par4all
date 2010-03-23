@@ -130,6 +130,58 @@ static matchTree select_tree_branch(matchTree t, int token)
         return matchTree_undefined;
 }
 
+static matchTree match_call(call , matchTree , list *);
+static matchTree match_expression(expression arg, matchTree t,list *args)
+{
+    syntax s = expression_syntax(arg);
+    switch(syntax_tag(s))
+    {
+        case is_syntax_call:
+            {
+                call c = syntax_call(s);
+                if (call_constant_p(c))
+                {
+                    t = select_tree_branch(t, CONSTANT_TOK);
+                    *args = CONS(EXPRESSION, arg, *args);
+                }
+                /* field call should be taken care of as references */
+                else if ( ENTITY_FIELD_P(call_function(c)) )
+                {
+                    t=match_expression(binary_call_rhs(c),t,args);
+                    /* right now we have matched the rhs of the field,
+                     * now bring back the lhs !
+                     */
+                    if( !matchTree_undefined_p(t))
+                        CAR(*args).p = arg;
+                }
+                else
+                    t = match_call(c, t, args);
+                break;
+            }
+
+        case is_syntax_reference:
+            {
+                basic bas = basic_of_reference(syntax_reference(s));
+                if(bas == basic_undefined)
+                {
+                    return matchTree_undefined;
+                }
+                else
+                {
+                    t = select_tree_branch(t, REFERENCE_TOK);
+                    *args = CONS(EXPRESSION, arg, *args);
+                    free_basic(bas);
+                }
+                break;
+            }
+
+        case is_syntax_range:
+        default:
+            return matchTree_undefined; /* unexpected token !! -> no match */
+    }
+    return t;
+}
+
 /* Warning: list of arguments is built in reversed order
  * (the head is in fact the last argument) */
 static matchTree match_call(call c, matchTree t, list *args)
@@ -143,43 +195,7 @@ static matchTree match_call(call c, matchTree t, list *args)
 
     FOREACH(EXPRESSION, arg, call_arguments(c))
     {
-        syntax s = expression_syntax(arg);
-        switch(syntax_tag(s))
-        {
-            case is_syntax_call:
-                {
-                    call c = syntax_call(s);
-                    if (call_constant_p(c))
-                    {
-                        t = select_tree_branch(t, CONSTANT_TOK);
-                        *args = CONS(EXPRESSION, arg, *args);
-                    }
-                    else
-                        t = match_call(c, t, args);
-                    break;
-                }
-
-            case is_syntax_reference:
-                {
-                    basic bas = basic_of_reference(syntax_reference(s));
-                    if(bas == basic_undefined)
-                    {
-                        return matchTree_undefined;
-                    }
-                    else
-                    {
-                        t = select_tree_branch(t, REFERENCE_TOK);
-                        *args = CONS(EXPRESSION, arg, *args);
-                        free_basic(bas);
-                    }
-                    break;
-                }
-
-            case is_syntax_range:
-            default:
-                return matchTree_undefined; /* unexpected token !! -> no match */
-        }
-
+        t=match_expression(arg,t,args);
         if (matchTree_undefined_p(t) )
             return matchTree_undefined;
     }
