@@ -9557,14 +9557,6 @@ print_source_out_effects       > MODULE.parsed_printed_file
 
 \section{Printed File (Sequential Views)}
 
-\subsection{Html output}
-
-\begin{PipsMake}
-html_prettyprint > MODULE.parsed_printed_file
-         < PROGRAM.entities
-         < MODULE.code
-\end{PipsMake}
-
 
 \begin{PipsPass}{printed_file}
 These are files containing a pretty-printed version of the internal
@@ -9583,6 +9575,28 @@ setproperty PRETTYPRINT_C_CODE TRUE
 Transformers and preconditions (and regions?) require cumulated effects
 to build the module value basis.
 \end{PipsPass}
+
+
+
+\subsection{Html output}
+
+This is intended to be used with PIPS IR Navigator (tm).
+
+\begin{PipsMake}
+html_prettyprint > MODULE.parsed_printed_file
+         < PROGRAM.entities
+         < MODULE.code
+\end{PipsMake}
+
+\begin{PipsMake}
+html_prettyprint_symbol_table > MODULE.parsed_printed_file
+         < PROGRAM.entities
+         < MODULE.code
+\end{PipsMake}
+
+The latter is module-independant, it'll produce the same output for each module
+(the symbol table is global/unique).
+
 
 \subsection{Menu for Sequential Views}
 
