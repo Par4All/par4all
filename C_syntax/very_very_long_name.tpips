@@ -1,0 +1,19 @@
+delete very_very_long_name 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING TRUE
+
+create very_very_long_name very_very_long_name.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+apply UNSPLIT(%ALL)
+
+close
+
+delete very_very_long_name
+quit
