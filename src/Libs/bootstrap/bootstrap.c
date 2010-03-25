@@ -4530,8 +4530,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {LLABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {LLDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {LLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {STROLL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {STROULL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+  {STRTOLL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+  {STRTOULL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {ULLOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
 
   /*#include <string.h>*/

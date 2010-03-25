@@ -537,8 +537,8 @@
 #define LLABS_FUNCTION_NAME             "llabs"
 #define LLDIV_FUNCTION_NAME             "lldiv"
 #define LLTOSTR_FUNCTION_NAME           "lltostr"
-#define STROLL_FUNCTION_NAME            "strtoll"
-#define STROULL_FUNCTION_NAME           "strtoull"
+#define STRTOLL_FUNCTION_NAME           "strtoll"
+#define STRTOULL_FUNCTION_NAME          "strtoull"
 #define ULLOSTR_FUNCTION_NAME           "ulltostr"
 
 /* include<assert.h> */

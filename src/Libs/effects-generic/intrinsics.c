@@ -785,6 +785,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
       {ldiv_t ldiv(long, long, 0, 0},*/
 
   {MALLOC_FUNCTION_NAME, any_heap_effects},
+  {REALLOC_FUNCTION_NAME, any_heap_effects},
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                           no_write_effects},
