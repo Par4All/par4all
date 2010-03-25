@@ -1,0 +1,23 @@
+delete label_bloc
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create label_bloc label_bloc.c
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+display PRINTED_FILE(%ALL)
+apply UNSPLIT(%ALL)
+
+close
+
+#delete label_bloc 
+quit
+# EOF
