@@ -1,0 +1,17 @@
+static void ABCDEFGHIJKLMNOPQRSTUVWXYZ_ABCDEGHIJKLMNO()
+{
+   while (0) {                                                          /*0003*/
+      if (0) goto l99999;                                               /*0005*/
+l99998:      ;
+      while (0)                                                         /*0008*/
+         ;                                                              /*0008*/
+      goto loop_end_1;
+l99999:      ;
+      if (0) {                                                          /*0006*/
+      }
+      else {
+         goto l99998;
+      }
+loop_end_1:      ;
+   }
+}
