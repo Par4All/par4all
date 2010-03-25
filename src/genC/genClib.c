@@ -691,12 +691,12 @@ union domain *dp ;
 	}
 	for( p=obj->l ; p!=NIL ; p=p->cdr )
 	{
-	    message_assert("Sharing of cons",
+	    message_assert("no sharing of cons",
 		  hash_get(obj_table, (char *)p) == HASH_UNDEFINED_VALUE);
 
 	    hash_put(obj_table, (char *)p, (char *)p);
 	}
-        return( !dp->li.persistant ) ;
+	return( !dp->li.persistant ) ;
     }
     case SET_DT:
 	return( !dp->se.persistant ) ;
