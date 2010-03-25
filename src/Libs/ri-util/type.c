@@ -826,10 +826,23 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 	    if(basic_pointer_p(b))
 	      {
               type t = basic_pointer(b);
-              basic bt = copy_basic(variable_basic(type_variable(
-                              ultimate_p?ultimate_type(t):t)));
-		      free_basic(b);
-		      b=bt;
+	      if(type_variable_p(t)) {
+		  basic bt =
+		    copy_basic(variable_basic(type_variable(
+							    ultimate_p?ultimate_type(t):t)));
+		  free_basic(b);
+		  b=bt;
+		}
+	      else if(type_functional_p(t)) {
+		/* The expression can denote a function, because a
+		   function is equivalent to a pointer towards a
+		   function */
+		/* FI: we might as well return a pointer to a
+		   function */
+		;
+	      }
+	      else
+		pips_internal_error("Unexpected basic kind\n");
 	      }
 	    else
 	      {
@@ -3705,18 +3718,22 @@ type type_to_pointer_type(type t)
 }
 
 /* returns t if t is not a pointer type, and the pointed type if t is
-   a pointer type. Type definitions are replaced. */
+   a pointer type. Type definitions are replaced. If t is undefined,
+   returns a type_undefined. */
 type type_to_pointed_type(type t)
 {
-  type ut = ultimate_type(t);
-  type pt = ut;
   type upt = type_undefined;
 
-  if(pointer_type_p(ut))
-    pt = basic_pointer(variable_basic(type_variable(ut)));
+  if(!type_undefined_p(t)) {
+    type ut = ultimate_type(t);
+    type pt = ut;
 
-  upt = ultimate_type(pt);
+    if(pointer_type_p(ut))
+      pt = basic_pointer(variable_basic(type_variable(ut)));
 
+    if(!type_undefined_p(pt))
+      upt = ultimate_type(pt);
+  }
   return upt;
 }
 
@@ -3725,11 +3742,14 @@ type type_to_pointed_type(type t)
    a pointer type. Type definitions are replaced. */
 type type_to_final_pointed_type(type t)
 {
-  type ut = ultimate_type(t);
-  type pt = ut;
+  type ut = type_undefined;
 
-  while(pointer_type_p(ut)) {
-    ut = type_to_pointed_type(ut);
+  if(!type_undefined_p(t)) {
+    ut = ultimate_type(t);
+
+    while(!type_undefined_p(ut) && pointer_type_p(ut)) {
+      ut = type_to_pointed_type(ut);
+    }
   }
   return ut;
 }
@@ -3754,10 +3774,42 @@ list derived_type_fields(type t)
       l = type_enum(t);
       break;
     default:
-      pips_assert("input type is a struct union, or enum\n", type_struct_p(t) || type_union_p(t) || type_enum_p(t) );
-      
+      pips_assert("input type is a struct union, or enum\n",
+		  type_struct_p(t) || type_union_p(t) || type_enum_p(t) );
     }
   return l;
+}
+
+bool qualifier_equal_p(qualifier q1, qualifier q2)
+{
+  bool equal_p = qualifier_tag(q1)==qualifier_tag(q2);
+
+  return equal_p;
+}
+
+string qualifier_to_string(qualifier q)
+{
+  string s = string_undefined;
+  switch (qualifier_tag(q)) {
+  case is_qualifier_register:
+    s = "register";
+    break;
+  case is_qualifier_const:
+    s = "const";
+    break;
+  case is_qualifier_restrict:
+    s = "restrict";
+    break;
+  case is_qualifier_volatile:
+    s = "volatile";
+    break;
+  case is_qualifier_auto:
+    s = "auto";
+    break;
+  default :
+    pips_internal_error("unexpected tag %d\n", qualifier_tag(q));
+  }
+  return s;
 }
 
 

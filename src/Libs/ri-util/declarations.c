@@ -1778,8 +1778,12 @@ static list words_qualifier(list obj)
     case is_qualifier_volatile:
       pc = CHAIN_SWORD(pc,"volatile ");
       break;
+    case is_qualifier_auto:
+      /* FI: the auto case was missing; I have no idea why. */
+      pc = CHAIN_SWORD(pc,"auto ");
+      break;
     default :
-      pips_error("words_qualifier", "unexpected tag");
+      pips_internal_error("unexpected tag %d\n", qualifier_tag(q));
     }
   },obj);
   return pc;

@@ -4578,7 +4578,7 @@ alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Point
 intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
            < PROGRAM.entities
            < MODULE.code
-           
+           < MODULE.summary_pointer_effects
 \end{PipsMake}
 
 \subsection{Points to Analysis}
@@ -4601,6 +4601,9 @@ points_to_analysis > MODULE.points_to_list
         < MODULE.summary_points_to_list
 
 \end{PipsMake}
+
+The pointer effects are useful, but they are recomputed for each
+expression and subexpression by the points-to analysis.
 
 \subsection{Points-to  Properties}
 
