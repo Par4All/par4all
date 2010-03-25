@@ -1,0 +1,22 @@
+int add(int a, int b)
+{
+   int ab;                                                              /*0006*/
+   return ab;                                                           /*0006*/
+}
+/* A function is equivalent to a pointer to a function
+
+   Here "FUNC fu=(functions[0]);" would be as good.
+*/
+
+extern int add(int a, int b);                                           /*0006*/
+
+typedef int (*FUNC)(int a, int b);                                      /*0008*/
+
+static FUNC functions[1] = {add};                                       /*0010*/
+
+extern int main();                                                      /*0012*/
+int main()
+{
+   FUNC fu = *functions[0];                                             /*0014*/
+   return (*fu)(1,1);                                                   /*0015*/
+}

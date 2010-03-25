@@ -26,29 +26,29 @@ echo
 
 display PARSED_PRINTED_FILE[decl24!]
 
-#echo
-#echo Parsed printed file for "HDL_progress_display"
-#echo
-#
-#display PARSED_PRINTED_FILE[HDL_progress_display]
+echo
+echo Parsed printed file for "HDL_progress_display"
+echo
 
-#echo
-#echo Parsed printed file for "HDL_progress_progress"
-#echo
-#
-#display PARSED_PRINTED_FILE[HDL_progress_progress]
+display PARSED_PRINTED_FILE[HDL_progress_display]
 
-#echo
-#echo Parsed printed file for "HDL_progress_end"
-#echo
-#
-#display PARSED_PRINTED_FILE[HDL_progress_end]
+echo
+echo Parsed printed file for "HDL_progress_progress"
+echo
 
-#echo
-#echo Parsed printed file for "HDL_progress_start_monitor"
-#echo
-#
-#display PARSED_PRINTED_FILE[HDL_progress_start_monitor]
+display PARSED_PRINTED_FILE[HDL_progress_progress]
+
+echo
+echo Parsed printed file for "HDL_progress_end"
+echo
+
+display PARSED_PRINTED_FILE[HDL_progress_end]
+
+echo
+echo Parsed printed file for "HDL_progress_start_monitor"
+echo
+
+display PARSED_PRINTED_FILE[HDL_progress_start_monitor]
 
 apply UNSPLIT
 shell cc -c decl24.database/Src/decl24.c
