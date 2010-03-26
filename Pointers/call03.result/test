@@ -1,0 +1,57 @@
+
+Parsed code for "call03"
+
+void call03()
+{
+   *pi = 1;
+   pi++;
+   q->one = 1;
+   (q->two)[4] = 2;
+}
+
+Code for "call03"
+
+void call03()
+{
+   *pi = 1;
+   pi++;
+   q->one = 1;
+   (q->two)[4] = 2;
+}
+
+Proper effects for "call03"
+
+void call03()
+{
+//               <must be read   >: TOP-LEVEL:pi
+//               <must be written>: TOP-LEVEL:pi[0]
+   *pi = 1;
+//               <must be read   >: TOP-LEVEL:pi
+//               <must be written>: TOP-LEVEL:pi
+   pi++;
+//               <must be read   >: TOP-LEVEL:q
+//               <must be written>: TOP-LEVEL:q[0][1]
+   q->one = 1;
+//               <must be read   >: TOP-LEVEL:q
+//               <must be written>: TOP-LEVEL:q[0][2][4]
+   (q->two)[4] = 2;
+}
+
+POINTS TO
+
+//  {}
+void call03()
+{
+   *pi = 1;
+   pi++;
+   q->one = 1;
+   (q->two)[4] = 2;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   call03();
+}

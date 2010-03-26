@@ -1,0 +1,31 @@
+void comma01()
+{
+   // BEGIN BLOCK
+   int i;
+   int *p;
+   int *q;
+   int *r;
+//               <must be written>: p q r
+   p = &i, q = &i, r = &i;
+//               <must be written>: i
+   
+   
+   i = 2;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+void comma01()
+{
+   // BEGIN BLOCK
+   int i;
+   int *p;
+   int *q;
+   int *r;
+   p = &i, q = &i, r = &i;
+//  {(p,i,-Exact-);(q,i,-Exact-);(r,i,-Exact-)}
+   
+   
+   i = 2;
+   // END BLOCK
+}

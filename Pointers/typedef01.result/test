@@ -1,0 +1,39 @@
+void compute()
+{
+   int i, j;
+//               <must be written>: i
+
+   for(i = 1; i <= 62; i += 1)
+//               <must be written>: j
+      for(j = 1; j <= 62; j += 1)
+//               <must be read   >: i j
+//               <must be written>: TOP-LEVEL:tab[i][j]
+         tab[i][j] = i*j;
+}
+
+POINTS TO
+
+//  {}
+void compute()
+{
+   int i, j;
+
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+         tab[i][j] = i*j;
+}
+
+POINTS TO
+
+//  {}
+int main(int argc, char *argv[])
+{
+   int t;
+   
+   
+   for(t = 0; t <= 63; t += 1)
+      compute();
+   
+   
+   return 0;
+}

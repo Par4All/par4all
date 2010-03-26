@@ -1,0 +1,30 @@
+void call17(int *x)
+{
+   /* check aliases */
+   int *y = x;
+   y[0] = 1;
+}
+
+Proper effects for "call17"
+
+void call17(int *x)
+{
+   /* check aliases */
+//               <must be read   >: x
+//               <must be written>: y
+   int *y = x;
+//               <must be read   >: y
+//               <must be written>: y[0]
+   y[0] = 1;
+}
+
+POINTS TO
+
+//  {(x,_x_1,-Exact-)}
+void call17(int *x)
+{
+   /* check aliases */
+//  {(x,_x_1,-Exact-)}
+   int *y = x;
+   y[0] = 1;
+}

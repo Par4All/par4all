@@ -1,0 +1,33 @@
+
+Parsed printed file for "dereferencing04"
+
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+   *(p+q-r) = 0.;
+}
+
+Proper pointer effects for "dereferencing04"
+
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+//               <must be read   >: p q r
+//               <must be written>: p[q-r]
+   *(p+q-r) = 0.;
+}
+
+POINTS TO
+
+//  {}
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+   *(p+q-r) = 0.;
+}

@@ -1,0 +1,68 @@
+
+Parsed code for "call10"
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k, l;
+
+   for (k = 0;k<i;k++)
+      x[i] = 0;
+   for (l = 0;l<j;l++)
+      y[i] = 0;
+}
+
+Code for "call10"
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k, l;
+
+   for(k = 0; k <= i-1; k += 1)
+      x[i] = 0;
+   for(l = 0; l <= j-1; l += 1)
+      y[i] = 0;
+}
+
+Proper effects for "call10"
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k, l;
+//               <must be read   >: i
+//               <must be written>: k
+
+   for(k = 0; k <= i-1; k += 1)
+//               <must be read   >: i
+//               <must be written>: x[i]
+      x[i] = 0;
+//               <must be read   >: j
+//               <must be written>: l
+   for(l = 0; l <= j-1; l += 1)
+//               <must be read   >: i j
+//               <must be written>: y[i]
+      y[i] = 0;
+}
+
+POINTS TO
+
+//  {}
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k, l;
+
+   for(k = 0; k <= i-1; k += 1)
+      x[i] = 0;
+   for(l = 0; l <= j-1; l += 1)
+      y[i] = 0;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+
+   call10(s.one, s.two, sp->one, sp->two);
+}

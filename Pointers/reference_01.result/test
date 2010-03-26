@@ -1,0 +1,49 @@
+
+Code for "reference01"
+
+int reference_01(void)
+{
+   int i = 0;                                                           /*0006*/
+   int j = 1;                                                           /*0007*/
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
+   // effects on empty references...
+   j/i;                                                                 /*0012*/
+   (void) j/i;                                                          /*0013*/
+   return i/j;                                                          /*0014*/
+}
+
+Code for "reference01"
+
+int reference_01(void)
+{
+//               <must be written>: i
+   int i = 0;                                                           /*0006*/
+//               <must be written>: j
+   int j = 1;                                                           /*0007*/
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
+   // effects on empty references...
+   j/i;                                                                 /*0012*/
+   (void) j/i;                                                          /*0013*/
+//               <must be read   >: i j
+   return i/j;                                                          /*0014*/
+}
+
+POINTS TO
+
+//  {}
+int reference_01(void)
+{
+   int i = 0;                                                           /*0006*/
+   int j = 1;                                                           /*0007*/
+   
+   // effects on useless expression
+   0;                                                                   /*0010*/
+   // effects on empty references...
+   j/i;                                                                 /*0012*/
+   (void) j/i;                                                          /*0013*/
+   return i/j;                                                          /*0014*/
+}

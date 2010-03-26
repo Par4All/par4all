@@ -1,0 +1,108 @@
+Select some options to deal with th C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+float main(int argc, char *argv[])
+{
+   int i, j, k;
+//               <must be written>: i
+
+   for(i = 0; i <= 8; i += 1)
+//               <must be written>: j
+      for(j = 0; j <= 8; j += 1) {
+//               <must be read   >: i j
+//               <must be written>: TOP-LEVEL:imagein[i][j][1]
+         imagein[i][j].re = 0.0;
+//               <must be read   >: i j
+//               <must be written>: TOP-LEVEL:imagein[i][j][2]
+         imagein[i][j].im = 0.0;
+      }
+//               <must be read   >: TOP-LEVEL:imagein[2][1][1]
+   return imagein[2][1].re;
+}
+//               <may be written >: TOP-LEVEL:imagein[*][*][1] 
+//                                  TOP-LEVEL:imagein[*][*][2]
+//               <must be read   >: TOP-LEVEL:imagein[2][1][1]
+float main(int argc, char *argv[])
+{
+   int i, j, k;
+//               <may be read    >: i j
+//               <may be written >: TOP-LEVEL:imagein[*][*][1] 
+//                                  TOP-LEVEL:imagein[*][*][2] j
+//               <must be written>: i
+
+   for(i = 0; i <= 8; i += 1)
+//               <may be read    >: i j
+//               <may be written >: TOP-LEVEL:imagein[*][*][1] 
+//                                  TOP-LEVEL:imagein[*][*][2]
+//               <must be written>: j
+      for(j = 0; j <= 8; j += 1) {
+//               <may be written >: TOP-LEVEL:imagein[*][*][1]
+//               <must be read   >: i j
+         imagein[i][j].re = 0.0;
+//               <may be written >: TOP-LEVEL:imagein[*][*][2]
+//               <must be read   >: i j
+         imagein[i][j].im = 0.0;
+      }
+//               <must be read   >: TOP-LEVEL:imagein[2][1][1]
+   return imagein[2][1].re;
+}
+
+//  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==2, PHI2==1,
+//    PHI3==1}>
+//  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=8,
+//    0<=PHI2, PHI2<=8, 1<=PHI3, PHI3<=2}>
+
+float main(int argc, char *argv[])
+{
+   int i, j, k;
+
+//  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=8,
+//    0<=PHI2, PHI2<=8, 1<=PHI3, PHI3<=2}>
+
+
+   for(i = 0; i <= 8; i += 1)
+
+//  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, 0<=PHI2,
+//    PHI2<=8, 1<=PHI3, PHI3<=2, 0<=i, i<=8}>
+
+      for(j = 0; j <= 8; j += 1) {
+
+//  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==1, 0<=i, i<=8, 0<=j, j<=8}>
+
+         imagein[i][j].re = 0.0;
+
+//  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==2, 0<=i, i<=8, 0<=j, j<=8}>
+
+         imagein[i][j].im = 0.0;
+      }
+
+//  <TOP-LEVEL:imagein[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==2, PHI2==1,
+//    PHI3==1, i==9, j==9}>
+
+   return imagein[2][1].re;
+}
+
+POINTS TO
+
+//  {}
+float main(int argc, char *argv[])
+{
+   int i, j, k;
+
+   for(i = 0; i <= 8; i += 1)
+      for(j = 0; j <= 8; j += 1) {
+         imagein[i][j].re = 0.0;
+         imagein[i][j].im = 0.0;
+      }
+   return imagein[2][1].re;
+}

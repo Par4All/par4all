@@ -1,0 +1,54 @@
+
+Parsed code for "call08"
+
+void call08(int r, int m, int *x)
+{
+   int j;
+
+   x[4] = 10*r+4;
+}
+
+Code for "call08"
+
+void call08(int r, int m, int *x)
+{
+   int j;
+
+   x[4] = 10*r+4;
+}
+
+Proper effects for "call08"
+
+void call08(int r, int m, int *x)
+{
+   int j;
+//               <must be read   >: r x
+//               <must be written>: x[4]
+
+   x[4] = 10*r+4;
+}
+
+POINTS TO
+
+//  {(x,_x_1,-Exact-)}
+void call08(int r, int m, int *x)
+{
+//  {(x,_x_1,-Exact-)}
+   int j;
+
+   x[4] = 10*r+4;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   int d1 = 4;
+   int d2 = 4;
+   int y[d1][d2];
+   int i, j;
+
+   for(i = 0; i <= d1-1; i += 1)
+      call08(i, d2, &y[i][1]);
+}

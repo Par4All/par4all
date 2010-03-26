@@ -1,0 +1,46 @@
+void call18(int i, ...)
+{
+   i++;
+   if (i) {
+      va_list pa;
+      int r;
+
+      va_start(pa, fmt);
+
+      va_end(pa);
+   }
+}
+
+Proper effects for "main"
+
+int main()
+{
+//               <must be written>: i
+   int i = 1;
+//               <must be written>: j
+   int j = 2;
+//               <must be written>: k
+   int k = 3;
+//               <must be read   >: i j k
+
+   call18(i, i, j, k, 0);
+}
+
+POINTS TO
+
+//  {}
+void call18(int i, ...)
+{
+   i++;
+   if (i) {
+      va_list pa;
+      int r;
+
+      va_start(pa, fmt);
+
+      va_end(pa);
+   }
+}
+
+POINTS TO
+

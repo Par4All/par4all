@@ -1,0 +1,103 @@
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+   int height, width, gris;
+   byte **m;
+   FILE *file;
+   char *buffer;
+   int i;
+
+   buffer = (char *) calloc(80, sizeof(char));
+   file = fopen(filename, "rb");
+   if (file==(void *) 0) 
+      nrerror("ouverture du fichier impossible\n");
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0) 
+      nrerror("entete du fichier %s invalide\n");
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+   
+   *nrl = 0;
+   *nrh = height-1;
+   *ncl = 0;
+   *nch = width-1;
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+
+   for(i = 0; i <= height-1; i += 1)
+      ReadPGMrow(file, width, m[i]);
+
+   fclose(file);
+   free(buffer);
+
+   return m;
+}
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+   fread(&line[0], sizeof(byte), width, file);
+}
+
+Proper effects for "ReadPGMrow"
+
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] line[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file width
+   fread(&line[0], sizeof(byte), width, file);
+}
+
+POINTS TO
+
+//  {(line,_line_1,-Exact-)}
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+//  {(line,_line_1,-Exact-)}
+   fread(&line[0], sizeof(byte), width, file);
+}
+
+POINTS TO
+
+//  {(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,-Exact-);(nch,_nch_6,
+//   -Exact-);(filename,_filename_2,-Exact-);(nrl,_nrl_3,-Exact-)}
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+//  {(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-);(nch,_nch_6,
+//   -Exact-);(filename,_filename_2,-Exact-);(ncl,_ncl_5,-Exact-)}
+   int height, width, gris;
+   byte **m;
+   FILE *file;
+   char *buffer;
+   int i;
+
+   buffer = (char *) calloc(80, sizeof(char));
+   file = fopen(filename, "rb");
+   if (file==(void *) 0) 
+      nrerror("ouverture du fichier impossible\n");
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0) 
+      nrerror("entete du fichier %s invalide\n");
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+   
+   *nrl = 0;
+   *nrh = height-1;
+   *ncl = 0;
+   *nch = width-1;
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+
+   for(i = 0; i <= height-1; i += 1)
+      ReadPGMrow(file, width, m[i]);
+
+   fclose(file);
+   free(buffer);
+
+   return m;
+}

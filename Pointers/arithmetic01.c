@@ -4,7 +4,7 @@ int main() {
   k=0;
   j=k; 
   i=&j;
-  i+=k ;
+  i++ ;
 
   return 0;
 }

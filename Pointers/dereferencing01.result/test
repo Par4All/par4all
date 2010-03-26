@@ -1,0 +1,44 @@
+
+Parsed printed file for "dereferencing01"
+
+void dereferencing01()
+{
+   double x = 1.;
+   double *p = &x;
+   double *q = 0;
+
+   q = p;
+   *p = 2.;
+}
+
+Proper effetcs for "dereferencing01"
+
+void dereferencing01()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <must be written>: q
+   double *q = 0;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+   *p = 2.;
+}
+
+POINTS TO
+
+//  {}
+void dereferencing01()
+{
+   double x = 1.;
+   double *p = &x;
+   double *q = 0;
+
+   q = p;
+   *p = 2.;
+}

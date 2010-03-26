@@ -1,0 +1,85 @@
+
+Proper effects for "main"
+
+void f3(int n_ptrs, int f4_after, ...)
+{
+   va_list ap, ap_save;
+   char *array[31];
+//               <must be written>: ptr_no
+   int ptr_no = 0;
+//               <must be read   >: n_ptrs
+   if (n_ptrs>31) 
+//               <must be written>: n_ptrs
+      n_ptrs = 31;
+//               <must be read   >: ap
+//               <must be written>: ap
+   va_start(ap, f4_after);
+//               <must be read   >: n_ptrs
+//               <must be written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
+//               <must be read   >: ap n_ptrs ptr_no
+//               <must be written>: ap array[ptr_no]
+      array[ptr_no] = va_arg(ap, char *);
+//               <must be read   >: f4_after n_ptrs ptr_no
+      if (ptr_no==f4_after) 
+//               <must be read   >: ap ap_save n_ptrs
+//               <must be written>: ap_save
+         va_copy(ap_save, ap);
+   }
+//               <may be written >: ap
+//               <must be read   >: ap
+   va_end(ap);
+//               <may be read    >: TOP-LEVEL:stderr 
+//                                  TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*] array[*]
+//               <may be written >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: n_ptrs
+   f2(n_ptrs, array);
+//               <must be read   >: f4_after n_ptrs
+//               <must be written>: n_ptrs
+   // Now process the saved copy.
+   n_ptrs -= f4_after;
+//               <must be read   >: n_ptrs
+//               <must be written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//               <must be read   >: ap_save n_ptrs ptr_no
+//               <must be written>: ap_save array[ptr_no]
+      array[ptr_no] = va_arg(ap_save, char *);
+//               <may be written >: ap_save
+//               <must be read   >: ap_save
+   va_end(ap_save);
+//               <may be read    >: TOP-LEVEL:stdout 
+//                                  TOP-LEVEL:stdout[*] 
+//                                  __IO_EFFECTS:LUNS[*] array[*]
+//               <may be written >: TOP-LEVEL:stdout[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: n_ptrs
+   f4(n_ptrs, array);
+}
+
+POINTS TO
+
+//  {}
+void f3(int n_ptrs, int f4_after, ...)
+{
+   va_list ap, ap_save;
+   char *array[31];
+   int ptr_no = 0;
+   if (n_ptrs>31) 
+      n_ptrs = 31;
+   va_start(ap, f4_after);
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
+      array[ptr_no] = va_arg(ap, char *);
+      if (ptr_no==f4_after) 
+         va_copy(ap_save, ap);
+   }
+   va_end(ap);
+   f2(n_ptrs, array);
+   // Now process the saved copy.
+   n_ptrs -= f4_after;
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+      array[ptr_no] = va_arg(ap_save, char *);
+   va_end(ap_save);
+   f4(n_ptrs, array);
+}

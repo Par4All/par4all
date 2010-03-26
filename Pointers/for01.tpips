@@ -1,0 +1,43 @@
+delete for01
+create for01 for01.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+#setproperty PPRETTYPRINT_BLOCKS FALSE TRUE
+#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty SEMANTICS_FLOW_SENSITIVE TRUE
+setproperty COMPUTE_ALL_DEPENDENCES TRUE
+setproperty SEMANTICS_FIX_POINT TRUE
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+display DG_FILE[main]
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+quit

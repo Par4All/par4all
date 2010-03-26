@@ -1,0 +1,83 @@
+
+Proper pointer effects for "main"
+
+int main()
+{
+   // BEGIN BLOCK
+   int *p, *q;
+//               <must be read   >: p
+//               <must be written>: p[0]
+
+   *p = 1;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <must be read   >: q
+//               <must be written>: q[0]
+   *q = 2;
+   return 0;
+   // END BLOCK
+}
+
+Cumulated pointer effects for "main"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+int main()
+{
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   // BEGIN BLOCK
+   int *p, *q;
+//               <must be read   >: p
+//               <must be written>: p[0]
+
+   *p = 1;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <must be read   >: q
+//               <must be written>: q[0]
+   *q = 2;
+   return 0;
+   // END BLOCK
+}
+
+Proper effects for "main"
+
+int main()
+{
+   // BEGIN BLOCK
+   int *p, *q;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+
+   *p = 1;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: q
+   *q = 2;
+   return 0;
+   // END BLOCK
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   // BEGIN BLOCK
+   int *p, *q;
+
+   *p = 1;
+
+   q = p;
+   *q = 2;
+   return 0;
+   // END BLOCK
+}

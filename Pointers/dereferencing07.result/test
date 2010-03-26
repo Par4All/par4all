@@ -1,0 +1,131 @@
+
+Proper pointer effects for "foo"
+
+void foo(int *col)
+{
+//               <must be read   >: col col[0]
+//               <must be written>: col
+   *col++;                                                              /*0009*/
+
+   return;                                                              /*0011*/
+}
+
+Proper pointer effects for "main"
+
+int main()
+{
+   int x, tab1[10], tab2[10], *p;                                       /*0016*/
+//               <must be read   >: x
+//               <must be written>: x
+   x++;                                                                 /*0017*/
+//               <must be read   >: x
+//               <must be written>: x
+   x += 3;                                                              /*0018*/
+//               <must be read   >: p tab1[tab2[x]] tab2[x] x
+//               <must be written>: p[tab1[tab2[x]]]
+   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   return 1;                                                            /*0020*/
+}
+
+Proper regions for "main"
+
+int main()
+{
+   int x, tab1[10], tab2[10], *p;                                       /*0016*/
+
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x++;                                                                 /*0017*/
+
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x += 3;                                                              /*0018*/
+
+//  <p-R-EXACT-{}>
+//  <p[PHI1]-W-MAY-{}>
+//  <tab1[PHI1]-R-MAY-{}>
+//  <tab2[PHI1]-R-EXACT-{PHI1==x}>
+//  <x-R-EXACT-{}>
+
+   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   return 1;                                                            /*0020*/
+}
+
+Proper effects for "foo"
+
+void foo(int *col)
+{
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: col
+   *col++;                                                              /*0009*/
+
+   return;                                                              /*0011*/
+}
+
+Proper effects for "main"
+
+int main()
+{
+   int x, tab1[10], tab2[10], *p;                                       /*0016*/
+//               <must be read   >: x
+//               <must be written>: x
+   x++;                                                                 /*0017*/
+//               <must be read   >: x
+//               <must be written>: x
+   x += 3;                                                              /*0018*/
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p tab1[tab2[x]] tab2[x] x
+   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   return 1;                                                            /*0020*/
+}
+
+Proper regions for "main"
+
+int main()
+{
+   int x, tab1[10], tab2[10], *p;                                       /*0016*/
+
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x++;                                                                 /*0017*/
+
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x += 3;                                                              /*0018*/
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <p-R-EXACT-{}>
+//  <tab1[PHI1]-R-MAY-{}>
+//  <tab2[PHI1]-R-EXACT-{PHI1==x}>
+//  <x-R-EXACT-{}>
+
+   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   return 1;                                                            /*0020*/
+}
+
+POINTS TO
+
+//  {(col,_col_1,-Exact-)}
+void foo(int *col)
+{
+//  {(col,_col_1,-Exact-)}
+   *col++;                                                              /*0009*/
+
+   return;                                                              /*0011*/
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   int x, tab1[10], tab2[10], *p;                                       /*0016*/
+   x++;                                                                 /*0017*/
+   x += 3;                                                              /*0018*/
+   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   return 1;                                                            /*0020*/
+}

@@ -1,0 +1,146 @@
+
+Parsed printed file for "dereferencing02"
+
+void dereferencing02()
+{
+   double x = 1.;
+   double *p = &x;
+   double **q = &p;
+   double **w;
+   int i = 1;
+   
+   
+   **q = 2.;
+   **(q+(i = 0)) = 3.;
+   **(w+(i = 2)) = 4.;
+   x = **q;
+   q++;
+   *q++;
+}
+
+Proper pointer effects for "dereferencing02"
+
+void dereferencing02()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <must be written>: q
+   double **q = &p;
+   double **w;
+//               <must be written>: i
+   int i = 1;
+//               <must be read   >: q q[0]
+//               <must be written>: q[0][0]
+   
+   
+   **q = 2.;
+//               <must be read   >: q q[0]
+//               <must be written>: q[0][0]
+   **(q+(i = 0)) = 3.;
+//               <must be read   >: w w[2]
+//               <must be written>: w[2][0]
+   **(w+(i = 2)) = 4.;
+//               <must be read   >: q q[0] q[0][0]
+//               <must be written>: x
+   x = **q;
+//               <must be read   >: q
+//               <must be written>: q
+   q++;
+//               <must be read   >: q q[0]
+//               <must be written>: q
+   *q++;
+}
+
+Cumulated pointer effects for "dereferencing02"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+void dereferencing02()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <must be written>: q
+   double **q = &p;
+   double **w;
+//               <must be written>: i
+   int i = 1;
+//               <must be read   >: q q[0]
+//               <must be written>: q[0][0]
+   
+   
+   **q = 2.;
+//               <must be read   >: q q[0]
+//               <must be written>: q[0][0]
+   **(q+(i = 0)) = 3.;
+//               <must be read   >: w w[2]
+//               <must be written>: w[2][0]
+   **(w+(i = 2)) = 4.;
+//               <must be read   >: q q[0] q[0][0]
+//               <must be written>: x
+   x = **q;
+//               <must be read   >: q
+//               <must be written>: q
+   q++;
+//               <must be read   >: q q[0]
+//               <must be written>: q
+   *q++;
+}
+
+Proper effects for "dereferencing02"
+
+void dereferencing02()
+{
+//               <must be written>: x
+   double x = 1.;
+//               <must be written>: p
+   double *p = &x;
+//               <must be written>: q
+   double **q = &p;
+   double **w;
+//               <must be written>: i
+   int i = 1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   
+   
+   **q = 2.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   **(q+(i = 0)) = 3.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   **(w+(i = 2)) = 4.;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: x
+   x = **q;
+//               <must be read   >: q
+//               <must be written>: q
+   q++;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: q
+   *q++;
+}
+
+POINTS TO
+
+//  {}
+void dereferencing02()
+{
+   double x = 1.;
+   double *p = &x;
+   double **q = &p;
+   double **w;
+   int i = 1;
+   
+   
+   **q = 2.;
+   **(q+(i = 0)) = 3.;
+   **(w+(i = 2)) = 4.;
+   x = **q;
+   q++;
+   *q++;
+}

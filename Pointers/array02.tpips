@@ -1,0 +1,22 @@
+delete array02
+create array02 array02.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[array02]
+
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[array02]
+
+close
+delete array02
+quit

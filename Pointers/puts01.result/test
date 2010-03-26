@@ -1,0 +1,24 @@
+int main()
+{
+   char *s = "sortie de puts";
+   puts(s);
+}
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//               <must be written>: s
+   char *s = "sortie de puts";
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   puts(s);
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   char *s = "sortie de puts";
+   puts(s);
+}

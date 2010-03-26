@@ -1,0 +1,30 @@
+
+Proper effects for "init_s"
+
+void init_s(s_t s, int max)
+{
+   // BEGIN BLOCK
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+
+   s.tab = (float *) malloc(max*sizeof(float));
+//               <must be read   >: max
+//               <must be written>: s[1]
+   s.max = max;
+   // END BLOCK
+}
+
+POINTS TO
+
+//  {}
+void init_s(s_t s, int max)
+{
+   // BEGIN BLOCK
+
+   s.tab = (float *) malloc(max*sizeof(float));
+   s.max = max;
+   // END BLOCK
+}
+
+POINTS TO
+

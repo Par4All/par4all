@@ -14,6 +14,7 @@ int main()
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
    // BEGIN BLOCK
@@ -23,7 +24,7 @@ int main()
    int y[10];
 
    x.first = &y[5];
-//  points to = {(x[1],y[5],-Exact-)}
+//  {(x[1],y[5],-Exact-)}
    
    
    return 0;

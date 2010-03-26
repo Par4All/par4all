@@ -1,0 +1,39 @@
+
+Parsed printed file for "assign03"
+
+void assign03()
+{
+   char *malloc(int);
+   double *p = (double *) malloc(10*sizeof(double));
+   int j = 2;
+
+   p[j] = 1.;
+}
+
+Proper effetcs for "assign03"
+
+void assign03()
+{
+   char *malloc(int);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+   double *p = (double *) malloc(10*sizeof(double));
+//               <must be written>: j
+   int j = 2;
+//               <must be read   >: j p
+//               <must be written>: p[j]
+
+   p[j] = 1.;
+}
+
+POINTS TO
+
+//  {}
+void assign03()
+{
+   char *malloc(int);
+   double *p = (double *) malloc(10*sizeof(double));
+   int j = 2;
+
+   p[j] = 1.;
+}

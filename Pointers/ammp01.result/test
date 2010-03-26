@@ -1,0 +1,208 @@
+
+Parsed printed file for "a_m_serial"
+
+ATOM * a_m_serial(int serial)
+{
+   static ATOM *ap = (void *) 0;
+   static ATOM *lastmatched = (void *) 0;
+   int i, n, a_number();
+   if (atomUPDATE)
+      n = a_number();
+   else
+      n = atomNUMBER;
+
+   ap = first;
+   if (ap==(void *) 0) 
+      return (void *) 0;
+   if (lastmatched==(void *) 0) 
+      lastmatched = first;
+
+   if (serial==lastmatched->serial) 
+      return lastmatched;
+   if (serial>lastmatched->serial) 
+      ap = lastmatched;
+   for (i = 0;i<n;i++) {
+      if (ap->serial==serial) {
+         lastmatched = ap;
+         return ap;
+      }
+      if (ap==ap->next)
+         ap = first;
+      else
+         ap = ap->next;
+   }
+   return (void *) 0;
+}
+
+Proper effects for "a_m_serial"
+
+ATOM * a_m_serial(int serial)
+{
+//               <may be written >: ap
+   static ATOM *ap = (void *) 0;
+//               <may be written >: lastmatched
+   static ATOM *lastmatched = (void *) 0;
+   int i, n, a_number();
+//               <must be read   >: TOP-LEVEL:atomUPDATE
+   if (atomUPDATE)
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: TOP-LEVEL:atomNUMBER 
+//                                  TOP-LEVEL:atomUPDATE
+//               <must be written>: n
+      n = a_number();
+   else
+//               <must be read   >: TOP-LEVEL:atomNUMBER
+//               <must be written>: n
+      n = atomNUMBER;
+//               <must be read   >: TOP-LEVEL:first
+//               <must be written>: ap
+
+   ap = first;
+//               <must be read   >: ap
+   if (ap==(void *) 0) 
+      return (void *) 0;
+//               <must be read   >: lastmatched
+   if (lastmatched==(void *) 0) 
+//               <must be read   >: TOP-LEVEL:first
+//               <must be written>: lastmatched
+      lastmatched = first;
+//               <must be read   >: lastmatched lastmatched[0][1] 
+//                                  serial
+
+   if (serial==lastmatched->serial) 
+//               <must be read   >: lastmatched
+      return lastmatched;
+//               <must be read   >: lastmatched lastmatched[0][1] 
+//                                  serial
+   if (serial>lastmatched->serial) 
+//               <must be read   >: lastmatched
+//               <must be written>: ap
+      ap = lastmatched;
+//               <must be read   >: n
+//               <must be written>: i
+   for(i = 0; i <= n-1; i += 1) {
+//               <must be read   >: ap ap[0][1] n serial
+      if (ap->serial==serial) {
+//               <must be read   >: ap n
+//               <must be written>: lastmatched
+         lastmatched = ap;
+//               <must be read   >: ap n
+         return ap;
+      }
+//               <must be read   >: ap ap[0][3] n
+      if (ap==ap->next)
+//               <must be read   >: TOP-LEVEL:first n
+//               <must be written>: ap
+         ap = first;
+      else
+//               <must be read   >: ap ap[0][3] n
+//               <must be written>: ap
+         ap = ap->next;
+   }
+   return (void *) 0;
+}
+POINTS TO
+//  {}
+ATOM * a_m_serial(int serial)
+{
+   static ATOM *ap = (void *) 0;
+   static ATOM *lastmatched = (void *) 0;
+   int i, n, a_number();
+   if (atomUPDATE)
+      n = a_number();
+   else
+      n = atomNUMBER;
+
+   ap = first;
+   if (ap==(void *) 0) 
+      return (void *) 0;
+   if (lastmatched==(void *) 0) 
+      lastmatched = first;
+
+   if (serial==lastmatched->serial) 
+      return lastmatched;
+   if (serial>lastmatched->serial) 
+      ap = lastmatched;
+   for(i = 0; i <= n-1; i += 1) {
+      if (ap->serial==serial) {
+         lastmatched = ap;
+         return ap;
+      }
+      if (ap==ap->next)
+         ap = first;
+      else
+         ap = ap->next;
+   }
+   return (void *) 0;
+}
+//  {}
+ATOM * a_next(int flag)
+{
+   static ATOM *ap = (void *) 0;
+   if (ap==(void *) 0) 
+      ap = first;
+   if (ap==(void *) 0) 
+      return (void *) 0;
+   if (flag<=0) {
+      ap = first;
+      return ap;
+   }
+   if (ap==ap->next) 
+      return (void *) 0;
+   ap = ap->next;
+   return ap;
+}
+//  {}
+int a_number()
+{
+   ATOM *ap;
+   if (atomUPDATE) {
+   }
+   else {
+      goto l99999;
+   }
+   atomUPDATE = 0;
+   atomNUMBER = 0;
+   if (first==(void *) 0) 
+      return 0;
+   ap = first;
+l99998:   ;
+   if (!1) goto break_1;
+   if (ap->next==(void *) 0) goto break_1;
+   atomNUMBER++;
+   if (ap->next==ap) goto break_1;
+   ap = ap->next;
+   goto l99998;
+break_1:   ;
+l99999:   ;
+   return atomNUMBER;
+}
+//  {}
+int activate(int i1, int i2)
+{
+   int upper, lower;
+   ATOM *ap, *a_m_serial(int), *a_next(int);
+   int i, numatm, a_number();
+
+   if (i2==0) {
+      ap = a_m_serial(i1);
+      if (ap!=(void *) 0) 
+         ap->active = 1;
+      return 0;
+   }
+
+   upper = i2;
+   lower = i1;
+   if (i2<i1) {
+      lower = i2;
+      upper = i1;
+   }
+
+   numatm = a_number();
+   for(i = 0; i <= numatm-1; i += 1) {
+      ap = a_next(i);
+      if (ap->serial>=lower&&ap->serial<=upper) 
+         ap->active = 1;
+   }
+   return 0;
+}

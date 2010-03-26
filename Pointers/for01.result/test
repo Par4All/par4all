@@ -1,0 +1,179 @@
+int main()
+{
+   int i, j, k;
+   int a[500];
+//               <must be written>: i
+
+   i = 0;
+//               <must be written>: j
+   j = 1;
+//               <must be written>: i
+   for(i = 0; i <= 499; i += 1) {
+//               <must be read   >: j
+//               <must be written>: j
+      j++;
+//               <must be read   >: i
+//               <must be written>: a[i]
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+//               <must be written>: k
+   k = 2;
+//               <must be read   >: k
+   return k;
+}
+int main()
+{
+   int i, j, k;
+   int a[500];
+//               <must be written>: i
+
+   i = 0;
+//               <must be written>: j
+   j = 1;
+//               <may be read    >: i j
+//               <may be written >: a[*] j
+//               <must be written>: i
+   for(i = 0; i <= 499; i += 1) {
+//               <must be read   >: j
+//               <must be written>: j
+      j++;
+//               <may be written >: a[*]
+//               <must be read   >: i
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+//               <must be written>: k
+   k = 2;
+//               <must be read   >: k
+   return k;
+}
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	13 --> 14 with conflicts
+		from <k-W-MUST> to <k-R-MUST>
+	09 --> 09 with conflicts
+		from <j-R-MUST> to <j-W-MUST> at levels  1
+
+	09 --> 09 with conflicts
+		from <j-W-MUST> to <j-W-MUST> at levels  1
+
+		from <j-W-MUST> to <j-R-MUST> at levels  1
+
+	07 --> 09 with conflicts
+		from <j-W-MUST> to <j-W-MUST>
+		from <j-W-MUST> to <j-R-MUST>
+	06 --> -1 with conflicts
+		from <i-W-MUST> to <i-W-MUST>
+
+****************** End of Dependence Graph ******************
+
+//  T(main) {main==2}
+
+int main()
+{
+
+//  T() {}
+
+   int i, j, k;
+
+//  T() {}
+
+   int a[500];
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(j) {j==1}
+
+   j = 1;
+
+//  T(i,j) {i+j#init==j, j#init<=j}
+
+   for(i = 0; i <= 499; i += 1) {
+
+//  T(j) {j==j#init+1}
+
+      j++;
+
+//  T() {}
+
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+
+//  T(k) {k==2}
+
+   k = 2;
+
+//  T(main) {k==main}
+
+   return k;
+}
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j, k;
+
+//  P() {}
+
+   int a[500];
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   j = 1;
+
+//  P(i,j) {i==0, j==1}
+
+   for(i = 0; i <= 499; i += 1) {
+
+//  P(i,j) {i==j-1, 0<=i, i<=499}
+
+      j++;
+
+//  P(i,j) {i==j-2, 0<=i, i<=499}
+
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+
+//  P(i,j) {i==500, j==501}
+
+   k = 2;
+
+//  P(i,j,k) {i==500, j==501, k==2}
+
+   return k;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   int i, j, k;
+   int a[500];
+
+   i = 0;
+   j = 1;
+   for(i = 0; i <= 499; i += 1) {
+      j++;
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+   k = 2;
+   return k;
+}

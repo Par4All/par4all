@@ -1,0 +1,31 @@
+int conditional_01()
+{
+   // BEGIN BLOCK
+   int *q;
+   int *p;
+//               <must be written>: i j
+   int i = 0, j = 1;
+//               <must be written>: q
+   q = &i;
+//               <may be read    >: q
+//               <must be read   >: i
+//               <must be written>: p
+   p = i>0?&j:q;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+int conditional_01()
+{
+   // BEGIN BLOCK
+   int *q;
+   int *p;
+   int i = 0, j = 1;
+   q = &i;
+//  {(q,i,-Exact-)}
+   p = i>0?&j:q;
+//  {(q,i,-Exact-)}
+   return 0;
+   // END BLOCK
+}

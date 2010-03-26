@@ -20,14 +20,15 @@ int main()
       // END BLOCK
    }
    else
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: x
-//               <must be written>: x[0]
       *x = &y;
 
    return 0;
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
    // BEGIN BLOCK
@@ -35,22 +36,22 @@ int main()
    x2 = 0;
    y1 = 1;
    x1 = &x2;
-//  points to = {(x1,x2,-Exact-)}
+//  {(x1,x2,-Exact-)}
 
    if (true) {
-//  points to = {(x1,x2,-Exact-)}
+//  {(x1,x2,-Exact-)}
       // BEGIN BLOCK
-//  points to = {(x1,x2,-Exact-)}
+//  {(x1,x2,-Exact-)}
 
       x = &x1;
-//  points to = {(x,x1,-Exact-);(x1,x2,-Exact-)}
+//  {(x,x1,-Exact-);(x1,x2,-Exact-)}
       y = &y1;
       // END BLOCK
    }
    else
-//  points to = {(x1,x2,-Exact-)}
+//  {(x1,x2,-Exact-)}
       *x = &y;
-//  points to = {(y,y1,-MAY-);(x,x1,-MAY-);(x1,x2,-Exact-)}
+//  {(y,y1,-MAY-);(x,x1,-MAY-);(x1,x2,-Exact-)}
 
    return 0;
    // END BLOCK

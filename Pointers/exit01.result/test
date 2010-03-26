@@ -22,7 +22,6 @@ void exit01()
    j = &i;
 //  {(j,i,-Exact-)}
    exit(0);
-//
    i = 2;
    // END BLOCK
 }

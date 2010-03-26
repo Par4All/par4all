@@ -1,17 +1,17 @@
-#include<stdio.h>
 int struct03()
 {
-  struct {
-    int **q;
-    int **p;
-  }m, n;
-  
-  int i=0, j=1, k=2;
-  int *r;
-  r = &k;
-  m.q = &i;
-  m.p = &j;
-  n = m;
-  r = n.p;
-  return 0;
+  struct three {
+    int first;
+    int second;
+  };
+  struct four {
+    struct three un;
+    struct three deux;
+  } x[10];
+  int i = 0;
+
+  for(i=0;i<10;i++) {
+    x[i].un.first = 1;
+    x[i].deux.second = 0;
+  }
 }

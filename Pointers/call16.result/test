@@ -1,0 +1,46 @@
+
+Parsed code for "call16"
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Code for "call16"
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Proper effects for "call16"
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+//               <must be read   >: _a _b _b[_i] _c _c[_i] _i
+//               <must be written>: _a[_i]
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+POINTS TO
+
+//  {(_c,__c_3,-Exact-);(_b,__b_2,-Exact-);(_a,__a_1,-Exact-)}
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+//  {(_a,__a_1,-Exact-);(_b,__b_2,-Exact-);(_c,__c_3,-Exact-)}
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+POINTS TO
+
+//  {(c,_c_6,-Exact-);(b,_b_5,-Exact-);(a,_a_4,-Exact-)}
+void dotprod(int *a, int *b, int *c)
+{
+//  {(a,_a_4,-Exact-);(b,_b_5,-Exact-);(c,_c_6,-Exact-)}
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      call16(i, a, b, c);
+   
+   
+   return;
+}

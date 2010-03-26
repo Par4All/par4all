@@ -1,0 +1,42 @@
+
+POINTS TO
+
+C  {(p,_p_1,-Exact-)}
+void foo(int *p)
+{
+//  {(p,_p_1,-Exact-)}
+   *p = 4;                                                              /*0011*/
+//  {(p,_p_1,-Exact-)}
+   return;                                                              /*0012*/
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+   int *x;                                                              /*0019*/
+   int tab[10];                                                         /*0020*/
+   int *tab2[10];                                                       /*0021*/
+   int tab3[10][10];                                                    /*0022*/
+   int **tab4;                                                          /*0023*/
+   int y;                                                               /*0024*/
+   
+   
+   foo(x);                                                              /*0027*/
+   foo(tab);                                                            /*0028*/
+   foo(tab2[4]);                                                        /*0029*/
+   foo(tab3[5]);                                                        /*0030*/
+   foo(tab4[6]);                                                        /*0031*/
+   foo(&y);                                                             /*0032*/
+   foo(&tab[1]);                                                        /*0033*/
+
+   printf("%d\n", *x);                                                  /*0035*/
+   printf("%d\n", tab[0]);                                              /*0036*/
+   printf("%d\n", tab2[4][0]);                                          /*0037*/
+   printf("%d\n", tab3[5][0]);                                          /*0038*/
+   printf("%d\n", tab4[6][0]);                                          /*0039*/
+   printf("%d\n", y);                                                   /*0040*/
+   printf("%d\n", tab[1]);                                              /*0041*/
+   return 1;                                                            /*0042*/
+}

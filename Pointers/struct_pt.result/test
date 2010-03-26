@@ -12,11 +12,11 @@ int main()
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m
    m = (my_str *) malloc(sizeof(my_str));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: m
-//               <must be written>: m[0][1]
    m->i = 1;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: m
-//               <must be written>: m[0][2]
    m->p = &j;
 //               <must be read   >: m
 //               <must be written>: n
@@ -26,6 +26,7 @@ int main()
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
    // BEGIN BLOCK
@@ -37,14 +38,13 @@ int main()
    int j;
    j = 2;
    m = (my_str *) malloc(sizeof(my_str));
-//  points to = {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANYWHERE*,-MAY-)}
    m->i = 1;
-//  points to = {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANYWHERE*,-MAY-)}
    m->p = &j;
-//  points to = {(m[0][2],j,-Exact-);(m,*ANYWHERE*,-MAY-)}
+//  {(m[0][2],j,-Exact-)}
    n = m;
-//  points to = {(m[0][2],j,-Exact-);(n,*ANYWHERE*,-MAY-);(m,
-//   *ANYWHERE*,-MAY-)}
+//  {(n,j,-Exact-);(m[0][2],j,-Exact-)}
 
    return 0;
    // END BLOCK

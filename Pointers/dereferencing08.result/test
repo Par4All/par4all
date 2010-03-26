@@ -1,0 +1,40 @@
+
+Initial code
+
+int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+int duck2(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+//               <must be written>: zaza
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: size zaza zaza[1]
+//               <must be written>: riri[2]
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+int duck2(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+//               <must be written>: zaza
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+//               <must be read   >: 
+//                                  loulou[3+(6-1-0+1)*(0+(size-1-0+1)
+//                                  *0)] size zaza zaza[1]
+//               <must be written>: riri[2]
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+//               <must be written>: zaza
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: riri[2]
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}

@@ -1,0 +1,18 @@
+
+POINTS TO
+
+C  {}
+void compute()
+{
+   int i, j;
+
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1) {
+         tab1[i][j] = i*j;
+         tab2[i][j] = i*j;
+         tab3[i][j] = i*j;
+      }
+}
+
+POINTS TO
+
