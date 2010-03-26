@@ -539,7 +539,7 @@
 #define LLTOSTR_FUNCTION_NAME           "lltostr"
 #define STRTOLL_FUNCTION_NAME           "strtoll"
 #define STRTOULL_FUNCTION_NAME          "strtoull"
-#define ULLOSTR_FUNCTION_NAME           "ulltostr"
+#define ULLTOSTR_FUNCTION_NAME          "ulltostr"
 
 /* include<assert.h> */
 

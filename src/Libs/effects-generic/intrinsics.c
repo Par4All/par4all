@@ -67,6 +67,7 @@
 /********************************************************* LOCAL FUNCTIONS */
 
 static list no_write_effects(entity e,list args);
+static list safe_c_effects(entity e,list args);
 static list address_expression_effects(entity e,list args);
 static list conditional_effects(entity e,list args);
 static list address_of_effects(entity e,list args);
@@ -772,13 +773,20 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ATOF_FUNCTION_NAME,                             no_write_effects},
   {ATOI_FUNCTION_NAME,                             no_write_effects},
   {ATOL_FUNCTION_NAME,                             no_write_effects},
-  {ATOLL_FUNCTION_NAME,                             no_write_effects},
+  {ATOLL_FUNCTION_NAME,                            no_write_effects},
   {ATOQ_FUNCTION_NAME,                             no_write_effects},
   {BSEARCH_FUNCTION_NAME,                          no_write_effects},
   {CALLOC_FUNCTION_NAME,                           no_write_effects},
   {DIV_FUNCTION_NAME,                              no_write_effects},
   {EXIT_FUNCTION_NAME,                             no_write_effects},
   {FREE_FUNCTION_NAME,                             any_heap_effects},
+  {LLABS_FUNCTION_NAME,                            no_write_effects},
+  {LLDIV_FUNCTION_NAME,                            no_write_effects},
+  {LLTOSTR_FUNCTION_NAME,                          safe_c_effects},
+  {STRTOLL_FUNCTION_NAME,                          safe_c_effects},
+  {STRTOULL_FUNCTION_NAME,                         safe_c_effects},
+  {ULLTOSTR_FUNCTION_NAME,                          no_write_effects},
+
 
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
@@ -936,6 +944,27 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
     lr = generic_proper_effects_of_expressions(args);
     debug(5, "no_write_effects", "end\n");
     return(lr);
+}
+
+
+/**
+   assumes may read and write effects on the objects pointed to by actual arguments
+ */
+static list
+safe_c_effects(entity e __attribute__ ((__unused__)),list args)
+{
+  list lw = NIL, lr = NIL;
+
+  pips_debug(5, "begin\n");
+  lr = generic_proper_effects_of_expressions(args);
+  FOREACH(EXPRESSION, arg, args)
+    {
+      lw = gen_nconc(lw, c_actual_argument_to_may_summary_effects(arg, 'x'));
+    }
+  pips_debug(5, "end\n");
+  lr = gen_nconc(lr, lw);
+  return(lr);
+  
 }
 
 static list
