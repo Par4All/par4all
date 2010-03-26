@@ -1304,29 +1304,29 @@ string external_statement_identification(statement s)
 }
 
 /* Like external_statement_identification(), but with internal
-   information, the hexadecimal address of the statement */
+   information, the hexadecimal address of the statement
+
+   Allocate a new string.
+ */
 string statement_identification(statement s)
 {
-    static char buffer[STATIC_BUFFER_SZ];
+  char * buffer;
     instruction i = statement_instruction(s);
     string instrstring = instruction_identification(i);
     int so = statement_ordering(s);
     entity called = entity_undefined;
-    int nb_char = 0;
 
     if(same_string_p(instrstring, "CALL")) {
 	called = call_function(instruction_call(i));
     }
 
-    nb_char = snprintf(buffer, STATIC_BUFFER_SZ, "%td (%d, %d) at %p: %s %s\n",
-		 statement_number(s),
-		 ORDERING_NUMBER(so),
-		 ORDERING_STATEMENT(so),
-		 s,
-		 instrstring,
-		 entity_undefined_p(called)? "" : module_local_name(called));
-
-    pips_assert ("static buffer overflow, increase the buffer size", nb_char < STATIC_BUFFER_SZ);
+    asprintf(&buffer, "%td (%d, %d) at %p: %s %s\n",
+	     statement_number(s),
+	     ORDERING_NUMBER(so),
+	     ORDERING_STATEMENT(so),
+	     s,
+	     instrstring,
+	     entity_undefined_p(called)? "" : module_local_name(called));
 
     return buffer;
 }

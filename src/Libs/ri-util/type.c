@@ -944,8 +944,10 @@ basic basic_of_any_expression(expression exp, bool apply_p)
  * basic as the expression "exp". Indeed, "exp" will be assigned to
  * a temporary variable, which will have the same declaration as "exp".
  *
- * Does not work if the expression is a reference to a functional entity,
- * as may be the case in a Fortran call.
+ * Does not work if the expression is a reference to a functional
+ * entity, as may be the case in a Fortran call or a C functional
+ * pointer initialization. For C, a pointer to a functional should
+ * be/is returned.
  *
  * WARNING: a new basic object is allocated
  *
