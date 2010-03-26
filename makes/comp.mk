@@ -45,7 +45,7 @@ BISON	= bison
 YFLAGS	= -y
 
 PROTO   = cproto
-PRFLAGS    = -evcf2
+PRFLAGS    = -qevcf2
 
 # A dummy target for the flymake-mode in Emacs:
 check-syntax:
