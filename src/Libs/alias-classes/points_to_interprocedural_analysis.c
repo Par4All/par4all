@@ -58,7 +58,7 @@ set formal_points_to_parameter(cell c)
 	r = cell_reference(c);
 	e = reference_variable(r);
 	fpt = ultimate_type(entity_type(e));
-	if(type_variable_p(fpt)){
+ 	if(type_variable_p(fpt)){
 		/* We ignor dimensions for the being, descriptors are not
 		 * implemented yet...Amira Mensi*/
 		basic fpb = variable_basic(type_variable(fpt));
@@ -83,6 +83,8 @@ set formal_points_to_parameter(cell c)
 		case is_basic_string:
 			break;
 		case is_basic_typedef:
+			break;
+		case is_basic_bit:
 			break;
 		default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(fpb));
 		}
@@ -138,13 +140,17 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
    * in formal_points_to_parameter() */
 	
   type upt = type_to_pointed_type(pt);
-  fprintf(stderr,"ultimate type at pointer_formal_parameter_to_stub_points_to\n ");
-  print_type(upt);
   r = cell_reference(copy_cell(c));
   e = reference_variable(r);
   if(type_variable_p(pt)){
+	  if(array_entity_p(e)){
     /* We ignor dimensions for the being, descriptors are not
      * implemented yet...Amira Mensi*/
+		  ;
+		  /* ultimate_type() returns a wrong type for arrays. For
+		   * example for type int*[10] it returns int*[10] instead of int[10]. */
+	  }
+	  else{
     basic fpb = variable_basic(type_variable(upt));
     switch(basic_tag(fpb)){
     case is_basic_int:{
@@ -177,23 +183,28 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
     }
     case is_basic_derived:
       break;
+	case is_basic_bit:
+      break;
 	case is_basic_string:{
 	  pt_to = create_stub_points_to(c, upt);
       pt_in = set_add_element(pt_in, pt_in,
 			      (void*) pt_to );
       break;
 	}
-    case is_basic_typedef:
+	case is_basic_typedef:{
+		pt_to = create_stub_points_to(c, upt);
+		pt_in = set_add_element(pt_in, pt_in,
+			      (void*) pt_to );
       break;
-	
+	}
     default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(fpb));
     }
-
+	  }
 
   }else if(type_functional_p(upt))
     ;/*we don't know how to handle pointers to functions*/
   else
-    pips_internal_error();
+	  ; //we don't know how to handle other typespips_internal_error();
 
   return pt_in;
 
@@ -240,14 +251,14 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
     functional f = type_functional(t);
     params = functional_parameters(f);
     FOREACH(PARAMETER, p, params){
-      dummy d = parameter_dummy(p);
-      if(dummy_identifier_p(d)){
-	entity e = dummy_identifier(d);
-	reference r = make_reference(e, NIL);
-	cell c = make_cell_reference(r);
-	pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
-      }
-    }
+		dummy d = parameter_dummy(p);
+		if(dummy_identifier_p(d)){
+			entity e = dummy_identifier(d);
+			reference r = make_reference(e, NIL);
+			cell c = make_cell_reference(r);
+			pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
+		}
+	}
   }
   else
     pips_user_warning("The module %s is not a function\n", module_name);

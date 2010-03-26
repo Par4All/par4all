@@ -67,7 +67,7 @@
 
 /****************************************************** STATIC INFORMATION */
 GENERIC_GLOBAL_FUNCTION(printed_points_to_list, statement_points_to)
-points_to_list summary_pts_to = NIL;
+
 /************************************************************* BASIC WORDS */
 /*Already exist in cprettyprint but in mode static. To be removed later.*/
 static bool variable_p(entity e)
@@ -170,29 +170,30 @@ bool print_code_points_to(string module_name,
 		      string file_suffix)
 {
   points_to_list summary_pts_to =
-    db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
+	  db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
   list wl = words_points_to_list(SUMMARY_PT_TO_SUFFIX, summary_pts_to);
   text t, st;
   bool res;
-
- debug_on("POINTS_TO_DEBUG_LEVEL");
- pips_debug(1, "considering module %s \n",
-			module_name);
- set_current_module_entity(local_name_to_top_level_entity(module_name));
-
+  //init_printed_points_to_list();
+  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  debug_on("POINTS_TO_DEBUG_LEVEL");
+  pips_debug(1, "considering module %s \n",
+			 module_name);
+ 
+ 
  /*  FI: just for debugging */
  // check_abstract_locations();
 
- set_proper_rw_effects((statement_effects)
-		       db_get_memory_resource(DBR_PROPER_EFFECTS,
-					      module_name, TRUE));
- set_printed_points_to_list((statement_points_to)
- db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE));
+ /* set_proper_rw_effects((statement_effects) */
+/* 		       db_get_memory_resource(DBR_PROPER_EFFECTS, */
+/* 					      module_name, TRUE)); */
+  set_printed_points_to_list((statement_points_to)
+							 db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE));
  // statement_points_to_consistent_p(get_printed_points_to_list());
- statement_points_to_consistent_p(get_printed_points_to_list());
- set_current_module_statement((statement)
-			      db_get_memory_resource(DBR_CODE,
-						     module_name,
+  statement_points_to_consistent_p(get_printed_points_to_list());
+  set_current_module_statement((statement)
+							   db_get_memory_resource(DBR_CODE,
+													  module_name,
 						     TRUE));
  // FI: should be language neutral...
  st = words_predicate_to_commentary(wl, PIPS_COMMENT_SENTINEL);
@@ -202,9 +203,10 @@ bool print_code_points_to(string module_name,
  MERGE_TEXTS(st, t);
  res= make_text_resource_and_free(module_name, DBR_PRINTED_FILE,
 				file_suffix, st);
-
+ reset_printed_points_to_list();
  reset_current_module_entity();
  reset_current_module_statement();
+ 
  debug_off();
  return TRUE;
 }
