@@ -188,7 +188,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -240,7 +240,7 @@ freia_status freia_03_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -293,7 +293,7 @@ freia_status freia_03_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -345,7 +345,7 @@ freia_status freia_03_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -397,7 +397,7 @@ freia_status freia_03_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -450,7 +450,7 @@ freia_status freia_03_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -500,7 +500,7 @@ freia_status freia_03_helper_0_0_6(freia_data2d * o0, freia_data2d * i0, int32_t
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, NULL);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
 
   return ret;
 }
@@ -553,7 +553,7 @@ freia_status freia_03_helper_0_0_7(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }

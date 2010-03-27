@@ -179,7 +179,7 @@ freia_status freia_06_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -245,7 +245,7 @@ freia_status freia_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -311,7 +311,7 @@ freia_status freia_06_helper_0_2_0(freia_data2d * o0, freia_data2d * i0, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }

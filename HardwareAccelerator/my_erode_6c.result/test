@@ -116,7 +116,7 @@ freia_status my_erode_6c_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int3
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, i0, NULL);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
 
   return ret;
 }

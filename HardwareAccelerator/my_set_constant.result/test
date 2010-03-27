@@ -107,7 +107,7 @@ freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, o0, NULL, NULL, NULL);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, NULL, NULL);
 
   return ret;
 }

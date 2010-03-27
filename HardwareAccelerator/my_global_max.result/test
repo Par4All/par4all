@@ -86,7 +86,7 @@ freia_status my_global_max_helper_0_0_0(freia_data2d * i0, int32_t * red0)
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(param, NULL, NULL, i0, NULL);
+  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, NULL);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);
