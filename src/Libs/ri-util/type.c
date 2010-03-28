@@ -2549,6 +2549,12 @@ type call_to_functional_type(call c, bool ultimate_p)
   return rt;
 }
 
+/* Recursive number of fields in a data structure...
+ *
+ * union and probably enum are not taken into account.
+ *
+ * FI: I guess enum should be added
+ */
 int number_of_fields(type t)
 {
   int n = 1;
@@ -2572,6 +2578,46 @@ int number_of_fields(type t)
       entity fe = ENTITY(CAR(ce));
       type ft = entity_type(fe);
       n += number_of_fields(ft);
+    }
+  }
+  else
+    pips_internal_error("Illegal type argument\n");
+
+  return n;
+}
+
+/* Same as above, but arrays in struct are taken into account */
+int number_of_items(type t)
+{
+  int n = 1;
+  type ut = ultimate_type(t);
+
+  if(type_variable_p(ut)) {
+    variable uv = type_variable(ut);
+    basic ub = variable_basic(uv);
+    int ne;
+    bool ok = NumberOfElements(ub, variable_dimensions(uv), &ne);
+
+    if(basic_derived_p(ub)) {
+      entity de = basic_derived(ub);
+      type dt = entity_type(de);
+      n = number_of_fields(dt);
+    }
+
+    if(ok)
+      n = n*ne;
+    else
+      pips_internal_error("Unexpected use of this function");
+  }
+  else if(type_struct_p(t)) {
+    list el = type_struct(t);
+    list ce = list_undefined;
+
+    n = 0;
+    for(ce = el; !ENDP(ce); POP(ce)) {
+      entity fe = ENTITY(CAR(ce));
+      type ft = entity_type(fe);
+      n += number_of_items(ft);
     }
   }
   else
