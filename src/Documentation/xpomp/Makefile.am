@@ -18,7 +18,6 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-docdir=$(datadir)/doc
 dist_noinst_DATA=xpomp_manual.tex xPOMP_window_explained.eps
 doc_DATA=xpomp_manual.pdf
 include $(top_srcdir)/makes/latex.mk

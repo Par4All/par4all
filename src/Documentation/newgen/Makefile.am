@@ -153,9 +153,10 @@ F_pdf=ri.pdf \
 	points_to_private.pdf \
 	freia_spoc_private.pdf
 
-docdir=$(datadir)/doc
+if WITH_DOC
 dist_noinst_DATA=$(F_tex) unstructured.idraw newgen_domain.sty
 doc_DATA=$(F_pdf)
+endif
 
 dist_noinst_SCRIPTS=remove-latex-comments
 noinst_LTLIBRARIES=libnewgenaux.la
