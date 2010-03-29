@@ -2856,11 +2856,11 @@ set points_to_sequence(sequence seq, set pt_in, bool store)
 
 /* compute the points-to set for an intrinsic call */
 set points_to_intrinsic(statement s,
-						call c,
-						entity e,
-						list pc,
-						set pt_in,
-						list effects)
+			call c,
+			entity e,
+			list pc,
+			set pt_in,
+			list el)
 {
   set pt_out = set_generic_make(set_private,
 				points_to_equal_p, points_to_rank);
@@ -2872,10 +2872,10 @@ set points_to_intrinsic(statement s,
 
   /* Recursive descent on subexpressions for cases such as "p=q=t=u;" */
   pt_cur = set_assign(pt_cur, pt_in);
-   FOREACH(EXPRESSION, ex, pc) {
-	  pt_cur = set_union(pt_cur, pt_cur, points_to_expression(ex, pt_cur, TRUE));
+  FOREACH(EXPRESSION, ex, pc) {
+    pt_cur = set_union(pt_cur, pt_cur, points_to_expression(ex, pt_cur, TRUE));
   }
-  
+
   if(ENTITY_ASSIGN_P(e)){
 	  lhs = EXPRESSION(CAR(pc));
 	  expression rhs = EXPRESSION(CAR(CDR(pc)));
@@ -2885,7 +2885,7 @@ set points_to_intrinsic(statement s,
 	 broken pointers towards default sinks.
 	 pt_out = points_to_filter_with_expression_effects(e, pt_cur);
       */
-		pt_out = points_to_filter_with_expression_effects(pt_cur, exp);
+      pt_out = points_to_filter_with_effects(pt_cur, exp);
     }
   }
   else if(ENTITY_PLUS_UPDATE_P(e) || ENTITY_MINUS_UPDATE_P(e)
@@ -2898,17 +2898,17 @@ set points_to_intrinsic(statement s,
        main effect is an effect on a pointer, occurences of this
        pointer must be removed from pt_cur to build pt_out.
 	*/
-	  
+
 	  lhs = EXPRESSION(CAR(pc));
 	  pt_cur = set_union(pt_cur, pt_cur, points_to_expression(lhs, pt_cur, TRUE));
-	  pt_out = points_to_filter_with_expression_effects(pt_cur, effects);
+	  pt_out = points_to_filter_with_effects(pt_cur, el);
   }
   else if(ENTITY_POST_INCREMENT_P(e) || ENTITY_POST_DECREMENT_P(e)
 	  || ENTITY_PRE_INCREMENT_P(e) || ENTITY_PRE_DECREMENT_P(e)) {
     /* same */
 	  lhs = EXPRESSION(CAR(pc));
 	  pt_cur = set_union(pt_cur, pt_cur, points_to_expression(lhs, pt_cur, TRUE));
-	  pt_out = points_to_filter_with_expression_effects(pt_cur, effects);
+	  pt_out = points_to_filter_with_effects(pt_cur, el);
   }
   else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e)||ENTITY_C_RETURN_P(e)) {
     /* The call is never returned from. No information is available
@@ -2928,6 +2928,7 @@ set points_to_intrinsic(statement s,
 	  //pt_out =
 	  //set_assign(pt_out,points_to_filter_with_expression_effects(pt_cur,
 	  //effects));
+    pt_out = points_to_filter_with_effects(pt_cur, el);
 	  ;
   }
   /* if pt_out != pt_cur, do not forget to free pt_cur... */
@@ -2935,23 +2936,71 @@ set points_to_intrinsic(statement s,
   return pt_out;
 }
 
-
-set points_to_filter_with_expression_effects(set pts_to, list effects)
+/* input:
+ *  a set of points-to pts
+ *  a list of effects el
+ *
+ * output
+ *  a updated set of points-to pts (side effects)
+ *
+ * Any pointer written in el does not point to its old target anymore
+ * but points to any memory location. OK, this is pretty bad, but it
+ * always is correct.
+ */
+set points_to_filter_with_effects(set pts, list el)
 {
-	points_to pt_to = points_to_undefined;
-  
-	SET_FOREACH(points_to, i, pts_to){
-		FOREACH(EFFECT, e, effects){
-			if(effect_pointer_type_p(e)){
-				pts_to = set_del_element(pts_to, pts_to, (void*)i);
-				pt_to = points_to_anywhere(points_to_source(i));
-				pts_to = set_add_element(pts_to, pts_to,
-										  (void*) pt_to );
-				
-			}
-		}
+  FOREACH(EFFECT, e, el){
+    if(effect_pointer_type_p(e) && effect_write_p(e)){
+      cell c = effect_cell(e);
+      /* The problem with the future extension to GAP is hidden
+	 within cell_to_reference */
+      reference r = cell_to_reference(c);
+
+      if(ENDP(reference_indices(r))) {
+	/* Simple case: a scalar pointer is written */
+	entity p = reference_variable(r);
+	points_to npt = points_to_undefined;
+
+	/* Remove previous targets */
+	SET_FOREACH(points_to, pt, pts){
+	  cell ptc = points_to_source(pt);
+	  reference ptr = cell_to_reference(ptc);
+	  entity sp = reference_variable(ptr);
+
+	  if(sp==p)
+	    pts = set_del_element(pts, pts, (void*)pt);
 	}
-	return pts_to;
+
+	/* add the anywhere points-to*/
+	npt = points_to_anywhere(copy_cell(c));
+	pts = set_add_element(pts, pts, (void*) npt);
+      }
+      else {
+	/* Complex case: is the reference usable with the current pts?
+	 * If it uses an indirection, check that the indirection is
+	 * not thru nowhere, not thru NULL, and maybe not thru
+	 * anywhere...
+	 */
+	points_to npt = points_to_undefined;
+
+	/* Remove previous targets */
+	SET_FOREACH(points_to, pt, pts){
+	  cell ptc = points_to_source(pt);
+	  reference ptr = cell_to_reference(ptc);
+
+	  if(reference_equal_p(r, ptr))
+	    pts = set_del_element(pts, pts, (void*)pt);
+	}
+
+	/* add the anywhere points-to*/
+	npt = points_to_anywhere(copy_cell(c));
+	pts = set_add_element(pts, pts, (void*) npt);
+	//pips_internal_error("Complex pointer write effect."
+	//" Not implemented yet\n");
+      }
+    }
+  }
+  return pts;
 }
 
 
@@ -3103,7 +3152,7 @@ set points_to_call(statement s,
 				points_to_equal_p, points_to_rank);
   set_methods_for_proper_simple_effects();
   set_methods_for_simple_pointer_effects();
-  list effects = call_to_proper_effects(c);
+  list el = call_to_proper_effects(c);
   generic_effects_reset_all_methods();
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_code:
@@ -3124,7 +3173,7 @@ set points_to_call(statement s,
     break;
   case is_value_intrinsic:{
     pips_debug(5, "intrinsic function %s\n", entity_name(e));
-	pt_out = set_assign(pt_out, points_to_intrinsic(s, c, e, pc, pt_in, effects));
+	pt_out = set_assign(pt_out, points_to_intrinsic(s, c, e, pc, pt_in, el));
     break;
   }
   default:
@@ -3139,8 +3188,13 @@ set points_to_call(statement s,
  */
 list call_to_proper_effects(call c)
 {
-	expression e = call_to_expression(c);
-	return expression_to_proper_effects(e);
+  expression e = call_to_expression(c);
+  list el = expression_to_proper_effects(e);
+
+  syntax_call(expression_syntax(e)) = call_undefined;
+  free_expression(e);
+
+  return el;
 }
 
 
@@ -3332,18 +3386,18 @@ bool points_to_analysis(char * module_name)
   pt_in = set_assign_list(pt_in, pts_to_list);
   /* Compute the points-to relations using the summary_points_to as input.*/
   points_to_statement(module_stat, pt_in);
-	 
+
   statement_points_to_consistent_p(get_pt_to_list());
   DB_PUT_MEMORY_RESOURCE
     (DBR_POINTS_TO_LIST, module_name, get_pt_to_list());
 
   reset_pt_to_list();
-  
+
   reset_current_module_entity();
   reset_current_module_statement();
  /*  reset_proper_rw_effects();   */
 /*   reset_expr_prw_effects(); */
-  
+
   debug_off();
   /* (*effects_computation_reset_func)(module_name); */
  /*  generic_effects_reset_all_methods(); */

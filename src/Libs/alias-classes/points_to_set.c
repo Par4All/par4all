@@ -115,16 +115,14 @@ _uint points_to_rank( const void *  vpt, size_t size)
 
 points_to points_to_anywhere(cell source)
 {
-	points_to pt_to = points_to_undefined;
-	cell sink = cell_undefined;
-	approximation rel = make_approximation_exact();
-	entity e = entity_all_locations();
-	reference r = make_reference(e, NIL);
-	sink = make_cell_reference(r);
-	pt_to = make_points_to(source, sink, rel,
-						   make_descriptor_none());
-	return pt_to;
-
+  points_to pt_to = points_to_undefined;
+  cell sink = cell_undefined;
+  approximation rel = make_approximation_may();
+  entity e = entity_all_locations();
+  reference r = make_reference(e, NIL);
+  sink = make_cell_reference(r);
+  pt_to = make_points_to(source, sink, rel, make_descriptor_none());
+  return pt_to;
 }
 
 
