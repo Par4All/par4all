@@ -1,8 +1,8 @@
-delete struct_pt
+delete null_pointer02
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create struct_pt struct_pt.c
+create null_pointer02 null_pointer02.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -32,6 +32,6 @@ display PRINTED_FILE[main]
 
 
 close
-delete struct_pt
+delete null_pointer02
 quit
 

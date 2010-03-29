@@ -4,8 +4,9 @@ void call06(int r, int m, int *x)
 {
   int j;
 
-    for(j=0; j<m;j++)
-      x[j] = 10*r+j;
+  for(j=0; j<m;j++)
+    x[j] = 10*r+j;
+  return;
 }
 
 main()
@@ -17,12 +18,5 @@ main()
 
   for(i=0;i<d1;i++)
     call06(i, d2, &(y[i][0]));
-
-  /*
-  for(i=0;i<d1;i++) {
-    for(j=0;j<d2;j++)
-      printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-    printf("\n");
-  }
-  */
+  exit(0);
 }
