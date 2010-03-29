@@ -120,14 +120,15 @@ bool SizeOfArray(entity e, int * s)
 
 	  /* Is it a call to the BRACE_INTRINSIC operator? */
 	  if(ENTITY_BRACE_INTRINSIC_P(f)) {
-	    /* This is too simple unfortunately */
+	    /* This is too simple unfortunately: OK, but why? which
+	       test case? */
 	    /* ne = gen_length(args); */
 	    int ni = number_of_initial_values(args);
 	    //int nf = number_of_fields(et);
 	    int nf;
 
-	    if(type_variable_p(et)) {
-	      variable ev = type_variable(et);
+	    if(type_variable_p(uet)) {
+	      variable ev = type_variable(uet);
 	      basic eb = variable_basic(ev);
 	      if(basic_derived_p(eb)) {
 		entity de = basic_derived(eb);
@@ -139,8 +140,10 @@ bool SizeOfArray(entity e, int * s)
 	    ne = ni/nf;
 	    if(nf*ne!=ni) {
 	      /* Should be a call to CParserError()... */
-	      pips_user_error("Number of initialization values (%d) incompatible"
-			      " with number of type fields (%d)\n", ni, nf);
+	      //pips_user_error("Number of initialization values (%d) incompatible"
+	      //	      " with number of type fields (%d)\n", ni, nf);
+	      // let's assume the source code is correct...
+	      ne = gen_length(args);
 	    }
 	    ok = TRUE;
 	  }
