@@ -4,8 +4,8 @@ Parsed code for "call01"
 void call01(int *pi, tf_t *q)
 {
    *pi = 1;
-   /* pi is passed by value: pi++ does not generate a summary effect
-        for call01 */
+/* pi is passed by value: pi++ does not generate a summary effect
+     for call01 */
    pi++;
    q->one = 1;
    (q->two)[4] = 2;
@@ -16,8 +16,8 @@ Code for "call01"
 void call01(int *pi, tf_t *q)
 {
    *pi = 1;
-   /* pi is passed by value: pi++ does not generate a summary effect
-        for call01 */
+/* pi is passed by value: pi++ does not generate a summary effect
+     for call01 */
    pi++;
    q->one = 1;
    (q->two)[4] = 2;
@@ -32,8 +32,8 @@ void call01(int *pi, tf_t *q)
    *pi = 1;
 //               <must be read   >: pi
 //               <must be written>: pi
-   /* pi is passed by value: pi++ does not generate a summary effect
-        for call01 */
+/* pi is passed by value: pi++ does not generate a summary effect
+     for call01 */
    pi++;
 //               <must be read   >: q
 //               <must be written>: q[0][1]
@@ -54,8 +54,8 @@ void call01(int *pi, tf_t *q)
    *pi = 1;
 //               <must be read   >: pi
 //               <must be written>: pi
-   /* pi is passed by value: pi++ does not generate a summary effect
-        for call01 */
+/* pi is passed by value: pi++ does not generate a summary effect
+     for call01 */
    pi++;
 //               <must be read   >: q
 //               <must be written>: q[0][1]
@@ -84,12 +84,12 @@ void call01(int *pi, tf_t *q)
 //  {(pi,_pi_1,-Exact-)}
    *pi = 1;
 //  {(pi,_pi_1,-Exact-)}
-   /* pi is passed by value: pi++ does not generate a summary effect
-        for call01 */
+/* pi is passed by value: pi++ does not generate a summary effect
+     for call01 */
    pi++;
-//  {(pi,*ANYWHERE*,-Exact-)}
+//  {(pi,*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
    q->one = 1;
-//  {(pi,*ANYWHERE*,-Exact-)}
+//  {(pi,*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
    (q->two)[4] = 2;
 }
 

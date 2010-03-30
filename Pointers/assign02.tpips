@@ -25,7 +25,8 @@ display PRINTED_FILE[make_s]
 echo
 echo POINTS TO for "assign02"
 echo
-#display PRINTED_FILE[assign02]
+
+display PRINTED_FILE[assign02]
 
 
 close
