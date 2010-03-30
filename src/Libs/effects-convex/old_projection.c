@@ -543,7 +543,7 @@ list regions_dynamic_elim(list l_reg)
 	
 	ifdebug(4)
 	  {
-	    pips_debug(4, "current region: \n%s\n", region_to_string(reg));
+	    pips_debug_effect(4, "current region: \n", reg);
 	  }
 	
 	/* If the reference is a common variable (ie. with storage ram but
@@ -570,7 +570,10 @@ list regions_dynamic_elim(list l_reg)
 	    case is_storage_formal:
 	      break;
 	    case is_storage_rom:
-	      pips_internal_error("bad tag for %s (rom)\n", entity_name(reg_ent));
+	      if(!entity_special_area_p(reg_ent) && !anywhere_effect_p(reg))
+		ignore_this_region = TRUE;
+	      break;
+	      /* pips_internal_error("bad tag for %s (rom)\n", entity_name(reg_ent)); */
 	    default:
 	      pips_internal_error("case default reached\n");
 	    }
@@ -582,14 +585,14 @@ list regions_dynamic_elim(list l_reg)
 	    region_dynamic_var_elim(r_res);
 	    ifdebug(4)
 	      {
-		pips_debug(4, "region kept : \n\t %s\n", region_to_string(r_res));
+		pips_debug_effect(4, "region kept : \n", r_res);
 	      }
             l_res = region_add_to_regions(r_res,l_res);
 	  }
 	else 
 	  ifdebug(4)
 	    {
-	      pips_debug(4, "region removed : \n\t %s\n", region_to_string(reg));
+	      pips_debug_effect(4, "region removed : \n", reg);
 	    }
       },
       l_reg);

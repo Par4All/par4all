@@ -1527,6 +1527,7 @@ static list any_heap_effects(entity e, list args)
   list lep = NIL;
   entity malloc_entity = entity_undefined;
   reference ref;
+  effect malloc_effect;
 
   pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
 
@@ -1548,12 +1549,15 @@ static list any_heap_effects(entity e, list args)
   ifdebug(8) print_reference(ref);
 
   /* Read first. */
-    le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
+  malloc_effect = (*reference_to_effect_func)(ref, is_action_read, false); 
+
+  le = CONS(EFFECT, malloc_effect, le);
 
   /* Write back. */
-  le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
+  malloc_effect = (*reference_to_effect_func)(copy_reference(ref), is_action_write, false); 
+  le = CONS(EFFECT, malloc_effect, le);
 
-  pips_debug(5, "end\n");
+  pips_debug_effects(5, "output effects :\n", le);
 
   return(le);
 }

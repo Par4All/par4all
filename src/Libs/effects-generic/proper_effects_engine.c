@@ -153,6 +153,184 @@ list generic_proper_effects_of_range(range r)
     return(le);
 }
 
+
+static list generic_r_proper_effects_of_derived_reference(effect input_eff, type input_type)
+{
+  basic b = variable_basic(type_variable(input_type));
+  list l_dim =  variable_dimensions(type_variable(input_type));
+  list le = NIL;
+  int current_rank = 1;
+
+  pips_debug_effect(8, "input effects:\n", input_eff);
+
+  pips_assert("input entity type basic must be derived", basic_derived_p(b));
+
+  // we first add as many unbounded indices as there are dimensions in the type.
+  for(int i=0; i< (int) gen_length(l_dim); i++)
+    (*effect_add_expression_dimension_func)(input_eff, make_unbounded_expression());   
+  
+  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL))); 
+  list l_fields = type_fields(entity_type(basic_derived(b)));
+  
+  FOREACH(ENTITY, f, l_fields)
+    {
+      type current_type = basic_concrete_type(entity_type(f));
+      basic current_basic = variable_basic(type_variable(current_type));
+      effect current_eff = (*effect_dup_func)(input_eff);
+
+      // we add the field index
+      effect_add_field_dimension(current_eff, current_rank);
+  
+      switch (basic_tag(current_basic))
+	{
+	case is_basic_derived:
+	  pips_debug(8, "derived case : recursing\n");
+	  le = gen_nconc(generic_r_proper_effects_of_derived_reference(current_eff, current_type),le);
+	  effect_free(current_eff);
+	  break;
+	case is_basic_typedef:
+	  // should not happen
+	  pips_internal_error("typedef case should not be possible here! \n");
+	  break;
+	default:
+	  {
+	    // we have reached a leaf : we just have to add as many unbounded indices as there are dimensions in the field type.
+	    list l_dim =  variable_dimensions(type_variable(current_type));
+	    pips_debug(8, "default case\n");
+	    for(int i=0; i< (int) gen_length(l_dim); i++)
+	      (*effect_add_expression_dimension_func)(current_eff, make_unbounded_expression());   
+	    
+	    le = gen_nconc(CONS(EFFECT, current_eff, NIL), le);
+	  }
+	}
+      current_rank++;
+    }
+  pips_debug_effects(8, "output effects:\n", le);
+
+  return le;
+}
+
+list generic_proper_effects_of_derived_reference(reference ref, bool write_p)
+{
+  type t = reference_to_type(ref);
+  basic b = variable_basic(type_variable(t));
+  list le = NIL;
+
+  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL)));
+ 
+  /* should'nt it be something more direct here ? ?*/
+  effect eff = (*reference_to_effect_func)
+    (ref, write_p? is_action_write : is_action_read, true);
+  
+  if (type_enum_p(entity_type(basic_derived(b))))
+    le = CONS(EFFECT, eff, NIL);
+  else
+    {
+      le = generic_r_proper_effects_of_derived_reference(eff, t);
+      le = gen_nreverse(le);
+    }
+  
+  return le;
+}
+
+list generic_intermediary_proper_effects_of_reference(reference ref)
+{
+  list le = NIL;
+  entity ent = reference_variable(ref);
+  type t = basic_concrete_type(entity_type(ent));
+  list l_ind_orig = reference_indices(ref);
+  list l_ind = l_ind_orig;
+  
+  pips_debug(7, "begin \n");
+  /* there should be a while here, I guess. Well work for tomorrow */
+
+  if (type_variable_p(t))
+    {
+      variable v = type_variable(t);
+      basic b = variable_basic(v);
+
+      pips_debug(4, "reference %s to entity %s of basic %s and"
+		 " number of dimensions %d.\n",
+		 words_to_string(words_reference(ref,NIL)),
+		 entity_name(ent),
+		 basic_to_string(variable_basic(v)),
+		 (int) gen_length(variable_dimensions(v)));
+
+      if (basic_pointer_p(b))
+	{
+	  reference read_ref = make_reference(ent, NIL);
+	  list l_dim_tmp = variable_dimensions(v);
+
+	  pips_debug(8, "it's a pointer type. l_dim_tmp = %d, "
+		     "l_inds_tmp = %d\n",
+		     (int) gen_length(l_dim_tmp),
+		     (int) gen_length(l_ind));
+
+	  /* while there is non partially subscripted references to pointers */
+	  while((basic_pointer_p(variable_basic(v)))
+		&& gen_length(l_dim_tmp) < gen_length(l_ind) )
+	    {
+	      effect eff_read;
+
+	      /* first we add the indices corresponding to the current
+		 array dimensions if any
+	      */
+
+	      pips_debug(8, "l_dim_tmp = %d, l_inds_tmp = %d\n",
+			 (int) gen_length(l_dim_tmp),
+			 (int) gen_length(l_ind));
+
+	      while (!ENDP(l_dim_tmp))
+		{
+		  reference_indices(read_ref)=
+		    gen_nconc(reference_indices(read_ref),
+			      CONS(EXPRESSION, copy_expression(EXPRESSION(CAR(l_ind))),
+				   NIL));
+		  POP(l_dim_tmp);
+		  POP(l_ind);
+		}
+
+	      pips_debug(4, "adding a read effect on reference %s\n",
+			 words_to_string(words_reference(read_ref,NIL)));
+
+	      eff_read = (*reference_to_effect_func)(copy_reference(read_ref),
+						     is_action_read,
+						     false);
+	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
+	      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
+	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
+
+	      v = type_variable(basic_pointer(variable_basic(v)));
+	      l_dim_tmp = variable_dimensions(v);
+
+	      /* if there are remaining indices, there is necessarily an index
+		 to reach the pointed dimension */
+	      if(!ENDP(l_ind))
+		{
+		  pips_debug(4, "adding an index for pointer dimension \n");
+		  reference_indices(read_ref)=
+		    gen_nconc(reference_indices(read_ref),
+			      CONS(EXPRESSION,
+				   copy_expression(EXPRESSION(CAR(l_ind))),
+				   NIL));
+		  POP(l_ind);
+		}
+	    }
+	  free_reference(read_ref);
+	}
+  
+    }  /* if (type_variable_p(t)) */
+  gen_nreverse(le);
+  le = gen_nconc(generic_proper_effects_of_expressions(l_ind), le);
+  free_type(t);
+
+  pips_debug_effects(7, "end with \n", le);
+  return le;
+}
+
+
+
+
 /**
  @param ref a reference.
  @param *pme : a pointer on the main effect corresponding to the reference.
@@ -327,41 +505,48 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
 
   pips_debug(3, "begin with reference %s\n",
 	     words_to_string(words_reference(ref,NIL)));
-  /* structure fields are referenced, not called, altough they are constant... */
-  if(!entity_field_p(v))
+  pips_assert("no effect on entity fields\n",!entity_field_p(v));
+  transformer context;
+
+  if (effects_private_current_context_empty_p())
+    context = transformer_undefined;
+  else {
+    context = effects_private_current_context_head();
+  }
+
+  if (! (*empty_context_test)(context))
     {
-      transformer context;
-
-    /* CA: lazy, because in the in region backward translation of formal
-     * parameters that are not simple references on the caller side,
-     * this stuff may be called without proper context.
-     */
-      if (effects_private_current_context_empty_p())
-	context = transformer_undefined;
-      else {
-	context = effects_private_current_context_head();
-      }
-
-      if (! (*empty_context_test)(context))
+      effect eff;
+      type ref_type = reference_to_type(ref);
+      if (type_variable_p(ref_type))
 	{
-	  effect eff;
-
-	  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
-	  le =  generic_p_proper_effect_of_reference(ref, &eff, written_p,
-						     FALSE);
-	  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
-
-	  if (!effect_undefined_p(eff))
+	  variable ref_type_var = type_variable(ref_type);
+	  if (basic_derived_p(variable_basic(ref_type_var)) && ENDP(variable_dimensions(ref_type_var)))
 	    {
-	      le = gen_nconc(le, CONS(EFFECT, eff, NIL));
+	      list lint = generic_intermediary_proper_effects_of_reference(ref);
+	      le = generic_proper_effects_of_derived_reference(ref, written_p);
+	      le = gen_nconc(lint, le);
 	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 	    }
-
-	  (*effects_precondition_composition_op)(le, context);
+	  else
+	    {
+	      le =  generic_p_proper_effect_of_reference(ref, &eff, written_p,
+							 FALSE);
+	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
+	      
+	      if (!effect_undefined_p(eff))
+		{
+		  le = gen_nconc(le, CONS(EFFECT, eff, NIL));
+		  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
+		}
+	    }
 	}
-
-      pips_debug(3, "end\n");
+	else
+	  pips_internal_error("case not handled yet \n");
+      (*effects_precondition_composition_op)(le, context);
     }
+
+  pips_debug(3, "end\n");
   return(le);
 }
 
@@ -897,22 +1082,36 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 	      context = effects_private_current_context_head();
 
 	    type addexp_t = expression_to_type(addexp);
-
 		  
 	    /* we add the read effect if it's not an array name
 	    */
-	    if (type_variable_p(addexp_t) && 
-		ENDP(variable_dimensions(type_variable(addexp_t))))
+	    if (type_variable_p(addexp_t))
 	      {
-		pips_debug(8, "adding main read effect \n"); 
-		le = CONS(EFFECT, e, le);
+		variable addexp_tv = type_variable(addexp_t);
+		if (ENDP(variable_dimensions(addexp_tv)))
+		  {
+		    basic addexp_tvb = variable_basic(addexp_tv);
+		    pips_debug(8, "adding main read effect \n"); 
+		    if (basic_derived_p(addexp_tvb) && !(type_enum_p(entity_type(basic_derived(addexp_tvb)))))
+		      {
+			list l_tmp = generic_r_proper_effects_of_derived_reference(e, addexp_t);
+			le = gen_nconc(le, l_tmp);
+		      }		    
+		      else
+			le = CONS(EFFECT, e, le);
+		  }
+		else
+		  {
+		    pips_debug(8, "main read effect is on array name : discarded\n");
+		    free_effect(e);
+		  }
 	      }
 	    else
 	      {
-		pips_debug(8, "main read effect is on array name : discarded\n");
-		free_effect(e);
+		pips_internal_error("case not handled yet \n");
 	      }
 
+	    free_type(addexp_t);
 	    if (!transformer_undefined_p(context))
 	      (*effects_precondition_composition_op)(le, context);
 	    
@@ -1204,6 +1403,35 @@ generic_proper_effects_of_external(entity func, list args)
     }
     return le;  
 }
+
+list generic_proper_effects_of_c_function_call_argument(expression arg)
+{
+  list le = NIL;
+  type arg_t = type_undefined;
+  pips_debug(3, "begin for actual argument: %s\n", words_to_string(words_expression(arg, NIL)));
+
+  arg_t = expression_to_type(arg);
+
+  /* If it's a sub-array, there are only intermediate effects */
+  if(type_variable_p(arg_t) && !ENDP(variable_dimensions(type_variable(arg_t))))
+    {
+      effect eff = effect_undefined;
+      /* I'm not sure it is OK for all type of arguments, in particular function calls */
+      le = generic_proper_effects_of_complex_address_expression(arg, &eff, false);
+      if (!effect_undefined_p(eff))
+	free_effect(eff);
+    }
+  else
+    {
+      le = generic_proper_effects_of_expression(arg);
+    }
+  
+
+  pips_debug_effects(3, "ouput effects: \n", le);
+  
+  return le;
+}
+
 
 /** 
 
@@ -1699,6 +1927,7 @@ static list generic_proper_effects_of_declaration(entity decl)
 	      l_tmp =  generic_effect_generate_all_accessible_paths_effects(decl_eff, decl_t, is_action_write);
 	    }
 	  else
+	    // make sure the make_reference does not create a memory leak
 	    l_tmp = generic_proper_effects_of_reference(make_reference(decl, 
 								       NIL),	
 							true);

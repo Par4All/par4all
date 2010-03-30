@@ -901,6 +901,7 @@ list type_fields(type t)
       break;
     case is_type_enum:
       l_res = type_enum(t);
+      break;
     default:
       pips_internal_error("type_fields improperly called\n");
     }
@@ -1534,18 +1535,25 @@ bool effect_reference_contains_pointer_dimension_p(reference ref, bool *exact_p)
  */
 bool effect_reference_dereferencing_p(reference ref, bool * exact_p)
 {
-  entity ent = reference_variable(ref);
   list l_ind = reference_indices(ref);
   bool result;
   int p_rank;
 
-  p_rank = effect_reference_first_pointer_dimension_rank(ref, exact_p);
+  if (entity_all_locations_p(reference_variable(ref)))
+    {
+      result = true;
+      *exact_p = false;
+    }
+  else
+    {
+      p_rank = effect_reference_first_pointer_dimension_rank(ref, exact_p);
   
 
-  if (p_rank == -1)
-    result = false;
-  else
-    result = p_rank < (int) gen_length(l_ind);
+      if (p_rank == -1)
+	result = false;
+      else
+	result = p_rank < (int) gen_length(l_ind);
+    }
   return result;
 }
 
@@ -1557,49 +1565,68 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 {
   bool read_dereferencing_p = false;
   bool write_dereferencing_p = false;
-  list l = l_pointer_eff;
+  list l = l_pointer_eff, le = NIL, lkeep = NIL;
 
   pips_debug_effects(8, "input effects : \n", l_pointer_eff);
 
-  while (!ENDP(l) && !(read_dereferencing_p && write_dereferencing_p)) 
+  while (!ENDP(l)) 
     {
       bool exact_p;
       effect eff = EFFECT(CAR(l));
       reference ref = effect_any_reference(eff);
-
-      if (effect_reference_dereferencing_p(ref, &exact_p))
+      
+      if (io_effect_p(eff)|| malloc_effect_p(eff))
 	{
-	  if (effect_read_p(eff)) read_dereferencing_p = true;
-	  else write_dereferencing_p = true;
+	  lkeep = CONS(EFFECT, eff, lkeep);
 	}
+      else 
+	if (!(read_dereferencing_p && write_dereferencing_p) && effect_reference_dereferencing_p(ref, &exact_p))
+	  {
+	    if (effect_read_p(eff)) read_dereferencing_p = true;
+	    else write_dereferencing_p = true;
+	  }
       POP(l);      
     }
-  l = NIL;
 	
+  lkeep = gen_nreverse(lkeep);
+
   if (write_dereferencing_p)
-    l = CONS(EFFECT, make_anywhere_effect(is_action_write), NIL);
+    le = CONS(EFFECT, make_anywhere_effect(is_action_write), le);
   if (read_dereferencing_p)
-    l = gen_nconc(l,CONS(EFFECT, make_anywhere_effect(is_action_read), NIL)); 
+    le = CONS(EFFECT, make_anywhere_effect(is_action_read), le); 
     
   if (!write_dereferencing_p)
     if (!read_dereferencing_p)
-      l = effects_dup(l_pointer_eff);
+      {
+	le = effects_dup(l_pointer_eff);
+      }
     else
       {
 	list l_write = effects_write_effects(l_pointer_eff);
-	l = gen_nconc(l, effects_dup(l_write));
+	list lkeep_read = effects_read_effects(lkeep);
+	le = gen_nconc(le, effects_dup(lkeep_read));
+	le = gen_nconc(le, effects_dup(l_write));
 	gen_free_list(l_write);
+	gen_free_list(lkeep_read);
       }
   else
     {
       if (!read_dereferencing_p)
 	{
 	  list l_read = effects_read_effects(l_pointer_eff);
-	  l = gen_nconc(l, effects_dup(l_read));
+	  list lkeep_write = effects_write_effects(lkeep);
+	  le = gen_nconc(le, effects_dup(lkeep_write));
+	  le = gen_nconc(le, effects_dup(l_read));
 	  gen_free_list(l_read);
+	  gen_free_list(lkeep_write);
+	}
+      else
+	{
+	  le = gen_nconc(le, effects_dup(lkeep));
 	}
     }
-  pips_debug_effects(8, "ouput effects : \n", l);
+  gen_free_list(lkeep);
+  pips_debug_effects(8, "ouput effects : \n", le);
 	
-  return l;
+  return le;
 }

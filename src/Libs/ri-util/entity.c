@@ -533,6 +533,17 @@ bool entity_subroutine_p(entity e)
     !entity_function_p(e);
 }
 
+bool entity_array_p(entity e)
+{
+  if (entity_variable_p(e))
+    {
+      variable var = type_variable(entity_type(e));
+      if (!ENDP(variable_dimensions(var)))  return TRUE;
+    }
+  return FALSE;
+}
+
+
 /* e is the field of a structure */
 bool entity_field_p(entity e)
 {
