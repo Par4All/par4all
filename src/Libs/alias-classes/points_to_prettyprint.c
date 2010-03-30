@@ -149,7 +149,9 @@ text text_points_to(entity module,int margin, statement s)
     (words_points_to_list(PT_TO_DECO,
 			  load_printed_points_to_list(s)),
      PIPS_COMMENT_SENTINEL)
-    :make_text(NIL);
+    :words_predicate_to_commentary
+    (CONS(STRING,PT_TO_DECO, CONS(STRING, strdup("{}"), NIL)),
+     PIPS_COMMENT_SENTINEL);
   return t;
 }
 

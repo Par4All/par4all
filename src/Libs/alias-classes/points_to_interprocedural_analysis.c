@@ -126,7 +126,6 @@ points_to create_stub_points_to(cell c, type t)
    output : a set of points-to where sinks are stub points-to.
    we descent recursively until reaching a basic type, then we call
    create_stub_points_to()to generate the adequate points-to.
-   
 */
 set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 {
@@ -138,73 +137,81 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 			       points_to_rank);
   /* maybe should be removed if we have already called ultimate type
    * in formal_points_to_parameter() */
-	
+
   type upt = type_to_pointed_type(pt);
   r = cell_reference(copy_cell(c));
   e = reference_variable(r);
-  if(type_variable_p(pt)){
-	  if(array_entity_p(e)){
-    /* We ignor dimensions for the being, descriptors are not
-     * implemented yet...Amira Mensi*/
-		  ;
-		  /* ultimate_type() returns a wrong type for arrays. For
-		   * example for type int*[10] it returns int*[10] instead of int[10]. */
-	  }
-	  else{
-    basic fpb = variable_basic(type_variable(upt));
-    switch(basic_tag(fpb)){
-    case is_basic_int:{
-	  pt_to = create_stub_points_to(c, upt);
-      pt_in = set_add_element(pt_in, pt_in,
-			      (void*) pt_to );
-        break;
-    }
-    case is_basic_float:{
-	  pt_to = create_stub_points_to(c, upt);
-      pt_in = set_add_element(pt_in, pt_in,
-			      (void*) pt_to );
-      break;
-    }
-    case is_basic_logical:
-      break;
-    case is_basic_overloaded:
-      break;
-    case is_basic_complex:
-      break;
-    case is_basic_pointer:{
-	  //pt = type_to_pointed_type(pt);
-      pt_to = create_stub_points_to(c, upt);
-      pt_in = set_add_element(pt_in, pt_in,
-			      (void*) pt_to );
-      cell sink = points_to_sink(pt_to);
-      pt_in = set_union(pt_in, pt_in,pointer_formal_parameter_to_stub_points_to(upt, sink));
-      /* what about storage*/
-      break;
-    }
-    case is_basic_derived:
-      break;
-	case is_basic_bit:
-      break;
-	case is_basic_string:{
-	  pt_to = create_stub_points_to(c, upt);
-      pt_in = set_add_element(pt_in, pt_in,
-			      (void*) pt_to );
-      break;
-	}
-	case is_basic_typedef:{
-		pt_to = create_stub_points_to(c, upt);
-		pt_in = set_add_element(pt_in, pt_in,
-			      (void*) pt_to );
-      break;
-	}
-    default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(fpb));
-    }
-	  }
 
-  }else if(type_functional_p(upt))
-    ;/*we don't know how to handle pointers to functions*/
+  if(type_variable_p(upt)){
+    if(array_entity_p(e)){
+      /* We ignor dimensions for the being, descriptors are not
+       * implemented yet...Amira Mensi*/
+      ;
+      /* ultimate_type() returns a wrong type for arrays. For
+       * example for type int*[10] it returns int*[10] instead of int[10]. */
+    }
+    else {
+      basic fpb = variable_basic(type_variable(upt));
+      switch(basic_tag(fpb)){
+      case is_basic_int:{
+	pt_to = create_stub_points_to(c, upt);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	break;
+      }
+      case is_basic_float:{
+	pt_to = create_stub_points_to(c, upt);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	break;
+      }
+      case is_basic_logical:
+	break;
+      case is_basic_overloaded:
+	break;
+      case is_basic_complex:
+	break;
+      case is_basic_pointer:{
+	//pt = type_to_pointed_type(pt);
+	pt_to = create_stub_points_to(c, upt);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	cell sink = points_to_sink(pt_to);
+	pt_in = set_union(pt_in, pt_in,pointer_formal_parameter_to_stub_points_to(upt, sink));
+	/* what about storage*/
+	break;
+      }
+      case is_basic_derived:
+	break;
+      case is_basic_bit:
+	break;
+      case is_basic_string:{
+	pt_to = create_stub_points_to(c, upt);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	break;
+      }
+      case is_basic_typedef:{
+	pt_to = create_stub_points_to(c, upt);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	break;
+      }
+      default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(fpb));
+      }
+    }
+  }
+  else if(type_functional_p(upt))
+    ;/*we don't know how to handle pointers to functions: nothing to
+       be done for points-to analysis. */
+  else if(type_void_p(upt)) {
+    /* Create a target of unknown type */
+    pt_to = create_stub_points_to(c, make_type_unknown() /*memory leak?*/);
+    pt_in = set_add_element(pt_in, pt_in, (void*) pt_to );
+  }
   else
-	  ; //we don't know how to handle other typespips_internal_error();
+    //we don't know how to handle other types
+    pips_internal_error("Unexpected type\n");
 
   return pt_in;
 
