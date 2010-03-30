@@ -23,16 +23,16 @@ C               <must be written>: I
          I = I+1                                                        0007
       ENDDO
       END
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C               <may be read    >: __IO_EFFECTS:LUNS(6)
+C               <may be written >: __IO_EFFECTS:LUNS(6)
       PROGRAM W01
       INTEGER I, N
 C               <must be written>: I
       I = 1                                                             0003
 C               <must be written>: N
       N = 10                                                            0004
-C               <must be read   >: I N __IO_EFFECTS:LUNS(6)
-C               <must be written>: I __IO_EFFECTS:LUNS(6)
+C               <may be read    >: I N __IO_EFFECTS:LUNS(6)
+C               <may be written >: I __IO_EFFECTS:LUNS(6)
       DO WHILE (I.LT.N)                                                 0005
 C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)

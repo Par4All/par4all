@@ -1,29 +1,150 @@
 
-Cumulated effetcs for "struct01"
+Proper pointer effects for "main"
 
-int struct01()
+int main()
 {
    struct one {
       int first;
       int second;
-   } x;
-   int y[10];
+   } x, y[10], z[10];
+   int i;
 //               <must be written>: x[1]
 
    x.first = 1;
 //               <must be written>: x[2]
    x.second = 2;
-//               <must be written>: y[0]
+//               <must be written>: i
 
-   y[0] = 1;
+   for(i = 0; i <= 9; i += 1) {
+//               <must be read   >: i x[1]
+//               <must be written>: y[i][1]
+      y[i].first = x.first;
+//               <must be read   >: i x[2]
+//               <must be written>: y[i][2]
+      y[i].second = x.second;
+   }
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <must be read   >: i x[1] x[2]
+//               <must be written>: z[i][1] z[i][2]
+      z[i] = x;
+   return 0;
 }
 
-Transformers for "struct01"
+Cumulated pointer effects for "main"
+
+int main()
+{
+   struct one {
+      int first;
+      int second;
+   } x, y[10], z[10];
+   int i;
+//               <must be written>: x[1]
+
+   x.first = 1;
+//               <must be written>: x[2]
+   x.second = 2;
+//               <may be read    >: i x[1] x[2]
+//               <may be written >: y[*][1] y[*][2]
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+//               <may be written >: y[*][1]
+//               <must be read   >: i x[1]
+      y[i].first = x.first;
+//               <may be written >: y[*][2]
+//               <must be read   >: i x[2]
+      y[i].second = x.second;
+   }
+//               <may be read    >: i x[1] x[2]
+//               <may be written >: z[*][1] z[*][2]
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <may be written >: z[*][1] z[*][2]
+//               <must be read   >: i x[1] x[2]
+      z[i] = x;
+   return 0;
+}
+
+Proper effects for "main"
+
+int main()
+{
+   struct one {
+      int first;
+      int second;
+   } x, y[10], z[10];
+   int i;
+//               <must be written>: x[1]
+
+   x.first = 1;
+//               <must be written>: x[2]
+   x.second = 2;
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+//               <must be read   >: i x[1]
+//               <must be written>: y[i][1]
+      y[i].first = x.first;
+//               <must be read   >: i x[2]
+//               <must be written>: y[i][2]
+      y[i].second = x.second;
+   }
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <must be read   >: i x[1] x[2]
+//               <must be written>: z[i][1] z[i][2]
+      z[i] = x;
+   return 0;
+}
+
+Cumulated effects for "main"
+
+int main()
+{
+   struct one {
+      int first;
+      int second;
+   } x, y[10], z[10];
+   int i;
+//               <must be written>: x[1]
+
+   x.first = 1;
+//               <must be written>: x[2]
+   x.second = 2;
+//               <may be read    >: i x[1] x[2]
+//               <may be written >: y[*][1] y[*][2]
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+//               <may be written >: y[*][1]
+//               <must be read   >: i x[1]
+      y[i].first = x.first;
+//               <may be written >: y[*][2]
+//               <must be read   >: i x[2]
+      y[i].second = x.second;
+   }
+//               <may be read    >: i x[1] x[2]
+//               <may be written >: z[*][1] z[*][2]
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <may be written >: z[*][1] z[*][2]
+//               <must be read   >: i x[1] x[2]
+      z[i] = x;
+   return 0;
+}
+
+Transformers for "main"
 
 
-//  T() {}
+//  T(main) {main==0}
 
-int struct01()
+int main()
 {
 
 //  T() {}
@@ -31,11 +152,11 @@ int struct01()
    struct one {
       int first;
       int second;
-   } x;
+   } x, y[10], z[10];
 
 //  T() {}
 
-   int y[10];
+   int i;
 
 //  T() {}
 
@@ -46,21 +167,43 @@ int struct01()
 
    x.second = 2;
 
+//  T(i) {}
+
+
+   for(i = 0; i <= 9; i += 1) {
+
 //  T() {}
 
+      y[i].first = x.first;
 
-   y[0] = 1;
+//  T() {}
+
+      y[i].second = x.second;
+   }
+
+//  T(i) {}
+
+
+   for(i = 0; i <= 9; i += 1)
+
+//  T() {}
+
+      z[i] = x;
+
+//  T(main) {main==0}
+
+   return 0;
 }
 
 Printed files with regions
 
-int struct01()
+int main()
 {
    struct one {
       int first;
       int second;
-   } x;
-   int y[10];
+   } x, y[10], z[10];
+   int i;
 
 //  <x[PHI1]-W-EXACT-{PHI1==1}>
 
@@ -71,8 +214,39 @@ int struct01()
 
    x.second = 2;
 
-//  <y[PHI1]-W-EXACT-{PHI1==0}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{1<=PHI1, PHI1<=2}>
+//  <y[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, 1<=PHI2, PHI2<=2}>
 
 
-   y[0] = 1;
+   for(i = 0; i <= 9; i += 1) {
+
+//  <i-R-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{PHI1==1, 0<=i, i<=9}>
+//  <y[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==1, 0<=i, i<=9}>
+
+      y[i].first = x.first;
+
+//  <i-R-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{PHI1==2, 0<=i, i<=9}>
+//  <y[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==2, 0<=i, i<=9}>
+
+      y[i].second = x.second;
+   }
+
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{1<=PHI1, PHI1<=2}>
+//  <z[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, 1<=PHI2, PHI2<=2}>
+
+
+   for(i = 0; i <= 9; i += 1)
+
+//  <i-R-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{1<=PHI1, PHI1<=2, 0<=i, i<=9}>
+//  <z[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=2, 0<=i, i<=9}>
+
+      z[i] = x;
+   return 0;
 }

@@ -42,9 +42,8 @@ int main()
    i = 0;                                                               /*0006*/
 //               <must be written>: j
    j = 1;                                                               /*0007*/
-//               <may be written >: a[*]
-//               <must be read   >: i j
-//               <must be written>: i j
+//               <may be read    >: i j
+//               <may be written >: a[*] i j
    while (i<=499) {                                                     /*0008*/
 //               <may be written >: a[*]
 //               <must be read   >: i j
