@@ -20,14 +20,19 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *i, j, k;
+//  points to = {}
    k = 0;
+//  points to = {}
    j = k;
+//  points to = {}
    i = &j;
 //  {(i,j,-Exact-)}
    i++;
-//  {(i,*ANYWHERE*,-Exact-)}
+//  {(i,*ANYWHERE*,-MAY-)}
 
    return 0;
    // END BLOCK

@@ -30,9 +30,13 @@ POINTS TO
 //  {}
 void reference_00(void)
 {
+//  points to = {}
    int i = 0;                                                           /*0003*/
+//  points to = {}
    int a[10];                                                           /*0004*/
+//  points to = {}
    // effects on empty references...
    i;                                                                   /*0006*/
+//  points to = {}
    a[i];                                                                /*0007*/
 }

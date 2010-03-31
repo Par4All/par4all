@@ -26,8 +26,12 @@ POINTS TO
 //  {}
 void dereferencing04()
 {
+//  points to = {}
    double *p;
+//  points to = {}
    double *q;
+//  points to = {}
    double *r;
+//  points to = {}
    *(p+q-r) = 0.;
 }

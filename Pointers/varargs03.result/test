@@ -49,12 +49,19 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    FILE *s;                                                             /*0024*/
+//  points to = {}
    char *fmt;                                                           /*0025*/
+//  points to = {}
    char *ch;                                                            /*0026*/
+//  points to = {}
    int tab[5];                                                          /*0027*/
+//  points to = {}
    int r;                                                               /*0028*/
+//  points to = {}
    r = varargs03(s, fmt, ch, tab);                                      /*0029*/
+//  points to = {}
    return r;                                                            /*0030*/
 }
 //  {(fmt,_fmt_1,-Exact-)}
@@ -64,11 +71,16 @@ int varargs03(FILE *stream, const char *fmt, ...)
    if (stream) {                                                        /*0007*/
 //  {(fmt,_fmt_1,-Exact-)}
       va_list pa;                                                       /*0009*/
+//  {(fmt,_fmt_1,-Exact-)}
       int r;                                                            /*0010*/
+//  {(fmt,_fmt_1,-Exact-)}
 
       va_start(pa, fmt);                                                /*0012*/
+//  {(fmt,_fmt_1,-Exact-)}
       r = vfprintf(stream, fmt, pa);                                    /*0013*/
+//  {(fmt,_fmt_1,-Exact-)}
       va_end(pa);                                                       /*0014*/
+//  {(fmt,_fmt_1,-Exact-)}
       return r;                                                         /*0016*/
    }
    else

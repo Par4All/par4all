@@ -22,12 +22,16 @@ void formal_parameter00(int *pi)
    // BEGIN BLOCK
 //  {(pi,_pi_1,-Exact-)}
    int *q;
+//  {(pi,_pi_1,-Exact-)}
    int i;
+//  {(pi,_pi_1,-Exact-)}
 
    i = 0;
+//  {(pi,_pi_1,-Exact-)}
    q = pi;
+//  {(q,_pi_1,-Exact-);(pi,_pi_1,-Exact-)}
    pi = &i;
-//  {(pi,i,-Exact-)}
+//  {(q,_pi_1,-Exact-);(pi,i,-Exact-)}
    return 0;
    // END BLOCK
 }

@@ -23,7 +23,9 @@ POINTS TO
 //  {}
 void lhs03()
 {
+//  points to = {}
    int i;
+//  points to = {}
 
    i = 2;
 }

@@ -35,14 +35,19 @@ POINTS TO
 //  {}
 int ptr_to_field()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    typedef struct {
       int *q;
       int *p;
    } my_str;
 
+//  points to = {}
    my_str *m, *n;
+//  points to = {}
    int i = 0, j = 1;
+//  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
 //  {(m,*ANYWHERE*,-MAY-)}
    n = (my_str *) malloc(sizeof(my_str));

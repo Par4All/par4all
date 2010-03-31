@@ -27,6 +27,7 @@ POINTS TO
 //  {}
 void call09(int i, int j)
 {
+//  points to = {}
    i = i+j;
 }
 
@@ -35,8 +36,11 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    tf_t s;
+//  points to = {}
    tf_t *sp = &s;
+//  points to = {}
 
    call09(s.one, sp->one);
 }

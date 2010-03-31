@@ -34,10 +34,14 @@ POINTS TO
 //  {}
 void dereferencing06()
 {
+//  points to = {}
    double x = 1.;
+//  points to = {}
    double *p = &x;
+//  points to = {}
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
+//  {(p,*ANYWHERE*,-MAY-)}
    *p++ = 1;
 }

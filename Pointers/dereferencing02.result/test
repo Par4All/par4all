@@ -130,17 +130,28 @@ POINTS TO
 //  {}
 void dereferencing02()
 {
+//  points to = {}
    double x = 1.;
+//  points to = {}
    double *p = &x;
+//  points to = {}
    double **q = &p;
+//  points to = {}
    double **w;
+//  points to = {}
    int i = 1;
+//  points to = {}
    
    
    **q = 2.;
+//  points to = {}
    **(q+(i = 0)) = 3.;
+//  points to = {}
    **(w+(i = 2)) = 4.;
+//  points to = {}
    x = **q;
+//  points to = {}
    q++;
+//  {(q,*ANYWHERE*,-MAY-)}
    *q++;
 }

@@ -30,9 +30,13 @@ POINTS TO
 //  {}
 void dereferencing03()
 {
+//  points to = {}
    double *p;
+//  points to = {}
    int i;
+//  points to = {}
 
    *(p+1) = 0.;
+//  points to = {}
    *(p+i) = 0.;
 }

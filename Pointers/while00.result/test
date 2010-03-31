@@ -29,18 +29,25 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *a, *b, c, d;
+//  points to = {}
    c = 0;
+//  points to = {}
    d = 1;
+//  points to = {}
    b = &c;
 //  {(b,c,-Exact-)}
 
    while (c>0) {
 //  {(a,d,-MAY-);(b,c,-MAY-);(a,c,-MAY-);(b,d,-MAY-)}
       // BEGIN BLOCK
+//  points to = {}
 
       a = b;
+//  points to = {}
       b = &d;
       // END BLOCK
    }

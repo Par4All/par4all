@@ -30,20 +30,28 @@ POINTS TO
 //  {}
 int struct03()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    struct three {
       int first;
       int second;
    };
+//  points to = {}
    struct four {
       struct three un;
       struct three deux;
    } x[10];
+//  points to = {}
    int i = 0;
+//  points to = {}
 
    for (i = 0;i<10;i++) {
+//  points to = {}
       // BEGIN BLOCK
+//  points to = {}
       x[i].un.first = 1;
+//  points to = {}
       x[i].deux.second = 0;
       // END BLOCK
    }

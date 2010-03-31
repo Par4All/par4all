@@ -23,7 +23,9 @@ POINTS TO for "assign01"
 //  {}
 void assign01()
 {
+//  points to = {}
    int i, j;
+//  points to = {}
 
    i = j = 1;
 }

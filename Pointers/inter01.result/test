@@ -61,15 +61,24 @@ POINTS TO
 //  {}
 void inter01()
 {
+//  points to = {}
    static int l;
+//  points to = {}
    int m;
+//  points to = {}
    int n;
+//  points to = {}
 
    for(n = 0; n <= 9; n += 1) {
+//  points to = {}
       i = 1;
+//  points to = {}
       j = 2;
+//  points to = {}
       k = 3;
+//  points to = {}
       l = 4;
+//  points to = {}
       m = 5;
    }
 }
@@ -79,5 +88,6 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    inter01();
 }

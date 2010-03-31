@@ -16,11 +16,17 @@ POINTS TO
 //  {}
 void assignment01()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int i;
+//  points to = {}
    int *p;
+//  points to = {}
    int *q;
+//  points to = {}
    int *r;
+//  points to = {}
 
    p = q = r = &i;
 //  {(r,i,-Exact-)}

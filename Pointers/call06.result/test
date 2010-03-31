@@ -7,6 +7,7 @@ void call06(int r, int m, int *x)
 
    for (j = 0;j<m;j++)
       x[j] = 10*r+j;
+   return;
 }
 
 Code for "call06"
@@ -17,6 +18,7 @@ void call06(int r, int m, int *x)
 
    for(j = 0; j <= m-1; j += 1)
       x[j] = 10*r+j;
+   return;
 }
 
 Proper effects for "call06"
@@ -31,6 +33,7 @@ void call06(int r, int m, int *x)
 //               <must be read   >: j m r x
 //               <must be written>: x[j]
       x[j] = 10*r+j;
+   return;
 }
 
 Cumulated effects for "call06"
@@ -50,6 +53,7 @@ void call06(int r, int m, int *x)
 //               <may be written >: x[*]
 //               <must be read   >: j m r x
       x[j] = 10*r+j;
+   return;
 }
 
 Proper effects for "main"
@@ -69,6 +73,7 @@ int main()
 //               <may be written >: y[i][*]
 //               <must be read   >: d1 d2 i
       call06(i, d2, &y[i][0]);
+   exit(0);
 }
 
 POINTS TO
@@ -78,9 +83,13 @@ void call06(int r, int m, int *x)
 {
 //  {(x,_x_1,-Exact-)}
    int j;
+//  {(x,_x_1,-Exact-)}
 
    for(j = 0; j <= m-1; j += 1)
+//  {(x,_x_1,-Exact-)}
       x[j] = 10*r+j;
+//  {(x,_x_1,-Exact-)}
+   return;
 }
 
 POINTS TO
@@ -88,11 +97,19 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int d1 = 4;
+//  points to = {}
    int d2 = 4;
+//  points to = {}
    int y[d1][d2];
+//  points to = {}
    int i, j;
+//  points to = {}
 
    for(i = 0; i <= d1-1; i += 1)
+//  points to = {}
       call06(i, d2, &y[i][0]);
+//  points to = {}
+   exit(0);
 }

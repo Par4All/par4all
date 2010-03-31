@@ -17,9 +17,13 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *x, *a, i;
+//  points to = {}
    i = 1;
+//  points to = {}
    a = &i;
 //  {(a,i,-Exact-)}
    x = a;

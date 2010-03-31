@@ -164,16 +164,25 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int i, j, k;
+//  points to = {}
    int a[500];
+//  points to = {}
 
    i = 0;
+//  points to = {}
    j = 1;
+//  points to = {}
    for(i = 0; i <= 499; i += 1) {
+//  points to = {}
       j++;
+//  points to = {}
       // Cumulated effects should be a[i] here and not a[*]
       a[i] = i;
    }
+//  points to = {}
    k = 2;
+//  points to = {}
    return k;
 }

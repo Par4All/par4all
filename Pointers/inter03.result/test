@@ -90,9 +90,12 @@ void foo(int *p)
 {
 //  {(p,_p_1,-Exact-)}
    int i;                                                               /*0011*/
+//  {(p,_p_1,-Exact-)}
 
    for(i = 0; i <= 9; i += 1)
+//  {(p,_p_1,-Exact-)}
       p[i] = i;                                                         /*0014*/
+//  {(p,_p_1,-Exact-)}
    return;                                                              /*0015*/
 }
 
@@ -101,35 +104,60 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int tab[10];                                                         /*0029*/
+//  points to = {}
    int *tab2[10];                                                       /*0030*/
+//  points to = {}
    int tab3[10][10];                                                    /*0031*/
+//  points to = {}
    int **tab4;                                                          /*0032*/
+//  points to = {}
    int tab5[15];                                                        /*0033*/
 
+//  points to = {}
    int i;                                                               /*0035*/
+//  points to = {}
 
    foo(tab);                                                            /*0037*/
+//  points to = {}
    printf("%s\n", "tab");                                               /*0038*/
+//  points to = {}
    myprint(tab);                                                        /*0039*/
+//  points to = {}
    
    
    foo(tab2[4]);                                                        /*0042*/
+//  points to = {}
    foo(tab3[5]);                                                        /*0043*/
+//  points to = {}
    foo(tab4[6]);                                                        /*0044*/
+//  points to = {}
    foo(&tab[0]);                                                        /*0045*/
+//  points to = {}
    foo(&tab5[3]);                                                       /*0046*/
+//  points to = {}
 
    printf("%s:\n", "tab2[4]");                                          /*0048*/
+//  points to = {}
    myprint(tab2[4]);                                                    /*0049*/
+//  points to = {}
    printf("%s\n", "tab3[5]");                                           /*0050*/
+//  points to = {}
    myprint(tab3[5]);                                                    /*0051*/
+//  points to = {}
    printf("%s\n", "tab4[6]");                                           /*0052*/
+//  points to = {}
    myprint(tab4[6]);                                                    /*0053*/
+//  points to = {}
    printf("%s\n", "tab");                                               /*0054*/
+//  points to = {}
    myprint(&tab[0]);                                                    /*0055*/
+//  points to = {}
    printf("%s\n", "tab5");                                              /*0056*/
+//  points to = {}
    myprint(&tab5[3]);                                                   /*0057*/
+//  points to = {}
    return 1;                                                            /*0058*/
 }
 

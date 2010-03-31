@@ -18,10 +18,15 @@ POINTS TO
 //  {}
 int conditional_01()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *q;
+//  points to = {}
    int *p;
+//  points to = {}
    int i = 0, j = 1;
+//  points to = {}
    q = &i;
 //  {(q,i,-Exact-)}
    p = i>0?&j:q;

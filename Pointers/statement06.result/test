@@ -72,14 +72,23 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int a, b, c, d;
+//  points to = {}
    int *pa, *pb, *pc, *pd;
+//  points to = {}
    int **ppa, **ppb, **ppc, **ppd;
+//  points to = {}
    a = 1;
+//  points to = {}
    b = 2;
+//  points to = {}
    c = 3;
+//  points to = {}
    d = 4;
+//  points to = {}
 
    pa = &a;
 //  {(pa,a,-Exact-)}

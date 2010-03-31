@@ -26,11 +26,16 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *x, x1, **y, *y1, y2;
+//  points to = {}
 
    x1 = 0;
+//  points to = {}
    y2 = 1;
+//  points to = {}
    x = &x1;
 //  {(x,x1,-Exact-)}
    y1 = &y2;

@@ -48,11 +48,16 @@ POINTS TO
 //  {}
 void call10(int i, int x[10], int j, int y[10])
 {
+//  points to = {}
    int k, l;
+//  points to = {}
 
    for(k = 0; k <= i-1; k += 1)
+//  points to = {}
       x[i] = 0;
+//  points to = {}
    for(l = 0; l <= j-1; l += 1)
+//  points to = {}
       y[i] = 0;
 }
 
@@ -61,8 +66,11 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    tf_t s;
+//  points to = {}
    tf_t *sp = &s;
+//  points to = {}
 
    call10(s.one, s.two, sp->one, sp->two);
 }

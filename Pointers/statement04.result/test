@@ -21,15 +21,21 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int **x, *y, k, h;
+//  points to = {}
    k = 1;
+//  points to = {}
    h = 2;
+//  points to = {}
    y = &h;
 //  {(y,h,-Exact-)}
    *x = y;
 //  {(y,h,-Exact-)}
    printf("x = %p \n", x);
+//  {(y,h,-Exact-)}
    return 0;
    // END BLOCK
 }

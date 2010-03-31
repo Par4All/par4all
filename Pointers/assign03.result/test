@@ -31,9 +31,13 @@ POINTS TO
 //  {}
 void assign03()
 {
+//  points to = {}
    char *malloc(int);
+//  points to = {}
    double *p = (double *) malloc(10*sizeof(double));
+//  points to = {}
    int j = 2;
+//  points to = {}
 
    p[j] = 1.;
 }

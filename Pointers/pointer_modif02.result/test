@@ -71,13 +71,19 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *p, *q;
+//  points to = {}
 
    *p = 1;
+//  points to = {}
 
    foo(&q, p);
+//  points to = {}
    *q = 2;
+//  points to = {}
    return 0;
    // END BLOCK
 }

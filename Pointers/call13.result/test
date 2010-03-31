@@ -101,21 +101,34 @@ POINTS TO
 //  {}
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
+//  points to = {}
    int i, j1, j2, k1, k2;
+//  points to = {}
    float R, I;
+//  points to = {}
 
    R = 0.0;
+//  points to = {}
    I = 0.0;
+//  points to = {}
 
    for(i = 0; i <= nrec-ntt+1-1; i += 1)
+//  points to = {}
       //    MOTIF     
       for(j1 = 0; j1 <= ntt-1; j1 += 1)
+//  points to = {}
          for(j2 = 0; j2 <= nsa-1; j2 += 1)
+//  points to = {}
             for(k1 = 0; k1 <= ntt-1; k1 += 1)
+//  points to = {}
                for(k2 = 0; k2 <= nsa-1; k2 += 1) {
+//  points to = {}
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
+//  points to = {}
                   I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+//  points to = {}
                   ptrout[i][j1][j2][k1][k2].re = R;
+//  points to = {}
                   ptrout[i][j1][j2][k1][k2].im = I;
                }
 }

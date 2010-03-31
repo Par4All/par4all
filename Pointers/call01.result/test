@@ -87,9 +87,9 @@ void call01(int *pi, tf_t *q)
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//  {(pi,*ANYWHERE*,-Exact-)}
+//  {(pi,*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
    q->one = 1;
-//  {(pi,*ANYWHERE*,-Exact-)}
+//  {(pi,*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
    (q->two)[4] = 2;
 }
 
@@ -98,8 +98,11 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int i;
+//  points to = {}
    tf_t s;
+//  points to = {}
 
    call01(&i, &s);
 }

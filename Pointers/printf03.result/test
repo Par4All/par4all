@@ -10,6 +10,7 @@ int main()
    printf(fmt, i, i+j, x);
 }
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
@@ -25,6 +26,7 @@ int main()
 
    y[0] = 0.;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf(fmt, i, i+j, x);
 }
@@ -34,12 +36,19 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int i = 5;
+//  points to = {}
    int j = 6;
+//  points to = {}
    float x;
+//  points to = {}
    double y[10];
+//  points to = {}
    char *fmt = "i=%d, %d, %f\n";
+//  points to = {}
 
    y[0] = 0.;
+//  points to = {}
    printf(fmt, i, i+j, x);
 }

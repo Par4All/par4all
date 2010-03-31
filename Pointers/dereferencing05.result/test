@@ -38,11 +38,17 @@ POINTS TO
 //  {}
 void dereferencing05()
 {
+//  points to = {}
    double *p;
+//  points to = {}
    int i;
+//  points to = {}
 
    *p++ = 0.;
+//  {(p,*ANYWHERE*,-MAY-)}
    *p-- = 0.;
+//  {(p,*ANYWHERE*,-MAY-)}
    *++p = 0.;
+//  {(p,*ANYWHERE*,-MAY-)}
    *--p = 0.;
 }

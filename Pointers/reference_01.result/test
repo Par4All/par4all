@@ -37,13 +37,19 @@ POINTS TO
 //  {}
 int reference_01(void)
 {
+//  points to = {}
    int i = 0;                                                           /*0006*/
+//  points to = {}
    int j = 1;                                                           /*0007*/
+//  points to = {}
    
    // effects on useless expression
    0;                                                                   /*0010*/
+//  points to = {}
    // effects on empty references...
    j/i;                                                                 /*0012*/
+//  points to = {}
    (void) j/i;                                                          /*0013*/
+//  points to = {}
    return i/j;                                                          /*0014*/
 }

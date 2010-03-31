@@ -15,8 +15,11 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int i;
+//  points to = {}
    tf_t s;
+//  points to = {}
 
    call15(&i, &s);
 }

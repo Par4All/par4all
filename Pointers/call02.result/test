@@ -106,13 +106,18 @@ POINTS TO
 //  {}
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
+//  points to = {}
    /* i can be modified locally, but it won't show in the summary
         effects... which creates a problem for transformer and
         precondition computation. */
    i = j+1;
+//  points to = {}
    y[i] = 0;
+//  points to = {}
    p->one = 1;
+//  points to = {}
    (p->two)[j] = 2.;
+//  points to = {}
    *q[i] = 3;
 }
 
@@ -121,12 +126,19 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int a;
+//  points to = {}
    int b;
+//  points to = {}
    int x[10];
+//  points to = {}
    int *ap[10];
+//  points to = {}
    tf_t s;
+//  points to = {}
    tf_t *sp = &s;
+//  points to = {}
 
    call02(a, b, x, ap, sp);
 }

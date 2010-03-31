@@ -41,12 +41,19 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int entier;
+//  points to = {}
    int graine;
+//  points to = {}
    double virgule;
+//  points to = {}
    graine = 50;
+//  points to = {}
    srandom(graine);
+//  points to = {}
    /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
+//  points to = {}
    entier = 1+rand();
 }

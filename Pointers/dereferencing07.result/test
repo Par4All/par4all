@@ -114,6 +114,7 @@ void foo(int *col)
 {
 //  {(col,_col_1,-Exact-)}
    *col++;                                                              /*0009*/
+//  {(col,*ANYWHERE*,-MAY-);(col,_col_1,-Exact-)}
 
    return;                                                              /*0011*/
 }
@@ -123,9 +124,14 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    int x, tab1[10], tab2[10], *p;                                       /*0016*/
+//  points to = {}
    x++;                                                                 /*0017*/
+//  points to = {}
    x += 3;                                                              /*0018*/
+//  points to = {}
    *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+//  points to = {}
    return 1;                                                            /*0020*/
 }

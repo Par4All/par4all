@@ -15,13 +15,18 @@ POINTS TO
 //  {}
 void exit01()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int i;
+//  points to = {}
    int *j;
+//  points to = {}
 
    j = &i;
 //  {(j,i,-Exact-)}
    exit(0);
+//  points to = {}
    i = 2;
    // END BLOCK
 }

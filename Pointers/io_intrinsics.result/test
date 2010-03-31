@@ -282,102 +282,169 @@ int main(char *fmt1, ...)
 {
 //  {(fmt1,_fmt1_1,-Exact-)}
    FILE *fp;
+//  {(fmt1,_fmt1_1,-Exact-)}
    size_t n, nr;
+//  {(fmt1,_fmt1_1,-Exact-)}
    char buf1[200];
+//  {(fmt1,_fmt1_1,-Exact-)}
    char *buf2 = malloc(200*sizeof(char));
+//  {(fmt1,_fmt1_1,-Exact-)}
    char *fmt2;
+//  {(fmt1,_fmt1_1,-Exact-)}
    char *i_name;
+//  {(fmt1,_fmt1_1,-Exact-)}
    int i, r, c, max;
+//  {(fmt1,_fmt1_1,-Exact-)}
    fpos_t *fp_pos, pos;
+//  {(fmt1,_fmt1_1,-Exact-)}
    long fp_pos_indic;
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_list vl;
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    
    // formatted IO functions
    fmt2 = "%s%d";
+//  {(fmt1,_fmt1_1,-Exact-)}
    max = 100;
+//  {(fmt1,_fmt1_1,-Exact-)}
    n = 200;
+//  {(fmt1,_fmt1_1,-Exact-)}
    fp = fopen("file.txt", "rb");
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    
    (void) fread(buf1, 8, 50, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) fscanf(fp, fmt2, i_name, &i);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) fprintf(fp, "%s%d", i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) vfscanf(fp, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) vfprintf(fp, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    (void) scanf("%s%d", i_name, &i);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) printf(fmt2, i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) vscanf(fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) vprintf(fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    
    (void) sscanf(buf1, fmt2, i_name, &i);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) sprintf(buf2, fmt2, i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) snprintf(buf2, 100, fmt2, i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) vsscanf(buf1, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) vsnprintf(buf2, 100, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) vsprintf(buf2, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    // character IO functions
    
    c = fgetc(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) fgets(buf1, max, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) fputc(c, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) fputs(buf1, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    c = _IO_getc(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) _IO_putc(c, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) ungetc(c, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    c = getchar();
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) putchar(c);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    (void) gets(buf1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) puts(buf1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    // direct IO functions
    
    nr = fread(buf2, sizeof(char), n, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    nr = fwrite(buf2, sizeof(char), n, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    // file positionning functions
    (void) fgetpos(fp, fp_pos);
+//  {(fmt1,_fmt1_1,-Exact-)}
    (void) fgetpos(fp, &pos);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    (void) fseek(fp, 0L, 0);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    (void) fsetpos(fp, fp_pos);
+//  {(fmt1,_fmt1_1,-Exact-)}
 
    fp_pos_indic = ftell(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    rewind(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    // error handling functions
    
    clearerr(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    r = feof(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    r = ferror(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    perror(buf1);
+//  {(fmt1,_fmt1_1,-Exact-)}
    /* should also have an effect on errno */
    
    fclose(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
    
    
    fprintf(stderr, "The END\n");

@@ -31,12 +31,18 @@ POINTS TO
 //  {}
 void call18(int i, ...)
 {
+//  points to = {}
    i++;
+//  points to = {}
    if (i) {
+//  points to = {}
       va_list pa;
+//  points to = {}
       int r;
+//  points to = {}
 
       va_start(pa, fmt);
+//  points to = {}
 
       va_end(pa);
    }

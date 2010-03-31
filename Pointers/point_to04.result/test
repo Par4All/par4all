@@ -4,12 +4,14 @@ POINTS TO
 C  {}
 void point_to04()
 {
+//  points to = {}
    struct s {
       int a;
       int b;
       int c;
       int d;
    } c, *p;
+//  points to = {}
 
    p = &c;
 //  {(p,c,-Exact-)}

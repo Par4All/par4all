@@ -1,3 +1,6 @@
+
+Pointer proper effects
+
 int main()
 {
    // BEGIN BLOCK
@@ -12,11 +15,11 @@ int main()
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m
    m = (my_str *) malloc(sizeof(my_str));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: m
+//               <must be written>: m[0][1]
    m->i = 1;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: m
+//               <must be written>: m[0][2]
    m->p = &j;
 //               <must be read   >: m
 //               <must be written>: n
@@ -25,18 +28,26 @@ int main()
    return 0;
    // END BLOCK
 }
-POINTS TO
+
+Points-to
+
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    typedef struct my_struct {
       int i;
       int *p;
    } my_str;
+//  points to = {}
    my_str *m, *n;
+//  points to = {}
    int j;
+//  points to = {}
    j = 2;
+//  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
 //  {(m,*ANYWHERE*,-MAY-)}
    m->i = 1;

@@ -26,5 +26,6 @@ void call17(int *x)
    /* check aliases */
 //  {(x,_x_1,-Exact-)}
    int *y = x;
+//  {(x,_x_1,-Exact-)}
    y[0] = 1;
 }

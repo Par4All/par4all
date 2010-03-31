@@ -1,19 +1,20 @@
 POINTS TO
 C  {}
-int main(int argc, char *argv[])
+int main()
 {
-   // BEGIN BLOCK
-   int i, j;
-   int *a[64];
+//  points to = {}
+   typedef struct {
+      int *p;
+   } my_str;
 
-   for (i = 0;i<64;i++) {
-      // BEGIN BLOCK
-      a[i] = malloc(64*sizeof(float));
-      for (j = 0;j<64;j++)
-         a[i][j] = 0.;
-      // END BLOCK
-   }
-
+//  points to = {}
+   my_str *s, *s1;
+//  points to = {}
+   int i = 0;
+//  points to = {}
+   s = (my_str *) malloc(sizeof(my_str));
+//  {(s,*ANYWHERE*,-MAY-)}
+   s1 = (my_str) malloc(sizeof(my_str));
+//  {(s1,*ANYWHERE*,-MAY-);(s,*ANYWHERE*,-MAY-)}
    return 0;
-   // END BLOCK
 }

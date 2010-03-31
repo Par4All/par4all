@@ -55,21 +55,33 @@ POINTS TO for "main"
 //  {}
 int main()
 {
+//  points to = {}
    int t[100][10][3];                                                   /*0007*/
 
+//  points to = {}
    int (*p)[3];                                                         /*0009*/
+//  points to = {}
    int *pu;                                                             /*0010*/
 
+//  points to = {}
    int (*q)[10][3];                                                     /*0012*/
+//  points to = {}
    int (*qu)[3];                                                        /*0013*/
 
+//  points to = {}
    int (*r)[100][10][3];                                                /*0015*/
+//  points to = {}
    int (*ru)[10][3];                                                    /*0016*/
+//  points to = {}
 
    printf("sizeof(t) = %zd\n", sizeof(t));                              /*0018*/
+//  points to = {}
    printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0019*/
+//  points to = {}
    printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0020*/
+//  points to = {}
    printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0021*/
+//  points to = {}
 
    p = &t[1][2];                                                        /*0023*/
 //  {(p,t[1][2],-Exact-)}

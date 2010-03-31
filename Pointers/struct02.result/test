@@ -37,23 +37,34 @@ POINTS TO
 //  {}
 int struct02()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    struct two {
       int first;
       int second;
    } x[10];
+//  points to = {}
    int i = 0;
+//  points to = {}
 
    for (i = 0;i<10;i++)
+//  points to = {}
       if (1) {
+//  points to = {}
          // BEGIN BLOCK
+//  points to = {}
          x[i].first = 1;
+//  points to = {}
          x[i].second = 0;
          // END BLOCK
       }
       else {
+//  points to = {}
          // BEGIN BLOCK
+//  points to = {}
          x[i].first = 0;
+//  points to = {}
          x[i].second = 1;
          // END BLOCK
       }

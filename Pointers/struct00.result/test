@@ -17,11 +17,15 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    struct one {
       int *first;
    } x;
+//  points to = {}
    int y[10];
+//  points to = {}
 
    x.first = &y[5];
 //  {(x[1],y[5],-Exact-)}

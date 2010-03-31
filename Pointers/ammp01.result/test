@@ -105,104 +105,172 @@ POINTS TO
 //  {}
 ATOM * a_m_serial(int serial)
 {
+//  points to = {}
    static ATOM *ap = (void *) 0;
+//  points to = {}
    static ATOM *lastmatched = (void *) 0;
+//  points to = {}
    int i, n, a_number();
+//  points to = {}
    if (atomUPDATE)
+//  points to = {}
       n = a_number();
    else
+//  points to = {}
       n = atomNUMBER;
+//  points to = {}
 
    ap = first;
+//  points to = {}
    if (ap==(void *) 0) 
+//  points to = {}
       return (void *) 0;
+//  points to = {}
    if (lastmatched==(void *) 0) 
+//  points to = {}
       lastmatched = first;
+//  points to = {}
 
    if (serial==lastmatched->serial) 
+//  points to = {}
       return lastmatched;
+//  points to = {}
    if (serial>lastmatched->serial) 
+//  points to = {}
       ap = lastmatched;
+//  points to = {}
    for(i = 0; i <= n-1; i += 1) {
+//  points to = {}
       if (ap->serial==serial) {
+//  points to = {}
          lastmatched = ap;
+//  points to = {}
          return ap;
       }
+//  points to = {}
       if (ap==ap->next)
+//  points to = {}
          ap = first;
       else
+//  points to = {}
          ap = ap->next;
    }
+//  points to = {}
    return (void *) 0;
 }
 //  {}
 ATOM * a_next(int flag)
 {
+//  points to = {}
    static ATOM *ap = (void *) 0;
+//  points to = {}
    if (ap==(void *) 0) 
+//  points to = {}
       ap = first;
+//  points to = {}
    if (ap==(void *) 0) 
+//  points to = {}
       return (void *) 0;
+//  points to = {}
    if (flag<=0) {
+//  points to = {}
       ap = first;
+//  points to = {}
       return ap;
    }
+//  points to = {}
    if (ap==ap->next) 
+//  points to = {}
       return (void *) 0;
+//  points to = {}
    ap = ap->next;
+//  points to = {}
    return ap;
 }
 //  {}
 int a_number()
 {
+//  points to = {}
    ATOM *ap;
+//  points to = {}
    if (atomUPDATE) {
    }
    else {
       goto l99999;
    }
+//  points to = {}
    atomUPDATE = 0;
+//  points to = {}
    atomNUMBER = 0;
+//  points to = {}
    if (first==(void *) 0) 
+//  points to = {}
       return 0;
+//  points to = {}
    ap = first;
 l99998:   ;
+//  points to = {}
    if (!1) goto break_1;
+//  points to = {}
    if (ap->next==(void *) 0) goto break_1;
+//  points to = {}
    atomNUMBER++;
+//  points to = {}
    if (ap->next==ap) goto break_1;
+//  points to = {}
    ap = ap->next;
    goto l99998;
+//  points to = {}
 break_1:   ;
 l99999:   ;
+//  points to = {}
    return atomNUMBER;
 }
 //  {}
 int activate(int i1, int i2)
 {
+//  points to = {}
    int upper, lower;
+//  points to = {}
    ATOM *ap, *a_m_serial(int), *a_next(int);
+//  points to = {}
    int i, numatm, a_number();
+//  points to = {}
 
    if (i2==0) {
+//  points to = {}
       ap = a_m_serial(i1);
+//  points to = {}
       if (ap!=(void *) 0) 
+//  points to = {}
          ap->active = 1;
+//  points to = {}
       return 0;
    }
+//  points to = {}
 
    upper = i2;
+//  points to = {}
    lower = i1;
+//  points to = {}
    if (i2<i1) {
+//  points to = {}
       lower = i2;
+//  points to = {}
       upper = i1;
    }
+//  points to = {}
 
    numatm = a_number();
+//  points to = {}
    for(i = 0; i <= numatm-1; i += 1) {
+//  points to = {}
       ap = a_next(i);
+//  points to = {}
       if (ap->serial>=lower&&ap->serial<=upper) 
+//  points to = {}
          ap->active = 1;
    }
+//  points to = {}
    return 0;
 }

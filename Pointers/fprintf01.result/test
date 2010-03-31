@@ -53,15 +53,24 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    FILE *pFile;
+//  points to = {}
    int n;
+//  points to = {}
    char name[100];
+//  points to = {}
 
    pFile = fopen("myfile.txt", "w");
+//  points to = {}
    for(n = 0; n <= 2; n += 1) {
+//  points to = {}
       puts("please, enter a name: ");
+//  points to = {}
       gets(name);
+//  points to = {}
       fprintf(pFile, "Name %d %s\n", n, name);
    }
+//  points to = {}
    fclose(pFile);
 }

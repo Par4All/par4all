@@ -35,10 +35,15 @@ POINTS TO
 //  {}
 void dereferencing01()
 {
+//  points to = {}
    double x = 1.;
+//  points to = {}
    double *p = &x;
+//  points to = {}
    double *q = 0;
+//  points to = {}
 
    q = p;
+//  points to = {}
    *p = 2.;
 }

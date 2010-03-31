@@ -19,6 +19,8 @@ POINTS TO
 //  {}
 void assert01()
 {
+//  points to = {}
    int i;
+//  points to = {}
    i>0?(void) 0:__assert_fail("i>0", "./assert01.c", 15, (const char *) 0);
 }

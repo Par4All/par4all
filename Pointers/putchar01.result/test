@@ -37,7 +37,10 @@ POINTS TO
 //  {}
 void putchar01()
 {
+//  points to = {}
    (int) putchar((int) 'a');
+//  points to = {}
    (int) putchar((int) 'b');
+//  points to = {}
    (int) putchar((int) 'c');
 }

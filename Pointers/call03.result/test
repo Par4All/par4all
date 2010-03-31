@@ -42,9 +42,13 @@ POINTS TO
 //  {}
 void call03()
 {
+//  points to = {}
    *pi = 1;
+//  points to = {}
    pi++;
+//  {(pi,*ANYWHERE*,-MAY-)}
    q->one = 1;
+//  {(pi,*ANYWHERE*,-MAY-)}
    (q->two)[4] = 2;
 }
 
@@ -53,5 +57,6 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    call03();
 }

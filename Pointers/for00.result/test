@@ -22,10 +22,15 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *a, *b, c, d, i;
+//  points to = {}
    c = 0;
+//  points to = {}
    d = 1;
+//  points to = {}
    b = &c;
 //  {(b,c,-Exact-)}
 

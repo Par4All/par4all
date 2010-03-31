@@ -29,11 +29,17 @@ POINTS TO
 //  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int **x, **y, *z, *t;
+//  points to = {}
    int i, j;
+//  points to = {}
    i = 1;
+//  points to = {}
    j = 2;
+//  points to = {}
 
    z = &i;
 //  {(z,i,-Exact-)}
@@ -45,6 +51,7 @@ int main()
    *x = z;
 //  {(t,j,-Exact-);(z,j,-Exact-)}
    printf(" x = %p\n", x);
+//  {(t,j,-Exact-);(z,j,-Exact-)}
    return 0;
    // END BLOCK
 }

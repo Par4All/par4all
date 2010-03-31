@@ -31,25 +31,41 @@ POINTS TO
 //  {}
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
+//  points to = {}
    int ix, iy;
+//  points to = {}
    double u, A, v, B;
+//  points to = {}
    
    // MOTIF 
    u = 0;
+//  points to = {}
    for(iy = 0; iy <= ny-1; iy += 1)
+//  points to = {}
       for(ix = 0; ix <= nx-1; ix += 1) {
+//  points to = {}
 
          while (u==0||u>1) 
+//  points to = {}
             u = rand()/32768.;
+//  points to = {}
          A = sqrt(-(2.*log(u)));
+//  points to = {}
          v = rand()/32768.;
+//  points to = {}
          B = 2.*3.141592653589793238*v;
+//  points to = {}
          A = 1.0;
+//  points to = {}
          v = 1.0;
+//  points to = {}
          B = 1.0;
+//  points to = {}
 
          pt_out[iy][ix].re = pt_in[iy][ix].re+Sigma2*A*cos(B);
+//  points to = {}
          pt_out[iy][ix].im = pt_in[iy][ix].im+Sigma2*A*sin(B);
+//  points to = {}
          u = 0;
       }
 }

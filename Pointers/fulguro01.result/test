@@ -111,87 +111,149 @@ POINTS TO
 //  {}
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
+//  points to = {}
    int j;
+//  points to = {}
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
+//  points to = {}
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
+//  points to = {}
    fgINT32 *pdest = (fgINT32 *) datdest->array;
+//  points to = {}
    fgINT32 v1;
+//  points to = {}
    fgINT32 v2;
+//  points to = {}
    fgINT32 result;
+//  points to = {}
    int spp = datdest->spp;
+//  points to = {}
    int length = datdest->length*spp;
+//  points to = {}
    for(j = 0; j <= length-1; j += 1) {
+//  points to = {}
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+//  points to = {}
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+//  points to = {}
       result = flgr_defop_add_fgINT32(v1, v2);
+//  points to = {}
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
+//  points to = {}
    return;
 }
 //  {}
 FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
+//  points to = {}
    FLGR_Ret ret;
+//  points to = {}
    if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
+//  points to = {}
       fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+//  points to = {}
       return FLGR_RET_NULL_OBJECT;
    }
+//  points to = {}
    if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK) 
+//  points to = {}
       return ret;
+//  points to = {}
    if ((ret = flgr2d_is_data_same_attributes(data2, data1))!=FLGR_RET_OK) 
+//  points to = {}
       return ret;
+//  points to = {}
 
    if (datdest->type==FLGR_BIT) {
+//  points to = {}
       flgr2d_arith_add_fgBIT(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_UINT8) {
+//  points to = {}
       flgr2d_arith_add_fgUINT8(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_UINT16) {
+//  points to = {}
       flgr2d_arith_add_fgUINT16(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_UINT32) {
+//  points to = {}
       flgr2d_arith_add_fgUINT32(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_INT8) {
+//  points to = {}
       flgr2d_arith_add_fgINT8(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_INT16) {
+//  points to = {}
       flgr2d_arith_add_fgINT16(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_INT32) {
+//  points to = {}
       flgr2d_arith_add_fgINT32(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_FLOAT32) {
+//  points to = {}
       flgr2d_arith_add_fgFLOAT32(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    if (datdest->type==FLGR_FLOAT64) {
+//  points to = {}
       flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
+//  points to = {}
       return FLGR_RET_OK;
    }
+//  points to = {}
    fprintf(stderr, "ERROR: File %s, Line %d, Function : ""type <%s> unknown!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+//  points to = {}
    return FLGR_RET_TYPE_UNKNOWN;
 }
 //  {}
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
+//  points to = {}
    FLGR_Data1D **pdest = datdest->row;
+//  points to = {}
    FLGR_Data1D **p1 = data1->row;
+//  points to = {}
    FLGR_Data1D **p2 = data2->row;
+//  points to = {}
    int i;
+//  points to = {}
    i = 0;
+//  points to = {}
    while (i<data1->size_y) {
+//  points to = {}
       flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
+//  points to = {}
       i++, pdest++, p1++, p2++;
    }
+//  {(p2,*ANYWHERE*,-MAY-);(p1,*ANYWHERE*,-MAY-);(pdest,*ANYWHERE*,
+//   -MAY-)}
    return;
 }
 //  {(array,_array_1,-Exact-)}
@@ -209,6 +271,7 @@ static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value
 //  {}
 static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
 {
+//  points to = {}
    return a+b;
 }
 //  {(array,_array_3,-Exact-)}

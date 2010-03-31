@@ -1,8 +1,8 @@
-delete malloc01
+delete malloc_anywhere
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create malloc01 malloc01.c
+create malloc_anywhere malloc_anywhere.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -16,6 +16,6 @@ display PRINTED_FILE[main]
 
 
 close
-delete malloc01
+delete malloc_anywhere
 quit
 

@@ -17,11 +17,14 @@ POINTS TO
 //  {}
 void point_to02()
 {
+//  points to = {}
    struct s {
       int a;
       int b[10];
    } c, *p;
+//  points to = {}
 
    p->a = 1;
+//  points to = {}
    (p->b)[2] = 3;
 }

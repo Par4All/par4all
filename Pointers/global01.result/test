@@ -15,7 +15,9 @@ POINTS TO
 //  {}
 void global01()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    i = &k;
 //  {(i,k,-Exact-)}
    j = i;
