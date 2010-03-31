@@ -1,5 +1,5 @@
-/* Check that the precedence based parentheses elimination algorithm
-    works for casts */
+/* Copy of precedence_operator.c. Check that the
+   PRETTYPRINT_ALL_PARENTHESES option works for casts */
 
 struct test2
 {

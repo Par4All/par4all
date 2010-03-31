@@ -13,7 +13,11 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
+display SYMBOL_TABLE_FILE[main]
+
 apply UNSPLIT(%ALL)
+shell cc -c struct_array_init2.database/Src/struct_array_init2.c
+shell rm struct_array_init2.o
 
 close
 

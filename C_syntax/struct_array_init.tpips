@@ -16,6 +16,8 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 display SYMBOL_TABLE_FILE[main]
 
 apply UNSPLIT
+shell cc -c struct_array_init.database/Src/struct_array_init.c
+shell rm struct_array_init.o
 
 close
 
