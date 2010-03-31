@@ -1,0 +1,21 @@
+delete switch_case
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING TRUE
+
+create switch_case switch_case.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+apply UNSPLIT(%ALL)
+shell gcc -c switch_case.database/Src/switch_case.c
+shell rm *.o
+
+close
+
+delete switch_case
+quit
