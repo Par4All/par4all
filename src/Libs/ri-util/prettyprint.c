@@ -1995,6 +1995,10 @@ words_syntax(syntax obj, list pdl)
       break;
     case is_syntax_cast:
       pc = words_cast(syntax_cast(obj), pdl);
+      if(get_bool_property("PRETTYPRINT_ALL_PARENTHESES")) {
+	pc = CONS(STRING, strdup("("),
+		  gen_nconc(pc,CONS(STRING, strdup(")"), NIL)));
+      }
       break;
     case is_syntax_sizeofexpression: {
       /* FI->SG: I do not know if in_type_declaration is TRUE, FALSE
