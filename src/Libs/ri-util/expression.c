@@ -310,7 +310,7 @@ make_assign_expression(expression lhs,
 }
 
 
-/* predicates on expressions */
+/* predicates and short cut accessors on expressions */
 
 bool expression_call_p(expression e)
 {
@@ -320,6 +320,16 @@ bool expression_call_p(expression e)
 call expression_call(expression e)
 {
   return(syntax_call(expression_syntax(e)));
+}
+
+bool expression_cast_p(expression e)
+{
+  return(syntax_cast_p(expression_syntax(e)));
+}
+
+cast expression_cast(expression e)
+{
+  return(syntax_cast(expression_syntax(e)));
 }
 
 bool expression_field_p(expression e)
@@ -349,7 +359,7 @@ bool is_expression_reference_to_entity_p(expression e, entity v)
   return is_e_reference_to_v;
 }
 
-
+
 /* This function returns TRUE, if there exists an equal expression in the list
  *                       FALSE, otherwise
 */
