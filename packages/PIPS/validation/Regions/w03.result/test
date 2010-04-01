@@ -71,9 +71,8 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
 C               <must be written>: I
 
       I = 1                                                             0007
-C               <may be written >: A(*)
-C               <must be read   >: I
-C               <must be written>: I
+C               <may be read    >: I
+C               <may be written >: A(*) I
 
       DO WHILE (I.LE.10)                                                0009
 C               <may be written >: A(*)
@@ -86,9 +85,8 @@ C               <must be written>: I
 C               <must be written>: I
 
       I = 2                                                             0014
-C               <may be read    >: A(*)
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: I __IO_EFFECTS:LUNS(6)
+C               <may be read    >: A(*) I __IO_EFFECTS:LUNS(6)
+C               <may be written >: I __IO_EFFECTS:LUNS(6)
 
       DO WHILE (I.LT.N)                                                 0016
 C               <may be read    >: A(*)
@@ -240,8 +238,8 @@ C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
       I = 2                                                             0014
 
 C  <A(PHI1)-R-MAY-{I<=PHI1+1, 1<=PHI1, PHI1<=8}>
-C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, I<=9}>
-C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, I<=9}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==6, I<=9}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6, I<=9}>
 
 
       DO WHILE (I.LT.N)                                                 0016

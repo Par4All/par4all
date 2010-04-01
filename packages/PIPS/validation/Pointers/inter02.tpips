@@ -1,0 +1,42 @@
+delete inter02
+create inter02 inter02.c
+
+#echo Select some options to deal with the C Language:
+#echo Parse as C:
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+#echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+#echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[foo]
+
+echo
+echo POINTS TO
+echo
+
+display PRINTED_FILE[main]
+
+
+
+
+close
+delete inter02
+quit

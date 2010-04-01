@@ -1,0 +1,38 @@
+delete dereferencing01
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create dereferencing01 dereferencing01.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Parsed printed file for "dereferencing01"
+echo
+
+display PARSED_PRINTED_FILE[dereferencing01]
+
+echo
+echo Proper effetcs for "dereferencing01"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[dereferencing01]
+
+
+echo
+echo POINTS TO
+echo 
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[dereferencing01]
+
+
+close
+delete dereferencing01
+quit

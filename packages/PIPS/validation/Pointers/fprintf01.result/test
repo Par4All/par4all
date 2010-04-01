@@ -1,0 +1,76 @@
+
+Code for "fprintf01"
+
+int main()
+{
+   FILE *pFile;
+   int n;
+   char name[100];
+
+   pFile = fopen("myfile.txt", "w");
+   for(n = 0; n <= 2; n += 1) {
+      puts("please, enter a name: ");
+      gets(name);
+      fprintf(pFile, "Name %d %s\n", n, name);
+   }
+   fclose(pFile);
+}
+
+Code with proper effects for "fprintf01"
+
+int main()
+{
+   FILE *pFile;
+   int n;
+   char name[100];
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be written>: pFile
+
+   pFile = fopen("myfile.txt", "w");
+//               <must be written>: n
+   for(n = 0; n <= 2; n += 1) {
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      puts("please, enter a name: ");
+//               <may be written >: name[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+      gets(name);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <must be read   >: n pFile
+      fprintf(pFile, "Name %d %s\n", n, name);
+   }
+//               <may be read    >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <must be read   >: pFile
+   fclose(pFile);
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   FILE *pFile;
+//  points to = {}
+   int n;
+//  points to = {}
+   char name[100];
+//  points to = {}
+
+   pFile = fopen("myfile.txt", "w");
+//  points to = {}
+   for(n = 0; n <= 2; n += 1) {
+//  points to = {}
+      puts("please, enter a name: ");
+//  points to = {}
+      gets(name);
+//  points to = {}
+      fprintf(pFile, "Name %d %s\n", n, name);
+   }
+//  points to = {}
+   fclose(pFile);
+}

@@ -17,51 +17,51 @@ int main()
    pa = &a;
 //               <must be written>: ppa
    ppa = &b;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: ppa
-//               <must be written>: ppa[0]
    *ppa = &pa;
 //               <must be written>: pb
 
    pb = &b;
 //               <must be written>: ppb
    ppb = &a;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: ppb
-//               <must be written>: ppb[0]
    *ppb = &pb;
 //               <must be written>: pc
 
    pc = &c;
 //               <must be written>: ppc
    ppc = &d;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: ppc
-//               <must be written>: ppc[0]
    *ppc = &pc;
 //               <must be written>: pd
 
    pd = &d;
 //               <must be written>: ppd
    ppd = &c;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: ppd
-//               <must be written>: ppd[0]
    *ppd = &pd;
 //               <must be read   >: pd
 //               <must be written>: pc
 
    pc = pd;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: ppc
-//               <must be written>: ppc[0]
 
    *ppc = &a;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: pc ppa
-//               <must be written>: ppa[0]
 
    *ppa = pc;
-//               <must be read   >: ppd ppd[0]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be written>: pa
 
    pa = *ppd;
-//               <must be read   >: ppa ppd ppd[0]
-//               <must be written>: ppa[0]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 
    *ppa = *ppd;
 
@@ -69,79 +69,85 @@ int main()
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int a, b, c, d;
+//  points to = {}
    int *pa, *pb, *pc, *pd;
+//  points to = {}
    int **ppa, **ppb, **ppc, **ppd;
+//  points to = {}
    a = 1;
+//  points to = {}
    b = 2;
+//  points to = {}
    c = 3;
+//  points to = {}
    d = 4;
+//  points to = {}
 
    pa = &a;
-//  points to = {(pa,a,-Exact-)}
+//  {(pa,a,-Exact-)}
    ppa = &b;
-//  points to = {(pa,a,-Exact-);(ppa,b,-Exact-)}
+//  {(pa,a,-Exact-);(ppa,b,-Exact-)}
    *ppa = &pa;
-//  points to = {(pa,a,-Exact-);(ppa,b,-Exact-)}
+//  {(pa,a,-Exact-);(ppa,b,-Exact-)}
 
    pb = &b;
-//  points to = {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-)}
+//  {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-)}
    ppb = &a;
-//  points to = {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-);(ppb,a,
-//   -Exact-)}
+//  {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
    *ppb = &pb;
-//  points to = {(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,-Exact-);(ppa,b,
-//   -Exact-)}
+//  {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
 
    pc = &c;
-//  points to = {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,
+//  {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,
 //   -Exact-);(ppa,b,-Exact-)}
    ppc = &d;
-//  points to = {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,
-//   -Exact-);(ppa,b,-Exact-);(ppc,d,-Exact-)}
+//  {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,
+//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-)}
    *ppc = &pc;
-//  points to = {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppc,d,
-//   -Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
+//  {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,
+//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-)}
 
    pd = &d;
-//  points to = {(pd,d,-Exact-);(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,
-//   -Exact-);(ppc,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
+//  {(pd,d,-Exact-);(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppc,
+//   d,-Exact-);(ppb,a,-Exact-);(ppa,b,-Exact-)}
    ppd = &c;
-//  points to = {(pa,a,-Exact-);(ppb,a,-Exact-);(ppa,b,-Exact-);(pd,d,
-//   -Exact-);(pc,c,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pb,b,
+//  {(pa,a,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(pd,d,
+//   -Exact-);(pc,c,-Exact-);(ppa,b,-Exact-);(ppd,c,-Exact-);(pb,b,
 //   -Exact-)}
    *ppd = &pd;
-//  points to = {(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pc,c,
-//   -Exact-);(pb,b,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pa,a,
+//  {(pa,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pd,d,
+//   -Exact-);(pc,c,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pb,b,
 //   -Exact-)}
 
    pc = pd;
-//  points to = {(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pc,d,
-//   -Exact-);(pb,b,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pa,a,
+//  {(pb,b,-Exact-);(ppb,a,-Exact-);(ppd,c,-Exact-);(pa,a,
+//   -Exact-);(pd,d,-Exact-);(ppa,b,-Exact-);(ppc,d,-Exact-);(pc,d,
 //   -Exact-)}
 
    *ppc = &a;
-//  points to = {(pc,d,-Exact-);(ppb,a,-Exact-);(ppa,b,-Exact-);(pb,b,
-//   -Exact-);(pa,a,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pd,d,
+//  {(pb,b,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pa,a,
+//   -Exact-);(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pc,d,
 //   -Exact-)}
 
    *ppa = pc;
-//  points to = {(pa,a,-Exact-);(b,d,-Exact-);(ppa,b,-Exact-);(ppb,a,
-//   -Exact-);(pd,d,-Exact-);(pc,d,-Exact-);(ppc,d,-Exact-);(ppd,c,
-//   -Exact-);(pb,b,-Exact-)}
+//  {(pa,a,-Exact-);(b,d,-Exact-);(ppc,d,-Exact-);(ppb,a,-Exact-);(pd,
+//   d,-Exact-);(pc,d,-Exact-);(ppa,b,-Exact-);(ppd,c,-Exact-);(pb,b,
+//   -Exact-)}
 
    pa = *ppd;
-//  points to = {(b,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pd,d,
-//   -Exact-);(pc,d,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pb,b,
-//   -Exact-)}
+//  {(pb,b,-Exact-);(ppd,c,-Exact-);(ppb,a,-Exact-);(b,d,-Exact-);(pd,
+//   d,-Exact-);(ppa,b,-Exact-);(ppc,d,-Exact-);(pc,d,-Exact-)}
 
    *ppa = *ppd;
-//  points to = {(b,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pd,d,
-//   -Exact-);(pc,d,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pb,b,
-//   -Exact-)}
+//  {(pc,d,-Exact-);(ppc,d,-Exact-);(ppb,a,-Exact-);(pb,b,-Exact-);(b,
+//   d,-Exact-);(ppa,b,-Exact-);(ppd,c,-Exact-);(pd,d,-Exact-)}
 
    return 0;
    // END BLOCK

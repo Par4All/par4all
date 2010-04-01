@@ -1,0 +1,451 @@
+int main(char *fmt1, ...)
+{
+   FILE *fp;
+   size_t n, nr;
+   char buf1[200];
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ buf2
+   char *buf2 = malloc(200*sizeof(char));
+   char *fmt2;
+   char *i_name;
+   int i, r, c, max;
+   fpos_t *fp_pos, pos;
+   long fp_pos_indic;
+   va_list vl;
+//               <must be written>: fmt2
+   
+   
+   // formatted IO functions
+   fmt2 = "%s%d";
+//               <must be written>: max
+   max = 100;
+//               <must be written>: n
+   n = 200;
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be written>: fp
+   fp = fopen("file.txt", "rb");
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] buf1[*] fp[*]
+//               <must be read   >: fp
+   
+   
+   (void) fread(buf1, 8, 50, fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt2[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*] 
+//                                  i_name[*]
+//               <must be read   >: fmt2 fp i_name
+//               <must be written>: i
+   (void) fscanf(fp, fmt2, i_name, &i);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp i i_name
+   (void) fprintf(fp, "%s%d", i_name, i);
+//               <must be read   >: vl
+//               <must be written>: vl
+
+   va_start(vl, fmt1);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt1[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fmt1 fp vl
+//               <must be written>: vl
+   (void) vfscanf(fp, fmt1, vl);
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <must be read   >: vl
+//               <must be written>: vl
+   va_start(vl, fmt1);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt1[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fmt1 fp vl
+//               <must be written>: vl
+   (void) vfprintf(fp, fmt1, vl);
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <may be written >: i_name[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[0] i_name
+//               <must be written>: __IO_EFFECTS:LUNS[0] i
+
+   (void) scanf("%s%d", i_name, &i);
+//               <may be read    >: fmt2[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1] fmt2 i i_name
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (void) printf(fmt2, i_name, i);
+//               <must be read   >: vl
+//               <must be written>: vl
+
+   va_start(vl, fmt1);
+//               <may be read    >: fmt1[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[0] fmt1 vl
+//               <must be written>: __IO_EFFECTS:LUNS[0] vl
+   (void) vscanf(fmt1, vl);
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <must be read   >: vl
+//               <must be written>: vl
+   va_start(vl, fmt1);
+//               <may be read    >: fmt1[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1] fmt1 vl
+//               <must be written>: __IO_EFFECTS:LUNS[1] vl
+   (void) vprintf(fmt1, vl);
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <may be read    >: buf1[*] fmt2[*]
+//               <may be written >: i_name[*]
+//               <must be read   >: fmt2 i_name
+//               <must be written>: i
+   
+   
+   (void) sscanf(buf1, fmt2, i_name, &i);
+//               <may be read    >: fmt2[*]
+//               <may be written >: buf2[*]
+//               <must be read   >: buf2 fmt2 i i_name
+   (void) sprintf(buf2, fmt2, i_name, i);
+//               <may be read    >: fmt2[*]
+//               <may be written >: buf2[*]
+//               <must be read   >: buf2 fmt2 i i_name
+   (void) snprintf(buf2, 100, fmt2, i_name, i);
+//               <must be read   >: vl
+//               <must be written>: vl
+
+   va_start(vl, fmt1);
+//               <may be read    >: buf1[*] fmt1[*]
+//               <must be read   >: fmt1 vl
+//               <must be written>: vl
+   (void) vsscanf(buf1, fmt1, vl);
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <must be read   >: vl
+//               <must be written>: vl
+   va_start(vl, fmt1);
+//               <may be read    >: fmt1[*]
+//               <may be written >: buf2[*]
+//               <must be read   >: buf2 fmt1 vl
+//               <must be written>: vl
+   (void) vsnprintf(buf2, 100, fmt1, vl);
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <must be read   >: vl
+//               <must be written>: vl
+   va_start(vl, fmt1);
+//               <may be read    >: fmt1[*]
+//               <may be written >: buf2[*]
+//               <must be read   >: buf2 fmt1 vl
+//               <must be written>: vl
+   (void) vsprintf(buf2, fmt1, vl);
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+//               <must be written>: c
+   
+   // character IO functions
+   
+   c = fgetc(fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] buf1[*] fp[*]
+//               <must be read   >: fp max
+   (void) fgets(buf1, max, fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: c fp
+   (void) fputc(c, fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] buf1[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+   (void) fputs(buf1, fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+//               <must be written>: c
+
+   c = _IO_getc(fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: c fp
+   (void) _IO_putc(c, fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: c fp
+   (void) ungetc(c, fp);
+//               <must be read   >: __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0] c
+
+   c = getchar();
+//               <must be read   >: __IO_EFFECTS:LUNS[1] c
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (void) putchar(c);
+//               <may be written >: buf1[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+
+   (void) gets(buf1);
+//               <may be read    >: buf1[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (void) puts(buf1);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] buf2[*] fp[*]
+//               <must be read   >: buf2 fp n
+//               <must be written>: nr
+   
+   // direct IO functions
+   
+   nr = fread(buf2, sizeof(char), n, fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] buf2[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: buf2 fp n
+//               <must be written>: nr
+   nr = fwrite(buf2, sizeof(char), n, fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*] 
+//                                  fp_pos[*]
+//               <must be read   >: fp fp_pos
+   
+   // file positionning functions
+   (void) fgetpos(fp, fp_pos);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+//               <must be written>: pos
+   (void) fgetpos(fp, &pos);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+
+   (void) fseek(fp, 0L, 0);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*] 
+//                                  fp_pos[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp fp_pos
+
+   (void) fsetpos(fp, fp_pos);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+//               <must be written>: fp_pos_indic
+
+   fp_pos_indic = ftell(fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+   rewind(fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+   
+   // error handling functions
+   
+   clearerr(fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+//               <must be written>: r
+   r = feof(fp);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+//               <must be written>: r
+   r = ferror(fp);
+//               <may be read    >: buf1[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[2]
+//               <must be written>: __IO_EFFECTS:LUNS[2]
+   perror(buf1);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <must be read   >: fp
+   /* should also have an effect on errno */
+   
+   fclose(fp);
+//               <may be read    >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <may be written >: TOP-LEVEL:stderr[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: TOP-LEVEL:stderr
+   
+   
+   fprintf(stderr, "The END\n");
+}
+
+POINTS TO
+
+//  {(fmt1,_fmt1_1,-Exact-)}
+int main(char *fmt1, ...)
+{
+//  {(fmt1,_fmt1_1,-Exact-)}
+   FILE *fp;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   size_t n, nr;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   char buf1[200];
+//  {(fmt1,_fmt1_1,-Exact-)}
+   char *buf2 = malloc(200*sizeof(char));
+//  {(fmt1,_fmt1_1,-Exact-)}
+   char *fmt2;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   char *i_name;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   int i, r, c, max;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   fpos_t *fp_pos, pos;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   long fp_pos_indic;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_list vl;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   
+   // formatted IO functions
+   fmt2 = "%s%d";
+//  {(fmt1,_fmt1_1,-Exact-)}
+   max = 100;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   n = 200;
+//  {(fmt1,_fmt1_1,-Exact-)}
+   fp = fopen("file.txt", "rb");
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   
+   (void) fread(buf1, 8, 50, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) fscanf(fp, fmt2, i_name, &i);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) fprintf(fp, "%s%d", i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) vfscanf(fp, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) vfprintf(fp, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   (void) scanf("%s%d", i_name, &i);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) printf(fmt2, i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) vscanf(fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) vprintf(fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   
+   (void) sscanf(buf1, fmt2, i_name, &i);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) sprintf(buf2, fmt2, i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) snprintf(buf2, 100, fmt2, i_name, i);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) vsscanf(buf1, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) vsnprintf(buf2, 100, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_start(vl, fmt1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) vsprintf(buf2, fmt1, vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   va_end(vl);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   // character IO functions
+   
+   c = fgetc(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) fgets(buf1, max, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) fputc(c, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) fputs(buf1, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   c = _IO_getc(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) _IO_putc(c, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) ungetc(c, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   c = getchar();
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) putchar(c);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   (void) gets(buf1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) puts(buf1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   // direct IO functions
+   
+   nr = fread(buf2, sizeof(char), n, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   nr = fwrite(buf2, sizeof(char), n, fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   // file positionning functions
+   (void) fgetpos(fp, fp_pos);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   (void) fgetpos(fp, &pos);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   (void) fseek(fp, 0L, 0);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   (void) fsetpos(fp, fp_pos);
+//  {(fmt1,_fmt1_1,-Exact-)}
+
+   fp_pos_indic = ftell(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   rewind(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   // error handling functions
+   
+   clearerr(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   r = feof(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   r = ferror(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   perror(buf1);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   /* should also have an effect on errno */
+   
+   fclose(fp);
+//  {(fmt1,_fmt1_1,-Exact-)}
+   
+   
+   fprintf(stderr, "The END\n");
+}

@@ -2,11 +2,6 @@
 Parsed printed file for "decl52!"
 
 typedef struct _hdl_progress_handler {
-   int percent_start;
-   int percent_stop;
-   int percent_done;
-   void (*progress)(struct _hdl_progress_handler *progress_mgr, const int nbfait, const int nbtotal);
-   void (*display)(struct _hdl_progress_handler *progress_mgr);
-   void *(*end_monitor)(struct _hdl_progress_handler *progress_mgr);
-   void *display_data;
-} const HDL_progress_handler;
+   const int i;
+   const int *first_data;
+} HDL_progress_handler;

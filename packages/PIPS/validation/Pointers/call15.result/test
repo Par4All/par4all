@@ -1,0 +1,25 @@
+
+POINTS TO
+
+C  {(pi,_pi_1,-Exact-)}
+void call15(int *pi, tf_t *q)
+{
+//  {(pi,_pi_1,-Exact-)}
+   *pi = 1;
+//  {(pi,_pi_1,-Exact-)}
+   q->one = 1;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int i;
+//  points to = {}
+   tf_t s;
+//  points to = {}
+
+   call15(&i, &s);
+}

@@ -34,6 +34,7 @@ digraph "dag_cleaned_0" {
 ! acceleration function
 
 #include <freiaCommon.h>
+#include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 

@@ -1,0 +1,54 @@
+
+Parsed code for "call04"
+
+void call04(int n, int m, int x[n][m])
+{
+   int i, j;
+
+   for (i = 0;i<n;i++)
+      for (j = 0;j<m;j++)
+         x[i][j] = 0;
+}
+
+Code for "call04"
+
+void call04(int n, int m, int x[n][m])
+{
+   int i, j;
+
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= m-1; j += 1)
+         x[i][j] = 0;
+}
+
+POINTS TO
+
+//  {}
+void call04(int n, int m, int x[n][m])
+{
+//  points to = {}
+   int i, j;
+//  points to = {}
+
+   for(i = 0; i <= n-1; i += 1)
+//  points to = {}
+      for(j = 0; j <= m-1; j += 1)
+//  points to = {}
+         x[i][j] = 0;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int d1 = 10;
+//  points to = {}
+   int d2 = 10;
+//  points to = {}
+   int y[d1][d2];
+//  points to = {}
+
+   call04(d1, d2, y);
+}

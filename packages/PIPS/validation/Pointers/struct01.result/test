@@ -1,39 +1,36 @@
-int main()
+int struct01()
 {
-   // BEGIN BLOCK
    struct one {
-      int *first;
-   } *x, x1;
-   int y[10], z[5];
-//               <must be written>: x1[1]
-   x1.first = &z[1];
-//               <must be read   >: x x1[1]
-//               <must be written>: x[0][1]
-   (*x).first = x1.first;
-//               <must be read   >: x
-//               <must be written>: x[0][1]
-   (*x).first = &y[5];
-   
-   
-   return 0;
-   // END BLOCK
+      int first;
+      int second;
+   } x;
+   int y[10];
+//               <must be written>: x[1]
+
+   x.first = 1;
+//               <must be written>: x[2]
+   x.second = 2;
+//               <must be written>: y[0]
+
+   y[0] = 1;
 }
 POINTS TO
-int main()
+//  {}
+int struct01()
 {
-   // BEGIN BLOCK
+//  points to = {}
    struct one {
-      int *first;
-   } *x, x1;
-   int y[10], z[5];
-   x1.first = &z[1];
-//  points to = {(x1[1],z[1],-Exact-)}
-   (*x).first = x1.first;
-//  points to = {(x[0][1],z[1],-Exact-);(x1[1],z[1],-Exact-)}
-   (*x).first = &y[5];
-//  points to = {(x[0][1],y[5],-Exact-);(x1[1],z[1],-Exact-)}
-   
-   
-   return 0;
-   // END BLOCK
+      int first;
+      int second;
+   } x;
+//  points to = {}
+   int y[10];
+//  points to = {}
+
+   x.first = 1;
+//  points to = {}
+   x.second = 2;
+//  points to = {}
+
+   y[0] = 1;
 }

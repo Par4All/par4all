@@ -1,0 +1,156 @@
+
+Parsed printed file for "point_to01"
+
+void point_to01()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+
+   p = &c;
+
+   if (1) {
+      p->a = 1;
+      p->b = 2;
+      p->c = 3;
+      p->d = p->a;
+      p->d = p->a = 4;
+   }
+}
+
+Proper pointer effects for "point_to01"
+
+void point_to01()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//               <must be written>: p
+
+   p = &c;
+
+   if (1) {
+//               <must be read   >: p
+//               <must be written>: p[0][1]
+      p->a = 1;
+//               <must be read   >: p
+//               <must be written>: p[0][2]
+      p->b = 2;
+//               <must be read   >: p
+//               <must be written>: p[0][3]
+      p->c = 3;
+//               <must be read   >: p p[0][1]
+//               <must be written>: p[0][4]
+      p->d = p->a;
+//               <must be read   >: p
+//               <must be written>: p[0][1] p[0][4]
+      p->d = p->a = 4;
+   }
+}
+
+Cumulated pointer effects for "point_to01"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+void point_to01()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//               <must be written>: p
+
+   p = &c;
+//               <may be read    >: p p[0][1]
+//               <may be written >: p[0][1] p[0][2] p[0][3] p[0][4]
+
+   if (1) {
+//               <must be read   >: p
+//               <must be written>: p[0][1]
+      p->a = 1;
+//               <must be read   >: p
+//               <must be written>: p[0][2]
+      p->b = 2;
+//               <must be read   >: p
+//               <must be written>: p[0][3]
+      p->c = 3;
+//               <must be read   >: p p[0][1]
+//               <must be written>: p[0][4]
+      p->d = p->a;
+//               <must be read   >: p
+//               <must be written>: p[0][1] p[0][4]
+      p->d = p->a = 4;
+   }
+}
+
+Proper effects for "point_to01"
+
+void point_to01()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//               <must be written>: p
+
+   p = &c;
+
+   if (1) {
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+      p->a = 1;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+      p->b = 2;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+      p->c = 3;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+      p->d = p->a;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+      p->d = p->a = 4;
+   }
+}
+
+POINTS TO
+
+//  {}
+void point_to01()
+{
+//  points to = {}
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//  points to = {}
+
+   p = &c;
+//  {(p,c,-Exact-)}
+
+   if (1) {
+//  {(p,c,-Exact-)}
+      p->a = 1;
+//  {(p,c,-Exact-)}
+      p->b = 2;
+//  {(p,c,-Exact-)}
+      p->c = 3;
+//  {(p,c,-Exact-)}
+      p->d = p->a;
+//  {(p,c,-Exact-)}
+      p->d = p->a = 4;
+   }
+}

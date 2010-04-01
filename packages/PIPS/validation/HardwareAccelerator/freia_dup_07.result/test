@@ -70,6 +70,7 @@ digraph "freia_dup_07_helper_0_0" {
 ! acceleration function
 
 #include <freiaCommon.h>
+#include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
@@ -82,7 +83,6 @@ freia_status freia_dup_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
   freia_microcode mcode;
   freia_dynamic_param dynparam;
   freia_reduction_results redres;
-  freia_op_sel op = 0;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -135,7 +135,7 @@ freia_status freia_dup_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
 
   return ret;
 }

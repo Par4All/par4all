@@ -1,0 +1,51 @@
+delete call04
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create call04 call04.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+activate MUST_POINTER_REGIONS
+
+
+# setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+echo
+echo Parsed code for "call04"
+echo
+
+display PARSED_PRINTED_FILE[call04]
+
+echo
+echo Code for "call04"
+echo
+
+display PRINTED_FILE[call04]
+
+echo
+echo POINTS TO
+echo 
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[call04]
+
+echo
+echo POINTS TO
+echo 
+display PRINTED_FILE[main]
+
+close
+delete call04
+quit

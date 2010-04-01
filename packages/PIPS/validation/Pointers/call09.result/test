@@ -1,0 +1,46 @@
+
+Parsed code for "call09"
+
+void call09(int i, int j)
+{
+   i = i+j;
+}
+
+Code for "call09"
+
+void call09(int i, int j)
+{
+   i = i+j;
+}
+
+Proper effects for "call09"
+
+void call09(int i, int j)
+{
+//               <must be read   >: i j
+//               <must be written>: i
+   i = i+j;
+}
+
+POINTS TO
+
+//  {}
+void call09(int i, int j)
+{
+//  points to = {}
+   i = i+j;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   tf_t s;
+//  points to = {}
+   tf_t *sp = &s;
+//  points to = {}
+
+   call09(s.one, sp->one);
+}

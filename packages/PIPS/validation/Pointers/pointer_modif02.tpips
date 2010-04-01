@@ -1,0 +1,47 @@
+delete pointer_modif02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create pointer_modif02 pointer_modif02.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty EFFECTS_POINTER_MODIFICATION_CHECKING TRUE
+
+echo
+echo Proper pointer effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated pointer effects for "main"
+echo
+#setenv EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+
+
+close
+delete pointer_modif02
+quit

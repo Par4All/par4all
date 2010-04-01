@@ -1,0 +1,31 @@
+delete varargs04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create varargs04 varargs04.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Proper effects for "main"
+echo
+
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[f3]
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[f3]
+
+close
+delete varargs04
+quit

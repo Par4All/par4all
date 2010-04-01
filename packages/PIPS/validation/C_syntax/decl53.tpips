@@ -25,7 +25,7 @@ echo Parsed printed file for "decl53!"
 echo
 
 display PARSED_PRINTED_FILE[decl53!]
-quit
+
 #echo
 #echo Parsed printed file for "HDL_progress_display"
 #echo
@@ -52,6 +52,7 @@ quit
 
 apply UNSPLIT
 shell cc -c decl53.database/Src/decl53.c
+shell rm decl53.o
 
 close
 #delete decl53

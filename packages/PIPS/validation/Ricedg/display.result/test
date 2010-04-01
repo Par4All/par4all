@@ -32,9 +32,9 @@ C               <must be written>: X
 
 Printed file with cumulated effects for "IMPACTMAYMUST"
 
-C               <may be read    >: Z(*)
+C               <may be read    >: Z(*) ZZ
 C               <may be written >: Z(*)
-C               <must be read   >: X Y ZZ
+C               <must be read   >: X Y
 C               <must be written>: T X Y
 
       SUBROUTINE FOO(X,Y,Z,ZZ)
@@ -48,9 +48,8 @@ C               <must be written>: T
       T = Y                                                             0006
 C               <must be written>: I
       I = 6                                                             0007
-C               <may be read    >: Z(*)
+C               <may be read    >: I Z(*) ZZ
 C               <may be written >: Z(*)
-C               <must be read   >: I ZZ
       DO WHILE (I.LT.5)                                                 0008
 C               <may be read    >: Z(*)
 C               <may be written >: Z(*)

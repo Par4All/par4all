@@ -1,0 +1,31 @@
+
+Parsed printed file for "assign01"
+
+void assign01()
+{
+   int i, j;
+
+   i = j = 1;
+}
+
+Cumulated effetcs for "assign01"
+
+void assign01()
+{
+   int i, j;
+//               <must be written>: i j
+
+   i = j = 1;
+}
+
+POINTS TO for "assign01"
+
+//  {}
+void assign01()
+{
+//  points to = {}
+   int i, j;
+//  points to = {}
+
+   i = j = 1;
+}

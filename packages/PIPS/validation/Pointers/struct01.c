@@ -1,13 +1,13 @@
-#include <stdio.h>
-int main() {
-   struct one {
-    int *first;
-   } *x, x1;
-   int y[10], z[5];
-   x1.first = &z[1];
-   (*x).first = x1.first;
-   (*x).first = &y[5];
+int struct01()
+{
+  struct one {
+    int first;
+    int second;
+  } x;
+  int y[10];
 
+  x.first = 1;
+  x.second = 2;
 
-  return 0;
+  y[0] = 1;
 }

@@ -1,0 +1,45 @@
+int main()
+{
+   FILE *fp;
+   size_t n;
+   char buf[200];
+   fp = fopen("file.txt", "rb");
+   n = fread(buf, 8, 50, fp);
+   if (n==-1) 
+      printf("fread failed");
+   fclose(fp);
+}
+int main()
+{
+   FILE *fp;
+   size_t n;
+   char buf[200];
+   fp = fopen("file.txt", "rb");
+   n = fread(buf, 8, 50, fp);
+   if (n==-1) 
+      printf("fread failed");
+   fclose(fp);
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   FILE *fp;
+//  points to = {}
+   size_t n;
+//  points to = {}
+   char buf[200];
+//  points to = {}
+   fp = fopen("file.txt", "rb");
+//  points to = {}
+   n = fread(buf, 8, 50, fp);
+//  points to = {}
+   if (n==-1) 
+//  points to = {}
+      printf("fread failed");
+//  points to = {}
+   fclose(fp);
+}

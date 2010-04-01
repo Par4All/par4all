@@ -1,0 +1,93 @@
+
+Parsed code for "inter01"
+
+void inter01()
+{
+   static int l;
+   int m;
+   int n;
+
+   for (n = 0;n<10;n++) {
+      i = 1;
+      j = 2;
+      k = 3;
+      l = 4;
+      m = 5;
+   }
+}
+
+Code for "inter01"
+
+void inter01()
+{
+   static int l;
+   int m;
+   int n;
+
+   for(n = 0; n <= 9; n += 1) {
+      i = 1;
+      j = 2;
+      k = 3;
+      l = 4;
+      m = 5;
+   }
+}
+
+Proper effects for "inter01"
+
+void inter01()
+{
+   static int l;
+   int m;
+   int n;
+//               <must be written>: n
+
+   for(n = 0; n <= 9; n += 1) {
+//               <must be written>: TOP-LEVEL:i
+      i = 1;
+//               <must be written>: TOP-LEVEL:j
+      j = 2;
+//               <must be written>: inter01!:k
+      k = 3;
+//               <must be written>: l
+      l = 4;
+//               <must be written>: m
+      m = 5;
+   }
+}
+
+POINTS TO
+
+//  {}
+void inter01()
+{
+//  points to = {}
+   static int l;
+//  points to = {}
+   int m;
+//  points to = {}
+   int n;
+//  points to = {}
+
+   for(n = 0; n <= 9; n += 1) {
+//  points to = {}
+      i = 1;
+//  points to = {}
+      j = 2;
+//  points to = {}
+      k = 3;
+//  points to = {}
+      l = 4;
+//  points to = {}
+      m = 5;
+   }
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   inter01();
+}

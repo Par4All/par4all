@@ -1,0 +1,44 @@
+# Make sure that efects in initializations are taken into account one
+# way or another
+
+delete flatten_code12
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create flatten_code12 flatten_code12.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER  TRUE
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+echo
+echo Execute initial code
+echo
+
+shell cc flatten_code12.database/Tmp/flatten_code12.cpp_processed.c -o flatten_code12.out
+shell ./flatten_code12.out
+shell rm flatten_code12.out
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[flatten_code12]
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[flatten_code12]
+
+
+
+close
+delete flatten_code12
+quit
+
