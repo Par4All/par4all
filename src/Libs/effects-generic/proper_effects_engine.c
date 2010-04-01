@@ -1043,6 +1043,75 @@ list generic_proper_effects_of_any_lhs(expression lhs)
   return generic_proper_effects_of_address_expression(lhs, TRUE);
 }
 
+
+/**
+ @return : a list of read effects corresponding to intermediate read memory 
+         accesses during the evaluation of add_exp.
+ @param add_exp is the expression which memory effects we are looking for
+ @param pme is a Pointer towards the Main memory Effect of add_exp.
+ @param lpme is a pointer towars the memory effects of the expression if it is
+        of type struct or union (but not an array of structs or union).
+ @param write_p is a boolean set to true if the main effect is write, false 
+         otherwise.
+
+ This function is an interface to generic_proper_effects_of_complex_address_expression
+ that also generates effects on paths accessible from struct and union fields down
+ to pointers if the expression type is a struct or union (basic derived but not enum, and
+ no dimensions).
+ If *lpme is not set to NIL, then the main effect has no real sense (effect on a variable name), 
+ and should be freed.
+*/
+list generic_proper_effects_of_complex_memory_access_expression(expression addexp, effect * pme, list *lpme, int write_p)
+{
+  list le = NIL;
+  *pme = effect_undefined; /* main data read-write effect: p[*] */ 
+  *lpme = NIL;
+  
+  pips_debug(5, "call or subscript case\n");
+  /* Look for a main read-write effect of the lhs and for its 
+     secondary effects */
+  le = generic_proper_effects_of_complex_address_expression(addexp, pme, write_p);
+  
+  if(!effect_undefined_p(*pme)) 
+    {
+      transformer context = transformer_undefined;
+      
+      if( !effects_private_current_context_empty_p())
+	context = effects_private_current_context_head();
+      
+      type addexp_t = expression_to_type(addexp);
+      
+      if (type_variable_p(addexp_t))
+	{
+	  variable addexp_tv = type_variable(addexp_t);
+	  if (ENDP(variable_dimensions(addexp_tv)))
+	    {
+	      basic addexp_tvb = variable_basic(addexp_tv);
+	      if (basic_derived_p(addexp_tvb) && !(type_enum_p(entity_type(basic_derived(addexp_tvb)))))
+		{
+		  *lpme = generic_r_proper_effects_of_derived_reference(*pme, addexp_t);
+		}		    
+	    }
+	  else
+	    {
+	      pips_debug(8, "main effect is on array name \n");
+	      
+	    }
+	}
+      else
+	{
+	  pips_internal_error("case not handled yet \n");
+	}
+
+      free_type(addexp_t);
+      if (!transformer_undefined_p(context))
+	(*effects_precondition_composition_op)(*lpme, context);
+	    
+    }	  
+  return le;
+
+}
+
 list generic_proper_effects_of_address_expression(expression addexp, int write_p)
 {
   list le = NIL;
