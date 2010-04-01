@@ -18,7 +18,8 @@ P4A_BUILD=$P4A_ROOT/build
 # Where things are installed
 P4A_INSTALL_PREFIX=$P4A_ROOT/run
 
-P4A_ETC=$P4A_BUILD/etc
+P4A_ETC=$P4A_INSTALL_PREFIX/etc
+mkdir -p $P4A_ETC
 
 if test -z "$INSTALL_PREFIX" ; then
     # install prefix passed by --prefix to the configure script
@@ -31,6 +32,14 @@ PIPS_CONFIGURE_COMMON_FLAGS=" --disable-static"
 
 cd $P4A_ROOT
 
+# Install Par4All scripts:
+mkdir -p $P4A_INSTALL_PREFIX/bin
+cp $P4A_ROOT/src/dev/{p4a_git,p4a_setup,p4a_valgrind} $P4A_INSTALL_PREFIX/bin
+cp $P4A_ROOT/src/dev/p4a_git_lib.bash $P4A_ETC
+cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $P4A_INSTALL_PREFIX/bin
+cp $P4A_ROOT/src/validation/p4a_validate $P4A_INSTALL_PREFIX/bin
+
+
 PIPS_COMPONENTS="linear newgen pips"
 PIPS_DIR=$P4A_ROOT/packages/PIPS
 
@@ -38,10 +47,66 @@ PIPS_DIR=$P4A_ROOT/packages/PIPS
 P4A_RC_SH=$P4A_ETC/par4all-rc.sh
 P4A_RC_CSH=$P4A_ETC/par4all-rc.csh
 
-# Build the package of name $1 that is to be found into directory $2:
+echo
+echo "### creating `basename $P4A_RC_SH`"
+mkdir -p  $P4A_ETC
+cat <<EOF > $P4A_RC_SH
+# Minimum Par4All rc file for sh-compatible shells
+
+export P4A_ROOT=$P4A_ROOT
+
+# default architecture
+#export PIPS_ARCH=$PIPS_ARCH
+# software roots
+#export EXTERN_ROOT=$P4A_BUILD
+#export NEWGEN_ROOT=$P4A_BUILD
+#export NEWGEN_ROOT=$PIPS_DIR/newgen
+unset NEWGEN_ROOT
+#export LINEAR_ROOT=$P4A_BUILD
+#export LINEAR_ROOT=$PIPS_DIR/linear
+unset LINEAR_ROOT
+#export PIPS_ROOT=$P4A_BUILD
+export PIPS_ROOT=$PIPS_DIR/pips
+# Hack to have access to makefiles...
+#export ROOT=$P4A_ROOT/packages/PIPS
+# For pyps:
+#export PIPS_NO_PYPS=1
+#export PYTHONPATH=$P4A_BUILD/lib
+
+#export INSTALL_DIR=$P4A_BUILD
+
+# Mainly to avoid the non working libraries.make:
+#unset WITH_DYNAMIC_LIBRARIES
+
+# fix path
+#PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
+PATH=\$PATH:\$P4A_ROOT/bin
+
+# Some hack to have p4a_recover_includes working. DIrectory to move
+# somewhere else later...
+export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
+export PYTHONPATH=/usr/share/pyshared
+EOF
+
+# Find the Fortran compiler:
+type gfortran && export PIPS_F77=gfortran
+type g77 && export PIPS_F77=g77
+if [ -n "$PIPS_F77" ]; then
+    echo >> $P4A_RC_SH
+    echo "# The Fortran compiler to use:" >> $P4A_RC_SH
+    echo "export PIPS_F77=$PIPS_F77" >> $P4A_RC_SH
+fi
+
+# Generate also a config file for csh users:
+$PIPS_DIR/pips/src/Scripts/env/sh2csh.pl < $P4A_RC_SH > $P4A_RC_CSH
+
+
+# Build the package of name $1 that is to be found into directory $2, with
+# some $3 options to configure:
 function build_package() {
     local package=$1
     local dir=$2
+    local options=$3
     (
 	cd $dir
 	dir=`pwd`
@@ -51,7 +116,7 @@ function build_package() {
 	autoreconf --install
 	mkdir -p $P4A_BUILD/$package
 	cd $P4A_BUILD/$package
-	$dir/configure ${PIPS_CONFIGURE_COMMON_FLAGS}
+	$dir/configure ${PIPS_CONFIGURE_COMMON_FLAGS} $options
 	make
 	make install
     )
@@ -79,15 +144,15 @@ build_package linear packages/PIPS/linear
 PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} ${PIPS_CONFIG} PATH=${INSTALL_PREFIX}/bin:$PATH "
 
 add_link_to_make_infrastructure pips
-build_package pips packages/PIPS/pips
+build_package pips packages/PIPS/pips "--enable-doc --enable-gpips --enable-tpips --enable-pyps --enable-hpfc"
 
 # that's all folks
 cat << EOF
 ============================================
 pips4u is ready
 everything got installed in $INSTALL_PREFIX
-all sources are available from $SRCDIR
 
+A file 
 you should consider add the following lines
 to your .bashrc or whatever:
 
