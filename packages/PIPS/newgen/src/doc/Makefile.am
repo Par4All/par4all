@@ -18,8 +18,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-SUBDIRS=scripts genC
-
-if WITH_DOC
-SUBDIRS+=doc
-endif
+docdir=$(datadir)/doc
+dist_noinst_DATA=newgen_manual.tex newgen_paper.tex tutoriel_newgen.tex
+doc_DATA=newgen_manual.pdf newgen_paper.pdf tutoriel_newgen.pdf
+include $(top_srcdir)/makes/latex.mk

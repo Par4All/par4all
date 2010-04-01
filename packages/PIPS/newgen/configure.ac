@@ -1,5 +1,24 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 AC_PREREQ(2.61)
 AC_INIT([newgen], [0.1], [pipsdev@cri.ensmp.fr])
@@ -20,6 +39,21 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AX_CHECK_CPROTO([4.7])
+
+# doc
+AX_ARG_ENABLE([doc],
+			  [enable documentation build],
+			  [no],
+			  [
+			   AX_CHECK_PROG([pdflatex])
+			   AX_CHECK_PROG([kpsepath])
+			   AX_CHECK_PROG([epstopdf])
+			   AX_LATEX_PACKAGE([pstricks])
+			   AX_LATEX_PACKAGE([html])
+			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf pstricks html])
+			  ]
+)
+AM_CONDITIONAL([WITH_DOC],[AX_HAS([doc])])
 
 # Checks for libraries.
 
@@ -46,6 +80,8 @@ AC_CONFIG_FILES([Makefile
                  src/genC/genread/Makefile
                  src/genC/genspec/Makefile
                  src/scripts/Makefile
+				 src/doc/Makefile
                  ])
+
 AX_DEPENDS([minimum],[lex yacc cproto std_headers strdup])
-AX_OUTPUT([minimum])
+AX_OUTPUT([minimum],[doc])
