@@ -1,0 +1,41 @@
+delete typedef01
+create typedef01 typedef01.c
+module main
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+apply FOR_LOOP_TO_DO_LOOP[compute]
+apply FOR_LOOP_TO_DO_LOOP[main]
+apply FOR_LOOP_TO_WHILE_LOOP[compute]
+apply FOR_LOOP_TO_WHILE_LOOP[main]
+activate MUST_POINTER_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+module compute
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[compute]
+echo
+echo POINTS TO
+echo
+
+display PRINTED_FILE[main]
+
+
+close 
+quit
+
+# EOF

@@ -1,0 +1,82 @@
+delete struct08
+create struct08 struct08.c
+
+#echo Select some options to deal with the C Language:
+#echo Parse as C:
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+#echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+
+#echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+
+
+echo
+echo Proper effects for "init"
+echo
+display PRINTED_FILE[init]
+echo
+echo Proper effects for "init2"
+echo
+display PRINTED_FILE[init2]
+echo
+echo Proper effects for "init3"
+echo
+display PRINTED_FILE[init3]
+echo
+echo Proper effects for "init4"
+echo
+display PRINTED_FILE[init4]
+
+#activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+#display PRINTED_FILE[init]
+#display PRINTED_FILE[init2]
+#display PRINTED_FILE[init3]
+#display PRINTED_FILE[init4]
+
+activate PRINT_CODE_PROPER_POINTER_REGIONS
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init]
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init2]
+
+echo
+echo POINTS TO
+echo
+
+
+display PRINTED_FILE[init3]
+echo
+echo POINTS TO
+echo
+
+display PRINTED_FILE[init4]
+
+
+close
+delete struct08
+quit

@@ -6,15 +6,22 @@ void global01()
 //               <must be read   >: TOP-LEVEL:i
 //               <must be written>: TOP-LEVEL:j
    j = i;
+//               <must be read   >: TOP-LEVEL:i __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("i = %p", i);
    // END BLOCK
 }
 POINTS TO
-//  {stubs for global pointters missing}
+//  {}
 void global01()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    i = &k;
 //  {(i,k,-Exact-)}
    j = i;
+//  {(j,k,-Exact-);(i,k,-Exact-)}
+   printf("i = %p", i);
    // END BLOCK
 }

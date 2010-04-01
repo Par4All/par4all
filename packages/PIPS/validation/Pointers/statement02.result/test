@@ -13,33 +13,39 @@ int main()
    y1 = &y2;
 //               <must be written>: y
    y = &y1;
-//               <must be read   >: y y[0]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be written>: x
    x = *y;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: x y
-//               <must be written>: y[0]
    *y = x;
    return 0;
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *x, x1, **y, *y1, y2;
+//  points to = {}
 
    x1 = 0;
+//  points to = {}
    y2 = 1;
+//  points to = {}
    x = &x1;
-//  points to = {(x,x1,-Exact-)}
+//  {(x,x1,-Exact-)}
    y1 = &y2;
-//  points to = {(y1,y2,-Exact-);(x,x1,-Exact-)}
+//  {(y1,y2,-Exact-);(x,x1,-Exact-)}
    y = &y1;
-//  points to = {(y,y1,-Exact-);(y1,y2,-Exact-);(x,x1,-Exact-)}
+//  {(y,y1,-Exact-);(y1,y2,-Exact-);(x,x1,-Exact-)}
    x = *y;
-//  points to = {(y,y1,-Exact-);(y1,y2,-Exact-);(x,y2,-Exact-)}
+//  {(y,y1,-Exact-);(y1,y2,-Exact-);(x,y2,-Exact-)}
    *y = x;
-//  points to = {(y,y1,-Exact-);(x,y2,-Exact-);(y1,y2,-Exact-)}
+//  {(y,y1,-Exact-);(x,y2,-Exact-);(y1,y2,-Exact-)}
    return 0;
    // END BLOCK
 }

@@ -1,13 +1,24 @@
-int struct01()
+int main()
 {
   struct one {
     int first;
     int second;
-  } x;
-  int y[10];
+  } x, y[10], z[10];
+  int i;
 
   x.first = 1;
   x.second = 2;
 
-  y[0] = 1;
+  for (i=0; i<10; i++)
+    {
+      y[i].first = x.first;
+      y[i].second = x.second;
+    }
+
+  for (i=0; i<10; i++)
+    {
+      z[i] = x;
+    }
+  return 0;
+
 }

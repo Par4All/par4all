@@ -1,0 +1,30 @@
+void array02()
+{
+   // BEGIN BLOCK
+   float x[11][2];
+   int i;
+//               <must be written>: i
+
+   for(i = 1; i <= 9; i += 1)
+//               <must be read   >: i
+//               <must be written>: x[i][1]
+      x[i][1] = 0.;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+void array02()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   float x[11][2];
+//  points to = {}
+   int i;
+//  points to = {}
+
+   for(i = 1; i <= 9; i += 1)
+//  points to = {}
+      x[i][1] = 0.;
+   // END BLOCK
+}

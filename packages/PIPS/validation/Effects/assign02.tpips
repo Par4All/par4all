@@ -19,31 +19,31 @@ echo
 display PARSED_PRINTED_FILE[assign02]
 
 echo
-echo Proper effetcs for "make_s"
+echo Proper pointer effects for "make_s"
 echo
 
 
-setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
 
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[make_s]
 
 echo
-echo Cumulated effetcs for "make_s"
+echo Cumulated pointer effects for "make_s"
 echo
 
 activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[make_s]
 
 echo
-echo Proper effetcs for "assign02"
+echo Proper pointer effects for "assign02"
 echo
 
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[assign02]
 
 echo
-echo Cumulated effetcs for "assign02"
+echo Cumulated pointer effects for "assign02"
 echo
 
 activate PRINT_CODE_CUMULATED_POINTER_EFFECTS

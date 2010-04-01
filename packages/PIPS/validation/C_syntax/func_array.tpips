@@ -1,0 +1,6 @@
+delete func_array 
+setproperty ABORT_ON_USER_ERROR TRUE
+create func_array func_array.c
+apply UNSPLIT(main)
+close
+quit

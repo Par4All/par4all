@@ -1340,7 +1340,7 @@ struct __gconv_trans_data {
 /* Pointer to step-local data.  */
 struct __gconv_step {
    struct __gconv_loaded_object *__shlib_handle;
-   char *__modname;
+   const char *__modname;
    int __counter;
    char *__from_name;
    char *__to_name;
@@ -2013,7 +2013,7 @@ extern size_t fread(void *__ptr, size_t __size, size_t __n, FILE *__stream);
    This function is a possible cancellation points and therefore not
    marked with __THROW.  */
 
-extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
+extern size_t fwrite(const void *__ptr, size_t __size, size_t __n, FILE *__s);
 
 /* Faster versions when locking is not necessary.
 
@@ -2024,7 +2024,7 @@ extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
 
 extern size_t fread_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
 
-extern size_t fwrite_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+extern size_t fwrite_unlocked(const void *__ptr, size_t __size, size_t __n, FILE *__stream);
 
 
 

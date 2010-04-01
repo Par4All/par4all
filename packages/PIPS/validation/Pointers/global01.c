@@ -10,4 +10,5 @@ void global01()
 {
   i = &k;
   j = i;
+  printf("i = %p",i);
 }

@@ -1,0 +1,65 @@
+delete fpointer01
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create fpointer01 fpointer01.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Symbol table for "fpointer01"
+echo
+
+display SYMBOL_TABLE_FILE[fpointer01]
+
+echo
+echo Parsed printed file for "fpointer01"
+echo
+
+display PARSED_PRINTED_FILE[fpointer01]
+#quit
+
+echo
+echo Proper pointer effects for "fpointer01"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[fpointer01]
+
+echo
+echo Cumulated pointer effects for "fpointer01"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[fpointer01]
+
+echo
+echo Proper effects for "fpointer01"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[fpointer01]
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[fpointer01]
+echo
+echo Cumulated effects for "fpointer01"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[fpointer01]
+
+close
+delete fpointer01
+quit

@@ -16,8 +16,8 @@ int main()
 //               <must be written>: z
 
    z = t;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: x z
-//               <must be written>: x[0]
    *x = z;
 //               <must be read   >: __IO_EFFECTS:LUNS[1] x
 //               <must be written>: __IO_EFFECTS:LUNS[1]
@@ -26,25 +26,32 @@ int main()
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int **x, **y, *z, *t;
+//  points to = {}
    int i, j;
+//  points to = {}
    i = 1;
+//  points to = {}
    j = 2;
+//  points to = {}
 
    z = &i;
-//  points to = {(z,i,-Exact-)}
+//  {(z,i,-Exact-)}
    t = &j;
-//  points to = {(t,j,-Exact-);(z,i,-Exact-)}
+//  {(t,j,-Exact-);(z,i,-Exact-)}
 
    z = t;
-//  points to = {(t,j,-Exact-);(z,j,-Exact-)}
+//  {(t,j,-Exact-);(z,j,-Exact-)}
    *x = z;
-//  points to = {(t,j,-Exact-);(z,j,-Exact-)}
+//  {(t,j,-Exact-);(z,j,-Exact-)}
    printf(" x = %p\n", x);
-//  points to = {(t,j,-Exact-);(z,j,-Exact-)}
+//  {(t,j,-Exact-);(z,j,-Exact-)}
    return 0;
    // END BLOCK
 }

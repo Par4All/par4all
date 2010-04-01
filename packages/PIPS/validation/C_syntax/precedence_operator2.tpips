@@ -1,0 +1,20 @@
+delete precedence_operator2
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_ALL_PARENTHESES TRUE
+
+create precedence_operator2 precedence_operator2.c
+
+display PRINTED_FILE[precedence_operator2!]
+display PRINTED_FILE[main]
+
+apply UNSPLIT(%ALL)
+
+shell gcc -c precedence_operator2.database/Src/precedence_operator2.c
+shell rm *.o
+
+close
+
+#delete precedence_operator2
+quit

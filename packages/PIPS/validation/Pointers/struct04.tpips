@@ -18,13 +18,6 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[struct04]
 
 
-
-
-
-
-
-
-
 echo POINTS TO
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[struct04]

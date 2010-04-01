@@ -1,0 +1,60 @@
+delete decl55
+
+#setproperty ABORT_ON_USER_ERROR TRUE
+
+create decl55 decl55.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+# The source code is not available, but pointers to functions are
+# defined and initialized with function names
+
+# display PARSED_PRINTED_FILE[%ALL]
+
+echo
+echo Parsed printed file for "decl55!"
+echo
+
+display PARSED_PRINTED_FILE[decl55!]
+
+#echo
+#echo Parsed printed file for "HDL_progress_display"
+#echo
+#
+#display PARSED_PRINTED_FILE[HDL_progress_display]
+
+#echo
+#echo Parsed printed file for "HDL_progress_progress"
+#echo
+#
+#display PARSED_PRINTED_FILE[HDL_progress_progress]
+
+#echo
+#echo Parsed printed file for "HDL_progress_end"
+#echo
+#
+#display PARSED_PRINTED_FILE[HDL_progress_end]
+
+#echo
+#echo Parsed printed file for "HDL_progress_start_monitor"
+#echo
+#
+#display PARSED_PRINTED_FILE[HDL_progress_start_monitor]
+
+apply UNSPLIT
+shell cc -c decl55.database/Src/decl55.c
+shell rm decl55.o
+
+close
+#delete decl55
+
+quit

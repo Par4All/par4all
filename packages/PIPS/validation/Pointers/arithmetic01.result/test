@@ -1,0 +1,39 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *i, j, k;
+//               <must be written>: k
+   k = 0;
+//               <must be read   >: k
+//               <must be written>: j
+   j = k;
+//               <must be written>: i
+   i = &j;
+//               <must be read   >: i
+//               <must be written>: i
+   i++;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   int *i, j, k;
+//  points to = {}
+   k = 0;
+//  points to = {}
+   j = k;
+//  points to = {}
+   i = &j;
+//  {(i,j,-Exact-)}
+   i++;
+//  {(i,*ANYWHERE*,-MAY-)}
+
+   return 0;
+   // END BLOCK
+}
