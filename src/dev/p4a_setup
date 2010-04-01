@@ -39,6 +39,11 @@ cp $P4A_ROOT/src/dev/p4a_git_lib.bash $P4A_ETC
 cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/validation/p4a_validate $P4A_INSTALL_PREFIX/bin
 
+# Stuff still lacking from PIPS install:
+cp $P4A_ROOT/packages/PIPS/pips/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin
+# To have the validation running:
+mkdir -p  $P4A_INSTALL_PREFIX/makes
+cp $P4A_ROOT/packages/PIPS/nlpmake/makes/{arch.sh,version.sh} $P4A_INSTALL_PREFIX/makes
 
 PIPS_COMPONENTS="linear newgen pips"
 PIPS_DIR=$P4A_ROOT/packages/PIPS
@@ -80,12 +85,18 @@ export PIPS_ROOT=$PIPS_DIR/pips
 
 # fix path
 #PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
-PATH=\$PATH:\$P4A_ROOT/bin
+PATH=\$PATH:\$P4A_ROOT/run/bin
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$P4A_ROOT/lib
+export PKG_CONFIG_PATH=\$P4A_ROOT/lib/pkgconfig
+# To fix...
+#export PYTHONPATH=\$P4A_ROOT/lib/python2.6/site-packages/pips
+
 
 # Some hack to have p4a_recover_includes working. DIrectory to move
 # somewhere else later...
-export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
-export PYTHONPATH=/usr/share/pyshared
+#export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
+#export PYTHONPATH=/usr/share/pyshared
 EOF
 
 # Find the Fortran compiler:
@@ -144,7 +155,8 @@ build_package linear packages/PIPS/linear
 PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} ${PIPS_CONFIG} PATH=${INSTALL_PREFIX}/bin:$PATH "
 
 add_link_to_make_infrastructure pips
-build_package pips packages/PIPS/pips "--enable-doc --enable-gpips --enable-tpips --enable-pyps --enable-hpfc"
+#build_package pips packages/PIPS/pips "--enable-doc --enable-gpips --enable-tpips --enable-pyps --enable-hpfc"
+build_package pips packages/PIPS/pips
 
 # that's all folks
 cat << EOF
@@ -157,7 +169,7 @@ you should consider add the following lines
 to your .bashrc or whatever:
 
 export PATH=$INSTALL_PREFIX/bin:\$PATH
-export LD_LIBRARY_PATH=$INSTALL_PREFIX/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_PREFIX/lib
 export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib/pkgconfig
 export PYTHONPATH=$INSTALL_PREFIX/lib/python2.6/site-packages/pips
 
