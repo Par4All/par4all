@@ -41,7 +41,11 @@ EOF
 	exit 1
     fi
     # To be change when the global installation infrastructure is more stable:
-    source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
+    if [[ -n $P4A_ETC/p4a_git_lib.bash ]]; then
+	source $P4A_ETC/p4a_git_lib.bash
+    else
+	source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
+    fi
 }
 
 enforce_P4A_TOP
