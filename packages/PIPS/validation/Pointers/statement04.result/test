@@ -8,8 +8,8 @@ int main()
    h = 2;
 //               <must be written>: y
    y = &h;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: x y
-//               <must be written>: x[0]
    *x = y;
 //               <must be read   >: __IO_EFFECTS:LUNS[1] x
 //               <must be written>: __IO_EFFECTS:LUNS[1]
@@ -18,18 +18,24 @@ int main()
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int **x, *y, k, h;
+//  points to = {}
    k = 1;
+//  points to = {}
    h = 2;
+//  points to = {}
    y = &h;
-//  points to = {(y,h,-Exact-)}
+//  {(y,h,-Exact-)}
    *x = y;
-//  points to = {(y,h,-Exact-)}
+//  {(y,h,-Exact-)}
    printf("x = %p \n", x);
-//  points to = {(y,h,-Exact-)}
+//  {(y,h,-Exact-)}
    return 0;
    // END BLOCK
 }

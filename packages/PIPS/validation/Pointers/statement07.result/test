@@ -14,15 +14,20 @@ int main()
    // END BLOCK
 }
 POINTS TO
+//  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    int *x, *a, i;
+//  points to = {}
    i = 1;
+//  points to = {}
    a = &i;
-//  points to = {(a,i,-Exact-)}
+//  {(a,i,-Exact-)}
    x = a;
-//  points to = {(x,i,-Exact-);(a,i,-Exact-)}
+//  {(x,i,-Exact-);(a,i,-Exact-)}
 
    return 0;
    // END BLOCK

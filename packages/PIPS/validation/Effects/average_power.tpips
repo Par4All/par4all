@@ -1,0 +1,77 @@
+delete average_power
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create average_power average_power.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+activate MUST_POINTER_REGIONS
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+setenv REGIONS_OPERATORS_DEBUG_LEVEL 8
+echo
+echo Parsed code for "average_power"
+echo
+
+display PARSED_PRINTED_FILE[average_power]
+
+echo
+echo Code for "average_power"
+echo
+
+display PRINTED_FILE[average_power]
+
+#echo
+#echo Code for "main"
+#echo
+#
+#display PRINTED_FILE[main]
+
+echo
+echo Proper effects for "average_power"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[average_power]
+
+echo
+echo Cumulated effects for "average_power"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[average_power]
+#quit
+echo
+echo Cumulated effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Regions for "main"
+echo
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+activate PRINT_CODE_POINTER_REGIONS
+display PRINTED_FILE[main]
+
+echo
+echo Regions for "average_power"
+echo
+
+activate PRINT_CODE_POINTER_REGIONS
+display PRINTED_FILE[average_power]
+
+close
+delete average_power
+quit

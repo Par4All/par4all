@@ -14,9 +14,16 @@ decl24.c	    NOK either a C parser or a prettyprinter bug;
 		        attribute const is moved from field display_data
 	 		to the typedef itself; see decl50 and decl51
 decl50.c	    OK  check the parsing and prettyprinting of the const 
-		    	qualifier for pointer
+		    	and volatile qualifier for pointer
 decl51.c	    OK  check the parsing and prettyprinting of the const 
 		    	qualifier for pointer and typedef
+decl52.c	    NOK simplified version of decl24.c
+decl53.c	    OK  a variety of const positions and combinations, 
+		    	but not for fields
+decl54.c	    OK  simplified version of decl52, struct with two int fields
+		    	the first is const and not the second
+decl55.c	    OK  simplified version of decl52, struct with one pointer
+		    	field, const for pointer target
 
 dereference.c	    NOK the source code is not easy to compile with gcc, even 
 		    	using the options available in the tpips script

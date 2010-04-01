@@ -442,7 +442,8 @@ set_control_to_label(entity m, control c, hash_table h)
 	string label = entity_name( statement_to_label( st )) ;
 
 	l = empty_global_label_p( label ) ? new_label_name(m) : label ;
-	debug(3, "set_control_to_label", "Associates label %s to stmt %s\n",
+	/* memory leak in debug code: statement_identification(). */
+	pips_debug(3, "Associates label %s to stmt %s\n",
 	      l, statement_identification(st));
 	hash_put(h, (char *) c, strdup(l)) ;
     }

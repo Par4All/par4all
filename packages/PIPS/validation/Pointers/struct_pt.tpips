@@ -1,4 +1,7 @@
 delete struct_pt
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create struct_pt struct_pt.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
@@ -13,12 +16,17 @@ setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 setenv PIPS_CPP="cpp -C"
 activate C_PARSER
 
+echo
+echo Pointer proper effects
+echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[main]
 
+echo
+echo Points-to
+echo
 
-echo POINTS TO
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 

@@ -1059,7 +1059,7 @@ static void freia_spoc_code_buildup
 	 FREIA_SPOC_CALL
 	 "  // actual call of spoc hardware\n"
 	 "  freia_cg_template_process_2i_2o",
-	 "(op, param, ", out0, ", ", out1, ", ", in0, ", ", in1, ");\n",
+	 "(&param, ", out0, ", ", out1, ", ", in0, ", ", in1, ");\n",
 	 NULL);
 
   if (some_reductions)

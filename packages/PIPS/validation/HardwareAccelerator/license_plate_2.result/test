@@ -1,0 +1,2002 @@
+
+! initial function
+
+int license_plate(void)
+{
+   freia_dataio fdin;                                                   /*0006*/
+   freia_dataio fdout;                                                  /*0007*/
+
+   freia_data2d *in;                                                    /*0009*/
+   freia_data2d *immir;                                                 /*0010*/
+   freia_data2d *imopen;                                                /*0011*/
+   freia_data2d *imclose;                                               /*0012*/
+   freia_data2d *imopenth;                                              /*0013*/
+   freia_data2d *imcloseth;                                             /*0014*/
+   freia_data2d *imand;                                                 /*0015*/
+   freia_data2d *imfilt;                                                /*0016*/
+   freia_data2d *imout;                                                 /*0017*/
+   freia_data2d *out;                                                   /*0018*/
+   
+   
+   
+   int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};                  /*0022*/
+   
+   
+   
+   int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};                  /*0026*/
+   //PIPS generated variable
+   int _return0, _return1, _return2, _return3, _return4;                /*0028*/
+   //PIPS generated variable
+   freia_status ret_0;                                                  /*0030*/
+   //PIPS generated variable
+   int i_0;                                                             /*0032*/
+   //PIPS generated variable
+   freia_status ret_1;                                                  /*0034*/
+   //PIPS generated variable
+   int i_1;                                                             /*0036*/
+   //PIPS generated variable
+   freia_status ret_2;                                                  /*0038*/
+   //PIPS generated variable
+   int i_2;                                                             /*0040*/
+   //PIPS generated variable
+   freia_status ret_3;                                                  /*0042*/
+   //PIPS generated variable
+   int i_3, i_4;                                                        /*0044*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0047*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0048*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0051*/
+   immir = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
+   imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
+   imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0054*/
+   imopenth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);         /*0055*/
+   imcloseth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0056*/
+   imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0057*/
+   imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0058*/
+   imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0059*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0060*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0063*/
+   //  freia_data2d imtmp;
+   
+   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
+   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
+   
+   
+   ret_0 = freia_aipo_erode_8c(imopen, in, kernel1x3);                  /*0070*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0071*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0072*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0073*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0074*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0075*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0076*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0077*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0078*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0079*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0080*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0081*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0082*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0083*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0084*/
+   i_0 = 15;                                                            /*0085*/
+
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0087*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0088*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0089*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0090*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0091*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0092*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0093*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0094*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0095*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0096*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0097*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0098*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0099*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0100*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0101*/
+   i_0 = 15;                                                            /*0102*/
+   
+   //freia_common_destruct_data(imtmp);
+   _return1 = ret_0;                                                    /*0105*/
+
+   ret_1 = freia_aipo_dilate_8c(imclose, in, kernel1x3);                /*0107*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0108*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0109*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0110*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0111*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0112*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0113*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0114*/
+   i_1 = 8;                                                             /*0115*/
+
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0117*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0118*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0119*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0120*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0121*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0122*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0123*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0124*/
+   i_1 = 8;                                                             /*0125*/
+   
+   
+   _return0 = ret_1;                                                    /*0128*/
+
+   freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0130*/
+   freia_aipo_threshold(imcloseth, imclose, 150, 255, 1);               /*0131*/
+
+   freia_aipo_and(imand, imopenth, imcloseth);                          /*0133*/
+   //  freia_data2d imtmp;
+   
+   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
+   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
+   
+   
+   ret_2 = freia_aipo_erode_8c(imfilt, imand, kernel3x1);               /*0140*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0141*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0142*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0143*/
+   i_2 = 4;                                                             /*0144*/
+
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0146*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0147*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0148*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0149*/
+   i_2 = 4;                                                             /*0150*/
+   
+   //freia_common_destruct_data(imtmp);
+   _return2 = ret_2;                                                    /*0153*/
+   //  freia_data2d imtmp;
+   
+   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
+   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
+   
+   
+   ret_3 = freia_aipo_erode_8c(imout, imfilt, kernel1x3);               /*0160*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0161*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0162*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0163*/
+   i_3 = 4;                                                             /*0164*/
+
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0166*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0167*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0168*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0169*/
+   i_3 = 4;                                                             /*0170*/
+   
+   //freia_common_destruct_data(imtmp);
+   _return3 = ret_3;                                                    /*0173*/
+   
+   
+   freia_aipo_dilate_8c(out, imout, (int *) freia_morpho_kernel_8c);    /*0176*/
+   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);      /*0177*/
+   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);      /*0178*/
+   i_4 = 3;                                                             /*0179*/
+   
+   
+   _return4 = 0;                                                        /*0182*/
+
+   freia_aipo_and(out, out, in);                                        /*0184*/
+   freia_common_tx_image(out, &fdout);                                  /*0185*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0188*/
+   freia_common_destruct_data(immir);                                   /*0189*/
+   freia_common_destruct_data(imopen);                                  /*0190*/
+   freia_common_destruct_data(imclose);                                 /*0191*/
+   freia_common_destruct_data(imopenth);                                /*0192*/
+   freia_common_destruct_data(imcloseth);                               /*0193*/
+   freia_common_destruct_data(imand);                                   /*0194*/
+   freia_common_destruct_data(imfilt);                                  /*0195*/
+   freia_common_destruct_data(imout);                                   /*0196*/
+   freia_common_destruct_data(out);                                     /*0197*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0200*/
+   freia_common_close_output(&fdout);                                   /*0201*/
+
+   return 0;                                                            /*0203*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "license_plate" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "184 &" [shape=trapezium,orientation=270];
+  "184 &" -> "out";
+  "182 ?" [shape=none];
+  "179 ?" [shape=none];
+  "178 D8" [shape=box];
+  "178 D8" -> "184 &" [label="out"];
+  "177 D8" [shape=box];
+  "177 D8" -> "178 D8" [label="out"];
+  "176 D8" [shape=box];
+  "176 D8" -> "177 D8" [label="out"];
+  "173 ?" [shape=none];
+  "170 ?" [shape=none];
+  "169 D8" [shape=box];
+  "169 D8" -> "176 D8" [label="imout"];
+  "168 D8" [shape=box];
+  "168 D8" -> "169 D8" [label="imout"];
+  "167 D8" [shape=box];
+  "167 D8" -> "168 D8" [label="imout"];
+  "166 D8" [shape=box];
+  "166 D8" -> "167 D8" [label="imout"];
+  "164 ?" [shape=none];
+  "163 E8" [shape=box];
+  "163 E8" -> "166 D8" [label="imout"];
+  "162 E8" [shape=box];
+  "162 E8" -> "163 E8" [label="imout"];
+  "161 E8" [shape=box];
+  "161 E8" -> "162 E8" [label="imout"];
+  "160 E8" [shape=box];
+  "160 E8" -> "161 E8" [label="imout"];
+  "153 ?" [shape=none];
+  "150 ?" [shape=none];
+  "149 D8" [shape=box];
+  "149 D8" -> "160 E8" [label="imfilt"];
+  "148 D8" [shape=box];
+  "148 D8" -> "149 D8" [label="imfilt"];
+  "147 D8" [shape=box];
+  "147 D8" -> "148 D8" [label="imfilt"];
+  "146 D8" [shape=box];
+  "146 D8" -> "147 D8" [label="imfilt"];
+  "144 ?" [shape=none];
+  "143 E8" [shape=box];
+  "143 E8" -> "146 D8" [label="imfilt"];
+  "142 E8" [shape=box];
+  "142 E8" -> "143 E8" [label="imfilt"];
+  "141 E8" [shape=box];
+  "141 E8" -> "142 E8" [label="imfilt"];
+  "140 E8" [shape=box];
+  "140 E8" -> "141 E8" [label="imfilt"];
+  "133 &" [shape=trapezium,orientation=270];
+  "133 &" -> "140 E8" [label="imand"];
+  "131 thr" [shape=parallelogram];
+  "131 thr" -> "133 &" [label="imcloseth"];
+  "130 thr" [shape=parallelogram];
+  "130 thr" -> "133 &" [label="imopenth"];
+  "128 ?" [shape=none];
+  "125 ?" [shape=none];
+  "124 E8" [shape=box];
+  "124 E8" -> "131 thr" [label="imclose"];
+  "123 E8" [shape=box];
+  "123 E8" -> "124 E8" [label="imclose"];
+  "122 E8" [shape=box];
+  "122 E8" -> "123 E8" [label="imclose"];
+  "121 E8" [shape=box];
+  "121 E8" -> "122 E8" [label="imclose"];
+  "120 E8" [shape=box];
+  "120 E8" -> "121 E8" [label="imclose"];
+  "119 E8" [shape=box];
+  "119 E8" -> "120 E8" [label="imclose"];
+  "118 E8" [shape=box];
+  "118 E8" -> "119 E8" [label="imclose"];
+  "117 E8" [shape=box];
+  "117 E8" -> "118 E8" [label="imclose"];
+  "115 ?" [shape=none];
+  "114 D8" [shape=box];
+  "114 D8" -> "117 E8" [label="imclose"];
+  "113 D8" [shape=box];
+  "113 D8" -> "114 D8" [label="imclose"];
+  "112 D8" [shape=box];
+  "112 D8" -> "113 D8" [label="imclose"];
+  "111 D8" [shape=box];
+  "111 D8" -> "112 D8" [label="imclose"];
+  "110 D8" [shape=box];
+  "110 D8" -> "111 D8" [label="imclose"];
+  "109 D8" [shape=box];
+  "109 D8" -> "110 D8" [label="imclose"];
+  "108 D8" [shape=box];
+  "108 D8" -> "109 D8" [label="imclose"];
+  "107 D8" [shape=box];
+  "107 D8" -> "108 D8" [label="imclose"];
+  "105 ?" [shape=none];
+  "102 ?" [shape=none];
+  "101 D8" [shape=box];
+  "101 D8" -> "130 thr" [label="imopen"];
+  "100 D8" [shape=box];
+  "100 D8" -> "101 D8" [label="imopen"];
+  "99 D8" [shape=box];
+  "99 D8" -> "100 D8" [label="imopen"];
+  "98 D8" [shape=box];
+  "98 D8" -> "99 D8" [label="imopen"];
+  "97 D8" [shape=box];
+  "97 D8" -> "98 D8" [label="imopen"];
+  "96 D8" [shape=box];
+  "96 D8" -> "97 D8" [label="imopen"];
+  "95 D8" [shape=box];
+  "95 D8" -> "96 D8" [label="imopen"];
+  "94 D8" [shape=box];
+  "94 D8" -> "95 D8" [label="imopen"];
+  "93 D8" [shape=box];
+  "93 D8" -> "94 D8" [label="imopen"];
+  "92 D8" [shape=box];
+  "92 D8" -> "93 D8" [label="imopen"];
+  "91 D8" [shape=box];
+  "91 D8" -> "92 D8" [label="imopen"];
+  "90 D8" [shape=box];
+  "90 D8" -> "91 D8" [label="imopen"];
+  "89 D8" [shape=box];
+  "89 D8" -> "90 D8" [label="imopen"];
+  "88 D8" [shape=box];
+  "88 D8" -> "89 D8" [label="imopen"];
+  "87 D8" [shape=box];
+  "87 D8" -> "88 D8" [label="imopen"];
+  "85 ?" [shape=none];
+  "84 E8" [shape=box];
+  "84 E8" -> "87 D8" [label="imopen"];
+  "83 E8" [shape=box];
+  "83 E8" -> "84 E8" [label="imopen"];
+  "82 E8" [shape=box];
+  "82 E8" -> "83 E8" [label="imopen"];
+  "81 E8" [shape=box];
+  "81 E8" -> "82 E8" [label="imopen"];
+  "80 E8" [shape=box];
+  "80 E8" -> "81 E8" [label="imopen"];
+  "79 E8" [shape=box];
+  "79 E8" -> "80 E8" [label="imopen"];
+  "78 E8" [shape=box];
+  "78 E8" -> "79 E8" [label="imopen"];
+  "77 E8" [shape=box];
+  "77 E8" -> "78 E8" [label="imopen"];
+  "76 E8" [shape=box];
+  "76 E8" -> "77 E8" [label="imopen"];
+  "75 E8" [shape=box];
+  "75 E8" -> "76 E8" [label="imopen"];
+  "74 E8" [shape=box];
+  "74 E8" -> "75 E8" [label="imopen"];
+  "73 E8" [shape=box];
+  "73 E8" -> "74 E8" [label="imopen"];
+  "72 E8" [shape=box];
+  "72 E8" -> "73 E8" [label="imopen"];
+  "71 E8" [shape=box];
+  "71 E8" -> "72 E8" [label="imopen"];
+  "70 E8" [shape=box];
+  "70 E8" -> "71 E8" [label="imopen"];
+  "in" -> "184 &";
+  "in" -> "107 D8";
+  "in" -> "70 E8";
+}
+// graph for dag "dag_cleaned_0" of module "license_plate" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "184 &" [shape=trapezium,orientation=270];
+  "184 &" -> "out";
+  "182 ?" [shape=none];
+  "179 ?" [shape=none];
+  "178 D8" [shape=box];
+  "178 D8" -> "184 &" [label="out"];
+  "177 D8" [shape=box];
+  "177 D8" -> "178 D8" [label="out"];
+  "176 D8" [shape=box];
+  "176 D8" -> "177 D8" [label="out"];
+  "173 ?" [shape=none];
+  "170 ?" [shape=none];
+  "169 D8" [shape=box];
+  "169 D8" -> "176 D8" [label="imout"];
+  "168 D8" [shape=box];
+  "168 D8" -> "169 D8" [label="imout"];
+  "167 D8" [shape=box];
+  "167 D8" -> "168 D8" [label="imout"];
+  "166 D8" [shape=box];
+  "166 D8" -> "167 D8" [label="imout"];
+  "164 ?" [shape=none];
+  "163 E8" [shape=box];
+  "163 E8" -> "166 D8" [label="imout"];
+  "162 E8" [shape=box];
+  "162 E8" -> "163 E8" [label="imout"];
+  "161 E8" [shape=box];
+  "161 E8" -> "162 E8" [label="imout"];
+  "160 E8" [shape=box];
+  "160 E8" -> "161 E8" [label="imout"];
+  "153 ?" [shape=none];
+  "150 ?" [shape=none];
+  "149 D8" [shape=box];
+  "149 D8" -> "160 E8" [label="imfilt"];
+  "148 D8" [shape=box];
+  "148 D8" -> "149 D8" [label="imfilt"];
+  "147 D8" [shape=box];
+  "147 D8" -> "148 D8" [label="imfilt"];
+  "146 D8" [shape=box];
+  "146 D8" -> "147 D8" [label="imfilt"];
+  "144 ?" [shape=none];
+  "143 E8" [shape=box];
+  "143 E8" -> "146 D8" [label="imfilt"];
+  "142 E8" [shape=box];
+  "142 E8" -> "143 E8" [label="imfilt"];
+  "141 E8" [shape=box];
+  "141 E8" -> "142 E8" [label="imfilt"];
+  "140 E8" [shape=box];
+  "140 E8" -> "141 E8" [label="imfilt"];
+  "133 &" [shape=trapezium,orientation=270];
+  "133 &" -> "140 E8" [label="imand"];
+  "131 thr" [shape=parallelogram];
+  "131 thr" -> "133 &" [label="imcloseth"];
+  "130 thr" [shape=parallelogram];
+  "130 thr" -> "133 &" [label="imopenth"];
+  "128 ?" [shape=none];
+  "125 ?" [shape=none];
+  "124 E8" [shape=box];
+  "124 E8" -> "131 thr" [label="imclose"];
+  "123 E8" [shape=box];
+  "123 E8" -> "124 E8" [label="imclose"];
+  "122 E8" [shape=box];
+  "122 E8" -> "123 E8" [label="imclose"];
+  "121 E8" [shape=box];
+  "121 E8" -> "122 E8" [label="imclose"];
+  "120 E8" [shape=box];
+  "120 E8" -> "121 E8" [label="imclose"];
+  "119 E8" [shape=box];
+  "119 E8" -> "120 E8" [label="imclose"];
+  "118 E8" [shape=box];
+  "118 E8" -> "119 E8" [label="imclose"];
+  "117 E8" [shape=box];
+  "117 E8" -> "118 E8" [label="imclose"];
+  "115 ?" [shape=none];
+  "114 D8" [shape=box];
+  "114 D8" -> "117 E8" [label="imclose"];
+  "113 D8" [shape=box];
+  "113 D8" -> "114 D8" [label="imclose"];
+  "112 D8" [shape=box];
+  "112 D8" -> "113 D8" [label="imclose"];
+  "111 D8" [shape=box];
+  "111 D8" -> "112 D8" [label="imclose"];
+  "110 D8" [shape=box];
+  "110 D8" -> "111 D8" [label="imclose"];
+  "109 D8" [shape=box];
+  "109 D8" -> "110 D8" [label="imclose"];
+  "108 D8" [shape=box];
+  "108 D8" -> "109 D8" [label="imclose"];
+  "107 D8" [shape=box];
+  "107 D8" -> "108 D8" [label="imclose"];
+  "105 ?" [shape=none];
+  "102 ?" [shape=none];
+  "101 D8" [shape=box];
+  "101 D8" -> "130 thr" [label="imopen"];
+  "100 D8" [shape=box];
+  "100 D8" -> "101 D8" [label="imopen"];
+  "99 D8" [shape=box];
+  "99 D8" -> "100 D8" [label="imopen"];
+  "98 D8" [shape=box];
+  "98 D8" -> "99 D8" [label="imopen"];
+  "97 D8" [shape=box];
+  "97 D8" -> "98 D8" [label="imopen"];
+  "96 D8" [shape=box];
+  "96 D8" -> "97 D8" [label="imopen"];
+  "95 D8" [shape=box];
+  "95 D8" -> "96 D8" [label="imopen"];
+  "94 D8" [shape=box];
+  "94 D8" -> "95 D8" [label="imopen"];
+  "93 D8" [shape=box];
+  "93 D8" -> "94 D8" [label="imopen"];
+  "92 D8" [shape=box];
+  "92 D8" -> "93 D8" [label="imopen"];
+  "91 D8" [shape=box];
+  "91 D8" -> "92 D8" [label="imopen"];
+  "90 D8" [shape=box];
+  "90 D8" -> "91 D8" [label="imopen"];
+  "89 D8" [shape=box];
+  "89 D8" -> "90 D8" [label="imopen"];
+  "88 D8" [shape=box];
+  "88 D8" -> "89 D8" [label="imopen"];
+  "87 D8" [shape=box];
+  "87 D8" -> "88 D8" [label="imopen"];
+  "85 ?" [shape=none];
+  "84 E8" [shape=box];
+  "84 E8" -> "87 D8" [label="imopen"];
+  "83 E8" [shape=box];
+  "83 E8" -> "84 E8" [label="imopen"];
+  "82 E8" [shape=box];
+  "82 E8" -> "83 E8" [label="imopen"];
+  "81 E8" [shape=box];
+  "81 E8" -> "82 E8" [label="imopen"];
+  "80 E8" [shape=box];
+  "80 E8" -> "81 E8" [label="imopen"];
+  "79 E8" [shape=box];
+  "79 E8" -> "80 E8" [label="imopen"];
+  "78 E8" [shape=box];
+  "78 E8" -> "79 E8" [label="imopen"];
+  "77 E8" [shape=box];
+  "77 E8" -> "78 E8" [label="imopen"];
+  "76 E8" [shape=box];
+  "76 E8" -> "77 E8" [label="imopen"];
+  "75 E8" [shape=box];
+  "75 E8" -> "76 E8" [label="imopen"];
+  "74 E8" [shape=box];
+  "74 E8" -> "75 E8" [label="imopen"];
+  "73 E8" [shape=box];
+  "73 E8" -> "74 E8" [label="imopen"];
+  "72 E8" [shape=box];
+  "72 E8" -> "73 E8" [label="imopen"];
+  "71 E8" [shape=box];
+  "71 E8" -> "72 E8" [label="imopen"];
+  "70 E8" [shape=box];
+  "70 E8" -> "71 E8" [label="imopen"];
+  "in" -> "184 &";
+  "in" -> "107 D8";
+  "in" -> "70 E8";
+}
+// graph for dag "license_plate_helper_0_0" of module "license_plate" in dot format
+digraph "license_plate_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "178 D8" [shape=box];
+  "178 D8" -> "out";
+  "177 D8" [shape=box];
+  "177 D8" -> "178 D8" [label="out"];
+  "176 D8" [shape=box];
+  "176 D8" -> "177 D8" [label="out"];
+  "169 D8" [shape=box];
+  "169 D8" -> "176 D8" [label="imout"];
+  "168 D8" [shape=box];
+  "168 D8" -> "169 D8" [label="imout"];
+  "167 D8" [shape=box];
+  "167 D8" -> "168 D8" [label="imout"];
+  "166 D8" [shape=box];
+  "166 D8" -> "167 D8" [label="imout"];
+  "163 E8" [shape=box];
+  "163 E8" -> "166 D8" [label="imout"];
+  "162 E8" [shape=box];
+  "162 E8" -> "163 E8" [label="imout"];
+  "161 E8" [shape=box];
+  "161 E8" -> "162 E8" [label="imout"];
+  "160 E8" [shape=box];
+  "160 E8" -> "161 E8" [label="imout"];
+  "149 D8" [shape=box];
+  "149 D8" -> "160 E8" [label="imfilt"];
+  "148 D8" [shape=box];
+  "148 D8" -> "149 D8" [label="imfilt"];
+  "147 D8" [shape=box];
+  "147 D8" -> "148 D8" [label="imfilt"];
+  "146 D8" [shape=box];
+  "146 D8" -> "147 D8" [label="imfilt"];
+  "143 E8" [shape=box];
+  "143 E8" -> "146 D8" [label="imfilt"];
+  "142 E8" [shape=box];
+  "142 E8" -> "143 E8" [label="imfilt"];
+  "141 E8" [shape=box];
+  "141 E8" -> "142 E8" [label="imfilt"];
+  "140 E8" [shape=box];
+  "140 E8" -> "141 E8" [label="imfilt"];
+  "133 &" [shape=trapezium,orientation=270];
+  "133 &" -> "140 E8" [label="imand"];
+  "131 thr" [shape=parallelogram];
+  "131 thr" -> "133 &" [label="imcloseth"];
+  "130 thr" [shape=parallelogram];
+  "130 thr" -> "133 &" [label="imopenth"];
+  "124 E8" [shape=box];
+  "124 E8" -> "131 thr" [label="imclose"];
+  "123 E8" [shape=box];
+  "123 E8" -> "124 E8" [label="imclose"];
+  "122 E8" [shape=box];
+  "122 E8" -> "123 E8" [label="imclose"];
+  "121 E8" [shape=box];
+  "121 E8" -> "122 E8" [label="imclose"];
+  "120 E8" [shape=box];
+  "120 E8" -> "121 E8" [label="imclose"];
+  "119 E8" [shape=box];
+  "119 E8" -> "120 E8" [label="imclose"];
+  "118 E8" [shape=box];
+  "118 E8" -> "119 E8" [label="imclose"];
+  "117 E8" [shape=box];
+  "117 E8" -> "118 E8" [label="imclose"];
+  "114 D8" [shape=box];
+  "114 D8" -> "117 E8" [label="imclose"];
+  "113 D8" [shape=box];
+  "113 D8" -> "114 D8" [label="imclose"];
+  "112 D8" [shape=box];
+  "112 D8" -> "113 D8" [label="imclose"];
+  "111 D8" [shape=box];
+  "111 D8" -> "112 D8" [label="imclose"];
+  "110 D8" [shape=box];
+  "110 D8" -> "111 D8" [label="imclose"];
+  "109 D8" [shape=box];
+  "109 D8" -> "110 D8" [label="imclose"];
+  "108 D8" [shape=box];
+  "108 D8" -> "109 D8" [label="imclose"];
+  "107 D8" [shape=box];
+  "107 D8" -> "108 D8" [label="imclose"];
+  "101 D8" [shape=box];
+  "101 D8" -> "130 thr" [label="imopen"];
+  "100 D8" [shape=box];
+  "100 D8" -> "101 D8" [label="imopen"];
+  "99 D8" [shape=box];
+  "99 D8" -> "100 D8" [label="imopen"];
+  "98 D8" [shape=box];
+  "98 D8" -> "99 D8" [label="imopen"];
+  "97 D8" [shape=box];
+  "97 D8" -> "98 D8" [label="imopen"];
+  "96 D8" [shape=box];
+  "96 D8" -> "97 D8" [label="imopen"];
+  "95 D8" [shape=box];
+  "95 D8" -> "96 D8" [label="imopen"];
+  "94 D8" [shape=box];
+  "94 D8" -> "95 D8" [label="imopen"];
+  "93 D8" [shape=box];
+  "93 D8" -> "94 D8" [label="imopen"];
+  "92 D8" [shape=box];
+  "92 D8" -> "93 D8" [label="imopen"];
+  "91 D8" [shape=box];
+  "91 D8" -> "92 D8" [label="imopen"];
+  "90 D8" [shape=box];
+  "90 D8" -> "91 D8" [label="imopen"];
+  "89 D8" [shape=box];
+  "89 D8" -> "90 D8" [label="imopen"];
+  "88 D8" [shape=box];
+  "88 D8" -> "89 D8" [label="imopen"];
+  "87 D8" [shape=box];
+  "87 D8" -> "88 D8" [label="imopen"];
+  "84 E8" [shape=box];
+  "84 E8" -> "87 D8" [label="imopen"];
+  "83 E8" [shape=box];
+  "83 E8" -> "84 E8" [label="imopen"];
+  "82 E8" [shape=box];
+  "82 E8" -> "83 E8" [label="imopen"];
+  "81 E8" [shape=box];
+  "81 E8" -> "82 E8" [label="imopen"];
+  "80 E8" [shape=box];
+  "80 E8" -> "81 E8" [label="imopen"];
+  "79 E8" [shape=box];
+  "79 E8" -> "80 E8" [label="imopen"];
+  "78 E8" [shape=box];
+  "78 E8" -> "79 E8" [label="imopen"];
+  "77 E8" [shape=box];
+  "77 E8" -> "78 E8" [label="imopen"];
+  "76 E8" [shape=box];
+  "76 E8" -> "77 E8" [label="imopen"];
+  "75 E8" [shape=box];
+  "75 E8" -> "76 E8" [label="imopen"];
+  "74 E8" [shape=box];
+  "74 E8" -> "75 E8" [label="imopen"];
+  "73 E8" [shape=box];
+  "73 E8" -> "74 E8" [label="imopen"];
+  "72 E8" [shape=box];
+  "72 E8" -> "73 E8" [label="imopen"];
+  "71 E8" [shape=box];
+  "71 E8" -> "72 E8" [label="imopen"];
+  "70 E8" [shape=box];
+  "70 E8" -> "71 E8" [label="imopen"];
+  "in" -> "107 D8";
+  "in" -> "70 E8";
+}
+// graph for dag "license_plate_helper_0_1" of module "license_plate" in dot format
+digraph "license_plate_helper_0_1" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "184 &" [shape=trapezium,orientation=270];
+  "184 &" -> "out";
+  "in" -> "184 &";
+  "out" -> "184 &";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module license_plate
+freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7, int32_t *kern8, int32_t *kern9, int32_t *kern10, int32_t *kern11, int32_t *kern12, int32_t *kern13, int32_t *kern14, int32_t *kern15, int32_t *kern16, int32_t *kern17, int32_t *kern18, int32_t *kern19, int32_t *kern20, int32_t *kern21, int32_t *kern22, int32_t *kern23, int32_t *kern24, int32_t *kern25, int32_t *kern26, int32_t *kern27, int32_t *kern28, int32_t *kern29, int32_t *kern30, int32_t *kern31, int32_t inf32, int32_t sup33, bool bin34)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`in [0 input 0] -> [0 poc 0] 70 erode_8c
+  // nope
+  // poc 70 erode_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+
+  // STAGE 1
+  // 0`imopen [0 poc 0] -> [1 poc 0] 71 erode_8c
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`imopen [1 input 0] -> [1 poc 0] 71 erode_8c
+  // nope
+  // poc 71 erode_8c stage 1 side 0
+  si.poc[1][0].op = SPOC_POC_ERODE;
+  si.poc[1][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][0].kernel[i] = kern1[i];
+
+
+  // STAGE 2
+  // 0`imopen [1 poc 0] -> [2 poc 0] 72 erode_8c
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`imopen [2 input 0] -> [2 poc 0] 72 erode_8c
+  // nope
+  // poc 72 erode_8c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_ERODE;
+  si.poc[2][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][0].kernel[i] = kern2[i];
+
+
+  // STAGE 3
+  // 0`imopen [2 poc 0] -> [3 poc 0] 73 erode_8c
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`imopen [3 input 0] -> [3 poc 0] 73 erode_8c
+  // nope
+  // poc 73 erode_8c stage 3 side 0
+  si.poc[3][0].op = SPOC_POC_ERODE;
+  si.poc[3][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[3][0].kernel[i] = kern3[i];
+
+
+  // STAGE 4
+  // 0`imopen [3 poc 0] -> [4 poc 0] 74 erode_8c
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`imopen [4 input 0] -> [4 poc 0] 74 erode_8c
+  // nope
+  // poc 74 erode_8c stage 4 side 0
+  si.poc[4][0].op = SPOC_POC_ERODE;
+  si.poc[4][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[4][0].kernel[i] = kern4[i];
+
+
+  // STAGE 5
+  // 0`imopen [4 poc 0] -> [5 poc 0] 75 erode_8c
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`imopen [5 input 0] -> [5 poc 0] 75 erode_8c
+  // nope
+  // poc 75 erode_8c stage 5 side 0
+  si.poc[5][0].op = SPOC_POC_ERODE;
+  si.poc[5][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[5][0].kernel[i] = kern5[i];
+
+
+  // STAGE 6
+  // 0`imopen [5 poc 0] -> [6 poc 0] 76 erode_8c
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`imopen [6 input 0] -> [6 poc 0] 76 erode_8c
+  // nope
+  // poc 76 erode_8c stage 6 side 0
+  si.poc[6][0].op = SPOC_POC_ERODE;
+  si.poc[6][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[6][0].kernel[i] = kern6[i];
+
+
+  // STAGE 7
+  // 0`imopen [6 poc 0] -> [7 poc 0] 77 erode_8c
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`imopen [7 input 0] -> [7 poc 0] 77 erode_8c
+  // nope
+  // poc 77 erode_8c stage 7 side 0
+  si.poc[7][0].op = SPOC_POC_ERODE;
+  si.poc[7][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[7][0].kernel[i] = kern7[i];
+
+
+  // STAGE 8
+  // 0`imopen [7 poc 0] -> [8 poc 0] 78 erode_8c
+  si.mux[7][0].op = SPOC_MUX_IN0;
+  // 0`imopen [8 input 0] -> [8 poc 0] 78 erode_8c
+  // nope
+  // poc 78 erode_8c stage 8 side 0
+  si.poc[8][0].op = SPOC_POC_ERODE;
+  si.poc[8][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[8][0].kernel[i] = kern8[i];
+
+
+  // STAGE 9
+  // 0`imopen [8 poc 0] -> [9 poc 0] 79 erode_8c
+  si.mux[8][0].op = SPOC_MUX_IN0;
+  // 0`imopen [9 input 0] -> [9 poc 0] 79 erode_8c
+  // nope
+  // poc 79 erode_8c stage 9 side 0
+  si.poc[9][0].op = SPOC_POC_ERODE;
+  si.poc[9][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[9][0].kernel[i] = kern9[i];
+
+
+  // STAGE 10
+  // 0`imopen [9 poc 0] -> [10 poc 0] 80 erode_8c
+  si.mux[9][0].op = SPOC_MUX_IN0;
+  // 0`imopen [10 input 0] -> [10 poc 0] 80 erode_8c
+  // nope
+  // poc 80 erode_8c stage 10 side 0
+  si.poc[10][0].op = SPOC_POC_ERODE;
+  si.poc[10][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[10][0].kernel[i] = kern10[i];
+
+
+  // STAGE 11
+  // 0`imopen [10 poc 0] -> [11 poc 0] 81 erode_8c
+  si.mux[10][0].op = SPOC_MUX_IN0;
+  // 0`imopen [11 input 0] -> [11 poc 0] 81 erode_8c
+  // nope
+  // poc 81 erode_8c stage 11 side 0
+  si.poc[11][0].op = SPOC_POC_ERODE;
+  si.poc[11][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[11][0].kernel[i] = kern11[i];
+
+
+  // STAGE 12
+  // 0`imopen [11 poc 0] -> [12 poc 0] 82 erode_8c
+  si.mux[11][0].op = SPOC_MUX_IN0;
+  // 0`imopen [12 input 0] -> [12 poc 0] 82 erode_8c
+  // nope
+  // poc 82 erode_8c stage 12 side 0
+  si.poc[12][0].op = SPOC_POC_ERODE;
+  si.poc[12][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[12][0].kernel[i] = kern12[i];
+
+
+  // STAGE 13
+  // 0`imopen [12 poc 0] -> [13 poc 0] 83 erode_8c
+  si.mux[12][0].op = SPOC_MUX_IN0;
+  // 0`imopen [13 input 0] -> [13 poc 0] 83 erode_8c
+  // nope
+  // poc 83 erode_8c stage 13 side 0
+  si.poc[13][0].op = SPOC_POC_ERODE;
+  si.poc[13][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[13][0].kernel[i] = kern13[i];
+
+
+  // STAGE 14
+  // 0`imopen [13 poc 0] -> [14 poc 0] 84 erode_8c
+  si.mux[13][0].op = SPOC_MUX_IN0;
+  // 0`imopen [14 input 0] -> [14 poc 0] 84 erode_8c
+  // nope
+  // poc 84 erode_8c stage 14 side 0
+  si.poc[14][0].op = SPOC_POC_ERODE;
+  si.poc[14][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[14][0].kernel[i] = kern14[i];
+
+
+  // STAGE 15
+  // 0`imopen [14 poc 0] -> [15 poc 0] 87 dilate_8c
+  si.mux[14][0].op = SPOC_MUX_IN0;
+  // 0`imopen [15 input 0] -> [15 poc 0] 87 dilate_8c
+  // nope
+  // poc 87 dilate_8c stage 15 side 0
+  si.poc[15][0].op = SPOC_POC_DILATE;
+  si.poc[15][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[15][0].kernel[i] = kern15[i];
+
+
+  // STAGE 0
+  // 0`in [0 input 1] -> [0 poc 1] 107 dilate_8c
+  // nope
+  // poc 107 dilate_8c stage 0 side 1
+  si.poc[0][1].op = SPOC_POC_DILATE;
+  si.poc[0][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][1].kernel[i] = kern16[i];
+
+
+  // STAGE 1
+  // 0`imclose [0 poc 1] -> [1 poc 1] 108 dilate_8c
+  si.mux[0][3].op = SPOC_MUX_IN1;
+  // 0`imclose [1 input 1] -> [1 poc 1] 108 dilate_8c
+  // nope
+  // poc 108 dilate_8c stage 1 side 1
+  si.poc[1][1].op = SPOC_POC_DILATE;
+  si.poc[1][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][1].kernel[i] = kern17[i];
+
+
+  // STAGE 2
+  // 0`imclose [1 poc 1] -> [2 poc 1] 109 dilate_8c
+  si.mux[1][3].op = SPOC_MUX_IN1;
+  // 0`imclose [2 input 1] -> [2 poc 1] 109 dilate_8c
+  // nope
+  // poc 109 dilate_8c stage 2 side 1
+  si.poc[2][1].op = SPOC_POC_DILATE;
+  si.poc[2][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][1].kernel[i] = kern18[i];
+
+
+  // STAGE 3
+  // 0`imclose [2 poc 1] -> [3 poc 1] 110 dilate_8c
+  si.mux[2][3].op = SPOC_MUX_IN1;
+  // 0`imclose [3 input 1] -> [3 poc 1] 110 dilate_8c
+  // nope
+  // poc 110 dilate_8c stage 3 side 1
+  si.poc[3][1].op = SPOC_POC_DILATE;
+  si.poc[3][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[3][1].kernel[i] = kern19[i];
+
+
+  // STAGE 4
+  // 0`imclose [3 poc 1] -> [4 poc 1] 111 dilate_8c
+  si.mux[3][3].op = SPOC_MUX_IN1;
+  // 0`imclose [4 input 1] -> [4 poc 1] 111 dilate_8c
+  // nope
+  // poc 111 dilate_8c stage 4 side 1
+  si.poc[4][1].op = SPOC_POC_DILATE;
+  si.poc[4][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[4][1].kernel[i] = kern20[i];
+
+
+  // STAGE 5
+  // 0`imclose [4 poc 1] -> [5 poc 1] 112 dilate_8c
+  si.mux[4][3].op = SPOC_MUX_IN1;
+  // 0`imclose [5 input 1] -> [5 poc 1] 112 dilate_8c
+  // nope
+  // poc 112 dilate_8c stage 5 side 1
+  si.poc[5][1].op = SPOC_POC_DILATE;
+  si.poc[5][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[5][1].kernel[i] = kern21[i];
+
+
+  // STAGE 6
+  // 0`imclose [5 poc 1] -> [6 poc 1] 113 dilate_8c
+  si.mux[5][3].op = SPOC_MUX_IN1;
+  // 0`imclose [6 input 1] -> [6 poc 1] 113 dilate_8c
+  // nope
+  // poc 113 dilate_8c stage 6 side 1
+  si.poc[6][1].op = SPOC_POC_DILATE;
+  si.poc[6][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[6][1].kernel[i] = kern22[i];
+
+
+  // STAGE 7
+  // 0`imclose [6 poc 1] -> [7 poc 1] 114 dilate_8c
+  si.mux[6][3].op = SPOC_MUX_IN1;
+  // 0`imclose [7 input 1] -> [7 poc 1] 114 dilate_8c
+  // nope
+  // poc 114 dilate_8c stage 7 side 1
+  si.poc[7][1].op = SPOC_POC_DILATE;
+  si.poc[7][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[7][1].kernel[i] = kern23[i];
+
+
+  // STAGE 8
+  // 0`imclose [7 poc 1] -> [8 poc 1] 117 erode_8c
+  si.mux[7][3].op = SPOC_MUX_IN1;
+  // 0`imclose [8 input 1] -> [8 poc 1] 117 erode_8c
+  // nope
+  // poc 117 erode_8c stage 8 side 1
+  si.poc[8][1].op = SPOC_POC_ERODE;
+  si.poc[8][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[8][1].kernel[i] = kern24[i];
+
+
+  // STAGE 9
+  // 0`imclose [8 poc 1] -> [9 poc 1] 118 erode_8c
+  si.mux[8][3].op = SPOC_MUX_IN1;
+  // 0`imclose [9 input 1] -> [9 poc 1] 118 erode_8c
+  // nope
+  // poc 118 erode_8c stage 9 side 1
+  si.poc[9][1].op = SPOC_POC_ERODE;
+  si.poc[9][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[9][1].kernel[i] = kern25[i];
+
+
+  // STAGE 10
+  // 0`imclose [9 poc 1] -> [10 poc 1] 119 erode_8c
+  si.mux[9][3].op = SPOC_MUX_IN1;
+  // 0`imclose [10 input 1] -> [10 poc 1] 119 erode_8c
+  // nope
+  // poc 119 erode_8c stage 10 side 1
+  si.poc[10][1].op = SPOC_POC_ERODE;
+  si.poc[10][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[10][1].kernel[i] = kern26[i];
+
+
+  // STAGE 11
+  // 0`imclose [10 poc 1] -> [11 poc 1] 120 erode_8c
+  si.mux[10][3].op = SPOC_MUX_IN1;
+  // 0`imclose [11 input 1] -> [11 poc 1] 120 erode_8c
+  // nope
+  // poc 120 erode_8c stage 11 side 1
+  si.poc[11][1].op = SPOC_POC_ERODE;
+  si.poc[11][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[11][1].kernel[i] = kern27[i];
+
+
+  // STAGE 12
+  // 0`imclose [11 poc 1] -> [12 poc 1] 121 erode_8c
+  si.mux[11][3].op = SPOC_MUX_IN1;
+  // 0`imclose [12 input 1] -> [12 poc 1] 121 erode_8c
+  // nope
+  // poc 121 erode_8c stage 12 side 1
+  si.poc[12][1].op = SPOC_POC_ERODE;
+  si.poc[12][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[12][1].kernel[i] = kern28[i];
+
+
+  // STAGE 13
+  // 0`imclose [12 poc 1] -> [13 poc 1] 122 erode_8c
+  si.mux[12][3].op = SPOC_MUX_IN1;
+  // 0`imclose [13 input 1] -> [13 poc 1] 122 erode_8c
+  // nope
+  // poc 122 erode_8c stage 13 side 1
+  si.poc[13][1].op = SPOC_POC_ERODE;
+  si.poc[13][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[13][1].kernel[i] = kern29[i];
+
+
+  // STAGE 14
+  // 0`imclose [13 poc 1] -> [14 poc 1] 123 erode_8c
+  si.mux[13][3].op = SPOC_MUX_IN1;
+  // 0`imclose [14 input 1] -> [14 poc 1] 123 erode_8c
+  // nope
+  // poc 123 erode_8c stage 14 side 1
+  si.poc[14][1].op = SPOC_POC_ERODE;
+  si.poc[14][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[14][1].kernel[i] = kern30[i];
+
+
+  // STAGE 15
+  // 0`imclose [14 poc 1] -> [15 poc 1] 124 erode_8c
+  si.mux[14][3].op = SPOC_MUX_IN1;
+  // 0`imclose [15 input 1] -> [15 poc 1] 124 erode_8c
+  // nope
+  // poc 124 erode_8c stage 15 side 1
+  si.poc[15][1].op = SPOC_POC_ERODE;
+  si.poc[15][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[15][1].kernel[i] = kern31[i];
+
+  // 0`imclose [15 poc 1] -> [15 threshold 1] 131 threshold
+  si.mux[15][3].op = SPOC_MUX_IN1;
+  // threshold 131 threshold stage 15 side 1
+  si.th[15][1].op = bin34? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[15][1].boundmin = inf32;
+  sp.th[15][1].boundmax = sup33;
+
+
+  // output image 0`imopen on 0 and image 0`imcloseth on 1
+  // 0`imopen [15 poc 0] -> [15 output 0] 0 null
+  si.mux[15][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`imopen [15 output 0] -> [15 output 0] 0 null
+  // nope
+
+  // 0`imcloseth [15 threshold 1] -> [15 output 1] 0 null
+  // nope
+
+  // fill in to the end...
+  // 0`imcloseth [15 output 1] -> [15 output 1] 0 null
+  // nope
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, o1, i0, i0);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module license_plate
+freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7, int32_t *kern8, int32_t *kern9, int32_t *kern10, int32_t *kern11, int32_t *kern12, int32_t *kern13, int32_t inf14, int32_t sup15, bool bin16, int32_t *kern17)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`imopen [0 input 1] -> [0 poc 1] 88 dilate_8c
+  // nope
+  // poc 88 dilate_8c stage 0 side 1
+  si.poc[0][1].op = SPOC_POC_DILATE;
+  si.poc[0][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][1].kernel[i] = kern0[i];
+
+
+  // STAGE 1
+  // 0`imopen [0 poc 1] -> [1 poc 1] 89 dilate_8c
+  si.mux[0][3].op = SPOC_MUX_IN1;
+  // 0`imopen [1 input 1] -> [1 poc 1] 89 dilate_8c
+  // nope
+  // poc 89 dilate_8c stage 1 side 1
+  si.poc[1][1].op = SPOC_POC_DILATE;
+  si.poc[1][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][1].kernel[i] = kern1[i];
+
+
+  // STAGE 2
+  // 0`imopen [1 poc 1] -> [2 poc 1] 90 dilate_8c
+  si.mux[1][3].op = SPOC_MUX_IN1;
+  // 0`imopen [2 input 1] -> [2 poc 1] 90 dilate_8c
+  // nope
+  // poc 90 dilate_8c stage 2 side 1
+  si.poc[2][1].op = SPOC_POC_DILATE;
+  si.poc[2][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][1].kernel[i] = kern2[i];
+
+
+  // STAGE 3
+  // 0`imopen [2 poc 1] -> [3 poc 1] 91 dilate_8c
+  si.mux[2][3].op = SPOC_MUX_IN1;
+  // 0`imopen [3 input 1] -> [3 poc 1] 91 dilate_8c
+  // nope
+  // poc 91 dilate_8c stage 3 side 1
+  si.poc[3][1].op = SPOC_POC_DILATE;
+  si.poc[3][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[3][1].kernel[i] = kern3[i];
+
+
+  // STAGE 4
+  // 0`imopen [3 poc 1] -> [4 poc 1] 92 dilate_8c
+  si.mux[3][3].op = SPOC_MUX_IN1;
+  // 0`imopen [4 input 1] -> [4 poc 1] 92 dilate_8c
+  // nope
+  // poc 92 dilate_8c stage 4 side 1
+  si.poc[4][1].op = SPOC_POC_DILATE;
+  si.poc[4][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[4][1].kernel[i] = kern4[i];
+
+
+  // STAGE 5
+  // 0`imopen [4 poc 1] -> [5 poc 1] 93 dilate_8c
+  si.mux[4][3].op = SPOC_MUX_IN1;
+  // 0`imopen [5 input 1] -> [5 poc 1] 93 dilate_8c
+  // nope
+  // poc 93 dilate_8c stage 5 side 1
+  si.poc[5][1].op = SPOC_POC_DILATE;
+  si.poc[5][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[5][1].kernel[i] = kern5[i];
+
+
+  // STAGE 6
+  // 0`imopen [5 poc 1] -> [6 poc 1] 94 dilate_8c
+  si.mux[5][3].op = SPOC_MUX_IN1;
+  // 0`imopen [6 input 1] -> [6 poc 1] 94 dilate_8c
+  // nope
+  // poc 94 dilate_8c stage 6 side 1
+  si.poc[6][1].op = SPOC_POC_DILATE;
+  si.poc[6][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[6][1].kernel[i] = kern6[i];
+
+
+  // STAGE 7
+  // 0`imopen [6 poc 1] -> [7 poc 1] 95 dilate_8c
+  si.mux[6][3].op = SPOC_MUX_IN1;
+  // 0`imopen [7 input 1] -> [7 poc 1] 95 dilate_8c
+  // nope
+  // poc 95 dilate_8c stage 7 side 1
+  si.poc[7][1].op = SPOC_POC_DILATE;
+  si.poc[7][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[7][1].kernel[i] = kern7[i];
+
+
+  // STAGE 8
+  // 0`imopen [7 poc 1] -> [8 poc 1] 96 dilate_8c
+  si.mux[7][3].op = SPOC_MUX_IN1;
+  // 0`imopen [8 input 1] -> [8 poc 1] 96 dilate_8c
+  // nope
+  // poc 96 dilate_8c stage 8 side 1
+  si.poc[8][1].op = SPOC_POC_DILATE;
+  si.poc[8][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[8][1].kernel[i] = kern8[i];
+
+
+  // STAGE 9
+  // 0`imopen [8 poc 1] -> [9 poc 1] 97 dilate_8c
+  si.mux[8][3].op = SPOC_MUX_IN1;
+  // 0`imopen [9 input 1] -> [9 poc 1] 97 dilate_8c
+  // nope
+  // poc 97 dilate_8c stage 9 side 1
+  si.poc[9][1].op = SPOC_POC_DILATE;
+  si.poc[9][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[9][1].kernel[i] = kern9[i];
+
+
+  // STAGE 10
+  // 0`imopen [9 poc 1] -> [10 poc 1] 98 dilate_8c
+  si.mux[9][3].op = SPOC_MUX_IN1;
+  // 0`imopen [10 input 1] -> [10 poc 1] 98 dilate_8c
+  // nope
+  // poc 98 dilate_8c stage 10 side 1
+  si.poc[10][1].op = SPOC_POC_DILATE;
+  si.poc[10][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[10][1].kernel[i] = kern10[i];
+
+
+  // STAGE 11
+  // 0`imopen [10 poc 1] -> [11 poc 1] 99 dilate_8c
+  si.mux[10][3].op = SPOC_MUX_IN1;
+  // 0`imopen [11 input 1] -> [11 poc 1] 99 dilate_8c
+  // nope
+  // poc 99 dilate_8c stage 11 side 1
+  si.poc[11][1].op = SPOC_POC_DILATE;
+  si.poc[11][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[11][1].kernel[i] = kern11[i];
+
+
+  // STAGE 12
+  // 0`imopen [11 poc 1] -> [12 poc 1] 100 dilate_8c
+  si.mux[11][3].op = SPOC_MUX_IN1;
+  // 0`imopen [12 input 1] -> [12 poc 1] 100 dilate_8c
+  // nope
+  // poc 100 dilate_8c stage 12 side 1
+  si.poc[12][1].op = SPOC_POC_DILATE;
+  si.poc[12][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[12][1].kernel[i] = kern12[i];
+
+
+  // STAGE 13
+  // 0`imopen [12 poc 1] -> [13 poc 1] 101 dilate_8c
+  si.mux[12][3].op = SPOC_MUX_IN1;
+  // 0`imopen [13 input 1] -> [13 poc 1] 101 dilate_8c
+  // nope
+  // poc 101 dilate_8c stage 13 side 1
+  si.poc[13][1].op = SPOC_POC_DILATE;
+  si.poc[13][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[13][1].kernel[i] = kern13[i];
+
+  // 0`imopen [13 poc 1] -> [13 threshold 1] 130 threshold
+  si.mux[13][3].op = SPOC_MUX_IN1;
+  // threshold 130 threshold stage 13 side 1
+  si.th[13][1].op = bin16? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[13][1].boundmin = inf14;
+  sp.th[13][1].boundmax = sup15;
+
+
+  // STAGE 14
+  // 0`imcloseth [0 input 0] -> [14 alu] 133 and
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [1 input 0] -> [14 alu] 133 and
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [2 input 0] -> [14 alu] 133 and
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [3 input 0] -> [14 alu] 133 and
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [4 input 0] -> [14 alu] 133 and
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [5 input 0] -> [14 alu] 133 and
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [6 input 0] -> [14 alu] 133 and
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [7 input 0] -> [14 alu] 133 and
+  si.mux[7][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [8 input 0] -> [14 alu] 133 and
+  si.mux[8][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [9 input 0] -> [14 alu] 133 and
+  si.mux[9][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [10 input 0] -> [14 alu] 133 and
+  si.mux[10][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [11 input 0] -> [14 alu] 133 and
+  si.mux[11][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [12 input 0] -> [14 alu] 133 and
+  si.mux[12][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [13 input 0] -> [14 alu] 133 and
+  si.mux[13][0].op = SPOC_MUX_IN0;
+  // 0`imcloseth [14 input 0] -> [14 alu] 133 and
+  // nope
+  // 0`imopenth [13 threshold 1] -> [14 alu] 133 and
+  // 0`imopenth [14 input 1] -> [14 alu] 133 and
+  // nope
+  // alu 133 and stage 14
+  si.alu[14][0].op = SPOC_ALU_AND_IN0_IN1;
+
+
+  // STAGE 15
+  // 0`imand [14 alu] -> [15 poc 0] 140 erode_8c
+  si.mux[14][0].op = SPOC_MUX_IN1;
+  si.mux[14][2].op = SPOC_MUX_IN0;
+  // 0`imand [15 input 0] -> [15 poc 0] 140 erode_8c
+  // nope
+  // poc 140 erode_8c stage 15 side 0
+  si.poc[15][0].op = SPOC_POC_ERODE;
+  si.poc[15][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[15][0].kernel[i] = kern17[i];
+
+
+  // output image 0`imfilt on 0
+  // 0`imfilt [15 poc 0] -> [15 output 0] 0 null
+  si.mux[15][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`imfilt [15 output 0] -> [15 output 0] 0 null
+  // nope
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module license_plate
+freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7, int32_t *kern8, int32_t *kern9, int32_t *kern10, int32_t *kern11, int32_t *kern12, int32_t *kern13, int32_t *kern14, int32_t *kern15)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`imfilt [0 input 0] -> [0 poc 0] 141 erode_8c
+  // nope
+  // poc 141 erode_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+
+  // STAGE 1
+  // 0`imfilt [0 poc 0] -> [1 poc 0] 142 erode_8c
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`imfilt [1 input 0] -> [1 poc 0] 142 erode_8c
+  // nope
+  // poc 142 erode_8c stage 1 side 0
+  si.poc[1][0].op = SPOC_POC_ERODE;
+  si.poc[1][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][0].kernel[i] = kern1[i];
+
+
+  // STAGE 2
+  // 0`imfilt [1 poc 0] -> [2 poc 0] 143 erode_8c
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`imfilt [2 input 0] -> [2 poc 0] 143 erode_8c
+  // nope
+  // poc 143 erode_8c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_ERODE;
+  si.poc[2][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][0].kernel[i] = kern2[i];
+
+
+  // STAGE 3
+  // 0`imfilt [2 poc 0] -> [3 poc 0] 146 dilate_8c
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`imfilt [3 input 0] -> [3 poc 0] 146 dilate_8c
+  // nope
+  // poc 146 dilate_8c stage 3 side 0
+  si.poc[3][0].op = SPOC_POC_DILATE;
+  si.poc[3][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[3][0].kernel[i] = kern3[i];
+
+
+  // STAGE 4
+  // 0`imfilt [3 poc 0] -> [4 poc 0] 147 dilate_8c
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`imfilt [4 input 0] -> [4 poc 0] 147 dilate_8c
+  // nope
+  // poc 147 dilate_8c stage 4 side 0
+  si.poc[4][0].op = SPOC_POC_DILATE;
+  si.poc[4][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[4][0].kernel[i] = kern4[i];
+
+
+  // STAGE 5
+  // 0`imfilt [4 poc 0] -> [5 poc 0] 148 dilate_8c
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`imfilt [5 input 0] -> [5 poc 0] 148 dilate_8c
+  // nope
+  // poc 148 dilate_8c stage 5 side 0
+  si.poc[5][0].op = SPOC_POC_DILATE;
+  si.poc[5][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[5][0].kernel[i] = kern5[i];
+
+
+  // STAGE 6
+  // 0`imfilt [5 poc 0] -> [6 poc 0] 149 dilate_8c
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`imfilt [6 input 0] -> [6 poc 0] 149 dilate_8c
+  // nope
+  // poc 149 dilate_8c stage 6 side 0
+  si.poc[6][0].op = SPOC_POC_DILATE;
+  si.poc[6][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[6][0].kernel[i] = kern6[i];
+
+
+  // STAGE 7
+  // 0`imfilt [6 poc 0] -> [7 poc 0] 160 erode_8c
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`imfilt [7 input 0] -> [7 poc 0] 160 erode_8c
+  // nope
+  // poc 160 erode_8c stage 7 side 0
+  si.poc[7][0].op = SPOC_POC_ERODE;
+  si.poc[7][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[7][0].kernel[i] = kern7[i];
+
+
+  // STAGE 8
+  // 0`imout [7 poc 0] -> [8 poc 0] 161 erode_8c
+  si.mux[7][0].op = SPOC_MUX_IN0;
+  // 0`imout [8 input 0] -> [8 poc 0] 161 erode_8c
+  // nope
+  // poc 161 erode_8c stage 8 side 0
+  si.poc[8][0].op = SPOC_POC_ERODE;
+  si.poc[8][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[8][0].kernel[i] = kern8[i];
+
+
+  // STAGE 9
+  // 0`imout [8 poc 0] -> [9 poc 0] 162 erode_8c
+  si.mux[8][0].op = SPOC_MUX_IN0;
+  // 0`imout [9 input 0] -> [9 poc 0] 162 erode_8c
+  // nope
+  // poc 162 erode_8c stage 9 side 0
+  si.poc[9][0].op = SPOC_POC_ERODE;
+  si.poc[9][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[9][0].kernel[i] = kern9[i];
+
+
+  // STAGE 10
+  // 0`imout [9 poc 0] -> [10 poc 0] 163 erode_8c
+  si.mux[9][0].op = SPOC_MUX_IN0;
+  // 0`imout [10 input 0] -> [10 poc 0] 163 erode_8c
+  // nope
+  // poc 163 erode_8c stage 10 side 0
+  si.poc[10][0].op = SPOC_POC_ERODE;
+  si.poc[10][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[10][0].kernel[i] = kern10[i];
+
+
+  // STAGE 11
+  // 0`imout [10 poc 0] -> [11 poc 0] 166 dilate_8c
+  si.mux[10][0].op = SPOC_MUX_IN0;
+  // 0`imout [11 input 0] -> [11 poc 0] 166 dilate_8c
+  // nope
+  // poc 166 dilate_8c stage 11 side 0
+  si.poc[11][0].op = SPOC_POC_DILATE;
+  si.poc[11][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[11][0].kernel[i] = kern11[i];
+
+
+  // STAGE 12
+  // 0`imout [11 poc 0] -> [12 poc 0] 167 dilate_8c
+  si.mux[11][0].op = SPOC_MUX_IN0;
+  // 0`imout [12 input 0] -> [12 poc 0] 167 dilate_8c
+  // nope
+  // poc 167 dilate_8c stage 12 side 0
+  si.poc[12][0].op = SPOC_POC_DILATE;
+  si.poc[12][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[12][0].kernel[i] = kern12[i];
+
+
+  // STAGE 13
+  // 0`imout [12 poc 0] -> [13 poc 0] 168 dilate_8c
+  si.mux[12][0].op = SPOC_MUX_IN0;
+  // 0`imout [13 input 0] -> [13 poc 0] 168 dilate_8c
+  // nope
+  // poc 168 dilate_8c stage 13 side 0
+  si.poc[13][0].op = SPOC_POC_DILATE;
+  si.poc[13][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[13][0].kernel[i] = kern13[i];
+
+
+  // STAGE 14
+  // 0`imout [13 poc 0] -> [14 poc 0] 169 dilate_8c
+  si.mux[13][0].op = SPOC_MUX_IN0;
+  // 0`imout [14 input 0] -> [14 poc 0] 169 dilate_8c
+  // nope
+  // poc 169 dilate_8c stage 14 side 0
+  si.poc[14][0].op = SPOC_POC_DILATE;
+  si.poc[14][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[14][0].kernel[i] = kern14[i];
+
+
+  // STAGE 15
+  // 0`imout [14 poc 0] -> [15 poc 0] 176 dilate_8c
+  si.mux[14][0].op = SPOC_MUX_IN0;
+  // 0`imout [15 input 0] -> [15 poc 0] 176 dilate_8c
+  // nope
+  // poc 176 dilate_8c stage 15 side 0
+  si.poc[15][0].op = SPOC_POC_DILATE;
+  si.poc[15][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[15][0].kernel[i] = kern15[i];
+
+
+  // output image 0`out on 0
+  // 0`out [15 poc 0] -> [15 output 0] 0 null
+  si.mux[15][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`out [15 output 0] -> [15 output 0] 0 null
+  // nope
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module license_plate
+freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`out [0 input 0] -> [0 poc 0] 177 dilate_8c
+  // nope
+  // poc 177 dilate_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+
+  // STAGE 1
+  // 0`out [0 poc 0] -> [1 poc 0] 178 dilate_8c
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`out [1 input 0] -> [1 poc 0] 178 dilate_8c
+  // nope
+  // poc 178 dilate_8c stage 1 side 0
+  si.poc[1][0].op = SPOC_POC_DILATE;
+  si.poc[1][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][0].kernel[i] = kern1[i];
+
+
+  // output image 0`out on 0
+  // 0`out [1 poc 0] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`out [1 output 0] -> [15 output 0] 0 null
+  // 0`out [2 input 0] -> [15 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`out [3 input 0] -> [15 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`out [4 input 0] -> [15 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`out [5 input 0] -> [15 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`out [6 input 0] -> [15 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`out [7 input 0] -> [15 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+  // 0`out [8 input 0] -> [15 output 0] 0 null
+  si.mux[8][0].op = SPOC_MUX_IN0;
+  // 0`out [9 input 0] -> [15 output 0] 0 null
+  si.mux[9][0].op = SPOC_MUX_IN0;
+  // 0`out [10 input 0] -> [15 output 0] 0 null
+  si.mux[10][0].op = SPOC_MUX_IN0;
+  // 0`out [11 input 0] -> [15 output 0] 0 null
+  si.mux[11][0].op = SPOC_MUX_IN0;
+  // 0`out [12 input 0] -> [15 output 0] 0 null
+  si.mux[12][0].op = SPOC_MUX_IN0;
+  // 0`out [13 input 0] -> [15 output 0] 0 null
+  si.mux[13][0].op = SPOC_MUX_IN0;
+  // 0`out [14 input 0] -> [15 output 0] 0 null
+  si.mux[14][0].op = SPOC_MUX_IN0;
+  // 0`out [15 input 0] -> [15 output 0] 0 null
+  si.mux[15][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module license_plate
+freia_status license_plate_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`in [0 input 0] -> [0 alu] 184 and
+  // nope
+  // 0`out [0 input 1] -> [0 alu] 184 and
+  // nope
+  // alu 184 and stage 0
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
+
+
+  // output image 0`out on 0
+  // 0`out [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`out [0 output 0] -> [15 output 0] 0 null
+  // 0`out [1 input 0] -> [15 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`out [2 input 0] -> [15 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`out [3 input 0] -> [15 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`out [4 input 0] -> [15 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`out [5 input 0] -> [15 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`out [6 input 0] -> [15 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`out [7 input 0] -> [15 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+  // 0`out [8 input 0] -> [15 output 0] 0 null
+  si.mux[8][0].op = SPOC_MUX_IN0;
+  // 0`out [9 input 0] -> [15 output 0] 0 null
+  si.mux[9][0].op = SPOC_MUX_IN0;
+  // 0`out [10 input 0] -> [15 output 0] 0 null
+  si.mux[10][0].op = SPOC_MUX_IN0;
+  // 0`out [11 input 0] -> [15 output 0] 0 null
+  si.mux[11][0].op = SPOC_MUX_IN0;
+  // 0`out [12 input 0] -> [15 output 0] 0 null
+  si.mux[12][0].op = SPOC_MUX_IN0;
+  // 0`out [13 input 0] -> [15 output 0] 0 null
+  si.mux[13][0].op = SPOC_MUX_IN0;
+  // 0`out [14 input 0] -> [15 output 0] 0 null
+  si.mux[14][0].op = SPOC_MUX_IN0;
+  // 0`out [15 input 0] -> [15 output 0] 0 null
+  si.mux[15][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+! updated function
+
+int license_plate(void)
+{
+   freia_dataio fdin;                                                   /*0006*/
+   freia_dataio fdout;                                                  /*0007*/
+
+   freia_data2d *in;                                                    /*0009*/
+   freia_data2d *imopen;                                                /*0011*/
+   freia_data2d *imcloseth;                                             /*0014*/
+   freia_data2d *imfilt;                                                /*0016*/
+   freia_data2d *out;                                                   /*0018*/
+   
+   
+   
+   int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};                  /*0022*/
+   
+   
+   
+   int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};                  /*0026*/
+   //PIPS generated variable
+   int _return0, _return1, _return2, _return3, _return4;                /*0028*/
+   //PIPS generated variable
+   freia_status ret_0;                                                  /*0030*/
+   //PIPS generated variable
+   int i_0;                                                             /*0032*/
+   //PIPS generated variable
+   freia_status ret_1;                                                  /*0034*/
+   //PIPS generated variable
+   int i_1;                                                             /*0036*/
+   //PIPS generated variable
+   freia_status ret_2;                                                  /*0038*/
+   //PIPS generated variable
+   int i_2;                                                             /*0040*/
+   //PIPS generated variable
+   freia_status ret_3;                                                  /*0042*/
+   //PIPS generated variable
+   int i_3, i_4;                                                        /*0044*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0047*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0048*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0051*/
+   imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
+   imcloseth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0056*/
+   imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0058*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0060*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0063*/
+   //  freia_data2d imtmp;
+   
+   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
+   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
+   
+   
+   ret_0 = license_plate_helper_0_0_0(imopen, imcloseth, in, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, 150, 255, 1);      /*0070*/
+   ret_0 |= 0;                                                          /*0071*/
+   ret_0 |= 0;                                                          /*0072*/
+   ret_0 |= 0;                                                          /*0073*/
+   ret_0 |= 0;                                                          /*0074*/
+   ret_0 |= 0;                                                          /*0075*/
+   ret_0 |= 0;                                                          /*0076*/
+   ret_0 |= 0;                                                          /*0077*/
+   ret_0 |= 0;                                                          /*0078*/
+   ret_0 |= 0;                                                          /*0079*/
+   ret_0 |= 0;                                                          /*0080*/
+   ret_0 |= 0;                                                          /*0081*/
+   ret_0 |= 0;                                                          /*0082*/
+   ret_0 |= 0;                                                          /*0083*/
+   ret_0 |= 0;                                                          /*0084*/
+   i_0 = 15;                                                            /*0085*/
+
+   ret_0 |= 0;                                                          /*0087*/
+   ret_0 |= license_plate_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, 1, 50, 1, kernel3x1);           /*0088*/
+   ret_0 |= 0;                                                          /*0089*/
+   ret_0 |= 0;                                                          /*0090*/
+   ret_0 |= 0;                                                          /*0091*/
+   ret_0 |= 0;                                                          /*0092*/
+   ret_0 |= 0;                                                          /*0093*/
+   ret_0 |= 0;                                                          /*0094*/
+   ret_0 |= 0;                                                          /*0095*/
+   ret_0 |= 0;                                                          /*0096*/
+   ret_0 |= 0;                                                          /*0097*/
+   ret_0 |= 0;                                                          /*0098*/
+   ret_0 |= 0;                                                          /*0099*/
+   ret_0 |= 0;                                                          /*0100*/
+   ret_0 |= 0;                                                          /*0101*/
+   i_0 = 15;                                                            /*0102*/
+   
+   //freia_common_destruct_data(imtmp);
+   _return1 = ret_0;                                                    /*0105*/
+
+   ret_1 = 0;                                                           /*0107*/
+   ret_1 |= 0;                                                          /*0108*/
+   ret_1 |= 0;                                                          /*0109*/
+   ret_1 |= 0;                                                          /*0110*/
+   ret_1 |= 0;                                                          /*0111*/
+   ret_1 |= 0;                                                          /*0112*/
+   ret_1 |= 0;                                                          /*0113*/
+   ret_1 |= 0;                                                          /*0114*/
+   i_1 = 8;                                                             /*0115*/
+
+   ret_1 |= 0;                                                          /*0117*/
+   ret_1 |= 0;                                                          /*0118*/
+   ret_1 |= 0;                                                          /*0119*/
+   ret_1 |= 0;                                                          /*0120*/
+   ret_1 |= 0;                                                          /*0121*/
+   ret_1 |= 0;                                                          /*0122*/
+   ret_1 |= 0;                                                          /*0123*/
+   ret_1 |= 0;                                                          /*0124*/
+   i_1 = 8;                                                             /*0125*/
+   
+   
+   _return0 = ret_1;                                                    /*0128*/
+   
+   
+   //  freia_data2d imtmp;
+   
+   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
+   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
+   
+   
+   ret_2 = 0;                                                           /*0140*/
+   ret_2 |= license_plate_helper_0_0_2(out, imfilt, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, (int *) freia_morpho_kernel_8c);   /*0141*/
+   ret_2 |= 0;                                                          /*0142*/
+   ret_2 |= 0;                                                          /*0143*/
+   i_2 = 4;                                                             /*0144*/
+
+   ret_2 |= 0;                                                          /*0146*/
+   ret_2 |= 0;                                                          /*0147*/
+   ret_2 |= 0;                                                          /*0148*/
+   ret_2 |= 0;                                                          /*0149*/
+   i_2 = 4;                                                             /*0150*/
+   
+   //freia_common_destruct_data(imtmp);
+   _return2 = ret_2;                                                    /*0153*/
+   //  freia_data2d imtmp;
+   
+   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
+   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
+   
+   
+   ret_3 = 0;                                                           /*0160*/
+   ret_3 |= 0;                                                          /*0161*/
+   ret_3 |= 0;                                                          /*0162*/
+   ret_3 |= 0;                                                          /*0163*/
+   i_3 = 4;                                                             /*0164*/
+
+   ret_3 |= 0;                                                          /*0166*/
+   ret_3 |= 0;                                                          /*0167*/
+   ret_3 |= 0;                                                          /*0168*/
+   ret_3 |= 0;                                                          /*0169*/
+   i_3 = 4;                                                             /*0170*/
+   
+   //freia_common_destruct_data(imtmp);
+   _return3 = ret_3;                                                    /*0173*/
+   
+   
+   license_plate_helper_0_0_3(out, out, (int *) freia_morpho_kernel_8c, (int *) freia_morpho_kernel_8c);             /*0177*/
+   i_4 = 3;                                                             /*0179*/
+   
+   
+   _return4 = 0;                                                        /*0182*/
+
+   license_plate_helper_0_1_0(out, in, out);                            /*0184*/
+   freia_common_tx_image(out, &fdout);                                  /*0185*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0188*/
+   freia_common_destruct_data(imopen);                                  /*0190*/
+   freia_common_destruct_data(imcloseth);                               /*0193*/
+   freia_common_destruct_data(imfilt);                                  /*0195*/
+   freia_common_destruct_data(out);                                     /*0197*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0200*/
+   freia_common_close_output(&fdout);                                   /*0201*/
+
+   return 0;                                                            /*0203*/
+}

@@ -1,0 +1,37 @@
+void formal_parameter00(int *pi)
+{
+   // BEGIN BLOCK
+   int *q;
+   int i;
+//               <must be written>: i
+
+   i = 0;
+//               <must be read   >: pi
+//               <must be written>: q
+   q = pi;
+//               <must be written>: pi
+   pi = &i;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+//  {(pi,_pi_1,-Exact-)}
+void formal_parameter00(int *pi)
+{
+//  {(pi,_pi_1,-Exact-)}
+   // BEGIN BLOCK
+//  {(pi,_pi_1,-Exact-)}
+   int *q;
+//  {(pi,_pi_1,-Exact-)}
+   int i;
+//  {(pi,_pi_1,-Exact-)}
+
+   i = 0;
+//  {(pi,_pi_1,-Exact-)}
+   q = pi;
+//  {(q,_pi_1,-Exact-);(pi,_pi_1,-Exact-)}
+   pi = &i;
+//  {(q,_pi_1,-Exact-);(pi,i,-Exact-)}
+   return 0;
+   // END BLOCK
+}

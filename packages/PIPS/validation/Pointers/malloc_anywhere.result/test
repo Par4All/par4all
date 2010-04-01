@@ -1,17 +1,20 @@
 POINTS TO
+C  {}
 int main()
 {
-   // BEGIN BLOCK
+//  points to = {}
    typedef struct {
       int *p;
    } my_str;
 
+//  points to = {}
    my_str *s, *s1;
+//  points to = {}
    int i = 0;
+//  points to = {}
    s = (my_str *) malloc(sizeof(my_str));
-//  points to = {(s,*ANYWHERE*,-MAY-)}
+//  {(s,*ANYWHERE*,-MAY-)}
    s1 = (my_str) malloc(sizeof(my_str));
-//  points to = {(s1,*ANYWHERE*,-MAY-);(s,*ANYWHERE*,-MAY-)}
+//  {(s1,*ANYWHERE*,-MAY-);(s,*ANYWHERE*,-MAY-)}
    return 0;
-   // END BLOCK
 }

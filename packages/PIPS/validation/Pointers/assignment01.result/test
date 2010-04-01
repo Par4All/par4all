@@ -1,0 +1,35 @@
+void assignment01()
+{
+   // BEGIN BLOCK
+   int i;
+   int *p;
+   int *q;
+   int *r;
+//               <must be written>: p q r
+
+   p = q = r = &i;
+//               <must be written>: i
+   i = 2;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+void assignment01()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   int i;
+//  points to = {}
+   int *p;
+//  points to = {}
+   int *q;
+//  points to = {}
+   int *r;
+//  points to = {}
+
+   p = q = r = &i;
+//  {(r,i,-Exact-)}
+   i = 2;
+   // END BLOCK
+}

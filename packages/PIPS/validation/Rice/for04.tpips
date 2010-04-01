@@ -30,10 +30,13 @@ setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
 
 # Privatize scalar variables
+setenv PRIVATIZE_DEBUG_LEVEL=8
 apply PRIVATIZE_MODULE[for04]
+#apply ARRAY_PRIVATIZER[for04]
 
 # Ask for the parallelization of "for04"
 activate RICE_ALL_DEPENDENCE
+display DG_FILE[for04]
 apply COARSE_GRAIN_PARALLELIZATION[for04]
 display PRINTED_FILE[for04]
 

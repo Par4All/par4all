@@ -1,0 +1,40 @@
+delete dereferencing08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create  dereferencing08  dereferencing08.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[duck1]
+display PRINTED_FILE[duck2]
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[duck1]
+display PRINTED_FILE[duck2]
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[duck1]
+display PRINTED_FILE[duck2]
+
+echo
+echo POINTS TO
+echo 
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[duck1]
+
+echo
+echo POINTS TO
+echo 
+display PRINTED_FILE[duck2]
+
+close
+delete  dereferencing08
+quit
+

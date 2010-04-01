@@ -1,0 +1,77 @@
+void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+//               <must be read   >: vct vct[0][3]
+//               <must be written>: array_s
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
+//               <must be read   >: dat dat[0][1] dat[0][1][row] row
+//               <must be written>: array_d
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
+//               <must be read   >: vct vct[0][1]
+//               <must be written>: I_0
+   int I_0 = vct->spp;                                                  /*0017*/
+   {
+      register fgUINT16 val;                                            /*0019*/
+      register int i;                                                   /*0020*/
+      register int k;                                                   /*0021*/
+      unsigned short _return0;                                          /*0022*/
+//               <must be read   >: I_0 col
+//               <must be written>: i
+      i = col*I_0;
+//               <must be read   >: I_0
+//               <must be written>: k
+      for(k = 0; k <= I_0-1; k += 1) {
+//               <must be read   >: I_0 array_s array_s[k] k
+//               <must be written>: _return0
+         _return0 = array_s[k];                                         /*0024*/
+//               <must be read   >: I_0 _return0
+//               <must be written>: val
+         val = _return0;                                                /*0025*/
+//               <must be read   >: I_0 array_d i val
+//               <must be written>: array_d[i]
+         array_d[i] = val;                                              /*0026*/
+//               <must be read   >: I_0 i
+//               <must be written>: i
+         i++;
+      }
+   }
+}
+
+POINTS TO
+
+void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+//               <must be read   >: vct vct[0][3]
+//               <must be written>: array_s
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
+//               <must be read   >: dat dat[0][1] dat[0][1][row] row
+//               <must be written>: array_d
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
+//               <must be read   >: vct vct[0][1]
+//               <must be written>: I_0
+   int I_0 = vct->spp;                                                  /*0017*/
+   {
+      register fgUINT16 val;                                            /*0019*/
+      register int i;                                                   /*0020*/
+      register int k;                                                   /*0021*/
+      unsigned short _return0;                                          /*0022*/
+//               <must be read   >: I_0 col
+//               <must be written>: i
+      i = col*I_0;
+//               <must be read   >: I_0
+//               <must be written>: k
+      for(k = 0; k <= I_0-1; k += 1) {
+//               <must be read   >: I_0 array_s array_s[k] k
+//               <must be written>: _return0
+         _return0 = array_s[k];                                         /*0024*/
+//               <must be read   >: I_0 _return0
+//               <must be written>: val
+         val = _return0;                                                /*0025*/
+//               <must be read   >: I_0 array_d i val
+//               <must be written>: array_d[i]
+         array_d[i] = val;                                              /*0026*/
+//               <must be read   >: I_0 i
+//               <must be written>: i
+         i++;
+      }
+   }
+}

@@ -15,50 +15,51 @@ int ptr_to_field()
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ n
    n = (my_str *) malloc(sizeof(my_str));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: m
-//               <must be written>: m[0][1]
    m->q = &i;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: m
-//               <must be written>: m[0][2]
    m->p = &j;
-//               <must be read   >: m m[0][2] n
-//               <must be written>: n[0][1]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
    n->q = m->p;
-//               <must be read   >: m m[0][1] n
-//               <must be written>: n[0][2]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
    n->p = m->q;
 
    return 0;
    // END BLOCK
 }
 POINTS TO
+//  {}
 int ptr_to_field()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    typedef struct {
       int *q;
       int *p;
    } my_str;
 
+//  points to = {}
    my_str *m, *n;
+//  points to = {}
    int i = 0, j = 1;
+//  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
-//  points to = {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANYWHERE*,-MAY-)}
    n = (my_str *) malloc(sizeof(my_str));
-//  points to = {(m,*ANYWHERE*,-MAY-);(n,*ANYWHERE*,-MAY-)}
+//  {(n,*ANYWHERE*,-MAY-);(m,*ANYWHERE*,-MAY-)}
    m->q = &i;
-//  points to = {(m[0][1],i,-Exact-);(m,*ANYWHERE*,-MAY-);(n,
-//   *ANYWHERE*,-MAY-)}
+//  {(n,*ANYWHERE*,-MAY-);(m[0][1],i,-Exact-)}
    m->p = &j;
-//  points to = {(m[0][2],j,-Exact-);(m[0][1],i,-Exact-);(m,
-//   *ANYWHERE*,-MAY-);(n,*ANYWHERE*,-MAY-)}
+//  {(n,*ANYWHERE*,-MAY-);(m[0][2],j,-Exact-)}
    n->q = m->p;
-//  points to = {(n[0][1],j,-Exact-);(m[0][2],j,-Exact-);(m[0][1],i,
-//   -Exact-);(m,*ANYWHERE*,-MAY-);(n,*ANYWHERE*,-MAY-)}
+//  {(n[0][1],j,-Exact-);(m[0][2],j,-Exact-)}
    n->p = m->q;
-//  points to = {(n[0][2],i,-Exact-);(n[0][1],j,-Exact-);(m[0][2],j,
-//   -Exact-);(m[0][1],i,-Exact-);(m,*ANYWHERE*,-MAY-);(n,*ANYWHERE*,
-//   -MAY-)}
+//  {(n[0][2],j,-Exact-);(m[0][2],j,-Exact-)}
 
    return 0;
    // END BLOCK

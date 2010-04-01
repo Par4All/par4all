@@ -1,0 +1,17 @@
+delete const02
+create const02 const02.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+# display PARSED_PRINTED_FILE[main]
+display PRINTED_FILE[const02!]
+display PRINTED_FILE[main]
+
+close
+
+delete const02
+
+quit

@@ -1,0 +1,41 @@
+
+Parsed code for "conditional01"
+
+char * conditional01(int i)
+{
+   char *p[3] = {"a", "b", "c"};
+   return i<0||i>2?p[0]:p[i];
+}
+
+Code for "conditional01"
+
+char * conditional01(int i)
+{
+   char *p[3] = {"a", "b", "c"};
+   return i<0||i>2?p[0]:p[i];
+}
+
+Proper effects for "conditional01"
+
+char * conditional01(int i)
+{
+//               <may be written >: p[*] p[*][*]
+   char *p[3] = {"a", "b", "c"};
+//               <may be read    >: p[0] p[*]
+//               <must be read   >: i
+   return i<0||i>2?p[0]:p[i];
+}
+
+Cumulated effects for "conditional01"
+
+
+POINTS TO
+
+//  {}
+char * conditional01(int i)
+{
+//  points to = {}
+   char *p[3] = {"a", "b", "c"};
+//  points to = {}
+   return i<0||i>2?p[0]:p[i];
+}

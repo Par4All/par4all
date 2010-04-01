@@ -1,0 +1,13 @@
+
+Parsed printed file for "decl55!"
+
+/* Simplified version of decl52.c to understand a bug: const is
+   applied to the pointer, not to the int */
+
+
+
+
+//int j;
+typedef struct _hdl_progress_handler {
+   const int *i;
+} HDL_progress_handler;

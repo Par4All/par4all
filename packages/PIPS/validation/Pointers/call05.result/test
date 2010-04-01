@@ -1,0 +1,131 @@
+
+Parsed code for "call05"
+
+void call05(int r, int m, int *x)
+{
+   int j;
+
+   for (j = 0;j<m;j++)
+      x[j] = 10*r+j;
+}
+
+Code for "call05"
+
+void call05(int r, int m, int *x)
+{
+   int j;
+
+   for(j = 0; j <= m-1; j += 1)
+      x[j] = 10*r+j;
+}
+
+Proper effects for "call05"
+
+void call05(int r, int m, int *x)
+{
+   int j;
+//               <must be read   >: m
+//               <must be written>: j
+
+   for(j = 0; j <= m-1; j += 1)
+//               <must be read   >: j m r x
+//               <must be written>: x[j]
+      x[j] = 10*r+j;
+}
+
+Cumulated effects for "call05"
+
+//               <may be read    >: r x
+//               <may be written >: x[*]
+//               <must be read   >: m
+void call05(int r, int m, int *x)
+{
+   int j;
+//               <may be read    >: j r x
+//               <may be written >: x[*]
+//               <must be read   >: m
+//               <must be written>: j
+
+   for(j = 0; j <= m-1; j += 1)
+//               <may be written >: x[*]
+//               <must be read   >: j m r x
+      x[j] = 10*r+j;
+}
+
+Proper effects for "main"
+
+int main()
+{
+//               <must be written>: d1
+   int d1 = 4;
+//               <must be written>: d2
+   int d2 = 4;
+   int y[d1][d2];
+   int i, j;
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//               <may be written >: y[i][*]
+//               <must be read   >: d1 d2 i
+      call05(i, d2, y[i]);
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1) {
+//               <must be read   >: d1 d2
+//               <must be written>: j
+      for(j = 0; j <= d2-1; j += 1)
+//               <must be read   >: __IO_EFFECTS:LUNS[1] d1 d2 i j 
+//                                  y[i][j]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+//               <must be read   >: __IO_EFFECTS:LUNS[1] d1
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\n");
+   }
+}
+
+POINTS TO
+
+//  {(x,_x_1,-Exact-)}
+void call05(int r, int m, int *x)
+{
+//  {(x,_x_1,-Exact-)}
+   int j;
+//  {(x,_x_1,-Exact-)}
+
+   for(j = 0; j <= m-1; j += 1)
+//  {(x,_x_1,-Exact-)}
+      x[j] = 10*r+j;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int d1 = 4;
+//  points to = {}
+   int d2 = 4;
+//  points to = {}
+   int y[d1][d2];
+//  points to = {}
+   int i, j;
+//  points to = {}
+
+   for(i = 0; i <= d1-1; i += 1)
+//  points to = {}
+      call05(i, d2, y[i]);
+//  points to = {}
+
+   for(i = 0; i <= d1-1; i += 1) {
+//  points to = {}
+      for(j = 0; j <= d2-1; j += 1)
+//  points to = {}
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+//  points to = {}
+      printf("\n");
+   }
+}

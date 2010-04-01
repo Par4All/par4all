@@ -1,0 +1,15 @@
+int main()
+{
+   char c;                                                              /*0003*/
+   if (c=='a') goto switch_1_case_a;
+   if (c=='b') goto switch_1_case_b;
+switch_1_default:   ;
+   goto break_1;
+switch_1_case_b:   ;
+   c--;                                                                 /*0009*/
+   goto break_1;
+switch_1_case_a:   ;
+   c++;                                                                 /*0006*/
+break_1:   ;
+   return 0;                                                            /*0014*/
+}

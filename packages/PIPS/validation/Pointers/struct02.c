@@ -1,17 +1,19 @@
-#include<stdio.h>
 int struct02()
 {
-  struct {
-    int *q;
-    int *p;
-  }m, n;
-  
-  int i=0, j=1, k=2;
-  int *r;
-  r = &k;
-  m.q = &i;
-  m.p = &j;
-  n = m;
-  r = n.p;
-  return 0;
+  struct two {
+    int first;
+    int second;
+  } x[10];
+  int i = 0;
+
+  for(i=0;i<10;i++) {
+    if(1) {
+      x[i].first = 1;
+      x[i].second = 0;
+    }
+    else {
+      x[i].first = 0;
+      x[i].second = 1;
+    }
+  }
 }

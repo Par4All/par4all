@@ -18,7 +18,6 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-docdir=$(datadir)/doc
 dist_noinst_DATA=pips_bugs.tex
 doc_DATA=pips_bugs.pdf
 include $(top_srcdir)/makes/latex.mk

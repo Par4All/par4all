@@ -1,0 +1,59 @@
+
+PRINT CODE for main
+
+int main()
+{
+   int entier;
+   int graine;
+   double virgule;
+   graine = 50;
+   srandom(graine);
+   /* generator initialization */
+   virgule = (double) rand()/(2147483647+1);
+   entier = 1+rand();
+}
+
+PRINT CUMULATED EFFECTS for main
+
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+int main()
+{
+   int entier;
+   int graine;
+   double virgule;
+//               <must be written>: graine
+   graine = 50;
+//               <must be read   >: graine
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+   srandom(graine);
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED virgule
+   /* generator initialization */
+   virgule = (double) rand()/(2147483647+1);
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED entier
+   entier = 1+rand();
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int entier;
+//  points to = {}
+   int graine;
+//  points to = {}
+   double virgule;
+//  points to = {}
+   graine = 50;
+//  points to = {}
+   srandom(graine);
+//  points to = {}
+   /* generator initialization */
+   virgule = (double) rand()/(2147483647+1);
+//  points to = {}
+   entier = 1+rand();
+}

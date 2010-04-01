@@ -1,0 +1,89 @@
+
+Proper effects for "main"
+
+int main()
+{
+   FILE *s;                                                             /*0024*/
+   char *fmt;                                                           /*0025*/
+   char *ch;                                                            /*0026*/
+   int tab[5];                                                          /*0027*/
+   int r;                                                               /*0028*/
+//               <may be read    >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
+//                                  s[*] tab[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] s[*] 
+//                                  tab[*]
+//               <must be read   >: ch fmt s
+//               <must be written>: r
+   r = varargs03(s, fmt, ch, tab);                                      /*0029*/
+//               <must be read   >: r
+   return r;                                                            /*0030*/
+}
+int varargs03(FILE *stream, const char *fmt, ...)
+{
+//               <must be read   >: stream
+   if (stream) {                                                        /*0007*/
+      va_list pa;                                                       /*0009*/
+      int r;                                                            /*0010*/
+//               <must be read   >: pa
+//               <must be written>: pa
+
+      va_start(pa, fmt);                                                /*0012*/
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt[*] 
+//                                  stream[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] stream[*]
+//               <must be read   >: fmt pa stream
+//               <must be written>: pa r
+      r = vfprintf(stream, fmt, pa);                                    /*0013*/
+//               <may be written >: pa
+//               <must be read   >: pa
+      va_end(pa);                                                       /*0014*/
+//               <must be read   >: r
+      return r;                                                         /*0016*/
+   }
+   else
+      return 0;                                                         /*0018*/
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   FILE *s;                                                             /*0024*/
+//  points to = {}
+   char *fmt;                                                           /*0025*/
+//  points to = {}
+   char *ch;                                                            /*0026*/
+//  points to = {}
+   int tab[5];                                                          /*0027*/
+//  points to = {}
+   int r;                                                               /*0028*/
+//  points to = {}
+   r = varargs03(s, fmt, ch, tab);                                      /*0029*/
+//  points to = {}
+   return r;                                                            /*0030*/
+}
+//  {(fmt,_fmt_1,-Exact-)}
+int varargs03(FILE *stream, const char *fmt, ...)
+{
+//  {(fmt,_fmt_1,-Exact-)}
+   if (stream) {                                                        /*0007*/
+//  {(fmt,_fmt_1,-Exact-)}
+      va_list pa;                                                       /*0009*/
+//  {(fmt,_fmt_1,-Exact-)}
+      int r;                                                            /*0010*/
+//  {(fmt,_fmt_1,-Exact-)}
+
+      va_start(pa, fmt);                                                /*0012*/
+//  {(fmt,_fmt_1,-Exact-)}
+      r = vfprintf(stream, fmt, pa);                                    /*0013*/
+//  {(fmt,_fmt_1,-Exact-)}
+      va_end(pa);                                                       /*0014*/
+//  {(fmt,_fmt_1,-Exact-)}
+      return r;                                                         /*0016*/
+   }
+   else
+//  {(fmt,_fmt_1,-Exact-)}
+      return 0;                                                         /*0018*/
+}

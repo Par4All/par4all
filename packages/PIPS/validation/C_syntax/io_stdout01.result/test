@@ -1,0 +1,7 @@
+int main()
+{
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   (void) printf("coucou\n");
+   return 0;
+}

@@ -1,3 +1,6 @@
+
+Pointer proper effects
+
 int main()
 {
    // BEGIN BLOCK
@@ -25,26 +28,34 @@ int main()
    return 0;
    // END BLOCK
 }
-POINTS TO
+
+Points-to
+
+//  {}
 int main()
 {
+//  points to = {}
    // BEGIN BLOCK
+//  points to = {}
    typedef struct my_struct {
       int i;
       int *p;
    } my_str;
+//  points to = {}
    my_str *m, *n;
+//  points to = {}
    int j;
+//  points to = {}
    j = 2;
+//  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
-//  points to = {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANYWHERE*,-MAY-)}
    m->i = 1;
-//  points to = {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANYWHERE*,-MAY-)}
    m->p = &j;
-//  points to = {(m[0][2],j,-Exact-);(m,*ANYWHERE*,-MAY-)}
+//  {(m[0][2],j,-Exact-)}
    n = m;
-//  points to = {(m[0][2],j,-Exact-);(n,*ANYWHERE*,-MAY-);(m,
-//   *ANYWHERE*,-MAY-)}
+//  {(n,j,-Exact-);(m[0][2],j,-Exact-)}
 
    return 0;
    // END BLOCK

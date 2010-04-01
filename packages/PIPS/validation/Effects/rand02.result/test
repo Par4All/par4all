@@ -60,8 +60,8 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //               <must be read   >: nx ny
 //               <must be written>: ix
       for(ix = 0; ix <= nx-1; ix += 1) {
-//               <must be read   >: nx ny u u _RANDOM_EFFECTS:GEN_SEED
-//               <must be written>: u _RANDOM_EFFECTS:GEN_SEED
+//               <may be read    >: nx ny u u _RANDOM_EFFECTS:GEN_SEED
+//               <may be written >: u _RANDOM_EFFECTS:GEN_SEED
 
          while (u==0||u>1) 
 //               <must be read   >: nx ny _RANDOM_EFFECTS:GEN_SEED
@@ -142,7 +142,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <pt_out[PHI1][PHI2][PHI3]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx, 1<=PHI3, PHI3<=2}>
 //  <u-R-EXACT-{}>
-//  <u-R-EXACT-{}>
+//  <u-R-MAY-{}>
 //  <u-W-EXACT-{}>
 //  <v-R-EXACT-{}>
 //  <v-W-EXACT-{}>
@@ -166,20 +166,20 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <pt_out[PHI1][PHI2][PHI3]-W-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    1<=PHI3, PHI3<=2, 0<=iy, 1+iy<=ny}>
 //  <u-R-EXACT-{}>
-//  <u-R-EXACT-{}>
+//  <u-R-MAY-{}>
 //  <u-W-EXACT-{}>
 //  <v-R-EXACT-{}>
 //  <v-W-EXACT-{}>
 
       for(ix = 0; ix <= nx-1; ix += 1) {
 
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
-//  <nx-R-EXACT-{}>
-//  <ny-R-EXACT-{}>
-//  <u-R-EXACT-{}>
-//  <u-R-EXACT-{}>
-//  <u-W-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-MAY-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-MAY-{}>
+//  <nx-R-MAY-{}>
+//  <ny-R-MAY-{}>
+//  <u-R-MAY-{}>
+//  <u-R-MAY-{}>
+//  <u-W-MAY-{}>
 
 
          while (u==0||u>1) 

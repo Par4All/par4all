@@ -11,34 +11,57 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
-# setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+
 
 echo
-echo Cumulated effetcs for "struct01"
+echo Proper pointer effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated pointer effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated effects for "main"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[struct01]
+display PRINTED_FILE[main]
 
 # quit
 
 echo
-echo Transformers for "struct01"
+echo Transformers for "main"
 echo
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[struct01]
+display PRINTED_FILE[main]
 
 echo
 echo Printed files with regions
 echo
 
-# activate MUST_REGIONS
+activate MUST_REGIONS
 activate PRINT_CODE_REGIONS
-display PRINTED_FILE[struct01]
+display PRINTED_FILE[main]
 
 close
 delete struct01

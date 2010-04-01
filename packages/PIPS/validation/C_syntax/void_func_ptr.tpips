@@ -10,7 +10,14 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
-apply UNSPLIT(glist_apply_ptr)
+echo
+echo Parsed code for "void_func_prt"
+echo
+
+display PARSED_PRINTED_FILE[void_func_ptr!]
+display PARSED_PRINTED_FILE[void_func_ptr]
+
+apply UNSPLIT
 
 close
 
