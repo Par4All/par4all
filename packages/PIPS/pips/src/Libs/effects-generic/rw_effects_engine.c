@@ -252,6 +252,10 @@ static void rw_effects_of_while(whileloop w)
     statement b = whileloop_body(w);
     transformer trans;
     
+    /* we should check if the loop is executed at least once : 
+       we could keep exact effects on scalars at least. 
+    */
+				   
     l_prop = effects_dup(load_proper_rw_effects_list(current_stat)); /* R[C] */
     l_body = effects_dup(load_rw_effects_list(b)); /* R[S] */
     /* I use the famous over-approximation of E[C]: Id */
@@ -259,6 +263,9 @@ static void rw_effects_of_while(whileloop w)
 
     l_body = (*effects_union_op)(l_body, l_prop, effects_same_action_p);
     l_body = (*effects_transformer_composition_op)(l_body, trans);
+
+    /* We don't know whether the loop is executed at least once or not. */
+    effects_to_may_effects(l_body);
 
     (*effects_descriptor_normalize_func)(l_body);
 

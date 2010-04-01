@@ -410,12 +410,16 @@ list generic_c_effects_backward_translation(entity callee,
 
 	      if (ith_parameter_p(callee, eff_ent, arg_num))
 		{
-
+		  bool exact_p = false;
 		  /* Whatever the real_arg may be if there is an effect on 
 		     the sole value of the formal arg, it generates no effect 
 		     on the caller side.
 		  */
-		  if (ENDP(reference_indices(eff_ref)))
+		  // not appropriate for structs and unions
+		  if (ENDP(reference_indices(eff_ref))
+		      ||
+		      (!entity_array_p(eff_ent) // to work around the fact that formal arrays are not internally represented as pointers for the moment
+		       && !effect_reference_dereferencing_p(eff_ref, &exact_p))) // for structs and unions
 		    {
 		      pips_debug(5, "effect on the value of the formal parameter -> skipped\n");
 		    }
@@ -465,7 +469,7 @@ list generic_c_effects_backward_translation(entity callee,
 	} /* else */
 
       /* add the proper effects on the real arg evaluation */
-      l_eff = gen_nconc(l_eff, generic_proper_effects_of_expression(real_arg));
+      l_eff = gen_nconc(l_eff, generic_proper_effects_of_c_function_call_argument(real_arg));
     } /* for */
 
   (*effects_translation_end_func)();

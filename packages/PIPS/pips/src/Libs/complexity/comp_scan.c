@@ -458,7 +458,7 @@ list effects_list;
     statement s = loop_body(loop_instr);
     execution ex = loop_execution(loop_instr);
     complexity comp, cbody, crange, clower, cupper, cincr, cioh, cboh;
-    char sl[9],su[9], si[9];
+    string sl,su,si;
     /* FI: Lei chose to allocate the UL and UU entities in the current
        module... Maybe, we are ready fo some dynamic profiling... */
     /* string mod_name = entity_module_name(ll); */
@@ -472,15 +472,15 @@ list effects_list;
 	/* if the statement were still reachable, we could try to use the
 	 * statement nunber...
 	 */
-	(void) strcpy(sl, "UL_");
-	(void) strcpy(su, "UU_");
-	(void) strcpy(si, "UU_");
+        sl=strdup("UL_");
+        su=strdup("UU_");
+        si=strdup("UU_");
     }
     else {
-	/*  In order to get rid of at-sign, add 1 , LZ 010492 */
-	sprintf(sl,"UL_%s",entity_local_name(loop_label(loop_instr))+1);
-	sprintf(su,"UU_%s",entity_local_name(loop_label(loop_instr))+1);
-	sprintf(si,"UI_%s",entity_local_name(loop_label(loop_instr))+1);
+        /*  In order to get rid of at-sign, add 1 , LZ 010492 */
+        asprintf(&sl,"UL_%s",entity_local_name(loop_label(loop_instr))+1);
+        asprintf(&su,"UU_%s",entity_local_name(loop_label(loop_instr))+1);
+        asprintf(&si,"UI_%s",entity_local_name(loop_label(loop_instr))+1);
     }
 
     /* tell callees that they mustn't try to evaluate the loop index */
@@ -665,6 +665,7 @@ list effects_list;
     complexity_check_and_warn("loop_to_complexity", comp);    
 
     trace_off();
+    free(sl);free(su);free(si);
     return(comp);
 }
 

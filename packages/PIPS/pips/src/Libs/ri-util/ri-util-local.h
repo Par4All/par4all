@@ -537,9 +537,9 @@
 #define LLABS_FUNCTION_NAME             "llabs"
 #define LLDIV_FUNCTION_NAME             "lldiv"
 #define LLTOSTR_FUNCTION_NAME           "lltostr"
-#define STROLL_FUNCTION_NAME            "strtoll"
-#define STROULL_FUNCTION_NAME           "strtoull"
-#define ULLOSTR_FUNCTION_NAME           "ulltostr"
+#define STRTOLL_FUNCTION_NAME           "strtoll"
+#define STRTOULL_FUNCTION_NAME          "strtoull"
+#define ULLTOSTR_FUNCTION_NAME          "ulltostr"
 
 /* include<assert.h> */
 
@@ -1238,7 +1238,7 @@
 /* #define effect_reference(e)					\
    preference_reference(cell_preference(effect_cell(e))) */
 #define effect_reference(e) \
-  pips_error("effect_reference not defined anymore \n")
+  pips_internal_error("effect_reference not defined anymore \n")
 
 /* FI: cannot be used as a left hand side */
 #define effect_any_reference(e) \

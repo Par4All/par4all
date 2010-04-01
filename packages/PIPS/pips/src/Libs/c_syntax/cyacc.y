@@ -1919,6 +1919,10 @@ decl_spec_list:
 			   /* Copy may be excessive as only the scope needs to be preserved...*/
 			   //ycontext = copy_c_parser_context((c_parser_context)stack_head(ContextStack));
 			   ycontext = GetContextCopy();
+			   /* FI: You do not want to propagate
+			      qualifiers */
+			   gen_full_free_list(c_parser_context_qualifiers(ycontext));
+			   c_parser_context_qualifiers(ycontext) = NIL;
 			   /* How can these two problems occur since
 			      ycontext is only a copy of the
 			      ContextStack's head? Are we in the
@@ -1996,6 +2000,8 @@ my_decl_spec_list:                         /* ISO 6.7 */
 |   TK_AUTO decl_spec_list_opt
                         {
 			  /* Make dynamic storage for current entity */
+			  c_parser_context_qualifiers(ycontext) = gen_nconc(c_parser_context_qualifiers(ycontext),
+									   CONS(QUALIFIER,make_qualifier_auto(),NIL));
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
@@ -2081,7 +2087,25 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			}
 |   attribute decl_spec_list_opt
                         {
-			  c_parser_context_qualifiers(ycontext) = CONS(QUALIFIER,$1,c_parser_context_qualifiers(ycontext));
+			  list ql = c_parser_context_qualifiers(ycontext);
+			  qualifier nq = $1;
+			  bool found = FALSE; // FI: Should never be useful...
+
+			  FOREACH(QUALIFIER, q, ql) {
+			    if(qualifier_equal_p(q, nq)) {
+			      /* FI: either the context was not
+				 stacked or it was not used and
+				 emptied... */
+			      pips_user_warning("Dupliquate qualifier \"%s\"\n",
+						qualifier_to_string(q));
+			      found = TRUE;
+			    }
+			  }
+
+			  if(!found)
+			    c_parser_context_qualifiers(ycontext) =
+			      CONS(QUALIFIER, nq, ql);
+
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
@@ -2477,17 +2501,48 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 field_decl_list: /* (* ISO 6.7.2 *) */
     field_decl
                         {
-			  $$ = CONS(ENTITY,$1,NIL);
+			  entity f = $1;
+			  $$ = CONS(ENTITY, f,NIL);
 			}
 |   field_decl TK_COMMA field_decl_list
                         {
-			  $$ = CONS(ENTITY,$1,$3);
+			  entity f = $1;
+			  $$ = CONS(ENTITY,f,$3);
 			}
 ;
 
 field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
     declarator
                         {
+			  /* For debugging... */
+			  /* It's probably the last place where you
+			     can use the qualifier from the context to
+			     update the type of e when e is a pointer. */
+			  entity e = $1;
+			  type t = entity_type(e);
+
+			  /* FI: Well, this piece of code may be fully
+			     useless because t or pt is always undefined. */
+			  if(FALSE && !type_undefined_p(t)) {
+			    type ut = ultimate_type(t);
+
+			    if(pointer_type_p(ut)) {
+			      type pt = type_to_final_pointed_type(ut);
+			      if(!type_undefined_p(pt) && type_variable_p(pt)) {
+				variable v = type_variable(pt);
+				list ql = c_parser_context_qualifiers(ycontext);
+				pips_assert("the current qualifier list is empty",
+					    ENDP(variable_qualifiers(v)));
+				/* FI: because of the above assert, the
+				   next statement could be simplified */
+				variable_qualifiers(v) =
+				  gen_nconc(variable_qualifiers(v), ql);
+				c_parser_context_qualifiers(ycontext) = NIL;
+			      }
+			    }
+			  }
+
+			  $$ = e;
 			}
 |   declarator TK_COLON expression
                         {

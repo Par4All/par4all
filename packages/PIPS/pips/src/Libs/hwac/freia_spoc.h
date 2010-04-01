@@ -199,6 +199,7 @@ typedef enum {
 // what about something simpler like "freia-spoc.h"?
 #define FREIA_SPOC_INCLUDES			\
   "#include <freiaCommon.h>\n"			\
+  "#include <freiaMediumGrain.h>\n"		\
   "#include <freiaCoarseGrain.h>\n"		\
   "#include <spoc.h>\n"
 
@@ -214,7 +215,6 @@ typedef enum {
   "  freia_microcode mcode;\n"					\
   "  freia_dynamic_param dynparam;\n"				\
   "  freia_reduction_results redres;\n"				\
-  "  freia_op_sel op = 0;\n"					\
   "  freia_op_param param;\n"					\
   "  freia_status ret;\n"					\
   "  int i;\n"							\

@@ -490,14 +490,23 @@ statement MakeCaseStatement(expression e)
          case e:
      to
          switch_xxx_case_e: ;
-     and generate 	
+     and generate
         if (c == e) goto switch_xxx_case_e
      where c is retrieved from SwitchControllerStack
            xxx is unique from LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab ;
   string estr = words_to_string(words_expression(e, NIL));
-  asprintf(&lab,"switch_%d_case_%s",i,estr);
+  string restr = estr;
+
+  /* The expression may be a character */
+  if(*estr=='\'') {
+    /* remove the quotes */
+    restr++;
+    *(estr+strlen(estr)-1) = '\000';
+  }
+
+  asprintf(&lab,"switch_%d_case_%s",i,restr);
   free(estr);
   statement s = MakeLabeledStatement(lab,
 				     make_continue_statement(entity_empty_label()),

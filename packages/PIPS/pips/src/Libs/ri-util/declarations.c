@@ -1778,8 +1778,12 @@ static list words_qualifier(list obj)
     case is_qualifier_volatile:
       pc = CHAIN_SWORD(pc,"volatile ");
       break;
+    case is_qualifier_auto:
+      /* FI: the auto case was missing; I have no idea why. */
+      pc = CHAIN_SWORD(pc,"auto ");
+      break;
     default :
-      pips_error("words_qualifier", "unexpected tag");
+      pips_internal_error("unexpected tag %d\n", qualifier_tag(q));
     }
   },obj);
   return pc;
@@ -2951,25 +2955,35 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
   gen_free_list(members);
 }
 
-/* This function is called from c_parse() via ResetCurrentModule() and fprint_environment() */
+/* This function is called from c_parse() via ResetCurrentModule() and
+   fprint_environment() */
 void fprint_functional(FILE * fd, functional f)
 {
   type tr = functional_result(f);
+  int count = 0;
 
-  MAPL(cp, {
-    parameter p = PARAMETER(CAR(cp));
+  FOREACH(PARAMETER, p, functional_parameters(f)) {
     type ta = parameter_type(p);
 
-    pips_assert("Argument type is variable or varags:variable or functional",
+    pips_assert("Argument type is variable or varags:variable or functional or void",
 		type_variable_p(ta)
 		|| (type_varargs_p(ta) && type_variable_p(type_varargs(ta)))
-		|| type_functional_p(ta));
+		|| type_functional_p(ta)
+		|| type_void_p(ta));
+
+    if(count>0)
+      (void) fprintf(fd, " x ");
+    count++;
 
     if(type_functional_p(ta)) {
       functional fa = type_functional(ta);
       /* (void) fprintf(fd, " %s:", type_to_string(ta)); */
       (void) fprintf(fd, "(");
       fprint_functional(fd, fa);
+      (void) fprintf(fd, ")");
+    }
+    else if(type_void_p(ta)) {
+      (void) fprintf(fd, "(");
       (void) fprintf(fd, ")");
     }
     else {
@@ -2979,10 +2993,7 @@ void fprint_functional(FILE * fd, functional f)
       }
       (void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
     }
-    if(!ENDP(cp->cdr))
-      (void) fprintf(fd, " x ");
-  },
-       functional_parameters(f));
+  }
 
   if(ENDP(functional_parameters(f))) {
     (void) fprintf(fd, " ()");

@@ -34,7 +34,8 @@ pypips.i:pypips.i.in pypips.h
 
 pypips.h:pypips.c
 	$(CPROTO) $(srcdir)/pypips.c > $@
-	echo "extern char *activate(char *phase);" >> $@
+	echo "extern char *activate(char *);" >> $@
+	echo "extern char *module_loops(const char*,const char*);" >> $@
 	echo "#include <unistd.h>" >> $@
 
 pypips_aux.c:pypips.h pypips.c
