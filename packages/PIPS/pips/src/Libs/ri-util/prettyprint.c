@@ -175,7 +175,7 @@ void reset_prettyprint_is_fortran()
   prettyprint_is_fortran = FALSE;
 }
 
-static list words_cast(cast obj, list pdl);
+static list words_cast(cast obj, int precedence, list pdl);
 static list words_sizeofexpression(sizeofexpression obj, bool in_type_declaration, list pdl);
 static list words_subscript(subscript s, list pdl);
 static list words_application(application a, list pdl);
@@ -1994,7 +1994,7 @@ words_syntax(syntax obj, list pdl)
       pc = words_call(syntax_call(obj), 0, TRUE, FALSE, pdl);
       break;
     case is_syntax_cast:
-      pc = words_cast(syntax_cast(obj), pdl);
+      pc = words_cast(syntax_cast(obj), 0, pdl);
       break;
     case is_syntax_sizeofexpression: {
       /* FI->SG: I do not know if in_type_declaration is TRUE, FALSE
@@ -2039,6 +2039,10 @@ list words_subexpression(
 
     if ( expression_call_p(obj) )
       pc = words_call(syntax_call(expression_syntax(obj)), precedence, leftmost, FALSE, pdl);
+    else if(expression_cast_p(obj)) {
+      cast c = expression_cast(obj);
+      pc = words_cast(c, precedence, pdl);
+    }
     else
       pc = words_syntax(expression_syntax(obj), pdl);
 
@@ -3969,7 +3973,7 @@ void output_a_graph_view_of_the_unstructured(text r,
 
 /* ================C prettyprinter functions================= */
 
-static list words_cast(cast obj, list pdl)
+static list words_cast(cast obj, int precedence, list pdl)
 {
   list pc = NIL;
   type t = cast_type(obj);
@@ -3979,7 +3983,12 @@ static list words_cast(cast obj, list pdl)
   pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, c_words_entity(t, NIL, pdl));
   pc = CHAIN_SWORD(pc, space_p? ") " : ")");
+  /* FI: Should it be a words_subexpression? */
   pc = gen_nconc(pc, words_expression(exp, pdl));
+  if(get_bool_property("PRETTYPRINT_ALL_PARENTHESES")  || precedence >= 25) {
+    pc = CONS(STRING, strdup("("),
+	      gen_nconc(pc,CONS(STRING, strdup(")"), NIL)));
+  }
   return pc;
 }
 

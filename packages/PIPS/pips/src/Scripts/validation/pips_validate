@@ -286,6 +286,11 @@ function validate_file()
       echo "skipped: ${file#$vdir/}" >> $summary
       return 0
     fi
+  elif [[ ! -f $full_name.result/test && ! -f $full_name.result/test.$arch ]]
+  then
+    verb 1 "skipping $file: no matching result test file"
+    echo "skipped: ${file#$vdir/}" >> $summary
+    return 0
   fi
 
   local name=${full_name/*\//}

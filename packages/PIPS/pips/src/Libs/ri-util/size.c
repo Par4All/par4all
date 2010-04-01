@@ -100,62 +100,75 @@ bool SizeOfArray(entity e, int * s)
   ok = NumberOfElements(variable_basic(a), variable_dimensions(a), &ne);
 
   if(!ok) {
-      /* Let's try to use the initial value */
-      value ev = entity_initial(e);
-      if(!value_undefined_p(ev))
-      {
+    /* Let's try to use the initial value */
+    value ev = entity_initial(e);
+    if(!value_undefined_p(ev)) {
+      if(value_expression_p(ev)) {
+	expression eve = value_expression(ev);
+	//type evet = expression_to_type(eve);
+	basic eveb = basic_of_expression(eve); /* FI: should eveb be freed? */
 
-          if(value_expression_p(ev)) {
-              expression eve = value_expression(ev);
-              //type evet = expression_to_type(eve);
-              basic eveb = basic_of_expression(eve); /* FI: should eveb be freed? */
+	/* Is it an array of characters initialized with a string expression? */
+	if(char_type_p(et) && !basic_undefined_p(eveb) && basic_string_p(eveb)) {
+	  ne = string_type_size(eveb);
+	  ok = TRUE;
+	}
+	else if(expression_call_p(eve)) {
+	  call evec = syntax_call(expression_syntax(eve));
+	  entity f = call_function(evec);
+	  list args = call_arguments(evec);
 
-              /* Is it an array of characters initialized with a string expression? */
-              if(char_type_p(et) && !basic_undefined_p(eveb) && basic_string_p(eveb)) {
-                  ne = string_type_size(eveb);
-                  ok = TRUE;
-              }
-              else if(expression_call_p(eve)) {
-                  call evec = syntax_call(expression_syntax(eve));
-                  entity f = call_function(evec);
-                  list args = call_arguments(evec);
+	  /* Is it a call to the BRACE_INTRINSIC operator? */
+	  if(ENTITY_BRACE_INTRINSIC_P(f)) {
+	    /* This is too simple unfortunately: OK, but why? which
+	       test case? */
+	    /* ne = gen_length(args); */
+	    int ni = number_of_initial_values(args);
+	    //int nf = number_of_fields(et);
+	    int nf;
 
-                  /* Is it a call to the BRACE_INTRINSIC operator? */
-                  if(ENTITY_BRACE_INTRINSIC_P(f)) {
-                      /* This is too simple unfortunately */
-                      /* ne = gen_length(args); */
-                      int ni = number_of_initial_values(args);
-                      int nf = number_of_fields(et);
-                      ne = ni/nf;
-                      if(nf*ne!=ni) {
-                          /* Should be a call to CParserError()... */
-                          pips_user_error("Number of initialization values (%d) incompatible"
-                                  " with number of type fields (%d)\n", ni, nf);
-                      }
-                      ok = TRUE;
-                  }
-                  /* Check for other dimensions which must be all declared: the
-                     first dimension only can be implicit */
-                  /* Already taken care of by "ni" */
-                  /*
-                     if(ok && gen_length(variable_dimensions(a))>1) {
-                     bool sok = FALSE;
-                     int sne = -1;
-                     sok = NumberOfElements(variable_basic(a), CDR(variable_dimensions(a)), &sne);
-                     if(sok) {
-                     ne *= sne;
-                     }
-                     else {
-                     ok = FALSE;
-                     }
-                     }
-                     */
-              }
-          }
-          else if(value_constant_p(ev)) {
-              pips_internal_error("Not implemented yet\n");
-          }
+	    if(type_variable_p(uet)) {
+	      variable ev = type_variable(uet);
+	      basic eb = variable_basic(ev);
+	      if(basic_derived_p(eb)) {
+		entity de = basic_derived(eb);
+		nf = number_of_items(entity_type(de));
+	      }
+	      else
+		nf = 1;
+	    }
+	    ne = ni/nf;
+	    if(nf*ne!=ni) {
+	      /* Should be a call to CParserError()... */
+	      //pips_user_error("Number of initialization values (%d) incompatible"
+	      //	      " with number of type fields (%d)\n", ni, nf);
+	      // let's assume the source code is correct...
+	      ne = gen_length(args);
+	    }
+	    ok = TRUE;
+	  }
+	  /* Check for other dimensions which must be all declared: the
+	     first dimension only can be implicit */
+	  /* Already taken care of by "ni" */
+	  /*
+	    if(ok && gen_length(variable_dimensions(a))>1) {
+	    bool sok = FALSE;
+	    int sne = -1;
+	    sok = NumberOfElements(variable_basic(a), CDR(variable_dimensions(a)), &sne);
+	    if(sok) {
+	    ne *= sne;
+	    }
+	    else {
+	    ok = FALSE;
+	    }
+	    }
+	  */
+	}
       }
+      else if(value_constant_p(ev)) {
+	pips_internal_error("Not implemented yet\n");
+      }
+    }
   }
 
   /* Check for 32 bit signed overflows */

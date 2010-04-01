@@ -18,7 +18,7 @@ pips_includes:Makefile
 	{ for dir in $(PIPS_SUBDIRS) ; do printf -- "-I../$$dir -I`cd $(top_srcdir) &>/dev/null ; pwd`/src/Libs/$$dir " ; done } > $@
 
 cprotoify:Makefile pips_includes
-	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h ; done
+	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h  & done ; wait
 
 
 CLEANFILES=pips_includes

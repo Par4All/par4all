@@ -19,6 +19,15 @@ class loop:
 	@property
 	def label(self): return self._label
 
+	def display(self): self._module.display()
+
+	def loops(self):
+		self._module.flag_loops()
+		loops=pypips.module_loops(self._module.name,self._label)
+		return map(lambda l:loop(self._module,l),str.split(loops," "))
+
+
+
 ### loop_methods /!\ do not touch this line /!\
 
 
@@ -56,9 +65,11 @@ class module:
 
 	def loops(self, label=""):
 		"""return desired loop if label given, an iterator over loops otherwise"""
-		self.apply("print_loops")
-		rcfile=self.show("loops_file")
-		return map(lambda line:loop(self,line[0:-1]), file(self._ws.dir()+rcfile).readlines()) if not label else loop(label)
+		if label: return loop(self,label)
+		else:
+			self.flag_loops()
+			loops=pypips.module_loops(self.name,"")
+			return map(lambda l:loop(self,l),str.split(loops," "))
 
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the passe name to the property when needed """
@@ -68,6 +79,11 @@ class module:
 				props[upper(passe+"_"+name)]=val
 				#print "warning, changing ", name, "into", passe+"_"+name
 		return props
+	def saveas(self,path):
+		fd=file(path,"w")
+		for line in self.code():
+			fd.write(line)
+		fd.close()
 
 ### module_methods /!\ do not touch this line /!\
 
@@ -104,7 +120,9 @@ class workspace:
 			return x+y if isinstance(y,list) else x +[y]
 		self._sources=reduce(helper,sources2,[])
 		pypips.create(name, self._sources)
-		if not verboseon:self.set_property(USER_LOG_P=False)
+		if not verboseon:
+			self.set_property(NO_USER_WARNING=True)
+			self.set_property(USER_LOG_P=False)
 		map(lambda x:pypips.activate(x),activates)
 		self._modules = {}
 		self._build_module_list()
@@ -192,7 +210,7 @@ class workspace:
 
 	def activate(self,phase):
 		"""activate a given phase"""
-		pypips.activate(phase)
+		pypips.activate(upper(phase))
 
 	def filter(self,matching=lambda x:True):
 		"""create an object containing current listing of all modules,

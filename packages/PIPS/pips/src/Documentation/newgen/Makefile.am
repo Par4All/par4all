@@ -153,9 +153,10 @@ F_pdf=ri.pdf \
 	points_to_private.pdf \
 	freia_spoc_private.pdf
 
-docdir=$(datadir)/doc
+if WITH_DOC
 dist_noinst_DATA=$(F_tex) unstructured.idraw newgen_domain.sty
 doc_DATA=$(F_pdf)
+endif
 
 dist_noinst_SCRIPTS=remove-latex-comments
 noinst_LTLIBRARIES=libnewgenaux.la
@@ -171,9 +172,12 @@ include_HEADERS=all_newgen_headers.h specs.h $(F_h)
 all_newgen_headers.h: specs.h Makefile
 	sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' specs.h > $@
 
-specs.h $(F_spec):Makefile $(srcdir)/*.tex
+specs.h:Makefile $(F_tex)
 	$(MAKE) `echo $(F_c) | sed -e 's/\.c/.newgen /g'`
 	PATH=`dirname $(NEWGEN)`:$$PATH $(NEWGEN) -c `echo $(F_c) | sed -e 's/\.c/.newgen/g'` | $(MAKE_ALL_SPECS) > specs.h
+
+$(F_spec):specs.h
+$(F_c):specs.h
 
 .tex.newgen:
 	$(srcdir)/remove-latex-comments $<

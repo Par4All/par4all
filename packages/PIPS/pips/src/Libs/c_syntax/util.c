@@ -1422,7 +1422,8 @@ void UpdateFunctionEntity(entity oe, list la)
      intrinsic. Then we are in trouble.
   */
   if(intrinsic_entity_p(oe)
-     && !compilation_unit_p(get_current_module_name())
+     && (!entity_undefined_p(get_current_module_entity())
+	 && !compilation_unit_p(get_current_module_name()))
      && !type_undefined_p(entity_type(oe)))
     return;
 
@@ -2471,9 +2472,15 @@ void UpdateAbstractEntity(entity e, stack ContextStack)
 void RemoveFromExterns(entity e)
 {
   entity f = get_current_module_entity();
-  code fc = value_code(entity_initial(f));
+  if(!entity_undefined_p(f)) {
+    code fc = value_code(entity_initial(f));
 
-  gen_remove(&code_externs(fc), (void *) e);
+    gen_remove(&code_externs(fc), (void *) e);
+  }
+  else {
+    /* This may happen when functional arguments are dealt with */
+    pips_user_warning("The C parser should not execute this call\n");
+  }
 }
 
 void AddToExterns(entity e, entity mod)
@@ -2550,11 +2557,22 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
 	  type_void(t2) = ql;
 	}
 	else if(type_variable_p(t2)) {
-	  variable_qualifiers(type_variable(t2)) = ql;
+	  if(pointer_type_p(t2)) {
+	    type pt = type_to_final_pointed_type(t2);
+	    if(type_void_p(pt))
+	      type_void(pt) = ql;
+	    else
+	      variable_qualifiers(type_variable(pt)) = ql;
+	  }
+	  else {
+	    variable_qualifiers(type_variable(t2)) = ql;
+	  }
 	}
 	else
 	  pips_internal_error("unexpected type\n");
-
+	/* Although it should be popped from the stack, the current
+	   context seems to be used later in case of typedef, such as
+	   seen in decl24.c */
 	c_parser_context_qualifiers(context) = NIL;
       }
     }

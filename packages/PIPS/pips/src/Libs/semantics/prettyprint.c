@@ -445,7 +445,7 @@ text text_transformer(transformer tran)
       if (foresys) append(",");
       append(" ");
 
-      ps = predicate_system(transformer_relation(tran));
+      ps = sc_copy(predicate_system(transformer_relation(tran)));
       sc_lexicographic_sort(ps, is_inferior_pvarval);
 
       ifdebug(7) {
@@ -456,6 +456,7 @@ text text_transformer(transformer tran)
       system_text_format(crt_line, str_prefix, txt, ps,
 			 (char * (*)(Variable)) pips_user_value_name, foresys);
 
+      sc_rm(ps);
     }
 
     close_current_line(crt_line, txt, str_prefix);

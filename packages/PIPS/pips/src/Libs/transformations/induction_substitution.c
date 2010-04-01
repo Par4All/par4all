@@ -65,6 +65,22 @@ typedef struct {
     expression substitute_by; /* The substitution expression */
 } substitute_ctx;
 
+
+
+
+
+/** \fn static bool inc_or_de_crement_instruction_p( instruction i ) {
+ * \brief check if the instruction is a ++ or --
+ */
+static bool inc_or_de_crement_instruction_p( instruction i ) {
+  return  native_instruction_p( i, POST_INCREMENT_OPERATOR_NAME ) //
+    || native_instruction_p( i, PRE_INCREMENT_OPERATOR_NAME ) //
+    || native_instruction_p( i, POST_DECREMENT_OPERATOR_NAME ) //
+    || native_instruction_p( i, PRE_DECREMENT_OPERATOR_NAME ) //
+    ;
+}
+
+
 /** \fn static bool reference_substitute( expression e, substitute_ctx *ctx )
  *  \brief callback for gen_recurse
  *  called during bottom-up phase on expression,
@@ -111,7 +127,9 @@ static bool is_left_part_of_assignment( instruction i, entity v ) {
             || native_instruction_p( i, MULTIPLY_UPDATE_OPERATOR_NAME ) //
             || native_instruction_p( i, DIVIDE_UPDATE_OPERATOR_NAME ) //
             || native_instruction_p( i, PLUS_UPDATE_OPERATOR_NAME ) //
-            || native_instruction_p( i, MINUS_UPDATE_OPERATOR_NAME ) ) {
+            || native_instruction_p( i, MINUS_UPDATE_OPERATOR_NAME )
+            || inc_or_de_crement_instruction_p(i) //
+            ) {
         /* Assignment are represented as function call */
         call c = call_undefined;
         if ( instruction_call_p(i) ) {
@@ -218,7 +236,9 @@ static bool subtitute_induction_statement_in( statement s ) {
                 || native_instruction_p( statement_instruction( s ), MULTIPLY_UPDATE_OPERATOR_NAME ) //
                 || native_instruction_p( statement_instruction( s ), DIVIDE_UPDATE_OPERATOR_NAME ) //
                 || native_instruction_p( statement_instruction( s ), PLUS_UPDATE_OPERATOR_NAME ) //
-                || native_instruction_p( statement_instruction( s ), MINUS_UPDATE_OPERATOR_NAME ) ) {
+                || native_instruction_p( statement_instruction( s ), MINUS_UPDATE_OPERATOR_NAME )
+                || inc_or_de_crement_instruction_p(statement_instruction( s ) )
+            ) {
 
             /* The precondition will be used for building a substitution expression */
             transformer prec = load_statement_precondition( s );
@@ -334,8 +354,9 @@ static bool subtitute_induction_statement_in( statement s ) {
                         && is_modified_entity_in_transformer( load_statement_transformer( s ), //
                         induction_variable_candidate ) //
                         // variable is modified on left part of assignment (no side effects )
+                        // or is a simple side-effects statement like "k++;"
                         && is_left_part_of_assignment( statement_instruction( s ), //
-                        induction_variable_candidate ) //
+                                                         induction_variable_candidate )
                 ) {
 
                     /* Add final division using the coeff */
@@ -357,42 +378,60 @@ static bool subtitute_induction_statement_in( statement s ) {
                         fprintf( stderr, "\n" );
                     }
 
-                    /* Now recurse on expressions in current statement and
-                     * replace induction_variable_candidate by substitute expression */
-                    substitute_ctx ctx;
-                    ctx.to_substitute = induction_variable_candidate;
-                    ctx.substitute_by = substitute;
-
-                    expression substitute_on = get_right_part_of_assignment( statement_instruction( s ) );
-                    gen_context_recurse ( substitute_on, &ctx, expression_domain, gen_true, reference_substitute );
-
-                    /* Force to generate again the normalized field of the expression */
-                    expression_normalized(substitute_on) = NormalizeExpression( substitute_on );
-
-                    /* Handle "update" affection (+=, -= , ...)
-                     * Transform z += 1 in z = induction + 1
-                     * */
                     expression unsugarized = expression_undefined;
-                    if ( native_instruction_p( statement_instruction( s ), MULTIPLY_UPDATE_OPERATOR_NAME ) ) {
-                        unsugarized = MakeBinaryCall( entity_intrinsic( MULTIPLY_OPERATOR_NAME ), //
-                        substitute, //
-                        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
-                    } else if ( native_instruction_p( statement_instruction( s ), DIVIDE_UPDATE_OPERATOR_NAME ) ) {
-                        unsugarized = MakeBinaryCall( entity_intrinsic( DIVIDE_OPERATOR_NAME ), //
-                        substitute, //
-                        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
-                    } else if ( native_instruction_p( statement_instruction( s ), PLUS_UPDATE_OPERATOR_NAME ) ) {
+                    if( inc_or_de_crement_instruction_p(statement_instruction( s ) ) ) {
+                      /* In the case of unary operator, prepare the assignment
+                       * It's a separate case since there's no right hand side
+                       */
+                      if( native_instruction_p( statement_instruction( s ), POST_INCREMENT_OPERATOR_NAME )
+                          || native_instruction_p( statement_instruction( s ), PRE_INCREMENT_OPERATOR_NAME ) ) {
                         unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
-                        substitute, //
-                        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
-                    } else if ( native_instruction_p( statement_instruction( s ), MINUS_UPDATE_OPERATOR_NAME ) ) {
+                                                      substitute, //
+                                                      int_to_expression(1) );
+                      } else if( native_instruction_p( statement_instruction( s ), POST_DECREMENT_OPERATOR_NAME )
+                                 || native_instruction_p( statement_instruction( s ), PRE_DECREMENT_OPERATOR_NAME ) ) {
                         unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
-                        substitute, //
-                        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+                                                      substitute, //
+                                                      int_to_expression(1) );
+                      }
+
+                    } else {
+                      /* Now recurse on expressions in current statement and
+                       * replace induction_variable_candidate by substitute expression */
+                      substitute_ctx ctx;
+                      ctx.to_substitute = induction_variable_candidate;
+                      ctx.substitute_by = substitute;
+
+                      expression substitute_on = get_right_part_of_assignment( statement_instruction( s ) );
+                      gen_context_recurse ( substitute_on, &ctx, expression_domain, gen_true, reference_substitute );
+
+                      /* Force to generate again the normalized field of the expression */
+                      expression_normalized(substitute_on) = NormalizeExpression( substitute_on );
+
+                      /* Handle "update" affection (+=, -= , ...)
+                       * Transform z += 1 in z = induction + 1
+                       * */
+                      if ( native_instruction_p( statement_instruction( s ), MULTIPLY_UPDATE_OPERATOR_NAME ) ) {
+                          unsugarized = MakeBinaryCall( entity_intrinsic( MULTIPLY_OPERATOR_NAME ), //
+                          substitute, //
+                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+                      } else if ( native_instruction_p( statement_instruction( s ), DIVIDE_UPDATE_OPERATOR_NAME ) ) {
+                          unsugarized = MakeBinaryCall( entity_intrinsic( DIVIDE_OPERATOR_NAME ), //
+                          substitute, //
+                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+                      } else if ( native_instruction_p( statement_instruction( s ), PLUS_UPDATE_OPERATOR_NAME ) ) {
+                          unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
+                          substitute, //
+                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+                      } else if ( native_instruction_p( statement_instruction( s ), MINUS_UPDATE_OPERATOR_NAME ) ) {
+                          unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
+                          substitute, //
+                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+                      }
                     }
 
-                    if ( !expression_undefined_p( unsugarized ) ) {
 
+                    if ( !expression_undefined_p( unsugarized ) ) {
                         /* substitute expression is no longer needed, but we used
                          * it when building unsugarized and we don't want it to
                          * be freed later, so unreference it now */
@@ -440,7 +479,7 @@ static bool subtitute_induction_statement_in( statement s ) {
  *  \param s the statement that will be checked
  *  \return always true
  */
-static bool subtitute_induction_statement_out( statement s ) {
+static void subtitute_induction_statement_out( statement s ) {
     if ( statement_loop_p( s ) ) {
         entity i = loop_index( statement_loop( s ) );
 
@@ -452,7 +491,6 @@ static bool subtitute_induction_statement_out( statement s ) {
 
         set_del_element( loop_indices_b, loop_indices_b, (Variable) i );
     }
-    return TRUE;
 }
 
 /** \fn bool induction_substitution( char * module_name )

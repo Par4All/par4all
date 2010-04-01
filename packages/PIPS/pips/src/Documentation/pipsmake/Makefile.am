@@ -18,8 +18,9 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-docdir=$(datadir)/doc
+if WITH_DOC
 doc_DATA=pipsmake-rc.pdf
+endif
 include $(top_srcdir)/makes/latex.mk
 
 # Convert idraw/eps files.
