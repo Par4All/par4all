@@ -1,8 +1,8 @@
-delete block_scope13
+delete freia01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create block_scope13 block_scope13.c
+create freia01 freia01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
@@ -18,37 +18,38 @@ echo
 echo Symbol table for block_scope13
 echo
 
-display SYMBOL_TABLE_FILE[block_scope13!]
+display SYMBOL_TABLE_FILE[freia01!]
 echo
-display SYMBOL_TABLE_FILE[block_scope13!block_scope13]
+display SYMBOL_TABLE_FILE[main]
 # quit
 
 echo
 echo Parser output
 echo
 
-display PARSED_PRINTED_FILE[block_scope13!]
+display PARSED_PRINTED_FILE[freia01!]
 echo
-display PARSED_PRINTED_FILE[block_scope13!block_scope13]
+display PARSED_PRINTED_FILE[main]
 # quit
 
 echo
 echo Parser output
 echo
 
-display PARSED_PRINTED_FILE[block_scope13!]
+display PARSED_PRINTED_FILE[freia01!]
 echo
-display PARSED_PRINTED_FILE[block_scope13!block_scope13]
+display PARSED_PRINTED_FILE[main]
 
 echo
 echo Controlizer output
 echo
 
+# Used to stop the execution as soon as an inconsistency is detected
 setenv CONTROL_DEBUG_LEVEL=8
-display PRINTED_FILE[block_scope13!block_scope13]
+display PRINTED_FILE[main]
 
 close
 
-#delete block_scope13
+#delete freia01
 
 

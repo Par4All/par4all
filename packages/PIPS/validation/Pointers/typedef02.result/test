@@ -1,0 +1,47 @@
+
+POINTS TO
+
+C  {}
+void compute()
+{
+//  points to = {}
+   int i, j;
+//  points to = {}
+
+   for(i = 1; i <= 62; i += 1)
+//  points to = {}
+      for(j = 1; j <= 62; j += 1) {
+//  points to = {}
+         tab1[i][j] = i*j;
+//  points to = {}
+         tab2[i][j] = i*j;
+//  points to = {}
+         tab3[i][j] = i*j;
+      }
+}
+
+POINTS TO
+
+//  {}
+int main(int argc, char *argv[])
+{
+//  points to = {}
+   int t, i;
+//  points to = {}
+
+   for(i = 1; i <= 62; i += 1)
+//  {(tab3[i],*ANYWHERE*,-MAY-)}
+      tab3[i] = malloc(64*sizeof(float));
+//  {(tab3[i],*ANYWHERE*,-MAY-)}
+   for(t = 0; t <= 63; t += 1)
+//  {(tab3[i],*ANYWHERE*,-MAY-)}
+      compute();
+//  {(tab3[i],*ANYWHERE*,-MAY-)}
+
+   for(i = 1; i <= 62; i += 1)
+//  {(tab3[i],*ANYWHERE*,-MAY-)}
+      free(tab3[i]);
+//  {(tab3[i],*ANYWHERE*,-MAY-)}
+
+   return 0;
+}
