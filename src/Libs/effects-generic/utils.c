@@ -1043,8 +1043,10 @@ bool effect_pointer_type_p(effect eff)
 
   pips_debug(8, "begin with effect reference %s\n",
 	     words_to_string(words_reference(ref,NIL)));
-
-  p = r_effect_pointer_type_p(eff, l_ind, t);
+  if (entity_abstract_locations_p(ent))
+    p = true;
+  else
+    p = r_effect_pointer_type_p(eff, l_ind, t);
 
   pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
   return p;
