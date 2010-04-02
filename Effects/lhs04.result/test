@@ -5,7 +5,7 @@ void lhs04()
 {
    float x;
 
-   *(int *) &x &= 0x7fffffff;
+   *((int *) &x) &= 0x7fffffff;
 }
 
 Proper effects for "lhs04"
@@ -16,7 +16,7 @@ void lhs04()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 
-   *(int *) &x &= 0x7fffffff;
+   *((int *) &x) &= 0x7fffffff;
 }
 
 Cumulated effects for "lhs04"
@@ -29,5 +29,5 @@ void lhs04()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 
-   *(int *) &x &= 0x7fffffff;
+   *((int *) &x) &= 0x7fffffff;
 }
