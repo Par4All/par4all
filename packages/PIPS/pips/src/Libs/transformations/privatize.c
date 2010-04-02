@@ -304,16 +304,16 @@ bool is_implied_do_index(entity e, instruction ins)
   return li;
 }
 
-/* TRY_PRIVATIZE knows that the effect F on entity E is performed in the
-   statement ST of the vertex V of the dependency graph. Arrays are not 
-   privatized. */
+/* TRY_PRIVATIZE knows that the effect F on entity E is performed in
+   the statement ST of the vertex V of the dependency graph. Arrays
+   are not privatized. */
 
 static void try_privatize(vertex v, statement st, effect f, entity e)
 {
   list ls ;
 
-  /* BC : really dirty : overrides problems in the computation of effects 
-     for C programs; Should be fixed later. */
+  /* BC : really dirty : overrides problems in the computation of
+     effects for C programs; Should be fixed later. */
   if (anywhere_effect_p(f))
     {return;}
 
@@ -337,20 +337,20 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 
   FOREACH(SUCCESSOR, succ, vertex_successors(v)) {
     vertex succ_v = successor_vertex( succ ) ;
-    dg_vertex_label succ_l = 
+    dg_vertex_label succ_l =
       (dg_vertex_label)vertex_vertex_label( succ_v ) ;
-    dg_arc_label arc_l = 
+    dg_arc_label arc_l =
       (dg_arc_label)successor_arc_label( succ ) ;
-    statement succ_st = 
+    statement succ_st =
       ordering_to_statement(dg_vertex_label_statement(succ_l));
     instruction succ_i = statement_instruction( succ_st ) ;
     list succ_ls = load_statement_enclosing_loops( succ_st ) ;
 
-    /* this portion of code induced the erroneous privatization of 
+    /* this portion of code induced the erroneous privatization of
        non-private variables, for instance in :
 
        DO I = 1,10
-       J = J +1 
+       J = J +1
        a(I) = J
        ENDDO
 
@@ -384,7 +384,7 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
       effect sc = conflict_source( c ) ;
       effect sk = conflict_sink( c ) ;
       cons *prefix ;
-			     
+
       /* Take into account def-def and use-def arcs only */
       if(!entity_conflict_p( e, effect_entity( sc )) ||
 	 !entity_conflict_p( e, effect_entity( sk )) ||
@@ -398,14 +398,16 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	continue ;
       }
       pips_debug(5,"Conflict for %s between statements %td and %td\n",
-		 entity_local_name(e), statement_number(st), statement_number(succ_st));
+		 entity_local_name(e),
+		 statement_number(st),
+		 statement_number(succ_st));
 
       if (v==succ_v) {
 	/* No decision can be made from this couple of effects alone */
 	;
 	//pips_debug(5,"remove %s from locals in all enclosing loops\n",
 	//	   entity_local_name(e));
-	//update_locals( NIL, ls, e ); /* remove e from all enclosing loops */ 
+	//update_locals( NIL, ls, e ); /* remove e from all enclosing loops */
       }
       else {
 	pips_debug(5,"remove %s from locals in non common enclosing loops\n",
@@ -448,10 +450,10 @@ bool privatize_module(char *mod_name)
 	pips_error("privatize_module", "unstructured expected\n");
 	*/
 
-    set_proper_rw_effects((statement_effects) 
+    set_proper_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
 
-    set_cumulated_rw_effects((statement_effects) 
+    set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE) );
 
     mod_graph = (graph)
@@ -459,7 +461,7 @@ bool privatize_module(char *mod_name)
 
     debug_on("PRIVATIZE_DEBUG_LEVEL");
     set_ordering_to_statement(mod_stat);
-    
+
 
     /* Build maximal lists of private variables in loop locals */
     /* scan_unstructured(instruction_unstructured(mod_inst), NIL); */
@@ -468,15 +470,15 @@ bool privatize_module(char *mod_name)
     /* remove non private variables from locals */
     FOREACH(VERTEX, v, graph_vertices( mod_graph )) {
 	dg_vertex_label vl = (dg_vertex_label) vertex_vertex_label( v ) ;
-	statement st = 
+	statement st =
 	    ordering_to_statement(dg_vertex_label_statement(vl));
-	
+
 	pips_debug(1, "Entering statement %03zd :\n", statement_ordering(st));
 	ifdebug(4) {
-      
+
 	  print_statement(st);
 	}
-	       
+
 	FOREACH(EFFECT, f, load_proper_rw_effects_list( st )) {
 	    entity e = effect_entity( f ) ;
 	    ifdebug(4) {
@@ -506,7 +508,7 @@ bool privatize_module(char *mod_name)
     return TRUE;
 }
 
-/** 
+/**
  * @name localize declaration
  * @{ */
 

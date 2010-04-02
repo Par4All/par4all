@@ -212,10 +212,13 @@ string name;
 {
     control c;
 
-    pips_assert("get_label_control", !empty_global_label_p(name)) ;
+    pips_assert("label is not the empty label", !empty_global_label_p(name)) ;
     c = (control)hash_get(Label_control, name);
     pips_assert("c is defined", c != (control) HASH_UNDEFINED_VALUE);
     pips_assert("c is a control", check_control(c));
+    ifdebug(8) {
+      check_control_coherency(c);
+    }
     return(c);
 }
 
@@ -357,12 +360,11 @@ static void add_proper_successor_to_predecessor(control pred, control c_res)
    SUCC. If they are linked later, it is useless to pass PRED down. If
    they are linked earlier, they might have to be unlinked when structured
    code is found. */
-bool controlize(
-    statement st,
-    control pred,
-    control succ,
-    control c_res,
-    hash_table used_labels)
+bool controlize(statement st,
+		control pred,
+		control succ,
+		control c_res,
+		hash_table used_labels)
 {
     instruction i = statement_instruction(st);
     string label = entity_name(statement_label(st));
@@ -371,7 +373,8 @@ bool controlize(
 
     ifdebug(5) {
 	pips_debug(1,
-	   "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
+		   "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\n"
+		   "st at entry:\n",
 		   st, pred, succ, c_res);
 	statement_consistent_p(st);
 	print_statement(st);
@@ -390,6 +393,7 @@ bool controlize(
 
     switch(instruction_tag(i)) {
     case is_instruction_block: {
+      /* A C block may have a label */
       /* A block may only contain declarations with initializations
 	 and side effects on the store */
       if(ENDP(instruction_block(i))) {
@@ -401,7 +405,20 @@ bool controlize(
 	controlized = controlize_list(st, instruction_block(i),
 				      pred, succ, c_res, used_labels);
 	statement_consistent_p(st);
-	/* If st carries local declarations, so should the statement associated to c_res. */
+
+	ifdebug(5) {
+	  pips_debug(1, "CFG consistency check before list6 controlization."
+		     " Control \"pred\" %p:\n", pred);
+	  display_linked_control_nodes(pred);
+	  pips_debug(1, "Control \"succ\" %p:\n", succ);
+	  display_linked_control_nodes(succ);
+
+	  check_control_coherency(pred);
+	  check_control_coherency(succ);
+	  check_control_coherency(c_res);
+	}
+	/* If st carries local declarations, so should the statement
+	   associated to c_res. */
 	if(controlized && !ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
 	  fprintf(stderr, "potentially lost declarations:\n");
@@ -429,13 +446,13 @@ bool controlize(
 	break;
     case is_instruction_goto: {
 	string name = entity_name(statement_label(instruction_goto(i)));
-        statement nop = make_continue_statement(statement_label(st));
+	statement nop = make_continue_statement(statement_label(st));
 
-        statement_number(nop) = statement_number(st);
-        statement_comments(nop) = statement_comments(st);
+	statement_number(nop) = statement_number(st);
+	statement_comments(nop) = statement_comments(st);
 	// Well, let's try this for the time being. What is the scope?!?
-        statement_declarations(nop) = statement_declarations(st);
-        statement_decls_text(nop) = statement_decls_text(st);
+	statement_declarations(nop) = statement_declarations(st);
+	statement_decls_text(nop) = statement_decls_text(st);
 
 	n_succ = get_label_control(name);
 
