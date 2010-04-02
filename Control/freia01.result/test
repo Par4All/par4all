@@ -1,0 +1,880 @@
+
+Symbol table for block_scope13
+
+freia01!
+
+Declarations for module "freia01!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:main" with type "functional" "void -> int"
+	Declared entity "freia01!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "freia01!:*HEAP*" with type "area" with size 0
+	Declared entity "freia01!:*STACK*" with type "area" with size 0
+	Declared entity "freia01!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:main"	with type "functional" "void -> int"
+
+Derived entities:
+
+	Variable "freia01!:#_PIPS_STRUCT_1"	kind = struct
+	Variable "freia01!:#_PIPS_STRUCT_2"	kind = struct
+
+Typedef entities:
+
+	Typedef "freia01!:$freia_data2d"	with type "variable" "struct  {int width; int height; int *bpp; int widthWa; int heightWa;}"
+	Typedef "freia01!:$freia_dataio"	with type "variable" "struct  {int framewidth; int frameheight; int frameindex;}"
+	Typedef "freia01!:$freia_status"	with type "variable" "int"
+	Typedef "freia01!:$int32_t"	with type "variable" "int"
+	Typedef "freia01!:$uint32_t"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "freia01!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "freia01!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "freia01!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "freia01!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module freia01!
+
+
+main
+
+Declarations for module "main" with type "void -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:findGlobalShift" with type "functional" "int32_t * x int32_t * x freia_data2d * x freia_data2d * x freia_data2d * x int32_t * x int x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_absdiff" with type "functional" "freia_data2d * x freia_data2d * x freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_add" with type "functional" "freia_data2d * x freia_data2d * x freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_and_const" with type "functional" "freia_data2d * x freia_data2d * x int -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_cast" with type "functional" "freia_data2d * x freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_copy" with type "functional" "freia_data2d * x freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_div_const" with type "functional" "freia_data2d * x freia_data2d * x int -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_global_max" with type "functional" "freia_data2d * x int32_t * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_global_min" with type "functional" "freia_data2d * x int32_t * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_global_vol" with type "functional" "freia_data2d * x int32_t * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_mul" with type "functional" "freia_data2d * x freia_data2d * x freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_mul_const" with type "functional" "freia_data2d * x freia_data2d * x int32_t -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_set_constant" with type "functional" "freia_data2d * x int -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_sub" with type "functional" "freia_data2d * x freia_data2d * x freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_sub_const" with type "functional" "freia_data2d * x freia_data2d * x int -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_threshold" with type "functional" "freia_data2d * x freia_data2d * x int32_t x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_aipo_xor" with type "functional" "freia_data2d * x freia_data2d * x freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_cipo_dilate" with type "functional" "freia_data2d * x freia_data2d * x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_cipo_erode" with type "functional" "freia_data2d * x freia_data2d * x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_cipo_geodesic_dilate" with type "functional" "freia_data2d * x freia_data2d * x freia_data2d * x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_cipo_geodesic_reconstruct_open" with type "functional" "freia_data2d * x freia_data2d * x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_common_alloc" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:freia_common_close_input" with type "functional" "freia_dataio * -> int"
+	Declared entity "TOP-LEVEL:freia_common_close_output" with type "functional" "freia_dataio * -> int"
+	Declared entity "TOP-LEVEL:freia_common_create_data" with type "functional" "int x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_common_destruct_data" with type "functional" "freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_common_free" with type "functional" "int32_t * -> int"
+	Declared entity "TOP-LEVEL:freia_common_open_input" with type "functional" "freia_dataio * x int -> int"
+	Declared entity "TOP-LEVEL:freia_common_open_output" with type "functional" "freia_dataio * x int x int x int x int * -> int"
+	Declared entity "TOP-LEVEL:freia_common_reset_wa" with type "functional" "freia_data2d * -> int"
+	Declared entity "TOP-LEVEL:freia_common_rx_image" with type "functional" "freia_data2d * x freia_dataio * -> int"
+	Declared entity "TOP-LEVEL:freia_common_set_wa" with type "functional" "freia_data2d * x int x int x int x int -> int"
+	Declared entity "TOP-LEVEL:freia_common_tx_image" with type "functional" "freia_data2d * x freia_dataio * -> int"
+	Declared entity "freia01!:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 270
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`10`11`ret" with type "variable" "freia_status"
+	Declared entity "main:0`10`12`imtmp" with type "variable" "freia_data2d *"
+	Declared entity "main:0`10`12`ret" with type "variable" "freia_status"
+	Declared entity "main:0`3`4`5`ret" with type "variable" "freia_status"
+	Declared entity "main:0`3`4`I_0" with type "variable" "int"
+	Declared entity "main:0`3`6`ret" with type "variable" "freia_status"
+	Declared entity "main:0`3`6`volcurrent" with type "variable" "int32_t"
+	Declared entity "main:0`3`6`volprevious" with type "variable" "int32_t"
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "main:0`_return0" with type "variable" "int"
+	Declared entity "main:0`_return1" with type "variable" "int"
+	Declared entity "main:0`_return2" with type "variable" "int"
+	Declared entity "main:0`_return3" with type "variable" "int"
+	Declared entity "main:0`binvalue" with type "variable" "int32_t"
+	Declared entity "main:0`contrastenhance" with type "variable" "_Bool"
+	Declared entity "main:0`end" with type "variable" "freia_status"
+	Declared entity "main:0`fdehn" with type "variable" "freia_dataio"
+	Declared entity "main:0`fdin" with type "variable" "freia_dataio"
+	Declared entity "main:0`fdmotion" with type "variable" "freia_dataio"
+	Declared entity "main:0`fdstab" with type "variable" "freia_dataio"
+	Declared entity "main:0`horizon" with type "variable" "uint32_t"
+	Declared entity "main:0`imbg" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imbg16" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imcurrent" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imehn" with type "variable" "freia_data2d *"
+	Declared entity "main:0`immotion" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imprevious" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imstab" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imtmp1" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imtmp2" with type "variable" "freia_data2d *"
+	Declared entity "main:0`imtmp3" with type "variable" "freia_data2d *"
+	Declared entity "main:0`maximal_shape" with type "variable" "int32_t"
+	Declared entity "main:0`maxmotion" with type "variable" "int32_t"
+	Declared entity "main:0`minimal_contrast" with type "variable" "int32_t"
+	Declared entity "main:0`minmotion" with type "variable" "int32_t"
+	Declared entity "main:0`motion_a" with type "variable" "int32_t"
+	Declared entity "main:0`motion_b" with type "variable" "int32_t"
+	Declared entity "main:0`motion_th" with type "variable" "int32_t"
+	Declared entity "main:0`motion_trig" with type "variable" "int32_t"
+	Declared entity "main:0`motiondetect" with type "variable" "_Bool"
+	Declared entity "main:0`shiftarray" with type "variable" "int32_t *"
+	Declared entity "main:0`stabilize" with type "variable" "_Bool"
+	Declared entity "main:0`xshift" with type "variable" "int32_t"
+	Declared entity "main:0`xshiftacc" with type "variable" "int32_t"
+	Declared entity "main:0`yshift" with type "variable" "int32_t"
+	Declared entity "main:0`yshiftacc" with type "variable" "int32_t"
+	Declared entity "main:main" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "freia01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 270:
+	Variable "main:0`fdin"	offset = 10	size = 12
+	Variable "main:0`fdstab"	offset = 22	size = 12
+	Variable "main:0`fdehn"	offset = 34	size = 12
+	Variable "main:0`fdmotion"	offset = 46	size = 12
+	Variable "main:0`imcurrent"	offset = 58	size = 8
+	Variable "main:0`imprevious"	offset = 66	size = 8
+	Variable "main:0`imstab"	offset = 74	size = 8
+	Variable "main:0`imtmp1"	offset = 82	size = 8
+	Variable "main:0`imtmp2"	offset = 90	size = 8
+	Variable "main:0`imehn"	offset = 98	size = 8
+	Variable "main:0`imtmp3"	offset = 106	size = 8
+	Variable "main:0`imbg16"	offset = 114	size = 8
+	Variable "main:0`imbg"	offset = 122	size = 8
+	Variable "main:0`immotion"	offset = 130	size = 8
+	Variable "main:0`shiftarray"	offset = 138	size = 8
+	Variable "main:0`maxmotion"	offset = 146	size = 4
+	Variable "main:0`minmotion"	offset = 150	size = 4
+	Variable "main:0`binvalue"	offset = 154	size = 4
+	Variable "main:0`xshift"	offset = 158	size = 4
+	Variable "main:0`yshift"	offset = 162	size = 4
+	Variable "main:0`xshiftacc"	offset = 166	size = 4
+	Variable "main:0`yshiftacc"	offset = 170	size = 4
+	Variable "main:0`end"	offset = 174	size = 4
+	Variable "main:0`stabilize"	offset = 178	size = 4
+	Variable "main:0`contrastenhance"	offset = 182	size = 4
+	Variable "main:0`motiondetect"	offset = 186	size = 4
+	Variable "main:0`horizon"	offset = 190	size = 4
+	Variable "main:0`maximal_shape"	offset = 194	size = 4
+	Variable "main:0`minimal_contrast"	offset = 198	size = 4
+	Variable "main:0`motion_a"	offset = 202	size = 4
+	Variable "main:0`motion_b"	offset = 206	size = 4
+	Variable "main:0`motion_th"	offset = 210	size = 4
+	Variable "main:0`motion_trig"	offset = 214	size = 4
+	Variable "main:0`_return0"	offset = 218	size = 4
+	Variable "main:0`_return1"	offset = 222	size = 4
+	Variable "main:0`_return2"	offset = 226	size = 4
+	Variable "main:0`_return3"	offset = 230	size = 4
+	Variable "main:0`3`4`I_0"	offset = 234	size = 4
+	Variable "main:0`3`4`5`ret"	offset = 238	size = 4
+	Variable "main:0`3`6`ret"	offset = 242	size = 4
+	Variable "main:0`3`6`volcurrent"	offset = 246	size = 4
+	Variable "main:0`3`6`volprevious"	offset = 250	size = 4
+	Variable "main:0`10`11`ret"	offset = 254	size = 4
+	Variable "main:0`10`12`ret"	offset = 258	size = 4
+	Variable "main:0`10`12`imtmp"	offset = 262	size = 8
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
+
+Parser output
+
+typedef int int32_t;
+typedef int uint32_t;
+typedef int freia_status;
+typedef struct {
+   int framewidth;
+   int frameheight;
+   int frameindex;
+} freia_dataio;
+typedef struct {
+   int width;
+   int height;
+   int *bpp;
+   int widthWa;
+   int heightWa;
+} freia_data2d;
+
+
+
+
+extern int main(void);
+
+int main(void)
+{
+   freia_dataio fdin;
+   freia_dataio fdstab;
+   freia_dataio fdehn;
+   freia_dataio fdmotion;
+
+   freia_data2d *imcurrent;
+   freia_data2d *imprevious;
+   freia_data2d *imstab;
+   freia_data2d *imtmp1;
+   freia_data2d *imtmp2;
+   freia_data2d *imehn;
+
+   freia_data2d *imtmp3;
+   freia_data2d *imbg16;
+   freia_data2d *imbg;
+   freia_data2d *immotion;
+
+   int32_t *shiftarray;
+
+   int32_t maxmotion;
+   int32_t minmotion;
+   int32_t binvalue = 128;
+
+   int32_t xshift, yshift;
+   int32_t xshiftacc, yshiftacc;
+   freia_status end = 1;
+   
+   /* Param set by user */
+   _Bool stabilize = 1;
+   _Bool contrastenhance = 1;
+   _Bool motiondetect = 1;
+
+   uint32_t horizon = 10;
+   int32_t maximal_shape = 21;
+   int32_t minimal_contrast = 50;
+   int32_t motion_a = 10;
+   int32_t motion_b = 100-motion_a;
+   int32_t motion_th = 30;
+   int32_t motion_trig = 75;
+   //PIPS generated variable
+   int _return0, _return1, _return2, _return3;
+
+   freia_common_open_input(&fdin, 0);
+
+   imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);
+   imprevious = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);
+   imtmp1 = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);
+
+   imstab = freia_common_create_data(16, fdin.framewidth-2*horizon, fdin.frameheight-2*horizon);
+   imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);
+
+   imtmp3 = freia_common_create_data(16, imstab->width, imstab->height);
+   imehn = freia_common_create_data(16, imstab->width, imstab->height);
+   imbg16 = freia_common_create_data(16, imstab->width, imstab->height);
+   imbg = freia_common_create_data(16, imstab->width, imstab->height);
+   immotion = freia_common_create_data(16, imstab->width, imstab->height);
+
+   freia_common_open_output(&fdstab, 0, imstab->width, imstab->height, imstab->bpp);
+   freia_common_open_output(&fdehn, 1, imstab->width, imstab->height, imstab->bpp);
+   freia_common_open_output(&fdmotion, 2, imstab->width, imstab->height, imstab->bpp);
+   shiftarray = (int32_t *) freia_common_alloc(sizeof(uint32_t)*(horizon*2+1)*(horizon*2+1)*3);
+
+   freia_aipo_set_constant(imbg16, 0);
+   freia_aipo_xor(imtmp1, imtmp1, imtmp1);
+   
+   /*********************/
+   /* application start */
+   /*********************/
+   xshiftacc = 0;
+   yshiftacc = 0;
+   
+   
+   end = freia_common_rx_image(imcurrent, &fdin);
+l99995:   ;
+   if (!(end==1))
+      goto break_1;
+   
+   /*******************/
+   /* Stabilization   */
+   /*******************/
+   freia_aipo_copy(imprevious, imcurrent);
+   end = freia_common_rx_image(imcurrent, &fdin);
+   if (end!=1)
+      goto break_1;
+
+   if (stabilize==1) {
+      /* save previous frame */
+      
+      /* detect shift */
+      findGlobalShift(&xshift, &yshift, imcurrent, imprevious, imtmp1, shiftarray, 64, 32, 10);
+      
+      /* accumulate shift */
+      xshiftacc += xshift;
+      yshiftacc += yshift;
+      freia_common_set_wa(imcurrent, xshiftacc+horizon, yshiftacc+horizon, 288-2*horizon, 224-2*horizon);
+      freia_aipo_copy(imstab, imcurrent);
+      freia_common_reset_wa(imcurrent);
+      freia_common_tx_image(imstab, &fdstab);
+   }
+   else {
+      freia_common_set_wa(imcurrent, xshiftacc+horizon, yshiftacc+horizon, 288-2*horizon, 224-2*horizon);
+      freia_aipo_copy(imstab, imcurrent);
+      freia_common_reset_wa(imcurrent);
+   }
+   /* save stab */
+   
+   
+   /*************************/
+   /* Contrast enhancement */
+   /*************************/
+   if (contrastenhance==1) {
+      {
+         int I_0;
+         I_0 = maximal_shape/2+1;
+         {
+            freia_status ret;
+
+            ret = freia_cipo_geodesic_reconstruct_open(imtmp2, imstab, 8, I_0);
+            ret |= freia_aipo_sub(imtmp2, imstab, imtmp2);
+            
+            
+            _return2 = ret;
+            goto l99997;
+l99997:            ;
+         }
+      }
+      _return2;
+      freia_aipo_threshold(imehn, imtmp2, minimal_contrast, 255, 0);
+      {
+         freia_status ret = 1;
+         int32_t volcurrent;
+         int32_t volprevious;
+         if (1!=1) {
+            //fprintf(stderr, "working areas of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 244,
+            //__FUNCTION__);
+            ;
+
+            while (0) 
+               ;
+break_1:            ;
+            _return3 = 2;
+            goto l99996;
+         }
+         else if (1!=1) {
+            
+            //fprintf(stderr, "bpp of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 249,
+            //__FUNCTION__);
+            ;
+
+            while (0) 
+               ;
+            _return3 = 2;
+            goto l99996;
+         }
+         else
+
+            ret = freia_aipo_global_vol(imehn, &volcurrent);
+         do {
+            ret |= freia_cipo_geodesic_dilate(imehn, imehn, imtmp2, 8, 1);
+            volprevious = volcurrent;
+            ret |= freia_aipo_global_vol(imehn, &volcurrent);
+         }
+         while (volcurrent!=volprevious);
+         
+         
+         _return3 = ret;
+         goto l99996;
+l99996:         ;
+      }
+      _return3;
+      freia_common_tx_image(imehn, &fdehn);
+   }
+   else
+      freia_aipo_copy(imehn, imstab);
+   
+   
+   /********************/
+   /* Motion Detection */
+   /********************/
+   if (motiondetect==1) {
+      
+      /* absolute difference background and current frame */
+      freia_aipo_absdiff(immotion, imehn, imbg);
+      
+      /* background update */
+      freia_aipo_cast(imtmp3, imehn);
+      freia_aipo_mul_const(imtmp3, imtmp3, motion_a);
+      freia_aipo_mul_const(imbg16, imbg16, motion_b);
+      freia_aipo_add(imbg16, imbg16, imtmp3);
+      freia_aipo_div_const(imbg16, imbg16, motion_a+motion_b);
+      freia_aipo_cast(imbg, imbg16);
+      
+      
+      /* max measure */
+      freia_aipo_global_max(immotion, &maxmotion);
+      
+      /* min measure */
+      freia_aipo_global_min(immotion, &minmotion);
+      if (maxmotion-minmotion>motion_trig) 
+         binvalue = maxmotion*motion_th/100;
+      
+      /* threashold */
+      freia_aipo_threshold(immotion, immotion, binvalue, 255, 1);
+      
+      /* openning */
+      ;
+      {
+         freia_status ret;
+
+         ret = freia_cipo_erode(imtmp2, immotion, 8, 1);
+         ret |= freia_cipo_dilate(imtmp2, imtmp2, 8, 1);
+         
+         
+         _return1 = ret;
+         goto l99998;
+l99998:         ;
+      }
+      _return1;
+      {
+         freia_status ret;
+         freia_data2d *imtmp;
+         if (1!=1) {
+            //fprintf(stderr, "working areas of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 125,
+            //__FUNCTION__);
+            ;
+            while (0) 
+               ;
+            _return0 = 2;
+            goto l99999;
+         }
+         else if (1!=1) {
+            
+            //fprintf(stderr, "bpp of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 130,
+            //__FUNCTION__);
+            ;
+
+            while (0) 
+               ;
+            _return0 = 2;
+            goto l99999;
+         }
+         else
+            imtmp = freia_common_create_data(immotion->bpp, immotion->widthWa, immotion->heightWa);
+
+         ret = freia_cipo_dilate(imtmp, imtmp2, 8, 1);
+         ret |= freia_cipo_erode(immotion, imtmp2, 8, 1);
+         ret |= freia_aipo_sub(immotion, imtmp, immotion);
+
+         freia_common_destruct_data(imtmp);
+         _return0 = 1;
+         goto l99999;
+l99999:         ;
+      }
+      _return0;
+      
+      /* save contrast motion detection */
+      freia_aipo_sub_const(immotion, immotion, 1);
+      freia_aipo_and_const(immotion, immotion, 1);
+      freia_aipo_mul(immotion, imstab, immotion);
+      freia_common_tx_image(immotion, &fdmotion);
+   }
+   else
+      //fprintf(stdout, "frame %d processed\n""INFO: %s: ",
+      //__FUNCTION__, fdin.frameindex);
+      ;
+   goto l99995;
+break_1:   ;
+   
+   
+   freia_common_free(shiftarray);
+
+   freia_common_destruct_data(imcurrent);
+   freia_common_destruct_data(imprevious);
+   freia_common_destruct_data(imtmp1);
+   freia_common_destruct_data(imstab);
+   freia_common_destruct_data(imtmp2);
+   freia_common_destruct_data(imtmp3);
+   freia_common_destruct_data(imehn);
+   freia_common_destruct_data(imbg16);
+   freia_common_destruct_data(imbg);
+   freia_common_destruct_data(immotion);
+
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdstab);
+   freia_common_close_output(&fdehn);
+   freia_common_close_output(&fdmotion);
+
+   return 0;
+}
+
+Parser output
+
+typedef int int32_t;
+typedef int uint32_t;
+typedef int freia_status;
+typedef struct {
+   int framewidth;
+   int frameheight;
+   int frameindex;
+} freia_dataio;
+typedef struct {
+   int width;
+   int height;
+   int *bpp;
+   int widthWa;
+   int heightWa;
+} freia_data2d;
+
+
+
+
+extern int main(void);
+
+int main(void)
+{
+   freia_dataio fdin;
+   freia_dataio fdstab;
+   freia_dataio fdehn;
+   freia_dataio fdmotion;
+
+   freia_data2d *imcurrent;
+   freia_data2d *imprevious;
+   freia_data2d *imstab;
+   freia_data2d *imtmp1;
+   freia_data2d *imtmp2;
+   freia_data2d *imehn;
+
+   freia_data2d *imtmp3;
+   freia_data2d *imbg16;
+   freia_data2d *imbg;
+   freia_data2d *immotion;
+
+   int32_t *shiftarray;
+
+   int32_t maxmotion;
+   int32_t minmotion;
+   int32_t binvalue = 128;
+
+   int32_t xshift, yshift;
+   int32_t xshiftacc, yshiftacc;
+   freia_status end = 1;
+   
+   /* Param set by user */
+   _Bool stabilize = 1;
+   _Bool contrastenhance = 1;
+   _Bool motiondetect = 1;
+
+   uint32_t horizon = 10;
+   int32_t maximal_shape = 21;
+   int32_t minimal_contrast = 50;
+   int32_t motion_a = 10;
+   int32_t motion_b = 100-motion_a;
+   int32_t motion_th = 30;
+   int32_t motion_trig = 75;
+   //PIPS generated variable
+   int _return0, _return1, _return2, _return3;
+
+   freia_common_open_input(&fdin, 0);
+
+   imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);
+   imprevious = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);
+   imtmp1 = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);
+
+   imstab = freia_common_create_data(16, fdin.framewidth-2*horizon, fdin.frameheight-2*horizon);
+   imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);
+
+   imtmp3 = freia_common_create_data(16, imstab->width, imstab->height);
+   imehn = freia_common_create_data(16, imstab->width, imstab->height);
+   imbg16 = freia_common_create_data(16, imstab->width, imstab->height);
+   imbg = freia_common_create_data(16, imstab->width, imstab->height);
+   immotion = freia_common_create_data(16, imstab->width, imstab->height);
+
+   freia_common_open_output(&fdstab, 0, imstab->width, imstab->height, imstab->bpp);
+   freia_common_open_output(&fdehn, 1, imstab->width, imstab->height, imstab->bpp);
+   freia_common_open_output(&fdmotion, 2, imstab->width, imstab->height, imstab->bpp);
+   shiftarray = (int32_t *) freia_common_alloc(sizeof(uint32_t)*(horizon*2+1)*(horizon*2+1)*3);
+
+   freia_aipo_set_constant(imbg16, 0);
+   freia_aipo_xor(imtmp1, imtmp1, imtmp1);
+   
+   /*********************/
+   /* application start */
+   /*********************/
+   xshiftacc = 0;
+   yshiftacc = 0;
+   
+   
+   end = freia_common_rx_image(imcurrent, &fdin);
+l99995:   ;
+   if (!(end==1))
+      goto break_1;
+   
+   /*******************/
+   /* Stabilization   */
+   /*******************/
+   freia_aipo_copy(imprevious, imcurrent);
+   end = freia_common_rx_image(imcurrent, &fdin);
+   if (end!=1)
+      goto break_1;
+
+   if (stabilize==1) {
+      /* save previous frame */
+      
+      /* detect shift */
+      findGlobalShift(&xshift, &yshift, imcurrent, imprevious, imtmp1, shiftarray, 64, 32, 10);
+      
+      /* accumulate shift */
+      xshiftacc += xshift;
+      yshiftacc += yshift;
+      freia_common_set_wa(imcurrent, xshiftacc+horizon, yshiftacc+horizon, 288-2*horizon, 224-2*horizon);
+      freia_aipo_copy(imstab, imcurrent);
+      freia_common_reset_wa(imcurrent);
+      freia_common_tx_image(imstab, &fdstab);
+   }
+   else {
+      freia_common_set_wa(imcurrent, xshiftacc+horizon, yshiftacc+horizon, 288-2*horizon, 224-2*horizon);
+      freia_aipo_copy(imstab, imcurrent);
+      freia_common_reset_wa(imcurrent);
+   }
+   /* save stab */
+   
+   
+   /*************************/
+   /* Contrast enhancement */
+   /*************************/
+   if (contrastenhance==1) {
+      {
+         int I_0;
+         I_0 = maximal_shape/2+1;
+         {
+            freia_status ret;
+
+            ret = freia_cipo_geodesic_reconstruct_open(imtmp2, imstab, 8, I_0);
+            ret |= freia_aipo_sub(imtmp2, imstab, imtmp2);
+            
+            
+            _return2 = ret;
+            goto l99997;
+l99997:            ;
+         }
+      }
+      _return2;
+      freia_aipo_threshold(imehn, imtmp2, minimal_contrast, 255, 0);
+      {
+         freia_status ret = 1;
+         int32_t volcurrent;
+         int32_t volprevious;
+         if (1!=1) {
+            //fprintf(stderr, "working areas of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 244,
+            //__FUNCTION__);
+            ;
+
+            while (0) 
+               ;
+break_1:            ;
+            _return3 = 2;
+            goto l99996;
+         }
+         else if (1!=1) {
+            
+            //fprintf(stderr, "bpp of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 249,
+            //__FUNCTION__);
+            ;
+
+            while (0) 
+               ;
+            _return3 = 2;
+            goto l99996;
+         }
+         else
+
+            ret = freia_aipo_global_vol(imehn, &volcurrent);
+         do {
+            ret |= freia_cipo_geodesic_dilate(imehn, imehn, imtmp2, 8, 1);
+            volprevious = volcurrent;
+            ret |= freia_aipo_global_vol(imehn, &volcurrent);
+         }
+         while (volcurrent!=volprevious);
+         
+         
+         _return3 = ret;
+         goto l99996;
+l99996:         ;
+      }
+      _return3;
+      freia_common_tx_image(imehn, &fdehn);
+   }
+   else
+      freia_aipo_copy(imehn, imstab);
+   
+   
+   /********************/
+   /* Motion Detection */
+   /********************/
+   if (motiondetect==1) {
+      
+      /* absolute difference background and current frame */
+      freia_aipo_absdiff(immotion, imehn, imbg);
+      
+      /* background update */
+      freia_aipo_cast(imtmp3, imehn);
+      freia_aipo_mul_const(imtmp3, imtmp3, motion_a);
+      freia_aipo_mul_const(imbg16, imbg16, motion_b);
+      freia_aipo_add(imbg16, imbg16, imtmp3);
+      freia_aipo_div_const(imbg16, imbg16, motion_a+motion_b);
+      freia_aipo_cast(imbg, imbg16);
+      
+      
+      /* max measure */
+      freia_aipo_global_max(immotion, &maxmotion);
+      
+      /* min measure */
+      freia_aipo_global_min(immotion, &minmotion);
+      if (maxmotion-minmotion>motion_trig) 
+         binvalue = maxmotion*motion_th/100;
+      
+      /* threashold */
+      freia_aipo_threshold(immotion, immotion, binvalue, 255, 1);
+      
+      /* openning */
+      ;
+      {
+         freia_status ret;
+
+         ret = freia_cipo_erode(imtmp2, immotion, 8, 1);
+         ret |= freia_cipo_dilate(imtmp2, imtmp2, 8, 1);
+         
+         
+         _return1 = ret;
+         goto l99998;
+l99998:         ;
+      }
+      _return1;
+      {
+         freia_status ret;
+         freia_data2d *imtmp;
+         if (1!=1) {
+            //fprintf(stderr, "working areas of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 125,
+            //__FUNCTION__);
+            ;
+            while (0) 
+               ;
+            _return0 = 2;
+            goto l99999;
+         }
+         else if (1!=1) {
+            
+            //fprintf(stderr, "bpp of images are not
+            //compatibles\n""ERROR: file %s, line %d, function %s: ",
+            //"../../api/cipo/src/freiaComplexOpMorpho.c", 130,
+            //__FUNCTION__);
+            ;
+
+            while (0) 
+               ;
+            _return0 = 2;
+            goto l99999;
+         }
+         else
+            imtmp = freia_common_create_data(immotion->bpp, immotion->widthWa, immotion->heightWa);
+
+         ret = freia_cipo_dilate(imtmp, imtmp2, 8, 1);
+         ret |= freia_cipo_erode(immotion, imtmp2, 8, 1);
+         ret |= freia_aipo_sub(immotion, imtmp, immotion);
+
+         freia_common_destruct_data(imtmp);
+         _return0 = 1;
+         goto l99999;
+l99999:         ;
+      }
+      _return0;
+      
+      /* save contrast motion detection */
+      freia_aipo_sub_const(immotion, immotion, 1);
+      freia_aipo_and_const(immotion, immotion, 1);
+      freia_aipo_mul(immotion, imstab, immotion);
+      freia_common_tx_image(immotion, &fdmotion);
+   }
+   else
+      //fprintf(stdout, "frame %d processed\n""INFO: %s: ",
+      //__FUNCTION__, fdin.frameindex);
+      ;
+   goto l99995;
+break_1:   ;
+   
+   
+   freia_common_free(shiftarray);
+
+   freia_common_destruct_data(imcurrent);
+   freia_common_destruct_data(imprevious);
+   freia_common_destruct_data(imtmp1);
+   freia_common_destruct_data(imstab);
+   freia_common_destruct_data(imtmp2);
+   freia_common_destruct_data(imtmp3);
+   freia_common_destruct_data(imehn);
+   freia_common_destruct_data(imbg16);
+   freia_common_destruct_data(imbg);
+   freia_common_destruct_data(immotion);
+
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdstab);
+   freia_common_close_output(&fdehn);
+   freia_common_close_output(&fdmotion);
+
+   return 0;
+}
+
+Controlizer output
+
