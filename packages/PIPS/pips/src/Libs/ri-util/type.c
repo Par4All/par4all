@@ -456,7 +456,7 @@ bool basic_equal_strict_p(basic b1, basic b2)
   case is_basic_typedef:
     /* FI->BC (?): suffixes _p should be removed */
     return basic_typedef_p(b2)
-      && same_entity_p(basic_typedef_p(b1),basic_typedef_p(b2));
+      && same_entity_p(basic_typedef(b1),basic_typedef(b2));
   default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
   }
   return FALSE; /* just to avoid a warning */
@@ -1693,23 +1693,23 @@ type reference_to_type(reference ref)
 {
   type t = type_undefined;
   type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
-  
+
   pips_debug(6, "reference case \n");
-  
+
   if(type_variable_p(exp_type))
     {
       type ct = exp_type; /* current type */
       basic cb = variable_basic(type_variable(exp_type)); /* current basic */
-      
+
       list cd = variable_dimensions(type_variable(exp_type)); /* current dimensions */
       list l_inds = reference_indices(ref);
-      
+
       pips_debug(7, "reference to a variable, "
 		 "we iterate over the indices if any \n");
-            
+
       while (!ENDP(l_inds))
 	{
-	  
+
 	  ifdebug(7) {
 	    pips_debug(7, "new iteration : current type : %s\n",
 		       words_to_string(words_type(ct, NIL)));
@@ -1733,7 +1733,7 @@ type reference_to_type(reference ref)
 	      POP(l_inds);
 	    }
 	}
-      
+
       /* Warning : qualifiers are set to NIL, because I do not see
 	 the need for something else for the moment. BC.
       */
@@ -1757,7 +1757,7 @@ type reference_to_type(reference ref)
 			  type_tag(exp_type), type_to_string(exp_type));
     }
   free_type(exp_type);
-  
+
   return t;
 }
 
@@ -2383,11 +2383,11 @@ type basic_concrete_type(type t)
 	variable vt = type_variable(t);
 	basic bt = variable_basic(vt);
 	list lt = variable_dimensions(vt);
-	
+
 	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n", 
 		   basic_to_string(bt),
 		   (int) gen_length(lt));
-	
+
 	if(basic_typedef_p(bt))
 	  {
 	    entity e = basic_typedef(bt);
@@ -3809,10 +3809,10 @@ type type_to_final_pointed_type(type t)
 list derived_type_fields(type t)
 {
   list l=NIL;
-  
+
   switch (type_tag(t))
     {
-    case is_type_struct: 
+    case is_type_struct:
       l = type_struct(t);
       break;
     case is_type_union:
@@ -3827,7 +3827,7 @@ list derived_type_fields(type t)
     }
   return l;
 }
-
+
 bool qualifier_equal_p(qualifier q1, qualifier q2)
 {
   bool equal_p = qualifier_tag(q1)==qualifier_tag(q2);
@@ -3858,6 +3858,123 @@ string qualifier_to_string(qualifier q)
     pips_internal_error("unexpected tag %d\n", qualifier_tag(q));
   }
   return s;
+}
+
+
+/* returns the type associated to se. If se can be evaluated as n,
+   returns the type of the nth field in the field list. If se is a
+   reference to a field f in fl, returns the type of f.
+
+   if se is an not a statically evaluable integer expression and not a
+   field reference, returns type_undefined.
+
+   If n is greater then the number of elements in fl, returns
+   type_undefined.
+
+   If f is not in fl, returns type_undefined.
+
+   It might be easier for callers to raise a pips_internal_error()
+   when the result is undefined...
+
+   Does not allocate a new type.
+*/
+static type subscripted_field_list_to_type(list fl, expression se)
+{
+  type ft = type_undefined;
+
+  if(expression_reference_p(se)) {
+    /* Must be a reference to a field */
+    entity f = reference_variable(expression_reference(se));
+
+    if(gen_in_list_p(f, fl)) {
+      ft = entity_type(f);
+    }
+    else {
+      pips_internal_error("Field f is not in field list fl.\n");
+    }
+  }
+  else {
+    /* Must be an integer expression */
+    int n = 0;
+    bool ok = expression_integer_value(se, &n);
+
+    if(ok) {
+      entity f = ENTITY(CAR(gen_nthcdr(n-1, fl)));
+      ft = entity_type(f);
+    }
+    else {
+      pips_internal_error("Unusable subscript expression for a derived type.\n");
+    }
+  }
+
+  if(type_undefined_p(ft))
+    pips_internal_error("Ill. arguments\n");
+
+  return ft;
+}
+
+/* Returns the type of an object of type t subscripted by expression
+   se.
+
+   For instance if t is a struct, the type returned is the type
+   corresponding to the se field.
+
+   It is much more difficult for arrays...
+
+   Do we assume that t is a ultimate type?
+
+   A new type is allocated.
+
+*/
+type subscripted_type_to_type(type t, expression se)
+{
+  type st = type_undefined;
+
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    list dl = variable_dimensions(v);
+
+    if(ENDP(dl)) {
+      /* scalar case */
+      basic b = variable_basic(v);
+
+      if(basic_pointer_p(b)) {
+	st = copy_type(type_to_pointed_type(t));
+      }
+      else if(basic_derived_p(b)) {
+	entity de = basic_derived(b);
+	type det = entity_type(de);
+	list fl = list_undefined;
+
+	if(type_struct_p(det)) {
+	  fl = type_struct(det); // field list
+	}
+	else if(type_union_p(det)) {
+	  fl = type_union(det); // field list
+	}
+	else if(type_enum_p(det)) {
+	  /* enum cannot be subscripted */
+	  pips_internal_error("enum type cannot be subscripted.\n");
+	}
+	else {
+	  pips_internal_error("This type cannot be subscripted.\n");
+	}
+	st = copy_type(subscripted_field_list_to_type(fl, se));
+      }
+      else {
+	/* Other basics are incompatible with subscripts */
+	pips_internal_error("This type cannot be subscripted\n");
+      }
+    }
+    else {
+      /* array case */
+      pips_internal_error("Not implemented yet.\n");
+    }
+  }
+  else {
+    pips_internal_error("Type t is not a variable type.\n");
+  }
+  return st;
 }
 
 

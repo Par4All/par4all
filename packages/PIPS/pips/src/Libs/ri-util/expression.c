@@ -344,6 +344,12 @@ bool expression_reference_p(expression e) {
   return(syntax_reference_p(expression_syntax(e)));
 }
 
+entity expression_variable(expression e)
+{
+  /* Assume e is a reference expression:
+     expression_reference_p(e)==TRUE  */
+  return reference_variable(syntax_reference(expression_syntax(e)));
+}
 
 /* Test if an expression is a reference to a given variable entity.
  */
