@@ -4,6 +4,7 @@
 # Sebastien Varrette <Sebastien.Varrette@uni.lu> and Serge Guelton
 # <Serge.Guelton@telecom-bretagne.eu>
 #
+# Ronan.Keryell@hpc-project.com
 
 # Stop on error, since going on after errors may lead to havoc
 set -o errexit
@@ -87,13 +88,13 @@ export PIPS_ROOT=$PIPS_DIR/pips
 #PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
 PATH=\$PATH:\$P4A_ROOT/run/bin
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$P4A_ROOT/lib
-export PKG_CONFIG_PATH=\$P4A_ROOT/lib/pkgconfig
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$P4A_ROOT/run/lib
+export PKG_CONFIG_PATH=\$P4A_ROOT/run/lib/pkgconfig
 # To fix...
-#export PYTHONPATH=\$P4A_ROOT/lib/python2.6/site-packages/pips
+export PYTHONPATH=\$P4A_ROOT/run/lib/python2.5/site-packages/pips
 
 
-# Some hack to have p4a_recover_includes working. DIrectory to move
+# Some hack to have p4a_recover_includes working. Directory to move
 # somewhere else later...
 #export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
 #export PYTHONPATH=/usr/share/pyshared
@@ -156,23 +157,16 @@ PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} ${PIPS_CONFIG} PATH=
 
 add_link_to_make_infrastructure pips
 #build_package pips packages/PIPS/pips "--enable-doc --enable-gpips --enable-tpips --enable-pyps --enable-hpfc"
-build_package pips packages/PIPS/pips
+build_package pips packages/PIPS/pips "--enable-tpips --enable-pyps"
 
 # that's all folks
 cat << EOF
 ============================================
-pips4u is ready
+Par4All is ready
 everything got installed in $INSTALL_PREFIX
 
-A file 
-you should consider add the following lines
-to your .bashrc or whatever:
-
-export PATH=$INSTALL_PREFIX/bin:\$PATH
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_PREFIX/lib
-export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib/pkgconfig
-export PYTHONPATH=$INSTALL_PREFIX/lib/python2.6/site-packages/pips
-
+According to your shell religion, you should include $P4A_RC_SH (bash,
+dash, sh...) or $P4A_RC_CSH (tcsh, csh...).
 ============================================
 EOF
 
