@@ -1450,7 +1450,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		      tmp_result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
 		    
 		    POP(l_fields);
-		    if (tmp_result > 0)
+		    if (tmp_result >= 0)
 		      result = result < 0 ? tmp_result : (tmp_result <= result ? tmp_result : result);
 		    free_type(current_type);
 		  }
