@@ -1,0 +1,32 @@
+
+Parsed printed file for "lhs04"
+
+void lhs04()
+{
+   float x;
+
+   *((int *) &x) &= 0x7fffffff;
+}
+
+Proper effects for "lhs04"
+
+void lhs04()
+{
+   float x;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+
+   *((int *) &x) &= 0x7fffffff;
+}
+
+POINTS TO
+
+//  {}
+void lhs04()
+{
+//  points to = {}
+   float x;
+//  points to = {}
+
+   *((int *) &x) &= 0x7fffffff;
+}
