@@ -154,7 +154,16 @@ print_sentence(FILE * fd,
 	/* FI: do not indent too much (9 June 1995) */
 	em = (em > MAX_START_COLUMN) ? MAX_START_COLUMN : em;
 
-	for (i = 0; i < em; i++)
+	/* Initial tabulation, if needed: do not put useless SPACEs
+	   in output file.
+
+	   Well, it's difficult to know if it is useful or not. The
+	   test below leads to misplaced opening braces.
+	*/
+	if(!ENDP(lw)
+	   /*&& gen_length(lw)>1
+	     && !same_string_p(STRING(CAR(lw)), "\n")*/)
+	  for (i = 0; i < em; i++)
 	    putc_sentence(' ', fd);
 
 	col = em + (get_bool_property("PRETTYPRINT_C_CODE")? 0 : 7);

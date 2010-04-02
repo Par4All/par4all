@@ -355,7 +355,7 @@ bool entity_all_dynamic_locations_p(entity e)
 }
 
 
-bool entity_abstract_locations_p(entity al)
+bool entity_abstract_location_p(entity al)
 {
   bool abstract_p = FALSE;
   string mn = entity_module_name(al);
@@ -463,8 +463,8 @@ entity entity_locations_max(entity al1, entity al2)
   else
     mn = ANY_MODULE_NAME;
 
-  if(entity_abstract_locations_p(al1))
-    if(entity_abstract_locations_p(al2)) {
+  if(entity_abstract_location_p(al1))
+    if(entity_abstract_location_p(al2)) {
       /* Both al1 and al2 are abstract locations and they are
 	 different */
       e = abstract_locations_max(al1, al2);
@@ -474,7 +474,7 @@ entity entity_locations_max(entity al1, entity al2)
       e = abstract_locations_max(al1, al);
     }
   else
-    if(entity_abstract_locations_p(al2)) {
+    if(entity_abstract_location_p(al2)) {
       entity al = variable_to_abstract_location(al1);
       e = abstract_locations_max(al, al2);
     }
