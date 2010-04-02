@@ -1,0 +1,43 @@
+
+POINTS TO for "make_s"
+
+C  {}
+s_t make_s(int i, float x)
+{
+//  points to = {}
+   s_t *p;
+//  points to = {}
+   char *malloc(int);
+//  points to = {}
+
+   p = (s_t *) malloc(sizeof(s_t));
+//  {(p,*ANYWHERE*,-MAY-)}
+   p->entier = i;
+//  {(p,*ANYWHERE*,-MAY-)}
+   p->reel = x;
+//  {(p,*ANYWHERE*,-MAY-)}
+   return *p;
+}
+
+POINTS TO for "assign02"
+
+//  {}
+void assign02()
+{
+//  points to = {}
+   s_t s;
+//  points to = {}
+   int j;
+//  points to = {}
+
+   s = make_s(1, 2.);
+//  points to = {}
+   s.entier = 4;
+//  points to = {}
+   
+   /* invalid lvalue in assignment */
+   /* make_s(1, 2.).entier = 4; */
+   
+   /* But this is OK in rhs */
+   j = make_s(1, 2.).entier;
+}

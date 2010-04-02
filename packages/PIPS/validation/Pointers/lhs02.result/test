@@ -1,0 +1,48 @@
+
+Parsed printed file for "lhs02"
+
+void lhs02()
+{
+   int i = 2;
+   int j = 2;
+
+   *(i>2?&i:&j) = 3;
+
+   j = i>2?i+1:j+2;
+}
+
+Proper effects for "lhs02"
+
+void lhs02()
+{
+//               <must be written>: i
+   int i = 2;
+//               <must be written>: j
+   int j = 2;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i
+
+   *(i>2?&i:&j) = 3;
+//               <may be read    >: j
+//               <must be read   >: i
+//               <must be written>: j
+
+   j = i>2?i+1:j+2;
+}
+
+POINTS TO
+
+//  {}
+void lhs02()
+{
+//  points to = {}
+   int i = 2;
+//  points to = {}
+   int j = 2;
+//  points to = {}
+
+   *(i>2?&i:&j) = 3;
+//  points to = {}
+
+   j = i>2?i+1:j+2;
+}

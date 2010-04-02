@@ -1,0 +1,196 @@
+
+Parsed printed file for "lhs01"
+
+void lhs01()
+{
+   int i = 2;
+   int j = 2;
+   int k = 2;
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i:j=3;
+   //(i>2?i:j)=3;
+   
+   *(i>2?&i:&j) = 3;
+   /* printf("i=%d, j=%d\n", i, j); */
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i=3:j=3;
+   /* This is OK*/
+   i = j = 2;
+   i>2?(i = 3):(j = 3);
+
+   i = j = 2;
+   if (i>2)
+      i = 3;
+   else
+      j = 3;
+
+   i = j = 2;
+   i>2?(j = 4):(j = 3);
+
+   if (i>2)
+      j = 4;
+   else
+      j = 3;
+}
+
+Proper effects for "lhs01"
+
+void lhs01()
+{
+//               <must be written>: i
+   int i = 2;
+//               <must be written>: j
+   int j = 2;
+//               <must be written>: k
+   int k = 2;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i:j=3;
+   //(i>2?i:j)=3;
+   
+   *(i>2?&i:&j) = 3;
+//               <must be written>: i j
+   /* printf("i=%d, j=%d\n", i, j); */
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i=3:j=3;
+   /* This is OK*/
+   i = j = 2;
+//               <may be written >: i j
+//               <must be read   >: i
+   i>2?(i = 3):(j = 3);
+//               <must be written>: i j
+
+   i = j = 2;
+//               <must be read   >: i
+   if (i>2)
+//               <must be written>: i
+      i = 3;
+   else
+//               <must be written>: j
+      j = 3;
+//               <must be written>: i j
+
+   i = j = 2;
+//               <must be read   >: i
+//               <must be written>: j
+   i>2?(j = 4):(j = 3);
+//               <must be read   >: i
+
+   if (i>2)
+//               <must be written>: j
+      j = 4;
+   else
+//               <must be written>: j
+      j = 3;
+}
+
+Proper pointer effects for "lhs01"
+
+void lhs01()
+{
+//               <must be written>: i
+   int i = 2;
+//               <must be written>: j
+   int j = 2;
+//               <must be written>: k
+   int k = 2;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i:j=3;
+   //(i>2?i:j)=3;
+   
+   *(i>2?&i:&j) = 3;
+//               <must be written>: i j
+   /* printf("i=%d, j=%d\n", i, j); */
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i=3:j=3;
+   /* This is OK*/
+   i = j = 2;
+//               <may be written >: i j
+//               <must be read   >: i
+   i>2?(i = 3):(j = 3);
+//               <must be written>: i j
+
+   i = j = 2;
+//               <must be read   >: i
+   if (i>2)
+//               <must be written>: i
+      i = 3;
+   else
+//               <must be written>: j
+      j = 3;
+//               <must be written>: i j
+
+   i = j = 2;
+//               <must be read   >: i
+//               <must be written>: j
+   i>2?(j = 4):(j = 3);
+//               <must be read   >: i
+
+   if (i>2)
+//               <must be written>: j
+      j = 4;
+   else
+//               <must be written>: j
+      j = 3;
+}
+
+POINTS TO
+
+//  {}
+void lhs01()
+{
+//  points to = {}
+   int i = 2;
+//  points to = {}
+   int j = 2;
+//  points to = {}
+   int k = 2;
+//  points to = {}
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i:j=3;
+   //(i>2?i:j)=3;
+   
+   *(i>2?&i:&j) = 3;
+//  points to = {}
+   /* printf("i=%d, j=%d\n", i, j); */
+   
+   /* This is a deprecated construct which is accepted by PIPS parser */
+   //i>2?i=3:j=3;
+   /* This is OK*/
+   i = j = 2;
+//  points to = {}
+   i>2?(i = 3):(j = 3);
+//  points to = {}
+
+   i = j = 2;
+//  points to = {}
+   if (i>2)
+//  points to = {}
+      i = 3;
+   else
+//  points to = {}
+      j = 3;
+//  points to = {}
+
+   i = j = 2;
+//  points to = {}
+   i>2?(j = 4):(j = 3);
+//  points to = {}
+
+   if (i>2)
+//  points to = {}
+      j = 4;
+   else
+//  points to = {}
+      j = 3;
+}

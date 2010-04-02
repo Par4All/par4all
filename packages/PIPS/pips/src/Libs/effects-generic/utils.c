@@ -1043,8 +1043,10 @@ bool effect_pointer_type_p(effect eff)
 
   pips_debug(8, "begin with effect reference %s\n",
 	     words_to_string(words_reference(ref,NIL)));
-
-  p = r_effect_pointer_type_p(eff, l_ind, t);
+  if (entity_abstract_location_p(ent))
+    p = true;
+  else
+    p = r_effect_pointer_type_p(eff, l_ind, t);
 
   pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
   return p;
@@ -1450,7 +1452,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		      tmp_result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
 		    
 		    POP(l_fields);
-		    if (tmp_result > 0)
+		    if (tmp_result >= 0)
 		      result = result < 0 ? tmp_result : (tmp_result <= result ? tmp_result : result);
 		    free_type(current_type);
 		  }

@@ -1,0 +1,807 @@
+
+Proper pointer effects for "main"
+
+int main()
+{
+   s_with_pointer a, b;
+   s_with_array c, d;
+   s_with_array_of_struct_with_pointer e, f;
+   s_with_array_of_struct_with_array g, h;
+
+   int i, j;
+   
+   // just to create a block for prettyprinting
+   if (1) {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[1]
+      
+      // definition of a
+      a.p = (int *) malloc(10*sizeof(int));
+//               <must be written>: a[2]
+      a.n = 2;
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1)
+//               <must be read   >: a[1] i
+//               <must be written>: a[1][i]
+         (a.p)[i] = i;
+//               <must be read   >: a[1] a[2]
+//               <must be written>: b[1] b[2]
+      
+      // definition of b, also modifies the elments of a.p
+      b = a;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with pointer copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1) {
+//               <must be read   >: b[1] i
+//               <must be written>: b[1][i]
+         (b.p)[i] = i*10;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] a[1] a[1][i] 
+//                                  b[1] b[1][i] i
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+         printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
+      }
+//               <must be written>: c[2]
+      
+      // definition of c
+      c.n = 3;
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1)
+//               <must be read   >: i
+//               <must be written>: c[1][i]
+         (c.array)[i] = i;
+//               <may be read    >: c[1][*]
+//               <may be written >: d[1][*]
+//               <must be read   >: c[2]
+//               <must be written>: d[2]
+      
+      // definition of d, does not modify c
+      d = c;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1) {
+//               <must be read   >: i
+//               <must be written>: d[1][i]
+         (d.array)[i] = i*10;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] c[1][i] 
+//                                  d[1][i] i
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+         printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
+      }
+//               <must be written>: e[2]
+      
+      // definition of e
+      e.m = 4;
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1) {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                                  e[1][i][1]
+         (e.champ)[i].p = malloc(10*sizeof(int));
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1)
+//               <must be read   >: e[1][i][1] i j
+//               <must be written>: e[1][i][1][j]
+            ((e.champ)[i].p)[j] = i+j;
+      }
+//               <may be read    >: e[1][*][1] e[1][*][2]
+//               <may be written >: f[1][*][1] f[1][*][2]
+//               <must be read   >: e[2]
+//               <must be written>: f[2]
+      
+      // definition of f, also modifies e.champ[*].p[*]
+      f = e;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with pointer copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1) {
+//               <must be read   >: f[1][i][1] i j
+//               <must be written>: f[1][i][1][j]
+            ((f.champ)[i].p)[j] = i*j;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] e[1][i][1] 
+//                                  e[1][i][1][j] f[1][i][1] 
+//                                  f[1][i][1][j] i j
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
+         }
+//               <must be written>: g[2]
+      
+      // definition of g
+      g.m = 5;
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1)
+//               <must be read   >: i j
+//               <must be written>: g[1][i][1][j]
+            ((g.champ)[i].array)[j] = i+j;
+//               <may be read    >: g[1][*][1][*] g[1][*][2]
+//               <may be written >: h[1][*][1][*] h[1][*][2]
+//               <must be read   >: g[2]
+//               <must be written>: h[2]
+      
+      // definition of h, does not modify g
+      h = g;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with array copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1) {
+//               <must be read   >: i j
+//               <must be written>: h[1][i][1][j]
+            ((h.champ)[i].array)[j] = i*j;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] g[1][i][1][j]
+//                                  h[1][i][1][j] i j
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
+         }
+   }
+   return 0;
+}
+
+Proper effects for "main"
+
+int main()
+{
+   s_with_pointer a, b;
+   s_with_array c, d;
+   s_with_array_of_struct_with_pointer e, f;
+   s_with_array_of_struct_with_array g, h;
+
+   int i, j;
+   
+   // just to create a block for prettyprinting
+   if (1) {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[1]
+      
+      // definition of a
+      a.p = (int *) malloc(10*sizeof(int));
+//               <must be written>: a[2]
+      a.n = 2;
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1)
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: a[1] i
+         (a.p)[i] = i;
+//               <must be read   >: a[1] a[2]
+//               <must be written>: b[1] b[2]
+      
+      // definition of b, also modifies the elments of a.p
+      b = a;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with pointer copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1) {
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: b[1] i
+         (b.p)[i] = i*10;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+         printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
+      }
+//               <must be written>: c[2]
+      
+      // definition of c
+      c.n = 3;
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1)
+//               <must be read   >: i
+//               <must be written>: c[1][i]
+         (c.array)[i] = i;
+//               <may be read    >: c[1][*]
+//               <may be written >: d[1][*]
+//               <must be read   >: c[2]
+//               <must be written>: d[2]
+      
+      // definition of d, does not modify c
+      d = c;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1) {
+//               <must be read   >: i
+//               <must be written>: d[1][i]
+         (d.array)[i] = i*10;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] c[1][i] 
+//                                  d[1][i] i
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+         printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
+      }
+//               <must be written>: e[2]
+      
+      // definition of e
+      e.m = 4;
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1) {
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+         (e.champ)[i].p = malloc(10*sizeof(int));
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1)
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+            ((e.champ)[i].p)[j] = i+j;
+      }
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+      
+      // definition of f, also modifies e.champ[*].p[*]
+      f = e;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with pointer copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1) {
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+            ((f.champ)[i].p)[j] = i*j;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
+         }
+//               <must be written>: g[2]
+      
+      // definition of g
+      g.m = 5;
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1)
+//               <must be read   >: i j
+//               <must be written>: g[1][i][1][j]
+            ((g.champ)[i].array)[j] = i+j;
+//               <may be read    >: g[1][*][1][*] g[1][*][2]
+//               <may be written >: h[1][*][1][*] h[1][*][2]
+//               <must be read   >: g[2]
+//               <must be written>: h[2]
+      
+      // definition of h, does not modify g
+      h = g;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with array copy : \n");
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1) {
+//               <must be read   >: i j
+//               <must be written>: h[1][i][1][j]
+            ((h.champ)[i].array)[j] = i*j;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] g[1][i][1][j]
+//                                  h[1][i][1][j] i j
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
+         }
+   }
+   return 0;
+}
+
+Cumulated effects for "main"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[1]
+int main()
+{
+   s_with_pointer a, b;
+   s_with_array c, d;
+   s_with_array_of_struct_with_pointer e, f;
+   s_with_array_of_struct_with_array g, h;
+
+   int i, j;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[1]
+   
+   // just to create a block for prettyprinting
+   if (1) {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[1]
+      
+      // definition of a
+      a.p = (int *) malloc(10*sizeof(int));
+//               <must be written>: a[2]
+      a.n = 2;
+//               <may be read    >: a[1] i
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+      for(i = 0; i <= 9; i += 1)
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: a[1] i
+         (a.p)[i] = i;
+//               <must be read   >: a[1] a[2]
+//               <must be written>: b[1] b[2]
+      
+      // definition of b, also modifies the elments of a.p
+      b = a;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with pointer copy : \n");
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[1]
+      for(i = 0; i <= 9; i += 1) {
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: b[1] i
+         (b.p)[i] = i*10;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+         printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
+      }
+//               <must be written>: c[2]
+      
+      // definition of c
+      c.n = 3;
+//               <may be read    >: i
+//               <may be written >: c[1][*]
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1)
+//               <may be written >: c[1][*]
+//               <must be read   >: i
+         (c.array)[i] = i;
+//               <may be read    >: c[1][*]
+//               <may be written >: d[1][*]
+//               <must be read   >: c[2]
+//               <must be written>: d[2]
+      
+      // definition of d, does not modify c
+      d = c;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array copy : \n");
+//               <may be read    >: __IO_EFFECTS:LUNS[1] c[1][*] 
+//                                  d[1][*] i
+//               <may be written >: __IO_EFFECTS:LUNS[1] d[1][*]
+//               <must be written>: i
+      for(i = 0; i <= 9; i += 1) {
+//               <may be written >: d[1][*]
+//               <must be read   >: i
+         (d.array)[i] = i*10;
+//               <may be read    >: c[1][*] d[1][*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+         printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
+      }
+//               <must be written>: e[2]
+      
+      // definition of e
+      e.m = 4;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  _MALLOC_EFFECTS:_MALLOC_
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  _MALLOC_EFFECTS:_MALLOC_
+      for(i = 0; i <= 4; i += 1) {
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+         (e.champ)[i].p = malloc(10*sizeof(int));
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+         for(j = 0; j <= 9; j += 1)
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+            ((e.champ)[i].p)[j] = i+j;
+      }
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+      
+      // definition of f, also modifies e.champ[*].p[*]
+      f = e;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with pointer copy : \n");
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[1]
+      for(i = 0; i <= 4; i += 1)
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[1]
+         for(j = 0; j <= 9; j += 1) {
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+            ((f.champ)[i].p)[j] = i*j;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
+         }
+//               <must be written>: g[2]
+      
+      // definition of g
+      g.m = 5;
+//               <may be read    >: i j
+//               <may be written >: g[1][*][1][*] j
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <may be read    >: i j
+//               <may be written >: g[1][*][1][*]
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1)
+//               <may be written >: g[1][*][1][*]
+//               <must be read   >: i j
+            ((g.champ)[i].array)[j] = i+j;
+//               <may be read    >: g[1][*][1][*] g[1][*][2]
+//               <may be written >: h[1][*][1][*] h[1][*][2]
+//               <must be read   >: g[2]
+//               <must be written>: h[2]
+      
+      // definition of h, does not modify g
+      h = g;
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with array copy : \n");
+//               <may be read    >: __IO_EFFECTS:LUNS[1] g[1][*][1][*]
+//                                  h[1][*][1][*] i j
+//               <may be written >: __IO_EFFECTS:LUNS[1] h[1][*][1][*]
+//                                  j
+//               <must be written>: i
+      for(i = 0; i <= 4; i += 1)
+//               <may be read    >: __IO_EFFECTS:LUNS[1] g[1][*][1][*]
+//                                  h[1][*][1][*] i j
+//               <may be written >: __IO_EFFECTS:LUNS[1] h[1][*][1][*]
+//               <must be written>: j
+         for(j = 0; j <= 9; j += 1) {
+//               <may be written >: h[1][*][1][*]
+//               <must be read   >: i j
+            ((h.champ)[i].array)[j] = i*j;
+//               <may be read    >: g[1][*][1][*] h[1][*][1][*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i j
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
+         }
+   }
+   return 0;
+}
+
+Printed files with regions
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+int main()
+{
+   s_with_pointer a, b;
+   s_with_array c, d;
+   s_with_array_of_struct_with_pointer e, f;
+   s_with_array_of_struct_with_array g, h;
+
+   int i, j;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   
+   // just to create a block for prettyprinting
+   if (1) {
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==1}>
+
+      
+      // definition of a
+      a.p = (int *) malloc(10*sizeof(int));
+
+//  <a[PHI1]-W-EXACT-{PHI1==2}>
+
+      a.n = 2;
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <a[PHI1]-R-EXACT-{PHI1==1}>
+//  <i-R-EXACT-{}>
+
+      for(i = 0; i <= 9; i += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <a[PHI1]-R-EXACT-{PHI1==1, 0<=i, i<=9}>
+//  <i-R-EXACT-{}>
+
+         (a.p)[i] = i;
+
+//  <a[PHI1]-R-EXACT-{1<=PHI1, PHI1<=2, i==10}>
+//  <b[PHI1]-W-EXACT-{1<=PHI1, PHI1<=2, i==10}>
+
+      
+      // definition of b, also modifies the elments of a.p
+      b = a;
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      printf("\nstruct with pointer copy : \n");
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      for(i = 0; i <= 9; i += 1) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <b[PHI1]-R-EXACT-{PHI1==1, 0<=i, i<=9}>
+//  <i-R-EXACT-{}>
+
+         (b.p)[i] = i*10;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
+      }
+
+//  <c[PHI1]-W-EXACT-{PHI1==2, i==10}>
+
+      
+      // definition of c
+      c.n = 3;
+
+//  <c[PHI1][PHI2]-W-EXACT-{PHI1==1, 0<=PHI2, PHI2<=9}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+      for(i = 0; i <= 9; i += 1)
+
+//  <c[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==i, 0<=i, i<=9}>
+//  <i-R-EXACT-{}>
+
+         (c.array)[i] = i;
+
+//  <c[PHI1][PHI2]-R-MAY-{PHI1==1, i==10}>
+//  <c[PHI1]-R-EXACT-{PHI1==2, i==10}>
+//  <d[PHI1]-W-EXACT-{PHI1==2, i==10}>
+//  <d[PHI1][PHI2]-W-MAY-{PHI1==1, i==10}>
+
+      
+      // definition of d, does not modify c
+      d = c;
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      printf("\nstruct with array copy : \n");
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <c[PHI1][PHI2]-R-EXACT-{PHI1==1, 0<=PHI2, PHI2<=9}>
+//  <d[PHI1][PHI2]-R-EXACT-{PHI1==1, 0<=PHI2, PHI2<=9}>
+//  <d[PHI1][PHI2]-W-EXACT-{PHI1==1, 0<=PHI2, PHI2<=9}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+      for(i = 0; i <= 9; i += 1) {
+
+//  <d[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==i, 0<=i, i<=9}>
+//  <i-R-EXACT-{}>
+
+         (d.array)[i] = i*10;
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <c[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==i, 0<=i, i<=9}>
+//  <d[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==i, 0<=i, i<=9}>
+//  <i-R-EXACT-{}>
+
+
+         printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
+      }
+
+//  <e[PHI1]-W-EXACT-{PHI1==2, i==10}>
+
+      
+      // definition of e
+      e.m = 4;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+      for(i = 0; i <= 4; i += 1) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+         (e.champ)[i].p = malloc(10*sizeof(int));
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         for(j = 0; j <= 9; j += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            ((e.champ)[i].p)[j] = i+j;
+      }
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      
+      // definition of f, also modifies e.champ[*].p[*]
+      f = e;
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      printf("\nstruct with array of structs with pointer copy : \n");
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      for(i = 0; i <= 4; i += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         for(j = 0; j <= 9; j += 1) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            ((f.champ)[i].p)[j] = i*j;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+            
+            
+            printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
+         }
+
+//  <g[PHI1]-W-EXACT-{PHI1==2, i==5, j==10}>
+
+      
+      // definition of g
+      g.m = 5;
+
+//  <g[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==1, PHI3==1, 0<=PHI2,
+//    PHI2<=4, 0<=PHI4, PHI4<=9}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <j-W-EXACT-{}>
+
+      for(i = 0; i <= 4; i += 1)
+
+//  <g[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    0<=PHI4, PHI4<=9, 0<=i, i<=4}>
+//  <i-R-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <j-W-EXACT-{}>
+
+         for(j = 0; j <= 9; j += 1)
+
+//  <g[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    PHI4==j, 0<=i, i<=4, 0<=j, j<=9}>
+//  <i-R-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+            ((g.champ)[i].array)[j] = i+j;
+
+//  <g[PHI1][PHI2][PHI3][PHI4]-R-MAY-{PHI1==1, PHI3==1, i==5, j==10}>
+//  <g[PHI1][PHI2][PHI3]-R-MAY-{PHI1==1, PHI3==2, i==5, j==10}>
+//  <g[PHI1]-R-EXACT-{PHI1==2, i==5, j==10}>
+//  <h[PHI1]-W-EXACT-{PHI1==2, i==5, j==10}>
+//  <h[PHI1][PHI2][PHI3]-W-MAY-{PHI1==1, PHI3==2, i==5, j==10}>
+//  <h[PHI1][PHI2][PHI3][PHI4]-W-MAY-{PHI1==1, PHI3==1, i==5, j==10}>
+
+      
+      // definition of h, does not modify g
+      h = g;
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      printf("\nstruct with array of structs with array copy : \n");
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <g[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==1, PHI3==1, 0<=PHI2,
+//    PHI2<=4, 0<=PHI4, PHI4<=9}>
+//  <h[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==1, PHI3==1, 0<=PHI2,
+//    PHI2<=4, 0<=PHI4, PHI4<=9}>
+//  <h[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==1, PHI3==1, 0<=PHI2,
+//    PHI2<=4, 0<=PHI4, PHI4<=9}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <j-W-EXACT-{}>
+
+      for(i = 0; i <= 4; i += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <g[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    0<=PHI4, PHI4<=9, 0<=i, i<=4}>
+//  <h[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    0<=PHI4, PHI4<=9, 0<=i, i<=4}>
+//  <h[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    0<=PHI4, PHI4<=9, 0<=i, i<=4}>
+//  <i-R-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <j-W-EXACT-{}>
+
+         for(j = 0; j <= 9; j += 1) {
+
+//  <h[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    PHI4==j, 0<=i, i<=4, 0<=j, j<=9}>
+//  <i-R-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+            ((h.champ)[i].array)[j] = i*j;
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <g[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    PHI4==j, 0<=i, i<=4, 0<=j, j<=9}>
+//  <h[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==1, PHI2==i, PHI3==1,
+//    PHI4==j, 0<=i, i<=4, 0<=j, j<=9}>
+//  <i-R-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+            
+            
+            printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
+         }
+   }
+   return 0;
+}

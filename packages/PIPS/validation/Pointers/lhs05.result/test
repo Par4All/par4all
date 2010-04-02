@@ -1,0 +1,31 @@
+
+Parsed printed file for "lhs05"
+
+void lhs05()
+{
+   int x;
+
+   *&x = 1;
+}
+
+Proper effects for "lhs05"
+
+void lhs05()
+{
+   int x;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+
+   *&x = 1;
+}
+
+POINTS TO
+
+//  {}
+void lhs05()
+{
+//  points to = {}
+   int x;
+//  points to = {}
+
+   *&x = 1;
+}
