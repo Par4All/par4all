@@ -19,15 +19,14 @@ void lhs04()
    *((int *) &x) &= 0x7fffffff;
 }
 
-Cumulated effects for "lhs04"
+POINTS TO
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//  {}
 void lhs04()
 {
+//  points to = {}
    float x;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//  points to = {}
 
    *((int *) &x) &= 0x7fffffff;
 }
