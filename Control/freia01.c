@@ -12,30 +12,18 @@ typedef struct {int width; int height; int * bpp; int widthWa; int heightWa;}  f
 
 int main(void)
 {
-  freia_dataio fdin;
   freia_dataio fdstab;
-  freia_dataio fdehn;
-  freia_dataio fdmotion;
 
   freia_data2d *imcurrent;
-  freia_data2d *imprevious;
   freia_data2d *imstab;
-  freia_data2d *imtmp1;
-  freia_data2d *imtmp2;
   freia_data2d *imehn;
 
-  freia_data2d *imtmp3;
-  freia_data2d *imbg16;
-  freia_data2d *imbg;
   freia_data2d *immotion;
-
-  int32_t *shiftarray;
 
   int32_t maxmotion;
   int32_t minmotion;
   int32_t binvalue = 128;
 
-  int32_t xshift, yshift;
   int32_t xshiftacc, yshiftacc;
 
   freia_status end = FREIA_OK;
@@ -47,9 +35,6 @@ int main(void)
 
   uint32_t horizon = 10;
   int32_t maximal_shape = 21;
-  int32_t minimal_contrast = 50;
-  int32_t motion_a = 10;
-  int32_t motion_b = 100-motion_a;
   int32_t motion_th = 30;
   int32_t motion_trig = 75;
   //PIPS generated variable
@@ -128,7 +113,6 @@ int main(void)
     }
     _return1;
     {
-      freia_status ret;
       freia_data2d *imtmp;
       if (1!=1) {
 	;
