@@ -44,6 +44,7 @@ echo
 echo Controlizer output
 echo
 
+# Used to stop the execution as soon as an inconsistency is detected
 setenv CONTROL_DEBUG_LEVEL=8
 display PRINTED_FILE[main]
 
