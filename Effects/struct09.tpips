@@ -15,14 +15,21 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
 echo
-echo Proper effetcs for "struct09"
+echo Proper pointer effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Proper effects for "struct09"
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
 
 echo
-echo Cumulated effetcs for "struct09"
+echo Cumulated effects for "struct09"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
