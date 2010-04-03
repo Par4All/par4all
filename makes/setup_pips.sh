@@ -30,7 +30,7 @@
 }
 
 # where to get pips
-SVN_CRI='http://svn.cri.ensmp.fr/svn'
+SVN_CRI='https://svn.cri.ensmp.fr/svn'
 PIPS_SVN=$SVN_CRI/pips
 
 #POLYLIB_SITE='http://icps.u-strasbg.fr/polylib/polylib_src'
