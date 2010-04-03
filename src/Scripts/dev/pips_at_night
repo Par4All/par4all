@@ -44,7 +44,7 @@ vopt="VOPT=--archive --diff"
 target=~/PIPS
 sdir=prod
 
-setup='http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
+setup='https://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
 
 while [ "$1" ]
 do

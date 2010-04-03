@@ -21,14 +21,16 @@ dist:linear.tar.gz newgen.tar.gz pips.tar.gz
 	TARGET="$*-$$VERSION.tar.gz" &&\
 	tar cvzf $$TARGET --exclude debian --exclude '*.svn*' $< &&\
 	ln -s $$TARGET $@
-	
 
+SVNCRI	= https://svn.cri.ensmp.fr/svn
+
+# hmmm... why not bundles/prod which is the same?
 pips-svn:
-	svn checkout --username=$(SVNUSER) http://svn.cri.ensmp.fr/svn/pips/trunk $@
+	svn checkout --username=$(SVNUSER) $(SVNCRI)/pips/trunk $@
 linear-svn:
-	svn checkout --username=$(SVNUSER) http://svn.cri.ensmp.fr/svn/linear/trunk $@
+	svn checkout --username=$(SVNUSER) $(SVNCRI)/linear/trunk $@
 newgen-svn:
-	svn checkout --username=$(SVNUSER) http://svn.cri.ensmp.fr/svn/newgen/trunk $@
+	svn checkout --username=$(SVNUSER) $(SVNCRI)/newgen/trunk $@
 
 clean:
 	rm -rf *.tar.gz
