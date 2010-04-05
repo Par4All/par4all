@@ -98,56 +98,52 @@ int main()
 //  {(pa,a,-Exact-);(ppa,b,-Exact-)}
 
    pb = &b;
-//  {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(ppa,b,-Exact-)}
    ppb = &a;
-//  {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
    *ppb = &pb;
-//  {(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-)}
 
    pc = &c;
-//  {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppb,a,
-//   -Exact-);(ppa,b,-Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,c,-Exact-);(ppa,b,
+//   -Exact-);(ppb,a,-Exact-)}
    ppc = &d;
-//  {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,c,-Exact-);(ppa,b,
 //   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-)}
    *ppc = &pc;
-//  {(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppa,b,
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,c,-Exact-);(ppa,b,
 //   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-)}
 
    pd = &d;
-//  {(pd,d,-Exact-);(pc,c,-Exact-);(pb,b,-Exact-);(pa,a,-Exact-);(ppc,
-//   d,-Exact-);(ppb,a,-Exact-);(ppa,b,-Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,c,-Exact-);(pd,d,-Exact-);(ppa,
+//   b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-)}
    ppd = &c;
-//  {(pa,a,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(pd,d,
-//   -Exact-);(pc,c,-Exact-);(ppa,b,-Exact-);(ppd,c,-Exact-);(pb,b,
-//   -Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,c,-Exact-);(pd,d,-Exact-);(ppa,
+//   b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
    *ppd = &pd;
-//  {(pa,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-);(pd,d,
-//   -Exact-);(pc,c,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pb,b,
-//   -Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,c,-Exact-);(pd,d,-Exact-);(ppa,
+//   b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
 
    pc = pd;
-//  {(pb,b,-Exact-);(ppb,a,-Exact-);(ppd,c,-Exact-);(pa,a,
-//   -Exact-);(pd,d,-Exact-);(ppa,b,-Exact-);(ppc,d,-Exact-);(pc,d,
-//   -Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,
+//   b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
 
    *ppc = &a;
-//  {(pb,b,-Exact-);(ppd,c,-Exact-);(ppc,d,-Exact-);(pa,a,
-//   -Exact-);(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(pc,d,
-//   -Exact-)}
+//  {(pa,a,-Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,
+//   b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
 
    *ppa = pc;
-//  {(pa,a,-Exact-);(b,d,-Exact-);(ppc,d,-Exact-);(ppb,a,-Exact-);(pd,
-//   d,-Exact-);(pc,d,-Exact-);(ppa,b,-Exact-);(ppd,c,-Exact-);(pb,b,
+//  {(b,d,-Exact-);(pa,a,-Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,
+//   -Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,
 //   -Exact-)}
 
    pa = *ppd;
-//  {(pb,b,-Exact-);(ppd,c,-Exact-);(ppb,a,-Exact-);(b,d,-Exact-);(pd,
-//   d,-Exact-);(ppa,b,-Exact-);(ppc,d,-Exact-);(pc,d,-Exact-)}
+//  {(b,d,-Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,
+//   b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
 
    *ppa = *ppd;
-//  {(pc,d,-Exact-);(ppc,d,-Exact-);(ppb,a,-Exact-);(pb,b,-Exact-);(b,
-//   d,-Exact-);(ppa,b,-Exact-);(ppd,c,-Exact-);(pd,d,-Exact-)}
+//  {(b,d,-Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,
+//   b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
 
    return 0;
    // END BLOCK

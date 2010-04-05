@@ -9,6 +9,7 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty ALIASING_ACROSS_TYPES TRUE
 
 #echo Select the most precise analysis:
 activate MUST_REGIONS

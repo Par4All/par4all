@@ -87,9 +87,9 @@ void call01(int *pi, tf_t *q)
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//  {(pi,*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
+//  {(pi,*ANY_MODULE*:*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
    q->one = 1;
-//  {(pi,*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
+//  {(pi,*ANY_MODULE*:*ANYWHERE*,-MAY-);(pi,_pi_1,-Exact-)}
    (q->two)[4] = 2;
 }
 
