@@ -1939,11 +1939,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0237
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=R, R<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5, 0.5<=1.0}
 
          PRINT *, 'float gt lt float'                                   0238
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=R, R<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5, 0.5<=1.0}
 
          PRINT *, R                                                     0239
       ENDIF
@@ -1953,11 +1953,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (R.GT.0.0D0.AND.R.LT.1.0D0) THEN                               0242
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=R, R<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5, 0.5<=1.0D0}
 
          PRINT *, 'float gt lt double'                                  0243
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=R, R<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5, 0.5<=1.0D0}
 
          PRINT *, R                                                     0244
       ENDIF
@@ -1967,11 +1967,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (R.GT.0.0E0.AND.R.LT.1.0E0) THEN                               0247
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=R, R<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5, 0.5<=1.0E0}
 
          PRINT *, 'float gt lt real'                                    0248
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=R, R<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5, 0.5<=1.0E0}
 
          PRINT *, R                                                     0249
       ENDIF
@@ -2055,11 +2055,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (R.GE.0.0.AND.R.LE.1.0) THEN                                   0281
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=R, R<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5, 0.5<=1.0}
 
          PRINT *, 'float ge le real'                                    0282
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=R, R<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5, 0.5<=1.0}
 
          PRINT *, R                                                     0283
       ENDIF
@@ -2069,11 +2069,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (R.GE.0.0D0.AND.R.LE.1.0D0) THEN                               0286
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=R, R<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5, 0.5<=1.0D0}
 
          PRINT *, 'float ge le double'                                  0287
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=R, R<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5, 0.5<=1.0D0}
 
          PRINT *, R                                                     0288
       ENDIF
@@ -2083,11 +2083,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (R.GE.0.0E0.AND.R.LE.1.0E0) THEN                               0291
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=R, R<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5, 0.5<=1.0E0}
 
          PRINT *, 'float ge le float'                                   0292
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=R, R<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5, 0.5<=1.0E0}
 
          PRINT *, R                                                     0293
       ENDIF
@@ -2113,11 +2113,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (D.GT.0.0.AND.D.LT.1.0) THEN                                   0303
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=D, D<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5D0, 0.5D0<=1.0}
 
          PRINT *, 'double gt lt float'                                  0304
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=D, D<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5D0, 0.5D0<=1.0}
 
          PRINT *, D                                                     0305
       ENDIF
@@ -2127,11 +2127,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (D.GT.0.0D0.AND.D.LT.1.0D0) THEN                               0308
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=D, D<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5D0, 0.5D0<=1.0D0}
 
          PRINT *, 'double gt lt double'                                 0309
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=D, D<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5D0, 0.5D0<=1.0D0}
 
          PRINT *, D                                                     0310
       ENDIF
@@ -2141,11 +2141,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (D.GT.0.0E0.AND.D.LT.1.0E0) THEN                               0313
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=D, D<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5D0, 0.5D0<=1.0E0}
 
          PRINT *, 'double gt lt real'                                   0314
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=D, D<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5D0, 0.5D0<=1.0E0}
 
          PRINT *, D                                                     0315
       ENDIF
@@ -2171,11 +2171,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (D.GE.0.0.AND.D.LE.1.0) THEN                                   0325
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=D, D<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5D0, 0.5D0<=1.0}
 
          PRINT *, 'double ge le float'                                  0326
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=D, D<=1.0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0<=0.5D0, 0.5D0<=1.0}
 
          PRINT *, D                                                     0327
       ENDIF
@@ -2185,11 +2185,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (D.GE.0.0D0.AND.D.LE.1.0D0) THEN                               0330
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=D, D<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5D0, 0.5D0<=1.0D0}
 
          PRINT *, 'double ge le double'                                 0331
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=D, D<=1.0D0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0D0<=0.5D0, 0.5D0<=1.0D0}
 
          PRINT *, D                                                     0332
       ENDIF
@@ -2199,11 +2199,11 @@ C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
       IF (D.GE.0.0E0.AND.D.LE.1.0E0) THEN                               0335
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=D, D<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5D0, 0.5D0<=1.0E0}
 
          PRINT *, 'double ge le real'                                   0336
 
-C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=D, D<=1.0E0}
+C  P(D,I,R) {0.5==R, 0.5D0==D, I==0, 0.0E0<=0.5D0, 0.5D0<=1.0E0}
 
          PRINT *, D                                                     0337
       ENDIF

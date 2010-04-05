@@ -6,8 +6,8 @@ void call02(int i, float x)
 //               <must be read   >: i
 //               <must be written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 //               <must be read   >: x
 //               <must be written>: x
@@ -16,15 +16,15 @@ void call02(int i, float x)
 
 Source code with cumulated effects
 
-//               <must be read   >: TOP-LEVEL:j i x
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j i x
+//               <must be written>: j
 void call02(int i, float x)
 {
 //               <must be read   >: i
 //               <must be written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 //               <must be read   >: x
 //               <must be written>: x
@@ -34,7 +34,7 @@ void call02(int i, float x)
 Source code with transformers
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 void call02(int i, float x)
 {
@@ -43,7 +43,7 @@ void call02(int i, float x)
 
    i++;                                                                 /*0007*/
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
    j++;                                                                 /*0008*/
 

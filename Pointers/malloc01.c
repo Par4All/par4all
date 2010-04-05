@@ -4,12 +4,13 @@
 
 #include <malloc.h>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   int i, j;
   int * a[N];
 
   for(i=0;i<N;i++) {
-	  a[i] =(float) malloc(N*sizeof(float));
+    a[i] =(float) malloc(N*sizeof(float));
     for(j=0;j<N;j++) {
       a[i][j]=0.;
     }

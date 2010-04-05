@@ -24,7 +24,7 @@ C  P(S,T) {"hello "==T, "hello"==S}
 
       IF (S.EQ.T) THEN                                                  0013
 
-C  P(S,T) {"hello "==S, "hello"==S, S==T}
+C  P(S,T) {"hello "=="hello", "hello "==S, "hello "==T}
 
 !        FALSE
          PRINT *, "Trailing blanks are ignored"                         0015

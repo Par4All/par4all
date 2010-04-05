@@ -93,19 +93,19 @@ C  P(BSZ,FTR,FTZ,GAM,TR,TZ) {0.0D0==FTR, 1.0D0==BSZ}
 C (0,9)
       BSR = 1.0D0                                                       0054
 
-C  P(BSR,BSZ,FTR,FTZ,GAM,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ}
+C  P(BSR,BSZ,FTR,FTZ,GAM,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ}
 
 C (0,10)
       QTZ = 1.0D0                                                       0055
 
-C  P(BSR,BSZ,FTR,FTZ,GAM,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ,
-C    BSR==QTZ}
+C  P(BSR,BSZ,FTR,FTZ,GAM,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR,
+C    1.0D0==BSZ, 1.0D0==QTZ}
 
 C (0,11)
       QTR = 1.0D0                                                       0056
 
 C  P(BSR,BSZ,FTR,FTZ,GAM,QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR,
-C    BSR==BSZ, BSR==QTR, BSR==QTZ}
+C    1.0D0==BSZ, 1.0D0==QTR, 1.0D0==QTZ}
 
 C (0,12)
 *
@@ -118,27 +118,27 @@ C (0,12)
       CON = GAM-1.0D0                                                   0064
 
 C  P(BSR,BSZ,CON,FTR,FTZ,GAM,QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR,
-C    BSR==BSZ, BSR+CON==GAM, BSR==QTR, BSR==QTZ}
+C    1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ}
 
 C (0,13)
       EN0 = PR0/CON                                                     0065
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,QTR,QTZ,TR,TZ) {0.0D0==FTR,
-C    1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR, BSR==QTZ}
+C    1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ}
 
 C (0,14)
 *
       MPCON = NINT(MP*XCZ/XLZ)                                          0067
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,MPCON,QTR,QTZ,TR,TZ) {0.0D0==FTR,
-C    1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR, BSR==QTZ}
+C    1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ}
 
 C (0,15)
       MPSTR = NINT(MP*XSZ/XLZ)                                          0068
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ}
 
 C (0,16)
       J = 1                                                             0070
@@ -146,8 +146,8 @@ C (0,17)
 99996 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=J, J<=161}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=J, J<=161}
 
 C (1,1)
 *
@@ -155,45 +155,45 @@ C     DO loop 5 with exit had to be desugared
       IF (J.GT.NP) GOTO 99999                                           0070
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=J, J<=160}
 
 C (10,1)
       I = 1                                                             0071
 99997 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=403, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=403, 1<=J, J<=160}
 
 C (7,1)
 C     DO loop 5 with exit had to be desugared
       IF (I.GT.MP) GOTO 99998                                           0071
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 
 C (9,1)
       READ (UNIT=11,FMT=1000,END=99) RO(I,J)                            0072
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 
 C (6,1)
 C     BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 
 C (6,2)
 5     CONTINUE                                                          0073
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 
 C (6,3)
       I = I+1                                                           0071
@@ -201,22 +201,22 @@ C     END BLOCK
       GOTO 99997
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 
 C (4,1)
 C     BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 
 C (4,2)
 99    WRITE (6, 1099)                                                   0109
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 
 C (4,3)
       STOP                                                              0110
@@ -234,8 +234,8 @@ C     END BLOCK
 99998 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, I==403, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, I==403, 1<=J, J<=160}
 
 C (8,1)
       J = J+1                                                           0070
@@ -243,88 +243,88 @@ C (8,1)
 99999 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, J==161}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, J==161}
 
 C (2,1)
 C     BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, J==161}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, J==161}
 
 C (2,2)
       DO 10 J = 1, NP                                                   0074
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=J, J<=160}
 
 C (2,3)
          DO 10 I = 1, MPCON                                             0075
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=MPCON, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=MPCON, 1<=J, J<=160}
 
 C (2,4)
 C           BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
 
 C (2,5)
 C        RO(I,J) =  RO0
             EN(I,J) = EN0                                               0077
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
 
 C (2,6)
             GZ(I,J) = 0.0D0                                             0078
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
 
 C (2,7)
             GR(I,J) = 0.0D0                                             0079
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, I<=MPCON, 1<=J, J<=160}
 
 C (2,8)
 10          CONTINUE                                                    0080
 C           END BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, J==161, 1<=I, I<=403, MPCON+1<=I}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, J==161, 1<=I, I<=403, MPCON+1<=I}
 
 C (2,9)
 *
       DO 12 J = 1, NP                                                   0082
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=J, J<=160, MPCON<=402}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=J, J<=160, MPCON<=402}
 
 C (2,10)
          DO 12 I = MPCON+1, MP                                          0083
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
 
 C (2,11)
 C           BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
 
 C (2,12)
 *        RO(I,J) =  RO0  *  10 ** ( REAL(MPCON-I) / REAL(MPSTR) )
@@ -332,30 +332,30 @@ C        RO(I,J) =  RO0  *  10 ** ( DBLE(MPCON-I) / DBLE(MPSTR) )
             EN(I,J) = EN0                                               0086
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
 
 C (2,13)
             GZ(I,J) = 0.0D0                                             0087
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
 
 C (2,14)
             GR(I,J) = 0.0D0                                             0088
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, 1<=I, I<=402, MPCON+1<=I, 1<=J, J<=160, MPCON<=402}
 
 C (2,15)
 12          CONTINUE                                                    0089
 C           END BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, I==403, J==161, MPCON<=402}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, I==403, J==161, MPCON<=402}
 
 C (2,16)
 *
@@ -363,63 +363,66 @@ C (2,16)
       ENJET = PRJET/CON+0.5D0*ROJET*VJET**2                             0092
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, I==403, J==161, MPCON<=401}
+C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
+C    1.0D0==QTZ, I==403, J==161, MPCON<=401}
 
 C (2,17)
       GZJET = ROJET*VJET                                                0093
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,GZJET,I,J,MPCON,MPSTR,QTR,QTZ,
-C    TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
-C    BSR==QTZ, I==403, J==161, MPCON<=401}
+C    TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM,
+C    1.0D0==QTR, 1.0D0==QTZ, I==403, J==161, MPCON<=401}
 
 C (2,18)
 *
       NPJET = NINT(NP*XLJET/XLR)                                        0095
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,GZJET,I,J,MPCON,MPSTR,NPJET,
-C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM,
-C    BSR==QTR, BSR==QTZ, I==403, J==161, MPCON<=401}
+C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ,
+C    1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ, I==403, J==161,
+C    MPCON<=401}
 
 C (2,19)
 *
       DO 20 J = 1, NPJET                                                0097
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,GZJET,I,J,MPCON,MPSTR,NPJET,
-C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM,
-C    BSR==QTR, BSR==QTZ, 1<=J, J<=NPJET, MPCON<=401}
+C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ,
+C    1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ, 1<=J, J<=NPJET,
+C    MPCON<=401}
 
 C (2,20)
          DO 20 I = 1, 2                                                 0098
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,GZJET,I,J,MPCON,MPSTR,NPJET,
-C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM,
-C    BSR==QTR, BSR==QTZ, 1<=I, I<=2, 1<=J, J<=NPJET, MPCON<=401}
+C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ,
+C    1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ, 1<=I, I<=2, 1<=J,
+C    J<=NPJET, MPCON<=401}
 
 C (2,21)
 C           BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,GZJET,I,J,MPCON,MPSTR,NPJET,
-C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM,
-C    BSR==QTR, BSR==QTZ, 1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
-C    MPCON<=401}
+C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ,
+C    1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ, 1<=I, I<=2, 1<=J, J<=160,
+C    J<=NPJET, MPCON<=401}
 
 C (2,22)
 C        RO(I,J) =  ROJET
             EN(I,J) = ENJET                                             0100
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,GZJET,I,J,MPCON,MPSTR,NPJET,
-C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM,
-C    BSR==QTR, BSR==QTZ, 1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
-C    MPCON<=401}
+C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ,
+C    1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ, 1<=I, I<=2, 1<=J, J<=160,
+C    J<=NPJET, MPCON<=401}
 
 C (2,23)
             GZ(I,J) = GZJET                                             0101
 
 C  P(BSR,BSZ,CON,EN0,ENJET,FTR,FTZ,GAM,GZJET,I,J,MPCON,MPSTR,NPJET,
-C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM,
-C    BSR==QTR, BSR==QTZ, 1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
-C    MPCON<=401}
+C    QTR,QTZ,TR,TZ) {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ,
+C    1.0D0+CON==GAM, 1.0D0==QTR, 1.0D0==QTZ, 1<=I, I<=2, 1<=J, J<=160,
+C    J<=NPJET, MPCON<=401}
 
 C (2,24)
 20          CONTINUE                                                    0102

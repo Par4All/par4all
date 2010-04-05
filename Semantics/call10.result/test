@@ -8,8 +8,8 @@ double call10(int i)
 //               <must be read   >: i
 //               <must be written>: i
    i += 10;                                                             /*0010*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0011*/
 //               <must be read   >: x
 
@@ -18,8 +18,8 @@ double call10(int i)
 
 Source code with cumulated effects
 
-//               <must be read   >: TOP-LEVEL:j i
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j i
+//               <must be written>: j
 double call10(int i)
 {
 //               <must be written>: x
@@ -27,8 +27,8 @@ double call10(int i)
 //               <must be read   >: i
 //               <must be written>: i
    i += 10;                                                             /*0010*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0011*/
 //               <must be read   >: x
 
@@ -38,7 +38,7 @@ double call10(int i)
 Source code with transformers for "call10"
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 double call10(int i)
 {
@@ -51,7 +51,7 @@ double call10(int i)
 
    i += 10;                                                             /*0010*/
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
    j++;                                                                 /*0011*/
 
@@ -64,7 +64,7 @@ double call10(int i)
 Source code with transformers for "main"
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 int main()
 {
@@ -73,7 +73,7 @@ int main()
 
    int ai = 3;                                                          /*0018*/
 
-//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==j#init+1, ai==ai#init+1}
+//  T(ai,j) {ai==ai#init+1, j==j#init+1}
 
 
    call10(++ai);                                                        /*0020*/
@@ -87,24 +87,24 @@ int main()
 Source code with preconditions for "call10"
 
 
-//  P() {TOP-LEVEL:j==0, i==4}
+//  P() {i==4, j==0}
 
 double call10(int i)
 {
 
-//  P() {TOP-LEVEL:j==0, i==4}
+//  P() {i==4, j==0}
 
    double x = 3.;                                                       /*0009*/
 
-//  P() {TOP-LEVEL:j==0, i==4}
+//  P() {i==4, j==0}
 
    i += 10;                                                             /*0010*/
 
-//  P(i) {TOP-LEVEL:j==0, i==14}
+//  P(i) {i==14, j==0}
 
    j++;                                                                 /*0011*/
 
-//  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==14, j#init==0}
+//  P(i,j) {i==14, j==1, j#init==0}
 
 
    return x;                                                            /*0013*/
@@ -113,21 +113,21 @@ double call10(int i)
 Source code with preconditions for "main"
 
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
 int main()
 {
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
    int ai = 3;                                                          /*0018*/
 
-//  P() {TOP-LEVEL:j==0, ai==3}
+//  P() {ai==3, j==0}
 
 
    call10(++ai);                                                        /*0020*/
 
-//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==1, ai==4, j#init==0}
+//  P(ai,j) {ai==4, j==1, j#init==0}
 
 
    ai = 0;                                                              /*0022*/
