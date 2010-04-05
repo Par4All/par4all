@@ -197,6 +197,8 @@ static bool print_parallelized_code_common(
     statement mod_stat;
     string pp = string_undefined;
 
+    set_current_module_entity(module);
+
     if (style) {
 	pp = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
 	set_string_property("PRETTYPRINT_PARALLEL", style);
@@ -225,6 +227,8 @@ static bool print_parallelized_code_common(
 	set_string_property("PRETTYPRINT_PARALLEL", pp);
 	free(pp);
     }
+
+    reset_current_module_entity();
 
     free_text(r);
     return success;
