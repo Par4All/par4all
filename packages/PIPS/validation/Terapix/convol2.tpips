@@ -34,11 +34,9 @@ display PRINTED_FILE
 echo
 echo After tiling
 echo
-setproperty LOOP_LABEL ""
+setproperty LOOP_LABEL "l99993"
+setproperty LOOP_TILING_MATRIX "126 0,0 5"
 apply LOOP_TILING
-l99993
-126 0
-0 5
 display PRINTED_FILE
 
 echo

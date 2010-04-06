@@ -5,9 +5,9 @@ Splitting file    ./data05.f
 Workspace data05 created and opened.
 Module DATA05 selected
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
-user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+user warning in parse_properties: property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
 Module DATA05 already active.
 Request: build resource PRINTED_FILE for module DATA05.
   BOOTSTRAP                      building   ENTITIES()

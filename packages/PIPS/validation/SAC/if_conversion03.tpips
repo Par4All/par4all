@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete if_conversion03
 create if_conversion03 if_conversion03.c
 

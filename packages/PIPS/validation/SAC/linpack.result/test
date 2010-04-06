@@ -1,0 +1,168 @@
+static REAL ddot_r(int n, REAL *dx, int incx, REAL *dy, int incy)
+{
+   REAL dtemp;
+   int i, ix, iy;
+
+   dtemp = 0.0;
+
+   if (n<=0) 
+      return 0.0;
+
+   if (incx!=1||incy!=1) {
+      
+      /* code for unequal increments or equal increments != 1 */
+      
+      ix = 0;
+      iy = 0;
+      if (incx<0) 
+         ix = (-n+1)*incx;
+      if (incy<0) 
+         iy = (-n+1)*incy;
+l99999:      ddot_rl99999(&dtemp, &ix, &iy, dx, dy, incx, incy, n);
+      return dtemp;
+   }
+   
+   /* code for both increments equal to 1 */
+   
+l99998:   ddot_rl99998(&dtemp, dx, dy, n);
+   return dtemp;
+}
+static REAL ddot_ur(int n, REAL *dx, int incx, REAL *dy, int incy)
+{
+   REAL dtemp;
+   int i, ix, iy, m;
+
+   dtemp = 0.0;
+
+   if (n<=0) 
+      return 0.0;
+
+   if (incx!=1||incy!=1) {
+      
+      /* code for unequal increments or equal increments != 1 */
+      
+      ix = 0;
+      iy = 0;
+      if (incx<0) 
+         ix = (-n+1)*incx;
+      if (incy<0) 
+         iy = (-n+1)*incy;
+l99996:      ddot_url99996(&dtemp, &ix, &iy, dx, dy, incx, incy, n);
+      return dtemp;
+   }
+   
+   /* code for both increments equal to 1 */
+   
+   m = n%5;
+   if (m!=0) {
+l99995:      ddot_url99995(&dtemp, m, dx, dy);
+      if (n<5) 
+         return dtemp;
+   }
+l99994:   ddot_url99994(&dtemp, m, dx, dy, n);
+   return dtemp;
+}
+static void dscal_r(int n, REAL da, REAL *dx, int incx)
+{
+   int i, nincx;
+
+   if (n<=0) 
+      return;
+   if (incx!=1) {
+      
+      /* code for increment not equal to 1 */
+      
+      nincx = n*incx;
+l99997:      dscal_rl99997(nincx, da, dx, incx);
+      return;
+   }
+   
+   /* code for increment equal to 1 */
+   
+l99996:   dscal_rl99996(da, dx, n);
+}
+static void dscal_ur(int n, REAL da, REAL *dx, int incx)
+{
+   int i, m, nincx;
+
+   if (n<=0) 
+      return;
+   if (incx!=1) {
+      
+      /* code for increment not equal to 1 */
+      
+      nincx = n*incx;
+l99997:      dscal_url99997(nincx, da, dx, incx);
+      return;
+   }
+   
+   /* code for increment equal to 1 */
+   
+   m = n%5;
+   if (m!=0) {
+l99996:      dscal_url99996(m, da, dx);
+      if (n<5) 
+         return;
+   }
+l99995:   dscal_url99995(m, da, dx, n);
+}
+static void daxpy_r(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
+{
+   int i, ix, iy;
+
+   if (n<=0) 
+      return;
+   if (da==0.0) 
+      return;
+
+   if (incx!=1||incy!=1) {
+      
+      /* code for unequal increments or equal increments != 1 */
+      
+      ix = 1;
+      iy = 1;
+      if (incx<0) 
+         ix = (-n+1)*incx+1;
+      if (incy<0) 
+         iy = (-n+1)*incy+1;
+l99997:      daxpy_rl99997(ix, iy, da, dx, dy, incx, incy, n);
+      return;
+   }
+   
+   /* code for both increments equal to 1 */
+   
+l99996:   daxpy_rl99996(da, dx, dy, n);
+}
+static void daxpy_ur(int n, REAL da, REAL *dx, int incx, REAL *dy, int incy)
+{
+   int i, ix, iy, m;
+
+   if (n<=0) 
+      return;
+   if (da==0.0) 
+      return;
+
+   if (incx!=1||incy!=1) {
+      
+      /* code for unequal increments or equal increments != 1 */
+      
+      ix = 1;
+      iy = 1;
+      if (incx<0) 
+         ix = (-n+1)*incx+1;
+      if (incy<0) 
+         iy = (-n+1)*incy+1;
+l99997:      daxpy_url99997(ix, iy, da, dx, dy, incx, incy, n);
+      return;
+   }
+   
+   /* code for both increments equal to 1 */
+   
+   m = n%4;
+   if (m!=0) {
+l99996:      daxpy_url99996(m, da, dx, dy);
+      if (n<4) 
+         return;
+   }
+l99995:   daxpy_url99995(m, da, dx, dy, n);
+}

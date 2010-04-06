@@ -1,18 +1,11 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete fulguro_convol_3x3
 
 setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG -Iinclude/fulguro"
 
 create fulguro_convol_3x3 fulguro_convol_3x3.c
 
-setproperty ABORT_ON_USER_ERROR TRUE
 setproperty C89_CODE_GENERATION TRUE
-
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
-
-activate C_PARSER
 
 apply SIMPLIFY_SUBSCRIPTS[%ALL]
 display PRINTED_FILE[%ALL]

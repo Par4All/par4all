@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete jacobi
 create jacobi jacobi.c include/SIMD.c
 module compute

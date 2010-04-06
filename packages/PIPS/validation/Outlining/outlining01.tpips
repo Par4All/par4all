@@ -1,13 +1,6 @@
-delete outlining01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv PIPS_CPP = "cpp"
-
+delete outlining01
 create outlining01 outlining01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code

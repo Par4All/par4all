@@ -5,8 +5,8 @@ double call11(void)
 {
 //               <must be written>: x
    double x = 3.;                                                       /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 //               <must be read   >: x
 
@@ -15,14 +15,14 @@ double call11(void)
 
 Source code with cumulated effects
 
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
 double call11(void)
 {
 //               <must be written>: x
    double x = 3.;                                                       /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 //               <must be read   >: x
 
@@ -32,7 +32,7 @@ double call11(void)
 Source code with transformers for "call11"
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 double call11(void)
 {
@@ -41,7 +41,7 @@ double call11(void)
 
    double x = 3.;                                                       /*0007*/
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
    j++;                                                                 /*0008*/
 
@@ -54,7 +54,7 @@ double call11(void)
 Source code with transformers for "main"
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 int main()
 {
@@ -63,7 +63,7 @@ int main()
 
    int ai = 3;                                                          /*0015*/
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 
    call11();                                                            /*0017*/
@@ -77,20 +77,20 @@ int main()
 Source code with preconditions for "call11"
 
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
 double call11(void)
 {
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
    double x = 3.;                                                       /*0007*/
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
    j++;                                                                 /*0008*/
 
-//  P(TOP-LEVEL:j) {TOP-LEVEL:j==1, j#init==0}
+//  P(j) {j==1, j#init==0}
 
 
    return x;                                                            /*0010*/
@@ -99,21 +99,21 @@ double call11(void)
 Source code with preconditions for "main"
 
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
 int main()
 {
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
    int ai = 3;                                                          /*0015*/
 
-//  P() {TOP-LEVEL:j==0, ai==3}
+//  P() {ai==3, j==0}
 
 
    call11();                                                            /*0017*/
 
-//  P(TOP-LEVEL:j) {TOP-LEVEL:j==1, ai==3, j#init==0}
+//  P(j) {ai==3, j==1, j#init==0}
 
 
    ai = 0;                                                              /*0019*/
@@ -122,6 +122,8 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active

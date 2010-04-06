@@ -278,98 +278,98 @@ C  P(S1,S2) {'bye'==S1, 'hi'==S2}
 
       IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0035
 
-C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0038
 
-C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0041
 
-C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0044
 
-C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+C  P(S1,S2) {'bye'==S1, 'hi'==S2, 'bye'<='hi'}
 
 !
       S1 = 'hi'                                                         0048
 
-C  P(S1,S2) {'hi'==S1, S1==S2, 'bye'<=S1}
+C  P(S1,S2) {'hi'==S1, 'hi'==S2, 'bye'<='hi'}
 
       S2 = 'bye'                                                        0049
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
       PRINT *, '-', S1, '-', S2, '-'                                    0050
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
       IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0051
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
       IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0054
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
       IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0057
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
       IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0060
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
       IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0063
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
       IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0066
 
-C  P(S1,S2) {'bye'==S2, 'hi'==S1, S2<=S1}
+C  P(S1,S2) {'bye'==S2, 'hi'==S1, 'bye'<='hi'}
 
 !
       S1 = 'hi world'                                                   0070
 
-C  P(S1,S2) {'bye'==S2, 'hi '==S1, S2<='hi'}
+C  P(S1,S2) {'bye'==S2, 'hi '==S1, 'bye'<='hi'}
 
       S2 = 'hi'                                                         0071
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
       PRINT *, '-', S1, '-', S2, '-'                                    0072
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0073
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0076
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0079
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.GT.S2) PRINT *, 's1 >  s2'                                 0082
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.LE.S2) PRINT *, 's1 <= s2'                                 0085
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
       IF (S1.GE.S2) PRINT *, 's1 >= s2'                                 0088
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<='hi'}
 
 !
       S1 = '   '                                                        0092
 
-C  P(S1,S2) {'   '==S1, 'hi'==S2, 'bye'<=S2}
+C  P(S1,S2) {'   '==S1, 'hi'==S2, 'bye'<='hi'}
 
       S2 = ' '                                                          0093
 

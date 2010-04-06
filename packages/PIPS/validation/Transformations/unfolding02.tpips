@@ -1,23 +1,12 @@
-delete unfolding02
-
 setproperty ABORT_ON_USER_ERROR TRUE
+delete unfolding02
 
 setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG "
 
 
 create unfolding02 unfolding01.c
-activate C_PARSER
+
 activate C_SYMBOL_TABLE
-
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-
-echo End of property settings
-
-# quit
 
 echo
 echo before unfolding

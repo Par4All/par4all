@@ -1,13 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS function_call02
 delete $WS
-
-setproperty ABORT_ON_USER_ERROR TRUE
 create $WS $WS.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 echo
 echo Initial code

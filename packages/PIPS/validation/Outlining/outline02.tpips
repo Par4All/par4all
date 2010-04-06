@@ -1,22 +1,23 @@
 delete outline02
 create outline02 outline02.c
-echo Select some options to deal with the C Language:
-echo Parse as C:
-activate C_PARSER
-echo Prettyprint the source as C, of course
-setproperty PRETTYPRINT_C_CODE TRUE
+
 display PARSED_PRINTED_FILE[main]
 display PRINTED_FILE[main]
+
 setproperty OUTLINE_LABEL "compute_kernel"
 setproperty OUTLINE_MODULE_NAME "compute_kernel"
 apply OUTLINE[main]
+
 setproperty OUTLINE_LABEL "init_kernel"
 setproperty OUTLINE_MODULE_NAME "init_kernel"
 apply OUTLINE[main]
+
 echo All the kernel parameters should be passed correctly
 display PRINTED_FILE[%ALL]
 apply PRIVATIZE_MODULE[%ALLFUNC]
 apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
 display PRINTED_FILE[%ALL]
+
 close
+delete outline02
 quit

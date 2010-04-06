@@ -8,7 +8,7 @@ int main()
    y1 = 1;
 //               <must be written>: x1
    x1 = &x2;
-//               <must be read   >: TOP-LEVEL:true
+//               <must be read   >: true
 
    if (true) {
       // BEGIN BLOCK
@@ -56,7 +56,7 @@ int main()
    else
 //  {(x1,x2,-Exact-)}
       *x = &y;
-//  {(y,y1,-MAY-);(x,x1,-MAY-);(x1,x2,-Exact-)}
+//  {(x,x1,-MAY-);(x1,x2,-Exact-);(y,y1,-MAY-)}
 
    return 0;
    // END BLOCK

@@ -1,5 +1,5 @@
-user warning, property ACTIVE_PHASES redefined
-user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property ACTIVE_PHASES redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
 user warning in tp_parse: multideclsinfile: No such workspace
 Registering file multideclsinfile.c
 Preprocessing file ./multideclsinfile.c
@@ -10,7 +10,7 @@ Module multideclsinfile! selected
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Selecting rule: C_SYMBOL_TABLE
 user warning in activate_phase: Rule `C_SYMBOL_TABLE' already active
 Selecting rule: C_PARSER

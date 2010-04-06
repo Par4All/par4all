@@ -1,17 +1,13 @@
-delete outlining02
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete outlining02
 create outlining02 outlining02.c
 
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code
 echo
 
+# activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
 
 echo

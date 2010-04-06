@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete onetriploop02
 create onetriploop02 onetriploop02.f
 # display PRINTED_FILE[onetriploop02]

@@ -1,7 +1,9 @@
-delete u
 setproperty ABORT_ON_USER_ERROR TRUE
+delete u
+
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
 create u unreach_1.f
 echo # preconditions...
 activate TRANSFORMERS_INTER_FULL

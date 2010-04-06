@@ -1,13 +1,6 @@
-delete variable_expansion01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete variable_expansion01
 create variable_expansion01 variable_expansion01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 echo
 echo Initial code

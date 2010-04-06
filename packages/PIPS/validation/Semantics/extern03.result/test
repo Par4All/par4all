@@ -13,21 +13,21 @@ extern int main();
 
 Cumulated effects for "main"
 
-//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
+//               <must be read   >: delta delta2
 int main()
 {
-//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
+//               <must be read   >: delta delta2
    // BEGIN BLOCK
 //               <must be written>: i
    float i = 0.;
-//               <must be read   >: TOP-LEVEL:delta i
+//               <must be read   >: delta i
 //               <must be written>: i
 
    i = i+delta;
-//               <must be read   >: TOP-LEVEL:delta i
+//               <must be read   >: delta i
 //               <must be written>: i
    i = i+delta;
-//               <must be read   >: TOP-LEVEL:delta2 i
+//               <must be read   >: delta2 i
 //               <must be written>: i
    i = i+delta2;
    // END BLOCK
@@ -36,32 +36,29 @@ int main()
 Transformers for "main"
 
 
-//  T() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  T() {1.+2.==delta2, 1.==delta}
 
 int main()
 {
 
-//  T() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  T() {1.+2.==delta2, 1.==delta}
 
    // BEGIN BLOCK
 
-//  T(i) {0.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  T(i) {0.==i, 1.+2.==delta2, 1.==delta}
 
    float i = 0.;
 
-//  T(i) {0.+1.==i, 0.==i#init, 1.+2.==TOP-LEVEL:delta2,
-//    1.==TOP-LEVEL:delta}
+//  T(i) {0.+1.==i, 0.==i#init, 1.+2.==delta2, 1.==delta}
 
 
    i = i+delta;
 
-//  T(i) {0.+1.==i#init, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta,
-//    1.+i#init==i}
+//  T(i) {0.+1.==i#init, 1.+2.==delta2, 1.==delta, 1.+i#init==i}
 
    i = i+delta;
 
-//  T(i) {0.+21.==i#init, 1.+2.==TOP-LEVEL:delta2,
-//    1.==TOP-LEVEL:delta, TOP-LEVEL:delta2+i#init==i}
+//  T(i) {0.+21.==i#init, 1.+2.==delta2, 1.==delta, delta2+i#init==i}
 
    i = i+delta2;
    // END BLOCK
@@ -70,29 +67,29 @@ int main()
 Preconditions for "main"
 
 
-//  P() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  P() {1.+2.==delta2, 1.==delta}
 
 int main()
 {
 
-//  P() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  P() {1.+2.==delta2, 1.==delta}
 
    // BEGIN BLOCK
 
-//  P() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  P() {1.+2.==delta2, 1.==delta}
 
    float i = 0.;
 
-//  P() {0.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  P() {0.==i, 1.+2.==delta2, 1.==delta}
 
 
    i = i+delta;
 
-//  P(i) {0.+1.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  P(i) {0.+1.==i, 1.+2.==delta2, 1.==delta}
 
    i = i+delta;
 
-//  P(i) {0.+21.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+//  P(i) {0.+21.==i, 1.+2.==delta2, 1.==delta}
 
    i = i+delta2;
    // END BLOCK

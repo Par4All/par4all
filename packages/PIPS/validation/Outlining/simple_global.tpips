@@ -1,13 +1,7 @@
-setenv WKS simple_global
-
-delete $WKS
 setproperty ABORT_ON_USER_ERROR TRUE
+setenv WKS simple_global
+delete $WKS
 create $WKS $WKS.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 echo
 echo Initial code
@@ -35,5 +29,5 @@ echo
 apply UNSPLIT[%ALL]
 
 close
-#delete outline08
+delete outline08
 quit

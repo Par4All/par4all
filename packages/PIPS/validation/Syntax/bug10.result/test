@@ -1,5 +1,5 @@
-user warning, property ACTIVE_PHASES redefined
-user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property ACTIVE_PHASES redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
 user warning in tp_parse: bug10a: No such workspace
 user warning in tp_parse: bug10b: No such workspace
 Registering file bug10.src/test1.f

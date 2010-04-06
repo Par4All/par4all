@@ -15,14 +15,6 @@ int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+9);
 }
 
-Code after partial eval
-
-int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
-{
-   int *zaza = (int *) fifi+3;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+9);
-}
-
 Unsplit resulting code
 
 ok

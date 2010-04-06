@@ -1,9 +1,11 @@
-activate MUST_REGIONS
-activate REGION_CHAINS
-activate PRINT_WHOLE_DEPENDENCE_GRAPH
+setproperty ABORT_ON_USER_ERROR TRUE
 
 delete simdizer02
 create simdizer02 simdizer02.c include/SIMD.c
+
+activate MUST_REGIONS
+activate REGION_CHAINS
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
 
 make PRINTED_FILE[%ALL]
 

@@ -6,8 +6,8 @@ void call03(int i, float x)
 //               <must be read   >: i
 //               <must be written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 //               <must be read   >: x
 //               <must be written>: x
@@ -16,15 +16,15 @@ void call03(int i, float x)
 
 Source code with cumulated effects
 
-//               <must be read   >: TOP-LEVEL:j i x
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j i x
+//               <must be written>: j
 void call03(int i, float x)
 {
 //               <must be read   >: i
 //               <must be written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 //               <must be read   >: x
 //               <must be written>: x
@@ -34,7 +34,7 @@ void call03(int i, float x)
 Source code with transformers for "call03"
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 void call03(int i, float x)
 {
@@ -43,7 +43,7 @@ void call03(int i, float x)
 
    i++;                                                                 /*0007*/
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
    j++;                                                                 /*0008*/
 
@@ -55,7 +55,7 @@ void call03(int i, float x)
 Source code with transformers for "main"
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 int main()
 {
@@ -68,7 +68,7 @@ int main()
 
    float ax = 4.;                                                       /*0015*/
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 
    call03(ai, ax);                                                      /*0017*/
@@ -82,20 +82,20 @@ int main()
 Source code with preconditions for "call03"
 
 
-//  P() {TOP-LEVEL:j==0, i==3}
+//  P() {i==3, j==0}
 
 void call03(int i, float x)
 {
 
-//  P() {TOP-LEVEL:j==0, i==3}
+//  P() {i==3, j==0}
 
    i++;                                                                 /*0007*/
 
-//  P(i) {TOP-LEVEL:j==0, i==4}
+//  P(i) {i==4, j==0}
 
    j++;                                                                 /*0008*/
 
-//  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==4, j#init==0}
+//  P(i,j) {i==4, j==1, j#init==0}
 
    x++;                                                                 /*0009*/
 }
@@ -103,25 +103,25 @@ void call03(int i, float x)
 Source code with preconditions for "main"
 
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
 int main()
 {
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
    int ai = 3;                                                          /*0014*/
 
-//  P() {TOP-LEVEL:j==0, ai==3}
+//  P() {ai==3, j==0}
 
    float ax = 4.;                                                       /*0015*/
 
-//  P() {TOP-LEVEL:j==0, ai==3}
+//  P() {ai==3, j==0}
 
 
    call03(ai, ax);                                                      /*0017*/
 
-//  P(TOP-LEVEL:j) {TOP-LEVEL:j==1, ai==3, j#init==0}
+//  P(j) {ai==3, j==1, j#init==0}
 
 
    ai = 0;                                                              /*0019*/
@@ -130,6 +130,8 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active

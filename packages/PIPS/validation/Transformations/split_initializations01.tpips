@@ -1,13 +1,8 @@
-delete split_initializations01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_BLOCKS TRUE
-
+delete split_initializations01
 create split_initializations01 split_initializations01.c
 
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_BLOCKS TRUE
 
 echo
 echo Initial code

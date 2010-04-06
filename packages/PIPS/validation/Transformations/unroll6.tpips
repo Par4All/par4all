@@ -1,5 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete unroll6
 create unroll6 unroll6.f
+
 module UNROLL6
 display PRINTED_FILE[UNROLL6]
 apply FULL_UNROLL_PRAGMA[UNROLL6]

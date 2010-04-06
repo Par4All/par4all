@@ -49,13 +49,13 @@ int main()
    j = 2;
 //  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    m->i = 1;
-//  {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    m->p = &j;
 //  {(m[0][2],j,-Exact-)}
    n = m;
-//  {(n,j,-Exact-);(m[0][2],j,-Exact-)}
+//  {(m[0][2],j,-Exact-);(n,j,-Exact-)}
 
    return 0;
    // END BLOCK

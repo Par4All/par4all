@@ -1,4 +1,4 @@
-void * memload(void **dest, void *src, size_t n)
+void * memload(void **dest, const void *src, size_t n)
 {
    size_t i;
    void *pdest = *dest = malloc(n);

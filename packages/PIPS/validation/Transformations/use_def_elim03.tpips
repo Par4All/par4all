@@ -1,12 +1,6 @@
-delete use_def_elim03
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete use_def_elim03
 create use_def_elim03 use_def_elim03.f
-
-#activate C_PARSER
-#setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Code for "USE_DEF_ELIM03"

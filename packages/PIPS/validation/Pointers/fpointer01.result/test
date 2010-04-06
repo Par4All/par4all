@@ -212,21 +212,21 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
 POINTS TO
 
-//  {(nbout,_nbout_3,-Exact-);(_stream,__stream_1,-Exact-);(col,
-//   _col_2,-Exact-)}
+//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
+//   _nbout_3,-Exact-)}
 void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
 {
-//  {(_stream,__stream_1,-Exact-);(nbout,_nbout_3,-Exact-);(col,
-//   _col_2,-Exact-)}
+//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
+//   _nbout_3,-Exact-)}
    if (c=='\n'||c=='\r')
-//  {(_stream,__stream_1,-Exact-);(nbout,_nbout_3,-Exact-);(col,
-//   _col_2,-Exact-)}
+//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
+//   _nbout_3,-Exact-)}
       /* on change de ligne */
       
       *col = 0;
    else {
-//  {(_stream,__stream_1,-Exact-);(nbout,_nbout_3,-Exact-);(col,
-//   _col_2,-Exact-)}
+//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
+//   _nbout_3,-Exact-)}
       /* indentation ok ? */
       
       while (*col<indent) {
@@ -237,19 +237,19 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 //  points to = {}
          (*col)++;
       }
-//  {(_stream,__stream_1,-Exact-);(nbout,_nbout_3,-Exact-);(col,
-//   _col_2,-Exact-)}
+//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
+//   _nbout_3,-Exact-)}
 
       (*col)++;
    }
-//  {(_stream,__stream_1,-Exact-);(nbout,_nbout_3,-Exact-);(col,
-//   _col_2,-Exact-)}
+//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
+//   _nbout_3,-Exact-)}
    
    /* dans tous les cas il faut afficher le caractere passe */
    
    my_fputc(c, _stream);
-//  {(_stream,__stream_1,-Exact-);(nbout,_nbout_3,-Exact-);(col,
-//   _col_2,-Exact-)}
+//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
+//   _nbout_3,-Exact-)}
    (*nbout)++;
 }
 

@@ -1,14 +1,10 @@
-delete icm01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_BLOCKS  TRUE
+delete icm01
 
 create icm01 icm01.c
 
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE            TRUE
+setproperty PRETTYPRINT_BLOCKS  TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER  TRUE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 echo
 echo Initial code

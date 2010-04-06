@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete SAXPY
 
 create SAXPY kernels/SAXPY/SAXPY.f include/simd.f

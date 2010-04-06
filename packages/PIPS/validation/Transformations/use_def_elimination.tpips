@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete use_def_elimination
 create use_def_elimination use_def_elimination.f
 

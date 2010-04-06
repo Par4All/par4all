@@ -39,13 +39,13 @@ POINTS TO
 //  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
 long long get_result(int argc, char **argv)
 {
-//  {(argv,_argv_1,-Exact-);(_argv_1,__argv_1_2,-Exact-)}
+//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
    long long result = 0;
-//  {(argv,_argv_1,-Exact-);(_argv_1,__argv_1_2,-Exact-)}
+//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
    result = atoll(argv[1]);
-//  {(argv,_argv_1,-Exact-);(_argv_1,__argv_1_2,-Exact-)}
+//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
    printf("return value will be %lld\n", result);
-//  {(argv,_argv_1,-Exact-);(_argv_1,__argv_1_2,-Exact-)}
+//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
    return result;
 }
 
@@ -54,8 +54,8 @@ POINTS TO
 //  {(_argv_3,__argv_3_4,-Exact-);(argv,_argv_3,-Exact-)}
 int main(int argc, char **argv)
 {
-//  {(argv,_argv_3,-Exact-);(_argv_3,__argv_3_4,-Exact-)}
+//  {(_argv_3,__argv_3_4,-Exact-);(argv,_argv_3,-Exact-)}
    long long size = get_result(argc, argv);
-//  {(argv,_argv_3,-Exact-);(_argv_3,__argv_3_4,-Exact-)}
+//  {(_argv_3,__argv_3_4,-Exact-);(argv,_argv_3,-Exact-)}
    return size;
 }

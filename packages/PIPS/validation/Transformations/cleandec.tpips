@@ -1,9 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 # FI: I do not understand what is cleaned up
 
 delete cleandec
-
-setproperty ABORT_ON_USER_ERROR TRUE
-
 create cleandec cleandec.f
 
 apply CLEAN_DECLARATIONS[BAR]

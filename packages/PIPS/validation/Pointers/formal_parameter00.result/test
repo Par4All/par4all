@@ -29,9 +29,9 @@ void formal_parameter00(int *pi)
    i = 0;
 //  {(pi,_pi_1,-Exact-)}
    q = pi;
-//  {(q,_pi_1,-Exact-);(pi,_pi_1,-Exact-)}
+//  {(pi,_pi_1,-Exact-);(q,_pi_1,-Exact-)}
    pi = &i;
-//  {(q,_pi_1,-Exact-);(pi,i,-Exact-)}
+//  {(pi,i,-Exact-);(q,_pi_1,-Exact-)}
    return 0;
    // END BLOCK
 }

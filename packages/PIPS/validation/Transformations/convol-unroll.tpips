@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 # Optimization by unrolling of loop 100 and 200,
 # and by repetitive partial evaluation
 

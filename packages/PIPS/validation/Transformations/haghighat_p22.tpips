@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 # Partial eval should be improved...
 
 delete haghighat_p22

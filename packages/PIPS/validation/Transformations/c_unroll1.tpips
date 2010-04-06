@@ -1,14 +1,6 @@
-delete c_unroll1
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete c_unroll1
 create c_unroll1 c_unroll1.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 
 echo
 echo Initial code

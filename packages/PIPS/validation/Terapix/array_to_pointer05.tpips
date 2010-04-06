@@ -1,0 +1,40 @@
+delete array_to_pointer05
+
+create array_to_pointer05 array_to_pointer04.c
+
+
+echo
+echo Initial code
+echo
+module vector_product
+
+display PRINTED_FILE
+
+echo
+echo Code after array conversion
+echo
+
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "1D"
+apply ARRAY_TO_POINTER
+display PRINTED_FILE
+
+echo
+echo Code after partial eval
+echo
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c array_to_pointer05.database/Src/array_to_pointer04.c  -o array_to_pointer04.o
+shell rm -rf array_to_pointer04.o
+
+close
+delete array_to_pointer05
+quit
+

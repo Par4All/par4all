@@ -152,6 +152,6 @@ void dereferencing02()
    x = **q;
 //  points to = {}
    q++;
-//  {(q,*ANYWHERE*,-MAY-)}
+//  {(q,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    *q++;
 }

@@ -1,13 +1,6 @@
-delete alphablending_c
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete alphablending_c
 create alphablending_c alphablending.c include/SIMD.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 echo
 echo Initial code

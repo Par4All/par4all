@@ -73,7 +73,8 @@ l1:
 
 Warnings
 
-unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
+unknown[unknown] (parse_properties) property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT redefined
 INITIAL_PRECONDITION[strip_mining01] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning strip_mining01 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
