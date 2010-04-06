@@ -103,7 +103,13 @@
 #define EMPTY_LABEL_NAME                LABEL_PREFIX
 #define LIST_DIRECTED_FORMAT_NAME       "LIST-DIRECTED"
 
+
+/* Module containing the global variables in Fortran and C */
 #define TOP_LEVEL_MODULE_NAME           "TOP-LEVEL"
+/* Module containing stub variables used to initialize intraprocedural
+   points-to in C */
+#define POINTS_TO_MODULE_NAME "*POINTS-TO-MODULE*"
+
 #define UNBOUNDED_DIMENSION_NAME        "UNBOUNDED-DIMENSION"
 #define IMPLIED_DO_NAME                 "IMPLIED-DO"
 #define IMPLIED_DO_FUNCTION_NAME        "IMPLIED-DO"

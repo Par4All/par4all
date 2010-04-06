@@ -154,15 +154,15 @@ static int emami_expression_type(expression exp)
 }
 
 /* a pointer_type_p already exist but do not respond to our needs...*/
-static bool type_pointer_p(expression e)
+bool expression_pointer_p(expression e)
 {
   bool rlt = false;
   syntax s = expression_syntax(e);
   reference r = syntax_reference(s);
   entity ent = reference_variable(r);
-  type t = entity_type(ent);
+  type t = ultimate_type(entity_type(ent));
   if(type_variable_p(t)){
-	variable v= type_variable(t);
+	variable v = type_variable(t);
 	if(basic_pointer_p(variable_basic(v)))
 	  rlt = true;
   }
@@ -170,7 +170,7 @@ static bool type_pointer_p(expression e)
 }
 
 /* Same as previous function, but for double pointers. */
-static bool type_double_pointer_p(expression e)
+bool expression_double_pointer_p(expression e)
 {
   syntax s = expression_syntax(e);
   reference r = syntax_reference(s);
@@ -358,8 +358,8 @@ set basic_ref_ref(set pts_to_set,
 	ent2 = reference_variable(ref2);
   }
   if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
-	if((type_pointer_p(lhs_tmp)&&(type_pointer_p(rhs_tmp) || array_entity_p(ent2))) ||
-	   (type_double_pointer_p(lhs_tmp)&& type_double_pointer_p(rhs_tmp))){
+	if((expression_pointer_p(lhs_tmp)&&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))) ||
+	   (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs_tmp))){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2 = effect_undefined;
 	  set_methods_for_proper_simple_effects();
@@ -458,7 +458,7 @@ set basic_ref_array(set pts_to_set,
   ref2 = expression_reference(rhs);
   ent2 = reference_variable(ref2);
   if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
-	if(type_pointer_p(lhs)){
+	if(expression_pointer_p(lhs)){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2 = effect_undefined;
 	  set_methods_for_proper_simple_effects();
@@ -542,7 +542,7 @@ set basic_ref_addr(set pts_to_set,
 	return pts_to_set;
   }
 
-  if(type_pointer_p(lhs)){
+  if(expression_pointer_p(lhs)){
 	// creation of the source
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
@@ -626,8 +626,8 @@ set basic_ref_deref(set pts_to_set,
   expression rhs_tmp = EXPRESSION (CAR(args));
   ref2 = expression_reference(rhs_tmp);
   ent2 = argument_entity(copy_expression(rhs_tmp));
-  if(type_pointer_p(lhs)&&
-	 type_double_pointer_p(rhs_tmp)){
+  if(expression_pointer_p(lhs) &&
+	 expression_double_pointer_p(rhs_tmp)){
 	// creation of the source
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
@@ -737,9 +737,9 @@ set basic_deref_ref(set pts_to_set,
 	}
   }
 
-  if(type_double_pointer_p(lhs_tmp)&&
-	 type_pointer_p(rhs)){
-	effect e1 = effect_undefined, e2 = effect_undefined;
+  if(expression_double_pointer_p(lhs_tmp)&&
+     expression_pointer_p(rhs)){
+    effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 =
 	  generic_proper_effects_of_complex_address_expression(ex,
@@ -886,7 +886,7 @@ static set basic_deref_addr(set pts_to_set,
 	return pts_to_set;
   }
 
-  if(type_double_pointer_p(lhs_tmp)){
+  if(expression_double_pointer_p(lhs_tmp)){
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 =
@@ -1018,7 +1018,7 @@ set basic_deref_array(set pts_to_set,
   c2 = syntax_call(syn2);
   list args2 = call_arguments(c2);
   expression  rhs_tmp = EXPRESSION (CAR(args2));
-  if(type_double_pointer_p(lhs_tmp)) {
+  if(expression_double_pointer_p(lhs_tmp)) {
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 =
@@ -1153,8 +1153,8 @@ set basic_deref_deref(set pts_to_set,
   expression rhs_tmp = EXPRESSION (CAR(args2));
   ref2 = expression_reference(rhs_tmp);
   ent2 = argument_entity(rhs_tmp);
-  if(type_double_pointer_p(lhs_tmp)&&
-	 type_pointer_p(rhs)) {
+  if(expression_double_pointer_p(lhs_tmp)&&
+	 expression_pointer_p(rhs)) {
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 = generic_proper_effects_of_complex_address_expression(lhs_tmp,
@@ -1282,7 +1282,7 @@ set basic_field_addr(set pts_to_set,
   call  c1 = syntax_call(syn1);
   list args1 = call_arguments(c1);
   expression  lhs_tmp = EXPRESSION (CAR(CDR(args1)));
-  if(type_pointer_p(lhs_tmp)) {
+  if(expression_pointer_p(lhs_tmp)) {
 	// creation of the source
 	//syntax ss = expression_syntax(lhs_tmp);
 	effect e1 = effect_undefined;
@@ -1371,8 +1371,8 @@ set basic_ref_field(set pts_to_set,
   ref2 = expression_reference(rhs_tmp);
   if(syntax_reference_p(syn1) && syntax_reference_p(s)){
 	ent2=reference_variable(ref2);
-	if(type_pointer_p(lhs)
-	   &&(type_pointer_p(rhs_tmp) || array_entity_p(ent2))){
+	if(expression_pointer_p(lhs)
+	   &&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2;
 	  set_methods_for_proper_simple_effects();
@@ -1475,8 +1475,8 @@ set basic_ref_ptr_to_field(set pts_to_set,
   ref2 = expression_reference(rhs_tmp);
   if(syntax_reference_p(syn1) && syntax_reference_p(s)){
 	ent2=reference_variable(ref2);
-	if(type_pointer_p(lhs)
-	   &&(type_pointer_p(rhs_tmp) || array_entity_p(ent2))){
+	if(expression_pointer_p(lhs)
+	   &&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2;
 	  set_methods_for_proper_simple_effects();
@@ -1607,7 +1607,7 @@ set basic_deref_field(set pts_to_set,
 	}
   }
 
-  if(type_double_pointer_p(lhs_tmp)&& type_pointer_p(rhs_tmp)){
+  if(expression_double_pointer_p(lhs_tmp)&& expression_pointer_p(rhs_tmp)){
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 = generic_proper_effects_of_complex_address_expression(ex,
@@ -1735,7 +1735,7 @@ set basic_ptr_to_field_addr(set pts_to_set,
   call  c1 = syntax_call(syn1);
   list args1 = call_arguments(c1);
   expression  lhs_tmp = EXPRESSION (CAR(CDR(args1)));
-  if(type_pointer_p(lhs_tmp)){
+  if(expression_pointer_p(lhs_tmp)){
 	// creation of the source
 	//syntax ss = expression_syntax(lhs_tmp);
 	effect e1 = effect_undefined;
@@ -1824,8 +1824,8 @@ set basic_ptr_to_field_ptr_to_field(set pts_to_set,
   ref2 = expression_reference(rhs_tmp);
   ent2 = reference_variable(ref2);
   if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
-	if((type_pointer_p(lhs_tmp)&&type_pointer_p(rhs_tmp)) ||
-	   (type_double_pointer_p(lhs_tmp)&& type_double_pointer_p(rhs_tmp))){
+	if((expression_pointer_p(lhs_tmp) && expression_pointer_p(rhs_tmp)) ||
+	   (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs_tmp))){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2 = effect_undefined;
 	  set_methods_for_proper_simple_effects();
@@ -1897,11 +1897,11 @@ set basic_deref_ptr_to_field(set pts_to_set,
   set s2 = set_generic_make(set_private, points_to_equal_p,points_to_rank);
   set s3 = set_generic_make(set_private, points_to_equal_p,points_to_rank);
   set change_pts_to= set_generic_make(set_private,
-									  points_to_equal_p,points_to_rank);
+				      points_to_equal_p,points_to_rank);
   set gen_pts_to =set_generic_make(set_private,
-								   points_to_equal_p,points_to_rank);
+				   points_to_equal_p,points_to_rank);
   set written_pts_to = set_generic_make(set_private,
-										points_to_equal_p,points_to_rank);
+					points_to_equal_p,points_to_rank);
   points_to pt_to = points_to_undefined;
   syntax syn1=syntax_undefined;
   reference ref1 = reference_undefined;
@@ -1914,7 +1914,7 @@ set basic_deref_ptr_to_field(set pts_to_set,
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
   ifdebug(1){
-	pips_debug(1, " case *x = m;y\n");
+    pips_debug(1, " case *x = m;y\n");
   }
   // recuperation of x
   syn1 = expression_syntax(lhs);
@@ -1925,14 +1925,14 @@ set basic_deref_ptr_to_field(set pts_to_set,
   /* if we have *m.x = m->y */
   syntax s = expression_syntax(lhs_tmp);
   if(syntax_call_p(s))
-  {
-	call c = expression_call(lhs_tmp);
-	if(entity_an_operator_p(call_function(c), FIELD))
+    {
+      call c = expression_call(lhs_tmp);
+      if(entity_an_operator_p(call_function(c), FIELD))
 	{
 	  list l = call_arguments(c);
 	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
 	}
-  }
+    }
   // recuperation of y
   syntax syn2 = expression_syntax(rhs);
   call c2 = syntax_call(syn2);
@@ -1942,113 +1942,113 @@ set basic_deref_ptr_to_field(set pts_to_set,
 
   syntax ss = expression_syntax(rhs_tmp);
   if(syntax_call_p(ss))
-  {
-	call c = expression_call(rhs_tmp);
-	if(entity_an_operator_p(call_function(c), POINT_TO))
+    {
+      call c = expression_call(rhs_tmp);
+      if(entity_an_operator_p(call_function(c), POINT_TO))
 	{
 	  list l = call_arguments(c);
 	  rhs_tmp = EXPRESSION (CAR(CDR(l)));
 	}
-  }
+    }
 
-  if(type_double_pointer_p(lhs_tmp)&&
-	 type_pointer_p(rhs_tmp)){
-	effect e1 = effect_undefined, e2 = effect_undefined;
-	set_methods_for_proper_simple_effects();
-	list l1 = generic_proper_effects_of_complex_address_expression(ex,
-																   &e1,
-																   true);
-	list l2 = generic_proper_effects_of_complex_address_expression(e,
-																   &e2,
-																   false);
-	effects_free(l1);
-	effects_free(l2);
-	generic_effects_reset_all_methods();
-	ref1 = effect_any_reference(e1);
-	ent1 = argument_entity(lhs_tmp);
+  if(expression_double_pointer_p(lhs_tmp)&&
+     expression_pointer_p(rhs_tmp)){
+    effect e1 = effect_undefined, e2 = effect_undefined;
+    set_methods_for_proper_simple_effects();
+    list l1 = generic_proper_effects_of_complex_address_expression(ex,
+								   &e1,
+								   true);
+    list l2 = generic_proper_effects_of_complex_address_expression(e,
+								   &e2,
+								   false);
+    effects_free(l1);
+    effects_free(l2);
+    generic_effects_reset_all_methods();
+    ref1 = effect_any_reference(e1);
+    ent1 = argument_entity(lhs_tmp);
 
 
-	source = make_cell_reference(ref1);
-	// recuperation of y
-	ref2 = effect_any_reference(e2);
-	sink = make_cell_reference(ref2);
+    source = make_cell_reference(ref1);
+    // recuperation of y
+    ref2 = effect_any_reference(e2);
+    sink = make_cell_reference(ref2);
 
-	/* creation of the set written_pts_to =
-	   {(x1,x2,rel)| (x, x1, EXACT), (x1, x2, rel) /in pts_to_set}*/
-	SET_FOREACH(points_to, i, pts_to_set){
-	  if( locations_equal_p(points_to_source(i), source) &&
-		  approximation_exact_p(points_to_approximation(i))){
-		SET_FOREACH(points_to, j,pts_to_set ){
-		  if( locations_equal_p(points_to_source(j) ,
-								points_to_sink(i)))
-			written_pts_to = set_add_element(written_pts_to,
-											 written_pts_to, (void *)j);
-		}
+    /* creation of the set written_pts_to =
+       {(x1,x2,rel)| (x, x1, EXACT), (x1, x2, rel) /in pts_to_set}*/
+    SET_FOREACH(points_to, i, pts_to_set){
+      if( locations_equal_p(points_to_source(i), source) &&
+	  approximation_exact_p(points_to_approximation(i))){
+	SET_FOREACH(points_to, j,pts_to_set ){
+	  if( locations_equal_p(points_to_source(j) ,
+				points_to_sink(i)))
+	    written_pts_to = set_add_element(written_pts_to,
+					     written_pts_to, (void *)j);
+	}
+      }
+    }
+    /* {(x1, x2,EXACT)|(x, x1, MAY),(x1, x2, EXACT) /in pts_to_set}*/
+    SET_FOREACH(points_to, k, pts_to_set){
+      if( locations_equal_p(points_to_source(i), source)
+	  && approximation_may_p(points_to_approximation(k))){
+	SET_FOREACH(points_to, h,pts_to_set ){
+	  if(locations_equal_p(points_to_source(h),points_to_sink(k))&&
+	     approximation_exact_p(points_to_approximation(h)))
+	    s2 = set_add_element(s2, s2, (void *)h);
+	}
+      }
+    }
+
+    /* {(x1, x2,MAY)|(x, x1, MAY),(x1, x2, EXACT) /in pts_to_set}*/
+    SET_FOREACH(points_to, l, pts_to_set){
+      if(locations_equal_p(points_to_source(l), source) &&
+	 approximation_may_p(points_to_approximation(l))){
+	SET_FOREACH(points_to, m,pts_to_set){
+	  if(locations_equal_p( points_to_source(m),points_to_sink(l))&&
+	     approximation_exact_p(points_to_approximation(m))){
+	    points_to_approximation(m) = make_approximation_may();
+	    s3 = set_add_element(s3, s3, (void *)m);
 	  }
 	}
-	/* {(x1, x2,EXACT)|(x, x1, MAY),(x1, x2, EXACT) /in pts_to_set}*/
-	SET_FOREACH(points_to, k, pts_to_set){
-	  if( locations_equal_p(points_to_source(i), source)
-		  && approximation_may_p(points_to_approximation(k))){
-		SET_FOREACH(points_to, h,pts_to_set ){
-		  if(locations_equal_p(points_to_source(h),points_to_sink(k))&&
-			 approximation_exact_p(points_to_approximation(h)))
-			s2 = set_add_element(s2, s2, (void *)h);
-		}
+      }
+    }
+    change_pts_to = set_difference(change_pts_to,pts_to_set, s3);
+    change_pts_to = set_union(change_pts_to,change_pts_to, s3);
+    SET_FOREACH(points_to, n, pts_to_set) {
+      if(locations_equal_p(points_to_source(n), source)){
+	SET_FOREACH(points_to, o, pts_to_set){
+	  if(locations_equal_p(points_to_source(o) , sink)){
+	    new_source = copy_cell(points_to_sink(n));
+	    new_sink = copy_cell(points_to_sink(o));
+	    rel = fusion_approximation(points_to_approximation(n),
+				       points_to_approximation(o));
+	    pt_to = make_points_to(new_source, new_sink, rel,
+				   make_descriptor_none());
+	    gen_pts_to = set_add_element(gen_pts_to, gen_pts_to,
+					 (void *)pt_to);
 	  }
 	}
-
-	/* {(x1, x2,MAY)|(x, x1, MAY),(x1, x2, EXACT) /in pts_to_set}*/
-	SET_FOREACH(points_to, l, pts_to_set){
-	  if(locations_equal_p(points_to_source(l), source) &&
-		 approximation_may_p(points_to_approximation(l))){
-		SET_FOREACH(points_to, m,pts_to_set){
-		  if(locations_equal_p( points_to_source(m),points_to_sink(l))&&
-			 approximation_exact_p(points_to_approximation(m))){
-			points_to_approximation(m) = make_approximation_may();
-			s3 = set_add_element(s3, s3, (void *)m);
-		  }
-		}
-	  }
-	}
-	change_pts_to = set_difference(change_pts_to,pts_to_set, s3);
-	change_pts_to = set_union(change_pts_to,change_pts_to, s3);
-	SET_FOREACH(points_to, n, pts_to_set) {
-	  if(locations_equal_p(points_to_source(n), source)){
-		SET_FOREACH(points_to, o, pts_to_set){
-		  if(locations_equal_p(points_to_source(o) , sink)){
-			new_source = copy_cell(points_to_sink(n));
-			new_sink = copy_cell(points_to_sink(o));
-			rel = fusion_approximation(points_to_approximation(n),
-									   points_to_approximation(o));
-			pt_to = make_points_to(new_source, new_sink, rel,
-								   make_descriptor_none());
-			gen_pts_to = set_add_element(gen_pts_to, gen_pts_to,
-										 (void *)pt_to);
-		  }
-		}
-	  }
-	}
-	s1 = set_difference(s1, change_pts_to, written_pts_to);
-	pts_to_set = set_union(pts_to_set, gen_pts_to, s1);
+      }
+    }
+    s1 = set_difference(s1, change_pts_to, written_pts_to);
+    pts_to_set = set_union(pts_to_set, gen_pts_to, s1);
   }
   else {
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
+    ifdebug(1) {
+      pips_debug(1, "Neither variable is a pointer\n");
+    }
   }
   return pts_to_set;
 }
 
 /* one basic case of Emami: < m->x = y.a > */
 set basic_ptr_to_field_field(set pts_to_set,
-							 expression lhs,
-							 expression rhs)
+			     expression lhs,
+			     expression rhs)
 {
   set gen_pts_to =set_generic_make(set_private,
-								   points_to_equal_p,points_to_rank);
+				   points_to_equal_p,points_to_rank);
   set written_pts_to = set_generic_make(set_private,
-										points_to_equal_p,points_to_rank);
+					points_to_equal_p,points_to_rank);
   points_to pt_to = points_to_undefined;
   syntax syn1=expression_syntax(lhs);
   syntax syn2=expression_syntax(rhs);
@@ -2063,99 +2063,99 @@ set basic_ptr_to_field_field(set pts_to_set,
   expression rhs_tmp = expression_undefined;
   ifdebug(1) printf("\n cas x = y \n");
   if(syntax_call_p(syn1)) {
-	call c1 = expression_call(lhs);
-	if(entity_an_operator_p(call_function(c1), POINT_TO)){
-	  list l = call_arguments(c1);
-	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
-	  syn1=expression_syntax(lhs_tmp);
-	}
+    call c1 = expression_call(lhs);
+    if(entity_an_operator_p(call_function(c1), POINT_TO)){
+      list l = call_arguments(c1);
+      lhs_tmp = EXPRESSION (CAR(CDR(l)));
+      syn1=expression_syntax(lhs_tmp);
+    }
   }else{
-	syn1=expression_syntax(lhs);
+    syn1=expression_syntax(lhs);
   }
   if(syntax_call_p(syn2)){
-	call c2 = expression_call(rhs);
-	if(entity_an_operator_p(call_function(c2),FIELD)){
-	  list l1 = call_arguments(c2);
-	  rhs_tmp = EXPRESSION (CAR(CDR(l1)));
-	  syn2=expression_syntax(rhs_tmp);
-	  ref2=expression_reference(rhs_tmp);
-	  ent2=reference_variable(ref2);
-	}
+    call c2 = expression_call(rhs);
+    if(entity_an_operator_p(call_function(c2),FIELD)){
+      list l1 = call_arguments(c2);
+      rhs_tmp = EXPRESSION (CAR(CDR(l1)));
+      syn2=expression_syntax(rhs_tmp);
+      ref2=expression_reference(rhs_tmp);
+      ent2=reference_variable(ref2);
+    }
   }else{
-	rhs_tmp = copy_expression(rhs);
-	syn2 = expression_syntax(rhs);
-	ref2 = expression_reference(rhs);
-	ent2 = reference_variable(ref2);
+    rhs_tmp = copy_expression(rhs);
+    syn2 = expression_syntax(rhs);
+    ref2 = expression_reference(rhs);
+    ent2 = reference_variable(ref2);
   }
   if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
-	if((type_pointer_p(lhs_tmp)&&(type_pointer_p(rhs_tmp) || array_entity_p(ent2))) ||
-	   (type_double_pointer_p(lhs_tmp)&& type_double_pointer_p(rhs_tmp))){
-	  // creation of the source
-	  effect e1 = effect_undefined, e2 = effect_undefined;
-	  set_methods_for_proper_simple_effects();
-	  list l1 = generic_proper_effects_of_complex_address_expression(lhs,
-																	 &e1,
-																	 true);
-	  list l2 = generic_proper_effects_of_complex_address_expression(rhs,
-																	 &e2,
-																	 false);
-	  effects_free(l1);
-	  effects_free(l2);
-	  generic_effects_reset_all_methods();
-	  ref1 = effect_any_reference(e1);
-	  source = make_cell_reference(ref1);
+    if((expression_pointer_p(lhs_tmp)&&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))) ||
+       (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs_tmp))){
+      // creation of the source
+      effect e1 = effect_undefined, e2 = effect_undefined;
+      set_methods_for_proper_simple_effects();
+      list l1 = generic_proper_effects_of_complex_address_expression(lhs,
+								     &e1,
+								     true);
+      list l2 = generic_proper_effects_of_complex_address_expression(rhs,
+								     &e2,
+								     false);
+      effects_free(l1);
+      effects_free(l2);
+      generic_effects_reset_all_methods();
+      ref1 = effect_any_reference(e1);
+      source = make_cell_reference(ref1);
 
-	  // add the points_to relation to the set generated
-	  // by this assignement
-	  ref2 = effect_any_reference(e2);
-	  sink = make_cell_reference(ref2);
-	  set s = set_generic_make(set_private,
-							   points_to_equal_p,points_to_rank);
-	  SET_FOREACH(points_to, i, pts_to_set){
-		if(locations_equal_p(points_to_source(i), sink))
-		  s = set_add_element(s, s, (void*)i);
-	  }
-	  SET_FOREACH(points_to, j, s){
-		new_sink = copy_cell(points_to_sink(j));
-		// locations new_source = copy_access(source);
-		rel = points_to_approximation(j);
-		pt_to = make_points_to(source, new_sink, rel,
-							   make_descriptor_none());
-		gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
-									 (void*) pt_to );
-	  }
-	  /* in case x = y[i]*/
-	  if(array_entity_p(ent2)){
-		new_sink = make_cell_reference(copy_reference(ref2));
-		// locations new_source = copy_access(source);
-		rel =make_approximation_exact();
-		pt_to = make_points_to(source, new_sink, rel,
-							   make_descriptor_none());
-		gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
-									 (void*) pt_to );
-	  }
+      // add the points_to relation to the set generated
+      // by this assignement
+      ref2 = effect_any_reference(e2);
+      sink = make_cell_reference(ref2);
+      set s = set_generic_make(set_private,
+			       points_to_equal_p,points_to_rank);
+      SET_FOREACH(points_to, i, pts_to_set){
+	if(locations_equal_p(points_to_source(i), sink))
+	  s = set_add_element(s, s, (void*)i);
+      }
+      SET_FOREACH(points_to, j, s){
+	new_sink = copy_cell(points_to_sink(j));
+	// locations new_source = copy_access(source);
+	rel = points_to_approximation(j);
+	pt_to = make_points_to(source, new_sink, rel,
+			       make_descriptor_none());
+	gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
+				     (void*) pt_to );
+      }
+      /* in case x = y[i]*/
+      if(array_entity_p(ent2)){
+	new_sink = make_cell_reference(copy_reference(ref2));
+	// locations new_source = copy_access(source);
+	rel =make_approximation_exact();
+	pt_to = make_points_to(source, new_sink, rel,
+			       make_descriptor_none());
+	gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
+				     (void*) pt_to );
+      }
 
-	  // creation of the written set
-	  // search of all the points_to relations in the
-	  // alias set where the source is equal to the lhs
-	  SET_FOREACH(points_to, k, pts_to_set){
-		if(locations_equal_p(points_to_source(k), source))
-		  written_pts_to = set_add_element(written_pts_to,
-										   written_pts_to, (void *)k);
-	  }
-	  pts_to_set = set_difference(pts_to_set,
-								  pts_to_set,
-								  written_pts_to);
-	  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
-	  ifdebug(1)
-		print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
-							pts_to_set);
-	}
+      // creation of the written set
+      // search of all the points_to relations in the
+      // alias set where the source is equal to the lhs
+      SET_FOREACH(points_to, k, pts_to_set){
+	if(locations_equal_p(points_to_source(k), source))
+	  written_pts_to = set_add_element(written_pts_to,
+					   written_pts_to, (void *)k);
+      }
+      pts_to_set = set_difference(pts_to_set,
+				  pts_to_set,
+				  written_pts_to);
+      pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
+      ifdebug(1)
+	print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+			    pts_to_set);
+    }
   }
   else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
+    ifdebug(1) {
+      pips_debug(1, "Neither variable is a pointer\n");
+    }
   }
   return pts_to_set;
 }
@@ -2212,8 +2212,8 @@ set basic_ptr_to_field_ref(set pts_to_set,
   if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
     ref2 = syntax_reference(syn2);
     ent2=reference_variable(ref2);
-    if((type_pointer_p(lhs_tmp)&&(type_pointer_p(rhs) || array_entity_p(ent2))) ||
-       (type_double_pointer_p(lhs_tmp)&& type_double_pointer_p(rhs))){
+    if((expression_pointer_p(lhs_tmp)&&(expression_pointer_p(rhs) || array_entity_p(ent2))) ||
+       (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs))){
       // creation of the source
       effect e1 = effect_undefined, e2 = effect_undefined;
       set_methods_for_proper_simple_effects();
@@ -2413,11 +2413,11 @@ set struct_double_pointer(set pts_to_set, expression lhs, expression rhs)
 // the result should be m.field1 = n.field2... A.M
 
 set struct_decomposition(expression lhs,
-						 expression rhs,
-						 set pt_in)
+			 expression rhs,
+			 set pt_in)
 {
   set pt_out = set_generic_make(set_private,
-								points_to_equal_p,points_to_rank);
+				points_to_equal_p,points_to_rank);
   pt_out = set_assign(pt_out, pt_in);
   entity e1 = expression_to_entity(lhs);
   entity e2 = expression_to_entity(rhs);
@@ -2434,92 +2434,92 @@ set struct_decomposition(expression lhs,
   list l1 = type_struct(tt1);
   list l2 = type_struct(tt2);
   FOREACH(ENTITY, i, l1) {
-	if(type_double_pointer_p(entity_to_expression(i))
-	   || type_pointer_p(entity_to_expression(i))) {
-	  ent2 = ENTITY (CAR(l2));
-	  expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-									  lhs,
-									  entity_to_expression(i));
-	  expression ex2 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-									  rhs,
-									  entity_to_expression(ent2));
-	  expression_consistent_p(ex1);
-	  expression_consistent_p(ex1);
-	  pt_out = set_union(pt_out, pt_out,
-						 struct_pointer(pt_in,
-										copy_expression(ex1),
-										copy_expression(ex2)));
-	}
-	l2 = CDR(l2);
+    if(expression_double_pointer_p(entity_to_expression(i))
+       || expression_pointer_p(entity_to_expression(i))) {
+      ent2 = ENTITY (CAR(l2));
+      expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
+				      lhs,
+				      entity_to_expression(i));
+      expression ex2 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
+				      rhs,
+				      entity_to_expression(ent2));
+      expression_consistent_p(ex1);
+      expression_consistent_p(ex1);
+      pt_out = set_union(pt_out, pt_out,
+			 struct_pointer(pt_in,
+					copy_expression(ex1),
+					copy_expression(ex2)));
+    }
+    l2 = CDR(l2);
   }
   return pt_out;
 }
 
 /* first version of the treatment of the heap : x = ()malloc(sizeof()) */
 set basic_ref_heap(set pts_to_set,
-				   expression lhs,
-				   expression rhs,
-				   statement current)
+		   expression lhs,
+		   expression rhs,
+		   statement current)
 {
-
-  set gen_pts_to =set_generic_make(set_private,
-								   points_to_equal_p,points_to_rank);
+  set gen_pts_to = set_generic_make(set_private,
+				    points_to_equal_p,points_to_rank);
   set written_pts_to = set_generic_make(set_private,
-										points_to_equal_p,points_to_rank);
+					points_to_equal_p,points_to_rank);
 
   points_to pt_to = points_to_undefined;
-  syntax syn1=syntax_undefined;
-  syntax syn2=syntax_undefined;
-  reference ref1 = reference_undefined;
+  syntax syn1 = expression_syntax(lhs);
+  syntax syn2 = expression_syntax(rhs);
+  reference ref1 = syntax_reference(syn1);
   reference ref2 = reference_undefined;
-  entity ent1 = entity_undefined;
+  entity ent1 = reference_variable(ref1);
   cell source = cell_undefined;
   cell sink = cell_undefined;
   approximation rel = approximation_undefined;
   string ss;
+  entity en = entity_undefined;
+  list l = NIL;
 
   ifdebug(1){
-	pips_debug(1, " case  x =()malloc(sizeof()) \n");
+    pips_debug(1, " case  x =()malloc(sizeof()) \n");
   }
-  syn1=expression_syntax(lhs);
-  ref1=syntax_reference(syn1);
-  ent1=reference_variable(ref1);
-  entity en = entity_undefined;
-  syn2 = expression_syntax(rhs);
-  list l = NIL;
+
   if(syntax_call_p(syn2)){
-	call c = syntax_call(syn2);
-	l = call_arguments(c);
-	en = call_function(c);
+    call c = syntax_call(syn2);
+    l = call_arguments(c);
+    en = call_function(c);
   }
   if(syntax_cast_p(syn2)){
-	cast ct = syntax_cast(syn2);
-	expression e = cast_expression(ct);
-	syntax s = expression_syntax(e);
-	if(syntax_call_p(s)){
-	  call cc = syntax_call(s);
-	  l = call_arguments(cc);
-	  en = call_function(cc);
-	  ss = entity_local_name(en);
+    cast ct = syntax_cast(syn2);
+    expression e = cast_expression(ct);
+    syntax s = expression_syntax(e);
+    if(syntax_call_p(s)){
+      call cc = syntax_call(s);
+      l = call_arguments(cc);
+      en = call_function(cc);
+      ss = entity_local_name(en);
 
-	}
+    }
   }
 
-  if(type_pointer_p(lhs)){
+  if(expression_pointer_p(lhs)){
     // creation of the source
     effect e1 = effect_undefined;
-	set_methods_for_proper_simple_effects();
-	set_methods_for_simple_pointer_effects();
-	//set_methods_for_proper_references();
+    type lhst = expression_to_type(lhs);
+    type pt = type_to_pointed_type(lhst);
+
+    //set_methods_for_proper_simple_effects();
+    set_methods_for_simple_pointer_effects();
+
+    //set_methods_for_proper_references();
     list  l1 = generic_proper_effects_of_complex_address_expression(lhs,
 								    &e1,
 								    true);
     effects_free(l1);
     generic_effects_reset_all_methods();
     ref1 = effect_any_reference(e1);
-    ref2 =  malloc_to_abstract_location(ref1, type_undefined,
+    ref2 =  malloc_to_abstract_location(ref1, pt,
 					type_undefined, expression_undefined,
-					entity_undefined,
+					get_current_module_entity(),
 					statement_number(current));
 
     source = make_cell_reference(ref1);
@@ -2556,9 +2556,9 @@ set basic_ref_heap(set pts_to_set,
     }
   }
   else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
+    ifdebug(1) {
+      pips_debug(1, "Neither variable is a pointer\n");
+    }
   }
   return pts_to_set;
 }

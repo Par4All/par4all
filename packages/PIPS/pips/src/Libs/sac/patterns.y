@@ -102,6 +102,8 @@ static size_t opcode_argc =0;
 %token DI_REF_TOK
 %token SF_REF_TOK
 %token DF_REF_TOK
+%token SC_REF_TOK
+%token DC_REF_TOK
 %token LOG_REF_TOK
 %token CONSTANT_TOK
 
@@ -201,6 +203,8 @@ type:
      | DI_REF_TOK                       { $$ = DI_REF_TOK; }
      | SF_REF_TOK                       { $$ = SF_REF_TOK; }
      | DF_REF_TOK                       { $$ = DF_REF_TOK; }
+	 | SC_REF_TOK						{ $$ = SC_REF_TOK; }
+	 | DC_REF_TOK						{ $$ = DC_REF_TOK; }
      | LOG_REF_TOK                      { $$ = LOG_REF_TOK; }
 
 tokens_list:

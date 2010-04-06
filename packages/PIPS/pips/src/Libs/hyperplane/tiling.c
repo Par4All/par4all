@@ -86,6 +86,34 @@ make_tile_index_entity(entity old_index)
   return make_new_index_entity(old_index, "_t");
 }
 
+bool
+static_partitioning_matrix(matrice P, int n, string serialized_matrix)
+{
+    pips_assert("interactive_partitioning_matrix", n>=1);
+    bool status = false;
+    if( serialized_matrix && !string_undefined_p(serialized_matrix) && !empty_string_p(serialized_matrix))
+    {
+        int row,col;
+        string ctxt0,ctxt1;
+        string saved_ptr,buffer,elem;
+        saved_ptr= buffer = strdup(serialized_matrix);
+        string line = strtok_r(buffer,",",&ctxt0);
+        DENOMINATOR(P) = VALUE_ONE;
+        for(row=1;row<=n;row++){
+            elem = strtok_r(line," ",&ctxt1);
+            for(col=1;col<=n;col++)
+            {
+                ACCESS(P, n, row, col)=atoi(elem);
+                elem = strtok_r(NULL," ",&ctxt1);
+            }
+            line = strtok_r(NULL,",",&ctxt0);
+        }
+        status= ( line == NULL ) && (elem == NULL );
+        free(saved_ptr);
+    }
+    return status;
+}
+
 /* Query the user for a partitioning matrix P
  */
 
@@ -296,8 +324,11 @@ tiling( list lls)
     P = matrice_new(n, n);
     HT = matrice_new(n, n);
 
-    if(!interactive_partitioning_matrix(P, n)) {
-	pips_user_error("A proper partitioning matrix was not provided\n");
+    if( 
+            !static_partitioning_matrix(P,n,get_string_property("LOOP_TILING_MATRIX")) &&
+            !interactive_partitioning_matrix(P, n)
+      ) {
+        pips_user_error("A proper partitioning matrix was not provided\n");
     }
 
     ifdebug(8) {

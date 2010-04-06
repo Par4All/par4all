@@ -101,6 +101,9 @@ static char * table_of_AC_operators[] =
   EOLE_PROD_OPERATOR_NAME,
   MIN_OPERATOR_NAME,
   MAX_OPERATOR_NAME,
+  PLUS_OPERATOR_NAME,
+  MINUS_OPERATOR_NAME,
+  MULTIPLY_OPERATOR_NAME,
   NULL
 };
 
@@ -169,10 +172,16 @@ static void pop_nesting(statement s)
  */
 static bool side_effects_p(expression e)
 {
-  effects ef = load_expr_prw_effects(e);
-  list /* of effect */ le = effects_effects(ef);
-  MAP(EFFECT, ef, if (effect_write_p(ef)) return TRUE, le);
-  return FALSE;
+    pips_debug(1,"considering expression %s\n",words_to_string(words_expression(e,NIL)));
+    effects ef = load_expr_prw_effects(e);
+    list /* of effect */ le = effects_effects(ef);
+    FOREACH(EFFECT, ef,le)
+        if (effect_write_p(ef)) {
+            pips_debug(1,"has side effects\n");
+            return TRUE;
+        }
+    pips_debug(1,"does not have side effects\n");
+    return FALSE;
 }
 
 /* Some effect in les interfere with var.
@@ -181,8 +190,9 @@ static bool interference_on(entity var, list /* of effect */ les)
 {
   FOREACH(EFFECT, ef, les)
   {
-      if (effect_write_p(ef) &&
-	  entity_conflict_p(var, reference_variable(effect_any_reference(ef))))
+      if (entity_all_locations_p(effect_entity(ef))
+              || (effect_write_p(ef) &&
+	  entity_conflict_p(var, reference_variable(effect_any_reference(ef)))))
       {
 	return TRUE;
       }
@@ -545,17 +555,21 @@ static void print_group_expr(gen_array_t /* array of group of expressions */ g
 */
 static void do_atomize_if_different_level(expression e, int level)
 {
-  int elevel = expr_level_of(e);
+    int elevel = expr_level_of(e);
 
-  if (elevel!=-1 &&
-      elevel<level &&
-      atomizable_sub_expression_p(e) &&
-      !side_effects_p(e))
+    pips_debug(1,"considering expression %s\n",words_to_string(words_expression(e,NIL)));
+    if (elevel!=-1 &&
+            elevel<level &&
+            atomizable_sub_expression_p(e) &&
+            !side_effects_p(e))
     {
-      statement atom = atomize_this_expression(hpfc_new_variable, e);
-      if (atom)
-	insert_before_statement(atom, statement_of_level(elevel), TRUE);
+        pips_debug(1,"atomize \n");
+        statement atom = atomize_this_expression(hpfc_new_variable, e);
+        if (atom)
+            insert_before_statement(atom, statement_of_level(elevel), TRUE);
     }
+    else
+        pips_debug(1,"not atomize\n");
 }
 
 static void atomize_call(call c, int level)
@@ -568,7 +582,8 @@ static void atomize_call(call c, int level)
 
   if (lenargs>=2)
   {
-    MAP(EXPRESSION, sube, do_atomize_if_different_level(sube, level), args);
+    FOREACH(EXPRESSION, sube, args)
+        do_atomize_if_different_level(sube, level);
   }
 }
 
@@ -595,6 +610,8 @@ static void atomize_or_associate_for_level(expression e, int level)
   syn = expression_syntax(e);
   if (!syntax_call_p(syn))
     return;
+
+  pips_debug(1,"considering expression %s\n",words_to_string(words_expression(e,NIL)));
 
   /* something to icm
    */
@@ -1015,7 +1032,7 @@ void perform_icm_association(string name, /* of the module */
       /* could also push while loops... */
       expression_domain, gen_true, atomize_or_associate,
       /* do not atomize index computations at the time... */
-      reference_domain, gen_false, gen_null,
+      //reference_domain, gen_false, gen_null,
       call_domain, icm_atom_call_flt, gen_null, /* skip IO calls */
 		    NULL);
   /* insert moved code in statement. */
@@ -1358,6 +1375,7 @@ static available_scalar_pt make_available_scalar(entity scalar,
 						 statement container,
 						 expression contents)
 {
+    pips_debug(2,"adding new scalar to pool:%s\nas a container for %s\n",entity_user_name(scalar),words_to_string(words_expression(contents,NIL)));
   syntax s = expression_syntax(contents);
 
   available_scalar_pt aspt =
@@ -1811,9 +1829,23 @@ static bool seq_flt(sequence s)
     top_of_w_effects = w_effects;
 
     FOREACH(STATEMENT, ss,sequence_statements(s))
+    {
         availables = atomize_cse_this_statement_expressions(ss, availables);
+    }
 
     /* Free top_of_w_effects and availables */
+    gen_full_free_list(*top_of_w_effects);
+    return true;
+}
+/* handle all calls not in a sequence */
+static bool call_flt(call c)
+{
+    statement parent = (statement)gen_get_ancestor(statement_domain,c);
+    pips_debug(1,"considering statement:\n");
+    ifdebug(1) { print_statement(parent); }
+    list availables = NIL;
+    list *top_of_w_effects = w_effects = &CDR(gen_cons(NIL,NIL));
+    availables = atomize_cse_this_statement_expressions(parent,availables);
     gen_full_free_list(*top_of_w_effects);
     return true;
 }
@@ -1834,7 +1866,10 @@ void perform_ac_cse(__attribute__((unused)) string name, statement s)
   /* make_current_statement_stack(); */
   init_inserted();
 
-  gen_recurse(s, sequence_domain, seq_flt, gen_null);
+  gen_multi_recurse(s, 
+          sequence_domain, seq_flt, gen_null,
+          call_domain, call_flt, gen_null,
+          0);
 
   /* insert moved code in statement. */
   gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);

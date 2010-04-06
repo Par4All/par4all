@@ -437,58 +437,72 @@ words_subscript_range(range obj, list pdl)
 }
 
 /* exported for expression.c
+ *
+ * Should only be used to prettyprint proper C references.
  */
-list
-words_reference(reference obj, list pdl)
+list words_any_reference(reference obj, list pdl, string (*enf)(entity))
 {
   list pc = NIL;
   string begin_attachment;
-
+  string cmn = get_current_module_name();
+  entity cme = get_current_module_entity();
+  string cun = compilation_unit_of_module(cmn);
   entity e = reference_variable(obj);
+  string emn = entity_module_name(e);
 
-  pc = CHAIN_SWORD(pc, entity_user_name(e));
+  /* entity_user_name() returns a shorter result than
+     entity_minimal_user_name() because the second one avoids
+     ambiguity.*/
+  //pc = CHAIN_SWORD(pc, entity_minimal_user_name(e));
+  pc = CHAIN_SWORD(pc, (*enf)(e));
+
   begin_attachment = STRING(CAR(pc));
 
   if (reference_indices(obj) != NIL) {
-    if (prettyprint_is_fortran)
-      {
-	pc = CHAIN_SWORD(pc,"(");
-	MAPL(pi, {
-	  expression subscript = EXPRESSION(CAR(pi));
-	  syntax ssubscript = expression_syntax(subscript);
+    if (prettyprint_is_fortran) {
+      int count = 0;
+      pc = CHAIN_SWORD(pc,"(");
+      FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+	syntax ssubscript = expression_syntax(subscript);
 
-	  if(syntax_range_p(ssubscript)) {
-	    pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript), pdl));
-	  }
-	  else {
-	    pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
-	  }
+	if (count>0)
+	  pc = CHAIN_SWORD(pc,",");
+	else
+	  count++;
 
-	  if (CDR(pi) != NIL)
-	    pc = CHAIN_SWORD(pc,",");
-	}, reference_indices(obj));
-	pc = CHAIN_SWORD(pc,")");
+	if(syntax_range_p(ssubscript)) {
+	  pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript), pdl));
+	}
+	else {
+	  pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+	}
+
       }
-    else
-      {
-	MAPL(pi, {
-	  expression subscript = EXPRESSION(CAR(pi));
-	  syntax ssubscript = expression_syntax(subscript);
-	  pc = CHAIN_SWORD(pc, "[");
-	  if(syntax_range_p(ssubscript)) {
-	    pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript), pdl));
-	  }
-	  else {
-	    pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
-	  }
-	  pc = CHAIN_SWORD(pc, "]");
-	}, reference_indices(obj));
+      pc = CHAIN_SWORD(pc,")");
+    }
+    else { /* C language*/
+      FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+	syntax ssubscript = expression_syntax(subscript);
+	pc = CHAIN_SWORD(pc, "[");
+	if(syntax_range_p(ssubscript)) {
+	  pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript), pdl));
+	}
+	else {
+	  pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+	}
+	pc = CHAIN_SWORD(pc, "]");
       }
+    }
   }
   attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
 				obj);
 
   return(pc);
+}
+
+list words_reference(reference obj, list pdl)
+{
+  return words_any_reference(obj, pdl, entity_user_name);
 }
 
 /* Management of alternate returns */

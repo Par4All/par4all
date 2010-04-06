@@ -1207,12 +1207,17 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* remove global variables if needed */
     if(get_bool_property("OUTLINE_ALLOW_GLOBALS"))
     {
+        string cu_name = compilation_unit_of_module(get_current_module_name());
+        entity cu = module_name_to_entity(cu_name);
+        list cu_decls = entity_declarations(cu);
+
         tmp_list=NIL;
+
         FOREACH(ENTITY,e,referenced_entities)
         {
-            if(!top_level_entity_p(e))
+            if( !top_level_entity_p(e) && gen_chunk_undefined_p(gen_find_eq(e,cu_decls) ) )
                 tmp_list=CONS(ENTITY,e,tmp_list);
-            else
+            else if (gen_chunk_undefined_p(gen_find_eq(e,cu_decls)))
             {
                 AddLocalEntityToDeclarations(e,new_fun,body);
             }
@@ -1239,19 +1244,18 @@ statement outliner(string outline_module_name, list statements_to_outline)
                 /* for parameter case */ (is_parameter_p=(entity_symbolic_p(e) && storage_rom_p(entity_storage(e)) && type_functional_p(t))) )
         {
             /* this create the dummy parameter */
-            type new_type = copy_type(t);
             entity dummy_entity = FindOrCreateEntity(
                     outline_module_name,
                     entity_user_name(e)
                     );
             entity_type(dummy_entity)=is_parameter_p?
                 make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):
-                new_type;
+                copy_type(t);
             entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
 
 
             formal_parameters=CONS(PARAMETER,make_parameter(
-                        is_parameter_p?make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):copy_type(new_type),
+                        is_parameter_p?make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):copy_type(t),
                         fortran_module_p(get_current_module_entity())?make_mode_reference():make_mode_value(),
                         make_dummy_identifier(dummy_entity)),formal_parameters);
 
@@ -1293,10 +1297,9 @@ statement outliner(string outline_module_name, list statements_to_outline)
                         entity_written
                   )
                 {
-                    type t = copy_type(entity_type(e));
                     entity_type(e)=make_type_variable(
                             make_variable(
-                                make_basic_pointer(t),
+                                make_basic_pointer(copy_type(entity_type(e))),
                                 NIL,
                                 NIL
                                 )
@@ -1337,7 +1340,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 	 */
 	gen_free_list(code_declarations(EntityCode(new_fun)));
 	code_declarations(EntityCode(new_fun))=NIL;
-
+/*
     FOREACH(PARAMETER,p,formal_parameters) {
         entity e = dummy_identifier(parameter_dummy(p));
         if(entity_variable_p(e)) {
@@ -1345,7 +1348,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
             entity_type(e)=type_undefined;
         }
     }
-
+*/
 
     /* and return the replacement statement */
     instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));
