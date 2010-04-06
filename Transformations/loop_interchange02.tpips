@@ -1,19 +1,11 @@
-delete loop_interchange02
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete loop_interchange02
 create loop_interchange02 loop_interchange02.c
 
-#setenv C_SYNTAX_DEBUG_LEVEL 9
-#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
-activate C_PARSER
-
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+# setenv C_SYNTAX_DEBUG_LEVEL 9
+# setproperty GENERATE_MISSING_SOURCE_FILES TRUE
 # setproperty PRETTYPRINT_BLOCKS TRUE
-#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+# setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
 
 # We use the winning combination, except TRANSFORMERS_IN_CONTEXT
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION

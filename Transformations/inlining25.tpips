@@ -1,14 +1,13 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 #
 # $Id: anr999-pips.tpips 149 2009-08-25 06:31:20Z coelho $
 #
 
 delete inlining25
-setproperty ABORT_ON_USER_ERROR TRUE
 create inlining25 inlining25.c
 
-activate C_PARSER
 activate C_SYMBOL_TABLE
-setproperty PRETTYPRINT_C_CODE TRUE
+
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 

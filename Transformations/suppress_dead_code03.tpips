@@ -1,11 +1,7 @@
-delete suppress_dead_code03
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete suppress_dead_code03
 create suppress_dead_code03 suppress_dead_code03.c
 
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 

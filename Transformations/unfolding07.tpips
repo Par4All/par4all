@@ -1,17 +1,10 @@
-delete unfolding07
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete unfolding07
 create unfolding07 unfolding07.c
-activate C_PARSER
+
 activate C_SYMBOL_TABLE
 
-setproperty PRETTYPRINT_C_CODE TRUE
-#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 # source code for middleware send_buff() and receive_buff() not available:
 

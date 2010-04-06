@@ -124,6 +124,8 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 INITIAL_PRECONDITION[call09] (add_or_kill_equivalenced_variables) storage return
 INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return

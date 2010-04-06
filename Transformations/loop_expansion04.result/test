@@ -1,0 +1,19 @@
+raw file with loop flagged and privated variables scanned
+int elligent(long le, short ie)
+{
+   short eil;
+l99999:
+   for(eil = 0; eil <= ie-1; eil += 1)
+      le += eil;
+   return eil;
+}
+after loop expansion
+int elligent(long le, short ie)
+{
+   short eil;
+l99999:
+   for(eil = 0; eil <= 128*((127+ie)/128)-1; eil += 1)
+      if (eil>=0&&eil<=ie-1) 
+         le += eil;
+   return eil;
+}

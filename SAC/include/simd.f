@@ -21,6 +21,13 @@
       vec(3) = base(3)
       vec(4) = base(4)
       end
+      subroutine simd_load_v2di(vec, base)
+      integer*8 vec(2)
+      integer*8 base(2)
+      
+      vec(1) = base(1)
+      vec(2) = base(2)
+      end
       subroutine simd_load_v2df(vec, base)
       real*8 vec(2)
       real*8 base(2)
@@ -40,6 +47,14 @@
       vec(2) = x2
       vec(3) = x3
       vec(4) = x4
+      end
+      subroutine simd_load_generic_v2di(vec, x1, x2)
+      integer*8 vec(2)
+      integer*8 x1
+      integer*8 x2
+
+      vec(1) = x1
+      vec(2) = x2
       end
       subroutine simd_load_generic_v2df(vec, x1, x2)
       real*8 vec(2)
@@ -79,6 +94,13 @@
       base(2) = vec(2)
       base(3) = vec(3)
       base(4) = vec(4)
+      end
+      subroutine simd_save_v2di(vec, base)
+      integer*8 vec(2)
+      integer*8 base(2)
+      
+      base(1) = vec(1)
+      base(2) = vec(2)
       end
       subroutine simd_save_v2df(vec, base)
       real*8 vec(2)
@@ -180,6 +202,25 @@
       dest(3) = src1(3) - src2(3)
       dest(4) = src1(4) - src2(4)
       end
+
+      subroutine simd_addcs(dest, src1, src2)
+      complex dest(2)
+      complex src1(2)
+      complex src2(2)
+
+      dest(1) = src1(1) + src2(1)
+      dest(2) = src1(2) + src2(2)
+      end
+
+      subroutine simd_mulcs(dest, src1, src2)
+      complex dest(2)
+      complex src1(2)
+      complex src2(2)
+
+      dest(1) = src1(1) * src2(1)
+      dest(2) = src1(2) * src2(2)
+      end
+
       subroutine simd_subpd(dest, src1, src2)
       real*8 dest(2)
       real*8 src1(2)
@@ -275,6 +316,14 @@
       
       base(1) = vec(1)
       base(2) = vec(2)
+      end
+      subroutine simd_save_generic_v2di(vec, x1, x2)
+      integer*8 vec(2)
+      integer*8 x1
+      integer*8 x2
+
+      x1 = vec(1)
+      x2 = vec(2)
       end
       
       subroutine simd_save_generic_v2si(vec, x1, x2)
@@ -398,14 +447,14 @@
       end
       subroutine simd_load_generic_v8hi(vec,b0,b1,b2,b3,b4,b5,b6,b7)
       integer*1 vec(8)
-      integer*1 b0(8)
-      integer*1 b1(8)
-      integer*1 b2(8)
-      integer*1 b3(8)
-      integer*1 b4(8)
-      integer*1 b5(8)
-      integer*1 b6(8)
-      integer*1 b7(8)
+      integer*1 b0
+      integer*1 b1
+      integer*1 b2
+      integer*1 b3
+      integer*1 b4
+      integer*1 b5
+      integer*1 b6
+      integer*1 b7
       
       vec(1) = b1
       vec(2) = b2

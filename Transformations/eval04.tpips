@@ -1,12 +1,6 @@
-delete eval04
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete eval04
 create eval04 eval04.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 # We want to see what happens with C "for" loops
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
@@ -35,6 +29,6 @@ activate PRINT_CODE
 display PRINTED_FILE[eval04]
 
 close eval04
-#delete eval04
+delete eval04
 quit
 

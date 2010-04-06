@@ -7,7 +7,7 @@ Module EQUIV24 selected
 Main module PROGRAM "EQUIV24" selected.
 Module EQUIV24 already active.
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module EQUIV24 already active.
 Request: build resource PRINTED_FILE for module EQUIV24.
   BOOTSTRAP                      building   ENTITIES()

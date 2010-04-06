@@ -1,13 +1,9 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete flatten_code02
 
-setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 
 create flatten_code02 flatten_code02.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code

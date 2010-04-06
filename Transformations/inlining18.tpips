@@ -1,12 +1,11 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete inlining18
 create inlining18 inlining18.c
-setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_C_CODE TRUE
-activate C_PARSER
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
 display PRINTED_FILE[%ALLFUNC]
 apply INLINING[foo]
 display PRINTED_FILE[inlining18!,main]
+
 close
 delete inlining18
 quit

@@ -1,5 +1,5 @@
-user warning, property ACTIVE_PHASES redefined
-user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property ACTIVE_PHASES redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
 user warning in tp_parse: inter06: No such workspace
 Registering file inter06.f
 Splitting file    ./inter06.f

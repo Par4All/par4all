@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS = complex_add
 delete $WS
 create $WS $WS.c include/SIMD.c

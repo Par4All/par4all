@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete MMULT
 create MMULT mmult.c include/SIMD.c
 

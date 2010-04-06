@@ -1,14 +1,9 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete flatten_code10
 
-setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 
 create flatten_code10 flatten_code10.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER   FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER  TRUE
 
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE

@@ -5,11 +5,6 @@ setproperty PRETTYPRINT_BLOCKS TRUE
 
 create flatten_code11 flatten_code11.c
 
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER  TRUE
-
-#setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
 
 setproperty PRETTYPRINT_TRANSFORMER    FALSE

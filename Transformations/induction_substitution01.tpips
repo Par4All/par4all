@@ -1,12 +1,6 @@
-delete induction_substitution01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete induction_substitution01
 create induction_substitution01 induction_substitution01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code for "induction01"

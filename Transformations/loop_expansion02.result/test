@@ -14,7 +14,7 @@ int pop(int pop)
    int I_0;
    I_0 = i;
 l99999:
-   for(i = I_0; i <= I_0+128*((127-i+op)/128)-1; i += 1)
+   for(i = i; i <= I_0+128*((127-i+op)/128)-1; i += 1)
       if (i>=I_0&&i<=op-1) 
          printf("%d", i);
 }

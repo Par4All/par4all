@@ -1,12 +1,6 @@
-delete inlining04
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete inlining04
 create inlining04 inlining04.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code

@@ -1,12 +1,6 @@
-delete silber01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete silber01
 create silber01 silber01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code
@@ -61,6 +55,6 @@ apply UNSPLIT
 shell cc -c silber01.database/Src/silber01.c
 
 close
-#delete silber01
+delete silber01
 quit
 

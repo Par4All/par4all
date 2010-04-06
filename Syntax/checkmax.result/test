@@ -1,5 +1,5 @@
 user warning in tp_parse: checkmax: No such workspace
-user warning, property PARSER_TYPE_CHECK_CALL_SITES redefined
+user warning in parse_properties: property PARSER_TYPE_CHECK_CALL_SITES redefined
 user warning in update_functional_type_with_actual_arguments: incompatible 3rd actual argument and type in call to MAX0 between lines 12 and 12. Current type is not updated
 user warning in update_functional_type_with_actual_arguments: incompatible 3rd actual argument and type in call to AMAX1 between lines 19 and 19. Current type is not updated
 user warning in update_functional_type_with_actual_arguments: incompatible 6th actual argument and type in call to AMAX0 between lines 31 and 31. Current type is not updated

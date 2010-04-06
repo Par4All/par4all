@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 setenv ws loop_expansion03
 delete $ws
 create $ws $ws.c

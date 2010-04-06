@@ -1,5 +1,5 @@
-user warning, property ACTIVE_PHASES redefined
-user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property ACTIVE_PHASES redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
 user warning in tp_parse: altret11: No such workspace
 Registering file altret11.f
 Splitting file    ./altret11.f
@@ -7,11 +7,11 @@ Splitting file    ./altret11.f
 Workspace altret11 created and opened.
 Module ALTRET11 selected
 setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
-user warning, property PARSER_SUBSTITUTE_ALTERNATE_RETURNS redefined
+user warning in parse_properties: property PARSER_SUBSTITUTE_ALTERNATE_RETURNS redefined
 setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
-user warning, property PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS redefined
+user warning in parse_properties: property PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS redefined
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
-user warning, property PRETTYPRINT_ALL_DECLARATIONS redefined
+user warning in parse_properties: property PRETTYPRINT_ALL_DECLARATIONS redefined
 Module ALTRET11 already active.
 Request: build resource PRINTED_FILE for module ALTRET11.
   BOOTSTRAP                      building   ENTITIES()

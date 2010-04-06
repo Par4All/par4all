@@ -1,5 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete privatization05
 create privatization05 privatization05.f
+
 apply PRIVATIZE_MODULE[PRIVATIZATION05]
 setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
 #setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"

@@ -1,13 +1,6 @@
-delete remove01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete remove01
 create remove01 remove01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 module volume
 

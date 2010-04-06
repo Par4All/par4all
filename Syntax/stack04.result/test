@@ -6,7 +6,7 @@ Workspace stack04 created and opened.
 Module STACK04 selected
 Module STACK04 already active.
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module STACK04 already active.
 Request: build resource PRINTED_FILE for module STACK04.
   BOOTSTRAP                      building   ENTITIES()

@@ -1,7 +1,3 @@
-Select some options to deal with the C Language:
-Parse as C:
-If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
-Prettyprint the source as C, of course
 Select the most precise analysis:
 int main(int argc, char *argv[])
 {
@@ -23,10 +19,10 @@ init_kernel:   for (i = 0;i<64;i++)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
 
 int main(int argc, char *argv[])
 {
@@ -35,13 +31,13 @@ int main(int argc, char *argv[])
 init_kernel:
    for(i = 0; i <= 63; i += 1)
 
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2,
-//    PHI2<=63, 0<=i, i<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
+//    i<=63}>
 
       for(j = 0; j <= 63; j += 1)
 
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          imagein_re[i][j] = 2*i;
 
@@ -51,8 +47,8 @@ init_kernel:
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -63,10 +59,10 @@ init_kernel:
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
 
 int main(int argc, char *argv[])
 {
@@ -75,13 +71,13 @@ int main(int argc, char *argv[])
 init_kernel:
    for(i = 0; i <= 63; i += 1)
 
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2,
-//    PHI2<=63, 0<=i, i<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
+//    i<=63}>
 
       for(j = 0; j <= 63; j += 1)
 
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          imagein_re[i][j] = 2*i;
 
@@ -91,8 +87,8 @@ init_kernel:
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -104,10 +100,10 @@ The first loop nest must be parallel:
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
 
 int main(int argc, char *argv[])
 {
@@ -117,14 +113,14 @@ int main(int argc, char *argv[])
 init_kernel:
    for(i = 0; i <= 63; i += 1)
 
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2,
-//    PHI2<=63, 0<=i, i<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
+//    i<=63}>
 
 #pragma omp parallel for 
       for(j = 0; j <= 63; j += 1)
 
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          imagein_re[i][j] = 2*i;
 
@@ -134,8 +130,8 @@ init_kernel:
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -168,10 +164,10 @@ init_kernel:
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
 
 int main(int argc, char *argv[])
 {
@@ -185,8 +181,8 @@ init_kernel:   init_kernel(imagein_re);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -225,10 +221,10 @@ init_kernel:
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63,
-//    0<=PHI2, PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
 
 int main(int argc, char *argv[])
 {
@@ -242,8 +238,8 @@ init_kernel:   init_kernel(imagein_re);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=63, 0<=j, j<=63}>
+//  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");

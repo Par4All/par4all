@@ -1,11 +1,6 @@
-delete outline01
-
 setproperty ABORT_ON_USER_ERROR TRUE
+delete outline01
 create outline01 outline01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code

@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete simdizer01
 create simdizer01 simdizer01.c include/SIMD.c
 
