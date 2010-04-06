@@ -3,24 +3,24 @@ Source code with proper effects
 
 int call12(void)
 {
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
+//               <must be read   >: j
 
    return j;                                                            /*0009*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
 int call12(void)
 {
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
+//               <must be read   >: j
 
    return j;                                                            /*0009*/
 }
@@ -28,16 +28,16 @@ int call12(void)
 Source code with transformers for "call12"
 
 
-//  T(TOP-LEVEL:j,call12) {TOP-LEVEL:j==call12, TOP-LEVEL:j==j#init+1}
+//  T(call12,j) {call12==j, call12==j#init+1}
 
 int call12(void)
 {
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
    j++;                                                                 /*0007*/
 
-//  T(call12) {TOP-LEVEL:j==call12}
+//  T(call12) {call12==j}
 
 
    return j;                                                            /*0009*/
@@ -46,7 +46,7 @@ int call12(void)
 Source code with transformers for "main"
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+2}
+//  T(j) {j==j#init+2}
 
 int main()
 {
@@ -55,12 +55,12 @@ int main()
 
    int ai = 3;                                                          /*0014*/
 
-//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==ai, TOP-LEVEL:j==j#init+1}
+//  T(ai,j) {ai==j, ai==j#init+1}
 
 
    ai = call12();                                                       /*0016*/
 
-//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==ai, TOP-LEVEL:j==j#init+1}
+//  T(ai,j) {ai==j, ai==j#init+1}
 
 
    ai = call12();                                                       /*0018*/
@@ -74,17 +74,16 @@ int main()
 Source code with preconditions for "call12"
 
 
-//  P() {0<=TOP-LEVEL:j, TOP-LEVEL:j<=1}
+//  P() {0<=j, j<=1}
 
 int call12(void)
 {
 
-//  P() {0<=TOP-LEVEL:j, TOP-LEVEL:j<=1}
+//  P() {0<=j, j<=1}
 
    j++;                                                                 /*0007*/
 
-//  P(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1, 1<=TOP-LEVEL:j,
-//    TOP-LEVEL:j<=2}
+//  P(j) {j==j#init+1, 1<=j, j<=2}
 
 
    return j;                                                            /*0009*/
@@ -93,26 +92,26 @@ int call12(void)
 Source code with preconditions for "main"
 
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
 int main()
 {
 
-//  P() {TOP-LEVEL:j==0}
+//  P() {j==0}
 
    int ai = 3;                                                          /*0014*/
 
-//  P() {TOP-LEVEL:j==0, ai==3}
+//  P() {ai==3, j==0}
 
 
    ai = call12();                                                       /*0016*/
 
-//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==1, ai==1, j#init==0}
+//  P(ai,j) {ai==1, j==1, j#init==0}
 
 
    ai = call12();                                                       /*0018*/
 
-//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==2, ai==2, j#init==0}
+//  P(ai,j) {ai==2, j==2, j#init==0}
 
 
    ai = 0;                                                              /*0020*/
@@ -121,6 +120,8 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 INITIAL_PRECONDITION[call12] (add_or_kill_equivalenced_variables) storage return
 INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return

@@ -33,7 +33,7 @@ rev=${rev#* }
 rev=${rev% *}
 
 # defaults
-root='http://svn.cri.ensmp.fr/svn'
+root='https://svn.cri.ensmp.fr/svn'
 svn='svn'
 msg=
 default_tmp="/tmp/${script}_$$"

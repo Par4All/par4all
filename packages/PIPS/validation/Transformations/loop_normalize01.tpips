@@ -1,5 +1,5 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete loop_normalize01
-set ABORT_ON_USER_ERROR TRUE
 create loop_normalize01 loop_normalize01.f
 
 apply LOOP_NORMALIZE

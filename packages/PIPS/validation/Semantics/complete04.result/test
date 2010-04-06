@@ -146,6 +146,11 @@ void complete04()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property FOR_TO_DO_LOOP_IN_CONTROLIZER redefined
+unknown[unknown] (parse_properties) property FOR_TO_WHILE_LOOP_IN_CONTROLIZER redefined
+unknown[unknown] (parse_properties) property PRETTYPRINT_BLOCKS redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 CUMULATED_EFFECTS[complete04] (rw_effects_of_forloop) Ongoing implementation! Amira mensi
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning complete04 instead
 TRANSFORMERS_INTER_FULL[complete04] (NormalizeExpression) expression is already normalized

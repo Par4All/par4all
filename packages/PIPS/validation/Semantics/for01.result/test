@@ -193,6 +193,10 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FLOW_SENSITIVE redefined
+unknown[unknown] (parse_properties) property COMPUTE_ALL_DEPENDENCES redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT redefined
 TRANSFORMERS_INTRA_FAST[main] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored
 TRANSFORMERS_INTRA_FAST[main] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return

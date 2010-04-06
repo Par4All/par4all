@@ -49,17 +49,18 @@ int ptr_to_field()
    int i = 0, j = 1;
 //  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    n = (my_str *) malloc(sizeof(my_str));
-//  {(n,*ANYWHERE*,-MAY-);(m,*ANYWHERE*,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(n,*ANY_MODULE*:*HEAP*_b0,
+//   -MAY-)}
    m->q = &i;
-//  {(n,*ANYWHERE*,-MAY-);(m[0][1],i,-Exact-)}
+//  {(m[0][1],i,-Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    m->p = &j;
-//  {(n,*ANYWHERE*,-MAY-);(m[0][2],j,-Exact-)}
+//  {(m[0][2],j,-Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    n->q = m->p;
-//  {(n[0][1],j,-Exact-);(m[0][2],j,-Exact-)}
+//  {(m[0][2],j,-Exact-);(n[0][1],j,-Exact-)}
    n->p = m->q;
-//  {(n[0][2],j,-Exact-);(m[0][2],j,-Exact-)}
+//  {(m[0][2],j,-Exact-);(n[0][2],j,-Exact-)}
 
    return 0;
    // END BLOCK

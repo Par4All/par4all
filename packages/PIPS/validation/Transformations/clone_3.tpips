@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete c3
 create c3 clone_3.f
 apply CLONE_ON_ARGUMENT(CLONEE)

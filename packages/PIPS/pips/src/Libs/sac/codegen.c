@@ -178,17 +178,16 @@ enum basic_utype get_basic_from_opcode(opcode oc, int argNum)
     switch(type)
     {
         case QI_REF_TOK:
-            return is_basic_int;
         case HI_REF_TOK:
-            return is_basic_int;
         case SI_REF_TOK:
-            return is_basic_int;
         case DI_REF_TOK:
             return is_basic_int;
         case SF_REF_TOK:
-            return is_basic_float;
         case DF_REF_TOK:
             return is_basic_float;
+        case SC_REF_TOK:
+        case DC_REF_TOK:
+            return is_basic_complex;
         default:
             pips_internal_error("subword size unknown.\n");
     }
@@ -215,6 +214,10 @@ int get_subwordSize_from_opcode(opcode oc, int argNum)
             return 32;
         case DF_REF_TOK:
             return 64;
+        case SC_REF_TOK:
+            return 64;
+        case DC_REF_TOK:
+            return 128;
         default:
             pips_internal_error("subword size unknown.\n");
     }
@@ -302,6 +305,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
                 {
                     case is_basic_int: width = 8 * basic_int(bas); break;
                     case is_basic_float: width = 8 * basic_float(bas); break;
+                    case is_basic_complex: width= 8 * basic_complex(bas); break;
                     case is_basic_logical: width = 1; break;
                     default: pips_user_error("basic %d not supported",basic_tag(bas));
                 }

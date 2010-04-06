@@ -86,27 +86,27 @@ int main()
    p = &t[1][2];                                                        /*0023*/
 //  {(p,t[1][2],-Exact-)}
    pu = t[1][2];                                                        /*0024*/
-//  {(pu,t[1][2],-Exact-);(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2],-Exact-)}
    pu = &t[1][2][0];                                                    /*0025*/
-//  {(pu,t[1][2][0],-Exact-);(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
 
    q = &t[1];                                                           /*0027*/
-//  {(q,t[1],-Exact-);(pu,t[1][2][0],-Exact-);(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-)}
    qu = t[1];                                                           /*0028*/
-//  {(qu,t[1],-Exact-);(q,t[1],-Exact-);(pu,t[1][2][0],-Exact-);(p,
-//   t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   t[1],-Exact-)}
    qu = &t[1][0];                                                       /*0029*/
-//  {(qu,t[1][0],-Exact-);(q,t[1],-Exact-);(pu,t[1][2][0],-Exact-);(p,
-//   t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   t[1][0],-Exact-)}
 
    r = &t;                                                              /*0031*/
-//  {(r,t,-Exact-);(qu,t[1][0],-Exact-);(q,t[1],-Exact-);(pu,
-//   t[1][2][0],-Exact-);(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   t[1][0],-Exact-);(r,t,-Exact-)}
    ru = t;                                                              /*0032*/
-//  {(ru,t,-Exact-);(r,t,-Exact-);(qu,t[1][0],-Exact-);(q,t[1],
-//   -Exact-);(pu,t[1][2][0],-Exact-);(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   t[1][0],-Exact-);(r,t,-Exact-);(ru,t,-Exact-)}
    ru = &t[0];                                                          /*0033*/
-//  {(ru,t[0],-Exact-);(r,t,-Exact-);(qu,t[1][0],-Exact-);(q,t[1],
-//   -Exact-);(pu,t[1][2][0],-Exact-);(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}
    return 0;                                                            /*0034*/
 }

@@ -1,15 +1,9 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 setenv WSPC flatten_code13
 delete $WSPC
 delete ${WSPC}_2
 
-setproperty ABORT_ON_USER_ERROR TRUE
-# setproperty PRETTYPRINT_BLOCKS TRUE
-
 create $WSPC $WSPC.c
-
-activate C_PARSER
-activate PRINT_CODE
-setproperty PRETTYPRINT_C_CODE TRUE
 
 # Makes the generated code unreadable, especially when it is parsed a
 # second time as is the case below

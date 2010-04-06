@@ -1,11 +1,6 @@
-delete inlining27
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete inlining27
 create inlining27 inlining27.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code

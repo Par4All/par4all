@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 #!/bin/sh
 #
 # printpriv.f test script
@@ -21,9 +22,6 @@
 # exit $exit_status
 
 delete printpriv
-
-setproperty ABORT_ON_USER_ERROR TRUE
-
 create printpriv printpriv.f
 
 apply PRIVATIZE_MODULE[PRINTPRIV]

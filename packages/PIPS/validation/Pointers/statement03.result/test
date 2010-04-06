@@ -35,10 +35,10 @@ int main()
    x = &k[2];
 //  {(x,k[2],-Exact-)}
    y = &h;
-//  {(y,h,-Exact-);(x,k[2],-Exact-)}
+//  {(x,k[2],-Exact-);(y,h,-Exact-)}
 
    x = y;
-//  {(y,h,-Exact-);(x,h,-Exact-)}
+//  {(x,h,-Exact-);(y,h,-Exact-)}
 
    return 0;
    // END BLOCK

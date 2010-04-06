@@ -1,11 +1,13 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS = average_power
 delete $WS
 create $WS $WS.c include/SIMD.c
-setproperty CONSTANT_PATH_EFFECTS FALSE
 
 module average_power
 
 display PRINTED_FILE
+
+apply SPLIT_UPDATE_OPERATOR
 
 source include/benchmark.tpips.h
 
@@ -13,6 +15,7 @@ apply UNSPLIT
 close
 
 shell cc $WS.c include/SIMD.c -o ${WS}0
+shell sed -i -e '1 i #define MOD(a,b) ((a)%(b))' -e '1 i #define MAX0(a,b) (((a)>(b))?(a):(b))' ${WS}.database/Src/$WS.c
 shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
 shell cc -Iinclude $WS.database/Src/$WS.c include/SIMD.c -o ${WS}1
 shell sed -i -e '1 d' $WS.database/Src/$WS.c

@@ -4,27 +4,27 @@ Initial code
 int flatten_code05()
 {
    // BEGIN BLOCK
-   int i = 1;                                                           /*0016*/
-   int j;                                                               /*0017*/
-   j++;                                                                 /*0018*/
+   int i = 1;
+   int j;
+   j++;
    {
       // BEGIN BLOCK
-      int i = j+1;                                                      /*0020*/
-      int k = 2;                                                        /*0021*/
-      i++;                                                              /*0022*/
-      j = 1;                                                            /*0023*/
+      int i = j+1;
+      int k = 2;
+      i++;
+      j = 1;
       {
          // BEGIN BLOCK
-         int k = 2;                                                     /*0025*/
-         i++;                                                           /*0026*/
-         j = 1;                                                         /*0027*/
+         int k = 2;
+         i++;
+         j = 1;
          // END BLOCK
       }
       // END BLOCK
    }
-   i = j;                                                               /*0030*/
+   i = j;
 
-   printf("%d %d\n", i, j);                                             /*0032*/
+   printf("%d %d\n", i, j);
    // END BLOCK
 }
 
@@ -33,18 +33,18 @@ Code after flatten_code
 int flatten_code05()
 {
    // BEGIN BLOCK
-   int i = 1;                                                           /*0016*/
-   int j;                                                               /*0017*/
+   int i = 1;
+   int j;
    //PIPS generated variable
    int i_0, k = 2, k_0 = 2, k_1 = 2;
-   j++;                                                                 /*0018*/
+   j++;
    i_0 = j+1;
-   i_0++;                                                               /*0022*/
-   j = 1;                                                               /*0023*/
-   i_0++;                                                               /*0026*/
-   j = 1;                                                               /*0027*/
-   i = j;                                                               /*0030*/
+   i_0++;
+   j = 1;
+   i_0++;
+   j = 1;
+   i = j;
 
-   printf("%d %d\n", i, j);                                             /*0032*/
+   printf("%d %d\n", i, j);
    // END BLOCK
 }

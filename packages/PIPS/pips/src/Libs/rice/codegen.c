@@ -524,7 +524,7 @@ statement MakeLoopAs(statement old_loop_statement,
   list new_locals = NewLoopLocals(body, loop_locals(old_loop));
   instruction ibody = statement_instruction(body);
 
-  if (instruction_loop_p(ibody))
+  if (!statement_block_p(body))
     body = make_block_statement(CONS(STATEMENT,body,NIL));
   ibody = statement_instruction(body);
 

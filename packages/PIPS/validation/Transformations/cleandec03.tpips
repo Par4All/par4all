@@ -1,16 +1,11 @@
-delete cleandec03
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete cleandec03
 create cleandec03 cleandec03.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 display PRINTED_FILE[c_clean_declarations03]
 apply CLEAN_DECLARATIONS[c_clean_declarations03]
 display PRINTED_FILE[c_clean_declarations03]
+
 close
 delete cleandec03
 quit

@@ -62,11 +62,11 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
   list members = get_common_members(c, mod, FALSE);
   list equiv_members = NIL;
 
-  string_buffer_append(result, 
+  string_buffer_append(result,
 		       concatenate(NL,"Layout for ",isfortran?"common /":"memory area \"",
-					  entity_name(c),isfortran?"/":"\""," of size ",
-					  itoa(area_size(type_area(entity_type(c)))),
-					  ":",NL,NULL));
+				   entity_name(c),isfortran?"/":"\""," of size ",
+				   itoa(area_size(type_area(entity_type(c)))),
+				   ":",NL,NULL));
 
 
   if(ENDP(members)) {
@@ -137,7 +137,7 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 	}
       }
     }
-    else {
+    else { // C language
       FOREACH(ENTITY, m, members) {
 	pips_assert("RAM storage",
 		    storage_ram_p(entity_storage(m)));
@@ -542,8 +542,14 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
 						   module_name, NULL);
   string dir = db_get_current_workspace_directory();
   string filename = strdup(concatenate(dir, "/", symboltable, NULL));
+  bool reset_p = FALSE;
 
-  //set_current_module_entity(module);
+  /* This function is called in two different context: as a
+     standalone phase or as part of debugging the parser?!? */
+  if(entity_undefined_p(get_current_module_entity())) {
+    reset_p = TRUE;
+    set_current_module_entity(module);
+  }
 
   out = safe_fopen(filename, "w");
 
@@ -554,6 +560,9 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
 
   free(dir);
   free(filename);
+
+  if(reset_p)
+    reset_current_module_entity();
 
   DB_PUT_FILE_RESOURCE(DBR_SYMBOL_TABLE_FILE, module_name, symboltable);
 

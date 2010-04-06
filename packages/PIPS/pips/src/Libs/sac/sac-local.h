@@ -27,9 +27,13 @@
 
 #include "sac_private.h"
 
-/* deatomizer.c */
-#define FUNC_TO_ATOMIZE_P(call) (type_functional_p(entity_type(call_function(call))) && \
-			    (gen_length(functional_parameters(type_functional(entity_type(call_function(call))))) != 0))
+#define FUNC_TO_ATOMIZE_P(call) (\
+        type_functional_p(entity_type(call_function(call))) && \
+	    (gen_length(functional_parameters(type_functional(entity_type(call_function(call))))) != 0) && \
+        (!ENTITY_DEREFERENCING_P(call_function(call))) && \
+        (!ENTITY_POINT_TO_P(call_function(call))) && \
+        (!ENTITY_FIELD_P(call_function(call)))\
+        )
 
 extern entity hpfc_new_variable(entity, basic);
 

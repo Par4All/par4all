@@ -13,8 +13,9 @@ int main()
    int i = 0;
 //  points to = {}
    s = (my_str *) malloc(sizeof(my_str));
-//  {(s,*ANYWHERE*,-MAY-)}
+//  {(s,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    s1 = (my_str) malloc(sizeof(my_str));
-//  {(s1,*ANYWHERE*,-MAY-);(s,*ANYWHERE*,-MAY-)}
+//  {(s,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(s1,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    return 0;
 }

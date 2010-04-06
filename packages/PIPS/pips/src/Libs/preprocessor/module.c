@@ -225,30 +225,125 @@ string entity_unambiguous_user_name(entity e)
 
    Note also that this function assumes the existence of a current module.
 
-   This function does not allocate a new string, which implies to keep
-   the scope information in the name of extraprocedural variables and
-   functions.
+   FI: why is this function in preprocessor and not in ri-util?
 */
-string
-entity_minimal_name(entity e)
+/* For REGIONS_MODULE_NAME, which could/should be defined in
+   ri-util-local.h as it is used to create entities? */
+#include "effects-convex.h"
+static string entity_more_or_less_minimal_name(entity e, bool strict_p)
 {
   entity m = get_current_module_entity();
   string mln = module_local_name(m);
   string emn = string_undefined;
+  string cun = string_undefined; // compilation unit name
+  entity cu = entity_undefined; // compilation unit
+  list cudl = list_undefined; // compilation unit declaration list
+  list mdl = code_declarations(value_code(entity_initial(m)));
+
+  if(c_module_p(m) && !compilation_unit_p(mln)) {
+    /* in pipsmake library...*/
+    string compilation_unit_of_module(string);
+    cun = compilation_unit_of_module(mln);
+    cu = global_name_to_entity(TOP_LEVEL_MODULE_NAME, cun);
+    cudl = code_declarations(value_code(entity_initial(cu)));
+  }
 
   pips_assert("some current entity", !entity_undefined_p(m));
 
-  if (strcmp(mln, entity_module_name(e)) == 0) {
+  /* gen_in_list_p() would/should be sufficient... */
+  if (strcmp(mln, entity_module_name(e)) == 0
+      || gen_in_list_p(e, mdl)) {
+    /* The variable is declared in the current module */
     //return global_name_to_user_name(entity_name(e));
-    emn = entity_unambiguous_user_name(e);
+    if(strict_p)
+      emn = entity_unambiguous_user_name(e);
+    else
+      emn = entity_user_name(e);
+  }
+  else if (!list_undefined_p(cudl) && gen_in_list_p(e, cudl)) {
+    /* The variable is declared in the compilation unit of the current
+       module */
+    //return global_name_to_user_name(entity_name(e));
+    if(strict_p)
+      emn = entity_unambiguous_user_name(e);
+    else
+      emn = entity_user_name(e);
+  }
+  else if (entity_field_p(e)) {
+    /* The variable is a union or struct field. No need to
+       disambiguate. */
+    if(strict_p)
+      emn = entity_unambiguous_user_name(e);
+    else
+      emn = entity_user_name(e);
+  }
+  else if (entity_formal_p(e)) {
+    /* Formal parameters should always be unambiguous? */
+    if(strict_p)
+      emn = entity_unambiguous_user_name(e);
+    else
+      emn = entity_user_name(e);
+  }
+  else if (strstr(entity_module_name(e), DUMMY_PARAMETER_PREFIX)) {
+    /* The variable is a dummy parameter entity, used in a function
+       declaration */
+    if(strict_p)
+      emn = entity_local_name(e);
+    else
+      emn = strdup(entity_local_name(e));
+  }
+  else if (strcmp(TOP_LEVEL_MODULE_NAME, entity_module_name(e)) == 0) {
+    /* The variable is a PHI entity */
+    if(strict_p)
+      emn = entity_local_name(e);
+    else
+      emn = strdup(entity_local_name(e));
+  }
+  else if (strcmp(REGIONS_MODULE_NAME, entity_module_name(e)) == 0) {
+    /* The variable is a PHI entity */
+    if(strict_p)
+      emn = entity_local_name(e);
+    else
+      emn = strdup(entity_local_name(e));
+  }
+  else if (strcmp(POINTS_TO_MODULE_NAME, entity_module_name(e)) == 0) {
+    /* The variable is a PHI entity */
+    if(strict_p)
+      emn = entity_local_name(e);
+    else
+      emn = strdup(entity_local_name(e));
   }
   else {
+    /* must be used to prettyprint interprocedural information... */
     //entity om = local_name_to_top_level_entity(mln);
     //emn = entity_interprocedural_unambiguous_user_name(e, om);
-    emn = entity_name(e);
+    if(strict_p)
+      emn = entity_name(e);
+    else
+      emn = strdup(entity_name(e));
   }
 
   return emn;
+}
+
+/* Do preserve scope informations
+
+   This function does not allocate a new string, which implies to keep
+   the scope information in the name of extraprocedural variables and
+   functions.
+ */
+string entity_minimal_name(entity e)
+{
+  return entity_more_or_less_minimal_name(e, TRUE);
+}
+
+/* Do not preserve scope information
+
+   A new string is allocated.
+ */
+string entity_minimal_user_name(entity e)
+{
+  return entity_more_or_less_minimal_name(e, FALSE);
 }
 
 /* Add an entity to the current's module compilation unit declarations
@@ -266,6 +361,7 @@ AddEntityToCompilationUnit(entity e, entity cu)
     if( c_module_p(cu) ) {
         if(!db_resource_required_or_available_p(DBR_CODE,cum))
         {
+	  bool controlizer(string);
             entity tmp = get_current_module_entity();
             statement stmt = get_current_module_statement();
             reset_current_module_entity();
@@ -299,6 +395,7 @@ recompile_module(char* module)
     entity modified_module = module_name_to_entity(module);
     statement modified_module_statement =
         (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
+    bool controlizer(string);
 
     set_current_module_entity( modified_module );
     set_current_module_statement( modified_module_statement );
@@ -333,25 +430,29 @@ recompile_module(char* module)
     reset_current_module_entity();
     reset_current_module_statement();
 
-    /* the ugliest glue ever produced by SG 
+    /* the ugliest glue ever produced by SG
      * needed to get all the declarations etc right
      * unfortunetly we do it without calling pipsmake, so handle it by hand
      * signed: SG
      */
-    string cu = compilation_unit_of_module(module);
+    //string compilation_unit_of_module(string);
+    //string cu = compilation_unit_of_module(module);
     {
         gen_array_t modules = db_get_module_list_initial_order();
         int n = gen_array_nitems(modules), i;
         for (i=0; i<n; i++)
         {
             string m = gen_array_item(modules, i);
-            if(!db_resource_required_or_available_p(DBR_CODE,m))
-                controlizer(m);
+	    if(!db_resource_required_or_available_p(DBR_CODE,m)) {
+	      (void) controlizer(m);
+	    }
 //            if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
 //                print_code(m);
         }
     }
 
+    bool parser(string); // Fortran parser
+    bool c_parser(string); // C parser
     bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
     if(!parsing_ok)
         pips_user_error("failed to recompile module");

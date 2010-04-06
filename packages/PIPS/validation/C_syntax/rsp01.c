@@ -4,6 +4,8 @@
 
 int filter();
 
+int res;
+
 int  main()
 {
   int i;

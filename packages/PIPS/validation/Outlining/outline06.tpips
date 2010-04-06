@@ -1,18 +1,13 @@
 # this example shows usage of OUTLINE_ALLOW_GLOBALS property
-delete outline06
-
 setproperty ABORT_ON_USER_ERROR TRUE
+delete outline06
 create outline06 outline06.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 echo
 echo Initial code
 echo
 
+# activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[%ALL]
 
 

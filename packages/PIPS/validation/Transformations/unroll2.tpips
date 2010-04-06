@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 #!/bin/sh
 #
 # unroll2.f test script

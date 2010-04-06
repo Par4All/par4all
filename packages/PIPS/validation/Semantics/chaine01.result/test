@@ -257,7 +257,7 @@ C  P(S) {'hello'==S}
 
       IF (S.EQ.'hello   ') THEN                                         0020
 
-C  P(S) {'hello   '==S, 'hello'==S}
+C  P(S) {'hello   '=='hello', 'hello   '==S}
 
 ! TRUE...
          PRINT *, 's == "hello   "'                                     0022
@@ -267,7 +267,7 @@ C  P(S) {'hello'==S}
 
       IF (S.EQ.'hello     ') THEN                                       0024
 
-C  P(S) {'hello     '==S, 'hello'==S}
+C  P(S) {'hello     '=='hello', 'hello     '==S}
 
 ! TRUE...
          PRINT *, 's == "hello     "'                                   0026
@@ -277,7 +277,7 @@ C  P(S) {'hello'==S}
 
       IF (S.EQ.'hello          ') THEN                                  0028
 
-C  P(S) {'hello          '==S, 'hello'==S}
+C  P(S) {'hello          '=='hello', 'hello          '==S}
 
 ! TRUE...
          PRINT *, 's == "hello          "'                              0030
@@ -312,21 +312,21 @@ C  P(S) {'hi'==S}
 
       T = 'hi'                                                          0042
 
-C  P(S,T) {'hi'==S, S==T}
+C  P(S,T) {'hi'==S, 'hi'==T}
 
       PRINT *, '-', S, '-', T, '-'                                      0043
 
-C  P(S,T) {'hi'==S, S==T}
+C  P(S,T) {'hi'==S, 'hi'==T}
 
       IF (S.EQ.T) THEN                                                  0044
 
-C  P(S,T) {'hi'==S, S==T}
+C  P(S,T) {'hi'==S, 'hi'==T}
 
 ! TRUE
          PRINT *, 's == t == "hi"'                                      0046
       ENDIF
 
-C  P(S,T) {'hi'==S, S==T}
+C  P(S,T) {'hi'==S, 'hi'==T}
 
 
       T = 'hi '                                                         0049
@@ -339,7 +339,7 @@ C  P(S,T) {'hi '==T, 'hi'==S}
 
       IF (S.EQ.T) THEN                                                  0051
 
-C  P(S,T) {'hi '==S, 'hi'==S, S==T}
+C  P(S,T) {'hi '=='hi', 'hi '==S, 'hi '==T}
 
 ! TRUE...
          PRINT *, 's == t == "hi "'                                     0053
@@ -358,7 +358,7 @@ C  P(S,T) {'hi '==T, 'hi'==S}
 
       IF (S.EQ.T) THEN                                                  0058
 
-C  P(S,T) {'hi '==S, 'hi'==S, S==T}
+C  P(S,T) {'hi '=='hi', 'hi '==S, 'hi '==T}
 
 ! TRUE...
          PRINT *, 's == t == "hi " (2)'                                 0060
@@ -404,7 +404,7 @@ C  P(S,T) {'hi        '==S, 'hi '==T}
 
       IF (S.EQ.T) THEN                                                  0074
 
-C  P(S,T) {'hi        '==S, 'hi '==S, S==T}
+C  P(S,T) {'hi        '=='hi ', 'hi        '==S, 'hi        '==T}
 
 ! TRUE...
          PRINT *, 's == t == "hi " (4)'                                 0076

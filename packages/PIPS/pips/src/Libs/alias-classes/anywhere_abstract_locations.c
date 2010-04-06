@@ -211,6 +211,48 @@ entity entity_all_module_xxx_locations(entity m, string xxx)
   return dynamic;
 }
 
+entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
+{
+  entity e = entity_undefined;
+  int count = 0;
+  bool found_p = FALSE; // a break could be used instead
+
+  pips_assert("Type t is defined", !type_undefined_p(t));
+
+  for(count = 0; !found_p; count++) {
+    string name = string_undefined;
+    type ot = type_undefined;
+
+    asprintf(&name, "%s%s%s%s%d",
+	     mn,
+	     MODULE_SEP_STRING,
+	     xxx,
+	     "_b", count);
+    e = find_or_create_entity(name);
+    ot = entity_type(e);
+    if(type_undefined_p(ot)) {
+      /* A new entity has been created */
+      //area a = make_area(0,NIL); /* Size and layout are unknown */
+      //type t = make_type_area(a);
+      /*FI: more work to be done here... */
+      entity_type(e) = t;
+      entity_storage(e) = make_storage_rom();
+      entity_initial(e) = make_value_unknown();
+      found_p = TRUE;
+    }
+    else if(type_equal_p(t, ot))
+      found_p = TRUE;
+  }
+
+  // FI: the debug message should be improved with full information
+  // about the type... See get_symbol_table() and isolate the code
+  // used to prettyprint the type. Too bad it uses the buffer type...
+  pips_debug(8, "New abstract location entity \"%s\" found or created"
+	     " with type \"%s\"", e, type_to_string(t));
+
+  return e;
+}
+
 
 /* test if an entity is the set of all memory locations in the xxx
    area of a module. The module is not checked, so it can be the set
@@ -235,17 +277,60 @@ entity entity_all_xxx_locations(string xxx)
 				       xxx,
 				       ANYWHERE_LOCATION,
 				       NULL));
-  dynamic = gen_find_tabulated(any_name, entity_domain);
-  if(storage_undefined_p(entity_storage(dynamic))) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
+  dynamic = find_or_create_entity(any_name);
+  //dynamic = gen_find_tabulated(any_name, entity_domain);
+  if(type_undefined_p(dynamic)) {
+    //area a = make_area(0,NIL); /* Size and layout are unknown */
+    //type t = make_type_area(a);
     /*FI: more work to be done here... */
-    entity_type(dynamic) = t;
+    entity_type(dynamic) = make_type_unknown();
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
   }
 
   return dynamic;
+}
+
+entity entity_all_xxx_locations_typed(string xxx, type t)
+{
+  entity e = entity_undefined;
+  int count = 0;
+  bool found_p = FALSE; // a break could be used instead
+
+  pips_assert("Type t is defined", !type_undefined_p(t));
+
+  for(count = 0; !found_p; count++) {
+    string name = string_undefined;
+    type ot = type_undefined;
+
+    asprintf(&name, "%s%s%s%s%d",
+	     ANY_MODULE_NAME,
+	     MODULE_SEP_STRING,
+	     xxx,
+	     "_b", count);
+    e = find_or_create_entity(name);
+    ot = entity_type(e);
+    if(type_undefined_p(ot)) {
+      /* A new entity has been created */
+      //area a = make_area(0,NIL); /* Size and layout are unknown */
+      //type t = make_type_area(a);
+      /*FI: more work to be done here... */
+      entity_type(e) = t;
+      entity_storage(e) = make_storage_rom();
+      entity_initial(e) = make_value_unknown();
+      found_p = TRUE;
+    }
+    else if(type_equal_p(t, ot))
+      found_p = TRUE;
+  }
+
+  // FI: the debug message should be improved with full information
+  // about the type... See get_symbol_table() and isolate the code
+  // used to prettyprint the type. Too bad it uses the buffer type...
+  pips_debug(8, "New abstract location entity \"%s\" found or created"
+	     " with type \"%s\"", entity_name(e), type_to_string(t));
+
+  return e;
 }
 
 /* test if an entity is the set of all memory locations in the xxx
@@ -268,6 +353,12 @@ entity entity_all_module_heap_locations(entity m)
   return entity_all_module_xxx_locations(m, HEAP_AREA_LOCAL_NAME);
 }
 
+entity entity_all_module_heap_locations_typed(entity m, type t)
+{
+  return entity_all_module_xxx_locations_typed(entity_local_name(m),
+					       HEAP_AREA_LOCAL_NAME, t);
+}
+
 /* test if an entity is the a heap area*/
 bool entity_all_module_heap_locations_p(entity e)
 {
@@ -277,6 +368,11 @@ bool entity_all_module_heap_locations_p(entity e)
 entity entity_all_heap_locations()
 {
   return entity_all_xxx_locations(HEAP_AREA_LOCAL_NAME);
+}
+
+entity entity_all_heap_locations_typed(type t)
+{
+  return entity_all_xxx_locations_typed(HEAP_AREA_LOCAL_NAME, t);
 }
 
 /* test if an entity is the set of all heap locations */

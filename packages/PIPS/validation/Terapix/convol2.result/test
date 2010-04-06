@@ -238,9 +238,8 @@ l99996:
                         __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
                   __scalar__0 = __scalar__0/9;
                }
-               if (i>=1&&i<=126)
-                  if (i+126*i_t-126>=1&&i+126*i_t-126<=510) 
-                     new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
+               if (i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510) 
+                  new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
             }
 }
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
@@ -253,7 +252,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    int i_t, j_t;
    //PIPS generated variable
-   int L_0, L_1, L_00;
+   int L_0;
 l99997:
    for(i = 1; i <= 512; i += 1)
 l99998:
@@ -281,10 +280,8 @@ l99996:
                         __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
                   __scalar__0 = __scalar__0/9;
                }
-               L_1 = i>=1&&i<=126;
-               L_00 = i+126*i_t-126>=1&&i+126*i_t-126<=510;
-               L_0 = L_1?L_00:L_0;
-               new_image[i+126*i_t-126][j+5*j_t-5] = L_1&&L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
+               L_0 = i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510;
+               new_image[i+126*i_t-126][j+5*j_t-5] = L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
                ;
             }
 }
@@ -294,7 +291,7 @@ After Double Outlining and load - store generation
 void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
-   int L_00, L_0, L_1;
+   int L_0;
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
@@ -316,10 +313,8 @@ l99996:
                   __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
             __scalar__0 = __scalar__0/9;
          }
-         L_1 = i>=1&&i<=126;
-         L_00 = i+126*i_t-126>=1&&i+126*i_t-126<=510;
-         L_0 = L_1?L_00:L_0;
-         new_image[i+126*i_t-126][j+5*j_t-5] = L_1&&L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
+         L_0 = i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510;
+         new_image[i+126*i_t-126][j+5*j_t-5] = L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
       }
 }
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
@@ -332,7 +327,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    int i_t, j_t;
    //PIPS generated variable
-   int L_0, L_1, L_00;
+   int L_0;
    //PIPS generated variable
    float (*P_0)[isi][isj], (*P_1)[3][3], (*P_2)[isi][isj];
 l99997:
@@ -362,7 +357,7 @@ l99991:         microcode_launcher(isi, isj, i_t, j_t, *P_2, *P_1, *P_0);
 void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
-   int L_00, L_0, L_1;
+   int L_0;
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
@@ -375,7 +370,7 @@ l99992:      convol_microcode(isi, isj, i, i_t, image, j_t, kernel, new_image);
 void convol_microcode(int isi, int isj, int i, int i_t, float image[isi][isj], int j_t, float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
-   int L_0, L_00, L_1;
+   int L_0;
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
@@ -394,9 +389,7 @@ l99996:
                __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
          __scalar__0 = __scalar__0/9;
       }
-      L_1 = i>=1&&i<=126;
-      L_00 = i+126*i_t-126>=1&&i+126*i_t-126<=510;
-      L_0 = L_1?L_00:L_0;
-      new_image[i+126*i_t-126][j+5*j_t-5] = L_1&&L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
+      L_0 = i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510;
+      new_image[i+126*i_t-126][j+5*j_t-5] = L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
    }
 }

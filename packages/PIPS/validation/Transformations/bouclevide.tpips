@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete bouclevide
 
 # setproperty PRETTYPRINT_BLOCKS TRUE

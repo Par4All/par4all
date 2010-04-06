@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete if_conversion_compact02
 create if_conversion_compact02 if_conversion_compact02.c
 

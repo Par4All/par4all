@@ -43,17 +43,18 @@
 struct __string_buffer_head
 {
   stack ins;
-  boolean dup; // whether to duplicate strings
+  boolean dup; // whether to duplicate all strings appended to the buffer.
 };
 
 /* allocate a new string buffer
- * @param dup tell whether to string duplicated appended strings
+ * @param dup tell whether to string duplicate appended strings
  * if so, the strings will be freed later.
  */
 string_buffer string_buffer_make(bool dup)
 {
-  string_buffer n = (string_buffer) malloc(sizeof(struct __string_buffer_head));
-  message_assert("allocated", n!=NULL);
+  string_buffer n =
+    (string_buffer) malloc(sizeof(struct __string_buffer_head));
+  message_assert("string_buffer is allocated", n!=NULL);
   n->ins = stack_make(0, 0, 0);
   n->dup = dup;
   return n;

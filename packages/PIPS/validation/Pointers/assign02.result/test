@@ -11,11 +11,11 @@ s_t make_s(int i, float x)
 //  points to = {}
 
    p = (s_t *) malloc(sizeof(s_t));
-//  {(p,*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    p->entier = i;
-//  {(p,*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    p->reel = x;
-//  {(p,*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    return *p;
 }
 

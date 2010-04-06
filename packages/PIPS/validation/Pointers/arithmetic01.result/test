@@ -32,7 +32,7 @@ int main()
    i = &j;
 //  {(i,j,-Exact-)}
    i++;
-//  {(i,*ANYWHERE*,-MAY-)}
+//  {(i,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
 
    return 0;
    // END BLOCK

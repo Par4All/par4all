@@ -45,10 +45,10 @@ void dereferencing05()
 //  points to = {}
 
    *p++ = 0.;
-//  {(p,*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    *p-- = 0.;
-//  {(p,*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    *++p = 0.;
-//  {(p,*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    *--p = 0.;
 }

@@ -24,7 +24,7 @@ void call16(int _i, int *_a, int *_b, int *_c)
 
 POINTS TO
 
-//  {(_c,__c_3,-Exact-);(_b,__b_2,-Exact-);(_a,__a_1,-Exact-)}
+//  {(_a,__a_1,-Exact-);(_b,__b_2,-Exact-);(_c,__c_3,-Exact-)}
 void call16(int _i, int *_a, int *_b, int *_c)
 {
 //  {(_a,__a_1,-Exact-);(_b,__b_2,-Exact-);(_c,__c_3,-Exact-)}
@@ -33,7 +33,7 @@ void call16(int _i, int *_a, int *_b, int *_c)
 
 POINTS TO
 
-//  {(c,_c_6,-Exact-);(b,_b_5,-Exact-);(a,_a_4,-Exact-)}
+//  {(a,_a_4,-Exact-);(b,_b_5,-Exact-);(c,_c_6,-Exact-)}
 void dotprod(int *a, int *b, int *c)
 {
 //  {(a,_a_4,-Exact-);(b,_b_5,-Exact-);(c,_c_6,-Exact-)}

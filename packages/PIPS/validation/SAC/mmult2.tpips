@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete MMULT2
 setenv PIPS_CPP_FLAGS="-DN=16"
 
@@ -48,7 +49,6 @@ apply SIMDIZER_AUTO_UNROLL
 apply FORWARD_SUBSTITUTE
 apply PARTIAL_EVAL
 apply SUPPRESS_DEAD_CODE
-apply SUPPRESS_DEAD_TEST
 display PRINTED_FILE
 
 #setproperty LOOP_LABEL "loop1"

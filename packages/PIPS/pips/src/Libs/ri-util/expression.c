@@ -2239,6 +2239,9 @@ static bool  davinci_dump_expression_rc(
     shape = "";
     color = "";
     break;
+  case is_syntax_cast:
+    pips_user_warning("skipping cast\n");
+    break;
   case is_syntax_reference:
     name = entity_local_name(reference_variable(syntax_reference(s)));
     shape = DV_CIRCLE;

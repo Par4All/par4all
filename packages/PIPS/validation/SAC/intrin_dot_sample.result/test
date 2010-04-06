@@ -1,0 +1,606 @@
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+
+   simd_mm_set_zero(sum);
+   //sets sum to zero
+   for(i = 0; i <= 31; i += 4) {
+      __m64 *ptr1, *ptr2, num3;
+      simd_load_w(ptr1, a[i]);
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      simd_load_w(ptr2, b[i]);
+      simd_m_pmaddwd(num3, ptr1, ptr2);
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      simd_m_paddw(sum, sum, num3);
+   }
+
+   simd_m_to_int(sum, data);
+   //converts __m64 data type to an int
+   simd_m_psrlqi(sum, sum);
+   //shifts sum    
+   simd_m_to_int(sum, result);
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+
+   SIMD_LOAD_GENERIC_V4SI(sum, 0, 0, 0, 0);
+   //sets sum to zero
+   for(i = 0; i <= 31; i += 4) {
+      __m64 ptr1, ptr2, num3;
+      ptr1 = &a[i];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2 = &b[i];
+      SIMD_MULW(num3, ptr1, ptr2);
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      SIMD_ADDW(sum, sum, num3);
+   }
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+   
+   
+   
+   sum[0] = 0;
+   sum[1] = 0;
+   sum[2] = 0;
+   sum[3] = 0;
+   //sets sum to zero
+   for(i = 0; i <= 31; i += 4) {
+      __m64 ptr1, ptr2, num3;
+      ptr1 = &a[i];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2 = &b[i];
+      num3[0] = ptr1[0]*ptr2[0];
+      num3[1] = ptr1[1]*ptr2[1];
+      num3[2] = ptr1[2]*ptr2[2];
+      num3[3] = ptr1[3]*ptr2[3];
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      sum[0] = sum[0]+num3[0];
+      sum[1] = sum[1]+num3[1];
+      sum[2] = sum[2]+num3[2];
+      sum[3] = sum[3]+num3[3];
+   }
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   
+   
+   
+   sum[0] = 0;
+   sum[1] = 0;
+   sum[2] = 0;
+   sum[3] = 0;
+   //sets sum to zero
+l99996:   LU_NUB0 = 8;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      {
+         __m64 ptr1, ptr2, num3;
+         ptr1 = &a[LU_IND0*4+0];
+         //Converts array a to a pointer of type
+         //__m64 and stores four elements into MMX
+         //registers
+         ptr2 = &b[LU_IND0*4+0];
+         num3[0] = ptr1[0]*ptr2[0];
+         num3[1] = ptr1[1]*ptr2[1];
+         num3[2] = ptr1[2]*ptr2[2];
+         num3[3] = ptr1[3]*ptr2[3];
+         //multiplies elements and adds lower
+         //elements with lower element and
+         //higher elements with higher
+         sum[0] = sum[0]+num3[0];
+         sum[1] = sum[1]+num3[1];
+         sum[2] = sum[2]+num3[2];
+         sum[3] = sum[3]+num3[3];
+      }
+l99995:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 2) {
+      {
+         __m64 ptr1, ptr2, num3;
+         ptr1 = &a[(LU_IND0+0)*4+0];
+         //Converts array a to a pointer of type
+         //__m64 and stores four elements into MMX
+         //registers
+         ptr2 = &b[(LU_IND0+0)*4+0];
+         num3[0] = ptr1[0]*ptr2[0];
+         num3[1] = ptr1[1]*ptr2[1];
+         num3[2] = ptr1[2]*ptr2[2];
+         num3[3] = ptr1[3]*ptr2[3];
+         //multiplies elements and adds lower
+         //elements with lower element and
+         //higher elements with higher
+         sum[0] = sum[0]+num3[0];
+         sum[1] = sum[1]+num3[1];
+         sum[2] = sum[2]+num3[2];
+         sum[3] = sum[3]+num3[3];
+      }
+      {
+         __m64 ptr1, ptr2, num3;
+         ptr1 = &a[(LU_IND0+1)*4+0];
+         //Converts array a to a pointer of type
+         //__m64 and stores four elements into MMX
+         //registers
+         ptr2 = &b[(LU_IND0+1)*4+0];
+         num3[0] = ptr1[0]*ptr2[0];
+         num3[1] = ptr1[1]*ptr2[1];
+         num3[2] = ptr1[2]*ptr2[2];
+         num3[3] = ptr1[3]*ptr2[3];
+         //multiplies elements and adds lower
+         //elements with lower element and
+         //higher elements with higher
+         sum[0] = sum[0]+num3[0];
+         sum[1] = sum[1]+num3[1];
+         sum[2] = sum[2]+num3[2];
+         sum[3] = sum[3]+num3[3];
+      }
+l99994:      ;
+   }
+   i = 0+MAX0(LU_NUB0, 0)*4;
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   
+   
+   
+   sum[0] = 0;
+   sum[1] = 0;
+   sum[2] = 0;
+   sum[3] = 0;
+   //sets sum to zero
+l99996:   LU_NUB0 = 8;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= -1; LU_IND0 += 1) {
+      {
+         __m64 ptr1, ptr2, num3;
+         ptr1 = &a[4*LU_IND0];
+         //Converts array a to a pointer of type
+         //__m64 and stores four elements into MMX
+         //registers
+         ptr2 = &b[4*LU_IND0];
+         num3[0] = ptr1[0]*ptr2[0];
+         num3[1] = ptr1[1]*ptr2[1];
+         num3[2] = ptr1[2]*ptr2[2];
+         num3[3] = ptr1[3]*ptr2[3];
+         //multiplies elements and adds lower
+         //elements with lower element and
+         //higher elements with higher
+         sum[0] = sum[0]+num3[0];
+         sum[1] = sum[1]+num3[1];
+         sum[2] = sum[2]+num3[2];
+         sum[3] = sum[3]+num3[3];
+      }
+l99995:      ;
+   }
+   for(LU_IND0 = 0; LU_IND0 <= 7; LU_IND0 += 2) {
+      {
+         __m64 ptr1, ptr2, num3;
+         ptr1 = &a[4*LU_IND0];
+         //Converts array a to a pointer of type
+         //__m64 and stores four elements into MMX
+         //registers
+         ptr2 = &b[4*LU_IND0];
+         num3[0] = ptr1[0]*ptr2[0];
+         num3[1] = ptr1[1]*ptr2[1];
+         num3[2] = ptr1[2]*ptr2[2];
+         num3[3] = ptr1[3]*ptr2[3];
+         //multiplies elements and adds lower
+         //elements with lower element and
+         //higher elements with higher
+         sum[0] = sum[0]+num3[0];
+         sum[1] = sum[1]+num3[1];
+         sum[2] = sum[2]+num3[2];
+         sum[3] = sum[3]+num3[3];
+      }
+      {
+         __m64 ptr1, ptr2, num3;
+         ptr1 = &a[4*LU_IND0+4];
+         //Converts array a to a pointer of type
+         //__m64 and stores four elements into MMX
+         //registers
+         ptr2 = &b[4*LU_IND0+4];
+         num3[0] = ptr1[0]*ptr2[0];
+         num3[1] = ptr1[1]*ptr2[1];
+         num3[2] = ptr1[2]*ptr2[2];
+         num3[3] = ptr1[3]*ptr2[3];
+         //multiplies elements and adds lower
+         //elements with lower element and
+         //higher elements with higher
+         sum[0] = sum[0]+num3[0];
+         sum[1] = sum[1]+num3[1];
+         sum[2] = sum[2]+num3[2];
+         sum[3] = sum[3]+num3[3];
+      }
+l99994:      ;
+   }
+   i = 32;
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS generated variable
+   __m64 ptr1_0, ptr2_0, num3_0, ptr1_1, ptr2_1, num3_1, ptr1_2, ptr2_2, num3_2, ptr1_3, ptr2_3, num3_3, ptr1_4, ptr2_4, num3_4, ptr1_5, ptr2_5, num3_5;
+   
+   
+   
+   sum[0] = 0;
+   sum[1] = 0;
+   sum[2] = 0;
+   sum[3] = 0;
+   //sets sum to zero
+l99996:   LU_NUB0 = 8;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= -1; LU_IND0 += 1) {
+      ptr1_1 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_1 = &b[4*LU_IND0];
+      num3_1[0] = ptr1_1[0]*ptr2_1[0];
+      num3_1[1] = ptr1_1[1]*ptr2_1[1];
+      num3_1[2] = ptr1_1[2]*ptr2_1[2];
+      num3_1[3] = ptr1_1[3]*ptr2_1[3];
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      sum[0] = sum[0]+num3_1[0];
+      sum[1] = sum[1]+num3_1[1];
+      sum[2] = sum[2]+num3_1[2];
+      sum[3] = sum[3]+num3_1[3];
+l99995:      ;
+   }
+   for(LU_IND0 = 0; LU_IND0 <= 7; LU_IND0 += 2) {
+      ptr1_4 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_4 = &b[4*LU_IND0];
+      num3_4[0] = ptr1_4[0]*ptr2_4[0];
+      num3_4[1] = ptr1_4[1]*ptr2_4[1];
+      num3_4[2] = ptr1_4[2]*ptr2_4[2];
+      num3_4[3] = ptr1_4[3]*ptr2_4[3];
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      sum[0] = sum[0]+num3_4[0];
+      sum[1] = sum[1]+num3_4[1];
+      sum[2] = sum[2]+num3_4[2];
+      sum[3] = sum[3]+num3_4[3];
+      ptr1_5 = &a[4*LU_IND0+4];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_5 = &b[4*LU_IND0+4];
+      num3_5[0] = ptr1_5[0]*ptr2_5[0];
+      num3_5[1] = ptr1_5[1]*ptr2_5[1];
+      num3_5[2] = ptr1_5[2]*ptr2_5[2];
+      num3_5[3] = ptr1_5[3]*ptr2_5[3];
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      sum[0] = sum[0]+num3_5[0];
+      sum[1] = sum[1]+num3_5[1];
+      sum[2] = sum[2]+num3_5[2];
+      sum[3] = sum[3]+num3_5[3];
+l99994:      ;
+   }
+   i = 32;
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS generated variable
+   __m64 ptr1_0, ptr2_0, num3_0, ptr1_1, ptr2_1, num3_1, ptr1_2, ptr2_2, num3_2, ptr1_3, ptr2_3, num3_3, ptr1_4, ptr2_4, num3_4, ptr1_5, ptr2_5, num3_5;
+   
+   
+   
+   sum[0] = 0;
+   sum[1] = 0;
+   sum[2] = 0;
+   sum[3] = 0;
+   //sets sum to zero
+l99996:   LU_NUB0 = 8;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= -1; LU_IND0 += 1) {
+      ptr1_1 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_1 = &b[4*LU_IND0];
+      num3_1[0] = ptr1_1[0]*ptr2_1[0];
+      num3_1[1] = ptr1_1[1]*ptr2_1[1];
+      num3_1[2] = ptr1_1[2]*ptr2_1[2];
+      num3_1[3] = ptr1_1[3]*ptr2_1[3];
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      sum[0] = sum[0]+num3_1[0];
+      sum[1] = sum[1]+num3_1[1];
+      sum[2] = sum[2]+num3_1[2];
+      sum[3] = sum[3]+num3_1[3];
+l99995:      ;
+   }
+   for(LU_IND0 = 0; LU_IND0 <= 7; LU_IND0 += 2) {
+      ptr1_4 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_4 = &b[4*LU_IND0];
+      num3_4[0] = ptr1_4[0]*ptr2_4[0];
+      num3_4[1] = ptr1_4[1]*ptr2_4[1];
+      num3_4[2] = ptr1_4[2]*ptr2_4[2];
+      num3_4[3] = ptr1_4[3]*ptr2_4[3];
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      sum[0] = sum[0]+num3_4[0];
+      sum[1] = sum[1]+num3_4[1];
+      sum[2] = sum[2]+num3_4[2];
+      sum[3] = sum[3]+num3_4[3];
+      ptr1_5 = &a[4*LU_IND0+4];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_5 = &b[4*LU_IND0+4];
+      num3_5[0] = ptr1_5[0]*ptr2_5[0];
+      num3_5[1] = ptr1_5[1]*ptr2_5[1];
+      num3_5[2] = ptr1_5[2]*ptr2_5[2];
+      num3_5[3] = ptr1_5[3]*ptr2_5[3];
+      //multiplies elements and adds lower
+      //elements with lower element and
+      //higher elements with higher
+      sum[0] = sum[0]+num3_5[0];
+      sum[1] = sum[1]+num3_5[1];
+      sum[2] = sum[2]+num3_5[2];
+      sum[3] = sum[3]+num3_5[3];
+l99994:      ;
+   }
+   i = 32;
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS generated variable
+   __m64 ptr1_0, ptr2_0, num3_0, ptr1_1, ptr2_1, num3_1, ptr1_2, ptr2_2, num3_2, ptr1_3, ptr2_3, num3_3, ptr1_4, ptr2_4, num3_4, ptr1_5, ptr2_5, num3_5;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec4[3+1];
+   //PIPS:SAC generated short vector(s)
+   short v8hi_vec5[7+1], v8hi_vec6[7+1], v8hi_vec7[7+1];
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec8[3+1], v4si_vec9[3+1], v4si_vec10[3+1], v4si_vec11[3+1];
+   
+   
+   
+   sum[0] = 0;
+   sum[1] = 0;
+   sum[2] = 0;
+   sum[3] = 0;
+   //sets sum to zero
+l99996:   LU_NUB0 = 8;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= -1; LU_IND0 += 1) {
+      ptr1_1 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_1 = &b[4*LU_IND0];
+      SIMD_LOAD_V4SI(v4si_vec2, &ptr2_1[0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &ptr1_1[0]);
+      SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &num3_1[0]);
+      SIMD_LOAD_V4SI(v4si_vec3, &sum[0]);
+      SIMD_ADDD(v4si_vec3, v4si_vec3, v4si_vec0);
+      SIMD_SAVE_V4SI(v4si_vec3, &sum[0]);
+l99995:      ;
+   }
+   for(LU_IND0 = 0; LU_IND0 <= 7; LU_IND0 += 2) {
+      ptr1_4 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_4 = &b[4*LU_IND0];
+      SIMD_LOAD_GENERIC_V8HI(v8hi_vec7, ptr2_4[0], ptr2_4[1], ptr2_4[2], ptr2_4[3], ptr2_5[0], ptr2_5[1], ptr2_5[2], ptr2_5[3]);
+      SIMD_LOAD_GENERIC_V8HI(v8hi_vec6, ptr1_4[0], ptr1_4[1], ptr1_4[2], ptr1_4[3], ptr1_5[0], ptr1_5[1], ptr1_5[2], ptr1_5[3]);
+      SIMD_MULW(v8hi_vec5, v8hi_vec6, v8hi_vec7);
+      SIMD_SAVE_GENERIC_V8HI(v8hi_vec5, &num3_4[0], &num3_4[1], &num3_4[2], &num3_4[3], &num3_5[0], &num3_5[1], &num3_5[2], &num3_5[3]);
+      SIMD_LOAD_V4SI(v4si_vec9, &num3_4[0]);
+      SIMD_LOAD_V4SI(v4si_vec8, &sum[0]);
+      SIMD_ADDD(v4si_vec8, v4si_vec8, v4si_vec9);
+      SIMD_SAVE_V4SI(v4si_vec8, &sum[0]);
+      ptr1_5 = &a[4*LU_IND0+4];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_5 = &b[4*LU_IND0+4];
+      SIMD_LOAD_V4SI(v4si_vec11, &num3_5[0]);
+      SIMD_LOAD_V4SI(v4si_vec10, &sum[0]);
+      SIMD_ADDD(v4si_vec10, v4si_vec10, v4si_vec11);
+      SIMD_SAVE_V4SI(v4si_vec10, &sum[0]);
+l99994:      ;
+   }
+   i = 32;
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}
+short MMX_dot_product(short *a, short *b)
+{
+   int i;
+   short result, data;
+   __m64 sum;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS generated variable
+   __m64 ptr1_0, ptr2_0, num3_0, ptr1_1, ptr2_1, num3_1, ptr1_2, ptr2_2, num3_2, ptr1_3, ptr2_3, num3_3, ptr1_4, ptr2_4, num3_4, ptr1_5, ptr2_5, num3_5;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec4[3+1];
+   //PIPS:SAC generated short vector(s)
+   short v8hi_vec5[7+1], v8hi_vec6[7+1], v8hi_vec7[7+1];
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec8[3+1], v4si_vec9[3+1], v4si_vec10[3+1], v4si_vec11[3+1];
+   
+   
+   
+   sum[0] = 0;
+   sum[1] = 0;
+   sum[2] = 0;
+   sum[3] = 0;
+   //sets sum to zero
+l99996:   LU_NUB0 = 8;
+   LU_IB0 = 0;
+   SIMD_LOAD_V4SI(v4si_vec2, &ptr2_1[0]);
+   SIMD_LOAD_V4SI(v4si_vec1, &ptr1_1[0]);
+   SIMD_LOAD_V4SI(v4si_vec3, &sum[0]);
+   for(LU_IND0 = 0; LU_IND0 <= -1; LU_IND0 += 1) {
+      ptr1_1 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_1 = &b[4*LU_IND0];
+      SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_ADDD(v4si_vec3, v4si_vec3, v4si_vec0);
+l99995:      ;
+   }
+   SIMD_SAVE_V4SI(v4si_vec0, &num3_1[0]);
+   SIMD_SAVE_V4SI(v4si_vec3, &sum[0]);
+   SIMD_LOAD_GENERIC_V8HI(v8hi_vec7, ptr2_4[0], ptr2_4[1], ptr2_4[2], ptr2_4[3], ptr2_5[0], ptr2_5[1], ptr2_5[2], ptr2_5[3]);
+   SIMD_LOAD_GENERIC_V8HI(v8hi_vec6, ptr1_4[0], ptr1_4[1], ptr1_4[2], ptr1_4[3], ptr1_5[0], ptr1_5[1], ptr1_5[2], ptr1_5[3]);
+   SIMD_LOAD_V4SI(v4si_vec8, &sum[0]);
+   SIMD_LOAD_V4SI(v4si_vec10, &sum[0]);
+   for(LU_IND0 = 0; LU_IND0 <= 7; LU_IND0 += 2) {
+      ptr1_4 = &a[4*LU_IND0];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_4 = &b[4*LU_IND0];
+      SIMD_MULW(v8hi_vec5, v8hi_vec6, v8hi_vec7);
+      SIMD_SAVE_GENERIC_V8HI(v8hi_vec5, &num3_4[0], &num3_4[1], &num3_4[2], &num3_4[3], &num3_5[0], &num3_5[1], &num3_5[2], &num3_5[3]);
+      SIMD_LOAD_V4SI(v4si_vec9, &num3_4[0]);
+      SIMD_ADDD(v4si_vec8, v4si_vec8, v4si_vec9);
+      ptr1_5 = &a[4*LU_IND0+4];
+      //Converts array a to a pointer of type
+      //__m64 and stores four elements into MMX
+      //registers
+      ptr2_5 = &b[4*LU_IND0+4];
+      SIMD_LOAD_V4SI(v4si_vec11, &num3_5[0]);
+      SIMD_ADDD(v4si_vec10, v4si_vec10, v4si_vec11);
+l99994:      ;
+   }
+   SIMD_SAVE_V4SI(v4si_vec8, &sum[0]);
+   SIMD_SAVE_V4SI(v4si_vec10, &sum[0]);
+   i = 32;
+
+   data = sum[3];
+   //converts __m64 data type to an int
+   sum[3] = sum[2];
+   //shifts sum    
+   result = sum[3];
+   result = result+data;
+   //clears the MMX registers and MMX state.
+   return result;
+}

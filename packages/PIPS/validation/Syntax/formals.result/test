@@ -6,7 +6,7 @@ Splitting file    ./formals.f
   Module         FPTRAK
 Workspace formals created and opened.
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module EXTEND selected
 Module EXTEND already active.
 Request: build resource PRINTED_FILE for module EXTEND.

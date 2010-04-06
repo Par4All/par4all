@@ -3328,7 +3328,7 @@ extern size_t fread(void *__ptr, size_t __size, size_t __n, FILE *__stream);
    This function is a possible cancellation points and therefore not
    marked with __THROW.  */
 
-extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
+extern size_t fwrite(const void *__ptr, size_t __size, size_t __n, FILE *__s);
 
 /* Faster versions when locking is not necessary.
 
@@ -3339,7 +3339,7 @@ extern size_t fwrite(void *__ptr, size_t __size, size_t __n, FILE *__s);
 
 extern size_t fread_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
 
-extern size_t fwrite_unlocked(void *__ptr, size_t __size, size_t __n, FILE *__stream);
+extern size_t fwrite_unlocked(const void *__ptr, size_t __size, size_t __n, FILE *__stream);
 
 
 
@@ -7644,7 +7644,7 @@ static fgBIT flgr_get_array_fgBIT(fgBIT *array, int pos)
    vectorSelect = pos/vectorbps;
    pixinVector = pos%vectorbps;
 
-   nbdec = vectorbps-(fgBIT) 1-pixinVector;
+   nbdec = vectorbps-((fgBIT) 1)-pixinVector;
    mask = (fgBIT) 1<<nbdec;
 
    val = array[vectorSelect];
@@ -7812,7 +7812,7 @@ static void flgr_set_array_fgBIT(fgBIT *array, int pos, fgBIT value)
    vectorSelect = pos/vectorbps;
    pixinVector = pos%vectorbps;
 
-   nbdec = vectorbps-(fgBIT) 1-pixinVector;
+   nbdec = vectorbps-((fgBIT) 1)-pixinVector;
    mask = (fgBIT) 1<<nbdec;
 
    val = array[vectorSelect];

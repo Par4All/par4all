@@ -42,6 +42,6 @@ void dereferencing06()
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//  {(p,*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    *p++ = 1;
 }

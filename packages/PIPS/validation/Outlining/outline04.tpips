@@ -1,12 +1,5 @@
 delete outline04
 create outline04 outline04.c
-echo Select some options to deal with the C Language:
-echo Parse as C:
-activate C_PARSER
-echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-echo Prettyprint the source as C, of course
-setproperty PRETTYPRINT_C_CODE TRUE
 
 echo Select the most precise analysis:
 activate MUST_REGIONS
@@ -21,9 +14,12 @@ setenv COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL 5
 display PARSED_PRINTED_FILE[main]
 activate PRINT_CODE_INV_REGIONS
 display PRINTED_FILE[main]
+
 apply PRIVATIZE_MODULE[main]
 display PRINTED_FILE[main]
+
 apply COARSE_GRAIN_PARALLELIZATION[main]
+
 echo The first loop nest must be parallel:
 display PRINTED_FILE[main]
 
@@ -31,10 +27,12 @@ setproperty OUTLINE_LABEL "init_kernel"
 setproperty OUTLINE_MODULE_NAME "init_kernel"
 apply OUTLINE[main]
 display PRINTED_FILE[%ALL]
+
 apply PRIVATIZE_MODULE[%ALLFUNC]
 apply COARSE_GRAIN_PARALLELIZATION[init_kernel]
 echo The loop nest of init_kernel should be parallel:
 display PRINTED_FILE[%ALL]
 
 close
+delete outline04
 quit

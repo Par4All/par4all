@@ -14,7 +14,7 @@ Symbol table for module EQUIV15
 echo
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Request: build resource PARSED_CODE for module EQUIV15.
   BOOTSTRAP                      building   ENTITIES()
   FILTER_FILE                    building   SOURCE_FILE(EQUIV15)

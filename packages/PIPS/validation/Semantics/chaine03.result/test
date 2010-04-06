@@ -58,7 +58,7 @@ C  P(S1,S2) {'hi '==S2, 'hi'==S1}
 
       IF (S1.EQ.S2) THEN                                                0007
 
-C  P(S1,S2) {'hi '==S1, 'hi'==S1, S1==S2}
+C  P(S1,S2) {'hi '=='hi', 'hi '==S1, 'hi '==S2}
 
          PRINT *, 's1 == s2'                                            0008
       ENDIF

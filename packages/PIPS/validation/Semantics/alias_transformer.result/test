@@ -1,5 +1,5 @@
-user warning, property ACTIVE_PHASES redefined
-user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property ACTIVE_PHASES redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
 user warning in tp_parse: alias_transformer: No such workspace
 Registering file alias_transformer.f
 Splitting file    ./alias_transformer.f
@@ -9,19 +9,19 @@ Workspace alias_transformer created and opened.
 Main module PROGRAM "ALIAS_TRANSFORMER" selected.
 Module ALIAS_TRANSFORMER selected
 setproperty PRETTYPRINT_BLOCKS TRUE
-user warning, property PRETTYPRINT_BLOCKS redefined
+user warning in parse_properties: property PRETTYPRINT_BLOCKS redefined
 setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
-user warning, property PRETTYPRINT_EMPTY_BLOCKS redefined
+user warning in parse_properties: property PRETTYPRINT_EMPTY_BLOCKS redefined
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
-user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
+user warning in parse_properties: property PRETTYPRINT_BLOCK_IF_ONLY redefined
 setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
-user warning, property PRETTYPRINT_DO_LABEL_AS_COMMENT redefined
+user warning in parse_properties: property PRETTYPRINT_DO_LABEL_AS_COMMENT redefined
 setproperty PRETTYPRINT_UNSTRUCTURED TRUE
-user warning, property PRETTYPRINT_UNSTRUCTURED redefined
+user warning in parse_properties: property PRETTYPRINT_UNSTRUCTURED redefined
 setproperty PRETTYPRINT_FINAL_RETURN TRUE
-user warning, property PRETTYPRINT_FINAL_RETURN redefined
+user warning in parse_properties: property PRETTYPRINT_FINAL_RETURN redefined
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
-user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
 Selecting rule: PRECONDITIONS_INTER_FULL
 Selecting rule: TRANSFORMERS_INTER_FULL
 Selecting rule: PRINT_CODE_TRANSFORMERS

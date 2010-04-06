@@ -1,12 +1,6 @@
-delete cleandec01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete cleandec01
 create cleandec01 cleandec01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code
