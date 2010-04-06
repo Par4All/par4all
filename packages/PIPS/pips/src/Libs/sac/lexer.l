@@ -61,6 +61,8 @@ typedef dg_vertex_label vertex_label;
 "DI_REF"                return DI_REF_TOK;
 "SF_REF"                return SF_REF_TOK;
 "DF_REF"                return DF_REF_TOK;
+"SC_REF"                return SC_REF_TOK;
+"DC_REF"                return DC_REF_TOK;
 "LOG_REF"               return LOG_REF_TOK;
 "CONSTANT"              return CONSTANT_TOK;
 "="			return ASSIGN_OPERATOR_TOK;

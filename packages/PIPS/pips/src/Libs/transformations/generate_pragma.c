@@ -43,6 +43,7 @@
 #include "text-util.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "control.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -180,12 +181,10 @@ static void generate_str_omp_pragma_loop (loop l) {
 //////////////////////////////////////////////////////////////
 // the phase function name
 
-bool ompify_code (char mod_name[]) {
-
-  debug_on("OMPIFY_CODE_DEBUG_LEVEL");
-
-  statement mod_stmt = statement_undefined;
-
+bool ompify_code (const string module_name) {
+  // Use this module name and this environment variable to set
+  statement module_statement = PIPS_PHASE_PRELUDE(module_name,
+						  "OMPIFY_CODE_DEBUG_LEVEL");
   // we want omp syntax so save and change the current PRETTYPRINT_PARALLEL
   // property
   string previous = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
@@ -194,10 +193,7 @@ bool ompify_code (char mod_name[]) {
   string type = get_string_property("PRAGMA_TYPE");
 
   // we need to iniatlize few things to generate reduction
-  reductions_pragma_omp_init (mod_name);
-
-  // Get the code and tell PIPS_DBM we do want to modify it
-  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  reductions_pragma_omp_init (module_name);
 
   // generate pragma string or expression using the correct language:
   set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
@@ -206,10 +202,10 @@ bool ompify_code (char mod_name[]) {
   // so ask NewGen gen_recurse to keep this informations for us
   // Iterate on all the loop
   if (strcmp (type, "str") == 0)
-    gen_recurse(mod_stmt, loop_domain, gen_true,
+    gen_recurse(module_statement, loop_domain, gen_true,
 		generate_str_omp_pragma_loop);
   else  if (strcmp (type, "expr") == 0)
-    gen_recurse(mod_stmt, loop_domain, gen_true,
+    gen_recurse(module_statement, loop_domain, gen_true,
 		generate_expr_omp_pragma_loop);
   else pips_assert ("not expected property", FALSE);
 
@@ -220,8 +216,8 @@ bool ompify_code (char mod_name[]) {
   // no more reductions to generate
   reductions_pragma_omp_end ();
 
-  pips_debug(2, "done for %s\n", mod_name);
-  debug_off();
+  // Put back the new statement module
+  PIPS_PHASE_POSTLUDE(module_statement);
 
   return TRUE;
 }

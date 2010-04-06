@@ -13,7 +13,7 @@ The pips sources also includes the newgen and linear libraries.
 
 On the edge version:
 
-	sh> svn co http://svn.cri.ensmp.fr/svn/pips/bundles/trunks MYPIPS
+	sh> svn co https://svn.cri.ensmp.fr/svn/pips/bundles/trunks MYPIPS
 
 Current production version?
 

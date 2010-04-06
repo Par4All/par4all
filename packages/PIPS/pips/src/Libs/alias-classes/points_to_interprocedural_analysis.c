@@ -28,7 +28,6 @@
 #include "points_to_private.h"
 #include "alias-classes.h"
 
-#define POINTS_TO_MODULE_NAME "*POINTS_TO_MODULE*"
 static int pointer_index = 1;
 
 /* --------------------------------Interprocedural Analysis-----------------------*/

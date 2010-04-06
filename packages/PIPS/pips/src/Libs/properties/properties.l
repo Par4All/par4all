@@ -96,7 +96,7 @@ void parse_properties_string(char *s)
 
 void parse_properties_string(char *s)
 {
-    fprintf(stderr, "[parse_properties_string] "
+    pips_user_error(
 	    "cannot parse string (%s) without flex\n", s);
     exit(1);
 }
@@ -171,7 +171,7 @@ static void parse_properties(void)
 	string n;
 
 	if (tok != TIDENT) {
-	    fprintf(stderr, "syntax error in parse_properties, "
+	    pips_user_error(
 		    "ident expected, got %d for -%s-.\n", tok, yytext);
 	    return;
 	}
@@ -179,7 +179,7 @@ static void parse_properties(void)
 	n = strdup(yytext);
 
 	if (update_property && property_undefined_p(get_property(n, TRUE))) {
-	    fprintf(stderr, "user error in parse_properties: "
+	    pips_user_error(
 		    "Unknown property %s to update\n", n);
 	    return;
 	}
@@ -201,7 +201,7 @@ static void parse_properties(void)
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
             if (q == NULL) {
-		fprintf(stderr, "user error in parse_properties: "
+                pips_user_error(
 			"bad string : %s\n", yytext);
 		return;
 	    }
@@ -210,7 +210,7 @@ static void parse_properties(void)
 	    break;
 	}
 	default:
-	    fprintf(stderr, "user error in parse_properties: "
+	    pips_user_error(
 		    "bad value for property %s: %s\n", n, yytext);
 	    return;
 	}
@@ -220,8 +220,7 @@ static void parse_properties(void)
 	{
 	    if (property_tag(opr)!=property_tag(pr))
 	    {
-		fprintf(stderr, "user warning, "
-			"cannot change type from %s to %s "
+            pips_user_warning("cannot change type from %s to %s "
 			"when updating property %s\n",
 			property_tag_to_string(property_tag(opr)),
 			property_tag_to_string(property_tag(pr)),
@@ -231,8 +230,7 @@ static void parse_properties(void)
 	    else
 	    {
 		if(!property_equal_p(pr, opr))
-		    fprintf(stderr, "user warning, "
-			    "property %s redefined\n", n);
+		    pips_user_warning("property %s redefined\n", n);
 		free_property(opr);
 		hash_update(pl, n, (char *) pr);
 	    }
