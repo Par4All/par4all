@@ -4,7 +4,9 @@ delete $WS
 create $WS $WS.c
 
 echo just check parsing
-display PRINTED_FILE[%ALL]
+make PRINTED_FILE[%ALL]
+module run
+display PRINTED_FILE[run]
 
 close
 delete $WS
