@@ -23,13 +23,24 @@ P4A_ETC=$P4A_INSTALL_PREFIX/etc
 mkdir -p $P4A_ETC
 
 if test -z "$INSTALL_PREFIX" ; then
-    # install prefix passed by --prefix to the configure script
+    # install prefix passed by --prefix to the configure script:
     INSTALL_PREFIX=$P4A_INSTALL_PREFIX
 fi
 mkdir -p $INSTALL_PREFIX
 
-# default flags for the configure script
+# Default flags for the configure script:
 PIPS_CONFIGURE_COMMON_FLAGS=" --disable-static"
+
+# Where to find PIPS/pips if not specified:
+if [[ -z $P4A_PIPS_SRC ]]; then
+    P4A_PIPS_SRC=$P4A_ROOT/packages/PIPS/pips
+fi
+
+# Where to find PIPS/nlpmake if not specified:
+if [[ -z $P4A_NLPMAKE_SRC ]]; then
+    P4A_NLPMAKE_SRC=$P4A_ROOT/packages/PIPS/nlpmake
+fi
+
 
 cd $P4A_ROOT
 
@@ -41,13 +52,14 @@ cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/validation/p4a_validate $P4A_INSTALL_PREFIX/bin
 
 # Stuff still lacking from PIPS install:
-cp $P4A_ROOT/packages/PIPS/pips/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin
+cp $P4A_PIPS_SRC/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin
+
 # To have the validation running:
 mkdir -p  $P4A_INSTALL_PREFIX/makes
-cp $P4A_ROOT/packages/PIPS/nlpmake/makes/{arch.sh,version.sh} $P4A_INSTALL_PREFIX/makes
+cp $P4A_NLPMAKE_SRC/makes/{arch.sh,version.sh} $P4A_INSTALL_PREFIX/makes
 
 PIPS_COMPONENTS="linear newgen pips"
-PIPS_DIR=$P4A_ROOT/packages/PIPS
+#PIPS_DIR=$P4A_ROOT/packages/PIPS
 
 # The config files to source later:
 P4A_RC_SH=$P4A_ETC/par4all-rc.sh
@@ -72,7 +84,7 @@ unset NEWGEN_ROOT
 #export LINEAR_ROOT=$PIPS_DIR/linear
 unset LINEAR_ROOT
 #export PIPS_ROOT=$P4A_BUILD
-export PIPS_ROOT=$PIPS_DIR/pips
+#export PIPS_ROOT=$PIPS_DIR/pips
 # Hack to have access to makefiles...
 #export ROOT=$P4A_ROOT/packages/PIPS
 # For pyps:
@@ -110,16 +122,28 @@ if [ -n "$PIPS_F77" ]; then
 fi
 
 # Generate also a config file for csh users:
-$PIPS_DIR/pips/src/Scripts/env/sh2csh.pl < $P4A_RC_SH > $P4A_RC_CSH
+$P4A_PIPS_SRC/src/Scripts/env/sh2csh.pl < $P4A_RC_SH > $P4A_RC_CSH
 
 
 # Build the package of name $1 that is to be found into directory $2, with
-# some $3 options to configure:
+# some $3 options to configure.
+
+# If the P4A_<PACKAGE>_SRC environment variable is set, the its value
+# represents the directory to be used to get the source package instead of
+# $2.  Useful to compile PIPS components directly from the SVN for
+# example.
 function build_package() {
     local package=$1
     local dir=$2
     local options=$3
     (
+	local upper_package=${package^^}
+	# Find the value of a P4A_<PACKAGE>_SRC variable:
+	eval "local src_dir=\${P4A_${upper_package}_SRC}"
+	if [[ -n $src_dir ]]; then
+	    # Overide the source origin from the given environment variable:
+	    dir=$src_dir
+	fi
 	cd $dir
 	dir=`pwd`
 	# There are lacking files in the Polylib that autoreconf do not
@@ -163,10 +187,14 @@ build_package pips packages/PIPS/pips "--enable-tpips --enable-pyps"
 cat << EOF
 ============================================
 Par4All is ready
-everything got installed in $INSTALL_PREFIX
+everything got installed in
+$INSTALL_PREFIX
 
-According to your shell religion, you should include $P4A_RC_SH (bash,
-dash, sh...) or $P4A_RC_CSH (tcsh, csh...).
+According to your shell religion, you should include
+$P4A_RC_SH
+(for bash, dash, sh...) or
+$P4A_RC_CSH
+(tcsh, csh...).
 ============================================
 EOF
 
