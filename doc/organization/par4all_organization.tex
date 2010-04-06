@@ -99,6 +99,25 @@ If some files are lacking from the commit, it will be detected.
 Afterwards you can do a \texttt{git push} into the central \Apfa
 repository with less risks.
 
+The classical \Aautotools environment variables can be used to influence
+the compilation. The most important one are \texttt{CFLAGS} and
+\texttt{CPPFLAGS} to compile \Apfa in debug mode. For example,
+\begin{verbatim}
+export CFLAGS='-ggdb -g3 -Wall -std=c99'
+\end{verbatim}
+are good debugging options that allow \texttt{gdb} to access macro
+definitions that are heavily used in \Apips.
+
+You may want to compile \Apfa directly from source packages that are not
+inside the \Apfa directory hierarchy (see \S~\ref{sec:direct-organ}). For
+this, you can specify in the \texttt{P4A\_\emph{PACKAGE}\_SRC} the
+location of the sources of \texttt{\emph{package}}, for example
+\verb|P4A_PIPS_SRC| or \verb|P4A_POLYLIB_SRC|. If all these variables are
+set (for example to a working copy of the \Apips{} \Asvn), you should be
+able to compile with only the \texttt{p4a-own} branch. For the \Apips
+packages, you should have the links to \texttt{nlpmake/makes} to have them
+to compile.
+
 
 \section{Collaborative repositories}
 \label{sec:coll-repos}

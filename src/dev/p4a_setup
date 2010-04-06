@@ -114,12 +114,24 @@ $PIPS_DIR/pips/src/Scripts/env/sh2csh.pl < $P4A_RC_SH > $P4A_RC_CSH
 
 
 # Build the package of name $1 that is to be found into directory $2, with
-# some $3 options to configure:
+# some $3 options to configure.
+
+# If the P4A_<PACKAGE>_SRC environment variable is set, the its value
+# represents the directory to be used to get the source package instead of
+# $2.  Useful to compile PIPS components directly from the SVN for
+# example.
 function build_package() {
     local package=$1
     local dir=$2
     local options=$3
     (
+	local upper_package=${package^^}
+	# Find the value of a P4A_<PACKAGE>_SRC variable:
+	eval "local src_dir=\${P4A_${upper_package}_SRC}"
+	if [[ -n $src_dir ]]; then
+	    # Overide the source origin from the given environment variable:
+	    dir=$src_dir
+	fi
 	cd $dir
 	dir=`pwd`
 	# There are lacking files in the Polylib that autoreconf do not
@@ -163,10 +175,14 @@ build_package pips packages/PIPS/pips "--enable-tpips --enable-pyps"
 cat << EOF
 ============================================
 Par4All is ready
-everything got installed in $INSTALL_PREFIX
+everything got installed in
+$INSTALL_PREFIX
 
-According to your shell religion, you should include $P4A_RC_SH (bash,
-dash, sh...) or $P4A_RC_CSH (tcsh, csh...).
+According to your shell religion, you should include
+$P4A_RC_SH
+(for bash, dash, sh...) or
+$P4A_RC_CSH
+(tcsh, csh...).
 ============================================
 EOF
 
