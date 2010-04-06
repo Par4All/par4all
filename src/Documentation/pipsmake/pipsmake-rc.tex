@@ -6432,7 +6432,7 @@ PARTIAL_DISTRIBUTION FALSE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop expansion
 \subsection{Loop Expansion}
-\begin{PipsPass}
+\begin{PipsPass}{loop_expansion}
 Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}.
 An offset can be set by \PipsPropRef{LOOP_EXPANSION_OFFSET} to accuratly change the lower bound too.
 The new loop is guarded to prevent illegal iterations, further transformations can elaborate on this.
@@ -6677,6 +6677,15 @@ loop_tiling                            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+This transformations prompts the user for a partition matrix.
+Alternatetively, this matrix can be provided through the \PipsPropRef{LOOP_TILING_MATRIX} property.
+The format of the matrix is a00 a01 a02,a10 a11 a12,a20 a21 a22
+\begin{PipsProp}{LOOP_TILING_MATRIX}
+LOOP_TILING_MATRIX ""
+\end{PipsProp}
+
+Likewise, one ca use the \PipsPropRef{LOOP_LABEL} property to specify the targeted loop.
 
 \subsection{Loop Normalize}
 \label{subsection-loop-normalize}
@@ -7650,6 +7659,16 @@ generate_two_addresses_code > MODULE.code
 			< PROGRAM.entities
 \end{PipsMake}
 
+%\begin{PipsPass}{iterator_detection}
+%convert array to pointer iterators
+%\end{PipsPass}
+%\begin{PipsMake}
+%iterator_detection > MODULE.code
+%	< MODULE.code
+%	< PROGRAM.entities
+%	< MODULE.cumulated_effects
+%\end{PipsMake}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARTIAL EVAL
 
 \subsection{Partial Evaluation}
@@ -7822,12 +7841,13 @@ array_to_pointer > MODULE.code
 		< MODULE.code
 \end{PipsMake}
 
-The property \PipsPropRef{ARRAY_TO_POINTER_CONVERT_PARAMETERS} can be used to change the signature of the module.
+The property \PipsPropRef{ARRAY_TO_POINTER_CONVERT_PARAMETERS} can be used to change the signature of the module, either not changing it,
+or using pointers \lstinline|POINTER| or \lstinline|1D|.
 Module similar to \lstinline|int foo(int a[20][2]);| will be turned into \lstinline|int foo(int *a);|
  The property \PipsPropRef{ARRAY_TO_POINTER_FLATTEN_ONLY} can be set to true to reduce (<>flatten) the number of dimensions of the arrays to 1, while keeping use of the \verb+[]+ operator.
 
 \begin{PipsProp}{ARRAY_TO_POINTER_CONVERT_PARAMETERS}
-ARRAY_TO_POINTER_CONVERT_PARAMETERS FALSE
+ARRAY_TO_POINTER_CONVERT_PARAMETERS ""
 \end{PipsProp}
 \begin{PipsProp}{ARRAY_TO_POINTER_FLATTEN_ONLY}
 ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
@@ -7948,6 +7968,10 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT FALSE
 \begin{PipsProp}{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS}
 COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \end{PipsProp}
+
+\begin{PipsPass}{icm}
+performs invariant code motion over sub expressions
+\end{PipsPass}
 
 %-----------End of Expression Transformations -------------------------
 
