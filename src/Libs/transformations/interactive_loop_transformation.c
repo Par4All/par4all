@@ -217,3 +217,54 @@ flag_loops(char *module_name)
     reset_current_module_statement();
     return true;
 }
+
+static
+bool module_loops_walker(statement s, list *l)
+{
+    if(statement_loop_p(s))
+    {
+        string tmp;
+        asprintf(&tmp,"%s ",label_local_name(statement_label(s)));
+        *l=CONS(STRING,tmp,*l);
+        return false;
+    }
+    return true;
+}
+
+/** 
+ * gather the list of enclosing loops
+ * expect flag_loops has been called before
+ * 
+ * @param module_name module we want the loops of
+ * @param parent_loop null if we wat to gather outer loops, a loop_label if we want to gather enclosed loops
+ * 
+ * @return list of strings, one string per loop label
+ */
+string module_loops(const string module_name, const string parent_loop)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    list loops = NIL;
+
+    statement seed = statement_undefined;
+    if(empty_string_p(parent_loop))
+        seed=get_current_module_statement();
+    else {
+        entity label = find_label_entity(module_name,parent_loop);
+        statement stmt = find_loop_from_label(get_current_module_statement(),label);
+        seed=loop_body(statement_loop(stmt));
+    }
+
+    /* run loop gatherer */
+    gen_context_recurse(seed,&loops,statement_domain,module_loops_walker,gen_null);
+    loops=gen_nreverse(loops);
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    string out = list_to_string(loops);
+    gen_free_list(loops);
+    if(out) out[strlen(out)-1]=0;
+    return out;
+}
