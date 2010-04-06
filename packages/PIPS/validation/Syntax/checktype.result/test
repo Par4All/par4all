@@ -8,7 +8,7 @@ Main module PROGRAM "CHECKTYPE" selected.
 Module CHECKTYPE already active.
 Module CHECKTYPE already active.
 setproperty PARSER_TYPE_CHECK_CALL_SITES   TRUE
-user warning, property PARSER_TYPE_CHECK_CALL_SITES redefined
+user warning in parse_properties: property PARSER_TYPE_CHECK_CALL_SITES redefined
 Module CHECKTYPE already active.
 Request: build resource PRINTED_FILE for module CHECKTYPE.
   BOOTSTRAP                      building   ENTITIES()

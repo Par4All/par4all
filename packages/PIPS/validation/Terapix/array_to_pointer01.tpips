@@ -21,12 +21,12 @@ echo
 apply ARRAY_TO_POINTER[duck]
 display PRINTED_FILE[duck]
 
-echo
-echo Code after partial eval
-echo
-
-apply PARTIAL_EVAL[duck]
-display PRINTED_FILE[duck]
+#echo
+#echo Code after partial eval
+#echo
+#
+#apply PARTIAL_EVAL[duck]
+#display PRINTED_FILE[duck]
 
 echo
 echo Unsplit resulting code

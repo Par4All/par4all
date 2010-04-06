@@ -7,7 +7,7 @@ typedef struct {
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv],
         Cplfloat Pow[Nth]) {
 
-    double PP;
+    float PP;
     int th, v, rg;
 
     for (th=0; th<Nth; th++) {

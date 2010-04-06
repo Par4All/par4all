@@ -10,8 +10,46 @@ void foo_l(int a[4], int b[4], int c[4])
    a[1] = tmp[2]+tmp[3];
 }
 
- **************** Effective Dependence Graph ****************
+ ******** Whole Dependence Graph with Dependence Cones ******
 
+	09 --> 10 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+	08 --> 10 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+	08 --> 09 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
+	06 --> 10 with conflicts
+		from <a[PHI1]-W-MUST> to <a[PHI1]-W-MUST>
+	06 --> 09 with conflicts
+		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
+		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
+	06 --> 08 with conflicts
+		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
+		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
+	05 --> 10 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+	05 --> 09 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
+	05 --> 08 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
+	05 --> 06 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+	04 --> 10 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+	04 --> 09 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
+	04 --> 08 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
+	04 --> 06 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
+	04 --> 05 with conflicts
+		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
 
 ****************** End of Dependence Graph ******************
 void foo_l(int a[4], int b[4], int c[4])

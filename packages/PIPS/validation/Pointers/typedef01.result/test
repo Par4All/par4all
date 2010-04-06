@@ -7,7 +7,7 @@ void compute()
 //               <must be written>: j
       for(j = 1; j <= 62; j += 1)
 //               <must be read   >: i j
-//               <must be written>: TOP-LEVEL:tab[i][j]
+//               <must be written>: tab[i][j]
          tab[i][j] = i*j;
 }
 

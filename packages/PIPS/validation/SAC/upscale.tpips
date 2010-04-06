@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete upscale
 create upscale upscale.c
 module upscale_chrominance

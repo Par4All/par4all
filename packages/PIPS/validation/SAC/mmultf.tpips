@@ -1,11 +1,6 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete MMULTF
-
-#setproperty ABORT_ON_USER_ERROR TRUE
-
 create MMULTF mmult.f include/simd.f
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 
 echo
@@ -14,7 +9,7 @@ echo
 
 display PRINTED_FILE[MMUL]
 
-setproperty SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE TRUE
+setproperty SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE TRUE
 #setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
 
 activate MUST_REGIONS
@@ -41,11 +36,11 @@ apply PARTIAL_EVAL
 apply SUPPRESS_DEAD_CODE
 apply FORWARD_SUBSTITUTE
 apply PARTIAL_EVAL 
-apply USE_DEF_ELIM
+apply USE_DEF_ELIMINATION
 apply SIMD_ATOMIZER
 apply SINGLE_ASSIGNMENT
-apply USE_DEF_ELIM
-#apply SIMDIZER
+apply USE_DEF_ELIMINATION
+apply SIMDIZER
 
 
 #source include/benchmark.tpips.h

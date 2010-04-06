@@ -1,5 +1,5 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete DOTPROD
-
 create DOTPROD kernels/DOTPROD/DOTPROD.f include/simd.f
 
 module DOTPROD

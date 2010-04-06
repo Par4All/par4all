@@ -1,5 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete bouclevide1
 create bouclevide1 bouclevide1.f
+
 module TEST1
 display PRINTED_FILE[TEST1]
 apply SUPPRESS_TRIVIAL_TEST[TEST1]

@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete split_update_operator01
 create split_update_operator01 split_update_operator01.c
 

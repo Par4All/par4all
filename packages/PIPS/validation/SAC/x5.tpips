@@ -1,0 +1,28 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS = x5
+delete $WS
+create $WS $WS.c include/simd_cpy.c
+
+setproperty SIMD_PATTERN_FILE "include/assign.def"
+
+module X_5
+
+display PRINTED_FILE
+
+source include/benchmark.tpips.h
+
+apply UNSPLIT
+close
+
+#shell cc $WS.c include/SIMD.c -o ${WS}0
+#shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
+#shell cc -Iinclude $WS.database/Src/$WS.c include/SIMD.c -o ${WS}1
+#shell sed -i -e '1 d' $WS.database/Src/$WS.c
+#shell if test "`./${WS}0`" = "`./${WS}1`" ; then echo seq-ok ; else echo seq-ko ; fi
+#
+#shell ./compileC.sh $WS $WS.c ${WS}-sse.c
+#shell cc -O3 -I. -march=native ${WS}-sse.c -o ${WS}2
+#shell if test "`./${WS}0`" = "`./${WS}2`" ; then echo sse-ok ; else echo sse-ko ; fi
+#shell rm -f ${WS}[012] $WS-sse.c
+
+delete $WS

@@ -1,0 +1,57 @@
+
+Initial code
+
+void P4A_scmp_kernel_0(int N, int a[N])
+{
+   int i;
+   for(i = 0; i <= 99; i += 1)
+      a[i] += 3;
+}
+int main()
+{
+
+   int a[N] = {0};
+   
+   
+kernel:   P4A_scmp_kernel_0(N, a);
+
+   return 0;
+}
+enum {N=100};
+
+extern void P4A_scmp_kernel_0(int N, int a[N]);
+
+extern int main();
+
+Code after outlining
+
+void P4A_scmp_kernel_0(int N, int a[N])
+{
+   int i;
+   for(i = 0; i <= 99; i += 1)
+      a[i] += 3;
+}
+void kernel(int N, int a[N])
+{
+   
+   
+kernel:   P4A_scmp_kernel_0(N, a);
+}
+int main()
+{
+
+   int a[N] = {0};
+   
+   
+kernel:   kernel(N, a);
+
+   return 0;
+}
+enum {N=100};
+
+extern void P4A_scmp_kernel_0(int N, int a[N]);
+
+extern int main();
+
+unsplit
+

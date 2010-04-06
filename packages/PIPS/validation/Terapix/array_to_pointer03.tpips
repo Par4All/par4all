@@ -19,7 +19,7 @@ echo Code after array conversion
 echo
 
 setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
 apply ARRAY_TO_POINTER[duck]
 display PRINTED_FILE[duck]
 

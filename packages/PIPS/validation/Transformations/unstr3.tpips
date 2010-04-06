@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete unstr3
 create unstr3 unstr3.f
 

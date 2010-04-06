@@ -1,16 +1,6 @@
-delete FULL_UNROLL
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete FULL_UNROLL
 create FULL_UNROLL full_unroll.c
-activate C_PARSER
-
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-
-echo End of property settings
 
 echo
 echo before unrolling

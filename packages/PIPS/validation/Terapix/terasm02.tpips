@@ -1,13 +1,6 @@
 delete terasm02
 
-setproperty ABORT_ON_USER_ERROR TRUE
-
 create terasm02 terasm02.c include/terasm.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 # for scalarization
 #
@@ -22,7 +15,7 @@ echo
 echo Initial code
 echo
 
-setproperty LOOP_NORMALIZE_1_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
 setproperty LOOP_NORMALIZE_LOWER_BOUND FALSE
 apply LOOP_NORMALIZE
 display PRINTED_FILE

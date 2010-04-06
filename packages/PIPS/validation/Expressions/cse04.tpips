@@ -1,0 +1,13 @@
+setenv WS cse04
+create $WS $WS.c
+
+display PRINTED_FILE[%ALL]
+
+setproperty COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS FALSE
+apply COMMON_SUBEXPRESSION_ELIMINATION[%ALL]
+
+display PRINTED_FILE[%ALL]
+
+close
+delete $WS
+

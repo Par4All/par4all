@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete unroll9
 create unroll9 unroll9.f
 

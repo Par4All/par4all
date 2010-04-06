@@ -104,8 +104,8 @@ C    1<=INEW, INEW<=2, 0<=LNEW, LNEW<=1, 0<=LOLD, LOLD<=1}
 
       SNEW = SOLD                                                       0010
 
-C  P(INEW,SNEW,XNEW) {"Hi!"==SNEW, 2.+3.==XNEW, INEW==IOLD,
-C    SNEW==SOLD, XNEW==XOLD, 1<=INEW, INEW<=2, 0<=LNEW, LNEW<=1,
+C  P(INEW,SNEW,XNEW) {"Hi!"==SNEW, "Hi!"==SOLD, 2.+3.==XNEW,
+C    INEW==IOLD, XNEW==XOLD, 1<=INEW, INEW<=2, 0<=LNEW, LNEW<=1,
 C    0<=LOLD, LOLD<=1}
 
       LNEW = LOLD                                                       0011
@@ -144,14 +144,14 @@ C  P(L2,S2,U,V) {"Hi!"==S2, 2.==U, 3.==V, L2==1}
 
       CALL COPY_FOUR(I, 1+MOD(J, 2), X, U+V, S1, S2, L1, L2.AND.L3)     0014
 
-C  P(I,L1,L2,S1,S2,U,V,X) {"Hi!"==S1, 2.+3.==X, 2.==U, 3.==V, L1==L3,
-C    L2==1, S1==S2, 1<=I, I<=2, 0<=L1, L1<=1}
+C  P(I,L1,L2,S1,S2,U,V,X) {"Hi!"==S1, "Hi!"==S2, 2.+3.==X, 2.==U,
+C    3.==V, L1==L3, L2==1, 1<=I, I<=2, 0<=L1, L1<=1}
 
 
       PRINT *, I, X, S1, L1                                             0016
 
-C  P(I,L1,L2,S1,S2,U,V,X) {"Hi!"==S1, 2.+3.==X, 2.==U, 3.==V, L1==L3,
-C    L2==1, S1==S2, 1<=I, I<=2, 0<=L1, L1<=1}
+C  P(I,L1,L2,S1,S2,U,V,X) {"Hi!"==S1, "Hi!"==S2, 2.+3.==X, 2.==U,
+C    3.==V, L1==L3, L2==1, 1<=I, I<=2, 0<=L1, L1<=1}
 
 
       READ *, J, U, V, S2, L2                                           0018

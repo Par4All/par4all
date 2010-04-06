@@ -29,67 +29,58 @@ simdized code
       INTEGER*4 A(SIZE,SIZE), B(SIZE,SIZE), C(SIZE,SIZE)
       INTEGER I, J,K
 
-      LU_NUB2 = 4
-      LU_IB2 = 0
-      LU_IND2 = 0
 99995 CONTINUE
       DO 99994 LU_IND2 = 0, 3, 2
-         LU_NUB1 = 4
-         LU_IB1 = 0
          LU_IND1 = 0
          DO LU_IND1 = 0, 3, 2
             C(LU_IND2+1,LU_IND1+1) = 0                                  0011
-            LU_NUB0 = 4
-            LU_IB0 = 0
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               I_00 = A(LU_IND2+1,LU_IND0+1)*B(LU_IND0+1,LU_IND1+1)
+               CALL SIMD_LOAD_V2SI(v2si_vec2, B(LU_IND0+1,LU_IND1+1))
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec1, A(LU_IND2+1,
+     &         LU_IND0+1), A(LU_IND2+1,LU_IND0+2))
+               CALL SIMD_MULD(v2si_vec0, v2si_vec1, v2si_vec2)
+               CALL SIMD_SAVE_GENERIC_V2SI(v2si_vec0, I_00, I_10)
                C(LU_IND2+1,LU_IND1+1) = C(LU_IND2+1,LU_IND1+1)+I_00     0013
-               I_10 = A(LU_IND2+1,LU_IND0+2)*B(LU_IND0+2,LU_IND1+1)
                C(LU_IND2+1,LU_IND1+1) = C(LU_IND2+1,LU_IND1+1)+I_10     0013
             ENDDO
-            K = 5
             C(LU_IND2+1,LU_IND1+2) = 0                                  0011
-            LU_NUB0 = 4
-            LU_IB0 = 0
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               I_20 = A(LU_IND2+1,LU_IND0+1)*B(LU_IND0+1,LU_IND1+2)
+               CALL SIMD_LOAD_V2SI(v2si_vec5, B(LU_IND0+1,LU_IND1+2))
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec4, A(LU_IND2+1,
+     &         LU_IND0+1), A(LU_IND2+1,LU_IND0+2))
+               CALL SIMD_MULD(v2si_vec3, v2si_vec4, v2si_vec5)
+               CALL SIMD_SAVE_GENERIC_V2SI(v2si_vec3, I_20, I_30)
                C(LU_IND2+1,LU_IND1+2) = C(LU_IND2+1,LU_IND1+2)+I_20     0013
-               I_30 = A(LU_IND2+1,LU_IND0+2)*B(LU_IND0+2,LU_IND1+2)
                C(LU_IND2+1,LU_IND1+2) = C(LU_IND2+1,LU_IND1+2)+I_30     0013
             ENDDO
-            K = 5
          ENDDO
-         J = 5
-         LU_NUB1 = 4
-         LU_IB1 = 0
          LU_IND1 = 0
          DO LU_IND1 = 0, 3, 2
             C(LU_IND2+2,LU_IND1+1) = 0                                  0011
-            LU_NUB0 = 4
-            LU_IB0 = 0
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               I_40 = A(LU_IND2+2,LU_IND0+1)*B(LU_IND0+1,LU_IND1+1)
+               CALL SIMD_LOAD_V2SI(v2si_vec8, B(LU_IND0+1,LU_IND1+1))
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec7, A(LU_IND2+2,
+     &         LU_IND0+1), A(LU_IND2+2,LU_IND0+2))
+               CALL SIMD_MULD(v2si_vec6, v2si_vec7, v2si_vec8)
+               CALL SIMD_SAVE_GENERIC_V2SI(v2si_vec6, I_40, I_50)
                C(LU_IND2+2,LU_IND1+1) = C(LU_IND2+2,LU_IND1+1)+I_40     0013
-               I_50 = A(LU_IND2+2,LU_IND0+2)*B(LU_IND0+2,LU_IND1+1)
                C(LU_IND2+2,LU_IND1+1) = C(LU_IND2+2,LU_IND1+1)+I_50     0013
             ENDDO
-            K = 5
             C(LU_IND2+2,LU_IND1+2) = 0                                  0011
-            LU_NUB0 = 4
-            LU_IB0 = 0
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               I_60 = A(LU_IND2+2,LU_IND0+1)*B(LU_IND0+1,LU_IND1+2)
+               CALL SIMD_LOAD_V2SI(v2si_vec11, B(LU_IND0+1,LU_IND1+2)
+     &         )
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec10, A(LU_IND2+2,
+     &         LU_IND0+1), A(LU_IND2+2,LU_IND0+2))
+               CALL SIMD_MULD(v2si_vec9, v2si_vec10, v2si_vec11)
+               CALL SIMD_SAVE_GENERIC_V2SI(v2si_vec9, I_60, I_70)
                C(LU_IND2+2,LU_IND1+2) = C(LU_IND2+2,LU_IND1+2)+I_60     0013
-               I_70 = A(LU_IND2+2,LU_IND0+2)*B(LU_IND0+2,LU_IND1+2)
                C(LU_IND2+2,LU_IND1+2) = C(LU_IND2+2,LU_IND1+2)+I_70     0013
             ENDDO
-            K = 5
          ENDDO
-         J = 5
 99994    CONTINUE
-      I = 5
       END

@@ -1,6 +1,6 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete scalarization02
 
-setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 
 ##TODO: explain

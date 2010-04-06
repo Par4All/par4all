@@ -1,5 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete cgpara
 create cgpara cgpara.f
+
 module TEST1
 apply COARSE_GRAIN_PARALLELIZATION # Coarse Grain Parallelization
 display PRINTED_FILE(TEST1)

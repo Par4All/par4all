@@ -1,15 +1,12 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 setenv WSPACE inlining22
 delete ${WSPACE}
 setenv MAIN $WSPACE.database/main
 
-setproperty ABORT_ON_USER_ERROR TRUE
-
 create ${WSPACE} inlining22.src/inlining22.c inlining22.src/inlining22-foo.c
 
-activate C_PARSER
 activate C_SYMBOL_TABLE
 
-setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 

@@ -1,12 +1,8 @@
-delete inlining29
 setproperty ABORT_ON_USER_ERROR TRUE
+delete inlining29
 setenv PIPS_CPP_FLAGS=-Iinclude
 
 create inlining29 include/array.c inlining29.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code

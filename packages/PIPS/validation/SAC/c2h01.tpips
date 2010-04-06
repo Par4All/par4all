@@ -1,13 +1,6 @@
-delete c2h01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete c2h01
 create c2h01 kernels/C2H/c2h01.c include/SIMD_C2H.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 
 echo
 echo Initial code

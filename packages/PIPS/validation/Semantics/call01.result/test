@@ -6,29 +6,29 @@ void call01(int i)
 //               <must be read   >: i
 //               <must be written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: TOP-LEVEL:j i
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j i
+//               <must be written>: j
 void call01(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: TOP-LEVEL:j
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: j
+//               <must be written>: j
    j++;                                                                 /*0008*/
 }
 
 Source code with transformers
 
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
 void call01(int i)
 {
@@ -37,7 +37,7 @@ void call01(int i)
 
    i++;                                                                 /*0007*/
 
-//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+//  T(j) {j==j#init+1}
 
    j++;                                                                 /*0008*/
 }
@@ -45,4 +45,6 @@ void call01(int i)
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning call01 instead

@@ -27,7 +27,7 @@ int main()
    a = &i;
 //  {(a,i,-Exact-)}
    x = a;
-//  {(x,i,-Exact-);(a,i,-Exact-)}
+//  {(a,i,-Exact-);(x,i,-Exact-)}
 
    return 0;
    // END BLOCK

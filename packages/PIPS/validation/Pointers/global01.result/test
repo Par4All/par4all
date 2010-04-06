@@ -1,12 +1,12 @@
 void global01()
 {
    // BEGIN BLOCK
-//               <must be written>: TOP-LEVEL:i
+//               <must be written>: i
    i = &k;
-//               <must be read   >: TOP-LEVEL:i
-//               <must be written>: TOP-LEVEL:j
+//               <must be read   >: i
+//               <must be written>: j
    j = i;
-//               <must be read   >: TOP-LEVEL:i __IO_EFFECTS:LUNS[1]
+//               <must be read   >: i __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("i = %p", i);
    // END BLOCK
@@ -21,7 +21,7 @@ void global01()
    i = &k;
 //  {(i,k,-Exact-)}
    j = i;
-//  {(j,k,-Exact-);(i,k,-Exact-)}
+//  {(i,k,-Exact-);(j,k,-Exact-)}
    printf("i = %p", i);
    // END BLOCK
 }

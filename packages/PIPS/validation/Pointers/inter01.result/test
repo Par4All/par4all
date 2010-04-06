@@ -43,11 +43,11 @@ void inter01()
 //               <must be written>: n
 
    for(n = 0; n <= 9; n += 1) {
-//               <must be written>: TOP-LEVEL:i
+//               <must be written>: i
       i = 1;
-//               <must be written>: TOP-LEVEL:j
+//               <must be written>: j
       j = 2;
-//               <must be written>: inter01!:k
+//               <must be written>: k
       k = 3;
 //               <must be written>: l
       l = 4;

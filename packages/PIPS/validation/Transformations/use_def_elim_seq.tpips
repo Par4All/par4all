@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 # Pb de coherence de la table
 # ordering_to_statement
 delete seq

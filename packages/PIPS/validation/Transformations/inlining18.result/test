@@ -1,35 +1,31 @@
 char * foo(void)
 {
-   const char *foo_fun = __FUNCTION__;                                  /*0003*/
-   return (char *) foo_fun;                                             /*0004*/
+   const char *foo_fun = __FUNCTION__;
+   return (char *) foo_fun;
 }
 int main(void)
 {
-   const char *fun, *fun2, *fun3;                                       /*0009*/
-   fun = foo();                                                         /*0010*/
-   fun2 = __FUNCTION__;                                                 /*0011*/
-   fun3 = __func__;                                                     /*0012*/
-   return 0;                                                            /*0013*/
+   const char *fun, *fun2, *fun3;
+   fun = foo();
+   fun2 = __FUNCTION__;
+   fun3 = __func__;
+   return 0;
 }
-extern char *foo(void);                                                 /*0001*/
+extern char *foo(void);
 
-extern int main(void);                                                  /*0003*/
+extern int main(void);
 int main(void)
 {
-   const char *fun, *fun2, *fun3;                                       /*0003*/
-   /*0009*/
+   const char *fun, *fun2, *fun3;
    //PIPS generated variable
-   char *_return0;                                                      /*0005*/
+   char *_return0;
    {
-      const char *foo_fun;                                              /*0007*/
-      /*0003*/
-      foo_fun = __FUNCTION__;                                           /*0008*/
-      _return0 = (char *) foo_fun;                                      /*0009*/
+      const char *foo_fun;
+      foo_fun = __FUNCTION__;
+      _return0 = (char *) foo_fun;
    }
-   fun = _return0;                                                      /*0013*/
-   fun2 = __FUNCTION__;                                                 /*0014*/
-   /*0011*/
-   fun3 = __func__;                                                     /*0015*/
-   /*0012*/
-   return 0;                                                            /*0016*/
+   fun = _return0;
+   fun2 = __FUNCTION__;
+   fun3 = __func__;
+   return 0;
 }

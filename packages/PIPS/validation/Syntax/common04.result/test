@@ -9,7 +9,7 @@ Main module PROGRAM "COMMON04" selected.
 Module COMMON04 selected
 Module COMMON04 already active.
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module BAR selected
 Module BAR already active.
 Request: build resource PRINTED_FILE for module BAR.

@@ -1,0 +1,16 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS cdotc
+delete $WS
+
+create $WS $WS.f include/simd.f
+
+module `echo $WS | tr [a-z] [A-Z]`
+
+display PRINTED_FILE
+
+source include/fortran.tpips
+
+close
+
+delete $WS
+

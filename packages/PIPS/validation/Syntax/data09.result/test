@@ -124,7 +124,7 @@ Workspace data09 created and opened.
 Main module PROGRAM "DATA09" selected.
 Module DATA09 selected
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
-user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+user warning in parse_properties: property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
 Module INIT1 selected
 Request: build resource PRINTED_FILE for module INIT1.
   BOOTSTRAP                      building   ENTITIES()

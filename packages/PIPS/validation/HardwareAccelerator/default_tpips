@@ -1,3 +1,4 @@
+# WSPACE=foo FILE=foo.c tpips default_tpips
 delete ${WSPACE}
 setenv NAME ${NAME:-$WSPACE}
 setproperty ABORT_ON_USER_ERROR=TRUE

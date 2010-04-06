@@ -166,7 +166,7 @@ l99996:
 
 Microcode After array conversion
 
-void microcode(int isi, int isj, int i, float *image, float *kernel, float *new_image)
+void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
    int j;
@@ -187,10 +187,10 @@ l99996:
                   for(kj = 0; kj <= 2; kj += 1)
                      
                      
-                     __scalar__0 = __scalar__0+image[j+kj+512*(i_1+ki)-513]*kernel[3*ki+kj];
+                     __scalar__0 = __scalar__0+image[j+kj-1+isj*(i_1+ki-1)]*kernel[3*ki+kj];
                __scalar__0 = __scalar__0/9;
             }
-            new_image[j+512*i_1] = __scalar__0;
+            new_image[j+isj*i_1] = __scalar__0;
          }
    }
    ;

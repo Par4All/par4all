@@ -252,8 +252,8 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
 //  points to = {}
       i++, pdest++, p1++, p2++;
    }
-//  {(p2,*ANYWHERE*,-MAY-);(p1,*ANYWHERE*,-MAY-);(pdest,*ANYWHERE*,
-//   -MAY-)}
+//  {(p1,*ANY_MODULE*:*ANYWHERE*,-MAY-);(p2,*ANY_MODULE*:*ANYWHERE*,
+//   -MAY-);(pdest,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    return;
 }
 //  {(array,_array_1,-Exact-)}

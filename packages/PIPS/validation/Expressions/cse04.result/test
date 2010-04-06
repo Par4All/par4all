@@ -1,0 +1,40 @@
+void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int i_t, j_t;
+l99998:
+   for(i_t = 1; i_t <= 4; i_t += 1)
+      for(j_t = 1; j_t <= 64; j_t += 1)
+         for(i = 1; i <= 128; i += 1)
+            for(j = 1; j <= 8; j += 1)
+               result[i+128*i_t-129][j+8*j_t-9] = (40*src0[i+128*i_t-129][j+8*j_t-9]+60*src1[i+128*i_t-129][j+8*j_t-9])/100;
+}
+extern void alphablending(short src0[512][512], short src1[512][512], short result[512][512]);
+void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int i_t, j_t;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5;
+   //PIPS generated variable
+   short I_6;
+   //PIPS generated variable
+   int I_7;
+   //PIPS generated variable
+   short I_8;
+   //PIPS generated variable
+   int I_9, I_10, I_11;
+l99998:
+   for(i_t = 1; i_t <= 4; i_t += 1)
+      for(j_t = 1; j_t <= 64; j_t += 1)
+         for(i = 1; i <= 128; i += 1)
+            for(j = 1; j <= 8; j += 1) {
+               I_2 = i+128*i_t-129;
+               I_5 = j+8*j_t-9;
+               result[I_2][I_5] = (40*src0[I_2][I_5]+60*src1[I_2][I_5])/100;
+            }
+}
+extern void alphablending(short src0[512][512], short src1[512][512], short result[512][512]);
+

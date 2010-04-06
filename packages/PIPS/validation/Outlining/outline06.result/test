@@ -23,7 +23,7 @@ kernel:      kernel(i, bar);
 void kernel(int i, int bar[256][256])
 {
    //PIPS generated variable
-   extern int j, K;
+   int j;
 kernel:
    for(j = 0; j <= 255; j += 1)
       bar[i][j] = K*i*j;

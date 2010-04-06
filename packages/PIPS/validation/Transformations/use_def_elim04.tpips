@@ -1,8 +1,5 @@
-delete use_def_elim04
-
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
+delete use_def_elim04
 create use_def_elim04 use_def_elim04.f
 
 echo

@@ -6,9 +6,9 @@ Module SYNTHESIS09 selected
 Main module PROGRAM "SYNTHESIS09" selected.
 Module SYNTHESIS09 already active.
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
-user warning, property PREPROCESSOR_MISSING_FILE_HANDLING redefined
+user warning in parse_properties: property PREPROCESSOR_MISSING_FILE_HANDLING redefined
 setproperty PARSER_TYPE_CHECK_CALL_SITES TRUE
-user warning, property PARSER_TYPE_CHECK_CALL_SITES redefined
+user warning in parse_properties: property PARSER_TYPE_CHECK_CALL_SITES redefined
 echo
 
 echo User source code for SYNTHESIS09

@@ -43,18 +43,17 @@ ATOM * a_m_serial(int serial)
 //               <may be written >: lastmatched
    static ATOM *lastmatched = (void *) 0;
    int i, n, a_number();
-//               <must be read   >: TOP-LEVEL:atomUPDATE
+//               <must be read   >: atomUPDATE
    if (atomUPDATE)
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: TOP-LEVEL:atomNUMBER 
-//                                  TOP-LEVEL:atomUPDATE
+//               <may be written >: atomNUMBER atomUPDATE
 //               <must be written>: n
       n = a_number();
    else
-//               <must be read   >: TOP-LEVEL:atomNUMBER
+//               <must be read   >: atomNUMBER
 //               <must be written>: n
       n = atomNUMBER;
-//               <must be read   >: TOP-LEVEL:first
+//               <must be read   >: first
 //               <must be written>: ap
 
    ap = first;
@@ -63,7 +62,7 @@ ATOM * a_m_serial(int serial)
       return (void *) 0;
 //               <must be read   >: lastmatched
    if (lastmatched==(void *) 0) 
-//               <must be read   >: TOP-LEVEL:first
+//               <must be read   >: first
 //               <must be written>: lastmatched
       lastmatched = first;
 //               <must be read   >: lastmatched lastmatched[0][1] 
@@ -91,7 +90,7 @@ ATOM * a_m_serial(int serial)
       }
 //               <must be read   >: ap ap[0][3] n
       if (ap==ap->next)
-//               <must be read   >: TOP-LEVEL:first n
+//               <must be read   >: first n
 //               <must be written>: ap
          ap = first;
       else

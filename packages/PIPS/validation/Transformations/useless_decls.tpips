@@ -1,6 +1,9 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete u
+
 setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
 setproperty PRETTYPRINT_HEADER_COMMENTS=TRUE
+
 create u useless_decls.f
 echo !! before cleaning declarations
 display PRINTED_FILE
