@@ -1296,15 +1296,8 @@ static bool icm_loop_rwt(loop l)
 	    make_assign_statement(index,
 				  compute_final_index_value(m1, m2, m3));
 
-	statement_label(index_statement) = statement_label(head);
-
-	statement_instruction(head) =
-	    make_instruction_block(CONS(STATEMENT,
-					index_statement,
-					CONS(STATEMENT, body, NIL)));
-
-	statement_number(head) = statement_number(loop_body(l));
-	statement_label(head) = entity_empty_label();
+    statement_instruction(head)=instruction_undefined;
+    update_statement_instruction(head,make_instruction_block(make_statement_list(index_statement,body)));
 
 	ifdebug(5) {
 	    fprintf(stderr, "-> loop on %s removed (statement %td)\n",
