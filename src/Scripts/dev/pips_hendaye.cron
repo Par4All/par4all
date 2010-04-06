@@ -1,3 +1,4 @@
 # $Id$
 # temporary fix for pips@verone because svn version 1.5 is required
+# CAUTION: NFS is very bad for that, and it may interact with backups...
 30 0 * * * /usr/bin/svn up $HOME/PIPS/prod $HOME/PIPS/validation > $HOME/PIPS/svn.out 2> $HOME/PIPS/svn.err
