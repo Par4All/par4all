@@ -23,14 +23,26 @@
  */
 static void guard_expanded_statement(statement s, expression guard)
 {
-    instruction ins = make_instruction_test(
-            make_test(
+    if(statement_test_p(s))
+    {
+        test t =statement_test(s);
+        test_condition(t)=MakeBinaryCall(
+                entity_intrinsic(AND_OPERATOR_NAME),
                 copy_expression(guard),
-                copy_statement(s),/* update_instruction force us to copy */
-                make_empty_statement()
-                )
-            );
-    update_statement_instruction(s,ins);
+                test_condition(t)
+                );
+    }
+    else
+    {
+        instruction ins = make_instruction_test(
+                make_test(
+                    copy_expression(guard),
+                    copy_statement(s),/* update_instruction force us to copy */
+                    make_empty_statement()
+                    )
+                );
+        update_statement_instruction(s,ins);
+    }
 }
 
 /** 
@@ -93,7 +105,6 @@ void do_loop_expansion(statement st, int size,int offset)
     {
         /* this gets (e-b)/i , that is the number of iterations in the loop */
         expression nb_iter = range_to_expression(r,range_to_nbiter);
-
         /* this gets the expanded nb_iter */
         expression expanded_nb_iter = 
             make_op_exp(MULTIPLY_OPERATOR_NAME,
@@ -108,20 +119,19 @@ void do_loop_expansion(statement st, int size,int offset)
                             ),
                         int_to_expression(size)
                         )
-                   );
-        /* we must check for loop_index() in range_lower and atomize it if found */
-        set ents = get_referenced_entities(range_lower(r));
-        expression former_range_lower = range_lower(r);
-        entity new_range_lower_value_entity = entity_undefined;
-        if(set_belong_p(ents,loop_index(l)))
-        {
-            new_range_lower_value_entity=make_new_scalar_variable(get_current_module_entity(),basic_of_expression(range_lower(r)));
-            AddEntityToCurrentModule(new_range_lower_value_entity);
-            range_lower(r)=entity_to_expression(new_range_lower_value_entity);
-        }
-        /* then compute expanded range values */
+                    );
         expression new_range_lower_value=
             make_op_exp(MINUS_OPERATOR_NAME,range_lower(r),int_to_expression(offset));
+        /* we must check for loop_index() in range_lower*/
+        set ents = get_referenced_entities(new_range_lower_value);
+        entity new_range_lower_value_entity = entity_undefined;
+        statement assign_statement = statement_undefined;;
+        if(set_belong_p(ents,loop_index(l)))
+        {
+            new_range_lower_value_entity=make_new_scalar_variable(get_current_module_entity(),basic_of_expression(new_range_lower_value));
+            AddEntityToCurrentModule(new_range_lower_value_entity);
+            assign_statement=make_assign_statement(entity_to_expression(new_range_lower_value_entity),copy_expression(new_range_lower_value));
+        }
         set_free(ents);
         expression new_range_upper_value=
             make_op_exp(MINUS_OPERATOR_NAME,
@@ -139,7 +149,7 @@ void do_loop_expansion(statement st, int size,int offset)
                     MakeBinaryCall(
                         entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
                         entity_to_expression(loop_index(l)),
-                        range_lower(r)
+                        entity_undefined_p(new_range_lower_value_entity)?range_lower(r):entity_to_expression(new_range_lower_value_entity)
                         )
                     ,
                     MakeBinaryCall(
@@ -152,11 +162,12 @@ void do_loop_expansion(statement st, int size,int offset)
         guard_expanded_statement_if_needed(loop_body(l),guard,l);
         free_expression(guard);
 
-        /* update loop fields and add initialization statement if needed */
+        /* update loop fields either by a constant, or by a new entity with appropriate init*/
         range_upper(r)=new_range_upper_value;
         range_lower(r)=new_range_lower_value;
-        if(!entity_undefined_p(new_range_lower_value_entity))
-            insert_statement(st,make_assign_statement(entity_to_expression(new_range_lower_value_entity),copy_expression(former_range_lower)),true);
+        /* insert statement in the end, otherwise pips gets disturbed */
+        if(!statement_undefined_p(assign_statement)) insert_statement(st,assign_statement,true);
+
     }
     else
         pips_user_warning("cannot expand a loop with non constant increment\n");
