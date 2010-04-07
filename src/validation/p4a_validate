@@ -40,12 +40,15 @@ class Validation:
 
 
     @staticmethod
-    def diff_filename(s):
+    def diff_filename(s, output_dir = None):
         "Get the file name containing the differences associated to a validation case"
 
         # Replace all the "/" by a "_"
         d = Validation.basic_name(s).replace('/', '_') + '.diff'
-        return os.path.join('RESULTS', d)
+
+        if not output_dir:
+            output_dir = 'RESULTS'
+        return os.path.join(output_dir, d)
 
 
     @staticmethod
@@ -120,16 +123,35 @@ class ValidationClass:
 
     #def __init__(self, *diff_file, *diff_string):
     def __init__(self, vc = None, elements = None):
-        # The set of validation elements of this class:
+        # The dictionary of validation elements of this class, the value
+        # is the status string
         self.elements = {}
+        # The date of the validation
+        self.date = None
+        # The output directory of the validation
+        self.output_directory = None
+        # The running directory of the validation
+        self.running_directory = None
+
         if vc:
             self.elements.update(vc.elements)
+            self.date = vc.date
+            self.output_directory = vc.output_directory
+            self.running_directory = vc.running_directory
         elif elements:
             self.elements.update(elements)
 
 
     def __str__(self):
         "Give a string representation of a ValidationClass"
+
+        if self.running_directory:
+            print('output directory:', self.output_directory)
+        if self.output_directory:
+            print('running directory:', self.output_directory)
+        if self.date:
+            print('date:', self.date)
+            print('')
 
         # Concatenate elements in a line-oriented way:
         return functools.reduce(lambda x, y: '\n'.join([x,y]),
@@ -215,8 +237,14 @@ class ValidationClass:
             if validation_output:
                 # Skip the header that ends with a 'date:' field:
                 if args[0] == 'date:':
+                    # Record the date
+                    self.date = ' '.join(args[1:])
                     # Switch back to normal mode:
                     validation_output = False
+                elif args[0] == 'output':
+                    self.output_directory = args[2]
+                elif args[0] == 'running':
+                    self.running_directory = args[2]
                 # See next line:
                 continue
             # Should be in normal mode now:
@@ -270,7 +298,7 @@ class ValidationClass:
         for n in self.ordered_list():
             if verbose:
                 print('Reading', n)
-            f = open(Validation.diff_filename(n))
+            f = open(Validation.diff_filename(n, self.output_directory))
             # slurp all the file in a string:
             content = f.read()
             f.close()
