@@ -20,7 +20,7 @@ Construct a file files-to-remove with a list of files that should not be
 into his branch by inspecting the files gcc-diff and ls-gfc
 
 A=`cat ../files-to-remove | tr '\n' ' '`
-git filter-branch --index-filter "git rm --cached --ignore-unmatch $A" HEAD
+git filter-branch --index-filter "git rm -r --cached --ignore-unmatch $A" HEAD
 
 Ronan Keryell, 19/01/2010.
 

@@ -12,7 +12,7 @@ Introduce the concept of validation class, not that far from CfEngine one.
 Ronan.Keryell@hpc-project.com
 """
 
-import re, optparse, pickle, os, shutil, subprocess, functools
+import re, optparse, pickle, os, shutil, subprocess, functools, sys
 
 verbose = False
 
@@ -96,6 +96,7 @@ class Validation:
 
 
 class ValidationElement:
+    "No longer used..."
 
     CHANGED = 'changed'
     FAILED = 'failed'
@@ -295,14 +296,15 @@ class ValidationClass:
     def show_diff_files(self):
         "Display the differences associated to the elements"
 
+        # To avoid messing with previous print(), flush the output:
+        sys.stdout.flush()
         for n in self.ordered_list():
             if verbose:
                 print('Reading', n)
-            f = open(Validation.diff_filename(n, self.output_directory))
-            # slurp all the file in a string:
-            content = f.read()
-            f.close()
-            print (content)
+            file_name = Validation.diff_filename(n, self.output_directory)
+            if os.path.exists(file_name):
+                # Use cat to avoid encoding trouble from inside Python:
+                subprocess.call(["cat", file_name])
 
 
     def accept(self):
