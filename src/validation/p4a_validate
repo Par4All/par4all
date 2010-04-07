@@ -12,9 +12,20 @@ Introduce the concept of validation class, not that far from CfEngine one.
 Ronan.Keryell@hpc-project.com
 """
 
-import re, optparse, pickle, os, shutil, subprocess
+import re, optparse, pickle, os, shutil, subprocess, functools
 
 verbose = False
+
+def from_file_to_string(file_name):
+    "Read a file and return its content as a string"
+
+    # Open the file:
+    f = open(file_name)
+    # slurp all the file in a string:
+    content = f.read()
+    f.close()
+    return content
+
 
 class Validation:
     "Abstract the PIPS validation concepts"
@@ -22,6 +33,7 @@ class Validation:
     @staticmethod
     def basic_name(s):
         "Get the basic validation name from a file name found in a validation output"
+
         # Remove the extension (.f, .tpips...)
         (root, ext) = os.path.splitext(s)
         return root
@@ -30,6 +42,7 @@ class Validation:
     @staticmethod
     def diff_filename(s):
         "Get the file name containing the differences associated to a validation case"
+
         # Replace all the "/" by a "_"
         d = Validation.basic_name(s).replace('/', '_') + '.diff'
         return os.path.join('RESULTS', d)
@@ -39,6 +52,7 @@ class Validation:
     def reference_directory_name(s):
         """For a given validation name, return the reference output
         validation directory name"""
+
         # Remove the extension (.f, .tpips...) if any, add the directory
         # extension:
         return Validation.basic_name(s) + ".result"
@@ -48,14 +62,17 @@ class Validation:
     def reference_file_name(s):
         """For a given validation name, return the reference output
         validation file name"""
+
         # This is the "test" file in the validation directory:
         return os.path.join(Validation.reference_directory_name(s), "test")
 
 
     @staticmethod
     def output_file_name(s):
+
         """For a given validation name, return the reference output
         validation file name"""
+
         # This is the "out" file in the validation directory:
         return os.path.join(Validation.reference_directory_name(s), "out")
 
@@ -63,6 +80,7 @@ class Validation:
     @staticmethod
     def accept(s):
         "Accept the output of this validation case as a reference"
+
         shutil.move(Validation.output_file_name(s),
                     Validation.reference_file_name(s))
 
@@ -70,7 +88,27 @@ class Validation:
     @staticmethod
     def git_add(s):
         "Add with git the validation reference"
+
         subprocess.call(["git", "add", Validation.reference_file_name(s)])
+
+
+class ValidationElement:
+
+    CHANGED = 'changed'
+    FAILED = 'failed'
+    SKIPPED = 'skipped'
+
+    def __init__(self, name, attribute = None):
+        "Create an element with an optional attribute (changed,failed,skipped)"
+
+        if verbose:
+            print('Creating ValidationElement', name, attribute)
+
+        self.name = name
+        self.attribute = attribute
+
+    def __str__(self):
+        return str(self.attribute) + ': ' + str(self.name)
 
 
 class ValidationClass:
@@ -81,13 +119,101 @@ class ValidationClass:
 
 
     #def __init__(self, *diff_file, *diff_string):
-    def __init__(self, vc = Null):
+    def __init__(self, vc = None, elements = None):
         # The set of validation elements of this class:
         self.elements = set()
+        if vc:
+            self.elements |= vc.elements
+        elif elements:
+            self.elements |= elements
+
+
+    def __str__(self):
+        "Give a string representation of a ValidationClass"
+
+        # Concatenate elements in a line-oriented way:
+        return functools.reduce(lambda x, y: '\n'.join([x,str(y)]), self.ordered_list(), '').lstrip()
+
+
+    def add(self, element):
+        "Adding an element to the validation class"
+
+        self.elements.add(element)
+
+
+    def __or__(self, vc):
+        "Implement | : add with another ValidationClass"
+
+        return ValidationClass(elements = self.elements + vc.elements)
+
+
+    def __ior__(self, vc):
+        "Implement |= : add with another ValidationClass"
+
+        self.elements += vc.elements
+        return self
+
+
+    def __sub__(self, vc):
+        "Implement - : subtract with another ValidationClass"
+
+        return ValidationClass(elements = self.elements - vc.elements)
+
+
+    def __isub__(self, vc):
+        "Implement -= : add with another ValidationClass"
+
+        self.elements -= vc.elements
+        return self
+
+
+    def from_string(self, string):
+        "Add the elements from a line-oriented string"
+
+        # Try to guess the format of the file that can be a mail output, a
+        # simple file of one result per line (with a status or not), a
+        # validation output:
+        first_line = True
+        validation_output = False
+        for line in string.splitlines():
+            args = line.split()
+            if len(args) == 0:
+                # Blank line
+                continue
+            if first_line:
+                if len(args) > 2:
+                    # It is a validation output, in file or mail format:
+                    validation_output = True
+                first_line = False
+            if validation_output:
+                # Skip the header that ends with a 'date:' field:
+                if args[0] == 'date:':
+                    # Switch back to normal mode:
+                    validation_output = False
+                # See next line:
+                continue
+            # Should be in normal mode now:
+            if len(args) == 2:
+                # We are in a 'skipped/failed/changed:
+                # Syntax/common2.tpips' form:
+                attribute = args[0].rstrip(':')
+                self.add(ValidationElement(args[1], attribute))
+            elif len(args) == 1:
+                # Just a line with a validation name:
+                self.add(ValidationElement(args[0]))
+            # Else, blank lines for example
+
+
+    def from_file(self, file_name):
+        "Add the elements from a line-oriented file"
+
+        self.from_string(from_file_to_string(file_name))
+        return self
 
 
     def add_changed_from_diff(self, file_name = None, string = None):
         """Add difference lines as elements"""
+
         if verbose:
             print('add_changed_from_diff from string', string)
             print('add_changed_from_diff from file_name', file_name)
@@ -111,19 +237,17 @@ class ValidationClass:
         return self
 
 
-    def __str__(self):
-        return str(self.elements)
-
-
     def ordered_list(self):
         "Return the ordered elements of this class"
+
         l = list(self.elements)
-        l.sort()
+        l.sort(key=lambda e:e.name)
         return l
 
 
     def show_diff_files(self):
         "Display the differences associated to the elements"
+
         for n in self.ordered_list():
             if verbose:
                 print('Reading', n)
@@ -136,23 +260,27 @@ class ValidationClass:
 
     def accept(self):
         "Accept the validation files of the class"
+
         for e in self.elements:
             Validation.accept(e)
 
 
     def git_add(self):
         "Add with git the validation reference of this class"
+
         for e in self.elements:
             Validation.git_add(e)
 
 
     def git_commit(self, message):
         "Commit with git the current validation with the message"
+
         subprocess.call(["git", "commit", "-m", message])
 
 
     def re_filter(self, res):
         "Only keep the validation elements matching this regex string"
+
         regex = re.compile(res)
         to_keep = set()
         for e in self.elements:
@@ -164,6 +292,7 @@ class ValidationClass:
 
     def re_filter_out(self, res):
         "Remove the validation elements matching this regex string"
+
         regex = re.compile(res)
         to_remove = set()
         for e in self.elements:
@@ -174,6 +303,8 @@ class ValidationClass:
 
 
 def main():
+    "The function called when this program is executed by its own"
+
     global verbose
 
     parser = optparse.OptionParser(usage = "usage: %prog [options] [<files>]",
@@ -182,6 +313,10 @@ def main():
     parser.add_option("--file", dest="simple_file_name",
                       help = "Initialize a validation class from a plain line-oriented file of validation case names",
                       metavar="FILE")
+
+    parser.add_option("-l", "--list",
+                      action = "store_true", dest = "list_elements", default = False,
+                      help = "List the elements of the validation class")
 
     parser.add_option("--changed-file", dest="changed_file_name",
                       help = "Initialize a validation class from the 'changed' found in a validation output file",
@@ -232,7 +367,7 @@ def main():
     verbose = options.verbose
 
     if options.simple_file_name:
-        vc = validation_class_from_file(options.simple_file_name)
+        vc = ValidationClass().from_file(options.simple_file_name)
 
     if options.changed_file_name:
         vc = validation_class_from_file(options.changed_file_name, 'changed')
@@ -260,9 +395,14 @@ def main():
         vc.git_add()
         vc.git_commit(options.message)
 
+    if options.list_elements:
+        print(vc)
+
+
 # If this programm is independent it is executed:
 if __name__ == "__main__":
     main()
+
 
 # Some Emacs stuff:
 ### Local Variables:

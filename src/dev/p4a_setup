@@ -6,6 +6,9 @@
 #
 # Ronan.Keryell@hpc-project.com
 
+# The P4A_MAKE_OPTS environment variable can be used to pass options to
+# make, such as --jobs=8
+
 # Stop on error, since going on after errors may lead to havoc
 set -o errexit
 
@@ -153,8 +156,8 @@ function build_package() {
 	mkdir -p $P4A_BUILD/$package
 	cd $P4A_BUILD/$package
 	$dir/configure ${PIPS_CONFIGURE_COMMON_FLAGS} $options
-	make
-	make install
+	make $P4A_MAKE_OPTS
+	make $P4A_MAKE_OPTS install
     )
 }
 

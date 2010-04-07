@@ -108,6 +108,13 @@ export CFLAGS='-ggdb -g3 -Wall -std=c99'
 are good debugging options that allow \texttt{gdb} to access macro
 definitions that are heavily used in \Apips.
 
+To speed up the compilation, you can pass options to the compilation with
+the \verb|P4A_MAKE_OPTS| environment variable, such as with
+\begin{verbatim}
+export P4A_MAKE_OPTS=--jobs=8
+\end{verbatim}
+to compile with 8 processes.
+
 You may want to compile \Apfa directly from source packages that are not
 inside the \Apfa directory hierarchy (see \S~\ref{sec:direct-organ}). For
 this, you can specify in the \texttt{P4A\_\emph{PACKAGE}\_SRC} the
