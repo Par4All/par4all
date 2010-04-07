@@ -339,6 +339,8 @@ error ()
 
 which_pips()
 {
+  # Avoid nasty language interference here:
+  export LANG=C
   type pips | sed -e 's,^pips is ,,'
 }
 
