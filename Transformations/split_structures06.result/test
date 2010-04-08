@@ -1,0 +1,35 @@
+initial functions
+struct ure  llement()
+{
+   struct ure noth = {1};
+   noth.ing = 2.;
+   return noth;
+}
+int main()
+{
+   struct ure nature = {2};
+   nature = llement();
+   printf("%f", nature.lle+nature.ing);
+}
+after split strucutres
+struct ure  llement()
+{
+   struct ure noth = {1};
+   //PIPS generated variable
+   int ure_lle = 1;
+   //PIPS generated variable
+   float ure_ing;
+   ure_ing = 2.;
+   noth.lle = ure_lle;
+   noth.ing = ure_ing;
+   return noth;
+}
+int main()
+{
+   struct ure nature = {2};
+   nature = llement();
+   printf("%f", nature.lle+nature.ing);
+}
+validate result
+ok
+

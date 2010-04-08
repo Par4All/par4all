@@ -1,0 +1,22 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="split_structures03"
+delete $WS
+create $WS $WS.c
+
+echo initial functions
+display PRINTED_FILE[%ALLFUNC]
+
+echo after split strucutres
+apply SPLIT_STRUCTURES[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+echo validate result
+apply UNSPLIT
+close
+
+shell cc $WS.c -o $WS-ref
+shell cc $WS.database/Src/$WS.c -o $WS-new
+shell ( test `./$WS-ref` = `./$WS-new` && echo "ok" ) || echo "ko"
+shell rm -f $WS-new $WS-ref
+
+delete $WS

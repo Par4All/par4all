@@ -1,13 +1,8 @@
-delete array_to_pointer02
-
 setproperty ABORT_ON_USER_ERROR TRUE
+delete array_to_pointer02
 
 #use the same source as array_to_pointer01.tpips
 create array_to_pointer02 array_to_pointer01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code

@@ -17,3 +17,8 @@ float sadd(int a, int b)
 {
     return (a + b > 255 ) ? 255 : a + b;
 }
+
+int addi(int a,int b)
+{
+    return a=a+b;
+}

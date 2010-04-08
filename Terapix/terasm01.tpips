@@ -1,12 +1,6 @@
-delete terasm01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete terasm01
 create terasm01 terasm01.c include/terasm.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 module microcode
 

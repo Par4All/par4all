@@ -490,12 +490,12 @@ nsucc = 1
 nsucc = 0 
 /* C pretty print for module SAXPY. */
 void
-saxpy (float sx[size - 1 + 1], float sy[size - 1 + 1])
+saxpy (float sx[1000], float sy[1000])
 {
-  float v4sf_vec3[3 - 0 + 1];
-  float v4sf_vec2[3 - 0 + 1];
-  float v4sf_vec1[3 - 0 + 1];
-  float v4sf_vec0[3 - 0 + 1];
+  float v4sf_vec3[4];
+  float v4sf_vec2[4];
+  float v4sf_vec1[4];
+  float v4sf_vec0[4];
   float f_03;
   float f_02;
   float f_01;

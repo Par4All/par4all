@@ -1,17 +1,10 @@
-delete invariant01
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
+delete invariant01
 create invariant01 invariant01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
-activate C_PARSER
 
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 #setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE

@@ -1,7 +1,10 @@
+setpropertu ABORT_ON_USER_ERROR TRUE
 delete c
 create c cpretty.f
+
+setproperty EVAL_SYMBOLIC_CONSTANT TRUE
 display PRINTED_FILE[%ALL]
-make CROUGH[%ALL]
 display C_PRINTED_FILE[%ALL]
+
 close
 delete c

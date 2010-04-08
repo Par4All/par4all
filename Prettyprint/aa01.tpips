@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete aa01
 create aa01 aa01.f
 
@@ -11,8 +12,8 @@ display PRINTED_FILE[INC]
 
 close
 
-shell cp aa01.database/AA01/AA01.parf foo.f
-shell cat aa01.database/INC/INC.pref >>foo.f
+shell cp aa01.database/AA01/AA01.par.f foo.f
+shell cat aa01.database/INC/INC.pre.f >>foo.f
 shell gfortran foo.f
 shell rm foo.f a.out
 

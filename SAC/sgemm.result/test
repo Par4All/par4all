@@ -5559,38 +5559,37 @@ nsucc = 0
 /* C pretty print for module SGEMM. */
 void
 sgemm (char transa, char transb, int m, int n, int k, float alpha,
-       float a[size - 1 + 1][size - 1 + 1], int lda,
-       float b[size - 1 + 1][size - 1 + 1], int ldb, float beta,
-       float c[size - 1 + 1][size - 1 + 1], int ldc)
+       float a[10][10], int lda, float b[10][10], int ldb, float beta,
+       float c[10][10], int ldc)
 {
-  double v2df_vec57[1 - 0 + 1];
-  double v2df_vec56[1 - 0 + 1];
-  double v2df_vec55[1 - 0 + 1];
-  float v4sf_vec48[3 - 0 + 1];
-  float v4sf_vec47[3 - 0 + 1];
-  float v4sf_vec46[3 - 0 + 1];
-  float v4sf_vec45[3 - 0 + 1];
-  float v4sf_vec38[3 - 0 + 1];
-  float v4sf_vec37[3 - 0 + 1];
-  float v4sf_vec36[3 - 0 + 1];
-  float v4sf_vec35[3 - 0 + 1];
-  float v4sf_vec32[3 - 0 + 1];
-  float v4sf_vec31[3 - 0 + 1];
-  double v2df_vec30[1 - 0 + 1];
-  double v2df_vec29[1 - 0 + 1];
-  double v2df_vec28[1 - 0 + 1];
-  float v4sf_vec21[3 - 0 + 1];
-  float v4sf_vec20[3 - 0 + 1];
-  float v4sf_vec19[3 - 0 + 1];
-  float v4sf_vec18[3 - 0 + 1];
-  float v4sf_vec11[3 - 0 + 1];
-  float v4sf_vec10[3 - 0 + 1];
-  float v4sf_vec9[3 - 0 + 1];
-  float v4sf_vec8[3 - 0 + 1];
-  float v4sf_vec5[3 - 0 + 1];
-  float v4sf_vec4[3 - 0 + 1];
-  float v4sf_vec1[3 - 0 + 1];
-  float v4sf_vec0[3 - 0 + 1];
+  double v2df_vec57[2];
+  double v2df_vec56[2];
+  double v2df_vec55[2];
+  float v4sf_vec48[4];
+  float v4sf_vec47[4];
+  float v4sf_vec46[4];
+  float v4sf_vec45[4];
+  float v4sf_vec38[4];
+  float v4sf_vec37[4];
+  float v4sf_vec36[4];
+  float v4sf_vec35[4];
+  float v4sf_vec32[4];
+  float v4sf_vec31[4];
+  double v2df_vec30[2];
+  double v2df_vec29[2];
+  double v2df_vec28[2];
+  float v4sf_vec21[4];
+  float v4sf_vec20[4];
+  float v4sf_vec19[4];
+  float v4sf_vec18[4];
+  float v4sf_vec11[4];
+  float v4sf_vec10[4];
+  float v4sf_vec9[4];
+  float v4sf_vec8[4];
+  float v4sf_vec5[4];
+  float v4sf_vec4[4];
+  float v4sf_vec1[4];
+  float v4sf_vec0[4];
   int nrowa0;
   int nrowb0;
   int l_911;
@@ -5698,10 +5697,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   float f_70;
   float c30;
   int l_990;
-  float red3[3 - 0 + 1];
-  float red2[0 - 0 + 1];
-  float red1[3 - 0 + 1];
-  float red0[0 - 0 + 1];
+  float red3[4];
+  float red2[1];
+  float red1[4];
+  float red0[1];
   int lu_ind9;
   int lu_ib9;
   int lu_nub9;
