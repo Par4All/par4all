@@ -1,0 +1,27 @@
+initial functions
+void foo(my *m)
+{
+   m->a = 3;
+}
+int main()
+{
+   my c = {2, 4};
+   c.b = 5;
+   foo(&c);
+   printf("%d", c.a+c.b);
+}
+after split strucutres
+void foo(my *m)
+{
+   m->a = 3;
+}
+int main()
+{
+   my c = {2, 4};
+   c.b = 5;
+   foo(&c);
+   printf("%d", c.a+c.b);
+}
+validate result
+ok
+

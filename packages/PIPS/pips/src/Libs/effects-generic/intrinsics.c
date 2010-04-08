@@ -1017,9 +1017,6 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
     list lr;
     expression e = EXPRESSION(CAR(args));
     syntax s = expression_syntax(e);
-    reference r = syntax_reference(s);
-    list i = reference_indices(r);
-
     pips_debug(5, "begin\n");
     pips_assert("address of has only one argument", gen_length(args)==1);
     /* FI: this is not true with "&c.a" */
@@ -1027,7 +1024,14 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
     pips_assert("address of has only one argument and it is a reference",
 		syntax_reference_p(s));
     */
-    lr = generic_proper_effects_of_expressions(i);
+    if( syntax_reference_p(s))
+    {
+        reference r = syntax_reference(s);
+        list i = reference_indices(r);
+        lr = generic_proper_effects_of_expressions(i);
+    }
+    else
+        pips_internal_error("case unhandled yet\n");
     pips_debug(5, "end\n");
     return(lr);
 }

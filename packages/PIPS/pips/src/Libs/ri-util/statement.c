@@ -473,8 +473,9 @@ make_assign_instruction(expression l,
    call c = call_undefined;
    instruction i = instruction_undefined;
 
-   pips_assert("make_assign_statement",
-               syntax_reference_p(expression_syntax(l)));
+/*   SG: not true in C
+ *   pips_assert("make_assign_statement",
+               syntax_reference_p(expression_syntax(l)));*/
    c = make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),
                  CONS(EXPRESSION, l, CONS(EXPRESSION, r, NIL)));
    i = make_instruction(is_instruction_call, c);

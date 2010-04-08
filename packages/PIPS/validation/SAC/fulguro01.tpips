@@ -2,13 +2,6 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete FULGURO_01
 create FULGURO_01 kernels/fulguro/fulguro01.c include/SIMD.c
 
-echo
-echo Initial code
-echo
-
-display PRINTED_FILE[flgr1d_arith_add_fgINT32]
-
-
 activate MUST_REGIONS
 activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL
@@ -21,17 +14,17 @@ setproperty SAC_SIMD_REGISTER_WIDTH = 128
 setproperty SIMD_AUTO_UNROLL_SIMPLE_CALCULATION FALSE
 setproperty SIMD_AUTO_UNROLL_MINIMIZE_UNROLL FALSE
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty C89_CODE_GENERATION TRUE
 #setproperty IF_CONVERSION_PHI "SIMD_PHI"
 
+echo
+echo Initial code
+echo
 
-apply IF_CONVERSION_INIT
-display PRINTED_FILE
+module flgr1d_arith_add_fgINT32
+apply INLINING
 
-apply IF_CONVERSION
-display PRINTED_FILE
-
-apply IF_CONVERSION_COMPACT
-#apply USE_DEF_ELIMINATION
+module test
 display PRINTED_FILE
 
 apply PARTIAL_EVAL
@@ -46,12 +39,7 @@ display PRINTED_FILE
 apply SIMD_REMOVE_REDUCTIONS
 display PRINTED_FILE
 
-#apply DEATOMIZER
-#apply PARTIAL_EVAL
-#apply USE_DEF_ELIMINATION
-#display PRINTED_FILE
-
-apply FORWARD_SUBSTITUTE
+#apply FORWARD_SUBSTITUTE
 apply SINGLE_ASSIGNMENT
 
 display PRINTED_FILE
@@ -77,7 +65,7 @@ echo
 echo simdized code
 echo
 
-display PRINTED_FILE[flgr1d_arith_add_fgINT32]
+display PRINTED_FILE
 
 close
 quit

@@ -24,7 +24,7 @@ struct entity_pair
     entity old;
     entity new;
 };
-
+#if 0
 /** @brief substitute `thecouple->new' to `thecouple->old' in `exp'
  *  only works if `exp' is a reference
  */
@@ -53,6 +53,7 @@ replace_entity_expression_walker(expression exp, struct entity_pair* thecouple)
 		free(emn_r);
     }
 }
+#endif
 
 
 static void
@@ -111,7 +112,7 @@ replace_entity(void* s, entity old, entity new) {
   else {
       gen_context_multi_recurse(s, &thecouple,
               reference_domain, gen_true, replace_entity_reference_walker,
-              expression_domain, gen_true, replace_entity_expression_walker,
+              //expression_domain, gen_true, replace_entity_expression_walker,
               statement_domain, gen_true, replace_entity_declaration_walker,
               loop_domain, gen_true, replace_entity_loop_walker,
               NULL);

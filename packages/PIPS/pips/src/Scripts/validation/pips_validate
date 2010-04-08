@@ -77,7 +77,7 @@ pips=$(type -p pips)
 sysarch=$(uname -m)
 
 # get good version of python with proper PYTHONPATH
-export PYTHONPATH=${PIPS_PYTHONPATH:-$root/lib/$arch}
+export PYTHONPATH=${PYTHONPATH:-$root/lib/$arch}
 python=$(type -p python)
 
 # by default, do not create a missing .result directory:

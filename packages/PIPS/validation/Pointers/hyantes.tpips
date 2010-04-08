@@ -1,0 +1,13 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="hyantes"
+delete $WS
+create $WS $WS.c
+
+echo just check parsing
+make PRINTED_FILE[%ALL]
+module run
+display PRINTED_FILE[run]
+
+close
+delete $WS
+quit

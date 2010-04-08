@@ -18,7 +18,10 @@ echo
 echo Symbol table for block_scope13
 echo
 
-display SYMBOL_TABLE_FILE[block_scope13!]
+# This output is OS dependent, let's avoid it as it is not relevant
+# for bug in the controlizer
+#display SYMBOL_TABLE_FILE[block_scope13!]
+
 echo
 display SYMBOL_TABLE_FILE[block_scope13!block_scope13]
 # quit

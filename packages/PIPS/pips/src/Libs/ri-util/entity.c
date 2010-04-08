@@ -663,7 +663,7 @@ bool entity_enum_p(entity e)
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   bool struct_p = (ns==NULL && *ln==ENUM_PREFIX_CHAR)
     || (ns!=NULL && *(ns+1)==ENUM_PREFIX_CHAR)
-    || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)!=NULL);
+    || (strstr(entity_name(e),ENUM_PREFIX DUMMY_ENUM_PREFIX)!=NULL);
   return struct_p;
 }
 
@@ -685,19 +685,15 @@ bool entity_struct_p(entity e)
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   bool struct_p = (ns==NULL && *ln==STRUCT_PREFIX_CHAR)
     || (ns!=NULL && *(ns+1)==STRUCT_PREFIX_CHAR)
-    || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)!=NULL);
+    || (strstr(entity_name(e),STRUCT_PREFIX DUMMY_STRUCT_PREFIX)!=NULL);
   return struct_p;
 }
 
 bool same_struct_entity_p(const entity e0, const entity e1)
 {
-    if( entity_struct_p(e0) && entity_struct_p(e1) )
-    {
-        string s0 = strrchr(entity_name(e0),MEMBER_SEP_CHAR),
-               s1 = strrchr(entity_name(e1),MEMBER_SEP_CHAR);
-        return s0 && s1 && ((s0-entity_name(e0)) == ( s1-entity_name(e1) ) ) &&
-            same_stringn_p(entity_name(e0),entity_name(e1),s0-entity_name(e0));
-    }
+    entity s0 = entity_field_to_entity_struct(e0),
+           s1 = entity_field_to_entity_struct(e1);
+    return same_entity_p(s0,s1);
 }
 
 bool entity_union_p(entity e)
@@ -706,7 +702,7 @@ bool entity_union_p(entity e)
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   bool union_p = (ns==NULL && *ln==UNION_PREFIX_CHAR)
     || (ns!=NULL && *(ns+1)==UNION_PREFIX_CHAR)
-    || (strstr(entity_name(e),DUMMY_UNION_PREFIX)!=NULL);
+    || (strstr(entity_name(e),UNION_PREFIX DUMMY_UNION_PREFIX)!=NULL);
   return union_p;
 }
 
@@ -2074,4 +2070,27 @@ entity operator_neutral_element(entity op)
 
     pips_internal_error("hunhadled case\n");
     return entity_undefined;
+}
+
+bool
+commutative_call_p(call c)
+{
+    basic b = basic_of_call(c,false,true);
+    entity op  = call_function(c);
+    bool commut_p = false;
+    switch(basic_tag(b))
+    {
+        case is_basic_float:
+            if(!get_bool_property("RELAX_FLOAT_COMMUTATIVITY"))
+                break;
+        case is_basic_logical:
+        case is_basic_int:
+            commut_p=ENTITY_PLUS_P(op)||ENTITY_MULTIPLY_P(op)||ENTITY_AND_P(op)||ENTITY_OR_P(op);
+        case is_basic_pointer:
+            break;
+        default:
+            pips_internal_error("unhandled case\n");
+    }
+    free_basic(b);
+    return commut_p;
 }
