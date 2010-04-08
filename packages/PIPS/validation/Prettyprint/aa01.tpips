@@ -1,5 +1,7 @@
-setproperty ABORT_ON_USER_ERROR TRUE
 delete aa01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create aa01 aa01.f
 
 # Interprocedural parallelism canot be expressed in Fortran 90
@@ -12,10 +14,12 @@ display PRINTED_FILE[INC]
 
 close
 
-shell cp aa01.database/AA01/AA01.par.f foo.f
-shell cat aa01.database/INC/INC.pre.f >>foo.f
-shell gfortran foo.f
-shell rm foo.f a.out
+# Let's try to make the validation process parallel:
+shell (cd aa01.database/AA01; \
+      cat ../INC/INC.pre.f >>AA01.par.f;\
+      gfortran AA01.par.f;\
+      rm a.out)
+
 
 delete aa01
 quit
