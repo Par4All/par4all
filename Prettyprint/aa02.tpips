@@ -1,5 +1,8 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 delete aa02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create aa02 aa02.f
 
 # Interprocedural parallelism canot be expressed in Fortran 90
@@ -7,10 +10,14 @@ create aa02 aa02.f
 
 activate PRINT_PARALLELIZED90_CODE
 
+#display DG_FILE[AA02]
+
 display PARALLELPRINTED_FILE
 close
-shell cp aa02.database/AA02/AA02.par.f foo.f
-shell gfortran foo.f
-shell rm foo.f a.out
+
+
+# Let's avoid non-parallelizable Shell activities...
+shell (cd aa02.database/AA02; gfortran AA02.par.f; rm a.out)
+# but we loose the core dump due to the compilation...
 delete aa02
 quit
