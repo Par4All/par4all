@@ -836,6 +836,7 @@
 #define ENTITY_MINUS_P(e) entity_an_operator_p(e, MINUS)
 #define ENTITY_MINUS_C_P(e) entity_an_operator_p(e, MINUS_C)
 #define ENTITY_UNARY_MINUS_P(e) entity_an_operator_p(e, UNARY_MINUS)
+#define ENTITY_UNARY_PLUS_P(e) entity_an_operator_p(e, UNARY_PLUS)
 #define ENTITY_MULTIPLY_P(e) entity_an_operator_p(e, MULTIPLY)
 #define ENTITY_MODULO_P(e) entity_an_operator_p(e, MODULO)
 #define ENTITY_C_MODULO_P(e) entity_an_operator_p(e, C_MODULO)

@@ -7635,6 +7635,15 @@ simplify_complex > MODULE.code
 SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS TRUE
 \end{PipsProp}
 
+\begin{PipsPass}{split_structures}
+Split structures in separated variables when possible, that is remove the structure variable and replaces all fields by different variables.
+\end{PipsPass}
+\begin{PipsMake}
+split_structures > MODULE.code
+    < PROGRAM.entities
+    < MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{new_atomizer}
 Here is a new version of the atomizer using a small atomizer from
 the HPF compiler (see Section~\ref{subsubsection-hpf-compiler}).
@@ -7840,6 +7849,11 @@ expression_substitution > MODULE.code
         < PROGRAM.entities
         < ALL.code
 \end{PipsMake}
+
+Set \PipsPropRef{RELAX_FLOAT_COMMUTATIVITY} to TRUE if you wan to consider some floating point operation as commutative
+\begin{PipsProp}{RELAX_FLOAT_COMMUTATIVITY}
+RELAX_FLOAT_COMMUTATIVITY FALSE
+\end{PipsProp}
 
 This property is used to set the one-liner module used during
 expression substitution. It must be the name of a module already
