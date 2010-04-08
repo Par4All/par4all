@@ -1,5 +1,5 @@
 \documentclass[a4paper]{article}
-\usepackage[latin9]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage{url}
 \usepackage{alltt}
 \usepackage{abbrev_reactive}
@@ -22,8 +22,8 @@
   ---\\
   HPC Project}
 
-\author{Serge \textsc{Guelton} \and Ronan \textsc{Keryell} \and Grégoire
-  \textsc{Péan} \and Claire \textsc{Seguin} \and Mickaël \textsc{Thievent}
+\author{Serge \textsc{Guelton} \and Ronan \textsc{Keryell} \and GrÃ©goire
+  \textsc{PÃ©an} \and Claire \textsc{Seguin} \and MickaÃ«l \textsc{Thievent}
   \and Pierre \textsc{Villalon}}
 
 \maketitle
@@ -37,7 +37,7 @@ to aim at achieving the migration of software to multicore and other
 parallel processors.
 
 It is mainly developed by \Ahpcp, MINES ParisTech/\Acri, Institut
-Télécom/Télécom Bretagne and others.
+TÃ©lÃ©com/TÃ©lÃ©com Bretagne and others.
 
 This document describes the internal organization of \Apfa and how its
 construction relies on \Agit repositories, \Asvn repositories and other
@@ -107,6 +107,21 @@ export CFLAGS='-ggdb -g3 -Wall -std=c99'
 \end{verbatim}
 are good debugging options that allow \texttt{gdb} to access macro
 definitions that are heavily used in \Apips.
+
+You can pass some options to \verb|src/dev/p4a_setup| to modify the
+installation process:
+\begin{description}
+\item[\texttt{--skip-polylib}:] skip the \Apolylib installation;
+\item[\texttt{--skip-newgen}:] skip the \Anewgen installation;
+\item[\texttt{--skip-linear}:] skip the \Alinear installation;
+\item[\texttt{--skip-pips}:] skip the \Apips installation;
+\item[\texttt{-v|--verbose}:] be verbose;
+\item[\texttt{-h|--help}:] display this usage.
+\end{description}
+
+If you often want to skip the compilation of a package you can define with
+some value respective environment variable: \verb|P4A_SKIP_POLYLIB|,
+\verb|P4A_SKIP_NEWGEN|, \verb|P4A_SKIP_LINEAR|, \verb|P4A_SKIP_PIPS|.
 
 To speed up the compilation, you can pass options to the compilation with
 the \verb|P4A_MAKE_OPTS| environment variable, such as with
@@ -196,27 +211,7 @@ inside the \texttt{package} top-level directory.
 
 \begin{description}
 \item[\texttt{build}] is the directory created with the various productions
-  of the compilation of all the \Apfa packages: binaries, header files,
-  documentation;
-  \marginpar{Right now it is still mainly in \texttt{package/PIPS} since
-    I'm waiting for the new \Apips compilation infrastructure. RK}
-  \begin{description}
-  \item[\texttt{bin}] contains the executable programs from \Apfa;
-  \item[\texttt{doc}] is the generated documentation for the \Apfa
-    infrastructure;
-  \item[\texttt{etc}] contains some generated configuration files;
-  \item[\texttt{include}] contains the include files used for the
-    compilation of \Apfa;
-  \item[\texttt{lib}] owns the libraries used to run \Apfa;
-  \item[\texttt{share}] contains shared files for run-time and
-    configuration files
-
-    \marginpar{what is the difference of this \texttt{pipsrc.sh} and the one in
-      \texttt{etc}? \texttt{RK->FC}}
-
-  \item[\texttt{utils}] gathers various utility programs used by \Apfa
-    infrastructure (validation...) and other internal tools;
-  \end{description}
+  of the compilation of all the \Apfa packages from the \Aautotools;
 \item[\texttt{doc}] are the sources of the \Apfa infrastructure;
 \item[\texttt{examples}] comes with some examples to exercise \Apfa;
 \item[\texttt{packages}] contains the different components of \Apfa; of
@@ -239,7 +234,22 @@ inside the \texttt{package} top-level directory.
   \end{description}
 \item[\texttt{src}] contains source of tools used for the internal
   organization of \Apfa itself, such as repository and product management,
-  publication process.
+  publication process or some run-time, such as \verb|p4a_accel|;
+\item[\texttt{run}] is where the usable \Apfa is installed after
+  compilation:
+  \begin{description}
+  \item[\texttt{bin}] contains the executable programs from \Apfa;
+  \item[\texttt{doc}] is the generated documentation for the \Apfa
+    infrastructure; \marginpar{in share/doc/pips ?}
+  \item[\texttt{etc}] contains some generated configuration files;
+  \item[\texttt{include}] contains the include files used for the
+    compilation of \Apfa;
+  \item[\texttt{lib}] owns the libraries used to run \Apfa;
+  \item[\texttt{makes}] contains some make stuff for the \Apips
+    validation;
+  \item[\texttt{share}] contains shared files for run-time and
+    configuration files
+  \end{description}
 \end{description}
 
 
@@ -529,7 +539,7 @@ these branches).
 
 The installation has been tested on Ubuntu/Linux 9.10 and you need to have
 at least these packages installed:
-\marginpar{À compléter par Mickael \& Claire !}
+\marginpar{Ã€ complÃ©ter par Mickael \& Claire !}
 
 
 There are scripts to ease the developer and user life.
@@ -680,7 +690,7 @@ defined branches:
 \item[\texttt{pips-gfc+gcc}] points to a working \Apipsgfc implementation
   of the Fortran 95 extension for \Apips in \texttt{package/pips-gfc};
 \item[\texttt{pips-gfc-4.4.1}] points to the original developments of
-  Raphaël in \Agcc in \texttt{package/pips-gfc}.
+  RaphaÃ«l in \Agcc in \texttt{package/pips-gfc}.
 \end{description}
 
 
