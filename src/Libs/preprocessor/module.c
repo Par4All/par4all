@@ -149,14 +149,44 @@ bool language_module_p(entity m, string lid)
 /** Test if a module is in C */
 bool c_module_p(entity m)
 {
-  return language_module_p(m, PP_C_ED);
+  bool c_p = FALSE;
+  value v = entity_initial(m);
+
+  if(!value_undefined_p(v)) {
+    language l = code_language(value_code(v));
+    c_p = language_c_p(l);
+    /* Temporary fix for the too many make_unknown_language()... */
+    if(language_unknown_p(l))
+      c_p = language_module_p(m, PP_C_ED);
+  }
+  else
+    c_p = language_module_p(m, PP_C_ED);
+
+  return c_p;
 }
 
 
 /** Test if a module is in Fortran */
+/* Could be better factored in with C case */
 bool fortran_module_p(entity m)
 {
-  return language_module_p(m, FORTRAN_FILE_SUFFIX);
+  /* These two first lines should be replaced by what follows. */
+  bool fortran_p =  language_module_p(m, FORTRAN_FILE_SUFFIX);
+  return fortran_p;
+
+  /* FI->FC: the code that follows breaks the validation of Hpfc?!? */
+
+  /*bool*/ fortran_p = FALSE;
+  value v = entity_initial(m);
+  if(!value_undefined_p(v)) {
+    fortran_p = language_fortran_p(code_language(value_code(v)));
+  }
+  else {
+    /* If this alternative did not exist, the source code should be
+       moved to ri-util*/
+    fortran_p =  language_module_p(m, FORTRAN_FILE_SUFFIX);
+  }
+  return fortran_p;
 }
 
 /* Return a list of all variables and functions accessible somewhere in a module. */

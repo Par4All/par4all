@@ -1213,6 +1213,8 @@
 // It is for extern variables whose ram offset is not known
 #define UNDEFINED_RAM_OFFSET (-2)
 // It is for dynamic allocation of arrays whose ram offset is not known either.
+/* FI: I would have assumed that it is used for the stack area, but I
+   must be wrong... */
 #define DYNAMIC_RAM_OFFSET (-3)
 
 
