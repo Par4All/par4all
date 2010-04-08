@@ -384,7 +384,7 @@ c
       PARAMETER (N = 100)
       INTEGER ITER, AGAIN, LAST
       CALL HPFC INIT NODE
-l99999 CONTINUE
+99999 CONTINUE
 ! updating shared variable ITER
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -394,7 +394,7 @@ l99999 CONTINUE
       BUF INDEX = BUF INDEX+1
       ITER = HPFC INTEGER4 BUFF(BUF INDEX)
 ! end of update
-      IF (ITER.LT.1.OR.ITER.GT.N) GOTO l99999
+      IF (ITER.LT.1.OR.ITER.GT.N) GOTO 99999
 c
 c procedure calls
 c
@@ -410,7 +410,7 @@ c
       BUF INDEX = BUF INDEX+1
       AGAIN = HPFC INTEGER4 BUFF(BUF INDEX)
 ! end of update
-      IF (AGAIN.EQ.1) GOTO l99999
+      IF (AGAIN.EQ.1) GOTO 99999
       CALL HPFC NODE END
       END
 !
