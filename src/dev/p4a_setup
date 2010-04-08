@@ -52,7 +52,7 @@ mkdir -p $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/dev/{p4a_git,p4a_setup,p4a_valgrind} $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/dev/p4a_git_lib.bash $P4A_ETC
 cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $P4A_INSTALL_PREFIX/bin
-cp $P4A_ROOT/src/validation/p4a_validate $P4A_INSTALL_PREFIX/bin
+cp $P4A_ROOT/src/validation/{p4a_validate,p4a_validation} $P4A_INSTALL_PREFIX/bin
 
 # Stuff still lacking from PIPS install:
 cp $P4A_PIPS_SRC/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin

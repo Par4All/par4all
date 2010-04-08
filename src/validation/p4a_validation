@@ -1,0 +1,21 @@
+#! /bin/bash -vx
+
+# Run the Par4All validation.
+
+if [[ -z $P4A_ROOT ]]; then
+    echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory"
+    exit
+fi
+
+PIPS_VALIDATION_DIR=$P4A_ROOT/packages/PIPS/validation
+
+cd $PIPS_VALIDATION_DIR
+
+# What we want to validate:
+# First pick the default list of directory:
+TARGET=`grep '^[a-zA-Z]' defaults | tr '\n' ' '`
+# Add some others:
+TARGET="$TARGET Pyps"
+
+make TARGET="$TARGET" validate
+
