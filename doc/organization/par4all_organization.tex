@@ -211,27 +211,7 @@ inside the \texttt{package} top-level directory.
 
 \begin{description}
 \item[\texttt{build}] is the directory created with the various productions
-  of the compilation of all the \Apfa packages: binaries, header files,
-  documentation;
-  \marginpar{Right now it is still mainly in \texttt{package/PIPS} since
-    I'm waiting for the new \Apips compilation infrastructure. RK}
-  \begin{description}
-  \item[\texttt{bin}] contains the executable programs from \Apfa;
-  \item[\texttt{doc}] is the generated documentation for the \Apfa
-    infrastructure;
-  \item[\texttt{etc}] contains some generated configuration files;
-  \item[\texttt{include}] contains the include files used for the
-    compilation of \Apfa;
-  \item[\texttt{lib}] owns the libraries used to run \Apfa;
-  \item[\texttt{share}] contains shared files for run-time and
-    configuration files
-
-    \marginpar{what is the difference of this \texttt{pipsrc.sh} and the one in
-      \texttt{etc}? \texttt{RK->FC}}
-
-  \item[\texttt{utils}] gathers various utility programs used by \Apfa
-    infrastructure (validation...) and other internal tools;
-  \end{description}
+  of the compilation of all the \Apfa packages from the \Aautotools;
 \item[\texttt{doc}] are the sources of the \Apfa infrastructure;
 \item[\texttt{examples}] comes with some examples to exercise \Apfa;
 \item[\texttt{packages}] contains the different components of \Apfa; of
@@ -254,7 +234,22 @@ inside the \texttt{package} top-level directory.
   \end{description}
 \item[\texttt{src}] contains source of tools used for the internal
   organization of \Apfa itself, such as repository and product management,
-  publication process.
+  publication process or some run-time, such as \verb|p4a_accel|;
+\item[\texttt{run}] is where the usable \Apfa is installed after
+  compilation:
+  \begin{description}
+  \item[\texttt{bin}] contains the executable programs from \Apfa;
+  \item[\texttt{doc}] is the generated documentation for the \Apfa
+    infrastructure; \marginpar{in share/doc/pips ?}
+  \item[\texttt{etc}] contains some generated configuration files;
+  \item[\texttt{include}] contains the include files used for the
+    compilation of \Apfa;
+  \item[\texttt{lib}] owns the libraries used to run \Apfa;
+  \item[\texttt{makes}] contains some make stuff for the \Apips
+    validation;
+  \item[\texttt{share}] contains shared files for run-time and
+    configuration files
+  \end{description}
 \end{description}
 
 
