@@ -82,6 +82,16 @@ SIMD_LOAD_CONSTANT_V4SF (float VEC[4], float X0, float X1, float X2, float X3)
 }
 
 void
+SIMD_LOAD_CONSTANT_V4SI (int VEC[4], int X0, int X1, int X2, int X3)
+{
+
+    VEC[0] = X0;
+    VEC[1] = X1;
+    VEC[2] = X2;
+    VEC[3] = X3;
+}
+
+void
 SIMD_SAVE_V4SI (int VEC[4], int BASE[4])
 {  
     BASE[0] = VEC[0];
@@ -221,6 +231,12 @@ SIMD_MULPS (float DEST[4], float SRC1[4], float SRC2[4])
     DEST[3] = SRC1[3] * SRC2[3];
 }
 void
+SIMD_DIVPD (double DEST[2], double SRC1[2], double SRC2[2])
+{
+    DEST[0] = SRC1[0] / SRC2[0];
+    DEST[1] = SRC1[1] / SRC2[1];
+}
+void
 SIMD_MULPD (double DEST[2], double SRC1[2], double SRC2[2])
 {
     DEST[0] = SRC1[0] * SRC2[0];
@@ -231,6 +247,12 @@ SIMD_ADDPD (double DEST[2], double SRC1[2], double SRC2[2])
 {
     DEST[0] = SRC1[0] + SRC2[0];
     DEST[1] = SRC1[1] + SRC2[1];
+}
+void
+SIMD_SUBPD (double DEST[2], double SRC1[2], double SRC2[2])
+{
+    DEST[0] = SRC1[0] - SRC2[0];
+    DEST[1] = SRC1[1] - SRC2[1];
 }
 
 void
@@ -688,6 +710,13 @@ SIMD_SETB (char DEST[8], char SRC[8])
     DEST[5] = SRC[5];
     DEST[6] = SRC[6];
     DEST[7] = SRC[7];
+}
+
+void
+SIMD_LOAD_CONSTANT_V2DF(double vec[2],double v0,double v1)
+{
+    vec[0]=v0;
+    vec[1]=v1;
 }
 
 #undef LOGICAL

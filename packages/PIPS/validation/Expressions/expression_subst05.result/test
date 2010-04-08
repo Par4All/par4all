@@ -1,0 +1,13 @@
+int test(int c)
+{
+   c = 1+c;
+   c = c+1;
+   return c;
+}
+int test(int c)
+{
+   addi(c, 1);
+   addi(c, 1);
+   return c;
+}
+
