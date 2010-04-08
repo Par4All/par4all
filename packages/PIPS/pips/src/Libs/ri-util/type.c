@@ -808,8 +808,8 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 	    }
 	  else if(type_functional_p(exp_type))
 	    {
-	      /* A reference to a function returns a pointer to a function of the very same time */
-	      b = make_basic_pointer(copy_type(exp_type));
+            /* A reference to a function returns a pointer to a function of the very same time */
+            b = make_basic_pointer(copy_type(exp_type));
 	    }
 	  else
 	    {
@@ -1199,14 +1199,14 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
             free_basic(rb);
             rb = basic_of_expression(EXPRESSION(CAR(args)));
 
-            MAP(EXPRESSION, arg, {
-                    basic b = basic_of_expression(arg);
-                    basic new_rb = basic_maximum(rb, b);
+            FOREACH(EXPRESSION, arg, CDR(args)){
+              basic b = basic_of_expression(arg);
+              basic new_rb = basic_maximum(rb, b);
 
-                    free_basic(rb);
-                    free_basic(b);
-                    rb = new_rb;
-                    }, CDR(args));
+              free_basic(rb);
+              free_basic(b);
+              rb = new_rb;
+            }
         }
 
     }

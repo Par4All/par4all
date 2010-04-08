@@ -416,7 +416,7 @@ static expression distance_between_entity(const entity e0, const entity e1)
 {
     if(same_entity_p(e0,e1))
         return int_to_expression(0);
-    else if( same_struct_entity_p(e0,e1) )
+    else if( entity_field_p(e0) && entity_field_p(e1) && same_struct_entity_p(e0,e1) )
         return make_op_exp(MINUS_OPERATOR_NAME,offset_of_struct(e1),offset_of_struct(e0));
     else
         return expression_undefined;

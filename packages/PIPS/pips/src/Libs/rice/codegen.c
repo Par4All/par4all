@@ -522,11 +522,6 @@ statement MakeLoopAs(statement old_loop_statement,
   statement new_loop_s;
   statement old_body = loop_body (old_loop);
   list new_locals = NewLoopLocals(body, loop_locals(old_loop));
-  instruction ibody = statement_instruction(body);
-
-  if (!statement_block_p(body))
-    body = make_block_statement(CONS(STATEMENT,body,NIL));
-  ibody = statement_instruction(body);
 
   if (rice_distribute_only)
     seq_or_par = is_execution_sequential;
@@ -534,11 +529,16 @@ statement MakeLoopAs(statement old_loop_statement,
   // copy declaration from old body to new body
   if ((statement_decls_text (old_body) != string_undefined) &&
       (statement_decls_text (old_body) != NULL))
-    statement_decls_text (body) = copy_string (statement_decls_text (old_body));
+  {
+      if(!statement_block_p(body)) body = make_block_statement(CONS(STATEMENT,body,NIL));
+      statement_decls_text (body) = copy_string (statement_decls_text (old_body));
+  }
   if ((statement_declarations (old_body) != list_undefined) &&
       (statement_declarations (old_body) != NULL))
-    //statement_declarations (body) = statement_declarations (old_body);
-    statement_declarations (body) = gen_copy_seq (statement_declarations (old_body));
+  {
+      if(!statement_block_p(body)) body = make_block_statement(CONS(STATEMENT,body,NIL));
+      statement_declarations (body) = gen_copy_seq (statement_declarations (old_body));
+  }
 
   new_loop = make_loop(loop_index(old_loop),
 		       loop_range(old_loop),

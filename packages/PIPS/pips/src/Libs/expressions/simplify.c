@@ -78,6 +78,218 @@ bool simplify_subscripts(string module_name)
 }
 
 /**************************************************************
+ * SPLIT_STRUCTURES
+ */
+
+typedef struct {
+    entity e;
+    bool used;
+} entity_used_in_calls_p;
+
+static
+void entity_used_in_calls_walker(call c, entity_used_in_calls_p *p)
+{
+    entity op = call_function(c);
+    if(!ENTITY_FIELD_P(op)&&!ENTITY_POINT_TO_P(op))
+    {
+        FOREACH(EXPRESSION,exp,call_arguments(c))
+        {
+            if(expression_reference_p(exp) && same_entity_p(reference_variable(expression_reference(exp)),p->e) )
+            {
+                p->used=true;
+            }
+        }
+        /* SG: as a special extension, we allow return call
+         * for it is handled elsewhere*/
+        if(p->used)
+            if(ENTITY_RETURN_P(op)||ENTITY_C_RETURN_P(op))
+                p->used=false;
+            else
+                gen_recurse_stop(0);
+    }
+}
+
+static 
+bool entity_used_in_calls(entity e)
+{
+    entity_used_in_calls_p p = { e, false};
+    gen_context_recurse(get_current_module_statement(),&p,call_domain,gen_true,entity_used_in_calls_walker);
+    return p.used;
+}
+
+typedef struct {
+    entity structure;
+    entity field;
+    entity new;
+} rfr_param;
+
+static void
+replace_field_by_reference_walker(call c,rfr_param * p)
+{
+    entity op = call_function(c);
+    if(ENTITY_POINT_TO_P(op) || ENTITY_FIELD_P(op))
+    {
+        expression lhs = binary_call_lhs(c);
+        expression rhs = binary_call_rhs(c);
+        if(expression_reference_p(lhs) && same_entity_p(reference_variable(expression_reference(lhs)),p->structure) &&
+                expression_reference_p(rhs) && same_entity_p(reference_variable(expression_reference(rhs)),p->field) )
+        {
+            gen_chunk *ancestor = gen_get_recurse_ancestor(c);
+            if(INSTANCE_OF(syntax,ancestor))
+            {
+                free_call(c);
+                syntax s = (syntax)ancestor;
+                syntax_tag(s) = is_syntax_reference;
+                syntax_reference(s)=make_reference(p->new,NIL);
+            }
+            else
+            {
+                call_function(c)=entity_intrinsic(UNARY_PLUS_OPERATOR_NAME);
+                gen_full_free_list(call_arguments(c));
+                call_arguments(c)=make_expression_list(entity_to_expression(p->new));
+            }
+        }
+    }
+}
+
+static void
+replace_field_by_reference(entity structure,entity field,entity new)
+{
+    rfr_param p = { structure, field,new };
+    gen_context_recurse(get_current_module_statement(),&p,call_domain,gen_true,replace_field_by_reference_walker);
+}
+
+typedef struct {
+    entity var;
+    list fields;
+    list new_vars;
+} dssrhp;
+
+static void
+do_split_structure_return_hook_walker(statement s,dssrhp *p)
+{
+    if(return_statement_p(s))
+    {
+        instruction i = statement_instruction(s);
+        expression returned = 
+            EXPRESSION(CAR(call_arguments(
+                        instruction_call_p(i)?
+                        instruction_call(i):
+                        expression_call(instruction_expression(i))
+                        )));
+        /* we return the same reference as the initial variable, update fields accordingly */
+        if(expression_reference_p(returned) &&
+                same_entity_p(reference_variable(expression_reference(returned)),p->var))
+        {
+            list fields_update = NIL;
+            list fields = p->fields;
+            FOREACH(ENTITY,nv,p->new_vars)
+            {
+                entity f = ENTITY(CAR(fields));
+                fields_update=CONS(STATEMENT,
+                        make_assign_statement(
+                            MakeBinaryCall(
+                                entity_intrinsic(FIELD_OPERATOR_NAME),
+                                entity_to_expression(p->var),
+                                entity_to_expression(f)
+                                ),/* this makes e.f */
+                            entity_to_expression(nv)/*this makes udpated value of the fields */
+                            ),
+                        fields_update
+                        );
+                POP(fields);
+
+            }
+            fields_update=gen_nreverse(fields_update);
+            insert_statement(s,make_block_statement(fields_update),true);
+
+        }
+            
+    }
+}
+
+static
+void do_split_structure_return_hook(entity var,list fields, list new_vars)
+{
+    pips_assert("as many new vars as fields\n",gen_length(fields)==gen_length(new_vars));
+    dssrhp p = { var, fields, new_vars };
+    gen_context_recurse(get_current_module_statement(),&p,
+            statement_domain,gen_true,do_split_structure_return_hook_walker);
+}
+
+static
+void do_split_structures(statement s)
+{
+    if(statement_block_p(s))
+    {
+        list added = NIL;
+        FOREACH(ENTITY,e,statement_declarations(s))
+        {
+            if(entity_variable_p(e) )
+            {
+                type t = ultimate_type(entity_type(e));
+                if(basic_derived_p(variable_basic(type_variable(t))) &&
+                    entity_struct_p(basic_derived(variable_basic(type_variable(t)))) &&
+                    !entity_used_in_calls(e))
+                    {
+                        list fields = type_struct(entity_type(basic_derived(variable_basic(type_variable(t)))));
+                        list inits = value_expression_p(entity_initial(e)) ?
+                            call_arguments(expression_call(value_expression(entity_initial(e)))):
+                            NIL;
+                        FOREACH(ENTITY,f,fields)
+                        {
+                            string new_name = strdup(entity_name(f));
+                            for(string found = strchr(new_name,MEMBER_SEP_CHAR);found;found = strchr(new_name,MEMBER_SEP_CHAR))
+                                *found='_';
+                            entity new = make_entity_copy_with_new_name(f,new_name,false);
+                            free_storage(entity_storage(new));
+                            entity_storage(new)=storage_undefined;
+                            if(!ENDP(inits))
+                                entity_initial(new)= 
+                                    make_value_expression(copy_expression(EXPRESSION(CAR(inits))));
+                            free(new_name);
+                            replace_field_by_reference(e,f,new);
+                            added=CONS(ENTITY,new,added);
+                            if(!ENDP(inits)) POP(inits);
+                        }
+                        added=gen_nreverse(added);
+                        /* hook: handle returns as a special case */
+                        do_split_structure_return_hook(e,fields,added);
+                    }
+
+            }
+        }
+        FOREACH(ENTITY,e,added)
+            AddLocalEntityToDeclarations(e,get_current_module_entity(),s);
+        gen_free_list(added);
+    }
+
+}
+
+bool split_structures(string module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    /* do the job */
+    gen_recurse(get_current_module_statement(),
+            statement_domain,gen_true,do_split_structures);
+    cleanup_subscripts(get_current_module_statement());
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
+}
+
+
+
+/**************************************************************
  * SIMPLIFY_COMPLEX
  */
 expression make_float_constant_expression(float);

@@ -153,7 +153,7 @@ bool find_write_effect_on_entity(statement s, entity e)
 	{
 		reference r = effect_any_reference(eff);
 		entity re = reference_variable(r);
-		if( same_entity_name_p(e,re) )
+		if( entity_conflict_p(e,re) )
 		{
 			cell c = effect_cell(eff);
 			if( ENDP( reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) ) )

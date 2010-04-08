@@ -323,7 +323,7 @@ static string c_dim_string(list ldim)
                we only need to print (upper dimension + 1)
                but in order to handle Fortran code, we check all other possibilities
                and print (upper - lower + 1). Problem : the order of dimensions is reversed !!!! */
-#if 0
+#if 1
             if (expression_integer_value(elow, &low))
             {
                 if (low == 0)
