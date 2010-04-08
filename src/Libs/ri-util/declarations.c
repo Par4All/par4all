@@ -401,11 +401,12 @@ list words_basic(basic obj, list pdl)
       {
 	entity ent = basic_derived(obj);
 	string name = entity_user_name(ent);
+	string lname = entity_local_name(ent);
 	type t = entity_type(ent);
 
-	if(strstr(name,DUMMY_STRUCT_PREFIX)==NULL
-	   && strstr(name,DUMMY_UNION_PREFIX)==NULL
-	   && strstr(name,DUMMY_ENUM_PREFIX)==NULL) {
+	if(strstr(lname,STRUCT_PREFIX DUMMY_STRUCT_PREFIX)==NULL
+	   && strstr(lname,UNION_PREFIX DUMMY_UNION_PREFIX)==NULL
+	   && strstr(lname,ENUM_PREFIX DUMMY_ENUM_PREFIX)==NULL) {
 	  pc = gen_nconc(pc,words_type(t, pdl));
 	  pc = CHAIN_SWORD(pc," ");
 	  pc = CHAIN_SWORD(pc,name);
@@ -2122,9 +2123,9 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	type t1 = entity_type(ent);
 	string n = entity_name(ent);
 	pips_debug(9,"Derived type with name = %s\n", list_to_string(name));
-	if((strstr(n,DUMMY_ENUM_PREFIX)==NULL)
-	   &&(strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
-	   &&(strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
+	if((strstr(n,ENUM_PREFIX DUMMY_ENUM_PREFIX)==NULL)
+	   &&(strstr(n,STRUCT_PREFIX DUMMY_STRUCT_PREFIX)==NULL)
+	   &&(strstr(n,UNION_PREFIX DUMMY_UNION_PREFIX)==NULL)) {
 	  if(!gen_in_list_p((void *) ent, pdl)) {
 	    /* The derived type has been declared explicitly
 	       elsewhere: see struct05.c */
@@ -2348,9 +2349,9 @@ text c_text_entities(entity module, list ldecl, int margin, list pdl)
 	 are exposed directly. */
       if(((strstr(n,DUMMY_ENUM_PREFIX)==NULL)
 	  || !type_used_in_type_declarations_p(e, ldecl))
-	 && (strstr(n,DUMMY_STRUCT_PREFIX)==NULL
+	 && (strstr(n,STRUCT_PREFIX DUMMY_STRUCT_PREFIX)==NULL
 	     ||strstr(n,MEMBER_SEP_STRING)!=NULL)
-	 && (strstr(n,DUMMY_UNION_PREFIX)==NULL
+	 && (strstr(n,UNION_PREFIX DUMMY_UNION_PREFIX)==NULL
 	     ||strstr(n,MEMBER_SEP_STRING)!=NULL) ) {
 	type et = ultimate_type(entity_type(e));
 	tmp = c_text_entity(module, e, margin, npdl);
