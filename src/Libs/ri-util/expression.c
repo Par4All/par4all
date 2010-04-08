@@ -1971,32 +1971,36 @@ int expression_to_int(expression exp)
 	       "expression is not an integer constant");
   return(rv);
 }
-
+
+constant expression_constant(expression exp)
+{
+  if(syntax_call_p(expression_syntax(exp)))
+  {
+    call c = syntax_call(expression_syntax(exp));
+    value v = entity_initial(call_function(c));
+    switch(value_tag(v))
+    {
+      case is_value_constant:
+        return value_constant(v);
+      case is_value_intrinsic:
+        if(ENTITY_UNARY_MINUS_P(call_function(c))||ENTITY_UNARY_PLUS_P(call_function(c)))
+          return expression_constant(binary_call_lhs(c));
+      default:
+        ;
+    }
+  }
+  return constant_undefined;
+}
 /*=================================================================*/
 /* bool expression_constant_p(expression exp)
  * Returns TRUE if "exp" contains an (integer) constant value.
  *
- * Note : A negative constant can be represented with a call to the unary
- *        minus intrinsic function upon a positive value.
+ * Note : A negativePositive constant can be represented with a call to the unary
+ *        minus/plus intrinsic function upon a positive value.
  */
 bool expression_constant_p(expression exp)
 {
-    if(syntax_call_p(expression_syntax(exp)))
-    {
-	call c = syntax_call(expression_syntax(exp));
-	switch(value_tag(entity_initial(call_function(c))))
-	{
-	case is_value_constant:
-	    return(TRUE);
-	case is_value_intrinsic:
-	    if(ENTITY_UNARY_MINUS_P(call_function(c)))
-		return expression_constant_p
-		    (binary_call_lhs(c));
-	default:
-	  ;
-	}
-    }
-    return(FALSE);
+  return !constant_undefined_p(expression_constant(exp));
 }
 
 /* Returns true if the value of the expression does not depend
@@ -2770,15 +2774,33 @@ static bool _expression_similar_p(expression target, expression pattern,hash_tab
             if( syntax_call_p(starget) &&
                     same_entity_p( call_function(syntax_call(starget)), call_function(syntax_call(spattern)) ) )
             {
-                list iter = call_arguments(syntax_call(spattern));
-                FOREACH(EXPRESSION, etarget, call_arguments(syntax_call(starget) ) )
+                call cpattern = syntax_call(spattern);
+                call ctarget = syntax_call(starget);
+                if(commutative_call_p(cpattern))
                 {
-                    if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
-                    expression epattern = EXPRESSION(CAR(iter));
-                    similar&= _expression_similar_p(etarget,epattern,symbols);
-                    POP(iter);
-                    if(!similar)
-                        break;
+                    pips_assert("pips commutative call have only two arguments\n",gen_length(call_arguments(cpattern))==2);
+                    expression lhs_pattern = binary_call_lhs(cpattern),
+                               rhs_pattern = binary_call_rhs(cpattern),
+                               lhs_target = binary_call_lhs(ctarget),
+                               rhs_target = binary_call_rhs(ctarget);
+                    similar = (_expression_similar_p(lhs_target,lhs_pattern,symbols) && _expression_similar_p(rhs_target,rhs_pattern,symbols))
+                        ||
+                        (_expression_similar_p(lhs_target,rhs_pattern,symbols) && _expression_similar_p(rhs_target,lhs_pattern,symbols))
+                        ;
+
+                }
+                else
+                {
+                    list iter = call_arguments(cpattern);
+                    FOREACH(EXPRESSION, etarget, call_arguments(ctarget) )
+                    {
+                        if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
+                        expression epattern = EXPRESSION(CAR(iter));
+                        similar&= _expression_similar_p(etarget,epattern,symbols);
+                        POP(iter);
+                        if(!similar)
+                            break;
+                    }
                 }
             }
             else
