@@ -87,12 +87,12 @@ main (int argc, char *argv[])
   return 0;
 }
 /* C pretty print for module SUB. */
-#define n 10
-
 void
 sub (int j, int k)
 {
   int i;
+  static const int n = 10;
+  ;
   double a[11];
 
   for (i = 0; i <= k; i++)
@@ -120,13 +120,13 @@ sub2 (int n, int m)
   return;
 }
 /* C pretty print for module SUB3. */
-#define n 2
-
-#define m 3
-
 void
 sub3 (void)
 {
+  static const int n = 2;
+  ;
+  static const int m = 3;
+  ;
   int i;
 
   i = (n + m);
@@ -138,11 +138,11 @@ sub3 (void)
   return;
 }
 /* C pretty print for module SUB4. */
-#define n 10
-
 void
 sub4 (double a[11])
 {
+  static const int n = 10;
+  ;
   int i;
   double b[11];
 

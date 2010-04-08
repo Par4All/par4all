@@ -1,0 +1,27 @@
+initial functions
+int main()
+{
+   struct {
+      int a;
+      int b;
+   } c;
+   c.a = 2;
+   c.b = 4;
+   printf("%d", c.a+c.b);
+}
+after split strucutres
+int main()
+{
+   struct {
+      int a;
+      int b;
+   } c;
+   //PIPS generated variable
+   int _PIPS_STRUCT_1_a, _PIPS_STRUCT_1_b;
+   _PIPS_STRUCT_1_a = 2;
+   _PIPS_STRUCT_1_b = 4;
+   printf("%d", _PIPS_STRUCT_1_a+_PIPS_STRUCT_1_b);
+}
+validate result
+ok
+

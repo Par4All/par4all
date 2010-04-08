@@ -10,10 +10,12 @@ echo // OMP style
 #apply INTERNALIZE_PARALLEL_CODE(%ALLFUNC)
 #apply OMPIFY_CODE(%ALL)
 
-apply PRECONDITIONS_INTER_FULL(%ALL)
+# Do not use %ALL because it includes compilation units and hence,
+# quite often, OS dependent source code.
+apply PRECONDITIONS_INTER_FULL(%ALLFUNC)
 
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
-display PRINTED_FILE(%ALL)
+display PRINTED_FILE(%ALLFUNC)
 
 close
 delete atoll

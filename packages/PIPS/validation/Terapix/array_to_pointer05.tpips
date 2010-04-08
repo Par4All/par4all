@@ -1,6 +1,7 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete array_to_pointer05
-
 create array_to_pointer05 array_to_pointer04.c
+
 
 
 echo

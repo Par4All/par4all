@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete convol2
 create convol2 convol.c include/load.c
 

@@ -1,0 +1,14 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="expression_subst05"
+delete $WS
+create $WS $WS.c include/patterns.c
+
+module test
+display PRINTED_FILE
+
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "addi"
+apply EXPRESSION_SUBSTITUTION
+display PRINTED_FILE
+
+close
+delete $WS
