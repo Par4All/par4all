@@ -1,6 +1,6 @@
 delete decl04
 create decl04 decl04.c
-
+setproperty ABORT_ON_USER_ERROR TRUE
 #echo Select some options to deal with the C Language:
 #echo Parse as C:
 setenv PIPS_CPP="cpp -C"
@@ -23,12 +23,13 @@ echo
 echo Proper effects
 echo
 display PRINTED_FILE[decl04]
+
 echo
 echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[decl04]
+display PRINTED_FILE[%ALLFUNC]
 
 
 close
