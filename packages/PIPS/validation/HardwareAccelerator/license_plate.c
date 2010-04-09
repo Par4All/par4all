@@ -17,30 +17,18 @@ int license_plate(void)
    freia_data2d *imout;
    freia_data2d *out;
    
-   
-   
-   int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
-   
-   
-   
-   int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
-   //PIPS generated variable
+   const int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
+   const int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
+
+   // PIPS generated variable
    int _return0, _return1, _return2, _return3, _return4;
-   //PIPS generated variable
    freia_status ret_0;
-   //PIPS generated variable
    int i_0;
-   //PIPS generated variable
    freia_status ret_1;
-   //PIPS generated variable
    int i_1;
-   //PIPS generated variable
    freia_status ret_2;
-   //PIPS generated variable
    int i_2;
-   //PIPS generated variable
    freia_status ret_3;
-   //PIPS generated variable
    int i_3, i_4;
    
    /* open videos flow */
@@ -61,11 +49,6 @@ int license_plate(void)
    
    /* processing */
    freia_common_rx_image(in, &fdin);
-   //  freia_data2d imtmp;
-   
-   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
-   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
-   
    
    ret_0 = freia_aipo_erode_8c(imopen, in, kernel1x3);
    ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);
@@ -101,7 +84,6 @@ int license_plate(void)
    ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);
    i_0 = 15;
    
-   //freia_common_destruct_data(imtmp);
    _return1 = ret_0;
 
    ret_1 = freia_aipo_dilate_8c(imclose, in, kernel1x3);
@@ -131,11 +113,6 @@ int license_plate(void)
    freia_aipo_threshold(imcloseth, imclose, 150, 255, 1);
 
    freia_aipo_and(imand, imopenth, imcloseth);
-   //  freia_data2d imtmp;
-   
-   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
-   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
-   
    
    ret_2 = freia_aipo_erode_8c(imfilt, imand, kernel3x1);
    ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);
@@ -149,13 +126,7 @@ int license_plate(void)
    ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);
    i_2 = 4;
    
-   //freia_common_destruct_data(imtmp);
    _return2 = ret_2;
-   //  freia_data2d imtmp;
-   
-   //imtmp = freia_common_create_data(imin->bpp, imin->width, imin->eight);
-   //freia_common_set_wa(imtmp, imin->xStartWa, imin->yStartWa,imin->widthWa, imin->heightWa);
-   
    
    ret_3 = freia_aipo_erode_8c(imout, imfilt, kernel1x3);
    ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);
@@ -169,15 +140,12 @@ int license_plate(void)
    ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);
    i_3 = 4;
    
-   //freia_common_destruct_data(imtmp);
    _return3 = ret_3;
-   
    
    freia_aipo_dilate_8c(out, imout, (int *) freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);
    i_4 = 3;
-   
    
    _return4 = 0;
 

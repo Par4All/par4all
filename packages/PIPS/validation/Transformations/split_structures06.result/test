@@ -16,9 +16,9 @@ struct ure  llement()
 {
    struct ure noth = {1};
    //PIPS generated variable
-   int ure_lle = 1;
+   int ure_lle = noth.lle;
    //PIPS generated variable
-   float ure_ing;
+   float ure_ing = noth.ing;
    ure_ing = 2.;
    noth.lle = ure_lle;
    noth.ing = ure_ing;

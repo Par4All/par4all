@@ -172,9 +172,9 @@ static bool compact_phi_functions(statement s0,statement s1)
 
                     /* 1:replace false_val[i] by true_val[!i]*/
                     free_expression(false_val[i]);
-                    CAR(CDR(CDR(call_arguments(phis[i])))).p=(gen_chunkp)true_val[!i];
+                    *REFCAR(CDR(CDR(call_arguments(phis[i]))))=(gen_chunkp)true_val[!i];
                     /* 2:unlink true_val[!i]*/
-                    CAR(CDR(call_arguments(phis[!i]))).p=gen_chunk_undefined;
+                    *REFCAR(CDR(call_arguments(phis[!i])))=gen_chunk_undefined;
                     /* 3: replace s[!i] by a continue */
                     update_statement_instruction(s[!i],make_continue_instruction());
                     return true;

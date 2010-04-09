@@ -1,6 +1,6 @@
 delete decl05
 create decl05 decl05.c
-
+setproperty ABORT_ON_USER_ERROR TRUE
 #echo Select some options to deal with the C Language:
 #echo Parse as C:
 setenv PIPS_CPP="cpp -C"

@@ -317,12 +317,12 @@ range r ;
 
 	    new_args = CONS(EXPRESSION, new_e, new_args ) ;
 	}, call_arguments( c )) ;
-	
+
 	new_e = expand_call(e, f, gen_nreverse(new_args));
 	break;
     }
     case is_syntax_range:
-	pips_error("expand_expression", 
+	pips_error("expand_expression",
 		   "Range expansion not implemented\n" ) ;
     default:
 	pips_error("expand_expression", "unexpected syntax tag (%d)\n",
@@ -332,34 +332,51 @@ range r ;
     return new_e;
 }
 
-text text_loop_90(module, label, margin, obj, n)
-entity module;
-string label;
-int margin;
-loop obj;
-int n ;
+/* The tests necessary to check the underlying assumptions have been
+   performed in text_loop(): b is either an assignment or a sequence
+   with only one statement which is an assignment. */
+static statement body_to_assignment_statement(statement b)
+{
+  instruction bi = statement_instruction(b);
+  statement s = statement_undefined;
+
+  if(instruction_sequence_p(bi)) {
+    list sl = sequence_statements(instruction_sequence(bi));
+    s = STATEMENT(CAR(sl));
+  }
+  else /* because of the input assumptions */
+    s = b;
+
+  return s;
+}
+
+/* Generate range subscript for simple loop with only one assignment. */
+text text_loop_90(entity module, string label, int margin, loop obj, int n)
 {
     /* text_loop_90() only is called if the loop is parallel and if its
-     * body is a unique assignment statement.
+     * body is a unique assignment statement or a list containing a
+     * unique assignment.
      */
-    instruction i = statement_instruction( loop_body( obj )) ;
+  statement as = body_to_assignment_statement( loop_body( obj )) ;
+  instruction i = statement_instruction(as);
     entity idx = loop_index( obj ) ;
     range r = loop_range( obj ) ;
+
     expression lhs =
 	EXPRESSION( CAR( call_arguments( instruction_call( i )))) ;
-    expression rhs = 
+    expression rhs =
 	EXPRESSION( CAR( CDR( call_arguments( instruction_call( i ))))) ;
     expression new_lhs = expression_undefined;
     expression new_rhs = expression_undefined;
     text t = text_undefined;
 
     pips_assert("Loop obj is consistent", loop_consistent_p(obj));
-    
+
     vectors = set_make( set_pointer ) ;
 
     new_lhs = expand_expression( lhs, idx, r ) ;
     new_rhs = expand_expression( rhs, idx, r ) ;
-    
+
     pips_assert("new_lhs is consistent", expression_consistent_p(new_lhs));
     pips_assert("new_rhs is consistent", expression_consistent_p(new_rhs));
 
@@ -368,11 +385,11 @@ int n ;
     if(!expression_undefined_p(new_lhs) && !expression_undefined_p(new_rhs)) {
 	statement new_s = make_assign_statement( new_lhs, new_rhs );
 
-	statement_number(new_s) = statement_number(loop_body(obj));
+	statement_number(new_s) = statement_number(as);
 	/* statement_ordering must be initialized too to avoid a
            prettyprinter warning */
-	statement_ordering(new_s) = statement_ordering(loop_body(obj));
-	statement_comments(new_s) = statement_comments(loop_body(obj));
+	statement_ordering(new_s) = statement_ordering(as);
+	statement_comments(new_s) = statement_comments(as);
 	t = text_statement(module, margin, new_s, NIL);
 	/* FI: Although new_s has been converted to text, it cannot
 	   always be freed. I do not know which part of new_s is

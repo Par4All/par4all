@@ -86,12 +86,21 @@ words_fictious_reference(reference obj)
   return(pc);
 }
 
+/* For debugging points-to: use this function in points_to_words_reference() */
+static string entity_full_name(entity e)
+{
+  return entity_name(e);
+}
+
 /* Specific handling of references appearing in points_to */
 list points_to_words_reference(reference r)
 {
   extern string entity_minimal_user_name(entity);
 
+  // Normal implementation, used for validation:
   return words_any_reference(r,NIL, entity_minimal_user_name);
+  // To ease debugging, use:
+  //return words_any_reference(r,NIL, entity_full_name);
 }
 
 list word_points_to(points_to pt)
@@ -139,8 +148,8 @@ int points_to_compare_cells(const void * vpt1, const void * vpt2)
 
   cell c1so = points_to_source(pt1);
   cell c2so = points_to_source(pt2);
-  cell c1si = points_to_source(pt1);
-  cell c2si = points_to_source(pt2);
+  cell c1si = points_to_sink(pt1);
+  cell c2si = points_to_sink(pt2);
 
   //cell c1 = CELL(CAR(vc1));
   //cell c2 = CELL(CAR(vc2));

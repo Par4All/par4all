@@ -44,12 +44,14 @@
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "text-util.h"
 
 #include "misc.h"
 #include "properties.h"
 
 #include "resources.h"
 #include "pipsdbm.h"
+#include "alias-classes.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"

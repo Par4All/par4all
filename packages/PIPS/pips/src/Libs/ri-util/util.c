@@ -428,7 +428,22 @@ bool static_area_p(entity aire)
 
 bool heap_area_p(entity aire)
 {
-  return same_string_p(module_local_name(aire),HEAP_AREA_LOCAL_NAME);
+  return same_string_p(module_local_name(aire), HEAP_AREA_LOCAL_NAME);
+}
+
+/* Returns the heap area a associated to module f.Area a is always a
+   defined entity.
+
+   Assumes that f is defined, as well as its heap area.
+*/
+entity module_to_heap_area(entity f)
+{
+  entity a = global_name_to_entity(entity_local_name(f), HEAP_AREA_LOCAL_NAME);
+
+  pips_assert("The heap area is defined for module f.\n",
+	      !entity_undefined_p(a));
+
+  return a;
 }
 
 bool stack_area_p(entity aire)

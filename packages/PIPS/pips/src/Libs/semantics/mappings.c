@@ -609,19 +609,26 @@ list variables_to_values(list list_mod)
   return list_val;
 }
 
+/* Build the list of values to be projected when the declaration list
+   list_mod is not longer valid because a block is closed/left.
+
+   Values for static variables are preserved. Values for heap
+   variables also, in case their values are computed in the future...
+*/
 list dynamic_variables_to_values(list list_mod)
 {
   list list_val = NIL;
 
-  MAP(ENTITY, e, {
-      if(entity_has_values_p(e) && !variable_static_p(e)) {
-    entity v_old = entity_to_old_value(e);
-    entity v_new = entity_to_new_value(e);
+  FOREACH(ENTITY, e, list_mod) {
+    if(entity_has_values_p(e)
+       && (variable_dynamic_p(e) || variable_stack_p(e))) {
+      entity v_old = entity_to_old_value(e);
+      entity v_new = entity_to_new_value(e);
 
-    list_val = CONS(ENTITY, v_old, list_val);
-    list_val = CONS(ENTITY, v_new, list_val);
+      list_val = CONS(ENTITY, v_old, list_val);
+      list_val = CONS(ENTITY, v_new, list_val);
     }
-  }, list_mod);
+  }
   return list_val;
 }
 

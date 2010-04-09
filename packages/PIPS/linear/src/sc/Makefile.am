@@ -61,4 +61,7 @@ libsc_la_SOURCES = 	sc_alloc.c \
 		sc_lex.l \
 		$(other_headers)
 
+# additionnal dep needed for // build
+sc_lex.c:sc_gram.h
+
 include $(top_srcdir)/makes/cproto.mk

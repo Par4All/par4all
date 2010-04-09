@@ -46,7 +46,7 @@ int main()
    b = &c;
 //  {(b,c,-Exact-)}
    do {
-//  {(a,c,-MAY-);(b,d,-Exact-);(a,d,-MAY-)}
+//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
       // BEGIN BLOCK
 //  points to = {}
       i = i+1;
@@ -57,7 +57,7 @@ int main()
       // END BLOCK
    }
    while (i<5);
-//  {(a,c,-MAY-);(b,d,-Exact-);(a,d,-MAY-)}
+//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
 
    return 0;
    // END BLOCK

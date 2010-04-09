@@ -32,6 +32,9 @@
 #include "genC.h"
 #include "newgen_include.h"
 
+#undef gen_recurse
+#undef gen_context_recurse
+
 #define FIELD  "" /* was: "field_" */
 #define STRUCT "_newgen_struct_" /* structure names */
 

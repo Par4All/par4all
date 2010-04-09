@@ -44,5 +44,9 @@ tokyacc.h: warning.h f77keywords f77symboles Makefile
 		sed 's,\([^A-Z]*\)\(.*\),%token \1 TK_\2,' $(srcdir)/f77keywords $(srcdir)/f77symboles ;\
 	} > $@
 
+# additionnal dep needed for // build
+scanner.c:syn_yacc.h
+
+
 include $(srcdir)/../pipslibs_includes.mk
 CLEANFILES=keywtbl.h syn_yacc.h syn_yacc.c tokyacc.h syn_yacc.y

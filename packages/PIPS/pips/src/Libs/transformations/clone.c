@@ -100,70 +100,73 @@ build_statement_for_clone(
  * which looks like a not yet parsed routine.
  * it puts the initial_file for the routine, and updates its user_file.
  */
-static
-entity build_a_clone_for(
-    entity cloned,
-    int argn,
-    int val)
+static entity build_a_clone_for(entity cloned,
+				int argn,
+				int val)
 {
-    string name = entity_local_name(cloned), new_name, comments;
-    entity new_fun;
-    statement stat;
-    bool saved_b1, saved_b2;
-    text t;
+  string name = entity_local_name(cloned), new_name, comments;
+  entity new_fun;
+  statement stat;
+  bool saved_b1, saved_b2;
+  text t;
+  language l = code_language(value_code(entity_initial(cloned)));
 
-    pips_debug(2, "building a version of %s with arg %d val=%d\n",
-	       name, argn, val);
-    
-    /* builds some kind of module / statement for the clone.
-     */
-    new_name = get_string_property("CLONE_NAME");
-    new_name = empty_string_p(new_name) ?
-            build_new_top_level_module_name(name) :
-            strdup(new_name);
+  pips_debug(2, "building a version of %s with arg %d val=%d\n",
+	     name, argn, val);
 
-    new_fun = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,new_name);
-    entity_type(new_fun) = copy_type(entity_type(cloned));
-    entity_storage(new_fun) = copy_storage(entity_storage(cloned));
-    entity_initial(new_fun) = entity_initial(cloned); /* no copy, reseted later*/
+  /* builds some kind of module / statement for the clone.
+   */
+  new_name = get_string_property("CLONE_NAME");
+  new_name = empty_string_p(new_name) ?
+    build_new_top_level_module_name(name) :
+    strdup(new_name);
 
-    saved_b1 = get_bool_property(ALL_DECLS);
-    saved_b2 = get_bool_property(STAT_ORDER);
-    set_bool_property(ALL_DECLS, TRUE);
-    set_bool_property(STAT_ORDER, FALSE);
+  new_fun = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,new_name);
+  entity_type(new_fun) = copy_type(entity_type(cloned));
+  entity_storage(new_fun) = copy_storage(entity_storage(cloned));
+  entity_initial(new_fun) = entity_initial(cloned); /* no copy, reseted later*/
 
-    stat = build_statement_for_clone(cloned, argn, val);
-    t = text_named_module(new_fun, cloned, stat);
+  saved_b1 = get_bool_property(ALL_DECLS);
+  saved_b2 = get_bool_property(STAT_ORDER);
+  set_bool_property(ALL_DECLS, TRUE);
+  set_bool_property(STAT_ORDER, FALSE);
+
+  stat = build_statement_for_clone(cloned, argn, val);
+  t = text_named_module(new_fun, cloned, stat);
 
 
-    set_bool_property(ALL_DECLS, saved_b1);
-    set_bool_property(STAT_ORDER, saved_b2);
+  set_bool_property(ALL_DECLS, saved_b1);
+  set_bool_property(STAT_ORDER, saved_b2);
 
-    /* add some comments before the code.
-     */
-    char *comment_prefix = fortran_module_p(cloned) ? "!!" : "//"; 
-    comments = strdup(concatenate(
-      comment_prefix,"\n",
-      comment_prefix," PIPS: please caution!\n",
-      comment_prefix,"\n",
-      comment_prefix," this routine has been generated as a clone of ", name, "\n",
-      comment_prefix," the code may change significantly with respect to the original\n",
-      comment_prefix," version, especially after program transformations such as dead\n",
-      comment_prefix," code elimination and partial evaluation, hence the function may\n",
-      comment_prefix," not have the initial behavior, if called under some other context.\n",
-      comment_prefix,"\n", NULL));
-    text_sentences(t) = 
-	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments), text_sentences(t));
-    extern string compilation_unit_of_module(string);
-    add_new_module_from_text(new_name,t,fortran_module_p(cloned),compilation_unit_of_module(get_current_module_name()));
+  /* add some comments before the code.
+   */
+  char *comment_prefix = fortran_module_p(cloned) ? "!!" : "//";
+  comments = strdup(concatenate(
+				comment_prefix,"\n",
+				comment_prefix," PIPS: please caution!\n",
+				comment_prefix,"\n",
+				comment_prefix," this routine has been generated as a clone of ", name, "\n",
+				comment_prefix," the code may change significantly with respect to the original\n",
+				comment_prefix," version, especially after program transformations such as dead\n",
+				comment_prefix," code elimination and partial evaluation, hence the function may\n",
+				comment_prefix," not have the initial behavior, if called under some other context.\n",
+				comment_prefix,"\n", NULL));
+  text_sentences(t) =
+    CONS(SENTENCE, make_sentence(is_sentence_formatted, comments), text_sentences(t));
+  extern string compilation_unit_of_module(string);
+  add_new_module_from_text(new_name,t,fortran_module_p(cloned),compilation_unit_of_module(get_current_module_name()));
 
-    /* should fix the declarations ...*/
-    entity_initial(new_fun)=make_value(is_value_code,
-				       make_code(NIL, strdup(""), make_sequence(NIL),NIL, make_language_unknown()));
+  /* should fix the declarations ... but not the language... */
+  entity_initial(new_fun) =
+    make_value(is_value_code,
+	       make_code(NIL, strdup(""),
+			 make_sequence(NIL),
+			 NIL,
+			 copy_language(l)));
 
-    free_statement(stat);
-    free(new_name);
-    return new_fun;
+  free_statement(stat);
+  free(new_name);
+  return new_fun;
 }
 
 
