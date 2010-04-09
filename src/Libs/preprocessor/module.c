@@ -319,11 +319,15 @@ static string entity_more_or_less_minimal_name(entity e, bool strict_p)
        declaration */
     if(strict_p)
       emn = entity_local_name(e);
-    else
-      emn = strdup(entity_local_name(e));
+    else {
+      /* In analysis results, let's know when dummy parameters are
+	 used... */
+      //emn = strdup(entity_local_name(e));
+      emn = strdup(entity_name(e));
+    }
   }
   else if (strcmp(TOP_LEVEL_MODULE_NAME, entity_module_name(e)) == 0) {
-    /* The variable is a PHI entity */
+    /* The variable is a ??? */
     if(strict_p)
       emn = entity_local_name(e);
     else
@@ -337,7 +341,7 @@ static string entity_more_or_less_minimal_name(entity e, bool strict_p)
       emn = strdup(entity_local_name(e));
   }
   else if (strcmp(POINTS_TO_MODULE_NAME, entity_module_name(e)) == 0) {
-    /* The variable is a PHI entity */
+    /* The variable is a stub entity for formal and global pointers */
     if(strict_p)
       emn = entity_local_name(e);
     else
