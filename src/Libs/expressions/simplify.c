@@ -242,8 +242,15 @@ void do_split_structures(statement s)
                             for(string found = strchr(new_name,MEMBER_SEP_CHAR);found;found = strchr(new_name,MEMBER_SEP_CHAR))
                                 *found='_';
                             entity new = make_entity_copy_with_new_name(f,new_name,false);
+                            /* we copied the field storage, that is rom, recompute a ram storage */
                             free_storage(entity_storage(new));
-                            entity_storage(new)=storage_undefined;
+                            entity dyn_area = global_name_to_entity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME); 
+                            entity_storage(new) = 
+                                make_storage_ram(
+                                        make_ram(get_current_module_entity(), dyn_area,
+                                            (basic_overloaded_p(entity_basic(new))?0:add_variable_to_area(dyn_area,new)),
+                                            NIL));
+                            /* then take car of initial value if any */
                             if(!ENDP(inits))
                                 entity_initial(new)= 
                                     make_value_expression(copy_expression(EXPRESSION(CAR(inits))));
