@@ -34,5 +34,7 @@ libunion_la_SOURCES=disjunct.c \
 		sl_gram.y \
 		sl_lex.l
 
-include $(top_srcdir)/makes/cproto.mk
+# additionnal dep needed for // build
+sl_lex.c:sl_gram.h
 
+include $(top_srcdir)/makes/cproto.mk
