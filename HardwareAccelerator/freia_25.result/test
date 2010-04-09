@@ -232,3 +232,4 @@ freia_status freia_25(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
 
    return FREIA_OK;                                                     /*0012*/
 }
+

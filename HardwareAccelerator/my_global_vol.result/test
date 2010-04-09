@@ -103,3 +103,4 @@ freia_status my_global_vol(freia_data2d *image, int32_t *vol)
 {
    return my_global_vol_helper_0_0_0(image, vol);                       /*0004*/
 }
+

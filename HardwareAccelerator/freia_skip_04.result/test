@@ -249,3 +249,4 @@ void freia_skip_04(freia_data2d *o, freia_data2d *i)
    freia_skip_04_helper_0_1_0(o, t, 8, seuil-4, true);                  /*0014*/
    freia_common_destruct_data(t);                                       /*0015*/
 }
+

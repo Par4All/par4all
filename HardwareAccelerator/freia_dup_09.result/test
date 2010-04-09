@@ -174,3 +174,4 @@ void freia_dup_09(freia_data2d *in0, int32_t *x)
    freia_dup_09_helper_0_0_0(in0, x);                                   /*0006*/
    freia_dup_09_helper_0_1_0(in0, x);                                   /*0007*/
 }
+

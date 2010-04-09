@@ -272,3 +272,4 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    // cleanup
    freia_common_destruct_data(t1);                                      /*0018*/
 }
+

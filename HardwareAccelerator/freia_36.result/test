@@ -159,3 +159,4 @@ freia_status freia_36(freia_data2d *i0, freia_data2d *i1)
    freia_common_destruct_data(t);                                       /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
+

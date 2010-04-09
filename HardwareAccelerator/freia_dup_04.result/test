@@ -140,3 +140,4 @@ freia_status freia_dup_04(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    freia_aipo_copy(o1, o0);
    return FREIA_OK;                                                     /*0012*/
 }
+

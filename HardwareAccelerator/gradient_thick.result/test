@@ -183,3 +183,4 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    
    return FREIA_OK;                                                     /*0020*/
 }
+

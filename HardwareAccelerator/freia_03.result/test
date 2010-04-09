@@ -309,3 +309,4 @@ freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32
    
    return FREIA_OK;                                                     /*0044*/
 }
+

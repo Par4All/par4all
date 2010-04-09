@@ -162,3 +162,4 @@ freia_status freia_ret_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    ret |= 0;                                                            /*0009*/
    return ret;                                                          /*0011*/
 }
+

@@ -291,3 +291,4 @@ void freia_skip_06(freia_data2d *o, freia_data2d *i)
    freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0011*/
    freia_common_destruct_data(t0);                                      /*0013*/
 }
+

@@ -125,3 +125,4 @@ freia_status my_not(freia_data2d *o, freia_data2d *i0)
 {
    return my_not_helper_0_0_0(o, i0);                                   /*0005*/
 }
+

@@ -173,3 +173,4 @@ freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1
    freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
    return FREIA_OK;                                                     /*0012*/
 }
+

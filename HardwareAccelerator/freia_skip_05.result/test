@@ -193,3 +193,4 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
    // allocation in the middle of the stream
    freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0008*/
 }
+

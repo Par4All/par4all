@@ -103,3 +103,4 @@ freia_status my_global_min(freia_data2d *i0, int32_t *p0)
 {
    return my_global_min_helper_0_0_0(i0, p0);                           /*0004*/
 }
+
