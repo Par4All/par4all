@@ -13,7 +13,11 @@ int main()
 after split strucutres
 void foo(my *m)
 {
-   m->a = 3;
+   //PIPS generated variable
+   int _PIPS_STRUCT_1_a = m->a, _PIPS_STRUCT_1_b = m->b;
+   _PIPS_STRUCT_1_a = 3;
+   m->a = _PIPS_STRUCT_1_a;
+   m->b = _PIPS_STRUCT_1_b;
 }
 int main()
 {
