@@ -23,6 +23,5 @@ display PRINTED_FILE[main]
 
 close
 delete if00
-07
 quit
 
