@@ -222,7 +222,7 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
 {
   entity module;
   type t;
-  statement module_stat;
+  //statement module_stat;
   list pt_list = NIL;
   list dcl = NIL;
   list params = NIL;
@@ -232,10 +232,12 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
 
+  /*
   set_current_module_statement( (statement)
 				db_get_memory_resource(DBR_CODE,
 						       module_name, TRUE));
   module_stat = get_current_module_statement();
+  */
   t = entity_type(module);
 
   debug_on("POINTS_TO_DEBUG_LEVEL");
@@ -254,20 +256,32 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
 		      " is ignored\n");
 
   if(type_functional_p(t)){
+    list dl = code_declarations(value_code(entity_initial(module)));
+
+    FOREACH(ENTITY, fp, dl) {
+      if(formal_parameter_p(fp)) {
+	reference r = make_reference(fp, NIL);
+	cell c = make_cell_reference(r);
+	pts_to_set = set_union(pts_to_set, pts_to_set,
+			       formal_points_to_parameter(c));
+      }
+    }
+    /*
     functional f = type_functional(t);
     params = functional_parameters(f);
     FOREACH(PARAMETER, p, params){
-		dummy d = parameter_dummy(p);
-		if(dummy_identifier_p(d)){
-			entity e = dummy_identifier(d);
-			reference r = make_reference(e, NIL);
-			cell c = make_cell_reference(r);
-			pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
-		}
-	}
+      dummy d = parameter_dummy(p);
+      if(dummy_identifier_p(d)){
+	entity e = dummy_identifier(d);
+	reference r = make_reference(e, NIL);
+	cell c = make_cell_reference(r);
+	pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
+      }
+    }
+    */
   }
   else
-    pips_user_warning("The module %s is not a function\n", module_name);
+    pips_user_error("The module %s is not a function.\n", module_name);
 
   pt_list = set_to_sorted_list(pts_to_set,
 			       (int(*)
@@ -279,7 +293,7 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
     (DBR_SUMMARY_POINTS_TO_LIST, module_name, summary_pts_to_list);
 
   reset_current_module_entity();
-  reset_current_module_statement();
+  //reset_current_module_statement();
 
   debug_off();
 

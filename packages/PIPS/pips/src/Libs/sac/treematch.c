@@ -152,7 +152,7 @@ static matchTree match_expression(expression arg, matchTree t,list *args)
                      * now bring back the lhs !
                      */
                     if( !matchTree_undefined_p(t))
-                        CAR(*args).p = arg;
+                        *REFCAR(*args) = (gen_chunkp)arg;
                 }
                 else
                     t = match_call(c, t, args);

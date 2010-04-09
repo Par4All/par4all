@@ -15,4 +15,7 @@ libpreprocessor_la_SOURCES=\
 AM_YFLAGS=-d -p splitc_
 AM_LFLAGS=-p splitc_
 
+# additionnal dep needed for // build
+lexer.c:splitc.h
+
 include $(srcdir)/../pipslibs_includes.mk

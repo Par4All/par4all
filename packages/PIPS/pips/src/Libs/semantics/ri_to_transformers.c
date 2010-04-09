@@ -1845,7 +1845,7 @@ transformer statement_to_transformer(
       * int i = 1; => T(i) {i==1}
       *
       * What is the impact of this choice? BC prefers the second one
-      * because it it consistent for convec effect computation.
+      * because it it consistent for convex effect computation.
       *
       * Note: this issue could be dealt with earlier in
       * declarations_to_transformer()
@@ -1884,7 +1884,9 @@ transformer statement_to_transformer(
     /* When we leave a block the local stack allocated variables
        disappear */
     if(statement_block_p(s) && !ENDP(dl=statement_declarations(s))) {
-      /* Get rid of the non static variables declared in this block statement. */
+      /* Get rid of the dynamic and stack variables declared in this block
+	 statement. No stack variable should be analyzed as the stack
+	 area is used only for dependent types. */
       list vl = dynamic_variables_to_values(dl);
       if(!ENDP(vl))
 	nt = safe_transformer_projection(nt, vl);

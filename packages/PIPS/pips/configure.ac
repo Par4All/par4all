@@ -92,7 +92,8 @@ AX_ARG_ENABLE([doc],
 			   AX_CHECK_PROG([epstopdf])
 			   AX_LATEX_PACKAGE([listings])
 			   AX_LATEX_PACKAGE([tikz])
-			   AX_LATEX_PACKAGE([html])
+			   AX_LATEX_PACKAGE([hyperref])
+			   AX_LATEX_PACKAGE([epsfig])
 			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf listings tikz html])
 			  ]
 )

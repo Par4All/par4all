@@ -37,6 +37,7 @@
 #include "misc.h"
 #include "control.h" /* for CONTROL_MAP() */
 #include "transformations.h"
+#include "properties.h"
 
 /* void atomize_as_required(stat, ref_decide, call_decide, test_decide, range_decide, while_decide, new)
  * statement stat;
@@ -352,7 +353,7 @@ void cleanup_subscript(expression e)
     }
 }
 
-void cleanup_subscripts(gen_chunkp obj)
+void cleanup_subscripts(void* obj)
 {
     gen_recurse(obj,expression_domain,gen_true,cleanup_subscript);
 }

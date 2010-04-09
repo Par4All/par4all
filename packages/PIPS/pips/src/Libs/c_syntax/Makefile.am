@@ -13,4 +13,8 @@ libc_syntax_la_SOURCES=\
 AM_YFLAGS=-d -p c_
 AM_LFLAGS=-p c_
 
+# additionnal dep needed for // build
+clex.c:cyacc.h
+
+
 include $(srcdir)/../pipslibs_includes.mk

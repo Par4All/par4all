@@ -16,4 +16,7 @@ libpipsmake_la_SOURCES=\
 AM_YFLAGS=-d -p pipsmake_
 AM_LFLAGS=-p pipsmake_
 
+# additionnal dep needed for // build
+lexer.c:readmakefile.h
+
 include $(srcdir)/../pipslibs_includes.mk

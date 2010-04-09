@@ -1294,14 +1294,25 @@ bool check_common_inclusion(entity common)
 
 entity make_new_common(string name, entity mod)
 {
-  string common_global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING
-             COMMON_PREFIX,name,NULL));
+  string common_global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
+						 MODULE_SEP_STRING
+						 COMMON_PREFIX,name,NULL));
   type common_type = make_type(is_type_area, make_area(8, NIL));
-  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
+  entity StaticArea =
+    FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
   storage common_storage = make_storage(is_storage_ram,
-          (make_ram(mod,StaticArea, 0, NIL)));
-  value common_value = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL, make_language_unknown()));
-  return  make_entity(common_global_name,common_type,common_storage,common_value);
+					(make_ram(mod,StaticArea, 0, NIL)));
+  value common_value =
+    make_value_code(make_code(NIL,
+			      string_undefined,
+			      make_sequence(NIL),
+			      NIL,
+			      make_language_fortran()));
+
+  return make_entity(common_global_name,
+		     common_type,
+		     common_storage,
+		     common_value);
 }
 
 /* This function creates a common variable in a given common in a given module.

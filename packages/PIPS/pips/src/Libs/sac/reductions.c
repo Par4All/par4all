@@ -57,6 +57,7 @@ typedef dg_vertex_label vertex_label;
 #include "callgraph.h"
 
 #include "control.h"
+#include "properties.h"
 
 entity make_float_constant_entity(float c)
 {

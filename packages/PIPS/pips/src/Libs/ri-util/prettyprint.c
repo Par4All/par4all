@@ -2505,9 +2505,27 @@ text text_loop(
 	MERGE_TEXTS(r, aux_r);
       }
     }
-    else if (pp_f90_style_p() &&
-	     instruction_assign_p(statement_instruction(body)) ) {
-      MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
+    else if (pp_f90_style_p()) {
+      instruction bi = statement_instruction(body); // body instruction
+      bool success_p = FALSE;
+      if(instruction_assign_p(bi) ) {
+	MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
+	success_p = TRUE;
+      }
+      else if(instruction_sequence_p(bi)) {
+	list sl = sequence_statements(instruction_sequence(bi));
+	if(gen_length(sl)==1) {
+	  statement ibs = STATEMENT(CAR(sl));
+	  instruction ibi = statement_instruction(ibs);
+	  if(instruction_assign_p(ibi) ) {
+	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
+	    success_p = TRUE;
+	  }
+	}
+      }
+      if(!success_p) {
+	MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n, pdl));
+      }
     }
     else {
       MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n, pdl));

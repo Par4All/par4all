@@ -80,7 +80,7 @@ bool prepend_call(string mn) {
   type t = make_type_functional(ft);
   storage st = make_storage_rom();
   code co = make_code(NIL, strdup(""), make_sequence(NIL),NIL,
-		      make_language_unknown());
+		      make_language_c());
   value v = make_value_code(co);
   string name = "MY_TRACK";
   string ffn = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
