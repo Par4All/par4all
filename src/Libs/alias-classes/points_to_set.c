@@ -59,15 +59,7 @@ reference location_reference(cell c)
 /*return true if two acces_path are equals*/
 bool locations_equal_p(cell acc1, cell acc2)
 {
-  reference r1 = cell_to_reference(acc1);
-  reference r2 = cell_to_reference(acc2);
-  entity e1 = reference_variable(r1);
-  entity e2 = reference_variable(r2);
-  //return reference_equal_p(r1,r2);
-  if(strcmp(entity_user_name(e1), entity_user_name(e2))== 0)
-    return true;
-  else 
-    return false;
+  return cell_equal_p(acc1, acc2);
 }
 
 /* returns true if two relations are equals. (maybe added to ri-util later)*/
@@ -82,15 +74,15 @@ int points_to_equal_p( const void * vpt1, const void*  vpt2)
   bool cmp1 = true, cmp2 = true, cmp3 = false;
   int rlt=0;
   // if (compare_entities_without_scope(&e1_source, &e2_source)== 0)
-  
-	cmp1 = locations_equal_p(c1,c2);
-	cmp2 = locations_equal_p(c3,c4);
-	cmp3 = (approximation_exact_p(points_to_approximation(pt1)) && approximation_exact_p(points_to_approximation(pt2))) ||
-		(approximation_may_p(points_to_approximation(pt1))&& approximation_may_p(points_to_approximation(pt2)));
-    
-	bool cmp =cmp1 && cmp2 && cmp3;
 
-	return cmp;
+  cmp1 = locations_equal_p(c1,c2);
+  cmp2 = locations_equal_p(c3,c4);
+  cmp3 = (approximation_exact_p(points_to_approximation(pt1)) && approximation_exact_p(points_to_approximation(pt2))) ||
+    (approximation_may_p(points_to_approximation(pt1))&& approximation_may_p(points_to_approximation(pt2)));
+
+  bool cmp =cmp1 && cmp2 && cmp3;
+
+  return cmp;
 }
 
 
@@ -141,9 +133,8 @@ points_to_path access_points_to_path(access a )
 */
 
 /*print a points-to for debug*/
-void print_points_to(FILE * fd, const void* vpt)
+void print_points_to(const points_to pt)
 {
-  points_to pt = (points_to)vpt;
   cell source = points_to_source(pt);
   cell sink = points_to_sink(pt);
   approximation app = points_to_approximation(pt);
@@ -156,17 +147,17 @@ void print_points_to(FILE * fd, const void* vpt)
   reference r2 = cell_to_reference(sink);
 
   print_reference(r1);
-  fprintf(fd,"->");
+  fprintf(stderr,"->");
   print_reference(r2);
-  fprintf(fd," (%d)\n", approximation_tag(app));
+  fprintf(stderr," (%d)\n", approximation_tag(app));
 }
 
 /*print a points-to set for debug*/
-void print_points_to_set(FILE *fd, string what,  set s)
+void print_points_to_set(string what,  set s)
 {
-  fprintf(fd,"points-to set %s:\n", what);
-  SET_MAP(elt, print_points_to(fd, (points_to) elt),s);
-  fprintf(fd, "\n");
+  fprintf(stderr,"points-to set %s:\n", what);
+  SET_MAP(elt, print_points_to((points_to) elt), s);
+  fprintf(stderr, "\n");
 }
 
 

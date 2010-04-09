@@ -3353,28 +3353,30 @@ bool points_to_analysis(char * module_name)
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,points_to_rank);
   list pts_to_list = NIL;
-  
+
   init_pt_to_list();
   module = module_name_to_entity(module_name);
   set_current_module_entity(module);
- /*  set_methods_for_proper_simple_effects(); */
-/*   set_methods_for_simple_pointer_effects(); */
+  /*  set_methods_for_proper_simple_effects(); */
+  /*   set_methods_for_simple_pointer_effects(); */
   /* Initialize the effect driver to obtain pointer effects */
   /* (*effects_computation_init_func)(module); */
- 
-/*   init_proper_rw_effects(); */
-/*   init_expr_prw_effects(); */
+
+  /*   init_proper_rw_effects(); */
+  /*   init_expr_prw_effects(); */
+  make_effects_private_current_context_stack();
+
   debug_on("POINTS_TO_DEBUG_LEVEL");
 
   pips_debug(1, "considering module %s\n", module_name);
   set_current_module_statement( (statement)
-								db_get_memory_resource(DBR_CODE,
-													   module_name, TRUE) );
+				db_get_memory_resource(DBR_CODE,
+						       module_name, TRUE) );
   module_stat = get_current_module_statement();
- 
+
   /* (*effects_computation_init_func)(module_name); */
-/*   init_proper_rw_effects(); */
-/*   proper_effects_of_module_statement(get_current_module_statement()); */
+  /*   init_proper_rw_effects(); */
+  /*   proper_effects_of_module_statement(get_current_module_statement()); */
 
   /* Get the summary_intraprocedural_points_to resource.*/
   points_to_list summary_pts_to_list = (points_to_list) db_get_memory_resource
@@ -3395,12 +3397,13 @@ bool points_to_analysis(char * module_name)
 
   reset_current_module_entity();
   reset_current_module_statement();
- /*  reset_proper_rw_effects();   */
-/*   reset_expr_prw_effects(); */
+  /*  reset_proper_rw_effects();   */
+  /*   reset_expr_prw_effects(); */
 
   debug_off();
+  reset_effects_private_current_context_stack();
   /* (*effects_computation_reset_func)(module_name); */
- /*  generic_effects_reset_all_methods(); */
+  /*  generic_effects_reset_all_methods(); */
   bool good_result_p = TRUE;
   return (good_result_p);
 
