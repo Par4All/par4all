@@ -161,7 +161,7 @@ pragma_to_string (pragma p) {
     s = pragma_string(p);
     break;
   case is_pragma_expression:
-    l_expr = pragma_expression (p);
+    l_expr = gen_nreverse (pragma_expression (p));
     FOREACH (EXPRESSION, e, l_expr) {
       if (flg == TRUE) {
 	string_buffer_append (sb, strdup (" "));
@@ -169,7 +169,7 @@ pragma_to_string (pragma p) {
       }
       flg = TRUE;
       l_str = words_expression(e, NIL);
-      l_str = gen_nreverse (l_str);
+      //      l_str = gen_nreverse (l_str);
       if (get_prettyprint_is_fortran() == TRUE) {
 	// In fortran line size can not be more than 72
 	FOREACH (STRING, str, l_str) {
@@ -179,7 +179,8 @@ pragma_to_string (pragma p) {
 		       size < (MAX_LINE_LENGTH - 7));
 	  line_sz += size;
 	  if (line_sz >= MAX_LINE_LENGTH - 8) {
-	    gen_insert_before (strdup (FORTRAN_OMP_CONTINUATION), str, l_str);
+	    l_str = gen_insert_before (strdup (FORTRAN_OMP_CONTINUATION), str,
+				       l_str);
 	    line_sz = size;
 	  }
 	}
@@ -187,7 +188,7 @@ pragma_to_string (pragma p) {
       string_buffer_append_list (sb, l_str);
       gen_free_list (l_str);
     }
-    s = string_buffer_to_string_reverse (sb);
+    s = string_buffer_to_string (sb);
     // Free the buffer with its strings
     string_buffer_free_all(&sb);
     break;
