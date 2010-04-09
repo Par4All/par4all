@@ -1,37 +1,30 @@
 delete typedef02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create typedef02 typedef02.c
-activate C_PARSER
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-apply FOR_LOOP_TO_DO_LOOP[compute]
-apply FOR_LOOP_TO_DO_LOOP[main]
-apply FOR_LOOP_TO_WHILE_LOOP[compute]
-apply FOR_LOOP_TO_WHILE_LOOP[main]
-activate MUST_POINTER_REGIONS
-activate TRANSFORMERS_INTER_FULL
-activate INTERPROCEDURAL_SUMMARY_PRECONDITION
-activate PRECONDITIONS_INTER_FULL
-activate REGION_CHAINS
-setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
-setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
-setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
-setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 
 
-echo
-echo POINTS TO
-echo
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
 
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[compute]
-echo
-echo POINTS TO
-echo
 
+activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
 
-close 
+
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+close
 delete typedef02
 quit
 
-# EOF

@@ -1,0 +1,23 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="split_structures07"
+delete $WS
+create $WS $WS.c
+
+echo initial functions
+display PRINTED_FILE[%ALLFUNC]
+
+echo after split strucutres
+setproperty C89_CODE_GENERATION TRUE
+apply SPLIT_INITIALIZATIONS[%ALLFUNC]
+apply SPLIT_STRUCTURES[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+echo validate result
+apply UNSPLIT
+close
+
+shell cc $WS.c -lm -o $WS-ref
+shell cc $WS.database/Src/$WS.c -lm -o $WS-new
+shell rm -f $WS-new $WS-ref
+
+delete $WS
