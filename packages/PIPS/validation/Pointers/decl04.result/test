@@ -1,0 +1,39 @@
+
+Proper effects
+
+void decl04(mystruct s)
+{
+//               <must be read   >: s[1] s[2]
+   mystruct s_loc = s;                                                  /*0006*/
+//               <must be read   >: s_loc[1]
+//               <must be written>: s_loc[1]
+
+   s_loc.champ1 = s_loc.champ1-1;                                       /*0008*/
+}
+
+POINTS TO
+
+//  {}
+void decl04(mystruct s)
+{
+//  points to = {}
+   mystruct s_loc = s;                                                  /*0006*/
+//  points to = {}
+
+   s_loc.champ1 = s_loc.champ1-1;                                       /*0008*/
+}
+//  {}
+int main()
+{
+//  points to = {}
+   mystruct s;                                                          /*0013*/
+//  points to = {}
+
+   s.champ1 = 3;                                                        /*0015*/
+//  points to = {}
+   s.champ2 = 4;                                                        /*0016*/
+//  points to = {}
+   decl04(s);                                                           /*0017*/
+//  points to = {}
+   return 0;                                                            /*0018*/
+}

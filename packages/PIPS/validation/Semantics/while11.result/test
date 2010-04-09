@@ -1,0 +1,68 @@
+
+Transformers for "while11"
+
+
+C  T() {}
+
+void while11()
+{
+
+//  T(x) {x==0}
+
+   int x = 0;
+
+//  T(y) {y==0}
+
+   int y = 0;
+
+//  T(x,y) {x+y#init==x#init+y, x<=50, x#init<=50}
+
+   while (x<=50) {
+
+//  T(x) {x==x#init+1}
+
+      x++;
+
+//  T(y) {y==y#init+1}
+
+      y++;
+   }
+
+//  T(y) {y==2}
+
+   y = 2;
+}
+
+Preconditions for "while11"
+
+
+//  P() {}
+
+void while11()
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P() {x==0}
+
+   int y = 0;
+
+//  P() {x==0, y==0}
+
+   while (x<=50) {
+
+//  P(x,y) {x==y, x<=50}
+
+      x++;
+
+//  P(x,y) {x==y+1, x<=51}
+
+      y++;
+   }
+
+//  P(x,y) {x==51, y==51}
+
+   y = 2;
+}

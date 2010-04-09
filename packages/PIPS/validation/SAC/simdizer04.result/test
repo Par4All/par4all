@@ -1,0 +1,86 @@
+raw file
+int main(int main, char *main[])
+{
+   struct _ {
+      int *a;
+      int c[4];
+   } __;
+   int b = atoi(argv[1]);
+   do {
+      __.a = malloc(sizeof(int)*4);
+      (__.a)[0] = b*2;
+      (__.a)[1] = b*3;
+      (__.a)[2] = b*4;
+      (__.a)[3] = b*5;
+   }
+   while (0);
+   do {
+      (__.c)[0] = b*2;
+      (__.c)[1] = b*3;
+      (__.c)[2] = b*4;
+      (__.c)[3] = b*5;
+   }
+   while (0);
+   return 0;
+}
+after sanitize
+int main(int main, char *main[])
+{
+   struct _ {
+      int *a;
+      int c[4];
+   } __;
+   int b = atoi(argv[1]);
+   //PIPS generated variable
+   int *__a;
+   //PIPS generated variable
+   int __c[4];
+   do {
+      __a = malloc(sizeof(int)*4);
+      __a[0] = b*2;
+      __a[1] = b*3;
+      __a[2] = b*4;
+      __a[3] = b*5;
+   }
+   while (0);
+   do {
+      __c[0] = b*2;
+      __c[1] = b*3;
+      __c[2] = b*4;
+      __c[3] = b*5;
+   }
+   while (0);
+   return 0;
+}
+after vectorization
+int main(int main, char *main[])
+{
+   struct _ {
+      int *a;
+      int c[4];
+   } __;
+   int b = atoi(argv[1]);
+   //PIPS generated variable
+   int *__a;
+   //PIPS generated variable
+   int __c[4];
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec4[3+1], v4si_vec5[3+1];
+   do {
+      __a = malloc(sizeof(int)*4);
+      SIMD_LOAD_CONSTANT_V4SI(v4si_vec2, 2, 3, 4, 5);
+      SIMD_LOAD_GENERIC_V4SI(v4si_vec1, b, b, b, b);
+      SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &__a[0]);
+   }
+   while (0);
+   do {
+      SIMD_LOAD_CONSTANT_V4SI(v4si_vec5, 2, 3, 4, 5);
+      SIMD_LOAD_GENERIC_V4SI(v4si_vec4, b, b, b, b);
+      SIMD_MULD(v4si_vec3, v4si_vec4, v4si_vec5);
+      SIMD_SAVE_V4SI(v4si_vec3, &__c[0]);
+   }
+   while (0);
+   return 0;
+}
+

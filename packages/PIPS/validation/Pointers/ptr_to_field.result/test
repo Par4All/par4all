@@ -54,13 +54,18 @@ int ptr_to_field()
 //  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(n,*ANY_MODULE*:*HEAP*_b0,
 //   -MAY-)}
    m->q = &i;
-//  {(m[0][1],i,-Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(n,
+//   *ANY_MODULE*:*HEAP*_b0,-MAY-)}
    m->p = &j;
-//  {(m[0][2],j,-Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(m[0][2],j,
+//   -Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
    n->q = m->p;
-//  {(m[0][2],j,-Exact-);(n[0][1],j,-Exact-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(m[0][2],j,
+//   -Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-);(n[0][1],j,-Exact-)}
    n->p = m->q;
-//  {(m[0][2],j,-Exact-);(n[0][2],j,-Exact-)}
+//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(m[0][2],j,
+//   -Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-);(n[0][2],i,
+//   -Exact-);(n[0][1],j,-Exact-)}
 
    return 0;
    // END BLOCK
