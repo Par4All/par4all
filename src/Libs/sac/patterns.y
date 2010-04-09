@@ -48,6 +48,7 @@ typedef dg_vertex_label vertex_label;
 #include "sac.h"
 
 int yywrap(void);
+void yyerror(char*);
 int yylex();
 
 static size_t opcode_argc =0;

@@ -38,6 +38,7 @@
 #include "effects-generic.h"
 #include "transformations.h"
 #include "preprocessor.h"
+#include "text-util.h"
 
 #include "dg.h"
 
