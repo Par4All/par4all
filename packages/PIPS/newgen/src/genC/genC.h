@@ -268,6 +268,12 @@ extern gen_chunk * gen_get_ancestor(int, const void *);
 #define gen_start_recurse_ancestor_tracking() /* NOPE */
 #define gen_stop_recurse_ancestor_tracking() /* NOPE */
 
+// fix gcc warning concerning gen_recurse and gen_context_recurse
+#define gen_recurse(start,domain_number,flt,rwt)\
+    gen_recurse((start),(domain_number),((bool (*)(void*))(flt)),((void (*)(void*))(rwt)))
+#define gen_context_recurse(start,ctxt,domain_number,flt,rwt)\
+    gen_context_recurse((start),(ctxt),(domain_number),((bool (*)(void*,void*))(flt)),((void (*)(void*,void*))(rwt)))
+
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),
  * this one is needed.
  */
