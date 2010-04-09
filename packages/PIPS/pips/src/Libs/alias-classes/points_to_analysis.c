@@ -419,7 +419,7 @@ set basic_ref_ref(set pts_to_set,
 								  written_pts_to);
 	  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
 	  ifdebug(1)
-		print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+		print_points_to_set("Points to pour le cas 1 <x = y>\n",
 							pts_to_set);
 	}
   }
@@ -497,7 +497,7 @@ set basic_ref_array(set pts_to_set,
 								  written_pts_to);
 	  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
 	  ifdebug(1)
-		print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+		print_points_to_set("Points to pour le cas 1 <x = y>\n",
 							pts_to_set);
 	}
   }
@@ -580,7 +580,7 @@ set basic_ref_addr(set pts_to_set,
 	pts_to_set = set_difference(pts_to_set, pts_to_set, written_pts_to);
 	pts_to_set = set_union(pts_to_set, pts_to_set, gen_pts_to);
 	ifdebug(1){
-	  print_points_to_set(stderr,"points-to for case 2 <x = &y> \n ",
+	  print_points_to_set("points-to for case 2 <x = &y> \n ",
 						  pts_to_set);
 	}
   } else {
@@ -679,7 +679,7 @@ set basic_ref_deref(set pts_to_set,
 	pts_to_set = set_difference(pts_to_set, pts_to_set,written_pts_to);
 	pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
 	ifdebug(1){
-	  print_points_to_set(stderr,"Points To pour le cas 3 <x = *y> \n",
+	  print_points_to_set("Points To pour le cas 3 <x = *y> \n",
 						  pts_to_set);
 	}
   }
@@ -958,7 +958,7 @@ static set basic_deref_addr(set pts_to_set,
 	pts_to_set = set_union(pts_to_set,gen_pts_to, s1);
 
 	ifdebug(1)
-	  print_points_to_set(stderr,"Points pour le cas 5 <*x = &y> \n ",
+	  print_points_to_set("Points pour le cas 5 <*x = &y> \n ",
 						  pts_to_set);
   }
   else {
@@ -1092,7 +1092,7 @@ set basic_deref_array(set pts_to_set,
 	s1 = set_difference(s1, change_pts_to, written_pts_to);
 	pts_to_set = set_union(pts_to_set,gen_pts_to, s1);
 	ifdebug(1)
-	  print_points_to_set(stderr,"Points pour le cas 5 <*x = &y> \n ",
+	  print_points_to_set("Points pour le cas 5 <*x = &y> \n ",
 						  pts_to_set);
   }
   else {
@@ -1236,7 +1236,7 @@ set basic_deref_deref(set pts_to_set,
 	s2 = set_union(s2, gen_pts_to, s1);
 	pts_to_set = set_union(pts_to_set,pts_to_set, s2);
 	ifdebug(1)
-	  print_points_to_set(stderr,"Points To pour le cas6  <*x = *y> \n",
+	  print_points_to_set("Points To pour le cas6  <*x = *y> \n",
 						  pts_to_set);
   }
 
@@ -1325,7 +1325,7 @@ set basic_field_addr(set pts_to_set,
 	pts_to_set = set_union(pts_to_set, pts_to_set, gen_pts_to);
 
 	ifdebug(1){
-	  print_points_to_set(stderr,"points To for the case <x.a = &y> \n ",
+	  print_points_to_set("points To for the case <x.a = &y> \n ",
 						  pts_to_set);
 	}
   }
@@ -1430,7 +1430,7 @@ set basic_ref_field(set pts_to_set,
 	  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
 
 	  ifdebug(1)
-		print_points_to_set(stderr,"Points to for the case <x = y.a>\n",
+		print_points_to_set("Points to for the case <x = y.a>\n",
 							pts_to_set);
 	}
   }
@@ -1533,7 +1533,7 @@ set basic_ref_ptr_to_field(set pts_to_set,
 	  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
 
 	  ifdebug(1)
-		print_points_to_set(stderr,"Points to pour le cas 1 <x = y.a>\n",
+		print_points_to_set("Points to pour le cas 1 <x = y.a>\n",
 							pts_to_set);
 	}
   }
@@ -1774,7 +1774,7 @@ set basic_ptr_to_field_addr(set pts_to_set,
 	pts_to_set = set_union(pts_to_set, pts_to_set, gen_pts_to);
 
 	ifdebug(1){
-	  print_points_to_set(stderr,"points To pour le cas 2 <m->x = &y> \n ",
+	  print_points_to_set("points To pour le cas 2 <m->x = &y> \n ",
 						  pts_to_set);
 	}
   }
@@ -1875,7 +1875,7 @@ set basic_ptr_to_field_ptr_to_field(set pts_to_set,
 								  written_pts_to);
 	  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
 	  ifdebug(1)
-		print_points_to_set(stderr,"Points to pour le cas 1 <m->x =m-> y>\n",
+		print_points_to_set("Points to pour le cas 1 <m->x =m-> y>\n",
 							pts_to_set);
 	}
   }
@@ -2148,7 +2148,7 @@ set basic_ptr_to_field_field(set pts_to_set,
 				  written_pts_to);
       pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
       ifdebug(1)
-	print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+	print_points_to_set("Points to pour le cas 1 <x = y>\n",
 			    pts_to_set);
     }
   }
@@ -2272,7 +2272,7 @@ set basic_ptr_to_field_ref(set pts_to_set,
 				  written_pts_to);
       pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
       ifdebug(1)
-	print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+	print_points_to_set("Points to pour le cas 1 <x = y>\n",
 			    pts_to_set);
     }
   }
@@ -2340,7 +2340,7 @@ set struct_pointer(set pts_to_set, expression lhs, expression rhs)
 							  written_pts_to);
   pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
   ifdebug(1)
-	print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+	print_points_to_set("Points to pour le cas 1 <x = y>\n",
 						pts_to_set);
 
   return pts_to_set;
@@ -2401,7 +2401,7 @@ set struct_double_pointer(set pts_to_set, expression lhs, expression rhs)
 							  written_pts_to);
   pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
   ifdebug(1)
-	print_points_to_set(stderr,"Points to pour le cas 1 <x = y>\n",
+	print_points_to_set("Points to pour le cas 1 <x = y>\n",
 						pts_to_set);
 
   return pts_to_set;
@@ -2550,8 +2550,7 @@ set basic_ref_heap(set pts_to_set,
     pts_to_set = set_difference(pts_to_set, pts_to_set,written_pts_to);
     pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
     ifdebug(1){
-      print_points_to_set(stderr,
-			  "Points To pour le cas 3 <x ==()malloc(sizeof()) > \n",
+      print_points_to_set("Points To pour le cas 3 <x ==()malloc(sizeof()) > \n",
 			  pts_to_set);
     }
   }
@@ -2885,7 +2884,9 @@ set points_to_intrinsic(statement s,
 	 broken pointers towards default sinks.
 	 pt_out = points_to_filter_with_expression_effects(e, pt_cur);
       */
-      pt_out = points_to_filter_with_effects(pt_cur, exp);
+      //pt_out = points_to_filter_with_effects(pt_cur, exp);
+      //pt_out = points_to_filter_with_expression_effects(exp, pt_cur);
+      pips_internal_error("To be implemented!\n");
     }
   }
   else if(ENTITY_PLUS_UPDATE_P(e) || ENTITY_MINUS_UPDATE_P(e)
@@ -3353,28 +3354,30 @@ bool points_to_analysis(char * module_name)
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,points_to_rank);
   list pts_to_list = NIL;
-  
+
   init_pt_to_list();
   module = module_name_to_entity(module_name);
   set_current_module_entity(module);
- /*  set_methods_for_proper_simple_effects(); */
-/*   set_methods_for_simple_pointer_effects(); */
+  /*  set_methods_for_proper_simple_effects(); */
+  /*   set_methods_for_simple_pointer_effects(); */
   /* Initialize the effect driver to obtain pointer effects */
   /* (*effects_computation_init_func)(module); */
- 
-/*   init_proper_rw_effects(); */
-/*   init_expr_prw_effects(); */
+
+  /*   init_proper_rw_effects(); */
+  /*   init_expr_prw_effects(); */
+  make_effects_private_current_context_stack();
+
   debug_on("POINTS_TO_DEBUG_LEVEL");
 
   pips_debug(1, "considering module %s\n", module_name);
   set_current_module_statement( (statement)
-								db_get_memory_resource(DBR_CODE,
-													   module_name, TRUE) );
+				db_get_memory_resource(DBR_CODE,
+						       module_name, TRUE) );
   module_stat = get_current_module_statement();
- 
+
   /* (*effects_computation_init_func)(module_name); */
-/*   init_proper_rw_effects(); */
-/*   proper_effects_of_module_statement(get_current_module_statement()); */
+  /*   init_proper_rw_effects(); */
+  /*   proper_effects_of_module_statement(get_current_module_statement()); */
 
   /* Get the summary_intraprocedural_points_to resource.*/
   points_to_list summary_pts_to_list = (points_to_list) db_get_memory_resource
@@ -3395,12 +3398,13 @@ bool points_to_analysis(char * module_name)
 
   reset_current_module_entity();
   reset_current_module_statement();
- /*  reset_proper_rw_effects();   */
-/*   reset_expr_prw_effects(); */
+  /*  reset_proper_rw_effects();   */
+  /*   reset_expr_prw_effects(); */
 
   debug_off();
+  reset_effects_private_current_context_stack();
   /* (*effects_computation_reset_func)(module_name); */
- /*  generic_effects_reset_all_methods(); */
+  /*  generic_effects_reset_all_methods(); */
   bool good_result_p = TRUE;
   return (good_result_p);
 

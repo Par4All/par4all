@@ -64,3 +64,4 @@
 #include "alias_private.h"
 #include "instrumentation.h"
 #include "transformations.h"
+#include "alias-classes.h"

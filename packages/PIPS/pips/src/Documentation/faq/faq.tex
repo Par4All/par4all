@@ -25,7 +25,7 @@
 %% titlepage,
 \documentclass[a4paper]{article}
 
-\usepackage{psfig,amstext,alltt,html}
+\usepackage{epsfig,amstext,alltt,hyperref,xspace}
 
 \title{\bf {\Huge PIPS} \\ Frequently Asked Questions}
 
@@ -40,20 +40,20 @@
 \renewcommand{\indexname}{Index}
 \makeindex
 
-\newcommand{\PIPSMAKERC}{\htmladdnormallink{\texttt{pipsmake-rc}}{http://www.cri.ensmp.fr/pips/pipsmake-rc}}
+\newcommand{\PIPSMAKERC}{\htmladdnormallink{\texttt{pipsmake-rc}}{http://www.cri.ensmp.fr/pips/pipsmake-rc}\xspace}
 
-\newcommand{\PIPS}{\htmladdnormallink{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
-\newcommand{\WPIPS}{\htmladdnormallink{{\em WPIPS}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
-\newcommand{\TPIPS}{\htmladdnormallink{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
-\newcommand{\PROPERTIES}{\htmladdnormallink{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+\newcommand{\PIPS}{\htmladdnormallink{{\em PIPS}}{http://www.cri.ensmp.fr/pips}\xspace}
+\newcommand{\WPIPS}{\htmladdnormallink{{\em WPIPS}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}\xspace}
+\newcommand{\TPIPS}{\htmladdnormallink{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}\xspace}
+\newcommand{\PROPERTIES}{\htmladdnormallink{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}\xspace}
+
+\sloppy
 
 \begin{document}
 \maketitle
 
-\begin{latexonly}
-  \clearpage
-  \tableofcontents  
-\end{latexonly}
+\clearpage
+\tableofcontents
 
 \newpage
 \section*{Welcome}
@@ -382,7 +382,7 @@ transformations are necessary.
 \bibliography{faq}
 }
 
-\input{faq.ind}
+%\printindex
 
 \end{document}
 \end

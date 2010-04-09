@@ -1025,6 +1025,59 @@ int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
   }
   return(OldOffset);
 }
+
+int new_add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
+{
+  int OldOffset=-1;
+  type ta = entity_type(a);
+  area aa = type_area(ta);
+
+  if(top_level_entity_p(a) && is_fortran_p ) {
+    /* COMMONs are supposed to havethe same layout in each routine */
+    pips_internal_error("COMMONs should not be modified.\n");
+  }
+  else if(static_area_p(a) || dynamic_area_p(a)) {
+    /* the local areas are StaticArea and DynamicArea in fortran */
+    /* the areas are localStaticArea, localDynamicArea,
+       moduleStaticArea, globalStaticArea in C*/
+    int s = 0;
+    OldOffset = area_size(aa);
+    if(!SizeOfArray(v, &s)) {
+      /* FI: should only happens with stack_area_p(a)... */
+      return DYNAMIC_RAM_OFFSET;
+    }
+
+    if(is_fortran_p) {
+      area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+      area_size(aa) = OldOffset+s;
+    }
+    else { /* C language */
+      if(!gen_in_list_p(v, area_layout(aa)))
+	area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+      area_size(aa) = OldOffset+s;
+    }
+  }
+  else if(stack_area_p(a)) {
+    /* By definition of the stack area, the offset is unknown because
+       the size of the cariables is unknown statically. E.g. dependent
+       types. This may happen in C99 or in Fortran 77 extensions. */
+    if(!gen_in_list_p(v, area_layout(aa)))
+      area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+  }
+  else if(heap_area_p(a)) {
+    /* FI: the points-to analysis is going to modify the symbol table
+       under some properties... Maybe it would be better not to track
+       buckets and abstract buckets declared in the heap? */
+    pips_assert("Not possible for Fortran code", !is_fortran_p);
+    if(!gen_in_list_p(v, area_layout(aa)))
+      area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+  }
+  else {
+    pips_internal_error("Unexpected area kind: \"%s\".\n",
+			entity_name(a));
+  }
+  return(OldOffset);
+}
 
 bool formal_parameter_p(entity v)
 {
@@ -1077,18 +1130,34 @@ bool variable_in_common_p(entity v)
     !entity_special_area_p(ram_section(storage_ram(entity_storage(v)))) ;
 }
 
-/* true if v appears in a SAVE statement, or in a DATA statement */
+/* true if v appears in a SAVE statement, or in a DATA statement, or
+   is declared static i C. The size of v in bytes can  */
 bool variable_static_p(entity v)
 {
   return(type_variable_p(entity_type(v)) &&
 	 storage_ram_p(entity_storage(v)) &&
 	 static_area_p(ram_section(storage_ram(entity_storage(v)))));
 }
+
 bool variable_dynamic_p(entity v)
 {
   return(type_variable_p(entity_type(v)) &&
 	 storage_ram_p(entity_storage(v)) &&
 	 dynamic_area_p(ram_section(storage_ram(entity_storage(v)))));
+}
+
+bool variable_stack_p(entity v)
+{
+  return(type_variable_p(entity_type(v)) &&
+	 storage_ram_p(entity_storage(v)) &&
+	 stack_area_p(ram_section(storage_ram(entity_storage(v)))));
+}
+
+bool variable_heap_p(entity v)
+{
+  return(type_variable_p(entity_type(v)) &&
+	 storage_ram_p(entity_storage(v)) &&
+	 heap_area_p(ram_section(storage_ram(entity_storage(v)))));
 }
 
 /* This test can only be applied to variables, not to functions, subroutines or

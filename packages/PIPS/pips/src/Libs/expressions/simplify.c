@@ -11,6 +11,7 @@
 #include "resources.h"
 #include "control.h"
 #include "properties.h"
+#include "expressions.h"
 
 static bool has_address_of_operator_walker_p(call c,bool *panswer)
 {
@@ -80,6 +81,24 @@ bool simplify_subscripts(string module_name)
 /**************************************************************
  * SPLIT_STRUCTURES
  */
+static bool type_struct_variable_p(type t)
+{
+    t = ultimate_type(t);
+    return basic_derived_p(variable_basic(type_variable(t))) &&
+         entity_struct_p(basic_derived(variable_basic(type_variable(t))));
+}
+
+static
+bool type_pointer_on_struct_variable_p(type t)
+{
+        t = ultimate_type(t);
+        if(basic_pointer_p(variable_basic(type_variable(t))))
+        {
+            type pt = basic_pointer(variable_basic(type_variable(t)));
+            return type_struct_variable_p(pt);
+        }
+        return false;
+}
 
 typedef struct {
     entity e;
@@ -165,6 +184,29 @@ typedef struct {
     list new_vars;
 } dssrhp;
 
+static
+instruction make_fields_assignment_instruction(entity var,list fields,list new_vars)
+{
+    list fields_update = NIL;
+    FOREACH(ENTITY,nv,new_vars)
+    {
+        entity f = ENTITY(CAR(fields));
+        fields_update=CONS(STATEMENT,
+                make_assign_statement(
+                    MakeBinaryCall(
+                        entity_intrinsic(type_struct_variable_p(entity_type(var))?FIELD_OPERATOR_NAME:POINT_TO_OPERATOR_NAME),
+                        entity_to_expression(var),
+                        entity_to_expression(f)
+                        ),/* this makes e.f */
+                    entity_to_expression(nv)/*this makes udpated value of the fields */
+                    ),
+                fields_update
+                );
+        POP(fields);
+    }
+    return make_instruction_sequence(make_sequence(gen_nreverse(fields_update)));
+}
+
 static void
 do_split_structure_return_hook_walker(statement s,dssrhp *p)
 {
@@ -181,27 +223,8 @@ do_split_structure_return_hook_walker(statement s,dssrhp *p)
         if(expression_reference_p(returned) &&
                 same_entity_p(reference_variable(expression_reference(returned)),p->var))
         {
-            list fields_update = NIL;
-            list fields = p->fields;
-            FOREACH(ENTITY,nv,p->new_vars)
-            {
-                entity f = ENTITY(CAR(fields));
-                fields_update=CONS(STATEMENT,
-                        make_assign_statement(
-                            MakeBinaryCall(
-                                entity_intrinsic(FIELD_OPERATOR_NAME),
-                                entity_to_expression(p->var),
-                                entity_to_expression(f)
-                                ),/* this makes e.f */
-                            entity_to_expression(nv)/*this makes udpated value of the fields */
-                            ),
-                        fields_update
-                        );
-                POP(fields);
-
-            }
-            fields_update=gen_nreverse(fields_update);
-            insert_statement(s,make_block_statement(fields_update),true);
+            instruction fields_update = make_fields_assignment_instruction(p->var,p->fields,p->new_vars);
+            insert_statement(s,instruction_to_statement(fields_update),true);
 
         }
             
@@ -215,7 +238,68 @@ void do_split_structure_return_hook(entity var,list fields, list new_vars)
     dssrhp p = { var, fields, new_vars };
     gen_context_recurse(get_current_module_statement(),&p,
             statement_domain,gen_true,do_split_structure_return_hook_walker);
+    /* also add a 'set all' operation at end ob block */
+    if(formal_parameter_p(var))
+    {
+        instruction fields_update = make_fields_assignment_instruction(var,fields,new_vars);
+        insert_statement(get_current_module_statement(),instruction_to_statement(fields_update),false);
+    }
+
 }
+
+
+static
+list do_split_structure(entity e)
+{
+    list added = NIL;
+    if(entity_variable_p(e) )
+    {
+        type t = ultimate_type(entity_type(e));
+        if(( type_struct_variable_p(t) || type_pointer_on_struct_variable_p(t)) &&
+                !entity_used_in_calls(e))
+        {
+            list fields = type_struct_variable_p(t)?
+                type_struct(entity_type(basic_derived(variable_basic(type_variable(t))))):
+                type_struct(entity_type(basic_derived(variable_basic(type_variable(ultimate_type(basic_pointer(variable_basic(type_variable(t)))))))));
+            list inits = value_expression_p(entity_initial(e)) ?
+                call_arguments(expression_call(value_expression(entity_initial(e)))):
+                NIL;
+            FOREACH(ENTITY,f,fields)
+            {
+                string new_name = strdup(entity_name(f));
+                for(string found = strchr(new_name,MEMBER_SEP_CHAR);found;found = strchr(new_name,MEMBER_SEP_CHAR))
+                    *found='_';
+                entity new = make_entity_copy_with_new_name(f,new_name,false);
+                /* we copied the field storage, that is rom, recompute a ram storage */
+                free_storage(entity_storage(new));
+                entity dyn_area = global_name_to_entity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME); 
+                entity_storage(new) = 
+                    make_storage_ram(
+                            make_ram(get_current_module_entity(), dyn_area,
+                                (basic_overloaded_p(entity_basic(new))?0:add_variable_to_area(dyn_area,new)),
+                                NIL));
+                /* then take car of initial value if any */
+                entity_initial(new)=
+                    make_value_expression(
+                            MakeBinaryCall(
+                                entity_intrinsic(type_struct_variable_p(t)?FIELD_OPERATOR_NAME:POINT_TO_OPERATOR_NAME),
+                                entity_to_expression(e),
+                                entity_to_expression(f)
+                                )
+                            );
+                free(new_name);
+                replace_field_by_reference(e,f,new);
+                added=CONS(ENTITY,new,added);
+                if(!ENDP(inits)) POP(inits);
+            }
+            added=gen_nreverse(added);
+            /* hook: handle returns as a special case */
+            do_split_structure_return_hook(e,fields,added);
+        }
+    }
+    return added;
+}
+
 
 static
 void do_split_structures(statement s)
@@ -225,39 +309,8 @@ void do_split_structures(statement s)
         list added = NIL;
         FOREACH(ENTITY,e,statement_declarations(s))
         {
-            if(entity_variable_p(e) )
-            {
-                type t = ultimate_type(entity_type(e));
-                if(basic_derived_p(variable_basic(type_variable(t))) &&
-                    entity_struct_p(basic_derived(variable_basic(type_variable(t)))) &&
-                    !entity_used_in_calls(e))
-                    {
-                        list fields = type_struct(entity_type(basic_derived(variable_basic(type_variable(t)))));
-                        list inits = value_expression_p(entity_initial(e)) ?
-                            call_arguments(expression_call(value_expression(entity_initial(e)))):
-                            NIL;
-                        FOREACH(ENTITY,f,fields)
-                        {
-                            string new_name = strdup(entity_name(f));
-                            for(string found = strchr(new_name,MEMBER_SEP_CHAR);found;found = strchr(new_name,MEMBER_SEP_CHAR))
-                                *found='_';
-                            entity new = make_entity_copy_with_new_name(f,new_name,false);
-                            free_storage(entity_storage(new));
-                            entity_storage(new)=storage_undefined;
-                            if(!ENDP(inits))
-                                entity_initial(new)= 
-                                    make_value_expression(copy_expression(EXPRESSION(CAR(inits))));
-                            free(new_name);
-                            replace_field_by_reference(e,f,new);
-                            added=CONS(ENTITY,new,added);
-                            if(!ENDP(inits)) POP(inits);
-                        }
-                        added=gen_nreverse(added);
-                        /* hook: handle returns as a special case */
-                        do_split_structure_return_hook(e,fields,added);
-                    }
-
-            }
+            list new = do_split_structure(e);
+            added=gen_nconc(added,new);
         }
         FOREACH(ENTITY,e,added)
             AddLocalEntityToDeclarations(e,get_current_module_entity(),s);
@@ -266,15 +319,30 @@ void do_split_structures(statement s)
 
 }
 
+static
+void do_split_structure_parameter(entity e)
+{
+    list added = do_split_structure(e);
+    FOREACH(ENTITY,e,added)
+        AddEntityToCurrentModule(e);
+    gen_free_list(added);
+}
+
 bool split_structures(string module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
 
-    /* do the job */
+    /* do the job for declared structures */
     gen_recurse(get_current_module_statement(),
             statement_domain,gen_true,do_split_structures);
+    /* now do the job for parameter structures */
+    FOREACH(ENTITY,e,entity_declarations(get_current_module_entity()))
+        if(formal_parameter_p(e))
+            do_split_structure_parameter(e);
+
+    /* change useless subscripts */
     cleanup_subscripts(get_current_module_statement());
 
     /* validate */

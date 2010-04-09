@@ -147,6 +147,7 @@ void simd_trace_call(statement s, hash_table array_to_vector)
     }
 
 }
+string compilation_unit_of_module(string);
 
 /** 
  * @brief pack load / store from char or short array

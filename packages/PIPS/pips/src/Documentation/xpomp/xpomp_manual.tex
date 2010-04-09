@@ -23,7 +23,7 @@
 %% Documentation for XPOMP
 
 \documentclass[a4paper]{article}
-\usepackage{psfig,xspace,html,verbatim}
+\usepackage{epsfig,xspace,hyperref,verbatim}
 %%\usepackage{page_de_garde_CRI}
 \begin{document}
 \newcommand{\CRI}{\htmladdnormallink{Centre de Recherche en Informatique}
@@ -50,7 +50,8 @@
 \renewcommand{\topfraction}{1}
 \renewcommand{\bottomfraction}{1}
 
-\begin{latexonly}
+\date{1996/12/20}
+
 \newcommand{\numerocri}{A/298-CRI}
 \newcommand{\titre}{xPOMP\\
   a Simple X11 graphical Library to Display Arrays in C,
@@ -60,7 +61,6 @@
 \newcommand{\docdate}{\today}
 \newcommand{\lieu}{}
 %%\SortLaPageDeGarde
-\end{latexonly}
 
 
 \title{xPOMP: a Simple X11 graphical Library to Display Arrays in C,
@@ -84,11 +84,6 @@
   }
 
 \maketitle
-
-\begin{rawhtml}
-You can also have this document in 
-<a href=xpomp_manual.ps.gz>Postscript</a>. 
-\end{rawhtml}
 
 \begin{abstract}
   \xPOMP is a small graphical interface able to open X11 windows and
@@ -149,25 +144,13 @@ From the user point of view, an \xPOMP window is a X11 window as shown
 on Figure~\ref{fig:xPOMP_window}. It uses its own X11 colormap to
 display a 256-level image.
 
-\begin{htmlonly}
-  \begin{figure}[htbp]
-    \begin{rawhtml}
-      <img src=xPOMP_window_explained.gif>
-    \end{rawhtml}
-    \caption{Example of an \xPOMP window displaying a fractal.}
-    \label{fig:xPOMP_window}
-  \end{figure}
-\end{htmlonly}
-
-\begin{latexonly}
-  \begin{figure}
-    \begin{center}
-      \psfig{file=xPOMP_window_explained.eps,width=\hsize}    
-    \end{center}
-    \caption{Example of an \xPOMP window displaying a fractal.}
-    \label{fig:xPOMP_window}
-  \end{figure}
-\end{latexonly}
+\begin{figure}
+  \begin{center}
+    \psfig{file=xPOMP_window_explained,width=\hsize}    
+  \end{center}
+  \caption{Example of an \xPOMP window displaying a fractal.}
+  \label{fig:xPOMP_window}
+\end{figure}
 
 Such a window is splitted in 2 parts:
 \begin{itemize}
@@ -491,6 +474,7 @@ accelerators):
 
 
 \subsubsection{Selecting a color map}
+\label{sec:selecting_user_colormap}
 
 All the color maps but the application defined one are controled by the
 following parameters:
@@ -794,12 +778,8 @@ function. At each mouse click, the image is zoomed in or out, or
 recentered, depending on the button pressed. 
 
 %% latex2html does not deal with verbatim input, hence:
-\begin{latexonly}
+
 {\small\verbatiminput{fractal.f}}
-\end{latexonly}
-\begin{rawhtml}
-<a href=fractal.f>Fractal HPF program</a>
-\end{rawhtml}
 
 %% \section*{Appendix}
 

@@ -37,6 +37,7 @@
 
 #include "semantics.h"
 #include "effects-generic.h"
+#include "effects-simple.h"
 #include "transformations.h"
 
 #include "dg.h"
