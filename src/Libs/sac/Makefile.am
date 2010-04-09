@@ -13,4 +13,7 @@ AM_YFLAGS=-d -p patterns_yy
 AM_LFLAGS=-p patterns_yy
 dist_sysconf_DATA=patterns.def
 
+# additionnal dep needed for // build
+lexer.c:patterns.h
+
 include $(srcdir)/../pipslibs_includes.mk
