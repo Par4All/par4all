@@ -32,6 +32,8 @@
 #include <setjmp.h>
 
 #include "genC.h"
+#undef gen_recurse
+#undef gen_context_recurse
 #include "newgen_include.h"
 #include "newgen_hash.h"
 #include "genread.h"
