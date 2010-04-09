@@ -98,22 +98,47 @@ reference malloc_to_abstract_location(reference lhs,
   /* in case the property ABSTRACT_HEAP_LOCATIONS is set to
      "flow-sensitive" or "context-sensitive".
 
-     No difference here. The diffferent behavior will show when
-     points-to and effects are translated at call sites
+     No difference here between the two values. The diffferent
+     behavior will show when points-to and effects are translated at
+     call sites
+
+     At this level, we want to use the statement number or the
+     statement ordering. The statement ordering is safer because two
+     statements or more can be put on the same line. The statement
+     number is more user-friendly.
+
+     There is no need to distinguish between types since the statement
+     ordering is at least as effective.
   */
   else if(strcmp(opt, "flow-sensitive")==0
 	  || strcmp(opt, "context-sensitive")==0 ){
-    e = entity_all_module_heap_locations(get_current_module_entity());
-    st = itoa(stmt_number);
-    s = strdup(concatenate(entity_name(e),"[", st, "]",NIL));
-    entity ee = find_or_create_entity(s);
-    if(entity_undefined_p(ee)) {
-      area a = make_area(0,NIL); /* Size and layout are unknown */
-      type t = make_type_area(a);
-      ee = make_entity(s,
-		       t, make_storage_rom(), make_value_unknown());
+    string s = asprintf(&s, "%s%s%s%s%d",
+			get_current_module_name(),
+			MODULE_SEP,
+			HEAP_AREA_LOCAL_NAME,
+			"_l_",
+			stmt_number);
+    e = find_or_create_entity(s);
+    if(type_undefined_p(entity_type(e))) {
+      entity f = get_current_module_entity();
+      entity a = module_to_heap_area(f);
+      ram r = make_ram(f, a, UNKNOWN_RAM_OFFSET, NIL);
+
+      /* FI: Beware, the symbol table is updated but this is not
+	 reflected in pipsmake.rc */
+      (void) add_C_variable_to_area(a, e);
+      entity_type(e) = var_t;
+      entity_storage(e) = make_storage_ram(r);
+      entity_initial(e) = make_value_unknown();
     }
-    r = make_reference(ee , NIL);
+    else {
+      /* We might be in trouble, unless a piece of code is
+	 reanalyzed. Let's assume the type is unchanged */
+      pips_assert("The type is unchanged",
+		  type_equal_p(var_t, entity_type(e)));
+    }
+
+    r = make_reference(e , NIL);
   }
   else {
     pips_user_error("Unrecognized value for property ABSTRACT_HEAP_LOCATION:"

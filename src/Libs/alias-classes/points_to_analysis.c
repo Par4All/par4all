@@ -1952,7 +1952,7 @@ set basic_deref_ptr_to_field(set pts_to_set,
     }
 
   if(expression_double_pointer_p(lhs_tmp)&&
-	 expression_pointer_p(rhs_tmp)){
+     expression_pointer_p(rhs_tmp)){
     effect e1 = effect_undefined, e2 = effect_undefined;
     set_methods_for_proper_simple_effects();
     list l1 = generic_proper_effects_of_complex_address_expression(ex,
