@@ -114,7 +114,7 @@ void foo(int *col)
 {
 //  {(col,_col_1,-Exact-)}
    *col++;                                                              /*0009*/
-//  {(col,*ANYWHERE*,-MAY-);(col,_col_1,-Exact-)}
+//  {(col,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
 
    return;                                                              /*0011*/
 }

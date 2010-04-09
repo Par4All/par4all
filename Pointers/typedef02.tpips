@@ -1,4 +1,7 @@
 delete typedef02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create typedef02 typedef02.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
@@ -23,6 +26,5 @@ display PRINTED_FILE[%ALLFUNC]
 
 close
 delete typedef02
-07
 quit
 
