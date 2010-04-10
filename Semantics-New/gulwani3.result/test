@@ -127,7 +127,7 @@ int main()
       z = y;
    }
 
-//  P(x,y,z) {x==101, y==z, 2<=y, y<=50}
+//  P(x,y,z) {x==101, y==50, z==50}
 
    
    
@@ -161,7 +161,6 @@ int main()
    }
    
    
-   if (x==101&&y==50) 
-      printf("property  verified\n");
+   printf("property  verified\n");
    ;
 }
