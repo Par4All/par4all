@@ -10345,6 +10345,7 @@ PRETTYPRINT_SCALAR_REGIONS FALSE
 \subsubsection{Display Internals for Debugging}
 \index{Debug}
 \index{PRETTYPRINT\_BLOCKS}
+\index{PRETTYPRINT\_ALL\_C\_BLOCKS}
 \index{PRETTYPRINT\_UNSTRUCTURED}
 \index{PRETTYPRINT\_ALL\_EFFECTS}
 \index{PRETTYPRINT\_EMPTY\_BLOCKS}
@@ -10373,8 +10374,20 @@ information  gathered about sequences by turning on this property.
 PRETTYPRINT_BLOCKS FALSE
 \end{PipsProp}
 
-Print unstructured statements.
 
+To print all the C blocks (the \verb|{ }| in C, you can set the following
+property:
+\begin{PipsProp}{PRETTYPRINT_ALL_C_BLOCKS}
+PRETTYPRINT_ALL_C_BLOCKS FALSE
+\end{PipsProp}
+This property is a C-specialized version of \verb|PRETTYPRINT_BLOCKS|,
+since in C you can represent the blocks.  Right now, the prettyprint of
+the C block is done in the wrong way, so if you use this option, you will
+have redundant blocks inside instructions, but you will have all the other
+hidden blocks too...
+
+
+To print unstructured statements:
 \begin{PipsProp}{PRETTYPRINT_UNSTRUCTURED}
 PRETTYPRINT_UNSTRUCTURED FALSE
 \end{PipsProp}
