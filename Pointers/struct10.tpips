@@ -1,8 +1,8 @@
-delete struct05
+delete struct10
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create struct05 struct05.c
+create struct10 struct10.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -12,15 +12,15 @@ echo Proper effetcs for "struct05"
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[struct05]
+display PRINTED_FILE[main]
 
 echo
 echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[struct05]
+display PRINTED_FILE[main]
 
 close
-delete struct05
+delete struct10
 quit
