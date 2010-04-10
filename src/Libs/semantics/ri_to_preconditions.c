@@ -97,9 +97,7 @@ get_module_global_arguments()
     return module_global_arguments;
 }
 
-void 
-set_module_global_arguments(args)
-list args;
+void set_module_global_arguments(list args)
 {
     module_global_arguments = args;
 }
@@ -107,10 +105,8 @@ list args;
 
 transformer statement_to_postcondition(transformer, statement);
 
-static transformer 
-block_to_postcondition(
-    transformer b_pre,
-    list b)
+static transformer block_to_postcondition(transformer b_pre,
+					  list b)
 {
     statement s;
     transformer post;
@@ -142,11 +138,9 @@ block_to_postcondition(
     return post;
 }
 
-static transformer 
-test_to_postcondition(
-    transformer pre,
-    test t,
-    transformer tf)
+static transformer test_to_postcondition(transformer pre,
+					 test t,
+					 transformer tf)
 {
 #   define DEBUG_TEST_TO_POSTCONDITION 7
     expression e = test_condition(t);
