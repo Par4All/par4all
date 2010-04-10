@@ -1,22 +1,23 @@
-delete malloc_anywhere
+delete malloc05
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create malloc_anywhere malloc_anywhere.c
+create malloc05 malloc05.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
-setproperty ABSTRACT_HEAP_LOCATIONS "unique"
-setproperty ALIASING_ACROSS_TYPES TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty ALIASING_ACROSS_TYPES FALSE
 
+echo
 echo POINTS TO
+echo
 
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
 
 close
-delete malloc_anywhere
+delete malloc05
 quit
-

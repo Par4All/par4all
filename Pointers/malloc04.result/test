@@ -1,0 +1,28 @@
+
+POINTS TO
+
+C  {}
+int main(int argc, char *argv[])
+{
+//  points to = {}
+   int *pi;
+//  points to = {}
+   float *px;
+//  points to = {}
+   float *pz;
+//  points to = {}
+   int (*pt)[30];
+//  points to = {}
+
+   pi = (int *) malloc(sizeof(int));
+//  {(pi,*HEAP*_b0,-MAY-)}
+   px = (float *) malloc(sizeof(float));
+//  {(pi,*HEAP*_b0,-MAY-);(px,*HEAP*_b1,-MAY-)}
+   pz = (float *) malloc(sizeof(float));
+//  {(pi,*HEAP*_b0,-MAY-);(px,*HEAP*_b1,-MAY-);(pz,*HEAP*_b1,-MAY-)}
+   pt = (int (*)[30]) malloc(sizeof(*pt));
+//  {(pi,*HEAP*_b0,-MAY-);(pt,*HEAP*_b2,-MAY-);(px,*HEAP*_b1,
+//   -MAY-);(pz,*HEAP*_b1,-MAY-)}
+
+   return 0;
+}

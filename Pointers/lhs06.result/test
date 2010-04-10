@@ -43,5 +43,31 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    *va_arg(pa, int *) = col;
 }
 
+Proper pointer effects for "lhs06"
+
+int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
+{
+   int nbout;
+//               <must be written>: col
+   int col = 0;
+//               <must be written>: indent
+   int indent = 0;
+   int ui32;
+   int i32;
+   static char buffer[2000];
+//               <must be read   >: my_fputc
+
+   if (!my_fputc) 
+      return 0;
+//               <must be written>: nbout
+
+   nbout = 0;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: col
+//               <must be written>: pa
+
+   *va_arg(pa, int *) = col;
+}
+
 POINTS TO
 
