@@ -291,51 +291,31 @@ static text insert_locals (text r) {
 /* This function returns true if BLOCK boundary markers are required.
 
    The function also creates the maker when needed.  */
-static bool mark_block(list *t_beg,
-		       list *t_end,
+static bool mark_block(unformatted *t_beg,
+		       unformatted *t_end,
+		       int n,
 		       int margin) {
   bool result = false;
   if (!get_bool_property("PRETTYPRINT_FOR_FORESYS")
       && (get_bool_property("PRETTYPRINT_ALL_EFFECTS")
-	  || get_bool_property("PRETTYPRINT_BLOCKS")
-	  || get_bool_property("PRETTYPRINT_ALL_C_BLOCKS")))
+	  || get_bool_property("PRETTYPRINT_BLOCKS")))
     result = true;
   if (result == true) {
     // Here we need to generate block markers for later use:
-    if (get_bool_property("PRETTYPRINT_BLOCKS") == true) {
-      // Add some comments marking the block boundaries:
-      *t_beg = CONS(SENTENCE,
-		    MAKE_ONE_WORD_SENTENCE(margin,
-					   concatenate(PIPS_COMMENT_SENTINEL,
-						       "BEGIN BLOCK",
-						       NULL)),
-		    NIL);
-      *t_end = CONS(SENTENCE,
-		    MAKE_ONE_WORD_SENTENCE(margin,
-					   concatenate(PIPS_COMMENT_SENTINEL,
-						       "END BLOCK",
-						       NULL)),
-		    NIL);
-    }
-    else {
-      // Nothing generated yet
-      *t_beg = NIL;
-      *t_end = NIL;
-    }
-
-    if (! prettyprint_is_fortran
-	&& get_bool_property("PRETTYPRINT_ALL_C_BLOCKS")) {
-      /* Add the real { } around the blocks, but inside the decorations
-	 added above: */
-      *t_beg = gen_nconc(*t_beg,
-			 CONS(SENTENCE,
-			      MAKE_ONE_WORD_SENTENCE(margin - INDENTATION,
-						     "{"),
-			      NIL));
-      *t_end = CONS(SENTENCE,
-		    MAKE_ONE_WORD_SENTENCE(margin - INDENTATION,
-					   "}"),
-		    *t_end);
+    if (prettyprint_is_fortran == true) {
+      // Fortran case: comments at the begin of the line
+      list pbeg = CHAIN_SWORD (NIL, "BEGIN BLOCK");
+      list pend = CHAIN_SWORD (NIL, "END BLOCK");
+      *t_beg = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pbeg);
+      *t_end = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pend);
+    } else {
+      // C case: comments alligned with blocks:
+      list pbeg = CHAIN_SWORD(NIL, strdup(PIPS_COMMENT_SENTINEL));
+      list pend = CHAIN_SWORD(NIL, strdup(PIPS_COMMENT_SENTINEL));
+      pbeg = CHAIN_SWORD (pbeg, " BEGIN BLOCK");
+      pend = CHAIN_SWORD (pend, " END BLOCK");
+      *t_beg = make_unformatted(NULL, n, margin, pbeg);
+      *t_end = make_unformatted(NULL, n, margin, pend);
     }
   }
   return result;
@@ -2126,15 +2106,37 @@ sentence_goto(
     return sentence_goto_label(module, label, margin, tlabel, n);
 }
 
-/********************************************************************* TEXT */
-static text text_block(entity module, string label, int margin, list objs,
-		       int n, list pdl)
+/* Build the text of a code block (a list of statements)
+
+   @module is the module entity the code to display belong to
+
+   @label is the label associated to the block
+
+   @param margin is the indentation level
+
+   @param objs is the list of statements in the sequence to display
+
+   @param n is the statement number of the sequence
+
+   @pdl is the parser declaration list to track type declaration display
+   in C
+
+   @return the text of the block
+*/
+static text
+text_block(entity module,
+	   string label,
+	   int margin,
+	   list objs,
+	   int n,
+	   list pdl)
 {
   text r = make_text(NIL);
 
-  if (ENDP(objs) && !get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")) {
-    return(r) ;
-  }
+  if (ENDP(objs)
+      && ! (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")
+	    || get_bool_property("PRETTYPRINT_ALL_C_BLOCKS")))
+    return(r);
 
   if(!empty_string_p(label)) {
     pips_user_warning("Illegal label \"%s\". "
@@ -2142,31 +2144,33 @@ static text text_block(entity module, string label, int margin, list objs,
 		      label);
   }
 
-  /* List of sentences to add at the beginning and at the end of a block: */
-  list bm_beg = NULL;
-  list bm_end = NULL;
+  /* "Unformatted" to be added at the beginning and at the end of a block: */
+  unformatted bm_beg = NULL;
+  unformatted bm_end = NULL;
   // Test if block markers are required and set them:
-  bool flg_marker = mark_block(&bm_beg, &bm_end, margin);
+  bool flg_marker = mark_block(&bm_beg, &bm_end, n, margin);
 
   // Print the begin block marker(s) if needed:
   if (flg_marker == true)
-    text_sentences(r) = gen_nconc(text_sentences(r), bm_beg);
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, bm_beg));
   else if ((get_bool_property("PRETTYPRINT_ALL_EFFECTS")
 	    || get_bool_property("PRETTYPRINT_BLOCKS"))
 	   && get_bool_property("PRETTYPRINT_FOR_FORESYS"))
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 					  strdup("C$BB\n")));
 
-  if (flg_marker && get_bool_property("PRETTYPRINT_BLOCKS"))
+  if (get_bool_property("PRETTYPRINT_ALL_C_BLOCKS")) {
     /* Since we generate new { }, we increment the margin for the nested
        statements: */
     margin += INDENTATION;
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "{"));
+  }
 
   // Append local variables if any:
   r = insert_locals (r);
 
-  // Begin block marker and declarations have already been printed, so
-  // print the block instructions:
+  /* Now begin block markers and declarations have been printed, so print
+     the block instructions: */
   for (; objs != NIL; objs = CDR(objs)) {
     statement s = STATEMENT(CAR(objs));
 
@@ -2176,9 +2180,15 @@ static text text_block(entity module, string label, int margin, list objs,
     free_text(t);
   }
 
+  if (get_bool_property("PRETTYPRINT_ALL_C_BLOCKS")) {
+    /* Get back to previous indentation: */
+    margin -= INDENTATION;
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "}"));
+  }
+
   // Print the end block marker(s) if needed:
   if (flg_marker == true)
-    text_sentences(r) = gen_nconc(text_sentences(r), bm_end);
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, bm_end));
 
   return r;
 }
@@ -2831,10 +2841,10 @@ text_block_if(
       }
 
     if(prettyprint_is_fortran)
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")))
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")));
     else if((!else_branch_p && !one_liner_true_statement)
 	    || (else_branch_p && !one_liner_false_statement))
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")))
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")));
 
     ifdebug(8){
       fprintf(stderr,"text_block_if=================================\n");
