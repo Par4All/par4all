@@ -142,9 +142,9 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   freia_aipo_dilate_8c(out, imout, (int *) freia_morpho_kernel_8c);    /*0145*/
-   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);      /*0146*/
-   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);      /*0147*/
+   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0145*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0146*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0147*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/
@@ -1986,7 +1986,7 @@ int license_plate(void)
    _return2 = ret_2;                                                    /*0129*/
 
    ret_3 = 0;                                                           /*0131*/
-   ret_3 |= license_plate_helper_0_0_5(out, imout, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, (int *) freia_morpho_kernel_8c);  /*0132*/
+   ret_3 |= license_plate_helper_0_0_5(out, imout, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, freia_morpho_kernel_8c);          /*0132*/
    ret_3 |= 0;                                                          /*0133*/
    ret_3 |= 0;                                                          /*0134*/
    i_3 = 4;                                                             /*0135*/
@@ -1999,7 +1999,7 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_0_6(out, out, (int *) freia_morpho_kernel_8c, (int *) freia_morpho_kernel_8c);             /*0146*/
+   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c, freia_morpho_kernel_8c);              /*0146*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/

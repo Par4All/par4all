@@ -142,9 +142,9 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   freia_aipo_dilate_8c(out, imout, (int *) freia_morpho_kernel_8c);    /*0145*/
-   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);      /*0146*/
-   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);      /*0147*/
+   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0145*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0146*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0147*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/
@@ -1888,7 +1888,7 @@ int license_plate(void)
    
    
    ret_2 = 0;                                                           /*0117*/
-   ret_2 |= license_plate_helper_0_0_2(out, imfilt, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, (int *) freia_morpho_kernel_8c);   /*0118*/
+   ret_2 |= license_plate_helper_0_0_2(out, imfilt, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, freia_morpho_kernel_8c);           /*0118*/
    ret_2 |= 0;                                                          /*0119*/
    ret_2 |= 0;                                                          /*0120*/
    i_2 = 4;                                                             /*0121*/
@@ -1915,7 +1915,7 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_0_3(out, out, (int *) freia_morpho_kernel_8c, (int *) freia_morpho_kernel_8c);             /*0146*/
+   license_plate_helper_0_0_3(out, out, freia_morpho_kernel_8c, freia_morpho_kernel_8c);              /*0146*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/
