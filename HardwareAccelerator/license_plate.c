@@ -142,9 +142,9 @@ int license_plate(void)
    
    _return3 = ret_3;
    
-   freia_aipo_dilate_8c(out, imout, (int *) freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(out, out, (int *) freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
    i_4 = 3;
    
    _return4 = 0;
