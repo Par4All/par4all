@@ -1,6 +1,6 @@
 TARGET	= c_syntax
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h cyacc.h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libc_syntax.la
 libc_syntax_la_SOURCES=\
@@ -12,9 +12,5 @@ libc_syntax_la_SOURCES=\
 
 AM_YFLAGS=-d -p c_
 AM_LFLAGS=-p c_
-
-# additionnal dep needed for // build
-clex.c:cyacc.h
-util.c:cyacc.h
 
 include $(srcdir)/../pipslibs_includes.mk
