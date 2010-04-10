@@ -1,0 +1,136 @@
+
+! initial function
+
+void border_os(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 1, 1, 0, 1, 1, 0};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "border_os_helper_0_0" of module "border_os" in dot format
+digraph "border_os_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_0" of module "border_os" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_os" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module border_os
+freia_status border_os_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // in [0 input 0] -> [0 poc 0] 8 erode_8c
+  // nope
+  // poc 8 erode_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+
+  // output image out on 0
+  // out [0 poc 0] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // out [0 output 0] -> [7 output 0] 0 null
+  // out [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // out [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // out [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // out [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // out [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // out [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // out [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
+! updated function
+
+void border_os(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 1, 1, 0, 1, 1, 0};                  /*0007*/
+   border_os_helper_0_0_0(out, in, kernel);                             /*0008*/
+}
+
