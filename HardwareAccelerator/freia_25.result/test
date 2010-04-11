@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -229,6 +232,186 @@ freia_status freia_25(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
    // o1 = i * i
    freia_25_helper_0_0_0(o0, i);                                        /*0009*/
    freia_25_helper_0_1_0(o1, i);                                        /*0010*/
+
+   return FREIA_OK;                                                     /*0012*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status freia_25(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses
+   // o0 = i + i
+   // o1 = i * i
+   freia_aipo_add(o0, i, i);                                            /*0009*/
+   freia_aipo_mul(o1, i, i);                                            /*0010*/
+
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_25" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 *" [shape=trapezium,orientation=270];
+  "10 *" -> "o1";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o0";
+  "i" -> "10 *";
+  "i" -> "10 *";
+  "i" -> "9 +";
+  "i" -> "9 +";
+}
+// graph for dag "dag_cleaned_0" of module "freia_25" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 *" [shape=trapezium,orientation=270];
+  "10 *" -> "o1";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o0";
+  "i" -> "10 *";
+  "i" -> "10 *";
+  "i" -> "9 +";
+  "i" -> "9 +";
+}
+// graph for dag "freia_25_helper_0_0" of module "freia_25" in dot format
+digraph "freia_25_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 *" [shape=trapezium,orientation=270];
+  "10 *" -> "o1";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o0";
+  "i" -> "10 *";
+  "i" -> "10 *";
+  "i" -> "9 +";
+  "i" -> "9 +";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module freia_25
+ * 1 input image, 2 output images
+ * 3 image operations in dag
+ * dag length is 2, dag width is 2
+ * cost is 8 cycles per imagelet row
+ */
+freia_status freia_25_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  freia_data2d * i0)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  terapix_mcu_instr mcu_instr[2];
+
+  // imagelet definitions...
+  int imagelet_size = 256;
+  int imagelet_1 = 0;
+  int imagelet_2 = 256;
+  int imagelet_3 = 512;
+  int imagelet_4 = 768;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: +(1,1) -> 2
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.xmin2 = imagelet_1;
+  mcu_instr[0].macrocode.ymin2 = 0;
+  mcu_instr[0].macrocode.xmin3 = imagelet_2;
+  mcu_instr[0].macrocode.ymin3 = 0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  // 1: *(1,1) -> 1
+  mcu_instr[1].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1].macrocode.ymin1 = 0;
+  mcu_instr[1].macrocode.xmin2 = imagelet_1;
+  mcu_instr[1].macrocode.ymin2 = 0;
+  mcu_instr[1].macrocode.xmin3 = imagelet_1;
+  mcu_instr[1].macrocode.ymin3 = 0;
+  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_MUL;
+
+  // inputs:
+  // - imagelet 1 is i0 for i
+
+  // outputs:
+  // - imagelet 2 is o0 for o0
+  // - imagelet 1 is o1 for o1
+
+  // double buffer management:
+  // - buffer 1/3
+  // - buffer 2/4
+
+  // output imagelet erosion:
+  //   north: 0
+  //   south: 0
+  //    west: 0
+  //    east: 0
+
+  ret = freia_cg_template_process_1i_2o(&param, o0, o1, i0);
+
+
+  return ret;
+}
+
+
+! updated function
+
+freia_status freia_25(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses
+   // o0 = i + i
+   // o1 = i * i
+   freia_25_helper_0_0(o0, o1, i);                                      /*0009*/
 
    return FREIA_OK;                                                     /*0012*/
 }

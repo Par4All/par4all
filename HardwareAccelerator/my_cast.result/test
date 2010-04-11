@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -15,6 +18,34 @@ freia_status my_cast(freia_data2d *o, freia_data2d *i0)
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+! updated function
+
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0004*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0004*/
+}
+
+! graphs
+
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
 
 ! updated function
 

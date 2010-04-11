@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -119,4 +122,13 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
    return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
 }
+#
+# TERAPIX
+#
 
+! initial function
+
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return freia_aipo_set_constant(o, p0);                               /*0004*/
+}

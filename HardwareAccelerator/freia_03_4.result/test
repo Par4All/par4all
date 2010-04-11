@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -364,4 +367,48 @@ freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32
 
    return FREIA_OK;                                                     /*0044*/
 }
+#
+# TERAPIX
+#
 
+! initial function
+
+freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
+{
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128), *t6 = freia_common_create_data(16, 128, 128), *t7 = freia_common_create_data(16, 128, 128);     /*0016*/
+   
+   // 1 pipeline call is enough
+   // t1 = f(i0)
+   // t2 = g(i1)
+   // t3 = t1 + t2
+   // t4 = h(t1)
+   // t5 = i(t3)
+   // t6 = t4 & t5
+   // t7 = m()
+   // o  = t6 * t7
+   freia_aipo_add_const(t1, i0, c1);                                    /*0027*/
+   freia_aipo_addsat_const(t2, i1, c2);                                 /*0028*/
+   freia_aipo_add(t3, t1, t2);                                          /*0029*/
+   freia_aipo_mul_const(t4, t1, c3);                                    /*0030*/
+   freia_aipo_div_const(t5, t3, c4);                                    /*0031*/
+   freia_aipo_and(t6, t4, t5);                                          /*0032*/
+   freia_aipo_set_constant(t7, c5);                                     /*0033*/
+   freia_aipo_mul(o, t6, t7);                                           /*0034*/
+
+   freia_common_destruct_data(t1);                                      /*0036*/
+   freia_common_destruct_data(t2);                                      /*0037*/
+   freia_common_destruct_data(t3);                                      /*0038*/
+   freia_common_destruct_data(t4);                                      /*0039*/
+   freia_common_destruct_data(t5);                                      /*0040*/
+   freia_common_destruct_data(t6);                                      /*0041*/
+   freia_common_destruct_data(t7);                                      /*0042*/
+
+   return FREIA_OK;                                                     /*0044*/
+}

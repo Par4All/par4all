@@ -1,2 +1,9 @@
 # WSPACE=foo FILE=foo.c tpips default_tpips
+echo #
+echo # SPOC
+echo #
 source spoc.tpips
+echo #
+echo # TERAPIX
+echo #
+source terapix.tpips

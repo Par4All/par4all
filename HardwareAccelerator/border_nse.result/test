@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -133,5 +136,170 @@ void border_nse(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 1, 1, 0, 1, 1, 0, 1, 1};                  /*0007*/
    border_nse_helper_0_0_0(out, in, kernel);                            /*0008*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+void border_nse(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 1, 1, 0, 1, 1, 0, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "border_nse_helper_0_0" of module "border_nse" in dot format
+digraph "border_nse_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_0" of module "border_nse" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_nse" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module border_nse
+ * 1 input image, 1 output image
+ * 2 image operations in dag
+ * dag length is 2, dag width is 1
+ * cost is 15 cycles per imagelet row
+ */
+freia_status border_nse_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * i0,
+  const int32_t * pi2)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  // operation 0 parameters
+  int16_t p_0[9];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  terapix_mcu_instr mcu_instr[2];
+
+  // imagelet definitions...
+  int imagelet_size = 341;
+  int imagelet_1 = 0;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: E8(1) -> 2
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0].macrocode.ymin2 = 0;
+  // copy of operation 0 parameters
+  for(i=0; i<9; i++)
+    p_0[i] = pi2[i];
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[0].macrocode.xmin3 = x_0;
+  mcu_instr[0].macrocode.ymin3 = y_0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // copy 2 -> 1
+  mcu_instr[1].macrocode.xmin1 = imagelet_2;
+  mcu_instr[1].macrocode.ymin1 = 0;
+  mcu_instr[1].macrocode.xmin2 = imagelet_1;
+  mcu_instr[1].macrocode.ymin2 = 0;
+  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_COPY;
+
+  // inputs:
+  // - imagelet 1 is i0 for in
+
+  // outputs:
+  // - imagelet 1 is o0 for out
+
+  // double buffer management:
+  // - buffer 1/3
+
+  // output imagelet erosion:
+  //   north: 1
+  //   south: 1
+  //    west: 0
+  //    east: 1
+
+  ret = freia_cg_template_process_1i_1o(&param, o0, i0);
+
+
+  return ret;
+}
+
+
+! updated function
+
+void border_nse(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 1, 1, 0, 1, 1, 0, 1, 1};                  /*0007*/
+   border_nse_helper_0_0(out, in, kernel);                              /*0008*/
 }
 

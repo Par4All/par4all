@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -1941,6 +1944,1642 @@ int license_plate(void)
    freia_common_destruct_data(imopen);                                  /*0158*/
    freia_common_destruct_data(imcloseth);                               /*0161*/
    freia_common_destruct_data(imfilt);                                  /*0163*/
+   freia_common_destruct_data(out);                                     /*0165*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0168*/
+   freia_common_close_output(&fdout);                                   /*0169*/
+
+   return 0;                                                            /*0171*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+int license_plate(void)
+{
+   freia_dataio fdin;                                                   /*0006*/
+   freia_dataio fdout;                                                  /*0007*/
+
+   freia_data2d *in;                                                    /*0009*/
+   freia_data2d *immir;                                                 /*0010*/
+   freia_data2d *imopen;                                                /*0011*/
+   freia_data2d *imclose;                                               /*0012*/
+   freia_data2d *imopenth;                                              /*0013*/
+   freia_data2d *imcloseth;                                             /*0014*/
+   freia_data2d *imand;                                                 /*0015*/
+   freia_data2d *imfilt;                                                /*0016*/
+   freia_data2d *imout;                                                 /*0017*/
+   freia_data2d *out;                                                   /*0018*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0020*/
+   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0021*/
+   
+   // PIPS generated variable
+   int _return0, _return1, _return2, _return3, _return4;                /*0024*/
+   freia_status ret_0;                                                  /*0025*/
+   int i_0;                                                             /*0026*/
+   freia_status ret_1;                                                  /*0027*/
+   int i_1;                                                             /*0028*/
+   freia_status ret_2;                                                  /*0029*/
+   int i_2;                                                             /*0030*/
+   freia_status ret_3;                                                  /*0031*/
+   int i_3, i_4;                                                        /*0032*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0035*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0036*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0039*/
+   immir = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0040*/
+   imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0041*/
+   imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0042*/
+   imopenth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);         /*0043*/
+   imcloseth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0044*/
+   imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0045*/
+   imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0046*/
+   imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0047*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0048*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0051*/
+
+   ret_0 = freia_aipo_erode_8c(imopen, in, kernel1x3);                  /*0053*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0054*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0055*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0056*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0057*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0058*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0059*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0060*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0061*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0062*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0063*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0064*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0065*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0066*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0067*/
+   i_0 = 15;                                                            /*0068*/
+
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0070*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0071*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0072*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0073*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0074*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0075*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0076*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0077*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0078*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0079*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0080*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0081*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0082*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0083*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0084*/
+   i_0 = 15;                                                            /*0085*/
+
+   _return1 = ret_0;                                                    /*0087*/
+
+   ret_1 = freia_aipo_dilate_8c(imclose, in, kernel1x3);                /*0089*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0090*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0091*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0092*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0093*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0094*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0095*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0096*/
+   i_1 = 8;                                                             /*0097*/
+
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0099*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0100*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0101*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0102*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0103*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0104*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0105*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0106*/
+   i_1 = 8;                                                             /*0107*/
+   
+   
+   _return0 = ret_1;                                                    /*0110*/
+
+   freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0112*/
+   freia_aipo_threshold(imcloseth, imclose, 150, 255, 1);               /*0113*/
+
+   freia_aipo_and(imand, imopenth, imcloseth);                          /*0115*/
+
+   ret_2 = freia_aipo_erode_8c(imfilt, imand, kernel3x1);               /*0117*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0118*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0119*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0120*/
+   i_2 = 4;                                                             /*0121*/
+
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0123*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0124*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0125*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0126*/
+   i_2 = 4;                                                             /*0127*/
+
+   _return2 = ret_2;                                                    /*0129*/
+
+   ret_3 = freia_aipo_erode_8c(imout, imfilt, kernel1x3);               /*0131*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0132*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0133*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0134*/
+   i_3 = 4;                                                             /*0135*/
+
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0137*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0138*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0139*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0140*/
+   i_3 = 4;                                                             /*0141*/
+
+   _return3 = ret_3;                                                    /*0143*/
+
+   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0145*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0146*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0147*/
+   i_4 = 3;                                                             /*0148*/
+
+   _return4 = 0;                                                        /*0150*/
+
+   freia_aipo_and(out, out, in);                                        /*0152*/
+   freia_common_tx_image(out, &fdout);                                  /*0153*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0156*/
+   freia_common_destruct_data(immir);                                   /*0157*/
+   freia_common_destruct_data(imopen);                                  /*0158*/
+   freia_common_destruct_data(imclose);                                 /*0159*/
+   freia_common_destruct_data(imopenth);                                /*0160*/
+   freia_common_destruct_data(imcloseth);                               /*0161*/
+   freia_common_destruct_data(imand);                                   /*0162*/
+   freia_common_destruct_data(imfilt);                                  /*0163*/
+   freia_common_destruct_data(imout);                                   /*0164*/
+   freia_common_destruct_data(out);                                     /*0165*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0168*/
+   freia_common_close_output(&fdout);                                   /*0169*/
+
+   return 0;                                                            /*0171*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "license_plate" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "152 &" [shape=trapezium,orientation=270];
+  "152 &" -> "out";
+  "150 ?" [shape=none];
+  "148 ?" [shape=none];
+  "147 D8" [shape=box];
+  "147 D8" -> "152 &" [label="out"];
+  "146 D8" [shape=box];
+  "146 D8" -> "147 D8" [label="out"];
+  "145 D8" [shape=box];
+  "145 D8" -> "146 D8" [label="out"];
+  "143 ?" [shape=none];
+  "141 ?" [shape=none];
+  "140 D8" [shape=box];
+  "140 D8" -> "145 D8" [label="imout"];
+  "139 D8" [shape=box];
+  "139 D8" -> "140 D8" [label="imout"];
+  "138 D8" [shape=box];
+  "138 D8" -> "139 D8" [label="imout"];
+  "137 D8" [shape=box];
+  "137 D8" -> "138 D8" [label="imout"];
+  "135 ?" [shape=none];
+  "134 E8" [shape=box];
+  "134 E8" -> "137 D8" [label="imout"];
+  "133 E8" [shape=box];
+  "133 E8" -> "134 E8" [label="imout"];
+  "132 E8" [shape=box];
+  "132 E8" -> "133 E8" [label="imout"];
+  "131 E8" [shape=box];
+  "131 E8" -> "132 E8" [label="imout"];
+  "129 ?" [shape=none];
+  "127 ?" [shape=none];
+  "126 D8" [shape=box];
+  "126 D8" -> "131 E8" [label="imfilt"];
+  "125 D8" [shape=box];
+  "125 D8" -> "126 D8" [label="imfilt"];
+  "124 D8" [shape=box];
+  "124 D8" -> "125 D8" [label="imfilt"];
+  "123 D8" [shape=box];
+  "123 D8" -> "124 D8" [label="imfilt"];
+  "121 ?" [shape=none];
+  "120 E8" [shape=box];
+  "120 E8" -> "123 D8" [label="imfilt"];
+  "119 E8" [shape=box];
+  "119 E8" -> "120 E8" [label="imfilt"];
+  "118 E8" [shape=box];
+  "118 E8" -> "119 E8" [label="imfilt"];
+  "117 E8" [shape=box];
+  "117 E8" -> "118 E8" [label="imfilt"];
+  "115 &" [shape=trapezium,orientation=270];
+  "115 &" -> "117 E8" [label="imand"];
+  "113 thr" [shape=parallelogram];
+  "113 thr" -> "115 &" [label="imcloseth"];
+  "112 thr" [shape=parallelogram];
+  "112 thr" -> "115 &" [label="imopenth"];
+  "110 ?" [shape=none];
+  "107 ?" [shape=none];
+  "106 E8" [shape=box];
+  "106 E8" -> "113 thr" [label="imclose"];
+  "105 E8" [shape=box];
+  "105 E8" -> "106 E8" [label="imclose"];
+  "104 E8" [shape=box];
+  "104 E8" -> "105 E8" [label="imclose"];
+  "103 E8" [shape=box];
+  "103 E8" -> "104 E8" [label="imclose"];
+  "102 E8" [shape=box];
+  "102 E8" -> "103 E8" [label="imclose"];
+  "101 E8" [shape=box];
+  "101 E8" -> "102 E8" [label="imclose"];
+  "100 E8" [shape=box];
+  "100 E8" -> "101 E8" [label="imclose"];
+  "99 E8" [shape=box];
+  "99 E8" -> "100 E8" [label="imclose"];
+  "97 ?" [shape=none];
+  "96 D8" [shape=box];
+  "96 D8" -> "99 E8" [label="imclose"];
+  "95 D8" [shape=box];
+  "95 D8" -> "96 D8" [label="imclose"];
+  "94 D8" [shape=box];
+  "94 D8" -> "95 D8" [label="imclose"];
+  "93 D8" [shape=box];
+  "93 D8" -> "94 D8" [label="imclose"];
+  "92 D8" [shape=box];
+  "92 D8" -> "93 D8" [label="imclose"];
+  "91 D8" [shape=box];
+  "91 D8" -> "92 D8" [label="imclose"];
+  "90 D8" [shape=box];
+  "90 D8" -> "91 D8" [label="imclose"];
+  "89 D8" [shape=box];
+  "89 D8" -> "90 D8" [label="imclose"];
+  "87 ?" [shape=none];
+  "85 ?" [shape=none];
+  "84 D8" [shape=box];
+  "84 D8" -> "112 thr" [label="imopen"];
+  "83 D8" [shape=box];
+  "83 D8" -> "84 D8" [label="imopen"];
+  "82 D8" [shape=box];
+  "82 D8" -> "83 D8" [label="imopen"];
+  "81 D8" [shape=box];
+  "81 D8" -> "82 D8" [label="imopen"];
+  "80 D8" [shape=box];
+  "80 D8" -> "81 D8" [label="imopen"];
+  "79 D8" [shape=box];
+  "79 D8" -> "80 D8" [label="imopen"];
+  "78 D8" [shape=box];
+  "78 D8" -> "79 D8" [label="imopen"];
+  "77 D8" [shape=box];
+  "77 D8" -> "78 D8" [label="imopen"];
+  "76 D8" [shape=box];
+  "76 D8" -> "77 D8" [label="imopen"];
+  "75 D8" [shape=box];
+  "75 D8" -> "76 D8" [label="imopen"];
+  "74 D8" [shape=box];
+  "74 D8" -> "75 D8" [label="imopen"];
+  "73 D8" [shape=box];
+  "73 D8" -> "74 D8" [label="imopen"];
+  "72 D8" [shape=box];
+  "72 D8" -> "73 D8" [label="imopen"];
+  "71 D8" [shape=box];
+  "71 D8" -> "72 D8" [label="imopen"];
+  "70 D8" [shape=box];
+  "70 D8" -> "71 D8" [label="imopen"];
+  "68 ?" [shape=none];
+  "67 E8" [shape=box];
+  "67 E8" -> "70 D8" [label="imopen"];
+  "66 E8" [shape=box];
+  "66 E8" -> "67 E8" [label="imopen"];
+  "65 E8" [shape=box];
+  "65 E8" -> "66 E8" [label="imopen"];
+  "64 E8" [shape=box];
+  "64 E8" -> "65 E8" [label="imopen"];
+  "63 E8" [shape=box];
+  "63 E8" -> "64 E8" [label="imopen"];
+  "62 E8" [shape=box];
+  "62 E8" -> "63 E8" [label="imopen"];
+  "61 E8" [shape=box];
+  "61 E8" -> "62 E8" [label="imopen"];
+  "60 E8" [shape=box];
+  "60 E8" -> "61 E8" [label="imopen"];
+  "59 E8" [shape=box];
+  "59 E8" -> "60 E8" [label="imopen"];
+  "58 E8" [shape=box];
+  "58 E8" -> "59 E8" [label="imopen"];
+  "57 E8" [shape=box];
+  "57 E8" -> "58 E8" [label="imopen"];
+  "56 E8" [shape=box];
+  "56 E8" -> "57 E8" [label="imopen"];
+  "55 E8" [shape=box];
+  "55 E8" -> "56 E8" [label="imopen"];
+  "54 E8" [shape=box];
+  "54 E8" -> "55 E8" [label="imopen"];
+  "53 E8" [shape=box];
+  "53 E8" -> "54 E8" [label="imopen"];
+  "in" -> "152 &";
+  "in" -> "89 D8";
+  "in" -> "53 E8";
+}
+// graph for dag "dag_cleaned_0" of module "license_plate" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "152 &" [shape=trapezium,orientation=270];
+  "152 &" -> "out";
+  "150 ?" [shape=none];
+  "148 ?" [shape=none];
+  "147 D8" [shape=box];
+  "147 D8" -> "152 &" [label="out"];
+  "146 D8" [shape=box];
+  "146 D8" -> "147 D8" [label="out"];
+  "145 D8" [shape=box];
+  "145 D8" -> "146 D8" [label="out"];
+  "143 ?" [shape=none];
+  "141 ?" [shape=none];
+  "140 D8" [shape=box];
+  "140 D8" -> "145 D8" [label="imout"];
+  "139 D8" [shape=box];
+  "139 D8" -> "140 D8" [label="imout"];
+  "138 D8" [shape=box];
+  "138 D8" -> "139 D8" [label="imout"];
+  "137 D8" [shape=box];
+  "137 D8" -> "138 D8" [label="imout"];
+  "135 ?" [shape=none];
+  "134 E8" [shape=box];
+  "134 E8" -> "137 D8" [label="imout"];
+  "133 E8" [shape=box];
+  "133 E8" -> "134 E8" [label="imout"];
+  "132 E8" [shape=box];
+  "132 E8" -> "133 E8" [label="imout"];
+  "131 E8" [shape=box];
+  "131 E8" -> "132 E8" [label="imout"];
+  "129 ?" [shape=none];
+  "127 ?" [shape=none];
+  "126 D8" [shape=box];
+  "126 D8" -> "131 E8" [label="imfilt"];
+  "125 D8" [shape=box];
+  "125 D8" -> "126 D8" [label="imfilt"];
+  "124 D8" [shape=box];
+  "124 D8" -> "125 D8" [label="imfilt"];
+  "123 D8" [shape=box];
+  "123 D8" -> "124 D8" [label="imfilt"];
+  "121 ?" [shape=none];
+  "120 E8" [shape=box];
+  "120 E8" -> "123 D8" [label="imfilt"];
+  "119 E8" [shape=box];
+  "119 E8" -> "120 E8" [label="imfilt"];
+  "118 E8" [shape=box];
+  "118 E8" -> "119 E8" [label="imfilt"];
+  "117 E8" [shape=box];
+  "117 E8" -> "118 E8" [label="imfilt"];
+  "115 &" [shape=trapezium,orientation=270];
+  "115 &" -> "117 E8" [label="imand"];
+  "113 thr" [shape=parallelogram];
+  "113 thr" -> "115 &" [label="imcloseth"];
+  "112 thr" [shape=parallelogram];
+  "112 thr" -> "115 &" [label="imopenth"];
+  "110 ?" [shape=none];
+  "107 ?" [shape=none];
+  "106 E8" [shape=box];
+  "106 E8" -> "113 thr" [label="imclose"];
+  "105 E8" [shape=box];
+  "105 E8" -> "106 E8" [label="imclose"];
+  "104 E8" [shape=box];
+  "104 E8" -> "105 E8" [label="imclose"];
+  "103 E8" [shape=box];
+  "103 E8" -> "104 E8" [label="imclose"];
+  "102 E8" [shape=box];
+  "102 E8" -> "103 E8" [label="imclose"];
+  "101 E8" [shape=box];
+  "101 E8" -> "102 E8" [label="imclose"];
+  "100 E8" [shape=box];
+  "100 E8" -> "101 E8" [label="imclose"];
+  "99 E8" [shape=box];
+  "99 E8" -> "100 E8" [label="imclose"];
+  "97 ?" [shape=none];
+  "96 D8" [shape=box];
+  "96 D8" -> "99 E8" [label="imclose"];
+  "95 D8" [shape=box];
+  "95 D8" -> "96 D8" [label="imclose"];
+  "94 D8" [shape=box];
+  "94 D8" -> "95 D8" [label="imclose"];
+  "93 D8" [shape=box];
+  "93 D8" -> "94 D8" [label="imclose"];
+  "92 D8" [shape=box];
+  "92 D8" -> "93 D8" [label="imclose"];
+  "91 D8" [shape=box];
+  "91 D8" -> "92 D8" [label="imclose"];
+  "90 D8" [shape=box];
+  "90 D8" -> "91 D8" [label="imclose"];
+  "89 D8" [shape=box];
+  "89 D8" -> "90 D8" [label="imclose"];
+  "87 ?" [shape=none];
+  "85 ?" [shape=none];
+  "84 D8" [shape=box];
+  "84 D8" -> "112 thr" [label="imopen"];
+  "83 D8" [shape=box];
+  "83 D8" -> "84 D8" [label="imopen"];
+  "82 D8" [shape=box];
+  "82 D8" -> "83 D8" [label="imopen"];
+  "81 D8" [shape=box];
+  "81 D8" -> "82 D8" [label="imopen"];
+  "80 D8" [shape=box];
+  "80 D8" -> "81 D8" [label="imopen"];
+  "79 D8" [shape=box];
+  "79 D8" -> "80 D8" [label="imopen"];
+  "78 D8" [shape=box];
+  "78 D8" -> "79 D8" [label="imopen"];
+  "77 D8" [shape=box];
+  "77 D8" -> "78 D8" [label="imopen"];
+  "76 D8" [shape=box];
+  "76 D8" -> "77 D8" [label="imopen"];
+  "75 D8" [shape=box];
+  "75 D8" -> "76 D8" [label="imopen"];
+  "74 D8" [shape=box];
+  "74 D8" -> "75 D8" [label="imopen"];
+  "73 D8" [shape=box];
+  "73 D8" -> "74 D8" [label="imopen"];
+  "72 D8" [shape=box];
+  "72 D8" -> "73 D8" [label="imopen"];
+  "71 D8" [shape=box];
+  "71 D8" -> "72 D8" [label="imopen"];
+  "70 D8" [shape=box];
+  "70 D8" -> "71 D8" [label="imopen"];
+  "68 ?" [shape=none];
+  "67 E8" [shape=box];
+  "67 E8" -> "70 D8" [label="imopen"];
+  "66 E8" [shape=box];
+  "66 E8" -> "67 E8" [label="imopen"];
+  "65 E8" [shape=box];
+  "65 E8" -> "66 E8" [label="imopen"];
+  "64 E8" [shape=box];
+  "64 E8" -> "65 E8" [label="imopen"];
+  "63 E8" [shape=box];
+  "63 E8" -> "64 E8" [label="imopen"];
+  "62 E8" [shape=box];
+  "62 E8" -> "63 E8" [label="imopen"];
+  "61 E8" [shape=box];
+  "61 E8" -> "62 E8" [label="imopen"];
+  "60 E8" [shape=box];
+  "60 E8" -> "61 E8" [label="imopen"];
+  "59 E8" [shape=box];
+  "59 E8" -> "60 E8" [label="imopen"];
+  "58 E8" [shape=box];
+  "58 E8" -> "59 E8" [label="imopen"];
+  "57 E8" [shape=box];
+  "57 E8" -> "58 E8" [label="imopen"];
+  "56 E8" [shape=box];
+  "56 E8" -> "57 E8" [label="imopen"];
+  "55 E8" [shape=box];
+  "55 E8" -> "56 E8" [label="imopen"];
+  "54 E8" [shape=box];
+  "54 E8" -> "55 E8" [label="imopen"];
+  "53 E8" [shape=box];
+  "53 E8" -> "54 E8" [label="imopen"];
+  "in" -> "152 &";
+  "in" -> "89 D8";
+  "in" -> "53 E8";
+}
+// graph for dag "license_plate_helper_0_0" of module "license_plate" in dot format
+digraph "license_plate_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "152 &" [shape=trapezium,orientation=270];
+  "152 &" -> "out";
+  "147 D8" [shape=box];
+  "147 D8" -> "152 &" [label="out"];
+  "146 D8" [shape=box];
+  "146 D8" -> "147 D8" [label="out"];
+  "145 D8" [shape=box];
+  "145 D8" -> "146 D8" [label="out"];
+  "140 D8" [shape=box];
+  "140 D8" -> "145 D8" [label="imout"];
+  "139 D8" [shape=box];
+  "139 D8" -> "140 D8" [label="imout"];
+  "138 D8" [shape=box];
+  "138 D8" -> "139 D8" [label="imout"];
+  "137 D8" [shape=box];
+  "137 D8" -> "138 D8" [label="imout"];
+  "134 E8" [shape=box];
+  "134 E8" -> "137 D8" [label="imout"];
+  "133 E8" [shape=box];
+  "133 E8" -> "134 E8" [label="imout"];
+  "132 E8" [shape=box];
+  "132 E8" -> "133 E8" [label="imout"];
+  "131 E8" [shape=box];
+  "131 E8" -> "132 E8" [label="imout"];
+  "126 D8" [shape=box];
+  "126 D8" -> "131 E8" [label="imfilt"];
+  "125 D8" [shape=box];
+  "125 D8" -> "126 D8" [label="imfilt"];
+  "124 D8" [shape=box];
+  "124 D8" -> "125 D8" [label="imfilt"];
+  "123 D8" [shape=box];
+  "123 D8" -> "124 D8" [label="imfilt"];
+  "120 E8" [shape=box];
+  "120 E8" -> "123 D8" [label="imfilt"];
+  "119 E8" [shape=box];
+  "119 E8" -> "120 E8" [label="imfilt"];
+  "118 E8" [shape=box];
+  "118 E8" -> "119 E8" [label="imfilt"];
+  "117 E8" [shape=box];
+  "117 E8" -> "118 E8" [label="imfilt"];
+  "115 &" [shape=trapezium,orientation=270];
+  "115 &" -> "117 E8" [label="imand"];
+  "112 thr" [shape=parallelogram];
+  "112 thr" -> "115 &" [label="imopenth"];
+  "84 D8" [shape=box];
+  "84 D8" -> "112 thr" [label="imopen"];
+  "83 D8" [shape=box];
+  "83 D8" -> "84 D8" [label="imopen"];
+  "82 D8" [shape=box];
+  "82 D8" -> "83 D8" [label="imopen"];
+  "81 D8" [shape=box];
+  "81 D8" -> "82 D8" [label="imopen"];
+  "80 D8" [shape=box];
+  "80 D8" -> "81 D8" [label="imopen"];
+  "79 D8" [shape=box];
+  "79 D8" -> "80 D8" [label="imopen"];
+  "78 D8" [shape=box];
+  "78 D8" -> "79 D8" [label="imopen"];
+  "77 D8" [shape=box];
+  "77 D8" -> "78 D8" [label="imopen"];
+  "76 D8" [shape=box];
+  "76 D8" -> "77 D8" [label="imopen"];
+  "75 D8" [shape=box];
+  "75 D8" -> "76 D8" [label="imopen"];
+  "74 D8" [shape=box];
+  "74 D8" -> "75 D8" [label="imopen"];
+  "73 D8" [shape=box];
+  "73 D8" -> "74 D8" [label="imopen"];
+  "72 D8" [shape=box];
+  "72 D8" -> "73 D8" [label="imopen"];
+  "113 thr" [shape=parallelogram];
+  "113 thr" -> "115 &" [label="imcloseth"];
+  "71 D8" [shape=box];
+  "71 D8" -> "72 D8" [label="imopen"];
+  "106 E8" [shape=box];
+  "106 E8" -> "113 thr" [label="imclose"];
+  "70 D8" [shape=box];
+  "70 D8" -> "71 D8" [label="imopen"];
+  "105 E8" [shape=box];
+  "105 E8" -> "106 E8" [label="imclose"];
+  "67 E8" [shape=box];
+  "67 E8" -> "70 D8" [label="imopen"];
+  "104 E8" [shape=box];
+  "104 E8" -> "105 E8" [label="imclose"];
+  "66 E8" [shape=box];
+  "66 E8" -> "67 E8" [label="imopen"];
+  "103 E8" [shape=box];
+  "103 E8" -> "104 E8" [label="imclose"];
+  "65 E8" [shape=box];
+  "65 E8" -> "66 E8" [label="imopen"];
+  "102 E8" [shape=box];
+  "102 E8" -> "103 E8" [label="imclose"];
+  "64 E8" [shape=box];
+  "64 E8" -> "65 E8" [label="imopen"];
+  "101 E8" [shape=box];
+  "101 E8" -> "102 E8" [label="imclose"];
+  "63 E8" [shape=box];
+  "63 E8" -> "64 E8" [label="imopen"];
+  "100 E8" [shape=box];
+  "100 E8" -> "101 E8" [label="imclose"];
+  "62 E8" [shape=box];
+  "62 E8" -> "63 E8" [label="imopen"];
+  "99 E8" [shape=box];
+  "99 E8" -> "100 E8" [label="imclose"];
+  "61 E8" [shape=box];
+  "61 E8" -> "62 E8" [label="imopen"];
+  "96 D8" [shape=box];
+  "96 D8" -> "99 E8" [label="imclose"];
+  "60 E8" [shape=box];
+  "60 E8" -> "61 E8" [label="imopen"];
+  "95 D8" [shape=box];
+  "95 D8" -> "96 D8" [label="imclose"];
+  "59 E8" [shape=box];
+  "59 E8" -> "60 E8" [label="imopen"];
+  "94 D8" [shape=box];
+  "94 D8" -> "95 D8" [label="imclose"];
+  "58 E8" [shape=box];
+  "58 E8" -> "59 E8" [label="imopen"];
+  "93 D8" [shape=box];
+  "93 D8" -> "94 D8" [label="imclose"];
+  "57 E8" [shape=box];
+  "57 E8" -> "58 E8" [label="imopen"];
+  "92 D8" [shape=box];
+  "92 D8" -> "93 D8" [label="imclose"];
+  "56 E8" [shape=box];
+  "56 E8" -> "57 E8" [label="imopen"];
+  "91 D8" [shape=box];
+  "91 D8" -> "92 D8" [label="imclose"];
+  "55 E8" [shape=box];
+  "55 E8" -> "56 E8" [label="imopen"];
+  "90 D8" [shape=box];
+  "90 D8" -> "91 D8" [label="imclose"];
+  "54 E8" [shape=box];
+  "54 E8" -> "55 E8" [label="imopen"];
+  "89 D8" [shape=box];
+  "89 D8" -> "90 D8" [label="imclose"];
+  "53 E8" [shape=box];
+  "53 E8" -> "54 E8" [label="imopen"];
+  "in" -> "152 &";
+  "in" -> "89 D8";
+  "in" -> "53 E8";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module license_plate
+ * 1 input image, 1 output image
+ * 70 image operations in dag
+ * dag length is 53, dag width is 2
+ * cost is 993 cycles per imagelet row
+ */
+freia_status license_plate_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * i0,
+  const int32_t * pi2,
+  int32_t pi3,
+  int32_t pi4,
+  int32_t pi5,
+  int32_t pi6,
+  int32_t pi7,
+  int32_t pi8,
+  const int32_t * pi9,
+  const int32_t * pi10)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  // operation 0 parameters
+  int16_t p_0[9];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  // operation 33 parameters
+  int16_t p_33[3];
+  const int32_t x_33 = 3;
+  const int32_t y_33 = 0;
+  // operation 47 parameters
+  int16_t p_47[3];
+  const int32_t x_47 = 6;
+  const int32_t y_47 = 0;
+  // operation 49 parameters
+  int16_t p_49[9];
+  const int32_t x_49 = 9;
+  const int32_t y_49 = 0;
+  // operation 65 parameters
+  int16_t p_65[9];
+  const int32_t x_65 = 12;
+  const int32_t y_65 = 0;
+  terapix_mcu_instr mcu_instr[69];
+
+  // imagelet definitions...
+  int imagelet_size = 204;
+  int imagelet_1 = 0;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: E8(1) -> 2
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0].macrocode.ymin2 = 0;
+  // copy of operation 0 parameters
+  for(i=0; i<9; i++)
+    p_0[i] = pi2[i];
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[0].macrocode.xmin3 = x_0;
+  mcu_instr[0].macrocode.ymin3 = y_0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 1: D8(1) -> 3
+  mcu_instr[1].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1].macrocode.ymin1 = 0;
+  mcu_instr[1].macrocode.xmin2 = imagelet_3;
+  mcu_instr[1].macrocode.ymin2 = 0;
+  mcu_instr[1].macrocode.xmin3 = x_0;
+  mcu_instr[1].macrocode.ymin3 = y_0;
+  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 2: E8(2) -> 4
+  mcu_instr[2].macrocode.xmin1 = imagelet_2;
+  mcu_instr[2].macrocode.ymin1 = 0;
+  mcu_instr[2].macrocode.xmin2 = imagelet_4;
+  mcu_instr[2].macrocode.ymin2 = 0;
+  mcu_instr[2].macrocode.xmin3 = x_0;
+  mcu_instr[2].macrocode.ymin3 = y_0;
+  mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[2].macrocode.iter2 = imagelet_size;
+  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 3: D8(3) -> 2
+  mcu_instr[3].macrocode.xmin1 = imagelet_3;
+  mcu_instr[3].macrocode.ymin1 = 0;
+  mcu_instr[3].macrocode.xmin2 = imagelet_2;
+  mcu_instr[3].macrocode.ymin2 = 0;
+  mcu_instr[3].macrocode.xmin3 = x_0;
+  mcu_instr[3].macrocode.ymin3 = y_0;
+  mcu_instr[3].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[3].macrocode.iter2 = imagelet_size;
+  mcu_instr[3].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 4: E8(4) -> 3
+  mcu_instr[4].macrocode.xmin1 = imagelet_4;
+  mcu_instr[4].macrocode.ymin1 = 0;
+  mcu_instr[4].macrocode.xmin2 = imagelet_3;
+  mcu_instr[4].macrocode.ymin2 = 0;
+  mcu_instr[4].macrocode.xmin3 = x_0;
+  mcu_instr[4].macrocode.ymin3 = y_0;
+  mcu_instr[4].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[4].macrocode.iter2 = imagelet_size;
+  mcu_instr[4].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 5: D8(2) -> 4
+  mcu_instr[5].macrocode.xmin1 = imagelet_2;
+  mcu_instr[5].macrocode.ymin1 = 0;
+  mcu_instr[5].macrocode.xmin2 = imagelet_4;
+  mcu_instr[5].macrocode.ymin2 = 0;
+  mcu_instr[5].macrocode.xmin3 = x_0;
+  mcu_instr[5].macrocode.ymin3 = y_0;
+  mcu_instr[5].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[5].macrocode.iter2 = imagelet_size;
+  mcu_instr[5].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 6: E8(3) -> 2
+  mcu_instr[6].macrocode.xmin1 = imagelet_3;
+  mcu_instr[6].macrocode.ymin1 = 0;
+  mcu_instr[6].macrocode.xmin2 = imagelet_2;
+  mcu_instr[6].macrocode.ymin2 = 0;
+  mcu_instr[6].macrocode.xmin3 = x_0;
+  mcu_instr[6].macrocode.ymin3 = y_0;
+  mcu_instr[6].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[6].macrocode.iter2 = imagelet_size;
+  mcu_instr[6].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 7: D8(4) -> 3
+  mcu_instr[7].macrocode.xmin1 = imagelet_4;
+  mcu_instr[7].macrocode.ymin1 = 0;
+  mcu_instr[7].macrocode.xmin2 = imagelet_3;
+  mcu_instr[7].macrocode.ymin2 = 0;
+  mcu_instr[7].macrocode.xmin3 = x_0;
+  mcu_instr[7].macrocode.ymin3 = y_0;
+  mcu_instr[7].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[7].macrocode.iter2 = imagelet_size;
+  mcu_instr[7].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 8: E8(2) -> 4
+  mcu_instr[8].macrocode.xmin1 = imagelet_2;
+  mcu_instr[8].macrocode.ymin1 = 0;
+  mcu_instr[8].macrocode.xmin2 = imagelet_4;
+  mcu_instr[8].macrocode.ymin2 = 0;
+  mcu_instr[8].macrocode.xmin3 = x_0;
+  mcu_instr[8].macrocode.ymin3 = y_0;
+  mcu_instr[8].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[8].macrocode.iter2 = imagelet_size;
+  mcu_instr[8].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 9: D8(3) -> 2
+  mcu_instr[9].macrocode.xmin1 = imagelet_3;
+  mcu_instr[9].macrocode.ymin1 = 0;
+  mcu_instr[9].macrocode.xmin2 = imagelet_2;
+  mcu_instr[9].macrocode.ymin2 = 0;
+  mcu_instr[9].macrocode.xmin3 = x_0;
+  mcu_instr[9].macrocode.ymin3 = y_0;
+  mcu_instr[9].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[9].macrocode.iter2 = imagelet_size;
+  mcu_instr[9].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 10: E8(4) -> 3
+  mcu_instr[10].macrocode.xmin1 = imagelet_4;
+  mcu_instr[10].macrocode.ymin1 = 0;
+  mcu_instr[10].macrocode.xmin2 = imagelet_3;
+  mcu_instr[10].macrocode.ymin2 = 0;
+  mcu_instr[10].macrocode.xmin3 = x_0;
+  mcu_instr[10].macrocode.ymin3 = y_0;
+  mcu_instr[10].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[10].macrocode.iter2 = imagelet_size;
+  mcu_instr[10].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 11: D8(2) -> 4
+  mcu_instr[11].macrocode.xmin1 = imagelet_2;
+  mcu_instr[11].macrocode.ymin1 = 0;
+  mcu_instr[11].macrocode.xmin2 = imagelet_4;
+  mcu_instr[11].macrocode.ymin2 = 0;
+  mcu_instr[11].macrocode.xmin3 = x_0;
+  mcu_instr[11].macrocode.ymin3 = y_0;
+  mcu_instr[11].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[11].macrocode.iter2 = imagelet_size;
+  mcu_instr[11].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 12: E8(3) -> 2
+  mcu_instr[12].macrocode.xmin1 = imagelet_3;
+  mcu_instr[12].macrocode.ymin1 = 0;
+  mcu_instr[12].macrocode.xmin2 = imagelet_2;
+  mcu_instr[12].macrocode.ymin2 = 0;
+  mcu_instr[12].macrocode.xmin3 = x_0;
+  mcu_instr[12].macrocode.ymin3 = y_0;
+  mcu_instr[12].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[12].macrocode.iter2 = imagelet_size;
+  mcu_instr[12].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 13: D8(4) -> 3
+  mcu_instr[13].macrocode.xmin1 = imagelet_4;
+  mcu_instr[13].macrocode.ymin1 = 0;
+  mcu_instr[13].macrocode.xmin2 = imagelet_3;
+  mcu_instr[13].macrocode.ymin2 = 0;
+  mcu_instr[13].macrocode.xmin3 = x_0;
+  mcu_instr[13].macrocode.ymin3 = y_0;
+  mcu_instr[13].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[13].macrocode.iter2 = imagelet_size;
+  mcu_instr[13].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 14: E8(2) -> 4
+  mcu_instr[14].macrocode.xmin1 = imagelet_2;
+  mcu_instr[14].macrocode.ymin1 = 0;
+  mcu_instr[14].macrocode.xmin2 = imagelet_4;
+  mcu_instr[14].macrocode.ymin2 = 0;
+  mcu_instr[14].macrocode.xmin3 = x_0;
+  mcu_instr[14].macrocode.ymin3 = y_0;
+  mcu_instr[14].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[14].macrocode.iter2 = imagelet_size;
+  mcu_instr[14].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 15: D8(3) -> 2
+  mcu_instr[15].macrocode.xmin1 = imagelet_3;
+  mcu_instr[15].macrocode.ymin1 = 0;
+  mcu_instr[15].macrocode.xmin2 = imagelet_2;
+  mcu_instr[15].macrocode.ymin2 = 0;
+  mcu_instr[15].macrocode.xmin3 = x_0;
+  mcu_instr[15].macrocode.ymin3 = y_0;
+  mcu_instr[15].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[15].macrocode.iter2 = imagelet_size;
+  mcu_instr[15].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 16: E8(4) -> 3
+  mcu_instr[16].macrocode.xmin1 = imagelet_4;
+  mcu_instr[16].macrocode.ymin1 = 0;
+  mcu_instr[16].macrocode.xmin2 = imagelet_3;
+  mcu_instr[16].macrocode.ymin2 = 0;
+  mcu_instr[16].macrocode.xmin3 = x_0;
+  mcu_instr[16].macrocode.ymin3 = y_0;
+  mcu_instr[16].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[16].macrocode.iter2 = imagelet_size;
+  mcu_instr[16].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 17: E8(2) -> 4
+  mcu_instr[17].macrocode.xmin1 = imagelet_2;
+  mcu_instr[17].macrocode.ymin1 = 0;
+  mcu_instr[17].macrocode.xmin2 = imagelet_4;
+  mcu_instr[17].macrocode.ymin2 = 0;
+  mcu_instr[17].macrocode.xmin3 = x_0;
+  mcu_instr[17].macrocode.ymin3 = y_0;
+  mcu_instr[17].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[17].macrocode.iter2 = imagelet_size;
+  mcu_instr[17].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 18: E8(3) -> 2
+  mcu_instr[18].macrocode.xmin1 = imagelet_3;
+  mcu_instr[18].macrocode.ymin1 = 0;
+  mcu_instr[18].macrocode.xmin2 = imagelet_2;
+  mcu_instr[18].macrocode.ymin2 = 0;
+  mcu_instr[18].macrocode.xmin3 = x_0;
+  mcu_instr[18].macrocode.ymin3 = y_0;
+  mcu_instr[18].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[18].macrocode.iter2 = imagelet_size;
+  mcu_instr[18].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 19: E8(4) -> 3
+  mcu_instr[19].macrocode.xmin1 = imagelet_4;
+  mcu_instr[19].macrocode.ymin1 = 0;
+  mcu_instr[19].macrocode.xmin2 = imagelet_3;
+  mcu_instr[19].macrocode.ymin2 = 0;
+  mcu_instr[19].macrocode.xmin3 = x_0;
+  mcu_instr[19].macrocode.ymin3 = y_0;
+  mcu_instr[19].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[19].macrocode.iter2 = imagelet_size;
+  mcu_instr[19].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 20: E8(2) -> 4
+  mcu_instr[20].macrocode.xmin1 = imagelet_2;
+  mcu_instr[20].macrocode.ymin1 = 0;
+  mcu_instr[20].macrocode.xmin2 = imagelet_4;
+  mcu_instr[20].macrocode.ymin2 = 0;
+  mcu_instr[20].macrocode.xmin3 = x_0;
+  mcu_instr[20].macrocode.ymin3 = y_0;
+  mcu_instr[20].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[20].macrocode.iter2 = imagelet_size;
+  mcu_instr[20].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 21: E8(3) -> 2
+  mcu_instr[21].macrocode.xmin1 = imagelet_3;
+  mcu_instr[21].macrocode.ymin1 = 0;
+  mcu_instr[21].macrocode.xmin2 = imagelet_2;
+  mcu_instr[21].macrocode.ymin2 = 0;
+  mcu_instr[21].macrocode.xmin3 = x_0;
+  mcu_instr[21].macrocode.ymin3 = y_0;
+  mcu_instr[21].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[21].macrocode.iter2 = imagelet_size;
+  mcu_instr[21].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 22: E8(4) -> 3
+  mcu_instr[22].macrocode.xmin1 = imagelet_4;
+  mcu_instr[22].macrocode.ymin1 = 0;
+  mcu_instr[22].macrocode.xmin2 = imagelet_3;
+  mcu_instr[22].macrocode.ymin2 = 0;
+  mcu_instr[22].macrocode.xmin3 = x_0;
+  mcu_instr[22].macrocode.ymin3 = y_0;
+  mcu_instr[22].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[22].macrocode.iter2 = imagelet_size;
+  mcu_instr[22].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 23: E8(2) -> 4
+  mcu_instr[23].macrocode.xmin1 = imagelet_2;
+  mcu_instr[23].macrocode.ymin1 = 0;
+  mcu_instr[23].macrocode.xmin2 = imagelet_4;
+  mcu_instr[23].macrocode.ymin2 = 0;
+  mcu_instr[23].macrocode.xmin3 = x_0;
+  mcu_instr[23].macrocode.ymin3 = y_0;
+  mcu_instr[23].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[23].macrocode.iter2 = imagelet_size;
+  mcu_instr[23].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 24: E8(3) -> 2
+  mcu_instr[24].macrocode.xmin1 = imagelet_3;
+  mcu_instr[24].macrocode.ymin1 = 0;
+  mcu_instr[24].macrocode.xmin2 = imagelet_2;
+  mcu_instr[24].macrocode.ymin2 = 0;
+  mcu_instr[24].macrocode.xmin3 = x_0;
+  mcu_instr[24].macrocode.ymin3 = y_0;
+  mcu_instr[24].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[24].macrocode.iter2 = imagelet_size;
+  mcu_instr[24].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 25: E8(4) -> 3
+  mcu_instr[25].macrocode.xmin1 = imagelet_4;
+  mcu_instr[25].macrocode.ymin1 = 0;
+  mcu_instr[25].macrocode.xmin2 = imagelet_3;
+  mcu_instr[25].macrocode.ymin2 = 0;
+  mcu_instr[25].macrocode.xmin3 = x_0;
+  mcu_instr[25].macrocode.ymin3 = y_0;
+  mcu_instr[25].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[25].macrocode.iter2 = imagelet_size;
+  mcu_instr[25].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 26: E8(2) -> 4
+  mcu_instr[26].macrocode.xmin1 = imagelet_2;
+  mcu_instr[26].macrocode.ymin1 = 0;
+  mcu_instr[26].macrocode.xmin2 = imagelet_4;
+  mcu_instr[26].macrocode.ymin2 = 0;
+  mcu_instr[26].macrocode.xmin3 = x_0;
+  mcu_instr[26].macrocode.ymin3 = y_0;
+  mcu_instr[26].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[26].macrocode.iter2 = imagelet_size;
+  mcu_instr[26].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 27: E8(3) -> 2
+  mcu_instr[27].macrocode.xmin1 = imagelet_3;
+  mcu_instr[27].macrocode.ymin1 = 0;
+  mcu_instr[27].macrocode.xmin2 = imagelet_2;
+  mcu_instr[27].macrocode.ymin2 = 0;
+  mcu_instr[27].macrocode.xmin3 = x_0;
+  mcu_instr[27].macrocode.ymin3 = y_0;
+  mcu_instr[27].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[27].macrocode.iter2 = imagelet_size;
+  mcu_instr[27].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 28: E8(4) -> 3
+  mcu_instr[28].macrocode.xmin1 = imagelet_4;
+  mcu_instr[28].macrocode.ymin1 = 0;
+  mcu_instr[28].macrocode.xmin2 = imagelet_3;
+  mcu_instr[28].macrocode.ymin2 = 0;
+  mcu_instr[28].macrocode.xmin3 = x_0;
+  mcu_instr[28].macrocode.ymin3 = y_0;
+  mcu_instr[28].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[28].macrocode.iter2 = imagelet_size;
+  mcu_instr[28].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 29: E8(2) -> 4
+  mcu_instr[29].macrocode.xmin1 = imagelet_2;
+  mcu_instr[29].macrocode.ymin1 = 0;
+  mcu_instr[29].macrocode.xmin2 = imagelet_4;
+  mcu_instr[29].macrocode.ymin2 = 0;
+  mcu_instr[29].macrocode.xmin3 = x_0;
+  mcu_instr[29].macrocode.ymin3 = y_0;
+  mcu_instr[29].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[29].macrocode.iter2 = imagelet_size;
+  mcu_instr[29].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 30: D8(3) -> 2
+  mcu_instr[30].macrocode.xmin1 = imagelet_3;
+  mcu_instr[30].macrocode.ymin1 = 0;
+  mcu_instr[30].macrocode.xmin2 = imagelet_2;
+  mcu_instr[30].macrocode.ymin2 = 0;
+  mcu_instr[30].macrocode.xmin3 = x_0;
+  mcu_instr[30].macrocode.ymin3 = y_0;
+  mcu_instr[30].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[30].macrocode.iter2 = imagelet_size;
+  mcu_instr[30].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 31: E8(4) -> 3
+  mcu_instr[31].macrocode.xmin1 = imagelet_4;
+  mcu_instr[31].macrocode.ymin1 = 0;
+  mcu_instr[31].macrocode.xmin2 = imagelet_3;
+  mcu_instr[31].macrocode.ymin2 = 0;
+  mcu_instr[31].macrocode.xmin3 = x_0;
+  mcu_instr[31].macrocode.ymin3 = y_0;
+  mcu_instr[31].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[31].macrocode.iter2 = imagelet_size;
+  mcu_instr[31].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 32: D8(2) -> 4
+  mcu_instr[32].macrocode.xmin1 = imagelet_2;
+  mcu_instr[32].macrocode.ymin1 = 0;
+  mcu_instr[32].macrocode.xmin2 = imagelet_4;
+  mcu_instr[32].macrocode.ymin2 = 0;
+  mcu_instr[32].macrocode.xmin3 = x_0;
+  mcu_instr[32].macrocode.ymin3 = y_0;
+  mcu_instr[32].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[32].macrocode.iter2 = imagelet_size;
+  mcu_instr[32].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 33: thr(3) -> 3
+  mcu_instr[33].macrocode.xmin1 = imagelet_3;
+  mcu_instr[33].macrocode.ymin1 = 0;
+  mcu_instr[33].macrocode.xmin2 = imagelet_3;
+  mcu_instr[33].macrocode.ymin2 = 0;
+  // copy of operation 33 parameters
+  p_33[0] = pi3;
+  p_33[1] = pi4;
+  p_33[2] = pi5;
+  gram.xoffset = x_33;
+  gram.yoffset = y_33;
+  gram.width = 3;
+  gram.height = 1;
+  gram.params = p_33;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[33].macrocode.xmin3 = x_33;
+  mcu_instr[33].macrocode.ymin3 = y_33;
+  mcu_instr[33].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[33].macrocode.iter2 = imagelet_size;
+  mcu_instr[33].macrocode.addrStart = TERAPIX_UCODE_THRESHOLD;
+  // 34: D8(4) -> 2
+  mcu_instr[34].macrocode.xmin1 = imagelet_4;
+  mcu_instr[34].macrocode.ymin1 = 0;
+  mcu_instr[34].macrocode.xmin2 = imagelet_2;
+  mcu_instr[34].macrocode.ymin2 = 0;
+  mcu_instr[34].macrocode.xmin3 = x_0;
+  mcu_instr[34].macrocode.ymin3 = y_0;
+  mcu_instr[34].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[34].macrocode.iter2 = imagelet_size;
+  mcu_instr[34].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 35: D8(2) -> 4
+  mcu_instr[35].macrocode.xmin1 = imagelet_2;
+  mcu_instr[35].macrocode.ymin1 = 0;
+  mcu_instr[35].macrocode.xmin2 = imagelet_4;
+  mcu_instr[35].macrocode.ymin2 = 0;
+  mcu_instr[35].macrocode.xmin3 = x_0;
+  mcu_instr[35].macrocode.ymin3 = y_0;
+  mcu_instr[35].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[35].macrocode.iter2 = imagelet_size;
+  mcu_instr[35].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 36: D8(4) -> 2
+  mcu_instr[36].macrocode.xmin1 = imagelet_4;
+  mcu_instr[36].macrocode.ymin1 = 0;
+  mcu_instr[36].macrocode.xmin2 = imagelet_2;
+  mcu_instr[36].macrocode.ymin2 = 0;
+  mcu_instr[36].macrocode.xmin3 = x_0;
+  mcu_instr[36].macrocode.ymin3 = y_0;
+  mcu_instr[36].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[36].macrocode.iter2 = imagelet_size;
+  mcu_instr[36].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 37: D8(2) -> 4
+  mcu_instr[37].macrocode.xmin1 = imagelet_2;
+  mcu_instr[37].macrocode.ymin1 = 0;
+  mcu_instr[37].macrocode.xmin2 = imagelet_4;
+  mcu_instr[37].macrocode.ymin2 = 0;
+  mcu_instr[37].macrocode.xmin3 = x_0;
+  mcu_instr[37].macrocode.ymin3 = y_0;
+  mcu_instr[37].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[37].macrocode.iter2 = imagelet_size;
+  mcu_instr[37].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 38: D8(4) -> 2
+  mcu_instr[38].macrocode.xmin1 = imagelet_4;
+  mcu_instr[38].macrocode.ymin1 = 0;
+  mcu_instr[38].macrocode.xmin2 = imagelet_2;
+  mcu_instr[38].macrocode.ymin2 = 0;
+  mcu_instr[38].macrocode.xmin3 = x_0;
+  mcu_instr[38].macrocode.ymin3 = y_0;
+  mcu_instr[38].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[38].macrocode.iter2 = imagelet_size;
+  mcu_instr[38].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 39: D8(2) -> 4
+  mcu_instr[39].macrocode.xmin1 = imagelet_2;
+  mcu_instr[39].macrocode.ymin1 = 0;
+  mcu_instr[39].macrocode.xmin2 = imagelet_4;
+  mcu_instr[39].macrocode.ymin2 = 0;
+  mcu_instr[39].macrocode.xmin3 = x_0;
+  mcu_instr[39].macrocode.ymin3 = y_0;
+  mcu_instr[39].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[39].macrocode.iter2 = imagelet_size;
+  mcu_instr[39].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 40: D8(4) -> 2
+  mcu_instr[40].macrocode.xmin1 = imagelet_4;
+  mcu_instr[40].macrocode.ymin1 = 0;
+  mcu_instr[40].macrocode.xmin2 = imagelet_2;
+  mcu_instr[40].macrocode.ymin2 = 0;
+  mcu_instr[40].macrocode.xmin3 = x_0;
+  mcu_instr[40].macrocode.ymin3 = y_0;
+  mcu_instr[40].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[40].macrocode.iter2 = imagelet_size;
+  mcu_instr[40].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 41: D8(2) -> 4
+  mcu_instr[41].macrocode.xmin1 = imagelet_2;
+  mcu_instr[41].macrocode.ymin1 = 0;
+  mcu_instr[41].macrocode.xmin2 = imagelet_4;
+  mcu_instr[41].macrocode.ymin2 = 0;
+  mcu_instr[41].macrocode.xmin3 = x_0;
+  mcu_instr[41].macrocode.ymin3 = y_0;
+  mcu_instr[41].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[41].macrocode.iter2 = imagelet_size;
+  mcu_instr[41].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 42: D8(4) -> 2
+  mcu_instr[42].macrocode.xmin1 = imagelet_4;
+  mcu_instr[42].macrocode.ymin1 = 0;
+  mcu_instr[42].macrocode.xmin2 = imagelet_2;
+  mcu_instr[42].macrocode.ymin2 = 0;
+  mcu_instr[42].macrocode.xmin3 = x_0;
+  mcu_instr[42].macrocode.ymin3 = y_0;
+  mcu_instr[42].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[42].macrocode.iter2 = imagelet_size;
+  mcu_instr[42].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 43: D8(2) -> 4
+  mcu_instr[43].macrocode.xmin1 = imagelet_2;
+  mcu_instr[43].macrocode.ymin1 = 0;
+  mcu_instr[43].macrocode.xmin2 = imagelet_4;
+  mcu_instr[43].macrocode.ymin2 = 0;
+  mcu_instr[43].macrocode.xmin3 = x_0;
+  mcu_instr[43].macrocode.ymin3 = y_0;
+  mcu_instr[43].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[43].macrocode.iter2 = imagelet_size;
+  mcu_instr[43].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 44: D8(4) -> 2
+  mcu_instr[44].macrocode.xmin1 = imagelet_4;
+  mcu_instr[44].macrocode.ymin1 = 0;
+  mcu_instr[44].macrocode.xmin2 = imagelet_2;
+  mcu_instr[44].macrocode.ymin2 = 0;
+  mcu_instr[44].macrocode.xmin3 = x_0;
+  mcu_instr[44].macrocode.ymin3 = y_0;
+  mcu_instr[44].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[44].macrocode.iter2 = imagelet_size;
+  mcu_instr[44].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 45: D8(2) -> 4
+  mcu_instr[45].macrocode.xmin1 = imagelet_2;
+  mcu_instr[45].macrocode.ymin1 = 0;
+  mcu_instr[45].macrocode.xmin2 = imagelet_4;
+  mcu_instr[45].macrocode.ymin2 = 0;
+  mcu_instr[45].macrocode.xmin3 = x_0;
+  mcu_instr[45].macrocode.ymin3 = y_0;
+  mcu_instr[45].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[45].macrocode.iter2 = imagelet_size;
+  mcu_instr[45].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 46: D8(4) -> 2
+  mcu_instr[46].macrocode.xmin1 = imagelet_4;
+  mcu_instr[46].macrocode.ymin1 = 0;
+  mcu_instr[46].macrocode.xmin2 = imagelet_2;
+  mcu_instr[46].macrocode.ymin2 = 0;
+  mcu_instr[46].macrocode.xmin3 = x_0;
+  mcu_instr[46].macrocode.ymin3 = y_0;
+  mcu_instr[46].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[46].macrocode.iter2 = imagelet_size;
+  mcu_instr[46].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 47: thr(2) -> 4
+  mcu_instr[47].macrocode.xmin1 = imagelet_2;
+  mcu_instr[47].macrocode.ymin1 = 0;
+  mcu_instr[47].macrocode.xmin2 = imagelet_4;
+  mcu_instr[47].macrocode.ymin2 = 0;
+  // copy of operation 47 parameters
+  p_47[0] = pi6;
+  p_47[1] = pi7;
+  p_47[2] = pi8;
+  gram.xoffset = x_47;
+  gram.yoffset = y_47;
+  gram.width = 3;
+  gram.height = 1;
+  gram.params = p_47;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[47].macrocode.xmin3 = x_47;
+  mcu_instr[47].macrocode.ymin3 = y_47;
+  mcu_instr[47].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[47].macrocode.iter2 = imagelet_size;
+  mcu_instr[47].macrocode.addrStart = TERAPIX_UCODE_THRESHOLD;
+  // 48: &(4,3) -> 4
+  mcu_instr[48].macrocode.xmin1 = imagelet_4;
+  mcu_instr[48].macrocode.ymin1 = 0;
+  mcu_instr[48].macrocode.xmin2 = imagelet_3;
+  mcu_instr[48].macrocode.ymin2 = 0;
+  mcu_instr[48].macrocode.xmin3 = imagelet_4;
+  mcu_instr[48].macrocode.ymin3 = 0;
+  mcu_instr[48].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[48].macrocode.iter2 = imagelet_size;
+  mcu_instr[48].macrocode.addrStart = TERAPIX_UCODE_AND;
+  // 49: E8(4) -> 3
+  mcu_instr[49].macrocode.xmin1 = imagelet_4;
+  mcu_instr[49].macrocode.ymin1 = 0;
+  mcu_instr[49].macrocode.xmin2 = imagelet_3;
+  mcu_instr[49].macrocode.ymin2 = 0;
+  // copy of operation 49 parameters
+  for(i=0; i<9; i++)
+    p_49[i] = pi9[i];
+  gram.xoffset = x_49;
+  gram.yoffset = y_49;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_49;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[49].macrocode.xmin3 = x_49;
+  mcu_instr[49].macrocode.ymin3 = y_49;
+  mcu_instr[49].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[49].macrocode.iter2 = imagelet_size;
+  mcu_instr[49].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 50: E8(3) -> 4
+  mcu_instr[50].macrocode.xmin1 = imagelet_3;
+  mcu_instr[50].macrocode.ymin1 = 0;
+  mcu_instr[50].macrocode.xmin2 = imagelet_4;
+  mcu_instr[50].macrocode.ymin2 = 0;
+  mcu_instr[50].macrocode.xmin3 = x_49;
+  mcu_instr[50].macrocode.ymin3 = y_49;
+  mcu_instr[50].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[50].macrocode.iter2 = imagelet_size;
+  mcu_instr[50].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 51: E8(4) -> 3
+  mcu_instr[51].macrocode.xmin1 = imagelet_4;
+  mcu_instr[51].macrocode.ymin1 = 0;
+  mcu_instr[51].macrocode.xmin2 = imagelet_3;
+  mcu_instr[51].macrocode.ymin2 = 0;
+  mcu_instr[51].macrocode.xmin3 = x_49;
+  mcu_instr[51].macrocode.ymin3 = y_49;
+  mcu_instr[51].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[51].macrocode.iter2 = imagelet_size;
+  mcu_instr[51].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 52: E8(3) -> 4
+  mcu_instr[52].macrocode.xmin1 = imagelet_3;
+  mcu_instr[52].macrocode.ymin1 = 0;
+  mcu_instr[52].macrocode.xmin2 = imagelet_4;
+  mcu_instr[52].macrocode.ymin2 = 0;
+  mcu_instr[52].macrocode.xmin3 = x_49;
+  mcu_instr[52].macrocode.ymin3 = y_49;
+  mcu_instr[52].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[52].macrocode.iter2 = imagelet_size;
+  mcu_instr[52].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 53: D8(4) -> 3
+  mcu_instr[53].macrocode.xmin1 = imagelet_4;
+  mcu_instr[53].macrocode.ymin1 = 0;
+  mcu_instr[53].macrocode.xmin2 = imagelet_3;
+  mcu_instr[53].macrocode.ymin2 = 0;
+  mcu_instr[53].macrocode.xmin3 = x_49;
+  mcu_instr[53].macrocode.ymin3 = y_49;
+  mcu_instr[53].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[53].macrocode.iter2 = imagelet_size;
+  mcu_instr[53].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 54: D8(3) -> 4
+  mcu_instr[54].macrocode.xmin1 = imagelet_3;
+  mcu_instr[54].macrocode.ymin1 = 0;
+  mcu_instr[54].macrocode.xmin2 = imagelet_4;
+  mcu_instr[54].macrocode.ymin2 = 0;
+  mcu_instr[54].macrocode.xmin3 = x_49;
+  mcu_instr[54].macrocode.ymin3 = y_49;
+  mcu_instr[54].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[54].macrocode.iter2 = imagelet_size;
+  mcu_instr[54].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 55: D8(4) -> 3
+  mcu_instr[55].macrocode.xmin1 = imagelet_4;
+  mcu_instr[55].macrocode.ymin1 = 0;
+  mcu_instr[55].macrocode.xmin2 = imagelet_3;
+  mcu_instr[55].macrocode.ymin2 = 0;
+  mcu_instr[55].macrocode.xmin3 = x_49;
+  mcu_instr[55].macrocode.ymin3 = y_49;
+  mcu_instr[55].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[55].macrocode.iter2 = imagelet_size;
+  mcu_instr[55].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 56: D8(3) -> 4
+  mcu_instr[56].macrocode.xmin1 = imagelet_3;
+  mcu_instr[56].macrocode.ymin1 = 0;
+  mcu_instr[56].macrocode.xmin2 = imagelet_4;
+  mcu_instr[56].macrocode.ymin2 = 0;
+  mcu_instr[56].macrocode.xmin3 = x_49;
+  mcu_instr[56].macrocode.ymin3 = y_49;
+  mcu_instr[56].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[56].macrocode.iter2 = imagelet_size;
+  mcu_instr[56].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 57: E8(4) -> 3
+  mcu_instr[57].macrocode.xmin1 = imagelet_4;
+  mcu_instr[57].macrocode.ymin1 = 0;
+  mcu_instr[57].macrocode.xmin2 = imagelet_3;
+  mcu_instr[57].macrocode.ymin2 = 0;
+  mcu_instr[57].macrocode.xmin3 = x_0;
+  mcu_instr[57].macrocode.ymin3 = y_0;
+  mcu_instr[57].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[57].macrocode.iter2 = imagelet_size;
+  mcu_instr[57].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 58: E8(3) -> 4
+  mcu_instr[58].macrocode.xmin1 = imagelet_3;
+  mcu_instr[58].macrocode.ymin1 = 0;
+  mcu_instr[58].macrocode.xmin2 = imagelet_4;
+  mcu_instr[58].macrocode.ymin2 = 0;
+  mcu_instr[58].macrocode.xmin3 = x_0;
+  mcu_instr[58].macrocode.ymin3 = y_0;
+  mcu_instr[58].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[58].macrocode.iter2 = imagelet_size;
+  mcu_instr[58].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 59: E8(4) -> 3
+  mcu_instr[59].macrocode.xmin1 = imagelet_4;
+  mcu_instr[59].macrocode.ymin1 = 0;
+  mcu_instr[59].macrocode.xmin2 = imagelet_3;
+  mcu_instr[59].macrocode.ymin2 = 0;
+  mcu_instr[59].macrocode.xmin3 = x_0;
+  mcu_instr[59].macrocode.ymin3 = y_0;
+  mcu_instr[59].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[59].macrocode.iter2 = imagelet_size;
+  mcu_instr[59].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 60: E8(3) -> 4
+  mcu_instr[60].macrocode.xmin1 = imagelet_3;
+  mcu_instr[60].macrocode.ymin1 = 0;
+  mcu_instr[60].macrocode.xmin2 = imagelet_4;
+  mcu_instr[60].macrocode.ymin2 = 0;
+  mcu_instr[60].macrocode.xmin3 = x_0;
+  mcu_instr[60].macrocode.ymin3 = y_0;
+  mcu_instr[60].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[60].macrocode.iter2 = imagelet_size;
+  mcu_instr[60].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 61: D8(4) -> 3
+  mcu_instr[61].macrocode.xmin1 = imagelet_4;
+  mcu_instr[61].macrocode.ymin1 = 0;
+  mcu_instr[61].macrocode.xmin2 = imagelet_3;
+  mcu_instr[61].macrocode.ymin2 = 0;
+  mcu_instr[61].macrocode.xmin3 = x_0;
+  mcu_instr[61].macrocode.ymin3 = y_0;
+  mcu_instr[61].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[61].macrocode.iter2 = imagelet_size;
+  mcu_instr[61].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 62: D8(3) -> 4
+  mcu_instr[62].macrocode.xmin1 = imagelet_3;
+  mcu_instr[62].macrocode.ymin1 = 0;
+  mcu_instr[62].macrocode.xmin2 = imagelet_4;
+  mcu_instr[62].macrocode.ymin2 = 0;
+  mcu_instr[62].macrocode.xmin3 = x_0;
+  mcu_instr[62].macrocode.ymin3 = y_0;
+  mcu_instr[62].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[62].macrocode.iter2 = imagelet_size;
+  mcu_instr[62].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 63: D8(4) -> 3
+  mcu_instr[63].macrocode.xmin1 = imagelet_4;
+  mcu_instr[63].macrocode.ymin1 = 0;
+  mcu_instr[63].macrocode.xmin2 = imagelet_3;
+  mcu_instr[63].macrocode.ymin2 = 0;
+  mcu_instr[63].macrocode.xmin3 = x_0;
+  mcu_instr[63].macrocode.ymin3 = y_0;
+  mcu_instr[63].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[63].macrocode.iter2 = imagelet_size;
+  mcu_instr[63].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 64: D8(3) -> 4
+  mcu_instr[64].macrocode.xmin1 = imagelet_3;
+  mcu_instr[64].macrocode.ymin1 = 0;
+  mcu_instr[64].macrocode.xmin2 = imagelet_4;
+  mcu_instr[64].macrocode.ymin2 = 0;
+  mcu_instr[64].macrocode.xmin3 = x_0;
+  mcu_instr[64].macrocode.ymin3 = y_0;
+  mcu_instr[64].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[64].macrocode.iter2 = imagelet_size;
+  mcu_instr[64].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 65: D8(4) -> 3
+  mcu_instr[65].macrocode.xmin1 = imagelet_4;
+  mcu_instr[65].macrocode.ymin1 = 0;
+  mcu_instr[65].macrocode.xmin2 = imagelet_3;
+  mcu_instr[65].macrocode.ymin2 = 0;
+  // copy of operation 65 parameters
+  for(i=0; i<9; i++)
+    p_65[i] = pi10[i];
+  gram.xoffset = x_65;
+  gram.yoffset = y_65;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_65;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[65].macrocode.xmin3 = x_65;
+  mcu_instr[65].macrocode.ymin3 = y_65;
+  mcu_instr[65].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[65].macrocode.iter2 = imagelet_size;
+  mcu_instr[65].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 66: D8(3) -> 4
+  mcu_instr[66].macrocode.xmin1 = imagelet_3;
+  mcu_instr[66].macrocode.ymin1 = 0;
+  mcu_instr[66].macrocode.xmin2 = imagelet_4;
+  mcu_instr[66].macrocode.ymin2 = 0;
+  mcu_instr[66].macrocode.xmin3 = x_65;
+  mcu_instr[66].macrocode.ymin3 = y_65;
+  mcu_instr[66].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[66].macrocode.iter2 = imagelet_size;
+  mcu_instr[66].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 67: D8(4) -> 3
+  mcu_instr[67].macrocode.xmin1 = imagelet_4;
+  mcu_instr[67].macrocode.ymin1 = 0;
+  mcu_instr[67].macrocode.xmin2 = imagelet_3;
+  mcu_instr[67].macrocode.ymin2 = 0;
+  mcu_instr[67].macrocode.xmin3 = x_65;
+  mcu_instr[67].macrocode.ymin3 = y_65;
+  mcu_instr[67].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[67].macrocode.iter2 = imagelet_size;
+  mcu_instr[67].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 68: &(3,1) -> 1
+  mcu_instr[68].macrocode.xmin1 = imagelet_3;
+  mcu_instr[68].macrocode.ymin1 = 0;
+  mcu_instr[68].macrocode.xmin2 = imagelet_1;
+  mcu_instr[68].macrocode.ymin2 = 0;
+  mcu_instr[68].macrocode.xmin3 = imagelet_1;
+  mcu_instr[68].macrocode.ymin3 = 0;
+  mcu_instr[68].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[68].macrocode.iter2 = imagelet_size;
+  mcu_instr[68].macrocode.addrStart = TERAPIX_UCODE_AND;
+
+  // inputs:
+  // - imagelet 1 is i0 for in
+
+  // outputs:
+  // - imagelet 1 is o0 for out
+
+  // double buffer management:
+  // - buffer 1/5
+
+  // output imagelet erosion:
+  //   north: 11
+  //   south: 11
+  //    west: 41
+  //    east: 41
+
+  ret = freia_cg_template_process_1i_1o(&param, o0, i0);
+
+
+  return ret;
+}
+
+
+! updated function
+
+int license_plate(void)
+{
+   freia_dataio fdin;                                                   /*0006*/
+   freia_dataio fdout;                                                  /*0007*/
+
+   freia_data2d *in;                                                    /*0009*/
+   freia_data2d *out;                                                   /*0018*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0020*/
+   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0021*/
+   
+   // PIPS generated variable
+   int _return0, _return1, _return2, _return3, _return4;                /*0024*/
+   freia_status ret_0;                                                  /*0025*/
+   int i_0;                                                             /*0026*/
+   freia_status ret_1;                                                  /*0027*/
+   int i_1;                                                             /*0028*/
+   freia_status ret_2;                                                  /*0029*/
+   int i_2;                                                             /*0030*/
+   freia_status ret_3;                                                  /*0031*/
+   int i_3, i_4;                                                        /*0032*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0035*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0036*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0039*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0048*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0051*/
+
+   ret_0 = license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0053*/
+   ret_0 |= 0;                                                          /*0054*/
+   ret_0 |= 0;                                                          /*0055*/
+   ret_0 |= 0;                                                          /*0056*/
+   ret_0 |= 0;                                                          /*0057*/
+   ret_0 |= 0;                                                          /*0058*/
+   ret_0 |= 0;                                                          /*0059*/
+   ret_0 |= 0;                                                          /*0060*/
+   ret_0 |= 0;                                                          /*0061*/
+   ret_0 |= 0;                                                          /*0062*/
+   ret_0 |= 0;                                                          /*0063*/
+   ret_0 |= 0;                                                          /*0064*/
+   ret_0 |= 0;                                                          /*0065*/
+   ret_0 |= 0;                                                          /*0066*/
+   ret_0 |= 0;                                                          /*0067*/
+   i_0 = 15;                                                            /*0068*/
+
+   ret_0 |= 0;                                                          /*0070*/
+   ret_0 |= 0;                                                          /*0071*/
+   ret_0 |= 0;                                                          /*0072*/
+   ret_0 |= 0;                                                          /*0073*/
+   ret_0 |= 0;                                                          /*0074*/
+   ret_0 |= 0;                                                          /*0075*/
+   ret_0 |= 0;                                                          /*0076*/
+   ret_0 |= 0;                                                          /*0077*/
+   ret_0 |= 0;                                                          /*0078*/
+   ret_0 |= 0;                                                          /*0079*/
+   ret_0 |= 0;                                                          /*0080*/
+   ret_0 |= 0;                                                          /*0081*/
+   ret_0 |= 0;                                                          /*0082*/
+   ret_0 |= 0;                                                          /*0083*/
+   ret_0 |= 0;                                                          /*0084*/
+   i_0 = 15;                                                            /*0085*/
+
+   _return1 = ret_0;                                                    /*0087*/
+
+   ret_1 = 0;                                                           /*0089*/
+   ret_1 |= 0;                                                          /*0090*/
+   ret_1 |= 0;                                                          /*0091*/
+   ret_1 |= 0;                                                          /*0092*/
+   ret_1 |= 0;                                                          /*0093*/
+   ret_1 |= 0;                                                          /*0094*/
+   ret_1 |= 0;                                                          /*0095*/
+   ret_1 |= 0;                                                          /*0096*/
+   i_1 = 8;                                                             /*0097*/
+
+   ret_1 |= 0;                                                          /*0099*/
+   ret_1 |= 0;                                                          /*0100*/
+   ret_1 |= 0;                                                          /*0101*/
+   ret_1 |= 0;                                                          /*0102*/
+   ret_1 |= 0;                                                          /*0103*/
+   ret_1 |= 0;                                                          /*0104*/
+   ret_1 |= 0;                                                          /*0105*/
+   ret_1 |= 0;                                                          /*0106*/
+   i_1 = 8;                                                             /*0107*/
+   
+   
+   _return0 = ret_1;                                                    /*0110*/
+   
+   
+   
+   ret_2 = 0;                                                           /*0117*/
+   ret_2 |= 0;                                                          /*0118*/
+   ret_2 |= 0;                                                          /*0119*/
+   ret_2 |= 0;                                                          /*0120*/
+   i_2 = 4;                                                             /*0121*/
+
+   ret_2 |= 0;                                                          /*0123*/
+   ret_2 |= 0;                                                          /*0124*/
+   ret_2 |= 0;                                                          /*0125*/
+   ret_2 |= 0;                                                          /*0126*/
+   i_2 = 4;                                                             /*0127*/
+
+   _return2 = ret_2;                                                    /*0129*/
+
+   ret_3 = 0;                                                           /*0131*/
+   ret_3 |= 0;                                                          /*0132*/
+   ret_3 |= 0;                                                          /*0133*/
+   ret_3 |= 0;                                                          /*0134*/
+   i_3 = 4;                                                             /*0135*/
+
+   ret_3 |= 0;                                                          /*0137*/
+   ret_3 |= 0;                                                          /*0138*/
+   ret_3 |= 0;                                                          /*0139*/
+   ret_3 |= 0;                                                          /*0140*/
+   i_3 = 4;                                                             /*0141*/
+
+   _return3 = ret_3;                                                    /*0143*/
+
+   i_4 = 3;                                                             /*0148*/
+
+   _return4 = 0;                                                        /*0150*/
+
+   freia_common_tx_image(out, &fdout);                                  /*0153*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0156*/
    freia_common_destruct_data(out);                                     /*0165*/
    
    /* close videos flow */

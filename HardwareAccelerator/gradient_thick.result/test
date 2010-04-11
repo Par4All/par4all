@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -178,6 +181,218 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    
    /* gradient thick using aipo calls*/
    gradient_thick_helper_0_0_0(out, in, kernel);                        /*0011*/
+   // freia_aipo_not(imout, imin);
+   
+   /* images destruction */
+   
+   return FREIA_OK;                                                     /*0020*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   freia_data2d *erode = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *dilate = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
+   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
+   
+   /* gradient thick using aipo calls*/
+   freia_aipo_erode_8c(erode, in, kernel);                              /*0011*/
+   freia_aipo_dilate_8c(dilate, in, kernel);                            /*0012*/
+   freia_aipo_sub(out, dilate, erode);                                  /*0013*/
+   // freia_aipo_not(imout, imin);
+   
+   /* images destruction */
+   freia_common_destruct_data(erode);                                   /*0017*/
+   freia_common_destruct_data(dilate);                                  /*0018*/
+
+   return FREIA_OK;                                                     /*0020*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "gradient_thick" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 D8" [shape=box];
+  "12 D8" -> "13 -" [label="dilate"];
+  "11 E8" [shape=box];
+  "11 E8" -> "13 -" [label="erode"];
+  "in" -> "12 D8";
+  "in" -> "11 E8";
+}
+// graph for dag "dag_cleaned_0" of module "gradient_thick" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 D8" [shape=box];
+  "12 D8" -> "13 -" [label="dilate"];
+  "11 E8" [shape=box];
+  "11 E8" -> "13 -" [label="erode"];
+  "in" -> "12 D8";
+  "in" -> "11 E8";
+}
+// graph for dag "gradient_thick_helper_0_0" of module "gradient_thick" in dot format
+digraph "gradient_thick_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 D8" [shape=box];
+  "12 D8" -> "13 -" [label="dilate"];
+  "11 E8" [shape=box];
+  "11 E8" -> "13 -" [label="erode"];
+  "in" -> "12 D8";
+  "in" -> "11 E8";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module gradient_thick
+ * 1 input image, 1 output image
+ * 4 image operations in dag
+ * dag length is 3, dag width is 2
+ * cost is 34 cycles per imagelet row
+ */
+freia_status gradient_thick_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * i0,
+  const int32_t * pi2)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  // operation 0 parameters
+  int16_t p_0[9];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  terapix_mcu_instr mcu_instr[3];
+
+  // imagelet definitions...
+  int imagelet_size = 256;
+  int imagelet_1 = 0;
+  int imagelet_2 = 256;
+  int imagelet_3 = 512;
+  int imagelet_4 = 768;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: E8(1) -> 2
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0].macrocode.ymin2 = 0;
+  // copy of operation 0 parameters
+  for(i=0; i<9; i++)
+    p_0[i] = pi2[i];
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[0].macrocode.xmin3 = x_0;
+  mcu_instr[0].macrocode.ymin3 = y_0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 1: D8(1) -> 3
+  mcu_instr[1].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1].macrocode.ymin1 = 0;
+  mcu_instr[1].macrocode.xmin2 = imagelet_3;
+  mcu_instr[1].macrocode.ymin2 = 0;
+  mcu_instr[1].macrocode.xmin3 = x_0;
+  mcu_instr[1].macrocode.ymin3 = y_0;
+  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 2: -(3,2) -> 1
+  mcu_instr[2].macrocode.xmin1 = imagelet_3;
+  mcu_instr[2].macrocode.ymin1 = 0;
+  mcu_instr[2].macrocode.xmin2 = imagelet_2;
+  mcu_instr[2].macrocode.ymin2 = 0;
+  mcu_instr[2].macrocode.xmin3 = imagelet_1;
+  mcu_instr[2].macrocode.ymin3 = 0;
+  mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[2].macrocode.iter2 = imagelet_size;
+  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_SUB;
+
+  // inputs:
+  // - imagelet 1 is i0 for in
+
+  // outputs:
+  // - imagelet 1 is o0 for out
+
+  // double buffer management:
+  // - buffer 1/4
+
+  // output imagelet erosion:
+  //   north: 1
+  //   south: 1
+  //    west: 1
+  //    east: 1
+
+  ret = freia_cg_template_process_1i_1o(&param, o0, i0);
+
+
+  return ret;
+}
+
+
+! updated function
+
+freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
+   
+   /* gradient thick using aipo calls*/
+   gradient_thick_helper_0_0(out, in, kernel);                          /*0011*/
    // freia_aipo_not(imout, imin);
    
    /* images destruction */
