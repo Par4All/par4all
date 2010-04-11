@@ -1,2 +1,4 @@
 * copy_00
 - le scheduling n'est pas bon, solution avec une image de moins ?
+* license plate
+- borders are too large (82/128 ~ 2/3 lost!), dag should be split in 2 or 3.
