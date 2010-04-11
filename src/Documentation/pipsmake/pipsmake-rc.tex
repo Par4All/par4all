@@ -1,4 +1,4 @@
-%
+%%
 %% $Id$
 %%
 %% Copyright 1989-2010 MINES ParisTech
@@ -6814,7 +6814,12 @@ tiling_sequence      > MODULE.code
 \label{hardware-accelerator}
 
 Generate code from a FREIA application targeting a particular
-hardware accelerator. I could add resources for the module dags?
+hardware accelerator, such as SPoC and Terapix.
+I could add resources for the module dags?
+I'm unsure about the right granularity (now it is at the function
+level) and the resource which is produced (should it be an accelerated
+file?). The current choice does not allow to easily mix different
+accelerators.
 
 \begin{PipsMake}
 freia_spoc_compiler	> MODULE.code
@@ -6831,23 +6836,48 @@ freia_terapix_compiler	> MODULE.code
 \end{PipsMake}
 
 Default depth of the target SPoC accelerator:
-\begin{PipsProp}{HWAC_SPOC_DEPTH} 
+\begin{PipsProp}{HWAC_SPOC_DEPTH}
 HWAC_SPOC_DEPTH 8
+\end{PipsProp}
+
+Number of processing elements (PE) for the Terapix accelerator:
+\begin{PipsProp}{HWAC_TERAPIX_NPE}
+HWAC_TERAPIX_NPE 128
+\end{PipsProp}
+
+Default size of memory, in pixel, for the Terapix accelerator
+(RAMPE is \emph{RAM} of \emph{PE}):
+\begin{PipsProp}{HWAC_TERAPIX_RAMPE}
+HWAC_TERAPIX_RAMPE 1024
+\end{PipsProp}
+
+Terapix DMA bandwidth. How many terapix cycles to transfer an imagelet row
+(size of which is the number of pe):
+\begin{PipsProp}{HWAC_TERAPIX_DMABW}
+HWAC_TERAPIX_DMABW 128
+\end{PipsProp}
+
+Terapix 2D global RAM (GRAM) width and height:
+\begin{PipsProp}{HWAC_TERAPIX_GRAM_WIDTH}
+HWAC_TERAPIX_GRAM_WIDTH 64
+\end{PipsProp}
+\begin{PipsProp}{HWAC_TERAPIX_GRAM_HEIGHT}
+HWAC_TERAPIX_GRAM_HEIGHT 32
 \end{PipsProp}
 
 Whether to label arcs in dag dot output with the image name,
 and to label nodes with the statement number.
-\begin{PipsProp}{FREIA_LABEL_ARCS} 
+\begin{PipsProp}{FREIA_LABEL_ARCS}
 FREIA_LABEL_ARCS FALSE
 \end{PipsProp}
-\begin{PipsProp}{FREIA_LABEL_NODES} 
+\begin{PipsProp}{FREIA_LABEL_NODES}
 FREIA_LABEL_NODES TRUE
 \end{PipsProp}
 
 Whether to remove duplicate operations in the DAG, including
 algebraic optimizations with on commutators.
 Should be always beneficial to terapix, but it may depend for spoc.
-\begin{PipsProp}{FREIA_REMOVE_DUPLICATE_OPERATIONS} 
+\begin{PipsProp}{FREIA_REMOVE_DUPLICATE_OPERATIONS}
 FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
 \end{PipsProp}
 

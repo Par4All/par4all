@@ -21,8 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 
 #include <stdint.h>
@@ -30,6 +31,7 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "freia.h"
 #include "freia_spoc.h"
 
 #include "linear.h"
@@ -39,17 +41,29 @@
 #include "ri-util.h"
 #include "properties.h"
 
+#include "freia_spoc_private.h"
+#include "hwac.h"
+
 // help reduce code size:
 #define T true
 #define F false
-#define cat concatenate
 
 #define NO_POC { { spoc_poc_unused, 0 }, { spoc_poc_unused, 0 } }
 #define NO_MES { measure_none, measure_none }
 
+#define NO_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
+#define NO_TERAPIX { 0, 0, 0, 0, 0, 0, false, NULL }
+
+#define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, "TERAPIX_UCODE_" op }
+#define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, "TERAPIX_UCODE_" op }
+
+// preliminary stuff for volume/min/max/..., although it is not defined yet
+#define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, "TERAPIX_UCODE_" op }
+
 // types used by AIPO parameters
 #define TY_INT "int32_t"
 #define TY_PIN "int32_t *"
+#define TY_CIP "const int32_t *"
 #define TY_UIN "uint32_t"
 #define TY_PUI "uint32_t *"
 
@@ -62,7 +76,7 @@
  */
 static const freia_api_t FREIA_AIPO_API[] = {
   { "undefined", "?", NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    { 0, NO_POC, alu_unused, NO_MES }
+    { 0, NO_POC, alu_unused, NO_MES }, NO_TERAPIX
   },
   {
     // ARITHMETIC
@@ -78,184 +92,211 @@ static const freia_api_t FREIA_AIPO_API[] = {
       alu_add,
       // global measures
       NO_MES
-    }
+    }, TRPX_OP(4, "ADD")
   },
   { AIPO "sub", "-", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_sub_01, NO_MES }
+      NO_POC, alu_sub_01, NO_MES }, TRPX_OP(4, "SUB")
   },
   { AIPO "mul", "*",  AIPO "mul", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_mul, NO_MES }
+      NO_POC, alu_mul, NO_MES }, TRPX_OP(4, "MUL")
   },
   { AIPO "div", "/", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_div_01, NO_MES }
+      NO_POC, alu_div_01, NO_MES }, TRPX_OP(4, "DIV")
   },
   { AIPO "addsat", "+s", AIPO "addsat", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_addsat, NO_MES }
+      NO_POC, alu_addsat, NO_MES }, TRPX_OP(4, "ADDSAT?")
   },
   { AIPO "subsat", "-s", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_subsat_01, NO_MES }
+      NO_POC, alu_subsat_01, NO_MES }, TRPX_OP(4, "SUBSAT?")
   },
   { AIPO "absdiff", "-|", AIPO "absdiff", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_abssub_01, NO_MES }
+      NO_POC, alu_abssub_01, NO_MES }, TRPX_OP(4, "ABS_DIFF")
   },
   { AIPO "inf", "<", AIPO "inf", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_inf_01, NO_MES }
+      NO_POC, alu_inf_01, NO_MES }, TRPX_OP(4, "INF")
   },
   { AIPO "sup", ">", AIPO "sup", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_sup_01, NO_MES }
+      NO_POC, alu_sup_01, NO_MES }, TRPX_OP(4, "SUP")
   },
   { AIPO "and", "&", AIPO "and", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_and, NO_MES }
+      NO_POC, alu_and, NO_MES }, TRPX_OP(4, "AND")
   },
   { AIPO "or", "|", AIPO "or", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_or, NO_MES }
+      NO_POC, alu_or, NO_MES }, TRPX_OP(4, "OR")
   },
   { AIPO "xor", "^", AIPO "xor", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_xor, NO_MES }
+      NO_POC, alu_xor, NO_MES }, TRPX_OP(4, "XOR")
   },
   // unary
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES },
+    TRPX_OP(4, "NOT") // ??? why not less
   },
   { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES },
+    TRPX_OP(3, "ADD_CONST")
   },
   { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES },
+    TRPX_OP(3, "INF_CONST?")
   },
   { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
+    TRPX_OP(3, "SUP_CONST?")
   },
   { AIPO "sub_const", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
+    TRPX_OP(3, "SUB_CONST")
   },
   { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES },
+    TRPX_OP(3, "AND_CONST")
   },
   { AIPO "or_const", "|.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES },
+    TRPX_OP(3, "OR_CONST?")
   },
   { AIPO "xor_const", "^.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES },
+    TRPX_OP(3, "XOR_CONST?")
   },
   { AIPO "addsat_const", "+s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES },
+    TRPX_OP(3, "ADDSAT_CONST?")
   },
   { AIPO "subsat_const", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
+    TRPX_OP(3, "SUBSAT_CONST?")
   },
   { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES },
+    TRPX_OP(3, "ABSDIFF_CONST?")
   },
   { AIPO "mul_const", "*.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES },
+    TRPX_OP(3, "MUL_CONST")
   },
   { AIPO "div_const", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
-    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
+    TRPX_OP(3, "DIV_CONST")
   },
   // nullary
   { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
-    { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES }
+    { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
+    TRPX_OP(2, "SET_CONST?")
   },
   // MISC
   // this one may be ignored?!
   { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
-    { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES }
+    { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES },
+    TRPX_OP(3, "COPY")
   },
   { // not implemented by SPOC!
     AIPO "cast", "=()", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
-    { spoc_nothing, NO_POC, alu_unused, NO_MES }
+    NO_SPOC, NO_TERAPIX
   },
   { AIPO "threshold", "thr", NULL, 1, 1, 0, 3, NO_PARAM,
     { TY_INT, TY_INT, TY_INT },
-    { spoc_input_0|spoc_output_0|spoc_th_0, NO_POC, alu_unused, NO_MES }
+    { spoc_input_0|spoc_output_0|spoc_th_0, NO_POC, alu_unused, NO_MES },
+    TRPX_OP(5, "THRESHOLD")
   },
   // MORPHO
-  { AIPO "erode_6c", "E6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "erode_6c", "E6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 6 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
-    }
+    },
+    TRPX_NG(10, "ERODE_3_3?")
   },
-  { AIPO "dilate_6c", "D6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "dilate_6c", "D6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 6 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
-    }
+    },
+    TRPX_NG(10, "DILATE_3_3?")
   },
-  { AIPO "erode_8c", "E8", NULL, 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "erode_8c", "E8", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
-    }
+    },
+    TRPX_NG(15, "ERODE_3_3")
   },
-  { AIPO "dilate_8c", "D8", NULL, 1, 1, 0, 1,  NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "dilate_8c", "D8", NULL, 1, 1, 0, 1,  NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
-    }
+    },
+    TRPX_NG(15, "DILATE_3_3")
   },
   // MEASURES
   { AIPO "global_min", "min", NULL, 0, 1, 1, 0,
     { TY_PIN, NULL, NULL }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min, measure_none }
-    }
+    },
+    TRPX_MS(1, 3, "MIN?")
   },
   { AIPO "global_max", "max", NULL, 0, 1, 1, 0, { TY_PIN, NULL, NULL },
     NO_PARAM, { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max, measure_none }
-    }
+    },
+    TRPX_MS(1, 3, "MAX?")
   },
   { AIPO "global_min_coord", "min!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PIN, TY_PIN }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min_coord, measure_none }
-    }
+    },
+    TRPX_MS(1, 3, "MIN_COORD?")
   },
   { AIPO "global_max_coord", "max!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PIN, TY_PIN }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max_coord, measure_none }
-    }
+    },
+    TRPX_MS(1, 3, "MAX_COORD?")
   },
   { AIPO "global_vol", "vol", NULL, 0, 1, 1, 0,
     { TY_PIN, NULL, NULL }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_vol, measure_none }
-    }
+    },
+    TRPX_MS(2, 3, "VOL?")
   },
   // LINEAR
   // not implemented by SPOC!
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
     NO_PARAM, { TY_PIN, TY_UIN, TY_UIN },
-    { spoc_nothing, NO_POC, alu_unused, NO_MES }
+    NO_SPOC, NO_TERAPIX
   },
   // not implemented by SPOC!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
     NO_PARAM, { TY_UIN, NULL, NULL },
-    { spoc_nothing, NO_POC, alu_unused, NO_MES }
+    NO_SPOC, NO_TERAPIX
   },
   // last entry
   { NULL, NULL, NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    { 0, NO_POC, alu_unused, NO_MES } }
+    { 0, NO_POC, alu_unused, NO_MES },
+    NO_TERAPIX
+  }
 };
 
 #define FREIA_AIPO_API_SIZE (sizeof(*FREIA_AIPO_API)/sizeof(freia_api_t))
 
 /* returns the index of the description of an AIPO function
  */
-int hwac_freia_api_index(string function)
+int hwac_freia_api_index(const string function)
 {
   const freia_api_t * api;
   for (api = FREIA_AIPO_API; api->function_name; api++)
@@ -267,7 +308,7 @@ int hwac_freia_api_index(string function)
 /* @returns the description of a FREIA AIPO API function.
  * may be moved elswhere. raise an error if not found.
  */
-const freia_api_t * hwac_freia_api(string function)
+const freia_api_t * hwac_freia_api(const string function)
 {
   int index = hwac_freia_api_index(function);
   return index>=0? &FREIA_AIPO_API[index]: NULL;
@@ -277,6 +318,14 @@ const freia_api_t * get_freia_api(int index)
 {
   // pips_assert("index exists", index>=0 && index<(int) FREIA_AIPO_API_SIZE);
   return &FREIA_AIPO_API[index];
+}
+
+/* @return new allocated variable name using provided prefix.
+ * *params is incremented as a side effect.
+ */
+static string get_var(string prefix, int * params)
+{
+  return strdup(cat(prefix, itoa((*params)++)));
 }
 
 /********************************************************* ALU CONFIGURATION */
@@ -352,7 +401,7 @@ const spoc_alu_op_t *get_spoc_alu_conf(spoc_alu_t alu)
 /* @return a string which describes the type of operation
  * (i.e. the hardware used by the function).
  */
-string what_operation(_int type)
+string what_operation(const _int type)
 {
   switch (type)
   {
@@ -370,7 +419,7 @@ string what_operation(_int type)
 
 /* SPoC: set shape depending on hardware component used by vertex
  */
-string what_operation_shape(_int type)
+string what_operation_shape(const _int type)
 {
   string shape;
   switch (type)
@@ -417,20 +466,101 @@ void set_operation(const freia_api_t * api, _int * type, _int * id)
   *id = hwac_freia_api_index(api->function_name);
 }
 
-/* returns an allocated expression list of the parameters only
- * (i.e. do not include the input & output images).
- */
-list /* of expression*/ freia_extract_parameters(int napi, list args)
+list freia_get_params(const freia_api_t * api, list args)
 {
-  const freia_api_t * api = get_freia_api(napi);
   int skip = api->arg_img_in + api->arg_img_out;
   while (skip--) args = CDR(args);
-  return gen_full_copy_list(args);
+  return args;
+}
+
+list freia_get_vertex_params(const dagvtx v)
+{
+  const vtxcontent vc = dagvtx_content(v);
+  pips_assert("there is a statement",
+	      pstatement_statement_p(vtxcontent_source(vc)));
+  const statement s = pstatement_statement(vtxcontent_source(vc));
+  const call c = freia_statement_to_call(s);
+  const freia_api_t * api = dagvtx_freia_api(v);
+  return freia_get_params(api, call_arguments(c));
+}
+
+/* returns an allocated expression list of the parameters only
+ * (i.e. do not include the input & output images).
+ * params maps variables (if so) to already present parameters names.
+ * the extraction function allocs new parameter names if necessary.
+ */
+list /* of expression */ freia_extract_params
+  (const int napi,     // api function number
+   list args,	       // actual arguments to call
+   string_buffer head, // function headers
+   hash_table params,  // argument/variable to parameter mapping
+   int * nparams)      // current number of parameters
+{
+  const freia_api_t * api = get_freia_api(napi);
+  args = freia_get_params(api, args);
+  list res = NIL;
+
+  pips_assert("number of arguments is okay",
+	      gen_length(args)==api->arg_misc_in+api->arg_misc_out);
+
+  for (unsigned int i = 0; i<api->arg_misc_in; i++)
+  {
+    expression e = EXPRESSION(CAR(args));
+    args = CDR(args);
+
+    if (params)
+    {
+      // ??? if the expression is a constant,
+      // the parameter could be skipped as well?
+      entity var = expression_to_entity(e);
+      if (entity_variable_p(var))
+      {
+	if (!hash_defined_p(params, var))
+	{
+	  // choose new name
+	  string name = get_var("pi", nparams);
+	  if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
+	  hash_put(params, var, name);
+	  hash_put(params, e, name);
+	  res = CONS(expression, copy_expression(e), res);
+	}
+	else
+	{
+	  // skip argument, just record its where it is found
+	  hash_put(params, e, hash_get(params, var));
+	}
+      }
+      else
+      {
+	string name = get_var("pi", nparams);
+	if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
+	hash_put(params, e, name);
+	res = CONS(expression, copy_expression(e), res);
+      }
+    }
+    else
+      res = CONS(expression, copy_expression(e), res);
+  }
+
+  for (unsigned int i = 0; i<api->arg_misc_out; i++)
+  {
+    expression e = EXPRESSION(CAR(args));
+    args = CDR(args);
+    string name = get_var("po", nparams);
+    if (head) sb_cat(head, ",\n  ", api->arg_out_types[i], " ", name);
+    if (params)
+      hash_put(params, e, name);
+    else
+      free(name);
+    res = CONS(expression, copy_expression(e), res);
+  }
+
+  return gen_nreverse(res);
 }
 
 /* all is well
  */
-static call freia_ok()
+static call freia_ok(void)
 {
   // how to build the "FREIA_OK" constant?
   return make_call(local_name_to_top_level_entity("0"), NIL);
@@ -438,14 +568,14 @@ static call freia_ok()
 
 /* is it an assignment to ignore
  */
-bool freia_assignment_p(entity e)
+bool freia_assignment_p(const entity e)
 {
   return ENTITY_ASSIGN_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e);
 }
 
 /* @return "freia_aipo_copy(target, source);"
  */
-statement freia_copy_image(entity source, entity target)
+statement freia_copy_image(const entity source, const entity target)
 {
   return call_to_statement(
     make_call(local_name_to_top_level_entity(AIPO "copy"),
@@ -503,7 +633,7 @@ void hwac_kill_statement(statement s)
 
 /* rather approximative?
  */
-bool freia_image_variable_p(entity var)
+bool freia_image_variable_p(const entity var)
 {
   bool is_image = false;
   if (entity_variable_p(var) && entity_scalar_p(var))
@@ -527,7 +657,7 @@ bool freia_image_variable_p(entity var)
 /* for "ret = freia_aipo_*()": return the 'ret' variable...
  * return NULL if not an assignment
  */
-static entity get_assigned_variable(statement s)
+static entity get_assigned_variable(const statement s)
 {
   entity assigned = NULL;
   pips_assert("statement is a call", statement_call_p(s));
@@ -540,7 +670,7 @@ static entity get_assigned_variable(statement s)
 
 /* returns whether the entity is a freia API (AIPO) function.
  */
-bool entity_freia_api_p(entity f)
+bool entity_freia_api_p(const entity f)
 {
   // very partial...
   return strncmp(entity_local_name(f), AIPO, strlen(AIPO))==0;
@@ -548,7 +678,7 @@ bool entity_freia_api_p(entity f)
 
 /* @return whether to optimize AIPO call to function for SPoC.
 */
-static bool freia_spoc_optimise(entity called)
+static bool freia_spoc_optimise(const entity called)
 {
   string fname = entity_local_name(called);
   return !same_string_p(fname, "freia_aipo_convolution") &&
@@ -558,7 +688,7 @@ static bool freia_spoc_optimise(entity called)
 
 /* returns whether the statement is a FREIA call.
  */
-bool freia_statement_aipo_call_p(statement s)
+bool freia_statement_aipo_call_p(const statement s)
 {
   // very partial as well
   instruction i = statement_instruction(s);
@@ -600,7 +730,7 @@ bool freia_statement_aipo_call_p(statement s)
  * scalars assigned to are ignored (return status).
  * no attempt at managing aliasing or the like...
  */
-static void set_add_scalars(set s, statement stat, bool written)
+static void set_add_scalars(set s, const statement stat, const bool written)
 {
   effects efs = load_cumulated_rw_effects(stat);
   entity skip = NULL;
@@ -612,7 +742,7 @@ static void set_add_scalars(set s, statement stat, bool written)
   FOREACH(effect, e, effects_effects(efs))
   {
     if (!malloc_effect_p(e) &&
-        ((written && effect_write_p(e)) || (!written && effect_read_p(e))))
+	((written && effect_write_p(e)) || (!written && effect_read_p(e))))
     {
       entity var = reference_variable(effect_any_reference(e));
       if (entity_variable_p(var) && entity_scalar_p(var) &&
@@ -628,7 +758,7 @@ static void set_add_scalars(set s, statement stat, bool written)
  * @param t target statement
  * @param vars if set, return list of scalars which hold the dependencies
  */
-bool freia_scalar_rw_dep(statement s, statement t, list * vars)
+bool freia_scalar_rw_dep(const statement s, const statement t, list * vars)
 {
   // pips_assert("distinct statements", s!=t);
   if (s==t || !s || !t) return false;
@@ -669,7 +799,7 @@ static bool lexpression_equal_p(const list l1, const list l2)
 /* return the actual function call from a statement,
  * dealing with assign and returns... return NULL if not a call.
  */
-call freia_statement_to_call(statement s)
+call freia_statement_to_call(const statement s)
 {
   // sanity check, somehow redundant
   instruction i = statement_instruction(s);
@@ -691,18 +821,124 @@ call freia_statement_to_call(statement s)
   return c;
 }
 
-#include "freia_spoc_private.h"
-#include "hwac.h"
-
-bool same_constant_parameters(dagvtx v1, dagvtx v2)
+/* tell whether v1 and v2 point to statements with the same parameters.
+ */
+bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
 {
   call
     c1 = freia_statement_to_call(dagvtx_statement(v1)),
     c2 = freia_statement_to_call(dagvtx_statement(v2));
   list
-    lp1 = freia_extract_parameters(dagvtx_opid(v1), call_arguments(c1)),
-    lp2 = freia_extract_parameters(dagvtx_opid(v1), call_arguments(c2));
+    lp1 = freia_extract_params
+	(dagvtx_opid(v1), call_arguments(c1), NULL, NULL, NULL),
+    lp2 = freia_extract_params
+	(dagvtx_opid(v1), call_arguments(c2), NULL, NULL, NULL);
   bool same = lexpression_equal_p(lp1, lp2);
+  gen_free_list(lp1), gen_free_list(lp2);
   // should also check that there is no w effects on parameters in between
   return same;
+}
+
+/* freia_statement_by_helper_call
+ * substitute those statement in ls that are in dag d and accelerated
+ * by a call to function_name(lparams)
+ * also update sets of remainings and global_remainings
+ */
+void freia_substitute_by_helper_call
+  (dag d,
+   set global_remainings,
+   set remainings,
+   list /* of statement */ ls,
+   string function_name,
+   list lparams)
+{
+  // statements that are not yet computed in d...
+  set not_dones = set_make(set_pointer), dones = set_make(set_pointer);
+  FOREACH(dagvtx, vs, dag_vertices(d))
+  {
+    pstatement ps = vtxcontent_source(dagvtx_content(vs));
+    if (pstatement_statement_p(ps))
+      set_add_element(not_dones, not_dones, pstatement_statement(ps));
+  }
+  set_difference(dones, remainings, not_dones);
+  set_difference(remainings, remainings, dones);
+  set_difference(global_remainings, global_remainings, dones);
+
+  // replace first statement of dones in ls (so last in sequence)
+  bool substitution_done = false;
+  FOREACH(statement, sc, ls)
+  {
+    pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
+
+    if (set_belong_p(dones, sc))
+    {
+      pips_assert("statement is a call", statement_call_p(sc));
+      pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
+
+      // substitute by call to helper
+      entity helper = make_empty_subroutine(function_name); // or function?
+      call c = make_call(helper, lparams);
+
+      hwac_replace_statement(sc, c, false);
+      substitution_done = true;
+      break;
+    }
+  }
+  pips_assert("substitution done", substitution_done);
+
+  set_free(not_dones);
+  set_free(dones);
+}
+
+/* insert added statements to actual code sequence in "ls"
+ */
+void freia_insert_added_stats(list ls, list added_stats)
+{
+  if (added_stats)
+  {
+    statement slast = STATEMENT(CAR(ls));
+    // fprintf(stderr, "adding stats to %p\n", slast);
+    instruction ilast = statement_instruction(slast);
+    statement newstat = instruction_to_statement(ilast);
+    // transfer comments and some cleanup...
+    statement_comments(newstat) = statement_comments(slast);
+    statement_comments(slast) = string_undefined;
+    statement_number(slast) = STATEMENT_NUMBER_UNDEFINED;
+    // pretty ugly because return must be handled especially...
+    if (instruction_call_p(ilast) &&
+	ENTITY_C_RETURN_P(call_function(instruction_call(ilast))))
+    {
+      call c = instruction_call(ilast);
+      if (!expression_constant_p(EXPRESSION(CAR(call_arguments(c)))))
+      {
+	// must split return...
+	pips_internal_error("return splitting not implemented yet...\n");
+      }
+      else
+      {
+	added_stats = gen_nconc(added_stats, CONS(statement, newstat, NIL));
+      }
+    }
+    else
+    {
+      added_stats = CONS(statement, newstat, added_stats);
+    }
+    statement_instruction(slast) =
+      make_instruction_sequence(make_sequence(added_stats));
+  }
+}
+
+/* prepend limg images in front of the argument list
+ * limg is consummed by the operation.
+ */
+void freia_add_image_arguments
+  (list limg, // of entity
+   list * lparams) // of expression
+{
+  list largs = NIL;
+  limg = gen_nreverse(limg);
+  FOREACH(entity, e, limg)
+    largs = CONS(expression, entity_to_expression(e), largs);
+  gen_free_list(limg), limg = NIL;
+  *lparams = gen_nconc(largs, *lparams);
 }

@@ -21,8 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 
 #include <stdint.h>
@@ -30,7 +31,7 @@
 
 #include "genC.h"
 #include "misc.h"
-#include "freia_spoc.h"
+#include "freia.h"
 
 #include "linear.h"
 #include "pipsdbm.h"
@@ -42,11 +43,15 @@
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
-#define cat concatenate
+// dirty debug helper...
+string dagvtx_to_string(const dagvtx v)
+{
+  return itoa(dagvtx_number(v));
+}
 
 /* return statement if any, or NULL (for input nodes).
  */
-statement dagvtx_statement(dagvtx v)
+statement dagvtx_statement(const dagvtx v)
 {
   pstatement ps = vtxcontent_source(dagvtx_content(v));
   return pstatement_statement_p(ps)? pstatement_statement(ps): NULL;
@@ -54,19 +59,19 @@ statement dagvtx_statement(dagvtx v)
 
 /* a vertex with a non AIPO or image related statement.
  */
-bool dagvtx_other_stuff_p(dagvtx v)
+bool dagvtx_other_stuff_p(const dagvtx v)
 {
   return vtxcontent_optype(dagvtx_content(v))==spoc_type_oth;
 }
 
 /* return the produced image or NULL */
-entity dagvtx_image(dagvtx v)
+entity dagvtx_image(const dagvtx v)
 {
   vtxcontent c = dagvtx_content(v);
   return (vtxcontent_out(c) != entity_undefined)? vtxcontent_out(c): NULL;
 }
 
-static void entity_list_dump(FILE * out, string what, list l)
+static void entity_list_dump(FILE * out, const string what, const list l)
 {
   fprintf(out, "%s: ", what);
   FOREACH(entity, e, l)
@@ -74,12 +79,17 @@ static void entity_list_dump(FILE * out, string what, list l)
   fprintf(out, "\n");
 }
 
+/* returns the vertex number, i.e. the underlying statement number.
+ */
 _int dagvtx_number(const dagvtx v)
 {
   if (v==NULL) return 0;
   pstatement source = vtxcontent_source(dagvtx_content(v));
   if (pstatement_statement_p(source))
-    return statement_number(pstatement_statement(source));
+  {
+    statement s = pstatement_statement(source);
+    return s? statement_number(s): 0;
+  }
   else
     return 0;
 }
@@ -119,13 +129,14 @@ int dagvtx_ordering(const dagvtx * v1, const dagvtx * v2)
 /* return (last) producer vertex or NULL if none found.
  * this is one of the two predecessors of sink.
  */
-static dagvtx get_producer(dag d, dagvtx sink, entity e)
+dagvtx
+dagvtx_get_producer(const dag d, const dagvtx sink, const entity e)
 {
   pips_assert("some image", e!=entity_undefined);
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     vtxcontent c = dagvtx_content(v);
-    // the image may kept within a pipe
+    // the image may be kept within a pipe
     if (vtxcontent_out(c)==e &&
 	(sink==NULL || gen_in_list_p(sink, dagvtx_succs(v))))
       return v;
@@ -133,7 +144,7 @@ static dagvtx get_producer(dag d, dagvtx sink, entity e)
   return NULL; // it is an external parameter?
 }
 
-void dagvtx_nb_dump(FILE * out, string what, list l)
+void dagvtx_nb_dump(FILE * out, const string what, const list l)
 {
   fprintf(out, "%s: ", what);
   FOREACH(dagvtx, v, l)
@@ -143,7 +154,7 @@ void dagvtx_nb_dump(FILE * out, string what, list l)
 
 /* for dag debug.
  */
-void dagvtx_dump(FILE * out, string name, dagvtx v)
+void dagvtx_dump(FILE * out, const string name, const dagvtx v)
 {
   if (!v) {
     fprintf(out, "vertex %s is NULL\n", name? name: "");
@@ -169,7 +180,7 @@ void dagvtx_dump(FILE * out, string name, dagvtx v)
 
 /* for dag debug
  */
-void dag_dump(FILE * out, string what, dag d)
+void dag_dump(FILE * out, const string what, const dag d)
 {
   fprintf(out, "dag '%s' (%p):\n", what, d);
 
@@ -195,13 +206,13 @@ static string entity_dot_name(entity e)
   return entity_user_name(e);
 }
 
-static void dagvtx_dot_node(FILE * out, string prefix, dagvtx v)
+static void dagvtx_dot_node(FILE * out, const string prefix, const dagvtx v)
 {
   fprintf(out, "%s\"%"_intFMT" %s\"", prefix? prefix: "",
 	  dagvtx_number(v), dagvtx_compact_operation(v));
 }
 
-static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
+static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 {
   bool label_nodes = get_bool_property("FREIA_LABEL_NODES");
   bool show_arcs = get_bool_property("FREIA_LABEL_ARCS");
@@ -267,7 +278,7 @@ static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
   }
 }
 
-static void dagvtx_list_dot(FILE * out, string comment, list l)
+static void dagvtx_list_dot(FILE * out, const string comment, const list l)
 {
   if (comment) fprintf(out, "  // %s\n", comment);
   FOREACH(dagvtx, v, l)
@@ -278,7 +289,7 @@ static void dagvtx_list_dot(FILE * out, string comment, list l)
 
 /* dag debug with dot format.
  */
-void dag_dot(FILE * out, string what, dag d)
+void dag_dot(FILE * out, const string what, const dag d)
 {
   fprintf(out, "digraph \"%s\" {\n", what);
 
@@ -306,7 +317,7 @@ void dag_dot(FILE * out, string what, dag d)
 
 /* generate a "dot" format from a dag to a file.
  */
-void dag_dot_dump(string module, string name, dag d)
+void dag_dot_dump(const string module, const string name, const dag d)
 {
   // build file name
   string src_dir = db_get_directory_name_for_module(module);
@@ -321,8 +332,15 @@ void dag_dot_dump(string module, string name, dag d)
   free(fn);
 }
 
+void dag_dot_dump_prefix(string module, string prefix, int number, dag d)
+{
+  string name = strdup(cat(prefix, itoa(number), NULL));
+  dag_dot_dump(module, name, d);
+  free(name);
+}
+
 // debug help
-static void check_removed(dagvtx v, dagvtx removed)
+static void check_removed(const dagvtx v, const dagvtx removed)
 { pips_assert("not removed vertex", v!=removed); }
 
 static int dagvtx_cmp_entity(const dagvtx * v1, const dagvtx * v2)
@@ -339,7 +357,7 @@ static void vertex_list_sorted_by_entities(list l)
 /* remove vertex v from dag d.
  * if v isx a used computation vertex, it is substituted by an input vertex.
  */
-void dag_remove_vertex(dag d, dagvtx v)
+void dag_remove_vertex(dag d, const dagvtx v)
 {
   pips_assert("vertex is in dag", gen_in_list_p(v, dag_vertices(d)));
 
@@ -384,7 +402,7 @@ dagvtx copy_dagvtx_norec(dagvtx v)
 
 /* returns whether the vertex is an image copy operation.
  */
-static bool dagvtx_is_copy_p(dagvtx v)
+static bool dagvtx_is_copy_p(const dagvtx v)
 {
   vtxcontent c = dagvtx_content(v);
   const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
@@ -393,7 +411,7 @@ static bool dagvtx_is_copy_p(dagvtx v)
 
 /* returns whether the vertex is an image measurement operation.
  */
-static bool dagvtx_is_measurement_p(dagvtx v)
+static bool dagvtx_is_measurement_p(const dagvtx v)
 {
   vtxcontent c = dagvtx_content(v);
   const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
@@ -413,7 +431,7 @@ void dag_append_vertex(dag d, dagvtx nv)
   FOREACH(entity, e, vtxcontent_inputs(dagvtx_content(nv)))
   {
     pips_assert("e is defined", e!=entity_undefined);
-    dagvtx pv = get_producer(d, NULL, e);
+    dagvtx pv = dagvtx_get_producer(d, NULL, e);
     if (!pv)
     {
       // side effect, create an input node of type 0 (not a computation)
@@ -435,7 +453,7 @@ void dag_append_vertex(dag d, dagvtx nv)
 /* return the number of actual operations in dag d.
  * may be zero if only input vertices remain in the dag after optimizations.
  */
-int dag_computation_count(dag d)
+int dag_computation_count(const dag d)
 {
   int count = 0;
   FOREACH(dagvtx, v, dag_vertices(d))
@@ -448,7 +466,7 @@ int dag_computation_count(dag d)
  * the same predecessor appears twice in b = a+a
  * build them in call order!
  */
-list dag_vertex_preds(dag d, dagvtx target)
+list dag_vertex_preds(const dag d, const dagvtx target)
 {
   list inputs = vtxcontent_inputs(dagvtx_content(target));
   int nins = (int) gen_length(inputs);
@@ -528,14 +546,14 @@ switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
   }
 }
 
-static bool same_operation_p(dagvtx v1, dagvtx v2)
+static bool same_operation_p(const dagvtx v1, const dagvtx v2)
 {
   return
     dagvtx_optype(v1) == dagvtx_optype(v2) &&
     dagvtx_opid(v1) == dagvtx_opid(v2);
 }
 
-static bool commutative_operation_p(dagvtx v1, dagvtx v2)
+static bool commutative_operation_p(const dagvtx v1, const dagvtx v2)
 {
   if (dagvtx_optype(v1) == dagvtx_optype(v2))
   {
@@ -546,7 +564,7 @@ static bool commutative_operation_p(dagvtx v1, dagvtx v2)
   else return false;
 }
 
-static bool list_commuted_p(list l1, list l2)
+static bool list_commuted_p(const list l1, const list l2)
 {
   pips_assert("length 2", gen_length(l1)==2 && gen_length(l2)==2);
   return CHUNKP(CAR(CDR(l1)))==CHUNKP(CAR(l2)) &&
@@ -556,11 +574,11 @@ static bool list_commuted_p(list l1, list l2)
 /* "copy" copies "source" image in dag "d".
  * remove it properly.
  */
-static void unlink_copy_vertex(dag d, entity source, dagvtx copy)
+static void unlink_copy_vertex(dag d, const entity source, dagvtx copy)
 {
   entity target = vtxcontent_out(dagvtx_content(copy));
   // may be NULL if source is an input
-  dagvtx prod = get_producer(d, copy, source);
+  dagvtx prod = dagvtx_get_producer(d, copy, source);
 
   // add copy successors as successors of prod
   // it is kept as a successor in case it is not removed
@@ -584,7 +602,7 @@ static void unlink_copy_vertex(dag d, entity source, dagvtx copy)
 
 /* @return whether all vertices in list "lv" are copies.
  */
-static bool all_vertices_are_copies_or_measures_p(list lv)
+static bool all_vertices_are_copies_or_measures_p(const list lv)
 {
   FOREACH(dagvtx, v, lv)
     if (!(dagvtx_is_copy_p(v) || dagvtx_is_measurement_p(v)))
@@ -713,7 +731,7 @@ list /* of statements */ dag_optimize(dag d)
 	  target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
       entity source = ENTITY(CAR(vtxcontent_inputs(c)));
-      dagvtx prod = get_producer(d, w, source);
+      dagvtx prod = dagvtx_get_producer(d, w, source);
 
       if (source==target)
       {
@@ -934,4 +952,219 @@ bool single_image_assignement_p(dag d)
   }
   set_free(outs);
   return true;
+}
+
+/* returns whether there is a scalar RW dependency from any vs to v
+ */
+static bool any_scalar_dep(dagvtx v, set vs)
+{
+  bool dep = false;
+  statement target = dagvtx_statement(v);
+  SET_FOREACH(dagvtx, source, vs)
+  {
+    if (freia_scalar_rw_dep(dagvtx_statement(source), target, NULL))
+    {
+      dep = true;
+      break;
+    }
+  }
+  return dep;
+}
+
+/* check scalar dependency from computed to v.
+ */
+static bool
+all_previous_stats_with_deps_are_computed(dag d, const set computed, dagvtx v)
+{
+  bool okay = true;
+
+  // scan in statement order... does it matter?
+  list lv = gen_nreverse(gen_copy_seq(dag_vertices(d)));
+  FOREACH(dagvtx, pv, lv)
+  {
+    // all previous have been scanned
+    if (pv==v) break;
+    if (freia_scalar_rw_dep(dagvtx_statement(pv), dagvtx_statement(v), NULL) &&
+	!set_belong_p(computed, pv))
+    {
+      okay = false;
+      break;
+    }
+  }
+  gen_free_list(lv);
+  return okay;
+}
+
+/* return the vertices which may be computed from the list of
+ * available images, excluding vertices in exclude.
+ * return a list for determinism.
+ * @param d is the considered full dag
+ * @param computed holds all previously computed vertices
+ * @param currents holds those in the current pipeline
+ * @params maybe holds vertices with live images
+ */
+list /* of dagvtx */ get_computable_vertices
+  (dag d, const set computed, const set maybe, const set currents)
+{
+  list computable = NIL;
+  set local_currents = set_make(set_pointer);
+  set_assign(local_currents, currents);
+
+  // hmmm... should reverse the list to handle implicit dependencies?
+  // where, there is an assert() to check that it does not happen.
+  list lv = gen_nreverse(gen_copy_seq(dag_vertices(d)));
+
+  FOREACH(dagvtx, v, lv)
+  {
+    if (set_belong_p(computed, v))
+      continue;
+
+    if (dagvtx_other_stuff_p(v))
+    {
+      // a vertex with other stuff is assimilated to the pipeline
+      // as soon as its dependences are fullfilled.
+      // I have a problem here... I really need use_defs?
+      if (all_previous_stats_with_deps_are_computed(d, computed, v))
+      {
+	computable = CONS(dagvtx, v, computable);
+	set_add_element(local_currents, local_currents, v);
+      }
+    }
+    else // we have an image computation
+    {
+      list preds = dag_vertex_preds(d, v);
+      pips_debug(9, "%d predecessors to %" _intFMT "\n",
+		 (int) gen_length(preds), dagvtx_number(v));
+
+      if(// no scalar dependencies in the current pipeline
+	 !any_scalar_dep(v, local_currents) &&
+	 // and image dependencies are fulfilled.
+	 list_in_set_p(preds, maybe))
+      {
+	computable = CONS(dagvtx, v, computable);
+	// we do not want deps with other currents considered!
+	set_add_element(local_currents, local_currents, v);
+      }
+
+      gen_free_list(preds), preds = NIL;
+    }
+
+    // update availables: not needed under assert for no img reuse.
+    // if (vtxcontent_out(c)!=entity_undefined)
+    //  set_del_element(avails, avails, vtxcontent_out(c));
+  }
+
+  // cleanup
+  set_free(local_currents);
+  gen_free_list(lv);
+  return computable;
+}
+
+void set_append_vertex_statements(set s, list lv)
+{
+  FOREACH(dagvtx, v, lv)
+  {
+    pstatement ps = vtxcontent_source(dagvtx_content(v));
+    if (pstatement_statement_p(ps))
+      set_add_element(s, s, pstatement_statement(ps));
+  }
+}
+
+/* convert the first n items in list args to entities.
+ */
+static list
+fs_expression_list_to_entity_list(list /* of expression */ args, int nargs)
+{
+  list /* of entity */ lent = NIL;
+  int n=0;
+  FOREACH(expression, ex, args)
+  {
+    syntax s = expression_syntax(ex);
+    pips_assert("is a ref", syntax_reference_p(s));
+    reference r = syntax_reference(s);
+    pips_assert("simple ref", reference_indices(r)==NIL);
+    lent = CONS(entity, reference_variable(r), lent);
+    if (++n==nargs) break;
+  }
+  lent = gen_nreverse(lent);
+  return lent;
+}
+
+/* extract first entity item from list.
+ */
+static entity extract_fist_item(list * lp)
+{
+  list l = gen_list_head(lp, 1);
+  entity e = ENTITY(CAR(l));
+  gen_free_list(l);
+  return e;
+}
+
+/* append statement s to dag d
+ */
+static void dag_append_freia_call(dag d, statement s)
+{
+  pips_debug(5, "adding statement %" _intFMT "\n", statement_number(s));
+
+  call c = freia_statement_to_call(s);
+
+  if (c && entity_freia_api_p(call_function(c)))
+  {
+    entity called = call_function(c);
+    const freia_api_t * api = hwac_freia_api(entity_local_name(called));
+    pips_assert("some api", api!=NULL);
+    list /* of entity */ args =
+      fs_expression_list_to_entity_list(call_arguments(c),
+					api->arg_img_in+api->arg_img_out);
+
+    // extract arguments
+    entity out = entity_undefined;
+    pips_assert("one out image max for an AIPO", api->arg_img_out<=1);
+    if (api->arg_img_out==1)
+      out = extract_fist_item(&args);
+    list ins = gen_list_head(&args, api->arg_img_in);
+    pips_assert("no more arguments", gen_length(args)==0);
+
+    vtxcontent cont =
+      make_vtxcontent(-1, 0, make_pstatement_statement(s), ins, out);
+    set_operation(api, &vtxcontent_optype(cont), &vtxcontent_opid(cont));
+
+    dagvtx nv = make_dagvtx(cont, NIL);
+    dag_append_vertex(d, nv);
+  }
+  else // some other kind of statement that we may keep in the DAG
+  {
+    dagvtx nv =
+      make_dagvtx(make_vtxcontent(spoc_type_oth, 0,
+	  make_pstatement_statement(s), NIL, entity_undefined), NIL);
+    dag_vertices(d) = CONS(dagvtx, nv, dag_vertices(d));
+  }
+}
+
+/* build a full dag from list of statements ls.
+ * @param module
+ * @param list of statements
+ * @param number dag identifier in function
+ * @param added_stat list of statements killed by dag optimization
+ */
+dag build_freia_dag(string module, list ls, int number, list * added_stats)
+{
+  // build full dag
+  dag fulld = make_dag(NIL, NIL, NIL);
+
+  FOREACH(statement, s, ls)
+    dag_append_freia_call(fulld, s);
+  dag_compute_outputs(fulld);
+  ifdebug(3) dag_dump(stderr, "fulld", fulld);
+
+  // dump resulting dag
+  dag_dot_dump_prefix(module, "dag_", number, fulld);
+
+  // remove copies if possible...
+  *added_stats = dag_optimize(fulld);
+
+  // dump final dag
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
+
+  return fulld;
 }

@@ -25,6 +25,7 @@ LIB_CFILES = \
 	hardware_accelerator.c \
 	freia.c \
 	freia_spoc.c \
+	freia_terapix.c \
 	dag-utils.c \
 	freia-utils.c
 
