@@ -83,7 +83,8 @@ digraph "freia_35_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_35
-freia_status freia_35_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t * red0)
+freia_status freia_35_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+  int32_t * po0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -164,7 +165,7 @@ freia_status freia_35_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   freia_cg_read_reduction_results(&redres);
 
   // measure 10 global_min stage 1 side 0
-  *red0 = (int32_t) reduc.measure[1][0].minimum;
+  *po0 = (int32_t) reduc.measure[1][0].minimum;
 
   return ret;
 }

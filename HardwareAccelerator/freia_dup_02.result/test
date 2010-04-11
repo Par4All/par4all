@@ -65,7 +65,8 @@ digraph "freia_dup_02_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_dup_02
-freia_status freia_dup_02_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
+freia_status freia_dup_02_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -88,7 +89,7 @@ freia_status freia_dup_02_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // output image o0 on 0

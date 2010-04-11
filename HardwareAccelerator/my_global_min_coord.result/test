@@ -50,7 +50,10 @@ digraph "my_global_min_coord_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_global_min_coord
-freia_status my_global_min_coord_helper_0_0_0(freia_data2d * i0, int32_t * red0, uint32_t * red1, uint32_t * red2)
+freia_status my_global_min_coord_helper_0_0_0(freia_data2d * i0,
+  int32_t * po0,
+  int32_t * po1,
+  int32_t * po2)
 {
   spoc_instr si;
   spoc_param sp;
@@ -92,9 +95,9 @@ freia_status my_global_min_coord_helper_0_0_0(freia_data2d * i0, int32_t * red0,
   freia_cg_read_reduction_results(&redres);
 
   // measure 5 global_min_coord stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].minimum;
-  *red1 = (uint32_t) reduc.measure[0][0].min_coord_x;
-  *red2 = (uint32_t) reduc.measure[0][0].min_coord_y;
+  *po0 = (int32_t) reduc.measure[0][0].minimum;
+  *po1 = (uint32_t) reduc.measure[0][0].min_coord_x;
+  *po2 = (uint32_t) reduc.measure[0][0].min_coord_y;
 
   return ret;
 }

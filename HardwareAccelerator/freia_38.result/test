@@ -115,7 +115,8 @@ digraph "freia_38_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_38
-freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5)
+freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -138,7 +139,7 @@ freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // i [0 input 1] -> [0 poc 1] 11 dilate_8c
   // nope
@@ -146,7 +147,7 @@ freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[0][1].op = SPOC_POC_DILATE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -158,7 +159,7 @@ freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern2[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
   // 0`d [0 poc 1] -> [1 poc 1] 14 dilate_8c
   si.mux[0][3].op = SPOC_MUX_IN1;
@@ -168,7 +169,7 @@ freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[1][1].op = SPOC_POC_DILATE;
   si.poc[1][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][1].kernel[i] = kern3[i];
+    sp.poc[1][1].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -180,7 +181,7 @@ freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[2][0].op = SPOC_POC_ERODE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern4[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
   // 0`d [1 poc 1] -> [2 poc 1] 17 dilate_8c
   si.mux[1][3].op = SPOC_MUX_IN1;
@@ -190,7 +191,7 @@ freia_status freia_38_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[2][1].op = SPOC_POC_DILATE;
   si.poc[2][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][1].kernel[i] = kern5[i];
+    sp.poc[2][1].kernel[i] = pi0[i];
 
   // 0`e [2 poc 0] -> [2 alu] 19 sub
   // nope
@@ -245,7 +246,7 @@ freia_status freia_38(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_38_helper_0_0_0(o, i, kern, kern, kern, kern, kern, kern);     /*0010*/
+   freia_38_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
    

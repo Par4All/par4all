@@ -142,7 +142,9 @@ digraph "freia_03_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_03
-freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t cst0, int32_t cst1)
+freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  int32_t pi0,
+  int32_t pi1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -163,7 +165,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // nope
   // alu 28 addsat_const stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_ADDSAT_IN1_CONST;
-  sp.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = pi0;
 
 
   // STAGE 1
@@ -173,7 +175,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // nope
   // alu 27 add_const stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
-  sp.alu[1][0].constant = cst1;
+  sp.alu[1][0].constant = pi1;
 
 
   // output image 0`t1 on 0 and image 0`t2 on 1
@@ -214,7 +216,8 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 }
 
 // FREIA-SPoC helper function for module freia_03
-freia_status freia_03_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t cst0)
+freia_status freia_03_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -246,7 +249,7 @@ freia_status freia_03_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_d
   // nope
   // alu 30 mul_const stage 1
   si.alu[1][0].op = SPOC_ALU_MUL_IN0_CONST;
-  sp.alu[1][0].constant = cst0;
+  sp.alu[1][0].constant = pi0;
 
 
   // output image 0`t4 on 0 and image 0`t3 on 1
@@ -287,7 +290,8 @@ freia_status freia_03_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_d
 }
 
 // FREIA-SPoC helper function for module freia_03
-freia_status freia_03_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t cst0)
+freia_status freia_03_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -308,7 +312,7 @@ freia_status freia_03_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_d
   // nope
   // alu 31 div_const stage 0
   si.alu[0][0].op = SPOC_ALU_DIV_IN0_CONST;
-  sp.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = pi0;
 
 
   // STAGE 1
@@ -353,7 +357,8 @@ freia_status freia_03_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_d
 }
 
 // FREIA-SPoC helper function for module freia_03
-freia_status freia_03_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+freia_status freia_03_helper_0_0_3(freia_data2d * o0, freia_data2d * i0,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -372,7 +377,7 @@ freia_status freia_03_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, int32_t
   // STAGE 0
   // alu 33 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
-  sp.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = pi0;
 
 
   // STAGE 1

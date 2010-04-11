@@ -50,7 +50,8 @@ digraph "my_set_constant_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_set_constant
-freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
+freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, ,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -69,7 +70,7 @@ freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
   // STAGE 0
   // alu 4 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
-  sp.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = pi0;
 
 
   // output image o on 0

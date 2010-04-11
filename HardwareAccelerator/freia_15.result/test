@@ -79,7 +79,11 @@ digraph "freia_15_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_15
-freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t * red1, int32_t * red2, int32_t cst3)
+freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+  int32_t * po0,
+  int32_t * po1,
+  int32_t * po2,
+  int32_t pi3)
 {
   spoc_instr si;
   spoc_param sp;
@@ -112,7 +116,7 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // nope
   // alu 8 add_const stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
-  sp.alu[1][0].constant = cst3;
+  sp.alu[1][0].constant = pi3;
 
 
   // output image o on 0
@@ -154,13 +158,13 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   freia_cg_read_reduction_results(&redres);
 
   // measure 9 global_min stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].minimum;
+  *po0 = (int32_t) reduc.measure[0][0].minimum;
 
   // measure 10 global_max stage 0 side 0
-  *red1 = (int32_t) reduc.measure[0][0].maximum;
+  *po1 = (int32_t) reduc.measure[0][0].maximum;
 
   // measure 11 global_vol stage 0 side 0
-  *red2 = (int32_t) reduc.measure[0][0].volume;
+  *po2 = (int32_t) reduc.measure[0][0].volume;
 
   return ret;
 }

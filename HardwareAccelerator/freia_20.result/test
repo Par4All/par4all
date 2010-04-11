@@ -171,7 +171,8 @@ digraph "freia_20_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_20
-freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7)
+freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -194,7 +195,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -206,7 +207,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -218,7 +219,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[2][0].op = SPOC_POC_DILATE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern2[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -230,7 +231,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern3[i];
+    sp.poc[3][0].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -242,7 +243,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[4][0].op = SPOC_POC_ERODE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][0].kernel[i] = kern4[i];
+    sp.poc[4][0].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -254,7 +255,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[5][0].op = SPOC_POC_ERODE;
   si.poc[5][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][0].kernel[i] = kern5[i];
+    sp.poc[5][0].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -266,7 +267,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[6][0].op = SPOC_POC_DILATE;
   si.poc[6][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][0].kernel[i] = kern6[i];
+    sp.poc[6][0].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -278,7 +279,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[7][0].op = SPOC_POC_DILATE;
   si.poc[7][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][0].kernel[i] = kern7[i];
+    sp.poc[7][0].kernel[i] = pi0[i];
 
 
   // output image 0`t7 on 0
@@ -308,7 +309,8 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 }
 
 // FREIA-SPoC helper function for module freia_20
-freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4)
+freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -331,7 +333,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -343,7 +345,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -355,7 +357,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[2][0].op = SPOC_POC_DILATE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern2[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -367,7 +369,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern3[i];
+    sp.poc[3][0].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -379,7 +381,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
   si.poc[4][0].op = SPOC_POC_ERODE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][0].kernel[i] = kern4[i];
+    sp.poc[4][0].kernel[i] = pi0[i];
 
 
   // output image o on 0
@@ -432,9 +434,9 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    freia_data2d *t7 = freia_common_create_data(16, 128, 128);           /*0018*/
    
    // long pipeline that must be cut
-   freia_20_helper_0_0_0(t7, i, k, k, k, k, k, k, k, k);                /*0021*/
+   freia_20_helper_0_0_0(t7, i, k);                                     /*0021*/
    // should cut here
-   freia_20_helper_0_0_1(o, t7, k, k, k, k, k);                         /*0030*/
+   freia_20_helper_0_0_1(o, t7, k);                                     /*0030*/
 
    freia_common_destruct_data(t7);                                      /*0043*/
 

@@ -86,7 +86,11 @@ digraph "freia_skip_05_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_skip_05
-freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t cst0, int32_t inf1, int32_t sup2, bool bin3)
+freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  int32_t pi0,
+  int32_t pi1,
+  int32_t pi2,
+  int32_t pi3)
 {
   spoc_instr si;
   spoc_param sp;
@@ -119,15 +123,15 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   // nope
   // alu 10 xor_const stage 1
   si.alu[1][0].op = SPOC_ALU_XOR_IN0_CONST;
-  sp.alu[1][0].constant = cst0;
+  sp.alu[1][0].constant = pi0;
 
   // 0`t [1 alu] -> [1 threshold 0] 11 threshold
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
   // threshold 11 threshold stage 1 side 0
-  si.th[1][0].op = bin3? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[1][0].boundmin = inf1;
-  sp.th[1][0].boundmax = sup2;
+  si.th[1][0].op = pi3? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[1][0].boundmin = pi1;
+  sp.th[1][0].boundmax = pi2;
 
 
   // output image i on 1 and image o on 0

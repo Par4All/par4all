@@ -77,7 +77,10 @@ digraph "freia_31_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_31
-freia_status freia_31_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2)
+freia_status freia_31_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  int32_t pi0,
+  int32_t pi1,
+  int32_t pi2)
 {
   spoc_instr si;
   spoc_param sp;
@@ -104,9 +107,9 @@ freia_status freia_31_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // i [0 input 1] -> [0 threshold 1] 10 threshold
   si.mux[0][3].op = SPOC_MUX_IN1;
   // threshold 10 threshold stage 0 side 1
-  si.th[0][1].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[0][1].boundmin = inf0;
-  sp.th[0][1].boundmax = sup1;
+  si.th[0][1].op = pi2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][1].boundmin = pi0;
+  sp.th[0][1].boundmax = pi1;
 
 
   // output image o0 on 0 and image o1 on 1

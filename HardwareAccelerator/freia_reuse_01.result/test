@@ -115,7 +115,8 @@ digraph "freia_reuse_01_helper_0_1" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_reuse_01
-freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t *kern0, int32_t *kern1)
+freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -138,7 +139,7 @@ freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, f
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -152,7 +153,7 @@ freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, f
   si.poc[2][0].op = SPOC_POC_ERODE;
   si.poc[2][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern1[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // output image o0 on 1 and image 0`t on 0
@@ -210,7 +211,8 @@ freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, f
 }
 
 // FREIA-SPoC helper function for module freia_reuse_01
-freia_status freia_reuse_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status freia_reuse_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -233,7 +235,7 @@ freia_status freia_reuse_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, f
   si.poc[0][1].op = SPOC_POC_DILATE;
   si.poc[0][1].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern0[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -245,7 +247,7 @@ freia_status freia_reuse_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, f
   si.poc[1][1].op = SPOC_POC_DILATE;
   si.poc[1][1].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][1].kernel[i] = kern1[i];
+    sp.poc[1][1].kernel[i] = pi0[i];
 
   // 0`t [0 input 0] -> [1 alu] 14 sub
   si.mux[0][0].op = SPOC_MUX_IN0;
@@ -302,8 +304,8 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    
    // variable reuse & duplicate operations?
-   freia_reuse_01_helper_0_0_0(o0, t, i, k, k);                         /*0009*/
-   freia_reuse_01_helper_0_1_0(o1, t, i, k, k);                         /*0012*/
+   freia_reuse_01_helper_0_0_0(o0, t, i, k);                            /*0009*/
+   freia_reuse_01_helper_0_1_0(o1, t, i, k);                            /*0012*/
    
    //freia_common_destruct_data(t);
    

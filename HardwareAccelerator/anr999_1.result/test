@@ -337,7 +337,9 @@ digraph "dag_cleaned_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_t * red1)
+freia_status anr999_helper_0_0_0(freia_data2d * i0,
+  int32_t * po0,
+  int32_t * po1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -382,16 +384,17 @@ freia_status anr999_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_t * re
   freia_cg_read_reduction_results(&redres);
 
   // measure 38 global_min stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].minimum;
+  *po0 = (int32_t) reduc.measure[0][0].minimum;
 
   // measure 39 global_vol stage 0 side 0
-  *red1 = (int32_t) reduc.measure[0][0].volume;
+  *po1 = (int32_t) reduc.measure[0][0].volume;
 
   return ret;
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -414,7 +417,7 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`in [0 input 1] -> [0 poc 1] 73 erode_8c
   // nope
@@ -422,7 +425,7 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -459,7 +462,8 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_2(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_2(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -482,7 +486,7 @@ freia_status anr999_helper_0_0_2(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 74 erode_8c
   // nope
@@ -490,7 +494,7 @@ freia_status anr999_helper_0_0_2(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -527,7 +531,8 @@ freia_status anr999_helper_0_0_2(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_3(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_3(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -550,7 +555,7 @@ freia_status anr999_helper_0_0_3(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 75 erode_8c
   // nope
@@ -558,7 +563,7 @@ freia_status anr999_helper_0_0_3(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -595,7 +600,8 @@ freia_status anr999_helper_0_0_3(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_4(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_4(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -618,7 +624,7 @@ freia_status anr999_helper_0_0_4(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 76 erode_8c
   // nope
@@ -626,7 +632,7 @@ freia_status anr999_helper_0_0_4(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -663,7 +669,8 @@ freia_status anr999_helper_0_0_4(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -686,7 +693,7 @@ freia_status anr999_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 77 erode_8c
   // nope
@@ -694,7 +701,7 @@ freia_status anr999_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -731,7 +738,8 @@ freia_status anr999_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_6(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_6(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -754,7 +762,7 @@ freia_status anr999_helper_0_0_6(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 78 erode_8c
   // nope
@@ -762,7 +770,7 @@ freia_status anr999_helper_0_0_6(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -799,7 +807,8 @@ freia_status anr999_helper_0_0_6(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_7(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_7(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -822,7 +831,7 @@ freia_status anr999_helper_0_0_7(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 79 erode_8c
   // nope
@@ -830,7 +839,7 @@ freia_status anr999_helper_0_0_7(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -867,7 +876,8 @@ freia_status anr999_helper_0_0_7(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_8(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_8(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -890,7 +900,7 @@ freia_status anr999_helper_0_0_8(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 80 erode_8c
   // nope
@@ -898,7 +908,7 @@ freia_status anr999_helper_0_0_8(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -935,7 +945,8 @@ freia_status anr999_helper_0_0_8(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_9(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_9(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -958,7 +969,7 @@ freia_status anr999_helper_0_0_9(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 81 erode_8c
   // nope
@@ -966,7 +977,7 @@ freia_status anr999_helper_0_0_9(freia_data2d * o0, freia_data2d * o1, freia_dat
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // output image 0`od on 0 and image 0`og on 1
@@ -1003,7 +1014,8 @@ freia_status anr999_helper_0_0_9(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_10(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1)
+freia_status anr999_helper_0_0_10(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -1026,7 +1038,7 @@ freia_status anr999_helper_0_0_10(freia_data2d * o0, freia_data2d * o1, freia_da
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
   // 0`og [0 input 1] -> [0 poc 1] 82 erode_8c
   // nope
@@ -1034,7 +1046,7 @@ freia_status anr999_helper_0_0_10(freia_data2d * o0, freia_data2d * o1, freia_da
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
   // 0`od [0 poc 0] -> [0 alu] 87 sub
   // nope
@@ -1110,16 +1122,16 @@ int anr999(void)
    
    anr999_helper_0_0_0(in, &measure_min, &measure_vol);                 /*0038*/
 
-   anr999_helper_0_0_1(od, og, in, freia_morpho_kernel_8c, freia_morpho_kernel_8c);    /*0041*/
-   anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0042*/
-   anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0043*/
-   anr999_helper_0_0_4(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0044*/
-   anr999_helper_0_0_5(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0045*/
-   anr999_helper_0_0_6(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0046*/
-   anr999_helper_0_0_7(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0047*/
-   anr999_helper_0_0_8(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0048*/
-   anr999_helper_0_0_9(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);               /*0049*/
-   anr999_helper_0_0_10(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c);              /*0050*/
+   anr999_helper_0_0_1(od, og, in, freia_morpho_kernel_8c);             /*0041*/
+   anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c);         /*0042*/
+   anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c);         /*0043*/
+   anr999_helper_0_0_4(od, og, od, og, freia_morpho_kernel_8c);         /*0044*/
+   anr999_helper_0_0_5(od, og, od, og, freia_morpho_kernel_8c);         /*0045*/
+   anr999_helper_0_0_6(od, og, od, og, freia_morpho_kernel_8c);         /*0046*/
+   anr999_helper_0_0_7(od, og, od, og, freia_morpho_kernel_8c);         /*0047*/
+   anr999_helper_0_0_8(od, og, od, og, freia_morpho_kernel_8c);         /*0048*/
+   anr999_helper_0_0_9(od, og, od, og, freia_morpho_kernel_8c);         /*0049*/
+   anr999_helper_0_0_10(od, og, od, og, freia_morpho_kernel_8c);        /*0050*/
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/

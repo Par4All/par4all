@@ -675,7 +675,8 @@ digraph "license_plate_helper_0_1" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7, int32_t *kern8, int32_t *kern9, int32_t *kern10, int32_t *kern11, int32_t *kern12, int32_t *kern13, int32_t *kern14, int32_t *kern15)
+freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -698,7 +699,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -710,7 +711,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -722,7 +723,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[2][0].op = SPOC_POC_ERODE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern2[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -734,7 +735,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[3][0].op = SPOC_POC_ERODE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern3[i];
+    sp.poc[3][0].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -746,7 +747,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[4][0].op = SPOC_POC_ERODE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][0].kernel[i] = kern4[i];
+    sp.poc[4][0].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -758,7 +759,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[5][0].op = SPOC_POC_ERODE;
   si.poc[5][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][0].kernel[i] = kern5[i];
+    sp.poc[5][0].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -770,7 +771,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[6][0].op = SPOC_POC_ERODE;
   si.poc[6][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][0].kernel[i] = kern6[i];
+    sp.poc[6][0].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -782,7 +783,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[7][0].op = SPOC_POC_ERODE;
   si.poc[7][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][0].kernel[i] = kern7[i];
+    sp.poc[7][0].kernel[i] = pi0[i];
 
 
   // STAGE 0
@@ -792,7 +793,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[0][1].op = SPOC_POC_DILATE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern8[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -804,7 +805,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[1][1].op = SPOC_POC_DILATE;
   si.poc[1][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][1].kernel[i] = kern9[i];
+    sp.poc[1][1].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -816,7 +817,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[2][1].op = SPOC_POC_DILATE;
   si.poc[2][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][1].kernel[i] = kern10[i];
+    sp.poc[2][1].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -828,7 +829,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[3][1].op = SPOC_POC_DILATE;
   si.poc[3][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][1].kernel[i] = kern11[i];
+    sp.poc[3][1].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -840,7 +841,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[4][1].op = SPOC_POC_DILATE;
   si.poc[4][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][1].kernel[i] = kern12[i];
+    sp.poc[4][1].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -852,7 +853,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[5][1].op = SPOC_POC_DILATE;
   si.poc[5][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][1].kernel[i] = kern13[i];
+    sp.poc[5][1].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -864,7 +865,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[6][1].op = SPOC_POC_DILATE;
   si.poc[6][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][1].kernel[i] = kern14[i];
+    sp.poc[6][1].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -876,7 +877,7 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[7][1].op = SPOC_POC_DILATE;
   si.poc[7][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][1].kernel[i] = kern15[i];
+    sp.poc[7][1].kernel[i] = pi0[i];
 
 
   // output image 0`imopen on 0 and image 0`imclose on 1
@@ -913,7 +914,11 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7, int32_t *kern8, int32_t *kern9, int32_t *kern10, int32_t *kern11, int32_t *kern12, int32_t *kern13, int32_t *kern14, int32_t *kern15, int32_t inf16, int32_t sup17, bool bin18)
+freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0,
+  int32_t pi1,
+  int32_t pi2,
+  int32_t pi3)
 {
   spoc_instr si;
   spoc_param sp;
@@ -936,7 +941,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern0[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -948,7 +953,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[1][1].op = SPOC_POC_ERODE;
   si.poc[1][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][1].kernel[i] = kern1[i];
+    sp.poc[1][1].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -960,7 +965,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[2][1].op = SPOC_POC_ERODE;
   si.poc[2][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][1].kernel[i] = kern2[i];
+    sp.poc[2][1].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -972,7 +977,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[3][1].op = SPOC_POC_ERODE;
   si.poc[3][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][1].kernel[i] = kern3[i];
+    sp.poc[3][1].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -984,7 +989,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[4][1].op = SPOC_POC_ERODE;
   si.poc[4][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][1].kernel[i] = kern4[i];
+    sp.poc[4][1].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -996,7 +1001,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[5][1].op = SPOC_POC_ERODE;
   si.poc[5][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][1].kernel[i] = kern5[i];
+    sp.poc[5][1].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -1008,7 +1013,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[6][1].op = SPOC_POC_ERODE;
   si.poc[6][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][1].kernel[i] = kern6[i];
+    sp.poc[6][1].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -1020,7 +1025,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[7][1].op = SPOC_POC_DILATE;
   si.poc[7][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][1].kernel[i] = kern7[i];
+    sp.poc[7][1].kernel[i] = pi0[i];
 
 
   // STAGE 0
@@ -1030,7 +1035,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern8[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -1042,7 +1047,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern9[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -1054,7 +1059,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[2][0].op = SPOC_POC_ERODE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern10[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -1066,7 +1071,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[3][0].op = SPOC_POC_ERODE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern11[i];
+    sp.poc[3][0].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -1078,7 +1083,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[4][0].op = SPOC_POC_ERODE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][0].kernel[i] = kern12[i];
+    sp.poc[4][0].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -1090,7 +1095,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[5][0].op = SPOC_POC_ERODE;
   si.poc[5][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][0].kernel[i] = kern13[i];
+    sp.poc[5][0].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -1102,7 +1107,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[6][0].op = SPOC_POC_ERODE;
   si.poc[6][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][0].kernel[i] = kern14[i];
+    sp.poc[6][0].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -1114,14 +1119,14 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
   si.poc[7][0].op = SPOC_POC_ERODE;
   si.poc[7][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][0].kernel[i] = kern15[i];
+    sp.poc[7][0].kernel[i] = pi0[i];
 
   // 0`imclose [7 poc 0] -> [7 threshold 0] 113 threshold
   si.mux[7][0].op = SPOC_MUX_IN0;
   // threshold 113 threshold stage 7 side 0
-  si.th[7][0].op = bin18? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[7][0].boundmin = inf16;
-  sp.th[7][0].boundmax = sup17;
+  si.th[7][0].op = pi3? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[7][0].boundmin = pi1;
+  sp.th[7][0].boundmax = pi2;
 
 
   // output image 0`imcloseth on 0 and image 0`imopen on 1
@@ -1158,7 +1163,8 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, fr
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7)
+freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -1181,7 +1187,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[0][1].op = SPOC_POC_DILATE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern0[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -1193,7 +1199,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[1][1].op = SPOC_POC_DILATE;
   si.poc[1][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][1].kernel[i] = kern1[i];
+    sp.poc[1][1].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -1205,7 +1211,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[2][1].op = SPOC_POC_DILATE;
   si.poc[2][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][1].kernel[i] = kern2[i];
+    sp.poc[2][1].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -1217,7 +1223,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[3][1].op = SPOC_POC_DILATE;
   si.poc[3][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][1].kernel[i] = kern3[i];
+    sp.poc[3][1].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -1229,7 +1235,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[4][1].op = SPOC_POC_DILATE;
   si.poc[4][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][1].kernel[i] = kern4[i];
+    sp.poc[4][1].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -1241,7 +1247,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[5][1].op = SPOC_POC_DILATE;
   si.poc[5][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][1].kernel[i] = kern5[i];
+    sp.poc[5][1].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -1253,7 +1259,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[6][1].op = SPOC_POC_DILATE;
   si.poc[6][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][1].kernel[i] = kern6[i];
+    sp.poc[6][1].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -1265,7 +1271,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[7][1].op = SPOC_POC_DILATE;
   si.poc[7][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][1].kernel[i] = kern7[i];
+    sp.poc[7][1].kernel[i] = pi0[i];
 
 
   // output image 0`imopen on 1
@@ -1295,7 +1301,12 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, fr
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t inf6, int32_t sup7, bool bin8, int32_t *kern9)
+freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+  const int32_t * pi0,
+  int32_t pi1,
+  int32_t pi2,
+  int32_t pi3,
+  const int32_t * pi4)
 {
   spoc_instr si;
   spoc_param sp;
@@ -1318,7 +1329,7 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[0][1].op = SPOC_POC_DILATE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern0[i];
+    sp.poc[0][1].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -1330,7 +1341,7 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[1][1].op = SPOC_POC_DILATE;
   si.poc[1][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][1].kernel[i] = kern1[i];
+    sp.poc[1][1].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -1342,7 +1353,7 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[2][1].op = SPOC_POC_DILATE;
   si.poc[2][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][1].kernel[i] = kern2[i];
+    sp.poc[2][1].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -1354,7 +1365,7 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[3][1].op = SPOC_POC_DILATE;
   si.poc[3][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][1].kernel[i] = kern3[i];
+    sp.poc[3][1].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -1366,7 +1377,7 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[4][1].op = SPOC_POC_DILATE;
   si.poc[4][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][1].kernel[i] = kern4[i];
+    sp.poc[4][1].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -1378,14 +1389,14 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[5][1].op = SPOC_POC_DILATE;
   si.poc[5][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][1].kernel[i] = kern5[i];
+    sp.poc[5][1].kernel[i] = pi0[i];
 
   // 0`imopen [5 poc 1] -> [5 threshold 1] 112 threshold
   si.mux[5][3].op = SPOC_MUX_IN1;
   // threshold 112 threshold stage 5 side 1
-  si.th[5][1].op = bin8? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[5][1].boundmin = inf6;
-  sp.th[5][1].boundmax = sup7;
+  si.th[5][1].op = pi3? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[5][1].boundmin = pi1;
+  sp.th[5][1].boundmax = pi2;
 
 
   // STAGE 6
@@ -1420,7 +1431,7 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
   si.poc[7][0].op = SPOC_POC_ERODE;
   si.poc[7][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][0].kernel[i] = kern9[i];
+    sp.poc[7][0].kernel[i] = pi4[i];
 
 
   // output image 0`imfilt on 0
@@ -1450,7 +1461,9 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, fr
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7)
+freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0,
+  const int32_t * pi1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -1473,7 +1486,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -1485,7 +1498,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -1497,7 +1510,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[2][0].op = SPOC_POC_ERODE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern2[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -1509,7 +1522,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern3[i];
+    sp.poc[3][0].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -1521,7 +1534,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[4][0].op = SPOC_POC_DILATE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][0].kernel[i] = kern4[i];
+    sp.poc[4][0].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -1533,7 +1546,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[5][0].op = SPOC_POC_DILATE;
   si.poc[5][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][0].kernel[i] = kern5[i];
+    sp.poc[5][0].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -1545,7 +1558,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[6][0].op = SPOC_POC_DILATE;
   si.poc[6][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][0].kernel[i] = kern6[i];
+    sp.poc[6][0].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -1557,7 +1570,7 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
   si.poc[7][0].op = SPOC_POC_ERODE;
   si.poc[7][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][0].kernel[i] = kern7[i];
+    sp.poc[7][0].kernel[i] = pi1[i];
 
 
   // output image 0`imout on 0
@@ -1587,7 +1600,9 @@ freia_status license_plate_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, in
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7)
+freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0,
+  const int32_t * pi1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -1610,7 +1625,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -1622,7 +1637,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -1634,7 +1649,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[2][0].op = SPOC_POC_ERODE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern2[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -1646,7 +1661,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern3[i];
+    sp.poc[3][0].kernel[i] = pi0[i];
 
 
   // STAGE 4
@@ -1658,7 +1673,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[4][0].op = SPOC_POC_DILATE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][0].kernel[i] = kern4[i];
+    sp.poc[4][0].kernel[i] = pi0[i];
 
 
   // STAGE 5
@@ -1670,7 +1685,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[5][0].op = SPOC_POC_DILATE;
   si.poc[5][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[5][0].kernel[i] = kern5[i];
+    sp.poc[5][0].kernel[i] = pi0[i];
 
 
   // STAGE 6
@@ -1682,7 +1697,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[6][0].op = SPOC_POC_DILATE;
   si.poc[6][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[6][0].kernel[i] = kern6[i];
+    sp.poc[6][0].kernel[i] = pi0[i];
 
 
   // STAGE 7
@@ -1694,7 +1709,7 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
   si.poc[7][0].op = SPOC_POC_DILATE;
   si.poc[7][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[7][0].kernel[i] = kern7[i];
+    sp.poc[7][0].kernel[i] = pi1[i];
 
 
   // output image 0`out on 0
@@ -1724,7 +1739,8 @@ freia_status license_plate_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, in
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_6(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1)
+freia_status license_plate_helper_0_0_6(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -1747,7 +1763,7 @@ freia_status license_plate_helper_0_0_6(freia_data2d * o0, freia_data2d * i0, in
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -1759,7 +1775,7 @@ freia_status license_plate_helper_0_0_6(freia_data2d * o0, freia_data2d * i0, in
   si.poc[1][0].op = SPOC_POC_DILATE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // output image 0`out on 0
@@ -1910,7 +1926,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3);  /*0053*/
+   ret_0 = license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3);  /*0053*/
    ret_0 |= 0;                                                          /*0054*/
    ret_0 |= 0;                                                          /*0055*/
    ret_0 |= 0;                                                          /*0056*/
@@ -1918,7 +1934,7 @@ int license_plate(void)
    ret_0 |= 0;                                                          /*0058*/
    ret_0 |= 0;                                                          /*0059*/
    ret_0 |= 0;                                                          /*0060*/
-   ret_0 |= license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, 150, 255, 1);   /*0061*/
+   ret_0 |= license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);   /*0061*/
    ret_0 |= 0;                                                          /*0062*/
    ret_0 |= 0;                                                          /*0063*/
    ret_0 |= 0;                                                          /*0064*/
@@ -1928,7 +1944,7 @@ int license_plate(void)
    i_0 = 15;                                                            /*0068*/
 
    ret_0 |= 0;                                                          /*0070*/
-   ret_0 |= license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3);        /*0071*/
+   ret_0 |= license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);          /*0071*/
    ret_0 |= 0;                                                          /*0072*/
    ret_0 |= 0;                                                          /*0073*/
    ret_0 |= 0;                                                          /*0074*/
@@ -1936,7 +1952,7 @@ int license_plate(void)
    ret_0 |= 0;                                                          /*0076*/
    ret_0 |= 0;                                                          /*0077*/
    ret_0 |= 0;                                                          /*0078*/
-   ret_0 |= license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, 1, 50, 1, kernel3x1);         /*0079*/
+   ret_0 |= license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);    /*0079*/
    ret_0 |= 0;                                                          /*0080*/
    ret_0 |= 0;                                                          /*0081*/
    ret_0 |= 0;                                                          /*0082*/
@@ -1972,7 +1988,7 @@ int license_plate(void)
    
    
    ret_2 = 0;                                                           /*0117*/
-   ret_2 |= license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel3x1, kernel1x3);     /*0118*/
+   ret_2 |= license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);           /*0118*/
    ret_2 |= 0;                                                          /*0119*/
    ret_2 |= 0;                                                          /*0120*/
    i_2 = 4;                                                             /*0121*/
@@ -1986,7 +2002,7 @@ int license_plate(void)
    _return2 = ret_2;                                                    /*0129*/
 
    ret_3 = 0;                                                           /*0131*/
-   ret_3 |= license_plate_helper_0_0_5(out, imout, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, kernel1x3, freia_morpho_kernel_8c);          /*0132*/
+   ret_3 |= license_plate_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);                /*0132*/
    ret_3 |= 0;                                                          /*0133*/
    ret_3 |= 0;                                                          /*0134*/
    i_3 = 4;                                                             /*0135*/
@@ -1999,7 +2015,7 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c, freia_morpho_kernel_8c);              /*0146*/
+   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c);        /*0146*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/

@@ -87,7 +87,8 @@ digraph "freia_reuse_00_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_reuse_00
-freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3)
+freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+  const int32_t * pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -110,7 +111,7 @@ freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, i
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
+    sp.poc[0][0].kernel[i] = pi0[i];
 
 
   // STAGE 1
@@ -122,7 +123,7 @@ freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, i
   si.poc[1][0].op = SPOC_POC_DILATE;
   si.poc[1][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi0[i];
 
 
   // STAGE 2
@@ -134,7 +135,7 @@ freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, i
   si.poc[2][0].op = SPOC_POC_ERODE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[2][0].kernel[i] = kern2[i];
+    sp.poc[2][0].kernel[i] = pi0[i];
 
 
   // STAGE 3
@@ -146,7 +147,7 @@ freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, i
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern3[i];
+    sp.poc[3][0].kernel[i] = pi0[i];
 
 
   // output image o on 0
@@ -191,7 +192,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k, k, k, k);                       /*0012*/
+   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
    
    
    return FREIA_OK;                                                     /*0019*/

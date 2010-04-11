@@ -111,7 +111,8 @@ digraph "freia_skip_06_helper_0_1" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_skip_06
-freia_status freia_skip_06_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t cst0)
+freia_status freia_skip_06_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -144,7 +145,7 @@ freia_status freia_skip_06_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   // nope
   // alu 10 and_const stage 1
   si.alu[1][0].op = SPOC_ALU_AND_IN0_CONST;
-  sp.alu[1][0].constant = cst0;
+  sp.alu[1][0].constant = pi0;
 
 
   // output image i on 0 and image 0`t0 on 1
@@ -204,7 +205,8 @@ freia_status freia_skip_06_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 }
 
 // FREIA-SPoC helper function for module freia_skip_06
-freia_status freia_skip_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t cst0)
+freia_status freia_skip_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -225,7 +227,7 @@ freia_status freia_skip_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, fr
   // nope
   // alu 11 xor_const stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_XOR_IN1_CONST;
-  sp.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = pi0;
 
 
   // STAGE 1

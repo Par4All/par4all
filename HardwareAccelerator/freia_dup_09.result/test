@@ -71,7 +71,8 @@ digraph "freia_dup_09_helper_0_1" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_dup_09
-freia_status freia_dup_09_helper_0_0_0(freia_data2d * i0, int32_t * red0)
+freia_status freia_dup_09_helper_0_0_0(freia_data2d * i0,
+  int32_t * po0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -113,13 +114,14 @@ freia_status freia_dup_09_helper_0_0_0(freia_data2d * i0, int32_t * red0)
   freia_cg_read_reduction_results(&redres);
 
   // measure 6 global_min stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].minimum;
+  *po0 = (int32_t) reduc.measure[0][0].minimum;
 
   return ret;
 }
 
 // FREIA-SPoC helper function for module freia_dup_09
-freia_status freia_dup_09_helper_0_1_0(freia_data2d * i0, int32_t * red0)
+freia_status freia_dup_09_helper_0_1_0(freia_data2d * i0,
+  int32_t * po0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -161,7 +163,7 @@ freia_status freia_dup_09_helper_0_1_0(freia_data2d * i0, int32_t * red0)
   freia_cg_read_reduction_results(&redres);
 
   // measure 7 global_min stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].minimum;
+  *po0 = (int32_t) reduc.measure[0][0].minimum;
 
   return ret;
 }

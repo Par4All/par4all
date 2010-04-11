@@ -60,7 +60,9 @@ digraph "freia_dup_00_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_dup_00
-freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_t * red1)
+freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0,
+  int32_t * po0,
+  int32_t * po1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -105,10 +107,10 @@ freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_
   freia_cg_read_reduction_results(&redres);
 
   // measure 7 global_max stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].maximum;
+  *po0 = (int32_t) reduc.measure[0][0].maximum;
 
   // measure 8 global_max stage 0 side 0
-  *red1 = (int32_t) reduc.measure[0][0].maximum;
+  *po1 = (int32_t) reduc.measure[0][0].maximum;
 
   return ret;
 }

@@ -50,7 +50,8 @@ digraph "my_global_vol_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_global_vol
-freia_status my_global_vol_helper_0_0_0(freia_data2d * i0, int32_t * red0)
+freia_status my_global_vol_helper_0_0_0(freia_data2d * i0,
+  int32_t * po0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -92,7 +93,7 @@ freia_status my_global_vol_helper_0_0_0(freia_data2d * i0, int32_t * red0)
   freia_cg_read_reduction_results(&redres);
 
   // measure 4 global_vol stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].volume;
+  *po0 = (int32_t) reduc.measure[0][0].volume;
 
   return ret;
 }

@@ -213,7 +213,10 @@ digraph "freia_scalar_07_helper_0_4" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_scalar_07
-freia_status freia_scalar_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t *kern1, int32_t * red2)
+freia_status freia_scalar_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+  int32_t * po0,
+  const int32_t * pi1,
+  int32_t * po2)
 {
   spoc_instr si;
   spoc_param sp;
@@ -242,7 +245,7 @@ freia_status freia_scalar_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[1][0].kernel[i] = pi1[i];
 
   // 0`X [1 poc 0] -> [1 measure 0] 21 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
@@ -286,16 +289,21 @@ freia_status freia_scalar_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
   freia_cg_read_reduction_results(&redres);
 
   // measure 17 global_max stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].maximum;
+  *po0 = (int32_t) reduc.measure[0][0].maximum;
 
   // measure 23 global_min stage 1 side 0
-  *red2 = (int32_t) reduc.measure[1][0].minimum;
+  *po2 = (int32_t) reduc.measure[1][0].minimum;
 
   return ret;
 }
 
 // FREIA-SPoC helper function for module freia_scalar_07
-freia_status freia_scalar_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2, int32_t *kern3, int32_t * red4)
+freia_status freia_scalar_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
+  int32_t pi0,
+  int32_t pi1,
+  int32_t pi2,
+  const int32_t * pi3,
+  int32_t * po4)
 {
   spoc_instr si;
   spoc_param sp;
@@ -315,9 +323,9 @@ freia_status freia_scalar_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
   // i [0 input 0] -> [0 threshold 0] 19 threshold
   si.mux[0][0].op = SPOC_MUX_IN0;
   // threshold 19 threshold stage 0 side 0
-  si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[0][0].boundmin = inf0;
-  sp.th[0][0].boundmax = sup1;
+  si.th[0][0].op = pi2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][0].boundmin = pi0;
+  sp.th[0][0].boundmax = pi1;
 
 
   // STAGE 3
@@ -332,7 +340,7 @@ freia_status freia_scalar_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern3[i];
+    sp.poc[3][0].kernel[i] = pi3[i];
 
   // 0`tB [2 poc 0] -> [3 alu] 29 mul
   si.mux[2][1].op = SPOC_MUX_IN0;
@@ -383,13 +391,19 @@ freia_status freia_scalar_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
   freia_cg_read_reduction_results(&redres);
 
   // measure 30 global_vol stage 3 side 0
-  *red4 = (int32_t) reduc.measure[3][0].volume;
+  *po4 = (int32_t) reduc.measure[3][0].volume;
 
   return ret;
 }
 
 // FREIA-SPoC helper function for module freia_scalar_07
-freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2, int32_t inf3, int32_t sup4, bool bin5)
+freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  int32_t pi0,
+  int32_t pi1,
+  int32_t pi2,
+  int32_t pi3,
+  int32_t pi4,
+  int32_t pi5)
 {
   spoc_instr si;
   spoc_param sp;
@@ -409,16 +423,16 @@ freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, 
   // 0`X [0 input 0] -> [0 threshold 0] 32 threshold
   si.mux[0][0].op = SPOC_MUX_IN0;
   // threshold 32 threshold stage 0 side 0
-  si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[0][0].boundmin = inf0;
-  sp.th[0][0].boundmax = sup1;
+  si.th[0][0].op = pi2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][0].boundmin = pi0;
+  sp.th[0][0].boundmax = pi1;
 
   // 0`X [0 input 1] -> [0 threshold 1] 25 threshold
   si.mux[0][3].op = SPOC_MUX_IN1;
   // threshold 25 threshold stage 0 side 1
-  si.th[0][1].op = bin5? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[0][1].boundmin = inf3;
-  sp.th[0][1].boundmax = sup4;
+  si.th[0][1].op = pi5? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][1].boundmin = pi3;
+  sp.th[0][1].boundmax = pi4;
 
 
   // output image 0`tC on 1 and image 0`tD on 0
