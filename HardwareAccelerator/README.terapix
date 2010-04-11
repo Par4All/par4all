@@ -2,3 +2,16 @@
 - le scheduling n'est pas bon, solution avec une image de moins ?
 * license plate
 - borders are too large (82/128 ~ 2/3 lost!), dag should be split in 2 or 3.
+* some coredumps in terapix validation.
+- freia_03.c
+- freia_03_1.c
+- freia_03_2.c
+- freia_03_3.c
+- freia_03_4.c
+- freia_03_5.c
+- freia_03_6.c
+- freia_03_7.c
+- freia_13.c
+- freia_14.c
+- my_set_constant.c
+* add echo at end of default_tpips
