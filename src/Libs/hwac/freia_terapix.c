@@ -87,7 +87,7 @@ static void compute_dead_vertices
   set_free(futured_computed);
 }
 
-/* tell whether the kernel is empty on 4 directions.
+/* tell whether the kernel is used on each of the 4 directions.
  */
 static void erosion_optimization
   (dagvtx v, bool * north, bool * south, bool * west, bool * east)
@@ -109,7 +109,7 @@ static void erosion_optimization
       {
 	list iargs = call_arguments(syntax_call(expression_syntax(ival)));
 	pips_assert("must be a kernel...", gen_length(iargs)==9);
-	// tell whether element is null
+	// tell whether kernel element is NULL
 	bool k00, k10, k20, k01, k11, k21, k02, k12, k22;
 	int i = 0;
 	k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
@@ -777,6 +777,7 @@ static void freia_terapix_call
   }
 
   // tell about imagelet erosion...
+  // current output should be max(w,e) & max(n,s)
   sb_cat(dbio, "\n  // output imagelet erosion:\n");
   sb_cat(dbio, "  //   north: ", itoa(n), "\n");
   sb_cat(dbio, "  //   south: ", itoa(s), "\n");
