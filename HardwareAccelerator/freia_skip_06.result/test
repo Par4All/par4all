@@ -537,4 +537,7 @@ void freia_skip_06(freia_data2d *o, freia_data2d *i)
    // live allocation in an intermediate statement
    freia_skip_06_helper_0_0(i, o, i, 111, 111);                         /*0007*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

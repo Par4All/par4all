@@ -302,4 +302,7 @@ void border_oe(freia_data2d *out, freia_data2d *in)
    const int32_t kernel = {0, 0, 0, 1, 1, 1, 0, 0, 0};                  /*0007*/
    border_oe_helper_0_0(out, in, kernel);                               /*0008*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

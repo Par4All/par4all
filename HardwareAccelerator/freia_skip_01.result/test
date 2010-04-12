@@ -541,4 +541,7 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
    freia_common_destruct_data(t);                                       /*0013*/
    return ret;                                                          /*0014*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

@@ -734,4 +734,7 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
    
    return 0;                                                            /*0029*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

@@ -551,4 +551,7 @@ int anr999_03(void)
 
    return 0;                                                            /*0048*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

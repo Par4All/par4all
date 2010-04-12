@@ -429,4 +429,7 @@ freia_status freia_dup_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, 
    freia_dup_05_helper_0_0(o0, o1, i0, i1);                             /*0009*/
    return FREIA_OK;                                                     /*0011*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

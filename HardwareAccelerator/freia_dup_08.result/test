@@ -281,4 +281,7 @@ int freia_dup_08(freia_data2d *i)
    freia_dup_08_helper_0_0(i, &max1, &max2, &x, &y);                    /*0007*/
    return max1+max2+x+y;                                                /*0009*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

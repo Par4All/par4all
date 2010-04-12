@@ -339,4 +339,7 @@ freia_status freia_ret_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    ret2 |= 0;                                                           /*0009*/
    return ret1|ret2;                                                    /*0011*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

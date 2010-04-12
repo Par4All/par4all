@@ -539,4 +539,7 @@ freia_status freia_scalar_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1
    freia_common_destruct_data(t1);                                      /*0013*/
    return FREIA_OK;                                                     /*0014*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

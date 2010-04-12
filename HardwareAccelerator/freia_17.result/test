@@ -245,4 +245,7 @@ freia_status freia_17(freia_data2d *o, freia_data2d *i)
 
    return FREIA_OK;                                                     /*0037*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

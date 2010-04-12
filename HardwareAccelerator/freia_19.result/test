@@ -139,4 +139,7 @@ freia_status freia_19(freia_data2d *o, freia_data2d *i)
    
    return FREIA_OK;                                                     /*0017*/
 }
+#
+# FREIA COMPILATION DONE
+#
 

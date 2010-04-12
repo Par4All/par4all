@@ -297,4 +297,7 @@ freia_status freia_scalar_01(freia_data2d *o, freia_data2d *i)
    freia_scalar_01_helper_0_0(o, i, thr-10, thr+10, false);             /*0008*/
    return FREIA_OK;                                                     /*0009*/
 }
+#
+# FREIA COMPILATION DONE
+#
 
