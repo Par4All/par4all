@@ -118,3 +118,11 @@ The following modules should be used: caveat.f, condinc.f, inc.f, pc.f
 pcpugh.f, rw.f, rw2.f, tme.f (combinatorial explosion on preconditions),
 tme2.f, tme3.f
 
+
+conv-cpu-rk:
+
+ * the C effects are not precise enough to get a result
+
+while08:
+
+ * the information about i==8 and n==0 is found but not always simplified; it is encoded as 64<=8i+8n<=72 and 8i+7n<=64 and n>=0
