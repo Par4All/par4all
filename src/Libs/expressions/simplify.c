@@ -192,16 +192,34 @@ instruction make_fields_assignment_instruction(entity var,list fields,list new_v
     {
         entity f = ENTITY(CAR(fields));
         fields_update=CONS(STATEMENT,
+                entity_scalar_p(nv) ?
                 make_assign_statement(
                     MakeBinaryCall(
                         entity_intrinsic(type_struct_variable_p(entity_type(var))?FIELD_OPERATOR_NAME:POINT_TO_OPERATOR_NAME),
                         entity_to_expression(var),
                         entity_to_expression(f)
-                        ),/* this makes e.f */
+                        )
+                    ,/* this makes e.f */
                     entity_to_expression(nv)/*this makes udpated value of the fields */
+                    ):
+                instruction_to_statement(
+                    make_call_instruction(
+                        entity_intrinsic(MEMCPY_FUNCTION_NAME),
+                        make_expression_list(
+                            MakeBinaryCall(
+                                entity_intrinsic(type_struct_variable_p(entity_type(var))?FIELD_OPERATOR_NAME:POINT_TO_OPERATOR_NAME),
+                                entity_to_expression(var),
+                                entity_to_expression(f)
+                                ),
+                            entity_to_expression(nv),
+                            make_expression(
+                                make_syntax_sizeofexpression(make_sizeofexpression_expression(entity_to_expression(nv))),
+                                normalized_undefined)
+                            )
+                        )
                     ),
                 fields_update
-                );
+                    );
         POP(fields);
     }
     return make_instruction_sequence(make_sequence(gen_nreverse(fields_update)));
@@ -249,7 +267,7 @@ void do_split_structure_return_hook(entity var,list fields, list new_vars)
 
 
 static
-list do_split_structure(entity e)
+list do_split_structure(entity e,statement s)
 {
     list added = NIL;
     if(entity_variable_p(e) )
@@ -266,10 +284,12 @@ list do_split_structure(entity e)
                 NIL;
             FOREACH(ENTITY,f,fields)
             {
+                expression init = ENDP(inits)?expression_undefined:EXPRESSION(CAR(inits));
                 string new_name = strdup(entity_name(f));
                 for(string found = strchr(new_name,MEMBER_SEP_CHAR);found;found = strchr(new_name,MEMBER_SEP_CHAR))
                     *found='_';
                 entity new = make_entity_copy_with_new_name(f,new_name,false);
+                free(new_name);
                 /* we copied the field storage, that is rom, recompute a ram storage */
                 free_storage(entity_storage(new));
                 entity dyn_area = global_name_to_entity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME); 
@@ -279,20 +299,48 @@ list do_split_structure(entity e)
                                 (basic_overloaded_p(entity_basic(new))?0:add_variable_to_area(dyn_area,new)),
                                 NIL));
                 /* then take car of initial value if any */
-                entity_initial(new)=
-                    make_value_expression(
-                            MakeBinaryCall(
-                                entity_intrinsic(type_struct_variable_p(t)?FIELD_OPERATOR_NAME:POINT_TO_OPERATOR_NAME),
-                                entity_to_expression(e),
-                                entity_to_expression(f)
-                                )
+                if(formal_parameter_p(e))
+                {
+                if(entity_scalar_p(new))
+                    entity_initial(new)=
+                        make_value_expression(
+                                MakeBinaryCall(
+                                    entity_intrinsic(type_struct_variable_p(t)?FIELD_OPERATOR_NAME:POINT_TO_OPERATOR_NAME),
+                                    entity_to_expression(e),
+                                    entity_to_expression(f)
+                                    )
+                                );
+                else
+                    insert_statement(s,
+                            instruction_to_statement(
+                                make_call_instruction(
+                                    entity_intrinsic(MEMCPY_FUNCTION_NAME),
+                                    make_expression_list(
+                                        entity_to_expression(new),
+                                        entity_to_expression(f),
+                                        make_expression(
+                                            make_syntax_sizeofexpression(make_sizeofexpression_expression(entity_to_expression(new))),
+                                            normalized_undefined)
+                                        )
+                                    )
+                                ),
+                            true
                             );
-                free(new_name);
+                }
+                else
+                    entity_initial(new)=expression_undefined_p(init)?
+                        make_value_unknown():
+                        make_value_expression(copy_expression(init));
                 replace_field_by_reference(e,f,new);
                 added=CONS(ENTITY,new,added);
                 if(!ENDP(inits)) POP(inits);
             }
             added=gen_nreverse(added);
+            if(value_expression_p(entity_initial(e)))
+            {
+                free_value(entity_initial(e));
+                entity_initial(e)=make_value_unknown();
+            }
             /* hook: handle returns as a special case */
             do_split_structure_return_hook(e,fields,added);
         }
@@ -309,7 +357,7 @@ void do_split_structures(statement s)
         list added = NIL;
         FOREACH(ENTITY,e,statement_declarations(s))
         {
-            list new = do_split_structure(e);
+            list new = do_split_structure(e,s);
             added=gen_nconc(added,new);
         }
         FOREACH(ENTITY,e,added)
@@ -322,7 +370,7 @@ void do_split_structures(statement s)
 static
 void do_split_structure_parameter(entity e)
 {
-    list added = do_split_structure(e);
+    list added = do_split_structure(e,get_current_module_statement());
     FOREACH(ENTITY,e,added)
         AddEntityToCurrentModule(e);
     gen_free_list(added);

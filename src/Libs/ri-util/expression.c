@@ -279,7 +279,7 @@ expression MakeBinaryCall(entity f, expression eg, expression ed) {
    @param e2 is the second argument expression given to the function to call
    @param e3 is the second argument expression given to the function to call
  */
-expression MakeTernaryCallExpr(entity f,
+expression MakeTernaryCall(entity f,
 			       expression e1,
 			       expression e2,
 			       expression e3) {

@@ -729,8 +729,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
                         )
                     );
 
-            free_instruction(statement_instruction(sl));
-            statement_instruction(sl)=make_instruction_sequence(seq);
+            update_statement_instruction(sl,make_instruction_sequence(seq));
 
             /* save change for futher processing */
             hash_put(p->ht,loop_bound,nb_iter);
@@ -878,6 +877,23 @@ bool terapixify(__attribute__((unused)) char * module_name)
     return true; /* everything is done in pipsmake-rc */
 }
 
+typedef enum {
+    NO_CONVERSION,
+    ARRAY_1D,
+    POINTER
+}array_to_pointer_conversion_mode ;
+
+static
+array_to_pointer_conversion_mode get_array_to_pointer_conversion_mode()
+{
+    string mode = get_string_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS");
+    if(!mode || empty_string_p(mode)) return NO_CONVERSION;
+    else if(same_string_p(mode,"1D")) return ARRAY_1D;
+    else if(same_string_p(mode,"POINTER")) return POINTER;
+    else pips_user_error("bad value %s for property ARRAY_TO_POINTER_CONVERT_PARAMETERS\n",mode);
+}
+
+
 /**
  * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
  *
@@ -901,8 +917,9 @@ bool expression_array_to_pointer(expression exp, bool in_init)
              * we are allowded to convert formal parameters such as int a[n][12] into int *a
              */
             bool force_cast = true;
-            if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") && ! get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY")
-                    && formal_parameter_p(reference_variable(ref)) )
+            if( get_array_to_pointer_conversion_mode()==POINTER && 
+                    ! get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY") &&
+                    formal_parameter_p(reference_variable(ref)) )
             {
                 force_cast=false;
             }
@@ -1071,17 +1088,49 @@ static
 void make_pointer_from_variable(variable param)
 {
     list parameter_dimensions = variable_dimensions(param);
-    if(!ENDP(parameter_dimensions))
+    switch(get_array_to_pointer_conversion_mode())
     {
-        gen_full_free_list(parameter_dimensions);
-        variable_dimensions(param)=NIL;
-        basic parameter_basic = variable_basic(param);
-        basic new_parameter_basic = make_basic_pointer(
-                make_type_variable(
-                    make_variable(parameter_basic,NIL,NIL)
-                    )
-                );
-        variable_basic(param)=new_parameter_basic;
+        case NO_CONVERSION:return;
+        case ARRAY_1D:
+            if(gen_length(parameter_dimensions) > 1)
+            {
+                list iter = parameter_dimensions;
+                expression full_length = expression_undefined;
+                {
+                    dimension d = DIMENSION(CAR(iter));
+                    full_length = SizeOfDimension(d);
+                    POP(iter);
+                }
+                FOREACH(DIMENSION,d,iter)
+                {
+                    full_length=make_op_exp(
+                            MULTIPLY_OPERATOR_NAME,
+                            SizeOfDimension(d),
+                            full_length);
+                }
+                gen_full_free_list(parameter_dimensions);
+                variable_dimensions(param)=
+                    CONS(DIMENSION,
+                            make_dimension(
+                                int_to_expression(0),
+                                make_op_exp(MINUS_OPERATOR_NAME,full_length,int_to_expression(1))
+                                ),
+                            NIL);
+            } break;
+        case POINTER:
+            if(!ENDP(parameter_dimensions))
+            {
+                gen_full_free_list(parameter_dimensions);
+                variable_dimensions(param)=NIL;
+                basic parameter_basic = variable_basic(param);
+                basic new_parameter_basic = make_basic_pointer(
+                        make_type_variable(
+                            make_variable(parameter_basic,NIL,NIL)
+                            )
+                        );
+                variable_basic(param)=new_parameter_basic;
+            } break;
+
     }
 }
 static
@@ -1138,10 +1187,9 @@ bool array_to_pointer(char *module_name)
         /* now fix array declarations : one dimension for every one ! */
         gen_recurse(get_current_module_statement(),statement_domain,gen_true,reduce_array_declaration_dimension);
 
-        /* if this property is set, we also change the signature of the module
+        /* eventually change the signature of the module
          * tricky : signature must be changed in two places !
          */
-        if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") )
         {
             FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
             {
@@ -1217,6 +1265,135 @@ generate_two_addresses_code(char *module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     return true;
+}
+#if 0
+
+static
+void iterator_detection_walker(reference r)
+{
+    if(!ENDP(reference_indices(r)))
+    {
+        /* we only handle simple references, in the form a[index0][index1] */
+
+        /* retreive enclosing loop statements */
+        list loops = NIL;
+        set loop_indices = set_make(set_pointer);
+        hash_table loop_to_expression = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+        loop l = (loop)gen_get_ancestor(loop_domain,r);
+        while(l && l!=HASH_UNDEFINED_VALUE)
+        {
+            loops=CONS(STATEMENT,gen_get_ancestor(statement_domain,l),loops);
+            set_add_element(loop_indices,loop_indices,loop_index(l));
+            l= (loop)gen_get_ancestor(loop_domain,l);
+        }
+        /* check indices dependencies and build the list of relevant loop statements*/
+        reference pointer_ref = make_reference(reference_variable(r),NIL);
+        FOREACH(EXPRESSION,exp,reference_indices(r))
+        {
+            set ref_entities = get_referenced_entities(exp);
+            set ref_indices = set_make(set_pointer);
+            ref_indices=set_intersection(ref_indices,ref_entities,loop_indices);
+            /* unnormalized case :'( */
+            if(set_size(ref_indices)!=1) return;
+
+            list tmp = set_to_list(ref_indices);
+            entity index = ENTITY(CAR(tmp));
+            gen_free_list(tmp);
+            set_free(ref_entities);
+            set_free(ref_indices);
+
+            FOREACH(STATEMENT,st,loops)
+            {
+                list effects = load_cumulated_rw_effects_list(st);
+                bool moveto = true;
+                FOREACH(EFFECT,eff,effects)
+                {
+                    if(effect_write_p(eff) &&
+                            entity_conflict_p(index,reference_variable(effect_any_reference(eff))))
+                    {
+                        moveto=false;
+                        break;
+                    }
+                    else if(effect_write_p(eff) &&
+                            reference_equal_p(effect_any_reference(eff),pointer_ref))
+                    {
+                        moveto=false;
+                        break;
+                    }
+                }
+                /* we can insert an iterator right before this statement, store this */
+                if(moveto)
+                {
+                    hash_put(loop_to_expression,st,exp);
+                    break;
+                }
+
+            }
+        }
+        /* if we found all relevant statements, we are ready to go */
+        if(hash_table_entry_count(loop_to_expression)==gen_length(reference_indices(r))-1)
+        {
+            /* iterator declaration */
+            type pointer_type = make_type_variable(
+                    make_variable(basic_of_reference(r),NIL,NIL)
+                    );
+            entity iterator = make_new_scalar_variable_with_prefix("iterator",
+                    get_current_module_entity(),
+                    make_basic_pointer(pointer_type));
+            AddEntityToCurrentModule(iterator);
+
+            /* find the init insertion point */
+            FOREACH(STATEMENT,l,loops)
+                if(hash_get(loop_to_expression,l)!=HASH_UNDEFINED_VALUE)
+                {
+                    expression exp = (expression)hash_get(loop_to_expression,st);
+                    if(exp != HASH_UNDEFINED_VALUE)
+                    {
+                        insert_statement(l,
+                                make_assign_statement(entity_to_expression(iterator),
+                                    MakeBinaryCall(entity_intrinsic(PLUS_C_OPERATOR_NAME),
+                                        entity_to_expression(reference_variable(r),
+                                            ))),
+                                true);
+                        break;
+                    }
+                }
+
+            /* iterator init */
+            int nb_insertion_left = gen_length(reference_indices(r));
+            FOREACH(STATEMENT,st,loops)
+            {
+                if(exp != HASH_UNDEFINED_VALUE)
+                {
+                    insert_statement(st,instruction_to_statement(make_instruction_expression(copy_expression(exp))),true);
+                }
+            }
+
+        }
+        gen_free_list(loops);
+        free_reference(pointer_ref);
+    }
     return true;
 }
 
+bool
+iterator_detection(const string module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), TRUE));
+
+    gen_recurse(get_current_module_statement(),reference_domain,iterator_detection_walker,gen_null);
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+    return true;
+}
+#endif
