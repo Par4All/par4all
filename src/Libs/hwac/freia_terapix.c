@@ -419,10 +419,11 @@ static void terapix_gram_management
 	gram_param(code, decl, name, v, hparams, 1, 1, used);
       break;
     default:
-      pips_internal_error("unexpected number of input arguments");
+      pips_internal_error("unexpected number of input image arguments");
     }
   }
 
+  // is it always [xy]min3?
   terapix_mcu_pval(code, op, "xmin3", "x_", name);
   terapix_mcu_pval(code, op, "ymin3", "y_", name);
 }
@@ -460,9 +461,14 @@ static void terapix_macro_code
     terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   case 0:
+    pips_assert("no input, one output image", out);
+    // const image generation... NSP
+    terapix_mcu_int(code, op, "xmin???", IMG_PTR, out);
+    terapix_mcu_int(code, op, "ymin???", "", 0);
+    terapix_gram_management(code, decl, op, api, v, hparams, used);
+    break;
   default:
-    // could be const image generation...
-    pips_internal_error("not implemented yet");
+    pips_internal_error("unexpected number of input images");
   }
   terapix_mcu_val(code, op, "iter1", "TERAPIX_PE_NUMBER");
   terapix_mcu_val(code, op, "iter2", "imagelet_size");
@@ -575,6 +581,7 @@ static void freia_terapix_call
   hash_table allocation = hash_table_make(hash_pointer, 0);
   set computed = set_make(set_pointer);
 
+  // the GRAM initialization may be shared between helper calls?
   bool * used = terapix_gram_init();
 
   if (n_ins)
