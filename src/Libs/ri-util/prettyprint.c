@@ -2162,8 +2162,11 @@ text_block(entity module,
   if (get_bool_property("PRETTYPRINT_ALL_C_BLOCKS")) {
     /* Since we generate new { }, we increment the margin for the nested
        statements: */
+    margin -= INDENTATION;
+    if (margin < 0)
+      margin = 0;
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "{{"));
     margin += INDENTATION;
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "{"));
   }
 
   // Append local variables if any:
@@ -2183,7 +2186,8 @@ text_block(entity module,
   if (get_bool_property("PRETTYPRINT_ALL_C_BLOCKS")) {
     /* Get back to previous indentation: */
     margin -= INDENTATION;
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "}"));
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "}}"));
+    margin += INDENTATION;
   }
 
   // Print the end block marker(s) if needed:
