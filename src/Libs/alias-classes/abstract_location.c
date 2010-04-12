@@ -112,13 +112,15 @@ reference malloc_to_abstract_location(reference lhs,
   */
   else if(strcmp(opt, "flow-sensitive")==0
 	  || strcmp(opt, "context-sensitive")==0 ){
-    string s = asprintf(&s, "%s%s%s%s%d",
-			get_current_module_name(),
-			MODULE_SEP,
-			HEAP_AREA_LOCAL_NAME,
-			"_l_",
-			stmt_number);
-    e = find_or_create_entity(s);
+	  string m = i2a(stmt_number);
+	  string s = strdup(concatenate(get_current_module_name(),
+									MODULE_SEP_STRING,
+									HEAP_AREA_LOCAL_NAME,
+									"_l_",
+									m,
+									NULL));
+
+	  e = find_or_create_entity(s);
     if(type_undefined_p(entity_type(e))) {
       entity f = get_current_module_entity();
       entity a = module_to_heap_area(f);
@@ -126,11 +128,13 @@ reference malloc_to_abstract_location(reference lhs,
 
       /* FI: Beware, the symbol table is updated but this is not
 	 reflected in pipsmake.rc */
+	  entity_type(e) = var_t;
+	  entity_storage(e) = make_storage_ram(r);
+	  entity_initial(e) = make_value_unknown();
       (void) add_C_variable_to_area(a, e);
-      entity_type(e) = var_t;
-      entity_storage(e) = make_storage_ram(r);
-      entity_initial(e) = make_value_unknown();
-    }
+      
+      
+	}
     else {
       /* We might be in trouble, unless a piece of code is
 	 reanalyzed. Let's assume the type is unchanged */
