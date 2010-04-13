@@ -57,3 +57,16 @@
 * bugs
 + allocs may be in the middle of the calls
 - reuse of images in some cases
+
+* terapix
++ must manage memory allocation in tiles
++ memory for measures?
++ I/O tiles : read before write
++ double buffering with additionnal tiles max(in-tiles,out-tiles)
++ in place operators
++ shadow 4-way declaration
++ handling of various parameters...
++ detect that an argument is used several times...
+- sequence extraction shouldn't include
+  functions not implemented for the target?
+- use global max length/ops/critical path as a decision driver?

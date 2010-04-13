@@ -1033,7 +1033,7 @@ expression:
 			}
 |   expression TK_QUEST opt_expression TK_COLON expression
 			{
-			  $$ = MakeTernaryCallExpr(CreateIntrinsic(CONDITIONAL_OPERATOR_NAME), $1, $3, $5);
+			  $$ = MakeTernaryCall(CreateIntrinsic(CONDITIONAL_OPERATOR_NAME), $1, $3, $5);
 			}
 |   expression TK_PLUS expression
 			{

@@ -75,28 +75,29 @@ transformer effects_to_transformer(list e) /* list of effects */
   Pbase b = VECTEUR_NUL;
   Psysteme s = sc_new();
 
-  MAP(EFFECT, ef, 
-  {
+  FOREACH(EFFECT, ef, e) {
     reference r = effect_any_reference(ef);
     action a = effect_action(ef);
     entity v = reference_variable(r);
-    
-    if(action_write_p(a) && entity_has_values_p(v)) 
+
+    /* The check on static should be useless because already taken
+       into account when effects are computed. And it is harmful here
+       since most effects on static variables cannot be ignored. */
+    if(action_write_p(a) && entity_has_values_p(v) /*&& !variable_static_p(v)*/)
     {
       entity new_val = entity_to_new_value(v);
       args = arguments_add_entity(args, new_val);
       b = vect_add_variable(b, (Variable) new_val);
     }
-  },
-      e);
-  
+  }
+
   s->base = b;
   s->dimension = vect_size(b);
 
   return make_transformer(args, make_predicate(s));
 }
 
-transformer filter_transformer(transformer t, list e) 
+transformer filter_transformer(transformer t, list e)
 {
   /* algorithm: keep only information about scalar variables with values
    * appearing in effects e and store it into a newly allocated transformer
@@ -144,6 +145,8 @@ transformer filter_transformer(transformer t, list e)
  * clean.  BC, oct. 94
  */
 
+/* Note: initializations of static variables are not used as
+   transformers but to initialize the program precondition. */
 /* It is assumed that entity_has_values_p(v)==TRUE */
 transformer declaration_to_transformer(entity v, transformer pre)
 {
@@ -218,7 +221,11 @@ transformer declaration_to_transformer(entity v, transformer pre)
 }
 
 /* For C declarations. Very close to a block_to_transformer() as
-   declarations can be seen as a sequence of assignments */
+   declarations can be seen as a sequence of assignments.
+
+   Note: initialization of static variables are not taken into
+   account. They must be used for summary preconditions.
+ */
 transformer declarations_to_transformer(list dl, transformer pre)
 {
   entity v = entity_undefined;
@@ -292,10 +299,10 @@ static transformer block_to_transformer(list b, transformer pre)
       post = transformer_safe_normalize(post, 4);
       btf = transformer_combine(btf, stf);
       btf = transformer_normalize(btf, 4);
-      ifdebug(1) 
-	pips_assert("btf is a consistent transformer", 
+      ifdebug(1)
+	pips_assert("btf is a consistent transformer",
 		    transformer_consistency_p(btf));
-	pips_assert("post is a consistent transformer if pre is defined", 
+	pips_assert("post is a consistent transformer if pre is defined",
 		    transformer_undefined_p(pre)
 		    || transformer_consistency_p(post));
     }

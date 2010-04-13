@@ -31,6 +31,10 @@ pips_c2openmp:pips_c2openmp.in
 pips_f2openmp:pips_f2openmp.in
 	sed -e 's,@datadir@,$${INSTALL_DIR:-$$PIPS_ROOT}/share,g' $< > $@
 
+clean: local-clean
+local-clean:
+	$(RM) $(SCRIPTS)
+
 # common stuff
 ROOT    = ../../..
 #PROJECT = pips

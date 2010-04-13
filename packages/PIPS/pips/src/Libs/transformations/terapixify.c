@@ -525,6 +525,375 @@ bool kernel_load_store(char *module_name) {
 }
 
 
+
+/**
+ * isolate_statement
+ */
+
+typedef struct {
+    entity old;
+    entity new;
+    list offsets;
+} isolate_param;
+
+/** 
+ * replace reference @p r on entity @p p->old  by a reference on entity @p p->new with offsets @p p->offsets
+ */
+static void isolate_patch_reference(reference r, isolate_param * p)
+{
+    if(same_entity_p(reference_variable(r),p->old))
+    {
+        reference_variable(r)=p->new;
+        list offsets = p->offsets;
+        FOREACH(EXPRESSION,index,reference_indices(r))
+        {
+            expression offset = EXPRESSION(CAR(offsets));
+            unnormalize_expression(index);
+            expression_syntax(index)=
+                make_syntax_call(
+                        make_call(
+                            entity_intrinsic(MINUS_OPERATOR_NAME),
+                            make_expression_list(
+                                copy_expression(index),
+                                copy_expression(offset)
+                                )
+                            )
+                        );
+            NORMALIZE_EXPRESSION(index);
+        }
+    }
+}
+
+static void isolate_patch_entities(void * ,entity , entity ,list );
+/** 
+ * run isolate_patch_entities on all declared entities from @p s
+ */
+static void isolate_patch_statement(statement s, isolate_param *p)
+{
+    FOREACH(ENTITY,e,statement_declarations(s))
+    {
+        if(!value_undefined_p(entity_initial(e)))
+            isolate_patch_entities(entity_initial(e),p->old,p->new,p->offsets);
+    }
+}
+
+/** 
+ * replace all references on entity @p old by references on entity @p new and adds offset @p offsets to its indices
+ */
+static void isolate_patch_entities(void * where,entity old, entity new,list offsets)
+{
+    isolate_param p = { old,new,offsets };
+    gen_context_multi_recurse(where,&p,
+            reference_domain,gen_true,isolate_patch_reference,
+            statement_domain,gen_true,isolate_patch_statement,
+            0);
+}
+
+/** 
+ * generate a list of dimensions @p dims and of offsets @p from a region @p r
+ * for example if r = a[phi0,phi1] 0<=phi0<=2 and 1<=phi1<=4
+ * we get dims = ( (0,3), (0,4) )
+ * and offsets = ( 0 , 1 )
+ * 
+ * @return false if we were enable to gather enough informations
+ */
+static bool region_to_minimal_dimensions(region r, list * dims, list *offsets)
+{
+    pips_assert("empty parameters\n",ENDP(*dims)&&ENDP(*offsets));
+    reference ref = region_any_reference(r);
+    Psysteme sc = sc_dup(region_system(r));
+    sc_transform_eg_in_ineg(sc);
+    FOREACH(EXPRESSION,index,reference_indices(ref))
+    {
+        Variable phi = expression_to_entity(index);
+        Pcontrainte lower,upper;
+        constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
+        if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
+        {
+            /* this is a constant : the dimension is 1 and the offset is the bound */
+            if(bounds_equal_p(phi,lower,upper))
+            {
+                expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(1)),*dims);
+                *offsets=CONS(EXPRESSION,bound,*offsets);
+            }
+            /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
+            else
+            {
+                expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                *dims=CONS(DIMENSION,
+                        make_dimension(
+                            int_to_expression(0),
+                            make_op_exp(MINUS_OPERATOR_NAME,eupper,elower)
+                            ),*dims);
+                *offsets=CONS(EXPRESSION,copy_expression(elower),*offsets);
+            }
+        }
+        else {
+            pips_user_warning("failed to analyse region");
+            return false;
+        }
+    }
+    *dims=gen_nreverse(*dims);
+    *offsets=gen_nreverse(*offsets);
+    return true;
+}
+
+/** 
+ * 
+ * @return region from @p regions on entity @p e
+ */
+static region find_region_on_entity(entity e,list regions)
+{
+    FOREACH(REGION,r,regions)
+        if(same_entity_p(e,reference_variable(region_any_reference(r)))) return r;
+    return region_undefined;
+}
+
+/** 
+ * @return list of expressions so that for all i, out(i) = global(i)+local(i)
+ */
+static list isolate_merge_offsets(list global, list local)
+{
+    list out = NIL;
+    FOREACH(EXPRESSION,gexp,global)
+    {
+        expression lexp = EXPRESSION(CAR(local));
+        out=CONS(EXPRESSION,make_op_exp(PLUS_OPERATOR_NAME,copy_expression(gexp),copy_expression(lexp)),out);
+        POP(local);
+    }
+    return gen_nreverse(out);
+}
+
+/** 
+ * @return a range suitable for iteration over all the elements of dimension @p d
+ */
+static range dimension_to_range(dimension d)
+{
+    return make_range(
+            copy_expression(dimension_lower(d)),
+            copy_expression(dimension_upper(d)),
+            int_to_expression(1));
+}
+
+/** 
+ * @return a list of @p nb new integer entities 
+ */
+static list isolate_generate_indices(size_t nb)
+{
+    list indices = NIL;
+    while(nb--)
+    {
+        entity e = make_new_scalar_variable_with_prefix("i",get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+        AddEntityToCurrentModule(e);
+        indices=CONS(ENTITY,e,indices);
+    }
+    return indices;
+}
+
+/** 
+ * @return a list of expressions, one for each entity in @p indices
+ */
+static list isolate_indices_to_expressions(list indices)
+{
+    list expressions=NIL;
+    FOREACH(ENTITY,e,indices)
+        expressions=CONS(EXPRESSION,entity_to_expression(e),expressions);
+    return gen_nreverse(expressions);
+}
+
+typedef enum {
+    transfer_in,
+    transfer_out
+} isolate_transfer;
+#define transfer_in_p(e) ( (e) == transfer_in )
+#define transfer_out_p(e) ( (e) == transfer_out )
+
+/** 
+ * 
+ * @return a statement holding the loops necessary to initialize @p new from @p old,
+ * knowing the dimension of the isolated entity @p dimensions and its offsets @p offsets and the direction of the transfer @p t
+ */
+static statement isolate_make_array_transfer(entity old,entity new, list dimensions, list offsets,isolate_transfer t)
+{
+    /* first create the assignment : we need a list of indices */
+    list index_entities = isolate_generate_indices(gen_length(dimensions));
+    list index_expressions = isolate_indices_to_expressions(index_entities);
+    list index_expressions_with_offset = 
+        isolate_merge_offsets(index_expressions,offsets);
+
+
+    statement body = make_assign_statement(
+            reference_to_expression(
+                make_reference(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset)
+                ),
+            reference_to_expression(
+                make_reference(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions)
+                )
+            );
+
+    FOREACH(DIMENSION,d,dimensions)
+    {
+        expression offset = EXPRESSION(CAR(offsets));
+        entity index = ENTITY(CAR(index_entities));
+        body = instruction_to_statement(
+                make_instruction_loop(
+                    make_loop(
+                        index,
+                        dimension_to_range(d),
+                        body,
+                        entity_empty_label(),
+                        make_execution_sequential(),
+                        NIL
+                        )
+                    )
+                );
+        POP(offsets);
+        POP(index_entities);
+    }
+    /* add a nice comment */
+    asprintf(&statement_comments(body),"/* transfer loop generated by PIPS from %s to %s */",entity_user_name(old),entity_user_name(new));
+    return body;
+}
+
+/** 
+ * isolate statement @p s from the outer memory, generating appropriate local array copy and copy code
+ */
+static void do_isolate_statement(statement s)
+{
+    list regions = load_cumulated_rw_effects_list(s);
+
+    list read_regions = regions_read_regions(regions);
+    list write_regions = regions_write_regions(regions);
+
+    statement prelude=make_empty_block_statement(),postlude=make_empty_block_statement();
+    set visited_entities = set_make(set_pointer);
+
+    FOREACH(REGION,reg,regions)
+    {
+        reference r = region_any_reference(reg);
+        entity e = reference_variable(r);
+        /* check we have not already dealt with this variable */
+        if(!set_belong_p(visited_entities,e))
+        {
+            set_add_element(visited_entities,visited_entities,e);
+            /* get the associated read and write regions, used for copy-in and copy-out
+             * later on, in and out regions may be used instead
+             * */
+            region read_region = find_region_on_entity(e,read_regions);
+            region write_region = find_region_on_entity(e,write_regions);
+
+            /* compute their convex hull : that's what we need to allocate
+             * in that case, the read and write regions must be used
+             * */
+            region rw_region = 
+                region_undefined_p(read_region)?write_region:
+                region_undefined_p(write_region)?read_region:
+                regions_must_convex_hull(read_region,write_region);
+
+            /* based on the rw_region, we can allocate a new entity with proper dimensions
+             */
+            list offsets = NIL,dimensions=NIL;
+            if(region_to_minimal_dimensions(rw_region,&dimensions,&offsets))
+            {
+                /* a scalar */
+                if(ENDP(dimensions))
+                {
+                }
+                /* an array */
+                else
+                {
+                    /* create the new entity */
+                    entity new = make_new_array_variable_with_prefix(entity_local_name(e),get_current_module_entity(),copy_basic(entity_basic(e)),dimensions);
+                    AddLocalEntityToDeclarations(new,get_current_module_entity(),s);
+
+                    /* replace it everywhere, and patch references*/
+                    isolate_patch_entities(s,e,new,offsets);
+
+                    /* generate the copy - in from read region */
+                    if(!region_undefined_p(read_region))
+                    {
+                        list read_dimensions=NIL,read_offsets=NIL;
+                        if(region_to_minimal_dimensions(read_region,&read_dimensions,&read_offsets))
+                        {
+                            insert_statement(prelude,isolate_make_array_transfer(e,new,read_dimensions,read_offsets,transfer_in),true);
+                        }
+                        else
+                        {
+                            pips_user_warning("failed to recover information from read region\n");
+                            return false;
+                        }
+                    }
+                    /* and the copy-out from write region */
+                    if(!region_undefined_p(write_region))
+                    {
+                        list write_dimensions=NIL,write_offsets=NIL;
+                        if(region_to_minimal_dimensions(write_region,&write_dimensions,&write_offsets))
+                        {
+                            insert_statement(postlude,isolate_make_array_transfer(new,e,write_dimensions,write_offsets,transfer_out),false);
+                        }
+                        else
+                        {
+                            pips_user_warning("failed to recover information from write region\n");
+                            return false;
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                pips_user_warning("failed to convert regions to minimal array dimensions, using whole array instead\n");
+                return false;
+            }
+
+        }
+
+    }
+    insert_statement(s,prelude,true);
+    insert_statement(s,postlude,false);
+
+
+
+
+    set_free(visited_entities);
+    gen_free_list(read_regions);
+    gen_free_list(write_regions);
+}
+
+bool
+isolate_statement(string module_name)
+{
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
+
+    string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
+    entity stmt_label_entity = find_label_entity(module_name,stmt_label);
+    if(entity_undefined_p(stmt_label_entity))
+        pips_user_error("label %s not found\n", stmt_label);
+    list statements_to_isolate = find_statements_with_label(get_current_module_statement(),stmt_label_entity);
+    statement statement_to_isolate = STATEMENT(CAR(statements_to_isolate));
+    gen_free_list(statements_to_isolate);
+    do_isolate_statement(statement_to_isolate);
+
+
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+    return true;
+}
+
+/**
+ * terapixify
+ */
+
 static
 bool cannot_terapixify(gen_chunk * elem, bool *can_terapixify)
 {
@@ -729,8 +1098,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
                         )
                     );
 
-            free_instruction(statement_instruction(sl));
-            statement_instruction(sl)=make_instruction_sequence(seq);
+            update_statement_instruction(sl,make_instruction_sequence(seq));
 
             /* save change for futher processing */
             hash_put(p->ht,loop_bound,nb_iter);
@@ -878,6 +1246,23 @@ bool terapixify(__attribute__((unused)) char * module_name)
     return true; /* everything is done in pipsmake-rc */
 }
 
+typedef enum {
+    NO_CONVERSION,
+    ARRAY_1D,
+    POINTER
+}array_to_pointer_conversion_mode ;
+
+static
+array_to_pointer_conversion_mode get_array_to_pointer_conversion_mode()
+{
+    string mode = get_string_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS");
+    if(!mode || empty_string_p(mode)) return NO_CONVERSION;
+    else if(same_string_p(mode,"1D")) return ARRAY_1D;
+    else if(same_string_p(mode,"POINTER")) return POINTER;
+    else pips_user_error("bad value %s for property ARRAY_TO_POINTER_CONVERT_PARAMETERS\n",mode);
+}
+
+
 /**
  * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
  *
@@ -901,8 +1286,9 @@ bool expression_array_to_pointer(expression exp, bool in_init)
              * we are allowded to convert formal parameters such as int a[n][12] into int *a
              */
             bool force_cast = true;
-            if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") && ! get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY")
-                    && formal_parameter_p(reference_variable(ref)) )
+            if( get_array_to_pointer_conversion_mode()==POINTER && 
+                    ! get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY") &&
+                    formal_parameter_p(reference_variable(ref)) )
             {
                 force_cast=false;
             }
@@ -1071,17 +1457,49 @@ static
 void make_pointer_from_variable(variable param)
 {
     list parameter_dimensions = variable_dimensions(param);
-    if(!ENDP(parameter_dimensions))
+    switch(get_array_to_pointer_conversion_mode())
     {
-        gen_full_free_list(parameter_dimensions);
-        variable_dimensions(param)=NIL;
-        basic parameter_basic = variable_basic(param);
-        basic new_parameter_basic = make_basic_pointer(
-                make_type_variable(
-                    make_variable(parameter_basic,NIL,NIL)
-                    )
-                );
-        variable_basic(param)=new_parameter_basic;
+        case NO_CONVERSION:return;
+        case ARRAY_1D:
+            if(gen_length(parameter_dimensions) > 1)
+            {
+                list iter = parameter_dimensions;
+                expression full_length = expression_undefined;
+                {
+                    dimension d = DIMENSION(CAR(iter));
+                    full_length = SizeOfDimension(d);
+                    POP(iter);
+                }
+                FOREACH(DIMENSION,d,iter)
+                {
+                    full_length=make_op_exp(
+                            MULTIPLY_OPERATOR_NAME,
+                            SizeOfDimension(d),
+                            full_length);
+                }
+                gen_full_free_list(parameter_dimensions);
+                variable_dimensions(param)=
+                    CONS(DIMENSION,
+                            make_dimension(
+                                int_to_expression(0),
+                                make_op_exp(MINUS_OPERATOR_NAME,full_length,int_to_expression(1))
+                                ),
+                            NIL);
+            } break;
+        case POINTER:
+            if(!ENDP(parameter_dimensions))
+            {
+                gen_full_free_list(parameter_dimensions);
+                variable_dimensions(param)=NIL;
+                basic parameter_basic = variable_basic(param);
+                basic new_parameter_basic = make_basic_pointer(
+                        make_type_variable(
+                            make_variable(parameter_basic,NIL,NIL)
+                            )
+                        );
+                variable_basic(param)=new_parameter_basic;
+            } break;
+
     }
 }
 static
@@ -1138,10 +1556,9 @@ bool array_to_pointer(char *module_name)
         /* now fix array declarations : one dimension for every one ! */
         gen_recurse(get_current_module_statement(),statement_domain,gen_true,reduce_array_declaration_dimension);
 
-        /* if this property is set, we also change the signature of the module
+        /* eventually change the signature of the module
          * tricky : signature must be changed in two places !
          */
-        if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") )
         {
             FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
             {
@@ -1217,6 +1634,4 @@ generate_two_addresses_code(char *module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     return true;
-    return true;
 }
-

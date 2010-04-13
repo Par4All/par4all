@@ -423,27 +423,27 @@ transformer add_loop_skip_condition(transformer tf, loop l, transformer pre)
       }
     }
     else {
-      debug(8,"add_loop_skip_condition","Non-analyzed variable in loop bound(s)\n");
+      pips_debug(8,"Non-analyzed variable in loop bound(s)\n");
     }
   }
   else {
-    debug(8,"add_loop_skip_condition","increment sign unknown or non-affine bound\n");
+    pips_debug(8,"increment sign unknown or non-affine bound\n");
   }
 
-  pips_debug(8,"end with new tf=%p\n", tf);
   ifdebug(8) {
+    pips_debug(8,"end with new tf=%p\n", tf);
     (void) print_transformer(tf);
   }
 
   return tf;
 }
 
-static transformer 
-add_affine_bound_conditions(transformer pre, 
-			    entity index,
-			    Pvecteur v_bound, 
-			    bool lower_or_upper,
-			    transformer tfb)
+/* FI: could be moved somewhere else, e.g. in transformer library. */
+static transformer add_affine_bound_conditions(transformer pre,
+					       entity index,
+					       Pvecteur v_bound,
+					       bool lower_or_upper,
+					       transformer tfb)
 {
   Pvecteur v = vect_dup(v_bound);
 
@@ -457,10 +457,10 @@ add_affine_bound_conditions(transformer pre,
    * and make sure that aliasings (I,J) and (I,X) are correctly handled
    */
 
-  /* Achtung: value_mappings_compatible_vector_p() has a side
-   * effect on its argument; it has to be evaluated before
-   * the second half of the test else effects would be wrongly
-   * interpreted in case of equivalences 
+  /* Achtung: value_mappings_compatible_vector_p() has a side effect
+   * on its argument; it has to be evaluated before the second half of
+   * the test else effects would be wrongly interpreted in case of
+   * equivalences
    */
 
   if(value_mappings_compatible_vector_p(v) &&
@@ -470,36 +470,33 @@ add_affine_bound_conditions(transformer pre,
 		    (Variable) entity_to_new_value(index), VALUE_MONE);
     else{
       vect_chg_sgn(v);
-      vect_add_elem(&v, 
-		    (Variable) entity_to_new_value(index), VALUE_ONE);
+      vect_add_elem(&v, (Variable) entity_to_new_value(index), VALUE_ONE);
     }
     pre = transformer_inequality_add(pre, v);
   }
   else{
     vect_rm(v);
     v = VECTEUR_UNDEFINED;
-  }	
+  }
   return pre;
 }
 
-static transformer 
-add_index_bound_conditions(
-    transformer pre,
-    entity index,
-    expression bound,
-    int lower_or_upper,
-    transformer tfb)
+static transformer add_index_bound_conditions(transformer pre,
+					      entity index,
+					      expression bound,
+					      int lower_or_upper,
+					      transformer tfb)
 {
   normalized n = NORMALIZE_EXPRESSION(bound);
   /* tfb does not take into account the index incrementation */
   transformer t_iter = transformer_dup(tfb);
 
-  /* It is assumed on entry that index has values recognized 
+  /* It is assumed on entry that index has values recognized
    * by the semantics analysis
    */
   /* pips_assert("add_index_bound_conditions", entity_has_values_p(index)); */
 
-  transformer_arguments(t_iter) = 
+  transformer_arguments(t_iter) =
     arguments_add_entity(transformer_arguments(t_iter), index);
 
   if(normalized_linear_p(n)) {
@@ -511,12 +508,10 @@ add_index_bound_conditions(
   return(pre);
 }
 
-transformer 
-add_index_range_conditions(
-    transformer pre,
-    entity i,
-    range r,
-    transformer tfb)
+transformer add_index_range_conditions(transformer pre,
+				       entity i,
+				       range r,
+				       transformer tfb)
 {
   /* if tfb is not undefined, then it is a loop;
      loop bounds can be kept as preconditions for the loop body
@@ -584,10 +579,8 @@ add_index_range_conditions(
   return pre;
 }
 
-static transformer 
-add_good_loop_conditions(
-    transformer pre,
-    loop l)
+static transformer add_good_loop_conditions(transformer pre,
+					    loop l)
 {
   /* loop bounds can be kept as preconditions for the loop body
      if the loop increment is numerically known and if they
@@ -611,7 +604,9 @@ add_good_loop_conditions(
 }
 
 
-transformer add_loop_index_initialization(transformer tf, loop l, transformer pre)
+transformer add_loop_index_initialization(transformer tf,
+					  loop l,
+					  transformer pre)
 {
     entity i = loop_index(l);
     expression init = range_lower(loop_range(l));
@@ -636,11 +631,11 @@ transformer add_loop_index_initialization(transformer tf, loop l, transformer pr
  *  - the increment is affine (non-necessary assumption made: it is affine if the
  *    increment sign is known)
  *  - the increment sign is known
- *  - the body and loop initialization execution does not modify 
+ *  - the body and loop initialization execution does not modify
  *    the value of the upper bound
  *  - the upper bound is affine (?)
  *
- * Affine increments can be handled when their signs only are known. 
+ * Affine increments can be handled when their signs only are known.
  *
  * For instance, for increment==k:
  *  i >= ub
@@ -656,8 +651,7 @@ transformer add_loop_index_initialization(transformer tf, loop l, transformer pr
  * lower bounds are affine, that the increment is affine and that the
  * increment sign is known.
  */
-transformer
-add_loop_index_exit_value(
+transformer add_loop_index_exit_value(
     transformer post, /* postcondition of the last iteration */
     loop l,           /* loop to process */
     transformer pre)  /* precondition on loop entrance */
@@ -759,7 +753,7 @@ add_loop_index_exit_value(
 	    vect_add_elem(&c2, (Variable) TCST, (Value) 1);
 	  }
 	  else if(ub_inc<=-1) {
-	    /* v_i - v_incr >= v_ub > v_i 
+	    /* v_i - v_incr >= v_ub > v_i
 	     *
 	     * or:
 	     * - v_i + v_incr + v_ub <= 0, - v_ub + v_i + 1 <= 0
@@ -861,8 +855,9 @@ transformer precondition_filter_old_values(transformer pre)
 }
 
 /* The loop initialization is performed before tf */
-static transformer 
-transformer_add_loop_index_initialization(transformer tf, loop l, transformer pre)
+static transformer transformer_add_loop_index_initialization(transformer tf,
+							     loop l,
+							     transformer pre)
 {
   entity i = loop_index(l);
   range r = loop_range(l);
@@ -875,7 +870,7 @@ transformer_add_loop_index_initialization(transformer tf, loop l, transformer pr
     Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
     Pcontrainte eq = CONTRAINTE_UNDEFINED;
     Pvecteur v_lb = vect_dup(normalized_linear(nlb));
-    Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
+    Pbase b_tmp, b_lb = make_base_from_vect(v_lb);
     entity i_init = entity_to_old_value(i);
 
     vect_add_elem(&v_lb, (Variable) i_init, VALUE_MONE);
@@ -900,7 +895,7 @@ transformer_add_loop_index_initialization(transformer tf, loop l, transformer pr
 	(sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED));
     }
     else
-      predicate_system_(transformer_relation(tf)) = 
+      predicate_system_(transformer_relation(tf)) =
 	newgen_Psysteme(sc);
   }
   else if(entity_has_values_p(i)) {
@@ -914,11 +909,9 @@ transformer_add_loop_index_initialization(transformer tf, loop l, transformer pr
 return tf;
 }
 
-static transformer 
-transformer_add_loop_index_incrementation(
-					  transformer tf,
-					  loop l,
-					  transformer pre)
+static transformer transformer_add_loop_index_incrementation(transformer tf,
+							     loop l,
+							     transformer pre)
 {
   entity i = loop_index(l);
   range r = loop_range(l);
@@ -932,9 +925,9 @@ transformer_add_loop_index_incrementation(
   pips_assert("Transformer tf is consistent before update",
 	      transformer_consistency_p(tf));
 
-  /* it does not contain the loop index update
-     the loop increment expression must be linear to find inductive 
-     variables related to the loop index */
+  /* it does not contain the loop index update the loop increment
+     expression must be linear to find inductive variables related to
+     the loop index */
   if(!VECTEUR_UNDEFINED_P(v_incr = expression_to_affine(incr))) {
     if(entity_has_values_p(i)) {
       if(value_mappings_compatible_vector_p(v_incr)) {
@@ -945,7 +938,7 @@ transformer_add_loop_index_incrementation(
 	entity i_new = entity_to_new_value(i);
 	Psysteme sc = predicate_system(transformer_relation(tf));
 	Pbase b = sc_base(sc);
-	
+
 	transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), i);
 	b = base_add_variable(b, (Variable) i_old);
 	b = base_add_variable(b, (Variable) i_new);
@@ -981,7 +974,7 @@ transformer_add_loop_index_incrementation(
 
 /* Side effects in loop bounds and increment are taken into account.  The
  * conditions on the loop index are given by the range of this
- * transformer. 
+ * transformer.
  */
 transformer loop_bound_evaluation_to_transformer(loop l, transformer pre)
 {
@@ -1090,16 +1083,14 @@ transformer loop_initialization_to_transformer(loop l, transformer pre)
   return t_init;
 }
 
-/* The transformer associated to a DO loop does not include the exit 
- * condition because it is used to compute the precondition for any 
+/* The transformer associated to a DO loop does not include the exit
+ * condition because it is used to compute the precondition for any
  * loop iteration.
  *
  * There is only one attachment for the unbounded transformer and
  * for the bounded one.
  */
-
-transformer 
-loop_to_transformer(loop l, transformer pre, list e)
+transformer loop_to_transformer(loop l, transformer pre, list e)
 {
   /* loop transformer tf = tfb* or tf = tfb+ or ... */
   transformer tf = transformer_undefined;
@@ -1128,7 +1119,7 @@ loop_to_transformer(loop l, transformer pre, list e)
     (void) print_transformer(preb);
   }
 
-  tfb = (statement_to_transformer(b, preb));
+  tfb = statement_to_transformer(b, preb);
   /* add indexation step under loop precondition pre */
   tfb = transformer_add_loop_index_incrementation(tfb, l, pre);
 
@@ -1179,7 +1170,7 @@ loop_to_transformer(loop l, transformer pre, list e)
     (void) fprintf(stderr,"%s: %s\n","loop_to_transformer",
 		   "resultat tf =");
     (void) (void) print_transformer(tf);
-    debug(8,"loop_to_transformer","end\n");
+    pips_debug(8,"end\n");
   }
 
   return tf;
@@ -1432,8 +1423,7 @@ transformer complete_repeatloop_transformer(transformer t_body_star,
 
 /* The index variable is always initialized and then the loop is either
    entered and exited or not entered */
-transformer 
-complete_loop_transformer(transformer ltf, transformer pre, loop l)
+transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
 {
   transformer tf = transformer_undefined;
   transformer t_enter = transformer_undefined;
@@ -1526,8 +1516,9 @@ complete_loop_transformer(transformer ltf, transformer pre, loop l)
   return tf;
 }
 
-transformer 
-complete_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
+transformer complete_whileloop_transformer(transformer ltf,
+					   transformer pre,
+					   whileloop l)
 {
   transformer tf = transformer_undefined;
   transformer t_enter = transformer_undefined;
@@ -1545,7 +1536,11 @@ complete_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
     (void) print_transformer(ltf);
   }
 
-  /* Recompute the exact loop body transformer. This is weird: it should have already been done by statement_to_transformer and propagated bask. However, we need to recompute it because it has not been stored and cannot be retrieved. It might be better to use complete_statement_transformer(retrieved t, preb, s). */
+  /* Recompute the exact loop body transformer. This is weird: it
+     should have already been done by statement_to_transformer and
+     propagated bask. However, we need to recompute it because it has
+     not been stored and cannot be retrieved. It might be better to
+     use complete_statement_transformer(retrieved t, preb, s). */
   if(statement_loop_p(s)) {
     /* Since it is not stored, we need to go down recursively. A way to
        avoid this would be to always have sequences as loop
@@ -1764,8 +1759,9 @@ static transformer loop_body_transformer_add_entry_and_iteration_information(tra
  * This is confusing when transformers are prettyprinted with the source code.
  */
 
-transformer 
-standard_whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whileloop l */
+transformer standard_whileloop_to_transformer(whileloop l,
+					      transformer pre,
+					      list e) // effects of whileloop l
 {
   /* loop transformer tf = tfb* or tf = tfb+ or ... */
   transformer tf;
@@ -1786,7 +1782,7 @@ standard_whileloop_to_transformer(whileloop l, transformer pre, list e) /* effec
       /* Make sure not to leave too much information in pre. Perform a very
 	 simplistic fix point based on effects. */
       transformer tf_star = effects_to_transformer(e);
-      
+
       pre_n = invariant_wrt_transformer(pre, tf_star);
       free_transformer(tf_star);
     }
@@ -1796,7 +1792,8 @@ standard_whileloop_to_transformer(whileloop l, transformer pre, list e) /* effec
     /* I'd like to use pre_n as context to evaluate the condition cond,
        but I'm not sure it's safe (Francois Irigoin) */
     /* Side effects in cond are ignored! */
-    pre_n = precondition_add_condition_information(pre_n, cond, transformer_undefined, TRUE);
+    pre_n = precondition_add_condition_information(pre_n, cond,
+						   transformer_undefined, TRUE);
 
     ifdebug(8) {
       pips_debug(8, "Precondition for loop body pre_n=\n");
@@ -1889,8 +1886,9 @@ standard_whileloop_to_transformer(whileloop l, transformer pre, list e) /* effec
   return tf;
 }
 
-transformer 
-whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whileloop l */
+transformer whileloop_to_transformer(whileloop l,
+				     transformer pre,
+				     list e) /* effects of whileloop l */
 {
   transformer t = transformer_undefined;
   evaluation lt = whileloop_evaluation(l);
@@ -1913,7 +1911,7 @@ transformer any_loop_to_postcondition(statement body,
 				      transformer t_exit,
 				      transformer pre)
 {
-  /* The precondition to propagate in the body is: 
+  /* The precondition to propagate in the body is:
    *
    * p_body = (t_init ; t_enter)(pre) + (t_body_star ; t_body ; t_next) (pre)
    *
@@ -2385,7 +2383,7 @@ transformer loop_to_total_precondition(
 		       "Always executed: post_al =");
 	(void) print_transformer(t_pre_al);
       }
-      
+
       t_pre = transformer_convex_hull(t_pre_ne, t_pre_al);
       transformer_free(t_pre_ne);
       transformer_free(t_pre_al);
@@ -2412,7 +2410,8 @@ transformer whileloop_to_postcondition(
 
   pips_debug(8, "begin\n");
 
-  if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
+  if(pips_flag_p(SEMANTICS_FIX_POINT)
+     && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
     pips_internal_error("Halbwachs not implemented\n");
   }
 
@@ -2424,44 +2423,90 @@ transformer whileloop_to_postcondition(
     /* do not add the exit condition since it is redundant with pre */
     post = transformer_dup(pre);
   }
-  else {
+  else { /* The loop may be entered at least once. */
     transformer pre_next = transformer_dup(pre);
-    transformer pre_init = precondition_add_condition_information(transformer_dup(pre),
-								  c, pre, TRUE);
-    transformer preb = transformer_undefined;
-    transformer tb = load_statement_transformer(s);
+    transformer pre_init =
+      precondition_add_condition_information(transformer_dup(pre),
+					     c, pre, TRUE);
+    transformer preb = transformer_undefined; // body precondition
+    transformer postb = transformer_undefined; // body postcondition
+    transformer tb = load_statement_transformer(s); // body transformer
 
-    pips_debug(8, "The loop may be executed and preconditions must be propagated in the loop body\n");
+    pips_debug(8, "The loop may be executed and preconditions must"
+	       " be propagated in the loop body\n");
 
     /* Apply the loop fix point transformer T* to obtain the set of stores
      * for any number of iteration, including 0. Instead, use T+ and a
      * convex hull with the precondition for the first iteration, which
      * preserves more information when the fixpoint is not precise.  */
     pre_next = transformer_combine(pre_next, tf);
-    pre_next = precondition_add_condition_information(pre_next, c, pre_next, TRUE);
+    pre_next = precondition_add_condition_information(pre_next, c,
+						      pre_next, TRUE);
     pre_next = transformer_combine(pre_next, tb);
-    pre_next = precondition_add_condition_information(pre_next, c, pre_next, TRUE);
+    pre_next = precondition_add_condition_information(pre_next, c,
+						      pre_next, TRUE);
     preb = transformer_convex_hull(pre_init, pre_next);
 
-    /* propagate preconditions in the loop body */
+    /* propagate preconditions in the loop body and get its postcondition */
 
-    (void) statement_to_postcondition(preb, s);
-
+    postb = statement_to_postcondition(preb, s);
 
     if(true_condition_wrt_precondition_p(c, pre)) {
-      /* At least one iteration is executed. The transformer of
-       * the loop body is useful.
+      /* At least one iteration is executed. The postcondition can be
+       * computed into three different ways:
+       *
+       *  - use the loop body postcondition and apply the loop exit
+       * condition transformer or precondition_add_condition_information;
+       *
+       *  - or use the loop precondition, the loop transformer, the loop
+       * entry condition, the loop body transformer and the loop exit
+       * transformer;
+       *
+       * - or use both and use their intersection as unique
+       * postcondition (the added redundant information seems to
+       * result in *less* information after a projection for w09.f,
+       * Halbwachs car example).
+       *
+       * The second way is more likely to suffer from non-convexity as
+       * it uses may more steps.
+       *
+       * Also, note that precondition_add_condition_information() is
+       * more geared towards Fortran as it assumes no side effects in
+       * the condition evaluation. However, it is better at handling
+       * non-convex condition than condition_to_transformer(), but
+       * condition_to_transformer(), which is built on top of
+       * precondition_add_condition_information() could be
+       * improved/might be improvable... In case the condition is not
+       * convex, there is no single transformer which fits it. But the
+       * postcondition can be updated with different convex components
+       * and then different results united in a unique postcondition
+       * by a convex hull.
        */
-      transformer ntl = transformer_undefined;
 
-      debug(8, "whileloop_to_postcondition", "The loop certainly is executed\n");
+      pips_debug(8, "The loop certainly is executed.\n");
 
-      ntl = transformer_apply(tf, pre);
-      /* Let's execute the last iteration since it certainly exists */
-      ntl = precondition_add_condition_information(ntl, c, ntl, TRUE);
-      post = transformer_apply(tb, ntl);
-      free_transformer(ntl);
-      post = precondition_add_condition_information(post, c, post, FALSE);
+      if(FALSE) {
+	transformer ntl = transformer_undefined;
+	transformer cpost = transformer_undefined; // combined postcondition
+	ntl = transformer_apply(tf, pre);
+	/* Let's execute the last iteration since it certainly exists */
+	ntl = precondition_add_condition_information(ntl, c, ntl, TRUE);
+	post = transformer_apply(tb, ntl);
+	free_transformer(ntl);
+	post = precondition_add_condition_information(post, c, post, FALSE);
+
+	postb = precondition_add_condition_information(postb, c, postb, FALSE);
+
+	cpost = transformer_intersection(post, postb);
+
+	free_transformer(post);
+	free_transformer(postb);
+
+	post = cpost;
+      }
+      else {
+	post = precondition_add_condition_information(postb, c, postb, FALSE);
+      }
     }
     else {
       /* Assume the loop is entered, post_al, or not, post_ne, and perform
@@ -2471,7 +2516,7 @@ transformer whileloop_to_postcondition(
       transformer post_al = transformer_undefined;
       transformer tb = load_statement_transformer(s);
 
-      debug(8, "whileloop_to_postcondition", "The loop may be executed or not\n");
+      pips_debug(8, "The loop may be executed or not\n");
 
       /* The loop is executed at least once: let's execute the last iteration */
       post_al = transformer_apply(tb, preb);
@@ -2487,8 +2532,7 @@ transformer whileloop_to_postcondition(
   }
 
   ifdebug(8) {
-    (void) fprintf(stderr,"%s: %s\n","[whileloop_to_postcondition]",
-		   "resultat post =");
+    pips_debug(8, "resultat post =");
     (void) print_transformer(post);
   }
   pips_debug(8, "end\n");

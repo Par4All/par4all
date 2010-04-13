@@ -26,6 +26,8 @@
 
 #define region effect
 #define REGION EFFECT  /* for casts */
+#define region_CAST REGION_CAST
+#define REGION_CAST(x) REGION(x)
 #define REGION_ EFFECT_  /* for some left casts */
 #define REGION_TYPE EFFECT_TYPE
 #define REGION_NEWGEN_DOMAIN EFFECT_NEWGEN_DOMAIN

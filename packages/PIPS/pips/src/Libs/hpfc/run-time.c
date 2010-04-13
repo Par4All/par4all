@@ -281,7 +281,7 @@ expr_compute_local_index(
 		    int_to_expression(load_hpf_number(array)),
 		    expr2 = int_to_expression(dim);
 	    
-	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_GAMMA), 
+	    return(MakeTernaryCall(hpfc_name_to_entity(LOCAL_IND_GAMMA), 
 				       expr1, expr2, expr));
 	}
 	case is_hpf_newdecl_delta:
@@ -290,7 +290,7 @@ expr_compute_local_index(
 		expr1 = int_to_expression(load_hpf_number(array)),
 		expr2 = int_to_expression(dim);
 	    
-	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_DELTA), 
+	    return(MakeTernaryCall(hpfc_name_to_entity(LOCAL_IND_DELTA), 
 				       expr1, expr2, expr));
 	}
 	default:
@@ -304,7 +304,7 @@ expr_compute_local_index(
 	    expr1 = int_to_expression(load_hpf_number(array)),
 	    expr2 = int_to_expression(dim);
 	
-	return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND), 
+	return(MakeTernaryCall(hpfc_name_to_entity(LOCAL_IND), 
 				   expr1, expr2, expr));
     }
 

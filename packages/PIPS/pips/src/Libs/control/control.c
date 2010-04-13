@@ -216,7 +216,7 @@ string name;
     c = (control)hash_get(Label_control, name);
     pips_assert("c is defined", c != (control) HASH_UNDEFINED_VALUE);
     pips_assert("c is a control", check_control(c));
-    ifdebug(8) {
+    ifdebug(2) {
       check_control_coherency(c);
     }
     return(c);
@@ -421,7 +421,6 @@ bool controlize(statement st,
 	   associated to c_res. */
 	if(controlized && !ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
-	  fprintf(stderr, "potentially lost declarations:\n");
 	  print_arguments(statement_declarations(st));
 	  pips_user_warning("Some local declarations may have been lost\n");
 	}
