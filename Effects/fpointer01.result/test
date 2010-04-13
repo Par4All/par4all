@@ -145,8 +145,9 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
       
       *col = 0;
    else {
-//               <may be read    >: col col[0] indent nbout nbout[0]
+//               <may be read    >: nbout nbout[0]
 //               <may be written >: col[0] nbout[0]
+//               <must be read   >: col col[0] indent
       /* indentation ok ? */
       
       while (*col<indent) {
