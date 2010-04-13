@@ -1,0 +1,51 @@
+# WSPACE=foo FILE=foo.c tpips default_tpips
+#setenv PIPS_HWAC_DEBUG_LEVEL=5
+delete ${WSPACE}
+setenv NAME ${NAME:-$WSPACE}
+setenv FREIA_TARGET ${FREIA_TARGET:-SPOC}
+# props...
+setproperty ABORT_ON_USER_ERROR=TRUE
+setproperty FREIA_LABEL_ARCS=TRUE
+# use "old" effects...
+setproperty CONSTANT_PATH_EFFECTS=FALSE
+#setenv PIPS_HWAC_DEBUG_LEVEL=7
+create ${WSPACE} ${FILE} freia.c
+shell ${PIPS_CC:-cc} -c ${FILE} -o ${WSPACE}.database/Tmp/${WSPACE}.o
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE=TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER=TRUE
+echo
+echo ! initial function
+echo
+display PRINTED_FILE[${NAME}]
+#
+# apply compiler and clean unused images
+#
+apply FREIA_${FREIA_TARGET}_COMPILER[${NAME}]
+setproperty DYNAMIC_ALLOCATION="freia_common_create_data"
+setproperty DYNAMIC_DEALLOCATION="freia_common_destruct_data"
+apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${NAME}]
+touch ${FREIA_TARGET}_FILE[${NAME}]
+touch PROPER_EFFECTS[${NAME}]
+touch CUMULATED_EFFECTS[${NAME}]
+#
+# show FREIA target results
+#
+setproperty ABORT_ON_USER_ERROR FALSE
+echo
+echo ! graphs
+echo
+shell cat ./${WSPACE}.database/${NAME}/*.dot
+echo
+echo ! acceleration function
+echo
+display ${FREIA_TARGET}_FILE[${NAME}]
+#
+# new function code
+#
+echo
+echo ! updated function
+echo
+display PRINTED_FILE[${NAME}]
+close
+delete ${WSPACE}

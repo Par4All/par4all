@@ -1,0 +1,3 @@
+# WSPACE=foo FILE=foo.c tpips spoc.tpips
+setenv FREIA_TARGET=SPOC
+source target.tpips

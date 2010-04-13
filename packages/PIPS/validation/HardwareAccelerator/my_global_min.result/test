@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -50,7 +53,8 @@ digraph "my_global_min_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_global_min
-freia_status my_global_min_helper_0_0_0(freia_data2d * i0, int32_t * red0)
+freia_status my_global_min_helper_0_0_0(freia_data2d * i0,
+  int32_t * po0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -92,7 +96,7 @@ freia_status my_global_min_helper_0_0_0(freia_data2d * i0, int32_t * red0)
   freia_cg_read_reduction_results(&redres);
 
   // measure 4 global_min stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].minimum;
+  *po0 = (int32_t) reduc.measure[0][0].minimum;
 
   return ret;
 }
@@ -103,3 +107,133 @@ freia_status my_global_min(freia_data2d *i0, int32_t *p0)
 {
    return my_global_min_helper_0_0_0(i0, p0);                           /*0004*/
 }
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status my_global_min(freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_global_min(i0, p0);                                /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_global_min" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 min" [shape=diamond];
+  "i0" -> "4 min";
+}
+// graph for dag "dag_cleaned_0" of module "my_global_min" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 min" [shape=diamond];
+  "i0" -> "4 min";
+}
+// graph for dag "my_global_min_helper_0_0" of module "my_global_min" in dot format
+digraph "my_global_min_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 min" [shape=diamond];
+  "i0" -> "4 min";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module my_global_min
+ * 1 input image, 0 output image
+ * 2 image operations in dag
+ * dag length is 2, dag width is 1
+ * cost is 3 cycles per imagelet row
+ */
+freia_status my_global_min_helper_0_0(
+  freia_data2d * i0,
+  int32_t * po1)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  terapix_mcu_instr mcu_instr[1];
+
+  // imagelet definitions...
+  int imagelet_size = 511;
+  int imagelet_1 = 0;
+  int imagelet_2 = 511;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // set measure min at 1023
+  // 0: min(1)
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_MIN?;
+  // inputs:
+  // - imagelet 1 is i0 for i0
+
+  // no output
+
+  // double buffer management:
+  // - buffer 1/2
+
+  // output imagelet erosion:
+  //   north: 0
+  //   south: 0
+  //    west: 0
+  //    east: 0
+
+  ret = freia_cg_template_process_1i_0o(&param, i0);
+
+  // get measure min result from 1023
+
+  return ret;
+}
+
+
+! updated function
+
+freia_status my_global_min(freia_data2d *i0, int32_t *p0)
+{
+   return my_global_min_helper_0_0(i0, p0);                             /*0004*/
+}
+#
+# FREIA COMPILATION DONE
+#
+

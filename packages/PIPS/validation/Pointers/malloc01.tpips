@@ -1,0 +1,23 @@
+delete malloc01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create malloc01 malloc01.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+
+close
+delete malloc01
+quit

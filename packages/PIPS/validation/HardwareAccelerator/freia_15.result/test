@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -79,7 +82,11 @@ digraph "freia_15_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_15
-freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t * red1, int32_t * red2, int32_t cst3)
+freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+  int32_t * po0,
+  int32_t * po1,
+  int32_t * po2,
+  int32_t pi3)
 {
   spoc_instr si;
   spoc_param sp;
@@ -112,7 +119,7 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // nope
   // alu 8 add_const stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
-  sp.alu[1][0].constant = cst3;
+  sp.alu[1][0].constant = pi3;
 
 
   // output image o on 0
@@ -154,13 +161,13 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   freia_cg_read_reduction_results(&redres);
 
   // measure 9 global_min stage 0 side 0
-  *red0 = (int32_t) reduc.measure[0][0].minimum;
+  *po0 = (int32_t) reduc.measure[0][0].minimum;
 
   // measure 10 global_max stage 0 side 0
-  *red1 = (int32_t) reduc.measure[0][0].maximum;
+  *po1 = (int32_t) reduc.measure[0][0].maximum;
 
   // measure 11 global_vol stage 0 side 0
-  *red2 = (int32_t) reduc.measure[0][0].volume;
+  *po2 = (int32_t) reduc.measure[0][0].volume;
 
   return ret;
 }
@@ -173,3 +180,208 @@ freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1
    freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
    return FREIA_OK;                                                     /*0012*/
 }
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_aipo_add_const(o, i, c);                                       /*0008*/
+   freia_aipo_global_min(i, r0);                                        /*0009*/
+   freia_aipo_global_max(i, r1);                                        /*0010*/
+   freia_aipo_global_vol(i, r2);                                        /*0011*/
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_15" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 vol" [shape=diamond];
+  "10 max" [shape=diamond];
+  "9 min" [shape=diamond];
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o";
+  "i" -> "11 vol";
+  "i" -> "10 max";
+  "i" -> "9 min";
+  "i" -> "8 +.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_15" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 vol" [shape=diamond];
+  "10 max" [shape=diamond];
+  "9 min" [shape=diamond];
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o";
+  "i" -> "11 vol";
+  "i" -> "10 max";
+  "i" -> "9 min";
+  "i" -> "8 +.";
+}
+// graph for dag "freia_15_helper_0_0" of module "freia_15" in dot format
+digraph "freia_15_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o";
+  "11 vol" [shape=diamond];
+  "10 max" [shape=diamond];
+  "9 min" [shape=diamond];
+  "i" -> "8 +.";
+  "i" -> "11 vol";
+  "i" -> "10 max";
+  "i" -> "9 min";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module freia_15
+ * 1 input image, 1 output image
+ * 5 image operations in dag
+ * dag length is 2, dag width is 1
+ * cost is 12 cycles per imagelet row
+ */
+freia_status freia_15_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * i0,
+  int32_t * po2,
+  int32_t * po3,
+  int32_t * po4,
+  int32_t pi5)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  // operation 3 parameters
+  int16_t p_3[1];
+  const int32_t x_3 = 0;
+  const int32_t y_3 = 0;
+  terapix_mcu_instr mcu_instr[4];
+
+  // imagelet definitions...
+  int imagelet_size = 510;
+  int imagelet_1 = 0;
+  int imagelet_2 = 510;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // set measure min at 1023
+  // 0: min(1)
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_MIN?;
+  // set measure max at 1022
+  // 1: max(1)
+  mcu_instr[1].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1].macrocode.ymin1 = 0;
+  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_MAX?;
+  // set measure vol at 1020
+  // 2: vol(1)
+  mcu_instr[2].macrocode.xmin1 = imagelet_1;
+  mcu_instr[2].macrocode.ymin1 = 0;
+  mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[2].macrocode.iter2 = imagelet_size;
+  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_VOL?;
+  // 3: +.(1) -> 1
+  mcu_instr[3].macrocode.xmin1 = imagelet_1;
+  mcu_instr[3].macrocode.ymin1 = 0;
+  mcu_instr[3].macrocode.xmin2 = imagelet_1;
+  mcu_instr[3].macrocode.ymin2 = 0;
+  // copy of operation 3 parameters
+  p_3[0] = pi5;
+  gram.xoffset = x_3;
+  gram.yoffset = y_3;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_3;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[3].macrocode.xmin3 = x_3;
+  mcu_instr[3].macrocode.ymin3 = y_3;
+  mcu_instr[3].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[3].macrocode.iter2 = imagelet_size;
+  mcu_instr[3].macrocode.addrStart = TERAPIX_UCODE_ADD_CONST;
+
+  // inputs:
+  // - imagelet 1 is i0 for i
+
+  // outputs:
+  // - imagelet 1 is o0 for o
+
+  // double buffer management:
+  // - buffer 1/2
+
+  // output imagelet erosion:
+  //   north: 0
+  //   south: 0
+  //    west: 0
+  //    east: 0
+
+  ret = freia_cg_template_process_1i_1o(&param, o0, i0);
+
+  // get measure min result from 1023
+  // get measure max result from 1022
+  // get measure vol result from 1020
+
+  return ret;
+}
+
+
+! updated function
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_15_helper_0_0(o, i, r0, r1, r2, c);                            /*0008*/
+   return FREIA_OK;                                                     /*0012*/
+}
+#
+# FREIA COMPILATION DONE
+#
+

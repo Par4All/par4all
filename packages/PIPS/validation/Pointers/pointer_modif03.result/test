@@ -1,0 +1,46 @@
+
+POINTS TO
+
+C  {}
+s_t make_s(int i, float x)
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   s_t *p;
+//  points to = {}
+
+   p = (s_t *) malloc(sizeof(s_t));
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+   p->entier = i;
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+   p->reel = x;
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+   return *p;
+   // END BLOCK
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   s_t s;
+//  points to = {}
+   int j;
+//  points to = {}
+
+   s = make_s(1, 2.);
+//  points to = {}
+   s.entier = 4;
+//  points to = {}
+
+   j = make_s(1, 2.).entier;
+//  {(*ANY_MODULE*:*ANYWHERE*,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+
+   return j;
+   // END BLOCK
+}

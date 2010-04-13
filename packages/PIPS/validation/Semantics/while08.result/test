@@ -80,12 +80,12 @@ int while08()
       i++;
    }
 
-//  P(i,n) {i==8, n==0}
+//  P(i,n) {8<=i+n, i+n<=9, 8i+7n<=64, n<=0}
 
 
    printf("exit: i=%d, n=%d, i+n=%d\n", i, n, i+n);
 
-//  P(i,n) {i==8, n==0}
+//  P(i,n) {8<=i+n, i+n<=9, 8i+7n<=64, n<=0}
 
 
    return i;

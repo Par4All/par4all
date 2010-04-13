@@ -1,0 +1,25 @@
+
+Proper effects for "static02"
+
+void static02()
+{
+   // BEGIN BLOCK
+   static int i = 0;
+   // END BLOCK
+}
+
+Cumulated effects for "static02"
+
+void static02()
+{
+   // BEGIN BLOCK
+   static int i = 0;
+   // END BLOCK
+}
+
+Cumulated effects for "main"
+
+int main()
+{
+   static02();
+}

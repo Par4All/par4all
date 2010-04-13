@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -86,7 +89,11 @@ digraph "freia_skip_05_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_skip_05
-freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t cst0, int32_t inf1, int32_t sup2, bool bin3)
+freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+  int32_t pi0,
+  int32_t pi1,
+  int32_t pi2,
+  int32_t pi3)
 {
   spoc_instr si;
   spoc_param sp;
@@ -119,15 +126,15 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   // nope
   // alu 10 xor_const stage 1
   si.alu[1][0].op = SPOC_ALU_XOR_IN0_CONST;
-  sp.alu[1][0].constant = cst0;
+  sp.alu[1][0].constant = pi0;
 
   // 0`t [1 alu] -> [1 threshold 0] 11 threshold
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
   // threshold 11 threshold stage 1 side 0
-  si.th[1][0].op = bin3? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[1][0].boundmin = inf1;
-  sp.th[1][0].boundmax = sup2;
+  si.th[1][0].op = pi3? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[1][0].boundmin = pi1;
+  sp.th[1][0].boundmax = pi2;
 
 
   // output image i on 1 and image o on 0
@@ -193,3 +200,229 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
    // allocation in the middle of the stream
    freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0008*/
 }
+#
+# TERAPIX
+#
+
+! initial function
+
+void freia_skip_05(freia_data2d *o, freia_data2d *i)
+{
+   int32_t seuil;                                                       /*0005*/
+   freia_data2d *t;                                                     /*0006*/
+   // allocation in the middle of the stream
+   freia_aipo_sub(i, i, i);                                             /*0008*/
+   t = freia_common_create_data(16, 128, 128);                          /*0009*/
+   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
+   freia_common_destruct_data(t);                                       /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_skip_05" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "9 ?" [shape=none];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "dag_cleaned_0" of module "freia_skip_05" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "9 ?" [shape=none];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "freia_skip_05_helper_0_0" of module "freia_skip_05" in dot format
+digraph "freia_skip_05_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module freia_skip_05
+ * 1 input image, 2 output images
+ * 4 image operations in dag
+ * dag length is 4, dag width is 2
+ * cost is 12 cycles per imagelet row
+ */
+freia_status freia_skip_05_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  freia_data2d * i0,
+  int32_t pi3,
+  int32_t pi4,
+  int32_t pi5,
+  int32_t pi6)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  // operation 1 parameters
+  int16_t p_1[1];
+  const int32_t x_1 = 0;
+  const int32_t y_1 = 0;
+  // operation 2 parameters
+  int16_t p_2[3];
+  const int32_t x_2 = 1;
+  const int32_t y_2 = 0;
+  terapix_mcu_instr mcu_instr[3];
+
+  // imagelet definitions...
+  int imagelet_size = 256;
+  int imagelet_1 = 0;
+  int imagelet_2 = 256;
+  int imagelet_3 = 512;
+  int imagelet_4 = 768;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: -(1,1) -> 1
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.xmin2 = imagelet_1;
+  mcu_instr[0].macrocode.ymin2 = 0;
+  mcu_instr[0].macrocode.xmin3 = imagelet_1;
+  mcu_instr[0].macrocode.ymin3 = 0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_SUB;
+  // 1: ^.(1) -> 2
+  mcu_instr[1].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1].macrocode.ymin1 = 0;
+  mcu_instr[1].macrocode.xmin2 = imagelet_2;
+  mcu_instr[1].macrocode.ymin2 = 0;
+  // copy of operation 1 parameters
+  p_1[0] = pi3;
+  gram.xoffset = x_1;
+  gram.yoffset = y_1;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_1;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[1].macrocode.xmin3 = x_1;
+  mcu_instr[1].macrocode.ymin3 = y_1;
+  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_XOR_CONST?;
+  // 2: thr(2) -> 1
+  mcu_instr[2].macrocode.xmin1 = imagelet_2;
+  mcu_instr[2].macrocode.ymin1 = 0;
+  mcu_instr[2].macrocode.xmin2 = imagelet_1;
+  mcu_instr[2].macrocode.ymin2 = 0;
+  // copy of operation 2 parameters
+  p_2[0] = pi4;
+  p_2[1] = pi5;
+  p_2[2] = pi6;
+  gram.xoffset = x_2;
+  gram.yoffset = y_2;
+  gram.width = 3;
+  gram.height = 1;
+  gram.params = p_2;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[2].macrocode.xmin3 = x_2;
+  mcu_instr[2].macrocode.ymin3 = y_2;
+  mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[2].macrocode.iter2 = imagelet_size;
+  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_THRESHOLD;
+
+  // inputs:
+  // - imagelet 1 is i0 for i
+
+  // outputs:
+  // - imagelet 1 is o0 for i
+  // - imagelet 1 is o1 for o
+
+  // double buffer management:
+  // - buffer 1/3
+  // - buffer 2/4
+
+  // output imagelet erosion:
+  //   north: 0
+  //   south: 0
+  //    west: 0
+  //    east: 0
+
+  ret = freia_cg_template_process_1i_2o(&param, o0, o1, i0);
+
+
+  return ret;
+}
+
+
+! updated function
+
+void freia_skip_05(freia_data2d *o, freia_data2d *i)
+{
+   // allocation in the middle of the stream
+   freia_skip_05_helper_0_0(i, o, i, 111, 8, 100, true);                /*0008*/
+}
+#
+# FREIA COMPILATION DONE
+#
+

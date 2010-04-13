@@ -14,11 +14,11 @@ int main()
 after split strucutres
 struct ure  llement()
 {
-   struct ure noth = {1};
+   struct ure noth;
    //PIPS generated variable
-   int ure_lle = noth.lle;
+   int ure_lle = 1;
    //PIPS generated variable
-   float ure_ing = noth.ing;
+   float ure_ing;
    ure_ing = 2.;
    noth.lle = ure_lle;
    noth.ing = ure_ing;

@@ -43,8 +43,10 @@ void complete05()
       // BEGIN BLOCK
 //               <must be written>: j
       int j = 0;                                                        /*0015*/
-//               <must be read   >: i j n
-//               <must be written>: i j
+//               <may be read    >: j
+//               <may be written >: j
+//               <must be read   >: i n
+//               <must be written>: i
       for (i = 0;i<n;i++) {                                             /*0016*/
 //               <must be read   >: i j
 //               <must be written>: i j
@@ -185,7 +187,6 @@ unknown[unknown] (parse_properties) property FOR_TO_DO_LOOP_IN_CONTROLIZER redef
 unknown[unknown] (parse_properties) property FOR_TO_WHILE_LOOP_IN_CONTROLIZER redefined
 unknown[unknown] (parse_properties) property PRETTYPRINT_BLOCKS redefined
 unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
-CUMULATED_EFFECTS[complete05] (rw_effects_of_forloop) Ongoing implementation! Amira mensi
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning complete05 instead
 TRANSFORMERS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized
 TRANSFORMERS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized

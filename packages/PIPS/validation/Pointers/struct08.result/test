@@ -1,0 +1,273 @@
+
+Proper effects for "init"
+
+void init(mys *m)
+{
+   int i;                                                               /*0014*/
+//               <must be read   >: m
+//               <must be written>: m[0][1]
+   m->num = 5;                                                          /*0015*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ m
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m[0][3]
+   m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
+//               <must be read   >: m
+//               <must be written>: m[0][2][0]
+   (m->tab1)[0] = 10;                                                   /*0017*/
+//               <must be read   >: m m[0][3]
+//               <must be written>: m[0][3][0]
+   (m->tab2)[0] = 20;                                                   /*0018*/
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {
+//               <must be read   >: i m
+//               <must be written>: m[0][2][i]
+      (m->tab1)[i] = 1;                                                 /*0021*/
+//               <must be read   >: i m m[0][2][i] m[0][3]
+//               <must be written>: m[0][3][i]
+      (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
+   }
+}
+
+Proper effects for "init2"
+
+void init2(mys *n)
+{
+   int i;                                                               /*0029*/
+   mys m;                                                               /*0030*/
+//               <may be read    >: n[0][2][*]
+//               <may be written >: m[2][*]
+//               <must be read   >: n n[0][1] n[0][3]
+//               <must be written>: m[1] m[3]
+
+   m = *n;                                                              /*0032*/
+//               <must be written>: m[1]
+   m.num = 5;                                                           /*0033*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m[3]
+   m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
+//               <must be written>: m[2][0]
+   (m.tab1)[0] = 10;                                                    /*0035*/
+//               <must be read   >: m[3]
+//               <must be written>: m[3][0]
+   (m.tab2)[0] = 20;                                                    /*0036*/
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {
+//               <must be read   >: i
+//               <must be written>: m[2][i]
+      (m.tab1)[i] = 1;                                                  /*0039*/
+//               <must be read   >: i m[2][i] m[3]
+//               <must be written>: m[3][i]
+      (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
+   }
+}
+
+Proper effects for "init3"
+
+void init3(mys **p)
+{
+   int i;                                                               /*0047*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+   p = malloc(5*sizeof(mys *));                                         /*0048*/
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i p
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
+      p[i] = malloc(sizeof(mys));                                       /*0051*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i p p[i]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                                  p[i][0][3]
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
+   }
+//               <must be read   >: p p[0]
+//               <must be written>: p[0][0][1]
+
+   p[0]->num = 11;                                                      /*0055*/
+//               <must be read   >: p p[0]
+//               <must be written>: p[0][0][2][0]
+   (p[0]->tab1)[0] = 20;                                                /*0056*/
+//               <must be read   >: p p[0] p[0][0][3]
+//               <must be written>: p[0][0][3][0]
+   (p[0]->tab2)[0] = 30;                                                /*0057*/
+//               <must be written>: i
+
+   for(i = 1; i <= 4; i += 1) {
+//               <must be read   >: i p p[i]
+//               <must be written>: p[i][0][1]
+      p[i]->num = 10;                                                   /*0061*/
+//               <must be read   >: i p p[i]
+//               <must be written>: p[i][0][2][0]
+      (p[i]->tab1)[0] = 21;                                             /*0062*/
+//               <must be read   >: i p p[i] p[i] p[i][0][2][0] 
+//                                  p[i][0][3]
+//               <must be written>: p[i][0][3][0]
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
+   }
+}
+
+Proper effects for "init4"
+
+void init4(mys *p[5])
+{
+   int i;                                                               /*0069*/
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
+      p[i] = malloc(sizeof(mys));                                       /*0072*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i p[i]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                                  p[i][0][3]
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
+   }
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][1]
+
+   p[0]->num = 11;                                                      /*0076*/
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][2][0]
+   (p[0]->tab1)[0] = 20;                                                /*0077*/
+//               <must be read   >: p[0] p[0][0][3]
+//               <must be written>: p[0][0][3][0]
+   (p[0]->tab2)[0] = 30;                                                /*0078*/
+//               <must be written>: i
+   
+   
+   for(i = 1; i <= 4; i += 1) {
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][1]
+      p[i]->num = 10;                                                   /*0083*/
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][2][0]
+      (p[i]->tab1)[0] = 21;                                             /*0084*/
+//               <must be read   >: i p[i] p[i] p[i][0][2][0] 
+//                                  p[i][0][3]
+//               <must be written>: p[i][0][3][0]
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
+   }
+}
+
+POINTS TO
+
+//  {}
+void init(mys *m)
+{
+//  points to = {}
+   int i;                                                               /*0014*/
+//  points to = {}
+   m->num = 5;                                                          /*0015*/
+//  points to = {}
+   m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
+//  points to = {}
+   (m->tab1)[0] = 10;                                                   /*0017*/
+//  points to = {}
+   (m->tab2)[0] = 20;                                                   /*0018*/
+//  points to = {}
+   for(i = 0; i <= 4; i += 1) {
+//  points to = {}
+      (m->tab1)[i] = 1;                                                 /*0021*/
+//  points to = {}
+      (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
+   }
+}
+
+POINTS TO
+
+//  {}
+void init2(mys *n)
+{
+//  points to = {}
+   int i;                                                               /*0029*/
+//  points to = {}
+   mys m;                                                               /*0030*/
+//  points to = {}
+
+   m = *n;                                                              /*0032*/
+//  points to = {}
+   m.num = 5;                                                           /*0033*/
+//  points to = {}
+   m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
+//  points to = {}
+   (m.tab1)[0] = 10;                                                    /*0035*/
+//  points to = {}
+   (m.tab2)[0] = 20;                                                    /*0036*/
+//  points to = {}
+   for(i = 0; i <= 4; i += 1) {
+//  points to = {}
+      (m.tab1)[i] = 1;                                                  /*0039*/
+//  points to = {}
+      (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
+   }
+}
+
+POINTS TO
+
+//  {(p,_p_1,-Exact-)}
+void init3(mys **p)
+{
+//  {(p,_p_1,-Exact-)}
+   int i;                                                               /*0047*/
+//  {(p,_p_1,-Exact-)}
+   p = malloc(5*sizeof(mys *));                                         /*0048*/
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+   for(i = 0; i <= 4; i += 1) {
+//  points to = {}
+      p[i] = malloc(sizeof(mys));                                       /*0051*/
+//  points to = {}
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
+   }
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//   -MAY-)}
+
+   p[0]->num = 11;                                                      /*0055*/
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//   -MAY-)}
+   (p[0]->tab1)[0] = 20;                                                /*0056*/
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//   -MAY-)}
+   (p[0]->tab2)[0] = 30;                                                /*0057*/
+//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//   -MAY-)}
+
+   for(i = 1; i <= 4; i += 1) {
+//  points to = {}
+      p[i]->num = 10;                                                   /*0061*/
+//  points to = {}
+      (p[i]->tab1)[0] = 21;                                             /*0062*/
+//  points to = {}
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
+   }
+}
+
+POINTS TO
+
+//  {}
+void init4(mys *p[5])
+{
+//  points to = {}
+   int i;                                                               /*0069*/
+//  points to = {}
+   for(i = 0; i <= 4; i += 1) {
+//  points to = {}
+      p[i] = malloc(sizeof(mys));                                       /*0072*/
+//  points to = {}
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
+   }
+//  points to = {}
+
+   p[0]->num = 11;                                                      /*0076*/
+//  points to = {}
+   (p[0]->tab1)[0] = 20;                                                /*0077*/
+//  points to = {}
+   (p[0]->tab2)[0] = 30;                                                /*0078*/
+//  points to = {}
+   
+   
+   for(i = 1; i <= 4; i += 1) {
+//  points to = {}
+      p[i]->num = 10;                                                   /*0083*/
+//  points to = {}
+      (p[i]->tab1)[0] = 21;                                             /*0084*/
+//  points to = {}
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
+   }
+}
