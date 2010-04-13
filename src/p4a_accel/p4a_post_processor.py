@@ -102,8 +102,11 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ## with
     ## P4A_call_accel_kernel_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
 
-    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
-                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
+#   content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
+#                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
+
+    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);",
+                     "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);", content)
 
     # Add missing declarations of the p4a_kernel_launcher (outliner or
     # prettyprinter bug?)
@@ -128,7 +131,6 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = re.sub("(?s)typedef int wchar_t;\n.*?\nextern int getloadavg\\(double __loadavg\\[\\], int __nelem\\);\n",
                      "#include <stdlib.h>\n", content)
 
-    
     if verbose:
         print content,
 

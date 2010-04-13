@@ -79,7 +79,7 @@ void write_data(char filename[]) {
 }
 
 
-void interation(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
+void iteration(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   int i, j;
 
   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
@@ -103,7 +103,7 @@ void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
 
   /* Apply the relaxation T times: */
   for(t = 0; t < T; t++)
-    interation(space, save);
+    iteration(space, save);
 }
 
 
