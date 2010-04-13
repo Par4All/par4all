@@ -6875,13 +6875,17 @@ FREIA_LABEL_NODES TRUE
 \end{PipsProp}
 
 Whether to remove duplicate operations in the DAG, including
-algebraic optimizations with on commutators.
+algebraic optimizations with commutators.
 Should be always beneficial to terapix, but it may depend for spoc.
 \begin{PipsProp}{FREIA_REMOVE_DUPLICATE_OPERATIONS}
 FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
 \end{PipsProp}
 
-
+Whether to merge identical arguments, especially kernels, when calling
+an accelerated function:
+\begin{PipsProp}{FREIA_MERGE_ARGUMENTS}
+FREIA_MERGE_ARGUMENTS TRUE
+\end{PipsProp}
 
 
 %-----------End of Loop Transformations -------------------------

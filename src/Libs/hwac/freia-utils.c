@@ -508,7 +508,7 @@ list /* of expression */ freia_extract_params
     expression e = EXPRESSION(CAR(args));
     args = CDR(args);
 
-    if (params)
+    if (params && get_bool_property("FREIA_MERGE_ARGUMENTS"))
     {
       // ??? if the expression is a constant,
       // the parameter could be skipped as well?
