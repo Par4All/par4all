@@ -415,7 +415,6 @@ list generic_c_effects_backward_translation(entity callee,
 		     the sole value of the formal arg, it generates no effect 
 		     on the caller side.
 		  */
-		  // not appropriate for structs and unions
 		  if (ENDP(reference_indices(eff_ref))
 		      ||
 		      (!entity_array_p(eff_ent) // to work around the fact that formal arrays are not internally represented as pointers for the moment

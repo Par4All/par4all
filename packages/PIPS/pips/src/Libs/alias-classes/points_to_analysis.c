@@ -349,6 +349,9 @@ set basic_ref_ref(set pts_to_set,
 	  ref2 = expression_reference(rhs_tmp);
 	  ent2 = reference_variable(ref2);
 	}
+	else
+		pips_internal_error("Don't know how to handle this function %s \n", entity_name(call_function(c1)));
+	
   }else{
 	lhs_tmp = copy_expression(lhs);
 	rhs_tmp = copy_expression(rhs);
@@ -357,6 +360,7 @@ set basic_ref_ref(set pts_to_set,
 	ref2 = expression_reference(rhs);
 	ent2 = reference_variable(ref2);
   }
+
   if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
 	if((expression_pointer_p(lhs_tmp)&&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))) ||
 	   (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs_tmp))){
@@ -421,13 +425,12 @@ set basic_ref_ref(set pts_to_set,
 	  ifdebug(1)
 		print_points_to_set("Points to pour le cas 1 <x = y>\n",
 							pts_to_set);
+	}else{
+	ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
 	}
-  }
-  else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
-  }
+	
+  }else
+	   pips_internal_error("Don't know how to handle this kind of expression \n");
   return pts_to_set;
 }
 
@@ -443,21 +446,16 @@ set basic_ref_array(set pts_to_set,
   set written_pts_to = set_generic_make(set_private,
 										points_to_equal_p,points_to_rank);
   points_to pt_to = points_to_undefined;
-  syntax syn1=expression_syntax(lhs);
-  syntax syn2=expression_syntax(rhs);
   reference ref1 = reference_undefined;
   reference ref2 = reference_undefined;
-  entity ent2 = entity_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
   ifdebug(1) printf("\n cas x = y[i] \n");
-  syn1 = expression_syntax(lhs);
-  syn2 = expression_syntax(rhs);
-  ref2 = expression_reference(rhs);
-  ent2 = reference_variable(ref2);
-  if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
+ 
+
+  if(expression_reference_p(lhs) && expression_reference_p(rhs)){
 	if(expression_pointer_p(lhs)){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2 = effect_undefined;
@@ -500,12 +498,13 @@ set basic_ref_array(set pts_to_set,
 		print_points_to_set("Points to pour le cas 1 <x = y>\n",
 							pts_to_set);
 	}
-  }
-  else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
+  
+	else{
+		ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
 	}
-  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression \n");
+  
   return pts_to_set;
 }
 
@@ -542,7 +541,8 @@ set basic_ref_addr(set pts_to_set,
 	return pts_to_set;
   }
 
-  if(expression_pointer_p(lhs)){
+  if(expression_reference_p(lhs)){
+	  if(expression_pointer_p(lhs)){
 	// creation of the source
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
@@ -582,12 +582,12 @@ set basic_ref_addr(set pts_to_set,
 	ifdebug(1){
 	  print_points_to_set("points-to for case 2 <x = &y> \n ",
 						  pts_to_set);
-	}
-  } else {
-	ifdebug(1){
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
-  }
+	} 
+	  }else {
+		  ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression \n");
   return pts_to_set;
 }
 
@@ -603,30 +603,29 @@ set basic_ref_deref(set pts_to_set,
   set written_pts_to = set_generic_make(set_private,
 										points_to_equal_p,points_to_rank);
   points_to pt_to = points_to_undefined;
-  syntax syn1=syntax_undefined;
-  syntax syn2=syntax_undefined;
   reference ref1 = reference_undefined;
   reference ref2 = reference_undefined;
   call c2 = call_undefined;
-  entity ent1 = entity_undefined;
-  entity ent2 = entity_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
+  expression rhs_tmp = expression_undefined;
+  
   ifdebug(1){
 	pips_debug(1, " case  x = *y\n");
   }
-  syn1=expression_syntax(lhs);
-  ref1=syntax_reference(syn1);
-  ent1=reference_variable(ref1);
-  syn2=expression_syntax(rhs);
-  c2 = syntax_call(syn2);
-  list  args = call_arguments(c2);
-  expression rhs_tmp = EXPRESSION (CAR(args));
-  ref2 = expression_reference(rhs_tmp);
-  ent2 = argument_entity(copy_expression(rhs_tmp));
-  if(expression_pointer_p(lhs) &&
+  
+  syntax syn2 = expression_syntax(rhs);
+  if(syntax_call_p(syn2)){
+	  c2 = syntax_call(syn2);
+	  list  args = call_arguments(c2);
+	  rhs_tmp = EXPRESSION (CAR(args));
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression \n");
+  
+  if(expression_reference_p(lhs)){
+	  if(expression_pointer_p(lhs) &&
 	 expression_double_pointer_p(rhs_tmp)){
 	// creation of the source
 	effect e1 = effect_undefined, e2 = effect_undefined;
@@ -683,11 +682,14 @@ set basic_ref_deref(set pts_to_set,
 						  pts_to_set);
 	}
   }
-  else {
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
-  }
+	  else {
+	  ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	
+	  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression \n");
+	  
+  
   return pts_to_set;
 }
 
@@ -734,11 +736,12 @@ set basic_deref_ref(set pts_to_set,
 	{
 	  list l = call_arguments(c);
 	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
-	}
+	}else
+		pips_internal_error("Don't know how to handle this call %s\n", entity_name(call_function(c)));
   }
-
-  if(expression_double_pointer_p(lhs_tmp)&&
-     expression_pointer_p(rhs)){
+  if(expression_reference_p(ex) && expression_reference_p(rhs)){
+	  if(expression_double_pointer_p(lhs_tmp)&&
+	 expression_pointer_p(rhs)){
     effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 =
@@ -822,10 +825,11 @@ set basic_deref_ref(set pts_to_set,
 	pts_to_set = set_union(pts_to_set, gen_pts_to, s1);
   }
   else {
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
+	ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
 	}
-  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression \n");
+    
   return pts_to_set;
 }
 
@@ -852,6 +856,8 @@ static set basic_deref_addr(set pts_to_set,
   entity ent1 = entity_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
+  expression rhs_tmp = expression_undefined;
+  
   ifdebug(1){
 	pips_debug(1, " case *x = &y\n");
   }
@@ -870,14 +876,21 @@ static set basic_deref_addr(set pts_to_set,
 	  list l = call_arguments(c);
 	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
 	}
+	else
+		pips_internal_error("Don't know how to handle this kind of function %s \n", entity_name(call_function(c)));
+	
   }
   ref1 = expression_reference(lhs_tmp);
   ent1 = argument_entity(lhs_tmp);
   // recuperation of y
   syn2 = expression_syntax(rhs);
-  c2 = syntax_call(syn2);
-  list args2 = call_arguments(c2);
-  expression  rhs_tmp = EXPRESSION (CAR(args2));
+  if(syntax_call_p(syn2)){
+	  c2 = syntax_call(syn2);
+	  list args2 = call_arguments(c2);
+    rhs_tmp = EXPRESSION (CAR(args2));
+  }else	  
+	  pips_internal_error("Don't know how to handle this kind of function\n");
+  
   if(array_argument_p(rhs_tmp))
   {
 	pts_to_set = set_assign(pts_to_set, basic_deref_array(pts_to_set,
@@ -885,8 +898,8 @@ static set basic_deref_addr(set pts_to_set,
 														  rhs_tmp));
 	return pts_to_set;
   }
-
-  if(expression_double_pointer_p(lhs_tmp)){
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs_tmp)){
+	  if(expression_double_pointer_p(lhs_tmp)){
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 =
@@ -960,12 +973,12 @@ static set basic_deref_addr(set pts_to_set,
 	ifdebug(1)
 	  print_points_to_set("Points pour le cas 5 <*x = &y> \n ",
 						  pts_to_set);
-  }
-  else {
-	ifdebug(1){
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
-  }
+  } else {
+		  ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression\n");
+  
   return pts_to_set;
 }
 
@@ -989,9 +1002,9 @@ set basic_deref_array(set pts_to_set,
   call c2 = call_undefined;
   reference ref1 = reference_undefined;
   reference ref2 = reference_undefined;
-  entity ent1 = entity_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
+   
   ifdebug(1){
 	pips_debug(1, " case *x = &y[i] or *m.x = &y[i]\n");
   }
@@ -1000,7 +1013,6 @@ set basic_deref_array(set pts_to_set,
   c1 = syntax_call(syn1);
   list  args1 = call_arguments(c1);
   expression  lhs_tmp = EXPRESSION (CAR(args1));
-  expression ex = copy_expression(lhs_tmp);
   syntax s = expression_syntax(lhs_tmp);
   if(syntax_call_p(s))
   {
@@ -1010,23 +1022,29 @@ set basic_deref_array(set pts_to_set,
 	  list l = call_arguments(c);
 	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
 	}
+	else
+		pips_internal_error("Don't know how to handle this kind of function %s \n", entity_name(call_function(c)));
+	
   }
-  ref1 = expression_reference(lhs_tmp);
-  ent1 = argument_entity(lhs_tmp);
+ 
   // recuperation of y
   syn2 = expression_syntax(rhs);
-  c2 = syntax_call(syn2);
-  list args2 = call_arguments(c2);
-  expression  rhs_tmp = EXPRESSION (CAR(args2));
-  if(expression_double_pointer_p(lhs_tmp)) {
+  if(syntax_call_p(syn2)){
+	  c2 = syntax_call(syn2);
+	  list args2 = call_arguments(c2);
+	  rhs = EXPRESSION (CAR(args2));
+  }
+
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs)){
+	  if(expression_double_pointer_p(lhs_tmp)) {
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
 	list l1 =
-	  generic_proper_effects_of_complex_address_expression(ex,
+	  generic_proper_effects_of_complex_address_expression(lhs_tmp,
 														   &e1,
 														   true);
 	list l2 =
-	  generic_proper_effects_of_complex_address_expression(rhs_tmp,
+	  generic_proper_effects_of_complex_address_expression(rhs,
 														   &e2,
 														   false);
 	effects_free(l1);
@@ -1094,12 +1112,12 @@ set basic_deref_array(set pts_to_set,
 	ifdebug(1)
 	  print_points_to_set("Points pour le cas 5 <*x = &y> \n ",
 						  pts_to_set);
+	  }  else {
+	ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	  }
   }
-  else {
-	ifdebug(1){
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
-  }
+  else
+	  pips_internal_error("Don't know how to handle this kind of expression\n");
   return pts_to_set;
 }
 
@@ -1153,7 +1171,9 @@ set basic_deref_deref(set pts_to_set,
   expression rhs_tmp = EXPRESSION (CAR(args2));
   ref2 = expression_reference(rhs_tmp);
   ent2 = argument_entity(rhs_tmp);
-  if(expression_double_pointer_p(lhs_tmp)&&
+
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs_tmp)){
+	  if(expression_double_pointer_p(lhs_tmp)&&
 	 expression_pointer_p(rhs)) {
 	effect e1 = effect_undefined, e2 = effect_undefined;
 	set_methods_for_proper_simple_effects();
@@ -1238,13 +1258,11 @@ set basic_deref_deref(set pts_to_set,
 	ifdebug(1)
 	  print_points_to_set("Points To pour le cas6  <*x = *y> \n",
 						  pts_to_set);
-  }
-
-  else {
-	ifdebug(1){
-	  pips_debug(1, "Neither variable is a pointer\n");
+  } else {
+	ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
 	}
-  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression\n");
   return pts_to_set;
 }
 
@@ -1282,7 +1300,8 @@ set basic_field_addr(set pts_to_set,
   call  c1 = syntax_call(syn1);
   list args1 = call_arguments(c1);
   expression  lhs_tmp = EXPRESSION (CAR(CDR(args1)));
-  if(expression_pointer_p(lhs_tmp)) {
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs_tmp)){
+	  if(expression_pointer_p(lhs_tmp)) {
 	// creation of the source
 	//syntax ss = expression_syntax(lhs_tmp);
 	effect e1 = effect_undefined;
@@ -1330,10 +1349,10 @@ set basic_field_addr(set pts_to_set,
 	}
   }
   else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
+	ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
 	}
-  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression\n");
   return pts_to_set;
 }
 
@@ -1347,12 +1366,9 @@ set basic_ref_field(set pts_to_set,
   set written_pts_to = set_generic_make(set_private,
 										points_to_equal_p,points_to_rank);
   points_to pt_to = points_to_undefined;
-  syntax syn1=expression_syntax(lhs);
   syntax syn2=syntax_undefined;
   reference ref1 = reference_undefined;
   reference ref2 = reference_undefined;
-  reference r = reference_undefined;
-  entity ent1 = entity_undefined;
   entity ent2 = entity_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
@@ -1360,23 +1376,20 @@ set basic_ref_field(set pts_to_set,
   approximation rel = approximation_undefined;
   list l=NIL, l1=NIL;
   pips_debug(1," case x = y.a \n");
-  syn1 = expression_syntax(lhs);
   syn2 = expression_syntax(rhs);
-
   call  c1 = syntax_call(syn2);
   list args1 = call_arguments(c1);
   expression  rhs_tmp = EXPRESSION (CAR(CDR(args1)));
-  r = expression_reference(rhs);
-  syntax s = expression_syntax(rhs_tmp);
+ 
   ref2 = expression_reference(rhs_tmp);
-  if(syntax_reference_p(syn1) && syntax_reference_p(s)){
+  if(expression_reference_p(lhs) && expression_reference_p(rhs_tmp)){
 	ent2=reference_variable(ref2);
 	if(expression_pointer_p(lhs)
 	   &&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2;
 	  set_methods_for_proper_simple_effects();
-	  l = generic_proper_effects_of_complex_address_expression(copy_expression(lhs),
+	  l = generic_proper_effects_of_complex_address_expression(lhs,
 															   &e1,
 															   true);
 	  l1 = generic_proper_effects_of_complex_address_expression(rhs,&e2,false);
@@ -1384,8 +1397,7 @@ set basic_ref_field(set pts_to_set,
 	  effects_free(l1);
 	  generic_effects_reset_all_methods();
 	  ref1 = effect_any_reference(e1);
-	  ent1 = reference_variable(copy_reference(ref1));
-	  source = make_cell_reference(copy_reference(ref1));
+	  source = make_cell_reference(ref1);
 	  // add the points_to relation to the set generated
 	  // by this assignement
 	  reference  ref = effect_any_reference(copy_effect(e2));
@@ -1433,12 +1445,11 @@ set basic_ref_field(set pts_to_set,
 		print_points_to_set("Points to for the case <x = y.a>\n",
 							pts_to_set);
 	}
-  }
-  else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
+	else{
+	ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
 	}
-  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression\n");
   return pts_to_set;
 }
 
@@ -1471,16 +1482,15 @@ set basic_ref_ptr_to_field(set pts_to_set,
   call  c1 = syntax_call(syn2);
   list args1 = call_arguments(c1);
   expression  rhs_tmp = EXPRESSION (CAR(CDR(args1)));
-  syntax s = expression_syntax(rhs_tmp);
   ref2 = expression_reference(rhs_tmp);
-  if(syntax_reference_p(syn1) && syntax_reference_p(s)){
+  if(expression_reference_p(lhs) && expression_reference_p(rhs_tmp)){
 	ent2=reference_variable(ref2);
 	if(expression_pointer_p(lhs)
 	   &&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))){
 	  // creation of the source
 	  effect e1 = effect_undefined, e2;
 	  set_methods_for_proper_simple_effects();
-	  l = generic_proper_effects_of_complex_address_expression(copy_expression(lhs),
+	  l = generic_proper_effects_of_complex_address_expression(lhs,
 															   &e1,
 															   true);
 	  l1 = generic_proper_effects_of_complex_address_expression(rhs,&e2,false);
@@ -1535,13 +1545,13 @@ set basic_ref_ptr_to_field(set pts_to_set,
 	  ifdebug(1)
 		print_points_to_set("Points to pour le cas 1 <x = y.a>\n",
 							pts_to_set);
+	
+	}else{
+		ifdebug(1)  pips_debug(1, "Neither variable is a pointer\n");
+	
 	}
-  }
-  else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
-  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression\n");
   return pts_to_set;
 }
 
@@ -1588,6 +1598,8 @@ set basic_deref_field(set pts_to_set,
 	  list l = call_arguments(c);
 	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
 	}
+	else
+		pips_internal_error("Don't know how to handle this kind of function %s\n", entity_name(call_function(c)));
   }
   // recuperation of y
   syntax syn2 = expression_syntax(rhs);
@@ -1604,7 +1616,8 @@ set basic_deref_field(set pts_to_set,
 	{
 	  list l = call_arguments(c);
 	  rhs_tmp = EXPRESSION (CAR(CDR(l)));
-	}
+	}else
+		pips_internal_error("Don't know how to handle this kind of function %s\n", entity_name(call_function(c)));
   }
 
   if(expression_double_pointer_p(lhs_tmp)&& expression_pointer_p(rhs_tmp)){
@@ -1735,7 +1748,8 @@ set basic_ptr_to_field_addr(set pts_to_set,
   call  c1 = syntax_call(syn1);
   list args1 = call_arguments(c1);
   expression  lhs_tmp = EXPRESSION (CAR(CDR(args1)));
-  if(expression_pointer_p(lhs_tmp)){
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs_tmp)){
+	  if(expression_pointer_p(lhs_tmp)){
 	// creation of the source
 	//syntax ss = expression_syntax(lhs_tmp);
 	effect e1 = effect_undefined;
@@ -1777,12 +1791,12 @@ set basic_ptr_to_field_addr(set pts_to_set,
 	  print_points_to_set("points To pour le cas 2 <m->x = &y> \n ",
 						  pts_to_set);
 	}
-  }
-  else{
-	ifdebug(1) {
-	  pips_debug(1, "Neither variable is a pointer\n");
-	}
-  }
+  
+	  }else{
+		  ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	  }
+  }else
+		pips_internal_error("Don't know how to handle this kind of expression");
   return pts_to_set;
 }
 
@@ -1823,21 +1837,21 @@ set basic_ptr_to_field_ptr_to_field(set pts_to_set,
   syn2 = expression_syntax(rhs_tmp);
   ref2 = expression_reference(rhs_tmp);
   ent2 = reference_variable(ref2);
-  if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
-	if((expression_pointer_p(lhs_tmp) && expression_pointer_p(rhs_tmp)) ||
-	   (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs_tmp))){
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs_tmp)){
+	  if((expression_pointer_p(lhs_tmp) && expression_pointer_p(rhs_tmp)) ||
+		 (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs_tmp))){
 	  // creation of the source
-	  effect e1 = effect_undefined, e2 = effect_undefined;
-	  set_methods_for_proper_simple_effects();
-	  list l1 = generic_proper_effects_of_complex_address_expression(lhs,
+		  effect e1 = effect_undefined, e2 = effect_undefined;
+		  set_methods_for_proper_simple_effects();
+		  list l1 = generic_proper_effects_of_complex_address_expression(lhs,
 																	 &e1,
-																	 true);
-	  list l2 = generic_proper_effects_of_complex_address_expression(rhs,
+																		 true);
+		  list l2 = generic_proper_effects_of_complex_address_expression(rhs,
 																	 &e2,
 																	 false);
-	  effects_free(l1);
-	  effects_free(l2);
-	  generic_effects_reset_all_methods();
+		  effects_free(l1);
+		  effects_free(l2);
+		  generic_effects_reset_all_methods();
 	  ref1 = effect_any_reference(e1);
 	  source = make_cell_reference(ref1);
 
@@ -1878,10 +1892,12 @@ set basic_ptr_to_field_ptr_to_field(set pts_to_set,
 		print_points_to_set("Points to pour le cas 1 <m->x =m-> y>\n",
 							pts_to_set);
 	}
-  }
-  else{
-	pips_debug(1, "Neither variable is a pointer\n");
-  }
+	else{
+		pips_debug(1, "Neither variable is a pointer\n");
+	}
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression");
+	
 
   return pts_to_set;
 }
@@ -1931,7 +1947,8 @@ set basic_deref_ptr_to_field(set pts_to_set,
 	{
 	  list l = call_arguments(c);
 	  lhs_tmp = EXPRESSION (CAR(CDR(l)));
-	}
+	}else
+		pips_internal_error("Don't know how to handle this kind of function %s\n", entity_name(call_function(c)));
     }
   // recuperation of y
   syntax syn2 = expression_syntax(rhs);
@@ -1948,10 +1965,11 @@ set basic_deref_ptr_to_field(set pts_to_set,
 	{
 	  list l = call_arguments(c);
 	  rhs_tmp = EXPRESSION (CAR(CDR(l)));
+	}else
+		  pips_internal_error("Don't know how to handle this kind of function %s\n", entity_name(call_function(c)));
 	}
-    }
-
-  if(expression_double_pointer_p(lhs_tmp)&&
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs_tmp)){
+	  if(expression_double_pointer_p(lhs_tmp)&&
      expression_pointer_p(rhs_tmp)){
     effect e1 = effect_undefined, e2 = effect_undefined;
     set_methods_for_proper_simple_effects();
@@ -2033,10 +2051,10 @@ set basic_deref_ptr_to_field(set pts_to_set,
     pts_to_set = set_union(pts_to_set, gen_pts_to, s1);
   }
   else {
-    ifdebug(1) {
-      pips_debug(1, "Neither variable is a pointer\n");
+	  ifdebug(1)  pips_debug(1, "Neither variable is a pointer\n");
     }
-  }
+  }else
+		pips_internal_error("Don't know how to handle this kind of expression");
   return pts_to_set;
 }
 
@@ -2080,14 +2098,10 @@ set basic_ptr_to_field_field(set pts_to_set,
       syn2=expression_syntax(rhs_tmp);
       ref2=expression_reference(rhs_tmp);
       ent2=reference_variable(ref2);
-    }
-  }else{
-    rhs_tmp = copy_expression(rhs);
-    syn2 = expression_syntax(rhs);
-    ref2 = expression_reference(rhs);
-    ent2 = reference_variable(ref2);
+    }else
+		pips_internal_error("Don't know how to handle this kind of function %s \n", entity_name(call_function(c2)));
   }
-  if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs)){
     if((expression_pointer_p(lhs_tmp)&&(expression_pointer_p(rhs_tmp) || array_entity_p(ent2))) ||
        (expression_double_pointer_p(lhs_tmp)&& expression_double_pointer_p(rhs_tmp))){
       // creation of the source
@@ -2151,12 +2165,11 @@ set basic_ptr_to_field_field(set pts_to_set,
 	print_points_to_set("Points to pour le cas 1 <x = y>\n",
 			    pts_to_set);
     }
-  }
-  else{
-    ifdebug(1) {
-      pips_debug(1, "Neither variable is a pointer\n");
-    }
-  }
+	else{
+		ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	}
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression");
   return pts_to_set;
 }
 
@@ -2170,11 +2183,12 @@ set basic_ptr_to_field_struct(set pts_to_set,
 
 
 /* one basic case of Emami: < m->x = *y > */
-set basic_ptr_to_field_deref(set pts_to_set,
+set basic_ptr_to_field_deref(set pts_to_set __attribute__ ((__unused__)),
 			     expression lhs __attribute__ ((__unused__)),
 			     expression rhs __attribute__ ((__unused__)))
 {
-  return pts_to_set;
+	pips_internal_error("<case m->x = *y> not implemented yet \n");
+// return pts_to_set;
 }
 
 /* one basic case of Emami: < m->x = y > */
@@ -2209,7 +2223,7 @@ set basic_ptr_to_field_ref(set pts_to_set,
   }else{
     lhs_tmp = copy_expression(lhs);
   }
-  if(syntax_reference_p(syn1) && syntax_reference_p(syn2)){
+  if(expression_reference_p(lhs_tmp) && expression_reference_p(rhs)){
     ref2 = syntax_reference(syn2);
     ent2=reference_variable(ref2);
     if((expression_pointer_p(lhs_tmp)&&(expression_pointer_p(rhs) || array_entity_p(ent2))) ||
@@ -2275,12 +2289,11 @@ set basic_ptr_to_field_ref(set pts_to_set,
 	print_points_to_set("Points to pour le cas 1 <x = y>\n",
 			    pts_to_set);
     }
-  }
-  else{
-    ifdebug(1) {
-      pips_debug(1, "Neither variable is a pointer\n");
-    }
-  }
+	else{
+    ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	}
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression");
   return pts_to_set;
 }
 
@@ -2356,7 +2369,8 @@ set struct_double_pointer(set pts_to_set, expression lhs, expression rhs)
   set written_pts_to = set_generic_make(set_private,
 										points_to_equal_p,points_to_rank);
   effect e1 = effect_undefined, e2 = effect_undefined;
-  set_methods_for_proper_simple_effects();
+  if(expression_reference_p(lhs) && expression_reference_p(rhs)){
+	  set_methods_for_proper_simple_effects();
   list l1 = generic_proper_effects_of_complex_address_expression(lhs,
 																 &e1,
 																 true);
@@ -2403,9 +2417,11 @@ set struct_double_pointer(set pts_to_set, expression lhs, expression rhs)
   ifdebug(1)
 	print_points_to_set("Points to pour le cas 1 <x = y>\n",
 						pts_to_set);
-
+  } else
+	  pips_internal_error("Don't know how to handle this kind of expression");
+  
   return pts_to_set;
-
+  
 }
 
 // to decompose the assignment m = n where  m and n are respectively
@@ -2471,7 +2487,6 @@ set basic_ref_heap(set pts_to_set,
   syntax syn2 = expression_syntax(rhs);
   reference ref1 = syntax_reference(syn1);
   reference ref2 = reference_undefined;
-  entity ent1 = reference_variable(ref1);
   cell source = cell_undefined;
   cell sink = cell_undefined;
   approximation rel = approximation_undefined;
@@ -2500,8 +2515,8 @@ set basic_ref_heap(set pts_to_set,
 
     }
   }
-
-  if(expression_pointer_p(lhs)){
+  if(expression_reference_p(lhs)){
+	  if(expression_pointer_p(lhs)){
     // creation of the source
     effect e1 = effect_undefined;
     type lhst = expression_to_type(lhs);
@@ -2553,12 +2568,12 @@ set basic_ref_heap(set pts_to_set,
       print_points_to_set("Points To pour le cas 3 <x ==()malloc(sizeof()) > \n",
 			  pts_to_set);
     }
-  }
-  else{
-    ifdebug(1) {
-      pips_debug(1, "Neither variable is a pointer\n");
-    }
-  }
+	  }
+	  else{
+		  ifdebug(1) pips_debug(1, "Neither variable is a pointer\n");
+	  }
+  }else
+	  pips_internal_error("Don't know how to handle this kind of expression");
   return pts_to_set;
 }
 
@@ -2855,7 +2870,7 @@ set points_to_sequence(sequence seq, set pt_in, bool store)
 
 /* compute the points-to set for an intrinsic call */
 set points_to_intrinsic(statement s,
-			call c,
+			call c __attribute__ ((__unused__)),
 			entity e,
 			list pc,
 			set pt_in,
@@ -2866,7 +2881,7 @@ set points_to_intrinsic(statement s,
   set pt_cur = set_generic_make(set_private,
 				points_to_equal_p, points_to_rank);
   expression lhs = expression_undefined;
-  expression exp = call_to_expression(c);
+ 
   pips_debug(8, "begin\n");
 
   /* Recursive descent on subexpressions for cases such as "p=q=t=u;" */

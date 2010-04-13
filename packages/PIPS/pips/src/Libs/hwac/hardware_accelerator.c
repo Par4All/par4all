@@ -21,8 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 
 #include "genC.h"
@@ -43,17 +44,14 @@
 #include "control.h" // for clean_up_sequences
 #include "effects-generic.h" // {set,reset}_proper_rw_effects
 
-extern string freia_compile(string, statement);
+#include "freia.h"
 
-#define SPOC_HW		"spoc"
-#define TERAPIX_HW	"terapix"
+extern string freia_compile(string, statement, string);
 
 static int freia_compiler(string module, string hardware)
 {
   debug_on("PIPS_HWAC_DEBUG_LEVEL");
-
-  pips_assert("only spoc hardware is implemented",
-	      same_string_p(hardware, SPOC_HW));
+  pips_debug(1, "considering module %s for hardware %s\n", module, hardware);
 
   // this will be usefull
   statement mod_stat =
@@ -70,14 +68,18 @@ static int freia_compiler(string module, string hardware)
   pips_debug(1, "considering module %s\n", module);
 
   // accelerated code generation
-  string spoc_file = freia_compile(module, mod_stat);
+  string freia_file = freia_compile(module, mod_stat, hardware);
 
   // some code cleanup
   clean_up_sequences(mod_stat);
 
   // put updated code and accelerated helpers
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
-  DB_PUT_NEW_FILE_RESOURCE(DBR_SPOC_FILE, module, spoc_file);
+
+  if (freia_spoc_p(hardware))
+    DB_PUT_NEW_FILE_RESOURCE(DBR_SPOC_FILE, module, freia_file);
+  else if (freia_terapix_p(hardware))
+    DB_PUT_NEW_FILE_RESOURCE(DBR_TERAPIX_FILE, module, freia_file);
 
   // release resources
   // ??? free statement_effects? MEMORY LEAK...
@@ -94,11 +96,13 @@ static int freia_compiler(string module, string hardware)
 
 int freia_spoc_compiler(string module)
 {
-  return freia_compiler(module, SPOC_HW);
+  return freia_compiler(module, "spoc");
 }
 
-// future work...
 int freia_terapix_compiler(string module)
 {
-  return freia_compiler(module, TERAPIX_HW);
+  return freia_compiler(module, "terapix");
 }
+
+/* freia_vhdl_compiler(string module) :-)
+ */

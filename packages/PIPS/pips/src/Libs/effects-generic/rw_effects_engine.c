@@ -248,7 +248,7 @@ static void rw_effects_of_unstructured(unstructured unst)
 static void rw_effects_of_while(whileloop w)
 {
     statement current_stat = effects_private_current_stmt_head();
-    list l_prop, l_body;
+    list l_prop, l_body, l_cond_first, l_res;
     statement b = whileloop_body(w);
     transformer trans;
     
@@ -257,6 +257,10 @@ static void rw_effects_of_while(whileloop w)
     */
 				   
     l_prop = effects_dup(load_proper_rw_effects_list(current_stat)); /* R[C] */
+
+    /* The condition is executed at least once : let's keep exact effects if we can */
+    l_cond_first = effects_dup(l_prop);
+
     l_body = effects_dup(load_rw_effects_list(b)); /* R[S] */
     /* I use the famous over-approximation of E[C]: Id */
     trans = (*load_transformer_func)(current_stat); /* T*[while(C)S] */
@@ -267,32 +271,71 @@ static void rw_effects_of_while(whileloop w)
     /* We don't know whether the loop is executed at least once or not. */
     effects_to_may_effects(l_body);
 
-    (*effects_descriptor_normalize_func)(l_body);
+    /* We add the effects of the first condition evaluation */
+    l_res = (*effects_union_op)(l_cond_first, l_body, effects_same_action_p);
 
-    store_rw_effects_list(current_stat, l_body);
+    (*effects_descriptor_normalize_func)(l_res);
+
+    store_rw_effects_list(current_stat, l_res);
 }
 
-/* Amira: To be refined later... */
 static void rw_effects_of_forloop(forloop w)
 {
     statement current_stat = effects_private_current_stmt_head();
-    list l_prop, l_body;
     statement b = forloop_body(w);
     transformer trans;
-    
-    pips_user_warning("Ongoing implementation! Amira mensi\n");
 
-    l_prop = effects_dup(load_proper_rw_effects_list(current_stat)); /* R[C] */
+    list l_body = NIL, l_res = NIL, li = NIL, lc = NIL, linc = NIL, l_init = NIL, l_cond_inc = NIL;
+    
+    /* we should check if the loop is executed at least once : 
+       we could keep exact effects on scalars at least. 
+    */
+
+    /* proper_effects first : we must recompute them
+     * there are must effects for the intialization and the first evaluation
+     * of the condition.
+     * the next evaluations of the condition and the incrementation must be 
+     * composed by the transformer.
+     */
+
+    /* effects of initialization */
+    li = generic_proper_effects_of_expression(forloop_initialization(w));
+
+    /* effects of condition expression */
+    lc = generic_proper_effects_of_expression(forloop_condition(w));
+
+    /* effects of incrementation expression  */
+    linc = generic_proper_effects_of_expression(forloop_increment(w));
+
+    l_init = gen_nconc(li, lc);
+    l_cond_inc = (*effects_union_op)(effects_dup(lc), linc, effects_same_action_p);
+
+    if (get_constant_paths_p())
+      {
+	list l_tmp = l_init;
+	l_init = pointer_effects_to_constant_path_effects(l_init);
+	effects_free(l_tmp);
+	l_tmp = l_cond_inc;
+	l_cond_inc = pointer_effects_to_constant_path_effects(l_cond_inc);
+	effects_free(l_tmp);
+      }
+
     l_body = effects_dup(load_rw_effects_list(b)); /* R[S] */
     /* I use the famous over-approximation of E[C]: Id */
     trans = (*load_transformer_func)(current_stat); /* T*[while(C)S] */
 
-    l_body = (*effects_union_op)(l_body, l_prop, effects_same_action_p);
-    l_body = (*effects_transformer_composition_op)(l_body, trans);
+    l_body = (*effects_union_op)(l_body, l_cond_inc, effects_same_action_p);
+    l_res = (*effects_transformer_composition_op)(l_body, trans);
 
-    (*effects_descriptor_normalize_func)(l_body);
+    /* We don't know whether the loop is executed at least once or not. */
+    effects_to_may_effects(l_res);
 
-    store_rw_effects_list(current_stat, l_body);
+    /* We finally add the effects of the initialization phase */
+    l_res = (*effects_union_op)(l_init, l_res, effects_same_action_p);
+    
+    (*effects_descriptor_normalize_func)(l_res);
+
+    store_rw_effects_list(current_stat, l_res);
 }
 
 static void rw_effects_of_loop(loop l)
@@ -604,6 +647,7 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 
       if (storage_ram_p(decl_s))
 	{
+	  /* static variable declaration has no effect, even in case of initialization. */
 	  if (! static_area_p(ram_section(storage_ram(decl_s))))
 	    {
 	      
@@ -702,32 +746,7 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 		      rb_lrw = gen_nconc(generic_proper_effects_of_expression(exp_init), rb_lrw);
 		    }
 		} /* if (! static_area_p(ram_section(storage_ram(decl_s))))*/
-	      else
-		{
-		  /* static variable : we must add the proper effects of the declaration 
-		     if there is an initialization at the function first call
-		  */
-		  list l_tmp = NIL;
-
-		   if(type_variable_p(entity_type(decl)))
-		     {
-		       value v_init = entity_initial(decl);
-		       expression exp_init = expression_undefined;
-		       if(value_expression_p(v_init))
-			 exp_init = value_expression(v_init);  
-		       if(!expression_undefined_p(exp_init))
-			 {
-			   l_tmp = generic_proper_effects_of_reference(make_reference(decl, 
-										      NIL),	
-								       true);
-			   l_tmp = gen_nconc(generic_proper_effects_of_expression(exp_init), l_tmp);
-			   effects_to_may_effects(l_tmp);
-			   rb_lrw = gen_nconc(l_tmp, rb_lrw);
-			 }
-		       
-		     }
-		   
-		}
+	      
 	    } /* if (storage_ram(decl_s)) */
 	} /* if (!ENDP(CDR(l_decl))) */
       // we should also do some kind of unioning...

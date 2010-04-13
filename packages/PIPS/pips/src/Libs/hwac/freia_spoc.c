@@ -21,8 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 
 #include <stdint.h>
@@ -30,6 +31,7 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "freia.h"
 #include "freia_spoc.h"
 
 #include "linear.h"
@@ -45,41 +47,28 @@
 // help reduce code size:
 #define T true
 #define F false
-#define cat concatenate
-
-#define sb_cat string_buffer_cat
-#define sb_app string_buffer_append
-
-/* @return new allocated variable name using provided prefix.
- * *params is incremented as a side effect.
- */
-static string get_var(string prefix, int * params)
-{
-  return strdup(cat(prefix, itoa((*params)++), NULL));
-}
 
 static void comment(string_buffer code, spoc_hardware_type hw,
 		    dagvtx v, int stage, int side, bool flip)
 {
   sb_cat(code, "  // ", what_operation(hw), " ",
-	 itoa(dagvtx_number(v)), " ", dagvtx_operation(v), NULL);
-  sb_cat(code, " stage ", itoa(stage), NULL);
-  if (hw!=spoc_type_alu) sb_cat(code, " side ", itoa(side), NULL);
-  if (hw==spoc_type_alu && flip) sb_app(code, " flipped");
-  sb_app(code, "\n");
+	 itoa(dagvtx_number(v)), " ", dagvtx_operation(v));
+  sb_cat(code, " stage ", itoa(stage));
+  if (hw!=spoc_type_alu) sb_cat(code, " side ", itoa(side));
+  if (hw==spoc_type_alu && flip) sb_cat(code, " flipped");
+  sb_cat(code, "\n");
 }
 
 /* generate a configuration for the ALU hardware component.
  */
 static void spoc_alu_conf
-(spoc_alu_t alu,
- string_buffer head,
- string_buffer body,
- __attribute__ ((__unused__)) string_buffer tail,
- int stage,
- bool flip,
- int * cst,
- dagvtx orig)
+  (spoc_alu_t alu,
+   string_buffer body,
+   __attribute__ ((__unused__)) string_buffer tail,
+   int stage,
+   bool flip,
+   dagvtx orig,
+   hash_table hp)
 {
   if (alu!=alu_unused) // should not be called? copy?
   {
@@ -97,16 +86,14 @@ static void spoc_alu_conf
     string s_stage = strdup(itoa(stage));
     comment(body, spoc_type_alu, orig, stage, -1, flip);
     sb_cat(body,
-      "  si.alu[", s_stage, "][0].op = ", aluop->setting, ";\n", NULL);
-    if (aluop->use_cst) {
-      // string var = "c%d";
-      string s_var = get_var("cst", cst);
-      // (*decls) += ", int32_t " + var;
-      sb_cat(head, ", int32_t ", s_var, NULL);
+      "  si.alu[", s_stage, "][0].op = ", aluop->setting, ";\n");
+    if (aluop->use_cst)
+    {
+      expression arg = EXPRESSION(CAR(freia_get_vertex_params(orig)));
+      string s_var = hash_get(hp, arg);
       // res += "spocinstr.alu[%stage][0].constant = " + var + ";\n";
       sb_cat(body,
-	"  sp.alu[", s_stage, "][0].constant = ", s_var, ";\n", NULL);
-      free(s_var);
+	"  sp.alu[", s_stage, "][0].constant = ", s_var, ";\n");
     }
 
     free(s_stage);
@@ -118,41 +105,40 @@ static void spoc_alu_conf
 /* generate a configuration for a POC (morpho) hardware component.
  */
 static void spoc_poc_conf
-(spoc_poc_t poc,
- string_buffer head,
- string_buffer body,
- __attribute__ ((__unused__)) string_buffer tail,
- int stage,
- int side,
- int * cst,
- dagvtx orig)
+  (spoc_poc_t poc,
+   string_buffer body,
+   __attribute__ ((__unused__)) string_buffer tail,
+   int stage,
+   int side,
+   dagvtx orig,
+   hash_table hp) // expression -> parameter name
 {
   if (poc.op!=spoc_poc_unused) // should not be called?
   {
     string
       s_stag = strdup(itoa(stage)),
-      s_side = strdup(itoa(side)),
-      s_var = get_var("kern", cst);
+      s_side = strdup(itoa(side));
 
-    // int32_t * var (kernel)
-    sb_cat(head, ", int32_t *", s_var, NULL);
+    // only one argument is expected, the kernel
+    expression arg = EXPRESSION(CAR(freia_get_vertex_params(orig)));
+    string s_var = hash_get(hp, arg);
 
     // spocinstr.poc[0][0].op = SPOC_POC_ERODE;
     comment(body, spoc_type_poc, orig, stage, side, false);
-    sb_cat(body, "  si.poc[", s_stag, "][", s_side, "].op = ", NULL);
+    sb_cat(body, "  si.poc[", s_stag, "][", s_side, "].op = ");
     if (poc.op==spoc_poc_erode)
-      sb_app(body, "SPOC_POC_ERODE;\n");
+      sb_cat(body, "SPOC_POC_ERODE;\n");
     else if (poc.op==spoc_poc_dilate)
-      sb_app(body, "SPOC_POC_DILATE;\n");
+      sb_cat(body, "SPOC_POC_DILATE;\n");
     else
       pips_internal_error("unexpected poc operation %d", poc.op);
 
     // spocinstr.poc[0][0].grid = SPOC_POC_8_CONNEX;
-    sb_cat(body, "  si.poc[", s_stag, "][", s_side, "].grid = ", NULL);
+    sb_cat(body, "  si.poc[", s_stag, "][", s_side, "].grid = ");
     if (poc.connectivity==6)
-      sb_app(body, "SPOC_POC_6_CONNEX;\n");
+      sb_cat(body, "SPOC_POC_6_CONNEX;\n");
     else if (poc.connectivity==8)
-      sb_app(body, "SPOC_POC_8_CONNEX;\n");
+      sb_cat(body, "SPOC_POC_8_CONNEX;\n");
     else
       pips_internal_error("unexpected poc connectivity %d", poc.connectivity);
 
@@ -160,35 +146,35 @@ static void spoc_poc_conf
     sb_cat(body,
       "  for(i=0 ; i<9 ; i++)\n"
       "    sp.poc[", s_stag, "][", s_side, "].kernel[i] = ",
-	      s_var, "[i];\n", NULL);
+	      s_var, "[i];\n");
 
     free(s_stag);
     free(s_side);
-    free(s_var);
   }
 }
 
 /* generate a configuration for a threshold component.
  */
 static void spoc_th_conf
-(string_buffer head,
- string_buffer body,
- __attribute__ ((__unused__)) string_buffer tail,
- int stage,
- int side,
- int * cst,
- dagvtx orig)
+  (string_buffer body,
+   __attribute__ ((__unused__)) string_buffer tail,
+   int stage,
+   int side,
+   dagvtx orig,
+   hash_table hp)
 {
+  list largs = freia_get_vertex_params(orig);
+  pips_assert("3 arguments to threshold", gen_length(largs)==3);
+  expression
+    e_inf = EXPRESSION(CAR(largs)),
+    e_sup = EXPRESSION(CAR(CDR(largs))),
+    e_bin = EXPRESSION(CAR(CDR(CDR(largs))));
   string
-    s_inf = get_var("inf", cst),
-    s_sup = get_var("sup", cst),
-    s_bin = get_var("bin", cst),
+    s_inf = hash_get(hp, e_inf),
+    s_sup = hash_get(hp, e_sup),
+    s_bin = hash_get(hp, e_bin),
     s_stag = strdup(itoa(stage)),
     s_side = strdup(itoa(side));
-
-  // , int32_t cstX, int32_t cstY, bool binZ
-  sb_cat(head, ", int32_t ", s_inf, ", int32_t ", s_sup, ", bool ", s_bin,
-	 NULL);
 
   // spocinstr.th[0][0].op =
   //   (binarize==true) ? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
@@ -199,12 +185,10 @@ static void spoc_th_conf
     "  si.th[", s_stag, "][", s_side, "].op = ",
 		s_bin, "? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;\n",
     "  sp.th[", s_stag, "][", s_side, "].boundmin = ", s_inf, ";\n",
-    "  sp.th[", s_stag, "][", s_side, "].boundmax = ", s_sup, ";\n",
-		    NULL);
+    "  sp.th[", s_stag, "][", s_side, "].boundmax = ", s_sup, ";\n");
 
-  free(s_inf);
-  free(s_sup);
-  free(s_bin);
+  free(s_stag);
+  free(s_side);
 }
 
 static int spoc_measure_n_params(spoc_measure_t measure)
@@ -225,14 +209,13 @@ static int spoc_measure_n_params(spoc_measure_t measure)
  * the issue is just to fetch them.
  */
 static void spoc_measure_conf
-(spoc_measure_t measure,
- string_buffer head,
- __attribute__ ((__unused__)) string_buffer body,
- string_buffer tail,
- int stage,
- int side,
- int * cst,
- dagvtx orig)
+  (spoc_measure_t measure,
+   __attribute__ ((__unused__)) string_buffer body,
+   string_buffer tail,
+   int stage,
+   int side,
+   dagvtx orig,
+   hash_table hp)
 {
   int n = spoc_measure_n_params(measure);
   if (n==0) return;
@@ -241,14 +224,19 @@ static void spoc_measure_conf
   string
     s_stage = strdup(itoa(stage)),
     s_side = strdup(itoa(side)),
-    reduc = strdup(cat("reduc.measure[", s_stage, "][", s_side, "].", NULL));
+    reduc = strdup(cat("reduc.measure[", s_stage, "][", s_side, "]."));
+
+  list largs = freia_get_vertex_params(orig);
+
+  pips_assert("argument list length is okay", (int) gen_length(largs)==n);
 
   string
-    v_1 = get_var("red", cst), v_2 = NULL, v_3 = NULL;
-  if (n>=2) v_2 = get_var("red", cst);
-  if (n>=3) v_3 = get_var("red", cst);
+    v_1 = hash_get(hp, EXPRESSION(CAR(largs))),
+    v_2 = NULL, v_3 = NULL;
+  if (n>=2) v_2 = hash_get(hp, EXPRESSION(CAR(CDR(largs))));
+  if (n>=3) v_3 = hash_get(hp, EXPRESSION(CAR(CDR(CDR(largs)))));
 
-  sb_app(tail, "\n");
+  sb_cat(tail, "\n");
   comment(tail, spoc_type_mes, orig, stage, side, false);
 
   switch (measure) {
@@ -256,25 +244,21 @@ static void spoc_measure_conf
   case measure_min:
   case measure_max_coord:
   case measure_min_coord:
-    sb_cat(head, ", int32_t * ", v_1, NULL);
     sb_cat(tail, "  *", v_1, " = (int32_t) ", reduc,
 	   measure==measure_min||measure==measure_min_coord?
-	   "minimum": "maximum", ";\n", NULL);
+	   "minimum": "maximum", ";\n");
     if (n>1)
     {
-      sb_cat(head, ", uint32_t * ", v_2, ", uint32_t * ", v_3, NULL);
       sb_cat(tail, "  *", v_2, " = (uint32_t) ", reduc,
 	     measure==measure_min||measure==measure_min_coord?
 	     "min": "max", "_coord_x;\n",
 	     "  *", v_3, " = (uint32_t) ", reduc,
 	     measure==measure_min||measure==measure_min_coord?
-	     "min": "max", "_coord_y;\n",
-	     NULL);
+	     "min": "max", "_coord_y;\n");
     }
     break;
   case measure_vol:
-    sb_cat(head, ", int32_t * ", v_1, NULL);
-    sb_cat(tail, "  *", v_1, " = (int32_t) ", reduc, "volume;\n", NULL);
+    sb_cat(tail, "  *", v_1, " = (int32_t) ", reduc, "volume;\n");
     break;
   default:
     pips_internal_error("unexpected measure %d", measure);
@@ -283,9 +267,6 @@ static void spoc_measure_conf
   free(s_stage);
   free(s_side);
   free(reduc);
-  free(v_1);
-  if (v_2) free(v_2);
-  if (v_3) free(v_3);
 }
 
 /* basic configuration generation for a stage, depending on hw description
@@ -294,29 +275,28 @@ static void spoc_measure_conf
  */
 static void basic_spoc_conf
   (spoc_hardware_type op,
-   string_buffer head,
    string_buffer body,
    string_buffer tail,
    int stage,
    int side,
    bool flip,
-   int * cst, // numbering of arguments...
    const spoc_hw_t * conf,
-   dagvtx orig)
+   dagvtx orig,
+   hash_table hp)
 {
   // only one call should be used for AIPO functions ?
   switch (op) {
   case spoc_type_poc:
-    spoc_poc_conf(conf->poc[0], head, body, tail, stage, side, cst, orig);
+    spoc_poc_conf(conf->poc[0], body, tail, stage, side, orig, hp);
     break;
   case spoc_type_alu:
-    spoc_alu_conf(conf->alu, head, body, tail, stage, flip, cst, orig);
+    spoc_alu_conf(conf->alu, body, tail, stage, flip, orig, hp);
     break;
   case spoc_type_thr:
-    spoc_th_conf(head, body, tail, stage, side, cst, orig);
+    spoc_th_conf(body, tail, stage, side, orig, hp);
     break;
   case spoc_type_mes:
-    spoc_measure_conf(conf->mes[0], head, body, tail, stage, side, cst, orig);
+    spoc_measure_conf(conf->mes[0], body, tail, stage, side, orig, hp);
     break;
   case spoc_type_inp:
   case spoc_type_nop:
@@ -326,7 +306,7 @@ static void basic_spoc_conf
     pips_internal_error("unexpected op type %s\n", what_operation(op));
   }
   if (op!=spoc_type_nop)
-    sb_app(body, "\n");
+    sb_cat(body, "\n");
 }
 
 typedef struct {
@@ -542,7 +522,7 @@ set_wiring(string_buffer code,
   // code
   string s_stage = strdup(itoa(stage)), s_mux = strdup(itoa(mux));
   sb_cat(code, "  si.mux[", s_stage, "][", s_mux, "].op = "
-	 "SPOC_MUX_IN", value? "1": "0", ";\n", NULL);
+	 "SPOC_MUX_IN", value? "1": "0", ";\n");
   free(s_stage);
   free(s_mux);
 
@@ -876,14 +856,14 @@ static void generate_wiring
 
   sb_cat(code,
 	 "  // ", entity_local_name(in->image),
-	 " [", in_stage, " ", what_operation(in->level), NULL);
+	 " [", in_stage, " ", what_operation(in->level));
   if (in->level!=spoc_type_alu)
-    sb_cat(code, " ", in_side, NULL);
-  sb_cat(code, "] -> [", out_stage, " ", what_operation(out->level), NULL);
+    sb_cat(code, " ", in_side);
+  sb_cat(code, "] -> [", out_stage, " ", what_operation(out->level));
   if (out->level!=spoc_type_alu)
-    sb_cat(code, " ", out_side, NULL);
+    sb_cat(code, " ", out_side);
   sb_cat(code, "] ", itoa(dagvtx_number(out->producer)), " ",
-	 dagvtx_operation(out->producer), "\n", NULL);
+	 dagvtx_operation(out->producer), "\n");
   free(in_stage); free(out_stage); free(in_side); free(out_side);
 
   // let us wire!
@@ -896,7 +876,7 @@ static void generate_wiring
 	if (out->level<=spoc_type_poc)
 	  pips_assert("same side if early", in->side==out->side);
 	if (out->level<=spoc_type_alu)
-	  sb_app(code, "  // nope\n");
+	  sb_cat(code, "  // nope\n");
 	// ELSE thr or mes...
 	else
 	{
@@ -920,7 +900,7 @@ static void generate_wiring
       case spoc_type_out:
 	// no choice
 	pips_assert("same side", in->side==out->side);
-	sb_app(code, "  // nope\n");
+	sb_cat(code, "  // nope\n");
 	break;
       case spoc_type_nop:
       default:
@@ -1039,19 +1019,19 @@ static void freia_spoc_code_buildup
   sb_cat(code,
 	 "\n"
 	 "// FREIA-SPoC helper function for module ", module, "\n"
-	 "freia_status ", function_name, "(", NULL);
+	 "freia_status ", function_name, "(");
   // first, image arguments
-  if (n_im_out>0) sb_app(code, FREIA_IMAGE "o0");
-  if (n_im_out>1) sb_app(code, ", " FREIA_IMAGE "o1");
-  if (n_im_out!=0) sb_app(code, ", ");
-  if (n_im_in>0) sb_app(code, FREIA_IMAGE "i0");
-  if (n_im_in>1) sb_app(code, ", " FREIA_IMAGE "i1");
+  if (n_im_out>0) sb_cat(code, FREIA_IMAGE "o0");
+  if (n_im_out>1) sb_cat(code, ", " FREIA_IMAGE "o1");
+  if (n_im_out!=0) sb_cat(code, ", ");
+  if (n_im_in>0) sb_cat(code, FREIA_IMAGE "i0");
+  if (n_im_in>1) sb_cat(code, ", " FREIA_IMAGE "i1");
 
   string_buffer_append_sb(code, head);
 
   // end of headers (some arguments may have been added by stages),
   // and begin the function body
-  sb_app(code, ")\n{\n" FREIA_SPOC_DECL);
+  sb_cat(code, ")\n{\n" FREIA_SPOC_DECL);
   string_buffer_append_sb(code, body);
 
   // generate actual call to the accelerator
@@ -1063,14 +1043,14 @@ static void freia_spoc_code_buildup
 	 NULL);
 
   if (some_reductions)
-    sb_app(code,
+    sb_cat(code,
 	   "\n"
 	   "  // get reductions\n"
 	   "  freia_cg_read_reduction_results(&redres);\n");
 
   string_buffer_append_sb(code, tail);
 
-  sb_app(code, "\n  return ret;\n}\n");
+  sb_cat(code, "\n  return ret;\n}\n");
 }
 
 /* tell whether the image produced by prod is definitely consummed by v
@@ -1194,6 +1174,9 @@ static void freia_spoc_pipeline
 
   set skipped = set_make(set_pointer);
 
+  // expression/variable -> parameter string name
+  hash_table hparams = hash_table_make(hash_pointer, 0);
+
   // keep track of current stage for comments, and to detect overflows
   int stage = -1;
 
@@ -1269,7 +1252,7 @@ static void freia_spoc_pipeline
 
       // get needed parameters if any
       *lparams = gen_nconc(*lparams,
-			   freia_extract_parameters(opid, call_arguments(c)));
+	  freia_extract_params(opid, call_arguments(c), head, hparams, &cst));
 
       some_reductions |= vtxcontent_optype(vc)==spoc_type_mes;
 
@@ -1278,7 +1261,7 @@ static void freia_spoc_pipeline
       if (out.stage!=stage)
       {
 	stage = out.stage;
-	sb_cat(body, "\n  // STAGE ", itoa(stage), "\n", NULL);
+	sb_cat(body, "\n  // STAGE ", itoa(stage), "\n");
       }
 
       // generate wiring, which may change flip stage on ALU operation
@@ -1289,9 +1272,9 @@ static void freia_spoc_pipeline
       if (in1.just_used)
 	generate_wiring(body, &in1, &out, wiring);
 
-      // generate stage
-      basic_spoc_conf(optype, head, body, tail,
-		      out.stage, out.side, out.flip, &cst, &(api->spoc), v);
+      // generate stage code
+      basic_spoc_conf(optype, body, tail, out.stage, out.side, out.flip,
+		      &(api->spoc), v, hparams);
 
       bool
 	in0_needed = image_is_needed(in0.producer, dpipe, todo),
@@ -1405,7 +1388,7 @@ static void freia_spoc_pipeline
   pips_assert("some input or output images", n_im_out || n_im_in);
   if (n_im_out==0)
   {
-    sb_app(body, "\n  // no output image\n");
+    sb_cat(body, "\n  // no output image\n");
   }
   else if (n_im_out==1)
   {
@@ -1439,13 +1422,13 @@ static void freia_spoc_pipeline
 
     sb_cat(body, "\n"
 	   "  // output image ", entity_local_name(imout),
-	   " on ", itoa(out.side), "\n", NULL);
+	   " on ", itoa(out.side), "\n");
     generate_wiring(body, &in0, &out, wiring);
 
     // do not trust the default initialisation of the paths
     in0 = out;
     out.stage = pipeline_depth-1;
-    sb_app(body, "\n  // fill in to the end...\n");
+    sb_cat(body, "\n  // fill in to the end...\n");
     generate_wiring(body, &in0, &out, wiring);
 
     if (out.side)
@@ -1504,9 +1487,9 @@ static void freia_spoc_pipeline
 
     sb_cat(body, "\n"
 	   "  // output image ", entity_local_name(out0),
-	   " on ", itoa(out0_side), NULL);
+	   " on ", itoa(out0_side));
     sb_cat(body, " and image ", entity_local_name(out1),
-	   " on ", itoa(out1_side), "\n", NULL);
+	   " on ", itoa(out1_side), "\n");
 
     // extract the first one.
     out.image = out0;
@@ -1519,11 +1502,11 @@ static void freia_spoc_pipeline
     // do not trust the default initialisation of the pipeline
     in0 = out;
     out.stage = pipeline_depth-1;
-    sb_app(body, "\n  // fill in to the end...\n");
+    sb_cat(body, "\n  // fill in to the end...\n");
     generate_wiring(body, &in0, &out, wiring);
 
     // extract the seconde one
-    sb_app(body, "\n");
+    sb_cat(body, "\n");
     out.image = out1;
     out.producer = NULL;
     out.level = spoc_type_out;
@@ -1534,19 +1517,14 @@ static void freia_spoc_pipeline
     // do not trust the default initialisation of the pipeline
     in1 = out;
     out.stage = pipeline_depth-1;
-    sb_app(body, "\n  // fill in to the end...\n");
+    sb_cat(body, "\n  // fill in to the end...\n");
     generate_wiring(body, &in1, &out, wiring);
   }
   else
     pips_internal_error("only 0 to 2 output images!");
 
   // handle function image arguments
-  list largs = NIL;
-  limg = gen_nreverse(limg);
-  FOREACH(entity, e, limg)
-    largs = CONS(expression, entity_to_expression(e), largs);
-  gen_free_list(limg), limg = NIL;
-  *lparams = gen_nconc(largs, *lparams);
+  freia_add_image_arguments(limg, lparams);
 
   // build whole code from various pieces
   freia_spoc_code_buildup(module, helper, code, head, body, tail,
@@ -1565,84 +1543,13 @@ static void freia_spoc_pipeline
 
 /***************************************************************** MISC UTIL */
 
-/* convert the first n items in list args to entities.
- */
-static list
-fs_expression_list_to_entity_list(list /* of expression */ args, int nargs)
-{
-  list /* of entity */ lent = NIL;
-  int n=0;
-  FOREACH(expression, ex, args)
-  {
-    syntax s = expression_syntax(ex);
-    pips_assert("is a ref", syntax_reference_p(s));
-    reference r = syntax_reference(s);
-    pips_assert("simple ref", reference_indices(r)==NIL);
-    lent = CONS(entity, reference_variable(r), lent);
-    if (++n==nargs) break;
-  }
-  lent = gen_nreverse(lent);
-  return lent;
-}
-
-/* extract first entity item from list.
- */
-static entity extract_fist_item(list * lp)
-{
-  list l = gen_list_head(lp, 1);
-  entity e = ENTITY(CAR(l));
-  gen_free_list(l);
-  return e;
-}
-
-/* append statement s to dag d
- */
-static void dag_append_freia_call(dag d, statement s)
-{
-  pips_debug(5, "adding statement %" _intFMT "\n", statement_number(s));
-
-  call c = freia_statement_to_call(s);
-
-  if (c && entity_freia_api_p(call_function(c)))
-  {
-    entity called = call_function(c);
-    const freia_api_t * api = hwac_freia_api(entity_local_name(called));
-    pips_assert("some api", api!=NULL);
-    list /* of entity */ args =
-      fs_expression_list_to_entity_list(call_arguments(c),
-					api->arg_img_in+api->arg_img_out);
-
-    // extract arguments
-    entity out = entity_undefined;
-    pips_assert("one out image max for an AIPO", api->arg_img_out<=1);
-    if (api->arg_img_out==1)
-      out = extract_fist_item(&args);
-    list ins = gen_list_head(&args, api->arg_img_in);
-    pips_assert("no more arguments", gen_length(args)==0);
-
-    vtxcontent cont =
-      make_vtxcontent(-1, 0, make_pstatement_statement(s), ins, out);
-    set_operation(api, &vtxcontent_optype(cont), &vtxcontent_opid(cont));
-
-    dagvtx nv = make_dagvtx(cont, NIL);
-    dag_append_vertex(d, nv);
-  }
-  else // some other kind of statement that we may keep in the DAG
-  {
-    dagvtx nv =
-      make_dagvtx(make_vtxcontent(spoc_type_oth, 0,
-	  make_pstatement_statement(s), NIL, entity_undefined), NIL);
-    dag_vertices(d) = CONS(dagvtx, nv, dag_vertices(d));
-  }
-}
-
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
  * correctness? that should not be the case as only computations
  * allowed by dependencies are schedule.
  * tells v1 < v2 => -1
  */
-static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
+int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
 {
   string why = "none";
   int result = 0;
@@ -1720,113 +1627,6 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
 }
 
 /************************************************************ IMPLEMENTATION */
-
-/* returns whether there is a scalar RW dependency from any vs to v
- */
-static bool any_scalar_dep(dagvtx v, set vs)
-{
-  bool dep = false;
-  statement target = dagvtx_statement(v);
-  SET_FOREACH(dagvtx, source, vs)
-  {
-    if (freia_scalar_rw_dep(dagvtx_statement(source), target, NULL))
-    {
-      dep = true;
-      break;
-    }
-  }
-  return dep;
-}
-
-/* check scalar dependency from computed to v.
- */
-static bool
-all_previous_stats_with_deps_are_computed(dag d, set computed, dagvtx v)
-{
-  bool okay = true;
-
-  // scan in statement order... does it matter?
-  list lv = gen_nreverse(gen_copy_seq(dag_vertices(d)));
-  FOREACH(dagvtx, pv, lv)
-  {
-    // all previous have been scanned
-    if (pv==v) break;
-    if (freia_scalar_rw_dep(dagvtx_statement(pv), dagvtx_statement(v), NULL) &&
-	!set_belong_p(computed, pv))
-    {
-      okay = false;
-      break;
-    }
-  }
-
-  gen_free_list(lv);
-  return okay;
-}
-
-/* return the vertices which may be computed from the list of
- * available images, excluding vertices in exclude.
- * return a list for determinism.
- * @param d is the considered full dag
- * @param computed holds all previously computed vertices
- * @param currents holds those in the current pipeline
- * @params maybe holds vertices with live images
- */
-static list /* of dagvtx */
-  get_computable_vertices(dag d, set computed, set maybe, set currents)
-{
-  list computable = NIL;
-  set local_currents = set_make(set_pointer);
-  set_assign(local_currents, currents);
-
-  // hmmm... should reverse the list to handle implicit dependencies?
-  // where, there is an assert() to check that it does not happen.
-  list lv = gen_nreverse(gen_copy_seq(dag_vertices(d)));
-
-  FOREACH(dagvtx, v, lv)
-  {
-    if (set_belong_p(computed, v))
-      continue;
-
-    if (dagvtx_other_stuff_p(v))
-    {
-      // a vertex with other stuff is assimilated to the pipeline
-      // as soon as its dependences are fullfilled.
-      // I have a problem here... I really need use_defs?
-      if (all_previous_stats_with_deps_are_computed(d, computed, v))
-      {
-	computable = CONS(dagvtx, v, computable);
-	set_add_element(local_currents, local_currents, v);
-      }
-    }
-    else // we have an image computation
-    {
-      list preds = dag_vertex_preds(d, v);
-      pips_debug(9, "%d predecessors to %" _intFMT "\n",
-		 (int) gen_length(preds), dagvtx_number(v));
-
-      if(// no scalar dependencies in the current pipeline
-	 !any_scalar_dep(v, local_currents) &&
-	 // and image dependencies are fulfilled.
-	 list_in_set_p(preds, maybe))
-      {
-	computable = CONS(dagvtx, v, computable);
-	// we do not want deps with other currents considered!
-	set_add_element(local_currents, local_currents, v);
-      }
-
-      gen_free_list(preds), preds = NIL;
-    }
-
-    // update availables: not needed under assert for no img reuse.
-    // if (vtxcontent_out(c)!=entity_undefined)
-    //  set_del_element(avails, avails, vtxcontent_out(c));
-  }
-
-  // cleanup
-  set_free(local_currents);
-  gen_free_list(lv);
-  return computable;
-}
 
 /* update sure/maybe set of live images after computing vertex v
  * that is the images that may be output from the pipeline.
@@ -2006,12 +1806,6 @@ static dagvtx first_which_may_be_added
   return chosen;
 }
 
-// dirty debug helper...
-static string dagvtx_to_string(const dagvtx v)
-{
-  return itoa(dagvtx_number(v));
-}
-
 /* split dag dall into a list of pipelinable dags
  * which must be processed in that order (?)
  * side effect: dall is more or less consummed...
@@ -2023,11 +1817,11 @@ static list /* of dags */ split_dag(dag initial)
     pips_user_warning("image reuse may result in subtly wrong code...\n");
 
   // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
+  // if everything was removed by optimizations, there is nothing to do.
+  if (dag_computation_count(initial)==0) return NIL;
 
   dag dall = copy_dag(initial);
   int nvertices = gen_length(dag_vertices(dall));
-  // if everything was removed by optimizations, there is nothing to do.
-  if (dag_computation_count(initial)==0) return NIL;
   list ld = NIL, lcurrent = NIL;
   set
     current = set_make(set_pointer),
@@ -2061,7 +1855,7 @@ static list /* of dags */ split_dag(dag initial)
 
     list computables = get_computable_vertices(dall, computed, avails, current);
     gen_sort_list(computables,
-		  (int(*)(const void*,const void*)) dagvtx_priority);
+		  (int(*)(const void*,const void*)) dagvtx_spoc_priority);
 
     pips_assert("something must be computable if current is empty",
 		computables || !set_empty_p(current));
@@ -2136,16 +1930,6 @@ static list /* of dags */ split_dag(dag initial)
   return gen_nreverse(ld);
 }
 
-static void set_append_vertex_statements(set s, list lv)
-{
-  FOREACH(dagvtx, v, lv)
-  {
-    pstatement ps = vtxcontent_source(dagvtx_content(v));
-    if (pstatement_statement_p(ps))
-      set_add_element(s, s, pstatement_statement(ps));
-  }
-}
-
 /* generate helpers for statements in ls of module
  * output resulting functions in helper, which may be empty in some cases.
  * @param module
@@ -2154,30 +1938,19 @@ static void set_append_vertex_statements(set s, list lv)
  * @param number current helper dag count
  */
 void freia_spoc_compile_calls
-(string module, list /* of statements */ ls, FILE * helper_file, int number)
+  (string module,
+   list /* of statements */ ls,
+   FILE * helper_file,
+   int number)
 {
+  // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  // build full dag
-  dag fulld = make_dag(NIL, NIL, NIL);
-  FOREACH(statement, s, ls)
-    dag_append_freia_call(fulld, s);
-  dag_compute_outputs(fulld);
-  ifdebug(3) dag_dump(stderr, "fulld", fulld);
+  list added_stats = NIL;
+  dag fulld = build_freia_dag(module, ls, number, &added_stats);
 
-  string dag_name = strdup(cat("dag_", itoa(number), NULL));
-  dag_dot_dump(module, dag_name, fulld);
-  free(dag_name), dag_name = NULL;
-
-  // remove copies if possible...
-  list added_stats = dag_optimize(fulld);
-
-  dag_name = strdup(cat("dag_cleaned_", itoa(number), NULL));
-  dag_dot_dump(module, dag_name, fulld);
-  free(dag_name), dag_name = NULL;
-
-  string fname_fulldag = strdup(cat(module, HELPER, itoa(number), NULL));
+  string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
   // split dag in one-pipe dags.
   list ld = split_dag(fulld);
@@ -2203,7 +1976,7 @@ void freia_spoc_compile_calls
     // set_del_element(remainings, remainings, inp);
 
     // generate a new helper function for dag d
-    string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_pipes++), NULL));
+    string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_pipes++)));
 
     ifdebug(4) dag_dump(stderr, "d", d);
     dag_dot_dump(module, fname_dag, d);
@@ -2221,7 +1994,7 @@ void freia_spoc_compile_calls
 	dag_dump(stderr, "d", d);
       }
 
-      string fname_split = strdup(cat(fname_dag, "_", itoa(split++), NULL));
+      string fname_split = strdup(cat(fname_dag, "_", itoa(split++)));
       list /* of expression */ lparams = NIL;
 
       string_buffer code = string_buffer_make(true);
@@ -2229,42 +2002,9 @@ void freia_spoc_compile_calls
       string_buffer_to_file(code, helper_file);
       string_buffer_free(&code);
 
-      // statements that are not yet computed in d...
-      set not_dones = set_make(set_pointer), dones = set_make(set_pointer);
-      FOREACH(dagvtx, vs, dag_vertices(d))
-      {
-	pstatement ps = vtxcontent_source(dagvtx_content(vs));
-	if (pstatement_statement_p(ps))
-	  set_add_element(not_dones, not_dones, pstatement_statement(ps));
-      }
-      set_difference(dones, remainings, not_dones);
-      set_difference(remainings, remainings, dones);
-      set_difference(global_remainings, global_remainings, dones);
+      freia_substitute_by_helper_call(d, global_remainings, remainings,
+				      ls, fname_split, lparams);
 
-      // replace first statement of dones in ls (so last in sequence)
-      bool substitution_done = false;
-      FOREACH(statement, sc, ls)
-      {
-	pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
-
-	if (set_belong_p(dones, sc))
-	{
-	  pips_assert("statement is a call", statement_call_p(sc));
-	  pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
-
-	  // substitute by call to helper
-	  entity helper = make_empty_subroutine(fname_split); // or function?
-	  call c = make_call(helper, lparams);
-
-	  hwac_replace_statement(sc, c, false);
-	  substitution_done = true;
-	  break;
-	}
-      }
-      pips_assert("substitution done", substitution_done);
-
-      set_free(not_dones), not_dones = NULL;
-      set_free(dones), dones = NULL;
       free(fname_split), fname_split = NULL;
     }
 
@@ -2275,35 +2015,7 @@ void freia_spoc_compile_calls
   // no, copy statements are not done...
   // pips_assert("all statements done", set_empty_p(global_remainings));
 
-  // hmmm... append added stats to code...
-  if (added_stats)
-  {
-    statement slast = STATEMENT(CAR(ls));
-    fprintf(stderr, "adding stats to %p\n", slast);
-    instruction ilast = statement_instruction(slast);
-    statement newstat = instruction_to_statement(ilast);
-    // transfer comments and some cleanup...
-    statement_comments(newstat) = statement_comments(slast);
-    statement_comments(slast) = string_undefined;
-    statement_number(slast) = STATEMENT_NUMBER_UNDEFINED;
-    // pretty ugly because return must be handled especially...
-    if (instruction_call_p(ilast) &&
-	ENTITY_C_RETURN_P(call_function(instruction_call(ilast))))
-    {
-      call c = instruction_call(ilast);
-      if (!expression_constant_p(EXPRESSION(CAR(call_arguments(c)))))
-      {
-	// must split return...
-	pips_internal_error("return splitting not implemented yet...\n");
-      }
-      else
-	added_stats = gen_nconc(added_stats, CONS(statement, newstat, NIL));
-    }
-    else
-      added_stats = CONS(statement, newstat, added_stats);
-    statement_instruction(slast) =
-      make_instruction_sequence(make_sequence(added_stats));
-  }
+  freia_insert_added_stats(ls, added_stats);
 
   // cleanup
   set_free(global_remainings), global_remainings = NULL;

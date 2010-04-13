@@ -47,20 +47,20 @@ extern bool prettyprint_is_fortran;
 		make_unformatted((char *) NULL, 0, m, CHAIN_SWORD(NIL, s)))
 
 #define ADD_SENTENCE_TO_TEXT(t,p)					\
-  {									\
+  do {									\
     text _t_ = (t);							\
     text_sentences(_t_) =						\
       gen_nconc(text_sentences(_t_), CONS(SENTENCE, (p), NIL));		\
-  }
+  } while(0)
 
 #define MERGE_TEXTS(r,t)					\
-  {								\
+  do {								\
     text _r_ = (r); text _t_ = (t);				\
     text_sentences(_r_) =					\
       gen_nconc(text_sentences(_r_), text_sentences(_t_));	\
     text_sentences(_t_) = NIL;					\
     free_text(_t_);						\
-  }
+  } while(0)
 
 /* maximum length of a line when prettyprinting...
  * from 0 to 69, i.e. 70 chars, plus "\n\0"

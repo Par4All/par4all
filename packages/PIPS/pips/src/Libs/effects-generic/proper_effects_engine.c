@@ -1976,7 +1976,7 @@ static list generic_proper_effects_of_declaration(entity decl)
 	  l_eff = generic_proper_effects_of_expression(exp_init); 
 	}
       
-      /* if there is an initial value, 
+      /* if there is an initial value, and if the variable is not a static one,
 	 then there is a write on the entity (well on  the reference constituted
 	 by the entity name with no indices !).
 	 There may be a memory leak here because we do not want a preference in 
@@ -1985,7 +1985,7 @@ static list generic_proper_effects_of_declaration(entity decl)
 	 I should may be call generic_proper_effects_of lhs instead, but the case is
 	 slightly different for arrays. Or directly (*reference_to_effect_func) in case of a scalar ?
       */
-      if (!value_unknown_p(v_init))
+      if (!variable_static_p(decl) && !value_unknown_p(v_init))
 	{
 	  type decl_t = basic_concrete_type(entity_type(decl));
 	  list l_tmp = NIL;
@@ -2002,9 +2002,7 @@ static list generic_proper_effects_of_declaration(entity decl)
 							true);
 	  storage decl_s = entity_storage(decl);
 	  l_eff= gen_nconc(l_eff, l_tmp);
-	  /* in case of a static variable, it is initialized only once -> may effects */
-	  if (storage_ram_p(decl_s) && static_area_p(ram_section(storage_ram(decl_s))))
-	    effects_to_may_effects(l_eff);
+	  
 	}
       pips_debug_effects(1, "ending with:", l_eff);
     }
