@@ -221,11 +221,6 @@ function build_package() {
 	cd $dir
 	dir=`pwd`
 
-	# There are lacking files in the PolyLib that autoreconf do not
-	# want to create :-(
-	if [[ $package == polylib ]]; then
-	    touch NEWS README AUTHORS ChangeLog
-	fi
 	autoreconf --install
 
 	mkdir -p $P4A_BUILD/$package
