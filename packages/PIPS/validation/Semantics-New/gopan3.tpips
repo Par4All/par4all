@@ -23,7 +23,7 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
-
+quit
 
 echo
 echo AFTER DEAD CODE ELIMINATION

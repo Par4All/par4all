@@ -75,7 +75,7 @@ make_phi_assign_instruction(reference lRef, expression cond,
         expression ref1, expression ref2)
 {
     entity phiEntity = get_function_entity(get_string_property("IF_CONVERSION_PHI"));
-    expression phiExp = MakeTernaryCallExpr(
+    expression phiExp = MakeTernaryCall(
             phiEntity,
             copy_expression(cond),
             copy_expression(ref1),

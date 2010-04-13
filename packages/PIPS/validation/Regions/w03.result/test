@@ -71,8 +71,8 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
 C               <must be written>: I
 
       I = 1                                                             0007
-C               <may be read    >: I
 C               <may be written >: A(*) I
+C               <must be read   >: I
 
       DO WHILE (I.LE.10)                                                0009
 C               <may be written >: A(*)
@@ -85,8 +85,9 @@ C               <must be written>: I
 C               <must be written>: I
 
       I = 2                                                             0014
-C               <may be read    >: A(*) I __IO_EFFECTS:LUNS(6)
+C               <may be read    >: A(*) __IO_EFFECTS:LUNS(6)
 C               <may be written >: I __IO_EFFECTS:LUNS(6)
+C               <must be read   >: I
 
       DO WHILE (I.LT.N)                                                 0016
 C               <may be read    >: A(*)

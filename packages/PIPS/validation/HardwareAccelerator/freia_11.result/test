@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -136,3 +139,152 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
    freia_11_helper_0_0_0(o, i);                                         /*0008*/
    return FREIA_OK;                                                     /*0009*/
 }
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_aipo_sub(o, i, i);                                             /*0008*/
+   return FREIA_OK;                                                     /*0009*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_11" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "dag_cleaned_0" of module "freia_11" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "freia_11_helper_0_0" of module "freia_11" in dot format
+digraph "freia_11_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module freia_11
+ * 1 input image, 1 output image
+ * 2 image operations in dag
+ * dag length is 2, dag width is 1
+ * cost is 4 cycles per imagelet row
+ */
+freia_status freia_11_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * i0)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  terapix_mcu_instr mcu_instr[1];
+
+  // imagelet definitions...
+  int imagelet_size = 512;
+  int imagelet_1 = 0;
+  int imagelet_2 = 512;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: -(1,1) -> 1
+  mcu_instr[0].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.xmin2 = imagelet_1;
+  mcu_instr[0].macrocode.ymin2 = 0;
+  mcu_instr[0].macrocode.xmin3 = imagelet_1;
+  mcu_instr[0].macrocode.ymin3 = 0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_SUB;
+
+  // inputs:
+  // - imagelet 1 is i0 for i
+
+  // outputs:
+  // - imagelet 1 is o0 for o
+
+  // double buffer management:
+  // - buffer 1/2
+
+  // output imagelet erosion:
+  //   north: 0
+  //   south: 0
+  //    west: 0
+  //    east: 0
+
+  ret = freia_cg_template_process_1i_1o(&param, o0, i0);
+
+
+  return ret;
+}
+
+
+! updated function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_11_helper_0_0(o, i);                                           /*0008*/
+   return FREIA_OK;                                                     /*0009*/
+}
+#
+# FREIA COMPILATION DONE
+#
+

@@ -1,0 +1,34 @@
+void update01()
+{
+   // BEGIN BLOCK
+   int i;
+   int *p;
+//               <must be written>: p
+
+   p = &i;
+//               <must be read   >: p
+//               <must be written>: p
+   p++;
+//               <must be written>: i
+   i = 2;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+void update01()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   int i;
+//  points to = {}
+   int *p;
+//  points to = {}
+
+   p = &i;
+//  {(p,i,-Exact-)}
+   p++;
+//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+   i = 2;
+   // END BLOCK
+}

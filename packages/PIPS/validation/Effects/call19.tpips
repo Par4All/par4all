@@ -1,0 +1,29 @@
+delete call19
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create call19 call19.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[call19]
+
+echo
+echo Proper pointer effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated pointer effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete call19
+quit

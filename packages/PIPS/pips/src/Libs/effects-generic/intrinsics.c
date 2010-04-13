@@ -1019,11 +1019,7 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
     syntax s = expression_syntax(e);
     pips_debug(5, "begin\n");
     pips_assert("address of has only one argument", gen_length(args)==1);
-    /* FI: this is not true with "&c.a" */
-    /*
-    pips_assert("address of has only one argument and it is a reference",
-		syntax_reference_p(s));
-    */
+    
     if( syntax_reference_p(s))
     {
         reference r = syntax_reference(s);
@@ -1031,8 +1027,15 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
         lr = generic_proper_effects_of_expressions(i);
     }
     else
-        pips_internal_error("case unhandled yet\n");
-    pips_debug(5, "end\n");
+      {
+	effect eff = effect_undefined;
+	lr = generic_proper_effects_of_complex_address_expression(e, &eff, false);
+	/* there is no effect on the argument of & */
+	if (!effect_undefined_p(eff))
+	  free_effect(eff);
+      }
+       
+    pips_debug_effects(5, "end\n", lr);
     return(lr);
 }
 

@@ -499,9 +499,9 @@ static transformer ordinary_summary_precondition(string module_name,
       debug(1, "summary_precondition", "begin for %s with %d callers\n",
 	    module_name,
 	    gen_length(lc));
-      MAP(STRING, caller_name, {
+      FOREACH(STRING, caller_name, lc) {
 	(void) fprintf(stderr, "%s, ", caller_name);
-      }, lc);
+      }
       (void) fprintf(stderr, "\n");
     }
 

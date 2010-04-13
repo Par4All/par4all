@@ -187,11 +187,11 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
    size_t k;
    size_t rangex, rangey;
    int nb;
-   towns tout = {nb, malloc(sizeof(town)*nb)};
+   towns tout;
    //PIPS generated variable
-   size_t _PIPS_STRUCT_31_nb_0 = tout.nb;
+   size_t _PIPS_STRUCT_31_nb_0 = nb;
    //PIPS generated variable
-   town *_PIPS_STRUCT_31_data_0 = tout.data;
+   town *_PIPS_STRUCT_31_data_0 = malloc(sizeof(town)*nb);
    //PIPS generated variable
    size_t _PIPS_STRUCT_31_nb_1 = t.nb;
    //PIPS generated variable

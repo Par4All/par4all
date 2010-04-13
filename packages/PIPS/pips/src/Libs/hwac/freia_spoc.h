@@ -155,27 +155,6 @@ typedef struct {
   // links: not sure...
 } spoc_hw_t;
 
-/* FREIA API function name -> SPoC hardware description (and others?)
- */
-typedef struct {
-  // function name
-  string function_name;
-  string compact_name; // something very short for graph nodes
-  string commutator; // if the function is commutative
-  // expected number of in/out arguments, that we should be able to use...
-  int arg_img_out;  // 0 1
-  int arg_img_in;   // 0 1 2
-  // cst, bool, kernel...
-  int arg_misc_out; // 0 1 2 3
-  int arg_misc_in;  // 0 1 2 3
-  // mmmh...
-  string arg_out_types[3];
-  string arg_in_types[3];
-  // ...
-  // corresponding hardware settings
-  spoc_hw_t spoc;
-} freia_api_t;
-
 typedef enum {
   // important, in hardware order
   spoc_type_oth = -2, // for anything else...
@@ -188,11 +167,7 @@ typedef enum {
   spoc_type_out = 5   // output...
 } spoc_hardware_type;
 
-#define FREIA_IMAGE_TYPE "freia_data2d"
-
 /****************************************************** SPOC CODE GENERATION */
-
-#define AIPO "freia_aipo_"
 
 #define spoc_depth_prop "HWAC_SPOC_DEPTH"
 
@@ -202,11 +177,6 @@ typedef enum {
   "#include <freiaMediumGrain.h>\n"		\
   "#include <freiaCoarseGrain.h>\n"		\
   "#include <spoc.h>\n"
-
-#define FREIA_IMAGE FREIA_IMAGE_TYPE " * "
-
-// ??? could/should be a property? what about asserts to check inputs?
-#define FREIA_DEFAULT_BPP "16"
 
 #define FREIA_SPOC_DECL						\
   "  spoc_instr si;\n"						\

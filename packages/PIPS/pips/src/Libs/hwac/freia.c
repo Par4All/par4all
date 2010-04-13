@@ -21,8 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 
 #include <stdint.h>
@@ -30,7 +31,9 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "freia.h"
 #include "freia_spoc.h"
+#include "freia_terapix.h"
 
 #include "linear.h"
 #include "pipsdbm.h"
@@ -42,8 +45,6 @@
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
-#define cat concatenate
-
 #define FUNC_C "functions.c"
 
 /* return malloc'ed "foo.database/Src/%{module}_helper_functions.c"
@@ -51,7 +52,7 @@
 static string helper_file_name(string func_name)
 {
   string src_dir = db_get_directory_name_for_module(func_name);
-  string fn = strdup(cat(src_dir, "/", func_name, HELPER FUNC_C, NULL));
+  string fn = strdup(cat(src_dir, "/", func_name, HELPER FUNC_C));
   free(src_dir);
   return fn;
 }
@@ -214,37 +215,55 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
   return true;
 }
 
-string freia_compile(string module, statement mod_stat)
+/* freia_compile:
+ * compile freia module & statement for target
+ * - collect sequences of freia operations
+ * - create file for generated functions
+ * - call hardware-specific code generation for each sequence
+ */
+string freia_compile(string module, statement mod_stat, string target)
 {
+  if (!(freia_spoc_p(target) || freia_terapix_p(target)))
+    pips_internal_error("unexpected target %s", target);
+
   freia_info fsi;
   fsi.seqs = NIL;
 
   // collect freia api functions...
   if (statement_call_p(mod_stat))
   {
-    // argh, there is only one statemnt in the code, and no sequence
+    // argh, there is only one statement in the code, and no sequence
     if (freia_statement_aipo_call_p(mod_stat))
       fsi.seqs = CONS(list, CONS(statement, mod_stat, NIL), NIL);
   }
   else // look for sequences
+  {
     gen_context_recurse(mod_stat, &fsi,
 			sequence_domain, sequence_flt, gen_null);
+  }
 
   // output file
   string file = helper_file_name(module);
   if (file_readable_p(file))
     pips_user_error("file '%s' already here, cannot reapply transformation\n");
-
-  pips_debug(1, "generating file '%s'\n", file);
   FILE * helper = safe_fopen(file, "w");
-  fprintf(helper, FREIA_SPOC_INCLUDES);
+  pips_debug(1, "generating file '%s'\n", file);
 
-  // generate stuff
+  // headers
+  if (freia_spoc_p(target))
+    fprintf(helper, FREIA_SPOC_INCLUDES);
+  else if (freia_terapix_p(target))
+    fprintf(helper, FREIA_TRPX_INCLUDES);
+
   int n_dags = 0;
   FOREACH(list, ls, fsi.seqs)
   {
-    freia_spoc_compile_calls(module, ls, helper, n_dags++);
+    if (freia_spoc_p(target))
+      freia_spoc_compile_calls(module, ls, helper, n_dags);
+    else if (freia_terapix_p(target))
+      freia_trpx_compile_calls(module, ls, helper, n_dags);
     gen_free_list(ls);
+    n_dags++;
   }
 
   // cleanup

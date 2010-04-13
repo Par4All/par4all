@@ -59,6 +59,7 @@ clean:
 
 unbuild: clean tags-clean
 	$(MAKE) -C src unbuild
+	$(MAKE) -C makes unbuild
 
 rebuild:
 	$(MAKE) unbuild

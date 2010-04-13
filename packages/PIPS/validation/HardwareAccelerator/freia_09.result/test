@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -349,3 +352,236 @@ freia_status freia_09(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
 
    return FREIA_OK;                                                     /*0039*/
 }
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status freia_09(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia_data2d *i2)
+{
+   freia_data2d *g0 = freia_common_create_data(16, 128, 128), *g1 = freia_common_create_data(16, 128, 128), *g2 = freia_common_create_data(16, 128, 128), *d0 = freia_common_create_data(16, 128, 128), *d1 = freia_common_create_data(16, 128, 128);       /*0019*/
+   int connexity = 8;                                                   /*0020*/
+   int size = 1;                                                        /*0021*/
+   
+   // T-rex motion detection
+   // i0, i1, i2 are successive input images
+   // the could be a loop with a pipeline
+   freia_cipo_inner_gradient(g0, i0, connexity, size);                  /*0026*/
+   freia_cipo_inner_gradient(g1, i1, connexity, size);                  /*0027*/
+   freia_cipo_inner_gradient(g2, i2, connexity, size);                  /*0028*/
+   freia_aipo_absdiff(d1, g2, g1);                                      /*0029*/
+   freia_aipo_absdiff(d0, g1, g0);                                      /*0030*/
+   freia_aipo_inf(o, d1, d0);                                           /*0031*/
+
+   freia_common_destruct_data(g0);                                      /*0033*/
+   freia_common_destruct_data(g1);                                      /*0034*/
+   freia_common_destruct_data(g2);                                      /*0035*/
+   freia_common_destruct_data(d0);                                      /*0036*/
+   freia_common_destruct_data(d1);                                      /*0037*/
+
+   return FREIA_OK;                                                     /*0039*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_09" in dot format
+digraph "dag_0" {
+  // inputs
+  "g0" [shape=circle];
+  "g1" [shape=circle];
+  "g2" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "31 <" [shape=trapezium,orientation=270];
+  "31 <" -> "o";
+  "30 -|" [shape=trapezium,orientation=270];
+  "30 -|" -> "31 <" [label="d0"];
+  "g0" -> "30 -|";
+  "29 -|" [shape=trapezium,orientation=270];
+  "29 -|" -> "31 <" [label="d1"];
+  "g1" -> "30 -|";
+  "g1" -> "29 -|";
+  "g2" -> "29 -|";
+}
+// graph for dag "dag_cleaned_0" of module "freia_09" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "g0" [shape=circle];
+  "g1" [shape=circle];
+  "g2" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "31 <" [shape=trapezium,orientation=270];
+  "31 <" -> "o";
+  "30 -|" [shape=trapezium,orientation=270];
+  "30 -|" -> "31 <" [label="d0"];
+  "g0" -> "30 -|";
+  "29 -|" [shape=trapezium,orientation=270];
+  "29 -|" -> "31 <" [label="d1"];
+  "g1" -> "30 -|";
+  "g1" -> "29 -|";
+  "g2" -> "29 -|";
+}
+// graph for dag "freia_09_helper_0_0" of module "freia_09" in dot format
+digraph "freia_09_helper_0_0" {
+  // inputs
+  "g0" [shape=circle];
+  "g1" [shape=circle];
+  "g2" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "31 <" [shape=trapezium,orientation=270];
+  "31 <" -> "o";
+  "30 -|" [shape=trapezium,orientation=270];
+  "30 -|" -> "31 <" [label="d0"];
+  "g0" -> "30 -|";
+  "29 -|" [shape=trapezium,orientation=270];
+  "29 -|" -> "31 <" [label="d1"];
+  "g1" -> "30 -|";
+  "g1" -> "29 -|";
+  "g2" -> "29 -|";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module freia_09
+ * 3 input images, 1 output image
+ * 6 image operations in dag
+ * dag length is 3, dag width is 3
+ * cost is 12 cycles per imagelet row
+ */
+freia_status freia_09_helper_0_0(
+  freia_data2d * o0,
+  freia_data2d * i0,
+  freia_data2d * i1,
+  freia_data2d * i2)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  terapix_mcu_instr mcu_instr[3];
+
+  // imagelet definitions...
+  int imagelet_size = 170;
+  int imagelet_1 = 0;
+  int imagelet_2 = 170;
+  int imagelet_3 = 340;
+  int imagelet_4 = 510;
+  int imagelet_5 = 680;
+  int imagelet_6 = 850;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: -|(3,2) -> 3
+  mcu_instr[0].macrocode.xmin1 = imagelet_3;
+  mcu_instr[0].macrocode.ymin1 = 0;
+  mcu_instr[0].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0].macrocode.ymin2 = 0;
+  mcu_instr[0].macrocode.xmin3 = imagelet_3;
+  mcu_instr[0].macrocode.ymin3 = 0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ABS_DIFF;
+  // 1: -|(2,1) -> 2
+  mcu_instr[1].macrocode.xmin1 = imagelet_2;
+  mcu_instr[1].macrocode.ymin1 = 0;
+  mcu_instr[1].macrocode.xmin2 = imagelet_1;
+  mcu_instr[1].macrocode.ymin2 = 0;
+  mcu_instr[1].macrocode.xmin3 = imagelet_2;
+  mcu_instr[1].macrocode.ymin3 = 0;
+  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_ABS_DIFF;
+  // 2: <(3,2) -> 1
+  mcu_instr[2].macrocode.xmin1 = imagelet_3;
+  mcu_instr[2].macrocode.ymin1 = 0;
+  mcu_instr[2].macrocode.xmin2 = imagelet_2;
+  mcu_instr[2].macrocode.ymin2 = 0;
+  mcu_instr[2].macrocode.xmin3 = imagelet_1;
+  mcu_instr[2].macrocode.ymin3 = 0;
+  mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[2].macrocode.iter2 = imagelet_size;
+  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_INF;
+
+  // inputs:
+  // - imagelet 1 is i0 for g0
+  // - imagelet 2 is i1 for g1
+  // - imagelet 3 is i2 for g2
+
+  // outputs:
+  // - imagelet 1 is o0 for o
+
+  // double buffer management:
+  // - buffer 1/4
+  // - buffer 2/5
+  // - buffer 3/6
+
+  // output imagelet erosion:
+  //   north: 0
+  //   south: 0
+  //    west: 0
+  //    east: 0
+
+  ret = freia_cg_template_process_3i_1o(&param, o0, i0, i1, i2);
+
+
+  return ret;
+}
+
+
+! updated function
+
+freia_status freia_09(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia_data2d *i2)
+{
+   freia_data2d *g0 = freia_common_create_data(16, 128, 128), *g1 = freia_common_create_data(16, 128, 128), *g2 = freia_common_create_data(16, 128, 128);         /*0019*/
+   int connexity = 8;                                                   /*0020*/
+   int size = 1;                                                        /*0021*/
+   
+   // T-rex motion detection
+   // i0, i1, i2 are successive input images
+   // the could be a loop with a pipeline
+   freia_cipo_inner_gradient(g0, i0, connexity, size);                  /*0026*/
+   freia_cipo_inner_gradient(g1, i1, connexity, size);                  /*0027*/
+   freia_cipo_inner_gradient(g2, i2, connexity, size);                  /*0028*/
+   freia_09_helper_0_0(o, g0, g1, g2);                                  /*0029*/
+
+   freia_common_destruct_data(g0);                                      /*0033*/
+   freia_common_destruct_data(g1);                                      /*0034*/
+   freia_common_destruct_data(g2);                                      /*0035*/
+
+   return FREIA_OK;                                                     /*0039*/
+}
+#
+# FREIA COMPILATION DONE
+#
+
