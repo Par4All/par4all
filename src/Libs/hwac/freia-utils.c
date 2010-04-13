@@ -508,21 +508,22 @@ list /* of expression */ freia_extract_params
     expression e = EXPRESSION(CAR(args));
     args = CDR(args);
 
-    if (params && get_bool_property("FREIA_MERGE_ARGUMENTS"))
+    if (params)
     {
       // ??? if the expression is a constant,
       // the parameter could be skipped as well?
       entity var = expression_to_entity(e);
-      if (entity_variable_p(var))
+      if (entity_variable_p(var) && get_bool_property("FREIA_MERGE_ARGUMENTS"))
       {
 	if (!hash_defined_p(params, var))
 	{
 	  // choose new name
 	  string name = get_var("pi", nparams);
 	  if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
-	  hash_put(params, var, name);
 	  hash_put(params, e, name);
 	  res = CONS(expression, copy_expression(e), res);
+	  // keep record for the *variable* as well...
+	  hash_put(params, var, name);
 	}
 	else
 	{
@@ -532,6 +533,7 @@ list /* of expression */ freia_extract_params
       }
       else
       {
+	// append and record new parameter
 	string name = get_var("pi", nparams);
 	if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
 	hash_put(params, e, name);
