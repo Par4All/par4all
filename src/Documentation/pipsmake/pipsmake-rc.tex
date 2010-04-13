@@ -5024,6 +5024,21 @@ rice_data_dependence            > MODULE.parallelized_code
 \subsection{Parallelization for Terapix architecture}
 \index{Terapix}
 
+\subsubsection{Isolate Statement}
+\begin{PipsPass}{isolate_statement}
+Isolate the statement given in \PipsPropRef{ISOLATE_STATEMENT_LABEL} in a separated memory
+\end{PipsPass}
+\begin{PipsMake}
+isolate_statement > MODULE.code
+	< MODULE.code
+	< MODULE.regions
+	< PROGRAM.entities
+\end{PipsMake}
+
+\begin{PipsProp}{ISOLATE_STATEMENT_LABEL}
+ISOLATE_STATEMENT_LABEL ""
+\end{PipsProp}
+
 \subsubsection{kernelize}
 
 Bootstraps the kernel ressource
@@ -5424,6 +5439,11 @@ simdizer                    > MODULE.code
 When set to true, following property tells the simdizer to try to padd arrays when it seems to be profitable
 \begin{PipsProp}{SIMDIZER_ALLOW_PADDING}
 SIMDIZER_ALLOW_PADDING FALSE
+\end{PipsProp}
+
+A comma seperated list of commutative simd operators:
+\begin{PipsProp}{SIMDIZER_COMMUTATIVE_OPERATORS}
+SIMDIZER_COMMUTATIVE_OPERATORS ""
 \end{PipsProp}
 
 
