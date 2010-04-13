@@ -30,10 +30,10 @@ void getimage(void)
 //               <must be written>: c
          c = foo(fp);
 //               <must be read   >: c i j
-//               <must be written>: TOP-LEVEL:imagein_re[i][j]
+//               <must be written>: imagein_re[i][j]
          imagein_re[i][j] = c==0?0.0:1.0;
 //               <must be read   >: i j
-//               <must be written>: TOP-LEVEL:imagein_im[i][j]
+//               <must be written>: imagein_im[i][j]
          imagein_im[i][j] = 0.0;
       }
 }
