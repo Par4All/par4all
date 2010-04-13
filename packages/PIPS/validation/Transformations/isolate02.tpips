@@ -1,0 +1,25 @@
+setenv WS="isolate02"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+
+module lonesome_cowboy
+
+echo original code
+display PRINTED_FILE[%ALL]
+
+echo isolated code
+setproperty ISOLATE_STATEMENT_LABEL "isolate"
+apply ISOLATE_STATEMENT
+display PRINTED_FILE
+
+
+apply UNSPLIT
+close
+
+shell cc $WS.c -o ref
+shell cc $WS.database/Src/$WS.c -o candidate
+shell ( test `./ref` = `./candidate` && echo "ok" ) || echo "ko"
+shell rm -f ref candidate
+
+delete $WS

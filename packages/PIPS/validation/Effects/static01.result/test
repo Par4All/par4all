@@ -1,4 +1,20 @@
 
+Proper effects for "static01"
+
+void static01()
+{
+   // BEGIN BLOCK
+   static int i = 0;
+//               <must be read   >: i
+//               <must be written>: i
+
+   i++;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+   // END BLOCK
+}
+
 Cumulated effects for "static01"
 
 //               <must be read   >: __IO_EFFECTS:LUNS[1] i
@@ -8,7 +24,6 @@ void static01()
 //               <must be read   >: __IO_EFFECTS:LUNS[1] i
 //               <must be written>: __IO_EFFECTS:LUNS[1] i
    // BEGIN BLOCK
-// No effect at all on i
    static int i = 0;
 //               <must be read   >: i
 //               <must be written>: i
@@ -17,5 +32,26 @@ void static01()
 //               <must be read   >: __IO_EFFECTS:LUNS[1] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", i);
+   // END BLOCK
+}
+
+Cumulated effects for "main"
+
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
+int main()
+{
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
+   // BEGIN BLOCK
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
+   static01();
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
+   static01();
+//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
+   static01();
    // END BLOCK
 }

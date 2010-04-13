@@ -1,0 +1,3 @@
+# WSPACE=foo FILE=foo.c tpips terapix.tpips
+setenv FREIA_TARGET=TERAPIX
+source target.tpips

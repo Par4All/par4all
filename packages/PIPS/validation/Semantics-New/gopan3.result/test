@@ -2,7 +2,7 @@
 TRANSFORMERS
 
 
-C  T() {}
+C  T(main) {103<=main}
 
 int main()
 {
@@ -63,18 +63,15 @@ int main()
       z = x;
    }
 
-//  T() {x==z, y==-1, 103<=x}
+//  T(main) {main==x, main==z, y==-1, 103<=main}
 
-   if (x==103)
-
-//  T() {x==103, y==-1, z==103}
-
-      printf("property  verified\n");
-   else
-
-//  T() {x==z, y==-1, 104<=x}
-
-      printf("property not found\n");
+   /*
+     if(x==103)
+       printf("property  verified\n");
+     else
+       printf("property not found\n");
+     */
+   return z;
 }
 
 PRECONDITIONS
@@ -139,45 +136,13 @@ int main()
       z = x;
    }
 
-//  P(x,y,z) {x==z, y==-1, 103<=x}
-
-   if (x==103)
-
 //  P(x,y,z) {x==103, y==-1, z==103}
 
-      printf("property  verified\n");
-   else
-
-//  P(x,y,z) {x==z, y==-1, 104<=x}
-
-      printf("property not found\n");
-}
-
-AFTER DEAD CODE ELIMINATION
-
-int main()
-{
-
-   int x, y, z, k;
-
-   x = 0;
-   y = 0;
-   z = 0;
-
-   while (y>=0) {
-      while (y>=0&&x<=50) {
-         x++;
-         y++;
-      }
-      while (y>=0&&x>50) {
-         y--;
-         x++;
-      }
-      z = x;
-   }
-   if (x==103)
-      printf("property  verified\n");
-   else
-      printf("property not found\n");
-   ;
+   /*
+     if(x==103)
+       printf("property  verified\n");
+     else
+       printf("property not found\n");
+     */
+   return z;
 }

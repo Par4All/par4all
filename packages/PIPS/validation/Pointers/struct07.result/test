@@ -1,0 +1,44 @@
+
+Parsed printed file for "struct07"
+
+void struct07()
+{
+   extern complex imagein[256][256], imageout[256][256];
+   int i, j, k, l;
+   float z1, z2;
+   float x[256][256];
+
+   for (k = 0;k<256;k++)
+      imageout[k][1].re = z1;
+
+   for (i = 0;i<256;i++)
+      for (j = 0;j<256;j++)
+         x[i][j] = 0.;
+}
+
+POINTS TO
+
+//  {}
+void struct07()
+{
+//  points to = {}
+   extern complex imagein[256][256], imageout[256][256];
+//  points to = {}
+   int i, j, k, l;
+//  points to = {}
+   float z1, z2;
+//  points to = {}
+   float x[256][256];
+//  points to = {}
+
+   for(k = 0; k <= 255; k += 1)
+//  points to = {}
+      imageout[k][1].re = z1;
+//  points to = {}
+
+   for(i = 0; i <= 255; i += 1)
+//  points to = {}
+      for(j = 0; j <= 255; j += 1)
+//  points to = {}
+         x[i][j] = 0.;
+}

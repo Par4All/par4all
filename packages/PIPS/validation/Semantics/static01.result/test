@@ -1,4 +1,24 @@
 
+Cumulated effects for "static01"
+
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <must be written>: __IO_EFFECTS:LUNS[1] i
+void static01()
+{
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <must be written>: __IO_EFFECTS:LUNS[1] i
+   // BEGIN BLOCK
+   static int i = 0;
+//               <must be read   >: i
+//               <must be written>: i
+
+   i++;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+   // END BLOCK
+}
+
 Cumulated effects for "main"
 
 //               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i

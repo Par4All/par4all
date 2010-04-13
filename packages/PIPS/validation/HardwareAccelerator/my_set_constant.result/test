@@ -1,3 +1,6 @@
+#
+# SPOC
+#
 
 ! initial function
 
@@ -50,7 +53,8 @@ digraph "my_set_constant_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_set_constant
-freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
+freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, ,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -69,7 +73,7 @@ freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
   // STAGE 0
   // alu 4 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
-  sp.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = pi0;
 
 
   // output image o on 0
@@ -118,3 +122,146 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
    return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
 }
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return freia_aipo_set_constant(o, p0);                               /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_set_constant" in dot format
+digraph "dag_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 C" [shape=trapezium,orientation=270];
+  "4 C" -> "o";
+}
+// graph for dag "dag_cleaned_0" of module "my_set_constant" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 C" [shape=trapezium,orientation=270];
+  "4 C" -> "o";
+}
+// graph for dag "my_set_constant_helper_0_0" of module "my_set_constant" in dot format
+digraph "my_set_constant_helper_0_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 C" [shape=trapezium,orientation=270];
+  "4 C" -> "o";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module my_set_constant
+ * 0 input image, 1 output image
+ * 1 image operations in dag
+ * dag length is 1, dag width is 1
+ * cost is 2 cycles per imagelet row
+ */
+freia_status my_set_constant_helper_0_0(
+  freia_data2d * o0,
+  int32_t pi1)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret;
+  // operation 0 parameters
+  int16_t p_0[1];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  terapix_mcu_instr mcu_instr[1];
+
+  // imagelet definitions...
+  int imagelet_size = 512;
+  int imagelet_1 = 0;
+  int imagelet_2 = 512;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // subimage operation
+  param.size = sizeof(mcu_instr);
+  param.raw = (void*) mcu_instr;
+
+  // dyn_param contents  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+  // 0: C() -> 1
+  mcu_instr[0].macrocode.xmin??? = imagelet_1;
+  mcu_instr[0].macrocode.ymin??? = 0;
+  // copy of operation 0 parameters
+  p_0[0] = pi1;
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_instr[0].macrocode.xmin3 = x_0;
+  mcu_instr[0].macrocode.ymin3 = y_0;
+  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_SET_CONST?;
+
+  // no input
+
+  // outputs:
+  // - imagelet 1 is o0 for o
+
+  // double buffer management:
+  // - buffer 1/2
+
+  // output imagelet erosion:
+  //   north: 0
+  //   south: 0
+  //    west: 0
+  //    east: 0
+
+  ret = freia_cg_template_process_0i_1o(&param, o0);
+
+
+  return ret;
+}
+
+
+! updated function
+
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return my_set_constant_helper_0_0(o, p0);                            /*0004*/
+}
+#
+# FREIA COMPILATION DONE
+#
+

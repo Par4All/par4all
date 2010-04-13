@@ -1,0 +1,47 @@
+
+Proper effetcs for "struct05"
+
+int struct05()
+{
+   struct two {
+      int first;
+      int second;
+   } x[10];
+//               <must be written>: i
+   int i = 0;
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+      if (1)
+//               <must be read   >: i x[i][2]
+//               <must be written>: x[i][1]
+         x[i].first = x[i].second;
+      else
+//               <must be read   >: i x[i][1]
+//               <must be written>: x[i][2]
+         x[i].second = x[i].first;
+}
+
+POINTS TO
+
+//  {}
+int struct05()
+{
+//  points to = {}
+   struct two {
+      int first;
+      int second;
+   } x[10];
+//  points to = {}
+   int i = 0;
+//  points to = {}
+
+   for(i = 0; i <= 9; i += 1)
+//  points to = {}
+      if (1)
+//  points to = {}
+         x[i].first = x[i].second;
+      else
+//  points to = {}
+         x[i].second = x[i].first;
+}

@@ -1,0 +1,35 @@
+initial functions
+struct ure  llement()
+{
+   struct ure noth = {1, {2, 3}};
+   (noth.ing)[0] = 2.;
+   return noth;
+}
+int main()
+{
+   struct ure nature = {2, {3, 4}};
+   nature = llement();
+   printf("%f", nature.lle+(nature.ing)[0]*(nature.ing)[1]);
+}
+after split strucutres
+struct ure  llement()
+{
+   struct ure noth;
+   //PIPS generated variable
+   int ure_lle = 1;
+   //PIPS generated variable
+   float ure_ing[2] = {2, 3};
+   ure_ing[0] = 2.;
+   noth.lle = ure_lle;
+   memcpy(noth.ing, ure_ing, sizeof(ure_ing));
+   return noth;
+}
+int main()
+{
+   struct ure nature = {2, {3, 4}};
+   nature = llement();
+   printf("%f", nature.lle+(nature.ing)[0]*(nature.ing)[1]);
+}
+validate result
+ok
+

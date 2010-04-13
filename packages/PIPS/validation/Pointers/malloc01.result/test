@@ -1,0 +1,24 @@
+
+POINTS TO
+
+C  {}
+int main(int argc, char *argv[])
+{
+//  points to = {}
+   int i, j;
+//  points to = {}
+   int *a[64];
+//  points to = {}
+
+   for(i = 0; i <= 63; i += 1) {
+//  points to = {}
+      a[i] = (float) malloc(64*sizeof(float));
+//  points to = {}
+      for(j = 0; j <= 63; j += 1)
+//  points to = {}
+         a[i][j] = 0.;
+   }
+//  points to = {}
+
+   return 0;
+}
