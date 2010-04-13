@@ -215,7 +215,7 @@ dist-hook: document
 	rm -rf `find $(distdir)/doc -name CVS`
 
 clean-local:
-	rm -rf doc
+
 distclean-local:
 	rm -f polylib*.pc polylib*-uninstalled.pc polylib*-uninstalled.sh polylib*.pc.in
 
