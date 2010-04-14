@@ -499,6 +499,7 @@ list /* of expression */ freia_extract_params
   const freia_api_t * api = get_freia_api(napi);
   args = freia_get_params(api, args);
   list res = NIL;
+  bool merge = get_bool_property("FREIA_MERGE_ARGUMENTS");
 
   pips_assert("number of arguments is okay",
 	      gen_length(args)==api->arg_misc_in+api->arg_misc_out);
@@ -513,7 +514,7 @@ list /* of expression */ freia_extract_params
       // ??? if the expression is a constant,
       // the parameter could be skipped as well?
       entity var = expression_to_entity(e);
-      if (entity_variable_p(var) && get_bool_property("FREIA_MERGE_ARGUMENTS"))
+      if (merge && entity_defined_p(var) && entity_variable_p(var))
       {
 	if (!hash_defined_p(params, var))
 	{
