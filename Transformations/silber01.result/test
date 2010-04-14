@@ -226,35 +226,75 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
 }
 void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
 {
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1)
+            dest[j*w+i] = bytes[j*w+i];
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            current = dest[j*w+i];
+            dest[j*w+i] = lut[dest[j*w+i]];
+         }
+   }
+   {
+      int i, j;
+
+      for(i = 0; i <= w-1; i += 1)
+         for(j = 0; j <= h-1; j += 1) {
+            unsigned char current;
+            current = dest[j*w+i];
+            dest[j*w+i] = (int) dest[j*w+i]+val>255?255:dest[j*w+i]+val;
+         }
+   }
+}
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
    //PIPS generated variable
-   int I_0, I_1, I_2;
+   int I_0, I_1, I_2, I_3;
    //PIPS generated variable
-   unsigned char I_3, I_4;
+   unsigned char I_4;
    //PIPS generated variable
-   int I_5, I_6;
+   int I_5, I_6, I_7;
    //PIPS generated variable
-   unsigned char I_7;
+   unsigned char I_8, I_9;
    //PIPS generated variable
-   int I_8, I_9;
+   int I_10, I_11, I_12;
    //PIPS generated variable
-   char I_10;
+   unsigned char I_13;
    //PIPS generated variable
-   int I_11;
+   int I_14, I_15, I_16;
+   //PIPS generated variable
+   char I_17;
+   //PIPS generated variable
+   int I_18;
    I_0 = w-1;
    int i, j;
 
    for(i = 0; i <= I_0; i += 1)
-      for(j = 0; j <= h-1; j += 1)
-         dest[j*w+i] = bytes[j*w+i];
+      for(j = 0; j <= h-1; j += 1) {
+         I_3 = j*w+i;
+         dest[I_3] = bytes[I_3];
+      }
    {
       int i, j;
 
       for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            I_2 = j*w+i;
-            current = dest[I_2];
-            dest[I_2] = lut[current];
+            //1
+            I_6 = j*w;
+            //3
+            I_7 = I_6+i;
+            I_8 = dest[I_7];
+            current = I_8;
+            dest[I_7] = lut[I_8];
          }
    }
    {
@@ -263,118 +303,95 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
       for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            I_6 = j*w+i;
-            current = dest[I_6];
-            dest[I_6] = (int) current+val>255?255:current+val;
+            //1
+            I_11 = j*w;
+            //4
+            I_12 = I_11+i;
+            I_13 = dest[I_12];
+            current = I_13;
+            dest[I_12] = (int) I_13+val>255?255:I_13+val;
          }
    }
 }
 void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
 {
    //PIPS generated variable
-   int I_0, I_1, I_2;
+   int I_0, I_1, I_2, I_3;
    //PIPS generated variable
-   unsigned char I_3, I_4;
+   unsigned char I_4;
    //PIPS generated variable
-   int I_5, I_6;
+   int I_5, I_6, I_7;
    //PIPS generated variable
-   unsigned char I_7;
+   unsigned char I_8, I_9;
    //PIPS generated variable
-   int I_8, I_9;
+   int I_10, I_11, I_12;
    //PIPS generated variable
-   char I_10;
+   unsigned char I_13;
    //PIPS generated variable
-   int I_11;
+   int I_14, I_15, I_16;
+   //PIPS generated variable
+   char I_17;
+   //PIPS generated variable
+   int I_18;
    I_0 = w-1;
    int i, j;
 
-   for(i = 0; i <= w-1; i += 1)
-      for(j = 0; j <= h-1; j += 1)
-         dest[j*w+i] = bytes[j*w+i];
+   for(i = 0; i <= I_0; i += 1)
+      for(j = 0; j <= h-1; j += 1) {
+         I_3 = j*w+i;
+         dest[I_3] = bytes[I_3];
+      }
    {
       int i, j;
 
-      for(i = 0; i <= w-1; i += 1)
+      for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            I_2 = j*w+i;
-            current = dest[j*w+i];
-            dest[j*w+i] = lut[dest[j*w+i]];
+            //1
+            I_6 = j*w;
+            //3
+            I_7 = I_6+i;
+            I_8 = dest[I_7];
+            current = I_8;
+            dest[I_7] = lut[I_8];
          }
    }
    {
       int i, j;
 
-      for(i = 0; i <= w-1; i += 1)
+      for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            I_6 = j*w+i;
-            current = dest[j*w+i];
-            dest[j*w+i] = (int) dest[j*w+i]+val>255?255:dest[j*w+i]+val;
-         }
-   }
-}
-void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
-{
-   //PIPS generated variable
-   int I_0, I_1, I_2;
-   //PIPS generated variable
-   unsigned char I_3, I_4;
-   //PIPS generated variable
-   int I_5, I_6;
-   //PIPS generated variable
-   unsigned char I_7;
-   //PIPS generated variable
-   int I_8, I_9;
-   //PIPS generated variable
-   char I_10;
-   //PIPS generated variable
-   int I_11;
-   I_0 = w-1;
-   int i, j;
-
-   for(i = 0; i <= w-1; i += 1)
-      for(j = 0; j <= h-1; j += 1)
-         dest[j*w+i] = bytes[j*w+i];
-   {
-      int i, j;
-
-      for(i = 0; i <= w-1; i += 1)
-         for(j = 0; j <= h-1; j += 1) {
-            unsigned char current;
-            I_2 = j*w+i;
-            current = dest[j*w+i];
-            dest[j*w+i] = lut[dest[j*w+i]];
-         }
-   }
-   {
-      int i, j;
-
-      for(i = 0; i <= w-1; i += 1)
-         for(j = 0; j <= h-1; j += 1) {
-            unsigned char current;
-            I_6 = j*w+i;
-            current = dest[j*w+i];
-            dest[j*w+i] = (int) dest[j*w+i]+val>255?255:dest[j*w+i]+val;
+            //1
+            I_11 = j*w;
+            //4
+            I_12 = I_11+i;
+            I_13 = dest[I_12];
+            current = I_13;
+            dest[I_12] = (int) I_13+val>255?255:I_13+val;
          }
    }
 }
 void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
 {
    //PIPS generated variable
-   int I_0, I_1, I_2;
+   int I_0, I_1, I_2, I_3;
    //PIPS generated variable
-   unsigned char I_3, I_4;
+   unsigned char I_4;
    //PIPS generated variable
-   int I_5, I_6;
+   int I_5, I_6, I_7;
    //PIPS generated variable
-   unsigned char I_7;
+   unsigned char I_8, I_9;
    //PIPS generated variable
-   int I_8, I_9;
+   int I_10, I_11, I_12;
    //PIPS generated variable
-   char I_10;
+   unsigned char I_13;
    //PIPS generated variable
-   int I_11, i_0, j_0;
+   int I_14, I_15, I_16;
+   //PIPS generated variable
+   char I_17;
+   //PIPS generated variable
+   int I_18, i_0, j_0;
    //PIPS generated variable
    unsigned char current_0, current_1;
    //PIPS generated variable
@@ -384,22 +401,32 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
    I_0 = w-1;
    int i, j;
 
-   for(i = 0; i <= w-1; i += 1)
-      for(j = 0; j <= h-1; j += 1)
-         dest[j*w+i] = bytes[j*w+i];
-
-   for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-      for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         I_2 = j_0*w+i_0;
-         current_1 = dest[j_0*w+i_0];
-         dest[j_0*w+i_0] = lut[dest[j_0*w+i_0]];
+   for(i = 0; i <= I_0; i += 1)
+      for(j = 0; j <= h-1; j += 1) {
+         I_3 = j*w+i;
+         dest[I_3] = bytes[I_3];
       }
 
-   for(i_1 = 0; i_1 <= w-1; i_1 += 1)
+   for(i_0 = 0; i_0 <= I_0; i_0 += 1)
+      for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
+         //1
+         I_6 = j_0*w;
+         //3
+         I_7 = I_6+i_0;
+         I_8 = dest[I_7];
+         current_1 = I_8;
+         dest[I_7] = lut[I_8];
+      }
+
+   for(i_1 = 0; i_1 <= I_0; i_1 += 1)
       for(j_1 = 0; j_1 <= h-1; j_1 += 1) {
-         I_6 = j_1*w+i_1;
-         current_3 = dest[j_1*w+i_1];
-         dest[j_1*w+i_1] = (int) dest[j_1*w+i_1]+val>255?255:dest[j_1*w+i_1]+val;
+         //1
+         I_11 = j_1*w;
+         //4
+         I_12 = I_11+i_1;
+         I_13 = dest[I_12];
+         current_3 = I_13;
+         dest[I_12] = (int) I_13+val>255?255:I_13+val;
       }
 }
 
