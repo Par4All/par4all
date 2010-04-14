@@ -2757,7 +2757,9 @@ freia_status license_plate_helper_0_0(
   const int32_t y_65 = 0;
   terapix_mcu_instr mcu_instr[69];
 
-  // imagelet definitions...
+  // imagelets definitions:
+  // - 4 computation imagelets
+  // - 1 double buffer imagelets
   int imagelet_size = 204;
   int imagelet_1 = 0;
   int imagelet_2 = 204;

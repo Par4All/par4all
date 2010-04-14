@@ -293,7 +293,9 @@ freia_status freia_29_helper_0_0(
   const int32_t y_1 = 0;
   terapix_mcu_instr mcu_instr[3];
 
-  // imagelet definitions...
+  // imagelets definitions:
+  // - 3 computation imagelets
+  // - 2 double buffer imagelets
   int imagelet_size = 204;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
