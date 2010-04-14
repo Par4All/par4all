@@ -200,13 +200,15 @@ static void update_erosions
  * maximal erosion in all four directions
  */
 static int dag_terapix_measures
-  (const dag d, int * width, int * cost, int * nops,
+  (const dag d, hash_table erosion,
+   int * width, int * cost, int * nops,
    int * north, int * south, int * west, int * east)
 {
   set processed = set_make(set_pointer);
   int dcost = 0, dlength = 0, dwidth = gen_length(dag_inputs(d)), dnops = 0;
+  bool keep_erosion = erosion!=NULL;
   // vertex output -> NSWE erosion (v+0 to v+3 is N S W E)
-  hash_table erosion = hash_table_make(hash_pointer, 0);
+  if (!keep_erosion) erosion = hash_table_make(hash_pointer, 0);
 
   FOREACH(dagvtx, in, dag_inputs(d))
     update_erosions(d, in, erosion);
@@ -250,7 +252,7 @@ static int dag_terapix_measures
 
   // cleanup
   set_free(processed);
-  hash_table_free(erosion);
+  if (!keep_erosion) hash_table_free(erosion);
 
   // return results
   *north = n, *south = s, *west = w, *east = e,
@@ -524,7 +526,8 @@ static void freia_terapix_call
 
   // get stats
   int length, width, cost, nops, n, s, w, e;
-  length = dag_terapix_measures(thedag, &width, &cost, &nops, &n, &s, &w, &e);
+  length = dag_terapix_measures(thedag, NULL,
+				&width, &cost, &nops, &n, &s, &w, &e);
 
   // show stats in function's comments
   sb_cat(head, "\n/* FREIA terapix helper function for module ", module, "\n");
