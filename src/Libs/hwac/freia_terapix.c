@@ -765,7 +765,11 @@ static void freia_terapix_call
   sb_cat(decl, "\n  // imagelets definitions:\n");
   sb_cat(decl, "  // - ", itoa(n_imagelets), " computation imagelets\n");
   sb_cat(decl, "  // - ", itoa(n_double_buffers), " double buffer imagelets\n");
+
+  // this is really a MAXIMUM available size
+  // the runtime can use that or less
   sb_cat(decl, "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
+
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)
   {
