@@ -16,6 +16,10 @@ activate REGION_CHAINS
 setproperty SAC_SIMD_REGISTER_WIDTH 128
 setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
 
+echo print dg
+apply PRINT_DOT_DEPENDENCE_GRAPH
+quit
+
 echo raw file
 display PRINTED_FILE
 
