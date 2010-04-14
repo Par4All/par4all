@@ -60,7 +60,6 @@
 #include "expressions.h"
 
 #include "eole_private.h"
-#define expression_scalar_p(e) (expression_reference_p((e)) && reference_scalar_p(expression_reference((e))))
 
 /******************************************************************* FLATTEN */
 

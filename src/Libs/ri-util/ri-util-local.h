@@ -1800,6 +1800,7 @@ the variable is unsigned, signed or not */
 
 #define binary_call_lhs(c) (EXPRESSION(CAR(call_arguments((c)))))
 #define binary_call_rhs(c) (EXPRESSION(CAR(CDR(call_arguments((c))))))
+#define expression_scalar_p(e) (expression_reference_p((e)) && reference_scalar_p(expression_reference((e))))
 #define hash_contains_p(htp, key) (hash_get(htp, key) != HASH_UNDEFINED_VALUE)
 
 
