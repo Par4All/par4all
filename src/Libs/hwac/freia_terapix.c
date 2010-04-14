@@ -141,12 +141,16 @@ static void erosion_optimization
   }
 }
 
+#define NORTH (0)
+#define SOUTH (1)
+#define WEST  (2)
+#define EAST  (3)
+
 /* update_erosions().
  * compute and store the imagelet erosion on vertex v output.
  */
 static void update_erosions
-  (const dag d, const dagvtx v,
-   hash_table ner, hash_table ser, hash_table wer, hash_table eer)
+  (const dag d, const dagvtx v, hash_table erosion)
 {
   _int n = 0, s = 0, w = 0, e = 0;
 
@@ -154,10 +158,14 @@ static void update_erosions
   const list preds = dag_vertex_preds(d, v);
   FOREACH(dagvtx, p, preds)
   {
-    if ((_int)hash_get(ner, p)>n) n = (_int) hash_get(ner, p);
-    if ((_int)hash_get(ser, p)>s) s = (_int) hash_get(ser, p);
-    if ((_int)hash_get(wer, p)>w) w = (_int) hash_get(wer, p);
-    if ((_int)hash_get(eer, p)>e) e = (_int) hash_get(eer, p);
+    if ((_int)hash_get(erosion, p+NORTH)>n)
+      n = (_int) hash_get(erosion, p+NORTH);
+    if ((_int)hash_get(erosion, p+SOUTH)>s)
+      s = (_int) hash_get(erosion, p+SOUTH);
+    if ((_int)hash_get(erosion, p+WEST)>w)
+      w = (_int) hash_get(erosion, p+WEST);
+    if ((_int)hash_get(erosion, p+EAST)>e)
+      e = (_int) hash_get(erosion, p+EAST);
   }
   gen_free_list(preds);
 
@@ -178,10 +186,10 @@ static void update_erosions
   if (east) e += api->terapix.east;
 
   // store results
-  hash_put(ner, v, (void*) n);
-  hash_put(ser, v, (void*) s);
-  hash_put(wer, v, (void*) w);
-  hash_put(eer, v, (void*) e);
+  hash_put(erosion, v+NORTH, (void*) n);
+  hash_put(erosion, v+SOUTH, (void*) s);
+  hash_put(erosion, v+WEST, (void*) w);
+  hash_put(erosion, v+EAST, (void*) e);
 }
 
 /* compute some measures about DAG d.
@@ -196,18 +204,14 @@ static int dag_terapix_measures
    int * north, int * south, int * west, int * east)
 {
   set processed = set_make(set_pointer);
-  list lv;
   int dcost = 0, dlength = 0, dwidth = gen_length(dag_inputs(d)), dnops = 0;
-  hash_table
-    // vertex output -> NSWE erosion
-    ner = hash_table_make(hash_pointer, 0),
-    ser = hash_table_make(hash_pointer, 0),
-    wer = hash_table_make(hash_pointer, 0),
-    eer = hash_table_make(hash_pointer, 0);
+  // vertex output -> NSWE erosion (v+0 to v+3 is N S W E)
+  hash_table erosion = hash_table_make(hash_pointer, 0);
 
   FOREACH(dagvtx, in, dag_inputs(d))
-    update_erosions(d, in, ner, ser, wer, eer);
+    update_erosions(d, in, erosion);
 
+  list lv;
   while ((lv = get_computable_vertices(d, processed, processed, processed)))
   {
     dlength++;
@@ -218,7 +222,7 @@ static int dag_terapix_measures
       dcost += api->terapix.cost;
       dnops ++;
       if (api->arg_img_out) level_width++;
-      update_erosions(d, v, ner, ser, wer, eer);
+      update_erosions(d, v, erosion);
     }
     if (level_width>dwidth) dwidth = level_width;
 
@@ -234,18 +238,19 @@ static int dag_terapix_measures
   int n=0, s=0, w=0, e=0;
   FOREACH(dagvtx, out, dag_outputs(d))
   {
-    if ((_int)hash_get(ner, out)>n) n = (int) (_int) hash_get(ner, out);
-    if ((_int)hash_get(ser, out)>s) s = (int) (_int) hash_get(ser, out);
-    if ((_int)hash_get(wer, out)>w) w = (int) (_int) hash_get(wer, out);
-    if ((_int)hash_get(eer, out)>e) e = (int) (_int) hash_get(eer, out);
+    if ((_int)hash_get(erosion, out+NORTH)>n)
+      n = (int) (_int) hash_get(erosion, out+NORTH);
+    if ((_int)hash_get(erosion, out+SOUTH)>s)
+      s = (int) (_int) hash_get(erosion, out+SOUTH);
+    if ((_int)hash_get(erosion, out+WEST)>w)
+      w = (int) (_int) hash_get(erosion, out+WEST);
+    if ((_int)hash_get(erosion, out+EAST)>e)
+      e = (int) (_int) hash_get(erosion, out+EAST);
   }
 
   // cleanup
   set_free(processed);
-  hash_table_free(ner);
-  hash_table_free(ser);
-  hash_table_free(wer);
-  hash_table_free(eer);
+  hash_table_free(erosion);
 
   // return results
   *north = n, *south = s, *west = w, *east = e,
@@ -341,7 +346,7 @@ static void gram_param
   int size = width*height;
   pips_assert("something to copy...", size>0);
 
-  int x, y;
+  int x = 0, y = 0;
   terapix_gram_allocate(used, width, height, &x, &y);
 
   sb_cat(decl, "  // operation ", name, " parameters\n");
