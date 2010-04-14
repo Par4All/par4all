@@ -762,10 +762,10 @@ static void freia_terapix_call
   sb_cat(decl, "  terapix_mcu_instr mcu_instr[", itoa(n_ops), "];\n");
 
   // computed values
-  sb_cat(decl,
-	 "\n"
-	 "  // imagelet definitions...\n"
-	 "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
+  sb_cat(decl, "\n  // imagelets definitions:\n");
+  sb_cat(decl, "  // - ", itoa(n_imagelets), " computation imagelets\n");
+  sb_cat(decl, "  // - ", itoa(n_double_buffers), " double buffer imagelets\n");
+  sb_cat(decl, "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)
   {
