@@ -1,5 +1,5 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv WS="simdizer05"
+setenv WS="simdizer06"
 delete $WS
 create $WS $WS.c include/SIMD.c
 
@@ -15,10 +15,6 @@ activate REGION_CHAINS
 
 setproperty SAC_SIMD_REGISTER_WIDTH 128
 setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
-
-#echo print dg
-#apply PRINT_DOT_DEPENDENCE_GRAPH
-#quit
 
 echo raw file
 display PRINTED_FILE
@@ -36,7 +32,7 @@ module main
 
 setproperty SAC_SIMD_REGISTER_WIDTH 128
 setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
-setproperty SIMDIZER_COMMUTATIVE_OPERATORS "SIMD_MULPS,SIMD_ADDPS,SIMD_MULPD,SIMD_ADDPD"
+setproperty SIMDIZER_COMMUTATIVE_OPERATORS "SIMD_ADDPS"
 
 echo after vectorization with commutativity
 apply SIMDIZER

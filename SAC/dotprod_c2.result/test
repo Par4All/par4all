@@ -36,7 +36,7 @@ float dotprod(int n, float b[n], float c[n])
    float _return0;
    for(i = 0; i <= n-1; i += 1) {
       _return0 = b[i]+c[i];
-      a += _return0;
+      a = a+_return0;
    }
    
    
@@ -50,7 +50,7 @@ float dotprod(int n, float b[n], float c[n])
    float _return0;
    for(i = 0; i <= n-1; i += 1) {
       _return0 = b[i]+c[i];
-      a += _return0;
+      a = a+_return0;
    }
    
    
@@ -64,7 +64,7 @@ float dotprod(int n, float b[n], float c[n])
    float _return0;
    for(i = 0; i <= n-1; i += 1) {
       _return0 = b[i]+c[i];
-      a += _return0;
+      a = a+_return0;
    }
    
    
@@ -78,7 +78,7 @@ float dotprod(int n, float b[n], float c[n])
    float _return0;
    for(i = 0; i <= n-1; i += 1) {
       _return0 = b[i]+c[i];
-      a += _return0;
+      a = a+_return0;
    }
    
    
@@ -96,25 +96,25 @@ float dotprod(int n, float b[n], float c[n])
    LU_IB0 = MOD(LU_NUB0, 4);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       _return0 = b[LU_IND0]+c[LU_IND0];
-      a += _return0;
+      a = a+_return0;
    }
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0]+c[LU_IND0];
       //c SIMD_COMMENT_1
-      a += _return0;
+      a = a+_return0;
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+1]+c[LU_IND0+1];
       //c SIMD_COMMENT_1
-      a += _return0;
+      a = a+_return0;
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+2]+c[LU_IND0+2];
       //c SIMD_COMMENT_1
-      a += _return0;
+      a = a+_return0;
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+3]+c[LU_IND0+3];
       //c SIMD_COMMENT_1
-      a += _return0;
+      a = a+_return0;
    }
    i = MAX0(LU_NUB0, 0);
    
@@ -136,7 +136,7 @@ float dotprod(int n, float b[n], float c[n])
    RED0[0] = 0.000000;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       _return0 = b[LU_IND0]+c[LU_IND0];
-      RED0[0] += _return0;
+      RED0[0] = RED0[0]+_return0;
    }
    a = RED0[0]+a;
    RED1[0] = 0.000000;
@@ -147,19 +147,19 @@ float dotprod(int n, float b[n], float c[n])
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0]+c[LU_IND0];
       //c SIMD_COMMENT_1
-      RED1[0] += _return0;
+      RED1[0] = RED1[0]+_return0;
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+1]+c[LU_IND0+1];
       //c SIMD_COMMENT_1
-      RED1[1] += _return0;
+      RED1[1] = RED1[1]+_return0;
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+2]+c[LU_IND0+2];
       //c SIMD_COMMENT_1
-      RED1[2] += _return0;
+      RED1[2] = RED1[2]+_return0;
       //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+3]+c[LU_IND0+3];
       //c SIMD_COMMENT_1
-      RED1[3] += _return0;
+      RED1[3] = RED1[3]+_return0;
    }
    a = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a;
    i = MAX0(LU_NUB0, 0);
@@ -224,7 +224,11 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    float RED0[0+1], RED1[3+1], _return00, _return01, _return02, _return03, a0, _return04;
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   //PIPS:SAC generated variable
+   float aligned[3+1] = {0, 0, 0, 0};
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    RED0[0] = 0.000000;
@@ -241,7 +245,7 @@ float dotprod(int n, float b[n], float c[n])
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &_return03, &_return02, &_return01, &_return00);
+      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
       SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
       SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
@@ -263,7 +267,11 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    float RED0[0+1], RED1[3+1], _return00, _return01, _return02, _return03, a0, _return04;
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   //PIPS:SAC generated variable
+   float aligned[3+1] = {0, 0, 0, 0};
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    RED0[0] = 0.000000;
@@ -283,7 +291,7 @@ float dotprod(int n, float b[n], float c[n])
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
    }
-   SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &_return03, &_return02, &_return01, &_return00);
+   SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
    SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
    a = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a0;
    i = MAX0(LU_NUB0, 0);
@@ -298,9 +306,11 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1], _return00, _return01, _return02, _return03, a0, _return04;
+   float RED0[0+1], RED1[3+1], a0, _return04;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   //PIPS:SAC generated variable
+   float aligned[3+1] = {0, 0, 0, 0};
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    RED0[0] = 0.000000;
@@ -320,7 +330,7 @@ float dotprod(int n, float b[n], float c[n])
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
    }
-   SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &_return03, &_return02, &_return01, &_return00);
+   SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
    SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
    a = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a0;
    i = MAX0(LU_NUB0, 0);
@@ -338,9 +348,11 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1], _return00, _return01, _return02, _return03, a0, _return04;
+   float RED0[0+1], RED1[3+1], a0, _return04;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   //PIPS:SAC generated variable
+   float aligned[3+1] = {0, 0, 0, 0};
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    RED0[0] = 0.000000;
@@ -360,7 +372,7 @@ float dotprod(int n, float b[n], float c[n])
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
    }
-   SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &_return03, &_return02, &_return01, &_return00);
+   SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
    SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
    a = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a0;
    i = MAX0(LU_NUB0, 0);
