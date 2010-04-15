@@ -239,8 +239,6 @@ static _stack_ptr find_or_allocate(stack s)
    save memory.
 
    @param policy not used, 0 is fine.
-
-   TODO : define the othe parameters !!!
  */
 stack stack_make(int type, int bucket_size, int policy)
 {
