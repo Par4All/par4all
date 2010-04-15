@@ -444,7 +444,7 @@ list /* of expression */ freia_extract_params
       // ??? if the expression is a constant,
       // the parameter could be skipped as well?
       entity var = expression_to_entity(e);
-      if (merge && var!=entity_undefined && entity_variable_p(var))
+      if (merge && !entity_undefined_p(var) && entity_variable_p(var))
       {
 	if (!hash_defined_p(params, var))
 	{
