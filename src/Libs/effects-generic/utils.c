@@ -932,7 +932,8 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	    basic b = variable_basic(v);
 	    list l_dim = variable_dimensions(v);
 
-	    pips_debug(8, "variable case, of dimension %d\n",
+	    pips_debug(8, "variable case, of basic %s, of dimension %d\n",
+		       basic_to_string(b),
 		       (int) gen_length(variable_dimensions(v)));
 
 	    while (!ENDP(l_dim) && !ENDP(l_ind))
@@ -996,8 +997,10 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 		/* the current type becomes the type of the
 		 *p_rank-th field
 		 */
-		ct = entity_type(ENTITY(gen_nth(rank - 1, l_ent)));
+		ct = basic_concrete_type(entity_type(ENTITY(gen_nth(rank - 1, l_ent))));
 		p = r_effect_pointer_type_p(eff, CDR(l_ind), ct);
+		free_type(ct);
+		ct = type_undefined;
 		finished = true;
 	      }
 	    else
@@ -1005,9 +1008,10 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	      {
 		while (!ENDP(l_ent) && p)
 		  {
-		    type new_ct = entity_type(ENTITY(CAR(l_ent)));
+		    type new_ct = basic_concrete_type(entity_type(ENTITY(CAR(l_ent))));
 		    p = r_effect_pointer_type_p(eff, CDR(l_ind), 
 						new_ct);
+		    free_type(new_ct);
 		    POP(l_ent);
 		  }
 		finished = true;
@@ -1048,6 +1052,7 @@ bool effect_pointer_type_p(effect eff)
   else
     p = r_effect_pointer_type_p(eff, l_ind, t);
 
+  free_type(t);
   pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
   return p;
 
@@ -1632,3 +1637,5 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 	
   return le;
 }
+
+
