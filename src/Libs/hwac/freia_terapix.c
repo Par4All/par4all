@@ -649,7 +649,8 @@ static void freia_terapix_call
 		pstatement_statement_p(vtxcontent_source(vc)));
     statement s = pstatement_statement(vtxcontent_source(vc));
     call c = freia_statement_to_call(s);
-    int optype = dagvtx_optype(current), opid = dagvtx_opid(current);
+    // int optype = dagvtx_optype(current);
+    int opid = dagvtx_opid(current);
     const freia_api_t * api = get_freia_api(opid);
     pips_assert("freia api found", api!=NULL);
 
@@ -854,7 +855,7 @@ static void freia_terapix_call
   free(used);
 }
 
-static hash_table erosion;
+static hash_table erosion = NULL;
 
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
@@ -1020,13 +1021,15 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
 
   do
   {
-    // GLOBAL
+    list lcurrent = NIL, computables;
     set_clear(current);
     set_clear(computed);
     set_assign_list(computed, dag_inputs(dall));
+
+    // GLOBAL
+    pips_assert("erosion is clean", erosion==NULL);
     erosion = hash_table_make(hash_pointer, 0);
     dag_terapix_erosion(dall, erosion);
-    list lcurrent = NIL, computables;
 
     // transitive closure
     while ((computables =
@@ -1037,14 +1040,10 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
 	  dagvtx_dump(stderr, "computable", v);
       }
 
-      // ???
-      // hmmm... chose one while building the schedule?
-      // dagvtx -> imagelet number
-      // dagvtx -> current erosion
-      // currently add them all (level by level)
       gen_sort_list(computables,
 		    (int(*)(const void*,const void*)) dagvtx_terapix_priority);
 
+      // choose one while building the schedule?
       dagvtx first = DAGVTX(CAR(computables));
       gen_free_list(computables), computables = NIL;
 
@@ -1059,7 +1058,7 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
     // is there something?
     if (lcurrent)
     {
-      //lcurrent = gen_nreverse(lcurrent);
+      // build extracted dag
       dag nd = make_dag(NIL, NIL, NIL);
       FOREACH(dagvtx, v, lcurrent)
       {
@@ -1077,12 +1076,11 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
       // update global list of dags to return.
       ld = CONS(dag, nd, ld);
 
-
-      // cleanup
+      // cleanup full dag for next round
       FOREACH(dagvtx, w, lcurrent)
 	dag_remove_vertex(dall, w);
 
-      gen_free_list(lcurrent);
+      gen_free_list(lcurrent), lcurrent = NIL;
     }
     hash_table_free(erosion), erosion = NULL;
   }
@@ -1104,7 +1102,7 @@ void freia_trpx_compile_calls
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
-  // THIS IS VERY PRELIMINARY
+  // THIS IS QUITE PRELIMINARY
 
   // split only on scalar deps... ??? is it that simple? NO!
   // consider A -> B -> s -> C -> D
