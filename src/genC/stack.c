@@ -231,9 +231,14 @@ static _stack_ptr find_or_allocate(stack s)
 
 /* ALLOCATEs a new stack of @p type
 
+   @param type record newgen domain of stack contents. should be used
+   to check the type of appended elements.
+
    @param bucket_size is the number of elements in the elemental stack
    container. If you now you will have big stacks, try big numbers here to
    save memory.
+
+   @param policy not used, 0 is fine.
 
    TODO : define the othe parameters !!!
  */
