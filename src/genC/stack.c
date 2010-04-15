@@ -229,7 +229,13 @@ static _stack_ptr find_or_allocate(stack s)
   }
 }
 
-/* ALLOCATEs a new stack of type
+/* ALLOCATEs a new stack of @p type
+
+   @param bucket_size is the number of elements in the elemental stack
+   container. If you now you will have big stacks, try big numbers here to
+   save memory.
+
+   TODO : define the othe parameters !!!
  */
 stack stack_make(int type, int bucket_size, int policy)
 {
@@ -290,6 +296,8 @@ void stack_free(stack * ps)
 #define STACK_OBSERVER(name, what)				\
   int stack_##name(const stack s) { STACK_CHECK(s); return(what); }
 
+/* Here we define stack_size(), stack_bsize(), stack_policy() and
+   stack_max_extent(): */
 STACK_OBSERVER(size, s->size)
 STACK_OBSERVER(bsize, s->bucket_size)
 STACK_OBSERVER(policy, s->policy)
@@ -448,6 +456,7 @@ void *stack_replace(void * item, stack s)
 
   return old;
 }
+
 
 /*  that is all
  */
