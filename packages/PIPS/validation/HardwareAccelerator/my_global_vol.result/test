@@ -181,7 +181,9 @@ freia_status my_global_vol_helper_0_0(
   freia_status ret;
   terapix_mcu_instr mcu_instr[1];
 
-  // imagelet definitions...
+  // imagelets definitions:
+  // - 1 computation imagelets
+  // - 1 double buffer imagelets
   int imagelet_size = 511;
   int imagelet_1 = 0;
   int imagelet_2 = 511;

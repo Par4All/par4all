@@ -60,7 +60,6 @@
 #include "expressions.h"
 
 #include "eole_private.h"
-#define expression_scalar_p(e) (expression_reference_p((e)) && reference_scalar_p(expression_reference((e))))
 
 /******************************************************************* FLATTEN */
 
@@ -602,14 +601,13 @@ static void atomize_or_associate_for_level(expression e, int level)
    */
   if (!currently_nested_p()) return;
 
-  /* Only a scalar expression can be atomized.
-   */
 
-
-
-  /* Only do something with calls.
-   */
   syn = expression_syntax(e);
+
+  /* skip casts */
+  if(syntax_cast_(syn)) return atomize_or_associate_for_level(cast_expression(syntax_cast(syn)),level);
+
+  /* Only do something with calls */
   if (!syntax_call_p(syn))
     return;
 
@@ -642,7 +640,7 @@ static void atomize_or_associate_for_level(expression e, int level)
 	{
 	  int j;
 	  bool satom_inserted = FALSE;
-	  syntax satom = make_syntax(is_syntax_call, make_call(func, lei));
+	  syntax satom = make_syntax_call(make_call(func, lei));
 	  expression eatom = expression_undefined;
 	  statement atom;
 
@@ -1162,6 +1160,7 @@ static bool expr_cse_flt(expression e,__attribute__((unused))list *skip_list)
         case is_syntax_reference:
             //return entity_scalar_p(reference_variable(syntax_reference(s)));
         case is_syntax_subscript:
+        case is_syntax_cast:
             return true;
         default:
             return false;

@@ -699,6 +699,10 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 					  set_translation_context_sc(sc);
 					}
 				      
+				      /* beware of casts : do not take them into account for the moment */
+				      syntax s_init = expression_syntax(exp_init);
+				      if (syntax_cast_p(s_init))
+					exp_init = cast_expression(syntax_cast(s_init));
 				      l_res_tmp = (*c_effects_on_formal_parameter_backward_translation_func)(l_tmp, exp_init, transformer_undefined);
 				      
 				      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)

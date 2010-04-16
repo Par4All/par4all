@@ -1,0 +1,46 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="simdizer05"
+delete $WS
+create $WS $WS.c include/SIMD.c
+
+make PRINTED_FILE[%ALL]
+module main
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+
+setproperty SAC_SIMD_REGISTER_WIDTH 128
+setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
+
+#echo print dg
+#apply PRINT_DOT_DEPENDENCE_GRAPH
+#quit
+
+echo raw file
+display PRINTED_FILE
+
+echo after vectorization without commutativity
+apply SIMDIZER
+display PRINTED_FILE
+
+close
+delete $WS
+
+create $WS $WS.c include/SIMD.c
+make PRINTED_FILE[%ALL]
+module main
+
+setproperty SAC_SIMD_REGISTER_WIDTH 128
+setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
+setproperty SIMDIZER_COMMUTATIVE_OPERATORS "SIMD_MULPS,SIMD_ADDPS,SIMD_MULPD,SIMD_ADDPD"
+
+echo after vectorization with commutativity
+apply SIMDIZER
+display PRINTED_FILE
+
+close
+delete $WS

@@ -32,7 +32,7 @@ echo
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 
 #setenv CONTROL_DEBUG_LEVEL=8
-setenv CONTROL_DEBUG_LEVEL=5
+setenv CONTROL_DEBUG_LEVEL=2
 display PRINTED_FILE[block_scope]
 
 apply RESTRUCTURE_CONTROL[block_scope]

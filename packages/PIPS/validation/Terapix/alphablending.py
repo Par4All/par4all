@@ -10,23 +10,33 @@ def microcode_normalizer(ws,module):
 	ws.set_property(array_priv_false_dep_only=False)
 
 	# remove ifs
-	module.if_conversion_init()
-	module.if_conversion()
+	#module.if_conversion_init()
+	#module.if_conversion()
 
-	module.array_to_pointer(convert_parameters="1D",flatten_only=True)
 	module.loop_normalize(one_increment=True,lower_bound=False)
+	module.display()
 	module.flatten_code(flatten_code_unroll=False)
-	module.partial_eval()
+	module.display()
+	#module.partial_eval()
+	#module.display()
 	module.common_subexpression_elimination()
-	module.icm()
-	module.partial_eval()
-	module.suppress_dead_code()
-	module.clean_declarations()
+	module.display()
+	#module.icm()
+	#module.display()
+	#module.partial_eval()
+	#module.display()
+	#module.suppress_dead_code()
+	#module.display()
+	#module.clean_declarations()
+	#module.display()
+	module.array_to_pointer(convert_parameters="1D",flatten_only=True)
+	module.display()
 	module.simd_atomizer(atomize_reference=True,atomize_lhs=True)
-	module.flatten_code(flatten_code_unroll=False)
+	module.display()
 	module.generate_two_addresses_code()
 	module.display()
 	module.normalize_microcode()
+	module.display()
 	for p in ["addi","subi","muli","divi","seti"]:
 		module.expression_substitution(pattern=p)
 	module.flatten_code(flatten_code_unroll=False)
@@ -41,13 +51,22 @@ if __name__ == "__main__":
 	m.partial_eval()
 	m.display()
 	
-	#print "tiling"
-	#for l in m.loops():
-	#	if l.loops():
-	#			l.loop_tiling(matrix="128 0,0 8")
-	#m.loop_normalize(one_increment=True,skip_index_side_effect=True)
-	#m.partial_eval()
-	#m.display()
+	print "tiling"
+	for l in m.loops():
+		if l.loops():
+				l.loop_tiling(matrix="128 0,0 8")
+	print "isolation"
+	kernels=[]
+	for l0 in m.loops():
+		for l1 in l0.loops():
+			for l2 in l1.loops():
+				kernels+=[l2.label]
+				m.isolate_statement(label=l2.label)
+	m.display()
+	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
+	m.display()
+	m.partial_eval()
+	m.display()
 	#m.iterator_detection()
 	#m.array_to_pointer(convert_parameters="POINTER",flatten_only=False)
 	#m.display(With="PRINT_CODE_PROPER_EFFECTS")
@@ -55,19 +74,16 @@ if __name__ == "__main__":
 	#m.simd_atomizer(atomize_reference=True,atomize_lhs=True)
 	#m.invariant_code_motion(CONSTANT_PATH_EFFECTS=False)
 	#m.icm(CONSTANT_PATH_EFFECTS=False)
-	m.display()
-	sys.exit()
+	#m.display()
 	
 	print "outlining to launcher"
 	seed,nb="launcher_",0
 	launchers=[]
-	for l0 in m.loops():
-		for l1 in l0.loops():
-			for l2 in l1.loops():
-				name=seed+str(nb)
-				nb+=1
-				m.outline(module_name=name,label=l2.label)
-				launchers+=[w[name]]
+	for k in kernels:
+		name=seed+str(nb)
+		nb+=1
+		m.outline(module_name=name,label=k)
+		launchers+=[w[name]]
 	m.display()
 	for l in launchers:l.display()
 	
@@ -85,11 +101,14 @@ if __name__ == "__main__":
 		print "normalize microcode", mc.name
 		microcode_normalizer(w,mc)
 
-	print "saving everything in", save_dir
-	w.save(indir=save_dir)
-	for m in microcodes:
-		path=save_dir+"/"+m.name
-		mc.saveas(path+".c")
-		terapips.conv(path+".c",file(path+".tera","w"))
-		os.remove(path+".c")
-
+#	print "saving everything in", save_dir
+#	w.save(indir=save_dir)
+#	for m in microcodes:
+#		path=save_dir+"/"+m.name
+#		mc.saveas(path+".c")
+#		terapips.conv(path+".c",file(path+".tera","w"))
+#		os.remove(path+".c")
+#		print "terapix microcode"
+#		for line in file(path+".tera"):
+#			print line,
+#

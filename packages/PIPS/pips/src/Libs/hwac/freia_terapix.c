@@ -141,12 +141,16 @@ static void erosion_optimization
   }
 }
 
+#define NORTH(v) ((void*) (((_int)v)+0))
+#define SOUTH(v) ((void*) (((_int)v)+1))
+#define WEST(v)  ((void*) (((_int)v)+2))
+#define EAST(v)  ((void*) (((_int)v)+3))
+
 /* update_erosions().
  * compute and store the imagelet erosion on vertex v output.
  */
 static void update_erosions
-  (const dag d, const dagvtx v,
-   hash_table ner, hash_table ser, hash_table wer, hash_table eer)
+  (const dag d, const dagvtx v, hash_table erosion)
 {
   _int n = 0, s = 0, w = 0, e = 0;
 
@@ -154,10 +158,14 @@ static void update_erosions
   const list preds = dag_vertex_preds(d, v);
   FOREACH(dagvtx, p, preds)
   {
-    if ((_int)hash_get(ner, p)>n) n = (_int) hash_get(ner, p);
-    if ((_int)hash_get(ser, p)>s) s = (_int) hash_get(ser, p);
-    if ((_int)hash_get(wer, p)>w) w = (_int) hash_get(wer, p);
-    if ((_int)hash_get(eer, p)>e) e = (_int) hash_get(eer, p);
+    if ((_int)hash_get(erosion, NORTH(p))>n)
+      n = (_int) hash_get(erosion, NORTH(p));
+    if ((_int)hash_get(erosion, SOUTH(p))>s)
+      s = (_int) hash_get(erosion, SOUTH(p));
+    if ((_int)hash_get(erosion, WEST(p))>w)
+      w = (_int) hash_get(erosion, WEST(p));
+    if ((_int)hash_get(erosion, EAST(p))>e)
+      e = (_int) hash_get(erosion, EAST(p));
   }
   gen_free_list(preds);
 
@@ -178,10 +186,10 @@ static void update_erosions
   if (east) e += api->terapix.east;
 
   // store results
-  hash_put(ner, v, (void*) n);
-  hash_put(ser, v, (void*) s);
-  hash_put(wer, v, (void*) w);
-  hash_put(eer, v, (void*) e);
+  hash_put(erosion, NORTH(v), (void*) n);
+  hash_put(erosion, SOUTH(v), (void*) s);
+  hash_put(erosion, WEST(v), (void*) w);
+  hash_put(erosion, EAST(v), (void*) e);
 }
 
 /* compute some measures about DAG d.
@@ -192,22 +200,20 @@ static void update_erosions
  * maximal erosion in all four directions
  */
 static int dag_terapix_measures
-  (const dag d, int * width, int * cost, int * nops,
+  (const dag d, hash_table erosion,
+   int * width, int * cost, int * nops,
    int * north, int * south, int * west, int * east)
 {
   set processed = set_make(set_pointer);
-  list lv;
   int dcost = 0, dlength = 0, dwidth = gen_length(dag_inputs(d)), dnops = 0;
-  hash_table
-    // vertex output -> NSWE erosion
-    ner = hash_table_make(hash_pointer, 0),
-    ser = hash_table_make(hash_pointer, 0),
-    wer = hash_table_make(hash_pointer, 0),
-    eer = hash_table_make(hash_pointer, 0);
+  bool keep_erosion = erosion!=NULL;
+  // vertex output -> NSWE erosion (v+0 to v+3 is N S W E)
+  if (!keep_erosion) erosion = hash_table_make(hash_pointer, 0);
 
   FOREACH(dagvtx, in, dag_inputs(d))
-    update_erosions(d, in, ner, ser, wer, eer);
+    update_erosions(d, in, erosion);
 
+  list lv;
   while ((lv = get_computable_vertices(d, processed, processed, processed)))
   {
     dlength++;
@@ -218,7 +224,7 @@ static int dag_terapix_measures
       dcost += api->terapix.cost;
       dnops ++;
       if (api->arg_img_out) level_width++;
-      update_erosions(d, v, ner, ser, wer, eer);
+      update_erosions(d, v, erosion);
     }
     if (level_width>dwidth) dwidth = level_width;
 
@@ -234,18 +240,19 @@ static int dag_terapix_measures
   int n=0, s=0, w=0, e=0;
   FOREACH(dagvtx, out, dag_outputs(d))
   {
-    if ((_int)hash_get(ner, out)>n) n = (int) (_int) hash_get(ner, out);
-    if ((_int)hash_get(ser, out)>s) s = (int) (_int) hash_get(ser, out);
-    if ((_int)hash_get(wer, out)>w) w = (int) (_int) hash_get(wer, out);
-    if ((_int)hash_get(eer, out)>e) e = (int) (_int) hash_get(eer, out);
+    if ((_int)hash_get(erosion, NORTH(out))>n)
+      n = (int) (_int) hash_get(erosion, NORTH(out));
+    if ((_int)hash_get(erosion, SOUTH(out))>s)
+      s = (int) (_int) hash_get(erosion, SOUTH(out));
+    if ((_int)hash_get(erosion, WEST(out))>w)
+      w = (int) (_int) hash_get(erosion, WEST(out));
+    if ((_int)hash_get(erosion, EAST(out))>e)
+      e = (int) (_int) hash_get(erosion, EAST(out));
   }
 
   // cleanup
   set_free(processed);
-  hash_table_free(ner);
-  hash_table_free(ser);
-  hash_table_free(wer);
-  hash_table_free(eer);
+  if (!keep_erosion) hash_table_free(erosion);
 
   // return results
   *north = n, *south = s, *west = w, *east = e,
@@ -253,6 +260,11 @@ static int dag_terapix_measures
   return dlength;
 }
 
+static void dag_terapix_erosion(const dag d, hash_table erosion)
+{
+  int i = 0;
+  dag_terapix_measures(d, erosion, &i, &i, &i, &i, &i, &i, &i);
+}
 
 /* @return the list of inputs to vertex v as imagelet numbers.
  */
@@ -341,7 +353,7 @@ static void gram_param
   int size = width*height;
   pips_assert("something to copy...", size>0);
 
-  int x, y;
+  int x = 0, y = 0;
   terapix_gram_allocate(used, width, height, &x, &y);
 
   sb_cat(decl, "  // operation ", name, " parameters\n");
@@ -519,7 +531,8 @@ static void freia_terapix_call
 
   // get stats
   int length, width, cost, nops, n, s, w, e;
-  length = dag_terapix_measures(thedag, &width, &cost, &nops, &n, &s, &w, &e);
+  length = dag_terapix_measures(thedag, NULL,
+				&width, &cost, &nops, &n, &s, &w, &e);
 
   // show stats in function's comments
   sb_cat(head, "\n/* FREIA terapix helper function for module ", module, "\n");
@@ -636,7 +649,8 @@ static void freia_terapix_call
 		pstatement_statement_p(vtxcontent_source(vc)));
     statement s = pstatement_statement(vtxcontent_source(vc));
     call c = freia_statement_to_call(s);
-    int optype = dagvtx_optype(current), opid = dagvtx_opid(current);
+    // int optype = dagvtx_optype(current);
+    int opid = dagvtx_opid(current);
     const freia_api_t * api = get_freia_api(opid);
     pips_assert("freia api found", api!=NULL);
 
@@ -757,10 +771,14 @@ static void freia_terapix_call
   sb_cat(decl, "  terapix_mcu_instr mcu_instr[", itoa(n_ops), "];\n");
 
   // computed values
-  sb_cat(decl,
-	 "\n"
-	 "  // imagelet definitions...\n"
-	 "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
+  sb_cat(decl, "\n  // imagelets definitions:\n");
+  sb_cat(decl, "  // - ", itoa(n_imagelets), " computation imagelets\n");
+  sb_cat(decl, "  // - ", itoa(n_double_buffers), " double buffer imagelets\n");
+
+  // this is really a MAXIMUM available size
+  // the runtime can use that or less
+  sb_cat(decl, "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
+
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)
   {
@@ -837,18 +855,149 @@ static void freia_terapix_call
   free(used);
 }
 
+static hash_table erosion = NULL;
+
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
  * correctness? that should not be the case as only computations
  * allowed by dependencies are schedule.
- * tells v1 < v2 => -1
+ * tells v1 < (before) v2 => -1
  */
 static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
 {
+  pips_assert("global erosion is set", erosion!=NULL);
+
   // ??? should prioritize if more outputs?
   // ??? should prioritize inplace?
   // ??? should prioritize no erosion first? levels do that currrently?
-  return dagvtx_spoc_priority(v1, v2);
+  string why = "none";
+  int result = 0;
+  vtxcontent
+    c1 = dagvtx_content(*v1),
+    c2 = dagvtx_content(*v2);
+  const freia_api_t
+    * a1 = dagvtx_freia_api(*v1),
+    * a2 = dagvtx_freia_api(*v2);
+
+  // prioritize first scalar ops, measures and last copies
+  // if there is only one of them
+  if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
+  {
+    // scalars operations first to remove (scalar) dependences
+    if (vtxcontent_optype(c1)==spoc_type_oth)
+      result = -1, why = "scal";
+    else if (vtxcontent_optype(c2)==spoc_type_oth)
+      result = 1, why = "scal";
+    // then measurements are put first
+    else if (vtxcontent_optype(c1)==spoc_type_mes)
+      result = -1, why = "mes";
+    else if (vtxcontent_optype(c2)==spoc_type_mes)
+      result = 1, why = "mes";
+    // the copies are performed last...
+    else if (vtxcontent_optype(c1)==spoc_type_nop)
+      result = 1, why = "copy";
+    else if (vtxcontent_optype(c2)==spoc_type_nop)
+      result = -1, why = "copy";
+    // idem with image generation...
+    else if (vtxcontent_optype(c1)==spoc_type_alu &&
+	     vtxcontent_inputs(c1)==NIL)
+      result = 1, why = "gen";
+    else if (vtxcontent_optype(c2)==spoc_type_alu &&
+	     vtxcontent_inputs(c2)==NIL)
+      result = -1, why = "gen";
+    // ??? do inplace last
+    // ??? or ONLY if there is a shared input?
+    else if (a1->terapix.inplace && !a2->terapix.inplace)
+      result = 1, why = "inplace";
+    else if (!a1->terapix.inplace && a2->terapix.inplace)
+      result = -1, why = "inplace";
+  }
+
+  // ??? priorise when an image is freed
+
+  if (result==0 &&
+      // is there an image output?
+      vtxcontent_optype(c1)!=spoc_type_oth &&
+      vtxcontent_optype(c1)!=spoc_type_mes &&
+      vtxcontent_optype(c2)!=spoc_type_oth &&
+      vtxcontent_optype(c2)!=spoc_type_mes)
+  {
+    ifdebug(6) {
+      dagvtx_dump(stderr, "v1", *v1);
+      dagvtx_dump(stderr, "v2", *v2);
+    }
+    pips_assert("erosion is defined",
+		hash_defined_p(erosion, NORTH(*v1)) &&
+		hash_defined_p(erosion, NORTH(*v2)));
+
+    // try to conclude with erosions:
+    // not sure about the right partial order to use...
+    int e1 = (int)
+      ((_int) hash_get(erosion, NORTH(*v1)) +
+       (_int) hash_get(erosion, SOUTH(*v1)) +
+       (_int) hash_get(erosion, WEST(*v1)) +
+       (_int) hash_get(erosion, EAST(*v1))),
+      e2 = (int)
+      ((_int) hash_get(erosion, NORTH(*v2)) +
+       (_int) hash_get(erosion, SOUTH(*v2)) +
+       (_int) hash_get(erosion, WEST(*v2)) +
+       (_int) hash_get(erosion, EAST(*v2)));
+
+    pips_debug(6, "e1=%d, e2=%d\n", e1, e2);
+
+    if (e1!=e2)
+      result = e1-e2, why = "erosion";
+  }
+
+  // ??? I should look at in place?
+  // ??? I should look at the number live uses?
+
+  if (result==0)
+  {
+    // if not set by previous case, use other criterions
+    int
+      l1 = (int) gen_length(vtxcontent_inputs(c1)),
+      l2 = (int) gen_length(vtxcontent_inputs(c2));
+
+    // count non mesure successors:
+    int nms1 = 0, nms2 = 0;
+
+    FOREACH(dagvtx, vs1, dagvtx_succs(*v1))
+      if (dagvtx_optype(vs1)!=spoc_type_mes) nms1++;
+
+    FOREACH(dagvtx, vs2, dagvtx_succs(*v2))
+      if (dagvtx_optype(vs2)!=spoc_type_mes) nms2++;
+
+    if (l1!=l2 && (l1==0 || l2==0))
+      // put image generators at the end, after any other computation
+      result = l2-l1, why = "args";
+    else if (nms1!=nms2 && l1==1 && l2==1)
+      // the less successors the better? the rational is:
+      // - mesures are handled before and do not have successors anyway,
+      // - so this is about whether a result of an unary op is reused by
+      //   two nodes, in which case it will just jam the pipeline, so
+      //   try to put other computations before it. Note that mes
+      //   successors do not really count, as the image is not lost.
+      result = nms1 - nms2, why = "succs";
+    else if (l1!=l2)
+      // else ??? no effect on my validation.
+      result = l2-l1, why = "args2";
+    else if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
+      // otherwise use the op types, which are somehow ordered
+      // so that if all is well the pipe is filled in order.
+      result = vtxcontent_optype(c1) - vtxcontent_optype(c2), why = "ops";
+    else
+      // if all else fails, rely on statement numbers.
+      result = dagvtx_number(*v1) - dagvtx_number(*v2), why = "stats";
+  }
+
+  pips_debug(6, "%" _intFMT " %s %s %" _intFMT " %s (%s)\n",
+	     dagvtx_number(*v1), dagvtx_operation(*v1),
+	     result<0? ">": (result==0? "=": "<"),
+	     dagvtx_number(*v2), dagvtx_operation(*v2), why);
+
+  pips_assert("total order", v1==v2 || result!=0);
+  return result;
 }
 
 static list /* of dags */ split_dag_on_scalars(const dag initial)
@@ -870,34 +1019,46 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
     // all vertices which are considered computed
     computed = set_make(set_pointer);
 
-  set_assign_list(computed, dag_inputs(dall));
-
   do
   {
-    set_clear(current);
     list lcurrent = NIL, computables;
+    set_clear(current);
+    set_clear(computed);
+    set_assign_list(computed, dag_inputs(dall));
+
+    // GLOBAL
+    pips_assert("erosion is clean", erosion==NULL);
+    erosion = hash_table_make(hash_pointer, 0);
+    dag_terapix_erosion(dall, erosion);
 
     // transitive closure
     while ((computables =
 	    get_computable_vertices(dall, computed, computed, current)))
     {
-      // ???
-      // hmmm... chose one while building the schedule?
-      // dagvtx -> imagelet number
-      // dagvtx -> current erosion
-      // currently add them all (level by level)
+      ifdebug(7) {
+	FOREACH(dagvtx, v, computables)
+	  dagvtx_dump(stderr, "computable", v);
+      }
+
       gen_sort_list(computables,
 		    (int(*)(const void*,const void*)) dagvtx_terapix_priority);
 
-      set_assign_list(current, computables);
-      set_union(computed, computed, current);
-      lcurrent = gen_nconc(lcurrent, computables);
+      // choose one while building the schedule?
+      dagvtx first = DAGVTX(CAR(computables));
+      gen_free_list(computables), computables = NIL;
+
+      ifdebug(7)
+	dagvtx_dump(stderr, "choice", first);
+
+      set_add_element(current, current, first);
+      set_add_element(computed, computed, first);
+      lcurrent = gen_nconc(lcurrent, CONS(dagvtx, first, NIL));
     }
 
     // is there something?
     if (lcurrent)
     {
-      //lcurrent = gen_nreverse(lcurrent);
+      // build extracted dag
       dag nd = make_dag(NIL, NIL, NIL);
       FOREACH(dagvtx, v, lcurrent)
       {
@@ -915,12 +1076,17 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
       // update global list of dags to return.
       ld = CONS(dag, nd, ld);
 
-      // cleanup
-      gen_free_list(lcurrent);
+      // cleanup full dag for next round
+      FOREACH(dagvtx, w, lcurrent)
+	dag_remove_vertex(dall, w);
+
+      gen_free_list(lcurrent), lcurrent = NIL;
     }
+    hash_table_free(erosion), erosion = NULL;
   }
   while (set_size(current));
 
+  free_dag(dall);
   return ld;
 }
 
@@ -936,7 +1102,7 @@ void freia_trpx_compile_calls
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
-  // THIS IS VERY PRELIMINARY
+  // THIS IS QUITE PRELIMINARY
 
   // split only on scalar deps... ??? is it that simple? NO!
   // consider A -> B -> s -> C -> D
