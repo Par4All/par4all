@@ -30,19 +30,25 @@ F.test	= $(wildcard *.test)
 # validation output
 F.valid	= $(F.result:%=%/$(TEST))
 
+SHELL	= /bin/bash
 SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
 FLT	= sed -e 's,$(here),$$VDIR,g'
 #OK	= exit 0
-FAILED	= failed
-OK	= [ $$? -eq 0 ] || echo $(SUBDIR)/$* >> $(FAILED) ; exit 0
+RESULTS	= failed
+OK	= status=$$? ; \
+	  if [ "$$status" != 0 ] ; then \
+	     echo "failed $(SUBDIR)/$*" ; \
+	  elif [ $$(svn diff $@ | wc -l) -ne 0 ] ; then \
+	     echo "changed $(SUBDIR)/$*" ; \
+	  fi >> $(RESULTS)
 
 # default target is to clean
 clean: clean-validate
 
 clean-validate:
 	$(RM) *~ *.o *.s *.tmp *.result/out out err a.out
-	$(RM) -r *.database
+	$(RM) -r *.database $(RESULTS)
 
 validate:
 	# Experimental parallel validation
