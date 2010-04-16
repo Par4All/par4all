@@ -560,6 +560,7 @@ static void isolate_patch_reference(reference r, isolate_param * p)
                             )
                         );
             NORMALIZE_EXPRESSION(index);
+            POP(offsets);
         }
     }
 }
