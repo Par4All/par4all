@@ -1,6 +1,6 @@
 /*
 
-  $Id$
+  $Id: newgen_generic_stack.h 1155 2010-01-07 14:57:47Z coelho $
 
   Copyright 1989-2010 MINES ParisTech
 
@@ -76,6 +76,10 @@
   PREFIX type __attribute__ ((unused)) name##_head(void)		\
   {									\
     return (type) stack_head(name##_stack);				\
+  }									\
+  PREFIX type __attribute__ ((unused)) name##_nth(int n)		\
+  {									\
+    return (type)  stack_nth(name##_stack, n);				\
   }									\
   PREFIX bool __attribute__ ((unused)) name##_empty_p(void)		\
   {									\
