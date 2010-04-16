@@ -92,9 +92,6 @@ static hash_table Label_statements;
 static hash_table Label_control;
 
 
-#define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined)
-
-
 /* In C, we can have some "goto" inside a block from outside, that
    translate as any complex control graph into an "unstructured" in the
    PIPS jargon.
@@ -636,8 +633,8 @@ statement loop_test(statement sl)
 			       NIL)));
   test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				     normalized_undefined),
-		     MAKE_CONTINUE_STATEMENT(),
-		     MAKE_CONTINUE_STATEMENT());
+		     make_plain_continue_statement(),
+		     make_plain_continue_statement());
   string csl = statement_comments(sl);
   string prev_comm = empty_comments_p(csl)? /* empty_comments */ strdup("")  : strdup(csl);
   string lab = string_undefined;
@@ -699,8 +696,8 @@ hash_table used_labels;
 {
     hash_table loop_used_labels = hash_table_make(hash_string, 0);
     control c_body = make_conditional_control(loop_body(l));
-    control c_inc = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-    control c_test = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+    control c_inc = make_control(make_plain_continue_statement(), NIL, NIL);
+    control c_test = make_control(make_plain_continue_statement(), NIL, NIL);
     bool controlized;
 
     pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
@@ -772,8 +769,8 @@ statement whileloop_test(statement sl)
 			    NIL));
     test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				       normalized_undefined),
-		       MAKE_CONTINUE_STATEMENT(),
-		       MAKE_CONTINUE_STATEMENT());
+		       make_plain_continue_statement(),
+		       make_plain_continue_statement());
     string csl = statement_comments(sl);
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
     string prev_comm = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
@@ -910,8 +907,8 @@ statement forloop_test(statement sl)
 			   NIL));
   test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				     normalized_undefined),
-		     MAKE_CONTINUE_STATEMENT(),
-		     MAKE_CONTINUE_STATEMENT());
+		     make_plain_continue_statement(),
+		     make_plain_continue_statement());
   string csl = statement_comments(sl);
   string cs = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
 
@@ -956,8 +953,8 @@ hash_table used_labels;
 {
   hash_table loop_used_labels = hash_table_make(hash_string, 0);
   control c_body = make_conditional_control(forloop_body(l));
-  control c_inc = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-  control c_test = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+  control c_inc = make_control(make_plain_continue_statement(), NIL, NIL);
+  control c_test = make_control(make_plain_continue_statement(), NIL, NIL);
   bool controlized = FALSE; /* To avoid gcc warning about possible
 			       non-initialization */
 
@@ -1393,7 +1390,7 @@ list controlize_list_1(list sts,
 
     if (controlized) {
       /* The previous controlize() returned a non structured control */
-      control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+      control c_in = make_control(make_plain_continue_statement(), NIL, NIL);
 
       ctls = CONS(CONTROL, c_in, ctls);
       /* Insert c_in as a predecessor of c_next
@@ -1412,7 +1409,7 @@ list controlize_list_1(list sts,
 	 so that it has a predecessor that is completely unconnected of
 	 previous control graph. */
       pred = (unreachable) ?
-	make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL) :
+	make_control(make_plain_continue_statement(), NIL, NIL) :
 	c_res;
     }
     /* The next control node is the control node of the next
@@ -1465,7 +1462,7 @@ bool controlize_list(statement st,
 {
     hash_table block_used_labels = hash_table_make(hash_string, 0);
     control c_block = control_undefined;
-    control c_end = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+    control c_end = make_control(make_plain_continue_statement(), NIL, NIL);
     control c_last = c_end;
     list ctls;
     bool controlized;
@@ -1733,7 +1730,7 @@ hash_table used_labels;
     f_used_labels = hash_table_make(hash_string, 0);
   control c1 = make_conditional_control(test_true(t));
   control c2 = make_conditional_control(test_false(t));
-  control c_join = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+  control c_join = make_control(make_plain_continue_statement(), NIL, NIL);
   statement s_t = test_true(t);
   statement s_f = test_false(t);
   bool controlized;
@@ -1794,8 +1791,8 @@ hash_table used_labels;
     UPDATE_CONTROL(c_res, st,
 		   ADD_PRED(pred, c_res),
 		   CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
-    test_true(t) = MAKE_CONTINUE_STATEMENT();
-    test_false(t) = MAKE_CONTINUE_STATEMENT();
+    test_true(t) = make_plain_continue_statement();
+    test_false(t) = make_plain_continue_statement();
     control_predecessors(succ) = ADD_PRED(c_join, succ);
     control_successors(c_join) = CONS(CONTROL, succ, NIL);
     controlized = TRUE;
@@ -2027,8 +2024,8 @@ statement st;
     create_statements_of_labels(st);
 
     result = make_conditional_control(st);
-    top = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-    bottom = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+    top = make_control(make_plain_continue_statement(), NIL, NIL);
+    bottom = make_control(make_plain_continue_statement(), NIL, NIL);
     Unreachable = NIL;
 
     statement_consistent_p(st);
