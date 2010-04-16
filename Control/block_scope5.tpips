@@ -1,4 +1,4 @@
-setenv WKS=block_scope4
+setenv WKS=block_scope5
 delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
