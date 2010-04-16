@@ -3,6 +3,8 @@ create malloc01 malloc01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE

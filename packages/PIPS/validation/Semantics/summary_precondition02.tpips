@@ -1,0 +1,12 @@
+delete summary_precondition02
+
+create summary_precondition02 summary_precondition02.c
+
+apply PRECONDITIONS_INTER_FULL(%ALL)
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+display PRINTED_FILE(%ALLFUNC)
+
+close
+delete summary_precondition02
+quit

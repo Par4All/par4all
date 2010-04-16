@@ -342,9 +342,9 @@ c SIMD_COMMENT_1
       INTEGER*2 I_07, I_06, I_05, I_04, I_03, I_02, I_01, I_00, I_0
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 v8hi_vec9(0:7), v8hi_vec8(0:7), v8hi_vec7(0:7), 
-     &v8hi_vec6(0:7), v8hi_vec5(0:7), v8hi_vec4(0:7), v8hi_vec3(0:7)
-     &, v8hi_vec2(0:7), v8hi_vec1(0:7), v8hi_vec0(0:7), RED0(0:7), A(
-     &1:1), B(1:SIZE), C(1:SIZE)
+     &v8hi_vec6(0:7), v8hi_vec5(0:7), aligned(0:7), v8hi_vec4(0:7), 
+     &v8hi_vec3(0:7), v8hi_vec2(0:7), v8hi_vec1(0:7), v8hi_vec0(0:7)
+     &, RED0(0:7), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0012
 99999 CONTINUE
@@ -360,8 +360,7 @@ c SIMD_COMMENT_1
          CALL SIMD_LOAD_V8HI(v8hi_vec2, C(LU_IND0+1))
          CALL SIMD_LOAD_V8HI(v8hi_vec1, B(LU_IND0+1))
          CALL SIMD_MULW(v8hi_vec0, v8hi_vec1, v8hi_vec2)
-         CALL SIMD_SAVE_GENERIC_V8HI(v8hi_vec0, I_07, I_06, I_05, 
-     &   I_04, I_03, I_02, I_01, I_00)
+         CALL SIMD_SAVE_V8HI(v8hi_vec0, aligned(0))
          CALL SIMD_LOAD_V8HI(v8hi_vec3, RED0(0))
          CALL SIMD_ADDW(v8hi_vec3, v8hi_vec3, v8hi_vec0)
          CALL SIMD_SAVE_V8HI(v8hi_vec3, RED0(0))
@@ -376,9 +375,9 @@ c SIMD_COMMENT_1
       INTEGER*2 I_07, I_06, I_05, I_04, I_03, I_02, I_01, I_00, I_0
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 v8hi_vec9(0:7), v8hi_vec8(0:7), v8hi_vec7(0:7), 
-     &v8hi_vec6(0:7), v8hi_vec5(0:7), v8hi_vec4(0:7), v8hi_vec3(0:7)
-     &, v8hi_vec2(0:7), v8hi_vec1(0:7), v8hi_vec0(0:7), RED0(0:7), A(
-     &1:1), B(1:SIZE), C(1:SIZE)
+     &v8hi_vec6(0:7), v8hi_vec5(0:7), aligned(0:7), v8hi_vec4(0:7), 
+     &v8hi_vec3(0:7), v8hi_vec2(0:7), v8hi_vec1(0:7), v8hi_vec0(0:7)
+     &, RED0(0:7), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0012
 99999 CONTINUE
@@ -408,9 +407,9 @@ c SIMD_COMMENT_1
       INTEGER*2 I_07, I_06, I_05, I_04, I_03, I_02, I_01, I_00, I_0
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 v8hi_vec9(0:7), v8hi_vec8(0:7), v8hi_vec7(0:7), 
-     &v8hi_vec6(0:7), v8hi_vec5(0:7), v8hi_vec4(0:7), v8hi_vec3(0:7)
-     &, v8hi_vec2(0:7), v8hi_vec1(0:7), v8hi_vec0(0:7), RED0(0:7), A(
-     &1:1), B(1:SIZE), C(1:SIZE)
+     &v8hi_vec6(0:7), v8hi_vec5(0:7), aligned(0:7), v8hi_vec4(0:7), 
+     &v8hi_vec3(0:7), v8hi_vec2(0:7), v8hi_vec1(0:7), v8hi_vec0(0:7)
+     &, RED0(0:7), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0012
 99999 CONTINUE

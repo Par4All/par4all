@@ -1,5 +1,7 @@
 delete for04
 
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 setproprety ABORT_ON_USER_ERROR TRUE
 
 create for04 for04.c

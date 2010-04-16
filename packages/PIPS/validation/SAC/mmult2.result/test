@@ -402,6 +402,8 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    float F_0, F_1, F_2, F_3, F_30, F_20, F_10, F_00;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   //PIPS:SAC generated variable
+   float aligned[3+1] = {0, 0, 0, 0};
 loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
 l99997:
@@ -432,7 +434,7 @@ l99999:
                   SIMD_LOAD_GENERIC_V4SF(v4sf_vec2, b[LU_IND1][j+4*j_t-5], b[LU_IND1+1][j+4*j_t-5], b[LU_IND1+2][j+4*j_t-5], b[LU_IND1+3][j+4*j_t-5]);
                   SIMD_LOAD_V4SF(v4sf_vec1, &a[i+4*i_t-5][LU_IND1]);
                   SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-                  SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &F_00, &F_10, &F_20, &F_30);
+                  SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
                   SIMD_LOAD_V4SF(v4sf_vec3, &RED[LU_IND1]);
                   SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
                   SIMD_SAVE_V4SF(v4sf_vec3, &RED[LU_IND1]);
@@ -476,6 +478,8 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    float F_0, F_1, F_2, F_3, F_30, F_20, F_10, F_00;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   //PIPS:SAC generated variable
+   float aligned[3+1] = {0, 0, 0, 0};
 loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
 l99997:
@@ -510,7 +514,7 @@ l99999:
                   SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
                   SIMD_SAVE_V4SF(v4sf_vec3, &RED[LU_IND1]);
                }
-               SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &F_00, &F_10, &F_20, &F_30);
+               SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
                k = 17;
                LU_NUB2 = 16;
                LU_IB2 = 0;

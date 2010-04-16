@@ -7,6 +7,8 @@
 
 delete gcd_bug
 
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create gcd_bug gcd_bug.c
