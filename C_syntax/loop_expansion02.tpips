@@ -1,0 +1,18 @@
+setenv ws loop_expansion02
+delete $ws
+create $ws $ws.c
+module pop
+
+echo raw file with loop flagged
+apply FLAG_LOOPS
+display PRINTED_FILE
+
+echo after loop expansion
+setproperty LOOP_LABEL "l99999"
+setproperty LOOP_EXPANSION_SIZE 128
+apply LOOP_EXPANSION
+display PRINTED_FILE
+
+close
+delete $ws
+quit
