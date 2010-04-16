@@ -81,7 +81,7 @@ catch_alarm_SC_CONVEX_HULL (int sig  __attribute__ ((unused)))
 }
 
 
-static void my_Matrix_Free(Matrix ** m)
+static void my_Matrix_Free(Matrix * volatile * m)
 {
   ifscdebug(9) {
     fprintf(stderr, "[my_Matrix_Free] in %p\n", *m);
@@ -95,7 +95,7 @@ static void my_Matrix_Free(Matrix ** m)
   }
 }
 
-static void my_Polyhedron_Free(Polyhedron ** p)
+static void my_Polyhedron_Free(Polyhedron * volatile * p)
 {
   ifscdebug(9) {
     fprintf(stderr, "[my_Polyhedron_Free] in %p\n", *p);

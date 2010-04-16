@@ -119,7 +119,7 @@ catch_alarm_projection (int sig)
  *   Better use sc_projection_along_variable_ofl_ctrl_timeout_ctrl. DN 29/10/02
  */
 void sc_projection_along_variable_ofl_ctrl(psc, v, ofl_ctrl) 
-Psysteme *psc;
+Psysteme volatile *psc;
 Variable v;
 int ofl_ctrl;
 {
@@ -176,7 +176,7 @@ int ofl_ctrl;
  *            the base.
  */
 void sc_and_base_projection_along_variable_ofl_ctrl(psc,v, ofl_ctrl) 
-Psysteme *psc;
+Psysteme volatile *psc;
 Variable v;
 int ofl_ctrl;
 {
@@ -1076,7 +1076,7 @@ void sc_project_very_simple_equalities(Psysteme s)
 */
 
 void sc_projection_along_variable_ofl_ctrl_timeout_ctrl(psc, v, ofl_ctrl)
-Psysteme *psc;
+Psysteme volatile *psc;
 Variable v;
 int ofl_ctrl;
 {
