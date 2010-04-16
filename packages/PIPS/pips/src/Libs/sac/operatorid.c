@@ -44,6 +44,7 @@ typedef dg_vertex_label vertex_label;
 #include "sac.h"
 #include "patterns.h"
 #include "pipsdbm.h"
+#include "properties.h"
 
 typedef struct {
     int id;
@@ -206,4 +207,15 @@ bool simd_operator_mappings(__attribute__((unused)) char * module_name)
 
     reset_simd_operator_mappings();
     return true;
+}
+
+bool opcode_commutative_p(opcode oc)
+{
+    bool result = false;
+    string operators = strdup(get_string_property("SIMDIZER_COMMUTATIVE_OPERATORS"));
+    string s = strtok(operators,",");
+    for (;s;s=strtok(NULL,","))
+        if(same_string_p(s,opcode_name(oc))) result=true;
+    free(s);
+    return result;
 }

@@ -662,6 +662,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
 
     string lsType = local_name(get_simd_vector_type(args));
     bool all_padded= all_padded_p(padded);
+    bool all_scalar = false;
 
     /* the function should not be called with an empty arguments list */
     assert((argc > 1) && (args != NIL));
@@ -676,15 +677,18 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     /* classify according to the second element
      * (first one should be the SIMD vector) */
     expression exp = EXPRESSION(CAR(CDR(args)));
-    if (expression_constant_p(exp))
+    expression real_exp = expression_field_p(exp)?binary_call_rhs(expression_call(exp)):exp;
+    if (expression_constant_p(real_exp))
     {
         argsType = CONSTANT;
+        all_scalar = true;
     }
     // If e is a reference expression, let's analyse this reference
-    else if (expression_reference_or_field_p(exp))
+    else if (expression_reference_p(real_exp))
     {
         argsType = CONSEC_REFS;
         fstExp = exp;
+        all_scalar = expression_scalar_p(exp); /* and not real_exp ! */
     }
     else
         argsType = OTHER;
@@ -694,24 +698,30 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     for(list iter = CDR(CDR(args));!ENDP(iter);POP(iter))
     {
         expression e = EXPRESSION(CAR(iter));
+        expression real_e = expression_field_p(e)?binary_call_rhs(expression_call(e)):e;
         if (argsType == OTHER)
-            break;
+        {
+            all_scalar &= expression_scalar_p(real_e);
+            continue;
+        }
         else if (argsType == CONSTANT)
         {
-            if (!expression_constant_p(e))
+            if (!expression_constant_p(real_e))
             {
                 argsType = OTHER;
-                break;
+                all_scalar &= expression_scalar_p(e);
+                continue;
             }
         }
         else if (argsType == CONSEC_REFS)
         {
             // If e is a reference expression, let's analyse this reference
             // and see if e is consecutive to the previous references
-            if ( (expression_reference_or_field_p(e)) &&
+            if ( (expression_reference_p(real_e)) &&
                     (consecutive_expression_p(fstExp, lastOffset, e)) )
             {
                 ++lastOffset;
+                all_scalar=false;
             }
             /* if all arguments are padded, we cas safely load an additionnal reference,
              * it will not be used anyway */
@@ -725,10 +735,66 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             else
             {
                 argsType = OTHER;
-                break;
+                all_scalar &= expression_scalar_p(e);
+                continue;
             }
         }
     }
+
+    /* first pass of analysis is done
+     * we may have found that we have no consecutive references
+     * but a set of scalar
+     * if so, we should replace those scalars by appropriate array
+     */
+    if(all_scalar)
+    {
+        size_t nbargs=gen_length(CDR(args));
+        basic shared_basic = basic_undefined;
+        FOREACH(EXPRESSION,e,CDR(args))
+        {
+            shared_basic=basic_of_expression(e);
+            if(basic_overloaded_p(shared_basic))
+                free_basic(shared_basic);
+            else
+                break;
+        }
+        entity scalar_holder = make_new_array_variable_with_prefix(
+                "aligned",get_current_module_entity(),shared_basic,
+                CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
+                );
+        AddEntityToCurrentModule(scalar_holder);
+        int index=0;
+        list inits = NIL;
+        FOREACH(EXPRESSION,e,CDR(args))
+        {
+            if(expression_constant_p(e))
+            {
+                inits=CONS(EXPRESSION,copy_expression(e),inits);
+            }
+            else
+            {
+                entity current_scalar = expression_to_entity(e);
+                inits=CONS(EXPRESSION,int_to_expression(0),inits);
+                expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
+                replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
+                FOREACH(EXPRESSION,e,args) replace_entity_by_expression(e,current_scalar,replacement);
+                free_expression(replacement);
+            }
+            index++;
+        }
+        free_value(entity_initial(scalar_holder));
+        entity_initial(scalar_holder) = make_value_expression(
+                call_to_expression(
+                    make_call(entity_intrinsic(BRACE_INTRINSIC),
+                        gen_nreverse(inits)
+                        )
+                    )
+                );
+        argsType=CONSEC_REFS;
+
+    }
+
+
 
     /* Now that the analyze is done, we can generate an "optimized"
      * load instruction.
@@ -977,6 +1043,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
 
     /* allocate memory */
     ssi = make_simdStatementInfo(oc, 
+            opcode_commutative_p(oc),
             nbargs,
             (entity *)malloc(sizeof(entity)*nbargs),
             (statementArgument*)malloc(sizeof(statementArgument) * nbargs * opcode_vectorSize(oc)));
@@ -1282,7 +1349,8 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
     return make_exec_statement_from_name( "PSHUFW",args);
 }
 
-static statement generate_load_statement(simdStatementInfo si, int line)
+static 
+statement do_generate_load_statement(simdStatementInfo si, int line)
 {
     list args = NIL;
     int offset = line * opcode_vectorSize(simdStatementInfo_opcode(si));
@@ -1384,6 +1452,53 @@ static statement generate_load_statement(simdStatementInfo si, int line)
         return make_load_statement(
                 opcode_vectorSize(simdStatementInfo_opcode(si)), 
                 args, padded);
+    }
+}
+
+static statement generate_load_statement(simdStatementInfo si, int line)
+{
+    if(!simdStatementInfo_commut(si) || simdStatementInfo_nbArgs(si)!=3) /* the second test is a strong assumtion: we only deal with a=b op c */
+        return do_generate_load_statement(si,line);
+    else /* we generate all the possible permutation and pick the first with a consecutive load */
+    {
+        size_t nb_alternatives = 1 << simdStatementInfo_nbArgs(si);
+        opcode oc = simdStatementInfo_opcode(si);
+        statementArgument * new_args =
+            (statementArgument*)calloc(simdStatementInfo_nbArgs(si)*opcode_vectorSize(oc),sizeof(statementArgument));
+        for(size_t a=0;a<nb_alternatives;a++)
+        {
+            /* we use the binary representation of i to try all combinaison: a 1 means exchange, a 0 means do nothing */
+            for(size_t i=0;i<opcode_vectorSize(oc);i++)
+            {
+                /* first elements are unchanged */
+                new_args[i + opcode_vectorSize(oc) * 0] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 0];
+                /* second and third elements are either swapped or unchanged */
+                if( a & (1 << i) )
+                {
+                    new_args[i + opcode_vectorSize(oc) * 1] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 1];
+                    new_args[i + opcode_vectorSize(oc) * 2] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 2];
+                }
+                else
+                {
+                    new_args[i + opcode_vectorSize(oc) * 2] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 1];
+                    new_args[i + opcode_vectorSize(oc) * 1] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 2];
+                }
+            }
+                
+            simdStatementInfo new_si = make_simdStatementInfo(
+                    simdStatementInfo_opcode(si),
+                    simdStatementInfo_commut(si),
+                    simdStatementInfo_nbArgs(si),
+                    simdStatementInfo_vectors(si),
+                    new_args);
+            statement new = do_generate_load_statement(new_si,line);
+            if(statement_undefined_p(new))
+            {
+                *si=*new_si; /*berk berk berk */
+                return new;
+            }
+        }
+        return do_generate_load_statement(si,line);
     }
 }
 

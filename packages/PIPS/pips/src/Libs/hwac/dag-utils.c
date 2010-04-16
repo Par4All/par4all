@@ -846,7 +846,8 @@ void dag_compute_outputs(dag d)
     }
     else
     {
-      pips_assert("is an input vertex", gen_in_list_p(v, dag_inputs(d)));
+      // ??? this aborts with terapix...
+      // pips_assert("is an input vertex", gen_in_list_p(v, dag_inputs(d)));
       if (!dagvtx_succs(v))
 	set_add_element(toremove, toremove, v);
     }

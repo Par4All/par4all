@@ -117,7 +117,7 @@ arguments (list of \verb+patternArg+).
 \domain{statementArgument = expression x dependances:vectorElement*}
 {}
 
-\domain{simdStatementInfo = opcode x nbArgs:int x vectors:entity[16] x arguments:statementArgument[48]}
+\domain{simdStatementInfo = opcode x commut:int x nbArgs:int x vectors:entity[16] x arguments:statementArgument[48]}
 {}
 
 \domain{statementInfo = simd:simdStatementInfo + nonsimd:statement}

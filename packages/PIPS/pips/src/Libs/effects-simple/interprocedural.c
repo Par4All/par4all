@@ -1016,310 +1016,321 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 						  transformer context)
 {
   list l_eff = NIL; /* the result */
-  syntax real_s = expression_syntax(real_arg);
-  type real_arg_t = expression_to_type(real_arg);
 
-
-  ifdebug(5)
+  if (!ENDP(l_sum_eff))
     {
-      pips_debug(8, "begin for real arg %s, of type %s and effects :\n",
-		 words_to_string(words_expression(real_arg,NIL)),
-		 type_to_string(real_arg_t));
-      (*effects_prettyprint_func)(l_sum_eff);
-    }
+      syntax real_s = expression_syntax(real_arg);
+      type real_arg_t = expression_to_type(real_arg);
+      ifdebug(5)
+	{
+	  pips_debug(8, "begin for real arg %s, of type %s and effects :\n",
+		     words_to_string(words_expression(real_arg,NIL)),
+		     type_to_string(real_arg_t));
+	  (*effects_prettyprint_func)(l_sum_eff);
+	}
 
-  switch (syntax_tag(real_s))
-    {
-    case is_syntax_reference:
-      {
-	reference real_ref = syntax_reference(real_s);
-	entity real_ent = reference_variable(real_ref);
-	list real_ind = reference_indices(real_ref);
-
-	/* if it's a pointer or a partially indexed array
-	 * We should do more testing here to check if types
-	 * are compatible... (see effect_array_substitution ?)
-	 */
-	if (pointer_type_p(real_arg_t) ||
-	    gen_length(real_ind) < type_depth(entity_type(real_ent)))
+      switch (syntax_tag(real_s))
+	{
+	case is_syntax_reference:
 	  {
-	    
-	    FOREACH(EFFECT, eff, l_sum_eff)
+	    reference real_ref = syntax_reference(real_s);
+	    entity real_ent = reference_variable(real_ref);
+	    list real_ind = reference_indices(real_ref);
+
+	    /* if it's a pointer or a partially indexed array
+	     * We should do more testing here to check if types
+	     * are compatible... (see effect_array_substitution ?)
+	     */
+	    if (pointer_type_p(real_arg_t) ||
+		gen_length(real_ind) < type_depth(entity_type(real_ent)))
 	      {
-		reference eff_ref = effect_any_reference(eff);
-		list eff_ind = reference_indices(eff_ref);
-		
-		reference new_ref = copy_reference(real_ref);
-		effect new_eff;
-		
-		pips_debug(8, "pointer type real arg reference\n");
-		
-		/* we add the indices of the effect reference
-		   to the real reference */
-		pips_debug(8, "effect on the pointed area : \n");
-		new_eff = (* reference_to_effect_func)
-		  (new_ref,
-		   effect_action_tag(eff), false);
-		FOREACH(EXPRESSION, eff_ind_exp, eff_ind)
+	    
+		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
-		    (*effect_add_expression_dimension_func)
-		      (new_eff, eff_ind_exp);
+		    reference eff_ref = effect_any_reference(eff);
+		    list eff_ind = reference_indices(eff_ref);
+		
+		    reference new_ref = copy_reference(real_ref);
+		    effect new_eff;
+		
+		    pips_debug(8, "pointer type real arg reference\n");
+		
+		    /* we add the indices of the effect reference
+		       to the real reference */
+		    pips_debug(8, "effect on the pointed area : \n");
+		    new_eff = (* reference_to_effect_func)
+		      (new_ref,
+		       effect_action_tag(eff), false);
+		    FOREACH(EXPRESSION, eff_ind_exp, eff_ind)
+		      {
+			(*effect_add_expression_dimension_func)
+			  (new_eff, eff_ind_exp);
+		      }
+		    l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
 		  }
-		l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
-	      }
 	    
-	  } /*  if (pointer_type_p(real_arg_t)) */
-	else
+	      } /*  if (pointer_type_p(real_arg_t)) */
+	    else
+	      {
+		pips_debug(8, "real arg reference is not a pointer and is not a partially indexed array -> NIL \n");
+	    
+	      } /* else */
+	    break;
+	  } /* case is_syntax_reference */ 
+	case is_syntax_subscript:
 	  {
-	    pips_debug(8, "real arg reference is not a pointer and is not a partially indexed array -> NIL \n");
-	    
-	  } /* else */
-	break;
-      } /* case is_syntax_reference */ 
-    case is_syntax_subscript:
-      {
-	bool read_p = false;
-	bool write_p = false;
-	pips_user_warning("Subscript not supported yet : returning anywhere effect\n");
-	FOREACH(EFFECT, eff, l_sum_eff)
+	    bool read_p = false;
+	    bool write_p = false;
+	    pips_user_warning("Subscript not supported yet : returning anywhere effect\n");
+	    FOREACH(EFFECT, eff, l_sum_eff)
 	      {
 		if (effect_read_p(eff)) read_p = true;
 		if (effect_write_p(eff)) write_p = true;
 	      }
-	if (read_p) 
-	  l_eff = CONS(EFFECT, make_anywhere_effect(is_action_read), NIL);
-	if (write_p)
-	  l_eff = CONS(EFFECT, make_anywhere_effect(is_action_write), l_eff);
-	break;
-      }
-    case is_syntax_call:
-      {
-	call real_call = syntax_call(real_s);
-	entity real_op = call_function(real_call);
-	list args = call_arguments(real_call);
-	effect n_eff = effect_undefined;
-	
-	if (ENTITY_ASSIGN_P(real_op))
-	  {
-	    l_eff = c_simple_effects_on_formal_parameter_backward_translation
-	      (l_sum_eff, EXPRESSION(CAR(CDR(args))), context);
+	    if (read_p) 
+	      l_eff = CONS(EFFECT, make_anywhere_effect(is_action_read), NIL);
+	    if (write_p)
+	      l_eff = CONS(EFFECT, make_anywhere_effect(is_action_write), l_eff);
+	    break;
 	  }
-	else if(ENTITY_ADDRESS_OF_P(real_op)) 
+	case is_syntax_call:
 	  {
-	    expression arg1 = EXPRESSION(CAR(args));
-	    syntax s1 = expression_syntax(arg1);
-	    reference r1 = syntax_reference(s1);
-	    list l_real_arg = NIL;
-	    effect eff1;
-	    
-	    /* first we compute an effect on the argument of the 
-	       address_of operator (to treat cases like &(n->m))*/
-	    pips_debug(6, "addressing operator case \n");
-
-
-	    l_real_arg = 
-	      generic_proper_effects_of_complex_address_expression
-	      (arg1, &eff1, true);
-
-	    ifdebug(6)
+	    call real_call = syntax_call(real_s);
+	    entity real_op = call_function(real_call);
+	    list args = call_arguments(real_call);
+	    effect n_eff = effect_undefined;
+	
+	    if (ENTITY_ASSIGN_P(real_op))
 	      {
-		pips_debug(6, "base effect :\n");
-		print_effect(eff1);
+		l_eff = c_simple_effects_on_formal_parameter_backward_translation
+		  (l_sum_eff, EXPRESSION(CAR(CDR(args))), context);
 	      }
-
-	    FOREACH(EFFECT, eff, l_sum_eff)
+	    else if(ENTITY_ADDRESS_OF_P(real_op)) 
 	      {
-		reference eff_ref = effect_any_reference(eff);
-		list eff_ind = reference_indices(eff_ref);
+		expression arg1 = EXPRESSION(CAR(args));
+		syntax s1 = expression_syntax(arg1);
+		reference r1 = syntax_reference(s1);
+		list l_real_arg = NIL;
+		effect eff1;
+	    
+		/* first we compute an effect on the argument of the 
+		   address_of operator (to treat cases like &(n->m))*/
+		pips_debug(6, "addressing operator case \n");
+
+
+		l_real_arg = 
+		  generic_proper_effects_of_complex_address_expression
+		  (arg1, &eff1, true);
 
 		ifdebug(6)
 		  {
-		    pips_debug(6, "current effect :\n");
-		    print_effect(eff);
+		    pips_debug(6, "base effect :\n");
+		    print_effect(eff1);
 		  }
-		
-		if (effect_undefined_p(eff1))
-		  n_eff =  make_anywhere_effect(effect_action_tag(eff));
-		else
+
+		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
-		    n_eff = (*effect_dup_func)(eff1);
-		    /* memory leaks ? */
-		    effect_approximation(n_eff) = 
-		      copy_approximation(effect_approximation(eff));
-		    effect_action(n_eff) =
-		      copy_action(effect_action(eff));
-		  }
-	      
-		/* BC : This must certainely be improved 
-		   only simple cases are handled .*/
-		if(ENDP(reference_indices(effect_any_reference(n_eff)))) 
-		  {
-		    expression first_ind = EXPRESSION(CAR(eff_ind));
-		    
-		    /* The operand of & is a scalar expression */
-		    /* the first index of eff reference (which must
-		       be equal to 0) must not be taken into account.
-		       The other indices must be appended to n_eff indices
-		    */
-		    
-		    pips_assert("scalar case : the first index of eff must be equal to [0]", expression_equal_integer_p(first_ind, 0));
-		    FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
+		    reference eff_ref = effect_any_reference(eff);
+		    list eff_ind = reference_indices(eff_ref);
+
+		    ifdebug(6)
 		      {
-			(*effect_add_expression_dimension_func)
-			  (n_eff, eff_ind_exp);
+			pips_debug(6, "current effect :\n");
+			print_effect(eff);
 		      }
-		  }
-		else 
-		  {
-		    expression first_ind = EXPRESSION(CAR(eff_ind));
-		    reference n_eff_ref = effect_any_reference(n_eff);
-		    expression last_n_eff_ind = 
-		      EXPRESSION(CAR(gen_last(reference_indices(n_eff_ref))));
-		    expression n_exp;
-		    
-		    
-		    /* The operand of & is subcripted */
-		    /* The first index of eff must be added to the last
-		     * index of n_eff (except if it is unbounded),
-		     * and the remaining indices list 
-		     * be appended to th indices of n_eff
-		     * could be more generic
-		     */
-		    if(!unbounded_expression_p(last_n_eff_ind))
+		
+		    if (effect_undefined_p(eff1))
+		      n_eff =  make_anywhere_effect(effect_action_tag(eff));
+		    else
 		      {
-			if(!unbounded_expression_p(first_ind))
+			n_eff = (*effect_dup_func)(eff1);
+			/* memory leaks ? */
+			effect_approximation(n_eff) = 
+			  copy_approximation(effect_approximation(eff));
+			effect_action(n_eff) =
+			  copy_action(effect_action(eff));
+		      }
+	      
+		    /* BC : This must certainely be improved 
+		       only simple cases are handled .*/
+		    if(ENDP(reference_indices(effect_any_reference(n_eff)))) 
+		      {
+			expression first_ind = EXPRESSION(CAR(eff_ind));
+		    
+			/* The operand of & is a scalar expression */
+			/* the first index of eff reference (which must
+			   be equal to 0) must not be taken into account.
+			   The other indices must be appended to n_eff indices
+			*/
+		    
+			pips_assert("scalar case : the first index of eff must be equal to [0]", expression_equal_integer_p(first_ind, 0));
+			FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
 			  {
-			    value v;
-			    n_exp = MakeBinaryCall
-			      (entity_intrinsic(PLUS_OPERATOR_NAME),
-			       last_n_eff_ind, copy_expression(first_ind));
-			    /* Then we must try to evaluate the expression */
-			    v = EvalExpression(n_exp);
-			    if (! value_undefined_p(v) && 
-				value_constant_p(v))
+			    (*effect_add_expression_dimension_func)
+			      (n_eff, eff_ind_exp);
+			  }
+		      }
+		    else 
+		      {
+			expression first_ind = EXPRESSION(CAR(eff_ind));
+			reference n_eff_ref = effect_any_reference(n_eff);
+			expression last_n_eff_ind = 
+			  EXPRESSION(CAR(gen_last(reference_indices(n_eff_ref))));
+			expression n_exp;
+		    
+		    
+			/* The operand of & is subcripted */
+			/* The first index of eff must be added to the last
+			 * index of n_eff (except if it is unbounded
+			 * or if it is a field or field rank),
+			 * and the remaining indices list 
+			 * be appended to th indices of n_eff
+			 * could be more generic
+			 */
+			if(!unbounded_expression_p(last_n_eff_ind))
+			  {
+			    if(!unbounded_expression_p(first_ind))
 			      {
-				constant vc = value_constant(v);
-				if (constant_int_p(vc))
+				value v;
+				n_exp = MakeBinaryCall
+				  (entity_intrinsic(PLUS_OPERATOR_NAME),
+				   last_n_eff_ind, copy_expression(first_ind));
+				/* Then we must try to evaluate the expression */
+				v = EvalExpression(n_exp);
+				if (! value_undefined_p(v) && 
+				    value_constant_p(v))
 				  {
+				    constant vc = value_constant(v);
+				    if (constant_int_p(vc))
+				      {
 				    
-				    /* free_expression(n_exp);*/
-				    n_exp = int_to_expression(constant_int(vc));
+					/* free_expression(n_exp);*/
+					n_exp = int_to_expression(constant_int(vc));
+				      }
 				  }
 			      }
+			    else
+			      {
+				n_exp = make_unbounded_expression();
+			      }
+			    CAR(gen_last(reference_indices(n_eff_ref))).p 
+			      = (void *) n_exp;
+			    /*should we free last_n_eff_ind ? */
 			  }
-			else
+			FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
 			  {
-			    n_exp = make_unbounded_expression();
+			    (*effect_add_expression_dimension_func)
+			      (n_eff, eff_ind_exp);
 			  }
-			CAR(gen_last(reference_indices(n_eff_ref))).p 
-			  = (void *) n_exp;
-			/*should we free last_n_eff_ind ? */
-		      }
-		    FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
-		      {
-			(*effect_add_expression_dimension_func)
-			  (n_eff, eff_ind_exp);
-		      }
-		  } /*else */
-		l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
-	      } /*  FOREACH(EFFECT, eff, l_sum_eff) */
-	    gen_free_list(l_real_arg);
-	    free_effect(eff1);
+		      } /*else */
+		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+		  } /*  FOREACH(EFFECT, eff, l_sum_eff) */
+		gen_free_list(l_real_arg);
+		free_effect(eff1);
 	    
-	  }
-	else if(ENTITY_POINT_TO_P(real_op)|| ENTITY_FIELD_P(real_op))
-	  {
-	    list l_real_arg = NIL;
-	    effect eff1;
-	    /* first we compute an effect on the real_arg */
-	    
-	    l_real_arg = generic_proper_effects_of_complex_address_expression
-	      (real_arg, &eff1, true);
-
-	     FOREACH(EFFECT, eff, l_sum_eff)
+	      }
+	    else if(ENTITY_POINT_TO_P(real_op)|| ENTITY_FIELD_P(real_op))
 	      {
-		reference eff_ref = effect_any_reference(eff);
-		list eff_ind = reference_indices(eff_ref);
+		list l_real_arg = NIL;
+		effect eff1;
+		/* first we compute an effect on the real_arg */
+	    
+		l_real_arg = generic_proper_effects_of_complex_address_expression
+		  (real_arg, &eff1, true);
 
-		if (effect_undefined_p(eff1))
-		  n_eff =  make_anywhere_effect(effect_action_tag(eff));
-		else
+		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
-		    n_eff = (*effect_dup_func)(eff1);
-		    /* memory leaks ? */
-		    effect_approximation(n_eff) = 
-		      copy_approximation(effect_approximation(eff));
-		    effect_action(n_eff) =
-		      copy_action(effect_action(eff));
-		  }
-		/* Then we add the indices of the effect reference */
-		/* Well this is valid only in the general case :
-		 * we should verify that types are compatible.
-		 * And it's not GENERIC.
-		 */
-		FOREACH(EXPRESSION, ind, eff_ind)
-		  {
-		    (*effect_add_expression_dimension_func)(n_eff, ind);
+		    reference eff_ref = effect_any_reference(eff);
+		    list eff_ind = reference_indices(eff_ref);
+
+		    if (effect_undefined_p(eff1))
+		      n_eff =  make_anywhere_effect(effect_action_tag(eff));
+		    else
+		      {
+			n_eff = (*effect_dup_func)(eff1);
+			/* memory leaks ? */
+			effect_approximation(n_eff) = 
+			  copy_approximation(effect_approximation(eff));
+			effect_action(n_eff) =
+			  copy_action(effect_action(eff));
+		      }
+		    /* Then we add the indices of the effect reference */
+		    /* Well this is valid only in the general case :
+		     * we should verify that types are compatible.
+		     * And it's not GENERIC.
+		     */
+		    FOREACH(EXPRESSION, ind, eff_ind)
+		      {
+			(*effect_add_expression_dimension_func)(n_eff, ind);
 		    
-		  }
-		l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
-	      } /* FOREACH(EFFECT, eff, l_sum_eff) */
-	     gen_free_list(l_real_arg);
-	     free_effect(eff1);
+		      }
+		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+		  } /* FOREACH(EFFECT, eff, l_sum_eff) */
+		gen_free_list(l_real_arg);
+		free_effect(eff1);
 	     
-	  }
-	else if(ENTITY_MALLOC_SYSTEM_P(real_op)) 
-	  {
-	    /* BC : do not generate effects on HEAP */
-	    /*n_eff = heap_effect(get_current_module_entity(),
-	      copy_action(effect_action(eff)));*/
-	  }
-	else 
-	  {
-	    l_eff = gen_nconc
-	      (l_eff, 
-	       c_actual_argument_to_may_summary_effects(real_arg, 'x'));
-	  }
+	      }
+	    else if(ENTITY_MALLOC_SYSTEM_P(real_op)) 
+	      {
+		/* BC : do not generate effects on HEAP */
+		/*n_eff = heap_effect(get_current_module_entity(),
+		  copy_action(effect_action(eff)));*/
+	      }
+	    else 
+	      {
+		l_eff = gen_nconc
+		  (l_eff, 
+		   c_actual_argument_to_may_summary_effects(real_arg, 'x'));
+	      }
 	
-	if (n_eff != effect_undefined && l_eff == NIL)
-	  l_eff = CONS(EFFECT,n_eff, NIL);
-	break;
-      } /* case is_syntax_call */
-    case is_syntax_cast :
-      {
-	/* Ignore the cast */
-	cast c = syntax_cast(real_s);
-	pips_user_warning("Cast effect is ignored\n");
-	l_eff = c_simple_effects_on_formal_parameter_backward_translation
-	  (l_sum_eff, cast_expression(c), context);
-	break;
-      }
-    case is_syntax_sizeofexpression :
-      {
-	pips_debug(5,"sizeof epxression -> NIL");
-	break;
-      }
-    case is_syntax_va_arg :
-      {
-	pips_internal_error("va_arg() : should have been treated before\n");
-	break;
-      }
-    case is_syntax_application :
-      {
-	pips_internal_error("Application not supported yet\n");
-	break;
-      }
-    case is_syntax_range :
-      {
-	pips_user_error("Illegal effective parameter: range\n");
-	break;
-      }
-    default:
-      pips_internal_error("Illegal kind of syntax\n");
-    } /* switch */
+	    if (n_eff != effect_undefined && l_eff == NIL)
+	      l_eff = CONS(EFFECT,n_eff, NIL);
+	    break;
+	  } /* case is_syntax_call */
+	case is_syntax_cast :
+	  {
+	    /* Ignore the cast */
+	    cast c = syntax_cast(real_s);
+	    bool read_p = false, write_p = false;
+	    pips_user_warning("Cast in actual parameter -> anywhere effect\n");
+	    FOREACH(EFFECT, eff, l_sum_eff)
+	      {
+		if(effect_write_p(eff)) write_p = true;
+		else read_p = false;
+	      }
+	    
+	    if (write_p)
+	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(is_action_write), NIL));
+	    if (read_p)
+	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(is_action_read), NIL));
+	    break;
+	  }
+	case is_syntax_sizeofexpression :
+	  {
+	    pips_debug(5,"sizeof epxression -> NIL");
+	    break;
+	  }
+	case is_syntax_va_arg :
+	  {
+	    pips_internal_error("va_arg() : should have been treated before\n");
+	    break;
+	  }
+	case is_syntax_application :
+	  {
+	    pips_internal_error("Application not supported yet\n");
+	    break;
+	  }
+	case is_syntax_range :
+	  {
+	    pips_user_error("Illegal effective parameter: range\n");
+	    break;
+	  }
+	default:
+	  pips_internal_error("Illegal kind of syntax\n");
+	} /* switch */
   
-  free_type(real_arg_t);
-  
+      free_type(real_arg_t);
+    }
 
   ifdebug(8)
     {
