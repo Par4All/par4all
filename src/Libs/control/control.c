@@ -95,6 +95,60 @@ static hash_table Label_control;
 #define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined)
 
 
+/* In C, we can have some "goto" inside a block from outside, that
+   translate as any complex control graph into an "unstructured" in the
+   PIPS jargon.
+
+   Unfortunately, that means it break the structured block nesting that
+   may carry declarations with the scoping information.
+
+   So we need to track this scope information independently of the control
+   graph. This is the aim of this declaration scope stack that is used to
+   track scoping during visiting the RI.
+*/
+stack declarations_stack;
+
+DEFINE_LOCAL_STACK(scoping_statement, statement)
+
+/* Initialize the declaration stack used to track nested declarations
+ */
+void declarations_stack_init() {
+  declarations_stack = stack_make(0, 0, 0);
+}
+
+
+/* Free the declaration stack used to track nested declarations
+ */
+void declarations_stack_free() {
+  stack_free(&declarations_stack);
+}
+
+
+/* Push a list of @p declarations on the declarations stack
+
+   We push the address of the list instead of the list so that we can
+   modify it later, such as completing a NIL list.
+ */
+void push_declarations(statement declarations) {
+  stack_push(declarations, declarations_stack);
+}
+
+
+/* Pop a list of declarations from the declarations stack
+
+   @return the last declaration list
+ */
+statement pop_declarations() {
+  return stack_pop(declarations_stack);
+}
+
+
+/* Free the declaration stack used to track nested declarations
+ */
+statement declarations_stack_head() {
+  return stack_head(declarations_stack);
+}
+
 
 /* HASH_GET_DEFAULT_EMPTY_LIST: returns an empty list instead of
    HASH_UNDEFINED_VALUE when a key is not found */
@@ -226,10 +280,9 @@ string name;
    statement ST. A used_label is a hash_table that maps the label
    name to the list of statements that references it. */
 
-static void update_used_labels(used_labels, name, st)
-hash_table used_labels;
-string name;
-statement st;
+static void update_used_labels(hash_table used_labels,
+			       string name,
+			       statement st)
 {
     cons *sts ;
 
@@ -248,35 +301,51 @@ statement st;
 
 /* UNION_USED_LABELS unions the used-labels list L1 and L2 and returns the
    result in L1 */
-
 static hash_table union_used_labels(l1, l2)
 hash_table l1, l2;
 {
     HASH_MAP(name, sts, {
 	MAPL(stts, {
 	    update_used_labels(l1, name, STATEMENT(CAR(stts)));
-	}, (cons *)sts);
+	}, (list) sts);
     }, l2);
     return( l1 ) ;
 }
 
-/* COVERS_LABELS_P returns whether a USED_LABELS list for statement ST
-   covers all the references to its labels. */
-static bool covers_labels_p(st,used_labels)
-statement st ;
-hash_table used_labels;
+
+/* Compute whether all the label references in a statement are in a given
+   label name to statement list mapping.
+
+   @param st is the statement we want to check if it owns all allusion to
+   the given label name in the @p used_labels mapping
+
+   @param used_labels is a hash table mapping a label name to a list of
+   statement that use it, as their label or because it is a goto to it
+
+   @return TRUE if all the label allusion in @p st are covered by the @p
+   used_labels mapping.
+*/
+static bool covers_labels_p(statement st,
+			    hash_table used_labels)
 {
     if( get_debug_level() >= 5 ) {
 	pips_debug(0, "Statement %td (%p): \n ", statement_number( st ), st);
 	print_statement(st);
     }
+    /* For all the labels in used_labels: */
     HASH_MAP(name, sts, {
-	cons *stats = (cons *)sts;
+	/* The statements using label name in used_labels: */
+	list stats = (list) sts;
 
+	/* For all the statements associated to label name: */
 	MAPL(defs, {
 	    bool found = FALSE;
+	    /* Get one statement from the statements associated to label
+	       name: */
 	    statement def = STATEMENT(CAR(defs));
 
+	    /* Verify that def is in all the statements associated to
+	       label name according to used_labels. */
 	    MAPL(sts, {
 		found |= (STATEMENT(CAR(sts))==def);
 	    }, stats);
@@ -285,7 +354,7 @@ hash_table used_labels;
 		pips_debug(5, "does not cover label %s\n", (char *) name);
 		return(FALSE);
 	    }
-	}, (cons *)hash_get_default_empty_list(Label_statements, name));
+	}, (list) hash_get_default_empty_list(Label_statements, name));
     }, used_labels);
 
     if( get_debug_level() >= 5 ) {
@@ -293,7 +362,8 @@ hash_table used_labels;
     }
     return(TRUE);
 }
-
+
+
 static void add_proper_successor_to_predecessor(control pred, control c_res)
 {
   /* Replaces the following statement: */
@@ -343,23 +413,28 @@ static void add_proper_successor_to_predecessor(control pred, control c_res)
     control_successors(pred) = ADD_SUCC(c_res, pred);
   }
 }
-
-/* CONTROLIZE computes in C_RES the control node of the statement ST
-   whose predecessor control node is PRED and successor SUCC. The
-   USED_LABELS is modified to deal with local use of labels. Returns TRUE
-   if the current statement isn't a structured control. The invariant is
-   that CONTROLIZE links predecessors and successors of C_RES, updates the
-   successors of PRED and the predecessors of SUCC.
 
-   In fact, it cannot update the successors of PRED because it cannot know
-   which successor of PRED C_RES is when PRED is associated to a
-   test. PRED and C_RES must be linked together when you enter
+
+/* Computes in @p c_res the control node of the statement @p st whose
+   predecessor control node is @p pred and successor @p succ.
+
+   The @p used_LABELS is modified to deal with local use of labels.
+
+   The invariant is that it links predecessors and successors of @p c_res,
+   updates the successors of @p pred and the predecessors of @p succ.
+
+   In fact, it cannot update the successors of @p pred because it cannot
+   know which successor of @p pred @p c_RES is when @p pred is associated
+   to a test. @p pred and @p c_res must be linked together when you enter
    controlize(), or they must be linked later by the caller. But they
-   cannot be linked here thru the successor list of PRED and, if the consistency
-   is true here, they cannot be linked either by the predecessor list of
-   SUCC. If they are linked later, it is useless to pass PRED down. If
-   they are linked earlier, they might have to be unlinked when structured
-   code is found. */
+   cannot be linked here thru the successor list of @p pred and, if the
+   consistency is true here, they cannot be linked either by the
+   predecessor list of @p succ. If they are linked later, it is useless to
+   pass @p pred down. If they are linked earlier, they might have to be
+   unlinked when structured code is found.
+
+   @return TRUE if the current statement isn't a structured control.
+*/
 bool controlize(statement st,
 		control pred,
 		control succ,
@@ -393,15 +468,17 @@ bool controlize(statement st,
 
     switch(instruction_tag(i)) {
     case is_instruction_block: {
-      /* A C block may have a label */
+      /* A C block may have a label and even goto from outside on it. */
       /* A block may only contain declarations with initializations
 	 and side effects on the store */
       if(ENDP(instruction_block(i))) {
+	/* Empty block */
 	controlized = controlize_call(st, pred, succ, c_res);
 	statement_consistent_p(st);
       }
       else {
 	statement_consistent_p(st);
+	push_declarations(st);
 	controlized = controlize_list(st, instruction_block(i),
 				      pred, succ, c_res, used_labels);
 	statement_consistent_p(st);
@@ -424,6 +501,7 @@ bool controlize(statement st,
 	  print_arguments(statement_declarations(st));
 	  pips_user_warning("Some local declarations may have been lost\n");
 	}
+	pop_declarations();
 	statement_consistent_p(st);
       }
       break;
@@ -534,6 +612,8 @@ bool controlize(statement st,
 	check_control_coherency(c_res);
     }
 
+    /* Update the association between the current statement and its label:
+    */
     update_used_labels(used_labels, label, st);
 
     return(controlized);
@@ -1040,17 +1120,103 @@ hash_table used_labels;
   return(controlized);
 }
 
-
-/* COMPACT_LIST takes a list of controls CTLS coming from a
-   CONTROLIZE_LIST and compacts the successive assignments,
-   i.e. concatenates (i=1) followed by (j=2) in a single control with
-   a block statement (i=1;j=2). The LAST control node is returned in
-   case on terminal compaction.
 
-   Added a set to avoid investigating a removed node.
-   Many memory leaks removed. RK.
-   In fact this procedure could be replaced by
-   fuse_sequences_in_unstructured()... RK.
+/* Move all the declarations found in a list of control to a given
+   statement
+
+   @ctls is a list of control nodes
+
+   It is useful in the controlizer to keep scoping of declarations even
+   with unstructured that may destroy the variable scoping rules.
+
+   If there are conflict names on declarations, they are renamed.
+
+   It relies on correct calls to push_declarations()/push_declarations()
+   before to track where to put the declarations.
+*/
+void
+move_declaration_control_node_declarations_to_statement(list ctls) {
+  statement s = declarations_stack_head();
+  list declarations = statement_declarations(s);
+  statement s_above = stack_nth(declarations_stack, 2);
+  pips_debug(2, "Dealing with block statement %p included into block"
+	     " statement %p\n", s, s_above);
+  list declarations_above  = statement_declarations(s_above);
+  list new_declarations = NIL;
+  /* The variables created in case of name conflict*/
+  list new_variables = NIL;
+  hash_table old_to_new_variables = hash_table_make(hash_chunk, 0);
+
+  /* Look for conflicting names: */
+  FOREACH(ENTITY, e, declarations) {
+    string name = entity_user_name(e);
+    bool conflict = FALSE;
+    FOREACH(ENTITY, e_above, declarations_above) {
+      string name_above = entity_user_name(e_above);
+      pips_debug(2, "Comparing variables %s and %s\n",
+		 entity_name(e), entity_name(e_above));
+
+      if (strcmp(name, name_above) == 0) {
+	/* There is a conflict name between a declaration in the current
+	   statement block and one in the statement block above: */
+	conflict = TRUE;
+	break;
+      }
+    }
+    entity v;
+    if (conflict) {
+      pips_debug(2, "Conflict on variable %s\n", entity_name(e));
+
+      /* Create a new variable with a non conflicting name: */
+      v = clone_variable_with_unique_name(e,
+					  s_above,
+					  "",
+					  "_",
+					  entity_to_module_entity(e));
+      new_variables = gen_entity_cons(v , new_variables);
+      hash_put(old_to_new_variables, e, v);
+    }
+    else
+      v = e;
+    /* Add the inner declaration to the upper statement later */
+    new_declarations = gen_entity_cons(v , new_declarations);
+  }
+  /* Remove the inner declaration from the inner statement block:
+   */
+  gen_free_list(statement_declarations(s));
+  statement_declarations(s) = NIL;
+
+  /* Add all the declarations to the statement block above and keep the
+     same order: */
+  statement_declarations(s_above) = gen_nconc(declarations_above,
+					      gen_nreverse(new_declarations));
+
+  /* Replace all the references on old variables to references to the new
+     ones in all the corresponding control nodes by in the code */
+  HASH_MAP(old, new, {
+      FOREACH(CONTROL, c, ctls) {
+	statement s = control_statement(c);
+	replace_entity(s, old, new);
+      }
+      /* We should free in some way the old variable... */
+    }, old_to_new_variables);
+  hash_table_free(old_to_new_variables);
+}
+
+
+/* Take a list of controls @p ctls coming from a controlize_list() and
+   compact the successive statements, i.e. concatenates (i=1) followed by
+   (j=2) in a single control with a block statement (i=1;j=2).
+
+   @return the last control node of the remaining control list. It may not
+   be @p c_end if this one has been fused with a previous control node.
+
+   Added a set to avoid investigating a removed node.  Many memory leaks
+   removed. RK.
+
+   This procedure cannot be replaced by fuse_sequences_in_unstructured()
+   since the API is not the same and because of various goto from/to
+   outside, this control list may belong to quite larger unstructured.
    */
 static control compact_list(list ctls,
 			    control c_end)
@@ -1066,8 +1232,9 @@ static control compact_list(list ctls,
 	fprintf(stderr, "\n");
     }
 
-    if( ENDP( ctls )) {
-	return( c_last ) ;
+    if (ENDP(ctls)) {
+      /* Empty statement control list, clearly nothing to do: */
+      return c_last;
     }
 
     processed_nodes = set_make(set_pointer);
@@ -1174,13 +1341,16 @@ static control compact_list(list ctls,
 		/* This happens quite often in Syntax with no
 		   consequences; this leads to a core dump for
 		   C_syntax/block_scope13.c */
-		/* pips_user_warning("creation of a dangling pointer via "
-				  "hash table Label_control for label
-				  \"%s\"\n", ln); */
+		pips_debug(2, "Do not fuse control %p since we will have a latent goto on it through label \"%s\"\n",
+			   c_res, ln);
+		/* Do not fuse. */
+		c_res = CONTROL(CAR(ctls));
+		continue;
+
 	      }
 	      else
 		pips_internal_error("Inconsistent hash table Label_control: "
-				    "same labels points towards two different controls");
+				    "same label points towards two different controls");
 	    }
 	  }
 	  /* Skip the useless control: */
@@ -1202,109 +1372,133 @@ static control compact_list(list ctls,
 }
 
 
-/* CONTROLIZE_LIST_1 is the equivalent of a mapcar of controlize on STS.
-   The trick is to keep a list of the controls to compact them latter. Note
+/* Do the equivalent of a mapcar of controlize on statement list @p sts.
+
+   The trick is to keep a list of the controls to compact them later. Note
    that if a statement is controlized, then the predecessor has to be
-   computed (i.e. is not the previous control on STS).; this is the purpose
-   of c_in.
+   computed (i.e. is not the previous control of @p sts); this is the
+   purpose of c_in.
 
    This function used to update its formal parameters pred and c_res, which
    makes stack visualization and debugging difficult.
- */
-
+*/
 list controlize_list_1(list sts,
 		       control i_pred,
 		       control i_succ,
 		       control i_c_res,
-		       hash_table used_labels)
-{
+		       hash_table used_labels) {
+  /* The list of all the control nodes associated to this statement
+     list: */
   list ctls = NIL;
   control pred = i_pred;
   control succ = i_succ;
   control c_res = i_c_res;
 
-    for(; !ENDP(sts); sts = CDR(sts)) {
-	statement st = STATEMENT(CAR(sts));
-	control c_next =
-		ENDP(CDR(sts)) ? succ :
-			make_conditional_control(STATEMENT(CAR(CDR(sts))));
-	bool controlized;
-	bool unreachable;
+  /* On all the statement list: */
+  for(; !ENDP(sts); sts = CDR(sts)) {
+    statement st = STATEMENT(CAR(sts));
+    /* Create a control node for the successor of this statement if
+       not the last one: */
+    control c_next = ENDP(CDR(sts)) ? succ :
+      make_conditional_control(STATEMENT(CAR(CDR(sts))));
+    bool controlized;
+    bool unreachable;
 
-	ifdebug(5) {
-	    pips_debug(0, "Nodes linked with pred %p:\n", pred);
-	     display_linked_control_nodes(pred);
-	}
-
-	ifdebug(1) {
-	    check_control_coherency(pred);
-	    check_control_coherency(succ);
-	    check_control_coherency(c_next);
-	    check_control_coherency(c_res);
-	}
-
-	controlized = controlize(st, pred, c_next, c_res, used_labels);
-	unreachable = ENDP(control_predecessors(c_next));
-
-	ctls = CONS(CONTROL, c_res, ctls);
-
-	if(unreachable) {
-	    Unreachable = CONS(STATEMENT, st, Unreachable);
-	}
-	if(controlized) {
-	    control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-
-	    ctls = CONS(CONTROL, c_in, ctls);
-	    control_predecessors(c_in) = control_predecessors(c_next);
-	    control_successors(c_in) = CONS(CONTROL, c_next, NIL);
-	    patch_references(SUCCS_OF_PREDS, c_next, c_in);
-	    control_predecessors(c_next) = CONS(CONTROL, c_in, NIL) ;
-	    pred = c_in;
-	}
-	else {
-	    pred = (unreachable) ?
-		    make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL) :
-		    c_res;
-	}
-	c_res = c_next ;
+    ifdebug(5) {
+      pips_debug(0, "Nodes linked with pred %p:\n", pred);
+      display_linked_control_nodes(pred);
     }
 
     ifdebug(1) {
-      /* The consistency check should be applied to all elements in
-	 ctls. Let's hope all controls in ctls are linked one way or
-	 the other. */
-      control c = CONTROL(CAR(ctls));
-	pips_debug(5, "Nodes from c %p\n", c);
-	display_linked_control_nodes(c);
-	check_control_coherency(c);
-
-	check_control_coherency(pred);
-	check_control_coherency(succ);
-	check_control_coherency(c_res);
-	pips_debug(5, "(pred = %p, succ = %p, c_res = %p)\n",
-		   pred, succ, c_res);
-	pips_debug(5, "Nodes from pred %p\n", pred);
-	display_linked_control_nodes(pred);
-	pips_debug(5, "Nodes from succ %p\n", succ);
-	display_linked_control_nodes(succ);
-	pips_debug(5, "Nodes from c_res %p\n", c_res);
-	display_linked_control_nodes(c_res);
+      check_control_coherency(pred);
+      check_control_coherency(succ);
+      check_control_coherency(c_next);
+      check_control_coherency(c_res);
     }
 
-    return(gen_nreverse(ctls));
+    /* Controlize the current statement: */
+    controlized = controlize(st, pred, c_next, c_res, used_labels);
+    unreachable = ENDP(control_predecessors(c_next));
+
+    /* Keep track of the control node associated to this statement: */
+    ctls = CONS(CONTROL, c_res, ctls);
+
+    if(unreachable) {
+      /* Keep track globally of the unreachable code: */
+      Unreachable = CONS(STATEMENT, st, Unreachable);
+    }
+
+    if(controlized) {
+      /* The previous controlize() returned a non structured control */
+      control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+
+      ctls = CONS(CONTROL, c_in, ctls);
+      /* Insert c_in as a predecessor of c_next
+
+	 RK: I do not understand why this is needed...
+      */
+      control_predecessors(c_in) = control_predecessors(c_next);
+      control_successors(c_in) = CONS(CONTROL, c_next, NIL);
+      patch_references(SUCCS_OF_PREDS, c_next, c_in);
+      control_predecessors(c_next) = CONS(CONTROL, c_in, NIL) ;
+      pred = c_in;
+    }
+    else {
+      /* If the next control node is unreachable, it will not be
+	 connected to the previous predecessor, so allocate a new one
+	 so that it has a predecessor that is completely unconnected of
+	 previous control graph. */
+      pred = (unreachable) ?
+	make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL) :
+	c_res;
+    }
+    /* The next control node is the control node of the next
+       statement: */
+    c_res = c_next ;
+  }
+
+  ifdebug(1) {
+    /* The consistency check should be applied to all elements in
+       ctls. Let's hope all controls in ctls are linked one way or
+       the other. */
+    control c = CONTROL(CAR(ctls));
+    pips_debug(5, "Nodes from c %p\n", c);
+    display_linked_control_nodes(c);
+    check_control_coherency(c);
+
+    check_control_coherency(pred);
+    check_control_coherency(succ);
+    check_control_coherency(c_res);
+    pips_debug(5, "(pred = %p, succ = %p, c_res = %p)\n",
+	       pred, succ, c_res);
+    pips_debug(5, "Nodes from pred %p\n", pred);
+    display_linked_control_nodes(pred);
+    pips_debug(5, "Nodes from succ %p\n", succ);
+    display_linked_control_nodes(succ);
+    pips_debug(5, "Nodes from c_res %p\n", c_res);
+    display_linked_control_nodes(c_res);
+  }
+
+  /* Since we built the list in reverse order to have a O(n)
+     construction: */
+  return gen_nreverse(ctls);
 }
-
-/* CONTROLIZE_LIST computes in C_RES the control graph of the list
-   STS (of statement ST) with PREDecessor and SUCCessor. We try to
-   minize the number of graphs by looking for graphs with one node
-   only and picking the statement in that case.
+
+
+/* Computes in @p c_res the control graph of the list @p sts (of statement
+   @p st) with @p pred predecessor and @p succ successor.
+
+   We try to minimize the number of graphs by looking for graphs with one
+   node only and picking the statement in that case.
+
+   @return TRUE if the code is not a structured control.
    */
-bool controlize_list(st, sts, pred, succ, c_res, used_labels)
-statement st;
-cons *sts;
-control pred, succ;
-control c_res;
-hash_table used_labels __attribute__((__unused__));
+bool controlize_list(statement st,
+		     list sts,
+		     control pred,
+		     control succ,
+		     control c_res,
+		     hash_table used_labels)
 {
     hash_table block_used_labels = hash_table_make(hash_string, 0);
     control c_block = control_undefined;
@@ -1312,6 +1506,7 @@ hash_table used_labels __attribute__((__unused__));
     control c_last = c_end;
     list ctls;
     bool controlized;
+    bool hierarchized_labels;
 
     pips_debug(5, "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	       st, pred, succ, c_res);
@@ -1328,6 +1523,9 @@ hash_table used_labels __attribute__((__unused__));
     }
 
     if(ENDP(sts)) {
+      /* Empty statement list. It looks like from controlize() that we
+	 cannot be called with an empty statement list... So I guess this
+	 is dead code here. RK */
       list d = gen_copy_seq(statement_declarations(st));
       string dt
 	= (statement_decls_text(st)==NULL || string_undefined_p(statement_decls_text(st))) ?
@@ -1347,6 +1545,8 @@ hash_table used_labels __attribute__((__unused__));
     }
     else {
       /* What happens to the declarations and comments attached to st? */
+      /* Create a control node to hold what was the statement block, with
+	 the first statement in it: */
       c_block = make_conditional_control(STATEMENT(CAR(sts)));
       /*pips_assert("declarations are preserved in conditional control",
 		  gen_length(statement_declarations(st))
@@ -1356,10 +1556,24 @@ hash_table used_labels __attribute__((__unused__));
 
     statement_consistent_p(st);
 
+    /* Do the real transformation of a statement list into a control
+       graph: */
     ctls = controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
 
-    statement_consistent_p(st);
+    /* Compute if there are goto from/to the statements of the statement
+       list: */
+    hierarchized_labels = covers_labels_p(st, block_used_labels);
 
+    if (!hierarchized_labels) {
+      /* We are in trouble since we will have an unstructured with goto
+	 from or to outside this statement sequence, but the statement
+	 sequence that define the scoping rules is going to disappear...
+	 So we gather all the declaration and push them up: */
+      move_declaration_control_node_declarations_to_statement(ctls);
+    }
+    /* Since we have generated a big control graph from what could be a
+       more structured statement block, try to restructure things a little
+       bit, with c_last pointing to the last control node of the list: */
     c_last = compact_list(ctls, c_end);
     /* To avoid compact list: c_last = c_end; */
 
@@ -1373,9 +1587,7 @@ hash_table used_labels __attribute__((__unused__));
 		gen_length(statement_declarations(st))
 		==gen_length(statement_declarations(control_statement(c_block))));*/
 
-    statement_consistent_p(st);
-
-    if(covers_labels_p(st,block_used_labels)) {
+    if (hierarchized_labels) {
 	/* There is no GOTO to/from  outside the statement list:
            hierarchize the control graph. */
 	statement new_st = statement_undefined;
@@ -1492,8 +1704,8 @@ hash_table used_labels __attribute__((__unused__));
 	controlized = FALSE;
     }
     else {
-	/* There are GOTO to/from outside this statement list: update
-           c_res to reflect c_block infact: */
+      pips_debug(2, "There are goto to/from outside this statement list\n");
+	/* Update c_res to reflect c_block in fact: */
 	/* We alredy have pred linked to c_block and the exit node
            linked to succ. RK */
 	UPDATE_CONTROL(c_res,
@@ -1512,7 +1724,7 @@ hash_table used_labels __attribute__((__unused__));
 
     statement_consistent_p(st);
 
-    union_used_labels( used_labels, block_used_labels);
+    union_used_labels(used_labels, block_used_labels);
 
     hash_table_free(block_used_labels);
 
@@ -1537,9 +1749,13 @@ hash_table used_labels __attribute__((__unused__));
 
     return(controlized);
 }
-
-/* CONTROL_TEST builds the control node of a statement ST in C_RES which is a
-   test T. */
+
+
+/* Builds the control node of a statement @p st in @p c_res which is a
+   test statement @p t.
+
+   @return TRUE if the control node generated is not structured_.
+ */
 bool controlize_test(st, t, pred, succ, c_res, used_labels)
 test t;
 statement st;
@@ -1852,8 +2068,14 @@ statement st;
 
     statement_consistent_p(st);
 
+    /* To track declaration scoping independently of control structure: */
+    declarations_stack_init();
+
     /* FI: structured or not, let's build an unstructured... */
     (void) controlize(st, top, bottom, result, used_labels);
+
+    /* Clean up scoping stack: */
+    declarations_stack_free();
 
     /* The statement st is not consistent anymore here. */
     //statement_consistent_p(st);
