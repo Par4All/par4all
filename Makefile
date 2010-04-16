@@ -101,7 +101,8 @@ $(HEAD):
 	  echo "validation for $(TARGET)" ; \
 	  echo "host: $$(hostname)" ; \
 	  echo "directory: $(PWD)" ; \
-	  echo " $(SVNURL)@$$(svnversion) ($$(svnversion -c))" ; \
+	  test -d .svn && \
+	    echo " $(SVNURL)@$$(svnversion) ($$(svnversion -c))" ; \
 	  echo "pips: $(shell which pips)" ; \
 	  pips -v ; \
 	  echo "tpips: $(shell which tpips)" ; \
