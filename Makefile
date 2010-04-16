@@ -82,6 +82,8 @@ validate-%: %
 
 .PHONY: parallel-validate-test
 
+RESULTS	= validation.out
+
 parallel-clean: $(TARGET:%=parallel-clean-%)
 
 parallel-validate-test: $(TARGET:%=parallel-validate-test-%)
@@ -90,12 +92,15 @@ parallel-validate-test: $(TARGET:%=parallel-validate-test-%)
 
 parallel-clean-%:
 	$(MAKE) -C $* clean unvalidate
+	$(RM) $(RESULTS)
 
 parallel-validate-test-%: parallel-clean-%
-	# -j1 do not run subdirectory validations in parallel as
-	# some directory cannot stand it at the time
-	# ISSUE: failed/changed are not detected?
-	$(MAKE) FAILED=../failed -C $* validate-test
+	$(MAKE) RESULTS=../$(RESULTS) -C $* validate-test
+
+parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
+
+parallel-unvalidate-%:
+	$(MAKE) -C $* unvalidate
 
 ## REMOVE ???
 # special handling of private
