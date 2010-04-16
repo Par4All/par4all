@@ -605,7 +605,7 @@ static void atomize_or_associate_for_level(expression e, int level)
   syn = expression_syntax(e);
 
   /* skip casts */
-  if(syntax_cast_(syn)) return atomize_or_associate_for_level(cast_expression(syntax_cast(syn)),level);
+  if(syntax_cast_p(syn)) return atomize_or_associate_for_level(cast_expression(syntax_cast(syn)),level);
 
   /* Only do something with calls */
   if (!syntax_call_p(syn))
