@@ -359,6 +359,45 @@ static void allocate_module_value_mappings(entity m)
 			    intermediate_value_number);
 }
 
+/* It is assumed that al is an abstract location that is written and
+   which may conflict with effects in effect list el. If there is a
+   conflict, than the variable associated to this effect is
+   written.
+
+   It should be generalized to non-interprocedural cases.
+*/
+void add_implicit_interprocedural_write_effects(entity al, list el)
+{
+  type alt = entity_type(al);
+
+  if(type_unknown_p(alt) || get_bool_property("ALIASING_ACROSS_TYPES")) {
+    FOREACH(EFFECT, ef, el) {
+      reference r = effect_any_reference(ef);
+      entity v = reference_variable(r);
+
+      if(!entity_abstract_location_p(v)
+	 && entity_conflict_p(al, v)) {
+	add_interprocedural_value_entities(v);
+      }
+    }
+  }
+  else {
+    FOREACH(EFFECT, ef, el) {
+      reference r = effect_any_reference(ef);
+      entity v = reference_variable(r);
+      type vt = ultimate_type(entity_type(v));
+
+      if(!entity_abstract_location_p(v)
+	 && entity_conflict_p(al, v)
+	 && type_equal_p(alt, vt)) {
+	if(dummy_parameter_entity_p(v))
+	  pips_internal_error("Effects cannot be related to dummy parameters.\n");
+	add_interprocedural_value_entities(v);
+      }
+    }
+  }
+}
+
 /* void module_to_value_mappings(entity m): build hash tables between
  * variables and values (old, new and intermediate), and between values
  * and names for module m, as well as equivalence equalities
@@ -426,7 +465,7 @@ void module_to_value_mappings(entity m)
 	     action_write_p(a)
 	     ||
 	     /* In C, write effects on scalar formal parameter are
-		masked by the vallue passing mode but the copy may
+		masked by the value passing mode but the copy may
 		nevertheless be written inside the function. */
 	      (c_module_p(m) && entity_formal_p(e))
 	     ||
@@ -436,6 +475,9 @@ void module_to_value_mappings(entity m)
 	      ))
 	 )
 	add_interprocedural_value_entities(e);
+      else if(entity_abstract_location_p(e)) {
+	add_implicit_interprocedural_write_effects(e, module_inter_effects);
+      }
     }
 
     /* look for interprocedural read effects on scalar analyzable variables

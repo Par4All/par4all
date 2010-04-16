@@ -342,13 +342,13 @@
 
 /* Bit manipulation functions */
 #define ISHFT_OPERATOR_NAME             "ISHFT"
-#define ISHFTC_OPERATOR_NAME            "ISHFTC" 
-#define IBITS_OPERATOR_NAME             "IBITS" 
+#define ISHFTC_OPERATOR_NAME            "ISHFTC"
+#define IBITS_OPERATOR_NAME             "IBITS"
 #define MVBITS_OPERATOR_NAME            "MVBITS"
 #define BTEST_OPERATOR_NAME             "BTEST"
 #define IBSET_OPERATOR_NAME             "IBSET"
 #define IBCLR_OPERATOR_NAME             "IBCLR"
-#define BIT_SIZE_OPERATOR_NAME          "BIT_SIZE"          
+#define BIT_SIZE_OPERATOR_NAME          "BIT_SIZE"
 #define IAND_OPERATOR_NAME              "IAND"
 #define IEOR_OPERATOR_NAME              "IEOR"
 #define IOR_OPERATOR_NAME               "IOR"
@@ -1167,7 +1167,7 @@
 #define ENTITY_DEREFERENCING_P(e) entity_an_operator_p(e, DEREFERENCING)
 /* Defined elsewhere: #define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF) */
 
-/* C varargs stuff */ 
+/* C varargs stuff */
 #define ENTITY_VA_END_P(e)   ENTITY_NAME_P(e, BUILTIN_VA_END)
 #define ENTITY_VA_START_P(e) ENTITY_NAME_P(e, BUILTIN_VA_START)
 #define ENTITY_VA_COPY_P(e)  ENTITY_NAME_P(e, BUILTIN_VA_COPY)
@@ -1241,7 +1241,7 @@
 
 /* FI: it would be useful to assert cell_preference_p(effect_cell(e)),
    but I do not know how to do it in such a way that it works both for
-   left hand sides and right hand sides using commas 
+   left hand sides and right hand sides using commas.
    I definitely remove this one : it is too dangerous.
 */
 /* #define effect_reference(e)					\
@@ -1256,6 +1256,8 @@
 /* An entity_variable_p(e) may hide a typedef and hence a functional
    type.  In C, use type_variable_p(ultimate_type(entity_type(e))) to
    make sure e is a variable.
+
+   It may also be a dummy C parameter.
  */
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 
