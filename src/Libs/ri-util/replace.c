@@ -154,7 +154,21 @@ void replace_entity_by_expression_expression_walker(expression e, struct param *
             syntax syn = copy_syntax(expression_syntax(p->exp));
             if(!ENDP(reference_indices(r))) {
                 list indices = gen_full_copy_list(reference_indices(r));
-                syn = make_syntax_subscript(make_subscript(make_expression(syn,normalized_undefined),indices));
+                /* if both are references , concatenante indices */
+                if(expression_reference_p(p->exp))
+                {
+                    reference pr = expression_reference(p->exp);
+                    syn = make_syntax_reference(
+                            make_reference(
+                                reference_variable(pr),
+                                gen_nconc(gen_full_copy_list(reference_indices(pr)),indices)
+                                )
+                            );
+                }
+                /* else generate a subscript */
+                else {
+                    syn = make_syntax_subscript(make_subscript(make_expression(syn,normalized_undefined),indices));
+                }
             }
             free_syntax(expression_syntax(e));
             expression_syntax(e) = syn;
