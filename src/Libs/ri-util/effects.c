@@ -303,11 +303,20 @@ bool references_must_conflict_p(reference r1 __attribute__ ((__unused__)),
 				reference r2 __attribute__ ((__unused__)))
 {
   bool conflict_p = FALSE;
-  pips_user_warning("Not implemented yet. "
-		    "Conservative under approximation is made\n");
+  entity e1 = reference_variable(r1);
+  entity e2 = reference_variable(r2);
+
+  // Do a simple check for scalar conflicts
+  if(reference_scalar_p(r1) && reference_scalar_p(r2) &&
+      entity_conflict_p( e1, e2 )) {
+    conflict_p = TRUE;
+  } else {
+    pips_user_warning("Not completely implemented yet. "
+        "Conservative under approximation is made\n");
+  }
   return conflict_p;
 }
-
+
 /* API for cell */
 bool cells_maymust_conflict_p(cell c1, cell c2, bool must_p)
 {
@@ -318,12 +327,12 @@ bool cells_maymust_conflict_p(cell c1, cell c2, bool must_p)
   if(cell_reference_p(c1))
     r1 = cell_reference(c1);
   else if(cell_preference_p(c1))
-    r1 = cell_preference(c1);
+    r1 = preference_reference(cell_preference(c1));
 
   if(cell_reference_p(c2))
     r2 = cell_reference(c2);
   else if(cell_preference_p(c2))
-    r2 = cell_preference(c2);
+    r2 = preference_reference(cell_preference(c2));
 
   if(reference_undefined_p(r1) || reference_undefined_p(r2)) {
     pips_internal_error("either undefined references or gap "
@@ -553,7 +562,29 @@ bool effect_comparable_p(effect e1, effect e2)
 
   return comparable_p;
 }
-
+
+/* Two effects will always conflict if they abstract two location sets with a
+   non-empty intersection and if at least one of them is a write.
+
+   This function is conservative: it is always correct not to declare a
+   conflict.
+ */
+bool effects_must_conflict_p(effect eff1, effect eff2)
+{
+  action ac1 = effect_action(eff1);
+  action ac2 = effect_action(eff2);
+  bool conflict_p = FALSE;
+
+  if(action_write_p(ac1)||action_write_p(ac2)) {
+    cell cell1 = effect_cell(eff1);
+    cell cell2 = effect_cell(eff2);
+    if( cells_must_conflict_p(cell1,cell2)) {
+      conflict_p = TRUE;
+    }
+  }
+  return conflict_p;
+}
+
 /* Two effects conflict if they abstract two location sets with a
    non-empty intersection and if at least one of them is a write.
 
@@ -564,13 +595,16 @@ bool effects_may_conflict_p(effect eff1, effect eff2)
 {
   action ac1 = effect_action(eff1);
   action ac2 = effect_action(eff2);
-  bool conflict_p = FALSE;
+  bool conflict_p = TRUE;
 
-  if(action_write_p(ac1)||action_write_p(ac2)) {
+  if(action_read_p(ac1)&&action_read_p(ac2)) {
+    // Two read won't conflict
+    conflict_p = FALSE;
+  } else {
     cell cell1 = effect_cell(eff1);
     cell cell2 = effect_cell(eff2);
-    if( cells_may_conflict_p(cell1,cell2)) {
-      conflict_p = TRUE;
+    if( ! cells_may_conflict_p(cell1,cell2)) {
+      conflict_p = FALSE;
     }
   }
   return conflict_p;
