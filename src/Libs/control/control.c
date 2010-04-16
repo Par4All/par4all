@@ -129,30 +129,11 @@ char * k;
  * a test since the position in the successor list is
  * significant. TRUE successors are in the odd positions (the first
  * element is of rank one). FALSE successors are in the odd position.
- *
- * Also pushnew() does not push anything. And it could be implemented
- * by "return gen_once((void *) x, l)"
- *
  */
 
-/* PUSHNEW pushes a control X on the list L if it's not here. */
-
-static cons * pushnew(x, l)
-control x;
-cons *l;
-{
-    cons *ll = l;
-
-    MAPL(elts, {if(CONTROL(CAR(elts)) == x) return(l);},
-	  ll)
-    return(CONS(CONTROL, x, l));
-}
-
-/* Add control "pred" to the predecessor set of control c if not already here */
-#define ADD_PRED(pred,c) (pushnew(pred,control_predecessors(c)))
-
-/* Make a one element list from succ. */
-#define ADD_SUCC(succ,c) (CONS(CONTROL, succ, NIL))
+/* Add control "pred" to the predecessor set of control c if not already
+   here */
+#define ADD_PRED_IF_NOT_ALREADY_HERE(pred,c) (gen_once(pred,control_predecessors(c)))
 
 /* Update control c by setting its statement to s, by unioning its predecessor
  * set with pd, and by setting its successor set to sc (i.e. previous successors
@@ -165,7 +146,7 @@ cons *l;
 #define UPDATE_CONTROL(c,s,pd,sc) { \
 	control_statement(c)=s; \
 	MAPL(preds, {control_predecessors(c) = \
-			      ADD_PRED(CONTROL(CAR(preds)), c);}, \
+			      ADD_PRED_IF_NOT_ALREADY_HERE(CONTROL(CAR(preds)), c);}, \
 	      pd); \
 	control_successors(c)=sc; \
 	}
@@ -366,7 +347,7 @@ static void add_proper_successor_to_predecessor(control pred, control c_res)
   }
   else {
     /* Do whatever was done before and let memory leak! */
-    control_successors(pred) = ADD_SUCC(c_res, pred);
+    control_successors(pred) = CONS(CONTROL, c_res, NIL);
   }
 }
 
@@ -507,8 +488,8 @@ bool controlize(statement st,
 	add_proper_successor_to_predecessor(pred, c_res);
 	UPDATE_CONTROL(c_res, nop,
 		       CONS(CONTROL, pred, NIL),
-		       ADD_SUCC(n_succ, c_res )) ;
-	control_predecessors(n_succ) = ADD_PRED(c_res, n_succ);
+		       CONS(CONTROL, n_succ, NIL));
+	control_predecessors(n_succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, n_succ);
 	/* I do not know why, but my following code does not work. So
            I put back former one above... :-( RK. */
 #if 0
@@ -594,12 +575,12 @@ bool controlize_call(statement st,
 	     st, pred, succ, c_res);
 
   UPDATE_CONTROL(c_res, st,
-		 ADD_PRED(pred, c_res),
+		 ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
 		 CONS(CONTROL, succ, NIL));
 
   /* control_successors(pred) = ADD_SUCC(c_res, pred); */
   add_proper_successor_to_predecessor(pred, c_res);
-  control_predecessors(succ) = ADD_PRED(c_res, succ);
+  control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
   return(FALSE);
 }
 
@@ -723,10 +704,10 @@ hash_table used_labels;
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
 				      copy_extensions(statement_extensions(st))),
-		       ADD_PRED(pred, c_res),
-		       ADD_SUCC(succ, c_res )) ;
+		       ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		       CONS(CONTROL, succ, NIL)) ;
 	controlized = FALSE;
-	control_predecessors(succ) = ADD_PRED(c_res, succ);
+	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
     }
     else {
 	control_statement(c_test) = loop_test(st);
@@ -738,10 +719,10 @@ hash_table used_labels;
 	control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
 	UPDATE_CONTROL(c_res,
 		       loop_header(st),
-		       ADD_PRED(pred, c_res),
+		       ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, c_test, NIL));
 	controlized = TRUE ;
-	control_predecessors(succ) = ADD_PRED(c_test, succ);
+	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_test, succ);
     }
     add_proper_successor_to_predecessor(pred, c_res);
     /* control_successors(pred) = ADD_SUCC(c_res, pred); */
@@ -855,8 +836,8 @@ hash_table used_labels;
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
 				      copy_extensions(statement_extensions(st))),
-		       ADD_PRED(pred, c_res),
-		       ADD_SUCC(succ, c_res )) ;
+		       ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		       CONS(CONTROL, succ, NIL));
 	controlized = FALSE;
     }
     else {
@@ -872,7 +853,7 @@ hash_table used_labels;
 	/* Cannot be consistent yet! */
 	/* ifdebug(5) check_control_coherency(c_res); */
     }
-    control_predecessors(succ) = ADD_PRED(c_res, succ);
+    control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
     add_proper_successor_to_predecessor(pred, c_res);
     /* control_successors(pred) = ADD_SUCC(c_res, pred); */
 
@@ -1039,10 +1020,10 @@ hash_table used_labels;
 
     UPDATE_CONTROL(c_res,
 		   d_st,
-		   ADD_PRED(pred, c_res),
-		   ADD_SUCC(succ, c_res));
+		   ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		   CONS(CONTROL, succ, NIL));
     controlized = FALSE;
-    control_predecessors(succ) = ADD_PRED(c_res, succ);
+    control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
   }
   else /* The for loop cannot be preserved as a control structure*/
     {
@@ -1059,10 +1040,10 @@ hash_table used_labels;
       control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
       UPDATE_CONTROL(c_res,
 		     forloop_header(st),
-		     ADD_PRED(pred, c_res),
+		     ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
 		     CONS(CONTROL, c_test, NIL));
       controlized = TRUE ;
-      control_predecessors(succ) = ADD_PRED(c_test, succ);
+      control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_test, succ);
     }
   add_proper_successor_to_predecessor(pred, c_res);
   /* control_successors(pred) = ADD_SUCC(c_res, pred); */
@@ -1673,7 +1654,7 @@ bool controlize_list(statement st,
 		       control_statement(c_block),
 		       control_predecessors(c_block),
 		       control_successors(c_block));
-	control_predecessors(succ) = ADD_PRED(c_end, succ);
+	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_end, succ);
 	control_successors(c_end) = CONS(CONTROL, succ, NIL);
 	patch_references(PREDS_OF_SUCCS, c_block, c_res);
 	patch_references(SUCCS_OF_PREDS, c_block, c_res);
@@ -1781,19 +1762,19 @@ hash_table used_labels;
 				  gen_copy_seq(statement_declarations(st)),
 				  strdup(statement_decls_text(st)),
 				  copy_extensions(statement_extensions(st))),
-		   ADD_PRED(pred, c_res),
+		   ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
-    control_predecessors(succ) = ADD_PRED(c_res, succ);
+    control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
     controlized = FALSE;
   }
   else {
     // Keep the unstructured test:
     UPDATE_CONTROL(c_res, st,
-		   ADD_PRED(pred, c_res),
+		   ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
     test_true(t) = make_plain_continue_statement();
     test_false(t) = make_plain_continue_statement();
-    control_predecessors(succ) = ADD_PRED(c_join, succ);
+    control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_join, succ);
     control_successors(c_join) = CONS(CONTROL, succ, NIL);
     controlized = TRUE;
   }
