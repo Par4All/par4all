@@ -701,7 +701,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         expression real_e = expression_field_p(e)?binary_call_rhs(expression_call(e)):e;
         if (argsType == OTHER)
         {
-            all_scalar &= expression_scalar_p(real_e);
+            all_scalar = all_scalar && expression_scalar_p(e);
             continue;
         }
         else if (argsType == CONSTANT)
@@ -709,7 +709,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             if (!expression_constant_p(real_e))
             {
                 argsType = OTHER;
-                all_scalar &= expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e);
                 continue;
             }
         }
@@ -735,7 +735,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             else
             {
                 argsType = OTHER;
-                all_scalar &= expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e);
                 continue;
             }
         }
@@ -764,33 +764,50 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                 );
         AddEntityToCurrentModule(scalar_holder);
         int index=0;
-        list inits = NIL;
-        FOREACH(EXPRESSION,e,CDR(args))
+            list inits = NIL;
+            for(list iter = CDR(args); !ENDP(iter) ; POP(iter) )
+            {
+                expression e = EXPRESSION(CAR(iter));
+                if(expression_constant_p(e))
+                {
+                    /* no support for array inital value in fortran */
+                    if(fortran_module_p(get_current_module_entity()))
+                    {
+                        insert_statement(get_current_module_statement(),
+                                make_assign_statement(
+                                    reference_to_expression(
+                                        make_reference(scalar_holder,CONS(EXPRESSION,int_to_expression(index),NIL))
+                                        ),
+                                    copy_expression(e)),true);
+                    }
+                    else
+                    {
+                        inits=CONS(EXPRESSION,copy_expression(e),inits);
+                    }
+                }
+                else
+                {
+                    entity current_scalar = expression_to_entity(e);
+                    inits=CONS(EXPRESSION,int_to_expression(0),inits);
+                    expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
+                    *(expression*)REFCAR(iter) = replacement;
+                    replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
+                }
+                index++;
+            }
+        if(!fortran_module_p(get_current_module_entity()))
         {
-            if(expression_constant_p(e))
-            {
-                inits=CONS(EXPRESSION,copy_expression(e),inits);
-            }
-            else
-            {
-                entity current_scalar = expression_to_entity(e);
-                inits=CONS(EXPRESSION,int_to_expression(0),inits);
-                expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
-                replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
-                FOREACH(EXPRESSION,e,args) replace_entity_by_expression(e,current_scalar,replacement);
-                free_expression(replacement);
-            }
-            index++;
-        }
-        free_value(entity_initial(scalar_holder));
-        entity_initial(scalar_holder) = make_value_expression(
-                call_to_expression(
-                    make_call(entity_intrinsic(BRACE_INTRINSIC),
-                        gen_nreverse(inits)
+            free_value(entity_initial(scalar_holder));
+            entity_initial(scalar_holder) = make_value_expression(
+                    call_to_expression(
+                        make_call(entity_intrinsic(BRACE_INTRINSIC),
+                            gen_nreverse(inits)
+                            )
                         )
-                    )
-                );
+                    );
+        }
         argsType=CONSEC_REFS;
+        fstExp = EXPRESSION(CAR(CDR(args)));
 
     }
 
