@@ -106,48 +106,7 @@ static hash_table Label_control;
    graph. This is the aim of this declaration scope stack that is used to
    track scoping during visiting the RI.
 */
-stack declarations_stack;
-
 DEFINE_LOCAL_STACK(scoping_statement, statement)
-
-/* Initialize the declaration stack used to track nested declarations
- */
-void declarations_stack_init() {
-  declarations_stack = stack_make(0, 0, 0);
-}
-
-
-/* Free the declaration stack used to track nested declarations
- */
-void declarations_stack_free() {
-  stack_free(&declarations_stack);
-}
-
-
-/* Push a list of @p declarations on the declarations stack
-
-   We push the address of the list instead of the list so that we can
-   modify it later, such as completing a NIL list.
- */
-void push_declarations(statement declarations) {
-  stack_push(declarations, declarations_stack);
-}
-
-
-/* Pop a list of declarations from the declarations stack
-
-   @return the last declaration list
- */
-statement pop_declarations() {
-  return stack_pop(declarations_stack);
-}
-
-
-/* Free the declaration stack used to track nested declarations
- */
-statement declarations_stack_head() {
-  return stack_head(declarations_stack);
-}
 
 
 /* HASH_GET_DEFAULT_EMPTY_LIST: returns an empty list instead of
@@ -478,7 +437,7 @@ bool controlize(statement st,
       }
       else {
 	statement_consistent_p(st);
-	push_declarations(st);
+	scoping_statement_push(st);
 	controlized = controlize_list(st, instruction_block(i),
 				      pred, succ, c_res, used_labels);
 	statement_consistent_p(st);
@@ -501,7 +460,7 @@ bool controlize(statement st,
 	  print_arguments(statement_declarations(st));
 	  pips_user_warning("Some local declarations may have been lost\n");
 	}
-	pop_declarations();
+	scoping_statement_pop();
 	statement_consistent_p(st);
       }
       break;
@@ -1136,9 +1095,9 @@ hash_table used_labels;
 */
 void
 move_declaration_control_node_declarations_to_statement(list ctls) {
-  statement s = declarations_stack_head();
+  statement s = scoping_statement_head();
   list declarations = statement_declarations(s);
-  statement s_above = stack_nth(declarations_stack, 2);
+  statement s_above = scoping_statement_nth(2);
   pips_debug(2, "Dealing with block statement %p included into block"
 	     " statement %p\n", s, s_above);
   list declarations_above  = statement_declarations(s_above);
@@ -2069,13 +2028,13 @@ statement st;
     statement_consistent_p(st);
 
     /* To track declaration scoping independently of control structure: */
-    declarations_stack_init();
+    make_scoping_statement_stack();
 
     /* FI: structured or not, let's build an unstructured... */
     (void) controlize(st, top, bottom, result, used_labels);
 
     /* Clean up scoping stack: */
-    declarations_stack_free();
+    free_scoping_statement_stack();
 
     /* The statement st is not consistent anymore here. */
     //statement_consistent_p(st);
