@@ -272,14 +272,16 @@ static void kill_effect( set kill, effect e, statement st ) {
         }
       },effects2statement)
 }
-
+
 /* GENKILL_ONE_STATEMENT loops over the entities written in the 
  statement ST. */
 static void genkill_one_statement( statement st ) {
   set gen = GEN( st );
   set ref = REF( st );
+  set kill = KILL( st );
   set_clear( gen );
   set_clear( ref );
+  set_clear( kill );
 
   // Loop over effects to find which one will kill some others, generate
   // or reference some variables
@@ -288,8 +290,6 @@ static void genkill_one_statement( statement st ) {
     action a = effect_action( e );
 
     if ( action_write_p( a ) ) {
-      set kill = KILL( st );
-      set_clear( kill );
       // This effects is a write, it may kill some others effects !
       pips_assert("Effect isn't map to this statement !", st == hash_get(effects2statement, e));
       kill_effect( kill, e, st );
