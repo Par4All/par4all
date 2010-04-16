@@ -50,10 +50,16 @@ validate:
 	# run "make validate-test" to generate "test" files.
 	# run "make unvalidate" to revert test files to their initial status.
 
+ifdef PARALLEL_VALIDATION
 # regenerate files: svn diff show the diffs!
 validate-dir:
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
+else # sequential validation
+validate-dir:
+	$(RM) $(F.valid)
+	for f in $(F.valid) ; do $(MAKE) $$f ; done
+endif
 
 # restore all initial "test" result files if you are unhappy with a validate
 unvalidate:
