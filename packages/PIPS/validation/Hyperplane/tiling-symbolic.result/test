@@ -1,0 +1,309 @@
+
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=9+SZ, 1<=PHI2, PHI2<=9+SZ,
+C    1<=SZ}>
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=9+SZ, 1<=PHI2, PHI2<=9+SZ,
+C    1<=SZ}>
+C  <B(PHI1,PHI2)-R-MAY-{0<=PHI1, PHI1<=10+SZ, 0<=PHI2, PHI2<=10+SZ,
+C    1<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==6, 1<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6, 1<=SZ}>
+
+      SUBROUTINE TILING(A,B,SZ)
+      
+      INTEGER A(1:SZ,1:SZ)
+      INTEGER B(0:SZ+1,0:SZ+1)
+      INTEGER KERNEL(0:2,0:2)
+      INTEGER T,SZ
+      PARAMETER (T=10)
+
+      IF (MOD(SZ, T).NE.0) RETURN                                       0009
+
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=9+SZ, 1<=PHI2, PHI2<=9+SZ,
+C    1<=SZ}>
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=9+SZ, 1<=PHI2, PHI2<=9+SZ,
+C    1<=SZ}>
+C  <B(PHI1,PHI2)-R-MAY-{0<=PHI1, PHI1<=10+SZ, 0<=PHI2, PHI2<=10+SZ,
+C    1<=SZ}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    1<=SZ}>
+
+
+      DO I = 1, SZ, T                                                   0011
+
+C  <A(PHI1,PHI2)-R-MAY-{I<=PHI1, PHI1<=9+I, 1<=PHI2, PHI2<=9+SZ, 1<=I,
+C    I<=SZ}>
+C  <A(PHI1,PHI2)-W-MAY-{I<=PHI1, PHI1<=9+I, 1<=PHI2, PHI2<=9+SZ, 1<=I,
+C    I<=SZ}>
+C  <B(PHI1,PHI2)-R-MAY-{I<=PHI1+1, PHI1<=10+I, 0<=PHI2, PHI2<=10+SZ,
+C    1<=I, I<=SZ}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    1<=I, I<=SZ}>
+
+         DO J = 1, SZ, T                                                0012
+
+C  <A(PHI1,PHI2)-R-EXACT-{I<=PHI1, PHI1<=9+I, J<=PHI2, PHI2<=9+J,
+C    1<=I, I<=SZ, 1<=J, J<=SZ}>
+C  <A(PHI1,PHI2)-W-EXACT-{I<=PHI1, PHI1<=9+I, J<=PHI2, PHI2<=9+J,
+C    1<=I, I<=SZ, 1<=J, J<=SZ}>
+C  <B(PHI1,PHI2)-R-EXACT-{I<=PHI1+1, PHI1<=10+I, J<=PHI2+1,
+C    PHI2<=10+J, 1<=I, I<=SZ, 1<=J, J<=SZ}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    1<=I, I<=SZ, 1<=J, J<=SZ}>
+
+            DO K = I, I+T-1                                             0013
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, J<=PHI2, PHI2<=9+J, K<=9+I, 1<=I,
+C    I<=K, I<=SZ, 1<=J, J<=SZ}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, J<=PHI2, PHI2<=9+J, K<=9+I, 1<=I,
+C    I<=K, I<=SZ, 1<=J, J<=SZ}>
+C  <B(PHI1,PHI2)-R-EXACT-{K<=PHI1+1, PHI1<=1+K, J<=PHI2+1, PHI2<=10+J,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, 1<=J, J<=SZ}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, 1<=J, J<=SZ}>
+
+               DO L = J, J+T-1                                          0014
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K, I<=SZ,
+C    L<=9+J, 1<=J, J<=L, J<=SZ}>
+
+                  A(K,L) = 0                                            0015
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K, I<=SZ,
+C    L<=9+J, 1<=J, J<=L, J<=SZ}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K, I<=SZ,
+C    L<=9+J, 1<=J, J<=L, J<=SZ}>
+C  <B(PHI1,PHI2)-R-EXACT-{K<=PHI1+1, PHI1<=1+K, L<=PHI2+1, PHI2<=1+L,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ}>
+
+                  DO M = -1, 1                                          0016
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K, I<=SZ,
+C    L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K, I<=SZ,
+C    L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1}>
+C  <B(PHI1,PHI2)-R-EXACT-{K+M==PHI1, L<=PHI2+1, PHI2<=1+L, K<=9+I,
+C    1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{PHI1==M+1, 0<=PHI2, PHI2<=2, K<=9+I,
+C    1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1}>
+
+                     DO N = -1, 1                                       0017
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K, I<=SZ,
+C    L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1, 0<=1+N, N<=1}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K, I<=SZ,
+C    L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1, 0<=1+N, N<=1}>
+C  <B(PHI1,PHI2)-R-EXACT-{K+M==PHI1, L+N==PHI2, K<=9+I, 1<=I, I<=K,
+C    I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1, 0<=1+N, N<=1}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{PHI1==M+1, PHI2==N+1, K<=9+I, 1<=I,
+C    I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1, 0<=1+N,
+C    N<=1}>
+
+                        A(K,L) = A(K,L)+B(K+M,L+N)*KERNEL(M+1,N+1)      0018
+                     ENDDO
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=SZ, 1<=PHI2, PHI2<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 1<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 1<=SZ}>
+
+
+      DO I = 1, SZ                                                      0026
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=SZ, 1<=I, I<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 1<=I, I<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 1<=I, I<=SZ}>
+
+         DO J = 1, SZ                                                   0027
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=SZ, 1<=J, J<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 1<=I, I<=SZ, 1<=J,
+C    J<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 1<=I, I<=SZ, 1<=J,
+C    J<=SZ}>
+
+            PRINT *, A(I,J)                                             0028
+         ENDDO
+      ENDDO
+      END
+
+C  <A(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=SZ, 1<=PHI2, PHI2<=SZ}>
+C  <B(PHI1,PHI2)-IN-MAY-{0<=PHI1, PHI1<=10+SZ, 0<=PHI2, PHI2<=10+SZ,
+C    1<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6, 1<=SZ}>
+
+      SUBROUTINE TILING(A,B,SZ)
+      
+      INTEGER A(1:SZ,1:SZ)
+      INTEGER B(0:SZ+1,0:SZ+1)
+      INTEGER KERNEL(0:2,0:2)
+      INTEGER T,SZ
+      PARAMETER (T=10)
+
+      IF (MOD(SZ, T).NE.0) RETURN                                       0009
+
+C  <B(PHI1,PHI2)-IN-MAY-{0<=PHI1, PHI1<=10+SZ, 0<=PHI2, PHI2<=10+SZ,
+C    1<=SZ}>
+C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    1<=SZ}>
+
+
+      DO I = 1, SZ, T                                                   0011
+
+C  <B(PHI1,PHI2)-IN-MAY-{I<=PHI1+1, PHI1<=10+I, 0<=PHI2, PHI2<=10+SZ,
+C    1<=I, I<=SZ, 1<=SZ}>
+C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    1<=I, I<=SZ, 1<=SZ}>
+
+         DO J = 1, SZ, T                                                0012
+
+C  <B(PHI1,PHI2)-IN-EXACT-{I<=PHI1+1, PHI1<=10+I, J<=PHI2+1,
+C    PHI2<=10+J, 1<=I, I<=SZ, 1<=J, J<=SZ}>
+C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    1<=I, I<=SZ, 1<=J, J<=SZ}>
+
+            DO K = I, I+T-1                                             0013
+
+C  <B(PHI1,PHI2)-IN-EXACT-{K<=PHI1+1, PHI1<=1+K, J<=PHI2+1,
+C    PHI2<=10+J, K<=9+I, 1<=I, I<=K, I<=SZ, 1<=J, J<=SZ}>
+C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, 1<=J, J<=SZ}>
+
+               DO L = J, J+T-1                                          0014
+                  A(K,L) = 0                                            0015
+
+C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K,
+C    I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ}>
+C  <B(PHI1,PHI2)-IN-EXACT-{K<=PHI1+1, PHI1<=1+K, L<=PHI2+1, PHI2<=1+L,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ}>
+C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ}>
+
+                  DO M = -1, 1                                          0016
+
+C  <A(PHI1,PHI2)-IN-EXACT-{K==PHI1, L==PHI2, K<=9+I, 1<=I, I<=K,
+C    I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1}>
+C  <B(PHI1,PHI2)-IN-EXACT-{K+M==PHI1, L<=PHI2+1, PHI2<=1+L, K<=9+I,
+C    1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1}>
+C  <KERNEL(PHI1,PHI2)-IN-EXACT-{PHI1==M+1, 0<=PHI2, PHI2<=2, K<=9+I,
+C    1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1}>
+
+                     DO N = -1, 1                                       0017
+
+C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K,
+C    I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1, 0<=1+N, N<=1}>
+C  <B(PHI1,PHI2)-IN-EXACT-{K+M==PHI1, L+N==PHI2, K<=9+I, 1<=I, I<=K,
+C    I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1, 0<=1+N, N<=1}>
+C  <KERNEL(PHI1,PHI2)-IN-EXACT-{PHI1==M+1, PHI2==N+1, K<=9+I, 1<=I,
+C    I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ, 0<=1+M, M<=1, 0<=1+N,
+C    N<=1}>
+
+                        A(K,L) = A(K,L)+B(K+M,L+N)*KERNEL(M+1,N+1)      0018
+                     ENDDO
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=SZ, 1<=PHI2, PHI2<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=SZ}>
+
+
+      DO I = 1, SZ                                                      0026
+
+C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==I, 1<=PHI2, PHI2<=SZ, 1<=I, I<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=I, I<=SZ, 1<=SZ}>
+
+         DO J = 1, SZ                                                   0027
+
+C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=SZ, 1<=J,
+C    J<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=I, I<=SZ, 1<=J,
+C    J<=SZ}>
+
+            PRINT *, A(I,J)                                             0028
+         ENDDO
+      ENDDO
+      END
+      SUBROUTINE TILING(A,B,SZ)
+      
+      INTEGER A(1:SZ,1:SZ)
+      INTEGER B(0:SZ+1,0:SZ+1)
+      INTEGER KERNEL(0:2,0:2)
+      INTEGER T,SZ
+      PARAMETER (T=10)
+
+      IF (MOD(SZ, T).NE.0) RETURN                                       0009
+
+C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, PHI1<=SZ, 1<=PHI2, PHI2<=SZ,
+C    1<=SZ}>
+
+
+      DO I = 1, SZ, T                                                   0011
+
+C  <A(PHI1,PHI2)-OUT-MAY-{I<=PHI1, 1<=PHI1, PHI1<=9+I, PHI1<=SZ,
+C    1<=PHI2, PHI2<=SZ, 1<=I, I<=SZ}>
+
+         DO J = 1, SZ, T                                                0012
+
+C  <A(PHI1,PHI2)-OUT-MAY-{I<=PHI1, PHI1<=9+I, PHI1<=SZ, J<=PHI2,
+C    1<=PHI2, PHI2<=9+J, PHI2<=SZ, 1<=I, I<=SZ, 1<=J, J<=SZ}>
+
+            DO K = I, I+T-1                                             0013
+
+C  <A(PHI1,PHI2)-OUT-MAY-{K==PHI1, PHI1<=SZ, J<=PHI2, PHI2<=9+J,
+C    PHI2<=SZ, K<=9+I, 1<=I, I<=K, I<=SZ, 1<=J, J<=SZ}>
+
+               DO L = J, J+T-1                                          0014
+
+C  <A(PHI1,PHI2)-OUT-EXACT-{PHI1==K, PHI2==L, K<=9+I, 1<=I, I<=K,
+C    I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ}>
+
+                  A(K,L) = 0                                            0015
+
+C  <A(PHI1,PHI2)-OUT-MAY-{PHI1==K, PHI2==L, PHI1<=SZ, PHI2<=SZ,
+C    K<=9+I, 1<=I, I<=K, I<=SZ, L<=9+J, 1<=J, J<=L, J<=SZ}>
+
+                  DO M = -1, 1                                          0016
+
+C  <A(PHI1,PHI2)-OUT-MAY-{K==PHI1, L==PHI2, I<=PHI1, PHI1<=9+I,
+C    PHI1+9M<=9+SZ, J<=PHI2, PHI2<=9+J, PHI2+9M<=9+SZ, 1<=I, I<=SZ,
+C    1<=J, J<=SZ, 0<=1+M, M<=1}>
+
+                     DO N = -1, 1                                       0017
+
+C  <A(PHI1,PHI2)-OUT-MAY-{PHI1==K, PHI2==L, I<=PHI1, PHI1<=9+I,
+C    PHI1+9M+9N<=18+SZ, J<=PHI2, PHI2<=9+J, PHI2+9M+9N<=18+SZ, 1<=I,
+C    I<=SZ, 1<=J, J<=SZ, 0<=1+M, M<=1, 0<=1+N, N<=1}>
+
+                        A(K,L) = A(K,L)+B(K+M,L+N)*KERNEL(M+1,N+1)      0018
+                     ENDDO
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{PHI1==6, 1<=SZ}>
+
+
+      DO I = 1, SZ                                                      0026
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{PHI1==6, 1<=I, I<=SZ}>
+
+         DO J = 1, SZ                                                   0027
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{PHI1==6, 1<=I, I<=SZ, 1<=J,
+C    J<=SZ}>
+
+            PRINT *, A(I,J)                                             0028
+         ENDDO
+      ENDDO
+      END
+

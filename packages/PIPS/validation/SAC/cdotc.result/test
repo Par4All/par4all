@@ -1,0 +1,1466 @@
+      COMPLEX FUNCTION CDOTC(N,CX,INCX,CY,INCY)
+*     .. Scalar Arguments ..
+      INTEGER INCX,INCY,N
+*     ..
+*     .. Array Arguments ..
+      COMPLEX CX(*),CY(*)
+*     ..
+*
+*  Purpose
+*  =======
+*
+*     forms the dot product of two vectors, conjugating the first
+*     vector.
+*
+*  Further Details
+*  ===============
+*
+*     jack dongarra, linpack,  3/11/78.
+*     modified 12/3/93, array(1) declarations changed to array(*)
+*
+*     .. Local Scalars ..
+      COMPLEX CTEMP
+      INTEGER I,IX,IY
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC CONJG
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) RETURN                                                0030
+      IF (INCX.EQ.1.AND.INCY.EQ.1) GOTO 20                              0031
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+      IX = 1                                                            0036
+      IY = 1                                                            0037
+      IF (INCX.LT.0) IX = (-N+1)*INCX+1                                 0038
+      IF (INCY.LT.0) IY = (-N+1)*INCY+1                                 0039
+      DO 10 I = 1, N                                                    0040
+         CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                             0041
+         IX = IX+INCX                                                   0042
+         IY = IY+INCY                                                   0043
+10       CONTINUE                                                       0044
+      CDOTC = CTEMP                                                     0045
+      RETURN
+*
+*        code for both increments equal to 1
+*
+20    DO 30 I = 1, N                                                    0050
+         CTEMP = CTEMP+CONJG(CX(I))*CY(I)                               0051
+30       CONTINUE                                                       0052
+      CDOTC = CTEMP                                                     0053
+      END
+      COMPLEX FUNCTION CDOTC(N,CX,INCX,CY,INCY)
+*     .. Scalar Arguments ..
+      INTEGER INCX,INCY,N
+*     ..
+*     .. Array Arguments ..
+      COMPLEX CX(*),CY(*)
+*     ..
+*
+*  Purpose
+*  =======
+*
+*     forms the dot product of two vectors, conjugating the first
+*     vector.
+*
+*  Further Details
+*  ===============
+*
+*     jack dongarra, linpack,  3/11/78.
+*     modified 12/3/93, array(1) declarations changed to array(*)
+*
+*     .. Local Scalars ..
+      COMPLEX CTEMP
+      INTEGER I,IX,IY
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC CONJG
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) RETURN                                                0030
+      IF (INCX.EQ.1.AND.INCY.EQ.1) GOTO 20                              0031
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+      IX = 1                                                            0036
+      IY = 1                                                            0037
+      IF (INCX.LT.0) IX = (-N+1)*INCX+1                                 0038
+      IF (INCY.LT.0) IY = (-N+1)*INCY+1                                 0039
+      DO 10 I = 1, N                                                    0040
+         CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                             0041
+         IX = IX+INCX                                                   0042
+         IY = IY+INCY                                                   0043
+10       CONTINUE                                                       0044
+      CDOTC = CTEMP                                                     0045
+      RETURN
+*
+*        code for both increments equal to 1
+*
+20    DO 30 I = 1, N                                                    0050
+         CTEMP = CTEMP+CONJG(CX(I))*CY(I)                               0051
+30       CONTINUE                                                       0052
+      CDOTC = CTEMP                                                     0053
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER N, INCX, INCY, I, IX, IY
+      COMPLEX*8 CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       DO 30 I = 1, N                                                 0050
+            CTEMP = CTEMP+CONJG(CX(I))*CY(I)                            0051
+30          CONTINUE                                                    0052
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         IF (INCX.LT.0) IX = (-N+1)*INCX+1                              0038
+         IF (INCY.LT.0) IY = (-N+1)*INCY+1                              0039
+         DO 10 I = 1, N                                                 0040
+            CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                          0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+10          CONTINUE                                                    0044
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER N, INCX, INCY, I, IX, IY
+      COMPLEX*8 CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       DO 30 I = 1, N                                                 0050
+            CTEMP = CTEMP+CONJG(CX(I))*CY(I)                            0051
+30          CONTINUE                                                    0052
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         IF (INCX.LT.0) IX = (-N+1)*INCX+1                              0038
+         IF (INCY.LT.0) IY = (-N+1)*INCY+1                              0039
+         DO 10 I = 1, N                                                 0040
+            CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                          0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+10          CONTINUE                                                    0044
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER N, INCX, INCY, I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       DO 30 I = 1, N                                                 0050
+            CTEMP = CTEMP+CONJG(CX(I))*CY(I)                            0051
+30          CONTINUE                                                    0052
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+!$PIPS IF_TO_CONVERT
+         IF (L_0) IX = (-N+1)*INCX+1
+!$omp end parallel do
+         L_1 = INCY.LT.0
+!$PIPS IF_TO_CONVERT
+         IF (L_1) IY = (-N+1)*INCY+1
+!$omp end parallel do
+         DO 10 I = 1, N                                                 0040
+            CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                          0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+10          CONTINUE                                                    0044
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER N, INCX, INCY, I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       DO 30 I = 1, N                                                 0050
+            CTEMP = CTEMP+CONJG(CX(I))*CY(I)                            0051
+30          CONTINUE                                                    0052
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+!$PIPS IF_TO_CONVERT
+         IF (L_0) IX = (-N+1)*INCX+1
+!$omp end parallel do
+         L_1 = INCY.LT.0
+!$PIPS IF_TO_CONVERT
+         IF (L_1) IY = (-N+1)*INCY+1
+!$omp end parallel do
+         DO 10 I = 1, N                                                 0040
+            CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                          0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+10          CONTINUE                                                    0044
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER IY0, IX0, N, INCX, INCY, I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       DO 30 I = 1, N                                                 0050
+            CTEMP = CTEMP+CONJG(CX(I))*CY(I)                            0051
+30          CONTINUE                                                    0052
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+         IX0 = (-N+1)*INCX+1
+         IX = L_0?IX0:IX
+         L_1 = INCY.LT.0
+         IY0 = (-N+1)*INCY+1
+         IY = L_1?IY0:IY
+         DO 10 I = 1, N                                                 0040
+            CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                          0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+10          CONTINUE                                                    0044
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER IY0, IX0, N, INCX, INCY, I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       DO 30 I = 1, N                                                 0050
+            CTEMP = CTEMP+CONJG(CX(I))*CY(I)                            0051
+30          CONTINUE                                                    0052
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+         IX0 = (-N+1)*INCX+1
+         IX = L_0?IX0:IX
+         L_1 = INCY.LT.0
+         IY0 = (-N+1)*INCY+1
+         IY = L_1?IY0:IY
+         DO 10 I = 1, N                                                 0040
+            CTEMP = CTEMP+CONJG(CX(IX))*CY(IY)                          0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+10          CONTINUE                                                    0044
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER I_5, I_4, I_3, I_2, I_1, I_0, IY0, IX0, N, INCX, INCY, 
+     &I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       DO 30 I = 1, N                                                 0050
+            C_0 = CONJG(CX(I))
+            C_1 = C_0*CY(I)
+            CTEMP = CTEMP+C_1                                           0051
+30          CONTINUE                                                    0052
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+         I_0 = -N
+         I_1 = I_0+1
+         I_2 = I_1*INCX
+         IX0 = I_2+1
+         IX = L_0?IX0:IX
+         L_1 = INCY.LT.0
+         I_3 = -N
+         I_4 = I_3+1
+         I_5 = I_4*INCY
+         IY0 = I_5+1
+         IY = L_1?IY0:IY
+         DO 10 I = 1, N                                                 0040
+            C_2 = CONJG(CX(IX))
+            C_3 = C_2*CY(IY)
+            CTEMP = CTEMP+C_3                                           0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+10          CONTINUE                                                    0044
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I_5
+     &, I_4, I_3, I_2, I_1, I_0, IY0, IX0, N, INCX, INCY, I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_0 = CONJG(CX(LU_IND0+1))
+            C_1 = C_0*CY(LU_IND0+1)
+            CTEMP = CTEMP+C_1                                           0051
+99999       CONTINUE
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+1)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_1                                           0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+2)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_1                                           0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+3)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_1                                           0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+4))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+4)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_1                                           0051
+99998       CONTINUE
+         I = MAX0(LU_NUB0, 0)+1
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+         I_0 = -N
+         I_1 = I_0+1
+         I_2 = I_1*INCX
+         IX0 = I_2+1
+         IX = L_0?IX0:IX
+         L_1 = INCY.LT.0
+         I_3 = -N
+         I_4 = I_3+1
+         I_5 = I_4*INCY
+         IY0 = I_5+1
+         IY = L_1?IY0:IY
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_2 = CONJG(CX(IX))
+            C_3 = C_2*CY(IY)
+            CTEMP = CTEMP+C_3                                           0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_3                                           0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_3                                           0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_3                                           0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            CTEMP = CTEMP+C_3                                           0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+99996       CONTINUE
+         I = MAX0(LU_NUB1, 0)+1
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I_5
+     &, I_4, I_3, I_2, I_1, I_0, IY0, IX0, N, INCX, INCY, I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 RED3(0:3), RED2(0:0), RED1(0:3), RED0(0:0), C_3, C_2
+     &, C_1, C_0, CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         RED0(0) = (0.000000, 0.000000)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_0 = CONJG(CX(LU_IND0+1))
+            C_1 = C_0*CY(LU_IND0+1)
+            RED0(0) = RED0(0)+C_1                                       0051
+99999       CONTINUE
+         CTEMP = RED0(0)+CTEMP
+         RED1(0) = (0.000000, 0.000000)
+         RED1(1) = (0.000000, 0.000000)
+         RED1(2) = (0.000000, 0.000000)
+         RED1(3) = (0.000000, 0.000000)
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+1)
+c SIMD_COMMENT_2
+            RED1(0) = RED1(0)+C_1                                       0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+2)
+c SIMD_COMMENT_2
+            RED1(1) = RED1(1)+C_1                                       0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+3)
+c SIMD_COMMENT_2
+            RED1(2) = RED1(2)+C_1                                       0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+4))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+4)
+c SIMD_COMMENT_2
+            RED1(3) = RED1(3)+C_1                                       0051
+99998       CONTINUE
+         CTEMP = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP
+         I = MAX0(LU_NUB0, 0)+1
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+         I_0 = -N
+         I_1 = I_0+1
+         I_2 = I_1*INCX
+         IX0 = I_2+1
+         IX = L_0?IX0:IX
+         L_1 = INCY.LT.0
+         I_3 = -N
+         I_4 = I_3+1
+         I_5 = I_4*INCY
+         IY0 = I_5+1
+         IY = L_1?IY0:IY
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         RED2(0) = (0.000000, 0.000000)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_2 = CONJG(CX(IX))
+            C_3 = C_2*CY(IY)
+            RED2(0) = RED2(0)+C_3                                       0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         CTEMP = RED2(0)+CTEMP
+         RED3(0) = (0.000000, 0.000000)
+         RED3(1) = (0.000000, 0.000000)
+         RED3(2) = (0.000000, 0.000000)
+         RED3(3) = (0.000000, 0.000000)
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(0) = RED3(0)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(1) = RED3(1)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(2) = RED3(2)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(3) = RED3(3)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+99996       CONTINUE
+         CTEMP = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP
+         I = MAX0(LU_NUB1, 0)+1
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I_5
+     &, I_4, I_3, I_2, I_1, I_0, IY0, IX0, N, INCX, INCY, I, IX, IY
+      LOGICAL L_1, L_0
+      COMPLEX*8 RED3(0:3), RED2(0:0), RED1(0:3), RED0(0:0), C_3, C_2
+     &, C_1, C_0, CX(1:*), CY(1:*), CTEMP
+*     ..
+      CTEMP = (0.0, 0.0)                                                0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         RED0(0) = (0.000000, 0.000000)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_0 = CONJG(CX(LU_IND0+1))
+            C_1 = C_0*CY(LU_IND0+1)
+            RED0(0) = RED0(0)+C_1                                       0051
+99999       CONTINUE
+         CTEMP = RED0(0)+CTEMP
+         RED1(0) = (0.000000, 0.000000)
+         RED1(1) = (0.000000, 0.000000)
+         RED1(2) = (0.000000, 0.000000)
+         RED1(3) = (0.000000, 0.000000)
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+1)
+c SIMD_COMMENT_2
+            RED1(0) = RED1(0)+C_1                                       0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+2)
+c SIMD_COMMENT_2
+            RED1(1) = RED1(1)+C_1                                       0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+3)
+c SIMD_COMMENT_2
+            RED1(2) = RED1(2)+C_1                                       0051
+c SIMD_COMMENT_0
+            C_0 = CONJG(CX(LU_IND0+4))
+c SIMD_COMMENT_1
+            C_1 = C_0*CY(LU_IND0+4)
+c SIMD_COMMENT_2
+            RED1(3) = RED1(3)+C_1                                       0051
+99998       CONTINUE
+         CTEMP = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP
+         CDOTC = CTEMP                                                  0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX = 1                                                         0036
+         IY = 1                                                         0037
+         L_0 = INCX.LT.0
+         I_0 = -N
+         I_1 = I_0+1
+         I_2 = I_1*INCX
+         IX0 = I_2+1
+         IX = L_0?IX0:IX
+         L_1 = INCY.LT.0
+         I_3 = -N
+         I_4 = I_3+1
+         I_5 = I_4*INCY
+         IY0 = I_5+1
+         IY = L_1?IY0:IY
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         RED2(0) = (0.000000, 0.000000)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_2 = CONJG(CX(IX))
+            C_3 = C_2*CY(IY)
+            RED2(0) = RED2(0)+C_3                                       0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         CTEMP = RED2(0)+CTEMP
+         RED3(0) = (0.000000, 0.000000)
+         RED3(1) = (0.000000, 0.000000)
+         RED3(2) = (0.000000, 0.000000)
+         RED3(3) = (0.000000, 0.000000)
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(0) = RED3(0)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(1) = RED3(1)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(2) = RED3(2)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+c SIMD_COMMENT_0
+            C_2 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_3 = C_2*CY(IY)
+c SIMD_COMMENT_2
+            RED3(3) = RED3(3)+C_3                                       0041
+c SIMD_COMMENT_3
+            IX = IX+INCX                                                0042
+c SIMD_COMMENT_4
+            IY = IY+INCY                                                0043
+99996       CONTINUE
+         CTEMP = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP
+         CDOTC = CTEMP                                                  0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER IX4, IY4, I_00, I_10, I_20, IX00, I_30, I_40, I_50, 
+     &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_5, I_4, I_3, I_2, I_1, I_0, IY0, 
+     &IX0, N, INCX, INCY, I, IX, IY
+      LOGICAL L_00, L_10, L_1, L_0
+      COMPLEX*8 CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, 
+     &C_01, C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33
+     &, C_22, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0
+     &:0), RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*)
+     &, CTEMP
+*     ..
+      CTEMP4 = (0.0, 0.0)                                               0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         RED0(0) = (0.000000, 0.000000)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_04 = CONJG(CX(LU_IND0+1))
+            C_14 = C_04*CY(LU_IND0+1)
+            RED0(0) = RED0(0)+C_14                                      0051
+99999       CONTINUE
+         CTEMP3 = RED0(0)+CTEMP4
+         RED1(0) = (0.000000, 0.000000)
+         RED1(1) = (0.000000, 0.000000)
+         RED1(2) = (0.000000, 0.000000)
+         RED1(3) = (0.000000, 0.000000)
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            C_03 = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_1
+            C_13 = C_03*CY(LU_IND0+1)
+c SIMD_COMMENT_2
+            RED1(0) = RED1(0)+C_13                                      0051
+c SIMD_COMMENT_0
+            C_02 = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_1
+            C_12 = C_02*CY(LU_IND0+2)
+c SIMD_COMMENT_2
+            RED1(1) = RED1(1)+C_12                                      0051
+c SIMD_COMMENT_0
+            C_01 = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_1
+            C_11 = C_01*CY(LU_IND0+3)
+c SIMD_COMMENT_2
+            RED1(2) = RED1(2)+C_11                                      0051
+c SIMD_COMMENT_0
+            C_00 = CONJG(CX(LU_IND0+4))
+c SIMD_COMMENT_1
+            C_10 = C_00*CY(LU_IND0+4)
+c SIMD_COMMENT_2
+            RED1(3) = RED1(3)+C_10                                      0051
+99998       CONTINUE
+         CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
+         CDOTC = CTEMP2                                                 0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX4 = 1                                                        0036
+         IY4 = 1                                                        0037
+         L_00 = INCX.LT.0
+         I_00 = -N
+         I_10 = I_00+1
+         I_20 = I_10*INCX
+         IX00 = I_20+1
+         IX = L_00?IX00:IX4
+         L_10 = INCY.LT.0
+         I_30 = -N
+         I_40 = I_30+1
+         I_50 = I_40*INCY
+         IY00 = I_50+1
+         IY = L_10?IY00:IY4
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         RED2(0) = (0.000000, 0.000000)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_24 = CONJG(CX(IX))
+            C_34 = C_24*CY(IY)
+            RED2(0) = RED2(0)+C_34                                      0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         CTEMP1 = RED2(0)+CTEMP4
+         RED3(0) = (0.000000, 0.000000)
+         RED3(1) = (0.000000, 0.000000)
+         RED3(2) = (0.000000, 0.000000)
+         RED3(3) = (0.000000, 0.000000)
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_23 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_33 = C_23*CY(IY)
+c SIMD_COMMENT_2
+            RED3(0) = RED3(0)+C_33                                      0041
+c SIMD_COMMENT_3
+            IX3 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY3 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_22 = CONJG(CX(IX3))
+c SIMD_COMMENT_1
+            C_32 = C_22*CY(IY3)
+c SIMD_COMMENT_2
+            RED3(1) = RED3(1)+C_32                                      0041
+c SIMD_COMMENT_3
+            IX2 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY2 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_21 = CONJG(CX(IX2))
+c SIMD_COMMENT_1
+            C_31 = C_21*CY(IY2)
+c SIMD_COMMENT_2
+            RED3(2) = RED3(2)+C_31                                      0041
+c SIMD_COMMENT_3
+            IX1 = IX2+INCX                                              0042
+c SIMD_COMMENT_4
+            IY1 = IY2+INCY                                              0043
+c SIMD_COMMENT_0
+            C_20 = CONJG(CX(IX1))
+c SIMD_COMMENT_1
+            C_30 = C_20*CY(IY1)
+c SIMD_COMMENT_2
+            RED3(3) = RED3(3)+C_30                                      0041
+c SIMD_COMMENT_3
+            IX = IX1+INCX                                               0042
+c SIMD_COMMENT_4
+            IY = IY1+INCY                                               0043
+99996       CONTINUE
+         CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
+         CDOTC = CTEMP0                                                 0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER IX4, IY4, I_00, I_10, I_20, IX00, I_30, I_40, I_50, 
+     &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_5, I_4, I_3, I_2, I_1, I_0, IY0, 
+     &IX0, N, INCX, INCY, I, IX, IY
+      INTEGER*8 v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), 
+     &v2di_vec6(0:1), v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1)
+     &, v2di_vec2(0:1), v2di_vec1(0:1), v2di_vec0(0:1)
+      LOGICAL L_00, L_10, L_1, L_0
+      COMPLEX*8 aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(
+     &0:1), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01
+     &, C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, 
+     &C_22, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0
+     &), RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
+     &CTEMP
+*     ..
+      CTEMP4 = (0.0, 0.0)                                               0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         RED0(0) = (0.000000, 0.000000)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_04 = CONJG(CX(LU_IND0+1))
+            C_14 = C_04*CY(LU_IND0+1)
+            RED0(0) = RED0(0)+C_14                                      0051
+99999       CONTINUE
+         CTEMP3 = RED0(0)+CTEMP4
+         RED1(0) = (0.000000, 0.000000)
+         RED1(1) = (0.000000, 0.000000)
+         RED1(2) = (0.000000, 0.000000)
+         RED1(3) = (0.000000, 0.000000)
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            aligned(0) = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_0
+            aligned(1) = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_0
+            aligned1(0) = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_0
+            aligned1(1) = CONJG(CX(LU_IND0+4))
+            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
+            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
+            CALL SIMD_SAVE_V2DI(v2di_vec0, aligned0(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
+            CALL SIMD_SAVE_V2DI(v2di_vec3, aligned2(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
+            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
+99998       CONTINUE
+         CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
+         CDOTC = CTEMP2                                                 0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX4 = 1                                                        0036
+         IY4 = 1                                                        0037
+         L_00 = INCX.LT.0
+         I_00 = -N
+         I_10 = I_00+1
+         I_20 = I_10*INCX
+         IX00 = I_20+1
+         IX = L_00?IX00:IX4
+         L_10 = INCY.LT.0
+         I_30 = -N
+         I_40 = I_30+1
+         I_50 = I_40*INCY
+         IY00 = I_50+1
+         IY = L_10?IY00:IY4
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         RED2(0) = (0.000000, 0.000000)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_24 = CONJG(CX(IX))
+            C_34 = C_24*CY(IY)
+            RED2(0) = RED2(0)+C_34                                      0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         CTEMP1 = RED2(0)+CTEMP4
+         RED3(0) = (0.000000, 0.000000)
+         RED3(1) = (0.000000, 0.000000)
+         RED3(2) = (0.000000, 0.000000)
+         RED3(3) = (0.000000, 0.000000)
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_23 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_33 = C_23*CY(IY)
+c SIMD_COMMENT_2
+            RED3(0) = RED3(0)+C_33                                      0041
+c SIMD_COMMENT_3
+            IX3 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY3 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_22 = CONJG(CX(IX3))
+c SIMD_COMMENT_1
+            C_32 = C_22*CY(IY3)
+c SIMD_COMMENT_2
+            RED3(1) = RED3(1)+C_32                                      0041
+c SIMD_COMMENT_3
+            IX2 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY2 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_21 = CONJG(CX(IX2))
+c SIMD_COMMENT_1
+            C_31 = C_21*CY(IY2)
+c SIMD_COMMENT_2
+            RED3(2) = RED3(2)+C_31                                      0041
+c SIMD_COMMENT_3
+            IX1 = IX2+INCX                                              0042
+c SIMD_COMMENT_4
+            IY1 = IY2+INCY                                              0043
+c SIMD_COMMENT_0
+            C_20 = CONJG(CX(IX1))
+c SIMD_COMMENT_1
+            C_30 = C_20*CY(IY1)
+c SIMD_COMMENT_2
+            RED3(3) = RED3(3)+C_30                                      0041
+c SIMD_COMMENT_3
+            IX = IX1+INCX                                               0042
+c SIMD_COMMENT_4
+            IY = IY1+INCY                                               0043
+99996       CONTINUE
+         CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
+         CDOTC = CTEMP0                                                 0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER IX4, IY4, I_00, I_10, I_20, IX00, I_30, I_40, I_50, 
+     &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_5, I_4, I_3, I_2, I_1, I_0, IY0, 
+     &IX0, N, INCX, INCY, I, IX, IY
+      INTEGER*8 v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), 
+     &v2di_vec6(0:1), v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1)
+     &, v2di_vec2(0:1), v2di_vec1(0:1), v2di_vec0(0:1)
+      LOGICAL L_00, L_10, L_1, L_0
+      COMPLEX*8 aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(
+     &0:1), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01
+     &, C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, 
+     &C_22, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0
+     &), RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
+     &CTEMP
+*     ..
+      CTEMP4 = (0.0, 0.0)                                               0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         RED0(0) = (0.000000, 0.000000)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_04 = CONJG(CX(LU_IND0+1))
+            C_14 = C_04*CY(LU_IND0+1)
+            RED0(0) = RED0(0)+C_14                                      0051
+99999       CONTINUE
+         CTEMP3 = RED0(0)+CTEMP4
+         RED1(0) = (0.000000, 0.000000)
+         RED1(1) = (0.000000, 0.000000)
+         RED1(2) = (0.000000, 0.000000)
+         RED1(3) = (0.000000, 0.000000)
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            aligned(0) = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_0
+            aligned(1) = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_0
+            aligned1(0) = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_0
+            aligned1(1) = CONJG(CX(LU_IND0+4))
+            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
+            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
+            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
+            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
+            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
+99998       CONTINUE
+         CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
+         CDOTC = CTEMP2                                                 0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX4 = 1                                                        0036
+         IY4 = 1                                                        0037
+         L_00 = INCX.LT.0
+         I_00 = -N
+         I_10 = I_00+1
+         I_20 = I_10*INCX
+         IX00 = I_20+1
+         IX = L_00?IX00:IX4
+         L_10 = INCY.LT.0
+         I_30 = -N
+         I_40 = I_30+1
+         I_50 = I_40*INCY
+         IY00 = I_50+1
+         IY = L_10?IY00:IY4
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         RED2(0) = (0.000000, 0.000000)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_24 = CONJG(CX(IX))
+            C_34 = C_24*CY(IY)
+            RED2(0) = RED2(0)+C_34                                      0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         CTEMP1 = RED2(0)+CTEMP4
+         RED3(0) = (0.000000, 0.000000)
+         RED3(1) = (0.000000, 0.000000)
+         RED3(2) = (0.000000, 0.000000)
+         RED3(3) = (0.000000, 0.000000)
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_23 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_33 = C_23*CY(IY)
+c SIMD_COMMENT_2
+            RED3(0) = RED3(0)+C_33                                      0041
+c SIMD_COMMENT_3
+            IX3 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY3 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_22 = CONJG(CX(IX3))
+c SIMD_COMMENT_1
+            C_32 = C_22*CY(IY3)
+c SIMD_COMMENT_2
+            RED3(1) = RED3(1)+C_32                                      0041
+c SIMD_COMMENT_3
+            IX2 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY2 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_21 = CONJG(CX(IX2))
+c SIMD_COMMENT_1
+            C_31 = C_21*CY(IY2)
+c SIMD_COMMENT_2
+            RED3(2) = RED3(2)+C_31                                      0041
+c SIMD_COMMENT_3
+            IX1 = IX2+INCX                                              0042
+c SIMD_COMMENT_4
+            IY1 = IY2+INCY                                              0043
+c SIMD_COMMENT_0
+            C_20 = CONJG(CX(IX1))
+c SIMD_COMMENT_1
+            C_30 = C_20*CY(IY1)
+c SIMD_COMMENT_2
+            RED3(3) = RED3(3)+C_30                                      0041
+c SIMD_COMMENT_3
+            IX = IX1+INCX                                               0042
+c SIMD_COMMENT_4
+            IY = IY1+INCY                                               0043
+99996       CONTINUE
+         CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
+         CDOTC = CTEMP0                                                 0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER IX4, IY4, I_00, I_10, I_20, IX00, I_30, I_40, I_50, 
+     &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, I_5, I_4, I_3, I_2, I_1, I_0, IY0, 
+     &IX0, N, INCX, INCY, I, IX, IY
+      INTEGER*8 v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), 
+     &v2di_vec6(0:1), v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1)
+     &, v2di_vec2(0:1), v2di_vec1(0:1), v2di_vec0(0:1)
+      LOGICAL L_00, L_10, L_1, L_0
+      COMPLEX*8 aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(
+     &0:1), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01
+     &, C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, 
+     &C_22, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0
+     &), RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
+     &CTEMP
+*     ..
+      CTEMP4 = (0.0, 0.0)                                               0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         RED0(0) = (0.000000, 0.000000)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_04 = CONJG(CX(LU_IND0+1))
+            C_14 = C_04*CY(LU_IND0+1)
+            RED0(0) = RED0(0)+C_14                                      0051
+99999       CONTINUE
+         CTEMP3 = RED0(0)+CTEMP4
+         RED1(0) = (0.000000, 0.000000)
+         RED1(1) = (0.000000, 0.000000)
+         RED1(2) = (0.000000, 0.000000)
+         RED1(3) = (0.000000, 0.000000)
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            aligned(0) = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_0
+            aligned(1) = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_0
+            aligned1(0) = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_0
+            aligned1(1) = CONJG(CX(LU_IND0+4))
+            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
+            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
+            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
+            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
+            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
+99998       CONTINUE
+         CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
+         CDOTC = CTEMP2                                                 0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX4 = 1                                                        0036
+         IY4 = 1                                                        0037
+         L_00 = INCX.LT.0
+         I_00 = -N
+         I_10 = I_00+1
+         I_20 = I_10*INCX
+         IX00 = I_20+1
+         IX = L_00?IX00:IX4
+         L_10 = INCY.LT.0
+         I_30 = -N
+         I_40 = I_30+1
+         I_50 = I_40*INCY
+         IY00 = I_50+1
+         IY = L_10?IY00:IY4
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         RED2(0) = (0.000000, 0.000000)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_24 = CONJG(CX(IX))
+            C_34 = C_24*CY(IY)
+            RED2(0) = RED2(0)+C_34                                      0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         CTEMP1 = RED2(0)+CTEMP4
+         RED3(0) = (0.000000, 0.000000)
+         RED3(1) = (0.000000, 0.000000)
+         RED3(2) = (0.000000, 0.000000)
+         RED3(3) = (0.000000, 0.000000)
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_23 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_33 = C_23*CY(IY)
+c SIMD_COMMENT_2
+            RED3(0) = RED3(0)+C_33                                      0041
+c SIMD_COMMENT_3
+            IX3 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY3 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_22 = CONJG(CX(IX3))
+c SIMD_COMMENT_1
+            C_32 = C_22*CY(IY3)
+c SIMD_COMMENT_2
+            RED3(1) = RED3(1)+C_32                                      0041
+c SIMD_COMMENT_3
+            IX2 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY2 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_21 = CONJG(CX(IX2))
+c SIMD_COMMENT_1
+            C_31 = C_21*CY(IY2)
+c SIMD_COMMENT_2
+            RED3(2) = RED3(2)+C_31                                      0041
+c SIMD_COMMENT_3
+            IX1 = IX2+INCX                                              0042
+c SIMD_COMMENT_4
+            IY1 = IY2+INCY                                              0043
+c SIMD_COMMENT_0
+            C_20 = CONJG(CX(IX1))
+c SIMD_COMMENT_1
+            C_30 = C_20*CY(IY1)
+c SIMD_COMMENT_2
+            RED3(3) = RED3(3)+C_30                                      0041
+c SIMD_COMMENT_3
+            IX = IX1+INCX                                               0042
+c SIMD_COMMENT_4
+            IY = IY1+INCY                                               0043
+99996       CONTINUE
+         CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
+         CDOTC = CTEMP0                                                 0045
+      ENDIF
+      END
+      COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
+      INTEGER IX4, IY4, I_00, I_10, I_20, IX00, I_30, I_40, I_50, 
+     &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
+     &LU_IND0, LU_IB0, LU_NUB0, N, INCX, INCY, IX, IY
+      INTEGER*8 v2di_vec8(0:1), v2di_vec6(0:1), v2di_vec5(0:1), 
+     &v2di_vec4(0:1), v2di_vec3(0:1), v2di_vec2(0:1), v2di_vec1(0:1)
+     &, v2di_vec0(0:1)
+      LOGICAL L_00, L_10
+      COMPLEX*8 aligned1(0:1), aligned(0:1), CTEMP4, C_04, C_14, 
+     &CTEMP3, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, C_22, C_32, 
+     &C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0), RED1(0:3)
+     &, RED0(0:0), CX(1:*), CY(1:*)
+*     ..
+      CTEMP4 = (0.0, 0.0)                                               0028
+      CDOTC = (0.0, 0.0)                                                0029
+      IF (N.LE.0) THEN                                                  0030
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+*
+*        code for both increments equal to 1
+*
+20       LU_NUB0 = N
+         LU_IB0 = MOD(LU_NUB0, 4)
+         RED0(0) = (0.000000, 0.000000)
+         DO 99999 LU_IND0 = 0, LU_IB0-1
+            C_04 = CONJG(CX(LU_IND0+1))
+            C_14 = C_04*CY(LU_IND0+1)
+            RED0(0) = RED0(0)+C_14                                      0051
+99999       CONTINUE
+         CTEMP3 = RED0(0)+CTEMP4
+         RED1(0) = (0.000000, 0.000000)
+         RED1(1) = (0.000000, 0.000000)
+         RED1(2) = (0.000000, 0.000000)
+         RED1(3) = (0.000000, 0.000000)
+         DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+c SIMD_COMMENT_0
+            aligned(0) = CONJG(CX(LU_IND0+1))
+c SIMD_COMMENT_0
+            aligned(1) = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_0
+            aligned1(0) = CONJG(CX(LU_IND0+3))
+c SIMD_COMMENT_0
+            aligned1(1) = CONJG(CX(LU_IND0+4))
+            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
+            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
+            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
+            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
+            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
+99998       CONTINUE
+         CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
+         CDOTC = CTEMP2                                                 0053
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         IX4 = 1                                                        0036
+         IY4 = 1                                                        0037
+         L_00 = INCX.LT.0
+         I_00 = -N
+         I_10 = I_00+1
+         I_20 = I_10*INCX
+         IX00 = I_20+1
+         IX = L_00?IX00:IX4
+         L_10 = INCY.LT.0
+         I_30 = -N
+         I_40 = I_30+1
+         I_50 = I_40*INCY
+         IY00 = I_50+1
+         IY = L_10?IY00:IY4
+         LU_NUB1 = N
+         LU_IB1 = MOD(LU_NUB1, 4)
+         RED2(0) = (0.000000, 0.000000)
+         DO 99997 LU_IND1 = 0, LU_IB1-1
+            C_24 = CONJG(CX(IX))
+            C_34 = C_24*CY(IY)
+            RED2(0) = RED2(0)+C_34                                      0041
+            IX = IX+INCX                                                0042
+            IY = IY+INCY                                                0043
+99997       CONTINUE
+         CTEMP1 = RED2(0)+CTEMP4
+         RED3(0) = (0.000000, 0.000000)
+         RED3(1) = (0.000000, 0.000000)
+         RED3(2) = (0.000000, 0.000000)
+         RED3(3) = (0.000000, 0.000000)
+         DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+c SIMD_COMMENT_0
+            C_23 = CONJG(CX(IX))
+c SIMD_COMMENT_1
+            C_33 = C_23*CY(IY)
+c SIMD_COMMENT_2
+            RED3(0) = RED3(0)+C_33                                      0041
+c SIMD_COMMENT_3
+            IX3 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY3 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_22 = CONJG(CX(IX3))
+c SIMD_COMMENT_1
+            C_32 = C_22*CY(IY3)
+c SIMD_COMMENT_2
+            RED3(1) = RED3(1)+C_32                                      0041
+c SIMD_COMMENT_3
+            IX2 = IX3+INCX                                              0042
+c SIMD_COMMENT_4
+            IY2 = IY3+INCY                                              0043
+c SIMD_COMMENT_0
+            C_21 = CONJG(CX(IX2))
+c SIMD_COMMENT_1
+            C_31 = C_21*CY(IY2)
+c SIMD_COMMENT_2
+            RED3(2) = RED3(2)+C_31                                      0041
+c SIMD_COMMENT_3
+            IX1 = IX2+INCX                                              0042
+c SIMD_COMMENT_4
+            IY1 = IY2+INCY                                              0043
+c SIMD_COMMENT_0
+            C_20 = CONJG(CX(IX1))
+c SIMD_COMMENT_1
+            C_30 = C_20*CY(IY1)
+c SIMD_COMMENT_2
+            RED3(3) = RED3(3)+C_30                                      0041
+c SIMD_COMMENT_3
+            IX = IX1+INCX                                               0042
+c SIMD_COMMENT_4
+            IY = IY1+INCY                                               0043
+99996       CONTINUE
+         CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
+         CDOTC = CTEMP0                                                 0045
+      ENDIF
+      END
+

@@ -401,14 +401,14 @@ digraph "freia_04_helper_0_0" {
   // computation vertices
   "33 +" [shape=trapezium,orientation=270];
   "33 +" -> "o";
-  "31 vol" [shape=diamond];
-  "29 thr" [shape=parallelogram];
-  "29 thr" -> "33 +" [label="t3"];
-  "29 thr" -> "31 vol" [label="t3"];
   "32 min" [shape=diamond];
   "30 thr" [shape=parallelogram];
   "30 thr" -> "33 +" [label="t4"];
   "30 thr" -> "32 min" [label="t4"];
+  "31 vol" [shape=diamond];
+  "29 thr" [shape=parallelogram];
+  "29 thr" -> "33 +" [label="t3"];
+  "29 thr" -> "31 vol" [label="t3"];
   "28 -" [shape=trapezium,orientation=270];
   "28 -" -> "29 thr" [label="t2"];
   "26 E8" [shape=box];
@@ -461,7 +461,9 @@ freia_status freia_04_helper_0_0(
   const int32_t y_3 = 0;
   terapix_mcu_instr mcu_instr[8];
 
-  // imagelet definitions...
+  // imagelets definitions:
+  // - 3 computation imagelets
+  // - 1 double buffer imagelets
   int imagelet_size = 255;
   int imagelet_1 = 0;
   int imagelet_2 = 255;
@@ -519,10 +521,10 @@ freia_status freia_04_helper_0_0(
   mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[2].macrocode.iter2 = imagelet_size;
   mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_SUB;
-  // 3: thr(3) -> 3
-  mcu_instr[3].macrocode.xmin1 = imagelet_3;
+  // 3: thr(2) -> 2
+  mcu_instr[3].macrocode.xmin1 = imagelet_2;
   mcu_instr[3].macrocode.ymin1 = 0;
-  mcu_instr[3].macrocode.xmin2 = imagelet_3;
+  mcu_instr[3].macrocode.xmin2 = imagelet_2;
   mcu_instr[3].macrocode.ymin2 = 0;
   // copy of operation 3 parameters
   p_3[0] = pi3;
@@ -539,30 +541,30 @@ freia_status freia_04_helper_0_0(
   mcu_instr[3].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[3].macrocode.iter2 = imagelet_size;
   mcu_instr[3].macrocode.addrStart = TERAPIX_UCODE_THRESHOLD;
-  // set measure min at 1023
-  // 4: min(3)
-  mcu_instr[4].macrocode.xmin1 = imagelet_3;
+  // set measure vol at 1022
+  // 4: vol(2)
+  mcu_instr[4].macrocode.xmin1 = imagelet_2;
   mcu_instr[4].macrocode.ymin1 = 0;
   mcu_instr[4].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[4].macrocode.iter2 = imagelet_size;
-  mcu_instr[4].macrocode.addrStart = TERAPIX_UCODE_MIN?;
-  // 5: thr(2) -> 2
-  mcu_instr[5].macrocode.xmin1 = imagelet_2;
+  mcu_instr[4].macrocode.addrStart = TERAPIX_UCODE_VOL?;
+  // 5: thr(3) -> 3
+  mcu_instr[5].macrocode.xmin1 = imagelet_3;
   mcu_instr[5].macrocode.ymin1 = 0;
-  mcu_instr[5].macrocode.xmin2 = imagelet_2;
+  mcu_instr[5].macrocode.xmin2 = imagelet_3;
   mcu_instr[5].macrocode.ymin2 = 0;
   mcu_instr[5].macrocode.xmin3 = x_3;
   mcu_instr[5].macrocode.ymin3 = y_3;
   mcu_instr[5].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[5].macrocode.iter2 = imagelet_size;
   mcu_instr[5].macrocode.addrStart = TERAPIX_UCODE_THRESHOLD;
-  // set measure vol at 1021
-  // 6: vol(2)
-  mcu_instr[6].macrocode.xmin1 = imagelet_2;
+  // set measure min at 1021
+  // 6: min(3)
+  mcu_instr[6].macrocode.xmin1 = imagelet_3;
   mcu_instr[6].macrocode.ymin1 = 0;
   mcu_instr[6].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[6].macrocode.iter2 = imagelet_size;
-  mcu_instr[6].macrocode.addrStart = TERAPIX_UCODE_VOL?;
+  mcu_instr[6].macrocode.addrStart = TERAPIX_UCODE_MIN?;
   // 7: +(2,3) -> 1
   mcu_instr[7].macrocode.xmin1 = imagelet_2;
   mcu_instr[7].macrocode.ymin1 = 0;
@@ -591,8 +593,8 @@ freia_status freia_04_helper_0_0(
 
   ret = freia_cg_template_process_1i_1o(&param, o0, i0);
 
-  // get measure min result from 1023
-  // get measure vol result from 1021
+  // get measure vol result from 1022
+  // get measure min result from 1021
 
   return ret;
 }
@@ -617,7 +619,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // v  = vol(t3)
    // m  = min(t4)
    // o  = t4 + t3
-   freia_04_helper_0_0(o, i, k, inf, sup, bin, m, v);                   /*0026*/
+   freia_04_helper_0_0(o, i, k, inf, sup, bin, v, m);                   /*0026*/
    
    
    return FREIA_OK;                                                     /*0041*/

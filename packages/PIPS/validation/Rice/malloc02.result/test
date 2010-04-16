@@ -123,9 +123,9 @@ void malloc02()
 	07 --> 07 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 	07 --> 07 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
-	07 --> 07 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1
+	07 --> 07 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
 

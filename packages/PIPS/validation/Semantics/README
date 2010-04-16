@@ -126,3 +126,5 @@ conv-cpu-rk:
 while08:
 
  * the information about i==8 and n==0 is found but not always simplified; it is encoded as 64<=8i+8n<=72 and 8i+7n<=64 and n>=0
+
+loop03: interference between privatization and preconditions and parallelization

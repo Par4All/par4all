@@ -1,10 +1,10 @@
-      SUBROUTINE TILING(SZ,A,B)
+      SUBROUTINE TILING(A,B)
       
-      INTEGER A(1:SZ,1:SZ)
-      INTEGER B(0:SZ,0:SZ)
-      INTEGER kernel(0:2,0:2)
       INTEGER T,SZ
-      PARAMETER (T=10)
+      PARAMETER (T=10,SZ=100)
+      INTEGER A(1:SZ,1:SZ)
+      INTEGER B(0:SZ+1,0:SZ+1)
+      INTEGER kernel(0:2,0:2)
 
       DO i=1,SZ,T
         DO j=1,SZ,T
@@ -22,9 +22,9 @@
       ENDDO
 
       DO i=1,SZ
-      DO j=1,SZ
+        DO j=1,SZ
           print *,A(i,j)
-      ENDDO
+        ENDDO
       ENDDO
 
       END

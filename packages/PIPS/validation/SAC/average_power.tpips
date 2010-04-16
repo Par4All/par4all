@@ -5,10 +5,7 @@ create $WS $WS.c include/SIMD.c
 
 module average_power
 
-display PRINTED_FILE
-
-apply SPLIT_UPDATE_OPERATOR
-
+setproperty SIMDIZER_COMMUTATIVE_OPERATORS "SIMD_MULPS,SIMD_ADDPS,SIMD_MULPD,SIMD_ADDPD"
 source include/benchmark.tpips.h
 
 apply UNSPLIT
