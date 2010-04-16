@@ -561,7 +561,7 @@ void set_methods_for_inout_effects_prettyprint(string module_name __attribute__ 
 void reset_methods_for_effects_prettyprint(string module_name __attribute__ ((unused)))
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
-    effect_prettyprint_func = (generic_prettyprint_function) abort;
+    effect_prettyprint_func = (void (*) (effect)) abort;
     effects_to_text_func = (generic_text_function) abort;
     reset_action_interpretation();
 }

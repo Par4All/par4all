@@ -40,6 +40,7 @@
 #include "misc.h"
 
 #include "ri-util.h"
+#include "alias-classes.h"
 
 /* API for reference */
 

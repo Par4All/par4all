@@ -261,9 +261,9 @@ simple_effects_to_text(
 
     /* We sort the list of effects in lexicographic order */
      if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) 
-	 gen_sort_list(sefs_list, compare_effect_reference_in_common);
+	 gen_sort_list(sefs_list, (gen_cmp_func_t)compare_effect_reference_in_common);
      else 
-	 gen_sort_list(sefs_list, compare_effect_reference);
+	 gen_sort_list(sefs_list, (gen_cmp_func_t)compare_effect_reference);
   
     /* Walk through all the effects */
     for(ce = sefs_list; !ENDP(ce); POP(ce)) 

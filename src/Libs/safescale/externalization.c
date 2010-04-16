@@ -31,6 +31,7 @@ static char vcid[] = "$Id$";
 
 
 #include "safescale.h"
+#include "preprocessor.h"
 extern bool prettyprint_is_fortran;
 
 
@@ -286,10 +287,10 @@ static boolean internal_compute_distribution_context(statement externalized_code
   l_in = regions_dup(load_statement_in_regions(externalized_code));
   l_out = regions_dup(load_statement_out_regions(externalized_code));
 
-  gen_sort_list(l_in, compare_effect_reference);
-  gen_sort_list(l_out, compare_effect_reference);
-  gen_sort_list(l_params, compare_effect_reference);
-  gen_sort_list(l_priv, compare_effect_reference);
+  gen_sort_list(l_in, (gen_cmp_func_t)compare_effect_reference);
+  gen_sort_list(l_out, (gen_cmp_func_t)compare_effect_reference);
+  gen_sort_list(l_params, (gen_cmp_func_t)compare_effect_reference);
+  gen_sort_list(l_priv, (gen_cmp_func_t)compare_effect_reference);
 
   ifdebug(2)
   {

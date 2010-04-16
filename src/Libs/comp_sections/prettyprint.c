@@ -392,11 +392,12 @@ effect reg;
     else
     {
 	free_text(t_reg);
-	t_reg = words_predicate_to_commentary(words_comp_region(reg), str_prefix);
+	t_reg = words_predicate_to_commentary(words_effect(reg), str_prefix);
     }
 
     return(t_reg);   
 }
+#if 0
 
 /* list words_comp_region(comp_desc Dad)
  * input    : a region.
@@ -423,7 +424,7 @@ list words_comp_region(comp_desc Dad)
 
   sprintf(buffer, "\nReference Template :: \n[ ");
   for (i=0; i < Rank; i++) {
-    RefType = GetRefTemp(Dad,i);
+    RefType = GetRefTemp(comp_desc_section(Dad),i);
     switch(RefType) {
       case is_rtype_lininvariant:
         		sprintf(buffer, "INV");
@@ -450,6 +451,7 @@ list words_comp_region(comp_desc Dad)
 
   return(pc);
 }
+#endif
 
 /*}}}*/
 

@@ -37,6 +37,7 @@
 #include "newgen_set.h"
 #include "misc.h"
 #include "ri.h"
+#include "properties.h"
 
 #include "ri-util.h"
 

@@ -59,6 +59,8 @@
 
 #include "semantics.h"
 #include "preprocessor.h"
+#include "properties.h"
+#include "alias-classes.h"
 
 /* EQUIVALENCE */
 

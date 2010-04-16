@@ -30,6 +30,7 @@
 */
 
 #include "local.h"
+#include "expressions.h"
 
 extern entity hpfc_new_variable(entity, basic);
 extern bool expression_constant_p(expression);
@@ -135,10 +136,10 @@ boolean new_atomizer(char * mod_name)
 
    atomize_as_required(mod_stat,
                        new_atomizer_expr_decide,
-                       new_atomizer_func_decide,
-                       gen_false,
-		       gen_false, /* range */
-		       gen_false, /* whileloop */
+(bool (*)(call,expression))                            new_atomizer_func_decide,
+(bool (*)(test,expression))                            gen_false,
+(bool (*)(range,expression))    		       gen_false, /* range */
+(bool (*)(whileloop,expression))		       gen_false, /* whileloop */
                        /*new_atomizer_create_a_new_entity*/
                        hpfc_new_variable);
 

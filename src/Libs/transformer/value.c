@@ -733,7 +733,7 @@ void print_value_mappings()
   extern string entity_minimal_name(entity);
 
   (void) fprintf(stderr,"\nhash table value to name:\n");
-  hash_table_fprintf(stderr, dump_value_name, string_identity,
+  hash_table_fprintf(stderr, (gen_string_func_t)dump_value_name, (gen_string_func_t)string_identity,
 		     hash_value_to_name);
 
   (void) fprintf(stderr,"\nhash table entity to new value:\n");
@@ -741,15 +741,15 @@ void print_value_mappings()
     hash_table_fprintf(stderr, entity_local_name, external_value_name,
     hash_entity_to_new_value);
   */
-  hash_table_fprintf(stderr, entity_minimal_name, entity_minimal_name,
+  hash_table_fprintf(stderr, (gen_string_func_t)entity_minimal_name, (gen_string_func_t)entity_minimal_name,
 		     hash_entity_to_new_value);
 
   (void) fprintf(stderr,"\nhash table entity to old value:\n");
-  hash_table_fprintf(stderr, entity_minimal_name, external_value_name,
+  hash_table_fprintf(stderr, (gen_string_func_t)entity_minimal_name, (gen_string_func_t)external_value_name,
 		     hash_entity_to_old_value);
 
   (void) fprintf(stderr, "\nhash table entity to intermediate value:\n");
-  hash_table_fprintf(stderr, entity_minimal_name, external_value_name,
+  hash_table_fprintf(stderr, (gen_string_func_t)entity_minimal_name, (gen_string_func_t)external_value_name,
 		     hash_entity_to_intermediate_value);
 }
 

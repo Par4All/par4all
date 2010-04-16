@@ -74,6 +74,7 @@
 #include "conversion.h"
 
 #include "transformations.h"
+#include "properties.h"
 
 #include "hyperplane.h"
 
@@ -243,7 +244,7 @@ tile_membership_constraints(Pbase initial_basis,
 
     ifdebug(8) {
 	debug(8, "tile_membership_constraints", "End with constraint system mc:\n");
-	sc_fprint(stderr, mc, entity_local_name);
+	sc_fprint(stderr, mc, (get_variable_name_t)entity_local_name);
     }
 
     return mc;
@@ -314,9 +315,9 @@ tiling( list lls)
     n = base_dimension(initial_basis);
     to = loop_nest_to_offset(lls);
     ifdebug(8) {
-	sc_fprint(stderr, sci, entity_local_name);
+	sc_fprint(stderr, sci, (get_variable_name_t)entity_local_name);
 	debug(8,"tiling","And with origin:\n");
-	vect_fprint(stderr, to, entity_local_name);
+	vect_fprint(stderr, to, (get_variable_name_t)entity_local_name);
     }
 
     /* computation of the partitioning matrix P and its inverse HT */
@@ -352,13 +353,13 @@ tiling( list lls)
     mc = sc_normalize(mc);
     ifdebug(8) {
 	(void) fprintf(stderr,"Tile membership constraints:\n");
-	sc_fprint(stderr, mc, entity_local_name);
+	sc_fprint(stderr, mc, (get_variable_name_t)entity_local_name);
     }
     /* mc and SC_B_prime are aliased after this call */
     sc_B_prime = sc_append(mc, sci);
     ifdebug(8) {
 	(void) fprintf(stderr,"sc_B_prime after call to sc_append (is the basis ok?):\n");
-	sc_fprint(stderr, sc_B_prime, entity_local_name);
+	sc_fprint(stderr, sc_B_prime, (get_variable_name_t)entity_local_name);
     }
     mc = SC_UNDEFINED;
     /* Save a copy to compute B" later */
@@ -369,14 +370,14 @@ tiling( list lls)
     sc_projection_along_variables_ofl_ctrl(&sc_B_prime, initial_basis, OFL_CTRL);
     ifdebug(8) {
 	(void) fprintf(stderr,"Tile domain:\n");
-	sc_fprint(stderr, sc_B_prime, entity_local_name);
+	sc_fprint(stderr, sc_B_prime, (get_variable_name_t)entity_local_name);
     }
 
     /* Build the constraint system to scan the set of tiles */
     sc_tile_scan = new_loop_bound(sc_B_prime, tile_basis);
     ifdebug(8) {
 	(void) fprintf(stderr,"Tile domain in echelon format:\n");
-	sc_fprint(stderr, sc_tile_scan, entity_local_name);
+	sc_fprint(stderr, sc_tile_scan, (get_variable_name_t)entity_local_name);
     }
 
     /* CA: Build the new basis (tile_basis+initial_basis)*/
@@ -384,18 +385,18 @@ tiling( list lls)
     new_basis = vect_add(vect_dup(initial_basis),vect_dup(tile_basis));
     ifdebug(8) {
 	(void) fprintf(stderr,"new_basis\n");
-	vect_fprint(stderr, new_basis, entity_local_name);
+	vect_fprint(stderr, new_basis, (get_variable_name_t)entity_local_name);
     }
 
     /* Build the constraint system sc_tile to scan one tile (BS IN PPoPP'91 paper) */
     ifdebug(8) {
 	(void) fprintf(stderr,"sc_B_second:\n");
-	sc_fprint(stderr, sc_B_second, entity_local_name);
+	sc_fprint(stderr, sc_B_second, (get_variable_name_t)entity_local_name);
     }
     sc_tile = new_loop_bound(sc_B_second, new_basis);
     ifdebug(8) {
 	(void) fprintf(stderr,"Iteration domain for one tile:\n");
-	sc_fprint(stderr, sc_tile, entity_local_name);
+	sc_fprint(stderr, sc_tile, (get_variable_name_t)entity_local_name);
     }
 
 
@@ -458,7 +459,7 @@ loop_tiling(string module_name)
 {
     bool return_status = FALSE;
 
-    return_status = interactive_loop_transformation(module_name, tiling);
+    return_status = interactive_loop_transformation(module_name,  (statement (*)(list, bool (*)(loop)))tiling);
     
     return return_status;
 }

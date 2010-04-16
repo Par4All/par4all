@@ -973,7 +973,7 @@ transformer any_user_call_site_to_transformer(entity f,
 			" for %d argument of function %s\n", n, entity_user_name(f));
 	*/
 	pips_user_warning("Type incompatibility between call site and declaration"
-			  " for argument \"%s\" (rank %d\) of function \"%s\" "
+			  " for argument \"%s\" (rank %d) of function \"%s\" "
 			  "called from function \"%s\": %s/%s\n",
 			  entity_user_name(fpv), n, entity_user_name(f),
 			  entity_user_name(get_current_module_entity()),

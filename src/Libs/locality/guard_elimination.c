@@ -40,6 +40,8 @@
 #include "ri-util.h"
 #include "pipsdbm.h" 
 #include "control.h"
+#include "conversion.h"
+#include "hyperplane.h"
 
 Psysteme sc_newbase;
 Ptsg sg;

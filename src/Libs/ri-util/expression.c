@@ -47,6 +47,7 @@
 #include "text-util.h"
 
 #include "arithmetique.h"
+#include "alias-classes.h"
 
 #include "ri-util.h"
 

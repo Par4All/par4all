@@ -41,6 +41,7 @@
 #include "semantics.h"
 #include "transformer.h"
 #include "pipsmake.h"
+#include "alias_private.h"
 #include "instrumentation.h"
 #include "ubs_private.h"
 #include "effects-generic.h"
@@ -49,6 +50,7 @@
 #include "conversion.h"
 #include "transformations.h"
 #include "text-util.h"
+extern Pbase entity_list_to_base(list);
 
 /* This analysis checks if the program uses a variable or an array element
    which has not been assigned a value. In this case, anything may happen:

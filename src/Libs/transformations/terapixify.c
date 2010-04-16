@@ -52,6 +52,7 @@
 #include "parser_private.h"
 #include "syntax.h"
 #include "c_syntax.h"
+#include "locality.h"
 
 
 
@@ -823,7 +824,7 @@ static void do_isolate_statement(statement s)
                         else
                         {
                             pips_user_warning("failed to recover information from read region\n");
-                            return false;
+                            return ;
                         }
                     }
                     /* and the copy-out from write region */
@@ -837,7 +838,7 @@ static void do_isolate_statement(statement s)
                         else
                         {
                             pips_user_warning("failed to recover information from write region\n");
-                            return false;
+                            return ;
                         }
                     }
                 }
@@ -846,7 +847,7 @@ static void do_isolate_statement(statement s)
             else
             {
                 pips_user_warning("failed to convert regions to minimal array dimensions, using whole array instead\n");
-                return false;
+                return ;
             }
 
         }

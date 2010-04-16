@@ -39,7 +39,7 @@ reference eval_reference_with_points_to(reference r, list pts_to)
 {
 /* iterer sur le path p[0][1][2][0] et tester chaque fois si on peut
  * dereferencer le pointeur*/
-	return entity_all_locations();
+	return make_reference(entity_all_locations(),NIL);
 }
 
 /*
