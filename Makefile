@@ -80,21 +80,59 @@ validate-%: %
 # directory-parallel validation test
 # may replace the previous entry some day
 
-.PHONY: parallel-validate-test
+.PHONY: parallel-validate parallel-clean
 
 RESULTS	= validation.out
+HEAD	= validation.head
+
+# SUMMARY:
+SUM.d	= SUMMARY_Archive
+NOW.d	:= $(shell date +%Y/%m)
+DEST.d	= $(SUM.d)/$(NOW.d)
+NOW	:= $(shell date +%Y-%m-%d_%H_%M_%S)
+
+$(DEST.d):
+	mkdir -p $@
+
+$(HEAD):
+	{ \
+	  echo "validation for $(TARGET)" ; \
+	  echo "host: $$(hostname)" ; \
+	  echo "pips: $(shell which pips)" ; \
+	  pips -v ; \
+	  echo "tpips: $(shell which tpips)" ; \
+	  tpips -v ; \
+	  echo "user: $$USERNAME" ; \
+	  echo "date: $$(date)" ; \
+	} > $@
+
+# TODO
+# skipped?
+
+summary: validation.head parallel-validate $(DEST.d)
+	{ \
+	  cat validation.head ; \
+	  echo ; \
+	  sort -k 2 $(RESULTS) ; \
+	  echo ; \
+	  echo $$(wc -l < validation.out) "failed out of ... on " $$(date) ; \
+	} > $(DEST.d)/$(NOW)
+	$(RM) $(SUM.d)/SUMMARY-previous
+	test -f $(SUM.d)/SUMMARY-last && \
+	  mv $(SUM.d)/SUMMARY-last $(SUM.d)/SUMMARY-previous ; \
+	ln -s $(NOW.d)/$(NOW) $(SUM.d)/SUMMARY-last
 
 parallel-clean: $(TARGET:%=parallel-clean-%)
+	$(RM) $(RESULTS) $(HEAD)
 
-parallel-validate-test: $(TARGET:%=parallel-validate-test-%)
+parallel-validate: $(TARGET:%=parallel-validate-%)
 	# TODO generate summary
 	# TODO archive summary
 
 parallel-clean-%:
 	$(MAKE) -C $* clean unvalidate
-	$(RM) $(RESULTS)
 
-parallel-validate-test-%: parallel-clean-%
+parallel-validate-%: parallel-clean-%
 	$(MAKE) RESULTS=../$(RESULTS) -C $* validate-test
 
 parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
