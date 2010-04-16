@@ -866,11 +866,20 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       } /* case is_syntax_call */
     case is_syntax_cast :
       {
-	/* Ignore the cast */
-	cast c = syntax_cast(real_s);
-	pips_user_warning("Cast effect is ignored\n");
-	l_eff = c_convex_effects_on_formal_parameter_backward_translation
-	  (l_sum_eff, cast_expression(c), context);
+	bool read_p = false, write_p = false;
+	    pips_user_warning("Cast in actual parameter -> anywhere effect\n");
+	    FOREACH(EFFECT, eff, l_sum_eff)
+	      {
+		if(effect_write_p(eff)) write_p = true;
+		else read_p = false;
+	      }
+	    
+	    if (write_p)
+	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(is_action_write), NIL));
+	    if (read_p)
+	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(is_action_read), NIL));
+	    break;
+	
 	break;
       }
     case is_syntax_sizeofexpression :

@@ -342,24 +342,25 @@ entity e;
 
 /* bool effects_read_or_write_entity_p(cons * effects, entity e): check whether e
  * is read or written by effects "effects" or not accessed at all
+ *
+ * In semantics, e can be a functional entity such as constant string
+ * or constant float.
  */
-bool effects_read_or_write_entity_p(fx, e)
-cons * fx;
-entity e;
+bool effects_read_or_write_entity_p(cons * fx, entity e)
 {
-    bool read_or_write = FALSE;
-    MAPL(cef, 
-     {
-	 effect ef = EFFECT(CAR(cef));
-	 entity e_used = reference_variable(effect_any_reference(ef));
-	 /* Used to be a simple pointer equality test */
-	 if(entity_conflict_p(e, e_used)) {
-	     read_or_write = TRUE;
-	     break;
-	 }
-     },
-	 fx);
-    return read_or_write;
+  bool read_or_write = FALSE;
+
+  if(entity_variable_p(e)) {
+    FOREACH(EFFECT, ef, fx) {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      /* Used to be a simple pointer equality test */
+      if(entity_conflict_p(e, e_used)) {
+	read_or_write = TRUE;
+	break;
+      }
+    }
+  }
+  return read_or_write;
 }
 
 entity effects_conflict_with_entity(fx, e)
@@ -932,7 +933,8 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	    basic b = variable_basic(v);
 	    list l_dim = variable_dimensions(v);
 
-	    pips_debug(8, "variable case, of dimension %d\n",
+	    pips_debug(8, "variable case, of basic %s, of dimension %d\n",
+		       basic_to_string(b),
 		       (int) gen_length(variable_dimensions(v)));
 
 	    while (!ENDP(l_dim) && !ENDP(l_ind))
@@ -996,8 +998,10 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 		/* the current type becomes the type of the
 		 *p_rank-th field
 		 */
-		ct = entity_type(ENTITY(gen_nth(rank - 1, l_ent)));
+		ct = basic_concrete_type(entity_type(ENTITY(gen_nth(rank - 1, l_ent))));
 		p = r_effect_pointer_type_p(eff, CDR(l_ind), ct);
+		free_type(ct);
+		ct = type_undefined;
 		finished = true;
 	      }
 	    else
@@ -1005,9 +1009,10 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	      {
 		while (!ENDP(l_ent) && p)
 		  {
-		    type new_ct = entity_type(ENTITY(CAR(l_ent)));
+		    type new_ct = basic_concrete_type(entity_type(ENTITY(CAR(l_ent))));
 		    p = r_effect_pointer_type_p(eff, CDR(l_ind), 
 						new_ct);
+		    free_type(new_ct);
 		    POP(l_ent);
 		  }
 		finished = true;
@@ -1048,6 +1053,7 @@ bool effect_pointer_type_p(effect eff)
   else
     p = r_effect_pointer_type_p(eff, l_ind, t);
 
+  free_type(t);
   pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
   return p;
 
@@ -1632,3 +1638,5 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 	
   return le;
 }
+
+

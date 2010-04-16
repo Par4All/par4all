@@ -662,13 +662,14 @@ storage_space_of_variable(entity v)
 
 #define INTERVAL_INTERSECTION(a,b,c,d) (!((b) <= (c) || (d) <= (a)))
 
-/* 
-this function returns TRUE if e1 and e2 have some memory locations in common
-*/
+/*
+  this function returns TRUE if e1 and e2 have some memory locations
+  in common
 
-bool 
-entity_conflict_p(e1, e2)
-entity e1, e2;
+  This function used to be called entity_conflict_p() but abstract
+  locations are new entities which require a generalization.
+*/
+bool variable_entity_conflict_p(entity e1, entity e2)
 {
     bool intersect_p = FALSE;
     storage s1, s2;
@@ -720,8 +721,8 @@ entity e1, e2;
 
     l2 = storage_space_of_variable(e2);
     l2 = l2+o2-1;
-	    
-    /* return(r1 != ram_undefined && r2 != ram_undefined && 
+
+    /* return(r1 != ram_undefined && r2 != ram_undefined &&
 	   f1 == f2 && a1 == a2 &&
 	   INTERVAL_INTERSECTION(o1, l1, o2, l2)); */
 
@@ -734,4 +735,53 @@ entity e1, e2;
     intersect_p = ( a1 == a2 && INTERVAL_INTERSECTION(o1, l1, o2, l2));
 
     return intersect_p;
+}
+
+bool entity_conflict_p(entity e1, entity e2)
+{
+  bool conflict_p = TRUE; // safe default value
+  extern bool entity_abstract_location_p(entity);
+  extern bool abstract_location_conflict_p(entity, entity);
+  extern entity variable_to_abstract_location(entity);
+
+  if(entity_abstract_location_p(e1))
+    if(entity_abstract_location_p(e2))
+      conflict_p = abstract_location_conflict_p(e1, e2);
+    else if(entity_variable_p(e2)) {
+      if(variable_return_p(e2))
+	conflict_p = FALSE;
+      else {
+	entity al2 = variable_to_abstract_location(e2);
+	conflict_p = abstract_location_conflict_p(e1, al2);
+      }
+    }
+    else {
+      pips_internal_error("Unexpected case.\n");;
+    }
+  else {
+    if(entity_abstract_location_p(e2)) {
+      if(entity_variable_p(e1)) {
+	if(variable_return_p(e1))
+	  conflict_p = FALSE;
+	else {
+	  entity al1 = variable_to_abstract_location(e1);
+	  conflict_p = abstract_location_conflict_p(al1, e2);
+	}
+      }
+      else {
+	  pips_internal_error("Unexpected case.\n");;
+	}
+      }
+    else {
+      if(variable_return_p(e1) && variable_return_p(e2)) {
+	return e1==e2;
+      }
+      else if(entity_variable_p(e1) && entity_variable_p(e2))
+	  conflict_p = variable_entity_conflict_p(e1, e2);
+      else {
+	  pips_internal_error("Unexpected case.\n");;
+	}
+    }
+  }
+  return conflict_p;
 }

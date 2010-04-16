@@ -568,6 +568,17 @@ i_unknown: TK_UNKNOWN TK_ENDOFLINE
 	    }
 	    else
 	    {
+	      /* FI->FC: It would be nicer to have the input string and the
+		 line number... */
+	      if(get_bool_property("ABORT_ON_USER_ERROR"))
+		pips_user_error("\n\n"
+		    "\tMaybe you intended to execute a direct shell command.\n"
+		    "\tThis convenient feature is desactivated by default.\n"
+		    "\tTo enable it, you can run tpips with the -s option,\n"
+		    "\tor do \"setproperty TPIPS_IS_A_SHELL=TRUE\",\n"
+		    "\tor do \"setenv TPIPS_IS_A_SHELL=TRUE\".\n"
+		    "\tOtherwise use ! or \"shell\" as a command prefix.\n\n");
+	      else
 		pips_user_warning("\n\n"
 		    "\tMaybe you intended to execute a direct shell command.\n"
 		    "\tThis convenient feature is desactivated by default.\n"

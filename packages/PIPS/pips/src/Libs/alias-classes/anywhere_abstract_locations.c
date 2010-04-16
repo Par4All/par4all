@@ -193,12 +193,11 @@ bool entity_all_module_locations_p(entity e)
 entity entity_all_module_xxx_locations(entity m, string xxx)
 {
   entity dynamic = entity_undefined;
-  string any_name = strdup(concatenate(entity_local_name(m),
-				       MODULE_SEP_STRING,
-				       xxx,
+  string any_name = strdup(concatenate(xxx,
 				       ANYWHERE_LOCATION,
 				       NULL));
-  dynamic = gen_find_tabulated(any_name, entity_domain);
+  //dynamic = gen_find_tabulated(any_name, entity_domain);
+  dynamic = FindOrCreateEntity(entity_local_name(m), any_name);
   if(storage_undefined_p(entity_storage(dynamic))) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
@@ -248,7 +247,7 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
   // about the type... See get_symbol_table() and isolate the code
   // used to prettyprint the type. Too bad it uses the buffer type...
   pips_debug(8, "New abstract location entity \"%s\" found or created"
-	     " with type \"%s\"", e, type_to_string(t));
+	     " with type \"%s\"", entity_name(e), type_to_string(t));
 
   return e;
 }
@@ -279,7 +278,7 @@ entity entity_all_xxx_locations(string xxx)
 				       NULL));
   dynamic = find_or_create_entity(any_name);
   //dynamic = gen_find_tabulated(any_name, entity_domain);
-  if(type_undefined_p(dynamic)) {
+  if(type_undefined_p(entity_type(dynamic))) {
     //area a = make_area(0,NIL); /* Size and layout are unknown */
     //type t = make_type_area(a);
     /*FI: more work to be done here... */
@@ -471,32 +470,71 @@ bool entity_abstract_location_p(entity al)
 }
 
 /* returns the smallest abstract locations containing the location of
-   variable v*/
+   variable v.
+
+   This does not work for formal parameters or, if it works, the
+   caller module is not known and the resulting abstract location is
+   very large. A larga abstract location is returned.
+
+   No idea to model return values... even though they are located in
+   the stack in real world.
+
+   If v cannot be converted into an abstract location, either the
+   function aborts or an undefined entity is returned.
+*/
 entity variable_to_abstract_location(entity v)
 {
   entity al = entity_undefined;
-  if(entity_variable_p(v)) {
-    storage s = entity_storage(v);
-    ram r = storage_ram(s);
-    entity f = ram_function(r);
-    entity a = ram_section(r);
-    string mn = entity_local_name(f);
-    string ln = string_undefined;
 
-    if(static_area_p(a))
-      ln = STATIC_AREA_LOCAL_NAME;
-    else if(dynamic_area_p(a))
-      ln = DYNAMIC_AREA_LOCAL_NAME;
-    else if(stack_area_p(a))
-      ln = STACK_AREA_LOCAL_NAME;
-    else if(heap_area_p(a))
-      ln = HEAP_AREA_LOCAL_NAME;
-    else
-      pips_internal_error("unexpected area\n");
-    al = FindOrCreateEntity(mn, ln);
+  if(entity_variable_p(v)
+     && !dummy_parameter_entity_p(v)
+     && !variable_return_p(v)) {
+    bool typed_p = get_bool_property("ALIASING_ACROSS_TYPES");
+
+    // Too simplistic
+    //al = FindOrCreateEntity(mn, ln);
+
+    if(formal_parameter_p(v))
+      if(typed_p)
+	//  FI: still to be developped
+	//al = entity_all_locations_typed(uvt);
+	al = entity_all_locations();
+      else
+	al = entity_all_locations();
+    else { // must be a standard variable
+      storage s = entity_storage(v);
+      ram r = storage_ram(s);
+      entity f = ram_function(r);
+      entity a = ram_section(r);
+      //string mn = entity_local_name(f);
+      string ln = string_undefined;
+      type uvt = ultimate_type(entity_type(v));
+
+      if(static_area_p(a))
+	ln = STATIC_AREA_LOCAL_NAME;
+      else if(dynamic_area_p(a))
+	ln = DYNAMIC_AREA_LOCAL_NAME;
+      else if(stack_area_p(a))
+	ln = STACK_AREA_LOCAL_NAME;
+      else if(heap_area_p(a))
+	ln = HEAP_AREA_LOCAL_NAME;
+      else
+	pips_internal_error("unexpected area\n");
+
+      if(typed_p) {
+	string fn = entity_local_name(f);
+	al = entity_all_module_xxx_locations_typed(fn, ln, uvt);
+      }
+      else
+	al = entity_all_module_xxx_locations(f, ln);
+    }
   }
   else
     pips_internal_error("arg. not in definition domain\n");
+
+  pips_assert("al is an abstract location entity",
+	      entity_abstract_location_p(al));
+
   return al;
 }
 
@@ -702,3 +740,12 @@ entity entity_locations_dereference(entity al __attribute__ ((__unused__)))
 
    /* Should/could be extended to check the max computation... */
  }
+
+/* Do these two abstract locations share some real memory locations? */
+bool abstract_location_conflict_p(entity al1, entity al2)
+{
+  entity mal = entity_locations_max(al1, al2); // maximal abstraction location
+  bool conflict_p = (mal==al1) || (mal==al2);
+
+  return conflict_p;
+}

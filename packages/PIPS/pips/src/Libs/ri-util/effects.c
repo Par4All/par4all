@@ -567,6 +567,11 @@ bool effects_may_conflict_p(effect eff1, effect eff2)
   bool conflict_p = FALSE;
 
   if(action_write_p(ac1)||action_write_p(ac2)) {
+    cell cell1 = effect_cell(eff1);
+    cell cell2 = effect_cell(eff2);
+    if( cells_may_conflict_p(cell1,cell2)) {
+      conflict_p = TRUE;
+    }
   }
   return conflict_p;
 }

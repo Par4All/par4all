@@ -318,7 +318,36 @@ void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
   return;
 }
 
+effect simple_effect_field_to_rank_conversion(effect input_effect)
+{
+  effect eff = copy_effect(input_effect); 
+  cell c = effect_cell(input_effect);
+  /* if it's a preference, we are sure there are no field dimensions */
+  if (cell_reference_p(c))
+    {
+      reference r = cell_reference(c);
+      list l_ind = reference_indices(r);
 
+      FOREACH(EXPRESSION, ind, l_ind)
+	{
+	  syntax s = expression_syntax(ind);
+	  if (syntax_reference_p(s))
+	    {
+	      entity ind_e = reference_variable(syntax_reference(s));
+	      if (entity_field_p(ind_e))
+		{
+		  int rank = entity_field_rank(ind_e);
+		  expression new_ind = int_to_expression(rank);
+		  
+		  free_syntax(s);
+		  expression_syntax(ind) = copy_syntax(expression_syntax(new_ind));
+		  free_expression(new_ind);
+		}
+	    }
+	} /* FOREACH*/
+    }
+  return eff;
+}
 
 /*********************************************************************************/
 /* SIMPLE EFFECTS                                                                */
