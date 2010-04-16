@@ -106,19 +106,6 @@ static hash_table Label_control;
 DEFINE_LOCAL_STACK(scoping_statement, statement)
 
 
-/* HASH_GET_DEFAULT_EMPTY_LIST: returns an empty list instead of
-   HASH_UNDEFINED_VALUE when a key is not found */
-
-static list hash_get_default_empty_list(h, k)
-hash_table h;
-char * k;
-{
-    list l = (list) hash_get(h, k);
-
-    return (l == (list) HASH_UNDEFINED_VALUE)? NIL : l;
-}
-
-
 /* FI -> PJ:
  *
  * The naming for ADD_PRED et ADD_SUCC is misleading. ADD_SUCC is in
@@ -156,7 +143,15 @@ char * k;
 
 /* PATCH_REFERENCES replaces all occurrences of FNODE by TNODE in the
    predecessors or successors lists of its predecessors
-   or successors list (according to HOW, PREDS_OF_SUCCS or SUCCS_OF_PREDS). */
+   or successors list (according to HOW, PREDS_OF_SUCCS or
+   SUCCS_OF_PREDS).
+
+   Move all the connection of:
+
+   - the predecessors of FNODE to point to TNODE
+
+   - or the successors of FNODE to point from TNODE
+ */
 static void patch_references(how, fnode, tnode)
 int how;
 control fnode, tnode;
@@ -1079,6 +1074,10 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
   statement s_above = scoping_statement_nth(2);
   pips_debug(2, "Dealing with block statement %p included into block"
 	     " statement %p\n", s, s_above);
+  if (ENDP(s_above))
+    /* No block statement above, so it is hard to move something there :-) */
+    return;
+
   list declarations_above  = statement_declarations(s_above);
   list new_declarations = NIL;
   /* The variables created in case of name conflict*/
