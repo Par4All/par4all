@@ -13,6 +13,7 @@ TEST	= test
 F.c	= $(wildcard *.c)
 F.f	= $(wildcard *.f)
 F.F	= $(wildcard *.F)
+#F.f95	= $(wildcard *.f95)
 
 # all source files
 F.src	= $(F.c) $(F.f) $(F.F)
@@ -26,6 +27,9 @@ F.result= $(wildcard *.result)
 # validation scripts
 F.tpips	= $(wildcard *.tpips)
 F.test	= $(wildcard *.test)
+F.py	= $(wildcard *.py)
+
+F.exe	= $(F.tpips) $(F.test) $(F.py)
 
 # validation output
 F.valid	= $(F.result:%=%/$(TEST))
@@ -38,9 +42,9 @@ FLT	= sed -e 's,$(here),$$VDIR,g'
 RESULTS	= failed
 OK	= status=$$? ; \
 	  if [ "$$status" != 0 ] ; then \
-	     echo "failed $(SUBDIR)/$*" ; \
+	     echo "failed: $(SUBDIR)/$*" ; \
 	  elif [ $$(svn diff $@ | wc -l) -ne 0 ] ; then \
-	     echo "changed $(SUBDIR)/$*" ; \
+	     echo "changed: $(SUBDIR)/$*" ; \
 	  fi >> $(RESULTS)
 
 # default target is to clean
@@ -131,6 +135,18 @@ DEFTEST	= default_test
 %.result/$(TEST): %.F $(DEFTEST)
 	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	| $(FLT) > $@ ; $(OK)
+
+# detect skipped stuff
+skipped:
+	for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
+	  if ! test -d $$base.result ; \
+	  then \
+	    echo "skipped: $(SUBDIR)/$$base" ; \
+	  elif ! [ -f $$base.result/test -o -f $$base.result/test.$(ARCH) ] ; \
+	  then \
+	    echo "missing: $(SUBDIR)/$$base" ; \
+	  fi ; \
+	done >> $(RESULTS)
 
 # what about nothing?
 missing:
