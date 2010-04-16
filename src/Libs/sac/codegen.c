@@ -768,7 +768,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             for(list iter = CDR(args); !ENDP(iter) ; POP(iter) )
             {
                 expression e = EXPRESSION(CAR(iter));
-                if(expression_constant_p(e))
+                bool formal_p=expression_reference_p(e) && formal_parameter_p(reference_variable(expression_reference(e)));
+                if(expression_constant_p(e) || formal_p)
                 {
                     /* no support for array inital value in fortran */
                     if(fortran_module_p(get_current_module_entity()))
@@ -784,13 +785,20 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                     {
                         inits=CONS(EXPRESSION,copy_expression(e),inits);
                     }
+                    if(formal_p)
+                    {
+                        entity current_scalar = expression_to_entity(e);
+                        expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
+                        *REFCAR(iter) = (gen_chunkp)replacement;
+                        replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
+                    }
                 }
                 else
                 {
                     entity current_scalar = expression_to_entity(e);
                     inits=CONS(EXPRESSION,int_to_expression(0),inits);
                     expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
-                    *(expression*)REFCAR(iter) = replacement;
+                    *REFCAR(iter) = (gen_chunkp)replacement;
                     replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
                 }
                 index++;
