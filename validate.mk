@@ -85,6 +85,10 @@ test: $(F.valid)
 %.result/$(TEST): %.tpips2
 	$(TPIPS) $< 2<&1 | $(FLT) > $@ ; $(OK)
 
+# python scripts
+%.result/$(TEST): %.py
+	python $< | $(FLT) > $@ ; $(OK)
+
 # default_tpips
 # FILE could be $<
 # VDIR could be avoided if running in local directory?
