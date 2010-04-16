@@ -7817,6 +7817,12 @@ to TRUE in order to force distribution, even when it does not seem profitable
 PARTIAL_EVAL_ALWAYS_SIMPLIFY FALSE
 \end{PipsProp}
 
+If  \PipsPropRef{PARTIAL_EVAL_LINEARIZE} is set to TRUE,
+Additionnal simplifications are done
+\begin{PipsProp}{PARTIAL_EVAL_LINEARIZE}
+PARTIAL_EVAL_LINEARIZE FALSE
+\end{PipsProp}
+
 Likewise, one can turn following property to true if he wants to use hard-coded value for size of types
 \begin{PipsProp}{EVAL_SIZEOF}
 EVAL_SIZEOF FALSE
