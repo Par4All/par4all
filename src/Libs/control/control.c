@@ -481,6 +481,7 @@ bool controlize(statement st,
 	statement_consistent_p(st);
 	break;
     case is_instruction_goto: {
+      /* Get the label name of the statement the goto point to: */
 	string name = entity_name(statement_label(instruction_goto(i)));
 	statement nop = make_continue_statement(statement_label(st));
 
@@ -1197,6 +1198,8 @@ static control compact_list(list ctls,
     }
 
     processed_nodes = set_make(set_pointer);
+
+    /* This is the iterator on the first element of the control list: */
     c_res = CONTROL(CAR(ctls));
 
     for(ctls = CDR(ctls); !ENDP(ctls); ctls = CDR(ctls)) {
@@ -1232,6 +1235,31 @@ static control compact_list(list ctls,
 	succ_st = control_statement(succ);
 	set_add_element(processed_nodes, processed_nodes, (char *) succ);
 
+	if(!statement_undefined_p(control_statement(succ))
+	   && !entity_empty_label_p(statement_label(control_statement(succ)))
+	   && !return_label_p(entity_name(statement_label(control_statement(succ))))) {
+	  /* Verify if the control node is not reachable on its label: */
+	  entity l = statement_label(control_statement(succ));
+	  string ln = entity_name(l);
+	  control c = get_label_control(ln);
+	  if(!control_undefined_p(c)) {
+	    /* There is a label that may be used on this control node: do
+	       not fuse */
+	    if (c==succ) {
+	      /* This happens quite often in Syntax with no
+		 consequences; this leads to a core dump for
+		 C_syntax/block_scope13.c */
+	      pips_debug(2, "Do not fuse control %p since we will have a latent goto on it through label \"%s\"\n",
+			 c_res, ln);
+	      /* Do not fuse: go to next control node: */
+	      c_res = CONTROL(CAR(ctls));
+	      continue;
+	    }
+	    else
+	      pips_internal_error("Inconsistent hash table Label_control: "
+				  "same label points towards two different controls");
+	  }
+	}
 	if(c_res != succ) {
 	    /* If it is not a loop on c_res, fuse the nodes: */
 	  if((statement_block_p(st) && !ENDP(statement_declarations(st)))
@@ -1284,35 +1312,7 @@ static control compact_list(list ctls,
 	  }
 	  pips_assert("control succ and its statement are consistent",
 		      control_consistent_p(succ));
-	  if(!statement_undefined_p(control_statement(succ))
-	     && !entity_empty_label_p(statement_label(control_statement(succ)))
-	     && !return_label_p(entity_name(statement_label(control_statement(succ))))) {
-	    /* We are going to free a node which may be accessible
-	       via a label... Let's hope no goto uses this label... */
-	    /* The quick fix would be not to fuse control with
-	       labelled statements, but labelled statements do not
-	       have to be the target of a goto statement. */
-	    entity l = statement_label(control_statement(succ));
-	    string ln = entity_name(l);
-	    control c = get_label_control(ln);
-	    if(!control_undefined_p(c)) {
-	      if(c==succ) {
-		/* This happens quite often in Syntax with no
-		   consequences; this leads to a core dump for
-		   C_syntax/block_scope13.c */
-		pips_debug(2, "Do not fuse control %p since we will have a latent goto on it through label \"%s\"\n",
-			   c_res, ln);
-		/* Do not fuse. */
-		c_res = CONTROL(CAR(ctls));
-		continue;
-
-	      }
-	      else
-		pips_internal_error("Inconsistent hash table Label_control: "
-				    "same label points towards two different controls");
-	    }
-	  }
-	  /* Skip the useless control: */
+	  /* Remove the useless control: */
 	  control_statement(succ) = statement_undefined;
 	  remove_a_control_from_an_unstructured(succ);
 	}
@@ -1382,12 +1382,16 @@ list controlize_list_1(list sts,
     /* Keep track of the control node associated to this statement: */
     ctls = CONS(CONTROL, c_res, ctls);
 
-    if(unreachable) {
+    if (unreachable) {
       /* Keep track globally of the unreachable code: */
       Unreachable = CONS(STATEMENT, st, Unreachable);
+      ifdebug(2) {
+	pips_debug(0, "There is a new unreachable statement:\n");
+	print_statement(st);
+      }
     }
 
-    if(controlized) {
+    if (controlized) {
       /* The previous controlize() returned a non structured control */
       control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
 
@@ -1535,7 +1539,8 @@ bool controlize_list(statement st,
        bit, with c_last pointing to the last control node of the list: */
     c_last = compact_list(ctls, c_end);
     /* To avoid compact list: c_last = c_end; */
-
+    //c_last = c_end;
+    gen_free_list(ctls);
     ifdebug(5) {
 	pips_debug(0, "Nodes from c_block %p\n", c_block);
 	display_linked_control_nodes(c_block);
@@ -1704,6 +1709,7 @@ bool controlize_list(statement st,
 		    ==gen_length(statement_declarations(control_statement(c_res))));
 	*/
     }
+
     statement_consistent_p(st);
 
     return(controlized);
