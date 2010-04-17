@@ -25,7 +25,6 @@
 #include "pips_config.h"
 #endif
 
-
 #include <stdio.h>
 
 #include "linear.h"
@@ -42,8 +41,8 @@
 
 /**
  * @brief Check if two effects always conflict.
- * @descriptionTwo effects will always conflict if their abstract two location
- * sets has a non-empty intersection and if at least one of them is a write.
+ * @descriptionTwo effects will always conflict if their two abstract locations
+ * has a non-empty intersection and if at least one of them is a write.
  * The approximation must also be "MUST", if one of them is a "MAY" there is no
  * conflict
  *
@@ -55,13 +54,20 @@
 bool effects_must_conflict_p( effect eff1, effect eff2 ) {
   action ac1 = effect_action(eff1);
   action ac2 = effect_action(eff2);
+  approximation ap1 = effect_approximation(eff1);
+  approximation ap2 = effect_approximation(eff2);
   bool conflict_p = FALSE;
 
-  if ( action_write_p(ac1) || action_write_p(ac2) ) {
-    cell cell1 = effect_cell(eff1);
-    cell cell2 = effect_cell(eff2);
-    if ( cells_must_conflict_p( cell1, cell2 ) ) {
-      conflict_p = TRUE;
+  /* We enforce must approximation for the two effects */
+  if ( approximation_must_p(ap1) && approximation_must_p(ap2) ) {
+    /* We enforce that at least one effect is a write */
+    if ( action_write_p(ac1) || action_write_p(ac2) ) {
+      cell cell1 = effect_cell(eff1);
+      cell cell2 = effect_cell(eff2);
+      /* Check that the cells conflicts */
+      if ( cells_must_conflict_p( cell1, cell2 ) ) {
+        conflict_p = TRUE;
+      }
     }
   }
   return conflict_p;
