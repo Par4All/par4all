@@ -515,7 +515,9 @@ static void genkill_unstructured( unstructured u, statement st ) {
    */
   inout_control( c );
 
-  /* Kill set will be the intersection of all kill inside the unstructured */
+  /* Kill set will be the intersection of all kill inside the unstructured
+   * FIXME : kill is initially empty, so the intersection will ALWAYS be empty !
+   */
   CONTROL_MAP( cc, {
         set_intersection( kill, kill, KILL( control_statement( cc )));
       }, c, blocs );
@@ -711,9 +713,9 @@ static void inout_test( statement s, test t ) {
  *
  * @param st is the statement that hold the loop
  * @param lo is the loop
+ * @param one_trip_do tell if there is always at least one trip (do loop only)
  */
-static void inout_loop( statement st, loop lo ) {
-  statement l = loop_body( lo );
+static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
   set diff = MAKE_STATEMENT_SET();
 
   ifdebug(1) {
@@ -722,24 +724,24 @@ static void inout_loop( statement st, loop lo ) {
 
   /* Compute "in" sets for the loop body
    * FIXME : diff temporary can be avoided ! */
-  set_union( DEF_IN( l ), GEN( st ), set_difference( diff,
+  set_union( DEF_IN( body ), GEN( st ), set_difference( diff,
                                                      DEF_IN( st ),
                                                      KILL( st ) ) );
   set_free( diff );
-  set_union( REF_IN( l ), REF_IN( st ), REF( st ) );
+  set_union( REF_IN( body ), REF_IN( st ), REF( st ) );
 
   /* Compute loop body */
-  inout_statement( l );
+  inout_statement( body );
 
   /* Compute "out" sets for the loop */
   if ( one_trip_do ) {
     /* Body is always done at least one time */
-    set_assign( DEF_OUT( st ), DEF_OUT( l ) );
-    set_assign( REF_OUT( st ), REF_OUT( l ) );
+    set_assign( DEF_OUT( st ), DEF_OUT( body ) );
+    set_assign( REF_OUT( st ), REF_OUT( body ) );
   } else {
     /* Body is not always done */
-    set_union( DEF_OUT( st ), DEF_OUT( l ), DEF_IN( st ) );
-    set_union( REF_OUT( st ), REF_OUT( l ), REF_IN( st ) );
+    set_union( DEF_OUT( st ), DEF_OUT( body ), DEF_IN( st ) );
+    set_union( REF_OUT( st ), REF_OUT( body ), REF_IN( st ) );
   }
 
   ifdebug(1) {
@@ -751,42 +753,33 @@ static void inout_loop( statement st, loop lo ) {
  * @brief Propagates in sets of ST (which is inherited) to compute the out sets.
  *
  * @param st is the statement that hold the loop
+ * @param lo is the loop
+ */
+static void inout_loop( statement st, loop lo ) {
+  statement body = loop_body( lo );
+  inout_any_loop(st, body, one_trip_do );
+}
+
+/**
+ * @brief Propagates in sets of ST (which is inherited) to compute the out sets.
+ *
+ * @param st is the statement that hold the loop
  * @param t is the loop
  */
 static void inout_whileloop( statement st, whileloop wl ) {
-  statement wlb = whileloop_body( wl );
-  set diff = MAKE_STATEMENT_SET();
-
-  /* Compute "in" sets for the loop body
-   * FIXME : diff temporary can be avoided ! */
-  set_union( DEF_IN( wlb ), GEN( st ), set_difference( diff,
-                                                       DEF_IN( st ),
-                                                       KILL( st ) ) );
-  set_free( diff );
-  set_union( REF_IN( wlb ), REF_IN( st ), REF( st ) );
-
-  /* Compute loop body */
-  inout_statement( wlb );
-
-  /* Compute "out" sets for the loop */
-  set_union( DEF_OUT( st ), DEF_OUT( wlb ), DEF_IN( st ) );
-  set_union( REF_OUT( st ), REF_OUT( wlb ), REF_IN( st ) );
+  statement body = whileloop_body( wl );
+  inout_any_loop(st, body, FALSE );
 }
 
-/* FIXME to be fused with whileloop */
+/**
+ * @brief Propagates in sets of ST (which is inherited) to compute the out sets.
+ *
+ * @param st is the statement that hold the loop
+ * @param t is the loop
+ */
 static void inout_forloop( statement st, forloop fl ) {
-  statement flb = forloop_body( fl );
-  set diff = MAKE_STATEMENT_SET();
-
-  set_union( DEF_IN( flb ), GEN( st ), set_difference( diff,
-                                                       DEF_IN( st ),
-                                                       KILL( st ) ) );
-  set_free( diff );
-  set_union( REF_IN( flb ), REF_IN( st ), REF( st ) );
-  inout_statement( flb );
-
-  set_union( DEF_OUT( st ), DEF_OUT( flb ), DEF_IN( st ) );
-  set_union( REF_OUT( st ), REF_OUT( flb ), REF_IN( st ) );
+  statement body = forloop_body( fl );
+  inout_any_loop(st, body, one_trip_do );
 }
 
 /**
