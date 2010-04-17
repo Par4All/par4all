@@ -98,7 +98,7 @@ test: $(F.valid)
 
 # shell script
 %.result/$(TEST): %.test
-	$(PF) ; $< | $(FLT)  > $@ ; $(OK)
+	$(PF) ; ./$< | $(FLT)  > $@ ; $(OK)
 
 # tpips scripts
 %.result/$(TEST): %.tpips
