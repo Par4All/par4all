@@ -116,19 +116,16 @@ new-validate:
 	$(MAKE) parallel-clean
 	$(MAKE) summary
 
-COUNT	:= $(shell for d in $(TARGET); do echo $$d/*.result ; done | wc -w)
-
-count:
-	echo $(COUNT)
-
 summary: validation.head parallel-validate $(DEST.d)
 	{ \
 	  cat validation.head ; \
 	  echo ; \
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
-	  echo $$(wc -l < validation.out) \
-		"failed out of $(COUNT) on" $$(date) ; \
+	  echo $$(egrep -v '^(skipp|pass)ed: ' < validation.out | wc -l) \
+		"failed out of" \
+		$$(grep -v 'skipped: ' < validation.out | wc -l) \
+		"on" $$(date) ; \
 	} > $(DEST.d)/$(NOW)
 	$(RM) $(SUM.d)/SUMMARY-previous
 	test -f $(SUM.d)/SUMMARY-last && \
