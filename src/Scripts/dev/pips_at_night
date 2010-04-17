@@ -37,12 +37,14 @@ update=
 clean=clean
 compile=
 valids=
+validate=validate
 # The default options for the validation:
 vopt="VOPT=--archive --diff"
 
 # where to do it by default
 target=~/PIPS
 sdir=prod
+email=
 
 setup='https://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
 
@@ -56,7 +58,7 @@ do
   esac
 
   case $opt in
-    -m|--mail) vopt="$vopt -m '$1'" ; shift ;;
+    -m|--mail) vopt="$vopt -m '$1'" ; email=$1 ; shift ;;
     # what to do
     -d|--download) download=1 ;;
     -nd|--no-download) download= ;;
@@ -73,6 +75,8 @@ do
     -sd|--source-directory) sdir=$1 ; shift ;;
     --source-directory=*) sdir=${opt#*=} ;;
     # validation directories
+    -pv|--parallel-validate) validate=new-validate ;;
+    -mv|--mail-validate) validate=mail-validate ;;
     -nv|--no-validate) valids= ;;
     -v|--validate) valids="$valids validation" ;;
     -av|--add-validation) valids="$valids $1" ; shift ;;
@@ -149,7 +153,7 @@ if [[ $valids ]] ; then
       echo "### validating $d"
       pushd $target/$d
       make clean
-      make "$vopt" validate
+      make "$vopt" EMAIL=$email $validate
       popd
     else
       echo "### skipping validation $d, no such directory"
