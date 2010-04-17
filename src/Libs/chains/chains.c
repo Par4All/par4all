@@ -38,8 +38,6 @@
 
 #include "genC.h"
 #include "ri.h"
-#include "text.h"
-#include "database.h"
 
 typedef void * arc_label;
 typedef void * vertex_label;
@@ -51,21 +49,19 @@ typedef void * vertex_label;
 #include "properties.h"
 
 #include "ri-util.h"
-#include "control.h"
-#include "prettyprint.h"
 
-/* #include "ricedg.h" */
-extern void prettyprint_dependence_graph( FILE*, statement, graph );
+#include "ricedg.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "effects-convex.h"
 
 #include "chains.h"
 #include "pipsdbm.h"
 
-#include "constants.h"
 #include "resources.h"
+
+#include "alias-classes.h"
+
 
 /* Some forward declarations */
 static void reset_effects();
