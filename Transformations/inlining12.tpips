@@ -6,6 +6,9 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
+# use "old" effects...
+setproperty CONSTANT_PATH_EFFECTS=FALSE
+
 echo
 echo Initial code
 echo
