@@ -62,7 +62,6 @@ typedef void * vertex_label;
 
 #include "alias-classes.h"
 
-
 /* Some forward declarations */
 static void reset_effects();
 static list load_statement_effects( statement s );
@@ -228,15 +227,24 @@ static bool init_one_statement( statement st ) {
  the array. Equivalence with non-array entities is managed properly. */
 
 /**
- * @brief Create the set of effects that an effects might kill
+ * @brief Update the set of effects that an effect might kill
  * @param kill the set to initialize
  * @param e the "killer" effect
- * @param st the statement associated to the effect
  */
-static void kill_effect( set kill, effect e, statement st ) {
+static void kill_effect( set kill, effect e ) {
   HASH_MAP(theEffect,theStatement, {
-        if( st != theStatement && effects_must_conflict_p( e, theEffect ) ) {
-          set_add_element( kill, kill, theEffect );
+        /* We avoid a self killing */
+        if( e != theEffect ) {
+          /* Check if there is a must conflict
+           * Avoid using effects_must_conflict_p() because we want to be
+           * able to kill "may" effects.
+           */
+          cell cell1 = effect_cell(e);
+          cell cell2 = effect_cell((effect)theEffect);
+          /* Check that the cells conflicts */
+          if ( cells_must_conflict_p( cell1, cell2 ) ) {
+            set_add_element( kill, kill, theEffect );
+          }
         }
       },effects2statement)
 }
@@ -263,7 +271,7 @@ static void genkill_one_statement( statement st ) {
       // This effects is a write, it may kill some others effects !
       pips_assert("Effect isn't map to this statement !",
           st == hash_get(effects2statement, e));
-      kill_effect( kill, e, st );
+      kill_effect( kill, e );
 
       // A write effect will always generate a definition
       set_add_element( gen, gen, (char *) e );
@@ -1464,8 +1472,9 @@ static void set_effects( char *module_name, enum chain_type use ) {
       rgch = FALSE;
       iorgch = TRUE;
       /* Proper regions */
-      string iopr =
-          db_get_memory_resource( DBR_PROPER_REGIONS, module_name, TRUE );
+      string iopr = db_get_memory_resource( DBR_PROPER_REGIONS,
+                                            module_name,
+                                            TRUE );
       set_proper_rw_effects( (statement_effects) iopr );
 
       /* in regions */
