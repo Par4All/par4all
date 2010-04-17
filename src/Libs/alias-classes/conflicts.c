@@ -30,6 +30,8 @@
 
 #include "linear.h"
 
+#include "alias-classes.h"
+
 #include "genC.h"
 
 #include "ri.h"
