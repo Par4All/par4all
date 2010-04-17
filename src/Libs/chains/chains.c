@@ -268,16 +268,20 @@ static void genkill_one_statement( statement st ) {
     action a = effect_action( e );
 
     if ( action_write_p( a ) ) {
-      // This effects is a write, it may kill some others effects !
+      /* This effects is a write, it may kill some others effects ! */
       pips_assert("Effect isn't map to this statement !",
           st == hash_get(effects2statement, e));
       kill_effect( kill, e );
 
-      // A write effect will always generate a definition
+      /* A write effect will always generate a definition */
       set_add_element( gen, gen, (char *) e );
-    } else { // action_read_p( a ); FIXME : is there other action ?
-      // A read effect will always generate a reference
+    } else if ( action_read_p( a ) ) {
+      /* A read effect will always generate a reference */
       set_add_element( ref, ref, (char *) e );
+    } else {
+      /* Secure programming */
+      pips_internal_error("Unknow action for effect : "
+          "neither a read nor a write !");
     }
   }
 }
@@ -309,7 +313,7 @@ static void genkill_test( test t, statement s ) {
  * @param s the set of effects
  * @param l the locals to mask
  */
-static void mask_effects( set s, cons *l ) {
+static void mask_effects( set s, list l ) {
   cons *to_mask = NIL;
   /*
    * Loop over effect and check if they affect a local variable
@@ -318,11 +322,14 @@ static void mask_effects( set s, cons *l ) {
   SET_FOREACH(effect, f, s) {
     action a = effect_action( f );
 
-    /* FIXME : use effects_conflict_with_entity ???*/
-    if ( action_read_p( a ) || gen_find_eq( effect_entity( f ), l )
-        != entity_undefined ) {
-      /* Register which one we have to mask */
-      to_mask = CONS( effect, f, to_mask );
+    if ( action_read_p( a ) ) {
+      FOREACH( entity, e, l )
+      {
+        if ( effect_may_conflict_with_entity_p( f, e ) ) {
+          /* Register which one we have to mask */
+          to_mask = CONS( effect, f, to_mask );
+        }
+      }
     }
   }
   /* Do the masking */
@@ -335,37 +342,38 @@ static void mask_effects( set s, cons *l ) {
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a loop
+ * @brief Compute Gen, Ref, and Kill set for any loop (do, for, while,...)
  * @description It has to deal specially with the loop variable which is not
- * managed in the Dragon book. If loops are at least one trip, then statements
- * are always killed by execution of loop body. Effect masking is performed
+ * managed in the Dragon book. Effect masking is performed
  * on locals (i.e., gen&ref sets are pruned from local definitions).
+ *
+ * For DO loop, if loops are at least one trip (set by property "ONE_TRIP_DO"),
+ * then statements are always killed by execution of loop body.
  *
  * @param l the loop to compute
  * @param st the statement that hold the loop
  *
- * FIXME FI: what should be made for while and for loops as well as for all
- * (block) occurences of local variables?
  */
-static void genkill_loop( loop l, statement st ) {
-  statement b = loop_body( l );
+static void genkill_any_loop( statement body,
+                              statement st,
+                              list locals,
+                              bool one_trip_do ) {
   set gen = GEN( st );
   set ref = REF( st );
-  list llocals = loop_locals( l );
-  list slocals = statement_declarations(st);
-  list locals = gen_nconc( gen_copy_seq( llocals ), gen_copy_seq( slocals ) );
 
   /* Compute genkill on the loop body */
-  genkill_statement( b );
+  genkill_statement( body );
 
   /* Summarize the body to the statement that hold the loop */
-  set_union( gen, gen, GEN( b ) );
-  set_union( ref, ref, REF( b ) );
-  if ( one_trip_do ) {
+  set_union( gen, gen, GEN( body ) );
+  set_union( ref, ref, REF( body ) );
+
+  /* This is used only for do loop */
+  if ( one_trip_do )  {
     /* If we assume the loop is always done at least one time, we can use
      * kill information from loop body.
      */
-    set_union( KILL( st ), KILL( st ), KILL( b ) );
+    set_union( KILL( st ), KILL( st ), KILL( body ) );
   }
 
   /* Filter effects on local variables */
@@ -373,73 +381,65 @@ static void genkill_loop( loop l, statement st ) {
     mask_effects( gen, locals );
     mask_effects( ref, locals );
   }
+
+}
+
+/**
+ * @brief Compute Gen, Ref, and Kill set for a "do" loop
+ * @description see genkill_any_loop()
+ *
+ * @param l the loop to compute
+ * @param st the statement that hold the loop
+ */
+static void genkill_loop( loop l, statement st ) {
+  statement body = loop_body( l );
+
+  /* Building locals list */
+  list llocals = loop_locals( l );
+  list slocals = statement_declarations(st);
+  list locals = gen_nconc( gen_copy_seq( llocals ), gen_copy_seq( slocals ) );
+
+  /* Call the generic function handling all kind of loop */
+  genkill_any_loop( body, st, locals, one_trip_do  );
 
   /* We free because we are good programmers and we don't leak ;-) */
   gen_free_list( locals );
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a for loop
- * @description It has to deal specially with the loop variable which is not
- * managed in the Dragon book. Effect masking is performed
- * on locals (i.e., gen&ref sets are pruned from local definitions).
+ * @brief Compute Gen, Ref, and Kill set for a "for" loop
+ * @description see genkill_any_loop()
  *
  * @param l the loop to compute
  * @param st the statement that hold the loop
  *
- * FIXME FI: should be fused with whileloop case and loop case when loop
- locals are removed */
+ */
 static void genkill_forloop( forloop l, statement st ) {
-  statement b = forloop_body( l );
-  set gen = GEN( st );
-  set ref = REF( st );
+  statement body = forloop_body( l );
   list locals = statement_declarations(st);
 
-  /* Compute genkill on the loop body */
-  genkill_statement( b );
+  /* Call the generic function handling all kind of loop */
+  genkill_any_loop( body, st, locals, one_trip_do  );
 
-  /* Summarize the body to the statement that hold the loop */
-  set_union( gen, gen, GEN( b ) );
-  set_union( ref, ref, REF( b ) );
-
-  /* Filter effects on local variables */
-  if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
-    mask_effects( gen, locals );
-    mask_effects( ref, locals );
-  }
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a while loop
- * @description It has to deal specially with the loop variable which is not
- * managed in the Dragon book. Effect masking is performed
- * on locals (i.e., gen&ref sets are pruned from local definitions).
+ * @brief Compute Gen, Ref, and Kill set for a "while" loop
+ * @description see genkill_any_loop()
  *
  * @param l the loop to compute
  * @param st the statement that hold the loop
  */
 static void genkill_whileloop( whileloop l, statement st ) {
-  statement b = whileloop_body( l );
-  set gen = GEN( st );
-  set ref = REF( st );
+  statement body = whileloop_body( l );
   list locals = statement_declarations(st);
 
-  /* Compute genkill on the loop body */
-  genkill_statement( b );
-
-  /* Summarize the body to the statement that hold the loop */
-  set_union( gen, gen, GEN( b ) );
-  set_union( ref, ref, REF( b ) );
-
-  /* Filter effects on local variables */
-  if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
-    mask_effects( gen, locals );
-    mask_effects( ref, locals );
-  }
+  /* Call the generic function handling all kind of loop */
+  genkill_any_loop( body, st, locals, one_trip_do  );
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a for loop
+ * @brief Compute Gen, Ref, and Kill set for a block
  * @description The Dragon book only deals with a sequence of two statements.
  * here we generalize to lists, via recursion. Statement are processed in
  * reversed order (i.e. on the descending phase of recursion)
@@ -447,7 +447,6 @@ static void genkill_whileloop( whileloop l, statement st ) {
  * @param sts the list of statements inside the block
  * @param st the statement that hold the block
  *
- * FIXME: shouldn't we mask effect on local variables ?
  */
 static void genkill_block( cons *sts, statement st ) {
   statement one;
@@ -479,6 +478,13 @@ static void genkill_block( cons *sts, statement st ) {
     set_free( diff );
     set_free( gen );
     set_free( ref );
+
+    /* FIXME : This should be done after all recursion for performance... */
+    if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
+      mask_effects( gen_st, statement_declarations(st));
+      mask_effects( ref_st, statement_declarations(st));
+    }
+
   }
 }
 
