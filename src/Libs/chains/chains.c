@@ -909,12 +909,12 @@ static bool ud( fin, fout )
     effect fin, fout; {
     return ( action_read_p( effect_action( fin )) && ( action_write_p( effect_action( fout )) || keep_read_read_dependences ) );
 }
-
-/* ADD_CONFLICTS adds conflitc arcs to the dependence graph dg between the
+
+/* ADD_CONFLICTS adds conflict arcs to the dependence graph dg between the
  in-coming statement STIN and the out-going STOUT.
  Note that output dependencies
  are not minimal (e.g., i = s ; s = ... ; s = ...) creates an oo-dep between
- the i assingment and the last s assignment. */
+ the i assignment and the last s assignment. */
 
 static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
     vertex vin;
@@ -1022,11 +1022,28 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
             }
         }
 
-    /* il faut verifier que l'arc vin/vout n'existe pas deja !! */
+    /* Add conflicts */
     if ( !ENDP( cs ) ) {
-        successor s = make_successor( make_dg_arc_label( cs ), vout );
 
-        vertex_successors( vin ) = CONS( SUCCESSOR, s, vertex_successors( vin ));
+        /* The sink vertex in the graph */
+        successor sout = successor_undefined;
+
+        /* Try first to find an existing vertex for this statement */
+        FOREACH( successor, s, vertex_successors( vin ) ) {
+          if( successor_vertex(s) == vout ) {
+              sout=s;
+              break;
+          }
+        }
+        if(successor_undefined_p(sout)) {
+          /* There is no sink vertex for this statement, create one */
+          sout = make_successor( make_dg_arc_label( cs ), vout );
+          vertex_successors( vin ) = CONS( SUCCESSOR, sout, vertex_successors( vin ));
+        } else {
+          /* Use existing vertex for this statement */
+          gen_nconc(successor_arc_label(sout), cs);
+
+        }
     }
 
     ifdebug(1) {
