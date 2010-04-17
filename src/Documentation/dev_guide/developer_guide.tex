@@ -1719,8 +1719,8 @@ For the \textbf{inter}-directory parallel validation, on defaults or
 only some directories by defining the \texttt{TARGET} make macro:
 \begin{verbatim}
   sh> cd validation
-  sh> make -j 8 parallel-validate
-  sh> make -j 8 TARGET='HardwareAccelerator Hpfc' parallel-validate
+  sh> make -j 8 new-validate
+  sh> make -j 8 TARGET='HardwareAccelerator Hpfc' new-validate
 \end{verbatim}
 The detailed results are stored in file \texttt{validation.out}.
 Possible test results are:
