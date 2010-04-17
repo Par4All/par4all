@@ -150,8 +150,7 @@ intersect(
 
 /* Compute the union of all initial preconditions.
  */
-bool
-program_precondition(string name)
+bool program_precondition(string name)
 {
     transformer t = transformer_identity();
     entity the_main = get_main_entity();
@@ -166,11 +165,11 @@ program_precondition(string name)
 	       module_local_name(the_main));
 
     set_current_module_entity(the_main);
-    set_current_module_statement( (statement) 
+    set_current_module_statement( (statement)
 				  db_get_memory_resource(DBR_CODE,
 							 module_local_name(the_main),
 							 TRUE));
-    set_cumulated_rw_effects((statement_effects) 
+    set_cumulated_rw_effects((statement_effects)
 			     db_get_memory_resource(DBR_CUMULATED_EFFECTS,
 						    module_local_name(the_main),
 						    TRUE));
@@ -183,7 +182,7 @@ program_precondition(string name)
 						      TRUE));
 
     module_to_value_mappings(the_main);
-    
+
     /* Unavoidable pitfall: initializations in uncalled modules may be
      * taken into account. It all depends on the "create" command.
      */
@@ -191,14 +190,13 @@ program_precondition(string name)
     nmodules = gen_array_nitems(modules);
     pips_assert("some modules in the program", nmodules>0);
 
-    for(i=0; i<nmodules; i++) 
-    {
+    for(i=0; i<nmodules; i++) {
 	transformer tm;
 	string mname = gen_array_item(modules, i);
 	pips_debug(1, "considering module %s\n", mname);
-	
+
 	tm = transformer_dup((transformer) /* no dup & FALSE => core */
-			     db_get_memory_resource(DBR_INITIAL_PRECONDITION,  
+			     db_get_memory_resource(DBR_INITIAL_PRECONDITION,
 						    mname, TRUE));
 
 	pred_debug(3, "current: t =\n", t);
@@ -214,14 +212,14 @@ program_precondition(string name)
 	}
 	pred_debug(3, "to be added after filtering:\n", tm);
 
-	intersect(t, tm); 
+	intersect(t, tm);
 	free_transformer(tm);
     }
 
     pred_debug(1, "resulting program precondition:\n", t);
 
-    ifdebug(1) 
-	pips_assert("consistent program precondition", 
+    ifdebug(1)
+	pips_assert("consistent program precondition",
 		    transformer_consistency_p(t));
 
     DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_PRECONDITION, "", t);

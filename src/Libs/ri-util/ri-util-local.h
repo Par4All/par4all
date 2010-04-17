@@ -1258,6 +1258,11 @@
    make sure e is a variable.
 
    It may also be a dummy C parameter.
+
+   It may also be a hidden entity such as an abstract location.
+
+   To sum up, this predicate does not imply that entity e represents a
+   variable declared in the source code by the programmer.
  */
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 
