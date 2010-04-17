@@ -1,6 +1,6 @@
 /*
 
- $Id $
+ $Id$
 
  Copyright 1989-2010 MINES ParisTech
 
@@ -20,7 +20,7 @@
  You should have received a copy of the GNU General Public License
  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
- */
+*/
 #ifdef HAVE_CONFIG_H
 #include "pips_config.h"
 #endif
