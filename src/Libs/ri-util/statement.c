@@ -86,10 +86,10 @@ static bool call_filter(call c,bool *statement_is_empty)
         return cannot_be_empty(statement_is_empty);
 }
 
-bool 
+bool
 empty_code_p(statement s)
 {
-    if ((!s) || statement_undefined_p(s)) 
+    if ((!s) || statement_undefined_p(s))
         return true;
 
     bool statement_is_empty = true;
@@ -114,18 +114,30 @@ empty_comments_p(string s)
   pips_assert("comments cannot be NULL", s!=NULL);
   return (s == NULL || string_undefined_p(s) || strcmp(s,"")==0);
 }
+
+
 bool
 comments_equal_p(string c1, string c2)
 {
-    return 
+    return
         ( empty_comments_p(c1) && empty_comments_p(c2)) ||
         (!empty_comments_p(c1) && !empty_comments_p(c2) && same_string_p(c1,c2));
 }
+
 
 /** @defgroup statements_p Predicates on statements
 
     @{
 */
+
+
+/* Return true if the statement has an empty statement: */
+bool
+statement_with_empty_comment_p(statement s)
+{
+    string the_comments = statement_comments(s);
+    return empty_comments_p(the_comments);
+}
 
 
 /* Test if a statement is an assignment. */
@@ -451,6 +463,41 @@ bool check_io_statement_p(statement s)
 
 /* functions to generate statements */
 
+
+/* Duplicate statement comments
+
+   @param comment is the comment to duplicate
+
+   @return the duplicated comment. If it was an allocated string, it is
+   strdup()ed
+*/
+string
+comments_dup(string comment) {
+  if (comment == NULL || string_undefined_p(comment))
+    /* Not allocated, just the same: */
+    return comment;
+  else
+    return strdup(comment);
+}
+
+
+/* Duplicate statement decls_text
+
+   @param dt is the decls_text to duplicate
+
+   @return the duplicated decls_text. If it was an allocated string, it is
+   strdup()ed
+*/
+string
+decls_text_dup(string dt) {
+  if (dt == NULL)
+    /* Not allocated, just the same: */
+    return dt;
+  else
+    return strdup(dt);
+}
+
+
 /** Build a statement from a give instruction
 
     There is also a macro instruction_to_statement() that does the same job.
@@ -462,7 +509,7 @@ make_stmt_of_instr(instruction instr) {
 			STATEMENT_ORDERING_UNDEFINED,
 			empty_comments,
 			instr,NIL,NULL,
-			empty_extensions ()));
+			empty_extensions()));
 }
 
 
@@ -529,6 +576,48 @@ statement make_empty_statement_with_declarations_and_comments(list d,
   statement_decls_text(s) = dt;
   statement_comments(s) = c;
   return s;
+}
+
+
+/* Move all the attributes from one statement to another one.
+
+   Do not copy the instruction
+
+   @param from is the statement we pick the attributes from
+
+   @param to is the statement we copy the attributes into
+*/
+void move_statement_attributes(statement from,
+			       statement to) {
+  statement_label(to) = statement_label(from);
+  statement_number(to) = statement_number(from);
+  statement_ordering(to) = statement_ordering(from);
+  statement_comments(to) = statement_comments(from);
+  //statement_instruction(to) = statement_instruction(from);
+  statement_declarations(to) = statement_declarations(from);
+  statement_decls_text(to) = statement_decls_text(from);
+  statement_extensions(to) = statement_extensions(from);
+}
+
+
+/* Copy all the attributes from one statement to another one.
+
+   Do not copy the instruction
+
+   @param from is the statement we pick the attributes from
+
+   @param to is the statement we copy the attributes into
+*/
+void copy_statement_attributes(statement from,
+			       statement to) {
+  statement_label(to) = statement_label(from);
+  statement_number(to) = statement_number(from);
+  statement_ordering(to) = statement_ordering(from);
+  statement_comments(to) = comments_dup(statement_comments(from));
+  //statement_instruction(to) = statement_instruction(from);
+  statement_declarations(to) = gen_copy_seq(statement_declarations(from));
+  statement_decls_text(to) = decls_text_dup(statement_decls_text(from));
+  statement_extensions(to) = copy_extensions(statement_extensions(from));
 }
 
 
@@ -793,16 +882,22 @@ statement make_plain_continue_statement()
 }
 
 
-/* To preserve declaration lines and comments, declaration statements
-   are used. */
-statement make_declaration_statement(entity v, int sn, string cs)
-{
-  statement ds = make_call_statement(CONTINUE_FUNCTION_NAME,
-				     NIL,
-				     entity_empty_label(),
-				     cs);
+/* Make a declaration statement
+
+   To preserve declaration lines and comments, declaration statements are
+   used
+
+   @param v is the variable to add in the declaration
+
+   @param sn is the statement number to use
+
+   @param cs is the comment string to associate with the declaration
+*/
+statement make_declaration_statement(entity v, int sn, string cs) {
+  statement ds = make_plain_continue_statement();
   statement_declarations(ds) = CONS(ENTITY, v, NIL);
   statement_number(ds) = sn;
+  statement_comments(ds) = cs;
 
   return ds;
 }
@@ -1281,7 +1376,7 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
 
 string external_statement_identification(statement s)
 {
-    static char buffer[STATIC_BUFFER_SZ];
+    char buffer;
     instruction i = statement_instruction(s);
     string instrstring = instruction_identification(i);
     int so = statement_ordering(s);
@@ -1292,14 +1387,12 @@ string external_statement_identification(statement s)
 	called = call_function(instruction_call(i));
     }
 
-    nb_char = snprintf(buffer, STATIC_BUFFER_SZ, "%td (%d, %d): %s %s\n",
-	    statement_number(s),
-	    ORDERING_NUMBER(so),
-	    ORDERING_STATEMENT(so),
-	    instrstring,
-	    entity_undefined_p(called)? "" : module_local_name(called));
-
-    pips_assert ("checking static buffer overflow", nb_char < STATIC_BUFFER_SZ);
+    asprintf(&buffer, "%td (%d, %d): %s %s\n",
+	     statement_number(s),
+	     ORDERING_NUMBER(so),
+	     ORDERING_STATEMENT(so),
+	     instrstring,
+	     entity_undefined_p(called)? "" : module_local_name(called));
 
     return buffer;
 }
@@ -1332,7 +1425,7 @@ string statement_identification(statement s)
     return buffer;
 }
 
-string 
+string
 safe_statement_identification(statement s)
 {
   if(statement_undefined_p(s)) {
@@ -1346,17 +1439,7 @@ safe_statement_identification(statement s)
 }
 
 
-
-/* Return true if the statement has an empty statement: */
-bool
-statement_with_empty_comment_p(statement s)
-{
-    string the_comments = statement_comments(s);
-    return empty_comments_p(the_comments);
-}
-
-
-static bool 
+static bool
 gather_all_comments_of_a_statement_filter(statement s, string * all_comments)
 {
     string the_comments = statement_comments(s);
@@ -2209,12 +2292,12 @@ default_generated_variable_commenter(__attribute__((unused))entity e)
     return strdup(PIPS_DECLARATION_COMMENT);
 }
 
+#define MAX_COMMENTERS 8
+
 /* commenters are function used to add comments to pips-created variables
  * they are handled as a limited size stack
  * all commenters are supposed to return allocated data
  */
-#define MAX_COMMENTERS 8 
-
 typedef string (*generated_variable_commenter)(entity);
 static generated_variable_commenter generated_variable_commenters[MAX_COMMENTERS] = {
     [0]=default_generated_variable_commenter /* c99 inside :) */
@@ -2226,11 +2309,13 @@ void push_generated_variable_commenter(string (*commenter)(entity))
     pips_assert("not exceeding stack commenters stack limited size\n",nb_commenters<MAX_COMMENTERS);
     generated_variable_commenters[nb_commenters++]=commenter;
 }
+
 void pop_generated_variable_commenter()
 {
     pips_assert("not removing default commenter",nb_commenters!=1);
     --nb_commenters;
 }
+
 string generated_variable_comment(entity e)
 {
     string tmp = generated_variable_commenters[nb_commenters-1](e);
@@ -2344,7 +2429,7 @@ statement update_statement_instruction(statement s,instruction i)
     /* try hard to keep comments and label when relevant */
     if (instruction_sequence_p(i) && (
                 !statement_with_empty_comment_p(s) ||
-                (!unlabelled_statement_p(s) && !entity_return_label_p(statement_label(s))) /*SG:note the special returnèlabel case */
+                (!unlabelled_statement_p(s) && !entity_return_label_p(statement_label(s))) /*SG:note the special return-label case */
                 ) )
     {
         statement cs = make_continue_statement(statement_label(s));
@@ -3368,6 +3453,14 @@ static bool statement_in_statement_walker(statement st, struct sb* sb)
     return true;
 }
 
+/* Look if a statement is another one
+
+   @param s is the potentially inside statement
+
+   @param st is the outside statement
+
+   @return TRUE is @p s is inside @p st
+*/
 bool statement_in_statement_p(statement s, statement st)
 {
     struct sb sb = { s,false };
@@ -3375,6 +3468,16 @@ bool statement_in_statement_p(statement s, statement st)
     return sb.res;
 }
 
+
+/* Look if at least one statement of a list of statements is in another
+   one
+
+   @param l is the list of statements
+
+   @param st is the outside statement
+
+   @return TRUE is at least one statement of @p l is inside @p st
+*/
 bool statement_in_statements_p(statement s, list l)
 {
     FOREACH(STATEMENT,st,l)
