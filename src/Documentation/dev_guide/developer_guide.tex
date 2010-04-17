@@ -855,6 +855,63 @@ There are also PIPS specific instructions to \verb|pips_git|:
 \end{itemize}
 
 
+\section{Coding style and conventions}
+\label{sec:coding}
+
+
+All the source code should be documented with Doxygen. It is far from this
+state right now, but the new code should be documented.
+
+All the code should be heavily documented. It is still not the
+case... PIPS is already a quite old and huge project and more than 20
+years later it is hard to understand many details of the code. So just
+think about the PIPS in 20 years more, when you will have forgotten many
+things...
+
+A lazy, but still useful, approach for the community could be that when
+you use a function that is not yet documented, please take some time to do
+it.
+
+Avoid doing some code bloat by using some heavy code inlining or code
+copy. Try to find if the function you need is not already somewhere,
+typically into \texttt{ri-util}. If not, ask to some old team member, on
+the discussion list, on IRC, and if not, implement it. Try to thing
+genericity for the common use. If the function exist somewhere but not at
+an enough global place, move it for example into \texttt{ri-util}.
+
+When committing into the version control system, try to have an explicit
+message structured with a summary line, and then a more precise
+description. A common habit with some tools such as \texttt{git} but that
+can be quite generalized.
+
+Try to do more small commits instead of big ones to ease bug tracking in
+case of problems.
+
+Libraries are named \verb|libXXX.a| where \verb|XXX| is the logical name of
+the library: {\tt vecteur}, {\tt prettyprint}, {\tt misc},etc.
+
+It is theoretically unuseful to put libraries in the Makefile dependencies,
+because header files which are automatically generated are in these
+dependencies, and are systematically modified each time an installation is
+performed. However, this does not work if the pass {\tt p} calls the library
+{\tt a} which needs the library {\tt b}, and if {\tt p} does not directly
+needs the library {\tt b}: modifications to {\tt b} will not provoke the
+link of {\tt p}.
+
+Each important library uses an environment variable \verb+XXX_DEBUG_LEVEL+
+to control debugging messages. This rule hase an exception:
+\verb+PARSER_DEBUG_LEVEL+ corresponds to the \verb+syntax+ library .
+
+Level 0 corresponds to the normal behaviour.
+The highest level is 8. Great care has to be brought to calls to
+\verb+debug_on()+ and \verb+debug_off()+, because successive debug levels
+are stored in a stack, and it could disturb its coherency. The debug of a
+function of another library should not unconsciously be activated.
+
+Have a look to \S~\ref{sec:pips_dynamic_debug} to have more information on
+debugging.
+
+
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
 \label{sec:shell}
 
@@ -1761,7 +1818,8 @@ debugging, gcc-specific options are added to have the macro
 definitions at the beginning of the file too, to keep the comments and
 display the list of included files.
 
-\subsection{Debugging PIPS C source code dynamiccaly}
+\subsection{Debugging PIPS C source code dynamically}
+\label{sec:pips_dynamic_debug}
 
 We use environment variables \verb/xxxx_DEBUG_LEVEL/ to control
 debugging output at the library level. So, one library (or phase)
@@ -2707,31 +2765,6 @@ TARGET_LIBS=    -lprivatize -lusedef -lprettyprint -lsemantics \
 
 $(TARGET): ../Lib/misc/misc.a
 \end{verbatim}
-
-\section{Conventions}
-\label{sec:conventions}
-
-
-libraries are named \verb|libXXX.a| where \verb|XXX| is the logical name of
-the library: {\tt vecteur}, {\tt prettyprint}, {\tt misc},etc.
-
-It is theoretically unuseful to put libraries in the Makefile dependencies,
-because header files which are automatically generated are in these
-dependencies, and are systematically modified each time an installation is
-performed. However, this does not work if the pass {\tt p} calls the library
-{\tt a} which needs the library {\tt b}, and if {\tt p} does not directly
-needs the library {\tt b}: modifications to {\tt b} will not provoke the
-link of {\tt p}. 
-
-Each important library uses an environment variable \verb+XXX_DEBUG_LEVEL+
-to control debugging messages. This rule hase an exception:
-\verb+PARSER_DEBUG_LEVEL+ corresponds to the \verb+syntax+ library .
-
-Level 0 corresponds to the normal behaviour.
-The highest level is 8. Great care has to be brought to calls to
-\verb+debug_on()+ and \verb+debug_off()+, because successive debug levels
-are stored in a stack, and it could disturb its coherency. The debug of a
-function of another library should not unconsciously be activated.  
 
 \section{Bug policy}
 \label{sec:bugs}
