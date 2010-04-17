@@ -77,20 +77,23 @@ validate-%: %
 	  PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD)/$< -O RESULTS . ; \
 	}
 
+#
+# PARALLEL VALIDATION
+#
 # directory-parallel validation test
 # may replace the previous entry some day
 
-.PHONY: parallel-validate parallel-clean
+.PHONY: parallel-validate parallel-clean parallel-unvalidate parallel-skipped
 
+# where results are stored
 RESULTS	= validation.out
 HEAD	= validation.head
 
-# KEEP SUMMARIES
+# keep summaries
 SUM.d	= SUMMARY_Archive
 NOW.d	:= $(shell date +%Y/%m)
 DEST.d	= $(SUM.d)/$(NOW.d)
 NOW	:= SUMMARY.$(shell date +%Y-%m-%d_%H_%M_%S)
-
 SUM.last	= $(SUM.d)/SUMMARY-last
 SUM.prev	= $(SUM.d)/SUMMARY-previous
 
@@ -99,9 +102,11 @@ $(DEST.d):
 
 SVNURL	= $(shell svn info | grep 'Repository Root' | cut -d: -f2-)
 
+# generate summary header
 $(HEAD):
 	{ \
-	  echo "validation for $(TARGET)" ; \
+	  echo "parallel validation" ; \
+	  echo "on: $(TARGET)" ; \
 	  echo "host: $$(hostname)" ; \
 	  echo "directory: $(PWD)" ; \
 	  test -d .svn && \
@@ -116,10 +121,19 @@ $(HEAD):
 
 # this target should replace the "validate" target
 new-validate:
+	$(RM) SUMMARY
 	$(MAKE) parallel-clean
-	$(MAKE) summary
+	$(MAKE) archive
 
-summary: validation.head parallel-validate $(DEST.d)
+mail-validate: new-validate
+	{ \
+	  cat $(SUM.d)/SUMMARY.diff ;
+	  echo ; \
+	  cat SUMMARY ; \
+	} | Mail -s "$(shell tail -1 SUMMARY)" $(EMAIL)
+
+# generate & archive validation summary
+SUMMARY: validation.head parallel-validate
 	{ \
 	  cat $(HEAD) ; \
 	  echo ; \
@@ -129,11 +143,14 @@ summary: validation.head parallel-validate $(DEST.d)
 		"failed out of" \
 		$$(grep -v 'skipped: ' < $(RESULTS) | wc -l) \
 		"on" $$(date) ; \
-	} > $(DEST.d)/$(NOW)
-	$(RM) $(SUM.prev)
-	test -f $(SUM.last) && mv $(SUM.last) $(SUM.prev)
-	ln -s $(NOW.d)/$(NOW) $(SUM.last)
-	test -f $(SUM.prev) -a -f $(SUM.last) && \
+	} > $@
+
+archive: SUMMARY $(DEST.d)
+	cp SUMMARY $(DEST.d)/$(NOW) ; \
+	$(RM) $(SUM.prev) ; \
+	test -L $(SUM.last) && mv $(SUM.last) $(SUM.prev) ; \
+	ln -s $(NOW.d)/$(NOW) $(SUM.last) ; \
+	test -L $(SUM.prev) -a -L $(SUM.last) && \
 	  diff $(SUM.prev) $(SUM.last) > $(SUM.d)/SUMMARY.diff
 
 # overall targets
@@ -146,7 +163,7 @@ parallel-validate: $(TARGET:%=parallel-validate-%)
 
 parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
 
-# subdir targets
+# generic subdir targets
 parallel-clean-%:
 	$(MAKE) -C $* clean unvalidate
 
