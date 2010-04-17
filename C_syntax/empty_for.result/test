@@ -15,7 +15,7 @@ complex imagein[N][N];
 extern int main(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
-   int i,  j,  k;
+   int i, j, k;
 
    for(i = 0; i <= 8; i += 1)
       for(j = 0; j <= 8; j += 1)
