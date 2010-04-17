@@ -30,8 +30,6 @@
 
 #include "linear.h"
 
-#include "alias-classes.h"
-
 #include "genC.h"
 
 #include "ri.h"
@@ -40,6 +38,7 @@
 
 #include "ri-util.h"
 
+#include "alias-classes.h"
 
 
 /* Two effects will always conflict if they abstract two location sets with a
