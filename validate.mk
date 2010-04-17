@@ -42,11 +42,15 @@ RESULTS	= failed
 
 SHELL	= /bin/bash
 PF	= set -o pipefail
+
+# extract validation result for summary
 OK	= status=$$? ; \
 	  if [ "$$status" != 0 ] ; then \
 	     echo "failed: $(SUBDIR)/$*" ; \
 	  elif [ $$(svn diff $@ | wc -l) -ne 0 ] ; then \
 	     echo "changed: $(SUBDIR)/$*" ; \
+	  else \
+	     echo "passed: $(SUBDIR)/$*" ; \
 	  fi >> $(RESULTS)
 
 # default target is to clean
