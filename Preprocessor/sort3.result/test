@@ -1,5 +1,4 @@
 extern void sort3();
-# 1
 void sort3(n,ra,rb,rc)
 int n;
 float ra[],rb[],rc[];

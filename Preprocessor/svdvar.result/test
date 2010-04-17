@@ -1,5 +1,4 @@
 extern void svdvar();
-# 1
 void svdvar(v,ma,w,cvm)
 float **v,w[],**cvm;
 int ma;

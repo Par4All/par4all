@@ -1,5 +1,4 @@
 extern float chebev();
-# 1
 float chebev(a,b,c,m,x)
 float a,b,c[],x;
 int m;

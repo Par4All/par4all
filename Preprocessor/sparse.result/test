@@ -1,5 +1,4 @@
 extern void sparse();
-# 1
 void sparse(b,n,x,rsq)
 float b[],x[],*rsq;
 int n;

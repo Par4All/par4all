@@ -1,5 +1,4 @@
 extern void shootf();
-# 1
 void shootf(nvar,v1,v2,delv1,delv2,n1,n2,x1,x2,xf,eps,h1,hmin,f,dv1,dv2)
 int nvar,n1,n2;
 float v1[],v2[],delv1[],delv2[],x1,x2,xf,eps,h1,hmin,f[],dv1[],dv2[];

@@ -1,5 +1,4 @@
 extern void vander();
-# 1
 void vander(x,w,q,n)
 float x[],w[],q[];
 int n;

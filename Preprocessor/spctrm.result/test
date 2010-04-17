@@ -2706,7 +2706,6 @@ extern void _IO_free_backup_area (_IO_FILE *) ;
 
 
 typedef _G_fpos_t fpos_t;
-# 2717 "./spctrm.c"
 /* The possibilities for the third argument to `setvbuf'.  */
 
 
@@ -3221,7 +3220,6 @@ extern int ftrylockfile (FILE *__stream) ;
 extern void funlockfile (FILE *__stream) ;
 /* If we are compiling with optimizing read this file.  It contains
    several optimizing inline functions and macros.  */
-# 3241 "./spctrm.c"
 static float sqrarg;
 
 
@@ -3230,7 +3228,6 @@ static float sqrarg;
 /* #define WINDOW(j,a,b) (1.0-SQR((((j)-1)-(a))*(b))) */ /* Welch  */
 
 extern void spctrm();
-# 3248
 void spctrm(fp,p,m,k,ovrlap)
 FILE *fp;
 float p[];

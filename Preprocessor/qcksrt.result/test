@@ -1,5 +1,4 @@
 extern void qcksrt();
-# 1
 void qcksrt(n,arr)
 int n;
 float arr[];

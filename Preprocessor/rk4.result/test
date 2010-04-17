@@ -1,5 +1,4 @@
 extern void rk4();
-# 1
 void rk4(y,dydx,n,x,h,yout,derivs)
 float y[],dydx[],x,h,yout[];
 void (*derivs)(); /* ANSI: void (*derivs)(float,float *,float *); */

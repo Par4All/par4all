@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void fgauss();
-# 1267
 void fgauss(x,a,y,dyda,na)
 float x,a[],*y,dyda[];
 int na;

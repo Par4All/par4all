@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void ttest();
-# 1267
 void ttest(data1,n1,data2,n2,t,prob)
 int n1,n2;
 float data1[],data2[],*t,*prob;

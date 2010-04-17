@@ -1,5 +1,4 @@
 extern void chebpc();
-# 1
 void chebpc(c,d,n)
 float c[],d[];
 int n;

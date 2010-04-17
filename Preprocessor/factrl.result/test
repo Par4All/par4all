@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float factrl();
-# 1267
 float factrl(n)
 int n;
 {

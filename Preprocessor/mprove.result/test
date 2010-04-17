@@ -1,5 +1,4 @@
 extern void mprove();
-# 1
 void mprove(a,alud,n,indx,b,x)
 float **a,**alud,b[],x[];
 int n,indx[];

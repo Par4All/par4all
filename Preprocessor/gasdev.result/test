@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float gasdev();
-# 1267
 float gasdev(idum)
 int *idum;
 {

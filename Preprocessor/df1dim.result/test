@@ -3,7 +3,6 @@ extern float *pcom,*xicom,(*nrfunc)();
 extern void (*nrdfun)();
 
 extern float df1dim();
-# 5
 float df1dim(x)
 float x;
 {

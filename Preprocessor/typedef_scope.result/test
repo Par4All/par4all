@@ -1,18 +1,16 @@
-# 17
 foo()
 {
   typedef int node;
-  //int node;
+  //int node; 
   struct node
   {
     int node;
   };
 }
-# 3
 main()
 {
   typedef int node;
-  //int node;
+  //int node; 
   struct node
   {
     int node;

@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float bessi0();
-# 1267
 float bessi0(x)
 float x;
 {

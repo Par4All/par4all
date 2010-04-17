@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void flmoon();
-# 1269
 void flmoon(n,nph,jd,frac)
 int n,nph;
 long *jd;

@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void simp1();
-# 1267
 void simp1(a,mm,ll,nll,iabf,kp,bmax)
 float **a,*bmax;
 int mm,ll[],nll,iabf,*kp;

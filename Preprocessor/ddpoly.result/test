@@ -1,5 +1,4 @@
 extern void ddpoly();
-# 1
 void ddpoly(c,nc,x,pd,nd)
 int nc,nd;
 float c[],x,pd[];

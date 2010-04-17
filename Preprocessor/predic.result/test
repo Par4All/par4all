@@ -1,5 +1,4 @@
 extern void predic();
-# 1
 void predic(data,ndata,d,npoles,future,nfut)
 float data[],d[],future[];
 int ndata,npoles,nfut;

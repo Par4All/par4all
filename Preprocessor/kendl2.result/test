@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void kendl2();
-# 1267
 void kendl2(tab,i,j,tau,z,prob)
 float **tab,*tau,*z,*prob;
 int i,j;

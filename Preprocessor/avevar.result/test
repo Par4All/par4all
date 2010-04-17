@@ -1,5 +1,4 @@
 extern void avevar();
-# 1
 void avevar(data,n,ave,svar)
 float data[],*ave,*svar;
 int n;
