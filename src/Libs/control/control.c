@@ -29,20 +29,42 @@
 char vcid_control_control[] = "$Id$";
 #endif /* lint */
 
-/* - control.c
+/* \defgroup controlizer Controlizer phase to build the Hierarchical Control Flow Graph
 
-   Computes the Hierarchical Control Flow Graph of a given statement.
+   It computes the Hierarchical Control Flow Graph of a given statement
+   according the control hierarchy.
+
+   It is used in PIPS to transform the output of the parsers (the
+   PARSED_CODE resource) into HCFG code (the PARSED_CODE resource).
+
+   For example if there are some "goto" in a program, it will encapsulated
+   the unstructured graph in an "unstructured" object covering all the
+   goto and their label targets to localize the messy part and this object
+   is put into a normal statement so that seen from above the code keep a
+   good hierarchy.
+
+   In PIPS the RI (Internal Representation or AST) is quite simple so that
+   it is easy to deal with. But the counterpart is that some complex
+   control structures need to be "unsugared". For example
+   switch/case/break/default are transformed into tests, goto and label,
+   for(;;) with break or continue are transformed into while() loops with
+   goto/label, and so on.
+
+   There are other phases in PIPS that can be used later to operate on the
+   CODE to optimize it further.
+
 
    WARNINGS:
 
-   . Temporary locations malloced while recursing in the process are
-     not freed (to be done latter ... if required)
+   . Temporary locations malloc()ed while recursing in the process are
+     often not freed (to be done latter ... if required)
+
    . The desugaring of DO loops is not perfect (in case of side-effects
      inside loop ranges.
 
-   Pierre Jouvelot (27/5/89) <- this is a French date:-)
+   Pierre Jouvelot (27/5/89) <- this is a French date :-)
 
-   MODIFICATIONS:
+   MODIFICATIONS (historian fun):
 
    . hash_get interface modification: in one hash table an undefined key
    meant an error; in another one an undefined key was associated to
@@ -50,6 +72,7 @@ char vcid_control_control[] = "$Id$";
    as NOT_FOUND value (i.e. HASH_UNDEFINED_VALUE); this would work again
    if HASH_UNDEFINED_VALUE can be user definable; Francois Irigoin, 7 Sept. 90
 
+   @{
 */
 
 /*
@@ -170,32 +193,46 @@ control fnode, tnode;
 	 control_successors(fnode));
 }
 
-/* MAKE_CONDITIONAL_CONTROL is make_control except when the statement ST
-   has a label and is thus already in Label_control. */
 
-static control make_conditional_control(st)
-statement st;
-{
-    string label = entity_name(statement_label(st));
+/* Make a control node from a statement if needed.
 
-    if(empty_global_label_p(label)) {
-	return(make_control(st, NIL, NIL));
-    }
-    else {
-      /* FI: I do not understand the double cast from control to list
-	 in hash_get_default_empty_list() and then from list to
-	 control here... */
-	return((control)hash_get_default_empty_list(Label_control, label));
-    }
+   It is like make_control() except when the statement @param st
+   has a label and is thus already in Label_control
+
+   @return the new (in the case of a statement without a label) or already
+   associated (in the case of a statement with a label) control node with
+   the statement
+
+   It returns NULL if the statement has a label but it is not associated to
+   any control node yet
+ */
+static control make_conditional_control(statement st) {
+  string label = entity_name(statement_label(st));
+
+  if (empty_global_label_p(label))
+    /* No label, so there cannot be a control already associated by a
+       label */
+    return make_control(st, NIL, NIL);
+  else
+      /* Get back the control node associated with this statement
+	 label. Since we store control object in this hash table, use
+	 cast. We rely on the fact that NIL for a list is indeed
+	 NULL... */
+    return (control)hash_get_default_empty_list(Label_control, label);
 }
 
-/* GET_LABEL_CONTROL returns the control node corresponding to a
-   useful label NAME in the Label_control table. The name must be an
-   entity name, not a local or a user name. */
 
-static control get_label_control(name)
-string name;
-{
+/* Get the control node associated to a label name
+
+   It looks for the label name into the Label_control table.
+
+   The @p name must be the complete entity name, not a local or a user name.
+
+   @param name is the string name of the label entity
+
+   @return the associated control
+*/
+static control get_label_control(string name) {
     control c;
 
     pips_assert("label is not the empty label", !empty_global_label_p(name)) ;
@@ -208,40 +245,62 @@ string name;
     return(c);
 }
 
-/* UPDATE_USED_LABELS adds the reference to the label NAME in the
-   statement ST. A used_label is a hash_table that maps the label
-   name to the list of statements that references it. */
 
+/* Add the reference to the label NAME in the
+   statement ST. A used_label is a hash_table that maps the label
+   name to the list of statements that references it.
+
+   A statement can appear many times for a label
+
+   @param used_labels is the hash table used to record the statements
+   related to a label
+
+   @param name is the label entity name
+
+   @param st is the statement to be recorded as related to the label
+*/
 static void update_used_labels(hash_table used_labels,
 			       string name,
-			       statement st)
-{
-    cons *sts ;
+			       statement st) {
+  list sts ;
 
-    if( !empty_global_label_p(name) ) {
-	list new_sts;
-	sts = hash_get_default_empty_list(used_labels, name) ;
-	new_sts = CONS(STATEMENT, st, sts);
-	if (hash_defined_p(used_labels, name))
-	    hash_update(used_labels, name, (char*) new_sts);
-	else
-	    hash_put(used_labels, name, (char*) new_sts);
-	debug(5, "update_used_labels", "Reference to statement %d seen\n",
-	      statement_number( st )) ;
-    }
+  /* Do something only of there is a label: */
+  if (!empty_global_label_p(name)) {
+    list new_sts;
+    /* Get a previous list of statements related with this label: */
+    sts = hash_get_default_empty_list(used_labels, name) ;
+    /* Add the given statement to the list */
+    new_sts = CONS(STATEMENT, st, sts);
+    if (hash_defined_p(used_labels, name))
+      /* If there was already something associated to the label, register
+	 the new list: */
+      hash_update(used_labels, name, (char*) new_sts);
+    else
+      /* Or create a new entry: */
+      hash_put(used_labels, name, (char*) new_sts);
+    debug(5, "update_used_labels", "Reference to statement %d seen\n",
+	  statement_number( st )) ;
+  }
 }
 
-/* UNION_USED_LABELS unions the used-labels list L1 and L2 and returns the
-   result in L1 */
-static hash_table union_used_labels(l1, l2)
-hash_table l1, l2;
-{
-    HASH_MAP(name, sts, {
-	MAPL(stts, {
-	    update_used_labels(l1, name, STATEMENT(CAR(stts)));
-	}, (list) sts);
+
+/* Unions 2 used-label hash maps
+
+   @param l1 is an hash map
+
+   @param l2 is another hash map
+
+   @returns the union of @p l1 and @p l2 interpreted as in the context of
+   update_used_labels()
+*/
+static hash_table union_used_labels(hash_table l1,
+				    hash_table l2) {
+  HASH_MAP(name, sts, {
+      FOREACH(STATEMENT, s, sts) {
+	update_used_labels(l1, name, s);
+      };
     }, l2);
-    return( l1 ) ;
+  return l1;
 }
 
 
@@ -258,41 +317,39 @@ hash_table l1, l2;
    used_labels mapping.
 */
 static bool covers_labels_p(statement st,
-			    hash_table used_labels)
-{
-    if( get_debug_level() >= 5 ) {
-	pips_debug(0, "Statement %td (%p): \n ", statement_number( st ), st);
-	print_statement(st);
-    }
-    /* For all the labels in used_labels: */
-    HASH_MAP(name, sts, {
-	/* The statements using label name in used_labels: */
-	list stats = (list) sts;
+			    hash_table used_labels) {
+  if( get_debug_level() >= 5 ) {
+    pips_debug(0, "Statement %td (%p): \n ", statement_number(st), st);
+    print_statement(st);
+  }
+  /* For all the labels in used_labels: */
+  HASH_MAP(name, sts, {
+      /* The statements using label name in used_labels: */
+      list stats = (list) sts;
 
-	/* For all the statements associated to label name: */
-	MAPL(defs, {
-	    bool found = FALSE;
-	    /* Get one statement from the statements associated to label
-	       name: */
-	    statement def = STATEMENT(CAR(defs));
+      /* For all the statements associated to label name: */
+      FOREACH(STATEMENT,
+	      def,
+	      (list) hash_get_default_empty_list(Label_statements, name)) {
+	bool found = FALSE;
+	/* Verify that def is in all the statements associated to the
+	   label name according to used_labels. */
+	FOREACH(STATEMENT, st, stats) {
+	  found |= st == def;
+	}
 
-	    /* Verify that def is in all the statements associated to
-	       label name according to used_labels. */
-	    MAPL(sts, {
-		found |= (STATEMENT(CAR(sts))==def);
-	    }, stats);
-
-	    if(!found) {
-		pips_debug(5, "does not cover label %s\n", (char *) name);
-		return(FALSE);
-	    }
-	}, (list) hash_get_default_empty_list(Label_statements, name));
+	if (!found) {
+	  pips_debug(5, "does not cover label %s\n", (char *) name);
+	  /* Not useful to go on: */
+	  return(FALSE);
+	}
+      }
     }, used_labels);
 
-    if( get_debug_level() >= 5 ) {
-	fprintf( stderr, "covers its label usage\n" ) ;
-    }
-    return(TRUE);
+  if (get_debug_level() >= 5)
+    fprintf(stderr, "covers its label usage\n");
+
+  return(TRUE);
 }
 
 
@@ -2062,3 +2119,7 @@ statement st;
 
     return(u);
 }
+
+/*
+  @}
+*/
