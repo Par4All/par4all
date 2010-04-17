@@ -118,13 +118,13 @@ new-validate:
 
 summary: validation.head parallel-validate $(DEST.d)
 	{ \
-	  cat validation.head ; \
+	  cat $(HEAD) ; \
 	  echo ; \
-	  sort -k 2 $(RESULTS) ; \
+	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
 	  echo ; \
-	  echo $$(egrep -v '^(skipp|pass)ed: ' < validation.out | wc -l) \
+	  echo $$(egrep -v '^(skipp|pass)ed: ' < $(RESULTS) | wc -l) \
 		"failed out of" \
-		$$(grep -v 'skipped: ' < validation.out | wc -l) \
+		$$(grep -v 'skipped: ' < $(RESULTS) | wc -l) \
 		"on" $$(date) ; \
 	} > $(DEST.d)/$(NOW)
 	$(RM) $(SUM.d)/SUMMARY-previous
