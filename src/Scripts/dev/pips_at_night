@@ -40,6 +40,7 @@ valids=
 validate=validate
 # The default options for the validation:
 vopt="VOPT=--archive --diff"
+mopt=
 
 # where to do it by default
 target=~/PIPS
@@ -75,8 +76,8 @@ do
     -sd|--source-directory) sdir=$1 ; shift ;;
     --source-directory=*) sdir=${opt#*=} ;;
     # validation directories
-    -pv|--parallel-validate) validate=new-validate ;;
-    -mv|--mail-validate) validate=mail-validate ;;
+    -pv|--parallel-validate) validate=new-validate ; mopt='-j 8' ;;
+    -mv|--mail-validate) validate=mail-validate ; mopt='-j 8' ;;
     -nv|--no-validate) valids= ;;
     -v|--validate) valids="$valids validation" ;;
     -av|--add-validation) valids="$valids $1" ; shift ;;
@@ -125,16 +126,16 @@ source $target/pipsrc.sh
 if [[ $compile && ! $download ]]
 then
   pushd $target/$sdir
-  make $clean
+  make $mopt $clean
 
   cd newgen
-  make $compile
+  make $mopt $compile
 
   cd ../linear
-  make $compile
+  make $mopt $compile
 
   cd ../pips
-  make $compile
+  make $mopt $compile
 
   if [ -f bin/$PIPS_ARCH/tpips ]
   then
@@ -152,8 +153,8 @@ if [[ $valids ]] ; then
     if [[ -d $target/$d/. ]] ; then
       echo "### validating $d"
       pushd $target/$d
-      make clean
-      make "$vopt" EMAIL=$email $validate
+      make $mopt clean
+      make $mopt "$vopt" EMAIL=$email $validate
       popd
     else
       echo "### skipping validation $d, no such directory"
