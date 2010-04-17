@@ -85,11 +85,14 @@ validate-%: %
 RESULTS	= validation.out
 HEAD	= validation.head
 
-# SUMMARY:
+# KEEP SUMMARIES
 SUM.d	= SUMMARY_Archive
 NOW.d	:= $(shell date +%Y/%m)
 DEST.d	= $(SUM.d)/$(NOW.d)
 NOW	:= SUMMARY.$(shell date +%Y-%m-%d_%H_%M_%S)
+
+SUM.last	= $(SUM.d)/SUMMARY-last
+SUM.prev	= $(SUM.d)/SUMMARY-previous
 
 $(DEST.d):
 	mkdir -p $@
@@ -127,10 +130,11 @@ summary: validation.head parallel-validate $(DEST.d)
 		$$(grep -v 'skipped: ' < $(RESULTS) | wc -l) \
 		"on" $$(date) ; \
 	} > $(DEST.d)/$(NOW)
-	$(RM) $(SUM.d)/SUMMARY-previous
-	test -f $(SUM.d)/SUMMARY-last && \
-	  mv $(SUM.d)/SUMMARY-last $(SUM.d)/SUMMARY-previous ; \
-	ln -s $(NOW.d)/$(NOW) $(SUM.d)/SUMMARY-last
+	$(RM) $(SUM.prev)
+	test -f $(SUM.last) && mv $(SUM.last) $(SUM.prev)
+	ln -s $(NOW.d)/$(NOW) $(SUM.last)
+	test -f $(SUM.prev) -a -f $(SUM.last) && \
+	  diff $(SUM.prev) $(SUM.last) > $(SUM.d)/SUMMARY.diff
 
 # overall targets
 parallel-clean: $(TARGET:%=parallel-clean-%)
