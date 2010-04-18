@@ -1,4 +1,10 @@
 # $Id$
+#
+# TODO
+# * timeout
+# * *.f95 for gfc2pips
+# * check for multiple sources
+# * check for multiple scripts
 
 # pips exes
 TPIPS	= tpips
