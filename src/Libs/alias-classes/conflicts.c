@@ -496,9 +496,12 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p ) {
     } else {
       if ( variable_return_p( e1 ) && variable_return_p( e2 ) ) {
         return e1 == e2;
-      } else if ( entity_variable_p(e1) && entity_variable_p(e2) )
-        conflict_p = variable_entity_conflict_p( e1, e2 );
-      else {
+      } else if ( entity_variable_p(e1) && entity_variable_p(e2) ) {
+        /* FIXME : variable_entity_must_conflict_p doesn't exist yet */
+        if( !must_p) {
+          conflict_p = variable_entity_may_conflict_p( e1, e2 );
+        }
+      } else {
         pips_internal_error("Unexpected case.\n");
         ;
       }
