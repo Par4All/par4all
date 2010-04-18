@@ -157,7 +157,8 @@ archive: SUMMARY $(DEST.d)
 	test -L $(SUM.last) && mv $(SUM.last) $(SUM.prev) ; \
 	ln -s $(NOW.d)/$(NOW) $(SUM.last) ; \
 	test -f $(SUM.prev) -a -f $(SUM.last) && \
-	  diff $(SUM.prev) $(SUM.last) > $(SUM.d)/SUMMARY.diff
+	  diff $(SUM.prev) $(SUM.last) | \
+	  egrep -v '^([0-9,]+[acd][0-9,]+|---)$$' > $(SUM.d)/SUMMARY.diff
 
 # overall targets
 parallel-clean: $(TARGET:%=parallel-clean-%)
