@@ -355,10 +355,16 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
     /* Do we have aliasing within a data structure? */
     bool get_bool_property( string );
     if ( !get_bool_property( "ALIASING_ACROSS_TYPES" ) ) {
-      type t1 = reference_to_type( r1 );
-      type t2 = reference_to_type( r2 );
+      /* No type check for abstract location
+       * FIXME : really ?
+       */
+      if ( !entity_abstract_location_p( reference_variable(r1) )
+          && !entity_abstract_location_p( reference_variable(r2) ) ) {
+        type t1 = reference_to_type( r1 );
+        type t2 = reference_to_type( r2 );
 
-      conflict_p = !type_equal_p( t1, t2 );
+        conflict_p = !type_equal_p( t1, t2 );
+      }
     }
     if ( conflict_p ) {
       /* Do we have some dereferencing in ind1 or ind2? Do we assume
