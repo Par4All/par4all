@@ -156,7 +156,7 @@ archive: SUMMARY $(DEST.d)
 	$(RM) $(SUM.prev) ; \
 	test -L $(SUM.last) && mv $(SUM.last) $(SUM.prev) ; \
 	ln -s $(NOW.d)/$(NOW) $(SUM.last) ; \
-	test -L $(SUM.prev) -a -L $(SUM.last) && \
+	test -f $(SUM.prev) -a -f $(SUM.last) && \
 	  diff $(SUM.prev) $(SUM.last) > $(SUM.d)/SUMMARY.diff
 
 # overall targets
