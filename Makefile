@@ -133,7 +133,7 @@ mail-validate: new-validate
 	  echo ; \
 	  cat SUMMARY ; \
 	  echo "end date: $$(date)" ; \
-	} | Mail -s "$(shell tail -1 SUMMARY)" $(EMAIL)
+	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
 
 # generate & archive validation summary
 SUMMARY: validation.head parallel-validate
