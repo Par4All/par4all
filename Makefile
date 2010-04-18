@@ -144,11 +144,11 @@ SUMMARY: validation.head parallel-validate
 	  echo ; \
 	  failed=$$(egrep -v '^(skipp|pass)ed: ' < $(RESULTS) | wc -l); \
 	  total=$$(grep -v 'skipped: ' < $(RESULTS) | wc -l); \
-	  [ $failed = 0 ] && \
-		status="SUCCEEDED $total" || \
-		status="FAILED $failed/$total"; \
-	  echo "$failed failed out of $total on $$(date)"; \
-	  echo "validation $(shell arch) $status ($(TARGET))" ; \
+	  [ $$failed = 0 ] && \
+		status="SUCCEEDED $$total" || \
+		status="FAILED $$failed/$$total"; \
+	  echo "$$failed failed out of $$total on $$(date)"; \
+	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
 	} > $@
 
 archive: SUMMARY $(DEST.d)
