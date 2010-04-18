@@ -105,6 +105,7 @@ SVN.R	= $(shell svnversion)
 SVN.C	= $(shell svnversion -c)
 
 # generate summary header
+# hmmm... not sure that start date is before the validation
 $(HEAD):
 	{ \
 	  echo "parallel validation" ; \
@@ -132,13 +133,13 @@ mail-validate: new-validate
 	  cat $(SUM.d)/SUMMARY.diff ; \
 	  echo ; \
 	  cat SUMMARY ; \
-	  echo "end date: $$(date)" ; \
 	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
 
 # generate & archive validation summary
-SUMMARY: validation.head parallel-validate
+SUMMARY: $(HEAD) parallel-validate
 	{ \
 	  cat $(HEAD) ; \
+	  echo "end date: $$(date)" ; \
 	  echo ; \
 	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
 	  echo ; \
