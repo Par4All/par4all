@@ -83,7 +83,7 @@ validate-%: %
 # directory-parallel validation test
 # may replace the previous entry some day
 
-.PHONY: parallel-validate parallel-clean parallel-unvalidate parallel-skipped
+.PHONY: parallel-validate parallel-clean parallel-unvalidate parallel-check
 
 # where results are stored
 RESULTS	= validation.out
@@ -165,7 +165,7 @@ archive: SUMMARY $(DEST.d)
 parallel-clean: $(TARGET:%=parallel-clean-%)
 	$(RM) $(RESULTS) $(HEAD)
 
-parallel-skipped: $(TARGET:%=parallel-skipped-%)
+parallel-check: $(TARGET:%=parallel-check-%)
 
 parallel-validate: $(TARGET:%=parallel-validate-%)
 
@@ -175,10 +175,10 @@ parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
 parallel-clean-%:
 	$(MAKE) -C $* clean unvalidate
 
-parallel-skipped-%: parallel-clean-%
-	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* skipped
+parallel-check-%: parallel-clean-%
+	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies
 
-parallel-validate-%: parallel-skipped-%
+parallel-validate-%: parallel-check-%
 	$(MAKE) RESULTS=../$(RESULTS) -C $* validate-test
 
 parallel-unvalidate-%:

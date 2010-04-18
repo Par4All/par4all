@@ -3,8 +3,6 @@
 # TODO
 # * timeout
 # * *.f95 for gfc2pips
-# * check for multiple sources
-# * check for multiple scripts
 
 # pips exes
 TPIPS	= tpips
@@ -159,6 +157,20 @@ skipped:
 	    echo "missing: $(SUBDIR)/$$base" ; \
 	  fi ; \
 	done >> $(RESULTS)
+
+multi-script:
+	for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
+	do \
+	  echo "multi-script: $(SUBDIR)/$$base" ; \
+	done >> $(RESULTS)
+
+multi-source:
+	for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
+	do \
+	  echo "multi-source: $(SUBDIR)/$$base" ; \
+	done >> $(RESULTS)
+
+inconsistencies: skipped multi-source multi-script
 
 # what about nothing?
 missing:
