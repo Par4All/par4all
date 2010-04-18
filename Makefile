@@ -143,8 +143,8 @@ SUMMARY: $(HEAD) parallel-validate
 	  echo ; \
 	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
 	  echo ; \
-	  failed=$$(egrep -v '^(skipp|pass)ed: ' < $(RESULTS) | wc -l); \
-	  total=$$(grep -v 'skipped: ' < $(RESULTS) | wc -l); \
+	  failed=$$(egrep '^(failed|changed): ' < $(RESULTS) | wc -l); \
+	  total=$$(egrep '^(failed|changed|passed): ' < $(RESULTS) | wc -l); \
 	  [ $$failed = 0 ] && \
 		status="SUCCEEDED $$total" || \
 		status="FAILED $$failed/$$total"; \
