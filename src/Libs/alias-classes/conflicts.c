@@ -447,24 +447,34 @@ bool cells_must_conflict_p( cell c1, cell c2 ) {
 }
 
 /**
- * @brief Check if two entities may conflict
+ * @brief Check if two entities may or must conflict
+ *
+ * @param must_p define if we enforce must conflict or only may one
  *
  */
-bool entities_may_conflict_p( entity e1, entity e2 ) {
-  bool conflict_p = TRUE; // safe default value
+bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p ) {
+  bool conflict_p = !must_p; // safe default value
   extern bool entity_abstract_location_p( entity );
   extern bool abstract_locations_may_conflict_p( entity, entity );
+  extern bool abstract_locations_must_conflict_p( entity, entity );
   extern entity variable_to_abstract_location( entity );
+
+  bool (*abstract_locations_conflict_p)(entity,entity);
+  if( must_p ) {
+    abstract_locations_conflict_p = abstract_locations_must_conflict_p;
+  } else  {
+    abstract_locations_conflict_p = abstract_locations_may_conflict_p;
+  }
 
   if ( entity_abstract_location_p( e1 ) )
     if ( entity_abstract_location_p( e2 ) )
-      conflict_p = abstract_locations_may_conflict_p( e1, e2 );
+      conflict_p = abstract_locations_conflict_p( e1, e2 );
     else if ( entity_variable_p(e2) ) {
       if ( variable_return_p( e2 ) )
         conflict_p = FALSE;
       else {
         entity al2 = variable_to_abstract_location( e2 );
-        conflict_p = abstract_locations_may_conflict_p( e1, al2 );
+        conflict_p = abstract_locations_conflict_p( e1, al2 );
       }
     } else {
       pips_internal_error("Unexpected case.\n");
@@ -477,7 +487,7 @@ bool entities_may_conflict_p( entity e1, entity e2 ) {
           conflict_p = FALSE;
         else {
           entity al1 = variable_to_abstract_location( e1 );
-          conflict_p = abstract_locations_may_conflict_p( al1, e2 );
+          conflict_p = abstract_locations_conflict_p( al1, e2 );
         }
       } else {
         pips_internal_error("Unexpected case.\n");
@@ -496,3 +506,20 @@ bool entities_may_conflict_p( entity e1, entity e2 ) {
   }
   return conflict_p;
 }
+
+/**
+ * @brief Check if two entities may conflict
+ *
+ */
+bool entities_may_conflict_p( entity e1, entity e2 ) {
+  return entities_maymust_conflict_p( e1, e2, FALSE);
+}
+
+/**
+ * @brief Check if two entities may conflict
+ *
+ */
+bool entities_must_conflict_p( entity e1, entity e2 ) {
+  return entities_maymust_conflict_p( e1, e2, FALSE);
+}
+
