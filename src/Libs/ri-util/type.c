@@ -1753,8 +1753,10 @@ type reference_to_type(reference ref)
     }
   else
     {
-      pips_internal_error("Bad reference type tag %d \"%s\"\n",
-			  type_tag(exp_type), type_to_string(exp_type));
+      pips_internal_error("Bad reference type tag %d \"%s\" for reference %s\n",
+			  type_tag(exp_type),
+			  type_to_string(exp_type),
+			  entity_name(reference_variable(ref)));
     }
   free_type(exp_type);
 
