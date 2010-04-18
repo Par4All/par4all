@@ -118,7 +118,6 @@ static hash_table Vertex_statement;
 
 static bool one_trip_do;
 static bool keep_read_read_dependences;
-static bool disambiguate_constant_subscripts;
 
 /* Access functions for debug only */
 
@@ -232,7 +231,8 @@ static bool init_one_statement( statement st ) {
  * @param e the "killer" effect
  */
 static void kill_effect( set kill, effect e ) {
-  if ( action_write_p(effect_action(e)) && approximation_must_p(effect_approximation(e)) ) {
+  if ( action_write_p(effect_action(e))
+      && approximation_must_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
           /* We avoid a self killing */
           if( e != theEffect ) {
@@ -1193,20 +1193,14 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       }
 
       if ( add_conflict_p ) {
-        list loops = load_statement_enclosing_loops( stout );
-        reference rin = effect_any_reference(fin);
-        reference rout = effect_any_reference(fout);
         bool remove_this_conflict_p = FALSE;
 
-        if ( disambiguate_constant_subscripts ) {
-          remove_this_conflict_p = references_do_not_conflict_p( rin, rout );
+        /* Here we filter effect on loop indices */
+        list loops = load_statement_enclosing_loops( stout );
+        FOREACH( statement, el, loops ) {
+          entity il = loop_index(statement_loop(el));
+          remove_this_conflict_p |= entities_may_conflict_p( ein, il );
         }
-
-        MAPL(pl, {
-              statement el = STATEMENT(CAR(pl));
-              entity il = loop_index(statement_loop(el));
-              remove_this_conflict_p |= entities_may_conflict_p(ein, il);
-            }, loops);
 
         if ( !remove_this_conflict_p )
           cs = pushnew_conflict( fin, fout, cs );
@@ -1327,8 +1321,12 @@ graph statement_dependence_graph( statement s ) {
   /* Initialize some properties */
   one_trip_do = get_bool_property( "ONE_TRIP_DO" );
   keep_read_read_dependences = get_bool_property( "KEEP_READ_READ_DEPENDENCE" );
-  disambiguate_constant_subscripts
-      = get_bool_property( "CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS" );
+
+  /* FIXME
+   * OBSOLETE
+   * disambiguate_constant_subscripts
+   *   = get_bool_property( "CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS" );
+   */
 
   ifdebug(1) {
     mem_spy_begin( );
