@@ -232,21 +232,23 @@ static bool init_one_statement( statement st ) {
  * @param e the "killer" effect
  */
 static void kill_effect( set kill, effect e ) {
-  HASH_MAP(theEffect,theStatement, {
-        /* We avoid a self killing */
-        if( e != theEffect ) {
-          /* Check if there is a must conflict
-           * Avoid using effects_must_conflict_p() because we want to be
-           * able to kill "may" effects.
-           */
-          cell cell1 = effect_cell(e);
-          cell cell2 = effect_cell((effect)theEffect);
-          /* Check that the cells conflicts */
-          if ( cells_must_conflict_p( cell1, cell2 ) ) {
-            set_add_element( kill, kill, theEffect );
+  if ( action_write_p(effect_action(e)) && approximation_must_p(effect_approximation(e)) ) {
+    HASH_MAP(theEffect,theStatement, {
+          /* We avoid a self killing */
+          if( e != theEffect ) {
+            /* Check if there is a must conflict
+             * Avoid using effects_must_conflict_p() because we want to be
+             * able to kill "may" effects.
+             */
+            cell cell1 = effect_cell(e);
+            cell cell2 = effect_cell((effect)theEffect);
+            /* Check that the cells conflicts */
+            if ( cells_must_conflict_p( cell1, cell2 ) ) {
+              set_add_element( kill, kill, theEffect );
+            }
           }
-        }
-      },effects2statement)
+        },effects2statement)
+  }
 }
 
 /**
@@ -369,7 +371,7 @@ static void genkill_any_loop( statement body,
   set_union( ref, ref, REF( body ) );
 
   /* This is used only for do loop */
-  if ( one_trip_do )  {
+  if ( one_trip_do ) {
     /* If we assume the loop is always done at least one time, we can use
      * kill information from loop body.
      */
@@ -400,7 +402,7 @@ static void genkill_loop( loop l, statement st ) {
   list locals = gen_nconc( gen_copy_seq( llocals ), gen_copy_seq( slocals ) );
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do  );
+  genkill_any_loop( body, st, locals, one_trip_do );
 
   /* We free because we are good programmers and we don't leak ;-) */
   gen_free_list( locals );
@@ -419,7 +421,7 @@ static void genkill_forloop( forloop l, statement st ) {
   list locals = statement_declarations(st);
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do  );
+  genkill_any_loop( body, st, locals, one_trip_do );
 
 }
 
@@ -435,7 +437,7 @@ static void genkill_whileloop( whileloop l, statement st ) {
   list locals = statement_declarations(st);
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do  );
+  genkill_any_loop( body, st, locals, one_trip_do );
 }
 
 /**
@@ -481,8 +483,8 @@ static void genkill_block( cons *sts, statement st ) {
 
     /* FIXME : This should be done after all recursion for performance... */
     if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
-      mask_effects( gen_st, statement_declarations(st));
-      mask_effects( ref_st, statement_declarations(st));
+      mask_effects( gen_st, statement_declarations(st) );
+      mask_effects( ref_st, statement_declarations(st) );
     }
 
   }
@@ -725,8 +727,8 @@ static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
   /* Compute "in" sets for the loop body
    * FIXME : diff temporary can be avoided ! */
   set_union( DEF_IN( body ), GEN( st ), set_difference( diff,
-                                                     DEF_IN( st ),
-                                                     KILL( st ) ) );
+                                                        DEF_IN( st ),
+                                                        KILL( st ) ) );
   set_free( diff );
   set_union( REF_IN( body ), REF_IN( st ), REF( st ) );
 
@@ -757,7 +759,7 @@ static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
  */
 static void inout_loop( statement st, loop lo ) {
   statement body = loop_body( lo );
-  inout_any_loop(st, body, one_trip_do );
+  inout_any_loop( st, body, one_trip_do );
 }
 
 /**
@@ -768,7 +770,7 @@ static void inout_loop( statement st, loop lo ) {
  */
 static void inout_whileloop( statement st, whileloop wl ) {
   statement body = whileloop_body( wl );
-  inout_any_loop(st, body, FALSE );
+  inout_any_loop( st, body, FALSE );
 }
 
 /**
@@ -779,7 +781,7 @@ static void inout_whileloop( statement st, whileloop wl ) {
  */
 static void inout_forloop( statement st, forloop fl ) {
   statement body = forloop_body( fl );
-  inout_any_loop(st, body, one_trip_do );
+  inout_any_loop( st, body, one_trip_do );
 }
 
 /**
@@ -1109,7 +1111,6 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
   vertex vin;
   vertex vout = vertex_statement( stout );
   statement stin = hash_get( effects2statement, fin );
-  cons *effect_ins = load_statement_effects( stin ); // FIXME : Debug only
   cons *effect_outs = load_statement_effects( stout );
   cons *cs = NIL;
 
@@ -1137,6 +1138,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
   /* To speed up pushnew_conflict() without damaging the integrity of
    the use-def chains */
   ifdebug(1) {
+    cons *effect_ins = load_statement_effects( stin );
     if ( !gen_once_p( effect_ins ) ) {
       pips_internal_error("effect_ins are redundant\n");
     }
@@ -1144,19 +1146,17 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       pips_internal_error("effect_outs are redundant\n");
     }
   }
-  entity ein = effect_entity( fin );
-  reference rin = effect_any_reference(fin);
-  int din = gen_length( reference_indices(rin) );
-  action ain = effect_action(fin);
   FOREACH(EFFECT, fout, effect_outs) {
     entity eout = effect_entity( fout );
-    reference rout = effect_any_reference(fout);
-    int dout = gen_length( reference_indices(rout) );
-    action aout = effect_action(fout);
 
-    if ( entity_conflict_p( ein, eout ) && ( *which )( fin, fout ) ) {
+    if ( effects_may_conflict_p( fin, fout ) && ( *which )( fin, fout ) ) {
+      entity ein = effect_entity( fin );
       type tin = ultimate_type( entity_type(ein) );
       type tout = ultimate_type( entity_type(eout) );
+      reference rin = effect_any_reference(fin);
+      int din = gen_length( reference_indices(rin) );
+      reference rout = effect_any_reference(fout);
+      int dout = gen_length( reference_indices(rout) );
       bool add_conflict_p = TRUE;
 
       if ( pointer_type_p( tin ) && pointer_type_p( tout ) ) {
@@ -1170,14 +1170,14 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
           /* a write on the shorter memory access path conflicts
            with the longer one. If a[i] is written, then a[i][j]
            depends on it. If a[i] is read, no conflict */
-          add_conflict_p = action_write_p(ain);
+          add_conflict_p = action_write_p(effect_action(fin));
         } else /* dout < din */{
           /* same explanation as above */
-          add_conflict_p = action_write_p(aout);
+          add_conflict_p = action_write_p(effect_action(fout));
         }
       } else {
         /* Why should we limit this test to pointers? Structures,
-         structures of arrays and arrays of sturctures with
+         structures of arrays and arrays of structures with
          pointers embedded somewhere must behave in the very same
          way. Why not unify the two cases? Because we have not
          spent enough time thinking about memory access paths. */
@@ -1185,10 +1185,10 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
           /* a write on the shorter memory access path conflicts
            with the longer one. If a[i] is written, then a[i][j]
            depends on it. If a[i] is read, no conflict */
-          add_conflict_p = action_write_p(ain);
+          add_conflict_p = action_write_p(effect_action(fin));
         } else if ( dout < din ) {
           /* same explanation as above */
-          add_conflict_p = action_write_p(aout);
+          add_conflict_p = action_write_p(effect_action(fout));
         }
       }
 
@@ -1197,6 +1197,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
         reference rin = effect_any_reference(fin);
         reference rout = effect_any_reference(fout);
         bool remove_this_conflict_p = FALSE;
+
         if ( disambiguate_constant_subscripts ) {
           remove_this_conflict_p = references_do_not_conflict_p( rin, rout );
         }
