@@ -100,7 +100,9 @@ SUM.prev	= $(SUM.d)/SUMMARY-previous
 $(DEST.d):
 	mkdir -p $@
 
-SVNURL	= $(shell svn info | grep 'Repository Root' | cut -d: -f2-)
+SVN.URL	= $(shell svn info | grep 'Repository Root' | cut -d: -f2-)
+SVN.R	= $(shell svnversion)
+SVN.C	= $(shell svnversion -c)
 
 # generate summary header
 $(HEAD):
@@ -110,13 +112,13 @@ $(HEAD):
 	  echo "host: $$(hostname)" ; \
 	  echo "directory: $(PWD)" ; \
 	  test -d .svn && \
-	    echo " $(SVNURL)@$$(svnversion) ($$(svnversion -c))" ; \
+	    echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
 	  echo "pips: $(shell which pips)" ; \
 	  pips -v ; \
 	  echo "tpips: $(shell which tpips)" ; \
 	  tpips -v ; \
 	  echo "user: $$USERNAME" ; \
-	  echo "date: $$(date)" ; \
+	  echo "start date: $$(date)" ; \
 	} > $@
 
 # this target should replace the "validate" target
@@ -127,9 +129,10 @@ new-validate:
 
 mail-validate: new-validate
 	{ \
-	  cat $(SUM.d)/SUMMARY.diff ;
+	  cat $(SUM.d)/SUMMARY.diff ; \
 	  echo ; \
 	  cat SUMMARY ; \
+	  echo "end date: $$(date)" ; \
 	} | Mail -s "$(shell tail -1 SUMMARY)" $(EMAIL)
 
 # generate & archive validation summary
@@ -139,10 +142,13 @@ SUMMARY: validation.head parallel-validate
 	  echo ; \
 	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
 	  echo ; \
-	  echo $$(egrep -v '^(skipp|pass)ed: ' < $(RESULTS) | wc -l) \
-		"failed out of" \
-		$$(grep -v 'skipped: ' < $(RESULTS) | wc -l) \
-		"on" $$(date) ; \
+	  failed=$$(egrep -v '^(skipp|pass)ed: ' < $(RESULTS) | wc -l); \
+	  total=$$(grep -v 'skipped: ' < $(RESULTS) | wc -l); \
+	  [ $failed = 0 ] && \
+		status="SUCCEEDED $total" || \
+		status="FAILED $failed/$total"; \
+	  echo "$failed failed out of $total on $$(date)"; \
+	  echo "validation $(shell arch) $status ($(TARGET))" ; \
 	} > $@
 
 archive: SUMMARY $(DEST.d)
