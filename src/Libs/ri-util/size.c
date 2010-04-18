@@ -666,7 +666,7 @@ storage_space_of_variable(entity v)
   this function returns TRUE if e1 and e2 have some memory locations
   in common
 
-  This function used to be called entity_conflict_p() but abstract
+  This function used to be called entities_may_conflict_p() but abstract
   locations are new entities which require a generalization.
 */
 bool variable_entity_conflict_p(entity e1, entity e2)

@@ -1042,7 +1042,7 @@ static void simplify_common_variables(Pcontrainte c)
 	for (vp=v->succ; vp; vp=vp->succ)
 	{
 	  entity varp = (entity) var_of(vp);
-	  if (varp && entity_conflict_p(var, varp))
+	  if (varp && entities_may_conflict_p(var, varp))
 	  {
 	    Value val = val_of(vp);
 	    changed = TRUE;

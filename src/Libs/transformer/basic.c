@@ -500,7 +500,7 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
 			(same_string_p(entity_local_name(e), eln) ?
 			 same_string_p(entity_module_name(e),emn)
 			 : TRUE);
-		    aliasing = aliasing && entity_conflict_p(e,val);
+		    aliasing = aliasing && entities_may_conflict_p(e,val);
 		}
 
 		if(!consistent)

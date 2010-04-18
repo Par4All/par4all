@@ -1205,7 +1205,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
         MAPL(pl, {
               statement el = STATEMENT(CAR(pl));
               entity il = loop_index(statement_loop(el));
-              remove_this_conflict_p |= entity_conflict_p(ein, il);
+              remove_this_conflict_p |= entities_may_conflict_p(ein, il);
             }, loops);
 
         if ( !remove_this_conflict_p )

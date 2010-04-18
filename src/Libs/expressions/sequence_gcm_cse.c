@@ -193,7 +193,7 @@ static bool interference_on(entity var, list /* of effect */ les)
   {
       if (entity_all_locations_p(effect_entity(ef))
               || (effect_write_p(ef) &&
-	  entity_conflict_p(var, reference_variable(effect_any_reference(ef)))))
+	  entities_may_conflict_p(var, reference_variable(effect_any_reference(ef)))))
       {
 	return TRUE;
       }

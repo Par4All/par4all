@@ -782,7 +782,7 @@ static void verify_formal_and_common_variables(entity ent,list l_callers)
 	    }
 	  else
 	    {
-	      if (entity_conflict_p(e,ent))
+	      if (entities_may_conflict_p(e,ent))
 		{
 		  pips_debug(1,"Common variable %s must be verified\n",entity_name(ent));
 		  check = TRUE;
@@ -910,7 +910,7 @@ static void initialize_and_verify_common_variable(entity ent, region reg)
   /* ram_shared does not work so we use common layout*/
   MAP(ENTITY,other,
   {
-    if (entity_conflict_p(ent,other))
+    if (entities_may_conflict_p(ent,other))
       {
 	string mod_name = entity_module_name(other);
 	entity mod = local_name_to_top_level_entity(mod_name);

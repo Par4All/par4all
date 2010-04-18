@@ -901,7 +901,7 @@ SaveChains()
 		    "\tCheck initalization consistency for %s\n",
 		    entity_name(e));
 	      MAP(ENTITY, ce, {
-		if(e!=ce && entity_conflict_p(e, ce)) {
+		if(e!=ce && entities_may_conflict_p(e, ce)) {
 		  if(value_defined_p(entity_initial(ce))
 		     && !value_unknown_p(entity_initial(ce))) {
 		    pips_user_warning("Overlapping initializations for %s and %s\n",

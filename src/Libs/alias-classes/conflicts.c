@@ -118,7 +118,7 @@ static bool old_effects_conflict_p( effect eff1, effect eff2 ) {
 
       /* Do we point to the same area? */
 
-      if ( entity_conflict_p( v1, v2 ) ) {
+      if ( entities_may_conflict_p( v1, v2 ) ) {
         list ind1 = reference_indices(r1);
         list ind2 = reference_indices(r2);
         list cind1 = list_undefined;
@@ -336,7 +336,7 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
 
-  if ( entity_conflict_p( v1, v2 ) ) {
+  if ( entities_may_conflict_p( v1, v2 ) ) {
     list ind1 = reference_indices(r1);
     list ind2 = reference_indices(r2);
 
@@ -390,7 +390,7 @@ bool references_must_conflict_p( reference r1, reference r2 ) {
 
   // Do a simple check for scalar conflicts
   if ( reference_scalar_p( r1 ) && reference_scalar_p( r2 )
-      && entity_conflict_p( e1, e2 ) ) {
+      && entities_may_conflict_p( e1, e2 ) ) {
     conflict_p = TRUE;
   } else {
     pips_user_warning("Not completely implemented yet. "
@@ -448,9 +448,9 @@ bool cells_must_conflict_p( cell c1, cell c2 ) {
 
 /**
  * @brief Check if two entities may conflict
- * FIXME : should be renamed entities_may_conflict
+ *
  */
-bool entity_conflict_p( entity e1, entity e2 ) {
+bool entities_may_conflict_p( entity e1, entity e2 ) {
   bool conflict_p = TRUE; // safe default value
   extern bool entity_abstract_location_p( entity );
   extern bool abstract_location_conflict_p( entity, entity );

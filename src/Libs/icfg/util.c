@@ -298,7 +298,7 @@ list /* of effect */ effects_filter(list l_effs, list l_ents)
 	reference ref = effect_any_reference(eff);
 	entity ent = reference_variable(ref);
 	MAP(ENTITY, e_flt, {
-	    if (entity_conflict_p(e_flt, ent)) {
+	    if (entities_may_conflict_p(e_flt, ent)) {
 	        bool found = FALSE;
 	        switch(get_int_property(RW_FILTERED_EFFECTS)) {
 		case READ_ALL:

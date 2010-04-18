@@ -1246,7 +1246,7 @@ entity value_alias(entity e)
      of the interprocedural alias set of e; the equivalence relation is "has
      same location" */
   HASH_MAP(var, val, {
-    if(variable_entity_p((entity) var) && entity_conflict_p((entity) var, e)) {
+    if(variable_entity_p((entity) var) && entities_may_conflict_p((entity) var, e)) {
       a = (entity) var;
       break;
     }

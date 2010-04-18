@@ -386,8 +386,8 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
       cons *prefix ;
 
       /* Take into account def-def and use-def arcs only */
-      if(!entity_conflict_p( e, effect_entity( sc )) ||
-	 !entity_conflict_p( e, effect_entity( sk )) ||
+      if(!entities_may_conflict_p( e, effect_entity( sc )) ||
+	 !entities_may_conflict_p( e, effect_entity( sk )) ||
 	 action_write_p( effect_action( sk))) {
 	continue ;
       }
