@@ -79,4 +79,4 @@ end=$(date)
   echo "linear: $(svnversion -c $target/prod/linear)"
   echo "nlpmake: $(svnversion -c $target/prod/pips/makes)"
   echo "validation: $(svnversion -c $target/validation)"
-} | ${PIPS_MAIL:-Mail} -s "[pips] $arch night job $result" $email
+} | ${PIPS_MAIL:-Mail} -a "Reply-To: $email" -s "[pips] $arch night job $result" $email
