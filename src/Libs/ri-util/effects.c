@@ -601,36 +601,6 @@ effect effect_interference(effect eff1, effect eff2)
   return n_eff1;
 }
 
-bool expression_invariant_wrt_effects(expression exp, list el)
-{
-  extern list proper_effects_of_expression(expression);
-  list ee = proper_effects_of_expression(exp);
-  list cee = list_undefined;
-  list cel = list_undefined;
-  bool invariant_p = TRUE;
-
-  for(cee=ee; !ENDP(cee) && invariant_p; POP(cee)) {
-    effect exp_e = EFFECT(CAR(cee));
-    //reference exp_r = effect_any_reference(exp_e);
-    //entity exp_v = reference_variable(exp_r);
-
-    for(cel=el; !ENDP(el) && invariant_p; POP(el)) {
-      effect l_e = EFFECT(CAR(cel));
-      action l_a = effect_action(l_e);
-
-      if(action_write_p(l_a)) {
-	//reference l_r = effect_any_reference(l_e);
-	//entity l_v = reference_variable(l_r);
-
-	if(effects_interfere_p(l_e,exp_e)) {
-	  invariant_p = FALSE;
-	}
-      }
-    }
-  }
-  return invariant_p;
-}
-
 string action_to_string(action ac)
 {
   return action_read_p(ac)? "read" : "write";
