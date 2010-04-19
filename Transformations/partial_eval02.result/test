@@ -40,8 +40,8 @@ int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6
    int *zaza = (int *) fifi+3;
    int i;
 
-   i = size;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+0);
+   i = 2;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
 }
 
 Code after partial evaluation for "main"
