@@ -1,5 +1,5 @@
 raw file with loop flagged
-int pop(int op)
+int pop(int pop)
 {
    int i = 0;
 l99999:
