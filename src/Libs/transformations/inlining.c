@@ -56,6 +56,8 @@
 #include "parser_private.h"
 #include "syntax.h"
 #include "c_syntax.h"
+#include "alias-classes.h"
+#include "locality.h"
 
 extern string compilation_unit_of_module(string);
 
@@ -185,8 +187,7 @@ solve_name_clashes(statement s, entity new)
     for(;!ENDP(l);POP(l))
     {
         entity decl_ent = ENTITY(CAR(l));
-        if( same_string_p(local_name(entity_name_without_scope(decl_ent)),
-                    local_name(entity_name_without_scope(new))) )
+        if( same_string_p(entity_user_name(decl_ent), entity_user_name(new)))
         {
             entity solve_clash = copy_entity(decl_ent);
             string ename = strdup(entity_name(solve_clash));
@@ -463,26 +464,13 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             if(need_copy)
             {
                 string emn = entity_module_name(e);
-                new = copy_entity(e);
-
-                /* fix name */
-                string tname = strdup(concatenate(
-                            emn,
-                            MODULE_SEP_STRING "0" BLOCK_SEP_STRING, /* we default to this block level, recompile_module will do the remaining */
-                            entity_local_name(e),
-                            NULL
-                            ));
-                entity_name(new)=tname;
-
-                /* fix storage */
-                entity dynamic_area = global_name_to_entity(emn, DYNAMIC_AREA_LOCAL_NAME);
-                entity_storage(new)= make_storage_ram(
-                        make_ram(
-                            get_current_module_entity(),
-                            dynamic_area,
-                            CurrentOffsetOfArea(dynamic_area, new),
-                            NIL)
-                        );
+                if(entity_scalar_p(e)) {
+                    new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
+                }
+                else {
+                    new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
+                            copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
+                }
 
                 /* fix value */
                 entity_initial(new) = make_value_expression( copy_expression( from ) );
