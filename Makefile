@@ -138,6 +138,7 @@ mail-validate: new-validate
 # generate & archive validation summary
 SUMMARY: $(HEAD) parallel-validate
 	{ \
+	  unset LANG LC_COLLATE ; \
 	  cat $(HEAD) ; \
 	  echo "end date: $$(date)" ; \
 	  echo ; \
