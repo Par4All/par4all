@@ -445,6 +445,10 @@ global_effect_translation(
       //return CONS(EFFECT, make_sdfi_effect(ef), NIL);
 	return CONS(EFFECT, translate_effect_to_sdfi_effect(ef), NIL);
 
+    if (malloc_effect_p(ef))
+      return CONS(EFFECT, translate_effect_to_sdfi_effect(ef), NIL);
+
+
     if (io_entity_p(eff_ent))
       //return CONS(EFFECT, make_sdfi_effect(ef), NIL);
 	return CONS(EFFECT, translate_effect_to_sdfi_effect(ef), NIL);

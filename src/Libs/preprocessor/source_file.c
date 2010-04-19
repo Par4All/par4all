@@ -582,10 +582,12 @@ static bool pips_split_file(string name, string tempfile)
   FILE * out = safe_fopen(tempfile, "w");
   string dir = db_get_current_workspace_directory();
 
-  if (dot_c_file_p(name))
-    err = csplit(dir, name, out);
-  else if (dot_f_file_p(name) || dot_F_file_p(name))
-    err = fsplit(dir, name, out);
+  if ( dot_c_file_p( name ) )
+    err = csplit( dir, name, out );
+  else if ( dot_f_file_p( name ) || dot_F_file_p( name ) )
+    err = fsplit( dir, name, out );
+  else if ( dot_f90_file_p( name ) || dot_f95_file_p( name ) )
+    err = f95split( dir, name, &out );
   else
     pips_user_error("unexpected file name for splitting: %s", name);
 
@@ -634,13 +636,24 @@ bool dot_f_file_p(string name) {
 }
 
 
+/* Test if a name ends with .f90 */
+bool dot_f90_file_p( string name ) {
+  return !!find_suffix( name, FORTRAN90_FILE_SUFFIX );
+}
+
+
+/* Test if a name ends with .f95 */
+bool dot_f95_file_p( string name ) {
+  return !!find_suffix( name, FORTRAN95_FILE_SUFFIX );
+}
+
+
 /* Test if a name ends with .c */
 bool dot_c_file_p(string name) {
   return !!find_suffix(name, C_FILE_SUFFIX);
 }
 
 
-
 /* Returns the newly allocated name if preprocessing succeeds.
  * Returns NULL if preprocessing fails.
  */
@@ -952,8 +965,8 @@ bool process_user_file(string file)
       pips_user_warning("Cannot preprocess file: %s\n", initial_file);
       return FALSE;
     }
-  }
-  else if (!dot_f_file_p(nfile)) {
+  } else if ( !dot_f_file_p( nfile ) && !dot_f90_file_p( nfile )
+      && !dot_f95_file_p( nfile ) ) {
     pips_user_error("Unexpected file extension\n");
   }
 
@@ -1051,6 +1064,28 @@ bool process_user_file(string file)
 	 * absolute path to the file so that db moves should be ok?
 	 */
 	DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
+
+     if ( dot_f90_file_p( nfile ) || dot_f95_file_p( nfile ) ) {
+       char *parsedcode_filename = get_resource_file_name( DBR_PARSED_CODE,
+                                                           mod_name );
+       FILE *parsedcode_file = safe_fopen( parsedcode_filename, "r" );
+       DB_PUT_NEW_FILE_RESOURCE(DBR_PARSED_CODE, mod_name,
+           gen_read( parsedcode_file ));
+       safe_fclose( parsedcode_file, parsedcode_filename );
+       char *callees_filename = get_resource_file_name( DBR_CALLEES, mod_name );
+       FILE *callees_file = safe_fopen( callees_filename, "r" );
+       DB_PUT_NEW_FILE_RESOURCE(DBR_CALLEES, mod_name,
+           gen_read( callees_file ) );
+       safe_fclose( callees_file, callees_filename );
+       string source_file_name = strdup( concatenate( dir_name,
+                                                      "/",
+                                                      mod_name,
+                                                      "/",
+                                                      mod_name,
+                                                      ".f90",
+                                                      NULL ) );
+       DB_PUT_NEW_FILE_RESOURCE( DBR_SOURCE_FILE, mod_name, source_file_name );
+     }
       }
 
       gen_free_list(modules), modules=NIL;

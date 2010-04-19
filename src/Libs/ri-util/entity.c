@@ -850,7 +850,8 @@ entity entity_intrinsic(string name)
 entity CreateIntrinsic(string name)
 {
   entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
-  pips_assert("entity is defined", e!=entity_undefined && intrinsic_entity_p(e));
+  pips_assert("entity is defined", e!=entity_undefined );
+  pips_assert("entity is intrinsic", intrinsic_entity_p(e));
   return(e);
 }
 

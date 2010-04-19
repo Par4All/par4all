@@ -166,7 +166,7 @@ string db_build_file_resource_name(string rname, string oname, string suffix)
 
 /* allocate a full file name for the given resource.
  */
-static string get_resource_file_name(string rname, string oname)
+string get_resource_file_name(string rname, string oname)
 {
     string dir_name, file_name;
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;

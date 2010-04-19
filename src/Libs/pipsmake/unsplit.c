@@ -79,7 +79,8 @@ get_new_user_file(string dir_name, string preprocessed_user_file)
       fclose(tmp);
     }
     tmp = safe_fopen(s, "w");
-    if(dot_f_file_p(user_file)) {
+    if(dot_f_file_p(user_file) || dot_f90_file_p(user_file)
+        || dot_f95_file_p(user_file) ) {
       fprintf(tmp, "!!\n!! file for %s\n!!\n", name);
     }
     else if(dot_c_file_p(user_file)) {
@@ -152,10 +153,12 @@ unsplit(string name)
 
 	module = gen_array_item(modules, i);
 	user_file = db_get_memory_resource(DBR_USER_FILE, module, TRUE);
-	pips_debug(1, "Module: \"%s\", user_file: \"%s\"\n", module, user_file);
 	new_user_file = get_new_user_file(src_dir, user_file);
 	printed_file = db_get_memory_resource(DBR_PRINTED_FILE, module, TRUE);
 	full = strdup(concatenate(dir_name, "/", printed_file, NULL));
+  pips_debug(1, "Module: \"%s\", user_file: \"%s\", new_user_file: \"%s\","
+             "full: \"%s\"\n",
+	           module, user_file, new_user_file, full);
 
 	out = safe_fopen(new_user_file, "a");
 	in = safe_fopen(full, "r");

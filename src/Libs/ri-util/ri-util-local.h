@@ -362,6 +362,12 @@
 #define OMP_PARALLEL_FUNCTION_NAME      "parallel"
 #define OMP_REDUCTION_FUNCTION_NAME     "reduction"
 
+/* F95 */
+#define ALLOCATE_FUNCTION_NAME          "ALLOCATE"
+#define DEALLOCATE_FUNCTION_NAME        "DEALLOCATE"
+#define ETIME_FUNCTION_NAME             "ETIME"
+#define DTIME_FUNCTION_NAME             "DTIME"
+
 /*io functions: C library and system io.Amira Mensi*/
 
 /* unistd.h */
