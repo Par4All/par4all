@@ -157,10 +157,8 @@ bool find_write_effect_on_entity(statement s, entity e)
 		entity re = reference_variable(r);
 		if( entities_may_conflict_p(e,re) )
 		{
-			cell c = effect_cell(eff);
-			if( ENDP( reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) ) )
-				if( action_write_p(effect_action(eff) ) )
-					return true;
+			if( ENDP( reference_indices(r) ) && action_write_p(effect_action(eff) ) )
+                return true;
 		}
 	}
 	return false;
