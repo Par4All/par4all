@@ -1695,7 +1695,7 @@ among hundreds.
 
 Scripting used to be shell based when PIPS was started. It is now
 mostly \verb/tpips/ based. Such scripts should end with a close, a
-delete of the current workspace\footnote{}, and a quit.
+delete of the current workspace, and a quit.
 
 When multiple source files are used, it is better to keep them in a
 subdirectory. The maintenance of the validation library is easier and
@@ -1780,15 +1780,18 @@ only some directories by defining the \texttt{TARGET} make macro:
   sh> make -j 8 TARGET='HardwareAccelerator Hpfc' new-validate
 \end{verbatim}
 The detailed results are stored in file \texttt{validation.out}.
-Possible test results are:
+Possible test results include:
 \begin{description}
 \item[passed] fine!
 \item[changed] there are some changes in the output.
 \item[failed] the test failed (abort, segfault\ldots).
 \item[skipped] some file (script, source) was skipped because there is
   no corresponding result directory.
-\item[missing] there is no result (\texttt{test} file) in a result
-  directory. \textbf{This is bad!}
+\item[missing] there is no \texttt{test} file in a result directory.
+  \textbf{This is bad!}
+\item[multi-source] there are several contradictory C or Fortran source files.
+\item[multi-script] there are several contradictory validation scripts
+  (tpips, tpips2, test, python), some of which may be ignored.
 \end{description}
 A summary of the result without passed tests is stored in
 \texttt{SUMMARY\_Archive/SUMMARY-last}.
