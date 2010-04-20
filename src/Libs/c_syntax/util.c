@@ -2010,6 +2010,8 @@ void CreateReturnEntity(entity f)
 {
   type ft = ultimate_type(entity_type(f));
 
+  pips_debug(8, "For module \"%s\"\n", entity_name(f));
+
   if(type_functional_p(ft)) {
       type rt = functional_result(type_functional(ft));
 
@@ -2055,9 +2057,9 @@ void UpdateEntity2(entity f,
     if(dummy_parameter_entity_p(v)) {
       string ln = entity_user_name(v);
       string mn = entity_local_name(f);
-      entity fp = global_name_to_entity(ln, mn);
+      entity fp = global_name_to_entity(mn, ln);
       if(entity_undefined_p(fp)) {
-	fp = FindOrCreateEntity(ln, mn);
+	fp = FindOrCreateEntity(mn, ln);
 	entity_type(fp) = copy_type(entity_type(v));
 	entity_initial(fp) = make_value_unknown();
 	entity_storage(fp) = make_storage_formal(make_formal(f, rank));
