@@ -26,7 +26,9 @@ GFC2PIPS_SRC.d = src
 GFC2PIPS_SRCS = $(GFC2PIPS_SRC.d)/gfc2pips.c $(GFC2PIPS_SRC.d)/gfc2pips_stubs.c
 #VERSION USED
 GCC_VERSION = 4.4.3
+BUILD.d	= build/$(GCC_VERSION)
 TARGET	= f951
+
 
 ARCHIVE_EXT=.tar.bz2
 #ARCHIVE_EXT=".tar.gz"
@@ -138,8 +140,6 @@ $(PATCHED): patch-$(GCC_VERSION).diff $(SRC.d)/.untar
 	patch -d gcc-$(GCC_VERSION) -p0 < $<
 	@touch $@
 
-BUILD.d	= build/$(GCC_VERSION)
-
 $(BUILD.d)/.dir:
 	mkdir -p $(BUILD.d)/gcc
 	@touch $@
@@ -163,17 +163,16 @@ $(BUILD.d)/.stage1: $(BUILD.d)/.configure-core
 	        maybe-all-libcpp
 	@touch $@
 
-# Final binary !
-$(BUILD.d)/gcc/f951: $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
-	rsync --exclude=.svn -av src/ gcc-$(GCC_VERSION)/gcc/fortran/
-	$(MAKE) -C build/$(GCC_VERSION)/gcc f951
 
 # useful targets
 configure: configure-core configure-fortran
 configure-core: $(BUILD.d)/.configure-core
 configure-fortran: $(BUILD.d)/.configure-fortran
 build-stage1: $(BUILD.d)/.stage1
-build-stage2: $(BUILD.d)/gcc/f951
+build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
+	rsync --exclude=.svn -av src/ gcc-$(GCC_VERSION)/gcc/fortran/
+	$(MAKE) -C build/$(GCC_VERSION)/gcc f951
+
 
 compile: build-stage2
 build: compile
