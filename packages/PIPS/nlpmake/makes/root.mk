@@ -25,15 +25,27 @@ endif
 
 # is this one really needed?
 ifndef PIPS_ROOT
+ifeq ($(PROJECT),pips)
+PIPS_ROOT	= $(ROOT)
+else
 PIPS_ROOT       = $(ROOT)/../pips
+endif
 endif # PIPS_ROOT
 
 ifndef NEWGEN_ROOT
+ifeq ($(PROJECT),newgen)
+NEWGEN_ROOT	= $(ROOT)
+else
 NEWGEN_ROOT     = $(ROOT)/../newgen
+endif
 endif # NEWGEN_ROOT
 
 ifndef LINEAR_ROOT
+ifeq ($(PROJECT),linear)
+LINEAR_ROOT	= $(ROOT)
+else
 LINEAR_ROOT     = $(ROOT)/../linear
+endif
 endif # LINEAR_ROOT
 
 ifndef EXTERN_ROOT
