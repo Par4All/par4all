@@ -1127,6 +1127,10 @@ effect make_reference_region(reference ref, tag tac)
       pips_debug(3,"effect type depth is %d\n", d);
     }
 
+  if (dummy_parameter_entity_p(e))
+    pips_internal_error("the input reference entity is a dummy parameter (%s)\n", 
+			entity_name(e));
+
   /* FI: If t is a pointer type, then d should depend on the type_depth
      of the pointed type... */
   if (d>0 || pointer_p)
