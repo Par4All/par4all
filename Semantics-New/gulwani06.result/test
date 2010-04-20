@@ -1,0 +1,159 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+int main()
+{
+
+
+//  T() {}
+
+   int x, y, z, lock;
+
+//  T(x) {x==1}
+
+
+   x = 1;
+
+//  T(lock) {lock==0, x==1}
+
+   lock = 0;
+
+//  T(y) {lock==0, x==1, y==0}
+
+   y = 0;
+
+//  T(lock,x,y,z) {lock#init==0, x#init==1, y#init==0, 0<=lock,
+//    1<=lock+x+y, lock+y<=x+1, lock+x<=y+1, 0<=y}
+
+   
+   
+   while (x!=y) {
+
+//  T(z) {}
+
+      scanf("%d", &z);
+
+//  T(lock,x,y) {lock+y==x+1, lock+y==y#init+1, 0<=lock, lock<=1}
+
+      if (z>=0) {
+
+//  T(lock) {lock==1, 0<=z}
+
+         lock = 1;
+
+//  T(x) {lock==1, x==y, 0<=z}
+
+         x = y;
+
+//  T(lock) {lock==0, lock#init==1, x==y, 0<=z}
+
+         lock = 0;
+
+//  T(y) {lock==0, x==y-1, x==y#init, 0<=z}
+
+         y++;
+      }
+      else {
+
+//  T(lock) {lock==1, z+1<=0}
+
+         lock = 1;
+
+//  T(x) {lock==1, x==y, z+1<=0}
+
+         x = y;
+      }
+   }
+
+//  T() {lock==1, x==y, 0<=x}
+
+   
+   
+   if (lock==1) 
+
+//  T() {lock==1, x==y, 0<=x}
+
+      printf("property  verified\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+
+//  P() {}
+
+   int x, y, z, lock;
+
+//  P() {}
+
+
+   x = 1;
+
+//  P(x) {x==1}
+
+   lock = 0;
+
+//  P(lock,x) {lock==0, x==1}
+
+   y = 0;
+
+//  P(lock,x,y) {lock==0, x==1, y==0}
+
+   
+   
+   while (x!=y) {
+
+//  P(lock,x,y,z) {lock==0, 1<=x+y, y<=x+1, x<=y+1}
+
+      scanf("%d", &z);
+
+//  P(lock,x,y,z) {lock==0, 1<=x+y, y<=x+1, x<=y+1}
+
+      if (z>=0) {
+
+//  P(lock,x,y,z) {lock==0, 1<=x+y, y<=x+1, x<=y+1, 0<=z}
+
+         lock = 1;
+
+//  P(lock,x,y,z) {lock==1, 1<=x+y, y<=x+1, x<=y+1, 0<=z}
+
+         x = y;
+
+//  P(lock,x,y,z) {lock==1, x==y, 0<=x, 0<=z}
+
+         lock = 0;
+
+//  P(lock,x,y,z) {lock==0, x==y, 0<=x, 0<=z}
+
+         y++;
+      }
+      else {
+
+//  P(lock,x,y,z) {lock==0, 1<=x+y, y<=x+1, x<=y+1, z+1<=0}
+
+         lock = 1;
+
+//  P(lock,x,y,z) {lock==1, 1<=x+y, y<=x+1, x<=y+1, z+1<=0}
+
+         x = y;
+      }
+   }
+
+//  P(lock,x,y,z) {lock==1, x==y, 0<=x}
+
+   
+   
+   if (lock==1) 
+
+//  P(lock,x,y,z) {lock==1, x==y, 0<=x}
+
+      printf("property  verified\n");
+}
