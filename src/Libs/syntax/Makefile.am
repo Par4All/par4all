@@ -4,7 +4,7 @@ dist_noinst_HEADERS=warning.h keywtbl.h tokyacc.h
 dist_sysconf_DATA=f77keywords f77symboles
 dist_noinst_DATA=gram.y
 
-BUILT_SOURCES=$(TARGET).h keywtbl.h syn_yacc.y
+BUILT_SOURCES=$(TARGET).h keywtbl.h syn_yacc.y scanner.c
 
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libsyntax.la
@@ -43,10 +43,6 @@ tokyacc.h: warning.h f77keywords f77symboles Makefile
 		cat $(srcdir)/warning.h ; \
 		sed 's,\([^A-Z]*\)\(.*\),%token \1 TK_\2,' $(srcdir)/f77keywords $(srcdir)/f77symboles ;\
 	} > $@
-
-# additionnal dep needed for // build
-scanner.c:syn_yacc.h
-
 
 include $(srcdir)/../pipslibs_includes.mk
 CLEANFILES=keywtbl.h syn_yacc.h syn_yacc.c tokyacc.h syn_yacc.y

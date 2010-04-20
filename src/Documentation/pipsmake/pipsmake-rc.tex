@@ -8115,7 +8115,7 @@ Same as inlining but always simulate the by-copy argument passing
 \end{PipsPass}
 \begin{PipsMake}
 inlining_simple      > CALLERS.parsed_code
-		! MODULE.split_Initializations
+		! MODULE.split_initializations
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file
@@ -8158,7 +8158,7 @@ INLINING_PURGE_LABELS TRUE
 \begin{PipsMake}
 
 unfolding      > MODULE.parsed_code
-		! CALLERS.split_Initializations
+		! CALLERS.split_initializations
         < PROGRAM.entities
         < MODULE.code
         < MODULE.printed_file
