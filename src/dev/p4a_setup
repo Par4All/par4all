@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash -vx
 #
 # Inspired from setup_pips.sh from Fabien Coelho and get-pips4u.sh from
 # Sebastien Varrette <Sebastien.Varrette@uni.lu> and Serge Guelton
@@ -101,22 +101,13 @@ fi
 
 cd $P4A_ROOT
 
+echo Installing Par4All scripts...
 # Install Par4All scripts:
 mkdir -p $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/dev/{p4a_git,p4a_setup,p4a_valgrind} $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/dev/p4a_git_lib.bash $P4A_ETC
 cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/validation/{p4a_validate,p4a_validation} $P4A_INSTALL_PREFIX/bin
-
-# Stuff still lacking from PIPS install:
-cp $P4A_PIPS_SRC/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin
-
-# To have the validation running:
-mkdir -p  $P4A_INSTALL_PREFIX/makes
-cp $P4A_NLPMAKE_SRC/makes/{arch.sh,version.sh} $P4A_INSTALL_PREFIX/makes
-
-PIPS_COMPONENTS="linear newgen pips"
-#PIPS_DIR=$P4A_ROOT/packages/PIPS
 
 # The config files to source later:
 P4A_RC_SH=$P4A_ETC/par4all-rc.sh
@@ -158,6 +149,7 @@ unset LINEAR_ROOT
 # fix path
 #PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
 PATH=\$PATH:\$P4A_ROOT/run/bin
+export P4A_ETC=\$P4A_ROOT/run/etc
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$P4A_ROOT/run/lib
 export PKG_CONFIG_PATH=\$P4A_ROOT/run/lib/pkgconfig
@@ -185,6 +177,18 @@ fi
 
 # Generate also a config file for csh users:
 $P4A_PIPS_SRC/src/Scripts/env/sh2csh.pl < $P4A_RC_SH > $P4A_RC_CSH
+
+
+echo Installing some lacking PIPS script...
+# Stuff still lacking from PIPS install:
+cp $P4A_PIPS_SRC/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin
+
+# To have the validation running:
+mkdir -p  $P4A_INSTALL_PREFIX/makes
+cp $P4A_NLPMAKE_SRC/makes/{arch.sh,version.sh} $P4A_INSTALL_PREFIX/makes
+
+PIPS_COMPONENTS="linear newgen pips"
+#PIPS_DIR=$P4A_ROOT/packages/PIPS
 
 
 # Build the package of name $1 that is to be found into directory $2, with

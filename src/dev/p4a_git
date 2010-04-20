@@ -65,9 +65,10 @@ EOF
     # To be changed when the global installation infrastructure is more
     # stable. Be aware that enforce_P4A_TOP may be called more than once
     # and thus this source too...
-    if [[ -r $P4A_ETC/p4a_git_lib.bash ]]; then
+    if [[ -n $P4A_ETC && -r $P4A_ETC/p4a_git_lib.bash ]]; then
 	source $P4A_ETC/p4a_git_lib.bash
     else
+	# Try this backup:
 	source $P4A_TOP/par4all/src/dev/p4a_git_lib.bash
     fi
 }
