@@ -5,7 +5,7 @@ dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py
 nodist_pkgpython_PYTHON=pypips.py
 pkgpyexec_LTLIBRARIES = _pypips.la
 _pypips_la_SOURCES = pypips_aux.c 
-dist__pypips_la_SOURCES =pypips_wrap.c
+nodist__pypips_la_SOURCES =pypips_wrap.c
 
 _pypips_la_LDFLAGS = -module $(PYTHON_LDFLAGS)
 _pypips_la_LIBADD = ../../Libs/libpipslibs.la $(PYTHON_EXTRALIBS) $(LINEARLIBS_LIBS) $(NEWGENLIBS_LIBS)
