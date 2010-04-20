@@ -611,11 +611,21 @@ void replace_subscript(expression e)
 {
     if( !simd_vector_p(e) && ! expression_constant_p(e) )
     {
-        expression e_copy = copy_expression(e);
-        if( ! syntax_undefined_p( expression_syntax(e) ) ) free_syntax(expression_syntax(e));
-        if( ! normalized_undefined_p( expression_normalized(e) ) ) free_normalized(expression_normalized(e));
-
-        *e=*MakeUnaryCall(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME), e_copy );
+        if(!expression_call_p(e))
+        {
+            unnormalize_expression(e);
+            expression_syntax(e) = make_syntax_call(
+                    make_call(
+                        entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                        make_expression_list(
+                            make_expression(
+                                expression_syntax(e),
+                                normalized_undefined
+                                )
+                            )
+                        )
+                    );
+        }
     }
 
 }
@@ -641,6 +651,16 @@ statement make_exec_statement_from_opcode(opcode oc, list args)
     return make_exec_statement_from_name( opcode_name(oc) , args );
 }
 
+#define SAC_ALIGNED_VECTOR_NAME "aligned"
+static bool sac_aligned_expression_p(expression e)
+{
+    if(expression_reference_p(e))
+    {
+        reference r = expression_reference(e);
+        return same_stringn_p(entity_user_name(reference_variable(r)),SAC_ALIGNED_VECTOR_NAME,sizeof(SAC_ALIGNED_VECTOR_NAME)-1);
+    }
+    return false;
+}
 
 
 static statement make_loadsave_statement(int argc, list args, bool isLoad, list padded)
@@ -663,6 +683,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     string lsType = local_name(get_simd_vector_type(args));
     bool all_padded= all_padded_p(padded);
     bool all_scalar = false;
+    bool all_same_aligned_ref = false;
 
     /* the function should not be called with an empty arguments list */
     assert((argc > 1) && (args != NIL));
@@ -689,6 +710,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         argsType = CONSEC_REFS;
         fstExp = exp;
         all_scalar = expression_scalar_p(exp); /* and not real_exp ! */
+        all_same_aligned_ref = sac_aligned_expression_p(exp);
     }
     else
         argsType = OTHER;
@@ -735,6 +757,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             else
             {
                 argsType = OTHER;
+                all_same_aligned_ref = all_same_aligned_ref && same_expression_p(e,fstExp);
                 all_scalar = all_scalar && expression_scalar_p(e);
                 continue;
             }
@@ -760,7 +783,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                 break;
         }
         entity scalar_holder = make_new_array_variable_with_prefix(
-                "aligned",get_current_module_entity(),shared_basic,
+                SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),shared_basic,
                 CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
                 );
         AddEntityToCurrentModule(scalar_holder);
@@ -806,7 +829,6 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                     inits=CONS(EXPRESSION,int_to_expression(0),inits);
                     expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
                     replacements=gen_cons(current_scalar,gen_cons(replacement,replacements));
-                    replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
                 }
                 index++;
             }
@@ -837,6 +859,10 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         fstExp = EXPRESSION(CAR(CDR(args)));
 
     }
+    if(all_same_aligned_ref)
+    {
+        argsType=CONSEC_REFS;
+    }
 
 
 
@@ -866,7 +892,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                 else
                 {
                     expression addr = fstExp;
-                    args = make_expression_list( EXPRESSION(CAR(args)), addr);
+                    args = make_expression_list( copy_expression(EXPRESSION(CAR(args))), copy_expression(addr));
                 }
 
                 gSimdCost += - argc + 1;
@@ -1499,6 +1525,17 @@ statement do_generate_load_statement(simdStatementInfo si, int line)
     }
 }
 
+static bool statement_consecutive_load_p(statement s)
+{
+    if(simd_load_stat_p(s))
+    {
+        return
+            !same_stringn_p(SIMD_GEN_LOAD_NAME,entity_user_name(call_function(statement_call(s))),sizeof(SIMD_GEN_LOAD_NAME)-1)
+            ;
+    }
+    return false;
+}
+
 static statement generate_load_statement(simdStatementInfo si, int line)
 {
     if(!simdStatementInfo_commut(si) || simdStatementInfo_nbArgs(si)!=3) /* the second test is a strong assumtion: we only deal with a=b op c */
@@ -1507,6 +1544,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
     {
         size_t nb_alternatives = 1 << simdStatementInfo_nbArgs(si);
         opcode oc = simdStatementInfo_opcode(si);
+        printf("###########\n");
         statementArgument * new_args =
             (statementArgument*)calloc(simdStatementInfo_nbArgs(si)*opcode_vectorSize(oc),sizeof(statementArgument));
         for(size_t a=0;a<nb_alternatives;a++)
@@ -1536,7 +1574,8 @@ static statement generate_load_statement(simdStatementInfo si, int line)
                     simdStatementInfo_vectors(si),
                     new_args);
             statement new = do_generate_load_statement(new_si,line);
-            if(statement_undefined_p(new))
+            print_statement(new);
+            if(statement_undefined_p(new) || statement_consecutive_load_p(new) )
             {
                 *si=*new_si; /*berk berk berk */
                 return new;
