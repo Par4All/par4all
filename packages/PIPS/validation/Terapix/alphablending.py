@@ -48,7 +48,7 @@ if __name__ == "__main__":
 	m = w["alphablending"]
 	
 	print "tidy the code just in case of"
-	m.partial_eval()
+	m.partial_eval(linearize=True)
 	m.display()
 	
 	print "tiling"
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 	m.display()
 	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
 	m.display()
-	m.partial_eval()
+	m.partial_eval(linearize=True)
 	m.display()
 	#m.iterator_detection()
 	#m.array_to_pointer(convert_parameters="POINTER",flatten_only=False)

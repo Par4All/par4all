@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float rtflsp();
-# 1269
 float rtflsp(func,x1,x2,xacc)
 float x1,x2,xacc;
 float (*func)(); /* ANSI: float (*func)(float); */

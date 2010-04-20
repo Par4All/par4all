@@ -1261,7 +1261,6 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern void rkqc();
-# 1263
 void rkqc(y,dydx,n,x,htry,eps,yscal,hdid,hnext,derivs)
 float y[],dydx[],*x,htry,eps,yscal[],*hdid,*hnext;
 void (*derivs)(); /* ANSI: void (*derivs)(float,float *,float *); */

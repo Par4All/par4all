@@ -1261,7 +1261,6 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern float qromb();
-# 1263
 float qromb(func,a,b)
 float a,b;
 float (*func)();

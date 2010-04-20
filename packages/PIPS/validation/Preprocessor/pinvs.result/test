@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void pinvs();
-# 1267
 void pinvs(ie1,ie2,je1,jsf,jc1,k,c,s)
 int ie1,ie2,je1,jsf,jc1,k;
 float ***c,**s;

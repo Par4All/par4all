@@ -1269,7 +1269,6 @@ static float sqrarg;
 
 
 extern void powell();
-# 1271
 void powell(p,xi,n,ftol,iter,fret,func)
 float p[],**xi,ftol,*fret,(*func)();
 int n,*iter;

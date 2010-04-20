@@ -1261,7 +1261,6 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern void mnbrak();
-# 1263
 void mnbrak(ax,bx,cx,fa,fb,fc,func)
 float *ax,*bx,*cx,*fa,*fb,*fc;
 float (*func)(); /* ANSI: float (*func)(float); */

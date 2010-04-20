@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float bico();
-# 1267
 float bico(n,k)
 int n,k;
 {

@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float rtsafe();
-# 1269
 float rtsafe(funcd,x1,x2,xacc)
 float x1,x2,xacc;
 void (*funcd)(); /* ANSI: void (*funcd)(float,float *,float *); */

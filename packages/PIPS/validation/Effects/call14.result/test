@@ -56,11 +56,13 @@ Proper effects for "main"
 
 int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
    int i, j;
-//               <may be written >: y[*]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: d1 d2
 
    call14(d1, d2, (int *) y);
@@ -84,14 +86,17 @@ int main()
 Cumulated effects for "main"
 
 //               <may be read    >: __IO_EFFECTS:LUNS[1]
-//               <may be written >: __IO_EFFECTS:LUNS[1]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[1]
 int main()
 {
+//               <must be written>: d1
    int d1 = 4;
+//               <must be written>: d2
    int d2 = 4;
    int y[d1][d2];
    int i, j;
-//               <may be written >: y[*]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: d1 d2
 
    call14(d1, d2, (int *) y);

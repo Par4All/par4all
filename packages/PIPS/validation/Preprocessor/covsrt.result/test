@@ -1,5 +1,4 @@
 extern void covsrt();
-# 1
 void covsrt(covar,ma,lista,mfit)
 float **covar;
 int ma,lista[],mfit;

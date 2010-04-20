@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float erfcc();
-# 1267
 float erfcc(x)
 float x;
 {

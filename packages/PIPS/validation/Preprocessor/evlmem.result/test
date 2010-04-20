@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float evlmem();
-# 1267
 float evlmem(fdt,cof,m,pm)
 float fdt,cof[],pm;
 int m;

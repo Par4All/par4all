@@ -1,5 +1,4 @@
 extern float bessy();
-# 1
 float bessy(n,x)
 int n;
 float x;

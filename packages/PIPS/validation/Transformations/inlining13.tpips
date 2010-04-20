@@ -2,6 +2,9 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete inlining13
 create inlining13 inlining13.c
 
+# use "old" effects...
+setproperty CONSTANT_PATH_EFFECTS=FALSE
+
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"

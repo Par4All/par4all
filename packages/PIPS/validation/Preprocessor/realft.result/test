@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void realft();
-# 1267
 void realft(data,n,isign)
 float data[];
 int n,isign;

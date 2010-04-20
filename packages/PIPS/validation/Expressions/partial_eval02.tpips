@@ -20,18 +20,27 @@ echo
 display PRINTED_FILE[main]
 
 echo
-echo Code after partial evalaluation for "partial_eval02"
+echo Code after partial evaluation for "partial_eval02"
 echo
 
 apply PARTIAL_EVAL[partial_eval02]
 display PRINTED_FILE[partial_eval02]
 
+
 echo
-echo Code after partial evalaluation for "main"
+echo Code after partial evaluation for "main"
 echo
 
 apply PARTIAL_EVAL[main]
 display PRINTED_FILE[main]
+
+echo
+echo Same code with evaluation of constants
+echo
+
+setproperty EVAL_SYMBOLIC_CONSTANT TRUE
+apply PARTIAL_EVAL[partial_eval02]
+display PRINTED_FILE[partial_eval02]
 
 echo
 echo Unsplit resulting code
@@ -44,6 +53,5 @@ shell if test `partial_eval02.database/Src/partial_eval` = `./partial_eval`; the
 shell rm -rf partial_eval02.database/Src/partial_eval partial_eval
 
 close
-# delete partial_eval02
-quit
+delete partial_eval02
 

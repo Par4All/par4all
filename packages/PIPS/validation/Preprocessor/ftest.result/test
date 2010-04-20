@@ -1,5 +1,4 @@
 extern void ftest();
-# 1
 void ftest(data1,n1,data2,n2,f,prob)
 float data1[],data2[],*f,*prob;
 int n1,n2;

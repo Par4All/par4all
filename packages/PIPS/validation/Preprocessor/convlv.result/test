@@ -2,7 +2,6 @@ static float sqrarg;
 
 
 extern void convlv();
-# 4
 void convlv(data,n,respns,m,isign,ans)
 float data[],respns[],ans[];
 int n,m,isign;

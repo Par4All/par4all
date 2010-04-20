@@ -1,5 +1,4 @@
 extern void simplx();
-# 1
 void simplx(a,m,n,m1,m2,m3,icase,izrov,iposv)
 int m,n,m1,m2,m3,*icase,izrov[],iposv[];
 float **a;

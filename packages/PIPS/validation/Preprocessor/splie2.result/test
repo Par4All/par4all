@@ -1,5 +1,4 @@
 extern void splie2();
-# 1
 void splie2(x1a,x2a,ya,m,n,y2a)
 float x1a[],x2a[],**ya,**y2a;
 int m,n;

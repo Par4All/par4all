@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void gauleg();
-# 1269
 void gauleg(x1,x2,x,w,n)
 double x1,x2,x[],w[];
 int n;

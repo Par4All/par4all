@@ -30,7 +30,7 @@ Parsed Printed file for "main"
 
 int main()
 {
-   int i0,  i1,  i2,  i3,  id;
+   int i0, i1, i2, i3, id;
 
    i0 = switch03(0);
    // 111

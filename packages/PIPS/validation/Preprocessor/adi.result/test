@@ -1264,7 +1264,6 @@ extern void adi();
 
 /* Double precision version of TRIDAG */
 extern void tridag();
-# 1263
 void adi(a,b,c,d,e,f,g,u,jmax,k,alpha,beta,eps)
 double **a,**b,**c,**d,**e,**f,**g,**u,alpha,beta,eps;
 int jmax,k;
@@ -1372,7 +1371,6 @@ int jmax,k;
         }
         nrerror("in ADI, too many iterations");
 }
-# 1372
 void tridag(a,b,c,r,u,n)
 double *a,*b,*c,*r,*u;
 int n;

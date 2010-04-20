@@ -1268,7 +1268,6 @@ int ndatat=0; /* defining declaration */
 float *xt=0,*yt=0,aa=0.0,abdevt=0.0; /* defining declaration */
 
 extern void medfit();
-# 1270
 void medfit(x,y,ndata,a,b,abdev)
 float *x,*y,*a,*b,*abdev;
 int ndata;

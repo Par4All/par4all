@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float midexp();
-# 1269
 float midexp(funk,aa,bb,n)
 float aa,bb;
 float (*funk)(); /* ANSI: float (*funk)(float); */

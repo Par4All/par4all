@@ -1268,7 +1268,6 @@ static float sqrarg;
 
 
 extern void fit();
-# 1270
 void fit(x,y,ndata,sig,mwt,a,b,siga,sigb,chi2,q)
 float x[],y[],sig[],*a,*b,*siga,*sigb,*chi2,*q;
 int ndata,mwt;

@@ -1,5 +1,4 @@
 extern void chint();
-# 1
 void chint(a,b,c,cint,n)
 float a,b,c[],cint[];
 int n;

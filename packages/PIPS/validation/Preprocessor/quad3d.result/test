@@ -1,4 +1,3 @@
-# 13
 float f1(x)
 float x;
 {
@@ -8,7 +7,6 @@ float x;
         xsav=x;
         return qgaus(f2,yy1(x),yy2(x));
 }
-# 23
 float f2(y)
 float y;
 {
@@ -18,7 +16,6 @@ float y;
         ysav=y;
         return qgaus(f3,z1(xsav,y),z2(xsav,y));
 }
-# 33
 float f3(z)
 float z;
 {
@@ -34,7 +31,6 @@ extern float f1();
 extern float f2();
 
 extern float f3();
-# 4
 float quad3d(func,x1,x2)
 float x1,x2,(*func)();
 {

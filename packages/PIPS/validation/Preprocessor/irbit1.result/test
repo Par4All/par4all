@@ -1,5 +1,4 @@
 extern int irbit1();
-# 1
 int irbit1(iseed)
 unsigned long *iseed;
 {

@@ -1,5 +1,4 @@
 extern void locate();
-# 1
 void locate(xx,n,x,j)
 float xx[],x;
 int n,*j;

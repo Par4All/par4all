@@ -1759,7 +1759,6 @@ extern void _IO_free_backup_area (_IO_FILE *) ;
 
 
 typedef _G_fpos_t fpos_t;
-# 1770 "./csplit01.c"
 /* The possibilities for the third argument to `setvbuf'.  */
 
 
@@ -2274,7 +2273,6 @@ extern int ftrylockfile (FILE *__stream) ;
 extern void funlockfile (FILE *__stream) ;
 /* If we are compiling with optimizing read this file.  It contains
    several optimizing inline functions and macros.  */
-# 2294 "./csplit01.c"
 /* Make sure that static functions receive unique names. */
 
 static void print_hello();
@@ -2282,19 +2280,16 @@ static void print_hello();
 extern void print_hello_too();
 
 extern main();
-# 2296
 static void print_hello()
 {
   printf("Hello World!\n");
 }
-# 2306
 main()
 {
   print_hello();
   /* Let's print hello again! */
   print_hello_too();
 }
-# 2301
 void print_hello_too()
 {
   printf("Hello World!\n");

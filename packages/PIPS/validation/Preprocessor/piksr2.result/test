@@ -1,5 +1,4 @@
 extern void piksr2();
-# 1
 void piksr2(n,arr,brr)
 int n;
 float arr[],brr[];

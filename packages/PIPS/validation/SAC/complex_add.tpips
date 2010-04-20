@@ -5,7 +5,7 @@ create $WS $WS.c include/SIMD.c
 
 module cadd
 
-source include/fortran.tpips
+source include/benchmark.tpips.h
 
 apply UNSPLIT
 close

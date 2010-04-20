@@ -1261,7 +1261,6 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern float dbrent();
-# 1263
 float dbrent(ax,bx,cx,f,df,tol,xmin)
 float ax,bx,cx,tol,*xmin;
 float (*f)(),(*df)(); /* ANSI: float (*f)(float),(*df)(float); */

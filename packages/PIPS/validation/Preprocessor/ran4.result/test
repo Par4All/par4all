@@ -1,7 +1,6 @@
 typedef struct IMMENSE {unsigned long l,r;} immense;
 
 extern float ran4();
-# 3
 float ran4(idum)
 int *idum;
 {

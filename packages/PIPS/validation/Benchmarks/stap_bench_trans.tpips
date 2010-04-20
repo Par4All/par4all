@@ -2,7 +2,7 @@ setenv WS=stap_bench_trans
 delete $WS
 
 create $WS $WS.c
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 apply UNSPLIT
 close
 
