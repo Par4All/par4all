@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void gaussj();
-# 1269
 void gaussj(a,n,b,m)
 float **a,**b;
 int n,m;

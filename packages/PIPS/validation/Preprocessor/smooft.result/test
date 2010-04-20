@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void smooft();
-# 1267
 void smooft(y,n,pts)
 float y[],pts;
 int n;

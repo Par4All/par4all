@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void polcof();
-# 1267
 void polcof(xa,ya,n,cof)
 float xa[],ya[],cof[];
 int n;

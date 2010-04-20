@@ -1,5 +1,4 @@
 extern void indexx();
-# 1
 void indexx(n,arrin,indx)
 int n,indx[];
 float arrin[];

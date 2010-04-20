@@ -1263,7 +1263,6 @@ extern int matherr (struct exception *__exc);
 float **d=0,*x=0; /* defining declaration */
 
 extern void bsstep();
-# 1265
 void bsstep(y,dydx,nv,xx,htry,eps,yscal,hdid,hnext,derivs)
 float y[],dydx[],*xx,htry,eps,yscal[],*hdid,*hnext;
 void (*derivs)();

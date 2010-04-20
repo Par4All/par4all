@@ -1,5 +1,4 @@
 extern void eigsrt();
-# 1
 void eigsrt(d,v,n)
 float d[],**v;
 int n;

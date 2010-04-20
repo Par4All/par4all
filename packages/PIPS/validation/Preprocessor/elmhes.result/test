@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void elmhes();
-# 1269
 void elmhes(a,n)
 float **a;
 int n;

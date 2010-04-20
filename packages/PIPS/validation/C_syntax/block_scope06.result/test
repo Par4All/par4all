@@ -3,11 +3,11 @@ Parser output
 
 int main()
 {
-   int k,  m;
+   int k, m;
    
    /* For loop comment */
    for (k = 1;k<=m;k++) {
-      int i,  j;
+      int i, j;
 
       i = 1;
       j = 2;
@@ -18,11 +18,11 @@ Controlizer output
 
 int main()
 {
-   int k,  m;
+   int k, m;
    
    /* For loop comment */
    for (k = 1;k<=m;k++) {
-      int i,  j;
+      int i, j;
 
       i = 1;
       j = 2;

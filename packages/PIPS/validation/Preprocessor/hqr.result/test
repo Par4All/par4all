@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void hqr();
-# 1269
 void hqr(a,n,wr,wi)
 float **a,wr[],wi[];
 int n;

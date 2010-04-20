@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float poidev();
-# 1269
 float poidev(xm,idum)
 float xm;
 int *idum;

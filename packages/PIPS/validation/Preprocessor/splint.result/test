@@ -1,5 +1,4 @@
 extern void splint();
-# 1
 void splint(xa,ya,y2a,n,x,y)
 float xa[],ya[],y2a[],x,*y;
 int n;

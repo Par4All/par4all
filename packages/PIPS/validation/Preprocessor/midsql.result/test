@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float midsql();
-# 1269
 float midsql(funk,aa,bb,n)
 float aa,bb;
 int n;

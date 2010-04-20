@@ -1,5 +1,4 @@
 extern void correl();
-# 1
 void correl(data1,data2,n,ans)
 float data1[],data2[],ans[];
 int n;

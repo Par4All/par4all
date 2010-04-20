@@ -1,5 +1,4 @@
 extern int main();
-# 1
 int main()
 {
   struct x

@@ -1,5 +1,4 @@
 extern void toeplz();
-# 1
 void toeplz(r,x,y,n)
 float r[],x[],y[];
 int n;

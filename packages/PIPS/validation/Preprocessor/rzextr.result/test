@@ -1,7 +1,6 @@
 extern float **d,*x; /* defined in BSSTEP */
 
 extern void rzextr();
-# 3
 void rzextr(iest,xest,yest,yz,dy,nv,nuse)
 int iest,nv,nuse;
 float xest,yest[],yz[],dy[];

@@ -1,5 +1,4 @@
 extern void eclass();
-# 1
 void eclass(nf,n,lista,listb,m)
 int nf[],lista[],listb[],n,m;
 {

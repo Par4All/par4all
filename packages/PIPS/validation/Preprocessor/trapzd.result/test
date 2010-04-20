@@ -1,5 +1,4 @@
 extern float trapzd();
-# 1
 float trapzd(func,a,b,n)
 float a,b;
 float (*func)(); /* ANSI: float (*func)(float); */

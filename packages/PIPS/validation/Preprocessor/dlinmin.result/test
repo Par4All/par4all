@@ -3,7 +3,6 @@ float *pcom=0,*xicom=0,(*nrfunc)();
 void (*nrdfun)();
 
 extern void dlinmin();
-# 5
 void dlinmin(p,xi,n,fret,func,dfunc)
 float p[],xi[],*fret,(*func)();
 void (*dfunc)();

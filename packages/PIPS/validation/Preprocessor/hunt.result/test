@@ -1,5 +1,4 @@
 extern void hunt();
-# 1
 void hunt(xx,n,x,jlo)
 int n,*jlo;
 float xx[],x;

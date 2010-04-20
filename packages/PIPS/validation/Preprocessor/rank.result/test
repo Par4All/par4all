@@ -1,5 +1,4 @@
 extern void rank();
-# 1
 void rank(n,indx,irank)
 int indx[],irank[],n;
 {

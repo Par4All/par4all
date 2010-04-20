@@ -1,5 +1,4 @@
 extern void mrqcof();
-# 1
 void mrqcof(x,y,sig,ndata,a,ma,lista,mfit,alpha,beta,chisq,funcs)
 float x[],y[],sig[],a[],**alpha,beta[],*chisq;
 int ndata,ma,lista[],mfit;

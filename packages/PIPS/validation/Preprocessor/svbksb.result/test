@@ -1,5 +1,4 @@
 extern void svbksb();
-# 1
 void svbksb(u,w,v,m,n,b,x)
 float **u,w[],**v,b[],x[];
 int m,n;

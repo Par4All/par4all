@@ -1,4 +1,3 @@
-# 2
 void foo()
 {
   printf("%d\n",i);

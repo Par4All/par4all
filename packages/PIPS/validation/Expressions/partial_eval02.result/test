@@ -33,18 +33,18 @@ int main()
    return 0;
 }
 
-Code after partial evalaluation for "partial_eval02"
+Code after partial evaluation for "partial_eval02"
 
 int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
    int *zaza = (int *) fifi+3;
    int i;
 
-   i = 2;
+   i = size;
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+0);
 }
 
-Code after partial evalaluation for "main"
+Code after partial evaluation for "main"
 
 int main()
 {

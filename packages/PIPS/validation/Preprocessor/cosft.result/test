@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void cosft();
-# 1267
 void cosft(y,n,isign)
 float y[];
 int n,isign;

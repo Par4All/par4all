@@ -1,5 +1,4 @@
 extern void polcoe();
-# 1
 void polcoe(x,y,n,cof)
 float x[],y[],cof[];
 int n;

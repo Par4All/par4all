@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void fourn();
-# 1269
 void fourn(data,nn,ndim,isign)
 float data[];
 int nn[],ndim,isign;

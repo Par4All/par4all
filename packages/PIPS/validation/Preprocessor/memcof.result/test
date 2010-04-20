@@ -1268,7 +1268,6 @@ static float sqrarg;
 
 
 extern void memcof();
-# 1270
 void memcof(data,n,m,pm,cof)
 float data[],*pm,cof[];
 int n,m;

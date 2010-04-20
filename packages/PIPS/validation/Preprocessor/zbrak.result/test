@@ -1,5 +1,4 @@
 extern void zbrak();
-# 1
 void zbrak(fx,x1,x2,n,xb1,xb2,nb)
 float x1,x2,xb1[],xb2[];
 float (*fx)(); /* ANSI: float (*fx)(float); */

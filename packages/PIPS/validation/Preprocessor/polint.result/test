@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void polint();
-# 1267
 void polint(xa,ya,n,x,y,dy)
 float xa[],ya[],x,*y,*dy;
 int n;

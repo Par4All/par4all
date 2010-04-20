@@ -1,5 +1,4 @@
 extern void fpoly();
-# 1
 void fpoly(x,p,np)
 float x,p[];
 int np;

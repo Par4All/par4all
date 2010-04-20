@@ -1268,7 +1268,6 @@ extern int ndatat; /* defined in MEDFIT */
 extern float *xt,*yt,aa,abdevt;
 
 extern float rofunc();
-# 1270
 float rofunc(b)
 float b;
 {

@@ -61,7 +61,7 @@ private:
 	  fi ; \
 	else \
 	  echo "checkout the private validation somewhere:"; \
-	  echo "> svn co http://svnpriv.cri.ensmp.fr/svn/pipspriv/trunk ???"; \
+	  echo "> svn co https://svnpriv.cri.ensmp.fr/svn/pipspriv/trunk ???"; \
 	  echo "and link it here as 'private':"; \
 	  echo "> ln -s ??? private"; \
 	  echo "CAUTION: it MUST NOT be distributed..." ; \
@@ -77,34 +77,113 @@ validate-%: %
 	  PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD)/$< -O RESULTS . ; \
 	}
 
+#
+# PARALLEL VALIDATION
+#
 # directory-parallel validation test
 # may replace the previous entry some day
 
-.PHONY: parallel-validate-test
+.PHONY: parallel-validate parallel-clean parallel-unvalidate parallel-check
 
+# where results are stored
+RESULTS	= validation.out
+HEAD	= validation.head
+
+# keep summaries
+SUM.d	= SUMMARY_Archive
+NOW.d	:= $(shell date +%Y/%m)
+DEST.d	= $(SUM.d)/$(NOW.d)
+NOW	:= SUMMARY.$(shell date +%Y-%m-%d_%H_%M_%S)
+SUM.last	= $(SUM.d)/SUMMARY-last
+SUM.prev	= $(SUM.d)/SUMMARY-previous
+
+$(DEST.d):
+	mkdir -p $@
+
+SVN.URL	= $(shell svn info | grep 'Repository Root' | cut -d: -f2-)
+SVN.R	= $(shell svnversion)
+SVN.C	= $(shell svnversion -c)
+
+# generate summary header
+# hmmm... not sure that start date is before the validation
+$(HEAD):
+	{ \
+	  echo "parallel validation" ; \
+	  echo "on: $(TARGET)" ; \
+	  echo "host: $$(hostname)" ; \
+	  echo "directory: $(PWD)" ; \
+	  test -d .svn && \
+	    echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
+	  echo "pips: $(shell which pips)" ; \
+	  pips -v ; \
+	  echo "tpips: $(shell which tpips)" ; \
+	  tpips -v ; \
+	  echo "user: $$USERNAME" ; \
+	  echo "start date: $$(date)" ; \
+	} > $@
+
+# this target should replace the "validate" target
+new-validate:
+	$(RM) SUMMARY
+	$(MAKE) parallel-clean
+	$(MAKE) archive
+
+mail-validate: new-validate
+	{ \
+	  cat $(SUM.d)/SUMMARY.diff ; \
+	  echo ; \
+	  cat SUMMARY ; \
+	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
+
+# generate & archive validation summary
+SUMMARY: $(HEAD) parallel-validate
+	{ \
+	  unset LANG LC_COLLATE ; \
+	  cat $(HEAD) ; \
+	  echo "end date: $$(date)" ; \
+	  echo ; \
+	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
+	  echo ; \
+	  failed=$$(egrep '^(failed|changed): ' < $(RESULTS) | wc -l); \
+	  total=$$(egrep '^(failed|changed|passed): ' < $(RESULTS) | wc -l); \
+	  [ $$failed = 0 ] && \
+		status="SUCCEEDED $$total" || \
+		status="FAILED $$failed/$$total"; \
+	  echo "$$failed failed out of $$total on $$(date)"; \
+	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
+	} > $@
+
+archive: SUMMARY $(DEST.d)
+	cp SUMMARY $(DEST.d)/$(NOW) ; \
+	$(RM) $(SUM.prev) ; \
+	test -L $(SUM.last) && mv $(SUM.last) $(SUM.prev) ; \
+	ln -s $(NOW.d)/$(NOW) $(SUM.last) ; \
+	test -f $(SUM.prev) -a -f $(SUM.last) && \
+	  diff $(SUM.prev) $(SUM.last) | \
+	  egrep -v '^([0-9,]+[acd][0-9,]+|---)$$' > $(SUM.d)/SUMMARY.diff
+
+# overall targets
 parallel-clean: $(TARGET:%=parallel-clean-%)
+	$(RM) $(RESULTS) $(HEAD)
 
-parallel-validate-test: $(TARGET:%=parallel-validate-test-%)
-	# TODO generate summary
-	# TODO archive summary
+parallel-check: $(TARGET:%=parallel-check-%)
 
+parallel-validate: $(TARGET:%=parallel-validate-%)
+
+parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
+
+# generic subdir targets
 parallel-clean-%:
 	$(MAKE) -C $* clean unvalidate
 
-# unsafe directories...
-# maybe it would be easier to list safe directories:-(
-parallel-validate-test-Control: SAFE=-j1
-parallel-validate-test-DemoStd: SAFE=-j1
-parallel-validate-test-Syntax: SAFE=-j1
-parallel-validate-test-Semantics: SAFE=-j1
-parallel-validate-test-Prettyprint: SAFE=-j1
+parallel-check-%: parallel-clean-%
+	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies
 
-SAFE	=
-parallel-validate-test-%: parallel-clean-%
-	# -j1 do not run subdirectory validations in parallel as
-	# some directory cannot stand it at the time
-	# ISSUE: failed/changed are not detected?
-	$(MAKE) $(SAFE) FAILED=../failed -C $* validate-test
+parallel-validate-%: parallel-check-%
+	$(MAKE) RESULTS=../$(RESULTS) -C $* validate-test
+
+parallel-unvalidate-%:
+	$(MAKE) -C $* unvalidate
 
 ## REMOVE ???
 # special handling of private

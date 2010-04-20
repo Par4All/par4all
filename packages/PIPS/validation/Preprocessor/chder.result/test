@@ -1,5 +1,4 @@
 extern void chder();
-# 1
 void chder(a,b,c,cder,n)
 float a,b,c[],cder[];
 int n;

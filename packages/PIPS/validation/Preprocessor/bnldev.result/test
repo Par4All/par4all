@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float bnldev();
-# 1269
 float bnldev(pp,n,idum)
 float pp;
 int n,*idum;

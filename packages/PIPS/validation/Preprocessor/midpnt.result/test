@@ -1,5 +1,4 @@
 extern float midpnt();
-# 1
 float midpnt(func,a,b,n)
 float a,b;
 int n;

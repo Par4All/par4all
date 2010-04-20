@@ -1,5 +1,4 @@
 extern void spline();
-# 1
 void spline(x,y,n,yp1,ypn,y2)
 float x[],y[],yp1,ypn,y2[];
 int n;

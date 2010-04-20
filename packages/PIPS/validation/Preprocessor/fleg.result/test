@@ -1,5 +1,4 @@
 extern void fleg();
-# 1
 void fleg(x,pl,nl)
 float x,pl[];
 int nl;

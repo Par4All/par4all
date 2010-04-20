@@ -1,5 +1,4 @@
 extern void svdfit();
-# 1
 void svdfit(x,y,sig,ndata,a,ma,u,v,w,chisq,funcs)
 float x[],y[],sig[],a[],**u,**v,w[],*chisq;
 int ndata,ma;
