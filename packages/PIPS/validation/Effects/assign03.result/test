@@ -10,7 +10,7 @@ void assign03()
    p[j] = 1.;
 }
 
-Proper effetcs for "assign03"
+Proper pointer effects for "assign03"
 
 void assign03()
 {
@@ -26,7 +26,7 @@ void assign03()
    p[j] = 1.;
 }
 
-Cumulated effetcs for "assign03"
+Cumulated pointer effects for "assign03"
 
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
@@ -44,7 +44,7 @@ void assign03()
    p[j] = 1.;
 }
 
-Proper effetcs for "foo"
+Proper effects for "foo"
 
 void foo()
 {
@@ -53,7 +53,7 @@ void foo()
    assign03();
 }
 
-Cumulated effetcs for "foo"
+Cumulated effects for "foo"
 
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_

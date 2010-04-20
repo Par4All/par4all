@@ -19,7 +19,7 @@ shell rm -f ${WSPACE}.database/Tmp/*.c
 
 # Display all C files, including compilation units, but get rid of pragmas,
 # except the line number pragma to avoid dependencies on gcc and/or preprocessor version
-shell cat ${WSPACE}.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+shell cat ${WSPACE}.database/*/*.c|sed -e '/^# [0-9][0-9]*/d'
 
 close
 delete ${WSPACE}

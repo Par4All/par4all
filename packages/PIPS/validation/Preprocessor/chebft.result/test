@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void chebft();
-# 1269
 void chebft(a,b,c,n,func)
 float a,b,c[];
 float (*func)(); /* ANSI: float (*func)(float); */

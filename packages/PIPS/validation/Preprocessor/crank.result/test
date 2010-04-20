@@ -1,5 +1,4 @@
 extern void crank();
-# 1
 void crank(n,w,s)
 float w[],*s;
 int n;

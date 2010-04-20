@@ -1269,7 +1269,6 @@ static float maxarg1,maxarg2;
 
 
 extern void ksone();
-# 1271
 void ksone(data,n,func,d,prob)
 float data[],*d,*prob;
 float (*func)(); /* ANSI: float (*func)(float); */

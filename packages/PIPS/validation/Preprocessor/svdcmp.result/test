@@ -1274,7 +1274,6 @@ static float maxarg1,maxarg2;
 
 
 extern void svdcmp();
-# 1276
 void svdcmp(a,m,n,w,v)
 float **a,*w,**v;
 int m,n;

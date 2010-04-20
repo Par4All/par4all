@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float plgndr();
-# 1267
 float plgndr(l,m,x)
 int l,m;
 float x;

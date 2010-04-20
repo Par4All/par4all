@@ -10,7 +10,7 @@
 # not that the time stamp is here to prevent too many runs of cproto ...
 
 CPROTO_STAMP_FILE=.cproto.stamp
-$(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES)
+$(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES) $(srcdir)/Makefile.am
 	test -f $(TARGET).h || ( cp $(srcdir)/$(TARGET)-local.h $(TARGET).h && chmod u+w $(TARGET).h && touch -r  $(srcdir)/$(TARGET)-local.h $(TARGET).h )
 	SOURCES=`for s in $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 	{ \
@@ -24,7 +24,7 @@ $(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES)
       	echo "#define $${guard}";\
       	cat `( test -f $(TARGET)-local.h && echo $(TARGET)-local.h ) || echo $(srcdir)/$(TARGET)-local.h ` ;\
 		for s in $$SOURCES ; do \
-			$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$s ;\
+			$(CPROTO) -evcf2 -O /dev/null -E "$(CPROTO_CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$s ;\
 		done ; \
       	echo "#endif /* $${guard} */"; \
 	} | sed -e '/ yy/ d' > $(CPROTO_STAMP_FILE)

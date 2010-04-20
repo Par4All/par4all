@@ -1,5 +1,4 @@
 extern float ran1();
-# 1
 float ran1(idum)
 int *idum;
 {

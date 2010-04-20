@@ -1,5 +1,4 @@
 extern float qgaus();
-# 1
 float qgaus(func,a,b)
 float a,b;
 float (*func)(); /* ANSI: float (*func)(float); */

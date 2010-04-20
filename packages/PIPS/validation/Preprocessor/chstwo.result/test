@@ -1,5 +1,4 @@
 extern void chstwo();
-# 1
 void chstwo(bins1,bins2,nbins,knstrn,df,chsq,prob)
 float bins1[],bins2[],*df,*chsq,*prob;
 int nbins,knstrn;

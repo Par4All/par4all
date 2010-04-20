@@ -207,6 +207,15 @@ entity argument_entity(expression exp)
   return copy_entity(var);
 }
 
+bool cell_equal_p(cell c1, cell c2)
+{
+  /* Has to be extended for GAPs */
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  return reference_equal_p(r1, r2);
+}
+
+
 /* FI: probably to be moved elsewhere in ri-util */
 /* Here, we only know how to cope (for the time being) with
    cell_reference and cell_preference, not with cell_gap and other

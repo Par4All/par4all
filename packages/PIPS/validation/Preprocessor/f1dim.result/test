@@ -2,7 +2,6 @@ extern int ncom; /* defined in LINMIN */
 extern float *pcom,*xicom,(*nrfunc)();
 
 extern float f1dim();
-# 4
 float f1dim(x)
 float x;
 {

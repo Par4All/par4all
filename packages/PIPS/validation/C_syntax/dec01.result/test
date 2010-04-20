@@ -9,8 +9,8 @@ void do_elem(char *dir)
    }
    if (dir[0]=='.') {
       char *last;
-       *last = '\0';
-       *last = '\0';
+      *last = '\0';
+      *last = '\0';
    }
 }
 
@@ -24,7 +24,7 @@ void do_elem(char *dir)
    }
    if (dir[0]=='.') {
       char *last;
-       *last = '\0';
-       *last = '\0';
+      *last = '\0';
+      *last = '\0';
    }
 }

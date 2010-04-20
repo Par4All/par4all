@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void cntab1();
-# 1269
 void cntab1(nn,ni,nj,chisq,df,prob,cramrv,ccc)
 int **nn,ni,nj;
 float *chisq,*df,*prob,*cramrv,*ccc;

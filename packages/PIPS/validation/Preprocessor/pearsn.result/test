@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void pearsn();
-# 1269
 void pearsn(x,y,n,r,prob,z)
 float x[],y[],*r,*prob,*z;
 int n;

@@ -28,11 +28,11 @@ pipsmake-rc.pdf:user-and-source-files.pdf
 
 dist_noinst_SCRIPTS=make-pips-menu make-builder-map generate_all_menu_documentation pipspassdep.pl
 
-sysconf_DATA=pipsmake.rc properties.rc pipsdep.rc wpips.rc properties-2009-10-31.rc 
+nodist_sysconf_DATA=pipsmake.rc properties.rc pipsdep.rc wpips.rc properties-2009-10-31.rc 
 dist_noinst_DATA=pipsmake.sed pipsmake-rc.tex properties-2009-10-31.rc.model resources.sed user-and-source-files.idraw
 
 BUILT_SOURCES=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
-include_HEADERS=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
+nodist_include_HEADERS=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
 
 pipsmake_flt	= $(SED) -f $(srcdir)/pipsmake.sed
 pipsprop_flt	= $(SED) -f pipsprop.sed
@@ -74,4 +74,4 @@ builder_map.h: pipsmake.rc $(srcdir)/make-builder-map
 epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex generate_all_menu_documentation
 	$(srcdir)/generate_all_menu_documentation -layout < $(srcdir)/pipsmake-rc.tex
 
-CLEANFILES=$(nodist_include_HEADERS) $(sysconf_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el user-and-source-files.pdf
+CLEANFILES=$(nodist_include_HEADERS) $(sysconf_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el user-and-source-files.pdf $(nodist_sysconf_DATA)

@@ -68,6 +68,7 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "text-util.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -77,6 +78,7 @@
 #include "semantics.h"
 #include "transformer.h"
 #include "conversion.h" /* for Psysteme_to_expression*/
+#include "alias_private.h"
 #include "instrumentation.h"
 #include "transformations.h"
 
@@ -231,7 +233,7 @@ static expression expression_less_than_in_context(expression e1, expression e2,
       fprintf(stderr, "\n Second expression e2: ");    
       print_expression(e2);
       fprintf(stderr, " \n e1 less e2 wrt to the precondition : ");
-      fprint_transformer(stderr,context, entity_local_name);
+      fprint_transformer(stderr,context, (get_variable_name_t)entity_local_name);
     }
   if (normalized_linear_p(n1) && normalized_linear_p(n2))
     {

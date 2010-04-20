@@ -229,7 +229,7 @@ bool find_covering_reference_path(set arcs_processed_set,
 {
   if (statement_equal_p(s_src, s_dest))
     {
-      if (entity_conflict_p(ent_src, ent_dest))
+      if (entities_may_conflict_p(ent_src, ent_dest))
 	return (action_write_p(act_dest) || action_read_p(act_src));
       else
 	return (action_write_p(act_dest) && action_read_p(act_src));
@@ -250,7 +250,7 @@ bool find_covering_reference_path(set arcs_processed_set,
 	  set arcs_processed_tmp_set = set_make(set_pointer);
 	  if (set_belong_p(arcs_processed_set, (char *)c)) continue;
 	  arcs_processed_tmp_set = set_add_element(arcs_processed_tmp_set, arcs_processed_set, (char *)c);
-	  if (entity_conflict_p(ent_src, ent_tmp_src))
+	  if (entities_may_conflict_p(ent_src, ent_tmp_src))
 	    {
 	      if (action_write_p(act_tmp_src) || action_read_p(act_src))
 		if (find_covering_reference_path(arcs_processed_tmp_set,
@@ -373,7 +373,7 @@ static effect get_effect_read_of_statement_on_variable(statement s, entity var)
 {
   MAP(EFFECT, eff, {
     entity e = reference_variable(effect_any_reference(eff));
-    if (entity_conflict_p(e, var) && action_read_p(effect_action(eff)))
+    if (entities_may_conflict_p(e, var) && action_read_p(effect_action(eff)))
       return eff;
   }, statement_to_effects(s));
   return NULL;
@@ -383,7 +383,7 @@ static effect get_effect_write_of_statement_on_variable(statement s, entity var)
 {
   MAP(EFFECT, eff, {
     entity e = reference_variable(effect_any_reference(eff));
-    if (entity_conflict_p(e, var) && action_write_p(effect_action(eff)))
+    if (entities_may_conflict_p(e, var) && action_write_p(effect_action(eff)))
       return eff;
   }, statement_to_effects(s));
   return NULL;
@@ -434,7 +434,7 @@ static int loop_executed_approximation(statement s)
   if (normalized_linear_p(n_m1) && normalized_linear_p(n_m2) && normalized_linear_p(n_m3))
     {
       bool m3_negatif, m3_positif;
-      /* Tester le signe de l'incrément en fonction des préconditions : */
+      /* Tester le signe de l'incrï¿½ment en fonction des prï¿½conditions : */
       Pvecteur pv3 = vect_dup(normalized_linear(n_m3));
       Pcontrainte pc3 = contrainte_make(pv3);
       /* Automatic variables read in a CATCH block need to be declared volatile as
@@ -457,7 +457,7 @@ static int loop_executed_approximation(statement s)
       /* Vire aussi pv3 & pc3 : */
       sc_rm(ps);
       
-      /* le signe est déterminé et différent de 0 */
+      /* le signe est dï¿½terminï¿½ et diffï¿½rent de 0 */
       if (m3_positif ^ m3_negatif)
 	{
 	  Pvecteur pv1, pv2, pv, pv_inverse;
@@ -702,7 +702,7 @@ static void check_for_effected_statement(statement s, list le)
     bool impact_must_p = FALSE; /* default value of dependence : MAY */
     effect eff_tmp;
 
-    if (entity_conflict_p(ent_dest, alias_ent1)) {
+    if (entities_may_conflict_p(ent_dest, alias_ent1)) {
       if (action_read_p(act_dest)) {
 	gen_free_list(stat_reads1);
 	/* used for remember to rebuild the list of read statements for alias_ent1 */
@@ -797,7 +797,7 @@ static void check_for_effected_statement(statement s, list le)
 	}, stat_writes2_old);
       }
     }
-    if (entity_conflict_p(ent_dest, alias_ent2)) {
+    if (entities_may_conflict_p(ent_dest, alias_ent2)) {
       if (action_read_p(act_dest)) {
 	gen_free_list(stat_reads2);
 	/* rebuild the list of read statements for alias_ent2 */

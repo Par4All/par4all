@@ -1,5 +1,4 @@
 extern void simp3();
-# 1
 void simp3(a,i1,k1,ip,kp)
 int i1,k1,ip,kp;
 float **a;

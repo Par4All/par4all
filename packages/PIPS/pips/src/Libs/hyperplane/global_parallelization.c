@@ -58,7 +58,7 @@ string module_name;
 	
     debug_on("HYPERPLANE_DEBUG_LEVEL");
 
-    look_for_nested_loop_statements(s, hyperplane, always_select);
+    look_for_nested_loop_statements(s,  (statement (*)(list, bool (*)(loop)))hyperplane, always_select);
 
     debug_off();
 
@@ -74,7 +74,7 @@ loop_hyperplane(string module_name)
 {
     bool return_status = FALSE;
 
-    return_status = interactive_loop_transformation(module_name, hyperplane);
+    return_status = interactive_loop_transformation(module_name,  (statement (*)(list, bool (*)(loop)))hyperplane);
     
     return return_status;
 }

@@ -77,6 +77,10 @@ effect reference_to_simple_effect(reference ref, tag act,
   pips_debug(8, "Begins for reference: \"%s\"\n",
 	     words_to_string(words_reference(ref,NIL)));
 
+  if (dummy_parameter_entity_p(ent))
+    pips_internal_error("the input reference entity is a dummy parameter (%s)\n", 
+			entity_name(ent));
+
   if (entity_all_locations_p(ent))
     {
       /* anywhere effect */

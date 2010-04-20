@@ -1,5 +1,4 @@
 extern void mdian1();
-# 1
 void mdian1(x,n,xmed)
 float x[],*xmed;
 int n;

@@ -4,7 +4,7 @@ int main()
       int *a;
       int b;
    } f1;
-   int i,  k;
+   int i, k;
    f1 *f;
 
    (f[k].a)[i] = 0;

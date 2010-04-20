@@ -1,0 +1,36 @@
+void call19(float *BASE)
+{
+   *BASE = 0.;
+}
+
+Proper pointer effects for "main"
+
+int main(int argc, char *argv[])
+{
+   Cplfloat cpl[10];
+   int i;
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <must be read   >: i
+//               <must be written>: cpl[i][1]
+      call19(&cpl[i].re);
+   return 0;
+}
+
+Cumulated pointer effects for "main"
+
+int main(int argc, char *argv[])
+{
+   Cplfloat cpl[10];
+   int i;
+//               <may be read    >: i
+//               <may be written >: cpl[*][1]
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//               <may be written >: cpl[*][1]
+//               <must be read   >: i
+      call19(&cpl[i].re);
+   return 0;
+}

@@ -289,6 +289,7 @@ basic base;
   return(e);
 }
 
+
 
 /* -------------------------------------------------------------
  *
@@ -322,6 +323,99 @@ reset_unique_variable_numbers()
 #define DEFAULT_STRUCT_PREFIX	"ST_"
 #define DEFAULT_UNION_PREFIX	"U_"
 #define DEFAULT_ENUM_PREFIX	"E_"
+
+/* Generate a new variable name from a seed name to a module
+
+   @param seed_name is the main name of the variable name to generate
+
+   @param prefix is the prefix to prepend to the variable name
+
+   @param suffix is the suffix to append to the variable name
+
+   @param module is the entity of the module the variable will belong to
+
+   Is there is already a variable with this name, a new one is tried with
+   some numerical suffixes.
+
+   @return the entity of the new variable. Its fields are to be filled
+   later before use.
+*/
+entity
+generate_variable_with_unique_name_to_module(string seed_name,
+					     string prefix,
+					     string suffix,
+					     entity module) {
+  const string format = fortran_module_p(module) ?
+    "%s "MODULE_SEP_STRING "%s%s%s":
+    "%s "MODULE_SEP_STRING "0" BLOCK_SEP_STRING "%s%s%s";
+
+  const string format_num = fortran_module_p(module) ?
+    "%s "MODULE_SEP_STRING "%s%s%s%d":
+    "%s "MODULE_SEP_STRING "0" BLOCK_SEP_STRING "%s%s%s%d";
+
+  string module_name = module_local_name(module);
+  string variable_name;
+  int number = 0;
+
+  /* First try a basic name without numeric suffix: */
+  asprintf(&variable_name, format, module_name, prefix, seed_name, suffix);
+  while(gen_find_tabulated(concatenate(module_name,
+				       MODULE_SEP_STRING,
+				       variable_name,
+				       NULL),
+			   entity_domain) != entity_undefined) {
+    /* Free the old name since it was already used: */
+    free(variable_name);
+    /* And try a new one with a number suffix: */
+    asprintf(&variable_name, format_num, module_name, prefix, seed_name, suffix, number++);
+  };
+
+  entity e = make_entity(variable_name,
+			 type_undefined,
+			 storage_undefined,
+			 value_undefined);
+  return e;
+}
+
+
+/* Clone a variable with a new name.
+
+   @param old_variable is the variable to clone
+
+   @param prefix is the prefix to prepend to the variable name
+
+   @param suffix is the suffix to append to the variable name
+
+   @param module is the entity of the module the variable will belong to
+
+   Is there is already a variable with this name, a new one is tried with
+   some numerical suffixes.
+
+   @return the entity of the new variable. Its fields are copies from the
+   old one. That means that there may be some aliasing since the old one
+   and the new one have the same offset (in the sense of RI ram).
+ */
+entity
+clone_variable_with_unique_name(entity old_variable,
+				statement declaration_statement,
+				string prefix,
+				string suffix,
+				entity module) {
+  string seed_name = entity_user_name(old_variable);
+  entity new_variable = generate_variable_with_unique_name_to_module(seed_name,
+								     prefix,
+								     suffix,
+								     module);
+
+  /* Clone the attributes of the old variable into the new one: */
+  entity_type(new_variable) = copy_type(entity_type(old_variable));
+  entity_storage(new_variable) = copy_storage(entity_storage(old_variable));
+  entity_initial(new_variable) = copy_value(entity_initial(old_variable));
+
+  AddLocalEntityToDeclarations(new_variable, module, declaration_statement);
+  return new_variable;
+}
+
 
 /* Create a new scalar variable of type b in the given module.
 

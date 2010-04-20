@@ -1,5 +1,4 @@
 extern void bcucof();
-# 1
 void bcucof(y,y1,y2,y12,d1,d2,c)
 float y[],y1[],y2[],y12[],d1,d2,**c;
 {

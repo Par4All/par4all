@@ -182,7 +182,7 @@ Psysteme s1, s2;
  *
  */
 void build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl)
-Psysteme *psc;
+Psysteme volatile *psc;
 int ofl_ctrl;
 {
 
@@ -239,7 +239,7 @@ int ofl_ctrl;
 } 
 
 void sc_safe_build_sc_nredund_1pass(ps)
-Psysteme *ps;
+Psysteme volatile *ps;
 {   
 
   if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
@@ -265,13 +265,13 @@ Psysteme *ps;
  * The set of equalities is copied as such and ignored by redundancy checks.
  */
 void build_sc_nredund_1pass(ps)
-Psysteme *ps;
+Psysteme volatile *ps;
 {
     build_sc_nredund_1pass_ofl_ctrl(ps,OFL_CTRL);
 } 
 
 void build_sc_nredund_2pass_ofl_ctrl(psc,ofl_ctrl)
-Psysteme *psc;
+Psysteme volatile *psc;
 int ofl_ctrl;
 {
   Psysteme ps = *psc;
@@ -294,7 +294,7 @@ int ofl_ctrl;
 
 
 void sc_safe_build_sc_nredund_2pass(ps)
-Psysteme *ps;
+Psysteme volatile *ps;
 {   
 
   if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
@@ -315,7 +315,7 @@ Psysteme *ps;
  *
  */
 
-void build_sc_nredund_2pass(Psysteme *psc)
+void build_sc_nredund_2pass(Psysteme volatile *psc)
 {
     if (SC_UNDEFINED_P(*psc)) 
 	return;

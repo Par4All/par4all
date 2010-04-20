@@ -31,16 +31,16 @@ int bar(int i_)
    int _return0;
    {
       //PIPS generated variable
-      int i = i_;
+      int i0 = i_;
       {
          int i__;
          i__ = 3;
          {
             int i_;
             i_ = i__;
-            i += i_;
+            i0 += i_;
          }
-         _return0 = i;
+         _return0 = i0;
       }
    }
    j += _return0;

@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void kstwo();
-# 1267
 void kstwo(data1,n1,data2,n2,d,prob)
 float data1[],data2[],*d,*prob;
 int n1,n2;

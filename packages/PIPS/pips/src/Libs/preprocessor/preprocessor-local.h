@@ -28,6 +28,8 @@
 #define SRCPATH "PIPS_SRCPATH"
 
 #define FORTRAN_FILE_SUFFIX ".f"
+#define FORTRAN90_FILE_SUFFIX ".f90"
+#define FORTRAN95_FILE_SUFFIX ".f95"
 #define RATFOR_FILE_SUFFIX ".F"
 #define C_FILE_SUFFIX ".c"
 #define FORTRAN_INITIAL_FILE_SUFFIX ".initial.f"

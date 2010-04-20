@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void eulsum();
-# 1267
 void eulsum(sum,term,jterm,wksp)
 float *sum,term,wksp[];
 int jterm;

@@ -60,5 +60,10 @@ ifdef PIPS_ENABLE_PYPS
 endif
 
 
+ifdef PIPS_ENABLE_GFC2PIPS
+        FWD_DIRS        += gfc2pips
+endif
+
+
 # after its dependencies
 FWD_DIRS	+= fpips

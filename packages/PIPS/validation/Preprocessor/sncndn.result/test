@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void sncndn();
-# 1269
 void sncndn(uu,emmc,sn,cn,dn)
 float uu,emmc;
 float *sn,*cn,*dn;

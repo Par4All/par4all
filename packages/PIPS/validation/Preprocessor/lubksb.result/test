@@ -1,5 +1,4 @@
 extern void lubksb();
-# 1
 void lubksb(a,n,indx,b)
 float **a,b[];
 int n,*indx;

@@ -1263,7 +1263,6 @@ extern int matherr (struct exception *__exc);
 extern void amoeba();
 
 extern float amotry();
-# 1263
 void amoeba(p,y,ndim,ftol,funk,nfunk)
 float **p,y[],ftol,(*funk)();
 int ndim,*nfunk;
@@ -1312,7 +1311,6 @@ int ndim,*nfunk;
         }
         free_vector(psum,1,ndim);
 }
-# 1312
 float amotry(p,y,psum,ndim,funk,ihi,nfunk,fac)
 float **p,*y,*psum,(*funk)(),fac;
 int ndim,ihi,*nfunk;

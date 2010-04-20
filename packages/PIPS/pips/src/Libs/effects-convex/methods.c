@@ -406,7 +406,7 @@ void init_convex_summary_in_out_regions(string module_name)
 void reset_convex_prettyprint(string __attribute__ ((unused)) module_name)
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
-    effect_prettyprint_func = (generic_prettyprint_function) abort;
+    effect_prettyprint_func = (void (*)(effect)) abort;
     effects_to_text_func = (generic_text_function) abort;
     reset_action_interpretation();
 }

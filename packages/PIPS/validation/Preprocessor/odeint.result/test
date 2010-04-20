@@ -1259,12 +1259,10 @@ extern int matherr (struct exception *__exc);
 
 
 /* Get machine-dependent inline versions (if there are any).  */
-# 1270 "./odeint.c"
 int kmax=0,kount=0; /* defining declaration */
 float *xp=0,**yp=0,dxsav=0; /* defining declaration */
 
 extern void odeint();
-# 1273
 void odeint(ystart,nvar,x1,x2,eps,h1,hmin,nok,nbad,derivs,rkqc)
 float ystart[],x1,x2,eps,h1,hmin;
 int nvar,*nok,*nbad;

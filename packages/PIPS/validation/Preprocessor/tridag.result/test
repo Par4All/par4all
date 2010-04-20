@@ -1,5 +1,4 @@
 extern void tridag();
-# 1
 void tridag(a,b,c,r,u,n)
 float a[],b[],c[],r[],u[];
 int n;

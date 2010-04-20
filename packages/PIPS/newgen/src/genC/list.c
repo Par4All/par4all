@@ -434,41 +434,67 @@ list gen_append(list l1, const list l2)
     return(l);
 }
 
-list gen_copy_seq(list l)
-{
-    cons *nlb = NIL, *nle = NIL;
 
-    while (! ENDP(l)) {
-	cons *p = CONS(CHUNK, CHUNK(CAR(l)), NIL);
+/* Copy a list structure
 
-	if (nle == NIL)
-	    nlb = p;
-	else
-	    CDR(nle) = p;
-	nle = p;
-	l = CDR(l);
-    }
+   It does not copy the list elements, the new list references the
+   elements of the old one.
 
-    return(nlb);
+   @return the new list
+ */
+list gen_copy_seq(list l) {
+  /* Begin of the new list: */
+  list nlb = NIL;
+  /* Pointer to the last element of th new list: */
+  list nle = NIL;
+
+  /* While we are not at the end of the list: */
+  while (! ENDP(l)) {
+    /* Create a new list element with the current element: */
+    list p = CONS(CHUNK, CHUNK(CAR(l)), NIL);
+
+    if (nle == NIL)
+      /* If nle is NIL, it is the first element, so keep it as the list
+	 beginning: */
+      nlb = p;
+    else
+      /* Append the new element at the end of the new list: */
+      CDR(nle) = p;
+    /* Update the end pointer: */
+    nle = p;
+    /* Look for the next element of the list to copy: */
+    l = CDR(l);
+  }
+
+  return nlb;
 }
 
-list gen_full_copy_list(list l)
-{
-    cons *nlb = NIL, *nle = NIL;
 
-    while (! ENDP(l)) {
-	cons *p = CONS(CHUNK, gen_copy_tree(CHUNK(CAR(l))), NIL);
+/* Copy a list structure with element copy
 
-	if (nle == NIL)
-	    nlb = p;
-	else
-	    CDR(nle) = p;
-	nle = p;
-	l = CDR(l);
-    }
+   It does copy the list elements.
 
-    return nlb;
+   @return the new list
+ */
+list gen_full_copy_list(list l) {
+  list nlb = NIL;
+  list nle = NIL;
+
+  while (! ENDP(l)) {
+    /* Create a new list element with a copy of the current element: */
+    list p = CONS(CHUNK, gen_copy_tree(CHUNK(CAR(l))), NIL);
+
+    if (nle == NIL)
+      nlb = p;
+    else
+      CDR(nle) = p;
+    nle = p;
+    l = CDR(l);
+  }
+
+  return nlb;
 }
+
 
 list /* of string */
 gen_copy_string_list(list /* of string */ ls)

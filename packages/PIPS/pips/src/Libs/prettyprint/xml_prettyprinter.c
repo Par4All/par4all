@@ -2642,7 +2642,7 @@ static string memory_for_array_p(string sa)
     n= strcspn(array_location_string+strlen(sa)+5,":\n");
     result=(char *)malloc(n+1);
     strncpy(result,array_location_string+strlen(sa)+5,n);
-    result[n]=(char) NULL;
+    result[n]=(char) 0;
   }
   free(array_mem_string);
   return (result);

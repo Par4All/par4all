@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void tred2();
-# 1267
 void tred2(a,n,d,e)
 float **a,d[],e[];
 int n;

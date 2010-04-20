@@ -362,6 +362,12 @@
 #define OMP_PARALLEL_FUNCTION_NAME      "parallel"
 #define OMP_REDUCTION_FUNCTION_NAME     "reduction"
 
+/* F95 */
+#define ALLOCATE_FUNCTION_NAME          "ALLOCATE"
+#define DEALLOCATE_FUNCTION_NAME        "DEALLOCATE"
+#define ETIME_FUNCTION_NAME             "ETIME"
+#define DTIME_FUNCTION_NAME             "DTIME"
+
 /*io functions: C library and system io.Amira Mensi*/
 
 /* unistd.h */
@@ -1258,6 +1264,11 @@
    make sure e is a variable.
 
    It may also be a dummy C parameter.
+
+   It may also be a hidden entity such as an abstract location.
+
+   To sum up, this predicate does not imply that entity e represents a
+   variable declared in the source code by the programmer.
  */
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 

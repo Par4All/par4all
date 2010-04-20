@@ -1,5 +1,4 @@
 extern void polin2();
-# 1
 void polin2(x1a,x2a,ya,m,n,x1,x2,y,dy)
 float x1a[],x2a[],**ya,x1,x2,*y,*dy;
 int m,n;

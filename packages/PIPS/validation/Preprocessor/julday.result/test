@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern long julday();
-# 1269
 long julday(mm,id,iyyy)
 int mm,id,iyyy;
 {

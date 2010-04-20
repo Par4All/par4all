@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void tqli();
-# 1269
 void tqli(d,e,n,z)
 float d[],e[],**z;
 int n;

@@ -74,6 +74,7 @@
 #include "c_syntax.h"
 
 extern int c_lineno;
+extern  int yylex (void);
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 

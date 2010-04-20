@@ -1261,7 +1261,6 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern float el2();
-# 1263
 float el2(x,qqc,aa,bb)
 float x,qqc,aa,bb;
 {

@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void ludcmp();
-# 1269
 void ludcmp(a,n,indx,d)
 int n,*indx;
 float **a,*d;

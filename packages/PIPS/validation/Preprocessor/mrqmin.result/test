@@ -1,5 +1,4 @@
 extern void mrqmin();
-# 1
 void mrqmin(x,y,sig,ndata,a,ma,lista,mfit,covar,alpha,chisq,funcs,alamda)
 float x[],y[],sig[],a[],**covar,**alpha,*chisq,*alamda;
 int ndata,ma,lista[],mfit;

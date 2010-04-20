@@ -96,7 +96,7 @@ static bool there_is_a_conflict(entity var)
 {
   MAP(ENTITY, v,
   {
-    if (entity_conflict_p(var, v))
+    if (entities_may_conflict_p(var, v))
       return TRUE;
   },
       variables_to_filter);
@@ -114,7 +114,7 @@ static entity a_variable = NULL;
  */
 static void reference_rwt(reference r)
 {
-  if (entity_conflict_p(reference_variable(r), a_variable))
+  if (entities_may_conflict_p(reference_variable(r), a_variable))
   {
     direct_reference_found = TRUE;
     gen_recurse_stop(NULL);
@@ -141,7 +141,7 @@ static bool direct_written_reference(statement s, entity var)
     {
       loop l = instruction_loop(i);
       check_if_direct_reference(loop_range(l));
-      if (!direct_reference_found && entity_conflict_p(loop_index(l), var))
+      if (!direct_reference_found && entities_may_conflict_p(loop_index(l), var))
 	direct_reference_found = TRUE;
       break;
     }

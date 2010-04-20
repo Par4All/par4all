@@ -1270,7 +1270,6 @@ typedef struct GREAT {unsigned short l,c,r;} great;
 unsigned long bit[33]; /* defining declaration */
 
 extern void des();
-# 1272
 void des(inp,key,newkey,isw,out)
 immense inp,key,*out;
 int *newkey,isw;

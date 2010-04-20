@@ -1267,7 +1267,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void caldat();
-# 1269
 void caldat(julian,mm,id,iyyy)
 long julian;
 int *mm,*id,*iyyy;

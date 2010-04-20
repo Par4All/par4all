@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern void moment();
-# 1267
 void moment(data,n,ave,adev,sdev,svar,skew,curt)
 int n;
 float data[],*ave,*adev,*sdev,*svar,*skew,*curt;

@@ -1,5 +1,4 @@
 extern void eclazz();
-# 1
 void eclazz(nf,n,equiv)
 int n,nf[];
 int (*equiv)();

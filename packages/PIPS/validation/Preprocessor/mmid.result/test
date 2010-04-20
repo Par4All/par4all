@@ -1,5 +1,4 @@
 extern void mmid();
-# 1
 void mmid(y,dydx,nvar,xs,htot,nstep,yout,derivs)
 float y[],dydx[],xs,htot,yout[];
 void (*derivs)(); /* ANSI: void (*derivs)(float,float *,float *); */

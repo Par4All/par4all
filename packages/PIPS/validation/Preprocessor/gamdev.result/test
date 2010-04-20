@@ -1265,7 +1265,6 @@ extern int matherr (struct exception *__exc);
 
 
 extern float gamdev();
-# 1267
 float gamdev(ia,idum)
 int ia,*idum;
 {

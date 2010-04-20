@@ -13,7 +13,8 @@ libalias_classes_la_SOURCES=alias_pairs.c \
 		points_to_analysis.c \
 		points_to_interprocedural_analysis.c \
 	 	prettyprint.c \
-		points_to_prettyprint.c 
+		points_to_prettyprint.c \
+		conflicts.c
 
 include $(srcdir)/../pipslibs_includes.mk
 include $(top_srcdir)/makes/cproto.mk

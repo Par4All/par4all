@@ -58,6 +58,7 @@
 #include "effects-simple.h"
 
 #include "semantics.h"
+#include "preprocessor.h"
 
 #define PREC_FORESYS_PREFIX "C$PREC"
 #define TRAN_FORESYS_PREFIX "C$TRAN"
