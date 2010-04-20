@@ -141,8 +141,21 @@ AX_ARG_ENABLE([hpfc],
 			  ]
 )
 
+#gfc2pips
+AX_ARG_ENABLE([fortran95],
+                          [enable Fortran95 support via GCC parser (GFC)],
+                          [no],
+                          [
+                           AX_CHECK_PROG([wget])
+                           AX_CHECK_PROG([rsync])
+                           AX_CHECK_PROG([md5])
+                           AX_DEPENDS([fortran95],[wget,rsync,md5])
+                          ]
+)
+
+
 # set the optionnal passes dirs there
-AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps"])
+AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps $ax_enable_fortran95"])
 
 # set the optionnal scripts dirs there
 AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc"])
@@ -211,6 +224,7 @@ AC_CONFIG_FILES([Makefile
 				 src/Libs/gnulib/Makefile
                  src/Makefile
                  src/Passes/Makefile
+                 src/Passes/gfc2pips/Makefile
                  src/Passes/gpips/Makefile
                  src/Passes/pips/Makefile
                  src/Passes/pyps/Makefile
@@ -263,4 +277,4 @@ AC_CONFIG_FILES([Makefile
 
 AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
-AX_OUTPUT([minimum],[tpips pyps gpips hpfc doc])
+AX_OUTPUT([minimum],[tpips pyps gpips hpfc doc fortran95])
