@@ -224,7 +224,7 @@ AC_CONFIG_FILES([Makefile
 				 src/Libs/gnulib/Makefile
                  src/Makefile
                  src/Passes/Makefile
-                 src/Passes/gfc2pips/Makefile
+                 src/Passes/fortran95/Makefile
                  src/Passes/gpips/Makefile
                  src/Passes/pips/Makefile
                  src/Passes/pyps/Makefile
