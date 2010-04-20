@@ -294,7 +294,7 @@ string get_symbol_table(entity m, bool isfortran)
   /* To simplify validation, at the expense of some information about
      the parsing process. */
 
-  gen_sort_list(decls, compare_entities);
+  gen_sort_list(decls, (gen_cmp_func_t)compare_entities);
 
   string_buffer_append(result, concatenate(NL,"Declarations for module \"",
 					   module_local_name(m),"\" with type \"", NULL));

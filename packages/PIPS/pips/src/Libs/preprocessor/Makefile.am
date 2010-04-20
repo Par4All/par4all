@@ -10,6 +10,7 @@ libpreprocessor_la_SOURCES=\
 	source_file.c \
 	split_file.c \
 	csplit_file.c \
+	f95split_file.c \
 	module.c
 
 AM_YFLAGS=-d -p splitc_

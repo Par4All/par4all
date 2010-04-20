@@ -52,7 +52,7 @@
 #include "prettyprint.h"
 #include "text-util.h"
 #include "top-level.h"
-
+#include "preprocessor.h"
 #include "complexity.h"
 
 static bool is_user_view;	/* print_code_complexities or print_source_complexities */

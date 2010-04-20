@@ -46,6 +46,15 @@ char vcid_ri_util_control[] = "$Id$";
 #include "text-util.h"
 #include "misc.h"
 
+/* \defgroup control Control and unstructured methods
+
+   Here are most of the functions that deals with control graph in PIPS
+   that are encapsulated in what is called an "unstructured" in the RI.
+
+   @{
+ */
+
+
 /* \defgroup control_visitors Control node visitors */
 
 /* @{ */
@@ -213,7 +222,22 @@ cons **l ;
 /* @} */
 
 
-/* Test if a control node is in a list of control nodes: */
+/* \defgroup control_methods Functions to manage control the graph and
+   unstructured
+
+   @{
+*/
+
+
+
+/* Test if a control node is in a list of control nodes
+
+   @param c control node to look for
+
+   @param cs is the list of control to search through
+
+   @return TRUE if the control node is in the list
+*/
 bool
 is_control_in_list_p(control c,
 		     list cs)
@@ -226,17 +250,31 @@ is_control_in_list_p(control c,
 }
 
 /* Count the number of occurences of a control node in a list of control
-   nodes */
+   nodes
+
+   @param c control node to look for
+
+   @param cs is the list of control to count through
+
+   @return the number of occurences
+ */
 int
 occurences_in_control_list(control c,
-		     list cs)
+			   list cs)
 {
     return gen_occurences((gen_chunk *) c, cs);
 }
 
 
-/* Replace references to c_old control node by references to c_new in the
-   list of control nodes: */
+/* Replace in a list of control nodes all the instance of a control node
+   by another one
+
+   @param l is the list of control nodes
+
+   @param c_old is the control node to remove
+
+   @param c_new is the control node to put instead
+ */
 void
 control_list_patch(list l,
 		   control c_old,
@@ -246,8 +284,19 @@ control_list_patch(list l,
 }
 
 
-/* Transfer the control node c as a predecessor from old_node to
-   new_node: */
+/* Transfer a control node as a predecessor from one node to another one
+
+   It disconnected a node @p c that was pointing to (was a predecessor of)
+   @p old_node and reconnect it to @p new_node that becomes its new
+   successor instead.
+
+   @param old_node the control node that was a successor of @p c
+
+   @param new_node the control node that will be a successor of @p c
+
+   @param c the control node that is disconnected of @p old_node and
+   connected to @p new_node
+ */
 void
 transfer_control_predecessor(control old_node,
 			     control new_node,
@@ -267,8 +316,19 @@ transfer_control_predecessor(control old_node,
 }
 
 
-/* Transfer the control node c as a successor from old_node to
-   new_node: */
+/* Transfer a control node as a successor of one node to another one
+
+   It disconnected a node @p c that was coming from (was a successor of)
+   @p old_node and reconnect it to @p new_node that becomes its new
+   predecessor instead.
+
+   @param old_node the control node that was a predecessor of @p c
+
+   @param new_node the control node that will be a predecessor of @p c
+
+   @param c the control node that is disconnected of @p old_node and
+   connected to @p new_node
+*/
 void
 transfer_control_successor(control old_node,
 			   control new_node,
@@ -288,9 +348,16 @@ transfer_control_successor(control old_node,
 }
 
 
-/* Replace all the references to old_node by new_node in the
-   successors & predecessors of the controls in the control node
-   list: */
+/* Replace all the references to a control node by a new one in the
+   successors & predecessors of a list of controls
+
+   @param old_node is the control node to replace
+
+   @param new_node is the control node to replace
+
+   @param controls is a list of controls we want to disconnect from @p
+   old_node and reconnect to @p new_node instead
+ */
 void
 replace_control_related_to_a_list(control old_node,
 				  control new_node,
@@ -352,10 +419,13 @@ replace_control_related_to_a_list(control old_node,
 }
 
 
-/* Test the coherency of a control network.
+/* Test the coherency of a control node network from a control node.
 
    Do not verify the fact that nodes could appear twice in the case of
-   unstructured tests. */
+   unstructured tests.
+
+   @param c is the control node we want to start the verification from
+ */
 void
 check_control_coherency(control c)
 {
@@ -470,7 +540,10 @@ static void print_control_nodes(list l)
 #endif
 
 
-/* Display a list of control: */
+/* Display the adresses a list of control nodes
+
+   @param cs is the control node list
+*/
 void
 display_address_of_control_nodes(list cs)
 {
@@ -482,7 +555,13 @@ display_address_of_control_nodes(list cs)
 
 
 /* Display all the control nodes reached or reachable from c for debugging
-   purpose: */
+   purpose
+
+   Display also the statement of each control node if the debug level is
+   high enough
+
+   @param c is the control node we start the visit from
+*/
 void display_linked_control_nodes(control c)
 {
   list blocs = NIL;
@@ -514,16 +593,26 @@ void display_linked_control_nodes(control c)
 }
 
 
-/* Remove all the control nodes (with its statement) from c in the
-   successor tree of c up to the nodes with more than 1 predecessor.
+/* Remove all the control nodes (with their statements) from @p c in the
+   successor tree of @p c up to the nodes with more than 1 predecessor,
+   that is when it reach another flow.
+
    The entry node of the unstructured is given to avoid removing it
    when there is an unreachable sequence pointing on it.
 
    If a control node contains a FORMAT, assume that it is useful and
    stop removing.
 
-   The do_not_delete_node is expected to be the entry or the exit node
-   for example in order not to delete them. */
+   The @param do_not_delete_node is expected to be the entry or the exit node
+   for example in order not to delete them.
+
+   @param c is the control we start the deletion from.
+
+   @param do_not_delete_node is a control node we stop at when encountered
+
+   @param do_not_delete_node_either is another control node we stop at
+   when encountered
+ */
 void
 remove_unreachable_following_control(control c,
 				     control do_not_delete_node,
@@ -650,7 +739,10 @@ remove_some_unreachable_controls_of_an_unstructured(unstructured u)
 
 /* Remove all control nodes that are not forward reachable from the
    entry node. Warning: useful FORMAT that are unreachable are also
-   discarded, so... */
+   discarded, so...
+
+   @param u is the unstructured to clean
+*/
 void
 remove_all_unreachable_controls_of_an_unstructured(unstructured u)
 {
@@ -732,7 +824,26 @@ remove_all_unreachable_controls_of_an_unstructured(unstructured u)
 
 
 /* Replace each occurence of c in a_source_control_list_of_c with a
-   a_dest_control_list_of_c: */
+   a_dest_control_list_of_c:
+
+   @param c is the control node to unlink. It is not freed
+
+   @param a_source_control_list_of_c is the list of control nodes to be
+   linked to the @p a_dest_control_list_of_c list of control nodes
+
+   @param a_dest_control_list_of_c is the list of control nodes to be
+   linked from the @p a_source_control_list_of_c list of control nodes
+
+   @param which_way precise if we deal with successors or predecessors:
+
+   - if it is source_is_predecessor_and_dest_is_successor: @p
+   a_source_control_list_of_c is considered as predecessors of @p c and @p
+   a_dest_control_list_of_c is considered as successors of @p c
+
+   -if it is source_is_successor_and_dest_is_predecessor: @p
+   a_source_control_list_of_c is considered as successors of @p c and @p
+   a_dest_control_list_of_c is considered as predecessors of @p c
+ */
 void
 remove_a_control_from_a_list_and_relink(control c,
                                         list a_source_control_list_of_c,
@@ -796,10 +907,17 @@ remove_a_control_from_a_list_and_relink(control c,
 }
 
 
-/* It removes a control node from its successor and predecessor list
-   and relink the successor and the predecessor.
+/* Remove a control node from a control graph
+
+   The control node is freed and its predecessors are relinked to its
+   successor and relink the successor and the predecessor.
+
+   @param c is the control node to unlink and to free
 
    Assume that it cannot have more than 1 successor (so no test node)
+
+   If the graph is in an unstructured and @param c is either the entry or
+   exit node, do not forget to update the entry or exit node.
    */
 void
 remove_a_control_from_an_unstructured(control c)
@@ -829,8 +947,15 @@ remove_a_control_from_an_unstructured(control c)
 }
 
 
-/* It removes a control node from its successor and predecessor. Can
-   apply to unstructured "IF". */
+/* It removes a control node from its successor and predecessor.
+
+   It can be applied to an unstructured "IF".
+
+   @param c is the control node to unlink and to free
+
+   If the graph is in an unstructured and @param c is either the entry or
+   exit node, do not forget to update the entry or exit node.
+*/
 void
 remove_a_control_from_an_unstructured_without_relinking(control c)
 {
@@ -856,8 +981,13 @@ remove_a_control_from_an_unstructured_without_relinking(control c)
 
 
 /* Used to discard an unstructured without touching its
-   statements. The statements are assumed to be referenced in another
-   way: */
+   statements.
+
+   The statements are assumed to be referenced in another
+   way.
+
+   @param he unstructured to free
+*/
 void
 discard_an_unstructured_without_its_statements(unstructured u)
 {
@@ -878,7 +1008,10 @@ discard_an_unstructured_without_its_statements(unstructured u)
 
 
 /* Remove a control node without touching its statement, its predecessors
-   and successors, if any. */
+   and successors, if any.
+
+   @param c is the control node to free
+ */
 void
 free_a_control_without_its_statement(control c) {
   /* Protect the statement: */
@@ -891,9 +1024,18 @@ free_a_control_without_its_statement(control c) {
   free_control(c);
 }
 
-/* Used to discard a control sequence without touching its statements.
- It also removes the reference to the sequence from the predecessors
- or the successors. */
+
+/* Remove a control sequence without touching its statements.
+
+   It also removes the reference to the sequence from the predecessors or
+   the successors.
+
+   @param begin is the control node we start from
+
+   @param end is the control node to stop at
+
+   Of course, there should be a unique path from @p begin to @p end.
+*/
 void
 discard_a_control_sequence_without_its_statements(control begin,
                                                   control end)
@@ -931,7 +1073,14 @@ discard_a_control_sequence_without_its_statements(control begin,
 
 
 /* Take a control sequence and return a list of all the statements in
-   the sequence (in the same order... :-) ). */
+   the sequence (in the same order... :-) ).
+
+   @param begin is the control node we start from
+
+   @param end is the control node to stop at
+
+   Of course, there should be a unique path from @p begin to @p end.
+*/
 list
 generate_a_statement_list_from_a_control_sequence(control begin,
                                                   control end)
@@ -959,7 +1108,14 @@ generate_a_statement_list_from_a_control_sequence(control begin,
 
 
 /* Add an edge between 2 control nodes.
-   Assume that this edge does not already exist. */
+
+   Assume that this edge does not already exist or the source should be an
+   unstructured IF.
+
+   @param source is the control node the edge starts from
+
+   @param target is the control node the edge ends to
+ */
 void
 link_2_control_nodes(control source,
 		     control target)
@@ -973,8 +1129,12 @@ link_2_control_nodes(control source,
 }
 
 
-/* Remove an edge between 2 control nodes.
-   Assume that this edge does already exist. */
+/* Remove all edged between 2 control nodes.
+
+   @param source is the control node the edges start from
+
+   @param target is the control node the edges end to
+*/
 void
 unlink_2_control_nodes(control source,
 		       control target)
@@ -984,11 +1144,21 @@ unlink_2_control_nodes(control source,
 }
 
 
-/* Fuse a 2 control node and add the statement of the second one to
-   the statement of the first one. Assumes that the second node is the
-   only successor of the first one.
+/* Fuse a 2 control nodes
 
-   It does not update the entry or exit field of the unstructured. */
+   It adds the statement of the second one to the statement of the first
+   one. Assumes that the second node is the only successor of the first
+   one.
+
+   The second control node is freed.
+
+   It does not update the entry or exit field of the unstructured.
+
+   @param first is the first control node
+
+   @param second is the control node to fuse in the first one. It is
+   precised because it is possible that there are not connected.
+ */
 void
 fuse_2_control_nodes(control first,
 		     control second)
@@ -1081,3 +1251,7 @@ fuse_2_control_nodes(control first,
     control_predecessors(second) = NIL;
     free_control(second);
 }
+
+/*
+  @}
+*/

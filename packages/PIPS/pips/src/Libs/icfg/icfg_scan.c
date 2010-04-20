@@ -222,7 +222,7 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
 	    entity var = reference_variable(syntax_reference(syn));
 
 	    MAP(ENTITY, e, {
-		if (entity_conflict_p(e, var)) {
+		if (entities_may_conflict_p(e, var)) {
 		  MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
 		  MERGE_TEXTS(t, safe_statement_to_text(current_stmt_head()));
 		  break;

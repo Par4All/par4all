@@ -1,6 +1,6 @@
 TARGET	= sac
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h lexer.c
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libsac.la
 libsac_la_SOURCES=\
@@ -12,8 +12,5 @@ libsac_la_SOURCES=\
 AM_YFLAGS=-d -p patterns_yy
 AM_LFLAGS=-p patterns_yy
 dist_sysconf_DATA=patterns.def
-
-# additionnal dep needed for // build
-lexer.c:patterns.h
 
 include $(srcdir)/../pipslibs_includes.mk

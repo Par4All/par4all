@@ -3,7 +3,7 @@ bin_PROGRAMS=tpips
 tpips_SOURCES=tp_yacc.y tp_lex.l tpips.c wrapper.c revisions.c main_tpips.c
 tpips_LDADD=../../Libs/libpipslibs.la
 tpips_LDFLAGS=$(READLINE_LIBS) $(TERMCAP_LIBS)
-include_HEADERS=completion_list.h $(TARGET).h
+nodist_include_HEADERS=completion_list.h $(TARGET).h
 dist_noinst_SCRIPTS=make_completion_lists.sh
 
 

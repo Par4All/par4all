@@ -271,6 +271,7 @@ void activate_language(language l)
   }
   else {
     /* The language is unknown*/
+    pips_user_warning("Unknown language initialization\n");
   }
 }
 

@@ -329,7 +329,7 @@ entity e;
 	entity e_used = reference_variable(effect_any_reference(ef));
 	
 	/* Note: to test aliasing == should be replaced below by
-	 * entity_conflict_p()
+	 * entities_may_conflict_p()
 	 */
 	if(e==e_used && action_write_p(a)) {
 	    write = TRUE;
@@ -354,7 +354,7 @@ bool effects_read_or_write_entity_p(cons * fx, entity e)
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
-      if(entity_conflict_p(e, e_used)) {
+      if(entities_may_conflict_p(e, e_used)) {
 	read_or_write = TRUE;
 	break;
       }
@@ -363,22 +363,36 @@ bool effects_read_or_write_entity_p(cons * fx, entity e)
   return read_or_write;
 }
 
+/**
+ * @brief Check if an effect may conflict with an entity : i.e. if the entity
+ * may be affected (read or write) by the effect.
+ */
+bool effect_may_conflict_with_entity_p( effect eff, entity e) {
+  bool conflict_p = TRUE;
+  entity e_used = reference_variable(effect_any_reference(eff));
+  if(!entities_may_conflict_p(e, e_used)) {
+    conflict_p = FALSE;
+  }
+  return conflict_p;
+}
+
+
 entity effects_conflict_with_entity(fx, e)
 cons * fx;
 entity e;
 {
-    entity conflict_e = entity_undefined;
-    MAPL(cef, 
-     {
-	 effect ef = EFFECT(CAR(cef));
-	 entity e_used = reference_variable(effect_any_reference(ef));
-	 if(entity_conflict_p(e, e_used)) {
-	     conflict_e = e_used;
-	     break;
-	 }
-     },
-	 fx);
-    return conflict_e;
+  entity conflict_e = entity_undefined;
+  MAPL(cef,
+      {
+        effect ef = EFFECT(CAR(cef));
+        if(effect_may_conflict_with_entity_p(ef, e)) {
+          entity e_used = reference_variable(effect_any_reference(ef));
+          conflict_e = e_used;
+          break;
+        }
+      },
+      fx);
+  return conflict_e;
 }
 
 list effects_conflict_with_entities(fx, e)
@@ -390,7 +404,7 @@ entity e;
      {
 	 effect ef = EFFECT(CAR(cef));
 	 entity e_used = reference_variable(effect_any_reference(ef));
-	 if(entity_conflict_p(e, e_used)) {
+	 if(entities_may_conflict_p(e, e_used)) {
 	     lconflict_e = gen_nconc(lconflict_e, 
 				     CONS(ENTITY, e_used, NIL));
 	    

@@ -47,6 +47,7 @@
 #include "text-util.h"
 
 #include "arithmetique.h"
+#include "alias-classes.h"
 
 #include "ri-util.h"
 
@@ -1262,13 +1263,6 @@ bool reference_equal_p(reference r1, reference r2)
   return TRUE;
 }
 
-bool cell_equal_p(cell c1, cell c2)
-{
-  /* Has to be extended for GAPs */
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
-  return reference_equal_p(r1, r2);
-}
 
 bool range_equal_p(range r1, range r2)
 {

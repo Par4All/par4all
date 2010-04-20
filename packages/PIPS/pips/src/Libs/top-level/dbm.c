@@ -26,6 +26,8 @@
 #endif
 
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "linear.h"
 
@@ -180,6 +182,24 @@ bool create_workspace(gen_array_t files)
     // pop_path() is too strict,
     // let's push anyway since user errors are not caught below!
     push_path();
+
+    // Flag that check if there is F90 file
+    bool fortran_90_p = FALSE;
+
+    // Precompile F95/F90 files, necessary because of module
+    for ( i = 0; i < argc; i++ ) {
+      string filename = gen_array_item( files, i );
+      if ( dot_f90_file_p( filename ) || dot_f95_file_p( filename ) ) {
+        fortran_90_p = TRUE;
+        compile_f90_module( filename );
+      }
+    }
+
+    if( fortran_90_p ) {
+      // Load entities (fortran95 need it)
+      extern bool bootstrap(string workspace);
+      bootstrap( NULL );
+    }
 
     for (i = 0; success && i < argc; i++)
       /* FI: it would be nice to have a catch here on user_error()! */
@@ -361,4 +381,26 @@ void set_script_directory_name(string dn)
 string get_script_directory_name()
 {
   return script_directory_name;
+}
+
+
+void compile_f90_module( string filename ) {
+  string dir = db_get_current_workspace_directory( );
+
+  // Create precompiled directory
+  char *compiled_dir_name = strdup( concatenate( dir, "/Precompiled", NULL ) );
+  mkdir( compiled_dir_name, 0xffffffff );
+
+  char *gfc_command = concatenate( "gfortran -fsyntax-only",
+                                  " -fcray-pointer -ffree-form",
+                                  " -x f95-cpp-input"
+                                  " -J ",
+                                  compiled_dir_name,
+                                  " ",
+                                  filename,
+                                  NULL );
+  if( 0 != system( gfc_command ) ) {
+    pips_user_warning("Precompilation failed : %s", gfc_command);
+  }
+
 }

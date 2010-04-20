@@ -1464,6 +1464,34 @@ void partial_eval_statement(statement stmt)
   }
 }
 
+void PartialEvalExpression(expression e)
+{
+    unnormalize_expression(e);
+    NORMALIZE_EXPRESSION(e);
+    normalized n = expression_normalized(e);
+    if( normalized_linear_p(n))
+    {
+        Pvecteur pv = normalized_linear(n);
+        expression new_e = make_vecteur_expression(pv);
+        if(!expression_undefined_p(new_e))
+        {
+#if 1
+            /* copy new_e to e */
+            free_syntax(expression_syntax(e));
+            free_normalized(expression_normalized(e));
+            expression_syntax(e)=expression_syntax(new_e);
+            expression_normalized(e)=expression_normalized(new_e);
+            /* clean memory */
+            expression_syntax(new_e)=syntax_undefined;
+            expression_normalized(new_e)=normalized_undefined;
+            free_expression(new_e);
+#else
+            *e=*new_e;
+#endif
+        }
+    }
+}
+
 
 /* Top-level function
  */
@@ -1500,6 +1528,8 @@ bool partial_eval(char *module_name)
 
   debug_on("PARTIAL_EVAL_DEBUG_LEVEL");
   gen_recurse(module_statement,statement_domain,gen_true,partial_eval_statement);
+  if(get_bool_property("PARTIAL_EVAL_LINEARIZE"))
+      gen_recurse(module_statement,expression_domain,gen_true,PartialEvalExpression);
   debug_off();
 
   /* Reorder the module, because new statements may have been generated. */
