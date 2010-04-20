@@ -19,28 +19,28 @@ echo
 display PARSED_PRINTED_FILE[assign03]
 
 echo
-echo Proper effetcs for "assign03"
+echo Proper pointer effects for "assign03"
 echo
 
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[assign03]
 
 echo
-echo Cumulated effetcs for "assign03"
+echo Cumulated pointer effects for "assign03"
 echo
 
 activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[assign03]
 
 echo
-echo Proper effetcs for "foo"
+echo Proper effects for "foo"
 echo
 
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
 display PRINTED_FILE[foo]
 
 echo
-echo Cumulated effetcs for "foo"
+echo Cumulated effects for "foo"
 echo
 
 activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
