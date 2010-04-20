@@ -266,7 +266,7 @@ Par4All is ready
 everything got installed in
 $INSTALL_PREFIX
 
-According to your shell religion, you should include
+According to your shell religion, you should source
 $P4A_RC_SH
 (for bash, dash, sh...) or
 $P4A_RC_CSH

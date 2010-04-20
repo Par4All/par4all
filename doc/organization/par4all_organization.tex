@@ -28,6 +28,7 @@
 
 \maketitle
 
+\tableofcontents{}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -140,6 +141,32 @@ set (for example to a working copy of the \Apips{} \Asvn), you should be
 able to compile with only the \texttt{p4a-own} branch. For the \Apips
 packages, you should have the links to \texttt{nlpmake/makes} to have them
 to compile.
+
+Beware that if you have used a \Apips directory to compile in an other
+context (such as the classical \Asvn build), the compilation will fail
+because of the wrong dependencies between files. You should do a
+\begin{verbatim}
+make clean
+\end{verbatim}
+there first.
+
+To recompile a part of \Apfa, for example when you are debugging one of
+the components, you go to \verb|$P4A_ROOT/build|, in the component you are
+interested, such as \verb|$P4A_ROOT/build/newgen| and type a
+\begin{verbatim}
+make
+\end{verbatim}
+and when you are happy do a
+\begin{verbatim}
+make install
+\end{verbatim}
+to put it on production. You can also try directly the \texttt{install}
+approach if you do not want to test the compilation first. But this 2-step
+approach is interesting for example if you have a debug session or a
+validation on the installed version and you want in parallel develop and
+verify it still compiles at the same time without breaking the running
+version.
+
 
 
 \section{Collaborative repositories}
