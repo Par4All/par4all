@@ -149,7 +149,7 @@ filtering_catch_alarm_S (int sig)
 void
 decision_data(c, pc, pv, magnitude, weight)
 Pcontrainte c;
-int *pc, *pv;
+int volatile *pc, *pv;
 Value *magnitude;
 int weight;
 {
@@ -286,7 +286,7 @@ chose_variable_to_project_for_feasability(Psysteme s, Pbase b, boolean ineq)
  * using equalities or both equalities and inequalities.
 */
 static boolean sc_fm_project_variables
-(Psysteme * ps1, boolean integer_p, boolean use_eq_only, int ofl_ctrl)
+(Psysteme volatile * ps1, boolean integer_p, boolean use_eq_only, int ofl_ctrl)
 {
   Pbase b = base_copy(sc_base(*ps1));
   Variable var;
