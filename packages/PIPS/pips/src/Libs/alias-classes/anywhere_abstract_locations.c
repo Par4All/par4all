@@ -1,3 +1,6 @@
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -741,11 +744,27 @@ entity entity_locations_dereference(entity al __attribute__ ((__unused__)))
    /* Should/could be extended to check the max computation... */
  }
 
-/* Do these two abstract locations share some real memory locations? */
-bool abstract_location_conflict_p(entity al1, entity al2)
-{
-  entity mal = entity_locations_max(al1, al2); // maximal abstraction location
-  bool conflict_p = (mal==al1) || (mal==al2);
+ /**
+  * @brief Do these two abstract locations MAY share some real memory
+  * locations ?
+  */
+ bool abstract_locations_may_conflict_p(entity al1, entity al2)
+ {
+   entity mal = entity_locations_max(al1, al2); // maximal abstraction location
+   bool conflict_p = (mal==al1) || (mal==al2);
 
-  return conflict_p;
-}
+   return conflict_p;
+ }
+
+ /**
+  * @brief Do these two abstract locations MUST share some real memory
+  * locations ? Never !!! DO NOT USE THIS FUNCTION !
+  */
+ bool abstract_locations_must_conflict_p(entity al1, entity al2)
+ {
+
+   pips_internal_error("abstract_locations_must_conflict_p is a non sense : "
+       "it's always FALSE ! avoid use it.");
+
+   return FALSE;
+ }

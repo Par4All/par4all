@@ -701,7 +701,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         expression real_e = expression_field_p(e)?binary_call_rhs(expression_call(e)):e;
         if (argsType == OTHER)
         {
-            all_scalar &= expression_scalar_p(real_e);
+            all_scalar = all_scalar && expression_scalar_p(e);
             continue;
         }
         else if (argsType == CONSTANT)
@@ -709,7 +709,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             if (!expression_constant_p(real_e))
             {
                 argsType = OTHER;
-                all_scalar &= expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e);
                 continue;
             }
         }
@@ -735,7 +735,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             else
             {
                 argsType = OTHER;
-                all_scalar &= expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e);
                 continue;
             }
         }
@@ -748,6 +748,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
      */
     if(all_scalar)
     {
+        list new_statements = NIL;
         size_t nbargs=gen_length(CDR(args));
         basic shared_basic = basic_undefined;
         FOREACH(EXPRESSION,e,CDR(args))
@@ -765,32 +766,75 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         AddEntityToCurrentModule(scalar_holder);
         int index=0;
         list inits = NIL;
-        FOREACH(EXPRESSION,e,CDR(args))
+        list replacements = NIL;
+            for(list iter = CDR(args); !ENDP(iter) ; POP(iter) )
+            {
+                expression e = EXPRESSION(CAR(iter));
+                bool formal_p=expression_reference_p(e) && formal_parameter_p(reference_variable(expression_reference(e)));
+                if(expression_constant_p(e) || formal_p)
+                {
+                    /* no support for array inital value in fortran */
+                    if(fortran_module_p(get_current_module_entity()))
+                    {
+                        new_statements=CONS(STATEMENT,
+                                make_assign_statement(
+                                    reference_to_expression(
+                                        make_reference(scalar_holder,CONS(EXPRESSION,int_to_expression(index),NIL))
+                                        ),
+                                    copy_expression(e)),new_statements);
+                    }
+                    else
+                    {
+                        inits=CONS(EXPRESSION,copy_expression(e),inits);
+                    }
+                    if(formal_p)
+                    {
+                        entity current_scalar = expression_to_entity(e);
+                        expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
+                        replacements=gen_cons(current_scalar,gen_cons(replacement,replacements));
+                    }
+                    else
+                    {
+                        entity current_scalar = expression_to_entity(e);
+                        expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
+                        *REFCAR(iter) = (gen_chunkp)replacement;
+                    }
+                }
+                else
+                {
+                    entity current_scalar = expression_to_entity(e);
+                    inits=CONS(EXPRESSION,int_to_expression(0),inits);
+                    expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
+                    replacements=gen_cons(current_scalar,gen_cons(replacement,replacements));
+                    replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
+                }
+                index++;
+            }
+            /* manage replacements in the end, otherwise it disturbs the whole process */
+            replacements=gen_nreverse(replacements);
+        for(list iter = replacements;!ENDP(iter);POP(iter))
         {
-            if(expression_constant_p(e))
-            {
-                inits=CONS(EXPRESSION,copy_expression(e),inits);
-            }
-            else
-            {
-                entity current_scalar = expression_to_entity(e);
-                inits=CONS(EXPRESSION,int_to_expression(0),inits);
-                expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
-                replace_entity_by_expression(get_current_module_statement(),current_scalar,replacement);
-                FOREACH(EXPRESSION,e,args) replace_entity_by_expression(e,current_scalar,replacement);
-                free_expression(replacement);
-            }
-            index++;
+            expression r = EXPRESSION(CAR(iter));
+            POP(iter);
+            entity e = ENTITY(CAR(iter));
+            replace_entity_by_expression(get_current_module_statement(),e,r);
         }
-        free_value(entity_initial(scalar_holder));
-        entity_initial(scalar_holder) = make_value_expression(
-                call_to_expression(
-                    make_call(entity_intrinsic(BRACE_INTRINSIC),
-                        gen_nreverse(inits)
+        gen_free_list(replacements);
+        if(!fortran_module_p(get_current_module_entity()))
+        {
+            free_value(entity_initial(scalar_holder));
+            entity_initial(scalar_holder) = make_value_expression(
+                    call_to_expression(
+                        make_call(entity_intrinsic(BRACE_INTRINSIC),
+                            gen_nreverse(inits)
+                            )
                         )
-                    )
-                );
+                    );
+        }
+        else if(!ENDP(new_statements))
+            insert_statement(get_current_module_statement(),make_block_statement(new_statements),true);
         argsType=CONSEC_REFS;
+        fstExp = EXPRESSION(CAR(CDR(args)));
 
     }
 
@@ -1441,7 +1485,7 @@ statement do_generate_load_statement(simdStatementInfo si, int line)
                 i--)
         {
             args = CONS(EXPRESSION,
-                    copy_expression(statementArgument_expression(simdStatementInfo_arguments(si)[i + offset])),
+                    (statementArgument_expression(simdStatementInfo_arguments(si)[i + offset])),
                     args);
         }
         args = CONS(EXPRESSION,
@@ -1518,7 +1562,7 @@ static statement generate_save_statement(simdStatementInfo si)
             i--)
     {
         args = CONS(EXPRESSION,
-                copy_expression(
+                (
                     statementArgument_expression(simdStatementInfo_arguments(si)[i + offset])),
                 args);
     }

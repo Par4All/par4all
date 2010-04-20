@@ -139,7 +139,7 @@ free_substitution(p_substitution subs)
 static bool no_write_effects_on_var(entity var, list le)
 {
     FOREACH(EFFECT, e, le)
-        if (effect_write_p(e) && entity_conflict_p(effect_variable(e), var))
+        if (effect_write_p(e) && entities_may_conflict_p(effect_variable(e), var))
             return FALSE;
                    return TRUE;  
 }
@@ -148,7 +148,7 @@ static bool functionnal_on_effects(reference ref, list /* of effect */ le)
 {
     FOREACH(EFFECT, e, le) {
         if ((effect_write_p(e) && effect_variable(e)!=reference_variable(ref)) ||
-                (effect_read_p(e) && entity_conflict_p(effect_variable(e), reference_variable(ref))))
+                (effect_read_p(e) && entities_may_conflict_p(effect_variable(e), reference_variable(ref))))
             return FALSE;
     }
   return TRUE;  
@@ -396,7 +396,7 @@ some_conflicts_between(hash_table successors, statement s1, statement s2, p_subs
        entity v2 = effect_variable(e2);
        pips_debug(9, "written variable %s\n", entity_name(v2));
        FOREACH(EFFECT, e1,effects_effects(efs1))
-       if (entity_conflict_p(effect_variable(e1), v2) &&
+       if (entities_may_conflict_p(effect_variable(e1), v2) &&
        (!(only_written && effect_read_p(e1))))
        {
        pips_debug(8, "conflict with %s\n", entity_name(effect_variable(e1)));

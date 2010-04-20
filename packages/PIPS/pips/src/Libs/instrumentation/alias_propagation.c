@@ -782,7 +782,7 @@ static list list_of_same_or_equivalence_arguments(entity e,list l)
 	  if (same_entity_p(var,e))
 	    retour = CONS(INT,j,retour);
 	  else 
-	    if (entity_conflict_p(var,e) && 
+	    if (entities_may_conflict_p(var,e) && 
 		!(variable_in_common_p(e)&&variable_in_common_p(var)))
 	      {
 		l_traversed = CONS(ENTITY,var,l_traversed);

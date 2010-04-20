@@ -596,6 +596,7 @@ bool flatten_code(string module_name)
  */
 static void split_initializations_in_statement(statement s)
 {
+#if 0
   if (FALSE && statement_block_p(s)) { // based on old declaration representation
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
@@ -622,7 +623,9 @@ static void split_initializations_in_statement(statement s)
     statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
   }
   //else if(declaration_statement_p(s)) {
-  else if(!get_bool_property("C89_CODE_GENERATION") && statement_block_p(s)) {
+  //else
+#endif
+  if(!get_bool_property("C89_CODE_GENERATION") && statement_block_p(s)) {
     /* generate C99 code */
     list cs = list_undefined;
     list pcs = NIL;

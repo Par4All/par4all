@@ -33,6 +33,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
+#include "transformations.h"
 #include "locality-local.h"
 
 #define DEFAULT_INT_PREFIX 	"I_"
@@ -66,7 +67,7 @@ typedef struct NID {
   Pmatrix coef;       /* le coefficient des fonctions d'acces  */
   Pvecteur pv_acces;     /*  */ 
   entity ref;           /*   */
-  Pmatrix n
+  Pmatrix n;
 } nid;
 
 static Pvecteur *tiling_indice;
@@ -1669,7 +1670,7 @@ statement Tiling_buffer_allocation ()
 		      {
 			 
 			int pos;
-			Pvecteur delai_plus;
+			expression delai_plus;
 			pos=position_one_element(P1,l+1);
 			pv= vect_make(VECTEUR_NUL ,itert[pos-1], VALUE_ONE,TCST,-VALUE_ONE);
 			delai_plus=Pvecteur_to_expression(pv);
@@ -1895,7 +1896,7 @@ statement Tiling_buffer_allocation ()
 		if (r==depth)
 		  {
 		    int pos;
-		    Pvecteur delai_plus;
+		    expression delai_plus;
 		    pos=position_one_element(P1,l+1);
                     
 		 

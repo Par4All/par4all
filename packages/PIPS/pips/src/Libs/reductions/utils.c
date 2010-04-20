@@ -158,7 +158,7 @@ update_reduction_under_effect(
 
     /* REDUCTION is dead if the reduction variable is affected
      */
-    if (entity_conflict_p(reduction_variable(red),var))
+    if (entities_may_conflict_p(reduction_variable(red),var))
     {
 	reduction_operator_tag(reduction_op(red)) =
 	    is_reduction_operator_none;
@@ -170,7 +170,7 @@ update_reduction_under_effect(
 
     /* now var is written */
     FOREACH (ENTITY, e, reduction_dependences(red)) {
-      if (entity_conflict_p(var, e)) {
+      if (entities_may_conflict_p(var, e)) {
 	updated = TRUE;
 	remove_variable_from_reduction(red, e);
       }
@@ -202,7 +202,7 @@ find_reduction_of_var(
       *pr = copy_reduction(r);
       return TRUE;
     }
-    else if (entity_conflict_p(red_var, var))
+    else if (entities_may_conflict_p(red_var, var))
       return FALSE; /* I will not combine them... */
   }
   return TRUE;
@@ -249,7 +249,7 @@ update_compatible_reduction_with(
     reduction r)
 {
     if (reduction_variable(r)!=var)
-	return !entity_conflict_p(var, reduction_variable(r));
+	return !entities_may_conflict_p(var, reduction_variable(r));
 
     /* else same var and no conflict */
     if (reduction_none_p(*pr))
@@ -313,7 +313,7 @@ update_compatible_reduction(
     else
     {
       FOREACH (EFFECT, e, le) {
-	if (entity_conflict_p(effect_variable(e), var))
+	if (entities_may_conflict_p(effect_variable(e), var))
 	  return FALSE;
 	else if (effect_write_p(e)) /* stores for latter cleaning */
 	  reduction_dependences(*pr) = gen_once(effect_variable(e),
@@ -597,7 +597,7 @@ no_other_effects_on_references (
     FOREACH (EFFECT, e, le) {
       reference r = effect_any_reference(e);
       if (!gen_in_list_p(r, lr) &&
-	  entity_conflict_p(reference_variable(r), var))
+	  entities_may_conflict_p(reference_variable(r), var))
 	return FALSE;
       pips_debug(7,"refrence r: %p of entity: %s\n", r, entity_name (reference_variable(r)));
     }

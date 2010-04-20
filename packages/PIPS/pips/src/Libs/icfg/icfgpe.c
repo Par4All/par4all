@@ -60,7 +60,7 @@ list /* of effect */ effects_filter(list l_effs)
       action ac = effect_action(eff);
       reference ref = effect_any_reference(eff);
       entity ent = reference_variable(ref);
-      if (entity_conflict_p(e_flt, ent) && !action_read_p(ac))
+      if (entities_may_conflict_p(e_flt, ent) && !action_read_p(ac))
 	l_flt = CONS(EFFECT, eff, l_flt);
     }, l_effs);
     return l_flt;

@@ -829,6 +829,11 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {STRERROR_FUNCTION_NAME,                         no_write_effects},
   {STRERROR_R_FUNCTION_NAME,                       no_write_effects},
 
+  /* F95 */
+  {ALLOCATE_FUNCTION_NAME,                         any_heap_effects},
+  {DEALLOCATE_FUNCTION_NAME,                       any_heap_effects},
+  {ETIME_FUNCTION_NAME,                            no_write_effects},
+  {DTIME_FUNCTION_NAME,                            no_write_effects},
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},

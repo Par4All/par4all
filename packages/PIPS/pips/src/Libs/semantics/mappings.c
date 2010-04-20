@@ -59,6 +59,8 @@
 
 #include "semantics.h"
 #include "preprocessor.h"
+#include "properties.h"
+#include "alias-classes.h"
 
 /* EQUIVALENCE */
 
@@ -226,7 +228,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 	 replaced by an exact test but it does not really matter;
 	 an exact test could only be useful in presence of arrays;
 	 and in presence of arrays we do nothing here */
-      if(entity_conflict_p(e, eq) && !analyzable_scalar_entity_p(eq)) {
+      if(entities_may_conflict_p(e, eq) && !analyzable_scalar_entity_p(eq)) {
 	pips_user_warning("Values for variable %s are not analyzed because "
 			  "%s is aliased with scalar variable %s with non "
 			  "analyzed type %s or with array variable\n",
@@ -236,7 +238,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 	break;
       }
 
-      if(entity_conflict_p(e, eq) && analyzable_scalar_entity_p(eq)) {
+      if(entities_may_conflict_p(e, eq) && analyzable_scalar_entity_p(eq)) {
 	if(!type_equal_p(entity_type(e),entity_type(eq))) {
 	  pips_user_warning("Values for variable %s of type %s are not analyzed because "
 			    "%s is aliased with scalar variable %s with different "
@@ -248,7 +250,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 	  break;
 	}
       }
-      if(entity_conflict_p(e, eq) && strcmp(entity_name(eq), entity_name(re))<0) {
+      if(entities_may_conflict_p(e, eq) && strcmp(entity_name(eq), entity_name(re))<0) {
 	re = eq;
       }
     }
@@ -279,7 +281,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 	entity eq = ENTITY(CAR(ce));
 
 	if(re==eq) continue;
-	if(entity_conflict_p(re, eq)) {
+	if(entities_may_conflict_p(re, eq)) {
 	  /* if eq is an integer scalar variable it does not
 	     only have a destructive effect */
 	  add_equivalenced_values(re, eq, readonly);
@@ -376,7 +378,7 @@ void add_implicit_interprocedural_write_effects(entity al, list el)
       entity v = reference_variable(r);
 
       if(!entity_abstract_location_p(v)
-	 && entity_conflict_p(al, v)) {
+	 && entities_may_conflict_p(al, v)) {
 	add_interprocedural_value_entities(v);
       }
     }
@@ -388,7 +390,7 @@ void add_implicit_interprocedural_write_effects(entity al, list el)
       type vt = ultimate_type(entity_type(v));
 
       if(!entity_abstract_location_p(v)
-	 && entity_conflict_p(al, v)
+	 && entities_may_conflict_p(al, v)
 	 && type_equal_p(alt, vt)) {
 	if(dummy_parameter_entity_p(v))
 	  pips_internal_error("Effects cannot be related to dummy parameters.\n");

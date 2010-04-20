@@ -4644,6 +4644,12 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
 
 #include "STEP_RT_bootstrap.h"
 
+  /* F95 */
+  {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {DEALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
   {NULL, 0, 0, 0, 0}
 };
 

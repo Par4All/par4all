@@ -71,15 +71,17 @@
 #include "ri.h"
 #include "alias_private.h"
 #include "ri-util.h"
+#include "text-util.h"
 #include "database.h"
 #include "pipsdbm.h"
+#include "preprocessor.h"
 #include "resources.h"
 #include "misc.h"
 #include "control.h"
 #include "properties.h"
 #include "semantics.h"
-#include "instrumentation.h"
 #include "transformations.h"
+#include "instrumentation.h"
 
 /* As we create checks with stop error message who tell us there are bound
  * violations for which array, on which dimension, which bound (lower or upper),
@@ -843,7 +845,7 @@ string print_variables(expression e)
   }
   return retour;
 }
-statement emit_message_and_stop(stop_message)
+statement emit_message_and_stop(string stop_message)
 {
   statement smt = statement_undefined;
 

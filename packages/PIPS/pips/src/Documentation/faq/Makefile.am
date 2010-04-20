@@ -18,6 +18,6 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-dist_noinst_DATA=faq.tex faq.ind
+dist_noinst_DATA=faq.tex
 doc_DATA=faq.pdf
 include $(top_srcdir)/makes/latex.mk

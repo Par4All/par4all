@@ -53,6 +53,7 @@
 
 #include "misc.h"
 #include "ri-util.h"
+#include "control.h"
 #include "pipsdbm.h"
 #include "text-util.h"
 #include "transformations.h"

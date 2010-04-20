@@ -31,7 +31,8 @@ LIB_CFILES = 	alias_pairs.c \
 		points_to_analysis.c \
 		points_to_interprocedural_analysis.c \
 	 	prettyprint.c \
-		points_to_prettyprint.c 
+		points_to_prettyprint.c \
+		conflicts.c
 	
 
 INC_TARGET =	$(TARGET).h

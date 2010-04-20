@@ -1081,7 +1081,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 
 		if (gen_find_eq(var, l_phi_var) == chunk_undefined)
 		{
-		  Psysteme psc = &sc;
+		  Psysteme volatile * psc = &sc;
 		    sc_projection_along_variable_ofl_ctrl(psc,(Variable) var,
 							  FWD_OFL_CTRL);
 		    sc_base_remove_variable(sc, (Variable) var);

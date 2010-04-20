@@ -695,7 +695,7 @@ bool freia_scalar_rw_dep(const statement s, const statement t, list * vars)
 {
   // pips_assert("distinct statements", s!=t);
   if (s==t || !s || !t) return false;
-  // I should really use entity_conflict_p...
+  // I should really use entities_may_conflict_p...
   set reads = set_make(set_pointer), writes = set_make(set_pointer);
   set_add_scalars(writes, s, true);
   set_add_scalars(reads, t, false);

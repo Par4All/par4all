@@ -193,7 +193,7 @@ static bool interference_on(entity var, list /* of effect */ les)
   {
       if (entity_all_locations_p(effect_entity(ef))
               || (effect_write_p(ef) &&
-	  entity_conflict_p(var, reference_variable(effect_any_reference(ef)))))
+	  entities_may_conflict_p(var, reference_variable(effect_any_reference(ef)))))
       {
 	return TRUE;
       }
@@ -605,7 +605,7 @@ static void atomize_or_associate_for_level(expression e, int level)
   syn = expression_syntax(e);
 
   /* skip casts */
-  if(syntax_cast_(syn)) return atomize_or_associate_for_level(cast_expression(syntax_cast(syn)),level);
+  if(syntax_cast_p(syn)) return atomize_or_associate_for_level(cast_expression(syntax_cast(syn)),level);
 
   /* Only do something with calls */
   if (!syntax_call_p(syn))

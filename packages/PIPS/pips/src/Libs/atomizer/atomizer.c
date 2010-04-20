@@ -57,6 +57,7 @@
  */
 
 #include "local.h"
+#include "expressions.h"
 
 /* Gives the size of the hash table named "MemToTmp". */
 #define MEM_TO_TMP_SIZE 100
@@ -158,10 +159,10 @@ void normalize_wp65_code(statement stat)
     normalize_all_expressions_of(stat);
     atomize_as_required(stat,
 			indirection_test,    /* reference test */
-			gen_false,           /* function call test */
-			gen_false,           /* test condition test */
-			gen_false,           /* range arguments test */
-			gen_false,           /* whileloop condition test */
+			(bool (*)(call,expression))     gen_false,           /* function call test */
+			(bool (*)(test,expression))     gen_false,           /* test condition test */
+			(bool (*)(range,expression))    gen_false,           /* range arguments test */
+			(bool (*)(whileloop,expression))gen_false,           /* whileloop condition test */
 			build_new_variable); /* new variable */
 }
 
