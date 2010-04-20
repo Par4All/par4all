@@ -457,6 +457,16 @@ void * hash_get(const hash_table htp, const void * key)
     hep->key!=HASH_ENTRY_FREE_FOR_PUT ? hep->val : HASH_UNDEFINED_VALUE;
 }
 
+
+/* Like hash_get() but returns an empty list instead of
+   HASH_UNDEFINED_VALUE when a key is not found */
+list hash_get_default_empty_list(const hash_table h, const void * k) {
+  list l = (list) hash_get(h, k);
+
+  return (l == (list) HASH_UNDEFINED_VALUE) ? NIL : l;
+}
+
+
 /* TRUE if key has e value in htp.
  */
 bool hash_defined_p(const hash_table htp, const void * key)

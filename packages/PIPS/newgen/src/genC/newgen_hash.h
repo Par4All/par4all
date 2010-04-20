@@ -101,6 +101,8 @@ extern void hash_table_clear(hash_table);
 extern void * hash_delget(hash_table, const void *, void **);
 extern void * hash_del(hash_table, const void *);
 extern void * hash_get(const hash_table, const void *);
+extern list hash_get_default_empty_list(const hash_table, const void *);
+
 extern void hash_put(hash_table, const void *, const void *);
 extern void hash_update(hash_table, const void *, const void *);
 extern bool hash_defined_p(const hash_table, const void *);
