@@ -7,7 +7,7 @@ l99999:
       printf("%d", i);
 }
 after loop expansion
-int pop(int pop)
+int pop(int op)
 {
    int i = 0;
    //PIPS generated variable
