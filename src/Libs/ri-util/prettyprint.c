@@ -1328,6 +1328,60 @@ words_io_inst(call obj,
   return(pc) ;
 }
 
+
+/**
+ *  Implemented for ALLOCATE(), but is applicable for every call to
+ *  function that take STAT= parameter
+ */
+static list
+words_stat_io_inst(call obj,
+        int precedence, bool leftmost, list pdl)
+{
+  list pc = NIL;
+  list pcio = call_arguments(obj);
+  list pio_write = pcio;
+  boolean good_fmt = FALSE;
+  bool good_unit = FALSE;
+  bool iolist_reached = FALSE;
+  bool complex_io_control_list = FALSE;
+  expression fmt_arg = expression_undefined;
+  expression unit_arg = expression_undefined;
+  string called = entity_local_name(call_function(obj));
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+
+  /* Write call function */
+  pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+  pc = CHAIN_SWORD(pc, " (");
+
+  while ( ( pio_write != NIL ) ) {
+    expression expr = EXPRESSION(CAR(pio_write));
+    syntax s = expression_syntax(expr);
+    call c;
+
+    if ( syntax_call_p(s) ) { /* STAT= is a call */
+      c = syntax_call(s);
+      if ( strcmp( entity_local_name( call_function(c) ), "STAT=" ) == 0 ) {
+        /* We got it ! */
+        pc = CHAIN_SWORD(pc, strdup("STAT=")); /* FIXME : strdup ? */
+        /* get argument */
+        pio_write = CDR(pio_write);
+        expression arg = EXPRESSION(CAR(pio_write));
+        entity f;
+        pc = gen_nconc( pc, words_expression( arg, pdl ) );
+      }
+    } else { /* It's not a call */
+      pc = gen_nconc( pc, words_expression( expr, pdl ) );
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
+    }
+    pio_write = CDR(pio_write);
+  }
+
+  pc = CHAIN_SWORD(pc, ") ");
+
+  return ( pc );
+}
+
+
 static list
 null(call __attribute__ ((unused)) obj,
      int __attribute__ ((unused)) precedence,
@@ -1807,6 +1861,8 @@ static struct intrinsic_handler {
 
     {ASSIGN_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
 
+    {ALLOCATE_FUNCTION_NAME, words_stat_io_inst, 0},
+    {DEALLOCATE_FUNCTION_NAME, words_stat_io_inst, 0},
     {WRITE_FUNCTION_NAME, words_io_inst, 0},
     {READ_FUNCTION_NAME, words_io_inst, 0},
     {PRINT_FUNCTION_NAME, words_io_inst, 0},

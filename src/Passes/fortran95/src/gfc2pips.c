@@ -3414,20 +3414,7 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       //some problem inducted by the prettyprinter output become DEALLOCATE (variable, STAT=, I)
       if ( c->expr ) {
         gfc2pips_debug(5,"Handling STAT=\n");
-        /*
-         * FIXME Really bad hack !!!
-         */
-        expression e = gfc2pips_expr2expression( c->expr );
-        list w = words_syntax( expression_syntax(e), NIL );
-        string s = words_to_string( w );
-        string stat = (string) malloc( sizeof(char) * ( strlen( "STAT=" )
-            + strlen( s ) + 1 ) );
-        sprintf( stat, "STAT=%s", s );
-        lci = CONS( EXPRESSION,
-            MakeCharacterConstantExpression( stat ), NULL);
-        /* OLD WAY : produce wrong results :
-         * lci = gfc2pips_exprIO( "STAT=", c->expr, NULL );
-         */
+        lci = gfc2pips_exprIO( "STAT=", c->expr, NULL );
       }
       for ( a = c->ext.alloc_list; a; a = a->next ) {
         lci = CONS( EXPRESSION, gfc2pips_expr2expression( a->expr ), lci );//DATA_LIST_FUNCTION_NAME, IO_LIST_STRING_NAME, or sthg else ?
