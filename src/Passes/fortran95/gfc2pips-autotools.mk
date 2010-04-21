@@ -44,9 +44,8 @@ INCLUDES += -I../../../../../Libs/ri-util/
 INCLUDES += -I../../../../../Libs/syntax/
 INCLUDES += -I../../../../../Libs/misc/
 INCLUDES += -I../../../../../Libs/newgen/
-INCLUDES += -I../../../$(pipssrcdir)/../../Documentation/constants/
 INCLUDES += -I../../../$(pipssrcdir)/../../Documentation/newgen/
-INCLUDES += -I../../../../../Documentation/newgen/ 
+INCLUDES += -I../../../$(pipssrcdir)/../../Documentation/constants/
 INCLUDES += $(LINEARLIBS_CFLAGS) $(NEWGENLIBS_CFLAGS) 
 
 fortran/gfc2pips.o: fortran/gfc2pips.c fortran/gfc2pips_stubs.c fortran/gfc2pips.h fortran/gfc2pips-private.h
