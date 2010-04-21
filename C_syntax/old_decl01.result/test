@@ -1,0 +1,63 @@
+
+Symbole table for "p3"
+
+p3
+
+Declarations for module "p3" with type "double x double * -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "old_decl01!:*STATIC*" with type "area" with size 0
+	Declared entity "p3:*DYNAMIC*" with type "area" with size 6
+	Declared entity "p3:*HEAP*" with type "area" with size 0
+	Declared entity "p3:*STACK*" with type "area" with size 0
+	Declared entity "p3:*STATIC*" with type "area" with size 0
+	Declared entity "p3:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "p3:0`__func__" with type "variable" "char *"
+	Declared entity "p3:x" with type "variable" "double"
+	Declared entity "p3:z" with type "variable" "double *"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable p3:x	offset = 1
+	Variable p3:z	offset = 2
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "old_decl01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "p3:*DYNAMIC*" of size 6:
+	Variable "p3:0`__func__"	offset = 0	size = 3
+	Variable "p3:0`__FUNCTION__"	offset = 3	size = 3
+
+
+Layout for memory area "p3:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "p3:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "p3:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module p3
+
+
+Parsed printed file for "p3"
+
+p3(double x, double *z)
+{
+   *z = x/2;
+}
