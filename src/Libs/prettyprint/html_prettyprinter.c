@@ -102,7 +102,9 @@ static void html_print_ram( ram r ) {
   snprintf( str, 100, "Offset : %d", (int) ram_offset( r ) );
   html_output( str );
 
-  MAP(ENTITY, an_entity, {html_print_entity(an_entity);}, ram_shared( r ) );
+  FOREACH(entity, e, ram_shared( r ) ) {
+    html_print_entity(e);
+  }
 
   end_block( "ram" );
 }
@@ -135,10 +137,9 @@ static void html_print_code( code c ) {
   if ( l ) {
     begin_block( "declarations" );
     if ( !ENDP(l) ) {
-      MAP(ENTITY, var,
-          {
-            html_print_entity( var );
-          },l);
+      FOREACH(entity, e, l ) {
+        html_print_entity( e );
+      }
     }
     end_block( "declarations" );
   }
@@ -220,7 +221,9 @@ static void html_print_area( area a ) {
   html_output( str );
 
   html_output( "Layout" );
-  MAP(ENTITY, an_entity, {html_print_entity(an_entity);}, area_layout( a ) );
+  FOREACH(entity, e, area_layout( a ) ){
+    html_print_entity(e);
+  }
 
   end_block( "area" );
 }
@@ -266,8 +269,12 @@ static void html_print_variable( variable v ) {
 
   html_print_basic( variable_basic( v ) );
 
-  MAP(DIMENSION, a_dim, {html_print_dimension(a_dim);}, variable_dimensions( v ) );
-  MAP(QUALIFIER, a_qual, {html_print_qualifier(a_qual);}, variable_qualifiers( v ) );
+  FOREACH(dimension, d, variable_dimensions( v )  ){
+    html_print_dimension(d);
+  }
+  FOREACH(qualifier, q, variable_qualifiers( v )  ){
+    html_print_qualifier(q);
+  }
 
   end_block( "variable" );
 }
@@ -303,7 +310,9 @@ static void html_print_parameter( parameter p ) {
 static void html_print_functional( functional f ) {
   begin_block( "functional" );
 
-  MAP(PARAMETER, param, {html_print_parameter(param);}, functional_parameters( f ) );
+  FOREACH(parameter, param, functional_parameters( f ) ) {
+    html_print_parameter(param);
+  }
 
   html_print_type( functional_result( f ) );
 
@@ -337,18 +346,21 @@ static void html_print_type( type t ) {
       break;
     case is_type_struct:
       html_output( "Struct" );
-      MAP(ENTITY, an_entity, {html_print_entity(an_entity);}, type_struct( t ) )
-      ;
+      FOREACH(entity, e, type_struct( t ) ) {
+        html_print_entity( e );
+      }
       break;
     case is_type_union:
       html_output( "Union" );
-      MAP(ENTITY, an_entity, {html_print_entity(an_entity);}, type_union( t ) )
-      ;
+      FOREACH(entity, e, type_union( t ) ) {
+        html_print_entity( e );
+      }
       break;
     case is_type_enum:
       html_output( "Enum" );
-      MAP(ENTITY, an_entity, {html_print_entity(an_entity);}, type_enum( t ) )
-      ;
+      FOREACH(entity, e, type_enum( t ) ) {
+        html_print_entity( e );
+      }
       break;
     default:
       break;
@@ -405,10 +417,9 @@ static void html_print_call( call c ) {
 
   if ( call_arguments( c ) ) {
     begin_block( "arguments" );
-    MAP(EXPRESSION, e,
-        {
-          html_print_expression( e );
-        }, call_arguments( c ) );
+    FOREACH(expression, e, call_arguments( c ) ) {
+      html_print_expression( e );
+    }
     end_block( "arguments" );
   }
   end_block( "call" );
@@ -428,10 +439,9 @@ static void html_print_reference( reference r ) {
 
   if ( reference_indices( r ) ) {
     begin_block( "indices" );
-    MAP(EXPRESSION, e,
-        {
-          html_print_expression(e);
-        }, reference_indices(r));
+    FOREACH(expression, e, reference_indices( r ) ) {
+      html_print_expression( e );
+    }
     end_block( "indices" );
   }
 
@@ -548,11 +558,9 @@ static void html_print_forloop( forloop f ) {
 
 static void html_print_sequence( sequence seq ) {
   begin_block( "sequence" );
-  MAP(STATEMENT, s,
-      {
-        html_print_statement( s );
-      },
-      sequence_statements(seq));
+  FOREACH( statement, s, sequence_statements( seq ) ) {
+    html_print_statement( s );
+  }
   end_block( "sequence" );
 }
 
@@ -583,10 +591,9 @@ static void html_print_statement( statement s ) {
   if ( l ) {
     begin_block( "declarations" );
     if ( !ENDP(l) ) {
-      MAP(ENTITY, var,
-          {
-            html_print_entity( var );
-          },l);
+      FOREACH( entity, e, l ) {
+        html_print_entity( e );
+      }
     }
     end_block( "declarations" );
   }
@@ -657,11 +664,8 @@ bool html_prettyprint_symbol_table( char /* unused */module ) {
   begin_block( "Symbol table" );
   list entities = gen_filter_tabulated( gen_true, entity_domain );
   int i = 0;
-  MAP(ENTITY,
-      an_entity,
-      {
-        html_print_entity_full(an_entity);
-      },
-      entities);
+  FOREACH(entity, e, entities ) {
+    html_print_entity_full( e );
+  }
   end_block( "Symbol table" );
 }
