@@ -38,17 +38,17 @@ f951$(exeext): $(F95_OBJS) $(LIBS_PIPS) fortran/gfc2pips.o \
 		$(F95_OBJS) $(BACKEND) $(LIBS) fortran/gfc2pips.o $(LIBS_PIPS) $(LINEARLIBS_LIBS) $(NEWGENLIBS_LIBS)  attribs.o $(BACKENDLIBS) -lgmp -lmpfr
 
 #INCLUDES += -I$(NEWGEN_ROOT)/include/ -I$(PIPS_ROOT)/include/ -I $(LINEAR_ROOT)/include/
-INCLUDES += -I../../../../../Documentation/newgen/ 
-INCLUDES += -I../../../../../Libs/preprocessor/
-INCLUDES += -I../../../../../Libs/ri-util/
-INCLUDES += -I../../../../../Libs/syntax/
-INCLUDES += -I../../../../../Libs/misc/
-INCLUDES += -I../../../../../Libs/newgen/
-INCLUDES += -I../../../$(pipssrcdir)/../../Documentation/newgen/
-INCLUDES += -I../../../$(pipssrcdir)/../../Documentation/constants/
-INCLUDES += $(LINEARLIBS_CFLAGS) $(NEWGENLIBS_CFLAGS) 
+PIPS_INC_PRE   = -I../../../../../Documentation/newgen/ 
+PIPS_INC_POST  = -I../../../../../Libs/preprocessor/
+PIPS_INC_POST += -I../../../../../Libs/ri-util/
+PIPS_INC_POST += -I../../../../../Libs/syntax/
+PIPS_INC_POST += -I../../../../../Libs/misc/
+PIPS_INC_POST += -I../../../../../Libs/newgen/
+PIPS_INC_POST += -I../../../$(pipssrcdir)/../../Documentation/newgen/
+PIPS_INC_POST += -I../../../$(pipssrcdir)/../../Documentation/constants/
+PIPS_INC_POST += $(LINEARLIBS_CFLAGS) $(NEWGENLIBS_CFLAGS) 
 
 fortran/gfc2pips.o: fortran/gfc2pips.c fortran/gfc2pips_stubs.c fortran/gfc2pips.h fortran/gfc2pips-private.h
-	$(CC) -std=c99 -g -c $(ALL_CPPFLAGS) -DBASEVER=$(BASEVER_s)  \
+	$(CC) $(PIPS_INC_PRE) -std=c99 -g -c $(ALL_CPPFLAGS) $(PIPS_INC_POST) -DBASEVER=$(BASEVER_s)  \
 		$< $(OUTPUT_OPTION)
 
