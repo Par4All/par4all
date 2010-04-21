@@ -2002,6 +2002,36 @@ void RemoveDummyArguments(entity f, list refs)
     gen_free_list(formals);
   }
 }
+
+void SubstituteDummyParameters(entity f, list el)
+{
+  list cel = el;
+
+  for(cel; !ENDP(cel); POP(cel)) {
+    entity v = ENTITY(CAR(cel));
+    if(dummy_parameter_entity_p(v)) {
+      string mn = entity_local_name(f);
+      string ln = entity_user_name(v);
+      entity nv = FindOrCreateEntity(mn, ln);
+      stack s = get_from_entity_type_stack_table(v);
+      /* The copy could be avoided by substituting v->s with nv->s */
+      stack ns = stack_copy(s);
+      ENTITY_(CAR(cel)) = nv;
+
+      /* Store type information. Might be useless. */
+      put_to_entity_type_stack_table(nv, ns);
+      remove_entity_type_stack(v);
+
+      /* Inherit any attribute you can */
+      if(!type_undefined_p(v))
+	entity_type(nv) = copy_type(entity_type(v));
+      if(!value_undefined_p(v))
+	entity_initial(nv) = copy_value(entity_initial(v));
+      if(!storage_undefined_p(v))
+	entity_storage(nv) = copy_storage(entity_storage(v));
+    }
+  }
+}
 
 /* If necessary, create the return entity, which is a hidden variable
    used in PIPS internal representation to carry the value returned by
