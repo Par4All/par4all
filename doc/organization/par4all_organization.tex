@@ -107,8 +107,9 @@ the compilation. The most important one are \texttt{CFLAGS} and
 \begin{verbatim}
 export CFLAGS='-ggdb -g3 -Wall -std=c99'
 \end{verbatim}
-are good debugging options that allow \texttt{gdb} to access macro
-definitions that are heavily used in \Apips.
+are good debugging options (to set \emph{before} using the \Aautotools,
+that is, \emph{before} using \verb|p4a_setup|) that allow \texttt{gdb} to
+access macro definitions that are heavily used in \Apips.
 
 You can pass some options to \verb|src/dev/p4a_setup| to modify the
 installation process:

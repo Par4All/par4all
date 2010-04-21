@@ -1,4 +1,4 @@
-#! /bin/bash -vx
+#! /bin/bash
 #
 # Inspired from setup_pips.sh from Fabien Coelho and get-pips4u.sh from
 # Sebastien Varrette <Sebastien.Varrette@uni.lu> and Serge Guelton
