@@ -477,6 +477,7 @@ language workspace_language(gen_array_t files)
   int i, argc = gen_array_nitems(files);
   language l = language_undefined;
   int n_fortran = 0;
+  int n_fortran95 = 0;
   int n_c = 0;
 
   for (i = 0; i < argc; i++) {
@@ -485,14 +486,18 @@ language workspace_language(gen_array_t files)
       n_fortran++;
     else if(dot_c_file_p(fn))
       n_c++;
-    else {
+    else if(dot_f90_file_p(fn) || dot_f95_file_p(fn)){
+      n_fortran95++;
+    } else {
       ;
     }
   }
 
-  if(n_fortran>0 && n_c==0)
+  if(n_fortran>0 && n_fortran95==0 && n_c==0)
     l = make_language_fortran();
-  else if(n_fortran==0 && n_c>0)
+  if(n_fortran==0 && n_fortran95>0 && n_c==0)
+    l = make_language_fortran95();
+  else if(n_fortran==0 && n_fortran95==0 && n_c>0)
     l = make_language_c();
   else
     l = make_language_unknown();
