@@ -50,6 +50,6 @@ INCLUDES += -I../../../../../Documentation/newgen/
 INCLUDES += $(LINEARLIBS_CFLAGS) $(NEWGENLIBS_CFLAGS) 
 
 fortran/gfc2pips.o: fortran/gfc2pips.c fortran/gfc2pips_stubs.c fortran/gfc2pips.h fortran/gfc2pips-private.h
-	$(CC) $( -std=c99 -g -c $(ALL_CPPFLAGS) -DBASEVER=$(BASEVER_s)  \
+	$(CC) -std=c99 -g -c $(ALL_CPPFLAGS) -DBASEVER=$(BASEVER_s)  \
 		$< $(OUTPUT_OPTION)
 
