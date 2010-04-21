@@ -1,0 +1,8 @@
+delete allocatable
+create allocatable allocatable.f90
+
+display PRINTED_FILE[ALLOCATABLE]
+
+close
+delete allocatable
+
