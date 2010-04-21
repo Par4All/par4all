@@ -90,11 +90,13 @@ static void html_print_entity( entity e ) {
 static void html_print_ram( ram r ) {
   begin_block( "ram" );
 
-  html_output( "Function" );
+  begin_block( "Function" );
   html_print_entity( ram_function( r ) );
+  end_block( "Function" );
 
-  html_output( "Section" );
+  begin_block( "Section" );
   html_print_entity( ram_section( r ) );
+  end_block( "Section" );
 
   char str[100];
   snprintf( str, 100, "Offset : %d", (int) ram_offset( r ) );
@@ -125,6 +127,25 @@ static void html_print_rom( unit r ) {
 
   end_block( "rom" );
 }
+
+static void html_print_code( code c ) {
+  begin_block( "code" );
+
+  list l = code_declarations(c);
+  if ( l ) {
+    begin_block( "declarations" );
+    if ( !ENDP(l) ) {
+      MAP(ENTITY, var,
+          {
+            html_print_entity( var );
+          },l);
+    }
+    end_block( "declarations" );
+  }
+  end_block( "code" );
+}
+
+
 
 static void html_print_storage( storage s ) {
   begin_block( "storage" );
@@ -340,7 +361,7 @@ static void html_print_value( value v ) {
 
   switch ( value_tag( v ) ) {
     case is_value_code:
-      html_output( "code" );
+      html_print_code( value_code( v ) );
       break;
     case is_value_symbolic:
       html_output( "symbolic" );
@@ -569,6 +590,7 @@ static void html_print_statement( statement s ) {
     }
     end_block( "declarations" );
   }
+
 
   begin_block( "instructions" );
   instruction i = statement_instruction(s);
