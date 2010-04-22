@@ -25,7 +25,7 @@ TARGET=sc
 
 other_headers= sc-private.h
 
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h sc_gram.h
 nodist_include_HEADERS=$(TARGET).h
 AM_CPPFLAGS=-I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I$(top_srcdir)
 
@@ -61,7 +61,6 @@ libsc_la_SOURCES = 	sc_alloc.c \
 		sc_lex.l \
 		$(other_headers)
 
-# additionnal dep needed for // build
-sc_lex.c:sc_gram.h
+CLEANFILES=sc_gram.[ch] sc_lex.c
 
 include $(top_srcdir)/makes/cproto.mk
