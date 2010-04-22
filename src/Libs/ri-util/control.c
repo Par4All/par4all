@@ -1156,18 +1156,14 @@ unlink_2_control_nodes(control source,
    successor of @p before.
 */
 void insert_control_in_arc(control c, control before, control after) {
-  pips_assert("before has only one successor",
-	      gen_length(control_successors(before)));
-  pips_assert("after has only one predecessor",
-	      gen_length(control_predecessors(after)));
-  pips_assert("after is the only successor of before",
-	      CONTROL(CAR(control_successors(before))) == after);
-  pips_assert("before is the only predecessor of after",
-	      before == CONTROL(CAR(control_predecessors(after))));
-  pips_assert("c has no successor",
-	      ENDP(control_successors(c)));
-  pips_assert("c has no predecessor",
-	      ENDP(control_predecessors(c)));
+  pips_assert("c is not a successor of before",
+	      !is_control_in_list_p(c, control_successors(before)));
+  pips_assert("c is not a predecessor of after",
+	      !is_control_in_list_p(c, control_predecessors(after)));
+  pips_assert("after is a successor of before",
+	      is_control_in_list_p(after, control_successors(before)));
+  pips_assert("before is a predecessor of after",
+	      is_control_in_list_p(before, control_predecessors(after)));
 
   unlink_2_control_nodes(before, after);
   link_2_control_nodes(before, c);
