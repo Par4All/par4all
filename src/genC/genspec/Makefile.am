@@ -5,3 +5,4 @@ AM_LFLAGS=-p genspec_
 AM_CPPFLAGS=-I$(srcdir)/.. -I..
 
 BUILT_SOURCES=genspec.h
+CLEANFILES=genspec*

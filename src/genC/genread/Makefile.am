@@ -5,3 +5,4 @@ AM_LFLAGS=-p genread_
 AM_CPPFLAGS=-I$(srcdir)/.. -I..
 
 BUILT_SOURCES=genread.h
+CLEANFILES=genread*
