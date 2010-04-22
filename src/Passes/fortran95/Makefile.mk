@@ -26,8 +26,8 @@
 GFC2PIPS_SRC.d = src
 GFC2PIPS_SRCS = $(GFC2PIPS_SRC.d)/gfc2pips.c $(GFC2PIPS_SRC.d)/gfc2pips_stubs.c
 #VERSION USED
-GCC_VERSION = 4.4.3
-BUILD.d	= build/$(GCC_VERSION)
+PIPS_GFC2PIPS_GCC_VERSION ?= 4.4.3
+BUILD.d	= build/$(PIPS_GFC2PIPS_GCC_VERSION)
 
 ARCHIVE_EXT=.tar.bz2
 #ARCHIVE_EXT=".tar.gz"
@@ -37,18 +37,18 @@ GCC_MIRROR = ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org
 GCC_MD5_MIRROR = ftp://ftp.uvsq.fr/pub
 
 # URL for GCC mirror repository
-GCC_URL = $(GCC_MIRROR)/gcc/releases/gcc-$(GCC_VERSION)
-GCC_MD5_URL = $(GCC_MD5_MIRROR)/gcc/releases/gcc-$(GCC_VERSION)
+GCC_URL = $(GCC_MIRROR)/gcc/releases/gcc-$(PIPS_GFC2PIPS_GCC_VERSION)
+GCC_MD5_URL = $(GCC_MD5_MIRROR)/gcc/releases/gcc-$(PIPS_GFC2PIPS_GCC_VERSION)
 
 
 #archive name
 DL.d	= .
-GCC_CORE_ARCHIVE = gcc-core-$(GCC_VERSION)$(ARCHIVE_EXT)
-GCC_FORTRAN_ARCHIVE = gcc-fortran-$(GCC_VERSION)$(ARCHIVE_EXT)
-GCC_MD5	= gcc-$(GCC_VERSION).md5
+GCC_CORE_ARCHIVE = gcc-core-$(PIPS_GFC2PIPS_GCC_VERSION)$(ARCHIVE_EXT)
+GCC_FORTRAN_ARCHIVE = gcc-fortran-$(PIPS_GFC2PIPS_GCC_VERSION)$(ARCHIVE_EXT)
+GCC_MD5	= gcc-$(PIPS_GFC2PIPS_GCC_VERSION).md5
 
 #after untar
-SRC.d		= gcc-$(GCC_VERSION)
+SRC.d		= gcc-$(PIPS_GFC2PIPS_GCC_VERSION)
 CONFIGURE_OPT 	= --disable-bootstrap --enable-languages=fortran \
 	--enable-stage1-languages=fortran --disable-libssp --disable-libada \
 	--disable-libgomp --disable-stage1-checking --without-ppl \
@@ -133,8 +133,8 @@ $(SRC.d)/.untar-fortran: $(SRC.d)/.md5-check-fortran
 	@touch $(SRC.d)/.untar-fortran
 
 # patch gcc sources
-$(PATCHED): patch-$(GCC_VERSION).diff $(SRC.d)/.untar
-	patch -d gcc-$(GCC_VERSION) -p0 < $<
+$(PATCHED): patch-$(PIPS_GFC2PIPS_GCC_VERSION).diff $(SRC.d)/.untar
+	patch -d gcc-$(PIPS_GFC2PIPS_GCC_VERSION) -p0 < $<
 	@touch $(PATCHED)
 
 $(BUILD.d)/.dir:
@@ -143,12 +143,12 @@ $(BUILD.d)/.dir:
 
 $(BUILD.d)/.configure-core: $(BUILD.d)/.dir $(PATCHED)
 	cd $(BUILD.d) && \
-	../../gcc-$(GCC_VERSION)/configure $(CONFIGURE_OPT)
+	../../gcc-$(PIPS_GFC2PIPS_GCC_VERSION)/configure $(CONFIGURE_OPT)
 	@touch $(BUILD.d)/.configure-core
 
 $(BUILD.d)/.configure-fortran: $(BUILD.d)/.stage1
 	cd $(BUILD.d)/gcc && \
-	../../../gcc-$(GCC_VERSION)/gcc/configure $(CONFIGURE_OPT)
+	../../../gcc-$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/configure $(CONFIGURE_OPT)
 	@touch $(BUILD.d)/.configure-fortran
 
 $(BUILD.d)/.stage1: $(BUILD.d)/.configure-core
