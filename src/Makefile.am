@@ -1,4 +1,5 @@
 SUBDIRS= \
+	gnulib \
 	arithmetique \
 	vecteur \
 	contrainte \
@@ -15,8 +16,9 @@ SUBDIRS= \
 
 lib_LTLIBRARIES=liblinearlibs.la
 liblinearlibs_la_SOURCES=
-liblinearlibs_la_LDFLAGS=$(POLYLIB64_LIBS)
+liblinearlibs_la_LDFLAGS=$(POLYLIB64_LIBS) -Wl,--no-undefined
 liblinearlibs_la_LIBADD=\
+	gnulib/libgnu.la\
 	arithmetique/libarithmetique.la\
 	contrainte/libcontrainte.la\
   	matrice/libmatrice.la\
