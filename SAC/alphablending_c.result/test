@@ -197,13 +197,6 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
-   //PIPS generated variable
-   float F_0, F_1, F_2;
-   //PIPS generated variable
-   unsigned int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec11[3+1];
    //PIPS:SAC generated variable
@@ -216,84 +209,90 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    float v4sf_vec12[3+1], v4sf_vec13[3+1], v4sf_vec14[3+1], v4sf_vec15[3+1], v4sf_vec16[3+1], v4sf_vec17[3+1], v4sf_vec18[3+1], v4sf_vec19[3+1], v4sf_vec20[3+1], v4sf_vec21[3+1], v4sf_vec22[3+1], v4sf_vec23[3+1];
    //PIPS:SAC generated variable
    int aligned4[3+1] = {1, 1, 1, 1};
-   LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-      F_04 = aligned[0]*src1[LU_IND0];
-      F_14 = 1-aligned[0];
-      F_24 = F_14*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_24;
+   {
+      unsigned int i;
+      //PIPS generated variable
+      float F_0, F_1, F_2;
+      //PIPS generated variable
+      unsigned int LU_NUB0, LU_IB0, LU_IND0;
+      //PIPS generated variable
+      float F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
+      LU_NUB0 = n;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         F_04 = aligned[0]*src1[LU_IND0];
+         F_14 = 1-aligned[0];
+         F_24 = F_14*src2[LU_IND0];
+         result[LU_IND0] = F_04+F_24;
+      }
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
+         SIMD_LOAD_V4SF(v4sf_vec1, &aligned[0]);
+         SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+         SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
+         SIMD_LOAD_V4SF(v4sf_vec4, &aligned1[0]);
+         SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
+         SIMD_SAVE_V4SF(v4sf_vec3, &aligned2[0]);
+         SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
+         SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
+         SIMD_SAVE_V4SF(v4sf_vec6, &aligned3[0]);
+         SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
+         SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
+      }
+      i = MAX0(LU_NUB0, 0);
+      ;
    }
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
+}
+void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
+{
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec11[3+1];
+   //PIPS:SAC generated variable
+   float aligned[3+1] = {alpha, alpha, alpha, alpha}, aligned0[3+1] = {0, 0, 0, 0};
+   //PIPS:SAC generated variable
+   int aligned1[3+1] = {1, 1, 1, 1};
+   //PIPS:SAC generated variable
+   float aligned2[3+1] = {0, 0, 0, 0}, aligned3[3+1] = {0, 0, 0, 0};
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec12[3+1], v4sf_vec13[3+1], v4sf_vec14[3+1], v4sf_vec15[3+1], v4sf_vec16[3+1], v4sf_vec17[3+1], v4sf_vec18[3+1], v4sf_vec19[3+1], v4sf_vec20[3+1], v4sf_vec21[3+1], v4sf_vec22[3+1], v4sf_vec23[3+1];
+   //PIPS:SAC generated variable
+   int aligned4[3+1] = {1, 1, 1, 1};
+   {
+      unsigned int i;
+      //PIPS generated variable
+      float F_0, F_1, F_2;
+      //PIPS generated variable
+      unsigned int LU_NUB0, LU_IB0, LU_IND0;
+      //PIPS generated variable
+      float F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
+      LU_NUB0 = n;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         F_04 = aligned[0]*src1[LU_IND0];
+         F_14 = 1-aligned[0];
+         F_24 = F_14*src2[LU_IND0];
+         result[LU_IND0] = F_04+F_24;
+      }
       SIMD_LOAD_V4SF(v4sf_vec1, &aligned[0]);
-      SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
       SIMD_LOAD_V4SF(v4sf_vec4, &aligned1[0]);
-      SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
+         SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+         SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
+         SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
+         SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
+         SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
+         SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
+      }
+      SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
       SIMD_SAVE_V4SF(v4sf_vec3, &aligned2[0]);
-      SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
-      SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
       SIMD_SAVE_V4SF(v4sf_vec6, &aligned3[0]);
-      SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
-      SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
+      i = MAX0(LU_NUB0, 0);
+      ;
    }
-   i = MAX0(LU_NUB0, 0);
-   ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
-   //PIPS generated variable
-   float F_0, F_1, F_2;
-   //PIPS generated variable
-   unsigned int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec11[3+1];
-   //PIPS:SAC generated variable
-   float aligned[3+1] = {alpha, alpha, alpha, alpha}, aligned0[3+1] = {0, 0, 0, 0};
-   //PIPS:SAC generated variable
-   int aligned1[3+1] = {1, 1, 1, 1};
-   //PIPS:SAC generated variable
-   float aligned2[3+1] = {0, 0, 0, 0}, aligned3[3+1] = {0, 0, 0, 0};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec12[3+1], v4sf_vec13[3+1], v4sf_vec14[3+1], v4sf_vec15[3+1], v4sf_vec16[3+1], v4sf_vec17[3+1], v4sf_vec18[3+1], v4sf_vec19[3+1], v4sf_vec20[3+1], v4sf_vec21[3+1], v4sf_vec22[3+1], v4sf_vec23[3+1];
-   //PIPS:SAC generated variable
-   int aligned4[3+1] = {1, 1, 1, 1};
-   LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-      F_04 = aligned[0]*src1[LU_IND0];
-      F_14 = 1-aligned[0];
-      F_24 = F_14*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_24;
-   }
-   SIMD_LOAD_V4SF(v4sf_vec1, &aligned[0]);
-   SIMD_LOAD_V4SF(v4sf_vec4, &aligned1[0]);
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
-      SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
-      SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
-      SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
-      SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
-      SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
-   }
-   SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
-   SIMD_SAVE_V4SF(v4sf_vec3, &aligned2[0]);
-   SIMD_SAVE_V4SF(v4sf_vec6, &aligned3[0]);
-   i = MAX0(LU_NUB0, 0);
-   ;
-}
-void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
-{
-   unsigned int i;
-   //PIPS generated variable
-   unsigned int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float F_24, F_14, F_04;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec6[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
    //PIPS:SAC generated variable
@@ -302,41 +301,43 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    int aligned1[3+1] = {1, 1, 1, 1};
    //PIPS:SAC generated variable
    float aligned2[3+1] = {0, 0, 0, 0}, aligned3[3+1] = {0, 0, 0, 0};
-   LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-      F_04 = aligned[0]*src1[LU_IND0];
-      F_14 = 1-aligned[0];
-      F_24 = F_14*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_24;
+   {
+      unsigned int i;
+      //PIPS generated variable
+      unsigned int LU_NUB0, LU_IB0, LU_IND0;
+      //PIPS generated variable
+      float F_24, F_14, F_04;
+      LU_NUB0 = n;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         F_04 = aligned[0]*src1[LU_IND0];
+         F_14 = 1-aligned[0];
+         F_24 = F_14*src2[LU_IND0];
+         result[LU_IND0] = F_04+F_24;
+      }
+      SIMD_LOAD_V4SF(v4sf_vec1, &aligned[0]);
+      SIMD_LOAD_V4SF(v4sf_vec4, &aligned1[0]);
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
+         SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+         SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
+         SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
+         SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
+         SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
+         SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
+      }
+      SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
+      SIMD_SAVE_V4SF(v4sf_vec3, &aligned2[0]);
+      SIMD_SAVE_V4SF(v4sf_vec6, &aligned3[0]);
+      i = MAX0(LU_NUB0, 0);
+      ;
    }
-   SIMD_LOAD_V4SF(v4sf_vec1, &aligned[0]);
-   SIMD_LOAD_V4SF(v4sf_vec4, &aligned1[0]);
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
-      SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
-      SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
-      SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
-      SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
-      SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
-   }
-   SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
-   SIMD_SAVE_V4SF(v4sf_vec3, &aligned2[0]);
-   SIMD_SAVE_V4SF(v4sf_vec6, &aligned3[0]);
-   i = MAX0(LU_NUB0, 0);
-   ;
 }
 
 simdized code
 
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
-   //PIPS generated variable
-   unsigned int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float F_24, F_14, F_04;
    //PIPS:SAC generated float vector(s)
    float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec6[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
    //PIPS:SAC generated variable
@@ -345,28 +346,35 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    int aligned1[3+1] = {1, 1, 1, 1};
    //PIPS:SAC generated variable
    float aligned2[3+1] = {0, 0, 0, 0}, aligned3[3+1] = {0, 0, 0, 0};
-   LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-      F_04 = aligned[0]*src1[LU_IND0];
-      F_14 = 1-aligned[0];
-      F_24 = F_14*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_24;
+   {
+      unsigned int i;
+      //PIPS generated variable
+      unsigned int LU_NUB0, LU_IB0, LU_IND0;
+      //PIPS generated variable
+      float F_24, F_14, F_04;
+      LU_NUB0 = n;
+      LU_IB0 = MOD(LU_NUB0, 4);
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+         F_04 = aligned[0]*src1[LU_IND0];
+         F_14 = 1-aligned[0];
+         F_24 = F_14*src2[LU_IND0];
+         result[LU_IND0] = F_04+F_24;
+      }
+      SIMD_LOAD_V4SF(v4sf_vec1, &aligned[0]);
+      SIMD_LOAD_V4SF(v4sf_vec4, &aligned1[0]);
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
+         SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+         SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
+         SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
+         SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
+         SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
+         SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
+      }
+      SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
+      SIMD_SAVE_V4SF(v4sf_vec3, &aligned2[0]);
+      SIMD_SAVE_V4SF(v4sf_vec6, &aligned3[0]);
+      i = MAX0(LU_NUB0, 0);
+      ;
    }
-   SIMD_LOAD_V4SF(v4sf_vec1, &aligned[0]);
-   SIMD_LOAD_V4SF(v4sf_vec4, &aligned1[0]);
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
-      SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
-      SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
-      SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
-      SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
-      SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
-   }
-   SIMD_SAVE_V4SF(v4sf_vec0, &aligned0[0]);
-   SIMD_SAVE_V4SF(v4sf_vec3, &aligned2[0]);
-   SIMD_SAVE_V4SF(v4sf_vec6, &aligned3[0]);
-   i = MAX0(LU_NUB0, 0);
-   ;
 }

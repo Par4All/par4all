@@ -1,4 +1,4 @@
-pop(int op)
+int pop(int op)
 {
     int i=0;
     for(;i<op;++i)
