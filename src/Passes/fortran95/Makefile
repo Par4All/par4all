@@ -34,7 +34,8 @@ build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
 	rsync --exclude=.svn -av $(srcdir)/src/ gcc-$(GCC_VERSION)/gcc/fortran/
 	$(MAKE) -C build/$(GCC_VERSION)/gcc f951
 
-install: compile
+compile: build
+install: build
 	cp -a $(BUILD.d)/gcc/f951 $(ROOT)/bin/
 phase0:
 phase1:
