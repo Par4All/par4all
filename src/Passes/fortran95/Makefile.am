@@ -20,8 +20,8 @@
 #
 
 
-bin_PROGRAMS=f951
-f951_SOURCES = 
+bin_PROGRAMS=gfc2pips
+gfc2pips_SOURCES = 
 dist_noinst_DATA = patch-4.4.3.diff patch-4.4.2.diff patch-4.4.1.diff src/gfc2pips.c src/gfc2pips.h src/gfc2pips_stubs.c
 
 
@@ -32,6 +32,6 @@ build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
 	$(MAKE) "GFC2PIPS-AUTOTOOL-MAKEFILE=-autotools" "pipssrcdir=$(srcdir)" "NEWGENLIBS_CFLAGS=$(NEWGENLIBS_CFLAGS)" "LINEARLIBS_CFLAGS=$(LINEARLIBS_CFLAGS)" "PIPSLIBS_CFLAGS=$(PIPSLIBS_CFLAGS)" "NEWGENLIBS_LIBS=$(NEWGENLIBS_LIBS)" "LINEARLIBS_LIBS=$(LINEARLIBS_LIBS)" -C build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc f951
 
 
-f951: build
-	cp build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/f951 ./
+gfc2pips: build
+	cp build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/f951 ./gfc2pips
 

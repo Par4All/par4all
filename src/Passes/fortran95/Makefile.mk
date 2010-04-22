@@ -26,7 +26,7 @@
 GFC2PIPS_SRC.d = src
 GFC2PIPS_SRCS = $(GFC2PIPS_SRC.d)/gfc2pips.c $(GFC2PIPS_SRC.d)/gfc2pips_stubs.c
 #VERSION USED
-PIPS_GFC2PIPS_GCC_VERSION=4.4.3
+PIPS_GFC2PIPS_GCC_VERSION = 4.4.3
 BUILD.d	= build/$(PIPS_GFC2PIPS_GCC_VERSION)
 
 ARCHIVE_EXT=.tar.bz2
@@ -68,7 +68,7 @@ patch : $(PATCHED)
 # local stuff
 unbuild: clean
 clean: local-clean
-	$(RM) $(ROOT)/bin/f951
+	$(RM) $(ROOT)/bin/gfc2pips
 
 local-clean:
 	$(RM) -r $(SRC.d) build $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE)

@@ -21,7 +21,7 @@
 
 ROOT	= ../../..
 
-TARGET	= f951
+TARGET	= gfc2pips
 
 WGET = wget
 
@@ -31,12 +31,12 @@ srcdir = .
 include Makefile.mk
 
 build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
-	rsync --exclude=.svn -av $(srcdir)/src/ gcc-$(GCC_VERSION)/gcc/fortran/
-	$(MAKE) -C build/$(GCC_VERSION)/gcc f951
+	rsync --exclude=.svn -av $(srcdir)/src/ gcc-$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/fortran/
+	$(MAKE) -C build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc f951
 
 compile: build
 install: build
-	cp -a $(BUILD.d)/gcc/f951 $(ROOT)/bin/
+	cp -a $(BUILD.d)/gcc/f951 $(ROOT)/bin/gfc2pips
 phase0:
 phase1:
 phase2:
