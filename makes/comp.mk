@@ -45,6 +45,8 @@ BISON	= bison
 YFLAGS	= -y
 
 PROTO   = cproto
+# do not use gcc -E here : it fails on .y and .l
+PROTO_CPP = cpp
 PRFLAGS    = -qevcf2
 
 # A dummy target for the flymake-mode in Emacs:
