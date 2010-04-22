@@ -30,7 +30,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
