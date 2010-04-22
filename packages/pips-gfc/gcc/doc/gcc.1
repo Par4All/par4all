@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GCC 1"
-.TH GCC 1 "2009-10-15" "gcc-4.4.2" "GNU"
+.TH GCC 1 "2010-01-21" "gcc-4.4.3" "GNU"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -7120,8 +7120,8 @@ If you use the \fB\-E\fR option, nothing is done except preprocessing.
 Some of these options make sense only together with \fB\-E\fR because
 they cause the preprocessor output to be unsuitable for actual
 compilation.
-.Sp
-.RS 4
+.IP "\fB\-Wp,\fR\fIoption\fR" 4
+.IX Item "-Wp,option"
 You can use \fB\-Wp,\fR\fIoption\fR to bypass the compiler driver
 and pass \fIoption\fR directly through to the preprocessor.  If
 \&\fIoption\fR contains commas, it is split into multiple options at the
@@ -7131,16 +7131,14 @@ by the compiler driver before being passed to the preprocessor, and
 interface is undocumented and subject to change, so whenever possible
 you should avoid using \fB\-Wp\fR and let the driver handle the
 options instead.
-.Sp
-\&\fB\-Xpreprocessor\fR \fIoption\fR
-.Sp
+.IP "\fB\-Xpreprocessor\fR \fIoption\fR" 4
+.IX Item "-Xpreprocessor option"
 Pass \fIoption\fR as an option to the preprocessor.  You can use this to
 supply system-specific preprocessor options which \s-1GCC\s0 does not know how to
 recognize.
 .Sp
 If you want to pass an option that takes an argument, you must use
 \&\fB\-Xpreprocessor\fR twice, once for the option and once for the argument.
-.RE
 .IP "\fB\-D\fR \fIname\fR" 4
 .IX Item "-D name"
 Predefine \fIname\fR as a macro, with definition \f(CW1\fR.
@@ -15359,9 +15357,3 @@ included in the \fIgfdl\fR\|(7) man page.
 \&     software.  Copies published by the Free Software Foundation raise
 \&     funds for GNU development.
 .Ve
-.SH "POD ERRORS"
-.IX Header "POD ERRORS"
-Hey! \fBThe above document had some coding errors, which are explained below:\fR
-.IP "Around line 8736:" 4
-.IX Item "Around line 8736:"
-You can't have =items (as at line 8749) unless the first thing after the =over is an =item

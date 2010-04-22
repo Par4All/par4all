@@ -11,21 +11,24 @@ http://gcc.gnu.org/gcc-4.4/index.html
    October 15, 2009
 
    The [1]GNU project and the GCC developers are pleased to announce the
-   release of GCC 4.4.2.
+   release of GCC 4.4.3.
 
    This release is a bug-fix release, containing fixes for regressions in
    GCC 4.4.1 relative to previous releases of GCC.
 
 Release History
 
+   GCC 4.4.3
+          January 21, 2010 ([2]changes)
+
    GCC 4.4.2
-          October 15, 2009 ([2]changes)
+          October 15, 2009 ([3]changes)
 
    GCC 4.4.1
-          July 22, 2009 ([3]changes)
+          July 22, 2009 ([4]changes)
 
    GCC 4.4.0
-          April 21, 2009 ([4]changes)
+          April 21, 2009 ([5]changes)
 
 References and Acknowledgements
 
@@ -33,38 +36,38 @@ References and Acknowledgements
    supports several other languages aside from C, it now stands for the
    GNU Compiler Collection.
 
-   A list of [5]successful builds is updated as new information becomes
+   A list of [6]successful builds is updated as new information becomes
    available.
 
    The GCC developers would like to thank the numerous people that have
    contributed new features, improvements, bug fixes, and other changes as
-   well as test results to GCC. This [6]amazing group of volunteers is
+   well as test results to GCC. This [7]amazing group of volunteers is
    what makes GCC successful.
 
-   For additional information about GCC please refer to the [7]GCC project
-   web site or contact the [8]GCC development mailing list.
+   For additional information about GCC please refer to the [8]GCC project
+   web site or contact the [9]GCC development mailing list.
 
-   To obtain GCC please use [9]our mirror sites or [10]our SVN server.
+   To obtain GCC please use [10]our mirror sites or [11]our SVN server.
 
-   Please send FSF & GNU inquiries & questions to [11]gnu@gnu.org. There
-   are also [12]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [12]gnu@gnu.org. There
+   are also [13]other ways to contact the FSF.
 
-   These pages are maintained by [13]the GCC team.
+   These pages are maintained by [14]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [14]GCC manuals. If that fails, the
-    [15]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [15]GCC manuals. If that fails, the
+    [16]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [16]gcc@gnu.org or [17]gcc@gcc.gnu.org.
-    All of our lists have [18]public archives.
+    our developer mailing list at [17]gcc@gnu.org or [18]gcc@gcc.gnu.org.
+    All of our lists have [19]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-10-15 [19]Valid XHTML 1.0
+   Last modified 2010-01-21 [20]Valid XHTML 1.0
 
 References
 
@@ -72,27 +75,28 @@ References
    2. http://gcc.gnu.org/gcc-4.4/changes.html
    3. http://gcc.gnu.org/gcc-4.4/changes.html
    4. http://gcc.gnu.org/gcc-4.4/changes.html
-   5. http://gcc.gnu.org/gcc-4.4/buildstat.html
-   6. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
-   7. http://gcc.gnu.org/index.html
-   8. mailto:gcc@gcc.gnu.org
-   9. http://gcc.gnu.org/mirrors.html
-  10. http://gcc.gnu.org/svn.html
-  11. mailto:gnu@gnu.org
-  12. http://www.gnu.org/home.html#ContactInfo
-  13. http://gcc.gnu.org/about.html
-  14. http://gcc.gnu.org/onlinedocs/
-  15. mailto:gcc-help@gcc.gnu.org
-  16. mailto:gcc@gnu.org
-  17. mailto:gcc@gcc.gnu.org
-  18. http://gcc.gnu.org/lists.html
-  19. http://validator.w3.org/check/referer
+   5. http://gcc.gnu.org/gcc-4.4/changes.html
+   6. http://gcc.gnu.org/gcc-4.4/buildstat.html
+   7. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
+   8. http://gcc.gnu.org/index.html
+   9. mailto:gcc@gcc.gnu.org
+  10. http://gcc.gnu.org/mirrors.html
+  11. http://gcc.gnu.org/svn.html
+  12. mailto:gnu@gnu.org
+  13. http://www.gnu.org/home.html#ContactInfo
+  14. http://gcc.gnu.org/about.html
+  15. http://gcc.gnu.org/onlinedocs/
+  16. mailto:gcc-help@gcc.gnu.org
+  17. mailto:gcc@gnu.org
+  18. mailto:gcc@gcc.gnu.org
+  19. http://gcc.gnu.org/lists.html
+  20. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.4/changes.html
                            GCC 4.4 Release Series
                       Changes, New Features, and Fixes
 
-   The latest release in the 4.4 release series is [1]GCC 4.4.2.
+   The latest release in the 4.4 release series is [1]GCC 4.4.3.
 
 Caveats
 
@@ -641,29 +645,36 @@ GCC 4.4.2
    not be complete (that is, it is possible that some PRs that have been
    fixed are not listed here).
 
-   Please send FSF & GNU inquiries & questions to [15]gnu@gnu.org. There
-   are also [16]other ways to contact the FSF.
+GCC 4.4.3
 
-   These pages are maintained by [17]the GCC team.
+   This is the [15]list of problem reports (PRs) from GCC's bug tracking
+   system that are known to be fixed in the 4.4.3 release. This list might
+   not be complete (that is, it is possible that some PRs that have been
+   fixed are not listed here).
+
+   Please send FSF & GNU inquiries & questions to [16]gnu@gnu.org. There
+   are also [17]other ways to contact the FSF.
+
+   These pages are maintained by [18]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [18]GCC manuals. If that fails, the
-    [19]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [19]GCC manuals. If that fails, the
+    [20]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [20]gcc@gnu.org or [21]gcc@gcc.gnu.org.
-    All of our lists have [22]public archives.
+    our developer mailing list at [21]gcc@gnu.org or [22]gcc@gcc.gnu.org.
+    All of our lists have [23]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-10-15 [23]Valid XHTML 1.0
+   Last modified 2010-01-21 [24]Valid XHTML 1.0
 
 References
 
-   1. http://gcc.gnu.org/gcc-4.4/changes.html#4.4.2
+   1. http://gcc.gnu.org/gcc-4.4/changes.html#4.4.3
    2. http://gcc.gnu.org/gcc-4.3/changes.html#obsoleted
    3. http://gcc.gnu.org/gcc-4.4/porting_to.html
    4. http://gcc.gnu.org/wiki/Graphite
@@ -677,15 +688,16 @@ References
   12. http://gcc.gnu.org/onlinedocs/gfortran/Fortran-Dialect-Options.html#index-g_t_0040code_007bbackslash_007d-34
   13. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.4.1
   14. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.4.2
-  15. mailto:gnu@gnu.org
-  16. http://www.gnu.org/home.html#ContactInfo
-  17. http://gcc.gnu.org/about.html
-  18. http://gcc.gnu.org/onlinedocs/
-  19. mailto:gcc-help@gcc.gnu.org
-  20. mailto:gcc@gnu.org
-  21. mailto:gcc@gcc.gnu.org
-  22. http://gcc.gnu.org/lists.html
-  23. http://validator.w3.org/check/referer
+  15. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.4.3
+  16. mailto:gnu@gnu.org
+  17. http://www.gnu.org/home.html#ContactInfo
+  18. http://gcc.gnu.org/about.html
+  19. http://gcc.gnu.org/onlinedocs/
+  20. mailto:gcc-help@gcc.gnu.org
+  21. mailto:gcc@gnu.org
+  22. mailto:gcc@gcc.gnu.org
+  23. http://gcc.gnu.org/lists.html
+  24. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.3/index.html
                            GCC 4.3 Release Series
@@ -1726,7 +1738,7 @@ New Languages and Language specific improvements
        for most cases which currently use -fno-unit-at-a-time. The
        -fno-unit-at-a-time option will be removed in some future version
        of GCC. If you know of a case which requires -fno-unit-at-a-time
-       which is not fixed by -fno-toplevel-reorder, please [3]open a bug
+       which is not fixed by -fno-toplevel-reorder, please open a bug
        report.
 
   C family
@@ -1802,7 +1814,7 @@ New Languages and Language specific improvements
      * Added support for TR1 <random>, <complex>, and C compatibility
        headers. In addition, a lock-free version of shared_ptr was
        contributed as part of Phillip Jordan's Google Summer of Code
-       project on lock-free containers. ([4]Implementation status of TR1)
+       project on lock-free containers. ([3]Implementation status of TR1)
      * In association with the Summer of Code work on lock-free
        containers, the interface for atomic builtins was adjusted,
        creating simpler alternatives for non-threaded code paths. Also,
@@ -1820,7 +1832,7 @@ New Languages and Language specific improvements
        (basic_tree, tree, trie), lists (list_update), and both
        collision-chaining and probing hash-based containers
        (basic_hash_table, cc_hash_table, gp_hash_table). More details per
-       the [5]documentation.
+       the [4]documentation.
      * The implementation of the debug mode was modified, whereby the
        debug namespaces were nested inside of namespace std and namespace
        __gnu_cxx in order to resolve some long standing corner cases
@@ -1853,7 +1865,7 @@ New Languages and Language specific improvements
        gfortran used 8-byte record markers by default (on most systems).
        In order to change the length of the record markers, e.g. to read
        unformatted files created by older gfortran versions, the
-       [6]-frecord-marker=8 option can be used.
+       [5]-frecord-marker=8 option can be used.
 
   Java (GCJ)
 
@@ -1864,7 +1876,7 @@ New Languages and Language specific improvements
        memory than if the shared version of libgcj were used. However
        caution should be used as it can also cause essential parts of the
        library to be omitted. Some of these issues are discussed in:
-       [7]http://gcc.gnu.org/wiki/Statically_linking_libgcj
+       [6]http://gcc.gnu.org/wiki/Statically_linking_libgcj
      * fastjar is no longer bundled with GCC. To build libgcj, you will
        need either InfoZIP (both zip and unzip) or an external jar
        program. In the former case, the GCC build will install a jar shell
@@ -1968,44 +1980,43 @@ Other significant improvements
        achieve the same effect, and works for all native and cross
        settings.
 
-   Please send FSF & GNU inquiries & questions to [8]gnu@gnu.org. There
-   are also [9]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [7]gnu@gnu.org. There
+   are also [8]other ways to contact the FSF.
 
-   These pages are maintained by [10]the GCC team.
+   These pages are maintained by [9]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [11]GCC manuals. If that fails, the
-    [12]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [10]GCC manuals. If that fails, the
+    [11]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [13]gcc@gnu.org or [14]gcc@gcc.gnu.org.
-    All of our lists have [15]public archives.
+    our developer mailing list at [12]gcc@gnu.org or [13]gcc@gcc.gnu.org.
+    All of our lists have [14]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-01-25 [16]Valid XHTML 1.0
+   Last modified 2009-11-08 [15]Valid XHTML 1.0
 
 References
 
    1. http://gcc.gnu.org/projects/gomp/
    2. http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
-   3. http://gcc.gnu.org/bugs.html
-   4. http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt01ch01.html#manual.intro.status.standard.tr1
-   5. http://gcc.gnu.org/onlinedocs/libstdc++/ext/pb_ds/index.html
-   6. http://gcc.gnu.org/onlinedocs/gfortran/Runtime-Options.html
-   7. http://gcc.gnu.org/wiki/Statically_linking_libgcj
-   8. mailto:gnu@gnu.org
-   9. http://www.gnu.org/home.html#ContactInfo
-  10. http://gcc.gnu.org/about.html
-  11. http://gcc.gnu.org/onlinedocs/
-  12. mailto:gcc-help@gcc.gnu.org
-  13. mailto:gcc@gnu.org
-  14. mailto:gcc@gcc.gnu.org
-  15. http://gcc.gnu.org/lists.html
-  16. http://validator.w3.org/check/referer
+   3. http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt01ch01.html#manual.intro.status.standard.tr1
+   4. http://gcc.gnu.org/onlinedocs/libstdc++/ext/pb_ds/index.html
+   5. http://gcc.gnu.org/onlinedocs/gfortran/Runtime-Options.html
+   6. http://gcc.gnu.org/wiki/Statically_linking_libgcj
+   7. mailto:gnu@gnu.org
+   8. http://www.gnu.org/home.html#ContactInfo
+   9. http://gcc.gnu.org/about.html
+  10. http://gcc.gnu.org/onlinedocs/
+  11. mailto:gcc-help@gcc.gnu.org
+  12. mailto:gcc@gnu.org
+  13. mailto:gcc@gcc.gnu.org
+  14. http://gcc.gnu.org/lists.html
+  15. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.1/index.html
                            GCC 4.1 Release Series
@@ -5154,7 +5165,7 @@ GCC 3.4.6
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2008-05-03 [420]Valid XHTML 1.0
+   Last modified 2009-11-08 [420]Valid XHTML 1.0
 
 References
 
@@ -5169,7 +5180,7 @@ References
    9. http://gcc.gnu.org/bugzilla/show_bug.cgi?id=8361
   10. http://gcc.gnu.org/onlinedocs/gcc-3.4.3/gcc/Other-Builtins.html#Other%20Builtins
   11. http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_closed.html#209
-  12. http://gcc.gnu.org/bugs.html#cxx_rvalbind
+  12. http://gcc.gnu.org/bugs/#cxx_rvalbind
   13. http://gcc.gnu.org/onlinedocs/gcc-3.4.3/gcc/Objective-C-Dialect-Options.html
   14. http://gcc.gnu.org/onlinedocs/gcc-3.4.3/gcc/Objective-C-Dialect-Options.html
   15. http://gcc.gnu.org/onlinedocs/gcc-3.4.3/gcc/Objective-C-Dialect-Options.html

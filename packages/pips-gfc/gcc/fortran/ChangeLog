@@ -1,3 +1,64 @@
+2010-01-21  Release Manager
+
+	* GCC 4.4.3 released.
+
+2010-01-09  Jakub Jelinek  <jakub@redhat.com>
+
+	* gfortranspec.c (lang_specific_driver): Update copyright notice
+	dates.
+
+2009-11-30  Jerry DeLisle  <jvdelisle@gcc.gnu.org>
+
+	PR fortran/41278
+	Backport from mainline.
+	* trans-array.c (gfc_conv_array_transpose): Delete unnecessary assert.
+	
+2009-11-26  Jerry DeLisle  <jvdelisle@gcc.gnu.org>
+
+	PR fortran/41807
+	Backport from mainline.
+	* trans-const.c (gfc_conv_const): Fix typo in comment. Replace assert
+	with error message if not constant. Set se->expr to a constant on error.
+	* resolve.c (next_data_value): Delete check for constant.
+	
+2009-11-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR fortran/42162
+	* trans-openmp.c (gfc_trans_omp_do): When dovar isn't a VAR_DECL,
+	don't use simple loop and handle clauses properly.
+
+2009-11-06  Jerry DeLisle  <jvdelisle@gcc.gnu.org>
+
+	PR fortran/41909
+	* resolve.c (is_illegal_recursion): Return false if sym is program.
+
+2009-11-02  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/41772
+	* trans-intrinsic.c (gfc_conv_intrinsic_transfer): Stop'extent'
+	from going negative.
+
+2009-11-01  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/41850
+	* trans-expr.c (gfc_conv_procedure_call): Deallocate intent-out
+	variables only when present.
+
+2009-10-30  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/41777
+	* trans-expr.c (gfc_conv_procedure_call,gfc_conv_expr_reference):
+	Use for generic EXPR_FUNCTION the attributes of the specific
+	function.
+
+2009-10-19  Tobias Burnus  <burnus@net-b.de>
+	    Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	PR fortran/41755
+	* symbol.c (gfc_undo_symbols): Add NULL check.
+	* match.c (gfc_match_equivalence): Add check for
+	missing comma.
+
 2009-10-15  Release Manager
 
 	* GCC 4.4.2 released.

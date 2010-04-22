@@ -1100,6 +1100,9 @@ is_illegal_recursion (gfc_symbol* sym, gfc_namespace* context)
   gfc_symbol* proc_sym;
   gfc_symbol* context_proc;
 
+  if (sym->attr.flavor == FL_PROGRAM)
+    return false;
+
   gcc_assert (sym->attr.flavor == FL_PROCEDURE);
 
   /* If we've got an ENTRY, find real procedure.  */
@@ -9444,10 +9447,6 @@ next_data_value (void)
 {
   while (mpz_cmp_ui (values.left, 0) == 0)
     {
-      if (!gfc_is_constant_expr (values.vnode->expr))
-	gfc_error ("non-constant DATA value at %L",
-		   &values.vnode->expr->where);
-
       if (values.vnode->next == NULL)
 	return FAILURE;
 

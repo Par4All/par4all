@@ -2620,8 +2620,11 @@ gfc_conv_function_call (gfc_se * se, gfc_symbol * sym,
 		   through arg->name.  */
 		conv_arglist_function (&parmse, arg->expr, arg->name);
 	      else if ((e->expr_type == EXPR_FUNCTION)
-			  && e->symtree->n.sym->attr.pointer
-			  && fsym && fsym->attr.target)
+			&& ((e->value.function.esym
+			     && e->value.function.esym->result->attr.pointer)
+			    || (!e->value.function.esym
+				&& e->symtree->n.sym->attr.pointer))
+			&& fsym && fsym->attr.target)
 		{
 		  gfc_conv_expr (&parmse, e);
 		  parmse.expr = build_fold_addr_expr (parmse.expr);
@@ -2668,16 +2671,21 @@ gfc_conv_function_call (gfc_se * se, gfc_symbol * sym,
 	        gfc_conv_array_parameter (&parmse, e, argss, f, fsym,
 					  sym->name);
 
-              /* If an ALLOCATABLE dummy argument has INTENT(OUT) and is 
-                 allocated on entry, it must be deallocated.  */
-              if (fsym && fsym->attr.allocatable
-                  && fsym->attr.intent == INTENT_OUT)
-                {
-                  tmp = build_fold_indirect_ref (parmse.expr);
-                  tmp = gfc_trans_dealloc_allocated (tmp);
-                  gfc_add_expr_to_block (&se->pre, tmp);
-                }
-
+	      /* If an ALLOCATABLE dummy argument has INTENT(OUT) and is 
+		 allocated on entry, it must be deallocated.  */
+	      if (fsym && fsym->attr.allocatable
+		  && fsym->attr.intent == INTENT_OUT)
+		{
+		  tmp = build_fold_indirect_ref (parmse.expr);
+		  tmp = gfc_trans_dealloc_allocated (tmp);
+		  if (fsym->attr.optional
+		      && e->expr_type == EXPR_VARIABLE
+		      && e->symtree->n.sym->attr.optional)
+		    tmp = fold_build3 (COND_EXPR, void_type_node,
+				     gfc_conv_expr_present (e->symtree->n.sym),
+				       tmp, build_empty_stmt ());
+		  gfc_add_expr_to_block (&se->pre, tmp);
+		}
 	    } 
 	}
 
@@ -3948,8 +3956,12 @@ gfc_conv_expr_reference (gfc_se * se, gfc_expr * expr)
     }
 
   if (expr->expr_type == EXPR_FUNCTION
-	&& expr->symtree->n.sym->attr.pointer
-	&& !expr->symtree->n.sym->attr.dimension)
+      && ((expr->value.function.esym
+	   && expr->value.function.esym->result->attr.pointer
+	   && !expr->value.function.esym->result->attr.dimension)
+	  || (!expr->value.function.esym
+	      && expr->symtree->n.sym->attr.pointer
+	      && !expr->symtree->n.sym->attr.dimension)))
     {
       se->want_pointer = 1;
       gfc_conv_expr (se, expr);

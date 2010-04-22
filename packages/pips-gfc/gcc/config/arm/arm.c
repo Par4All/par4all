@@ -53,6 +53,7 @@
 #include "debug.h"
 #include "langhooks.h"
 #include "df.h"
+#include "libfuncs.h"
 
 /* Forward definitions of types.  */
 typedef struct minipool_node    Mnode;
@@ -922,6 +923,9 @@ arm_init_libfuncs (void)
   set_optab_libfunc (umod_optab, DImode, NULL);
   set_optab_libfunc (smod_optab, SImode, NULL);
   set_optab_libfunc (umod_optab, SImode, NULL);
+
+  if (TARGET_AAPCS_BASED)
+    synchronize_libfunc = init_one_libfunc ("__sync_synchronize");
 }
 
 /* On AAPCS systems, this is the "struct __va_list".  */
@@ -10975,7 +10979,7 @@ output_move_neon (rtx *operands)
 	  {
 	    /* We're only using DImode here because it's a convenient size.  */
 	    ops[0] = gen_rtx_REG (DImode, REGNO (reg) + 2 * i);
-	    ops[1] = adjust_address (mem, SImode, 8 * i);
+	    ops[1] = adjust_address (mem, DImode, 8 * i);
 	    if (reg_overlap_mentioned_p (ops[0], mem))
 	      {
 		gcc_assert (overlap == -1);

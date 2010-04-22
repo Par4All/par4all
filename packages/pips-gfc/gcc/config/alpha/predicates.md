@@ -439,9 +439,11 @@
        (match_code "mem"))
 {
   rtx base;
+  int offset;
 
   if (MEM_ALIGN (op) >= 32)
     return 1;
+
   op = XEXP (op, 0);
 
   /* LEGITIMIZE_RELOAD_ADDRESS creates (plus (plus reg const_hi) const_lo)
@@ -449,13 +451,28 @@
   if (reload_in_progress
       && GET_CODE (op) == PLUS
       && GET_CODE (XEXP (op, 0)) == PLUS)
-    base = XEXP (XEXP (op, 0), 0);
+    {
+      base = XEXP (XEXP (op, 0), 0);
+      offset = INTVAL (XEXP (op, 1));
+    }
   else
     {
       if (! memory_address_p (mode, op))
 	return 0;
-      base = (GET_CODE (op) == PLUS ? XEXP (op, 0) : op);
+      if (GET_CODE (op) == PLUS)
+	{
+	  base = XEXP (op, 0);
+	  offset = INTVAL (XEXP (op, 1));
+	}
+      else
+	{
+	  base = op;
+	  offset = 0;
+	}
     }
+
+  if (offset % GET_MODE_SIZE (mode))
+    return 0;
 
   return (GET_CODE (base) == REG && REGNO_POINTER_ALIGN (REGNO (base)) >= 32);
 })
@@ -467,9 +484,11 @@
        (match_code "mem"))
 {
   rtx base;
+  int offset;
 
   if (MEM_ALIGN (op) >= 32)
     return 0;
+
   op = XEXP (op, 0);
 
   /* LEGITIMIZE_RELOAD_ADDRESS creates (plus (plus reg const_hi) const_lo)
@@ -477,13 +496,28 @@
   if (reload_in_progress
       && GET_CODE (op) == PLUS
       && GET_CODE (XEXP (op, 0)) == PLUS)
-    base = XEXP (XEXP (op, 0), 0);
+    {
+      base = XEXP (XEXP (op, 0), 0);
+      offset = INTVAL (XEXP (op, 1));
+    }
   else
     {
       if (! memory_address_p (mode, op))
 	return 0;
-      base = (GET_CODE (op) == PLUS ? XEXP (op, 0) : op);
+      if (GET_CODE (op) == PLUS)
+	{
+	  base = XEXP (op, 0);
+	  offset = INTVAL (XEXP (op, 1));
+	}
+      else
+	{
+	  base = op;
+	  offset = 0;
+	}
     }
+
+  if (offset % GET_MODE_SIZE (mode))
+    return 1;
 
   return (GET_CODE (base) == REG && REGNO_POINTER_ALIGN (REGNO (base)) < 32);
 })

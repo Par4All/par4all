@@ -10379,7 +10379,7 @@ i386_output_dwarf_dtprel (FILE *file, int size, rtx x)
 static bool
 ix86_pic_register_p (rtx x)
 {
-  if (GET_CODE (x) == VALUE)
+  if (GET_CODE (x) == VALUE && CSELIB_VAL_PTR (x))
     return (pic_offset_table_rtx
 	    && rtx_equal_for_cselib_p (x, pic_offset_table_rtx));
   else
@@ -11313,13 +11313,14 @@ print_operand (FILE *file, rtx x, int code)
 	    case 2: size = "WORD"; break;
 	    case 4: size = "DWORD"; break;
 	    case 8: size = "QWORD"; break;
-	    case 12: size = "XWORD"; break;
+	    case 12: size = "TBYTE"; break;
 	    case 16:
 	      if (GET_MODE (x) == XFmode)
-		size = "XWORD";
+		size = "TBYTE";
               else
 		size = "XMMWORD";
               break;
+	    case 32: size = "YMMWORD"; break;
 	    default:
 	      gcc_unreachable ();
 	    }
@@ -15674,8 +15675,9 @@ ix86_expand_int_vcond (rtx operands[])
 	    }
 	}
 
-      /* Unsigned parallel compare is not supported by the hardware.  Play some
-	 tricks to turn this into a signed comparison against 0.  */
+      /* Unsigned parallel compare is not supported by the hardware.
+	 Play some tricks to turn this into a signed comparison
+	 against 0.  */
       if (code == GTU)
 	{
 	  cop0 = force_reg (mode, cop0);
@@ -15684,32 +15686,26 @@ ix86_expand_int_vcond (rtx operands[])
 	    {
 	    case V4SImode:
 	    case V2DImode:
-	      {
-		rtx t1, t2, mask;
+		{
+		  rtx t1, t2, mask;
+		  rtx (*gen_sub3) (rtx, rtx, rtx);
 
-		/* Perform a parallel modulo subtraction.  */
-		t1 = gen_reg_rtx (mode);
-		emit_insn ((mode == V4SImode
-			    ? gen_subv4si3
-			    : gen_subv2di3) (t1, cop0, cop1));
+		  /* Subtract (-(INT MAX) - 1) from both operands to make
+		     them signed.  */
+		  mask = ix86_build_signbit_mask (GET_MODE_INNER (mode),
+						  true, false);
+		  gen_sub3 = (mode == V4SImode
+			      ? gen_subv4si3 : gen_subv2di3);
+		  t1 = gen_reg_rtx (mode);
+		  emit_insn (gen_sub3 (t1, cop0, mask));
 
-		/* Extract the original sign bit of op0.  */
-		mask = ix86_build_signbit_mask (GET_MODE_INNER (mode),
-						true, false);
-		t2 = gen_reg_rtx (mode);
-		emit_insn ((mode == V4SImode
-			    ? gen_andv4si3
-			    : gen_andv2di3) (t2, cop0, mask));
+		  t2 = gen_reg_rtx (mode);
+		  emit_insn (gen_sub3 (t2, cop1, mask));
 
-		/* XOR it back into the result of the subtraction.  This results
-		   in the sign bit set iff we saw unsigned underflow.  */
-		x = gen_reg_rtx (mode);
-		emit_insn ((mode == V4SImode
-			    ? gen_xorv4si3
-			    : gen_xorv2di3) (x, t1, t2));
-
-		code = GT;
-	      }
+		  cop0 = t1;
+		  cop1 = t2;
+		  code = GT;
+		}
 	      break;
 
 	    case V16QImode:
@@ -15719,6 +15715,8 @@ ix86_expand_int_vcond (rtx operands[])
 	      emit_insn (gen_rtx_SET (VOIDmode, x,
 				      gen_rtx_US_MINUS (mode, cop0, cop1)));
 
+	      cop0 = x;
+	      cop1 = CONST0_RTX (mode);
 	      code = EQ;
 	      negate = !negate;
 	      break;
@@ -15726,9 +15724,6 @@ ix86_expand_int_vcond (rtx operands[])
 	    default:
 	      gcc_unreachable ();
 	    }
-
-	  cop0 = x;
-	  cop1 = CONST0_RTX (mode);
 	}
     }
 

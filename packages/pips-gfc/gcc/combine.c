@@ -2445,10 +2445,16 @@ try_combine (rtx i3, rtx i2, rtx i1, int *new_direct_jump_p)
 	  i2dest = SET_DEST (temp);
 	  i2dest_killed = dead_or_set_p (i2, i2dest);
 
+          /* Replace the source in I2 with the new constant and make the
+             resulting insn the new pattern for I3.  Then skip to
+             where we validate the pattern.  Everything was set up above.  */
 	  SUBST (SET_SRC (temp),
 		 immed_double_const (olo, ohi, GET_MODE (SET_DEST (temp))));
 
 	  newpat = PATTERN (i2);
+
+          /* The dest of I3 has been replaced with the dest of I2.  */
+          changed_i3_dest = 1;
 	  goto validate_replacement;
 	}
     }
@@ -2820,8 +2826,6 @@ try_combine (rtx i3, rtx i2, rtx i1, int *new_direct_jump_p)
 	}
     }
 
-  /* We come here when we are replacing a destination in I2 with the
-     destination of I3.  */
  validate_replacement:
 
   /* Note which hard regs this insn has as inputs.  */
@@ -7039,15 +7043,14 @@ make_compound_operation (rtx x, enum rtx_code in_code)
       tem = make_compound_operation (SUBREG_REG (x), in_code);
 
       {
-	rtx simplified;
-	simplified = simplify_subreg (GET_MODE (x), tem, GET_MODE (tem),
-				      SUBREG_BYTE (x));
+	rtx simplified = simplify_subreg (mode, tem, GET_MODE (SUBREG_REG (x)),
+					  SUBREG_BYTE (x));
 
 	if (simplified)
 	  tem = simplified;
 
 	if (GET_CODE (tem) != GET_CODE (SUBREG_REG (x))
-	    && GET_MODE_SIZE (mode) < GET_MODE_SIZE (GET_MODE (tem))
+	    && GET_MODE_SIZE (mode) < GET_MODE_SIZE (GET_MODE (SUBREG_REG (x)))
 	    && subreg_lowpart_p (x))
 	  {
 	    rtx newer = force_to_mode (tem, mode, ~(HOST_WIDE_INT) 0,
@@ -8511,6 +8514,12 @@ distribute_and_simplify_rtx (rtx x, int n)
   enum machine_mode mode;
   enum rtx_code outer_code, inner_code;
   rtx decomposed, distributed, inner_op0, inner_op1, new_op0, new_op1, tmp;
+
+  /* Distributivity is not true for floating point as it can change the
+     value.  So we don't do it unless -funsafe-math-optimizations.  */
+  if (FLOAT_MODE_P (GET_MODE (x))
+      && ! flag_unsafe_math_optimizations)
+    return NULL_RTX;
 
   decomposed = XEXP (x, n);
   if (!ARITHMETIC_P (decomposed))
@@ -13035,4 +13044,3 @@ struct rtl_opt_pass pass_combine =
   TODO_ggc_collect,                     /* todo_flags_finish */
  }
 };
-
