@@ -5,11 +5,11 @@ void init_s(s_t s, int max)
 {
    // BEGIN BLOCK
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[tab]
 
    s.tab = (float *) malloc(max*sizeof(float));
 //               <must be read   >: max
-//               <must be written>: s[1]
+//               <must be written>: s[max]
    s.max = max;
    // END BLOCK
 }
@@ -17,18 +17,20 @@ void init_s(s_t s, int max)
 Cumulated effects for "init_s"
 
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[max] 
+//                                  s[tab]
 void init_s(s_t s, int max)
 {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[max] 
+//                                  s[tab]
    // BEGIN BLOCK
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[tab]
 
    s.tab = (float *) malloc(max*sizeof(float));
 //               <must be read   >: max
-//               <must be written>: s[1]
+//               <must be written>: s[max]
    s.max = max;
    // END BLOCK
 }
@@ -40,12 +42,13 @@ int main()
    // BEGIN BLOCK
    s_t s;
    int j;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s[max] 
+//                                  s[tab]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 
    init_s(s, 10);
-//               <may be written >: s[2][*]
-//               <must be read   >: s s[2]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: s[max] s[tab]
 
    compute_s(s, 10);
    
@@ -69,12 +72,13 @@ int main()
    // BEGIN BLOCK
    s_t s;
    int j;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s[max] 
+//                                  s[tab]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 
    init_s(s, 10);
-//               <may be written >: s[2][*]
-//               <must be read   >: s s[2]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: s[max] s[tab]
 
    compute_s(s, 10);
    
