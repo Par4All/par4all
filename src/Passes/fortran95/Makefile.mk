@@ -165,6 +165,5 @@ configure: configure-core configure-fortran
 configure-core: $(BUILD.d)/.configure-core
 configure-fortran: $(BUILD.d)/.configure-fortran
 build-stage1: $(BUILD.d)/.stage1
-compile: build-stage2
-build: compile
+build: build-stage2
 

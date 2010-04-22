@@ -21,6 +21,8 @@
 
 
 bin_PROGRAMS=f951
+f951_SOURCES =
+
 
 include Makefile.mk
 
