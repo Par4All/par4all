@@ -57,6 +57,7 @@ cumulated_references(string module_name)
 {
     bool ok;
     set_methods_for_cumulated_references();
+    set_constant_paths_p(false);
     ok = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return ok;
@@ -67,6 +68,7 @@ proper_references(string module_name)
 {
     bool ok;
     set_methods_for_proper_references();
+    set_constant_paths_p(false);
     ok = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return ok;

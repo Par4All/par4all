@@ -322,6 +322,13 @@ void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
   return;
 }
 
+/**
+   @brief copies the input_effect and converts all it's reference indices that refer to
+          field entities to an integer which is their rank in the field list
+          of the ancestor derived type.
+   @input input_effect is  simple effect, and is not modified.
+   @return a new effect.
+ */
 effect simple_effect_field_to_rank_conversion(effect input_effect)
 {
   effect eff = copy_effect(input_effect); 
@@ -477,11 +484,15 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 
     if(!extended_integer_constant_expression_p(se)) {
       if(!unbounded_expression_p(se)) {
-	expression nse = make_unbounded_expression();
-	may_p = TRUE;
-	free_expression(se);
-	//CAR(cind).p = (void *) nse;
-	EXPRESSION_(CAR(cind)) = nse;
+	
+	/* it may still be a field entity */
+	    if (!(expression_reference_p(se) && 
+		  entity_field_p(expression_variable(se))))
+	    {
+	      may_p = TRUE;
+	      free_expression(se);
+	      EXPRESSION_(CAR(cind)) = make_unbounded_expression();
+	    }
       }
     }
   }
