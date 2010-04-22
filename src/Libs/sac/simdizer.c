@@ -46,7 +46,6 @@ typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
-#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -60,6 +59,7 @@ typedef dg_vertex_label vertex_label;
 #include "callgraph.h"
 
 #include "effects-convex.h"
+#include "sac.h"
 
 static graph dependence_graph = NULL;
 

@@ -27,6 +27,7 @@ INC_CFILES =	pipsmake.c \
 		callback.c \
 		unsplit.c \
 		stubs.c
+INC_YFILES=readmakefile.y lexer.l
 
 DERIVED_HEADERS = readmakefile.h
 DERIVED_CFILES = readmakefile.c lexer.c

@@ -22,9 +22,6 @@
 
 */
 
-#ifndef __SAVC_LOCAL_H__
-#define __SAVC_LOCAL_H__
-
 #include "sac_private.h"
 
 #define FUNC_TO_ATOMIZE_P(call) (\
@@ -41,15 +38,6 @@ extern entity hpfc_new_variable(entity, basic);
 #define IF_TO_CONVERT "PIPS IF_TO_CONVERT"
 #define IF_CONV_TO_COMPACT "PIPS IF_CONV_TO_COMPACT"
 
-entity get_function_entity(string name);
-
-basic get_basic_from_array_ref(reference ref);
-
-void saCallReplace(call c, reference ref, entity next);
-
-list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_process)(statement ));
-
-void init_dep_graph(graph dg);
 
 #define ENTITY_FUNCTION_P(f) (type_functional_p(entity_type(f)) && \
 			    (gen_length(functional_parameters(type_functional(entity_type(f)))) != 0))
@@ -70,8 +58,6 @@ void init_dep_graph(graph dg);
 
 #define SIMD_NAME "SIMD_"
 
-list expression_to_proper_effects(expression e);
-
 #define STATEMENT_INFO_NEWGEN_DOMAIN SIMDSTATEMENTINFO_NEWGEN_DOMAIN
 #define gen_STATEMENT_INFO_cons gen_SIMDSTATEMENTINFO_cons
 
@@ -84,6 +70,3 @@ list expression_to_proper_effects(expression e);
 
 #define SIMD_COMMENT "SIMD_COMMENT_"
 
-
-
-#endif /*__SAVC_LOCAL_H__*/

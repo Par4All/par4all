@@ -111,7 +111,7 @@ get_new_user_file(string dir_name, string preprocessed_user_file)
  *         < ALL.printed_file
  */
 bool
-unsplit(string name)
+unsplit(const char* name)
 {
     gen_array_t modules = db_get_module_list_initial_order();
     int n = gen_array_nitems(modules), i;

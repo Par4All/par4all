@@ -34,6 +34,7 @@ INC_CFILES= 	declaration.c \
 		return.c \
 		malloc-info.c \
 		macros.c
+INC_YFILES= gram.y scanner.l
 
 DERIVED_HEADERS = keywtbl.h tokyacc.h syn_yacc.h yacc.in
 DERIVED_CFILES = syn_yacc.c scanner.c
