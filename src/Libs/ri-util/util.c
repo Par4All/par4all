@@ -146,7 +146,7 @@ string make_entity_fullname(string module_name, string local_name)
 }
 
 //empty_local_label_name_p(s)
-bool empty_string_p(string s)
+bool empty_string_p(const char* s)
 {
     return(strcmp(s, "") == 0);
 }
@@ -177,7 +177,7 @@ bool return_label_p(string s)
     return(return_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
 }
 
-entity find_label_entity(string module_name, string label_local_name)
+entity find_label_entity(const char* module_name, const char* label_local_name)
 {
     string full = concatenate(module_name, MODULE_SEP_STRING,
 			      LABEL_PREFIX, label_local_name, NULL);

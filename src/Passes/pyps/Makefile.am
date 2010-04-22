@@ -11,8 +11,6 @@ _pypips_la_LDFLAGS = -module $(PYTHON_LDFLAGS)
 _pypips_la_LIBADD = ../../Libs/libpipslibs.la $(PYTHON_EXTRALIBS) $(LINEARLIBS_LIBS) $(NEWGENLIBS_LIBS)
 _pypips_la_CPPFLAGS = \
 	$(PYTHON_CPPFLAGS)\
-	$(LINEARLIBS_CFLAGS)\
-	$(NEWGENLIBS_CFLAGS)\
 	-I$(top_srcdir)/src/Documentation/constants \
 	-I../../Documentation/pipsmake \
 	-I../../Documentation/newgen \
@@ -22,7 +20,10 @@ _pypips_la_CPPFLAGS = \
 	-I../../Libs/top-level\
 	-I../../Libs/pipsmake\
 	-I../../Libs/pipsdbm\
-	-I../../Libs/properties
+	-I../../Libs/properties\
+	-I../../Libs/transformations\
+	$(LINEARLIBS_CFLAGS)\
+	$(NEWGENLIBS_CFLAGS)
 
 pypips_wrap.c : pypips.i pypips.h
 	$(SWIG) -python -o pypips_wrap.c-tmp pypips.i
@@ -46,6 +47,9 @@ pypips.h:pypips.c Makefile
 	echo '#include "transformations.h"' >> pypips.h
 	echo "#undef _POSIX_C_SOURCE" >> pypips.h
 	echo "#undef assert" >> pypips.h
+	echo "extern char *activate(char *);" >> pypips.h
+	echo "extern char *module_loops(const char*,const char*);" >> pypips.h
+
 
 pypips_aux.c:pypips.h pypips.c
 	cat pypips.h $(srcdir)/pypips.c > pypips_aux.c

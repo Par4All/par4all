@@ -35,7 +35,7 @@
 
 /* the current module is expected by some load/save functions...
  */
-string dbll_current_module = (string) NULL;
+const char* dbll_current_module = (const char*) NULL;
 
 typedef char * (* READER)(FILE *);
 typedef void  (* WRITER)(FILE *, void *);
@@ -67,7 +67,7 @@ static methods all_methods[] = {
 
 /* return the methods for resource name
  */
-static methods * get_methods(string name)
+static methods * get_methods(const char* name)
 {
     /* we use a local cache for fast retrieval.
      */
@@ -98,16 +98,16 @@ string dbll_get_ith_resource_name(int i)
     return all_methods[i].name;
 }
 
-bool dbll_very_special_resource_p(string rname, string oname)
+bool dbll_very_special_resource_p(const char* rname, const char* oname)
 {
   return same_string_p(rname, DBR_ENTITIES) && same_string_p(oname, "");
 }
 
 /********************************************************************** FILE */
 
-static string current_builder = NULL;
+static char* current_builder = NULL;
 
-void db_set_current_builder_name(string name)
+void db_set_current_builder_name(const char* name)
 {
     pips_assert("no current builder", !current_builder);
     current_builder = strdup(name);
@@ -129,7 +129,7 @@ string db_get_current_builder_name(void)
 
 /* returns the allocated and mkdir'ed directory for module name
  */
-string db_get_directory_name_for_module(string name)
+string db_get_directory_name_for_module(const char* name)
 {
     string dir_name, ws_dir_name;
     pips_assert("some valid name", name && !same_string_p(name, ""));
@@ -148,7 +148,7 @@ string db_get_directory_name_for_module(string name)
  * this function is to be used by all phases that generate files.
  * it does not include the directory for movability
  */
-string db_build_file_resource_name(string rname, string oname, string suffix)
+string db_build_file_resource_name(const char* rname, const char* oname, const char* suffix)
 {
   string result;
   if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
@@ -166,7 +166,7 @@ string db_build_file_resource_name(string rname, string oname, string suffix)
 
 /* allocate a full file name for the given resource.
  */
-string get_resource_file_name(string rname, string oname)
+string get_resource_file_name(const char* rname, const char* oname)
 {
     string dir_name, file_name;
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
@@ -176,7 +176,7 @@ string get_resource_file_name(string rname, string oname)
     return file_name;
 }
 
-static FILE * open_resource_file(string rname, string oname, string what)
+static FILE * open_resource_file(const char* rname, const char* oname, const char* what)
 {
     FILE * file;
     string file_name = get_resource_file_name(rname, oname);
@@ -185,7 +185,7 @@ static FILE * open_resource_file(string rname, string oname, string what)
     return file;
 }
 
-static void close_resource_file(FILE * file, string rname, string oname)
+static void close_resource_file(FILE * file, const char* rname, const char* oname)
 {
     string file_name = get_resource_file_name(rname, oname);
     safe_fclose(file, file_name);
@@ -198,7 +198,7 @@ static void close_resource_file(FILE * file, string rname, string oname)
 #include <sys/stat.h>
 #include <unistd.h>
 
-void dbll_unlink_resource_file(string rname, string oname, bool erroriffailed)
+void dbll_unlink_resource_file(const char* rname, const char* oname, bool erroriffailed)
 {
     string full_name = get_resource_file_name(rname, oname);
     if (unlink(full_name) && erroriffailed) {
@@ -211,7 +211,7 @@ void dbll_unlink_resource_file(string rname, string oname, bool erroriffailed)
 /* returns 0 on errors (say no file).
  * otherwise returns the modification time.
  */
-static int dbll_stat_file(string file_name, bool okifnotthere)
+static int dbll_stat_file(const char* file_name, bool okifnotthere)
 {
     struct stat buf;
     int time = 0, error = stat(file_name, &buf);
@@ -230,7 +230,7 @@ static int dbll_stat_file(string file_name, bool okifnotthere)
 /* It is impportant that the workspace directory does not appear in the
  * file name so as to allow workspaces to be moveable.
  */
-int dbll_stat_local_file(string file_name, bool okifnotthere)
+int dbll_stat_local_file(const char* file_name, bool okifnotthere)
 {
     string full_name;
     int time;
@@ -244,7 +244,7 @@ int dbll_stat_local_file(string file_name, bool okifnotthere)
     return time;
 }
 
-int dbll_stat_resource_file(string rname, string oname, bool okifnotthere)
+int dbll_stat_resource_file(const char* rname, const char* oname, bool okifnotthere)
 {
     string file_name = get_resource_file_name(rname, oname);
     int time = dbll_stat_file(file_name, okifnotthere);
@@ -254,7 +254,7 @@ int dbll_stat_resource_file(string rname, string oname, bool okifnotthere)
 
 /* save rname of oname p. get the method, then apply it.
  */
-void dbll_save_resource(string rname, string oname, void * p)
+void dbll_save_resource(const char* rname, const char* oname, void * p)
 {
     methods * m;
     FILE * f;
@@ -273,7 +273,7 @@ void dbll_save_resource(string rname, string oname, void * p)
     dbll_current_module = (string) NULL;
 }
 
-void * dbll_load_resource(string rname, string oname)
+void * dbll_load_resource(const char* rname, const char* oname)
 {
     methods * m;
     FILE * f;
@@ -292,7 +292,7 @@ void * dbll_load_resource(string rname, string oname)
     return p;
 }
 
-void dbll_free_resource(string rname, string oname, void * p)
+void dbll_free_resource(const char* rname, const char* oname, void * p)
 {
     methods * m; 
     pips_debug(7, "freeing resource %s[%s] (0x%p)\n", rname, oname, p);
@@ -300,7 +300,7 @@ void dbll_free_resource(string rname, string oname, void * p)
     m->free_function(p);
 }
 
-bool dbll_check_resource(string rname, string oname, void * p)
+bool dbll_check_resource(const char* rname, const char* oname, void * p)
 {
     methods * m;
     pips_debug(7, "checking resource %s[%s] (0x%p)\n", rname, oname, p);
@@ -308,7 +308,7 @@ bool dbll_check_resource(string rname, string oname, void * p)
     return m->check_function(p);
 }
 
-bool dbll_storable_p(string rname)
+bool dbll_storable_p(const char* rname)
 {
     methods * m = get_methods(rname);
     return m->write_function!=no_write;
@@ -317,7 +317,7 @@ bool dbll_storable_p(string rname)
 
 /****************************************************** LESS BASIC INTERFACE */
 
-void dbll_save_and_free_resource(string rname, string oname, 
+void dbll_save_and_free_resource(const char* rname, const char* oname, 
 				 void * p, bool do_free)
 {
     dbll_save_resource(rname, oname, p);
@@ -325,7 +325,7 @@ void dbll_save_and_free_resource(string rname, string oname,
 }
 
 /* rather approximated. */
-bool displayable_file_p(string name)
+bool displayable_file_p(const char* name)
 {
     methods * m = get_methods(name);
     return m->write_function==writeln_string && strstr(name, "_FILE");
@@ -336,7 +336,7 @@ bool displayable_file_p(string name)
  * basically SOURCE_FILEs are given relative names with leading . or /,
  * while within the database a leading "*.database/" is always appended.
  */
-bool dbll_database_managed_file_p(string name)
+bool dbll_database_managed_file_p(const char* name)
 {
     return name[0]!='.' && name[0]!='/';
 }

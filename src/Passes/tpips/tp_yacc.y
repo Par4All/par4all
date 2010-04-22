@@ -121,7 +121,7 @@ static void set_env_log_and_free(string var, string val)
 
 /* forward.
  */
-static bool perform(bool (*)(string, string), res_or_rule *);
+static bool perform(bool (*)(const char*, const char*), res_or_rule *);
 
 static void try_to_parse_everything_just_in_case(void)
 {
@@ -134,7 +134,7 @@ static void try_to_parse_everything_just_in_case(void)
 
 /* try hard to open a module.
  */
-static bool tp_set_current_module(string name)
+static bool tp_set_current_module(const char* name)
 {
   bool ok = lazy_open_module(name);
   if (!ok)
@@ -159,7 +159,7 @@ static bool tp_set_current_module(string name)
 
 /* display a resource using $PAGER if defined and stdout on a tty.
  */
-static bool display_a_resource(string rname, string mname)
+static bool display_a_resource(const char* rname, const char* mname)
 {
     string fname, pager = getenv("PAGER");
     if (!isatty(fileno(stdout))) pager = NULL;
@@ -207,7 +207,7 @@ static bool display_a_resource(string rname, string mname)
     return TRUE;
 }
 
-static bool remove_a_resource(string rname, string mname)
+static bool remove_a_resource(const char* rname, const char* mname)
 {
     if (db_resource_p(rname, mname))
 	db_delete_resource(rname, mname);
@@ -221,7 +221,7 @@ static bool remove_a_resource(string rname, string mname)
  * which do not change the results of some analyses.
  * under the responsability of the user, obviously...
  */
-static bool touch_a_resource(string rname, string mname)
+static bool touch_a_resource(const char* rname, const char* mname)
 {
   if (db_resource_p(rname, mname))
     db_touch_resource(rname, mname);
@@ -230,7 +230,7 @@ static bool touch_a_resource(string rname, string mname)
   return true;
 }
 
-static bool just_show(string rname, string mname)
+static bool just_show(const char* rname, const char* mname)
 {
     string file;
 
@@ -254,7 +254,7 @@ static bool just_show(string rname, string mname)
 
 /* perform "what" to all resources in "res". res is freed. Several rules
 call it: display, apply. */
-static bool perform(bool (*what)(string, string), res_or_rule * res)
+static bool perform(bool (*what)(const char*, const char*), res_or_rule * res)
 {
     bool result = TRUE;
 
@@ -299,7 +299,7 @@ static bool perform(bool (*what)(string, string), res_or_rule * res)
     return result;
 }
 
-static void tp_system(string s)
+static void tp_system(const char* s)
 {
     int status;
     user_log("shell%s%s\n", (s[0]==' '|| s[0]=='\t')? "": " ", s);
@@ -319,7 +319,7 @@ static void tp_system(string s)
     }
 }
 
-static bool tp_close_the_workspace(string s)
+static bool tp_close_the_workspace(const char* s)
 {
     bool result = TRUE;
 
@@ -352,7 +352,7 @@ static bool tp_close_the_workspace(string s)
     return result;
 }
 
-static void tp_some_info(string about)
+static void tp_some_info(const char* about)
 {
     if (same_string_p(about, "workspace"))
     {

@@ -63,7 +63,7 @@
 /* returns the allocated full path name.
  * the database is added if it is relative...
  */
-static string get_view_file(string print_type, bool displayable)
+static string get_view_file(const char* print_type, bool displayable)
 {
     string module_name = db_get_current_module_name();
 
@@ -106,12 +106,12 @@ static string get_view_file(string print_type, bool displayable)
    return NULL;
 }
 
-string build_view_file(string print_type)
+string build_view_file(const char* print_type)
 {
     return get_view_file(print_type, TRUE);
 }
 
-string get_dont_build_view_file(string print_type)
+string get_dont_build_view_file(const char* print_type)
 {
     return get_view_file(print_type, FALSE);
 }

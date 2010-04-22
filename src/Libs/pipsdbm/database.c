@@ -69,12 +69,12 @@ extern bool compilation_unit_p(string); /* alas in c_syntax.h */
     "abcdefghijklmnopqrstuvwxyz" \
     FILE_SEP_STRING MODULE_SEP_STRING "_#-." )
 
-static bool simple_name_p(const string name)
+static bool simple_name_p(const char* name)
 {
     return strlen(name)==strspn(name, MODULE_NAME_CHARS);
 }
 
-static db_symbol find_or_create_db_symbol(const string name)
+static db_symbol find_or_create_db_symbol(const char* name)
 {
     db_symbol s = gen_find_tabulated(name, db_symbol_domain);
     if (!simple_name_p(name))
@@ -172,7 +172,7 @@ static string db_status_string(db_status s)
   }
 }
 
-static void dump_db_resource(string rname, string oname, db_resource r)
+static void dump_db_resource(const char* rname, const char* oname, db_resource r)
 {
   ifdebug(1)
   {
@@ -211,7 +211,7 @@ void dump_all_db_resource_status(FILE * file, string where)
 
 #define debug_db_resource(l, r, o, p) ifdebug(l) { dump_db_resource(r, o, p);}
 
-static void init_owned_resources_if_necessary(string name)
+static void init_owned_resources_if_necessary(const char* name)
 {
     db_symbol s = find_or_create_db_symbol(name);
     /* set the owner_resources in the pips_database. */
@@ -219,14 +219,14 @@ static void init_owned_resources_if_necessary(string name)
 	store_pips_database(s, make_db_owned_resources());;
 }
 
-static db_owned_resources get_db_owned_resources(string oname)
+static db_owned_resources get_db_owned_resources(const char * oname)
 {
     db_symbol o = find_or_create_db_symbol(oname);
     return bound_pips_database_p(o)?
 	load_pips_database(o): db_owned_resources_undefined;
 }
 
-static db_resource get_resource(string rname, db_owned_resources or)
+static db_resource get_resource(const char * rname, db_owned_resources or)
 {
     db_symbol rs = find_or_create_db_symbol(rname);
     db_resource r = bound_db_owned_resources_p(or, rs)?
@@ -235,7 +235,7 @@ static db_resource get_resource(string rname, db_owned_resources or)
     return r;
 }
 
-static db_resource get_db_resource(string rname, string oname)
+static db_resource get_db_resource(const char * rname, const char * oname)
 {
   db_owned_resources or;
   or = get_db_owned_resources(oname);
@@ -247,7 +247,7 @@ static db_resource get_db_resource(string rname, string oname)
   return get_resource(rname, or);
 }
 
-static db_resource get_real_db_resource(string rname, string oname)
+static db_resource get_real_db_resource(const char* rname, const char* oname)
 {
   db_resource r = get_db_resource(rname, oname);
   if (db_resource_undefined_p(r) || db_resource_required_p(r))
@@ -255,7 +255,7 @@ static db_resource get_real_db_resource(string rname, string oname)
   return r;
 }
 
-static db_resource find_or_create_db_resource(string rname, string oname)
+static db_resource find_or_create_db_resource(const char* rname, const char* oname)
 {
     db_resource r;
     db_owned_resources or;
@@ -341,7 +341,7 @@ static void db_clean_db_resources()
 
 /** Delete a resource
  */
-void db_delete_resource(string rname, string oname)
+void db_delete_resource(const char* rname, const char* oname)
 {
     db_resource r;
     db_owned_resources or;
@@ -368,7 +368,7 @@ void db_delete_resource(string rname, string oname)
 
 /* this should really be a put. Just there for upward compatibility.
  */
-bool db_update_time(string rname, string oname)
+bool db_update_time(const char* rname, const char* oname)
 {
   db_resource r;
   DB_OK;
@@ -385,13 +385,13 @@ bool db_update_time(string rname, string oname)
 typedef struct
 {
   int time;
-  string owner_name;
-  string res_name;
+  const char* owner_name;
+  const char* res_name;
 } t_tmp_result, * p_tmp_result;
 
 #define gen_DB_VOID_cons(i,l) gen_cons(i,l)
 
-static p_tmp_result make_tmp_result(int t, string on, string rn)
+static p_tmp_result make_tmp_result(int t, const char* on, const char* rn)
 {
   p_tmp_result res = (p_tmp_result) malloc(sizeof(t_tmp_result));
   res->time = t;
@@ -493,14 +493,14 @@ void db_clean_all_required_resources(void)
 /* from now on we must not know about the database internals? */
 
 /* TRUE if exists and in *ANY* state. */
-bool db_resource_required_or_available_p(string rname, string oname)
+bool db_resource_required_or_available_p(const char* rname, const char* oname)
 {
   DB_OK;
   return !db_resource_undefined_p(get_db_resource(rname, oname));
 }
 
 /* TRUE if exists and in required state. */
-bool db_resource_is_required_p(string rname, string oname)
+bool db_resource_is_required_p(const char* rname, const char* oname)
 {
   db_resource r;
   DB_OK;
@@ -512,7 +512,7 @@ bool db_resource_is_required_p(string rname, string oname)
 }
 
 /* TRUE if exists and in loaded or stored state. */
-bool db_resource_p(string rname, string oname)
+bool db_resource_p(const char* rname, const char* oname)
 {
   db_resource r;
   DB_OK;
@@ -526,7 +526,7 @@ bool db_resource_p(string rname, string oname)
 
 /* touch logical time for resource[owner], possibly behind the back of pipsdbm.
  */
-bool db_touch_resource(string rname, string oname)
+bool db_touch_resource(const char* rname, const char* oname)
 {
   db_resource r;
   DB_OK;
@@ -535,7 +535,7 @@ bool db_touch_resource(string rname, string oname)
   return true;
 }
 
-static void db_check_time(string rname, string oname, db_resource r)
+static void db_check_time(const char* rname, const char* oname, db_resource r)
 {
   pips_assert("resource is loaded",
 	      db_resource_loaded_and_stored_p(r) || db_resource_loaded_p(r));
@@ -575,7 +575,7 @@ static void db_check_time(string rname, string oname, db_resource r)
   }
 }
 
-static void db_load_resource(string rname, string oname, db_resource r)
+static void db_load_resource(const char* rname, const char* oname, db_resource r)
 {
   pips_debug(7, "loading %s[%s]\n", rname, oname);
   pips_assert("resource is stored", db_resource_stored_p(r));
@@ -591,7 +591,7 @@ static void db_load_resource(string rname, string oname, db_resource r)
   db_check_time(rname, oname, r);
 }
 
-int db_time_of_resource(string rname, string oname)
+int db_time_of_resource(const char* rname, const char* oname)
 {
   db_resource r;
   DB_OK;
@@ -615,7 +615,7 @@ int db_time_of_resource(string rname, string oname)
   return db_resource_time(r);
 }
 
-static void db_save_resource(string rname, string oname, db_resource r)
+static void db_save_resource(const char* rname, const char* oname, db_resource r)
 {
     pips_debug(7, "saving %s[%s]\n", rname, oname);
     pips_assert("resource loaded",
@@ -637,7 +637,7 @@ static void db_save_resource(string rname, string oname, db_resource r)
 }
 
 static void db_save_and_free_resource(
-    string rname, string oname, db_resource r, bool do_free)
+    const char* rname, const char* oname, db_resource r, bool do_free)
 {
     pips_debug(7, "saving%s... %s[%s]\n",
 	       do_free? " and freeing": "", rname, oname);
@@ -692,7 +692,7 @@ static void db_save_and_free_resource(
 
 /* some way to identify a resource... count be an id...
  */
-string db_get_resource_id(string rname, string oname)
+string db_get_resource_id(const char* rname, const char* oname)
 {
     return (char*) get_real_db_resource(rname, oname);
 }
@@ -743,7 +743,7 @@ string db_get_resource_id(string rname, string oname)
 
     @return an opaque pointer to the resource in memory.
  */
-string db_get_memory_resource(const string rname, const string oname, bool pure)
+string db_get_memory_resource(const char* rname, const char* oname, bool pure)
 {
     db_resource r;
     void * result;
@@ -785,7 +785,7 @@ string db_get_memory_resource(const string rname, const string oname, bool pure)
     return result;
 }
 
-void db_set_resource_as_required(string rname, string oname)
+void db_set_resource_as_required(const char* rname, const char* oname)
 {
   db_resource r;
   db_status s;
@@ -842,7 +842,7 @@ void db_set_resource_as_required(string rname, string oname)
     - If TRUE, even if a resource is valid and not marked as required,
       this function will succeed to update it.
 */
-void db_put_or_update_memory_resource(string rname, string oname,
+void db_put_or_update_memory_resource(const char* rname, const char* oname,
 				      void * p, bool update_is_ok) {
   db_resource r;
   /* Check the database coherency: */
@@ -887,7 +887,7 @@ void db_put_or_update_memory_resource(string rname, string oname,
 
 /** Delete all the resources of a given type
  */
-void db_unput_resources(string rname)
+void db_unput_resources(const char* rname)
 {
     db_symbol r;
     DB_OK;
@@ -904,7 +904,7 @@ void db_unput_resources(string rname)
 }
 
 void db_save_and_free_memory_resource_if_any
-  (string rname, string oname, bool do_free)
+  (const char* rname, const char* oname, bool do_free)
 {
     db_resource r;
     DB_OK;
@@ -934,9 +934,9 @@ void db_delete_all_resources(void)
 /* when telling the database about a module name, the module is
  * registered as a db_symbol, and it is added to the database.
  */
-static string current_module_name = NULL;
+static char* current_module_name = NULL;
 
-bool db_set_current_module_name(string name)
+bool db_set_current_module_name(const char* name)
 {
     bool ok = FALSE;
     DB_OK; pips_assert("no current module", !current_module_name);
@@ -967,7 +967,7 @@ void db_reset_current_module_name(void)
 /* delete all obsolete resources before a close.
  * return the number of resources destroyed.
  */
-int db_delete_obsolete_resources(bool (*keep_p)(string, string))
+int db_delete_obsolete_resources(bool (*keep_p)(const char*, const char*))
 {
     int ndeleted = 0;
     list /* of string */ lr = NIL, lo = NIL, lrp, lop;
