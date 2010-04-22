@@ -139,7 +139,7 @@ void init_the_buffer(void)
 /* If the string is undefined, just skip it. Well, I hope it will not hide
    some bugs by masking some deliberate string_undefined put to trigger a
    wrong assertion is some higher parts of the code... */
-string append_to_the_buffer(string s /* what to append to the buffer */)
+string append_to_the_buffer(const char* s /* what to append to the buffer */)
 {
   if (s != string_undefined)
   {
@@ -177,7 +177,7 @@ string get_the_buffer(void)
  *
  * FC.
  */
-string concatenate(string next, ...)
+string concatenate(const char* next, ...)
 {
   int count = 0;
   va_list args;
@@ -222,7 +222,7 @@ string strupper(string s1, const char* s2)
   return r;
 }
 
-string strlower(string s1, string s2)
+string strlower(string s1, const char* s2)
 {
   char *r = s1;
 
