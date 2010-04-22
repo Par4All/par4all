@@ -282,7 +282,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	i = statement_instruction(emulator);
 	instruction_block(i) = gen_nconc(instruction_block(i), 
 					 CONS(STATEMENT, 
-					      gen_copy_tree(s), NIL));
+					      copy_statement(s), NIL));
     }
      else { /* communications for variables having to be 
 	      loaded in local memories  for assignments */
@@ -302,7 +302,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	} 
 	i = statement_instruction(computational);
 	instruction_block(i) = gen_nconc(instruction_block(i), 
-					 CONS(STATEMENT, gen_copy_tree(s), NIL));
+					 CONS(STATEMENT, copy_statement(s), NIL));
 	 /* communications for variables having to be 
 	      stored in global memory  for assignments */
 	if ((lrefs = (list) GET_STATEMENT_MAPPING(store_map,s))
@@ -545,9 +545,9 @@ loop_nest_movement_generation(
 	   },
 	 fetch_data_list);
     /* update of variable names according to the module of appartenance */
-    sc_variables_rename(sc_tile,local_basis2,local_basis, entity_local_name);
+    sc_variables_rename(sc_tile,local_basis2,local_basis, (string(*)(void*))entity_local_name);
     sc_variables_rename(sc_tile, tile_basis_in_tile_basis2, 
-			tile_basis_in_tile_basis,entity_local_name);
+			tile_basis_in_tile_basis,(string(*)(void*))entity_local_name);
     MAPL(r1,{ 
 	reference rf = REFERENCE(CAR(r1));
 	entity rv = (entity) reference_variable(rf);
@@ -696,9 +696,9 @@ loop_nest_to_wp65_code(
 	    (void) fprintf(stderr,"first_parallel_level :%d, last_parallel_level %d\n",
 			   first_parallel_level,last_parallel_level);
 	    (void) fprintf(stderr,"\nLoop body basis - loop_nest:");
-	    base_fprint(stderr, loop_body_indices, entity_local_name);
+	    base_fprint(stderr, loop_body_indices, (string(*)(void*))entity_local_name);
   	    (void) fprintf(stderr,"\nInitial basis - loop_nest:");
-	    base_fprint(stderr, initial_basis, entity_local_name);
+	    base_fprint(stderr, initial_basis, (string(*)(void*))entity_local_name);
 	}
     }
 
@@ -794,10 +794,10 @@ loop_nest_to_wp65_code(
 		 ifdebug(2) {
 		     (void) fprintf(stderr,"full basis\n");
 		     base_fprint(stderr, initial_basis2, 
-				 entity_local_name);
+				 (string(*)(void*))entity_local_name);
 		     (void)  fprintf(stderr,"full iteration domain\n");
 		     sc_fprint(stderr,iteration_domain2, 
-			       entity_local_name);
+			       (string(*)(void*))entity_local_name);
 		 }
 		 create_tile_basis(module,compute_module,memory_module, loop_body_indices,
 				   &tbib2, &tbtl3, &lba3, &tbtl4, &lba4);
@@ -861,12 +861,12 @@ loop_nest_to_wp65_code(
 	    fprintf(stderr,"loop body \n");
 	    wp65_debug_print_text(module, body); 
 	    fprintf(stderr,"base_initiale 1\n");
-	    vect_fprint(stderr,initial_basis,entity_local_name);
+	    vect_fprint(stderr,initial_basis,(string(*)(void*))entity_local_name);
 	}
 	
-    sc_variables_rename(sc_tile,local_basis,local_basis2, entity_local_name);
+    sc_variables_rename(sc_tile,local_basis,local_basis2, (string(*)(void*))entity_local_name);
     sc_variables_rename(sc_tile, tile_basis_in_tile_basis, 
-			tile_basis_in_tile_basis2,entity_local_name);  
+			tile_basis_in_tile_basis2,(string(*)(void*))entity_local_name);  
 
     cb = make_compute_block(compute_module, body, offsets, r_to_llv,tile, 
 			    initial_basis, local_basis2,
@@ -937,7 +937,7 @@ loop_nest_to_wp65_code(
 	reference_list_print(store_data_list);
 	reference_list_print(store_reference_list);
     }
-    gen_map(reference_scalar_defined_p, store_data_list);
+    gen_map((gen_iter_func_t)reference_scalar_defined_p, store_data_list);
     
       MAPL(r1,{ 
 	reference rf = REFERENCE(CAR(r1));

@@ -203,6 +203,7 @@
 #include "misc.h"
 
 #include "transformer.h"
+#include "alias-classes.h"
 
 /* STATIC VARIABLES */
 

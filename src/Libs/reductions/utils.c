@@ -32,7 +32,7 @@
 
 #include "local-header.h"
 #include "semantics.h"
-
+#include "alias-classes.h"
 /******************************************************************** MISC */
 /* ??? some arrangements with words_range to print a star in this case:-)
  */

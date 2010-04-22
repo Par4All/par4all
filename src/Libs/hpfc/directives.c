@@ -427,7 +427,7 @@ handle_align_and_realign_directive(entity f,
     pips_user_assert("align sg with sg", gen_length(args)>=2);
     template = expression_to_reference(EXPRESSION(CAR(last)));
 
-    gen_map(normalize_all_expressions_of, args);
+    gen_map((gen_iter_func_t)normalize_all_expressions_of, args);
 
     if (dynamic) store_renamings(current_stmt_head(), NIL);
 
@@ -631,7 +631,7 @@ handle_distribute_and_redistribute_directive(
      */
     pips_user_assert("distribute sg with sg", gen_length(args)>=2);
     proc = expression_to_reference(EXPRESSION(CAR(last)));
-    gen_map(normalize_all_expressions_of, args);
+    gen_map((gen_iter_func_t)normalize_all_expressions_of, args);
 
     /*  calls the simple case handler.
      */
@@ -661,12 +661,12 @@ HANDLER_PROTOTYPE(unexpected)
 
 HANDLER_PROTOTYPE(processors)
 {
-    gen_map(new_processor, args); /* see new_processor */
+    gen_map((gen_iter_func_t)new_processor, args); /* see new_processor */
 }
 
 HANDLER_PROTOTYPE(template)
 {
-    gen_map(new_template, args); /* see new_template */
+    gen_map((gen_iter_func_t)new_template, args); /* see new_template */
 }
 
 HANDLER_PROTOTYPE(align)
@@ -689,7 +689,7 @@ HANDLER_PROTOTYPE(reduction)
     list /* of entity */ l = expression_list_to_entity_list(args);
     statement s;
 
-    init_ctrl_graph_travel(current_stmt_head(), gen_true);
+    init_ctrl_graph_travel(current_stmt_head(), (bool(*)(statement))gen_true);
 
     while(next_ctrl_graph_travel(&s))
     {
@@ -725,7 +725,7 @@ HANDLER_PROTOTYPE(independent)
     /*  travels thru the full control graph to find the loops
      *  and tag them as parallel.
      */
-    init_ctrl_graph_travel(current_stmt_head(), gen_true);
+    init_ctrl_graph_travel(current_stmt_head(), (bool(*)(statement))gen_true);
 
     while(next_ctrl_graph_travel(&s))
     {
@@ -777,7 +777,7 @@ HANDLER_PROTOTYPE(new)
 
 HANDLER_PROTOTYPE(dynamic)
 {
-    gen_map(new_dynamic, args); /* see new_dynamic */
+    gen_map((gen_iter_func_t)new_dynamic, args); /* see new_dynamic */
 }
 
 /*   may be used to declare functions as pure.
@@ -791,7 +791,7 @@ HANDLER_PROTOTYPE(pure)
     if (ENDP(args))
 	add_a_pure(module);
     else
-	gen_map(new_pure_function, args);
+	gen_map((gen_iter_func_t)new_pure_function, args);
 }
 
 HANDLER_PROTOTYPE(io)
@@ -800,7 +800,7 @@ HANDLER_PROTOTYPE(io)
     if (ENDP(args))
 	add_an_io_function(module);
     else
-	gen_map(new_io_function, args);
+	gen_map((gen_iter_func_t)new_io_function, args);
 }
 
 HANDLER_PROTOTYPE(fake)
@@ -809,7 +809,7 @@ HANDLER_PROTOTYPE(fake)
     if (ENDP(args))
 	add_a_fake_function(module);
     else
-	gen_map(new_fake_function, args);
+	gen_map((gen_iter_func_t)new_fake_function, args);
 }
 
 HANDLER_PROTOTYPE(realign)
@@ -1122,7 +1122,7 @@ void handle_hpf_directives(statement s, bool dyn)
 
     /* CLEAN
      */
-    gen_map(clean_statement, to_be_cleaned);
+    gen_map((gen_iter_func_t)clean_statement, to_be_cleaned);
     pips_assert("empty stack", current_stmt_empty_p());
     gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();

@@ -55,6 +55,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "misc.h"
 #include <ctype.h>
+#include <stdlib.h>
 #include "c_syntax.h"
 
 #define MAX_PACK 16
@@ -89,21 +90,25 @@ static bool expression_reference_or_field_p(expression e)
     return expression_reference_p(e) || expression_field_p(e);
 }
 
+bool simd_vector_entity_p(entity e)
+{
+    return 
+        strstr(entity_user_name(e),VECTOR_POSTFIX)
+        && type_variable_p(entity_type(e))
+        && !entity_scalar_p(e);
+    ;
+}
 /* expression is an simd vector
  * if it is a reference array
  * containing VECTOR_POSTFIX in its name
  */
 static
-bool simd_vector_p(expression e)
+bool simd_vector_expression_p(expression e)
 {
     syntax s = expression_syntax(e);
-    return 
-           syntax_reference_p(s)
-        && strstr(entity_local_name(reference_variable(syntax_reference(s))),VECTOR_POSTFIX)
-        && type_variable_p(entity_type(reference_variable(syntax_reference(s))))
-        && ! ENDP( variable_dimensions(type_variable(entity_type(reference_variable(syntax_reference(s))))))
-    ;
+    return syntax_reference_p(s) && simd_vector_entity_p(reference_variable(syntax_reference(s)));
 }
+
 
 /* a padding statement as all its expression set to 1, a constant, 
  * event the fist one, that is the lhs of the assignement */
@@ -609,7 +614,7 @@ static string get_vect_name_from_data(int argc, expression exp)
 static
 void replace_subscript(expression e)
 {
-    if( !simd_vector_p(e) && ! expression_constant_p(e) )
+    if( !simd_vector_expression_p(e) && ! expression_constant_p(e) )
     {
         if(!expression_call_p(e))
         {
@@ -991,8 +996,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, enum basic_utype b
     entity_type(str_dec) = entity_type(str_type);
 #endif
 
-    AddLocalEntityToDeclarations(new_ent,mod_ent,
-            c_module_p(mod_ent)?get_current_module_statement():statement_undefined);
+    AddEntityToCurrentModule(new_ent);
 
     return new_ent;
 }
@@ -1090,23 +1094,11 @@ static vectorElement copy_vector_element(vectorElement ve)
     return vec;
 }
 
-static string codegen_commenter(entity e)
-{
-    string s=NULL;
-    string b = basic_to_string(entity_basic(e));
-    asprintf(&s,"PIPS:SAC generated %s vector(s)", b);
-    free(b);
-    return s;
-}
-
 static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list* args)
 {
     statementInfo si;
     simdStatementInfo ssi;
     size_t nbargs;
-
-    /* use a special commnter there */
-    push_generated_variable_commenter(codegen_commenter);
 
     /* find out the number of arguments needed */
     nbargs = opcodeClass_nbArgs(kind);
@@ -1207,8 +1199,6 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
                     make_vector_element(ssi, nbargs-1, j),
                     NIL);
     }
-    pop_generated_variable_commenter();
-
     return si;
 }
 
@@ -1420,7 +1410,7 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
 }
 
 static 
-statement do_generate_load_statement(simdStatementInfo si, int line)
+statement generate_load_statement(simdStatementInfo si, int line)
 {
     list args = NIL;
     int offset = line * opcode_vectorSize(simdStatementInfo_opcode(si));
@@ -1536,54 +1526,6 @@ static bool statement_consecutive_load_p(statement s)
     return false;
 }
 
-static statement generate_load_statement(simdStatementInfo si, int line)
-{
-    if(!simdStatementInfo_commut(si) || simdStatementInfo_nbArgs(si)!=3) /* the second test is a strong assumtion: we only deal with a=b op c */
-        return do_generate_load_statement(si,line);
-    else /* we generate all the possible permutation and pick the first with a consecutive load */
-    {
-        size_t nb_alternatives = 1 << simdStatementInfo_nbArgs(si);
-        opcode oc = simdStatementInfo_opcode(si);
-        printf("###########\n");
-        statementArgument * new_args =
-            (statementArgument*)calloc(simdStatementInfo_nbArgs(si)*opcode_vectorSize(oc),sizeof(statementArgument));
-        for(size_t a=0;a<nb_alternatives;a++)
-        {
-            /* we use the binary representation of i to try all combinaison: a 1 means exchange, a 0 means do nothing */
-            for(size_t i=0;i<opcode_vectorSize(oc);i++)
-            {
-                /* first elements are unchanged */
-                new_args[i + opcode_vectorSize(oc) * 0] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 0];
-                /* second and third elements are either swapped or unchanged */
-                if( a & (1 << i) )
-                {
-                    new_args[i + opcode_vectorSize(oc) * 1] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 1];
-                    new_args[i + opcode_vectorSize(oc) * 2] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 2];
-                }
-                else
-                {
-                    new_args[i + opcode_vectorSize(oc) * 2] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 1];
-                    new_args[i + opcode_vectorSize(oc) * 1] = simdStatementInfo_arguments(si)[i + opcode_vectorSize(oc) * 2];
-                }
-            }
-                
-            simdStatementInfo new_si = make_simdStatementInfo(
-                    simdStatementInfo_opcode(si),
-                    simdStatementInfo_commut(si),
-                    simdStatementInfo_nbArgs(si),
-                    simdStatementInfo_vectors(si),
-                    new_args);
-            statement new = do_generate_load_statement(new_si,line);
-            print_statement(new);
-            if(statement_undefined_p(new) || statement_consecutive_load_p(new) )
-            {
-                *si=*new_si; /*berk berk berk */
-                return new;
-            }
-        }
-        return do_generate_load_statement(si,line);
-    }
-}
 
 static statement generate_save_statement(simdStatementInfo si)
 {
@@ -1613,6 +1555,113 @@ static statement generate_save_statement(simdStatementInfo si)
     return make_save_statement(opcode_vectorSize(simdStatementInfo_opcode(si)), args, padded);
 }
 
+static
+bool simd_optimized_layout_p(statementArgument sa0, statementArgument sa1)
+{
+    expression e0 = statementArgument_expression(sa0),
+               e1 = statementArgument_expression(sa1);
+    /* constant first */
+    if(extended_expression_constant_p(e0)) return true;
+    if(extended_expression_constant_p(e1)) return false;
+    /* then scalar */
+    if(expression_scalar_p(e0)) return true;
+    if(expression_scalar_p(e1)) return false;
+    /* we finally end with two references */
+    pips_assert("only references left\n",expression_reference_or_field_p(e0) && expression_reference_or_field_p(e1));
+    expression distance = distance_between_expression(e0,e1);
+    int val;
+    if( !expression_undefined_p(distance) && expression_integer_value(distance,&val))
+    {
+        free_expression(distance);
+        return val <= 0 ;
+    }
+    else
+    {
+        entity ent0 = expression_to_entity(e0);
+        entity ent1 = expression_to_entity(e1);
+        return compare_entities(&ent0,&ent1)<=0;
+    }
+
+}
+
+static int intsort(const void *a, const void*b)
+{
+    int A = *(int*)a;
+    int B = *(int*)b;
+    return A==B?0:A<B?-1:1; }
+
+static void simdStatementInfo_bubblesort_arguments(simdStatementInfo ssi,intptr_t sz, int distances[sz])
+{
+    int tmp[sz];
+    memcpy(&tmp[0],&distances[0],sizeof(int)*sz);
+    qsort(&tmp[0],sz,sizeof(int),intsort);
+    for(intptr_t i=1;i<sz;i++) // do nothing if some elements are equals
+        if(tmp[i]==tmp[i-1]) return;
+    statementArgument tmpargs[sz* simdStatementInfo_nbArgs(ssi)];
+    memcpy(&tmpargs[0],simdStatementInfo_arguments(ssi),sizeof(statementArgument)*sz*simdStatementInfo_nbArgs(ssi));
+    for(intptr_t i=0;i<sz;i++)
+    {
+        intptr_t new_index = ((int*)bsearch(distances+i,&tmp[0],sz,sizeof(int),intsort))-&tmp[0];
+        for(intptr_t j =0;j<simdStatementInfo_nbArgs(ssi) ; j++)
+        {
+            simdStatementInfo_arguments(ssi)[i+j*sz]= tmpargs[new_index+j*sz];
+        }
+    }
+}
+
+static
+void simd_optimize_data_layout(simdStatementInfo ssi)
+{
+    opcode oc = simdStatementInfo_opcode(ssi);
+    intptr_t sz = opcode_vectorSize(oc);
+    /* first optimization: if we have commutativity, reorder the arguments */
+    if(simdStatementInfo_commut(ssi) && simdStatementInfo_nbArgs(ssi)==3)
+    {
+        for(intptr_t i=0;i<sz;i++)
+        {
+            /* first elements are unchanged , second and third may be exchanged */
+            if(!simd_optimized_layout_p(
+                        simdStatementInfo_arguments(ssi)[i + sz * 0],
+                        simdStatementInfo_arguments(ssi)[i + sz * 1])
+              )
+            {
+                statementArgument tmp = simdStatementInfo_arguments(ssi)[i + sz * 0];
+                simdStatementInfo_arguments(ssi)[i + sz * 0]=
+                    simdStatementInfo_arguments(ssi)[i + sz * 1];
+                simdStatementInfo_arguments(ssi)[i + sz * 1]=tmp;
+            }
+        }
+    }
+    /* second optimization : if all statements are comparable, sort them accordingly */
+    for(intptr_t i = 0 ; i < simdStatementInfo_nbArgs(ssi) ; i++)
+    {
+        bool all_comparable = true;
+        int distances[sz];
+        distances[0]=0;
+        for(intptr_t j = 1 ; j < sz ; j++)
+        {
+            expression distance = distance_between_expression(
+                    statementArgument_expression(simdStatementInfo_arguments(ssi)[0+sz*i]),
+                    statementArgument_expression(simdStatementInfo_arguments(ssi)[j+sz*i])
+                    );
+            if(!expression_undefined_p(distance) && expression_integer_value(distance,distances+j))
+            {
+                free_expression(distance);
+            }
+            else
+            {
+                all_comparable = false;
+                break;
+            }
+        }
+        if(all_comparable)
+        {
+            simdStatementInfo_bubblesort_arguments(ssi,sz,distances);
+            break;
+        }
+    }
+}
+
 list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
 {
     list sl_begin; /* <statement> */
@@ -1639,6 +1688,9 @@ list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
             /* SIMD statement (will generate more than one statement) */
             int i;
             simdStatementInfo ssi = statementInfo_simd(si);
+
+            /* this phase optimizes the data layout */
+            simd_optimize_data_layout(ssi);
 
             //First, the load statement(s)
             for(i = 0; i < simdStatementInfo_nbArgs(ssi)-1; i++)

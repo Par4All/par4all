@@ -1376,7 +1376,7 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
 
 string external_statement_identification(statement s)
 {
-    char buffer;
+    string buffer;
     instruction i = statement_instruction(s);
     string instrstring = instruction_identification(i);
     int so = statement_ordering(s);

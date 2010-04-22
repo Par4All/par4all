@@ -41,6 +41,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
+#include "preprocessor.h"
 
 /* initial user file -> generated user file
  */

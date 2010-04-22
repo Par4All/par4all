@@ -66,6 +66,7 @@ typedef dg_vertex_label vertex_label;
 #include "effects-generic.h"
 #include "effects-convex.h"
 #include "top-level.h"
+#include "control.h"
 
 #include "wp65.h"
 
@@ -247,7 +248,7 @@ statement * pemulator;
     compute_module = make_empty_subroutine(compute_module_name);
 
     functional_parameters(type_functional(entity_type(compute_module)))
-	= CONS(PARAMETER, make_parameter(MakeTypeVariable(make_basic(is_basic_int,4), NIL),
+	= CONS(PARAMETER, make_parameter(MakeTypeVariable(make_basic_int(4), NIL),
 					 make_mode(is_mode_reference, UU),
 					 make_dummy_unknown()),
 	       NIL);
@@ -257,7 +258,7 @@ statement * pemulator;
 
     functional_parameters(type_functional(entity_type(memory_module)))
 	= CONS(PARAMETER, 
-	       make_parameter(MakeTypeVariable(make_basic(is_basic_int,
+	       make_parameter(MakeTypeVariable(make_basic_int(
 							  4), NIL),
 			      make_mode(is_mode_reference, UU),
 			      make_dummy_unknown()),
@@ -319,7 +320,7 @@ statement * pemulator;
 
     ifdebug(6) {
 	(void) fprintf(stderr,"Bank indices:\n");
-	vect_fprint(stderr, bank_indices, entity_local_name);
+	vect_fprint(stderr, bank_indices, (string(*)(void*))entity_local_name);
 	(void) fprintf(stderr,"Code for the computational module:\n");
 	wp65_debug_print_module(compute_module,computational);
 	(void) fprintf(stderr,"Code for the memory module:\n");

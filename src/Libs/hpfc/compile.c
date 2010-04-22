@@ -37,6 +37,7 @@
 #include "effects-convex.h"
 #include "callgraph.h"
 #include "transformations.h"
+#include "expressions.h"
 
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
@@ -314,13 +315,13 @@ init_host_and_node_entities ()
 	text t;
 	debug_on("PRETTYPRINT_DEBUG_LEVEL");
 	pips_debug(3,"new declarations - node_module:\n");
-	(void) gen_consistent_p(node_module);
+	(void) entity_consistent_p(node_module);
 	t = text_declaration(node_module);
 	print_text(stderr, t);
 	free_text(t);
 
 	pips_debug(3, "new declarations - host_module:\n");
-	(void) gen_consistent_p(host_module);
+	(void) entity_consistent_p(host_module);
 	t = text_declaration(host_module);
 	print_text(stderr, t);
 	free_text(t);
@@ -666,7 +667,7 @@ static bool invariant_expression_p(
     MAP(EFFECT, ef1,
 	MAP(EFFECT, ef2,
 	{
-	    variable v = effect_variable(ef1);
+	    entity v = effect_variable(ef1);
 	    if ((v==effect_variable(ef2) && effect_write_p(ef2)) ||
 		gen_in_list_p(v, le))
 	    {
@@ -856,10 +857,10 @@ void NormalizeCodeForHpfc(statement s)
     normalize_all_expressions_of(s);
     atomize_as_required(s, 
 			hpfc_decision,      /* reference test */
-			gen_false,          /* function call test */
-			ref_to_dist_array_p,/* test condition test */
-			gen_false,          /* range test */
-			gen_false,          /* whileloop test */
+			(bool(*)(call,expression))gen_false,          /* function call test */
+			(bool (*)(test,expression))ref_to_dist_array_p,/* test condition test */
+			(bool(*)(range,expression))gen_false,          /* range test */
+			(bool(*)(whileloop,expression))gen_false,          /* whileloop test */
 			hpfc_new_variable);
 }
 

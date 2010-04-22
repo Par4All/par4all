@@ -39,6 +39,7 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 #include "top-level.h"
+#include "preprocessor.h"
 
 #include <gtk/gtk.h>
 #include "gpips.h"
@@ -78,7 +79,7 @@ void enable_compile_selection() {
 }
 
 void notify_hpfc_file_view(GtkWidget * widget, gpointer data) {
-	char * file_name = gpips_gtk_menu_item_get_label(widget);
+	const char * file_name = gpips_gtk_menu_item_get_label(widget);
 	char * path_name = hpfc_generate_path_name_of_file_name(file_name);
 
 	(void) alloc_first_initialized_window(FALSE);
@@ -154,7 +155,8 @@ void initialize_gpips_hpfc_hack_for_fabien_and_from_fabien() {
 }
 
 void hpfc_notify(GtkWidget * menu_item, gpointer data) {
-	char *label, *modulename;
+	const char *label;
+    char *modulename;
 
 	modulename = db_get_current_module_name();
 	if (!modulename) {

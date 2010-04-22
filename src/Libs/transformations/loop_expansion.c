@@ -34,11 +34,12 @@ static void guard_expanded_statement(statement s, expression guard)
     }
     else
     {
+        statement false_branch = make_empty_statement();
         instruction ins = make_instruction_test(
                 make_test(
                     copy_expression(guard),
                     copy_statement(s),/* update_instruction force us to copy */
-                    make_empty_statement()
+                    false_branch
                     )
                 );
         update_statement_instruction(s,ins);
@@ -143,8 +144,7 @@ void do_loop_expansion(statement st, int size,int offset)
                     );
 
         /* set the guard on all statement that need it */
-        expression guard = 
-            MakeBinaryCall(
+        expression guard = MakeBinaryCall(
                     entity_intrinsic(AND_OPERATOR_NAME),
                     MakeBinaryCall(
                         entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),

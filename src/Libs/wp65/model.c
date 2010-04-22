@@ -45,6 +45,7 @@
 #include "genC.h"
 #include "misc.h"
 #include "top-level.h" /* ??? */
+#include "properties.h"
 
 void model_fprint(FILE * fd, int pn, int bn, int ls)
 {

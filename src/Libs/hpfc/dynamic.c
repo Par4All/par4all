@@ -1375,7 +1375,7 @@ static void regenerate_renamings(statement s)
 
     {
 	list /* of renaming(s) */ l = load_renamings(s);
-	gen_map(gen_free, l), gen_free_list(l); /* ??? */
+	gen_map((gen_iter_func_t)gen_free, l), gen_free_list(l); /* ??? */
 	update_renamings(s, ln);
     }
 }
@@ -1415,9 +1415,9 @@ static void dump_remapping_graph_info(statement s)
     what_stat_debug(1, s);
 
     fprintf(stderr, "predecessors: ");
-    gen_map(print_control_ordering, control_predecessors(c));
+    gen_map((gen_iter_func_t)print_control_ordering, control_predecessors(c));
     fprintf(stderr, "\nsuccessors: ");
-    gen_map(print_control_ordering, control_successors(c));
+    gen_map((gen_iter_func_t)print_control_ordering, control_successors(c));
     fprintf(stderr, "\n");
 
     elst_ifdef("remapped", remapped, s);
@@ -1434,7 +1434,7 @@ dump_remapping_graph(
     list /* of statement */ ls)
 {
     fprintf(stderr, "[dump_remapping_graph] for %s\n", when);
-    gen_map(dump_remapping_graph_info, ls);
+    gen_map((gen_iter_func_t)dump_remapping_graph_info, ls);
     fprintf(stderr, "[dump_remapping_graph] done\n");
 }
 
@@ -1473,10 +1473,10 @@ void simplify_remapping_graph(void)
 
     ifdebug(8) dump_remapping_graph("0", ls);
 
-    gen_map(initialize_reaching_propagation, ls);
-    gen_map(remove_not_remapped_leavings, ls);
-    gen_map(initialize_maybeuseful_mappings, ls);
-    gen_map(reinitialize_reaching_mappings, ls);
+    gen_map((gen_iter_func_t)initialize_reaching_propagation, ls);
+    gen_map((gen_iter_func_t)remove_not_remapped_leavings, ls);
+    gen_map((gen_iter_func_t)initialize_maybeuseful_mappings, ls);
+    gen_map((gen_iter_func_t)reinitialize_reaching_mappings, ls);
 
     ifdebug(4) dump_remapping_graph("1", ls);
 
@@ -1490,7 +1490,7 @@ void simplify_remapping_graph(void)
 
     if (bound_remapped_p(root))	remove_unused_remappings(root);
 
-    gen_map(regenerate_renamings, ls);
+    gen_map((gen_iter_func_t)regenerate_renamings, ls);
 
     gen_free_list(ls);
 }

@@ -34,7 +34,7 @@
 %token MODULE
 %token MAIN
 %token COMMON
-%token CALLEES
+%token TK_CALLEES
 %token CALLERS
 %token ALL
 %token SELECT
@@ -63,8 +63,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "linear.h"
 
 #include "genC.h"
+#include "ri.h"
 #include "database.h"
 #include "makefile.h"
 
@@ -180,7 +182,7 @@ owner:		PROGRAM
 		    /*$$ = make_owner(is_owner_common, UU);*/
 		    YYERROR;
 		}
-	|	CALLEES
+	|	TK_CALLEES
 		{ $$ = make_owner(is_owner_callees, UU); }
 	|	CALLERS
 		{ $$ = make_owner(is_owner_callers, UU); }
@@ -359,7 +361,7 @@ void add_rule(rule r)
 					     CONS(RULE, r, NIL));
 }
 
-makefile open_makefile(string name)
+makefile open_makefile(const char* name)
 {
     FILE * fd;
     char * mkf_name;

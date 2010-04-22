@@ -587,7 +587,7 @@ initialize_variable_used_map_for_current_loop_nest(
 	{
 	    i = statement_instruction(s);
 	    
-	    if (!(instruction_loop_p(i) && l==i))
+	    if (!(instruction_loop_p(i) && l==instruction_loop(i)))
 		gen_recurse(s,
 			    reference_domain,
 			    gen_true,

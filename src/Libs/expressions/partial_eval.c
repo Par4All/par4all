@@ -1463,6 +1463,19 @@ void partial_eval_statement(statement stmt)
     pips_internal_error("Bad instruction tag %d\n", instruction_tag(inst));
   }
 }
+/* to is freed, from is copied into to and then freed */
+static void assign_expression(expression to, expression from)
+{
+    /* copy from to to */
+    free_syntax(expression_syntax(to));
+    free_normalized(expression_normalized(to));
+    expression_syntax(to)=expression_syntax(from);
+    expression_normalized(to)=expression_normalized(from);
+    /* clean memory */
+    expression_syntax(from)=syntax_undefined;
+    expression_normalized(from)=normalized_undefined;
+    free_expression(from);
+}
 
 void PartialEvalExpression(expression e)
 {
@@ -1474,21 +1487,7 @@ void PartialEvalExpression(expression e)
         Pvecteur pv = normalized_linear(n);
         expression new_e = make_vecteur_expression(pv);
         if(!expression_undefined_p(new_e))
-        {
-#if 1
-            /* copy new_e to e */
-            free_syntax(expression_syntax(e));
-            free_normalized(expression_normalized(e));
-            expression_syntax(e)=expression_syntax(new_e);
-            expression_normalized(e)=expression_normalized(new_e);
-            /* clean memory */
-            expression_syntax(new_e)=syntax_undefined;
-            expression_normalized(new_e)=normalized_undefined;
-            free_expression(new_e);
-#else
-            *e=*new_e;
-#endif
-        }
+            assign_expression(e,new_e);
     }
 }
 

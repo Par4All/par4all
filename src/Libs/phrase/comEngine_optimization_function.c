@@ -66,6 +66,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 #include "comEngine.h"
+extern void print_entity_variable(entity );
 
 extern hash_table gLoopToToggleEnt;
 extern hash_table gToggleToInc;
@@ -86,7 +87,7 @@ static void opt_loop_interchange_fill_lists_stat(statement stat)
 
 static void opt_loop_interchange_fill_lists(statement stat)
 {
-  bool bIsNewLoop = (bool)hash_get(gIsNewLoop, stat);
+  void* bIsNewLoop = hash_get(gIsNewLoop, stat);
 
   if(bIsNewLoop != HASH_UNDEFINED_VALUE)
     {
@@ -351,7 +352,7 @@ static statement make_seqStat(statement stat, statement loopPattern,
 {
   statement tempStat = STATEMENT(CAR(oldCurList));
 
-  bool bIsNewLoop = (bool)hash_get(gIsNewLoop, tempStat);
+  void* bIsNewLoop = hash_get(gIsNewLoop, tempStat);
 
   if(bIsNewLoop == HASH_UNDEFINED_VALUE)
     {

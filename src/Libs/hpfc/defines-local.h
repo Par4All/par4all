@@ -83,7 +83,7 @@ void fprint_entity_list(FILE *fp, list l);
 /* list of variables...
  */
 #define add_to_list_of_vars(l, fun, n)\
-  l = gen_nconc(make_list_of_dummy_variables(fun, n), l);
+  l = gen_nconc(make_list_of_dummy_variables((entity(*)())fun, n), l);
 
 #define one_statement_unstructured(u) \
     ((control_predecessors(unstructured_control(u)) == NIL) && \
@@ -140,7 +140,7 @@ void fprint_entity_list(FILE *fp, list l);
 #define DEBUG_ELST(D, W, L)\
    GEN_DEBUG(D, W, fprint_entity_list(stderr, L); fprintf(stderr, "\n"))
 #define DEBUG_BASE(D, W, B)\
-   GEN_DEBUG(D, W, base_fprint(stderr, B, entity_local_name);\
+   GEN_DEBUG(D, W, base_fprint(stderr, B, (string(*)(Variable))entity_local_name);\
 	           fprintf(stderr, "\n"))
 
 #define what_stat_debug(level, stat)\

@@ -25,31 +25,39 @@ _pypips_la_CPPFLAGS = \
 	-I../../Libs/properties
 
 pypips_wrap.c : pypips.i pypips.h
-	$(SWIG) -python -o $@-tmp pypips.i
-	cat pypips.h $@-tmp > $@
-	rm -f $@-tmp
+	$(SWIG) -python -o pypips_wrap.c-tmp pypips.i
+	cat pypips.h pypips_wrap.c-tmp > pypips_wrap.c
+	rm -f pypips_wrap.c-tmp
 
 
 pypips.i:pypips.i.in pypips.h
-	sed -e 's/SWIG_MODULE_NAME/pypips/' $(srcdir)/pypips.i.in pypips.h > $@
+	sed -e 's/SWIG_MODULE_NAME/pypips/' $(srcdir)/pypips.i.in pypips.h > pypips.i
 
-pypips.h:pypips.c
-	$(CPROTO) $(srcdir)/pypips.c > $@
-	echo "extern char *activate(char *);" >> $@
-	echo "extern char *module_loops(const char*,const char*);" >> $@
-	echo "#include <unistd.h>" >> $@
+pypips.h:pypips.c Makefile
+	$(CPROTO) -evfc2 -E "$(CPROTO_CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c > pypips.h
+	echo "#include <unistd.h>" >> pypips.h
+	echo '#include "linear.h"' >> pypips.h
+	echo '#include "genC.h"' >> pypips.h
+	echo '#include "ri.h"' >> pypips.h
+	echo '#include "makefile.h"' >> pypips.h
+	echo '#include "text.h"' >> pypips.h
+	echo '#include "pipsmake.h"' >> pypips.h
+	echo '#include "top-level.h"' >> pypips.h
+	echo '#include "transformations.h"' >> pypips.h
+	echo "#undef _POSIX_C_SOURCE" >> pypips.h
+	echo "#undef assert" >> pypips.h
 
 pypips_aux.c:pypips.h pypips.c
-	cat pypips.h $(srcdir)/pypips.c > $@
+	cat pypips.h $(srcdir)/pypips.c > pypips_aux.c
 
 p2p_cmd= $(srcdir)/pipsmakerc2python.pl $(top_srcdir)/src/Documentation/pipsmake/pipsmake-rc.tex ../../Documentation/pipsmake/properties.rc ../../Documentation/pipsmake/pipsdep.rc
 pyps.py:$(p2p_cmd) _pyps.py 
-	sed -n -e '1,/### loop_methods/ p' $(srcdir)/_pyps.py > $@
-	$(PERL) $(p2p_cmd) -loop >> $@
-	sed -n -e '/### loop_methods/,/### module_methods/ p' $(srcdir)/_pyps.py >> $@
-	$(PERL) $(p2p_cmd) -module >> $@
-	sed -n -e '/### module_methods/,/### modules_methods/ p' $(srcdir)/_pyps.py >> $@
-	$(PERL) $(p2p_cmd) -modules >> $@
-	sed -n -e '/### modules_methods/,$$ p' $(srcdir)/_pyps.py >> $@
+	sed -n -e '1,/### loop_methods/ p' $(srcdir)/_pyps.py > pyps.py
+	$(PERL) $(p2p_cmd) -loop >> pyps.py
+	sed -n -e '/### loop_methods/,/### module_methods/ p' $(srcdir)/_pyps.py >> pyps.py
+	$(PERL) $(p2p_cmd) -module >> pyps.py
+	sed -n -e '/### module_methods/,/### modules_methods/ p' $(srcdir)/_pyps.py >> pyps.py
+	$(PERL) $(p2p_cmd) -modules >> pyps.py
+	sed -n -e '/### modules_methods/,$$ p' $(srcdir)/_pyps.py >> pyps.py
 
 CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h

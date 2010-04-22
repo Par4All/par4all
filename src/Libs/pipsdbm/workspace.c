@@ -43,7 +43,7 @@
 #define WORKSPACE_NAME_CHARS \
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
-bool workspace_name_p(string name)
+bool workspace_name_p(const char* name)
 {
     return strlen(name)==strspn(name, WORKSPACE_NAME_CHARS);
 }
@@ -57,7 +57,7 @@ bool workspace_name_p(string name)
  */
 static string current_workspace_name = NULL;
 
-static void db_set_current_workspace_name(string name)
+static void db_set_current_workspace_name(const char* name)
 {
     if (current_workspace_name)
 	pips_internal_error("current workspace %s not closed\n", 
@@ -85,7 +85,7 @@ string db_get_current_workspace_name(void)
 }
 
 /* returns an allocated string. */
-string db_get_workspace_directory_name(string name)
+string db_get_workspace_directory_name(const char* name)
 {
     return strdup(concatenate("./", name, ".database", NULL)); 
 }
@@ -259,7 +259,7 @@ static bool load_meta_data(void)
 
 /**************************************************************** MANAGEMENT */
 
-bool workspace_exists_p(string name)
+bool workspace_exists_p(const char* name)
 {
     string full_name = db_get_workspace_directory_name(name);
     bool result = directory_exists_p(full_name);
@@ -267,7 +267,7 @@ bool workspace_exists_p(string name)
     return result;
 }
 
-bool workspace_ok_p(string name)
+bool workspace_ok_p(const char* name)
 {
     string full_name = db_get_workspace_directory_name(name);
     bool result = file_readable_p(full_name);
@@ -275,7 +275,7 @@ bool workspace_ok_p(string name)
     return result;
 }
 
-bool db_create_workspace(string name)
+bool db_create_workspace(const char* name)
 {
     bool ok;
     string dir_name;
@@ -371,7 +371,7 @@ bool db_close_workspace(bool is_quit)
     return TRUE;
 }
 
-bool db_open_workspace(string name)
+bool db_open_workspace(const char* name)
 {
     bool ok = TRUE;
     string dir_name;

@@ -920,7 +920,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	    int n = gen_array_nitems($2), i=0;
 	    bool saved_tpips_is_interactive = tpips_is_interactive;
 	    tpips_is_interactive = FALSE;
-	    CATCH(user_error)
+	    CATCH(user_exception_error)
 	    {
 	      /* cleanup */
 	      gen_array_full_free($2);
@@ -955,7 +955,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	      gen_array_full_free($2);
 	      tpips_set_line_to_parse(""); /* humm... */
 	      tpips_is_interactive = saved_tpips_is_interactive;
-	      UNCATCH(user_error);
+	      UNCATCH(user_exception_error);
 	    }
 	}
 

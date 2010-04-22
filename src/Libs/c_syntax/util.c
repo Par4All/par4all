@@ -2023,11 +2023,11 @@ void SubstituteDummyParameters(entity f, list el)
       remove_entity_type_stack(v);
 
       /* Inherit any attribute you can */
-      if(!type_undefined_p(v))
+      if(!type_undefined_p(entity_type(v)))
 	entity_type(nv) = copy_type(entity_type(v));
-      if(!value_undefined_p(v))
+      if(!value_undefined_p(entity_initial(v)))
 	entity_initial(nv) = copy_value(entity_initial(v));
-      if(!storage_undefined_p(v))
+      if(!storage_undefined_p(entity_storage(v)))
 	entity_storage(nv) = copy_storage(entity_storage(v));
     }
   }

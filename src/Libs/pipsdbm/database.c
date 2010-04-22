@@ -1019,7 +1019,7 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
  * this name. The table may be created when resources are marked as
  * required by pipsmake, and is never destroyed?
  */
-bool db_module_exists_p(string name)
+bool db_module_exists_p(const char* name)
 {
   bool ok = FALSE;
 
