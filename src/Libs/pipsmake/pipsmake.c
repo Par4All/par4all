@@ -82,7 +82,7 @@
 #include "properties.h"
 #include "pipsmake.h"
 
-static bool catch_user_error(bool (*f)(const char *), const char* rname, const char* oname)
+static bool catch_user_error(bool (*f)(char *), string rname, string oname)
 {
     bool success = FALSE;
 
@@ -103,7 +103,7 @@ static bool catch_user_error(bool (*f)(const char *), const char* rname, const c
     return success;
 }
 
-static bool (*get_builder(const char* name))(const char *)
+static bool (*get_builder(string name))(char *)
 {
     struct builder_map * pbm;
     for (pbm = builder_maps; pbm->builder_name; pbm++)
@@ -219,7 +219,7 @@ void reset_static_phase_variables()
    synthesized module codes would be located.
 
   */
-string compilation_unit_of_module(const char* module_name)
+string compilation_unit_of_module(string module_name)
 {
   /* Should only be called for C modules. */
   string compilation_unit_name = string_undefined;
@@ -248,7 +248,7 @@ string compilation_unit_of_module(const char* module_name)
  *
  * In spite of the name, no resource is actually built.
  */
-static list build_real_resources(const char* oname, list lvr)
+static list build_real_resources(string oname, list lvr)
 {
     list pvr, result = NIL;
 
@@ -411,7 +411,7 @@ static list build_real_resources(const char* oname, list lvr)
     return gen_nreverse(result);
 }
 
-static void update_preserved_resources(const char* oname, rule ru)
+static void update_preserved_resources(string oname, rule ru)
 {
     list reals;
 
@@ -443,7 +443,7 @@ static void update_preserved_resources(const char* oname, rule ru)
     gen_full_free_list (reals);
 }
 
-static bool apply_a_rule(const char* oname, rule ru)
+static bool apply_a_rule(string oname, rule ru)
 {
     static int number_of_applications_of_a_rule = 0;
     static bool checkpoint_workspace_being_done = FALSE;
@@ -454,7 +454,7 @@ static bool apply_a_rule(const char* oname, rule ru)
 	 print_timing_p = get_bool_property("LOG_TIMINGS"),
 	 print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE"),
 	 check_res_use_p = get_bool_property("CHECK_RESOURCE_USAGE");
-    bool (*builder) (const char*) = get_builder(run);
+    bool (*builder) (char*) = get_builder(run);
     int frequency = get_int_property("PIPSMAKE_CHECKPOINTS");
     list lrp;
 
@@ -560,7 +560,7 @@ static bool apply_a_rule(const char* oname, rule ru)
 /* This function returns the active rule to produce resource rname. It
    selects the first active rule in the database which produces the
    resource but does not use/require it.  */
-rule find_rule_by_resource(const char* rname)
+rule find_rule_by_resource(string rname)
 {
     makefile m = parse_makefile();
 
@@ -614,7 +614,7 @@ rule find_rule_by_resource(const char* rname)
 }
 
 /* Always returns a defined rule */
-static rule safe_find_rule_by_resource(const char* rname)
+static rule safe_find_rule_by_resource(string rname)
 {
   rule ru = rule_undefined;
 
@@ -626,8 +626,8 @@ static rule safe_find_rule_by_resource(const char* rname)
   return ru;
 }
 
-static bool make_pre_transformation(const char*, rule);
-static bool make_required(const char*, rule);
+static bool make_pre_transformation(string, rule);
+static bool make_required(string, rule);
 
 /* Apply do NOT activate the rule applied. 
  * In the case of an interprocedural rule, the rules applied to the
@@ -639,8 +639,8 @@ static bool make_required(const char*, rule);
  * that it requires (no transitive closure) --DB 8/96
  */
 static bool apply_without_reseting_up_to_date_resources(
-    const char* pname, 
-    const char* oname)
+    string pname, 
+    string oname)
 {
     rule ru;
 
@@ -664,7 +664,7 @@ static bool apply_without_reseting_up_to_date_resources(
 
 /* compute all pre-transformations to apply a rule on an object 
  */
-static bool make_pre_transformation(const char* oname, rule ru)
+static bool make_pre_transformation(string oname, rule ru)
 {
     list reals;
     bool success_p = TRUE;
@@ -714,7 +714,7 @@ static bool make_pre_transformation(const char* oname, rule ru)
     return TRUE;
 }
 
-static bool make(const char* rname, const char* oname)
+static bool make(string rname, string oname)
 {
     bool success_p = TRUE;
 
@@ -740,7 +740,7 @@ static bool make(const char* rname, const char* oname)
 }
 
 /* recursive make resource. Should be static, but FI needs it from callgraph.c */
-bool rmake(const char* rname, const char* oname)
+bool rmake(string rname, string oname)
 {
     rule ru;
     char * res = NULL;
@@ -836,7 +836,7 @@ bool rmake(const char* rname, const char* oname)
 }
 
 
-static bool apply(const char* pname, const char* oname)
+static bool apply(string pname, string oname)
 {
     bool success_p = TRUE;
 
@@ -857,7 +857,7 @@ static bool apply(const char* pname, const char* oname)
 
 
 static bool concurrent_apply(
-    const char* pname,       /* phase to be applied */
+    string pname,       /* phase to be applied */
     gen_array_t modules /* modules that must be computed */)
 {
     bool okay = TRUE;
@@ -898,7 +898,7 @@ static bool concurrent_apply(
 }
 
 /* compute all resources needed to apply a rule on an object */
-static bool make_required(const char* oname, rule ru)
+static bool make_required(string oname, rule ru)
 {
     list reals;
     bool success_p = TRUE;
@@ -934,7 +934,7 @@ static bool make_required(const char* oname, rule ru)
 
 /* returns whether resource is up to date.
  */
-static bool check_physical_resource_up_to_date(const char* rname, const char* oname)
+static bool check_physical_resource_up_to_date(string rname, string oname)
 {
   list real_required_resources = NIL;
   list real_modified_resources = NIL;
@@ -1136,14 +1136,14 @@ void delete_some_resources(void)
 /* To be used in a rule. use and update the up_to_dat list
  * created by makeapply 
  */
-bool check_resource_up_to_date(const char* rname, const char* oname)
+bool check_resource_up_to_date(string rname, string oname)
 {
     return db_resource_p(rname, oname)?
 	check_physical_resource_up_to_date(rname, oname): FALSE;
 }
 
 /* Delete from up_to_date all the resources of a given name */
-void delete_named_resources (const char* rn)
+void delete_named_resources (string rn)
 {
     /* GO 29/6/95: many lines ...
        db_unput_resources_verbose (rn);*/
@@ -1211,7 +1211,7 @@ string get_first_main_module(void)
 
 /* check the usage of resources 
  */
-void do_resource_usage_check(const char* oname, rule ru)
+void do_resource_usage_check(string oname, rule ru)
 {
     list reals;
     set res_read = set_undefined;
@@ -1312,11 +1312,11 @@ static void logs_off(void)
 }
 
 static bool safe_do_something(
-    const char* name,
-    const char* module_n,
-    const char* what_it_is,
-    rule (*find_rule)(const char*),
-    bool (*doit)(const char*,const char*))
+    string name,
+    string module_n,
+    string what_it_is,
+    rule (*find_rule)(string),
+    bool (*doit)(string,string))
 {
     bool success = FALSE;
 
@@ -1371,20 +1371,20 @@ static bool safe_do_something(
     return success;
 }
 
-bool safe_make(const char* res_n, const char* module_n)
+bool safe_make(string res_n, string module_n)
 {
     return safe_do_something(res_n, module_n, "resource",
 			     find_rule_by_resource, make);
 }
 
-bool safe_apply(const char* phase_n, const char* module_n)
+bool safe_apply(string phase_n, string module_n)
 {
     return safe_do_something(phase_n, module_n, "phase/rule",
 			     find_rule_by_phase, apply);
 }
 
 bool safe_concurrent_apply(
-    const char* phase_n,
+    string phase_n,
     gen_array_t modules)
 {
     bool ok = TRUE;

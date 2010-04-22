@@ -214,7 +214,7 @@ void yyerror(char * s)
 }
 
 void 
-fprint_virtual_resources(FILE *fd, const char* dir, list lrv)
+fprint_virtual_resources(FILE *fd, string dir, list lrv)
 {
     MAP(VIRTUAL_RESOURCE, vr,
     {
@@ -290,7 +290,7 @@ parse_makefile(void)
 
 
 /* this function returns the rule that defines builder pname */
-rule find_rule_by_phase(const char* pname)
+rule find_rule_by_phase(string pname)
 {
     makefile m = parse_makefile();
 
@@ -392,7 +392,7 @@ makefile open_makefile(const char* name)
 }
 
 void 
-save_makefile(const char* name)
+save_makefile(string name)
 {
     char * mkf_name = build_pgm_makefile(name);
     FILE * fd = safe_fopen(mkf_name, "w");
@@ -403,7 +403,7 @@ save_makefile(const char* name)
 }
 
 bool 
-close_makefile(const char* name)
+close_makefile(string name)
 {
     save_makefile(name);
     free_makefile(pipsmakefile), pipsmakefile = makefile_undefined;
