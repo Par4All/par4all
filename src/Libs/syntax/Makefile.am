@@ -45,4 +45,5 @@ tokyacc.h: warning.h f77keywords f77symboles Makefile
 	} > $@
 
 include $(srcdir)/../pipslibs_includes.mk
-CLEANFILES=keywtbl.h syn_yacc.h syn_yacc.c tokyacc.h syn_yacc.y
+CLEANFILES=keywtbl.h syn_yacc.h syn_yacc.c tokyacc.h syn_yacc.y scanner.c XXXXXX.c
+

@@ -1,6 +1,6 @@
 TARGET	= preprocessor
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h splitc.h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libpreprocessor.la
 libpreprocessor_la_SOURCES=\
@@ -16,7 +16,6 @@ libpreprocessor_la_SOURCES=\
 AM_YFLAGS=-d -p splitc_
 AM_LFLAGS=-p splitc_
 
-# additionnal dep needed for // build
-lexer.c:splitc.h
+CLEANFILES=splitc.[ch] lexer.c
 
 include $(srcdir)/../pipslibs_includes.mk

@@ -12,5 +12,6 @@ libsac_la_SOURCES=\
 AM_YFLAGS=-d -p patterns_yy
 AM_LFLAGS=-p patterns_yy
 dist_sysconf_DATA=patterns.def
+CLEANFILES=lexer.c patterns.[ch]
 
 include $(srcdir)/../pipslibs_includes.mk

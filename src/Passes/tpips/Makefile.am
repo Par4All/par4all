@@ -29,7 +29,7 @@ completion_list.h :	\
 		../../Documentation/pipsmake/properties.rc \
 		> $@
 
-BUILT_SOURCES=$(TARGET).h revisions.h completion_list.h
+BUILT_SOURCES=$(TARGET).h revisions.h completion_list.h tp_yacc.h
 AM_CPPFLAGS=\
 	$(READLINE_CFLAGS) $(TERMCAP_CFLAGS)\
 	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
@@ -50,8 +50,6 @@ AM_CPPFLAGS=\
 	-DNLPMAKE_REV='"unknown"' \
 	-DCC_VERSION='"unknown"'
 
-# additionnal dep needed for // build
-tp_lex.c:tp_yacc.h
-	
 include $(top_srcdir)/makes/cproto.mk
 DISTCLEANFILES=completion_list.h revisions.h
+CLEANFILES=tp_yacc.[ch] tp_lex.c
