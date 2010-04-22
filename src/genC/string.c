@@ -207,7 +207,7 @@ string concatenate(string next, ...)
   return buffer;
 }
 
-string strupper(string s1, string s2)
+string strupper(string s1, const char* s2)
 {
   char *r = s1;
 

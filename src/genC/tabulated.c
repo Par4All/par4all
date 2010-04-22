@@ -206,13 +206,13 @@ static void gen_delete_tabulated_name(gen_chunk * obj)
   // free(okey);
 }
 
-static _int gen_get_tabulated_name_basic(int domain, char * id)
+static _int gen_get_tabulated_name_basic(int domain, const char * id)
 {
   gen_tabulated_p gtp = get_tabulated_from_domain(domain);
   return (_int) hash_get(gtp->names, id);
 }
 
-void * gen_find_tabulated(char * key, int domain)
+void * gen_find_tabulated(const char * key, int domain)
 {
   _int number = gen_get_tabulated_name_basic(domain, key);
 
