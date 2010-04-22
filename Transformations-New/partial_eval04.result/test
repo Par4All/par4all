@@ -1,0 +1,54 @@
+
+"foo" file
+
+int foo(int i)
+{
+   int j;
+   int n;
+
+   j = n*i-n*i;
+   j = n*i-i*n;
+   return j;
+}
+
+"foo" file with preconditions
+
+
+//  P() {}
+
+int foo(int i)
+{
+
+//  P() {}
+
+   int j;
+
+//  P() {}
+
+   int n;
+
+//  P() {}
+
+
+   j = n*i-n*i;
+
+//  P(j) {}
+
+   j = n*i-i*n;
+
+//  P(j) {}
+
+   return j;
+}
+
+"foo" file after partial evaluation
+
+int foo(int i)
+{
+   int j;
+   int n;
+
+   j = 0;
+   j = n*i-i*n;
+   return j;
+}
