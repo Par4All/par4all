@@ -653,7 +653,6 @@ static bool simd_simple_sequence_filter(statement s)
     return ! ( instruction_call_p( statement_instruction(s) ) ) ;
 }
 
-extern string simd_vector_entity_p(entity);
 string sac_commenter(entity e)
 {
     if(simd_vector_entity_p(e))
