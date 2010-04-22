@@ -28,10 +28,10 @@ dist_noinst_DATA = patch-4.4.3.diff patch-4.4.2.diff patch-4.4.1.diff src/gfc2pi
 include Makefile.mk
 
 build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
-	rsync --exclude=.svn -av $(srcdir)/src/ gcc-$(GCC_VERSION)/gcc/fortran/
-	$(MAKE) "GFC2PIPS-AUTOTOOL-MAKEFILE=-autotools" "pipssrcdir=$(srcdir)" "NEWGENLIBS_CFLAGS=$(NEWGENLIBS_CFLAGS)" "LINEARLIBS_CFLAGS=$(LINEARLIBS_CFLAGS)" "PIPSLIBS_CFLAGS=$(PIPSLIBS_CFLAGS)" "NEWGENLIBS_LIBS=$(NEWGENLIBS_LIBS)" "LINEARLIBS_LIBS=$(LINEARLIBS_LIBS)" -C build/$(GCC_VERSION)/gcc f951
+	rsync --exclude=.svn -av $(srcdir)/src/ gcc-$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/fortran/
+	$(MAKE) "GFC2PIPS-AUTOTOOL-MAKEFILE=-autotools" "pipssrcdir=$(srcdir)" "NEWGENLIBS_CFLAGS=$(NEWGENLIBS_CFLAGS)" "LINEARLIBS_CFLAGS=$(LINEARLIBS_CFLAGS)" "PIPSLIBS_CFLAGS=$(PIPSLIBS_CFLAGS)" "NEWGENLIBS_LIBS=$(NEWGENLIBS_LIBS)" "LINEARLIBS_LIBS=$(LINEARLIBS_LIBS)" -C build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc f951
 
 
 f951: build
-	cp build/$(GCC_VERSION)/gcc/f951 ./
+	cp build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/f951 ./
 
