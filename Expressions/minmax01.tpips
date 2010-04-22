@@ -1,0 +1,9 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="minmax01"
+delete $WS
+create $WS $WS.c
+
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WS
