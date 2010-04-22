@@ -493,14 +493,15 @@ language workspace_language(gen_array_t files)
     }
   }
 
-  if(n_fortran>0 && n_fortran95==0 && n_c==0)
+  if(n_fortran>0 && n_fortran95==0 && n_c==0) {
     l = make_language_fortran();
-  if(n_fortran==0 && n_fortran95>0 && n_c==0)
+  } else if(n_fortran==0 && n_fortran95>0 && n_c==0) {
     l = make_language_fortran95();
-  else if(n_fortran==0 && n_fortran95==0 && n_c>0)
+  } else if(n_fortran==0 && n_fortran95==0 && n_c>0) {
     l = make_language_c();
-  else
+  } else {
     l = make_language_unknown();
+  }
 
   return l;
 }
