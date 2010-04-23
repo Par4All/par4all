@@ -7,7 +7,7 @@
 # The PIPS modules:
 PIPS_MODULES="linear newgen nlpmake pips validation"
 #PIPS_MODULES=nlpmake
-P4A_PACKAGES="$PIPS_MODULES polylib"
+P4A_PACKAGES="$PIPS_MODULES polylib gcc-gfc"
 
 # All the suffix to have a standard branch infrastructure:
 P4A_BRANCH_SUFFIX="$P4A_PACKAGES packages own"
@@ -241,7 +241,8 @@ function do_branch_action() {
 function do_add_remotes() {
     verb 1 "Entering add_svn_remote_path"
     enforce_P4A_TOP
-    stop_on_error
+    # No stop_on_error since if we did a clone we may have already some
+    # tracking branches
     (
 	cd $P4A_ROOT
 	for i in $PIPS_MODULES; do

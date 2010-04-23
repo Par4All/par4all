@@ -107,8 +107,9 @@ the compilation. The most important one are \texttt{CFLAGS} and
 \begin{verbatim}
 export CFLAGS='-ggdb -g3 -Wall -std=c99'
 \end{verbatim}
-are good debugging options that allow \texttt{gdb} to access macro
-definitions that are heavily used in \Apips.
+are good debugging options (to set \emph{before} using the \Aautotools,
+that is, \emph{before} using \verb|p4a_setup|) that allow \texttt{gdb} to
+access macro definitions that are heavily used in \Apips.
 
 You can pass some options to \verb|src/dev/p4a_setup| to modify the
 installation process:
@@ -371,12 +372,12 @@ If you want to begin from this \texttt{p4a} your own branch infrastructure
 attached to the main \verb|p4a|-prefixed branch infrastructure, you have
 to do a:
 \begin{verbatim}
-p4a_git --merge-prefix-branches p4a-very-personal
+p4a_git --merge-remote-branches p4a-very-personal
 \end{verbatim}
 
 If you want to start from the \texttt{p4a-0.2-alpha}, use a
 \begin{verbatim}
-p4a_git --merge-prefix-branches p4a-very-personal p4a-0.2-alpha
+p4a_git --merge-remote-branches p4a-very-personal p4a-0.2-alpha
 \end{verbatim}
 
 When you are happy with this version, you can push these branches for
@@ -385,11 +386,57 @@ sharing or merge them into the main \Apfa \texttt{p4a} with
 p4a_git --branch-action git push origin p4a-very-personal\$suffix
 \end{verbatim}
 
+To push the official version, just use a:
+\begin{verbatim}
+p4a_git --branch-action git push origin p4a\$suffix
+\end{verbatim}
+
 An example to set up all the tracking branches for version
 \texttt{p4a-0.2-alpha} before you can use them:
 \begin{verbatim}
 p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
         remotes/origin/p4a-0.2-alpha\$suffix
+\end{verbatim}
+\texttt{}
+If you want to develop and try a new version of the scripts dealing with
+the \Apfa infrastructure itself such as \verb|p4a_setup|, it becomes
+really tricky since it change the branch when executing and the script
+itself may disappear during it execution since it not committed into the
+final branch\footnote{It is really a case where it cuts the branch it sits
+on. \smiley}.
+
+To test this, you can first clone the repository into a new one into the
+\verb|$P4A_TOP| %$
+directory. Then set \verb|P4A_ROOT| to the new repository,
+and may be even \verb|P4A_TOP| to a new world if you really want to do
+quite independent stuff. You set \verb|P4A_ETC| to point to the directory
+where the \verb|p4a_git_lib.bash| you want to use is. Then you can execute
+the \verb|p4a_setup| you are working on to do some action to the new
+sand-box repository working copy.
+
+Example to test the merge and build process into a new \texttt{p5}
+repository from an old \texttt{par4all} one you want to test before
+pushing all the stuff:
+\begin{verbatim}
+cd $P4A_TOP
+git clone par4all p5
+export P4A_ROOT=$P4A_TOP/p5
+export P4A_ETC=$P4A_TOP/par4all/src/dev
+$P4A_TOP/par4all/src/dev/p4a_git --add-remotes
+# To recreate the tracking branches:
+$P4A_TOP/par4all/src/dev/p4a_git --merge-remote-branches p4a remotes/origin/p4a
+# Update the svn-git gateways:
+$P4A_TOP/par4all/src/dev/p4a_git --update-git-svn
+# Get the content of svn-git gateways:
+$P4A_TOP/par4all/src/dev/p4a_git --fetch-remote-git
+# Merge all the component branches into the p4a branch:
+$P4A_TOP/par4all/src/dev/p4a_git --pull-remote-git
+# Build all the infrastructure:
+$P4A_TOP/par4all/src/dev/p4a_setup
+# Source the new environment. Be carefull, it override the P4A_ETC
+# variable above:
+source $P4A_ROOT/run/etc/par4all-rc.sh
+# Just try it now...
 \end{verbatim}
 
 
@@ -520,9 +567,25 @@ rollback.
 \subsection{PIPS-GFC extension workflow}
 \label{sec:pips-gfc-workflow}
 
-This part is into the \texttt{package/pips-gfc} directory. It contains
-plain \Agcc core and Fortran 4.4.1 distribution, pointed by the branch
-\texttt{gcc-4.4.1}
+\subsubsection{New version}
+\label{sec:new-version}
+
+In the work of Mehdi, \textsc{Amini}, the branch
+\texttt{p4a-gcc-gfc-4.4.3} contains the sources of \Agcc-\Agfc 4.4.3 to
+get the Fortran~95. Then the branch is named also \texttt{p4a-gcc-gfc}
+which is merged into \texttt{p4a-packages}.
+
+During \Apfa construction, these sources are patched and compiled into the
+\Apips Fortran~95 parser.
+
+
+\subsubsection{Old version}
+\label{sec:new-version}
+
+
+This part from Raphaël \textsc{Roosz}is into the \texttt{package/pips-gfc}
+directory. It contains plain \Agcc core and Fortran 4.4.1 distribution,
+pointed by the branch \texttt{gcc-4.4.1}
 
 The development of \Apipsgfc should be done in the branch
 \texttt{pips-gfc-4.4.1} and this branch should be merged with the
