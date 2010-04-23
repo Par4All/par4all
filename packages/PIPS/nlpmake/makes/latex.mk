@@ -12,5 +12,5 @@ SUFFIXES=.tex .pdf .eps .idraw
 	TEXINPUTS=`$(KPSEPATH) tex`:$(builddir):$(srcdir) $(PDFLATEX) $<
 
 clean-local:
-	$(RM) *.aux  *.idx  *.log  *.out *.toc *.brf
+	rm -f *.aux  *.idx  *.log  *.out *.toc *.brf
 DISTCLEANFILES=$(doc_DATA)

@@ -16,13 +16,13 @@ $(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES) $(srcdir)/Makefile.a
 	{ \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
       	echo "/* Warning! Do not modify this file that is automatically generated! */"; \
-      	echo "/* Modify src/Libs/$(TARGET)/$(TARGET)-local.h instead, to add your own modifications. */"; \
+      	echo "/* Modify $(srcdir)/$(TARGET)-local.h instead, to add your own modifications. */"; \
       	echo ""; \
       	echo "/* header file built by $(CPROTO) */"; \
       	echo ""; \
       	echo "#ifndef $${guard}";\
       	echo "#define $${guard}";\
-      	cat `( test -f $(TARGET)-local.h && echo $(TARGET)-local.h ) || echo $(srcdir)/$(TARGET)-local.h ` ;\
+      	cat $(srcdir)/$(TARGET)-local.h ;\
 		for s in $$SOURCES ; do \
 			$(CPROTO) -evcf2 -O /dev/null -E "$(CPROTO_CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$s ;\
 		done ; \
@@ -33,9 +33,6 @@ $(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES) $(srcdir)/Makefile.a
 # and so do not trigger rebuild of all files including the header
 $(TARGET).h:$(CPROTO_STAMP_FILE)
 	cmp -s $(TARGET).h $(CPROTO_STAMP_FILE) || cp $(CPROTO_STAMP_FILE) $(TARGET).h
-
-$(TARGET)-local.h:
-	touch $@
 
 clean-local:
 	rm -f $(TARGET).h $(CPROTO_STAMP_FILE)
