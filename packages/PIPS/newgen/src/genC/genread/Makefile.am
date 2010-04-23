@@ -4,5 +4,5 @@ AM_YFLAGS=-d -p genread_
 AM_LFLAGS=-p genread_
 AM_CPPFLAGS=-I$(srcdir)/.. -I..
 
-# additionnal dep needed for // build
-genread_lex.c:genread.h
+BUILT_SOURCES=genread.h
+CLEANFILES=genread*
