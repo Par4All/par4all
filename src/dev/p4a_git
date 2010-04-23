@@ -126,7 +126,7 @@ if [[ $pull_remote_git ]]; then
 fi
 
 if [[ -n $merge_to_prefix_branches ]]; then
-    do_merge_remote_branches $merge_to_prefix_branches $merge_from_prefix_branches
+    do_merge_remote_branches $merge_to_prefix_branches $merge_remote_git_prefix
 fi
 
 if [[ -n $branch_action ]]; then
