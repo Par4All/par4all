@@ -3762,13 +3762,13 @@ find_last_statement(statement s)
 
     pips_assert("statement is defined", !statement_undefined_p(s));
 
-    if(block_statement_p(s)) {
+    if(statement_sequence_p(s)) {
 	list ls = instruction_block(statement_instruction(s));
 
 	last = (ENDP(ls)? statement_undefined : STATEMENT(CAR(gen_last(ls))));
     }
-    else if(unstructured_statement_p(s)) {
-	unstructured u = instruction_unstructured(statement_instruction(s));
+    else if(statement_unstructured_p(s)) {
+	unstructured u = statement_unstructured(s);
 	list trail = unstructured_to_trail(u);
 
 	last = control_statement(CONTROL(CAR(trail)));
@@ -3789,13 +3789,13 @@ find_last_statement(statement s)
 
     /* recursive call */
     if(!statement_undefined_p(last)
-       && (block_statement_p(last) || unstructured_statement_p(last))) {
+       && (statement_sequence_p(last) || statement_unstructured_p(last))) {
 	last = find_last_statement(last);
     }
 
     /* Too many program transformations and syntheses violate the following assert */
     if(!(statement_undefined_p(last)
-	 || !block_statement_p(s)
+	 || !statement_sequence_p(s)
 	 || return_statement_p(last))) {
       if (prettyprint_is_fortran) /* to avoid this warning for C, is it right for C ?*/
 	{
@@ -3807,7 +3807,7 @@ find_last_statement(statement s)
     /* I had a lot of trouble writing the condition for this assert... */
     pips_assert("Last statement is either undefined or a call to return",
 	 statement_undefined_p(last) /* let's give up: it's always safe */
-     || !block_statement_p(s) /* not a block: any kind of statement... */
+     || !statement_sequence_p(s) /* not a block: any kind of statement... */
 		|| return_statement_p(last)); /* if a block, then a return */
 
     return last;

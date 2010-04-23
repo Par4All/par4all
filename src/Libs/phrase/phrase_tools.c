@@ -401,17 +401,6 @@ statement make_assignement_statement (entity a_variable,
 				     stat);
 }
 
-/**
- * Return unstructured for a statement asserting that this one
- * represent an unstructured
- */
-unstructured statement_unstructured (statement stat)
-{
-  pips_assert("Statement is UNSTRUCTURED",
-	      instruction_tag(statement_instruction(stat))
-	      == is_instruction_unstructured);
-  return instruction_unstructured(statement_instruction(stat));
-}
 
 /**
  * Special function made for Ronan Keryell who likes a lot
