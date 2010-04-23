@@ -1,0 +1,19 @@
+original code
+int main()
+{
+   int a, b, c;
+   a = b = c = 1;
+   printf("%d-%d-%d", a, b, c);
+}
+atomized code
+int main()
+{
+   int a, b, c;
+   //PIPS generated variable
+   int I_0;
+   I_0 = c = 1;
+   a = b = I_0;
+   printf("%d-%d-%d", a, b, c);
+}
+ok
+

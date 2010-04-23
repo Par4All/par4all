@@ -185,7 +185,7 @@ list lcontent, lneighbour, ldomain;
 	lm = CONS(MESSAGE,
 		  make_message(array,
 			       CONSP(CAR(lc)),
-			       PVECTOR(CAR(ln)),
+			       (Pvecteur)PVECTOR(CAR(ln)),
 			       CONSP(CAR(ld))),
 		  lm);			       
     }

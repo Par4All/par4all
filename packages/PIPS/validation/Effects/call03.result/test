@@ -23,39 +23,37 @@ Proper effects for "call03"
 
 void call03()
 {
-//               <must be read   >: TOP-LEVEL:pi
-//               <must be written>: TOP-LEVEL:pi[0]
+//               <must be read   >: pi
+//               <must be written>: pi[0]
    *pi = 1;
-//               <must be read   >: TOP-LEVEL:pi
-//               <must be written>: TOP-LEVEL:pi
+//               <must be read   >: pi
+//               <must be written>: pi
    pi++;
-//               <must be read   >: TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:q[0][1]
+//               <must be read   >: q
+//               <must be written>: q[0][one]
    q->one = 1;
-//               <must be read   >: TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:q[0][2][4]
+//               <must be read   >: q
+//               <must be written>: q[0][two][4]
    (q->two)[4] = 2;
 }
 
 Cumulated effects for "call03"
 
-//               <must be read   >: TOP-LEVEL:pi TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:pi TOP-LEVEL:pi[0] 
-//                                  TOP-LEVEL:q[0][1] 
-//                                  TOP-LEVEL:q[0][2][4]
+//               <must be read   >: pi q
+//               <must be written>: pi pi[0] q[0][one] q[0][two][4]
 void call03()
 {
-//               <must be read   >: TOP-LEVEL:pi
-//               <must be written>: TOP-LEVEL:pi[0]
+//               <must be read   >: pi
+//               <must be written>: pi[0]
    *pi = 1;
-//               <must be read   >: TOP-LEVEL:pi
-//               <must be written>: TOP-LEVEL:pi
+//               <must be read   >: pi
+//               <must be written>: pi
    pi++;
-//               <must be read   >: TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:q[0][1]
+//               <must be read   >: q
+//               <must be written>: q[0][one]
    q->one = 1;
-//               <must be read   >: TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:q[0][2][4]
+//               <must be read   >: q
+//               <must be written>: q[0][two][4]
    (q->two)[4] = 2;
 }
 
@@ -63,45 +61,41 @@ Proper effects for "main"
 
 int main()
 {
-//               <must be read   >: TOP-LEVEL:pi TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:pi TOP-LEVEL:pi[0] 
-//                                  TOP-LEVEL:q[0][1] 
-//                                  TOP-LEVEL:q[0][2][4]
+//               <must be read   >: pi q
+//               <must be written>: pi pi[0] q[0][one] q[0][two][4]
    call03();
 }
 
 Regions for "call03"
 
 
-//  <TOP-LEVEL:pi-R-EXACT-{}>
-//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
-//  <TOP-LEVEL:pi-W-EXACT-{}>
-//  <TOP-LEVEL:q-R-EXACT-{}>
-//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
-//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
-//    PHI3==4}>
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <pi-W-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][one]-W-EXACT-{PHI1==0}>
+//  <q[PHI1][two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 
 void call03()
 {
 
-//  <TOP-LEVEL:pi-R-EXACT-{}>
-//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
 
    *pi = 1;
 
-//  <TOP-LEVEL:pi-R-EXACT-{}>
-//  <TOP-LEVEL:pi-W-EXACT-{}>
+//  <pi-R-EXACT-{}>
+//  <pi-W-EXACT-{}>
 
    pi++;
 
-//  <TOP-LEVEL:q-R-EXACT-{}>
-//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][one]-W-EXACT-{PHI1==0}>
 
    q->one = 1;
 
-//  <TOP-LEVEL:q-R-EXACT-{}>
-//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
-//    PHI3==4}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 
    (q->two)[4] = 2;
 }
@@ -109,24 +103,22 @@ void call03()
 Regions for "main"
 
 
-//  <TOP-LEVEL:pi-R-EXACT-{}>
-//  <TOP-LEVEL:pi-W-EXACT-{}>
-//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
-//  <TOP-LEVEL:q-R-EXACT-{}>
-//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
-//    PHI3==4}>
-//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <pi-R-EXACT-{}>
+//  <pi-W-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
+//  <q[PHI1][one]-W-EXACT-{PHI1==0}>
 
 int main()
 {
 
-//  <TOP-LEVEL:pi-R-EXACT-{}>
-//  <TOP-LEVEL:pi-W-EXACT-{}>
-//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
-//  <TOP-LEVEL:q-R-EXACT-{}>
-//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
-//    PHI3==4}>
-//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <pi-R-EXACT-{}>
+//  <pi-W-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
+//  <q[PHI1][one]-W-EXACT-{PHI1==0}>
 
    call03();
 }

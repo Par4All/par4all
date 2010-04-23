@@ -1328,6 +1328,60 @@ words_io_inst(call obj,
   return(pc) ;
 }
 
+
+/**
+ *  Implemented for ALLOCATE(), but is applicable for every call to
+ *  function that take STAT= parameter
+ */
+static list
+words_stat_io_inst(call obj,
+        int precedence, bool leftmost, list pdl)
+{
+  list pc = NIL;
+  list pcio = call_arguments(obj);
+  list pio_write = pcio;
+  boolean good_fmt = FALSE;
+  bool good_unit = FALSE;
+  bool iolist_reached = FALSE;
+  bool complex_io_control_list = FALSE;
+  expression fmt_arg = expression_undefined;
+  expression unit_arg = expression_undefined;
+  string called = entity_local_name(call_function(obj));
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+
+  /* Write call function */
+  pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+  pc = CHAIN_SWORD(pc, " (");
+
+  while ( ( pio_write != NIL ) ) {
+    expression expr = EXPRESSION(CAR(pio_write));
+    syntax s = expression_syntax(expr);
+    call c;
+
+    if ( syntax_call_p(s) ) { /* STAT= is a call */
+      c = syntax_call(s);
+      if ( strcmp( entity_local_name( call_function(c) ), "STAT=" ) == 0 ) {
+        /* We got it ! */
+        pc = CHAIN_SWORD(pc, strdup("STAT=")); /* FIXME : strdup ? */
+        /* get argument */
+        pio_write = CDR(pio_write);
+        expression arg = EXPRESSION(CAR(pio_write));
+        entity f;
+        pc = gen_nconc( pc, words_expression( arg, pdl ) );
+      }
+    } else { /* It's not a call */
+      pc = gen_nconc( pc, words_expression( expr, pdl ) );
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
+    }
+    pio_write = CDR(pio_write);
+  }
+
+  pc = CHAIN_SWORD(pc, ") ");
+
+  return ( pc );
+}
+
+
 static list
 null(call __attribute__ ((unused)) obj,
      int __attribute__ ((unused)) precedence,
@@ -1807,6 +1861,8 @@ static struct intrinsic_handler {
 
     {ASSIGN_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
 
+    {ALLOCATE_FUNCTION_NAME, words_stat_io_inst, 0},
+    {DEALLOCATE_FUNCTION_NAME, words_stat_io_inst, 0},
     {WRITE_FUNCTION_NAME, words_io_inst, 0},
     {READ_FUNCTION_NAME, words_io_inst, 0},
     {PRINT_FUNCTION_NAME, words_io_inst, 0},
@@ -3706,13 +3762,13 @@ find_last_statement(statement s)
 
     pips_assert("statement is defined", !statement_undefined_p(s));
 
-    if(block_statement_p(s)) {
+    if(statement_sequence_p(s)) {
 	list ls = instruction_block(statement_instruction(s));
 
 	last = (ENDP(ls)? statement_undefined : STATEMENT(CAR(gen_last(ls))));
     }
-    else if(unstructured_statement_p(s)) {
-	unstructured u = instruction_unstructured(statement_instruction(s));
+    else if(statement_unstructured_p(s)) {
+	unstructured u = statement_unstructured(s);
 	list trail = unstructured_to_trail(u);
 
 	last = control_statement(CONTROL(CAR(trail)));
@@ -3733,13 +3789,13 @@ find_last_statement(statement s)
 
     /* recursive call */
     if(!statement_undefined_p(last)
-       && (block_statement_p(last) || unstructured_statement_p(last))) {
+       && (statement_sequence_p(last) || statement_unstructured_p(last))) {
 	last = find_last_statement(last);
     }
 
     /* Too many program transformations and syntheses violate the following assert */
     if(!(statement_undefined_p(last)
-	 || !block_statement_p(s)
+	 || !statement_sequence_p(s)
 	 || return_statement_p(last))) {
       if (prettyprint_is_fortran) /* to avoid this warning for C, is it right for C ?*/
 	{
@@ -3751,7 +3807,7 @@ find_last_statement(statement s)
     /* I had a lot of trouble writing the condition for this assert... */
     pips_assert("Last statement is either undefined or a call to return",
 	 statement_undefined_p(last) /* let's give up: it's always safe */
-     || !block_statement_p(s) /* not a block: any kind of statement... */
+     || !statement_sequence_p(s) /* not a block: any kind of statement... */
 		|| return_statement_p(last)); /* if a block, then a return */
 
     return last;

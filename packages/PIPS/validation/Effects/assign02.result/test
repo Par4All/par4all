@@ -16,7 +16,7 @@ void assign02()
    j = make_s(1, 2.).entier;
 }
 
-Proper effetcs for "make_s"
+Proper pointer effects for "make_s"
 
 s_t make_s(int i, float x)
 {
@@ -27,16 +27,16 @@ s_t make_s(int i, float x)
 
    p = (s_t *) malloc(sizeof(s_t));
 //               <must be read   >: i p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][entier]
    p->entier = i;
 //               <must be read   >: p x
-//               <must be written>: p[0][2]
+//               <must be written>: p[0][reel]
    p->reel = x;
-//               <must be read   >: p p[0]
+//               <must be read   >: p p[0][reel] p[0][entier]
    return *p;
 }
 
-Cumulated effetcs for "make_s"
+Cumulated pointer effects for "make_s"
 
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
@@ -51,16 +51,16 @@ s_t make_s(int i, float x)
 
    p = (s_t *) malloc(sizeof(s_t));
 //               <must be read   >: i p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][entier]
    p->entier = i;
 //               <must be read   >: p x
-//               <must be written>: p[0][2]
+//               <must be written>: p[0][reel]
    p->reel = x;
-//               <must be read   >: p p[0]
+//               <must be read   >: p p[0][reel] p[0][entier]
    return *p;
 }
 
-Proper effetcs for "assign02"
+Proper pointer effects for "assign02"
 
 void assign02()
 {
@@ -69,10 +69,11 @@ void assign02()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[entier]
+//                                  s[reel]
 
    s = make_s(1, 2.);
-//               <must be written>: s[1]
+//               <must be written>: s[entier]
    s.entier = 4;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
@@ -86,7 +87,7 @@ void assign02()
    j = make_s(1, 2.).entier;
 }
 
-Cumulated effetcs for "assign02"
+Cumulated pointer effects for "assign02"
 
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
@@ -99,10 +100,11 @@ void assign02()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[entier]
+//                                  s[reel]
 
    s = make_s(1, 2.);
-//               <must be written>: s[1]
+//               <must be written>: s[entier]
    s.entier = 4;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*

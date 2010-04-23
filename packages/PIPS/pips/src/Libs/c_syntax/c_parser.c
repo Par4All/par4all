@@ -93,31 +93,37 @@ stack get_from_entity_type_stack_table(entity key)
     return ((stack) p);
 }
 
+void remove_entity_type_stack(entity e)
+{
+  //entity te = entity_undefined;
+  void * p = hash_get(entity_to_type_stack_table, (void *) entity_name(e));
+  //void * p = hash_delget(entity_to_type_stack_table, (void *) e, (void **) &te);
+
+  pips_debug(8, "Remove type stack for \"%s\":", entity_name(e));
+  //fprintf(stderr, "Remove type stack for \"%s\"\n", entity_name(e));
+  //pips_debug(8, "get=%p, delget=%p\n", p1, p);
+  if(p==HASH_UNDEFINED_VALUE) {
+    ifdebug(8) {fprintf(stderr, "no associated stack\n");
+    }
+  }
+  else {
+    stack es = (stack) p;
+
+    (void) hash_del(entity_to_type_stack_table, (void *) entity_name(e));
+    if(!stack_undefined_p(es))
+      stack_free(&es);
+    ifdebug(8) fprintf(stderr, "done\n");
+  }
+}
+
 void remove_entity_type_stacks(list el)
 {
   list ce = list_undefined;
 
-  for(ce=el; !ENDP(ce); POP(ce)) {
-    entity e = ENTITY(CAR(ce));
-    //entity te = entity_undefined;
-    void * p = hash_get(entity_to_type_stack_table, (void *) entity_name(e));
-    //void * p = hash_delget(entity_to_type_stack_table, (void *) e, (void **) &te);
-
-    pips_debug(8, "Remove type stack for \"%s\":", entity_name(e));
-    //fprintf(stderr, "Remove type stack for \"%s\"\n", entity_name(e));
-    //pips_debug(8, "get=%p, delget=%p\n", p1, p);
-    if(p==HASH_UNDEFINED_VALUE) {
-      ifdebug(8) {fprintf(stderr, "no associated stack\n");
-      }
-    }
-    else {
-      stack es = (stack) p;
-
-      (void) hash_del(entity_to_type_stack_table, (void *) entity_name(e));
-      if(!stack_undefined_p(es))
-	stack_free(&es);
-      ifdebug(8) fprintf(stderr, "done\n");
-    }
+  //for(ce=el; !ENDP(ce); POP(ce)) {
+  //entity e = ENTITY(CAR(ce));
+  FOREACH(ENTITY, e, el) {
+    remove_entity_type_stack(e);
   }
 }
 

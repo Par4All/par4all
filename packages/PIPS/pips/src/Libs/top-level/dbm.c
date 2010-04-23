@@ -83,7 +83,7 @@ static void pop_path(void)
    names, but this is no longer possible with C functions. To make it
    easier for the user and for the validation, an upper case version of
    name is open if name cannot be open. */
-bool open_module(string name)
+bool open_module(const char* name)
 {
     bool success = FALSE;
     string upper_case_name = strupper(strdup(name), name);
@@ -93,7 +93,7 @@ bool open_module(string name)
       pips_user_error("No current workspace, open or create one first!\n");
 
     if (db_module_exists_p(name))
-      module_name = name;
+      module_name = strdup(name);
     else if(db_module_exists_p(upper_case_name)) {
       module_name = upper_case_name;
       pips_user_warning("Module \"%s\" selected instead of \"%s\""
@@ -122,7 +122,7 @@ bool open_module(string name)
 			  name, upper_case_name);
     }
 
-    free(upper_case_name);
+    free(module_name);
     return success;
 }
 
@@ -248,7 +248,7 @@ bool create_workspace(gen_array_t files)
 }
 
 /* Do not open a module already opened : */
-bool lazy_open_module(string name)
+bool lazy_open_module(const char* name)
 {
     bool success = TRUE;
 
@@ -268,7 +268,7 @@ bool lazy_open_module(string name)
 }
 
 /* should be: success (cf wpips.h) */
-bool open_workspace(string name)
+bool open_workspace(const char* name)
 {
     bool success;
 
@@ -322,14 +322,14 @@ bool close_workspace(bool is_quit)
     /*clear_props();*/
 }
 
-bool delete_workspace(string wname)
+bool delete_workspace(const char * wname)
 {
     int success = check_delete_workspace(wname,TRUE);
 
     return success;
 }
 
-bool check_delete_workspace(string wname, bool check)
+bool check_delete_workspace(const char* wname, bool check)
 {
     int failure;
     string current = db_get_current_workspace_name();

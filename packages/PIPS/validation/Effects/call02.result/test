@@ -41,10 +41,10 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //               <must be written>: y[i]
    y[i] = 0;
 //               <must be read   >: p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][one]
    p->one = 1;
 //               <must be read   >: j p
-//               <must be written>: p[0][2][j]
+//               <must be written>: p[0][two][j]
    (p->two)[j] = 2.;
 //               <must be read   >: i q[i]
 //               <must be written>: q[i][0]
@@ -54,9 +54,9 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 Cumulated effects for "call02"
 
 //               <may be read    >: q[*]
-//               <may be written >: p[0][2][*] q[*][0] y[*]
+//               <may be written >: p[0][two][*] q[*][0] y[*]
 //               <must be read   >: i j p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][one]
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 //               <must be read   >: j
@@ -69,9 +69,9 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //               <must be read   >: i
    y[i] = 0;
 //               <must be read   >: p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][one]
    p->one = 1;
-//               <may be written >: p[0][2][*]
+//               <may be written >: p[0][two][*]
 //               <must be read   >: j p
    (p->two)[j] = 2.;
 //               <may be read    >: q[*]
@@ -94,14 +94,61 @@ int main()
 //               <must be written>: sp
    tf_t *sp = &s;
 //               <may be read    >: ap[*]
-//               <may be written >: ap[*][0] sp[0][2][*] x[*]
+//               <may be written >: ap[*][0] sp[0][two][*] x[*]
 //               <must be read   >: a b sp
-//               <must be written>: sp[0][1]
+//               <must be written>: sp[0][one]
 
    call02(a, b, x, ap, sp);
 }
 
-Regions for "main"
+Pointer Regions for "call02"
+
+
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <p[PHI1][one]-W-EXACT-{PHI1==0}>
+//  <p[PHI1][two][PHI3]-W-EXACT-{PHI1==0, PHI3==j}>
+//  <q[PHI1]-R-EXACT-{PHI1==j+1}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==j+1, PHI2==0}>
+//  <y[PHI1]-W-EXACT-{PHI1==j+1}>
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+
+//  <i-R-EXACT-{}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, i==j+1}>
+
+   y[i] = 0;
+
+//  <p-R-EXACT-{}>
+//  <p[PHI1][one]-W-EXACT-{PHI1==0, i==j+1}>
+
+   p->one = 1;
+
+//  <j-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <p[PHI1][two][PHI3]-W-EXACT-{PHI1==0, PHI3==j, i==j+1}>
+
+   (p->two)[j] = 2.;
+
+//  <i-R-EXACT-{}>
+//  <q[PHI1]-R-EXACT-{PHI1==i, i==j+1}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==0, i==j+1}>
+
+   *q[i] = 3;
+}
+
+Pointer Regions for "main"
 
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
@@ -124,57 +171,10 @@ int main()
 //  <ap[PHI1][PHI2]-W-EXACT-{PHI1==b+1, PHI2==0}>
 //  <b-R-EXACT-{}>
 //  <sp-R-EXACT-{}>
-//  <sp[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
-//  <sp[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, b==PHI3}>
+//  <sp[PHI1][two][PHI3]-W-EXACT-{PHI1==0, b==PHI3}>
+//  <sp[PHI1][one]-W-EXACT-{PHI1==0}>
 //  <x[PHI1]-W-EXACT-{PHI1==b+1}>
 
 
    call02(a, b, x, ap, sp);
-}
-
-Regions for "call02"
-
-
-//  <i-R-EXACT-{}>
-//  <i-W-EXACT-{}>
-//  <j-R-EXACT-{}>
-//  <p-R-EXACT-{}>
-//  <p[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
-//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==j}>
-//  <q[PHI1]-R-EXACT-{PHI1==j+1}>
-//  <q[PHI1][PHI2]-W-EXACT-{PHI1==j+1, PHI2==0}>
-//  <y[PHI1]-W-EXACT-{PHI1==j+1}>
-
-void call02(int i, int j, int y[10], int *q[10], tf_t *p)
-{
-
-//  <i-W-EXACT-{}>
-//  <j-R-EXACT-{}>
-
-   /* i can be modified locally, but it won't show in the summary
-        effects... which creates a problem for transformer and
-        precondition computation. */
-   i = j+1;
-
-//  <i-R-EXACT-{}>
-//  <y[PHI1]-W-EXACT-{PHI1==i, i==j+1}>
-
-   y[i] = 0;
-
-//  <p-R-EXACT-{}>
-//  <p[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1, i==j+1}>
-
-   p->one = 1;
-
-//  <j-R-EXACT-{}>
-//  <p-R-EXACT-{}>
-//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==j, i==j+1}>
-
-   (p->two)[j] = 2.;
-
-//  <i-R-EXACT-{}>
-//  <q[PHI1]-R-EXACT-{PHI1==i, i==j+1}>
-//  <q[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==0, i==j+1}>
-
-   *q[i] = 3;
 }

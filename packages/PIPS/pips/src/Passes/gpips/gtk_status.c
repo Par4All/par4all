@@ -72,14 +72,14 @@ typedef struct {
 } LabelEntryAndButton;
 
 GtkWidget *directory_name_entry, *directory_name_entry_button;
-GtkWidget *workspace_name_entry, *memory_name, *message, *window_number;
+GtkWidget *workspace_name_entry, *memory_name, *gmessage, *window_number;
 GtkWidget *module_name_entry;
 GtkWidget *cpu_usage_item;
 
 //Server_image status_window_pips_image;
 
 /* Strange, "man end" says that end is a function! */
-extern etext, edata, end;
+extern char etext, edata, end;
 
 void display_memory_usage() {
 	char memory_string[17];
@@ -179,7 +179,7 @@ static void choose_dir_callback(GtkWidget * w __attribute__((unused)), gpointer 
 	GtkWidget * file_chooser_dialog;
 
 	file_chooser_dialog = gtk_file_chooser_dialog_new("Choose Directory",
-			main_window, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+			GTK_WINDOW(main_window), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN,
 			GTK_RESPONSE_ACCEPT, NULL);
 
@@ -216,12 +216,12 @@ static GtkWidget * create_dir_choose_entry(GtkWidget * vbox) {
 	entry = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 5);
 	g_signal_connect(GTK_OBJECT(entry), "activate",
-			end_directory_notify_callback, NULL);
+			G_CALLBACK(end_directory_notify_callback), NULL);
 	gtk_widget_set_sensitive(entry, FALSE);
 
 	cd_button = gtk_button_new_with_label("CD");
 	gtk_box_pack_start(GTK_BOX(hbox), cd_button, FALSE, FALSE, 5);
-	g_signal_connect(GTK_OBJECT(cd_button), "clicked", choose_dir_callback,
+	g_signal_connect(GTK_OBJECT(cd_button), "clicked", G_CALLBACK(choose_dir_callback),
 			entry);
 
 	gtk_widget_show_all(hbox);
@@ -275,13 +275,13 @@ static GtkWidget * create_workspace_entry(GtkWidget * vbox) {
 	entry = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 5);
 	g_signal_connect(GTK_OBJECT(entry), "activate",
-			open_or_create_workspace_callback, NULL);
+			G_CALLBACK(open_or_create_workspace_callback), NULL);
 
 	menu_item = gtk_menu_item_new_with_label("Workspace list");
 	// regenerating the menu every time we try to access it
 	menu = NULL; // (necessary initialization for the callback)
 	g_signal_connect(G_OBJECT(menu_item), "button-press-event",
-			regenerate_workspace_menu_callback, menu);
+			G_CALLBACK(regenerate_workspace_menu_callback), menu);
 	gtk_widget_show(menu_item);
 
 	menu_bar = gtk_menu_bar_new();
@@ -309,13 +309,13 @@ static GtkWidget * create_module_entry(GtkWidget * vbox) {
 	entry = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 5);
 	g_signal_connect(GTK_OBJECT(entry), "activate",
-			end_select_module_callback, NULL);
+			G_CALLBACK(end_select_module_callback), NULL);
 
 	menu_item = gtk_menu_item_new_with_label("Select module");
 	// regenerating the menu every time we try to access it
 	menu = NULL; // (necessary initialization for the callback)
 	g_signal_connect(G_OBJECT(menu_item), "button-press-event",
-			regenerate_module_menu_callback, menu);
+			G_CALLBACK(regenerate_module_menu_callback), menu);
 	gtk_widget_show(menu_item);
 
 	menu_bar = gtk_menu_bar_new();
@@ -336,8 +336,8 @@ void create_status_subwindow() {
 	GtkWidget * status_frame_vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(status_frame), status_frame_vbox);
 
-	message = gtk_label_new("Message:");
-	gtk_box_pack_start(GTK_BOX(status_frame_vbox), message, FALSE, FALSE, 5);
+	gmessage = gtk_label_new("Message:");
+	gtk_box_pack_start(GTK_BOX(status_frame_vbox), gmessage, FALSE, FALSE, 5);
 
 	directory_name_entry = create_dir_choose_entry(status_frame_vbox);
 

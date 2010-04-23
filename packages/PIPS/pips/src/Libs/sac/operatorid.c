@@ -81,6 +81,8 @@ static oper_id_mapping operators[] =
     { PLUS_OPERATOR_NAME,              PLUS_OPERATOR_TOK },
     { PLUS_C_OPERATOR_NAME,            PLUS_OPERATOR_TOK },
     { MINUS_OPERATOR_NAME,             MINUS_OPERATOR_TOK },
+    { COS_OPERATOR_NAME,               COS_OPERATOR_TOK },
+    { SIN_OPERATOR_NAME,               SIN_OPERATOR_TOK },
     { UNARY_MINUS_OPERATOR_NAME,       UNARY_MINUS_OPERATOR_TOK },
     { MULTIPLY_OPERATOR_NAME,          MULTIPLY_OPERATOR_TOK },
     { DIVIDE_OPERATOR_NAME,            DIVIDE_OPERATOR_TOK },

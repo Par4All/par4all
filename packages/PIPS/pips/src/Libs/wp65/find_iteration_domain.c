@@ -85,8 +85,8 @@ instruction * inst;
     compute_iteration_domain(list_loop_statement,sc,basis);
 	ifdebug(8) {
 	    (void) fprintf(stderr,"[find_iteration_domain] initial basis \n");
-	    vect_fprint(stderr,*basis,entity_local_name);
-	    sc_fprint(stderr,*sc,entity_local_name);
+	    vect_fprint(stderr,*basis,(string(*)(void*))entity_local_name);
+	    sc_fprint(stderr,*sc,(string(*)(void*))entity_local_name);
 	}
     debug(8, "find_iteration_domain", "end\n");
 }
@@ -110,7 +110,7 @@ Pbase *basis;
     sci = loop_iteration_domaine_to_sc(list_loop_statement, &base_index);
     sci->base = base_reversal(sci->base);
     ifdebug(8) { (void) fprintf(stderr,"compute_iteration_domain\n");
-		 vect_fprint(stderr,base_index,entity_local_name);
+		 vect_fprint(stderr,base_index,(string(*)(void*))entity_local_name);
 	     }
     *sc = sci;
     *basis = base_index;

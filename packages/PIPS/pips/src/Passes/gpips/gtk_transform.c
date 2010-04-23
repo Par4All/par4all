@@ -83,8 +83,8 @@ static void apply_on_each_transform_menu_item(GtkWidget * widget,
 
 void apply_on_each_transform_item(void(* function_to_apply_on_each_menu_item)(
 		GtkWidget *)) {
-	gtk_container_foreach(GTK_CONTAINER(transform_menu), G_CALLBACK(
-			apply_on_each_transform_menu_item),
+	gtk_container_foreach(GTK_CONTAINER(transform_menu), (GtkCallback)
+			apply_on_each_transform_menu_item,
 			function_to_apply_on_each_menu_item);
 }
 
@@ -117,7 +117,7 @@ void safe_apply_outside_the_notifyer(string transformation_name_to_apply,
 }
 
 static void transform_notify(GtkWidget * menu_item, gpointer data __attribute__((unused))) {
-	char * label = gpips_gtk_menu_item_get_label(menu_item);
+	const char * label = gpips_gtk_menu_item_get_label(menu_item);
 
 	char * modulename = db_get_current_module_name();
 

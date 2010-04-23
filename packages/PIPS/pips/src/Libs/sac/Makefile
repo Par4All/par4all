@@ -26,6 +26,8 @@ INC_CFILES = \
 	treematch.c atomizer.c vectransform.c reductions.c \
 	singleass.c deatomizer.c if_conversion.c simd_memory_packing.c
 
+INC_YFILES = patterns.y lexer.l
+
 DERIVED_CFILES = patterns.c lexer.c
 
 DERIVED_HEADERS = patterns.h

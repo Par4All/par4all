@@ -95,7 +95,7 @@ void pips_get_fortran_list(gen_array_t array)
 
 /* Return the path of an HPFC file name relative to the current PIPS
    directory. Can be freed by the caller. */
-string hpfc_generate_path_name_of_file_name(string file_name)
+string hpfc_generate_path_name_of_file_name(const char* file_name)
 {
     string dir_name = db_get_current_workspace_directory(),
 	name = strdup(concatenate(
@@ -142,7 +142,7 @@ int hpfc_get_file_list(gen_array_t file_names,
 /* Change to the given directory if it exists and return a canonical name.
 
    Return NULL if it does not exist. */
-string pips_change_directory(char *dir)
+string pips_change_directory(const char *dir)
 {
     if (directory_exists_p(dir)) {
 	chdir(dir);

@@ -139,7 +139,7 @@ SCAN	= $(LEX) $(LFLAGS) $(LOPT) -t
 TYPECK	= $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(LINT_LIBS)
 PARSE	= $(YACC) $(YFLAGS) $(YOPT)
 ARCHIVE = $(AR) $(ARFLAGS)
-PROTOIZE= $(PROTO) $(PRFLAGS) -E "$(PREPROC) -DCPROTO_IS_PROTOTYPING"
+PROTOIZE= $(PROTO) $(PRFLAGS) -E "$(PROTO_CPP) $(CPPOPT) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING"
 M4FLT	= $(M4) $(M4OPT) $(M4FLAGS)
 MAKEDEP	= $(CC) $(CMKDEP) $(CANSI) $(CFLAGS) $(COPT) $(CPPOPT) $(CPPFLAGS)
 NODIR	= --no-print-directory
@@ -342,7 +342,7 @@ $(INC_TARGET).tmp:
 	  echo "#ifndef $(name)_header_included";\
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
-	  $(PROTOIZE) $(INC_CFILES) | \
+	  $(PROTOIZE) $(INC_CFILES) $(INC_YFILES) | \
 	  sed -f $(MAKE.d)/proto.sed ; \
 	  echo "#endif /* $(name)_header_included */"; \
 	} > $@ ;

@@ -37,19 +37,19 @@ void point_to01()
 
    if (1) {
 //               <must be read   >: p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][a]
       p->a = 1;
 //               <must be read   >: p
-//               <must be written>: p[0][2]
+//               <must be written>: p[0][b]
       p->b = 2;
 //               <must be read   >: p
-//               <must be written>: p[0][3]
+//               <must be written>: p[0][c]
       p->c = 3;
-//               <must be read   >: p p[0][1]
-//               <must be written>: p[0][4]
+//               <must be read   >: p p[0][a]
+//               <must be written>: p[0][d]
       p->d = p->a;
 //               <must be read   >: p
-//               <must be written>: p[0][1] p[0][4]
+//               <must be written>: p[0][d] p[0][a]
       p->d = p->a = 4;
    }
 }
@@ -69,24 +69,24 @@ void point_to01()
 //               <must be written>: p
 
    p = &c;
-//               <may be read    >: p p[0][1]
-//               <may be written >: p[0][1] p[0][2] p[0][3] p[0][4]
+//               <may be read    >: p p[0][a]
+//               <may be written >: p[0][a] p[0][d] p[0][c] p[0][b]
 
    if (1) {
 //               <must be read   >: p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][a]
       p->a = 1;
 //               <must be read   >: p
-//               <must be written>: p[0][2]
+//               <must be written>: p[0][b]
       p->b = 2;
 //               <must be read   >: p
-//               <must be written>: p[0][3]
+//               <must be written>: p[0][c]
       p->c = 3;
-//               <must be read   >: p p[0][1]
-//               <must be written>: p[0][4]
+//               <must be read   >: p p[0][a]
+//               <must be written>: p[0][d]
       p->d = p->a;
 //               <must be read   >: p
-//               <must be written>: p[0][1] p[0][4]
+//               <must be written>: p[0][d] p[0][a]
       p->d = p->a = 4;
    }
 }

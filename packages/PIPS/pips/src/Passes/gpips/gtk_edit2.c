@@ -158,7 +158,7 @@ void edit_notify(GtkWidget * widget, gpointer data) {
 				TRUE);
 
 		gpips_gtk_menu_item_set_label(
-				GTK_MENU_ITEM(current_selection_menu_item), "Lasts");
+				GTK_WIDGET(GTK_MENU_ITEM(current_selection_menu_item)), "Lasts");
 		gtk_widget_set_sensitive(GTK_WIDGET(current_selection_menu_item), TRUE);
 
 		gtk_widget_set_sensitive(GTK_WIDGET(close_menu_item), TRUE);
@@ -221,7 +221,7 @@ int alloc_first_initialized_window(bool the_same_as_previous) {
 	for (i = next; i < next + number_of_gpips_windows; i++) {
 		candidate = i % number_of_gpips_windows;
 		/* Skip windows with modified text inside : */
-		if (gpips_gtk_widget_get_sensitive(edited_file[candidate].save_button))
+		if (gpips_gtk_widget_get_sensitive(GTK_WIDGET(edited_file[candidate].save_button)))
 			continue;
 		/* Skip windows with a retain attribute : */
 		if ((bool) gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
@@ -266,7 +266,7 @@ char * icon_name, char * icon_title) {
 }
 
 /* Display a file in a gpips window: */
-void gpips_file_view(char * file_name, char * title_module_name, /* The module name for example */
+void gpips_file_view(char * file_name, const char * title_module_name, /* The module name for example */
 char * title_label, /* "Sequential View" for exemple */
 char * icon_name, char * icon_title) {
 	if (file_name == NULL) {
@@ -405,7 +405,7 @@ void gpips_execute_and_display_something(char * resource_name) {
 }
 
 /* To execute something and display some Pips output with gpips by knowing its alias: */
-void gpips_execute_and_display_something_from_alias(char * alias_name) {
+void gpips_execute_and_display_something_from_alias(const char * alias_name) {
 	char * module_name = db_get_current_module_name();
 	gpips_view_menu_layout_line * current_view;
 
@@ -427,7 +427,7 @@ void gpips_execute_and_display_something_from_alias(char * alias_name) {
 
 void view_notify(GtkWidget * menu_item, gpointer data) {
 	/* Translate the menu string in a resource name: */
-	char * label = gpips_gtk_menu_item_get_label(menu_item);
+	const char * label = gpips_gtk_menu_item_get_label(menu_item);
 	gpips_execute_and_display_something_from_alias(label);
 }
 
@@ -435,11 +435,11 @@ void edit_close_notify(GtkWidget * widget, gpointer data) {
 	int i;
 
 	for (i = 0; i < MAX_NUMBER_OF_GPIPS_WINDOWS; i++)
-		if (!gpips_gtk_widget_get_sensitive(edited_file[i].save_button))
+		if (!gpips_gtk_widget_get_sensitive(GTK_WIDGET(edited_file[i].save_button)))
 			hide_window(edit_window[i], NULL, NULL);
 
 	for (i = 0; i < MAX_NUMBER_OF_GPIPS_WINDOWS; i++)
-		if (gpips_gtk_widget_get_sensitive(edited_file[i].save_button)) {
+		if (gpips_gtk_widget_get_sensitive(GTK_WIDGET(edited_file[i].save_button))) {
 			gtk_widget_show(edit_window[i]);
 			prompt_user("File not saved in editor");
 			return;
@@ -483,8 +483,8 @@ void apply_on_each_view_item(void(* function_to_apply_on_each_menu_item)(
 	int i;
 
 	/* Skip the "current_selection_mi" and "close" Menu_items: */
-	gtk_container_foreach(GTK_CONTAINER(view_menu), G_CALLBACK(
-			apply_on_each_view_menu_item), function_to_apply_on_each_menu_item);
+	gtk_container_foreach(GTK_CONTAINER(view_menu), (GtkCallback)
+			apply_on_each_view_menu_item, function_to_apply_on_each_menu_item);
 	//	for (i = (int) xv_get(view_menu, MENU_NITEMS); i > 0; i--) {
 	//		Menu_item menu_item = (Menu_item) xv_get(view_menu, MENU_NTH_ITEM, i);
 	//		/* Skip the title item: */
@@ -495,8 +495,8 @@ void apply_on_each_view_item(void(* function_to_apply_on_each_menu_item)(
 	//	}
 
 	/* Now walk through the options frame: */
-	gtk_container_foreach(GTK_CONTAINER(options_frame), G_CALLBACK(
-			apply_on_each_options_frame_button),
+	gtk_container_foreach(GTK_CONTAINER(options_frame), (GtkCallback)
+			apply_on_each_options_frame_button,
 			function_to_apply_on_each_panel_item);
 }
 
@@ -522,17 +522,17 @@ void create_edit_window() {
 
 		gtk_container_add(GTK_CONTAINER(edit_window[i]), vbox);
 
-		edited_file[i].view = gtk_text_view_new();
-		text_buffer = gtk_text_buffer_new(NULL);
+		edited_file[i].view = GTK_TEXT_VIEW(gtk_text_view_new());
+		text_buffer = GTK_WIDGET(gtk_text_buffer_new(NULL));
 		gtk_text_view_set_buffer(GTK_TEXT_VIEW(edited_file[i].view),
 				GTK_TEXT_BUFFER(text_buffer));
-		gtk_box_pack_start(GTK_BOX(vbox), edited_file[i].view, TRUE, FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(edited_file[i].view), TRUE, FALSE, 0);
 
 		g_signal_connect(G_OBJECT(text_buffer), "changed", G_CALLBACK(
 				buffer_changed_callback), &edited_file[i]);
 
-		edited_file[i].save_button = gtk_button_new_with_label("Save");
-		gtk_box_pack_start(GTK_BOX(vbox), edited_file[i].save_button, FALSE,
+		edited_file[i].save_button = GTK_BUTTON(gtk_button_new_with_label("Save"));
+		gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(edited_file[i].save_button), FALSE,
 				FALSE, 0);
 		gtk_widget_set_sensitive(GTK_WIDGET(edited_file[i].save_button), FALSE);
 		g_signal_connect(G_OBJECT(edited_file[i].save_button), "clicked",

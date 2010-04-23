@@ -57,7 +57,7 @@ enum {
 	SC2_AVAILABLE_CHOICES_COLUMN_ID, SC2_COLUMNS_NUMBER
 };
 
-static void (* apply_on_choice)(char *);
+static void (* apply_on_choice)(const char *);
 static void (* apply_on_cancel)(void);
 
 static void schoose_help_notify(GtkWidget * widget, gpointer data) {
@@ -82,7 +82,7 @@ static void schoose_ok_notify(GtkWidget * widget, gpointer data) {
 	//	gtk_tree_model_get(GTK_TREE_MODEL(*model), &iter,
 	//			SC2_AVAILABLE_CHOICES_COLUMN_ID, &gc_choice, -1);
 
-	gc_choice = strdup(gtk_label_get_text(choice_label));
+	gc_choice = strdup(gtk_label_get_text(GTK_LABEL(choice_label)));
 	// ----
 
 	//	curchoice = strdup((char *) xv_get(choice, PANEL_VALUE, 0));
@@ -146,7 +146,7 @@ static void schoose_window_done_callback(GtkWidget * window, GdkEvent * ev,
 }
 
 void schoose(char * title, gen_array_t array, char * initial_choice,
-		void(*function_for_ok)(char *), void(*function_for_cancel)(void)) {
+		void(*function_for_ok)(const char *), void(*function_for_cancel)(void)) {
 	guint i;
 	string name;
 	GtkTreeIter iter;

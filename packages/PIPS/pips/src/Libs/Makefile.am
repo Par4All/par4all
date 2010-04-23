@@ -27,7 +27,7 @@ CLEANFILES=pips_includes
 lib_LTLIBRARIES=libpipslibs.la
 
 libpipslibs_la_SOURCES=
-libpipslibs_la_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS)
+libpipslibs_la_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS) -Wl,--no-undefined
 libpipslibs_la_CPPFLAGS=$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
 libpipslibs_la_LIBADD=\
 	top-level/libtop-level.la\

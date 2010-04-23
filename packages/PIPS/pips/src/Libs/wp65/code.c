@@ -108,14 +108,14 @@ static void eval_var(reference ref)
 	  if (normalized_linear_p(norm1)) {
 	      Pvecteur pv1 = (Pvecteur) normalized_linear(norm1);
 	      fprintf(stderr,"\n expression->vecteur:");
-		  vect_fprint(stderr,pv1,entity_local_name);
+		  vect_fprint(stderr,pv1,(string(*)(Variable))entity_local_name);
 	      if (value_notzero_p(coeff = vect_coeff(var_to_evaluate,pv1)))
 	      {
 		  vect_chg_coeff(&pv1,var_to_evaluate,VALUE_ZERO);
 		  vect_add_elem(&pv1,TCST,
 				value_mult(var_minmax,coeff));
 		  fprintf(stderr,"\n nouvelle expression:");
-		  vect_fprint(stderr,pv1,entity_local_name);
+		  vect_fprint(stderr,pv1,(string(*)(Variable))entity_local_name);
 		  expr2 = make_vecteur_expression(pv1);
 	      }
 	      else expr2 = expr1;
@@ -275,7 +275,7 @@ make_scanning_over_tiles(
 
     ifdebug(8) {
 	(void) fprintf(stderr, "Tile basis -> initial basis:\n");
-	sc_fprint(stderr, tile_domain, entity_local_name);
+	sc_fprint(stderr, tile_domain,(string(*)(Variable)) entity_local_name);
     }
 
     /* get rid of initial indices; they would be preserved to generate
@@ -294,7 +294,7 @@ make_scanning_over_tiles(
 
     ifdebug(8) {
 	(void) fprintf(stderr, "Constraints on tile indices:\n");
-	sc_fprint(stderr, tile_domain, entity_local_name);
+	sc_fprint(stderr, tile_domain, (string(*)(Variable))entity_local_name);
     }
 
     /* apply a row echelon transformation */
@@ -304,7 +304,7 @@ make_scanning_over_tiles(
 
     ifdebug(8) {
 	(void) fprintf(stderr, "Ordered constraints on tile indices:\n");
-	sc_fprint(stderr, ordered_tile_domain, entity_local_name);
+	sc_fprint(stderr, ordered_tile_domain, (string(*)(Variable))entity_local_name);
     }
 
 
@@ -537,7 +537,7 @@ int first_parallel_level,last_parallel_level;
 
     ifdebug(8) {
 	(void) fprintf(stderr, "Full system before projections:\n");
-	sc_fprint(stderr, tile_domain, entity_local_name);
+	sc_fprint(stderr, tile_domain,(string(*)(Variable)) entity_local_name);
     }
 
     /* get rid of tile_basis_in_initial_basis; we might as well (?) keep
@@ -550,7 +550,7 @@ int first_parallel_level,last_parallel_level;
     ifdebug(8) {
 	(void) fprintf(stderr, 
 		       "Constraints on local tile indices parametrized by tile origin and initial indices:\n");
-	sc_fprint(stderr, tile_domain, entity_local_name);
+	sc_fprint(stderr, tile_domain,(string(*)(Variable)) entity_local_name);
     }
 
     /* get rid of initial indices */
@@ -562,7 +562,7 @@ int first_parallel_level,last_parallel_level;
     ifdebug(8) {
 	(void) fprintf(stderr, 
 		       "Constraints on local tile indices parametrized by tile origin:\n");
-	sc_fprint(stderr, tile_domain, entity_local_name);
+	sc_fprint(stderr, tile_domain, (string(*)(Variable))entity_local_name);
     }
 
     /* TEMPTATIVE */
@@ -581,7 +581,7 @@ int first_parallel_level,last_parallel_level;
     ifdebug(8) {
 	(void) fprintf(stderr, 
 		       "Absolute constraints on tile origins:\n");
-	sc_fprint(stderr, origin_domain, entity_local_name);
+	sc_fprint(stderr, origin_domain,(string(*)(Variable)) entity_local_name);
     }
 
     /* inject this redundant information */
@@ -590,7 +590,7 @@ int first_parallel_level,last_parallel_level;
     ifdebug(8) {
 	(void) fprintf(stderr, 
 		       "Constraints on local tile indices parametrized by tile origin, with redundant information:\n");
-	sc_fprint(stderr, tile_domain, entity_local_name);
+	sc_fprint(stderr, tile_domain,(string(*)(Variable)) entity_local_name);
     }
 
     pv =tile_basis_in_tile_basis;
@@ -609,7 +609,7 @@ int first_parallel_level,last_parallel_level;
     
     ifdebug(8) {
 	(void) fprintf(stderr, "Ordered constraints on local indices:\n");
-	sc_fprint(stderr, ordered_tile_domain, entity_local_name);
+	sc_fprint(stderr, ordered_tile_domain,(string(*)(Variable)) entity_local_name);
     }
 
     /* transform these constraints into a loop nest with the right body,
@@ -1136,7 +1136,7 @@ Pbase *new_index_base;
 
     ifdebug(8) { 
 	(void) fprintf(stderr," The array function :\n");
-	(void) sc_fprint(stderr,sc_array_function,entity_local_name);
+	(void) sc_fprint(stderr,sc_array_function,(string(*)(Variable))entity_local_name);
     }
 
     debug(8,"build_sc_with_several_uniform_ref", "end\n");
@@ -1524,7 +1524,7 @@ Pbase member;
 
     ifdebug(8) {
 	(void) fprintf(stderr,"Tile membership conditions:\n");
-	sc_fprint(stderr, m, entity_local_name);
+	sc_fprint(stderr, m, (string(*)(Variable))entity_local_name);
     }
 
     debug(8,"tile_membership", "end\n");

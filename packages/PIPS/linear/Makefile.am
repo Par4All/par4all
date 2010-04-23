@@ -12,4 +12,5 @@ pkgconfig_DATA= linearlibs.pc
 #	$(SED) -r -e 's/#define ([A-Za-z_]+) (.*)/#ifndef \1\n #define \1 \2\n#endif/g' $^ > $@
 
 # aclocal stuff
-ACLOCAL_AMFLAGS=-I makes/m4
+ACLOCAL_AMFLAGS=-I makes/m4 -I src/gnulib/m4
+dist_noinst_HEADERS=link-warning.h

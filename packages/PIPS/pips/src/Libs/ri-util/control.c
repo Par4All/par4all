@@ -1144,6 +1144,33 @@ unlink_2_control_nodes(control source,
 }
 
 
+/* Insert a control node between 2 connected control nodes
+
+   @param c is the control node to insert
+
+   @param before is the control node before where @p c is to be inserted
+
+   @param after is the control node after where @p c is to be inserted
+
+   Assume that @p c is not already connected and that @p after is the
+   successor of @p before.
+*/
+void insert_control_in_arc(control c, control before, control after) {
+  pips_assert("c is not a successor of before",
+	      !is_control_in_list_p(c, control_successors(before)));
+  pips_assert("c is not a predecessor of after",
+	      !is_control_in_list_p(c, control_predecessors(after)));
+  pips_assert("after is a successor of before",
+	      is_control_in_list_p(after, control_successors(before)));
+  pips_assert("before is a predecessor of after",
+	      is_control_in_list_p(before, control_predecessors(after)));
+
+  unlink_2_control_nodes(before, after);
+  link_2_control_nodes(before, c);
+  link_2_control_nodes(c, after);
+}
+
+
 /* Fuse a 2 control nodes
 
    It adds the statement of the second one to the statement of the first

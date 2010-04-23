@@ -29,14 +29,14 @@ functions=`grep '^[a-z]' | sed 's/ .*//' | sort -u`
 
 for f in $functions
 do
-    echo "extern bool $f(char *);"
+    echo "extern bool $f(const char *);"
 done
 
 cat <<EOF
 
 static struct builder_map {
-    char *builder_name;
-    bool (*builder_func)(char *);
+    const char *builder_name;
+    bool (*builder_func)(const char *);
 } builder_maps[] = {
 
 EOF

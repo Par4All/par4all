@@ -265,11 +265,9 @@ int main(char *fmt1, ...)
    /* should also have an effect on errno */
    
    fclose(fp);
-//               <may be read    >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <must be read   >: TOP-LEVEL:stderr
+//               <may be read    >: stderr[*] __IO_EFFECTS:LUNS[*]
+//               <may be written >: stderr[*] __IO_EFFECTS:LUNS[*]
+//               <must be read   >: stderr
    
    
    fprintf(stderr, "The END\n");

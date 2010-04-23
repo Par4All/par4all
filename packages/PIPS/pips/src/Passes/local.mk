@@ -60,8 +60,8 @@ ifdef PIPS_ENABLE_PYPS
 endif
 
 
-ifdef PIPS_ENABLE_GFC2PIPS
-        FWD_DIRS        += gfc2pips
+ifdef PIPS_ENABLE_FORTRAN95
+        FWD_DIRS        += fortran95
 endif
 
 

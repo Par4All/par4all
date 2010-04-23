@@ -2967,12 +2967,15 @@ old_pardef_list:
 			}
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list
                         {
-			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
+			  list el = $2;
+			  entity f = stack_head(FunctionStack);
+			  SubstituteDummyParameters(f, el);
+			  UpdateEntities(el,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/
-			  /*$$ = gen_nconc($1,gen_nconc($2,$4));*/
-			  $$ = gen_nconc($2,$4);
+			  /*$$ = gen_nconc($1,gen_nconc(el,$4));*/
+			  $$ = gen_nconc(el,$4);
 			}
 ;
 

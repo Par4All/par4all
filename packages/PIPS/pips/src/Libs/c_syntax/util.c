@@ -2002,6 +2002,36 @@ void RemoveDummyArguments(entity f, list refs)
     gen_free_list(formals);
   }
 }
+
+void SubstituteDummyParameters(entity f, list el)
+{
+  list cel = el;
+
+  for(cel; !ENDP(cel); POP(cel)) {
+    entity v = ENTITY(CAR(cel));
+    if(dummy_parameter_entity_p(v)) {
+      string mn = entity_local_name(f);
+      string ln = entity_user_name(v);
+      entity nv = FindOrCreateEntity(mn, ln);
+      stack s = get_from_entity_type_stack_table(v);
+      /* The copy could be avoided by substituting v->s with nv->s */
+      stack ns = stack_copy(s);
+      ENTITY_(CAR(cel)) = nv;
+
+      /* Store type information. Might be useless. */
+      put_to_entity_type_stack_table(nv, ns);
+      remove_entity_type_stack(v);
+
+      /* Inherit any attribute you can */
+      if(!type_undefined_p(entity_type(v)))
+	entity_type(nv) = copy_type(entity_type(v));
+      if(!value_undefined_p(entity_initial(v)))
+	entity_initial(nv) = copy_value(entity_initial(v));
+      if(!storage_undefined_p(entity_storage(v)))
+	entity_storage(nv) = copy_storage(entity_storage(v));
+    }
+  }
+}
 
 /* If necessary, create the return entity, which is a hidden variable
    used in PIPS internal representation to carry the value returned by
@@ -2009,6 +2039,8 @@ void RemoveDummyArguments(entity f, list refs)
 void CreateReturnEntity(entity f)
 {
   type ft = ultimate_type(entity_type(f));
+
+  pips_debug(8, "For module \"%s\"\n", entity_name(f));
 
   if(type_functional_p(ft)) {
       type rt = functional_result(type_functional(ft));
@@ -2055,9 +2087,9 @@ void UpdateEntity2(entity f,
     if(dummy_parameter_entity_p(v)) {
       string ln = entity_user_name(v);
       string mn = entity_local_name(f);
-      entity fp = global_name_to_entity(ln, mn);
+      entity fp = global_name_to_entity(mn, ln);
       if(entity_undefined_p(fp)) {
-	fp = FindOrCreateEntity(ln, mn);
+	fp = FindOrCreateEntity(mn, ln);
 	entity_type(fp) = copy_type(entity_type(v));
 	entity_initial(fp) = make_value_unknown();
 	entity_storage(fp) = make_storage_formal(make_formal(f, rank));

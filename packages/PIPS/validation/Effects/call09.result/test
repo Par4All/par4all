@@ -39,7 +39,7 @@ int main()
    tf_t s;
 //               <must be written>: sp
    tf_t *sp = &s;
-//               <must be read   >: s[1] sp sp[0][1]
+//               <must be read   >: s[one] sp sp[0][one]
 
    call09(s.one, sp->one);
 }
@@ -61,8 +61,8 @@ int main()
 
    tf_t *sp = &s;
 
-//  <s[PHI1]-R-EXACT-{PHI1==1}>
-//  <sp[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==1}>
+//  <s[one]-R-EXACT-{}>
+//  <sp[PHI1][one]-R-EXACT-{PHI1==0}>
 //  <sp-R-EXACT-{}>
 
 

@@ -1302,9 +1302,6 @@
 #define statement_block_p(stat) \
         (instruction_block_p(statement_instruction(stat)))
 
-#define statement_unstructured_p(stat) \
-        (instruction_unstructured_p(statement_instruction(stat)))
-
 #define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
   storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
 

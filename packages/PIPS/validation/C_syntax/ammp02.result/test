@@ -1,0 +1,62 @@
+
+Symbole table for "activate"
+
+activate
+
+Declarations for module "activate" with type "int x int -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "activate:*DYNAMIC*" with type "area" with size 18
+	Declared entity "activate:*HEAP*" with type "area" with size 0
+	Declared entity "activate:*STACK*" with type "area" with size 0
+	Declared entity "activate:*STATIC*" with type "area" with size 0
+	Declared entity "activate:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "activate:0`__func__" with type "variable" "char *"
+	Declared entity "activate:i1" with type "variable" "int"
+	Declared entity "activate:i2" with type "variable" "int"
+	Declared entity "ammp02!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable activate:i1	offset = 1
+	Variable activate:i2	offset = 2
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "activate:*DYNAMIC*" of size 18:
+	Variable "activate:0`__func__"	offset = 0	size = 9
+	Variable "activate:0`__FUNCTION__"	offset = 9	size = 9
+
+
+Layout for memory area "activate:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "activate:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "activate:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ammp02!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module activate
+
+
+Parsed printed file for "activate"
+
+activate(int i1, int i2)
+{
+}

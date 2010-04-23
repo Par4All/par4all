@@ -47,10 +47,6 @@ typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
 
-#include "sac-local.h" /* needed because sac.h may not exist when 
-                        * simdizer.c is compiled */
-#include "sac.h"
-
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
@@ -63,6 +59,7 @@ typedef dg_vertex_label vertex_label;
 #include "callgraph.h"
 
 #include "effects-convex.h"
+#include "sac.h"
 
 static graph dependence_graph = NULL;
 
@@ -656,10 +653,19 @@ static bool simd_simple_sequence_filter(statement s)
     return ! ( instruction_call_p( statement_instruction(s) ) ) ;
 }
 
-static string sac_commenter(__attribute__((unused)) entity e)
+string sac_commenter(entity e)
 {
-    return strdup("PIPS:SAC generated variable");
+    if(simd_vector_entity_p(e))
+    {
+        string s,g = basic_to_string(entity_basic(e));
+        asprintf(&s,"PIPS:SAC generated %s vector(s)", g);
+        free(g);
+        return s;
+    }
+    else
+        return strdup("PIPS:SAC generated variable");
 }
+
 
 /*
  * main entry function
@@ -671,7 +677,10 @@ bool simdizer(char * mod_name)
     statement mod_stmt = (statement)
         db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
-    set_current_module_statement(mod_stmt);
+    //what a trick ! this is needed because we would lose declarations otherwise */
+    statement parent_stmt=make_block_statement(make_statement_list(mod_stmt));
+
+    set_current_module_statement(parent_stmt); 
     set_current_module_entity(module_name_to_entity(mod_name));
 	set_ordering_to_statement(mod_stmt);
     dependence_graph = 
@@ -691,9 +700,10 @@ bool simdizer(char * mod_name)
             statement_consistent_p(mod_stmt));
 
     /* Reorder the module, because new statements have been added */  
-    module_reorder(mod_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, compute_callees(mod_stmt));
+    clean_up_sequences(parent_stmt);
+    module_reorder(parent_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, parent_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, compute_callees(parent_stmt));
     //DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, dependence_graph);
 
     /* update/release resources */

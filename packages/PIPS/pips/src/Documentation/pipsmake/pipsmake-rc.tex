@@ -10302,6 +10302,15 @@ PRETTYPRINT_ANALYSES_WITH_LF TRUE
 
 This feature only exists for the semantics analyses.
 
+\begin{PipsProp}{PRETTYPRINT_FREE_FORM} 
+PRETTYPRINT_FREE_FORM FALSE
+\end{PipsProp}
+
+This properties control the output of the prettyprinter, if set to false it'll
+be compliant with F77 Standard (line begin on 7th column and so on), else code
+will be display on a free form basis. This property is set to FALSE by default
+for Fortran77 file, and is set to TRUE for Fortran90/95 and C files.
+
 \subsubsection{Target Language Selection}
 \index{HPF}
 \index{Fortran 90}

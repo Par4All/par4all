@@ -73,6 +73,8 @@ typedef void * vertex_label;
 #include "text.h"
 #include "text-util.h"
 #include "paf-util.h"
+#include "effects-generic.h"
+
 #include "static_controlize.h"
 
 /* Global variables 	*/

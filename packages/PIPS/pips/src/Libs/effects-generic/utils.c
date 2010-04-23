@@ -997,22 +997,28 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	case is_type_enum:
 	  {
 	    list l_ent = type_fields(ct);
-	    expression rank_exp = EXPRESSION(CAR(l_ind));
-	    int rank;
+	    expression field_exp = EXPRESSION(CAR(l_ind));
+	    entity field = entity_undefined;
 
-	    pips_debug(7, "field case, with rank expression : %s \n",
-		       words_to_string(words_expression(rank_exp,NIL)));
+	    pips_debug(7, "field case, with field expression : %s \n",
+		       words_to_string(words_expression(field_exp,NIL)));
 
-	    /* If the field rank is known, we only look at the
-	       corresponding type.
+	    /* If the field is known, we only look at the corresponding type.
 	       If not, we have to recursively look at each field
 	    */
-	    if (expression_integer_value(rank_exp, &rank))
+	    if (!unbounded_expression_p(field_exp))
 	      {
-		/* the current type becomes the type of the
-		 *p_rank-th field
-		 */
-		ct = basic_concrete_type(entity_type(ENTITY(gen_nth(rank - 1, l_ent))));
+		pips_assert("the field expression must be a reference\n", 
+			    expression_reference_p(field_exp));
+		field = expression_variable(field_exp);
+		if (variable_phi_p(field))
+		  field = entity_undefined;
+	      }
+	      
+	    if (!entity_undefined_p(field))
+	      {
+		/* the current type is the type of the field */
+		ct = basic_concrete_type(entity_type(field));
 		p = r_effect_pointer_type_p(eff, CDR(l_ind), ct);
 		free_type(ct);
 		ct = type_undefined;
@@ -1122,25 +1128,31 @@ type simple_effect_reference_type(reference ref)
 	    case is_basic_derived:
 	      {
 		/* we must know which field it is, else return an undefined type */
-		expression exp = EXPRESSION(CAR(l_inds));
-		pips_debug(8, "field dimension : ");
-		if (expression_constant_p(exp))
+		expression field_exp = EXPRESSION(CAR(l_inds));
+		entity field;
+		pips_debug(8, "field dimension : %s\n", 
+			   words_to_string(words_expression(field_exp,NIL)));
+		
+		if (!unbounded_expression_p(field_exp))
 		  {
-		    int rank = expression_to_int(exp);
-		    
-		    list fields = type_fields(entity_type(basic_derived(cb)));
-		    entity cf = ENTITY(gen_nth(rank-1, fields));
-		    
-		    pips_debug(8, "constant rank (%d), poping field dimension\n", rank);
-		    
+		    pips_assert("the field expression must be a reference\n", 
+				expression_reference_p(field_exp));
+		    field = expression_variable(field_exp);
+		    if (variable_phi_p(field))
+		      field = entity_undefined;
+		  }
+	      		
+		if (!entity_undefined_p(field))
+		  {
+		    pips_debug(8, "known field, poping field dimension\n");
 		    free_type(bct);
-		    bct =  basic_concrete_type(entity_type(cf));
+		    bct =  basic_concrete_type(entity_type(field));
 		    ct = bct;
 		    POP(l_inds);
 		  }
 		else 
 		  {
-		    pips_debug(8, "non constant rank, returning type_undefined\n");
+		    pips_debug(8, "unknown field, returning type_undefined\n");
 		    t = type_undefined;
 		    finished = true;
 		  }

@@ -28,6 +28,7 @@ INC_CFILES = \
 	csplit_file.c \
         f95split_file.c \
 	module.c
+INC_YFILES=splitc.y lexer.l
 
 DERIVED_HEADERS = splitc.h
 DERIVED_CFILES = splitc.c lexer.c

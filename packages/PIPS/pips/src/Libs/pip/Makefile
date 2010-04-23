@@ -31,6 +31,7 @@ INC_CFILES =	pip.c \
 		tab.c \
 		integrer.c \
 		maind.c
+INC_YFILES=solpip_parse.y solpip_scan.l
 
 DERIVED_CFILES = \
 		solpip_parse.c \
