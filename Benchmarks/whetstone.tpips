@@ -1,8 +1,42 @@
 delete whetstone
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create whetstone whetstone.c
 module main
 
-echo main file
+echo
+echo "main" file
+echo
+
+display PRINTED_FILE
+
+echo
+echo "main" file with proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo "main" file with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+echo
+echo "main" file with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+quit
+echo
+echo "main" file with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE
 
 echo aftter privatization
