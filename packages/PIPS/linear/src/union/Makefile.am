@@ -20,7 +20,7 @@
 #
 
 TARGET=union
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h sl_gram.h
 nodist_include_HEADERS=$(TARGET).h
 AM_CPPFLAGS=-I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I../sc -I../sommet -I../polyedre -I../ray_dte -I../sg -I$(top_srcdir)
 AM_YFLAGS=-p slx_ -d
@@ -34,7 +34,6 @@ libunion_la_SOURCES=disjunct.c \
 		sl_gram.y \
 		sl_lex.l
 
-# additionnal dep needed for // build
-sl_lex.c:sl_gram.h
+CLEANFILES=sl_gram.[ch] sl_lex.c
 
 include $(top_srcdir)/makes/cproto.mk

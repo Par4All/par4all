@@ -13,6 +13,8 @@ AC_LANG([C])
 # Checks for programs.
 AX_PROG_YACC
 AC_PROG_CC
+gl_EARLY
+
 # must be right there
 AC_PROG_CPP
 AX_PROG_LEX
@@ -48,7 +50,7 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AX_CHECK_FUNCS([alarm gettimeofday memset mkdir strchr strdup])
+AX_CHECK_FUNCS([alarm gettimeofday mkdir])
 
 # Check for cproto
 AX_CHECK_CPROTO([4.7])
@@ -56,9 +58,14 @@ AX_CHECK_CPROTO([4.7])
 # set linear cppflags
 CPPFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 
+# this takes care of the gnulib stuff
+gl_INIT
+CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/gnulib"
+
 AC_CONFIG_FILES([Makefile
 				 linearlibs.pc
                  src/Makefile
+				 src/gnulib/Makefile
                  src/arithmetique/Makefile
                  src/contrainte/Makefile
                  src/matrice/Makefile
@@ -73,6 +80,6 @@ AC_CONFIG_FILES([Makefile
                  src/sparse_sc/Makefile
                  src/vecteur/Makefile])
 
-AX_DEPENDS([minimum],[lex yacc polylib64 cproto std_headers alarm_gettimeofday_memset_mkdir_strchr_strdup])
+AX_DEPENDS([minimum],[lex yacc polylib64 cproto std_headers alarm_gettimeofday_mkdir])
 AX_OUTPUT([minimum])
 
