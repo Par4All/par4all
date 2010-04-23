@@ -18,7 +18,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-SUBDIRS=scripts genC
+SUBDIRS=gnulib scripts genC 
 
 if WITH_DOC
 SUBDIRS+=doc

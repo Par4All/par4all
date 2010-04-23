@@ -4,5 +4,5 @@ AM_YFLAGS=-d -p genspec_
 AM_LFLAGS=-p genspec_
 AM_CPPFLAGS=-I$(srcdir)/.. -I..
 
-# additionnal dep needed for // build
-genspec_lex.c:genspec.h
+BUILT_SOURCES=genspec.h
+CLEANFILES=genspec*

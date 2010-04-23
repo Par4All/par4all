@@ -32,6 +32,7 @@ AC_LANG([C])
 # Checks for programs.
 AX_PROG_YACC
 AC_PROG_CC_C99
+gl_EARLY
 AC_PROG_CPP
 AX_PROG_LEX
 AC_PROG_INSTALL
@@ -71,11 +72,15 @@ AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_REALLOC
 AC_FUNC_VPRINTF
-AX_CHECK_FUNCS([strdup])
+
+# this takes care of the gnulib stuff
+gl_INIT
+CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/gnulib"
 
 AC_CONFIG_FILES([Makefile
 				 newgenlibs.pc
                  src/Makefile
+				 src/gnulib/Makefile
                  src/genC/Makefile
                  src/genC/genread/Makefile
                  src/genC/genspec/Makefile
@@ -83,5 +88,5 @@ AC_CONFIG_FILES([Makefile
 				 src/doc/Makefile
                  ])
 
-AX_DEPENDS([minimum],[lex yacc cproto std_headers strdup])
+AX_DEPENDS([minimum],[lex yacc cproto std_headers])
 AX_OUTPUT([minimum],[doc])

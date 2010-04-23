@@ -271,7 +271,7 @@ typedef struct cons {
 extern void gen_copy(void *, void *);
 extern bool gen_eq(const void *, const void *);
 extern void *gen_identity(const void *);
-extern void *gen_find_tabulated(string, int);
+extern void *gen_find_tabulated(const char*, int);
 extern list gen_filter_tabulated(bool(*)(gen_chunk*), int);
 extern void gen_free_area(void**, int);
 extern void gen_mapc_tabulated(void (*)(), int);
