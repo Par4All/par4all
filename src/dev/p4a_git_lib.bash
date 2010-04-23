@@ -7,7 +7,7 @@
 # The PIPS modules:
 PIPS_MODULES="linear newgen nlpmake pips validation"
 #PIPS_MODULES=nlpmake
-P4A_PACKAGES="$PIPS_MODULES polylib"
+P4A_PACKAGES="$PIPS_MODULES polylib gcc-gfc"
 
 # All the suffix to have a standard branch infrastructure:
 P4A_BRANCH_SUFFIX="$P4A_PACKAGES packages own"

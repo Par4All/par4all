@@ -521,9 +521,25 @@ rollback.
 \subsection{PIPS-GFC extension workflow}
 \label{sec:pips-gfc-workflow}
 
-This part is into the \texttt{package/pips-gfc} directory. It contains
-plain \Agcc core and Fortran 4.4.1 distribution, pointed by the branch
-\texttt{gcc-4.4.1}
+\subsubsection{New version}
+\label{sec:new-version}
+
+In the work of Mehdi, \textsc{Amini}, the branch
+\texttt{p4a-gcc-gfc-4.4.3} contains the sources of \Agcc-\Agfc 4.4.3 to
+get the Fortran~95. Then the branch is named also \texttt{p4a-gcc-gfc}
+which is merged into \texttt{p4a-packages}.
+
+During \Apfa construction, these sources are patched and compiled into the
+\Apips Fortran~95 parser.
+
+
+\subsubsection{Old version}
+\label{sec:new-version}
+
+
+This part from Raphaël \textsc{Roosz}is into the \texttt{package/pips-gfc}
+directory. It contains plain \Agcc core and Fortran 4.4.1 distribution,
+pointed by the branch \texttt{gcc-4.4.1}
 
 The development of \Apipsgfc should be done in the branch
 \texttt{pips-gfc-4.4.1} and this branch should be merged with the
