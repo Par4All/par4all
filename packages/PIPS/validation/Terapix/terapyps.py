@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from pyps import *
+from sys import exit
 import terapips
 
 verbose=2
@@ -13,6 +14,7 @@ def microcode_normalizer(ws,module):
 	# remove ifs
 	module.if_conversion_init()
 	module.if_conversion()
+	
 
 	module.array_to_pointer(convert_parameters=True,flatten_only=True)
 	module.loop_normalize(one_increment=True,lower_bound=False)
@@ -52,44 +54,48 @@ def terapyps(kernel_module,loop_label,*input_sources):
 	km.scalarization()
 	if verbose == 2: km.display()
 	km.privatize_module()
-	km.array_to_pointer(convert_parameters=False,flatten_only=True)
-	km.common_subexpression_elimination(skip_lhs=False)
+	#km.array_to_pointer(convert_parameters=False,flatten_only=True)
+	#km.common_subexpression_elimination(skip_lhs=False)
 	#km.simd_atomizer(atomize_reference=True,atomize_lhs=True)
 	#km.invariant_code_motion(partial_distribution=False)
 	if verbose == 2: km.display()
 
 	# tile the loop flaged 
-#	km.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
-#	km.partial_eval(always_simplify=True)
-#	km.display()
-#	kernel=km.loops(loop_label)
-#	kernel.loop_expansion(size=126)
-#	if verbose == 2: kernel.display()
-#	kernel.loop_tiling("126 0,0 5")
-#	if verbose == 2: kernel.display()
+	km.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
+	km.partial_eval(always_simplify=True)
+	km.display()
+	kernel=km.loops(loop_label)
+	kernel.loop_expansion(size=126) #,trick_region="// remove this one later")
+	if verbose == 2: kernel.display()
+	kernel.loop_tiling("126 0,0 5")
+	if verbose == 2: km.display(With="PRINT_CODE_REGIONS")
+	
+	launchers_loop = []
+	for l0 in kernel.loops():
+		for l1 in l0.loops():
+			launchers_loop += [l1]
+			km.isolate_statement(label=l1.label)
+			if verbose == 2: l1.display()
 #
-#	# be cleaner
-#	km.loop_normalize(one_increment=True,skip_index_side_effect=True)
-#	km.partial_eval()
-#	if verbose == 2: km.display()
+	# be cleaner
+	km.loop_normalize(one_increment=True,skip_index_side_effect=True)
+	km.partial_eval(linearize=True)
+	if verbose == 2: km.display()
+	exit()
 #	km.suppress_trivial_test()
 #	if verbose == 2: km.display()
-#	km.privatize_module()
-#	if verbose == 2: km.display()
-#
-#	
-#
-#	# outline lauchers
-#	launchers,seed,nb=[],"launcher",0
-#	for l1 in kernel.loops():
-#		for l2 in l1.loops():
-#			name=seed+str(nb)
-#			km.privatize_module()
-#			km.outline(label=l2.label,module_name=name)
-#			if verbose == 2: km.display()
-#			if verbose == 2: tws[name].display()
-#			launchers+=[tws[name]]
-#			nb+=1
+	km.privatize_module()
+	if verbose == 2: km.display()
+
+	# outline lauchers
+	launchers,seed,nb=[],"launcher",0
+	for launcher_loop in launchers_loop:
+			name=seed+str(nb)
+			km.outline(label=launcher_loop.label,module_name=name)
+			if verbose == 2: km.display()
+			if verbose == 2: tws[name].display()
+			launchers+=[tws[name]]
+			nb+=1
 #
 #	km.kernel_load_store(load_function="memload",
 #			store_function="memstore",
@@ -97,24 +103,24 @@ def terapyps(kernel_module,loop_label,*input_sources):
 #			deallocate_function="memfree")
 #	if verbose == 2: km.display()
 #
-#	# // lauchers
-#	for kl in launchers:
-#		kl.common_subexpression_elimination()
-#		kl.display()
-#		kl.privatize_module()
-#		# perform loop expansion on inner loop
-#		for l1 in kl.loops():
-#			l1.loop_expansion(size=128,offset=1)
-#			if verbose == 2: l1.display()
-#		# from launcher to microcode
-#		for l0 in kl.loops():
-#			for l1 in l0.loops():
-#				name=kl.name+"_microcode"
-#				kl.privatize_module()
-#				kl.outline(label=l1.label, module_name=name)
-#				if verbose == 2: kl.display()
-#				if verbose == 2: tws[name].display()
-#
+	# // lauchers
+	for kl in launchers:
+		kl.common_subexpression_elimination()
+		kl.display()
+		kl.privatize_module()
+		# perform loop expansion on inner loop
+		for l1 in kl.loops():
+			l1.loop_expansion(size=128,offset=1)
+			if verbose == 2: l1.display()
+		# from launcher to microcode
+		for l0 in kl.loops():
+			for l1 in l0.loops():
+				name=kl.name+"_microcode"
+				kl.privatize_module()
+				kl.outline(label=l1.label, module_name=name)
+				if verbose == 2: kl.display()
+				if verbose == 2: tws[name].display()
+
 #		# last steps on microcode
 #		microcode=tws[kl.name+"_microcode"]
 #		if verbose == 2: microcode.display()

@@ -1,0 +1,24 @@
+int main()
+{
+   int a[4], b[4];
+   a[0] = b[0]+0;
+   a[2] = b[2]+2;
+   a[1] = b[1]+1;
+   a[3] = b[3]+3;
+}
+after vectorization with commutativity
+int main()
+{
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1];
+   //PIPS:SAC generated variable
+   int aligned[3+1] = {0, 1, 2, 3};
+   {
+      int a[4], b[4];
+      SIMD_LOAD_V4SI(v4si_vec2, &aligned[0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &b[0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &a[0]);
+   }
+}
+

@@ -22,10 +22,10 @@ void point_to02()
       int b[10];
    } c, *p;
 //               <must be read   >: p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][a]
 
    p->a = 1;
 //               <must be read   >: p
-//               <must be written>: p[0][2][2]
+//               <must be written>: p[0][b][2]
    (p->b)[2] = 3;
 }

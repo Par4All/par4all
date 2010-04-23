@@ -1,0 +1,18 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="simdizer08"
+delete $WS
+create $WS $WS.c include/SIMD.c
+
+make PRINTED_FILE[%ALL]
+module main
+display PRINTED_FILE
+
+setproperty SAC_SIMD_REGISTER_WIDTH 128
+setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
+
+echo after vectorization with commutativity
+apply SIMDIZER
+display PRINTED_FILE
+
+close
+delete $WS

@@ -1,0 +1,39 @@
+
+"foo" file
+
+int foo(int i)
+{
+   int j;
+   j = 3*i-3*i;
+   return j;
+}
+
+"foo" file with preconditions
+
+
+//  P() {}
+
+int foo(int i)
+{
+
+//  P() {}
+
+   int j;
+
+//  P() {}
+
+   j = 3*i-3*i;
+
+//  P(j) {j==0}
+
+   return j;
+}
+
+"foo" file after partial evaluation
+
+int foo(int i)
+{
+   int j;
+   j = 0;
+   return 0;
+}
