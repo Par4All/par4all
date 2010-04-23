@@ -785,6 +785,30 @@ static list mapping_to_domain_list(hash_table h)
 
   HASH_MAP(var, val, {
     if(!gen_in_list_p((entity) val, values)) {
+      values = CONS(ENTITY,(entity) var, values);
+      count++;
+    }
+  }, h);
+
+  pips_assert("The number of insertions is equal to the list length",
+	      count == gen_length(values));
+
+  return values;
+}
+
+/* Returns the list of entities in the mapping range.
+ *
+ * Could be more efficient to return a set.
+ *
+ * Note: this is a copy of mapping_to_value_number()
+*/
+static list mapping_to_range_list(hash_table h)
+{
+  size_t count = 0;
+  list values = NIL;
+
+  HASH_MAP(var, val, {
+    if(!gen_in_list_p((entity) val, values)) {
       values = CONS(ENTITY,(entity) val, values);
       count++;
     }
@@ -797,11 +821,25 @@ static list mapping_to_domain_list(hash_table h)
 }
 
 /* Return the list of all analyzed variables which are modified in
-   the current module*/
+   the current module. If they are modified, they must have old
+   values. */
 list modified_variables_with_values()
 {
   /* The intermediate values could be used as well */
-  return mapping_to_domain_list(hash_entity_to_old_value);
+  /*
+  list ivl = mapping_to_domain_list(hash_entity_to_old_value); // initial
+							       // value list
+  list wvl = NIL; // written variable list
+
+  FOREACH(ENTITY, e, ivl) {
+    entity wv = new_value_to_variable(e);
+    ivl = CONS(ENTITY, wv, ivl);
+  }
+
+  gen_reverse(wvl);
+  */
+  list wvl = mapping_to_domain_list(hash_entity_to_old_value);
+  return wvl;
 }
 
 void test_mapping_entry_consistency()

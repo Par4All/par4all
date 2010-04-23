@@ -95,11 +95,11 @@ transformer effects_to_transformer(list e) /* list of effects */
       list wvl = modified_variables_with_values();
 
       FOREACH(ENTITY, wv, wvl) {
-	if(entities_may_conflict_p(v,wv)) {
+	if(entities_may_conflict_p(v,wv) && entity_has_values_p(wv)) {
 	  /* FI->FI: I do not understand why these three lines copied
 	     from above are sufficient, not why they were not pacted
 	     together. */
-	  entity new_val = entity_to_new_value(v);
+	  entity new_val = entity_to_new_value(wv);
 	  args = arguments_add_entity(args, new_val);
 	  b = vect_add_variable(b, (Variable) new_val);
 	}
