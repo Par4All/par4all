@@ -125,12 +125,11 @@ transformer filter_transformer(transformer t, list e)
   list args = NIL;
   Psysteme sc_restricted_to_variables_transitive_closure(Psysteme, Pbase);
 
-  MAP(EFFECT, ef, 
-  {
+  FOREACH(EFFECT, ef, e) {
     reference r = effect_any_reference(ef);
     /* action a = effect_action(ef); */
     entity v = reference_variable(r);
-    
+
     if(/* action_write_p(a) && */ entity_has_values_p(v)) {
       /* I do not know yet if I should keep old values... */
       entity new_val = entity_to_new_value(v);
@@ -140,8 +139,7 @@ transformer filter_transformer(transformer t, list e)
 	args = arguments_add_entity(args, v);
       }
     }
-  },
-      e);
+  }
 
   /* FI: I should check if sc is sc_empty but I haven't (yet) found a
      cheap syntactic test */

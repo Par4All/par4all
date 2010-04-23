@@ -320,6 +320,8 @@ eformat_t partial_eval_expression(expression e, Psysteme ps, effects fx)
       /* FI: it may be simpler because the simplification may be
 	 performed by normalize_expression() */
       ef.simpler = TRUE;
+      if(expression_undefined_p(ef.expr) && ef.icoef!=0)
+	ef.expr = ne;
       //ef.expr = ne;
       //ef.icoef = 1;
       //ef.ishift = 0;
@@ -521,15 +523,17 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
 
 void partial_eval_call_and_regenerate(call ca, Psysteme ps, effects fx)
 {
+  list le = list_undefined;
+
   pips_assert("ca is a defined call",
 	      ca!= call_undefined);
 
-  MAPL(le, {
-      expression exp = EXPRESSION(CAR(le));
+  for(le=call_arguments(ca); !ENDP(le); POP(le)) {
+    expression exp = EXPRESSION(CAR(le));
 
-      partial_eval_expression_and_regenerate(&exp, ps, fx);
-      EXPRESSION_(CAR(le))= exp;
-    }, call_arguments(ca));
+    partial_eval_expression_and_regenerate(&exp, ps, fx);
+    EXPRESSION_(CAR(le))= exp;
+  }
 }
 
 
@@ -595,16 +599,43 @@ eformat_t partial_eval_call(expression exp, Psysteme ps, effects fx)
     {
         /* FI: The actual aruments are not partially evaluated?
          * SG: no it's not, I fixed this
+	 *
+	 * FI: Actually, the parameter mode should be checked. And the
+	 * actual effects.
+	 *
+	 * Note FI: the result obtained for the call to fx in
+	 * Transformations/eval.c is correct, but I do not understand
+	 * why. Actual parameters must be evaluated somewhere else.
          */
-        FOREACH(EXPRESSION,eparam,call_arguments(ec))
+      list ce;
+      for(ce = call_arguments(ec); !ENDP(ce); POP(ce))
         {
-            partial_eval_expression(eparam,ps,fx);
+	  expression eparam = EXPRESSION(CAR(ce));
+	  if(c_module_p(func)) {
+	    /* value passing */
+	    partial_eval_expression_and_regenerate(&eparam,ps,fx);
+	    EXPRESSION_(CAR(ce)) = eparam;
+	  }
+	  else if(fortran_module_p(func)) {
+	    /* the partial evaluation could be further improved by
+	       checking if there is a write effect on the
+	       corresponding formal parameter */
+	    if(expression_reference_p(eparam))
+	      ; // in doubt, do nothing
+	    else {
+	      partial_eval_expression_and_regenerate(&eparam,ps,fx);
+	      EXPRESSION_(CAR(ce)) = eparam;
+	    }
+	  }
+	  else {
+	    pips_internal_error("Unexpected programming language");
+	  }
         }
 
         ef = eformat_undefined;
     } break;
   default:
-    pips_error("partial_eval_call", "case default\n");
+    pips_internal_error("Default case reached.\n");
   }
   return(ef);
 }
