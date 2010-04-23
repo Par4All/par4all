@@ -13,3 +13,4 @@ pkgconfig_DATA= linearlibs.pc
 
 # aclocal stuff
 ACLOCAL_AMFLAGS=-I makes/m4 -I src/gnulib/m4
+dist_noinst_HEADERS=link-warning.h
