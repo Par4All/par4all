@@ -1,0 +1,31 @@
+int main()
+{
+   Cplfloat b[10][10];
+   foo(&b[3][5].re);
+   return 0;
+}
+
+Proper pointer effects for "main"
+
+int main()
+{
+   Cplfloat b[10][10];
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   foo(&b[3][5].re);
+   return 0;
+}
+
+Pointer regions for "main"
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+int main()
+{
+   Cplfloat b[10][10];
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   foo(&b[3][5].re);
+   return 0;
+}

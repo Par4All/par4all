@@ -1,7 +1,11 @@
 setenv ws loop_expansion02
 delete $ws
+setproperty ABORT_ON_USER_ERROR TRUE
 create $ws $ws.c
 module pop
+
+display PARSED_PRINTED_FILE
+quit
 
 echo raw file with loop flagged
 apply FLAG_LOOPS

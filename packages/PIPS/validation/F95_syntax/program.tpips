@@ -1,0 +1,8 @@
+delete program
+create program program.f90
+
+display PRINTED_FILE[TOTO]
+
+close
+delete program
+

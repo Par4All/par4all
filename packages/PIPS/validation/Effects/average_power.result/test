@@ -57,36 +57,36 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //               <must be read   >: Nrg Nth Nv
 //               <must be written>: v
          for(v = 0; v <= Nv-1; v += 1)
-//               <must be read   >: Nrg Nth Nv PP ptrin[th][rg][v][1] 
-//                                  ptrin[th][rg][v][1] 
-//                                  ptrin[th][rg][v][2] 
-//                                  ptrin[th][rg][v][2] rg th v
+//               <must be read   >: Nrg Nth Nv PP ptrin[th][rg][v][im]
+//                                  ptrin[th][rg][v][im] 
+//                                  ptrin[th][rg][v][re] 
+//                                  ptrin[th][rg][v][re] rg th v
 //               <must be written>: PP
 
             PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
 //               <must be read   >: Nrg Nth Nv PP th
-//               <must be written>: Pow[th][1]
+//               <must be written>: Pow[th][re]
       Pow[th].re = (float) PP/((float) Nv*Nrg);
 //               <must be read   >: Nth th
-//               <must be written>: Pow[th][2]
+//               <must be written>: Pow[th][im]
       Pow[th].im = 0.;
    }
 }
 
 Cumulated effects for "average_power"
 
-//               <may be read    >: ptrin[*][*][*][1] 
-//                                  ptrin[*][*][*][2]
-//               <may be written >: Pow[*][1] Pow[*][2]
+//               <may be read    >: ptrin[*][*][*][im] 
+//                                  ptrin[*][*][*][re]
+//               <may be written >: Pow[*][im] Pow[*][re]
 //               <must be read   >: Nrg Nth Nv
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
 
    double PP;
    int th, v, rg;
-//               <may be read    >: Nrg Nv PP ptrin[*][*][*][1] 
-//                                  ptrin[*][*][*][2] rg th v
-//               <may be written >: PP Pow[*][1] Pow[*][2] rg v
+//               <may be read    >: Nrg Nv PP ptrin[*][*][*][im] 
+//                                  ptrin[*][*][*][re] rg th v
+//               <may be written >: PP Pow[*][im] Pow[*][re] rg v
 //               <must be read   >: Nth
 //               <must be written>: th
 
@@ -94,28 +94,28 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //               <must be read   >: Nth
 //               <must be written>: PP
       PP = 0.;
-//               <may be read    >: Nv PP ptrin[*][*][*][1] 
-//                                  ptrin[*][*][*][2] rg th v
+//               <may be read    >: Nv PP ptrin[*][*][*][im] 
+//                                  ptrin[*][*][*][re] rg th v
 //               <may be written >: PP v
 //               <must be read   >: Nrg Nth
 //               <must be written>: rg
       for(rg = 0; rg <= Nrg-1; rg += 1)
-//               <may be read    >: PP ptrin[*][*][*][1] 
-//                                  ptrin[*][*][*][2] rg th v
+//               <may be read    >: PP ptrin[*][*][*][im] 
+//                                  ptrin[*][*][*][re] rg th v
 //               <may be written >: PP
 //               <must be read   >: Nrg Nth Nv
 //               <must be written>: v
          for(v = 0; v <= Nv-1; v += 1)
-//               <may be read    >: ptrin[*][*][*][1] 
-//                                  ptrin[*][*][*][2]
+//               <may be read    >: ptrin[*][*][*][im] 
+//                                  ptrin[*][*][*][re]
 //               <must be read   >: Nrg Nth Nv PP rg th v
 //               <must be written>: PP
 
             PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
-//               <may be written >: Pow[*][1]
+//               <may be written >: Pow[*][re]
 //               <must be read   >: Nrg Nth Nv PP th
       Pow[th].re = (float) PP/((float) Nv*Nrg);
-//               <may be written >: Pow[*][2]
+//               <may be written >: Pow[*][im]
 //               <must be read   >: Nth th
       Pow[th].im = 0.;
    }
@@ -134,38 +134,39 @@ int main(int argc, char *argv[])
    {
       Cplfloat in[th][rg][v], pow[th];
 //               <may be read    >: i j k rg v
-//               <may be written >: in[*][*][*][1] in[*][*][*][2] j k
+//               <may be written >: in[*][*][*][im] in[*][*][*][re] j 
+//                                  k
 //               <must be read   >: th
 //               <must be written>: i
       for(i = 0; i <= th-1; i += 1)
 //               <may be read    >: i j k v
-//               <may be written >: in[*][*][*][1] in[*][*][*][2] k
+//               <may be written >: in[*][*][*][im] in[*][*][*][re] k
 //               <must be read   >: rg th
 //               <must be written>: j
          for(j = 0; j <= rg-1; j += 1)
 //               <may be read    >: i j k
-//               <may be written >: in[*][*][*][1] in[*][*][*][2]
+//               <may be written >: in[*][*][*][im] in[*][*][*][re]
 //               <must be read   >: rg th v
 //               <must be written>: k
             for(k = 0; k <= v-1; k += 1) {
-//               <may be written >: in[*][*][*][1]
+//               <may be written >: in[*][*][*][re]
 //               <must be read   >: i j k rg th v
                in[i][j][k].re = i*j*k;
-//               <may be written >: in[*][*][*][2]
+//               <may be written >: in[*][*][*][im]
 //               <must be read   >: i j k rg th v
                in[i][j][k].im = i*j+k;
             }
-//               <may be read    >: in[*][*][*][1] in[*][*][*][2]
-//               <may be written >: pow[*][1] pow[*][2]
+//               <may be read    >: in[*][*][*][im] in[*][*][*][re]
+//               <may be written >: pow[*][im] pow[*][re]
 //               <must be read   >: rg th v
       average_power(th, rg, v, in, pow);
-//               <may be read    >: __IO_EFFECTS:LUNS[1] i pow[*][1] 
-//                                  pow[*][2]
+//               <may be read    >: __IO_EFFECTS:LUNS[1] i pow[*][re] 
+//                                  pow[*][im]
 //               <may be written >: __IO_EFFECTS:LUNS[1]
 //               <must be read   >: th
 //               <must be written>: i
       for(i = 0; i <= th-1; i += 1)
-//               <may be read    >: pow[*][1] pow[*][2]
+//               <may be read    >: pow[*][re] pow[*][im]
 //               <must be read   >: __IO_EFFECTS:LUNS[1] i th
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("-%f-", pow[i]);
@@ -194,9 +195,10 @@ int main(int argc, char *argv[])
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
-//    PHI2<=12, 0<=PHI3, PHI3<=11, 1<=PHI4, PHI4<=2, rg==13, th==14,
-//    v==12}>
+//  <in[PHI1][PHI2][PHI3][re]-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
+//    PHI2<=12, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
+//  <in[PHI1][PHI2][PHI3][im]-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
+//    PHI2<=12, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>
 //  <k-R-EXACT-{}>
@@ -208,9 +210,10 @@ int main(int argc, char *argv[])
       for(i = 0; i <= th-1; i += 1)
 
 //  <i-R-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
-//    0<=PHI3, PHI3<=11, 1<=PHI4, PHI4<=2, rg==13, th==14, v==12,
-//    0<=i, i<=13}>
+//  <in[PHI1][PHI2][PHI3][re]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
+//    0<=PHI3, PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13}>
+//  <in[PHI1][PHI2][PHI3][im]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
+//    0<=PHI3, PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>
 //  <k-R-EXACT-{}>
@@ -222,9 +225,10 @@ int main(int argc, char *argv[])
          for(j = 0; j <= rg-1; j += 1)
 
 //  <i-R-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
-//    PHI3<=11, 1<=PHI4, PHI4<=2, rg==13, th==14, v==12, 0<=i, i<=13,
-//    0<=j, j<=12}>
+//  <in[PHI1][PHI2][PHI3][re]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12}>
+//  <in[PHI1][PHI2][PHI3][im]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12}>
 //  <j-R-EXACT-{}>
 //  <k-R-EXACT-{}>
 //  <k-W-EXACT-{}>
@@ -235,9 +239,8 @@ int main(int argc, char *argv[])
             for(k = 0; k <= v-1; k += 1) {
 
 //  <i-R-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==j, PHI3==k,
-//    PHI4==1, rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12, 0<=k,
-//    k<=11}>
+//  <in[PHI1][PHI2][PHI3][re]-W-EXACT-{PHI1==i, PHI2==j, PHI3==k,
+//    rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12, 0<=k, k<=11}>
 //  <j-R-EXACT-{}>
 //  <k-R-EXACT-{}>
 //  <rg-R-EXACT-{}>
@@ -247,9 +250,8 @@ int main(int argc, char *argv[])
                in[i][j][k].re = i*j*k;
 
 //  <i-R-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==j, PHI3==k,
-//    PHI4==2, rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12, 0<=k,
-//    k<=11}>
+//  <in[PHI1][PHI2][PHI3][im]-W-EXACT-{PHI1==i, PHI2==j, PHI3==k,
+//    rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12, 0<=k, k<=11}>
 //  <j-R-EXACT-{}>
 //  <k-R-EXACT-{}>
 //  <rg-R-EXACT-{}>
@@ -259,9 +261,12 @@ int main(int argc, char *argv[])
                in[i][j][k].im = i*j+k;
             }
 
-//  <in[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
-//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v, 1<=PHI4, PHI4<=2}>
-//  <pow[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=th, 1<=PHI2, PHI2<=2}>
+//  <in[PHI1][PHI2][PHI3][im]-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
+//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v}>
+//  <in[PHI1][PHI2][PHI3][re]-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
+//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v}>
+//  <pow[PHI1][re]-W-EXACT-{0<=PHI1, PHI1+1<=th}>
+//  <pow[PHI1][im]-W-EXACT-{0<=PHI1, PHI1+1<=th}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>
 //  <v-R-EXACT-{}>
@@ -272,8 +277,10 @@ int main(int argc, char *argv[])
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <pow[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=13, 1<=PHI2, PHI2<=2,
-//    j==13, k==12, rg==13, th==14, v==12}>
+//  <pow[PHI1][re]-R-EXACT-{0<=PHI1, PHI1<=13, j==13, k==12, rg==13,
+//    th==14, v==12}>
+//  <pow[PHI1][im]-R-EXACT-{0<=PHI1, PHI1<=13, j==13, k==12, rg==13,
+//    th==14, v==12}>
 //  <th-R-EXACT-{}>
 
       for(i = 0; i <= th-1; i += 1)
@@ -281,8 +288,10 @@ int main(int argc, char *argv[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <i-R-EXACT-{}>
-//  <pow[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=2, j==13, k==12,
-//    rg==13, th==14, v==12, 0<=i, i<=13}>
+//  <pow[PHI1][re]-R-EXACT-{PHI1==i, j==13, k==12, rg==13, th==14,
+//    v==12, 0<=i, i<=13}>
+//  <pow[PHI1][im]-R-EXACT-{PHI1==i, j==13, k==12, rg==13, th==14,
+//    v==12, 0<=i, i<=13}>
 //  <th-R-EXACT-{}>
 
          printf("-%f-", pow[i]);
@@ -296,9 +305,12 @@ Regions for "average_power"
 //  <Nrg-R-EXACT-{}>
 //  <Nth-R-EXACT-{}>
 //  <Nv-R-EXACT-{}>
-//  <Pow[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=Nth, 1<=PHI2, PHI2<=2}>
-//  <ptrin[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
-//    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, 1<=PHI4, PHI4<=2}>
+//  <Pow[PHI1][re]-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
+//  <Pow[PHI1][im]-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
+//  <ptrin[PHI1][PHI2][PHI3][im]-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
+//    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3][re]-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
+//    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
 
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
@@ -311,9 +323,12 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <Nv-R-EXACT-{}>
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
-//  <Pow[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=Nth, 1<=PHI2, PHI2<=2}>
-//  <ptrin[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
-//    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, 1<=PHI4, PHI4<=2}>
+//  <Pow[PHI1][re]-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
+//  <Pow[PHI1][im]-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
+//  <ptrin[PHI1][PHI2][PHI3][im]-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
+//    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3][re]-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
+//    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
 //  <rg-R-EXACT-{}>
 //  <rg-W-EXACT-{}>
 //  <th-R-EXACT-{}>
@@ -334,9 +349,10 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <Nv-R-EXACT-{}>
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
-//  <ptrin[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==th, 0<=PHI2,
-//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, 1<=PHI4, PHI4<=2, 1+th<=Nth,
-//    0<=th}>
+//  <ptrin[PHI1][PHI2][PHI3][im]-R-EXACT-{PHI1==th, 0<=PHI2,
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, 1+th<=Nth, 0<=th}>
+//  <ptrin[PHI1][PHI2][PHI3][re]-R-EXACT-{PHI1==th, 0<=PHI2,
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, 1+th<=Nth, 0<=th}>
 //  <rg-R-EXACT-{}>
 //  <rg-W-EXACT-{}>
 //  <th-R-EXACT-{}>
@@ -350,9 +366,10 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <Nv-R-EXACT-{}>
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
-//  <ptrin[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==th, PHI2==rg,
-//    0<=PHI3, PHI3+1<=Nv, 1<=PHI4, PHI4<=2, 1+rg<=Nrg, 1+th<=Nth,
-//    0<=rg, 0<=th}>
+//  <ptrin[PHI1][PHI2][PHI3][im]-R-EXACT-{PHI1==th, PHI2==rg, 0<=PHI3,
+//    PHI3+1<=Nv, 1+rg<=Nrg, 1+th<=Nth, 0<=rg, 0<=th}>
+//  <ptrin[PHI1][PHI2][PHI3][re]-R-EXACT-{PHI1==th, PHI2==rg, 0<=PHI3,
+//    PHI3+1<=Nv, 1+rg<=Nrg, 1+th<=Nth, 0<=rg, 0<=th}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>
 //  <v-R-EXACT-{}>
@@ -365,9 +382,10 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <Nv-R-EXACT-{}>
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
-//  <ptrin[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==th, PHI2==rg,
-//    PHI3==v, 1<=PHI4, PHI4<=2, 1+rg<=Nrg, 1+th<=Nth, 1+v<=Nv, 0<=rg,
-//    0<=th, 0<=v}>
+//  <ptrin[PHI1][PHI2][PHI3][im]-R-EXACT-{PHI1==th, PHI2==rg, PHI3==v,
+//    1+rg<=Nrg, 1+th<=Nth, 1+v<=Nv, 0<=rg, 0<=th, 0<=v}>
+//  <ptrin[PHI1][PHI2][PHI3][re]-R-EXACT-{PHI1==th, PHI2==rg, PHI3==v,
+//    1+rg<=Nrg, 1+th<=Nth, 1+v<=Nv, 0<=rg, 0<=th, 0<=v}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>
 //  <v-R-EXACT-{}>
@@ -379,15 +397,15 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <Nth-R-EXACT-{}>
 //  <Nv-R-EXACT-{}>
 //  <PP-R-EXACT-{}>
-//  <Pow[PHI1][PHI2]-W-EXACT-{PHI1==th, PHI2==1, Nrg<=rg, 1+th<=Nth,
-//    0<=rg, 0<=th}>
+//  <Pow[PHI1][re]-W-EXACT-{PHI1==th, Nrg<=rg, 1+th<=Nth, 0<=rg,
+//    0<=th}>
 //  <th-R-EXACT-{}>
 
       Pow[th].re = (float) PP/((float) Nv*Nrg);
 
 //  <Nth-R-EXACT-{}>
-//  <Pow[PHI1][PHI2]-W-EXACT-{PHI1==th, PHI2==2, Nrg<=rg, 1+th<=Nth,
-//    0<=rg, 0<=th}>
+//  <Pow[PHI1][im]-W-EXACT-{PHI1==th, Nrg<=rg, 1+th<=Nth, 0<=rg,
+//    0<=th}>
 //  <th-R-EXACT-{}>
 
       Pow[th].im = 0.;

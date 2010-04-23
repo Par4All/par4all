@@ -1,20 +1,6 @@
-raw file with loop flagged
 int pop(int pop)
 {
    int i = 0;
-l99999:
-   for(i = i; i <= op-1; i += 1)
+   for (;i<op;++i)
       printf("%d", i);
-}
-after loop expansion
-int pop(int pop)
-{
-   int i = 0;
-   //PIPS generated variable
-   int I_0;
-   I_0 = i;
-l99999:
-   for(i = i; i <= I_0+128*((127-i+op)/128)-1; i += 1)
-      if (i>=I_0&&i<=op-1) 
-         printf("%d", i);
 }

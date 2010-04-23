@@ -8,26 +8,26 @@ int main()
       int second;
    } x, y[10], z[10];
    int i;
-//               <must be written>: x[1]
+//               <must be written>: x[first]
 
    x.first = 1;
-//               <must be written>: x[2]
+//               <must be written>: x[second]
    x.second = 2;
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//               <must be read   >: i x[1]
-//               <must be written>: y[i][1]
+//               <must be read   >: i x[first]
+//               <must be written>: y[i][first]
       y[i].first = x.first;
-//               <must be read   >: i x[2]
-//               <must be written>: y[i][2]
+//               <must be read   >: i x[second]
+//               <must be written>: y[i][second]
       y[i].second = x.second;
    }
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <must be read   >: i x[1] x[2]
-//               <must be written>: z[i][1] z[i][2]
+//               <must be read   >: i x[first] x[second]
+//               <must be written>: z[i][first] z[i][second]
       z[i] = x;
    return 0;
 }
@@ -41,30 +41,30 @@ int main()
       int second;
    } x, y[10], z[10];
    int i;
-//               <must be written>: x[1]
+//               <must be written>: x[first]
 
    x.first = 1;
-//               <must be written>: x[2]
+//               <must be written>: x[second]
    x.second = 2;
-//               <may be read    >: i x[1] x[2]
-//               <may be written >: y[*][1] y[*][2]
+//               <may be read    >: i x[second] x[first]
+//               <may be written >: y[*][second] y[*][first]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//               <may be written >: y[*][1]
-//               <must be read   >: i x[1]
+//               <may be written >: y[*][first]
+//               <must be read   >: i x[first]
       y[i].first = x.first;
-//               <may be written >: y[*][2]
-//               <must be read   >: i x[2]
+//               <may be written >: y[*][second]
+//               <must be read   >: i x[second]
       y[i].second = x.second;
    }
-//               <may be read    >: i x[1] x[2]
-//               <may be written >: z[*][1] z[*][2]
+//               <may be read    >: i x[first] x[second]
+//               <may be written >: z[*][first] z[*][second]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <may be written >: z[*][1] z[*][2]
-//               <must be read   >: i x[1] x[2]
+//               <may be written >: z[*][first] z[*][second]
+//               <must be read   >: i x[first] x[second]
       z[i] = x;
    return 0;
 }
@@ -78,26 +78,26 @@ int main()
       int second;
    } x, y[10], z[10];
    int i;
-//               <must be written>: x[1]
+//               <must be written>: x[first]
 
    x.first = 1;
-//               <must be written>: x[2]
+//               <must be written>: x[second]
    x.second = 2;
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//               <must be read   >: i x[1]
-//               <must be written>: y[i][1]
+//               <must be read   >: i x[first]
+//               <must be written>: y[i][first]
       y[i].first = x.first;
-//               <must be read   >: i x[2]
-//               <must be written>: y[i][2]
+//               <must be read   >: i x[second]
+//               <must be written>: y[i][second]
       y[i].second = x.second;
    }
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <must be read   >: i x[1] x[2]
-//               <must be written>: z[i][1] z[i][2]
+//               <must be read   >: i x[first] x[second]
+//               <must be written>: z[i][first] z[i][second]
       z[i] = x;
    return 0;
 }
@@ -111,30 +111,30 @@ int main()
       int second;
    } x, y[10], z[10];
    int i;
-//               <must be written>: x[1]
+//               <must be written>: x[first]
 
    x.first = 1;
-//               <must be written>: x[2]
+//               <must be written>: x[second]
    x.second = 2;
-//               <may be read    >: i x[1] x[2]
-//               <may be written >: y[*][1] y[*][2]
+//               <may be read    >: i x[second] x[first]
+//               <may be written >: y[*][second] y[*][first]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//               <may be written >: y[*][1]
-//               <must be read   >: i x[1]
+//               <may be written >: y[*][first]
+//               <must be read   >: i x[first]
       y[i].first = x.first;
-//               <may be written >: y[*][2]
-//               <must be read   >: i x[2]
+//               <may be written >: y[*][second]
+//               <must be read   >: i x[second]
       y[i].second = x.second;
    }
-//               <may be read    >: i x[1] x[2]
-//               <may be written >: z[*][1] z[*][2]
+//               <may be read    >: i x[first] x[second]
+//               <may be written >: z[*][first] z[*][second]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <may be written >: z[*][1] z[*][2]
-//               <must be read   >: i x[1] x[2]
+//               <may be written >: z[*][first] z[*][second]
+//               <must be read   >: i x[first] x[second]
       z[i] = x;
    return 0;
 }
@@ -205,47 +205,53 @@ int main()
    } x, y[10], z[10];
    int i;
 
-//  <x[PHI1]-W-EXACT-{PHI1==1}>
+//  <x[first]-W-EXACT-{}>
 
 
    x.first = 1;
 
-//  <x[PHI1]-W-EXACT-{PHI1==2}>
+//  <x[second]-W-EXACT-{}>
 
    x.second = 2;
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <x[PHI1]-R-EXACT-{1<=PHI1, PHI1<=2}>
-//  <y[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, 1<=PHI2, PHI2<=2}>
+//  <x[second]-R-EXACT-{}>
+//  <x[first]-R-EXACT-{}>
+//  <y[PHI1][first]-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <y[PHI1][second]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1) {
 
 //  <i-R-EXACT-{}>
-//  <x[PHI1]-R-EXACT-{PHI1==1, 0<=i, i<=9}>
-//  <y[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==1, 0<=i, i<=9}>
+//  <x[first]-R-EXACT-{0<=i, i<=9}>
+//  <y[PHI1][first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       y[i].first = x.first;
 
 //  <i-R-EXACT-{}>
-//  <x[PHI1]-R-EXACT-{PHI1==2, 0<=i, i<=9}>
-//  <y[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==2, 0<=i, i<=9}>
+//  <x[second]-R-EXACT-{0<=i, i<=9}>
+//  <y[PHI1][second]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       y[i].second = x.second;
    }
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <x[PHI1]-R-EXACT-{1<=PHI1, PHI1<=2}>
-//  <z[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, 1<=PHI2, PHI2<=2}>
+//  <x[first]-R-EXACT-{}>
+//  <x[second]-R-EXACT-{}>
+//  <z[PHI1][second]-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <z[PHI1][first]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
 
 //  <i-R-EXACT-{}>
-//  <x[PHI1]-R-EXACT-{1<=PHI1, PHI1<=2, 0<=i, i<=9}>
-//  <z[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=2, 0<=i, i<=9}>
+//  <x[first]-R-EXACT-{0<=i, i<=9}>
+//  <x[second]-R-EXACT-{0<=i, i<=9}>
+//  <z[PHI1][second]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <z[PHI1][first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       z[i] = x;
    return 0;

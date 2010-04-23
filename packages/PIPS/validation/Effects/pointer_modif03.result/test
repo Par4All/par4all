@@ -1,5 +1,5 @@
 
-Proper effects for "make_s"
+Proper pointer effects for "make_s"
 
 s_t make_s(int i, float x)
 {
@@ -10,12 +10,126 @@ s_t make_s(int i, float x)
 
    p = (s_t *) malloc(sizeof(s_t));
 //               <must be read   >: i p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][entier]
    p->entier = i;
 //               <must be read   >: p x
-//               <must be written>: p[0][2]
+//               <must be written>: p[0][reel]
    p->reel = x;
-//               <must be read   >: p p[0]
+//               <must be read   >: p p[0][reel] p[0][entier]
+   return *p;
+   // END BLOCK
+}
+
+Cumulated pointer effects for "make_s"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+s_t make_s(int i, float x)
+{
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+   // BEGIN BLOCK
+   s_t *p;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+
+   p = (s_t *) malloc(sizeof(s_t));
+//               <must be read   >: i p
+//               <must be written>: p[0][entier]
+   p->entier = i;
+//               <must be read   >: p x
+//               <must be written>: p[0][reel]
+   p->reel = x;
+//               <must be read   >: p p[0][reel] p[0][entier]
+   return *p;
+   // END BLOCK
+}
+
+Proper pointer effects for "main"
+
+int main()
+{
+   // BEGIN BLOCK
+   s_t s;
+   int j;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[entier]
+//                                  s[reel]
+
+   s = make_s(1, 2.);
+//               <must be written>: s[entier]
+   s.entier = 4;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+
+   j = make_s(1, 2.).entier;
+//               <must be read   >: j
+
+   return j;
+   // END BLOCK
+}
+
+Cumulated pointer effects for "main"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+   // BEGIN BLOCK
+   s_t s;
+   int j;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[entier]
+//                                  s[reel]
+
+   s = make_s(1, 2.);
+//               <must be written>: s[entier]
+   s.entier = 4;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+
+   j = make_s(1, 2.).entier;
+//               <must be read   >: j
+
+   return j;
+   // END BLOCK
+}
+
+Proper effects for "make_s"
+
+s_t make_s(int i, float x)
+{
+   // BEGIN BLOCK
+   s_t *p;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+
+   p = (s_t *) malloc(sizeof(s_t));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i p
+   p->entier = i;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p x
+   p->reel = x;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
    return *p;
    // END BLOCK
 }
@@ -38,13 +152,13 @@ s_t make_s(int i, float x)
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
 
    p = (s_t *) malloc(sizeof(s_t));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: i p
-//               <must be written>: p[0][1]
    p->entier = i;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: p x
-//               <must be written>: p[0][2]
    p->reel = x;
-//               <must be read   >: p p[0]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
    return *p;
    // END BLOCK
 }
@@ -59,15 +173,15 @@ int main()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 
    s = make_s(1, 2.);
-//               <must be written>: s[1]
+//               <must be written>: s[entier]
    s.entier = 4;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 
    j = make_s(1, 2.).entier;
 //               <must be read   >: j
@@ -94,15 +208,15 @@ int main()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 
    s = make_s(1, 2.);
-//               <must be written>: s[1]
+//               <must be written>: s[entier]
    s.entier = 4;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 
    j = make_s(1, 2.).entier;
 //               <must be read   >: j

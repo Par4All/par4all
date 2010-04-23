@@ -17,22 +17,26 @@ void for03(int n)
    al_t e1;
    al_t e2;
    float t, delta_t, t_max;
-//               <must be written>: e1[2]
+//               <must be written>: e1[next]
 
    e1.next = &e2;
 //               <must be written>: j
 
    for(j = 0; j <= 99; j += 1) {
 //               <must be read   >: j
-//               <must be written>: e1[1][j]
+//               <must be written>: e1[x][j]
       (e1.x)[j] = 0.;
-//               <may be written >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: e1[2] j
+//               <must be read   >: e1[next] j
+//               <must be written>: e1[next][0][x][j]
       (e1.next->x)[j] = 1.;
    }
 }
 
 Check the regions
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
 void for03(int n)
 {
@@ -41,26 +45,24 @@ void for03(int n)
    al_t e2;
    float t, delta_t, t_max;
 
-//  <e1[PHI1]-W-EXACT-{PHI1==2}>
+//  <e1[next]-W-EXACT-{}>
 
 
    e1.next = &e2;
 
-//  <e1[PHI1]-R-EXACT-{PHI1==2}>
-//  <e1[PHI1][PHI2]-W-EXACT-{PHI1==1, 0<=PHI2, PHI2<=99}>
-//  <e1[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==2, PHI2==0, PHI3==1,
-//    0<=PHI4, PHI4<=99}>
+//  <e1[next]-R-EXACT-{}>
+//  <e1[x][PHI2]-W-EXACT-{0<=PHI2, PHI2<=99}>
+//  <e1[next][PHI2][x][PHI4]-W-EXACT-{PHI2==0, 0<=PHI4, PHI4<=99}>
 
 
    for(j = 0; j <= 99; j += 1) {
 
-//  <e1[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==j, 0<=j, j<=99}>
+//  <e1[x][PHI2]-W-EXACT-{PHI2==j, 0<=j, j<=99}>
 
       (e1.x)[j] = 0.;
 
-//  <e1[PHI1]-R-EXACT-{PHI1==2, 0<=j, j<=99}>
-//  <e1[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==2, PHI2==0, PHI3==1,
-//    PHI4==j, 0<=j, j<=99}>
+//  <e1[next]-R-EXACT-{0<=j, j<=99}>
+//  <e1[next][PHI2][x][PHI4]-W-EXACT-{PHI2==0, PHI4==j, 0<=j, j<=99}>
 
       (e1.next->x)[j] = 1.;
    }
@@ -72,18 +74,12 @@ Chains
  *********************** Use-Def Chains *********************
 
 	29 --> 29 with conflicts
-		from <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST> to <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST>
-	29 --> 28 with conflicts
-		from <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST> to <e1[PHI1][PHI2]-W-MUST>
-	28 --> 29 with conflicts
-		from <e1[PHI1][PHI2]-W-MUST> to <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST>
+		from <e1[next][PHI2][x][PHI4]-W-MUST> to <e1[next][PHI2][x][PHI4]-W-MUST>
 	28 --> 28 with conflicts
-		from <e1[PHI1][PHI2]-W-MUST> to <e1[PHI1][PHI2]-W-MUST>
+		from <e1[x][PHI2]-W-MUST> to <e1[x][PHI2]-W-MUST>
 	25 --> 29 with conflicts
-		from <e1[PHI1]-W-MUST> to <e1[PHI1]-R-MUST>
-		from <e1[PHI1]-W-MUST> to <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST>
-	25 --> 28 with conflicts
-		from <e1[PHI1]-W-MUST> to <e1[PHI1][PHI2]-W-MUST>
+		from <e1[next]-W-MUST> to <e1[next]-R-MUST>
+		from <e1[next]-W-MUST> to <e1[next][PHI2][x][PHI4]-W-MUST>
 
 ****************** End of Dependence Graph ******************
 

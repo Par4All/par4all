@@ -74,6 +74,7 @@ echo Regions for "main"
 echo
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
+setenv PROPER_EFFECTS_DEBUG_LEVEL 8
 activate PRINT_CODE_POINTER_REGIONS
 display PRINTED_FILE[main]
 
