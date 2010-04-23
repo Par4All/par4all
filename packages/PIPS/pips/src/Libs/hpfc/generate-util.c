@@ -116,7 +116,7 @@ hpfc_gen_n_vars_expr(
 expression 
 make_reference_expression(
     entity e,
-    entity (*creation)(int))
+    entity (*creation)())
 {
     return reference_to_expression(make_reference(e,
 	   hpfc_gen_n_vars_expr(creation, NumberOfDimension(e))));
@@ -437,7 +437,7 @@ hpfc_lazy_buffer_packing(
     entity trg,   /* target array */
     entity lid,   /* local id for base target */
     entity proc,  /* the processors, needed for broadcasts */
-    entity (*array_dim)(int), /* variables for array dimensions */
+    entity (*array_dim)(), /* variables for array dimensions */
     bool is_send, /* send or receive ? */
     bool is_lazy) /* means you send the buffer directly, without packing... */
 {
@@ -522,7 +522,7 @@ statement
 hpfc_lazy_packing(
     entity array,
     entity lid, 
-    entity (*creation)(int),
+    entity (*creation)(),
     bool pack,
     bool lazy)
 {
@@ -551,7 +551,7 @@ statement
 hpfc_compute_lid(
     entity lid,               /* variable to be assigned to */
     entity proc,              /* processor arrangement */
-    entity (*creation)(int),  /* individual variables */
+    entity (*creation)(),  /* individual variables */
     entity array)             /* to be used for partial (broadcasts...) */
 {
     if (!get_bool_property("HPFC_EXPAND_CMPLID"))

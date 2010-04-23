@@ -154,6 +154,7 @@
 #include "conversion.h"
 #include "text-util.h"
 #include "transformations.h"
+#include "alias-classes.h"
 
 #define ALIAS_SECTION "ALIAS_SECTION"
 

@@ -539,7 +539,7 @@ put_variables_in_ordered_lists(
 	    
 	    fprintf(stderr, "%s rebuilt with ", entity_local_name
 		    (reference_variable(expression_reference(ex))));
-	    egalite_fprint(stderr, pc, entity_local_name);
+	    egalite_fprint(stderr, pc, (string(*)(Variable))entity_local_name);
 	},
 	    lrebuild);
     }

@@ -1941,6 +1941,131 @@ type expression_to_user_type(expression e)
 }
 
 /*************************************************************************/
+/* cell references */
+
+static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
+{
+  type t = type_undefined;  /* the return type */
+  pips_assert("input type tag should be variable\n", type_variable_p(current_type));
+
+  basic current_basic = variable_basic(type_variable(current_type)); /* current basic */
+  list l_current_dim = variable_dimensions(type_variable(current_type)); /* current type array dimensions */
+  size_t current_nb_dim = gen_length(l_current_dim);
+     
+  pips_debug(8, "input type : %s\n", type_to_string(current_type));
+  pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
+
+  /* the remainder of the function heavily relies on the following assumption */
+  pips_assert("there should be no memory access paths to variable names\n", gen_length(ref_l_ind) >= current_nb_dim);
+
+ /*first skip array dimensions if any*/
+  for(int i=0; i< (int) current_nb_dim; i++, POP(ref_l_ind));
+  
+  if (ENDP(ref_l_ind)) /* We have reached the current basic */
+    {
+      /* Warning : qualifiers are set to NIL, because I do not see
+	 the need for something else for the moment. BC.
+      */
+      t = make_type(is_type_variable, make_variable(copy_basic(current_basic), NIL, NIL));
+    }
+  else
+    {
+      /* The cell reference contains indices that go beyond the current type array dimensions.
+         This can happen if and only if the current basic is a pointer or a derived 
+         (typedef have been eliminated by the use of basic_concrete_type).
+      */
+      switch (basic_tag(current_basic)) 
+	{
+	case is_basic_pointer:
+	  {
+	    type new_current_type = basic_concrete_type(basic_pointer(current_basic));
+	    POP(ref_l_ind); /* pop the pointer dimension */
+	    t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type);
+	    free_type(new_current_type);
+	    break;
+	  }
+	case is_basic_derived:
+	  {
+	    /* the next reference index should be a field entity */
+	    expression next_index = EXPRESSION(CAR(ref_l_ind));
+	    syntax s = expression_syntax(next_index);
+	    if (syntax_reference_p(s))
+	      {
+		entity next_index_e = reference_variable(syntax_reference(s));
+		if (entity_field_p(next_index_e))
+		  {
+		    type new_current_type = basic_concrete_type(entity_type(next_index_e));
+		    POP(ref_l_ind); /* pop the field dimension */
+		    t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type);
+		    free_type(new_current_type);
+		  }
+		else
+		  pips_internal_error("the current basic tag is derived, but corresponding index is not a field entity\n");
+	      }
+	    else
+	      pips_internal_error("the current basic tag is derived, but corresponding index is not a reference\n");
+	    break;
+	  }      
+	default:
+	  {
+	    pips_internal_error("unexpected basic tag\n");
+	  }
+	}
+    }
+      
+  ifdebug(8)
+    {
+      variable v = type_variable(t);
+      pips_debug(8, "output type is: %s\n",  type_to_string(t));
+      pips_debug(8, "with basic : %s, and number of dimensions %d\n", 
+		 basic_to_string(variable_basic(v)), 
+		 (int) gen_length(variable_dimensions(v)));
+    }
+  return t;
+}
+
+/**
+ @brief computes the type of a cell reference representing a memory access path. 
+        Cell references are not compatible with entity typing: spurious dimensions 
+        are added to handle struct fields and the dereferencing operator.
+	BEWARE : does not work if field entity indices have been converted to ranks.
+ @param ref is a reference from a cell.
+ @return a *newly allocated* type corresponding to the type of the memory cells targeted by the access path.
+ */
+type cell_reference_to_type(reference ref)
+{
+  type t = type_undefined;
+  type ref_type = basic_concrete_type(entity_type(reference_variable(ref)));
+
+  pips_debug(6, "input reference: %s \n",  words_to_string(words_reference(ref,NIL)));
+
+  if(type_variable_p(ref_type))
+    {
+      t = r_variable_cell_reference_to_type(reference_indices(ref), ref_type);
+    }
+  else if(type_functional_p(ref_type))
+    {
+      /* A reference to a function returns a pointer to a function
+	 of the very same time */
+      t = make_type(is_type_variable,
+		    make_variable
+		    (make_basic(is_basic_pointer, copy_type(ref_type)),
+		     NIL, NIL));
+    }
+  else
+    {
+      pips_internal_error("Bad reference type tag %d \"%s\" for reference %s\n",
+			  type_tag(ref_type),
+			  type_to_string(ref_type),
+			  entity_name(reference_variable(ref)));
+    }
+  free_type(ref_type);
+
+  return t;
+}
+
+
+/*************************************************************************/
 
 
 

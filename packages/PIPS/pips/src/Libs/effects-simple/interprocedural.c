@@ -1116,6 +1116,8 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		reference r1 = syntax_reference(s1);
 		list l_real_arg = NIL;
 		effect eff1;
+		bool anywhere_w_p = false;
+		bool anywhere_r_p = false;
 	    
 		/* first we compute an effect on the argument of the 
 		   address_of operator (to treat cases like &(n->m))*/
@@ -1126,108 +1128,154 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		  generic_proper_effects_of_complex_address_expression
 		  (arg1, &eff1, true);
 
-		ifdebug(6)
-		  {
-		    pips_debug(6, "base effect :\n");
-		    print_effect(eff1);
-		  }
+		pips_debug(6, "base effect :\n", eff1);
 
 		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
 		    reference eff_ref = effect_any_reference(eff);
 		    list eff_ind = reference_indices(eff_ref);
-
-		    ifdebug(6)
+		    tag eff_act = effect_action_tag(eff);
+		    
+		    pips_debug_effect(6, "current effect :\n", eff);
+		    
+		    if ((anywhere_r_p && eff_act == is_action_read) || (anywhere_w_p && eff_act == is_action_write))
 		      {
-			pips_debug(6, "current effect :\n");
-			print_effect(eff);
+			pips_debug(6, "no need to translate, result is already anywhere\n");
 		      }
-		
-		    if (effect_undefined_p(eff1))
-		      n_eff =  make_anywhere_effect(effect_action_tag(eff));
 		    else
 		      {
-			n_eff = (*effect_dup_func)(eff1);
-			/* memory leaks ? */
-			effect_approximation(n_eff) = 
-			  copy_approximation(effect_approximation(eff));
-			effect_action(n_eff) =
-			  copy_action(effect_action(eff));
-		      }
-	      
-		    /* BC : This must certainely be improved 
-		       only simple cases are handled .*/
-		    if(ENDP(reference_indices(effect_any_reference(n_eff)))) 
-		      {
-			expression first_ind = EXPRESSION(CAR(eff_ind));
-		    
-			/* The operand of & is a scalar expression */
-			/* the first index of eff reference (which must
-			   be equal to 0) must not be taken into account.
-			   The other indices must be appended to n_eff indices
-			*/
-		    
-			pips_assert("scalar case : the first index of eff must be equal to [0]", expression_equal_integer_p(first_ind, 0));
-			FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
+			if (effect_undefined_p(eff1))
 			  {
-			    (*effect_add_expression_dimension_func)
-			      (n_eff, eff_ind_exp);
+			    n_eff =  make_anywhere_effect(eff_act);
+			    if (eff_act == is_action_read) 
+			      anywhere_r_p = true;
+			    else
+			      anywhere_w_p = true;
 			  }
-		      }
-		    else 
-		      {
-			expression first_ind = EXPRESSION(CAR(eff_ind));
-			reference n_eff_ref = effect_any_reference(n_eff);
-			expression last_n_eff_ind = 
-			  EXPRESSION(CAR(gen_last(reference_indices(n_eff_ref))));
-			expression n_exp;
-		    
-		    
-			/* The operand of & is subcripted */
-			/* The first index of eff must be added to the last
-			 * index of n_eff (except if it is unbounded
-			 * or if it is a field or field rank),
-			 * and the remaining indices list 
-			 * be appended to th indices of n_eff
-			 * could be more generic
-			 */
-			if(!unbounded_expression_p(last_n_eff_ind))
+			else
 			  {
-			    if(!unbounded_expression_p(first_ind))
+			    n_eff = (*effect_dup_func)(eff1);
+			    /* memory leaks ? */
+			    effect_approximation(n_eff) = 
+			      copy_approximation(effect_approximation(eff));
+			    effect_action(n_eff) =
+			      copy_action(effect_action(eff));
+			  }
+	      
+			/* BC : This must certainely be improved only simple cases are handled .*/
+			if(ENDP(reference_indices(effect_any_reference(n_eff)))) 
+			  {
+			    expression first_ind = EXPRESSION(CAR(eff_ind));
+		    
+			    /* The operand of & is a scalar expression */
+			    /* the first index of eff reference (which must
+			       be equal to 0) must not be taken into account.
+			       The other indices must be appended to n_eff indices
+			    */
+		    
+			    if (!expression_equal_integer_p(first_ind, 0))
 			      {
-				value v;
-				n_exp = MakeBinaryCall
-				  (entity_intrinsic(PLUS_OPERATOR_NAME),
-				   last_n_eff_ind, copy_expression(first_ind));
-				/* Then we must try to evaluate the expression */
-				v = EvalExpression(n_exp);
-				if (! value_undefined_p(v) && 
-				    value_constant_p(v))
-				  {
-				    constant vc = value_constant(v);
-				    if (constant_int_p(vc))
-				      {
-				    
-					/* free_expression(n_exp);*/
-					n_exp = int_to_expression(constant_int(vc));
-				      }
-				  }
+				pips_user_warning("potential memory overflow due to effect : %s"
+						  " corresponding to real argument %s -> returning anywhere effect\n",
+						  words_to_string(words_effect(eff)),
+						  words_to_string(words_expression(real_arg, NIL)));
+				free_effect(n_eff);
+				n_eff = make_anywhere_effect(eff_act);
+				if (eff_act == is_action_read) 
+				  anywhere_r_p = true;
+				else
+				  anywhere_w_p = true;
 			      }
 			    else
 			      {
-				n_exp = make_unbounded_expression();
+				FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
+				  {
+				    (*effect_add_expression_dimension_func)
+				      (n_eff, eff_ind_exp);
+				  }
 			      }
-			    CAR(gen_last(reference_indices(n_eff_ref))).p 
-			      = (void *) n_exp;
-			    /*should we free last_n_eff_ind ? */
 			  }
-			FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
+			else 
 			  {
-			    (*effect_add_expression_dimension_func)
-			      (n_eff, eff_ind_exp);
-			  }
-		      } /*else */
-		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+			    expression first_ind = EXPRESSION(CAR(eff_ind));
+			    reference n_eff_ref = effect_any_reference(n_eff);
+			    expression last_n_eff_ind = 
+			      EXPRESSION(CAR(gen_last(reference_indices(n_eff_ref))));
+			    expression n_exp;
+		    
+		    
+			    /* The operand of & is subcripted */
+			    /* The first index of eff must be added to the last
+			     * index of n_eff (except if it is unbounded
+			     * or if it is a field),
+			     * and the remaining indices list 
+			     * be appended to th indices of n_eff
+			     * could be more generic
+			     */
+			    if(!unbounded_expression_p(last_n_eff_ind))
+			      {
+				if (expression_reference_p(last_n_eff_ind) && 
+				    entity_field_p(expression_variable(last_n_eff_ind)))
+				  {
+				    if (!expression_equal_integer_p(first_ind, 0))
+				      {
+					pips_user_warning("potential memory overflow due to effect : %s"
+							  " corresponding to real argument %s -> returning anywhere effect\n",
+							  words_to_string(words_effect(eff)),
+							  words_to_string(words_expression(real_arg, NIL)));
+					free_effect(n_eff);
+					n_eff = make_anywhere_effect(eff_act);
+					if (eff_act == is_action_read) 
+					  anywhere_r_p = true;
+					else
+					  anywhere_w_p = true;
+				      }	
+				    else
+				      n_exp = last_n_eff_ind;
+				  }
+			    
+				else if(!unbounded_expression_p(first_ind))
+				  {
+				
+				    value v;
+				    n_exp = MakeBinaryCall
+				      (entity_intrinsic(PLUS_OPERATOR_NAME),
+				       last_n_eff_ind, copy_expression(first_ind));
+				    /* Then we must try to evaluate the expression */
+				    v = EvalExpression(n_exp);
+				    if (! value_undefined_p(v) && 
+					value_constant_p(v))
+				      {
+					constant vc = value_constant(v);
+					if (constant_int_p(vc))
+					  {
+				    
+					    /* free_expression(n_exp);*/
+					    n_exp = int_to_expression(constant_int(vc));
+					  }
+				      }
+				  }
+				else
+				  {
+				    n_exp = make_unbounded_expression();
+				  }
+				if (!anywhere_effect_p(n_eff))
+				  {CAR(gen_last(reference_indices(n_eff_ref))).p 
+				      = (void *) n_exp;
+				  }
+				/*should we free last_n_eff_ind ? beware n_exp can be equal to it*/
+			      }
+			    if (!anywhere_effect_p(n_eff))
+			      {
+				FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
+				  {
+				    (*effect_add_expression_dimension_func)
+				      (n_eff, eff_ind_exp);
+				  }
+			      }
+			  } /*else */
+			l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+		      }
 		  } /*  FOREACH(EFFECT, eff, l_sum_eff) */
 		gen_free_list(l_real_arg);
 		free_effect(eff1);
@@ -1237,6 +1285,8 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	      {
 		list l_real_arg = NIL;
 		effect eff1;
+		bool anywhere_w_p = false;
+		bool anywhere_r_p = false;
 		/* first we compute an effect on the real_arg */
 	    
 		l_real_arg = generic_proper_effects_of_complex_address_expression
@@ -1246,29 +1296,43 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		  {
 		    reference eff_ref = effect_any_reference(eff);
 		    list eff_ind = reference_indices(eff_ref);
+		    tag eff_act = effect_action_tag(eff);
 
-		    if (effect_undefined_p(eff1))
-		      n_eff =  make_anywhere_effect(effect_action_tag(eff));
+		    if ((anywhere_r_p && eff_act == is_action_read) || (anywhere_w_p && eff_act == is_action_write))
+		      {
+			pips_debug(6, "no need to translate, result is already anywhere\n");
+		      }
 		    else
 		      {
-			n_eff = (*effect_dup_func)(eff1);
-			/* memory leaks ? */
-			effect_approximation(n_eff) = 
-			  copy_approximation(effect_approximation(eff));
-			effect_action(n_eff) =
-			  copy_action(effect_action(eff));
-		      }
-		    /* Then we add the indices of the effect reference */
-		    /* Well this is valid only in the general case :
-		     * we should verify that types are compatible.
-		     * And it's not GENERIC.
-		     */
-		    FOREACH(EXPRESSION, ind, eff_ind)
-		      {
-			(*effect_add_expression_dimension_func)(n_eff, ind);
+			if (effect_undefined_p(eff1))
+			  {
+			    n_eff =  make_anywhere_effect(effect_action_tag(eff));
+			    if (eff_act == is_action_read) 
+			      anywhere_r_p = true;
+			    else
+			      anywhere_w_p = true;
+			  }
+			else
+			  {
+			    n_eff = (*effect_dup_func)(eff1);
+			    /* memory leaks ? */
+			    effect_approximation(n_eff) = 
+			      copy_approximation(effect_approximation(eff));
+			    effect_action(n_eff) =
+			      copy_action(effect_action(eff));
+			  }
+			/* Then we add the indices of the effect reference */
+			/* Well this is valid only in the general case :
+			 * we should verify that types are compatible.
+			 * And it's not GENERIC.
+			 */
+			FOREACH(EXPRESSION, ind, eff_ind)
+			  {
+			    (*effect_add_expression_dimension_func)(n_eff, ind);
 		    
+			  }
+			l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
 		      }
-		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
 		  } /* FOREACH(EFFECT, eff, l_sum_eff) */
 		gen_free_list(l_real_arg);
 		free_effect(eff1);

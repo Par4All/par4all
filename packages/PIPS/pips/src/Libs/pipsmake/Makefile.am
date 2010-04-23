@@ -1,6 +1,6 @@
 TARGET	= pipsmake
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h readmakefile.h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libpipsmake.la
 libpipsmake_la_SOURCES=\
@@ -16,7 +16,6 @@ libpipsmake_la_SOURCES=\
 AM_YFLAGS=-d -p pipsmake_
 AM_LFLAGS=-p pipsmake_
 
-# additionnal dep needed for // build
-lexer.c:readmakefile.h
+CLEANFILES=readmakefile.[ch] lexer.c
 
 include $(srcdir)/../pipslibs_includes.mk

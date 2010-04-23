@@ -198,11 +198,11 @@ statement initial, *phost, *pnode;
     hostfunction = make_reduction_function("H", dim, red->kind, b, 0);
     nodefunction = make_reduction_function("N", dim, red->kind, b, 4*dim+2);
 
-    *phost = make_assign_statement((expression) gen_copy_tree(ref),
+    *phost = make_assign_statement( copy_expression(ref),
 				   make_call_expression(hostfunction, NIL));
     *pnode = 
 	make_assign_statement
-	    ((expression) gen_copy_tree(ref),
+	    ( copy_expression(ref),
 	     make_call_expression
 	     (nodefunction,
 	      CONS(EXPRESSION, entity_to_expression(array),
@@ -387,7 +387,7 @@ compile_hpf_reduction(
 void free_vector_list(l)
 list l;
 {
-    gen_map(vect_rm, l);
+    gen_map((gen_iter_func_t)vect_rm, l);
     gen_free_list(l);
 }
 

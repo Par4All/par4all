@@ -20,6 +20,7 @@ License.
 
 #include "defines-local.h"
 #include "effects-convex.h"
+#include "alias_private.h"
 #include "instrumentation.h"
 #include "preprocessor.h"
 

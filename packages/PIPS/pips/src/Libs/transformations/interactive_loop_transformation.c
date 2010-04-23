@@ -240,7 +240,7 @@ bool module_loops_walker(statement s, list *l)
  * 
  * @return list of strings, one string per loop label
  */
-string module_loops(const string module_name, const string parent_loop)
+char* module_loops(const char* module_name, const char* parent_loop)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));

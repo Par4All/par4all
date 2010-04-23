@@ -69,7 +69,7 @@ static void mchoose_ok_notify(GtkWidget * widget  __attribute__((unused)), gpoin
 
 //	nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
 
-	mchoices_notify_buffer = strdup(gtk_label_get_text(mchoices_label));
+	mchoices_notify_buffer = strdup(gtk_label_get_text(GTK_LABEL(mchoices_label)));
 	/* Upperbound size for the scanf buffer: */
 	buffer = (char *) malloc(strlen(mchoices_notify_buffer) + 1);
 
@@ -175,7 +175,7 @@ static void mchoose_callback(GtkTreeSelection * selection, gpointer data  __attr
 	/* Make the PANEL_VALUE of mchoices a string that is all the
 	 names of the selected files: */
 	selected_rows = gtk_tree_selection_get_selected_rows(GTK_TREE_SELECTION(
-			selection), &choices);
+			selection), (GtkTreeModel**)&choices);
 
 	g_list_foreach(selected_rows, concat_labels, &new_mchoices_label);
 	g_list_free(selected_rows);

@@ -157,7 +157,7 @@ void hpfc_close_dummy_to_prime()
 Psysteme shift_system_to_prime_variables(s)
 Psysteme s;
 {
-    return sc_rename_variables(s, bound_dummy_to_prime_p,
+    return sc_rename_variables(s, (boolean (*)())bound_dummy_to_prime_p,
 			       (Variable(*)()) load_dummy_to_prime);
 }
 

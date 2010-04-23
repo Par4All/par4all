@@ -12,5 +12,6 @@ libc_syntax_la_SOURCES=\
 
 AM_YFLAGS=-d -p c_
 AM_LFLAGS=-p c_
+CLEANFILES=cyacc.[ch] clex.c
 
 include $(srcdir)/../pipslibs_includes.mk

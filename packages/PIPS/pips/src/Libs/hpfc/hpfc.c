@@ -811,7 +811,7 @@ bool hpfc_close(string name)
     
     set_string_property("PRETTYPRINT_COMMONS", "declaration"); 
     set_string_property("PIPSDBM_RESOURCES_TO_DELETE", "all");
-    gen_map(compile_common, get_the_commons());
+    gen_map((gen_iter_func_t)compile_common, get_the_commons());
 
     put_generated_resources_for_program(name);      /* global informations */
 

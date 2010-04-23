@@ -192,7 +192,7 @@ static statement hpfc_hmessage(
 
     ld = hpfc_name_to_entity(T_LID);
     lid = entity_to_expression(ld);
-    cmp_lid = hpfc_compute_lid(ld, proc, get_ith_processor_dummy, NULL);
+    cmp_lid = hpfc_compute_lid(ld, proc, (entity (*)())get_ith_processor_dummy, NULL);
 
     lp = CONS(STATEMENT, cmp_lid, NIL);
 
@@ -265,8 +265,8 @@ GENERATION(node_pre_io,
 	   hpfc_buffer_initialization(TRUE, FALSE, TRUE),
 	   hpfc_nrecv(array, FALSE))
 GENERATION(node_in_io,
-	   hpfc_buffer_packing(array, get_ith_local_dummy, TRUE),
-	   hpfc_buffer_packing(array, get_ith_local_dummy, FALSE))
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, TRUE),
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, FALSE))
 GENERATION(node_post_io,
 	   hpfc_nsend(array),
 	   make_empty_statement())
@@ -274,8 +274,8 @@ GENERATION(host_pre_io,
 	   hpfc_hmessage(array, array_to_processors(array), FALSE),
 	   hpfc_buffer_initialization(TRUE, FALSE, TRUE))
 GENERATION(host_in_io,
-	   hpfc_buffer_packing(array, get_ith_array_dummy, FALSE),
-	   hpfc_buffer_packing(array, get_ith_array_dummy, TRUE))
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, FALSE),
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, TRUE))
 GENERATION(host_post_io,
 	   make_empty_statement(),
 	   hpfc_hmessage(array, array_to_processors(array), TRUE))
@@ -460,11 +460,11 @@ void generate_io_statements_for_shared_arrays(
 	n_cont = make_empty_statement(),
 	h_pre = hpfc_buffer_initialization(TRUE, FALSE, TRUE),
 	h_rebuild = generate_deducables(rebuild),
-	h_pack = hpfc_buffer_packing(array, get_ith_array_dummy, TRUE),
+	h_pack = hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, TRUE),
 	h_cast = hpfc_hcast(array),
 	n_rcv = hpfc_nrecv(array, TRUE),
 	n_rebuild = generate_deducables(rebuild),
-	n_unpack = hpfc_buffer_packing(array, get_ith_local_dummy, FALSE),
+	n_unpack = hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, FALSE),
 	h_scan = systeme_to_loop_nest
 	             (echelon, 
 		      scanners,

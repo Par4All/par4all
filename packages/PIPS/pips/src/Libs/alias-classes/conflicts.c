@@ -360,8 +360,8 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
        */
       if ( !entity_abstract_location_p( reference_variable(r1) )
           && !entity_abstract_location_p( reference_variable(r2) ) ) {
-        type t1 = reference_to_type( r1 );
-        type t2 = reference_to_type( r2 );
+        type t1 = cell_reference_to_type( r1 );
+        type t2 = cell_reference_to_type( r2 );
 
         conflict_p = !type_equal_p( t1, t2 );
       }
@@ -371,7 +371,8 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
        that p[0] conflicts with any reference? We might as well use
        reference_to_abstract_location()... */
       /* Could be improved with ALIASING_ACROSS_DATA_STRUCTURES? */
-      conflict_p = memory_dereferencing_p( r1 ) || memory_dereferencing_p( r2 );
+      bool exact1, exact2;
+      conflict_p = effect_reference_dereferencing_p( r1, &exact1 ) || effect_reference_dereferencing_p( r2, &exact2 );
     }
   }
   return conflict_p;

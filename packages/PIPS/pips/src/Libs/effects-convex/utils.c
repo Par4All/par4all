@@ -1527,6 +1527,53 @@ void convex_region_change_ith_dimension_expression(effect reg, expression exp,
 }
 
 
+/**
+   @brief copies the input_effect and converts all it's reference indices that refer to
+          field entities to a phi variable, and add the corresponding constraint 
+	  (PHI_x == rank) in the descriptor system, rank being the integer corresponding 
+	  to the field rank in the field list of the ancestor derived type.
+   @input input_effect is a convex effect, and is not modified.
+   @return a new effect.
+ */
+effect convex_effect_field_to_rank_conversion(effect input_effect)
+{
+  effect eff = copy_effect(input_effect); 
+  cell c = effect_cell(input_effect);
+  /* if it's a preference, we are sure there are no field dimensions */
+  if (cell_reference_p(c))
+    {
+      reference r = cell_reference(c);
+      list l_ind = reference_indices(r);
+      int dim = 1;
+      
+      FOREACH(EXPRESSION, ind, l_ind)
+	{
+	  syntax s = expression_syntax(ind);
+	  if (syntax_reference_p(s))
+	    {
+	      entity ind_e = reference_variable(syntax_reference(s));
+	      if (entity_field_p(ind_e))
+		{
+		  int rank = entity_field_rank(ind_e);
+		  expression rank_exp = int_to_expression(rank);
+
+		  /* first change the effect reference index */
+		  expression new_ind = make_phi_expression(dim);
+		  free_syntax(s);
+		  expression_syntax(ind) = copy_syntax(expression_syntax(new_ind));
+		  free_expression(new_ind);
+		  /* Then add the constrain PHI_rank == rank into the effect system */
+		  bool dim_linear_p =
+		    sc_add_phi_equation(&region_system(eff), rank_exp, dim, IS_EG, PHI_FIRST);
+		  free_expression(rank_exp);
+		}
+	    }
+	  dim++;
+	} /* FOREACH*/
+    }
+  return eff;
+}
+
 
 /**
  
@@ -1558,11 +1605,18 @@ effect region_append(effect eff1, effect eff2)
 
   for(i=1; i<= nb_phi_2; i++)
     {
-      l_ind_1 = gen_nconc(l_ind_1,
-			  CONS(EXPRESSION,
-			       make_phi_expression(nb_phi_1+i),
-			       NIL));
-      
+      expression ind_exp_2 = EXPRESSION(CAR(l_ind_2));
+      if (entity_field_p(expression_variable(ind_exp_2)))
+	l_ind_1 = gen_nconc(l_ind_1,
+			    CONS(EXPRESSION,
+				 copy_expression(ind_exp_2),
+				 NIL));
+      else
+	l_ind_1 = gen_nconc(l_ind_1,
+			    CONS(EXPRESSION,
+				 make_phi_expression(nb_phi_1+i),
+				 NIL));  
+      POP(l_ind_2);
     }
   reference_indices(effect_any_reference(eff1)) = l_ind_1;
   

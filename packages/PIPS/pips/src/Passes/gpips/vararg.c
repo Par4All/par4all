@@ -27,6 +27,17 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include "genC.h"
+#include "misc.h"
+#include "database.h"
+#include "linear.h"
+#include "ri.h"
+#include "ri-util.h"
+#include "pipsdbm.h"
+
+#include <gtk/gtk.h>
+#include "gpips.h"
+
 
 #define SMALL_BUFFER_LENGTH 2560
 
@@ -34,8 +45,8 @@
 
 /*VARARGS0*/
 void
-gpips_user_error(char * calling_function_name,
-                 char * a_message_format,
+gpips_user_error(const char * calling_function_name,
+                 const char * a_message_format,
                  va_list * some_arguments)
 {
    char error_buffer[SMALL_BUFFER_LENGTH];
@@ -54,8 +65,8 @@ gpips_user_error(char * calling_function_name,
 
 /*VARARGS0*/
 void
-gpips_user_warning(char * calling_function_name,
-                   char * a_message_format,
+gpips_user_warning(const char * calling_function_name,
+                   const char * a_message_format,
                    va_list * some_arguments)
 {
    char warning_buffer[SMALL_BUFFER_LENGTH];

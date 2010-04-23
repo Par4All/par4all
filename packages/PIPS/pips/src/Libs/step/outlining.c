@@ -433,10 +433,10 @@ static bool inline_outlined_block(statement stmt)
   pips_debug(1,"stmt = %p\n", stmt);
 
   STEP_DEBUG_STATEMENT(3,"current",stmt);
-  
-  if (!block_statement_p(stmt))
+
+  if (!statement_block_p(stmt))
     return FALSE;
-  
+
   MAP(STATEMENT,s,{
       if(statement_call_p(s) && strcmp(target_label,entity_name(statement_label(s)))==0)
 	{

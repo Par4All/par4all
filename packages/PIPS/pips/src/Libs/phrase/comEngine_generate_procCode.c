@@ -372,10 +372,10 @@ This function get the toggle entity associated to reference curRef
  */
 static entity get_toggleEnt_from_ref(reference curRef, list lToggleEnt)
 {
-  int fifoNum = (int)hash_get(gRefToFifo, curRef);
+  void* fifoNum = hash_get(gRefToFifo, curRef);
 
   pips_assert("fifoNum != HASH_UNDEFINED_VALUE",
-	      fifoNum != (int)HASH_UNDEFINED_VALUE);
+	      fifoNum != HASH_UNDEFINED_VALUE);
 
   int numOfFifo = (int)hash_get(gRefToFifoOff, fifoNum);
 
@@ -1287,10 +1287,10 @@ void create_realFifo_proc(statement stat, list lRef)
     if(bDone)
       continue;
 
-    int fifoNum = (int)hash_get(gRefToFifo, curRef1);
+    void* fifoNum = hash_get(gRefToFifo, curRef1);
 
     pips_assert("fifoNum != HASH_UNDEFINED_VALUE",
-		fifoNum != (int)HASH_UNDEFINED_VALUE);
+		fifoNum != HASH_UNDEFINED_VALUE);
 
     hash_put(gRefToFifoOff, fifoNum, (void *)2);
 

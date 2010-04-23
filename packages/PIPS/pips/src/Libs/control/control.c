@@ -1131,7 +1131,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
   statement s_above = scoping_statement_nth(2);
   pips_debug(2, "Dealing with block statement %p included into block"
 	     " statement %p\n", s, s_above);
-  if (ENDP(s_above))
+  if (s_above==NULL)
     /* No block statement above, so it is hard to move something there :-) */
     return;
 

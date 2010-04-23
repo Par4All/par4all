@@ -56,6 +56,7 @@
 #include "gpips.h"
 
 #include "resources.h"
+#include "preprocessor.h"
 
 /* Maximum size of the module menu of the main frame: */
 enum {
@@ -99,7 +100,7 @@ void select_a_module_by_default() {
 	show_module();
 }
 
-success end_directory_notify(char * dir) {
+success end_directory_notify(const char * dir) {
 	char *s;
 
 	/*   if (dir != NULL) {*/
@@ -272,7 +273,7 @@ void enable_module_selection() {
 	enable_option_selection();
 }
 
-void end_delete_workspace_notify(char * name) {
+void end_delete_workspace_notify(const char * name) {
 	schoose_close();
 
 	if (db_get_current_workspace_name() != NULL && strcmp(
@@ -284,7 +285,7 @@ void end_delete_workspace_notify(char * name) {
 				GTK_BUTTONS_YES_NO, concatenate("The workspace ", name,
 						" is currently opened!\n",
 						"Do you really want to close and remove it ?", NULL));
-		result = gtk_dialog_run(dialog);
+		result = gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
 
 		if (result == GTK_RESPONSE_NO || !close_workspace_notify(NULL, NULL))
@@ -362,7 +363,7 @@ void cancel_create_workspace_notify(GtkWidget * widget, gpointer data) {
 	show_workspace();
 }
 
-success continue_create_workspace_notify(char * name) {
+success continue_create_workspace_notify(const char* name) {
 	gen_array_t fortran_list;
 	int fortran_list_length = 0;
 
@@ -388,7 +389,7 @@ success continue_create_workspace_notify(char * name) {
 						GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, concatenate(
 								"The database ", name, " already exists!\n",
 								"Do you really want to remove it ?", NULL));
-				result = gtk_dialog_run(dialog);
+				result = gtk_dialog_run(GTK_DIALOG(dialog));
 				gtk_widget_destroy(dialog);
 
 				if (result == GTK_RESPONSE_NO) {
@@ -428,7 +429,7 @@ success continue_create_workspace_notify(char * name) {
 	return FALSE;
 }
 
-void user_prompt_not_a_valid_workspace_name(char * workspace_name) {
+void user_prompt_not_a_valid_workspace_name(const char * workspace_name) {
 	prompt_user("The name \"%s\" is not a valid workspace name!\n",
 			workspace_name);
 	enable_workspace_create_or_open();
@@ -440,7 +441,7 @@ void end_create_workspace_notify(gen_array_t files) {
 	/* If the user click quickly on OK, be sure
 	 end_create_workspace_notify() is not reentrant by verifying
 	 something as not been opened already: */
-	char* workspace_name_to_create = gtk_entry_get_text(GTK_ENTRY(
+	const char* workspace_name_to_create = gtk_entry_get_text(GTK_ENTRY(
 			workspace_name_entry));
 	if (db_get_current_workspace_name() == NULL) {
 		/* Is the name a valid workspace name? */
@@ -481,7 +482,7 @@ void end_create_workspace_notify(gen_array_t files) {
 	}
 }
 
-void end_open_workspace_notify(string name) {
+void end_open_workspace_notify(const char* name) {
 	schoose_close();
 
 	if (open_workspace(name)) {
@@ -566,7 +567,7 @@ success close_workspace_notify(GtkWidget * widget, gpointer data) {
 
 /* To be used with schoose_create_abbrev_menu_with_text from the main
  panel: */
-void open_or_create_workspace(char * workspace_name_original) {
+void open_or_create_workspace(const char * workspace_name_original) {
 	int i;
 	gen_array_t workspace_list;
 	int workspace_list_length = 0;
@@ -641,19 +642,19 @@ GtkWidget * generate_workspace_menu() {
 
 	temp_item = gtk_menu_item_new_with_label("Create Workspace");
 	g_signal_connect(G_OBJECT(temp_item), "activate",
-			start_create_workspace_notify, NULL);
+			G_CALLBACK(start_create_workspace_notify), NULL);
 	gtk_menu_append(GTK_MENU(menu), temp_item);
 	gtk_widget_set_sensitive(temp_item, !gpips_create_workspace_menu_inactive);
 
 	temp_item = gtk_menu_item_new_with_label("Close Workspace");
-	g_signal_connect(G_OBJECT(temp_item), "activate", close_workspace_notify,
+	g_signal_connect(G_OBJECT(temp_item), "activate", G_CALLBACK(close_workspace_notify),
 			NULL);
 	gtk_menu_append(GTK_MENU(menu), temp_item);
 	gtk_widget_set_sensitive(temp_item, !gpips_close_workspace_menu_inactive);
 
 	delete_menu_item = gtk_menu_item_new_with_label("Delete Workspace");
 	g_signal_connect(G_OBJECT(delete_menu_item), "activate",
-			start_delete_workspace_notify, NULL);
+			G_CALLBACK(start_delete_workspace_notify), NULL);
 	gtk_menu_append(GTK_MENU(menu), delete_menu_item);
 	gtk_widget_set_sensitive(delete_menu_item,
 			!gpips_delete_workspace_menu_inactive);
@@ -674,7 +675,7 @@ GtkWidget * generate_workspace_menu() {
 			temp_item = gtk_menu_item_new_with_label(name);
 			gtk_menu_append(GTK_MENU(menu), temp_item);
 			g_signal_connect(G_OBJECT(temp_item), "activate",
-					select_workspace_notify, NULL);
+					G_CALLBACK(select_workspace_notify), NULL);
 			gtk_widget_set_sensitive(temp_item,
 					!gpips_open_workspace_menu_inactive);
 		}
@@ -687,7 +688,7 @@ GtkWidget * generate_workspace_menu() {
 	return menu;
 }
 
-void end_select_module_callback(string name) {
+void end_select_module_callback(const char* name) {
 	gen_array_t module_list = db_get_module_list();
 	int module_list_length = gen_array_nitems(module_list);
 
@@ -716,7 +717,7 @@ void end_select_module_callback(string name) {
 	gen_array_full_free(module_list);
 }
 
-void cancel_select_module_notify() {
+void cancel_select_module_notify(void) {
 }
 
 void select_module_from_menubar_callback(GtkWidget * widget, gpointer data) {
@@ -739,7 +740,7 @@ void select_module_from_menubar_callback(GtkWidget * widget, gpointer data) {
 
 static void select_module_from_status_menu_callback(GtkWidget * widget, gpointer data __attribute__((unused)))
 {
-	char * module_name = gpips_gtk_menu_item_get_label(widget);
+	const char * module_name = gpips_gtk_menu_item_get_label(widget);
 	gtk_entry_set_text(GTK_ENTRY(module_name_entry), module_name);
 	end_select_module_callback(module_name);
 }
@@ -774,7 +775,7 @@ GtkWidget * generate_module_menu() {
 				module_menu_item = gtk_menu_item_new_with_label(mn);
 				gtk_menu_append(GTK_MENU(menu), module_menu_item);
 				g_signal_connect(G_OBJECT(module_menu_item), "activate",
-									select_module_from_status_menu_callback, NULL);
+									G_CALLBACK(select_module_from_status_menu_callback), NULL);
 			}
 		}
 		gen_array_full_free(module_list);

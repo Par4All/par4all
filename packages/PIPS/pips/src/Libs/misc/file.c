@@ -56,7 +56,7 @@ FILE * check_fopen(char * file, char * mode)
     return fd;
 }
 
-FILE * safe_fopen(char *filename, char *what)
+FILE * safe_fopen(const char *filename, const char *what)
 {
     FILE * f;
     if((f = fopen( filename, what)) == (FILE *) NULL) {

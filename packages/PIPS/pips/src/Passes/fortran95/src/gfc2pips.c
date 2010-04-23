@@ -33,10 +33,17 @@
 
 #include "c_parser_private.h"
 #include "misc.h"
+#include "text-util.h"
 #include "gfc2pips_stubs.c"
+#include <stdio.h>
 
 // HACK
 #undef toupper
+#undef fgetc
+#undef fputc
+#undef fread
+#undef asprintf
+int asprintf(char **strp, const char *fmt, ...);
 
 // globals defined somewhere in pips...
 // Temporary HACK, waiting for PIPS to be modified : these have to be moved
@@ -284,7 +291,7 @@ entity gfc2pips_main_entity = entity_undefined;
 
 void pips_init() {
 
-  static initialized = FALSE;
+  static int initialized = FALSE;
 
   if ( !initialized ) {
     /* get NewGen data type description */
@@ -368,7 +375,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   // FIXME : do we really want upper case conversion ?
   if ( bloc_token == MET_MODULE ) {
     CurrentPackage
-        = str2upper( strdup( concatenate( ns->proc_name->name, "!", NULL ) ) );
+        = str2upper( strdup( concatenate( (char *)(ns->proc_name->name), "!", NULL ) ) );
   } else {
     CurrentPackage = str2upper( strdup( ns->proc_name->name ) );
   }
@@ -408,6 +415,41 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   // ?????? To be removed (Mehdi)
   gfc2pips_main_entity = gfc2pips_symbol2entity( ns->proc_name );
 
+
+  /*
+   * PIPS STUFF Initialization
+   */
+
+  // It's safer to declare the current module in PIPS (ri-util)
+  set_current_module_entity( gfc2pips_main_entity );
+
+  /* No common has yet been declared */
+  initialize_common_size_map( );
+
+  /* Generic PIPS areas are created for memory allocation. */
+  InitAreas( );
+
+  // declare variables
+  list variables_p, variables;
+  variables_p = variables = gfc2pips_vars( ns );
+  gfc2pips_debug(2, "%zu variable(s) founded\n",gen_length(variables));
+
+  /* Get declarations */
+  list decls = code_declarations(EntityCode(gfc2pips_main_entity));
+  decls = gen_nconc(decls,variables);
+  code_declarations(EntityCode(gfc2pips_main_entity)) = decls;
+  /* Fix Storage for declarations */
+  FOREACH( entity, e, decls ) {
+    // Fixme insecure
+    if(entity_variable_p(e)) {
+      ram r = storage_ram(entity_storage(e));
+      ram_function(r) = gfc2pips_main_entity;
+      string name = module_local_name(gfc2pips_main_entity);
+      ram_section(r) = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);;
+    }
+
+  }
+
   list use_stmts;
   if ( ns2use ) {
     if ( ( use_stmts = hash_get( ns2use, (char *) ns ) )
@@ -446,18 +488,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
    */
   gfc2pips_getTypesDeclared( ns );
 
-  /*
-   * PIPS STUFF Initialization
-   */
-
-  // It's safer to declare the current module in PIPS (ri-util)
-  set_current_module_entity( gfc2pips_main_entity );
-
-  /* No common has yet been declared */
-  initialize_common_size_map( );
-
-  /* Generic PIPS areas are created for memory allocation. */
-  InitAreas( );
 
   /*
    * Parameters (if applicable)
@@ -635,11 +665,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   // declare DIMENSIONS => no need to handle, information
   // already transfered to each and every entity
 
-  // declare variables
-  list variables_p, variables;
-  variables_p = variables = gfc2pips_vars( ns );
-  gfc2pips_debug(2, "%zu variable(s) founded\n",gen_length(variables));
-
   // Mehdi : FIXME, unused !!
   // we concatenate the entities from variables, commons and parameters and
   // make sure they are declared only once. It seems parameters cannot be
@@ -674,6 +699,9 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   gfc2pips_debug(2, "%zu declaration(s) founded\n",gen_length(list_of_declarations));
   complete_list_of_entities = gen_union( complete_list_of_entities,
                                          list_of_declarations );
+
+
+
 
   /*
    * Get extern entities
@@ -1026,6 +1054,7 @@ gfc2pips_main_entity_type get_symbol_token( gfc_symbol *root_sym ) {
   return bloc_token;
 }
 
+
 list gfc2pips_parameters( gfc_namespace * ns,
                           gfc2pips_main_entity_type bloc_token ) {
 
@@ -1255,7 +1284,7 @@ list gfc2pips_vars_( gfc_namespace *ns, list variables_p ) {
             );
       } else {
         gfc2pips_debug(5, "the symbol is a constant\n");
-        Value = make_value_constant( (constant) make_constant_int( TypeSize ) );
+        Value = make_value_expression( int_to_expression( TypeSize ));
       }
 
       int i, j = 0;
@@ -1619,16 +1648,22 @@ bool gfc2pips_test_variable( gfc_namespace __attribute__ ((__unused__)) *ns,
                              gfc_symtree *st ) {
   if ( !st || !st->n.sym )
     return false;
-  return ( st->n.sym->attr.flavor == FL_VARIABLE || st->n.sym->attr.flavor
-      == FL_PARAMETER )
+  bool variable_p = TRUE;
+
+  variable_p = ( st->n.sym->attr.flavor == FL_VARIABLE || st->n.sym->attr.flavor
+      == FL_PARAMETER );
+
   /*&& (
    (!st->n.sym->attr.implicit_type||st->n.sym->attr.save==SAVE_EXPLICIT)
    || st->n.sym->value//very important
    )*/
-  && !st->n.sym->attr.external
+  variable_p = variable_p && !st->n.sym->attr.external;
   //&& !st->n.sym->attr.in_common
-      && !st->n.sym->attr.pointer && !st->n.sym->attr.dummy
-      && !st->n.sym->ts.type == BT_DERIVED;
+  variable_p = variable_p && !st->n.sym->attr.pointer;
+  variable_p = variable_p && !st->n.sym->attr.dummy;
+  variable_p = variable_p && !(st->n.sym->ts.type == BT_DERIVED);
+
+  return variable_p;
 }
 
 /*
@@ -3354,8 +3389,6 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
 
     case EXEC_ALLOCATE:
     case EXEC_DEALLOCATE: {
-      extern int the_current_debug_level;
-      //      the_current_debug_level = 6;
       gfc2pips_debug(5, "Translation of %s\n",c->op==EXEC_ALLOCATE?"ALLOCATE":"DEALLOCATE");
       list lci = NULL;
       gfc_alloc *a;
@@ -3381,26 +3414,12 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       //some problem inducted by the prettyprinter output become DEALLOCATE (variable, STAT=, I)
       if ( c->expr ) {
         gfc2pips_debug(5,"Handling STAT=\n");
-        /*
-         * FIXME Really bad hack !!!
-         */
-        expression e = gfc2pips_expr2expression( c->expr );
-        list w = words_syntax( expression_syntax(e), NIL );
-        string s = words_to_string( w );
-        string stat = (string) malloc( sizeof(char) * ( strlen( "STAT=" )
-            + strlen( s ) + 1 ) );
-        sprintf( stat, "STAT=%s", s );
-        lci = CONS( EXPRESSION,
-            MakeCharacterConstantExpression( stat ), NULL);
-        /* OLD WAY : produce wrong results :
-         * lci = gfc2pips_exprIO( "STAT=", c->expr, NULL );
-         */
+        lci = gfc2pips_exprIO( "STAT=", c->expr, NULL );
       }
       for ( a = c->ext.alloc_list; a; a = a->next ) {
         lci = CONS( EXPRESSION, gfc2pips_expr2expression( a->expr ), lci );//DATA_LIST_FUNCTION_NAME, IO_LIST_STRING_NAME, or sthg else ?
         //show_expr (a->expr);
       }
-      //      the_current_debug_level = 0;
       return make_instruction_call( make_call( e, gen_nconc( lci, NULL ) ) );
     }
       break;

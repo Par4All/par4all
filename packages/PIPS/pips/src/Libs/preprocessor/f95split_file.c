@@ -30,7 +30,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
@@ -95,11 +94,11 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
    TRUE ), NULL ) );
    */
   // "char **argv" for gfc2pips :-)
-  char* gfc2pips_args[] = { "f951", "-Wall",// "-Werror",
+  char* gfc2pips_args[] = { "gfc2pips", "-Wall",// "-Werror",
                             // We give it where to output...
                             "-pips-entities",
                             entities_filename,
-                            //"-o","/dev/null",
+                            "-o","/dev/null",
                             //parsedcode_filename,
                             file_name,
                             // ... and where to read inputs
@@ -155,7 +154,7 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
       arg++;
     }
     fprintf( stderr, "\n" );
-    execvp( "f951", gfc2pips_args );
+    execvp( "gfc2pips", gfc2pips_args );
     // No return from exec
     perror( "execvp f951" );
     exit( -1 );

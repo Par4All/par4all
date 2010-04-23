@@ -1,6 +1,4 @@
-#!/bin/sh
-#
-# $Id$
+# $Id: Makefile 16070 2010-02-07 10:54:43Z amini $
 #
 # Copyright 1989-2010 MINES ParisTech
 #
@@ -21,39 +19,28 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Derivation of builder_map.h (stdout) from pipsmake.rc (stdin)
+ROOT	= ../../..
 
-functions=`grep '^[a-z]' | sed 's/ .*//' | sort -u`
+TARGET	= gfc2pips
 
-# echo $functions >/dev/tty
+WGET = wget
 
-for f in $functions
-do
-    echo "extern bool $f(const char *);"
-done
+srcdir = .
 
-cat <<EOF
 
-static struct builder_map {
-    const char *builder_name;
-    bool (*builder_func)(const char *);
-} builder_maps[] = {
+include Makefile.mk
 
-EOF
+build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
+	rsync --exclude=.svn -av $(srcdir)/src/ gcc-$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/fortran/
+	$(MAKE) -C build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc f951
 
-for f in $functions
-do
-  # echo $func
-  F=`echo $f | tr '[a-z]' '[A-Z]'`
-  echo "    { BUILDER_$F, $f },"
-done
-
-cat <<EOF
-
-    { NULL, NULL }
-};
-EOF
-
-# end of it
-#
-
+compile: build
+install: build
+	cp -a $(BUILD.d)/gcc/f951 $(ROOT)/bin/gfc2pips
+phase0:
+phase1:
+phase2:
+phase3:
+phase4:
+phase5: install
+phase6:

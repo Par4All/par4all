@@ -960,7 +960,7 @@ static string prefixes[] = {
     COMMON_PREFIX,
 };
 
-entity local_name_to_top_level_entity(string n)
+entity local_name_to_top_level_entity(const char *n)
 {
   entity module = entity_undefined;
   int i;
@@ -988,7 +988,7 @@ entity local_name_to_top_level_entity(string n)
   return module;
 }
 
-entity module_name_to_entity(const string mn)
+entity module_name_to_entity(const char* mn)
 {
   /* Because of static C function, the entity returned is not always a
      top-level entity. */
@@ -1008,7 +1008,7 @@ entity module_name_to_entity(const string mn)
 
 /* Retrieve an entity from its package/module name "m" and its local
    name "n". */
-entity global_name_to_entity(string m, string n)
+entity global_name_to_entity(const char* m, const char* n)
 {
   return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, NULL),
 			    entity_domain);

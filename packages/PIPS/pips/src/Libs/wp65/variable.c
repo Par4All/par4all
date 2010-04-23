@@ -254,7 +254,7 @@ int ls;
 	esvd2 = make_dimension(MakeIntegerConstantExpression(string_0),
 			       MakeIntegerConstantExpression(esvd_string));
 
-	entity_type(esv) = MakeTypeVariable((basic) gen_copy_tree(bv), 
+	entity_type(esv) = MakeTypeVariable(copy_basic(bv), 
 					    CONS(DIMENSION, esvd1,
 						 CONS(DIMENSION, esvd2, NIL)));
     }
@@ -262,7 +262,7 @@ int ls;
 	/* FI->CA, LZ: what should we do with scalar variables? Put a copy
 	   on each memory bank? Take into account memory bank conflicts
 	   shown in thresholding (PUMA WP 6.1 and 6.7) */
-	entity_type(esv) = MakeTypeVariable((basic) gen_copy_tree(bv), NIL);
+	entity_type(esv) = MakeTypeVariable( copy_basic(bv), NIL);
     }
 
     entity_initial(esv) = make_value_unknown();
@@ -341,7 +341,7 @@ hash_table v_to_lllv;
 	entity lv;
 	/* a new btv is necessary for each variable because CONS cannot
 	   be shared under NewGen rules */
-	basic btv = (basic) gen_copy_tree(variable_basic(type_variable(tv)));
+	basic btv =  copy_basic(variable_basic(type_variable(tv)));
 
 	(void) asprintf(&local_variable_name,"%s%s%s%s%s%d%s%d",
 		       computational_name,
@@ -646,7 +646,7 @@ Pbase b;
     matrice_free(IP);
 
     ifdebug(8) {
-	sc_fprint(stderr, tc, entity_local_name);
+	sc_fprint(stderr, tc, (string(*)(Variable))entity_local_name);
     }
 
     debug(8,"make_tile_constraints", "end\n");
@@ -772,7 +772,7 @@ int dimn;
 		ifdebug(8) {
 		    (void) fprintf(stderr,
 				   "System on phi for dimension %d:\n", d);
-		    sc_fprint(stderr, s, entity_local_name);
+		    sc_fprint(stderr, s, (string(*)(Variable))entity_local_name);
 		}
 
 

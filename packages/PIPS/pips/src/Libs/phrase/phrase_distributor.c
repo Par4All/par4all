@@ -664,8 +664,8 @@ void add_parameter_variable_to_module (reference ref,
     = CONS (ENTITY, new_variable, module_declarations);
   
   new_parameter = make_parameter (entity_type(new_variable),
-				  make_mode(is_mode_reference, UU),
-				  strdup(""));
+				  make_mode_reference(),
+				  /*strdup("")*/make_dummy_identifier(new_variable));
   
   module_parameters = functional_parameters(type_functional(entity_type(module)));
 

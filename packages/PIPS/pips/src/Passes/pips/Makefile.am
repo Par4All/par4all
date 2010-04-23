@@ -28,7 +28,7 @@ AM_CPPFLAGS=\
 	-DNLPMAKE_REV='"unknown"' \
 	-DCC_VERSION='"unknown"'
 
-MAINTAINERCLEANFILES=revisions.h
+CLEANFILES=revisions.h
 
 
 

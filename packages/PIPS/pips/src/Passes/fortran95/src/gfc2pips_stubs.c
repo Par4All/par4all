@@ -31,6 +31,19 @@ bool dot_c_file_p( string name ) {
   return !!find_suffix( name, C_FILE_SUFFIX );
 }
 
+/* Test if a name ends with .f90 */
+bool dot_f90_file_p( string name ) {
+  STUB_WARNING();
+  return !!find_suffix( name, FORTRAN90_FILE_SUFFIX );
+}
+
+/* Test if a name ends with .f95 */
+bool dot_f95_file_p( string name ) {
+  STUB_WARNING();
+  return !!find_suffix( name, FORTRAN95_FILE_SUFFIX );
+}
+
+
 /** Test if a module is in C */
 bool c_module_p( entity m ) {
   STUB_WARNING();

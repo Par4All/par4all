@@ -48,6 +48,7 @@ char vcid_syntax_equivalence[] = "$Id$";
 #include "misc.h"
 
 #include "syntax.h"
+#include "alias-classes.h"
 
 #define EQUIADD 0
 #define EQUIMERGE 1

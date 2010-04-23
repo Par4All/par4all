@@ -146,7 +146,7 @@ string make_entity_fullname(string module_name, string local_name)
 }
 
 //empty_local_label_name_p(s)
-bool empty_string_p(string s)
+bool empty_string_p(const char* s)
 {
     return(strcmp(s, "") == 0);
 }
@@ -177,7 +177,7 @@ bool return_label_p(string s)
     return(return_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
 }
 
-entity find_label_entity(string module_name, string label_local_name)
+entity find_label_entity(const char* module_name, const char* label_local_name)
 {
     string full = concatenate(module_name, MODULE_SEP_STRING,
 			      LABEL_PREFIX, label_local_name, NULL);
@@ -477,6 +477,7 @@ language workspace_language(gen_array_t files)
   int i, argc = gen_array_nitems(files);
   language l = language_undefined;
   int n_fortran = 0;
+  int n_fortran95 = 0;
   int n_c = 0;
 
   for (i = 0; i < argc; i++) {
@@ -485,17 +486,22 @@ language workspace_language(gen_array_t files)
       n_fortran++;
     else if(dot_c_file_p(fn))
       n_c++;
-    else {
+    else if(dot_f90_file_p(fn) || dot_f95_file_p(fn)){
+      n_fortran95++;
+    } else {
       ;
     }
   }
 
-  if(n_fortran>0 && n_c==0)
+  if(n_fortran>0 && n_fortran95==0 && n_c==0) {
     l = make_language_fortran();
-  else if(n_fortran==0 && n_c>0)
+  } else if(n_fortran==0 && n_fortran95>0 && n_c==0) {
+    l = make_language_fortran95();
+  } else if(n_fortran==0 && n_fortran95==0 && n_c>0) {
     l = make_language_c();
-  else
+  } else {
     l = make_language_unknown();
+  }
 
   return l;
 }

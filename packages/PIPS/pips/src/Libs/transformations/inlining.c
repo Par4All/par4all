@@ -461,7 +461,6 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             entity new = entity_undefined;
             if(need_copy)
             {
-                string emn = entity_module_name(e);
                 if(entity_scalar_p(e)) {
                     new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
                 }

@@ -53,6 +53,7 @@ typedef dg_vertex_label vertex_label;
 #include "control.h"
 
 #include "ricedg.h"
+#include "effects-simple.h"
 
 static graph dependence_graph;
 
