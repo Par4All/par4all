@@ -200,7 +200,7 @@ statement MakeStatementLike(stat, the_tag)
 statement stat;
 int the_tag;
 {
-    loop x = loop_undefined;
+    void* x = loop_undefined;
     string c = statement_comments(stat);
     statement new_s;
 
@@ -239,7 +239,7 @@ expression expr;
 {
     list le = proper_effects_of_expression(expr), lde = NIL;
 
-    MAP(EFFECT, e, if (array_distributed_p(e)) lde=CONS(EFFECT,e,lde), le);
+    MAP(EFFECT, e, if (array_distributed_p(effect_variable(e))) lde=CONS(EFFECT,e,lde), le);
     
     gen_free_list(le);
     return(lde);
@@ -301,7 +301,7 @@ entity model;
 	       new_name, entity_name(model));
 
     ifdebug(9)
-	pips_assert("consistent model", gen_consistent_p(model));
+	pips_assert("consistent model", entity_consistent_p(model));
 
     return(!entity_undefined_p(new) ? new :
 	   make_entity(copy_string(new_name),
@@ -415,8 +415,8 @@ string suffix;
 
 void AddCommonToHostAndNodeModules(entity common)
 {
-    AddCommonToModule(common, node_module, store_new_node_variable, NODE_NAME);
-    AddCommonToModule(common, host_module, store_new_host_variable, HOST_NAME);
+    AddCommonToModule(common, node_module, (void (*)())store_new_node_variable, NODE_NAME);
+    AddCommonToModule(common, host_module, (void (*)())store_new_host_variable, HOST_NAME);
 }
 
 alignment FindAlignmentOfDim(lal, dim)

@@ -74,6 +74,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 
+#include "phrase.h"
 /**
  * Build and store new module START_RU.
  * Create statement module_statement

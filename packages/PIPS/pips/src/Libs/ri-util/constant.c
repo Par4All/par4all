@@ -311,7 +311,9 @@ Character constants are typed as int.
 	pips_internal_error("No digit found in integer constant string\n");
       }
 
-      ce = make_constant(is_constant_int, (void*) l); // Not OK on 32 bit machines
+      /* SG :this ensure everything is ok on 32 bits */
+      pips_assert("no data lost in conversion",l == (long long int )(intptr_t)l);
+      ce = make_constant_int( (intptr_t)l); 
     }
     else if(bt == is_basic_int && size==1) {
       // Character constant

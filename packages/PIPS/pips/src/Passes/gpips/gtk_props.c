@@ -77,7 +77,7 @@ enum {
 };
 
 typedef struct {
-	char * label; // label en court de traitement ds le frame option
+	const char * label; // label en court de traitement ds le frame option
 	int position; // position du dit label dans la vbox du frame option
 	GtkWidget * vbox; // Vbox du frame options
 } LabelAndVbox;
@@ -98,7 +98,7 @@ string hash_get_key_by_value(hash_table htp, string svp) {
 void apply_on_each_options_menu_item(GtkWidget * widget, gpointer _func) {
 	void (*func)(GtkWidget *);
 	func = (void(*)(GtkWidget *)) _func;
-	char * label;
+	const char * label;
 	label = gpips_gtk_menu_item_get_label(widget);
 	if (label == NULL || strcmp(label, display_options_panel) == 0 || strcmp(
 			label, hide_options_panel) == 0)
@@ -117,13 +117,13 @@ void apply_on_each_option_item(void(* function_to_apply_on_each_menu_item)(
 		GtkWidget *), void(* function_to_apply_on_each_frame_choice)(
 		GtkWidget *)) {
 	/* Walk through items of options_menu */
-	gtk_container_foreach(GTK_CONTAINER(options_menu), G_CALLBACK(
-			apply_on_each_options_menu_item),
+	gtk_container_foreach(GTK_CONTAINER(options_menu), (GtkCallback)
+			apply_on_each_options_menu_item,
 			function_to_apply_on_each_menu_item);
 
 	/* Now walk through the options frame: */
-	gtk_container_foreach(GTK_CONTAINER(options_frame), G_CALLBACK(
-			apply_on_each_options_frame_choice),
+	gtk_container_foreach(GTK_CONTAINER(options_frame), (GtkCallback)
+			apply_on_each_options_frame_choice,
 			function_to_apply_on_each_frame_choice);
 }
 
@@ -137,8 +137,9 @@ void enable_option_selection() {
 
 void update_options() {
 	gint i, j;
-	char * child_resource_alias;
-	string res_true_n, phase_alias_n, phase_true_n;
+	const char * child_resource_alias;
+	const char * phase_alias_n;
+	string res_true_n, phase_true_n;
 	GtkWidget * menu_options, *special_prop_menu;
 	GtkWidget *spm_item;
 
@@ -207,7 +208,7 @@ void update_options() {
 			/* walk through items of special_prop_m to select the activated
 			 one */
 			for (j = g_list_length(spm_children) - 1; j >= 0; j--) {
-				char * spm_item_label;
+				const char * spm_item_label;
 				spm_item = (GtkWidget *) g_list_nth_data(spm_children, j);
 				if (!GTK_IS_MENU_ITEM(spm_item))
 					continue;
@@ -240,7 +241,7 @@ void update_options() {
 	debug_off();
 }
 
-void options_select(char * aliased_phase) {
+void options_select(const char * aliased_phase) {
 	string phase = hash_get(aliases, aliased_phase);
 
 	if (phase == (string) HASH_UNDEFINED_VALUE) {
@@ -270,12 +271,12 @@ void options_combo_box_change_callback(GtkWidget * item, gpointer data __attribu
 }
 
 void options_frame_to_view_menu_gateway(GtkWidget * widget, gpointer data __attribute__((unused))) {
-	gchar * label = gtk_button_get_label(GTK_BUTTON(widget));
+	const gchar * label = gtk_button_get_label(GTK_BUTTON(widget));
 	gpips_execute_and_display_something_from_alias(label);
 }
 
 void options_menu_callback(GtkWidget * widget, gpointer data __attribute__((unused))) {
-	string aliased_phase = gpips_gtk_menu_item_get_label(widget);
+	const char* aliased_phase = gpips_gtk_menu_item_get_label(widget);
 	options_select(aliased_phase);
 }
 
@@ -302,7 +303,7 @@ static void synch_viewmenu_and_opframe_search_in_view(GtkWidget * widget,
 }
 
 static void synch_viewmenu_and_opframe(GtkWidget * widget, gpointer data) {
-	char * label;
+	const char * label;
 	LabelAndVbox * lav = (LabelAndVbox *) data;
 
 	if (GTK_IS_LABEL(widget)) {
@@ -311,9 +312,9 @@ static void synch_viewmenu_and_opframe(GtkWidget * widget, gpointer data) {
 		// si yen a un on rajoute un bouton
 		lav->label = label;
 		gtk_container_child_get_property(GTK_CONTAINER(lav->vbox), widget,
-				"position", &(lav->position));
-		gtk_container_foreach(GTK_CONTAINER(view_menu), G_CALLBACK(
-				synch_viewmenu_and_opframe_search_in_view), lav);
+				"position", (GValue*)&(lav->position));
+		gtk_container_foreach(GTK_CONTAINER(view_menu), (GtkCallback)
+				synch_viewmenu_and_opframe_search_in_view, lav);
 	}
 }
 
@@ -452,8 +453,8 @@ void build_options_menu_and_panel(GtkWidget * menu_options,
 
 	LabelAndVbox lav;
 	lav.vbox = frame_vbox;
-	gtk_container_foreach(GTK_CONTAINER(options_frame), G_CALLBACK(
-			synch_viewmenu_and_opframe), &lav);
+	gtk_container_foreach(GTK_CONTAINER(options_frame), (GtkCallback)
+			synch_viewmenu_and_opframe, &lav);
 }
 
 /* Construct a table linking PIPS phase name to more human names, the
@@ -491,7 +492,7 @@ void build_aliases() {
 }
 
 void display_or_hide_options_frame(GtkWidget * menu_item, gpointer data) {
-	char *message_string;
+	const char *message_string;
 
 	/* Should be added : when the options panel is destroyed by the
 	 window manager, toggle the menu. RK, 7/6/93. */

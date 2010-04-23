@@ -59,14 +59,14 @@ void print_entity_variable(entity e)
     v = type_variable(entity_type(e));
 
     fprintf(stderr,"basic %s\n",flint_print_basic(variable_basic(v)));
-    gen_map(print_dimension, variable_dimensions(v));
+    gen_map((gen_iter_func_t)print_dimension, variable_dimensions(v));
 }
 
 void print_align(align a)
 {
     (void) fprintf(stderr, "aligned (%d dimensions)\n", 
 		   gen_length(align_alignment(a)));
-    gen_map(print_alignment, align_alignment(a));
+    gen_map((gen_iter_func_t)print_alignment, align_alignment(a));
     (void) fprintf(stderr, "to template %s\n\n",
 		   entity_name(align_template(a)));
 }
@@ -115,7 +115,7 @@ void print_distribute(distribute d)
 {
     (void) fprintf(stderr,"distributed\n");
 
-    gen_map(print_distribution, distribute_distribution(d));
+    gen_map((gen_iter_func_t)print_distribution, distribute_distribution(d));
 
     (void) fprintf(stderr, "to processors %s\n\n", 
 		   entity_name(distribute_processors(d)));    
@@ -163,19 +163,19 @@ void print_hpf_dir(void)
 void print_templates(void)
 {
     (void) fprintf(stderr,"Templates:\n");
-    gen_map(print_entity_variable, list_of_templates());
+    gen_map((gen_iter_func_t)print_entity_variable, list_of_templates());
 }
 
 void print_processors(void)
 {
     (void) fprintf(stderr,"Processors:\n");
-    gen_map(print_entity_variable, list_of_processors());
+    gen_map((gen_iter_func_t)print_entity_variable, list_of_processors());
 }
 
 void print_distributed_arrays(void)
 {
     (void) fprintf(stderr,"Distributed Arrays:\n");
-    gen_map(print_entity_variable, list_of_distributed_arrays());
+    gen_map((gen_iter_func_t)print_entity_variable, list_of_distributed_arrays());
 }
 
 void hpfc_print_common(

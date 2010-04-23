@@ -1,4 +1,4 @@
-# $Id: Makefile 16070 2010-02-07 10:54:43Z amini $
+# $Id$
 #
 # Copyright 1989-2010 MINES ParisTech
 #
@@ -19,16 +19,15 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ROOT	= ../../..
+
+
 
 # Gfc2pips source files
 GFC2PIPS_SRC.d = src
 GFC2PIPS_SRCS = $(GFC2PIPS_SRC.d)/gfc2pips.c $(GFC2PIPS_SRC.d)/gfc2pips_stubs.c
 #VERSION USED
-GCC_VERSION = 4.4.3
-BUILD.d	= build/$(GCC_VERSION)
-TARGET	= f951
-
+PIPS_GFC2PIPS_GCC_VERSION = 4.4.3
+BUILD.d	= build/$(PIPS_GFC2PIPS_GCC_VERSION)
 
 ARCHIVE_EXT=.tar.bz2
 #ARCHIVE_EXT=".tar.gz"
@@ -38,18 +37,18 @@ GCC_MIRROR = ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org
 GCC_MD5_MIRROR = ftp://ftp.uvsq.fr/pub
 
 # URL for GCC mirror repository
-GCC_URL = $(GCC_MIRROR)/gcc/releases/gcc-$(GCC_VERSION)
-GCC_MD5_URL = $(GCC_MD5_MIRROR)/gcc/releases/gcc-$(GCC_VERSION)
+GCC_URL = $(GCC_MIRROR)/gcc/releases/gcc-$(PIPS_GFC2PIPS_GCC_VERSION)
+GCC_MD5_URL = $(GCC_MD5_MIRROR)/gcc/releases/gcc-$(PIPS_GFC2PIPS_GCC_VERSION)
 
 
 #archive name
 DL.d	= .
-GCC_CORE_ARCHIVE = $(DL.d)/gcc-core-$(GCC_VERSION)$(ARCHIVE_EXT)
-GCC_FORTRAN_ARCHIVE = $(DL.d)/gcc-fortran-$(GCC_VERSION)$(ARCHIVE_EXT)
-GCC_MD5	= $(DL.d)/gcc-$(GCC_VERSION).md5
+GCC_CORE_ARCHIVE = gcc-core-$(PIPS_GFC2PIPS_GCC_VERSION)$(ARCHIVE_EXT)
+GCC_FORTRAN_ARCHIVE = gcc-fortran-$(PIPS_GFC2PIPS_GCC_VERSION)$(ARCHIVE_EXT)
+GCC_MD5	= gcc-$(PIPS_GFC2PIPS_GCC_VERSION).md5
 
 #after untar
-SRC.d		= gcc-$(GCC_VERSION)
+SRC.d		= gcc-$(PIPS_GFC2PIPS_GCC_VERSION)
 CONFIGURE_OPT 	= --disable-bootstrap --enable-languages=fortran \
 	--enable-stage1-languages=fortran --disable-libssp --disable-libada \
 	--disable-libgomp --disable-stage1-checking --without-ppl \
@@ -69,90 +68,88 @@ patch : $(PATCHED)
 # local stuff
 unbuild: clean
 clean: local-clean
-	$(RM) $(ROOT)/bin/f951
+	$(RM) $(ROOT)/bin/gfc2pips
 
 local-clean:
-	$(RM) -r $(SRC.d) build
+	$(RM) -r $(SRC.d) build $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE)
 
 $(SRC.d)/.dir:
 	mkdir -p $(SRC.d)
-	touch $@
-
-WGET	= wget -q -O
+	touch $(SRC.d)/.dir
 
 # Get archive for GCC source from mirrors with wget
-$(GCC_FORTRAN_ARCHIVE):
+$(DL.d)/$(GCC_FORTRAN_ARCHIVE):
 	@echo "**** Getting GCC fortran specifs ****"
-	$(WGET) $@ $(GCC_URL)/$@
-	@touch $@
+	$(WGET) -q -O  $(DL.d)/$(GCC_FORTRAN_ARCHIVE) $(GCC_URL)/$(GCC_FORTRAN_ARCHIVE)
+	@touch $(DL.d)/$(GCC_FORTRAN_ARCHIVE)
 
-$(GCC_CORE_ARCHIVE):
+$(DL.d)/$(GCC_CORE_ARCHIVE):
 	@echo "**** Getting GCC core ****"
-	$(WGET) $@ $(GCC_URL)/$@
-	@touch $@
-
+	$(WGET) -q -O  $(DL.d)/$(GCC_CORE_ARCHIVE) $(GCC_URL)/$(GCC_CORE_ARCHIVE)
+	@touch $(DL.d)/$(GCC_CORE_ARCHIVE)
 
 # Get md5 checksum for GCC source archive
-$(GCC_MD5):
+$(DL.d)/$(GCC_MD5):
 	@echo "**** Getting md5 checksum source file ****"
-	$(WGET) $@ $(GCC_MD5_URL)/md5.sum
-
+	$(WGET) -q -O  $(DL.d)/$(GCC_MD5) $(GCC_MD5_URL)/md5.sum
 
 # check md5 on core source archive
 md5-check-core: $(SRC.d)/.md5-check-core
-$(SRC.d)/.md5-check-core: $(GCC_CORE_ARCHIVE) $(GCC_MD5) $(SRC.d)/.dir
+$(SRC.d)/.md5-check-core: $(DL.d)/$(GCC_CORE_ARCHIVE) $(DL.d)/$(GCC_MD5) $(SRC.d)/.dir
 	@echo "**** Check md5 checksum for gcc-core ****"
-	grep $(notdir $(GCC_CORE_ARCHIVE)) $(GCC_MD5) > $@.list
-	md5sum -c $@.list
-	$(RM) $@.list
-	@touch $@
+	grep `basename $(DL.d)/$(GCC_CORE_ARCHIVE)` $(DL.d)/$(GCC_MD5) > $(SRC.d)/.md5-check-core.list
+	sed -ie 's#$(GCC_CORE_ARCHIVE)#$(DL.d)/$(GCC_CORE_ARCHIVE)#' $(SRC.d)/.md5-check-core.list
+	md5sum -c $(SRC.d)/.md5-check-core.list
+	$(RM) $(SRC.d)/.md5-check-core.list
+	@touch $(SRC.d)/.md5-check-core
 
 # check md5 on fortran source archive
 md5-check-fortran: $(SRC.d)/.md5-check-fortran
-$(SRC.d)/.md5-check-fortran : $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5) $(SRC.d)/.dir
+$(SRC.d)/.md5-check-fortran : $(DL.d)/$(GCC_FORTRAN_ARCHIVE) $(DL.d)/$(GCC_MD5) $(SRC.d)/.dir
 	@echo "**** Check md5 checksum for gcc-fortran ****"
-	grep $(notdir $(GCC_FORTRAN_ARCHIVE)) $(GCC_MD5) > $@.list
-	md5sum -c $@.list
-	$(RM) $@.list
-	@touch $@
+	grep `basename $(DL.d)/$(GCC_FORTRAN_ARCHIVE)` $(DL.d)/$(GCC_MD5) > $(SRC.d)/.md5-check-fortran.list
+	sed -ie 's#$(GCC_FORTRAN_ARCHIVE)#$(DL.d)/$(GCC_FORTRAN_ARCHIVE)#' $(SRC.d)/.md5-check-fortran.list
+	md5sum -c $(SRC.d)/.md5-check-fortran.list
+	$(RM) $(SRC.d)/.md5-check-fortran.list
+	@touch $(SRC.d)/.md5-check-fortran
 
 md5-check: md5-check-fortran md5-check-core
 
 untar: $(SRC.d)/.untar
 
 $(SRC.d)/.untar: $(SRC.d)/.untar-core $(SRC.d)/.untar-fortran
-	touch $@
+	touch $(SRC.d)/.untar
 
 $(SRC.d)/.untar-core: $(SRC.d)/.md5-check-core
 	@echo "**** Unpacking GCC-core ****"
-	tar -xjf $(GCC_CORE_ARCHIVE)
+	tar -xjf $(DL.d)/$(GCC_CORE_ARCHIVE)
 	$(RM) $(PATCHED)
-	@touch $@
+	@touch $(SRC.d)/.untar-core
 
 $(SRC.d)/.untar-fortran: $(SRC.d)/.md5-check-fortran
 	@echo "**** Unpacking GCC-fortran ****"
-	tar -xjf $(GCC_FORTRAN_ARCHIVE)
+	tar -xjf $(DL.d)/$(GCC_FORTRAN_ARCHIVE)
 	$(RM) $(PATCHED)
-	@touch $@
+	@touch $(SRC.d)/.untar-fortran
 
 # patch gcc sources
-$(PATCHED): patch-$(GCC_VERSION).diff $(SRC.d)/.untar
-	patch -d gcc-$(GCC_VERSION) -p0 < $<
-	@touch $@
+$(PATCHED): patch-$(PIPS_GFC2PIPS_GCC_VERSION).diff $(SRC.d)/.untar
+	patch -d gcc-$(PIPS_GFC2PIPS_GCC_VERSION) -p0 < $<
+	@touch $(PATCHED)
 
 $(BUILD.d)/.dir:
 	mkdir -p $(BUILD.d)/gcc
-	@touch $@
+	@touch $(BUILD.d)/.dir
 
 $(BUILD.d)/.configure-core: $(BUILD.d)/.dir $(PATCHED)
 	cd $(BUILD.d) && \
-	../../gcc-$(GCC_VERSION)/configure $(CONFIGURE_OPT)
-	@touch $@
+	../../gcc-$(PIPS_GFC2PIPS_GCC_VERSION)/configure $(CONFIGURE_OPT)
+	@touch $(BUILD.d)/.configure-core
 
 $(BUILD.d)/.configure-fortran: $(BUILD.d)/.stage1
 	cd $(BUILD.d)/gcc && \
-	../../../gcc-$(GCC_VERSION)/gcc/configure $(CONFIGURE_OPT)
-	@touch $@
+	../../../gcc-$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/configure $(CONFIGURE_OPT)
+	@touch $(BUILD.d)/.configure-fortran
 
 $(BUILD.d)/.stage1: $(BUILD.d)/.configure-core
 	$(MAKE) -C $(BUILD.d) \
@@ -161,27 +158,12 @@ $(BUILD.d)/.stage1: $(BUILD.d)/.configure-core
 	        maybe-all-build-fixincludes \
 	        maybe-all-libdecnumber \
 	        maybe-all-libcpp
-	@touch $@
-
+	@touch $(BUILD.d)/.stage1
 
 # useful targets
 configure: configure-core configure-fortran
 configure-core: $(BUILD.d)/.configure-core
 configure-fortran: $(BUILD.d)/.configure-fortran
 build-stage1: $(BUILD.d)/.stage1
-build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
-	rsync --exclude=.svn -av src/ gcc-$(GCC_VERSION)/gcc/fortran/
-	$(MAKE) -C build/$(GCC_VERSION)/gcc f951
+build: build-stage2
 
-
-compile: build-stage2
-build: compile
-install: compile
-	cp -a $(BUILD.d)/gcc/f951 $(ROOT)/bin/
-phase0:
-phase1:
-phase2:
-phase3:
-phase4:
-phase5: install
-phase6:

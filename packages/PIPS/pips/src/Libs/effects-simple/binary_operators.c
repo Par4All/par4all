@@ -313,10 +313,17 @@ effect proper_to_summary_simple_effect(effect eff)
       }
 
       if(!extended_integer_constant_expression_p(se)) {
-	if(!unbounded_expression_p(se)) {
-	  may_p = TRUE;
-	  EXPRESSION_(CAR(cind)) = make_unbounded_expression();
-	}
+	if(!unbounded_expression_p(se)) 
+	  {
+	    /* it may still be a field entity */
+	    if (!(expression_reference_p(se) && 
+		  entity_field_p(expression_variable(se))))
+	    {
+	      may_p = TRUE;
+	      free_expression(se);
+	      EXPRESSION_(CAR(cind)) = make_unbounded_expression();
+	    }
+	  }
       }
     }
 

@@ -74,10 +74,10 @@ static GtkWidget * directory_gen_pullright(GtkWidget * widget) {
 	parent_menu = gtk_widget_get_parent(widget);
 
 	char directory[MAXNAMELEN + 1];
-	char * parent_directory;
+	const char * parent_directory;
 
 	debug(2, "directory_gen_pullright", "widget = %#x (%s), parent = %#x\n",
-			widget, gpips_gtk_menu_item_get_label(GTK_MENU_ITEM(widget)), parent_menu);
+			widget, gpips_gtk_menu_item_get_label(GTK_WIDGET(GTK_MENU_ITEM(widget))), parent_menu);
 
 	/* First get the parent directory name that is the title: */
 	parent_directory = gtk_menu_get_title(GTK_MENU(parent_menu));
@@ -85,7 +85,7 @@ static GtkWidget * directory_gen_pullright(GtkWidget * widget) {
 			parent_directory);
 
 	/* Build the new directory name: */
-	(void) sprintf(directory, "%s/%s", parent_directory, gpips_gtk_menu_item_get_label(GTK_MENU_ITEM(widget)));
+	(void) sprintf(directory, "%s/%s", parent_directory, gpips_gtk_menu_item_get_label(GTK_WIDGET(GTK_MENU_ITEM(widget))));
 
 	if (gtk_menu_item_get_submenu(GTK_MENU_ITEM(widget)) != NULL) {
 		/* Well, there is already a menu... we've been already here.
@@ -103,8 +103,8 @@ static GtkWidget * directory_gen_pullright(GtkWidget * widget) {
 
 static void generate_a_directory_menu_notify(GtkWidget * widget, gpointer data) {
 	GtkWidget * parent;
-	char * parent_path_name;
-	char * directory_name;
+	const char * parent_path_name;
+	const char * directory_name;
 	char full_directory_name[MAXNAMELEN + 1];
 	directory_name = gpips_gtk_menu_item_get_label(widget);
 	parent = gtk_widget_get_parent(widget);

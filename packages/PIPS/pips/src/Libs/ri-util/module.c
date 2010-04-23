@@ -55,7 +55,7 @@ bool module_name_p(string name) {
 
 /* Check if the given name is a static module name.
  */
-bool static_module_name_p(string name)
+bool static_module_name_p(const char* name)
 {
   /* An entity is a static module if its name contains the FILE_SEP_STRING
      but the last one is not the last character of the name string */
@@ -95,7 +95,7 @@ bool static_module_p(entity e) {
 
 /* Check if the given name is a compilation unit internal name.
  */
-bool compilation_unit_p(string module_name) {
+bool compilation_unit_p(const char* module_name) {
   /* A module name is a compilation unit if and only if its last character is
      FILE_SEP */
   if (module_name[strlen(module_name)-1]==FILE_SEP)

@@ -432,12 +432,41 @@ void effect_add_dereferencing_dimension(effect eff)
  *            effect reference dimensions.Also modifies the descriptor
  *            if the representation includes one.
  */
-void effect_add_field_dimension(effect eff, int rank)
-{
 
-  expression rank_exp = int_to_expression(rank);
-  (*effect_add_expression_dimension_func)(eff, rank_exp);
-  free_expression(rank_exp);
+/**
+   @brief adds a last dimension to the effect reference, which is a
+          reference expression to the field entity.
+   @param effect the input effect, whose reference is modified
+   @param field the input field entity
+ */
+void effect_add_field_dimension(effect eff, entity field)
+{
+  cell eff_c = effect_cell(eff);
+  reference ref;
+  
+  pips_debug_effect(8, "begin with effect :\n", eff);
+  
+  if (cell_preference_p(eff_c))
+    {
+      /* it's a preference : we change for a reference cell */
+      pips_debug(8, "It's a preference\n");
+      ref = copy_reference(preference_reference(cell_preference(eff_c)));
+      free_cell(eff_c);
+      effect_cell(eff) = make_cell_reference(ref);
+    }
+  else
+    {
+      /* it's a reference : let'us modify it */
+      ref = cell_reference(eff_c);
+    }
+
+  reference_indices(ref) = gen_nconc(reference_indices(ref),
+				     CONS(EXPRESSION, 
+					  entity_to_expression(field), 
+					  NIL));
+  
+  pips_debug_effect(8, "end with effect :\n",eff);
+  
   return;
 }
 

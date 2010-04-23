@@ -75,6 +75,8 @@ typedef dg_vertex_label vertex_label;
 "^"			return POWER_OPERATOR_TOK;
 "%"			return MODULO_OPERATOR_TOK;
 "MIN"			return MIN_OPERATOR_TOK;
+"COS"			return COS_OPERATOR_TOK;
+"SIN"			return SIN_OPERATOR_TOK;
 "MIN0"			return MIN0_OPERATOR_TOK;
 "AMIN1"			return AMIN1_OPERATOR_TOK;
 "DMIN1"			return DMIN1_OPERATOR_TOK;
@@ -102,7 +104,8 @@ typedef dg_vertex_label vertex_label;
 "?"				return PHI_TOK;
 [0-9.-]+                  { yylval.iVal = atoi(yytext); return INTEGER_TOK; }
 [A-Za-z][0-9A-Za-z_]*   { yylval.strVal = strdup(yytext); return IDENTIFIER_TOK; }
-[ \t\n]                 ;
+[ \t]                   ;
+[\n]					{ sac_lineno ++; }
 "#".*                   ;
 .                       return *yytext;
 %%

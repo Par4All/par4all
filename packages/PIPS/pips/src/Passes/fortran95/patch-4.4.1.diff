@@ -1,6 +1,6 @@
 diff -cr gcc/fortran/dump-parse-tree.c gcc.patched/gcc/fortran/dump-parse-tree.c
-*** gcc/fortran/dump-parse-tree.c	2010-04-19 15:00:25.000000000 +0200
---- gcc.patched/gcc/fortran/dump-parse-tree.c	2010-04-19 15:36:27.000000000 +0200
+*** gcc/fortran/dump-parse-tree.c	2008-09-02 10:13:21.000000000 +0200
+--- gcc.patched/gcc/fortran/dump-parse-tree.c	2010-04-20 21:35:22.770964102 +0200
 ***************
 *** 42,48 ****
   static FILE *dumpfile;
@@ -57,7 +57,7 @@ Seulement dans gcc.patched/gcc/fortran: gfc2pips-private.h
 Seulement dans gcc.patched/gcc/fortran: gfc2pips_stubs.c
 diff -cr gcc/fortran/gfortran.h gcc.patched/gcc/fortran/gfortran.h
 *** gcc/fortran/gfortran.h	2009-02-21 23:25:06.000000000 +0100
---- gcc.patched/gcc/fortran/gfortran.h	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/gfortran.h	2010-04-20 21:35:22.780964675 +0200
 ***************
 *** 230,236 ****
     ST_OMP_PARALLEL_WORKSHARE, ST_OMP_SECTIONS, ST_OMP_SECTION, ST_OMP_SINGLE,
@@ -88,7 +88,7 @@ diff -cr gcc/fortran/gfortran.h gcc.patched/gcc/fortran/gfortran.h
   
 diff -cr gcc/fortran/lang.opt gcc.patched/gcc/fortran/lang.opt
 *** gcc/fortran/lang.opt	2009-03-18 22:14:53.000000000 +0100
---- gcc.patched/gcc/fortran/lang.opt	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/lang.opt	2010-04-20 21:35:22.780964675 +0200
 ***************
 *** 68,73 ****
 --- 68,77 ----
@@ -104,81 +104,30 @@ diff -cr gcc/fortran/lang.opt gcc.patched/gcc/fortran/lang.opt
   Warn about possible aliasing of dummy arguments
 diff -cr gcc/fortran/Make-lang.in gcc.patched/gcc/fortran/Make-lang.in
 *** gcc/fortran/Make-lang.in	2008-12-11 12:29:38.000000000 +0100
---- gcc.patched/gcc/fortran/Make-lang.in	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/Make-lang.in	2010-04-20 21:40:15.000000000 +0200
 ***************
-*** 70,76 ****
-  
-  fortran_OBJS = $(F95_OBJS) gfortranspec.o
-  
-! #
-  # Define the names for selecting gfortran in LANGUAGES.
-  fortran: f951$(exeext)
-  
---- 70,76 ----
-  
-  fortran_OBJS = $(F95_OBJS) gfortranspec.o
-  
-! #
-  # Define the names for selecting gfortran in LANGUAGES.
-  fortran: f951$(exeext)
-  
-***************
-*** 94,104 ****
-  	-rm -f gfortran-cross$(exeext)
+*** 95,104 ****
   	cp gfortran$(exeext) gfortran-cross$(exeext)
   
   # The compiler itself is called f951.
 ! f951$(exeext): $(F95_OBJS) \
-  		$(BACKEND) $(LIBDEPS) attribs.o
-  	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ \
+! 		$(BACKEND) $(LIBDEPS) attribs.o
+! 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ \
 ! 		$(F95_OBJS) $(BACKEND) $(LIBS) attribs.o $(BACKENDLIBS)
   
   gt-fortran-trans.h    : s-gtype; @true
   #
---- 94,133 ----
-  	-rm -f gfortran-cross$(exeext)
+--- 95,101 ----
   	cp gfortran$(exeext) gfortran-cross$(exeext)
   
-+ 
-+ # PIPS Libraries
-+ ROOT=../../../../../..
-+ PROJECT = pips
-+ MAKE.d = $(ROOT)/makes
-+ include $(ROOT)/makes/root.mk
-+ include $(ROOT)/makes/arch.mk
-+ 
-+ LIBS_PIPS_DIR = $(ROOT)/lib/$(ARCH)
-+ LIBS_PIPS =  $(LIBS_PIPS_DIR)/libri-util.a \
-+ 	$(LIBS_PIPS_DIR)/libtext-util.a \
-+ 	$(LIBS_PIPS_DIR)/libsyntax.a \
-+ 	$(LIBS_PIPS_DIR)/libalias-classes.a \
-+ 	$(LIBS_PIPS_DIR)/libri-util.a \
-+ 	$(LIBS_PIPS_DIR)/libmisc.a \
-+ 	$(LIBS_PIPS_DIR)/libnewgen.a \
-+ 	$(NEWGEN_ROOT)/lib/$(ARCH)/libgenC.a \
-+ 	$(LINEAR_ROOT)/lib/$(ARCH)/libvecteur.a \
-+ 	$(LINEAR_ROOT)/lib/$(ARCH)/libsc.a \
-+ 	$(LINEAR_ROOT)/lib/$(ARCH)/libcontrainte.a \
-+ 	$(LINEAR_ROOT)/lib/$(ARCH)/libarithmetique.a
-+ 
-+ 
   # The compiler itself is called f951.
-! f951$(exeext): $(F95_OBJS) $(LIBS_PIPS) fortran/gfc2pips.o \
-  		$(BACKEND) $(LIBDEPS) attribs.o
-  	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ \
-! 		$(F95_OBJS) $(BACKEND) $(LIBS) fortran/gfc2pips.o $(LIBS_PIPS) attribs.o $(BACKENDLIBS) -lgmp -lmpfr
-! 
-! INCLUDES += -I$(NEWGEN_ROOT)/include/ -I$(PIPS_ROOT)/include/ -I $(LINEAR_ROOT)/include/
-! 
-! fortran/gfc2pips.o: fortran/gfc2pips.c fortran/gfc2pips_stubs.c fortran/gfc2pips.h fortran/gfc2pips-private.h
-! 	$(CC) -std=c99 -g -c $(ALL_CPPFLAGS) -DBASEVER=$(BASEVER_s) \
-! 		$< $(OUTPUT_OPTION)
+! include ../../../$(pipssrcdir)/gfc2pips$(GFC2PIPS-AUTOTOOL-MAKEFILE).mk
   
   gt-fortran-trans.h    : s-gtype; @true
   #
 diff -cr gcc/fortran/module.c gcc.patched/gcc/fortran/module.c
 *** gcc/fortran/module.c	2009-05-22 14:54:23.000000000 +0200
---- gcc.patched/gcc/fortran/module.c	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/module.c	2010-04-20 21:35:22.790990880 +0200
 ***************
 *** 487,492 ****
 --- 487,493 ----
@@ -203,7 +152,7 @@ diff -cr gcc/fortran/module.c gcc.patched/gcc/fortran/module.c
         if ((m = gfc_match (" %n ::", module_nature)) == MATCH_YES)
 diff -cr gcc/fortran/options.c gcc.patched/gcc/fortran/options.c
 *** gcc/fortran/options.c	2008-11-03 08:20:24.000000000 +0100
---- gcc.patched/gcc/fortran/options.c	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/options.c	2010-04-20 21:35:22.790990880 +0200
 ***************
 *** 123,128 ****
 --- 123,129 ----
@@ -229,7 +178,7 @@ diff -cr gcc/fortran/options.c gcc.patched/gcc/fortran/options.c
         break;
 diff -cr gcc/fortran/parse.c gcc.patched/gcc/fortran/parse.c
 *** gcc/fortran/parse.c	2009-04-04 15:19:15.000000000 +0200
---- gcc.patched/gcc/fortran/parse.c	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/parse.c	2010-04-20 21:35:22.800994735 +0200
 ***************
 *** 27,32 ****
 --- 27,38 ----
@@ -358,7 +307,7 @@ diff -cr gcc/fortran/parse.c gcc.patched/gcc/fortran/parse.c
     top.state = COMP_NONE;
 diff -cr gcc/fortran/scanner.c gcc.patched/gcc/fortran/scanner.c
 *** gcc/fortran/scanner.c	2009-02-20 16:20:38.000000000 +0100
---- gcc.patched/gcc/fortran/scanner.c	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/scanner.c	2010-04-20 21:35:22.810962622 +0200
 ***************
 *** 48,53 ****
 --- 48,55 ----
@@ -382,7 +331,7 @@ diff -cr gcc/fortran/scanner.c gcc.patched/gcc/fortran/scanner.c
   	     2) handle OpenMP conditional compilation, where
 diff -cr gcc/fortran/st.c gcc.patched/gcc/fortran/st.c
 *** gcc/fortran/st.c	2008-08-31 12:00:30.000000000 +0200
---- gcc.patched/gcc/fortran/st.c	2010-04-19 14:15:31.000000000 +0200
+--- gcc.patched/gcc/fortran/st.c	2010-04-20 21:35:22.810962622 +0200
 ***************
 *** 50,55 ****
 --- 50,59 ----

@@ -132,7 +132,7 @@ void gpips_user_warning_message(char warning_buffer[]) {
 
 #define MAXARGS     100
 
-void gpips_user_log(string fmt, va_list args) {
+void gpips_user_log(const char* fmt, va_list args) {
 	static char log_buffer[SMALL_BUFFER_LENGTH];
 
 	(void) vsprintf(log_buffer, fmt, args);
@@ -215,8 +215,8 @@ void create_log_window() {
 	GtkWidget * scrolled_window;
 
 	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-	scrolled_window_vadjustment = gtk_scrolled_window_get_vadjustment(
-			GTK_SCROLLED_WINDOW(scrolled_window));
+	scrolled_window_vadjustment = GTK_WIDGET(gtk_scrolled_window_get_vadjustment(
+			GTK_SCROLLED_WINDOW(scrolled_window)));
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 

@@ -61,7 +61,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "ricedg.h"
 
-#include "sac-local.h"
+#include "sac.h"
 
 
 /** 

@@ -51,7 +51,7 @@
 static string current_phase = NULL;
 static string current_module = NULL;
 
-void set_pips_current_computation(string rname, string oname)
+void set_pips_current_computation(const char* rname, const char* oname)
 {
     pips_assert("no current computation", !current_module && !current_phase);
 
@@ -69,7 +69,7 @@ void reset_pips_current_computation(void)
 
 /* FI: grah, qu'est-ce que c'est que cette heresie? misc ne devait pas
    dependre de NewGen! */
-extern bool get_bool_property(string);
+extern bool get_bool_property(const char*);
 
 #define INPUT_BUFFER_LENGTH 256 /*error caught by terminal at 257th character*/
 
@@ -172,7 +172,7 @@ static string warning_file_name = (string) NULL;
 
 #define WARNING_FILE_NAME "Warnings"
 
-void open_warning_file(const string dir)
+void open_warning_file(const char* dir)
 {
     warning_file_name = strdup(concatenate(dir, "/", WARNING_FILE_NAME, 0));
     warning_file = safe_fopen(warning_file_name, "a");
@@ -290,7 +290,7 @@ pips_internal_error_function(
 #endif /* no __GNUC__ */
 
 /* make sure the user has noticed something */
-void default_prompt_user(const string s)
+void default_prompt_user(const char* s)
 {
     fprintf(stderr, "%s\nPress <Return> to continue ", s);
     while (getchar() != '\n') ;

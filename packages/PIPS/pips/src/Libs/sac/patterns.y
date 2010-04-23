@@ -50,8 +50,10 @@ typedef dg_vertex_label vertex_label;
 int yywrap(void);
 void yyerror(char*);
 int yylex();
+int yyparse();
 
 static size_t opcode_argc =0;
+size_t sac_lineno = 0;
 
 /* fake helpers */
 #define TOKEN_NEWGEN_DOMAIN (-1)
@@ -118,6 +120,8 @@ static size_t opcode_argc =0;
 %token POWER_OPERATOR_TOK
 %token MODULO_OPERATOR_TOK
 %token MIN_OPERATOR_TOK
+%token COS_OPERATOR_TOK
+%token SIN_OPERATOR_TOK
 %token MIN0_OPERATOR_TOK
 %token AMIN1_OPERATOR_TOK
 %token DMIN1_OPERATOR_TOK
@@ -227,6 +231,8 @@ token:
      | POWER_OPERATOR_TOK		{ $$ = POWER_OPERATOR_TOK; }
      | MODULO_OPERATOR_TOK		{ $$ = MODULO_OPERATOR_TOK; }
      | MIN_OPERATOR_TOK			{ $$ = MIN_OPERATOR_TOK; }
+     | COS_OPERATOR_TOK			{ $$ = COS_OPERATOR_TOK; }
+     | SIN_OPERATOR_TOK			{ $$ = SIN_OPERATOR_TOK; }
      | MIN0_OPERATOR_TOK		{ $$ = MIN0_OPERATOR_TOK; }
      | AMIN1_OPERATOR_TOK		{ $$ = AMIN1_OPERATOR_TOK; }
      | DMIN1_OPERATOR_TOK		{ $$ = DMIN1_OPERATOR_TOK; }
@@ -283,5 +289,5 @@ int yywrap(void)
 
 void yyerror(char* s)
 {
-   pips_internal_error("patterns parser: %s\n", s);
+   pips_internal_error("patterns parser:%zd: %s\n",sac_lineno, s);
 }

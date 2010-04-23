@@ -1842,25 +1842,25 @@ int *tab2; \} mys;&& \\
 && \\
 
 mys a, b[N], *c, **d; & & \\
-                  & a.num  & a[1] \\
-                  & a.tab1[J] & a[2][J] \\
-                  & a.tab2[K] & a[3][K] \\
+                  & a.num  & a[num] \\
+                  & a.tab1[J] & a[tab1][J] \\
+                  & a.tab2[K] & a[tab2][K] \\
 && \\
-                  & b[I].num & b[I][1] \\
-                  & b[I].tab1[J] & b[I][2][J]\\
-                  & b[I].tab2[K]& b[I][3][K]\\
+                  & b[I].num & b[I][num] \\
+                  & b[I].tab1[J] & b[I][tab1][J]\\
+                  & b[I].tab2[K]& b[I][tab2][K]\\
 && \\
                   & c->num & c[0][1]\\
-                  & c->tab1[J] & c[0][2][J] \\
-                  & c->tab2[K] & c[0][3][K] \\
+                  & c->tab1[J] & c[0][tab1][J] \\
+                  & c->tab2[K] & c[0][tab2][K] \\
 && \\
-                  & d[I]->num & d[I][0][1]\\
-                  & d[I]->tab1[J] & d[I][0][2][J]\\
-                  & d[I]->tab2[K] & d[I][0][3][K]\\ \hline
+                  & d[I]->num & d[I][0][num]\\
+                  & d[I]->tab1[J] & d[I][0][tab1][J]\\
+                  & d[I]->tab2[K] & d[I][0][tab2][K]\\ \hline
                   
 \end{tabular}
 \end{center}
-\caption{Representinf effects with additional dimensions}\label{tab:effects}
+\caption{Representing effects with additional dimensions}\label{tab:effects}
 \end{table}
 
 
@@ -1885,6 +1885,9 @@ Several possibilities come to mind for data structures if the current
  preserved, which is enough for an analyzer; array fields are a
  natural dimension, inserted at the right place among index
  dimensions;
+
+\item a variant of the previous possibility is to use field entities
+  (and not solely their names) as effect reference indices;
 
 \item to build new variable names located at the field address,
  i.e. in equivalence with the whole data structure but not with its
@@ -1918,12 +1921,12 @@ Regions are similar to effects and are not impacted. The semantics
  with equivalenced variables: currently, the analyses are restricted
  to non aliased variables.
 
-The dependence test should be able to deal with all three options
+The dependence test should be able to deal with all four options
  because it deals with regions, i.e. set of array elements, and with
  equivalenced variables, i.e. an aliasing test is performed before the
  array dependence test.
 
-The third option requires improvements in memory allocation and in
+The fourth option requires improvements in memory allocation and in
  aliasing management. Data structures for aliasing exist because of
  Fortran, but they are not currently used for C. The scalar analysis
  of semantics can be used right away to analyze structure fields.
@@ -1935,9 +1938,11 @@ The effect prettyprinter is easier with option 2, unless the naming
  conflict: they should include the structure name and \verb/a.x/ would
  become something like \verb/a.a-x/.
 
-All three schemes are minimum. They are sufficient to represent any
+All four schemes are minimum. They are sufficient to represent any
  constant address with indexing equivalent to a field access
  expression. And any field expression is represented in only one way.
+
+After testing the second option for a while, we finally changed for the third one in particular because it avoids merging convex effects of different access path types. We have chosen to keep PHI variable numbers equal to their ranks in the effect reference indices list for practical reasons. Functions are provided to convert effects with references containing indices refering to field entities to their rank equivalent versions.
 
 \section{Unions}
 \label{section:unions}

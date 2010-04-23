@@ -320,6 +320,7 @@ bool simd_treematcher(__attribute__((unused)) char * module_name)
     set_simd_treematch(treematch);
 
     /* fill it */
+    sac_lineno=0;
     patterns_yyin=fopen_config("patterns.def","SIMD_PATTERN_FILE",NULL);
     patterns_yyparse();
     fclose(patterns_yyin);

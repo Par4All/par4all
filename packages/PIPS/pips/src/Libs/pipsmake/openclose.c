@@ -61,7 +61,7 @@
 /* returns the program makefile file name
  */
 #define PIPSMAKE_FILE "/pipsmake"
-string build_pgm_makefile(string __attribute__ ((unused)) n)
+string build_pgm_makefile(const char* __attribute__ ((unused)) n)
 {
     string dir_name = db_get_meta_data_directory(),
 	res = strdup(concatenate(dir_name, PIPSMAKE_FILE, NULL));
@@ -69,7 +69,7 @@ string build_pgm_makefile(string __attribute__ ((unused)) n)
     return res;
 }
 
-string  make_open_workspace(string name)
+string  make_open_workspace(const char* name)
 {
     if (db_open_workspace(name)) 
     {

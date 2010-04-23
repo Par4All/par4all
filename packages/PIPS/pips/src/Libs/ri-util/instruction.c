@@ -82,6 +82,30 @@ instruction make_continue_instruction() {
   return MakeNullaryCallInst(called_function);
 }
 
+
+instruction
+make_assign_instruction(expression l,
+                        expression r)
+{
+   call c = call_undefined;
+   instruction i = instruction_undefined;
+
+/*   SG: not true in C
+ *   pips_assert("make_assign_statement",
+               syntax_reference_p(expression_syntax(l)));*/
+   c = make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),
+                 CONS(EXPRESSION, l, CONS(EXPRESSION, r, NIL)));
+   i = make_instruction(is_instruction_call, c);
+
+   return i;
+}
+
+
+/** Build an instruction block from a list of statements
+ */
+instruction make_instruction_block(list statements) {
+  return make_instruction_sequence(make_sequence(statements));
+}
 /** @} */
 
 
@@ -176,6 +200,26 @@ instruction_format_p(instruction i) {
   return native_instruction_p(i, FORMAT_FUNCTION_NAME);
 }
 
+
+/* Checks if an instruction block is a list of assignments, possibly
+   followed by a continue.
+*/
+bool assignment_block_p(instruction i)
+{
+  /* FOREACH cannot be used in this case */
+  MAPL(cs,
+       {
+	 statement s = STATEMENT(CAR(cs));
+
+	 if(!assignment_statement_p(s))
+	   if(!(continue_statement_p(s) && ENDP(CDR(cs)) ))
+	     return FALSE;
+       },
+       instruction_block(i));
+  return TRUE;
+}
+
+
 /** @} */
 
 
@@ -204,25 +248,6 @@ void flatten_block_if_necessary(instruction i)
     gen_free_list(instruction_block(i));
     instruction_block(i) = ls;
   }
-}
-
-
-/* Checks if an instruction block is a list of assignments, possibly
-   followed by a continue.
-*/
-bool assignment_block_p(instruction i)
-{
-  /* FOREACH cannot be used in this case */
-  MAPL(cs,
-       {
-	 statement s = STATEMENT(CAR(cs));
-
-	 if(!assignment_statement_p(s))
-	   if(!(continue_statement_p(s) && ENDP(CDR(cs)) ))
-	     return FALSE;
-       },
-       instruction_block(i));
-  return TRUE;
 }
 
 
@@ -295,4 +320,27 @@ string safe_instruction_identification(instruction i)
   else
     instrstring = instruction_identification(i);
   return instrstring;
+}
+
+
+/* Get a list of all variables declared recursively within an instruction */
+list instruction_to_declarations(instruction i)
+{
+  list statement_to_all_included_declarations = NIL;
+
+  gen_context_recurse(i,&statement_to_all_included_declarations,
+		      statement_domain, add_statement_declarations, gen_null);
+
+  return statement_to_all_included_declarations;
+}
+
+/* Returns the declarations contained in a list of statement. */
+list statements_to_declarations(list sl)
+{
+  instruction i = make_instruction_block(sl);
+  list dl = instruction_to_declarations(i);
+  /* The declaration list is reversed by
+     instruction_to_declarations(). */
+  dl = gen_nreverse(dl);
+  return dl;
 }

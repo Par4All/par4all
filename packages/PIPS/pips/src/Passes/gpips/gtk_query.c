@@ -42,10 +42,10 @@ static GtkWidget * query_entry, * query_entry_label;
 static GtkWidget * query_cancel_button;
 
 static char *query_help_topic;
-static success (*apply_on_query)(char *);
+static success (*apply_on_query)(const char *);
 
 void start_query(char * window_title, char * query_title, char * help_topic,
-		success(* ok_func)(char *), void(* cancel_func)( GtkWidget, gpointer*)) {
+		success(* ok_func)(const char * ), void(* cancel_func)( GtkWidget*, gpointer)) {
 
 	gtk_window_set_title(GTK_WINDOW(query_dialog), window_title);
 
@@ -100,7 +100,7 @@ void start_query(char * window_title, char * query_title, char * help_topic,
 //}
 
 void end_query_notify(GtkWidget * widget, gpointer data) {
-	char * s = gtk_entry_get_text(GTK_ENTRY(query_entry));
+	const char * s = gtk_entry_get_text(GTK_ENTRY(query_entry));
 	if (s == NULL)
 		s = strdup("");
 	else
@@ -108,7 +108,6 @@ void end_query_notify(GtkWidget * widget, gpointer data) {
 
 	if (apply_on_query(s))
 		hide_window(query_dialog, NULL, NULL);
-	free(s);
 }
 
 void help_query_notify(GtkWidget * widget, gpointer data) {
@@ -125,16 +124,16 @@ void cancel_user_request_notify(GtkWidget * widget, gpointer data) {
 	gtk_entry_set_text(GTK_ENTRY(query_entry), "");
 	hide_window(query_dialog, NULL, NULL);
 	/* Just return the "": */
-	gtk_dialog_response(query_dialog, 1);
+	gtk_dialog_response(GTK_DIALOG(query_dialog), 1);
 }
 
-success end_user_request_notify(char * the_answer) {
+success end_user_request_notify(const char * the_answer) {
 	hide_window(query_dialog, NULL, NULL);
-	gtk_dialog_response(query_dialog, 1);
+	gtk_dialog_response(GTK_DIALOG(query_dialog), 1);
 	return TRUE;
 }
 
-string gpips_user_request(char * a_printf_format, va_list args) {
+string gpips_user_request(const char * a_printf_format, va_list args) {
 
 	char * the_answer;
 
@@ -149,7 +148,7 @@ string gpips_user_request(char * a_printf_format, va_list args) {
 
 	gtk_widget_show(query_dialog);
 	gtk_window_set_modal(GTK_WINDOW(query_dialog), TRUE);
-	gtk_dialog_run(query_dialog); // On force l'attente de la réponse
+	gtk_dialog_run(GTK_DIALOG(query_dialog)); // On force l'attente de la réponse
 	gtk_window_set_modal(GTK_WINDOW(query_dialog), FALSE);
 
 	/* Log the answer for possible rerun through tpips: */

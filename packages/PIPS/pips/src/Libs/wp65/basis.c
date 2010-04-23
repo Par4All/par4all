@@ -120,7 +120,7 @@ Pbase *local_tile_basis2;
 	  module_local_name(initial_module));
     ifdebug(8) {
 	(void) fprintf(stderr, "initial_basis:\n");
-	vect_fprint(stderr, initial_basis, entity_local_name);
+	vect_fprint(stderr, initial_basis, (string(*)(void*))entity_local_name);
     }
 
     for (pv = initial_basis; !VECTEUR_NUL_P(pv); pv=pv->succ) {
@@ -167,18 +167,18 @@ Pbase *local_tile_basis2;
 
     ifdebug(8) {
 	(void) fprintf(stderr,"\nInitial basis:");
-	base_fprint(stderr, initial_basis, entity_local_name);
+	base_fprint(stderr, initial_basis, (string(*)(void*))entity_local_name);
 	(void) fprintf(stderr,"\nTile basis in initial basis:");
-	base_fprint(stderr, *tile_basis_in_initial_basis, entity_local_name);
+	base_fprint(stderr, *tile_basis_in_initial_basis, (string(*)(void*))entity_local_name);
 	(void) fprintf(stderr,"\nTile basis in tile basis:");
-	base_fprint(stderr, *tile_basis_in_tile_basis, entity_local_name);
+	base_fprint(stderr, *tile_basis_in_tile_basis, (string(*)(void*))entity_local_name);
 	(void) fprintf(stderr,"\nLocal basis:");
-	base_fprint(stderr, *local_tile_basis, entity_local_name);
+	base_fprint(stderr, *local_tile_basis, (string(*)(void*))entity_local_name);
 	(void) fprintf(stderr,
 		       "\nTile basis in tile basis for compute module:");
-	base_fprint(stderr, *tile_basis_in_tile_basis2, entity_local_name);
+	base_fprint(stderr, *tile_basis_in_tile_basis2, (string(*)(void*))entity_local_name);
 	(void) fprintf(stderr,"\nLocal basis for compute module:");
-	base_fprint(stderr, *local_tile_basis2, entity_local_name);
+	base_fprint(stderr, *local_tile_basis2, (string(*)(void*))entity_local_name);
     }
     
     debug(8, "create_tile_basis", "end\n");

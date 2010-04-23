@@ -308,8 +308,8 @@ processor_loop(
     entity oth,                   /* communicating processor arrangement */
     entity lid,                   /* variable for the comm. proc local id */
     entity array,                 /* array being remapped */
-    entity (*create_psi)(int),    /* to create a local proc. dim. */
-    entity (*create_oth)(int),    /* to create a comm. proc. dim. */
+    entity (*create_psi)(),    /* to create a local proc. dim. */
+    entity (*create_oth)(),    /* to create a comm. proc. dim. */
     statement body,               /* loop body */
     boolean sh)                   /* whether to shift the psi's */
 {
@@ -448,7 +448,7 @@ broadcast(
 {
     statement cmp_lid, body, nest;
 
-    cmp_lid = hpfc_compute_lid(lid, proc, get_ith_processor_prime, NULL);
+    cmp_lid = hpfc_compute_lid(lid, proc, (entity(*)())get_ith_processor_prime, NULL);
     body = make_block_statement
 	(CONS(STATEMENT, cmp_lid,
 	 CONS(STATEMENT, if_different_pe_and_not_twin
@@ -1149,7 +1149,7 @@ hpf_remapping(
     sc_rm(proc), sc_rm(enume);
     gen_free_list(scanners);
     gen_free_list(l), gen_free_list(lp), gen_free_list(ld);
-    gen_map(gen_free, lddc), gen_free_list(lddc);  /* ??? */
+    gen_map((gen_iter_func_t)gen_free, lddc), gen_free_list(lddc);  /* ??? */
 
     reset_information_for_code_optimizations();
     

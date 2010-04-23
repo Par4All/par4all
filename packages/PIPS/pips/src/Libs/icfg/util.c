@@ -48,6 +48,7 @@
 #include "pipsdbm.h"      /* DB_PUT_FILE_RESOURCE is defined there */
 #include "text-util.h"
 #include "icfg.h"
+#include "alias-classes.h"
 
 void safe_free_vertex(vertex ver, list l_of_vers)
 {

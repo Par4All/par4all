@@ -60,7 +60,8 @@ void quit_notify(GtkWidget * widget, gpointer data) {
 	if ((pn = db_get_current_workspace_name())) {
 		string fmt = "Workspace %s not closed";
 		char str[SMALL_BUFFER_LENGTH];
-		string str1, str2, menu_string;
+		string str1, str2;
+        const char *menu_string;
 
 		str2 = "Do you really want to quit PIPS?";
 		menu_string = gpips_gtk_menu_item_get_label(widget);
@@ -74,7 +75,7 @@ void quit_notify(GtkWidget * widget, gpointer data) {
 		GtkWidget * dialog = gtk_message_dialog_new(GTK_WINDOW(main_window),
 				GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO,
 				GTK_BUTTONS_YES_NO, concatenate(str, str1, str2, NULL));
-		result = gtk_dialog_run(dialog);
+		result = gtk_dialog_run(GTK_DIALOG(dialog));
 
 		if (result == GTK_RESPONSE_NO)
 			return;

@@ -159,7 +159,6 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
   basic b = variable_basic(type_variable(input_type));
   list l_dim =  variable_dimensions(type_variable(input_type));
   list le = NIL;
-  int current_rank = 1;
 
   pips_debug_effect(8, "input effects:\n", input_eff);
 
@@ -179,7 +178,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
       effect current_eff = (*effect_dup_func)(input_eff);
 
       // we add the field index
-      effect_add_field_dimension(current_eff, current_rank);
+      effect_add_field_dimension(current_eff, f);
   
       switch (basic_tag(current_basic))
 	{
@@ -203,7 +202,6 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 	    le = gen_nconc(CONS(EFFECT, current_eff, NIL), le);
 	  }
 	}
-      current_rank++;
     }
   pips_debug_effects(8, "output effects:\n", le);
 
@@ -902,15 +900,14 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		  syntax s2 = expression_syntax(e2);
 		  reference r2 = syntax_reference(s2);
 		  entity f = reference_variable(r2);
-		  int rank = entity_field_rank(f);
 		  
 		  pips_assert("e2 is a reference", syntax_reference_p(s2));
 		  
 		  pips_debug(4, "It's a field operator\n");
 
 		  /* we extend *pme by adding a dimension corresponding
-		  * to the rank of the field */
-		  effect_add_field_dimension(*pme,rank);
+		  * to the field */
+		  effect_add_field_dimension(*pme,f);
 		  finished_p = TRUE;
 		}
 	      else if(ENTITY_POINT_TO_P(op)) 
@@ -918,13 +915,11 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		  expression e2 = EXPRESSION(CAR(CDR(args)));
 		  syntax s2 = expression_syntax(e2);
 		  entity f;
-		  int rank;
 		  effect eff_read;
 
 		  pips_assert("e2 is a reference", syntax_reference_p(s2));
 
 		  f = reference_variable(syntax_reference(s2));
-		  rank = entity_field_rank(f);
 		  
 		  pips_debug(4, "It's a point to operator\n");
 		  
@@ -940,7 +935,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		   effect_add_dereferencing_dimension(* pme);
 		  
 		  /* we add the field dimension */
-		  effect_add_field_dimension(*pme,rank);
+		  effect_add_field_dimension(*pme,f);
 		  finished_p = TRUE;
 		}
 	      else if(ENTITY_DEREFERENCING_P(op)) 

@@ -257,6 +257,16 @@ bool statement_possible_less_p(statement st1, statement st2)
     return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2));
 }
 
+
+/* @defgroup statement_2nd_access_test  Direct test of the instruction
+   type of statement
+
+   With these methods you can directly test the type of the instruction
+   inside a statement
+
+   @{
+*/
+
 /* Statement classes induced from instruction type
  *
  * Naming conflict between English, block_statement_p(), and NewGen convention
@@ -264,7 +274,7 @@ bool statement_possible_less_p(statement st1, statement st2)
  */
 
 /* See also macro statement_block_p() */
-bool block_statement_p(statement s)
+bool statement_sequence_p(statement s)
 {
   instruction i = statement_instruction(s);
   bool r = instruction_sequence_p(i);
@@ -274,29 +284,52 @@ bool block_statement_p(statement s)
 
 bool statement_test_p(statement s)
 {
-  return(instruction_test_p(statement_instruction(s)));
+  return instruction_test_p(statement_instruction(s));
 }
 
 
 bool statement_loop_p(statement s)
 {
-  return(instruction_loop_p(statement_instruction(s)));
+  return instruction_loop_p(statement_instruction(s));
 }
 
 bool statement_whileloop_p(statement s)
 {
-  return(instruction_whileloop_p(statement_instruction(s)));
+  return instruction_whileloop_p(statement_instruction(s));
+}
+
+bool statement_goto_p(statement s)
+{
+  return instruction_goto_p(statement_instruction(s));
+}
+
+bool statement_call_p(statement s)
+{
+  return instruction_call_p(statement_instruction(s));
+}
+
+bool statement_unstructured_p(statement s)
+{
+  return instruction_unstructured_p(statement_instruction(s));
 }
 
 bool statement_forloop_p(statement s)
 {
-  return(instruction_forloop_p(statement_instruction(s)));
+  return instruction_forloop_p(statement_instruction(s));
 }
 
-bool unstructured_statement_p(statement s)
+bool statement_multitest_p(statement s)
 {
-  return(instruction_unstructured_p(statement_instruction(s)));
+  return instruction_multitest_p(statement_instruction(s));
 }
+
+bool statement_expression_p(statement s)
+{
+  return instruction_expression_p(statement_instruction(s));
+}
+
+/* @} */
+
 
 /* Test if a statement is empty. */
 bool empty_statement_p(statement st)
@@ -437,12 +470,6 @@ bool empty_statement_or_continue_without_comment_p(statement st)
 }
 
 
-bool statement_call_p(statement s)
-{
-  return(instruction_call_p(statement_instruction(s)));
-}
-
-
 bool check_io_statement_p(statement s)
 {
   bool check_io = FALSE;
@@ -513,24 +540,6 @@ make_stmt_of_instr(instruction instr) {
 }
 
 
-instruction
-make_assign_instruction(expression l,
-                        expression r)
-{
-   call c = call_undefined;
-   instruction i = instruction_undefined;
-
-/*   SG: not true in C
- *   pips_assert("make_assign_statement",
-               syntax_reference_p(expression_syntax(l)));*/
-   c = make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),
-                 CONS(EXPRESSION, l, CONS(EXPRESSION, r, NIL)));
-   i = make_instruction(is_instruction_call, c);
-
-   return i;
-}
-
-
 statement make_assign_statement(expression l,
 				expression r)
 {
@@ -541,13 +550,6 @@ statement make_assign_statement(expression l,
 /** @defgroup block_statement_constructors Block/sequence statement constructors
     @{
  */
-
-/** Build an instruction block from a list of statements
- */
-instruction make_instruction_block(list statements) {
-  return make_instruction_sequence(make_sequence(statements));
-}
-
 
 /** Make a block statement from a list of statement
  */
@@ -687,7 +689,7 @@ make_statement_from_statement_varargs_list(statement s, ...) {
  */
 statement
 make_block_with_stmt_if_not_already(statement stmt) {
-  if (block_statement_p(stmt))
+  if (statement_sequence_p(stmt))
     /* It is already a block statement */
     return stmt;
   else
@@ -979,44 +981,128 @@ statement make_expression_statement(expression e)
 }
 
 
-/* Direct accesses to second level fields */
+/* @defgroup statement_2nd_access_method  Direct statement accessors to
+   second level fields
 
-loop
-statement_loop(s)
-statement s;
+   With these methods you can access directly to the inside of the
+   instructions
+
+   @{
+*/
+
+/* Get the sequence of a statement sequence */
+sequence
+statement_sequence(statement s)
 {
-    pips_assert("statement_loop", statement_loop_p(s));
+  pips_assert("statement_sequence", statement_sequence_p(s));
 
-    return(instruction_loop(statement_instruction(s)));
+  return instruction_sequence(statement_instruction(s));
 }
 
-test
-statement_test(s)
-statement s;
-{
-    pips_assert("statement_test", statement_test_p(s));
 
-    return(instruction_test(statement_instruction(s)));
-}
-
-call
-statement_call(s)
-statement s;
-{
-    pips_assert("statement_call", statement_call_p(s));
-
-    return(instruction_call(statement_instruction(s)));
-}
-
+/* Get the list of block statements of a statement sequence */
 list
-statement_block(s)
-statement s;
+statement_block(statement s)
 {
-    pips_assert("statement_block", statement_block_p(s));
+  pips_assert("statement_sequence", statement_sequence_p(s));
 
-    return(instruction_block(statement_instruction(s)));
+  return sequence_statements(statement_sequence(s));
 }
 
+
+/* Get the test of a statement */
+test
+statement_test(statement s)
+{
+  pips_assert("statement_test", statement_test_p(s));
+
+  return instruction_test(statement_instruction(s));
+}
+
+
+/* Get the loop of a statement */
+loop
+statement_loop(statement s)
+{
+  pips_assert("statement_loop", statement_loop_p(s));
+
+  return instruction_loop(statement_instruction(s));
+}
+
+
+/* Get the loop of a statement */
+loop
+statement_whileloop(statement s)
+{
+  pips_assert("statement_loop", statement_loop_p(s));
+
+  return instruction_loop(statement_instruction(s));
+}
+
+
+/* Get the goto of a statement
+
+   @return the statement pointed to by the "goto"
+*/
+statement
+statement_goto(statement s)
+{
+  pips_assert("statement_goto", statement_goto_p(s));
+
+  return instruction_goto(statement_instruction(s));
+}
+
+
+/* Get the call of a statement */
+call
+statement_call(statement s)
+{
+  pips_assert("statement_call", statement_call_p(s));
+
+  return instruction_call(statement_instruction(s));
+}
+
+
+/* Get the unstructured of a statement */
+unstructured
+statement_unstructured(statement s)
+{
+  pips_assert("statement_unstructured", statement_unstructured_p(s));
+
+  return instruction_unstructured(statement_instruction(s));
+}
+
+
+/* Get the forloop of a statement */
+forloop
+statement_forloop(statement s)
+{
+  pips_assert("statement_forloop", statement_forloop_p(s));
+
+  return instruction_forloop(statement_instruction(s));
+}
+
+
+/* Get the multitest of a statement */
+multitest
+statement_multitest(statement s)
+{
+  pips_assert("statement_multitest", statement_multitest_p(s));
+
+  return instruction_multitest(statement_instruction(s));
+}
+
+
+/* Get the expression of a statement */
+expression
+statement_expression(statement s)
+{
+  pips_assert("statement_expression", statement_expression_p(s));
+
+  return instruction_expression(statement_instruction(s));
+}
+
+/* @} */
 
 
 bool assignment_block_or_statement_p(statement s)
@@ -1209,7 +1295,7 @@ apply_number_to_statement(hash_table nts, _int n)
     return s;
 }
 
-hash_table 
+hash_table
 build_number_to_statement(nts, s)
 hash_table nts;
 statement s;
@@ -1281,8 +1367,8 @@ statement s;
 
     statement_label(s) = entity_empty_label();
 
-    if(instruction_loop_p(statement_instruction(s))) 
-	loop_label(instruction_loop(statement_instruction(s))) = 
+    if(instruction_loop_p(statement_instruction(s)))
+	loop_label(instruction_loop(statement_instruction(s))) =
 	    entity_empty_label();
 }
 
@@ -1376,12 +1462,11 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
 
 string external_statement_identification(statement s)
 {
-    char buffer;
+    string buffer;
     instruction i = statement_instruction(s);
     string instrstring = instruction_identification(i);
     int so = statement_ordering(s);
     entity called = entity_undefined;
-    int nb_char = 0;
 
     if(same_string_p(instrstring, "CALL")) {
 	called = call_function(instruction_call(i));
@@ -2565,7 +2650,14 @@ bool all_statements_defined_p(statement s)
 }
 
 
-static bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
+/* Add the declarations of a statement to a list if not already here
+
+   This function is indeed to be used by statement_to_declarations() and
+   instruction_to_declarations() but not by its own.
+
+   @return TRUE (to go on diving in a gen_recurse())
+*/
+bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
 {
     /* naive version with O(n^2) complexity)*/
     if(declaration_statement_p(s))
@@ -2587,27 +2679,6 @@ list statement_to_declarations(statement s)
   return statement_to_all_included_declarations;
 }
 
-/* Get a list of all variables declared recursively within an instruction */
-list instruction_to_declarations(instruction i)
-{
-  list statement_to_all_included_declarations = NIL;
-
-  gen_context_recurse(i,&statement_to_all_included_declarations,
-		      statement_domain, add_statement_declarations, gen_null);
-
-  return statement_to_all_included_declarations;
-}
-
-/* Returns the declarations contained in a list of statement. */
-list statements_to_declarations(list sl)
-{
-  instruction i = make_instruction_block(sl);
-  list dl = instruction_to_declarations(i);
-  /* The declaration list is reversed by
-     instruction_to_declarations(). */
-  dl = gen_nreverse(dl);
-  return dl;
-}
 
 /************************************************************ STAT VARIABLES */
 

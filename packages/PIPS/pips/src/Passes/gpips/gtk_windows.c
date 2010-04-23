@@ -89,7 +89,7 @@ void create_windows() {
 	//	install_event_procedure(main_frame);
 
 	log_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_transient_for(GTK_WINDOW(log_window), main_window);
+	gtk_window_set_transient_for(GTK_WINDOW(log_window), GTK_WINDOW(main_window));
 	gtk_window_set_default_size(GTK_WINDOW(log_window), 300, 300);
 //	gtk_window_set_default_size(log_window, defaults_get_integer(
 //			GPIPS_LOG_WINDOW_WIDTH_RESSOURCE_NAME,

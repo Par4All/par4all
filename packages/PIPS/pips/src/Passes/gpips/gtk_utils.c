@@ -39,9 +39,9 @@
 
 extern char *getwd();
 
-gchar * gpips_gtk_menu_item_get_label(GtkWidget * w) {
+const char * gpips_gtk_menu_item_get_label(GtkWidget * w) {
 	guint i;
-	gchar * label;
+	const char * label;
 	GtkWidget * child;
 	if (!GTK_IS_MENU_ITEM(w))
 		return NULL;

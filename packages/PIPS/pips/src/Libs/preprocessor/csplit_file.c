@@ -190,7 +190,7 @@ void csplit_close_compilation_unit()
 */
 void copy_between_2_fd_up_to_offset(FILE * source,
 				    FILE * destination,
-				    size_t up_to_offset,
+				    unsigned long long up_to_offset,
 				    bool greedy_spaces) {
   int c = EOF;
   int next_c = EOF;
@@ -243,7 +243,7 @@ void copy_between_2_fd_up_to_offset(FILE * source,
 /* Copy the input file to the compilation unit between the function
    declarations up to the current function definition. */
 void csplit_append_to_compilation_unit(int last_line,
-				       size_t last_offset) {
+				       unsigned long long last_offset) {
   pips_debug(2, "append to compilation unit up-to line %d (from %d) or offset %zd\n",
 	     last_line, current_input_line, last_offset);
 

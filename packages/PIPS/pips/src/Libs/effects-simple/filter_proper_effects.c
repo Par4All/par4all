@@ -40,6 +40,7 @@
 #include "properties.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "alias-classes.h"
 
 static list /* of entity */ get_variables_to_filter()
 {

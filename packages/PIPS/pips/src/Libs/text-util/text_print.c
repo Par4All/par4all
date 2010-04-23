@@ -138,9 +138,9 @@ print_sentence(FILE * fd,
 	    deal_with_attachments_in_this_string(label,
 						 position_in_the_output);
 
-	    if (!get_bool_property("PRETTYPRINT_C_CODE"))
+	    if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
 	      fprintf_sentence(fd, "%-5s ", label);
-	    else
+	    } else
 	      {
 		/* C prettyprinter: a label cannot begin with a number so "l" is added for this case*/
 		if (strlen(label)>0)
@@ -148,7 +148,9 @@ print_sentence(FILE * fd,
 	      }
 	}
 	else {
-	  fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"":"      ");
+	  if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
+	    fprintf_sentence(fd,"      ");
+	  }
 	}
 
 	/* FI: do not indent too much (9 June 1995) */
@@ -166,14 +168,18 @@ print_sentence(FILE * fd,
 	  for (i = 0; i < em; i++)
 	    putc_sentence(' ', fd);
 
-	col = em + (get_bool_property("PRETTYPRINT_C_CODE")? 0 : 7);
+  col = em;
+
+  if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
+	  col = col + 7; /* Fortran77 start on 7th column */
+  }
 
 	pips_assert("not too many columns", col <= MAX_END_COLUMN);
 
 	FOREACH(STRING, w, lw) {
-	  if (get_bool_property("PRETTYPRINT_C_CODE"))
+	  if( get_bool_property("PRETTYPRINT_FREE_FORM")) {
 	    col += fprintf_sentence(fd, "%s", w);
-	  else {
+	  } else {
 
 	    /* if the string fits on the current line: no problem */
 	    if (col + strlen(w) <= 70) {
@@ -269,9 +275,9 @@ print_sentence(FILE * fd,
 	}
 
 	pips_debug(9, "line completed, col=%d\n", col);
-	if (!get_bool_property("PRETTYPRINT_C_CODE"))
+  if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
 	  pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
-
+  }
 	/* statement line number starts at different column depending on */
 	/* the used language : C or fortran                              */
 	size_t column_start = 0;

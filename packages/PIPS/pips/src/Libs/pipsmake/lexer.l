@@ -45,7 +45,7 @@
 <TEXT>MODULE		{return MODULE;}
 <TEXT>MAIN		{return MAIN;}
 <TEXT>COMMON		{return COMMON;}
-<TEXT>CALLEES		{return CALLEES;}
+<TEXT>CALLEES		{return TK_CALLEES;}
 <TEXT>CALLERS		{return CALLERS;}
 <TEXT>ALL		{return ALL;}
 <TEXT>SELECT		{return SELECT;}
