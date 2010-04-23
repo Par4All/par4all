@@ -89,6 +89,22 @@ transformer effects_to_transformer(list e) /* list of effects */
       args = arguments_add_entity(args, new_val);
       b = vect_add_variable(b, (Variable) new_val);
     }
+    else if(action_write_p(a) && entity_abstract_location_p(v)) {
+      /* All analyzed variables conflicting with v must be considered
+	 written. */
+      list wvl = modified_variables_with_values();
+
+      FOREACH(ENTITY, wv, wvl) {
+	if(entities_may_conflict_p(v,wv)) {
+	  /* FI->FI: I do not understand why these three lines copied
+	     from above are sufficient, not why they were not pacted
+	     together. */
+	  entity new_val = entity_to_new_value(v);
+	  args = arguments_add_entity(args, new_val);
+	  b = vect_add_variable(b, (Variable) new_val);
+	}
+      }
+    }
   }
 
   s->base = b;

@@ -553,6 +553,11 @@ entity variable_to_abstract_location(entity v)
   If al1 and al2 are related to the same area, then the area is
   preserved. Else, the *anywhere* area is used.
 
+  FI: The type part of the abstract location lattice is not
+  implemented... Since the abstract locations are somewhere defined as
+  area, they cannot carry a type. Types are taken care of for heap
+  modelization but not more the abstract locations.
+
   FI: we are in trouble with the NULL pointer...
 */
 /* here al1 and al2 must be abstract locations */
@@ -561,10 +566,16 @@ entity abstract_locations_max(entity al1, entity al2)
   entity e = entity_undefined;
   string ln1 = entity_local_name(al1);
   string ln2 = entity_local_name(al2);
-  string mn1 = entity_module_name(al1);
-  string mn2 = entity_module_name(al2);
+  string mn1 = strdup(entity_module_name(al1));
+  string mn2 = strdup(entity_module_name(al2));
   string ln;
   string mn;
+
+  if(!get_bool_property("ALIASING_ACROSS_TYPES")) {
+    //pips_internal_error("Option not implemented yet.\n");
+    pips_user_warning("property \"ALIASING_ACROSS_TYPES\" is assumed true"
+		      " for abstract locations.\n");
+  }
 
   if(strcmp(ln1, ln2)==0)
     ln = ln1;
@@ -576,15 +587,18 @@ entity abstract_locations_max(entity al1, entity al2)
   else
     mn = ANY_MODULE_NAME;
   e = FindOrCreateEntity(mn, ln);
+  free(mn1);
+  free(mn2);
   return e;
 }
 
-/* Here, entity al1 and entity al2 can be program variables */
+/* Here, entity al1 and entity al2 can be program variables
+ */
 entity entity_locations_max(entity al1, entity al2)
 {
   entity e = entity_undefined;
-  string mn1 = entity_module_name(al1);
-  string mn2 = entity_module_name(al2);
+  string mn1 = strdup(entity_module_name(al1));
+  string mn2 = strdup(entity_module_name(al2));
   //string ln1 = entity_local_name(al1);
   //string ln2 = entity_local_name(al2);
 
@@ -594,63 +608,65 @@ entity entity_locations_max(entity al1, entity al2)
   else {
     string mn = string_undefined;
 
-  /* Can we preserve information about the module? */
-  if(strcmp(mn1, mn2)==0)
-    mn = mn1;
-  else
-    mn = ANY_MODULE_NAME;
+    /* Can we preserve information about the module? */
+    if(strcmp(mn1, mn2)==0)
+      mn = mn1;
+    else
+      mn = ANY_MODULE_NAME;
 
-  if(entity_abstract_location_p(al1))
-    if(entity_abstract_location_p(al2)) {
-      /* Both al1 and al2 are abstract locations and they are
-	 different */
-      e = abstract_locations_max(al1, al2);
-    }
-    else {
-      entity al = variable_to_abstract_location(al2);
-      e = abstract_locations_max(al1, al);
-    }
-  else
-    if(entity_abstract_location_p(al2)) {
-      entity al = variable_to_abstract_location(al1);
-      e = abstract_locations_max(al, al2);
-    }
-    else {
-      /* al1 and al2 are assumed to be variables */
-      storage s1 = entity_storage(al1);
-      storage s2 = entity_storage(al2);
-
-      if(storage_ram_p(s1) && storage_ram_p(s2)) {
-	ram r1 = storage_ram(s1);
-	ram r2 = storage_ram(s2);
-	entity f1 = ram_function(r1);
-	entity f2 = ram_function(r2);
-	entity a1 = ram_section(r1);
-	entity a2 = ram_section(r2);
-	string mn = string_undefined;
-	string ln = string_undefined;
-
-	if(f1==f2)
-	  mn = entity_local_name(f1);
-	else
-	  mn = ANY_MODULE_NAME;
-
-	if(static_area_p(a1) && static_area_p(a2))
-	  ln = STATIC_AREA_LOCAL_NAME;
-	else if(dynamic_area_p(a1) && dynamic_area_p(a2))
-	  ln = DYNAMIC_AREA_LOCAL_NAME;
-	else if(stack_area_p(a1) && stack_area_p(a2))
-	  ln = STACK_AREA_LOCAL_NAME;
-	else if(heap_area_p(a1) && heap_area_p(a2))
-	  ln = HEAP_AREA_LOCAL_NAME;
-	else
-	  ln = ANYWHERE_LOCATION;
-	e = FindOrCreateEntity(mn, ln);
+    if(entity_abstract_location_p(al1))
+      if(entity_abstract_location_p(al2)) {
+	/* Both al1 and al2 are abstract locations and they are
+	   different */
+	e = abstract_locations_max(al1, al2);
       }
-      else
-	pips_internal_error("not implemented\n");
-    }
+      else {
+	entity al = variable_to_abstract_location(al2);
+	e = abstract_locations_max(al1, al);
+      }
+    else
+      if(entity_abstract_location_p(al2)) {
+	entity al = variable_to_abstract_location(al1);
+	e = abstract_locations_max(al, al2);
+      }
+      else {
+	/* al1 and al2 are assumed to be variables */
+	storage s1 = entity_storage(al1);
+	storage s2 = entity_storage(al2);
+
+	if(storage_ram_p(s1) && storage_ram_p(s2)) {
+	  ram r1 = storage_ram(s1);
+	  ram r2 = storage_ram(s2);
+	  entity f1 = ram_function(r1);
+	  entity f2 = ram_function(r2);
+	  entity a1 = ram_section(r1);
+	  entity a2 = ram_section(r2);
+	  string mn = string_undefined;
+	  string ln = string_undefined;
+
+	  if(f1==f2)
+	    mn = entity_local_name(f1);
+	  else
+	    mn = ANY_MODULE_NAME;
+
+	  if(static_area_p(a1) && static_area_p(a2))
+	    ln = STATIC_AREA_LOCAL_NAME;
+	  else if(dynamic_area_p(a1) && dynamic_area_p(a2))
+	    ln = DYNAMIC_AREA_LOCAL_NAME;
+	  else if(stack_area_p(a1) && stack_area_p(a2))
+	    ln = STACK_AREA_LOCAL_NAME;
+	  else if(heap_area_p(a1) && heap_area_p(a2))
+	    ln = HEAP_AREA_LOCAL_NAME;
+	  else
+	    ln = ANYWHERE_LOCATION;
+	  e = FindOrCreateEntity(mn, ln);
+	}
+	else
+	  pips_internal_error("not implemented\n");
+      }
   }
+  free(mn1);
+  free(mn2);
   return e;
 }
 

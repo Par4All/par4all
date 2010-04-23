@@ -21,8 +21,8 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 
- * FI: these values were taken from syntax/tokyacc.h but I do not 
+/*
+ * FI: these values were taken from syntax/tokyacc.h but I do not
  * think they matter. Wouldn't an enum be better?
  *
  * MOD was an initial exception. So are MINIMUM and MAXIMUM
@@ -54,3 +54,16 @@
 #define BITWISE_XOR 90
 #define RIGHT_SHIFT 91
 #define LEFT_SHIFT 92
+
+#define ASSIGN 100
+#define POST_INCREMENT 101
+#define POST_DECREMENT 102
+#define PRE_INCREMENT 103
+#define PRE_DECREMENT 104
+#define MULTIPLY_UPDATE 105
+#define DIVIDE_UPDATE 106
+#define PLUS_UPDATE 107
+#define MINUS_UPDATE 108
+#define LEFT_SHIFT_UPDATE 109
+#define RIGHT_SHIFT_UPDATE 110
+#define BITWISE_OR_UPDATE 111

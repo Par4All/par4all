@@ -496,9 +496,9 @@ static transformer ordinary_summary_precondition(string module_name,
     list lc = callees_callees(callers);
 
     ifdebug(1) {
-      debug(1, "summary_precondition", "begin for %s with %d callers\n",
-	    module_name,
-	    gen_length(lc));
+      pips_debug(1, "begin for %s with %d callers\n",
+		 module_name,
+		 gen_length(lc));
       FOREACH(STRING, caller_name, lc) {
 	(void) fprintf(stderr, "%s, ", caller_name);
       }

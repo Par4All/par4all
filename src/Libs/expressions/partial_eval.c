@@ -24,11 +24,13 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
+
 /*
  * Integer constants calculated by preconditions are replaced by their value.
  * Expressions are evaluated to (ICOEF*SUBEXPR + ISHIFT) in order to perform
- * some simplifications.
+ * some simplifications. When ICOEF==0, SUBEXPR must be undefined.
  */
+
 /* Hypotheses pour l'implementation:
 
 Toute fonction d'evaluation partielle retourne eformat_undefined
@@ -50,7 +52,14 @@ information, de`s qu'eformat est simplife', alors eformat.simpler
 devient vrai. L'expression d'origine sera alors free'e lorsque
 regenerate_expression().
 
-Des que l'evaluation n'est plus possible, il faut regenerer l'expression
+Des que l'evaluation n'est plus possible, il faut regenerer l'expression.
+
+Note: now NORMALIZE_EXPRESSION() is also used to simplify expressions
+and sub-expressions because automatic program transformations
+sometimes generate kind of stupid code such as "i-i+1" or
+"512-1". When a simplification occurs, no feedback is provided and the
+linearized version of the expression is assumed "simpler". Hence,
+"simpler" now means "may be simpler".
  */
 
 #include <stdio.h>
@@ -161,7 +170,7 @@ effects stmt_to_fx(statement stmt, statement_effects fx_map)
   pips_assert("stmt is defined", stmt != statement_undefined);
 
   pips_debug(9,
-	"Look for effects for statement at %p (ordering %d, number %d):\n",
+	"Look for effects for statement at %p (ordering %td, number %td):\n",
 	stmt, statement_ordering(stmt), statement_number(stmt));
 
   fx = apply_statement_effects(fx_map, stmt);
@@ -211,7 +220,7 @@ Psysteme stmt_prec(statement stmt)
   pips_assert("stmt_prec", stmt != statement_undefined);
 
   pips_debug(9,
-	"Look for preconditions for statement at %p (ordering %d, number %d):\n",
+	"Look for preconditions for statement at %p (ordering %td, number %td):\n",
 	stmt, statement_ordering(stmt), statement_number(stmt));
 
   t = load_statement_precondition(stmt);
@@ -234,7 +243,7 @@ void transformer_map_print(void)
   hash_table_print_header (htp,f);
 
   HASH_MAP(k, v, {
-      fprintf(f, "\nFor statement at %p (ordering %d, number %d):\n",
+      fprintf(f, "\nFor statement at %p (ordering %td, number %td):\n",
 	      k,
 	      statement_ordering((statement) k),
 	      statement_number((statement) k));
@@ -283,7 +292,7 @@ eformat_t partial_eval_expression_and_copy(expression expr, Psysteme ps, effects
 {
   eformat_t ef;
 
-  ef= partial_eval_expression(expr, ps, fx);
+  ef = partial_eval_expression(expr, ps, fx);
 
   if(eformat_equivalent_p(ef,eformat_undefined)) {
     ef.expr = copy_expression(expr);
@@ -294,7 +303,30 @@ eformat_t partial_eval_expression_and_copy(expression expr, Psysteme ps, effects
 
 eformat_t partial_eval_expression(expression e, Psysteme ps, effects fx)
 {
-  eformat_t ef = partial_eval_syntax(e, ps, fx);
+  eformat_t ef;
+  expression ne = e;
+  normalized n;
+
+  unnormalize_expression(e);
+  NORMALIZE_EXPRESSION(e);
+  n = expression_normalized(e);
+
+  /* In case the expression is affine, use its affine form */
+  if(normalized_linear_p(n)) {
+    Pvecteur pv = normalized_linear(n);
+    ne = make_vecteur_expression(pv);
+    ef = partial_eval_syntax(ne, ps, fx);
+    if(!ef.simpler /*&& !ef.icoef==0 && !ef.ishift==0*/) {
+      /* FI: it may be simpler because the simplification may be
+	 performed by normalize_expression() */
+      ef.simpler = TRUE;
+      //ef.expr = ne;
+      //ef.icoef = 1;
+      //ef.ishift = 0;
+    }
+  }
+  else
+    ef = partial_eval_syntax(ne, ps, fx);
 
   return ef;
 }
@@ -398,14 +430,13 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
      their values */
   if(!type_variable_p(entity_type(var)) ||
      !basic_int_p(variable_basic(type_variable(ultimate_type(entity_type(var))))) ) {
-    debug(9, "partial_eval_reference",
-	  "Reference to a non-scalar-integer variable %s cannot be evaluated\n",
-	  entity_name(var));
+    pips_debug(9, "Reference to a non-scalar-integer variable %s cannot be evaluated\n",
+	       entity_name(var));
     return(eformat_undefined);
   }
 
   if (SC_UNDEFINED_P(ps)) {
-    debug(9, "partial_eval_reference", "No precondition information\n");
+    pips_debug(9, "No precondition information\n");
     pips_error("partial_eval_reference", "Probably corrupted precondition\n");
     return(eformat_undefined);
   }
@@ -419,9 +450,7 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
   }
 
   if(live_loop_index_p(var)) {
-    debug(9, "partial_eval_reference",
-	  "Index %s cannot be evaluated\n",
-	  entity_name(var));
+    pips_debug(9, "Index %s cannot be evaluated\n", entity_name(var));
     return(eformat_undefined);
   }
 
@@ -433,20 +462,18 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
     Value min, max;
     Psysteme ps1 = sc_dup(ps);
 
-    /* feasible = sc_minmax_of_variable(ps1, (Variable)var, &min, &max); */
-    feasible = sc_minmax_of_variable2(ps1, (Variable)var, &min, &max);
+    /* feasible = sc_minmax_of_variable(ps1, (Variable) var, &min, &max); */
+    feasible = sc_minmax_of_variable2(ps1, (Variable) var, &min, &max);
     if (! feasible) {
-      user_warning("partial_eval_reference",
-		   "Not feasible system:"
+      pips_user_warning("Not feasible system:"
 		   " module contains some dead code.\n");
     }
     if ( value_eq(min,max) ) {
       eformat_t ef;
 
       /* var is constant and has to be replaced */
-      if ( get_debug_level() == 9) {
-	debug(9, "partial_eval_reference",
-	      "Constant to replace: \n");
+      ifdebug(9) {
+	pips_debug(9, "Constant to replace: \n");
 	print_expression(e);
       }
 
@@ -587,7 +614,7 @@ eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effect
   eformat_t ef;
   expression *sub_ep;
 
-  pips_assert("partial_eval_unary_operator", gen_length(la)==1);
+  pips_assert("one argument", gen_length(la)==1);
   sub_ep = /*&EXPRESSION(CAR(la));*/ (expression*) REFCAR(la);
 
   if (strcmp(entity_local_name(func), UNARY_MINUS_OPERATOR_NAME) == 0) {
@@ -604,9 +631,9 @@ eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effect
     ef.ishift= -(ef.ishift);
   }
   else {
-    /* operator is unknown */
+    /* operator can be a pre/post inc/dec C operator */
     partial_eval_expression_and_regenerate(sub_ep, ps, fx);
-    ef= eformat_undefined;
+    ef = eformat_undefined;
   }
   return(ef);
 }
@@ -692,90 +719,110 @@ eformat_t partial_eval_plus_or_minus_operator(int token,
 					      Psysteme ps,
 					      effects fx)
 {
-  eformat_t ef, ef1, ef2;
-
-  ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
-  ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
-
-  /* generate ef.icoef and ef.expr */
-  if( (ef1.icoef==ef2.icoef || ef1.icoef==-ef2.icoef)
-      && (ef1.icoef<-1 || ef1.icoef>1) ) {
-    /* factorize */
-    ef.simpler=TRUE;
-    if( (token==PERFORM_ADDITION && ef1.icoef==ef2.icoef)
-	|| (token==PERFORM_SUBTRACTION && ef1.icoef==-ef2.icoef) ) {
-      /* addition */
-      ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			      ef1.expr,
-			      ef2.expr);
-      ef.icoef= ef1.icoef;
-    }
-    else if( (ef1.icoef>1)
-	     && (token==PERFORM_SUBTRACTION ? (ef2.icoef>0) : (ef2.icoef<0)) ) {
-      /* substraction e1-e2 */
-      ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-			      ef1.expr,
-			      ef2.expr);
-      ef.icoef= ef1.icoef;
-    }
-    else {
-      /* substraction e2-e1 */
-      ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-			      ef2.expr,
-			      ef1.expr);
-      ef.icoef= -ef1.icoef;
-    }
-  }
-  else if(ef1.icoef!=0 && ef2.icoef!=0) {
-    int c1 = ef1.icoef;
-    int c2 = (token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
-    expression e1= generate_monome((c1>0 ? c1: -c1), ef1.expr);
-    expression e2= generate_monome((c2>0 ? c2: -c2), ef2.expr);
-    /* generate without factorize */
-    ef.simpler= (ef1.simpler || ef2.simpler); /* not precise ?? */
-    if(c1*c2>0) {
-      ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			      e1, e2);
-      ef.icoef= (c1>0 ? 1 : -1);
-    }
-    else if(c1>0) {
-      ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-			      e1, e2);
-      ef.icoef= 1;
-    }
-    else {
-      ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-			      e2, e1);
-      ef.icoef= 1;
-    }
+  eformat_t ef;
+  /* Automatic tools sometimes generate source code like "i - i" */
+  if(expression_equal_p(*ep1, *ep2) && token==PERFORM_SUBTRACTION) {
+    ef.simpler = TRUE;
+    ef.expr = expression_undefined; //int_to_expression(0);
+    ef.icoef = 0;
+    ef.ishift = 0;
   }
   else {
-    ef.simpler= (ef1.simpler || ef2.simpler);
-    if(ef1.icoef==0) {
-      /* CA (9/9/97) condition <0 added in order to simplify
-	 also expression like (J)+(-1) in (J-1)    */
-      if(ef1.ishift<=0) ef.simpler=TRUE;
-      ef.expr=ef2.expr;
-      ef.icoef=(token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
+    eformat_t ef1, ef2;
+
+    ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+    ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+    /* generate ef.icoef and ef.expr */
+    if( (ef1.icoef==ef2.icoef || ef1.icoef==-ef2.icoef)
+	&& (ef1.icoef<-1 || ef1.icoef>1) ) {
+      /* factorize icoef */
+      ef.simpler=TRUE;
+      if( (token==PERFORM_ADDITION && ef1.icoef==ef2.icoef)
+	  || (token==PERFORM_SUBTRACTION && ef1.icoef==-ef2.icoef) ) {
+	/* addition */
+	ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+				ef1.expr,
+				ef2.expr);
+	ef.icoef= ef1.icoef;
+      }
+      else if( (ef1.icoef>1)
+	       && (token==PERFORM_SUBTRACTION ? (ef2.icoef>0) : (ef2.icoef<0)) ) {
+	/* substraction e1-e2 */
+	ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+				ef1.expr,
+				ef2.expr);
+	ef.icoef= ef1.icoef;
+      }
+      else {
+	/* substraction e2-e1 */
+	ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+				ef2.expr,
+				ef1.expr);
+	ef.icoef= -ef1.icoef;
+      }
+    }
+    else if(ef1.icoef!=0 && ef2.icoef!=0) {
+      int c1 = ef1.icoef;
+      int c2 = (token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
+      expression e1= generate_monome((c1>0 ? c1: -c1), ef1.expr);
+      expression e2= generate_monome((c2>0 ? c2: -c2), ef2.expr);
+
+      /* generate without factorize, but for -1? */
+      ef.simpler= (ef1.simpler || ef2.simpler); /* not precise ?? */
+      if(c1*c2>0) {
+	ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+				e1, e2);
+	ef.icoef= (c1>0 ? 1 : -1);
+      }
+      else if(c1>0) {
+	ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+				e1, e2);
+	ef.icoef= 1;
+      }
+      else {
+	ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+				e2, e1);
+	ef.icoef= 1;
+      }
     }
     else {
-      if(ef2.ishift<=0) ef.simpler=TRUE;
-      ef.expr=ef1.expr;
-      ef.icoef=ef1.icoef;
+      ef.simpler= (ef1.simpler || ef2.simpler);
+      if(ef1.icoef==0) {
+	/* CA (9/9/97) condition <0 added in order to simplify
+	   also expression like (J)+(-1) in (J-1)    */
+	if(ef1.ishift<=0)
+	  ef.simpler=TRUE;
+	ef.expr=ef2.expr;
+	ef.icoef=(token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
+      }
+      else if(ef2.icoef==0) {
+	/* FI: simplification i++ + 0? I do not understand Corinne's
+	   code above. ef.ishift is generated below. I force simpler
+	   because ef2.icoef==0 can result from a simplification */
+	ef.expr = ef1.expr;
+	ef.icoef = ef1.icoef;
+	ef.simpler=TRUE;
+      }
+      else {
+	if(ef2.ishift<=0)
+	  ef.simpler=TRUE;
+	ef.expr=ef1.expr;
+	ef.icoef=ef1.icoef;
+      }
     }
+
+    /* generate ef.ishift */
+    if  ((ef1.icoef==0 || ef1.ishift!=0)
+	 && (ef2.icoef==0 || ef2.ishift!=0))
+      {
+	/* simplify shifts */
+	ef.simpler= TRUE;
+      }
+
+    ef.ishift= (token==PERFORM_SUBTRACTION ?
+		ef1.ishift-ef2.ishift : ef1.ishift+ef2.ishift);
   }
-
-  /* generate ef.ishift */
-  if  ((ef1.icoef==0 || ef1.ishift!=0)
-       && (ef2.icoef==0 || ef2.ishift!=0))
-    {
-      /* simplify shifts */
-      ef.simpler= TRUE;
-    }
-
-  ef.ishift= (token==PERFORM_SUBTRACTION ?
-	      ef1.ishift-ef2.ishift : ef1.ishift+ef2.ishift);
-
   return ef;
 }
 
@@ -826,6 +873,7 @@ eformat_t partial_eval_minus_operator(expression *ep1,
 
   return ef;
 }
+
 eformat_t partial_eval_minus_c_operator(expression *ep1,
 					expression *ep2,
 					Psysteme ps,
@@ -994,6 +1042,27 @@ eformat_t partial_eval_power_operator(expression *ep1,
   return ef;
 }
 
+/* FI: a better job could be done by distinguishing between the
+   different kinds of operators. For instance "a+=0" or "b*=1;" could
+   be simplified. For the time being, we simplify the two
+   sub-expressions but not the current expression. */
+eformat_t partial_eval_update_operators(expression *ep1,
+					expression *ep2,
+					Psysteme ps,
+					effects fx)
+{
+  eformat_t ef, ef1, ef2;
+
+  ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+  ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+  regenerate_expression(&ef1, ep1);
+  regenerate_expression(&ef2, ep2);
+  ef = eformat_undefined;
+
+  return ef;
+}
+
 static struct perform_switch {
   string operator_name;
   eformat_t (*binary_operator)(expression *, expression *, Psysteme, effects);
@@ -1010,6 +1079,14 @@ static struct perform_switch {
   {MIN_OPERATOR_NAME, partial_eval_min_operator},
   {MAX0_OPERATOR_NAME, partial_eval_max_operator},
   {MAX_OPERATOR_NAME, partial_eval_max_operator},
+  {ASSIGN_OPERATOR_NAME, partial_eval_update_operators},
+  {MULTIPLY_UPDATE_OPERATOR_NAME, partial_eval_update_operators},
+  {DIVIDE_UPDATE_OPERATOR_NAME, partial_eval_update_operators},
+  {PLUS_UPDATE_OPERATOR_NAME, partial_eval_update_operators},
+  {MINUS_UPDATE_OPERATOR_NAME, partial_eval_update_operators},
+  {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, partial_eval_update_operators},
+  {LEFT_SHIFT_UPDATE_OPERATOR_NAME, partial_eval_update_operators},
+  {BITWISE_OR_UPDATE_OPERATOR_NAME, partial_eval_update_operators},
   {0 , 0}
 };
 
@@ -1311,7 +1388,7 @@ void regenerate_expression(eformat_t *efp, expression *ep)
     }
     else {
       /* check */
-      pips_assert("regenerate_expression",
+      pips_assert("the expression is undefined",
 		  efp->expr == expression_undefined);
       /* final expression is constant efp->ishift */
       tmp_expr= int_expr(efp->ishift);
@@ -1479,10 +1556,10 @@ static void assign_expression(expression to, expression from)
 
 void PartialEvalExpression(expression e)
 {
-    unnormalize_expression(e);
-    NORMALIZE_EXPRESSION(e);
-    normalized n = expression_normalized(e);
-    if( normalized_linear_p(n))
+  unnormalize_expression(e);
+  NORMALIZE_EXPRESSION(e);
+  normalized n = expression_normalized(e);
+  if( normalized_linear_p(n))
     {
         Pvecteur pv = normalized_linear(n);
         expression new_e = make_vecteur_expression(pv);

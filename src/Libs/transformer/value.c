@@ -636,8 +636,8 @@ entity entity_to_new_value(entity e)
   entity n;
   if((n = (entity) hash_get(hash_entity_to_new_value, (char *) e))
      == entity_undefined)
-    pips_error("entity_to_new_value","unbounded entity %s\n",
-	       entity_name(e));
+    pips_internal_error("unbounded entity %s\n",
+			entity_name(e));
   return n;
 }
 
@@ -646,8 +646,8 @@ entity entity_to_old_value(entity e)
   entity o;
   if((o = (entity) hash_get(hash_entity_to_old_value, (char *) e))
      == entity_undefined)
-    pips_error("entity_to_old_value","unbounded entity %s\n",
-	       entity_name(e));
+    pips_internal_error("unbounded entity %s\n",
+			entity_name(e));
   return o;
 }
 
@@ -656,8 +656,8 @@ entity entity_to_intermediate_value(entity e)
   entity i;
   if((i = (entity) hash_get(hash_entity_to_intermediate_value, (char *) e))
      == entity_undefined)
-    pips_error("entity_to_intermediate_value","unbounded entity %s\n",
-	       entity_name(e));
+    pips_internal_error("unbounded entity %s\n",
+			entity_name(e));
   return i;
 }
 
@@ -772,14 +772,46 @@ static int mapping_to_value_number(hash_table h)
   return count;
 }
 
+/* Returns the list of entities in the mapping domain
+ *
+ * Could be more efficient to return a set.
+ *
+ * Note: this is a copy of mapping_to_value_number()
+*/
+static list mapping_to_domain_list(hash_table h)
+{
+  size_t count = 0;
+  list values = NIL;
+
+  HASH_MAP(var, val, {
+    if(!gen_in_list_p((entity) val, values)) {
+      values = CONS(ENTITY,(entity) val, values);
+      count++;
+    }
+  }, h);
+
+  pips_assert("The number of insertions is equal to the list length",
+	      count == gen_length(values));
+
+  return values;
+}
+
+/* Return the list of all analyzed variables which are modified in
+   the current module*/
+list modified_variables_with_values()
+{
+  /* The intermediate values could be used as well */
+  return mapping_to_domain_list(hash_entity_to_old_value);
+}
+
 void test_mapping_entry_consistency()
 {
   int nbo = 0;
   int nbi = 0;
   int nbn = 0;
 
-  pips_assert("The number of old values is equal to the number of intermediate values", 
-	      ((nbo= hash_table_entry_count(hash_entity_to_old_value)) 
+  pips_assert("The number of old values is equal to the number of intermediate values",
+	      ((nbo= hash_table_entry_count(hash_entity_to_old_value))
 	       == (nbi= hash_table_entry_count(hash_entity_to_intermediate_value))));
   /* This second assert is too strong when some analyzable variables are
      equivalenced together. The number of values required is smaller
@@ -791,7 +823,7 @@ void test_mapping_entry_consistency()
     pips_assert("The number of values is greater than the number"
     " of new, old and intermediate values",
     hash_table_entry_count(hash_value_to_name) >=
-    hash_table_entry_count(hash_entity_to_new_value) 
+    hash_table_entry_count(hash_entity_to_new_value)
     + nbo + nbi);
   */
   nbo = mapping_to_value_number(hash_entity_to_old_value);
@@ -818,6 +850,7 @@ int aproximate_number_of_analyzed_variables()
   return hash_table_entry_count(hash_entity_to_new_value);
 }
 
+/* FI: looks more like the number of values used. */
 int number_of_analyzed_variables()
 {
   return hash_table_entry_count(hash_value_to_name);
@@ -834,9 +867,9 @@ void allocate_value_mappings(int n, int o, int i)
   /* hash_warn_on_redefinition(); */
   hash_entity_to_new_value = hash_table_make(hash_pointer, n);
   hash_entity_to_old_value = hash_table_make(hash_pointer, o);
-  hash_entity_to_intermediate_value = 
+  hash_entity_to_intermediate_value =
     hash_table_make(hash_pointer, i);
-  hash_value_to_name = 
+  hash_value_to_name =
     hash_table_make(hash_pointer, n + o + i);
 }
 
@@ -862,7 +895,7 @@ void error_reset_value_mappings(void)
 
 void free_value_mappings(void)
 {
-  pips_assert("no free of undefined mappings", 
+  pips_assert("no free of undefined mappings",
 	      !hash_table_undefined_p(hash_entity_to_old_value));
   error_free_value_mappings();
 }
@@ -886,7 +919,7 @@ void error_free_value_mappings(void)
   hash_table_free(hash_entity_to_old_value);
   hash_table_free(hash_entity_to_intermediate_value);
   hash_table_free(hash_value_to_name);
-    
+
   reset_value_mappings();
   reset_temporary_value_counter();
   reset_analyzed_types();
@@ -897,8 +930,8 @@ void error_free_value_mappings(void)
 /* void add_new_value_name(entity e): add a new value name for entity e */
 static void add_new_value_name(entity e)
 {
-  string new_value_name = 
-    strdup(concatenate(entity_name(e), NEW_VALUE_SUFFIX, 
+  string new_value_name =
+    strdup(concatenate(entity_name(e), NEW_VALUE_SUFFIX,
 		       (char *) NULL));
   pips_debug(8,"begin: for %s\n", entity_name(e));
   if(hash_get(hash_value_to_name, (char *) e) == HASH_UNDEFINED_VALUE)
@@ -922,7 +955,7 @@ void add_new_alias_value(entity e, entity a)
   entity v = entity_undefined;
   pips_debug(8, "begin: for %s and %s\n",
 	entity_name(e),entity_name(a));
-  pips_assert("hash_entity_to_new_value is defined", 
+  pips_assert("hash_entity_to_new_value is defined",
 	      (hash_get(hash_entity_to_new_value, (char *) e)
 	       == HASH_UNDEFINED_VALUE));
 
@@ -952,7 +985,7 @@ entity external_entity_to_old_value(entity e)
   entity old_value;
   string old_value_name;
 
-  old_value_name = concatenate(entity_name(e),OLD_VALUE_SUFFIX, 
+  old_value_name = concatenate(entity_name(e),OLD_VALUE_SUFFIX,
 			       (char *) NULL);
   old_value = gen_find_tabulated(old_value_name, entity_domain);
 
@@ -967,7 +1000,7 @@ void add_old_value(entity e)
   string old_value_name;
 
   /* find the old value entity if possible, else, generate it */
-  old_value_name = concatenate(entity_name(e),OLD_VALUE_SUFFIX, 
+  old_value_name = concatenate(entity_name(e),OLD_VALUE_SUFFIX,
 			       (char *) NULL);
   old_value = gen_find_tabulated(old_value_name, entity_domain);
   if(old_value == entity_undefined)
@@ -979,7 +1012,7 @@ void add_old_value(entity e)
   if(hash_get(hash_entity_to_old_value, (char *) e) == HASH_UNDEFINED_VALUE) {
     hash_put(hash_entity_to_old_value, (char *) e, (char *) old_value);
     /* add its name */
-    hash_put(hash_value_to_name, (char *) old_value, 
+    hash_put(hash_value_to_name, (char *) old_value,
 	     strdup(entity_name(old_value)));
   }
 }
@@ -1002,11 +1035,11 @@ void add_intermediate_value(entity e)
   entity intermediate_value;
 
   /* get a new intermediate value, if necessary */
-  if((intermediate_value = 
+  if((intermediate_value =
       (entity) hash_get(hash_entity_to_intermediate_value, (char *) e))
      == (entity) HASH_UNDEFINED_VALUE) {
     intermediate_value = make_local_intermediate_value_entity(entity_type(e));
-    hash_put(hash_entity_to_intermediate_value, (char *) e, 
+    hash_put(hash_entity_to_intermediate_value, (char *) e,
 	     (char *) intermediate_value);
     /* add its (external) name */
     hash_put(hash_value_to_name, (char *) intermediate_value,
@@ -1035,7 +1068,7 @@ void add_local_old_value(entity e)
   entity old_value;
 
   /* get a new old value, if necessary */
-  if((old_value = 
+  if((old_value =
       (entity) hash_get(hash_entity_to_old_value, (char *) e))
      == (entity) HASH_UNDEFINED_VALUE) {
     old_value = make_local_old_value_entity(entity_type(e));
@@ -1052,11 +1085,11 @@ void add_local_intermediate_value(entity e)
   entity intermediate_value;
 
   /* get a new intermediate value, if necessary */
-  if((intermediate_value = 
+  if((intermediate_value =
       (entity) hash_get(hash_entity_to_intermediate_value, (char *) e))
      == (entity) HASH_UNDEFINED_VALUE) {
     intermediate_value = make_local_intermediate_value_entity(entity_type(e));
-    hash_put(hash_entity_to_intermediate_value, (char *) e, 
+    hash_put(hash_entity_to_intermediate_value, (char *) e,
 	     (char *) intermediate_value);
     /* add its (external) name */
     hash_put(hash_value_to_name, (char *) intermediate_value,
@@ -1066,8 +1099,7 @@ void add_local_intermediate_value(entity e)
   }
 }
 
-void 
-remove_entity_values(entity e, bool readonly)
+void remove_entity_values(entity e, bool readonly)
 {
   entity new_value = entity_to_new_value(e);
   string s;
@@ -1241,7 +1273,7 @@ entity value_alias(entity e)
 {
   entity a = entity_undefined;
 
-  debug(8,"value_alias","begin: for %s\n", entity_name(e));
+  pips_debug(8,"begin: for %s\n", entity_name(e));
 
   /* lookup the current value name mapping and return an arbitraty "representant"
      of the interprocedural alias set of e; the equivalence relation is "has
