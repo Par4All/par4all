@@ -15,11 +15,11 @@
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
                      DO LALPHA3 = 1, 8
-                        DO LALPHA2 = -15+16*PSIp1, 16*PSIp1
+                        DO LALPHA2 = 16*PSIp1-15, 16*PSIp1
                            DO LALPHA1 = 1, 20
                               LALPHAp3 = LALPHA3
-                              LALPHAp2 = 16+LALPHA2-16*PSIp1
-                              LALPHAp1 = -20+LALPHA1+20*PSI1
+                              LALPHAp2 = LALPHA2-16*PSIp1+16
+                              LALPHAp1 = LALPHA1+20*PSI1-20
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL4 BUFF(BUF INDEX) = T31P(
      &                        LALPHA1,LALPHA2,LALPHA3)
@@ -51,11 +51,11 @@
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA3 = 1, 8
-                        DO LALPHA2 = -15+16*PSIp1, 16*PSIp1
+                        DO LALPHA2 = 16*PSIp1-15, 16*PSIp1
                            DO LALPHA1 = 1, 20
                               LALPHAp3 = LALPHA3
-                              LALPHAp2 = 16+LALPHA2-16*PSIp1
-                              LALPHAp1 = -20+LALPHA1+20*PSI1
+                              LALPHAp2 = LALPHA2-16*PSIp1+16
+                              LALPHAp1 = LALPHA1+20*PSI1-20
                               IF (BUF INDEX.EQ.
      &                        SIZE OF RECEIVED BUFFER) THEN
                                  RECEIVED NOT PERFORMED = .TRUE.
@@ -71,11 +71,11 @@
                   ELSE
 ! - lazy copying
                      DO LALPHA3 = 1, 8
-                        DO LALPHA2 = -15+16*PSIp1, 16*PSIp1
+                        DO LALPHA2 = 16*PSIp1-15, 16*PSIp1
                            DO LALPHA1 = 1, 20
                               LALPHAp3 = LALPHA3
-                              LALPHAp2 = 16+LALPHA2-16*PSIp1
-                              LALPHAp1 = -20+LALPHA1+20*PSI1
+                              LALPHAp2 = LALPHA2-16*PSIp1+16
+                              LALPHAp1 = LALPHA1+20*PSI1-20
                               T31P_1(LALPHAp1,LALPHAp2,LALPHAp3) = 
      &                        T31P(LALPHA1,LALPHA2,LALPHA3)
                            ENDDO
@@ -125,7 +125,7 @@
       ALPHA2 = 1
       ALPHA1 = 1
       LALPHA1 = ALPHA1
-      LALPHA2 = 16+ALPHA2-16*PSI1
+      LALPHA2 = ALPHA2-16*PSI1+16
       LALPHA3 = ALPHA3
       BUF INDEX = BUF INDEX+1
       T31P(ALPHA1,ALPHA2,ALPHA3) = HPFC REAL4 BUFF(BUF INDEX)
@@ -307,7 +307,7 @@
          ALPHA2 = 1
          ALPHA1 = 1
          LALPHA1 = ALPHA1
-         LALPHA2 = 16+ALPHA2-16*PSI1
+         LALPHA2 = ALPHA2-16*PSI1+16
          LALPHA3 = ALPHA3
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = T31P_1(LALPHA1,LALPHA2,LALPHA3)

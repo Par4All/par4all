@@ -14,22 +14,22 @@
       PRINT *, 'hpftest34 running'
 ! collecting distributed variable B
       DO PSI1 = 1, 2
-         DO PSI2 = MAX(-1+PSI1, HPFC DIVIDE(9-3*PSI1, 4)), MIN(5+
-     &   HPFC DIVIDE(-4*PSI1, 3), 1+PSI1)
+         DO PSI2 = MAX(PSI1-1, HPFC DIVIDE(-3*PSI1+9, 4)), MIN(5+
+     &   HPFC DIVIDE(-4*PSI1, 3), PSI1+1)
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
             SIZE OF RECEIVED BUFFER = 0
-            T LID = -2+2*PSI1+PSI2
+            T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = MAX(2, -4+5*PSI2, HPFC DIVIDE(29-15*PSI1, 4)
-     &      , -8+5*PSI1), MIN(9, 5*PSI2, 3+5*PSI1, HPFC DIVIDE(67-20*
-     &      PSI1, 3))
-               DO ALPHA1 = MAX(-4+5*PSI1, HPFC DIVIDE(28-4*ALPHA2, 3)
-     &         , -3+ALPHA2), MIN(4+ALPHA2, HPFC DIVIDE(51-3*ALPHA2, 4
+            DO ALPHA2 = MAX(2, 5*PSI2-4, HPFC DIVIDE(-15*PSI1+29, 4)
+     &      , 5*PSI1-8), MIN(9, 5*PSI2, 5*PSI1+3, HPFC DIVIDE(-20*
+     &      PSI1+67, 3))
+               DO ALPHA1 = MAX(5*PSI1-4, HPFC DIVIDE(-4*ALPHA2+28, 3)
+     &         , ALPHA2-3), MIN(ALPHA2+4, HPFC DIVIDE(-3*ALPHA2+51, 4
      &         ), 5*PSI1)
-                  LALPHA1 = 5+ALPHA1-5*PSI1
-                  LALPHA2 = 5+ALPHA2-5*PSI2
+                  LALPHA1 = ALPHA1-5*PSI1+5
+                  LALPHA2 = ALPHA2-5*PSI2+5
                   BUF INDEX = BUF INDEX+1
                   B(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
                ENDDO
@@ -234,12 +234,13 @@
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA2 = MAX(2, -4+5*PSI2, HPFC DIVIDE(29-15*PSI1, 4), -8+5*
-     &PSI1), MIN(9, 5*PSI2, 3+5*PSI1, HPFC DIVIDE(67-20*PSI1, 3))
-         DO ALPHA1 = MAX(-4+5*PSI1, HPFC DIVIDE(28-4*ALPHA2, 3), -3+
-     &   ALPHA2), MIN(4+ALPHA2, HPFC DIVIDE(51-3*ALPHA2, 4), 5*PSI1)
-            LALPHA1 = 5+ALPHA1-5*PSI1
-            LALPHA2 = 5+ALPHA2-5*PSI2
+      DO ALPHA2 = MAX(2, 5*PSI2-4, HPFC DIVIDE(-15*PSI1+29, 4), 5*
+     &PSI1-8), MIN(9, 5*PSI2, 5*PSI1+3, HPFC DIVIDE(-20*PSI1+67, 3))
+         DO ALPHA1 = MAX(5*PSI1-4, HPFC DIVIDE(-4*ALPHA2+28, 3), 
+     &   ALPHA2-3), MIN(ALPHA2+4, HPFC DIVIDE(-3*ALPHA2+51, 4), 5*
+     &   PSI1)
+            LALPHA1 = ALPHA1-5*PSI1+5
+            LALPHA2 = ALPHA2-5*PSI2+5
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
          ENDDO

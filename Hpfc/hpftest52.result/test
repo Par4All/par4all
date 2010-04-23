@@ -46,14 +46,14 @@ c
          BUF INDEX = 0
          RECEIVED NOT PERFORMED = .FALSE.
          SIZE OF RECEIVED BUFFER = 0
-         T LID = -2+2*PSI1+PSI2
+         T LID = 2*PSI1+PSI2-2
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL4 BUFUPK
-         DO ALPHA2 = MAX(12, -249+250*PSI2), MIN(60, 250*PSI2)
-            DO ALPHA1 = MAX(2, -249+250*PSI1), MIN(10, 250*PSI1)
+         DO ALPHA2 = MAX(12, 250*PSI2-249), MIN(60, 250*PSI2)
+            DO ALPHA1 = MAX(2, 250*PSI1-249), MIN(10, 250*PSI1)
                ALPHA3 = OLD
-               LALPHA1 = 250+ALPHA1-250*PSI1
-               LALPHA2 = 250+ALPHA2-250*PSI2
+               LALPHA1 = ALPHA1-250*PSI1+250
+               LALPHA2 = ALPHA2-250*PSI2+250
                LALPHA3 = ALPHA3
                BUF INDEX = BUF INDEX+1
                TEMP(ALPHA1,ALPHA2,ALPHA3) = HPFC REAL4 BUFF(BUF INDEX
@@ -295,11 +295,11 @@ c
          IF (PSI2.LE.1.AND.PSI1.LE.1) THEN
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA2 = MAX(12, -249+250*PSI2), MIN(60, 250*PSI2)
-               DO ALPHA1 = MAX(2, -249+250*PSI1), MIN(10, 250*PSI1)
+            DO ALPHA2 = MAX(12, 250*PSI2-249), MIN(60, 250*PSI2)
+               DO ALPHA1 = MAX(2, 250*PSI1-249), MIN(10, 250*PSI1)
                   ALPHA3 = OLD
-                  LALPHA1 = 250+ALPHA1-250*PSI1
-                  LALPHA2 = 250+ALPHA2-250*PSI2
+                  LALPHA1 = ALPHA1-250*PSI1+250
+                  LALPHA2 = ALPHA2-250*PSI2+250
                   LALPHA3 = ALPHA3
                   BUF INDEX = BUF INDEX+1
                   HPFC REAL4 BUFF(BUF INDEX) = TEMP(LALPHA1,LALPHA2,

@@ -32,8 +32,8 @@ c print results
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL4 BUFUPK
          DO ALPHA2 = 50, 225
-            DO ALPHA1 = MAX(25, -62+63*PSI1), MIN(200, 63*PSI1)
-               LALPHA1 = 63+ALPHA1-63*PSI1
+            DO ALPHA1 = MAX(25, 63*PSI1-62), MIN(200, 63*PSI1)
+               LALPHA1 = ALPHA1-63*PSI1+63
                LALPHA2 = ALPHA2
                BUF INDEX = BUF INDEX+1
                TC(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
@@ -230,8 +230,8 @@ c computation and copy back (dataparallel semantic)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
       DO ALPHA2 = 50, 225
-         DO ALPHA1 = MAX(25, -62+63*PSI1), MIN(200, 63*PSI1)
-            LALPHA1 = 63+ALPHA1-63*PSI1
+         DO ALPHA1 = MAX(25, 63*PSI1-62), MIN(200, 63*PSI1)
+            LALPHA1 = ALPHA1-63*PSI1+63
             LALPHA2 = ALPHA2
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = TC(LALPHA1,LALPHA2)

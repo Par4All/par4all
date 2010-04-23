@@ -30,12 +30,12 @@
       DO PSI2 = 1, 2
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA1 = -4+5*PSI2, 5*PSI2
-            LALPHA1 = 5+ALPHA1-5*PSI2
+         DO ALPHA1 = 5*PSI2-4, 5*PSI2
+            LALPHA1 = ALPHA1-5*PSI2+5
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = NORTH(ALPHA1)
          ENDDO
-         T LID = -2+2*PSI1+PSI2
+         T LID = 2*PSI1+PSI2-2
          CALL HPFC REAL4 BUFPCK
          CALL HPFC SND TO NODE(T LID)
       ENDDO
@@ -53,13 +53,13 @@ c print results
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
             SIZE OF RECEIVED BUFFER = 0
-            T LID = -2+2*PSI1+PSI2
+            T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = MAX(2, -4+5*PSI2), MIN(9, 5*PSI2)
-               DO ALPHA1 = MAX(2, -4+5*PSI1), MIN(9, 5*PSI1)
-                  LALPHA1 = 5+ALPHA1-5*PSI1
-                  LALPHA2 = 5+ALPHA2-5*PSI2
+            DO ALPHA2 = MAX(2, 5*PSI2-4), MIN(9, 5*PSI2)
+               DO ALPHA1 = MAX(2, 5*PSI1-4), MIN(9, 5*PSI1)
+                  LALPHA1 = ALPHA1-5*PSI1+5
+                  LALPHA2 = ALPHA2-5*PSI2+5
                   BUF INDEX = BUF INDEX+1
                   TC(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
                ENDDO
@@ -217,8 +217,8 @@ c print results
          SIZE OF RECEIVED BUFFER = 0
          CALL HPFC RCV FROM HOST
          CALL HPFC REAL4 BUFUPK
-         DO ALPHA1 = -4+5*PSI2, 5*PSI2
-            LALPHA1 = 5+ALPHA1-5*PSI2
+         DO ALPHA1 = 5*PSI2-4, 5*PSI2
+            LALPHA1 = ALPHA1-5*PSI2+5
             BUF INDEX = BUF INDEX+1
             NORTH(LALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
          ENDDO
@@ -322,10 +322,10 @@ c computation and copy back (dataparallel semantic)
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA2 = MAX(2, -4+5*PSI2), MIN(9, 5*PSI2)
-         DO ALPHA1 = MAX(2, -4+5*PSI1), MIN(9, 5*PSI1)
-            LALPHA1 = 5+ALPHA1-5*PSI1
-            LALPHA2 = 5+ALPHA2-5*PSI2
+      DO ALPHA2 = MAX(2, 5*PSI2-4), MIN(9, 5*PSI2)
+         DO ALPHA1 = MAX(2, 5*PSI1-4), MIN(9, 5*PSI1)
+            LALPHA1 = ALPHA1-5*PSI1+5
+            LALPHA2 = ALPHA2-5*PSI2+5
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = TC(LALPHA1,LALPHA2)
          ENDDO
