@@ -37,10 +37,10 @@ int struct03()
 
    for(i = 0; i <= 9; i += 1) {
 //               <must be read   >: i
-//               <must be written>: x[i][1][1]
+//               <must be written>: x[i][un][first]
       x[i].un.first = 1;
 //               <must be read   >: i
-//               <must be written>: x[i][2][2]
+//               <must be written>: x[i][deux][second]
       x[i].deux.second = 0;
    }
 }
@@ -60,14 +60,14 @@ int struct03()
 //               <must be written>: i
    int i = 0;
 //               <may be read    >: i
-//               <may be written >: x[*][1][1] x[*][2][2]
+//               <may be written >: x[*][deux][second] x[*][un][first]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//               <may be written >: x[*][1][1]
+//               <may be written >: x[*][un][first]
 //               <must be read   >: i
       x[i].un.first = 1;
-//               <may be written >: x[*][2][2]
+//               <may be written >: x[*][deux][second]
 //               <must be read   >: i
       x[i].deux.second = 0;
    }
@@ -87,19 +87,17 @@ int struct03()
    } x[10];
    int i = 0;
 
-//  <x[PHI1][PHI2][PHI3]-W-MAY-{PHI2==PHI3, 0<=PHI1, PHI1<=9, 1<=PHI2,
-//    PHI2<=2}>
+//  <x[PHI1][un][first]-W-MAY-{0<=PHI1, PHI1<=9}>
+//  <x[PHI1][deux][second]-W-MAY-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1) {
 
-//  <x[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==1, PHI3==1, 0<=i,
-//    i<=9}>
+//  <x[PHI1][un][first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       x[i].un.first = 1;
 
-//  <x[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==2, PHI3==2, 0<=i,
-//    i<=9}>
+//  <x[PHI1][deux][second]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       x[i].deux.second = 0;
    }
@@ -109,7 +107,6 @@ Dependence graph for "struct07"
 
 
  **************** Effective Dependence Graph ****************
-
 
 ****************** End of Dependence Graph ******************
 
