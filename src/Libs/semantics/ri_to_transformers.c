@@ -48,6 +48,7 @@
 #include "constants.h"
 #include "control.h"
 #include "effects-generic.h"
+#include "alias-classes.h"
 #include "effects-simple.h"
 
 #include "misc.h"
