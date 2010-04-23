@@ -315,16 +315,42 @@ class ValidationClass:
 
 
     def show_diff_files(self):
-        "Display the differences associated to the elements"
+        """Display the differences associated to the elements from the
+        result in the *.result directories (diff between the .out and the
+        .test)"""
 
-        # To avoid messing with previous print(), flush the output:
-        sys.stdout.flush()
+        for n in self.ordered_list():
+            if verbose:
+                print('Reading', n)
+            ref = Validation.reference_file_name(n)
+            out = Validation.output_file_name(n)
+
+            if not os.path.exists(ref):
+                print(ref, 'not found')
+                continue
+
+            if not os.path.exists(out):
+                print(out, 'not found')
+                continue
+
+            print("Differences between", ref, "and", out)
+            # To avoid messing with previous print(), flush the output:
+            sys.stdout.flush()
+            subprocess.call(["diff", ref, out])
+
+
+    def show_diff_results(self):
+        """Display the differences associated to the elements stored into
+        the validation result directory"""
+
         for n in self.ordered_list():
             if verbose:
                 print('Reading', n)
             file_name = Validation.diff_filename(n, self.output_directory)
             if os.path.exists(file_name):
-                # Use cat to avoid encoding trouble from inside Python:
+                # To avoid messing with previous print(), flush the output:
+                sys.stdout.flush()
+               # Use cat to avoid encoding trouble from inside Python:
                 subprocess.call(["cat", file_name])
             else:
                 print(file_name, 'not found')
@@ -428,9 +454,13 @@ def main():
                       action = "store_true", dest = "list_elements", default = False,
                       help = "List the elements of the validation class")
 
-    parser.add_option("-s",  "--show-diff", action = "store_true",
-                      dest = "show_diff", default = False,
-                      help = "Show the output differences for the current class")
+    parser.add_option("-s",  "--show-diff-files", action = "store_true",
+                      dest = "show_diff_files", default = False,
+                      help = "Show the output differences for the current class by looking into the *.results directories")
+
+    parser.add_option("--show-diff-results", action = "store_true",
+                      dest = "show_diff_results", default = False,
+                      help = "Show the output differences for the current class from the RESULTS directory")
 
     parser.add_option("-a",  "--accept",
                       action = "store_true", dest = "accept", default = False,
@@ -493,9 +523,14 @@ def main():
         # Display the validation class element names:
         print(vc)
 
-    if options.show_diff:
-        # Show the diff recorded for the validation class elements:
+    if options.show_diff_files:
+        # Show the diff in the .results directories for the validation
+        # class elements:
         vc.show_diff_files()
+
+    if options.show_diff_results:
+        # Show the diff recorded in RESULTS for the validation class elements:
+        vc.show_diff_results()
 
     if options.accept:
         # Accept the validation class elements:

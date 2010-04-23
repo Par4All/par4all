@@ -728,7 +728,9 @@ least interest for \Apfa...), defining smaller validation classes such as
 a \Amat (Minimal Acceptance Test).
 
 Here is a small description of the options of \verb|p4a_validate|, that
-are processed in this very order, so that you can pipe actions:
+are processed in this very order, so that you can pipe actions. To be
+useful, \verb|pips_validate| should be run with the \texttt{-k} (history
+keeping) option before.
 
 \begin{description}
 \item[\texttt{--version}:] show program's version number and exit;
@@ -765,8 +767,11 @@ are processed in this very order, so that you can pipe actions:
 \item[\texttt{-l} or \texttt{--list}:] list the elements of the validation
   class;
 
-\item[\texttt{-s} or \texttt{--show-diff}:] show the output differences
-  for the current class;
+\item[\texttt{-s} or \texttt{--show-diff-files}:] show the output
+  differences for the current class by looking into the \texttt{*.results}
+  directories;
+\item[\texttt{--show-diff-results}:] show the output differences for the
+  current class from the \texttt{RESULTS} directory;
 
 \item[\texttt{-a} or \texttt{--accept}:] accept for the current validation
   class;
