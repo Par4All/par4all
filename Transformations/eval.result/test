@@ -35,11 +35,11 @@ C
       K = M+2*N                                                         0034
       K = M-2*N                                                         0035
       K = M-2*N                                                         0036
-      K = -M-2*N                                                        0037
+      K = -(M+2*N)                                                      0037
       K = -(M+2*N)                                                      0038
       K = 2*N-M                                                         0039
 C
-      K = 1+N                                                           0041
+      K = N+1                                                           0041
       K = -N-1                                                          0042
       K = -N-1                                                          0043
       K = -N-1                                                          0044
@@ -67,17 +67,23 @@ c     (-5)/2 = 5/(-2) = -2
       K = (4*M+5)/2                                                     0066
       K = 4*M+5                                                         0067
       K = 2*M+3                                                         0068
-      K = 1                                                             0069
-      K = 1                                                             0070
+c     MOD(3,2) = 1
+      K1 = 1                                                            0070
+c     MOD(-3,-2) = -1
+      K2 = -1                                                           0072
+C     Not true with gfortran
 c     MOD(-3,2) = MOD(3,-2) = -1
-      K = -1                                                            0072
-      K = -1                                                            0073
+c     MOD(-3,2) = -1
+      K3 = -1                                                           0076
+c     MOD(3,-2) = 1
+      K4 = 1                                                            0078
+      PRINT *, 1, -1, -1, 1, "(should be 1, -1, -1, 1)"                 0079
 C
 C     do not replace written parameters of assign, fonctions 
 C     or subroutines!
-      I = 10                                                            0077
-      I = I                                                             0078
-      J = 0                                                             0079
-      CALL FX(10, J)                                                    0080
+      I = 10                                                            0083
+      I = I                                                             0084
+      J = 0                                                             0085
+      CALL FX(10, J)                                                    0086
 C
       END
