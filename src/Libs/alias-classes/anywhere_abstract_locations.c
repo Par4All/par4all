@@ -467,6 +467,22 @@ bool entity_abstract_location_p(entity al)
     string ln = entity_local_name(al);
     string found = strstr(ln, ANYWHERE_LOCATION);
     abstract_p = (found!=NULL);
+    if(!abstract_p) {
+      found = strstr(ln, STATIC_AREA_LOCAL_NAME);
+      abstract_p = (found!=NULL);
+    }
+    if(!abstract_p) {
+      found = strstr(ln, DYNAMIC_AREA_LOCAL_NAME);
+      abstract_p = (found!=NULL);
+    }
+    if(!abstract_p) {
+      found = strstr(ln, STACK_AREA_LOCAL_NAME);
+      abstract_p = (found!=NULL);
+    }
+    if(!abstract_p) {
+      found = strstr(ln, HEAP_AREA_LOCAL_NAME);
+      abstract_p = (found!=NULL);
+    }
   }
 
   return abstract_p;

@@ -674,8 +674,10 @@ eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effect
 #define PERFORM_SUBTRACTION 2
 #define PERFORM_MULTIPLICATION 3
 #define PERFORM_DIVISION 4
+#define PERFORM_C_DIVISION 14
 #define PERFORM_POWER 5
 #define PERFORM_MODULO 6
+#define PERFORM_C_MODULO 16
 #define PERFORM_MINIMUM 7
 #define PERFORM_MAXIMUM 8
 
@@ -957,8 +959,20 @@ eformat_t partial_eval_div_or_mod_operator(int token,
     if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
       ef.ishift= FORTRAN_DIV(ef1.ishift, ef2.ishift);
     }
-    else { /* tocken==PERFORM_MODULO */
-      ef.ishift= FORTRAN_MOD(ef1.ishift, ef2.ishift);
+    else {
+      /* FI: C and Fortran modulo and division operators seem in fact
+	 equivalent, using negative modulo to maintain the equation
+
+	 a == (a/b)*b+a%b
+
+	 instead of a positive remainder, i.e. modulo.
+      */
+      if(token==PERFORM_MODULO)
+	ef.ishift= FORTRAN_MOD(ef1.ishift, ef2.ishift);
+      else if(token==PERFORM_C_MODULO)
+	ef.ishift= C_MODULO(ef1.ishift, ef2.ishift);
+      else
+	pips_internal_error("Unexpected tocken");
     }
   }
   else {
@@ -990,6 +1004,19 @@ eformat_t partial_eval_mod_operator(expression *ep1,
   eformat_t ef;
 
   ef = partial_eval_div_or_mod_operator(PERFORM_MODULO,
+					ep1, ep2, ps, fx);
+
+  return ef;
+}
+
+eformat_t partial_eval_c_mod_operator(expression *ep1,
+				    expression *ep2,
+				    Psysteme ps,
+				    effects fx)
+{
+  eformat_t ef;
+
+  ef = partial_eval_div_or_mod_operator(PERFORM_C_MODULO,
 					ep1, ep2, ps, fx);
 
   return ef;
@@ -1106,6 +1133,7 @@ static struct perform_switch {
   {DIVIDE_OPERATOR_NAME, partial_eval_div_operator},
   {POWER_OPERATOR_NAME, partial_eval_power_operator},
   {MODULO_OPERATOR_NAME, partial_eval_mod_operator},
+  {C_MODULO_OPERATOR_NAME, partial_eval_c_mod_operator},
   {MIN0_OPERATOR_NAME, partial_eval_min_operator},
   {MIN_OPERATOR_NAME, partial_eval_min_operator},
   {MAX0_OPERATOR_NAME, partial_eval_max_operator},
@@ -1175,16 +1203,23 @@ eformat_t partial_eval_binary_operator_old(entity func,
   if (strcmp(entity_local_name(func), MINUS_OPERATOR_NAME) == 0) {
     token = PERFORM_SUBTRACTION;
   }
-  if (strcmp(entity_local_name(func), PLUS_OPERATOR_NAME) == 0) {
+  else if (strcmp(entity_local_name(func), PLUS_OPERATOR_NAME) == 0) {
     token = PERFORM_ADDITION;
   }
-  if (strcmp(entity_local_name(func), MULTIPLY_OPERATOR_NAME) == 0) {
+  else if (strcmp(entity_local_name(func), MULTIPLY_OPERATOR_NAME) == 0) {
     token = PERFORM_MULTIPLICATION;
   }
-  if (strcmp(entity_local_name(func), DIVIDE_OPERATOR_NAME) == 0) {
+  else if (strcmp(entity_local_name(func), DIVIDE_OPERATOR_NAME) == 0) {
+    /* FI: The C divide operator may be defined differently for negative
+       integers */
     token = PERFORM_DIVISION;
   }
-  if (strcmp(entity_local_name(func), MODULO_OPERATOR_NAME) == 0) {
+  else if (strcmp(entity_local_name(func), MODULO_OPERATOR_NAME) == 0) {
+    token = PERFORM_MODULO;
+  }
+  else if (strcmp(entity_local_name(func), C_MODULO_OPERATOR_NAME) == 0) {
+    /* FI: The C modulo operator may be defined differently for negative
+       integers */
     token = PERFORM_MODULO;
   }
 
