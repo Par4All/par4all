@@ -1,0 +1,64 @@
+
+"main" file
+
+C Checking results for Fortran integer division as opposed to C integer division
+
+      PROGRAM MAIN
+      LOGICAL CHECK_MOD_DIV
+
+      I = 3/2                                                           0006
+      PRINT *, I, "must be 1 and check_mod_div(3,2)", CHECK_MOD_DIV(3   0007
+     &, 2)                                                              0007
+
+      I = -3/2                                                          0010
+      PRINT *, I, "must be -1 and check_mod_div(-3,2)", CHECK_MOD_DIV   0011
+     &(-3, 2)                                                           0011
+
+      I = 3/(-2)                                                        0014
+      PRINT *, I, "must be -1 and check_mod_div(3,-2)", CHECK_MOD_DIV   0015
+     &(3, -2)                                                           0015
+
+      I = -3/(-2)                                                       0018
+      PRINT *, I, "must be 1 and check_mod_div(-3,-2)", CHECK_MOD_DIV   0019
+     &(-3, -2)                                                          0019
+
+      END
+
+Result before partial evaluation
+
+           1 must be 1 and check_mod_div(3,2) T
+          -1 must be -1 and check_mod_div(-3,2) T
+          -1 must be -1 and check_mod_div(3,-2) T
+           1 must be 1 and check_mod_div(-3,-2) T
+
+"main" file after partial evaluation
+
+C Checking results for Fortran integer division as opposed to C integer division
+
+      PROGRAM MAIN
+      LOGICAL CHECK_MOD_DIV
+
+      I = 1                                                             0006
+      PRINT *, 1, "must be 1 and check_mod_div(3,2)", CHECK_MOD_DIV(3   0007
+     &, 2)                                                              0007
+
+      I = -1                                                            0010
+      PRINT *, -1, "must be -1 and check_mod_div(-3,2)",                0011
+     &CHECK_MOD_DIV(-3, 2)                                              0011
+
+      I = -1                                                            0014
+      PRINT *, -1, "must be -1 and check_mod_div(3,-2)",                0015
+     &CHECK_MOD_DIV(3, -2)                                              0015
+
+      I = 1                                                             0018
+      PRINT *, 1, "must be 1 and check_mod_div(-3,-2)", CHECK_MOD_DIV   0019
+     &(-3, -2)                                                          0019
+
+      END
+
+Result after partial evaluation
+
+           1 must be 1 and check_mod_div(3,2) T
+          -1 must be -1 and check_mod_div(-3,2) T
+          -1 must be -1 and check_mod_div(3,-2) T
+           1 must be 1 and check_mod_div(-3,-2) T

@@ -1,0 +1,138 @@
+
+"main" file
+
+int main()
+{
+   int i = 1;
+   int j = 2;
+   int k = 3;
+   int l;
+   int m;
+   int n;
+   int a[10];
+
+   i = j = k = 4;
+   foo(i = j = k = 5);
+   foo(i-i);
+   foo(a[i-i]);
+   k = i*j+i*j;
+   k = i*j+i*j+1;
+   k = 1+i*j+i*j;
+   k = m*n+m*n;
+   k = m*n+m*n+1;
+   k = 1+m*n+m*n;
+   k += i-i;
+   return i;
+}
+
+"main" file with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 1;
+
+//  P() {i==1}
+
+   int j = 2;
+
+//  P() {i==1, j==2}
+
+   int k = 3;
+
+//  P() {i==1, j==2, k==3}
+
+   int l;
+
+//  P() {i==1, j==2, k==3}
+
+   int m;
+
+//  P() {i==1, j==2, k==3}
+
+   int n;
+
+//  P() {i==1, j==2, k==3}
+
+   int a[10];
+
+//  P() {i==1, j==2, k==3}
+
+
+   i = j = k = 4;
+
+//  P(i,j,k) {i==4, j==4, k==4}
+
+   foo(i = j = k = 5);
+
+//  P(i,j,k) {i==5, j==5, k==5}
+
+   foo(i-i);
+
+//  P(i,j,k) {i==5, j==5, k==5}
+
+   foo(a[i-i]);
+
+//  P(i,j,k) {i==5, j==5, k==5}
+
+   k = i*j+i*j;
+
+//  P(i,j,k) {i==5, j==5}
+
+   k = i*j+i*j+1;
+
+//  P(i,j,k) {i==5, j==5}
+
+   k = 1+i*j+i*j;
+
+//  P(i,j,k) {i==5, j==5}
+
+   k = m*n+m*n;
+
+//  P(i,j,k) {i==5, j==5}
+
+   k = m*n+m*n+1;
+
+//  P(i,j,k) {i==5, j==5}
+
+   k = 1+m*n+m*n;
+
+//  P(i,j,k) {i==5, j==5}
+
+   k += i-i;
+
+//  P(i,j,k) {i==5, j==5}
+
+   return i;
+}
+
+"main" file after partial evaluation
+
+int main()
+{
+   int i = 1;
+   int j = 2;
+   int k = 3;
+   int l;
+   int m;
+   int n;
+   int a[10];
+
+   i = j = k = 4;
+   foo(i = j = k = 5);
+   foo(0);
+   foo(a[0]);
+   k = 50;
+   k = 51;
+   k = 51;
+   k = 2*m*n;
+   k = 2*m*n+1;
+   k = m*n+m*n+1;
+   k += 0;
+   return 5;
+}
