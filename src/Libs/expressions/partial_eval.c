@@ -54,12 +54,16 @@ regenerate_expression().
 
 Des que l'evaluation n'est plus possible, il faut regenerer l'expression.
 
-Note: now NORMALIZE_EXPRESSION() is also used to simplify expressions
-and sub-expressions because automatic program transformations
-sometimes generate kind of stupid code such as "i-i+1" or
-"512-1". When a simplification occurs, no feedback is provided and the
-linearized version of the expression is assumed "simpler". Hence,
-"simpler" now means "may be simpler".
+Note FI: now NORMALIZE_EXPRESSION() is also used to simplify
+expressions and sub-expressions in partial_eval_expression() because
+automatic program transformations sometimes generate kind of stupid
+code such as "i-i+1" or "512-1". When a simplification occurs, no
+feedback is provided and the linearized version of the expression is
+assumed "simpler". Hence, "simpler" now means "may be simpler". See
+comments below in partial_eval_expression(). Also, I did not take time
+to understand the invariant for expression allocation and free. I'm
+very likely to have introduced memory leaks via the changes in
+partial_eval_expression().
  */
 
 #include <stdio.h>
@@ -311,7 +315,12 @@ eformat_t partial_eval_expression(expression e, Psysteme ps, effects fx)
   NORMALIZE_EXPRESSION(e);
   n = expression_normalized(e);
 
-  /* In case the expression is affine, use its affine form */
+  /* In case the expression is affine, use its affine form
+
+     FI: it would be better to test if ne is really simpler than e: it
+     should contain fewer operators (1+1->2) or fewer references
+     (n->1).
+ */
   if(normalized_linear_p(n)) {
     Pvecteur pv = normalized_linear(n);
     ne = make_vecteur_expression(pv);
@@ -957,6 +966,11 @@ eformat_t partial_eval_div_or_mod_operator(int token,
     ef.icoef= 0;
     ef.expr= expression_undefined;
     if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
+      /* FI->SG: FORTRAN_DIV, SIGN_EQ, FORTRAN_MOD,... have been left in
+	 transformations-local.h when this code was moved into
+	 expressions. I haven't checked if they are used
+	 elsewhere. Could the expression library not dependent on
+	 transformations? */
       ef.ishift= FORTRAN_DIV(ef1.ishift, ef2.ishift);
     }
     else {
