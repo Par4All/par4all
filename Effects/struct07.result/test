@@ -18,7 +18,7 @@ void struct07()
 
 Cumulated effetcs for "struct07"
 
-//               <may be written >: imageout[*][1][re]
+//               <may be written >: imageout[*][1][.re]
 void struct07()
 {
    extern complex imagein[256][256], imageout[256][256];
@@ -26,11 +26,11 @@ void struct07()
    float z1, z2;
    float x[256][256];
 //               <may be read    >: k z1
-//               <may be written >: imageout[*][1][re]
+//               <may be written >: imageout[*][1][.re]
 //               <must be written>: k
 
    for(k = 0; k <= 255; k += 1)
-//               <may be written >: imageout[*][1][re]
+//               <may be written >: imageout[*][1][.re]
 //               <must be read   >: k z1
       imageout[k][1].re = z1;
 //               <may be read    >: i j
@@ -50,7 +50,7 @@ void struct07()
 Printed files with regions
 
 
-//  <imageout[PHI1][PHI2][re]-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
+//  <imageout[PHI1][PHI2][.re]-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
 
 void struct07()
 {
@@ -59,12 +59,12 @@ void struct07()
    float z1, z2;
    float x[256][256];
 
-//  <imageout[PHI1][PHI2][re]-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
+//  <imageout[PHI1][PHI2][.re]-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
 
 
    for(k = 0; k <= 255; k += 1)
 
-//  <imageout[PHI1][PHI2][re]-W-EXACT-{PHI1==k, PHI2==1, 0<=k,
+//  <imageout[PHI1][PHI2][.re]-W-EXACT-{PHI1==k, PHI2==1, 0<=k,
 //    k<=255}>
 
       imageout[k][1].re = z1;

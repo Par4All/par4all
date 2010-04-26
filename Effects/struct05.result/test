@@ -30,12 +30,12 @@ int struct05()
 
    for(i = 0; i <= 9; i += 1)
       if (1)
-//               <must be read   >: i x[i][second]
-//               <must be written>: x[i][first]
+//               <must be read   >: i x[i][.second]
+//               <must be written>: x[i][.first]
          x[i].first = x[i].second;
       else
-//               <must be read   >: i x[i][first]
-//               <must be written>: x[i][second]
+//               <must be read   >: i x[i][.first]
+//               <must be written>: x[i][.second]
          x[i].second = x[i].first;
 }
 
@@ -49,22 +49,22 @@ int struct05()
    } x[10];
 //               <must be written>: i
    int i = 0;
-//               <may be read    >: i x[*][second] x[*][first]
-//               <may be written >: x[*][first] x[*][second]
+//               <may be read    >: i x[*][.second] x[*][.first]
+//               <may be written >: x[*][.first] x[*][.second]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <may be read    >: x[*][second] x[*][first]
-//               <may be written >: x[*][first] x[*][second]
+//               <may be read    >: x[*][.second] x[*][.first]
+//               <may be written >: x[*][.first] x[*][.second]
 //               <must be read   >: i
       if (1)
-//               <may be read    >: x[*][second]
-//               <may be written >: x[*][first]
+//               <may be read    >: x[*][.second]
+//               <may be written >: x[*][.first]
 //               <must be read   >: i
          x[i].first = x[i].second;
       else
-//               <may be read    >: x[*][first]
-//               <may be written >: x[*][second]
+//               <may be read    >: x[*][.first]
+//               <may be written >: x[*][.second]
 //               <must be read   >: i
          x[i].second = x[i].first;
 }
@@ -155,19 +155,19 @@ int struct05()
    } x[10];
    int i = 0;
 
-//  <x[PHI1][second]-R-EXACT-{0<=PHI1, PHI1<=9}>
-//  <x[PHI1][first]-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <x[PHI1][.second]-R-EXACT-{0<=PHI1, PHI1<=9}>
+//  <x[PHI1][.first]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
 
-//  <x[PHI1][second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
-//  <x[PHI1][first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       if (1)
 
-//  <x[PHI1][second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
-//  <x[PHI1][first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
          x[i].first = x[i].second;
       else
@@ -184,20 +184,20 @@ int struct05()
    } x[10];
    int i = 0;
 
-//  <x[PHI1][second]-R-EXACT-{0<=PHI1, PHI1<=9}>
-//  <x[PHI1][first]-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <x[PHI1][.second]-R-EXACT-{0<=PHI1, PHI1<=9}>
+//  <x[PHI1][.first]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
 #pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
 
-//  <x[PHI1][second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
-//  <x[PHI1][first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       if (1)
 
-//  <x[PHI1][second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
-//  <x[PHI1][first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.second]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][.first]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
          x[i].first = x[i].second;
       else
