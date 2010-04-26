@@ -355,7 +355,7 @@ eformat_t partial_eval_syntax(expression e, Psysteme ps, effects fx)
     ef = eformat_undefined;
     break;
   case is_syntax_call:
-    ef = partial_eval_call(e, ps, fx);
+    ef = partial_eval_call_expression(e, ps, fx);
     break;
   case is_syntax_cast: {
     cast c = syntax_cast(s);
@@ -532,31 +532,30 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
 
 void partial_eval_call_and_regenerate(call ca, Psysteme ps, effects fx)
 {
-  list le = list_undefined;
+  //list le = list_undefined;
+  eformat_t ef = partial_eval_call(ca, ps, fx);
 
-  pips_assert("ca is a defined call",
-	      ca!= call_undefined);
+  pips_assert("ca is a defined call", ca!= call_undefined);
 
+  /* FI: if the call is an operator, it is not part of the
+     simplification; e.g. "3+5;" */
+  /*
   for(le=call_arguments(ca); !ENDP(le); POP(le)) {
     expression exp = EXPRESSION(CAR(le));
 
     partial_eval_expression_and_regenerate(&exp, ps, fx);
     EXPRESSION_(CAR(le))= exp;
   }
+  */
+  regenerate_call(&ef, ca);
 }
 
 
-eformat_t partial_eval_call(expression exp, Psysteme ps, effects fx)
+eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
 {
-  call ec;
   entity func;
   value vinit;
   eformat_t ef;
-
-  pips_assert("The expression is a call",
-	      syntax_call_p(expression_syntax(exp)));
-  ec = syntax_call(expression_syntax(exp));
-
   func = call_function(ec);
   vinit = entity_initial(func);
 
@@ -629,7 +628,9 @@ eformat_t partial_eval_call(expression exp, Psysteme ps, effects fx)
 	    /* the partial evaluation could be further improved by
 	       checking if there is a write effect on the
 	       corresponding formal parameter */
-	    if(expression_reference_p(eparam))
+	    if(FALSE && expression_reference_p(eparam))
+	      /* This is dealt for using fx when dealing with a
+		 reference */
 	      ; // in doubt, do nothing
 	    else {
 	      partial_eval_expression_and_regenerate(&eparam,ps,fx);
@@ -647,6 +648,22 @@ eformat_t partial_eval_call(expression exp, Psysteme ps, effects fx)
     pips_internal_error("Default case reached.\n");
   }
   return(ef);
+}
+
+eformat_t partial_eval_call_expression(expression exp, Psysteme ps, effects fx)
+{
+  call ec;
+  //entity func;
+  //value vinit;
+  eformat_t ef;
+
+  pips_assert("The expression is a call",
+	      syntax_call_p(expression_syntax(exp)));
+  ec = syntax_call(expression_syntax(exp));
+
+  ef = partial_eval_call(ec, ps,fx);
+
+  return ef;
 }
 
 eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effects fx)
@@ -763,11 +780,27 @@ eformat_t partial_eval_plus_or_minus_operator(int token,
 {
   eformat_t ef;
   /* Automatic tools sometimes generate source code like "i - i" */
-  if(expression_equal_p(*ep1, *ep2) && token==PERFORM_SUBTRACTION) {
-    ef.simpler = TRUE;
-    ef.expr = expression_undefined; //int_to_expression(0);
-    ef.icoef = 0;
-    ef.ishift = 0;
+  /* Could be improved with a commutative_expression_equal_p() if
+     cases arise */
+  if(expression_equal_p(*ep1, *ep2)) {
+    if(token==PERFORM_SUBTRACTION) {
+      ef.simpler = TRUE;
+      ef.expr = expression_undefined; //int_to_expression(0);
+      ef.icoef = 0;
+      ef.ishift = 0;
+    }
+    else if(token==PERFORM_ADDITION) {
+      ef.simpler = TRUE;
+      /* FI: no idea of the expression should be copied or not, let's
+	 play safe. */
+      /* Here we should go down to see if *ep1 can be partially
+	 evaluated */
+      eformat_t ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+      ef.expr = ef1.expr;
+      ef.icoef = 2*ef1.icoef;
+      ef.ishift = 2*ef1.ishift;
+      /* FI: here I should get rid of ef1... */
+    }
   }
   else {
     eformat_t ef1, ef2;
@@ -1118,17 +1151,17 @@ eformat_t partial_eval_power_operator(expression *ep1,
    different kinds of operators. For instance "a+=0" or "b*=1;" could
    be simplified. For the time being, we simplify the two
    sub-expressions but not the current expression. */
-eformat_t partial_eval_update_operators(expression *ep1,
+eformat_t partial_eval_update_operators(expression *ep1 __attribute__ ((__unused__)),
 					expression *ep2,
 					Psysteme ps,
 					effects fx)
 {
-  eformat_t ef, ef1, ef2;
+  eformat_t ef, ef2;
 
-  ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+  //ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
   ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
 
-  regenerate_expression(&ef1, ep1);
+  //regenerate_expression(&ef1, ep1);
   regenerate_expression(&ef2, ep2);
   ef = eformat_undefined;
 
@@ -1479,6 +1512,43 @@ void regenerate_expression(eformat_t *efp, expression *ep)
   }
 }
 
+/* We are likely to end up in trouble because the regenerated
+   expression may not be a call; for instance "n+0" is converted into
+   a reference to n... */
+void regenerate_call(eformat_t *efp, call ca)
+{
+  expression e = expression_undefined;
+  regenerate_expression(efp, &e);
+  if(expression_undefined_p(e)) {
+    /* Nothing to do */
+    ;
+  }
+  else if(expression_call_p(e)) {
+    call nc = syntax_call(expression_syntax(e));
+    list al = call_arguments(ca);
+    call_function(ca) = call_function(nc);
+    call_arguments(ca) = call_arguments(nc);
+    // gen_full_free_list(al);
+  }
+  else if(expression_reference_p(e)) {
+    /* We are in trouble... */
+    list el = expression_to_proper_effects(e);
+    /* Any memory write effect? */
+    if(effects_all_read_p(el)) {
+      call_function(ca) = entity_intrinsic(CONTINUE_FUNCTION_NAME);
+      call_arguments(ca) = NIL;
+    }
+    else {
+      /* Do not change the initial call */
+      free_expression(e);
+    }
+  }
+  else {
+    /* We are even more in trouble */
+    pips_internal_error("Unexpected case.\n");
+  }
+}
+
 expression generate_monome(int coef, expression expr)
 {
   if(coef==0) {
@@ -1498,12 +1568,20 @@ expression generate_monome(int coef, expression expr)
 			expr));
 }
 
-
+
 /**
  * apply partial eval on each statement
  * we cannot recurse on something other than a statement
  * because we use the effects & preconditions attached to the statement
  * @param stmt statement to partial_eval
+ *
+ * It is assumed that sub-expressions do not have side effects because
+ * the same precondition is used for all of them.
+ *
+ * It would be simpler to transform instruction calls into instruction
+ * expression to have fewer cases to handle. Case instruction
+ * expression was introduced for C, but it subsumed instruction call
+ * which is now kind of obsolete.
  */
 void partial_eval_statement(statement stmt)
 {

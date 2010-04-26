@@ -515,7 +515,7 @@ int IsBinaryOperator(entity e)
   else if (same_string_p(n, RIGHT_SHIFT_OPERATOR_NAME))
     token = RIGHT_SHIFT;
 
-  else if (same_string_p(n, RIGHT_SHIFT_OPERATOR_NAME)) // C operators
+  else if (same_string_p(n, ASSIGN_OPERATOR_NAME)) // C operators
     token = ASSIGN;
   else if (same_string_p(n, MULTIPLY_UPDATE_OPERATOR_NAME))
     token = MULTIPLY_UPDATE;
