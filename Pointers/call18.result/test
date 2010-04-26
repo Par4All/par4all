@@ -1,18 +1,22 @@
 void call18(int i, ...)
 {
+//               <must be read   >: i
+//               <must be written>: i
    i++;
+//               <must be read   >: i
    if (i) {
       va_list pa;
       int r;
+//               <must be read   >: pa
+//               <must be written>: pa
 
       va_start(pa, fmt);
+//               <may be written >: pa
+//               <must be read   >: pa
 
       va_end(pa);
    }
 }
-
-Proper effects for "main"
-
 int main()
 {
 //               <must be written>: i
@@ -47,6 +51,16 @@ void call18(int i, ...)
       va_end(pa);
    }
 }
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 1;
+//  points to = {}
+   int j = 2;
+//  points to = {}
+   int k = 3;
+//  points to = {}
 
-POINTS TO
-
+   call18(i, i, j, k, 0);
+}

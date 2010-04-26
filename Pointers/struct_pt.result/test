@@ -3,7 +3,6 @@ Pointer proper effects
 
 int main()
 {
-   // BEGIN BLOCK
    typedef struct my_struct {
       int i;
       int *p;
@@ -26,7 +25,6 @@ int main()
    n = m;
 
    return 0;
-   // END BLOCK
 }
 
 Points-to
@@ -34,8 +32,6 @@ Points-to
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    typedef struct my_struct {
       int i;
@@ -59,5 +55,4 @@ int main()
 //   *ANY_MODULE*:*HEAP*_b0,-MAY-)}
 
    return 0;
-   // END BLOCK
 }

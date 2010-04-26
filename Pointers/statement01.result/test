@@ -1,6 +1,5 @@
 int main()
 {
-   // BEGIN BLOCK
    int *i, j, k;
 //               <must be written>: k
    k = 0;
@@ -11,14 +10,11 @@ int main()
    i = &j;
 
    return 0;
-   // END BLOCK
 }
 POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int *i, j, k;
 //  points to = {}
@@ -30,5 +26,4 @@ int main()
 //  {(i,j,-Exact-)}
 
    return 0;
-   // END BLOCK
 }
