@@ -1,0 +1,14 @@
+delete main08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main08 main08.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c main08.database/Src/main08.f90
+shell rm *.o
+
+close
+quit
