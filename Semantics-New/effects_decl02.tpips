@@ -1,0 +1,50 @@
+delete effects_decl02
+create effects_decl02 effects_decl02.c
+
+#echo Select some options to deal with the C Language:
+#echo Parse as C:
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+#echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+#echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+activate PRINT_CODE_PROPER_EFFECTS
+
+echo
+echo Proper effects
+echo
+display PRINTED_FILE[main]
+
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+
+echo
+echo Cumulated effects 
+echo
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_TRANSFORMERS
+
+echo
+echo Transformers
+echo
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Preconditions
+echo
+display PRINTED_FILE[main]
+
+close
+delete effects_decl02
+quit

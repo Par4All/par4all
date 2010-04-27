@@ -1,0 +1,148 @@
+
+Proper effects
+
+int main()
+{
+   int i;
+//               <must be written>: j
+   int j = 2;
+//               <must be read   >: i
+//               <must be written>: k
+   int k = i;
+//               <must be read   >: j
+//               <must be written>: j l
+   int l = j++;
+//               <must be written>: m
+   int m = 4;
+//               <must be read   >: m
+//               <must be written>: n
+   int n = m;
+//               <must be written>: i
+
+   i = 5;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i j k l m n
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
+   return 0;
+}
+
+Cumulated effects 
+
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+   int i;
+//               <must be written>: j
+   int j = 2;
+//               <must be read   >: i
+//               <must be written>: k
+   int k = i;
+//               <must be read   >: j
+//               <must be written>: j l
+   int l = j++;
+//               <must be written>: m
+   int m = 4;
+//               <must be read   >: m
+//               <must be written>: n
+   int n = m;
+//               <must be written>: i
+
+   i = 5;
+//               <must be read   >: __IO_EFFECTS:LUNS[1] i j k l m n
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
+   return 0;
+}
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i) {}
+
+   int i;
+
+//  T(j) {j==2}
+
+   int j = 2;
+
+//  T(k) {i==k}
+
+   int k = i;
+
+//  T(j,l) {j==j#init+1, j==l+1}
+
+   int l = j++;
+
+//  T(m) {m==4}
+
+   int m = 4;
+
+//  T(n) {m==n}
+
+   int n = m;
+
+//  T(i) {i==5}
+
+
+   i = 5;
+
+//  T() {}
+
+   printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
+
+//  T(main) {main==0}
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   int j = 2;
+
+//  P(i,j) {j==2}
+
+   int k = i;
+
+//  P(i,j,k) {i==k, j==2}
+
+   int l = j++;
+
+//  P(i,j,k,l) {i==k, j==3, l==2}
+
+   int m = 4;
+
+//  P(i,j,k,l,m) {i==k, j==3, l==2, m==4}
+
+   int n = m;
+
+//  P(i,j,k,l,m,n) {i==k, j==3, l==2, m==4, n==4}
+
+
+   i = 5;
+
+//  P(i,j,k,l,m,n) {i==5, j==3, l==2, m==4, n==4}
+
+   printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
+
+//  P(i,j,k,l,m,n) {i==5, j==3, l==2, m==4, n==4}
+
+   return 0;
+}
