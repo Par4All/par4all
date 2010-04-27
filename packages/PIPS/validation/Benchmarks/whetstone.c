@@ -138,8 +138,12 @@ main()
 
 	x = y = z = 1.0;
 
-	for (i = 1; i <= n8; i +=1)
-		p3(x, y, &z);
+	for (i = 1; i <= n8; i +=1) {
+	  // FI: to avoid problemes raised by an *anywhere* effect
+	  //created by this call site, comment it out
+	  p3(x, y, &z);
+	  ;
+	}
 #ifdef POUT
 	pout(n8, j, k, x, y, z, z);
 #endif

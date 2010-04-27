@@ -13,17 +13,17 @@ int main()
    // just to create a block for prettyprinting
    if (1) {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[p]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[.p]
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1)
-//               <must be read   >: a[p] i
-//               <must be written>: a[p][i]
+//               <must be read   >: a[.p] i
+//               <must be written>: a[.p][i]
          (a.p)[i] = i;
-//               <must be read   >: a[p]
-//               <must be written>: b[p]
+//               <must be read   >: a[.p]
+//               <must be written>: b[.p]
       
       // definition of b, also modifies a
       b = a;
@@ -32,11 +32,11 @@ int main()
       printf("\nstruct with pointer copy : \n");
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1) {
-//               <must be read   >: b[p] i
-//               <must be written>: b[p][i]
+//               <must be read   >: b[.p] i
+//               <must be written>: b[.p][i]
          (b.p)[i] = i*10;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] a[p] a[p][i] 
-//                                  b[p] b[p][i] i
+//               <must be read   >: __IO_EFFECTS:LUNS[1] a[.p] 
+//                                  a[.p][i] b[.p] b[.p][i] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
@@ -45,10 +45,10 @@ int main()
       // definition of c
       for(i = 0; i <= 9; i += 1)
 //               <must be read   >: i
-//               <must be written>: c[array][i]
+//               <must be written>: c[.array][i]
          (c.array)[i] = i;
-//               <may be read    >: c[array][*]
-//               <may be written >: d[array][*]
+//               <may be read    >: c[.array][*]
+//               <may be written >: d[.array][*]
       
       // definition of d, does not modify c
       d = c;
@@ -58,10 +58,10 @@ int main()
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1) {
 //               <must be read   >: i
-//               <must be written>: d[array][i]
+//               <must be written>: d[.array][i]
          (d.array)[i] = i*10;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] c[array][i] 
-//                                  d[array][i] i
+//               <must be read   >: __IO_EFFECTS:LUNS[1] c[.array][i] 
+//                                  d[.array][i] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -72,16 +72,16 @@ int main()
       for(i = 0; i <= 4; i += 1) {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  e[champ][i][p]
+//                                  e[.champ][i][.p]
          (e.champ)[i].p = malloc(10*sizeof(int));
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1)
-//               <must be read   >: e[champ][i][p] i j
-//               <must be written>: e[champ][i][p][j]
+//               <must be read   >: e[.champ][i][.p] i j
+//               <must be written>: e[.champ][i][.p][j]
             ((e.champ)[i].p)[j] = i+j;
       }
-//               <may be read    >: e[champ][*][p]
-//               <may be written >: f[champ][*][p]
+//               <may be read    >: e[.champ][*][.p]
+//               <may be written >: f[.champ][*][.p]
       
       // definition of f, also modifies e
       f = e;
@@ -92,13 +92,14 @@ int main()
       for(i = 0; i <= 4; i += 1)
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1) {
-//               <must be read   >: f[champ][i][p] i j
-//               <must be written>: f[champ][i][p][j]
+//               <must be read   >: f[.champ][i][.p] i j
+//               <must be written>: f[.champ][i][.p][j]
             ((f.champ)[i].p)[j] = i*j;
 //               <must be read   >: __IO_EFFECTS:LUNS[1] 
-//                                  e[champ][i][p] e[champ][i][p][j] 
-//                                  f[champ][i][p] f[champ][i][p][j] i
-//                                  j
+//                                  e[.champ][i][.p] 
+//                                  e[.champ][i][.p][j] 
+//                                  f[.champ][i][.p] 
+//                                  f[.champ][i][.p][j] i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -111,10 +112,10 @@ int main()
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1)
 //               <must be read   >: i j
-//               <must be written>: g[champ][i][array][j]
+//               <must be written>: g[.champ][i][.array][j]
             ((g.champ)[i].array)[j] = i+j;
-//               <may be read    >: g[champ][*][array][*]
-//               <may be written >: h[champ][*][array][*]
+//               <may be read    >: g[.champ][*][.array][*]
+//               <may be written >: h[.champ][*][.array][*]
       
       // definition of h, does not modify g
       h = g;
@@ -126,11 +127,11 @@ int main()
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1) {
 //               <must be read   >: i j
-//               <must be written>: h[champ][i][array][j]
+//               <must be written>: h[.champ][i][.array][j]
             ((h.champ)[i].array)[j] = i*j;
 //               <must be read   >: __IO_EFFECTS:LUNS[1] 
-//                                  g[champ][i][array][j] 
-//                                  h[champ][i][array][j] i j
+//                                  g[.champ][i][.array][j] 
+//                                  h[.champ][i][.array][j] i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -154,17 +155,17 @@ int main()
    // just to create a block for prettyprinting
    if (1) {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[p]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[.p]
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1)
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: a[p] i
+//               <must be read   >: a[.p] i
          (a.p)[i] = i;
-//               <must be read   >: a[p]
-//               <must be written>: b[p]
+//               <must be read   >: a[.p]
+//               <must be written>: b[.p]
       
       // definition of b, also modifies a
       b = a;
@@ -174,7 +175,7 @@ int main()
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1) {
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: b[p] i
+//               <must be read   >: b[.p] i
          (b.p)[i] = i*10;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
@@ -186,10 +187,10 @@ int main()
       // definition of c
       for(i = 0; i <= 9; i += 1)
 //               <must be read   >: i
-//               <must be written>: c[array][i]
+//               <must be written>: c[.array][i]
          (c.array)[i] = i;
-//               <may be read    >: c[array][*]
-//               <may be written >: d[array][*]
+//               <may be read    >: c[.array][*]
+//               <may be written >: d[.array][*]
       
       // definition of d, does not modify c
       d = c;
@@ -199,10 +200,10 @@ int main()
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1) {
 //               <must be read   >: i
-//               <must be written>: d[array][i]
+//               <must be written>: d[.array][i]
          (d.array)[i] = i*10;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] c[array][i] 
-//                                  d[array][i] i
+//               <must be read   >: __IO_EFFECTS:LUNS[1] c[.array][i] 
+//                                  d[.array][i] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -250,10 +251,10 @@ int main()
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1)
 //               <must be read   >: i j
-//               <must be written>: g[champ][i][array][j]
+//               <must be written>: g[.champ][i][.array][j]
             ((g.champ)[i].array)[j] = i+j;
-//               <may be read    >: g[champ][*][array][*]
-//               <may be written >: h[champ][*][array][*]
+//               <may be read    >: g[.champ][*][.array][*]
+//               <may be written >: h[.champ][*][.array][*]
       
       // definition of h, does not modify g
       h = g;
@@ -265,11 +266,11 @@ int main()
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1) {
 //               <must be read   >: i j
-//               <must be written>: h[champ][i][array][j]
+//               <must be written>: h[.champ][i][.array][j]
             ((h.champ)[i].array)[j] = i*j;
 //               <must be read   >: __IO_EFFECTS:LUNS[1] 
-//                                  g[champ][i][array][j] 
-//                                  h[champ][i][array][j] i j
+//                                  g[.champ][i][.array][j] 
+//                                  h[.champ][i][.array][j] i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -305,18 +306,18 @@ int main()
    // just to create a block for prettyprinting
    if (1) {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[p]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a[.p]
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
-//               <may be read    >: a[p] i
+//               <may be read    >: a[.p] i
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
       for(i = 0; i <= 9; i += 1)
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: a[p] i
+//               <must be read   >: a[.p] i
          (a.p)[i] = i;
-//               <must be read   >: a[p]
-//               <must be written>: b[p]
+//               <must be read   >: a[.p]
+//               <must be written>: b[.p]
       
       // definition of b, also modifies a
       b = a;
@@ -329,7 +330,7 @@ int main()
 //                                  __IO_EFFECTS:LUNS[1]
       for(i = 0; i <= 9; i += 1) {
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: b[p] i
+//               <must be read   >: b[.p] i
          (b.p)[i] = i*10;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
@@ -337,31 +338,31 @@ int main()
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
 //               <may be read    >: i
-//               <may be written >: c[array][*]
+//               <may be written >: c[.array][*]
 //               <must be written>: i
       
       // definition of c
       for(i = 0; i <= 9; i += 1)
-//               <may be written >: c[array][*]
+//               <may be written >: c[.array][*]
 //               <must be read   >: i
          (c.array)[i] = i;
-//               <may be read    >: c[array][*]
-//               <may be written >: d[array][*]
+//               <may be read    >: c[.array][*]
+//               <may be written >: d[.array][*]
       
       // definition of d, does not modify c
       d = c;
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array copy : \n");
-//               <may be read    >: __IO_EFFECTS:LUNS[1] c[array][*] 
-//                                  d[array][*] i
-//               <may be written >: __IO_EFFECTS:LUNS[1] d[array][*]
+//               <may be read    >: __IO_EFFECTS:LUNS[1] c[.array][*] 
+//                                  d[.array][*] i
+//               <may be written >: __IO_EFFECTS:LUNS[1] d[.array][*]
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1) {
-//               <may be written >: d[array][*]
+//               <may be written >: d[.array][*]
 //               <must be read   >: i
          (d.array)[i] = i*10;
-//               <may be read    >: c[array][*] d[array][*]
+//               <may be read    >: c[.array][*] d[.array][*]
 //               <must be read   >: __IO_EFFECTS:LUNS[1] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
@@ -414,20 +415,20 @@ int main()
             printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
          }
 //               <may be read    >: i j
-//               <may be written >: g[champ][*][array][*] j
+//               <may be written >: g[.champ][*][.array][*] j
 //               <must be written>: i
       
       // definition of g
       for(i = 0; i <= 4; i += 1)
 //               <may be read    >: i j
-//               <may be written >: g[champ][*][array][*]
+//               <may be written >: g[.champ][*][.array][*]
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1)
-//               <may be written >: g[champ][*][array][*]
+//               <may be written >: g[.champ][*][.array][*]
 //               <must be read   >: i j
             ((g.champ)[i].array)[j] = i+j;
-//               <may be read    >: g[champ][*][array][*]
-//               <may be written >: h[champ][*][array][*]
+//               <may be read    >: g[.champ][*][.array][*]
+//               <may be written >: h[.champ][*][.array][*]
       
       // definition of h, does not modify g
       h = g;
@@ -435,24 +436,24 @@ int main()
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with array copy : \n");
 //               <may be read    >: __IO_EFFECTS:LUNS[1] 
-//                                  g[champ][*][array][*] 
-//                                  h[champ][*][array][*] i j
+//                                  g[.champ][*][.array][*] 
+//                                  h[.champ][*][.array][*] i j
 //               <may be written >: __IO_EFFECTS:LUNS[1] 
-//                                  h[champ][*][array][*] j
+//                                  h[.champ][*][.array][*] j
 //               <must be written>: i
       for(i = 0; i <= 4; i += 1)
 //               <may be read    >: __IO_EFFECTS:LUNS[1] 
-//                                  g[champ][*][array][*] 
-//                                  h[champ][*][array][*] i j
+//                                  g[.champ][*][.array][*] 
+//                                  h[.champ][*][.array][*] i j
 //               <may be written >: __IO_EFFECTS:LUNS[1] 
-//                                  h[champ][*][array][*]
+//                                  h[.champ][*][.array][*]
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1) {
-//               <may be written >: h[champ][*][array][*]
+//               <may be written >: h[.champ][*][.array][*]
 //               <must be read   >: i j
             ((h.champ)[i].array)[j] = i*j;
-//               <may be read    >: g[champ][*][array][*] 
-//                                  h[champ][*][array][*]
+//               <may be read    >: g[.champ][*][.array][*] 
+//                                  h[.champ][*][.array][*]
 //               <must be read   >: __IO_EFFECTS:LUNS[1] i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             
@@ -495,26 +496,26 @@ int main()
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <a[p]-W-EXACT-{}>
+//  <a[.p]-W-EXACT-{}>
 
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
 
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <a[p]-R-EXACT-{}>
+//  <a[.p]-R-EXACT-{}>
 //  <i-R-EXACT-{}>
 
       for(i = 0; i <= 9; i += 1)
 
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <a[p]-R-EXACT-{0<=i, i<=9}>
+//  <a[.p]-R-EXACT-{0<=i, i<=9}>
 //  <i-R-EXACT-{}>
 
          (a.p)[i] = i;
 
-//  <a[p]-R-EXACT-{i==10}>
-//  <b[p]-W-EXACT-{i==10}>
+//  <a[.p]-R-EXACT-{i==10}>
+//  <b[.p]-W-EXACT-{i==10}>
 
       
       // definition of b, also modifies a
@@ -533,7 +534,7 @@ int main()
       for(i = 0; i <= 9; i += 1) {
 
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <b[p]-R-EXACT-{0<=i, i<=9}>
+//  <b[.p]-R-EXACT-{0<=i, i<=9}>
 //  <i-R-EXACT-{}>
 
          (b.p)[i] = i*10;
@@ -545,7 +546,7 @@ int main()
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
 
-//  <c[array][PHI2]-W-EXACT-{0<=PHI2, PHI2<=9}>
+//  <c[.array][PHI2]-W-EXACT-{0<=PHI2, PHI2<=9}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
 
@@ -553,13 +554,13 @@ int main()
       // definition of c
       for(i = 0; i <= 9; i += 1)
 
-//  <c[array][PHI2]-W-EXACT-{PHI2==i, 0<=i, i<=9}>
+//  <c[.array][PHI2]-W-EXACT-{PHI2==i, 0<=i, i<=9}>
 //  <i-R-EXACT-{}>
 
          (c.array)[i] = i;
 
-//  <c[array][PHI2]-R-MAY-{i==10}>
-//  <d[array][PHI2]-W-MAY-{i==10}>
+//  <c[.array][PHI2]-R-MAY-{i==10}>
+//  <d[.array][PHI2]-W-MAY-{i==10}>
 
       
       // definition of d, does not modify c
@@ -572,23 +573,23 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <c[array][PHI2]-R-EXACT-{0<=PHI2, PHI2<=9}>
-//  <d[array][PHI2]-R-EXACT-{0<=PHI2, PHI2<=9}>
-//  <d[array][PHI2]-W-EXACT-{0<=PHI2, PHI2<=9}>
+//  <c[.array][PHI2]-R-EXACT-{0<=PHI2, PHI2<=9}>
+//  <d[.array][PHI2]-R-EXACT-{0<=PHI2, PHI2<=9}>
+//  <d[.array][PHI2]-W-EXACT-{0<=PHI2, PHI2<=9}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
 
       for(i = 0; i <= 9; i += 1) {
 
-//  <d[array][PHI2]-W-EXACT-{PHI2==i, 0<=i, i<=9}>
+//  <d[.array][PHI2]-W-EXACT-{PHI2==i, 0<=i, i<=9}>
 //  <i-R-EXACT-{}>
 
          (d.array)[i] = i*10;
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <c[array][PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
-//  <d[array][PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
+//  <c[.array][PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
+//  <d[.array][PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
 //  <i-R-EXACT-{}>
 
 
@@ -662,7 +663,7 @@ int main()
             printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
          }
 
-//  <g[champ][PHI2][array][PHI4]-W-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
+//  <g[.champ][PHI2][.array][PHI4]-W-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
 //    PHI4<=9}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
@@ -673,7 +674,7 @@ int main()
       // definition of g
       for(i = 0; i <= 4; i += 1)
 
-//  <g[champ][PHI2][array][PHI4]-W-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
+//  <g[.champ][PHI2][.array][PHI4]-W-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
 //    0<=i, i<=4}>
 //  <i-R-EXACT-{}>
 //  <j-R-EXACT-{}>
@@ -681,15 +682,15 @@ int main()
 
          for(j = 0; j <= 9; j += 1)
 
-//  <g[champ][PHI2][array][PHI4]-W-EXACT-{PHI2==i, PHI4==j, 0<=i,
+//  <g[.champ][PHI2][.array][PHI4]-W-EXACT-{PHI2==i, PHI4==j, 0<=i,
 //    i<=4, 0<=j, j<=9}>
 //  <i-R-EXACT-{}>
 //  <j-R-EXACT-{}>
 
             ((g.champ)[i].array)[j] = i+j;
 
-//  <g[champ][PHI2][array][PHI4]-R-MAY-{i==5, j==10}>
-//  <h[champ][PHI2][array][PHI4]-W-MAY-{i==5, j==10}>
+//  <g[.champ][PHI2][.array][PHI4]-R-MAY-{i==5, j==10}>
+//  <h[.champ][PHI2][.array][PHI4]-W-MAY-{i==5, j==10}>
 
       
       // definition of h, does not modify g
@@ -702,11 +703,11 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <g[champ][PHI2][array][PHI4]-R-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
+//  <g[.champ][PHI2][.array][PHI4]-R-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
 //    PHI4<=9}>
-//  <h[champ][PHI2][array][PHI4]-R-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
+//  <h[.champ][PHI2][.array][PHI4]-R-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
 //    PHI4<=9}>
-//  <h[champ][PHI2][array][PHI4]-W-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
+//  <h[.champ][PHI2][.array][PHI4]-W-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
 //    PHI4<=9}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
@@ -717,11 +718,11 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <g[champ][PHI2][array][PHI4]-R-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
+//  <g[.champ][PHI2][.array][PHI4]-R-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
 //    0<=i, i<=4}>
-//  <h[champ][PHI2][array][PHI4]-R-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
+//  <h[.champ][PHI2][.array][PHI4]-R-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
 //    0<=i, i<=4}>
-//  <h[champ][PHI2][array][PHI4]-W-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
+//  <h[.champ][PHI2][.array][PHI4]-W-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
 //    0<=i, i<=4}>
 //  <i-R-EXACT-{}>
 //  <j-R-EXACT-{}>
@@ -729,7 +730,7 @@ int main()
 
          for(j = 0; j <= 9; j += 1) {
 
-//  <h[champ][PHI2][array][PHI4]-W-EXACT-{PHI2==i, PHI4==j, 0<=i,
+//  <h[.champ][PHI2][.array][PHI4]-W-EXACT-{PHI2==i, PHI4==j, 0<=i,
 //    i<=4, 0<=j, j<=9}>
 //  <i-R-EXACT-{}>
 //  <j-R-EXACT-{}>
@@ -738,9 +739,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <g[champ][PHI2][array][PHI4]-R-EXACT-{PHI2==i, PHI4==j, 0<=i,
+//  <g[.champ][PHI2][.array][PHI4]-R-EXACT-{PHI2==i, PHI4==j, 0<=i,
 //    i<=4, 0<=j, j<=9}>
-//  <h[champ][PHI2][array][PHI4]-R-EXACT-{PHI2==i, PHI4==j, 0<=i,
+//  <h[.champ][PHI2][.array][PHI4]-R-EXACT-{PHI2==i, PHI4==j, 0<=i,
 //    i<=4, 0<=j, j<=9}>
 //  <i-R-EXACT-{}>
 //  <j-R-EXACT-{}>

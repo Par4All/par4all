@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* 
+/*
 
 This file contains a set of functions to evaluate integer constant
 expressions. The algorithm is built on a recursive analysis of the
@@ -39,7 +39,7 @@ call: a call to a user function is not evaluated. a call to an intrinsic
 function is successfully evaluated if arguments can be evaluated. a call
 to a constant function is evaluated if its basic type is integer.
 
-range: a range is not evaluated. 
+range: a range is not evaluated.
 */
 
 #include <stdio.h>
@@ -101,45 +101,43 @@ value EvalSyntax(syntax s)
 /* only calls to constant, symbolic or intrinsic functions might be
  * evaluated. recall that intrinsic functions are not known.
  */
-value
-EvalCall(call c)
+value EvalCall(call c)
 {
-    value vout, vin;
-    entity f;
+  value vout, vin;
+  entity f;
 
-    f = call_function(c);
-    vin = entity_initial(f);
+  f = call_function(c);
+  vin = entity_initial(f);
 
-    if (value_undefined_p(vin))
-	pips_internal_error("undefined value for %s\n", entity_name(f));
+  if (value_undefined_p(vin))
+    pips_internal_error("undefined value for %s\n", entity_name(f));
 
-    switch (value_tag(vin)) {
-      case is_value_intrinsic:
-	vout = EvalIntrinsic(f, call_arguments(c));
-	break;
-      case is_value_constant:
-	vout = EvalConstant((value_constant(vin)));
-	break;
-      case is_value_symbolic:
+  switch (value_tag(vin)) {
+  case is_value_intrinsic:
+    vout = EvalIntrinsic(f, call_arguments(c));
+    break;
+  case is_value_constant:
+    vout = EvalConstant((value_constant(vin)));
+    break;
+  case is_value_symbolic:
     /* SG: it may be better not to evaluate symbolic and keep their symbolic name */
     if(get_bool_property("EVAL_SYMBOLIC_CONSTANT"))
-	    vout = EvalConstant((symbolic_constant(value_symbolic(vin))));
+      vout = EvalConstant((symbolic_constant(value_symbolic(vin))));
     else
-        vout = make_value_unknown();
-	break;
-      case is_value_unknown:
-	/* it might be an intrinsic function */
-	vout = EvalIntrinsic(f, call_arguments(c));
-	break;
-      case is_value_code:
-	vout = make_value_unknown();
-	break;
-      default:
-	fprintf(stderr, "[EvalCall] case default\n");
-	abort();
-    }
+      vout = make_value_unknown();
+    break;
+  case is_value_unknown:
+    /* it might be an intrinsic function */
+    vout = EvalIntrinsic(f, call_arguments(c));
+    break;
+  case is_value_code:
+    vout = make_value_unknown();
+    break;
+  default:
+    pips_internal_error("Unexpected default case.\n");
+  }
 
-    return(vout);
+  return(vout);
 }
 
 value EvalSizeofexpression(sizeofexpression soe)
@@ -166,15 +164,14 @@ value EvalSizeofexpression(sizeofexpression soe)
   return v;
 }
 
-value 
-EvalConstant(constant c) 
+value EvalConstant(constant c)
 {
   //return make_value(is_value_constant, copy_constant(c));
 
     return((constant_int_p(c)) ?
 	   make_value(is_value_constant, make_constant(is_constant_int,
 						   (void*) constant_int(c))) :
-	   make_value(is_value_constant, 
+	   make_value(is_value_constant,
 		      make_constant(is_constant_litteral, NIL)));
 }
 
@@ -187,8 +184,7 @@ e is the intrinsic function.
 la is the list of arguments.
 */
 
-value 
-EvalIntrinsic(entity e, list la)
+value EvalIntrinsic(entity e, list la)
 {
   value v;
   int token;
@@ -247,8 +243,7 @@ value EvalConditionalOp(list la)
 }
 
 
-value 
-EvalUnaryOp(int t, list la)
+value EvalUnaryOp(int t, list la)
 {
   value vout, v;
   int arg;
@@ -280,8 +275,7 @@ EvalUnaryOp(int t, list la)
   return(vout);
 }
 
-value 
-EvalBinaryOp(int t, list la)
+value EvalBinaryOp(int t, list la)
 {
   value v;
   int argl, argr;
@@ -323,7 +317,7 @@ EvalBinaryOp(int t, list la)
     else {
       fprintf(stderr, "[EvalBinaryOp] zero divide\n");
       abort();
-    }	
+    }
     break;
   case MOD:
     if (argr != 0)
@@ -392,8 +386,7 @@ EvalBinaryOp(int t, list la)
   return(v);
 }
 
-value 
-EvalNaryOp(int t, list la)
+value EvalNaryOp(int t, list la)
 {
     value v = value_undefined;
     value w = value_undefined;
@@ -434,97 +427,121 @@ EvalNaryOp(int t, list la)
     return(w);
 }
 
-int 
-IsUnaryOperator(entity e)
+int IsUnaryOperator(entity e)
 {
-	int token;
-	string n = entity_local_name(e);
+  int token;
+  string n = entity_local_name(e);
 
-	if (same_string_p(n, UNARY_MINUS_OPERATOR_NAME))
-		token = MINUS;
-	else if (same_string_p(n, UNARY_PLUS_OPERATOR_NAME))
-		token = PLUS;
-	else if (same_string_p(n, NOT_OPERATOR_NAME)
-		 || same_string_p(n, C_NOT_OPERATOR_NAME))
-		token = NOT;
-	else
-		token = -1;
+  if (same_string_p(n, UNARY_MINUS_OPERATOR_NAME))
+    token = MINUS;
+  else if (same_string_p(n, UNARY_PLUS_OPERATOR_NAME))
+    token = PLUS;
+  else if (same_string_p(n, NOT_OPERATOR_NAME)
+	   || same_string_p(n, C_NOT_OPERATOR_NAME))
+    token = NOT;
+  else if (same_string_p(n, POST_INCREMENT_OPERATOR_NAME))
+    token = POST_INCREMENT;
+  else if (same_string_p(n, POST_DECREMENT_OPERATOR_NAME))
+    token = POST_DECREMENT;
+  else if (same_string_p(n, PRE_INCREMENT_OPERATOR_NAME))
+    token = PRE_INCREMENT;
+  else if (same_string_p(n, PRE_DECREMENT_OPERATOR_NAME))
+    token = PRE_DECREMENT;
+  else
+    token = -1;
 
-	return(token);
+  return(token);
 }
 
-/* FI: These string constants are defined in ri-util.h */
-int 
-IsBinaryOperator(entity e)
+/* FI: These string constants are defined in ri-util.h and the tokens
+   in ri-util/operator.h */
+int IsBinaryOperator(entity e)
 {
-	int token;
-	string n = entity_local_name(e);
+  int token;
+  string n = entity_local_name(e);
 
-	if      (same_string_p(n, MINUS_OPERATOR_NAME)
-		 || same_string_p(n, MINUS_C_OPERATOR_NAME))
-		token = MINUS;
-	else if (same_string_p(n, PLUS_OPERATOR_NAME)
-		 || same_string_p(n, PLUS_C_OPERATOR_NAME))
-		token = PLUS;
-	else if (same_string_p(n, MULTIPLY_OPERATOR_NAME))
-		token = STAR;
-	else if (same_string_p(n, DIVIDE_OPERATOR_NAME))
-		token = SLASH;
-	else if (same_string_p(n, POWER_OPERATOR_NAME))
-		token = POWER;
-	else if (same_string_p(n, MODULO_OPERATOR_NAME)
-		 || same_string_p(n, C_MODULO_OPERATOR_NAME))
-		token = MOD;
-	else if (same_string_p(n, EQUAL_OPERATOR_NAME)
-		 || same_string_p(n, C_EQUAL_OPERATOR_NAME))
-		token = EQ;
-	else if (same_string_p(n, NON_EQUAL_OPERATOR_NAME)
-		 || same_string_p(n, C_NON_EQUAL_OPERATOR_NAME))
-		token = NE;
-	else if (same_string_p(n, MODULO_OPERATOR_NAME)
-		 || same_string_p(n, C_MODULO_OPERATOR_NAME))
-		token = EQV;
-	else if (same_string_p(n, EQUIV_OPERATOR_NAME))
-		token = NEQV;
-	else if (same_string_p(n, GREATER_THAN_OPERATOR_NAME)
-		 || same_string_p(n, C_MODULO_OPERATOR_NAME))
-		token = GT;
-	else if (same_string_p(n, LESS_THAN_OPERATOR_NAME)
-		 || same_string_p(n, C_LESS_THAN_OPERATOR_NAME))
-		token = LT;
-	else if (same_string_p(n, GREATER_OR_EQUAL_OPERATOR_NAME)
-		 || same_string_p(n, C_GREATER_OR_EQUAL_OPERATOR_NAME))
-		token = GE;
-	else if (same_string_p(n, LESS_OR_EQUAL_OPERATOR_NAME)
-		 || same_string_p(n, C_LESS_OR_EQUAL_OPERATOR_NAME))
-		token = LE;
-	else if (same_string_p(n, OR_OPERATOR_NAME)
-		 || same_string_p(n, C_OR_OPERATOR_NAME))
-		token = OR;
-	else if (same_string_p(n, AND_OPERATOR_NAME)
-		 || same_string_p(n, C_AND_OPERATOR_NAME))
-		token = AND;
-	else if (same_string_p(n, BITWISE_AND_OPERATOR_NAME))
-		token = BITWISE_AND;
-	else if (same_string_p(n, BITWISE_OR_OPERATOR_NAME))
-		token = BITWISE_OR;
-	else if (same_string_p(n, BITWISE_XOR_OPERATOR_NAME))
-		token = BITWISE_XOR;
-	else if (same_string_p(n, LEFT_SHIFT_OPERATOR_NAME))
-		token = LEFT_SHIFT;
-	else if (same_string_p(n, RIGHT_SHIFT_OPERATOR_NAME))
-		token = RIGHT_SHIFT;
-	else if (same_string_p(entity_local_name(e), IMPLIED_COMPLEX_NAME) ||
-		 same_string_p(entity_local_name(e), IMPLIED_DCOMPLEX_NAME))
-	        token = CAST_OP;
-	else
-		token = -1;
+  if      (same_string_p(n, MINUS_OPERATOR_NAME)
+	   || same_string_p(n, MINUS_C_OPERATOR_NAME))
+    token = MINUS;
+  else if (same_string_p(n, PLUS_OPERATOR_NAME)
+	   || same_string_p(n, PLUS_C_OPERATOR_NAME))
+    token = PLUS;
+  else if (same_string_p(n, MULTIPLY_OPERATOR_NAME))
+    token = STAR;
+  else if (same_string_p(n, DIVIDE_OPERATOR_NAME))
+    token = SLASH;
+  else if (same_string_p(n, POWER_OPERATOR_NAME))
+    token = POWER;
+  else if (same_string_p(n, MODULO_OPERATOR_NAME)
+	   || same_string_p(n, C_MODULO_OPERATOR_NAME))
+    token = MOD;
+  else if (same_string_p(n, EQUAL_OPERATOR_NAME)
+	   || same_string_p(n, C_EQUAL_OPERATOR_NAME))
+    token = EQ;
+  else if (same_string_p(n, NON_EQUAL_OPERATOR_NAME)
+	   || same_string_p(n, C_NON_EQUAL_OPERATOR_NAME))
+    token = NE;
+  else if (same_string_p(n, MODULO_OPERATOR_NAME)
+	   || same_string_p(n, C_MODULO_OPERATOR_NAME))
+    token = EQV;
+  else if (same_string_p(n, EQUIV_OPERATOR_NAME))
+    token = NEQV;
+  else if (same_string_p(n, GREATER_THAN_OPERATOR_NAME)
+	   || same_string_p(n, C_MODULO_OPERATOR_NAME))
+    token = GT;
+  else if (same_string_p(n, LESS_THAN_OPERATOR_NAME)
+	   || same_string_p(n, C_LESS_THAN_OPERATOR_NAME))
+    token = LT;
+  else if (same_string_p(n, GREATER_OR_EQUAL_OPERATOR_NAME)
+	   || same_string_p(n, C_GREATER_OR_EQUAL_OPERATOR_NAME))
+    token = GE;
+  else if (same_string_p(n, LESS_OR_EQUAL_OPERATOR_NAME)
+	   || same_string_p(n, C_LESS_OR_EQUAL_OPERATOR_NAME))
+    token = LE;
+  else if (same_string_p(n, OR_OPERATOR_NAME)
+	   || same_string_p(n, C_OR_OPERATOR_NAME))
+    token = OR;
+  else if (same_string_p(n, AND_OPERATOR_NAME)
+	   || same_string_p(n, C_AND_OPERATOR_NAME))
+    token = AND;
+  else if (same_string_p(n, BITWISE_AND_OPERATOR_NAME))
+    token = BITWISE_AND;
+  else if (same_string_p(n, BITWISE_OR_OPERATOR_NAME))
+    token = BITWISE_OR;
+  else if (same_string_p(n, BITWISE_XOR_OPERATOR_NAME))
+    token = BITWISE_XOR;
+  else if (same_string_p(n, LEFT_SHIFT_OPERATOR_NAME))
+    token = LEFT_SHIFT;
+  else if (same_string_p(n, RIGHT_SHIFT_OPERATOR_NAME))
+    token = RIGHT_SHIFT;
 
-	return(token);
+  else if (same_string_p(n, ASSIGN_OPERATOR_NAME)) // C operators
+    token = ASSIGN;
+  else if (same_string_p(n, MULTIPLY_UPDATE_OPERATOR_NAME))
+    token = MULTIPLY_UPDATE;
+  else if (same_string_p(n, DIVIDE_UPDATE_OPERATOR_NAME))
+    token = DIVIDE_UPDATE;
+  else if (same_string_p(n, PLUS_UPDATE_OPERATOR_NAME))
+    token = PLUS_UPDATE;
+  else if (same_string_p(n, MINUS_UPDATE_OPERATOR_NAME))
+    token = MINUS_UPDATE;
+  else if (same_string_p(n, LEFT_SHIFT_UPDATE_OPERATOR_NAME))
+    token = LEFT_SHIFT_UPDATE;
+  else if (same_string_p(n, RIGHT_SHIFT_UPDATE_OPERATOR_NAME))
+    token = RIGHT_SHIFT_UPDATE;
+  else if (same_string_p(n, BITWISE_OR_UPDATE_OPERATOR_NAME))
+    token = BITWISE_OR_UPDATE;
+
+  else if (same_string_p(entity_local_name(e), IMPLIED_COMPLEX_NAME) ||
+	   same_string_p(entity_local_name(e), IMPLIED_DCOMPLEX_NAME))
+    token = CAST_OP;
+  else
+    token = -1;
+
+  return(token);
 }
 
-int 
-IsNaryOperator(entity e)
+int IsNaryOperator(entity e)
 {
 	int token;
 

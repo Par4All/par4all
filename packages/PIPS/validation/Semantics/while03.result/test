@@ -7,7 +7,7 @@ C  T(while03) {4<=while03}
 int while03()
 {
 
-//  T() {}
+//  T(i,j,n) {}
 
    int i, j, n;
 
@@ -60,39 +60,39 @@ int while03()
 
    int i, j, n;
 
-//  P() {}
+//  P(i,j,n) {}
 
 
    i = 0;
 
-//  P(i) {i==0}
+//  P(i,j,n) {i==0}
 
    j = 1;
 
-//  P(i,j) {i==0, j==1}
+//  P(i,j,n) {i==0, j==1}
 
 
    if (n<=1) 
 
-//  P(i,j) {i==0, j==1, n<=1}
+//  P(i,j,n) {i==0, j==1, n<=1}
 
       exit(1);
 
-//  P(i,j) {i==0, j==1, 2<=n}
+//  P(i,j,n) {i==0, j==1, 2<=n}
 
 
    while (j<n) {
 
-//  P(i,j) {2i==j-1, 2i+2<=n, 2<=n}
+//  P(i,j,n) {2i==j-1, 2i+2<=n, 2<=n}
 
       i++;
 
-//  P(i,j) {2i==j+1, 2i<=n, 2<=n}
+//  P(i,j,n) {2i==j+1, 2i<=n, 2<=n}
 
       j += 2;
    }
 
-//  P(i,j) {2i==j-1, n<=2i+1, 2i<=n, 2<=n}
+//  P(i,j,n) {2i==j-1, n<=2i+1, 2i<=n, 2<=n}
 
    return i+j;
 }

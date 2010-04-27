@@ -1,0 +1,69 @@
+
+"main" file
+
+int main()
+{
+   int i = 2;
+   int j;
+   int k = 3;
+   i+++j-j;
+   i+++j-j;
+   i+++k-k;
+   i+++k-k;
+   return i;
+}
+
+"main" file with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 2;
+
+//  P() {i==2}
+
+   int j;
+
+//  P() {i==2}
+
+   int k = 3;
+
+//  P() {i==2, k==3}
+
+   i+++j-j;
+
+//  P(i) {k==3}
+
+   i+++j-j;
+
+//  P(i) {k==3}
+
+   i+++k-k;
+
+//  P(i) {k==3}
+
+   i+++k-k;
+
+//  P(i) {k==3}
+
+   return i;
+}
+
+"main" file after partial evaluation
+
+int main()
+{
+   int i = 2;
+   int j;
+   int k = 3;
+   i+++j-j;
+   i++;
+   i++;
+   i++;
+   return i;
+}

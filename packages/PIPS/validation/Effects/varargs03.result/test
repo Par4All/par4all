@@ -1,5 +1,5 @@
 
-Proper effects for "main"
+Proper pointer effects
 
 int main()
 {
@@ -10,14 +10,42 @@ int main()
    int r;
 //               <may be read    >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
 //                                  s[*] tab[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
-//                                  s[*] tab[*]
-//               <must be read   >: ch fmt s tab
+//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] s[*] 
+//                                  tab[*]
+//               <must be read   >: ch fmt s
 //               <must be written>: r
-   r = varargs03(s, fmt, ch, tab);                                      /*0029*/
+   r = varargs03(s, fmt, ch, tab);
 //               <must be read   >: r
-   return r;                                                            /*0030*/
+   return r;
 }
+int varargs03(FILE *stream, const char *fmt, ...)
+{
+//               <must be read   >: stream
+   if (stream) {
+      va_list pa;
+      int r;
+//               <must be read   >: pa
+//               <must be written>: pa
+
+      va_start(pa, fmt);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt[*] 
+//                                  stream[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] stream[*]
+//               <must be read   >: fmt pa stream
+//               <must be written>: pa r
+      r = vfprintf(stream, fmt, pa);
+//               <may be written >: pa
+//               <must be read   >: pa
+      va_end(pa);
+//               <must be read   >: r
+      return r;
+   }
+   else
+      return 0;
+}
+
+Cumulated pointer effects
+
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: *ANY_MODULE*:*ANYWHERE* 
@@ -31,11 +59,43 @@ int main()
    int r;
 //               <may be read    >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
 //                                  s[*] tab[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
-//                                  s[*] tab[*]
-//               <must be read   >: ch fmt s tab
+//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] s[*] 
+//                                  tab[*]
+//               <must be read   >: ch fmt s
 //               <must be written>: r
-   r = varargs03(s, fmt, ch, tab);                                      /*0029*/
+   r = varargs03(s, fmt, ch, tab);
 //               <must be read   >: r
-   return r;                                                            /*0030*/
+   return r;
+}
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt fmt[*] 
+//                                  stream[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] stream[*]
+//               <must be read   >: stream
+int varargs03(FILE *stream, const char *fmt, ...)
+{
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt fmt[*] 
+//                                  stream[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] stream[*]
+//               <must be read   >: stream
+   if (stream) {
+      va_list pa;
+      int r;
+//               <must be read   >: pa
+//               <must be written>: pa
+
+      va_start(pa, fmt);
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fmt[*] 
+//                                  stream[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] stream[*]
+//               <must be read   >: fmt pa stream
+//               <must be written>: pa r
+      r = vfprintf(stream, fmt, pa);
+//               <may be written >: pa
+//               <must be read   >: pa
+      va_end(pa);
+//               <must be read   >: r
+      return r;
+   }
+   else
+      return 0;
 }

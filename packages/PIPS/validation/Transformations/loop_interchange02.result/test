@@ -27,8 +27,8 @@ void loop_interchange02(int n, int ni, int nj, int nk)
 l1:
    for(i = 0; i <= ni-1; i += 1)
 l2:
-      for(jp = 0; jp <= -1+nk; jp += 1)
-         for(kp = 0; kp <= -1+nj; kp += 1)
+      for(jp = 0; jp <= nk-1; jp += 1)
+         for(kp = 0; kp <= nj-1; kp += 1)
             x[i][kp][jp] = 0.;
 }
 

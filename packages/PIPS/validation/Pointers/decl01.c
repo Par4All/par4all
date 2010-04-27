@@ -1,6 +1,6 @@
 /* Make sure that effects in declarations are taken into account */
 
-void decl01()
+int decl01()
 {
   int i = 2;
   int j = i;
@@ -9,4 +9,5 @@ void decl01()
   i = 2;
   j = i;
   j = sizeof(i);
+  return 0;
 }

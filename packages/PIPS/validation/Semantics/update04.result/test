@@ -62,7 +62,7 @@ void update04()
 
    int i = 1;
 
-//  T() {i==1}
+//  T(j,k) {}
 
    int j, k;
 
@@ -93,17 +93,17 @@ void update04()
 
    int i = 1;
 
-//  P() {i==1}
+//  P(i) {i==1}
 
    int j, k;
 
-//  P() {i==1}
+//  P(i,j,k) {i==1}
 
    
    //i = 2;
    j = ++i;
 
-//  P(i,j) {i==2, j==2}
+//  P(i,j,k) {i==2, j==2}
 
    k = i++;
 

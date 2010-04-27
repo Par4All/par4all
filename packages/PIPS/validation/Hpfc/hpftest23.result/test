@@ -21,8 +21,8 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO LALPHA1 = 1, (13-PSI1)/3
-            ALPHA1 = -3+3*LALPHA1+PSI1
+         DO LALPHA1 = 1, (-PSI1+13)/3
+            ALPHA1 = 3*LALPHA1+PSI1-3
             BUF INDEX = BUF INDEX+1
             J(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
          ENDDO
@@ -36,8 +36,8 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO LALPHA1 = 1, (13-PSI1)/3
-            ALPHA1 = -3+3*LALPHA1+PSI1
+         DO LALPHA1 = 1, (-PSI1+13)/3
+            ALPHA1 = 3*LALPHA1+PSI1-3
             BUF INDEX = BUF INDEX+1
             K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
          ENDDO
@@ -63,8 +63,8 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO LALPHA1 = 1, (13-PSI1)/3
-            ALPHA1 = -3+3*LALPHA1+PSI1
+         DO LALPHA1 = 1, (-PSI1+13)/3
+            ALPHA1 = 3*LALPHA1+PSI1-3
             BUF INDEX = BUF INDEX+1
             J(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
          ENDDO
@@ -78,8 +78,8 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO LALPHA1 = (8-PSI1)/3, (10-PSI1)/3
-            ALPHA1 = -3+3*LALPHA1+PSI1
+         DO LALPHA1 = (-PSI1+8)/3, (-PSI1+10)/3
+            ALPHA1 = 3*LALPHA1+PSI1-3
             BUF INDEX = BUF INDEX+1
             K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
          ENDDO
@@ -182,8 +182,8 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = 1, (13-PSI1)/3
-         ALPHA1 = -3+3*LALPHA1+PSI1
+      DO LALPHA1 = 1, (-PSI1+13)/3
+         ALPHA1 = 3*LALPHA1+PSI1-3
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = J(LALPHA1)
       ENDDO
@@ -194,8 +194,8 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = 1, (13-PSI1)/3
-         ALPHA1 = -3+3*LALPHA1+PSI1
+      DO LALPHA1 = 1, (-PSI1+13)/3
+         ALPHA1 = 3*LALPHA1+PSI1-3
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = K(LALPHA1)
       ENDDO
@@ -215,8 +215,8 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = 1, (13-PSI1)/3
-         ALPHA1 = -3+3*LALPHA1+PSI1
+      DO LALPHA1 = 1, (-PSI1+13)/3
+         ALPHA1 = 3*LALPHA1+PSI1-3
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = J(LALPHA1)
       ENDDO
@@ -227,8 +227,8 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = (8-PSI1)/3, (10-PSI1)/3
-         ALPHA1 = -3+3*LALPHA1+PSI1
+      DO LALPHA1 = (-PSI1+8)/3, (-PSI1+10)/3
+         ALPHA1 = 3*LALPHA1+PSI1-3
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = K(LALPHA1)
       ENDDO

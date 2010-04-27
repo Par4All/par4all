@@ -2745,6 +2745,39 @@ transformer any_expressions_to_transformer(entity v,
   free_transformer(cpre);
   return tf;
 }
+/* compute integer bounds @p pmax, @p pmin of expression @p exp under precondtiotions @p tr
+ * require value mappings set !
+ */
+bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* pmin, intptr_t* pmax)
+{
+    bool success;
+    /* create a temproraty value */
+    basic bas = basic_of_expression(exp);
+    entity var = make_local_temporary_value_entity_with_basic(bas);
+    free_basic(bas);
+
+    /* compute its preconditions */
+    transformer var_tr = safe_any_expression_to_transformer(var,exp,tr,false);
+    /* retreive the associated psysteme*/
+    Psysteme ps = predicate_system(transformer_relation(var_tr));
+    /* compute min / max bounds */
+    Value vmin,vmax;
+    if((success=sc_minmax_of_variable(ps,var,&vmin,&vmax)))
+    {
+        /* special case to handle VMIN and VMAX in 32 bits*/
+        if(vmax != (Value)(intptr_t)(vmax) && vmax == VALUE_MAX) vmax= INT_MAX;
+        if(vmin != (Value)(intptr_t)(vmin) && vmin == VALUE_MIN) vmin= INT_MIN;
+        pips_assert("no data loss", vmin == (Value)(intptr_t)(vmin));
+        pips_assert("no data loss", vmax == (Value)(intptr_t)(vmax));
+        *pmin=(intptr_t)vmin;
+        *pmax=(intptr_t)vmax;
+    }
+    /* tidy & return */
+    predicate_system(transformer_relation(var_tr))=SC_UNDEFINED;
+    free_transformer(var_tr);
+    free_entity(var);
+    return success;
+}
 
 bool false_condition_wrt_precondition_p(expression c, transformer pre)
 {

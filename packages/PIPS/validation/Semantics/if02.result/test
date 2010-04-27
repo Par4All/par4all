@@ -76,20 +76,20 @@ void if02()
 
    int j = -1;
 
-//  P() {j==-1}
+//  P(j) {j==-1}
 
    int n = 2;
 
-//  P() {j==-1, n==2}
+//  P(j,n) {j==-1, n==2}
 
    int i = 0;
 
-//  P() {i==0, j==-1, n==2}
+//  P(i,j,n) {i==0, j==-1, n==2}
 
 
    if (n)
 
-//  P() {i==0, j==-1, n==2}
+//  P(i,j,n) {i==0, j==-1, n==2}
 
       printf("n == true\n");
    else
@@ -98,7 +98,7 @@ void if02()
 
       printf("n == true\n");
 
-//  P() {i==0, j==-1, n==2}
+//  P(i,j,n) {i==0, j==-1, n==2}
 
    /* no */
    
@@ -109,17 +109,17 @@ void if02()
       printf("i == true\n");
    else
 
-//  P() {i==0, j==-1, n==2}
+//  P(i,j,n) {i==0, j==-1, n==2}
 
       printf("n == true\n");
 
-//  P() {i==0, j==-1, n==2}
+//  P(i,j,n) {i==0, j==-1, n==2}
 
    /* yes */
    
    if (j)
 
-//  P() {i==0, j==-1, n==2}
+//  P(i,j,n) {i==0, j==-1, n==2}
 
       printf("j == true\n");
    else

@@ -84,60 +84,80 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
 
    buffer = (char *) calloc(80, sizeof(char));
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    file = fopen(filename, "rb");
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    if (file==(void *) 0) 
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
       nrerror("ouverture du fichier impossible\n");
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    
    // The code synthesis fails because of type_supporting_entities() which explodes the stack
    //readitem(file, buffer);
    if (strcmp(buffer, "P5")!=0) 
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
       nrerror("entete du fichier %s invalide\n");
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
    //gris   = atoi(readitem(file, buffer));
    
    *nrl = 0;
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    *nrh = height-1;
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    *ncl = 0;
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    *nch = width-1;
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,
+//   -Exact-);(nrl,_nrl_3,-Exact-)}
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*,-MAY-);(nch,_nch_6,
+//   -Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,
+//   -Exact-)}
 
    for(i = 0; i <= height-1; i += 1)
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*,-MAY-);(nch,_nch_6,
+//   -Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,
+//   -Exact-)}
       ReadPGMrow(file, width, m[i]);
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*,-MAY-);(nch,_nch_6,
+//   -Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,
+//   -Exact-)}
 
    fclose(file);
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*,-MAY-);(nch,_nch_6,
+//   -Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,
+//   -Exact-)}
    free(buffer);
-//  {(filename,_filename_2,-Exact-);(nch,_nch_6,-Exact-);(ncl,_ncl_5,
-//   -Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,-Exact-)}
+//  {(buffer,*ANY_MODULE*:*ANYWHERE*,-MAY-);(filename,_filename_2,
+//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*,-MAY-);(nch,_nch_6,
+//   -Exact-);(ncl,_ncl_5,-Exact-);(nrh,_nrh_4,-Exact-);(nrl,_nrl_3,
+//   -Exact-)}
 
    return m;
 }

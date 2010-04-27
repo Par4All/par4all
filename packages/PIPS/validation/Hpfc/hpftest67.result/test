@@ -25,8 +25,8 @@
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
          DO ALPHA2 = 1, 25
-            DO ALPHA1 = -8+9*PSI1, MIN(25, 9*PSI1)
-               LALPHA1 = 9+ALPHA1-9*PSI1
+            DO ALPHA1 = 9*PSI1-8, MIN(25, 9*PSI1)
+               LALPHA1 = ALPHA1-9*PSI1+9
                LALPHA2 = ALPHA2
                BUF INDEX = BUF INDEX+1
                A(ALPHA1,ALPHA2) = HPFC INTEGER4 BUFF(BUF INDEX)
@@ -134,8 +134,8 @@
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
       DO ALPHA2 = 1, 25
-         DO ALPHA1 = -8+9*PSI1, MIN(25, 9*PSI1)
-            LALPHA1 = 9+ALPHA1-9*PSI1
+         DO ALPHA1 = 9*PSI1-8, MIN(25, 9*PSI1)
+            LALPHA1 = ALPHA1-9*PSI1+9
             LALPHA2 = ALPHA2
             BUF INDEX = BUF INDEX+1
             HPFC INTEGER4 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)

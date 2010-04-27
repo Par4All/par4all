@@ -189,10 +189,22 @@ entity find_label_entity(const char* module_name, const char* label_local_name)
 
 /* Return the module part of an entity name.
  *
- * OK, this function name is pretty misleading.
+ * OK, this function name is pretty misleading: entity_name_to_entity_module_name().
  *
  * Maybe, it should be wrapped up in a higher-level function such as
  * entity_to_module_name().
+ *
+ * It uses a static buffer and should create trouble with long
+ * function names.
+ *
+ * No memory allocation is performed, but it's result is transient. It
+ * must be strdup'ed by the caller if it is to be preserved.
+ *
+ * To eliminate the static buffer and to allocate the returned string
+ * would require lots of changes or add lots of memory leaks in PIPS
+ * since the callers do not know they must free the result. Maybe we
+ * should stack allocate a buffer of size strlen(s), but we would end
+ * up returning a pointer to a popped area of the stack...
  */
 string module_name(string s)
 {

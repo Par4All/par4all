@@ -63,14 +63,14 @@ ATOM * a_m_serial(int serial)
 //               <must be read   >: first
 //               <must be written>: lastmatched
       lastmatched = first;
-//               <must be read   >: lastmatched lastmatched[0][serial]
-//                                  serial
+//               <must be read   >: lastmatched 
+//                                  lastmatched[0][.serial] serial
 
    if (serial==lastmatched->serial) 
 //               <must be read   >: lastmatched
       return lastmatched;
-//               <must be read   >: lastmatched lastmatched[0][serial]
-//                                  serial
+//               <must be read   >: lastmatched 
+//                                  lastmatched[0][.serial] serial
    if (serial>lastmatched->serial) 
 //               <must be read   >: lastmatched
 //               <must be written>: ap
@@ -78,7 +78,7 @@ ATOM * a_m_serial(int serial)
 //               <must be read   >: n
 //               <must be written>: i
    for(i = 0; i <= n-1; i += 1) {
-//               <must be read   >: ap ap[0][serial] n serial
+//               <must be read   >: ap ap[0][.serial] n serial
       if (ap->serial==serial) {
 //               <must be read   >: ap n
 //               <must be written>: lastmatched
@@ -86,13 +86,13 @@ ATOM * a_m_serial(int serial)
 //               <must be read   >: ap n
          return ap;
       }
-//               <must be read   >: ap ap[0][next] n
+//               <must be read   >: ap ap[0][.next] n
       if (ap==ap->next)
 //               <must be read   >: first n
 //               <must be written>: ap
          ap = first;
       else
-//               <must be read   >: ap ap[0][next] n
+//               <must be read   >: ap ap[0][.next] n
 //               <must be written>: ap
          ap = ap->next;
    }
@@ -135,27 +135,27 @@ ATOM * a_m_serial(int serial)
 //               <must be read   >: first
 //               <must be written>: lastmatched
       lastmatched = first;
-//               <must be read   >: lastmatched lastmatched[0][serial]
-//                                  serial
+//               <must be read   >: lastmatched 
+//                                  lastmatched[0][.serial] serial
 
    if (serial==lastmatched->serial) 
 //               <must be read   >: lastmatched
       return lastmatched;
 //               <may be written >: ap
-//               <must be read   >: lastmatched lastmatched[0][serial]
-//                                  serial
+//               <must be read   >: lastmatched 
+//                                  lastmatched[0][.serial] serial
    if (serial>lastmatched->serial) 
 //               <must be read   >: lastmatched
 //               <must be written>: ap
       ap = lastmatched;
-//               <may be read    >: first ap ap[0][next] ap[0][serial]
-//                                  serial
+//               <may be read    >: first ap ap[0][.next] 
+//                                  ap[0][.serial] serial
 //               <may be written >: ap lastmatched
 //               <must be read   >: n
 //               <must be written>: i
    for(i = 0; i <= n-1; i += 1) {
 //               <may be written >: lastmatched
-//               <must be read   >: ap ap[0][serial] n serial
+//               <must be read   >: ap ap[0][.serial] n serial
       if (ap->serial==serial) {
 //               <must be read   >: ap n
 //               <must be written>: lastmatched
@@ -164,14 +164,14 @@ ATOM * a_m_serial(int serial)
          return ap;
       }
 //               <may be read    >: first
-//               <must be read   >: ap ap[0][next] n
+//               <must be read   >: ap ap[0][.next] n
 //               <must be written>: ap
       if (ap==ap->next)
 //               <must be read   >: first n
 //               <must be written>: ap
          ap = first;
       else
-//               <must be read   >: ap ap[0][next] n
+//               <must be read   >: ap ap[0][.next] n
 //               <must be written>: ap
          ap = ap->next;
    }
@@ -228,7 +228,7 @@ int activate(int i1, int i2)
 //               <must be read   >: ap
       if (ap!=(void *) 0) 
 //               <must be read   >: ap
-//               <must be written>: ap[0][active]
+//               <must be written>: ap[0][.active]
          ap->active = 1;
       return 0;
    }
@@ -257,15 +257,15 @@ int activate(int i1, int i2)
 //               <must be written>: i
    for(i = 0; i <= numatm-1; i += 1) {
 //               <may be read    >: first
-//               <must be read   >: a_next:0`ap a_next:0`ap[0][next] i
-//                                  numatm
+//               <must be read   >: a_next:0`ap a_next:0`ap[0][.next] 
+//                                  i numatm
 //               <must be written>: a_next:0`ap ap
       ap = a_next(i);
-//               <must be read   >: ap ap[0][serial] ap[0][serial] 
+//               <must be read   >: ap ap[0][.serial] ap[0][.serial] 
 //                                  lower numatm upper
       if (ap->serial>=lower&&ap->serial<=upper) 
 //               <must be read   >: ap numatm
-//               <must be written>: ap[0][active]
+//               <must be written>: ap[0][.active]
          ap->active = 1;
    }
    return 0;
@@ -284,7 +284,7 @@ int activate(int i1, int i2)
 //               <may be written >: atomNUMBER atomUPDATE 
 //                                  a_m_serial:0`ap 
 //                                  a_m_serial:0`lastmatched ap 
-//                                  ap[0][active]
+//                                  ap[0][.active]
 
    if (i2==0) {
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
@@ -293,11 +293,11 @@ int activate(int i1, int i2)
 //               <must be read   >: i1
 //               <must be written>: a_m_serial:0`ap ap
       ap = a_m_serial(i1);
-//               <may be written >: ap[0][active]
+//               <may be written >: ap[0][.active]
 //               <must be read   >: ap
       if (ap!=(void *) 0) 
 //               <must be read   >: ap
-//               <must be written>: ap[0][active]
+//               <must be written>: ap[0][.active]
          ap->active = 1;
       return 0;
    }
@@ -324,23 +324,23 @@ int activate(int i1, int i2)
 
    numatm = a_number();
 //               <may be read    >: first a_next:0`ap 
-//                                  a_next:0`ap[0][next] ap 
-//                                  ap[0][serial] i lower upper
-//               <may be written >: a_next:0`ap ap ap[0][active]
+//                                  a_next:0`ap[0][.next] ap 
+//                                  ap[0][.serial] i lower upper
+//               <may be written >: a_next:0`ap ap ap[0][.active]
 //               <must be read   >: numatm
 //               <must be written>: i
    for(i = 0; i <= numatm-1; i += 1) {
 //               <may be read    >: first
-//               <must be read   >: a_next:0`ap a_next:0`ap[0][next] i
-//                                  numatm
+//               <must be read   >: a_next:0`ap a_next:0`ap[0][.next] 
+//                                  i numatm
 //               <must be written>: a_next:0`ap ap
       ap = a_next(i);
-//               <may be written >: ap[0][active]
-//               <must be read   >: ap ap[0][serial] lower numatm 
+//               <may be written >: ap[0][.active]
+//               <must be read   >: ap ap[0][.serial] lower numatm 
 //                                  upper
       if (ap->serial>=lower&&ap->serial<=upper) 
 //               <must be read   >: ap numatm
-//               <must be written>: ap[0][active]
+//               <must be written>: ap[0][.active]
          ap->active = 1;
    }
    return 0;

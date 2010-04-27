@@ -25,16 +25,15 @@
 ! end of update
 ! collecting distributed variable A
       IF (1.LE.N) THEN
-         DO PSI1 = 1, MIN(4, HPFC DIVIDE(130+N, 128))
+         DO PSI1 = 1, MIN(4, HPFC DIVIDE(N+130, 128))
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
             SIZE OF RECEIVED BUFFER = 0
             T LID = PSI1
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC INTEGER4 BUFUPK
-            DO ALPHA1 = MAX(1, -130+128*PSI1), MIN(-3+128*PSI1, 500, 
-     &      N)
-               LALPHA1 = 131+ALPHA1-128*PSI1
+            DO ALPHA1 = MAX(1, 128*PSI1-130), MIN(128*PSI1-3, 500, N)
+               LALPHA1 = ALPHA1-128*PSI1+131
                BUF INDEX = BUF INDEX+1
                A(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
             ENDDO
@@ -122,12 +121,11 @@
 ! collecting distributed variable A
       IF (1.LE.N) THEN
          PSI1 = MY POS(1,1)
-         IF (128*PSI1.LE.130+N) THEN
+         IF (128*PSI1.LE.N+130) THEN
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA1 = MAX(1, -130+128*PSI1), MIN(-3+128*PSI1, 500, 
-     &      N)
-               LALPHA1 = 131+ALPHA1-128*PSI1
+            DO ALPHA1 = MAX(1, 128*PSI1-130), MIN(128*PSI1-3, 500, N)
+               LALPHA1 = ALPHA1-128*PSI1+131
                BUF INDEX = BUF INDEX+1
                HPFC INTEGER4 BUFF(BUF INDEX) = A(LALPHA1)
             ENDDO

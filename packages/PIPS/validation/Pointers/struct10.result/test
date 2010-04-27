@@ -151,3 +151,141 @@ int main()
 
 POINTS TO
 
+//  {}
+int main()
+{
+//  points to = {}
+   s_with_pointer a, b;
+//  points to = {}
+   s_with_array c, d;
+//  points to = {}
+   s_with_array_of_struct_with_pointer e, f;
+//  points to = {}
+   s_with_array_of_struct_with_array g, h;
+
+//  points to = {}
+   int i, j;
+//  points to = {}
+   
+   // just to create a block for prettyprinting
+   if (1) {
+//  points to = {}
+      
+      // definition of a
+      a.p = (int *) malloc(10*sizeof(int));
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      a.n = 2;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 9; i += 1)
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+         (a.p)[i] = i;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      
+      // definition of b, also modifies the elments of a.p
+      b = a;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      printf("\nstruct with pointer copy : \n");
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 9; i += 1) {
+//  points to = {}
+         (b.p)[i] = i*10;
+//  points to = {}
+         printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
+      }
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      
+      // definition of c
+      c.n = 3;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 9; i += 1)
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+         (c.array)[i] = i;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      
+      // definition of d, does not modify c
+      d = c;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      printf("\nstruct with array copy : \n");
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 9; i += 1) {
+//  points to = {}
+         (d.array)[i] = i*10;
+//  points to = {}
+
+         printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
+      }
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      
+      // definition of e
+      e.m = 4;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 4; i += 1) {
+//  points to = {}
+         (e.champ)[i].p = malloc(10*sizeof(int));
+//  points to = {}
+         for(j = 0; j <= 9; j += 1)
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+            ((e.champ)[i].p)[j] = i+j;
+      }
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      
+      // definition of f, also modifies e.champ[*].p[*]
+      f = e;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      printf("\nstruct with array of structs with pointer copy : \n");
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 4; i += 1)
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+         for(j = 0; j <= 9; j += 1) {
+//  points to = {}
+            ((f.champ)[i].p)[j] = i*j;
+//  points to = {}
+            
+            
+            printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
+         }
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      
+      // definition of g
+      g.m = 5;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 4; i += 1)
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+         for(j = 0; j <= 9; j += 1)
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+            ((g.champ)[i].array)[j] = i+j;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      
+      // definition of h, does not modify g
+      h = g;
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      printf("\nstruct with array of structs with array copy : \n");
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+      for(i = 0; i <= 4; i += 1)
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+         for(j = 0; j <= 9; j += 1) {
+//  points to = {}
+            ((h.champ)[i].array)[j] = i*j;
+//  points to = {}
+            
+            
+            printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
+         }
+   }
+//  {(a[1],*ANY_MODULE*:*ANYWHERE*,-MAY-);(e[1][i][1],
+//   *ANY_MODULE*:*ANYWHERE*,-MAY-)}
+   return 0;
+}

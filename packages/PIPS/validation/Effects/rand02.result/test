@@ -28,10 +28,11 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 
 PRINT CUMULATED EFFECTS for AddNoise
 
-//               <may be read    >: Sigma2 pt_in[*][*][im] 
-//                                  pt_in[*][*][re] 
+//               <may be read    >: Sigma2 pt_in[*][*][.im] 
+//                                  pt_in[*][*][.re] 
 //                                  _RANDOM_EFFECTS:GEN_SEED
-//               <may be written >: pt_out[*][*][im] pt_out[*][*][re] 
+//               <may be written >: pt_out[*][*][.im] 
+//                                  pt_out[*][*][.re] 
 //                                  _RANDOM_EFFECTS:GEN_SEED
 //               <must be read   >: nx ny
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
@@ -43,19 +44,19 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
    // MOTIF 
    u = 0;
 //               <may be read    >: A B Sigma2 ix iy nx 
-//                                  pt_in[*][*][im] pt_in[*][*][re] u 
-//                                  u v _RANDOM_EFFECTS:GEN_SEED
-//               <may be written >: A B ix pt_out[*][*][im] 
-//                                  pt_out[*][*][re] u v 
+//                                  pt_in[*][*][.im] pt_in[*][*][.re] 
+//                                  u u v _RANDOM_EFFECTS:GEN_SEED
+//               <may be written >: A B ix pt_out[*][*][.im] 
+//                                  pt_out[*][*][.re] u v 
 //                                  _RANDOM_EFFECTS:GEN_SEED
 //               <must be read   >: ny
 //               <must be written>: iy
    for(iy = 0; iy <= ny-1; iy += 1)
-//               <may be read    >: A B Sigma2 ix iy pt_in[*][*][im] 
-//                                  pt_in[*][*][re] u u v 
+//               <may be read    >: A B Sigma2 ix iy pt_in[*][*][.im] 
+//                                  pt_in[*][*][.re] u u v 
 //                                  _RANDOM_EFFECTS:GEN_SEED
-//               <may be written >: A B pt_out[*][*][im] 
-//                                  pt_out[*][*][re] u v 
+//               <may be written >: A B pt_out[*][*][.im] 
+//                                  pt_out[*][*][.re] u v 
 //                                  _RANDOM_EFFECTS:GEN_SEED
 //               <must be read   >: nx ny
 //               <must be written>: ix
@@ -86,13 +87,13 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //               <must be read   >: nx ny
 //               <must be written>: B
          B = 1.0;
-//               <may be read    >: pt_in[*][*][re]
-//               <may be written >: pt_out[*][*][re]
+//               <may be read    >: pt_in[*][*][.re]
+//               <may be written >: pt_out[*][*][.re]
 //               <must be read   >: A B Sigma2 ix iy nx ny
 
          pt_out[iy][ix].re = pt_in[iy][ix].re+Sigma2*A*cos(B);
-//               <may be read    >: pt_in[*][*][im]
-//               <may be written >: pt_out[*][*][im]
+//               <may be read    >: pt_in[*][*][.im]
+//               <may be written >: pt_out[*][*][.im]
 //               <must be read   >: A B Sigma2 ix iy nx ny
          pt_out[iy][ix].im = pt_in[iy][ix].im+Sigma2*A*sin(B);
 //               <must be read   >: nx ny
@@ -109,13 +110,13 @@ PRINT REGIONS for AddNoise
 //  <Sigma2-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][im]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_in[PHI1][PHI2][.im]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_in[PHI1][PHI2][re]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_in[PHI1][PHI2][.re]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_out[PHI1][PHI2][re]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_out[PHI1][PHI2][.re]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_out[PHI1][PHI2][im]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_out[PHI1][PHI2][.im]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
@@ -142,13 +143,13 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <iy-W-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][im]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_in[PHI1][PHI2][.im]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_in[PHI1][PHI2][re]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_in[PHI1][PHI2][.re]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_out[PHI1][PHI2][re]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_out[PHI1][PHI2][.re]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_out[PHI1][PHI2][im]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_out[PHI1][PHI2][.im]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
@@ -170,13 +171,13 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <iy-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][im]-R-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
+//  <pt_in[PHI1][PHI2][.im]-R-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    0<=iy, 1+iy<=ny}>
-//  <pt_in[PHI1][PHI2][re]-R-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
+//  <pt_in[PHI1][PHI2][.re]-R-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    0<=iy, 1+iy<=ny}>
-//  <pt_out[PHI1][PHI2][re]-W-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
+//  <pt_out[PHI1][PHI2][.re]-W-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    0<=iy, 1+iy<=ny}>
-//  <pt_out[PHI1][PHI2][im]-W-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
+//  <pt_out[PHI1][PHI2][.im]-W-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    0<=iy, 1+iy<=ny}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
@@ -252,9 +253,9 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <iy-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][re]-R-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
+//  <pt_in[PHI1][PHI2][.re]-R-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
 //    1+ix<=nx, 0<=iy, 1+iy<=ny}>
-//  <pt_out[PHI1][PHI2][re]-W-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
+//  <pt_out[PHI1][PHI2][.re]-W-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
 //    1+ix<=nx, 0<=iy, 1+iy<=ny}>
 
 
@@ -267,9 +268,9 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <iy-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][im]-R-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
+//  <pt_in[PHI1][PHI2][.im]-R-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
 //    1+ix<=nx, 0<=iy, 1+iy<=ny}>
-//  <pt_out[PHI1][PHI2][im]-W-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
+//  <pt_out[PHI1][PHI2][.im]-W-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
 //    1+ix<=nx, 0<=iy, 1+iy<=ny}>
 
          pt_out[iy][ix].im = pt_in[iy][ix].im+Sigma2*A*sin(B);

@@ -38,6 +38,7 @@
 #include "ri-util.h"
 
 #include "alias-classes.h"
+#include "effects-generic.h"
 
 /**
  * @brief Check if two effects always conflict.

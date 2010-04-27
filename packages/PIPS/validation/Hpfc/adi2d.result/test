@@ -15,9 +15,9 @@
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL8 BUFF(BUF INDEX) = B_1(LALPHA1,
      &                     LALPHA2)
@@ -48,9 +48,9 @@
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
                               RECEIVED NOT PERFORMED = .TRUE.
@@ -65,9 +65,9 @@
                   ELSE
 ! - lazy copying
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            B(LALPHAp1,LALPHAp2) = B_1(LALPHA1,LALPHA2
      &                     )
                         ENDDO
@@ -99,10 +99,10 @@
 ! - lazy sending
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL8 BUFF(BUF INDEX) = B(LALPHA1,
      &                     LALPHA2)
@@ -132,10 +132,10 @@
                      BUF INDEX = 0
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
                               RECEIVED NOT PERFORMED = .TRUE.
@@ -149,10 +149,10 @@
                      ENDDO
                   ELSE
 ! - lazy copying
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            B_1(LALPHAp1,LALPHAp2) = B(LALPHA1,LALPHA2
      &                     )
                         ENDDO
@@ -185,9 +185,9 @@
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL8 BUFF(BUF INDEX) = UH_1(LALPHA1,
      &                     LALPHA2)
@@ -218,9 +218,9 @@
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
                               RECEIVED NOT PERFORMED = .TRUE.
@@ -235,9 +235,9 @@
                   ELSE
 ! - lazy copying
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            UH(LALPHAp1,LALPHAp2) = UH_1(LALPHA1,
      &                     LALPHA2)
                         ENDDO
@@ -269,10 +269,10 @@
 ! - lazy sending
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL8 BUFF(BUF INDEX) = UH(LALPHA1,
      &                     LALPHA2)
@@ -302,10 +302,10 @@
                      BUF INDEX = 0
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
                               RECEIVED NOT PERFORMED = .TRUE.
@@ -319,10 +319,10 @@
                      ENDDO
                   ELSE
 ! - lazy copying
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            UH_1(LALPHAp1,LALPHAp2) = UH(LALPHA1,
      &                     LALPHA2)
                         ENDDO
@@ -355,9 +355,9 @@
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL8 BUFF(BUF INDEX) = U_1(LALPHA1,
      &                     LALPHA2)
@@ -388,9 +388,9 @@
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
                               RECEIVED NOT PERFORMED = .TRUE.
@@ -405,9 +405,9 @@
                   ELSE
 ! - lazy copying
                      DO LALPHA2 = 1, 128
-                        DO LALPHA1 = -127+128*PSIp1, 128*PSIp1
-                           LALPHAp2 = -128+LALPHA2+128*PSI1
-                           LALPHAp1 = 128+LALPHA1-128*PSIp1
+                        DO LALPHA1 = 128*PSIp1-127, 128*PSIp1
+                           LALPHAp2 = LALPHA2+128*PSI1-128
+                           LALPHAp1 = LALPHA1-128*PSIp1+128
                            U(LALPHAp1,LALPHAp2) = U_1(LALPHA1,LALPHA2
      &                     )
                         ENDDO
@@ -439,10 +439,10 @@
 ! - lazy sending
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL8 BUFF(BUF INDEX) = U(LALPHA1,
      &                     LALPHA2)
@@ -472,10 +472,10 @@
                      BUF INDEX = 0
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
                               RECEIVED NOT PERFORMED = .TRUE.
@@ -489,10 +489,10 @@
                      ENDDO
                   ELSE
 ! - lazy copying
-                     DO LALPHA2 = -127+128*PSIp1, 128*PSIp1
+                     DO LALPHA2 = 128*PSIp1-127, 128*PSIp1
                         DO LALPHA1 = 1, 128
-                           LALPHAp2 = 128+LALPHA2-128*PSIp1
-                           LALPHAp1 = -128+LALPHA1+128*PSI1
+                           LALPHAp2 = LALPHA2-128*PSIp1+128
+                           LALPHAp1 = LALPHA1+128*PSI1-128
                            U_1(LALPHAp1,LALPHAp2) = U(LALPHA1,LALPHA2
      &                     )
                         ENDDO
@@ -600,9 +600,9 @@
       T LID = PSI1
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL8 BUFUPK
-      DO ALPHA2 = 10, MIN(148-128*PSI1, 11)
-         DO ALPHA1 = MAX(10, -127+128*PSI1), MIN(21-ALPHA2, 128*PSI1)
-            LALPHA1 = 128+ALPHA1-128*PSI1
+      DO ALPHA2 = 10, MIN(-128*PSI1+148, 11)
+         DO ALPHA1 = MAX(10, 128*PSI1-127), MIN(-ALPHA2+21, 128*PSI1)
+            LALPHA1 = ALPHA1-128*PSI1+128
             LALPHA2 = ALPHA2
             BUF INDEX = BUF INDEX+1
             U(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
@@ -1078,10 +1078,10 @@
       IF (PSI1.LE.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA2 = 10, MIN(148-128*PSI1, 11)
-            DO ALPHA1 = MAX(10, -127+128*PSI1), MIN(21-ALPHA2, 128*
+         DO ALPHA2 = 10, MIN(-128*PSI1+148, 11)
+            DO ALPHA1 = MAX(10, 128*PSI1-127), MIN(-ALPHA2+21, 128*
      &      PSI1)
-               LALPHA1 = 128+ALPHA1-128*PSI1
+               LALPHA1 = ALPHA1-128*PSI1+128
                LALPHA2 = ALPHA2
                BUF INDEX = BUF INDEX+1
                HPFC REAL8 BUFF(BUF INDEX) = U(LALPHA1,LALPHA2)

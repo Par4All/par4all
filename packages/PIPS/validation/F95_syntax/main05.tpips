@@ -1,0 +1,14 @@
+delete main05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main05 main05.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c main05.database/Src/main05.f90
+shell rm *.o
+
+close
+quit

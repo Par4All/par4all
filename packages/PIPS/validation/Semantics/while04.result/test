@@ -11,7 +11,7 @@ int while04(int n)
 
    // BEGIN BLOCK
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 
@@ -38,7 +38,7 @@ int while04(int n)
 
       // BEGIN BLOCK
 
-//  T() {i==0, j==1, 2<=n}
+//  T(k) {}
 
       int k;
 
@@ -85,12 +85,12 @@ int while04(int n)
 
    int i, j;
 
-//  P() {}
+//  P(i,j) {}
 
 
    i = 0;
 
-//  P(i) {i==0}
+//  P(i,j) {i==0}
 
    j = 1;
 
@@ -112,20 +112,20 @@ int while04(int n)
 
       int k;
 
-//  P(i,j) {i==0, j==1, 2<=n}
+//  P(i,j,k) {i==0, j==1, 2<=n}
 
 
       while (i<n-1&&j<n) {
 
-//  P(i,j) {i==j-1, 0<=i, i+2<=n}
+//  P(i,j,k) {i==j-1, 0<=i, i+2<=n}
 
          // BEGIN BLOCK
 
-//  P(i,j) {i==j-1, 0<=i, i+2<=n}
+//  P(i,j,k) {i==j-1, 0<=i, i+2<=n}
 
          i++;
 
-//  P(i,j) {i==j, 1<=i, i+1<=n, 2<=n}
+//  P(i,j,k) {i==j, 1<=i, i+1<=n, 2<=n}
 
          j++;
          // END BLOCK

@@ -22,19 +22,19 @@ Check transformers on strip-mined loop
 void comma04()
 {
 
-//  T() {}
+//  T(i) {}
 
    int i;
 
-//  T() {}
+//  T(j) {}
 
    int j;
 
-//  T() {}
+//  T(k) {}
 
    int k;
 
-//  T() {}
+//  T(l) {}
 
    int l;
 

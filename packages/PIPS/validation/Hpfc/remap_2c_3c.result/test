@@ -16,8 +16,8 @@
                      SEND NOT INITIALIZED = .TRUE.
                      DO I_1 = 1+HPFC DIVIDE(-3*PSI1+2*PSIp1, 6), 10+
      &               HPFC DIVIDE(-3*PSI1+2*PSIp1, 6)
-                        LALPHAp1 = 1+PSI1-PSIp1+2*I_1
-                        LALPHA1 = 1+PSI1-PSIp1+3*I_1
+                        LALPHAp1 = PSI1-PSIp1+2*I_1+1
+                        LALPHA1 = PSI1-PSIp1+3*I_1+1
                         BUF INDEX = BUF INDEX+1
                         HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
                         IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
@@ -46,8 +46,8 @@
                      SIZE OF RECEIVED BUFFER = 0
                      DO I_1 = 1+HPFC DIVIDE(-3*PSI1+2*PSIp1, 6), 10+
      &               HPFC DIVIDE(-3*PSI1+2*PSIp1, 6)
-                        LALPHAp1 = 1+PSI1-PSIp1+2*I_1
-                        LALPHA1 = 1+PSI1-PSIp1+3*I_1
+                        LALPHAp1 = PSI1-PSIp1+2*I_1+1
+                        LALPHA1 = PSI1-PSIp1+3*I_1+1
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
                            RECEIVED NOT PERFORMED = .TRUE.
@@ -61,8 +61,8 @@
 ! - lazy copying
                      DO I_1 = 1+HPFC DIVIDE(-3*PSI1+2*PSIp1, 6), 10+
      &               HPFC DIVIDE(-3*PSI1+2*PSIp1, 6)
-                        LALPHAp1 = 1+PSI1-PSIp1+2*I_1
-                        LALPHA1 = 1+PSI1-PSIp1+3*I_1
+                        LALPHAp1 = PSI1-PSIp1+2*I_1+1
+                        LALPHA1 = PSI1-PSIp1+3*I_1+1
                         A_1(LALPHAp1) = A(LALPHA1)
                      ENDDO
                   ENDIF
@@ -99,8 +99,8 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL4 BUFUPK
-         DO LALPHA1 = (25-PSI1)/2, 11
-            ALPHA1 = -2+2*LALPHA1+PSI1
+         DO LALPHA1 = (-PSI1+25)/2, 11
+            ALPHA1 = 2*LALPHA1+PSI1-2
             BUF INDEX = BUF INDEX+1
             A(ALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
          ENDDO
@@ -115,8 +115,8 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL4 BUFUPK
-         DO LALPHA1 = (38-PSI1)/3, 11
-            ALPHA1 = -3+3*LALPHA1+PSI1
+         DO LALPHA1 = (-PSI1+38)/3, 11
+            ALPHA1 = 3*LALPHA1+PSI1-3
             BUF INDEX = BUF INDEX+1
             A(ALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
          ENDDO
@@ -202,8 +202,8 @@
       PSI1 = MY POS(1,2)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = (25-PSI1)/2, 11
-         ALPHA1 = -2+2*LALPHA1+PSI1
+      DO LALPHA1 = (-PSI1+25)/2, 11
+         ALPHA1 = 2*LALPHA1+PSI1-2
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
       ENDDO
@@ -221,8 +221,8 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = (38-PSI1)/3, 11
-         ALPHA1 = -3+3*LALPHA1+PSI1
+      DO LALPHA1 = (-PSI1+38)/3, 11
+         ALPHA1 = 3*LALPHA1+PSI1-3
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1)
       ENDDO

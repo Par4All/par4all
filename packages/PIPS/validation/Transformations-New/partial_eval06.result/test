@@ -1,0 +1,51 @@
+
+"foo" file
+
+int foo(int i)
+{
+   int j;
+   int n;
+
+   j = i+++0;
+
+   return j;
+}
+
+"foo" file with preconditions
+
+
+//  P() {}
+
+int foo(int i)
+{
+
+//  P() {}
+
+   int j;
+
+//  P() {}
+
+   int n;
+
+//  P() {}
+
+
+   j = i+++0;
+
+//  P(i,j) {i==j+1}
+
+
+   return j;
+}
+
+"foo" file after partial evaluation
+
+int foo(int i)
+{
+   int j;
+   int n;
+
+   j = i++;
+
+   return j;
+}

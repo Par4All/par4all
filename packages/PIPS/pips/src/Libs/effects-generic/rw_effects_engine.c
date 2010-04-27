@@ -712,7 +712,7 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 					}
 				      
 				      if (!exact_p) effects_to_may_effects(l_res_tmp);
-				      l_eff = gen_nconc(l_res_tmp, l_eff);
+				      l_eff = (*effects_union_op)(l_res_tmp, l_eff, effects_same_action_p);
 				      gen_free_list(l_tmp); 
 				    }
 				  else
@@ -747,7 +747,7 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 		  // and then add the effects due to the initialization part
 		  if(!expression_undefined_p(exp_init))
 		    {
-		      rb_lrw = gen_nconc(generic_proper_effects_of_expression(exp_init), rb_lrw);
+		      rb_lrw = (*effects_union_op)(generic_proper_effects_of_expression(exp_init), rb_lrw, effects_same_action_p);
 		    }
 		} /* if (! static_area_p(ram_section(storage_ram(decl_s))))*/
 	      

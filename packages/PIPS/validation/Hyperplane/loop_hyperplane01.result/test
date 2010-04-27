@@ -23,8 +23,8 @@ void loop_hyperplane01(int n, int ni, int nj)
    int ip, jp;
 
 l1:
-   for(ip = 0; ip <= -2+ni+nj; ip += 1)
-      for(jp = MAX(-ip, 1-ni); jp <= MIN(-1-ip+nj, 0); jp += 1)
+   for(ip = 0; ip <= ni+nj-2; ip += 1)
+      for(jp = MAX(-ip, -ni+1); jp <= MIN(-ip+nj-1, 0); jp += 1)
          x[-jp][ip+jp] = 0.;
 }
 

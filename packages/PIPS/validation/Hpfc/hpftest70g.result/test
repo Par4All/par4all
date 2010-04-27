@@ -11,14 +11,14 @@
             PSI3 = MY POS(3,2)
             IF (MY LID.LE.8) THEN
                DO TMP3 = 0, 1
-                  DO PSIp1 = -2+PSI1+2*PSI3+4*TMP3, MIN(5, -2+PSI1+2*
-     &            PSI3+4*TMP3)
-                     T LID = -1+2*PSIp1
+                  DO PSIp1 = PSI1+2*PSI3+4*TMP3-2, MIN(5, PSI1+2*PSI3
+     &            +4*TMP3-2)
+                     T LID = 2*PSIp1-1
 ! - broadcasting
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO LALPHAp1 = -9+10*PSI2, 10*PSI2
-                        LALPHA1 = 45+5*LALPHAp1-50*PSI2+PSIp1
+                     DO LALPHAp1 = 10*PSI2-9, 10*PSI2
+                        LALPHA1 = 5*LALPHAp1-50*PSI2+PSIp1+45
                         BUF INDEX = BUF INDEX+1
                         HPFC INTEGER4 BUFF(BUF INDEX) = A_1(LALPHA1)
                         IF (BUF INDEX.EQ.HPFC INTEGER4 BUFF SIZE
@@ -43,17 +43,17 @@
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      DO PSI3 = 1, 2
-                        DO TMP3 = (5-PSI1-2*PSI3+PSIp1)/4, 
-     &                  HPFC DIVIDE(2-PSI1-2*PSI3+PSIp1, 4)
-                           T LID = -6+4*PSI1+2*PSI2+PSI3
+                        DO TMP3 = (-PSI1-2*PSI3+PSIp1+5)/4, 
+     &                  HPFC DIVIDE(-PSI1-2*PSI3+PSIp1+2, 4)
+                           T LID = 4*PSI1+2*PSI2+PSI3-6
                            IF (MY LID.NE.T LID) THEN
 ! - receiving
                               BUF INDEX = 0
                               RECEIVED NOT PERFORMED = .TRUE.
                               SIZE OF RECEIVED BUFFER = 0
-                              DO LALPHAp1 = -9+10*PSI2, 10*PSI2
-                                 LALPHA1 = 45+5*LALPHAp1-50*PSI2+
-     &                           PSIp1
+                              DO LALPHAp1 = 10*PSI2-9, 10*PSI2
+                                 LALPHA1 = 5*LALPHAp1-50*PSI2+PSIp1+
+     &                           45
                                  IF (BUF INDEX.EQ.
      &                           SIZE OF RECEIVED BUFFER) THEN
                                     CALL HPFC INTEGER4 BUFUPK(T LID)
@@ -65,9 +65,9 @@
                               ENDDO
                            ELSE
 ! - copying
-                              DO LALPHAp1 = -9+10*PSI2, 10*PSI2
-                                 LALPHA1 = 45+5*LALPHAp1-50*PSI2+
-     &                           PSIp1
+                              DO LALPHAp1 = 10*PSI2-9, 10*PSI2
+                                 LALPHA1 = 5*LALPHAp1-50*PSI2+PSIp1+
+     &                           45
                                  A_2(LALPHAp1) = A_1(LALPHA1)
                               ENDDO
                            ENDIF
@@ -94,13 +94,13 @@
 ! remapping A[3]: A[3] -> A_1[2]
             PSI1 = MY POS(1,3)
             IF (MY LID.LE.10) THEN
-               PSIp2 = (4+PSI1)/5
-               T LID = -1+2*PSIp2
+               PSIp2 = (PSI1+4)/5
+               T LID = 2*PSIp2-1
 ! - broadcasting
                BUF INDEX = 0
                SEND NOT INITIALIZED = .TRUE.
                DO LALPHA1 = 1, 10
-                  LALPHAp1 = 40+LALPHA1+10*PSI1-50*PSIp2
+                  LALPHAp1 = LALPHA1+10*PSI1-50*PSIp2+40
                   BUF INDEX = BUF INDEX+1
                   HPFC INTEGER4 BUFF(BUF INDEX) = A(LALPHA1)
                   IF (BUF INDEX.EQ.HPFC INTEGER4 BUFF SIZE) THEN
@@ -120,7 +120,7 @@
             PSIp2 = MY POS(2,2)
             PSIp3 = MY POS(3,2)
             IF (MY LID.LE.8) THEN
-               DO PSI1 = -4+5*PSIp2, 5*PSIp2
+               DO PSI1 = 5*PSIp2-4, 5*PSIp2
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
 ! - receiving
@@ -128,7 +128,7 @@
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA1 = 1, 10
-                        LALPHAp1 = 40+LALPHA1+10*PSI1-50*PSIp2
+                        LALPHAp1 = LALPHA1+10*PSI1-50*PSIp2+40
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
                            CALL HPFC INTEGER4 BUFUPK(T LID)
@@ -140,7 +140,7 @@
                   ELSE
 ! - copying
                      DO LALPHA1 = 1, 10
-                        LALPHAp1 = 40+LALPHA1+10*PSI1-50*PSIp2
+                        LALPHAp1 = LALPHA1+10*PSI1-50*PSIp2+40
                         A_1(LALPHAp1) = A(LALPHA1)
                      ENDDO
                   ENDIF

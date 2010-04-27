@@ -157,11 +157,11 @@ void init(mys *m)
    m->num = 5;                                                          /*0015*/
 //  points to = {}
    m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
-//  points to = {}
+//  {(m[0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    (m->tab1)[0] = 10;                                                   /*0017*/
-//  points to = {}
+//  {(m[0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    (m->tab2)[0] = 20;                                                   /*0018*/
-//  points to = {}
+//  {(m[0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    for(i = 0; i <= 4; i += 1) {
 //  points to = {}
       (m->tab1)[i] = 1;                                                 /*0021*/
@@ -186,11 +186,11 @@ void init2(mys *n)
    m.num = 5;                                                           /*0033*/
 //  points to = {}
    m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
-//  points to = {}
+//  {(m[3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    (m.tab1)[0] = 10;                                                    /*0035*/
-//  points to = {}
+//  {(m[3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    (m.tab2)[0] = 20;                                                    /*0036*/
-//  points to = {}
+//  {(m[3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    for(i = 0; i <= 4; i += 1) {
 //  points to = {}
       (m.tab1)[i] = 1;                                                  /*0039*/
@@ -215,17 +215,21 @@ void init3(mys **p)
 //  points to = {}
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
    }
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p,
+//   *ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
 //   -MAY-)}
 
    p[0]->num = 11;                                                      /*0055*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p,
+//   *ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
 //   -MAY-)}
    (p[0]->tab1)[0] = 20;                                                /*0056*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p,
+//   *ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
 //   -MAY-)}
    (p[0]->tab2)[0] = 30;                                                /*0057*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p,
+//   *ANY_MODULE*:*HEAP*_b0,-MAY-);(p[i],*ANY_MODULE*:*HEAP*_b1,
 //   -MAY-)}
 
    for(i = 1; i <= 4; i += 1) {
@@ -252,14 +256,14 @@ void init4(mys *p[5])
 //  points to = {}
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
    }
-//  points to = {}
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
 
    p[0]->num = 11;                                                      /*0076*/
-//  points to = {}
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    (p[0]->tab1)[0] = 20;                                                /*0077*/
-//  points to = {}
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    (p[0]->tab2)[0] = 30;                                                /*0078*/
-//  points to = {}
+//  {(p[i][0][3],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    
    
    for(i = 1; i <= 4; i += 1) {

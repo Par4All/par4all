@@ -48,6 +48,7 @@
 #include "constants.h"
 #include "control.h"
 #include "effects-generic.h"
+#include "alias-classes.h"
 #include "effects-simple.h"
 
 #include "misc.h"
@@ -89,6 +90,22 @@ transformer effects_to_transformer(list e) /* list of effects */
       args = arguments_add_entity(args, new_val);
       b = vect_add_variable(b, (Variable) new_val);
     }
+    else if(action_write_p(a) && entity_abstract_location_p(v)) {
+      /* All analyzed variables conflicting with v must be considered
+	 written. */
+      list wvl = modified_variables_with_values();
+
+      FOREACH(ENTITY, wv, wvl) {
+	if(entities_may_conflict_p(v,wv) && entity_has_values_p(wv)) {
+	  /* FI->FI: I do not understand why these three lines copied
+	     from above are sufficient, not why they were not pacted
+	     together. */
+	  entity new_val = entity_to_new_value(wv);
+	  args = arguments_add_entity(args, new_val);
+	  b = vect_add_variable(b, (Variable) new_val);
+	}
+      }
+    }
   }
 
   s->base = b;
@@ -108,12 +125,11 @@ transformer filter_transformer(transformer t, list e)
   list args = NIL;
   Psysteme sc_restricted_to_variables_transitive_closure(Psysteme, Pbase);
 
-  MAP(EFFECT, ef, 
-  {
+  FOREACH(EFFECT, ef, e) {
     reference r = effect_any_reference(ef);
     /* action a = effect_action(ef); */
     entity v = reference_variable(r);
-    
+
     if(/* action_write_p(a) && */ entity_has_values_p(v)) {
       /* I do not know yet if I should keep old values... */
       entity new_val = entity_to_new_value(v);
@@ -123,8 +139,7 @@ transformer filter_transformer(transformer t, list e)
 	args = arguments_add_entity(args, v);
       }
     }
-  },
-      e);
+  }
 
   /* FI: I should check if sc is sc_empty but I haven't (yet) found a
      cheap syntactic test */

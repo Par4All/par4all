@@ -42,15 +42,15 @@
          DO PSI2 = 1, 4
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA2 = -199+200*PSI2, 200*PSI2
-               DO ALPHA1 = -199+200*PSI1, 200*PSI1
-                  LALPHA1 = 200+ALPHA1-200*PSI1
-                  LALPHA2 = 200+ALPHA2-200*PSI2
+            DO ALPHA2 = 200*PSI2-199, 200*PSI2
+               DO ALPHA1 = 200*PSI1-199, 200*PSI1
+                  LALPHA1 = ALPHA1-200*PSI1+200
+                  LALPHA2 = ALPHA2-200*PSI2+200
                   BUF INDEX = BUF INDEX+1
                   HPFC REAL8 BUFF(BUF INDEX) = V(ALPHA1,ALPHA2)
                ENDDO
             ENDDO
-            T LID = -4+4*PSI1+PSI2
+            T LID = 4*PSI1+PSI2-4
             CALL HPFC REAL8 BUFPCK
             CALL HPFC SND TO NODE(T LID)
          ENDDO
@@ -140,10 +140,10 @@
       SIZE OF RECEIVED BUFFER = 0
       CALL HPFC RCV FROM HOST
       CALL HPFC REAL8 BUFUPK
-      DO ALPHA2 = -199+200*PSI2, 200*PSI2
-         DO ALPHA1 = -199+200*PSI1, 200*PSI1
-            LALPHA1 = 200+ALPHA1-200*PSI1
-            LALPHA2 = 200+ALPHA2-200*PSI2
+      DO ALPHA2 = 200*PSI2-199, 200*PSI2
+         DO ALPHA1 = 200*PSI1-199, 200*PSI1
+            LALPHA1 = ALPHA1-200*PSI1+200
+            LALPHA2 = ALPHA2-200*PSI2+200
             BUF INDEX = BUF INDEX+1
             V(LALPHA1,LALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
          ENDDO

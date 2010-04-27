@@ -44,11 +44,11 @@ Transformers for main
 int main()
 {
 
-//  T() {}
+//  T(entier) {}
 
    int entier;
 
-//  T() {}
+//  T(graine) {}
 
    int graine;
 

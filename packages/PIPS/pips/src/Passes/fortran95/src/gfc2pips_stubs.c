@@ -132,6 +132,9 @@ void CParserError( char *msg ) {
 list expression_to_proper_effects( expression e ) {
   STUB_ERROR();
 }
+bool effect_reference_dereferencing_p(reference ref, bool * exact_p) {
+    STUB_ERROR();
+}
 
 /***********************************************
  * Control
