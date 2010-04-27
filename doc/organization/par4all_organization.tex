@@ -143,6 +143,10 @@ able to compile with only the \texttt{p4a-own} branch. For the \Apips
 packages, you should have the links to \texttt{nlpmake/makes} to have them
 to compile.
 
+You can change the options passed to \texttt{configure} for a package by
+setting the \texttt{P4A\_\emph{PACKAGE}\_CONFIGURE\_OPTIONS} environment
+variable.
+
 Beware that if you have used a \Apips directory to compile in an other
 context (such as the classical \Asvn build), the compilation will fail
 because of the wrong dependencies between files. You should do a
