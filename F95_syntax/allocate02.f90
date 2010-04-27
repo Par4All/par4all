@@ -1,6 +1,6 @@
 ! Try to parse and print again ALLOCATABLE & ALLOCATE
       SUBROUTINE ALLOCATABLE ()
-      
+
       ALLOCATABLE UBAR(:), RBAR(:)
       INTEGER ERR
       JMAX = 10
