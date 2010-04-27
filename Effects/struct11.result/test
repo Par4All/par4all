@@ -95,7 +95,7 @@ int main()
 
 Cumulated pointer effects for "main"
 
-//               <must be read   >: s[.p] s[.n] s[.p]
+//               <must be read   >: s[.p] s[.n]
 s_with_pointer foo1(s_with_pointer s)
 {
 //               <must be read   >: s[.p] s[.n]
@@ -220,7 +220,6 @@ Printed files with pointer regions
 
 //  <s[.p]-R-EXACT-{}>
 //  <s[.n]-R-EXACT-{}>
-//  <s[.p]-R-EXACT-{}>
 
 s_with_pointer foo1(s_with_pointer s)
 {
