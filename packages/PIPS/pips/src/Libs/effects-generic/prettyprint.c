@@ -428,18 +428,26 @@ list /* of string */ effect_words_reference(reference obj)
     string end = prettyprint_is_fortran? ")" : "]";
 
     pc = CHAIN_SWORD(pc,beg);
-    MAPL(pi, {
-	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pi)),NIL));
+    for(list pi = reference_indices(obj); !ENDP(pi); POP(pi))
+      {
+	expression ind_exp = EXPRESSION(CAR(pi));
+	syntax s = expression_syntax(ind_exp);
+	if (syntax_reference_p(s) && 
+	    entity_field_p(reference_variable(syntax_reference(s))))
+	  {
+	    // add a '.' to disambiguate field names from variable names 
+	    pc = CHAIN_SWORD(pc, ".");
+	    
+	  }
+	pc = gen_nconc(pc, words_expression(ind_exp,NIL));
 	if (CDR(pi) != NIL)
 	  pc = CHAIN_SWORD(pc,mid);
-      }, reference_indices(obj));
+      }
     pc = CHAIN_SWORD(pc,end);
   }
 
-
   attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
 				obj);
-
   return(pc);
 }
 

@@ -121,12 +121,11 @@ void add_equivalenced_values(entity e, entity eq, bool readonly)
 
 /* ???? */
 
-/* void add_interprocedural_value_entities 
+/* void add_interprocedural_value_entities
  */
 static void add_interprocedural_value_entities(entity e)
 {
-    debug(8,"add_interprocedural_value_entities","for %s\n", 
-	  entity_name(e));
+    pips_debug(8,"for %s\n", entity_name(e));
     if(!entity_has_values_p(e)) {
 	entity a = entity_undefined;
 	if((a=value_alias(e))==entity_undefined){
@@ -142,10 +141,11 @@ static void add_interprocedural_value_entities(entity e)
 	}
     }
 }
+
 static void add_interprocedural_new_value_entity(entity e)
 {
-    debug(8,"add_interprocedural_new_value_entities","for %s\n", 
-	  entity_name(e));
+    pips_debug(8,"add_interprocedural_new_value_entities","for %s\n",
+	       entity_name(e));
     if(!entity_has_values_p(e)) {
 	entity a = entity_undefined;
 	if((a=value_alias(e))==entity_undefined){
@@ -171,7 +171,7 @@ static void add_intraprocedural_value_entities_unconditionally(entity e)
 /* void add_intraprocedural_value_entities(entity e)
  */
 static void add_intraprocedural_value_entities(entity e)
-{ 
+{
   type ut = ultimate_type(entity_type(e));
 
   pips_debug(8, "for %s\n", entity_name(e));
@@ -372,13 +372,17 @@ void add_implicit_interprocedural_write_effects(entity al, list el)
 {
   type alt = entity_type(al);
 
-  if(type_unknown_p(alt) || get_bool_property("ALIASING_ACROSS_TYPES")) {
+  if(type_unknown_p(alt)
+     || type_area_p(alt) // FI: Let's agree about typing issues!
+     || get_bool_property("ALIASING_ACROSS_TYPES")
+     || overloaded_type_p(alt)) {
     FOREACH(EFFECT, ef, el) {
       reference r = effect_any_reference(ef);
       entity v = reference_variable(r);
 
       if(!entity_abstract_location_p(v)
-	 && entities_may_conflict_p(al, v)) {
+	 && entities_may_conflict_p(al, v)
+	 && analyzable_scalar_entity_p(v)) {
 	add_interprocedural_value_entities(v);
       }
     }
@@ -477,7 +481,7 @@ void module_to_value_mappings(entity m)
 	      ))
 	 )
 	add_interprocedural_value_entities(e);
-      else if(entity_abstract_location_p(e)) {
+      else if(entity_abstract_location_p(e) && action_write_p(a)) {
 	add_implicit_interprocedural_write_effects(e, module_inter_effects);
       }
     }
@@ -720,10 +724,10 @@ upwards_vect_rename(Pvecteur v, transformer post)
      * scan va and vb than the argument list...
      */
     list modified_values = transformer_arguments(post);
-    
+
     MAP(ENTITY, v_new, {
 	entity v_init = new_value_to_old_value(v_new);
-	
+
 	(void) vect_variable_rename(v, (Variable) v_new,
 				    (Variable) v_init);
     }, modified_values);

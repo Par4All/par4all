@@ -38,6 +38,7 @@ clean=clean
 compile=
 valids=
 validate=validate
+unvalidate=
 # The default options for the validation:
 vopt="VOPT=--archive --diff"
 mopt=
@@ -76,8 +77,14 @@ do
     -sd|--source-directory) sdir=$1 ; shift ;;
     --source-directory=*) sdir=${opt#*=} ;;
     # validation directories
-    -pv|--parallel-validate) validate=new-validate ; mopt='-j 8' ;;
-    -mv|--mail-validate) validate=mail-validate ; mopt='-j 8' ;;
+    -pv|--parallel-validate)
+      validate=new-validate
+      unvalidate=parallel-unvalidate
+      mopt='-j 8' ;;
+    -mv|--mail-validate)
+      validate=mail-validate
+      unvalidate=parallel-unvalidate
+      mopt='-j 8' ;;
     -nv|--no-validate) valids= ;;
     -v|--validate) valids="$valids validation" ;;
     -av|--add-validation) valids="$valids $1" ; shift ;;
@@ -155,6 +162,8 @@ if [[ $valids ]] ; then
       pushd $target/$d
       make $mopt clean
       make $mopt "$vopt" EMAIL=$email $validate
+      # cleanup
+      [ "$unvalidate" ] && make $mopt $unvalidate
       popd
     else
       echo "### skipping validation $d, no such directory"
