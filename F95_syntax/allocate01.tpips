@@ -1,13 +1,13 @@
-delete main04
+delete allocate01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create main04 main04.f90
+create allocate01 allocate01.f90
 
 display PRINTED_FILE[%ALL]
 
 apply UNSPLIT[%ALL]
-shell gcc -c main04.database/Src/main04.f90
+shell gcc -c allocate01.database/Src/allocate01.f90
 shell rm *.o
 
 close
