@@ -1985,17 +1985,18 @@ static list generic_proper_effects_of_declaration(entity decl)
 	  type decl_t = basic_concrete_type(entity_type(decl));
 	  list l_tmp = NIL;
 	  
-	  if (!ENDP(variable_dimensions(type_variable(decl_t))) || basic_derived_p(variable_basic(type_variable(decl_t))))
+	  if (!ENDP(variable_dimensions(type_variable(decl_t))))
 	    {
 	      effect decl_eff = (*reference_to_effect_func)(make_reference(decl,NIL), is_action_write, true);
 	      l_tmp =  generic_effect_generate_all_accessible_paths_effects(decl_eff, decl_t, is_action_write);
 	    }
 	  else
-	    // make sure the make_reference does not create a memory leak
-	    l_tmp = generic_proper_effects_of_reference(make_reference(decl, 
-								       NIL),	
-							true);
-	  storage decl_s = entity_storage(decl);
+	    {
+	      // make sure the make_reference does not create a memory leak
+	      l_tmp = generic_proper_effects_of_reference(make_reference(decl, 
+									 NIL),	
+							  true);
+	    }
 	  l_eff= gen_nconc(l_eff, l_tmp);
 	  
 	}
