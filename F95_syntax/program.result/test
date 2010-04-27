@@ -1,0 +1,4 @@
+PROGRAM TOTO
+PRINT *, 'hello'
+END
+
