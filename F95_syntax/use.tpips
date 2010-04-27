@@ -1,0 +1,10 @@
+delete use
+create use foo.f90 use.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+
+close
+delete use
+quit
