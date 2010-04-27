@@ -15,8 +15,8 @@
 ! - lazy sending
                   BUF INDEX = 0
                   SEND NOT INITIALIZED = .TRUE.
-                  DO LALPHA1 = -562+563*PSIp1, MIN(4500, 563*PSIp1)
-                     LALPHAp1 = 563+LALPHA1-563*PSIp1
+                  DO LALPHA1 = 563*PSIp1-562, MIN(4500, 563*PSIp1)
+                     LALPHAp1 = LALPHA1-563*PSIp1+563
                      BUF INDEX = BUF INDEX+1
                      HPFC REAL4 BUFF(BUF INDEX) = SOL_1(LALPHA1)
                      IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
@@ -43,8 +43,8 @@
                   BUF INDEX = 0
                   RECEIVED NOT PERFORMED = .TRUE.
                   SIZE OF RECEIVED BUFFER = 0
-                  DO LALPHA1 = -562+563*PSIp1, MIN(4500, 563*PSIp1)
-                     LALPHAp1 = 563+LALPHA1-563*PSIp1
+                  DO LALPHA1 = 563*PSIp1-562, MIN(4500, 563*PSIp1)
+                     LALPHAp1 = LALPHA1-563*PSIp1+563
                      IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER) THEN
                         RECEIVED NOT PERFORMED = .TRUE.
                         CALL HPFC REAL4 BUFUPK(T LID)
@@ -55,8 +55,8 @@
                   ENDDO
                ELSE
 ! - lazy copying
-                  DO LALPHA1 = -562+563*PSIp1, MIN(4500, 563*PSIp1)
-                     LALPHAp1 = 563+LALPHA1-563*PSIp1
+                  DO LALPHA1 = 563*PSIp1-562, MIN(4500, 563*PSIp1)
+                     LALPHAp1 = LALPHA1-563*PSIp1+563
                      SOL(LALPHAp1) = SOL_1(LALPHA1)
                   ENDDO
                ENDIF
@@ -83,8 +83,8 @@
 ! - lazy broadcasting
                BUF INDEX = 0
                SEND NOT INITIALIZED = .TRUE.
-               DO LALPHA1 = 1, MIN(563, 5063-563*PSI1)
-                  LALPHAp1 = -563+LALPHA1+563*PSI1
+               DO LALPHA1 = 1, MIN(563, -563*PSI1+5063)
+                  LALPHAp1 = LALPHA1+563*PSI1-563
                   BUF INDEX = BUF INDEX+1
                   HPFC REAL4 BUFF(BUF INDEX) = SOL(LALPHA1)
                   IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
@@ -109,8 +109,8 @@
                      BUF INDEX = 0
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
-                     DO LALPHA1 = 1, MIN(563, 5063-563*PSI1)
-                        LALPHAp1 = -563+LALPHA1+563*PSI1
+                     DO LALPHA1 = 1, MIN(563, -563*PSI1+5063)
+                        LALPHAp1 = LALPHA1+563*PSI1-563
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
                            RECEIVED NOT PERFORMED = .TRUE.
@@ -122,8 +122,8 @@
                      ENDDO
                   ELSE
 ! - lazy copying
-                     DO LALPHA1 = 1, MIN(563, 5063-563*PSI1)
-                        LALPHAp1 = -563+LALPHA1+563*PSI1
+                     DO LALPHA1 = 1, MIN(563, -563*PSI1+5063)
+                        LALPHAp1 = LALPHA1+563*PSI1-563
                         SOL_1(LALPHAp1) = SOL(LALPHA1)
                      ENDDO
                   ENDIF
@@ -303,7 +303,7 @@
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL4 BUFUPK
       ALPHA1 = 1
-      LALPHA1 = 563+ALPHA1-563*PSI1
+      LALPHA1 = ALPHA1-563*PSI1+563
       BUF INDEX = BUF INDEX+1
       SOL(ALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
 ! end of collect
@@ -391,7 +391,7 @@
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA1 = 1
-         LALPHA1 = 563+ALPHA1-563*PSI1
+         LALPHA1 = ALPHA1-563*PSI1+563
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = SOL(LALPHA1)
          CALL HPFC REAL4 BUFPCK

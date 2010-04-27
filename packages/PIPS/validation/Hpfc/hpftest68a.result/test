@@ -11,12 +11,12 @@
             IF (MY LID.LE.4) THEN
                PSIp1 = PSI2
                PSIp2 = PSI1
-               T LID = -2+2*PSIp1+PSIp2
+               T LID = 2*PSIp1+PSIp2-2
                IF (MY LID.NE.T LID) THEN
 ! - sending
                   CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(35-15*PSIp1, 15)
+                     DO LALPHA1 = 1, MIN(-15*PSIp1+35, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -35,14 +35,14 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp2
                PSI2 = PSIp1
-               T LID = -2+2*PSI1+PSI2
+               T LID = 2*PSI1+PSI2-2
                IF (MY LID.NE.T LID) THEN
 ! - receiving
                   CALL pvmfrecv(NODE TIDS(T LID), RECV CHANNELS(T LID
      &            ), HPFC BUFID)
                   RECV CHANNELS(T LID) = RECV CHANNELS(T LID)+2
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(35-15*PSIp1, 15)
+                     DO LALPHA1 = 1, MIN(-15*PSIp1+35, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -53,7 +53,7 @@
                ELSE
 ! - copying
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(35-15*PSIp1, 15)
+                     DO LALPHA1 = 1, MIN(-15*PSIp1+35, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         A(LALPHAp1,LALPHAp2) = A_1(LALPHA1,LALPHA2)
@@ -82,12 +82,12 @@
             IF (MY LID.LE.4) THEN
                PSIp1 = PSI2
                PSIp2 = PSI1
-               T LID = -2+2*PSIp1+PSIp2
+               T LID = 2*PSIp1+PSIp2-2
                IF (MY LID.NE.T LID) THEN
 ! - sending
                   CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(35-15*PSIp2, 15)
+                     DO LALPHA1 = 1, MIN(-15*PSIp2+35, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -106,14 +106,14 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp2
                PSI2 = PSIp1
-               T LID = -2+2*PSI1+PSI2
+               T LID = 2*PSI1+PSI2-2
                IF (MY LID.NE.T LID) THEN
 ! - receiving
                   CALL pvmfrecv(NODE TIDS(T LID), RECV CHANNELS(T LID
      &            ), HPFC BUFID)
                   RECV CHANNELS(T LID) = RECV CHANNELS(T LID)+2
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(35-15*PSIp2, 15)
+                     DO LALPHA1 = 1, MIN(-15*PSIp2+35, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -124,7 +124,7 @@
                ELSE
 ! - copying
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(35-15*PSIp2, 15)
+                     DO LALPHA1 = 1, MIN(-15*PSIp2+35, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         A_1(LALPHAp1,LALPHAp2) = A(LALPHA1,LALPHA2)
@@ -167,13 +167,13 @@
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
       SIZE OF RECEIVED BUFFER = 0
-      T LID = -2+2*PSI1+PSI2
+      T LID = 2*PSI1+PSI2-2
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL4 BUFUPK
       ALPHA2 = 20
       ALPHA1 = 10
-      LALPHA1 = 15+ALPHA1-15*PSI1
-      LALPHA2 = 15+ALPHA2-15*PSI2
+      LALPHA1 = ALPHA1-15*PSI1+15
+      LALPHA2 = ALPHA2-15*PSI2+15
       BUF INDEX = BUF INDEX+1
       A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
 ! end of collect
@@ -186,13 +186,13 @@
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
       SIZE OF RECEIVED BUFFER = 0
-      T LID = -2+2*PSI1+PSI2
+      T LID = 2*PSI1+PSI2-2
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL4 BUFUPK
       ALPHA2 = 20
       ALPHA1 = 10
-      LALPHA1 = 15+ALPHA1-15*PSI2
-      LALPHA2 = 15+ALPHA2-15*PSI1
+      LALPHA1 = ALPHA1-15*PSI2+15
+      LALPHA2 = ALPHA2-15*PSI1+15
       BUF INDEX = BUF INDEX+1
       A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
 ! end of collect
@@ -203,14 +203,14 @@
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
             SIZE OF RECEIVED BUFFER = 0
-            T LID = -2+2*PSI1+PSI2
+            T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = MAX(-14+15*PSI1, -15+15*PSI2), MIN(19, -1+15*
-     &      PSI2, 15*PSI1)
-               ALPHA1 = 1+ALPHA2
-               LALPHA1 = 15+ALPHA1-15*PSI2
-               LALPHA2 = 15+ALPHA2-15*PSI1
+            DO ALPHA2 = MAX(15*PSI1-14, 15*PSI2-15), MIN(19, 15*PSI2-
+     &      1, 15*PSI1)
+               ALPHA1 = ALPHA2+1
+               LALPHA1 = ALPHA1-15*PSI2+15
+               LALPHA2 = ALPHA2-15*PSI1+15
                BUF INDEX = BUF INDEX+1
                A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
             ENDDO
@@ -233,13 +233,13 @@
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
       SIZE OF RECEIVED BUFFER = 0
-      T LID = -2+2*PSI1+PSI2
+      T LID = 2*PSI1+PSI2-2
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL4 BUFUPK
       ALPHA2 = 20
       ALPHA1 = 10
-      LALPHA1 = 15+ALPHA1-15*PSI1
-      LALPHA2 = 15+ALPHA2-15*PSI2
+      LALPHA1 = ALPHA1-15*PSI1+15
+      LALPHA2 = ALPHA2-15*PSI2+15
       BUF INDEX = BUF INDEX+1
       A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
 ! end of collect
@@ -397,8 +397,8 @@
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20
          ALPHA1 = 10
-         LALPHA1 = 15+ALPHA1-15*PSI1
-         LALPHA2 = 15+ALPHA2-15*PSI2
+         LALPHA1 = ALPHA1-15*PSI1+15
+         LALPHA2 = ALPHA2-15*PSI2+15
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)
          CALL HPFC REAL4 BUFPCK
@@ -432,8 +432,8 @@
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20
          ALPHA1 = 10
-         LALPHA1 = 15+ALPHA1-15*PSI2
-         LALPHA2 = 15+ALPHA2-15*PSI1
+         LALPHA1 = ALPHA1-15*PSI2+15
+         LALPHA2 = ALPHA2-15*PSI1+15
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
          CALL HPFC REAL4 BUFPCK
@@ -446,11 +446,11 @@
       IF (PSI1.LE.PSI2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA2 = MAX(-14+15*PSI1, -15+15*PSI2), MIN(19, -1+15*
-     &   PSI2, 15*PSI1)
-            ALPHA1 = 1+ALPHA2
-            LALPHA1 = 15+ALPHA1-15*PSI2
-            LALPHA2 = 15+ALPHA2-15*PSI1
+         DO ALPHA2 = MAX(15*PSI1-14, 15*PSI2-15), MIN(19, 15*PSI2-1, 
+     &   15*PSI1)
+            ALPHA1 = ALPHA2+1
+            LALPHA1 = ALPHA1-15*PSI2+15
+            LALPHA2 = ALPHA2-15*PSI1+15
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
          ENDDO
@@ -483,8 +483,8 @@
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20
          ALPHA1 = 10
-         LALPHA1 = 15+ALPHA1-15*PSI1
-         LALPHA2 = 15+ALPHA2-15*PSI2
+         LALPHA1 = ALPHA1-15*PSI1+15
+         LALPHA2 = ALPHA2-15*PSI2+15
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)
          CALL HPFC REAL4 BUFPCK

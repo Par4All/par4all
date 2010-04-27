@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
       a[i] = (float) malloc(64*sizeof(float));
 //  points to = {}
       for(j = 0; j <= 63; j += 1)
-//  points to = {}
+//  {(a[i],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
          a[i][j] = 0.;
    }
-//  points to = {}
+//  {(a[i],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
 
    return 0;
 }

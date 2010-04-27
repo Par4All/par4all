@@ -1,0 +1,46 @@
+
+"main" file
+
+int main()
+{
+   int i;
+   i = 3%2;
+   printf("pos-pos 3%c2=%d (must be 1)\n", '%', i);
+   i = -3%2;
+   printf("neg pos (-3)%c2=%d (must be -1)\n", '%', i);
+   i = 3%(-2);
+   printf("pos neg 3%c(-2)%d (must be 1)\n", '%', i);
+   i = -3%(-2);
+   printf("neg neg (-3)%c(-2)=%d (must be -1)\n", '%', i);
+   return i;
+}
+
+Result before partial evaluation
+
+pos-pos 3%2=1 (must be 1)
+neg pos (-3)%2=-1 (must be -1)
+pos neg 3%(-2)1 (must be 1)
+neg neg (-3)%(-2)=-1 (must be -1)
+
+"main" file after partial evaluation
+
+int main()
+{
+   int i;
+   i = 1;
+   printf("pos-pos 3%c2=%d (must be 1)\n", 37, i);
+   i = -1;
+   printf("neg pos (-3)%c2=%d (must be -1)\n", 37, i);
+   i = 1;
+   printf("pos neg 3%c(-2)%d (must be 1)\n", 37, i);
+   i = -1;
+   printf("neg neg (-3)%c(-2)=%d (must be -1)\n", 37, i);
+   return i;
+}
+
+Result after partial evaluation
+
+pos-pos 3%2=1 (must be 1)
+neg pos (-3)%2=-1 (must be -1)
+pos neg 3%(-2)1 (must be 1)
+neg neg (-3)%(-2)=-1 (must be -1)

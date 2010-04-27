@@ -1,0 +1,31 @@
+delete partial_eval11
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval11 partial_eval11.f
+
+echo
+echo "MAIN" file
+echo
+
+display PRINTED_FILE[MAIN]
+
+echo
+echo "MAIN" file with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[MAIN]
+
+apply PARTIAL_EVAL[MAIN]
+
+echo
+echo "MAIN" file after partial evaluation
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete partial_eval11
+quit

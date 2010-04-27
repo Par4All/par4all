@@ -43,31 +43,32 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    *va_arg(pa, int *) = col;
 }
 
-Proper pointer effects for "lhs06"
+POINTS TO
 
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
 int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
 {
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
    int nbout;
-//               <must be written>: col
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
    int col = 0;
-//               <must be written>: indent
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
    int indent = 0;
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
    int ui32;
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
    int i32;
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
    static char buffer[2000];
-//               <must be read   >: my_fputc
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
 
    if (!my_fputc) 
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
       return 0;
-//               <must be written>: nbout
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
 
    nbout = 0;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: col
-//               <must be written>: pa
+//  {(_stream,__stream_2,-Exact-);(fmt,_fmt_1,-Exact-)}
 
    *va_arg(pa, int *) = col;
 }
-
-POINTS TO
-

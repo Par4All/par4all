@@ -35,11 +35,11 @@ Source code with transformers
 void assign01()
 {
 
-//  T() {}
+//  T(i) {}
 
    int i;                                                               /*0010*/
 
-//  T() {}
+//  T(j) {}
 
    int j;                                                               /*0011*/
 

@@ -1,7 +1,14 @@
 delete allocatable
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create allocatable allocatable.f90
 
 display PRINTED_FILE[ALLOCATABLE]
+
+apply UNSPLIT [%ALL]
+shell gcc -c allocatable.database/Src/allocatable.f90
+shell rm *.o
 
 close
 delete allocatable

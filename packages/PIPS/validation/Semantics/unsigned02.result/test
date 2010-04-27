@@ -33,7 +33,7 @@ int main()
 
    int k = 6;
 
-//  T() {}
+//  T(l) {}
 
    int l;
 
@@ -101,40 +101,40 @@ int main()
 
    unsigned int i = 2;
 
-//  P() {i==2}
+//  P(i) {i==2}
 
    int j = 4;
 
-//  P() {i==2, j==4}
+//  P(i,j) {i==2, j==4}
 
    int k = 6;
 
-//  P() {i==2, j==4, k==6}
+//  P(i,j,k) {i==2, j==4, k==6}
 
    int l;
 
-//  P() {i==2, j==4, k==6}
+//  P(i,j,k,l) {i==2, j==4, k==6}
 
 
    i++;
 
-//  P(i) {i==3, j==4, k==6}
+//  P(i,j,k,l) {i==3, j==4, k==6}
 
    i += j;
 
-//  P(i) {i==7, j==4, k==6}
+//  P(i,j,k,l) {i==7, j==4, k==6}
 
    i = foo(k);
 
-//  P(i) {i==6, j==4, k==6}
+//  P(i,j,k,l) {i==6, j==4, k==6}
 
    k = bar(i);
 
-//  P(i,k) {i==6, j==4, k==12}
+//  P(i,j,k,l) {i==6, j==4, k==12}
 
    l = foo(k)*bar(i);
 
-//  P(i,k,l) {i==6, j==4, k==12}
+//  P(i,j,k,l) {i==6, j==4, k==12}
 
    return;
 }
@@ -159,7 +159,7 @@ int main()
 
    int k = 6;
 
-//  T() {i==2, j==4, k==6}
+//  T(l) {}
 
    int l;
 
@@ -201,40 +201,40 @@ int main()
 
    unsigned int i = 2;
 
-//  P() {i==2}
+//  P(i) {i==2}
 
    int j = 4;
 
-//  P() {i==2, j==4}
+//  P(i,j) {i==2, j==4}
 
    int k = 6;
 
-//  P() {i==2, j==4, k==6}
+//  P(i,j,k) {i==2, j==4, k==6}
 
    int l;
 
-//  P() {i==2, j==4, k==6}
+//  P(i,j,k,l) {i==2, j==4, k==6}
 
 
    i++;
 
-//  P(i) {i==3, j==4, k==6}
+//  P(i,j,k,l) {i==3, j==4, k==6}
 
    i += j;
 
-//  P(i) {i==7, j==4, k==6}
+//  P(i,j,k,l) {i==7, j==4, k==6}
 
    i = foo(k);
 
-//  P(i) {i==6, j==4, k==6}
+//  P(i,j,k,l) {i==6, j==4, k==6}
 
    k = bar(i);
 
-//  P(i,k) {i==6, j==4, k==12}
+//  P(i,j,k,l) {i==6, j==4, k==12}
 
    l = foo(k)*bar(i);
 
-//  P(i,k,l) {i==6, j==4, k==12}
+//  P(i,j,k,l) {i==6, j==4, k==12}
 
    return;
 }

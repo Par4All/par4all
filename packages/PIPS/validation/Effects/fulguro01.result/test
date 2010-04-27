@@ -198,22 +198,22 @@ static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;
-//               <must be read   >: data1 data1[0][array]
+//               <must be read   >: data1 data1[0][.array]
 //               <must be written>: psrc1
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
-//               <must be read   >: data2 data2[0][array]
+//               <must be read   >: data2 data2[0][.array]
 //               <must be written>: psrc2
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
-//               <must be read   >: datdest datdest[0][array]
+//               <must be read   >: datdest datdest[0][.array]
 //               <must be written>: pdest
    fgINT32 *pdest = (fgINT32 *) datdest->array;
    fgINT32 v1;
    fgINT32 v2;
    fgINT32 result;
-//               <must be read   >: datdest datdest[0][spp]
+//               <must be read   >: datdest datdest[0][.spp]
 //               <must be written>: spp
    int spp = datdest->spp;
-//               <must be read   >: datdest datdest[0][length] spp
+//               <must be read   >: datdest datdest[0][.length] spp
 //               <must be written>: length
    int length = datdest->length*spp;
 //               <must be read   >: length
@@ -236,32 +236,33 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    }
    return;
 }
-//               <may be read    >: data1[0][array][*] 
-//                                  data2[0][array][*]
-//               <may be written >: datdest[0][array][*]
-//               <must be read   >: data1 data1[0][array] data2 
-//                                  data2[0][array] datdest 
-//                                  datdest[0][array] datdest[0][spp] 
-//                                  datdest[0][length]
+//               <may be read    >: data1[0][.array][*] 
+//                                  data2[0][.array][*]
+//               <may be written >: datdest[0][.array][*]
+//               <must be read   >: data1 data1[0][.array] data2 
+//                                  data2[0][.array] datdest 
+//                                  datdest[0][.array] 
+//                                  datdest[0][.spp] 
+//                                  datdest[0][.length]
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;
-//               <must be read   >: data1 data1[0][array]
+//               <must be read   >: data1 data1[0][.array]
 //               <must be written>: psrc1
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
-//               <must be read   >: data2 data2[0][array]
+//               <must be read   >: data2 data2[0][.array]
 //               <must be written>: psrc2
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
-//               <must be read   >: datdest datdest[0][array]
+//               <must be read   >: datdest datdest[0][.array]
 //               <must be written>: pdest
    fgINT32 *pdest = (fgINT32 *) datdest->array;
    fgINT32 v1;
    fgINT32 v2;
    fgINT32 result;
-//               <must be read   >: datdest datdest[0][spp]
+//               <must be read   >: datdest datdest[0][.spp]
 //               <must be written>: spp
    int spp = datdest->spp;
-//               <must be read   >: datdest datdest[0][length] spp
+//               <must be read   >: datdest datdest[0][.length] spp
 //               <must be written>: length
    int length = datdest->length*spp;
 //               <may be read    >: j pdest psrc1 psrc1[*] psrc2 

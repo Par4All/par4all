@@ -1,0 +1,14 @@
+delete main02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main02 main02.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c main02.database/Src/main02.f90
+shell rm *.o
+
+close
+quit

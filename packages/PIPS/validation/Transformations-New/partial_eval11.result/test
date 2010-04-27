@@ -1,0 +1,45 @@
+
+"MAIN" file
+
+      PROGRAM MAIN
+
+      I = 10                                                            0003
+      J = 0                                                             0004
+
+      CALL FX(I, J)                                                     0006
+c
+      END
+
+"MAIN" file with preconditions
+
+
+C  P() {}
+
+      PROGRAM MAIN
+
+C  P() {}
+
+
+      I = 10                                                            0003
+
+C  P(I) {I==10}
+
+      J = 0                                                             0004
+
+C  P(I,J) {I==10, J==0}
+
+
+      CALL FX(I, J)                                                     0006
+c
+      END
+
+"MAIN" file after partial evaluation
+
+      PROGRAM MAIN
+
+      I = 10                                                            0003
+      J = 0                                                             0004
+
+      CALL FX(10, J)                                                    0006
+c
+      END

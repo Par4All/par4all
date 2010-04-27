@@ -28,8 +28,8 @@ C     Check tiling: use integer loop bounds, mutiple of the tile size
       DO I_t = 0, 2                                                     0007
          DO J_t = 0, 1
 
-            DO I = 1+5*I_t, 5+5*I_t                                     0007
-               DO J = 1+5*J_t, 5+5*J_t                                  0008
+            DO I = 5*I_t+1, 5*I_t+5                                     0007
+               DO J = 5*J_t+1, 5*J_t+5                                  0008
                   X(I,J) = FLOAT(I+J)                                   0009
 200               CONTINUE                                              0010
                ENDDO

@@ -71,12 +71,11 @@ Dependence graph
 	17 --> 18 with conflicts
 		from <k-W-MUST> to <k-R-MUST>
 	10 --> 10 with conflicts
-		from <j-R-MUST> to <j-W-MUST> at levels  1
-
-	10 --> 10 with conflicts
 		from <j-W-MUST> to <j-W-MUST> at levels  1
 
 		from <j-W-MUST> to <j-R-MUST> at levels  1
+
+		from <j-R-MUST> to <j-W-MUST> at levels  1
 
 	07 --> 10 with conflicts
 		from <j-W-MUST> to <j-W-MUST>
@@ -94,7 +93,7 @@ Source code with transformers
 int main()
 {
 
-//  T() {}
+//  T(i,j,k) {}
 
    int i, j, k;                                                         /*0003*/
 
@@ -150,35 +149,35 @@ int main()
 
    int i, j, k;                                                         /*0003*/
 
-//  P() {}
+//  P(i,j,k) {}
 
    int a[500];                                                          /*0004*/
 
-//  P() {}
+//  P(i,j,k) {}
 
 
    i = 0;                                                               /*0006*/
 
-//  P(i) {i==0}
+//  P(i,j,k) {i==0}
 
    j = 1;                                                               /*0007*/
 
-//  P(i,j) {i==0, j==1}
+//  P(i,j,k) {i==0, j==1}
 
 
    for(i = 0; i <= 499; i += 1) {
 
-//  P(i,j) {i==j-1, 0<=i, i<=499}
+//  P(i,j,k) {i==j-1, 0<=i, i<=499}
 
       j++;                                                              /*0010*/
 
-//  P(i,j) {i==j-2, 0<=i, i<=499}
+//  P(i,j,k) {i==j-2, 0<=i, i<=499}
 
       // Cumulated effects should be a[i] here and not a[*]
       a[i] = i;                                                         /*0012*/
    }
 
-//  P(i,j) {i==500, j==501}
+//  P(i,j,k) {i==500, j==501}
 
    /* We would have j==501 in the preconditions here... if we'd use
       // the proper activate and properties: the fast analysis exclude
@@ -198,6 +197,45 @@ unknown[unknown] (parse_properties) property SEMANTICS_FLOW_SENSITIVE redefined
 unknown[unknown] (parse_properties) property COMPUTE_ALL_DEPENDENCES redefined
 unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT redefined
 unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
+ATOMIC_CHAINS[main] (references_must_conflict_p) Not completely implemented yet. Conservative under approximation is made
 INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return

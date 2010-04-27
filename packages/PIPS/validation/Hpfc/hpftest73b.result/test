@@ -11,15 +11,15 @@
             IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
-                     T LID = -2+2*PSIp1+PSIp2
+                     T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                         CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                         LAZY SEND = .FALSE.
-                        DO LALPHA1 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp2 = -255+256*PSI1, 256*PSI1
-                              LALPHA2 = 510+2*LALPHAp2-512*PSI1+PSIp2
-                              LALPHAp1 = 510+2*LALPHA1+PSI2-512*PSIp1
+                        DO LALPHA1 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp2 = 256*PSI1-255, 256*PSI1
+                              LALPHA2 = 2*LALPHAp2-512*PSI1+PSIp2+510
+                              LALPHAp1 = 2*LALPHA1+PSI2-512*PSIp1+510
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL4 BUFF(BUF INDEX) = A_1(
      &                        LALPHA1,LALPHA2)
@@ -42,14 +42,14 @@
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
-                     T LID = -2+2*PSI1+PSI2
+                     T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                         LAZY RECV = .TRUE.
-                        DO LALPHA1 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp2 = -255+256*PSI1, 256*PSI1
-                              LALPHA2 = 510+2*LALPHAp2-512*PSI1+PSIp2
-                              LALPHAp1 = 510+2*LALPHA1+PSI2-512*PSIp1
+                        DO LALPHA1 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp2 = 256*PSI1-255, 256*PSI1
+                              LALPHA2 = 2*LALPHAp2-512*PSI1+PSIp2+510
+                              LALPHAp1 = 2*LALPHA1+PSI2-512*PSIp1+510
                               IF (LAZY RECV) THEN
                                  CALL pvmfrecv(NODE TIDS(T LID), 
      &                           RECV CHANNELS(T LID), HPFC BUFID)
@@ -64,10 +64,10 @@
                         ENDDO
                      ELSE
 ! - lazy copying
-                        DO LALPHA1 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp2 = -255+256*PSI1, 256*PSI1
-                              LALPHA2 = 510+2*LALPHAp2-512*PSI1+PSIp2
-                              LALPHAp1 = 510+2*LALPHA1+PSI2-512*PSIp1
+                        DO LALPHA1 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp2 = 256*PSI1-255, 256*PSI1
+                              LALPHA2 = 2*LALPHAp2-512*PSI1+PSIp2+510
+                              LALPHAp1 = 2*LALPHA1+PSI2-512*PSIp1+510
                               A(LALPHAp1,LALPHAp2) = A_1(LALPHA1,
      &                        LALPHA2)
                            ENDDO
@@ -97,15 +97,15 @@
             IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
-                     T LID = -2+2*PSIp1+PSIp2
+                     T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                         CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                         LAZY SEND = .FALSE.
-                        DO LALPHA2 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp1 = -255+256*PSI1, 256*PSI1
-                              LALPHA1 = 510+2*LALPHAp1-512*PSI1+PSIp2
-                              LALPHAp2 = 510+2*LALPHA2+PSI2-512*PSIp1
+                        DO LALPHA2 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp1 = 256*PSI1-255, 256*PSI1
+                              LALPHA1 = 2*LALPHAp1-512*PSI1+PSIp2+510
+                              LALPHAp2 = 2*LALPHA2+PSI2-512*PSIp1+510
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1,
      &                        LALPHA2)
@@ -128,14 +128,14 @@
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
-                     T LID = -2+2*PSI1+PSI2
+                     T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                         LAZY RECV = .TRUE.
-                        DO LALPHA2 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp1 = -255+256*PSI1, 256*PSI1
-                              LALPHA1 = 510+2*LALPHAp1-512*PSI1+PSIp2
-                              LALPHAp2 = 510+2*LALPHA2+PSI2-512*PSIp1
+                        DO LALPHA2 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp1 = 256*PSI1-255, 256*PSI1
+                              LALPHA1 = 2*LALPHAp1-512*PSI1+PSIp2+510
+                              LALPHAp2 = 2*LALPHA2+PSI2-512*PSIp1+510
                               IF (LAZY RECV) THEN
                                  CALL pvmfrecv(NODE TIDS(T LID), 
      &                           RECV CHANNELS(T LID), HPFC BUFID)
@@ -150,10 +150,10 @@
                         ENDDO
                      ELSE
 ! - lazy copying
-                        DO LALPHA2 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp1 = -255+256*PSI1, 256*PSI1
-                              LALPHA1 = 510+2*LALPHAp1-512*PSI1+PSIp2
-                              LALPHAp2 = 510+2*LALPHA2+PSI2-512*PSIp1
+                        DO LALPHA2 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp1 = 256*PSI1-255, 256*PSI1
+                              LALPHA1 = 2*LALPHAp1-512*PSI1+PSIp2+510
+                              LALPHAp2 = 2*LALPHA2+PSI2-512*PSIp1+510
                               A_1(LALPHAp1,LALPHAp2) = A(LALPHA1,
      &                        LALPHA2)
                            ENDDO
@@ -183,15 +183,15 @@
             IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
-                     T LID = -2+2*PSIp1+PSIp2
+                     T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                         CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                         LAZY SEND = .FALSE.
-                        DO LALPHA1 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp2 = -255+256*PSI1, 256*PSI1
-                              LALPHA2 = 510+2*LALPHAp2-512*PSI1+PSIp2
-                              LALPHAp1 = 510+2*LALPHA1+PSI2-512*PSIp1
+                        DO LALPHA1 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp2 = 256*PSI1-255, 256*PSI1
+                              LALPHA2 = 2*LALPHAp2-512*PSI1+PSIp2+510
+                              LALPHAp1 = 2*LALPHA1+PSI2-512*PSIp1+510
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL4 BUFF(BUF INDEX) = B_2(
      &                        LALPHA1,LALPHA2)
@@ -214,14 +214,14 @@
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
-                     T LID = -2+2*PSI1+PSI2
+                     T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                         LAZY RECV = .TRUE.
-                        DO LALPHA1 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp2 = -255+256*PSI1, 256*PSI1
-                              LALPHA2 = 510+2*LALPHAp2-512*PSI1+PSIp2
-                              LALPHAp1 = 510+2*LALPHA1+PSI2-512*PSIp1
+                        DO LALPHA1 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp2 = 256*PSI1-255, 256*PSI1
+                              LALPHA2 = 2*LALPHAp2-512*PSI1+PSIp2+510
+                              LALPHAp1 = 2*LALPHA1+PSI2-512*PSIp1+510
                               IF (LAZY RECV) THEN
                                  CALL pvmfrecv(NODE TIDS(T LID), 
      &                           RECV CHANNELS(T LID), HPFC BUFID)
@@ -236,10 +236,10 @@
                         ENDDO
                      ELSE
 ! - lazy copying
-                        DO LALPHA1 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp2 = -255+256*PSI1, 256*PSI1
-                              LALPHA2 = 510+2*LALPHAp2-512*PSI1+PSIp2
-                              LALPHAp1 = 510+2*LALPHA1+PSI2-512*PSIp1
+                        DO LALPHA1 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp2 = 256*PSI1-255, 256*PSI1
+                              LALPHA2 = 2*LALPHAp2-512*PSI1+PSIp2+510
+                              LALPHAp1 = 2*LALPHA1+PSI2-512*PSIp1+510
                               B_1(LALPHAp1,LALPHAp2) = B_2(LALPHA1,
      &                        LALPHA2)
                            ENDDO
@@ -269,15 +269,15 @@
             IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
-                     T LID = -2+2*PSIp1+PSIp2
+                     T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                         CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                         LAZY SEND = .FALSE.
-                        DO LALPHA2 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp1 = -255+256*PSI1, 256*PSI1
-                              LALPHA1 = 510+2*LALPHAp1-512*PSI1+PSIp2
-                              LALPHAp2 = 510+2*LALPHA2+PSI2-512*PSIp1
+                        DO LALPHA2 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp1 = 256*PSI1-255, 256*PSI1
+                              LALPHA1 = 2*LALPHAp1-512*PSI1+PSIp2+510
+                              LALPHAp2 = 2*LALPHA2+PSI2-512*PSIp1+510
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL4 BUFF(BUF INDEX) = B_1(
      &                        LALPHA1,LALPHA2)
@@ -300,14 +300,14 @@
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
-                     T LID = -2+2*PSI1+PSI2
+                     T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                         LAZY RECV = .TRUE.
-                        DO LALPHA2 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp1 = -255+256*PSI1, 256*PSI1
-                              LALPHA1 = 510+2*LALPHAp1-512*PSI1+PSIp2
-                              LALPHAp2 = 510+2*LALPHA2+PSI2-512*PSIp1
+                        DO LALPHA2 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp1 = 256*PSI1-255, 256*PSI1
+                              LALPHA1 = 2*LALPHAp1-512*PSI1+PSIp2+510
+                              LALPHAp2 = 2*LALPHA2+PSI2-512*PSIp1+510
                               IF (LAZY RECV) THEN
                                  CALL pvmfrecv(NODE TIDS(T LID), 
      &                           RECV CHANNELS(T LID), HPFC BUFID)
@@ -322,10 +322,10 @@
                         ENDDO
                      ELSE
 ! - lazy copying
-                        DO LALPHA2 = -255+256*PSIp1, 256*PSIp1
-                           DO LALPHAp1 = -255+256*PSI1, 256*PSI1
-                              LALPHA1 = 510+2*LALPHAp1-512*PSI1+PSIp2
-                              LALPHAp2 = 510+2*LALPHA2+PSI2-512*PSIp1
+                        DO LALPHA2 = 256*PSIp1-255, 256*PSIp1
+                           DO LALPHAp1 = 256*PSI1-255, 256*PSI1
+                              LALPHA1 = 2*LALPHAp1-512*PSI1+PSIp2+510
+                              LALPHAp2 = 2*LALPHA2+PSI2-512*PSIp1+510
                               B_2(LALPHAp1,LALPHAp2) = B_1(LALPHA1,
      &                        LALPHA2)
                            ENDDO
@@ -355,14 +355,14 @@
             IF (MY LID.LE.4) THEN
                PSIp1 = PSI1
                DO PSIp2 = 1, 2
-                  T LID = -2+2*PSIp1+PSIp2
+                  T LID = 2*PSIp1+PSIp2-2
                   IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                      CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                      LAZY SEND = .FALSE.
                      DO LALPHA1 = 1, 512
-                        DO LALPHAp2 = -255+256*PSI2, 256*PSI2
-                           LALPHA2 = 510+2*LALPHAp2-512*PSI2+PSIp2
+                        DO LALPHAp2 = 256*PSI2-255, 256*PSI2
+                           LALPHA2 = 2*LALPHAp2-512*PSI2+PSIp2+510
                            LALPHAp1 = LALPHA1
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,
@@ -384,13 +384,13 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp1
                DO PSI2 = 1, 2
-                  T LID = -2+2*PSI1+PSI2
+                  T LID = 2*PSI1+PSI2-2
                   IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                      LAZY RECV = .TRUE.
                      DO LALPHA1 = 1, 512
-                        DO LALPHAp2 = -255+256*PSI2, 256*PSI2
-                           LALPHA2 = 510+2*LALPHAp2-512*PSI2+PSIp2
+                        DO LALPHAp2 = 256*PSI2-255, 256*PSI2
+                           LALPHA2 = 2*LALPHAp2-512*PSI2+PSIp2+510
                            LALPHAp1 = LALPHA1
                            IF (LAZY RECV) THEN
                               CALL pvmfrecv(NODE TIDS(T LID), 
@@ -407,8 +407,8 @@
                   ELSE
 ! - lazy copying
                      DO LALPHA1 = 1, 512
-                        DO LALPHAp2 = -255+256*PSI2, 256*PSI2
-                           LALPHA2 = 510+2*LALPHAp2-512*PSI2+PSIp2
+                        DO LALPHAp2 = 256*PSI2-255, 256*PSI2
+                           LALPHA2 = 2*LALPHAp2-512*PSI2+PSIp2+510
                            LALPHAp1 = LALPHA1
                            B_1(LALPHAp1,LALPHAp2) = B(LALPHA1,LALPHA2
      &                     )

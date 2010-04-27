@@ -1,0 +1,14 @@
+delete main03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main03 main03.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c main03.database/Src/main03.f90
+shell rm *.o
+
+close
+quit

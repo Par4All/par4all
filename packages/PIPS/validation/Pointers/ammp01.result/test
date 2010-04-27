@@ -38,9 +38,7 @@ Proper effects for "a_m_serial"
 
 ATOM * a_m_serial(int serial)
 {
-//               <may be written >: ap
    static ATOM *ap = (void *) 0;
-//               <may be written >: lastmatched
    static ATOM *lastmatched = (void *) 0;
    int i, n, a_number();
 //               <must be read   >: atomUPDATE
@@ -120,24 +118,24 @@ ATOM * a_m_serial(int serial)
 //  points to = {}
 
    ap = first;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    if (ap==(void *) 0) 
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       return (void *) 0;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    if (lastmatched==(void *) 0) 
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       lastmatched = first;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
 
    if (serial==lastmatched->serial) 
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       return lastmatched;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    if (serial>lastmatched->serial) 
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       ap = lastmatched;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    for(i = 0; i <= n-1; i += 1) {
 //  points to = {}
       if (ap->serial==serial) {
@@ -154,7 +152,7 @@ ATOM * a_m_serial(int serial)
 //  points to = {}
          ap = ap->next;
    }
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    return (void *) 0;
 }
 //  {}
@@ -166,22 +164,22 @@ ATOM * a_next(int flag)
    if (ap==(void *) 0) 
 //  points to = {}
       ap = first;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    if (ap==(void *) 0) 
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       return (void *) 0;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    if (flag<=0) {
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       ap = first;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       return ap;
    }
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    if (ap==ap->next) 
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       return (void *) 0;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    ap = ap->next;
 //  points to = {}
    return ap;
@@ -239,11 +237,11 @@ int activate(int i1, int i2)
    if (i2==0) {
 //  points to = {}
       ap = a_m_serial(i1);
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       if (ap!=(void *) 0) 
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
          ap->active = 1;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       return 0;
    }
 //  points to = {}
@@ -270,6 +268,6 @@ int activate(int i1, int i2)
 //  points to = {}
          ap->active = 1;
    }
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    return 0;
 }

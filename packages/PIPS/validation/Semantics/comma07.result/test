@@ -46,7 +46,7 @@ Transformers for "comma07"
 int comma07()
 {
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 

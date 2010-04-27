@@ -37,7 +37,8 @@ int main()
 //               <must be read   >: __IO_EFFECTS:LUNS[0]
 //               <must be written>: __IO_EFFECTS:LUNS[0]
       gets(name);
-//               <may be read    >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*] name[*] 
+//                                  pFile[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*] pFile[*]
 //               <must be read   >: n pFile
       fprintf(pFile, "Name %d %s\n", n, name);

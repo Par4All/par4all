@@ -1,6 +1,8 @@
-setproperty ABORT_ON_USER_ERROR TRUE
 delete partial_eval01
+setproperty ABORT_ON_USER_ERROR TRUE
 create partial_eval01 partial_eval01.c
+
+setproperty CONSTANT_PATH_EFFECTS TRUE
 
 echo
 echo Initial code
@@ -8,6 +10,38 @@ echo
 
 display PRINTED_FILE[duck]
 
+echo
+echo Initial code with proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Initial code with proper effects for "duck"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[duck]
+activate PRINT_CODE
+
+echo
+echo Initial code with preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Initial code with preconditions for "duck"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[duck]
+activate PRINT_CODE
+quit
 echo
 echo Code after array conversion
 echo

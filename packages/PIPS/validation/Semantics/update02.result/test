@@ -83,7 +83,7 @@ void update02()
 
    int i = 1;
 
-//  T() {}
+//  T(j) {}
 
    int j;
 
@@ -126,11 +126,11 @@ void update02()
 
    int i = 1;
 
-//  P() {i==1}
+//  P(i) {i==1}
 
    int j;
 
-//  P() {i==1}
+//  P(i,j) {i==1}
 
    
    //i = (i+= 2);

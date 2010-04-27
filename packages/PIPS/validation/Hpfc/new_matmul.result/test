@@ -11,16 +11,16 @@
             IF (MY LID.LE.4.AND.PSI2.EQ.PSI1) THEN
                DO TMP3 = 0, 1
                   PSIp1 = PSI2
-                  PSIp2 = 1+TMP3
-                  T LID = -2+2*PSIp1+PSIp2
+                  PSIp2 = TMP3+1
+                  T LID = 2*PSIp1+PSIp2-2
                   IF (MY LID.NE.T LID.AND..NOT.HPFC TWIN P(2, T LID)
      &            ) THEN
 ! - lazy sending
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO LALPHA2 = -4+5*PSIp2, 5*PSIp2
+                     DO LALPHA2 = 5*PSIp2-4, 5*PSIp2
                         DO LALPHA1 = 1, 5
-                           LALPHAp2 = 5+LALPHA2-5*PSIp2
+                           LALPHAp2 = LALPHA2-5*PSIp2+5
                            LALPHAp1 = LALPHA1
                            BUF INDEX = BUF INDEX+1
                            HPFC REAL8 BUFF(BUF INDEX) = A_1(LALPHA1,
@@ -47,17 +47,17 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp1
                PSI2 = PSIp1
-               TMP3 = -1+PSIp2
-               T LID = -2+2*PSI1+PSI2
+               TMP3 = PSIp2-1
+               T LID = 2*PSI1+PSI2-2
                IF (MY LID.NE.T LID.AND..NOT.HPFC TWIN P(2, T LID)
      &         ) THEN
 ! - lazy receiving
                   BUF INDEX = 0
                   RECEIVED NOT PERFORMED = .TRUE.
                   SIZE OF RECEIVED BUFFER = 0
-                  DO LALPHA2 = -4+5*PSIp2, 5*PSIp2
+                  DO LALPHA2 = 5*PSIp2-4, 5*PSIp2
                      DO LALPHA1 = 1, 5
-                        LALPHAp2 = 5+LALPHA2-5*PSIp2
+                        LALPHAp2 = LALPHA2-5*PSIp2+5
                         LALPHAp1 = LALPHA1
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
@@ -72,9 +72,9 @@
                   ENDDO
                ELSE
 ! - lazy copying
-                  DO LALPHA2 = -4+5*PSIp2, 5*PSIp2
+                  DO LALPHA2 = 5*PSIp2-4, 5*PSIp2
                      DO LALPHA1 = 1, 5
-                        LALPHAp2 = 5+LALPHA2-5*PSIp2
+                        LALPHAp2 = LALPHA2-5*PSIp2+5
                         LALPHAp1 = LALPHA1
                         A(LALPHAp1,LALPHAp2) = A_1(LALPHA1,LALPHA2)
                      ENDDO
@@ -101,13 +101,13 @@
             PSI2 = MY POS(2,1)
             IF (MY LID.LE.4) THEN
                PSIp1 = PSI1
-               T LID = -1+2*PSIp1
+               T LID = 2*PSIp1-1
 ! - lazy broadcasting
                BUF INDEX = 0
                SEND NOT INITIALIZED = .TRUE.
                DO LALPHA2 = 1, 5
                   DO LALPHA1 = 1, 5
-                     LALPHAp2 = -5+LALPHA2+5*PSI2
+                     LALPHAp2 = LALPHA2+5*PSI2-5
                      LALPHAp1 = LALPHA1
                      BUF INDEX = BUF INDEX+1
                      HPFC REAL8 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)
@@ -130,7 +130,7 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp1
                DO PSI2 = 1, 2
-                  T LID = -2+2*PSI1+PSI2
+                  T LID = 2*PSI1+PSI2-2
                   IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                      BUF INDEX = 0
@@ -138,7 +138,7 @@
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA2 = 1, 5
                         DO LALPHA1 = 1, 5
-                           LALPHAp2 = -5+LALPHA2+5*PSI2
+                           LALPHAp2 = LALPHA2+5*PSI2-5
                            LALPHAp1 = LALPHA1
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
@@ -155,7 +155,7 @@
 ! - lazy copying
                      DO LALPHA2 = 1, 5
                         DO LALPHA1 = 1, 5
-                           LALPHAp2 = -5+LALPHA2+5*PSI2
+                           LALPHAp2 = LALPHA2+5*PSI2-5
                            LALPHAp1 = LALPHA1
                            A_1(LALPHAp1,LALPHAp2) = A(LALPHA1,LALPHA2
      &                     )
@@ -183,19 +183,19 @@
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
             IF (MY LID.LE.4) THEN
-               DO TMP3 = 0, -1+PSI2
+               DO TMP3 = 0, PSI2-1
                   PSIp1 = PSI1
-                  DO PSIp2 = PSI2, 1+TMP3
-                     T LID = -2+2*PSIp1+PSIp2
+                  DO PSIp2 = PSI2, TMP3+1
+                     T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID.AND..NOT.HPFC TWIN P(1, 
      &               T LID)) THEN
 ! - lazy sending
                         BUF INDEX = 0
                         SEND NOT INITIALIZED = .TRUE.
                         DO LALPHA2 = 1, 5
-                           DO LALPHA1 = -4+5*PSIp1, 5*PSIp1
+                           DO LALPHA1 = 5*PSIp1-4, 5*PSIp1
                               LALPHAp2 = LALPHA2
-                              LALPHAp1 = 5+LALPHA1-5*PSIp1
+                              LALPHAp1 = LALPHA1-5*PSIp1+5
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL8 BUFF(BUF INDEX) = B_1(
      &                        LALPHA1,LALPHA2)
@@ -222,8 +222,8 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp1
                PSI2 = PSIp2
-               TMP3 = -1+PSIp2
-               T LID = -2+2*PSI1+PSI2
+               TMP3 = PSIp2-1
+               T LID = 2*PSI1+PSI2-2
                IF (MY LID.NE.T LID.AND..NOT.HPFC TWIN P(1, T LID)
      &         ) THEN
 ! - lazy receiving
@@ -231,9 +231,9 @@
                   RECEIVED NOT PERFORMED = .TRUE.
                   SIZE OF RECEIVED BUFFER = 0
                   DO LALPHA2 = 1, 5
-                     DO LALPHA1 = -4+5*PSIp1, 5*PSIp1
+                     DO LALPHA1 = 5*PSIp1-4, 5*PSIp1
                         LALPHAp2 = LALPHA2
-                        LALPHAp1 = 5+LALPHA1-5*PSIp1
+                        LALPHAp1 = LALPHA1-5*PSIp1+5
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
                            RECEIVED NOT PERFORMED = .TRUE.
@@ -248,9 +248,9 @@
                ELSE
 ! - lazy copying
                   DO LALPHA2 = 1, 5
-                     DO LALPHA1 = -4+5*PSIp1, 5*PSIp1
+                     DO LALPHA1 = 5*PSIp1-4, 5*PSIp1
                         LALPHAp2 = LALPHA2
-                        LALPHAp1 = 5+LALPHA1-5*PSIp1
+                        LALPHAp1 = LALPHA1-5*PSIp1+5
                         B(LALPHAp1,LALPHAp2) = B_1(LALPHA1,LALPHA2)
                      ENDDO
                   ENDDO
@@ -283,7 +283,7 @@
                DO LALPHA2 = 1, 5
                   DO LALPHA1 = 1, 5
                      LALPHAp2 = LALPHA2
-                     LALPHAp1 = -5+LALPHA1+5*PSI1
+                     LALPHAp1 = LALPHA1+5*PSI1-5
                      BUF INDEX = BUF INDEX+1
                      HPFC REAL8 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
                      IF (BUF INDEX.EQ.HPFC REAL8 BUFF SIZE) THEN
@@ -305,7 +305,7 @@
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   PSI2 = PSIp2
-                  T LID = -2+2*PSI1+PSI2
+                  T LID = 2*PSI1+PSI2-2
                   IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                      BUF INDEX = 0
@@ -314,7 +314,7 @@
                      DO LALPHA2 = 1, 5
                         DO LALPHA1 = 1, 5
                            LALPHAp2 = LALPHA2
-                           LALPHAp1 = -5+LALPHA1+5*PSI1
+                           LALPHAp1 = LALPHA1+5*PSI1-5
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                     ) THEN
                               RECEIVED NOT PERFORMED = .TRUE.
@@ -331,7 +331,7 @@
                      DO LALPHA2 = 1, 5
                         DO LALPHA1 = 1, 5
                            LALPHAp2 = LALPHA2
-                           LALPHAp1 = -5+LALPHA1+5*PSI1
+                           LALPHAp1 = LALPHA1+5*PSI1-5
                            B_1(LALPHAp1,LALPHAp2) = B(LALPHA1,LALPHA2
      &                     )
                         ENDDO
@@ -380,13 +380,13 @@ c
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
             SIZE OF RECEIVED BUFFER = 0
-            T LID = -2+2*PSI1+PSI2
+            T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL8 BUFUPK
-            DO ALPHA2 = -4+5*PSI2, 5*PSI2
-               DO ALPHA1 = -4+5*PSI1, 5*PSI1
-                  LALPHA1 = 5+ALPHA1-5*PSI1
-                  LALPHA2 = 5+ALPHA2-5*PSI2
+            DO ALPHA2 = 5*PSI2-4, 5*PSI2
+               DO ALPHA1 = 5*PSI1-4, 5*PSI1
+                  LALPHA1 = ALPHA1-5*PSI1+5
+                  LALPHA2 = ALPHA2-5*PSI2+5
                   BUF INDEX = BUF INDEX+1
                   C(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
                ENDDO
@@ -422,13 +422,13 @@ c
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
       SIZE OF RECEIVED BUFFER = 0
-      T LID = -2+2*PSI1+PSI2
+      T LID = 2*PSI1+PSI2-2
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL8 BUFUPK
       ALPHA2 = 5
       ALPHA1 = 5
-      LALPHA1 = 5+ALPHA1-5*PSI1
-      LALPHA2 = 5+ALPHA2-5*PSI2
+      LALPHA1 = ALPHA1-5*PSI1+5
+      LALPHA2 = ALPHA2-5*PSI2+5
       BUF INDEX = BUF INDEX+1
       B(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
 ! end of collect
@@ -438,13 +438,13 @@ c
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
       SIZE OF RECEIVED BUFFER = 0
-      T LID = -2+2*PSI1+PSI2
+      T LID = 2*PSI1+PSI2-2
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL8 BUFUPK
       ALPHA2 = 5
       ALPHA1 = 5
-      LALPHA1 = 5+ALPHA1-5*PSI1
-      LALPHA2 = 5+ALPHA2-5*PSI2
+      LALPHA1 = ALPHA1-5*PSI1+5
+      LALPHA2 = ALPHA2-5*PSI2+5
       BUF INDEX = BUF INDEX+1
       A(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
 ! end of collect
@@ -689,10 +689,10 @@ c
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA2 = -4+5*PSI2, 5*PSI2
-         DO ALPHA1 = -4+5*PSI1, 5*PSI1
-            LALPHA1 = 5+ALPHA1-5*PSI1
-            LALPHA2 = 5+ALPHA2-5*PSI2
+      DO ALPHA2 = 5*PSI2-4, 5*PSI2
+         DO ALPHA1 = 5*PSI1-4, 5*PSI1
+            LALPHA1 = ALPHA1-5*PSI1+5
+            LALPHA2 = ALPHA2-5*PSI2+5
             BUF INDEX = BUF INDEX+1
             HPFC REAL8 BUFF(BUF INDEX) = C(LALPHA1,LALPHA2)
          ENDDO
@@ -738,8 +738,8 @@ c
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 5
          ALPHA1 = 5
-         LALPHA1 = 5+ALPHA1-5*PSI1
-         LALPHA2 = 5+ALPHA2-5*PSI2
+         LALPHA1 = ALPHA1-5*PSI1+5
+         LALPHA2 = ALPHA2-5*PSI2+5
          BUF INDEX = BUF INDEX+1
          HPFC REAL8 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
          CALL HPFC REAL8 BUFPCK
@@ -754,8 +754,8 @@ c
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 5
          ALPHA1 = 5
-         LALPHA1 = 5+ALPHA1-5*PSI1
-         LALPHA2 = 5+ALPHA2-5*PSI2
+         LALPHA1 = ALPHA1-5*PSI1+5
+         LALPHA2 = ALPHA2-5*PSI2+5
          BUF INDEX = BUF INDEX+1
          HPFC REAL8 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)
          CALL HPFC REAL8 BUFPCK

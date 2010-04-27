@@ -1,0 +1,39 @@
+delete partial_eval14
+
+# Not compatible with commpile and execute shell commands below
+#setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval14 partial_eval14.c
+
+echo
+echo "main" file
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Result before partial evaluation
+echo
+
+apply UNSPLIT
+shell (cd partial_eval14.database/Src; gcc partial_eval14.c;./a.out)
+
+apply PARTIAL_EVAL[main]
+
+echo
+echo "main" file after partial evaluation
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+echo
+echo Result after partial evaluation
+echo
+
+apply UNSPLIT
+shell (cd partial_eval14.database/Src; gcc partial_eval14.c;./a.out)
+
+close
+delete partial_eval14
+quit

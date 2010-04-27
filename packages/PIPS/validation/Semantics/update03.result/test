@@ -86,7 +86,7 @@ void update03()
 
    int i = 1;
 
-//  P() {i==1}
+//  P(i) {i==1}
 
    
    /* This does not make much sense, just like "i = i;". */

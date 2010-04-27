@@ -11,7 +11,7 @@ void beatrice01()
 
    // BEGIN BLOCK
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 
@@ -70,7 +70,7 @@ void beatrice01()
 
    int i, j;
 
-//  P() {}
+//  P(i,j) {}
 
 
    for(i = 0; i <= 63; i += 1)

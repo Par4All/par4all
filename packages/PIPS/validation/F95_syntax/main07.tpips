@@ -1,0 +1,14 @@
+delete main07
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main07 main07.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c main07.database/Src/main07.f90
+shell rm *.o
+
+close
+quit

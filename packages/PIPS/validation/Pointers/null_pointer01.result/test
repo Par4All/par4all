@@ -39,7 +39,7 @@ int main()
    *p = 1;
 //  points to = {}
    *q = &i;
-//  points to = {}
+//  {(q[0],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
 
    return 0;
    // END BLOCK

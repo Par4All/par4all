@@ -8,7 +8,7 @@ int main()
 {
 
 
-//  T() {}
+//  T(lock,x,y,z) {}
 
    int x, y, z, lock;
 
@@ -92,20 +92,20 @@ int main()
 
    int x, y, z, lock;
 
-//  P() {}
+//  P(lock,x,y,z) {}
 
 
    x = 1;
 
-//  P(x) {x==1}
+//  P(lock,x,y,z) {x==1}
 
    lock = 0;
 
-//  P(lock,x) {lock==0, x==1}
+//  P(lock,x,y,z) {lock==0, x==1}
 
    y = 0;
 
-//  P(lock,x,y) {lock==0, x==1, y==0}
+//  P(lock,x,y,z) {lock==0, x==1, y==0}
 
    
    

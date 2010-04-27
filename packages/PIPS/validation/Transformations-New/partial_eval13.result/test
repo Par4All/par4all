@@ -1,0 +1,54 @@
+
+"main" file
+
+C bug seen in Transformations/eval.c: modulo evaluatiaon for negative arguments
+
+      PROGRAM MAIN
+
+      I = MOD(3, 2)                                                     0005
+      PRINT *, I, "must be 1"                                           0006
+
+      I = MOD(-3, 2)                                                    0008
+      PRINT *, I, "must be -1"                                          0009
+
+      I = MOD(3, -2)                                                    0011
+      PRINT *, I, "must be 1"                                           0012
+
+      I = MOD(-3, -2)                                                   0014
+      PRINT *, I, "must be -1"                                          0015
+
+      END
+
+Result before partial evaluation
+
+           1 must be 1
+          -1 must be -1
+           1 must be 1
+          -1 must be -1
+
+"main" file after partial evaluation
+
+C bug seen in Transformations/eval.c: modulo evaluatiaon for negative arguments
+
+      PROGRAM MAIN
+
+      I = 1                                                             0005
+      PRINT *, 1, "must be 1"                                           0006
+
+      I = -1                                                            0008
+      PRINT *, -1, "must be -1"                                         0009
+
+      I = 1                                                             0011
+      PRINT *, 1, "must be 1"                                           0012
+
+      I = -1                                                            0014
+      PRINT *, -1, "must be -1"                                         0015
+
+      END
+
+Result after partial evaluation
+
+           1 must be 1
+          -1 must be -1
+           1 must be 1
+          -1 must be -1

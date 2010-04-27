@@ -21,7 +21,10 @@ CoarseGrainParallelization
 SAC
 PHRASE
 Callgraph
+# Transformations, using PIPS initial default options
 Transformations
+# Same kinds of validations, but using 2009 PIPS default option
+Transformations-New
 DemoStd
 Hyperplane
 Icfg

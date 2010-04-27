@@ -80,19 +80,19 @@ void f3(int n_ptrs, int f4_after, ...)
 //  points to = {}
          va_copy(ap_save, ap);
    }
-//  points to = {}
+//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    va_end(ap);
-//  points to = {}
+//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    f2(n_ptrs, array);
-//  points to = {}
+//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    // Now process the saved copy.
    n_ptrs -= f4_after;
-//  points to = {}
+//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-//  points to = {}
+//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
       array[ptr_no] = va_arg(ap_save, char *);
-//  points to = {}
+//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    va_end(ap_save);
-//  points to = {}
+//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    f4(n_ptrs, array);
 }

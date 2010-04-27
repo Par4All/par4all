@@ -8,15 +8,15 @@
 ! remapping A[2]: A_1[1] -> A[2]
             PSI1 = MY POS(1,1)
             IF (MY LID.LE.2) THEN
-               DO PSIp1 = (-3+8*PSI1)/5, 2
+               DO PSIp1 = (8*PSI1-3)/5, 2
                   T LID = PSIp1
                   IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO LALPHA1 = MAX(1, 4-8*PSI1+5*PSIp1), MIN(8, 8-
-     &               8*PSI1+5*PSIp1)
-                        LALPHAp1 = -3+LALPHA1+8*PSI1-5*PSIp1
+                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(8, 
+     &               -8*PSI1+5*PSIp1+8)
+                        LALPHAp1 = LALPHA1+8*PSI1-5*PSIp1-3
                         BUF INDEX = BUF INDEX+1
                         HPFC INTEGER4 BUFF(BUF INDEX) = A_1(LALPHA1)
                         IF (BUF INDEX.EQ.HPFC INTEGER4 BUFF SIZE
@@ -37,16 +37,16 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             IF (MY LID.LE.2) THEN
-               DO PSI1 = 1, (7+5*PSIp1)/8
+               DO PSI1 = 1, (5*PSIp1+7)/8
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                      BUF INDEX = 0
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
-                     DO LALPHA1 = MAX(1, 4-8*PSI1+5*PSIp1), MIN(8, 8-
-     &               8*PSI1+5*PSIp1)
-                        LALPHAp1 = -3+LALPHA1+8*PSI1-5*PSIp1
+                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(8, 
+     &               -8*PSI1+5*PSIp1+8)
+                        LALPHAp1 = LALPHA1+8*PSI1-5*PSIp1-3
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
                            RECEIVED NOT PERFORMED = .TRUE.
@@ -58,9 +58,9 @@
                      ENDDO
                   ELSE
 ! - lazy copying
-                     DO LALPHA1 = MAX(1, 4-8*PSI1+5*PSIp1), MIN(8, 8-
-     &               8*PSI1+5*PSIp1)
-                        LALPHAp1 = -3+LALPHA1+8*PSI1-5*PSIp1
+                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(8, 
+     &               -8*PSI1+5*PSIp1+8)
+                        LALPHAp1 = LALPHA1+8*PSI1-5*PSIp1-3
                         A(LALPHAp1) = A_1(LALPHA1)
                      ENDDO
                   ENDIF

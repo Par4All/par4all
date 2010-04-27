@@ -1,39 +1,30 @@
 delete array03
+setproperty ABORT_ON_USER_ERROR TRUE
 create array03 array03.c
 
 #echo Select some options to deal with the C Language:
 #echo Parse as C:
-setenv PIPS_CPP="cpp -C"
-activate C_PARSER
-#echo Prettyprint the source as C, of course
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
 setproperty ALIASING_ACROSS_TYPES TRUE
 
-#echo Select the most precise analysis:
-activate MUST_REGIONS
-activate TRANSFORMERS_INTER_FULL
-activate INTERPROCEDURAL_SUMMARY_PRECONDITION
-activate PRECONDITIONS_INTER_FULL
-activate REGION_CHAINS
+
 
 activate PRINT_CODE_POINTS_TO_LIST
 
 echo
 echo POINTS TO for "foo"
 echo
-display PRINTED_FILE[foo]
+display PRINTED_FILE[%ALLFUNC]
 
-echo
-echo POINTS TO for "foo2"
-echo
-display PRINTED_FILE[foo2]
+#echo
+#echo POINTS TO for "foo2"
+#echo
+#display PRINTED_FILE[foo2]
 
-echo
-echo POINTS TO for "foo3"
-echo
-display PRINTED_FILE[foo3]
+#echo
+#echo POINTS TO for "foo3"
+#echo
+#display PRINTED_FILE[foo3]
 
 
 close

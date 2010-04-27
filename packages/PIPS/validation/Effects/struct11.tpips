@@ -1,0 +1,50 @@
+delete struct11
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create struct11 struct11.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+echo
+echo Proper pointer effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[foo1]
+display PRINTED_FILE[foo2]
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated pointer effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[foo1]
+display PRINTED_FILE[foo2]
+display PRINTED_FILE[main]
+
+# quit
+
+
+echo
+echo Printed files with pointer regions
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_POINTER_REGIONS
+display PRINTED_FILE[foo1]
+display PRINTED_FILE[foo2]
+display PRINTED_FILE[main]
+
+close
+delete struct11
+quit
