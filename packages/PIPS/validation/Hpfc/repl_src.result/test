@@ -11,17 +11,17 @@
             PSI3 = MY POS(3,2)
             IF (MY LID.LE.8) THEN
                DO TMP3 = 0, 1
-                  DO PSIp1 = -2+PSI1+2*PSI3+4*TMP3, MIN(5, -2+PSI1+2*
-     &            PSI3+4*TMP3)
-                     T LID = -1+2*PSIp1
+                  DO PSIp1 = PSI1+2*PSI3+4*TMP3-2, MIN(5, PSI1+2*PSI3
+     &            +4*TMP3-2)
+                     T LID = 2*PSIp1-1
 ! - lazy broadcasting
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     GAMMAp1 = -1+PSI2
-                     DO LALPHA1 = 9+10*GAMMAp1-10*PSI2+2*PSIp1, 10+10
-     &               *GAMMAp1-10*PSI2+2*PSIp1
-                        LALPHAp1 = -8-8*GAMMAp1+LALPHA1+10*PSI2-2*
-     &                  PSIp1
+                     GAMMAp1 = PSI2-1
+                     DO LALPHA1 = 10*GAMMAp1-10*PSI2+2*PSIp1+9, 10*
+     &               GAMMAp1-10*PSI2+2*PSIp1+10
+                        LALPHAp1 = -8*GAMMAp1+LALPHA1+10*PSI2-2*PSIp1
+     &                  -8
                         BUF INDEX = BUF INDEX+1
                         HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
                         IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
@@ -45,20 +45,20 @@
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      DO PSI3 = 1, 2
-                        DO TMP3 = (5-PSI1-2*PSI3+PSIp1)/4, 
-     &                  HPFC DIVIDE(2-PSI1-2*PSI3+PSIp1, 4)
-                           T LID = -6+4*PSI1+2*PSI2+PSI3
+                        DO TMP3 = (-PSI1-2*PSI3+PSIp1+5)/4, 
+     &                  HPFC DIVIDE(-PSI1-2*PSI3+PSIp1+2, 4)
+                           T LID = 4*PSI1+2*PSI2+PSI3-6
                            IF (MY LID.NE.T LID.AND..NOT.HPFC TWIN P(2
      &                     , T LID)) THEN
 ! - lazy receiving
                               BUF INDEX = 0
                               RECEIVED NOT PERFORMED = .TRUE.
                               SIZE OF RECEIVED BUFFER = 0
-                              GAMMAp1 = -1+PSI2
-                              DO LALPHA1 = 9+10*GAMMAp1-10*PSI2+2*
-     &                        PSIp1, 10+10*GAMMAp1-10*PSI2+2*PSIp1
-                                 LALPHAp1 = -8-8*GAMMAp1+LALPHA1+10*
-     &                           PSI2-2*PSIp1
+                              GAMMAp1 = PSI2-1
+                              DO LALPHA1 = 10*GAMMAp1-10*PSI2+2*PSIp1
+     &                        +9, 10*GAMMAp1-10*PSI2+2*PSIp1+10
+                                 LALPHAp1 = -8*GAMMAp1+LALPHA1+10*
+     &                           PSI2-2*PSIp1-8
                                  IF (BUF INDEX.EQ.
      &                           SIZE OF RECEIVED BUFFER) THEN
                                     RECEIVED NOT PERFORMED = .TRUE.
@@ -71,11 +71,11 @@
                               ENDDO
                            ELSE
 ! - lazy copying
-                              GAMMAp1 = -1+PSI2
-                              DO LALPHA1 = 9+10*GAMMAp1-10*PSI2+2*
-     &                        PSIp1, 10+10*GAMMAp1-10*PSI2+2*PSIp1
-                                 LALPHAp1 = -8-8*GAMMAp1+LALPHA1+10*
-     &                           PSI2-2*PSIp1
+                              GAMMAp1 = PSI2-1
+                              DO LALPHA1 = 10*GAMMAp1-10*PSI2+2*PSIp1
+     &                        +9, 10*GAMMAp1-10*PSI2+2*PSIp1+10
+                                 LALPHAp1 = -8*GAMMAp1+LALPHA1+10*
+     &                           PSI2-2*PSIp1-8
                                  A_1(LALPHAp1) = A(LALPHA1)
                               ENDDO
                            ENDIF

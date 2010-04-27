@@ -11,7 +11,7 @@
             IF (MY LID.LE.4) THEN
                PSIp1 = PSI2
                PSIp2 = PSI1
-               T LID = -2+2*PSIp1+PSIp2
+               T LID = 2*PSIp1+PSIp2-2
                IF (MY LID.NE.T LID) THEN
 ! - sending
                   CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
@@ -35,7 +35,7 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp2
                PSI2 = PSIp1
-               T LID = -2+2*PSI1+PSI2
+               T LID = 2*PSI1+PSI2-2
                IF (MY LID.NE.T LID) THEN
 ! - receiving
                   CALL pvmfrecv(NODE TIDS(T LID), RECV CHANNELS(T LID
@@ -82,14 +82,14 @@
             IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
-                     T LID = -2+2*PSIp1+PSIp2
+                     T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
 ! - sending
                         CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
-                        DO LALPHAp2 = -24+25*PSI2, 25*PSI2
-                           DO LALPHAp1 = -24+25*PSI1, 25*PSI1
-                              LALPHA2 = 48+2*LALPHAp2-50*PSI2+PSIp2
-                              LALPHA1 = 48+2*LALPHAp1-50*PSI1+PSIp1
+                        DO LALPHAp2 = 25*PSI2-24, 25*PSI2
+                           DO LALPHAp1 = 25*PSI1-24, 25*PSI1
+                              LALPHA2 = 2*LALPHAp2-50*PSI2+PSIp2+48
+                              LALPHA1 = 2*LALPHAp1-50*PSI1+PSIp1+48
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,
      &                        LALPHA2)
@@ -108,16 +108,16 @@
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
-                     T LID = -2+2*PSI1+PSI2
+                     T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN
 ! - receiving
                         CALL pvmfrecv(NODE TIDS(T LID), RECV CHANNELS
      &                  (T LID), HPFC BUFID)
                         RECV CHANNELS(T LID) = RECV CHANNELS(T LID)+2
-                        DO LALPHAp2 = -24+25*PSI2, 25*PSI2
-                           DO LALPHAp1 = -24+25*PSI1, 25*PSI1
-                              LALPHA2 = 48+2*LALPHAp2-50*PSI2+PSIp2
-                              LALPHA1 = 48+2*LALPHAp1-50*PSI1+PSIp1
+                        DO LALPHAp2 = 25*PSI2-24, 25*PSI2
+                           DO LALPHAp1 = 25*PSI1-24, 25*PSI1
+                              LALPHA2 = 2*LALPHAp2-50*PSI2+PSIp2+48
+                              LALPHA1 = 2*LALPHAp1-50*PSI1+PSIp1+48
                               BUF INDEX = BUF INDEX+1
                               B_1(LALPHAp1,LALPHAp2) = 
      &                        HPFC REAL4 BUFF(BUF INDEX)
@@ -125,10 +125,10 @@
                         ENDDO
                      ELSE
 ! - copying
-                        DO LALPHAp2 = -24+25*PSI2, 25*PSI2
-                           DO LALPHAp1 = -24+25*PSI1, 25*PSI1
-                              LALPHA2 = 48+2*LALPHAp2-50*PSI2+PSIp2
-                              LALPHA1 = 48+2*LALPHAp1-50*PSI1+PSIp1
+                        DO LALPHAp2 = 25*PSI2-24, 25*PSI2
+                           DO LALPHAp1 = 25*PSI1-24, 25*PSI1
+                              LALPHA2 = 2*LALPHAp2-50*PSI2+PSIp2+48
+                              LALPHA1 = 2*LALPHAp1-50*PSI1+PSIp1+48
                               B_1(LALPHAp1,LALPHAp2) = B(LALPHA1,
      &                        LALPHA2)
                            ENDDO

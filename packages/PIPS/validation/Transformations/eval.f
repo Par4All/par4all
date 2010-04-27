@@ -66,11 +66,17 @@ c     (-5)/2 = 5/(-2) = -2
       K= (4*M+5)/2
       K= (4*M+5)/1
       K= (4*M+6)/2
-      K= MOD(3,2)
-      K= MOD(-3,-2)
+c     MOD(3,2) = 1
+      K1= MOD(3,2)
+c     MOD(-3,-2) = -1
+      K2= MOD(-3,-2)
+C     Not true with gfortran
 c     MOD(-3,2) = MOD(3,-2) = -1
-      K= MOD(-3,2)
-      K= MOD(3,-2)
+c     MOD(-3,2) = -1
+      K3= MOD(-3,2)
+c     MOD(3,-2) = 1
+      K4= MOD(3,-2)
+      print *, k1, k2, k3, k4, "(should be 1, -1, -1, 1)"
 C
 C     do not replace written parameters of assign, fonctions 
 C     or subroutines!

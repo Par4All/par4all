@@ -44,6 +44,6 @@ void dereferencing01()
 //  points to = {}
 
    q = p;
-//  points to = {}
+//  {(q,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    *p = 2.;
 }

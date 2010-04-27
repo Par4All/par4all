@@ -1,0 +1,14 @@
+delete main06
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main06 main06.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c main06.database/Src/main06.f90
+shell rm *.o
+
+close
+quit

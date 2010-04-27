@@ -7,7 +7,7 @@ C  T(repeat01) {16<=repeat01}
 int repeat01()
 {
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 
@@ -57,12 +57,12 @@ int repeat01()
 
    int i, j;
 
-//  P() {}
+//  P(i,j) {}
 
 
    i = 0;
 
-//  P(i) {i==0}
+//  P(i,j) {i==0}
 
    j = 1;
    {
@@ -71,15 +71,15 @@ int repeat01()
 
       int n = 10;
 
-//  P(i,j) {i==0, j==1, n==10}
+//  P(i,j,n) {i==0, j==1, n==10}
 
       do {
 
-//  P(i,j) {2i==j-1, n==10, i<=4}
+//  P(i,j,n) {2i==j-1, n==10, i<=4}
 
          i++;
 
-//  P(i,j) {2i==j+1, n==10, i<=5}
+//  P(i,j,n) {2i==j+1, n==10, i<=5}
 
          j += 2;
       }

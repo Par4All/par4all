@@ -7,7 +7,7 @@ C  T(while06) {while06==10}
 int while06()
 {
 
-//  T() {}
+//  T(i,n) {}
 
    int i, n;
 
@@ -51,12 +51,12 @@ int while06()
 
    int i, n;
 
-//  P() {}
+//  P(i,n) {}
 
 
    i = 0;
 
-//  P(i) {i==0}
+//  P(i,n) {i==0}
 
    n = 10;
 

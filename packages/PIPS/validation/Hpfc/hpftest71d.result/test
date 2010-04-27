@@ -11,7 +11,7 @@
             IF (MY LID.LE.4) THEN
                PSIp1 = PSI2
                PSIp2 = PSI1
-               T LID = -2+2*PSIp1+PSIp2
+               T LID = 2*PSIp1+PSIp2-2
                IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                   BUF INDEX = 0
@@ -43,7 +43,7 @@
             IF (MY LID.LE.4) THEN
                PSI1 = PSIp2
                PSI2 = PSIp1
-               T LID = -2+2*PSI1+PSI2
+               T LID = 2*PSI1+PSI2-2
                IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                   BUF INDEX = 0
@@ -96,15 +96,15 @@
             IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
-                     T LID = -2+2*PSIp1+PSIp2
+                     T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy sending
                         BUF INDEX = 0
                         SEND NOT INITIALIZED = .TRUE.
-                        DO LALPHAp2 = -24+25*PSI2, 25*PSI2
-                           DO LALPHAp1 = -24+25*PSI1, 25*PSI1
-                              LALPHA2 = 48+2*LALPHAp2-50*PSI2+PSIp2
-                              LALPHA1 = 48+2*LALPHAp1-50*PSI1+PSIp1
+                        DO LALPHAp2 = 25*PSI2-24, 25*PSI2
+                           DO LALPHAp1 = 25*PSI1-24, 25*PSI1
+                              LALPHA2 = 2*LALPHAp2-50*PSI2+PSIp2+48
+                              LALPHA1 = 2*LALPHAp1-50*PSI1+PSIp1+48
                               BUF INDEX = BUF INDEX+1
                               HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,
      &                        LALPHA2)
@@ -131,16 +131,16 @@
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
-                     T LID = -2+2*PSI1+PSI2
+                     T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                         BUF INDEX = 0
                         RECEIVED NOT PERFORMED = .TRUE.
                         SIZE OF RECEIVED BUFFER = 0
-                        DO LALPHAp2 = -24+25*PSI2, 25*PSI2
-                           DO LALPHAp1 = -24+25*PSI1, 25*PSI1
-                              LALPHA2 = 48+2*LALPHAp2-50*PSI2+PSIp2
-                              LALPHA1 = 48+2*LALPHAp1-50*PSI1+PSIp1
+                        DO LALPHAp2 = 25*PSI2-24, 25*PSI2
+                           DO LALPHAp1 = 25*PSI1-24, 25*PSI1
+                              LALPHA2 = 2*LALPHAp2-50*PSI2+PSIp2+48
+                              LALPHA1 = 2*LALPHAp1-50*PSI1+PSIp1+48
                               IF (BUF INDEX.EQ.
      &                        SIZE OF RECEIVED BUFFER) THEN
                                  RECEIVED NOT PERFORMED = .TRUE.
@@ -154,10 +154,10 @@
                         ENDDO
                      ELSE
 ! - lazy copying
-                        DO LALPHAp2 = -24+25*PSI2, 25*PSI2
-                           DO LALPHAp1 = -24+25*PSI1, 25*PSI1
-                              LALPHA2 = 48+2*LALPHAp2-50*PSI2+PSIp2
-                              LALPHA1 = 48+2*LALPHAp1-50*PSI1+PSIp1
+                        DO LALPHAp2 = 25*PSI2-24, 25*PSI2
+                           DO LALPHAp1 = 25*PSI1-24, 25*PSI1
+                              LALPHA2 = 2*LALPHAp2-50*PSI2+PSIp2+48
+                              LALPHA1 = 2*LALPHAp1-50*PSI1+PSIp1+48
                               B_1(LALPHAp1,LALPHAp2) = B(LALPHA1,
      &                        LALPHA2)
                            ENDDO

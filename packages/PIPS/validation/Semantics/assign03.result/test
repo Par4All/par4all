@@ -45,19 +45,19 @@ Source code with transformers
 void assign03()
 {
 
-//  T() {}
+//  T(i) {}
 
    int i;                                                               /*0010*/
 
-//  T() {}
+//  T(j) {}
 
    int j;                                                               /*0011*/
 
-//  T() {}
+//  T(k) {}
 
    int k;                                                               /*0012*/
 
-//  T() {}
+//  T(n) {}
 
    int n;                                                               /*0013*/
 

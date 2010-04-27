@@ -1,1 +1,19 @@
-Unlike Semantics, the tpips scripts use the current pipsmake environment and not the initial one.
+Unlike Semantics, the tpips scripts use the current pipsmake
+environment (Fall 20009) and not the initial one.
+
+atoll:      call site located in a declaration initialization (P. Villalon)
+
+continue01:
+
+global01.c: take abstract locations into account (derived from
+	    Benchmarks/whetstone, submitted by Serge Guelton)
+
+gopan3.c:   example from Gopan (preparation of a paper, bug fix for loop postcondition)
+
+gulwani03.c: example from Gulwani (same as opan3)
+
+mehdi01.c:  example submitted by Mehdi Amini
+
+summary_precondition02.c:
+
+summary_precondition03.c:

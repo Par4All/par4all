@@ -60,11 +60,11 @@ int main()
 
    int i = 4;
 
-//  P() {i==4}
+//  P(i) {i==4}
 
    inter08(i);
 
-//  P() {i==4}
+//  P(i) {i==4}
 
    foo(i);
 }

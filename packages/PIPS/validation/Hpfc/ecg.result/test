@@ -36,7 +36,7 @@
          ALPHA2 = PSI1
          DO ALPHA1 = 1, 32768
             LALPHA1 = ALPHA1
-            LALPHA2 = 1+ALPHA2-PSI1
+            LALPHA2 = ALPHA2-PSI1+1
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = SIGNAL(ALPHA1,ALPHA2)
          ENDDO
@@ -138,7 +138,7 @@
       ALPHA2 = PSI1
       DO ALPHA1 = 1, 32768
          LALPHA1 = ALPHA1
-         LALPHA2 = 1+ALPHA2-PSI1
+         LALPHA2 = ALPHA2-PSI1+1
          BUF INDEX = BUF INDEX+1
          SIGNAL(LALPHA1,LALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
       ENDDO

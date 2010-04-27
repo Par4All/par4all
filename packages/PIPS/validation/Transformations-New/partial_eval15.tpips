@@ -1,0 +1,38 @@
+delete partial_eval15
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval15 partial_eval15.f
+
+echo
+echo "main" file
+echo
+
+display PRINTED_FILE[MAIN]
+
+echo
+echo Result before partial evaluation
+echo
+
+apply UNSPLIT
+shell (cd partial_eval15.database/Src; gfortran partial_eval15.f;./a.out)
+
+apply PARTIAL_EVAL[MAIN]
+
+echo
+echo "main" file after partial evaluation
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+echo
+echo Result after partial evaluation
+echo
+
+apply UNSPLIT
+shell (cd partial_eval15.database/Src; gfortran partial_eval15.f;./a.out)
+
+close
+delete partial_eval15
+quit

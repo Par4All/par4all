@@ -1,64 +1,43 @@
 
-Parsed printed file for "decl01"
-
-void decl01()
-{
-   int i = 2;                                                           /*0005*/
-   int j = i;                                                           /*0006*/
-   int a[sizeof(i)];                                                    /*0007*/
-
-   i = 2;                                                               /*0009*/
-   j = i;                                                               /*0010*/
-   j = sizeof(i);                                                       /*0011*/
-}
-
 Proper effects for "decl01"
 
-void decl01()
+int decl01()
 {
 //               <must be written>: i
-// (0,2)
-   int i = 2;                                                           /*0005*/
+   int i = 2;
 //               <must be read   >: i
 //               <must be written>: j
-// (0,3)
-   int j = i;                                                           /*0006*/
-// (0,4)
-   int a[sizeof(i)];                                                    /*0007*/
+   int j = i;
+   int a[sizeof(i)];
 //               <must be written>: i
-// (0,5)
 
-   i = 2;                                                               /*0009*/
+   i = 2;
 //               <must be read   >: i
 //               <must be written>: j
-// (0,6)
-   j = i;                                                               /*0010*/
+   j = i;
 //               <must be written>: j
-// (0,7)
-   j = sizeof(i);                                                       /*0011*/
+   j = sizeof(i);
+   return 0;
 }
+
 POINTS TO
 
 //  {}
-void decl01()
+int decl01()
 {
 //  points to = {}
-// (0,2)
-   int i = 2;                                                           /*0005*/
+   int i = 2;
 //  points to = {}
-// (0,3)
-   int j = i;                                                           /*0006*/
+   int j = i;
 //  points to = {}
-// (0,4)
-   int a[sizeof(i)];                                                    /*0007*/
+   int a[sizeof(i)];
 //  points to = {}
-// (0,5)
 
-   i = 2;                                                               /*0009*/
+   i = 2;
 //  points to = {}
-// (0,6)
-   j = i;                                                               /*0010*/
+   j = i;
 //  points to = {}
-// (0,7)
-   j = sizeof(i);                                                       /*0011*/
+   j = sizeof(i);
+//  points to = {}
+   return 0;
 }

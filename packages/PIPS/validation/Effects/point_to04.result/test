@@ -29,12 +29,12 @@ void point_to04()
 //               <must be written>: p
 
    p = &c;
-//               <must be read   >: p p[0][a]
-//               <must be written>: p[0][d]
+//               <must be read   >: p p[0][.a]
+//               <must be written>: p[0][.d]
 
    p->d = p->a;
 //               <must be read   >: p
-//               <must be written>: p[0][d] p[0][a]
+//               <must be written>: p[0][.d] p[0][.a]
    p->d = p->a = 4;
 }
 
@@ -53,12 +53,12 @@ void point_to04()
 //               <must be written>: p
 
    p = &c;
-//               <must be read   >: p p[0][a]
-//               <must be written>: p[0][d]
+//               <must be read   >: p p[0][.a]
+//               <must be written>: p[0][.d]
 
    p->d = p->a;
 //               <must be read   >: p
-//               <must be written>: p[0][d] p[0][a]
+//               <must be written>: p[0][.d] p[0][.a]
    p->d = p->a = 4;
 }
 

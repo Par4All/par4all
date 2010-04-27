@@ -63,7 +63,7 @@ void complete01()
 
    // BEGIN BLOCK
 
-//  T() {}
+//  T(i) {}
 
    int i;                                                               /*0010*/
    {
@@ -110,15 +110,15 @@ void complete01()
    int i;                                                               /*0010*/
    {
 
-//  P() {}
+//  P(i) {}
 
       // BEGIN BLOCK
 
-//  P() {}
+//  P(i) {}
 
       int j = 0;                                                        /*0014*/
 
-//  P() {j==0}
+//  P(i,j) {j==0}
 
       for (i = 0;i<10;i++)                                              /*0015*/
 

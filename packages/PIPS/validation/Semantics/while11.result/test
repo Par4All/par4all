@@ -45,11 +45,11 @@ void while11()
 
    int x = 0;
 
-//  P() {x==0}
+//  P(x) {x==0}
 
    int y = 0;
 
-//  P() {x==0, y==0}
+//  P(x,y) {x==0, y==0}
 
    while (x<=50) {
 

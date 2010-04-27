@@ -22,7 +22,7 @@ After hyperplanning (1, 1)
       REAL X(N, M)
 
       DO Ip = 2, M+N                                                    0005
-         DO Jp = MAX(1-Ip, -N), MIN(-Ip+M, -1)                          0006
+         DO Jp = MAX(-Ip+1, -N), MIN(-Ip+M, -1)                         0006
             X(-Jp,Ip+Jp) = FLOAT(Ip)                                    0007
 200         CONTINUE                                                    0008
          ENDDO

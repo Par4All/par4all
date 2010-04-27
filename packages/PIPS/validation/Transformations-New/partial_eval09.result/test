@@ -1,0 +1,27 @@
+
+"foo" file
+
+int foo(int j, int n)
+{
+   return (2*n+1)*0;
+}
+
+"foo" file with preconditions
+
+
+//  P() {}
+
+int foo(int j, int n)
+{
+
+//  P() {}
+
+   return (2*n+1)*0;
+}
+
+"foo" file after partial evaluation
+
+int foo(int j, int n)
+{
+   return 0;
+}

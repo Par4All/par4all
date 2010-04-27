@@ -15,7 +15,7 @@ Transformers for "main"
 int main(void)
 {
 
-//  T() {}
+//  T(j) {}
 
    int j;
 
@@ -55,7 +55,7 @@ int main(void)
 
    int j;
 
-//  P() {}
+//  P(j) {}
 
 
    j = foo(-5, 12);
@@ -84,7 +84,7 @@ Transformers for "main" after transformer refining
 int main(void)
 {
 
-//  T() {}
+//  T(j) {}
 
    int j;
 
@@ -111,7 +111,7 @@ int main(void)
 
    int j;
 
-//  P() {}
+//  P(j) {}
 
 
    j = foo(-5, 12);

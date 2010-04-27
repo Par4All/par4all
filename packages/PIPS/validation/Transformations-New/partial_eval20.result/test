@@ -1,0 +1,54 @@
+
+"main" file
+
+int main()
+{
+   int i;
+   int j;
+   j;
+   /* Can be eliminated because the store is not impacted */
+   j+0;
+   return i;
+}
+
+"main" file with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i;
+
+//  P() {}
+
+   int j;
+
+//  P() {}
+
+   j;
+
+//  P() {}
+
+   /* Can be eliminated because the store is not impacted */
+   j+0;
+
+//  P() {}
+
+   return i;
+}
+
+"main" file after partial evaluation
+
+int main()
+{
+   int i;
+   int j;
+   j;
+   /* Can be eliminated because the store is not impacted */
+   ;
+   return i;
+}

@@ -121,8 +121,8 @@
 ! - lazy sending
                   BUF INDEX = 0
                   SEND NOT INITIALIZED = .TRUE.
-                  DO LALPHA1 = -4+5*PSIp1, 5*PSIp1
-                     LALPHAp1 = 5+LALPHA1-5*PSIp1
+                  DO LALPHA1 = 5*PSIp1-4, 5*PSIp1
+                     LALPHAp1 = LALPHA1-5*PSIp1+5
                      BUF INDEX = BUF INDEX+1
                      HPFC REAL4 BUFF(BUF INDEX) = SOL_1(LALPHA1)
                      IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
@@ -149,8 +149,8 @@
                   BUF INDEX = 0
                   RECEIVED NOT PERFORMED = .TRUE.
                   SIZE OF RECEIVED BUFFER = 0
-                  DO LALPHA1 = -4+5*PSIp1, 5*PSIp1
-                     LALPHAp1 = 5+LALPHA1-5*PSIp1
+                  DO LALPHA1 = 5*PSIp1-4, 5*PSIp1
+                     LALPHAp1 = LALPHA1-5*PSIp1+5
                      IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER) THEN
                         RECEIVED NOT PERFORMED = .TRUE.
                         CALL HPFC REAL4 BUFUPK(T LID)
@@ -161,8 +161,8 @@
                   ENDDO
                ELSE
 ! - lazy copying
-                  DO LALPHA1 = -4+5*PSIp1, 5*PSIp1
-                     LALPHAp1 = 5+LALPHA1-5*PSIp1
+                  DO LALPHA1 = 5*PSIp1-4, 5*PSIp1
+                     LALPHAp1 = LALPHA1-5*PSIp1+5
                      SOL(LALPHAp1) = SOL_1(LALPHA1)
                   ENDDO
                ENDIF
@@ -190,7 +190,7 @@
                BUF INDEX = 0
                SEND NOT INITIALIZED = .TRUE.
                DO LALPHA1 = 1, 5
-                  LALPHAp1 = -5+LALPHA1+5*PSI1
+                  LALPHAp1 = LALPHA1+5*PSI1-5
                   BUF INDEX = BUF INDEX+1
                   HPFC REAL4 BUFF(BUF INDEX) = SOL(LALPHA1)
                   IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
@@ -216,7 +216,7 @@
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA1 = 1, 5
-                        LALPHAp1 = -5+LALPHA1+5*PSI1
+                        LALPHAp1 = LALPHA1+5*PSI1-5
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
                            RECEIVED NOT PERFORMED = .TRUE.
@@ -229,7 +229,7 @@
                   ELSE
 ! - lazy copying
                      DO LALPHA1 = 1, 5
-                        LALPHAp1 = -5+LALPHA1+5*PSI1
+                        LALPHAp1 = LALPHA1+5*PSI1-5
                         SOL_1(LALPHAp1) = SOL(LALPHA1)
                      ENDDO
                   ENDIF

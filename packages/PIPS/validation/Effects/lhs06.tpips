@@ -22,6 +22,13 @@ close
 open lhs06
 
 echo
+echo Proper pointer effects for "lhs06"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[lhs06]
+
+echo
 echo Proper effects for "lhs06"
 echo
 

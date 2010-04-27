@@ -25,11 +25,11 @@ C     Check tiling: use integer lower loop bounds and symbolic upper bounds
 
       REAL X(0:15, 0:10)
 
-      DO I_t = 0, (-1+M)/5                                              0007
-         DO J_t = 0, (-1+N)/5
+      DO I_t = 0, (M-1)/5                                               0007
+         DO J_t = 0, (N-1)/5
 
-            DO I = 1+5*I_t, MIN(M, 5+5*I_t)                             0007
-               DO J = 1+5*J_t, MIN(5+5*J_t, N)                          0008
+            DO I = 5*I_t+1, MIN(M, 5*I_t+5)                             0007
+               DO J = 5*J_t+1, MIN(5*J_t+5, N)                          0008
                   X(I,J) = FLOAT(I+J)                                   0009
 200               CONTINUE                                              0010
                ENDDO

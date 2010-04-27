@@ -23,8 +23,8 @@ void loop_interchange01(int n, int ni, int nj)
    int ip, jp;
 
 l1:
-   for(ip = 0; ip <= -1+nj; ip += 1)
-      for(jp = 0; jp <= -1+ni; jp += 1)
+   for(ip = 0; ip <= nj-1; ip += 1)
+      for(jp = 0; jp <= ni-1; jp += 1)
          x[jp][ip] = 0.;
 }
 

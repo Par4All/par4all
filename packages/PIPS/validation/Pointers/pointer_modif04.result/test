@@ -24,7 +24,7 @@ void init_s(s_t s, int max)
 //  points to = {}
 
    s.tab = (float *) malloc(max*sizeof(float));
-//  points to = {}
+//  {(s[2],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    s.max = max;
    // END BLOCK
 }

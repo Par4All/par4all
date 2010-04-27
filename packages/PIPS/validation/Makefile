@@ -174,16 +174,21 @@ parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
 
 # generic subdir targets
 parallel-clean-%:
-	$(MAKE) -C $* clean unvalidate
+	[ -d $* -a -f $*/Makefile ] \
+	  && $(MAKE) -C $* clean unvalidate ; exit 0
 
 parallel-check-%: parallel-clean-%
-	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies
+	[ -d $* -a -f $*/Makefile ] \
+	  && $(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies ; exit 0
 
 parallel-validate-%: parallel-check-%
-	$(MAKE) RESULTS=../$(RESULTS) -C $* validate-test
+	[ -d $* -a -f $*/Makefile ] \
+	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-test \
+	  || echo "broken-directory: $*" >> $(RESULTS)
 
 parallel-unvalidate-%:
-	$(MAKE) -C $* unvalidate
+	[ -d $* -a -f $*/Makefile ] \
+	  && $(MAKE) -C $* unvalidate ; exit 0
 
 ## REMOVE ???
 # special handling of private

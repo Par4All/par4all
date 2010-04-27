@@ -1,8 +1,15 @@
 delete program
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create program program.f90
 
 display PRINTED_FILE[TOTO]
 
+apply UNSPLIT [%ALL]
+shell gcc -c program.database/Src/program.f90
+shell rm *.o
+
 close
-delete program
+#delete program
 

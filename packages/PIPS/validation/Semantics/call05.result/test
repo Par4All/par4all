@@ -37,7 +37,7 @@ Source code with transformers for "main"
 int main()
 {
 
-//  T() {}
+//  T(ai) {}
 
    int ai;                                                              /*0010*/
 
@@ -72,7 +72,7 @@ int main()
 
    int ai;                                                              /*0010*/
 
-//  P() {}
+//  P(ai) {}
 
 
    ai = call05(2);                                                      /*0012*/
