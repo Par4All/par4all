@@ -8,7 +8,7 @@ int main()
 {
 
 
-//  T() {}
+//  T(x,y,z) {}
 
    int x, y, z;
 
@@ -82,16 +82,16 @@ int main()
 
    int x, y, z;
 
-//  P() {}
+//  P(x,y,z) {}
 
 
    x = 1;
 
-//  P(x) {x==1}
+//  P(x,y,z) {x==1}
 
    y = 0;
 
-//  P(x,y) {x==1, y==0}
+//  P(x,y,z) {x==1, y==0}
 
    z = 0;
 

@@ -49,7 +49,7 @@ Source code with transformers
 void assign04()
 {
 
-//  T() {}
+//  T(i) {}
 
    int i;                                                               /*0010*/
 

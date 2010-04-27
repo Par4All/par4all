@@ -61,7 +61,7 @@ int main()
 
    int i = 0;
 
-//  P() {delta==1, delta2==3, i==0}
+//  P(i) {delta==1, delta2==3, i==0}
 
 
    i = i+delta;

@@ -33,11 +33,11 @@ int generate01()
 
    int i = 1;
 
-//  P() {i==1}
+//  P(i) {i==1}
 
    float x = 0.5;
 
-//  P() {i==1}
+//  P(i) {i==1}
 
 
    return foo(i, x);

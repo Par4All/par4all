@@ -187,11 +187,11 @@ Transformers for "main"
 int main()
 {
 
-//  T() {}
+//  T(a) {}
 
    int a;
 
-//  T() {}
+//  T(b) {}
 
    int b;
 

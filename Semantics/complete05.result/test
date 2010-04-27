@@ -79,11 +79,11 @@ void complete05()
 
    // BEGIN BLOCK
 
-//  T() {}
+//  T(i) {}
 
    int i;                                                               /*0010*/
 
-//  T() {}
+//  T(n) {}
 
    int n;                                                               /*0011*/
    {
@@ -139,32 +139,32 @@ void complete05()
 
    int i;                                                               /*0010*/
 
-//  P() {}
+//  P(i) {}
 
    int n;                                                               /*0011*/
    {
 
-//  P() {}
+//  P(i,n) {}
 
       // BEGIN BLOCK
 
-//  P() {}
+//  P(i,n) {}
 
       int j = 0;                                                        /*0015*/
 
-//  P() {j==0}
+//  P(i,j,n) {j==0}
 
       for (i = 0;i<n;i++) {                                             /*0016*/
 
-//  P(i,j) {i==0, 0<=j, 1<=n}
+//  P(i,j,n) {i==0, 0<=j, 1<=n}
 
          // BEGIN BLOCK
 
-//  P(i,j) {i==0, 0<=j, 1<=n}
+//  P(i,j,n) {i==0, 0<=j, 1<=n}
 
          j++;                                                           /*0017*/
 
-//  P(i,j) {i==0, 1<=j, 1<=n}
+//  P(i,j,n) {i==0, 1<=j, 1<=n}
 
          i--;                                                           /*0018*/
          // END BLOCK
@@ -172,7 +172,7 @@ void complete05()
       // END BLOCK
    }
 
-//  P(i) {i==0, n<=0}
+//  P(i,n) {i==0, n<=0}
 
 
    foo(i);                                                              /*0022*/

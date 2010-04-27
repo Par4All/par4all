@@ -102,11 +102,11 @@ int bar()
 
    int x = 3;
 
-//  P() {x==3}
+//  P(x) {x==3}
 
    int y = x-3;
 
-//  P() {x==3, y==0}
+//  P(x,y) {x==3, y==0}
 
 
    while (x<=4) {
@@ -152,17 +152,17 @@ int foo(int s)
 
    int t = s+2;
 
-//  P() {s==t-2}
+//  P(t) {s==t-2}
 
 
    if (t>6)
 
-//  P() {s==t-2, 5<=s}
+//  P(t) {s==t-2, 5<=s}
 
       t -= 3;
    else
 
-//  P() {s==t-2, s<=4}
+//  P(t) {s==t-2, s<=4}
 
       t--;
 
@@ -320,40 +320,41 @@ int bar()
 
    int x = 3;
 
-//  P() {x==3}
+//  P(x) {x==3}
 
    int y = x-3;
    //PIPS generated variable
 
-//  P() {x==3, y==0}
+//  P(x,y) {x==3, y==0}
 
    int _return0, _return1;
 
-//  P() {x==3, y==0}
+//  P(_return0,_return1,x,y) {x==3, y==0}
 
 
    while (x<=4) {
 
-//  P(_return0,x,y) {x<=4, 3<=x+y, x<=y+3}
+//  P(_return0,_return1,x,y) {x<=4, 3<=x+y, x<=y+3}
 
       // BEGIN BLOCK
 
-//  P(_return0,x,y) {x<=4, 3<=x+y, x<=y+3}
+//  P(_return0,_return1,x,y) {x<=4, 3<=x+y, x<=y+3}
 
       // BEGIN BLOCK
       y++;
       {
 
-//  P(_return0,x,y) {x<=4, 4<=x+y, x<=y+2}
+//  P(_return0,_return1,x,y) {x<=4, 4<=x+y, x<=y+2}
 
          // BEGIN BLOCK
          // BEGIN BLOCK
 
-//  P(_return0,x,y) {x<=4, 4<=x+y, x<=y+2}
+//  P(_return0,_return1,x,y) {x<=4, 4<=x+y, x<=y+2}
 
          int t = x+2;
 
-//  P() {0==-1}
+//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==x+2, 0`1`2`t<=6,
+//    6<=0`1`2`t+y, 0`1`2`t<=y+4}
 
 
          if (t>6)
@@ -363,11 +364,13 @@ int bar()
             t -= 3;
          else
 
-//  P() {0==-1}
+//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==x+2, 0`1`2`t<=6,
+//    6<=0`1`2`t+y, 0`1`2`t<=y+4}
 
             t--;
 
-//  P() {0==-1}
+//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==x+1, 0`1`2`t<=5,
+//    5<=0`1`2`t+y, 0`1`2`t<=y+3}
 
          // BEGIN BLOCK
          
@@ -375,7 +378,8 @@ int bar()
          // BEGIN BLOCK
          _return0 = t;
 
-//  P() {0==-1}
+//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==_return0, 0`1`2`t==x+1,
+//    0`1`2`t<=5, 5<=0`1`2`t+y, 0`1`2`t<=y+3}
 
          // END BLOCK
          // END BLOCK
@@ -383,7 +387,8 @@ int bar()
          // END BLOCK
       }
 
-//  P() {0==-1}
+//  P(_return0,_return1,x,y) {_return0==x+1, _return0<=5,
+//    5<=_return0+y, _return0<=y+3}
 
       // END BLOCK
       x = _return0;
@@ -391,21 +396,21 @@ int bar()
    }
    {
 
-//  P(_return0,x,y) {_return0==5, x==5, 2<=y}
+//  P(_return0,_return1,x,y) {_return0==5, x==5, 2<=y}
 
       // BEGIN BLOCK
       // BEGIN BLOCK
 
-//  P(_return0,x,y) {_return0==5, x==5, 2<=y}
+//  P(_return0,_return1,x,y) {_return0==5, x==5, 2<=y}
 
       int t = x+2;
 
-//  P() {0==-1}
+//  P(0`3`t,_return0,_return1,x,y) {0`3`t==7, _return0==5, x==5, 2<=y}
 
 
       if (t>6)
 
-//  P() {0==-1}
+//  P(0`3`t,_return0,_return1,x,y) {0`3`t==7, _return0==5, x==5, 2<=y}
 
          t -= 3;
       else
@@ -414,7 +419,7 @@ int bar()
 
          t--;
 
-//  P() {0==-1}
+//  P(0`3`t,_return0,_return1,x,y) {0`3`t==4, _return0==5, x==5, 2<=y}
 
       // BEGIN BLOCK
       
@@ -422,7 +427,8 @@ int bar()
       // BEGIN BLOCK
       _return1 = t;
 
-//  P() {0==-1}
+//  P(0`3`t,_return0,_return1,x,y) {0`3`t==4, _return0==5,
+//    _return1==4, x==5, 2<=y}
 
       // END BLOCK
       // END BLOCK
@@ -430,12 +436,12 @@ int bar()
       // END BLOCK
    }
 
-//  P() {0==-1}
+//  P(_return0,_return1,x,y) {_return0==5, _return1==4, x==5, 2<=y}
 
    // END BLOCK
    y = _return1;
 
-//  P() {0==-1}
+//  P(_return0,_return1,x,y) {_return0==5, _return1==4, x==5, y==4}
 
    // END BLOCK
    
@@ -460,86 +466,112 @@ int bar()
 
    int x = 3;
 
-//  P() {x==3}
+//  P(x) {x==3}
 
    int y = x-3;
    //PIPS generated variable
 
-//  P() {x==3, y==0}
+//  P(x,y) {x==3, y==0}
 
    int _return0, _return1;
 
-//  P() {x==3, y==0}
+//  P(_return0,_return1,x,y) {x==3, y==0}
 
 
    while (x<=4) {
 
-//  P(y) {x==3, 0<=y}
+//  P(_return0,_return1,x,y) {x==y+3, 3<=x, x<=4}
 
       // BEGIN BLOCK
 
-//  P(y) {x==3, 0<=y}
+//  P(_return0,_return1,x,y) {x==y+3, 3<=x, x<=4}
 
       // BEGIN BLOCK
       y++;
       {
 
-//  P(y) {x==3, 1<=y}
+//  P(_return0,_return1,x,y) {x==y+2, 3<=x, x<=4}
 
          // BEGIN BLOCK
          // BEGIN BLOCK
 
-//  P(y) {x==3, 1<=y}
+//  P(_return0,_return1,x,y) {x==y+2, 3<=x, x<=4}
 
          int t = x+2;
 
-//  P() {0==-1}
+//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==x+2, 0`1`2`t==y+4,
+//    5<=0`1`2`t, 0`1`2`t<=6}
 
-         
+
+         t--;
+
+//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==x+1, 0`1`2`t==y+3,
+//    4<=0`1`2`t, 0`1`2`t<=5}
+
          // BEGIN BLOCK
          
          
          // BEGIN BLOCK
+         _return0 = t;
+
+//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==_return0, 0`1`2`t==x+1,
+//    0`1`2`t==y+3, 4<=0`1`2`t, 0`1`2`t<=5}
+
          // END BLOCK
          // END BLOCK
          ;
          // END BLOCK
       }
 
-//  P() {0==-1}
+//  P(_return0,_return1,x,y) {_return0==x+1, _return0==y+3,
+//    4<=_return0, _return0<=5}
 
       // END BLOCK
-      ;
+      x = _return0;
       // END BLOCK
    }
    {
 
-//  P() {0==-1}
+//  P(_return0,_return1,x,y) {_return0==5, x==5, y==2}
 
       // BEGIN BLOCK
       // BEGIN BLOCK
 
-//  P() {0==-1}
+//  P(_return0,_return1,x,y) {_return0==5, x==5, y==2}
 
       int t = x+2;
 
-//  P() {0==-1}
+//  P(0`3`t,_return0,_return1,x,y) {0`3`t==7, _return0==5, x==5, y==2}
 
-      
+
+      t -= 3;
+
+//  P(0`3`t,_return0,_return1,x,y) {0`3`t==4, _return0==5, x==5, y==2}
+
       // BEGIN BLOCK
       
       
       // BEGIN BLOCK
+      _return1 = t;
+
+//  P(0`3`t,_return0,_return1,x,y) {0`3`t==4, _return0==5,
+//    _return1==4, x==5, y==2}
+
       // END BLOCK
       // END BLOCK
       ;
       // END BLOCK
    }
+
+//  P(_return0,_return1,x,y) {_return0==5, _return1==4, x==5, y==2}
+
    // END BLOCK
+   y = _return1;
+
+//  P(_return0,_return1,x,y) {_return0==5, _return1==4, x==5, y==4}
+
    // END BLOCK
    
-
-//  P() {0==-1}
-
+   return y;
    // END BLOCK
 }

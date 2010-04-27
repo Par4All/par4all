@@ -61,7 +61,7 @@ int main()
 
    int i = 4;
 
-//  P() {i==4}
+//  P(i) {i==4}
 
    i = inter09(i);
 

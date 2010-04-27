@@ -11,7 +11,7 @@ int repeat02()
 
    // BEGIN BLOCK
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 
@@ -70,39 +70,39 @@ int repeat02()
 
    int i, j;
 
-//  P() {}
+//  P(i,j) {}
 
    int n = 10;
 
-//  P() {n==10}
+//  P(i,j,n) {n==10}
 
 
    i = 0;
 
-//  P(i) {i==0, n==10}
+//  P(i,j,n) {i==0, n==10}
 
    j = 1;
 
-//  P(i,j) {i==0, j==1, n==10}
+//  P(i,j,n) {i==0, j==1, n==10}
 
    do {
 
-//  P(i,j) {2i==j-1, n==10, 0<=i}
+//  P(i,j,n) {2i==j-1, n==10, 0<=i}
 
       // BEGIN BLOCK
 
-//  P(i,j) {2i==j-1, n==10, 0<=i}
+//  P(i,j,n) {2i==j-1, n==10, 0<=i}
 
       i++;
 
-//  P(i,j) {2i==j+1, n==10, 1<=i}
+//  P(i,j,n) {2i==j+1, n==10, 1<=i}
 
       j += 2;
       // END BLOCK
    }
    while (j>n);
 
-//  P(i,j) {i==1, j==3, n==10}
+//  P(i,j,n) {i==1, j==3, n==10}
 
    //}
    return i+j;
