@@ -220,7 +220,15 @@ function build_package() {
 	    dir=$src_dir
 	fi
 
-	echo "Installing the '$package' package from '$dir':"
+	# Find if there are configuration options:
+	eval "local config_options=\$P4A_${upper_package}_CONFIGURE_OPTIONS"
+	if [[ -n $config_options ]]; then
+	    # Overide the source origin from the given environment variable:
+	    options=$config_options
+	fi
+
+
+	echo "Installing the '$package' package from '$dir' with options '$options':"
 	echo
 	cd $dir
 	dir=`pwd`

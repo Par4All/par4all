@@ -96,14 +96,28 @@ class Validation:
 
 
 class ValidationElement:
-    "No longer used..."
+    "Store information about a validation item"
 
+    # The possible status attributes of a validation item:
     CHANGED = 'changed'
     FAILED = 'failed'
     SKIPPED = 'skipped'
 
+    # To deal with diff validation output:
+    OLD_DIFF = "OLD"
+    NEW_DIFF = "NEW"
+    # To address 2 different regex according to the key above:
+    DIFF_FILTER_RE = {
+        # Match an old changed information:
+        OLD_DIFF : re.compile("^< ([^:]+): (.*)$", re.MULTILINE),
+        # Match a new changed information:
+        NEW_DIFF : re.compile("^> ([^:]+): (.*)$", re.MULTILINE)
+        }
+
+
     def __init__(self, name, attribute = None):
-        "Create an element with an optional attribute (changed,failed,skipped)"
+        """Create an element with an optional attribute (changed,failed,skipped)
+        Right now it is not used"""
 
         if verbose:
             print('Creating ValidationElement', name, attribute)
@@ -117,10 +131,6 @@ class ValidationElement:
 
 class ValidationClass:
     """Implement the concept of PIPS validation classes"""
-
-    # Match a changed information:
-    changed_re = re.compile("^> changed: (.*)$", re.MULTILINE)
-
 
     #def __init__(self, *diff_file, *diff_string):
     def __init__(self, vc = None, elements = None):
@@ -267,20 +277,31 @@ class ValidationClass:
         return self
 
 
-    def add_changed_from_diff(self, file_name = None, string = None):
-        """Add difference lines as elements"""
+    def add_from_diff(self,
+                      file_name = None,
+                      string = None,
+                      keep = None):
+        """Add difference lines as elements
+        selected according to keep (OLD or NEW)"""
 
         if verbose:
-            print('add_changed_from_diff from string', string)
-            print('add_changed_from_diff from file_name', file_name)
+            print('add_from_diff from string', string)
+            print('add_from_diff from file_name', file_name)
+
         if string:
-            # A string is given to this method:
-            for m in ValidationClass.changed_re.finditer(string):
-                changed = m.group(1)
+            # A string is given to this method
+
+            # Select the correct filter regex:
+            changed_re = ValidationElement.DIFF_FILTER_RE[keep]
+
+            for m in changed_re.finditer(string):
+                status = m.group(1)
+                name = m.group(2)
                 if verbose:
-                    print(changed)
-                # Add the change to the current set:
-                self.elements.add(changed)
+                    print(name, status)
+                # Add the element with its status to the current set:
+                self.add(name, status)
+
         if file_name:
             # A file name is given to this method, so open the file:
             f = open(file_name)
@@ -288,23 +309,51 @@ class ValidationClass:
             content = f.read()
             f.close()
             # Call again this method with the read string:
-            self.add_changed_from_diff(string = content)
+            self.add_from_diff(string = content, keep = keep)
         # To ease chaining of operations:
         return self
 
 
     def show_diff_files(self):
-        "Display the differences associated to the elements"
+        """Display the differences associated to the elements from the
+        result in the *.result directories (diff between the .out and the
+        .test)"""
 
-        # To avoid messing with previous print(), flush the output:
-        sys.stdout.flush()
+        for n in self.ordered_list():
+            if verbose:
+                print('Reading', n)
+            ref = Validation.reference_file_name(n)
+            out = Validation.output_file_name(n)
+
+            if not os.path.exists(ref):
+                print(ref, 'not found')
+                continue
+
+            if not os.path.exists(out):
+                print(out, 'not found')
+                continue
+
+            print("Differences between", ref, "and", out)
+            # To avoid messing with previous print(), flush the output:
+            sys.stdout.flush()
+            subprocess.call(["diff", ref, out])
+
+
+    def show_diff_results(self):
+        """Display the differences associated to the elements stored into
+        the validation result directory"""
+
         for n in self.ordered_list():
             if verbose:
                 print('Reading', n)
             file_name = Validation.diff_filename(n, self.output_directory)
             if os.path.exists(file_name):
-                # Use cat to avoid encoding trouble from inside Python:
+                # To avoid messing with previous print(), flush the output:
+                sys.stdout.flush()
+               # Use cat to avoid encoding trouble from inside Python:
                 subprocess.call(["cat", file_name])
+            else:
+                print(file_name, 'not found')
 
 
     def accept(self):
@@ -325,6 +374,14 @@ class ValidationClass:
         "Commit with git the current validation with the message"
 
         subprocess.call(["git", "commit", "-m", message])
+
+
+    def filter_status(self, status):
+        "Only keep elements that match the given status"
+
+        # Only keep elements with the correct status:
+        self.elements = dict(filter(lambda e : e[1] == status,
+                                    self.elements.items()))
 
 
     def re_filter(self, res):
@@ -356,40 +413,54 @@ def main():
 
     global verbose
 
-    parser = optparse.OptionParser(usage = "usage: %prog [options] [<files>]",
+    parser = optparse.OptionParser(usage = """usage: %prog [options] [<files>]
+    The following options are processed in this very order, so that you
+    can pipe actions:""",
                                    version = "$Id")
 
     parser.add_option("--file", dest="simple_file_name",
                       help = "Initialize a validation class from a plain line-oriented file of validation case names",
                       metavar="FILE")
 
+    parser.add_option("--old-diff-file", dest="old_diff_file_name",
+                      help = "Add to a validation class the items from the old differences found in a validation diff output file",
+                      metavar="FILE")
+
+    parser.add_option("--new-diff-file", dest="new_diff_file_name",
+                      help = "Add to a validation class the items from the new differences found in a validation diff output file",
+                      metavar="FILE")
+
+    parser.add_option("--keep-changed", dest="keep_status",
+                      action = "store_const", const = ValidationElement.CHANGED,
+                      help = 'Filter the current validation class by keeping the "changed" elements only')
+
+    parser.add_option("--keep-failed", dest="keep_status",
+                      action = "store_const", const = ValidationElement.FAILED,
+                      help = 'Filter the current validation class by keeping the "failed" elements only')
+
+    parser.add_option("--keep-skipped", dest="keep_status",
+                      action = "store_const", const = ValidationElement.SKIPPED,
+                      help = 'Filter the current validation class by keeping the "skipped" elements only')
+
+    parser.add_option("-f",  "--filter", dest="filter",
+                      help = "Filter the current class by keeping all the validation items with a name matching a regular expression",
+                      metavar="REGULAR-EXPRESSION")
+
+    parser.add_option("--filter-out", dest="filter_out",
+                      help = "Filter out the current class by removing all the validation items with a name matching a regular expression",
+                      metavar="REGULAR-EXPRESSION")
+
     parser.add_option("-l", "--list",
                       action = "store_true", dest = "list_elements", default = False,
                       help = "List the elements of the validation class")
 
-    parser.add_option("--changed-file", dest="changed_file_name",
-                      help = "Initialize a validation class from the 'changed' found in a validation output file",
-                      metavar="FILE")
+    parser.add_option("-s",  "--show-diff-files", action = "store_true",
+                      dest = "show_diff_files", default = False,
+                      help = "Show the output differences for the current class by looking into the *.results directories")
 
-    parser.add_option("--failed-file", dest="failed_file_name",
-                      help = "Initialize a validation class from the 'failed' found in a validation output file",
-                      metavar="FILE")
-
-    parser.add_option("--skipped-file", dest="skipped_file_name",
-                      help = "Initialize a validation class from the 'skipped' found in a validation output file",
-                      metavar="FILE")
-
-    parser.add_option("-d",  "--diff-file", dest="diff_file_name",
-                      help = "Initialize a validation class from a new difference found in a validation diff file",
-                      metavar="FILE")
-
-    parser.add_option("-f",  "--filter", dest="filter",
-                      help = "Filter the current class by applying a regex on the file names",
-                      metavar="REGULAR-EXPRESSION")
-
-    parser.add_option("-s",  "--show",
-                      action = "store_true", dest = "show", default = False,
-                      help = "Show the output differences for the current class")
+    parser.add_option("--show-diff-results", action = "store_true",
+                      dest = "show_diff_results", default = False,
+                      help = "Show the output differences for the current class from the RESULTS directory")
 
     parser.add_option("-a",  "--accept",
                       action = "store_true", dest = "accept", default = False,
@@ -415,37 +486,61 @@ def main():
 
     verbose = options.verbose
 
+    # To keep track of the current validation class:
+    vc = None
+
     if options.simple_file_name:
+        # Create a validation class from a validation output file:
         vc = ValidationClass().from_file(options.simple_file_name)
 
-    if options.changed_file_name:
-        vc = validation_class_from_file(options.changed_file_name, 'changed')
+    if options.old_diff_file_name:
+        # Add to a validation class what is marked as old into a diff
+        # validation output file:
+        vc = ValidationClass(vc = vc) \
+             .add_from_diff(file_name = options.old_diff_file_name,
+                            keep = ValidationElement.OLD_DIFF)
 
-    if options.failed_file_name:
-        vc = validation_class_from_file(options.failed_file_name, 'failed')
+    if options.new_diff_file_name:
+        # Add to a validation class what is marked as new into a diff
+        # validation output file:
+        vc = ValidationClass(vc = vc) \
+             .add_from_diff(file_name = options.new_diff_file_name,
+                            keep = ValidationElement.NEW_DIFF)
 
-    if options.skipped_file_name:
-        vc = validation_class_from_file(options.skipped_file_name, 'skipped')
-
-    if options.diff_file_name:
-        vc = ValidationClass(vc = vc).add_changed_from_diff(file_name = options.diff_file_name)
-        #vc = ValidationClass(diff_file = options.diff_file_name)
+    if options.keep_status:
+        # Only keep validation items that have a given status:
+        vc.filter_status(options.keep_status)
 
     if options.filter:
+        # Only keep validation items that match a regular expression:
         vc.re_filter(options.filter)
 
-    if options.show:
+    if options.filter_out:
+        # Only keep validation items that do not match a regular expression:
+        vc.re_filter_out(options.filter_out)
+
+    if options.list_elements:
+        # Display the validation class element names:
+        print(vc)
+
+    if options.show_diff_files:
+        # Show the diff in the .results directories for the validation
+        # class elements:
         vc.show_diff_files()
 
+    if options.show_diff_results:
+        # Show the diff recorded in RESULTS for the validation class elements:
+        vc.show_diff_results()
+
     if options.accept:
+        # Accept the validation class elements:
         vc.accept()
 
     if options.message:
+        # Commit with git and a given message the state of the validation
+        # class elements:
         vc.git_add()
         vc.git_commit(options.message)
-
-    if options.list_elements:
-        print(vc)
 
 
 # If this programm is independent it is executed:
