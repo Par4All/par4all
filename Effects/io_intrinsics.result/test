@@ -37,7 +37,8 @@ int main(char *fmt1, ...)
 //               <must be read   >: fmt2 fp i_name
 //               <must be written>: i
    (void) fscanf(fp, fmt2, i_name, &i);
-//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*] 
+//                                  i_name[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
 //               <must be read   >: fp i i_name
    (void) fprintf(fp, "%s%d", i_name, i);
@@ -69,7 +70,7 @@ int main(char *fmt1, ...)
 //               <must be written>: i
 
    (void) scanf("%s%d", i_name, &i);
-//               <may be read    >: fmt2[*]
+//               <may be read    >: fmt2[*] i_name[*]
 //               <must be read   >: __IO_EFFECTS:LUNS[1] fmt2 i i_name
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    (void) printf(fmt2, i_name, i);
@@ -101,11 +102,11 @@ int main(char *fmt1, ...)
    
    
    (void) sscanf(buf1, fmt2, i_name, &i);
-//               <may be read    >: fmt2[*]
+//               <may be read    >: fmt2[*] i_name[*]
 //               <may be written >: buf2[*]
 //               <must be read   >: buf2 fmt2 i i_name
    (void) sprintf(buf2, fmt2, i_name, i);
-//               <may be read    >: fmt2[*]
+//               <may be read    >: fmt2[*] i_name[*]
 //               <may be written >: buf2[*]
 //               <must be read   >: buf2 fmt2 i i_name
    (void) snprintf(buf2, 100, fmt2, i_name, i);
