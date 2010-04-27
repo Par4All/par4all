@@ -186,11 +186,19 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
             of the va_list).
 
      The tag fields are not relevant.
+     
+     I'm not satisfied with the description of effects for the last arguments 
+     of printf-like functions. If it is n*, effects on char * individual 
+     characters are missed. If it is r*, effects are generated
+     on pointed-to cells even when the user just want to print out pointer 
+     addresses. I change for r* because it's correct even if it is sometimes 
+     a very rough approximation. We need to analyse formatting patterns
+     for a more precise behaviour. BC (04/27/10).
 
   */
 
-  {PRINTF_FUNCTION_NAME,        "rn*",     is_action_read, is_approximation_must},
-  {FPRINTF_FUNCTION_NAME,       "srn*",    is_action_read, is_approximation_must},
+  {PRINTF_FUNCTION_NAME,        "rr*",     is_action_read, is_approximation_must},
+  {FPRINTF_FUNCTION_NAME,       "srr*",    is_action_read, is_approximation_must},
   {SCANF_FUNCTION_NAME,         "rw*",     is_action_read, is_approximation_must},
   {ISOC99_SCANF_FUNCTION_NAME,         "rw*",     is_action_read, is_approximation_must},
   {FSCANF_FUNCTION_NAME,        "srw*",    is_action_read, is_approximation_must},
@@ -201,8 +209,8 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {FGETS_FUNCTION_NAME,         "wns",     is_action_read, is_approximation_must},
   {FOPEN_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
   {FCLOSE_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
-  {SNPRINTF_FUNCTION_NAME,      "wnrn*",    is_action_read, is_approximation_must},
-  {SPRINTF_FUNCTION_NAME,       "wrn*",     is_action_read, is_approximation_must},
+  {SNPRINTF_FUNCTION_NAME,      "wnrr*",    is_action_read, is_approximation_must},
+  {SPRINTF_FUNCTION_NAME,       "wrr*",     is_action_read, is_approximation_must},
   {SSCANF_FUNCTION_NAME,        "rrw*",    is_action_read, is_approximation_must},
   {ISOC99_SSCANF_FUNCTION_NAME,        "rrw*",    is_action_read, is_approximation_must},
   {VFPRINTF_FUNCTION_NAME,      "srv",      is_action_read, is_approximation_must},

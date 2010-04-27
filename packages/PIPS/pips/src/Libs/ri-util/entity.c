@@ -733,6 +733,8 @@ bool entity_in_common_p(entity e)
 	 !entity_special_area_p(ram_section(storage_ram(s))));
 }
 
+/* See comments about module_name(). Its result is transient and must
+   be strduped. */
 string entity_module_name(entity e)
 {
   return module_name(entity_name(e));
@@ -871,7 +873,12 @@ int compare_entities(const entity *pe1, const entity *pe2)
     null_2 = (*pe2==(entity)NULL);
 
   if (null_1 || null_2)
-    return(null_2-null_1);
+    // FI: I reverse the test to place the constant term at the end of
+    //the vector so as to regenerate expressions with trailing
+    //constant terms; for instance, I get J+1 instead of 1+J.
+    // Of course, this impacts PIPS code generation
+    //return(null_2-null_1);
+    return(null_1-null_2);
   else {
     /* FI: Which sorting do you want? */
 

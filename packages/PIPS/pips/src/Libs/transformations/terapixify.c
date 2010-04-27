@@ -53,6 +53,9 @@
 #include "syntax.h"
 #include "c_syntax.h"
 #include "locality.h"
+#include "expressions.h"
+#include "semantics.h"
+#include "transformer.h"
 
 
 
@@ -591,6 +594,76 @@ static void isolate_patch_entities(void * where,entity old, entity new,list offs
             0);
 }
 
+static bool
+expression_minmax_p(expression e)
+{
+    if(expression_call_p(e))
+    {
+        entity op = call_function(expression_call(e));
+        return ENTITY_MIN_P(op) || ENTITY_MAX_P(op);
+    }
+    return false;
+}
+
+/* replace caller by field , where field is conatianed by caller */
+static void local_assign_expression(expression caller, expression field)
+{
+     syntax s = expression_syntax(field) ;
+     expression_syntax(field)=syntax_undefined;
+     free_syntax(expression_syntax(caller));
+     expression_syntax(caller)=s;
+     free_normalized(expression_normalized(caller));
+}
+
+static void bounds_of_expression(expression e, transformer tr,bool is_max)
+{
+    intptr_t lbound, ubound;
+    if(precondition_minmax_of_expression(e,tr,&lbound,&ubound))
+    {
+        free_syntax(expression_syntax(e));
+        free_normalized(expression_normalized(e));
+        expression new = int_to_expression(is_max ? ubound : lbound);
+        expression_syntax(e)=expression_syntax(new);
+        expression_normalized(e)=expression_normalized(new);
+        expression_syntax(new)=syntax_undefined;
+        expression_normalized(new)=normalized_undefined;
+        free_expression(new);
+    }
+}
+static void upperbound_of_expression(expression e, transformer tr)
+{
+    bounds_of_expression(e,tr,true);
+}
+static void lowerbound_of_expression(expression e, transformer tr)
+{
+    bounds_of_expression(e,tr,false);
+}
+
+static void simplify_minmax_expression(expression e,transformer tr)
+{
+    call c =expression_call(e);
+    bool is_max = ENTITY_MAX_P(call_function(c));
+
+    expression lhs = binary_call_lhs(c);
+    expression rhs = binary_call_rhs(c);
+    intptr_t lhs_lbound,lhs_ubound,rhs_lbound,rhs_ubound;
+    if(precondition_minmax_of_expression(lhs,tr,&lhs_lbound,&lhs_ubound) &&
+            precondition_minmax_of_expression(rhs,tr,&rhs_lbound,&rhs_ubound))
+    {
+        if(is_max)
+        {
+            if(lhs_lbound >=rhs_ubound) local_assign_expression(e,lhs);
+            else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,rhs);
+        }
+        else
+        {
+            if(lhs_lbound >=rhs_ubound) local_assign_expression(e,rhs);
+            else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,lhs);
+        }
+    }
+}
+
+
 /** 
  * generate a list of dimensions @p dims and of offsets @p from a region @p r
  * for example if r = a[phi0,phi1] 0<=phi0<=2 and 1<=phi1<=4
@@ -599,7 +672,7 @@ static void isolate_patch_entities(void * where,entity old, entity new,list offs
  * 
  * @return false if we were enable to gather enough informations
  */
-static bool region_to_minimal_dimensions(region r, list * dims, list *offsets)
+static bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *offsets)
 {
     pips_assert("empty parameters\n",ENDP(*dims)&&ENDP(*offsets));
     reference ref = region_any_reference(r);
@@ -616,7 +689,7 @@ static bool region_to_minimal_dimensions(region r, list * dims, list *offsets)
             if(bounds_equal_p(phi,lower,upper))
             {
                 expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(1)),*dims);
+                *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),*dims);
                 *offsets=CONS(EXPRESSION,bound,*offsets);
             }
             /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
@@ -624,12 +697,22 @@ static bool region_to_minimal_dimensions(region r, list * dims, list *offsets)
             {
                 expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
                 expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                if(expression_minmax_p(elower))
+                    simplify_minmax_expression(elower,tr);
+                if(expression_minmax_p(eupper))
+                    simplify_minmax_expression(eupper,tr);
+                expression offset = copy_expression(elower);
+
+                expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
+                if(expression_minmax_p(elower)||expression_minmax_p(eupper))
+                    upperbound_of_expression(dim,tr);
+
                 *dims=CONS(DIMENSION,
                         make_dimension(
                             int_to_expression(0),
-                            make_op_exp(MINUS_OPERATOR_NAME,eupper,elower)
+                            dim
                             ),*dims);
-                *offsets=CONS(EXPRESSION,copy_expression(elower),*offsets);
+                *offsets=CONS(EXPRESSION,offset,*offsets);
             }
         }
         else {
@@ -768,6 +851,7 @@ static void do_isolate_statement(statement s)
 
     list read_regions = regions_read_regions(regions);
     list write_regions = regions_write_regions(regions);
+    transformer tr = transformer_range(load_statement_precondition(s));
 
     statement prelude=make_empty_block_statement(),postlude=make_empty_block_statement();
     set visited_entities = set_make(set_pointer);
@@ -797,7 +881,7 @@ static void do_isolate_statement(statement s)
             /* based on the rw_region, we can allocate a new entity with proper dimensions
              */
             list offsets = NIL,dimensions=NIL;
-            if(region_to_minimal_dimensions(rw_region,&dimensions,&offsets))
+            if(region_to_minimal_dimensions(rw_region,tr,&dimensions,&offsets))
             {
                 /* a scalar */
                 if(ENDP(dimensions))
@@ -817,7 +901,7 @@ static void do_isolate_statement(statement s)
                     if(!region_undefined_p(read_region))
                     {
                         list read_dimensions=NIL,read_offsets=NIL;
-                        if(region_to_minimal_dimensions(read_region,&read_dimensions,&read_offsets))
+                        if(region_to_minimal_dimensions(read_region,tr,&read_dimensions,&read_offsets))
                         {
                             insert_statement(prelude,isolate_make_array_transfer(e,new,read_dimensions,read_offsets,transfer_in),true);
                         }
@@ -831,7 +915,7 @@ static void do_isolate_statement(statement s)
                     if(!region_undefined_p(write_region))
                     {
                         list write_dimensions=NIL,write_offsets=NIL;
-                        if(region_to_minimal_dimensions(write_region,&write_dimensions,&write_offsets))
+                        if(region_to_minimal_dimensions(write_region,tr,&write_dimensions,&write_offsets))
                         {
                             insert_statement(postlude,isolate_make_array_transfer(new,e,write_dimensions,write_offsets,transfer_out),false);
                         }
@@ -862,6 +946,7 @@ static void do_isolate_statement(statement s)
     set_free(visited_entities);
     gen_free_list(read_regions);
     gen_free_list(write_regions);
+    free_transformer(tr);
 }
 
 bool
@@ -870,6 +955,8 @@ isolate_statement(string module_name)
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
+    module_to_value_mappings(get_current_module_entity());
+    set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
     string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
     entity stmt_label_entity = find_label_entity(module_name,stmt_label);
@@ -889,6 +976,9 @@ isolate_statement(string module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    reset_precondition_map();
+    free_value_mappings();
+
     return true;
 }
 
