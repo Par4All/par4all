@@ -3,7 +3,7 @@
 program main
 
     implicit none
-    
+
     real :: a
 
     integer :: toto, tata, titi, tutu
