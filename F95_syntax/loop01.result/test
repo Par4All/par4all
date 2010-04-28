@@ -1,0 +1,6 @@
+PROGRAM MAIN
+    INTEGER I,A(10)
+    DO I=1,10
+        A(I) = 0
+    END DO
+END

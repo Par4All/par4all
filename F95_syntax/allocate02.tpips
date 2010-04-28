@@ -8,7 +8,7 @@ display PRINTED_FILE[%ALL]
 
 apply UNSPLIT [%ALL]
 shell gcc -c allocate02.database/Src/allocate02.f90
-shell rm *.o
+shell rm allocate02.o
 
 close
 delete allocate02

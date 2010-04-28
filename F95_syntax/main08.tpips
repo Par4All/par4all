@@ -8,7 +8,7 @@ display PRINTED_FILE[%ALL]
 
 apply UNSPLIT[%ALL]
 shell gcc -c main08.database/Src/main08.f90
-shell rm *.o
+shell rm main08.o
 
 close
 quit
