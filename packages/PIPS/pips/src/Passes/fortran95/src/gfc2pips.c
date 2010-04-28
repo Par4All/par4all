@@ -324,7 +324,7 @@ void gfc2pips_add_to_callees( entity e ) {
 
   if ( !intrinsic_entity_p( e ) && strcmp_( entity_local_name( e ),
                                             CurrentPackage ) != 0 ) {
-    printf( "Add callee : %s\n", entity_local_name( e ) );
+    gfc2pips_debug(5, "Add callee : %s\n", entity_local_name( e ) );
     gfc_called_modules = CONS(string,entity_local_name(e),gfc_called_modules);
   }
 }
