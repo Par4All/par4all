@@ -7,6 +7,11 @@
       ALLOCATE(UBAR(JMAX-1), RBAR(JMAX-1), STAT=ERR)
       UBAR=0D0
       RBAR=0D0
-
+      print *, ubar
+      print *, rbar
       RETURN
       END
+
+program main
+  call allocatable
+end

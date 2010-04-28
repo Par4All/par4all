@@ -1,0 +1,15 @@
+delete loop01
+create loop01 loop01.f90
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE(%ALL)
+
+apply UNSPLIT (%ALL)
+shell gcc -c loop01.database/Src/loop01.f90
+shell rm loop01.o
+
+close
+delete loop01
+quit
+

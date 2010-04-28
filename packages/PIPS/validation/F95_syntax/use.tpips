@@ -1,0 +1,15 @@
+delete use
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create use foo.f90 use.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c use.database/Src/use.f90
+shell rm use.o
+
+close
+delete use
+quit
