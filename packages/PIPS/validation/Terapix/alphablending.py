@@ -48,7 +48,7 @@ if __name__ == "__main__":
 	m = w["alphablending"]
 	
 	print "tidy the code just in case of"
-	m.partial_eval(linearize=True)
+	m.partial_eval()
 	m.display()
 	
 	print "tiling"

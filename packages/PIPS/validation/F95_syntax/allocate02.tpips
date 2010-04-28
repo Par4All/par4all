@@ -1,0 +1,15 @@
+delete allocate02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create allocate02 allocate02.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT [%ALL]
+shell gcc -c allocate02.database/Src/allocate02.f90
+shell rm allocate02.o
+
+close
+delete allocate02
+

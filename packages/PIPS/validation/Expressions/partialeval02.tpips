@@ -6,14 +6,9 @@ create $WS $WS.c
 echo input code
 display PRINTED_FILE(%ALLFUNC)
 
-echo partially evaled code without normalization
+echo partially evaled code with normalization
 apply PARTIAL_EVAL(foo)
 display PRINTED_FILE(foo)
-
-echo partially evaled code with normalization
-setproperty PARTIAL_EVAL_LINEARIZE TRUE
-apply PARTIAL_EVAL(bar)
-display PRINTED_FILE(bar)
 
 close
 delete $WS

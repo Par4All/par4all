@@ -1,3 +1,4 @@
+#include <stdio.h>
 /* Check that a static initialization does not generate a write effect
    on the static variable. The static initialization is not executed
    when the function is called. It is executed statically at compiler

@@ -1,0 +1,14 @@
+delete main09
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create main09 main09.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+shell gcc -c main09.database/Src/main09.f90
+shell rm main09.o
+
+close
+quit

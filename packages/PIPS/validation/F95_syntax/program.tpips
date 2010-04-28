@@ -8,7 +8,7 @@ display PRINTED_FILE[TOTO]
 
 apply UNSPLIT [%ALL]
 shell gcc -c program.database/Src/program.f90
-shell rm *.o
+shell rm program.o
 
 close
 #delete program
