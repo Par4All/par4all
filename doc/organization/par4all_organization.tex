@@ -76,6 +76,12 @@ If you want to download \Apfa from the \Agit and compile it, try:
 Everything is built into \verb|$P4A_ROOT/build| and installed into
 \verb|$P4A_ROOT/run|.
 
+If you want to pull a new version, try
+\begin{verbatim}
+git pull origin p4a
+\end{verbatim}
+and recompile.
+
 To be sure you do not break the compilation process, you should compile
 your work before committing it on the central repositories. By a nice side
 effect, it allows you to test your code. \smiley
@@ -119,7 +125,9 @@ installation process:
 \item[\texttt{--skip-linear}:] skip the \Alinear installation;
 \item[\texttt{--skip-pips}:] skip the \Apips installation;
 \item[\texttt{-v|--verbose}:] be verbose;
-\item[\texttt{-h|--help}:] display this usage.
+\item[\texttt{-h|--help}:] display this usage;
+\item[\texttt{\emph{compilation targets}}:] the targets that are built, by
+  default it is \texttt{autoreconf configure install}.
 \end{description}
 
 If you often want to skip the compilation of a package you can define with
@@ -146,6 +154,19 @@ to compile.
 You can change the options passed to \texttt{configure} for a package by
 setting the \texttt{P4A\_\emph{PACKAGE}\_CONFIGURE\_OPTIONS} environment
 variable.
+
+For example, if you want just to compile \Apips with Fortran 95 support:
+\begin{verbatim}
+export P4A_PIPS_CONFIGURE_OPTIONS="--enable-tpips --enable-pyps \
+  --enable-hpfc --enable-fortran95"
+p4a_setup --skip-polylib --skip-newgen --skip-linear
+\end{verbatim}
+
+Then, if you have modified \Apips and you just want to recompile and
+install it, just use:
+\begin{verbatim}
+p4a_setup --skip-polylib --skip-newgen --skip-linear install
+\end{verbatim}
 
 Beware that if you have used a \Apips directory to compile in an other
 context (such as the classical \Asvn build), the compilation will fail
