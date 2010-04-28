@@ -619,12 +619,12 @@ eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
       for(ce = call_arguments(ec); !ENDP(ce); POP(ce))
         {
 	  expression eparam = EXPRESSION(CAR(ce));
-	  if(c_module_p(func)) {
+	  if(c_language_module_p(func)) {
 	    /* value passing */
 	    partial_eval_expression_and_regenerate(&eparam,ps,fx);
 	    EXPRESSION_(CAR(ce)) = eparam;
 	  }
-	  else if(fortran_module_p(func)) {
+	  else if(fortran_language_module_p(func)) {
 	    /* the partial evaluation could be further improved by
 	       checking if there is a write effect on the
 	       corresponding formal parameter */
@@ -1156,13 +1156,18 @@ eformat_t partial_eval_update_operators(expression *ep1 __attribute__ ((__unused
 					Psysteme ps,
 					effects fx)
 {
-  eformat_t ef, ef2;
+  eformat_t ef, ef1, ef2;
 
-  //ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+  /* You do not want to change "n = 1; n = 1;" into n = 1; 1 = 1;" */
+  if(!(expression_reference_p(*ep1)
+       && reference_scalar_p(expression_reference(*ep1)))) {
+    ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+    regenerate_expression(&ef1, ep1);
+  }
+
   ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
-
-  //regenerate_expression(&ef1, ep1);
   regenerate_expression(&ef2, ep2);
+
   ef = eformat_undefined;
 
   return ef;
@@ -1525,7 +1530,7 @@ void regenerate_call(eformat_t *efp, call ca)
   }
   else if(expression_call_p(e)) {
     call nc = syntax_call(expression_syntax(e));
-    list al = call_arguments(ca);
+    //list al = call_arguments(ca);
     call_function(ca) = call_function(nc);
     call_arguments(ca) = call_arguments(nc);
     // gen_full_free_list(al);
