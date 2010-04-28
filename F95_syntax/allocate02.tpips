@@ -7,8 +7,11 @@ create allocate02 allocate02.f90
 display PRINTED_FILE[%ALL]
 
 apply UNSPLIT [%ALL]
-shell gcc -c allocate02.database/Src/allocate02.f90
-shell rm allocate02.o
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o allocate02.database/Src/allocate02.o allocate02.database/Src/allocate02.f90
 
 close
 delete allocate02

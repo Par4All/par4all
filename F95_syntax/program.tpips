@@ -7,8 +7,11 @@ create program program.f90
 display PRINTED_FILE[TOTO]
 
 apply UNSPLIT [%ALL]
-shell gcc -c program.database/Src/program.f90
-shell rm program.o
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o program.database/Src/program.o program.database/Src/program.f90
 
 close
 #delete program
