@@ -1637,6 +1637,7 @@ expression Pvecteur_to_expression(Pvecteur vect)
 }
 
 
+/* Short cut, meaningful only if expression_reference_p(e) holds. */
 reference expression_reference(expression e)
 {
     return syntax_reference(expression_syntax(e));
