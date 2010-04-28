@@ -168,6 +168,8 @@ export PKG_CONFIG_PATH=\$P4A_ROOT/run/lib/pkgconfig
 # To fix...
 export PYTHONPATH=\$P4A_ROOT/run/lib/python2.5/site-packages/pips
 
+# To have ply under python3.1:
+PYTHONPATH=\$PYTHONPATH:/usr/share/pyshared
 
 # Temporary place for P4A_accel
 export P4A_ACCEL_DIR=\$P4A_ROOT/src/p4a_accel
@@ -217,7 +219,10 @@ function build_package() {
     local options=$4
     (
 	# Get the package name uppercased:
-	local upper_package=${package^^}
+	# Hmmm... Only bash v4...
+	# local upper_package=${package^^}
+	# Do not hurt bash v3 with modernism...
+	local upper_package=`echo ${package} | tr "[:lower:]" "[:upper:]"`
 	# If the P4A_SKIP_<PACKAGE> is defined, skip its installation:
 	eval "local skip_package=\$P4A_SKIP_${upper_package}"
 	if [[ -n $skip_package ]]; then
