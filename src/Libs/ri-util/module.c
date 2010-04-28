@@ -469,6 +469,37 @@ list module_to_all_declarations(entity m)
 
   return dl;
 }
+
+/* Simplified versions of c_module_p() and fortran_module_p().
+ *
+ * They cannot be used before the parsing is advanced unlike the other
+ * above two functions located in preprocessor, but they only require
+ * stuff from ri-util.
+*/
+static bool x_language_module_p(entity m, unsigned int x)
+{
+  bool is_x = TRUE;
+  value mv = entity_initial(m);
+
+  if(value_code_p(mv)) {
+    code c = value_code(mv);
+    is_x = language_tag(code_language(c))==x;
+  }
+  else
+    is_x = FALSE;
+
+  return is_x;
+}
+
+bool c_language_module_p(entity m)
+{
+  return x_language_module_p(m, is_language_c);
+}
+
+bool fortran_language_module_p(entity m)
+{
+  return x_language_module_p(m, is_language_fortran);
+}
 
 /*
  *  that is all
