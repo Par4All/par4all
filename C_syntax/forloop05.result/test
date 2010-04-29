@@ -100,7 +100,10 @@ int main()
 //               <must be read   >: BlockEnd k
 //               <must be written>: l
             l = k;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] BlockEnd l
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  BlockEnd l
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             printf("%d\n", l);
 //               <must be read   >: BlockEnd j
@@ -144,7 +147,7 @@ Printed file with transformers for "main"
 int main()
 {
 
-//  T(BlockEnd) {BlockEnd==3}
+//  T(BlockEnd,i,j,n) {BlockEnd==3}
 
    int i, j, n, BlockEnd = 3;
 
@@ -166,7 +169,7 @@ int main()
 
          for(n = 0; n <= BlockEnd-1; n += 1) {
 
-//  T() {BlockEnd==3, i<=15, 0<=n, n<=2}
+//  T(k,l) {BlockEnd==3, i<=15, 0<=n, n<=2}
 
             int k, l;
 
@@ -210,50 +213,56 @@ int main()
 
    int i, j, n, BlockEnd = 3;
 
-//  P() {BlockEnd==3}
+//  P(BlockEnd,i,j,n) {BlockEnd==3}
 
 
    i = 1;
 
-//  P(i) {BlockEnd==3, i==1}
+//  P(BlockEnd,i,j,n) {BlockEnd==3, i==1}
 
    while (i<16) {
       {
 
-//  P(foo:0`l,i,j,n) {BlockEnd==3, i<=15}
+//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, i<=15}
 
          j = i;
 
-//  P(foo:0`l,i,j,n) {BlockEnd==3, i==j, i<=15}
+//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, i==j, i<=15}
 
          for(n = 0; n <= BlockEnd-1; n += 1) {
 
-//  P(foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, i<=j, 0<=n, n<=2}
+//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, i+n==j, j<=n+15, 0<=n,
+//    n<=2}
 
             int k, l;
 
-//  P(foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, i<=j, 0<=n, n<=2}
+//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, i+n==j, j<=n+15, 0<=n,
+//    n<=2}
 
             k = foo((j, n));
 
-//  P(foo:0`l,i,j,k,n) {BlockEnd==3, foo:0`l+i==j, foo:0`l==k,
-//    foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, i<=15, i<=j}
+//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j,
+//    foo:0`l==k, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, j<=foo:0`l+15,
+//    i<=15}
 
             l = k;
 
-//  P(foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j, foo:0`l==k,
-//    foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, i<=15, i<=j}
+//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j,
+//    foo:0`l==k, foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2,
+//    j<=foo:0`l+15, i<=15}
 
             printf("%d\n", l);
 
-//  P(foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j, foo:0`l==k,
-//    foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, i<=15, i<=j}
+//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j,
+//    foo:0`l==k, foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2,
+//    j<=foo:0`l+15, i<=15}
 
             j++;
          }
       }
 
-//  P(foo:0`l,i,j,n) {BlockEnd==3, foo:0`l==2, i==j-3, n==3, i<=15}
+//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, foo:0`l==2, i==j-3, n==3,
+//    i<=15}
 
       i <<= 2;
    }

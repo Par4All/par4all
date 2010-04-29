@@ -1,4 +1,251 @@
 
+Preconditions for EVAL
+
+
+C  P() {}
+
+C     
+C     
+      PROGRAM EVAL
+C
+C     Programme de test pour l'evaluation partielle et le 
+C     remplacement de constantes.
+C
+      INTEGER L(10)
+
+C  P() {}
+
+C
+C
+      I = 0                                                             0011
+
+C  P(I) {I==0}
+
+      J = 1                                                             0012
+
+C  P(I,J) {I==0, J==1}
+
+      K = 5                                                             0013
+
+C  P(I,J,K) {I==0, J==1, K==5}
+
+C
+C     do not replace array references, but array indices
+      L(I+J+1) = L(1)+L(J-0)+I                                          0016
+
+C  P(I,J,K) {I==0, J==1, K==5}
+
+C
+      DO I = J, K+0, J                                                  0018
+
+C  P(I,J,K) {J==1, K==5, 1<=I, I<=5}
+
+         P = P+I                                                        0019
+      ENDDO
+
+C  P(I,J,K) {I==6, J==1, K==5}
+
+C
+      IF (2*N*J-0.GT.0) P = 0                                           0022
+
+C  P(I,J,K) {I==6, J==1, K==5}
+
+C
+C     test de PLUS et MINUS
+      K = 2*M+2*N                                                       0027
+
+C  P(I,J,K) {I==6, J==1, 2M+2N==K}
+
+      K = 2*M-2*N                                                       0028
+
+C  P(I,J,K) {I==6, J==1, K+2N==2M}
+
+      K = 2*M+(-2)*N                                                    0029
+
+C  P(I,J,K) {I==6, J==1, K+2N==2M}
+
+      K = -2*M+2*N                                                      0030
+
+C  P(I,J,K) {I==6, J==1, K+2M==2N}
+
+      K = -2*M-2*N                                                      0031
+
+C  P(I,J,K) {I==6, J==1, K+2M+2N==0}
+
+      K = -2*M+(-2)*N                                                   0032
+
+C  P(I,J,K) {I==6, J==1, K+2M+2N==0}
+
+C
+      K = M+2*N                                                         0034
+
+C  P(I,J,K) {I==6, J==1, M+2N==K}
+
+      K = M-2*N                                                         0035
+
+C  P(I,J,K) {I==6, J==1, K+2N==M}
+
+      K = M+(-2)*N                                                      0036
+
+C  P(I,J,K) {I==6, J==1, K+2N==M}
+
+      K = -M-2*N                                                        0037
+
+C  P(I,J,K) {I==6, J==1, K+M+2N==0}
+
+      K = -M+(-2)*N                                                     0038
+
+C  P(I,J,K) {I==6, J==1, K+M+2N==0}
+
+      K = -M-(-2)*N                                                     0039
+
+C  P(I,J,K) {I==6, J==1, K+M==2N}
+
+C
+      K = 1+N                                                           0041
+
+C  P(I,J,K) {I==6, J==1, K==N+1}
+
+      K = -1-N                                                          0042
+
+C  P(I,J,K) {I==6, J==1, K+N==-1}
+
+      K = -N-1                                                          0043
+
+C  P(I,J,K) {I==6, J==1, K+N==-1}
+
+      K = -N+(-1)                                                       0044
+
+C  P(I,J,K) {I==6, J==1, K+N==-1}
+
+      K = N+1                                                           0045
+
+C  P(I,J,K) {I==6, J==1, K==N+1}
+
+      K = 0+N-0                                                         0046
+
+C  P(I,J,K) {I==6, J==1, K==N}
+
+C
+C     test pour MULT
+      K = 3*M*(-2)                                                      0049
+
+C  P(I,J,K) {I==6, J==1, K+6M==0}
+
+      K = 1*N                                                           0050
+
+C  P(I,J,K) {I==6, J==1, K==N}
+
+      K = (2*N+1)*0                                                     0051
+
+C  P(I,J,K) {I==6, J==1, K==0}
+
+      K = 3*N*M                                                         0052
+
+C  P(I,J,K) {I==6, J==1}
+
+      K = 2+(3*N+0)*(M-1)+5                                             0053
+
+C  P(I,J,K) {I==6, J==1}
+
+      K = (N+1)*M                                                       0054
+
+C  P(I,J,K) {I==6, J==1}
+
+C
+C     test pour DIV et MOD.
+C     {A=3/2} est equivalent a {A=1}, mais different de {A=3./2}
+      A = 3/2                                                           0058
+
+C  P(I,J,K) {I==6, J==1}
+
+      A = 3./2                                                          0059
+
+C  P(I,J,K) {I==6, J==1}
+
+      K = 3/2                                                           0060
+
+C  P(I,J,K) {I==6, J==1, K==1}
+
+      K = 4/2                                                           0061
+
+C  P(I,J,K) {I==6, J==1, K==2}
+
+      K = -5/(-2)                                                       0062
+
+C  P(I,J,K) {I==6, J==1, K==2}
+
+c     (-5)/2 = 5/(-2) = -2
+      K = -5/2                                                          0064
+
+C  P(I,J,K) {I==6, J==1, K==-2}
+
+      K = 5/(-2)                                                        0065
+
+C  P(I,J,K) {I==6, J==1, K==-2}
+
+      K = (4*M+5)/2                                                     0066
+
+C  P(I,J,K) {I==6, J==1, K==2M+2}
+
+      K = (4*M+5)/1                                                     0067
+
+C  P(I,J,K) {I==6, J==1, K==4M+5}
+
+      K = (4*M+6)/2                                                     0068
+
+C  P(I,J,K) {I==6, J==1, K==2M+3}
+
+c     MOD(3,2) = 1
+      K1 = MOD(3, 2)                                                    0070
+
+C  P(I,J,K,K1) {I==6, J==1, K==2M+3, K1==1}
+
+c     MOD(-3,-2) = -1
+      K2 = MOD(-3, -2)                                                  0072
+
+C  P(I,J,K,K1,K2) {I==6, J==1, K==2M+3, K1==1, K2==-1}
+
+C     Not true with gfortran
+c     MOD(-3,2) = MOD(3,-2) = -1
+c     MOD(-3,2) = -1
+      K3 = MOD(-3, 2)                                                   0076
+
+C  P(I,J,K,K1,K2,K3) {I==6, J==1, K==2M+3, K1==1, K2==-1, K3==-1}
+
+c     MOD(3,-2) = 1
+      K4 = MOD(3, -2)                                                   0078
+
+C  P(I,J,K,K1,K2,K3,K4) {I==6, J==1, K==2M+3, K1==1, K2==-1, K3==-1,
+C    K4==1}
+
+      PRINT *, K1, K2, K3, K4, "(should be 1, -1, -1, 1)"               0079
+
+C  P(I,J,K,K1,K2,K3,K4) {I==6, J==1, K==2M+3, K1==1, K2==-1, K3==-1,
+C    K4==1}
+
+C
+C     do not replace written parameters of assign, fonctions 
+C     or subroutines!
+      I = 10                                                            0083
+
+C  P(I,J,K,K1,K2,K3,K4) {I==10, J==1, K==2M+3, K1==1, K2==-1, K3==-1,
+C    K4==1}
+
+      I = I                                                             0084
+
+C  P(I,J,K,K1,K2,K3,K4) {I==10, J==1, K==2M+3, K1==1, K2==-1, K3==-1,
+C    K4==1}
+
+      J = 0                                                             0085
+
+C  P(I,J,K,K1,K2,K3,K4) {I==10, J==0, K==2M+3, K1==1, K2==-1, K3==-1,
+C    K4==1}
+
+      CALL FX(I, J)                                                     0086
+C
+      END
+
 Partialy evaluated code for EVAL
 
 C     
