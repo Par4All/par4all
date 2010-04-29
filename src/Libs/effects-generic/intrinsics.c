@@ -1405,25 +1405,34 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	 ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
 	{
 	  // The output is written to stdout
-	  std_ref = make_reference(local_name_to_top_level_entity("stdout"), NIL);
+	  std_ref = make_reference(FindOrCreateTopLevelEntity("stdout"), NIL);
 	  
-	  /* we cannot use STDOUT_FILENO because the stdout variable may have been modified by the user */
-	  unit = make_unbounded_expression();	  
+	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
+	    unit = int_to_expression(STDOUT_FILENO); 
+	  else
+	    /* we cannot use STDOUT_FILENO because the stdout variable may have been modified by the user */
+	    unit = make_unbounded_expression();	  
 	}
       else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || 
 	       ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
 	{
 	  //The input is obtained from stdin
-	  std_ref = make_reference(local_name_to_top_level_entity("stdin"), NIL);
+	  std_ref = make_reference(FindOrCreateTopLevelEntity("stdin"), NIL);
 	  
-	  /* we cannot use STDIN_FILENO because the stdout variable may have been modified by the user */
-	  unit = make_unbounded_expression();
+	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
+	    unit = int_to_expression(STDIN_FILENO); 
+	  else
+	    /* we cannot use STDIN_FILENO because the stdout variable may have been modified by the user */
+	    unit = make_unbounded_expression();
 	}
       else if (ENTITY_PERROR_P(e))
 	{
+	  std_ref = make_reference(FindOrCreateTopLevelEntity("stderr"), NIL);
 	  /* we cannot use STDERR_FILENO because the stdout variable may have been modified by the user */
-	  std_ref = make_reference(local_name_to_top_level_entity("stderr"), NIL);
-	  unit = make_unbounded_expression();
+	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
+	    unit = int_to_expression(STDERR_FILENO); 
+	  else
+	    unit = make_unbounded_expression();
 	}
       
       else if(ENTITY_FOPEN_P(e))
@@ -1765,9 +1774,6 @@ static list effects_of_C_ioelem(expression arg, tag act)
     {
     case 'f':
       unit = copy_expression(arg);
-    case 's':
-      pips_debug(5, "stream or integer file descriptor case \n");
-
             /* We simulate actions on files by read/write actions
 	       to a special static integer array.
 	       GO:
@@ -1775,34 +1781,26 @@ static list effects_of_C_ioelem(expression arg, tag act)
 	       the array, because it updates the file-pointer so
 	       it reads it and then writes it ...
 	    */
+      indices = CONS(EXPRESSION, unit, NIL);
+      private_io_entity = global_name_to_entity
+	(IO_EFFECTS_PACKAGE_NAME,
+	 IO_EFFECTS_ARRAY_NAME);
+
+      pips_assert("private_io_entity is defined\n", 
+		  private_io_entity != entity_undefined);
+       
+      ref1 = make_reference(private_io_entity, indices);
+      ref2 = copy_reference(ref1);
+      eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
+      eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
       
-       indices = CONS(EXPRESSION, 
-		      act == 'f'? unit : make_unbounded_expression(), 
-		      NIL);
-       must_p = act == 'f' ? true : false;
-       private_io_entity = global_name_to_entity
-	 (IO_EFFECTS_PACKAGE_NAME,
-	  IO_EFFECTS_ARRAY_NAME);
+      le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
+      break;
+    case 's':
+      pips_debug(5, "stream or integer file descriptor case \n");
 
-       pips_assert("private_io_entity is defined\n", 
-		   private_io_entity != entity_undefined);
-       
-       ref1 = make_reference(private_io_entity, indices);
-       ref2 = copy_reference(ref1);
-       /* FI: I would like not to use "preference" instead of
-	  "reference", but this causes a bug in cumulated effects and I
-	  do not have time to chase it. */
-       eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
-       eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
-       
-       if(!must_p) 
-	 {
-	   effect_approximation_tag(eff1) = is_approximation_may;
-	   effect_approximation_tag(eff2) = is_approximation_may;
-	 }
-       le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
 
-       /* and the effects on the file pointer */
+       /* first the effects on the file pointer */
        /* We should maybe check here that the argument has the right type (FILE *) */
        effect fp_eff_w = effect_undefined;
        effect fp_eff_r = effect_undefined;
@@ -1827,6 +1825,54 @@ static list effects_of_C_ioelem(expression arg, tag act)
 	     }
 	 }
        l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
+
+       /* Then we simulate actions on files by read/write actions
+	  to a special static integer array.
+	  GO: It is necessary to do a read and write action to
+	  the array, because it updates the file-pointer so
+	  it reads it and then writes it ...
+	  We try to identify if the stream points to a std file
+       */
+ 
+       if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
+	 {
+	   string s = entity_user_name(effect_entity(fp_eff_r));
+	   if (same_string_p(s, "stdout"))
+	     unit = int_to_expression(STDOUT_FILENO);
+	   else if (same_string_p(s, "stdin"))
+	     unit = int_to_expression(STDIN_FILENO);
+	   else /* (same_string_p(s, "stderr")) */
+	     unit = int_to_expression(STDERR_FILENO);
+	   must_p = true;
+	     
+	 }
+       else
+	 {
+	   unit = make_unbounded_expression();
+	   must_p = false;
+	 }
+       indices = CONS(EXPRESSION, 
+		      unit, 
+		      NIL);
+       private_io_entity = global_name_to_entity
+	 (IO_EFFECTS_PACKAGE_NAME,
+	  IO_EFFECTS_ARRAY_NAME);
+
+       pips_assert("private_io_entity is defined\n", 
+		   private_io_entity != entity_undefined);
+       
+       ref1 = make_reference(private_io_entity, indices);
+       ref2 = copy_reference(ref1);
+       eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
+       eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
+       
+       if(!must_p) 
+	 {
+	   effect_approximation_tag(eff1) = is_approximation_may;
+	   effect_approximation_tag(eff2) = is_approximation_may;
+	 }
+       le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
+
        le = gen_nconc(le, l_fp_eff);
        
        break;
@@ -1852,19 +1898,17 @@ static list effects_of_C_ioelem(expression arg, tag act)
       /* first check whether the argument is a char *. */
       type t = expression_to_type(arg);
       variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-      if (!variable_undefined_p(v) 
-	  && basic_pointer_p(variable_basic(v)) 
-	  && ENDP(variable_dimensions(v)) 
-	  && char_type_p(basic_pointer(variable_basic(v))))
-	{
+      if (act == 'W' 
+	  ||
+	  (!variable_undefined_p(v) 
+	   && ((basic_pointer_p(variable_basic(v)) 
+		&& ENDP(variable_dimensions(v)) 
+		&& char_type_p(basic_pointer(variable_basic(v))))
+	       ||
+	       (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1)))))
+	     {
 	  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, tolower(act)));
-	}
-      else
-	{
-	  if (act == 'W')	    
-	    le = gen_nconc(le, generic_proper_effects_of_any_lhs(arg));
-	  /* act == R is not useful since the effects of evaluation of arguments are added later */
-	}
+	}      
       break;
     case 'n':
       pips_debug(5, "only effects on actual argument evaluation\n");

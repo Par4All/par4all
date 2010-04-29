@@ -271,6 +271,12 @@ bool io_effect_p(effect e)
   return io_effect_entity_p(reference_variable(effect_any_reference(e)));
 }
 
+bool std_file_effect_p(effect e)
+{
+  string s = entity_user_name(effect_entity(e));
+  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr")); 
+}
+
 /* Can we merge these two effects because they are equal or because
    they only differ by their approximations and their descriptors? */
 bool effect_comparable_p(effect e1, effect e2)
