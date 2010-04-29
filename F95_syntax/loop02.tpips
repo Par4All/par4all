@@ -1,0 +1,17 @@
+delete loop02
+create loop02 loop02.f90
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE(%ALL)
+
+apply UNSPLIT (%ALL)
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o loop02.database/Src/loop02.o loop02.database/Src/loop02.f90
+
+close
+#delete loop02
+quit
