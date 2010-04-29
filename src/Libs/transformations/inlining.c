@@ -164,7 +164,7 @@ bool find_write_effect_on_entity(statement s, entity e)
 	return false;
 }
 
-bool has_similar_entity(entity e,set se)
+static bool has_similar_entity(entity e,set se)
 {
     SET_FOREACH(entity,ee,se)
         if( same_string_p(entity_user_name(e),entity_user_name(ee)))
@@ -1135,6 +1135,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
     entity new_fun = make_empty_subroutine(outline_module_name);
+    entity_language(new_fun)=copy_language(entity_language(get_current_module_entity()));
     statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
     /* Retrieve referenced and declared entities */
