@@ -13,6 +13,6 @@ echo
 shell gcc -c -o parameter.database/Src/parameter.o parameter.database/Src/parameter.f90
 
 close
-#delete parameter
+delete parameter
 quit
 
