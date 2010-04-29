@@ -27,7 +27,9 @@ int main()
       
       // definition of b, also modifies a
       b = a;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with pointer copy : \n");
 //               <must be written>: i
@@ -35,7 +37,9 @@ int main()
 //               <must be read   >: b[.p] i
 //               <must be written>: b[.p][i]
          (b.p)[i] = i*10;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] a[.p] 
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] a[.p] 
 //                                  a[.p][i] b[.p] b[.p][i] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
@@ -52,7 +56,9 @@ int main()
       
       // definition of d, does not modify c
       d = c;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array copy : \n");
 //               <must be written>: i
@@ -60,8 +66,10 @@ int main()
 //               <must be read   >: i
 //               <must be written>: d[.array][i]
          (d.array)[i] = i*10;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] c[.array][i] 
-//                                  d[.array][i] i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  c[.array][i] d[.array][i] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -85,7 +93,9 @@ int main()
       
       // definition of f, also modifies e
       f = e;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with pointer copy : \n");
 //               <must be written>: i
@@ -95,7 +105,9 @@ int main()
 //               <must be read   >: f[.champ][i][.p] i j
 //               <must be written>: f[.champ][i][.p][j]
             ((f.champ)[i].p)[j] = i*j;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] 
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
 //                                  e[.champ][i][.p] 
 //                                  e[.champ][i][.p][j] 
 //                                  f[.champ][i][.p] 
@@ -119,7 +131,9 @@ int main()
       
       // definition of h, does not modify g
       h = g;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with array copy : \n");
 //               <must be written>: i
@@ -129,7 +143,9 @@ int main()
 //               <must be read   >: i j
 //               <must be written>: h[.champ][i][.array][j]
             ((h.champ)[i].array)[j] = i*j;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] 
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
 //                                  g[.champ][i][.array][j] 
 //                                  h[.champ][i][.array][j] i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
@@ -169,7 +185,9 @@ int main()
       
       // definition of b, also modifies a
       b = a;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with pointer copy : \n");
 //               <must be written>: i
@@ -177,8 +195,9 @@ int main()
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: b[.p] i
          (b.p)[i] = i*10;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
@@ -194,7 +213,9 @@ int main()
       
       // definition of d, does not modify c
       d = c;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array copy : \n");
 //               <must be written>: i
@@ -202,8 +223,10 @@ int main()
 //               <must be read   >: i
 //               <must be written>: d[.array][i]
          (d.array)[i] = i*10;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] c[.array][i] 
-//                                  d[.array][i] i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  c[.array][i] d[.array][i] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -227,7 +250,9 @@ int main()
       
       // definition of f, also modifies e
       f = e;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with pointer copy : \n");
 //               <must be written>: i
@@ -237,8 +262,9 @@ int main()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
             ((f.champ)[i].p)[j] = i*j;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -258,7 +284,9 @@ int main()
       
       // definition of h, does not modify g
       h = g;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with array copy : \n");
 //               <must be written>: i
@@ -268,7 +296,9 @@ int main()
 //               <must be read   >: i j
 //               <must be written>: h[.champ][i][.array][j]
             ((h.champ)[i].array)[j] = i*j;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] 
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
 //                                  g[.champ][i][.array][j] 
 //                                  h[.champ][i][.array][j] i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
@@ -321,7 +351,9 @@ int main()
       
       // definition of b, also modifies a
       b = a;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with pointer copy : \n");
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
@@ -332,8 +364,9 @@ int main()
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: b[.p] i
          (b.p)[i] = i*10;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
@@ -351,19 +384,25 @@ int main()
       
       // definition of d, does not modify c
       d = c;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array copy : \n");
-//               <may be read    >: __IO_EFFECTS:LUNS[1] c[.array][*] 
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1] c[.array][*] 
 //                                  d[.array][*] i
-//               <may be written >: __IO_EFFECTS:LUNS[1] d[.array][*]
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1] 
+//                                  d[.array][*]
 //               <must be written>: i
       for(i = 0; i <= 9; i += 1) {
 //               <may be written >: d[.array][*]
 //               <must be read   >: i
          (d.array)[i] = i*10;
-//               <may be read    >: c[.array][*] d[.array][*]
-//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <may be read    >: stdout[0] c[.array][*] 
+//                                  d[.array][*]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -391,7 +430,9 @@ int main()
       
       // definition of f, also modifies e
       f = e;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with pointer copy : \n");
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
@@ -407,8 +448,9 @@ int main()
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
             ((f.champ)[i].p)[j] = i*j;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -432,29 +474,34 @@ int main()
       
       // definition of h, does not modify g
       h = g;
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with array copy : \n");
-//               <may be read    >: __IO_EFFECTS:LUNS[1] 
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1] 
 //                                  g[.champ][*][.array][*] 
 //                                  h[.champ][*][.array][*] i j
-//               <may be written >: __IO_EFFECTS:LUNS[1] 
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1] 
 //                                  h[.champ][*][.array][*] j
 //               <must be written>: i
       for(i = 0; i <= 4; i += 1)
-//               <may be read    >: __IO_EFFECTS:LUNS[1] 
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1] 
 //                                  g[.champ][*][.array][*] 
 //                                  h[.champ][*][.array][*] i j
-//               <may be written >: __IO_EFFECTS:LUNS[1] 
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1] 
 //                                  h[.champ][*][.array][*]
 //               <must be written>: j
          for(j = 0; j <= 9; j += 1) {
 //               <may be written >: h[.champ][*][.array][*]
 //               <must be read   >: i j
             ((h.champ)[i].array)[j] = i*j;
-//               <may be read    >: g[.champ][*][.array][*] 
+//               <may be read    >: stdout[0] g[.champ][*][.array][*] 
 //                                  h[.champ][*][.array][*]
-//               <must be read   >: __IO_EFFECTS:LUNS[1] i j
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -523,6 +570,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
       printf("\nstruct with pointer copy : \n");
 
@@ -542,6 +592,9 @@ int main()
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
@@ -568,6 +621,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
       printf("\nstruct with array copy : \n");
 
@@ -578,6 +634,9 @@ int main()
 //  <d[.array][PHI2]-W-EXACT-{0<=PHI2, PHI2<=9}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
       for(i = 0; i <= 9; i += 1) {
 
@@ -591,6 +650,9 @@ int main()
 //  <c[.array][PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
 //  <d[.array][PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
 //  <i-R-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -632,6 +694,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
       printf("\nstruct with array of structs with pointer copy : \n");
 
@@ -657,6 +722,9 @@ int main()
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
             
             
@@ -698,6 +766,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
       printf("\nstruct with array of structs with array copy : \n");
 
@@ -713,6 +784,9 @@ int main()
 //  <i-W-EXACT-{}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
       for(i = 0; i <= 4; i += 1)
 
@@ -727,6 +801,9 @@ int main()
 //  <i-R-EXACT-{}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
          for(j = 0; j <= 9; j += 1) {
 
@@ -745,6 +822,9 @@ int main()
 //    i<=4, 0<=j, j<=9}>
 //  <i-R-EXACT-{}>
 //  <j-R-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
             
             
