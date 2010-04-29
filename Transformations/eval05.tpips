@@ -1,0 +1,24 @@
+delete eval05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create eval05 eval05.f
+
+echo
+echo Preconditions for EVAL05
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+activate PRINT_CODE
+
+echo
+echo Partialy evaluated code for EVAL05
+echo
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+close
+delete eval05
+quit
+

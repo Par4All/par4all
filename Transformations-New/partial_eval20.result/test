@@ -23,20 +23,20 @@ int main()
 
    int i;
 
-//  P() {}
+//  P(i) {}
 
    int j;
 
-//  P() {}
+//  P(i,j) {}
 
    j;
 
-//  P() {}
+//  P(i,j) {}
 
    /* Can be eliminated because the store is not impacted */
    j+0;
 
-//  P() {}
+//  P(i,j) {}
 
    return i;
 }

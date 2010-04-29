@@ -49,7 +49,7 @@ PRINTED FILE with transformers for main
 int main()
 {
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 

@@ -20,6 +20,22 @@ echo
 display PRINTED_FILE[main]
 
 echo
+echo Preconditions "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Preconditions "partial_eval02"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[partial_eval02]
+activate PRINT_CODE
+
+echo
 echo Code after partial evaluation for "partial_eval02"
 echo
 
@@ -47,11 +63,11 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cc partial_eval02.c -o partial_eval
-shell cc partial_eval02.database/Src/partial_eval02.c  -o partial_eval02.database/Src/partial_eval
-shell if test `partial_eval02.database/Src/partial_eval` = `./partial_eval`; then echo "ok"; else echo "ko" ; fi
-shell rm -rf partial_eval02.database/Src/partial_eval partial_eval
+shell (cd partial_eval02.database/Src; cc ../../partial_eval02.c -o partial_eval0)
+shell (cd partial_eval02.database/Src; cc partial_eval02.c  -o partial_eval)
+shell (cd partial_eval02.database/Src; if test `./partial_eval0` = `./partial_eval`; then echo "ok"; else echo "ko" ; fi)
+#shell rm -rf partial_eval02.database/Src/partial_eval partial_eval
 
 close
 delete partial_eval02
-
+quit

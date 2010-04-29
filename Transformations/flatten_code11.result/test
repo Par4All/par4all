@@ -43,7 +43,7 @@ void flatten_code11(void)
 
    int i;                                                               /*0007*/
 
-//  P() {}
+//  P(i) {}
 
    
    /* Let's execute this loop four times! */

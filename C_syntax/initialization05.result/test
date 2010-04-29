@@ -19,11 +19,11 @@ Transformers for "initialization05"
 int initialization05()
 {
 
-//  T(a) {}
+//  T(a) {a==a#init}
 
    int a = a;
 
-//  T() {}
+//  T(i) {}
 
    int i;
 
@@ -53,16 +53,16 @@ int initialization05()
 
    int a = a;
 
-//  P() {}
+//  P(a) {}
 
    int i;
 
-//  P() {}
+//  P(a,i) {}
 
 
    i = a+1;
 
-//  P(i) {a==i-1}
+//  P(a,i) {a==i-1}
 
    a = 2;
 

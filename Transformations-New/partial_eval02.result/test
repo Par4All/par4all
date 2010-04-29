@@ -20,7 +20,7 @@ int foo(int i)
 
    int j;
 
-//  P() {}
+//  P(j) {}
 
    j = 3*i-3*i;
 

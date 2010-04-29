@@ -62,11 +62,23 @@ int main()
       for(j = 0; j <= 5; j += 1)
          loulou[0][i][j] = k++;
 
-   printf("%d\n", partial_eval02(riri, fifi, size, loulou));
+   printf("%d\n", partial_eval02(riri, fifi, 2, loulou));
 
    return 0;
+}
+
+Same code with evaluation of constants
+
+int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   int *zaza = (int *) fifi+3;
+   int i;
+
+   i = e;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+0);
 }
 
 Unsplit resulting code
 
 ok
+

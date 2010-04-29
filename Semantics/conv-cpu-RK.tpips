@@ -30,6 +30,9 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 echo Try to restructure the code for more precision:
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 echo Check transformers for "conv_cpu"
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[conv_cpu]

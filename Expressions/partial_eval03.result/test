@@ -21,11 +21,11 @@ void partial_eval03()
 
    foo size = 2;
 
-//  P() {size==2}
+//  P(size) {size==2}
 
    foo i;
 
-//  P() {size==2}
+//  P(i,size) {size==2}
 
 
    i = size;

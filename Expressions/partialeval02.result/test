@@ -7,13 +7,8 @@ int foo(int i, int j)
 {
    return i+2*j-i-2*j;
 }
-partially evaled code without normalization
-int foo(int i, int j)
-{
-   return 0;
-}
 partially evaled code with normalization
-int bar(int i, int j)
+int foo(int i, int j)
 {
    return 0;
 }

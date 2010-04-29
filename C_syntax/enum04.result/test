@@ -27,32 +27,32 @@ int main()
 
    int ia;
 
-//  P() {}
+//  P(ia) {}
 
    int ib;
 
-//  P() {}
+//  P(ia,ib) {}
 
    int ic;
 
-//  P() {}
+//  P(ia,ib,ic) {}
 
    int t;
 
-//  P() {}
+//  P(ia,ib,ic,t) {}
 
 
    ia = a;
 
-//  P(ia) {ia==0}
+//  P(ia,ib,ic,t) {ia==0}
 
    ib = b;
 
-//  P(ia,ib) {ia==0, ib==1}
+//  P(ia,ib,ic,t) {ia==0, ib==1}
 
    ic = c;
 
-//  P(ia,ib,ic) {ia==0, ib==1, ic==1}
+//  P(ia,ib,ic,t) {ia==0, ib==1, ic==1}
 
 
    t = ia+ib+ic;

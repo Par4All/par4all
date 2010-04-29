@@ -22,19 +22,19 @@ int main()
 
    int i;
 
-//  P() {}
+//  P(i) {}
 
    int j;
 
-//  P() {}
+//  P(i,j) {}
 
    i+++j-j;
 
-//  P(i) {}
+//  P(i,j) {}
 
    j;
 
-//  P(i) {}
+//  P(i,j) {}
 
    return i;
 }
