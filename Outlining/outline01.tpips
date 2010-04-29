@@ -25,7 +25,7 @@ echo
 echo unsplit
 echo
 
-apply UNSPLIT[%ALL]
+apply UNSPLIT
 
 close
 delete outline01
