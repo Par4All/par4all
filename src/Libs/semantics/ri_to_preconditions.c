@@ -373,7 +373,7 @@ static transformer call_to_postcondition(transformer pre,
  * exploited.
  *
  */
-static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
+static transformer fortran_data_to_prec_for_variables(entity m, list /* of entity */le)
 {
   transformer pre = transformer_identity();
   transformer pre_r = transformer_undefined; // range of pre
@@ -443,6 +443,59 @@ static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
   return pre_r;
 }
 
+static transformer c_data_to_prec_for_variables(entity m, list /* of entity */le)
+{
+  transformer pre = transformer_identity();
+  transformer pre_r = transformer_undefined; // range of pre
+  //linear_hashtable_pt b = linear_hashtable_make(); /* already seen */
+  //list ce = list_undefined;
+
+  pips_debug(8, "begin for %s\n", module_local_name(m));
+
+  /* look for static entities with an initial value. */
+  FOREACH(ENTITY, e, le) {
+    if(variable_static_p(e) && entity_has_values_p(e)) {
+      /* e may not have values but its initialization expression may
+	 refer other variables which have values, however they are not
+	 likely to be static initializations. */
+      expression ie = variable_initial_expression(e);
+      transformer npre = safe_assigned_expression_to_transformer(e, ie, pre);
+
+      pips_debug(8, "begin for variable %s\n", entity_name(e));
+
+
+      pre = transformer_combine(pre, npre);
+      pre = transformer_safe_normalize(pre, 2);
+      free_transformer(npre);
+    }
+  }
+
+  pre = transformer_temporary_value_projection(pre);
+  pre_r = transformer_range(pre);
+  free_transformer(pre);
+
+  ifdebug(8) {
+    dump_transformer(pre_r);
+    pips_debug(8, "end for %s\n", module_local_name(m));
+  }
+
+  return pre_r;
+}
+
+static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
+{
+  transformer tf = transformer_undefined;
+
+  if(c_language_module_p(m))
+    tf = c_data_to_prec_for_variables(m, le);
+  else if(fortran_language_module_p(m))
+    tf = fortran_data_to_prec_for_variables(m, le);
+  else
+    pips_internal_error("Unexpected language");
+
+  return tf;
+}
+
 /* returns an allocated list of entities that appear in lef.
  * an entity may appear several times.
  */
@@ -469,9 +522,9 @@ transformer data_to_precondition(entity m)
 transformer all_data_to_precondition(entity m)
 {
   /* FI: it would be nice, if only for debugging, to pass a more
-     restricted list... 
+     restricted list...
 
-     This assumes the all varibles declared in a statement is also
+     This assumes the all variables declared in a statement is also
      declared at the module level. */
   //  transformer pre =
   // data_to_prec_for_variables(m, code_declarations(entity_code(m)));
