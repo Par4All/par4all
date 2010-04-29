@@ -1,0 +1,6 @@
+PROGRAM MAIN
+INTEGER ARRAY(1:10)
+END
+
+"compile sources produced by pips"
+
