@@ -47,8 +47,9 @@
 #include "parser_private.h"
 #include "syntax.h"
 #include "resources.h"
-bool
-variable_entity_p(entity e)
+
+/* See also macro entity_variable_p()... */
+bool variable_entity_p(entity e)
 {
   bool variable =
     (entity_storage(e)!=storage_undefined) &&
