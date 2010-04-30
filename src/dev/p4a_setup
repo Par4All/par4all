@@ -193,7 +193,7 @@ fi
 $P4A_PIPS_SRC/src/Scripts/env/sh2csh.pl < $P4A_RC_SH > $P4A_RC_CSH
 
 
-echo Installing some lacking PIPS script...
+echo Installing some lacking PIPS scripts...
 # Stuff still lacking from PIPS install:
 cp $P4A_PIPS_SRC/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin
 
@@ -204,6 +204,7 @@ cp $P4A_NLPMAKE_SRC/makes/{arch.sh,version.sh} $P4A_INSTALL_PREFIX/makes
 PIPS_COMPONENTS="linear newgen pips"
 #PIPS_DIR=$P4A_ROOT/packages/PIPS
 
+echo
 
 # Build the package of name $1 that is to be found into directory $2,
 # compilation targetw $4, with some $4 options to configure.
@@ -320,8 +321,8 @@ build_package linear packages/PIPS/linear "$compilation_targets"
 # Make the targets on PIPS:
 PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} ${PIPS_CONFIG} PATH=${INSTALL_PREFIX}/bin:$PATH "
 add_link_to_make_infrastructure pips
-#build_package pips packages/PIPS/pips $compilation_targets "--enable-tpips --enable-pyps --enable-hpfc --enable-fortran95"
-build_package pips packages/PIPS/pips "$compilation_targets" "--enable-tpips --enable-pyps --enable-hpfc"
+build_package pips packages/PIPS/pips "$compilation_targets" "--enable-tpips --enable-pyps --enable-hpfc --enable-fortran95"
+#build_package pips packages/PIPS/pips "$compilation_targets" "--enable-tpips --enable-pyps --enable-hpfc"
 
 cat << EOF
 ============================================
