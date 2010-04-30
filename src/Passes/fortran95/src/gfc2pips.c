@@ -474,8 +474,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
 
   if ( bloc_token == MET_FUNC || bloc_token == MET_SUB ) {
     UpdateFunctionalType( gfc2pips_main_entity, parameters_name );
-  } else if ( bloc_token == MET_MODULE ) {
-    entity_type(gfc2pips_main_entity) = make_type( is_type_unknown, UU );
   }
 
   int stack_offset = 0;
@@ -1858,7 +1856,11 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     module = true;
   } else if ( s->attr.flavor == FL_MODULE ) {
     char *module_name = str2upper(strdup(concatenate(name,"!")));
-    e = FindOrCreateEntity(  TOP_LEVEL_MODULE_NAME , module_name );
+    if(( e = gfc2pips_check_entity_module_exists( module_name))
+        ==entity_undefined ) {
+      gfc2pips_debug(1, "create module %s\n",module_name);
+      e = make_empty_subroutine(module_name);
+    }
     free(module_name);
     module = true;
   } else {
