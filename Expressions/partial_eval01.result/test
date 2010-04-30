@@ -31,10 +31,10 @@ int main()
 //               <must be read   >: i j k size
 //               <must be written>: k loulou[0][i][j]
          loulou[0][i][j] = k++;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1] riri[2]
    printf("%d\n", duck(riri, fifi, size, loulou));
    return 0;
 }
@@ -102,7 +102,7 @@ int main()
 
    printf("%d\n", duck(riri, fifi, size, loulou));
 
-//  P(i,j,k,size) {}
+//  P(i,j,k,size) {i==2, j==6, size==2}
 
    return 0;
 }

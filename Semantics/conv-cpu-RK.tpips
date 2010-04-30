@@ -44,7 +44,7 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[conv_cpu]
-quit
+
 echo
 echo Preconditions for "main"
 echo
@@ -57,7 +57,6 @@ echo Preconditions for "conv_cpu"
 echo
 
 display PRINTED_FILE[conv_cpu]
-quit
 
 echo Privatize scalar variables on all the modules of the program:
 apply PRIVATIZE_MODULE[conv_cpu]

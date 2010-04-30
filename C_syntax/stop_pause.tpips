@@ -1,8 +1,17 @@
+# Prettyprint Fortran code in C
+
 delete stop_pause
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create stop_pause stop_pause.f
+
 setproperty PRETTYPRINT_C_CODE TRUE
+
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 display PRINTED_FILE
+
 apply UNSPLIT[%PROGRAM]
+
 close
 quit

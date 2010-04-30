@@ -6,7 +6,7 @@ create $WS $WS.c
 module lonesome_cowboy
 
 echo original code
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 echo isolated code
 setproperty ISOLATE_STATEMENT_LABEL "isolate"

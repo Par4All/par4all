@@ -27,7 +27,7 @@ int volume()
    int v = 0;
    int i, j;
    //PIPS generated variable
-   int RED[255+1];
+   int RED[256];
    for(i = 0; i <= 255; i += 1)
       RED[i] = 0;
 volume:
@@ -45,11 +45,11 @@ after array to pointer
 
 int volume()
 {
-   int a[65535+1];
+   int a[65536];
    int v = 0;
    int i, j;
    //PIPS generated variable
-   int RED[255+1];
+   int RED[256];
    for(i = 0; i <= 255; i += 1)
       *((int *) RED+i) = 0;
 volume:

@@ -14,7 +14,9 @@ echo Code after inlining
 echo
 
 apply INLINING[inlining02!pmax]
-display PRINTED_FILE[inlining02!,main]
+# Not possible anymore with include of stdio.h
+#display PRINTED_FILE[inlining02!,main]
+display PRINTED_FILE[main]
 
 echo
 echo Unsplit resulting code
