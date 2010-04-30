@@ -1,3 +1,4 @@
+#include <stdio.h>
 void lonesome_cowboy()
 {
     int i,a[12];

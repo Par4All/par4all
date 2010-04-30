@@ -1,3 +1,4 @@
+#include <stdio.h>
 int main () {
   float a[10];
   float b[10][10][10][10][10];

@@ -1,5 +1,6 @@
 /* Check that external initializationa are properly taken into
    account. */
+#include <stdio.h>
 
 void static02()
 {
