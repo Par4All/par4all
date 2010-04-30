@@ -103,7 +103,7 @@ list make_unbounded_subscripts(int d)
    parser.
  */
 static entity make_empty_module(string full_name,
-				type r)
+				type r, language l)
 {
   string name = string_undefined;
   entity e = gen_find_tabulated(full_name, entity_domain);
@@ -121,12 +121,12 @@ static entity make_empty_module(string full_name,
 
   e = make_entity
     (strdup(full_name),
-     make_type(is_type_functional,
+     make_type_functional(
 	       make_functional(NIL, r)),
      make_storage_rom(),
-     make_value(is_value_code,
+     make_value_code(
 		make_code(NIL, strdup(""), make_sequence(NIL),NIL,
-			  make_language_unknown())));
+			  l)));
 
   name = module_local_name(e);
   DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
@@ -156,32 +156,32 @@ static entity make_empty_module(string full_name,
   return(e);
 }
 
-entity make_empty_program(string name)
+entity make_empty_program(string name,language l)
 {
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
-				 MODULE_SEP_STRING, MAIN_PREFIX, name, NULL);
-  return make_empty_module(full_name, make_type(is_type_void, UU));
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
+				 MODULE_SEP_STRING  MAIN_PREFIX, name, NULL);
+  return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
-entity make_empty_subroutine(string name)
+entity make_empty_subroutine(string name,language l)
 {
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
 				 MODULE_SEP_STRING, name, NULL);
-  return make_empty_module(full_name, make_type(is_type_void, UU));
+  return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
-entity make_empty_function(string name, type r)
+entity make_empty_function(string name, type r, language l)
 {
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
 				 MODULE_SEP_STRING, name, NULL);
-  return make_empty_module(full_name, r);
+  return make_empty_module(full_name, r,l);
 }
 
-entity make_empty_blockdata(string name)
+entity make_empty_blockdata(string name,language l)
 {
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING
 				 BLOCKDATA_PREFIX, name, NULL);
-  return make_empty_module(full_name, make_type(is_type_void, UU));
+  return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
 
