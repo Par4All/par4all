@@ -89,8 +89,9 @@ partial_eval_expression().
 #include "semantics.h" /* for module_to_value_mappings() */
 
 #include "arithmetique.h"
+#include "transformations.h" /*used for FORTRAN_DIV ... */
 
-#include "transformations.h" /* should be removed? */
+#include "preprocessor.h"
 #include "expressions.h"
 
 
