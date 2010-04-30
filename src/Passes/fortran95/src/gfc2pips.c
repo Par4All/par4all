@@ -343,7 +343,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
 
   /* Debug level is currently set at compile time */
   extern int the_current_debug_level;
-  the_current_debug_level = 0;
+  the_current_debug_level = 6;
 
   gfc2pips_debug(2, "Starting gfc2pips dumping\n");
   message_assert( "No namespace to dump.", ns );
@@ -372,13 +372,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
    */
   gfc2pips_main_entity_type bloc_token = get_symbol_token( root_sym );
 
-  // FIXME : do we really want upper case conversion ?
-  if ( bloc_token == MET_MODULE ) {
-    CurrentPackage
-        = str2upper( strdup( concatenate( (char *)(ns->proc_name->name), "!", NULL ) ) );
-  } else {
-    CurrentPackage = str2upper( strdup( ns->proc_name->name ) );
-  }
+
   /*
    * We have to create a PIPS entity which is a program/function/other.
    * According to the type we have to create different values as parameters
@@ -388,34 +382,18 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
 
   // Name for entity in PIPS corresponding to current procedure in GFC
   //maybe right FIXME
-  string full_name =
-      strdup( concatenate( TOP_LEVEL_MODULE_NAME,
-                           MODULE_SEP_STRING,
-                           root_sym->attr.is_main_program ? MAIN_PREFIX : "",
-                           CurrentPackage,
-                           NULL ) );
-  gfc2pips_debug(2, "Currently parsing : %s \n", full_name);
-  // FIXME findentitybyname ??
-  gfc2pips_main_entity = gen_find_tabulated( full_name, entity_domain );
-
-  if ( gfc2pips_main_entity != entity_undefined ) {
-    /* we have defined this entity already. Nothing to do ? we need at least
-     * to know the bloc_token force temporarily the type for the
-     * set_curren_module_entity(<entity>)
-     * Mehdi : FIXME ?
-     */
-    entity_initial(gfc2pips_main_entity)
-        = make_value_code( make_code( NIL,
-                                      strdup( "" ),
-                                      make_sequence( NIL ),
-                                      NIL,
-                                      make_language_fortran95( ) ) );
-  }
 
   // ?????? To be removed (Mehdi)
   gfc2pips_main_entity = gfc2pips_symbol2entity( ns->proc_name );
 
-
+  string full_name = entity_name(gfc2pips_main_entity);
+  CurrentPackage = entity_local_name(gfc2pips_main_entity);
+  if( CurrentPackage[0] == '%') {
+    // jump MAIN_PREFIX
+    CurrentPackage++;
+  }
+  gfc2pips_debug(2, "Currently parsing : %s\n", full_name);
+  gfc2pips_debug(2, "CurrentPackage : %s\n", CurrentPackage);
   /*
    * PIPS STUFF Initialization
    */
@@ -911,7 +889,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
 
   // We don't produce output for module
   if ( bloc_token == MET_MODULE ) {
-    pips_user_warning("Module are ignored : %s\n", full_name);
+    pips_user_warning("Modules are ignored : %s\n", full_name);
 
     unsplit_modname = (char *) malloc( sizeof(char) * ( strlen( CurrentPackage )
         + 2 ) );
@@ -1879,7 +1857,9 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     }
     module = true;
   } else if ( s->attr.flavor == FL_MODULE ) {
-    e = FindOrCreateEntity( str2upper( ( name ) ), str2upper( ( name ) ) );
+    char *module_name = str2upper(strdup(concatenate(name,"!")));
+    e = FindOrCreateEntity(  TOP_LEVEL_MODULE_NAME , module_name );
+    free(module_name);
     module = true;
   } else {
     gfc2pips_debug(9, "create entity %s\n",str2upper( ( name ) ));
@@ -1920,7 +1900,7 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
                                         strdup( "" ),
                                         make_sequence( NIL ),
                                         NULL,
-                                        make_language_fortran( ) ) );
+                                        make_language_fortran95( ) ) );
     }
 
   }
