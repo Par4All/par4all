@@ -126,7 +126,7 @@ string step_make_new_directive_module_name(string suffix, string id)
 
       free(i_s);
       free(new_name);
-      make_empty_subroutine(final_name); // for matching the next try with the same "new_name" but for a new directive
+      make_empty_subroutine(final_name,copy_language(module_language(current_module))); // for matching the next try with the same "new_name" but for a new directive
       new_name = final_name;
     }
 

@@ -592,7 +592,7 @@ static entity create_module_with_statement(statement stat, string new_module_nam
   pips_debug(5, "[BEGIN] create_module_with_statement\n");
   pips_debug(2, "Creating new module: [%s]\n", new_module_name);
 
-  new_module = make_empty_subroutine(new_module_name);
+  new_module = make_empty_subroutine(new_module_name,copy_language(module_language(get_current_module_entity())));
   
   /* Deal with private variables */
   MAP(REFERENCE, ref, {

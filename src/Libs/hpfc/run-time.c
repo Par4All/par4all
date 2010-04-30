@@ -50,7 +50,7 @@ MakeRunTimeSupportSubroutine(
 {
     entity res = module_name_to_entity(local_name);
     if (entity_undefined_p(res))
-	res = make_empty_subroutine(local_name);
+	res = make_empty_subroutine(local_name,make_language_fortran());
     return res;
 }
 
@@ -69,7 +69,7 @@ MakeRunTimeSupportFunction(
     entity f = make_empty_function(local_name,
 				   (return_type==is_basic_int ? /* ??? rough */
 				    MakeIntegerResult() :
-				    MakeOverloadedResult()));
+				    MakeOverloadedResult()),make_language_fortran());
     return f;
 }
 

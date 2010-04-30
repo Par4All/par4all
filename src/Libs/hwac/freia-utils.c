@@ -809,7 +809,7 @@ void freia_substitute_by_helper_call
       pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
 
       // substitute by call to helper
-      entity helper = make_empty_subroutine(function_name); // or function?
+      entity helper = make_empty_subroutine(function_name,make_language_unknown()); // or function?
       call c = make_call(helper, lparams);
 
       hwac_replace_statement(sc, c, false);

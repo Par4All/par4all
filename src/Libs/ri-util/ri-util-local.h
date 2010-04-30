@@ -1275,7 +1275,8 @@
 #define entity_symbolic_p(e) (type_functional_p(entity_type(e)) && \
   storage_rom_p(entity_storage(e)) && value_symbolic_p(entity_initial(e)))
 
-#define entity_language(e)\
+/* implemented as a macro to allow lhs */
+#define module_language(e)\
     code_language(value_code(entity_initial((e))))
 
 #define call_intrinsic_p(C)                       \
