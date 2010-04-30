@@ -1405,7 +1405,9 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	 ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
 	{
 	  // The output is written to stdout
-	  std_ref = make_reference(FindOrCreateTopLevelEntity("stdout"), NIL);
+	  entity std_ent =  local_name_to_top_level_entity("stdout");
+	  pips_assert("stdout must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
+	  std_ref = make_reference(std_ent, NIL);
 	  
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDOUT_FILENO); 
@@ -1417,18 +1419,23 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	       ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
 	{
 	  //The input is obtained from stdin
-	  std_ref = make_reference(FindOrCreateTopLevelEntity("stdin"), NIL);
-	  
+	  entity std_ent =  local_name_to_top_level_entity("stdin");
+	  pips_assert("stdin must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
+	  std_ref = make_reference(std_ent, NIL);
+
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDIN_FILENO); 
 	  else
-	    /* we cannot use STDIN_FILENO because the stdout variable may have been modified by the user */
+	    /* we cannot use STDIN_FILENO because the stdin variable may have been modified by the user */
 	    unit = make_unbounded_expression();
 	}
       else if (ENTITY_PERROR_P(e))
 	{
-	  std_ref = make_reference(FindOrCreateTopLevelEntity("stderr"), NIL);
-	  /* we cannot use STDERR_FILENO because the stdout variable may have been modified by the user */
+	  entity std_ent =  local_name_to_top_level_entity("stderr");
+	  pips_assert("stderr must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
+	  std_ref = make_reference(std_ent, NIL);
+
+	  /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDERR_FILENO); 
 	  else
