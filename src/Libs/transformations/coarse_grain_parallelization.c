@@ -289,7 +289,7 @@ static void coarse_grain_loop_parallelization(statement module_stat)
     @param module_name is the name of the module to parallelize
     @return TRUE in case of success. Indeed, return alway true. :-)
  */
-bool coarse_grain_parallelization_main(string module_name,
+static bool coarse_grain_parallelization_main(string module_name,
 				       bool use_reductions_p)
 {
     statement module_stat;
@@ -363,6 +363,7 @@ bool coarse_grain_parallelization(string module_name) {
   return coarse_grain_parallelization_main(module_name, FALSE);
 }
 
+#if 0
 
 /** Parallelize code by using region informations to prove iteration
     independance. Use reduction information to filter out false
@@ -374,8 +375,9 @@ bool coarse_grain_parallelization(string module_name) {
     @param module_name is the name of the module to parallelize
     @return TRUE in case of success. Indeed, return alway true. :-)
  */
-bool coarse_grain_parallelization_with_reduction(string module_name) {
+static bool coarse_grain_parallelization_with_reduction(string module_name) {
   /* Use reductions: */
   /* not implemented: */
   return coarse_grain_parallelization_main(module_name, TRUE);
 }
+#endif

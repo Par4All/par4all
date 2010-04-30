@@ -35,10 +35,6 @@
 
 #include "genC.h"
 
-int get_cache_line_size(void)
-{
-    return 1;
-}
 
 int get_processor_number(void)
 {
@@ -55,10 +51,16 @@ int get_vector_register_number(void)
     return 8;
 }
 
-int get_minimal_task_size(void)
+#if 0
+static int get_cache_line_size(void)
+{
+    return 1;
+}
+static int get_minimal_task_size(void)
 {
     /* the unit is supposed to be consistent with the complexity cost tables used
      * that should be expressed in machine cycles
      */
     return 10000;
 }
+#endif

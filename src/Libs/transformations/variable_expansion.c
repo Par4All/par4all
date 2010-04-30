@@ -253,7 +253,7 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
     }
 }
 
-bool scalar_expansion(char *module_name)
+static bool scalar_expansion(char *module_name)
 {
     pips_user_warning("\nExperimental phase: on-going debugging!\n");
     /* prelude */

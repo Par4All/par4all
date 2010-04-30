@@ -66,8 +66,8 @@
 /************************************* USEFUL VARIABLES AND ACCESS FUNCTIONS */
 
 /* global static variable local_regions_map, and its access functions */
-GENERIC_GLOBAL_FUNCTION(private_effects, statement_effects)
-GENERIC_GLOBAL_FUNCTION(copy_out_effects, statement_effects)
+GENERIC_LOCAL_FUNCTION(private_effects, statement_effects)
+GENERIC_LOCAL_FUNCTION(copy_out_effects, statement_effects)
 
 /* statement stack */
 DEFINE_LOCAL_STACK(current_stmt, statement)

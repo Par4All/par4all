@@ -72,6 +72,7 @@ static int dead_code_unstructured_if_removed;
 static int dead_code_unstructured_if_replaced_by_its_effect;
 static int dead_code_unstructured_if_false_branch_removed;
 static int dead_code_unstructured_if_true_branch_removed;
+static void suppress_dead_code_statement(statement);
 
 static void
 initialize_dead_code_statistics()
@@ -190,7 +191,7 @@ dead_test_filter(statement st_true, statement st_false)
 
 /* Replace an instruction by an empty one. If there is a label on the
    statement, put it on a continue to be coherent with the PIPS RI. */
-bool
+static bool
 discard_statement_and_save_label_and_comment(statement s)
 {
 
@@ -488,6 +489,23 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
   free_instruction(i);
   return false;
 }
+/* Return true if a statement has at least one write effect in the
+   effects list. */
+static bool statement_write_effect_p(statement s)
+{
+  bool write_effect_found = false;
+  list effects_list = load_proper_rw_effects_list(s);
+
+  FOREACH(effect, an_effect, effects_list)
+  {
+    if (action_write_p(effect_action(an_effect))) {
+      write_effect_found = true;
+      break;
+    }
+  };
+
+  return write_effect_found;
+}
 
 
 /* Remove an IF(x) statement (replace s with an empty statement) if x
@@ -496,7 +514,7 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
    this_test_is_unstructured_p is a hint for the statistics.
    true means that you assert that the test is unstructured.
  */
-void remove_if_statement_according_to_write_effects
+static void remove_if_statement_according_to_write_effects
 (statement s, bool this_test_is_unstructured_p)
 {
   instruction i = statement_instruction(s);
@@ -1058,9 +1076,8 @@ static bool dead_statement_filter(statement s)
   return retour;
 }
 
-
 /* Suppress the dead code of the given module: */
-void suppress_dead_code_statement(statement mod_stmt)
+static void suppress_dead_code_statement(statement mod_stmt)
 {
   pips_assert("statement d is consistent", statement_consistent_p(mod_stmt));
 
@@ -1071,6 +1088,7 @@ void suppress_dead_code_statement(statement mod_stmt)
 
   pips_assert("statement d is consistent", statement_consistent_p(mod_stmt));
 }
+
 
 /*
  * Dead code elimination
@@ -1150,23 +1168,6 @@ bool suppress_dead_code(string mod_name)
 }
 
 
-/* Return true if a statement has at least one write effect in the
-   effects list. */
-bool statement_write_effect_p(statement s)
-{
-  bool write_effect_found = false;
-  list effects_list = load_proper_rw_effects_list(s);
-
-  FOREACH(effect, an_effect, effects_list)
-  {
-    if (action_write_p(effect_action(an_effect))) {
-      write_effect_found = true;
-      break;
-    }
-  };
-
-  return write_effect_found;
-}
 
 /**
  * @brief remove the label of a statement if the statement is not
@@ -1175,7 +1176,7 @@ bool statement_write_effect_p(statement s)
  *
  * @param s statement considered
  */
-void statement_remove_useless_label(statement s)
+static void statement_remove_useless_label(statement s)
 {
   instruction i = statement_instruction(s);
   if(!instruction_unstructured_p(i) &&

@@ -190,7 +190,7 @@ bool array_argument_p(expression e)
   return FALSE;
 }
 
-bool scalar_argument_p(entity e)
+static bool scalar_argument_p(entity e)
 {
   type t = entity_type(e);
   return(ENDP(variable_dimensions(type_variable(t))));
@@ -325,7 +325,7 @@ static list my_list_combination(list l1, list l2, entity op)
   return l;
 }
 
-list entity_to_formal_integer_parameters(entity f )
+static list entity_to_formal_integer_parameters(entity f )
 {
   /* get unsorted list of formal integer parameters of module f by declaration
      filtering; these parameters may not be used by the callee's
@@ -408,7 +408,7 @@ transformer formal_and_actual_parameters_association(call c, transformer pre)
 }
 
 
-bool expression_equal_in_context_p(expression e1, expression e2, transformer context)
+static bool expression_equal_in_context_p(expression e1, expression e2, transformer context)
 {
   /* Fast checks : 
      + e1 and e2 are same expressions 

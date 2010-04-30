@@ -424,7 +424,7 @@ static void compute_renamings(statement s, string sc, string mn, hash_table rena
 
   - replace declaration statements
 */
-void statement_flatten_declarations(statement s)
+static void statement_flatten_declarations(statement s)
 {
   /* For the time being, we handle only blocks with declarations */
   if (statement_block_p(s)) {

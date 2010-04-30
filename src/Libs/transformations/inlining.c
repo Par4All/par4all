@@ -1134,8 +1134,7 @@ list private_variables(statement stat)
 statement outliner(string outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
-    entity new_fun = make_empty_subroutine(outline_module_name);
-    entity_language(new_fun)=copy_language(entity_language(get_current_module_entity()));
+    entity new_fun = make_empty_subroutine(outline_module_name,copy_language(module_language(get_current_module_entity())));
     statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
     /* Retrieve referenced and declared entities */
