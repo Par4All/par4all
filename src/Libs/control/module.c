@@ -102,6 +102,7 @@ static statement update_unstructured_declarations(statement module_stat)
 bool controlizer(string module_name)
 {
   entity m = module_name_to_entity(module_name);
+  pips_assert("Module must be defined in symbol table",!entity_undefined_p(m));
 
   statement module_stat, parsed_mod_stat;
 
