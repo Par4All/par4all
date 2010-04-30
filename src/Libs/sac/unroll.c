@@ -102,6 +102,38 @@ static void compute_variable_size(statement s, MinMaxVar* varwidth)
         varwidth->min = width;
 }
 
+static void addSimdCommentToStat(statement s, int num)
+{
+
+    char comment[sizeof("c " SIMD_COMMENT) + 8*sizeof(int) ];
+
+    sprintf(comment, "c " SIMD_COMMENT "%d\n", num);
+
+    insert_comments_to_statement(s, comment);
+}
+
+static void addSimdCommentToStats(statement s)
+{
+    if(instruction_sequence_p(statement_instruction(s)))
+    {
+        sequence seq = instruction_sequence(statement_instruction(s));
+        int num = 0;
+        FOREACH(STATEMENT, curStat, sequence_statements(seq) )
+        {
+            addSimdCommentToStat(curStat, num++);
+        }
+    }
+    else
+    {
+        addSimdCommentToStat(s, 0);
+    }
+}
+
+static void simd_loop_unroll(statement loop_statement, int rate)
+{
+    do_loop_unroll(loop_statement,rate,addSimdCommentToStats);
+}
+
 static bool simple_simd_unroll_loop_filter(statement s)
 {
     MinMaxVar varwidths;
@@ -211,7 +243,7 @@ static bool full_simd_unroll_loop_filter(statement s)
     return false;
 }
 
-void simd_unroll_as_needed(statement module_stmt)
+static void simd_unroll_as_needed(statement module_stmt)
 {
     /* Choose algorithm to use, and use it */
     if (get_bool_property("SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION"))
@@ -261,34 +293,5 @@ bool simdizer_auto_unroll(char * mod_name)
 }
 
 
-static void addSimdCommentToStat(statement s, int num)
-{
 
-    char comment[sizeof("c " SIMD_COMMENT) + 8*sizeof(int) ];
 
-    sprintf(comment, "c " SIMD_COMMENT "%d\n", num);
-
-    insert_comments_to_statement(s, comment);
-}
-
-static void addSimdCommentToStats(statement s)
-{
-    if(instruction_sequence_p(statement_instruction(s)))
-    {
-        sequence seq = instruction_sequence(statement_instruction(s));
-        int num = 0;
-        FOREACH(STATEMENT, curStat, sequence_statements(seq) )
-        {
-            addSimdCommentToStat(curStat, num++);
-        }
-    }
-    else
-    {
-        addSimdCommentToStat(s, 0);
-    }
-}
-
-void simd_loop_unroll(statement loop_statement, int rate)
-{
-    do_loop_unroll(loop_statement,rate,addSimdCommentToStats);
-}

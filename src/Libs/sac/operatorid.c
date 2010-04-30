@@ -175,24 +175,35 @@ static void insert_mapping(oper_id_mapping* item)
     t->id = item->id;
 }
 
-int get_operator_id(entity e)
+static int do_get_operator_id(string ename)
 {
-    char * s;
     operator_id_tree* t = mappings;
-
-    for(s = entity_local_name(e); *s != 0; s++)
+    for(char *s = ename; *s != 0; s++)
     {
         operator_id_tree * next;
         char c = *s;
 
         next = (operator_id_tree *)hash_get(t->sons, (void*)((int)c));
         if (next == HASH_UNDEFINED_VALUE)
+        {
             return UNKNOWN_TOK;
-
+        }
         t = next;
     }
-
     return t->id;
+}
+
+int get_operator_id(entity e)
+{
+    string ename = entity_local_name(e);
+    int res = do_get_operator_id(ename);
+    if(res == UNKNOWN_TOK )
+    {
+        /* retry with uppercase version, cos -> COS :) */
+        ename = strupper(strdup(ename),ename);
+        res = do_get_operator_id(ename);
+    }
+    return res;
 }
 
 bool simd_operator_mappings(__attribute__((unused)) char * module_name)

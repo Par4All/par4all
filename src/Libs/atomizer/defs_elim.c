@@ -41,7 +41,7 @@
  * The "ordering" is an integer. To each statement is associated a different
  * number.
  */
-static int 
+int 
 vertex_ordering(v)
 vertex v;
 {
