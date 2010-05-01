@@ -56,6 +56,9 @@ list CalledModules = NIL;
 
 statement ModuleStatement = statement_undefined;
 
+// To track the file name we are parsing for error messages:
+static string c_parser_current_file_name;
+
 stack ContextStack = stack_undefined;
 stack FunctionStack = stack_undefined;
 stack FormalStack = stack_undefined;
@@ -65,10 +68,10 @@ stack StructNameStack = stack_undefined;
 /* Global counter */
 int loop_counter = 1;
 int derived_counter = 1;
-
-// to store the mapping between the entity and its type stack
 
+// To store the mapping between the entity and its type stack
 static hash_table entity_to_type_stack_table = hash_table_undefined;
+
 
 void init_entity_type_storage_table()
 {
@@ -212,6 +215,10 @@ void CParserError(char *msg)
   extern void c_reset_lex(void);
   extern int c_lineno;
 
+  pips_user_warning("\nRecovery from C parser failure not (fully) implemented yet.\n"
+		    "C parser is likely to fail later if re-used.\n");
+  pips_user_error("\n%s at user line %d (local line %d) in file \"%s\"\n", msg, get_current_C_line_number(), c_lineno, c_parser_current_file_name);
+
   c_reset_lex();
 
   /* Reset the parser global variables ?*/
@@ -249,7 +256,7 @@ void CParserError(char *msg)
       stack_free(&SwitchGotoStack);
       stack_free(&SwitchControllerStack);
       stack_free(&LoopStack);
-      stack_free(&BlockStack);  
+      stack_free(&BlockStack);
       /* Reset them to stack_undefined_p instead of STACK_NULL */
       SwitchGotoStack = stack_undefined;
       SwitchControllerStack = stack_undefined;
@@ -274,9 +281,6 @@ void CParserError(char *msg)
   reset_C_comment(TRUE);
   reset_expression_comment();
 
-  pips_user_warning("\nRecovery from C parser failure not (fully) implemented yet.\n"
-		    "C parser is likely to fail later if re-used.\n");
-  pips_user_error("\n%s at line %d (%d)\n", msg, get_current_C_line_number(), c_lineno);
   debug_off();
 }
 
@@ -462,11 +466,13 @@ static bool actual_c_parser(string module_name,
       }
 
     /* discard_C_comment(); */
-    set_current_C_line_number();
     init_C_comment();
+    /* Mainly reset the line number: */
+    set_current_C_line_number();
 
     /* yacc parser is called */
     c_in = safe_fopen(file_name, "r");
+    c_parser_current_file_name = file_name;
 
     init_entity_type_storage_table();
     c_parse();
