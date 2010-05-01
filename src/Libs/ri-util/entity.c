@@ -166,7 +166,15 @@ entity make_empty_program(string name,language l)
 entity make_empty_subroutine(string name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
-				 MODULE_SEP_STRING, name, NULL);
+         MODULE_SEP_STRING, name, NULL);
+  return make_empty_module(full_name, make_type_void(NIL),l);
+}
+
+entity make_empty_f95module(string name,language l)
+{
+  pips_assert("Module are only defined in Fortran95",language_fortran95_p(l));
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
+         MODULE_SEP_STRING, F95MODULE_PREFIX, name, NULL);
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
@@ -499,6 +507,11 @@ bool entity_main_module_p(entity e)
   return entity_module_p(e)
     && (strspn(entity_local_name(e), MAIN_PREFIX)==1
 	|| same_string_p(entity_local_name(e), "main"));
+}
+
+bool entity_f95module_p(entity e) {
+  return entity_module_p(e) &&
+      strspn(entity_local_name(e), F95MODULE_PREFIX)==1;
 }
 
 bool entity_blockdata_p(entity e)

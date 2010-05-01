@@ -494,6 +494,8 @@ sentence sentence_head(entity e, list pdl)
 	      {
 		if (entity_blockdata_p(e))
 		  pc = CHAIN_SWORD(pc, "BLOCKDATA ");
+		else if (entity_f95module_p(e))
+      pc = CHAIN_SWORD(pc, "MODULE ");
 		else
 		  pc = CHAIN_SWORD(pc,"SUBROUTINE ");
 	      }

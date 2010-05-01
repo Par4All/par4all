@@ -1826,7 +1826,7 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     if ( ( e = gfc2pips_check_entity_program_exists( name ) )
         ==entity_undefined ) {
       gfc2pips_debug(9, "create main program %s\n",name);
-      e = make_empty_program( str2upper( ( name ) ) );
+      e = make_empty_program( str2upper( ( name ) ), make_language_fortran95() );
     }
     module = true;
   } else if ( s->attr.function ) {
@@ -1836,7 +1836,7 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
           == entity_undefined ) {
         gfc2pips_debug(0, "create function %s\n",str2upper( ( name ) ));
         e = make_empty_function( str2upper( ( name ) ),
-                                 gfc2pips_symbol2type( s ) );
+                                 gfc2pips_symbol2type( s ), make_language_fortran95() );
       }
     }
     module = true;
@@ -1844,14 +1844,14 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     if ( ( e = gfc2pips_check_entity_module_exists( name ) )
         ==entity_undefined ) {
       gfc2pips_debug(1, "create subroutine %s\n",name);
-      e = make_empty_subroutine( str2upper( ( name ) ) );
+      e = make_empty_subroutine( str2upper( ( name ) ), make_language_fortran95() );
     }
     module = true;
   } else if ( s->attr.flavor == FL_BLOCK_DATA ) {
     if ( ( e = gfc2pips_check_entity_block_data_exists( name ) )
         ==entity_undefined ) {
       gfc2pips_debug(9, "block data \n");
-      e = make_empty_blockdata( str2upper( ( name ) ) );
+      e = make_empty_blockdata( str2upper( ( name ) ), make_language_fortran95() );
     }
     module = true;
   } else if ( s->attr.flavor == FL_MODULE ) {
@@ -1859,7 +1859,7 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     if(( e = gfc2pips_check_entity_module_exists( module_name))
         ==entity_undefined ) {
       gfc2pips_debug(1, "create module %s\n",module_name);
-      e = make_empty_subroutine(module_name);
+      e = make_empty_f95module(module_name, make_language_fortran95());
     }
     free(module_name);
     module = true;
