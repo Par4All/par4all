@@ -43,7 +43,7 @@
 #undef fputc
 #undef fread
 #undef asprintf
-int asprintf(char **strp, const char *fmt, ...);
+int asprintf( char **strp, const char *fmt, ... );
 
 // globals defined somewhere in pips...
 // Temporary HACK, waiting for PIPS to be modified : these have to be moved
@@ -372,7 +372,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
    */
   gfc2pips_main_entity_type bloc_token = get_symbol_token( root_sym );
 
-
   /*
    * We have to create a PIPS entity which is a program/function/other.
    * According to the type we have to create different values as parameters
@@ -387,8 +386,8 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   gfc2pips_main_entity = gfc2pips_symbol2entity( ns->proc_name );
 
   string full_name = entity_name(gfc2pips_main_entity);
-  CurrentPackage = entity_local_name(gfc2pips_main_entity);
-  if( CurrentPackage[0] == '%') {
+  CurrentPackage = entity_local_name( gfc2pips_main_entity );
+  if ( CurrentPackage[0] == '%' ) {
     // jump MAIN_PREFIX
     CurrentPackage++;
   }
@@ -414,16 +413,17 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
 
   /* Get declarations */
   list decls = code_declarations(EntityCode(gfc2pips_main_entity));
-  decls = gen_nconc(decls,variables);
+  decls = gen_nconc( decls, variables );
   code_declarations(EntityCode(gfc2pips_main_entity)) = decls;
   /* Fix Storage for declarations */
   FOREACH( entity, e, decls ) {
     // Fixme insecure
-    if(entity_variable_p(e)) {
+    if ( entity_variable_p(e) ) {
       ram r = storage_ram(entity_storage(e));
       ram_function(r) = gfc2pips_main_entity;
-      string name = module_local_name(gfc2pips_main_entity);
-      ram_section(r) = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);;
+      string name = module_local_name( gfc2pips_main_entity );
+      ram_section(r) = FindOrCreateEntity( name, DYNAMIC_AREA_LOCAL_NAME );
+      ;
     }
 
   }
@@ -465,7 +465,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
    * we need to build user-defined elements
    */
   gfc2pips_getTypesDeclared( ns );
-
 
   /*
    * Parameters (if applicable)
@@ -675,9 +674,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   gfc2pips_debug(2, "%zu declaration(s) founded\n",gen_length(list_of_declarations));
   complete_list_of_entities = gen_union( complete_list_of_entities,
                                          list_of_declarations );
-
-
-
 
   /*
    * Get extern entities
@@ -991,13 +987,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   FILE *fp = safe_fopen( file_list, "a" );
   fprintf( fp, "%s %s/%s.f90\n", unsplit_modname, dir_name, unsplit_modname );
   safe_fclose( fp, file_list );
-  fp = safe_fopen( file_list, "r" );
-  char buf[4096]; // FIXME
-  memset( buf, 0, 4096 );
-  fread( buf, 1, 4096, fp );
-  fprintf( stderr, "Read %s", buf );
-  safe_fclose( fp, file_list );
-  free( unsplit_modname );
 
   // Loop over contained procedures
   for ( ns = ns->contained; ns; ns = ns->sibling ) {
@@ -1006,7 +995,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   }
 
   //  printf( "nend\n" );
-  //  exit( 0 );
+//  exit( 0 );
 }
 
 gfc2pips_main_entity_type get_symbol_token( gfc_symbol *root_sym ) {
@@ -1029,7 +1018,6 @@ gfc2pips_main_entity_type get_symbol_token( gfc_symbol *root_sym ) {
   }
   return bloc_token;
 }
-
 
 list gfc2pips_parameters( gfc_namespace * ns,
                           gfc2pips_main_entity_type bloc_token ) {
@@ -1260,7 +1248,7 @@ list gfc2pips_vars_( gfc_namespace *ns, list variables_p ) {
             );
       } else {
         gfc2pips_debug(5, "the symbol is a constant\n");
-        Value = make_value_expression( int_to_expression( TypeSize ));
+        Value = make_value_expression( int_to_expression( TypeSize ) );
       }
 
       int i, j = 0;
@@ -1626,8 +1614,8 @@ bool gfc2pips_test_variable( gfc_namespace __attribute__ ((__unused__)) *ns,
     return false;
   bool variable_p = TRUE;
 
-  variable_p = ( st->n.sym->attr.flavor == FL_VARIABLE || st->n.sym->attr.flavor
-      == FL_PARAMETER );
+  variable_p = ( st->n.sym->attr.flavor == FL_VARIABLE
+      || st->n.sym->attr.flavor == FL_PARAMETER );
 
   /*&& (
    (!st->n.sym->attr.implicit_type||st->n.sym->attr.save==SAVE_EXPLICIT)
@@ -1637,7 +1625,7 @@ bool gfc2pips_test_variable( gfc_namespace __attribute__ ((__unused__)) *ns,
   //&& !st->n.sym->attr.in_common
   variable_p = variable_p && !st->n.sym->attr.pointer;
   variable_p = variable_p && !st->n.sym->attr.dummy;
-  variable_p = variable_p && !(st->n.sym->ts.type == BT_DERIVED);
+  variable_p = variable_p && !( st->n.sym->ts.type == BT_DERIVED );
 
   return variable_p;
 }
@@ -1826,7 +1814,9 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     if ( ( e = gfc2pips_check_entity_program_exists( name ) )
         ==entity_undefined ) {
       gfc2pips_debug(9, "create main program %s\n",name);
-      e = make_empty_program( str2upper( ( name ) ), make_language_fortran95() );
+      e
+          = make_empty_program( str2upper( ( name ) ),
+                                make_language_fortran95( ) );
     }
     module = true;
   } else if ( s->attr.function ) {
@@ -1836,7 +1826,8 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
           == entity_undefined ) {
         gfc2pips_debug(0, "create function %s\n",str2upper( ( name ) ));
         e = make_empty_function( str2upper( ( name ) ),
-                                 gfc2pips_symbol2type( s ), make_language_fortran95() );
+                                 gfc2pips_symbol2type( s ),
+                                 make_language_fortran95( ) );
       }
     }
     module = true;
@@ -1844,24 +1835,26 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     if ( ( e = gfc2pips_check_entity_module_exists( name ) )
         ==entity_undefined ) {
       gfc2pips_debug(1, "create subroutine %s\n",name);
-      e = make_empty_subroutine( str2upper( ( name ) ), make_language_fortran95() );
+      e = make_empty_subroutine( str2upper( ( name ) ),
+                                 make_language_fortran95( ) );
     }
     module = true;
   } else if ( s->attr.flavor == FL_BLOCK_DATA ) {
     if ( ( e = gfc2pips_check_entity_block_data_exists( name ) )
         ==entity_undefined ) {
       gfc2pips_debug(9, "block data \n");
-      e = make_empty_blockdata( str2upper( ( name ) ), make_language_fortran95() );
+      e = make_empty_blockdata( str2upper( ( name ) ),
+                                make_language_fortran95( ) );
     }
     module = true;
   } else if ( s->attr.flavor == FL_MODULE ) {
-    char *module_name = str2upper(strdup(concatenate(name,"!")));
-    if(( e = gfc2pips_check_entity_module_exists( module_name))
+    char *module_name = str2upper( strdup( concatenate( name, "!" ) ) );
+    if ( ( e = gfc2pips_check_entity_module_exists( module_name ) )
         ==entity_undefined ) {
       gfc2pips_debug(1, "create module %s\n",module_name);
-      e = make_empty_f95module(module_name, make_language_fortran95());
+      e = make_empty_f95module( module_name, make_language_fortran95( ) );
     }
-    free(module_name);
+    free( module_name );
     module = true;
   } else {
     gfc2pips_debug(9, "create entity %s\n",str2upper( ( name ) ));
@@ -3952,7 +3945,7 @@ expression gfc2pips_buildCaseTest( gfc_expr *test, gfc_case *cp ) {
 
 list gfc2pips_dumpSELECT( gfc_code *c ) {
   list list_of_statements = NULL;
-  gfc_case *cp;
+  gfc_case * cp;
   gfc_code *d = c->block;
   gfc2pips_debug(5,"dump of SELECT\n");
 
@@ -4463,14 +4456,18 @@ expression gfc2pips_expr2expression( gfc_expr *expr ) {
           pips_user_error( "intrinsic( (string)%s ) : 1st arg is null or undefined\n", c);
         }
         if ( expr->value.op.op2 == NULL ) {
-          if ( expr->value.op.op == INTRINSIC_UMINUS ) {
-            return MakeFortranUnaryCall( CreateIntrinsic( UNARY_MINUS_OPERATOR_NAME ),
-                                         e1 );
-          } else if ( expr->value.op.op == INTRINSIC_UPLUS ) {
-            return e1;
-          } else {
-            pips_user_error( "No second expression member for intrinsic %s\n",
-                c );
+          switch ( expr->value.op.op ) {
+            case INTRINSIC_UMINUS:
+              return MakeFortranUnaryCall( CreateIntrinsic( UNARY_MINUS_OPERATOR_NAME ),
+                                           e1 );
+            case INTRINSIC_UPLUS:
+              return e1;
+            case INTRINSIC_NOT:
+              return MakeFortranUnaryCall( CreateIntrinsic( NOT_OPERATOR_NAME ),
+                                           e1 );
+            default:
+              pips_user_error( "No second expression member for intrinsic %s\n",
+                  c );
           }
         }
         expression e2 = gfc2pips_expr2expression( expr->value.op.op2 );
