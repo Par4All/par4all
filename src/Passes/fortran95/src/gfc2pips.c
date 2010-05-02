@@ -336,6 +336,25 @@ void gfc2pips_add_to_callees( entity e ) {
 }
 
 /**
+ * @brief This function will read an environment variable and set the debug
+ * level.
+ */
+void gfc2pips_setDebugLevel() {
+  extern int the_current_debug_level;
+  the_current_debug_level = 0;
+
+  string debug = getenv("GFC2PIPS_DEBUG_LEVEL");
+  if(debug) {
+    the_current_debug_level = strtol(debug, NULL, 10);
+    if(the_current_debug_level<0) {
+      the_current_debug_level = 0;
+    } else if(the_current_debug_level>9) {
+      the_current_debug_level = 9;
+    }
+  }
+}
+
+/**
  * @brief Entry point for gfc2pips translation
  * This will be called each time the parser encounter
  * subroutine, function, or program.
@@ -347,9 +366,8 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   instruction icf = instruction_undefined;
   gfc2pips_format = gfc2pips_format2 = NULL;
 
-  /* Debug level is currently set at compile time */
-  extern int the_current_debug_level;
-  the_current_debug_level = 0;
+  /* Debug level */
+  gfc2pips_setDebugLevel( );
 
   gfc2pips_debug(2, "Starting gfc2pips dumping\n");
   message_assert( "No namespace to dump.", ns );
@@ -1823,7 +1841,7 @@ entity gfc2pips_check_entity_exists( const char *s ) {
  */
 //add declarations of parameters
 entity gfc2pips_symbol2entity( gfc_symbol* s ) {
-  char* name = str2upper(gfc2pips_get_safe_name( s->name ));
+  char* name = str2upper( gfc2pips_get_safe_name( s->name ) );
   entity e = entity_undefined;//gfc2pips_check_entity_doesnt_exists(name);
   bool module = false;
 
@@ -1892,15 +1910,15 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
             = MakeTypeVariable( make_basic_derived( (entity) str2upper( strdup( s->ts.derived->name ) ) ),
                                 gfc2pips_get_list_of_dimensions2( s ) );
     } else {
-      string location = strdup(CurrentPackage);
-      if(s->attr.use_assoc) {
+      string location = strdup( CurrentPackage );
+      if ( s->attr.use_assoc ) {
         gfc2pips_debug(2, "Entity %s is located in a module (%s)\n",
-                       name,
-                       s->module);
-        free(location);
-        location = str2upper(strdup(concatenate(s->module,"!",NULL)));
+            name,
+            s->module);
+        free( location );
+        location = str2upper( strdup( concatenate( s->module, "!", NULL ) ) );
         e = FindEntity( location, name );
-        if(e==entity_undefined) {
+        if ( e == entity_undefined ) {
           pips_internal_error("Entity '%s' located in module '%s' can't be "
               "found in symbol table, are you sure that you parsed the module "
               "first ? Aborting\n",name, s->module);
