@@ -3614,103 +3614,6 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
         e = CreateIntrinsic( READ_FUNCTION_NAME );
       }
 
-      list list_of_arguments, list_of_arguments_p;
-      list_of_arguments = list_of_arguments_p = NULL;
-      if ( c->block->next->expr == NULL ) {
-        //check we have a DO
-      }
-      for ( c = c->block->next; c; c = c->next ) {
-        if ( c->op == EXEC_DO ) {
-          list do_list_of_arguments, do_list_of_arguments_p;
-          do_list_of_arguments = do_list_of_arguments_p = NULL;
-          //this block represent
-          // ( val1 , val2 , ... , valn , iterator=init_val , increment )
-          gfc2pips_debug(9,"\t\twe have a loop for a variable\n");
-
-          // add the range to list_of_arguments
-          //construction of the range expression
-          expression ex = expression_undefined;
-          expression expression_ref = expression_undefined;
-
-          if ( c->ext.iterator->var->ref ) {
-            //we do not have ranges here. Do we need them ? if yes use gfc2pips_mkRangeExpression instead of gfc2pips_array_ref2indices
-            //1: gfc2pips_array_ref2indices
-            syntax
-                synt =
-                    make_syntax_reference( make_reference( gfc2pips_symbol2entity( c->ext.iterator->var->symtree->n.sym ),
-                                                           gfc2pips_array_ref2indices( &c->ext.iterator->var->ref->u.ar ) ) );
-            expression_ref = make_expression( synt, normalized_undefined );
-
-            //2: gfc2pips_mkRangeExpression
-            /*expression_ref = gfc2pips_mkRangeExpression(
-             gfc2pips_symbol2entity(c->ext.iterator->var->symtree->n.sym),
-             &c->ext.iterator->var->ref->u.ar
-             );*/
-
-          } else {
-            //peut-être faux
-            syntax
-                synt =
-                    make_syntax_reference( make_reference( gfc2pips_symbol2entity( c->ext.iterator->var->symtree->n.sym ),
-                                                           //ref
-                                                           NULL ) );
-            expression_ref = make_expression( synt, normalized_undefined );
-          }
-          range r =
-              make_range( gfc2pips_expr2expression( c->ext.iterator->start ),
-                          gfc2pips_expr2expression( c->ext.iterator->end ),
-                          gfc2pips_expr2expression( c->ext.iterator->step ) );
-
-          gfc_code * transfer_code = c->block->next;
-          for ( ; transfer_code; transfer_code = transfer_code->next ) {
-            ex = gfc2pips_expr2expression( transfer_code->expr );
-            if ( ex != expression_undefined && ex != NULL ) {
-              if ( do_list_of_arguments_p ) {
-                CDR( do_list_of_arguments_p) = CONS( EXPRESSION, ex, NULL );
-                do_list_of_arguments_p = CDR( do_list_of_arguments_p );
-              } else {
-                do_list_of_arguments = do_list_of_arguments_p
-                    = CONS( EXPRESSION, ex, NULL );
-              }
-            }
-          }
-          expression er = make_expression( make_syntax_range( r ),
-                                           normalized_undefined );
-          do_list_of_arguments = CONS( EXPRESSION,
-              expression_ref,
-              CONS( EXPRESSION,
-                  er,
-                  do_list_of_arguments ) );
-          call call_ = make_call( CreateIntrinsic( IMPLIED_DO_NAME ),
-                                  do_list_of_arguments );
-          ex
-              = make_expression( make_syntax_call( call_ ),
-                                 normalized_undefined );
-          if ( list_of_arguments_p ) {
-            CDR( list_of_arguments_p) = CONS( EXPRESSION, ex, NULL );
-            list_of_arguments_p = CDR( list_of_arguments_p );
-          } else {
-            list_of_arguments = list_of_arguments_p = CONS( EXPRESSION,
-                ex,
-                NULL );
-          }
-        } else if ( c->op == EXEC_TRANSFER ) {
-          expression ex = gfc2pips_expr2expression( c->expr );
-          if ( ex != expression_undefined && ex != NULL ) {
-            if ( list_of_arguments_p ) {
-              CDR( list_of_arguments_p) = CONS( EXPRESSION, ex, NULL );
-              list_of_arguments_p = CDR( list_of_arguments_p );
-            } else {
-              list_of_arguments = list_of_arguments_p = CONS( EXPRESSION,
-                  ex,
-                  NULL );
-            }
-          }//else{fprintf(stderr,"boum1\n");}
-        }//else{fprintf(stderr,"boum2\n");}
-        //fprintf(stderr,"boum3\n");
-      }
-
-      list_of_arguments = gen_nreverse( list_of_arguments );
 
       expression std, format, unite, f;
       list lci = NULL;
@@ -3845,23 +3748,7 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
                   format,
                   CONS( EXPRESSION, f, lci ) ) ) );
 
-      //we have to have a peer number of elements in the list, so we need to insert an element between each and every elements of our arguments list
-      list pc, lr;
-      lr = NULL;
-
-      pc = list_of_arguments;
-      while ( pc != NULL ) {
-        expression e = MakeCharacterConstantExpression( IO_LIST_STRING_NAME );
-        list p = CONS( EXPRESSION, e, NULL );
-
-        CDR( p) = pc;
-        pc = CDR( pc );
-        CDR( CDR( p )) = NULL;
-
-        lr = gen_nconc( p, lr );
-      }
-
-      return make_instruction_call( make_call( e, gen_nconc( lci, lr ) ) );
+      return make_instruction_call( make_call( e, lci ) );
 
       /*	    show_dt_code:
        fputc ('\n', dumpfile);
