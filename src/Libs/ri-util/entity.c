@@ -968,12 +968,13 @@ bool entity_list_p(list el)
 /* this function maps a local name, for instance P, to the corresponding
  * TOP-LEVEL entity, whose name is TOP-LEVEL:P. n is the local name.
  */
-
+#define PREFIXES_SIZE 5
 static string prefixes[] = {
     "",
     MAIN_PREFIX,
     BLOCKDATA_PREFIX,
     COMMON_PREFIX,
+    F95MODULE_PREFIX,
 };
 
 entity local_name_to_top_level_entity(const char *n)
@@ -995,8 +996,8 @@ entity local_name_to_top_level_entity(const char *n)
   }
   else
     {
-      for(i=0; i<4 && entity_undefined_p(module); i++)
-	module = gen_find_tabulated(concatenate
+      for(i=0; i<PREFIXES_SIZE && entity_undefined_p(module); i++)
+        module = gen_find_tabulated(concatenate
 				    (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, NULL),
 				    entity_domain);
     }
