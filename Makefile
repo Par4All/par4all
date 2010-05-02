@@ -142,6 +142,8 @@ SUMMARY: $(HEAD) parallel-validate
 	  cat $(HEAD) ; \
 	  echo "end date: $$(date)" ; \
 	  echo ; \
+          ./summary.pl $(RESULTS) ; \
+          echo ; \
 	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
 	  echo ; \
 	  failed=$$(egrep '^(failed|changed): ' < $(RESULTS) | wc -l); \
