@@ -1,0 +1,11 @@
+delete namelist
+
+create namelist  namelist.f90
+
+display PRINTED_FILE(%ALL)
+
+close
+
+delete namelist
+quit
+# EOF
