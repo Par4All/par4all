@@ -1079,11 +1079,6 @@ list gfc2pips_args( gfc_namespace* ns ) {
   list args_list = NULL, args_list_p = NULL;
   entity e = entity_undefined;
   set_current_number_of_alternate_returns( );
-  type
-      type_alt_return =
-          make_type_variable( make_variable( make_basic_overloaded( ),
-                                             NULL,
-                                             NULL ) );
 
   if ( ns && ns->proc_name ) {
 
@@ -1104,8 +1099,12 @@ list gfc2pips_args( gfc_namespace* ns ) {
             e
                 = generate_pseudo_formal_variable_for_formal_label( CurrentPackage,
                                                                     get_current_number_of_alternate_returns( ) );
-            if ( entity_type(e) == type_undefined )
-              entity_type(e) = type_alt_return;
+            if ( entity_type(e) == type_undefined ) {
+              entity_type(e)
+                  = make_type_variable( make_variable( make_basic_overloaded( ),
+                                                       NULL,
+                                                       NULL ) );
+            }
           }
           args_list = args_list_p = CONS( ENTITY, e, NULL );//fprintf(stderr,"%s\n",formal->sym->name);
 
@@ -2864,7 +2863,7 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       }
 
       if ( entity_type(called_function) == type_undefined ) {
-        //fprintf(stderr,"type is already undefined %s\n",entity_name(called_function));
+        gfc2pips_debug(2,"Type is undefined %s\n",entity_name(called_function));
         //invent list of parameters
         list param_of_call = gen_copy_seq( list_of_arguments );
         list param_of_call_p = param_of_call;
@@ -2873,10 +2872,10 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
           entity _new =
               (entity) gen_copy_tree( (gen_chunk *) param_of_call_p->car.e );
           entity_name(_new) = "toto";
-          fprintf( stderr,
-                   "%s %s",
-                   entity_name((entity)param_of_call_p->car.e),
-                   entity_name(_new) );
+          gfc2pips_debug(2,
+              "%s - %s",
+              entity_name((entity)param_of_call_p->car.e),
+              entity_name(_new) );
           param_of_call_p->car.e = _new;
           POP( param_of_call_p );
         }
@@ -3625,7 +3624,7 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
 
       if ( dt->format_expr ) { //if no format ; it is standard
         fmt = gfc2pips_expr2expression( dt->format_expr );
-      } else if ( dt->format_label ) {
+      } else if ( dt->format_label && dt->format_label->value != -1 ) {
         if ( dt->format_label->format ) {
 
           if ( dt->format_label->value ) {
@@ -3757,10 +3756,11 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
 
       }
 
-      if ( std != expression_undefined ) {
-        expression unite = MakeCharacterConstantExpression( "UNIT=" );
-        lci = CONS( EXPRESSION, unite, CONS( EXPRESSION, std, lci ) );
+      if ( std == expression_undefined ) {
+        std = MakeNullaryCall( CreateIntrinsic( LIST_DIRECTED_FORMAT_NAME ) );
       }
+      expression unite = MakeCharacterConstantExpression( "UNIT=" );
+      lci = CONS( EXPRESSION, unite, CONS( EXPRESSION, std, lci ) );
 
       return make_instruction_call( make_call( e, lci ) );
 
@@ -4537,23 +4537,28 @@ expression gfc2pips_expr2expression( gfc_expr *expr ) {
       break;
     case EXPR_FUNCTION:
       gfc2pips_debug(5, "func\n");
-      // FIXME (Mehdi) ????
-      //beware the automatic conversion here, some conversion functions may be
-      //automatically called here, and we do not want them in the code
+
+      /*
+       * beware the automatic conversion here, some conversion functions may be
+       * automatically called here, and we do not want them in the code
+       * these implicit "cast" have a "__convert_" prefix (gfc internal)
+       */
       if ( strncmp( expr->symtree->n.sym->name,
                     "__convert_",
                     strlen( "__convert_" ) ) == 0 ) {
         if ( expr->value.function.actual->expr ) {
-          gfc2pips_debug(6, "expression not null !\n");
+          gfc2pips_debug(6, "expression not null for implicit cast !\n");
           //show_expr(expr->value.function.actual->expr);
           return gfc2pips_expr2expression( expr->value.function.actual->expr );
         } else {
-          pips_user_error( "expression null while trying to handle %s\n", expr->value.function.name );
+          pips_user_error( "expression null while trying to handle %s\n",
+              expr->value.function.name );
         }
       } else {
-        // FIXME (Mehdi) ????
-        //functions whose name begin with __ should be used by gfc only
-        // therefore we put the old name back
+        /*
+         * functions whose name begin with __ should be used by gfc only
+         * therefore we put the old name back
+         */
         if ( strncmp( expr->value.function.name, "__", strlen( "__" ) ) == 0
             || strncmp( expr->value.function.name,
                         "_gfortran_",
@@ -4561,26 +4566,31 @@ expression gfc2pips_expr2expression( gfc_expr *expr ) {
           expr->value.function.name = expr->symtree->n.sym->name;
         }
 
-        //actual est la liste
+        /*
+         * actual is the list of actual argument
+         */
         list list_of_arguments = NULL, list_of_arguments_p = NULL;
         gfc_actual_arglist *act = expr->value.function.actual;
 
         if ( act ) {
           do {
-            //gfc add default parameters for some FORTRAN functions, but it is NULL in this case (could break ?)
+            /*
+             * gfc add default parameters for some FORTRAN functions, but it is
+             * NULL in this case (could break ?)
+             */
             if ( act->expr ) {
               expression ex = gfc2pips_expr2expression( act->expr );
               if ( ex != expression_undefined ) {
-
                 if ( list_of_arguments_p ) {
                   CDR( list_of_arguments_p) = CONS( EXPRESSION, ex, NIL );
                   list_of_arguments_p = CDR( list_of_arguments_p );
                 } else {
                   list_of_arguments_p = CONS( EXPRESSION, ex, NIL );
                 }
+                if ( list_of_arguments == NULL ) {
+                  list_of_arguments = list_of_arguments_p;
+                }
               }
-              if ( list_of_arguments == NULL )
-                list_of_arguments = list_of_arguments_p;
             } else {
               break;
             }
@@ -4588,23 +4598,26 @@ expression gfc2pips_expr2expression( gfc_expr *expr ) {
           } while ( ( act = act->next ) != NULL );
         }
 
+        string func_name = gfc2pips_get_safe_name( expr->value.function.name );
+        func_name = str2upper( func_name );
         entity
             e =
                 FindOrCreateEntity( TOP_LEVEL_MODULE_NAME,
-                                    str2upper( gfc2pips_get_safe_name( expr->value.function.name ) ) );
+                                    func_name );
+
+        /*
+         *  This is impossible !
+         *  We must have found functions when converting symbol table
+         *  The only possibility here is a missing intrinsic in PIPS
+         */
         if ( entity_initial(e) == value_undefined ) {
-          pips_user_warning("(%d) Entity not declared : '%s'\n",
-              __LINE__,gfc2pips_get_safe_name( entity_name( e)));
+          pips_user_warning("(%d) Entity not declared : '%s' is it a missing"
+              "intrinsic ??\n",
+              __LINE__,entity_name( e ) );
           entity_initial(e) = make_value( is_value_intrinsic, e );
-          //entity_initial(e) = make_value(is_value_constant,make_constant(is_constant_int, (void *) CurrentTypeSize));
-
         }
-
-        entity_type(e)
-            = make_type_functional( make_functional( NIL,
-                                                     MakeOverloadedResult( ) ) );
         call call_ = make_call( e, list_of_arguments );
-        //update_called_modules(e);//syntax !!
+
         return make_expression( make_syntax_call( call_ ), normalized_undefined );
       }
       break;
