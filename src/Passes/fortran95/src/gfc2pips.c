@@ -229,6 +229,12 @@ void gfc2pips_truncate_useless_zeroes( char *s ) {
   }
 }
 
+/**
+ * void gfc2pips_get_use_st( void );
+ * @brief This function is called by the GFC parser when encountering a USE
+ * statement. It'll produce an entry in "ns2use" hashtable
+ *
+ */
 hash_table ns2use = NULL;
 void gfc2pips_get_use_st( void ) {
 
@@ -367,30 +373,20 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
     root_sym = current_proc->n.sym;
   }
 
-  /* Get the block_token (what we are working on)
+  /*
+   * Get the block_token (what we are working on)
    * and the the return type if it's a function
    */
   gfc2pips_main_entity_type bloc_token = get_symbol_token( root_sym );
 
   /*
-   * We have to create a PIPS entity which is a program/function/other.
-   * According to the type we have to create different values as parameters
-   * for the creation of the PIPS entity by :
-   * MakeCurrentFunction(type_undefined, TK_PROGRAM , CurrentPackage, NULL);
+   * Name for entity in PIPS corresponding to current procedure in GFC
    */
-
-  // Name for entity in PIPS corresponding to current procedure in GFC
-  //maybe right FIXME
-
-  // ?????? To be removed (Mehdi)
   gfc2pips_main_entity = gfc2pips_symbol2entity( ns->proc_name );
 
   string full_name = entity_name(gfc2pips_main_entity);
-  CurrentPackage = entity_local_name( gfc2pips_main_entity );
-  if ( CurrentPackage[0] == '%' ) {
-    // jump MAIN_PREFIX
-    CurrentPackage++;
-  }
+  CurrentPackage = global_name_to_user_name( full_name );
+
   gfc2pips_debug(2, "Currently parsing : %s\n", full_name);
   gfc2pips_debug(2, "CurrentPackage : %s\n", CurrentPackage);
   /*
@@ -406,13 +402,25 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   /* Generic PIPS areas are created for memory allocation. */
   InitAreas( );
 
-  // declare variables
+  /* declare variables */
   list variables_p, variables;
   variables_p = variables = gfc2pips_vars( ns );
   gfc2pips_debug(2, "%zu variable(s) founded\n",gen_length(variables));
 
+  /* Filter variables so that we keep only local variable */
+  variables = NIL;
+  FOREACH(entity,e,variables_p) {
+    storage s = entity_storage(e);
+    if ( storage_ram_p(s) ) {
+      if ( ram_function(storage_ram(s)) == gfc2pips_main_entity ) {
+        variables = CONS(ENTITY,e,variables);
+      }
+    }
+  }
+
   /* Get declarations */
   list decls = code_declarations(EntityCode(gfc2pips_main_entity));
+  /* Add variables to declaration */
   decls = gen_nconc( decls, variables );
   code_declarations(EntityCode(gfc2pips_main_entity)) = decls;
   /* Fix Storage for declarations */
@@ -1217,7 +1225,7 @@ list gfc2pips_vars( gfc_namespace *ns ) {
 list gfc2pips_vars_( gfc_namespace *ns, list variables_p ) {
   list variables = NULL;
   //variables_p = gen_nreverse(getSymbolBy(ns,ns->sym_root, gfc2pips_test_variable));
-  variables_p;//balancer la suite dans une fonction à part afin de pouvoir la réutiliser pour les calls
+  //balancer la suite dans une fonction à part afin de pouvoir la réutiliser pour les calls
   //list arguments,arguments_p;
   //arguments = arguments_p = gfc2pips_args(ns);
   while ( variables_p ) {
@@ -1225,9 +1233,15 @@ list gfc2pips_vars_( gfc_namespace *ns, list variables_p ) {
     //create entities here
     gfc_symtree *current_symtree = (gfc_symtree*) variables_p->car.e;
     if ( current_symtree && current_symtree->n.sym ) {
-      gfc2pips_debug(3, "translation of entity gfc2pips start\n");
+      gfc2pips_debug(3, "translation of entity start\n");
       if ( current_symtree->n.sym->attr.in_common ) {
-        gfc2pips_debug(4, " %s is in a common\r\n", (current_symtree->name) );
+        gfc2pips_debug(4, " %s is in a common, skipping\r\n", (current_symtree->name) );
+        //we have to skip them, they don't have any place here
+        POP( variables_p );
+        continue;
+      }
+      if ( current_symtree->n.sym->attr.use_assoc ) {
+        gfc2pips_debug(4, " %s is in a module, skipping\r\n", (current_symtree->name) );
         //we have to skip them, they don't have any place here
         POP( variables_p );
         continue;
@@ -1254,7 +1268,10 @@ list gfc2pips_vars_( gfc_namespace *ns, list variables_p ) {
       //list list_of_dimensions = gfc2pips_get_list_of_dimensions(current_symtree);
       //si allocatable alors on fait qqch d'un peu spécial
 
-      //we look into the list of arguments to know if the entity is in and thus the offset in the stack
+      /*
+       * we look into the list of arguments to know if the entity is in and thus
+       * the offset in the stack
+       */
       /*i=0;j=1;
        arguments_p = arguments;
        while(arguments_p){
@@ -1268,12 +1285,13 @@ list gfc2pips_vars_( gfc_namespace *ns, list variables_p ) {
        }*/
       //fprintf(stderr,"%s %d\n",current_symtree->name,i);
 
-      variables = CONS( ENTITY,
-          FindOrCreateEntity( CurrentPackage,
-              str2upper( gfc2pips_get_safe_name( current_symtree->name ) ) ),
-          variables );
+      entity
+          newEntity =
+              FindOrCreateEntity( CurrentPackage,
+                                  str2upper( gfc2pips_get_safe_name( current_symtree->name ) ) );
+      variables = CONS( ENTITY,newEntity,variables );
       entity_type((entity)variables->car.e) = Type;
-      entity_initial((entity)variables->car.e) = Value;//make_value(is_value_code, make_code(NULL, strdup(""), make_sequence(NIL),NIL));
+      entity_initial((entity)variables->car.e) = Value;
       if ( current_symtree->n.sym->attr.dummy ) {
         gfc2pips_debug(0,"dummy parameter \"%s\" put in FORMAL\n",current_symtree->n.sym->name);
         //we have a formal parameter (argument of the function/subroutine)
@@ -1341,7 +1359,7 @@ list gfc2pips_vars_( gfc_namespace *ns, list variables_p ) {
        entity_type((entity)variables->car.e) = newType;
        }*/
       //}
-      gfc2pips_debug(3, "translation of entity gfc2pips end\n");
+      gfc2pips_debug(3, "translation for %s end\n",entity_name(newEntity));
     } else {
       variables_p->car.e = NULL;
     }
@@ -1805,7 +1823,7 @@ entity gfc2pips_check_entity_exists( const char *s ) {
  */
 //add declarations of parameters
 entity gfc2pips_symbol2entity( gfc_symbol* s ) {
-  char* name = gfc2pips_get_safe_name( s->name );
+  char* name = str2upper(gfc2pips_get_safe_name( s->name ));
   entity e = entity_undefined;//gfc2pips_check_entity_doesnt_exists(name);
   bool module = false;
 
@@ -1847,7 +1865,7 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
     }
     module = true;
   } else if ( s->attr.flavor == FL_MODULE ) {
-    char *module_name = str2upper( strdup( concatenate( name, "!" ) ) );
+    char *module_name = str2upper( strdup( concatenate( name, "!", NULL ) ) );
     if ( ( e = gfc2pips_check_entity_module_exists( module_name ) )
         ==entity_undefined ) {
       gfc2pips_debug(1, "create module %s\n",module_name);
@@ -1874,7 +1892,22 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ) {
             = MakeTypeVariable( make_basic_derived( (entity) str2upper( strdup( s->ts.derived->name ) ) ),
                                 gfc2pips_get_list_of_dimensions2( s ) );
     } else {
-      e = FindOrCreateEntity( CurrentPackage, str2upper( ( name ) ) );
+      string location = strdup(CurrentPackage);
+      if(s->attr.use_assoc) {
+        gfc2pips_debug(2, "Entity %s is located in a module (%s)\n",
+                       name,
+                       s->module);
+        free(location);
+        location = str2upper(strdup(concatenate(s->module,"!",NULL)));
+        e = FindEntity( location, name );
+        if(e==entity_undefined) {
+          pips_internal_error("Entity '%s' located in module '%s' can't be "
+              "found in symbol table, are you sure that you parsed the module "
+              "first ? Aborting\n",name, s->module);
+        }
+      } else {
+        e = FindOrCreateEntity( location, name );
+      }
       if ( entity_initial(e) == value_undefined )
         entity_initial(e) = make_value_unknown( );
       if ( entity_type(e) == type_undefined )
@@ -4600,10 +4633,7 @@ expression gfc2pips_expr2expression( gfc_expr *expr ) {
 
         string func_name = gfc2pips_get_safe_name( expr->value.function.name );
         func_name = str2upper( func_name );
-        entity
-            e =
-                FindOrCreateEntity( TOP_LEVEL_MODULE_NAME,
-                                    func_name );
+        entity e = FindOrCreateEntity( TOP_LEVEL_MODULE_NAME, func_name );
 
         /*
          *  This is impossible !
