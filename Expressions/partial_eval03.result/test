@@ -1,12 +1,13 @@
 
 Initial code for "partial_eval03"
 
-void partial_eval03()
+foo partial_eval03()
 {
    foo size = 2;
    foo i;
 
    i = size;
+   return i;
 }
 
 Code with preconditions for "partial_eval03"
@@ -14,7 +15,7 @@ Code with preconditions for "partial_eval03"
 
 //  P() {}
 
-void partial_eval03()
+foo partial_eval03()
 {
 
 //  P() {}
@@ -29,16 +30,21 @@ void partial_eval03()
 
 
    i = size;
+
+//  P(i,size) {i==2, size==2}
+
+   return i;
 }
 
 Code after partial evaluation for "partial_eval03"
 
-void partial_eval03()
+foo partial_eval03()
 {
    foo size = 2;
    foo i;
 
    i = 2;
+   return 2;
 }
 
 Unsplit resulting code

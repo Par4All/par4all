@@ -1,6 +1,7 @@
+setenv WS="partial_eval03"
 setproperty ABORT_ON_USER_ERROR TRUE
-delete partial_eval03
-create partial_eval03 partial_eval03.c
+delete $WS
+create $WS $WS.c
 
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
@@ -33,12 +34,11 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cc -c partial_eval03.c -o partial_eval
-shell cc -c partial_eval03.database/Src/partial_eval03.c
-shell if test `partial_eval03.database/Src/partial_eval` = `partial_eval`; then echo "ok"; else echo "ko" ; fi
-shell rm -rf partial_eval03.database/Src/partial_eval partial_eval
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell if test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`; then echo "ok"; else echo "ko" ; fi
 
 close
-# delete partial_eval03
+delete $WS
 quit
 

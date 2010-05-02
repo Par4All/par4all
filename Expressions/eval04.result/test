@@ -1,10 +1,10 @@
 
-Transformers for "eval03"
+Transformers for "eval04"
 
 
 C  T() {}
 
-void eval03()
+void eval04()
 {
 
 //  T(i) {}
@@ -18,24 +18,24 @@ void eval03()
 //  T(i) {i==7}
 
 
-   i = 3+4;
+   i = 3+4+0;
 
-//  T(i,j) {i<=509}
+//  T(i,j) {3<=i, i<=509}
 
 
-   for (i = 1+2;i<511-1;i++)
+   for (i = 1+2+0;i<511-1+0;i+++0)
 
 //  T(j) {j==2}
 
       j = 2;
 }
 
-Preconditions for "eval03" (useless)
+Preconditions for "eval04" (useless)
 
 
 //  P() {}
 
-void eval03()
+void eval04()
 {
 
 //  P() {}
@@ -49,21 +49,21 @@ void eval03()
 //  P(i,j) {}
 
 
-   i = 3+4;
+   i = 3+4+0;
 
 //  P(i,j) {i==7}
 
 
-   for (i = 1+2;i<511-1;i++)
+   for (i = 1+2+0;i<511-1+0;i+++0)
 
-//  P(i,j) {i<=509}
+//  P(i,j) {3<=i, i<=509}
 
       j = 2;
 }
 
-Code for "eval03" after partial evaluation
+Code for "eval04" after partial evaluation
 
-void eval03()
+void eval04()
 {
    int i;
    int j;
