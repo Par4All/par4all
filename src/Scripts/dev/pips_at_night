@@ -162,7 +162,10 @@ if [[ $valids ]] ; then
       pushd $target/$d
       make $mopt clean
       make $mopt "$vopt" EMAIL=$email $validate
-      # cleanup
+      # full cleanup: the validation directory is cleaned,
+      # so that subsequent "svn up" should work properly.
+      # hmmm... this means that there is no point to look
+      # at the validation directory for result details.
       [ "$unvalidate" ] && make $mopt $unvalidate
       popd
     else
