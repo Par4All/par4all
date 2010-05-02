@@ -403,9 +403,7 @@ string local_name_to_scope(string ln)
   string name = local_name(entity_name(e));
 
   return (name
-    + strspn(name, MAIN_PREFIX)
-    + strspn(name, BLOCKDATA_PREFIX)
-    + strspn(name, COMMON_PREFIX));
+   + strspn(name, F95MODULE_PREFIX MAIN_PREFIX BLOCKDATA_PREFIX COMMON_PREFIX));
 }
 
 /* Returns a pointer towards the resource name. The resource name is
@@ -414,9 +412,7 @@ string module_resource_name(entity e)
 {
   string rn = entity_local_name(e);
 
-  rn += strspn(rn, MAIN_PREFIX)
-    + strspn(rn, BLOCKDATA_PREFIX)
-    + strspn(rn, COMMON_PREFIX);
+  rn += strspn(rn, F95MODULE_PREFIX MAIN_PREFIX BLOCKDATA_PREFIX COMMON_PREFIX);
 
   return rn;
 }
