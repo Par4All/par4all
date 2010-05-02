@@ -86,6 +86,10 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
   gen_write_tabulated( fd, entity_domain );
   safe_fclose( fd, (char *) entities_filename );
 
+  /*
+   * directory where module are precompiled
+   */
+  char *compiled_dir_name = get_resource_file_name( "", "/Precompiled" );
 
   // Check if source file exist
   /*  string source_filename =
@@ -110,7 +114,7 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
                              */
                             "-fdump-parse-tree",
                             "-quiet",
-
+                            "-I",compiled_dir_name,
                             /* we may have non-standard file extensions
                              * (e.g. .f_initial) and gfortran will not be able
                              * to know what it is so we force the language input
