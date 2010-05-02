@@ -995,7 +995,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   }
 
   //  printf( "nend\n" );
-//  exit( 0 );
+  //  exit( 0 );
 }
 
 gfc2pips_main_entity_type get_symbol_token( gfc_symbol *root_sym ) {
@@ -3606,6 +3606,11 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       gfc2pips_debug(5, "Translation of %s\n",c->op==EXEC_WRITE?"PRINT":"READ");
       //yeah ! we've got an intrinsic
       gfc_code *d = c;
+      gfc_dt *dt = d->ext.dt;
+
+      pips_assert("dt can't be NULL",dt!=NULL);
+
+      /* Create the entity that will be "called", READ or WRITE only */
       entity e = entity_undefined;
       if ( c->op == EXEC_WRITE ) {
         //print or write ? print is only a particular case of write
@@ -3614,60 +3619,38 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
         e = CreateIntrinsic( READ_FUNCTION_NAME );
       }
 
-
-      expression std, format, unite, f;
+      expression std = expression_undefined;
+      expression fmt = expression_undefined;
       list lci = NULL;
 
-      //creation of the representation of the default channels for IO
-      f = MakeNullaryCall( CreateIntrinsic( LIST_DIRECTED_FORMAT_NAME ) );
-      std = MakeNullaryCall( CreateIntrinsic( LIST_DIRECTED_FORMAT_NAME ) );
+      if ( dt->format_expr ) { //if no format ; it is standard
+        fmt = gfc2pips_expr2expression( dt->format_expr );
+      } else if ( dt->format_label ) {
+        if ( dt->format_label->format ) {
 
-      //we check if the chan is standard and if not put the right value
-      //ajouter une property pour que * soit prioritaire sur 5/6 pour les canaux :  GFC_IOSTAR_IS_PRIOTITY
-      if ( d->ext.dt ) {
-        //if no format it is standard
-        if ( d->ext.dt->format_expr ) {
-          f = gfc2pips_expr2expression( d->ext.dt->format_expr );
-        } else if ( d->ext.dt->format_label && d->ext.dt->format_label->value
-            != -1 ) {
-          if ( d->ext.dt->format_label->format ) {
-            //if is a reference to a FORMAT
-            if ( d->ext.dt->format_label->value ) {
-              //we check if we have already the label or not the label is associated to a FORMAT => we check if we already have this format
-              //this check is important 'cause we do not have to remove quotes twice !
-              if ( gen_find_eq( (void *) (_int) d->ext.dt->format_label->value,
-                                gfc2pips_format2 ) == gen_chunk_undefined ) {
-                //we do have a label somewhere with a format
-                f = gfc2pips_int2expression( d->ext.dt->format_label->value );
+          if ( dt->format_label->value ) {
+            /* It is a reference to a FORMAT
+             * we do have a label somewhere with a format
+             */
+            fmt = gfc2pips_int2expression( dt->format_label->value );
 
-                //we have to push the current FORMAT in a list, we will dump it at the very, very TOP
-                //we need to change the expression, a FORMAT statement doesn't have quotes around it
-                expression fmt_expr =
-                    gfc2pips_expr2expression( d->ext.dt->format_label->format );
-                //delete supplementary quotes
-                char
-                    * str =
-                        entity_name(call_function(syntax_call(expression_syntax(fmt_expr))));
-                int curr_char_indice = 0, curr_char_indice_cible = 0,
-                    length_curr_format = strlen( str );
-                for ( ; curr_char_indice_cible < length_curr_format - 1; curr_char_indice++, curr_char_indice_cible++ ) {
-                  if ( str[curr_char_indice_cible] == '\'' )
-                    curr_char_indice_cible++;
-                  str[curr_char_indice] = str[curr_char_indice_cible];
-                }
-                str[curr_char_indice] = '\0';
-
-                gfc2pips_format = gen_cons( fmt_expr, gfc2pips_format );
-                gfc2pips_format2
-                    = gen_cons( (void *) (_int) d->ext.dt->format_label->value,
-                                gfc2pips_format2 );
-              }
-            } else {//the format is given as an argument !
-              expression f =
-                  gfc2pips_expr2expression( d->ext.dt->format_label->format );
-              //delete supplementary quotes
-              char * str =
-                  entity_name(call_function(syntax_call(expression_syntax(f))));
+            /*
+             * we check if we have already the label or not
+             * the label is associated to a FORMAT =>
+             * we check if we already have this format
+             */
+            if ( gen_find_eq( (void *) (_int) dt->format_label->value,
+                              gfc2pips_format2 ) == gen_chunk_undefined ) {
+              /*
+               * we have to push the current FORMAT in a list, we will dump it at
+               * the very, very TOP. we need to change the expression, a FORMAT
+               * statement doesn't have quotes around it
+               */
+              expression fmt_expr =
+                  gfc2pips_expr2expression( dt->format_label->format );
+              /* delete supplementary quotes */
+              char *str = entity_name(
+                  call_function(syntax_call(expression_syntax(fmt_expr))));
               int curr_char_indice = 0, curr_char_indice_cible = 0,
                   length_curr_format = strlen( str );
               for ( ; curr_char_indice_cible < length_curr_format - 1; curr_char_indice++, curr_char_indice_cible++ ) {
@@ -3676,77 +3659,108 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
                 str[curr_char_indice] = str[curr_char_indice_cible];
               }
               str[curr_char_indice] = '\0';
+
+              gfc2pips_format = gen_cons( fmt_expr, gfc2pips_format );
+              gfc2pips_format2
+                  = gen_cons( (void *) (_int) dt->format_label->value,
+                              gfc2pips_format2 );
             }
           } else {
-            //error or warning: we have bad code
-            pips_user_error( "gfc2pips_code2instruction, No format for label\n" );
+            // The format is given as an argument !
+            fmt = gfc2pips_expr2expression( dt->format_label->format );
+            //delete supplementary quotes
+            char * str =
+                entity_name(call_function(syntax_call(expression_syntax(fmt))));
+            int curr_char_indice = 0, curr_char_indice_cible = 0,
+                length_curr_format = strlen( str );
+            for ( ; curr_char_indice_cible < length_curr_format - 1; curr_char_indice++, curr_char_indice_cible++ ) {
+              if ( str[curr_char_indice_cible] == '\'' )
+                curr_char_indice_cible++;
+              str[curr_char_indice] = str[curr_char_indice_cible];
+            }
+            str[curr_char_indice] = '\0';
           }
-        }
-        if (
-        //if GFC_IOSTAR_IS_PRIOTITY = TRUE
-        d->ext.dt->io_unit && ( d->ext.dt->io_unit->expr_type != EXPR_CONSTANT
-        //if the canal is 6, it is standard for write
-            //if the canal is 5, it is standard for read
-            || ( d->ext.dt->io_unit->expr_type == EXPR_CONSTANT && ( ( d->op
-                == EXEC_READ && mpz_get_si( d->ext.dt->io_unit->value.integer )
-                != 5 ) || ( d->op == EXEC_WRITE
-                && mpz_get_si( d->ext.dt->io_unit->value.integer ) != 6 ) ) ) ) ) {
-          std = gfc2pips_expr2expression( d->ext.dt->io_unit );
+        } else {
+          //error or warning: we have bad code
+          pips_user_error( "gfc2pips_code2instruction, No format for label\n" );
         }
       }
 
-      unite = MakeCharacterConstantExpression( "UNIT=" );
-      format = MakeCharacterConstantExpression( "FMT=" );
+      /*
+       * Handling of UNIT=
+       */
+      if ( dt->io_unit ) {
+        bool has_to_generate_unit = FALSE; // Flag
 
-      if ( d->ext.dt ) {
+        if ( dt->io_unit->expr_type != EXPR_CONSTANT ) {
+          /* UNIT is not a constant, we have to print it */
+          has_to_generate_unit = TRUE;
+        } else if ( d->op == EXEC_READ
+            && mpz_get_si( dt->io_unit->value.integer ) != 5 || d->op
+            == EXEC_WRITE && mpz_get_si( dt->io_unit->value.integer ) != 6 ) {
+          /*
+           * if the canal is 6, it is standard for write
+           * if the canal is 5, it is standard for read
+           */
+          has_to_generate_unit = TRUE;
+        }
 
-        if ( d->ext.dt->err )
-          lci = gfc2pips_exprIO2( "ERR=", d->ext.dt->err->value, lci );
-        if ( d->ext.dt->end )
-          lci = gfc2pips_exprIO2( "END=", d->ext.dt->end->value, lci );
-        if ( d->ext.dt->eor )
-          lci = gfc2pips_exprIO2( "EOR=", d->ext.dt->end->value, lci );
+        /* We have to print UNIT= ; it's not implicit */
+        if ( has_to_generate_unit ) {
+          std = gfc2pips_expr2expression( dt->io_unit );
+        }
+      }
 
-        if ( d->ext.dt->sign )
-          lci = gfc2pips_exprIO( "SIGN=", d->ext.dt->sign, lci );
-        if ( d->ext.dt->round )
-          lci = gfc2pips_exprIO( "ROUND=", d->ext.dt->round, lci );
-        if ( d->ext.dt->pad )
-          lci = gfc2pips_exprIO( "PAD=", d->ext.dt->pad, lci );
-        if ( d->ext.dt->delim )
-          lci = gfc2pips_exprIO( "DELIM=", d->ext.dt->delim, lci );
-        if ( d->ext.dt->decimal )
-          lci = gfc2pips_exprIO( "DECIMAL=", d->ext.dt->decimal, lci );
-        if ( d->ext.dt->blank )
-          lci = gfc2pips_exprIO( "BLANK=", d->ext.dt->blank, lci );
-        if ( d->ext.dt->asynchronous )
-          lci = gfc2pips_exprIO( "ASYNCHRONOUS=", d->ext.dt->asynchronous, lci );
-        if ( d->ext.dt->pos )
-          lci = gfc2pips_exprIO( "POS=", d->ext.dt->pos, lci );
-        if ( d->ext.dt->id )
-          lci = gfc2pips_exprIO( "ID=", d->ext.dt->id, lci );
-        if ( d->ext.dt->advance )
-          lci = gfc2pips_exprIO( "ADVANCE=", d->ext.dt->advance, lci );
-        if ( d->ext.dt->rec )
-          lci = gfc2pips_exprIO( "REC=", d->ext.dt->rec, lci );
-        if ( d->ext.dt->size )
-          lci = gfc2pips_exprIO( "SIZE=", d->ext.dt->size, lci );
-        if ( d->ext.dt->iostat )
-          lci = gfc2pips_exprIO( "IOSTAT=", d->ext.dt->iostat, lci );
-        if ( d->ext.dt->iomsg )
-          lci = gfc2pips_exprIO( "IOMSG=", d->ext.dt->iomsg, lci );
+      if ( dt->err )
+        lci = gfc2pips_exprIO2( "ERR=", dt->err->value, lci );
+      if ( dt->end )
+        lci = gfc2pips_exprIO2( "END=", dt->end->value, lci );
+      if ( dt->eor )
+        lci = gfc2pips_exprIO2( "EOR=", dt->end->value, lci );
 
-        if ( d->ext.dt->namelist )
-          lci = gfc2pips_exprIO3( "NML=",
-                                  (string) d->ext.dt->namelist->name,
-                                  lci );
+      if ( dt->sign )
+        lci = gfc2pips_exprIO( "SIGN=", dt->sign, lci );
+      if ( dt->round )
+        lci = gfc2pips_exprIO( "ROUND=", dt->round, lci );
+      if ( dt->pad )
+        lci = gfc2pips_exprIO( "PAD=", dt->pad, lci );
+      if ( dt->delim )
+        lci = gfc2pips_exprIO( "DELIM=", dt->delim, lci );
+      if ( dt->decimal )
+        lci = gfc2pips_exprIO( "DECIMAL=", dt->decimal, lci );
+      if ( dt->blank )
+        lci = gfc2pips_exprIO( "BLANK=", dt->blank, lci );
+      if ( dt->asynchronous )
+        lci = gfc2pips_exprIO( "ASYNCHRONOUS=", dt->asynchronous, lci );
+      if ( dt->pos )
+        lci = gfc2pips_exprIO( "POS=", dt->pos, lci );
+      if ( dt->id )
+        lci = gfc2pips_exprIO( "ID=", dt->id, lci );
+      if ( dt->advance )
+        lci = gfc2pips_exprIO( "ADVANCE=", dt->advance, lci );
+      if ( dt->rec )
+        lci = gfc2pips_exprIO( "REC=", dt->rec, lci );
+      if ( dt->size )
+        lci = gfc2pips_exprIO( "SIZE=", dt->size, lci );
+      if ( dt->iostat )
+        lci = gfc2pips_exprIO( "IOSTAT=", dt->iostat, lci );
+      if ( dt->iomsg )
+        lci = gfc2pips_exprIO( "IOMSG=", dt->iomsg, lci );
+
+      if ( dt->namelist )
+        lci = gfc2pips_exprIO3( "NML=", (string) dt->namelist->name, lci );
+
+      if ( fmt != expression_undefined ) {
+        //        fmt = MakeNullaryCall( CreateIntrinsic( LIST_DIRECTED_FORMAT_NAME ) );
+        expression format = MakeCharacterConstantExpression( "FMT=" );
+        lci = CONS( EXPRESSION, format, CONS( EXPRESSION, fmt, lci ) );
 
       }
-      lci = CONS( EXPRESSION, unite, CONS( EXPRESSION,
-              std,
-              CONS( EXPRESSION,
-                  format,
-                  CONS( EXPRESSION, f, lci ) ) ) );
+
+      if ( std != expression_undefined ) {
+        expression unite = MakeCharacterConstantExpression( "UNIT=" );
+        lci = CONS( EXPRESSION, unite, CONS( EXPRESSION, std, lci ) );
+      }
 
       return make_instruction_call( make_call( e, lci ) );
 
