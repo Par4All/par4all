@@ -343,7 +343,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
 
   /* Debug level is currently set at compile time */
   extern int the_current_debug_level;
-  the_current_debug_level = 6;
+  the_current_debug_level = 0;
 
   gfc2pips_debug(2, "Starting gfc2pips dumping\n");
   message_assert( "No namespace to dump.", ns );
