@@ -3844,28 +3844,39 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
 }
 
 expression gfc2pips_buildCaseTest( gfc_expr *test, gfc_case *cp ) {
+  expression range_expr = expression_undefined;
   expression tested_variable = gfc2pips_expr2expression( test );
-  expression bound1 = gfc2pips_expr2expression( cp->low );
-  expression bound2 = gfc2pips_expr2expression( cp->high );
-  return MakeBinaryCall( CreateIntrinsic( EQUAL_OPERATOR_NAME ),
-                         tested_variable,
-                         bound1 );
-  /*
-   expression low_test = MakeBinaryCall(
-   CreateIntrinsic(".GE."),
-   tested_variable,
-   bound1
-   );
-   expression high_test = MakeBinaryCall(
-   CreateIntrinsic(".LE."),
-   tested_variable,
-   bound2
-   );
-   return MakeBinaryCall(
-   CreateIntrinsic(".OR."),
-   low_test,
-   high_test
-   );*/
+  pips_assert("CASE expr require at least an high OR a low bound !",
+      cp->low||cp->high);
+  if ( cp->low == cp->high ) {
+    // Exact bound
+    range_expr = MakeBinaryCall( CreateIntrinsic( EQUAL_OPERATOR_NAME ),
+                                 tested_variable,
+                                 gfc2pips_expr2expression( cp->low ) );
+  } else {
+    expression low = NULL, high = NULL;
+    if ( cp->low ) {
+      low = MakeBinaryCall( CreateIntrinsic( GREATER_OR_EQUAL_OPERATOR_NAME ),
+                            tested_variable,
+                            gfc2pips_expr2expression( cp->low ) );
+    }
+    if ( cp->high ) {
+      high = MakeBinaryCall( CreateIntrinsic( LESS_OR_EQUAL_OPERATOR_NAME ),
+                             tested_variable,
+                             gfc2pips_expr2expression( cp->high ) );
+    }
+
+    if ( low && !high ) {
+      range_expr = low;
+    } else if ( !low && high ) {
+      range_expr = high;
+    } else {
+      range_expr = MakeBinaryCall( CreateIntrinsic( AND_OPERATOR_NAME ),
+                                   low,
+                                   high );
+    }
+  }
+  return range_expr;
 }
 
 list gfc2pips_dumpSELECT( gfc_code *c ) {
@@ -3899,39 +3910,70 @@ list gfc2pips_dumpSELECT( gfc_code *c ) {
    ),
    NULL
    );*/
+
+  statement selectcase = NULL, current_case = NULL, default_stmt = NULL;
   for ( ; d; d = d->block ) {
     gfc2pips_debug(5,"dump of SELECT CASE\n");
     //create a function with low/high returning a test in one go
     expression test_expr = expression_undefined;
     for ( cp = d->ext.case_list; cp; cp = cp->next ) {
-      if(test_expr == expression_undefined ) {
+      if ( !cp->low && !cp->high ) {
+        // Default test case ... or error if test_expr != expression_undefined ?
+        pips_assert("We should have default case, but it doesn't seem to be"
+            "the case, aborting.\n",test_expr == expression_undefined);
+        break;
+      }
+      if ( test_expr == expression_undefined ) {
         test_expr = gfc2pips_buildCaseTest( c->expr, cp );
       } else {
         test_expr = MakeBinaryCall( CreateIntrinsic( OR_OPERATOR_NAME ),
                                     test_expr,
-                                    gfc2pips_buildCaseTest( c->expr, cp ));
+                                    gfc2pips_buildCaseTest( c->expr, cp ) );
       }
-      //transform add a list of OR to follow the list as in gfc
     }
 
     instruction s_if = gfc2pips_code2instruction( d->next, false );
-    //boucle//s_if = instruction_to_statement(gfc2pips_code2instruction(d->next,false));
     if ( s_if != instruction_undefined ) {
-      instruction select_case = test_to_instruction(
-          make_test(
-              test_expr,
-              make_stmt_of_instr(s_if),
-              make_empty_block_statement()
-          )
-      );
-      list_of_statements = gen_nconc( list_of_statements, CONS( STATEMENT,
-          make_stmt_of_instr( select_case ),
-          NULL ) );
+      statement casetest;
+      if ( test_expr == expression_undefined ) {
+        // Default case
+        default_stmt = make_stmt_of_instr( s_if );
+      } else {
+        casetest = make_stmt_of_instr( test_to_instruction(
+            make_test(
+                test_expr,
+                make_stmt_of_instr(s_if),
+                make_empty_block_statement()
+            )
+        ) );
+        if ( current_case != NULL ) {
+          free_statement( test_false(statement_test(current_case)) );
+          test_false(statement_test(current_case)) = casetest;
+        }
+        current_case = casetest;
+        if ( !selectcase ) {
+          selectcase = casetest;
+        }
+      }
+
     } else {
-      pips_user_error( "instruction in SELECT CASE is undefined\n" );
+      pips_user_error( "in SELECT : CASE block is empty ?\n" );
+    }
+  }
+  if ( default_stmt ) {
+    if ( current_case ) {
+      free_statement( test_false(statement_test(current_case)) );
+      test_false(statement_test(current_case)) = default_stmt;
+    } else {
+      selectcase = default_stmt;
     }
   }
 
+  if ( selectcase != NULL ) {
+    list_of_statements = gen_nconc( list_of_statements, CONS( STATEMENT,
+        selectcase,
+        NULL ) );
+  }
   return list_of_statements;
 }
 
@@ -4289,7 +4331,7 @@ expression gfc2pips_expr2expression( gfc_expr *expr ) {
   //expression => sous_expression | TK_LPAR sous_expression TK_RPAR
   //MakeFortranBinaryCall(CreateIntrinsic("+"), expression 1, expression 2);
   expression e = expression_undefined;
-  message_assert( "No expr\n", expr );
+  message_assert( "Expr can't be null !\n", expr );
   if ( !expr->symtree ) {
     //fprintf(stderr,"No symtree\n");
   } else if ( !expr->symtree->n.sym ) {

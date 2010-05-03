@@ -182,6 +182,7 @@ bool check_loop_range( range r, hash_table h ) {
 bool get_bool_property( const string name ) {
   if ( strcmp( "PRETTYPRINT_LISTS_WITH_SPACES", name ) == 0
       || strcmp( "PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS", name ) == 0
+      || strcmp( "PRETTYPRINT_C_CODE", name ) == 0
       || strcmp( "ABORT_ON_USER_ERROR", name ) == 0 ) {
     return true;
   }
