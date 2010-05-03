@@ -1,8 +1,8 @@
-delete use
+delete use_rename
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create use foo.f90 use.f90
+create use_rename foo.f90 use_rename.f90
 
 display PRINTED_FILE[%ALL]
 
@@ -11,8 +11,9 @@ apply UNSPLIT[%ALL]
 echo
 echo "compile sources produced by pips"
 echo
-shell gcc -c -o use.database/Src/use.o use.database/Src/use.f90
+shell gcc -c -o use_rename.database/Src/use_rename.o use_rename.database/Src/use_rename.f90
+
 
 close
-delete use
+delete use_rename 
 quit

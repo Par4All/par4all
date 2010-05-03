@@ -3,8 +3,8 @@
 program use
 use foo, titi => toto
 implicit none
-integer tata
-tata = 4
+integer toto
+toto = 4
 titi = 5
 end program use
 
