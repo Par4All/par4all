@@ -70,7 +70,7 @@ while (<>)
 
 my $count = $failed + $changed + $passed;
 my $not_passed = $failed + $changed;
-my $warned = $skipped + $scripts + $sources;
+my $warned = $skipped + $missing + $scripts + $sources;
 
 printf
   "total: $count\n" .
