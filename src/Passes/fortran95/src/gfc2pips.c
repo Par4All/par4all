@@ -335,7 +335,6 @@ void gfc2pips_add_to_callees( entity e ) {
   }
 }
 
-
 /**
  * @brief Entry point for gfc2pips translation
  * This will be called each time the parser encounter
@@ -2559,34 +2558,26 @@ instruction gfc2pips_code2instruction__TOP( gfc_namespace *ns, gfc_code* c ) {
   //dump other
   //we know we have at least one instruction, otherwise we would have
   //returned an empty list of statements
-  while ( i == instruction_undefined && c ) {
-    if ( c->op == EXEC_SELECT ) {
-      list_of_statements = gen_nconc( list_of_statements,
-                                      gfc2pips_dumpSELECT( c ) );
-      c = c->next;
-      if ( list_of_statements )
-        break;
-    } else {
-      i = gfc2pips_code2instruction_( c );
-      if ( i != instruction_undefined ) {
-        //string comments  = gfc2pips_get_comment_of_code(c);
-        //fprintf(stderr,"comment founded")
-        statement s = make_statement( gfc2pips_code2get_label( c ),
-                                      STATEMENT_NUMBER_UNDEFINED,
-                                      STATEMENT_ORDERING_UNDEFINED,
-                                      //comments,
-                                      empty_comments,
-                                      i,
-                                      NULL,
-                                      NULL,
-                                      empty_extensions( ) );
-        /* unlike the classical method, we don't know if we have had
-         * a first statement (data inst)
-         */
-        list_of_statements = gen_nconc( list_of_statements, CONS( STATEMENT,
-            s,
-            NIL ) );
-      }
+  while ( i == instruction_undefined && c->op != EXEC_SELECT ) {
+    i = gfc2pips_code2instruction_( c );
+    if ( i != instruction_undefined ) {
+      //string comments  = gfc2pips_get_comment_of_code(c);
+      //fprintf(stderr,"comment founded")
+      statement s = make_statement( gfc2pips_code2get_label( c ),
+                                    STATEMENT_NUMBER_UNDEFINED,
+                                    STATEMENT_ORDERING_UNDEFINED,
+                                    //comments,
+                                    empty_comments,
+                                    i,
+                                    NULL,
+                                    NULL,
+                                    empty_extensions( ) );
+      /* unlike the classical method, we don't know if we have had
+       * a first statement (data inst)
+       */
+      list_of_statements = gen_nconc( list_of_statements, CONS( STATEMENT,
+          s,
+          NIL ) );
     }
     c = c->next;
   }
@@ -3909,11 +3900,17 @@ list gfc2pips_dumpSELECT( gfc_code *c ) {
    NULL
    );*/
   for ( ; d; d = d->block ) {
-    //create a function with low/high returning a test in one go
-    expression test_expr;
     gfc2pips_debug(5,"dump of SELECT CASE\n");
+    //create a function with low/high returning a test in one go
+    expression test_expr = expression_undefined;
     for ( cp = d->ext.case_list; cp; cp = cp->next ) {
-      test_expr = gfc2pips_buildCaseTest( c->expr, cp );
+      if(test_expr == expression_undefined ) {
+        test_expr = gfc2pips_buildCaseTest( c->expr, cp );
+      } else {
+        test_expr = MakeBinaryCall( CreateIntrinsic( OR_OPERATOR_NAME ),
+                                    test_expr,
+                                    gfc2pips_buildCaseTest( c->expr, cp ));
+      }
       //transform add a list of OR to follow the list as in gfc
     }
 
