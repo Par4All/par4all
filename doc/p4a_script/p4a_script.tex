@@ -1,0 +1,119 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{alltt}
+\usepackage{../libs/tex/abbrev_reactive}
+
+\let\OldRightarrow=\Rightarrow
+\RequirePackage{marvosym}
+\let\MarvosymRightarrow=\Rightarrow
+\let\Rightarrow=\OldRightarrow
+\RequirePackage{wasysym}
+\let\Lightning\UnTrucIndefini% Car conflit entre ifsym et marvosym
+\let\Sun\UnTrucIndefini%
+\RequirePackage[weather]{ifsym}
+
+
+\sloppy
+
+\begin{document}
+
+\title{Par4All script\\
+  \textsc{draft}\\
+  ---\\
+  HPC Project}
+
+\author{Ronan \textsc{Keryell}}
+
+\maketitle
+
+\tableofcontents{}
+
+\section{Introduction}
+\label{sec:introduction}
+
+\texttt{p4a} is the basic script interface to quickly use \Apfa for people
+not interested in all the \Apfa details.
+
+This script can take C or Fortran source files and generate \Aopenmp or
+\Acuda output to run respectively on shared memory multicore processors or
+\Agpu.
+
+The output is created in a \texttt{\emph{x}.database} directory.
+
+
+\section{Examples}
+\label{sec:examples}
+
+You want to generate some \Aopenmp code:
+\begin{verbatim}
+p4a --openmp example.f
+\end{verbatim}
+and the output should be in a \texttt{\emph{random-name}.database/Src}
+directory.
+
+To generate a \Acuda executable:
+\begin{verbatim}
+p4a --accel --cuda --compile --database a example.c
+\end{verbatim}
+there should be a \texttt{example} binary executable file in
+\texttt{a.database/P4A}
+
+To generate an \Aopenmp emulation executable of \Agpu like code, try:
+\begin{verbatim}
+p4a --accel --openmp --compile example.c
+\end{verbatim}
+there should be a \texttt{example} binary executable file in
+\texttt{\emph{random-name}.database/P4A}
+
+To generate accelerated source code, use:
+\begin{verbatim}
+p4a --accel --database b example.c
+\end{verbatim}
+then you will have in \texttt{b.database/P4A} a parallelized source code
+you can use later by compiling it or improving it. When compiling if you
+define the
+\begin{itemize}
+\item \verb|P4A_ACCEL_CUDA| preprocessor symbol, the source is to be
+  compiled as \Acuda;
+\item \verb|P4A_ACCEL_OPENMP| preprocessor symbol, the source is to be
+  compiled as \Aopenmp or sequential emulation code.
+\end{itemize}
+
+
+\section{Options}
+\label{sec:options}
+
+The basic usage is \texttt{p4a [\emph{options}] <\emph{source files}>}
+with the following options:
+\begin{description}
+\item[\texttt{--openmp}:] parallelize with \Aopenmp output. If combined
+  with the \texttt{--accel} option, generate \Apfa \texttt{accel} run-time
+  call with \Aopenmp implementation instead of native \Aopenmp output;
+
+\item[\texttt{--accel}:] parallelize with output using the \Apfa
+  \texttt{accel} run-time that can execute code for various
+  hardware accelerators such as \Agpu or even \Aopenmp emulation;
+
+\item[\emph{--cuda}:] ask for \Acuda output, to be combined with
+  \texttt{--accel};
+
+\item[\texttt{--compile}:] call the compiler to generate an executable,
+  \texttt{gcc} in the case of sequential or \Aopenmp code, \texttt{nvcc}
+  in the case of \Acuda output code.
+
+\item[\texttt{--database \emph{name}}:] choose to create a
+  \texttt{\emph{name}.database} database instead of one with a random name;
+
+\item[\texttt{-h} or \texttt{--help}:] show this help message and exit.
+\end{description}
+
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% ispell-local-dictionary: "american"
+%%% End:
+
