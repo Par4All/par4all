@@ -224,7 +224,7 @@ void prettyprint_dependence_graph( FILE * fd,
         qsort( gen_array_pointer( conflicts_array ),
                gen_array_nitems( conflicts_array ),
                sizeof(void *),
-               (__compar_fn_t) conflicts_sort_callback);
+               (gen_cmp_func_t) conflicts_sort_callback);
         list conflicts_list = NIL;
         GEN_ARRAY_MAP(s, conflicts_list = CONS(CONFLICT, s, conflicts_list), conflicts_array);
         gen_array_free(conflicts_array);
