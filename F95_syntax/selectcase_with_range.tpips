@@ -1,0 +1,10 @@
+delete selectcase_with_range
+create selectcase_with_range selectcase_with_range.f90 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE[%ALL]
+
+close
+delete selectcase_with_range
+quit
