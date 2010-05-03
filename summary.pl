@@ -8,6 +8,7 @@ my $failed = 0;
 my $changed = 0;
 my $passed = 0;
 my $skipped = 0;
+my $missing = 0;
 my $scripts = 0;
 my $sources = 0;
 my $broken = 0;
@@ -16,6 +17,7 @@ my %failed = ();
 my %changed = ();
 my %passed = ();
 my %skipped = ();
+my %missing = ();
 my %scripts = ();
 my %sources = ();
 
@@ -42,11 +44,15 @@ while (<>)
     $broken++;
     #$broken{$1}++;
   }
-  elsif (/^(skipped|multi-script|multi-source): (\w+)/)
+  elsif (/^(skipped|missing|multi-script|multi-source): (\w+)/)
   {
     if ($1 eq 'skipped') {
       $skipped++;
       $skipped{$1}++;
+    }
+    elsif ($1 eq 'missing') {
+      $missing++;
+      $missing{$1}++;
     }
     elsif ($1 eq 'multi-script') {
       $scripts++;
@@ -74,6 +80,7 @@ printf
   " - changed: $changed\n" .
   "warned: $warned\n" .
   " * skipped: $skipped\n" .
+  " * missing: $missing\n" .
   " * multi-script: $scripts\n" .
   " * multi-source: $sources\n" .
   "broken directory: $broken\n" .
