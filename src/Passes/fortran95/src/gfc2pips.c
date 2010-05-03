@@ -335,24 +335,6 @@ void gfc2pips_add_to_callees( entity e ) {
   }
 }
 
-/**
- * @brief This function will read an environment variable and set the debug
- * level.
- */
-void gfc2pips_setDebugLevel() {
-  extern int the_current_debug_level;
-  the_current_debug_level = 0;
-
-  string debug = getenv("GFC2PIPS_DEBUG_LEVEL");
-  if(debug) {
-    the_current_debug_level = strtol(debug, NULL, 10);
-    if(the_current_debug_level<0) {
-      the_current_debug_level = 0;
-    } else if(the_current_debug_level>9) {
-      the_current_debug_level = 9;
-    }
-  }
-}
 
 /**
  * @brief Entry point for gfc2pips translation
@@ -367,7 +349,7 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
   gfc2pips_format = gfc2pips_format2 = NULL;
 
   /* Debug level */
-  gfc2pips_setDebugLevel( );
+  debug_on("GFC2PIPS_DEBUG_LEVEL");
 
   gfc2pips_debug(2, "Starting gfc2pips dumping\n");
   message_assert( "No namespace to dump.", ns );
