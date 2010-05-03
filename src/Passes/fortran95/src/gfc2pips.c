@@ -3646,6 +3646,20 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       expression fmt = expression_undefined;
       list lci = NULL;
 
+      /* lci will be set in reverse order, so we have to put data first */
+      for ( c = c->block->next; c && c->op == EXEC_TRANSFER; c = c->next ) {
+        if ( c->expr ) {
+          lci = CONS(EXPRESSION,gfc2pips_expr2expression(c->expr),lci);
+        }
+      }
+
+      /* Separator is IO_LIST */
+      if ( lci ) {
+        lci = CONS( EXPRESSION,
+            MakeCharacterConstantExpression( "IOLIST=" ),
+            lci);
+      }
+
       if ( dt->format_expr ) { //if no format ; it is standard
         fmt = gfc2pips_expr2expression( dt->format_expr );
       } else if ( dt->format_label && dt->format_label->value != -1 ) {
@@ -3773,6 +3787,10 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       if ( dt->namelist )
         lci = gfc2pips_exprIO3( "NML=", (string) dt->namelist->name, lci );
 
+      if ( fmt == expression_undefined && !dt->rec && !dt->namelist ) {
+        fmt = MakeNullaryCall( CreateIntrinsic( LIST_DIRECTED_FORMAT_NAME ) );
+      }
+
       if ( fmt != expression_undefined ) {
         //        fmt = MakeNullaryCall( CreateIntrinsic( LIST_DIRECTED_FORMAT_NAME ) );
         expression format = MakeCharacterConstantExpression( "FMT=" );
@@ -3788,57 +3806,39 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
 
       return make_instruction_call( make_call( e, lci ) );
 
-      /*	    show_dt_code:
-       fputc ('\n', dumpfile);
-       for (c = c->block->next; c; c = c->next)
-       show_code_node (level + (c->next != NULL), c);
-       //return;
-       */
-
     }
       break;
       //this should be never dumped because only used in a WRITE block of gfc
-      /*case EXEC_TRANSFER:
-       fputs ("TRANSFER ", dumpfile);
-       show_expr (c->expr);
-       break;*/
+    case EXEC_TRANSFER:
+      pips_user_warning("TRANSFER has been encounter ! Ignoring it !\n");
+      break;
 
-      /*	    case EXEC_DT_END:
-       fputs ("DT_END", dumpfile);
-       dt = c->ext.dt;
+    case EXEC_DT_END:
+      pips_user_warning("DT_END has been encounter ! Ignoring it !\n");
+      break;
 
-       if (dt->err != NULL)
-       fprintf (dumpfile, " ERR=%d", dt->err->value);
-       if (dt->end != NULL)
-       fprintf (dumpfile, " END=%d", dt->end->value);
-       if (dt->eor != NULL)
-       fprintf (dumpfile, " EOR=%d", dt->eor->value);
-       break;
-
-       case EXEC_OMP_ATOMIC:
-       case EXEC_OMP_BARRIER:
-       case EXEC_OMP_CRITICAL:
-       case EXEC_OMP_FLUSH:
-       case EXEC_OMP_DO:
-       case EXEC_OMP_MASTER:
-       case EXEC_OMP_ORDERED:
-       case EXEC_OMP_PARALLEL:
-       case EXEC_OMP_PARALLEL_DO:
-       case EXEC_OMP_PARALLEL_SECTIONS:
-       case EXEC_OMP_PARALLEL_WORKSHARE:
-       case EXEC_OMP_SECTIONS:
-       case EXEC_OMP_SINGLE:
-       case EXEC_OMP_TASK:
-       case EXEC_OMP_TASKWAIT:
-       case EXEC_OMP_WORKSHARE:
-       show_omp_node (level, c);
-       break;
-       */
+    case EXEC_OMP_ATOMIC:
+    case EXEC_OMP_BARRIER:
+    case EXEC_OMP_CRITICAL:
+    case EXEC_OMP_FLUSH:
+    case EXEC_OMP_DO:
+    case EXEC_OMP_MASTER:
+    case EXEC_OMP_ORDERED:
+    case EXEC_OMP_PARALLEL:
+    case EXEC_OMP_PARALLEL_DO:
+    case EXEC_OMP_PARALLEL_SECTIONS:
+    case EXEC_OMP_PARALLEL_WORKSHARE:
+    case EXEC_OMP_SECTIONS:
+    case EXEC_OMP_SINGLE:
+    case EXEC_OMP_TASK:
+    case EXEC_OMP_TASKWAIT:
+    case EXEC_OMP_WORKSHARE:
+      pips_user_warning("OpenMP is not supported !!\n");
+      break;
     default:
-      //pips_warning_handler("gfc2pips_code2instruction", "not yet dumpable %d\n",c->op);
       pips_user_warning( "not yet dumpable %d\n", (int) c->op );
-      //gfc_internal_error ("show_code_node(): Bad statement code");
   }
+
   //return instruction_undefined;
   return make_instruction_block( NULL );;
 }
