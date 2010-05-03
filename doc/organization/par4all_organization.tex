@@ -771,6 +771,11 @@ Validation of \Apfa is done inside the \texttt{validation} directory with
 But right now it is still mostly done in the
 \texttt{package/PIPS/validation} directory.
 
+
+\subsection{p4a\_validate utility}
+\label{sec:p4a_validate-utility}
+
+
 To ease interacting with the validation, the \verb|p4a_validate| is a
 script that adds the concept of validation classes to the \Apips
 validation. A class is a set of validation cases.
@@ -813,14 +818,13 @@ keeping) option before.
 \item[\texttt{--new-diff-file=\emph{FILE}}:] add to a validation class the
   items from the new differences found in a validation diff output file;
 
-\item[\texttt{--keep-changed}:] filter the current validation class by
-  keeping the "changed" elements only;
+\item[\texttt{-keep-status=\emph{status}}:] filter the current validation
+  class by keeping the elements with the \texttt{\emph{status}} only, in
+  \texttt{changed}, \texttt{failed}, \texttt{skipped} or \texttt{success};
 
-\item[\texttt{--keep-failed}:] filter the current validation class by
-  keeping the ``failed'' elements only;
-
-\item[\texttt{--keep-skipped}:] filter the current validation class by
-  keeping the ``skipped'' elements only;
+\item[\texttt{-remove-status=\emph{status}}:] filter the current
+  validation class by removing the elements with the given status, in
+  \texttt{changed}, \texttt{failed}, \texttt{skipped} or \texttt{success};
 
 \item[\texttt{-f \emph{REGULAR-EXPRESSION}} or
   \texttt{--filter=\emph{REGULAR-EXPRESSION}}:] filter the current class
@@ -853,6 +857,17 @@ There are also some debug options:
 
 \item[\texttt{-q} or \texttt{--quiet}:] run in quiet mode (default mode).
 \end{description}
+
+
+\subsection{Example}
+\label{sec:example}
+
+To select display from the last validation the test case marked as
+\texttt{changed} only in \verb|C_syntax|, you can use:
+\begin{verbatim}
+p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/' \
+             --keep-status=changed --list
+\end{verbatim}
 
 
 \section{Branches}
