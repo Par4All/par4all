@@ -22,8 +22,8 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 loop0:
    for(i_t = 0; i_t <= 3; i_t += 1)
       for(j_t = 0; j_t <= 3; j_t += 1)
-         for(i = 4*i_t; i <= 3+4*i_t; i += 1)
-            for(j = 4*j_t; j <= 3+4*j_t; j += 1) {
+         for(i = 4*i_t; i <= 4*i_t+3; i += 1)
+            for(j = 4*j_t; j <= 4*j_t+3; j += 1) {
                c[i][j] = 0;
 loop2:
                for(k = 0; k <= 15; k += 1)
@@ -63,7 +63,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    //PIPS generated variable
    int i_t, j_t;
    //PIPS generated variable
-   float RED[15+1];
+   float RED[16];
 loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
 l99997:
@@ -96,7 +96,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    //PIPS generated variable
    int i_t, j_t;
    //PIPS generated variable
-   float RED[15+1];
+   float RED[16];
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1, LU_NUB2, LU_IB2, LU_IND2;
 loop0:
@@ -167,7 +167,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    //PIPS generated variable
    int i_t, j_t;
    //PIPS generated variable
-   float RED[15+1];
+   float RED[16];
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1, LU_NUB2, LU_IB2, LU_IND2;
 loop0:
@@ -238,7 +238,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    //PIPS generated variable
    int i_t, j_t;
    //PIPS generated variable
-   float RED[15+1];
+   float RED[16];
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1, LU_NUB2, LU_IB2, LU_IND2;
    //PIPS generated variable
@@ -315,7 +315,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    //PIPS generated variable
    int i_t, j_t;
    //PIPS generated variable
-   float RED[15+1];
+   float RED[16];
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1, LU_NUB2, LU_IB2, LU_IND2;
    //PIPS generated variable
@@ -392,15 +392,15 @@ simdized code
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       int i, j, k;
       //PIPS generated variable
       int i_t, j_t;
       //PIPS generated variable
-      float RED[15+1];
+      float RED[16];
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1, LU_NUB2, LU_IB2, LU_IND2;
       //PIPS generated variable
@@ -470,15 +470,15 @@ l99999:
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       int i, j, k;
       //PIPS generated variable
       int i_t, j_t;
       //PIPS generated variable
-      float RED[15+1];
+      float RED[16];
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1, LU_NUB2, LU_IB2, LU_IND2;
       //PIPS generated variable

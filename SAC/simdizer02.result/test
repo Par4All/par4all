@@ -9,65 +9,22 @@ void foo_l(int a[4], int b[4], int c[4])
    tmp[3] = b[1]*c[3];
    a[1] = tmp[2]+tmp[3];
 }
-
- ******** Whole Dependence Graph with Dependence Cones ******
-
-	09 --> 10 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-	08 --> 10 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-	08 --> 09 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
-	06 --> 10 with conflicts
-		from <a[PHI1]-W-MUST> to <a[PHI1]-W-MUST>
-	06 --> 09 with conflicts
-		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
-		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
-	06 --> 08 with conflicts
-		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
-		from <tmp[PHI1]-R-MUST> to <tmp[PHI1]-W-MUST>
-	05 --> 10 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-	05 --> 09 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
-	05 --> 08 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
-	05 --> 06 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-	04 --> 10 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-	04 --> 09 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
-	04 --> 08 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
-	04 --> 06 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-R-MUST>
-	04 --> 05 with conflicts
-		from <tmp[PHI1]-W-MUST> to <tmp[PHI1]-W-MUST>
-
-****************** End of Dependence Graph ******************
 void foo_l(int a[4], int b[4], int c[4])
 {
    //PIPS:SAC generated int vector(s)
-   int v2si_vec0[1+1], v2si_vec1[1+1], v2si_vec2[1+1], v2si_vec3[1+1], v2si_vec4[1+1], v2si_vec5[1+1];
+   int v2si_vec0[2], v2si_vec1[2], v2si_vec2[2], v2si_vec3[2], v2si_vec4[2], v2si_vec5[2], v2si_vec6[2], v2si_vec7[2], v2si_vec8[2];
    {
       int tmp[4];
-      SIMD_LOAD_GENERIC_V2SI(v2si_vec2, c[0], c[2]);
-      SIMD_LOAD_V2SI(v2si_vec1, &b[0]);
+      SIMD_LOAD_V2SI(v2si_vec2, &c[0]);
+      SIMD_LOAD_GENERIC_V2SI(v2si_vec1, b[0], b[0]);
       SIMD_MULD(v2si_vec0, v2si_vec1, v2si_vec2);
-      SIMD_SAVE_V2SI(v2si_vec0, &tmp[0]);
-      a[0] = tmp[0]+tmp[1];
-      SIMD_LOAD_GENERIC_V2SI(v2si_vec5, c[1], c[3]);
-      SIMD_LOAD_V2SI(v2si_vec4, &b[0]);
+      SIMD_SAVE_GENERIC_V2SI(v2si_vec0, &tmp[0], &tmp[2]);
+      SIMD_LOAD_V2SI(v2si_vec5, &c[2]);
+      SIMD_LOAD_GENERIC_V2SI(v2si_vec4, b[1], b[1]);
       SIMD_MULD(v2si_vec3, v2si_vec4, v2si_vec5);
-      SIMD_SAVE_V2SI(v2si_vec3, &tmp[2]);
-      a[1] = tmp[2]+tmp[3];
+      SIMD_SAVE_GENERIC_V2SI(v2si_vec3, &tmp[1], &tmp[3]);
+      SIMD_ADDD(v2si_vec6, v2si_vec0, v2si_vec3);
+      SIMD_SAVE_V2SI(v2si_vec6, &a[0]);
    }
 }
 

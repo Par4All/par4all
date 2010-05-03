@@ -1,3 +1,4 @@
+#include <stdio.h>
 #define N 100
 #define M 4
 void filtre(float x[N], float y[N], float h[M])

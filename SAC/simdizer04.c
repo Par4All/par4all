@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 int main(int argc, char *argv[])
 {
     struct _ { int *a ; int c[4]; } __;

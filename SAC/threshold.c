@@ -1,3 +1,4 @@
+#include <stdio.h>
 void threshold(float data[128],float val)
 {
     int i;
@@ -6,10 +7,12 @@ void threshold(float data[128],float val)
             data[i]=val;
 }
 
-void main()
+main()
 {
-    float data[128],i;
+    float data[128];
+    int i;
+    for(i=0;i<128;i++) data[i]=i/10;
     threshold(data,10.);
     for(i=0;i<128;i++)
-        printf("%d",i);
+        printf("%f",data[i]);
 }

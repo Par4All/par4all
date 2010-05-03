@@ -1,3 +1,4 @@
+#include <stdio.h>
 #define N 200
 float dotprod(float b[N], float c[N])
 {

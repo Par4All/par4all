@@ -1,0 +1,303 @@
+
+Initial code
+
+void average(short *a, short *b, short *c)
+{
+   int i;
+   for(i = 0; i <= 99; i += 1)
+      a[i] = b[i]/2+c[i]/2;
+}
+void average_packed(short *a, short *b, short *c)
+{
+   {
+      int i;
+      for(i = 0; i <= 99; i += 1)
+         a[i] = b[i]/2+c[i]/2;
+   }
+}
+void average_packed(short *a, short *b, short *c)
+{
+   {
+      int i;
+      for(i = 0; i <= 99; i += 1)
+         a[i] = b[i]/2+c[i]/2;
+   }
+}
+void average_packed(short *a, short *b, short *c)
+{
+   {
+      int i;
+      for(i = 0; i <= 99; i += 1)
+         a[i] = b[i]/2+c[i]/2;
+   }
+}
+void average_packed(short *a, short *b, short *c)
+{
+   //PIPS generated variable
+   short I_0, I_1;
+   {
+      int i;
+      for(i = 0; i <= 99; i += 1) {
+         I_0 = b[i];
+         I_0 = I_0/2;
+         I_1 = c[i];
+         I_1 = I_1/2;
+         a[i] = I_0;
+         a[i] = a[i]+I_1;
+      }
+   }
+}
+void average_packed(short *a, short *b, short *c)
+{
+   //PIPS generated variable
+   short I_0, I_1;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   {
+      int i;
+      LU_NUB0 = 100;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 2) {
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0] = a[LU_IND0]+I_1;
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0+1];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0+1];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0+1] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0+1] = a[LU_IND0+1]+I_1;
+      }
+      i = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+void average_packed(short *a, short *b, short *c)
+{
+   //PIPS generated variable
+   short I_0, I_1;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   {
+      int i;
+      LU_NUB0 = 100;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 2) {
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0] = a[LU_IND0]+I_1;
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0+1];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0+1];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0+1] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0+1] = a[LU_IND0+1]+I_1;
+      }
+      i = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+void average_packed(short *a, short *b, short *c)
+{
+   //PIPS generated variable
+   short I_0, I_1;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   {
+      int i;
+      LU_NUB0 = 100;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 2) {
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0] = a[LU_IND0]+I_1;
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0+1];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0+1];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0+1] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0+1] = a[LU_IND0+1]+I_1;
+      }
+      i = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+void average_packed(short *a, short *b, short *c)
+{
+   //PIPS generated variable
+   short I_0, I_1;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   {
+      int i;
+      LU_NUB0 = 100;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 2) {
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0] = a[LU_IND0]+I_1;
+         //c SIMD_COMMENT_0
+         I_0 = b[LU_IND0+1];
+         //c SIMD_COMMENT_1
+         I_0 = I_0/2;
+         //c SIMD_COMMENT_2
+         I_1 = c[LU_IND0+1];
+         //c SIMD_COMMENT_3
+         I_1 = I_1/2;
+         //c SIMD_COMMENT_4
+         a[LU_IND0+1] = I_0;
+         //c SIMD_COMMENT_5
+         a[LU_IND0+1] = a[LU_IND0+1]+I_1;
+      }
+      i = MAX0(LU_NUB0, 0);
+   }
+   ;
+}
+
+simdized code
+
+void average_packed(short *a, short *b, short *c)
+{
+   //PIPS:SAC generated short vector(s)
+   short v2hi_vec0[2], v2hi_vec1[2], v2hi_vec2[2], v2hi_vec3[2], v2hi_vec4[2], v2hi_vec5[2];
+   //PIPS:SAC generated variable
+   short aligned[2] = {0, 0}, aligned0[2] = {0, 0};
+   {
+      //PIPS generated variable
+      short I_0, I_1;
+      //PIPS generated variable
+      int LU_NUB0, LU_IB0, LU_IND0;
+      {
+         int i;
+         LU_NUB0 = 100;
+         LU_IB0 = 0;
+         LU_IND0 = 0;
+         for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 2) {
+            SIMD_LOAD_V2HI(v2hi_vec1, &b[LU_IND0]);
+            SIMD_SETW(v2hi_vec0, v2hi_vec1);
+            SIMD_SAVE_V2HI(v2hi_vec0, &aligned[0]);
+            //c SIMD_COMMENT_1
+            aligned[0] = aligned[0]/2;
+            SIMD_LOAD_V2HI(v2hi_vec3, &c[LU_IND0]);
+            SIMD_SETW(v2hi_vec2, v2hi_vec3);
+            SIMD_SAVE_V2HI(v2hi_vec2, &aligned0[0]);
+            //c SIMD_COMMENT_3
+            aligned0[0] = aligned0[0]/2;
+            SIMD_LOAD_V2HI(v2hi_vec5, &aligned[0]);
+            SIMD_SETW(v2hi_vec4, v2hi_vec5);
+            SIMD_SAVE_V2HI(v2hi_vec4, &a[LU_IND0]);
+            //c SIMD_COMMENT_5
+            a[LU_IND0] = a[LU_IND0]+aligned0[0];
+            //c SIMD_COMMENT_1
+            aligned[0] = aligned[0]/2;
+            //c SIMD_COMMENT_3
+            aligned0[0] = aligned0[0]/2;
+            //c SIMD_COMMENT_5
+            a[LU_IND0+1] = a[LU_IND0+1]+aligned0[0];
+         }
+         i = MAX0(LU_NUB0, 0);
+      }
+      ;
+   }
+}
+void average_packed(int *a, int *b, int *c)
+{
+   //PIPS:SAC generated short vector(s)
+   short v2hi_vec0[2], v2hi_vec1[2], v2hi_vec2[2], v2hi_vec3[2], v2hi_vec4[2], v2hi_vec5[2];
+   //PIPS:SAC generated variable
+   short aligned[2] = {0, 0}, aligned0[2] = {0, 0};
+   {
+      //PIPS generated variable
+      short I_0, I_1;
+      //PIPS generated variable
+      int LU_NUB0, LU_IB0, LU_IND0;
+      {
+         int i;
+         LU_NUB0 = 100;
+         LU_IB0 = 0;
+         LU_IND0 = 0;
+         for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 2) {
+            SIMD_LOAD_V2HI(v2hi_vec1, &b[LU_IND0]);
+            SIMD_SETW(v2hi_vec0, v2hi_vec1);
+            SIMD_SAVE_V2HI(v2hi_vec0, &aligned[0]);
+            //c SIMD_COMMENT_1
+            aligned[0] = aligned[0]/2;
+            SIMD_LOAD_V2HI(v2hi_vec3, &c[LU_IND0]);
+            SIMD_SETW(v2hi_vec2, v2hi_vec3);
+            SIMD_SAVE_V2HI(v2hi_vec2, &aligned0[0]);
+            //c SIMD_COMMENT_3
+            aligned0[0] = aligned0[0]/2;
+            SIMD_LOAD_V2HI(v2hi_vec5, &aligned[0]);
+            SIMD_SETW(v2hi_vec4, v2hi_vec5);
+            SIMD_SAVE_V2HI(v2hi_vec4, &a[LU_IND0]);
+            //c SIMD_COMMENT_5
+            a[LU_IND0] = a[LU_IND0]+aligned0[0];
+            //c SIMD_COMMENT_1
+            aligned[0] = aligned[0]/2;
+            //c SIMD_COMMENT_3
+            aligned0[0] = aligned0[0]/2;
+            //c SIMD_COMMENT_5
+            a[LU_IND0+1] = a[LU_IND0+1]+aligned0[0];
+         }
+         i = MAX0(LU_NUB0, 0);
+      }
+   }
+}

@@ -3,14 +3,14 @@ Initial code
 
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    for(i = 0; i <= 127; i += 1)
-      if (data[i]>val)                                                  /*0005*/
-         data[i] = val;                                                 /*0006*/
+      if (data[i]>val) 
+         data[i] = val;
 }
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    //PIPS generated variable
    int I_0;
    for(i = 0; i <= 127; i += 1) {
@@ -21,7 +21,7 @@ void threshold(float data[128], float val)
 }
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    //PIPS generated variable
    int I_0;
    for(i = 0; i <= 127; i += 1) {
@@ -32,9 +32,9 @@ void threshold(float data[128], float val)
 }
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    //PIPS generated variable
-   int I_0[127+1];
+   int I_0[128];
    for(i = 0; i <= 127; i += 1) {
       I_0[i] = data[i]>val;
       data[i] = I_0[i]?val:data[i];
@@ -43,9 +43,9 @@ void threshold(float data[128], float val)
 }
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    //PIPS generated variable
-   int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
    LU_NUB0 = 128;
    LU_IB0 = 0;
    LU_IND0 = 0;
@@ -72,9 +72,9 @@ void threshold(float data[128], float val)
 }
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    //PIPS generated variable
-   int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
    LU_NUB0 = 128;
    LU_IB0 = 0;
    LU_IND0 = 0;
@@ -101,9 +101,9 @@ void threshold(float data[128], float val)
 }
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    //PIPS generated variable
-   int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
    LU_NUB0 = 128;
    LU_IB0 = 0;
    LU_IND0 = 0;
@@ -130,9 +130,9 @@ void threshold(float data[128], float val)
 }
 void threshold(float data[128], float val)
 {
-   int i;                                                               /*0003*/
+   int i;
    //PIPS generated variable
-   int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
    LU_NUB0 = 128;
    LU_IB0 = 0;
    LU_IND0 = 0;
@@ -160,27 +160,19 @@ void threshold(float data[128], float val)
 void threshold(float data[128], float val)
 {
    //PIPS:SAC generated int vector(s)
-   int v4si_vec0[3+1];
+   int v4si_vec0[4];
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated int vector(s)
-   int v4si_vec4[3+1];
+   int v4si_vec4[4];
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec5[3+1];
+   float v4sf_vec5[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {val, val, val, val};
-   //PIPS:SAC generated int vector(s)
-   int v4si_vec6[3+1];
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
-   //PIPS:SAC generated int vector(s)
-   int v4si_vec10[3+1];
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec11[3+1];
+   float aligned[4] = {val, val, val, val};
    {
-      int i;                                                            /*0003*/
+      int i;
       //PIPS generated variable
-      int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+      int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
       LU_NUB0 = 128;
       LU_IB0 = 0;
       LU_IND0 = 0;
@@ -199,27 +191,19 @@ void threshold(float data[128], float val)
 void threshold(float data[128], float val)
 {
    //PIPS:SAC generated int vector(s)
-   int v4si_vec0[3+1];
+   int v4si_vec0[4];
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated int vector(s)
-   int v4si_vec4[3+1];
+   int v4si_vec4[4];
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec5[3+1];
+   float v4sf_vec5[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {val, val, val, val};
-   //PIPS:SAC generated int vector(s)
-   int v4si_vec6[3+1];
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
-   //PIPS:SAC generated int vector(s)
-   int v4si_vec10[3+1];
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec11[3+1];
+   float aligned[4] = {val, val, val, val};
    {
-      int i;                                                            /*0003*/
+      int i;
       //PIPS generated variable
-      int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+      int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
       LU_NUB0 = 128;
       LU_IB0 = 0;
       LU_IND0 = 0;
@@ -238,15 +222,15 @@ void threshold(float data[128], float val)
 void threshold(float data[128], float val)
 {
    //PIPS:SAC generated int vector(s)
-   int v4si_vec0[3+1];
+   int v4si_vec0[4];
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {val, val, val, val};
+   float aligned[4] = {val, val, val, val};
    {
-      int i;                                                            /*0003*/
+      int i;
       //PIPS generated variable
-      int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+      int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
       LU_NUB0 = 128;
       LU_IB0 = 0;
       LU_IND0 = 0;
@@ -268,15 +252,15 @@ simdized code
 void threshold(float data[128], float val)
 {
    //PIPS:SAC generated int vector(s)
-   int v4si_vec0[3+1];
+   int v4si_vec0[4];
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {val, val, val, val};
+   float aligned[4] = {val, val, val, val};
    {
-      int i;                                                            /*0003*/
+      int i;
       //PIPS generated variable
-      int I_0[127+1], LU_NUB0, LU_IB0, LU_IND0;
+      int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
       LU_NUB0 = 128;
       LU_IB0 = 0;
       LU_IND0 = 0;

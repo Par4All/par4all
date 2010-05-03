@@ -127,7 +127,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    
    int i, j, ki, kj;
    //PIPS generated variable
-   float RED0[2+1];
+   float RED0[3];
 
 
 
@@ -171,7 +171,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    
    int i, j, ki, kj;
    //PIPS generated variable
-   float RED0[2+1], F_0, F_1, F_2, F_3, F_4;
+   float RED0[3], F_0, F_1, F_2, F_3, F_4;
 
 
 
@@ -220,7 +220,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    
    int i, j, ki, kj;
    //PIPS generated variable
-   float RED0[2+1], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
+   float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
    
    
    for(i = 0; i <= isi-1; i += 1)
@@ -265,16 +265,16 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS:SAC generated variable
    overloaded PADDING_VALUE;
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       //     The convolution kernel is not applied on the outer part
       //     of the image
       
       int i, j, ki, kj;
       //PIPS generated variable
-      float RED0[2+1], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
+      float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
       
       
       for(i = 0; i <= isi-1; i += 1)
@@ -315,16 +315,16 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS:SAC generated variable
    overloaded PADDING_VALUE;
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       //     The convolution kernel is not applied on the outer part
       //     of the image
       
       int i, j, ki, kj;
       //PIPS generated variable
-      float RED0[2+1], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
+      float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
       
       
       for(i = 0; i <= isi-1; i += 1)
@@ -366,16 +366,16 @@ l100:               ;
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       //     The convolution kernel is not applied on the outer part
       //     of the image
       
       int i, j, ki, kj;
       //PIPS generated variable
-      float RED0[2+1], F_40, F_30;
+      float RED0[3], F_40, F_30;
       
       
       for(i = 0; i <= isi-1; i += 1)
