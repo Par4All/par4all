@@ -783,30 +783,13 @@ bool split_initializations(string module_name)
   return (good_result_p);
 }
 
-static entity
-update_operator_to_operator(entity op)
-{
-#define CHECK_OP(OP,op) if(ENTITY_##OP##_UPDATE_P(op)) return entity_intrinsic(OP##_OPERATOR_NAME)
-    if(ENTITY_PLUS_UPDATE_P(op)) return entity_intrinsic(PLUS_C_OPERATOR_NAME);
-    if(ENTITY_MINUS_UPDATE_P(op)) return entity_intrinsic(MINUS_C_OPERATOR_NAME);
-    CHECK_OP(BITWISE_AND,op);
-    CHECK_OP(BITWISE_OR,op);
-    CHECK_OP(BITWISE_XOR,op);
-    CHECK_OP(DIVIDE,op);
-    CHECK_OP(MULTIPLY,op);
-    CHECK_OP(MODULO,op);
-    CHECK_OP(LEFT_SHIFT,op);
-    CHECK_OP(RIGHT_SHIFT,op);
-    return entity_undefined;
-#undef CHECK_OP
-}
 
 void
 split_update_call(call c)
 {
     entity op = call_function(c);
     list args = call_arguments(c);
-    entity new_op = update_operator_to_operator(op);
+    entity new_op = update_operator_to_regular_operator(op);
     if(!entity_undefined_p(new_op))
     {
         if(ENTITY_PLUS_C_P(new_op)||ENTITY_MINUS_C_P(new_op))

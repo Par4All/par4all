@@ -33,6 +33,7 @@
 
 #include "misc.h"
 #include "ri-util.h"
+#include "text-util.h"
 #include "pipsdbm.h"
 
 #include "semantics.h"
@@ -134,6 +135,30 @@ static set get_statement_matching_types(statement s)
 
 static hash_table equivalence_table = hash_table_undefined;
 
+static bool successor_only_has_rr_conflict_p(successor su)
+{
+    bool all_rr = true;
+    FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(su)))
+    {
+        if(effect_read_p(conflict_sink(c))&&
+                effect_read_p(conflict_source(c)))
+        {
+            pips_debug(3,
+                    "conflict skipped between %s and %s\n",
+                    words_to_string(words_reference(effect_any_reference(conflict_sink(c)),NIL)),
+                    words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
+        }
+        else {
+            all_rr = false;
+            pips_debug(3,
+                    "conflict found between %s and %s\n",
+                    words_to_string(words_reference(effect_any_reference(conflict_sink(c)),NIL)),
+                    words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
+        }
+    }
+    return all_rr;
+}
+
 /*
  * This function stores in the hash_table equivalence_table
  * all statement equivalent to those in l
@@ -163,8 +188,10 @@ static void init_statement_equivalence_table(list l,graph dependence_graph)
     {
         FOREACH(SUCCESSOR,su,vertex_successors((vertex)k))
         {
-            /* do not take into account backward references */
-            if(vertex_ordering(successor_vertex(su)) > vertex_ordering((vertex)k)  )
+            statement sus = vertex_to_statement(successor_vertex(su));
+            /* do not take into account backward references, or R-R conflicts */
+            if(vertex_ordering(successor_vertex(su)) > vertex_ordering((vertex)k)  &&
+                    !successor_only_has_rr_conflict_p(su) )
             {
                 void* counter = hash_get(counters,successor_vertex(su));
                 if(counter != HASH_UNDEFINED_VALUE)
@@ -205,7 +232,7 @@ static void init_statement_equivalence_table(list l,graph dependence_graph)
                 FOREACH(SUCCESSOR,su,vertex_successors(v)) {
                     void* counter = hash_get(counters,successor_vertex(su));
                     /* do not take into account backward references and ignored statements */
-                    if(counter != HASH_UNDEFINED_VALUE && vertex_ordering(successor_vertex(su)) > vertex_ordering(v) )
+                    if(counter != HASH_UNDEFINED_VALUE && vertex_ordering(successor_vertex(su)) > vertex_ordering(v) && !successor_only_has_rr_conflict_p(su))
                     {
                         intptr_t value = (intptr_t)counter;
                         --value;
@@ -231,320 +258,6 @@ static void free_statement_equivalence_table()
     hash_table_free(equivalence_table);/* leak spotted !*/
     equivalence_table=hash_table_undefined;
 }
-
-#if 0
-/*
-   This function returns TRUE if there is a conflict between s1 and s2
-   that prevents the simdization of s2
-   */
-static bool successor_p(statement s1, statement s2, bool nonGroupStat)
-{
-    list succ;
-
-    if(!instruction_call_p(statement_instruction(s1)))
-    {
-        return TRUE;
-    }
-
-    succ = (list)hash_get(successors, (void*)s1);
-
-    FOREACH(SUCCESSOR, s,succ)
-    {
-        if (vertex_to_statement(successor_vertex(s)) == s2)
-        {
-            FOREACH(CONFLICT, c,dg_arc_label_conflicts(successor_arc_label(s)))
-            {
-                // If there is a write-read conflict between
-                // s1-s2, then s2 can't be simdized
-                if((effect_write_p(conflict_source(c)) && 
-                            effect_read_p(conflict_sink(c))))
-                {
-                    ifdebug(4) {
-                        pips_debug(4,"write read conflict between:\n");
-                        print_effect(conflict_source(c));
-                        print_effect(conflict_sink(c));
-                    }
-                    return TRUE;
-                }
-
-                // If there is a read-write conflict or 
-                // a write-write conflict between s1-s2
-                // then s2 can't be simdized. Because, otherwise,
-                // since s1 doesn't belong to the same simd
-                // group as s2, then s2 would be executed before s1.
-                if(((effect_read_p(conflict_source(c)) && 
-                                effect_write_p(conflict_sink(c)))) ||
-                        ((effect_write_p(conflict_source(c)) && 
-                          effect_write_p(conflict_sink(c)))))
-                {
-                    if(nonGroupStat)
-                    {
-                        ifdebug(4) {
-                            pips_debug(4,"read write conflict between:\n");
-                            print_effect(conflict_source(c));
-                            print_effect(conflict_sink(c));
-                        }
-                        return TRUE;
-                    }
-                }
-
-            }
-        }
-    }
-    return FALSE;
-}
-#endif
-
-#define SIMD_COMMENT "SIMD_COMMENT_"
-
-/*
-   This function return TRUE if SIMD_COMMENT_ has been
-   found in the statement comments. And, if so, num holds
-   the simd number of the statement.
-   */
-static bool getSimdCommentNum(statement stat, int * num) 
-{
-    string comments;
-    char*  next_line;
-
-    bool res = FALSE;
-
-    if (!statement_with_empty_comment_p(stat)) 
-    {
-        comments = strdup(statement_comments(stat));
-        next_line = strtok (comments, "\n");
-        if (next_line != NULL) {
-            do {
-                sscanf(next_line, "c SIMD_COMMENT_%d", num);
-                res = TRUE;
-
-                next_line = strtok(NULL, "\n");
-            }
-            while (next_line != NULL);
-        }
-        free(comments);
-    }
-
-    return res;
-}
-#if 0
-
-/*
-   This function returns TRUE if s can be added to the simd group
-   whose STATEMENT(CAR(group_first)) is the first element
-   */
-static bool move_allowed_p(list group_first, list group_last, statement s)
-{ 
-    cons * i;
-    bool nonGroupStat = FALSE;
-
-    for(i = group_first; (i != NIL) && (STATEMENT(CAR(i)) != s); i = CDR(i))
-    {
-        if (successor_p(STATEMENT(CAR(i)), s, nonGroupStat))
-        {
-            pips_debug(3,"move not allowed\n");
-            return FALSE;
-        }
-
-        if((STATEMENT(CAR(group_last)) == STATEMENT(CAR(i))) && (!nonGroupStat))
-        {
-            nonGroupStat = TRUE;
-        }
-    }
-    pips_debug(3,"move allowed\n");
-
-    return TRUE;
-}
-#endif
-#if 0
-
-/* Transform the code to use SIMD instructions. The input statement
- * should be a sequence of simple statements.
- * If the block contains loops, ifs, or any other control flow 
- * instruction, the result may not be correct.
- * Non-simple calls should be handled properly, but WILL NOT be 
- * optimized to use SIMD instructions.
- */
-static list simdize_simple_statements_pass1(list seq, float * simdCost)
-{
-    cons * i;
-    list sinfo; /* <statement_info> */
-    list sinfo_begin;
-    list newseq;
-
-    //argument info dependencies are local to each sequence -> RESET
-    reset_argument_info();
-
-    // cons a NULL?
-    sinfo = sinfo_begin = gen_statementInfo_cons( make_statementInfo(0,NULL), NIL);
-
-    /* Traverse to list to group isomorphic statements */
-    for( i = seq;
-            i != NIL;
-            i = CDR(i) )
-    {
-        cons * j, * p;
-        cons * group_first, * group_last;
-        statement si = STATEMENT(CAR(i));
-
-        /* Initialize current group */
-        group_first = i;
-        group_last = i;
-
-        set group_matches = get_statement_matching_types(si);
-
-        //printf("si\n");print_statement(si);
-        /* try to find all the compatible isomorphic statements after the
-         * current statement
-         */
-        for( j = CDR(group_last), p = NIL;
-                j != NIL;
-                p = j, j = CDR(j) )
-        {
-            statement sj = STATEMENT(CAR(j));
-            int num1, num2;
-            list m_sj;
-
-            //printf("sj\n");print_statement(sj);
-            /* if the two statements came from the same original statement
-            */
-            if(getSimdCommentNum(si, &num1) &&
-                    getSimdCommentNum(sj, &num2))
-            {
-                if(num1 != num2)
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                continue;
-            }
-
-            m_sj = get_statement_matching_types(sj);
-
-            gen_list_and(&group_matches, m_sj);
-            if (move_allowed_p(group_first, group_last, sj))
-            {
-                if (j != CDR(group_last))
-                {
-                    /* do the move */
-                    CDR(p) = CDR(j);
-                    CDR(group_last) = CONS(STATEMENT, sj, CDR(group_last));
-
-                    /* keep searching from the next one */
-                    j = p;
-                }
-
-                group_last = CDR(group_last);
-            }
-        }
-
-        /* if this is not a recognized statement (ie, no match), skip it */
-        if (group_matches == NIL)
-        {
-            list ind = group_first;
-            /* No optimized opcode found... */
-            for( ;
-                    (ind != CDR(group_last));
-                    ind = CDR(ind) )
-            {
-                CDR(sinfo) = gen_statementInfo_cons(
-                        make_nonsimd_statement_info(STATEMENT(CAR(ind))),
-                        NIL);
-                sinfo = CDR(sinfo);
-            }
-        }
-        else
-        {
-            /* the previous group of isomorphic statements is complete. 
-             * we can now generate SIMD statement info.
-             * group is delimited by group_first and group_last (included)
-             */
-            CDR(sinfo) = make_simd_statements(group_matches, 
-                    group_first, 
-                    group_last);
-        }
-
-        while(CDR(sinfo) != NIL)
-            sinfo = CDR(sinfo);
-
-        /* skip what has already been matched */
-        i = group_last;
-    }
-
-    /* Now, based on the statement information gathered, 
-     * generate the actual code (new sequence of statements)
-     */
-    newseq = generate_simd_code(CDR(sinfo_begin), simdCost);
-
-    /* Free the list of statements info */
-    gen_free_list(sinfo_begin);
-
-    /* Set the new list as the statements' instructions */
-    return newseq;
-}
-/*
-   This function returns true if ts1 is a sucessor of s2
-   */
-static bool dg_successor_p(statement s1, statement s2)
-{
-    set succ = (set)hash_get(successors, (void*)s2);
-
-    SET_FOREACH(successor, s,succ)
-    {
-        statement curr = vertex_to_statement(successor_vertex(s));
-        if ( curr == s1)
-        {
-            FOREACH(CONFLICT, c, dg_arc_label_conflicts(successor_arc_label(s)))
-            {
-                // If there is a write-read conflict between
-                // s1-s2, then s2 can't be simdized
-                if((effect_write_p(conflict_source(c)) && 
-                            effect_read_p(conflict_sink(c))))
-                {
-                    ifdebug(4) {
-                        pips_debug(4,"write read conflict between:\n");
-                        print_effect(conflict_source(c));
-                        print_effect(conflict_sink(c));
-                    }
-                    return true;
-                }
-
-                // If there is a read-write conflict or 
-                // a write-write conflict between s1-s2
-                // then s2 can't be simdized. Because, otherwise,
-                // since s1 doesn't belong to the same simd
-                // group as s2, then s2 would be executed before s1.
-                if(((effect_read_p(conflict_source(c)) && 
-                                effect_write_p(conflict_sink(c)))) ||
-                        ((effect_write_p(conflict_source(c)) && 
-                          effect_write_p(conflict_sink(c)))))
-                {
-                    ifdebug(4) {
-                        pips_debug(4,"read write conflict between:\n");
-                        print_effect(conflict_source(c));
-                        print_effect(conflict_sink(c));
-                    }
-                    return true;
-                }
-                /* a write-write conflict is not that good either */
-                if((effect_write_p(conflict_source(c)) && 
-                            effect_write_p(conflict_sink(c))))
-                {
-                    ifdebug(4) {
-                        pips_debug(4,"write write conflict between:\n");
-                        print_effect(conflict_source(c));
-                        print_effect(conflict_sink(c));
-                    }
-                    return true;
-                }
-            }
-        }
-    } 
-    return false;
-}
-#endif
 
 static set extract_non_conflicting_statements(statement s, list tail)
 {
@@ -829,45 +542,63 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
  */
 static void simdize_simple_statements(statement s,graph dependence_graph)
 {
-    list seq = NIL;
-    list copyseq = NIL;
-
-    list newseq = NIL;
-    list saveseq = NIL;
-
-    float newSimdCost = 0;
-    float saveSimdCost = 0;
-
-    if (!instruction_sequence_p(statement_instruction(s)))
-        /* not much we can do with a single statement, or with
-         * "complex" statements (ie, with tests/loops/...)
-         */
-        return;
-
-    seq = sequence_statements(instruction_sequence(statement_instruction(s)));
-
-    init_statement_matches_map(seq);
-    init_statement_equivalence_table(seq,dependence_graph);
-
-
-    saveseq = simdize_simple_statements_pass2(seq, &saveSimdCost);
-
-
-    pips_debug(2,"opcode cost1 %f\n", saveSimdCost);
-
-    if((saveSimdCost >= 0.0001))
+    /* not much we can do with a single statement, or with
+     * "complex" statements (ie, with tests/loops/...)
+     */
+    if (statement_block_p(s))
     {
-        gen_free_list(newseq);
-        gen_free_list(saveseq);
-    }
-    else
-    {
-        sequence_statements(instruction_sequence(statement_instruction(s))) = saveseq;
-        gen_free_list(seq);
-    }
+        /* we cannot handle anything but sequence of calls */
+        list iter = statement_block(s);
+        list new_seq = NIL;
+        while(!ENDP(iter))
+        {
+            list seq = NIL;
+            for(;!ENDP(iter);POP(iter))
+            {
+                statement st = STATEMENT(CAR(iter));
+                if(statement_call_p(st))
+                    seq=CONS(STATEMENT,st,seq);
 
-    free_statement_matches_map();
-    free_statement_equivalence_table();
+                if(!statement_call_p(st)||ENDP(CDR(iter)))
+                {
+                    /* process already existing statements */
+                    if(!ENDP(seq))
+                    {
+                        seq=gen_nreverse(seq);
+
+                        init_statement_matches_map(seq);
+                        init_statement_equivalence_table(seq,dependence_graph);
+
+                        float saveSimdCost = 0;
+                        list simdseq = simdize_simple_statements_pass2(seq, &saveSimdCost);
+
+
+                        pips_debug(2,"opcode cost1 %f\n", saveSimdCost);
+
+                        if((saveSimdCost >= 0.0001))
+                        {
+                            new_seq=gen_append(new_seq,seq);
+                            gen_free_list(simdseq);
+                        }
+                        else
+                        {
+                            new_seq=gen_append(new_seq,simdseq);
+                            gen_free_list(seq);
+                        }
+
+                        free_statement_matches_map();
+                        free_statement_equivalence_table();
+                        seq=NIL;
+
+                    }
+                    if(!statement_call_p(st))
+                        new_seq=gen_append(new_seq,CONS(STATEMENT,st,NIL));
+                }
+
+            }
+        }
+        sequence_statements(instruction_sequence(statement_instruction(s))) = new_seq;
+    }
 }
 
 /*
@@ -945,147 +676,3 @@ bool simdizer(char * mod_name)
 
     return TRUE;
 }
-
-#if 0
-static bool successor_internal_p(statement s1, statement s2,set seen)
-{
-    list succ = (list)hash_get(successors, (void*)s2);
-
-    FOREACH(SUCCESSOR, s,succ)
-    {
-        statement curr = vertex_to_statement(successor_vertex(s));
-        if(!set_belong_p(seen,curr))
-        {
-            set_add_element(seen,seen,curr);
-            if ( curr == s1)
-                return true;
-            if( successor_internal_p(s1,curr,seen))
-                return true;
-        }
-    } 
-    return false;
-}
-/*
-   This function returns true if ts1 is a sucessor of s2
-   */
-static bool successor_p(statement s1, statement s2)
-{
-    set seen = set_make(set_pointer);
-    bool res = successor_internal_p(s1,s2,seen);
-    set_free(seen);
-    return res;
-}
-
-static int compare_statements(const void * v0, const void * v1)
-{
-    statement s0 = *(statement*)v0;
-    statement s1 = *(statement*)v1;
-    if (statement_ordering(s0) > statement_ordering(s1)) return 1;
-    if (statement_ordering(s0) < statement_ordering(s1)) return -1;
-    return 0;
-}
-static list do_statement_packing(list statements)
-{
-    if(!ENDP(statements))
-    {
-        list first_pack = NIL;
-        list second_pack = NIL;
-        statement head = STATEMENT(CAR(statements));
-        /* first pack is filled with head successors
-         * second pack is filled with others */
-        FOREACH(STATEMENT,st,CDR(statements))
-            if(dg_successor_p(st,head))
-                first_pack=CONS(STATEMENT,st,first_pack);
-            else
-                second_pack=CONS(STATEMENT,st,second_pack);
-        /* repeat the process on second_pack */
-        list fst = do_statement_packing(first_pack);
-        list snd=NIL;
-        if(ENDP(second_pack)) snd=CONS(STATEMENT,head,NIL);
-        else {
-            do_statement_packing(second_pack);
-        }
-
-    }
-    return NIL;
-}
-static list statement_packing(list statements)
-{
-    list decls = NIL;
-    list iter = statements;
-    /* move out declarations */
-    for(;!ENDP(iter);POP(iter))
-    {
-        statement st = STATEMENT(CAR(iter));
-        if(declaration_statement_p(st))
-            decls=CONS(STATEMENT,st,decls);
-        else
-            break;
-    }
-    decls=gen_nreverse(decls);
-    return CONS(LIST,decls,do_statement_packing(iter));
-}
-
-/* a packer takes a list of statement list and generate a list of statement*/
-typedef list (*packer)(list);
-
-static list packer_keep_ordering(list statements)
-{
-    list out = NIL;
-    FOREACH(LIST,l,statements)
-    {
-        gen_sort_list(l,compare_statements);
-        out=gen_nconc(out,l);
-    }
-    return out;
-}
-
-static packer select_statement()
-{
-    /* will use properties later */
-    return packer_keep_ordering;
-}
-
-static void pack_sequence(sequence seq,graph dependence_graph)
-{
-    /* we will use successors */
-    init_statement_successors_map(sequence_statements(seq),dependence_graph);
-
-    /* do the packing */
-    list packs = statement_packing(sequence_statements(seq));
-    list pack = select_statement()(packs);
-    sequence_statements(seq)=pack;
-   
-    /* and the cleaning */
-    free_statement_successors_map();
-}
-
-bool pack_statements(const char * module_name)
-{
-    /* get the resources */
-    set_current_module_statement( (statement)db_get_memory_resource(DBR_CODE, module_name,true)); 
-    set_current_module_entity(module_name_to_entity(module_name));
-	set_ordering_to_statement(get_current_module_statement());
-    graph dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, true);
-
-    /* Now do the job */
-
-    gen_context_recurse(get_current_module_statement(), dependence_graph,sequence_domain,
-            gen_true, pack_sequence);
-
-    pips_assert("Statement is consistent after packing", 
-            statement_consistent_p(get_current_module_statement()));
-
-    /* Reorder the module, because statements have been moved */
-    module_reorder(get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
-
-    /* update/release resources */
-	reset_ordering_to_statement();
-    reset_current_module_statement();
-    reset_current_module_entity();
-    return true;
-}
-
-#endif
-bool pack_statements(const char * module_name)  { return true ; }
