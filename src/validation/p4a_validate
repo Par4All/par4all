@@ -482,7 +482,7 @@ def main():
 
     parser.add_option("-a",  "--accept",
                       action = "store_true", dest = "accept", default = False,
-                      help = "Accept for the current validation class")
+                      help = "Accept for the current validation class and add them with git")
 
     parser.add_option("-c",  "--commit", dest="message",
                       help = "Commit in git the accepted modifications with the given message",
@@ -557,11 +557,12 @@ def main():
     if options.accept:
         # Accept the validation class elements:
         vc.accept()
+        # Add them as changed to git:
+        vc.git_add()
 
     if options.message:
         # Commit with git and a given message the state of the validation
         # class elements:
-        vc.git_add()
         vc.git_commit(options.message)
 
 

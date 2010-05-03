@@ -845,7 +845,7 @@ keeping) option before.
   current class from the \texttt{RESULTS} directory;
 
 \item[\texttt{-a} or \texttt{--accept}:] accept for the current validation
-  class;
+  class and add it under git;
 
 \item[\texttt{-c \emph{MESSAGE}} or \texttt{--commit=\emph{MESSAGE}}:]
   commit in git the accepted modifications with the given message.
@@ -862,12 +862,26 @@ There are also some debug options:
 \subsection{Example}
 \label{sec:example}
 
-To select display from the last validation the test case marked as
+To display from the last validation the test cases marked as
 \texttt{changed} only in \verb|C_syntax|, you can use:
 \begin{verbatim}
 p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/' \
              --keep-status=changed --list
 \end{verbatim}
+
+To show what changed compared to the reference:
+\begin{verbatim}
+p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
+             --keep-status=changed --show-diff-files
+\end{verbatim}
+
+To accept the validation of what changed in \texttt{C\_syntax/decl\emph{*}}:
+\begin{verbatim}
+p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
+             --keep-status=changed --accept
+\end{verbatim}
+then if you are happy with it you can commit with 'Agit or revert back to
+previous state with \Agit.
 
 
 \section{Branches}
