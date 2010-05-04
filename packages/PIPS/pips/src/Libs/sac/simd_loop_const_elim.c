@@ -61,7 +61,7 @@ static graph dependence_graph;
 #define SIZEOFSTRING(s) (sizeof((s))-1)
 
 
-bool simd_save_stat_p(statement stat)
+static bool simd_save_stat_p(statement stat)
 {
     if(statement_call_p(stat))
     {
@@ -76,7 +76,7 @@ bool simd_save_stat_p(statement stat)
         return FALSE;
     }
 }
-bool simd_load_stat_p(statement stat)
+static bool simd_load_stat_p(statement stat)
 {
     if(statement_call_p(stat))
     {
@@ -102,7 +102,7 @@ bool simd_loadsave_stat_p(statement stat)
 /* This function returns true if the statement is a simd
  * statement
  */
-bool simd_stat_p(statement stat)
+static bool simd_stat_p(statement stat)
 {
     return statement_call_p(stat)
         && same_stringn_p( entity_local_name(call_function(statement_call(stat))) , SIMD_NAME, SIZEOFSTRING(SIMD_NAME));
@@ -343,7 +343,6 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
 
 
     // Insert the statements removed from the sequence before
-    list oldStatDecls = statement_declarations(s);
     statement_declarations(s) = NIL;
 
     // Replace the old statement instruction by the new one

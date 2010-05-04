@@ -2027,7 +2027,7 @@ bool alias_check(char * module_name)
 				 storage_undefined, value_undefined);
       alias_function = gen_find_tabulated(alias_function_name,entity_domain);
       if (entity_undefined_p(alias_function))
-	alias_function = make_empty_subroutine(ALIAS_FUNCTION);
+	alias_function = make_empty_subroutine(ALIAS_FUNCTION,copy_language(module_language(current_mod)));
       module_statement = (statement) db_get_memory_resource(DBR_CODE,module_name,TRUE);
       ifdebug(2)
 	{

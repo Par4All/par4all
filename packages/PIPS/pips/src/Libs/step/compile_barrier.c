@@ -14,7 +14,7 @@ License.
 entity step_create_mpi_barrier(entity directive_module)
 {
   string new_name = step_find_new_module_name(directive_module,STEP_MPI_SUFFIX);
-  entity mpi_module = make_empty_subroutine(new_name);
+  entity mpi_module = make_empty_subroutine(new_name,copy_language(module_language(get_current_module_entity())));
 
   step_seqlist = CONS(STATEMENT,make_return_statement(mpi_module),
 		      CONS(STATEMENT,call_STEP_subroutine(RT_STEP_Barrier,NIL),

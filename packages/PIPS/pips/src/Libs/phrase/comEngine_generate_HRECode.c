@@ -674,7 +674,7 @@ statement comEngine_generate_HRECode(statement externalized_code,
 
   if(get_bool_property("COMENGINE_CONTROL_IN_HRE"))
     {
-      entity new_fun = make_empty_subroutine(new_module_name);
+      entity new_fun = make_empty_subroutine(new_module_name,make_language_unknown());
 
       reset_current_module_entity();
 

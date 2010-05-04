@@ -613,7 +613,7 @@ static void compile_omp(entity module)
       entity omp_module;
       omp_body = copy_statement((statement)db_get_memory_resource(DBR_CODE, module_name, TRUE));
       new_name = step_find_new_module_name(module,STEP_OMP_SUFFIX);
-      omp_module = make_empty_subroutine(new_name); // necessaire pour add_new_module
+      omp_module = make_empty_subroutine(new_name,copy_language(module_language(module))); // necessaire pour add_new_module
 
       /* Ajout des directives OpenMP
        */

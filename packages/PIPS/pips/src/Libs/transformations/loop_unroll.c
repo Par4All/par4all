@@ -810,7 +810,7 @@ static int number_of_requested_unrollings = 0;
    flexibility... */
 #define FULL_UNROLL_PRAGMA "Cxxx"
 
-bool find_unroll_pragma_and_fully_unroll(statement s)
+static bool find_unroll_pragma_and_fully_unroll(statement s)
 {
     instruction inst = statement_instruction (s);
     bool go_on = TRUE;

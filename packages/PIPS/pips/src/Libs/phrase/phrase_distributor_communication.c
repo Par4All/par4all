@@ -96,7 +96,7 @@ entity make_start_ru_module (hash_table ht_params,
   instruction sequence_instruction;
   entity set_entity = get_current_module_entity();
  
-  start_ru_module = make_empty_subroutine(strdup(START_RU_MODULE_NAME));
+  start_ru_module = make_empty_subroutine(START_RU_MODULE_NAME,make_language_unknown());
   pips_debug(2, "Creating module %s\n", entity_global_name(start_ru_module));
   reset_current_module_entity();
   set_current_module_entity(start_ru_module);
@@ -238,7 +238,7 @@ entity make_wait_ru_module (statement* module_statement,
   entity unit_id = NULL;
   entity set_entity = get_current_module_entity();
 
-  wait_ru_module = make_empty_subroutine(strdup(WAIT_RU_MODULE_NAME));
+  wait_ru_module = make_empty_subroutine(WAIT_RU_MODULE_NAME,make_language_unknown());
   pips_debug(2, "Creating module %s\n", entity_global_name(wait_ru_module));
   reset_current_module_entity();
   set_current_module_entity(wait_ru_module);
@@ -362,7 +362,7 @@ static entity make_scalar_communication_module (variable var,
   instruction sequence_instruction;
   int param_nb = 1;
 
-  new_module = make_empty_subroutine(module_name);
+  new_module = make_empty_subroutine(module_name,make_language_unknown());
   pips_debug(2, "Creating module %s\n", entity_global_name(new_module));
   reset_current_module_entity();
   set_current_module_entity(new_module);
@@ -847,7 +847,7 @@ static entity make_array_communication_module (entity function,
   list l_reg_variables; /* list of dynamic variables....*/
   int param_nb = 1;
  
-  new_module = make_empty_subroutine(module_name);
+  new_module = make_empty_subroutine(module_name,make_language_unknown());
   pips_debug(2, "Creating module %s\n", entity_local_name(new_module));
   pips_debug(2, "Function [%s]\n", entity_local_name(function));
   pips_debug(2, "Region: ");

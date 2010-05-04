@@ -58,7 +58,7 @@
 ///@return the new pragma
 ///@param l, the loop to analyze for omp reduction
 ///@param exprs, the pragma as a list of expression
-list append_private_clause (loop l, list exprs) {
+static list append_private_clause (loop l, list exprs) {
   // the private variables as a list of entites
   list private = loop_private_variables_as_entites (l, TRUE, TRUE);
   // add private clause if needed

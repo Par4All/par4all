@@ -300,7 +300,7 @@ static bool store_mapping(control c, persistant_statement_to_control map)
 
 
 
-void
+static void
 suppress_trivial_test_statement(statement mod_stmt)
 {
   persistant_statement_to_control map;

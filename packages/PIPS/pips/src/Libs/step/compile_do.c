@@ -839,7 +839,7 @@ entity step_create_mpi_loop_module(entity directive_module)
   init_reduction_entities();
 
   new_name=step_find_new_module_name(directive_module,STEP_MPI_SUFFIX);
-  mpi_module = make_empty_subroutine(new_name);
+  mpi_module = make_empty_subroutine(new_name,copy_language(module_language(get_current_module_entity())));
 
   pips_debug(2, "entity_name(mpi_module) : %s\n\n", entity_name(mpi_module));
   

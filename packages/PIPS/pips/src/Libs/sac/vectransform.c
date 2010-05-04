@@ -63,6 +63,7 @@ void insert_transformation(char * name, int vectorLengthOut, int subwordSizeOut,
     transformations = CONS(TRANSFORMATION, t, transformations);
 }
 
+#if 0
 static statement make_transformation_statement(transformation t, entity vdest, entity vsrc1, entity vsrc2)
 {
     list l=NIL;
@@ -80,8 +81,7 @@ static bool best_transformation_p(transformation t1, transformation t2)
     return ((t2 == transformation_undefined) || 
             (transformation_nbArgs(t1) < transformation_nbArgs(t2)));
 }
-
-statement generate_transformation_statement(simdStatementInfo si, int line)
+static statement generate_transformation_statement(simdStatementInfo si, int line)
 {
     int vectorLength = opcode_vectorSize(simdStatementInfo_opcode(si));
     //MOIint subwordSize = opcode_subwordSize(simdStatementInfo_opcode(si));
@@ -186,3 +186,4 @@ statement generate_transformation_statement(simdStatementInfo si, int line)
             bestFirstArg,
             bestSecArg);
 }
+#endif

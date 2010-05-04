@@ -59,47 +59,22 @@ typedef dg_vertex_label vertex_label;
 #include "control.h"
 #include "properties.h"
 
-entity make_float_constant_entity(float c)
+static entity make_float_constant_entity(float c)
 {
     entity ce;
     char num[32];
     string cn;
 
     snprintf(num,sizeof(num)/sizeof(*num), "%f", c);
-
-    cn = concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,num,(char *)NULL);
-    ce = gen_find_tabulated(cn,entity_domain);
-
-    if (ce==entity_undefined)
-    {
-        functional cf = 
-            make_functional(NIL, 
-                    make_type(is_type_variable, 
-                        make_variable(make_basic(is_basic_float, (void*)sizeof(float)),
-                            NIL,NIL)));
-        type ct = make_type(is_type_functional, cf);
-        ce = make_entity(strdup(cn), ct, make_storage_rom(),
-                make_value(is_value_constant, 
-                    make_constant(is_constant_litteral, NULL)));
-    }
-
-    return (ce);
+    return MakeConstant(num,is_basic_float);
 }
 
 expression make_float_constant_expression(float c)
 {
-    expression ex_cons;
-    entity ce;   
-
-    ce = make_float_constant_entity(c);
-    /* make expression for the constant c*/
-    ex_cons = make_expression(
-            make_syntax(is_syntax_call,
-                make_call(ce,NIL)), 
-            normalized_undefined);
-    return (ex_cons);
+    entity ce = make_float_constant_entity(c);
+    return call_to_expression(make_call(ce,NIL));
 }
-expression make_complex_constant_expression(float re, float im)
+static expression make_complex_constant_expression(float re, float im)
 {
     return MakeComplexConstantExpression(make_float_constant_expression(re),make_float_constant_expression(im));
 }
@@ -310,6 +285,7 @@ static expression make_0val_expression(basic b)
         default:
             pips_internal_error("function not implemented for this basic \n");
     }
+    return expression_undefined;
 }
 
 /*

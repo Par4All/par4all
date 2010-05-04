@@ -699,7 +699,7 @@ static void make_HRE_empty_module()
 				     (char *) NULL));
   free(num);
 
-  entity new_fun = make_empty_subroutine(prefix);
+  entity new_fun = make_empty_subroutine(prefix,make_language_unknown());
 
   reset_current_module_entity();
 

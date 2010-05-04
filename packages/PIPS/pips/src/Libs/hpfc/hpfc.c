@@ -538,7 +538,7 @@ bool hpfc_init(string name)
     set_bool_property("WARN_ABOUT_EMPTY_SEQUENCES", FALSE);
 
     /* where the specials dummy/variables are stored... ??? */
-    (void) make_empty_program(HPFC_PACKAGE);
+    (void) make_empty_program(HPFC_PACKAGE,make_language_fortran());
 
     /* mkdir... */
     {

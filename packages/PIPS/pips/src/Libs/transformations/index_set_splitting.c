@@ -82,7 +82,7 @@ find_loop_from_label(statement s, entity label)
     return p.found;
 } 
 
-void
+static void
 index_set_split_loop(statement original_loop, entity new_loop_bound)
 {
     pips_assert("index_set_split_loop called on a loop", statement_loop_p(original_loop));
