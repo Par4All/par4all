@@ -7,7 +7,7 @@ echo
 echo Initial code
 echo
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 
 echo
@@ -19,14 +19,14 @@ setproperty OUTLINE_LABEL "kernel"
 setproperty OUTLINE_ALLOW_GLOBALS TRUE
 apply OUTLINE[main]
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 
 echo
 echo unsplit
 echo
 
-apply UNSPLIT[%ALL]
+apply UNSPLIT
 
 close
 delete outline08

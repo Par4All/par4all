@@ -1,3 +1,4 @@
+#include <stdio.h>
 void pas_vous()
 {
     int i,j,k;

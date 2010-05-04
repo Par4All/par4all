@@ -103,7 +103,7 @@ list make_unbounded_subscripts(int d)
    parser.
  */
 static entity make_empty_module(string full_name,
-				type r)
+				type r, language l)
 {
   string name = string_undefined;
   entity e = gen_find_tabulated(full_name, entity_domain);
@@ -121,12 +121,12 @@ static entity make_empty_module(string full_name,
 
   e = make_entity
     (strdup(full_name),
-     make_type(is_type_functional,
+     make_type_functional(
 	       make_functional(NIL, r)),
      make_storage_rom(),
-     make_value(is_value_code,
+     make_value_code(
 		make_code(NIL, strdup(""), make_sequence(NIL),NIL,
-			  make_language_unknown())));
+			  l)));
 
   name = module_local_name(e);
   DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
@@ -156,32 +156,40 @@ static entity make_empty_module(string full_name,
   return(e);
 }
 
-entity make_empty_program(string name)
+entity make_empty_program(string name,language l)
 {
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
-				 MODULE_SEP_STRING, MAIN_PREFIX, name, NULL);
-  return make_empty_module(full_name, make_type(is_type_void, UU));
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
+				 MODULE_SEP_STRING  MAIN_PREFIX, name, NULL);
+  return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
-entity make_empty_subroutine(string name)
+entity make_empty_subroutine(string name,language l)
 {
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
+         MODULE_SEP_STRING, name, NULL);
+  return make_empty_module(full_name, make_type_void(NIL),l);
+}
+
+entity make_empty_f95module(string name,language l)
+{
+  pips_assert("Module are only defined in Fortran95",language_fortran95_p(l));
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
+         MODULE_SEP_STRING, F95MODULE_PREFIX, name, NULL);
+  return make_empty_module(full_name, make_type_void(NIL),l);
+}
+
+entity make_empty_function(string name, type r, language l)
+{
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME
 				 MODULE_SEP_STRING, name, NULL);
-  return make_empty_module(full_name, make_type(is_type_void, UU));
+  return make_empty_module(full_name, r,l);
 }
 
-entity make_empty_function(string name, type r)
+entity make_empty_blockdata(string name,language l)
 {
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
-				 MODULE_SEP_STRING, name, NULL);
-  return make_empty_module(full_name, r);
-}
-
-entity make_empty_blockdata(string name)
-{
-  string full_name = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+  string full_name = concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING
 				 BLOCKDATA_PREFIX, name, NULL);
-  return make_empty_module(full_name, make_type(is_type_void, UU));
+  return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
 
@@ -395,9 +403,7 @@ string local_name_to_scope(string ln)
   string name = local_name(entity_name(e));
 
   return (name
-    + strspn(name, MAIN_PREFIX)
-    + strspn(name, BLOCKDATA_PREFIX)
-    + strspn(name, COMMON_PREFIX));
+   + strspn(name, F95MODULE_PREFIX MAIN_PREFIX BLOCKDATA_PREFIX COMMON_PREFIX));
 }
 
 /* Returns a pointer towards the resource name. The resource name is
@@ -406,9 +412,7 @@ string module_resource_name(entity e)
 {
   string rn = entity_local_name(e);
 
-  rn += strspn(rn, MAIN_PREFIX)
-    + strspn(rn, BLOCKDATA_PREFIX)
-    + strspn(rn, COMMON_PREFIX);
+  rn += strspn(rn, F95MODULE_PREFIX MAIN_PREFIX BLOCKDATA_PREFIX COMMON_PREFIX);
 
   return rn;
 }
@@ -499,6 +503,11 @@ bool entity_main_module_p(entity e)
   return entity_module_p(e)
     && (strspn(entity_local_name(e), MAIN_PREFIX)==1
 	|| same_string_p(entity_local_name(e), "main"));
+}
+
+bool entity_f95module_p(entity e) {
+  return entity_module_p(e) &&
+      strspn(entity_local_name(e), F95MODULE_PREFIX)==1;
 }
 
 bool entity_blockdata_p(entity e)
@@ -959,12 +968,13 @@ bool entity_list_p(list el)
 /* this function maps a local name, for instance P, to the corresponding
  * TOP-LEVEL entity, whose name is TOP-LEVEL:P. n is the local name.
  */
-
+#define PREFIXES_SIZE 5
 static string prefixes[] = {
     "",
     MAIN_PREFIX,
     BLOCKDATA_PREFIX,
     COMMON_PREFIX,
+    F95MODULE_PREFIX,
 };
 
 entity local_name_to_top_level_entity(const char *n)
@@ -986,8 +996,8 @@ entity local_name_to_top_level_entity(const char *n)
   }
   else
     {
-      for(i=0; i<4 && entity_undefined_p(module); i++)
-	module = gen_find_tabulated(concatenate
+      for(i=0; i<PREFIXES_SIZE && entity_undefined_p(module); i++)
+        module = gen_find_tabulated(concatenate
 				    (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, NULL),
 				    entity_domain);
     }

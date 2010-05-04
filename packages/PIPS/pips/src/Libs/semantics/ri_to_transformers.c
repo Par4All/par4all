@@ -162,13 +162,39 @@ transformer filter_transformer(transformer t, list e)
 
 /* Note: initializations of static variables are not used as
    transformers but to initialize the program precondition. */
-/* It is assumed that entity_has_values_p(v)==TRUE */
+/* It is not assumed that entity_has_values_p(v)==TRUE */
+/* A write effect on the declared variable is assumed as required by
+   Beatrice Creusillet for region computation. */
 transformer declaration_to_transformer(entity v, transformer pre)
 {
   transformer tf = transformer_undefined;
 
   pips_debug(8, "Transformer for declaration of \"%s\"\n", entity_name(v));
 
+  if(FALSE && !entity_has_values_p(v)) {
+    /* FI: the initialization expression might have relevant
+       side-effects? This could ba handled by generalizing
+       variable_to_initial_expression() and by returning
+       expression_undefined incase of failure instead of aborting. */
+    tf = transformer_identity();
+  }
+  else if(variable_static_p(v)) {
+    if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT"))
+      tf = transformer_range(pre);
+    else
+      tf = transformer_identity();
+  }
+  else {
+    expression ie = variable_initial_expression(v);
+    tf = safe_assigned_expression_to_transformer(v, ie, pre);
+    free_expression(ie);
+  }
+
+  pips_assert("tf is defined", !transformer_undefined_p(tf));
+
+  /* FI: I preserve the code below in case I have problems with
+     integer typing in the future*/
+  /*
   if(entity_has_values_p(v) && !variable_static_p(v)) {
     value vv = entity_initial(v);
     if(value_unknown_p(vv)) {
@@ -226,6 +252,7 @@ transformer declaration_to_transformer(entity v, transformer pre)
   else {
     tf = transformer_identity();
   }
+  */
 
   ifdebug(8) {
     pips_debug(8, "Ends with:\n");
@@ -1365,18 +1392,16 @@ transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
 
 /* transformer assigned_expression_to_transformer(entity e, expression
  * expr, list ef): returns a transformer abstracting the effect of
- * assignment e = expr when possible, transformer_undefined otherwise.
+ * assignment "e = expr" when possible, transformer_undefined otherwise.
  *
  * Note: it might be better to distinguish further between e and expr
  * and to return a transformer stating that e is modified when e
  * is accepted for semantics analysis.
  *
  */
-transformer 
-assigned_expression_to_transformer(
-    entity v,
-    expression expr,
-    transformer pre)
+transformer assigned_expression_to_transformer(entity v,
+					       expression expr,
+					       transformer pre)
 {
   transformer tf = transformer_undefined;
 
@@ -1397,7 +1422,7 @@ assigned_expression_to_transformer(
        as in i = (i = 2) + 1, transformer_value_substitute() cannot be
        used right away. The previous store must be projected out. */
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
-	/* v must be assigneded */
+	/* v must be assigned */
 	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
 	tf = transformer_combine(tf, teq);
 	free_transformer(teq);
@@ -1407,7 +1432,9 @@ assigned_expression_to_transformer(
 	tf = transformer_value_substitute(tf, v_new, v_old);
 	tf = transformer_value_substitute(tf, tmp, v_new);
 	// v cannot be a temporary variable
-	transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v);
+	//transformer_arguments(tf) =
+	//arguments_add_entity(transformer_arguments(tf), v);
+	tf = transformer_add_value_update(tf, v);
       }
       tf = transformer_temporary_value_projection(tf);
     }
@@ -1421,6 +1448,42 @@ assigned_expression_to_transformer(
 
   return tf;
 }
+
+/* Always returns a fully defined transformer.
+ *
+ * FI: The property to compute transformers in context is not taken
+ * into account to add information from pre within tf. pre is used to
+ * evaluate expr, but is not made part of tf.
+ */
+transformer safe_assigned_expression_to_transformer(entity v,
+						    expression expr,
+						    transformer pre)
+{
+  transformer tf = transformer_undefined;
+
+  if(expression_undefined_p(expr)) {
+    ; // That is fixed below
+  }
+  else
+    tf = assigned_expression_to_transformer(v, expr, pre);
+
+  if(transformer_undefined_p(tf)) {
+    if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT"))
+      tf = transformer_range(pre);
+    else
+      tf = transformer_identity();
+
+    if(entity_has_values_p(v)) {
+      tf = transformer_add_modified_variable_entity(tf, v);
+    }
+  }
+
+  pips_assert("tf is defined", !transformer_undefined_p(tf));
+  pips_assert("tf is consistent", transformer_consistency_p(tf));
+
+  return tf;
+}
+
 
 /* This function never returns an undefined transformer. It is used
    for an assignment statement, not for an assignment operation. */
@@ -1462,7 +1525,7 @@ transformer integer_assign_to_transformer(expression lhs,
       /* check that *all* read effects are on integer scalar entities */
       /*
 	if(integer_scalar_read_effects_p(ef)) {
-	tf = assigned_expression_to_transformer(e, rhs, ef);
+	tf = assigned_expres`sion_to_transformer(e, rhs, ef);
 	}
       */
       /* Check that *some* read or write effects are on integer
@@ -1881,7 +1944,7 @@ transformer statement_to_transformer(
 	/* Option 1 */
 	nt = dt;
       }
-      else {
+      else if(FALSE) {
 	/* Option 2, currently bugged */
 	/* Currently, the preconditions is useless as only the
 	   effects will be used to compute the CONTINUE transformer. */
@@ -1889,6 +1952,10 @@ transformer statement_to_transformer(
 	nt = transformer_image_intersection(it, dt);
 	free_transformer(it);
 	free_transformer(dt);
+      }
+      else {
+	nt = dt; // Do nothing because everything has been taken care of by
+	  // declaration_to_transformer()
       }
       free_transformer(post);
       // free_transformer(ipre);

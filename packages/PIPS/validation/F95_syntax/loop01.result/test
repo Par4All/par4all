@@ -4,3 +4,7 @@ PROGRAM MAIN
         A(I) = 0
     END DO
 END
+
+"compile sources produced by pips"
+
+

@@ -33,6 +33,97 @@ int main()
    return 0;
 }
 
+Preconditions "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+//  P() {}
+
+   int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
+
+//  P() {}
+
+   int size = 2;
+
+//  P(size) {size==2}
+
+   int loulou[1][size][6];
+
+//  P(size) {size==2}
+
+   int i;
+
+//  P(i,size) {size==2}
+
+   int j;
+
+//  P(i,j,size) {size==2}
+
+   int k = 16;
+
+//  P(i,j,k,size) {k==16, size==2}
+
+
+   i = size;
+
+//  P(i,j,k,size) {i==2, k==16, size==2}
+
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  P(i,j,k,size) {size==2, 0<=i, i<=1}
+
+      for(j = 0; j <= 5; j += 1)
+
+//  P(i,j,k,size) {size==2, 0<=i, i<=1, 0<=j, j<=5}
+
+         loulou[0][i][j] = k++;
+
+//  P(i,j,k,size) {i==2, j==6, size==2}
+
+
+   printf("%d\n", partial_eval02(riri, fifi, size, loulou));
+
+//  P(i,j,k,size) {i==2, j==6, size==2}
+
+
+   return 0;
+}
+
+Preconditions "partial_eval02"
+
+
+//  P() {}
+
+int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+
+//  P() {}
+
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+
+   i = size;
+
+//  P(i) {i==size}
+
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
 Code after partial evaluation for "partial_eval02"
 
 int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
@@ -41,7 +132,7 @@ int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6
    int i;
 
    i = 2;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+0);
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
 }
 
 Code after partial evaluation for "main"
@@ -51,7 +142,7 @@ int main()
    int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
    int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
    int size = 2;
-   int loulou[1][size][6];
+   int loulou[1][2][6];
    int i;
    int j;
    int k = 16;
@@ -62,9 +153,20 @@ int main()
       for(j = 0; j <= 5; j += 1)
          loulou[0][i][j] = k++;
 
-   printf("%d\n", partial_eval02(riri, fifi, size, loulou));
+   printf("%d\n", partial_eval02(riri, fifi, 2, loulou));
 
    return 0;
+}
+
+Same code with evaluation of constants
+
+int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   int *zaza = (int *) fifi+3;
+   int i;
+
+   i = 2;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
 }
 
 Unsplit resulting code

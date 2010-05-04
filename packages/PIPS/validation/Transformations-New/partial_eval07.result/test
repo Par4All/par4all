@@ -26,26 +26,26 @@ int foo(int i)
 
    int j;
 
-//  P() {}
+//  P(j) {}
 
    int n;
 
-//  P() {}
+//  P(j,n) {}
 
 
    if (n>0)
 
-//  P() {1<=n}
+//  P(j,n) {1<=n}
 
       return j = i+++0;
    else if (n<0)
 
-//  P() {n+1<=0}
+//  P(j,n) {n+1<=0}
 
       return i+++0;
    else
 
-//  P() {n==0}
+//  P(j,n) {n==0}
 
       return 1+2+3;
 }

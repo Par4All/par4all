@@ -23,20 +23,20 @@ int foo(int i)
 
    int j;
 
-//  P() {}
+//  P(j) {}
 
    int n;
 
-//  P() {}
+//  P(j,n) {}
 
 
    j = n*i-n*i;
 
-//  P(j) {}
+//  P(j,n) {}
 
    j = n*i-i*n;
 
-//  P(j) {}
+//  P(j,n) {}
 
    return j;
 }

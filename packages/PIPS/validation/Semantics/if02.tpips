@@ -17,6 +17,8 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 echo
 echo Transformers for "if02"
 echo

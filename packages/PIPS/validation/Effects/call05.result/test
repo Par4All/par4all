@@ -76,11 +76,15 @@ int main()
 //               <must be read   >: d1 d2
 //               <must be written>: j
       for(j = 0; j <= d2-1; j += 1)
-//               <must be read   >: __IO_EFFECTS:LUNS[1] d1 d2 i j 
-//                                  y[i][j]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1 d2 
+//                                  i j y[i][j]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-//               <must be read   >: __IO_EFFECTS:LUNS[1] d1
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\n");
    }
@@ -88,8 +92,9 @@ int main()
 
 Cumulated effects for "main"
 
-//               <may be read    >: __IO_EFFECTS:LUNS[1]
-//               <may be written >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
 int main()
 {
 //               <must be written>: d1
@@ -107,23 +112,29 @@ int main()
 //               <may be written >: y[*][*]
 //               <must be read   >: d1 d2 i
       call05(i, d2, y[i]);
-//               <may be read    >: __IO_EFFECTS:LUNS[1] d2 i j 
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1] d2 i j 
 //                                  y[*][*]
-//               <may be written >: __IO_EFFECTS:LUNS[1] j
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1] j
 //               <must be read   >: d1
 //               <must be written>: i
 
    for(i = 0; i <= d1-1; i += 1) {
-//               <may be read    >: __IO_EFFECTS:LUNS[1] i j y[*][*]
-//               <may be written >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1] i j y[*][*]
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
 //               <must be read   >: d1 d2
 //               <must be written>: j
       for(j = 0; j <= d2-1; j += 1)
-//               <may be read    >: y[*][*]
-//               <must be read   >: __IO_EFFECTS:LUNS[1] d1 d2 i j
+//               <may be read    >: stdout[0] y[*][*]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1 d2 
+//                                  i j
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-//               <must be read   >: __IO_EFFECTS:LUNS[1] d1
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\n");
    }
@@ -156,6 +167,9 @@ Regions for "main"
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
 int main()
 {
@@ -175,6 +189,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <y[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3, d1==4,
 //    d2==4}>
 
@@ -183,6 +200,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <y[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=3, d1==4, d2==4,
 //    0<=i, i<=3}>
 
@@ -190,6 +210,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <y[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, d1==4, d2==4, 0<=i,
 //    i<=3, 0<=j, j<=3}>
 
@@ -197,6 +220,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
       printf("\n");
    }

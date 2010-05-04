@@ -1,6 +1,6 @@
 delete namelist
 
-create namelist  namelist.F
+create namelist  namelist.f90
 
 display PRINTED_FILE(%ALL)
 

@@ -242,6 +242,20 @@ SIMD_MULPD (double DEST[2], double SRC1[2], double SRC2[2])
     DEST[0] = SRC1[0] * SRC2[0];
     DEST[1] = SRC1[1] * SRC2[1];
 }
+#ifdef WITH_TRIGO
+void
+SIMD_SINPD (double DEST[2], double SRC1[2])
+{
+    DEST[0] = COS(SRC1[0]);
+    DEST[1] = COS(SRC1[1]);
+}
+void
+SIMD_COSPD (double DEST[2], double SRC1[2])
+{
+    DEST[0] = SIN(SRC1[0]);
+    DEST[1] = SIN(SRC1[1]);
+}
+#endif
 void
 SIMD_ADDPD (double DEST[2], double SRC1[2], double SRC2[2])
 {

@@ -73,9 +73,20 @@
 #define FIRST_C_LINE_NUMBER (1)
 #define UNDEFINED_C_LINE_NUMBER (-1)
 
-static int C_line_number = UNDEFINED_C_LINE_NUMBER;
 
+/* To track the user line number, that is the one in the original user file */
+static int C_line_number = UNDEFINED_C_LINE_NUMBER;
+/* Use a stack to survive to file inclusions if any.
+
+   I guess that it is currently not used since file inclusion is already
+   done by the preprocessor... RK
+*/
 DEFINE_LOCAL_STACK(line_number, int)
+
+/* To track the absolute line number in the file that is parsed
+   use the default flex yylineno that is renamed c_lineno here */
+/* Use a stack to survive to file inclusions if any */
+DEFINE_LOCAL_STACK(absolute_line_number, int)
 
 /* Count the number of c in s. */
 unsigned int character_occurences_in_string(string s, char c)
@@ -96,27 +107,34 @@ int get_current_C_line_number()
 
 void set_current_C_line_number()
 {
-  if(C_line_number==UNDEFINED_C_LINE_NUMBER)
+  if (C_line_number == UNDEFINED_C_LINE_NUMBER) {
+    /* Initialize the user line number... */
     C_line_number = FIRST_C_LINE_NUMBER;
+    /* ... and the absolute line number in the current file */
+    c_lineno = FIRST_C_LINE_NUMBER;
+  }
   else
-    pips_internal_error("C_line_number not resetted\n");
+   pips_internal_error("C_line_number not resetted\n");
 
   /* Some check on it first? It should have been disallocated by reset_current_C_line_number() */
   make_line_number_stack();
+  make_absolute_line_number_stack();
 }
 
-/* The line number stack, designed for structured control structure, is not used yet. */
-
+/* The line number stack, designed for structured control structure, is
+   not used yet. */
 void push_current_C_line_number()
 {
   int ln = get_current_C_line_number();
 
   line_number_push(ln);
+  absolute_line_number_push(c_lineno);
 }
 
 int pop_current_C_line_number()
 {
   int ln = line_number_pop();
+  c_lineno = absolute_line_number_pop();
 
   return ln;
 }
@@ -124,18 +142,22 @@ int pop_current_C_line_number()
 void reset_current_C_line_number()
 {
   C_line_number = UNDEFINED_C_LINE_NUMBER;
+  c_lineno = FIRST_C_LINE_NUMBER;
 
   if(!line_number_empty_p()) {
     pips_internal_error("Line number stack is not empty\n");
   }
   free_line_number_stack();
+  free_absolute_line_number_stack();
 }
 
 void error_reset_current_C_line_number()
 {
   C_line_number = UNDEFINED_C_LINE_NUMBER;
+  c_lineno = FIRST_C_LINE_NUMBER;
 
   free_line_number_stack();
+  free_absolute_line_number_stack();
 }
 
 /* Comment management:
@@ -766,12 +788,15 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 			}
 %%
 
+/* The default function called when a parsing error happens */
 void c_error(char * msg)
 {
-    user_warning("yyerror", "C %s near \"%s\" at line %d\n", msg, yytext, yylineno);
-    CParserError("Parsing failed\n");
+  user_warning("yyerror", "C %s near \"%s\" at user line %d (local line %d in the effective file)\n", msg, yytext, get_current_C_line_number(), c_lineno);
+  CParserError("Parsing failed\n");
 }
 
+
+/* Mainly reset the line number and restart on c_in... */
 void c_reset_lex(void)
 {
     c_lineno = 1;
@@ -780,6 +805,7 @@ void c_reset_lex(void)
 #else
     /* reset lex... Might be better to read the whole file?
      */
+     /* Huh... What is this ? RK */
     syn_sptr = syn_sbuf;
 # define MMNEWLINE 10
     syn_previous = MMNEWLINE;

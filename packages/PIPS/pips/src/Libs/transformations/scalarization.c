@@ -62,7 +62,7 @@
  * WARNING ! This function introduces side-effects on g
  */
 
-Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
+static Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
 {
   Pbase gb = sc_base(g);
 
@@ -125,7 +125,7 @@ Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
    variables.
  */
 
-bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
+static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
 {
   bool functional_p = TRUE;
 
@@ -199,7 +199,7 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
    This function checks that graph g is a total function graph from
    domain d to range r.
 */
-bool sc_totally_functional_graph_p( Psysteme g, // function graph
+static bool sc_totally_functional_graph_p( Psysteme g, // function graph
 				    Pbase d,    // domain's basis
 				    Psysteme D, // membership predicate for functional domain
 				    Pbase r,    // range's predicate
@@ -266,7 +266,7 @@ static void * car_effect_to_variable(gen_chunk car) {
 }
 
 
-Pbase make_phi_base(int phi_min, int phi_max)
+static Pbase make_phi_base(int phi_min, int phi_max)
 {
   Pbase phi_b = BASE_NULLE;
   int i;

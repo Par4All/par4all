@@ -171,8 +171,16 @@ static list words_dimension(dimension obj, list pdl)
       expression eup = dimension_upper(obj);
       int up;
       if (FALSE && expression_integer_value(eup, &up))
-	/* FI: why do you want to change the source code? */
+	/* FI: why do you want to change the source code? Because it
+	   may no longer be the user source code after partial
+	   evaluation */
 	pc = CHAIN_IWORD(pc,up+1);
+      if(expression_constant_p(eup)
+	 && constant_int_p(expression_constant(eup))) {
+	/* To deal with partial eval generated expressions */
+	up = expression_to_int(eup);
+	pc = CHAIN_IWORD(pc,up+1);
+      }
       else {
 	if(expression_call_p(eup)) {
 	  call c = syntax_call(expression_syntax(eup));
@@ -486,6 +494,8 @@ sentence sentence_head(entity e, list pdl)
 	      {
 		if (entity_blockdata_p(e))
 		  pc = CHAIN_SWORD(pc, "BLOCKDATA ");
+		else if (entity_f95module_p(e))
+      pc = CHAIN_SWORD(pc, "MODULE ");
 		else
 		  pc = CHAIN_SWORD(pc,"SUBROUTINE ");
 	      }

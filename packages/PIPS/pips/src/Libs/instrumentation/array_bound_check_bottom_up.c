@@ -1179,7 +1179,7 @@ make_c_stop_statement(int abort_program)
 {
     /*
      * XXX 'entity_intrinsic' not verified ...
-     * Pourtant exit() et abort() sont déclarés ds bootstrap.c
+     * Pourtant exit() et abort() sont dï¿½clarï¿½s ds bootstrap.c
      */
 #if 0
     list l = NIL;
@@ -1209,17 +1209,6 @@ make_c_stop_statement(int abort_program)
     return emit_message_and_stop("Buffer overflow!");
 }
 
-static int
-list_length(list l)
-{
-    int s = 0;
-
-    while (!ENDP(l)) {
-        l = CDR(l);
-        s++;
-    }
-    return s;
-}
 
 /*
  * entity_constant_string_size:
@@ -1364,7 +1353,7 @@ expression_try_find_size(expression expr)
                 return expression_undefined;
             else
                 return make_sub_expression(base_size, x);
-        } else // XXX traiter le cas de fonctions imbriquées !
+        } else // XXX traiter le cas de fonctions imbriquï¿½es !
             return expression_undefined;
     }
 
@@ -1782,7 +1771,7 @@ alloc_instrumentation(expression args[], int nargs)
     func_call = syntax_call(expression_syntax(args[1]));
     func_name = entity_name(call_function(func_call));
     func_args = call_arguments(func_call);
-    func_nargs = list_length(func_args);
+    func_nargs = gen_length(func_args);
 
     if (strcmp(func_name, "TOP-LEVEL:malloc") == 0) {
         if (func_nargs != 1)
@@ -1841,7 +1830,7 @@ cstr_args_check(statement s)
 
     /* Convert the arguments list into an array */
     args = call_arguments(cal);
-    nargs = list_length(args);
+    nargs = gen_length(args);
     argstab = malloc(sizeof(expression) * nargs);
     for (k = 0; k < nargs; k++) {
         argstab[k] = EXPRESSION(CAR(args));

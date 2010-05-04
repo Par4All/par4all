@@ -76,7 +76,7 @@ void reset_padding_entities() {
     _padding_entity_=entity_undefined;
 }
 
-entity get_padding_entity() {
+static entity get_padding_entity() {
     if(entity_undefined_p(_padding_entity_))
     {
         _padding_entity_=make_scalar_entity(SAC_PADDING_ENTITY_NAME,get_current_module_name(),make_basic_overloaded());
@@ -85,7 +85,7 @@ entity get_padding_entity() {
     return _padding_entity_;
 }
 
-static bool expression_reference_or_field_p(expression e)
+bool expression_reference_or_field_p(expression e)
 {
     return expression_reference_p(e) || expression_field_p(e);
 }
@@ -161,23 +161,17 @@ static void patch_all_padded_simd_statements(simdStatementInfo ssi)
     gen_free_list(paddings);
 }
 
-entity vectorElement_vector(vectorElement ve)
+static entity vectorElement_vector(vectorElement ve)
 {
     CHECK_VECTORELEMENT(ve);
     return simdStatementInfo_vectors(vectorElement_statement(ve))[vectorElement_vectorIndex(ve)];
-}
-
-int vectorElement_vectorLength(vectorElement ve)
-{
-    CHECK_VECTORELEMENT(ve);
-    return opcode_vectorSize(simdStatementInfo_opcode(vectorElement_statement(ve)));
 }
 
 /*
    This function return the basic corresponding to the argNum-th
    argument of opcode oc
    */
-enum basic_utype get_basic_from_opcode(opcode oc, int argNum)
+static enum basic_utype get_basic_from_opcode(opcode oc, int argNum)
 {
     int type = INT(gen_nth(argNum, opcode_argType(oc)));
 
@@ -248,7 +242,7 @@ opcode generate_opcode(string name, list types, float cost)
     return oc;
 }
 
-int get_subwordSize_from_vector(entity vec)
+static int get_subwordSize_from_vector(entity vec)
 {
     char * name = entity_local_name(vec);
 
@@ -271,6 +265,7 @@ int get_subwordSize_from_vector(entity vec)
 
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
+ * it is a greedy matchinbg, so it supposes the list of args is in the best order for us
  */
 static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 {
@@ -433,7 +428,7 @@ static expression distance_between_entity(const entity e0, const entity e1)
  * 
  * @return expression_undefined if not comparable, an expression of the distance otherwise
  */
-static expression distance_between_expression(const expression exp0, const expression exp1)
+expression distance_between_expression(const expression exp0, const expression exp1)
 {
     bool eval_sizeof = get_bool_property("EVAL_SIZEOF");
     set_bool_property("EVAL_SIZEOF",true);
@@ -507,7 +502,7 @@ static bool consecutive_expression_p(expression e0, int lastOffset, expression e
     {
         int idistance;
         NORMALIZE_EXPRESSION(distance);
-        if(result=expression_integer_value(distance,&idistance))
+        if((result=expression_integer_value(distance,&idistance)))
         {
             pips_debug(3,"distance between %s and %s is %d\n",words_to_string(words_expression(e0,NIL)),words_to_string(words_expression(e1,NIL)),idistance);
             result= idistance == ref_offset+ref_offset*lastOffset;
@@ -635,7 +630,7 @@ void replace_subscript(expression e)
 
 }
 
-statement make_exec_statement_from_name(string ename, list args)
+static statement make_exec_statement_from_name(string ename, list args)
 {
     /* SG: ugly patch to make sure fortran's parameter passing and c's are respected */
     if( c_module_p(get_current_module_entity()) )
@@ -651,7 +646,7 @@ statement make_exec_statement_from_name(string ename, list args)
     }
     return call_to_statement(make_call(get_function_entity(ename), args));
 }
-statement make_exec_statement_from_opcode(opcode oc, list args)
+static statement make_exec_statement_from_opcode(opcode oc, list args)
 {
     return make_exec_statement_from_name( opcode_name(oc) , args );
 }
@@ -823,7 +818,6 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                     }
                     else
                     {
-                        entity current_scalar = expression_to_entity(e);
                         expression replacement = make_entity_expression(scalar_holder,make_expression_list(int_to_expression(index)));
                         *REFCAR(iter) = (gen_chunkp)replacement;
                     }
@@ -1209,31 +1203,37 @@ void free_simd_statement_info(simdStatementInfo s)
     free(simdStatementInfo_arguments(s));
 }
 
-list make_simd_statements(list kinds, cons* first, cons* last)
+static int compare_statements(const void * v0, const void * v1)
 {
-    list i;
-    int index;
+    statement s0 = *(statement*)v0;
+    statement s1 = *(statement*)v1;
+    if (statement_ordering(s0) > statement_ordering(s1)) return 1;
+    if (statement_ordering(s0) < statement_ordering(s1)) return -1;
+    return 0;
+}
+
+statementInfo make_simd_statements(set opkinds, list statements)
+{
     list args[MAX_PACK];
-    opcodeClass type;
-    list instr; 
-    list all_instr;
+    /* there should be a better order than this */
+    list first = statements;
+    list last = gen_last(first);
+    list kinds = set_to_list(opkinds);
+    set_free(opkinds);
 
     pips_debug(3,"make_simd_statements 1\n");
 
     if (first == last)
-        return gen_statementInfo_cons(
-                make_nonsimd_statement_info(STATEMENT(CAR(first))),
-                NIL);
+        return statementInfo_undefined;
 
     pips_debug(3,"make_simd_statements 2\n");
 
-    i = first;
-    all_instr = gen_statementInfo_cons(make_statementInfo(0,NULL), NIL);
-    instr = all_instr;
+    list i = first;
+    statementInfo instr = statementInfo_undefined;
 
-    type = OPCODECLASS(CAR(kinds));
-    while(i != CDR(last))
+    opcodeClass type = OPCODECLASS(CAR(kinds));
     {
+        int index;
         opcode oc;
         list j;
 
@@ -1263,32 +1263,18 @@ list make_simd_statements(list kinds, cons* first, cons* last)
         /* compute the opcode to use */
         oc = get_optimal_opcode(type, index, args);
 
-        if (opcode_undefined_p(oc))
-        {
-            /* No optimized opcode found... */
-            for( index = 0;
-                    (index < MAX_PACK) && (i != CDR(last));
-                    index++, i = CDR(i) )
-            {
-                pips_debug(3,"make_simd_statements : non simd\n");
-                CDR(instr) = gen_statementInfo_cons(
-                        make_nonsimd_statement_info(STATEMENT(CAR(i))),
-                        NIL);
-                instr = CDR(instr);
-            }
-        }
-        else
+        if (!opcode_undefined_p(oc))
         {
             /* now that we know the optimal opcode, we can change the padding to the neutral element
-             */
+            */
             if(padding_added)
             {
                 statement sfirst = STATEMENT(CAR(first));
                 if(assignment_statement_p(sfirst))
                 {
                     expression neutral_element= entity_to_expression(operator_neutral_element(
-                            call_function(expression_call(binary_call_rhs(statement_call(sfirst))))
-                            ));
+                                call_function(expression_call(binary_call_rhs(statement_call(sfirst))))
+                                ));
                     bool first=true;
                     FOREACH(EXPRESSION,e,args[index-1])
                     {
@@ -1320,16 +1306,10 @@ list make_simd_statements(list kinds, cons* first, cons* last)
 
             /* generate the statement information */
             pips_debug(3,"make_simd_statements : simd\n");
-            CDR(instr) = gen_statementInfo_cons( 
-                    make_simd_statement_info(type, oc, args),
-                    NIL);
-            instr = CDR(instr);
+            instr =  make_simd_statement_info(type, oc, args);
         }
     }
 
-    instr = CDR(all_instr);
-    CDR(all_instr) = NIL;
-    gen_free_list(all_instr);
     pips_debug(3,"make_simd_statements 3\n");
     return instr;
 }
@@ -1514,18 +1494,6 @@ statement generate_load_statement(simdStatementInfo si, int line)
                 args, padded);
     }
 }
-
-static bool statement_consecutive_load_p(statement s)
-{
-    if(simd_load_stat_p(s))
-    {
-        return
-            !same_stringn_p(SIMD_GEN_LOAD_NAME,entity_user_name(call_function(statement_call(s))),sizeof(SIMD_GEN_LOAD_NAME)-1)
-            ;
-    }
-    return false;
-}
-
 
 static statement generate_save_statement(simdStatementInfo si)
 {

@@ -2,3 +2,6 @@ PROGRAM TOTO
 PRINT *, 'hello'
 END
 
+"compile sources produced by pips"
+
+

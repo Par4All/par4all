@@ -427,6 +427,19 @@ bool basic_equal_strict_p(basic b1, basic b2)
     return TRUE;
   case is_basic_complex:
     return basic_complex(b1) == basic_complex(b2);
+  case is_basic_bit: {
+    symbolic s1 = basic_bit(b1);
+    symbolic s2 = basic_bit(b2);
+
+    /* FI: there are two definition of equality, one more strict via
+       the expression, and one more practical via the constant. But
+       the constant is not always defined. And the Newgen declaration
+       of symbolic looks wrong with "float:int"... */
+
+    expression e1 = symbolic_expression(s1);
+    expression e2 = symbolic_expression(s2);
+    return expression_equal_p(e1, e2);
+  }
   case is_basic_pointer:
     {
       type t1 = basic_pointer(b1);
@@ -457,7 +470,7 @@ bool basic_equal_strict_p(basic b1, basic b2)
     /* FI->BC (?): suffixes _p should be removed */
     return basic_typedef_p(b2)
       && same_entity_p(basic_typedef(b1),basic_typedef(b2));
-  default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
+  default: pips_internal_error("unexpected tag %d\n", basic_tag(b1));
   }
   return FALSE; /* just to avoid a warning */
 }

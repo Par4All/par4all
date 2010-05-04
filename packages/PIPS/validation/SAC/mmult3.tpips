@@ -1,7 +1,8 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete MMULT3
+setenv WS="mmult"
+delete $WS
 setenv PIPS_CPP_FLAGS="-DN=3"
-create MMULT3 mmult.c include/SIMD.c
+create $WS $WS.c include/SIMD.c
 
 echo
 echo Initial code
@@ -58,20 +59,20 @@ apply SIMD_LOOP_CONST_ELIM
 display PRINTED_FILE
 
 
-
 apply UNSPLIT
+shell sed -i -e '1,/Matrix_Mult/ d'  $WS.database/Src/$WS.c
 
-shell cc $PIPS_CPP_FLAGS mmult.c include/SIMD.c -o mmult0
-shell sed -i -e '1 i #include "SIMD.h"' -e 's/overloaded/float/g' MMULT3.database/Src/mmult.c
-shell cc -Iinclude MMULT3.database/Src/mmult.c include/SIMD.c -o mmult1
-shell sed -i -e '1 d' MMULT3.database/Src/mmult.c
-shell if test "`./mmult0`" = "`./mmult1`" ; then echo seq-ok ; else echo seq-ko ; fi
+shell cc $PIPS_CPP_FLAGS $WS.c include/SIMD.c -o $WS.database/Tmp/ref
+shell sed -i -e '1 i #include "SIMD.h"'  -e 's/overloaded/float/g' $WS.database/Src/$WS.c
+shell cc $PIPS_CPP_FLAGS -Iinclude $WS.database/Src/$WS.c include/SIMD.c -o $WS.database/Tmp/seq
+shell sed -i -e '1 d' $WS.database/Src/$WS.c
+shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
 
-shell ./compileC.sh MMULT3 mmult.c mmult-sse.c
-shell cc $PIPS_CPP_FLAGS -O3 -I. -march=native mmult-sse.c -o mmult2
-shell if test "`./mmult0`" = "`./mmult2`" ; then echo sse-ok ; else echo sse-ko ; fi
-shell rm -f mmult[012] mmult-sse.c
+shell ./compileC.sh $WS $WS.c $WS.database/Tmp/sse.c
+shell cc $PIPS_CPP_FLAGS -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
+shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi
 
 close
-delete MMULT
+delete $WS
 quit
+

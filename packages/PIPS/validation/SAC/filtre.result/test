@@ -29,7 +29,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1];
+   float RED0[1], RED1[4];
    for(i = 4-1; i <= 99; i += 1) {
 loop:      LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -75,7 +75,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1];
+   float RED0[1], RED1[4];
    for(i = 4-1; i <= 99; i += 1) {
 loop:      LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -121,7 +121,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
+   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -162,7 +162,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
+   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -198,11 +198,9 @@ void filtre(float x[100], float y[100], float h[4])
 void filtre(float x[100], float y[100], float h[4])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
+   float aligned[4] = {0, 0, 0, 0};
    {
       int i, k;
       //PIPS generated variable
@@ -210,7 +208,7 @@ void filtre(float x[100], float y[100], float h[4])
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
+      float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
       for(i = 3; i <= 99; i += 1) {
          LU_NUB0 = 4;
          LU_IB0 = 0;
@@ -238,11 +236,9 @@ void filtre(float x[100], float y[100], float h[4])
 void filtre(float x[100], float y[100], float h[4])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
+   float aligned[4] = {0, 0, 0, 0};
    {
       int i, k;
       //PIPS generated variable
@@ -250,7 +246,7 @@ void filtre(float x[100], float y[100], float h[4])
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
+      float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
       for(i = 3; i <= 99; i += 1) {
          LU_NUB0 = 4;
          LU_IB0 = 0;
@@ -278,15 +274,15 @@ void filtre(float x[100], float y[100], float h[4])
 void filtre(float x[100], float y[100], float h[4])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       int i, k;
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1];
+      float RED0[1], RED1[4];
       for(i = 3; i <= 99; i += 1) {
          LU_NUB0 = 4;
          LU_IB0 = 0;
@@ -317,15 +313,15 @@ simdized code
 void filtre(float x[100], float y[100], float h[4])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       int i, k;
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1];
+      float RED0[1], RED1[4];
       for(i = 3; i <= 99; i += 1) {
          LU_NUB0 = 4;
          LU_IB0 = 0;

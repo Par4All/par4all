@@ -154,7 +154,7 @@ int main()
       int second;
    } x, y[10], z[10];
 
-//  T() {}
+//  T(i) {}
 
    int i;
 

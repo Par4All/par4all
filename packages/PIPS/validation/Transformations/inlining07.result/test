@@ -15,10 +15,6 @@ int main(int argc, char **argv)
 
 Code after inlining
 
-extern int printf(const char *format, ...);
-static int pmax(int a, int b);
-
-extern int main(int argc, char **argv);
 int main(int argc, char **argv)
 {
    //PIPS generated variable

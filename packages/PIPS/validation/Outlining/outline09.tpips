@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete outlining02
-create outlining02 outlining02.c
+setenv WS="outline09"
+delete $WS
+create $WS $WS.c
 
 
 echo
@@ -25,12 +26,11 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc outlining02.c -o outlining
-shell gcc outlining02.database/Src/outlining02.c -o outlining02.database/Src/outlining
-shell if test `outlining02.database/Src/outlining` = `outlining`; then echo "ok"; else echo "ko" ; fi
-shell rm -rf outlining02.database/Src/outlining outlining
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/new
+shell if test `$WS.database/Tmp/ref` = `$WS.database/Tmp/new`; then echo "ok"; else echo "ko" ; fi
 
 close
-delete outlining02
+delete $WS
 quit
 

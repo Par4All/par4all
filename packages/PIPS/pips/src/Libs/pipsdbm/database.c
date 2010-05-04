@@ -67,7 +67,7 @@ extern bool compilation_unit_p(string); /* alas in c_syntax.h */
   ( "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
     "0123456789" \
     "abcdefghijklmnopqrstuvwxyz" \
-    FILE_SEP_STRING MODULE_SEP_STRING "_#-." )
+    FILE_SEP_STRING MODULE_SEP_STRING "|_#-." )
 
 static bool simple_name_p(const char* name)
 {

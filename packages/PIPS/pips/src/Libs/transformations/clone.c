@@ -109,7 +109,7 @@ static entity build_a_clone_for(entity cloned,
   statement stat;
   bool saved_b1, saved_b2;
   text t;
-  language l = code_language(value_code(entity_initial(cloned)));
+  language l = module_language(cloned);
 
   pips_debug(2, "building a version of %s with arg %d val=%d\n",
 	     name, argn, val);
@@ -702,7 +702,7 @@ clone_substitute(string name)
  * and get_current_statement()
  * to build a new copy entity
  */
-entity
+static entity
 clone_current_entity()
 {
     return build_a_clone_for(get_current_module_entity(), 0,0);

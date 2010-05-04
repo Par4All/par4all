@@ -73,7 +73,7 @@ Transformers for convold1
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
 
-//  T() {}
+//  T(m,res) {}
 
    int m, res;
 
@@ -110,14 +110,14 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 
    int m, res;
 
-//  P() {}
+//  P(m,res) {}
 
    
    /* for  (m = 0; m<= 5; m++) */
    
    res = 0;
 
-//  P(res) {res==0}
+//  P(m,res) {res==0}
 
    for(m = 0; m <= 5; m += 1)
 

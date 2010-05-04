@@ -2,7 +2,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete if_conversion03
 create if_conversion03 if_conversion03.c
 
-make PRINTED_FILE[%ALL]
+make PRINTED_FILE[%ALLFUNC]
 module foo
 display PRINTED_FILE
 apply IF_CONVERSION_INIT

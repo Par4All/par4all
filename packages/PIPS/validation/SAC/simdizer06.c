@@ -4,7 +4,6 @@ main()
     float b[4]={3,2,1,0};
     int i;
 
-    for(i=0;i<1;i++)
     {
         /* this should be a first pack */
         a[0]=b[0]+a[0];

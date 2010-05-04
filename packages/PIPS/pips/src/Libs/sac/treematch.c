@@ -274,7 +274,7 @@ void insert_opcodeClass(char * s, int nbArgs, list opcodes)
     make_opcodeClass(s, nbArgs, opcodes);
 }
 
-opcodeClass get_opcodeClass(char * s)
+static opcodeClass get_opcodeClass(char * s)
 {
     return gen_find_opcodeClass(s);
 }

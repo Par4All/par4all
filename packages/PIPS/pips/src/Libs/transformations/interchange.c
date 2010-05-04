@@ -61,7 +61,7 @@ extern int set_interchange_parameters();
  *        ...
  *  ENDDO
  */
-statement
+static statement
 gener_DOSEQ(
     list lls,
     Pvecteur *pvg,

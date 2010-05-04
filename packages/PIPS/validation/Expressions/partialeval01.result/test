@@ -12,7 +12,7 @@ int bar(int i, int j)
 }
 int foo(int i, int j)
 {
-   return (i+1)*5+j;
+   return 5*i+j+5;
 }
 int bar(int i, int j)
 {

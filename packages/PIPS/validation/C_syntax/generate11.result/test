@@ -29,7 +29,7 @@ void generate11()
 
    int i, j;
 
-//  P() {}
+//  P(i,j) {}
 
 
    func(i, &j);

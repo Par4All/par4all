@@ -39,21 +39,21 @@ int main()
 
    int i, j, k, l;
 
-//  P() {}
+//  P(i,j,k,l) {}
 
    i = 015;
 
-//  P(i) {i==13}
+//  P(i,j,k,l) {i==13}
 
    // octal constant
    j = 0x1ae;
 
-//  P(i,j) {i==13, j==430}
+//  P(i,j,k,l) {i==13, j==430}
 
    // hexadecimal 
    k = 890L;
 
-//  P(i,j,k) {i==13, j==430, k==890}
+//  P(i,j,k,l) {i==13, j==430, k==890}
 
    // long constant
    l = i+j+k;

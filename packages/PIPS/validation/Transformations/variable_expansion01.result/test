@@ -26,7 +26,7 @@ Code after variable_expansion
 
 int foo(int c[10])
 {
-   int i, k[9+1];
+   int i, k[10];
    for(i = 0; i <= 9; i += 1) {
       k[i] = c[i];
       k[i] = k[i]+1;

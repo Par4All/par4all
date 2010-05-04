@@ -68,7 +68,7 @@ static void blind_loop_distribute(instruction l)
 /* distribute any loop in module mod_name.
    implemented top-down. could be done bottom-up.
  */
-bool blind_loop_distribution(char * mod_name)  
+static bool blind_loop_distribution(char * mod_name)  
 {
   /* get code from dbm. */
   statement mod_stmt = (statement) 

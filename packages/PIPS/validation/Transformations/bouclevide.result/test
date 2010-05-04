@@ -16,13 +16,14 @@ C      parameter (NC=100)
             GAMAI(I) = W(I)+G(I,J)                                      0017
          ENDDO
 99996    CONTINUE
+99995    CONTINUE
 320      CONTINUE                                                       0020
          GOTO 99998
 99999    CONTINUE
          IF (NC.LT.JC.AND.NC.GT.10) GOTO 99997                          0013
          GOTO 99996
 99997    CONTINUE
-         GOTO 320
+         GOTO 99995
 99998    CONTINUE
 
       END

@@ -3,3 +3,6 @@ INTEGER A, B
 ADD2 = A+B
 return
 END
+
+"compile sources produced by pips"
+

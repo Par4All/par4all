@@ -1,6 +1,7 @@
 #!/bin/sh
 
 Delete $WSPACE
+NAME=`echo $WSPACE | tr '[a-z]' '[A-Z]'`
 # ??? bad idea for // valid
 echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" > properties.rc
 if Pips -f $FILE -w $WSPACE -m $NAME \

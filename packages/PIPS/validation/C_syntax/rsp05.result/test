@@ -111,7 +111,7 @@ int main()
 
    int X[13][13], Y[8][8], H[8][13], K[8][8];
 
-//  T() {}
+//  T(i,j) {}
 
    int OUT[8][8], COEFF[6], i, j;
 
@@ -199,12 +199,12 @@ int main()
 
    int OUT[8][8], COEFF[6], i, j;
 
-//  P() {}
+//  P(i,j) {}
 
 
    init_coeff(COEFF);
 
-//  P() {}
+//  P(i,j) {}
 
 
    for(i = 0; i <= 12; i += 1)

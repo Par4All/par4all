@@ -473,9 +473,15 @@ bool logical_expression_p(expression e)
 
 
 /* This function returns:
- *                        1 , if e is a relational expression that is always TRUE
- *                       -1 , if e is a relational expression that is always FALSE
- *                        0 , otherwise */
+ *
+ *  1, if e is a relational expression that is always TRUE
+ *
+ * -1, if e is a relational expression that is always FALSE
+ *
+ *  0, otherwise.
+ *
+ * It should be called trivial_condition_p().
+ */
 
 int trivial_expression_p(expression e)
 {
@@ -1763,7 +1769,7 @@ bool call_constant_p(call c)
  */
 bool expression_equal_integer_p(expression exp, int i)
 {
-  debug( 7, "expression_equal_integer", "doing\n");
+  pips_debug(7, "doing\n");
   if(expression_constant_p(exp))
     return(expression_to_int(exp) == i);
   return(FALSE);

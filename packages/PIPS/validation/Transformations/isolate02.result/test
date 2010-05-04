@@ -1,6 +1,4 @@
 original code
-extern void lonesome_cowboy();
-extern int main();
 void lonesome_cowboy()
 {
    int i, a[12];
@@ -26,7 +24,7 @@ void lonesome_cowboy()
       a[i] = 1;
    {
       //PIPS generated variable
-      int a0[9+1];
+      int a0[10];
       ;
 
 isolate:

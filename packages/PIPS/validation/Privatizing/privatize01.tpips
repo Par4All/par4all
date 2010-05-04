@@ -5,6 +5,7 @@ setenv FILE=privatize01.c
 delete $WSPACE
 create $WSPACE $FILE
 setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
 
 display PRINTED_FILE[%ALL]
 

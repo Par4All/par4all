@@ -62,7 +62,7 @@ void update04()
 
    int i = 1;
 
-//  T(j,k) {}
+//  T(j,k) {i==1}
 
    int j, k;
 

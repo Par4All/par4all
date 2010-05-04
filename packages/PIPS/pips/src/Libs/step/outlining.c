@@ -66,7 +66,7 @@ entity outlining_start(string new_module_name)
   for( i = 0; new_module_name[ i ]; i++)
     new_module_name[ i ] = toupper( new_module_name[ i ] );
 
-  outlined_module = make_empty_subroutine(new_module_name);
+  outlined_module = make_empty_subroutine(new_module_name,copy_language(module_language(get_current_module_entity())));
 
   if (entity_undefined_p(outlined_module)) return FALSE;
 

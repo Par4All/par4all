@@ -35,11 +35,11 @@ void generate01()
 
    int i = 0;
 
-//  P() {i==0}
+//  P(i) {i==0}
 
    double x = 1.;
 
-//  P() {i==0}
+//  P(i) {i==0}
 
    
    // use an undeclared function without source code, which returns

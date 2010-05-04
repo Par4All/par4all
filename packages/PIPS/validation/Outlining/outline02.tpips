@@ -13,10 +13,10 @@ setproperty OUTLINE_MODULE_NAME "init_kernel"
 apply OUTLINE[main]
 
 echo All the kernel parameters should be passed correctly
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 apply PRIVATIZE_MODULE[%ALLFUNC]
 apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 close
 delete outline02

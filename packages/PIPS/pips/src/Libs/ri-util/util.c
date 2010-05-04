@@ -100,6 +100,9 @@ string global_name_to_user_name(string global_name)
       pips_debug(8, "name = %s \n", s);
       user_name = s;
     }
+    /* Then F95module seperator */
+    else if (strstr(global_name,F95MODULE_PREFIX) != NULL)
+      user_name = strstr(global_name,F95MODULE_PREFIX) + 1;
 
     /* Then block seperators */
     else if (strstr(global_name,BLOCK_SEP_STRING) != NULL)
@@ -108,6 +111,7 @@ string global_name_to_user_name(string global_name)
     /* Then module seperator */
     else if (strstr(global_name,MODULE_SEP_STRING) != NULL)
       user_name = strstr(global_name,MODULE_SEP_STRING) + 1;
+
 
     /* Then file seperator */
     else if (strstr(global_name,FILE_SEP_STRING) != NULL)

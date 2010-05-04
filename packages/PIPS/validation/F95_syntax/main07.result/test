@@ -15,3 +15,7 @@ B = 20
 C = ADD1(A, B)
 C = ADD2(A, B)
 END
+
+"compile sources produced by pips"
+
+

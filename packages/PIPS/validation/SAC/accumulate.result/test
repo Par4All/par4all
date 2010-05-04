@@ -72,7 +72,7 @@ short accumulate(size_t n, short a[n], short seed)
    //PIPS generated variable
    size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   short RED0[0+1], RED1[7+1];
+   short RED0[1], RED1[8];
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
@@ -115,7 +115,7 @@ short accumulate(size_t n, short a[n], short seed)
    //PIPS generated variable
    size_t LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   short RED0[0+1], RED1[7+1], seed0;
+   short RED0[1], RED1[8], seed0;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 8);
    RED0[0] = 0;
@@ -155,13 +155,13 @@ short accumulate(size_t n, short a[n], short seed)
 short accumulate(size_t n, short a[n], short seed)
 {
    //PIPS:SAC generated short vector(s)
-   short v8hi_vec0[7+1], v8hi_vec1[7+1], v8hi_vec2[7+1], v8hi_vec3[7+1];
+   short v8hi_vec0[8], v8hi_vec1[8];
    {
       size_t i;
       //PIPS generated variable
       size_t LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      short RED0[0+1], RED1[7+1], seed0;
+      short RED0[1], RED1[8], seed0;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 8);
       RED0[0] = 0;
@@ -190,13 +190,13 @@ short accumulate(size_t n, short a[n], short seed)
 short accumulate(size_t n, short a[n], short seed)
 {
    //PIPS:SAC generated short vector(s)
-   short v8hi_vec0[7+1], v8hi_vec1[7+1], v8hi_vec2[7+1], v8hi_vec3[7+1];
+   short v8hi_vec0[8], v8hi_vec1[8];
    {
       size_t i;
       //PIPS generated variable
       size_t LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      short RED0[0+1], RED1[7+1], seed0;
+      short RED0[1], RED1[8], seed0;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 8);
       RED0[0] = 0;
@@ -225,13 +225,13 @@ short accumulate(size_t n, short a[n], short seed)
 short accumulate(size_t n, short a[n], short seed)
 {
    //PIPS:SAC generated short vector(s)
-   short v8hi_vec0[7+1], v8hi_vec1[7+1];
+   short v8hi_vec0[8], v8hi_vec1[8];
    {
       size_t i;
       //PIPS generated variable
       size_t LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      short RED0[0+1], RED1[7+1], seed0;
+      short RED0[1], RED1[8], seed0;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 8);
       RED0[0] = 0;
@@ -263,13 +263,13 @@ simdized code
 short accumulate(size_t n, short a[n], short seed)
 {
    //PIPS:SAC generated short vector(s)
-   short v8hi_vec0[7+1], v8hi_vec1[7+1];
+   short v8hi_vec0[8], v8hi_vec1[8];
    {
       size_t i;
       //PIPS generated variable
       size_t LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      short RED0[0+1], RED1[7+1], seed0;
+      short RED0[1], RED1[8], seed0;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 8);
       RED0[0] = 0;

@@ -23,7 +23,7 @@ setproperty OUTLINE_MODULE_NAME "init_kernel"
 apply OUTLINE[main]
 
 apply CLEAN_DECLARATIONS[%ALLFUNC]
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 apply LOCALIZE_DECLARATION[%ALLFUNC]
 display PRINTED_FILE[init_kernel]
@@ -32,7 +32,7 @@ apply CLEAN_DECLARATIONS[%ALLFUNC]
 display PRINTED_FILE[init_kernel]
 
 apply COARSE_GRAIN_PARALLELIZATION[init_kernel]
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 close
 quit

@@ -21,11 +21,13 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include <stdlib.h>
+
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
 
-#include "local.h" 
+#include "local.h"
 
 extern bool 
 ignore_this_conflict(vertex v1, vertex v2, conflict c, int l);
@@ -88,7 +90,71 @@ static string dependence_graph_banner[8] = {
 	"\n ********* Dependence Graph (ill. option combination) *******\n",
 	"\n **** Loop Carried Dependence Graph with Dependence Cones ***\n"
     };
-
+
+/**
+ * @brief This is a callback for qsort function, it compares two conflicts
+ * @return 0 if conflicts are equals, -1 if first is lower, 1 if second is lower
+ */
+int conflicts_sort_callback( conflict *c1, conflict *c2 ) {
+  int r_value = 0;
+  effect e1_sink = conflict_sink((*c1));
+  effect e2_sink = conflict_sink((*c2));
+  action a1_sink = effect_action(e1_sink);
+  action a2_sink = effect_action(e2_sink);
+  effect e1_source = conflict_source((*c1));
+  effect e2_source = conflict_source((*c2));
+  action a1_source = effect_action(e1_source);
+  action a2_source = effect_action(e2_source);
+
+  string s1;
+  if ( action_read_p(a1_source) && action_read_p(a1_sink) ) {
+    s1 = "RR";
+  } else if ( action_read_p(a1_source) && action_write_p(a1_sink) ) {
+    s1 = "RW";
+  } else if ( action_write_p(a1_source) && action_read_p(a1_sink) ) {
+    s1 = "WR";
+  } else {
+    s1 = "WW";
+  }
+  string s2;
+  if ( action_read_p(a2_source) && action_read_p(a2_sink) ) {
+    s2 = "RR";
+  } else if ( action_read_p(a2_source) && action_write_p(a2_sink) ) {
+    s2 = "RW";
+  } else if ( action_write_p(a2_source) && action_read_p(a2_sink) ) {
+    s2 = "WR";
+  } else {
+    s2 = "WW";
+  }
+
+  // Compare Action in lexical order
+  r_value = strcmp( s1, s2 );
+
+  if ( r_value == 0 ) {
+    // Compare string representing source reference
+    reference r1_source = effect_any_reference(e1_source);
+    string s1 = words_to_string( effect_words_reference( r1_source ) );
+    reference r2_source = effect_any_reference(e2_source);
+    string s2 = words_to_string( effect_words_reference( r2_source ) );
+    r_value = strcmp( s1, s2 );
+    free( s1 );
+    free( s2 );
+  }
+  if ( r_value == 0 ) {
+    // Compare string representing sink reference
+    reference r1_sink = effect_any_reference(e1_sink);
+    string s1 = words_to_string( effect_words_reference( r1_sink ) );
+    reference r2_sink = effect_any_reference(e2_sink);
+    string s2 = words_to_string( effect_words_reference( r2_sink ) );
+    r_value = strcmp( s1, s2 );
+    free( s1 );
+    free( s2 );
+  }
+
+  return r_value;
+}
+
+
 /* Print all edges and arcs */
 void prettyprint_dependence_graph( FILE * fd,
                                    statement mod_stat,
@@ -144,6 +210,30 @@ void prettyprint_dependence_graph( FILE * fd,
         fprintf( fd, " %02td with conflicts\n", statement_number(s2) );
       }
 
+      /*
+       * If we have more than one conflict, let's sort them !
+       */
+      int nb_conflicts = gen_length(dg_arc_label_conflicts(dal));
+      if ( nb_conflicts > 1 ) {
+        /*
+         * Convert the list to an array for sorting
+         * 20 is the initial size, should be enough for most of the case
+         */
+        gen_array_t conflicts_array = gen_array_make( 20 );
+        list_to_array( dg_arc_label_conflicts(dal), conflicts_array );
+        qsort( gen_array_pointer( conflicts_array ),
+               gen_array_nitems( conflicts_array ),
+               sizeof(void *),
+               (gen_cmp_func_t) conflicts_sort_callback);
+        list conflicts_list = NIL;
+        GEN_ARRAY_MAP(s, conflicts_list = CONS(CONFLICT, s, conflicts_list), conflicts_array);
+        gen_array_free(conflicts_array);
+        dg_arc_label_conflicts(dal)=conflicts_list;
+      }
+
+      /*
+       * Loop over conflict and print them
+       */
       for ( pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc) ) {
         conflict c = CONFLICT(CAR(pc));
 
@@ -322,7 +412,7 @@ static void prettyprint_dot_label( FILE *fd, statement s, bool print_statement )
   if( ! print_statement ) {
     // Print only ordering
     long int o = statement_ordering(s);
-    fprintf( fd, "(%d,%d)", ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
+    fprintf( fd, "(%ld,%ld)", ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
   } else {
     // Print the code
 

@@ -101,7 +101,7 @@ static void translate_unary_into_binary_ref(statement stat)
 entity 
 MakeEntityFunction(string sname)
 {
-    entity f = make_empty_function(sname, MakeIntegerResult());
+    entity f = make_empty_function(sname, MakeIntegerResult(), make_language_unknown());
     return f;
 }
 
@@ -245,7 +245,7 @@ statement * pemulator;
     /*       Generate two new modules, compute module and memory module
      */
     compute_module_name = strdup(COMPUTE_ENGINE_NAME);
-    compute_module = make_empty_subroutine(compute_module_name);
+    compute_module = make_empty_subroutine(compute_module_name,copy_language(module_language(module)));
 
     functional_parameters(type_functional(entity_type(compute_module)))
 	= CONS(PARAMETER, make_parameter(MakeTypeVariable(make_basic_int(4), NIL),
@@ -254,7 +254,7 @@ statement * pemulator;
 	       NIL);
 
     memory_module_name = strdup(BANK_NAME);
-    memory_module = make_empty_subroutine(memory_module_name);
+    memory_module = make_empty_subroutine(memory_module_name,copy_language(module_language(module)));
 
     functional_parameters(type_functional(entity_type(memory_module)))
 	= CONS(PARAMETER, 

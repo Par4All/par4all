@@ -1,3 +1,6 @@
 PROGRAM MAIN
 PRINT *, 'hello world'
 END
+
+"compile sources produced by pips"
+

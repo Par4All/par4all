@@ -25,31 +25,31 @@ int main()
 
    int i = 2;
 
-//  P() {i==2}
+//  P(i) {i==2}
 
    int j;
 
-//  P() {i==2}
+//  P(i,j) {i==2}
 
    int k = 3;
 
-//  P() {i==2, k==3}
+//  P(i,j,k) {i==2, k==3}
 
    i+++j-j;
 
-//  P(i) {k==3}
+//  P(i,j,k) {k==3}
 
    i+++j-j;
 
-//  P(i) {k==3}
+//  P(i,j,k) {k==3}
 
    i+++k-k;
 
-//  P(i) {k==3}
+//  P(i,j,k) {k==3}
 
    i+++k-k;
 
-//  P(i) {k==3}
+//  P(i,j,k) {k==3}
 
    return i;
 }

@@ -32,6 +32,8 @@ setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 
 
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 module getimage
 
 echo
@@ -40,6 +42,7 @@ echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE
+activate PRINT_CODE
 
 echo
 echo Preconditions for "getimage" before privatization
@@ -65,6 +68,7 @@ echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE
+activate PRINT_CODE
 
 echo
 echo Preconditions for "getimage" after privatization
@@ -72,6 +76,7 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE
+activate PRINT_CODE
 
 
 setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES FALSE

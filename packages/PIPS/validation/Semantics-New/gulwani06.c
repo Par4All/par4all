@@ -30,5 +30,5 @@ int main()
 
 
   if (lock ==1) printf("property  verified\n");
- 
+
 }

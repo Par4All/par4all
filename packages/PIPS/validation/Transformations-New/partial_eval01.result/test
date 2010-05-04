@@ -20,7 +20,7 @@ int foo(int i)
 
    int j;
 
-//  P() {}
+//  P(j) {}
 
    j = i-i;
 

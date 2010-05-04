@@ -15,6 +15,57 @@
 #include "transformations.h"
 #include "effects-generic.h"
 
+#if 0
+static void remove_guard(test t)
+{
+    statement s = (statement)gen_get_ancestor(statement_domain,t);
+    list regions = load_cumulated_rw_effects_list(s);
+
+    list read_regions = regions_read_regions(regions);
+    list write_regions = regions_write_regions(regions);
+    transformer tr = transformer_range(load_statement_precondition(s));
+    /* skip read regions ... should be in a property */
+    FOREACH(REGION,reg,write_regions)
+    {
+        reference r = region_any_reference(reg);
+        entity e = reference_variable(r);
+        /* so e is written by s, does the write exactly match
+         * the dimension of e or not ?
+         */
+        list 
+        if(region_to_minimal_dimensions(reg,tr
+    }
+}
+
+bool remove_guards(const char *module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
+    module_to_value_mappings(get_current_module_entity());
+    set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
+
+    /* main */
+    gen_recurse(get_current_module_statement(),
+            test_domain,gen_true,remove_guard);
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /* postlude */
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+    reset_precondition_map();
+    free_value_mappings();
+
+    return true;
+
+}
+#endif
+
 /** 
  * create a guard @a guard around statement @a s
  * 
