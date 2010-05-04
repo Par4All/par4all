@@ -1,5 +1,7 @@
 # $Id$
 # the default validation includes the following subdirectories
+Benchmarks
+SAC
 Syntax
 Control
 Preprocessor
@@ -18,7 +20,6 @@ Chains
 Rice
 Ricedg
 CoarseGrainParallelization
-SAC
 PHRASE
 Callgraph
 # Transformations, using PIPS initial default options
@@ -45,7 +46,6 @@ Terapix
 Tpips
 TutorialPPoPP2010
 Scalopes
-Benchmarks
 Expressions
 Pyps
 Properties
