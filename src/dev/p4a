@@ -84,15 +84,15 @@ def process(project, openmp, accel, cuda, compile, fine, files):
 	#	(project, ext) = os.path.splitext(os.path.basename(files[0]))
 	if accel:
 		files.append(os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c"))
-	if cuda:
-		print "TODO"
-		sys.exit(1)
+#	if cuda:
+#		print "TODO"
+#		sys.exit(1)
 	try:
 		w = workspace(
 			files,
 			name = project,
 			activates = [],
-			verboseon = True
+			verboseon = False
 		)
 		w.set_property(
 			PRETTYPRINT_C_CODE = True,
@@ -130,10 +130,10 @@ def process(project, openmp, accel, cuda, compile, fine, files):
 			#kernels.display()
 			# Add communication around all the call site of the kernels:
 			kernel_launchers.kernel_load_store()
-			kernel_launchers.display()
+			#kernel_launchers.display()
 
 			kernel_launchers.gpu_loop_nest_annotate()
-			kernel_launchers.display()
+			#kernel_launchers.display()
 
 			# Inline back the kernel into the wrapper, since CUDA can only deal with
 			# local functions if they are in the same file as the caller (by inlining
@@ -145,7 +145,7 @@ def process(project, openmp, accel, cuda, compile, fine, files):
 			# Display the wrappers to see the work done:
 			kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
 			kernel_wrappers = w.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
-			kernel_wrappers.display()
+			#kernel_wrappers.display()
 
 			# Instead, do a global loop normalization above:
 			#kernels.loop_normalize()
