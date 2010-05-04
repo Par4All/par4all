@@ -45,3 +45,19 @@ Scalopes
 Benchmarks
 Expressions
 Pyps
+Properties
+# should be added?
+# AliasChecking
+# ArrayBoundCheck
+# ArrayResizing
+# Blas
+# Crough
+# Demo-2009
+# Flint
+# Gpu
+# Pointers
+# SC95
+# Tpips
+# RegionTranslation
+# UseBeforeSet
+# Wp65
