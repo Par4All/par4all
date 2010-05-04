@@ -25,26 +25,26 @@ my %dir = ();
 
 while (<>)
 {
-  if (/^failed: (\w+)/) {
+  if (/^failed: ([-\w]+)/) {
     $failed++;
     $failed{$1}++;
     $dir{$1} = 1;
   }
-  elsif (/^changed: (\w+)/) {
+  elsif (/^changed: ([-\w]+)/) {
     $changed++;
     $changed{$1}++;
     $dir{$1} = 1;
   }
-  elsif (/^passed: (\w+)/) {
+  elsif (/^passed: ([-\w]+)/) {
     $passed++;
     $passed{$1}++;
     $dir{$1} = 1;
   }
-  elsif (/^broken-directory: (\w+)/) {
+  elsif (/^broken-directory: ([-\w]+)/) {
     $broken++;
     #$broken{$1}++;
   }
-  elsif (/^(skipped|missing|multi-script|multi-source): (\w+)/)
+  elsif (/^(skipped|missing|multi-script|multi-source): ([-\w]+)/)
   {
     if ($1 eq 'skipped') {
       $skipped++;
