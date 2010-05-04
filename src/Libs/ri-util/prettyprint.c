@@ -1371,9 +1371,11 @@ words_stat_io_inst(call obj,
       }
     } else { /* It's not a call */
       pc = gen_nconc( pc, words_expression( expr, pdl ) );
-      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     }
     pio_write = CDR(pio_write);
+    if(pio_write) {
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
+    }
   }
 
   pc = CHAIN_SWORD(pc, ") ");
