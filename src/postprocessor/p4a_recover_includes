@@ -549,9 +549,11 @@ def postpreprocess(output_string):
     # For later use of the lexer, if any, throw away useless characters:
     l.lexer.content = ""
 
+
 #/usr/include/
 parse_line_pragma_re = re.compile(r'\# (\d+) "([^"]+)" (\d) ?(\d)? ?(\d)?\n')
 include_stack = []
+
 def postpreprocess_simple(output_string):
     "Add a comment on all the begin of standard include files"
     # Build the lexer:
@@ -563,22 +565,25 @@ def postpreprocess_simple(output_string):
     # Tokenize:
     for tok in l.lexer:
         if verbose:
-            print(tok)
+            print(tok, include_stack)
+        #print(tok, include_stack)
         if tok.type == 'std_include':
             #print(tok.value, end = '')
             m = parse_line_pragma_re.match(tok.value)
             if m:
                 file_name = m.group(2)
-                print(file_name,m.group(3),m.group(4),m.group(5))
+                #print(file_name,m.group(3),m.group(4),m.group(5))
                 if m.group(3) == "1":
                     include_stack.append(file_name)
                     if verbose:
                         print('Including', file_name, len(include_stack))
                     #print(include_stack)
                 if m.group(3) == "2":
+                    returning_from = include_stack.pop()
                     if verbose:
-                        print('Returning from', include_stack.pop(), len(include_stack))
-                    pass
+                        print('Returning from',
+                              returning_from,
+                              len(include_stack))
         elif include_stack:
             # We are in an inclusion, so decorate only full statements:
             if tok.type == 'comment':
@@ -590,17 +595,16 @@ def postpreprocess_simple(output_string):
                 if tok.type == 'SEMICOLON' and l.lexer.level == 0:
                     # The end of a construction, output a comment,
                     # followed by the construction
-                    print('/* P4A include tracking:', include_stack[0], '*/')
+                    print('\n/* P4A include tracking:', include_stack[0], '*/')
                     # Remove leading \n:
                     content = re.sub('^\s+', '', l.lexer.content)
-                    print(content)
+                    print(content, end = '')
                     l.lexer.content = ""
         else:
             # No special processing:
             # Keep the content and print it:
             l.lexer.content += tok.value
-            #print(l.lexer.content, end = '')
-            print(l.lexer.content)
+            print(l.lexer.content, end = '')
             # Reset the content buffer:
             l.lexer.content = ""
 
@@ -648,7 +652,10 @@ def recover_header_simple(file_name, output_file_name):
                 found_headers.add(header)
             else:
                 # Normal comment
-                print(tok.value, end = '')
+                l.lexer.content += tok.value
+                print(l.lexer.content, end = '')
+                # Reset the content buffer:
+                l.lexer.content = ""
         elif header:
             # We are skipping up to the end of the statement since it will
             # be replaced later by a #include:
@@ -662,7 +669,14 @@ def recover_header_simple(file_name, output_file_name):
                 pass
         else:
             # Normal content & output:
-            print(tok.value, end = '')
+            l.lexer.content += tok.value
+            print(l.lexer.content, end = '')
+            # Reset the content buffer:
+            l.lexer.content = ""
+    # Flush the output
+    print(l.lexer.content, end = '')
+    # For later use of the lexer, if any, throw away useless characters:
+    l.lexer.content = ""
 
 
 def postpreprocess(output_string):
