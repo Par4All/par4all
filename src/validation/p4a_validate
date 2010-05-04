@@ -102,6 +102,7 @@ class ValidationElement:
     CHANGED = 'changed'
     FAILED = 'failed'
     SKIPPED = 'skipped'
+    SUCCESS = 'success'
 
     # To deal with diff validation output:
     OLD_DIFF = "OLD"
@@ -127,6 +128,19 @@ class ValidationElement:
 
     def __str__(self):
         return str(self.attribute) + ': ' + str(self.name)
+
+
+    def verify_status(status):
+        "Verify it is a valid status"
+
+        if status == ValidationElement.CHANGED \
+           or status == ValidationElement.FAILED \
+           or status == ValidationElement.SKIPPED \
+           or status == ValidationElement.SUCCESS:
+            pass
+        else:
+            print('Status', status, 'not allowed.', file = sys.stderr)
+            sys.exit(1)
 
 
 class ValidationClass:
@@ -376,36 +390,44 @@ class ValidationClass:
         subprocess.call(["git", "commit", "-m", message])
 
 
+    def generic_filter(self, elemental_filter):
+        """Filter the current validation class by keeping elements where
+        the elemental_filter is true.
+
+        elemental_filter is given (element, status)
+        """
+
+        self.elements = dict(filter(elemental_filter, self.elements.items()))
+
+
     def filter_status(self, status):
         "Only keep elements that match the given status"
 
+        ValidationElement.verify_status(status)
         # Only keep elements with the correct status:
-        self.elements = dict(filter(lambda e : e[1] == status,
-                                    self.elements.items()))
+        self.generic_filter(lambda e : e[1] == status)
+
+
+    def filter_out_status(self, status):
+        "Remove elements that match the given status"
+
+        ValidationElement.verify_status(status)
+        # Only keep elements with the correct status:
+        self.generic_filter(lambda e : e[1] != status)
 
 
     def re_filter(self, res):
         "Only keep the validation elements matching this regex string"
 
         regex = re.compile(res)
-        to_keep = set()
-        for e in self.elements:
-            if regex.match(e):
-                # Remove an element with a matching name:
-                to_keep.add(e)
-        self.elements = to_keep
+        self.generic_filter(lambda e : regex.search(e[0]))
 
 
     def re_filter_out(self, res):
         "Remove the validation elements matching this regex string"
 
         regex = re.compile(res)
-        to_remove = set()
-        for e in self.elements:
-            if regex.match(e):
-                # Remove an element with a matching name:
-                to_remove.add(e)
-        self.elements -= to_remove
+        self.generic_filter(lambda e : not regex.search(e[0]))
 
 
 def main():
@@ -430,17 +452,13 @@ def main():
                       help = "Add to a validation class the items from the new differences found in a validation diff output file",
                       metavar="FILE")
 
-    parser.add_option("--keep-changed", dest="keep_status",
-                      action = "store_const", const = ValidationElement.CHANGED,
-                      help = 'Filter the current validation class by keeping the "changed" elements only')
+    parser.add_option("--keep-status", dest="keep_status",
+                      metavar='changed|failed|skipped|success',
+                      help = 'Filter the current validation class by keeping only the elements with the expected status')
 
-    parser.add_option("--keep-failed", dest="keep_status",
-                      action = "store_const", const = ValidationElement.FAILED,
-                      help = 'Filter the current validation class by keeping the "failed" elements only')
-
-    parser.add_option("--keep-skipped", dest="keep_status",
-                      action = "store_const", const = ValidationElement.SKIPPED,
-                      help = 'Filter the current validation class by keeping the "skipped" elements only')
+    parser.add_option("--remove-status", dest="remove_status",
+                      metavar='changed|failed|skipped|success',
+                      help = 'Filter the current validation class by removing the elements with the given status')
 
     parser.add_option("-f",  "--filter", dest="filter",
                       help = "Filter the current class by keeping all the validation items with a name matching a regular expression",
@@ -464,7 +482,7 @@ def main():
 
     parser.add_option("-a",  "--accept",
                       action = "store_true", dest = "accept", default = False,
-                      help = "Accept for the current validation class")
+                      help = "Accept for the current validation class and add them with git")
 
     parser.add_option("-c",  "--commit", dest="message",
                       help = "Commit in git the accepted modifications with the given message",
@@ -511,6 +529,10 @@ def main():
         # Only keep validation items that have a given status:
         vc.filter_status(options.keep_status)
 
+    if options.remove_status:
+        # Remove validation items that have a given status:
+        vc.filter_out_status(options.remove_status)
+
     if options.filter:
         # Only keep validation items that match a regular expression:
         vc.re_filter(options.filter)
@@ -535,11 +557,12 @@ def main():
     if options.accept:
         # Accept the validation class elements:
         vc.accept()
+        # Add them as changed to git:
+        vc.git_add()
 
     if options.message:
         # Commit with git and a given message the state of the validation
         # class elements:
-        vc.git_add()
         vc.git_commit(options.message)
 
 
