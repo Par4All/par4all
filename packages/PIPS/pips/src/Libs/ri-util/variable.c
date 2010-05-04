@@ -47,8 +47,9 @@
 #include "parser_private.h"
 #include "syntax.h"
 #include "resources.h"
-bool
-variable_entity_p(entity e)
+
+/* See also macro entity_variable_p()... */
+bool variable_entity_p(entity e)
 {
   bool variable =
     (entity_storage(e)!=storage_undefined) &&
@@ -1523,6 +1524,15 @@ expression variable_initial_expression(entity v)
   }
   else if(value_unknown_p(val)) {
     exp = expression_undefined;
+  }
+  else if(value_intrinsic_p(val)) {
+    exp = expression_undefined;
+  }
+  else if(value_symbolic_p(val)) {
+    symbolic s = value_symbolic(val);
+    /* FI: not sure this is used in C; also, the constant field could be
+       used as well. */
+    exp = copy_expression(symbolic_expression(s));
   }
   else {
     pips_internal_error("Unexpected value tag %d.\n", value_tag(val));

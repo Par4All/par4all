@@ -109,7 +109,7 @@ GENERIC_LOCAL_FUNCTION(control_father, persistant_statement_to_control)
 
 
 /* Build a mapping from a statement to its eventual control father. */
-void
+static void
 set_control_statement_father(control c)
 {
    store_control_father(control_statement(c), c);
@@ -482,7 +482,7 @@ remove_all_the_non_marked_statements(statement s)
 }
 
 
-void
+static void
 use_def_elimination_on_a_statement(statement s)
 {
    the_useful_statements = set_make(set_pointer);

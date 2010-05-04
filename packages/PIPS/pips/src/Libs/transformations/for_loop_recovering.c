@@ -70,7 +70,7 @@ static graph dependence_graph;
      that represents the index evolution and initial_rv points to the initial
      variable of rv in the transformer.
 */
-bool
+static bool
 find_simple_for_like_variable(statement s,
 			      entity rv,
 			      entity * initial_rv,
@@ -215,7 +215,7 @@ find_simple_for_like_variable(statement s,
      a[future_i] = future_i;
    }
  */
-void
+static void
 try_to_recover_for_loop_in_a_while(whileloop wl) {
   /* Get the englobing statement of the "while" assuming we are called
      from a gen_recurse()-like function: */
@@ -309,7 +309,7 @@ try_to_recover_for_loop_in_a_while(whileloop wl) {
 
 
 /* Apply recursively for-loop recovering to a given statement. */
-void
+static void
 recover_for_loop_in_statement(statement s) {
   /* We need to access to the statement containing the current
      while-loops, so ask NewGen gen_recurse to keep this informations for

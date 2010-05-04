@@ -51,7 +51,7 @@
 
 typedef struct { list old, new; } entity_lists;
 
-boolean  rw_effect_on_variable_p(list efs, entity var, boolean b)
+static boolean  rw_effect_on_variable_p(list efs, entity var, boolean b)
 {
   boolean readeff = FALSE;
   list le = NIL;
@@ -68,7 +68,7 @@ boolean  rw_effect_on_variable_p(list efs, entity var, boolean b)
   return readeff;
 }  
 
-boolean  entity_in_call_arguments_p(entity ent,  call c)
+static boolean  entity_in_call_arguments_p(entity ent,  call c)
 {
   list le=call_arguments(c);
   boolean seen=FALSE;
@@ -82,7 +82,7 @@ boolean  entity_in_call_arguments_p(entity ent,  call c)
 }
 
 
-void substitute_entity_in_call_arguments(entity old, entity new, call c)
+static void substitute_entity_in_call_arguments(entity old, entity new, call c)
 {
         
       list args = call_arguments(c);

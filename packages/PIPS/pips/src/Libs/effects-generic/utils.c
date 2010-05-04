@@ -1609,7 +1609,7 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
       effect eff = EFFECT(CAR(l));
       reference ref = effect_any_reference(eff);
       
-      if (io_effect_p(eff)|| malloc_effect_p(eff))
+      if (io_effect_p(eff)|| malloc_effect_p(eff) || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)))
 	{
 	  lkeep = CONS(EFFECT, eff, lkeep);
 	}

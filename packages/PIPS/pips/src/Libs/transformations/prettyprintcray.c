@@ -57,7 +57,7 @@
  * - and are member of loop_locals(lp)
  * makes sure the loop index is in the list
  */
-list real_loop_locals(loop lp, effects cfx)
+static list real_loop_locals(loop lp, effects cfx)
 {
     list rll= NIL;
 
@@ -89,7 +89,7 @@ list real_loop_locals(loop lp, effects cfx)
  * recursively concatenates all real loop locals of all enclosed loops.
  * filters redondant entities
  */
-list all_enclosed_scope_variables(statement stmt)
+static list all_enclosed_scope_variables(statement stmt)
 {
     instruction instr = statement_instruction(stmt);
     list ent_l= NIL;
@@ -151,7 +151,7 @@ list all_enclosed_scope_variables(statement stmt)
 }
 
 /* lp_stt must be a loop statement */
-text text_microtasked_loop(__attribute__((unused)) entity module,__attribute__((unused))  int margin, statement lp_stt)
+static text text_microtasked_loop(__attribute__((unused)) entity module,__attribute__((unused))  int margin, statement lp_stt)
 {
     text txt;
     unformatted u;
@@ -264,7 +264,7 @@ text text_microtasked_loop(__attribute__((unused)) entity module,__attribute__((
 }
 
 /* lp_stt must be a loop statement */
-text text_vectorized_loop(__attribute__((unused)) entity module,__attribute__((unused))  int margin,__attribute__((unused))  statement lp_stt)
+static text text_vectorized_loop(__attribute__((unused)) entity module,__attribute__((unused))  int margin,__attribute__((unused))  statement lp_stt)
 {
     text txt;
     unformatted u;
@@ -281,7 +281,7 @@ text text_vectorized_loop(__attribute__((unused)) entity module,__attribute__((u
 }
 
 
-text text_cray(entity module, int margin, statement stat)
+static text text_cray(entity module, int margin, statement stat)
 {
     text txt = text_undefined;
 

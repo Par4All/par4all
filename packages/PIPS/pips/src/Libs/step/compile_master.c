@@ -138,7 +138,7 @@ static void step_create_mpi_after_master(step_region_analyse step_analyse, entit
 entity step_create_mpi_master(entity directive_module)
 {
   string new_name = step_find_new_module_name(directive_module,STEP_MPI_SUFFIX);
-  entity mpi_module = make_empty_subroutine(new_name);
+  entity mpi_module = make_empty_subroutine(new_name,copy_language(module_language(get_current_module_entity())));
   statement statmt;
   step_region_analyse master_analyse = load_step_analyse_map(directive_module);
   /* 

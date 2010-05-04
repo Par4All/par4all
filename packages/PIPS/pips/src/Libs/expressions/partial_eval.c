@@ -89,8 +89,9 @@ partial_eval_expression().
 #include "semantics.h" /* for module_to_value_mappings() */
 
 #include "arithmetique.h"
+#include "transformations.h" /*used for FORTRAN_DIV ... */
 
-#include "transformations.h" /* should be removed? */
+#include "preprocessor.h"
 #include "expressions.h"
 
 
@@ -1572,7 +1573,42 @@ expression generate_monome(int coef, expression expr)
 			int_expr(coef),
 			expr));
 }
+
+/* assumes conditions checked by partial_eval_declarations()
+ *
+ * partial evaluation of expressions in dimensions and of
+ * initialization expression.
+ */
+static void partial_eval_declaration(entity v, Psysteme pre_sc, effects fx)
+{
+  type vt = entity_type(v);
+  list dl = variable_dimensions(type_variable(vt));
+  expression ie = variable_initial_expression(v);
 
+  /* See if the dimensions can be simplified */
+  FOREACH(RANGE, r, dl) {
+    partial_eval_expression_and_regenerate(&range_lower(r), pre_sc, fx);
+    partial_eval_expression_and_regenerate(&range_upper(r), pre_sc, fx);
+  }
+
+  /* See if the initialization expression can be simplified */
+  if(!expression_undefined_p(ie)) {
+    /* FI: Lots of short cuts about side effects: pre and fx should be
+       recomputed between each partial evaluation by the caller... */
+    partial_eval_expression_and_regenerate(&ie, pre_sc, fx);
+    entity_initial(v) = make_value_expression(ie);
+    /* Too bad for the memory leak of entity_initial() but I'm afraid
+       the expression might be shared*/
+  }
+}
+
+void partial_eval_declarations(list el, Psysteme pre_sc, effects fx)
+{
+  FOREACH(ENTITY, e, el) {
+    if(variable_entity_p(e) && entity_variable_p(e))
+      partial_eval_declaration(e, pre_sc, fx);
+  }
+}
 
 /**
  * apply partial eval on each statement
@@ -1585,8 +1621,9 @@ expression generate_monome(int coef, expression expr)
  *
  * It would be simpler to transform instruction calls into instruction
  * expression to have fewer cases to handle. Case instruction
- * expression was introduced for C, but it subsumed instruction call
- * which is now kind of obsolete.
+ * expression was introduced for C and made instruction call
+ * obsolete. The same is true for value: as expressions have been
+ * added, constant became redundant.
  */
 void partial_eval_statement(statement stmt)
 {
@@ -1595,13 +1632,24 @@ void partial_eval_statement(statement stmt)
 
   pips_debug(8, "begin with tag %d\n",  instruction_tag(inst));
 
+  if(declaration_statement_p(stmt)) {
+    list dl = statement_declarations(stmt);
+    partial_eval_declarations(dl, stmt_prec(stmt),stmt_to_fx(stmt,fx_map));
+  }
+
   switch(instruction_tag(inst)) {
   case is_instruction_block :
     {
-      FOREACH(ENTITY,e,statement_declarations(stmt)) {
-	value v = entity_initial(e);
-	if(value_expression_p(v))
-	  partial_eval_expression_and_regenerate(&value_expression(v),stmt_prec(stmt),stmt_to_fx(stmt,fx_map));
+      /* This is no longer useful with the new representation of C
+	 declarations. */
+      if(FALSE) {
+	FOREACH(ENTITY,e,statement_declarations(stmt)) {
+	  value v = entity_initial(e);
+	  if(value_expression_p(v))
+	    partial_eval_expression_and_regenerate(&value_expression(v),
+						   stmt_prec(stmt),
+						   stmt_to_fx(stmt,fx_map));
+	}
       }
     } break;
   case is_instruction_test :

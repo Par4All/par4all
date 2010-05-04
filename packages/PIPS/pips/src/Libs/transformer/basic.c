@@ -228,7 +228,12 @@ Pvecteur incr;
     return t;
 }
 
-/* Add an update of variable v to t */
+/* Add an update of variable v into t
+ *
+ * FI: I do not understand why v_old is not added to the system
+ * basis. t is unlikely to be consistent after a call to this
+ * function. See transformer_add_value_update().
+ */
 transformer transformer_add_variable_update(transformer t, entity v)
 {
   Psysteme psyst = predicate_system(transformer_relation(t));
@@ -662,6 +667,9 @@ precondition_to_abstract_store(transformer pre)
   return as;
 }
 
+/* FI: this function does not end up with a consistent transformer
+   because the old value is not added to the basis of sc. Also, the
+   variable should be transformed into a new value... */
 transformer transformer_add_modified_variable(
     transformer tf,
     entity var)
@@ -673,6 +681,31 @@ transformer transformer_add_modified_variable(
   transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), var);
   sc_base(sc) = vect_add_variable(b, (Variable) var);
   sc_dimension(sc) = base_dimension(sc_base(sc));
+
+  return tf;
+}
+
+/**/
+transformer transformer_add_modified_variable_entity(transformer tf,
+						     entity var)
+{
+  Psysteme sc =  (Psysteme) predicate_system(transformer_relation(tf));
+  Pbase b = sc_base(sc);
+
+  if(entity_has_values_p(var)) {
+    entity v_new = entity_to_new_value(var);
+    entity v_old = entity_to_old_value(var);
+
+    /* FI: it is not well specifived if the argument should be made
+       of new values or of progtram variables because up to now the
+       two are the same, except when printed out. */
+    transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), var);
+    sc_base(sc) = vect_add_variable(b, (Variable) v_new);
+    sc_base(sc) = vect_add_variable(sc_base(sc), (Variable) v_old);
+    sc_dimension(sc) = base_dimension(sc_base(sc));
+  }
+  else
+    pips_internal_error("Entity \"%s\" has no values.\n", entity_name(var));
 
   return tf;
 }

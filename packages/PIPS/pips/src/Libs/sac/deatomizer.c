@@ -74,11 +74,6 @@ static bool gRepDone = FALSE;
 
 static graph dep_graph;
 
-void init_dep_graph(graph dg)
-{
-    dep_graph = dg;
-}
-
 static void checkReplaceReference(expression e, reference ref)
 {
     syntax s = expression_syntax(e);
@@ -283,7 +278,7 @@ static bool expr_has_write_eff_ref_p(reference ref, expression expr)
 /*
    This function returns TRUE if stat has a write effect on the reference ref.
    */
-bool stat_has_write_eff_ref_p(reference ref, statement stat)
+static bool stat_has_write_eff_ref_p(reference ref, statement stat)
 {
     bool actionWrite = FALSE;
 
@@ -394,7 +389,7 @@ static bool stats_has_rw_conf_p(statement si, statement sj,
 /*
    This function really does the job.
    */
-list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_process)(statement ))
+static list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_process)(statement ))
 {
     cons * i;
 

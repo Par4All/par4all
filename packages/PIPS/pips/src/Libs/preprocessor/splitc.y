@@ -1814,7 +1814,15 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			}
 |   direct_decl TK_LBRACKET attributes comma_expression_opt TK_RBRACKET
                         {
-			  $$ = build_signature($1, new_lbracket(), $3, $4, new_rbracket(), NULL);
+			  string s1 = $1;
+			  string s3 = $3;
+			  string s4 = $4;
+			  /* FI: quick fix for
+			     summary_preconditions02.c which uses a
+			     function call to size an array... */
+			  if(string_undefined_p(s4))
+			    s4 = new_empty();
+			  $$ = build_signature(s1, new_lbracket(), s3, s4, new_rbracket(), NULL);
 			}
 |   direct_decl TK_LBRACKET attributes error TK_RBRACKET
                         {

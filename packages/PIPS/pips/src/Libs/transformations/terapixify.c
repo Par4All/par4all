@@ -634,10 +634,12 @@ static void upperbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,true);
 }
+#if 0
 static void lowerbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,false);
 }
+#endif
 
 static void simplify_minmax_expression(expression e,transformer tr)
 {
@@ -669,10 +671,12 @@ static void simplify_minmax_expression(expression e,transformer tr)
  * for example if r = a[phi0,phi1] 0<=phi0<=2 and 1<=phi1<=4
  * we get dims = ( (0,3), (0,4) )
  * and offsets = ( 0 , 1 )
+ * if @p exact is set to false, we are allowed to give an upperbound to the dimensions
  * 
  * @return false if we were enable to gather enough informations
  */
-static bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *offsets)
+static
+bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *offsets,bool exact)
 {
     pips_assert("empty parameters\n",ENDP(*dims)&&ENDP(*offsets));
     reference ref = region_any_reference(r);
@@ -704,7 +708,7 @@ static bool region_to_minimal_dimensions(region r, transformer tr, list * dims, 
                 expression offset = copy_expression(elower);
 
                 expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
-                if(expression_minmax_p(elower)||expression_minmax_p(eupper))
+                if(!exact && (expression_minmax_p(elower)||expression_minmax_p(eupper)))
                     upperbound_of_expression(dim,tr);
 
                 *dims=CONS(DIMENSION,
@@ -716,7 +720,7 @@ static bool region_to_minimal_dimensions(region r, transformer tr, list * dims, 
             }
         }
         else {
-            pips_user_warning("failed to analyse region");
+            pips_user_warning("failed to analyse region\n");
             return false;
         }
     }
@@ -820,7 +824,6 @@ static statement isolate_make_array_transfer(entity old,entity new, list dimensi
 
     FOREACH(DIMENSION,d,dimensions)
     {
-        expression offset = EXPRESSION(CAR(offsets));
         entity index = ENTITY(CAR(index_entities));
         body = instruction_to_statement(
                 make_instruction_loop(
@@ -834,7 +837,6 @@ static statement isolate_make_array_transfer(entity old,entity new, list dimensi
                         )
                     )
                 );
-        POP(offsets);
         POP(index_entities);
     }
     /* add a nice comment */
@@ -881,7 +883,7 @@ static void do_isolate_statement(statement s)
             /* based on the rw_region, we can allocate a new entity with proper dimensions
              */
             list offsets = NIL,dimensions=NIL;
-            if(region_to_minimal_dimensions(rw_region,tr,&dimensions,&offsets))
+            if(region_to_minimal_dimensions(rw_region,tr,&dimensions,&offsets,false))
             {
                 /* a scalar */
                 if(ENDP(dimensions))
@@ -901,7 +903,7 @@ static void do_isolate_statement(statement s)
                     if(!region_undefined_p(read_region))
                     {
                         list read_dimensions=NIL,read_offsets=NIL;
-                        if(region_to_minimal_dimensions(read_region,tr,&read_dimensions,&read_offsets))
+                        if(region_to_minimal_dimensions(read_region,tr,&read_dimensions,&read_offsets,true))
                         {
                             insert_statement(prelude,isolate_make_array_transfer(e,new,read_dimensions,read_offsets,transfer_in),true);
                         }
@@ -915,7 +917,7 @@ static void do_isolate_statement(statement s)
                     if(!region_undefined_p(write_region))
                     {
                         list write_dimensions=NIL,write_offsets=NIL;
-                        if(region_to_minimal_dimensions(write_region,tr,&write_dimensions,&write_offsets))
+                        if(region_to_minimal_dimensions(write_region,tr,&write_dimensions,&write_offsets,true))
                         {
                             insert_statement(postlude,isolate_make_array_transfer(new,e,write_dimensions,write_offsets,transfer_out),false);
                         }
@@ -1105,6 +1107,7 @@ entity terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,str
         replace_entity(get_current_module_statement(),e,ne);
         return ne;
     }
+    return e;
 }
 
 static
@@ -1352,6 +1355,7 @@ array_to_pointer_conversion_mode get_array_to_pointer_conversion_mode()
     else if(same_string_p(mode,"1D")) return ARRAY_1D;
     else if(same_string_p(mode,"POINTER")) return POINTER;
     else pips_user_error("bad value %s for property ARRAY_TO_POINTER_CONVERT_PARAMETERS\n",mode);
+    return NO_CONVERSION;
 }
 
 

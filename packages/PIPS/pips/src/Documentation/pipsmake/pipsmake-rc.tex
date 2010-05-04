@@ -2236,6 +2236,16 @@ results. This property also affects the computation of regions.
 CONSTANT_PATH_EFFECTS TRUE
 \end{PipsProp}
 
+Property \PipsPropRef{USER_EFFECTS_ON_STDIOS} is used to control the
+way the user uses {\tt stdout}, {\tt stdin} and {\tt stderr}. The
+default case ({\tt FALSE}) means that the user does not modify these
+global variables. When set to {\tt TRUE}, they are considered as user
+variables, and dereferencing them through calls to stdio functions
+leads to less precise effects.
+
+\begin{PipsProp}{USER_EFFECTS_ON_STD_FILES FALSE}
+USER_EFFECTS_ON_STD_FILES FALSE
+\end{PipsProp}
  
 
 \section{Reductions}

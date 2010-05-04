@@ -697,8 +697,7 @@ list lis;
 			  (basic_tag(base)!=is_basic_overloaded)?
 			  (add_variable_to_area(a, e)):(0),
 			  NIL));
-  entity_initial(e) = make_value(is_value_constant,
-				 make_constant_litteral());
+  entity_initial(e) = make_value_unknown();
   return(e);
 }
 

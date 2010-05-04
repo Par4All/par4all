@@ -55,8 +55,8 @@ make_host_and_node_modules (entity module)
 
     if (entity_main_module_p(module))
     {
-	host = make_empty_subroutine(HOST_NAME);
-	node = make_empty_subroutine(NODE_NAME);
+	host = make_empty_subroutine(HOST_NAME,make_language_fortran());
+	node = make_empty_subroutine(NODE_NAME,make_language_fortran());
     }
     else
     {
@@ -65,11 +65,11 @@ make_host_and_node_modules (entity module)
 	/* HOST and NODE empty routines...
 	 */
 	tmp = strdup(concatenate(name, "_", HOST_NAME, NULL));
-	host = make_empty_subroutine(tmp);
+	host = make_empty_subroutine(tmp,make_language_fortran());
 	free(tmp);
 
 	tmp = strdup(concatenate(name, "_", NODE_NAME, NULL));
-	node = make_empty_subroutine(tmp);
+	node = make_empty_subroutine(tmp,make_language_fortran());
 	free(tmp);
 
 	/*  Arity and result
