@@ -95,6 +95,9 @@ archive_dir_basename=SUMMARY_Archive
 # Whether to run with some timeout
 timeout=''
 
+# Whether to show 'passed' validation explicitely
+passed=
+
 # fix collation (sort) order to default ASCII for all validations
 unset LANG LC_ALL LC_COLLATE
 export LC_ALL=C
@@ -171,6 +174,7 @@ while [ "$1" ] ; do
       --tpips=*) tpips=${opt#*=} ;;
       -p|--pips) pips=$1 ; shift ;;
       --pips=*) pips=${opt#*=} ;;
+      --passed) passed=1 ;;
       # directories to use
       -V|--valid) vdir=$1 ; shift ;;
       --valid=*) vdir=${opt#*=} ;;
@@ -437,7 +441,7 @@ function validate_file()
       status=1 # something was wrong...
     else
       verb 3 "$rel_name: SUCCEEDED" # ok!
-      echo "passed: $rel_name" >> $summary.tmp
+      [ "$passed" ] && echo "passed: $rel_name" >> $summary.tmp
       rm -f $out.* $file_resdir/*.filtered
     fi
 
