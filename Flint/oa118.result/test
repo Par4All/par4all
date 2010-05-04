@@ -6,2112 +6,2136 @@ CLOCK has been flinted : everything is ok.
 
 Non-initialized variables:
 --------------------------
-In statement number 3 (0.5):
+In statement number 14 (0.5):
 	"I" used but not initialized.
-In statement number 4 (0.6):
+In statement number 15 (0.6):
 	"I" used but not initialized.
-In statement number 6 (0.8):
+In statement number 18 (0.8):
 	"I" used but not initialized.
 	"B" used but not initialized.
-In statement number 14 (5.6):
+In statement number 26 (5.6):
 	"I" used but not initialized.
-In statement number 15 (5.7):
+In statement number 27 (5.7):
 	"AA" used but not initialized.
-In statement number 17 (5.9):
+In statement number 29 (5.9):
 	"I" used but not initialized.
-In statement number 20 (5.13):
+In statement number 32 (5.13):
 	"I" used but not initialized.
 	"II" used but not initialized.
-In statement number 21 (5.14):
+In statement number 33 (5.14):
 	"II" used but not initialized.
-In statement number 22 (5.16):
+In statement number 34 (5.16):
 	"II" used but not initialized.
-In statement number 23 (5.17):
+In statement number 35 (5.17):
 	"I" used but not initialized.
 	"JJ" used but not initialized.
 	"II" used but not initialized.
-In statement number 24 (5.18):
+In statement number 36 (5.18):
 	"JJ" used but not initialized.
 	"II" used but not initialized.
-In statement number 25 (5.19):
+In statement number 37 (5.19):
 	"II" used but not initialized.
 	"JJ" used but not initialized.
-In statement number 27 (5.21):
+In statement number 39 (5.21):
 	"I" used but not initialized.
-In statement number 28 (5.22):
+In statement number 40 (5.22):
 	"II" used but not initialized.
-In statement number 31 (5.25):
+In statement number 41 (5.23):
+	"D" used but not initialized.
+In statement number 43 (5.25):
 	"I" used but not initialized.
-In statement number 34 (5.28):
+In statement number 46 (5.28):
 	"I" used but not initialized.
 	"II" used but not initialized.
-In statement number 37 (5.31):
+In statement number 49 (5.31):
 	"I" used but not initialized.
 	"II" used but not initialized.
-In statement number 39 (5.33):
+In statement number 51 (5.33):
 	"I" used but not initialized.
 
-number of messages from flint for GRAD1 : 26
+number of messages from flint for GRAD1 : 27
 
 
 Non-initialized variables:
 --------------------------
-In statement number 16 (0.17):
+In statement number 83 (0.17):
 	"__IO_EFFECTS:LUNS" used but not initialized.
-In statement number 36 (0.38):
+In statement number 111 (0.38):
 	"N" used but not initialized.
-In statement number 37 (0.39):
+In statement number 112 (0.39):
 	"N" used but not initialized.
-In statement number 40 (0.43):
+In statement number 115 (0.43):
 	"I" used but not initialized.
-In statement number 45 (0.49):
+In statement number 121 (0.49):
 	"N" used but not initialized.
-In statement number 46 (0.50):
+In statement number 122 (0.50):
 	"N" used but not initialized.
-In statement number 49 (0.54):
+In statement number 125 (0.54):
 	"I" used but not initialized.
-In statement number 55 (0.60):
-	"FNZ" used but not initialized.
-	"FXZ" used but not initialized.
-	"FXX" used but not initialized.
-	"FNY" used but not initialized.
-	"FXY" used but not initialized.
-	"FNX" used but not initialized.
-	"YF" used but not initialized.
+In statement number 128 (0.57):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 137 (0.60):
 	"ZF" used but not initialized.
+	"YF" used but not initialized.
 	"XF" used but not initialized.
-In statement number 63 (0.69):
-	"N" used but not initialized.
-In statement number 67 (0.74):
-	"I" used but not initialized.
+	"XF" used but not initialized.
 	"YF" used but not initialized.
 	"ZF" used but not initialized.
+	"ZF" used but not initialized.
+	"ZF" used but not initialized.
+	"YF" used but not initialized.
+	"YF" used but not initialized.
+	"XF" used but not initialized.
+	"XF" used but not initialized.
+	"FXZ" used but not initialized.
+	"FXY" used but not initialized.
+	"FXX" used but not initialized.
+	"FNZ" used but not initialized.
+	"FNY" used but not initialized.
+	"FNX" used but not initialized.
+	"ZF" used but not initialized.
+	"YF" used but not initialized.
+	"XF" used but not initialized.
+In statement number 146 (0.69):
+	"N" used but not initialized.
+In statement number 151 (0.74):
+	"I" used but not initialized.
+	"XF" used but not initialized.
+	"YF" used but not initialized.
 	"XO" used but not initialized.
 	"YO" used but not initialized.
 	"ZO" used but not initialized.
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 69 (0.77):
+In statement number 154 (0.77):
 	"K" used but not initialized.
 	"I" used but not initialized.
+	"XF" used but not initialized.
 	"YF" used but not initialized.
-	"ZF" used but not initialized.
-In statement number 76 (0.85):
+In statement number 163 (0.85):
 	"I" used but not initialized.
 	"FNZ" used but not initialized.
-	"FNX" used but not initialized.
-In statement number 82 (0.92):
-	"N" used but not initialized.
-In statement number 83 (0.93):
-	"N" used but not initialized.
-In statement number 84 (0.94):
-	"N" used but not initialized.
-In statement number 85 (0.95):
-	"N" used but not initialized.
-In statement number 86 (0.96):
-	"N" used but not initialized.
-In statement number 87 (0.97):
-	"N" used but not initialized.
-In statement number 88 (0.98):
-	"N" used but not initialized.
-In statement number 89 (0.99):
-	"N" used but not initialized.
-In statement number 90 (0.100):
-	"N" used but not initialized.
-In statement number 91 (0.101):
-	"N" used but not initialized.
-In statement number 92 (0.102):
-	"N" used but not initialized.
-In statement number 93 (0.103):
-	"N" used but not initialized.
-In statement number 94 (0.104):
-	"N" used but not initialized.
-In statement number 95 (0.105):
-	"N" used but not initialized.
-In statement number 96 (0.106):
-	"N" used but not initialized.
-In statement number 97 (0.107):
-	"N" used but not initialized.
-In statement number 98 (0.108):
-	"N" used but not initialized.
-In statement number 101 (0.111):
-	"FXY" used but not initialized.
-	"FEX" used but not initialized.
-	"FEZ" used but not initialized.
 	"FNY" used but not initialized.
-	"YF" used but not initialized.
-	"XO" used but not initialized.
+In statement number 175 (0.92):
+	"N" used but not initialized.
+In statement number 176 (0.93):
+	"N" used but not initialized.
+In statement number 177 (0.94):
+	"N" used but not initialized.
+In statement number 178 (0.95):
+	"N" used but not initialized.
+In statement number 179 (0.96):
+	"N" used but not initialized.
+In statement number 180 (0.97):
+	"N" used but not initialized.
+In statement number 181 (0.98):
+	"N" used but not initialized.
+In statement number 182 (0.99):
+	"N" used but not initialized.
+In statement number 183 (0.100):
+	"N" used but not initialized.
+In statement number 184 (0.101):
+	"N" used but not initialized.
+In statement number 185 (0.102):
+	"N" used but not initialized.
+In statement number 186 (0.103):
+	"N" used but not initialized.
+In statement number 187 (0.104):
+	"N" used but not initialized.
+In statement number 188 (0.105):
+	"N" used but not initialized.
+In statement number 189 (0.106):
+	"N" used but not initialized.
+In statement number 190 (0.107):
+	"N" used but not initialized.
+In statement number 191 (0.108):
+	"N" used but not initialized.
+In statement number 201 (0.111):
 	"ZO" used but not initialized.
+	"XO" used but not initialized.
+	"XF" used but not initialized.
+	"YF" used but not initialized.
+	"YO" used but not initialized.
+	"ZF" used but not initialized.
 	"O" used but not initialized.
 	"AA" used but not initialized.
-	"YO" used but not initialized.
-	"ZF" used but not initialized.
-	"FNZ" used but not initialized.
-	"FNX" used but not initialized.
-	"FEY" used but not initialized.
-	"FXZ" used but not initialized.
-	"FXX" used but not initialized.
-In statement number 106 (0.117):
-	"I" used but not initialized.
-In statement number 107 (0.118):
-	"I" used but not initialized.
-In statement number 111 (0.123):
-	"I" used but not initialized.
-In statement number 114 (0.126):
-	"O" used but not initialized.
-In statement number 119 (0.132):
-	"I" used but not initialized.
-In statement number 120 (0.133):
-	"I" used but not initialized.
-In statement number 121 (0.134):
-	"I" used but not initialized.
-In statement number 124 (0.138):
-	"J" used but not initialized.
-	"ZO" used but not initialized.
-	"YO" used but not initialized.
-In statement number 126 (0.140):
-	"O" used but not initialized.
-In statement number 129 (0.143):
-	"J" used but not initialized.
-In statement number 131 (0.146):
-	"I" used but not initialized.
-In statement number 132 (0.147):
-	"I" used but not initialized.
-In statement number 133 (0.148):
-	"I" used but not initialized.
-	"J" used but not initialized.
-In statement number 138 (0.155):
-	"JJ" used but not initialized.
-	"J" used but not initialized.
-In statement number 142 (0.160):
-	"J" used but not initialized.
-In statement number 145 (0.163):
-	"J" used but not initialized.
-In statement number 148 (0.167):
-	"J" used but not initialized.
-In statement number 150 (0.169):
-	"YO" used but not initialized.
-	"ZO" used but not initialized.
-In statement number 152 (0.171):
-	"I" used but not initialized.
-In statement number 154 (0.173):
-	"O" used but not initialized.
-In statement number 159 (0.179):
-	"I" used but not initialized.
-In statement number 160 (0.180):
-	"I" used but not initialized.
-In statement number 161 (0.181):
-	"I" used but not initialized.
-In statement number 162 (0.182):
-	"I" used but not initialized.
-In statement number 165 (0.186):
-	"N" used but not initialized.
-In statement number 166 (0.187):
-	"N" used but not initialized.
-In statement number 167 (0.188):
-	"N" used but not initialized.
-In statement number 169 (0.190):
-	"YO" used but not initialized.
-	"ZO" used but not initialized.
-	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 175 (0.197):
+	"FNX" used but not initialized.
+	"FEZ" used but not initialized.
+	"FEY" used but not initialized.
+	"FEX" used but not initialized.
+	"FXY" used but not initialized.
+	"FXX" used but not initialized.
+In statement number 207 (0.117):
 	"I" used but not initialized.
-In statement number 176 (0.198):
+In statement number 208 (0.118):
 	"I" used but not initialized.
-In statement number 177 (0.199):
+In statement number 214 (0.123):
 	"I" used but not initialized.
-In statement number 178 (0.200):
+In statement number 223 (0.126):
+	"O" used but not initialized.
+	"AA" used but not initialized.
+In statement number 229 (0.132):
 	"I" used but not initialized.
-In statement number 179 (0.201):
+In statement number 230 (0.133):
 	"I" used but not initialized.
-In statement number 185 (0.208):
+In statement number 231 (0.134):
 	"I" used but not initialized.
-In statement number 186 (0.209):
+In statement number 237 (0.138):
+	"J" used but not initialized.
+	"XO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 246 (0.140):
+	"O" used but not initialized.
+	"AA" used but not initialized.
+In statement number 249 (0.143):
+	"J" used but not initialized.
+In statement number 252 (0.146):
+	"I" used but not initialized.
+In statement number 253 (0.147):
+	"I" used but not initialized.
+In statement number 254 (0.148):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 263 (0.155):
+	"JJ" used but not initialized.
+	"J" used but not initialized.
+In statement number 267 (0.160):
+	"J" used but not initialized.
+In statement number 271 (0.163):
+	"J" used but not initialized.
+In statement number 276 (0.167):
+	"J" used but not initialized.
+In statement number 279 (0.169):
+	"YO" used but not initialized.
+	"ZO" used but not initialized.
+In statement number 282 (0.171):
+	"I" used but not initialized.
+In statement number 296 (0.179):
+	"I" used but not initialized.
+In statement number 297 (0.180):
+	"I" used but not initialized.
+In statement number 298 (0.181):
+	"I" used but not initialized.
+In statement number 299 (0.182):
+	"I" used but not initialized.
+In statement number 307 (0.186):
+	"N" used but not initialized.
+In statement number 308 (0.187):
+	"N" used but not initialized.
+In statement number 309 (0.188):
+	"N" used but not initialized.
+In statement number 311 (0.190):
+	"XO" used but not initialized.
+	"YO" used but not initialized.
+	"ZO" used but not initialized.
+	"FNX" used but not initialized.
+	"FNZ" used but not initialized.
+In statement number 323 (0.197):
+	"I" used but not initialized.
+In statement number 324 (0.198):
+	"I" used but not initialized.
+In statement number 325 (0.199):
+	"I" used but not initialized.
+In statement number 329 (0.200):
+	"I" used but not initialized.
+In statement number 330 (0.201):
+	"I" used but not initialized.
+In statement number 340 (0.208):
+	"I" used but not initialized.
+In statement number 342 (0.209):
+	"I" used but not initialized.
 	"AIRE" used but not initialized.
-	"I" used but not initialized.
-In statement number 189 (0.212):
+In statement number 345 (0.212):
 	"IDT" used but not initialized.
-In statement number 195 (0.219):
+In statement number 347 (0.214):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 351 (0.219):
 	"I" used but not initialized.
-In statement number 196 (0.220):
+In statement number 352 (0.220):
 	"I" used but not initialized.
-In statement number 197 (0.221):
+In statement number 353 (0.221):
 	"I" used but not initialized.
-In statement number 198 (0.222):
+In statement number 354 (0.222):
 	"I" used but not initialized.
-In statement number 199 (0.223):
+In statement number 355 (0.223):
 	"I" used but not initialized.
-In statement number 200 (0.224):
+In statement number 356 (0.224):
 	"I" used but not initialized.
 	"YO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 214 (0.239):
+In statement number 361 (0.228):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 372 (0.239):
 	"J" used but not initialized.
-In statement number 219 (0.245):
-	"J" used but not initialized.
-	"I" used but not initialized.
-In statement number 220 (0.246):
-	"J" used but not initialized.
-In statement number 221 (0.247):
-	"J" used but not initialized.
-In statement number 222 (0.248):
-	"AIRE" used but not initialized.
-In statement number 223 (0.249):
-	"AIRE" used but not initialized.
-In statement number 226 (0.252):
+In statement number 377 (0.245):
 	"J" used but not initialized.
 	"I" used but not initialized.
-In statement number 229 (0.256):
+In statement number 378 (0.246):
+	"J" used but not initialized.
+In statement number 379 (0.247):
+	"J" used but not initialized.
+In statement number 380 (0.248):
+	"AIRE" used but not initialized.
+In statement number 381 (0.249):
+	"AIRE" used but not initialized.
+In statement number 384 (0.252):
 	"J" used but not initialized.
 	"I" used but not initialized.
-In statement number 230 (0.257):
-	"J" used but not initialized.
-In statement number 231 (0.258):
-	"J" used but not initialized.
-In statement number 232 (0.259):
-	"AIRE" used but not initialized.
-In statement number 233 (0.260):
-	"AIRE" used but not initialized.
-In statement number 236 (0.263):
+In statement number 387 (0.256):
 	"J" used but not initialized.
 	"I" used but not initialized.
-In statement number 238 (0.265):
+In statement number 388 (0.257):
 	"J" used but not initialized.
-In statement number 239 (0.266):
+In statement number 389 (0.258):
 	"J" used but not initialized.
-In statement number 241 (0.268):
+In statement number 390 (0.259):
+	"AIRE" used but not initialized.
+In statement number 391 (0.260):
+	"AIRE" used but not initialized.
+In statement number 394 (0.263):
 	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 396 (0.265):
+	"J" used but not initialized.
+In statement number 397 (0.266):
+	"J" used but not initialized.
+In statement number 399 (0.268):
+	"J" used but not initialized.
+In statement number 403 (0.271):
+	"__IO_EFFECTS:LUNS" used but not initialized.
 
-flint message from check reference: WARNING, in module OA118, in statement (0.69), number 63
+flint message from check reference: WARNING, in module OA118, in statement (0.69), number 146
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OA118, in statement (0.69), number 63
+flint message from check reference: WARNING, in module OA118, in statement (0.69), number 146
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OA118, in statement (0.69), number 63
+flint message from check reference: WARNING, in module OA118, in statement (0.69), number 146
 the 1th index may not be a mere integer
-number of messages from flint for OA118 : 143
+number of messages from flint for OA118 : 160
 
 
 Non-initialized variables:
 --------------------------
-In statement number 7 (0.9):
+In statement number 22 (0.9):
 	"J" used but not initialized.
 	"I" used but not initialized.
-In statement number 10 (0.13):
+In statement number 25 (0.13):
 	"I" used but not initialized.
-In statement number 13 (0.17):
+In statement number 29 (0.17):
+	"J" used but not initialized.
 	"FXX" used but not initialized.
+In statement number 30 (0.18):
 	"J" used but not initialized.
-In statement number 14 (0.18):
 	"FXY" used but not initialized.
+In statement number 31 (0.19):
 	"J" used but not initialized.
-In statement number 15 (0.19):
 	"FXZ" used but not initialized.
+In statement number 32 (0.20):
 	"J" used but not initialized.
-In statement number 16 (0.20):
 	"FEX" used but not initialized.
+In statement number 33 (0.21):
 	"J" used but not initialized.
-In statement number 17 (0.21):
 	"FEY" used but not initialized.
+In statement number 34 (0.22):
 	"J" used but not initialized.
-In statement number 18 (0.22):
 	"FEZ" used but not initialized.
+In statement number 35 (0.23):
 	"J" used but not initialized.
-In statement number 19 (0.23):
 	"FNX" used but not initialized.
+In statement number 36 (0.24):
 	"J" used but not initialized.
-In statement number 20 (0.24):
 	"FNY" used but not initialized.
+In statement number 37 (0.25):
 	"J" used but not initialized.
-In statement number 21 (0.25):
 	"FNZ" used but not initialized.
+In statement number 39 (0.26):
 	"J" used but not initialized.
-In statement number 22 (0.26):
 	"ZO" used but not initialized.
-	"J" used but not initialized.
 	"XO" used but not initialized.
-In statement number 23 (0.27):
+In statement number 40 (0.27):
+	"J" used but not initialized.
 	"ZO" used but not initialized.
-	"J" used but not initialized.
 	"XO" used but not initialized.
-In statement number 24 (0.28):
+In statement number 41 (0.28):
+	"J" used but not initialized.
 	"ZO" used but not initialized.
-	"J" used but not initialized.
 	"XO" used but not initialized.
-In statement number 26 (0.31):
+In statement number 44 (0.31):
 	"K" used but not initialized.
-In statement number 27 (0.32):
-	"XO" used but not initialized.
+In statement number 45 (0.32):
 	"J" used but not initialized.
+	"XO" used but not initialized.
 	"XF" used but not initialized.
-In statement number 28 (0.33):
+In statement number 46 (0.33):
+	"J" used but not initialized.
 	"YO" used but not initialized.
-	"J" used but not initialized.
 	"YF" used but not initialized.
-In statement number 29 (0.34):
+In statement number 47 (0.34):
+	"J" used but not initialized.
 	"ZO" used but not initialized.
-	"J" used but not initialized.
 	"ZF" used but not initialized.
-In statement number 32 (0.37):
-	"XO" used but not initialized.
+In statement number 51 (0.37):
 	"J" used but not initialized.
+	"XO" used but not initialized.
+	"K" used but not initialized.
 	"XF" used but not initialized.
-	"K" used but not initialized.
-In statement number 33 (0.38):
-	"YO" used but not initialized.
+In statement number 52 (0.38):
 	"J" used but not initialized.
+	"YO" used but not initialized.
+	"K" used but not initialized.
 	"YF" used but not initialized.
-	"K" used but not initialized.
-In statement number 34 (0.39):
-	"ZO" used but not initialized.
+In statement number 53 (0.39):
 	"J" used but not initialized.
+	"ZO" used but not initialized.
+	"K" used but not initialized.
 	"ZF" used but not initialized.
-	"K" used but not initialized.
-In statement number 45 (0.51):
-	"VS" used but not initialized.
+In statement number 66 (0.51):
 	"J" used but not initialized.
-In statement number 48 (0.56):
-	"YO" used but not initialized.
+	"VS" used but not initialized.
+In statement number 69 (0.56):
 	"J" used but not initialized.
 	"YO" used but not initialized.
 	"I" used but not initialized.
+	"YO" used but not initialized.
 	"KS" used but not initialized.
-In statement number 49 (0.57):
-	"ZO" used but not initialized.
+In statement number 70 (0.57):
 	"I" used but not initialized.
-	"XO" used but not initialized.
-In statement number 50 (0.58):
 	"ZO" used but not initialized.
-	"I" used but not initialized.
 	"XO" used but not initialized.
-In statement number 51 (0.59):
+In statement number 71 (0.58):
+	"I" used but not initialized.
 	"ZO" used but not initialized.
-	"I" used but not initialized.
 	"XO" used but not initialized.
-In statement number 63 (0.72):
+In statement number 72 (0.59):
+	"I" used but not initialized.
+	"ZO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 89 (0.72):
 	"J" used but not initialized.
 	"I" used but not initialized.
-In statement number 64 (0.73):
+In statement number 90 (0.73):
 	"I" used but not initialized.
+	"J" used but not initialized.
 	"VS" used but not initialized.
+In statement number 97 (0.81):
 	"J" used but not initialized.
-In statement number 69 (0.81):
 	"VS" used but not initialized.
-	"J" used but not initialized.
-In statement number 72 (0.86):
-	"YO" used but not initialized.
+In statement number 101 (0.86):
 	"J" used but not initialized.
 	"YO" used but not initialized.
 	"I" used but not initialized.
+	"YO" used but not initialized.
 	"KS" used but not initialized.
-In statement number 73 (0.87):
+In statement number 102 (0.87):
+	"I" used but not initialized.
 	"ZO" used but not initialized.
-	"I" used but not initialized.
 	"XO" used but not initialized.
-In statement number 74 (0.88):
+In statement number 103 (0.88):
+	"I" used but not initialized.
 	"ZO" used but not initialized.
-	"I" used but not initialized.
 	"XO" used but not initialized.
-In statement number 75 (0.89):
+In statement number 104 (0.89):
+	"I" used but not initialized.
 	"ZO" used but not initialized.
-	"I" used but not initialized.
 	"XO" used but not initialized.
-In statement number 77 (0.91):
+In statement number 108 (0.91):
 	"I" used but not initialized.
-In statement number 82 (0.98):
+In statement number 118 (0.98):
 	"__IO_EFFECTS:LUNS" used but not initialized.
 
-flint message from check call, in module OAMAT1, in statement (0.71), number 62
+flint message from check call, in module OAMAT1, in statement (0.71), number 88
 too many arguments (2) in call to TOP-LEVEL:ATAN2 (1)
 number of messages from flint for OAMAT1 : 92
 
 
 Non-initialized variables:
 --------------------------
-In statement number 3 (0.4):
+In statement number 19 (0.4):
 	"__IO_EFFECTS:LUNS" used but not initialized.
-In statement number 7 (0.10):
+In statement number 23 (0.10):
 	"K" used but not initialized.
 	"IJ" used but not initialized.
-In statement number 8 (0.11):
+In statement number 24 (0.11):
 	"K" used but not initialized.
 	"IJ" used but not initialized.
-In statement number 9 (0.12):
+In statement number 25 (0.12):
 	"K" used but not initialized.
 	"IJ" used but not initialized.
-In statement number 10 (0.13):
+In statement number 26 (0.13):
 	"K" used but not initialized.
 	"IJ" used but not initialized.
-In statement number 19 (0.23):
+In statement number 33 (0.19):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 36 (0.23):
 	"IJ" used but not initialized.
-In statement number 20 (0.24):
+In statement number 37 (0.24):
 	"IJ" used but not initialized.
-In statement number 21 (0.25):
+In statement number 38 (0.25):
 	"IJ" used but not initialized.
-In statement number 24 (0.29):
+In statement number 46 (0.29):
 	"I" used but not initialized.
-In statement number 25 (0.30):
+In statement number 47 (0.30):
 	"I" used but not initialized.
-In statement number 26 (0.31):
+In statement number 48 (0.31):
 	"I" used but not initialized.
-In statement number 27 (0.32):
+In statement number 49 (0.32):
 	"I" used but not initialized.
-In statement number 28 (0.33):
+In statement number 50 (0.33):
 	"I" used but not initialized.
-In statement number 29 (0.34):
+In statement number 51 (0.34):
 	"I" used but not initialized.
-In statement number 34 (0.39):
+In statement number 56 (0.39):
 	"I" used but not initialized.
-In statement number 36 (0.41):
+In statement number 58 (0.41):
 	"I" used but not initialized.
-In statement number 37 (0.42):
+In statement number 59 (0.42):
 	"I" used but not initialized.
-In statement number 38 (0.43):
+In statement number 60 (0.43):
 	"I" used but not initialized.
-In statement number 39 (0.44):
+In statement number 61 (0.44):
 	"I" used but not initialized.
-In statement number 40 (0.45):
+In statement number 62 (0.45):
 	"I" used but not initialized.
-In statement number 41 (0.46):
+In statement number 63 (0.46):
 	"I" used but not initialized.
-In statement number 42 (0.47):
+In statement number 64 (0.47):
 	"I" used but not initialized.
-In statement number 44 (0.49):
+In statement number 66 (0.49):
 	"I" used but not initialized.
-In statement number 45 (0.50):
+In statement number 67 (0.50):
 	"I" used but not initialized.
-In statement number 46 (0.51):
+In statement number 68 (0.51):
 	"I" used but not initialized.
-In statement number 47 (0.52):
+In statement number 69 (0.52):
 	"I" used but not initialized.
-In statement number 48 (0.53):
+In statement number 70 (0.53):
 	"I" used but not initialized.
-In statement number 49 (0.54):
+In statement number 71 (0.54):
 	"I" used but not initialized.
-In statement number 50 (0.55):
+In statement number 73 (0.55):
 	"I" used but not initialized.
-In statement number 51 (0.56):
+In statement number 74 (0.56):
 	"I" used but not initialized.
-In statement number 52 (0.57):
+In statement number 75 (0.57):
 	"I" used but not initialized.
-In statement number 55 (0.61):
+In statement number 79 (0.61):
 	"JJ" used but not initialized.
-In statement number 61 (0.68):
+In statement number 86 (0.68):
 	"JJ" used but not initialized.
 
-number of messages from flint for OAMET : 37
+number of messages from flint for OAMET : 38
 
 
 Non-initialized variables:
 --------------------------
-In statement number 1 (0.2):
+In statement number 10 (0.2):
 	"IFM" used but not initialized.
-In statement number 2 (0.3):
+In statement number 11 (0.3):
 	"JFM" used but not initialized.
-In statement number 7 (0.8):
+In statement number 17 (0.8):
 	"XO" used but not initialized.
-	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 8 (0.9):
 	"XO" used but not initialized.
+In statement number 18 (0.9):
 	"XO" used but not initialized.
-In statement number 9 (0.10):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 19 (0.10):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 10 (0.11):
 	"YO" used but not initialized.
+In statement number 20 (0.11):
 	"YO" used but not initialized.
-In statement number 11 (0.12):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 21 (0.12):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 12 (0.13):
+In statement number 22 (0.13):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 13 (0.14):
+In statement number 24 (0.14):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 14 (0.15):
+In statement number 26 (0.15):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 15 (0.16):
+In statement number 27 (0.16):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 16 (0.17):
+In statement number 28 (0.17):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 17 (0.18):
+In statement number 29 (0.18):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 18 (0.19):
+In statement number 30 (0.19):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 19 (0.20):
+In statement number 31 (0.20):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 20 (0.21):
+In statement number 33 (0.21):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 21 (0.22):
 	"O" used but not initialized.
+In statement number 34 (0.22):
 	"O" used but not initialized.
-In statement number 27 (0.29):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 43 (0.29):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 28 (0.30):
 	"XO" used but not initialized.
+In statement number 44 (0.30):
 	"XO" used but not initialized.
-In statement number 29 (0.31):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 45 (0.31):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 30 (0.32):
 	"YO" used but not initialized.
+In statement number 46 (0.32):
 	"YO" used but not initialized.
-In statement number 31 (0.33):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 47 (0.33):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 32 (0.34):
+In statement number 48 (0.34):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 33 (0.35):
+In statement number 50 (0.35):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 34 (0.36):
+In statement number 52 (0.36):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 35 (0.37):
+In statement number 53 (0.37):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 36 (0.38):
+In statement number 54 (0.38):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 37 (0.39):
+In statement number 55 (0.39):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 38 (0.40):
+In statement number 56 (0.40):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 39 (0.41):
+In statement number 57 (0.41):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 40 (0.42):
+In statement number 59 (0.42):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 41 (0.43):
 	"O" used but not initialized.
+In statement number 60 (0.43):
 	"O" used but not initialized.
-In statement number 47 (0.49):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 68 (0.49):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 48 (0.50):
 	"XO" used but not initialized.
+In statement number 69 (0.50):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 49 (0.51):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 70 (0.51):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 50 (0.52):
 	"YO" used but not initialized.
+In statement number 71 (0.52):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 51 (0.53):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 72 (0.53):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 52 (0.54):
+In statement number 73 (0.54):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 53 (0.55):
+In statement number 75 (0.55):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 54 (0.56):
+In statement number 77 (0.56):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 55 (0.57):
+In statement number 78 (0.57):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 56 (0.58):
+In statement number 79 (0.58):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 57 (0.59):
+In statement number 80 (0.59):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 58 (0.60):
+In statement number 81 (0.60):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 59 (0.61):
+In statement number 82 (0.61):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 60 (0.62):
+In statement number 84 (0.62):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 61 (0.63):
 	"O" used but not initialized.
+In statement number 85 (0.63):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 67 (0.69):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 94 (0.69):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 68 (0.70):
 	"XO" used but not initialized.
+In statement number 95 (0.70):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 69 (0.71):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 96 (0.71):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 70 (0.72):
 	"YO" used but not initialized.
+In statement number 97 (0.72):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 71 (0.73):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 98 (0.73):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 72 (0.74):
+In statement number 99 (0.74):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 73 (0.75):
+In statement number 101 (0.75):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 74 (0.76):
+In statement number 103 (0.76):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 75 (0.77):
+In statement number 104 (0.77):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 76 (0.78):
+In statement number 105 (0.78):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 77 (0.79):
+In statement number 106 (0.79):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 78 (0.80):
+In statement number 107 (0.80):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 79 (0.81):
+In statement number 108 (0.81):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 80 (0.82):
+In statement number 110 (0.82):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 81 (0.83):
 	"O" used but not initialized.
+In statement number 111 (0.83):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 87 (0.90):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 120 (0.90):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 88 (0.91):
 	"XO" used but not initialized.
+In statement number 121 (0.91):
 	"XO" used but not initialized.
-In statement number 89 (0.92):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 122 (0.92):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 90 (0.93):
 	"YO" used but not initialized.
+In statement number 123 (0.93):
 	"YO" used but not initialized.
-In statement number 91 (0.94):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 124 (0.94):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 92 (0.95):
+In statement number 125 (0.95):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 93 (0.96):
+In statement number 127 (0.96):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 94 (0.97):
+In statement number 129 (0.97):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 95 (0.98):
+In statement number 130 (0.98):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 96 (0.99):
+In statement number 131 (0.99):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 97 (0.100):
+In statement number 132 (0.100):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 98 (0.101):
+In statement number 133 (0.101):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 99 (0.102):
+In statement number 134 (0.102):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 100 (0.103):
+In statement number 136 (0.103):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 101 (0.104):
 	"O" used but not initialized.
+In statement number 137 (0.104):
 	"O" used but not initialized.
-In statement number 107 (0.110):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 145 (0.110):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 108 (0.111):
 	"XO" used but not initialized.
+In statement number 146 (0.111):
 	"XO" used but not initialized.
-In statement number 109 (0.112):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 147 (0.112):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 110 (0.113):
 	"YO" used but not initialized.
+In statement number 148 (0.113):
 	"YO" used but not initialized.
-In statement number 111 (0.114):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 149 (0.114):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 112 (0.115):
+In statement number 150 (0.115):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 113 (0.116):
+In statement number 152 (0.116):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 114 (0.117):
+In statement number 154 (0.117):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 115 (0.118):
+In statement number 155 (0.118):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 116 (0.119):
+In statement number 156 (0.119):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 117 (0.120):
+In statement number 157 (0.120):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 118 (0.121):
+In statement number 158 (0.121):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 119 (0.122):
+In statement number 159 (0.122):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 120 (0.123):
+In statement number 161 (0.123):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 121 (0.124):
 	"O" used but not initialized.
+In statement number 162 (0.124):
 	"O" used but not initialized.
-In statement number 127 (0.131):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 171 (0.131):
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 128 (0.132):
 	"XO" used but not initialized.
+In statement number 172 (0.132):
 	"XO" used but not initialized.
-In statement number 129 (0.133):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 173 (0.133):
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 130 (0.134):
 	"YO" used but not initialized.
+In statement number 174 (0.134):
 	"YO" used but not initialized.
-In statement number 131 (0.135):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 175 (0.135):
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 132 (0.136):
+In statement number 176 (0.136):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 133 (0.137):
+In statement number 178 (0.137):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 134 (0.138):
+In statement number 180 (0.138):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 135 (0.139):
+In statement number 181 (0.139):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 136 (0.140):
+In statement number 182 (0.140):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 137 (0.141):
+In statement number 183 (0.141):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 138 (0.142):
+In statement number 184 (0.142):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 139 (0.143):
+In statement number 185 (0.143):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 140 (0.144):
-	"O" used but not initialized.
+In statement number 187 (0.144):
 	"JFM" used but not initialized.
+	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 141 (0.145):
+In statement number 188 (0.145):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 147 (0.152):
+In statement number 199 (0.152):
 	"JFM" used but not initialized.
-In statement number 148 (0.153):
+In statement number 200 (0.153):
 	"JFM" used but not initialized.
-In statement number 151 (0.156):
+In statement number 203 (0.156):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 152 (0.157):
+In statement number 204 (0.157):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 153 (0.158):
+In statement number 205 (0.158):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 154 (0.159):
+In statement number 206 (0.159):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 155 (0.160):
+In statement number 207 (0.160):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 156 (0.161):
+In statement number 208 (0.161):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 157 (0.162):
+In statement number 210 (0.162):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 158 (0.163):
+In statement number 212 (0.163):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 159 (0.164):
+In statement number 213 (0.164):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 160 (0.165):
+In statement number 214 (0.165):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 161 (0.166):
+In statement number 215 (0.166):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 162 (0.167):
+In statement number 216 (0.167):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 163 (0.168):
+In statement number 217 (0.168):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 164 (0.169):
+In statement number 219 (0.169):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 165 (0.170):
+In statement number 220 (0.170):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 171 (0.176):
-	"XO" used but not initialized.
+In statement number 228 (0.176):
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 172 (0.177):
 	"XO" used but not initialized.
+In statement number 229 (0.177):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 173 (0.178):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 230 (0.178):
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 174 (0.179):
 	"YO" used but not initialized.
+In statement number 231 (0.179):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 175 (0.180):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 232 (0.180):
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 176 (0.181):
+In statement number 233 (0.181):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 177 (0.182):
+In statement number 235 (0.182):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 178 (0.183):
+In statement number 237 (0.183):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 179 (0.184):
+In statement number 238 (0.184):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 180 (0.185):
+In statement number 239 (0.185):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 181 (0.186):
+In statement number 240 (0.186):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 182 (0.187):
+In statement number 241 (0.187):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 183 (0.188):
+In statement number 242 (0.188):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 184 (0.189):
-	"O" used but not initialized.
+In statement number 244 (0.189):
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 185 (0.190):
 	"O" used but not initialized.
+In statement number 245 (0.190):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 191 (0.196):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 254 (0.196):
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 192 (0.197):
 	"XO" used but not initialized.
+In statement number 255 (0.197):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 193 (0.198):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 256 (0.198):
 	"JFM" used but not initialized.
+	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 194 (0.199):
+In statement number 257 (0.199):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 195 (0.200):
-	"ZO" used but not initialized.
+In statement number 258 (0.200):
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 196 (0.201):
+In statement number 259 (0.201):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 197 (0.202):
+In statement number 261 (0.202):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 198 (0.203):
+In statement number 263 (0.203):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 199 (0.204):
+In statement number 264 (0.204):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 200 (0.205):
+In statement number 265 (0.205):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 201 (0.206):
+In statement number 266 (0.206):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 202 (0.207):
+In statement number 267 (0.207):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 203 (0.208):
+In statement number 268 (0.208):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 204 (0.209):
-	"O" used but not initialized.
+In statement number 270 (0.209):
 	"JFM" used but not initialized.
+	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 205 (0.210):
+In statement number 271 (0.210):
 	"O" used but not initialized.
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 211 (0.217):
+In statement number 280 (0.217):
 	"JFM" used but not initialized.
-In statement number 212 (0.218):
+In statement number 281 (0.218):
 	"JFM" used but not initialized.
-In statement number 215 (0.221):
+In statement number 284 (0.221):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 216 (0.222):
+In statement number 285 (0.222):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 217 (0.223):
+In statement number 286 (0.223):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 218 (0.224):
+In statement number 287 (0.224):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 219 (0.225):
+In statement number 288 (0.225):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 220 (0.226):
+In statement number 289 (0.226):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 221 (0.227):
+In statement number 291 (0.227):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 222 (0.228):
+In statement number 293 (0.228):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 223 (0.229):
+In statement number 294 (0.229):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 224 (0.230):
+In statement number 295 (0.230):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 225 (0.231):
+In statement number 296 (0.231):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 226 (0.232):
+In statement number 297 (0.232):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 227 (0.233):
+In statement number 298 (0.233):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 228 (0.234):
+In statement number 300 (0.234):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 229 (0.235):
+In statement number 301 (0.235):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 235 (0.241):
-	"XO" used but not initialized.
+In statement number 310 (0.241):
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 236 (0.242):
 	"XO" used but not initialized.
+In statement number 311 (0.242):
 	"XO" used but not initialized.
-In statement number 237 (0.243):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 312 (0.243):
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 238 (0.244):
 	"YO" used but not initialized.
+In statement number 313 (0.244):
 	"YO" used but not initialized.
-In statement number 239 (0.245):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 314 (0.245):
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 240 (0.246):
+In statement number 315 (0.246):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 241 (0.247):
+In statement number 317 (0.247):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 242 (0.248):
+In statement number 319 (0.248):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 243 (0.249):
+In statement number 320 (0.249):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 244 (0.250):
+In statement number 321 (0.250):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 245 (0.251):
+In statement number 322 (0.251):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 246 (0.252):
+In statement number 323 (0.252):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 247 (0.253):
+In statement number 324 (0.253):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 248 (0.254):
-	"O" used but not initialized.
+In statement number 326 (0.254):
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 249 (0.255):
 	"O" used but not initialized.
+In statement number 327 (0.255):
 	"O" used but not initialized.
-In statement number 255 (0.261):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 335 (0.261):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 256 (0.262):
 	"XO" used but not initialized.
+In statement number 336 (0.262):
 	"XO" used but not initialized.
-In statement number 257 (0.263):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 337 (0.263):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 258 (0.264):
 	"YO" used but not initialized.
+In statement number 338 (0.264):
 	"YO" used but not initialized.
-In statement number 259 (0.265):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 339 (0.265):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 260 (0.266):
+In statement number 340 (0.266):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 261 (0.267):
+In statement number 342 (0.267):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 262 (0.268):
+In statement number 344 (0.268):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 263 (0.269):
+In statement number 345 (0.269):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 264 (0.270):
+In statement number 346 (0.270):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 265 (0.271):
+In statement number 347 (0.271):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 266 (0.272):
+In statement number 348 (0.272):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 267 (0.273):
+In statement number 349 (0.273):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 268 (0.274):
+In statement number 351 (0.274):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 269 (0.275):
 	"O" used but not initialized.
+In statement number 352 (0.275):
 	"O" used but not initialized.
-In statement number 275 (0.282):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 361 (0.282):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 276 (0.283):
 	"XO" used but not initialized.
+In statement number 362 (0.283):
 	"XO" used but not initialized.
-In statement number 277 (0.284):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 363 (0.284):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 278 (0.285):
 	"YO" used but not initialized.
+In statement number 364 (0.285):
 	"YO" used but not initialized.
-In statement number 279 (0.286):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 365 (0.286):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 280 (0.287):
+In statement number 366 (0.287):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 281 (0.288):
+In statement number 368 (0.288):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 282 (0.289):
+In statement number 370 (0.289):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 283 (0.290):
+In statement number 371 (0.290):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 284 (0.291):
+In statement number 372 (0.291):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 285 (0.292):
+In statement number 373 (0.292):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 286 (0.293):
+In statement number 374 (0.293):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 287 (0.294):
+In statement number 375 (0.294):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 288 (0.295):
+In statement number 377 (0.295):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 289 (0.296):
 	"O" used but not initialized.
+In statement number 378 (0.296):
 	"O" used but not initialized.
-In statement number 295 (0.302):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 386 (0.302):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 296 (0.303):
 	"XO" used but not initialized.
+In statement number 387 (0.303):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 297 (0.304):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 388 (0.304):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 298 (0.305):
 	"YO" used but not initialized.
+In statement number 389 (0.305):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 299 (0.306):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 390 (0.306):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 300 (0.307):
+In statement number 391 (0.307):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 301 (0.308):
+In statement number 393 (0.308):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 302 (0.309):
+In statement number 395 (0.309):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 303 (0.310):
+In statement number 396 (0.310):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 304 (0.311):
+In statement number 397 (0.311):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 305 (0.312):
+In statement number 398 (0.312):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 306 (0.313):
+In statement number 399 (0.313):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 307 (0.314):
+In statement number 400 (0.314):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 308 (0.315):
+In statement number 402 (0.315):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 309 (0.316):
 	"O" used but not initialized.
+In statement number 403 (0.316):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 315 (0.322):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 412 (0.322):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 316 (0.323):
 	"XO" used but not initialized.
+In statement number 413 (0.323):
 	"XO" used but not initialized.
 	"XO" used but not initialized.
-In statement number 317 (0.324):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 414 (0.324):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 318 (0.325):
 	"YO" used but not initialized.
+In statement number 415 (0.325):
 	"YO" used but not initialized.
 	"YO" used but not initialized.
-In statement number 319 (0.326):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 416 (0.326):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 320 (0.327):
+In statement number 417 (0.327):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 321 (0.328):
+In statement number 419 (0.328):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 322 (0.329):
+In statement number 421 (0.329):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 323 (0.330):
+In statement number 422 (0.330):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 324 (0.331):
+In statement number 423 (0.331):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 325 (0.332):
+In statement number 424 (0.332):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 326 (0.333):
+In statement number 425 (0.333):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 327 (0.334):
+In statement number 426 (0.334):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 328 (0.335):
+In statement number 428 (0.335):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 329 (0.336):
 	"O" used but not initialized.
+In statement number 429 (0.336):
 	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 335 (0.343):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 438 (0.343):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 336 (0.344):
 	"XO" used but not initialized.
+In statement number 439 (0.344):
 	"XO" used but not initialized.
-In statement number 337 (0.345):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 440 (0.345):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 338 (0.346):
 	"YO" used but not initialized.
+In statement number 441 (0.346):
 	"YO" used but not initialized.
-In statement number 339 (0.347):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 442 (0.347):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 340 (0.348):
+In statement number 443 (0.348):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 341 (0.349):
+In statement number 445 (0.349):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 342 (0.350):
+In statement number 447 (0.350):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 343 (0.351):
+In statement number 448 (0.351):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 344 (0.352):
+In statement number 449 (0.352):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 345 (0.353):
+In statement number 450 (0.353):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 346 (0.354):
+In statement number 451 (0.354):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 347 (0.355):
+In statement number 452 (0.355):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 348 (0.356):
+In statement number 454 (0.356):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
 	"O" used but not initialized.
-In statement number 349 (0.357):
 	"O" used but not initialized.
+In statement number 455 (0.357):
 	"O" used but not initialized.
-In statement number 355 (0.363):
-	"XO" used but not initialized.
+	"O" used but not initialized.
+In statement number 463 (0.363):
 	"XO" used but not initialized.
 	"JFM" used but not initialized.
 	"XO" used but not initialized.
-In statement number 356 (0.364):
 	"XO" used but not initialized.
+In statement number 464 (0.364):
 	"XO" used but not initialized.
-In statement number 357 (0.365):
-	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 465 (0.365):
 	"YO" used but not initialized.
 	"JFM" used but not initialized.
 	"YO" used but not initialized.
-In statement number 358 (0.366):
 	"YO" used but not initialized.
+In statement number 466 (0.366):
 	"YO" used but not initialized.
-In statement number 359 (0.367):
-	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 467 (0.367):
 	"ZO" used but not initialized.
 	"JFM" used but not initialized.
+	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 360 (0.368):
+In statement number 468 (0.368):
 	"ZO" used but not initialized.
 	"ZO" used but not initialized.
-In statement number 361 (0.369):
+In statement number 470 (0.369):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 362 (0.370):
+In statement number 472 (0.370):
 	"FNY" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 363 (0.371):
+In statement number 473 (0.371):
 	"FNY" used but not initialized.
 	"FNX" used but not initialized.
-In statement number 364 (0.372):
+In statement number 474 (0.372):
 	"FNX" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 365 (0.373):
+In statement number 475 (0.373):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 366 (0.374):
+In statement number 476 (0.374):
 	"FNX" used but not initialized.
 	"FNZ" used but not initialized.
-In statement number 367 (0.375):
+In statement number 477 (0.375):
 	"FNZ" used but not initialized.
 	"FNY" used but not initialized.
-In statement number 368 (0.376):
+In statement number 479 (0.376):
 	"O" used but not initialized.
-	"O" used but not initialized.
 	"JFM" used but not initialized.
+	"O" used but not initialized.
 	"O" used but not initialized.
-In statement number 369 (0.377):
+In statement number 480 (0.377):
 	"O" used but not initialized.
 	"O" used but not initialized.
 
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.8), number 7
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.8), number 17
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.8), number 7
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.8), number 17
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.9), number 8
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.9), number 18
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.10), number 9
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.10), number 19
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.10), number 9
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.10), number 19
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.11), number 10
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.11), number 20
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.12), number 11
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.12), number 21
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.12), number 11
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.12), number 21
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.13), number 12
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.13), number 22
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.21), number 20
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.21), number 33
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.21), number 20
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.21), number 33
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.22), number 21
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.22), number 34
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.29), number 27
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.29), number 43
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.29), number 27
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.29), number 43
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.30), number 28
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.30), number 44
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.30), number 28
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.30), number 44
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.31), number 29
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.31), number 45
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.31), number 29
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.31), number 45
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.32), number 30
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.32), number 46
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.32), number 30
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.32), number 46
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.33), number 31
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.33), number 47
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.33), number 31
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.33), number 47
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.34), number 32
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.34), number 48
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.34), number 32
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.34), number 48
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.42), number 40
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.42), number 59
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.42), number 40
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.42), number 59
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.43), number 41
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.43), number 60
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.43), number 41
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.43), number 60
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.49), number 47
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.49), number 68
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.49), number 47
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.49), number 68
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.50), number 48
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.50), number 69
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.50), number 48
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.50), number 69
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.51), number 49
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.51), number 70
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.51), number 49
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.51), number 70
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.52), number 50
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.52), number 71
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.52), number 50
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.52), number 71
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.53), number 51
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.53), number 72
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.53), number 51
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.53), number 72
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.54), number 52
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.54), number 73
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.54), number 52
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.54), number 73
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.62), number 60
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.62), number 84
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.62), number 60
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.62), number 84
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.63), number 61
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.63), number 85
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.63), number 61
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.63), number 85
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.69), number 67
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.69), number 94
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.69), number 67
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.69), number 94
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.70), number 68
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.70), number 95
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.70), number 68
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.70), number 95
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.71), number 69
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.71), number 96
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.71), number 69
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.71), number 96
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.72), number 70
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.72), number 97
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.72), number 70
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.72), number 97
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.73), number 71
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.73), number 98
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.73), number 71
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.73), number 98
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.74), number 72
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.74), number 99
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.74), number 72
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.74), number 99
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.82), number 80
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.82), number 110
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.82), number 80
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.82), number 110
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.83), number 81
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.83), number 111
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.83), number 81
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.83), number 111
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.90), number 87
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.90), number 120
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.90), number 87
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.90), number 120
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.91), number 88
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.91), number 121
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.91), number 88
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.91), number 121
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.92), number 89
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.92), number 122
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.92), number 89
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.92), number 122
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.93), number 90
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.93), number 123
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.93), number 90
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.93), number 123
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.94), number 91
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.94), number 124
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.94), number 91
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.94), number 124
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.95), number 92
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.95), number 125
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.95), number 92
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.95), number 125
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.103), number 100
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.103), number 136
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.103), number 100
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.103), number 136
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.104), number 101
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.104), number 137
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.104), number 101
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.104), number 137
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.110), number 107
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.110), number 145
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.110), number 107
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.110), number 145
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.111), number 108
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.111), number 146
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.112), number 109
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.112), number 147
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.112), number 109
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.112), number 147
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.113), number 110
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.113), number 148
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.114), number 111
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.114), number 149
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.114), number 111
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.114), number 149
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.115), number 112
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.115), number 150
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.123), number 120
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.123), number 161
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.123), number 120
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.123), number 161
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.124), number 121
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.124), number 162
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.131), number 127
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.131), number 171
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.131), number 127
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.131), number 171
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.132), number 128
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.132), number 172
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.133), number 129
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.133), number 173
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.133), number 129
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.133), number 173
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.134), number 130
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.134), number 174
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.135), number 131
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.135), number 175
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.135), number 131
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.135), number 175
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.136), number 132
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.136), number 176
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.144), number 140
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.144), number 187
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.144), number 140
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.144), number 187
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.145), number 141
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.145), number 188
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.176), number 171
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.176), number 228
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.176), number 171
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.176), number 228
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.177), number 172
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.177), number 229
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.177), number 172
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.177), number 229
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.178), number 173
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.178), number 230
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.178), number 173
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.178), number 230
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.179), number 174
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.179), number 231
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.179), number 174
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.179), number 231
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.180), number 175
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.180), number 232
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.180), number 175
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.180), number 232
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.181), number 176
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.181), number 233
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.181), number 176
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.181), number 233
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.189), number 184
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.189), number 244
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.189), number 184
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.189), number 244
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.190), number 185
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.190), number 245
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.190), number 185
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.190), number 245
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.196), number 191
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.196), number 254
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.196), number 191
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.196), number 254
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.197), number 192
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.197), number 255
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.197), number 192
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.197), number 255
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.198), number 193
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.198), number 256
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.198), number 193
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.198), number 256
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.199), number 194
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.199), number 257
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.199), number 194
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.199), number 257
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.200), number 195
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.200), number 258
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.200), number 195
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.200), number 258
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.201), number 196
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.201), number 259
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.201), number 196
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.201), number 259
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.209), number 204
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.209), number 270
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.209), number 204
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.209), number 270
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.210), number 205
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.210), number 271
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.210), number 205
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.210), number 271
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.241), number 235
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.241), number 310
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.241), number 235
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.241), number 310
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.242), number 236
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.242), number 311
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.243), number 237
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.243), number 312
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.243), number 237
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.243), number 312
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.244), number 238
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.244), number 313
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.245), number 239
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.245), number 314
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.245), number 239
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.245), number 314
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.246), number 240
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.246), number 315
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.254), number 248
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.254), number 326
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.254), number 248
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.254), number 326
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.255), number 249
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.255), number 327
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.261), number 255
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.261), number 335
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.261), number 255
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.261), number 335
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.262), number 256
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.262), number 336
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.263), number 257
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.263), number 337
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.263), number 257
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.263), number 337
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.264), number 258
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.264), number 338
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.265), number 259
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.265), number 339
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.265), number 259
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.265), number 339
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.266), number 260
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.266), number 340
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.274), number 268
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.274), number 351
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.274), number 268
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.274), number 351
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.275), number 269
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.275), number 352
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.282), number 275
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.282), number 361
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.282), number 275
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.282), number 361
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.283), number 276
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.283), number 362
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.283), number 276
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.283), number 362
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.284), number 277
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.284), number 363
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.284), number 277
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.284), number 363
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.285), number 278
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.285), number 364
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.285), number 278
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.285), number 364
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.286), number 279
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.286), number 365
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.286), number 279
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.286), number 365
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.287), number 280
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.287), number 366
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.287), number 280
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.287), number 366
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.295), number 288
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.295), number 377
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.295), number 288
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.295), number 377
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.296), number 289
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.296), number 378
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.296), number 289
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.296), number 378
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.302), number 295
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.302), number 386
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.302), number 295
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.302), number 386
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.303), number 296
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.303), number 387
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.303), number 296
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.303), number 387
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.304), number 297
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.304), number 388
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.304), number 297
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.304), number 388
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.305), number 298
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.305), number 389
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.305), number 298
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.305), number 389
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.306), number 299
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.306), number 390
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.306), number 299
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.306), number 390
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.307), number 300
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.307), number 391
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.307), number 300
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.307), number 391
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.315), number 308
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.315), number 402
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.315), number 308
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.315), number 402
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.316), number 309
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.316), number 403
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.316), number 309
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.316), number 403
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.322), number 315
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.322), number 412
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.322), number 315
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.322), number 412
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.323), number 316
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.323), number 413
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.323), number 316
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.323), number 413
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.324), number 317
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.324), number 414
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.324), number 317
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.324), number 414
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.325), number 318
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.325), number 415
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.325), number 318
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.325), number 415
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.326), number 319
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.326), number 416
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.326), number 319
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.326), number 416
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.327), number 320
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.327), number 417
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.327), number 320
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.327), number 417
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.335), number 328
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.335), number 428
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.335), number 328
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.335), number 428
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.336), number 329
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.336), number 429
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.336), number 329
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.336), number 429
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.343), number 335
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.343), number 438
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.343), number 335
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.343), number 438
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.344), number 336
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.344), number 439
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.344), number 336
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.344), number 439
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.345), number 337
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.345), number 440
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.345), number 337
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.345), number 440
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.346), number 338
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.346), number 441
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.346), number 338
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.346), number 441
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.347), number 339
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.347), number 442
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.347), number 339
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.347), number 442
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.348), number 340
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.348), number 443
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.348), number 340
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.348), number 443
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.356), number 348
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.356), number 454
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.356), number 348
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.356), number 454
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.357), number 349
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.357), number 455
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.357), number 349
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.357), number 455
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.363), number 355
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.363), number 463
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.363), number 355
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.363), number 463
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.364), number 356
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.364), number 464
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.365), number 357
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.365), number 465
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.365), number 357
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.365), number 465
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.366), number 358
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.366), number 466
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.367), number 359
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.367), number 467
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.367), number 359
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.367), number 467
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.368), number 360
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.368), number 468
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.376), number 368
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.376), number 479
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.376), number 368
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.376), number 479
 the 1th index may not be a mere integer
-flint message from check reference: WARNING, in module OAVITEL, in statement (0.377), number 369
+flint message from check reference: WARNING, in module OAVITEL, in statement (0.377), number 480
 the 1th index may not be a mere integer
 number of messages from flint for OAVITEL : 986
 
 
 Non-initialized variables:
 --------------------------
-In statement number 2 (0.3):
+In statement number 16 (0.3):
 	"PIO2" used but not initialized.
-In statement number 5 (0.6):
+In statement number 22 (0.6):
 	"N" used but not initialized.
-In statement number 6 (0.7):
+In statement number 23 (0.7):
 	"SWY" used but not initialized.
 	"SWY" used but not initialized.
 	"E33" used but not initialized.
 	"SWZ" used but not initialized.
 	"SWZ" used but not initialized.
 	"E22" used but not initialized.
-In statement number 7 (0.8):
+In statement number 24 (0.8):
 	"SWZ" used but not initialized.
 	"SWZ" used but not initialized.
 	"E11" used but not initialized.
 	"SWX" used but not initialized.
 	"SWX" used but not initialized.
 	"E33" used but not initialized.
-In statement number 8 (0.9):
+In statement number 25 (0.9):
 	"SWX" used but not initialized.
 	"SWX" used but not initialized.
 	"E22" used but not initialized.
 	"SWY" used but not initialized.
 	"SWY" used but not initialized.
 	"E11" used but not initialized.
-In statement number 13 (0.14):
+In statement number 30 (0.14):
 	"E22" used but not initialized.
 	"E33" used but not initialized.
-In statement number 14 (0.15):
+In statement number 31 (0.15):
 	"E33" used but not initialized.
 	"E11" used but not initialized.
-In statement number 15 (0.16):
+In statement number 32 (0.16):
 	"E11" used but not initialized.
 	"E22" used but not initialized.
-In statement number 17 (0.18):
+In statement number 37 (0.18):
 	"I" used but not initialized.
-In statement number 18 (0.19):
+In statement number 39 (0.19):
 	"N" used but not initialized.
-In statement number 20 (0.22):
+In statement number 41 (0.22):
 	"K" used but not initialized.
-In statement number 21 (0.23):
+In statement number 42 (0.23):
+	"K" used but not initialized.
 	"SWX" used but not initialized.
-	"K" used but not initialized.
 	"SWX" used but not initialized.
-In statement number 22 (0.24):
-	"SWY" used but not initialized.
+In statement number 43 (0.24):
 	"K" used but not initialized.
 	"SWY" used but not initialized.
-In statement number 23 (0.25):
-	"SWZ" used but not initialized.
+	"SWY" used but not initialized.
+In statement number 44 (0.25):
 	"K" used but not initialized.
 	"SWZ" used but not initialized.
-In statement number 25 (0.27):
+	"SWZ" used but not initialized.
+In statement number 46 (0.27):
 	"E33" used but not initialized.
 	"E22" used but not initialized.
 	"E11" used but not initialized.
-In statement number 31 (0.36):
-	"SWX" used but not initialized.
+In statement number 53 (0.36):
 	"K" used but not initialized.
+	"SWX" used but not initialized.
+	"I" used but not initialized.
 	"XO" used but not initialized.
-	"I" used but not initialized.
-In statement number 32 (0.37):
+In statement number 54 (0.37):
+	"K" used but not initialized.
 	"SWY" used but not initialized.
-	"K" used but not initialized.
+	"I" used but not initialized.
 	"YO" used but not initialized.
-	"I" used but not initialized.
 	"KS" used but not initialized.
-In statement number 33 (0.38):
-	"SWZ" used but not initialized.
+In statement number 55 (0.38):
 	"K" used but not initialized.
-	"ZO" used but not initialized.
+	"SWZ" used but not initialized.
 	"I" used but not initialized.
-In statement number 35 (0.40):
+	"ZO" used but not initialized.
+In statement number 57 (0.40):
 	"SWX" used but not initialized.
+	"I" used but not initialized.
 	"XO" used but not initialized.
-	"I" used but not initialized.
-In statement number 36 (0.41):
+In statement number 58 (0.41):
 	"SWY" used but not initialized.
+	"I" used but not initialized.
 	"YO" used but not initialized.
-	"I" used but not initialized.
 	"KS" used but not initialized.
-In statement number 37 (0.42):
+In statement number 59 (0.42):
 	"SWZ" used but not initialized.
-	"ZO" used but not initialized.
 	"I" used but not initialized.
-In statement number 39 (0.44):
+	"ZO" used but not initialized.
+In statement number 61 (0.44):
 	"E33" used but not initialized.
 	"E22" used but not initialized.
 	"E11" used but not initialized.
-In statement number 41 (0.46):
+In statement number 63 (0.46):
 	"E33" used but not initialized.
 	"E22" used but not initialized.
 	"E11" used but not initialized.
-In statement number 53 (0.59):
+In statement number 81 (0.59):
 	"I" used but not initialized.
 
-flint message from check call, in module PHWAK, in statement (0.58), number 52
+flint message from check call, in module PHWAK, in statement (0.58), number 80
 too many arguments (2) in call to TOP-LEVEL:ATAN2 (1)
 number of messages from flint for PHWAK : 72
 
 
 Non-initialized variables:
 --------------------------
-In statement number 4 (0.5):
+In statement number 18 (0.5):
 	"PIO2" used but not initialized.
-In statement number 6 (0.8):
+In statement number 23 (0.8):
 	"J" used but not initialized.
 	"SWY" used but not initialized.
 	"SWY" used but not initialized.
@@ -2119,7 +2143,7 @@ In statement number 6 (0.8):
 	"SWZ" used but not initialized.
 	"SWZ" used but not initialized.
 	"E22" used but not initialized.
-In statement number 7 (0.9):
+In statement number 24 (0.9):
 	"J" used but not initialized.
 	"SWZ" used but not initialized.
 	"SWZ" used but not initialized.
@@ -2127,7 +2151,7 @@ In statement number 7 (0.9):
 	"SWX" used but not initialized.
 	"SWX" used but not initialized.
 	"E33" used but not initialized.
-In statement number 8 (0.10):
+In statement number 25 (0.10):
 	"J" used but not initialized.
 	"SWX" used but not initialized.
 	"SWX" used but not initialized.
@@ -2135,119 +2159,119 @@ In statement number 8 (0.10):
 	"SWY" used but not initialized.
 	"SWY" used but not initialized.
 	"E11" used but not initialized.
-In statement number 9 (0.11):
+In statement number 26 (0.11):
 	"J" used but not initialized.
-In statement number 10 (0.12):
+In statement number 27 (0.12):
 	"J" used but not initialized.
-In statement number 11 (0.13):
+In statement number 28 (0.13):
 	"J" used but not initialized.
-In statement number 12 (0.14):
+In statement number 29 (0.14):
 	"J" used but not initialized.
-In statement number 13 (0.15):
+In statement number 30 (0.15):
 	"J" used but not initialized.
 	"E22" used but not initialized.
 	"E33" used but not initialized.
-In statement number 14 (0.16):
+In statement number 31 (0.16):
 	"J" used but not initialized.
 	"E33" used but not initialized.
 	"E11" used but not initialized.
-In statement number 15 (0.17):
+In statement number 32 (0.17):
 	"J" used but not initialized.
 	"E11" used but not initialized.
 	"E22" used but not initialized.
-In statement number 18 (0.20):
+In statement number 38 (0.20):
 	"I" used but not initialized.
-In statement number 21 (0.25):
+In statement number 42 (0.25):
 	"K" used but not initialized.
-In statement number 22 (0.26):
-	"SWX" used but not initialized.
+In statement number 43 (0.26):
 	"J" used but not initialized.
 	"K" used but not initialized.
 	"SWX" used but not initialized.
-In statement number 23 (0.27):
-	"SWY" used but not initialized.
+	"SWX" used but not initialized.
+In statement number 44 (0.27):
 	"J" used but not initialized.
 	"K" used but not initialized.
 	"SWY" used but not initialized.
-In statement number 24 (0.28):
-	"SWZ" used but not initialized.
+	"SWY" used but not initialized.
+In statement number 45 (0.28):
 	"J" used but not initialized.
 	"K" used but not initialized.
 	"SWZ" used but not initialized.
-In statement number 26 (0.30):
+	"SWZ" used but not initialized.
+In statement number 47 (0.30):
 	"E33" used but not initialized.
 	"E22" used but not initialized.
 	"E11" used but not initialized.
-In statement number 28 (0.33):
+In statement number 49 (0.33):
 	"J" used but not initialized.
-In statement number 32 (0.39):
-	"SWX" used but not initialized.
+In statement number 53 (0.39):
 	"J" used but not initialized.
 	"K" used but not initialized.
+	"SWX" used but not initialized.
+	"I" used but not initialized.
 	"XO" used but not initialized.
-	"I" used but not initialized.
-In statement number 33 (0.40):
+In statement number 54 (0.40):
+	"J" used but not initialized.
+	"K" used but not initialized.
 	"SWY" used but not initialized.
-	"J" used but not initialized.
-	"K" used but not initialized.
+	"I" used but not initialized.
 	"YO" used but not initialized.
-	"I" used but not initialized.
 	"KS" used but not initialized.
-In statement number 34 (0.41):
-	"SWZ" used but not initialized.
+In statement number 55 (0.41):
 	"J" used but not initialized.
 	"K" used but not initialized.
-	"ZO" used but not initialized.
+	"SWZ" used but not initialized.
 	"I" used but not initialized.
-In statement number 36 (0.43):
+	"ZO" used but not initialized.
+In statement number 57 (0.43):
+	"J" used but not initialized.
 	"SWX" used but not initialized.
-	"J" used but not initialized.
+	"I" used but not initialized.
 	"XO" used but not initialized.
-	"I" used but not initialized.
-In statement number 37 (0.44):
+In statement number 58 (0.44):
+	"J" used but not initialized.
 	"SWY" used but not initialized.
-	"J" used but not initialized.
+	"I" used but not initialized.
 	"YO" used but not initialized.
-	"I" used but not initialized.
 	"KS" used but not initialized.
-In statement number 38 (0.45):
+In statement number 59 (0.45):
+	"J" used but not initialized.
 	"SWZ" used but not initialized.
-	"J" used but not initialized.
+	"I" used but not initialized.
 	"ZO" used but not initialized.
-	"I" used but not initialized.
-In statement number 40 (0.47):
+In statement number 61 (0.47):
 	"E33" used but not initialized.
 	"E22" used but not initialized.
 	"E11" used but not initialized.
-In statement number 41 (0.48):
+In statement number 62 (0.48):
 	"J" used but not initialized.
-In statement number 42 (0.49):
+In statement number 63 (0.49):
 	"E33" used but not initialized.
 	"E22" used but not initialized.
 	"E11" used but not initialized.
-In statement number 43 (0.50):
+In statement number 64 (0.50):
 	"J" used but not initialized.
-In statement number 44 (0.51):
+In statement number 65 (0.51):
 	"J" used but not initialized.
-In statement number 54 (0.62):
+In statement number 78 (0.62):
 	"I" used but not initialized.
+	"J" used but not initialized.
 	"OTXE" used but not initialized.
-	"J" used but not initialized.
 
-flint message from check_call, in module PHWPAN, in statement (0.3), number 2
+flint message from check_call, in module PHWPAN, in statement (0.3), number 16
 incompatible basic type, 0th arg in call to TOP-LEVEL:=, float>int
-flint message from check call, in module PHWPAN, in statement (0.61), number 53
+flint message from check call, in module PHWPAN, in statement (0.61), number 77
 too many arguments (2) in call to TOP-LEVEL:ATAN2 (1)
 number of messages from flint for PHWPAN : 96
 
 
 Non-initialized variables:
 --------------------------
-In statement number 3 (0.5):
+In statement number 9 (0.5):
 	"J" used but not initialized.
-	"AA" used but not initialized.
 	"I" used but not initialized.
-In statement number 4 (0.6):
+	"AA" used but not initialized.
+In statement number 11 (0.6):
 	"I" used but not initialized.
 	"V" used but not initialized.
 
@@ -2256,19 +2280,19 @@ number of messages from flint for PMAT : 5
 
 Non-initialized variables:
 --------------------------
-In statement number 4 (0.5):
+In statement number 8 (0.5):
 	"N" used but not initialized.
-In statement number 5 (0.7):
+In statement number 9 (0.7):
 	"Y" used but not initialized.
 	"X" used but not initialized.
 	"N" used but not initialized.
-In statement number 6 (0.8):
+In statement number 10 (0.8):
 	"INCX" used but not initialized.
 	"N" used but not initialized.
-In statement number 7 (0.9):
+In statement number 11 (0.9):
 	"INCY" used but not initialized.
 	"N" used but not initialized.
-In statement number 8 (0.10):
+In statement number 12 (0.10):
 	"N" used but not initialized.
 
 number of messages from flint for SDOT : 9
@@ -2276,61 +2300,61 @@ number of messages from flint for SDOT : 9
 
 Non-initialized variables:
 --------------------------
-In statement number 1 (0.2):
+In statement number 4 (0.2):
 	"N" used but not initialized.
-In statement number 2 (0.4):
+In statement number 5 (0.4):
 	"I" used but not initialized.
 	"N" used but not initialized.
-In statement number 3 (0.5):
+In statement number 6 (0.5):
 	"I" used but not initialized.
 	"N" used but not initialized.
-In statement number 4 (0.6):
+In statement number 7 (0.6):
 	"J" used but not initialized.
 	"I" used but not initialized.
 	"N" used but not initialized.
-In statement number 5 (0.7):
+In statement number 8 (0.7):
 	"I" used but not initialized.
 	"N" used but not initialized.
-In statement number 6 (0.8):
+In statement number 9 (0.8):
 	"N" used but not initialized.
 	"I" used but not initialized.
-In statement number 7 (0.10):
+In statement number 10 (0.10):
 	"I" used but not initialized.
 	"N" used but not initialized.
-In statement number 8 (0.11):
+In statement number 11 (0.11):
 	"N" used but not initialized.
-In statement number 9 (0.13):
+In statement number 12 (0.13):
 	"I" used but not initialized.
 	"K" used but not initialized.
 	"N" used but not initialized.
-In statement number 10 (0.14):
+In statement number 13 (0.14):
 	"N" used but not initialized.
-In statement number 11 (0.15):
+In statement number 14 (0.15):
 	"J" used but not initialized.
 	"K" used but not initialized.
 	"I" used but not initialized.
 	"N" used but not initialized.
-In statement number 12 (0.16):
+In statement number 15 (0.16):
 	"K" used but not initialized.
 	"I" used but not initialized.
 	"N" used but not initialized.
-In statement number 13 (0.17):
+In statement number 16 (0.17):
 	"N" used but not initialized.
-In statement number 14 (0.19):
+In statement number 18 (0.19):
 	"N" used but not initialized.
-In statement number 15 (0.20):
+In statement number 19 (0.20):
 	"N" used but not initialized.
-In statement number 16 (0.22):
+In statement number 20 (0.22):
 	"II" used but not initialized.
 	"N" used but not initialized.
-In statement number 17 (0.23):
+In statement number 21 (0.23):
 	"N" used but not initialized.
-In statement number 18 (0.24):
+In statement number 22 (0.24):
 	"N" used but not initialized.
-In statement number 19 (0.25):
+In statement number 23 (0.25):
 	"J" used but not initialized.
 	"N" used but not initialized.
-In statement number 20 (0.26):
+In statement number 24 (0.26):
 	"N" used but not initialized.
 
 number of messages from flint for SOLV : 36
@@ -2338,106 +2362,106 @@ number of messages from flint for SOLV : 36
 
 Non-initialized variables:
 --------------------------
-In statement number 1 (0.2):
+In statement number 20 (0.2):
 	"NP1" used but not initialized.
-In statement number 2 (0.4):
+In statement number 22 (0.4):
 	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 3 (0.6):
+In statement number 23 (0.6):
 	"IP" used but not initialized.
 	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 4 (0.7):
+In statement number 24 (0.7):
 	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 5 (0.8):
+In statement number 26 (0.8):
 	"NP1" used but not initialized.
 	"K" used but not initialized.
-In statement number 6 (0.10):
+In statement number 27 (0.10):
 	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 7 (0.11):
+In statement number 28 (0.11):
 	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 8 (0.13):
-	"K" used but not initialized.
-	"IP" used but not initialized.
-	"NP1" used but not initialized.
-In statement number 9 (0.14):
-	"K" used but not initialized.
-	"NP1" used but not initialized.
-In statement number 10 (0.16):
-	"NP1" used but not initialized.
-In statement number 11 (0.17):
-	"K" used but not initialized.
-	"NP1" used but not initialized.
-In statement number 12 (0.18):
-	"K" used but not initialized.
-	"NP1" used but not initialized.
-In statement number 13 (0.20):
+In statement number 29 (0.13):
 	"K" used but not initialized.
 	"IP" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 14 (0.21):
+In statement number 30 (0.14):
 	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 15 (0.22):
+In statement number 32 (0.16):
+	"NP1" used but not initialized.
+In statement number 33 (0.17):
 	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 16 (0.23):
+In statement number 34 (0.18):
+	"K" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 17 (0.24):
+In statement number 35 (0.20):
+	"K" used but not initialized.
+	"IP" used but not initialized.
+	"NP1" used but not initialized.
+In statement number 36 (0.21):
+	"K" used but not initialized.
+	"NP1" used but not initialized.
+In statement number 37 (0.22):
+	"K" used but not initialized.
+	"NP1" used but not initialized.
+In statement number 39 (0.23):
+	"NP1" used but not initialized.
+In statement number 44 (0.24):
 	"B" used but not initialized.
-In statement number 18 (0.25):
+In statement number 45 (0.25):
 	"NP1" used but not initialized.
-In statement number 19 (0.27):
+In statement number 46 (0.27):
 	"NP1" used but not initialized.
-In statement number 20 (0.28):
+In statement number 47 (0.28):
 	"I" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 21 (0.30):
+In statement number 48 (0.30):
 	"J" used but not initialized.
 	"I" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 22 (0.31):
+In statement number 49 (0.31):
 	"I" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 23 (0.32):
+In statement number 50 (0.32):
 	"I" used but not initialized.
 	"B" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 24 (0.33):
+In statement number 51 (0.33):
 	"NP1" used but not initialized.
-In statement number 25 (0.34):
+In statement number 55 (0.34):
 	"NP1" used but not initialized.
-In statement number 26 (0.36):
+In statement number 56 (0.36):
 	"I" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 27 (0.37):
+In statement number 57 (0.37):
 	"NP1" used but not initialized.
-In statement number 28 (0.38):
+In statement number 61 (0.38):
 	"NP1" used but not initialized.
-In statement number 29 (0.39):
+In statement number 62 (0.39):
 	"NP1" used but not initialized.
-In statement number 30 (0.40):
+In statement number 63 (0.40):
 	"NP1" used but not initialized.
-In statement number 31 (0.42):
+In statement number 64 (0.42):
 	"NP1" used but not initialized.
-In statement number 32 (0.43):
+In statement number 65 (0.43):
 	"NP1" used but not initialized.
-In statement number 33 (0.45):
+In statement number 66 (0.45):
 	"J" used but not initialized.
 	"NP1" used but not initialized.
-In statement number 34 (0.46):
+In statement number 67 (0.46):
 	"NP1" used but not initialized.
-In statement number 35 (0.47):
+In statement number 68 (0.47):
 	"NP1" used but not initialized.
-In statement number 36 (0.48):
+In statement number 69 (0.48):
 	"NP1" used but not initialized.
-In statement number 37 (0.49):
+In statement number 70 (0.49):
 	"NP1" used but not initialized.
 
-flint message from check_call, in module SOLV3, in statement (0.42), number 31
+flint message from check_call, in module SOLV3, in statement (0.42), number 64
 incompatible basic type, 0th arg in call to TOP-LEVEL:=, int>float
 number of messages from flint for SOLV3 : 62
 TIME has been flinted : everything is ok.

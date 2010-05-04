@@ -5,7 +5,7 @@
 C     REND LE TEMPS CPU INSTANTANE, EN SECONDES.
           EXTERNAL TIME
           INTEGER TIME
-      GETIME = REAL(TIME())                                             0001
+      GETIME = REAL(TIME())                                             0007
       END
 C     Modifications:
 C      - function TIME added
@@ -177,52 +177,52 @@ C
 C             CORPS DU PROGRAMME
 C             ------------------
 
-      CALL OPENFILE                                                     0001
+      CALL OPENFILE                                                     0171
 
 C
 C     ACQUISITION DES PARAMETRES DE LA MODELISATION
 C     ---------------------------------------------
 
 C     WRITE (6,'('' ENTRER LE NB DE POINTS DU MAILLAGE CARRE (NP) ? '',$)')
-      READ (4, *) NP                                                    0002
+      READ (4, *) NP                                                    0178
 C     WRITE (6,'('' ENTRER LE NB DE PAS DE TEMPS TOTAL (NT) ? '',$)')
-      READ (4, *) NT                                                    0003
+      READ (4, *) NT                                                    0180
 C     WRITE (6,'('' ENTRER LE PAS DE DISCR. EN ESPACE (H) ? '',$)')
-      READ (4, *) H                                                     0004
+      READ (4, *) H                                                     0182
 C     WRITE (6,'('' ENTRER LE PAS DE DISCR. EN TEMPS (DELTAT) ? '',$)')
-      READ (4, *) DELTAT                                                0005
+      READ (4, *) DELTAT                                                0184
 C     WRITE (6,'('' ENTRER LA POSITION EN X DE LA SOURCE (JS) ? '',$)')
-      READ (4, *) JS                                                    0006
+      READ (4, *) JS                                                    0186
 C     WRITE (6,'('' ENTRER LA POSITION EN Z DE LA SOURCE (IS) ? '',$)')
-      READ (4, *) IS                                                    0007
+      READ (4, *) IS                                                    0188
 C     WRITE (6,'('' ENTRER LA FREQUENCE DE LA SOURCE (F) ? '',$)')
-      READ (4, *) F                                                     0008
+      READ (4, *) F                                                     0190
 
 
 
 
-      WRITE (1, 1100)                                                   0009
-      WRITE (1, 1110)                                                   0010
-      WRITE (1, 1120)                                                   0011
-      WRITE (1, 1130) NP, NP                                            0012
-      WRITE (1, 1135) NT                                                0013
-      WRITE (1, 1140) IS, JS                                            0014
-      WRITE (1, 1171) H                                                 0015
-      WRITE (1, 1170) DELTAT                                            0016
-      WRITE (1, 1180) F                                                 0017
+      WRITE (1, 1100)                                                   0195
+      WRITE (1, 1110)                                                   0196
+      WRITE (1, 1120)                                                   0197
+      WRITE (1, 1130) NP, NP                                            0198
+      WRITE (1, 1135) NT                                                0199
+      WRITE (1, 1140) IS, JS                                            0200
+      WRITE (1, 1171) H                                                 0201
+      WRITE (1, 1170) DELTAT                                            0202
+      WRITE (1, 1180) F                                                 0203
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
-      CALL STIMER(W)                                                    0018
-      TINIT = GETIME(W)                                                 0019
-      TFIN = GETIME(W)                                                  0020
-      TMESUR = TFIN-TINIT                                               0021
+      CALL STIMER(W)                                                    0206
+      TINIT = GETIME(W)                                                 0207
+      TFIN = GETIME(W)                                                  0208
+      TMESUR = TFIN-TINIT                                               0209
 C////////////////END   FUNCTION TIMER/////////////////
 C
 C     INITIALISATION DES VARIABLES SCALAIRES
 C     --------------------------------------
-      KM = 1                                                            0022
-      KP = 2                                                            0023
-      G0 = 0                                                            0024
+      KM = 1                                                            0214
+      KP = 2                                                            0215
+      G0 = 0                                                            0216
 
 
 C     INITIALISATION DU CHAMP VITESSE
@@ -230,37 +230,37 @@ C     V(I,J)     = READ (Vi) (CAS D'UN MILIEU HETEROGENE)
 C     -------------------------------------------------------
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
-      TINIT = GETIME(W)                                                 0025
+      TINIT = GETIME(W)                                                 0224
 C////////////////END   FUNCTION TIMER/////////////////
 
 
-      READ (3, *) NP                                                    0026
-      READ (3, *) NP                                                    0027
-      DO 21 I = 1, NP                                                   0028
-         DO 22 J = 1, NP                                                0029
-            READ (3, *) V(I,J)                                          0030
-22          CONTINUE                                                    0031
-21       CONTINUE                                                       0032
+      READ (3, *) NP                                                    0228
+      READ (3, *) NP                                                    0229
+      DO 21 I = 1, NP                                                   0230
+         DO 22 J = 1, NP                                                0231
+            READ (3, *) V(I,J)                                          0232
+22          CONTINUE                                                    0233
+21       CONTINUE                                                       0234
 
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
-      TFIN = GETIME(W)                                                  0033
-      T3CPU = TFIN-TINIT                                                0034
+      TFIN = GETIME(W)                                                  0238
+      T3CPU = TFIN-TINIT                                                0239
 C////////////////END   FUNCTION TIMER/////////////////
 
-      VMAX = V(1,1)                                                     0035
-      VMIN = V(1,1)                                                     0036
-      DO 112 I = 1, NP                                                  0037
-         DO 122 J = 1, NP                                               0038
-            IF (V(I,J).LT.VMIN) VMIN = V(I,J)                           0039
-            IF (V(I,J).GT.VMAX) VMAX = V(I,J)                           0041
-122         CONTINUE                                                    0043
-112      CONTINUE                                                       0044
-      WRITE (1, 1051) VMIN, VMAX                                        0045
+      VMAX = V(1,1)                                                     0242
+      VMIN = V(1,1)                                                     0243
+      DO 112 I = 1, NP                                                  0244
+         DO 122 J = 1, NP                                               0245
+            IF (V(I,J).LT.VMIN) VMIN = V(I,J)                           0246
+            IF (V(I,J).GT.VMAX) VMAX = V(I,J)                           0249
+122         CONTINUE                                                    0252
+112      CONTINUE                                                       0253
+      WRITE (1, 1051) VMIN, VMAX                                        0254
 
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
-      TINIT = GETIME(W)                                                 0046
+      TINIT = GETIME(W)                                                 0258
 C////////////////END   FUNCTION TIMER/////////////////
 
 
@@ -270,18 +270,18 @@ C     ET DES ENREGISTREMENTS
 C     SISMO (T=1) = 0.0
 C     ------------------------------
 
-      DO 10 K = 1, 2                                                    0047
-         DO 20 J = 1, NP                                                0048
-            DO 30 I = 1, NP                                             0049
-               U(I,J,K) = 0.0                                           0050
-30             CONTINUE                                                 0051
-20          CONTINUE                                                    0052
-10       CONTINUE                                                       0053
+      DO 10 K = 1, 2                                                    0268
+         DO 20 J = 1, NP                                                0269
+            DO 30 I = 1, NP                                             0270
+               U(I,J,K) = 0.0                                           0271
+30             CONTINUE                                                 0272
+20          CONTINUE                                                    0273
+10       CONTINUE                                                       0274
 
 
-      DO 84 I = 1, NBTRAC                                               0054
-         SISMO(I,1) = 0.0                                               0055
-84       CONTINUE                                                       0056
+      DO 84 I = 1, NBTRAC                                               0277
+         SISMO(I,1) = 0.0                                               0278
+84       CONTINUE                                                       0279
 
 
 
@@ -297,107 +297,107 @@ C     --------------------------------------------------------
 
 C     CAS DES TROIS POINTS DU COIN E-S
 C     --------------------------------
-      C1 = 4/(1/V(NP-1,NP)+1/V(NP-1,NP-1)+1/V(NP-2,NP)+1/V(NP-2,NP-1)   0057
-     &)                                                                 0057
-      W = C1*DELTAT                                                     0058
-      B(NP-1,1,1) = 2*W/(4*W+3*H)                                       0059
-      B(NP-1,1,2) = 3*H/(4*W+3*H)                                       0060
+      C1 = 4/(1/V(NP-1,NP)+1/V(NP-1,NP-1)+1/V(NP-2,NP)+1/V(NP-2,NP-1)   0295
+     &)                                                                 0295
+      W = C1*DELTAT                                                     0297
+      B(NP-1,1,1) = 2*W/(4*W+3*H)                                       0298
+      B(NP-1,1,2) = 3*H/(4*W+3*H)                                       0299
 
-      C2 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))      0061
-      W = C2*DELTAT                                                     0062
-      B(NP,2,1) = 2*W/(4*W+3*H)                                         0063
-      B(NP,2,2) = 3*H/(4*W+3*H)                                         0064
+      C2 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))      0301
+      W = C2*DELTAT                                                     0303
+      B(NP,2,1) = 2*W/(4*W+3*H)                                         0304
+      B(NP,2,2) = 3*H/(4*W+3*H)                                         0305
 
-      C3 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))      0065
-      W = C3*DELTAT                                                     0066
-      B(NP-1,2,1) = 2*W/(4*W+3*H)                                       0067
-      B(NP-1,2,2) = 3*H/(4*W+3*H)                                       0068
+      C3 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))      0307
+      W = C3*DELTAT                                                     0309
+      B(NP-1,2,1) = 2*W/(4*W+3*H)                                       0310
+      B(NP-1,2,2) = 3*H/(4*W+3*H)                                       0311
 
-      V(NP-1,NP) = C1                                                   0069
-      V(NP,NP) = C2                                                     0070
-      V(NP,NP-1) = C3                                                   0071
+      V(NP-1,NP) = C1                                                   0313
+      V(NP,NP) = C2                                                     0314
+      V(NP,NP-1) = C3                                                   0315
 
 C     CAS DES 3 POINTS DU COIN W-S
 C     ----------------------------
-      C1 = 4/(1/V(NP,2)+1/V(NP,3)+1/V(NP-1,2)+1/V(NP-1,3))              0072
-      W = C1*DELTAT                                                     0073
-      B(2,2,1) = 2*W/(4*W+3*H)                                          0074
-      B(2,2,2) = 3*H/(4*W+3*H)                                          0075
+      C1 = 4/(1/V(NP,2)+1/V(NP,3)+1/V(NP-1,2)+1/V(NP-1,3))              0319
+      W = C1*DELTAT                                                     0321
+      B(2,2,1) = 2*W/(4*W+3*H)                                          0322
+      B(2,2,2) = 3*H/(4*W+3*H)                                          0323
 
-      C2 = 4/(1/V(NP,1)+1/V(NP,2)+1/V(NP-1,1)+1/V(NP-1,2))              0076
-      W = C2*DELTAT                                                     0077
-      B(1,2,1) = 2*W/(4*W+3*H)                                          0078
-      B(1,2,2) = 3*H/(4*W+3*H)                                          0079
+      C2 = 4/(1/V(NP,1)+1/V(NP,2)+1/V(NP-1,1)+1/V(NP-1,2))              0325
+      W = C2*DELTAT                                                     0327
+      B(1,2,1) = 2*W/(4*W+3*H)                                          0328
+      B(1,2,2) = 3*H/(4*W+3*H)                                          0329
 
-      C3 = 4/(1/V(NP-1,1)+1/V(NP-1,2)+1/V(NP-2,1)+1/V(NP-2,2))          0080
-      W = C3*DELTAT                                                     0081
-      B(NP-1,3,1) = 2*W/(4*W+3*H)                                       0082
-      B(NP-1,3,2) = 3*H/(4*W+3*H)                                       0083
+      C3 = 4/(1/V(NP-1,1)+1/V(NP-1,2)+1/V(NP-2,1)+1/V(NP-2,2))          0331
+      W = C3*DELTAT                                                     0333
+      B(NP-1,3,1) = 2*W/(4*W+3*H)                                       0334
+      B(NP-1,3,2) = 3*H/(4*W+3*H)                                       0335
 
-      V(NP,2) = C1                                                      0084
-      V(NP,1) = C2                                                      0085
-      V(NP-1,1) = C3                                                    0086
+      V(NP,2) = C1                                                      0337
+      V(NP,1) = C2                                                      0338
+      V(NP-1,1) = C3                                                    0339
 
 
 C     CAS DES BORDS   E - S - W
 C     -------------------------
-      DO 41 I = 2, NP-2                                                 0087
-         V(I,NP) = 2/(1/V(I,NP)+1/V(I,NP-1))                            0088
-         W = V(I,NP)*DELTAT                                             0089
-         B(I,1,1) = 1-1/(W+H)*(2*H+W*W/H)                               0090
-         B(I,1,2) = 2*H/(W+H)                                           0091
-         B(I,1,3) = W*W/(2*H*(W+H))                                     0092
-41       CONTINUE                                                       0093
+      DO 41 I = 2, NP-2                                                 0344
+         V(I,NP) = 2/(1/V(I,NP)+1/V(I,NP-1))                            0345
+         W = V(I,NP)*DELTAT                                             0346
+         B(I,1,1) = 1-1/(W+H)*(2*H+W*W/H)                               0347
+         B(I,1,2) = 2*H/(W+H)                                           0348
+         B(I,1,3) = W*W/(2*H*(W+H))                                     0349
+41       CONTINUE                                                       0350
 
-      DO 42 I = 3, NP-2                                                 0094
-         V(NP,I) = 2/(1/V(NP,I)+1/V(NP-1,I))                            0095
-         W = V(NP,I)*DELTAT                                             0096
-         B(I,2,1) = 1-1/(W+H)*(2*H+W*W/H)                               0097
-         B(I,2,2) = 2*H/(W+H)                                           0098
-         B(I,2,3) = W*W/(2*H*(W+H))                                     0099
-42       CONTINUE                                                       0100
+      DO 42 I = 3, NP-2                                                 0352
+         V(NP,I) = 2/(1/V(NP,I)+1/V(NP-1,I))                            0353
+         W = V(NP,I)*DELTAT                                             0354
+         B(I,2,1) = 1-1/(W+H)*(2*H+W*W/H)                               0355
+         B(I,2,2) = 2*H/(W+H)                                           0356
+         B(I,2,3) = W*W/(2*H*(W+H))                                     0357
+42       CONTINUE                                                       0358
 
-      DO 43 I = 2, NP-2                                                 0101
-         V(I,1) = 2/(1/V(I,1)+1/V(I,2))                                 0102
-         W = V(I,1)*DELTAT                                              0103
-         B(I,3,1) = 1-1/(W+H)*(2*H+W*W/H)                               0104
-         B(I,3,2) = 2*H/(W+H)                                           0105
-         B(I,3,3) = W*W/(2*H*(W+H))                                     0106
-43       CONTINUE                                                       0107
+      DO 43 I = 2, NP-2                                                 0360
+         V(I,1) = 2/(1/V(I,1)+1/V(I,2))                                 0361
+         W = V(I,1)*DELTAT                                              0362
+         B(I,3,1) = 1-1/(W+H)*(2*H+W*W/H)                               0363
+         B(I,3,2) = 2*H/(W+H)                                           0364
+         B(I,3,3) = W*W/(2*H*(W+H))                                     0365
+43       CONTINUE                                                       0366
 
 C
 C     INITIALISATION DES CONSTANTES LIEES AUX BORDS INTERNES
 C     ------------------------------------------------------
-      DO 51 I = 3, NP-1                                                 0108
-         V(I,2) = (V(I,2)*DELTAT/H)**2                                  0109
-51       CONTINUE                                                       0110
+      DO 51 I = 3, NP-1                                                 0371
+         V(I,2) = (V(I,2)*DELTAT/H)**2                                  0372
+51       CONTINUE                                                       0373
 
-      DO 52 I = 3, NP-1                                                 0111
-         V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0112
-52       CONTINUE                                                       0113
+      DO 52 I = 3, NP-1                                                 0375
+         V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0376
+52       CONTINUE                                                       0377
 
-      DO 53 I = 3, NP-2                                                 0114
-         V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0115
-53       CONTINUE                                                       0116
+      DO 53 I = 3, NP-2                                                 0379
+         V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0380
+53       CONTINUE                                                       0381
 
 
 C     INITIALISATION DES CONSTANTES LIEES AU DOMAINE INTERIEUR
 C            V(I,J) <--  1/12*((V(I,J)*DELTAT/H)**2)
 C     --------------------------------------------------------
-      DO 40 J = 3, NP-2                                                 0117
-         DO 50 I = 3, NP-2                                              0118
-            V(I,J) = (V(I,J)*DELTAT/H)**2/12                            0119
-50          CONTINUE                                                    0120
-40       CONTINUE                                                       0121
+      DO 40 J = 3, NP-2                                                 0387
+         DO 50 I = 3, NP-2                                              0388
+            V(I,J) = (V(I,J)*DELTAT/H)**2/12                            0389
+50          CONTINUE                                                    0390
+40       CONTINUE                                                       0391
 
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
-      TFIN = GETIME(W)                                                  0122
-      T1CPU = TFIN-TINIT-TMESUR                                         0123
-      WRITE (1, 1015) TMESUR                                            0124
-      WRITE (1, 1010) T1CPU                                             0125
+      TFIN = GETIME(W)                                                  0395
+      T1CPU = TFIN-TINIT-TMESUR                                         0396
+      WRITE (1, 1015) TMESUR                                            0397
+      WRITE (1, 1010) T1CPU                                             0398
 
-      TINIT = GETIME(W)                                                 0126
+      TINIT = GETIME(W)                                                 0400
 C////////////////END   FUNCTION TIMER/////////////////
 
 C     -----------------------------------------------------------
@@ -411,16 +411,16 @@ C     ----------------------------
 C     !     BOUCLE EN TEMPS      !
 C     ----------------------------
 
-      DO 70 N = 2, NT                                                   0127
+      DO 70 N = 2, NT                                                   0414
 
 C     PRISE EN COMPTE DE LA FONCTION SOURCE PENDANT UN TEMPS DE TMAX SEC.
 C     Un = Un + SOURCE
 C     ------------------------------------------------------------------
-         W = F*(N*DELTAT-1.0/F)                                         0128
-         IF (W**2.LT.TMAX) THEN                                         0129
-            W = (W*PI)**2                                               0130
-            G0 = (1.0-2.0*W)*EXP(-W)                                    0131
-            U(IS,JS,KM) = U(IS,JS,KM)+G0*12*V(IS,JS)*H**2               0132
+         W = F*(N*DELTAT-1.0/F)                                         0419
+         IF (W**2.LT.TMAX) THEN                                         0420
+            W = (W*PI)**2                                               0421
+            G0 = (1.0-2.0*W)*EXP(-W)                                    0422
+            U(IS,JS,KM) = U(IS,JS,KM)+G0*12*V(IS,JS)*H**2               0423
          ENDIF
 
 
@@ -430,11 +430,11 @@ C     SAUVEGARDE DE LA FRANGE CONNEXE AUX BORDS POUR LE CALCUL
 C     ULTERIEUR DE LA SOLUTION AUX BORDS
 C     --------------------------------------------------------
 
-         DO 71 I = 2, NP-1                                              0133
-            UB(I,1) = U(I,NP-1,KP)                                      0134
-            UB(I,2) = U(NP-1,I,KP)                                      0135
-            UB(I,3) = U(I,2,KP)                                         0136
-71          CONTINUE                                                    0137
+         DO 71 I = 2, NP-1                                              0433
+            UB(I,1) = U(I,NP-1,KP)                                      0434
+            UB(I,2) = U(NP-1,I,KP)                                      0435
+            UB(I,3) = U(I,2,KP)                                         0436
+71          CONTINUE                                                    0437
 
 C
 C     ------------------------------------------------
@@ -442,20 +442,20 @@ C     SOLUTION SUR LE DOMAINE INTERIEUR
 C     SCHEMA D'ORDRE 2 EN TEMPS ET D'ORDRE 4 EN ESPACE
 C     ------------------------------------------------
 
-         DO 80 J = 3, NP-2                                              0138
+         DO 80 J = 3, NP-2                                              0445
 
 C     levee des dependances pour forcer la vectorisation.
 C     kp et km sont toujours different.
 C DIR$ IVDEP
 
-            DO 90 I = 3, NP-2                                           0139
+            DO 90 I = 3, NP-2                                           0451
 
-               U(I,J,KP) = 2*U(I,J,KM)-U(I,J,KP)-V(I,J)*(60*U(I,J,KM)   0140
-     &         -16*(U(I+1,J,KM)+U(I-1,J,KM)+U(I,J-1,KM)+U(I,J+1,KM))+   0140
-     &         U(I+2,J,KM)+U(I-2,J,KM)+U(I,J-2,KM)+U(I,J+2,KM))         0140
+               U(I,J,KP) = 2*U(I,J,KM)-U(I,J,KP)-V(I,J)*(60*U(I,J,KM)   0453
+     &         -16*(U(I+1,J,KM)+U(I-1,J,KM)+U(I,J-1,KM)+U(I,J+1,KM))+   0453
+     &         U(I+2,J,KM)+U(I-2,J,KM)+U(I,J-2,KM)+U(I,J+2,KM))         0453
 
-90             CONTINUE                                                 0141
-80          CONTINUE                                                    0142
+90             CONTINUE                                                 0459
+80          CONTINUE                                                    0460
 
 C
 C     ------------------------------------------------
@@ -464,70 +464,70 @@ C     SCHEMA D'ORDRE 2 EN TEMPS ET D'ORDRE 2 EN ESPACE
 C     ------------------------------------------------
 
 C DIR$ IVDEP
-         DO 140 I = 3, NP-1                                             0143
-            U(I,2,KP) = 2*U(I,2,KM)-U(I,2,KP)-V(I,2)*(4*U(I,2,KM)-(U(   0144
-     &      I+1,2,KM)+U(I-1,2,KM)+U(I,1,KM)+U(I,3,KM)))                 0144
-140         CONTINUE                                                    0145
+         DO 140 I = 3, NP-1                                             0469
+            U(I,2,KP) = 2*U(I,2,KM)-U(I,2,KP)-V(I,2)*(4*U(I,2,KM)-(U(   0470
+     &      I+1,2,KM)+U(I-1,2,KM)+U(I,1,KM)+U(I,3,KM)))                 0470
+140         CONTINUE                                                    0474
 
 C DIR$ IVDEP
-         DO 141 I = 3, NP-1                                             0146
-            U(I,NP-1,KP) = 2*U(I,NP-1,KM)-U(I,NP-1,KP)-V(I,NP-1)*(4*U   0147
-     &      (I,NP-1,KM)-(U(I+1,NP-1,KM)+U(I-1,NP-1,KM)+U(I,NP-2,KM)+U   0147
-     &      (I,NP,KM)))                                                 0147
-141         CONTINUE                                                    0148
+         DO 141 I = 3, NP-1                                             0477
+            U(I,NP-1,KP) = 2*U(I,NP-1,KM)-U(I,NP-1,KP)-V(I,NP-1)*(4*U   0478
+     &      (I,NP-1,KM)-(U(I+1,NP-1,KM)+U(I-1,NP-1,KM)+U(I,NP-2,KM)+U   0478
+     &      (I,NP,KM)))                                                 0478
+141         CONTINUE                                                    0482
 
 
 C DIR$ IVDEP
-         DO 142 I = 3, NP-2                                             0149
-            U(NP-1,I,KP) = 2*U(NP-1,I,KM)-U(NP-1,I,KP)-V(NP-1,I)*(4*U   0150
-     &      (NP-1,I,KM)-(U(NP,I,KM)+U(NP-2,I,KM)+U(NP-1,I-1,KM)+U(NP-   0150
-     &      1,I+1,KM)))                                                 0150
-142         CONTINUE                                                    0151
+         DO 142 I = 3, NP-2                                             0486
+            U(NP-1,I,KP) = 2*U(NP-1,I,KM)-U(NP-1,I,KP)-V(NP-1,I)*(4*U   0487
+     &      (NP-1,I,KM)-(U(NP,I,KM)+U(NP-2,I,KM)+U(NP-1,I-1,KM)+U(NP-   0487
+     &      1,I+1,KM)))                                                 0487
+142         CONTINUE                                                    0491
 
 C
 C     --------------------------------------------------------
 C     SOLUTION AU BORD EAST. CONDITIONS ABSORBANTES D'ORDRE 2.
 C     --------------------------------------------------------
 
-         DO 92 I = 3, NP-2                                              0152
-            UINT(I) = B(I,1,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UB(I,1)+B(I,   0153
-     &      1,2)*(U(I,NP,KM)+U(I,NP-1,KM))+B(I,1,3)*(U(I+1,NP-1,KP)+U   0153
-     &      (I+1,NP,KP)+U(I-1,NP-1,KP)+U(I-1,NP,KP))                    0153
-92          CONTINUE                                                    0154
+         DO 92 I = 3, NP-2                                              0498
+            UINT(I) = B(I,1,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UB(I,1)+B(I,   0499
+     &      1,2)*(U(I,NP,KM)+U(I,NP-1,KM))+B(I,1,3)*(U(I+1,NP-1,KP)+U   0499
+     &      (I+1,NP,KP)+U(I-1,NP-1,KP)+U(I-1,NP,KP))                    0499
+92          CONTINUE                                                    0504
 
-         DO 93 I = 3, NP-2                                              0155
-            U(I,NP,KP) = UINT(I)                                        0156
-93          CONTINUE                                                    0157
+         DO 93 I = 3, NP-2                                              0506
+            U(I,NP,KP) = UINT(I)                                        0507
+93          CONTINUE                                                    0508
 
 C
 C     --------------------------------------------------------
 C     SOLUTION AU BORD SOUTH. CONDITIONS ABSORBANTES D'ORDRE 2.
 C     --------------------------------------------------------
 
-         DO 94 I = 3, NP-2                                              0158
-            UINT(I) = B(I,2,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UB(I,2)+B(I,   0159
-     &      2,2)*(U(NP,I,KM)+U(NP-1,I,KM))+B(I,2,3)*(U(NP-1,I+1,KP)+U   0159
-     &      (NP,I+1,KP)+U(NP-1,I-1,KP)+U(NP,I-1,KP))                    0159
-94          CONTINUE                                                    0160
+         DO 94 I = 3, NP-2                                              0515
+            UINT(I) = B(I,2,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UB(I,2)+B(I,   0516
+     &      2,2)*(U(NP,I,KM)+U(NP-1,I,KM))+B(I,2,3)*(U(NP-1,I+1,KP)+U   0516
+     &      (NP,I+1,KP)+U(NP-1,I-1,KP)+U(NP,I-1,KP))                    0516
+94          CONTINUE                                                    0521
 
-         DO 95 I = 3, NP-2                                              0161
-            U(NP,I,KP) = UINT(I)                                        0162
-95          CONTINUE                                                    0163
+         DO 95 I = 3, NP-2                                              0523
+            U(NP,I,KP) = UINT(I)                                        0524
+95          CONTINUE                                                    0525
 
 C
 C     --------------------------------------------------------
 C     SOLUTION AU BORD WEST. CONDITIONS ABSORBANTES D'ORDRE 2.
 C     --------------------------------------------------------
 
-         DO 96 I = 3, NP-2                                              0164
-            UINT(I) = B(I,3,1)*(U(I,1,KP)+U(I,2,KP))-UB(I,3)+B(I,3,2)   0165
-     &      *(U(I,1,KM)+U(I,2,KM))+B(I,3,3)*(U(I+1,2,KP)+U(I+1,1,KP)+   0165
-     &      U(I-1,2,KP)+U(I-1,1,KP))                                    0165
-96          CONTINUE                                                    0166
+         DO 96 I = 3, NP-2                                              0532
+            UINT(I) = B(I,3,1)*(U(I,1,KP)+U(I,2,KP))-UB(I,3)+B(I,3,2)   0533
+     &      *(U(I,1,KM)+U(I,2,KM))+B(I,3,3)*(U(I+1,2,KP)+U(I+1,1,KP)+   0533
+     &      U(I-1,2,KP)+U(I-1,1,KP))                                    0533
+96          CONTINUE                                                    0538
 
-         DO 97 I = 3, NP-2                                              0167
-            U(I,1,KP) = UINT(I)                                         0168
-97          CONTINUE                                                    0169
+         DO 97 I = 3, NP-2                                              0540
+            U(I,1,KP) = UINT(I)                                         0541
+97          CONTINUE                                                    0542
 
 
 
@@ -536,14 +536,14 @@ C      CALCUL DU BORD DU COIN
 C      U(NP-1,NP,KP) ,  U(NP,NP-1,KP) ET U(NP-1,NP,KP)
 C      -----------------------------------------------
 
-         U(NP-1,NP,KP) = B(NP-1,1,1)*(U(NP-1,NP-1,KP)+U(NP-2,NP,KP))+   0170
-     &   B(NP-1,1,2)*U(NP-1,NP,KM)                                      0170
+         U(NP-1,NP,KP) = B(NP-1,1,1)*(U(NP-1,NP-1,KP)+U(NP-2,NP,KP))+   0551
+     &   B(NP-1,1,2)*U(NP-1,NP,KM)                                      0551
 
-         U(NP,NP-1,KP) = B(NP-1,2,1)*(U(NP,NP-2,KP)+U(NP-1,NP-1,KP))+   0171
-     &   B(NP-1,2,2)*U(NP,NP-1,KM)                                      0171
+         U(NP,NP-1,KP) = B(NP-1,2,1)*(U(NP,NP-2,KP)+U(NP-1,NP-1,KP))+   0554
+     &   B(NP-1,2,2)*U(NP,NP-1,KM)                                      0554
 
-         U(NP,NP,KP) = B(NP,2,1)*(U(NP,NP-1,KP)+U(NP-1,NP,KP))+B(NP,2   0172
-     &   ,2)*U(NP,NP,KM)                                                0172
+         U(NP,NP,KP) = B(NP,2,1)*(U(NP,NP-1,KP)+U(NP-1,NP,KP))+B(NP,2   0557
+     &   ,2)*U(NP,NP,KM)                                                0557
 
 
 C      -----------------------------------------------
@@ -551,57 +551,57 @@ C      CALCUL DU BORD DU COIN
 C      U(NP,2,KP) ,  U(NP-1,1,KP) ET U(NP,1,KP)
 C      -----------------------------------------------
 
-         U(NP,2,KP) = B(2,2,1)*(U(NP,3,KP)+U(NP-1,2,KP))+B(2,2,2)*U(    0173
-     &   NP,2,KM)                                                       0173
+         U(NP,2,KP) = B(2,2,1)*(U(NP,3,KP)+U(NP-1,2,KP))+B(2,2,2)*U(    0566
+     &   NP,2,KM)                                                       0566
 
-         U(NP-1,1,KP) = B(NP-1,3,1)*(U(NP-1,2,KP)+U(NP-2,1,KP))+B(NP-   0174
-     &   1,3,2)*U(NP-1,1,KM)                                            0174
+         U(NP-1,1,KP) = B(NP-1,3,1)*(U(NP-1,2,KP)+U(NP-2,1,KP))+B(NP-   0569
+     &   1,3,2)*U(NP-1,1,KM)                                            0569
 
-         U(NP,1,KP) = B(1,2,1)*(U(NP-1,1,KP)+U(NP,2,KP))+B(1,2,2)*U(    0175
-     &   NP,1,KM)                                                       0175
+         U(NP,1,KP) = B(1,2,1)*(U(NP-1,1,KP)+U(NP,2,KP))+B(1,2,2)*U(    0572
+     &   NP,1,KM)                                                       0572
 
 
 C
 C     ENREGISTREMENT DU SISMOGRAMME
 C     -----------------------------
-         DO 81 I = 1, NBTRAC                                            0176
-            SISMO(I,N) = U(IS,NP-NBTRAC+I,KP)                           0177
-81          CONTINUE                                                    0178
+         DO 81 I = 1, NBTRAC                                            0579
+            SISMO(I,N) = U(IS,NP-NBTRAC+I,KP)                           0580
+81          CONTINUE                                                    0581
 
 
 C     PERMUTATION A CHAQUE ITERATION DES PLANS ESPACE
 C     -----------------------------------------------
 C
-         KM = KP                                                        0179
-         KP = 3-KP                                                      0180
+         KM = KP                                                        0587
+         KP = 3-KP                                                      0588
 
-70       CONTINUE                                                       0181
+70       CONTINUE                                                       0590
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
-      TFIN = GETIME(W)                                                  0182
-      T2CPU = TFIN-TINIT-TMESUR                                         0183
-      WRITE (1, 1000) T2CPU                                             0184
+      TFIN = GETIME(W)                                                  0593
+      T2CPU = TFIN-TINIT-TMESUR                                         0594
+      WRITE (1, 1000) T2CPU                                             0595
 
-      TINIT = GETIME(W)                                                 0185
+      TINIT = GETIME(W)                                                 0597
 C////////////////END   FUNCTION TIMER/////////////////
 
 C
 C     SORTIE FICHIER DU SISMOGRAMME
 C     -----------------------------
 
-      WRITE (2, *) NBTRAC                                               0186
-      WRITE (2, *) NT                                                   0187
-      DO 82 K = 1, NBTRAC                                               0188
-         DO 83 J = 1, NT                                                0189
-            WRITE (2, *) SISMO(K,J)                                     0190
-83          CONTINUE                                                    0191
-82       CONTINUE                                                       0192
+      WRITE (2, *) NBTRAC                                               0604
+      WRITE (2, *) NT                                                   0605
+      DO 82 K = 1, NBTRAC                                               0606
+         DO 83 J = 1, NT                                                0607
+            WRITE (2, *) SISMO(K,J)                                     0608
+83          CONTINUE                                                    0609
+82       CONTINUE                                                       0610
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
-      TFIN = GETIME(W)                                                  0193
-      T3CPU = T3CPU+TFIN-TINIT-TMESUR                                   0194
-      WRITE (1, 1020) T3CPU                                             0195
-      WRITE (1, 1030) T1CPU+T2CPU+T3CPU                                 0196
+      TFIN = GETIME(W)                                                  0613
+      T3CPU = T3CPU+TFIN-TINIT-TMESUR                                   0614
+      WRITE (1, 1020) T3CPU                                             0615
+      WRITE (1, 1030) T1CPU+T2CPU+T3CPU                                 0616
 C////////////////END   FUNCTION TIMER/////////////////
 
 C
@@ -610,86 +610,86 @@ C     --------------------------
 
 C     INITIALISATIONS
 C     ---------------
-      NBOP1 = 114.0+(NP-3)*72.0+(NP-4)*(NP-4)*4.0                       0197
+      NBOP1 = 114.0+(NP-3)*72.0+(NP-4)*(NP-4)*4.0                       0625
 
 C     RESOLUTION
 C     ----------
-      NBOP2 = (NT-1)*((NP-4)*(NP-4)*14.0+(NP-3)*27.0+(NP-4)*33.0+26.0   0198
-     &)                                                                 0198
+      NBOP2 = (NT-1)*((NP-4)*(NP-4)*14.0+(NP-3)*27.0+(NP-4)*33.0+26.0   0629
+     &)                                                                 0629
 
 
-      MFLOPS = NBOP2/(T2CPU*1.0E06)                                     0199
-      WRITE (1, 1060) MFLOPS                                            0200
+      MFLOPS = NBOP2/(T2CPU*1.0E06)                                     0633
+      WRITE (1, 1060) MFLOPS                                            0634
 
-      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU)*1.0E06)                     0201
-      WRITE (1, 1065) MFLOPS                                            0202
+      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU)*1.0E06)                     0636
+      WRITE (1, 1065) MFLOPS                                            0637
 
-      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU+T3CPU)*1.0E06)               0203
-      WRITE (1, 1070) MFLOPS                                            0204
+      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU+T3CPU)*1.0E06)               0639
+      WRITE (1, 1070) MFLOPS                                            0641
 
 
 C
 C     CALCUL DE STATISTIQUES SUR LE RESULTAT
 C     --------------------------------------
-      UMAX = U(1,1,KM)                                                  0205
-      UMIN = U(1,1,KM)                                                  0206
-      DO 110 J = 1, NP                                                  0207
-         DO 120 I = 1, NP                                               0208
-            IF (U(I,J,KM).LT.UMIN) UMIN = U(I,J,KM)                     0209
-            IF (U(I,J,KM).GT.UMAX) UMAX = U(I,J,KM)                     0211
-120         CONTINUE                                                    0213
-110      CONTINUE                                                       0214
-      WRITE (1, 1050) UMIN, UMAX                                        0215
+      UMAX = U(1,1,KM)                                                  0647
+      UMIN = U(1,1,KM)                                                  0648
+      DO 110 J = 1, NP                                                  0649
+         DO 120 I = 1, NP                                               0650
+            IF (U(I,J,KM).LT.UMIN) UMIN = U(I,J,KM)                     0651
+            IF (U(I,J,KM).GT.UMAX) UMAX = U(I,J,KM)                     0654
+120         CONTINUE                                                    0657
+110      CONTINUE                                                       0658
+      WRITE (1, 1050) UMIN, UMAX                                        0659
 
 
-      SISMAX = SISMO(1,1)                                               0216
-      SISMIN = SISMO(1,1)                                               0217
-      DO 111 I = 1, NBTRAC                                              0218
-         DO 121 J = 1, NT                                               0219
-            IF (SISMO(I,J).LT.SISMIN) SISMIN = SISMO(I,J)               0220
-            IF (SISMO(I,J).GT.SISMAX) SISMAX = SISMO(I,J)               0222
-121         CONTINUE                                                    0224
-111      CONTINUE                                                       0225
-      WRITE (1, 1055) SISMIN, SISMAX                                    0226
+      SISMAX = SISMO(1,1)                                               0662
+      SISMIN = SISMO(1,1)                                               0663
+      DO 111 I = 1, NBTRAC                                              0664
+         DO 121 J = 1, NT                                               0665
+            IF (SISMO(I,J).LT.SISMIN) SISMIN = SISMO(I,J)               0666
+            IF (SISMO(I,J).GT.SISMAX) SISMAX = SISMO(I,J)               0669
+121         CONTINUE                                                    0672
+111      CONTINUE                                                       0673
+      WRITE (1, 1055) SISMIN, SISMAX                                    0674
 
 
 
-      WRITE (1, 1200)                                                   0227
+      WRITE (1, 1200)                                                   0678
 
-      CLOSE (1)                                                         0228
-      CLOSE (2)                                                         0229
-      CLOSE (3)                                                         0230
-      CLOSE (4)                                                         0231
+      CLOSE (1)                                                         0680
+      CLOSE (2)                                                         0681
+      CLOSE (3)                                                         0682
+      CLOSE (4)                                                         0683
 
-      STOP                                                              0232
+      STOP                                                              0685
 
 
 C     DECLARATIONS DE FORMATS DE SORTIE
 C     ---------------------------------
 
-1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0233
+1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0691
 
 1120  FORMAT(1X,'MODELISATION PAR EQUATION D"ONDES',/,1X,'SCHEMA D"ORDRE
-     & 4 EN ESPACE ET 2 EN TEMPS'//)                                    0234
-1130  FORMAT(1X,'TAILLE DU MAILLAGE NPXNP       : ',I4,'  X',I4)        0235
-1135  FORMAT(1X,'NOMBRE DE PAS DE TEMPS         : ',I4)                 0236
-1140  FORMAT(1X,'POSITION DE LA SOURCE          : (',I3,',',I3,')')     0237
-1171  FORMAT(1X,'PAS DE DISCR. EN ESPACE (H)    : ',E12.5)              0238
-1170  FORMAT(1X,'PAS DE DISCR. EN TEMPS (DELTAT): ',E12.5)              0239
-1180  FORMAT(1X,'FREQUENCE DE LA SOURCE (F)     : ',E12.5)              0240
-1051  FORMAT(1X,'MIN DE V:',E11.5,3X,'MAX DE V:  ',E11.5//)             0241
-1200  FORMAT(1X,/,1X,'FIN DU PROGRAMME')                                0242
+     & 4 EN ESPACE ET 2 EN TEMPS'//)                                    0693
+1130  FORMAT(1X,'TAILLE DU MAILLAGE NPXNP       : ',I4,'  X',I4)        0695
+1135  FORMAT(1X,'NOMBRE DE PAS DE TEMPS         : ',I4)                 0696
+1140  FORMAT(1X,'POSITION DE LA SOURCE          : (',I3,',',I3,')')     0697
+1171  FORMAT(1X,'PAS DE DISCR. EN ESPACE (H)    : ',E12.5)              0698
+1170  FORMAT(1X,'PAS DE DISCR. EN TEMPS (DELTAT): ',E12.5)              0699
+1180  FORMAT(1X,'FREQUENCE DE LA SOURCE (F)     : ',E12.5)              0700
+1051  FORMAT(1X,'MIN DE V:',E11.5,3X,'MAX DE V:  ',E11.5//)             0701
+1200  FORMAT(1X,/,1X,'FIN DU PROGRAMME')                                0702
 
-1000  FORMAT(1X,'TEMPS CPU DE LA RESOLUTION     (RESOL) : ',E15.5)      0243
-1010  FORMAT(1X,'TEMPS CPU DES INITIALISATIONS   (INIT) : ',E15.5)      0244
-1020  FORMAT(1X,'TEMPS CPU DES ENTREES/SORTIES    (E/S) : ',E15.5)      0245
-1030  FORMAT(1X,'TEMPS CPU TOTAL       (RESOL+INIT+E/S) : ',E15.5//)    0246
-1015  FORMAT(1X,'TEMPS CPU DE L"APPEL AU TIMER          : ',E15.5)      0247
-1050  FORMAT(1X,'MIN DE U     :',E15.5,3X,'MAX DE U     : ',E15.5)      0248
-1055  FORMAT(1X,'MIN DE SISMO :',E15.5,3X,'MAX DE SISMO : ',E15.5//)    0249
-1060  FORMAT(1X,'MFLOPS CPU PARTIE VECTORIELLE  (RESOL) : ',E15.5)      0250
-1065  FORMAT(1X,'MFLOPS CPU RESOLUTION     (RESOL+INIT) : ',E15.5)      0251
-1070  FORMAT(1X,'MFLOPS CPU GLOBAL     (RESOL+INIT+E/S) : ',E15.5//)    0252
+1000  FORMAT(1X,'TEMPS CPU DE LA RESOLUTION     (RESOL) : ',E15.5)      0704
+1010  FORMAT(1X,'TEMPS CPU DES INITIALISATIONS   (INIT) : ',E15.5)      0705
+1020  FORMAT(1X,'TEMPS CPU DES ENTREES/SORTIES    (E/S) : ',E15.5)      0706
+1030  FORMAT(1X,'TEMPS CPU TOTAL       (RESOL+INIT+E/S) : ',E15.5//)    0707
+1015  FORMAT(1X,'TEMPS CPU DE L"APPEL AU TIMER          : ',E15.5)      0708
+1050  FORMAT(1X,'MIN DE U     :',E15.5,3X,'MAX DE U     : ',E15.5)      0709
+1055  FORMAT(1X,'MIN DE SISMO :',E15.5,3X,'MAX DE SISMO : ',E15.5//)    0710
+1060  FORMAT(1X,'MFLOPS CPU PARTIE VECTORIELLE  (RESOL) : ',E15.5)      0711
+1065  FORMAT(1X,'MFLOPS CPU RESOLUTION     (RESOL+INIT) : ',E15.5)      0712
+1070  FORMAT(1X,'MFLOPS CPU GLOBAL     (RESOL+INIT+E/S) : ',E15.5//)    0713
 
 
 
@@ -709,7 +709,7 @@ C/////////////////////////////////////////////////////////////////////
      &     RESOLUTION SUR SUN 4                  ',/,1X,'     DOUBLE PRE
      &CISION (64 bits)              ',/,1X,'         VERSION STANDART   
      &                 ',/,1X,'                                         
-     &    ',/,1X,'*********************************************'//)     0253
+     &    ',/,1X,'*********************************************'//)     0729
 
       END
 
@@ -719,13 +719,13 @@ C     ----------------------
 
       SUBROUTINE OPENFILE
 
-      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0001
+      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0008
 
-      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0002
+      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0010
 
-      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0003
+      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0012
 
-      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0004
+      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0014
 
       END
 
@@ -738,7 +738,7 @@ C     INITIALISE LE TIMER - INUTILE SUR DE NOMBREUSES MACHINES
       END
 
       INTEGER FUNCTION TIME
-      TIME = 0.                                                         0001
+      TIME = 0.                                                         0003
       END
 ### type checked
 
@@ -747,7 +747,7 @@ C     INITIALISE LE TIMER - INUTILE SUR DE NOMBREUSES MACHINES
 C     REND LE TEMPS CPU INSTANTANE, EN SECONDES.
           EXTERNAL TIME
           INTEGER TIME
-      GETIME = REAL(TIME())                                             0001
+      GETIME = REAL(TIME())                                             0007
       END
 C     Modifications:
 C      - function TIME added
@@ -919,55 +919,55 @@ C
 C             CORPS DU PROGRAMME
 C             ------------------
 
-      CALL OPENFILE                                                     0001
+      CALL OPENFILE                                                     0171
 
 C
 C     ACQUISITION DES PARAMETRES DE LA MODELISATION
 C     ---------------------------------------------
 
 C     WRITE (6,'('' ENTRER LE NB DE POINTS DU MAILLAGE CARRE (NP) ? '',$)')
-      READ (4, *) NP                                                    0002
+      READ (4, *) NP                                                    0178
 C     WRITE (6,'('' ENTRER LE NB DE PAS DE TEMPS TOTAL (NT) ? '',$)')
-      READ (4, *) NT                                                    0003
+      READ (4, *) NT                                                    0180
 C     WRITE (6,'('' ENTRER LE PAS DE DISCR. EN ESPACE (H) ? '',$)')
-      READ (4, *) H                                                     0004
+      READ (4, *) H                                                     0182
 C     WRITE (6,'('' ENTRER LE PAS DE DISCR. EN TEMPS (DELTAT) ? '',$)')
-      READ (4, *) DELTAT                                                0005
+      READ (4, *) DELTAT                                                0184
 C     WRITE (6,'('' ENTRER LA POSITION EN X DE LA SOURCE (JS) ? '',$)')
-      READ (4, *) JS                                                    0006
+      READ (4, *) JS                                                    0186
 C     WRITE (6,'('' ENTRER LA POSITION EN Z DE LA SOURCE (IS) ? '',$)')
-      READ (4, *) IS                                                    0007
+      READ (4, *) IS                                                    0188
 C     WRITE (6,'('' ENTRER LA FREQUENCE DE LA SOURCE (F) ? '',$)')
-      READ (4, *) F                                                     0008
+      READ (4, *) F                                                     0190
 
 
 
 
-      WRITE (1, 1100)                                                   0009
-      WRITE (1, 1110)                                                   0010
-      WRITE (1, 1120)                                                   0011
-      WRITE (1, 1130) NP, NP                                            0012
-      WRITE (1, 1135) NT                                                0013
-      WRITE (1, 1140) IS, JS                                            0014
-      WRITE (1, 1171) H                                                 0015
-      WRITE (1, 1170) DELTAT                                            0016
-      WRITE (1, 1180) F                                                 0017
+      WRITE (1, 1100)                                                   0195
+      WRITE (1, 1110)                                                   0196
+      WRITE (1, 1120)                                                   0197
+      WRITE (1, 1130) NP, NP                                            0198
+      WRITE (1, 1135) NT                                                0199
+      WRITE (1, 1140) IS, JS                                            0200
+      WRITE (1, 1171) H                                                 0201
+      WRITE (1, 1170) DELTAT                                            0202
+      WRITE (1, 1180) F                                                 0203
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
 !ERROR: invalid arg #1 to 'STIMER', REAL*8 instead of REAL*4!
-      CALL STIMER(W)                                                    0018
+      CALL STIMER(W)                                                    0206
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TINIT = DBLE(GETIME(W))                                           0019
+      TINIT = DBLE(GETIME(W))                                           0207
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TFIN = DBLE(GETIME(W))                                            0020
-      TMESUR = TFIN-TINIT                                               0021
+      TFIN = DBLE(GETIME(W))                                            0208
+      TMESUR = TFIN-TINIT                                               0209
 C////////////////END   FUNCTION TIMER/////////////////
 C
 C     INITIALISATION DES VARIABLES SCALAIRES
 C     --------------------------------------
-      KM = 1                                                            0022
-      KP = 2                                                            0023
-      G0 = 0.0D0                                                        0024
+      KM = 1                                                            0214
+      KP = 2                                                            0215
+      G0 = 0.0D0                                                        0216
 
 
 C     INITIALISATION DU CHAMP VITESSE
@@ -976,39 +976,39 @@ C     -------------------------------------------------------
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TINIT = DBLE(GETIME(W))                                           0025
+      TINIT = DBLE(GETIME(W))                                           0224
 C////////////////END   FUNCTION TIMER/////////////////
 
 
-      READ (3, *) NP                                                    0026
-      READ (3, *) NP                                                    0027
-      DO 21 I = 1, NP                                                   0028
-         DO 22 J = 1, NP                                                0029
-            READ (3, *) V(I,J)                                          0030
-22          CONTINUE                                                    0031
-21       CONTINUE                                                       0032
+      READ (3, *) NP                                                    0228
+      READ (3, *) NP                                                    0229
+      DO 21 I = 1, NP                                                   0230
+         DO 22 J = 1, NP                                                0231
+            READ (3, *) V(I,J)                                          0232
+22          CONTINUE                                                    0233
+21       CONTINUE                                                       0234
 
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TFIN = DBLE(GETIME(W))                                            0033
-      T3CPU = TFIN-TINIT                                                0034
+      TFIN = DBLE(GETIME(W))                                            0238
+      T3CPU = TFIN-TINIT                                                0239
 C////////////////END   FUNCTION TIMER/////////////////
 
-      VMAX = V(1,1)                                                     0035
-      VMIN = V(1,1)                                                     0036
-      DO 112 I = 1, NP                                                  0037
-         DO 122 J = 1, NP                                               0038
-            IF (V(I,J).LT.VMIN) VMIN = V(I,J)                           0039
-            IF (V(I,J).GT.VMAX) VMAX = V(I,J)                           0041
-122         CONTINUE                                                    0043
-112      CONTINUE                                                       0044
-      WRITE (1, 1051) VMIN, VMAX                                        0045
+      VMAX = V(1,1)                                                     0242
+      VMIN = V(1,1)                                                     0243
+      DO 112 I = 1, NP                                                  0244
+         DO 122 J = 1, NP                                               0245
+            IF (V(I,J).LT.VMIN) VMIN = V(I,J)                           0246
+            IF (V(I,J).GT.VMAX) VMAX = V(I,J)                           0249
+122         CONTINUE                                                    0252
+112      CONTINUE                                                       0253
+      WRITE (1, 1051) VMIN, VMAX                                        0254
 
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TINIT = DBLE(GETIME(W))                                           0046
+      TINIT = DBLE(GETIME(W))                                           0258
 C////////////////END   FUNCTION TIMER/////////////////
 
 
@@ -1018,18 +1018,18 @@ C     ET DES ENREGISTREMENTS
 C     SISMO (T=1) = 0.0
 C     ------------------------------
 
-      DO 10 K = 1, 2                                                    0047
-         DO 20 J = 1, NP                                                0048
-            DO 30 I = 1, NP                                             0049
-               U(I,J,K) = 0.0D0                                         0050
-30             CONTINUE                                                 0051
-20          CONTINUE                                                    0052
-10       CONTINUE                                                       0053
+      DO 10 K = 1, 2                                                    0268
+         DO 20 J = 1, NP                                                0269
+            DO 30 I = 1, NP                                             0270
+               U(I,J,K) = 0.0D0                                         0271
+30             CONTINUE                                                 0272
+20          CONTINUE                                                    0273
+10       CONTINUE                                                       0274
 
 
-      DO 84 I = 1, NBTRAC                                               0054
-         SISMO(I,1) = 0.0D0                                             0055
-84       CONTINUE                                                       0056
+      DO 84 I = 1, NBTRAC                                               0277
+         SISMO(I,1) = 0.0D0                                             0278
+84       CONTINUE                                                       0279
 
 
 
@@ -1045,114 +1045,114 @@ C     --------------------------------------------------------
 
 C     CAS DES TROIS POINTS DU COIN E-S
 C     --------------------------------
-      C1 = 4.0D0/(1.0D0/V(NP-1,NP)+1.0D0/V(NP-1,NP-1)+1.0D0/V(NP-2,NP   0057
-     &)+1.0D0/V(NP-2,NP-1))                                             0057
-      W = C1*DELTAT                                                     0058
-      B(NP-1,1,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                           0059
-      B(NP-1,1,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                           0060
+      C1 = 4.0D0/(1.0D0/V(NP-1,NP)+1.0D0/V(NP-1,NP-1)+1.0D0/V(NP-2,NP   0295
+     &)+1.0D0/V(NP-2,NP-1))                                             0295
+      W = C1*DELTAT                                                     0297
+      B(NP-1,1,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                           0298
+      B(NP-1,1,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                           0299
 
-      C2 = 4.0D0/(1.0D0/V(NP,NP)+1.0D0/V(NP,NP-1)+1.0D0/V(NP-1,NP)+     0061
-     &1.0D0/V(NP-1,NP-1))                                               0061
-      W = C2*DELTAT                                                     0062
-      B(NP,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                             0063
-      B(NP,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                             0064
+      C2 = 4.0D0/(1.0D0/V(NP,NP)+1.0D0/V(NP,NP-1)+1.0D0/V(NP-1,NP)+     0301
+     &1.0D0/V(NP-1,NP-1))                                               0301
+      W = C2*DELTAT                                                     0303
+      B(NP,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                             0304
+      B(NP,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                             0305
 
-      C3 = 4.0D0/(1.0D0/V(NP,NP)+1.0D0/V(NP,NP-1)+1.0D0/V(NP-1,NP)+     0065
-     &1.0D0/V(NP-1,NP-1))                                               0065
-      W = C3*DELTAT                                                     0066
-      B(NP-1,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                           0067
-      B(NP-1,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                           0068
+      C3 = 4.0D0/(1.0D0/V(NP,NP)+1.0D0/V(NP,NP-1)+1.0D0/V(NP-1,NP)+     0307
+     &1.0D0/V(NP-1,NP-1))                                               0307
+      W = C3*DELTAT                                                     0309
+      B(NP-1,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                           0310
+      B(NP-1,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                           0311
 
-      V(NP-1,NP) = C1                                                   0069
-      V(NP,NP) = C2                                                     0070
-      V(NP,NP-1) = C3                                                   0071
+      V(NP-1,NP) = C1                                                   0313
+      V(NP,NP) = C2                                                     0314
+      V(NP,NP-1) = C3                                                   0315
 
 C     CAS DES 3 POINTS DU COIN W-S
 C     ----------------------------
-      C1 = 4.0D0/(1.0D0/V(NP,2)+1.0D0/V(NP,3)+1.0D0/V(NP-1,2)+1.0D0/V   0072
-     &(NP-1,3))                                                         0072
-      W = C1*DELTAT                                                     0073
-      B(2,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                              0074
-      B(2,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                              0075
+      C1 = 4.0D0/(1.0D0/V(NP,2)+1.0D0/V(NP,3)+1.0D0/V(NP-1,2)+1.0D0/V   0319
+     &(NP-1,3))                                                         0319
+      W = C1*DELTAT                                                     0321
+      B(2,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                              0322
+      B(2,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                              0323
 
-      C2 = 4.0D0/(1.0D0/V(NP,1)+1.0D0/V(NP,2)+1.0D0/V(NP-1,1)+1.0D0/V   0076
-     &(NP-1,2))                                                         0076
-      W = C2*DELTAT                                                     0077
-      B(1,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                              0078
-      B(1,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                              0079
+      C2 = 4.0D0/(1.0D0/V(NP,1)+1.0D0/V(NP,2)+1.0D0/V(NP-1,1)+1.0D0/V   0325
+     &(NP-1,2))                                                         0325
+      W = C2*DELTAT                                                     0327
+      B(1,2,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                              0328
+      B(1,2,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                              0329
 
-      C3 = 4.0D0/(1.0D0/V(NP-1,1)+1.0D0/V(NP-1,2)+1.0D0/V(NP-2,1)+      0080
-     &1.0D0/V(NP-2,2))                                                  0080
-      W = C3*DELTAT                                                     0081
-      B(NP-1,3,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                           0082
-      B(NP-1,3,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                           0083
+      C3 = 4.0D0/(1.0D0/V(NP-1,1)+1.0D0/V(NP-1,2)+1.0D0/V(NP-2,1)+      0331
+     &1.0D0/V(NP-2,2))                                                  0331
+      W = C3*DELTAT                                                     0333
+      B(NP-1,3,1) = 2.0D0*W/(4.0D0*W+3.0D0*H)                           0334
+      B(NP-1,3,2) = 3.0D0*H/(4.0D0*W+3.0D0*H)                           0335
 
-      V(NP,2) = C1                                                      0084
-      V(NP,1) = C2                                                      0085
-      V(NP-1,1) = C3                                                    0086
+      V(NP,2) = C1                                                      0337
+      V(NP,1) = C2                                                      0338
+      V(NP-1,1) = C3                                                    0339
 
 
 C     CAS DES BORDS   E - S - W
 C     -------------------------
-      DO 41 I = 2, NP-2                                                 0087
-         V(I,NP) = 2.0D0/(1.0D0/V(I,NP)+1.0D0/V(I,NP-1))                0088
-         W = V(I,NP)*DELTAT                                             0089
-         B(I,1,1) = 1.0D0-1.0D0/(W+H)*(2.0D0*H+W*W/H)                   0090
-         B(I,1,2) = 2.0D0*H/(W+H)                                       0091
-         B(I,1,3) = W*W/(2.0D0*H*(W+H))                                 0092
-41       CONTINUE                                                       0093
+      DO 41 I = 2, NP-2                                                 0344
+         V(I,NP) = 2.0D0/(1.0D0/V(I,NP)+1.0D0/V(I,NP-1))                0345
+         W = V(I,NP)*DELTAT                                             0346
+         B(I,1,1) = 1.0D0-1.0D0/(W+H)*(2.0D0*H+W*W/H)                   0347
+         B(I,1,2) = 2.0D0*H/(W+H)                                       0348
+         B(I,1,3) = W*W/(2.0D0*H*(W+H))                                 0349
+41       CONTINUE                                                       0350
 
-      DO 42 I = 3, NP-2                                                 0094
-         V(NP,I) = 2.0D0/(1.0D0/V(NP,I)+1.0D0/V(NP-1,I))                0095
-         W = V(NP,I)*DELTAT                                             0096
-         B(I,2,1) = 1.0D0-1.0D0/(W+H)*(2.0D0*H+W*W/H)                   0097
-         B(I,2,2) = 2.0D0*H/(W+H)                                       0098
-         B(I,2,3) = W*W/(2.0D0*H*(W+H))                                 0099
-42       CONTINUE                                                       0100
+      DO 42 I = 3, NP-2                                                 0352
+         V(NP,I) = 2.0D0/(1.0D0/V(NP,I)+1.0D0/V(NP-1,I))                0353
+         W = V(NP,I)*DELTAT                                             0354
+         B(I,2,1) = 1.0D0-1.0D0/(W+H)*(2.0D0*H+W*W/H)                   0355
+         B(I,2,2) = 2.0D0*H/(W+H)                                       0356
+         B(I,2,3) = W*W/(2.0D0*H*(W+H))                                 0357
+42       CONTINUE                                                       0358
 
-      DO 43 I = 2, NP-2                                                 0101
-         V(I,1) = 2.0D0/(1.0D0/V(I,1)+1.0D0/V(I,2))                     0102
-         W = V(I,1)*DELTAT                                              0103
-         B(I,3,1) = 1.0D0-1.0D0/(W+H)*(2.0D0*H+W*W/H)                   0104
-         B(I,3,2) = 2.0D0*H/(W+H)                                       0105
-         B(I,3,3) = W*W/(2.0D0*H*(W+H))                                 0106
-43       CONTINUE                                                       0107
+      DO 43 I = 2, NP-2                                                 0360
+         V(I,1) = 2.0D0/(1.0D0/V(I,1)+1.0D0/V(I,2))                     0361
+         W = V(I,1)*DELTAT                                              0362
+         B(I,3,1) = 1.0D0-1.0D0/(W+H)*(2.0D0*H+W*W/H)                   0363
+         B(I,3,2) = 2.0D0*H/(W+H)                                       0364
+         B(I,3,3) = W*W/(2.0D0*H*(W+H))                                 0365
+43       CONTINUE                                                       0366
 
 C
 C     INITIALISATION DES CONSTANTES LIEES AUX BORDS INTERNES
 C     ------------------------------------------------------
-      DO 51 I = 3, NP-1                                                 0108
-         V(I,2) = (V(I,2)*DELTAT/H)**2                                  0109
-51       CONTINUE                                                       0110
+      DO 51 I = 3, NP-1                                                 0371
+         V(I,2) = (V(I,2)*DELTAT/H)**2                                  0372
+51       CONTINUE                                                       0373
 
-      DO 52 I = 3, NP-1                                                 0111
-         V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0112
-52       CONTINUE                                                       0113
+      DO 52 I = 3, NP-1                                                 0375
+         V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0376
+52       CONTINUE                                                       0377
 
-      DO 53 I = 3, NP-2                                                 0114
-         V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0115
-53       CONTINUE                                                       0116
+      DO 53 I = 3, NP-2                                                 0379
+         V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0380
+53       CONTINUE                                                       0381
 
 
 C     INITIALISATION DES CONSTANTES LIEES AU DOMAINE INTERIEUR
 C            V(I,J) <--  1/12*((V(I,J)*DELTAT/H)**2)
 C     --------------------------------------------------------
-      DO 40 J = 3, NP-2                                                 0117
-         DO 50 I = 3, NP-2                                              0118
-            V(I,J) = (V(I,J)*DELTAT/H)**2/12.0D0                        0119
-50          CONTINUE                                                    0120
-40       CONTINUE                                                       0121
+      DO 40 J = 3, NP-2                                                 0387
+         DO 50 I = 3, NP-2                                              0388
+            V(I,J) = (V(I,J)*DELTAT/H)**2/12.0D0                        0389
+50          CONTINUE                                                    0390
+40       CONTINUE                                                       0391
 
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TFIN = DBLE(GETIME(W))                                            0122
-      T1CPU = TFIN-TINIT-TMESUR                                         0123
-      WRITE (1, 1015) TMESUR                                            0124
-      WRITE (1, 1010) T1CPU                                             0125
+      TFIN = DBLE(GETIME(W))                                            0395
+      T1CPU = TFIN-TINIT-TMESUR                                         0396
+      WRITE (1, 1015) TMESUR                                            0397
+      WRITE (1, 1010) T1CPU                                             0398
 
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TINIT = DBLE(GETIME(W))                                           0126
+      TINIT = DBLE(GETIME(W))                                           0400
 C////////////////END   FUNCTION TIMER/////////////////
 
 C     -----------------------------------------------------------
@@ -1166,16 +1166,16 @@ C     ----------------------------
 C     !     BOUCLE EN TEMPS      !
 C     ----------------------------
 
-      DO 70 N = 2, NT                                                   0127
+      DO 70 N = 2, NT                                                   0414
 
 C     PRISE EN COMPTE DE LA FONCTION SOURCE PENDANT UN TEMPS DE TMAX SEC.
 C     Un = Un + SOURCE
 C     ------------------------------------------------------------------
-         W = F*(DBLE(N)*DELTAT-1.0D0/F)                                 0128
-         IF (W**2.LT.DBLE(TMAX)) THEN                                   0129
-            W = (W*PI)**2                                               0130
-            G0 = (1.0D0-2.0D0*W)*DEXP(-W)                               0131
-            U(IS,JS,KM) = U(IS,JS,KM)+G0*12.0D0*V(IS,JS)*H**2           0132
+         W = F*(DBLE(N)*DELTAT-1.0D0/F)                                 0419
+         IF (W**2.LT.DBLE(TMAX)) THEN                                   0420
+            W = (W*PI)**2                                               0421
+            G0 = (1.0D0-2.0D0*W)*DEXP(-W)                               0422
+            U(IS,JS,KM) = U(IS,JS,KM)+G0*12.0D0*V(IS,JS)*H**2           0423
          ENDIF
 
 
@@ -1185,11 +1185,11 @@ C     SAUVEGARDE DE LA FRANGE CONNEXE AUX BORDS POUR LE CALCUL
 C     ULTERIEUR DE LA SOLUTION AUX BORDS
 C     --------------------------------------------------------
 
-         DO 71 I = 2, NP-1                                              0133
-            UB(I,1) = U(I,NP-1,KP)                                      0134
-            UB(I,2) = U(NP-1,I,KP)                                      0135
-            UB(I,3) = U(I,2,KP)                                         0136
-71          CONTINUE                                                    0137
+         DO 71 I = 2, NP-1                                              0433
+            UB(I,1) = U(I,NP-1,KP)                                      0434
+            UB(I,2) = U(NP-1,I,KP)                                      0435
+            UB(I,3) = U(I,2,KP)                                         0436
+71          CONTINUE                                                    0437
 
 C
 C     ------------------------------------------------
@@ -1197,21 +1197,21 @@ C     SOLUTION SUR LE DOMAINE INTERIEUR
 C     SCHEMA D'ORDRE 2 EN TEMPS ET D'ORDRE 4 EN ESPACE
 C     ------------------------------------------------
 
-         DO 80 J = 3, NP-2                                              0138
+         DO 80 J = 3, NP-2                                              0445
 
 C     levee des dependances pour forcer la vectorisation.
 C     kp et km sont toujours different.
 C DIR$ IVDEP
 
-            DO 90 I = 3, NP-2                                           0139
+            DO 90 I = 3, NP-2                                           0451
 
-               U(I,J,KP) = 2.0D0*U(I,J,KM)-U(I,J,KP)-V(I,J)*(60.0D0*U   0140
-     &         (I,J,KM)-16.0D0*(U(I+1,J,KM)+U(I-1,J,KM)+U(I,J-1,KM)+U   0140
-     &         (I,J+1,KM))+U(I+2,J,KM)+U(I-2,J,KM)+U(I,J-2,KM)+U(I,J+   0140
-     &         2,KM))                                                   0140
+               U(I,J,KP) = 2.0D0*U(I,J,KM)-U(I,J,KP)-V(I,J)*(60.0D0*U   0453
+     &         (I,J,KM)-16.0D0*(U(I+1,J,KM)+U(I-1,J,KM)+U(I,J-1,KM)+U   0453
+     &         (I,J+1,KM))+U(I+2,J,KM)+U(I-2,J,KM)+U(I,J-2,KM)+U(I,J+   0453
+     &         2,KM))                                                   0453
 
-90             CONTINUE                                                 0141
-80          CONTINUE                                                    0142
+90             CONTINUE                                                 0459
+80          CONTINUE                                                    0460
 
 C
 C     ------------------------------------------------
@@ -1220,70 +1220,70 @@ C     SCHEMA D'ORDRE 2 EN TEMPS ET D'ORDRE 2 EN ESPACE
 C     ------------------------------------------------
 
 C DIR$ IVDEP
-         DO 140 I = 3, NP-1                                             0143
-            U(I,2,KP) = 2.0D0*U(I,2,KM)-U(I,2,KP)-V(I,2)*(4.0D0*U(I,2   0144
-     &      ,KM)-(U(I+1,2,KM)+U(I-1,2,KM)+U(I,1,KM)+U(I,3,KM)))         0144
-140         CONTINUE                                                    0145
+         DO 140 I = 3, NP-1                                             0469
+            U(I,2,KP) = 2.0D0*U(I,2,KM)-U(I,2,KP)-V(I,2)*(4.0D0*U(I,2   0470
+     &      ,KM)-(U(I+1,2,KM)+U(I-1,2,KM)+U(I,1,KM)+U(I,3,KM)))         0470
+140         CONTINUE                                                    0474
 
 C DIR$ IVDEP
-         DO 141 I = 3, NP-1                                             0146
-            U(I,NP-1,KP) = 2.0D0*U(I,NP-1,KM)-U(I,NP-1,KP)-V(I,NP-1)*   0147
-     &      (4.0D0*U(I,NP-1,KM)-(U(I+1,NP-1,KM)+U(I-1,NP-1,KM)+U(I,NP   0147
-     &      -2,KM)+U(I,NP,KM)))                                         0147
-141         CONTINUE                                                    0148
+         DO 141 I = 3, NP-1                                             0477
+            U(I,NP-1,KP) = 2.0D0*U(I,NP-1,KM)-U(I,NP-1,KP)-V(I,NP-1)*   0478
+     &      (4.0D0*U(I,NP-1,KM)-(U(I+1,NP-1,KM)+U(I-1,NP-1,KM)+U(I,NP   0478
+     &      -2,KM)+U(I,NP,KM)))                                         0478
+141         CONTINUE                                                    0482
 
 
 C DIR$ IVDEP
-         DO 142 I = 3, NP-2                                             0149
-            U(NP-1,I,KP) = 2.0D0*U(NP-1,I,KM)-U(NP-1,I,KP)-V(NP-1,I)*   0150
-     &      (4.0D0*U(NP-1,I,KM)-(U(NP,I,KM)+U(NP-2,I,KM)+U(NP-1,I-1,    0150
-     &      KM)+U(NP-1,I+1,KM)))                                        0150
-142         CONTINUE                                                    0151
+         DO 142 I = 3, NP-2                                             0486
+            U(NP-1,I,KP) = 2.0D0*U(NP-1,I,KM)-U(NP-1,I,KP)-V(NP-1,I)*   0487
+     &      (4.0D0*U(NP-1,I,KM)-(U(NP,I,KM)+U(NP-2,I,KM)+U(NP-1,I-1,    0487
+     &      KM)+U(NP-1,I+1,KM)))                                        0487
+142         CONTINUE                                                    0491
 
 C
 C     --------------------------------------------------------
 C     SOLUTION AU BORD EAST. CONDITIONS ABSORBANTES D'ORDRE 2.
 C     --------------------------------------------------------
 
-         DO 92 I = 3, NP-2                                              0152
-            UINT(I) = B(I,1,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UB(I,1)+B(I,   0153
-     &      1,2)*(U(I,NP,KM)+U(I,NP-1,KM))+B(I,1,3)*(U(I+1,NP-1,KP)+U   0153
-     &      (I+1,NP,KP)+U(I-1,NP-1,KP)+U(I-1,NP,KP))                    0153
-92          CONTINUE                                                    0154
+         DO 92 I = 3, NP-2                                              0498
+            UINT(I) = B(I,1,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UB(I,1)+B(I,   0499
+     &      1,2)*(U(I,NP,KM)+U(I,NP-1,KM))+B(I,1,3)*(U(I+1,NP-1,KP)+U   0499
+     &      (I+1,NP,KP)+U(I-1,NP-1,KP)+U(I-1,NP,KP))                    0499
+92          CONTINUE                                                    0504
 
-         DO 93 I = 3, NP-2                                              0155
-            U(I,NP,KP) = UINT(I)                                        0156
-93          CONTINUE                                                    0157
+         DO 93 I = 3, NP-2                                              0506
+            U(I,NP,KP) = UINT(I)                                        0507
+93          CONTINUE                                                    0508
 
 C
 C     --------------------------------------------------------
 C     SOLUTION AU BORD SOUTH. CONDITIONS ABSORBANTES D'ORDRE 2.
 C     --------------------------------------------------------
 
-         DO 94 I = 3, NP-2                                              0158
-            UINT(I) = B(I,2,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UB(I,2)+B(I,   0159
-     &      2,2)*(U(NP,I,KM)+U(NP-1,I,KM))+B(I,2,3)*(U(NP-1,I+1,KP)+U   0159
-     &      (NP,I+1,KP)+U(NP-1,I-1,KP)+U(NP,I-1,KP))                    0159
-94          CONTINUE                                                    0160
+         DO 94 I = 3, NP-2                                              0515
+            UINT(I) = B(I,2,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UB(I,2)+B(I,   0516
+     &      2,2)*(U(NP,I,KM)+U(NP-1,I,KM))+B(I,2,3)*(U(NP-1,I+1,KP)+U   0516
+     &      (NP,I+1,KP)+U(NP-1,I-1,KP)+U(NP,I-1,KP))                    0516
+94          CONTINUE                                                    0521
 
-         DO 95 I = 3, NP-2                                              0161
-            U(NP,I,KP) = UINT(I)                                        0162
-95          CONTINUE                                                    0163
+         DO 95 I = 3, NP-2                                              0523
+            U(NP,I,KP) = UINT(I)                                        0524
+95          CONTINUE                                                    0525
 
 C
 C     --------------------------------------------------------
 C     SOLUTION AU BORD WEST. CONDITIONS ABSORBANTES D'ORDRE 2.
 C     --------------------------------------------------------
 
-         DO 96 I = 3, NP-2                                              0164
-            UINT(I) = B(I,3,1)*(U(I,1,KP)+U(I,2,KP))-UB(I,3)+B(I,3,2)   0165
-     &      *(U(I,1,KM)+U(I,2,KM))+B(I,3,3)*(U(I+1,2,KP)+U(I+1,1,KP)+   0165
-     &      U(I-1,2,KP)+U(I-1,1,KP))                                    0165
-96          CONTINUE                                                    0166
+         DO 96 I = 3, NP-2                                              0532
+            UINT(I) = B(I,3,1)*(U(I,1,KP)+U(I,2,KP))-UB(I,3)+B(I,3,2)   0533
+     &      *(U(I,1,KM)+U(I,2,KM))+B(I,3,3)*(U(I+1,2,KP)+U(I+1,1,KP)+   0533
+     &      U(I-1,2,KP)+U(I-1,1,KP))                                    0533
+96          CONTINUE                                                    0538
 
-         DO 97 I = 3, NP-2                                              0167
-            U(I,1,KP) = UINT(I)                                         0168
-97          CONTINUE                                                    0169
+         DO 97 I = 3, NP-2                                              0540
+            U(I,1,KP) = UINT(I)                                         0541
+97          CONTINUE                                                    0542
 
 
 
@@ -1292,14 +1292,14 @@ C      CALCUL DU BORD DU COIN
 C      U(NP-1,NP,KP) ,  U(NP,NP-1,KP) ET U(NP-1,NP,KP)
 C      -----------------------------------------------
 
-         U(NP-1,NP,KP) = B(NP-1,1,1)*(U(NP-1,NP-1,KP)+U(NP-2,NP,KP))+   0170
-     &   B(NP-1,1,2)*U(NP-1,NP,KM)                                      0170
+         U(NP-1,NP,KP) = B(NP-1,1,1)*(U(NP-1,NP-1,KP)+U(NP-2,NP,KP))+   0551
+     &   B(NP-1,1,2)*U(NP-1,NP,KM)                                      0551
 
-         U(NP,NP-1,KP) = B(NP-1,2,1)*(U(NP,NP-2,KP)+U(NP-1,NP-1,KP))+   0171
-     &   B(NP-1,2,2)*U(NP,NP-1,KM)                                      0171
+         U(NP,NP-1,KP) = B(NP-1,2,1)*(U(NP,NP-2,KP)+U(NP-1,NP-1,KP))+   0554
+     &   B(NP-1,2,2)*U(NP,NP-1,KM)                                      0554
 
-         U(NP,NP,KP) = B(NP,2,1)*(U(NP,NP-1,KP)+U(NP-1,NP,KP))+B(NP,2   0172
-     &   ,2)*U(NP,NP,KM)                                                0172
+         U(NP,NP,KP) = B(NP,2,1)*(U(NP,NP-1,KP)+U(NP-1,NP,KP))+B(NP,2   0557
+     &   ,2)*U(NP,NP,KM)                                                0557
 
 
 C      -----------------------------------------------
@@ -1307,60 +1307,60 @@ C      CALCUL DU BORD DU COIN
 C      U(NP,2,KP) ,  U(NP-1,1,KP) ET U(NP,1,KP)
 C      -----------------------------------------------
 
-         U(NP,2,KP) = B(2,2,1)*(U(NP,3,KP)+U(NP-1,2,KP))+B(2,2,2)*U(    0173
-     &   NP,2,KM)                                                       0173
+         U(NP,2,KP) = B(2,2,1)*(U(NP,3,KP)+U(NP-1,2,KP))+B(2,2,2)*U(    0566
+     &   NP,2,KM)                                                       0566
 
-         U(NP-1,1,KP) = B(NP-1,3,1)*(U(NP-1,2,KP)+U(NP-2,1,KP))+B(NP-   0174
-     &   1,3,2)*U(NP-1,1,KM)                                            0174
+         U(NP-1,1,KP) = B(NP-1,3,1)*(U(NP-1,2,KP)+U(NP-2,1,KP))+B(NP-   0569
+     &   1,3,2)*U(NP-1,1,KM)                                            0569
 
-         U(NP,1,KP) = B(1,2,1)*(U(NP-1,1,KP)+U(NP,2,KP))+B(1,2,2)*U(    0175
-     &   NP,1,KM)                                                       0175
+         U(NP,1,KP) = B(1,2,1)*(U(NP-1,1,KP)+U(NP,2,KP))+B(1,2,2)*U(    0572
+     &   NP,1,KM)                                                       0572
 
 
 C
 C     ENREGISTREMENT DU SISMOGRAMME
 C     -----------------------------
-         DO 81 I = 1, NBTRAC                                            0176
-            SISMO(I,N) = U(IS,NP-NBTRAC+I,KP)                           0177
-81          CONTINUE                                                    0178
+         DO 81 I = 1, NBTRAC                                            0579
+            SISMO(I,N) = U(IS,NP-NBTRAC+I,KP)                           0580
+81          CONTINUE                                                    0581
 
 
 C     PERMUTATION A CHAQUE ITERATION DES PLANS ESPACE
 C     -----------------------------------------------
 C
-         KM = KP                                                        0179
-         KP = 3-KP                                                      0180
+         KM = KP                                                        0587
+         KP = 3-KP                                                      0588
 
-70       CONTINUE                                                       0181
+70       CONTINUE                                                       0590
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TFIN = DBLE(GETIME(W))                                            0182
-      T2CPU = TFIN-TINIT-TMESUR                                         0183
-      WRITE (1, 1000) T2CPU                                             0184
+      TFIN = DBLE(GETIME(W))                                            0593
+      T2CPU = TFIN-TINIT-TMESUR                                         0594
+      WRITE (1, 1000) T2CPU                                             0595
 
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TINIT = DBLE(GETIME(W))                                           0185
+      TINIT = DBLE(GETIME(W))                                           0597
 C////////////////END   FUNCTION TIMER/////////////////
 
 C
 C     SORTIE FICHIER DU SISMOGRAMME
 C     -----------------------------
 
-      WRITE (2, *) NBTRAC                                               0186
-      WRITE (2, *) NT                                                   0187
-      DO 82 K = 1, NBTRAC                                               0188
-         DO 83 J = 1, NT                                                0189
-            WRITE (2, *) SISMO(K,J)                                     0190
-83          CONTINUE                                                    0191
-82       CONTINUE                                                       0192
+      WRITE (2, *) NBTRAC                                               0604
+      WRITE (2, *) NT                                                   0605
+      DO 82 K = 1, NBTRAC                                               0606
+         DO 83 J = 1, NT                                                0607
+            WRITE (2, *) SISMO(K,J)                                     0608
+83          CONTINUE                                                    0609
+82       CONTINUE                                                       0610
 
 C////////////////BEGIN FUNCTION TIMER/////////////////
 !ERROR: invalid arg #1 to 'GETIME', REAL*8 instead of REAL*4!
-      TFIN = DBLE(GETIME(W))                                            0193
-      T3CPU = T3CPU+TFIN-TINIT-TMESUR                                   0194
-      WRITE (1, 1020) T3CPU                                             0195
-      WRITE (1, 1030) T1CPU+T2CPU+T3CPU                                 0196
+      TFIN = DBLE(GETIME(W))                                            0613
+      T3CPU = T3CPU+TFIN-TINIT-TMESUR                                   0614
+      WRITE (1, 1020) T3CPU                                             0615
+      WRITE (1, 1030) T1CPU+T2CPU+T3CPU                                 0616
 C////////////////END   FUNCTION TIMER/////////////////
 
 C
@@ -1369,86 +1369,86 @@ C     --------------------------
 
 C     INITIALISATIONS
 C     ---------------
-      NBOP1 = DBLE(114.0+REAL(NP-3)*72.0+REAL((NP-4)*(NP-4))*4.0)       0197
+      NBOP1 = DBLE(114.0+REAL(NP-3)*72.0+REAL((NP-4)*(NP-4))*4.0)       0625
 
 C     RESOLUTION
 C     ----------
-      NBOP2 = DBLE(REAL(NT-1)*(REAL((NP-4)*(NP-4))*14.0+REAL(NP-3)*     0198
-     &27.0+REAL(NP-4)*33.0+26.0))                                       0198
+      NBOP2 = DBLE(REAL(NT-1)*(REAL((NP-4)*(NP-4))*14.0+REAL(NP-3)*     0629
+     &27.0+REAL(NP-4)*33.0+26.0))                                       0629
 
 
-      MFLOPS = NBOP2/(T2CPU*1.0D06)                                     0199
-      WRITE (1, 1060) MFLOPS                                            0200
+      MFLOPS = NBOP2/(T2CPU*1.0D06)                                     0633
+      WRITE (1, 1060) MFLOPS                                            0634
 
-      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU)*1.0D06)                     0201
-      WRITE (1, 1065) MFLOPS                                            0202
+      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU)*1.0D06)                     0636
+      WRITE (1, 1065) MFLOPS                                            0637
 
-      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU+T3CPU)*1.0D06)               0203
-      WRITE (1, 1070) MFLOPS                                            0204
+      MFLOPS = (NBOP1+NBOP2)/((T1CPU+T2CPU+T3CPU)*1.0D06)               0639
+      WRITE (1, 1070) MFLOPS                                            0641
 
 
 C
 C     CALCUL DE STATISTIQUES SUR LE RESULTAT
 C     --------------------------------------
-      UMAX = U(1,1,KM)                                                  0205
-      UMIN = U(1,1,KM)                                                  0206
-      DO 110 J = 1, NP                                                  0207
-         DO 120 I = 1, NP                                               0208
-            IF (U(I,J,KM).LT.UMIN) UMIN = U(I,J,KM)                     0209
-            IF (U(I,J,KM).GT.UMAX) UMAX = U(I,J,KM)                     0211
-120         CONTINUE                                                    0213
-110      CONTINUE                                                       0214
-      WRITE (1, 1050) UMIN, UMAX                                        0215
+      UMAX = U(1,1,KM)                                                  0647
+      UMIN = U(1,1,KM)                                                  0648
+      DO 110 J = 1, NP                                                  0649
+         DO 120 I = 1, NP                                               0650
+            IF (U(I,J,KM).LT.UMIN) UMIN = U(I,J,KM)                     0651
+            IF (U(I,J,KM).GT.UMAX) UMAX = U(I,J,KM)                     0654
+120         CONTINUE                                                    0657
+110      CONTINUE                                                       0658
+      WRITE (1, 1050) UMIN, UMAX                                        0659
 
 
-      SISMAX = SISMO(1,1)                                               0216
-      SISMIN = SISMO(1,1)                                               0217
-      DO 111 I = 1, NBTRAC                                              0218
-         DO 121 J = 1, NT                                               0219
-            IF (SISMO(I,J).LT.SISMIN) SISMIN = SISMO(I,J)               0220
-            IF (SISMO(I,J).GT.SISMAX) SISMAX = SISMO(I,J)               0222
-121         CONTINUE                                                    0224
-111      CONTINUE                                                       0225
-      WRITE (1, 1055) SISMIN, SISMAX                                    0226
+      SISMAX = SISMO(1,1)                                               0662
+      SISMIN = SISMO(1,1)                                               0663
+      DO 111 I = 1, NBTRAC                                              0664
+         DO 121 J = 1, NT                                               0665
+            IF (SISMO(I,J).LT.SISMIN) SISMIN = SISMO(I,J)               0666
+            IF (SISMO(I,J).GT.SISMAX) SISMAX = SISMO(I,J)               0669
+121         CONTINUE                                                    0672
+111      CONTINUE                                                       0673
+      WRITE (1, 1055) SISMIN, SISMAX                                    0674
 
 
 
-      WRITE (1, 1200)                                                   0227
+      WRITE (1, 1200)                                                   0678
 
-      CLOSE (1)                                                         0228
-      CLOSE (2)                                                         0229
-      CLOSE (3)                                                         0230
-      CLOSE (4)                                                         0231
+      CLOSE (1)                                                         0680
+      CLOSE (2)                                                         0681
+      CLOSE (3)                                                         0682
+      CLOSE (4)                                                         0683
 
-      STOP                                                              0232
+      STOP                                                              0685
 
 
 C     DECLARATIONS DE FORMATS DE SORTIE
 C     ---------------------------------
 
-1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0233
+1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0691
 
 1120  FORMAT(1X,'MODELISATION PAR EQUATION D"ONDES',/,1X,'SCHEMA D"ORDRE
-     & 4 EN ESPACE ET 2 EN TEMPS'//)                                    0234
-1130  FORMAT(1X,'TAILLE DU MAILLAGE NPXNP       : ',I4,'  X',I4)        0235
-1135  FORMAT(1X,'NOMBRE DE PAS DE TEMPS         : ',I4)                 0236
-1140  FORMAT(1X,'POSITION DE LA SOURCE          : (',I3,',',I3,')')     0237
-1171  FORMAT(1X,'PAS DE DISCR. EN ESPACE (H)    : ',E12.5)              0238
-1170  FORMAT(1X,'PAS DE DISCR. EN TEMPS (DELTAT): ',E12.5)              0239
-1180  FORMAT(1X,'FREQUENCE DE LA SOURCE (F)     : ',E12.5)              0240
-1051  FORMAT(1X,'MIN DE V:',E11.5,3X,'MAX DE V:  ',E11.5//)             0241
-1200  FORMAT(1X,/,1X,'FIN DU PROGRAMME')                                0242
+     & 4 EN ESPACE ET 2 EN TEMPS'//)                                    0693
+1130  FORMAT(1X,'TAILLE DU MAILLAGE NPXNP       : ',I4,'  X',I4)        0695
+1135  FORMAT(1X,'NOMBRE DE PAS DE TEMPS         : ',I4)                 0696
+1140  FORMAT(1X,'POSITION DE LA SOURCE          : (',I3,',',I3,')')     0697
+1171  FORMAT(1X,'PAS DE DISCR. EN ESPACE (H)    : ',E12.5)              0698
+1170  FORMAT(1X,'PAS DE DISCR. EN TEMPS (DELTAT): ',E12.5)              0699
+1180  FORMAT(1X,'FREQUENCE DE LA SOURCE (F)     : ',E12.5)              0700
+1051  FORMAT(1X,'MIN DE V:',E11.5,3X,'MAX DE V:  ',E11.5//)             0701
+1200  FORMAT(1X,/,1X,'FIN DU PROGRAMME')                                0702
 
-1000  FORMAT(1X,'TEMPS CPU DE LA RESOLUTION     (RESOL) : ',E15.5)      0243
-1010  FORMAT(1X,'TEMPS CPU DES INITIALISATIONS   (INIT) : ',E15.5)      0244
-1020  FORMAT(1X,'TEMPS CPU DES ENTREES/SORTIES    (E/S) : ',E15.5)      0245
-1030  FORMAT(1X,'TEMPS CPU TOTAL       (RESOL+INIT+E/S) : ',E15.5//)    0246
-1015  FORMAT(1X,'TEMPS CPU DE L"APPEL AU TIMER          : ',E15.5)      0247
-1050  FORMAT(1X,'MIN DE U     :',E15.5,3X,'MAX DE U     : ',E15.5)      0248
-1055  FORMAT(1X,'MIN DE SISMO :',E15.5,3X,'MAX DE SISMO : ',E15.5//)    0249
-1060  FORMAT(1X,'MFLOPS CPU PARTIE VECTORIELLE  (RESOL) : ',E15.5)      0250
-1065  FORMAT(1X,'MFLOPS CPU RESOLUTION     (RESOL+INIT) : ',E15.5)      0251
-1070  FORMAT(1X,'MFLOPS CPU GLOBAL     (RESOL+INIT+E/S) : ',E15.5//)    0252
+1000  FORMAT(1X,'TEMPS CPU DE LA RESOLUTION     (RESOL) : ',E15.5)      0704
+1010  FORMAT(1X,'TEMPS CPU DES INITIALISATIONS   (INIT) : ',E15.5)      0705
+1020  FORMAT(1X,'TEMPS CPU DES ENTREES/SORTIES    (E/S) : ',E15.5)      0706
+1030  FORMAT(1X,'TEMPS CPU TOTAL       (RESOL+INIT+E/S) : ',E15.5//)    0707
+1015  FORMAT(1X,'TEMPS CPU DE L"APPEL AU TIMER          : ',E15.5)      0708
+1050  FORMAT(1X,'MIN DE U     :',E15.5,3X,'MAX DE U     : ',E15.5)      0709
+1055  FORMAT(1X,'MIN DE SISMO :',E15.5,3X,'MAX DE SISMO : ',E15.5//)    0710
+1060  FORMAT(1X,'MFLOPS CPU PARTIE VECTORIELLE  (RESOL) : ',E15.5)      0711
+1065  FORMAT(1X,'MFLOPS CPU RESOLUTION     (RESOL+INIT) : ',E15.5)      0712
+1070  FORMAT(1X,'MFLOPS CPU GLOBAL     (RESOL+INIT+E/S) : ',E15.5//)    0713
 
 
 
@@ -1468,7 +1468,7 @@ C/////////////////////////////////////////////////////////////////////
      &     RESOLUTION SUR SUN 4                  ',/,1X,'     DOUBLE PRE
      &CISION (64 bits)              ',/,1X,'         VERSION STANDART   
      &                 ',/,1X,'                                         
-     &    ',/,1X,'*********************************************'//)     0253
+     &    ',/,1X,'*********************************************'//)     0729
 
       END
 
@@ -1478,13 +1478,13 @@ C     ----------------------
 
       SUBROUTINE OPENFILE
 
-      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0001
+      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0008
 
-      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0002
+      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0010
 
-      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0003
+      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0012
 
-      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0004
+      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0014
 
       END
 
@@ -1497,7 +1497,7 @@ C     INITIALISE LE TIMER - INUTILE SUR DE NOMBREUSES MACHINES
       END
 
       INTEGER FUNCTION TIME
-      TIME = 0                                                          0001
+      TIME = 0                                                          0003
       END
 TYPE_CHECKER[GETIME] (put_summary) summary of 'GETIME': 0 errors, 0 convertions., 0 simplifications
 TYPE_CHECKER[ONDE24] (put_summary) summary of 'ONDE24': 11 errors, 20 convertions., 113 simplifications

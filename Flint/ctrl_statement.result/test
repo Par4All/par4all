@@ -14,14 +14,14 @@ C     At most one argument:
 C        * Integer constant with not more than 5 digits
 C        * Character constant
 C     =======================
-      STOP                                                              0002
-      STOP 12345                                                        0003
-      STOP "STRING"                                                     0004
+      STOP                                                              0018
+      STOP 12345                                                        0019
+      STOP "STRING"                                                     0020
 
 !ERROR: Argument must be an integer of at most 5 digits (instead of '10')
-      STOP 1234567890                                                   0005
+      STOP 1234567890                                                   0022
 !ERROR: Argument #1 of 'STOP' must be an integer or character constant
-      STOP I                                                            0006
+      STOP I                                                            0023
 
       END
 

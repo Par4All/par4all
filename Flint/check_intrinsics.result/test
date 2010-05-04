@@ -5,9 +5,9 @@ Flinted file
 
 Non-initialized variables:
 --------------------------
-In statement number 6 (0.7):
+In statement number 15 (0.7):
 	"W" used but not initialized.
 
-flint message from check reference, in module CHECK_INTRINSICS, in statement (0.2), number 1
+flint message from check reference, in module CHECK_INTRINSICS, in statement (0.2), number 5
 the 1th index is not a mere integer
 number of messages from flint for CHECK_INTRINSICS : 2

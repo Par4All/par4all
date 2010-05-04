@@ -3,76 +3,90 @@ compile and execute initial file
 ! test various constant simplifications
 !
       PROGRAM CONSTANTS
+
       INTEGER I
       REAL R
       COMPLEX C
       DOUBLE PRECISION D
       DOUBLE COMPLEX DC
-      I = 1                                                             0001
-      R = 1.1                                                           0002
-      D = 1.1D0                                                         0003
-      C = (1.1, 0.0E0)                                                  0004
-      DC = (1.1D0, 0.0D0)                                               0005
-      I = 1                                                             0006
-      R = 1.0594630943592952645618252E0                                 0007
-      D = 1.0594630943592952645618252D0                                 0008
-      C = (1.0594630943592952645618252E0, 0.0E0)                        0009
-      DC = (1.0594630943592952645618252D0, 0.0D0)                       0010
-      PRINT *, 'int: ', I                                               0011
-      PRINT *, 'real: ', R                                              0012
-      PRINT *, 'cmplx: ', C                                             0013
-      PRINT *, 'dbl: ', D                                               0014
-      PRINT *, 'dcmplx: ', DC                                           0015
+
+      I = 1                                                             0012
+      R = 1.1                                                           0013
+      D = 1.1D0                                                         0014
+      C = (1.1, 0.0E0)                                                  0015
+      DC = (1.1D0, 0.0D0)                                               0016
+
+      I = 1                                                             0018
+      R = 1.0594630943592952645618252E0                                 0019
+      D = 1.0594630943592952645618252D0                                 0020
+      C = (1.0594630943592952645618252E0, 0.0E0)                        0021
+      DC = (1.0594630943592952645618252D0, 0.0D0)                       0022
+
+      PRINT *, 'int: ', I                                               0024
+      PRINT *, 'real: ', R                                              0025
+      PRINT *, 'cmplx: ', C                                             0026
+      PRINT *, 'dbl: ', D                                               0027
+      PRINT *, 'dcmplx: ', DC                                           0028
+
 ! double complex promotion?
 ! it does not seem to work cleanly...
-      D = 1.23456789012345D0                                            0016
-      C = (1.23456E0, 1.23456E0)                                        0017
+      D = 1.23456789012345D0                                            0032
+      C = (1.23456E0, 1.23456E0)                                        0033
 !ERROR: mixed complex and double arguments of '+' forbidden
-      PRINT *, 'double complex', D+C                                    0018
+      PRINT *, 'double complex', D+C                                    0034
+
 ! other simplifications
-      PRINT *, -1234                                                    0019
-      PRINT *, -1234.0E0                                                0020
-      PRINT *, -1234.0D0                                                0021
-      PRINT *, CMPLX(-1234.0E0, 0.0E0)                                  0022
-      PRINT *, DCMPLX(-1234.0D0, 0.0D0)                                 0023
+
+      PRINT *, -1234                                                    0038
+      PRINT *, -1234.0E0                                                0039
+      PRINT *, -1234.0D0                                                0040
+      PRINT *, CMPLX(-1234.0E0, 0.0E0)                                  0041
+      PRINT *, DCMPLX(-1234.0D0, 0.0D0)                                 0042
+
 ! ambiguous (real*4)?
-      PRINT *, 1                                                        0024
-      PRINT *, 1.1                                                      0025
-      PRINT *, 1.1D0                                                    0026
-      PRINT *, CMPLX(1.1, 0.0E0)                                        0027
-      PRINT *, DCMPLX(1.1D0, 0.0D0)                                     0028
-      PRINT *, 1                                                        0029
-      PRINT *, 1.234567E0                                               0030
-      PRINT *, 1.234567D0                                               0031
-      PRINT *, CMPLX(1.234567E0, 0.0E0)                                 0032
-      PRINT *, DCMPLX(1.234567D0, 0.0D0)                                0033
-      PRINT *, 1                                                        0034
-      PRINT *, 1.234567890123456E0                                      0035
-      PRINT *, 1.234567890123456D0                                      0036
-      PRINT *, CMPLX(1.234567890123456E0, 0.0E0)                        0037
-      PRINT *, DCMPLX(1.234567890123456D0, 0.0D0)                       0038
+      PRINT *, 1                                                        0045
+      PRINT *, 1.1                                                      0046
+      PRINT *, 1.1D0                                                    0047
+      PRINT *, CMPLX(1.1, 0.0E0)                                        0048
+      PRINT *, DCMPLX(1.1D0, 0.0D0)                                     0049
+
+      PRINT *, 1                                                        0051
+      PRINT *, 1.234567E0                                               0052
+      PRINT *, 1.234567D0                                               0053
+      PRINT *, CMPLX(1.234567E0, 0.0E0)                                 0054
+      PRINT *, DCMPLX(1.234567D0, 0.0D0)                                0055
+
+      PRINT *, 1                                                        0057
+      PRINT *, 1.234567890123456E0                                      0058
+      PRINT *, 1.234567890123456D0                                      0059
+      PRINT *, CMPLX(1.234567890123456E0, 0.0E0)                        0060
+      PRINT *, DCMPLX(1.234567890123456D0, 0.0D0)                       0061
+
 ! too many figures?
-      PRINT *, 1                                                        0039
-      PRINT *, 1.0594630943592952645618252E0                            0040
-      PRINT *, 1.0594630943592952645618252D0                            0041
-      PRINT *, CMPLX(1.0594630943592952645618252E0, 0.0E0)              0042
-      PRINT *, DCMPLX(1.0594630943592952645618252D0, 0.0D0)             0043
-      PRINT *, 1                                                        0044
-      PRINT *, 1.234567E0                                               0045
-      PRINT *, 1.234567D0                                               0046
-      PRINT *, CMPLX(1.234567E0, -1.234567E0)                           0047
-      PRINT *, DCMPLX(1.234567D0, -1.234567D0)                          0048
+      PRINT *, 1                                                        0064
+      PRINT *, 1.0594630943592952645618252E0                            0065
+      PRINT *, 1.0594630943592952645618252D0                            0066
+      PRINT *, CMPLX(1.0594630943592952645618252E0, 0.0E0)              0067
+      PRINT *, DCMPLX(1.0594630943592952645618252D0, 0.0D0)             0068
+
+      PRINT *, 1                                                        0070
+      PRINT *, 1.234567E0                                               0071
+      PRINT *, 1.234567D0                                               0072
+      PRINT *, CMPLX(1.234567E0, -1.234567E0)                           0073
+      PRINT *, DCMPLX(1.234567D0, -1.234567D0)                          0074
+
 ! this extension should be accepted?
 !ERROR: #1 argument of 'INT' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      PRINT *, -1                                                       0049
+      PRINT *, -1                                                       0077
 !ERROR: #1 argument of 'REAL' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      PRINT *, -1.234567890123456E0                                     0050
+      PRINT *, -1.234567890123456E0                                     0078
 !ERROR: #1 argument of 'DBLE' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      PRINT *, -1.234567890123456D0                                     0051
+      PRINT *, -1.234567890123456D0                                     0079
 !ERROR: #1 argument of 'CMPLX' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      PRINT *, CMPLX((-1.234567890123456D0, -1.234567890123456D0))      0052
+      PRINT *, CMPLX((-1.234567890123456D0, -1.234567890123456D0))      0080
 !ERROR: #1 argument of 'DCMPLX' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      PRINT *, (-1.234567890123456D0, -1.234567890123456D0)             0053
+      PRINT *, (-1.234567890123456D0, -1.234567890123456D0)             0081
+
       END
 compile and execute result file
 differences...
