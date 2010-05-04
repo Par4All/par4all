@@ -48,12 +48,12 @@ Pyps
 Properties
 Crough
 Top-level
+Demo-2009
 # should be added?
 # AliasChecking
 # ArrayBoundCheck
 # ArrayResizing
 # Blas
-# Demo-2009
 # Flint
 # Gpu
 # Pointers
