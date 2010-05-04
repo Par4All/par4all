@@ -3267,15 +3267,19 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
           !=instruction_undefined );
       statement s = instruction_to_statement(do_i);
 
-      //it would be perfect if we new there is a EXIT or a CYCLE in the loop, do not add if already one (then how to stock the label ?)
-      //add to s a continue statement at the end to make cycle/continue statements
+      /*
+       * it would be perfect if we new there is a EXIT or a CYCLE in the loop,
+       * do not add if already one (then how to stock the label ?)
+       * add to s a continue statement at the end to make
+       * cycle/continue statements
+       */
       list list_of_instructions =
           sequence_statements(instruction_sequence(statement_instruction(s)));
       list_of_instructions = gen_nreverse( list_of_instructions );
-      list_of_instructions
+/*      list_of_instructions
           = gen_cons( make_continue_statement( gfc2pips_int2label( gfc2pips_last_created_label ) ),
                       list_of_instructions );
-      gfc2pips_last_created_label -= gfc2pips_last_created_label_step;
+      gfc2pips_last_created_label -= gfc2pips_last_created_label_step;*/
       list_of_instructions = gen_nreverse( list_of_instructions );
       sequence_statements(instruction_sequence(statement_instruction(s)))
           = list_of_instructions;
