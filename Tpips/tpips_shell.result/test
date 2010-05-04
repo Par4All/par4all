@@ -1,12 +1,12 @@
 ## phase 1
 ! hello bla!
       SUBROUTINE BLA
-      PRINT *, 'bla'                                                    0001
+      PRINT *, 'bla'                                                    0003
       END
 ! foo and bla as usual...
       PROGRAM FOO
-      PRINT *, 'foo'                                                    0001
-      CALL BLA                                                          0002
+      PRINT *, 'foo'                                                    0003
+      CALL BLA                                                          0004
       END
 ## ls...
 BLA/
@@ -17,6 +17,6 @@ Warnings
 ## phase 2
 ! hello bla!
       SUBROUTINE BLA
-      PRINT *, 'bla'                                                    0001
+      PRINT *, 'bla'                                                    0003
       END
 ## done

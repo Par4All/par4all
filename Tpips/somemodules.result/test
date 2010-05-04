@@ -6,9 +6,9 @@ but inexistant in the workspace sm
 ! Source code for module "foo" is not available but it can be generated
 !
       PROGRAM MAIN
-      PRINT *, 'main'                                                   0001
-      CALL BLA(3)                                                       0002
-      CALL FOO(1, 'hello')                                              0003
+      PRINT *, 'main'                                                   0005
+      CALL BLA(3)                                                       0006
+      CALL FOO(1, 'hello')                                              0007
       END
 
 Source code for FOO, although FOO does not exist yet in the workspace
@@ -20,7 +20,7 @@ Source code for FOO, although FOO does not exist yet in the workspace
 !
       SUBROUTINE FOO(F1, F2)
       INTEGER*4 F1
-      CHARACTER*6 F2
+      CHARACTER*5 F2
       END
 
 No source code for BOOM, which does not exist,
@@ -33,9 +33,9 @@ Source code for MAIN
 ! Source code for module "foo" is not available but it can be generated
 !
       PROGRAM MAIN
-      PRINT *, 'main'                                                   0001
-      CALL BLA(3)                                                       0002
-      CALL FOO(1, 'hello')                                              0003
+      PRINT *, 'main'                                                   0005
+      CALL BLA(3)                                                       0006
+      CALL FOO(1, 'hello')                                              0007
       END
 
 Source code for FOO
@@ -47,7 +47,7 @@ Source code for FOO
 !
       SUBROUTINE FOO(F1, F2)
       INTEGER*4 F1
-      CHARACTER*6 F2
+      CHARACTER*5 F2
       END
 
 Source code for the main program
@@ -56,8 +56,8 @@ Source code for the main program
 ! Source code for module "foo" is not available but it can be generated
 !
       PROGRAM MAIN
-      PRINT *, 'main'                                                   0001
-      CALL BLA(3)                                                       0002
-      CALL FOO(1, 'hello')                                              0003
+      PRINT *, 'main'                                                   0005
+      CALL BLA(3)                                                       0006
+      CALL FOO(1, 'hello')                                              0007
       END
 
