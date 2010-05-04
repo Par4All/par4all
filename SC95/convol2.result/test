@@ -10,25 +10,25 @@ c     of the image
       REAL KERNEL(KSI,KSJ)
 
 
-      DO I = 1, ISI                                                     0001
-         DO J = 1, ISJ                                                  0002
-            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0003
+      DO I = 1, ISI                                                     0010
+         DO J = 1, ISJ                                                  0011
+            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0012
          ENDDO
       ENDDO
 
 
-      DO 400 I = 1+KSI/2, ISI-KSI/2                                     0004
-         DO 300 J = 1+KSJ/2, ISJ-KSJ/2                                  0005
-            NEW_IMAGE(I,J) = 0.                                         0006
-            DO 200 KI = 1, KSI                                          0007
-               DO 100 KJ = 1, KSJ                                       0008
-                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-KSI/2-1,   0009
-     &            J+KJ-KSJ/2-1)*KERNEL(KI,KJ)                           0009
-100               CONTINUE                                              0010
-200            CONTINUE                                                 0011
-            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/(KSI*KSJ)                   0012
-300         CONTINUE                                                    0013
-400      CONTINUE                                                       0014
+      DO 400 I = 1+KSI/2, ISI-KSI/2                                     0017
+         DO 300 J = 1+KSJ/2, ISJ-KSJ/2                                  0018
+            NEW_IMAGE(I,J) = 0.                                         0019
+            DO 200 KI = 1, KSI                                          0020
+               DO 100 KJ = 1, KSJ                                       0021
+                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-KSI/2-1,   0022
+     &            J+KJ-KSJ/2-1)*KERNEL(KI,KJ)                           0022
+100               CONTINUE                                              0025
+200            CONTINUE                                                 0026
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/(KSI*KSJ)                   0027
+300         CONTINUE                                                    0028
+400      CONTINUE                                                       0029
 
       END
 
@@ -43,25 +43,25 @@ c     of the image
       REAL KERNEL(KSI,KSJ)
 
 
-      DO I = 1, 512                                                     0001
-         DO J = 1, 512                                                  0002
-            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0003
+      DO I = 1, 512                                                     0010
+         DO J = 1, 512                                                  0011
+            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0012
          ENDDO
       ENDDO
 
 
-      DO 400 I = 2, 511                                                 0004
-         DO 300 J = 2, 511                                              0005
-            NEW_IMAGE(I,J) = 0.                                         0006
-            DO 200 KI = 1, 3                                            0007
-               DO 100 KJ = 1, 3                                         0008
-                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-2,J+KJ-2   0009
-     &            )*KERNEL(KI,KJ)                                       0009
-100               CONTINUE                                              0010
-200            CONTINUE                                                 0011
-            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0012
-300         CONTINUE                                                    0013
-400      CONTINUE                                                       0014
+      DO 400 I = 2, 511                                                 0017
+         DO 300 J = 2, 511                                              0018
+            NEW_IMAGE(I,J) = 0.                                         0019
+            DO 200 KI = 1, 3                                            0020
+               DO 100 KJ = 1, 3                                         0021
+                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-2,J+KJ-2   0022
+     &            )*KERNEL(KI,KJ)                                       0022
+100               CONTINUE                                              0025
+200            CONTINUE                                                 0026
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0027
+300         CONTINUE                                                    0028
+400      CONTINUE                                                       0029
 
       END
 
@@ -76,24 +76,24 @@ c     of the image
       REAL KERNEL(KSI,KSJ)
 
 
-      DO I = 1, 512                                                     0001
-         DO J = 1, 512                                                  0002
-            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0003
+      DO I = 1, 512                                                     0010
+         DO J = 1, 512                                                  0011
+            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0012
          ENDDO
       ENDDO
 
 
-      DO 400 I = 2, 511                                                 0004
-         DO 300 J = 2, 511                                              0005
-            NEW_IMAGE(I,J) = 0.                                         0006
-            DO 200 KIp = 1, 3                                           0007
-               DO 100 KJp = 1, 3                                        0008
-                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(-2+I+KJp,-2+J   0009
-     &            +KIp)*KERNEL(KJp,KIp)                                 0009
-100               CONTINUE                                              0010
-            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0012
-300         CONTINUE                                                    0013
-400      CONTINUE                                                       0014
+      DO 400 I = 2, 511                                                 0017
+         DO 300 J = 2, 511                                              0018
+            NEW_IMAGE(I,J) = 0.                                         0019
+            DO 200 KIp = 1, 3                                           0020
+               DO 100 KJp = 1, 3                                        0021
+                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KJp-2,J+KIp   0022
+     &            -2)*KERNEL(KJp,KIp)                                   0022
+100               CONTINUE                                              0025
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0027
+300         CONTINUE                                                    0028
+400      CONTINUE                                                       0029
 
       END
 
@@ -108,26 +108,26 @@ c     of the image
       REAL KERNEL(KSI,KSJ)
 
 
-      DO I = 1, 512                                                     0001
-         DO J = 1, 512                                                  0002
-            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0003
+      DO I = 1, 512                                                     0010
+         DO J = 1, 512                                                  0011
+            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0012
          ENDDO
       ENDDO
 
 
-      DO 400 I = 2, 511                                                 0004
-         DO 300 J = 2, 511                                              0005
-            NEW_IMAGE(I,J) = 0.                                         0006
-            DO 200 KIp = 1, 3                                           0007
-               DO KJp_1 = 1, 3, (3-1+5)/5                               0008
-                  DO KJp = KJp_1, MIN(KJp_1+(3-1+5)/5-1, 3)
-                     NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(-2+I+KJp,    0009
-     &               -2+J+KIp)*KERNEL(KJp,KIp)                          0009
-100                  CONTINUE                                           0010
-                  ENDDO
-               ENDDO
-            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0012
-300         CONTINUE                                                    0013
-400      CONTINUE                                                       0014
+      DO 400 I = 2, 511                                                 0017
+         DO J_1 = 2, 511, 4                                             0018
+            DO J = J_1, MIN(J_1+3, 511)
+               NEW_IMAGE(I,J) = 0.                                      0019
+               DO 200 KIp = 1, 3                                        0020
+                  DO 100 KJp = 1, 3                                     0021
+                     NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KJp-2,J+   0022
+     &               KIp-2)*KERNEL(KJp,KIp)                             0022
+100                  CONTINUE                                           0025
+               NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                        0027
+300            CONTINUE                                                 0028
+            ENDDO
+         ENDDO
+400      CONTINUE                                                       0029
 
       END
