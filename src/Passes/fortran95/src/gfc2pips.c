@@ -3268,7 +3268,7 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       statement s = instruction_to_statement(do_i);
 
       /*
-       * it would be perfect if we new there is a EXIT or a CYCLE in the loop,
+       * it would be perfect if we knew there is a EXIT or a CYCLE in the loop,
        * do not add if already one (then how to stock the label ?)
        * add to s a continue statement at the end to make
        * cycle/continue statements
@@ -3651,14 +3651,29 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       list lci = NULL;
 
       /* lci will be set in reverse order, so we have to put data first */
-      for ( c = c->block->next; c && c->op == EXEC_TRANSFER; c = c->next ) {
+      for ( c = c->block->next; c; c = c->next ) {
         if ( c->expr ) {
           lci = CONS(EXPRESSION,gfc2pips_expr2expression(c->expr),lci);
-          /* Separator is IO_LIST */
-          lci = CONS( EXPRESSION,
-              MakeCharacterConstantExpression( "IOLIST=" ),
-              lci);
+        } else {
+          instruction i = gfc2pips_code2instruction_(c);
+          if(instruction_loop_p(i)) {
+            /*
+             * We have to convert manually a loop to a call to a DO-IMPLIED
+             */
+            loop l = instruction_loop(i);
+            print_statement(loop_body(l));
+            lci = CONS(EXPRESSION,loop_to_implieddo(l),lci);
+          } else if(instruction_call_p(i)) {
+            lci = CONS(EXPRESSION,call_to_expression(instruction_call(i)),lci);
+          } else {
+            pips_user_warning("We don't know how to handle op : %d \n", c->op);
+            continue;
+          }
         }
+        /* Separator is IO_LIST */
+        lci = CONS( EXPRESSION,
+            MakeCharacterConstantExpression( "IOLIST=" ),
+            lci);
       }
 
       if ( dt->format_expr ) { //if no format ; it is standard
@@ -3816,11 +3831,12 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
 
     }
       break;
-      //this should be never dumped because only used in a WRITE block of gfc
-    case EXEC_TRANSFER:
-      pips_user_warning("TRANSFER has been encounter ! Ignoring it !\n");
+    case EXEC_TRANSFER: {
+      // FIXME, chained transfert ? c->block->next not null ?
+      expression transfered = gfc2pips_expr2expression(c->expr);
+      return make_instruction_expression(transfered);
       break;
-
+    }
     case EXEC_DT_END:
       pips_user_warning("DT_END has been encounter ! Ignoring it !\n");
       break;
