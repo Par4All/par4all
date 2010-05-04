@@ -9372,7 +9372,7 @@ transformation_test    > MODULE.code
 \label{subsection-open_mp_pragma}
 \index{OpenMP}
 
-\begin{PipsPass}{OMP Pragma}
+\begin{PipsPass}{ompify_code}
 The following transformation reads the sequential code and generates OpenMP pragma as
 an extension to statements. The pragmas produced are based on the information
 previously computed by differents phases and already stores in the pips internal
@@ -9396,7 +9396,7 @@ otherwise pragmas would be generated as expressions.
 PRAGMA_TYPE "expr"
 \end{PipsProp}
 
-\begin{PipsPass}{Loop parallel threshold}
+\begin{PipsPass}{omp_loop_parallel_threshold_set}
 The PIPS phase  OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET allows to add the OpenMP
 \verb|if| clause to all the OpenMP pragmas. Afterwodrs, the number of iteraion
 of the loop will be evaluated dynamically and compared to the defined threshold.
