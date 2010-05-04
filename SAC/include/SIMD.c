@@ -221,6 +221,14 @@ SIMD_SUBPS (float DEST[4], float SRC1[4], float SRC2[4])
     DEST[2] = SRC1[2] - SRC2[2];
     DEST[3] = SRC1[3] - SRC2[3];
 }
+void
+SIMD_UMINPS (float DEST[4], float SRC1[4])
+{
+    DEST[0] =  - SRC1[0];
+    DEST[1] =  - SRC1[1];
+    DEST[2] =  - SRC1[2];
+    DEST[3] =  - SRC1[3];
+}
 
 void
 SIMD_MULPS (float DEST[4], float SRC1[4], float SRC2[4])

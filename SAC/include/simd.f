@@ -191,6 +191,15 @@
       dest(1) = src1(1) + src2(1)
       dest(2) = src1(2) + src2(2)
       end
+      subroutine simd_uminps(dest, src1)
+      real*4 dest(4)
+      real*4 src1(4)
+
+      dest(1) =  - src1(1)
+      dest(2) =  - src1(2)
+      dest(3) =  - src1(3)
+      dest(4) =  - src1(4)
+      end
 
       subroutine simd_subps(dest, src1, src2)
       real*4 dest(4)

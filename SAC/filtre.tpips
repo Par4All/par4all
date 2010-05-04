@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete filtre
-create filtre filtre.c include/SIMD.c
+setenv WS="filtre"
+delete $WS
+create $WS $WS.c include/SIMD.c
 
 activate MUST_REGIONS
 activate PRECONDITIONS_INTER_FULL
@@ -20,7 +21,7 @@ echo
 echo Initial code
 echo
 
-module filtre
+module $WS
 display PRINTED_FILE
 
 apply SIMD_ATOMIZER
@@ -82,11 +83,11 @@ echo
 display PRINTED_FILE
 apply UNSPLIT
 
-shell cc filtre.c include/SIMD.c -o filtre0
-shell sed -i -e '1 i #include "SIMD.h"' filtre.database/Src/filtre.c
-shell cc -Iinclude filtre.database/Src/filtre.c include/SIMD.c -o filtre1
-shell sed -i -e '1 d' filtre.database/Src/filtre.c
-shell if test "`./filtre0`" = "`./filtre1`" ; then echo seq-ok ; else echo seq-ko ; fi
+shell cc $WS.c include/SIMD.c -o $WS.database/Tmp/ref
+shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
+shell cc -Iinclude $WS.database/Src/$WS.c include/SIMD.c -o $WS.database/Tmp/seq
+shell sed -i -e '1 d' $WS.database/Src/$WS.c
+shell if test "`$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
 
 #shell ./compileC.sh filtre filtre.c filtre-sse.c
 #shell cc -O3 -I. -march=native filtre-sse.c -o filtre2

@@ -28,4 +28,5 @@ echo
 display PRINTED_FILE
 
 close
+delete DOTPROD_C
 quit
