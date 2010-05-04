@@ -45,7 +45,7 @@ FLT	= sed -e 's,$(here),$$VDIR,g'
 RESULTS	= failed
 
 SHELL	= /bin/bash
-PF	= set -o pipefail
+PF	= set -o pipefail ; export PIPS_MORE=cat
 
 # extract validation result for summary
 OK	= status=$$? ; \
