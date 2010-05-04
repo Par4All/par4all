@@ -3650,14 +3650,11 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       for ( c = c->block->next; c && c->op == EXEC_TRANSFER; c = c->next ) {
         if ( c->expr ) {
           lci = CONS(EXPRESSION,gfc2pips_expr2expression(c->expr),lci);
+          /* Separator is IO_LIST */
+          lci = CONS( EXPRESSION,
+              MakeCharacterConstantExpression( "IOLIST=" ),
+              lci);
         }
-      }
-
-      /* Separator is IO_LIST */
-      if ( lci ) {
-        lci = CONS( EXPRESSION,
-            MakeCharacterConstantExpression( "IOLIST=" ),
-            lci);
       }
 
       if ( dt->format_expr ) { //if no format ; it is standard
@@ -3803,6 +3800,13 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       }
       expression unite = MakeCharacterConstantExpression( "UNIT=" );
       lci = CONS( EXPRESSION, unite, CONS( EXPRESSION, std, lci ) );
+
+      ifdebug(8) {
+        gfc2pips_debug(8,"List of arg : \n");
+        FOREACH(expression, e, lci) {
+          print_expression(e);
+        }
+      }
 
       return make_instruction_call( make_call( e, lci ) );
 
