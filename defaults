@@ -36,6 +36,7 @@ OpenMP
 Outlining
 # ngspice_bug:
 Step
+SC95
 Bootstrap
 HardwareAccelerator
 Privatizing
@@ -57,7 +58,6 @@ Demo-2009
 # Flint
 # Gpu
 # Pointers
-# SC95
 # Tpips
 # RegionTranslation
 # UseBeforeSet
