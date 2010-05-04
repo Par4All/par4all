@@ -38,7 +38,7 @@ int while04(int n)
 
       // BEGIN BLOCK
 
-//  T(k) {}
+//  T(k) {i==0, j==1, 2<=n}
 
       int k;
 

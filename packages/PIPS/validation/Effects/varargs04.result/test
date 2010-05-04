@@ -29,10 +29,10 @@ void f3(int n_ptrs, int f4_after, ...)
 //               <may be written >: ap
 //               <must be read   >: ap
    va_end(ap);
-//               <may be read    >: stderr stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*] array[*] 
+//               <may be read    >: stderr stderr[0] 
+//                                  __IO_EFFECTS:LUNS[0] array[*] 
 //                                  array[*][*]
-//               <may be written >: stderr[*] __IO_EFFECTS:LUNS[*]
+//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[0]
 //               <must be read   >: n_ptrs
    f2(n_ptrs, array);
 //               <must be read   >: f4_after n_ptrs
@@ -48,10 +48,10 @@ void f3(int n_ptrs, int f4_after, ...)
 //               <may be written >: ap_save
 //               <must be read   >: ap_save
    va_end(ap_save);
-//               <may be read    >: stdout stdout[*] 
-//                                  __IO_EFFECTS:LUNS[*] array[*] 
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1] array[*] 
 //                                  array[*][*]
-//               <may be written >: stdout[*] __IO_EFFECTS:LUNS[*]
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
 //               <must be read   >: n_ptrs
    f4(n_ptrs, array);
 }

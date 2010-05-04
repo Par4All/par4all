@@ -5,5 +5,9 @@ create $WS $WS.c
 
 display PRINTED_FILE[%ALLFUNC]
 
+echo "min / max should have disapeared"
+apply PARTIAL_EVAL[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
 close
 delete $WS

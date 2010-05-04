@@ -2,7 +2,7 @@ after vectorization with commutativity
 int main()
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    {
       float a[4] = {0, 1, 2, 3};
       float b[4] = {3, 2, 1, 0};

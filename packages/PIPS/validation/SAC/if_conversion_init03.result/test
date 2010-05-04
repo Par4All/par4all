@@ -6,7 +6,6 @@ void foo()
    if (i) 
       i++;
 }
-extern void foo();
 void foo()
 {
    int i = 0;
@@ -15,5 +14,4 @@ void foo()
    if (i) 
       i++;
 }
-extern void foo();
 

@@ -19,6 +19,8 @@ activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 echo
 echo Source code with proper effects
 echo

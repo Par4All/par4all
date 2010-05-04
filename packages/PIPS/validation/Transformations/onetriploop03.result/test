@@ -38,16 +38,16 @@ void onetriploop03(int n)
 
    int i;
 
-//  P() {}
+//  P(i) {}
 
    int m;
 
-//  P() {}
+//  P(i,m) {}
 
 
    m = n;
 
-//  P(m) {m==n}
+//  P(i,m) {m==n}
 
 
    for(i = n; i <= m; i += 1)

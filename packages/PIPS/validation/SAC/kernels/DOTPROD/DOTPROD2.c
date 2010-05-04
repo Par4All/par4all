@@ -1,3 +1,4 @@
+#include <stdio.h>
 float inner_loop(int _i, float *_b, float *_c)
 {
     return _b[_i] + _c[_i];

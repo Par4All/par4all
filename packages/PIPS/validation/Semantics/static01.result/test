@@ -1,11 +1,15 @@
 
 Cumulated effects for "static01"
 
-//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] i
 //               <must be written>: __IO_EFFECTS:LUNS[1] i
 void static01()
 {
-//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] i
 //               <must be written>: __IO_EFFECTS:LUNS[1] i
    // BEGIN BLOCK
    static int i = 0;
@@ -13,7 +17,9 @@ void static01()
 //               <must be written>: i
 
    i++;
-//               <must be read   >: __IO_EFFECTS:LUNS[1] i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] i
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", i);
    // END BLOCK
@@ -21,20 +27,35 @@ void static01()
 
 Cumulated effects for "main"
 
-//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  static01:0`i
 //               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
 int main()
 {
-//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  static01:0`i
 //               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
    // BEGIN BLOCK
-//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  static01:0`i
 //               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
    static01();
-//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  static01:0`i
 //               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
    static01();
-//               <must be read   >: __IO_EFFECTS:LUNS[1] static01:0`i
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  static01:0`i
 //               <must be written>: __IO_EFFECTS:LUNS[1] static01:0`i
    static01();
    // END BLOCK

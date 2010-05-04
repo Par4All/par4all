@@ -47,11 +47,11 @@ int strip_mining01(int *in, int *val)
    int i;
    //PIPS generated variable
 
-//  P() {}
+//  P(i) {}
 
    int i_1;
 
-//  P() {}
+//  P(i,i_1) {}
 
 
 l1:

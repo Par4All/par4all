@@ -17,16 +17,16 @@ int main()
 
   while(x<100)
     {
-    while ( x<=50) 
-      x++;
-    while (x<=100 && x>50){
-      x++; y++;
-    }
-    
+      while ( x<=50)
+	x++;
+      while (x<=100 && x>50){
+	x++; y++;
+      }
+
       z=y;
-  }
+    }
 
 
   if (x ==101 && y==50) printf("property  verified\n");
- 
+
 }

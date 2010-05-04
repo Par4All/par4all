@@ -33,7 +33,7 @@ int pointer03()
 Source code with transformers
 
 
-//  T(pointer03) {pointer03==3}
+//  T(pointer03) {}
 
 int pointer03()
 {
@@ -46,7 +46,7 @@ int pointer03()
 
    int *ip = &i;                                                        /*0006*/
 
-//  T() {}
+//  T(i) {}
 
    *ip = 4;                                                             /*0007*/
 
@@ -67,15 +67,15 @@ int pointer03()
 
    int i = 3;                                                           /*0005*/
 
-//  P() {i==3}
+//  P(i) {i==3}
 
    int *ip = &i;                                                        /*0006*/
 
-//  P() {i==3}
+//  P(i) {i==3}
 
    *ip = 4;                                                             /*0007*/
 
-//  P() {i==3}
+//  P(i) {}
 
    return i;                                                            /*0008*/
 }
@@ -89,6 +89,7 @@ INITIAL_PRECONDITION[pointer03] (add_or_kill_equivalenced_variables) storage ret
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer03 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[pointer03] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[pointer03] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 PRINT_CODE_TRANSFORMERS[pointer03] (add_or_kill_equivalenced_variables) storage return
 PRECONDITIONS_INTER_FULL[pointer03] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[pointer03] (add_or_kill_equivalenced_variables) storage return

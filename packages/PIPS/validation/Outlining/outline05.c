@@ -1,3 +1,5 @@
+#include<stdio.h>
+
 #define N 64
 float imagein_re[N][N];
 float imagein_im[N][N];

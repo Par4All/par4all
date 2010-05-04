@@ -26,11 +26,11 @@ void getimage(char *filename)
 
    double z, amp, sum, squares;
 
-//  T() {}
+//  T(conj,i,j,nx,ny) {}
 
    int i, j, conj, nx, ny;
 
-//  T() {}
+//  T(c) {}
 
    unsigned char c;
 
@@ -104,56 +104,56 @@ void getimage(char *filename)
 
    int i, j, conj, nx, ny;
 
-//  P() {}
+//  P(conj,i,j,nx,ny) {}
 
    unsigned char c;
 
-//  P() {}
+//  P(c,conj,i,j,nx,ny) {}
 
    FILE *fp;
 
-//  P() {}
+//  P(c,conj,i,j,nx,ny) {}
 
 
    for(i = 0; i <= 63; i += 1)
 
-//  P(i,j) {0<=i, i<=63}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=63}
 
       for(j = 0; j <= 63; j += 1) {
 
-//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=63, 0<=j, j<=63}
 
          imagein_re[i][j] = 0.0;
 
-//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=63, 0<=j, j<=63}
 
          imagein_im[i][j] = 0.0;
       }
 
-//  P(i,j) {i==64, j==64}
+//  P(c,conj,i,j,nx,ny) {i==64, j==64}
 
 
    for(i = 0; i <= 255; i += 1)
 
-//  P(i,j) {0<=i, i<=255}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=255}
 
       for(j = 0; j <= 255; j += 1) {
 
-//  P(i,j) {0<=i, i<=255, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=255, 0<=j, j<=255}
 
          imageout_re[i][j] = 0.0;
 
-//  P(i,j) {0<=i, i<=255, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=255, 0<=j, j<=255}
 
          imageout_im[i][j] = 0.0;
       }
 
-//  P(i,j) {i==256, j==256}
+//  P(c,conj,i,j,nx,ny) {i==256, j==256}
 
 
    fp = fopen(filename, "r");
 
-//  P(i,j) {i==256, j==256}
+//  P(c,conj,i,j,nx,ny) {i==256, j==256}
 
    fclose(fp);
 }
@@ -164,12 +164,12 @@ Privatize scalar variables on all the modules of the program:
 Transformers for "getimage" after privatization
 
 
-//  T() {}
+//  T() {0==-1}
 
 void getimage(char *filename)
 {
 
-//  T() {}
+//  T() {0==-1}
 
    // BEGIN BLOCK
 
@@ -181,11 +181,11 @@ void getimage(char *filename)
 
    double z, amp, sum, squares;
 
-//  T() {}
+//  T(conj,i,j,nx,ny) {}
 
    int i, j, conj, nx, ny;
 
-//  T() {}
+//  T(c) {}
 
    unsigned char c;
 
@@ -216,12 +216,12 @@ void getimage(char *filename)
          // END BLOCK
       }
 
-//  T(i,j) {i#init==64, j#init==64, 0<=i}
+//  T(i,j) {192i==j-64, i#init==64, j#init==64, 0<=i}
 
 
    for(i = 0; i <= 255; i += 1)
 
-//  T(j) {0<=i, i<=255, 0<=j}
+//  T(j) {j#init==64, 0<=i, i<=255, 0<=j}
 
       for(j = 0; j <= 255; j += 1) {
 
@@ -239,12 +239,12 @@ void getimage(char *filename)
          // END BLOCK
       }
 
-//  T() {i==256, j==256}
+//  T() {0==-1}
 
 
    fp = fopen(filename, "r");
 
-//  T() {i==256, j==256}
+//  T() {0==-1}
 
    fclose(fp);
    // END BLOCK
@@ -274,66 +274,66 @@ void getimage(char *filename)
 
    int i, j, conj, nx, ny;
 
-//  P() {}
+//  P(conj,i,j,nx,ny) {}
 
    unsigned char c;
 
-//  P() {}
+//  P(c,conj,i,j,nx,ny) {}
 
    FILE *fp;
 
-//  P() {}
+//  P(c,conj,i,j,nx,ny) {}
 
 
    for(i = 0; i <= 63; i += 1)
 
-//  P(i,j) {0<=i, i<=63}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=63}
 
       for(j = 0; j <= 63; j += 1) {
 
-//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=63, 0<=j, j<=63}
 
          // BEGIN BLOCK
 
-//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=63, 0<=j, j<=63}
 
          imagein_re[i][j] = 0.0;
 
-//  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=63, 0<=j, j<=63}
 
          imagein_im[i][j] = 0.0;
          // END BLOCK
       }
 
-//  P(i,j) {i==64, j==64}
+//  P(c,conj,i,j,nx,ny) {i==64, j==64}
 
 
    for(i = 0; i <= 255; i += 1)
 
-//  P(i,j) {0<=i, i<=255}
+//  P(c,conj,i,j,nx,ny) {192i==j-64, 0<=i, i<=255}
 
       for(j = 0; j <= 255; j += 1) {
 
-//  P(i,j) {0<=i, i<=255, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {i==0, 0<=j, j<=255}
 
          // BEGIN BLOCK
 
-//  P(i,j) {0<=i, i<=255, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {i==0, 0<=j, j<=255}
 
          imageout_re[i][j] = 0.0;
 
-//  P(i,j) {0<=i, i<=255, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {i==0, 0<=j, j<=255}
 
          imageout_im[i][j] = 0.0;
          // END BLOCK
       }
 
-//  P(i,j) {i==256, j==256}
+//  P() {0==-1}
 
 
    fp = fopen(filename, "r");
 
-//  P(i,j) {i==256, j==256}
+//  P() {0==-1}
 
    fclose(fp);
    // END BLOCK

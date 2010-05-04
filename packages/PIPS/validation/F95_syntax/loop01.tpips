@@ -6,8 +6,11 @@ setproperty ABORT_ON_USER_ERROR TRUE
 display PRINTED_FILE(%ALL)
 
 apply UNSPLIT (%ALL)
-shell gcc -c loop01.database/Src/loop01.f90
-shell rm loop01.o
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o loop01.database/Src/loop01.o loop01.database/Src/loop01.f90
 
 close
 delete loop01

@@ -7,11 +7,11 @@ int main(int argc, char **argv)
    //int i = 10, j = i+1, a[i], k = foo(i);
    
 
-//  T() {i==10}
+//  T(i) {i==10}
 
    int i = 10;
 
-//  T(i) {i==i#init+1, i==j+1}
+//  T(i,j,k) {i==i#init+1, i==j+1}
 
    int j = i++, a[i], k = foo(i);
 
@@ -33,11 +33,11 @@ int main(int argc, char **argv)
 
    int i = 10;
 
-//  P() {i==10}
+//  P(i) {i==10}
 
    int j = i++, a[i], k = foo(i);
 
-//  P(i) {i==11, j==10}
+//  P(i,j,k) {i==11, j==10}
 
 
    return j;
@@ -52,7 +52,7 @@ long long foo(char **argv)
 
    long long result = 0;
 
-//  P() {result==0}
+//  P(result) {result==0}
 
    result = atoll(argv[1]);
 

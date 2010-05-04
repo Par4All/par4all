@@ -13,27 +13,29 @@ int main()
 after vectorization without commutativity
 int main()
 {
-   float a[4] = {0, 1, 2, 3};
-   float b[4] = {3, 2, 1, 0};
-   
-   /* this should be a first pack */
-   a[0] = b[0]+a[0];
-   a[1] = a[1]+b[1];
-   a[2] = b[2]+a[2];
-   a[3] = b[3]+a[3];
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[4], v4sf_vec1[4];
+   {
+      float a[4] = {0, 1, 2, 3};
+      float b[4] = {3, 2, 1, 0};
+      SIMD_LOAD_GENERIC_V4SF(v4sf_vec0, a[0], b[1], a[2], a[3]);
+      SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, b[0], a[1], b[2], b[3]);
+      SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec0);
+      SIMD_SAVE_V4SF(v4sf_vec0, &a[0]);
+   }
 }
 after vectorization with commutativity
 int main()
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1];
+   float v4sf_vec2[4], v4sf_vec3[4];
    {
       float a[4] = {0, 1, 2, 3};
       float b[4] = {3, 2, 1, 0};
-      SIMD_LOAD_V4SF(v4sf_vec0, &a[0]);
-      SIMD_LOAD_V4SF(v4sf_vec1, &b[0]);
-      SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec0);
-      SIMD_SAVE_V4SF(v4sf_vec0, &a[0]);
+      SIMD_LOAD_V4SF(v4sf_vec2, &a[0]);
+      SIMD_LOAD_V4SF(v4sf_vec3, &b[0]);
+      SIMD_ADDPS(v4sf_vec2, v4sf_vec3, v4sf_vec2);
+      SIMD_SAVE_V4SF(v4sf_vec2, &a[0]);
    }
 }
 

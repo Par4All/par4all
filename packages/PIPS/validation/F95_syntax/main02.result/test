@@ -9,3 +9,6 @@ A = 10
 B = 20
 CALL ADD(A, B)
 END
+
+"compile sources produced by pips"
+

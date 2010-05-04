@@ -9,3 +9,6 @@ PRINT *, A
 PRINT *, B
 PRINT *, C
 END
+
+"compile sources produced by pips"
+

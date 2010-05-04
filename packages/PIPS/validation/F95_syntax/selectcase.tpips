@@ -1,0 +1,11 @@
+delete selectcase
+create selectcase selectcase.f90 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE[%ALL]
+apply UNSPLIT[%ALL]
+
+close
+delete selectcase
+quit

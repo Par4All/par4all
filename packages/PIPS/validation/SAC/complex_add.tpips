@@ -21,4 +21,4 @@ close
 #shell if test "`./${WS}0`" = "`./${WS}2`" ; then echo sse-ok ; else echo sse-ko ; fi
 #shell rm -f ${WS}[012] $WS-sse.c
 
-delete $WS
+#delete $WS

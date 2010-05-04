@@ -1,3 +1,4 @@
+#include <stdio.h>
 void papy_boom()
 {
     int i=0;

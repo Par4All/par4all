@@ -2,8 +2,12 @@
 Parsed code for "extern03!"
 
 // BEGIN BLOCK
-/* Check that successive external floating point dependent initializationa are properly taken
-   into account. */
+/* Check that successive external floating point dependent
+   initializations are properly taken into account.
+
+   Transformers are computed "in context". Make sure that the
+   precondition is used in the declarations.
+ */
 
 float delta = 1.;
 float delta2 = delta+2.;
@@ -20,6 +24,8 @@ int main()
    // BEGIN BLOCK
 //               <must be written>: i
    float i = 0.;
+//               <must be written>: k
+   int k = 1;
 //               <must be read   >: delta i
 //               <must be written>: i
 
@@ -45,20 +51,25 @@ int main()
 
    // BEGIN BLOCK
 
-//  T(i) {0.==i, 1.+2.==delta2, 1.==delta}
+//  T(i) {0.==i, 1.+2.==delta2, 1.==delta}}
 
    float i = 0.;
 
-//  T(i) {0.+1.==i, 0.==i#init, 1.+2.==delta2, 1.==delta}
+//  T(k) {0.==i, 1.+2.==delta2, 1.==delta, k==1}
+
+   int k = 1;
+
+//  T(i) {0.+1.==i, 0.==i#init, 1.+2.==delta2, 1.==delta, k==1}
 
 
    i = i+delta;
 
-//  T(i) {0.+1.==i#init, 1.+2.==delta2, 1.==delta, 1.+i#init==i}
+//  T(i) {0.+1.==i#init, 1.+2.==delta2, 1.==delta, 1.+i#init==i, k==1}
 
    i = i+delta;
 
-//  T(i) {0.+21.==i#init, 1.+2.==delta2, 1.==delta, delta2+i#init==i}
+//  T(i) {0.+21.==i#init, 1.+2.==delta2, 1.==delta, delta2+i#init==i,
+//    k==1}
 
    i = i+delta2;
    // END BLOCK
@@ -80,16 +91,20 @@ int main()
 
    float i = 0.;
 
-//  P() {0.==i, 1.+2.==delta2, 1.==delta}
+//  P(i) {0.==i, 1.+2.==delta2, 1.==delta}
+
+   int k = 1;
+
+//  P(i,k) {0.==i, 1.+2.==delta2, 1.==delta, k==1}
 
 
    i = i+delta;
 
-//  P(i) {0.+1.==i, 1.+2.==delta2, 1.==delta}
+//  P(i,k) {0.+1.==i, 1.+2.==delta2, 1.==delta, k==1}
 
    i = i+delta;
 
-//  P(i) {0.+21.==i, 1.+2.==delta2, 1.==delta}
+//  P(i,k) {0.+21.==i, 1.+2.==delta2, 1.==delta, k==1}
 
    i = i+delta2;
    // END BLOCK

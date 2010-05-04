@@ -15,6 +15,11 @@ Request: build resource PARALLELPRINTED_FILE for module EQUIV02.
   CONTROLIZER                    building   CODE(EQUIV02)
   PROPER_EFFECTS                 building   PROPER_EFFECTS(EQUIV02)
   ATOMIC_CHAINS                  building   CHAINS(EQUIV02)
+user warning in references_must_conflict_p: Not completely implemented yet. Conservative under approximation is made
+user warning in references_must_conflict_p: Not completely implemented yet. Conservative under approximation is made
+user warning in references_must_conflict_p: Not completely implemented yet. Conservative under approximation is made
+user warning in references_must_conflict_p: Not completely implemented yet. Conservative under approximation is made
+user warning in references_must_conflict_p: Not completely implemented yet. Conservative under approximation is made
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(EQUIV02)
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(EQUIV02)
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(EQUIV02)
@@ -26,8 +31,8 @@ Request: build resource PARALLELPRINTED_FILE for module EQUIV02.
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(EQUIV02)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(EQUIV02)
   RICE_SEMANTICS_DEPENDENCE_GRAPH building   DG(EQUIV02)
-dep 11 (<U(I-1)-R-MUST>) --> 11 (<T(I)-W-MUST>) 
-user warning in TestCoupleOfReferences: Dependence between differents variables: U and T
+dep 11 (<T(I)-W-MUST>) --> 11 (<U(I-1)-R-MUST>)
+user warning in TestCoupleOfReferences: Dependence between differents variables: T and U
 Dependence assumed
   RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(EQUIV02)
   PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(EQUIV02)

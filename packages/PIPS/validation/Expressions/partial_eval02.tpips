@@ -1,6 +1,7 @@
+setenv WS="partial_eval02"
 setproperty ABORT_ON_USER_ERROR TRUE
-delete partial_eval02
-create partial_eval02 partial_eval02.c
+delete $WS
+create $WS $WS.c
 
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
@@ -18,6 +19,22 @@ echo Initial code for "main"
 echo
 
 display PRINTED_FILE[main]
+
+echo
+echo Preconditions "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Preconditions "partial_eval02"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[partial_eval02]
+activate PRINT_CODE
 
 echo
 echo Code after partial evaluation for "partial_eval02"
@@ -47,11 +64,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cc partial_eval02.c -o partial_eval
-shell cc partial_eval02.database/Src/partial_eval02.c  -o partial_eval02.database/Src/partial_eval
-shell if test `partial_eval02.database/Src/partial_eval` = `./partial_eval`; then echo "ok"; else echo "ko" ; fi
-shell rm -rf partial_eval02.database/Src/partial_eval partial_eval
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell if test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`; then echo "ok"; else echo "ko" ; fi
 
 close
-delete partial_eval02
-
+delete $WS
+quit

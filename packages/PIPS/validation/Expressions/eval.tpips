@@ -11,6 +11,14 @@ delete eval
 create eval eval.f
 
 echo
+echo Preconditions for EVAL
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+activate PRINT_CODE
+
+echo
 echo Partialy evaluated code for EVAL
 echo
 

@@ -423,21 +423,13 @@ kernel1:
 void compute()
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec11[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4], v4sf_vec5[4], v4sf_vec6[4], v4sf_vec7[4], v4sf_vec8[4], v4sf_vec9[4], v4sf_vec10[4], v4sf_vec11[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0}, aligned0[3+1] = {0, 0, 0, 0}, aligned1[3+1] = {0, 0, 0, 0}, aligned2[3+1] = {0.25, 0.25, 0.25, 0.25};
+   float aligned[4] = {0, 0, 0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0}, aligned2[4] = {0.25, 0.25, 0.25, 0.25};
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec12[3+1], v4sf_vec13[3+1], v4sf_vec14[3+1], v4sf_vec15[3+1], v4sf_vec16[3+1], v4sf_vec17[3+1], v4sf_vec18[3+1], v4sf_vec19[3+1], v4sf_vec20[3+1], v4sf_vec21[3+1], v4sf_vec22[3+1], v4sf_vec23[3+1];
+   float v4sf_vec12[4], v4sf_vec13[4], v4sf_vec14[4], v4sf_vec15[4], v4sf_vec16[4], v4sf_vec17[4], v4sf_vec18[4], v4sf_vec19[4], v4sf_vec20[4], v4sf_vec21[4], v4sf_vec22[4], v4sf_vec23[4];
    //PIPS:SAC generated variable
-   float aligned3[3+1] = {0.25, 0.25, 0.25, 0.25};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec24[3+1], v4sf_vec25[3+1], v4sf_vec26[3+1], v4sf_vec27[3+1], v4sf_vec28[3+1], v4sf_vec29[3+1], v4sf_vec30[3+1], v4sf_vec31[3+1], v4sf_vec32[3+1], v4sf_vec33[3+1], v4sf_vec34[3+1], v4sf_vec35[3+1];
-   //PIPS:SAC generated variable
-   float aligned4[3+1] = {0, 0, 0, 0}, aligned5[3+1] = {0, 0, 0, 0}, aligned6[3+1] = {0, 0, 0, 0}, aligned7[3+1] = {0.25, 0.25, 0.25, 0.25};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec36[3+1], v4sf_vec37[3+1], v4sf_vec38[3+1], v4sf_vec39[3+1], v4sf_vec40[3+1], v4sf_vec41[3+1], v4sf_vec42[3+1], v4sf_vec43[3+1], v4sf_vec44[3+1], v4sf_vec45[3+1], v4sf_vec46[3+1], v4sf_vec47[3+1];
-   //PIPS:SAC generated variable
-   float aligned8[3+1] = {0.25, 0.25, 0.25, 0.25};
+   float aligned3[4] = {0, 0, 0, 0}, aligned4[4] = {0, 0, 0, 0}, aligned5[4] = {0, 0, 0, 0}, aligned6[4] = {0.25, 0.25, 0.25, 0.25};
    {
       int i, j;
       //PIPS generated variable
@@ -491,19 +483,19 @@ kernel1:
             space[i][LU_IND1+1] = 0.25*F_54;
          }
          for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
-            SIMD_LOAD_V4SF(v4sf_vec26, &save[i+1][LU_IND1+1]);
-            SIMD_LOAD_V4SF(v4sf_vec25, &save[i-1][LU_IND1+1]);
-            SIMD_ADDPS(v4sf_vec24, v4sf_vec25, v4sf_vec26);
-            SIMD_SAVE_V4SF(v4sf_vec24, &aligned4[0]);
-            SIMD_LOAD_V4SF(v4sf_vec29, &save[i][LU_IND1]);
-            SIMD_ADDPS(v4sf_vec27, v4sf_vec24, v4sf_vec29);
-            SIMD_SAVE_V4SF(v4sf_vec27, &aligned5[0]);
-            SIMD_LOAD_V4SF(v4sf_vec32, &save[i][LU_IND1+2]);
-            SIMD_ADDPS(v4sf_vec30, v4sf_vec27, v4sf_vec32);
-            SIMD_SAVE_V4SF(v4sf_vec30, &aligned6[0]);
-            SIMD_LOAD_V4SF(v4sf_vec34, &aligned7[0]);
-            SIMD_MULPS(v4sf_vec33, v4sf_vec34, v4sf_vec30);
-            SIMD_SAVE_V4SF(v4sf_vec33, &space[i][LU_IND1+1]);
+            SIMD_LOAD_V4SF(v4sf_vec14, &save[i+1][LU_IND1+1]);
+            SIMD_LOAD_V4SF(v4sf_vec13, &save[i-1][LU_IND1+1]);
+            SIMD_ADDPS(v4sf_vec12, v4sf_vec13, v4sf_vec14);
+            SIMD_SAVE_V4SF(v4sf_vec12, &aligned3[0]);
+            SIMD_LOAD_V4SF(v4sf_vec17, &save[i][LU_IND1]);
+            SIMD_ADDPS(v4sf_vec15, v4sf_vec12, v4sf_vec17);
+            SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
+            SIMD_LOAD_V4SF(v4sf_vec20, &save[i][LU_IND1+2]);
+            SIMD_ADDPS(v4sf_vec18, v4sf_vec15, v4sf_vec20);
+            SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
+            SIMD_LOAD_V4SF(v4sf_vec22, &aligned6[0]);
+            SIMD_MULPS(v4sf_vec21, v4sf_vec22, v4sf_vec18);
+            SIMD_SAVE_V4SF(v4sf_vec21, &space[i][LU_IND1+1]);
          }
          j = 63;
       }
@@ -513,21 +505,13 @@ kernel1:
 void compute()
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec11[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4], v4sf_vec5[4], v4sf_vec6[4], v4sf_vec7[4], v4sf_vec8[4], v4sf_vec9[4], v4sf_vec10[4], v4sf_vec11[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0}, aligned0[3+1] = {0, 0, 0, 0}, aligned1[3+1] = {0, 0, 0, 0}, aligned2[3+1] = {0.25, 0.25, 0.25, 0.25};
+   float aligned[4] = {0, 0, 0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0}, aligned2[4] = {0.25, 0.25, 0.25, 0.25};
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec12[3+1], v4sf_vec13[3+1], v4sf_vec14[3+1], v4sf_vec15[3+1], v4sf_vec16[3+1], v4sf_vec17[3+1], v4sf_vec18[3+1], v4sf_vec19[3+1], v4sf_vec20[3+1], v4sf_vec21[3+1], v4sf_vec22[3+1], v4sf_vec23[3+1];
+   float v4sf_vec12[4], v4sf_vec13[4], v4sf_vec14[4], v4sf_vec15[4], v4sf_vec16[4], v4sf_vec17[4], v4sf_vec18[4], v4sf_vec19[4], v4sf_vec20[4], v4sf_vec21[4], v4sf_vec22[4], v4sf_vec23[4];
    //PIPS:SAC generated variable
-   float aligned3[3+1] = {0.25, 0.25, 0.25, 0.25};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec24[3+1], v4sf_vec25[3+1], v4sf_vec26[3+1], v4sf_vec27[3+1], v4sf_vec28[3+1], v4sf_vec29[3+1], v4sf_vec30[3+1], v4sf_vec31[3+1], v4sf_vec32[3+1], v4sf_vec33[3+1], v4sf_vec34[3+1], v4sf_vec35[3+1];
-   //PIPS:SAC generated variable
-   float aligned4[3+1] = {0, 0, 0, 0}, aligned5[3+1] = {0, 0, 0, 0}, aligned6[3+1] = {0, 0, 0, 0}, aligned7[3+1] = {0.25, 0.25, 0.25, 0.25};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec36[3+1], v4sf_vec37[3+1], v4sf_vec38[3+1], v4sf_vec39[3+1], v4sf_vec40[3+1], v4sf_vec41[3+1], v4sf_vec42[3+1], v4sf_vec43[3+1], v4sf_vec44[3+1], v4sf_vec45[3+1], v4sf_vec46[3+1], v4sf_vec47[3+1];
-   //PIPS:SAC generated variable
-   float aligned8[3+1] = {0.25, 0.25, 0.25, 0.25};
+   float aligned3[4] = {0, 0, 0, 0}, aligned4[4] = {0, 0, 0, 0}, aligned5[4] = {0, 0, 0, 0}, aligned6[4] = {0.25, 0.25, 0.25, 0.25};
    {
       int i, j;
       //PIPS generated variable
@@ -587,21 +571,21 @@ kernel1:
 
             space[i][LU_IND1+1] = 0.25*F_54;
          }
-         SIMD_LOAD_V4SF(v4sf_vec34, &aligned7[0]);
+         SIMD_LOAD_V4SF(v4sf_vec22, &aligned6[0]);
          for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
-            SIMD_LOAD_V4SF(v4sf_vec26, &save[i+1][LU_IND1+1]);
-            SIMD_LOAD_V4SF(v4sf_vec25, &save[i-1][LU_IND1+1]);
-            SIMD_ADDPS(v4sf_vec24, v4sf_vec25, v4sf_vec26);
-            SIMD_LOAD_V4SF(v4sf_vec29, &save[i][LU_IND1]);
-            SIMD_ADDPS(v4sf_vec27, v4sf_vec24, v4sf_vec29);
-            SIMD_LOAD_V4SF(v4sf_vec32, &save[i][LU_IND1+2]);
-            SIMD_ADDPS(v4sf_vec30, v4sf_vec27, v4sf_vec32);
-            SIMD_MULPS(v4sf_vec33, v4sf_vec34, v4sf_vec30);
-            SIMD_SAVE_V4SF(v4sf_vec33, &space[i][LU_IND1+1]);
+            SIMD_LOAD_V4SF(v4sf_vec14, &save[i+1][LU_IND1+1]);
+            SIMD_LOAD_V4SF(v4sf_vec13, &save[i-1][LU_IND1+1]);
+            SIMD_ADDPS(v4sf_vec12, v4sf_vec13, v4sf_vec14);
+            SIMD_LOAD_V4SF(v4sf_vec17, &save[i][LU_IND1]);
+            SIMD_ADDPS(v4sf_vec15, v4sf_vec12, v4sf_vec17);
+            SIMD_LOAD_V4SF(v4sf_vec20, &save[i][LU_IND1+2]);
+            SIMD_ADDPS(v4sf_vec18, v4sf_vec15, v4sf_vec20);
+            SIMD_MULPS(v4sf_vec21, v4sf_vec22, v4sf_vec18);
+            SIMD_SAVE_V4SF(v4sf_vec21, &space[i][LU_IND1+1]);
          }
-         SIMD_SAVE_V4SF(v4sf_vec24, &aligned4[0]);
-         SIMD_SAVE_V4SF(v4sf_vec27, &aligned5[0]);
-         SIMD_SAVE_V4SF(v4sf_vec30, &aligned6[0]);
+         SIMD_SAVE_V4SF(v4sf_vec12, &aligned3[0]);
+         SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
+         SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
          j = 63;
       }
       ;
@@ -610,13 +594,13 @@ kernel1:
 void compute()
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec5[4], v4sf_vec6[4], v4sf_vec8[4], v4sf_vec9[4], v4sf_vec10[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0}, aligned0[3+1] = {0, 0, 0, 0}, aligned1[3+1] = {0, 0, 0, 0}, aligned2[3+1] = {0.25, 0.25, 0.25, 0.25};
+   float aligned[4] = {0, 0, 0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0}, aligned2[4] = {0.25, 0.25, 0.25, 0.25};
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec24[3+1], v4sf_vec25[3+1], v4sf_vec26[3+1], v4sf_vec27[3+1], v4sf_vec29[3+1], v4sf_vec30[3+1], v4sf_vec32[3+1], v4sf_vec33[3+1], v4sf_vec34[3+1];
+   float v4sf_vec12[4], v4sf_vec13[4], v4sf_vec14[4], v4sf_vec15[4], v4sf_vec17[4], v4sf_vec18[4], v4sf_vec20[4], v4sf_vec21[4], v4sf_vec22[4];
    //PIPS:SAC generated variable
-   float aligned4[3+1] = {0, 0, 0, 0}, aligned5[3+1] = {0, 0, 0, 0}, aligned6[3+1] = {0, 0, 0, 0}, aligned7[3+1] = {0.25, 0.25, 0.25, 0.25};
+   float aligned3[4] = {0, 0, 0, 0}, aligned4[4] = {0, 0, 0, 0}, aligned5[4] = {0, 0, 0, 0}, aligned6[4] = {0.25, 0.25, 0.25, 0.25};
    {
       int i, j;
       //PIPS generated variable
@@ -674,21 +658,21 @@ kernel1:
 
             space[i][LU_IND1+1] = 0.25*F_54;
          }
-         SIMD_LOAD_V4SF(v4sf_vec34, &aligned7[0]);
+         SIMD_LOAD_V4SF(v4sf_vec22, &aligned6[0]);
          for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
-            SIMD_LOAD_V4SF(v4sf_vec26, &save[i+1][LU_IND1+1]);
-            SIMD_LOAD_V4SF(v4sf_vec25, &save[i-1][LU_IND1+1]);
-            SIMD_ADDPS(v4sf_vec24, v4sf_vec25, v4sf_vec26);
-            SIMD_LOAD_V4SF(v4sf_vec29, &save[i][LU_IND1]);
-            SIMD_ADDPS(v4sf_vec27, v4sf_vec24, v4sf_vec29);
-            SIMD_LOAD_V4SF(v4sf_vec32, &save[i][LU_IND1+2]);
-            SIMD_ADDPS(v4sf_vec30, v4sf_vec27, v4sf_vec32);
-            SIMD_MULPS(v4sf_vec33, v4sf_vec34, v4sf_vec30);
-            SIMD_SAVE_V4SF(v4sf_vec33, &space[i][LU_IND1+1]);
+            SIMD_LOAD_V4SF(v4sf_vec14, &save[i+1][LU_IND1+1]);
+            SIMD_LOAD_V4SF(v4sf_vec13, &save[i-1][LU_IND1+1]);
+            SIMD_ADDPS(v4sf_vec12, v4sf_vec13, v4sf_vec14);
+            SIMD_LOAD_V4SF(v4sf_vec17, &save[i][LU_IND1]);
+            SIMD_ADDPS(v4sf_vec15, v4sf_vec12, v4sf_vec17);
+            SIMD_LOAD_V4SF(v4sf_vec20, &save[i][LU_IND1+2]);
+            SIMD_ADDPS(v4sf_vec18, v4sf_vec15, v4sf_vec20);
+            SIMD_MULPS(v4sf_vec21, v4sf_vec22, v4sf_vec18);
+            SIMD_SAVE_V4SF(v4sf_vec21, &space[i][LU_IND1+1]);
          }
-         SIMD_SAVE_V4SF(v4sf_vec24, &aligned4[0]);
-         SIMD_SAVE_V4SF(v4sf_vec27, &aligned5[0]);
-         SIMD_SAVE_V4SF(v4sf_vec30, &aligned6[0]);
+         SIMD_SAVE_V4SF(v4sf_vec12, &aligned3[0]);
+         SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
+         SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
          j = 63;
       }
       ;
