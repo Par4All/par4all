@@ -395,8 +395,8 @@ bool references_must_conflict_p( reference r1, reference r2 ) {
       && entities_may_conflict_p( e1, e2 ) ) {
     conflict_p = TRUE;
   } else {
-    pips_user_warning("Not completely implemented yet. "
-        "Conservative under approximation is made\n");
+    /* pips_user_warning("Not completely implemented yet. "
+       "Conservative under approximation is made\n");*/
   }
   return conflict_p;
 }
