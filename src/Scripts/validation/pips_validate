@@ -322,6 +322,7 @@ function validate_file()
 
   # rel_file='directory/file.f'
   local rel_file=${file/$updir\//}
+  local rel_name=${rel_file/.*/} # no suffix
   # Just in case pips command are not found and all the following tests
   # fail, initialize the status:
   local status=-1
@@ -429,19 +430,20 @@ function validate_file()
     ${PIPS_DIFF:-diff -b -u} $reference_filtered $out_filtered > $out.diff
 
     if [[ -s $out.diff ]] ; then
-      verb 2 "$rel_file: CHANGED"
-      echo "changed: $rel_file" >> $summary
+      verb 2 "$rel_name: CHANGED"
+      echo "changed: $rel_name" >> $summary
       cp $out.out $file_resdir/out
       [[ $out_is_filtered ]] && cp $out_filtered $file_resdir/out.filtered
       status=1 # something was wrong...
     else
-      verb 3 "$rel_file: SUCCEEDED" # ok!
+      verb 3 "$rel_name: SUCCEEDED" # ok!
+      echo "passed: $rel_name" >> $summary
       rm -f $out.* $file_resdir/*.filtered
     fi
 
   else
-      verb 2 "$rel_file: FAILED"
-      echo "failed: $rel_file" >> $summary
+      verb 2 "$rel_name: FAILED"
+      echo "failed: $rel_name" >> $summary
   fi
 
   popd > /dev/null
