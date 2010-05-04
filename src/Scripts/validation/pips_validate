@@ -283,13 +283,13 @@ function validate_file()
       echo "  of this file as the reference."
     else
       verb 1 "skipping $file: no matching result directory"
-      echo "skipped: ${file#$vdir/}" >> $summary
+      echo "skipped: ${file#$vdir/}" >> $summary.tmp
       return 0
     fi
   elif [[ ! -f $full_name.result/test && ! -f $full_name.result/test.$arch ]]
   then
     verb 1 "skipping $file: no matching result test file"
-    echo "skipped: ${file#$vdir/}" >> $summary
+    echo "skipped: ${file#$vdir/}" >> $summary.tmp
     return 0
   fi
 
@@ -431,19 +431,19 @@ function validate_file()
 
     if [[ -s $out.diff ]] ; then
       verb 2 "$rel_name: CHANGED"
-      echo "changed: $rel_name" >> $summary
+      echo "changed: $rel_name" >> $summary.tmp
       cp $out.out $file_resdir/out
       [[ $out_is_filtered ]] && cp $out_filtered $file_resdir/out.filtered
       status=1 # something was wrong...
     else
       verb 3 "$rel_name: SUCCEEDED" # ok!
-      echo "passed: $rel_name" >> $summary
+      echo "passed: $rel_name" >> $summary.tmp
       rm -f $out.* $file_resdir/*.filtered
     fi
 
   else
       verb 2 "$rel_name: FAILED"
-      echo "failed: $rel_name" >> $summary
+      echo "failed: $rel_name" >> $summary.tmp
   fi
 
   popd > /dev/null
@@ -497,6 +497,10 @@ do
   fi
   [[ $failed ]] && elist="$elist$obj "
 done
+
+# sort final result
+sort -k 2 $summary.tmp >> $summary
+rm -f $summary.tmp
 
 echo -e "\n$errors failed out of $dones on $(date)" >> $summary
 rm -rf *.database # cold cleanup
