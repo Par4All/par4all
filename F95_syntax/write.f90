@@ -1,0 +1,18 @@
+program main
+     integer i, a(1:10), b(100:200)
+
+! Print can be converted to write, but the format must be created
+    print*,"hello world"
+    write (1,fmt=*) "hello world"
+
+! Try to handle also write with more than one data param
+    i = 0
+    write(*, *) i, i
+
+! Try to handle also write with implied-do loop inside (this one was tricky)
+    write (*,*) (a(i), i=1, 10), (b(i), i=100, 110)
+
+
+end program main
+
+
