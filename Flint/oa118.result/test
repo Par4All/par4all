@@ -102,7 +102,7 @@ In statement number 151 (0.74):
 	"I" used but not initialized.
 	"XF" used but not initialized.
 	"YF" used but not initialized.
-	"XO" used but not initialized.
+	"ZF" used but not initialized.
 	"YO" used but not initialized.
 	"ZO" used but not initialized.
 	"FNX" used but not initialized.
@@ -112,11 +112,11 @@ In statement number 154 (0.77):
 	"K" used but not initialized.
 	"I" used but not initialized.
 	"XF" used but not initialized.
-	"YF" used but not initialized.
+	"ZF" used but not initialized.
 In statement number 163 (0.85):
 	"I" used but not initialized.
 	"FNZ" used but not initialized.
-	"FNY" used but not initialized.
+	"FNX" used but not initialized.
 In statement number 175 (0.92):
 	"N" used but not initialized.
 In statement number 176 (0.93):
@@ -153,7 +153,6 @@ In statement number 191 (0.108):
 	"N" used but not initialized.
 In statement number 201 (0.111):
 	"ZO" used but not initialized.
-	"XO" used but not initialized.
 	"XF" used but not initialized.
 	"YF" used but not initialized.
 	"YO" used but not initialized.
@@ -166,6 +165,7 @@ In statement number 201 (0.111):
 	"FEZ" used but not initialized.
 	"FEY" used but not initialized.
 	"FEX" used but not initialized.
+	"FXZ" used but not initialized.
 	"FXY" used but not initialized.
 	"FXX" used but not initialized.
 In statement number 207 (0.117):
@@ -185,8 +185,8 @@ In statement number 231 (0.134):
 	"I" used but not initialized.
 In statement number 237 (0.138):
 	"J" used but not initialized.
-	"XO" used but not initialized.
 	"YO" used but not initialized.
+	"ZO" used but not initialized.
 In statement number 246 (0.140):
 	"O" used but not initialized.
 	"AA" used but not initialized.
@@ -213,6 +213,8 @@ In statement number 279 (0.169):
 	"ZO" used but not initialized.
 In statement number 282 (0.171):
 	"I" used but not initialized.
+In statement number 290 (0.173):
+	"AA" used but not initialized.
 In statement number 296 (0.179):
 	"I" used but not initialized.
 In statement number 297 (0.180):
@@ -232,7 +234,7 @@ In statement number 311 (0.190):
 	"YO" used but not initialized.
 	"ZO" used but not initialized.
 	"FNX" used but not initialized.
-	"FNZ" used but not initialized.
+	"FNY" used but not initialized.
 In statement number 323 (0.197):
 	"I" used but not initialized.
 In statement number 324 (0.198):
@@ -294,7 +296,7 @@ In statement number 389 (0.258):
 In statement number 390 (0.259):
 	"AIRE" used but not initialized.
 In statement number 391 (0.260):
-	"AIRE" used but not initialized.
+	"FNX" used but not initialized.
 In statement number 394 (0.263):
 	"J" used but not initialized.
 	"I" used but not initialized.
@@ -313,7 +315,7 @@ flint message from check reference: WARNING, in module OA118, in statement (0.69
 the 1th index may not be a mere integer
 flint message from check reference: WARNING, in module OA118, in statement (0.69), number 146
 the 1th index may not be a mere integer
-number of messages from flint for OA118 : 160
+number of messages from flint for OA118 : 161
 
 
 Non-initialized variables:
