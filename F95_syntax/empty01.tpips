@@ -1,0 +1,17 @@
+delete empty01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create empty01 empty01.f90
+
+apply SUMMARY_PRECONDITION(%ALL)
+
+apply UNSPLIT[%ALL]
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o empty01.database/Src/empty01.o empty01.database/Src/empty01.f90
+
+close
+quit

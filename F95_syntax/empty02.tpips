@@ -1,0 +1,19 @@
+delete empty
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create empty empty.f90
+
+display PRINTED_FILE[%ALL]
+
+apply SUMMARY_PRECONDITION(%ALL)
+
+apply UNSPLIT[%ALL]
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o empty.database/Src/empty.o empty.database/Src/empty.f90
+
+close
+quit
