@@ -31,11 +31,11 @@ void generate12()
 
    int i, j;
 
-//  P() {}
+//  P(i,j) {}
 
    void func(void);
 
-//  P() {}
+//  P(i,j) {}
 
 
    func();

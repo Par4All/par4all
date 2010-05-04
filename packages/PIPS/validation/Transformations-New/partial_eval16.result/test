@@ -37,76 +37,76 @@ int main()
 
    int i = 1;
 
-//  P() {i==1}
+//  P(i) {i==1}
 
    int j = 2;
 
-//  P() {i==1, j==2}
+//  P(i,j) {i==1, j==2}
 
    int k = 3;
 
-//  P() {i==1, j==2, k==3}
+//  P(i,j,k) {i==1, j==2, k==3}
 
    int l;
 
-//  P() {i==1, j==2, k==3}
+//  P(i,j,k,l) {i==1, j==2, k==3}
 
    int m;
 
-//  P() {i==1, j==2, k==3}
+//  P(i,j,k,l,m) {i==1, j==2, k==3}
 
    int n;
 
-//  P() {i==1, j==2, k==3}
+//  P(i,j,k,l,m,n) {i==1, j==2, k==3}
 
    int a[10];
 
-//  P() {i==1, j==2, k==3}
+//  P(i,j,k,l,m,n) {i==1, j==2, k==3}
 
 
    i = j = k = 4;
 
-//  P(i,j,k) {i==4, j==4, k==4}
+//  P(i,j,k,l,m,n) {i==4, j==4, k==4}
 
    foo(i = j = k = 5);
 
-//  P(i,j,k) {i==5, j==5, k==5}
+//  P(i,j,k,l,m,n) {i==5, j==5, k==5}
 
    foo(i-i);
 
-//  P(i,j,k) {i==5, j==5, k==5}
+//  P(i,j,k,l,m,n) {i==5, j==5, k==5}
 
    foo(a[i-i]);
 
-//  P(i,j,k) {i==5, j==5, k==5}
+//  P(i,j,k,l,m,n) {i==5, j==5, k==5}
 
    k = i*j+i*j;
 
-//  P(i,j,k) {i==5, j==5}
+//  P(i,j,k,l,m,n) {i==5, j==5}
 
    k = i*j+i*j+1;
 
-//  P(i,j,k) {i==5, j==5}
+//  P(i,j,k,l,m,n) {i==5, j==5}
 
    k = 1+i*j+i*j;
 
-//  P(i,j,k) {i==5, j==5}
+//  P(i,j,k,l,m,n) {i==5, j==5}
 
    k = m*n+m*n;
 
-//  P(i,j,k) {i==5, j==5}
+//  P(i,j,k,l,m,n) {i==5, j==5}
 
    k = m*n+m*n+1;
 
-//  P(i,j,k) {i==5, j==5}
+//  P(i,j,k,l,m,n) {i==5, j==5}
 
    k = 1+m*n+m*n;
 
-//  P(i,j,k) {i==5, j==5}
+//  P(i,j,k,l,m,n) {i==5, j==5}
 
    k += i-i;
 
-//  P(i,j,k) {i==5, j==5}
+//  P(i,j,k,l,m,n) {i==5, j==5}
 
    return i;
 }

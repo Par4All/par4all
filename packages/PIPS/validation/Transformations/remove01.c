@@ -1,3 +1,4 @@
+#include <stdio.h>
 int volume(int a[256][256])
 {
     int v=0;

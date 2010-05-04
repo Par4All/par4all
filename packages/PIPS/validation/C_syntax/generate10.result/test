@@ -35,7 +35,7 @@ void generate10()
 
    int i, j, k;
 
-//  P() {}
+//  P(i,j,k) {}
 
 
    func(i, j, k);

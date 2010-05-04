@@ -23,7 +23,7 @@ int initialization06(int af)
 
    int a = af;
 
-//  T() {a==af}
+//  T(i) {a==af}
 
    int i;
 
@@ -53,16 +53,16 @@ int initialization06(int af)
 
    int a = af;
 
-//  P() {a==af}
+//  P(a) {a==af}
 
    int i;
 
-//  P() {a==af}
+//  P(a,i) {a==af}
 
 
    i = a+1;
 
-//  P(i) {a==af, a==i-1}
+//  P(a,i) {a==af, a==i-1}
 
    a = 2;
 

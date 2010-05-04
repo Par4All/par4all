@@ -159,7 +159,7 @@ int main()
 
    int k = 6;
 
-//  T(l) {}
+//  T(l) {i==2, j==4, k==6}
 
    int l;
 

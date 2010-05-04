@@ -1,3 +1,4 @@
+#include <stdlib.h>
 main(int argc, char *argv[])
 {
     int b,* a ,c[4];

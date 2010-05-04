@@ -59,7 +59,7 @@ Transformers for "main"
 int main()
 {
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;                                                            /*0013*/
 
@@ -90,7 +90,7 @@ int main()
 
    int i, j;                                                            /*0013*/
 
-//  P() {}
+//  P(i,j) {}
 
 
    i = (j = 1, 2);                                                      /*0015*/

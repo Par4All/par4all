@@ -7,8 +7,11 @@ create main02 main02.f90
 display PRINTED_FILE[%ALL]
 
 apply UNSPLIT[%ALL]
-shell gcc -c main02.database/Src/main02.f90
-shell rm main02.o
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o main02.database/Src/main02.o main02.database/Src/main02.f90
 
 close
 quit

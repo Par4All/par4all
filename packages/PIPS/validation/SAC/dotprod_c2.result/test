@@ -130,7 +130,7 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1];
+   float RED0[1], RED1[4];
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    RED0[0] = 0.000000;
@@ -176,7 +176,7 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[0+1], RED1[3+1], _return00, _return01, _return02, _return03, a0, _return04;
+   float RED0[1], RED1[4], _return00, _return01, _return02, _return03, a0, _return04;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    RED0[0] = 0.000000;
@@ -216,11 +216,9 @@ float dotprod(int n, float b[n], float c[n])
 float dotprod(int n, float b[n], float c[n])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
+   float aligned[4] = {0, 0, 0, 0};
    {
       float a;
       int i;
@@ -229,7 +227,7 @@ float dotprod(int n, float b[n], float c[n])
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1], _return00, _return01, _return02, _return03, a0, _return04;
+      float RED0[1], RED1[4], _return00, _return01, _return02, _return03, a0, _return04;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 4);
       RED0[0] = 0.000000;
@@ -261,11 +259,9 @@ float dotprod(int n, float b[n], float c[n])
 float dotprod(int n, float b[n], float c[n])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
-   //PIPS:SAC generated float vector(s)
-   float v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
+   float aligned[4] = {0, 0, 0, 0};
    {
       float a;
       int i;
@@ -274,7 +270,7 @@ float dotprod(int n, float b[n], float c[n])
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1], _return00, _return01, _return02, _return03, a0, _return04;
+      float RED0[1], RED1[4], _return00, _return01, _return02, _return03, a0, _return04;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 4);
       RED0[0] = 0.000000;
@@ -306,16 +302,16 @@ float dotprod(int n, float b[n], float c[n])
 float dotprod(int n, float b[n], float c[n])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       float a;
       int i;
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1], a0, _return04;
+      float RED0[1], RED1[4], a0, _return04;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 4);
       RED0[0] = 0.000000;
@@ -350,16 +346,16 @@ simdized code
 float dotprod(int n, float b[n], float c[n])
 {
    //PIPS:SAC generated float vector(s)
-   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
+   float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    //PIPS:SAC generated variable
-   float aligned[3+1] = {0, 0, 0, 0};
+   float aligned[4] = {0, 0, 0, 0};
    {
       float a;
       int i;
       //PIPS generated variable
       int LU_NUB0, LU_IB0, LU_IND0;
       //PIPS generated variable
-      float RED0[0+1], RED1[3+1], a0, _return04;
+      float RED0[1], RED1[4], a0, _return04;
       LU_NUB0 = n;
       LU_IB0 = MOD(LU_NUB0, 4);
       RED0[0] = 0.000000;

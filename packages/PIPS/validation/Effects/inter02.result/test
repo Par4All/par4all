@@ -38,28 +38,43 @@ int main()
    foo(&y);                                                             /*0032*/
 //               <must be written>: tab[1]
    foo(&tab[1]);                                                        /*0033*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1] x x[0]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] x x[0]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
    printf("%d\n", *x);                                                  /*0035*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1] tab[0]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] tab[0]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab[0]);                                              /*0036*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1] tab2[4] 
-//                                  tab2[4][0]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  tab2[4] tab2[4][0]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab2[4][0]);                                          /*0037*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1] tab3[5][0]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  tab3[5][0]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab3[5][0]);                                          /*0038*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1] tab4 tab4[6] 
-//                                  tab4[6][0]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] tab4 
+//                                  tab4[6] tab4[6][0]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab4[6][0]);                                          /*0039*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1] y
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] y
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", y);                                                   /*0040*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1] tab[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] tab[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab[1]);                                              /*0041*/
    return 1;                                                            /*0042*/
@@ -134,6 +149,9 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <x[PHI1]-R-EXACT-{PHI1==0}>
 //  <x-R-EXACT-{}>
 
@@ -142,12 +160,18 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <tab[PHI1]-R-EXACT-{PHI1==0}>
 
    printf("%d\n", tab[0]);                                              /*0036*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <tab2[PHI1]-R-EXACT-{PHI1==4}>
 //  <tab2[PHI1][PHI2]-R-EXACT-{PHI1==4, PHI2==0}>
 
@@ -155,12 +179,18 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <tab3[PHI1][PHI2]-R-EXACT-{PHI1==5, PHI2==0}>
 
    printf("%d\n", tab3[5][0]);                                          /*0038*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <tab4-R-EXACT-{}>
 //  <tab4[PHI1]-R-EXACT-{PHI1==6}>
 //  <tab4[PHI1][PHI2]-R-EXACT-{PHI1==6, PHI2==0}>
@@ -169,12 +199,18 @@ int main()
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <y-R-EXACT-{}>
 
    printf("%d\n", y);                                                   /*0040*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <tab[PHI1]-R-EXACT-{PHI1==1}>
 
    printf("%d\n", tab[1]);                                              /*0041*/
@@ -223,27 +259,33 @@ int main()
    foo(&tab[1]);                                                        /*0033*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
 
 
    printf("%d\n", *x);                                                  /*0035*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
 
    printf("%d\n", tab[0]);                                              /*0036*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
 
    printf("%d\n", tab2[4][0]);                                          /*0037*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
 
    printf("%d\n", tab3[5][0]);                                          /*0038*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
 
    printf("%d\n", tab4[6][0]);                                          /*0039*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
 
    printf("%d\n", y);                                                   /*0040*/
    printf("%d\n", tab[1]);                                              /*0041*/

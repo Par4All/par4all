@@ -1,0 +1,9 @@
+delete summary_precondition02
+
+create summary_precondition02 summary_precondition02.c
+
+display PARSED_PRINTED_FILE(%ALLFUNC)
+
+close
+delete summary_precondition02
+quit

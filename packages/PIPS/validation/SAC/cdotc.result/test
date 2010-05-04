@@ -364,8 +364,8 @@
             C_2 = CONJG(CX(IX))
             C_3 = C_2*CY(IY)
             CTEMP = CTEMP+C_3                                           0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = INCX+IX                                                0042
+            IY = INCY+IY                                                0043
 10          CONTINUE                                                    0044
          CDOTC = CTEMP                                                  0045
       ENDIF
@@ -443,8 +443,8 @@ c SIMD_COMMENT_2
             C_2 = CONJG(CX(IX))
             C_3 = C_2*CY(IY)
             CTEMP = CTEMP+C_3                                           0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = INCX+IX                                                0042
+            IY = INCY+IY                                                0043
 99997       CONTINUE
          DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
 c SIMD_COMMENT_0
@@ -454,9 +454,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             CTEMP = CTEMP+C_3                                           0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -464,9 +464,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             CTEMP = CTEMP+C_3                                           0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -474,9 +474,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             CTEMP = CTEMP+C_3                                           0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -484,9 +484,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             CTEMP = CTEMP+C_3                                           0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 99996       CONTINUE
          I = MAX0(LU_NUB1, 0)+1
          CDOTC = CTEMP                                                  0045
@@ -574,8 +574,8 @@ c SIMD_COMMENT_2
             C_2 = CONJG(CX(IX))
             C_3 = C_2*CY(IY)
             RED2(0) = RED2(0)+C_3                                       0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = INCX+IX                                                0042
+            IY = INCY+IY                                                0043
 99997       CONTINUE
          CTEMP = RED2(0)+CTEMP
          RED3(0) = (0.000000, 0.000000)
@@ -590,9 +590,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(0) = RED3(0)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -600,9 +600,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(1) = RED3(1)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -610,9 +610,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(2) = RED3(2)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -620,9 +620,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(3) = RED3(3)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 99996       CONTINUE
          CTEMP = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP
          I = MAX0(LU_NUB1, 0)+1
@@ -710,8 +710,8 @@ c SIMD_COMMENT_2
             C_2 = CONJG(CX(IX))
             C_3 = C_2*CY(IY)
             RED2(0) = RED2(0)+C_3                                       0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = INCX+IX                                                0042
+            IY = INCY+IY                                                0043
 99997       CONTINUE
          CTEMP = RED2(0)+CTEMP
          RED3(0) = (0.000000, 0.000000)
@@ -726,9 +726,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(0) = RED3(0)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -736,9 +736,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(1) = RED3(1)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -746,9 +746,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(2) = RED3(2)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 c SIMD_COMMENT_0
             C_2 = CONJG(CX(IX))
 c SIMD_COMMENT_1
@@ -756,9 +756,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(3) = RED3(3)+C_3                                       0041
 c SIMD_COMMENT_3
-            IX = IX+INCX                                                0042
+            IX = INCX+IX                                                0042
 c SIMD_COMMENT_4
-            IY = IY+INCY                                                0043
+            IY = INCY+IY                                                0043
 99996       CONTINUE
          CTEMP = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP
          CDOTC = CTEMP                                                  0045
@@ -850,8 +850,8 @@ c SIMD_COMMENT_2
             C_24 = CONJG(CX(IX))
             C_34 = C_24*CY(IY)
             RED2(0) = RED2(0)+C_34                                      0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = INCX+IX                                                0042
+            IY = INCY+IY                                                0043
 99997       CONTINUE
          CTEMP1 = RED2(0)+CTEMP4
          RED3(0) = (0.000000, 0.000000)
@@ -866,9 +866,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(0) = RED3(0)+C_33                                      0041
 c SIMD_COMMENT_3
-            IX3 = IX3+INCX                                              0042
+            IX3 = INCX+IX3                                              0042
 c SIMD_COMMENT_4
-            IY3 = IY3+INCY                                              0043
+            IY3 = INCY+IY3                                              0043
 c SIMD_COMMENT_0
             C_22 = CONJG(CX(IX3))
 c SIMD_COMMENT_1
@@ -876,9 +876,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(1) = RED3(1)+C_32                                      0041
 c SIMD_COMMENT_3
-            IX2 = IX3+INCX                                              0042
+            IX2 = INCX+IX3                                              0042
 c SIMD_COMMENT_4
-            IY2 = IY3+INCY                                              0043
+            IY2 = INCY+IY3                                              0043
 c SIMD_COMMENT_0
             C_21 = CONJG(CX(IX2))
 c SIMD_COMMENT_1
@@ -886,9 +886,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(2) = RED3(2)+C_31                                      0041
 c SIMD_COMMENT_3
-            IX1 = IX2+INCX                                              0042
+            IX1 = INCX+IX2                                              0042
 c SIMD_COMMENT_4
-            IY1 = IY2+INCY                                              0043
+            IY1 = INCY+IY2                                              0043
 c SIMD_COMMENT_0
             C_20 = CONJG(CX(IX1))
 c SIMD_COMMENT_1
@@ -896,9 +896,9 @@ c SIMD_COMMENT_1
 c SIMD_COMMENT_2
             RED3(3) = RED3(3)+C_30                                      0041
 c SIMD_COMMENT_3
-            IX = IX1+INCX                                               0042
+            IX = INCX+IX1                                               0042
 c SIMD_COMMENT_4
-            IY = IY1+INCY                                               0043
+            IY = INCY+IY1                                               0043
 99996       CONTINUE
          CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
          CDOTC = CTEMP0                                                 0045
@@ -909,21 +909,37 @@ c SIMD_COMMENT_4
      &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
      &LU_IND0, LU_IB0, LU_NUB0, I_5, I_4, I_3, I_2, I_1, I_0, IY0, 
      &IX0, N, INCX, INCY, I, IX, IY
-      INTEGER*8 v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), 
-     &v2di_vec6(0:1), v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1)
-     &, v2di_vec2(0:1), v2di_vec1(0:1), v2di_vec0(0:1)
+      INTEGER aligned12(0:3), aligned11(0:3), aligned10(0:3), 
+     &v4si_vec27(0:3), v4si_vec26(0:3), v4si_vec25(0:3), aligned9(0:3
+     &), aligned6(0:3), aligned5(0:3), v4si_vec24(0:3), v4si_vec23(0:
+     &3), v4si_vec22(0:3), v4si_vec16(0:3), v4si_vec15(0:3)
+      INTEGER*8 v2di_vec21(0:1), v2di_vec20(0:1), v2di_vec19(0:1), 
+     &v2di_vec18(0:1), v2di_vec17(0:1), v2di_vec14(0:1), v2di_vec13(0
+     &:1), v2di_vec12(0:1), v2di_vec11(0:1), v2di_vec10(0:1), 
+     &v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), v2di_vec6(0:1)
+     &, v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1), v2di_vec2(0:1
+     &), v2di_vec1(0:1), v2di_vec0(0:1)
       LOGICAL L_00, L_10, L_1, L_0
-      COMPLEX*8 aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(
-     &0:1), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01
-     &, C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, 
-     &C_22, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0
-     &), RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
+      COMPLEX*8 aligned8(0:1), aligned7(0:1), aligned4(0:1), aligned3
+     &(0:1), aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(0:1
+     &), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01, 
+     &C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, C_22
+     &, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0), 
+     &RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
      &CTEMP
+      aligned10(3) = 1
+      aligned10(2) = 1
+      aligned10(1) = 1
+      aligned10(0) = 1
+      aligned6(3) = INCY
+      aligned6(2) = INCX
+      aligned6(1) = INCY
+      aligned6(0) = INCX
 *     ..
       CTEMP4 = (0.0, 0.0)                                               0028
       CDOTC = (0.0, 0.0)                                                0029
       IF (N.LE.0) THEN                                                  0030
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+      ELSEIF (aligned6(0).EQ.1.AND.aligned6(1).EQ.1) THEN               0030
 *
 *        code for both increments equal to 1
 *
@@ -943,26 +959,26 @@ c SIMD_COMMENT_4
          DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
 c SIMD_COMMENT_0
             aligned(0) = CONJG(CX(LU_IND0+1))
-c SIMD_COMMENT_0
-            aligned(1) = CONJG(CX(LU_IND0+2))
-c SIMD_COMMENT_0
-            aligned1(0) = CONJG(CX(LU_IND0+3))
-c SIMD_COMMENT_0
-            aligned1(1) = CONJG(CX(LU_IND0+4))
             CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
             CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
             CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
             CALL SIMD_SAVE_V2DI(v2di_vec0, aligned0(0))
-            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
-            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
-            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
-            CALL SIMD_SAVE_V2DI(v2di_vec3, aligned2(0))
-            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
-            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
-            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec3, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec3, v2di_vec3, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec3, RED1(0))
+c SIMD_COMMENT_0
+            aligned(1) = CONJG(CX(LU_IND0+2))
+c SIMD_COMMENT_0
+            aligned1(0) = CONJG(CX(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec7, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec6, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec5, v2di_vec6, v2di_vec7)
+            CALL SIMD_SAVE_V2DI(v2di_vec5, aligned2(0))
             CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
-            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec5)
             CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
+c SIMD_COMMENT_0
+            aligned1(1) = CONJG(CX(LU_IND0+4))
 99998       CONTINUE
          CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
          CDOTC = CTEMP2                                                 0053
@@ -973,18 +989,18 @@ c SIMD_COMMENT_0
 *
          IX4 = 1                                                        0036
          IY4 = 1                                                        0037
-         L_00 = INCX.LT.0
-         I_00 = -N
-         I_10 = I_00+1
-         I_20 = I_10*INCX
-         IX00 = I_20+1
-         IX = L_00?IX00:IX4
-         L_10 = INCY.LT.0
-         I_30 = -N
-         I_40 = I_30+1
-         I_50 = I_40*INCY
-         IY00 = I_50+1
-         IY = L_10?IY00:IY4
+         L_00 = aligned6(0).LT.0
+         aligned11(0) = -N
+         CALL SIMD_LOAD_V4SI(v4si_vec27, aligned10(0))
+         CALL SIMD_LOAD_V4SI(v4si_vec26, aligned11(0))
+         CALL SIMD_ADDD(v4si_vec25, v4si_vec26, v4si_vec27)
+         CALL SIMD_SAVE_V4SI(v4si_vec25, aligned12(0))
+         aligned11(1) = aligned12(0)*aligned6(0)
+         IX = L_00?aligned12(1):IX4
+         L_10 = aligned6(1).LT.0
+         aligned11(2) = -N
+         aligned11(3) = aligned12(2)*aligned6(1)
+         IY = L_10?aligned12(3):IY4
          LU_NUB1 = N
          LU_IB1 = MOD(LU_NUB1, 4)
          RED2(0) = (0.000000, 0.000000)
@@ -992,8 +1008,8 @@ c SIMD_COMMENT_0
             C_24 = CONJG(CX(IX))
             C_34 = C_24*CY(IY)
             RED2(0) = RED2(0)+C_34                                      0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = aligned6(0)+IX                                         0042
+            IY = aligned6(1)+IY                                         0043
 99997       CONTINUE
          CTEMP1 = RED2(0)+CTEMP4
          RED3(0) = (0.000000, 0.000000)
@@ -1002,45 +1018,39 @@ c SIMD_COMMENT_0
          RED3(3) = (0.000000, 0.000000)
          DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
 c SIMD_COMMENT_0
-            C_23 = CONJG(CX(IX))
-c SIMD_COMMENT_1
-            C_33 = C_23*CY(IY)
-c SIMD_COMMENT_2
-            RED3(0) = RED3(0)+C_33                                      0041
-c SIMD_COMMENT_3
-            IX3 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY3 = IY3+INCY                                              0043
+            aligned3(0) = CONJG(CX(IX))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec12, CY(IY), CY(
+     &      aligned5(1)))
+            CALL SIMD_LOAD_V2DI(v2di_vec11, aligned3(0))
+            CALL SIMD_MULCS(v2di_vec10, v2di_vec11, v2di_vec12)
+            CALL SIMD_SAVE_V2DI(v2di_vec10, aligned4(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_ADDCS(v2di_vec13, v2di_vec13, v2di_vec10)
+            CALL SIMD_SAVE_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec15, aligned5(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec16, aligned6(0))
+            CALL SIMD_ADDD(v4si_vec15, v4si_vec16, v4si_vec15)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec15, aligned5(0), 
+     &      aligned5(1), aligned9(0), aligned9(1))
 c SIMD_COMMENT_0
-            C_22 = CONJG(CX(IX3))
-c SIMD_COMMENT_1
-            C_32 = C_22*CY(IY3)
-c SIMD_COMMENT_2
-            RED3(1) = RED3(1)+C_32                                      0041
-c SIMD_COMMENT_3
-            IX2 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY2 = IY3+INCY                                              0043
+            aligned3(1) = CONJG(CX(aligned5(0)))
 c SIMD_COMMENT_0
-            C_21 = CONJG(CX(IX2))
-c SIMD_COMMENT_1
-            C_31 = C_21*CY(IY2)
-c SIMD_COMMENT_2
-            RED3(2) = RED3(2)+C_31                                      0041
-c SIMD_COMMENT_3
-            IX1 = IX2+INCX                                              0042
-c SIMD_COMMENT_4
-            IY1 = IY2+INCY                                              0043
+            aligned7(0) = CONJG(CX(aligned9(0)))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec19, CY(aligned9(1)), 
+     &      CY(aligned9(3)))
+            CALL SIMD_LOAD_V2DI(v2di_vec18, aligned7(0))
+            CALL SIMD_MULCS(v2di_vec17, v2di_vec18, v2di_vec19)
+            CALL SIMD_SAVE_V2DI(v2di_vec17, aligned8(0))
+            CALL SIMD_LOAD_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_ADDCS(v2di_vec20, v2di_vec20, v2di_vec17)
+            CALL SIMD_SAVE_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_LOAD_V4SI(v4si_vec24, aligned9(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec23, aligned6(0))
+            CALL SIMD_ADDD(v4si_vec22, v4si_vec23, v4si_vec24)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec22, aligned9(2), 
+     &      aligned9(3), IX, IY)
 c SIMD_COMMENT_0
-            C_20 = CONJG(CX(IX1))
-c SIMD_COMMENT_1
-            C_30 = C_20*CY(IY1)
-c SIMD_COMMENT_2
-            RED3(3) = RED3(3)+C_30                                      0041
-c SIMD_COMMENT_3
-            IX = IX1+INCX                                               0042
-c SIMD_COMMENT_4
-            IY = IY1+INCY                                               0043
+            aligned7(1) = CONJG(CX(aligned9(2)))
 99996       CONTINUE
          CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
          CDOTC = CTEMP0                                                 0045
@@ -1051,21 +1061,37 @@ c SIMD_COMMENT_4
      &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
      &LU_IND0, LU_IB0, LU_NUB0, I_5, I_4, I_3, I_2, I_1, I_0, IY0, 
      &IX0, N, INCX, INCY, I, IX, IY
-      INTEGER*8 v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), 
-     &v2di_vec6(0:1), v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1)
-     &, v2di_vec2(0:1), v2di_vec1(0:1), v2di_vec0(0:1)
+      INTEGER aligned12(0:3), aligned11(0:3), aligned10(0:3), 
+     &v4si_vec27(0:3), v4si_vec26(0:3), v4si_vec25(0:3), aligned9(0:3
+     &), aligned6(0:3), aligned5(0:3), v4si_vec24(0:3), v4si_vec23(0:
+     &3), v4si_vec22(0:3), v4si_vec16(0:3), v4si_vec15(0:3)
+      INTEGER*8 v2di_vec21(0:1), v2di_vec20(0:1), v2di_vec19(0:1), 
+     &v2di_vec18(0:1), v2di_vec17(0:1), v2di_vec14(0:1), v2di_vec13(0
+     &:1), v2di_vec12(0:1), v2di_vec11(0:1), v2di_vec10(0:1), 
+     &v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), v2di_vec6(0:1)
+     &, v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1), v2di_vec2(0:1
+     &), v2di_vec1(0:1), v2di_vec0(0:1)
       LOGICAL L_00, L_10, L_1, L_0
-      COMPLEX*8 aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(
-     &0:1), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01
-     &, C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, 
-     &C_22, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0
-     &), RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
+      COMPLEX*8 aligned8(0:1), aligned7(0:1), aligned4(0:1), aligned3
+     &(0:1), aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(0:1
+     &), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01, 
+     &C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, C_22
+     &, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0), 
+     &RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
      &CTEMP
+      aligned10(3) = 1
+      aligned10(2) = 1
+      aligned10(1) = 1
+      aligned10(0) = 1
+      aligned6(3) = INCY
+      aligned6(2) = INCX
+      aligned6(1) = INCY
+      aligned6(0) = INCX
 *     ..
       CTEMP4 = (0.0, 0.0)                                               0028
       CDOTC = (0.0, 0.0)                                                0029
       IF (N.LE.0) THEN                                                  0030
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+      ELSEIF (aligned6(0).EQ.1.AND.aligned6(1).EQ.1) THEN               0030
 *
 *        code for both increments equal to 1
 *
@@ -1085,24 +1111,24 @@ c SIMD_COMMENT_4
          DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
 c SIMD_COMMENT_0
             aligned(0) = CONJG(CX(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
+            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
+            CALL SIMD_LOAD_V2DI(v2di_vec3, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec3, v2di_vec3, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec3, RED1(0))
 c SIMD_COMMENT_0
             aligned(1) = CONJG(CX(LU_IND0+2))
 c SIMD_COMMENT_0
             aligned1(0) = CONJG(CX(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec7, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec6, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec5, v2di_vec6, v2di_vec7)
+            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec5)
+            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
 c SIMD_COMMENT_0
             aligned1(1) = CONJG(CX(LU_IND0+4))
-            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
-            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
-            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
-            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
-            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
-            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
-            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
-            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
-            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
-            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
-            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
-            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
 99998       CONTINUE
          CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
          CDOTC = CTEMP2                                                 0053
@@ -1113,18 +1139,18 @@ c SIMD_COMMENT_0
 *
          IX4 = 1                                                        0036
          IY4 = 1                                                        0037
-         L_00 = INCX.LT.0
-         I_00 = -N
-         I_10 = I_00+1
-         I_20 = I_10*INCX
-         IX00 = I_20+1
-         IX = L_00?IX00:IX4
-         L_10 = INCY.LT.0
-         I_30 = -N
-         I_40 = I_30+1
-         I_50 = I_40*INCY
-         IY00 = I_50+1
-         IY = L_10?IY00:IY4
+         L_00 = aligned6(0).LT.0
+         aligned11(0) = -N
+         CALL SIMD_LOAD_V4SI(v4si_vec27, aligned10(0))
+         CALL SIMD_LOAD_V4SI(v4si_vec26, aligned11(0))
+         CALL SIMD_ADDD(v4si_vec25, v4si_vec26, v4si_vec27)
+         CALL SIMD_SAVE_V4SI(v4si_vec25, aligned12(0))
+         aligned11(1) = aligned12(0)*aligned6(0)
+         IX = L_00?aligned12(1):IX4
+         L_10 = aligned6(1).LT.0
+         aligned11(2) = -N
+         aligned11(3) = aligned12(2)*aligned6(1)
+         IY = L_10?aligned12(3):IY4
          LU_NUB1 = N
          LU_IB1 = MOD(LU_NUB1, 4)
          RED2(0) = (0.000000, 0.000000)
@@ -1132,8 +1158,8 @@ c SIMD_COMMENT_0
             C_24 = CONJG(CX(IX))
             C_34 = C_24*CY(IY)
             RED2(0) = RED2(0)+C_34                                      0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = aligned6(0)+IX                                         0042
+            IY = aligned6(1)+IY                                         0043
 99997       CONTINUE
          CTEMP1 = RED2(0)+CTEMP4
          RED3(0) = (0.000000, 0.000000)
@@ -1142,45 +1168,37 @@ c SIMD_COMMENT_0
          RED3(3) = (0.000000, 0.000000)
          DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
 c SIMD_COMMENT_0
-            C_23 = CONJG(CX(IX))
-c SIMD_COMMENT_1
-            C_33 = C_23*CY(IY)
-c SIMD_COMMENT_2
-            RED3(0) = RED3(0)+C_33                                      0041
-c SIMD_COMMENT_3
-            IX3 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY3 = IY3+INCY                                              0043
+            aligned3(0) = CONJG(CX(IX))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec12, CY(IY), CY(
+     &      aligned5(1)))
+            CALL SIMD_LOAD_V2DI(v2di_vec11, aligned3(0))
+            CALL SIMD_MULCS(v2di_vec10, v2di_vec11, v2di_vec12)
+            CALL SIMD_LOAD_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_ADDCS(v2di_vec13, v2di_vec13, v2di_vec10)
+            CALL SIMD_SAVE_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec15, aligned5(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec16, aligned6(0))
+            CALL SIMD_ADDD(v4si_vec15, v4si_vec16, v4si_vec15)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec15, aligned5(0), 
+     &      aligned5(1), aligned9(0), aligned9(1))
 c SIMD_COMMENT_0
-            C_22 = CONJG(CX(IX3))
-c SIMD_COMMENT_1
-            C_32 = C_22*CY(IY3)
-c SIMD_COMMENT_2
-            RED3(1) = RED3(1)+C_32                                      0041
-c SIMD_COMMENT_3
-            IX2 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY2 = IY3+INCY                                              0043
+            aligned3(1) = CONJG(CX(aligned5(0)))
 c SIMD_COMMENT_0
-            C_21 = CONJG(CX(IX2))
-c SIMD_COMMENT_1
-            C_31 = C_21*CY(IY2)
-c SIMD_COMMENT_2
-            RED3(2) = RED3(2)+C_31                                      0041
-c SIMD_COMMENT_3
-            IX1 = IX2+INCX                                              0042
-c SIMD_COMMENT_4
-            IY1 = IY2+INCY                                              0043
+            aligned7(0) = CONJG(CX(aligned9(0)))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec19, CY(aligned9(1)), 
+     &      CY(aligned9(3)))
+            CALL SIMD_LOAD_V2DI(v2di_vec18, aligned7(0))
+            CALL SIMD_MULCS(v2di_vec17, v2di_vec18, v2di_vec19)
+            CALL SIMD_LOAD_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_ADDCS(v2di_vec20, v2di_vec20, v2di_vec17)
+            CALL SIMD_SAVE_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_LOAD_V4SI(v4si_vec24, aligned9(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec23, aligned6(0))
+            CALL SIMD_ADDD(v4si_vec22, v4si_vec23, v4si_vec24)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec22, aligned9(2), 
+     &      aligned9(3), IX, IY)
 c SIMD_COMMENT_0
-            C_20 = CONJG(CX(IX1))
-c SIMD_COMMENT_1
-            C_30 = C_20*CY(IY1)
-c SIMD_COMMENT_2
-            RED3(3) = RED3(3)+C_30                                      0041
-c SIMD_COMMENT_3
-            IX = IX1+INCX                                               0042
-c SIMD_COMMENT_4
-            IY = IY1+INCY                                               0043
+            aligned7(1) = CONJG(CX(aligned9(2)))
 99996       CONTINUE
          CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
          CDOTC = CTEMP0                                                 0045
@@ -1191,21 +1209,37 @@ c SIMD_COMMENT_4
      &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
      &LU_IND0, LU_IB0, LU_NUB0, I_5, I_4, I_3, I_2, I_1, I_0, IY0, 
      &IX0, N, INCX, INCY, I, IX, IY
-      INTEGER*8 v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), 
-     &v2di_vec6(0:1), v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1)
-     &, v2di_vec2(0:1), v2di_vec1(0:1), v2di_vec0(0:1)
+      INTEGER aligned12(0:3), aligned11(0:3), aligned10(0:3), 
+     &v4si_vec27(0:3), v4si_vec26(0:3), v4si_vec25(0:3), aligned9(0:3
+     &), aligned6(0:3), aligned5(0:3), v4si_vec24(0:3), v4si_vec23(0:
+     &3), v4si_vec22(0:3), v4si_vec16(0:3), v4si_vec15(0:3)
+      INTEGER*8 v2di_vec21(0:1), v2di_vec20(0:1), v2di_vec19(0:1), 
+     &v2di_vec18(0:1), v2di_vec17(0:1), v2di_vec14(0:1), v2di_vec13(0
+     &:1), v2di_vec12(0:1), v2di_vec11(0:1), v2di_vec10(0:1), 
+     &v2di_vec9(0:1), v2di_vec8(0:1), v2di_vec7(0:1), v2di_vec6(0:1)
+     &, v2di_vec5(0:1), v2di_vec4(0:1), v2di_vec3(0:1), v2di_vec2(0:1
+     &), v2di_vec1(0:1), v2di_vec0(0:1)
       LOGICAL L_00, L_10, L_1, L_0
-      COMPLEX*8 aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(
-     &0:1), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01
-     &, C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, 
-     &C_22, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0
-     &), RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
+      COMPLEX*8 aligned8(0:1), aligned7(0:1), aligned4(0:1), aligned3
+     &(0:1), aligned2(0:1), aligned1(0:1), aligned0(0:1), aligned(0:1
+     &), CTEMP4, C_04, C_14, CTEMP3, C_03, C_13, C_02, C_12, C_01, 
+     &C_11, C_00, C_10, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, C_22
+     &, C_32, C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0), 
+     &RED1(0:3), RED0(0:0), C_3, C_2, C_1, C_0, CX(1:*), CY(1:*), 
      &CTEMP
+      aligned10(3) = 1
+      aligned10(2) = 1
+      aligned10(1) = 1
+      aligned10(0) = 1
+      aligned6(3) = INCY
+      aligned6(2) = INCX
+      aligned6(1) = INCY
+      aligned6(0) = INCX
 *     ..
       CTEMP4 = (0.0, 0.0)                                               0028
       CDOTC = (0.0, 0.0)                                                0029
       IF (N.LE.0) THEN                                                  0030
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+      ELSEIF (aligned6(0).EQ.1.AND.aligned6(1).EQ.1) THEN               0030
 *
 *        code for both increments equal to 1
 *
@@ -1225,24 +1259,24 @@ c SIMD_COMMENT_4
          DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
 c SIMD_COMMENT_0
             aligned(0) = CONJG(CX(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
+            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
+            CALL SIMD_LOAD_V2DI(v2di_vec3, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec3, v2di_vec3, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec3, RED1(0))
 c SIMD_COMMENT_0
             aligned(1) = CONJG(CX(LU_IND0+2))
 c SIMD_COMMENT_0
             aligned1(0) = CONJG(CX(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec7, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec6, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec5, v2di_vec6, v2di_vec7)
+            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec5)
+            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
 c SIMD_COMMENT_0
             aligned1(1) = CONJG(CX(LU_IND0+4))
-            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
-            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
-            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
-            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
-            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
-            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
-            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
-            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
-            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
-            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
-            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
-            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
 99998       CONTINUE
          CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
          CDOTC = CTEMP2                                                 0053
@@ -1253,18 +1287,18 @@ c SIMD_COMMENT_0
 *
          IX4 = 1                                                        0036
          IY4 = 1                                                        0037
-         L_00 = INCX.LT.0
-         I_00 = -N
-         I_10 = I_00+1
-         I_20 = I_10*INCX
-         IX00 = I_20+1
-         IX = L_00?IX00:IX4
-         L_10 = INCY.LT.0
-         I_30 = -N
-         I_40 = I_30+1
-         I_50 = I_40*INCY
-         IY00 = I_50+1
-         IY = L_10?IY00:IY4
+         L_00 = aligned6(0).LT.0
+         aligned11(0) = -N
+         CALL SIMD_LOAD_V4SI(v4si_vec27, aligned10(0))
+         CALL SIMD_LOAD_V4SI(v4si_vec26, aligned11(0))
+         CALL SIMD_ADDD(v4si_vec25, v4si_vec26, v4si_vec27)
+         CALL SIMD_SAVE_V4SI(v4si_vec25, aligned12(0))
+         aligned11(1) = aligned12(0)*aligned6(0)
+         IX = L_00?aligned12(1):IX4
+         L_10 = aligned6(1).LT.0
+         aligned11(2) = -N
+         aligned11(3) = aligned12(2)*aligned6(1)
+         IY = L_10?aligned12(3):IY4
          LU_NUB1 = N
          LU_IB1 = MOD(LU_NUB1, 4)
          RED2(0) = (0.000000, 0.000000)
@@ -1272,77 +1306,82 @@ c SIMD_COMMENT_0
             C_24 = CONJG(CX(IX))
             C_34 = C_24*CY(IY)
             RED2(0) = RED2(0)+C_34                                      0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = aligned6(0)+IX                                         0042
+            IY = aligned6(1)+IY                                         0043
 99997       CONTINUE
          CTEMP1 = RED2(0)+CTEMP4
          RED3(0) = (0.000000, 0.000000)
          RED3(1) = (0.000000, 0.000000)
          RED3(2) = (0.000000, 0.000000)
          RED3(3) = (0.000000, 0.000000)
+         CALL SIMD_LOAD_V4SI(v4si_vec16, aligned6(0))
+         CALL SIMD_LOAD_V4SI(v4si_vec23, aligned6(0))
          DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
 c SIMD_COMMENT_0
-            C_23 = CONJG(CX(IX))
-c SIMD_COMMENT_1
-            C_33 = C_23*CY(IY)
-c SIMD_COMMENT_2
-            RED3(0) = RED3(0)+C_33                                      0041
-c SIMD_COMMENT_3
-            IX3 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY3 = IY3+INCY                                              0043
+            aligned3(0) = CONJG(CX(IX))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec12, CY(IY), CY(
+     &      aligned5(1)))
+            CALL SIMD_LOAD_V2DI(v2di_vec11, aligned3(0))
+            CALL SIMD_MULCS(v2di_vec10, v2di_vec11, v2di_vec12)
+            CALL SIMD_LOAD_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_ADDCS(v2di_vec13, v2di_vec13, v2di_vec10)
+            CALL SIMD_SAVE_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec15, aligned5(0))
+            CALL SIMD_ADDD(v4si_vec15, v4si_vec16, v4si_vec15)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec15, aligned5(0), 
+     &      aligned5(1), aligned9(0), aligned9(1))
 c SIMD_COMMENT_0
-            C_22 = CONJG(CX(IX3))
-c SIMD_COMMENT_1
-            C_32 = C_22*CY(IY3)
-c SIMD_COMMENT_2
-            RED3(1) = RED3(1)+C_32                                      0041
-c SIMD_COMMENT_3
-            IX2 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY2 = IY3+INCY                                              0043
+            aligned3(1) = CONJG(CX(aligned5(0)))
 c SIMD_COMMENT_0
-            C_21 = CONJG(CX(IX2))
-c SIMD_COMMENT_1
-            C_31 = C_21*CY(IY2)
-c SIMD_COMMENT_2
-            RED3(2) = RED3(2)+C_31                                      0041
-c SIMD_COMMENT_3
-            IX1 = IX2+INCX                                              0042
-c SIMD_COMMENT_4
-            IY1 = IY2+INCY                                              0043
+            aligned7(0) = CONJG(CX(aligned9(0)))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec19, CY(aligned9(1)), 
+     &      CY(aligned9(3)))
+            CALL SIMD_LOAD_V2DI(v2di_vec18, aligned7(0))
+            CALL SIMD_MULCS(v2di_vec17, v2di_vec18, v2di_vec19)
+            CALL SIMD_LOAD_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_ADDCS(v2di_vec20, v2di_vec20, v2di_vec17)
+            CALL SIMD_SAVE_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_LOAD_V4SI(v4si_vec24, aligned9(0))
+            CALL SIMD_ADDD(v4si_vec22, v4si_vec23, v4si_vec24)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec22, aligned9(2), 
+     &      aligned9(3), IX, IY)
 c SIMD_COMMENT_0
-            C_20 = CONJG(CX(IX1))
-c SIMD_COMMENT_1
-            C_30 = C_20*CY(IY1)
-c SIMD_COMMENT_2
-            RED3(3) = RED3(3)+C_30                                      0041
-c SIMD_COMMENT_3
-            IX = IX1+INCX                                               0042
-c SIMD_COMMENT_4
-            IY = IY1+INCY                                               0043
+            aligned7(1) = CONJG(CX(aligned9(2)))
 99996       CONTINUE
          CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
          CDOTC = CTEMP0                                                 0045
       ENDIF
       END
       COMPLEX*8 FUNCTION CDOTC(N, CX, INCX, CY, INCY)
-      INTEGER IX4, IY4, I_00, I_10, I_20, IX00, I_30, I_40, I_50, 
-     &IY00, IX3, IY3, IX2, IY2, IX1, IY1, LU_IND1, LU_IB1, LU_NUB1, 
-     &LU_IND0, LU_IB0, LU_NUB0, N, INCX, INCY, IX, IY
-      INTEGER*8 v2di_vec8(0:1), v2di_vec6(0:1), v2di_vec5(0:1), 
-     &v2di_vec4(0:1), v2di_vec3(0:1), v2di_vec2(0:1), v2di_vec1(0:1)
-     &, v2di_vec0(0:1)
+      INTEGER IX4, IY4, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, 
+     &LU_NUB0, N, INCX, INCY, IX, IY
+      INTEGER aligned12(0:3), aligned11(0:3), aligned10(0:3), 
+     &v4si_vec27(0:3), v4si_vec26(0:3), v4si_vec25(0:3), aligned9(0:3
+     &), aligned6(0:3), aligned5(0:3), v4si_vec24(0:3), v4si_vec23(0:
+     &3), v4si_vec22(0:3), v4si_vec16(0:3), v4si_vec15(0:3)
+      INTEGER*8 v2di_vec20(0:1), v2di_vec19(0:1), v2di_vec18(0:1), 
+     &v2di_vec17(0:1), v2di_vec13(0:1), v2di_vec12(0:1), v2di_vec11(0
+     &:1), v2di_vec10(0:1), v2di_vec8(0:1), v2di_vec7(0:1), v2di_vec6
+     &(0:1), v2di_vec5(0:1), v2di_vec3(0:1), v2di_vec2(0:1), 
+     &v2di_vec1(0:1), v2di_vec0(0:1)
       LOGICAL L_00, L_10
-      COMPLEX*8 aligned1(0:1), aligned(0:1), CTEMP4, C_04, C_14, 
-     &CTEMP3, CTEMP2, C_24, C_34, CTEMP1, C_23, C_33, C_22, C_32, 
-     &C_21, C_31, C_20, C_30, CTEMP0, RED3(0:3), RED2(0:0), RED1(0:3)
-     &, RED0(0:0), CX(1:*), CY(1:*)
+      COMPLEX*8 aligned7(0:1), aligned3(0:1), aligned1(0:1), aligned(
+     &0:1), CTEMP4, C_04, C_14, CTEMP3, CTEMP2, C_24, C_34, CTEMP1, 
+     &CTEMP0, RED3(0:3), RED2(0:0), RED1(0:3), RED0(0:0), CX(1:*), CY
+     &(1:*)
+      aligned10(3) = 1
+      aligned10(2) = 1
+      aligned10(1) = 1
+      aligned10(0) = 1
+      aligned6(3) = INCY
+      aligned6(2) = INCX
+      aligned6(1) = INCY
+      aligned6(0) = INCX
 *     ..
       CTEMP4 = (0.0, 0.0)                                               0028
       CDOTC = (0.0, 0.0)                                                0029
       IF (N.LE.0) THEN                                                  0030
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0030
+      ELSEIF (aligned6(0).EQ.1.AND.aligned6(1).EQ.1) THEN               0030
 *
 *        code for both increments equal to 1
 *
@@ -1362,24 +1401,24 @@ c SIMD_COMMENT_4
          DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
 c SIMD_COMMENT_0
             aligned(0) = CONJG(CX(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
+            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
+            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
+            CALL SIMD_LOAD_V2DI(v2di_vec3, RED1(0))
+            CALL SIMD_ADDCS(v2di_vec3, v2di_vec3, v2di_vec0)
+            CALL SIMD_SAVE_V2DI(v2di_vec3, RED1(0))
 c SIMD_COMMENT_0
             aligned(1) = CONJG(CX(LU_IND0+2))
 c SIMD_COMMENT_0
             aligned1(0) = CONJG(CX(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec7, CY(LU_IND0+3))
+            CALL SIMD_LOAD_V2DI(v2di_vec6, aligned1(0))
+            CALL SIMD_MULCS(v2di_vec5, v2di_vec6, v2di_vec7)
+            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
+            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec5)
+            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
 c SIMD_COMMENT_0
             aligned1(1) = CONJG(CX(LU_IND0+4))
-            CALL SIMD_LOAD_V2DI(v2di_vec2, CY(LU_IND0+1))
-            CALL SIMD_LOAD_V2DI(v2di_vec1, aligned(0))
-            CALL SIMD_MULCS(v2di_vec0, v2di_vec1, v2di_vec2)
-            CALL SIMD_LOAD_V2DI(v2di_vec5, CY(LU_IND0+3))
-            CALL SIMD_LOAD_V2DI(v2di_vec4, aligned1(0))
-            CALL SIMD_MULCS(v2di_vec3, v2di_vec4, v2di_vec5)
-            CALL SIMD_LOAD_V2DI(v2di_vec6, RED1(0))
-            CALL SIMD_ADDCS(v2di_vec6, v2di_vec6, v2di_vec0)
-            CALL SIMD_SAVE_V2DI(v2di_vec6, RED1(0))
-            CALL SIMD_LOAD_V2DI(v2di_vec8, RED1(2))
-            CALL SIMD_ADDCS(v2di_vec8, v2di_vec8, v2di_vec3)
-            CALL SIMD_SAVE_V2DI(v2di_vec8, RED1(2))
 99998       CONTINUE
          CTEMP2 = RED1(3)+RED1(2)+RED1(1)+RED1(0)+CTEMP3
          CDOTC = CTEMP2                                                 0053
@@ -1390,18 +1429,18 @@ c SIMD_COMMENT_0
 *
          IX4 = 1                                                        0036
          IY4 = 1                                                        0037
-         L_00 = INCX.LT.0
-         I_00 = -N
-         I_10 = I_00+1
-         I_20 = I_10*INCX
-         IX00 = I_20+1
-         IX = L_00?IX00:IX4
-         L_10 = INCY.LT.0
-         I_30 = -N
-         I_40 = I_30+1
-         I_50 = I_40*INCY
-         IY00 = I_50+1
-         IY = L_10?IY00:IY4
+         L_00 = aligned6(0).LT.0
+         aligned11(0) = -N
+         CALL SIMD_LOAD_V4SI(v4si_vec27, aligned10(0))
+         CALL SIMD_LOAD_V4SI(v4si_vec26, aligned11(0))
+         CALL SIMD_ADDD(v4si_vec25, v4si_vec26, v4si_vec27)
+         CALL SIMD_SAVE_V4SI(v4si_vec25, aligned12(0))
+         aligned11(1) = aligned12(0)*aligned6(0)
+         IX = L_00?aligned12(1):IX4
+         L_10 = aligned6(1).LT.0
+         aligned11(2) = -N
+         aligned11(3) = aligned12(2)*aligned6(1)
+         IY = L_10?aligned12(3):IY4
          LU_NUB1 = N
          LU_IB1 = MOD(LU_NUB1, 4)
          RED2(0) = (0.000000, 0.000000)
@@ -1409,55 +1448,47 @@ c SIMD_COMMENT_0
             C_24 = CONJG(CX(IX))
             C_34 = C_24*CY(IY)
             RED2(0) = RED2(0)+C_34                                      0041
-            IX = IX+INCX                                                0042
-            IY = IY+INCY                                                0043
+            IX = aligned6(0)+IX                                         0042
+            IY = aligned6(1)+IY                                         0043
 99997       CONTINUE
          CTEMP1 = RED2(0)+CTEMP4
          RED3(0) = (0.000000, 0.000000)
          RED3(1) = (0.000000, 0.000000)
          RED3(2) = (0.000000, 0.000000)
          RED3(3) = (0.000000, 0.000000)
+         CALL SIMD_LOAD_V4SI(v4si_vec16, aligned6(0))
+         CALL SIMD_LOAD_V4SI(v4si_vec23, aligned6(0))
          DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
 c SIMD_COMMENT_0
-            C_23 = CONJG(CX(IX))
-c SIMD_COMMENT_1
-            C_33 = C_23*CY(IY)
-c SIMD_COMMENT_2
-            RED3(0) = RED3(0)+C_33                                      0041
-c SIMD_COMMENT_3
-            IX3 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY3 = IY3+INCY                                              0043
+            aligned3(0) = CONJG(CX(IX))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec12, CY(IY), CY(
+     &      aligned5(1)))
+            CALL SIMD_LOAD_V2DI(v2di_vec11, aligned3(0))
+            CALL SIMD_MULCS(v2di_vec10, v2di_vec11, v2di_vec12)
+            CALL SIMD_LOAD_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_ADDCS(v2di_vec13, v2di_vec13, v2di_vec10)
+            CALL SIMD_SAVE_V2DI(v2di_vec13, RED3(0))
+            CALL SIMD_LOAD_V4SI(v4si_vec15, aligned5(0))
+            CALL SIMD_ADDD(v4si_vec15, v4si_vec16, v4si_vec15)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec15, aligned5(0), 
+     &      aligned5(1), aligned9(0), aligned9(1))
 c SIMD_COMMENT_0
-            C_22 = CONJG(CX(IX3))
-c SIMD_COMMENT_1
-            C_32 = C_22*CY(IY3)
-c SIMD_COMMENT_2
-            RED3(1) = RED3(1)+C_32                                      0041
-c SIMD_COMMENT_3
-            IX2 = IX3+INCX                                              0042
-c SIMD_COMMENT_4
-            IY2 = IY3+INCY                                              0043
+            aligned3(1) = CONJG(CX(aligned5(0)))
 c SIMD_COMMENT_0
-            C_21 = CONJG(CX(IX2))
-c SIMD_COMMENT_1
-            C_31 = C_21*CY(IY2)
-c SIMD_COMMENT_2
-            RED3(2) = RED3(2)+C_31                                      0041
-c SIMD_COMMENT_3
-            IX1 = IX2+INCX                                              0042
-c SIMD_COMMENT_4
-            IY1 = IY2+INCY                                              0043
+            aligned7(0) = CONJG(CX(aligned9(0)))
+            CALL SIMD_LOAD_GENERIC_V2DI(v2di_vec19, CY(aligned9(1)), 
+     &      CY(aligned9(3)))
+            CALL SIMD_LOAD_V2DI(v2di_vec18, aligned7(0))
+            CALL SIMD_MULCS(v2di_vec17, v2di_vec18, v2di_vec19)
+            CALL SIMD_LOAD_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_ADDCS(v2di_vec20, v2di_vec20, v2di_vec17)
+            CALL SIMD_SAVE_V2DI(v2di_vec20, RED3(2))
+            CALL SIMD_LOAD_V4SI(v4si_vec24, aligned9(0))
+            CALL SIMD_ADDD(v4si_vec22, v4si_vec23, v4si_vec24)
+            CALL SIMD_SAVE_GENERIC_V4SI(v4si_vec22, aligned9(2), 
+     &      aligned9(3), IX, IY)
 c SIMD_COMMENT_0
-            C_20 = CONJG(CX(IX1))
-c SIMD_COMMENT_1
-            C_30 = C_20*CY(IY1)
-c SIMD_COMMENT_2
-            RED3(3) = RED3(3)+C_30                                      0041
-c SIMD_COMMENT_3
-            IX = IX1+INCX                                               0042
-c SIMD_COMMENT_4
-            IY = IY1+INCY                                               0043
+            aligned7(1) = CONJG(CX(aligned9(2)))
 99996       CONTINUE
          CTEMP0 = RED3(3)+RED3(2)+RED3(1)+RED3(0)+CTEMP1
          CDOTC = CTEMP0                                                 0045

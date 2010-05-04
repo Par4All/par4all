@@ -17,7 +17,10 @@ echo
 setproperty INLINING_CALLERS "main"
 apply INLINING[inlining01!pmax]
 apply RESTRUCTURE_CONTROL[main]
-display PRINTED_FILE[inlining01!,main]
+
+# Not possible anymore with include of stdio.h
+#display PRINTED_FILE[inlining01!,main]
+display PRINTED_FILE[main]
 
 echo
 echo Unsplit resulting code

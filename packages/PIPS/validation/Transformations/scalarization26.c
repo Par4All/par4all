@@ -1,3 +1,4 @@
+#include <stdio.h>
 #define N 512
 
 void microcode(short image[N][N], short kernel[3][3], short new_image[N][N], short N1, short N2 )

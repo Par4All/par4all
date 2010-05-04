@@ -25,7 +25,7 @@ int foo(int i)
 
    int j;
 
-//  P() {}
+//  P(j) {}
 
 
    j = 3*i-2*i-i;

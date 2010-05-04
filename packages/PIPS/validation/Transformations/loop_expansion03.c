@@ -1,3 +1,4 @@
+#include <stdio.h>
 int pop(int op)
 {
     int i,j;

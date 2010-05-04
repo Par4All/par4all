@@ -34,64 +34,64 @@ int main()
 
    int i;
 
-//  P() {}
+//  P(i) {}
 
    int k = 2;
 
-//  P() {k==2}
+//  P(i,k) {k==2}
 
    int j;
 
-//  P() {k==2}
+//  P(i,j,k) {k==2}
 
    int m;
 
-//  P() {k==2}
+//  P(i,j,k,m) {k==2}
 
    int a[10];
 
-//  P() {k==2}
+//  P(i,j,k,m) {k==2}
 
    i = 1, j = 2*(m-m), k = 3*(m-m);
 
-//  P(i,j,k) {i==1, j==0, k==0}
+//  P(i,j,k,m) {i==1, j==0, k==0}
 
    i = k += j-j;
 
-//  P(i,j,k) {i==0, j==0, k==0}
+//  P(i,j,k,m) {i==0, j==0, k==0}
 
    a[i-i] = 1, a[j-j] = 2, a[k-k] = 3;
 
-//  P(i,j,k) {i==0, j==0, k==0}
+//  P(i,j,k,m) {i==0, j==0, k==0}
 
 
    k -= j-j;
 
-//  P(i,j,k) {i==0, j==0, k==0}
+//  P(i,j,k,m) {i==0, j==0, k==0}
 
    k *= j-j;
 
-//  P(i,j,k) {i==0, j==0, k==0}
+//  P(i,j,k,m) {i==0, j==0, k==0}
 
    k /= j+1-j;
 
-//  P(i,j,k) {i==0, j==0}
+//  P(i,j,k,m) {i==0, j==0}
 
    k <<= j-j;
 
-//  P(i,j,k) {i==0, j==0}
+//  P(i,j,k,m) {i==0, j==0}
 
    k >>= j-j;
 
-//  P(i,j,k) {i==0, j==0}
+//  P(i,j,k,m) {i==0, j==0}
 
    k |= j*m-j*m;
 
-//  P(i,j,k) {i==0, j==0}
+//  P(i,j,k,m) {i==0, j==0}
 
    i+++j-j;
 
-//  P(i,j,k) {j==0}
+//  P(i,j,k,m) {j==0}
 
    return i;
 }

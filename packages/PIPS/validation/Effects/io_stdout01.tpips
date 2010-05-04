@@ -16,7 +16,48 @@ module main
 
 #setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 
+echo
+echo proper pointer effects
+echo
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+
+close
+delete io_stdout01
+create io_stdout01 io_stdout01.c
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+module main
+
+
+setproperty USER_EFFECTS_ON_STD_FILES TRUE
+
+echo
+echo proper pointer effects with USER_EFFECTS_ON_STD_FILES TRUE
+echo
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo proper effects with USER_EFFECTS_ON_STD_FILES TRUE
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
 
 close

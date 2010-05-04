@@ -21,7 +21,7 @@ int main()
 int main()
 {
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 
@@ -47,15 +47,15 @@ int main()
 
    int i, j;
 
-//  P() {}
+//  P(i,j) {}
 
    int a[5];
 
-//  P() {}
+//  P(i,j) {}
 
    for(i = 1; i <= 4; i += 1)
 
-//  P(i) {1<=i, i<=4}
+//  P(i,j) {1<=i, i<=4}
 
       a[i] = i;
 }

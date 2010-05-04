@@ -1,0 +1,57 @@
+
+"main" file
+
+int main()
+{
+   int n = 2;
+   int j = n++;
+   int k = n+1;
+   int a[n];
+   int b[10];
+   return a[j-1];
+}
+
+"main" file with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int n = 2;
+
+//  P(n) {n==2}
+
+   int j = n++;
+
+//  P(j,n) {j==2, n==3}
+
+   int k = n+1;
+
+//  P(j,k,n) {j==2, k==4, n==3}
+
+   int a[n];
+
+//  P(j,k,n) {j==2, k==4, n==3}
+
+   int b[10];
+
+//  P(j,k,n) {j==2, k==4, n==3}
+
+   return a[j-1];
+}
+
+"main" file after partial evaluation
+
+int main()
+{
+   int n = 2;
+   int j = n++;
+   int k = 4;
+   int a[3];
+   int b[10];
+   return a[1];
+}

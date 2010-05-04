@@ -1,4 +1,4 @@
-foo_tball()
+int foo_tball()
 {
     int i,j;
     i=j?1:i;

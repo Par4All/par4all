@@ -1,0 +1,45 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="outline08"
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after outlining
+echo
+
+apply OUTLINE[main]
+outlined
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+y
+n
+display PRINTED_FILE[main]
+display PRINTED_FILE[outlined]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/new
+shell if test ` $WS.database/Tmp/ref` = `$WS.database/Tmp/new`; then echo "ok"; else echo "ko" ; fi
+
+close
+delete $WS
+quit
+

@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 delete SHRINK
 create SHRINK cycle_shrinking.c include/SIMD.c
+setproperty PARTIAL_EVAL_ALWAYS_SIMPLIFY TRUE
 
 echo
 echo Initial code

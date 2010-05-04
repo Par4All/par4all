@@ -14,7 +14,7 @@ echo Code after inlining
 echo
 
 apply INLINING[inlining07!pmax]
-display PRINTED_FILE[inlining07!,main]
+display PRINTED_FILE[main]
 
 echo
 echo Unsplit resulting code

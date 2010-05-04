@@ -29,7 +29,7 @@ Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.
 user error in CParserError: 
 Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
- at line -1 (1)
+ at user line 2 (local line 6) in file "./decl11.database/decl11!/decl11!.c"
 user warning in set_debug_stack_pointer: debug level stack is set to 2
 user warning in safe_do_something: Request aborted under pipsmake: build resource SYMBOL_TABLE_FILE for module decl11!.
 user error in display_a_resource: Cannot build view file SYMBOL_TABLE_FILE
@@ -48,7 +48,7 @@ Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.
 user error in CParserError: 
 Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
- at line -1 (1)
+ at user line 2 (local line 6) in file "./decl11.database/decl11!/decl11!.c"
 user warning in set_debug_stack_pointer: debug level stack is set to 2
 user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module decl11!.
 user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE

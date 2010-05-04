@@ -136,8 +136,8 @@ c
       DO 10 I = 1, 1000                                                 0029
          F_1 = SA*SX(IX)
          SY(IY) = SY(IY)+F_1                                            0030
-         IX = IX+INCX                                                   0031
-         IY = IY+INCY                                                   0032
+         IX = INCX+IX                                                   0031
+         IY = INCY+IY                                                   0032
 10       CONTINUE                                                       0033
       RETURN
 c
@@ -303,11 +303,9 @@ c      PRINT *, 'aft'
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY, M, MP1
-      REAL*4 v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), 
-     &v4sf_vec6(0:3), v4sf_vec5(0:3), aligned0(0:3), aligned(0:3), 
-     &v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3)
-     &, v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE)
-     &, SY(1:SIZE), SA
+      REAL*4 aligned0(0:3), aligned(0:3), v4sf_vec4(0:3), v4sf_vec3(0
+     &:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_02
+     &, F_01, F_00, F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
       aligned(0) = 3                                                    0017
       INCX = 1                                                          0018
@@ -345,11 +343,9 @@ c      PRINT *, 'aft'
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY, M, MP1
-      REAL*4 v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), 
-     &v4sf_vec6(0:3), v4sf_vec5(0:3), aligned0(0:3), aligned(0:3), 
-     &v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3)
-     &, v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE)
-     &, SY(1:SIZE), SA
+      REAL*4 aligned0(0:3), aligned(0:3), v4sf_vec4(0:3), v4sf_vec3(0
+     &:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_02
+     &, F_01, F_00, F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
       aligned(0) = 3                                                    0017
       INCX = 1                                                          0018

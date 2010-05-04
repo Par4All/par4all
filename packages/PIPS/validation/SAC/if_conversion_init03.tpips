@@ -2,9 +2,9 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete if_conversion_init03
 create if_conversion_init03 if_conversion_init03.c
 
-display PRINTED_FILE[%ALL]
-apply IF_CONVERSION_INIT[%ALL]
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
+apply IF_CONVERSION_INIT[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
 
 close if_conversion_init03
 delete if_conversion_init03

@@ -1,0 +1,18 @@
+delete long_line
+create long_line long_line.f90
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE(%ALL)
+
+apply UNSPLIT (%ALL)
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o long_line.database/Src/long_line.o long_line.database/Src/long_line.f90
+
+close
+delete long_line
+quit
+

@@ -1,3 +1,4 @@
+#include <stdio.h>
 void foo_l(int a[4], int b[4], int c[4])
 {
     int tmp[4];

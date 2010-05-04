@@ -17,11 +17,11 @@ Transformers for "main"
 int main(void)
 {
 
-//  T() {}
+//  T(i) {}
 
    int i;
 
-//  T() {}
+//  T(ui) {}
 
    unsigned int ui;
 
@@ -55,16 +55,16 @@ int main(void)
 
    int i;
 
-//  P() {}
+//  P(i) {}
 
    unsigned int ui;
 
-//  P() {}
+//  P(i,ui) {}
 
 
    i = -1;
 
-//  P(i) {i==-1}
+//  P(i,ui) {i==-1}
 
    ui = i;
 
@@ -82,11 +82,11 @@ Transformers for "main" after transformer refining
 int main(void)
 {
 
-//  T() {}
+//  T(i) {}
 
    int i;
 
-//  T() {}
+//  T(ui) {}
 
    unsigned int ui;
 
@@ -117,20 +117,20 @@ int main(void)
 
    int i;
 
-//  P() {}
+//  P(i) {}
 
    unsigned int ui;
 
-//  P() {}
+//  P(i,ui) {}
 
 
    i = -1;
 
-//  P(i) {i==-1}
+//  P(i,ui) {i==-1}
 
    ui = i;
 
-//  P(i,ui) {i==-1, ui==-1}
+//  P(i,ui) {i==-1, ui==4294967295}
 
 
    fprintf(stderr, "ui = %u\n", ui);

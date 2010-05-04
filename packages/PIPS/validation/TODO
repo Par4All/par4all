@@ -1,4 +1,5 @@
-* validation
-- use only relative filenames: pb with expansion (create foo xxx/*.c)
-- must not rely on PIPS_* env directory variable to exists
-- may run in parallel? see ticket #148
+* parallel validation
+- check casses of default (parallelization) validation
+- investigate validate/new-validate differences
+- remove old validate?
+- update private repos

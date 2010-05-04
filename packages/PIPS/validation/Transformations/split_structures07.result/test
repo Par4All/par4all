@@ -30,6 +30,7 @@ towns read_towns(const  char fname[])
 {
    FILE *fd = fopen(fname, "r");
    size_t curr = 0;
+   char c;
    towns the_towns = {1, malloc(sizeof(town))};
    fprintf(stderr, "begin parsing ...\n");
 l99997:   ;
@@ -45,14 +46,12 @@ l99997:   ;
    ++curr;
    goto l99997;
 l99998:   ;
-   char c;
-l99996:   ;
    if (!!feof(fd)) goto break_2;
    c = (char) fgetc(fd);
    if (c=='\n'||c=='\r') {
    }
    else {
-      goto l99996;
+      goto l99998;
    }
 break_2:   ;
    goto l99997;
@@ -141,6 +140,7 @@ towns read_towns(const  char fname[])
 {
    FILE *fd;
    size_t curr;
+   char c;
    towns the_towns = {1, malloc(sizeof(town))};
    fd = fopen(fname, "r");
    curr = 0;
@@ -158,14 +158,12 @@ l99997:   ;
    ++curr;
    goto l99997;
 l99998:   ;
-   char c;
-l99996:   ;
    if (!!feof(fd)) goto break_2;
    c = (char) fgetc(fd);
    if (c=='\n'||c=='\r') {
    }
    else {
-      goto l99996;
+      goto l99998;
    }
 break_2:   ;
    goto l99997;

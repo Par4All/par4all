@@ -27,7 +27,7 @@ void scalarization19(double B[SIZE][SIZE])
 
    int i, j;
 
-//  P() {SIZE==10}
+//  P(i,j) {SIZE==10}
 
    for(i = 0; i <= SIZE-1; i += 1)
 
