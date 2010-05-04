@@ -41,6 +41,7 @@ Bootstrap
 HardwareAccelerator
 Privatizing
 Terapix
+Tpips
 TutorialPPoPP2010
 Scalopes
 Benchmarks
@@ -58,7 +59,6 @@ Demo-2009
 # Flint
 # Gpu
 # Pointers
-# Tpips
 # RegionTranslation
 # UseBeforeSet
 # Wp65
