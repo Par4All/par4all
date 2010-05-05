@@ -112,7 +112,7 @@ test: $(F.valid)
 	$(PF) ; $(TPIPS) $< | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.tpips2
-	$(PF) ; $(TPIPS) $< 2<&1 | $(FLT) > $@ ; $(OK)
+	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $@ ; $(OK)
 
 # python scripts
 %.result/$(TEST): %.py
