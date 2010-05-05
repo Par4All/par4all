@@ -2,6 +2,26 @@
 
 Source files copied in : pi/Source/
 Generated source files : pi/src
+###################### pi/src/pi.f ######################
+!!
+!! file for pi.f
+!!
+	PROGRAM PI
+! 	implicit none
+	INTEGER I, NUM_ITER
+	DOUBLE PRECISION X, MY_PI, CONTRIB, ITER
+      CALL STEP_INIT
+      CONTRIB = 0.0                                                     0006
+      NUM_ITER = 10                                                     0007
+      ITER = 1.0/NUM_ITER                                               0008
+C     !$omp parallel do reduction (+:contrib)
+      CALL PI_PARDO10_MPI(I, 1, NUM_ITER, X, ITER, CONTRIB)
+
+      MY_PI = ITER*CONTRIB                                              0018
+
+      PRINT *, MY_PI                                                    0020
+      CALL STEP_FINALIZE
+      END
 ###################### pi/src/PI_PARDO10.f ######################
 !!
 !! file for PI_PARDO10.f
@@ -8944,23 +8964,3 @@ c      print *,STEP_Rank,') AlltoAll_odd2_Merge_C16'
       parameter (STEP_AND=MPI_LAND,STEP_OR=MPI_LOR)
       parameter (STEP_MIN=MPI_MIN,STEP_MAX=MPI_MAX)
       parameter (STEP_IAND=MPI_BAND,STEP_IOR=MPI_BOR,STEP_IEOR=MPI_BXOR)
-###################### pi/src/pi.f ######################
-!!
-!! file for pi.f
-!!
-	PROGRAM PI
-! 	implicit none
-	INTEGER I, NUM_ITER
-	DOUBLE PRECISION X, MY_PI, CONTRIB, ITER
-      CALL STEP_INIT
-      CONTRIB = 0.0                                                     0006
-      NUM_ITER = 10                                                     0007
-      ITER = 1.0/NUM_ITER                                               0008
-C     !$omp parallel do reduction (+:contrib)
-      CALL PI_PARDO10_MPI(I, 1, NUM_ITER, X, ITER, CONTRIB)
-
-      MY_PI = ITER*CONTRIB                                              0018
-
-      PRINT *, MY_PI                                                    0020
-      CALL STEP_FINALIZE
-      END
