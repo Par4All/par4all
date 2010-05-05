@@ -1,8 +1,5 @@
-echo
 
-echo The message should be: workspace protected_workspace2: Permission denied
 The message should be: workspace protected_workspace2: Permission denied
-echo
 
 Registering file protected_workspace2.f
 Splitting file    ./protected_workspace2.f
