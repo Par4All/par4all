@@ -1,0 +1,174 @@
+#!/usr/bin/env python
+
+import sys
+import getopt
+import os
+import re
+from pyps import *
+
+def usage():
+	print "Usage: " + sys.argv[0] + " [options] <source files>"
+	print "Options:"
+	print """
+  -p "name"
+  --project "name"
+              Name for the project (and for the program database). If you
+			  do not specify the project, a random name will be used.
+
+  --fine      Use a fine-grained parallelization (Rice).
+
+  --openmp    Parallelize with OpenMP output. If combined with the --accel 
+              option, generate Par4All accel run-time call with OpenMP 
+              implementation instead of native OpenMP output.
+
+  --accel     Parallelize with output using the Par4All accel run-time that
+              can execute code for various hardware accelerators such as GPU
+              or even OpenMP emulation.
+
+  --cuda      Ask for CUDA output, must be combined with --accel.
+
+  -c
+  --compile   (TODO) Call the compiler to generate an executable, GCC in the case of
+              sequential or OpenMP code, NVCC in the case of CUDA output code.
+
+  -h
+  --help      Show this help message and exit.
+"""
+
+def main(argv):
+	database = ""
+	compile = 0
+	openmp = 0
+	cuda = 0
+	accel = 0
+	project = ""
+	fine = 0
+	if len(argv) == 0:
+		usage()
+		sys.exit()
+	try:
+		opts, args = getopt.getopt(argv, "hcd:p:", ["help", "database=", "openmp", "accel", "cuda", "compile", "debug", "project="])
+	except getopt.GetoptError:
+		usage()
+		sys.exit(1)
+	for opt, arg in opts:
+		if opt in ("-h", "--help"):
+			usage()
+			sys.exit()
+		elif opt in ("--debug"):
+			global _debug
+			_debug = 1
+		elif opt in ("-d", "--database"):
+			database = arg
+		elif opt in ("-c", "--compile"):
+			compile = 1
+		elif opt in ("--cuda"):
+			cuda = 1
+		elif opt in ("--accel"):
+			accel = 1
+		elif opt in ("--openmp"):
+			openmp = 1
+		elif opt in ("-p", "--project"):
+			project = arg
+	if len(args) == 0:
+		print "Missing input files"
+		sys.exit(1)
+	for file in args:
+		if not os.path.exists(file):
+			print "File '" + file + "' does not exist"
+	process(project = project, openmp = openmp, accel = accel, 
+		cuda = cuda, compile = compile, fine = fine, files = args)
+
+def process(project, openmp, accel, cuda, compile, fine, files):
+	#if project == "":
+	#	(project, ext) = os.path.splitext(os.path.basename(files[0]))
+	if accel:
+		files.append(os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c"))
+#	if cuda:
+#		print "TODO"
+#		sys.exit(1)
+	try:
+		w = workspace(
+			files,
+			name = project,
+			activates = [],
+			verboseon = False
+		)
+		w.set_property(
+			PRETTYPRINT_C_CODE = True,
+			FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+		)
+		
+		# Skip module name of P4A runtime:
+		skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
+		all_modules = w.filter(lambda module: not skip_p4a_runtime_and_compilation_unit_re.match(module.name))
+		
+		all_modules.loop_normalize(
+				# Loop normalize for the C language and GPU friendly
+				LOOP_NORMALIZE_ONE_INCREMENT = True,
+				LOOP_NORMALIZE_LOWER_BOUND = 0,
+				# It is legal in the following by construction:
+				LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True
+		)
+		all_modules.privatize_module()
+		
+		if fine:
+			all_modules.internalize_parallel_code()
+		else:
+			all_modules.coarse_grain_parallelization()
+		
+		if cuda:
+			#mn.display()
+			all_modules.gpu_ify()
+			#mn.display()
+			
+			# Isolate kernels by using the fact that all the generated kernels have
+			# their name beginning with "p4a_":
+			kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
+			kernel_launchers = w.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+
+			#kernels.display()
+			# Add communication around all the call site of the kernels:
+			kernel_launchers.kernel_load_store()
+			#kernel_launchers.display()
+
+			kernel_launchers.gpu_loop_nest_annotate()
+			#kernel_launchers.display()
+
+			# Inline back the kernel into the wrapper, since CUDA can only deal with
+			# local functions if they are in the same file as the caller (by inlining
+			# them, by the way... :-) )
+			kernel_filter_re = re.compile("p4a_kernel_\\d+$")
+			kernels = w.filter(lambda m: kernel_filter_re.match(m.name))
+			kernels.inlining()
+
+			# Display the wrappers to see the work done:
+			kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
+			kernel_wrappers = w.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
+			#kernel_wrappers.display()
+
+			# Instead, do a global loop normalization above:
+			#kernels.loop_normalize()
+			#kernels.use_def_elimination()
+			#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
+
+			#w.all.suppress_dead_code()
+			#w["main"].display()
+
+			w["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+		
+		if openmp:
+			all_modules.ompify_code()
+		
+		w.all.unsplit()
+		
+		if compile:
+			print "TODO"
+			sys.exit(1)
+		
+	except:
+		print sys.exc_info()[0]
+		sys.exit(2)
+
+if __name__ == "__main__":
+	main(sys.argv[1:])
