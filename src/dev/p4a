@@ -1,174 +1,305 @@
 #!/usr/bin/env python
 
-import sys
-import getopt
-import os
-import re
-from pyps import *
+# -*- coding: utf-8 -*-
 
-def usage():
-	print "Usage: " + sys.argv[0] + " [options] <source files>"
-	print "Options:"
-	print """
-  -p "name"
-  --project "name"
-              Name for the project (and for the program database). If you
-			  do not specify the project, a random name will be used.
-
-  --fine      Use a fine-grained parallelization (Rice).
-
-  --openmp    Parallelize with OpenMP output. If combined with the --accel 
-              option, generate Par4All accel run-time call with OpenMP 
-              implementation instead of native OpenMP output.
-
-  --accel     Parallelize with output using the Par4All accel run-time that
-              can execute code for various hardware accelerators such as GPU
-              or even OpenMP emulation.
-
-  --cuda      Ask for CUDA output, must be combined with --accel.
-
-  -c
-  --compile   (TODO) Call the compiler to generate an executable, GCC in the case of
-              sequential or OpenMP code, NVCC in the case of CUDA output code.
-
-  -h
-  --help      Show this help message and exit.
+"""
+Par4All Frontend Script
 """
 
-def main(argv):
-	database = ""
-	compile = 0
-	openmp = 0
-	cuda = 0
-	accel = 0
-	project = ""
-	fine = 0
-	if len(argv) == 0:
-		usage()
-		sys.exit()
-	try:
-		opts, args = getopt.getopt(argv, "hcd:p:", ["help", "database=", "openmp", "accel", "cuda", "compile", "debug", "project="])
-	except getopt.GetoptError:
-		usage()
-		sys.exit(1)
-	for opt, arg in opts:
-		if opt in ("-h", "--help"):
-			usage()
-			sys.exit()
-		elif opt in ("--debug"):
-			global _debug
-			_debug = 1
-		elif opt in ("-d", "--database"):
-			database = arg
-		elif opt in ("-c", "--compile"):
-			compile = 1
-		elif opt in ("--cuda"):
-			cuda = 1
-		elif opt in ("--accel"):
-			accel = 1
-		elif opt in ("--openmp"):
-			openmp = 1
-		elif opt in ("-p", "--project"):
-			project = arg
+import sys, os, re, optparse, subprocess, string, random, shutil, pyps
+
+verbose = False
+
+def gen_name(length = 8, chars = string.letters + string.digits):
+	chars = string.ascii_letters + string.digits
+	return "".join(random.choice(chars) for x in range(random.randint(8, 16)))
+
+def rmdb(dir):
+	(base, ext) = os.path.splitext(dir)
+	if ext != ".database":
+		print "Cannot remove, not a .database directory: " + dir
+		sys.exit(123)
+	for root, dirs, files in os.walk(dir, topdown = False):
+		for name in files:
+			os.remove(os.path.join(root, name))
+		for name in dirs:
+			os.rmdir(os.path.join(root, name))
+	os.removedirs(dir)
+
+def main():
+	"The function called when this program is executed by its own"
+
+	global verbose
+
+	parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = "$Id")
+
+	main_group = optparse.OptionGroup(parser, "Processing Options")
+
+	main_group.add_option("-p", "--project", dest = "project", metavar = "NAME",
+		help = "Name for the project (and for the program database). If you do not specify the project, a random name will be used, and the program database will be removed after script execution (unless you say --keep-after).")
+
+	main_group.add_option("--keep-after", dest = "keep_after", action = "store_true", default = False,
+		help = "Keep database after processing. Useful only when --project is not specified.")
+
+	main_group.add_option("--remove-after", dest = "remove_after", action = "store_true", default = False,
+		help = "Remove database directory after processing. Inverse of --keep-after.")
+
+	main_group.add_option("--remove-first", dest = "remove_first", action = "store_true", default = False,
+		help = "Remove existing database if it already exists. Remove existing output files if they already exist.")
+
+	main_group.add_option("--copy", dest = "copy", action = "store_true", default = False,
+		help = "Copy output files from database to source files directory, using the \"_p4a\" suffix.")
+
+	main_group.add_option("--accel", dest = "accel", action = "store_true", default = False,
+		help = "Parallelize with output using the Par4All accel run-time that can execute code for various hardware accelerators such as GPU or even OpenMP emulation.")
+
+	main_group.add_option("--cuda", dest = "cuda", action = "store_true", default = False,
+		help = "Enable CUDA generation, should be used along with --accel.")
+
+	main_group.add_option("--include-modules", dest="filter_include", metavar = "REGULAR-EXPRESSION",
+		help = "Parallelize only the modules which names match the regular expression.")
+
+	main_group.add_option("--exclude-modules", dest="filter_exclude", metavar = "REGULAR-EXPRESSION",
+		help = "Exclude the modules matching the regular expression from the parallelization.")
+
+	main_group.add_option("--openmp", dest = "openmp", action = "store_true",
+		help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All accel run-time call with OpenMP implementation instead of native OpenMP output.")
+
+	main_group.add_option("--fine", dest = "fine", action = "store_true", default = False,
+		help = "Use a fine-grained parallelization algorithm.")
+
+	main_group.add_option("--coarse", dest = "fine", action = "store_false",
+		help = "Use a coarse-grained parallelization algorithm.")
+
+	main_group.add_option("--report", dest = "report", action = "store_true", default = False,
+		help = "(TODO) Display a processing report at the end.")
+
+	main_group.add_option("--cmake", dest = "cmake", action = "store_true", default = False,
+		help = "Generate a CMakeLists.txt in current directory for compiling the output files.")
+
+	main_group.add_option("--makeit", dest = "makeit", action = "store_true", default = False,
+		help = "Try to build CMake project in current directory (use in conjunction with --cmake).")
+
+	parser.add_option_group(main_group)
+
+	debug_group = optparse.OptionGroup(parser, "Debugging Options")
+
+	debug_group.add_option("-v", "--verbose", action = "store_true", dest = "verbose", default = False, 
+		help = "Run in verbose mode")
+
+	debug_group.add_option("--more-verbose", action = "store_true", dest = "more_verbose", default = False, 
+		help = "Run in PIPS verbose mode")
+
+	debug_group.add_option("-q", "--quiet", action = "store_false", dest = "verbose", 
+		help = "Run in quiet mode [default]")
+
+	parser.add_option_group(debug_group)
+
+	(options, args) = parser.parse_args()
+
+	verbose = options.verbose
+
+	# Check options.
 	if len(args) == 0:
 		print "Missing input files"
 		sys.exit(1)
+	if options.remove_after and options.keep_after:
+		print "Cannot --remove-after and --keep-after at the same time"
+		sys.exit(1)
+
+	# Make all paths absolute.
+	files = []
 	for file in args:
+		files.append(os.path.abspath(file))
+
+	# If --accel, then add the P4A stubs to the file list.
+	if options.accel:
+		files.append(os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c"))
+
+	# Preliminary check: input files must exist.
+	for file in files:
 		if not os.path.exists(file):
 			print "File '" + file + "' does not exist"
-	process(project = project, openmp = openmp, accel = accel, 
-		cuda = cuda, compile = compile, fine = fine, files = args)
 
-def process(project, openmp, accel, cuda, compile, fine, files):
-	#if project == "":
-	#	(project, ext) = os.path.splitext(os.path.basename(files[0]))
-	if accel:
-		files.append(os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c"))
-#	if cuda:
-#		print "TODO"
-#		sys.exit(1)
-	try:
-		w = workspace(
-			files,
-			name = project,
-			activates = [],
-			verboseon = False
-		)
-		w.set_property(
-			PRETTYPRINT_C_CODE = True,
-			FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-		)
-		
-		# Skip module name of P4A runtime:
-		skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
-		all_modules = w.filter(lambda module: not skip_p4a_runtime_and_compilation_unit_re.match(module.name))
-		
-		all_modules.loop_normalize(
-				# Loop normalize for the C language and GPU friendly
-				LOOP_NORMALIZE_ONE_INCREMENT = True,
-				LOOP_NORMALIZE_LOWER_BOUND = 0,
-				# It is legal in the following by construction:
-				LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True
-		)
-		all_modules.privatize_module()
-		
-		if fine:
-			all_modules.internalize_parallel_code()
+	# Determine the database directory.
+	database_dir = ""
+	project = options.project
+	if project == None:
+		while True:
+			project = gen_name()
+			database_dir = os.path.join(os.getcwd(), project + ".database")
+			if not os.path.exists(database_dir):
+				break
+		if verbose:
+			print "Database directory: " + database_dir
+	else:
+		database_dir = os.path.join(os.getcwd(), project + ".database")
+		if os.path.exists(database_dir):
+			if options.remove_first:
+				if verbose:
+					print "Removing existing database directory: " + database_dir
+				rmdb(database_dir)
+			else:
+				print "Database already exists: " + database_dir
+				sys.exit(2)
+
+	# Decide once and for all if we are going to remove the database directory at the end.
+	remove_after = (options.project == None and not options.keep_after) or options.remove_after;
+	if remove_after:
+		print "Setting --copy automatically since database will be erased"
+		options.copy = True
+
+	# Make up the expected output file paths.
+	# Check if they already exist and act accordingly.
+	output_files = []
+	final_output_files = []
+	for file in files:
+		output_file = os.path.join(database_dir, "Src", os.path.basename(file))
+		output_files.append(output_file)
+		(base, ext) = os.path.splitext(file)
+		final_output_file = base + "_p4a" + ext
+		final_output_files.append(final_output_file)
+		if os.path.exists(final_output_file):
+			if options.remove_first:
+				print "Removing " + final_output_file
+				os.remove(final_output_file)
+			else:
+				if options.copy:
+					print "WARNING: Output file " + final_output_file + " already exists"
+				else:
+					print "WARNING: File " + final_output_file + " exists but this is not the final output destination (--copy not specified)"
+		if verbose:
+			print "  " + file + " -> " + output_file + " (" + final_output_file + ")"
+
+	# Reflect the final_output_files as being output_files if not copying.
+	if not options.copy:
+		for file in range(len(final_output_files)):
+			final_output_files[i] = output_files[i]
+
+	# Create the PyPS workspace.
+	workspace = pyps.workspace(files, name = project, activates = [], verboseon = options.more_verbose)
+	workspace.set_property(PRETTYPRINT_C_CODE = True,
+		FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+		PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+
+	# Skip module name of P4A runtime.
+	# Also filter out modules based on --include-modules and --exclude-modules.
+	skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
+	filter_include_re = None
+	if options.filter_include:
+		filter_include_re = re.compile(options.filter_include)
+	filter_exclude_re = None
+	if options.filter_exclude:
+		filter_exclude_re = re.compile(options.filter_exclude)
+	all_modules = workspace.filter(lambda module:
+		not skip_p4a_runtime_and_compilation_unit_re.match(module.name) 
+		and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
+		and (filter_include_re == None or filter_include_re.match(module.name)))
+
+	# Not sure about that.
+	all_modules.loop_normalize(
+			# Loop normalize for the C language and GPU friendly
+			LOOP_NORMALIZE_ONE_INCREMENT = True,
+			LOOP_NORMALIZE_LOWER_BOUND = 0,
+			# It is legal in the following by construction:
+			LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True)
+
+	all_modules.privatize_module()
+
+	# Here comes the parallelization!
+	if options.fine:
+		all_modules.internalize_parallel_code()
+	else:
+		all_modules.coarse_grain_parallelization()
+
+	if options.cuda:
+		#mn.display()
+		all_modules.gpu_ify()
+		#mn.display()
+
+		# Isolate kernels by using the fact that all the generated kernels have
+		# their name beginning with "p4a_":
+		kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
+		kernel_launchers = w.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+
+		#kernels.display()
+		# Add communication around all the call site of the kernels:
+		kernel_launchers.kernel_load_store()
+		#kernel_launchers.display()
+
+		kernel_launchers.gpu_loop_nest_annotate()
+		#kernel_launchers.display()
+
+		# Inline back the kernel into the wrapper, since CUDA can only deal with
+		# local functions if they are in the same file as the caller (by inlining
+		# them, by the way... :-) )
+		kernel_filter_re = re.compile("p4a_kernel_\\d+$")
+		kernels = w.filter(lambda m: kernel_filter_re.match(m.name))
+		kernels.inlining()
+
+		# Display the wrappers to see the work done:
+		kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
+		kernel_wrappers = w.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
+		#kernel_wrappers.display()
+
+		# Instead, do a global loop normalization above:
+		#kernels.loop_normalize()
+		#kernels.use_def_elimination()
+		#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
+
+		#w.all.suppress_dead_code()
+		#w["main"].display()
+
+		workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+
+	if options.openmp:
+		all_modules.ompify_code()
+
+	# Build the output source files (UNSPLIT operation).
+	workspace.all.unsplit()
+
+	# Copy the output files to their final location.
+	for i in range(len(output_files)):
+		if os.path.exists(output_files[i]):
+			if options.copy:
+				if verbose:
+					print "Copying " + output_files[i] + " to " + final_output_files[i]
+				shutil.copyfile(output_files[i], final_output_files[i])
 		else:
-			all_modules.coarse_grain_parallelization()
-		
-		if cuda:
-			#mn.display()
-			all_modules.gpu_ify()
-			#mn.display()
-			
-			# Isolate kernels by using the fact that all the generated kernels have
-			# their name beginning with "p4a_":
-			kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
-			kernel_launchers = w.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+			print "WARNING: Output file for " + files[i] + " not found (" + output_files[i] + ")"
 
-			#kernels.display()
-			# Add communication around all the call site of the kernels:
-			kernel_launchers.kernel_load_store()
-			#kernel_launchers.display()
+	# Remove the database directory if requested.
+	if remove_after:
+		if verbose:
+			print "Removing database directory: " + database_dir
+		rmdb(database_dir)
 
-			kernel_launchers.gpu_loop_nest_annotate()
-			#kernel_launchers.display()
+	# Generate a CMakeLists.txt.
+	if options.cmake:
+		cmakefile = os.path.join(os.getcwd(), "CMakeLists.txt")
+		if os.path.exists(cmakefile):
+			cmakefile_backup = os.path.join(os.getcwd(), "CMakeLists.txt.BAK")
+			if verbose:
+				print "WARNING: moving existing " + cmakefile + " out of the way (" + cmakefile_backup + ")"
+			shutil.move(cmakefile, cmakefile_backup)
+		if verbose:
+			print "Generating " + cmakefile
+		f = open(cmakefile, "w")
+		f.write("cmake_minimum_required(VERSION 2.6)\n")
+		f.write("add_executable(" + project + " " + " " .join(final_output_files) + ")\n")
+		if options.openmp:
+			f.write("set(CMAKE_C_FLAGS \"-fopenmp\")\n");
+		f.close()
+		if options.makeit:
+			os.system("mkdir -p __build && cd __build && cmake .. && make")
 
-			# Inline back the kernel into the wrapper, since CUDA can only deal with
-			# local functions if they are in the same file as the caller (by inlining
-			# them, by the way... :-) )
-			kernel_filter_re = re.compile("p4a_kernel_\\d+$")
-			kernels = w.filter(lambda m: kernel_filter_re.match(m.name))
-			kernels.inlining()
-
-			# Display the wrappers to see the work done:
-			kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
-			kernel_wrappers = w.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
-			#kernel_wrappers.display()
-
-			# Instead, do a global loop normalization above:
-			#kernels.loop_normalize()
-			#kernels.use_def_elimination()
-			#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
-
-			#w.all.suppress_dead_code()
-			#w["main"].display()
-
-			w["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
-		
-		if openmp:
-			all_modules.ompify_code()
-		
-		w.all.unsplit()
-		
-		if compile:
-			print "TODO"
-			sys.exit(1)
-		
-	except:
-		print sys.exc_info()[0]
-		sys.exit(2)
 
 if __name__ == "__main__":
-	main(sys.argv[1:])
+	main()
+
+# Some Emacs stuff:
+### Local Variables:
+### mode: python
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:
