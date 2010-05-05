@@ -434,6 +434,7 @@ function validate_file()
 	fi
     fi
 
+    # ignore space changes... is it a good idea when testing a prettyprinter?
     ${PIPS_DIFF:-diff -b -u} $reference_filtered $out_filtered > $out.diff
 
     if [[ -s $out.diff ]] ; then
