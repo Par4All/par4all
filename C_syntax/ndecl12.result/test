@@ -15,8 +15,8 @@ Variable list:
 	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
 	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "main:0`t" with type "variable" "TREE"
-	Declared entity "main:0`tree" with type "variable" "struct  {int left; int right;}"
-	Declared entity "main:0`treeptr" with type "variable" "struct  {int left; int right;} *"
+	Declared entity "main:0`tree" with type "variable" "struct {int left; int right;}"
+	Declared entity "main:0`treeptr" with type "variable" "struct {int left; int right;} *"
 	Declared entity "main:main" with type "variable" "int"
 	Declared entity "ndecl12!:*STATIC*" with type "area" with size 0
 
@@ -30,8 +30,8 @@ Derived entities:
 
 Typedef entities:
 
-	Typedef "main:0`$TREE"	with type "variable" "struct  {int left; int right;}"
-	Typedef "main:0`$TREEPTR"	with type "variable" "struct  {int left; int right;} *"
+	Typedef "main:0`$TREE"	with type "variable" "struct {int left; int right;}"
+	Typedef "main:0`$TREEPTR"	with type "variable" "struct {int left; int right;} *"
 
 Layout for return variable:
 
