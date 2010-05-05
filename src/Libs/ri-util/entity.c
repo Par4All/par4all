@@ -983,10 +983,18 @@ static string prefixes[] = {
     F95MODULE_PREFIX,
 };
 
+
+/**
+ * @brief This function try to find a top-level entity from a local name
+ *
+ * @description Because of static C function, the entity returned is not always
+ * a top-level entity.
+ *
+ * @return the entity if found, else entity_undefined
+ */
 entity local_name_to_top_level_entity(const char *n)
 {
   entity module = entity_undefined;
-  int i;
 
   /* Extension with C: the scope of a module can be its compilation unit if this is
      a static module, not only TOP-LEVEL. */
@@ -994,15 +1002,13 @@ entity local_name_to_top_level_entity(const char *n)
   if (static_module_name_p(n)) {
     string cun = strdup(n);
     string sep = strchr(cun, FILE_SEP);
-    //string ln = strchr(n, MODULE_SEP)+1;
-
     *(sep+1) = '\0';
-    module = gen_find_tabulated(concatenate(cun, MODULE_SEP_STRING, n, NULL),entity_domain);
+    module = global_name_to_entity(cun,n);
     free(cun);
   }
   else
     {
-      for(i=0; i<PREFIXES_SIZE && entity_undefined_p(module); i++)
+      for(int i=0; i<PREFIXES_SIZE && entity_undefined_p(module); i++)
         module = gen_find_tabulated(concatenate
 				    (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, NULL),
 				    entity_domain);
@@ -1011,37 +1017,41 @@ entity local_name_to_top_level_entity(const char *n)
   return module;
 }
 
-entity module_name_to_entity(const char* mn)
-{
-  /* Because of static C function, the entity returned is not always a
-     top-level entity. */
-  entity module = entity_undefined;
+/**
+ * @brief This is an alias for local_name_to_top_level_entity
+ * @return the entity if found, else entity_undefined
+ */
+entity module_name_to_entity(const char* mn) {
+  return local_name_to_top_level_entity(mn);
+}
 
-  if(static_module_name_p(mn)) {
-    string cun = strdup(mn); /* compilation unit name */
-    *(strstr(cun, FILE_SEP_STRING)+1)='\0';
-    module = global_name_to_entity(cun, mn);
-    free(cun);
+
+/**
+ * @brief Retrieve an entity from its package/module name and its local name
+ * @return the entity if found, else entity_undefined
+ */
+entity global_name_to_entity( const char* package, const char* name ) {
+  return gen_find_tabulated( concatenate( package,
+                                          MODULE_SEP_STRING,
+                                          name,
+                                          NULL ), entity_domain );
+}
+
+
+/**
+ * @brief Retrieve an entity from its package/module name and its local name
+ * @return the entity if found, else entity_undefined
+ */
+entity FindEntity( const char* package, const char* name ) {
+  entity e = global_name_to_entity(package, name);
+  if ( entity_undefined_p(e) ) {
+    e = gen_find_tabulated( concatenate( package,
+                                         MODULE_SEP_STRING,
+                                         "0",
+                                         BLOCK_SEP_STRING,
+                                         name,
+                                         NULL ), entity_domain );
   }
-  else
-    module = local_name_to_top_level_entity(mn);
-
-  return module;
-}
-
-/* Retrieve an entity from its package/module name "m" and its local
-   name "n". */
-entity global_name_to_entity(const char* m, const char* n)
-{
-  return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, NULL),
-			    entity_domain);
-}
-
-entity FindEntity(string package, string name)
-{
-  entity e = gen_find_tabulated(concatenate(package,MODULE_SEP_STRING,name,NULL), entity_domain);
-  if( entity_undefined_p(e))
-    e=gen_find_tabulated(concatenate(package,MODULE_SEP_STRING,"0",BLOCK_SEP_STRING,name,NULL), entity_domain);
   return e;
 }
 
