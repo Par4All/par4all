@@ -2055,7 +2055,7 @@ entity gfc2pips_int2label( int n ) {
   char str[60];
   sprintf( str,
            "%s%s%s%d",
-           TOP_LEVEL_MODULE_NAME,
+           CurrentPackage,
            MODULE_SEP_STRING,
            LABEL_PREFIX,
            n );//fprintf(stderr,"new label: %s %s %s %s %d\n",str,TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);
