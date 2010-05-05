@@ -3,7 +3,7 @@
 !!
 
 
-C Check the impact of the Fortran preprocessor on unsplit
+C     Check the impact of the Fortran preprocessor on unsplit
 ! 1
       PROGRAM ONE
       INTEGER I, THREE
