@@ -392,7 +392,7 @@ bool references_must_conflict_p( reference r1, reference r2 ) {
 
   // Do a simple check for scalar conflicts
   if ( reference_scalar_p( r1 ) && reference_scalar_p( r2 )
-      && entities_may_conflict_p( e1, e2 ) ) {
+      && entities_must_conflict_p( e1, e2 ) ) {
     conflict_p = TRUE;
   } else {
     /* pips_user_warning("Not completely implemented yet. "
