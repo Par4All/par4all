@@ -3661,7 +3661,6 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
              * We have to convert manually a loop to a call to a DO-IMPLIED
              */
             loop l = instruction_loop(i);
-            print_statement(loop_body(l));
             lci = CONS(EXPRESSION,loop_to_implieddo(l),lci);
           } else if(instruction_call_p(i)) {
             lci = CONS(EXPRESSION,call_to_expression(instruction_call(i)),lci);

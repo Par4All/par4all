@@ -130,15 +130,22 @@ cons *l;
 /*
  * @brief Convert a loop to an IMPLIED-DO
  */
-expression loop_to_implieddo(loop l) {
-  syntax index = make_syntax_reference(make_reference(loop_index(l),NIL));
+expression loop_to_implieddo( loop l ) {
+  syntax index = make_syntax_reference( make_reference( loop_index(l), NIL ) );
   range r = loop_range(l);
 
-  list make_arg_from_stmt(statement stmt, list args) {
+  list make_arg_from_stmt( statement stmt, list args ) {
     instruction i = statement_instruction(stmt);
-    pips_assert("Cannot handle anything other than expressions\n",
-        instruction_expression_p(i));
-    args = CONS(EXPRESSION,instruction_expression(i), args );
+    expression expr;
+    if ( instruction_expression_p(i) ) {
+      expr = instruction_expression(i);
+    } else if ( instruction_loop_p(i) ) {
+      expr = loop_to_implieddo( instruction_loop(i) );
+    } else {
+      pips_internal_error("We can't handle anything other than expression"
+          "and loop for loop-to-implieddo conversion.\n");
+    }
+    args = CONS(EXPRESSION,expr, args );
     return args;
   }
 
