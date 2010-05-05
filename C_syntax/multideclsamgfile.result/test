@@ -1,30 +1,149 @@
-bar!
+user warning in parse_properties: property ACTIVE_PHASES redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in tp_parse: multideclsamgfile: No such workspace
+Registering file multideclsamgfile/foo.c
+Preprocessing file ./multideclsamgfile/foo.c
+Splitting file    ./multideclsamgfile.database/Tmp/foo.cpp_processed.c
+  Module         foo!
+Registering file multideclsamgfile/bar.c
+Preprocessing file ./multideclsamgfile/bar.c
+Splitting file    ./multideclsamgfile.database/Tmp/bar.cpp_processed.c
+  Module         bar!
+Workspace multideclsamgfile created and opened.
+Module foo! selected
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
+Selecting rule: C_SYMBOL_TABLE
+user warning in activate_phase: Rule `C_SYMBOL_TABLE' already active
+Selecting rule: C_PARSER
+user warning in activate_phase: Rule `C_PARSER' already active
+Module bar! selected
+Request: build resource SYMBOL_TABLE_FILE for module bar!.
+  BOOTSTRAP                      building   ENTITIES()
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(bar!)
 
-Declarations for module bar! with type () -> unknow
+Declarations for module bar! with type  () ->  unknown
+
+
 Variable list:
+
 
 Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
 Declared entity TOP-LEVEL:a	with type variable INTEGER*4
 Declared entity bar!:*DYNAMIC*	with type area with size 0
+Declared entity bar!:*HEAP*	with type area with size 0
 Declared entity bar!:*STACK*	with type area with size 0
 Declared entity bar!:*STATIC*	with type area with size 0
+* empty external declaration list *
+
+
 
 Layouts for areas (commons):
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:a	offset = 0	size = 4
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4: 
+	Variable TOP-LEVEL:a,	offset = 0,	size = 4
 
 
-Layout for common /bar!:*DYNAMIC*/ of size 0:
+Layout for memory area "bar!:*DYNAMIC*" of size 0: 
 	* empty area *
 
 
-Layout for common /bar!:*STACK*/ of size 0:
+Layout for memory area "bar!:*HEAP*" of size 0: 
 	* empty area *
 
 
-Layout for common /bar!:*STATIC*/ of size 0:
+Layout for memory area "bar!:*STACK*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "bar!:*STATIC*" of size 0: 
 	* empty area *
 
 End of declarations for module bar!
 
+  C_SYMBOL_TABLE                 building   SYMBOL_TABLE_FILE(bar!)
+SYMBOL_TABLE_FILE made for bar!.
+Module foo! selected
+Request: build resource SYMBOL_TABLE_FILE for module foo!.
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(foo!)
+user warning in CCompilationUnitMemoryAllocations: Multiple declarations of variable a in different files
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Fix your source code!
+ at user line 2 (local line 6) in file "./multideclsamgfile.database/foo!/foo!.c"
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource SYMBOL_TABLE_FILE for module foo!.
+user error in display_a_resource: Cannot build view file SYMBOL_TABLE_FILE
+Module bar! selected
+Request: build resource PARSED_PRINTED_FILE for module bar!.
+  PRINT_SOURCE                   building   PARSED_PRINTED_FILE(bar!)
+PARSED_PRINTED_FILE made for bar!.
+Module foo! selected
+Request: build resource PARSED_PRINTED_FILE for module foo!.
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(foo!)
+user warning in CCompilationUnitMemoryAllocations: Multiple declarations of variable a in different files
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Fix your source code!
+ at user line 2 (local line 6) in file "./multideclsamgfile.database/foo!/foo!.c"
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module foo!.
+user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
+bar!
+
+Declarations for module "bar!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "bar!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "bar!:*HEAP*" with type "area" with size 0
+	Declared entity "bar!:*STACK*" with type "area" with size 0
+	Declared entity "bar!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 4
+
+
+Layout for memory area "bar!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module bar!
+
+//Multiple declaration check for global variables
+int a;
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module bar!.
+  Closing module foo!.
+Closing program.
+Closing workspace.
+Workspace multideclsamgfile closed.
+
+Workspace multideclsamgfile deleted.
