@@ -288,12 +288,15 @@ function validate_file()
     else
       verb 1 "skipping $file: no matching result directory"
       echo "skipped: ${file#$vdir/}" >> $summary.tmp
+      # hmmm... uncount if not result directory
+      let dones--
       return 0
     fi
   elif [[ ! -f $full_name.result/test && ! -f $full_name.result/test.$arch ]]
   then
     verb 1 "skipping $file: no matching result test file"
     echo "skipped: ${file#$vdir/}" >> $summary.tmp
+    # hmmm... do not uncount, this is inconsistent...
     return 0
   fi
 
