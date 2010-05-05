@@ -14,7 +14,7 @@ C (statement ordering unavailable)
 1        READ (UNIT=NIRR,FMT=1000,END=2)                                0005
 C (statement ordering unavailable)
          GOTO 99999
-         
+      
 C (statement ordering unavailable)
          GOTO 2
 99999    CONTINUE
