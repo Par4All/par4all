@@ -2215,7 +2215,8 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pips_debug(9,"Struct type ... with name = %s\n", sname);
 
       pc = CHAIN_SWORD(pc,"struct ");
-      if(strstr(sname,DUMMY_STRUCT_PREFIX)==NULL) {
+      // hmmm... name may be an empty list... and the sname test seems true
+      if(name && strstr(sname,DUMMY_STRUCT_PREFIX)==NULL) {
 	pc = gen_nconc(pc,name);
 	pc = CHAIN_SWORD(pc," ");
       }
