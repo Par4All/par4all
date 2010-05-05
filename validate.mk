@@ -163,13 +163,12 @@ skipped:
 
 orphan:
 	for base in $(sort $(F.list)) ; do \
-	  dir=$${base/\/*/} ; \
 	  test -f $$base.tpips -o \
 	       -f $$base.tpips2 -o \
 	       -f $$base.test -o \
 	       -f $$base.py -o \
-	       -f $$dir/default_tpips -o \
-	       -f $$dir/default_test || \
+	       -f default_tpips -o \
+	       -f default_test || \
 	  echo "orphan: $$base" ; \
 	done >> $(RESULTS)
 
