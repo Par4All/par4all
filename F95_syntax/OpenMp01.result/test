@@ -1,0 +1,26 @@
+// OMP style
+PROGRAM OPENMP01
+INTEGER J, I
+INTEGER B(1:100)
+I = 0
+J = 0
+!$omp parallel do
+DO I = 1, 100
+   B(I) = 0
+ENDDO
+!$omp end parallel do
+!$omp parallel do private(I)
+DO J = 1, 100
+   DO I = 1, 100
+      B(J) = B(J)+I
+   ENDDO
+ENDDO
+!$omp end parallel do
+DO I = 1, 100
+!$omp parallel do
+   DO J = 1, 100
+      B(J) = B(J)+I
+   ENDDO
+!$omp end parallel do
+ENDDO
+END
