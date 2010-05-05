@@ -79,6 +79,7 @@
 
 /*  constant names
  */
+#define F95_USE_LOCAL_NAME              "*USE*"
 #define BLANK_COMMON_LOCAL_NAME         "*BLANK*"
 #define DYNAMIC_AREA_LOCAL_NAME         "*DYNAMIC*"
 #define STATIC_AREA_LOCAL_NAME          "*STATIC*"

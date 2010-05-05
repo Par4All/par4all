@@ -498,6 +498,12 @@ bool entity_module_p(entity e)
   }
 }
 
+bool entity_f95use_p(entity e)
+{
+  string name = entity_name(e);
+  return strncmp(name,F95_USE_LOCAL_NAME,strlen(F95_USE_LOCAL_NAME)) == 0;
+}
+
 bool entity_main_module_p(entity e)
 {
   return entity_module_p(e)

@@ -253,17 +253,13 @@ void gfc2pips_get_use_st( void ) {
   int pos = len;
   do {
     if ( p == NULL ) {
-      c = '\n';
+      c = '\0';
     } else {
       c = *p++;
-      if ( c == '\0' ) {
-        c = '\n';
-      }
     }
 
     use_stmt[pos++] = c;
-  } while ( c != '\n' );
-  use_stmt[pos] = '\0';
+  } while ( c != '\0' );
   if ( ns2use == NULL ) {
     ns2use = hash_table_make( hash_pointer, 0 );
   }
@@ -417,26 +413,13 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
     }
   }
 
-  /* Get declarations */
-  list decls = code_declarations(EntityCode(gfc2pips_main_entity));
-  /* Add variables to declaration */
-  decls = gen_nconc( decls, variables );
-  code_declarations(EntityCode(gfc2pips_main_entity)) = decls;
-  /* Fix Storage for declarations */
-  FOREACH( entity, e, decls ) {
-    // Fixme insecure
-    if ( entity_variable_p(e) ) {
-      ram r = storage_ram(entity_storage(e));
-      ram_function(r) = gfc2pips_main_entity;
-      string name = module_local_name( gfc2pips_main_entity );
-      ram_section(r) = FindOrCreateEntity( name, DYNAMIC_AREA_LOCAL_NAME );
-      ;
-    }
-
-  }
-
-  list use_stmts;
+  /*
+   * Get USE statements
+   */
+  list use_entities = NULL; // List of entities
   if ( ns2use ) {
+    int currentUse = 1;
+    list use_stmts = NULL; // List of entities
     if ( ( use_stmts = hash_get( ns2use, (char *) ns ) )
         != HASH_UNDEFINED_VALUE ) {
       string use = NULL;
@@ -453,8 +436,35 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
         strcpy( &( use[current_len - a_len - 1] ), a_use );
       }
       printf( "Module whole use : \n'%s'\n", use );
+      /* Create an entity */
+      string entity_name;
+      asprintf( &entity_name, "%s-use-%d", CurrentPackage, currentUse++ );
+      entity e = FindOrCreateEntity( F95_USE_LOCAL_NAME, use );
+      entity_type(e) = make_type_unknown();
+      entity_storage(e) = make_storage_rom();
+      entity_initial(e) = make_value_unknown();
+      use_entities = CONS(ENTITY,e,use_entities);
     }
   }
+
+  /* Get declarations */
+  list decls = code_declarations(EntityCode(gfc2pips_main_entity));
+  /* Add variables to declaration */
+  decls = gen_nconc( use_entities, gen_nconc( decls, variables ));
+  code_declarations(EntityCode(gfc2pips_main_entity)) = decls;
+  /* Fix Storage for declarations */
+  FOREACH( entity, e, decls ) {
+    // Fixme insecure
+    if ( entity_variable_p(e) ) {
+      ram r = storage_ram(entity_storage(e));
+      ram_function(r) = gfc2pips_main_entity;
+      string name = module_local_name( gfc2pips_main_entity );
+      ram_section(r) = FindOrCreateEntity( name, DYNAMIC_AREA_LOCAL_NAME );
+      ;
+    }
+
+  }
+
   gfc2pips_debug(2, "gfc2pips_main_entity %s %p %s\n",
       entity_name(gfc2pips_main_entity),
       gfc2pips_main_entity,
@@ -3276,10 +3286,10 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       list list_of_instructions =
           sequence_statements(instruction_sequence(statement_instruction(s)));
       list_of_instructions = gen_nreverse( list_of_instructions );
-/*      list_of_instructions
-          = gen_cons( make_continue_statement( gfc2pips_int2label( gfc2pips_last_created_label ) ),
-                      list_of_instructions );
-      gfc2pips_last_created_label -= gfc2pips_last_created_label_step;*/
+      /*      list_of_instructions
+       = gen_cons( make_continue_statement( gfc2pips_int2label( gfc2pips_last_created_label ) ),
+       list_of_instructions );
+       gfc2pips_last_created_label -= gfc2pips_last_created_label_step;*/
       list_of_instructions = gen_nreverse( list_of_instructions );
       sequence_statements(instruction_sequence(statement_instruction(s)))
           = list_of_instructions;
@@ -3655,14 +3665,14 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
         if ( c->expr ) {
           lci = CONS(EXPRESSION,gfc2pips_expr2expression(c->expr),lci);
         } else {
-          instruction i = gfc2pips_code2instruction_(c);
-          if(instruction_loop_p(i)) {
+          instruction i = gfc2pips_code2instruction_( c );
+          if ( instruction_loop_p(i) ) {
             /*
              * We have to convert manually a loop to a call to a DO-IMPLIED
              */
             loop l = instruction_loop(i);
             lci = CONS(EXPRESSION,loop_to_implieddo(l),lci);
-          } else if(instruction_call_p(i)) {
+          } else if ( instruction_call_p(i) ) {
             lci = CONS(EXPRESSION,call_to_expression(instruction_call(i)),lci);
           } else {
             pips_user_warning("We don't know how to handle op : %d \n", c->op);
@@ -3821,8 +3831,9 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
 
       ifdebug(8) {
         gfc2pips_debug(8,"List of arg : \n");
-        FOREACH(expression, e, lci) {
-          print_expression(e);
+        FOREACH(expression, e, lci)
+        {
+          print_expression( e );
         }
       }
 
@@ -3832,8 +3843,8 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       break;
     case EXEC_TRANSFER: {
       // FIXME, chained transfert ? c->block->next not null ?
-      expression transfered = gfc2pips_expr2expression(c->expr);
-      return make_instruction_expression(transfered);
+      expression transfered = gfc2pips_expr2expression( c->expr );
+      return make_instruction_expression( transfered );
       break;
     }
     case EXEC_DT_END:
