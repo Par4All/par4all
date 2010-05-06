@@ -81,7 +81,7 @@ class ValidationClass:
 				
 				commands.getstatusoutput("Delete "+os.path.basename(test_name_path)+" 2> /dev/null 1>&2")
 
-				(int_status, output) = commands.getstatusoutput("Init -f "+test_file_path+" -d "+os.path.basename(test_name_path)+" 2> "+err_result)
+				(int_status, output) = commands.getstatusoutput("Init -f "+test_file_path+" -d "+os.path.basename(test_name_path)+" 2> "+err_file_path)
 
 				(int_status, output_display) = commands.getstatusoutput("while read module ; do Display -m  $module -w "+os.path.basename(test_name_path)+" ; done < "+os.path.basename(test_name_path)+".database/modules")
 				err_file_h.write ('%s' % (output_display))
@@ -171,6 +171,7 @@ class ValidationClass:
 	
 		# Return to validation Par4All
 		os.chdir(self.PWD)
+		return status
 
 ###### Validate only test what we want ######
   def valid_par4all(self):
@@ -199,14 +200,20 @@ class ValidationClass:
 			directory_test = self.par4ll_validation_dir + directory[0]
 			
 			print (('# Considering %s')%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
+			nb_test = 0
+			nb_failed = 0
 
 			if os.path.isdir(directory_test):
 				# Run test
-				self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt')
+				nb_test = nb_test+1
+				status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt')
+				if (status != "succeeded"):
+					nb_failed = nb_failed+1
 			else:
 				print ('%s not accessible' % (directory_test))
 
 		f.close()
+		print('%s failed in %s test'%(nb_failed,nb_test))
 
 ###### Validate all tests (done by "default" file) ######
   def valid_pips(self):
@@ -215,7 +222,7 @@ class ValidationClass:
 			commands.getstatusoutput("rm -rf RESULT")
 		os.mkdir("RESULT")
 
-		default_file_path = self.par4ll_validation_dir+"/defaults"
+		default_file_path = self.par4ll_validation_dir+"defaults"
 
 		default_file = open(default_file_path)
 
@@ -227,13 +234,19 @@ class ValidationClass:
 					line  = line.strip('\n')
 					directory_test = self.par4ll_validation_dir + line
 					print (('# Considering %s')%(os.path.basename(directory_test)))
+					nb_test = 0
+					nb_failed = 0
 
 					for file_test in os.listdir(directory_test):
 						(root, ext) = os.path.splitext(file_test)
 						if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
+							nb_test = nb_test+1
 							file_tested = directory_test + '/' + file_test
-							self.test_par4all(directory_test, file_tested,'pips_log.txt')
+							status = self.test_par4all(directory_test, file_tested,'pips_log.txt')
+							if (status != "succeeded"):
+								nb_failed = nb_failed+1
 
+		print('%s failed in %s test'%(nb_failed,nb_test))
 		default_file.close()
 
 def main():
