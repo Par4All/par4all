@@ -277,12 +277,17 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 								copy_expression(input_ind), 
 								NIL));
 		}
-	      l = CONS(CELL, make_cell(is_cell_reference, build_ref), NIL);
+	      pips_debug(8, "adding reference %s\n",
+			 words_to_string(words_reference(build_ref, NIL)));
+	      l = CONS(CELL, make_cell(is_cell_reference, build_ref), l);
 	      *exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
 	    } /* end of FOREACH(POINTS_TO,...) */
 	} /* else branche of if (input_path_length == 0) */
     } /* else branch of if (entity_abstract_location_p(input_ent)) */
   
+
+  
+
   return l;
 }
 
