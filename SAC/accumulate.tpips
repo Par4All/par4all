@@ -1,12 +1,13 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete accumulate
-create accumulate accumulate.c include/SIMD.c
+setenv WS="accumulate"
+delete $WS
+create $WS $WS.c include/SIMD.c
 
 echo
 echo Initial code
 echo
 
-module accumulate
+module $WS
 display PRINTED_FILE
 
 source include/benchmark.tpips.h
@@ -17,11 +18,12 @@ echo
 
 display PRINTED_FILE
 apply UNSPLIT
-
-shell ./compileC.sh accumulate accumulate.c test.c
-shell gcc -O3 -I. -march=native -c test.c
-shell rm test.c test.o
-
 close
-delete accumulate
-quit
+
+shell sed -i -e "1,/${WS}(/ d" $WS.database/Src/$WS.c
+shell sed -i -e "1 i #define MOD(a,b) (a)%(b)\n#define MAX0(a,b) (a>b)?a:b" $WS.database/Src/$WS.c
+shell cc -O3 -I. -march=native  $WS.c -o  $WS.database/Tmp/ref
+shell cc -O3 -I. -march=native  $WS.database/Src/$WS.c include/SIMD.c -o $WS.database/Tmp/seq
+shell ( test "`./$WS.database/Tmp/ref`" = "`./$WS.database/Tmp/seq`" && echo ok ) || echo ko
+
+delete $WS

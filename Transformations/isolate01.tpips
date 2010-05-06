@@ -7,7 +7,7 @@ module alphablending
 
 echo original code
 apply PARTIAL_EVAL
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 echo tiled code
 apply FLAG_LOOPS

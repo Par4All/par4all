@@ -1,0 +1,25 @@
+setenv WS="isolate05"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+
+module lonesome_cowboy
+
+echo original code
+display PRINTED_FILE[%ALLFUNC]
+
+echo isolated code
+setproperty ISOLATE_STATEMENT_LABEL "isolate"
+apply ISOLATE_STATEMENT
+display PRINTED_FILE
+
+
+apply UNSPLIT
+close
+
+shell sed -i -e '1,/lonesome_cowboy(/ d' $WS.database/Src/$WS.c
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/candidate
+shell ( test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/candidate` && echo "ok" ) || echo "ko"
+
+delete $WS

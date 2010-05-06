@@ -22,28 +22,26 @@ int main(int argc, char *argv[])
 after vectorization
 int main(int argc, char *argv[])
 {
-   //PIPS:SAC generated int vector(s)
-   int v4si_vec0[4], v4si_vec1[4], v4si_vec2[4];
-   //PIPS:SAC generated variable
-   int aligned[4] = {2, 3, 4, 5}, aligned0[4] = {0, 0, 0, 0};
-   {
-      int b, *a, c[4];
-      do {
-         a = malloc(sizeof(int)*4);
-         a[0] = aligned0[0]*2;
-         a[1] = aligned0[0]*3;
-         a[2] = aligned0[0]*4;
-         a[3] = aligned0[0]*5;
-      }
-      while (0);
-      do {
-         SIMD_LOAD_V4SI(v4si_vec2, &aligned[0]);
-         SIMD_LOAD_V4SI(v4si_vec1, &aligned0[0]);
-         SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);
-         SIMD_SAVE_V4SI(v4si_vec0, &c[0]);
-      }
-      while (0);
-      return 0;
+   int b, *a, c[4];
+   do {
+      a = malloc(4*sizeof(int));
+      a[0] = 2*b;
+      a[1] = 3*b;
+      a[2] = 4*b;
+      a[3] = 5*b;
    }
+   while (0);
+   do {
+      //PIPS:SAC generated int vector(s)
+      int v4si_vec0[4], v4si_vec1[4], v4si_vec2[4];
+      //SAC generated temporary array
+      int aligned[4] = {0, 0, 0, 0}, aligned0[4] = {2, 3, 4, 5};
+      SIMD_LOAD_V4SI(v4si_vec2, &aligned[0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &aligned0[0]);
+      SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &c[0]);
+   }
+   while (0);
+   return 0;
 }
 

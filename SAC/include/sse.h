@@ -27,6 +27,7 @@ do { \
 /* handle padded value, this is a very bad implementation ... */
 #define SIMD_MASKED_SAVE_V4SF(vec,arr) do { float tmp[4] ; SIMD_SAVE_V4SF(vec,&tmp[0]); (arr)[0]=tmp[0];(arr)[1]=tmp[1];(arr)[2]=tmp[2]; } while(0)
 
+
 /* double */
 #define SIMD_LOAD_V2DF(vec,arr) vec=_mm_loadu_pd(arr)
 #define SIMD_MULPD(vec1,vec2,vec3) vec1=_mm_mul_pd(vec2,vec3)
@@ -36,12 +37,18 @@ do { \
 do { \
     double tmp[2]; \
     SIMD_SAVE_V2DF(vec,&tmp[0]);\
-    *v0=tmp[0];\
-    *v1=tmp[1];\
+    *(v0)=tmp[0];\
+    *(v1)=tmp[1];\
 } while (0)
 #define SIMD_LOAD_GENERIC_V2DF(vec,v0,v1)\
 do { \
     double v[2] = { v0,v1};\
     SIMD_LOAD_V2DF(vec,&v[0]); \
 } while(0)
+
+/* conversions */
+#define SIMD_SAVE_V2SF_TO_V2DF(vec,f) \
+    SIMD_SAVE_GENERIC_V2DF(vec,(f),(f)+1)
+#define SIMD_LOAD_V2SF_TO_V2DF(vec,f) \
+    SIMD_LOAD_GENERIC_V2DF(vec,(f)[0],(f)[1])
 

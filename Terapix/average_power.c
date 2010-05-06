@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 {
     int i,j,k;
     int th,rg,v;
-    th=14,rg=13,v=12;
+    th=16,rg=13,v=12;
     {
         Cplfloat in[th][rg][v],pow[th];
         for(i=0;i<th;i++)
@@ -39,8 +39,9 @@ int main(int argc, char *argv[])
                     in[i][j][k].im=i*j+k;
                 }
         average_power(th,rg,v,in,pow);
+        /* only print with bad precision for valdiation */
         for(i=0;i<th;i++)
-            printf("-%f-", pow[i]);
+            printf("-%d-%d-", ((int)pow[i].re)/10, ((int)pow[i].im))/10;
     }
     return 0;
 }

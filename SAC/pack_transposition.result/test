@@ -191,182 +191,174 @@ void pack_transposition(double a[5][5])
 }
 void pack_transposition(double a[5][5])
 {
-   //PIPS:SAC generated double vector(s)
-   double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec4[2], v2df_vec5[2];
-   {
-      int i, j;
-      //PIPS generated variable
-      int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
-      LU_NUB1 = 4;
-      LU_IB1 = 0;
-      LU_IND1 = 0;
-      for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[LU_IND1+1][2]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[LU_IND1+1][0]);
-         SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[LU_IND1+1][1]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[LU_IND1+1][3]);
-         SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[LU_IND1+1][2]);
-         //c SIMD_COMMENT_6
-         j = 2;
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_6
-         j = 2;
-      }
-      i = 4;
-      ;
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   LU_NUB1 = 4;
+   LU_IB1 = 0;
+   LU_IND1 = 0;
+   for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
+      //PIPS:SAC generated double vector(s)
+      double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec4[2], v2df_vec5[2];
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[1+LU_IND1][2]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[1+LU_IND1][0]);
+      SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[1+LU_IND1][1]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[1+LU_IND1][3]);
+      SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[1+LU_IND1][2]);
+      //c SIMD_COMMENT_6
+      j = 2;
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_6
+      j = 2;
    }
+   i = 4;
+   ;
 }
 void pack_transposition(double a[5][5])
 {
-   //PIPS:SAC generated double vector(s)
-   double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec4[2], v2df_vec5[2];
-   {
-      int i, j;
-      //PIPS generated variable
-      int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
-      LU_NUB1 = 4;
-      LU_IB1 = 0;
-      LU_IND1 = 0;
-      for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[LU_IND1+1][2]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[LU_IND1+1][0]);
-         SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[LU_IND1+1][1]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[LU_IND1+1][3]);
-         SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[LU_IND1+1][2]);
-         //c SIMD_COMMENT_6
-         j = 2;
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_6
-         j = 2;
-      }
-      i = 4;
-      ;
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   LU_NUB1 = 4;
+   LU_IB1 = 0;
+   LU_IND1 = 0;
+   for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
+      //PIPS:SAC generated double vector(s)
+      double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec4[2], v2df_vec5[2];
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[1+LU_IND1][2]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[1+LU_IND1][0]);
+      SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[1+LU_IND1][1]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[1+LU_IND1][3]);
+      SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[1+LU_IND1][2]);
+      //c SIMD_COMMENT_6
+      j = 2;
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_6
+      j = 2;
    }
+   i = 4;
+   ;
 }
 void pack_transposition(double a[5][5])
 {
-   //PIPS:SAC generated double vector(s)
-   double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec5[2];
-   {
-      int i, j;
-      //PIPS generated variable
-      int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
-      LU_NUB1 = 4;
-      LU_IB1 = 0;
-      LU_IND1 = 0;
-      for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[LU_IND1+1][2]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[LU_IND1+1][0]);
-         SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[LU_IND1+1][1]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[LU_IND1+1][3]);
-         SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[LU_IND1+1][2]);
-         //c SIMD_COMMENT_6
-         j = 2;
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_6
-         j = 2;
-      }
-      i = 4;
-      ;
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   LU_NUB1 = 4;
+   LU_IB1 = 0;
+   LU_IND1 = 0;
+   for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
+      //PIPS:SAC generated double vector(s)
+      double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec4[2], v2df_vec5[2];
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[1+LU_IND1][2]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[1+LU_IND1][0]);
+      SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[1+LU_IND1][1]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[1+LU_IND1][3]);
+      SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[1+LU_IND1][2]);
+      //c SIMD_COMMENT_6
+      j = 2;
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_6
+      j = 2;
    }
+   i = 4;
+   ;
 }
 
 simdized code
 
 void pack_transposition(double a[5][5])
 {
-   //PIPS:SAC generated double vector(s)
-   double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec5[2];
-   {
-      int i, j;
-      //PIPS generated variable
-      int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
-      LU_NUB1 = 4;
-      LU_IB1 = 0;
-      LU_IND1 = 0;
-      for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[LU_IND1+1][2]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[LU_IND1+1][0]);
-         SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[LU_IND1+1][1]);
-         SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[LU_IND1+1][3]);
-         SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
-         SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[LU_IND1+1][2]);
-         //c SIMD_COMMENT_6
-         j = 2;
-         //c SIMD_COMMENT_0
-         LU_NUB0 = 2;
-         //c SIMD_COMMENT_1
-         LU_IB0 = 0;
-         //c SIMD_COMMENT_2
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_3
-         LU_IND0 = 0;
-         //c SIMD_COMMENT_6
-         j = 2;
-      }
-      i = 4;
-      ;
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   LU_NUB1 = 4;
+   LU_IB1 = 0;
+   LU_IND1 = 0;
+   for(LU_IND1 = 0; LU_IND1 <= 3; LU_IND1 += 2) {
+      //PIPS:SAC generated double vector(s)
+      double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2], v2df_vec4[2], v2df_vec5[2];
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec2, a[LU_IND1][2], a[1+LU_IND1][2]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec1, a[LU_IND1][0], a[1+LU_IND1][0]);
+      SIMD_ADDPD(v2df_vec0, v2df_vec1, v2df_vec2);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec0, &a[LU_IND1][1], &a[1+LU_IND1][1]);
+      SIMD_LOAD_GENERIC_V2DF(v2df_vec5, a[LU_IND1][3], a[1+LU_IND1][3]);
+      SIMD_ADDPD(v2df_vec3, v2df_vec0, v2df_vec5);
+      SIMD_SAVE_GENERIC_V2DF(v2df_vec3, &a[LU_IND1][2], &a[1+LU_IND1][2]);
+      //c SIMD_COMMENT_6
+      j = 2;
+      //c SIMD_COMMENT_0
+      LU_NUB0 = 2;
+      //c SIMD_COMMENT_1
+      LU_IB0 = 0;
+      //c SIMD_COMMENT_2
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_3
+      LU_IND0 = 0;
+      //c SIMD_COMMENT_6
+      j = 2;
    }
+   i = 4;
+   ;
 }
 seq-ok
 sse-ok
