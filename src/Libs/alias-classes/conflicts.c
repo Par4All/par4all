@@ -266,6 +266,11 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 ) {
               /* context sensitive heap modelization */
               conflict_p = same_string_p(entity_name(s1), entity_name(s2));
             }
+            else if( entity_field_p(s1) &&  entity_field_p(s2))
+            {
+                if(type_struct_variable_p(t)) conflict_p=same_entity_p(s1,s2);
+                else if(type_union_variable_p(t)) conflict_p=true;
+            }
           } else {
             /* assume the code is correct... Assume no floating
              point index... a[i] vs a[x]... */
