@@ -1,0 +1,22 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete inlining30
+create inlining30 inlining30.f
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[ARRAY]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[ARRAY]
+display PRINTED_FILE[ARRAY]
+
+
+close
+delete inlining30
+quit
+
