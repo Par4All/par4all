@@ -40,6 +40,7 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "transformations.h"
+#include "alias-classes.h"
 
 #include "dg.h"
 
@@ -141,7 +142,8 @@ static bool successor_only_has_rr_conflict_p(successor su)
     FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(su)))
     {
         if(effect_read_p(conflict_sink(c))&&
-                effect_read_p(conflict_source(c)))
+                effect_read_p(conflict_source(c))
+          )
         {
             pips_debug(3,
                     "conflict skipped between %s and %s\n",
@@ -345,6 +347,7 @@ static bool comparable_statements_on_distance_p(statement s0, statement s1)
             if(val) return true;
         }
         POP(iter);
+        if(ENDP(iter)) break;
     }
     return false;
 }
@@ -419,12 +422,11 @@ static list order_isomorphic_statements(set s)
 
 static list simdize_simple_statements_pass2(list seq, float * simdCost)
 {
-    list newseq;
+    list newseq=NIL;
 
     //argument info dependencies are local to each sequence -> RESET
-    reset_argument_info();
+    init_vector_to_expressions();
 
-    list sinfo = NIL;
     set visited = set_make(set_pointer);
 
     /* Traverse to list to group isomorphic statements */
@@ -439,15 +441,13 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
                 print_statement(si);
             }
 
-            /* Initialize current group */
-            list group_current = CONS(STATEMENT,si,NIL);
-
             /* if this is not a recognized statement (ie, no match), skip it */
             set group_matches = get_statement_matching_types(si);
             if (set_empty_p(group_matches) )
             {
                 pips_debug(3,"no match found\n");
-                sinfo = gen_statementInfo_cons( make_nonsimd_statement_info(STATEMENT(CAR(i))),sinfo);
+                invalidate_expressions_in_statement(si);
+                newseq = CONS(STATEMENT,si,newseq);
                 continue;
             }
             else 
@@ -482,7 +482,8 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
                     pips_debug(3,"following statement cannot be moved\n");
                     print_statement(si);
                 }
-                sinfo = gen_statementInfo_cons( make_nonsimd_statement_info(si),sinfo);
+                invalidate_expressions_in_statement(si);
+                newseq = CONS(STATEMENT,si,newseq);
             }
             else
             {
@@ -494,42 +495,45 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
                 }
                 list iso_stats = order_isomorphic_statements(isomorphics);
                 set_free(isomorphics);
-                statementInfo ssi = make_simd_statements(group_matches, iso_stats);
-                if(statementInfo_undefined_p(ssi))
+                for(list iso_iter=iso_stats;!ENDP(iso_iter);)
                 {
-                    sinfo = gen_statementInfo_cons( make_nonsimd_statement_info(si),sinfo);
-                }
-                else
-                {
-                    sinfo=gen_statementInfo_cons(ssi,sinfo);
-                    list iter = iso_stats;
-                    for(intptr_t i= opcode_vectorSize(simdStatementInfo_opcode(statementInfo_simd(ssi)));i!=0;i--)
+                    simdstatement ss = make_simd_statements(group_matches, iso_iter);
+                    if(simdstatement_undefined_p(ss))
                     {
-                        if(!ENDP(iter)) { /*endp can occur when padded statements are added */
-                            set_add_element(visited,visited,STATEMENT(CAR(iter)));
-                            POP(iter);
+                        invalidate_expressions_in_statement(si);
+                        newseq = CONS(STATEMENT,si,newseq);
+                        POP(iso_iter);
+                        break;
+                    }
+                    else
+                    {
+                        newseq=gen_append(generate_simd_code(ss,simdCost),newseq);
+                        for(intptr_t i= opcode_vectorSize(simdstatement_opcode(ss));i!=0;i--)
+                        {
+                            if(!ENDP(iso_iter)) { /*endp can occur when padded statements are added */
+                                set_add_element(visited,visited,STATEMENT(CAR(iso_iter)));
+                                POP(iso_iter);
+                            }
                         }
                     }
                 }
+                set_free(group_matches);
                 gen_free_list(iso_stats);
             }
             simd_reset_finalArgType();
         }
     }
-    sinfo=gen_nreverse(sinfo);
-
-    /* Now, based on the statement information gathered, 
-     * generate the actual code (new sequence of statements)
-     */
-    newseq = generate_simd_code(sinfo, simdCost);
+    reset_vector_to_expressions();
+    newseq=gen_nreverse(newseq);
 
     /* Free the list of statements info */
-    free_simd_statements(sinfo);
-    gen_free_list(sinfo);
 
     /* Set the new list as the statements' instructions */
     return newseq;
 }
+
+statement sac_current_block = statement_undefined;
+instruction sac_real_current_instruction = instruction_undefined;
 
 /*
  * This function tries to simdize with two algorithms.
@@ -547,8 +551,12 @@ static void simdize_simple_statements(statement s,graph dependence_graph)
      */
     if (statement_block_p(s))
     {
+        sac_current_block=s;
         /* we cannot handle anything but sequence of calls */
         list iter = statement_block(s);
+        sac_real_current_instruction = statement_instruction(s);
+        statement_instruction(s)=make_instruction_block(NIL);
+
         list new_seq = NIL;
         while(!ENDP(iter))
         {
@@ -556,48 +564,53 @@ static void simdize_simple_statements(statement s,graph dependence_graph)
             for(;!ENDP(iter);POP(iter))
             {
                 statement st = STATEMENT(CAR(iter));
-                if(statement_call_p(st))
-                    seq=CONS(STATEMENT,st,seq);
+                if(declaration_statement_p(st))
+                    insert_statement(s,st,false);
+                else {
+                    if(statement_call_p(st))
+                        seq=CONS(STATEMENT,st,seq);
 
-                if(!statement_call_p(st)||ENDP(CDR(iter)))
-                {
-                    /* process already existing statements */
-                    if(!ENDP(seq))
+                    if(!statement_call_p(st)||ENDP(CDR(iter)))
                     {
-                        seq=gen_nreverse(seq);
-
-                        init_statement_matches_map(seq);
-                        init_statement_equivalence_table(seq,dependence_graph);
-
-                        float saveSimdCost = 0;
-                        list simdseq = simdize_simple_statements_pass2(seq, &saveSimdCost);
-
-
-                        pips_debug(2,"opcode cost1 %f\n", saveSimdCost);
-
-                        if((saveSimdCost >= 0.0001))
+                        /* process already existing statements */
+                        if(!ENDP(seq))
                         {
-                            new_seq=gen_append(new_seq,seq);
-                            gen_free_list(simdseq);
-                        }
-                        else
-                        {
-                            new_seq=gen_append(new_seq,simdseq);
-                            gen_free_list(seq);
-                        }
+                            seq=gen_nreverse(seq);
 
-                        free_statement_matches_map();
-                        free_statement_equivalence_table();
-                        seq=NIL;
+                            init_statement_matches_map(seq);
+                            init_statement_equivalence_table(seq,dependence_graph);
 
+                            float saveSimdCost = 0;
+                            list simdseq = simdize_simple_statements_pass2(seq, &saveSimdCost);
+
+
+                            pips_debug(2,"opcode cost1 %f\n", saveSimdCost);
+
+                            if((saveSimdCost >= 0.0001))
+                            {
+                                new_seq=gen_append(new_seq,seq);
+                                gen_free_list(simdseq);
+                            }
+                            else
+                            {
+                                new_seq=gen_append(new_seq,simdseq);
+                                gen_free_list(seq);
+                            }
+
+                            free_statement_matches_map();
+                            free_statement_equivalence_table();
+                            seq=NIL;
+
+                        }
+                        if(!statement_call_p(st))
+                            new_seq=gen_append(new_seq,CONS(STATEMENT,st,NIL));
                     }
-                    if(!statement_call_p(st))
-                        new_seq=gen_append(new_seq,CONS(STATEMENT,st,NIL));
                 }
 
             }
         }
-        sequence_statements(instruction_sequence(statement_instruction(s))) = new_seq;
+        sequence_statements(instruction_sequence(statement_instruction(s)))=
+            gen_append(statement_block(s),new_seq);
     }
 }
 
@@ -610,9 +623,13 @@ static bool simd_simple_sequence_filter(statement s,__attribute__((unused)) grap
     return ! ( instruction_call_p( statement_instruction(s) ) ) ;
 }
 
-static string sac_commenter(entity e)
+string sac_commenter(entity e)
 {
-    if(simd_vector_entity_p(e))
+    if(sac_aligned_entity_p(e))
+    {
+        return strdup("SAC generated temporary array");
+    }
+    else if(simd_vector_entity_p(e))
     {
         string s,g = basic_to_string(entity_basic(e));
         asprintf(&s,"PIPS:SAC generated %s vector(s)", g);
@@ -634,16 +651,14 @@ bool simdizer(char * mod_name)
     statement mod_stmt = (statement)
         db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
-    //what a trick ! this is needed because we would lose declarations otherwise */
-    statement parent_stmt=make_block_statement(make_statement_list(mod_stmt));
-
-    set_current_module_statement(parent_stmt); 
+    set_current_module_statement(mod_stmt); 
     set_current_module_entity(module_name_to_entity(mod_name));
 	set_ordering_to_statement(mod_stmt);
     graph dependence_graph = 
         (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
     set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
     set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,TRUE));
     push_generated_variable_commenter(sac_commenter);
     init_padding_entities();
 
@@ -657,14 +672,15 @@ bool simdizer(char * mod_name)
             statement_consistent_p(mod_stmt));
 
     /* Reorder the module, because new statements have been added */  
-    clean_up_sequences(parent_stmt);
-    module_reorder(parent_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, parent_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, compute_callees(parent_stmt));
+    clean_up_sequences(mod_stmt);
+    module_reorder(mod_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, compute_callees(mod_stmt));
     //DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, dependence_graph);
 
     /* update/release resources */
     reset_padding_entities();
+    reset_cumulated_rw_effects();
     reset_simd_operator_mappings();
     reset_simd_treematch();
 	reset_ordering_to_statement();
@@ -675,4 +691,67 @@ bool simdizer(char * mod_name)
     debug_off();
 
     return TRUE;
+}
+
+
+static void do_simdizer_init(call c)
+{
+#define SWAP_ARGUMENTS(c) do { call_arguments(c)=gen_nreverse(call_arguments(c)) ; return ;} while(0)
+#define NOSWAP_ARGUMENTS(c)  return
+    if(commutative_call_p(c))
+    {
+        pips_assert("commutative call are binary calls",gen_length(call_arguments(c))==2);
+        expression e0 = binary_call_lhs(c),
+                   e1 = binary_call_rhs(c);
+        /* constant first */
+        if(extended_expression_constant_p(e0)) NOSWAP_ARGUMENTS(c);
+        if(extended_expression_constant_p(e1)) SWAP_ARGUMENTS(c);
+        /* then scalar */
+        if(expression_scalar_p(e0)) NOSWAP_ARGUMENTS(c);
+        if(expression_scalar_p(e1)) SWAP_ARGUMENTS(c) ;
+
+        /* we finally end with two references */
+        if(expression_reference_or_field_p(e0) && expression_reference_or_field_p(e1))
+        {
+            expression distance = distance_between_expression(e0,e1);
+            int val;
+            if( !expression_undefined_p(distance) && expression_integer_value(distance,&val))
+            {
+                free_expression(distance);
+                if(val <= 0) NOSWAP_ARGUMENTS(c);
+                else SWAP_ARGUMENTS(c) ;
+            }
+            else
+            {
+                entity ent0 = expression_to_entity(e0);
+                entity ent1 = expression_to_entity(e1);
+                if(compare_entities(&ent0,&ent1)<=0) NOSWAP_ARGUMENTS(c);
+                else SWAP_ARGUMENTS(c) ;
+            }
+        }
+        else
+        {
+            string msg = words_to_string(words_call(c,0,true,true,NIL));
+            pips_user_warning("unable to decide how to commute %s\n",msg);
+            free(msg);
+        }
+    }
+#undef SWAP_ARGUMENTS
+#undef NOSWAP_ARGUMENTS
+}
+bool simdizer_init(const char * module_name)
+{
+    /* get the resources */
+    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, true));
+    set_current_module_entity(module_name_to_entity(module_name));
+
+    /* sort commutative operators */
+    gen_recurse(get_current_module_statement(),call_domain,gen_true,do_simdizer_init);
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+    /* reset */
+    reset_current_module_statement();
+    reset_current_module_entity();
+
 }

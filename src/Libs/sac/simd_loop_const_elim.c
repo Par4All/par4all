@@ -69,7 +69,8 @@ static bool simd_save_stat_p(statement stat)
         string funcName = entity_local_name(call_function(statement_call(stat)));
         return    same_stringn_p(funcName, SIMD_SAVE_NAME, SIZEOFSTRING(SIMD_SAVE_NAME))
                || same_stringn_p(funcName, SIMD_GEN_SAVE_NAME, SIZEOFSTRING(SIMD_GEN_SAVE_NAME))
-               || same_stringn_p(funcName, SIMD_CONS_SAVE_NAME, SIZEOFSTRING(SIMD_CONS_SAVE_NAME));
+               || same_stringn_p(funcName, SIMD_CONS_SAVE_NAME, SIZEOFSTRING(SIMD_CONS_SAVE_NAME))
+               || same_stringn_p(funcName, SIMD_MASKED_SAVE_NAME, SIZEOFSTRING(SIMD_MASKED_SAVE_NAME));
     }
     else
     {
@@ -84,7 +85,8 @@ static bool simd_load_stat_p(statement stat)
         string funcName = entity_local_name(call_function(statement_call(stat)));
         return    same_stringn_p(funcName, SIMD_LOAD_NAME, SIZEOFSTRING(SIMD_LOAD_NAME))
                || same_stringn_p(funcName, SIMD_GEN_LOAD_NAME, SIZEOFSTRING(SIMD_GEN_LOAD_NAME))
-               || same_stringn_p(funcName, SIMD_CONS_LOAD_NAME,SIZEOFSTRING(SIMD_CONS_LOAD_NAME));
+               || same_stringn_p(funcName, SIMD_CONS_LOAD_NAME,SIZEOFSTRING(SIMD_CONS_LOAD_NAME))
+               || same_stringn_p(funcName, SIMD_MASKED_LOAD_NAME, SIZEOFSTRING(SIMD_MASKED_LOAD_NAME));
     }
     else
     {
@@ -146,52 +148,6 @@ static bool list_eq_expression(list args1, list args2, bool allow_addressing)
     }
 }
 
-/* checks if one of the expression in args depends on the loop index
- * this may be rewritten using a gen_recurse ?
- */
-static bool index_argument_conflict(list args, list l_reg)
-{
-    FOREACH(EXPRESSION, arg, args)
-    {
-        /* hack to handle the & operator in C */
-        if( expression_call_p(arg) )
-        {
-            call c = expression_call(arg);
-            if( entity_an_operator_p( call_function(c) , ADDRESS_OF ) )
-                arg = EXPRESSION(CAR( call_arguments(c) ) );
-        }
-        /* default reference handler */
-        if(expression_reference_p(arg))
-        {
-            FOREACH(EXPRESSION, ind, reference_indices(expression_reference(arg)) )
-            {
-
-                list ef = expression_to_proper_effects(ind);
-
-                FOREACH(EFFECT, indEff, ef)
-                {
-                    FOREACH(EFFECT, loopEff, l_reg)
-                    {
-                        if(action_write_p(effect_action(loopEff)) &&
-                                same_entity_p(effect_entity(indEff), effect_entity(loopEff)))
-                        {
-                            gen_free_list(ef);
-                            pips_debug(1,"depend on loop index !\n");
-                            return TRUE;
-                        }
-                    }
-                }
-
-                gen_free_list(ef);
-
-            }
-        }
-    }
-
-    return FALSE;
-}
-
-
 
 /* This function returns true if the arguments of the simd statement theStat do
  * not depend on the loop iteration
@@ -219,7 +175,7 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
                 {
                     //conflict c = CONFLICT(CAR(l3));
                     // If stat2 is not a simd statement, then return FALSE
-                    if(!simd_stat_p(stat2))
+                    if(!simd_stat_p(stat2)&&!declaration_statement_p(stat2))
                     {
                         pips_debug(1,"conflicting with:\n");
                         ifdebug(1) { print_statement(stat2); }
@@ -253,14 +209,43 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
         }
     }
 
-    return  !index_argument_conflict(args, l_reg);
+    return  true;
+}
+static bool statements_uses_loop_index(statement s0,statement s1)
+{
+    statement fake = copy_statement(s1);
+    if(statement_loop_p(fake)) {
+        free_statement(loop_body(statement_loop(fake)));
+        loop_body(instruction_loop(statement_instruction(fake)))=statement_undefined;
+    }
+    else if(statement_whileloop_p(fake))
+    {
+        free_statement(whileloop_body(statement_whileloop(fake)));
+        whileloop_body(instruction_whileloop(statement_instruction(fake)))=statement_undefined;
+    }
+    else if(statement_forloop_p(fake))
+    {
+        free_statement(forloop_body(statement_forloop(fake)));
+        forloop_body(instruction_forloop(statement_instruction(fake)))=statement_undefined;
+    }
+
+
+    set S0 = get_referenced_entities(s0);
+    set S1 = get_referenced_entities(fake);
+    free_statement(fake);
+    bool uses = set_intersection_p(S0,S1);
+    set_free(S0);
+    set_free(S1);
+    return uses;
+
+
 }
 
 /* This function searches for simd load or save statements that can be
  * put out of the loop body. It stores these statements in
  * constArgs hash table.
  */
-static bool searchForConstArgs(statement body, hash_table constArgs, list l_reg)
+static bool searchForConstArgs(statement head,statement body, hash_table constArgs, list l_reg)
 {
     if(statement_block_p(body))
     {
@@ -278,7 +263,7 @@ static bool searchForConstArgs(statement body, hash_table constArgs, list l_reg)
                 /* If the arguments of the statement do not depend on the iteration,
                  * then store the statement in constArgs
                  */
-                if(constant_argument_list_p(args, curStat, statement_block(body), l_reg))
+                if(!statements_uses_loop_index(curStat,head) && constant_argument_list_p(args, curStat, statement_block(body), l_reg))
                 {
                     pips_debug(1,"no conflict ^^\n");
                     hash_put(constArgs, curStat, args);
@@ -288,12 +273,36 @@ static bool searchForConstArgs(statement body, hash_table constArgs, list l_reg)
                 pips_debug(1,"not a save / load statement !\n");
             }
         }
-        return TRUE;
+        return true;
     }
     else
     {
-        return FALSE;
+        return false;
     }
+}
+
+static list simdstatement_to_entities(statement s)
+{
+    list out = NIL;
+    FOREACH(EXPRESSION,exp,call_arguments(statement_call(s)))
+    {
+        if(expression_call_p(exp))
+        {
+            call c = expression_call(exp);
+            if(ENTITY_ADDRESS_OF_P(call_function(c)))
+            {
+                exp=EXPRESSION(CAR(call_arguments(c)));
+                if(expression_reference_p(exp))
+                    out=CONS(ENTITY,expression_to_entity(exp),out);
+                else if(expression_field_p(exp))
+                    out=CONS(ENTITY,expression_to_entity(binary_call_lhs(expression_call(exp))),out);
+            }
+
+        }
+        else if(expression_reference_p(exp))
+            out=CONS(ENTITY,expression_to_entity(exp),out);
+    }
+    return out;
 }
 
 /* This function moves the statements in constArgs out of the loop body
@@ -305,49 +314,73 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
     list bodySeq = NIL;
     list headerSeq = NIL;
     list footerSeq = NIL;
+    instruction old = statement_instruction(s);
+    statement_instruction(s)=instruction_undefined;
+    update_statement_instruction(s,make_instruction_block(NIL));
 
     /* Go through the statements in the loop body to fill argsToVect
      * and argsToFunc and to replace simdVector, if necessary
      */
-    FOREACH(STATEMENT, curStat, statement_block(body))
+    /* gather moved vector here */
+    set moved_vectors = set_make(set_pointer);
+    /* reverse now so that everything is built in correct order */
+    sequence_statements(instruction_sequence(statement_instruction(body)))=gen_nreverse(statement_block(body));
+
+    /* work on a copy beacuase we remove statement during iteration */
+    list body_statement_copies = gen_copy_seq(statement_block(body));
+    
+    FOREACH(STATEMENT, curStat, body_statement_copies)
     {
         list args = (list) hash_get(constArgs, curStat);
 
         /* add it to argsToVect / argsToFunc */
         if(args != HASH_UNDEFINED_VALUE)
         {
+            list moved_entities=simdstatement_to_entities(curStat);
+            set_append_list(moved_vectors,moved_entities);
+            gen_free_list(moved_entities);
             if(simd_load_stat_p(curStat))
-                headerSeq = gen_nconc(headerSeq, CONS(STATEMENT, copy_statement(curStat),NIL) );
+                headerSeq = CONS(STATEMENT, curStat,headerSeq);
             else if(simd_save_stat_p(curStat) )
-                footerSeq = gen_nconc(footerSeq, CONS(STATEMENT, copy_statement(curStat),NIL) );
+                footerSeq = CONS(STATEMENT, curStat,footerSeq);
             else
                 pips_user_error("const statement not a load or save !?!");
+        }
+        /* should we moved the declaration too ? thnaks to the reverse transversal, we already now 
+         * moved entities from moved_vectors */
+        else if(declaration_statement_p(curStat))
+        {
+            /* copy beacause cannot modify in place using RemoveLocal... */
+            list declared_entities = gen_copy_seq(statement_declarations(curStat));
+            bool something_did_not_move = false;
+            FOREACH(ENTITY,e,declared_entities)
+            {
+                if(set_belong_p(moved_vectors,e))
+                {
+                    RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),body);
+                    AddLocalEntityToDeclarations(e,get_current_module_entity(),s);
+                }
+                else
+                {
+                    something_did_not_move=true;
+                }
+            }
+            gen_free_list(declared_entities);
+            if(something_did_not_move)
+                bodySeq = CONS(STATEMENT, curStat, bodySeq);
         }
         /* keep it in for's body */
         else
         {
-            bodySeq = gen_nconc(bodySeq, CONS(STATEMENT, copy_statement(curStat), NIL) );
+            bodySeq = CONS(STATEMENT, curStat, bodySeq);
         }
     }
-
-
-    gen_free_list(instruction_block(statement_instruction(body)));
-    instruction_block(statement_instruction(body)) = bodySeq;
-
-    /* put everything together*/
-    list newseq = footerSeq;
-    statement scp = copy_statement(s);
-    statement_label(s)=entity_empty_label();/*scp now holds the label*/
-    newseq = CONS(STATEMENT, scp, newseq);
-    newseq = gen_nconc(headerSeq, newseq);
-
-
-    // Insert the statements removed from the sequence before
-    statement_declarations(s) = NIL;
-
-    // Replace the old statement instruction by the new one
-    update_statement_instruction(s, make_instruction_sequence(make_sequence(newseq)));
-
+    gen_free_list(body_statement_copies);
+    set_free(moved_vectors);
+    /* put everything together */
+    statement_instruction(body)=instruction_undefined;
+    update_statement_instruction(body,make_instruction_block(bodySeq));
+    insert_statement(s,make_block_statement(gen_nconc(headerSeq,CONS(STATEMENT,instruction_to_statement(old),footerSeq))),false);
 }
 
 /* This function is called for each statement and performs the
@@ -386,7 +419,7 @@ static void simd_loop_const_elim_rwt(statement s)
      * Move the statements in constArgs out of the loop body
      */
     hash_table constArgs = hash_table_make(hash_pointer, 0);
-    if(searchForConstArgs(body, constArgs, l_reg))
+    if(searchForConstArgs(s,body, constArgs, l_reg))
         moveConstArgsStatements(s, body, constArgs);
     hash_table_free(constArgs);
 }
@@ -408,15 +441,18 @@ bool simd_loop_const_elim(char * module_name)
     );
 
     dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+    push_generated_variable_commenter(sac_commenter);
 
     debug_on("SIMD_LOOP_CONST_ELIM_DEBUG_LEVEL");
 
     /* Go through all the statements */
     gen_recurse(module_stat, statement_domain,
             gen_true, simd_loop_const_elim_rwt);
+    clean_up_sequences(module_stat);
 
     pips_assert("Statement is consistent after SIMD_LOOP_CONST_ELIM",
             statement_consistent_p(module_stat));
+    pop_generated_variable_commenter();
 
     module_reorder(module_stat);
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);

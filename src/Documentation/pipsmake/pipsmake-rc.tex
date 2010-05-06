@@ -5441,6 +5441,12 @@ This function initialize operator matchings used by \PipsPassRef{simdizer} for s
 simd_operator_mappings > PROGRAM.simd_operator_mappings
 \end{PipsMake}
 
+\begin{PipsMake}
+simdizer_init  > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{simdizer}
 Function \PipsPassRef{simdizer} is an attempt at generating SIMD code for SIMD
 multimedia instruction set such as MMX, SSE2, VIS,... This
@@ -5453,6 +5459,7 @@ alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
                             > MODULE.callees
+		! MODULE.simdizer_init
 		< PROGRAM.simd_treematch
 		< PROGRAM.simd_operator_mappings
         < PROGRAM.entities
@@ -5464,12 +5471,6 @@ When set to true, following property tells the simdizer to try to padd arrays wh
 \begin{PipsProp}{SIMDIZER_ALLOW_PADDING}
 SIMDIZER_ALLOW_PADDING FALSE
 \end{PipsProp}
-
-A comma seperated list of commutative simd operators:
-\begin{PipsProp}{SIMDIZER_COMMUTATIVE_OPERATORS}
-SIMDIZER_COMMUTATIVE_OPERATORS ""
-\end{PipsProp}
-
 
 \begin{PipsPass}{simd_loop_const_elim}
 This phase tries to optimize the SIMD code by removing from the loop body

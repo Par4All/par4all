@@ -222,13 +222,3 @@ bool simd_operator_mappings(__attribute__((unused)) char * module_name)
     return true;
 }
 
-bool opcode_commutative_p(opcode oc)
-{
-    bool result = false;
-    string operators = strdup(get_string_property("SIMDIZER_COMMUTATIVE_OPERATORS"));
-    string s = strtok(operators,",");
-    for (;s;s=strtok(NULL,","))
-        if(same_string_p(s,opcode_name(oc))) result=true;
-    free(s);
-    return result;
-}

@@ -49,6 +49,9 @@ typedef dg_vertex_label vertex_label;
 #include "control.h"
 #include "callgraph.h"
 #include "preprocessor.h"
+#include "effects-simple.h"
+#include "alias-classes.h"
+#include "atomizer.h"
 #include "sac.h"
 
 //Creates a new entity to replace the given one
@@ -62,37 +65,93 @@ static entity make_replacement_entity(entity e)
     return new_ent;
 }
 
+static void single_assign_replace(statement in, reference old, entity new,bool replace_assign)
+{
+    list actionRead=NIL,actionWrite=NIL;
+    FOREACH(EFFECT, f, load_proper_rw_effects_list(in)) {
+        reference effRef = effect_any_reference(f) ;
 
+        if(effect_write_p(f) && references_must_conflict_p(old, effRef))
+        {
+            actionWrite = CONS(EFFECT,f,actionWrite);
+        }
+        if(effect_read_p(f) && references_must_conflict_p(old, effRef))
+        {
+            actionRead = CONS(EFFECT,f,actionRead);
+        }
+    }
+    if(!ENDP(actionWrite)||!ENDP(actionRead))
+    {
+        if((!ENDP(actionRead)&&ENDP(actionWrite)) || (!ENDP(actionWrite)&&ENDP(actionRead)&&replace_assign))
+        {
+            pips_debug(1,"replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(old)),entity_user_name(new));
+            ifdebug(1) { print_statement(in); }
+            replace_reference(in,old,new);
+            FOREACH(EFFECT,f,actionRead) replace_entity(f,reference_variable(old),new);
+        }
+        else if(!ENDP(actionWrite)&&ENDP(actionRead)){
+            pips_debug(1,"not replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(old)),entity_user_name(new));
+            ifdebug(1) { print_statement(in); }
+        }
+        /* we are in trouble there: we should only change the read part */
+        else
+        {
+            /* if it is an assign expression ,checks lhs part for only write effect and rhs for only read effects */
+            if(assignment_statement_p(in))
+            {
+                call c = statement_call(in);
+                expression lhs = binary_call_lhs(c);
+                expression rhs = binary_call_rhs(c);
+                list reffects = proper_effects_of_expression(rhs);
+                if(!effects_write_variable_p(reffects,reference_variable(old)) && effects_read_variable_p(reffects,reference_variable(old)))
+                {
+                    pips_debug(1,"replacing entity %s by %s in lhs of assign statement:\n",entity_user_name(reference_variable(old)),entity_user_name(new));
+                    ifdebug(1) { print_statement(in); }
+                    replace_reference(lhs,old,new);
+                    FOREACH(EFFECT,f,actionRead) replace_entity(f,reference_variable(old),new);
+                }
+                else
+                    pips_internal_error("cannot handle this case\n");
+                gen_full_free_list(reffects);
+            }
+            else
+                pips_internal_error("cannot handle this case\n");
 
+        }
+        gen_free_list(actionWrite);
+        gen_free_list(actionRead);
+    }
+}
 
 static void single_assign_statement(graph dg) {
-    hash_table nbPred = hash_table_make(hash_pointer, 0);
 
-    //First, compute the number of incoming DU arcs for each reference
+    set all_entities = set_make(set_pointer);
+    set_assign_list(all_entities,entity_declarations(get_current_module_entity()));
+
+    //First, compute the number of incoming DU arcs for each entity
     FOREACH(VERTEX, a_vertex, graph_vertices(dg)) {
         FOREACH(SUCCESSOR, suc, vertex_successors(a_vertex)) {
             FOREACH(CONFLICT, c, dg_arc_label_conflicts(successor_arc_label(suc))) {
-                reference r = effect_any_reference(conflict_sink(c));
-                int nbRef;
                 /* Consider only potential DU arcs (may or must does not matter)
                    and do not consider arrays */
-                if ((gen_length(reference_indices(effect_any_reference(conflict_source(c)))) != 0)
-                        || (gen_length(reference_indices(effect_any_reference(conflict_sink(c)))) != 0)
-                        || !effect_write_p(conflict_source(c))
-                        || !effect_read_p(conflict_sink(c)))
-                    continue;
+                if (reference_scalar_p(effect_any_reference(conflict_source(c))) &&
+                        reference_scalar_p(effect_any_reference(conflict_sink(c))) &&
+                        effect_write_p(conflict_source(c)) &&
+                        effect_read_p(conflict_sink(c)) &&
+                        vertex_ordering(a_vertex) >= vertex_ordering(successor_vertex(suc)))
+                {
+                    entity e = reference_variable(effect_any_reference(conflict_sink(c)));
+                    pips_debug(1,"removing %s from ssa entities, conflicts betwwen statements:\n",entity_user_name(e));
+                    ifdebug(1) { print_statement(vertex_to_statement(a_vertex)); print_statement(vertex_to_statement(successor_vertex(suc))); }
 
-                nbRef = (_int) hash_get(nbPred, r);
-                if (nbRef == (_int) HASH_UNDEFINED_VALUE)
-                    nbRef = 0;
-                nbRef++;
-                pips_debug(1,"increasing the number of reference to %s to %d\n",words_to_string(words_reference(r, NIL)),nbRef);
-                hash_put(nbPred, r, (void*)(_int)nbRef);
+                    set_del_element(all_entities,all_entities,e);
+                }
             }
         }
     }
-    //Then, for each reference which does never stem from more than one Def,
-    //change the variable name
+
+    /* Then, for each entity suitable for a substitution,change the variable name
+     */
     FOREACH(VERTEX, a_vertex, graph_vertices(dg)) {
         statement currStat= vertex_to_statement(a_vertex);
         hash_table toBeDone = hash_table_make(hash_pointer, 0);
@@ -106,72 +165,36 @@ static void single_assign_statement(graph dg) {
                 list lSuc;
 
                 //do something only if we are sure to write
-                if ((gen_length(reference_indices(effect_any_reference(conflict_source(c)))) != 0) ||
-                        (gen_length(reference_indices(effect_any_reference(conflict_sink(c)))) != 0) ||
-                        !effect_write_p(conflict_source(c)) ||
-                        !effect_must_p(conflict_source(c)) ||
-                        !effect_read_p(conflict_sink(c)))
-                    continue;
-
-                //if the module has an OUT effect on the variable, do not replace
-                if (0)
-                    continue;
-
-                l = hash_get(toBeDone, effect_any_reference(conflict_source(c)));
-                lSuc = hash_get(hashSuc, effect_any_reference(conflict_source(c)));
-
-                //If the sink reference has more than one incoming arc, do not change
-                //the variable name.
-                //In this caeffect_entity(conflict_source(c))se, previous conflicts related to this reference are removed
-                //from the work list, and the list is set to NIL in the work list: this way
-                //it can be seen in later conflicts also.
-                if ((_int)hash_get(nbPred, effect_any_reference(conflict_sink(c))) > 1)
+                if (set_belong_p(all_entities, reference_variable(effect_any_reference(conflict_sink(c)))))
                 {
-                    if (l != HASH_UNDEFINED_VALUE)
-                        gen_free_list(l);
-                    l = NIL;
-
-                    if (lSuc != HASH_UNDEFINED_VALUE)
-                        gen_free_list(lSuc);
-                    lSuc = NIL;
-                }
-                else if (l != NIL)
-                {
-                    if(simd_supported_stat_p(vertex_to_statement(a_vertex)) &&
-                            simd_supported_stat_p(vertex_to_statement(successor_vertex(suc))))
+                    if (reference_scalar_p(effect_any_reference(conflict_source(c))) &&
+                            reference_scalar_p(effect_any_reference(conflict_sink(c))) &&
+                            effect_write_p(conflict_source(c)) &&
+                            effect_read_p(conflict_sink(c)))
                     {
-                        if (l == HASH_UNDEFINED_VALUE)
-                            l = NIL;
+
+                        l = hash_get_default_empty_list(toBeDone, effect_any_reference(conflict_source(c)));
+                        lSuc = hash_get_default_empty_list(hashSuc, effect_any_reference(conflict_source(c)));
+
                         l = CONS(CONFLICT, c, l);
-
-                        if (lSuc == HASH_UNDEFINED_VALUE)
-                            lSuc = NIL;
                         lSuc = CONS(SUCCESSOR, suc, lSuc);
-                    }
-                    else
-                    {
-                        if (l != HASH_UNDEFINED_VALUE)
-                            gen_free_list(l);
-                        l = NIL;
 
-                        if (lSuc != HASH_UNDEFINED_VALUE)
-                            gen_free_list(lSuc);
-                        lSuc = NIL;
+                        hash_put_or_update(toBeDone, effect_any_reference(conflict_source(c)), l);
+                        hash_put_or_update(hashSuc, effect_any_reference(conflict_source(c)), lSuc);
                     }
                 }
-
-                hash_put(toBeDone, effect_any_reference(conflict_source(c)), l);
-                hash_put(hashSuc, effect_any_reference(conflict_source(c)), lSuc);
             }
         }
 
 
-        void *hash_iter=NULL,*r,*l;
-        while( (hash_iter = hash_table_scan(toBeDone,hash_iter,&r,&l)) )
+        void *hash_iter=NULL;
+        reference r;
+        list l;
+        while( (hash_iter = hash_table_scan(toBeDone,hash_iter,(void**)&r,(void**)&l)) )
         {
             list lSuc = hash_get(hashSuc, r);
             list lCurSuc = lSuc;
-            FOREACH(CONFLICT, c, (list)l) {
+            FOREACH(CONFLICT, c, l) {
                 entity ne;
                 reference rSource;
                 reference rSink;
@@ -191,56 +214,26 @@ static void single_assign_statement(graph dg) {
                 statement stat2 = vertex_to_statement(successor_vertex(suc));
 
                 // If the source variable hasn't be replaced yet for the source
-                if(var_created == FALSE)
+                if(!var_created)
                 {
                     // Create a new variable
                     ne = make_replacement_entity(eSource);
-
-                    // Replace the source by the created variable
-                    pips_debug(1,"replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(rSource)),entity_user_name(ne));
-                    ifdebug(1) { print_statement(currStat); }
-                    replace_reference(currStat,rSource,ne);
-
                     pips_debug(1, "ref created %s\n",
                             entity_local_name(effect_entity(conflict_source(c))));
 
+                    single_assign_replace(currStat,rSource,ne,true);
+
                     // Save the entity corresponding to the created variable
                     se = ne;
-                    var_created = TRUE;
+                    var_created = true;
                 }
+                single_assign_replace(stat2,rSink,se,false);
 
-                bool actionWrite = FALSE;
-                FOREACH(EFFECT, f, load_proper_rw_effects_list(stat2)) {
-                    entity effEnt = effect_entity(f) ;
-
-                    if(action_write_p(effect_action(f)) && same_entity_p(eSink, effEnt))
-                    {
-                        actionWrite = TRUE;
-                        break;
-                    }
-                }
-
-
-                expression exp2 = EXPRESSION(CAR(call_arguments(instruction_call(statement_instruction(stat2)))));
-
-                if(!actionWrite)
-                {
-                    pips_debug(1,"replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(rSink)),entity_user_name(se));
-                    ifdebug(1) { print_statement(stat2); }
-                    replace_reference(exp2,rSink,se);
-                }
-                else {
-                    pips_debug(1,"not replacing entity %s by %s in statement:\n",entity_user_name(reference_variable(rSink)),entity_user_name(se));
-                    ifdebug(1) { print_statement(stat2); }
-                }
-
-                exp2 = EXPRESSION(CAR(CDR(call_arguments(instruction_call(statement_instruction(stat2))))));
-                replace_reference(exp2,rSink,se);
 
                 lCurSuc = CDR(lCurSuc);
             }
 
-            var_created = FALSE;
+            var_created = false;
 
             gen_free_list(l);
             gen_free_list(lSuc);
@@ -249,7 +242,7 @@ static void single_assign_statement(graph dg) {
         hash_table_free(toBeDone);
         hash_table_free(hashSuc);
     }
-    hash_table_free(nbPred);
+    set_free(all_entities);
 }
 
 
