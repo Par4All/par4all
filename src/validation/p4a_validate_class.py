@@ -47,7 +47,7 @@ class ValidationClass:
 		else:
 			# output of the test and error of the tests
 			output_file_path = test_result_path+'/'+os.path.basename(test_name_path)+'.out'
-			err_result = test_name_path + '.err'
+			err_file_path = test_name_path + '.err'
 		
 			# go to the directory of the test
 	 		os.chdir(directory_test_path)
@@ -55,13 +55,13 @@ class ValidationClass:
 			commands.getstatusoutput("rm -rf *.database")
 
 			if (os.path.isfile(test_name_path+".test")):
-				(int_status, output) = commands.getstatusoutput(test_name_path+".test 2> "+err_result)
+				(int_status, output) = commands.getstatusoutput(test_name_path+".test 2> "+err_file_path)
 
 			elif (os.path.isfile(test_name_path+".py")):
-				(int_status, output) = commands.getstatusoutput("python "+test_name_path+".py 2> "+err_result)
+				(int_status, output) = commands.getstatusoutput("python "+test_name_path+".py 2> "+err_file_path)
 
 			elif (os.path.isfile(test_name_path+".tpips")):
-				(int_status, output) = commands.getstatusoutput("tpips "+test_name_path+".tpips 2> "+err_result)
+				(int_status, output) = commands.getstatusoutput("tpips "+test_name_path+".tpips 2> "+err_file_path)
 
 			elif (os.path.isfile(test_name_path+".tpips2")):
 				(int_status, output) = commands.getstatusoutput("tpips "+test_name_path+".tpips2 2>&1")
@@ -70,14 +70,13 @@ class ValidationClass:
 				# test_name=file
 				# upper=FILE
 				upper = os.path.basename(test_name_path).upper()
-				(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" NAME="+upper+" "+directory_test_path+"/default_test 2>"+err_result)
+				(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" NAME="+upper+" "+directory_test_path+"/default_test 2>"+err_file_path)
 
 			elif (os.path.isfile(directory_test_path+"/default_tpips")):
-				(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips 2>"+err_result)
+				(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips 2>"+err_file_path)
 		
 			else:
 				# Create a err file
-				err_file_path = err_result
 				err_file_h = open(err_file_path,'w')
 				
 				commands.getstatusoutput("Delete "+os.path.basename(test_name_path)+" 2> /dev/null 1>&2")
@@ -95,9 +94,10 @@ class ValidationClass:
   		# cpp or other stuff run by pips, even if relative path names are used.
 			output = output.replace(test_file_path,'./'+os.path.basename(test_file_path))
 
-			if (os.path.isfile(err_result) == True):
+			if (os.path.isfile(err_file_path) == True):
 				# copy error file on RESULT directories of par4all validation
-				commands.getstatusoutput("mv -f "+err_result+' $P4A_ROOT/src/validation/RESULT')
+				commands.getstatusoutput("mv -f "+err_file_path+' $P4A_ROOT/src/validation/RESULT')
+				os.rename(self.p4a_root+"/src/validation/RESULT/"+os.path.basename(err_file_path),self.p4a_root+"/src/validation/RESULT/"+os.path.basename(directory_test_path)+"_"+os.path.basename(err_file_path))
 		
 			if(int_status != 0):
 				status = "failed"
@@ -237,10 +237,10 @@ class ValidationClass:
 		default_file.close()
 
 def main():
-	usage = "usage: %prog [options] arg1 arg2"
+	usage = "usage: python %prog [options]"
 	parser = optparse.OptionParser(usage=usage)
-	parser.add_option("--pips", action="store_true", dest="pips", help = "Validate PIPS (all tests will be done)")
-	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate Par4All (only tests in the specific file will be tested)")
+	parser.add_option("--pips", action="store_true", dest="pips", help = "Validate tests which are done by default file (in packages/PIPS/validation)")
+	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate tests which are done by par4all_validation.txt (which must be previously created in src/validation)")
 	(options, args) = parser.parse_args()
 
 	if options.pips:
@@ -252,7 +252,8 @@ def main():
 		print('Result of the tests are in p4a_log.txt')
 	
 	else:
-		print('Available options are: "--pips", "--p4a". You can use -h option for more help')
+		output = commands.getoutput("python p4a_validate_class.py -h")
+		print(output)
 
 # If this programm is independent it is executed:
 if __name__ == "__main__":
