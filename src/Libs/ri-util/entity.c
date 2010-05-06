@@ -2121,22 +2121,26 @@ entity operator_neutral_element(entity op)
 bool
 commutative_call_p(call c)
 {
-    basic b = basic_of_call(c,false,true);
     entity op  = call_function(c);
     bool commut_p = false;
-    switch(basic_tag(b))
+    if(ENTITY_PLUS_P(op)||ENTITY_MULTIPLY_P(op)||ENTITY_AND_P(op)||ENTITY_OR_P(op))
     {
-        case is_basic_float:
-            if(!get_bool_property("RELAX_FLOAT_COMMUTATIVITY"))
+        basic b = basic_of_call(c,false,true);
+        switch(basic_tag(b))
+        {
+            case is_basic_float:
+                if(!get_bool_property("RELAX_FLOAT_COMMUTATIVITY"))
+                    break;
+            case is_basic_logical:
+            case is_basic_overloaded:
+            case is_basic_int:
+                commut_p=true;
+            case is_basic_pointer:
                 break;
-        case is_basic_logical:
-        case is_basic_int:
-            commut_p=ENTITY_PLUS_P(op)||ENTITY_MULTIPLY_P(op)||ENTITY_AND_P(op)||ENTITY_OR_P(op);
-        case is_basic_pointer:
-            break;
-        default:
-            pips_internal_error("unhandled case\n");
+            default:
+                pips_internal_error("unhandled case\n");
+        }
+        free_basic(b);
     }
-    free_basic(b);
     return commut_p;
 }

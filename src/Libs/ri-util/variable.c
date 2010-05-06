@@ -112,7 +112,7 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
             {
                 bool decl_stat = declaration_statement_p(stat);
                 RemoveLocalEntityFromDeclarations(e,module,stat);
-                /* this take care of removind useless declaration statements*/
+                /* this take care of removing useless declaration statements*/
                 if(ENDP(statement_declarations(stat)) && decl_stat)
                 {
                     gen_remove_once(&instruction_block(statement_instruction(s)),stat);
