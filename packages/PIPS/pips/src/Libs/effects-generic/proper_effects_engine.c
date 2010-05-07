@@ -59,6 +59,7 @@
 #include "semantics.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "alias-classes.h"
 
 #include "effects-generic.h"
 
@@ -2100,7 +2101,7 @@ bool proper_effects_engine(char *module_name)
     init_proper_rw_effects();
 
     if (get_use_points_to())
-      set_pt_to_list( (statement_mapping)
+      set_pt_to_list( (statement_points_to)
 			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
   
     debug_on("PROPER_EFFECTS_DEBUG_LEVEL");

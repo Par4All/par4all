@@ -104,8 +104,6 @@ static list l_number_iter_exp = NIL;
 static int loop_nest_depth = 0;
 static bool inner_reached = FALSE;
 
-/* Statement stack to walk on control flow representation */
-DEFINE_GLOBAL_STACK(p4a_private_current_stmt, statement)
 
 static bool loop_push(loop l)
 {
@@ -183,7 +181,7 @@ static void loop_annotate(loop l)
   */
   if (gen_length(l_enclosing_loops) == 1)
     {
-      statement current_stat = p4a_private_current_stmt_head();
+      statement current_stat = (statement) gen_get_ancestor(statement_domain, l);
 #define LOOP_NEST_P4A_BEGIN "// Loop nest P4A begin,"
       string outer_s;
       asprintf(&outer_s, LOOP_NEST_P4A_BEGIN "%dD" OPENPAREN , loop_nest_depth);
@@ -222,13 +220,11 @@ static void loop_annotate(loop l)
 static bool stmt_push(statement s)
 {
   pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
-  p4a_private_current_stmt_push(s);
   return(TRUE);
 }
 
 static void stmt_pop(statement s)
 {
-    p4a_private_current_stmt_pop();
     pips_debug(1, "End statement%03zd :\n", statement_ordering(s));
 
 }
@@ -262,18 +258,13 @@ bool gpu_loop_nest_annotate(char *module_name)
   statement module_statement = 
     PIPS_PHASE_PRELUDE(module_name,
 		       "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
-  
-  
-  make_p4a_private_current_stmt_stack();
-  
+    
   /* Compute the loops normalization of the module. */
   gen_multi_recurse(module_statement, 
 		    statement_domain, stmt_push, stmt_pop,
 		    loop_domain, loop_push, loop_annotate,
 		    NULL); 
-  free_p4a_private_current_stmt_stack();
-  
-  
+
   /* postlude */
   PIPS_PHASE_POSTLUDE(module_statement);
   

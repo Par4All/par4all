@@ -20,7 +20,7 @@
 #
 
 use_pdflatex = 1
-INSTALL_DOC = developer_guide.pdf
+INSTALL_DOC = developer_guide.pdf auto_pips.pdf
 INSTALL_HTM = developer_guide.htdoc
 # Hide the PDF into the HTML documentation directory
 DOC.subd = $(INSTALL_HTM)
