@@ -1,0 +1,101 @@
+
+Initial code for "compute"
+
+void compute(int fullcount, float input[0][0], float output[1][256])
+{
+   float fSlow2 = 4.656613e-10f*fslider2;
+   int index;
+   int i;
+
+   float output0[256];
+   
+   
+   for(index = 0; index <= fullcount-32; index += 32) {
+      const int count = 32;
+      float *output0 = &output[0][index];
+      
+      
+      fYec0_idx = fYec0_idx+fYec0_idx_save&1023;
+
+      for(i = 0; i <= count-1; i += 1)
+         output0[i] = fSlow2;
+   }
+}
+
+TRANSFORMERS
+
+
+//  T(fYec0_idx,fYec0_idx_save) {}
+
+void compute(int fullcount, float input[0][0], float output[1][256])
+{
+
+//  T() {}
+
+   float fSlow2 = 4.656613e-10f*fslider2;
+
+//  T(index) {}
+
+   int index;
+
+//  T(i) {}
+
+   int i;
+
+
+//  T() {}
+
+   float output0[256];
+
+//  T(fYec0_idx,fYec0_idx_save,fullcount,i,index) {0<=index}
+
+   
+   
+   for(index = 0; index <= fullcount-32; index += 32) {
+
+//  T(count) {count==32}
+
+      const int count = 32;
+
+//  T() {}
+
+      float *output0 = &output[0][index];
+
+//  T(fYec0_idx) {}
+
+      
+      
+      fYec0_idx = fYec0_idx+fYec0_idx_save&1023;
+
+//  T(count,fYec0_idx,fYec0_idx_save,fullcount,i,index) {0<=i}
+
+
+      for(i = 0; i <= count-1; i += 1)
+
+//  T(count,fYec0_idx,fYec0_idx_save,fullcount,i,index) {}
+
+         output0[i] = fSlow2;
+   }
+}
+
+//  T(fYec0_idx,fYec0_idx_save) {}
+
+void main()
+{
+
+//  T(count) {count==256}
+
+   int count = 256;
+
+//  T() {}
+
+   float in[0][0];
+
+//  T() {}
+
+   float out[1][count];
+
+//  T(fYec0_idx,fYec0_idx_save) {}
+
+   compute(count, in, out);
+}

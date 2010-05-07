@@ -1,0 +1,28 @@
+int main()
+{
+   int a, b, c;
+   a = 1;
+   a = 2;
+   b = a;
+   b = b+a;
+   a = 3;
+   c = a;
+   printf("%d-%d-%d", a, b, c);
+   return 0;
+}
+int main()
+{
+   int a, b, c;
+   //PIPS generated variable
+   int c0, a0, b0, a1;
+   a = 1;
+   a1 = 2;
+   b = a1;
+   b0 = b+a1;
+   a0 = 3;
+   c0 = a0;
+   printf("%d-%d-%d", a0, b0, c0);
+   return 0;
+}
+ok
+

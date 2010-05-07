@@ -1,9 +1,8 @@
-echo
 
-echo The message should be: workspace protected_workspace2: Permission denied
 The message should be: workspace protected_workspace2: Permission denied
-echo
 
+Registering file protected_workspace2.f
+Splitting file    ./protected_workspace2.f
   Module         PROTECTED_WORKSPACE2
 Workspace protected_workspace2 created and opened.
 Module PROTECTED_WORKSPACE2 selected

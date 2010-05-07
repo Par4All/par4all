@@ -135,6 +135,8 @@ mail-validate: new-validate
 	  cat SUMMARY ; \
 	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
 
+SUMUP	= pips_validation_summary.pl
+
 # generate & archive validation summary
 SUMMARY: $(HEAD) parallel-validate
 	{ \
@@ -142,7 +144,7 @@ SUMMARY: $(HEAD) parallel-validate
 	  cat $(HEAD) ; \
 	  echo "end date: $$(date)" ; \
 	  echo ; \
-          ./summary.pl $(RESULTS) ; \
+          $(SUMUP) $(RESULTS) ; \
           echo ; \
 	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
 	  echo ; \

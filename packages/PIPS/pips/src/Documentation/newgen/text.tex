@@ -28,13 +28,33 @@
 \begin{document}
 \sloppy
 
+The domain text is used to factor out of PIPS prettyprinter all layout
+considerations. It does not depend on PIPS internal representation.
+
 \domain{Text = sentences:sentence*}
 {}
+
+A text is a list of sentences.
 
 \domain{Sentence = formatted:string + unformatted}
 {}
 
+Each sentence can be either formatted and the correspoonding string
+must be printed out exactly as it is, or unformatted and line breaks
+and indentation must be generated.
+
 \domain{Unformatted = label:string x number:int x extra\_margin:int x  words:string*}
 {}
+
+Because of the Fortran origin, but it is also useful in C, a label can
+be defined as a string for each sentence. The number field is the
+statement number. The indentation is defined by field extra\_margin,
+extra because of Fortran~77 fixed input fields. Finally a list of
+words define the content of the sentence. The linefeed can be inserted
+between two words and the continuation handled if necessary.
+
+FI: I assume that the text library depends on the output language.
+
+FI: Fabien Coelho has developped another interface to output source code.
 
 \end{document}

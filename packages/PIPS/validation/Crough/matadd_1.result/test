@@ -20,13 +20,11 @@
 
       END
 /* C pretty print for module MATADD. */
-#define m 402
-
-#define n 160
-
 int
 main (int argc, char *argv[])
 {
+  static const int m = 402;
+  static const int n = 160;
   int i;
   int j;
   float a[160][402];

@@ -13,22 +13,22 @@
       COMMON/CNI/L
       DATA N1,N3,N4,N7,N10,N14,N17/1,3,4,7,10,14,17/
 
-      READ (NXYZ) I1, I2, J1, JA, K1, K2                                0001
-      REWIND (NXYZ)                                                     0002
+      READ (NXYZ) I1, I2, J1, JA, K1, K2                                0010
+      REWIND (NXYZ)                                                     0011
 C     
-      IF (J1.GE.1.AND.K1.GE.1) THEN                                     0003
-         J1 = J1+1                                                      0004
-         J2 = 2*JA+1                                                    0005
-         JA = JA+1                                                      0006
-         K1 = K1+1                                                      0007
-         CALL EXTR(N7, N17)                                             0008
-         PRINT *, T                                                     0009
-         CALL EXTR(N4, N17)                                             0010
-         PRINT *, T                                                     0011
-         CALL EXTR(N1, N17)                                             0012
-         PRINT *, T                                                     0013
-         CALL NORM(N10, N7, N4, N14, N17, I2)                           0014
-         PRINT *, T                                                     0015
+      IF (J1.GE.1.AND.K1.GE.1) THEN                                     0013
+         J1 = J1+1                                                      0014
+         J2 = 2*JA+1                                                    0015
+         JA = JA+1                                                      0016
+         K1 = K1+1                                                      0017
+         CALL EXTR(N7, N17)                                             0018
+         PRINT *, T                                                     0019
+         CALL EXTR(N4, N17)                                             0020
+         PRINT *, T                                                     0021
+         CALL EXTR(N1, N17)                                             0022
+         PRINT *, T                                                     0023
+         CALL NORM(N10, N7, N4, N14, N17, I2)                           0024
+         PRINT *, T                                                     0025
       ENDIF
       END
 
@@ -46,20 +46,20 @@ C********************************************************
       COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
       COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
       COMMON/CNI/L
-      L = NI                                                            0001
-      K = K1                                                            0002
-      DO 300 J = J1, JA                                                 0003
-         S1 = D(J, K, J, K+1)                                           0004
-         S2 = D(J, K+1, J, K+2)+S1                                      0005
-         S3 = D(J, K+2, J, K+3)+S2                                      0006
-         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0007
-         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0008
-         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0009
-         JH = J1+J2-J                                                   0010
-         T(JH,1,NC+3) = T(J,1,NC+3)                                     0011
-         T(JH,1,NC+4) = T(J,1,NC+4)                                     0012
-         T(JH,1,NC+5) = T(J,1,NC+5)                                     0013
-300      CONTINUE                                                       0014
+      L = NI                                                            0013
+      K = K1                                                            0014
+      DO 300 J = J1, JA                                                 0015
+         S1 = D(J, K, J, K+1)                                           0016
+         S2 = D(J, K+1, J, K+2)+S1                                      0017
+         S3 = D(J, K+2, J, K+3)+S2                                      0018
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0019
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0020
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0021
+         JH = J1+J2-J                                                   0022
+         T(JH,1,NC+3) = T(J,1,NC+3)                                     0023
+         T(JH,1,NC+4) = T(J,1,NC+4)                                     0024
+         T(JH,1,NC+5) = T(J,1,NC+5)                                     0025
+300      CONTINUE                                                       0026
 
       END
 
@@ -74,8 +74,8 @@ C*****************************************
       COMMON/CT/T
       COMMON/CNI/L
 C     
-      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
-     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0001
+      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0010
+     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0010
       END
 
 5- Show parallel version of EXTR.
@@ -92,19 +92,19 @@ C********************************************************
       COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
       COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
       COMMON/CNI/L
-      L = NI                                                            0001
-      K = K1                                                            0002
-      DO J = J1, JA                                                     0003
-         S1 = D(J, K, J, K+1)                                           0004
-         S2 = D(J, K+1, J, K+2)+S1                                      0005
-         S3 = D(J, K+2, J, K+3)+S2                                      0006
-         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0007
-         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0008
-         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0009
-         JH = J1+J2-J                                                   0010
-         T(JH,1,NC+3) = T(J,1,NC+3)                                     0011
-         T(JH,1,NC+4) = T(J,1,NC+4)                                     0012
-         T(JH,1,NC+5) = T(J,1,NC+5)                                     0013
+      L = NI                                                            0013
+      K = K1                                                            0014
+      DO J = J1, JA                                                     0015
+         S1 = D(J, K, J, K+1)                                           0016
+         S2 = D(J, K+1, J, K+2)+S1                                      0017
+         S3 = D(J, K+2, J, K+3)+S2                                      0018
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0019
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0020
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0021
+         JH = J1+J2-J                                                   0022
+         T(JH,1,NC+3) = T(J,1,NC+3)                                     0023
+         T(JH,1,NC+4) = T(J,1,NC+4)                                     0024
+         T(JH,1,NC+5) = T(J,1,NC+5)                                     0025
       ENDDO
 
       END
@@ -112,7 +112,8 @@ C********************************************************
 6- Show D with regions
 
 
-C  <T(PHI1,PHI2,PHI3)-R-MAY-{L<=PHI3, PHI3<=2+L}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
 
 C
       REAL FUNCTION D(J,K,JP,KP)
@@ -123,11 +124,12 @@ C*****************************************
       COMMON/CT/T
       COMMON/CNI/L
 
-C  <T(PHI1,PHI2,PHI3)-R-MAY-{L<=PHI3, PHI3<=2+L}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
 
 C     
-      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
-     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0001
+      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0010
+     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0010
       END
 
 7- Show D with MUST regions 
@@ -149,8 +151,8 @@ C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
 C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
 
 C     
-      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
-     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0001
+      D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0010
+     &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0010
       END
 
 8- Show EXTR parallelized with interprocedural information
@@ -167,23 +169,23 @@ C********************************************************
       COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
       COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
       COMMON/CNI/L
-      L = NI                                                            0001
-      K = K1                                                            0002
-      DOALL J = J1, JA                                                  0003
+      L = NI                                                            0013
+      K = K1                                                            0014
+      DOALL J = J1, JA                                                  0015
          PRIVATE S3,S2,S1
-         S1 = D(J, K, J, K+1)                                           0004
-         S2 = D(J, K+1, J, K+2)+S1                                      0005
-         S3 = D(J, K+2, J, K+3)+S2                                      0006
-         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0007
-         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0008
-         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0009
+         S1 = D(J, K, J, K+1)                                           0016
+         S2 = D(J, K+1, J, K+2)+S1                                      0017
+         S3 = D(J, K+2, J, K+3)+S2                                      0018
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))                          0019
+         T(J,1,NC+4) = S3*S1/((S2-S3)*(S2-S1))                          0020
+         T(J,1,NC+5) = S1*S2/((S3-S1)*(S3-S2))                          0021
       ENDDO
-      DOALL J = J1, JA                                                  0003
+      DOALL J = J1, JA                                                  0015
          PRIVATE JH
-         JH = J1+J2-J                                                   0010
-         T(JH,1,NC+3) = T(J,1,NC+3)                                     0011
-         T(JH,1,NC+4) = T(J,1,NC+4)                                     0012
-         T(JH,1,NC+5) = T(J,1,NC+5)                                     0013
+         JH = J1+J2-J                                                   0022
+         T(JH,1,NC+3) = T(J,1,NC+3)                                     0023
+         T(JH,1,NC+4) = T(J,1,NC+4)                                     0024
+         T(JH,1,NC+5) = T(J,1,NC+5)                                     0025
       ENDDO
 
       END
@@ -211,14 +213,14 @@ C****************************************************************
 
 C     ....
 
-      DO 300 K = K1, K2                                                 0001
-         DO 300 J = J1, JA                                              0002
+      DO 300 K = K1, K2                                                 0022
+         DO 300 J = J1, JA                                              0023
 
-            CALL PVNMUT(TI)                                             0003
-            T(J,K,NN) = S*TI(1)                                         0004
-            T(J,K,NN+1) = S*TI(2)                                       0005
-            T(J,K,NN+2) = S*TI(3)                                       0006
-300         CONTINUE                                                    0007
+            CALL PVNMUT(TI)                                             0025
+            T(J,K,NN) = S*TI(1)                                         0026
+            T(J,K,NN+1) = S*TI(2)                                       0027
+            T(J,K,NN+2) = S*TI(3)                                       0028
+300         CONTINUE                                                    0029
 
 C     ....
 
@@ -232,13 +234,13 @@ C********************************************
 C     ECRITURE DE C
 C********************************************
       DIMENSION C(3), CX(3)
-      CX(1) = 1                                                         0001
-      CX(2) = 2                                                         0002
-      CX(3) = 3                                                         0003
-      R = SQRT(CX(1)*CX(1)+CX(2)*CX(2)+CX(3)*CX(3))                     0004
-      IF (R.LT.1.E-12) R = 1.                                           0005
-      DO I = 1, 3                                                       0007
-         C(I) = CX(I)/R                                                 0008
+      CX(1) = 1                                                         0007
+      CX(2) = 2                                                         0008
+      CX(3) = 3                                                         0009
+      R = SQRT(CX(1)*CX(1)+CX(2)*CX(2)+CX(3)*CX(3))                     0010
+      IF (R.LT.1.E-12) R = 1.                                           0011
+      DO I = 1, 3                                                       0012
+         C(I) = CX(I)/R                                                 0013
       ENDDO
       END
 
@@ -275,39 +277,39 @@ C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=JA, K1<=K2}>
 
 C     ....
 
-      DO 300 K = K1, K2                                                 0001
+      DO 300 K = K1, K2                                                 0022
 
 C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==K, J1<=PHI1, PHI1<=JA, 14<=PHI3,
 C    PHI3<=16, NN==14, K1<=K, K<=K2}>
 C  <TI(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=JA, K1<=K, K<=K2}>
 C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=JA, K1<=K, K<=K2}>
 
-         DO 300 J = J1, JA                                              0002
+         DO 300 J = J1, JA                                              0023
 
 C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=J, J<=JA, K1<=K,
 C    K<=K2}>
 
 
-            CALL PVNMUT(TI)                                             0003
+            CALL PVNMUT(TI)                                             0025
 
 C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN, NN==14,
 C    J1<=J, J<=JA, K1<=K, K<=K2}>
 C  <TI(PHI1)-R-EXACT-{PHI1==1, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN) = S*TI(1)                                         0004
+            T(J,K,NN) = S*TI(1)                                         0026
 
 C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+1, NN==14,
 C    J1<=J, J<=JA, K1<=K, K<=K2}>
 C  <TI(PHI1)-R-EXACT-{PHI1==2, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN+1) = S*TI(2)                                       0005
+            T(J,K,NN+1) = S*TI(2)                                       0027
 
 C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+2, NN==14,
 C    J1<=J, J<=JA, K1<=K, K<=K2}>
 C  <TI(PHI1)-R-EXACT-{PHI1==3, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN+2) = S*TI(3)                                       0006
-300         CONTINUE                                                    0007
+            T(J,K,NN+2) = S*TI(3)                                       0028
+300         CONTINUE                                                    0029
 
 C     ....
 
@@ -336,23 +338,23 @@ C****************************************************************
 
 C     ....
 
-      DO 300 K = K1, K2                                                 0001
-         DO 300 J = J1, JA                                              0002
+      DO 300 K = K1, K2                                                 0022
+         DO 300 J = J1, JA                                              0023
 
-            CALL PVNMUT(TI)                                             0003
+            CALL PVNMUT(TI)                                             0025
 
 C  <TI(PHI1)-IN-EXACT-{PHI1==1, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN) = S*TI(1)                                         0004
+            T(J,K,NN) = S*TI(1)                                         0026
 
 C  <TI(PHI1)-IN-EXACT-{PHI1==2, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN+1) = S*TI(2)                                       0005
+            T(J,K,NN+1) = S*TI(2)                                       0027
 
 C  <TI(PHI1)-IN-EXACT-{PHI1==3, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN+2) = S*TI(3)                                       0006
-300         CONTINUE                                                    0007
+            T(J,K,NN+2) = S*TI(3)                                       0028
+300         CONTINUE                                                    0029
 
 C     ....
 
@@ -391,38 +393,38 @@ C    PHI3<=16, MI==4, NC==17, NI==7, NN==14}>
 
 C     ....
 
-      DO 300 K = K1, K2                                                 0001
+      DO 300 K = K1, K2                                                 0022
 
 C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI2==K, J1<=PHI1, 1<=PHI1, PHI1<=JA,
 C    PHI1<=52, 1<=PHI2, PHI2<=21, 14<=PHI3, PHI3<=16, MI==4, NC==17,
 C    NI==7, NN==14, K1<=K, K<=K2}>
 
-         DO 300 J = J1, JA                                              0002
+         DO 300 J = J1, JA                                              0023
 
 C  <TI(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=3, NN==14, J1<=J, J<=JA, K1<=K,
 C    K<=K2}>
 
 
-            CALL PVNMUT(TI)                                             0003
+            CALL PVNMUT(TI)                                             0025
 
 C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI1==J, K==PHI2, PHI3==NN, 1<=PHI1,
 C    PHI1<=52, 1<=PHI2, PHI2<=21, MI==4, NC==17, NI==7, NN==14, J1<=J,
 C    J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN) = S*TI(1)                                         0004
+            T(J,K,NN) = S*TI(1)                                         0026
 
 C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{J==PHI1, PHI2==K, PHI3==NN+1,
 C    1<=PHI1, PHI1<=52, 1<=PHI2, PHI2<=21, MI==4, NC==17, NI==7,
 C    NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN+1) = S*TI(2)                                       0005
+            T(J,K,NN+1) = S*TI(2)                                       0027
 
 C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI1==J, K==PHI2, PHI3==NN+2,
 C    1<=PHI1, PHI1<=52, 1<=PHI2, PHI2<=21, MI==4, NC==17, NI==7,
 C    NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
-            T(J,K,NN+2) = S*TI(3)                                       0006
-300         CONTINUE                                                    0007
+            T(J,K,NN+2) = S*TI(3)                                       0028
+300         CONTINUE                                                    0029
 
 C     ....
 
@@ -451,15 +453,15 @@ C****************************************************************
 
 C     ....
 
-      DOALL K = K1, K2                                                  0001
+      DOALL K = K1, K2                                                  0022
          PRIVATE J
-         DOALL J = J1, JA                                               0002
+         DOALL J = J1, JA                                               0023
             PRIVATE TI(1:3)
 
-            CALL PVNMUT(TI)                                             0003
-            T(J,K,NN) = S*TI(1)                                         0004
-            T(J,K,NN+1) = S*TI(2)                                       0005
-            T(J,K,NN+2) = S*TI(3)                                       0006
+            CALL PVNMUT(TI)                                             0025
+            T(J,K,NN) = S*TI(1)                                         0026
+            T(J,K,NN+1) = S*TI(2)                                       0027
+            T(J,K,NN+2) = S*TI(3)                                       0028
          ENDDO
       ENDDO
 

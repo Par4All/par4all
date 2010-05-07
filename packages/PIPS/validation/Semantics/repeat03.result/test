@@ -24,7 +24,7 @@ void getimage(char *filename)
    }
    while ((c = fgetc(fp))=='#');
    /* Skip comment lines */
-
+   
    fclose(fp);
 }
 void getimage(char *filename)
@@ -39,7 +39,7 @@ void getimage(char *filename)
    }
    while ((c = fgetc(fp))=='#');
    /* Skip comment lines */
-
+   
    fclose(fp);
 }
 Regenerate the sources from the PIPS transformed code:

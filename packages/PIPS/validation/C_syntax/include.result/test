@@ -1400,7 +1400,7 @@ typedef struct __gconv_info {
 } *__gconv_t;
 typedef union {
    struct __gconv_info __cd;
-   struct  {struct __gconv_info __cd; struct __gconv_step_data __data;} __combined;
+   struct {struct __gconv_info __cd; struct __gconv_step_data __data;} __combined;
 } _G_iconv_t;
 
 typedef int _G_int16_t;

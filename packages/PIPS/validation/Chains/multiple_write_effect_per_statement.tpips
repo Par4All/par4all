@@ -1,0 +1,10 @@
+delete multiple_write_effect_per_statement
+
+create multiple_write_effect_per_statement multiple_write_effect_per_statement.c
+
+setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
+apply  PRINT_WHOLE_DEPENDENCE_GRAPH[multiple]
+display DG_FILE[multiple]
+
+close multiple_write_effect_per_statement
+delete multiple_write_effect_per_statement

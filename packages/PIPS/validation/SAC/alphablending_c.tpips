@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete alphablending_c
-create alphablending_c alphablending.c include/SIMD.c
+setenv WS="alphablending_c"
+delete $WS
+create $WS alphablending.c include/SIMD.c
 
 echo
 echo Initial code
@@ -18,10 +19,9 @@ echo
 display PRINTED_FILE
 apply UNSPLIT
 
-shell ./compileC.sh alphablending_c alphablending.c test.c
-shell gcc -O3 -I$. -march=native -c test.c
-shell rm test.c test.o
+shell ./compileC.sh $WS alphablending.c $WS.database/Tmp/test.c
+shell gcc -O3 -I$. -march=native -c  $WS.database/Tmp/test.c
 
 close
-delete alphablending_c
+delete $WS
 quit

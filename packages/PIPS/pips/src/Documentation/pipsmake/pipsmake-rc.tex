@@ -1999,7 +1999,12 @@ effects in which intermediary access paths may refer to different
 memory locations at different program points; regular {\tt effects}
 are constant path effects, which means that their intermediary access
 paths all refer to unique memory locations. The same distinction holds
-for regions (see section~\ref{subsection-array-regions}).
+for regions (see section~\ref{subsection-array-regions}). 
+
+{\tt proper\_effects\_with\_points\_to} is an alternative to compute
+constant path proper effects using points-to analysis (see
+subsection~\ref{subsection-points-to-analysis}). This is still highly
+experimental.
 
 Summary effects (see
 Section~\ref{subsubection-summary-data-flow-information}) of a called
@@ -2010,11 +2015,7 @@ binding. If too many actual arguments are defined, a user warning is
 issued but the processing goes on because a simple semantics is
 available: ignore useless actual arguments. If too few actual
 arguments are provided, a user error is issued because the effects of
-the call are not defined. It would be necessary to assume either a
-general \verb+READ+ or a general \verb+WRITE+ for each read or written
-formal parameter with no actual counterpart\marginpar{This is
-implemented for calls by reference as in Fortran. The call-by-value
-implementation is on-going. See Amira Mensi.}.
+the call are not defined. 
 
 Variables private to loops are handled like regular variable.
 
@@ -2029,6 +2030,14 @@ proper_pointer_effects                  > MODULE.proper_pointer_effects
 proper_effects                  > MODULE.proper_effects
         < PROGRAM.entities
         < MODULE.code
+        < CALLEES.summary_effects
+\end{PipsMake}
+
+\begin{PipsMake}
+proper_effects_with_points_to > MODULE.proper_effects
+        < PROGRAM.entities
+        < MODULE.code        
+        < MODULE.points_to_list
         < CALLEES.summary_effects
 \end{PipsMake}
 
@@ -4612,6 +4621,8 @@ intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
 \end{PipsMake}
 
 \subsection{Points to Analysis}
+\label{subsection-points-to-analysis}
+\index{Points to Analysis}
 
 points\_to\_analysis phase.
 
@@ -5430,6 +5441,12 @@ This function initialize operator matchings used by \PipsPassRef{simdizer} for s
 simd_operator_mappings > PROGRAM.simd_operator_mappings
 \end{PipsMake}
 
+\begin{PipsMake}
+simdizer_init  > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{simdizer}
 Function \PipsPassRef{simdizer} is an attempt at generating SIMD code for SIMD
 multimedia instruction set such as MMX, SSE2, VIS,... This
@@ -5442,6 +5459,7 @@ alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
                             > MODULE.callees
+		! MODULE.simdizer_init
 		< PROGRAM.simd_treematch
 		< PROGRAM.simd_operator_mappings
         < PROGRAM.entities
@@ -5453,12 +5471,6 @@ When set to true, following property tells the simdizer to try to padd arrays wh
 \begin{PipsProp}{SIMDIZER_ALLOW_PADDING}
 SIMDIZER_ALLOW_PADDING FALSE
 \end{PipsProp}
-
-A comma seperated list of commutative simd operators:
-\begin{PipsProp}{SIMDIZER_COMMUTATIVE_OPERATORS}
-SIMDIZER_COMMUTATIVE_OPERATORS ""
-\end{PipsProp}
-
 
 \begin{PipsPass}{simd_loop_const_elim}
 This phase tries to optimize the SIMD code by removing from the loop body
@@ -9372,7 +9384,7 @@ transformation_test    > MODULE.code
 \label{subsection-open_mp_pragma}
 \index{OpenMP}
 
-\begin{PipsPass}{OMP Pragma}
+\begin{PipsPass}{ompify_code}
 The following transformation reads the sequential code and generates OpenMP pragma as
 an extension to statements. The pragmas produced are based on the information
 previously computed by differents phases and already stores in the pips internal
@@ -9396,7 +9408,7 @@ otherwise pragmas would be generated as expressions.
 PRAGMA_TYPE "expr"
 \end{PipsProp}
 
-\begin{PipsPass}{Loop parallel threshold}
+\begin{PipsPass}{omp_loop_parallel_threshold_set}
 The PIPS phase  OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET allows to add the OpenMP
 \verb|if| clause to all the OpenMP pragmas. Afterwodrs, the number of iteraion
 of the loop will be evaluated dynamically and compared to the defined threshold.

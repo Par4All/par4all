@@ -1,4 +1,3 @@
-/home/local/fabien/PIPS/prod/pips/bin/pips -f $VDIR/mm03.f mm03
 C     
 C     MATRIX MULTIPLICATION - VERSION WITH CALL TO SAXPY
 C     

@@ -11,10 +11,6 @@ int caller()
    short a[40][40], b[40][40], c[40][40];
    alphablending(a, b, c);
 }
-
-extern void alphablending(short src0[40][40], short src1[40][40], short result[40][40]);
-
-extern int caller();
 tiled code
 void alphablending(short src0[40][40], short src1[40][40], short result[40][40])
 {

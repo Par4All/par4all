@@ -1,0 +1,395 @@
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      DO 100 I = 1, N
+         S = S+X(I)*Y(I)
+100      CONTINUE
+
+      DOTPRODUCT = S
+      END
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      LU_NUB0 = (N-1+1)/1
+      LU_IB0 = MOD(LU_NUB0, 3)
+      DO 99999 LU_IND0 = 0, LU_IB0-1
+         S = S+X(LU_IND0*1+1)*Y(LU_IND0*1+1)
+99999    CONTINUE
+      DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 3
+         S = S+X((LU_IND0+0)*1+1)*Y((LU_IND0+0)*1+1)
+         S = S+X((LU_IND0+1)*1+1)*Y((LU_IND0+1)*1+1)
+         S = S+X((LU_IND0+2)*1+1)*Y((LU_IND0+2)*1+1)
+99998    CONTINUE
+      I = 1+MAX0(LU_NUB0, 0)*1
+
+      DOTPRODUCT = S
+      END
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      LU_NUB0 = 90
+      LU_IB0 = 0
+      DO 99999 LU_IND0 = 0, LU_IB0-1
+         S = S+X(LU_IND0+1)*Y(LU_IND0+1)
+99999    CONTINUE
+      DO 99998 LU_IND0 = LU_IB0, 89, 3
+         S = S+X(LU_IND0+1)*Y(LU_IND0+1)
+         S = S+X(LU_IND0+2)*Y(LU_IND0+2)
+         S = S+X(LU_IND0+3)*Y(LU_IND0+3)
+99998    CONTINUE
+      I = 91
+
+      DOTPRODUCT = S
+      END
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      LU_NUB0 = 90
+      LU_IB0 = 0
+      DO 99999 LU_IND0 = 0, LU_IB0-1
+         I_0 = LU_IND0+1
+         I_1 = LU_IND0+1
+         F_0 = X(I_0)
+         F_1 = Y(I_1)
+         F_2 = F_0*F_1
+         S = S+F_2
+99999    CONTINUE
+      DO 99998 LU_IND0 = LU_IB0, 89, 3
+         I_2 = LU_IND0+1
+         I_3 = LU_IND0+1
+         F_3 = X(I_2)
+         F_4 = Y(I_3)
+         F_5 = F_3*F_4
+         S = S+F_5
+         I_4 = LU_IND0+2
+         I_5 = LU_IND0+2
+         F_6 = X(I_4)
+         F_7 = Y(I_5)
+         F_8 = F_6*F_7
+         S = S+F_8
+         I_6 = LU_IND0+3
+         I_7 = LU_IND0+3
+         F_9 = X(I_6)
+         F_10 = Y(I_7)
+         F_11 = F_9*F_10
+         S = S+F_11
+99998    CONTINUE
+      I = 91
+
+      DOTPRODUCT = S
+      END
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      LU_IB0 = 0
+      DO 99999 LU_IND0 = 0, LU_IB0-1
+         I_0 = LU_IND0+1
+         I_1 = LU_IND0+1
+         F_0 = X(I_0)
+         F_1 = Y(I_1)
+         F_2 = F_0*F_1
+         S = S+F_2
+99999    CONTINUE
+      DO 99998 LU_IND0 = LU_IB0, 89, 3
+         I_2 = LU_IND0+1
+         I_3 = LU_IND0+1
+         F_3 = X(I_2)
+         F_4 = Y(I_3)
+         F_5 = F_3*F_4
+         S = S+F_5
+         I_4 = LU_IND0+2
+         I_5 = LU_IND0+2
+         F_6 = X(I_4)
+         F_7 = Y(I_5)
+         F_8 = F_6*F_7
+         S = S+F_8
+         I_6 = LU_IND0+3
+         I_7 = LU_IND0+3
+         F_9 = X(I_6)
+         F_10 = Y(I_7)
+         F_11 = F_9*F_10
+         S = S+F_11
+99998    CONTINUE
+
+      DOTPRODUCT = S
+      END
+
+      PROGRAM DEMO1
+
+      PARAMETER (IDIM = 90)
+      REAL  V1(IDIM), V2(IDIM), RESULT
+
+      DO I = 1, IDIM
+         V1(I) = FLOAT(I)
+         V2(I) = 2.
+      ENDDO
+
+      RESULT = DOTPRODUCT(IDIM, V1, V2)
+      PRINT *, "result =", RESULT
+      END
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      LU_IB0 = 0
+      DO 99999 LU_IND0 = 0, -1
+         I_0 = LU_IND0+1
+         I_1 = LU_IND0+1
+         F_0 = X(I_0)
+         F_1 = Y(I_1)
+         F_2 = F_0*F_1
+         S = S+F_2
+99999    CONTINUE
+      DO 99998 LU_IND0 = 0, 89, 3
+         I_2 = LU_IND0+1
+         I_3 = LU_IND0+1
+         F_3 = X(I_2)
+         F_4 = Y(I_3)
+         F_5 = F_3*F_4
+         S = S+F_5
+         I_4 = LU_IND0+2
+         I_5 = LU_IND0+2
+         F_6 = X(I_4)
+         F_7 = Y(I_5)
+         F_8 = F_6*F_7
+         S = S+F_8
+         I_6 = LU_IND0+3
+         I_7 = LU_IND0+3
+         F_9 = X(I_6)
+         F_10 = Y(I_7)
+         F_11 = F_9*F_10
+         S = S+F_11
+99998    CONTINUE
+
+      DOTPRODUCT = S
+      END
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      LU_IB0 = 0
+      LU_IND0 = 0
+      DO 99998 LU_IND0 = 0, 89, 3
+         I_2 = LU_IND0+1
+         I_3 = LU_IND0+1
+         F_3 = X(I_2)
+         F_4 = Y(I_3)
+         F_5 = F_3*F_4
+         S = S+F_5
+         I_4 = LU_IND0+2
+         I_5 = LU_IND0+2
+         F_6 = X(I_4)
+         F_7 = Y(I_5)
+         F_8 = F_6*F_7
+         S = S+F_8
+         I_6 = LU_IND0+3
+         I_7 = LU_IND0+3
+         F_9 = X(I_6)
+         F_10 = Y(I_7)
+         F_11 = F_9*F_10
+         S = S+F_11
+
+      DOTPRODUCT = S
+      END
+      REAL FUNCTION DOTPRODUCT(N,X,Y)
+      
+      REAL X(N), Y(N)
+      REAL S
+      INTEGER I
+
+      S = 0.
+      DO 99998 LU_IND0 = 0, 89, 3
+         I_2 = LU_IND0+1
+         I_3 = LU_IND0+1
+         F_3 = X(I_2)
+         F_4 = Y(I_3)
+         F_5 = F_3*F_4
+         S = S+F_5
+         I_4 = LU_IND0+2
+         I_5 = LU_IND0+2
+         F_6 = X(I_4)
+         F_7 = Y(I_5)
+         F_8 = F_6*F_7
+         S = S+F_8
+         I_6 = LU_IND0+3
+         I_7 = LU_IND0+3
+         F_9 = X(I_6)
+         F_10 = Y(I_7)
+         F_11 = F_9*F_10
+         S = S+F_11
+
+      DOTPRODUCT = S
+      END
+      REAL*4 FUNCTION DOTPRODUCT(N, X, Y)
+      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, LU_IND0, LU_IB0
+     &, LU_NUB0, N, I
+      REAL*4 F_11, F_10, F_9, F_8, F_7, F_6, F_5, F_4, F_3, F_2, F_1
+     &, F_0, X(1:N), Y(1:N), S
+
+      S = 0.
+      DO 99998 LU_IND0 = 0, 89, 3
+         I_2 = LU_IND0+1
+         I_3 = LU_IND0+1
+         F_3 = X(I_2)
+         F_4 = Y(I_3)
+         F_5 = F_3*F_4
+         S = S+F_5
+         I_4 = LU_IND0+2
+         I_5 = LU_IND0+2
+         F_6 = X(I_4)
+         F_7 = Y(I_5)
+         F_8 = F_6*F_7
+         S = S+F_8
+         I_6 = LU_IND0+3
+         I_7 = LU_IND0+3
+         F_9 = X(I_6)
+         F_10 = Y(I_7)
+         F_11 = F_9*F_10
+         S = S+F_11
+
+      DOTPRODUCT = S
+      END
+
+C  P() {N==90}
+
+      REAL*4 FUNCTION DOTPRODUCT(N, X, Y)
+      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, LU_IND0, LU_IB0
+     &, LU_NUB0, N, I
+      REAL*4 F_11, F_10, F_9, F_8, F_7, F_6, F_5, F_4, F_3, F_2, F_1
+     &, F_0, X(1:N), Y(1:N), S
+
+C  P() {N==90}
+
+
+      S = 0.
+
+C  P() {N==90}
+
+      DO 99998 LU_IND0 = 0, 89, 3
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {N==90, 0<=LU_IND0, LU_IND0<=89}
+
+         I_2 = LU_IND0+1
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==LU_IND0+1, N==90, 1<=I_2,
+C    I_2<=90}
+
+         I_3 = LU_IND0+1
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==LU_IND0+1,
+C    N==90, 1<=I_2, I_2<=90}
+
+         F_3 = X(I_2)
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==LU_IND0+1,
+C    N==90, 1<=I_2, I_2<=90}
+
+         F_4 = Y(I_3)
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==LU_IND0+1,
+C    N==90, 1<=I_2, I_2<=90}
+
+         F_5 = F_3*F_4
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==LU_IND0+1,
+C    N==90, 1<=I_2, I_2<=90}
+
+         S = S+F_5
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==LU_IND0+1,
+C    N==90, 1<=I_2, I_2<=90}
+
+         I_4 = LU_IND0+2
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+
+         I_5 = LU_IND0+2
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+
+         F_6 = X(I_4)
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+
+         F_7 = Y(I_5)
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+
+         F_8 = F_6*F_7
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+
+         S = S+F_8
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+
+         I_6 = LU_IND0+3
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==I_6-2, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+
+         I_7 = LU_IND0+3
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
+C    1<=I_2, I_2<=90}
+
+         F_9 = X(I_6)
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
+C    1<=I_2, I_2<=90}
+
+         F_10 = Y(I_7)
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
+C    1<=I_2, I_2<=90}
+
+         F_11 = F_9*F_10
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
+C    1<=I_2, I_2<=90}
+
+         S = S+F_11
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0-2, N==90,
+C    88<=I_2, I_2<=90}
+
+
+      DOTPRODUCT = S
+      END

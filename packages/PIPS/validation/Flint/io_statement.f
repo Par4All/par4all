@@ -26,8 +26,8 @@ C     Like: ERR, END
 C     ===================================
       READ(UNIT=12345, FMT=0, ERR=1234, END=1234)
 
-      READ(UNIT=12345, FMT=0, ERR=L, END=I)
-      READ(UNIT=12345, FMT=0, ERR=1234, END=CH)
+!      READ(UNIT=12345, FMT=0, ERR=L, END=I)
+!      READ(UNIT=12345, FMT=0, ERR=1234, END=CH)
 
 C     Specifier must be a label statement, integer or character expression
 C     Like: FMT, REC
@@ -77,6 +77,3 @@ C     ======================================================
       INQUIRE(IOSTAT=I, NAME="STRING", SEQUENTIAL=12, DIRECT=I)
 
       END
-
-
-

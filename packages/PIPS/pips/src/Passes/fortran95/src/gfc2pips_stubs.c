@@ -65,7 +65,8 @@ string entity_minimal_name( entity e ) {
 }
 
 string compilation_unit_of_module(string module_name) {
-  STUB_ERROR();
+  STUB_WARNING();
+  return "";
 }
 
 

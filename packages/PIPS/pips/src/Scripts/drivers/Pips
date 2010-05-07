@@ -352,7 +352,7 @@ which_pips()
 
 pips_version=${pips_version:-`which_pips`}
 
-$VERBOSE $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM
+$VERBOSE $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM >&2
 
 $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM || error
 

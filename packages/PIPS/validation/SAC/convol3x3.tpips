@@ -123,4 +123,5 @@ echo
 #display PRINTED_FILE
 
 close
+delete CONVOL
 quit

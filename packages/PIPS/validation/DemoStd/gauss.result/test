@@ -1,4 +1,3 @@
-/home/local/fabien/PIPS/prod/pips/bin/pips -f $VDIR/gauss.f gauss
 C
 C     GAUSS METHOD
 C

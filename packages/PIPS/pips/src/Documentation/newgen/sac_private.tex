@@ -110,20 +110,7 @@ arguments (list of \verb+patternArg+).
 
 \section*{Statement information}
 
-
-\domain{vectorElement = statement:simdStatementInfo x vectorIndex:int x element:int}
-{}
-
-\domain{statementArgument = expression x dependances:vectorElement*}
-{}
-
-\domain{simdStatementInfo = opcode x commut:int x nbArgs:int x vectors:entity[16] x arguments:statementArgument[48]}
-{}
-
-\domain{statementInfo = simd:simdStatementInfo + nonsimd:statement}
-{}
-
-\domain{argumentInfo = expression x placesAvailable:vectorElement*}
+\domain{simdstatement = opcode x nbArgs:int x vectors:entity[16] x arguments:expression[48]}
 {}
 
 \section*{Transformation}

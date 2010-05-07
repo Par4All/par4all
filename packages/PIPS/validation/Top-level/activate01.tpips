@@ -7,5 +7,5 @@ create activate01 activate01.c
 display PARALLELPRINTED_FILE
 close
 # shell cat activate01.database/Warnings
-# delete activate01
+delete activate01
 quit

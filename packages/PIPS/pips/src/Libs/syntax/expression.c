@@ -108,21 +108,61 @@ cons *l;
     expression er;
 
     if (!syntax_reference_p(v))
-	    FatalError("MakeImpliedDo", "function call as DO variable\n");
+      FatalError("MakeImpliedDo", "function call as DO variable\n");
 
     if (reference_indices(syntax_reference(v)) != NULL)
-	    FatalError("MakeImpliedDo", "variable reference as DO variable\n");
+      FatalError("MakeImpliedDo", "variable reference as DO variable\n");
 
     /* the range is enclosed in an expression */
-    er = make_expression(make_syntax(is_syntax_range, r), 
-			 normalized_undefined);
+    er = make_expression(make_syntax(is_syntax_range, r),
+       normalized_undefined);
 
-    l = CONS(EXPRESSION, make_expression(v, normalized_undefined), 
-	     CONS(EXPRESSION, er, l));
+    l = CONS(EXPRESSION, make_expression(v, normalized_undefined),
+       CONS(EXPRESSION, er, l));
 
     c = make_call(CreateIntrinsic(IMPLIED_DO_NAME), l);
-    return(make_expression(make_syntax(is_syntax_call, c), 
-			   normalized_undefined));
+    return(make_expression(make_syntax(is_syntax_call, c),
+         normalized_undefined));
+}
+
+
+
+/*
+ * @brief Convert a loop to an IMPLIED-DO
+ */
+expression loop_to_implieddo( loop l ) {
+  syntax index = make_syntax_reference( make_reference( loop_index(l), NIL ) );
+  range r = loop_range(l);
+
+  list make_arg_from_stmt( statement stmt, list args ) {
+    instruction i = statement_instruction(stmt);
+    expression expr;
+    if ( instruction_expression_p(i) ) {
+      expr = instruction_expression(i);
+    } else if ( instruction_loop_p(i) ) {
+      expr = loop_to_implieddo( instruction_loop(i) );
+    } else {
+      pips_internal_error("We can't handle anything other than expression"
+          "and loop for loop-to-implieddo conversion.\n");
+    }
+    args = CONS(EXPRESSION,expr, args );
+    return args;
+  }
+
+  /* Fix last parameter */
+  statement body = loop_body(l);
+  instruction ibody = statement_instruction(body);
+  list args = NIL;
+  if(instruction_sequence_p(ibody)) {
+    sequence seq = instruction_sequence(ibody);
+    FOREACH(statement,stmt,sequence_statements(seq)) {
+      args = make_arg_from_stmt(stmt, args);
+    }
+    args = gen_nreverse(args);
+  } else {
+    args = make_arg_from_stmt(body, args);
+  }
+  return MakeImpliedDo(index, r, args);
 }
 
 

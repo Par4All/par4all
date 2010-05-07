@@ -5,5 +5,5 @@ C     See default_module_name() for a case with no main module but with
 C     several modules.
 
       SUBROUTINE NO_MAIN_MODULE
-      PRINT *, 'coucou'                                                 0001
+      PRINT *, 'coucou'                                                 0008
       END

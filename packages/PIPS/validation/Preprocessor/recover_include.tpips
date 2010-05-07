@@ -1,0 +1,20 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="recover_include"
+delete $WS
+
+shell cp $WS.c /tmp/$WS.c
+shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' $WS.c
+create $WS $WS.c
+shell rm $WS.c
+shell mv /tmp/$WS.c $WS.c
+
+echo [original module]
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT[%ALL]
+shell sed -i -r -e 's,//pips_begin <([^>]+)>,#include <\1>\n//pips_begin <\1>,g' $WS.database/Src/$WS.c
+shell grep '//pips_begin' $WS.database/Src/$WS.c | sed -e 's,//pips_begin ,,g' | while read include ; do sed -i -r -e "/\/\/pips_begin $include/,/\/\/pips_end $include/ d" $WS.database/Src/$WS.c ; done
+echo [after unsplit and recovering]
+shell cat $WS.database/Src/$WS.c
+close
+delete $WS
