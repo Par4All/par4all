@@ -254,7 +254,9 @@ void inlining_regenerate_labels(statement s, string new_module)
     if(!entity_empty_label_p(lbl))
     {
         if( !entity_undefined_p(find_label_entity(new_module,label_local_name(lbl))))
+        {
             statement_label(s)=lbl=make_new_label(new_module);
+        }
         else
             FindOrCreateEntity(new_module,entity_local_name(lbl));
         if( statement_loop_p(s) )
@@ -314,15 +316,16 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     /* add external declartions for all extern referenced entities it
      * is needed because inlined module and current module may not
      * share the same compilation unit.
+     * Not relevant for fortran
      *
      * FI: However, it would be nice to check first if the entity is not
      * already in the scope for the function or in the scope of its
      * compilation unit (OK, the later is difficult because the order
      * of declarations has to be taken into account).
      */
+    if(c_module_p(get_current_module_entity()))
     {
         string cu_name = compilation_unit_of_module(get_current_module_name());
-        //string mln = module_local_name(inlined_module(p));
         set inlined_referenced_entities = get_referenced_entities(expanded);
         list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
         set_free(inlined_referenced_entities);
@@ -362,6 +365,52 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             }
         }
         gen_free_list(lire);
+    }
+    /* we have anothe rproblem with fortran, where declaration are  not handled like in C
+     * another side effect of 'declarations as statements' */
+    else
+    {
+        bool did_something = false;
+        FOREACH(ENTITY,e,entity_declarations(inlined_module(p)))
+        {
+            if(!entity_area_p(e))
+            {
+                entity new;
+                if(entity_variable_p(e)) {
+                    if(entity_scalar_p(e)) {
+                        new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
+                    }
+                    else {
+                        new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
+                                copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
+                    }
+                }
+                else
+                {
+                    /*sg: unsafe*/
+                    bool regenerate = entity_undefined_p(FindEntity(get_current_module_name(),entity_local_name(e)));
+                    new=FindOrCreateEntity(get_current_module_name(),entity_local_name(e));
+                    if(regenerate)
+                    {
+                        entity_storage(new)=copy_storage(entity_storage(e));
+                        entity_initial(new)=copy_value(entity_initial(e));
+                        entity_type(new)=copy_type(entity_type(e));
+                    }
+                }
+                gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
+                AddEntityToDeclarations(new,get_current_module_entity());
+                replace_entity(expanded,e,new);
+                did_something=true;
+            }
+        }
+        if(did_something)
+        {
+            string decls = code_decls_text(entity_code(get_current_module_entity()));
+            if(decls && !empty_string_p(decls)){
+                free(decls);
+                code_decls_text(entity_code(get_current_module_entity()))=strdup("");
+            }
+        }
     }
 
 
