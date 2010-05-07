@@ -1079,6 +1079,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 {
     entity f = call_function(c);
     type rt = functional_result(type_functional(entity_type(f)));
+    pips_assert("not calling basic_of_intrinsic on something returing void",!type_void_p(rt));
     basic rb = copy_basic(variable_basic(type_variable(rt)));
 
     pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
@@ -2687,6 +2688,19 @@ type call_to_functional_type(call c, bool ultimate_p)
   pips_assert("The typedef type is functional", type_functional_p(rt));
 
   return rt;
+}
+bool type_struct_variable_p(type t)
+{
+    t = ultimate_type(t);
+    return basic_derived_p(variable_basic(type_variable(t))) &&
+         entity_struct_p(basic_derived(variable_basic(type_variable(t))));
+}
+
+bool type_union_variable_p(type t)
+{
+    t = ultimate_type(t);
+    return basic_derived_p(variable_basic(type_variable(t))) &&
+         entity_union_p(basic_derived(variable_basic(type_variable(t))));
 }
 
 /* Recursive number of fields in a data structure...

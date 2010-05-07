@@ -81,12 +81,6 @@ bool simplify_subscripts(string module_name)
 /**************************************************************
  * SPLIT_STRUCTURES
  */
-static bool type_struct_variable_p(type t)
-{
-    t = ultimate_type(t);
-    return basic_derived_p(variable_basic(type_variable(t))) &&
-         entity_struct_p(basic_derived(variable_basic(type_variable(t))));
-}
 
 static
 bool type_pointer_on_struct_variable_p(type t)

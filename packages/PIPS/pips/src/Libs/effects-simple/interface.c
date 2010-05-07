@@ -116,6 +116,18 @@ proper_effects(string module_name)
 }
 
 bool 
+proper_effects_with_points_to(string module_name)
+{
+    bool ok;
+    set_methods_for_proper_simple_effects();
+    set_use_points_to(true);
+    ok = proper_effects_engine(module_name);
+    reset_use_points_to();
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool 
 summary_effects(string module_name)
 {
     bool ok;

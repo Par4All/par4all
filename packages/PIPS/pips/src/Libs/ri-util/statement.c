@@ -1030,13 +1030,13 @@ statement_loop(statement s)
 }
 
 
-/* Get the loop of a statement */
-loop
+/* Get the whileloop of a statement */
+whileloop
 statement_whileloop(statement s)
 {
-  pips_assert("statement_loop", statement_loop_p(s));
+  pips_assert("statement_whileloop", statement_whileloop_p(s));
 
-  return instruction_loop(statement_instruction(s));
+  return instruction_whileloop(statement_instruction(s));
 }
 
 

@@ -635,6 +635,16 @@ static sentence sentence_basic_declaration(entity e)
 		       make_unformatted(NULL, 0, 0, decl)));
 }
 
+static sentence sentence_f95use_declaration( entity e ) {
+  list decl = NIL;
+  decl = CHAIN_SWORD(decl, entity_local_name(e));
+
+  return ( make_sentence( is_sentence_unformatted, make_unformatted( NULL,
+                                                                     0,
+                                                                     0,
+                                                                     decl ) ) );
+}
+
 static sentence sentence_external(entity f)
 {
   list pc = NIL;
@@ -1405,7 +1415,7 @@ static text text_entity_declaration(entity module,
     ph1 = NIL, ph2 = NIL, ph4 = NIL, ph8 = NIL,
     pf4 = NIL, pf8 = NIL,
     pl = NIL,
-    pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL;
+    pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL, uses = NIL;
   list * ppi=NULL;
   list * pph=NULL;
   text r, t_chars = make_text(NIL), t_area = make_text(NIL);
@@ -1482,7 +1492,9 @@ static text text_entity_declaration(entity module,
       if (skip_it)
 	{
 	  pips_debug(5, "skipping function %s\n", entity_name(e));
-	}
+  } else if ( entity_f95use_p(e) ) {
+    uses = CONS(SENTENCE, sentence_f95use_declaration(e), uses);
+  }
       else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
 	{
 	  pips_debug(5, "skipping entity %s\n", entity_name(e));
@@ -1681,7 +1693,8 @@ static text text_entity_declaration(entity module,
   /* usually they are sorted in order, and appended backwards,
    * hence the reversion.
    */
-  r = make_text(gen_nreverse(before));
+  r = make_text( uses );
+  MERGE_TEXTS(r, make_text( gen_nreverse( before ) ));
 
   MERGE_TEXTS(r, text_of_parameters(lparam));
   gen_free_list(lparam), lparam = NIL;
@@ -2202,7 +2215,8 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pips_debug(9,"Struct type ... with name = %s\n", sname);
 
       pc = CHAIN_SWORD(pc,"struct ");
-      if(strstr(sname,DUMMY_STRUCT_PREFIX)==NULL) {
+      // hmmm... name may be an empty list... and the sname test seems true
+      if(name && strstr(sname,DUMMY_STRUCT_PREFIX)==NULL) {
 	pc = gen_nconc(pc,name);
 	pc = CHAIN_SWORD(pc," ");
       }

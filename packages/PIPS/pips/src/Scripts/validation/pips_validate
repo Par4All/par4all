@@ -95,6 +95,9 @@ archive_dir_basename=SUMMARY_Archive
 # Whether to run with some timeout
 timeout=''
 
+# Whether to show 'passed' validation explicitely
+passed=
+
 # fix collation (sort) order to default ASCII for all validations
 unset LANG LC_ALL LC_COLLATE
 export LC_ALL=C
@@ -171,6 +174,7 @@ while [ "$1" ] ; do
       --tpips=*) tpips=${opt#*=} ;;
       -p|--pips) pips=$1 ; shift ;;
       --pips=*) pips=${opt#*=} ;;
+      --passed) passed=1 ;;
       # directories to use
       -V|--valid) vdir=$1 ; shift ;;
       --valid=*) vdir=${opt#*=} ;;
@@ -283,13 +287,16 @@ function validate_file()
       echo "  of this file as the reference."
     else
       verb 1 "skipping $file: no matching result directory"
-      echo "skipped: ${file#$vdir/}" >> $summary
+      echo "skipped: ${file#$vdir/}" >> $summary.tmp
+      # hmmm... uncount if not result directory
+      let dones--
       return 0
     fi
   elif [[ ! -f $full_name.result/test && ! -f $full_name.result/test.$arch ]]
   then
     verb 1 "skipping $file: no matching result test file"
-    echo "skipped: ${file#$vdir/}" >> $summary
+    echo "skipped: ${file#$vdir/}" >> $summary.tmp
+    # hmmm... do not uncount, this is inconsistent...
     return 0
   fi
 
@@ -322,6 +329,7 @@ function validate_file()
 
   # rel_file='directory/file.f'
   local rel_file=${file/$updir\//}
+  local rel_name=${rel_file/.*/} # no suffix
   # Just in case pips command are not found and all the following tests
   # fail, initialize the status:
   local status=-1
@@ -426,22 +434,24 @@ function validate_file()
 	fi
     fi
 
+    # ignore space changes... is it a good idea when testing a prettyprinter?
     ${PIPS_DIFF:-diff -b -u} $reference_filtered $out_filtered > $out.diff
 
     if [[ -s $out.diff ]] ; then
-      verb 2 "$rel_file: CHANGED"
-      echo "changed: $rel_file" >> $summary
+      verb 2 "$rel_name: CHANGED"
+      echo "changed: $rel_name" >> $summary.tmp
       cp $out.out $file_resdir/out
       [[ $out_is_filtered ]] && cp $out_filtered $file_resdir/out.filtered
       status=1 # something was wrong...
     else
-      verb 3 "$rel_file: SUCCEEDED" # ok!
+      verb 3 "$rel_name: SUCCEEDED" # ok!
+      [ "$passed" ] && echo "passed: $rel_name" >> $summary.tmp
       rm -f $out.* $file_resdir/*.filtered
     fi
 
   else
-      verb 2 "$rel_file: FAILED"
-      echo "failed: $rel_file" >> $summary
+      verb 2 "$rel_name: FAILED"
+      echo "failed: $rel_name" >> $summary.tmp
   fi
 
   popd > /dev/null
@@ -495,6 +505,10 @@ do
   fi
   [[ $failed ]] && elist="$elist$obj "
 done
+
+# sort final result
+sort -k 2 $summary.tmp >> $summary
+rm -f $summary.tmp
 
 echo -e "\n$errors failed out of $dones on $(date)" >> $summary
 rm -rf *.database # cold cleanup

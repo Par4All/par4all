@@ -1129,7 +1129,7 @@ type simple_effect_reference_type(reference ref)
 	      {
 		/* we must know which field it is, else return an undefined type */
 		expression field_exp = EXPRESSION(CAR(l_inds));
-		entity field;
+		entity field = entity_undefined;
 		pips_debug(8, "field dimension : %s\n", 
 			   words_to_string(words_expression(field_exp,NIL)));
 		
@@ -1591,75 +1591,149 @@ bool effect_reference_dereferencing_p(reference ref, bool * exact_p)
   return result;
 }
 
+
+/************ CONVERSION TO CONSTANT PATH EFFECTS ***********/
+
+static bool use_points_to = false;
+
+void set_use_points_to(bool pt_p)
+{
+  use_points_to = pt_p;
+}
+void reset_use_points_to()
+{
+  use_points_to = false;
+}
+bool get_use_points_to()
+{
+  return use_points_to;
+}
+
+
 /**
    @param l_pointer_eff is a list of effects that may involve access paths dereferencing pointers.
    @return a list of effects with no access paths dereferencing pointers.
  */
 list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 {
-  bool read_dereferencing_p = false;
-  bool write_dereferencing_p = false;
-  list l = l_pointer_eff, le = NIL, lkeep = NIL;
+  list le = NIL;
 
   pips_debug_effects(8, "input effects : \n", l_pointer_eff);
 
-  while (!ENDP(l)) 
+  if (get_use_points_to())
     {
-      bool exact_p;
-      effect eff = EFFECT(CAR(l));
-      reference ref = effect_any_reference(eff);
-      
-      if (io_effect_p(eff)|| malloc_effect_p(eff) || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)))
+      FOREACH(EFFECT, eff, l_pointer_eff)
 	{
-	  lkeep = CONS(EFFECT, eff, lkeep);
+	  bool exact_p;
+	  reference ref = effect_any_reference(eff);
+      
+	  if (io_effect_p(eff)|| malloc_effect_p(eff) || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)))
+	    {
+	      le = CONS(EFFECT, copy_effect(eff), le);
+	    }
+	  else 
+	    {
+	      if (effect_reference_dereferencing_p(ref, &exact_p))
+		{
+		  pips_debug(8, "dereferencing case \n");
+		  bool exact_p = false;
+		  list l_new_cells = eval_cell_with_points_to(effect_cell(eff), 
+							      points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
+							      &exact_p); 
+		  if (ENDP(l_new_cells))
+		    {
+		      pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
+		      /* We have not found any equivalent constant path : it may point anywhere */
+		      /* We should maybe contract these effects later. Is it done by the callers ? */
+		      le = CONS(EFFECT, make_anywhere_effect(effect_action_tag(eff)), le);
+		    }
+		  else
+		    {
+		      FOREACH(CELL, c, l_new_cells)
+			{			  
+			  le = CONS(EFFECT, 
+				    make_effect(c, copy_action(effect_action(eff)), 
+						make_approximation(exact_p? is_approximation_must:is_approximation_may,UU), 
+						make_descriptor_none()),
+				    le);
+			}	
+		    }
+		  
+		}
+	      else
+		le = CONS(EFFECT, copy_effect(eff), le);
+	    }
 	}
-      else 
-	if (!(read_dereferencing_p && write_dereferencing_p) && effect_reference_dereferencing_p(ref, &exact_p))
-	  {
-	    if (effect_read_p(eff)) read_dereferencing_p = true;
-	    else write_dereferencing_p = true;
-	  }
-      POP(l);      
-    }
 	
-  lkeep = gen_nreverse(lkeep);
+      le = gen_nreverse(le);
 
-  if (write_dereferencing_p)
-    le = CONS(EFFECT, make_anywhere_effect(is_action_write), le);
-  if (read_dereferencing_p)
-    le = CONS(EFFECT, make_anywhere_effect(is_action_read), le); 
-    
-  if (!write_dereferencing_p)
-    if (!read_dereferencing_p)
-      {
-	le = effects_dup(l_pointer_eff);
-      }
-    else
-      {
-	list l_write = effects_write_effects(l_pointer_eff);
-	list lkeep_read = effects_read_effects(lkeep);
-	le = gen_nconc(le, effects_dup(lkeep_read));
-	le = gen_nconc(le, effects_dup(l_write));
-	gen_free_list(l_write);
-	gen_free_list(lkeep_read);
-      }
+    }
   else
     {
-      if (!read_dereferencing_p)
+      bool read_dereferencing_p = false;
+      bool write_dereferencing_p = false;
+      list l = l_pointer_eff, lkeep = NIL;
+
+      while (!ENDP(l)) 
 	{
-	  list l_read = effects_read_effects(l_pointer_eff);
-	  list lkeep_write = effects_write_effects(lkeep);
-	  le = gen_nconc(le, effects_dup(lkeep_write));
-	  le = gen_nconc(le, effects_dup(l_read));
-	  gen_free_list(l_read);
-	  gen_free_list(lkeep_write);
+	  bool exact_p;
+	  effect eff = EFFECT(CAR(l));
+	  reference ref = effect_any_reference(eff);
+      
+	  if (io_effect_p(eff)|| malloc_effect_p(eff) || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)))
+	    {
+	      lkeep = CONS(EFFECT, eff, lkeep);
+	    }
+	  else 
+	    if (!(read_dereferencing_p && write_dereferencing_p) && effect_reference_dereferencing_p(ref, &exact_p))
+	      {
+		if (effect_read_p(eff)) read_dereferencing_p = true;
+		    else write_dereferencing_p = true;
+	      }
+	  POP(l);      
 	}
+	
+      lkeep = gen_nreverse(lkeep);
+
+      if (write_dereferencing_p)
+	le = CONS(EFFECT, make_anywhere_effect(is_action_write), le);
+      if (read_dereferencing_p)
+	le = CONS(EFFECT, make_anywhere_effect(is_action_read), le); 
+      
+      if (!write_dereferencing_p)
+	if (!read_dereferencing_p)
+	  {
+	    le = effects_dup(l_pointer_eff);
+	  }
+	else
+	  {
+	    list l_write = effects_write_effects(l_pointer_eff);
+	    list lkeep_read = effects_read_effects(lkeep);
+	    le = gen_nconc(le, effects_dup(lkeep_read));
+	    le = gen_nconc(le, effects_dup(l_write));
+	    gen_free_list(l_write);
+	    gen_free_list(lkeep_read);
+	  }
       else
 	{
-	  le = gen_nconc(le, effects_dup(lkeep));
+	  if (!read_dereferencing_p)
+	    {
+	      list l_read = effects_read_effects(l_pointer_eff);
+	      list lkeep_write = effects_write_effects(lkeep);
+	      le = gen_nconc(le, effects_dup(lkeep_write));
+	      le = gen_nconc(le, effects_dup(l_read));
+	      gen_free_list(l_read);
+	      gen_free_list(lkeep_write);
+	    }
+	  else
+	    {
+	      le = gen_nconc(le, effects_dup(lkeep));
+	    }
 	}
+      gen_free_list(lkeep);
+	
     }
-  gen_free_list(lkeep);
+
   pips_debug_effects(8, "ouput effects : \n", le);
 	
   return le;
