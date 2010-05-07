@@ -9,7 +9,7 @@ Homepage: https://pips.enstb.org
 Package: libnewgenlibs-dev
 Section: libdevel
 Architecture: any
-Depends: libnewgenlibs0 (= ${binary:Version})
+Depends: libnewgenlibs0 (= ${binary:Version}), ${misc:Depends}
 Replaces: libgenc-dev
 Conflicts: libgenc-dev
 Description: development headers for newgen library
