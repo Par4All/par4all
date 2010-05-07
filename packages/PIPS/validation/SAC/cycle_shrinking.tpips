@@ -18,4 +18,5 @@ echo
 display PRINTED_FILE[shrink]
 
 close
+delete SHRINK
 quit

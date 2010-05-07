@@ -1,0 +1,344 @@
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+
+      DO I = 1, ISI
+         DO J = 1, ISJ
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+
+
+      DO 400 I = 1+KSI/2, ISI-KSI/2
+         DO 300 J = 1+KSJ/2, ISJ-KSJ/2
+            NEW_IMAGE(I,J) = 0.
+            DO 200 KI = 1, KSI
+               DO 100 KJ = 1, KSJ
+                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-KSI/2-1,
+     &            J+KJ-KSJ/2-1)*KERNEL(KI,KJ)
+100               CONTINUE
+200            CONTINUE
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/(KSI*KSJ)
+300         CONTINUE
+400      CONTINUE
+
+      END
+      PROGRAM IMAGE_PROCESSING
+c     goal: show effect of cloning, partial evaluation and loop unrolling
+c     and reduction parallelization for a Power architecture
+
+c     kernel_size must be even
+      PARAMETER (IMAGE_SIZE=512, KERNEL_SIZE=3, NSTEPS=20)
+      REAL IMAGE(IMAGE_SIZE,IMAGE_SIZE)
+      REAL NEW_IMAGE(IMAGE_SIZE,IMAGE_SIZE)
+      REAL KERNEL(KERNEL_SIZE, KERNEL_SIZE)
+
+      DO I = 1, KERNEL_SIZE
+         DO J = 1, KERNEL_SIZE
+            KERNEL(I,J) = 1.
+         ENDDO
+      ENDDO
+
+c     read *, image
+      DO I = 1, IMAGE_SIZE
+         DO J = 1, IMAGE_SIZE
+            IMAGE(I,J) = 1.
+         ENDDO
+      ENDDO
+
+      DO N = 1, NSTEPS
+         CALL CONVOL(NEW_IMAGE, IMAGE, IMAGE_SIZE, IMAGE_SIZE, KERNEL
+     &   , KERNEL_SIZE, KERNEL_SIZE)
+      ENDDO
+
+c     print *, new_image
+      PRINT *, NEW_IMAGE(IMAGE_SIZE/2,IMAGE_SIZE/2)
+
+      END
+
+C  P() {ISI==512, ISJ==512, KSI==3, KSJ==3}
+
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+C  P() {ISI==512, ISJ==512, KSI==3, KSJ==3}
+
+
+
+      DO I = 1, ISI
+
+C  P(I,J) {ISI==512, ISJ==512, KSI==3, KSJ==3, 1<=I, I<=512}
+
+         DO J = 1, ISJ
+
+C  P(I,J) {ISI==512, ISJ==512, KSI==3, KSJ==3, 1<=I, I<=512, 1<=J,
+C    J<=512}
+
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+
+C  P(I,J) {I==513, ISI==512, ISJ==512, J==513, KSI==3, KSJ==3}
+
+
+
+      DO 400 I = 1+KSI/2, ISI-KSI/2
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I}
+
+         DO 300 J = 1+KSJ/2, ISJ-KSJ/2
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J}
+
+            NEW_IMAGE(I,J) = 0.
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J}
+
+            DO 200 KI = 1, KSI
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J,
+C    1<=KI, KI<=3}
+
+               DO 100 KJ = 1, KSJ
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J,
+C    1<=KI, KI<=3, 1<=KJ, KJ<=3}
+
+                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-KSI/2-1,
+     &            J+KJ-KSJ/2-1)*KERNEL(KI,KJ)
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J,
+C    1<=KI, KI<=3, 1<=KJ, KJ<=3}
+
+100               CONTINUE
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KJ==4, KSI==3, KSJ==3, 2<=I,
+C    2<=J, 1<=KI, KI<=3}
+
+200            CONTINUE
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KI==4, KJ==4, KSI==3, KSJ==3,
+C    2<=I, 2<=J}
+
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/(KSI*KSJ)
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KI==4, KJ==4, KSI==3, KSJ==3,
+C    2<=I, 2<=J}
+
+300         CONTINUE
+
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J}
+
+400      CONTINUE
+
+      END
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+
+      DO I = 1, 512
+         DO J = 1, 512
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+
+
+      DO 400 I = 2, 511
+         DO 300 J = 2, 511
+            NEW_IMAGE(I,J) = 0.
+            DO 200 KI = 1, 3
+               DO 100 KJ = 1, 3
+                  NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-2,J+KJ-2
+     &            )*KERNEL(KI,KJ)
+100               CONTINUE
+200            CONTINUE
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9
+300         CONTINUE
+400      CONTINUE
+
+      END
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+
+      DO I = 1, 512
+         DO J = 1, 512
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+
+
+      DO 400 I = 2, 511
+         DO 300 J = 2, 511
+            NEW_IMAGE(I,J) = 0.
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1-2,J+1-2)*KERNEL
+     &      (1,1)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1-2,J+2-2)*KERNEL
+     &      (1,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1-2,J+3-2)*KERNEL
+     &      (1,3)
+            KJ = 4
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+1-2)*KERNEL
+     &      (2,1)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+2-2)*KERNEL
+     &      (2,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+3-2)*KERNEL
+     &      (2,3)
+            KJ = 4
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+1-2)*KERNEL
+     &      (3,1)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+2-2)*KERNEL
+     &      (3,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+3-2)*KERNEL
+     &      (3,3)
+            KJ = 4
+200         CONTINUE
+            KI = 4
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9
+300         CONTINUE
+400      CONTINUE
+
+      END
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+
+      DO I = 1, 512
+         DO J = 1, 512
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+
+
+      DO 400 I = 2, 511
+         DO 300 J = 2, 511
+            NEW_IMAGE(I,J) = 0.
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1-2,J+1-2)*KERNEL
+     &      (1,1)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1-2,J+2-2)*KERNEL
+     &      (1,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1-2,J+3-2)*KERNEL
+     &      (1,3)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+1-2)*KERNEL
+     &      (2,1)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+2-2)*KERNEL
+     &      (2,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+3-2)*KERNEL
+     &      (2,3)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+1-2)*KERNEL
+     &      (3,1)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+2-2)*KERNEL
+     &      (3,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+3-2)*KERNEL
+     &      (3,3)
+200         CONTINUE
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9
+300         CONTINUE
+400      CONTINUE
+
+      END
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+
+      DO I = 1, 512
+         DO J = 1, 512
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+
+
+      DO 400 I = 2, 511
+         DO 300 J = 2, 511
+            NEW_IMAGE(I,J) = 0.
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I-1,J-1)*KERNEL(1,1
+     &      )
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I-1,J)*KERNEL(1,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I-1,J+1)*KERNEL(1,3
+     &      )
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I,J-1)*KERNEL(2,1)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I,J)*KERNEL(2,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I,J+1)*KERNEL(2,3)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1,J-1)*KERNEL(3,1
+     &      )
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1,J)*KERNEL(3,2)
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1,J+1)*KERNEL(3,3
+     &      )
+200         CONTINUE
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9
+300         CONTINUE
+400      CONTINUE
+
+      END
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+
+      DO I = 1, 512
+         DO J = 1, 512
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+
+
+      DO 400 Ip = 2, 511
+         DO 300 Jp = 2, 511
+            NEW_IMAGE(Jp,Ip) = 0.
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp-1,Ip-1)*
+     &      KERNEL(1,1)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp-1,Ip)*KERNEL
+     &      (1,2)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp-1,Ip+1)*
+     &      KERNEL(1,3)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp,Ip-1)*KERNEL
+     &      (2,1)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp,Ip)*KERNEL(2
+     &      ,2)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp,Ip+1)*KERNEL
+     &      (2,3)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp+1,Ip-1)*
+     &      KERNEL(3,1)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp+1,Ip)*KERNEL
+     &      (3,2)
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)+IMAGE(Jp+1,Ip+1)*
+     &      KERNEL(3,3)
+200         CONTINUE
+            NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)/9
+300         CONTINUE
+
+      END

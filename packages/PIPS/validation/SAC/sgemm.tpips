@@ -18,3 +18,4 @@ apply PRINT_C_CODE[MAIN]
 display C_PRINTED_FILE
 
 close
+delete SGEMM

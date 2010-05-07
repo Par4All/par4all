@@ -33,61 +33,61 @@ simdized code
       DO 99994 LU_IND2 = 0, 3, 2
          LU_IND1 = 0
          DO LU_IND1 = 0, 3, 2
-            C(LU_IND2+1,LU_IND1+1) = 0                                  0011
+            C(1+LU_IND2,1+LU_IND1) = 0                                  0011
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec2, B(LU_IND0+1,LU_IND1+1))
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec1, A(LU_IND2+1,
-     &         LU_IND0+1), A(LU_IND2+1,LU_IND0+2))
+               CALL SIMD_LOAD_V2SI(v2si_vec2, B(1+LU_IND0,1+LU_IND1))
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec1, A(1+LU_IND2,1+
+     &         LU_IND0), A(1+LU_IND2,2+LU_IND0))
                CALL SIMD_MULD(v2si_vec0, v2si_vec1, v2si_vec2)
                CALL SIMD_SAVE_V2SI(v2si_vec0, aligned(0))
-               C(LU_IND2+1,LU_IND1+1) = C(LU_IND2+1,LU_IND1+1)+         0013
-     &         aligned(0)                                               0013
-               C(LU_IND2+1,LU_IND1+1) = C(LU_IND2+1,LU_IND1+1)+         0013
-     &         aligned(1)                                               0013
+               C(1+LU_IND2,1+LU_IND1) = aligned(0)+C(1+LU_IND2,1+       0013
+     &         LU_IND1)                                                 0013
+               C(1+LU_IND2,1+LU_IND1) = aligned(1)+C(1+LU_IND2,1+       0013
+     &         LU_IND1)                                                 0013
             ENDDO
-            C(LU_IND2+1,LU_IND1+2) = 0                                  0011
+            C(1+LU_IND2,2+LU_IND1) = 0                                  0011
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec5, B(LU_IND0+1,LU_IND1+2))
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec4, A(LU_IND2+1,
-     &         LU_IND0+1), A(LU_IND2+1,LU_IND0+2))
+               CALL SIMD_LOAD_V2SI(v2si_vec5, B(1+LU_IND0,2+LU_IND1))
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec4, A(1+LU_IND2,1+
+     &         LU_IND0), A(1+LU_IND2,2+LU_IND0))
                CALL SIMD_MULD(v2si_vec3, v2si_vec4, v2si_vec5)
                CALL SIMD_SAVE_V2SI(v2si_vec3, aligned0(0))
-               C(LU_IND2+1,LU_IND1+2) = C(LU_IND2+1,LU_IND1+2)+         0013
-     &         aligned0(0)                                              0013
-               C(LU_IND2+1,LU_IND1+2) = C(LU_IND2+1,LU_IND1+2)+         0013
-     &         aligned0(1)                                              0013
+               C(1+LU_IND2,2+LU_IND1) = aligned0(0)+C(1+LU_IND2,2+      0013
+     &         LU_IND1)                                                 0013
+               C(1+LU_IND2,2+LU_IND1) = aligned0(1)+C(1+LU_IND2,2+      0013
+     &         LU_IND1)                                                 0013
             ENDDO
          ENDDO
          LU_IND1 = 0
          DO LU_IND1 = 0, 3, 2
-            C(LU_IND2+2,LU_IND1+1) = 0                                  0011
+            C(2+LU_IND2,1+LU_IND1) = 0                                  0011
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec8, B(LU_IND0+1,LU_IND1+1))
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec7, A(LU_IND2+2,
-     &         LU_IND0+1), A(LU_IND2+2,LU_IND0+2))
+               CALL SIMD_LOAD_V2SI(v2si_vec8, B(1+LU_IND0,1+LU_IND1))
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec7, A(2+LU_IND2,1+
+     &         LU_IND0), A(2+LU_IND2,2+LU_IND0))
                CALL SIMD_MULD(v2si_vec6, v2si_vec7, v2si_vec8)
                CALL SIMD_SAVE_V2SI(v2si_vec6, aligned1(0))
-               C(LU_IND2+2,LU_IND1+1) = C(LU_IND2+2,LU_IND1+1)+         0013
-     &         aligned1(0)                                              0013
-               C(LU_IND2+2,LU_IND1+1) = C(LU_IND2+2,LU_IND1+1)+         0013
-     &         aligned1(1)                                              0013
+               C(2+LU_IND2,1+LU_IND1) = aligned1(0)+C(2+LU_IND2,1+      0013
+     &         LU_IND1)                                                 0013
+               C(2+LU_IND2,1+LU_IND1) = aligned1(1)+C(2+LU_IND2,1+      0013
+     &         LU_IND1)                                                 0013
             ENDDO
-            C(LU_IND2+2,LU_IND1+2) = 0                                  0011
+            C(2+LU_IND2,2+LU_IND1) = 0                                  0011
             LU_IND0 = 0
             DO LU_IND0 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec11, B(LU_IND0+1,LU_IND1+2)
+               CALL SIMD_LOAD_V2SI(v2si_vec11, B(1+LU_IND0,2+LU_IND1)
      &         )
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec10, A(LU_IND2+2,
-     &         LU_IND0+1), A(LU_IND2+2,LU_IND0+2))
+               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec10, A(2+LU_IND2,1+
+     &         LU_IND0), A(2+LU_IND2,2+LU_IND0))
                CALL SIMD_MULD(v2si_vec9, v2si_vec10, v2si_vec11)
                CALL SIMD_SAVE_V2SI(v2si_vec9, aligned2(0))
-               C(LU_IND2+2,LU_IND1+2) = C(LU_IND2+2,LU_IND1+2)+         0013
-     &         aligned2(0)                                              0013
-               C(LU_IND2+2,LU_IND1+2) = C(LU_IND2+2,LU_IND1+2)+         0013
-     &         aligned2(1)                                              0013
+               C(2+LU_IND2,2+LU_IND1) = aligned2(0)+C(2+LU_IND2,2+      0013
+     &         LU_IND1)                                                 0013
+               C(2+LU_IND2,2+LU_IND1) = aligned2(1)+C(2+LU_IND2,2+      0013
+     &         LU_IND1)                                                 0013
             ENDDO
          ENDDO
 99994    CONTINUE

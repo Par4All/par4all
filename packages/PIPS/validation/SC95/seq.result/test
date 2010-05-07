@@ -9,19 +9,19 @@ c     Goal: show different dependence tests and privatization
 
       REAL D(LX, MX, NX)
 
-      READ *, A                                                         0001
+      READ *, A                                                         0012
 
-      CALL MATMUL(B, A, A, N, N, N)                                     0002
+      CALL MATMUL(B, A, A, N, N, N)                                     0014
 
-      CALL SMATMUL(B, A, A, N, N, N)                                    0003
+      CALL SMATMUL(B, A, A, N, N, N)                                    0016
 
-      CALL TRANSPOSE(B, N)                                              0004
+      CALL TRANSPOSE(B, N)                                              0018
 
-      CALL FLIPFLOP(C, N, 0.25)                                         0005
+      CALL FLIPFLOP(C, N, 0.25)                                         0020
 
-      CALL INIT                                                         0006
-      CALL TESTINIT                                                     0007
-      CALL DIGITALIZE(D, LX, MX, NX)                                    0008
+      CALL INIT                                                         0022
+      CALL TESTINIT                                                     0023
+      CALL DIGITALIZE(D, LX, MX, NX)                                    0024
 
       END
 
@@ -29,15 +29,15 @@ c     Goal: show different dependence tests and privatization
 c     compute x := y * z
       REAL X(L,N), Y(L,M), Z(M,N)
 
-      DOALL I = 1, L                                                    0001
-         DOALL J = 1, N                                                 0002
-            X(I,J) = 0.                                                 0003
+      DOALL I = 1, L                                                    0006
+         DOALL J = 1, N                                                 0007
+            X(I,J) = 0.                                                 0008
          ENDDO
       ENDDO
-      DOALL I = 1, L                                                    0001
-         DOALL J = 1, N                                                 0002
-            DO K = 1, M                                                 0004
-               X(I,J) = X(I,J)+Y(I,K)*Z(K,J)                            0005
+      DOALL I = 1, L                                                    0006
+         DOALL J = 1, N                                                 0007
+            DO K = 1, M                                                 0009
+               X(I,J) = X(I,J)+Y(I,K)*Z(K,J)                            0010
             ENDDO
          ENDDO
       ENDDO
@@ -46,19 +46,19 @@ c     compute x := y * z
 
  **************** Effective Dependence Graph ****************
 
-	05 --> 05 with conflicts
+	10 --> 10 with conflicts
+		from <X(I,J)-W-MUST> to <X(I,J)-R-MUST> at levels  3
+	10 --> 10 with conflicts
+		from <X(I,J)-W-MUST> to <X(I,J)-W-MUST> at levels  3
+	10 --> 10 with conflicts
 		from <X(I,J)-R-MUST> to <X(I,J)-W-MUST> at levels  3
-	05 --> 05 with conflicts
-		from <X(I,J)-W-MUST> to <X(I,J)-R-MUST> at levels  3
-	05 --> 05 with conflicts
-		from <X(I,J)-W-MUST> to <X(I,J)-W-MUST> at levels  3
-	04 --> 04 with conflicts
+	09 --> 09 with conflicts
 		from <K-W-MUST> to <K-W-MUST> at levels  1 2
-	03 --> 05 with conflicts
+	08 --> 10 with conflicts
 		from <X(I,J)-W-MUST> to <X(I,J)-R-MUST> at levels  3
-	03 --> 05 with conflicts
+	08 --> 10 with conflicts
 		from <X(I,J)-W-MUST> to <X(I,J)-W-MUST> at levels  3
-	02 --> 02 with conflicts
+	07 --> 07 with conflicts
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
@@ -67,13 +67,13 @@ c     compute x := y * z
 c     compute x := y * z
       REAL X(L,N), Y(L,M), Z(M,N)
 
-      DO I = 1, L                                                       0001
-         DO J = 1, N                                                    0002
-            S = 0.                                                      0003
-            DO K = 1, M                                                 0004
-               S = S+Y(I,K)*Z(K,J)                                      0005
+      DO I = 1, L                                                       0006
+         DO J = 1, N                                                    0007
+            S = 0.                                                      0008
+            DO K = 1, M                                                 0009
+               S = S+Y(I,K)*Z(K,J)                                      0010
             ENDDO
-            X(I,J) = S                                                  0006
+            X(I,J) = S                                                  0012
          ENDDO
       ENDDO
 
@@ -81,33 +81,33 @@ c     compute x := y * z
 
  **************** Effective Dependence Graph ****************
 
-	06 --> 05 with conflicts
+	12 --> 10 with conflicts
 		from <S-R-MUST> to <S-W-MUST> at levels  1 2
-	06 --> 03 with conflicts
+	12 --> 08 with conflicts
 		from <S-R-MUST> to <S-W-MUST> at levels  1 2
-	05 --> 06 with conflicts
+	10 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
-	05 --> 05 with conflicts
+	10 --> 10 with conflicts
+		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
+	10 --> 10 with conflicts
+		from <S-W-MUST> to <S-W-MUST> at levels  1 2 3
+	10 --> 10 with conflicts
 		from <S-R-MUST> to <S-W-MUST> at levels  1 2 3
-	05 --> 05 with conflicts
-		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
-	05 --> 05 with conflicts
-		from <S-W-MUST> to <S-W-MUST> at levels  1 2 3
-	05 --> 03 with conflicts
+	10 --> 08 with conflicts
+		from <S-W-MUST> to <S-W-MUST> at levels  1 2
+	10 --> 08 with conflicts
 		from <S-R-MUST> to <S-W-MUST> at levels  1 2
-	05 --> 03 with conflicts
-		from <S-W-MUST> to <S-W-MUST> at levels  1 2
-	04 --> 04 with conflicts
+	09 --> 09 with conflicts
 		from <K-W-MUST> to <K-W-MUST> at levels  1 2
-	03 --> 06 with conflicts
+	08 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
-	03 --> 05 with conflicts
+	08 --> 10 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
-	03 --> 05 with conflicts
+	08 --> 10 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  1 2 3
-	03 --> 03 with conflicts
+	08 --> 08 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  1 2
-	02 --> 02 with conflicts
+	07 --> 07 with conflicts
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
@@ -116,15 +116,15 @@ c     compute x := y * z
 c     compute x := y * z
       REAL X(L,N), Y(L,M), Z(M,N)
 
-      DOALL I = 1, L                                                    0001
+      DOALL I = 1, L                                                    0006
          PRIVATE J
-         DOALL J = 1, N                                                 0002
+         DOALL J = 1, N                                                 0007
             PRIVATE S,K
-            S = 0.                                                      0003
-            DO K = 1, M                                                 0004
-               S = S+Y(I,K)*Z(K,J)                                      0005
+            S = 0.                                                      0008
+            DO K = 1, M                                                 0009
+               S = S+Y(I,K)*Z(K,J)                                      0010
             ENDDO
-            X(I,J) = S                                                  0006
+            X(I,J) = S                                                  0012
          ENDDO
       ENDDO
 
@@ -132,19 +132,19 @@ c     compute x := y * z
 
  **************** Effective Dependence Graph ****************
 
-	05 --> 06 with conflicts
+	10 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  3
-	05 --> 05 with conflicts
-		from <S-R-MUST> to <S-W-MUST> at levels  3
-	05 --> 05 with conflicts
+	10 --> 10 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  3
-	05 --> 05 with conflicts
+	10 --> 10 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  3
-	03 --> 06 with conflicts
+	10 --> 10 with conflicts
+		from <S-R-MUST> to <S-W-MUST> at levels  3
+	08 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  3
-	03 --> 05 with conflicts
+	08 --> 10 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  3
-	03 --> 05 with conflicts
+	08 --> 10 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  3
 
 ****************** End of Dependence Graph ******************
@@ -152,11 +152,11 @@ c     compute x := y * z
       SUBROUTINE TRANSPOSE(X,N)
       REAL X(N,N)
 
-      DO I = 1, N-1                                                     0001
-         DO J = I+1, N                                                  0002
-            T = X(I,J)                                                  0003
-            X(I,J) = X(J,I)                                             0004
-            X(J,I) = T                                                  0005
+      DO I = 1, N-1                                                     0005
+         DO J = I+1, N                                                  0006
+            T = X(I,J)                                                  0007
+            X(I,J) = X(J,I)                                             0008
+            X(J,I) = T                                                  0009
          ENDDO
       ENDDO
 
@@ -164,29 +164,17 @@ c     compute x := y * z
 
  **************** Effective Dependence Graph ****************
 
-	05 --> 04 with conflicts
-		from <X(J,I)-W-MUST> to <X(I,J)-W-MUST> at levels  1
-	05 --> 03 with conflicts
+	09 --> 07 with conflicts
 		from <T-R-MUST> to <T-W-MUST> at levels  1 2
-	05 --> 03 with conflicts
-		from <X(J,I)-W-MUST> to <X(I,J)-R-MUST> at levels  1
-	04 --> 05 with conflicts
+	08 --> 09 with conflicts
 		from <X(J,I)-R-MUST> to <X(J,I)-W-MUST> at levels  3
-	04 --> 05 with conflicts
-		from <X(I,J)-W-MUST> to <X(J,I)-W-MUST> at levels  1 3
-	04 --> 04 with conflicts
-		from <X(J,I)-R-MUST> to <X(I,J)-W-MUST> at levels  1
-	04 --> 04 with conflicts
-		from <X(I,J)-W-MUST> to <X(J,I)-R-MUST> at levels  1
-	03 --> 05 with conflicts
-		from <X(I,J)-R-MUST> to <X(J,I)-W-MUST> at levels  1 3
-	03 --> 05 with conflicts
+	07 --> 09 with conflicts
 		from <T-W-MUST> to <T-R-MUST> at levels  1 2 3
-	03 --> 04 with conflicts
+	07 --> 08 with conflicts
 		from <X(I,J)-R-MUST> to <X(I,J)-W-MUST> at levels  3
-	03 --> 03 with conflicts
+	07 --> 07 with conflicts
 		from <T-W-MUST> to <T-W-MUST> at levels  1 2
-	02 --> 02 with conflicts
+	06 --> 06 with conflicts
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
@@ -194,13 +182,13 @@ c     compute x := y * z
       SUBROUTINE TRANSPOSE(X,N)
       REAL X(N,N)
 
-      DOALL I = 1, N-1                                                  0001
+      DOALL I = 1, N-1                                                  0005
          PRIVATE J
-         DOALL J = I+1, N                                               0002
+         DOALL J = I+1, N                                               0006
             PRIVATE T
-            T = X(I,J)                                                  0003
-            X(I,J) = X(J,I)                                             0004
-            X(J,I) = T                                                  0005
+            T = X(I,J)                                                  0007
+            X(I,J) = X(J,I)                                             0008
+            X(J,I) = T                                                  0009
          ENDDO
       ENDDO
 
@@ -208,11 +196,11 @@ c     compute x := y * z
 
  **************** Effective Dependence Graph ****************
 
-	04 --> 05 with conflicts
+	08 --> 09 with conflicts
 		from <X(J,I)-R-MUST> to <X(J,I)-W-MUST> at levels  3
-	03 --> 05 with conflicts
+	07 --> 09 with conflicts
 		from <T-W-MUST> to <T-R-MUST> at levels  3
-	03 --> 04 with conflicts
+	07 --> 08 with conflicts
 		from <X(I,J)-R-MUST> to <X(I,J)-W-MUST> at levels  3
 
 ****************** End of Dependence Graph ******************
@@ -223,20 +211,20 @@ c     compute x := y * z
 
       INTEGER I, J, NEW, OLD, T
 
-      NEW = 1                                                           0001
+      NEW = 1                                                           0008
 
-10    CONTINUE                                                          0002
-      OLD = NEW                                                         0003
-      NEW = 3-OLD                                                       0004
+10    CONTINUE                                                          0010
+      OLD = NEW                                                         0011
+      NEW = 3-OLD                                                       0012
 
-      DO J = 2, N-1                                                     0005
-         DO I = 2, N-1                                                  0006
-            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0007
-     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0007
+      DO J = 2, N-1                                                     0014
+         DO I = 2, N-1                                                  0015
+            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0016
+     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0016
          ENDDO
       ENDDO
 
-      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
+      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0021
 
       END
 
@@ -246,24 +234,24 @@ c     compute x := y * z
 
       INTEGER I, J, NEW, OLD, T
 
-      NEW = 1                                                           0001
+      NEW = 1                                                           0008
 
-10    CONTINUE                                                          0002
-      OLD = NEW                                                         0003
-      NEW = 3-OLD                                                       0004
+10    CONTINUE                                                          0010
+      OLD = NEW                                                         0011
+      NEW = 3-OLD                                                       0012
 
-      DO J = 2, N-1                                                     0005
-         DO I = 2, N-1                                                  0006
-            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0007
-     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0007
+      DO J = 2, N-1                                                     0014
+         DO I = 2, N-1                                                  0015
+            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0016
+     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0016
          ENDDO
       ENDDO
 
-      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
+      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0021
 
       END
 
-C  P() {}
+C  P() {N==10}
 
 
       SUBROUTINE FLIPFLOP(X,N,C)
@@ -272,44 +260,44 @@ C  P() {}
 
       INTEGER I, J, NEW, OLD, T
 
-C  P() {}
+C  P() {N==10}
 
 
-      NEW = 1                                                           0001
+      NEW = 1                                                           0008
 
-C  P(I,J,NEW,OLD) {}
-
-
-10    CONTINUE                                                          0002
-
-C  P(I,J,NEW,OLD) {}
-
-      OLD = NEW                                                         0003
-
-C  P(I,J,NEW,OLD) {NEW==OLD}
-
-      NEW = 3-OLD                                                       0004
-
-C  P(I,J,NEW,OLD) {NEW+OLD==3}
+C  P(I,J,NEW,OLD) {N==10}
 
 
-      DO J = 2, N-1                                                     0005
+10    CONTINUE                                                          0010
 
-C  P(I,J,NEW,OLD) {NEW+OLD==3, 2<=J, J+1<=N}
+C  P(I,J,NEW,OLD) {N==10}
 
-         DO I = 2, N-1                                                  0006
+      OLD = NEW                                                         0011
 
-C  P(I,J,NEW,OLD) {NEW+OLD==3, 2<=I, I+1<=N, 2<=J, J+1<=N}
+C  P(I,J,NEW,OLD) {N==10, NEW==OLD}
 
-            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0007
-     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0007
+      NEW = 3-OLD                                                       0012
+
+C  P(I,J,NEW,OLD) {N==10, NEW+OLD==3}
+
+
+      DO J = 2, N-1                                                     0014
+
+C  P(I,J,NEW,OLD) {N==10, NEW+OLD==3, 2<=J, J<=9}
+
+         DO I = 2, N-1                                                  0015
+
+C  P(I,J,NEW,OLD) {N==10, NEW+OLD==3, 2<=I, I<=9, 2<=J, J<=9}
+
+            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0016
+     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0016
          ENDDO
       ENDDO
 
-C  P(I,J,NEW,OLD) {NEW+OLD==3, N<=J}
+C  P(I,J,NEW,OLD) {N==10, NEW+OLD==3, 10<=J}
 
 
-      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
+      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0021
 
       END
 
@@ -319,20 +307,20 @@ C  P(I,J,NEW,OLD) {NEW+OLD==3, N<=J}
 
       INTEGER I, J, NEW, OLD, T
 
-      NEW = 1                                                           0001
+      NEW = 1                                                           0008
 
-10    CONTINUE                                                          0002
-      OLD = NEW                                                         0003
-      NEW = 3-OLD                                                       0004
+10    CONTINUE                                                          0010
+      OLD = NEW                                                         0011
+      NEW = 3-OLD                                                       0012
 
-      DOALL J = 2, N-1                                                  0005
-         DOALL I = 2, N-1                                               0006
-            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0007
-     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0007
+      DOALL J = 2, N-1                                                  0014
+         DOALL I = 2, N-1                                               0015
+            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0016
+     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0016
          ENDDO
       ENDDO
 
-      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
+      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0021
 
       END
 
@@ -341,14 +329,14 @@ C  P(I,J,NEW,OLD) {NEW+OLD==3, N<=J}
 
       COMMON /C2/ M,MM1,MP1
 
-      MS = MM1/2                                                        0001
-      MM = MP1/2                                                        0002
+      MS = MM1/2                                                        0007
+      MM = MP1/2                                                        0008
 
-      DO K = 2, N-1                                                     0003
-         DO J = 2, MM                                                   0004
-            JJ = J+MS                                                   0005
-            X(J,K,1) = X(JJ,K,2)                                        0006
-            X(JJ,K,1) = X(J,K,2)                                        0007
+      DO K = 2, N-1                                                     0010
+         DO J = 2, MM                                                   0011
+            JJ = J+MS                                                   0012
+            X(J,K,1) = X(JJ,K,2)                                        0013
+            X(JJ,K,1) = X(J,K,2)                                        0014
          ENDDO
       ENDDO
 
@@ -359,15 +347,16 @@ C  P(I,J,NEW,OLD) {NEW+OLD==3, N<=J}
 
       COMMON /C2/ M,MM1,MP1
 
-      MS = MM1/2                                                        0001
-      MM = MP1/2                                                        0002
+      MS = MM1/2                                                        0007
+      MM = MP1/2                                                        0008
 
-      DOALL K = 2, N-1                                                  0003
+      DOALL K = 2, N-1                                                  0010
          PRIVATE J
-         DO J = 2, MM                                                   0004
-            JJ = J+MS                                                   0005
-            X(J,K,1) = X(JJ,K,2)                                        0006
-            X(JJ,K,1) = X(J,K,2)                                        0007
+         DOALL J = 2, MM                                                0011
+            PRIVATE JJ
+            JJ = J+MS                                                   0012
+            X(J,K,1) = X(JJ,K,2)                                        0013
+            X(JJ,K,1) = X(J,K,2)                                        0014
          ENDDO
       ENDDO
 
@@ -384,41 +373,41 @@ C  P() {LX==32, MM1==MP1-2, MX==92, NX==42, 1<=MM1, MM1<=91}
 C  P() {LX==32, MM1==MP1-2, MX==92, NX==42, 1<=MM1, MM1<=91}
 
 
-      MS = MM1/2                                                        0001
+      MS = MM1/2                                                        0007
 
 C  P(MS) {LX==32, MM1==MP1-2, MX==92, NX==42, 1<=MM1, MM1<=91,
 C    2MS<=MM1, MM1<=2MS+1}
 
-      MM = MP1/2                                                        0002
+      MM = MP1/2                                                        0008
 
 C  P(MM,MS) {LX==32, MM1==MP1-2, MX==92, NX==42, MM1+1<=2MM,
 C    2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
 
-      DO K = 2, N-1                                                     0003
+      DO K = 2, N-1                                                     0010
 
 C  P(J,JJ,K,MM,MS) {LX==32, MM1==MP1-2, MX==92, NX==42, 2<=K, K+1<=N,
 C    MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
-         DO J = 2, MM                                                   0004
+         DO J = 2, MM                                                   0011
 
 C  P(J,JJ,K,MM,MS) {LX==32, MM1==MP1-2, MX==92, NX==42, 2<=J, J<=MM,
 C    2<=K, K+1<=N, MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1,
 C    MM1<=2MS+1}
 
-            JJ = J+MS                                                   0005
+            JJ = J+MS                                                   0012
 
 C  P(J,JJ,K,MM,MS) {J+MS==JJ, LX==32, MM1==MP1-2, MX==92, NX==42,
 C    2<=J, J<=MM, 2<=K, K+1<=N, MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1,
 C    MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
-            X(J,K,1) = X(JJ,K,2)                                        0006
+            X(J,K,1) = X(JJ,K,2)                                        0013
 
 C  P(J,JJ,K,MM,MS) {J+MS==JJ, LX==32, MM1==MP1-2, MX==92, NX==42,
 C    2<=J, J<=MM, 2<=K, K+1<=N, MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1,
 C    MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
-            X(JJ,K,1) = X(J,K,2)                                        0007
+            X(JJ,K,1) = X(J,K,2)                                        0014
          ENDDO
       ENDDO
 
@@ -429,16 +418,16 @@ C    MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
       COMMON /C2/ M,MM1,MP1
 
-      MS = MM1/2                                                        0001
-      MM = MP1/2                                                        0002
+      MS = MM1/2                                                        0007
+      MM = MP1/2                                                        0008
 
-      DOALL K = 2, N-1                                                  0003
+      DOALL K = 2, N-1                                                  0010
          PRIVATE J
-         DOALL J = 2, MM                                                0004
+         DOALL J = 2, MM                                                0011
             PRIVATE JJ
-            JJ = J+MS                                                   0005
-            X(J,K,1) = X(JJ,K,2)                                        0006
-            X(JJ,K,1) = X(J,K,2)                                        0007
+            JJ = J+MS                                                   0012
+            X(J,K,1) = X(JJ,K,2)                                        0013
+            X(JJ,K,1) = X(J,K,2)                                        0014
          ENDDO
       ENDDO
 

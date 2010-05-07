@@ -1,18 +1,18 @@
       PROGRAM SUB
-      PRINT *, 'hello from sub'                                         0001
-      CALL SUB1                                                         0002
+      PRINT *, 'hello from sub'                                         0002
+      CALL SUB1                                                         0003
 !ERROR: Ignored INTEGER*4 value returned by 'SUB2'
-      CALL SUB2()                                                       0003
+      CALL SUB2()                                                       0004
       END
 
       SUBROUTINE SUB1
       EXTERNAL SUB2
       INTEGER SUB2
-      PRINT *, 'hello from sub1'                                        0001
-      PRINT *, SUB2()+1                                                 0002
+      PRINT *, 'hello from sub1'                                        0005
+      PRINT *, SUB2()+1                                                 0006
       END
 
       INTEGER FUNCTION SUB2()
-      PRINT *, 'hello from sub2'                                        0001
-      SUB2 = 1                                                          0002
+      PRINT *, 'hello from sub2'                                        0003
+      SUB2 = 1                                                          0004
       END

@@ -1,0 +1,20 @@
+[original module]
+foo fooo(foo fo)
+{
+   return fo;
+}
+[after unsplit and recovering]
+/*
+ * file for recover_include.c
+ */
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int foo;
+
+extern foo fooo(foo fo);
+foo fooo(foo fo)
+{
+   return fo;
+}
+

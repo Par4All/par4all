@@ -58,16 +58,16 @@
       PARAMETER (LD = 1.0D0)
       INTEGER J
       REAL*4 K
-      PRINT *, I, R, D                                                  0001
-      J = I+5                                                           0002
-      K = I+5.9                                                         0003
-      PRINT *, I, IR, ID, IFL, IO                                       0004
-      PRINT *, R, RI, RD, RF, RO, ROR                                   0005
-      PRINT *, D, DI, DF, DR, DOP, DOI                                  0006
-      PRINT *, L, L1, L2                                                0007
+      PRINT *, I, R, D                                                  0034
+      J = I+5                                                           0035
+      K = I+5.9                                                         0036
+      PRINT *, I, IR, ID, IFL, IO                                       0037
+      PRINT *, R, RI, RD, RF, RO, ROR                                   0038
+      PRINT *, D, DI, DF, DR, DOP, DOI                                  0039
+      PRINT *, L, L1, L2                                                0040
 ! 8 errors...
-      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0008
-      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0009
+      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0042
+      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0043
       END
 #### after type checking
       PROGRAM PARAM
@@ -129,13 +129,13 @@
       PARAMETER (LD = 1.0D0)
       INTEGER J
       REAL*4 K
-      PRINT *, I, R, D                                                  0001
-      J = I+5                                                           0002
-      K = REAL(I)+5.9                                                   0003
-      PRINT *, I, IR, ID, IFL, IO                                       0004
-      PRINT *, R, RI, RD, RF, RO, ROR                                   0005
-      PRINT *, D, DI, DF, DR, DOP, DOI                                  0006
-      PRINT *, L, L1, L2                                                0007
+      PRINT *, I, R, D                                                  0034
+      J = I+5                                                           0035
+      K = REAL(I)+5.9                                                   0036
+      PRINT *, I, IR, ID, IFL, IO                                       0037
+      PRINT *, R, RI, RD, RF, RO, ROR                                   0038
+      PRINT *, D, DI, DF, DR, DOP, DOI                                  0039
+      PRINT *, L, L1, L2                                                0040
 ! 8 errors...
 !ERROR: INTEGER*4 parameter 'IL' definition from incompatible type LOGICAL*4
 !ERROR: REAL*8 parameter 'DL' definition from incompatible type LOGICAL*4
@@ -144,7 +144,7 @@
 !ERROR: LOGICAL*4 parameter 'LR' definition from incompatible type REAL*4
 !ERROR: LOGICAL*4 parameter 'LD' definition from incompatible type REAL*8
 !ERROR: LOGICAL*4 parameter 'L3' definition from incompatible type INTEGER*4
-      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0008
-      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0009
+      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0042
+      PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0043
       END
 run resulting code

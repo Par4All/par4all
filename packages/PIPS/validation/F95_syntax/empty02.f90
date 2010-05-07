@@ -1,0 +1,10 @@
+SUBROUTINE EMPTY02 (i)
+  i=1
+END SUBROUTINE EMPTY02
+
+PROGRAM MAIN
+  integer :: i
+  i = 4
+  CALL EMPTY02 (i)
+  print *, i
+END PROGRAM MAIN

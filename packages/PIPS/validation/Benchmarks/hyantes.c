@@ -22,6 +22,7 @@ towns read_towns(const char fname[])
 {
     FILE * fd = fopen(fname,"r");
     size_t curr=0;
+    char c;
     towns the_towns = { 1 , malloc(sizeof(town)) };
     fprintf(stderr,"begin parsing ...\n");
 
@@ -34,7 +35,6 @@ towns read_towns(const char fname[])
         }
         if(fscanf(fd,INPUT_FORMAT,&the_towns.data[curr][0],&the_towns.data[curr][1],&the_towns.data[curr][2]) !=3 )
         {
-            char c;
             while(!feof(fd))
             {
                 c=(char)fgetc(fd);

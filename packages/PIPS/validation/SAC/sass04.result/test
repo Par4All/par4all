@@ -1,0 +1,32 @@
+int main()
+{
+   int a, b, c, i;
+   a = 1;
+   b = a;
+   for(i = 0; i <= 9; i += 1) {
+      a = 2;
+      b = a+b;
+      a = 3;
+   }
+   c = a;
+   printf("%d-%d-%d", a, b, c);
+   return 0;
+}
+int main()
+{
+   int a, b, c, i;
+   //PIPS generated variable
+   int c0, a0, a1, a2;
+   a2 = 1;
+   b = a2;
+   for(i = 0; i <= 9; i += 1) {
+      a1 = 2;
+      b = a1+b;
+      a0 = 3;
+   }
+   c0 = a0;
+   printf("%d-%d-%d", a0, b, c0);
+   return 0;
+}
+ok
+

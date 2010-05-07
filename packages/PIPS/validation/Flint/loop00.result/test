@@ -8,68 +8,68 @@
       LOGICAL L
       CHARACTER H
 ! type of index
-      DO I = 1, 10, 2                                                   0001
-         PRINT *, 'hello'                                               0002
+      DO I = 1, 10, 2                                                   0010
+         PRINT *, 'hello'                                               0011
       ENDDO
-      DO R = 1, 10, 2                                                   0003
-         PRINT *, 'hello'                                               0004
-      ENDDO
-      DO D = 1, 10, 2                                                   0005
-         PRINT *, 'hello'                                               0006
-      ENDDO
-      DO C = 1, 10, 2                                                   0007
-         PRINT *, 'hello'                                               0008
-      ENDDO
-      DO DC = 1, 10, 2                                                  0009
-         PRINT *, 'hello'                                               0010
-      ENDDO
-      DO L = 1, 10, 2                                                   0011
-         PRINT *, 'hello'                                               0012
-      ENDDO
-      DO H = 1, 10, 2                                                   0013
+      DO R = 1, 10, 2                                                   0013
          PRINT *, 'hello'                                               0014
       ENDDO
-! int index
-      DO I = 1.0, 10.0, 2.0                                             0015
-         PRINT *, 'hello'                                               0016
+      DO D = 1, 10, 2                                                   0016
+         PRINT *, 'hello'                                               0017
       ENDDO
-      DO I = 1.0, 10.0, 2.0                                             0017
-         PRINT *, 'hello'                                               0018
-      ENDDO
-      DO I = 1.0E0, 10.0E0, 2.0E0                                       0019
+      DO C = 1, 10, 2                                                   0019
          PRINT *, 'hello'                                               0020
       ENDDO
-      DO I = 1.0D0, 10.0D0, 2.0D0                                       0021
-         PRINT *, 'hello'                                               0022
+      DO DC = 1, 10, 2                                                  0022
+         PRINT *, 'hello'                                               0023
       ENDDO
-      DO I = L, C, DC                                                   0023
-         PRINT *, 'hello'                                               0024
-      ENDDO
-! real index
-      DO R = 1.0, 10.0, 2.0                                             0025
+      DO L = 1, 10, 2                                                   0025
          PRINT *, 'hello'                                               0026
       ENDDO
-      DO R = 1.0, 10.0, 2.0                                             0027
-         PRINT *, 'hello'                                               0028
+      DO H = 1, 10, 2                                                   0028
+         PRINT *, 'hello'                                               0029
       ENDDO
-      DO R = 1.0E0, 10.0E0, 2.0E0                                       0029
-         PRINT *, 'hello'                                               0030
+! int index
+      DO I = 1.0, 10.0, 2.0                                             0032
+         PRINT *, 'hello'                                               0033
       ENDDO
-      DO R = 1.0D0, 10.0D0, 2.0D0                                       0031
-         PRINT *, 'hello'                                               0032
-      ENDDO
-! double index
-      DO D = 1.0, 10.0, 2.0                                             0033
-         PRINT *, 'hello'                                               0034
-      ENDDO
-      DO D = 1.0, 10.0, 2.0                                             0035
+      DO I = 1.0, 10.0, 2.0                                             0035
          PRINT *, 'hello'                                               0036
       ENDDO
-      DO D = 1.0E0, 10.0E0, 2.0E0                                       0037
-         PRINT *, 'hello'                                               0038
+      DO I = 1.0E0, 10.0E0, 2.0E0                                       0038
+         PRINT *, 'hello'                                               0039
       ENDDO
-      DO D = 1.0D0, 10.0D0, 2.0D0                                       0039
-         PRINT *, 'hello'                                               0040
+      DO I = 1.0D0, 10.0D0, 2.0D0                                       0041
+         PRINT *, 'hello'                                               0042
+      ENDDO
+      DO I = L, C, DC                                                   0044
+         PRINT *, 'hello'                                               0045
+      ENDDO
+! real index
+      DO R = 1.0, 10.0, 2.0                                             0048
+         PRINT *, 'hello'                                               0049
+      ENDDO
+      DO R = 1.0, 10.0, 2.0                                             0051
+         PRINT *, 'hello'                                               0052
+      ENDDO
+      DO R = 1.0E0, 10.0E0, 2.0E0                                       0054
+         PRINT *, 'hello'                                               0055
+      ENDDO
+      DO R = 1.0D0, 10.0D0, 2.0D0                                       0057
+         PRINT *, 'hello'                                               0058
+      ENDDO
+! double index
+      DO D = 1.0, 10.0, 2.0                                             0061
+         PRINT *, 'hello'                                               0062
+      ENDDO
+      DO D = 1.0, 10.0, 2.0                                             0064
+         PRINT *, 'hello'                                               0065
+      ENDDO
+      DO D = 1.0E0, 10.0E0, 2.0E0                                       0067
+         PRINT *, 'hello'                                               0068
+      ENDDO
+      DO D = 1.0D0, 10.0D0, 2.0D0                                       0070
+         PRINT *, 'hello'                                               0071
       ENDDO
       END
 ### type checked file
@@ -82,86 +82,86 @@
       LOGICAL L
       CHARACTER H
 ! type of index
-      DO I = 1, 10, 2                                                   0001
-         PRINT *, 'hello'                                               0002
+      DO I = 1, 10, 2                                                   0010
+         PRINT *, 'hello'                                               0011
       ENDDO
 !ERROR: Obsolescent non integer loop index 'R' (R822 ISO/IEC 1539:1991 (E))
-      DO R = 1.0E0, 10.0E0, 2.0E0                                       0003
-         PRINT *, 'hello'                                               0004
+      DO R = 1.0E0, 10.0E0, 2.0E0                                       0013
+         PRINT *, 'hello'                                               0014
       ENDDO
 !ERROR: Obsolescent non integer loop index 'D' (R822 ISO/IEC 1539:1991 (E))
-      DO D = 1.0D0, 10.0D0, 2.0D0                                       0005
-         PRINT *, 'hello'                                               0006
+      DO D = 1.0D0, 10.0D0, 2.0D0                                       0016
+         PRINT *, 'hello'                                               0017
       ENDDO
 !ERROR: Obsolescent non integer loop index 'C' (R822 ISO/IEC 1539:1991 (E))
 !ERROR: Index 'C' must be Integer, Real or Double!
-      DO C = 1, 10, 2                                                   0007
-         PRINT *, 'hello'                                               0008
+      DO C = 1, 10, 2                                                   0019
+         PRINT *, 'hello'                                               0020
       ENDDO
 !ERROR: Obsolescent non integer loop index 'DC' (R822 ISO/IEC 1539:1991 (E))
 !ERROR: Index 'DC' must be Integer, Real or Double!
-      DO DC = 1, 10, 2                                                  0009
-         PRINT *, 'hello'                                               0010
+      DO DC = 1, 10, 2                                                  0022
+         PRINT *, 'hello'                                               0023
       ENDDO
 !ERROR: Obsolescent non integer loop index 'L' (R822 ISO/IEC 1539:1991 (E))
 !ERROR: Index 'L' must be Integer, Real or Double!
-      DO L = 1, 10, 2                                                   0011
-         PRINT *, 'hello'                                               0012
+      DO L = 1, 10, 2                                                   0025
+         PRINT *, 'hello'                                               0026
       ENDDO
 !ERROR: Obsolescent non integer loop index 'H' (R822 ISO/IEC 1539:1991 (E))
 !ERROR: Index 'H' must be Integer, Real or Double!
-      DO H = 1, 10, 2                                                   0013
-         PRINT *, 'hello'                                               0014
+      DO H = 1, 10, 2                                                   0028
+         PRINT *, 'hello'                                               0029
       ENDDO
 ! int index
-      DO I = 1, 10, 2                                                   0015
-         PRINT *, 'hello'                                               0016
+      DO I = 1, 10, 2                                                   0032
+         PRINT *, 'hello'                                               0033
       ENDDO
-      DO I = 1, 10, 2                                                   0017
-         PRINT *, 'hello'                                               0018
+      DO I = 1, 10, 2                                                   0035
+         PRINT *, 'hello'                                               0036
       ENDDO
-      DO I = 1, 10, 2                                                   0019
-         PRINT *, 'hello'                                               0020
+      DO I = 1, 10, 2                                                   0038
+         PRINT *, 'hello'                                               0039
       ENDDO
-      DO I = 1, 10, 2                                                   0021
-         PRINT *, 'hello'                                               0022
+      DO I = 1, 10, 2                                                   0041
+         PRINT *, 'hello'                                               0042
       ENDDO
 !ERROR: Range of index 'I' must be Integer, Real or Double!
-      DO I = L, C, DC                                                   0023
-         PRINT *, 'hello'                                               0024
+      DO I = L, C, DC                                                   0044
+         PRINT *, 'hello'                                               0045
       ENDDO
 ! real index
 !ERROR: Obsolescent non integer loop index 'R' (R822 ISO/IEC 1539:1991 (E))
-      DO R = 1.0, 10.0, 2.0                                             0025
-         PRINT *, 'hello'                                               0026
+      DO R = 1.0, 10.0, 2.0                                             0048
+         PRINT *, 'hello'                                               0049
       ENDDO
 !ERROR: Obsolescent non integer loop index 'R' (R822 ISO/IEC 1539:1991 (E))
-      DO R = 1.0, 10.0, 2.0                                             0027
-         PRINT *, 'hello'                                               0028
+      DO R = 1.0, 10.0, 2.0                                             0051
+         PRINT *, 'hello'                                               0052
       ENDDO
 !ERROR: Obsolescent non integer loop index 'R' (R822 ISO/IEC 1539:1991 (E))
-      DO R = 1.0E0, 10.0E0, 2.0E0                                       0029
-         PRINT *, 'hello'                                               0030
+      DO R = 1.0E0, 10.0E0, 2.0E0                                       0054
+         PRINT *, 'hello'                                               0055
       ENDDO
 !ERROR: Obsolescent non integer loop index 'R' (R822 ISO/IEC 1539:1991 (E))
-      DO R = 1.0E0, 10.0E0, 2.0E0                                       0031
-         PRINT *, 'hello'                                               0032
+      DO R = 1.0E0, 10.0E0, 2.0E0                                       0057
+         PRINT *, 'hello'                                               0058
       ENDDO
 ! double index
 !ERROR: Obsolescent non integer loop index 'D' (R822 ISO/IEC 1539:1991 (E))
-      DO D = 1.0D0, 10.0D0, 2.0D0                                       0033
-         PRINT *, 'hello'                                               0034
+      DO D = 1.0D0, 10.0D0, 2.0D0                                       0061
+         PRINT *, 'hello'                                               0062
       ENDDO
 !ERROR: Obsolescent non integer loop index 'D' (R822 ISO/IEC 1539:1991 (E))
-      DO D = 1.0D0, 10.0D0, 2.0D0                                       0035
-         PRINT *, 'hello'                                               0036
+      DO D = 1.0D0, 10.0D0, 2.0D0                                       0064
+         PRINT *, 'hello'                                               0065
       ENDDO
 !ERROR: Obsolescent non integer loop index 'D' (R822 ISO/IEC 1539:1991 (E))
-      DO D = 1.0D0, 10.0D0, 2.0D0                                       0037
-         PRINT *, 'hello'                                               0038
+      DO D = 1.0D0, 10.0D0, 2.0D0                                       0067
+         PRINT *, 'hello'                                               0068
       ENDDO
 !ERROR: Obsolescent non integer loop index 'D' (R822 ISO/IEC 1539:1991 (E))
-      DO D = 1.0D0, 10.0D0, 2.0D0                                       0039
-         PRINT *, 'hello'                                               0040
+      DO D = 1.0D0, 10.0D0, 2.0D0                                       0070
+         PRINT *, 'hello'                                               0071
       ENDDO
       END

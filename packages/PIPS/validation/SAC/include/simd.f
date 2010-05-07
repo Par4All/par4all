@@ -11,6 +11,26 @@
 
       phi = x
       end
+      subroutine SIMD_LOAD_V2SF_TO_V2DF(vsf,vsi)
+      real*4 vsf(2)
+      real*8 vdf(2)
+      vsf(1)=vdf(1)
+      vsf(2)=vdf(2)
+      end
+      subroutine SIMD_SAVE_V2SF_TO_V2DF(sdf,vsf)
+      real*4 vsf(2)
+      real*8 vdf(2)
+      vdf(1)=vsf(1)
+      vdf(2)=vsf(2)
+      end
+      subroutine SIMD_LOAD_V4SI_TO_V4SF(vsf,vsi)
+      real*4 vsf(4)
+      integer*4 vsi(4)
+      vsf(1)=vsi(1)
+      vsf(2)=vsi(2)
+      vsf(3)=vsi(3)
+      vsf(4)=vsi(4)
+      end
 
       subroutine simd_load_v4sf(vec, base)
       real*4 vec(4)
@@ -190,6 +210,15 @@
 
       dest(1) = src1(1) + src2(1)
       dest(2) = src1(2) + src2(2)
+      end
+      subroutine simd_uminps(dest, src1)
+      real*4 dest(4)
+      real*4 src1(4)
+
+      dest(1) =  - src1(1)
+      dest(2) =  - src1(2)
+      dest(3) =  - src1(3)
+      dest(4) =  - src1(4)
       end
 
       subroutine simd_subps(dest, src1, src2)

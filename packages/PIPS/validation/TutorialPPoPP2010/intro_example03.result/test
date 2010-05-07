@@ -1,0 +1,13 @@
+!!
+!! file for intro_example03.f
+!!
+      REAL FUNCTION SUM(N, A)
+      REAL S, A(100)
+      IF (101.LE.N) STOP 'Bound violation:, READING,  array SUM:A, upper
+     & bound, 1st dimension'
+      S = 0.
+      DO I = 1, N
+         S = S+2.*A(I)
+      ENDDO
+      SUM = S
+      END

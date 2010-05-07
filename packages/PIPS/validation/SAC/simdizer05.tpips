@@ -29,7 +29,7 @@ module main
 
 setproperty SAC_SIMD_REGISTER_WIDTH 128
 setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
-setproperty SIMDIZER_COMMUTATIVE_OPERATORS "SIMD_MULPS,SIMD_ADDPS,SIMD_MULPD,SIMD_ADDPD"
+setproperty RELAX_FLOAT_COMMUTATIVITY TRUE
 
 echo after vectorization with commutativity
 apply SIMDIZER

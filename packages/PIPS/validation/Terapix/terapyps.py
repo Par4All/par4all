@@ -80,7 +80,8 @@ def terapyps(kernel_module,loop_label,*input_sources):
 	# be cleaner
 	km.loop_normalize(one_increment=True,skip_index_side_effect=True)
 	km.partial_eval(linearize=True)
-	if verbose == 2: km.display()
+	if verbose == 2: km.display(With="PRINT_CODE_REGIONS")
+	if verbose == 2: km.display(With="PRINT_CODE_PRECONDITIONS")
 	exit()
 #	km.suppress_trivial_test()
 #	if verbose == 2: km.display()

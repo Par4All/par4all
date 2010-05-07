@@ -1,0 +1,10 @@
+delete write
+create write write.f90 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE[%ALL]
+
+close
+delete write
+quit

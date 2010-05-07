@@ -6,13 +6,13 @@ C  P() {}
 
 C  P() {}
 
-      PRINT *, 'hello'                                                  0001
+      PRINT *, 'hello'                                                  0003
 
 C  P() {}
 
-      I = 1                                                             0002
+      I = 1                                                             0004
 
 C  P(I) {I==1}
 
-      PRINT *, 'bye'                                                    0003
+      PRINT *, 'bye'                                                    0005
       END
