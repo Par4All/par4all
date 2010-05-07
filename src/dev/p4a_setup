@@ -165,11 +165,9 @@ export P4A_ETC=\$P4A_ROOT/run/etc
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$P4A_ROOT/run/lib
 export PKG_CONFIG_PATH=\$P4A_ROOT/run/lib/pkgconfig
-# To fix...
-export PYTHONPATH=\$P4A_ROOT/run/lib/python2.5/site-packages/pips
 
-# To have ply under python3.1:
-PYTHONPATH=\$PYTHONPATH:/usr/share/pyshared
+PYTHONPATH_=\$(echo \$P4A_ROOT/run/lib/python*/site-packages/pips)
+export PYTHONPATH=\$PYTHONPATH_:/usr/share/pyshared
 
 # Temporary place for P4A_accel
 export P4A_ACCEL_DIR=\$P4A_ROOT/src/p4a_accel
@@ -177,7 +175,6 @@ export P4A_ACCEL_DIR=\$P4A_ROOT/src/p4a_accel
 # Some hack to have p4a_recover_includes working. Directory to move
 # somewhere else later...
 #export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
-#export PYTHONPATH=/usr/share/pyshared
 EOF
 
 # Find the Fortran compiler:

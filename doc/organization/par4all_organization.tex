@@ -883,6 +883,38 @@ p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
 then if you are happy with it you can commit with 'Agit or revert back to
 previous state with \Agit.
 
+\subsection{Validation script}
+\label{sec:validation_script}
+
+It is possible to select different options to test with the python script \verb|p4a_validate_class.py|
+Currently, 3 options are available:
+
+\begin{description}
+\item[\texttt{--pips}:] Validate tests which are done by default file (in packages/PIPS/validation)
+
+\item[\texttt{--p4a}:] Validate tests which are done by \verb|par4all_validation.txt| (which must be previously created in src/validation)
+
+\item[\texttt{-h} or \texttt{--help}:] Help for \verb|p4a_validate_class.py|
+\end{description}
+
+Examples with \verb|p4a_validate_class.py|:
+\begin{verbatim}
+python p4a_validate_class.py --pips
+\end{verbatim}
+or
+\begin{verbatim}
+python p4a_validate_class.py --p4a
+\end{verbatim}
+
+To use the option --p4a, a  \verb|par4all_validation.txt| must be previously created. This file lists all tests that the validation will do.
+Syntax to add a new test is: \verb|directory_test/name_test|
+
+Example of a \verb|par4all_validation.txt| with 3 tests:
+\begin{verbatim}
+Syntax\alias.f
+Syntax\allocatable.tpips
+Syntax\altret01.f
+\end{verbatim}
 
 \section{Branches}
 \label{sec:branches}

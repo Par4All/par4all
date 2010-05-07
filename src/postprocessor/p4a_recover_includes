@@ -30,6 +30,10 @@ import ply.lex as lex
 
 #from pyps import *
 
+verbose = False
+#verbose = True
+
+
 # The #include files we want to analyse:
 # I use on the GNU libc'Appendix B Summary of Library Facilities' a
 # grep '\.h' l | sed 's/.*`/    "/; s/'"'"'.*/",/' | sort -u
@@ -141,7 +145,6 @@ tmp_header_file_name = "header.c"
 header_information_file_name = "header_information.pickle"
 
 
-verbose = False
 declaration_to_header = {}
 
 
@@ -232,13 +235,90 @@ class SimpleC99Lexer:
     # C99 character literal:
     t_char = r'\'([^\\\n]|(\\.))*?\''
 
-    # A preprocessor postion information about an included standard
+    # A preprocessor position information about an included standard
     # include of the form '# 1 "/usr/include/features.h" 1 3 4'
     # See cpp-4.2 info '9 Preprocessor Output'
 
     #t_std_include = r'# 1 "/usr/include/[^"]+"[^\n]+\n'
     #t_std_include = r'\# .*1 [^\n]+\n'
     t_std_include = r'\#[ ][1][ ]"/usr/include/[^"]+"[^\n]+\n'
+
+    # For other characters, we store them as the current declaration:
+    def t_error(self, t):
+        if verbose:
+            print("Found character '%s'" % t.value[0])
+        # Keep the caracter as input
+        t.lexer.content += t.value[0]
+        # Remove is from the input:
+        t.lexer.skip(1)
+
+    # A string containing ignored characters (spaces and tabs)
+    t_ignore  = ''
+
+    # Build the lexer:
+    def build(self, **kwargs):
+        self.lexer = lex.lex(module=self, **kwargs)
+        # To store the string of a declaration encountered:
+        self.lexer.content = ""
+        # Start without a nest { }:
+        self.lexer.level = 0
+
+
+class SimpleC99Lexer_simple:
+    """The PLY-lexer to parse C declarations with comments.
+    The difficulty it to track nested { }"""
+
+    # Declare the tokens:
+    tokens = (
+        'LBRACE',
+        'RBRACE',
+        'SEMICOLON',
+        'std_include',
+        'comment',
+        'string',
+        'char'
+        )
+
+
+    # Match the '{':
+    def t_LBRACE(self, t):
+        r'\{'
+        if verbose:
+            print ("Found '{' at level", t.lexer.level)
+        # Increase the nesting counter:
+        t.lexer.level += 1
+        return t
+
+
+    # Match the '}':
+    def t_RBRACE(self, t):
+        r'\}'
+        t.lexer.level -= 1
+        if verbose:
+            print ("Found '}' back to level", t.lexer.level)
+        return t
+
+    # C99 comments, taken from pips/src/Libs/c_syntax/clex.l:
+    t_comment = r'(/\*([^*]|(\*+[^/*]))*\*+/\w*)|(//(\\\n|[^\n])*\n?)'
+
+
+    # C99 string:
+    t_string = r'"(\\"|[^"\\]|\\[^"])*"'
+
+    # C99 character literal:
+    t_char = r'\'([^\\\n]|(\\.))*?\''
+
+    # A preprocessor position information about an included standard
+    # include of the form '# 1 "/usr/include/features.h" 1 3 4'
+    # See cpp-4.2 info '9 Preprocessor Output'
+
+    #t_std_include = r'# 1 "/usr/include/[^"]+"[^\n]+\n'
+    #t_std_include = r'\# .*1 [^\n]+\n'
+    #t_std_include = r'#[^\n]+\n'
+    t_std_include = r'\#[ ]\d+ [^\n]+\n'
+
+    # Match the potential end of a declaration:
+    t_SEMICOLON = r';'
 
     # For other characters, we store them as the current declaration:
     def t_error(self, t):
@@ -469,6 +549,179 @@ def postpreprocess(output_string):
     # For later use of the lexer, if any, throw away useless characters:
     l.lexer.content = ""
 
+#/usr/include/
+parse_line_pragma_re = re.compile(r'\# (\d+) "([^"]+)" (\d) ?(\d)? ?(\d)?\n')
+include_stack = []
+def postpreprocess_simple(output_string):
+    "Add a comment on all the begin of standard include files"
+    # Build the lexer:
+    l = SimpleC99Lexer_simple()
+    l.build()
+    # Give the lexer some input:
+    l.lexer.input(output_string)
+
+    # Tokenize:
+    for tok in l.lexer:
+        if verbose:
+            print(tok)
+        if tok.type == 'std_include':
+            #print(tok.value, end = '')
+            m = parse_line_pragma_re.match(tok.value)
+            if m:
+                file_name = m.group(2)
+                print(file_name,m.group(3),m.group(4),m.group(5))
+                if m.group(3) == "1":
+                    include_stack.append(file_name)
+                    if verbose:
+                        print('Including', file_name, len(include_stack))
+                    #print(include_stack)
+                if m.group(3) == "2":
+                    if verbose:
+                        print('Returning from', include_stack.pop(), len(include_stack))
+                    pass
+        elif include_stack:
+            # We are in an inclusion, so decorate only full statements:
+            if tok.type == 'comment':
+                # Remove comments
+                pass
+            else:
+                # Keep the content
+                l.lexer.content += tok.value
+                if tok.type == 'SEMICOLON' and l.lexer.level == 0:
+                    # The end of a construction, output a comment,
+                    # followed by the construction
+                    print('/* P4A include tracking:', include_stack[0], '*/')
+                    # Remove leading \n:
+                    content = re.sub('^\s+', '', l.lexer.content)
+                    print(content)
+                    l.lexer.content = ""
+        else:
+            # No special processing:
+            # Keep the content and print it:
+            l.lexer.content += tok.value
+            #print(l.lexer.content, end = '')
+            print(l.lexer.content)
+            # Reset the content buffer:
+            l.lexer.content = ""
+
+    # Flush the output
+    print(l.lexer.content, end = '')
+    # For later use of the lexer, if any, throw away useless characters:
+    l.lexer.content = ""
+
+
+# To get pseudo-comments as /* P4A include tracking: /usr/include/stdio.h */
+parse_pseudo_comment_re = re.compile(r'^/\* P4A include tracking: /usr/include/(.*) \*/$')
+def recover_header_simple(file_name, output_file_name):
+    """Replace CPP-inlined stuff from previous #include <something.h> by
+    the #include <something.h> itself"""
+
+    # To store the set of found headers:
+    found_headers = set()
+
+    f = open(file_name)
+    # slurp all the file in a string:
+    content = f.read()
+    f.close()
+
+    # Build the lexer:
+    l = SimpleC99Lexer_simple()
+    l.build()
+
+    # Give the lexer some input:
+    l.lexer.input(content)
+
+    # The current header use encountered, used also as a FSM:
+    header = None
+
+    # Tokenize:
+    for tok in l.lexer:
+        if verbose:
+            print(tok)
+        if tok.type == 'comment':
+            #print(tok.value, end = '')
+            m = parse_pseudo_comment_re.match(tok.value)
+            if m:
+                header = m.group(1)
+                if verbose:
+                    print('Header used:', header)
+                found_headers.add(header)
+            else:
+                # Normal comment
+                print(tok.value, end = '')
+        elif header:
+            # We are skipping up to the end of the statement since it will
+            # be replaced later by a #include:
+            if tok.type == 'SEMICOLON' and l.lexer.level == 0:
+                if verbose:
+                    print('End of header used:', header)
+                # It is the end of the statement, revert in normal mode:
+                header = None
+            else:
+                # Just skip:
+                pass
+        else:
+            # Normal content & output:
+            print(tok.value, end = '')
+
+
+def postpreprocess(output_string):
+    "Add a comment on all the begin of standard include files"
+    # Build the lexer:
+    l = SimpleC99Lexer_simple()
+    l.build()
+    # Give the lexer some input:
+    l.lexer.input(output_string)
+
+    # Tokenize:
+    for tok in l.lexer:
+        if verbose:
+            print(tok)
+        if tok.type == 'std_include':
+            #print(tok.value, end = '')
+            m = parse_line_pragma_re.match(tok.value)
+            if m:
+                file_name = m.group(2)
+                #print(file_name,m.group(3),m.group(4),m.group(5))
+                if m.group(3) == "1":
+                    include_stack.append(file_name)
+                    if verbose:
+                        print('Including', file_name, len(include_stack))
+                    #print(include_stack)
+                if m.group(3) == "2":
+                    if verbose:
+                        print('Returning from', include_stack.pop(), len(include_stack))
+                    pass
+        elif include_stack:
+            # We are in an inclusion, so decorate only full statements:
+            if tok.type == 'comment':
+                # Remove comments
+                pass
+            else:
+                # Keep the content
+                l.lexer.content += tok.value
+                if tok.type == 'SEMICOLON' and l.lexer.level == 0:
+                    # The end of a construction, output a comment,
+                    # followed by the construction
+                    print('/* P4A include tracking:', include_stack[0], '*/')
+                    # Remove leading \n:
+                    content = re.sub('^\s+', '', l.lexer.content)
+                    print(content)
+                    l.lexer.content = ""
+        else:
+            # No special processing:
+            # Keep the content and print it:
+            l.lexer.content += tok.value
+            #print(l.lexer.content, end = '')
+            print(l.lexer.content)
+            # Reset the content buffer:
+            l.lexer.content = ""
+
+    # Flush the output
+    print(l.lexer.content, end = '')
+    # For later use of the lexer, if any, throw away useless characters:
+    l.lexer.content = ""
+
 
 def preprocess(option, opt_str, value, parser):
     """Call the preprocessor on the given argument and postprocess a little bit the output to add comments to better track standard file inclusion.
@@ -494,7 +747,8 @@ def preprocess(option, opt_str, value, parser):
         print('The output before', output_string)
     # Well, add a postprocess phase in the... preprocessor phase :-)
     # Transform the byte array into string before
-    postpreprocess(output_string.decode())
+    #postpreprocess(output_string.decode())
+    postpreprocess_simple(output_string.decode())
 
 
 def main():
@@ -539,10 +793,10 @@ def main():
             # If there are still args, this program is used as a #include
             # recovery tool.
             # Then first load the mapping information
-            load_header_information()
+            ###load_header_information()
             # An then recover #include in each file:
             for file_name in args:
-                recover_header(file_name, options.output_file_name)
+                recover_header_simple(file_name, options.output_file_name)
 
 
 # If this programm is independent it is executed:
