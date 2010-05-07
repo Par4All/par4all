@@ -52,12 +52,12 @@ Properties
 Crough
 Top-level
 Demo-2009
+Gpu
 # should be added?
 # AliasChecking
 # ArrayBoundCheck
 # ArrayResizing
 # Blas
-# Gpu
 # Pointers
 # RegionTranslation
 # UseBeforeSet

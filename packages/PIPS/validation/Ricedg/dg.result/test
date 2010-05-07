@@ -12,6 +12,4 @@ First dependence graph for "FOO"
 
 First dependence graph for "FOO1"
 
-4 5 W R <X(1)> - <X(2)> levels()
-4 5 W W <X(1)> - <X(2)> levels()
 

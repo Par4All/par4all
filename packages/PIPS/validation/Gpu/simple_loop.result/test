@@ -16,19 +16,19 @@ void P4A_accel_malloc(void **dest, size_t n)
 {
    *dest = malloc(n);
 }
-void * P4A_copy_from_accel(void *host_address, void *accel_address, size_t n)
+void * P4A_copy_from_accel(void *host_address, const void *accel_address, size_t n)
 {
    size_t i;
 
-   for(i = 0; i <= n-1; i += 1)
+   for(i = 0; i <= -1+n; i += 1)
       ((char *) host_address)[i] = ((const char *) accel_address)[i];
    return host_address;
 }
-void * P4A_copy_to_accel(void *host_address, void *accel_address, size_t n)
+void * P4A_copy_to_accel(const void *host_address, void *accel_address, size_t n)
 {
    size_t i;
 
-   for(i = 0; i <= n-1; i += 1)
+   for(i = 0; i <= -1+n; i += 1)
       ((char *) accel_address)[i] = ((const char *) host_address)[i];
    return accel_address;
 }
@@ -66,19 +66,19 @@ void P4A_accel_malloc(void **dest, size_t n)
 {
    *dest = malloc(n);
 }
-void * P4A_copy_from_accel(void *host_address, void *accel_address, size_t n)
+void * P4A_copy_from_accel(void *host_address, const void *accel_address, size_t n)
 {
    size_t i;
 
-   for(i = 0; i <= n-1; i += 1)
+   for(i = 0; i <= -1+n; i += 1)
       ((char *) host_address)[i] = ((const char *) accel_address)[i];
    return host_address;
 }
-void * P4A_copy_to_accel(void *host_address, void *accel_address, size_t n)
+void * P4A_copy_to_accel(const void *host_address, void *accel_address, size_t n)
 {
    size_t i;
 
-   for(i = 0; i <= n-1; i += 1)
+   for(i = 0; i <= -1+n; i += 1)
       ((char *) accel_address)[i] = ((const char *) host_address)[i];
    return accel_address;
 }
