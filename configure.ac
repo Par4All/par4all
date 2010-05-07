@@ -94,7 +94,7 @@ AX_ARG_ENABLE([doc],
 			   AX_LATEX_PACKAGE([tikz])
 			   AX_LATEX_PACKAGE([hyperref])
 			   AX_LATEX_PACKAGE([epsfig])
-			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf listings tikz html])
+			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf listings tikz hyperref epsfig])
 			  ]
 )
 AM_CONDITIONAL([WITH_DOC],[AX_HAS([doc])])
