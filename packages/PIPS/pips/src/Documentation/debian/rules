@@ -89,7 +89,7 @@ binary-arch: build install
 #	dh_installemacsen
 #	dh_installpam
 #	dh_installmime
-	dh_pysupport
+	dh_pysupport --sourcedir=debian/tmp
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
