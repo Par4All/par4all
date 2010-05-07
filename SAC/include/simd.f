@@ -11,18 +11,33 @@
 
       phi = x
       end
+      subroutine SIMD_LOAD_V2DC_TO_V2DI(vdc,vdi)
+      integer*8 vdi(2)
+      complex*8 vdc(2)
+      vdc(1)=vdi(1)
+      vdc(2)=vdi(2)
+      end
+      subroutine SIMD_SAVE_V2DC_TO_V2DI(vdc,vdi)
+      integer*8 vdi(2)
+      complex*8 vdc(2)
+      vdc(1)=vdi(1)
+      vdc(2)=vdi(2)
+      end
+
       subroutine SIMD_LOAD_V2SF_TO_V2DF(vsf,vsi)
       real*4 vsf(2)
-      real*8 vdf(2)
-      vsf(1)=vdf(1)
-      vsf(2)=vdf(2)
+      real*8 vsi(2)
+      vsf(1)=vsi(1)
+      vsf(2)=vsi(2)
       end
-      subroutine SIMD_SAVE_V2SF_TO_V2DF(sdf,vsf)
+
+      subroutine SIMD_SAVE_V2SF_TO_V2DF(vdf,vsf)
       real*4 vsf(2)
       real*8 vdf(2)
       vdf(1)=vsf(1)
       vdf(2)=vsf(2)
       end
+
       subroutine SIMD_LOAD_V4SI_TO_V4SF(vsf,vsi)
       real*4 vsf(4)
       integer*4 vsi(4)
