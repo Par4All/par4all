@@ -587,6 +587,12 @@ static void html_print_test( test t ) {
 static void html_print_statement( statement s ) {
   begin_block( "statement" );
 
+  if(statement_label(s) != entity_undefined ) {
+    begin_block( "label" );
+    html_print_entity( statement_label(s) );
+    end_block( "label" );
+  }
+
   list l = statement_declarations(s);
   if ( l ) {
     begin_block( "declarations" );

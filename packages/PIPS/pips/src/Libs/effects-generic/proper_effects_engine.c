@@ -2098,6 +2098,10 @@ bool proper_effects_engine(char *module_name)
 
     /* Compute the effects or references of the module. */
     init_proper_rw_effects();
+
+    if (get_use_points_to())
+      set_pt_to_list( (statement_mapping)
+			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
   
     debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
@@ -2108,7 +2112,9 @@ bool proper_effects_engine(char *module_name)
     debug_off();
 
     (*db_put_proper_rw_effects_func)(module_name, get_proper_rw_effects());
-
+    
+     if (get_use_points_to())
+       reset_pt_to_list();
     reset_current_module_entity();
     reset_current_module_statement();
     reset_proper_rw_effects();
