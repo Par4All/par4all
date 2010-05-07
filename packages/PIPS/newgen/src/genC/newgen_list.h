@@ -325,6 +325,7 @@ extern list gen_once(const void *, list);
 extern bool gen_in_list_p(const void *, const list);
 extern int gen_occurences(const void *, const list);
 extern bool gen_once_p(const list);
+extern bool gen_equals(const list, const list, gen_eq_func_t);
 
 // LIST MODIFIERS
 extern void gen_sort_list(list, gen_cmp_func_t);

@@ -183,6 +183,23 @@ void * gen_reduce(void * r, void *(*fp)(void *, const list), const list l)
   }
   return r;
 }
+/* compares two lists using the functor given in parameters
+ * returns true if for all n, the n'th element of first list is equals
+ * to the n'th element of the second list
+ */
+bool gen_equals(const list l0, const list l1,gen_eq_func_t equals)
+{
+    list iter0=l0,iter1=l1;
+    while(!ENDP(iter0)&&!ENDP(iter1))
+    {
+        if(!equals(CHUNK(CAR(iter0)),CHUNK(CAR(iter1))))
+            return false;
+        POP(iter0);
+        POP(iter1);
+    }
+    return true;
+
+}
 
 list gen_some(gen_filter_func_t fp, const list l)
 {
@@ -720,6 +737,7 @@ void gen_sort_list(list l, gen_cmp_func_t compare)
 
     gen_free_area((void**) table, n*sizeof(gen_chunk*));
 }
+
 
 /* void gen_closure(iterate, initial)
  * list [of X] (*iterate)([ X, list of X ]), initial;
