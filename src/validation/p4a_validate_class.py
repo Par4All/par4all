@@ -190,6 +190,9 @@ class ValidationClass:
 		if os.path.isfile('p4a_log.txt'):
 			commands.getstatusoutput('rm -rf p4a_log.txt')
 
+		nb_test = 0
+		nb_failed = 0
+
     # Open the file where par4all tests are:		
 		for line in f:
 			# delete .f, .c and .tpips of the file name
@@ -200,9 +203,7 @@ class ValidationClass:
 			directory_test = self.par4ll_validation_dir + directory[0]
 			
 			print (('# Considering %s')%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
-			nb_test = 0
-			nb_failed = 0
-
+			
 			if os.path.isdir(directory_test):
 				# Run test
 				nb_test = nb_test+1
@@ -229,13 +230,14 @@ class ValidationClass:
 		if os.path.isfile('pips_log.txt'):
 			commands.getstatusoutput('rm -rf pips_log.txt')
 
+		nb_test = 0
+		nb_failed = 0
+
 		for line in default_file:
 				if (not re.match('#',line)):
 					line  = line.strip('\n')
 					directory_test = self.par4ll_validation_dir + line
 					print (('# Considering %s')%(os.path.basename(directory_test)))
-					nb_test = 0
-					nb_failed = 0
 
 					for file_test in os.listdir(directory_test):
 						(root, ext) = os.path.splitext(file_test)
