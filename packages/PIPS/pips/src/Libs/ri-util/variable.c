@@ -1449,13 +1449,11 @@ entity make_new_index_entity(entity old_index, string suffix)
 
   old_name = entity_name(old_index);
 
-  /* add a terminal p till a new name is found. */
-  for (asprintf(&new_name, "%s%s", old_name, suffix);
-       gen_find_tabulated(new_name, entity_domain)!=entity_undefined;
-
-       old_name = new_name) {
-    free(new_name);
-    asprintf(&new_name, "%s%s", old_name, suffix);
+  /* add a terminal suffix till a new name is found. */
+  for (asprintf(&new_name, "%s%s", old_name, suffix); gen_find_tabulated(new_name, entity_domain)!=entity_undefined; old_name = new_name) {
+      char *tmp = new_name;
+      asprintf(&new_name, "%s%s", old_name, suffix);
+      free(tmp);
   }
 
   // FI: copy_storage() cree de l'aliasing entre new_index et old_index

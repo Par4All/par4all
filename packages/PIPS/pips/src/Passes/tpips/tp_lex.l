@@ -23,7 +23,7 @@
 
 */
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 
 #include <stdio.h>
@@ -46,11 +46,11 @@ void yyrestart(FILE *f){ yyin = f;}
 
 #else
 
-#define YY_INPUT(buf,result,max_size)			\
-  {							\
-    int c = tpips_lex_input();				\
-    result = (c == '\0') ? YY_NULL : (buf[0] = c, 1);	\
-  }
+#define YY_INPUT(buf,result,max_size)									\
+	{																										\
+		int c = tpips_lex_input();												\
+		result = (c == '\0') ? YY_NULL : (buf[0] = c, 1);	\
+	}
 
 #endif
 
@@ -60,31 +60,35 @@ static char * line_parsed;
 
 void tpips_set_line_to_parse(char * line)
 {
-    skip_blanks(line);
-    /* store line pointer */
-    line_parsed = line_to_parse = line;
-    cr_not_returned = TRUE;
+	skip_blanks(line);
+	/* store line pointer */
+	line_parsed = line_to_parse = line;
+	cr_not_returned = TRUE;
 }
 
 char * tpips_get_line_to_parse(void)
 {
-    return line_to_parse;
+	return line_to_parse;
 }
 
-static void tpips_lex_print_pos(FILE* fout)
+void tpips_lex_print_pos(FILE* fout)
 {
-    fprintf(fout,"%s\n",line_parsed);
-    fprintf(fout,"%*s^\n",(int)((long) line_to_parse - (long)line_parsed),"");
+	fprintf(fout,
+					"%s\n"
+					"%*s^\n"
+					"at line %d in \"%s\"\n",
+					line_parsed, (int)((long) line_to_parse - (long)line_parsed), "",
+					tpips_current_line(), tpips_current_name());
 }
 
 static int tpips_lex_input (void)
 {
-    char c = *line_to_parse;
-    pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
-    if (c) line_to_parse++;
-    /* a fake \n is provided, to check for nargs in the syntax... */
-    else if (cr_not_returned) { cr_not_returned=FALSE; return (int) '\n'; }
-    return (int) c;
+	char c = *line_to_parse;
+	pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
+	if (c) line_to_parse++;
+	/* a fake \n is provided, to check for nargs in the syntax... */
+	else if (cr_not_returned) { cr_not_returned=FALSE; return (int) '\n'; }
+	return (int) c;
 }
 
 /* string to be processed by some other lexer/parser.
@@ -93,10 +97,10 @@ static char unk[2]; /* one char lines are not implicit shells */
 
 #define RETURN(x)  pips_debug(8, "init %d\n", x); return x
 #define KEYWORD(x) pips_debug(8, "key %d\n", x); BEGIN INITIAL; return x
-#define LITTERAL(x)				\
-  pips_debug(8, "lit %d\n", x);			\
-  BEGIN LIT;					\
-  return x
+#define LITTERAL(x)															\
+	pips_debug(8, "lit %d\n", x);									\
+	BEGIN LIT;																		\
+	return x
 #define RESTART(x) pips_debug(8, "rst %d\n", x); BEGIN KEY; return x
 
 %}
@@ -145,11 +149,11 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY,INITIAL>[ \t]+	/* skip blanks... */
 
 <UNK>[^\r\n]*		{ yylval.name = strdup(concatenate(unk, yytext, NULL));
-			  KEYWORD(TK_UNKNOWN); }
+	 KEYWORD(TK_UNKNOWN); }
 
 <LIT>[^\r\n]*		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
 <INITIAL,KEY>#[^\r\n]*	{ BEGIN INITIAL;
-			  /* skip comments... (not for echo, shell set). */}
+	 /* skip comments... (not for echo, shell set). */}
 <KEY>.			{ unk[0]=yytext[0]; unk[1]='\0'; BEGIN UNK; }
 
 <INITIAL>\(		{ RETURN(TK_OPENPAREN); }
@@ -164,10 +168,11 @@ static char unk[2]; /* one char lines are not implicit shells */
 <LIT,INITIAL>(\n|\r|\r\n|;)	{ RESTART(TK_ENDOFLINE); }
 <LIT,INITIAL><<EOF>>	{ RESTART(TK_ENDOFLINE); }
 
-<STR>[^\"]*\"		{ /* " */ yylval.name = strdup(yytext);
-			  yylval.name[strlen(yytext)-1] = '\0';
-			  BEGIN INITIAL; RETURN(TK_A_STRING);}
-<INITIAL>\"		{ /* " */ BEGIN STR;}
+<STR>[^\"]*\"		{
+	yylval.name = strdup(yytext);
+	yylval.name[strlen(yytext)-1] = '\0';
+	BEGIN INITIAL; RETURN(TK_A_STRING);}
+<INITIAL>\"		{ BEGIN STR; }
 
 <INITIAL>"$ALL"		{ RETURN(TK_OWNER_ALL); }
 <INITIAL>"$ALLFUNC"	{ RETURN(TK_OWNER_ALLFUNC); }
@@ -186,9 +191,9 @@ static char unk[2]; /* one char lines are not implicit shells */
 <INITIAL>"%CALLEES"	{ RETURN(TK_OWNER_CALLEES); }
 
 <INITIAL>[/\.0-9A-Za-z_:-][!/\.0-9A-Za-z_:-]*	{
-			  yylval.name=strdup(yytext);
-			  RETURN(TK_NAME);
-			}
+	yylval.name=strdup(yytext);
+	RETURN(TK_NAME);
+ }
 
 .			{ pips_user_error("unexpected char %c\n", *yytext); }
 
@@ -206,7 +211,7 @@ void yyinit_lex()
 
 void yyerror(char * s)
 {
-    tpips_init(); /* needed for user error... */
-    tpips_lex_print_pos(stderr);
-    pips_user_error("%s\n", s);
+	tpips_init(); /* needed for user error... */
+	tpips_lex_print_pos(stderr);
+	pips_user_error("%s\n", s);
 }
