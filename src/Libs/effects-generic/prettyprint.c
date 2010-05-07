@@ -365,7 +365,7 @@ print_source_or_code_effects_engine(
     char *file_name, *file_resource_name;
     bool success = TRUE;
 
-    prettyprint_is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
+    set_prettyprint_is_fortran_p (!get_bool_property("PRETTYPRINT_C_CODE"));
 
     file_name =
       strdup(concatenate(file_suffix,
@@ -423,9 +423,28 @@ list /* of string */ effect_words_reference(reference obj)
   begin_attachment = STRING(CAR(pc));
 
   if (reference_indices(obj) != NIL) {
-    string beg = prettyprint_is_fortran? "(" : "[";
-    string mid = prettyprint_is_fortran? "," : "][";
-    string end = prettyprint_is_fortran? ")" : "]";
+    string beg = string_undefined;
+    string mid = string_undefined;
+    string end = string_undefined;
+
+    switch (language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
+      beg = "(";
+      mid = ",";
+      end = ")";
+      break;
+    case is_language_c:
+      beg = "[";
+      mid = "][";
+      end = "]";
+      break;
+    case is_language_fortran95:
+      pips_assert ("Need to update F95 case", FALSE);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
+    }
 
     pc = CHAIN_SWORD(pc,beg);
     for(list pi = reference_indices(obj); !ENDP(pi); POP(pi))
@@ -437,7 +456,6 @@ list /* of string */ effect_words_reference(reference obj)
 	  {
 	    // add a '.' to disambiguate field names from variable names 
 	    pc = CHAIN_SWORD(pc, ".");
-	    
 	  }
 	pc = gen_nconc(pc, words_expression(ind_exp,NIL));
 	if (CDR(pi) != NIL)

@@ -515,7 +515,21 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	if((l=control_to_label_name(c, labels))!=string_undefined) {
 	    if(strcmp(l, label_local_name(statement_to_label(control_statement(c))))
 	       != 0) {
-		list pc = CHAIN_SWORD(NIL,prettyprint_is_fortran?"CONTINUE":";") ;
+	        list pc = NIL;
+		switch (language_tag (get_prettyprint_language ())) {
+		case is_language_fortran:
+		  pc = CHAIN_SWORD(pc, "CONTINUE");
+		  break;
+		case is_language_c:
+		  pc = CHAIN_SWORD(pc, ";");
+		  break;
+		case is_language_fortran95:
+		  pips_assert ("Need to update F95 case", FALSE);
+		  break;
+		default:
+		  pips_assert ("This case should have been handled before", FALSE);
+		  break;
+		}
 		sentence s = make_sentence(is_sentence_unformatted,
 					   make_unformatted(NULL, 0, margin, pc)) ;
 		unformatted_label(sentence_unformatted(s)) = l ;
@@ -592,8 +606,20 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						      strdup(comments)));
 	    }
-
-	    pc = CHAIN_SWORD(NIL, prettyprint_is_fortran?"IF (":"if (");
+	    switch (language_tag (get_prettyprint_language ())) {
+	    case is_language_fortran:
+	      pc = CHAIN_SWORD(NIL, "IF (");
+	      break;
+	    case is_language_c:
+	      pc = CHAIN_SWORD(NIL, "if (");
+	      break;
+	    case is_language_fortran95:
+	      pips_assert ("Need to update F95 case", FALSE);
+	      break;
+	    default:
+	      pips_assert ("This case should have been handled before", FALSE);
+	      break;
+	    }
 	    t = instruction_test(i);
 	    pc = gen_nconc(pc, words_expression(test_condition(t), NIL));
 
@@ -609,15 +635,21 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 			/* succ2 must be reached by GOTO */
 			l = control_to_label_name(succ2, labels);
 			pips_assert("Must be labelled", l!= string_undefined);
-			if (prettyprint_is_fortran)
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-			  }
-			else 
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
-			  }
+			switch (language_tag (get_prettyprint_language ())) {
+			case is_language_fortran:
+			  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			  break;
+			case is_language_c:
+			  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+			  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+			  break;
+			case is_language_fortran95:
+			  pips_assert ("Need to update F95 case", FALSE);
+			  break;
+			default:
+			  pips_assert ("This case should have been handled before", FALSE);
+			  break;
+			}
 			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
 								     margin+INDENTATION,
 								     l, 0));
@@ -637,15 +669,21 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
 								     margin+INDENTATION,
 								     l, 0));
-			if (prettyprint_is_fortran)
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-			  }
-			else 
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
-			  }
+			switch (language_tag (get_prettyprint_language ())) {
+			case is_language_fortran:
+			  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			  break;
+			case is_language_c:
+			  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+			  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+			  break;
+			case is_language_fortran95:
+			  pips_assert ("Need to update F95 case", FALSE);
+			  break;
+			default:
+			  pips_assert ("This case should have been handled before", FALSE);
+			  break;
+			}
 			l = control_to_label_name(succ2, labels);
 			pips_assert("Must be labelled", l!= string_undefined);
 			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
@@ -663,15 +701,21 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
 							     margin+INDENTATION,
 							     l, 0));
-		if (prettyprint_is_fortran)
-		  {
-		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-		  }
-		else 
-		  {
-		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
-		  }
+		switch (language_tag (get_prettyprint_language ())) {
+		case is_language_fortran:
+		  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+		  break;
+		case is_language_c:
+		  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+		  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+		  break;
+		case is_language_fortran95:
+		  pips_assert ("Need to update F95 case", FALSE);
+		  break;
+		default:
+		  pips_assert ("This case should have been handled before", FALSE);
+		  break;
+		}
 		l = control_to_label_name(succ2, labels);
 		pips_assert("Must be labelled", l!= string_undefined);
 		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
@@ -684,7 +728,20 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 		pc = gen_nconc(pc, words_goto_label(l));
 	    }
 	    else {
-	      pc = CHAIN_SWORD(pc, prettyprint_is_fortran? ") THEN": ") {");
+	      switch (language_tag (get_prettyprint_language ())) {
+	      case is_language_fortran:
+		pc = CHAIN_SWORD(pc, ") THEN");
+		break;
+	      case is_language_c:
+		pc = CHAIN_SWORD(pc, ") {");
+		break;
+	      case is_language_fortran95:
+		pips_assert ("Need to update F95 case", FALSE);
+		break;
+	      default:
+		pips_assert ("This case should have been handled before", FALSE);
+		break;
+	      }
 	    }
 	    u = make_unformatted(NULL, statement_number(st), margin, pc) ;
 
@@ -704,8 +761,22 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	    s = make_sentence(is_sentence_unformatted, u) ;
 	    ADD_SENTENCE_TO_TEXT(r, s);
 	    MERGE_TEXTS(r, r1);
-	    if(!no_endif)
-		ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,prettyprint_is_fortran?"ENDIF":"}"));
+	    if(!no_endif) {
+	      switch (language_tag (get_prettyprint_language ())) {
+	      case is_language_fortran:
+		ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "ENDIF"));
+		break;
+	      case is_language_c:
+		ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "}"));
+		break;
+	      case is_language_fortran95:
+		pips_assert ("Need to update F95 case", FALSE);
+		break;
+	      default:
+		pips_assert ("This case should have been handled before", FALSE);
+		break;
+	      }
+	    }
 	    break;
 	}
 	default:

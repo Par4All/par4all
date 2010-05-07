@@ -10254,6 +10254,15 @@ PRETTYPRINT_C_CODE FALSE
 However, this is not a good way to handle multi-target languages. To be
 replaced ...
 
+PIPS can handle many different languages. By default the PrettyPrinter uses
+the native language as an output but it is also possible to prettyprint
+Fortran code as C code. Possible values for the PRETTYPRINT\_LANGUAGE property
+are: \texttt{native F95 F77 C}.
+
+\begin{PipsProp}{PRETTYPRINT_LANGUAGE}
+PRETTYPRINT_LANGUAGE "F77"
+\end{PipsProp}
+
 \subsubsection{Layout}
 \index{Analysis}
 \index{PRETTYPRINT\_LOOSE}

@@ -49,7 +49,6 @@
 
 /*===================== Variables and Function prototypes for C ===========*/
 
-extern bool prettyprint_is_fortran;
 /* pdl is the parser declaration list. It is used to decide if a
    derived entity should be simply declared, "struct s", or fully
    defined, "struct s {....}" */
@@ -125,11 +124,22 @@ static list words_parameters(entity e, list pdl)
 	    parameter p = PARAMETER(gen_nth(i-1,functional_parameters(fe)));
 	    type t = parameter_type(p);
 	    //string pn = parameter_name(p);
-	    /* param can be undefined for C language: void foo(void)
-	       We do not have an entity corresponding to the 1st argument */
-	    if (prettyprint_is_fortran)
+	    switch (language_tag (get_prettyprint_language ())) {
+	    case is_language_fortran:
 	      pips_user_warning("%dth parameter out of %d parameters not found for function %s\n",
 				i, nparams, entity_name(e));
+	      break;
+	    case is_language_c:
+	      /* param can be undefined for C language: void foo(void)
+		 We do not have an entity corresponding to the 1st argument */
+	      break;
+	    case is_language_fortran95:
+	      pips_assert ("Need to update F95 case", FALSE);
+	      break;
+	    default:
+	      pips_assert ("This case should have been handled before", FALSE);
+	      break;
+	    }
 	    pc = gen_nconc(pc,words_type(t, pdl));
 	    /* Should be correct, but seems useless */
 	    //if(!same_string_p(pn, "")) {
@@ -139,15 +149,24 @@ static list words_parameters(entity e, list pdl)
 	  }
 	else
 	  {
-	    if (prettyprint_is_fortran)
+	    type t = type_undefined;
+	    switch (language_tag (get_prettyprint_language ())) {
+	    case is_language_fortran:
 	      pc = CHAIN_SWORD(pc, entity_local_name(param));
-	    else
-	      {
-		/* We have to print variable's type, dimensions, ... with C
-		   This can be also a formal function */
-		type t = entity_type(param);
-		pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,entity_local_name(param)), pdl));
-	      }
+	      break;
+	    case is_language_c:
+	      /* We have to print variable's type, dimensions, ... with C
+		 This can be also a formal function */
+	      t = entity_type(param);
+	      pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,entity_local_name(param)), pdl));
+	      break;
+	    case is_language_fortran95:
+	      pips_assert ("Need to update F95 case", FALSE);
+	      break;
+	    default:
+	      pips_assert ("This case should have been handled before", FALSE);
+	      break;
+	    }
 	  }
       }
   }
@@ -157,19 +176,25 @@ static list words_parameters(entity e, list pdl)
 static list words_dimension(dimension obj, list pdl)
 {
   list pc = NIL;
-  if (prettyprint_is_fortran) {
+  call c = call_undefined;
+  entity f = entity_undefined;
+  expression eup = expression_undefined;
+  expression e1 = expression_undefined;
+  expression e2 = expression_undefined;
+  int up, i;
+  switch (language_tag (get_prettyprint_language ())) {
+  case is_language_fortran:
     pc = words_expression(dimension_lower(obj), pdl);
     pc = CHAIN_SWORD(pc,":");
     pc = gen_nconc(pc, words_expression(dimension_upper(obj), pdl));
-  }
-  else {
+    break;
+  case is_language_c:
     /* The lower bound of array in C is always equal to 0,
        we only need to print (upper dimension + 1) */
     if (unbounded_dimension_p(obj))
       pc = CHAIN_SWORD(pc,"");
     else {
-      expression eup = dimension_upper(obj);
-      int up;
+      eup = dimension_upper(obj);
       if (FALSE && expression_integer_value(eup, &up))
 	/* FI: why do you want to change the source code? Because it
 	   may no longer be the user source code after partial
@@ -183,13 +208,11 @@ static list words_dimension(dimension obj, list pdl)
       }
       else {
 	if(expression_call_p(eup)) {
-	  call c = syntax_call(expression_syntax(eup));
-	  entity f = call_function(c);
+	  c = syntax_call(expression_syntax(eup));
+	  f = call_function(c);
 	  if(ENTITY_MINUS_P(f)||ENTITY_MINUS_C_P(f)){
-	    expression e1 = binary_call_lhs(c);
-	    expression e2 = binary_call_rhs(c);
-	    int i;
-
+	    e1 = binary_call_lhs(c);
+	    e2 = binary_call_rhs(c);
 	    if (expression_integer_value(e2, &i) && i==1)
 	      pc = words_expression(e1, pdl);
 	  }
@@ -200,6 +223,13 @@ static list words_dimension(dimension obj, list pdl)
 	  pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)), pdl);
       }
     }
+    break;
+  case is_language_fortran95:
+    pips_assert ("Need to update F95 case", FALSE);
+    break;
+  default:
+    pips_assert ("This case should have been handled before", FALSE);
+    break;
   }
   return(pc);
 }
@@ -230,7 +260,7 @@ list words_declaration(
 	    {
 		list dims = variable_dimensions(type_variable(entity_type(e)));
 
-		if (prettyprint_is_fortran)
+		if (language_tag (get_prettyprint_language ()) == is_language_fortran)
 		  {
 		    pl = CHAIN_SWORD(pl, "(");
 		    MAPL(pd,
@@ -240,7 +270,7 @@ list words_declaration(
 		    }, dims);
 		    pl = CHAIN_SWORD(pl, ")");
 		  }
-		else
+		else if (language_tag (get_prettyprint_language ()) == is_language_c)
 		  {
 		    MAPL(pd,
 		    {
@@ -248,6 +278,14 @@ list words_declaration(
 		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
 		      pl = CHAIN_SWORD(pl, "]");
 		    }, dims);
+		  }
+		else if (language_tag (get_prettyprint_language ()) == is_language_fortran95)
+		  {
+		    pips_assert ("Need to update F95 case", FALSE);
+		  }
+		else
+		  {
+		    pips_assert ("This case should have been handled before", FALSE);
 		  }
 	    }
 	}
@@ -270,115 +308,163 @@ list words_basic(basic obj, list pdl)
     switch (basic_tag(obj)) {
     case is_basic_int:
       {
-	if (prettyprint_is_fortran)
-	  {
-	    pc = CHAIN_SWORD(pc,"INTEGER*");
-	    pc = CHAIN_IWORD(pc,basic_int(obj));
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
+	  pc = CHAIN_SWORD(pc,"INTEGER*");
+	  pc = CHAIN_IWORD(pc,basic_int(obj));
+	  break;
+	case is_language_c:
+	  switch (basic_int(obj)) {
+	  case 1: pc = CHAIN_SWORD(pc,"char");
+	    break;
+	  case 2: pc = CHAIN_SWORD(pc,"short");
+	    break;
+	  case 4: pc = CHAIN_SWORD(pc,"int");
+	    break;
+	  case 6: pc = CHAIN_SWORD(pc,"long");
+	    break;
+	  case 8: pc = CHAIN_SWORD(pc,"long long");
+	    break;
+	  case 11: pc = CHAIN_SWORD(pc,"unsigned char");
+	    break;
+	  case 12: pc = CHAIN_SWORD(pc,"unsigned short");
+	    break;
+	  case 14: pc = CHAIN_SWORD(pc,"unsigned int");
+	    break;
+	  case 16: pc = CHAIN_SWORD(pc,"unsigned long");
+	    break;
+	  case 18: pc = CHAIN_SWORD(pc,"unsigned long long");
+	    break;
+	  case 21: pc = CHAIN_SWORD(pc,"signed char");
+	    break;
+	  case 22: pc = CHAIN_SWORD(pc,"signed short");
+	    break;
+	  case 24: pc = CHAIN_SWORD(pc,"signed int");
+	    break;
+	  case 26: pc = CHAIN_SWORD(pc,"signed long");
+	    break;
+	  case 28: pc = CHAIN_SWORD(pc,"signed long long");
+	    break;
 	  }
-	else
-	  {
-	    switch (basic_int(obj)) {
-	    case 1: pc = CHAIN_SWORD(pc,"char");
-	      break;
-	    case 2: pc = CHAIN_SWORD(pc,"short");
-	      break;
-	    case 4: pc = CHAIN_SWORD(pc,"int");
-	      break;
-	    case 6: pc = CHAIN_SWORD(pc,"long");
-	      break;
-	    case 8: pc = CHAIN_SWORD(pc,"long long");
-	      break;
-	    case 11: pc = CHAIN_SWORD(pc,"unsigned char");
-	      break;
-	    case 12: pc = CHAIN_SWORD(pc,"unsigned short");
-	      break;
-	    case 14: pc = CHAIN_SWORD(pc,"unsigned int");
-	      break;
-	    case 16: pc = CHAIN_SWORD(pc,"unsigned long");
-	      break;
-	    case 18: pc = CHAIN_SWORD(pc,"unsigned long long");
-	      break;
-	    case 21: pc = CHAIN_SWORD(pc,"signed char");
-	      break;
-	    case 22: pc = CHAIN_SWORD(pc,"signed short");
-	      break;
-	    case 24: pc = CHAIN_SWORD(pc,"signed int");
-	      break;
-	    case 26: pc = CHAIN_SWORD(pc,"signed long");
-	      break;
-	    case 28: pc = CHAIN_SWORD(pc,"signed long long");
-	      break;
-	    }
-	  }
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
+	}
 	break;
       }
     case is_basic_float:
       {
-	if (prettyprint_is_fortran)
-	  {
-	    pc = CHAIN_SWORD(pc,"REAL*");
-	    pc = CHAIN_IWORD(pc,basic_float(obj));
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
+	  pc = CHAIN_SWORD(pc,"REAL*");
+	  pc = CHAIN_IWORD(pc,basic_float(obj));
+	  break;
+	case is_language_c:
+	  switch (basic_float(obj)) {
+	  case 4: pc = CHAIN_SWORD(pc,"float");
+	    break;
+	  case 8: pc = CHAIN_SWORD(pc,"double");
+	    break;
 	  }
-	else
-	  {
-	    switch (basic_float(obj)) {
-	    case 4: pc = CHAIN_SWORD(pc,"float");
-	      break;
-	    case 8: pc = CHAIN_SWORD(pc,"double");
-	      break;
-	    }
-	  }
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
+	}
 	break;
       }
     case is_basic_logical:
       {
-	if (prettyprint_is_fortran)
-	  {
-	    pc = CHAIN_SWORD(pc,"LOGICAL*");
-	    pc = CHAIN_IWORD(pc,basic_logical(obj));
-	  }
-	else
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
+	  pc = CHAIN_SWORD(pc,"LOGICAL*");
+	  pc = CHAIN_IWORD(pc,basic_logical(obj));
+	  break;
+	case is_language_c:
 	  pc = CHAIN_SWORD(pc,"int"); /* FI: Use stdbool.h instead? */
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
+	}
 	break;
       }
     case is_basic_overloaded:
       {
 	/* should be a user error? Or simply bootstrap.c is not accurate? */
-	pc = CHAIN_SWORD(pc,prettyprint_is_fortran?"OVERLOADED":"overloaded");
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
+	  pc = CHAIN_SWORD(pc,"OVERLOADED");
+	  break;
+	case is_language_c:
+	  pc = CHAIN_SWORD(pc,"overloaded");
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
+	}
 	break;
       }
     case is_basic_complex:
       {
-	if(prettyprint_is_fortran) {
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
 	  pc = CHAIN_SWORD(pc,"COMPLEX*");
 	  pc = CHAIN_IWORD(pc,basic_complex(obj));
-	}
-	else
-	  {
-	    switch (basic_complex(obj)) {
-	    case 8: pc = CHAIN_SWORD(pc,"_Complex");
-	      break;
-	    case 9: pc = CHAIN_SWORD(pc,"float _Complex");
-	      break;
-	    case 16: pc = CHAIN_SWORD(pc,"double _Complex");
-	      break;
-	    case 32: pc = CHAIN_SWORD(pc,"long double _Complex");
-	      break;
-	    default:
-	      pips_internal_error("Unexpected complex size");
-	    }
+	  break;
+	case is_language_c:
+	  switch (basic_complex(obj)) {
+	  case 8: pc = CHAIN_SWORD(pc,"_Complex");
+	    break;
+	  case 9: pc = CHAIN_SWORD(pc,"float _Complex");
+	    break;
+	  case 16: pc = CHAIN_SWORD(pc,"double _Complex");
+	    break;
+	  case 32: pc = CHAIN_SWORD(pc,"long double _Complex");
+	    break;
+	  default:
+	    pips_internal_error("Unexpected complex size");
 	  }
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
+	}
 	break;
       }
     case is_basic_string:
       {
-	if (prettyprint_is_fortran)
-	  {
-	    pc = CHAIN_SWORD(pc,"CHARACTER*");
-	    pc = gen_nconc(pc, words_value(basic_string(obj)));
-	  }
-	else
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
+	  pc = CHAIN_SWORD(pc,"CHARACTER*");
+	  pc = gen_nconc(pc, words_value(basic_string(obj)));
+	  break;
+	case is_language_c:
 	  pc = CHAIN_SWORD(pc,"char *"); // FI: should it be char[]?
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
+	}
 	break;
       }
     case is_basic_bit:
@@ -486,22 +572,29 @@ sentence sentence_head(entity e, list pdl)
     switch (type_tag(tr)) {
     case is_type_void:
       {
-	if (prettyprint_is_fortran)
-	  {
-	    if (entity_main_module_p(e))
-	      pc = CHAIN_SWORD(pc,"PROGRAM ");
-	    else
-	      {
-		if (entity_blockdata_p(e))
-		  pc = CHAIN_SWORD(pc, "BLOCKDATA ");
-		else if (entity_f95module_p(e))
-      pc = CHAIN_SWORD(pc, "MODULE ");
-		else
-		  pc = CHAIN_SWORD(pc,"SUBROUTINE ");
-	      }
-	  }
-	else {
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
+	  if (entity_main_module_p(e))
+	    pc = CHAIN_SWORD(pc,"PROGRAM ");
+	  else
+	    {
+	      if (entity_blockdata_p(e))
+		pc = CHAIN_SWORD(pc, "BLOCKDATA ");
+	      else if (entity_f95module_p(e))
+		pc = CHAIN_SWORD(pc, "MODULE ");
+	      else
+		pc = CHAIN_SWORD(pc,"SUBROUTINE ");
+	    }
+	  break;
+	case is_language_c:
 	  pc = CHAIN_SWORD(pc,"void ");
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
 	}
 	break;
       }
@@ -509,7 +602,20 @@ sentence sentence_head(entity e, list pdl)
       {
 	list pdl = NIL;
 	pc = gen_nconc(pc, words_basic(variable_basic(type_variable(tr)), pdl));
-	pc = CHAIN_SWORD(pc,prettyprint_is_fortran? " FUNCTION ":" ");
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
+	  pc = CHAIN_SWORD(pc," FUNCTION ");
+	  break;
+	case is_language_c:
+	  pc = CHAIN_SWORD(pc," ");
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
+	}
 	break;
       }
     case is_type_unknown:
@@ -533,7 +639,10 @@ sentence sentence_head(entity e, list pdl)
       pc = gen_nconc(pc, args);
       pc = CHAIN_SWORD(pc, ")");
     }
-    else if (type_variable_p(tr) || (!prettyprint_is_fortran && (type_unknown_p(tr) || type_void_p(tr)))) {
+    else if (type_variable_p(tr) ||
+	     ((language_tag (get_prettyprint_language ()) == is_language_c) &&
+	      (type_unknown_p(tr) ||
+	       type_void_p(tr)))) {
       pc = CHAIN_SWORD(pc, "()");
     }
 
@@ -1911,8 +2020,7 @@ list words_dimensions(list dims, list pdl)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-
-  if (prettyprint_is_fortran)
+  if (language_tag (get_prettyprint_language ()) == is_language_fortran)
     {
       pc = CHAIN_SWORD(pc, "(");
       MAPL(pd,
@@ -1922,7 +2030,7 @@ list words_dimensions(list dims, list pdl)
       }, dims);
       pc = CHAIN_SWORD(pc, ")");
     }
-  else
+  else if (language_tag (get_prettyprint_language ()) == is_language_c)
     {
       MAP(DIMENSION,d,
       {
@@ -1930,6 +2038,14 @@ list words_dimensions(list dims, list pdl)
 	pc = gen_nconc(pc, words_dimension(d, pdl));
 	pc = CHAIN_SWORD(pc, "]");
       }, dims);
+    }
+  else if (language_tag (get_prettyprint_language ()) == is_language_fortran95)
+    {
+      pips_assert ("Need to update F95 case", FALSE);
+    }
+  else
+    {
+      pips_assert ("This case should have been handled before", FALSE);
     }
   return pc;
 }

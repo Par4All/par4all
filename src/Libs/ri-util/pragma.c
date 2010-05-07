@@ -134,7 +134,7 @@ list pragma_omp_parallel_for_as_exprs (void) {
  */
 string close_pragma (pragma p) {
   string result = string_undefined;
-  if (get_prettyprint_is_fortran () == TRUE)
+  if (language_tag (get_prettyprint_language ()) == is_language_fortran)
     {
       if (pragma_entity_p (p))
 	result=directive_to_string(load_global_directives(pragma_entity(p)),true);
@@ -170,7 +170,7 @@ pragma_to_string (pragma p) {
       flg = TRUE;
       l_str = words_expression(e, NIL);
       //      l_str = gen_nreverse (l_str);
-      if (get_prettyprint_is_fortran() == TRUE) {
+      if (language_tag (get_prettyprint_language ()) == is_language_fortran) {
 	// In fortran line size can not be more than 72
 	FOREACH (STRING, str, l_str) {
 	  pips_assert ("algo bug", line_sz < MAX_LINE_LENGTH - 7);
@@ -200,11 +200,20 @@ pragma_to_string (pragma p) {
     break;
   }
   if (s != string_undefined) {
-    if (get_prettyprint_is_fortran() == TRUE) {
+    switch (language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
       s = strdup(concatenate (FORTRAN_PRAGMA_HEADER, s, NULL));
-    }
-    else
+      break;
+    case is_language_c:
       s = strdup(concatenate (C_PRAGMA_HEADER, " ", s, NULL));
+      break;
+    case is_language_fortran95:
+      pips_assert ("Need to update F95 case", FALSE);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
+    }
   }
   return s;
 }

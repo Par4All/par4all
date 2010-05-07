@@ -148,13 +148,21 @@ static void pragma_str_for (loop l, statement stmt) {
   chop_newline (str, FALSE);
   if ((str !=string_undefined) && (str != NULL) && (strcmp (str, "") != 0)) {
     string tmp = string_undefined;
-    if (get_prettyprint_is_fortran () == TRUE) {
+    switch (language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
       // for fortran case we need to look at the O of OMP and skip !$
       tmp = strchr (str, 'O');
-    }
-    else {
+      break;
+    case is_language_c:
       // for C case we need to look at the o of omp and skip #pragma"
       tmp = strchr (str, 'o');
+      break;
+    case is_language_fortran95:
+      pips_assert ("Need to update F95 case", FALSE);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
     }
     // insert the pragma as a string to the current statement
     if ((tmp !=string_undefined) && (tmp != NULL) && (strcmp (tmp, "") != 0)) {

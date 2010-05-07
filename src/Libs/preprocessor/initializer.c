@@ -268,7 +268,8 @@ static text compilation_unit_text(entity cu, entity module)
     list pdl = NIL; // Let's hope it works; else pdl should contain
 		    // each type to declare except for the module
 
-    pips_assert("We must be in a C prettyprinter environment", !get_prettyprint_is_fortran());
+    pips_assert("We must be in a C prettyprinter environment",
+		prettyprint_language_is_c_p ());
 
     if (type_undefined_p(t))
 	pips_user_error("undefined type for %s\n", entity_name(module));

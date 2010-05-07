@@ -33,6 +33,7 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "ri-util.h"
 #include "text.h"
 
 #include "misc.h"
@@ -198,9 +199,23 @@ print_sentence(FILE * fd,
 			if (n > 0 &&
 			    get_bool_property("PRETTYPRINT_STATEMENT_NUMBER"))
 			{
-			    for (i = col; i <= MAX_END_COLUMN; i++)
-				putc_sentence(' ', fd);
-			    fprintf_sentence(fd, prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
+			  for (i = col; i <= MAX_END_COLUMN; i++) {
+			    putc_sentence(' ', fd);
+			  }
+			  switch (language_tag (get_prettyprint_language ())) {
+			  case is_language_fortran:
+			    fprintf_sentence(fd, "%04d", n);
+			    break;
+			  case is_language_c:
+			    fprintf_sentence(fd, "/*%04d*/", n);
+			    break;
+			  case is_language_fortran95:
+			    pips_assert ("Need to update F95 case", FALSE);
+			    break;
+			  default:
+			    pips_assert ("This case should have been handled before", FALSE);
+			    break;
+			  }
 			}
 
 			/* start a new line with its prefix */
@@ -275,27 +290,51 @@ print_sentence(FILE * fd,
 	}
 
 	pips_debug(9, "line completed, col=%d\n", col);
-  if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
+	if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
 	  pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
-  }
+	}
 	/* statement line number starts at different column depending on */
 	/* the used language : C or fortran                              */
 	size_t column_start = 0;
-	if (prettyprint_is_fortran) {
+	switch (language_tag (get_prettyprint_language ())) {
+	case is_language_fortran:
 	  /* fortran case */
 	  column_start = MAX_END_COLUMN;
-	} else {
+	  break;
+	case is_language_c:
 	  /* C case */
 	  column_start = C_STATEMENT_LINE_COLUMN;
 	  while (column_start <= col)
 	    column_start += C_STATEMENT_LINE_STEP;
+	  break;
+	case is_language_fortran95:
+	  pips_assert ("Need to update F95 case", FALSE);
+	  break;
+	default:
+	  pips_assert ("This case should have been handled before", FALSE);
+	  break;
 	}
+
 	/* Output the statement line number on the right end of the
            line: */
 	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
-	    for (size_t i = col; i <= column_start; i++)
-		putc_sentence(' ', fd);
-	    fprintf_sentence(fd,  prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
+	  for (size_t i = col; i <= column_start; i++) {
+	    putc_sentence(' ', fd);
+	  }
+	  switch (language_tag (get_prettyprint_language ())) {
+	  case is_language_fortran:
+	    fprintf_sentence(fd, "%04d", n);
+	    break;
+	  case is_language_c:
+	    fprintf_sentence(fd, "/*%04d*/", n);
+	    break;
+	  case is_language_fortran95:
+	    pips_assert ("Need to update F95 case", FALSE);
+	    break;
+	  default:
+	    pips_assert ("This case should have been handled before", FALSE);
+	    break;
+	  }
 	}
 	putc_sentence('\n', fd);
     }

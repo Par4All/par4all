@@ -1160,14 +1160,15 @@ void print_statement(statement s)
   set_alternate_return_set();
   reset_label_counter();
   push_current_module_statement(s);
-  bool previous_is_fortran_p = get_prettyprint_is_fortran();
+  language previous_language = copy_language (get_prettyprint_language ());
   /* Prettyprint in the correct language: */
   set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
   text txt = text_statement(entity_undefined, 0, s, NIL);
   print_text(stderr, txt);
   free_text(txt);
   /* Put back the previous prettyprint language: */
-  set_prettyprint_is_fortran_p(previous_is_fortran_p);
+  set_prettyprint_language (previous_language);
+  free_language (previous_language);
   pop_current_module_statement();
   reset_alternate_return_set();
   debug_off();

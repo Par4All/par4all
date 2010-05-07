@@ -82,14 +82,14 @@ static entity omp_operator_entity (reduction_operator o) {
     result = CreateIntrinsic(MAX_OPERATOR_NAME);
     break;
   case is_reduction_operator_and:
-    result = (get_prettyprint_is_fortran () == TRUE) ?
-                      CreateIntrinsic(AND_OPERATOR_NAME) :
-                      CreateIntrinsic(C_AND_OPERATOR_NAME);
+    result = (prettyprint_language_is_fortran_p () == TRUE ?
+	      CreateIntrinsic(AND_OPERATOR_NAME) :
+	      CreateIntrinsic(C_AND_OPERATOR_NAME));
     break;
   case is_reduction_operator_or:
-    result = (get_prettyprint_is_fortran () == TRUE) ?
-                      CreateIntrinsic(OR_OPERATOR_NAME) :
-                      CreateIntrinsic(C_OR_OPERATOR_NAME);
+    result = (prettyprint_language_is_fortran_p () == TRUE ?
+	      CreateIntrinsic(OR_OPERATOR_NAME) :
+	      CreateIntrinsic(C_OR_OPERATOR_NAME));
     break;
   case is_reduction_operator_bitwise_or:
     result = CreateIntrinsic(BITWISE_OR_OPERATOR_NAME);
@@ -101,11 +101,11 @@ static entity omp_operator_entity (reduction_operator o) {
     result = CreateIntrinsic(BITWISE_AND_OPERATOR_NAME);
     break;
   case is_reduction_operator_eqv:
-    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
     result = CreateIntrinsic(EQUIV_OPERATOR_NAME);
     break;
   case is_reduction_operator_neqv:
-    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
     result = CreateIntrinsic(NON_EQUIV_OPERATOR_NAME);
     break;
   default:
@@ -176,10 +176,10 @@ static string omp_operator_str (reduction_operator o) {
     result = "MAX";
     break;
   case is_reduction_operator_and:
-    result = (get_prettyprint_is_fortran () == TRUE) ? ".AND." : "&&";
+    result = (prettyprint_language_is_fortran_p () == TRUE) ? ".AND." : "&&";
     break;
   case is_reduction_operator_or:
-    result = (get_prettyprint_is_fortran () == TRUE) ? ".OR." :"||";
+    result = (prettyprint_language_is_fortran_p () == TRUE) ? ".OR." :"||";
     break;
   case is_reduction_operator_bitwise_or:
     result = "|";
@@ -191,11 +191,11 @@ static string omp_operator_str (reduction_operator o) {
     result = "&";
     break;
   case is_reduction_operator_eqv:
-    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
     result = ".EQV.";
     break;
   case is_reduction_operator_neqv:
-    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
     result = ".NEQV.";
     break;
   default:
@@ -210,8 +210,9 @@ static string omp_operator_str (reduction_operator o) {
 static string reduction_as_str (reduction r)
 {
   string str;
-  string header = (get_prettyprint_is_fortran ()) ? OMP_PRAGMA_FOR_HEADER_F :
-                                                    OMP_PRAGMA_FOR_HEADER_C;
+  string header = (prettyprint_language_is_fortran_p ()
+		   ? OMP_PRAGMA_FOR_HEADER_F :
+		   OMP_PRAGMA_FOR_HEADER_C);
   str = concatenate (header, " ", REDUCTION_KEYWORD,
 		     "(", omp_operator_str (reduction_op(r)), ":",
 		     words_to_string(words_reference(reduction_reference(r),NIL)),
