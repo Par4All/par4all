@@ -120,13 +120,15 @@ def main():
 
 	debug_group = optparse.OptionGroup(parser, "Debugging & Reporting Options")
 
-	debug_group.add_option("-v", "--verbose", action = "count", dest = "verbosity", default = 0, 
-		help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+	debug_group.add_option("-v", "--verbose", action = "count",
+						   dest = "verbosity", default = 0,
+						   help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
 
-	debug_group.add_option("-r", "--report", action = "count", dest = "report", default = 0, 
-		help = "Display a processing report.")
+	debug_group.add_option("-r", "--report", action = "count",
+						   dest = "report", default = 0,
+						   help = "Display a processing report.")
 
-	#debug_group.add_option("--log", dest = "log", metavar = "FILE", 
+	#debug_group.add_option("--log", dest = "log", metavar = "FILE",
 	#	help = "Log all output to FILE.")
 
 	parser.add_option_group(debug_group)
@@ -134,7 +136,7 @@ def main():
 	(options, args) = parser.parse_args()
 
 	verbosity = options.verbosity
-	
+
 	# Check options.
 	if len(args) == 0:
 		error("Missing input files")
@@ -264,9 +266,8 @@ def main():
 
 	# Create the PyPS workspace.
 	workspace = pyps.workspace(files, name = project, activates = [], verboseon = True)
-	workspace.set_property(PRETTYPRINT_C_CODE = True,
-		FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-		PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+	workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+						   PRETTYPRINT_SEQUENTIAL_STYLE = "do")
 
 	# Skip module name of P4A runtime.
 	# Also filter out modules based on --include-modules and --exclude-modules.
@@ -278,7 +279,7 @@ def main():
 	if options.filter_exclude:
 		filter_exclude_re = re.compile(options.filter_exclude)
 	all_modules = workspace.filter(lambda module:
-		not skip_p4a_runtime_and_compilation_unit_re.match(module.name) 
+		not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
 		and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
 		and (filter_include_re == None or filter_include_re.match(module.name)))
 
@@ -347,7 +348,7 @@ def main():
 
 	# Build the output source files (UNSPLIT operation).
 	workspace.all.unsplit()
-	
+
 	# Copy the output files to their final location.
 	for i in range(len(output_files)):
 		if os.path.exists(output_files[i]):
@@ -392,4 +393,5 @@ if __name__ == "__main__":
 ### mode: python
 ### mode: flyspell
 ### ispell-local-dictionary: "american"
+### tab-width: 4
 ### End:
