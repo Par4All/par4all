@@ -2531,14 +2531,14 @@ statement update_statement_instruction(statement s,instruction i)
 
     else
     {
-        if(entity_return_label_p(statement_label(s)) && !return_statement_p(s))
-            statement_label(s)=entity_empty_label();
         free_instruction(statement_instruction(s));
         statement_instruction(s) = i;
         /* SG: if the old statement had declarations, they are removed
          * maybe we should regenerate the new one if any to keep global coherency ?*/
         gen_free_list(statement_declarations(s));
         statement_declarations(s)=NIL;
+        if(entity_return_label_p(statement_label(s)) && !return_statement_p(s))
+            statement_label(s)=entity_empty_label();
     }
     return s;
 }
