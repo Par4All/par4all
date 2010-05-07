@@ -27,6 +27,11 @@ setproperty GPU_USE_KERNEL TRUE
 apply GPU_IFY
 
 display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+shell cat $WKS.database/Src/matadd.f
+
 close
 delete $WKS
 quit

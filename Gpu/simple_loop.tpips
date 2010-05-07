@@ -46,6 +46,8 @@ apply UNSPLIT
 echo All generated modules should be there
 shell cat $WKS.database/Src/$WKS.c
 
+shell gcc -o $WKS.database/Src/$WKS $WKS.database/Src/*.c
+
 close
 #delete $WKS
 quit
