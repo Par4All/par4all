@@ -458,6 +458,8 @@ sh> svn commit my-branch-name
 sh> cd my-branch-name
 sh> svn merge https://svn.cri.ensmp.fr/svn/pips/trunk
 # do the merging into the branch working copy
+# consider options -x -b or -x -w
+# to ignore space-related changes
 sh> svn commit
 \end{verbatim}
   }
@@ -467,6 +469,8 @@ sh> svn commit
 \begin{verbatim}
 sh> cd my-branch-name
 sh> svn merge ^/trunk
+# consider options -x -b or -x -w
+# to ignore space-related changes
 sh> svn commit
 \end{verbatim}
   }
@@ -513,6 +517,8 @@ sh> svn mergeinfo \
 sh> svn merge \
   https://svn.cri.ensmp.fr/svn/pips/branches/calvin/my-branch-name \
   --reintegrate
+# consider options -x -b or -x -w
+# to ignore space-related changes
 sh> svn commit
 \end{verbatim}
   }
