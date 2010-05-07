@@ -1,6 +1,6 @@
 TARGET	= sac
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h lexer.h
+BUILT_SOURCES=$(TARGET).h patterns.h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libsac.la
 libsac_la_SOURCES=\
