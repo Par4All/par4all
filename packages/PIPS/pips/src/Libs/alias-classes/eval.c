@@ -19,9 +19,13 @@
 #include "alias-classes.h"
 
 /*
+  @param r1 and r2 are two path references
+  @param exact_p is a pointer towards a boolean, which is set to false
+         is the result is an over-approximation, true if it's an exact answer.
   @return true if r1 path may be a predecessor of r2 path
 
   (we consider that p[1] is not a predecessor of p[*], with *exact_p = false.)
+
   should be move elsewhere. There should be a cell library
  */
 bool cell_reference_predeceding_p(reference r1, reference r2, bool * exact_p)
@@ -80,24 +84,45 @@ bool cell_reference_predeceding_p(reference r1, reference r2, bool * exact_p)
 
 
 /*
-  A subcase of eval_cell_with_points_to(). It takes a reference and a
-  list of points-to and try to evaluate the reference. Each time we
-  dereference we test if it's a constant one by exploiting the
-  points-to information.
+  @brief tries to find in the points-to list ptl a points-to with a
+       maximal length source path but shorter than the length of the
+       input path represetned by input_ref. If it's an exact
+       points-to, that's OK, if not we have to find other possible
+       paths. (I don't know yet if we must iterate the process with
+       found paths as suggested in the original comment of this
+       function), because I don't know if points-to sinks can be
+       non-constant paths.  I presently assume that all sinks are
+       constant paths.
+       
+       There is no sharing between the returned list cells and the
+       input reference.
+       
+       When the input reference contains no dereferencing dimension
+       the result is an empty list. The caller should check this
+       case before calling the function because an empty list when there 
+       is a dereferencing dimension means that no target has been found
+       and that the input path may point to anywhere.
 
-  we dereference and eval until either found a constant one so return a
-  list of reference to wich points r or return anywhere:anywhere
+  @param input_ref is a reference representing a memory access path.
+  @param ptl is a list of points-to
+  @param exact_p is a pointer towards a boolean. It is set to true if
+         the result is exact, and to false if it is an approximation, 
+	 either because the matching points-to sources found in ptl are 
+	 over-approximations of the preceding path of input_ref or because 
+	 the matching points-to have MAY approximation tag.
 
-  it is not clear if the decision to replace a dereferencement by a
-  reference to anywhere should be taken here or not. I would rather
-  postpone it as it depends on write effects unknown from this function.
-*/
-/*
-  BC : try to find in the points-to list a points-to with a maximal length source path but 
-       shorter than the length of the input path. If it's an exact points-to, that's OK, if not
-       we have to find other possible paths. I don't know yet if we must iterate the process 
-       with found paths, because I don't know if points-to sinks can be non-constant paths.
+  From the original comment (FI): it is not clear if the decision to
+  replace a dereferencement by a reference to anywhere should be taken
+  here or not. I would rather postpone it as it depends on write
+  effects unknown from this function.
+
+  Reply (BC): the original function used to return a single
+  reference. It now returns a list of cell. It's up to the caller to
+  take the decision to turn this list into an anywhere effect or not,
+  depending on the context.
+
  */
+
 list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 {
 /* iterer sur le path p[0][1][2][0] et tester chaque fois si on peut
@@ -121,25 +146,26 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 
   if (entity_abstract_location_p(input_ent))
     {
+      /* If the input path is an abstract location, the result is the same abstract location */
       l = CONS(CELL, make_cell(is_cell_reference, make_reference(input_ent, NIL)), NIL);
       *exact_p = false;
     }
   else
     {
-      if (input_path_length == 0) /* should this case arise ? */
+      if (input_path_length == 0) 
 	{
+	  /* simple scalar case. I think this should not happen, because there is no dereferencing dimension. */
 	  l = NIL;
 	  *exact_p = true;
 	}
       else 
 	{
-	  size_t current_max_path_length = 0;
 	  /* first build a temporary list with matching points-to of maximum length */
+	  size_t current_max_path_length = 0; /* the current maximum length */
 	  list matching_list = NIL;
 	  *exact_p = true; /* assume exactness */
-	  while (!ENDP(ptl))
+	  FOREACH(POINTS_TO, pt, ptl)
 	    {
-	      points_to pt = POINTS_TO(CAR(ptl));
 	      cell source_cell = points_to_source(pt);
 	      reference source_ref = reference_undefined;
 	      
@@ -154,12 +180,18 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      size_t source_path_length = gen_length(source_indices);
 	      bool exact_prec = false;
 
+	      /* eligible points-to candidates must have a path length
+	         greater or equal to the current maximum length and
+	         their path must be a predecessor of the input_ref
+	         path.*/
 	      if ( (source_path_length >= current_max_path_length)
 		   && cell_reference_predeceding_p(source_ref, input_ref, &exact_prec))
-		{
-		  
+		{		  
 		  if (source_path_length > current_max_path_length )
 		    {
+		      /* if the candidate has a path length strictly greater than the current maximum lenght,
+		         the list of previously found matching candidates must be cleared
+		      */
 		      if(!ENDP(matching_ptl))
 			{
 			  gen_free_list(matching_ptl);
@@ -173,15 +205,26 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 		  /* I keep the whole points_to and not only the sink because I will need the approximation to further test
 		     the exactness
 		  */
-		  matching_list = CONS(POINTS_TO, pt, matching_list); 
-		  
+		  matching_list = CONS(POINTS_TO, pt, matching_list); 		  
 		}
-	      
-	      POP(ptl);
-	    } /* end of while */
+	    } /* end of FOREACH */
 
 	  /* Then build the return list with the points-to sinks to which we add/append the indices of input_ref 
-	     which are not in the source reference 
+	     which are not in the points-to source reference. This is comparable to an interprocedural translation
+	     where the input_ref is a path from the formal parameter, the source the formal parameter and the
+	     sink the actual parameter preceded by a & operator.
+	     
+	     Let the remaining indices be the indices from input_ref which are not in common with the sources of the points-to
+	     (which by construction have all the same path length).
+	     For each points-to, the new path is built from the sink reference. If the latter has indices, we add to 
+	     the value of its last index the value of the first index of the remaining indices. Then we append to the new path 
+	     the last indices of the reamining indices. If the sink reference has no indices, then the first index of the
+	     remaining indices must be equal to zero, and be skipped. And we simply append to the new path 
+	     the last indices of the reamining indices.
+
+	     The part of the code inside of the FOREACH could certainely be shared with the interprocedural translation.
+	     Besides, it should be made generic to handle convex input paths as well. Only simple paths are currently 
+	     taken into account.
 	  */
 	  /* first compute the list of additional indices of input_ref */
 	  for(int i = 0; i < (int) current_max_path_length; i++, POP(input_indices));
@@ -280,24 +323,28 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      pips_debug(8, "adding reference %s\n",
 			 words_to_string(words_reference(build_ref, NIL)));
 	      l = CONS(CELL, make_cell(is_cell_reference, build_ref), l);
+	      /* the approximation tag of the points-to is taken into account for the exactness of the result  */
 	      *exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
 	    } /* end of FOREACH(POINTS_TO,...) */
 	} /* else branche of if (input_path_length == 0) */
     } /* else branch of if (entity_abstract_location_p(input_ent)) */
-  
-
-  
 
   return l;
 }
 
 /*
-  @param c is a the cell for which we look a constant path
-  @param ptl is the list of points-to in which we search for a constant path
+  @param c is a the cell for which we look an equivalent constant path
+  @param ptl is the list of points-to in which we search for constant paths
+  @param  exact_p is a pointer towards a boolean. It is set to true if
+         the result is exact, and to false if it is an approximation, 
+	 either because the matching points-to sources found in ptl are 
+	 over-approximations of the preceding path of input_ref or because 
+	 the matching points-to have MAY approximation tag.
   @return a list of constant path cells. It is a list because at a given
           program point the cell may correspond to several constant paths.
 
 
+  original comment:	  
   goal: see if cell c can be shortened by replacing its indirections
   by their values when they are defined in ptl. For instance, p[0][0]
   and (p,q,EXACT) is reduced to q[0]. And if (q,i,EXACT) is also
@@ -306,15 +353,16 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
   because its goal is to build an as constant as possible reference or
   gap.
 
-  For the time being this function is never called...
+  I currently assume that points-to sinks are constant paths because
+  in the last example we should also have (p[0], i, EXACT) in the
+  points-to list. (BC)
 
-  It should be called by effect to see if a memory access path can be
-  transformed into a constant, and by the points-to analysis to see if
-  a sink or a source can be preserved in spite of write effects. This
-  function should be called before points_to_filter_effects() to
-  reduce the number of anywhere locations generated.
-
-  BC : I'm not yet sure, but we may also need an exactness information to keep exactness at the effect level.
+  This function is called by effects to see if a memory access path
+  can be transformed into a constant. It should also be called by the
+  points-to analysis to see if a sink or a source can be preserved in
+  spite of write effects. This function should be called before
+  points_to_filter_effects() to reduce the number of anywhere
+  locations generated.
 */
 list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
 {

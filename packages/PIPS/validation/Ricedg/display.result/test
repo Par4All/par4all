@@ -76,12 +76,11 @@ Whole dependence graph for "IMPACTMAYMUST"
  ******** Whole Dependence Graph with Dependence Cones ******
 
 	13 --> 13 with conflicts
-		from <X-R-MUST> to <X-W-MUST> at levels  1
+		from <X-W-MUST> to <X-W-MUST> at levels  1
 
-	13 --> 13 with conflicts
 		from <X-W-MUST> to <X-R-MUST> at levels  1
 
-		from <X-W-MUST> to <X-W-MUST> at levels  1
+		from <X-R-MUST> to <X-W-MUST> at levels  1
 
 	11 --> 13 with conflicts
 		from <Y-W-MUST> to <Y-R-MUST>
@@ -90,10 +89,9 @@ Whole dependence graph for "IMPACTMAYMUST"
 	09 --> 12 with conflicts
 		from <I-R-MUST> to <I-W-MUST>
 	09 --> 09 with conflicts
-		from <Z(I)-R-MUST> to <Z(I)-W-MUST>
-	09 --> 09 with conflicts
-		from <Z(I)-W-MUST> to <Z(I)-R-MUST>
 		from <Z(I)-W-MUST> to <Z(I)-W-MUST>
+		from <Z(I)-W-MUST> to <Z(I)-R-MUST>
+		from <Z(I)-R-MUST> to <Z(I)-W-MUST>
 	08 --> 12 with conflicts
 		from <I-R-MUST> to <I-W-MUST>
 	07 --> 12 with conflicts
@@ -105,9 +103,8 @@ Whole dependence graph for "IMPACTMAYMUST"
 	06 --> 11 with conflicts
 		from <Y-R-MUST> to <Y-W-MUST>
 	05 --> 13 with conflicts
-		from <X-R-MUST> to <X-W-MUST>
-	05 --> 13 with conflicts
-		from <X-W-MUST> to <X-R-MUST>
 		from <X-W-MUST> to <X-W-MUST>
+		from <X-W-MUST> to <X-R-MUST>
+		from <X-R-MUST> to <X-W-MUST>
 
 ****************** End of Dependence Graph ******************

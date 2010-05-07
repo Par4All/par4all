@@ -332,6 +332,8 @@ bool do_kernelize(statement s, entity loop_label)
       if( !entity_is_argument_p(loop_index(statement_loop(s)),loop_locals(statement_loop(s))) )
 	pips_user_error("you tried to kernelize a loop whose index is not private\n");
 
+      if(nb_nodes >1 )
+      {
       /* we can strip mine the loop */
       loop_strip_mine(s,nb_nodes,-1);
       /* unfortunetly, the strip mining does not exactly does what we
@@ -356,6 +358,7 @@ bool do_kernelize(statement s, entity loop_label)
 	loop_body(statement_loop(s))=make_block_statement(make_statement_list(s2));
 	AddLocalEntityToDeclarations(outer_index,get_current_module_entity(),loop_body(statement_loop(s)));
 	l = statement_loop(s);
+      }
       }
 
       string kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");

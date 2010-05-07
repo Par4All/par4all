@@ -1,0 +1,357 @@
+\documentclass{article}
+
+% lang
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+% others
+\usepackage{hyperref}
+\usepackage{color}
+\definecolor{freeblue}{rgb}{0.25,0.41,0.88}
+\definecolor{thingray}{rgb}{0.9,0.9,0.95}
+
+\usepackage{listings}
+
+\lstset{basicstyle=\ttfamily\small,keywordstyle=\bfseries,stringstyle=\it\color{blue},commentstyle=\color{blue},breaklines=true,language=c,moredelim=[is][\bfseries\color{blue}]{!}{!},
+framerule=2mm,framexleftmargin=5mm, frame=leftline, rulecolor=\color{freeblue}, breaklines=true, backgroundcolor=\color{thingray}
+}
+
+\usepackage{url}
+\usepackage{acronym}
+
+\usepackage{tikz}
+
+%%%% begin tikz macros for nice icons
+\newcommand{\fileicon}{
+  \ifx\du\undefined
+	\newlength{\du}
+  \fi
+	\setlength{\du}{0.25em}
+\begin{tikzpicture}
+\pgftransformxscale{1.000000}
+\pgftransformyscale{-1.000000}
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetfillcolor{dialinecolor}
+\pgfsetlinewidth{0.100000\du}
+\pgfsetdash{}{0pt}
+\pgfsetdash{}{0pt}
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetlinewidth{0.100000\du}
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetdash{}{0pt}
+\definecolor{dialinecolor}{rgb}{1.000000, 1.000000, 1.000000}
+\pgfsetfillcolor{dialinecolor}
+\fill (13.950000\du,3.650000\du)--(15.150000\du,3.650000\du)--(15.550000\du,4.050000\du)--(15.550000\du,5.650000\du)--(13.950000\du,5.650000\du)--cycle;
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\draw (13.950000\du,3.650000\du)--(15.150000\du,3.650000\du)--(15.550000\du,4.050000\du)--(15.550000\du,5.650000\du)--(13.950000\du,5.650000\du)--cycle;
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetdash{}{0pt}
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\draw (15.150000\du,3.650000\du)--(15.150000\du,4.050000\du)--(15.550000\du,4.050000\du)--(15.550000\du,4.050000\du);
+\end{tikzpicture}
+}
+\newcommand{\diricon}{
+\ifx\du\undefined
+  \newlength{\du}
+\fi
+\setlength{\du}{0.25em}
+\begin{tikzpicture}
+\pgftransformxscale{1.000000}
+\pgftransformyscale{-1.000000}
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\definecolor{dialinecolor}{rgb}{1.000000, 1.000000, 1.000000}
+\pgfsetfillcolor{dialinecolor}
+\pgfsetlinewidth{0.100000\du}
+\pgfsetdash{}{0pt}
+\pgfsetdash{}{0pt}
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetlinewidth{0.100000\du}
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetdash{}{0pt}
+\definecolor{dialinecolor}{rgb}{0.901961, 0.901961, 0.901961}
+\pgfsetfillcolor{dialinecolor}
+\pgfpathmoveto{\pgfpoint{12.850000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{12.850000\du}{5.350000\du}}{\pgfpoint{12.850000\du}{5.350000\du}}{\pgfpoint{13.100000\du}{5.350000\du}}
+\pgfpathcurveto{\pgfpoint{13.350000\du}{5.350000\du}}{\pgfpoint{13.350000\du}{5.350000\du}}{\pgfpoint{13.600000\du}{5.350000\du}}
+\pgfpathcurveto{\pgfpoint{13.850000\du}{5.350000\du}}{\pgfpoint{13.850000\du}{5.350000\du}}{\pgfpoint{13.850000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{13.850000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{14.600000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{7.358884\du}}{\pgfpoint{14.600000\du}{7.358884\du}}
+\pgfpathcurveto{\pgfpoint{14.600000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{7.358884\du}}
+\pgfpathcurveto{\pgfpoint{12.850000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{6.153554\du}}{\pgfpoint{12.850000\du}{5.751777\du}}
+\pgfusepath{fill}
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\pgfpathmoveto{\pgfpoint{12.850000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{12.850000\du}{5.350000\du}}{\pgfpoint{12.850000\du}{5.350000\du}}{\pgfpoint{13.100000\du}{5.350000\du}}
+\pgfpathcurveto{\pgfpoint{13.350000\du}{5.350000\du}}{\pgfpoint{13.350000\du}{5.350000\du}}{\pgfpoint{13.600000\du}{5.350000\du}}
+\pgfpathcurveto{\pgfpoint{13.850000\du}{5.350000\du}}{\pgfpoint{13.850000\du}{5.350000\du}}{\pgfpoint{13.850000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{13.850000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{14.600000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{7.358884\du}}{\pgfpoint{14.600000\du}{7.358884\du}}
+\pgfpathcurveto{\pgfpoint{14.600000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{7.358884\du}}
+\pgfpathcurveto{\pgfpoint{12.850000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{6.153554\du}}{\pgfpoint{12.850000\du}{5.751777\du}}
+\pgfusepath{stroke}
+\pgfsetlinewidth{0.010000\du}
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetdash{}{0pt}
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\pgfpathmoveto{\pgfpoint{12.850000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{12.850000\du}{5.350000\du}}{\pgfpoint{12.850000\du}{5.350000\du}}{\pgfpoint{13.100000\du}{5.350000\du}}
+\pgfpathcurveto{\pgfpoint{13.350000\du}{5.350000\du}}{\pgfpoint{13.350000\du}{5.350000\du}}{\pgfpoint{13.600000\du}{5.350000\du}}
+\pgfpathcurveto{\pgfpoint{13.850000\du}{5.350000\du}}{\pgfpoint{13.850000\du}{5.350000\du}}{\pgfpoint{13.850000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{13.850000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{5.751777\du}}
+\pgfpathcurveto{\pgfpoint{14.600000\du}{5.751777\du}}{\pgfpoint{14.600000\du}{7.358884\du}}{\pgfpoint{14.600000\du}{7.358884\du}}
+\pgfpathcurveto{\pgfpoint{14.600000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{7.358884\du}}
+\pgfpathcurveto{\pgfpoint{12.850000\du}{7.358884\du}}{\pgfpoint{12.850000\du}{6.153554\du}}{\pgfpoint{12.850000\du}{5.751777\du}}
+\pgfusepath{stroke}
+\pgfsetlinewidth{0.100000\du}
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetdash{}{0pt}
+\definecolor{dialinecolor}{rgb}{1.000000, 1.000000, 1.000000}
+\pgfsetfillcolor{dialinecolor}
+\fill (12.850000\du,7.358884\du)--(12.600000\du,5.952665\du)--(14.350000\du,5.952665\du)--(14.600000\du,7.358884\du)--cycle;
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\draw (12.850000\du,7.358884\du)--(12.600000\du,5.952665\du)--(14.350000\du,5.952665\du)--(14.600000\du,7.358884\du)--cycle;
+\pgfsetlinewidth{0.010000\du}
+\pgfsetbuttcap
+\pgfsetmiterjoin
+\pgfsetdash{}{0pt}
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\draw (12.850000\du,7.358884\du)--(12.600000\du,5.952665\du)--(14.350000\du,5.952665\du)--(14.600000\du,7.358884\du)--cycle;
+% setfont left to latex
+\definecolor{dialinecolor}{rgb}{0.000000, 0.000000, 1.000000}
+\pgfsetstrokecolor{dialinecolor}
+\node[anchor=west] at (13.600000\du,6.454886\du){};
+\end{tikzpicture}
+}
+
+
+
+\newcommand{\PIPS}{\textbf{\texttt{PIPS}}}
+\newcommand{\autoconf}{\texttt{autoconf}}
+\newcommand{\automake}{\texttt{automake}}
+\newcommand{\gnulib}{\texttt{gnulib}}
+\newcommand{\file}[1]{\fileicon{}\texttt{#1}}
+\newcommand{\cmd}[1]{\textbf{`}\texttt{#1}\textbf{`}}
+\newcommand{\dir}[1]{\diricon\texttt{#1}}
+
+\title{Autotools for \PIPS{}}
+
+\author{Serge \textsc{Guelton}}
+
+% document
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This documents describes the new build infrastructure of \PIPS{},
+ based on the famous \texttt{autotools} suite.
+It describes
+\begin{itemize}
+\item the meaning of each involved file~\ref{sec:structure};
+\item maintenance processes~\ref{sec:maintain} for \PIPS{} developers;
+\item installation process~\ref{sec:install} for \PIPS{} users and developers.
+\end{itemize}
+\end{abstract}
+
+%%%
+\section{Introduction}
+
+Building a large software like \PIPS{} is quite complicated:
+\begin{enumerate}
+\item several source languages;
+\item many tools involved;
+\item unusual head file generations.
+\end{enumerate}
+
+If you want to ensure a good level of portability,
+you have to rely on portable tools.
+
+If you want to ensure a good level of maintainability,
+you have to rely on external, asserted tools.
+
+As \PIPS{} targets \texttt{*nix} based systems and is written mainly in \texttt{C},
+\texttt{autotools} appear as a \textit{de facto} standard.
+It is especially known for enforcing good portability between \texttt{MacOs}, \texttt{Linux} and \texttt{BSD}.
+Through \autoconf{}, it separate configuration step from build step.
+Through \gnulib{}, it ensures portability of non-standard \texttt{C} functions.
+
+As of now, \PIPS{} Compiles on  \texttt{Linux}, \texttt{BSD} and \texttt{MacOs} Operating Systems.
+It can be compiled using either \texttt{gcc} or \texttt{icc}.
+
+%%%
+\section{Infrastructure Organization}
+\label{sec:structure}
+
+In this section, we describe the configuration files used by the several tools involved in \PIPS{} build process.
+
+\subsection{\autoconf{}}
+
+\autoconf{} manages the configuration of the build process.
+Involved files are
+\begin{description}
+\item[\file{configure.ac}] central place for configuration. Running \cmd{autoreconf -vi} will produce a \file{configure} script from it.
+\item[\dir{makes/m4}] auxiliary directory where \texttt{m4} configuration macros are stored. It is read by \cmd{autoreconf}.
+\item[\file{Makefile.am}] top-level \file{Makefile.am} contains a macro variable definition \texttt{ACLOCAL\_AMFLAGS} where \cmd{autoreconf} will find its additional \texttt{m4} sources.
+Running \cmd{autoreconf -vi} will produce a \file{Makefile.in} for each \file{Makefile.am}
+\item[\file{configure}] is the portable configuration script generated by \cmd{autoreconf}. Running it will turn each \file{Makefile.in} into a regular \file{Makefile}.
+\item[\file{config.status}] is a script generated by configuration step, that memorize configuration parameters.
+\end{description}
+
+For in-depth documentation of \autoconf{}, feel free to read \url{http://www.gnu.org/software/autoconf/manual}.
+
+\subsection{\automake{}}
+
+\automake{} manages the set of makefiles involved in the build process.
+
+Each \file{Makefile.am} in source repository describes the build process for this repository.
+It follows the \cmd{make} syntax, without support for \texttt{GNU-make} extensions for the sake of portability.
+
+For in-depth documentation of \automake{}, feel free to read \url{http://www.gnu.org/software/automake/manual}.
+
+\subsection{\gnulib{}}
+
+\gnulib{} manages portability of \texttt{C} functions across \texttt{*nix} flavors.
+Its whole configuration is stored in \dir{src/Libs/gnulib} and \dir{src/Libs/gnulib/m4}.
+A few lines have been added in \file{configure.ac} to manage \gnulib{} configuration.
+
+For in-depth documentation of \gnulib{}, feel free to read \url{http://www.gnu.org/software/gnulib/manual}.
+
+%%%
+\section{Maintenance Processes}
+\label{sec:maintain}
+
+This section describes the process to follow when changing build infrastructure.
+
+\subsection{Adding a \texttt{C} source file in an existing \PIPS{} library}
+
+Let us assume you want to add the file \file{pips.c} into library \dir{src/Libs/ri-util}.
+First make sure your source file includes pips configuration header, by adding 
+
+\begin{lstlisting}
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
+\end{lstlisting}
+
+at the top of your source file, before any other include.
+
+
+The only thing you have to do then is to add your file in the macro variable suffixed \texttt{\_SOURCES}
+in \file{src/Libs/ri-util/Makefile.am}
+That is
+\begin{lstlisting}
+libri_util_la_SOURCES=eval.c  ... size.c
+\end{lstlisting}
+Becomes
+\begin{lstlisting}
+libri_util_la_SOURCES=eval.c  ... size.c !pips.c!
+\end{lstlisting}
+
+\subsection{Adding a \texttt{C} header file in an existing \PIPS{} library}
+
+Let us assume you want to add the file \file{pips.h} into library \dir{src/Libs/ri-util}.
+You will have to modify \file{src/Libs/ri-util/Makefile.am}
+Ask yourself the question: Do I want to install the header file with the distribution ?
+\begin{itemize}
+\item If the answer is yes, add your file to the \texttt{include\_HEADERS} macro variable in, or create it if it does not exist.
+\item If the answer is no, add your file to the \texttt{dist\_noinst\_HEADERS}  macro variable, or create it if it does not exist.
+\end{itemize}
+That is write something like this
+\begin{lstlisting}
+include_HEADERS=!pips.h!
+\end{lstlisting}
+
+\automake{} provides a fine grain control over what gets installed and distributed.
+
+
+\subsection{Adding a \texttt{tex} file in an existing \PIPS{} directory}
+Let us assume you want to add the file \file{pips.tex} into library \dir{src/Libs/ri-util}.
+You will have to modify \file{src/Libs/ri-util/Makefile.am}
+
+First, beware that documentation is not built by default.
+It is only built when user activates configure flags \texttt{--enable-doc}.
+
+So everything you do in a makefile that is relevant to documentation must be guarded by \texttt{WITH\_DOC}
+The \automake{} variable for documentation is \texttt{dist\_noinst\_DATA} for sources and \texttt{doc\_DATA} for output.
+That is
+\begin{lstlisting}
+if !WITH_DOC!
+dist_noinst_DATA=!pips.tex!
+doc_DATA=!pips.pdf!
+endif
+\end{lstlisting}
+
+In addition to this, you have to supply \automake{} rules to build pdf from tex files, using the directive
+\begin{lstlisting}
+include $(top_srcdir)/makes/latex.mk
+\end{lstlisting}
+If it is not already there.
+
+
+\subsection{Adding a library}
+
+This one is a bit more difficult.
+In the following, we assume you want to add \dir{mylib} into \dir{src/Libs}.
+
+There are many steps involved, follow them carefully:
+\begin{enumerate}
+\item create a directory \dir{mylib} into \dir{src/Libs};
+\item add \texttt{mylib} to the \texttt{PIPS\_SUBDIRS} macro variable in \file{src/Libs/Makefile.am};
+\item add \texttt{mylib/libmylib.la} to the \texttt{libpipslibs\_la\_LIBADD} macro variable  in \file{src/Libs/Makefile.am};
+\item add following template in \file{src/Libs/mylib/Makefile.am}
+\begin{lstlisting}
+TARGET  = !mylib!
+include_HEADERS = $(TARGET).h
+BUILT_SOURCES=$(TARGET).h
+include $(top_srcdir)/makes/cproto.mk
+noinst_LTLIBRARIES=lib!mylib!.la
+lib_!mylib!_la_SOURCES= !src0.c src1.c ... srcn.c!
+
+include $(srcdir)/../pipslibs_includes.mk
+\end{lstlisting}
+Where
+\begin{description}
+\item[\texttt{TARGET}] is used to avoid redundancy and to communicate with \file{cproto.mk}.
+\item[\texttt{include\_HEADERS}] specifies that you want to distribute the header generated by \cmd{cproto}.
+\item[\texttt{BUILT\_SOURCES}] specifies that  \cmd{cproto} generated header must be built before anything else.
+\item[\texttt{include \$(top\_srcdir)/makes/cproto.mk}] specifies how to use \cmd{cproto}.
+\item[\texttt{noinst\_LTLIBRARIES}] specifies the name of local libraries.
+\item[\texttt{lib\_mylib\_la\_SOURCES}] specifies the sources of your library.
+\item[\texttt{include \$(srcdir)/../pipslibs\_includes.mk}] sets preprocessor include path correctly.
+\end{description}
+
+\item add \texttt{src/Libs/mylib/Makefile} to the \texttt{AC\_CONFIG\_FILES(...)} macro function parameters in \file{configure.ac};
+\end{enumerate}
+
+%%%
+\section{Installation Processes}
+\label{sec:install}
+
+For short:
+\begin{lstlisting}
+wget http://ridee.enstb.org/pips/get-pips4u.sh
+chmod u+x get-pips4u.sh
+./get-pips4u.sh --help
+\end{lstlisting}
+
+%%%
+\begin{acronym}
+\end{acronym}
+
+\end{document}
