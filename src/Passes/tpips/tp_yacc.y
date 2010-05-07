@@ -566,8 +566,7 @@ i_unknown: TK_UNKNOWN TK_ENDOFLINE
 		}
 		else
 		{
-			/* FI->FC: It would be nicer to have the input string and the
-				 line number... */
+			tpips_lex_print_pos(stderr);
 			if(get_bool_property("ABORT_ON_USER_ERROR"))
 				pips_user_error(
 					"\n\n"
@@ -947,7 +946,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 				}
 				else
 				{
-					tpips_process_a_file(sourced, FALSE);
+					tpips_process_a_file(sourced, name, FALSE);
 					fclose(sourced);
 				}
 			}
