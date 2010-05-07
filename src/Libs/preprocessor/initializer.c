@@ -446,6 +446,8 @@ add_new_module_from_text(string module_name,
       DB_PUT_FILE_RESOURCE(res, cun, init_name);
       DB_PUT_FILE_RESOURCE(DBR_USER_FILE, cun, strdup(src_name));
     }
+    else if(!is_fortran)
+        AddEntityToModuleCompilationUnit(m,module_name_to_entity(compilation_unit_name));
 
     free(file_name), free(dir_name), free(full_name), free(finit_name);
     return success_p;
