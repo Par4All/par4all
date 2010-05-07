@@ -2129,6 +2129,7 @@ commutative_call_p(call c)
         switch(basic_tag(b))
         {
             case is_basic_float:
+            case is_basic_complex:
                 if(!get_bool_property("RELAX_FLOAT_COMMUTATIVITY"))
                     break;
             case is_basic_logical:
