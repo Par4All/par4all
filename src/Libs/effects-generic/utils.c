@@ -1613,6 +1613,12 @@ bool get_use_points_to()
 /**
    @param l_pointer_eff is a list of effects that may involve access paths dereferencing pointers.
    @return a list of effects with no access paths dereferencing pointers.
+
+   Two algorithms are currently used, depending on the value returned by get_use_points_to.
+   
+   If true, when there is an effect reference with a dereferencing dimension, eval_cell_with_points_to is called
+   to find an equivalent constant path using points-to.
+   If false, effect references with a dereferencing dimension are systematically replaced by anywhere effects.
  */
 list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 {
