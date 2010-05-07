@@ -1,0 +1,397 @@
+#!/usr/bin/env python
+
+# -*- coding: utf-8 -*-
+
+"""
+Par4All Frontend Script
+"""
+
+import sys, os, re, optparse, subprocess, string, random, shutil, logging, time, pyps
+
+verbosity = 0
+logger = None
+
+def gen_name(length = 8, chars = string.letters + string.digits):
+	"Generates a random name / password"
+	return "".join(random.choice(chars) for x in range(random.randint(8, 16)))
+
+def rmdb(dir):
+	"Removes a PIPS database directory recursively"
+	(base, ext) = os.path.splitext(dir)
+	if ext != ".database":
+		sys.stderr.write("Cannot remove, not a .database directory: " + dir)
+		sys.exit(123)
+	for root, dirs, files in os.walk(dir, topdown = False):
+		for name in files:
+			os.remove(os.path.join(root, name))
+		for name in dirs:
+			os.rmdir(os.path.join(root, name))
+	os.removedirs(dir)
+
+def debug(msg):
+	if verbosity >= 3:
+		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
+	if logger:
+		logger.debug(msg)
+
+def info(msg):
+	if verbosity >= 2:
+		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
+	if logger:
+		logger.info(msg)
+
+def warn(msg, prepend_warning = True):
+	if verbosity >= 1:
+		prepend = ""
+		if prepend_warning:
+			prepend = "WARNING: "
+		sys.stderr.write(sys.argv[0] + ": " + prepend + msg.rstrip() + "\n");
+	if logger:
+		logger.warn(msg)
+
+def error(msg):
+	sys.stderr.write(sys.argv[0] + ": ERROR: " + msg.rstrip() + "\n");
+	if logger:
+		logger.error(msg)
+
+def critical(msg):
+	sys.stderr.write(sys.argv[0] + ": ERROR: " + msg.rstrip() + "\n");
+	if logger:
+		logger.critical(msg)
+
+def main():
+	"The function called when this program is executed by its own"
+
+	global verbosity
+
+	parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = "$Id")
+
+	main_group = optparse.OptionGroup(parser, "Processing Options")
+
+	main_group.add_option("-p", "--project", dest = "project", metavar = "NAME",
+		help = "Name for the project (and for the program database). If you do not specify the project, a random name will be used, and the program database will be removed after script execution (unless you say --keep-after).")
+
+	main_group.add_option("--keep-after", dest = "keep_after", action = "store_true", default = False,
+		help = "Keep database after processing. Useful only when --project is not specified.")
+
+	main_group.add_option("--remove-after", dest = "remove_after", action = "store_true", default = False,
+		help = "Remove database directory after processing. Inverse of --keep-after.")
+
+	main_group.add_option("--remove-first", dest = "remove_first", action = "store_true", default = False,
+		help = "Remove existing database if it already exists. Remove existing output files if they already exist.")
+
+	main_group.add_option("--copy", dest = "copy", action = "store_true", default = False,
+		help = "Copy output files from database to source files directory, using the \"_p4a\" suffix.")
+
+	main_group.add_option("--accel", dest = "accel", action = "store_true", default = False,
+		help = "Parallelize with output using the Par4All accel run-time that can execute code for various hardware accelerators such as GPU or even OpenMP emulation.")
+
+	main_group.add_option("--cuda", dest = "cuda", action = "store_true", default = False,
+		help = "Enable CUDA generation, should be used along with --accel.")
+
+	main_group.add_option("--include-modules", dest="filter_include", metavar = "REGULAR-EXPRESSION",
+		help = "Parallelize only the modules which names match the regular expression.")
+
+	main_group.add_option("--exclude-modules", dest="filter_exclude", metavar = "REGULAR-EXPRESSION",
+		help = "Exclude the modules matching the regular expression from the parallelization.")
+
+	main_group.add_option("--openmp", dest = "openmp", action = "store_true", default = False,
+		help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All accel run-time call with OpenMP implementation instead of native OpenMP output. If --cuda is not specified, this option is set by default.")
+
+	main_group.add_option("--simple", dest = "simple", action = "store_true", default = False,
+		help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it.")
+
+	main_group.add_option("--fine", dest = "fine", action = "store_true", default = False,
+		help = "Use a fine-grained parallelization algorithm.")
+
+	main_group.add_option("--coarse", dest = "fine", action = "store_false",
+		help = "Use a coarse-grained parallelization algorithm.")
+
+	main_group.add_option("--cmake", dest = "cmake", action = "store_true", default = False,
+		help = "Generate a CMakeLists.txt in current directory for compiling the output files.")
+
+	main_group.add_option("--makeit", dest = "makeit", action = "store_true", default = False,
+		help = "Try to build CMake project in current directory (use in conjunction with --cmake).")
+
+	main_group.add_option("--here", dest = "here", action = "store_true", default = False,
+		help = "Do not spawn a process to run PIPS and be able to filter out its output, run it here.")
+
+	parser.add_option_group(main_group)
+
+	debug_group = optparse.OptionGroup(parser, "Debugging & Reporting Options")
+
+	debug_group.add_option("-v", "--verbose", action = "count",
+						   dest = "verbosity", default = 0,
+						   help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+
+	debug_group.add_option("-r", "--report", action = "count",
+						   dest = "report", default = 0,
+						   help = "Display a processing report.")
+
+	#debug_group.add_option("--log", dest = "log", metavar = "FILE",
+	#	help = "Log all output to FILE.")
+
+	parser.add_option_group(debug_group)
+
+	(options, args) = parser.parse_args()
+
+	verbosity = options.verbosity
+
+	# Check options.
+	if len(args) == 0:
+		error("Missing input files")
+		sys.exit(1)
+	if options.remove_after and options.keep_after:
+		error("Cannot --remove-after and --keep-after at the same time")
+		sys.exit(1)
+	if options.simple and (options.cuda or options.openmp):
+		error("Cannot combine --simple with --cuda and/or --openmp")
+		sys.exit(1)
+
+	# Run ourselves (to filter PIPS/PyPS output) unless --here is specified.
+	if not options.here:
+		report = ""
+		full_report = ""
+		sys.argv.append("--here")
+		proc = subprocess.Popen(sys.argv, shell = False,
+			stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		#space_re = re.compile(r"^\s*$")
+		module_re = re.compile(r"  Module +(\S+)")
+		made_re = re.compile(r"(\S+) made for (\S+)")
+		script_re = re.compile("(" + sys.argv[0] + r": .+?(\n|\Z))")
+		while True:
+			try:
+				stdout_value, stderr_value = proc.communicate()
+				sys.stdout.write(stdout_value)
+				for line in stderr_value.rstrip().split("\n"):
+					m = made_re.match(line)
+					if m:
+						module = m.group(2)
+						module = module.rstrip(".")
+						report += module + ": " + m.group(1) + " done\n"
+					m = module_re.match(line)
+					if m:
+						report += m.group(1) + ": new module\n"
+					if script_re.match(line):
+						sys.stderr.write(line + "\n")
+					else:
+						full_report += line + "\n"
+			except:
+				#print "EXCEPTION: " + repr(sys.exc_info())
+				break
+		if options.report == 1:
+			sys.stdout.write(report)
+		elif options.report > 1:
+			sys.stdout.write(full_report)
+		if proc.returncode != None:
+			sys.exit(proc.returncode)
+		else:
+			sys.exit(255)
+
+	# Set up defaults.
+	if not options.simple and not options.cuda and not options.openmp:
+		info("Defaulting to --openmp")
+		options.openmp = True
+
+	# Make all paths absolute.
+	files = []
+	for file in args:
+		files.append(os.path.abspath(file))
+
+	# If --accel, then add the P4A stubs to the file list.
+	if options.accel:
+		files.append(os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c"))
+
+	# Preliminary check: input files must exist.
+	for file in files:
+		if not os.path.exists(file):
+			error("Input file '" + file + "' does not exist")
+			sys.exit(2)
+
+	# Determine the database directory.
+	database_dir = ""
+	project = options.project
+	if project == None:
+		while True:
+			project = gen_name()
+			database_dir = os.path.join(os.getcwd(), project + ".database")
+			if not os.path.exists(database_dir):
+				break
+		info("Database directory: " + database_dir)
+	else:
+		database_dir = os.path.join(os.getcwd(), project + ".database")
+		if os.path.exists(database_dir):
+			if options.remove_first:
+				info("Removing existing database directory: " + database_dir)
+				rmdb(database_dir)
+			else:
+				error("Database already exists: " + database_dir)
+				sys.exit(2)
+
+	# Decide once and for all if we are going to remove the database directory at the end.
+	remove_after = (options.project == None and not options.keep_after) or options.remove_after;
+	if remove_after:
+		info("Setting --copy automatically since database will be erased")
+		options.copy = True
+
+	# Make up the expected output file paths.
+	# Check if they already exist and act accordingly.
+	output_files = []
+	final_output_files = []
+	for file in files:
+		output_file = os.path.join(database_dir, "Src", os.path.basename(file))
+		output_files.append(output_file)
+		(base, ext) = os.path.splitext(file)
+		final_output_file = base + "_p4a" + ext
+		final_output_files.append(final_output_file)
+		if os.path.exists(output_file):
+			info("Removing " + output_file)
+			os.remove(output_file)
+		if os.path.exists(final_output_file):
+			if options.remove_first:
+				info("Removing " + final_output_file)
+				os.remove(final_output_file)
+			else:
+				if options.copy:
+					warn("Output file " + final_output_file + " already exists, will be lost")
+					os.remove(final_output_file)
+				else:
+					info("File " + final_output_file + " exists but this is not the final output destination (--copy not specified)")
+		info(file + " -> " + output_file + " (" + final_output_file + ")")
+
+	# Reflect the final_output_files as being output_files if not copying.
+	if not options.copy:
+		for file in range(len(final_output_files)):
+			final_output_files[i] = output_files[i]
+
+	# Create the PyPS workspace.
+	workspace = pyps.workspace(files, name = project, activates = [], verboseon = True)
+	workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+						   PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+
+	# Skip module name of P4A runtime.
+	# Also filter out modules based on --include-modules and --exclude-modules.
+	skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
+	filter_include_re = None
+	if options.filter_include:
+		filter_include_re = re.compile(options.filter_include)
+	filter_exclude_re = None
+	if options.filter_exclude:
+		filter_exclude_re = re.compile(options.filter_exclude)
+	all_modules = workspace.filter(lambda module:
+		not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
+		and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
+		and (filter_include_re == None or filter_include_re.match(module.name)))
+
+	# Not sure about that.
+	all_modules.loop_normalize(
+			# Loop normalize for the C language and GPU friendly
+			LOOP_NORMALIZE_ONE_INCREMENT = True,
+			LOOP_NORMALIZE_LOWER_BOUND = 0,
+			# It is legal in the following by construction:
+			LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True)
+
+	all_modules.privatize_module()
+
+	# Here comes the parallelization!
+	if options.fine:
+		all_modules.internalize_parallel_code()
+	else:
+		all_modules.coarse_grain_parallelization()
+
+	if options.cuda:
+		#mn.display()
+		all_modules.gpu_ify()
+		#mn.display()
+
+		# Isolate kernels by using the fact that all the generated kernels have
+		# their name beginning with "p4a_":
+		kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
+		kernel_launchers = w.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+
+		#kernels.display()
+		# Add communication around all the call site of the kernels:
+		kernel_launchers.kernel_load_store()
+		#kernel_launchers.display()
+
+		kernel_launchers.gpu_loop_nest_annotate()
+		#kernel_launchers.display()
+
+		# Inline back the kernel into the wrapper, since CUDA can only deal with
+		# local functions if they are in the same file as the caller (by inlining
+		# them, by the way... :-) )
+		kernel_filter_re = re.compile("p4a_kernel_\\d+$")
+		kernels = w.filter(lambda m: kernel_filter_re.match(m.name))
+		kernels.inlining()
+
+		# Display the wrappers to see the work done:
+		kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
+		kernel_wrappers = w.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
+		#kernel_wrappers.display()
+
+		# Instead, do a global loop normalization above:
+		#kernels.loop_normalize()
+		#kernels.use_def_elimination()
+		#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
+
+		#w.all.suppress_dead_code()
+		#w["main"].display()
+
+		#workspace["main"].prepend_comment(PREPEND_COMMENT = "/*** Prepend P4A_init_accel here ***/")
+
+	if options.openmp:
+		all_modules.ompify_code()
+
+	for module in workspace:
+		module.prepend_comment(PREPEND_COMMENT = "// Generated on " + time.strftime("%Y-%m-%d %H:%M:%S") + " by " + " ".join(sys.argv) + "\n")
+		module.prepend_comment(PREPEND_COMMENT = "// Module name: " + module.name + "\n")
+
+	# Build the output source files (UNSPLIT operation).
+	workspace.all.unsplit()
+
+	# Copy the output files to their final location.
+	for i in range(len(output_files)):
+		if os.path.exists(output_files[i]):
+			if options.copy:
+				info("Copying " + output_files[i] + " to " + final_output_files[i])
+				shutil.copyfile(output_files[i], final_output_files[i])
+			warn(final_output_files[i] + " created", False)
+		else:
+			error("Expected output file for " + files[i] + " not found: " + output_files[i])
+			error("You might want to re-run with -rr to display full PIPS output")
+			remove_after = False
+			options.cmake = False
+
+	# Remove the database directory if requested.
+	if remove_after:
+		info("Removing database directory: " + database_dir)
+		rmdb(database_dir)
+
+	# Generate a CMakeLists.txt.
+	if options.cmake:
+		cmakefile = os.path.join(os.getcwd(), "CMakeLists.txt")
+		if os.path.exists(cmakefile):
+			cmakefile_backup = os.path.join(os.getcwd(), "CMakeLists.txt.BAK")
+			warn("Moving existing " + cmakefile + " out of the way (" + cmakefile_backup + ")")
+			shutil.move(cmakefile, cmakefile_backup)
+		info("Generating " + cmakefile)
+		f = open(cmakefile, "w")
+		f.write("cmake_minimum_required(VERSION 2.6)\n")
+		f.write("add_executable(" + project + " " + " " .join(final_output_files) + ")\n")
+		if options.openmp:
+			f.write("set(CMAKE_C_FLAGS \"-fopenmp\")\n");
+		f.close()
+		if options.makeit:
+			os.system("mkdir -p __build && cd __build && cmake .. && make")
+
+
+if __name__ == "__main__":
+	main()
+
+# Some Emacs stuff:
+### Local Variables:
+### mode: python
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### tab-width: 4
+### End:
