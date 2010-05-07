@@ -637,6 +637,10 @@ static string get_vect_name_from_data(int argc, expression exp)
             prefix[3] = 'i';
             itemSize = 8 * basic_logical(bas);
             break;
+        case is_basic_complex:
+            prefix[3] = 'c';
+            itemSize = 8 * basic_complex(bas);
+            break;
 
         default:
             return strdup("");
