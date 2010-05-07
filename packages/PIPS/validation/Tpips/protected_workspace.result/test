@@ -4,6 +4,8 @@ echo The message should be: workspace protected_workspace: Permission denied
 The message should be: workspace protected_workspace: Permission denied
 echo
 
+Registering file protected_workspace.f
+Splitting file    ./protected_workspace.f
   Module         PROTECTED_WORKSPACE
 Workspace protected_workspace created and opened.
 Module PROTECTED_WORKSPACE selected

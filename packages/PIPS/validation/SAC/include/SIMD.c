@@ -1,5 +1,29 @@
 #define LOGICAL int
 #define DMAX(A,B) (A)>(B)?(A):(B)
+void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4])
+{
+    b[0]=a[0];
+    b[1]=a[1];
+    b[2]=a[2];
+    b[3]=a[3];
+}
+void SIMD_SAVE_V4SF_TO_V4SI(float a[4], int b[4])
+{
+    a[0]=b[0];
+    a[1]=b[1];
+    a[2]=b[2];
+    a[3]=b[3];
+}
+void SIMD_SAVE_V2SF_TO_V2DF(double a[2],float b[2])
+{
+    a[0]=b[0];
+    a[1]=b[1];
+}
+void SIMD_LOAD_V2SF_TO_V2DF(double a[2],float b[2])
+{
+    b[0]=a[0];
+    b[1]=a[1];
+}
 
 int
 PHI (LOGICAL L, int X1, int X2)
@@ -221,6 +245,14 @@ SIMD_SUBPS (float DEST[4], float SRC1[4], float SRC2[4])
     DEST[2] = SRC1[2] - SRC2[2];
     DEST[3] = SRC1[3] - SRC2[3];
 }
+void
+SIMD_UMINPS (float DEST[4], float SRC1[4])
+{
+    DEST[0] =  - SRC1[0];
+    DEST[1] =  - SRC1[1];
+    DEST[2] =  - SRC1[2];
+    DEST[3] =  - SRC1[3];
+}
 
 void
 SIMD_MULPS (float DEST[4], float SRC1[4], float SRC2[4])
@@ -359,6 +391,10 @@ SIMD_ADDW (short DEST[8], short SRC1[8], short SRC2[8])
     DEST[1] = SRC1[1] + SRC2[1];
     DEST[2] = SRC1[2] + SRC2[2];
     DEST[3] = SRC1[3] + SRC2[3];
+    DEST[4] = SRC1[4] + SRC2[4];
+    DEST[5] = SRC1[5] + SRC2[5];
+    DEST[6] = SRC1[6] + SRC2[6];
+    DEST[7] = SRC1[7] + SRC2[7];
 }
 
 void
@@ -368,6 +404,10 @@ SIMD_SUBW (short DEST[8], short SRC1[8], short SRC2[8])
     DEST[1] = SRC1[1] - SRC2[1];
     DEST[2] = SRC1[2] - SRC2[2];
     DEST[3] = SRC1[3] - SRC2[3];
+    DEST[4] = SRC1[4] - SRC2[4];
+    DEST[5] = SRC1[5] - SRC2[5];
+    DEST[6] = SRC1[6] - SRC2[6];
+    DEST[7] = SRC1[7] - SRC2[7];
 }
 
 void
@@ -377,13 +417,23 @@ SIMD_MULW (short DEST[8], short SRC1[8], short SRC2[8])
     DEST[1] = SRC1[1] * SRC2[1];
     DEST[2] = SRC1[2] * SRC2[2];
     DEST[3] = SRC1[3] * SRC2[3];
+    DEST[4] = SRC1[4] * SRC2[4];
+    DEST[5] = SRC1[5] * SRC2[5];
+    DEST[6] = SRC1[6] * SRC2[6];
+    DEST[7] = SRC1[7] * SRC2[7];
 }
 
 void
-SIMD_DIVW (short DEST[2], short SRC1[2], short SRC2[2])
+SIMD_DIVW (short DEST[8], short SRC1[8], short SRC2[8])
 {
     DEST[0] = SRC1[0] / SRC2[0];
     DEST[1] = SRC1[1] / SRC2[1];
+    DEST[2] = SRC1[2] / SRC2[2];
+    DEST[3] = SRC1[3] / SRC2[3];
+    DEST[4] = SRC1[4] / SRC2[4];
+    DEST[5] = SRC1[5] / SRC2[5];
+    DEST[6] = SRC1[6] / SRC2[6];
+    DEST[7] = SRC1[7] / SRC2[7];
 }
 
 void

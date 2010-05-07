@@ -8,7 +8,7 @@ In spite of the generate command, the main program, MODULE, should be selected
 ! what if module name is wrong.
 !
       PROGRAM MODULE
-      WRITE (*, 'module')                                               0001
+      WRITE (*, 'module')                                               0005
       END
 
 Select a wrong module name after the creation of the worskpace
@@ -21,7 +21,7 @@ since TOTO could not be generated
 ! what if module name is wrong.
 !
       PROGRAM MODULE
-      WRITE (*, 'module')                                               0001
+      WRITE (*, 'module')                                               0005
       END
 
 Select the main program as module
@@ -30,7 +30,7 @@ Select the main program as module
 ! what if module name is wrong.
 !
       PROGRAM MODULE
-      WRITE (*, 'module')                                               0001
+      WRITE (*, 'module')                                               0005
       END
 
 Select MODULE as current module
@@ -39,6 +39,6 @@ Select MODULE as current module
 ! what if module name is wrong.
 !
       PROGRAM MODULE
-      WRITE (*, 'module')                                               0001
+      WRITE (*, 'module')                                               0005
       END
 

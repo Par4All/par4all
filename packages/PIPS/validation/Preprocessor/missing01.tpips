@@ -24,7 +24,7 @@ display C_SOURCE_FILE[inC1]
 display C_SOURCE_FILE[inC1!]
 
 # List all C files, including compilation unitsencies on gcc and/or preprocessor version
-shell ls missing01.database/*/*.c
+shell ls missing01.database/*/*.c | sort
 
 close
 delete missing01

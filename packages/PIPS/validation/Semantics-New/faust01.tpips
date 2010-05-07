@@ -1,0 +1,33 @@
+#
+delete faust01 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create faust01 faust01.c 
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+
+
+echo
+echo Initial code for "compute"
+echo
+
+display PRINTED_FILE[compute]
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[compute]
+display PRINTED_FILE[main]
+
+# quit
+
+
+
+close
+delete faust01 
+quit
+# EOF

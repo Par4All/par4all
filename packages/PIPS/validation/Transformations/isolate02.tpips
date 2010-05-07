@@ -17,9 +17,9 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell cc $WS.c -o ref
-shell cc $WS.database/Src/$WS.c -o candidate
-shell ( test `./ref` = `./candidate` && echo "ok" ) || echo "ko"
-shell rm -f ref candidate
+shell sed -i -e '1,/lonesome_cowboy(/ d' $WS.database/Src/$WS.c
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/candidate
+shell ( test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/candidate` && echo "ok" ) || echo "ko"
 
 delete $WS

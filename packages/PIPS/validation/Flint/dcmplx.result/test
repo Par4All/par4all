@@ -4,24 +4,24 @@
       DOUBLE PRECISION X
       COMPLEX W, Z
 
-      A = (1.0, 1.0)                                                    0001
-      B = 1                                                             0002
-      C = 1.0E0                                                         0003
-      D = 1.0D0                                                         0004
+      A = (1.0, 1.0)                                                    0006
+      B = 1                                                             0007
+      C = 1.0E0                                                         0008
+      D = 1.0D0                                                         0009
 
-      E = A+B                                                           0005
-      F = COS(E)                                                        0006
-      X = ABS(F)                                                        0007
-      F = DCMPLX(X)                                                     0008
-      H = LOG(G)+SQRT(F)+SIN(E)+EXP(A)                                  0009
+      E = A+B                                                           0011
+      F = COS(E)                                                        0012
+      X = ABS(F)                                                        0013
+      F = DCMPLX(X)                                                     0014
+      H = LOG(G)+SQRT(F)+SIN(E)+EXP(A)                                  0015
 
-      PRINT *, H                                                        0010
+      PRINT *, H                                                        0017
 
-      W = (1.0, 1.0)                                                    0011
-      Z = W+1                                                           0012
+      W = (1.0, 1.0)                                                    0019
+      Z = W+1                                                           0020
 
-      W = CMPLX(1.0, 1.0)                                               0013
-      Z = W+1                                                           0014
+      W = CMPLX(1.0, 1.0)                                               0022
+      Z = W+1                                                           0023
 
       END
 ### no dc, no summary, no explicit constants
@@ -30,32 +30,32 @@
       DOUBLE PRECISION X
       COMPLEX W, Z
 
-      A = (1.0D0, 1.0D0)                                                0001
-      B = (1.0D0, 0.0D0)                                                0002
-      C = (1.0D0, 0.0D0)                                                0003
-      D = (1.0D0, 0.0D0)                                                0004
+      A = (1.0D0, 1.0D0)                                                0006
+      B = (1.0D0, 0.0D0)                                                0007
+      C = (1.0D0, 0.0D0)                                                0008
+      D = (1.0D0, 0.0D0)                                                0009
 
 !ERROR: #1 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #2 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      E = DCMPLX(A+B)                                                   0005
+      E = DCMPLX(A+B)                                                   0011
 !ERROR: #1 argument of 'COS' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      F = DCMPLX(COS(E))                                                0006
+      F = DCMPLX(COS(E))                                                0012
 !ERROR: #1 argument of 'ABS' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      X = DBLE(ABS(F))                                                  0007
-      F = DCMPLX(X, 0.0D0)                                              0008
+      X = DBLE(ABS(F))                                                  0013
+      F = DCMPLX(X, 0.0D0)                                              0014
 !ERROR: #1 argument of 'LOG' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #1 argument of 'SQRT' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #1 argument of 'SIN' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #1 argument of 'EXP' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      H = DCMPLX(LOG(G)+SQRT(F)+SIN(E)+EXP(A))                          0009
+      H = DCMPLX(LOG(G)+SQRT(F)+SIN(E)+EXP(A))                          0015
 
-      PRINT *, H                                                        0010
+      PRINT *, H                                                        0017
 
-      W = (1.0, 1.0)                                                    0011
-      Z = W+(1.0E0, 0.0E0)                                              0012
+      W = (1.0, 1.0)                                                    0019
+      Z = W+(1.0E0, 0.0E0)                                              0020
 
-      W = CMPLX(1.0, 1.0)                                               0013
-      Z = W+(1.0E0, 0.0E0)                                              0014
+      W = CMPLX(1.0, 1.0)                                               0022
+      Z = W+(1.0E0, 0.0E0)                                              0023
 
       END
 ### no dc, summary, no explicit constants
@@ -65,32 +65,32 @@
       DOUBLE PRECISION X
       COMPLEX W, Z
 
-      A = (1.0D0, 1.0D0)                                                0001
-      B = (1.0D0, 0.0D0)                                                0002
-      C = (1.0D0, 0.0D0)                                                0003
-      D = (1.0D0, 0.0D0)                                                0004
+      A = (1.0D0, 1.0D0)                                                0006
+      B = (1.0D0, 0.0D0)                                                0007
+      C = (1.0D0, 0.0D0)                                                0008
+      D = (1.0D0, 0.0D0)                                                0009
 
 !ERROR: #1 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #2 argument of '+' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      E = DCMPLX(A+B)                                                   0005
+      E = DCMPLX(A+B)                                                   0011
 !ERROR: #1 argument of 'COS' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      F = DCMPLX(COS(E))                                                0006
+      F = DCMPLX(COS(E))                                                0012
 !ERROR: #1 argument of 'ABS' must be INT, REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      X = DBLE(ABS(F))                                                  0007
-      F = DCMPLX(X, 0.0D0)                                              0008
+      X = DBLE(ABS(F))                                                  0013
+      F = DCMPLX(X, 0.0D0)                                              0014
 !ERROR: #1 argument of 'LOG' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #1 argument of 'SQRT' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #1 argument of 'SIN' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
 !ERROR: #1 argument of 'EXP' must be REAL, DOUBLE, COMPLEX,  but not COMPLEX*16
-      H = DCMPLX(LOG(G)+SQRT(F)+SIN(E)+EXP(A))                          0009
+      H = DCMPLX(LOG(G)+SQRT(F)+SIN(E)+EXP(A))                          0015
 
-      PRINT *, H                                                        0010
+      PRINT *, H                                                        0017
 
-      W = (1.0, 1.0)                                                    0011
-      Z = W+(1.0E0, 0.0E0)                                              0012
+      W = (1.0, 1.0)                                                    0019
+      Z = W+(1.0E0, 0.0E0)                                              0020
 
-      W = CMPLX(1.0, 1.0)                                               0013
-      Z = W+(1.0E0, 0.0E0)                                              0014
+      W = CMPLX(1.0, 1.0)                                               0022
+      Z = W+(1.0E0, 0.0E0)                                              0023
 
       END
 ### dc, summary, no explicit constants
@@ -100,24 +100,24 @@
       DOUBLE PRECISION X
       COMPLEX W, Z
 
-      A = (1.0D0, 1.0D0)                                                0001
-      B = (1.0D0, 0.0D0)                                                0002
-      C = (1.0D0, 0.0D0)                                                0003
-      D = (1.0D0, 0.0D0)                                                0004
+      A = (1.0D0, 1.0D0)                                                0006
+      B = (1.0D0, 0.0D0)                                                0007
+      C = (1.0D0, 0.0D0)                                                0008
+      D = (1.0D0, 0.0D0)                                                0009
 
-      E = A+B                                                           0005
-      F = CDCOS(E)                                                      0006
-      X = CDABS(F)                                                      0007
-      F = DCMPLX(X, 0.0D0)                                              0008
-      H = CDLOG(G)+CDSQRT(F)+CDSIN(E)+CDEXP(A)                          0009
+      E = A+B                                                           0011
+      F = CDCOS(E)                                                      0012
+      X = CDABS(F)                                                      0013
+      F = DCMPLX(X, 0.0D0)                                              0014
+      H = CDLOG(G)+CDSQRT(F)+CDSIN(E)+CDEXP(A)                          0015
 
-      PRINT *, H                                                        0010
+      PRINT *, H                                                        0017
 
-      W = (1.0, 1.0)                                                    0011
-      Z = W+(1.0E0, 0.0E0)                                              0012
+      W = (1.0, 1.0)                                                    0019
+      Z = W+(1.0E0, 0.0E0)                                              0020
 
-      W = CMPLX(1.0, 1.0)                                               0013
-      Z = W+(1.0E0, 0.0E0)                                              0014
+      W = CMPLX(1.0, 1.0)                                               0022
+      Z = W+(1.0E0, 0.0E0)                                              0023
 
       END
 ### dc, summary, explicit constants
@@ -127,23 +127,23 @@
       DOUBLE PRECISION X
       COMPLEX W, Z
 
-      A = DCMPLX(1.0D0, 1.0D0)                                          0001
-      B = DCMPLX(1.0D0, 0.0D0)                                          0002
-      C = DCMPLX(1.0D0, 0.0D0)                                          0003
-      D = DCMPLX(1.0D0, 0.0D0)                                          0004
+      A = DCMPLX(1.0D0, 1.0D0)                                          0006
+      B = DCMPLX(1.0D0, 0.0D0)                                          0007
+      C = DCMPLX(1.0D0, 0.0D0)                                          0008
+      D = DCMPLX(1.0D0, 0.0D0)                                          0009
 
-      E = A+B                                                           0005
-      F = CDCOS(E)                                                      0006
-      X = CDABS(F)                                                      0007
-      F = DCMPLX(X, 0.0D0)                                              0008
-      H = CDLOG(G)+CDSQRT(F)+CDSIN(E)+CDEXP(A)                          0009
+      E = A+B                                                           0011
+      F = CDCOS(E)                                                      0012
+      X = CDABS(F)                                                      0013
+      F = DCMPLX(X, 0.0D0)                                              0014
+      H = CDLOG(G)+CDSQRT(F)+CDSIN(E)+CDEXP(A)                          0015
 
-      PRINT *, H                                                        0010
+      PRINT *, H                                                        0017
 
-      W = CMPLX(1.0, 1.0)                                               0011
-      Z = W+CMPLX(1.0E0, 0.0E0)                                         0012
+      W = CMPLX(1.0, 1.0)                                               0019
+      Z = W+CMPLX(1.0E0, 0.0E0)                                         0020
 
-      W = CMPLX(1.0, 1.0)                                               0013
-      Z = W+CMPLX(1.0E0, 0.0E0)                                         0014
+      W = CMPLX(1.0, 1.0)                                               0022
+      Z = W+CMPLX(1.0E0, 0.0E0)                                         0023
 
       END

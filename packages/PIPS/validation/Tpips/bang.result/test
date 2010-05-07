@@ -4,9 +4,9 @@
 ! un entier
       INTEGER I   
 ! une entree
-      READ *, I                                                         0001
+      READ *, I                                                         0007
 ! une sortie
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0009
 ! et c'est tout
       END
 

@@ -98,5 +98,5 @@ shell if test "`./$WS.database/Tmp/ref`" = "`./$WS.database/Tmp/seq`" ; then ech
 #shell if test "`./threshold0`" = "`./threshold2`" ; then echo sse-ok ; else echo sse-ko ; fi
 
 close
-#delete $WS
+delete $WS
 quit

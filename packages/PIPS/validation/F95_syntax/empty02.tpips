@@ -1,0 +1,19 @@
+delete empty02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create empty02 empty02.f90
+
+display PRINTED_FILE[%ALL]
+
+apply INTERPROCEDURAL_SUMMARY_PRECONDITION(%ALL)
+
+apply UNSPLIT[%ALL]
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o empty02.database/Src/empty02.o empty02.database/Src/empty02.f90
+
+close
+quit

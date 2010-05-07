@@ -1,5 +1,0 @@
-      SUBROUTINE ADDED_MODULE
-
-      PRINT *, 'added_module'                                           0001
-
-      END

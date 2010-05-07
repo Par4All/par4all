@@ -14,3 +14,4 @@ shell ./compileC.sh ALPHABLENDING
 display C_PRINTED_FILE
 
 close
+delete ALPHABLENDING

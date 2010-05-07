@@ -206,27 +206,27 @@ c     CORPS DU PROGRAMME
 c===========================
 c
 c  on recupere le parametre de la ligne de commande
-      CALL GARGZZ(1, ETAPE)                                             0001
-      IETAPE = INT(ETAPE)                                               0002
+      CALL GARGZZ(1, ETAPE)                                             0209
+      IETAPE = INT(ETAPE)                                               0210
 c
 c     appel etape 12
 c
-      IF (IETAPE.EQ.12) THEN                                            0003
-         CALL LEGO12                                                    0004
+      IF (IETAPE.EQ.12) THEN                                            0214
+         CALL LEGO12                                                    0215
 c
 c     appel etape 334
 c
-      ELSEIF (IETAPE.EQ.334) THEN                                       0003
-         CALL LEG334(NOBLC, ISLB, NUSTA, NUSCI, NINGR, SIVAR, LIBLSI    0006
-     &   , UNITSI, VARI, LIBLRI, UNITRI, XY, UU, XYU, CNXYU, TOLL,      0006
-     &   DATI, IPDATI, IP, IPVRS, IPS, IPVRT, IPI, IPVRI)               0006
+      ELSEIF (IETAPE.EQ.334) THEN                                       0214
+         CALL LEG334(NOBLC, ISLB, NUSTA, NUSCI, NINGR, SIVAR, LIBLSI    0220
+     &   , UNITSI, VARI, LIBLRI, UNITRI, XY, UU, XYU, CNXYU, TOLL,      0220
+     &   DATI, IPDATI, IP, IPVRS, IPS, IPVRT, IPI, IPVRI)               0220
 c
 c     appel etape 45
 c
-      ELSEIF (IETAPE.EQ.45) THEN                                        0003
-         CALL LEGO45(NOBLC, ISLB, NUSTA, NUSCI, NINGR, SIVAR, LIBLSI    0008
-     &   , UNITSI, VARI, LIBLRI, UNITRI, XY, UU, XYU, CNXYU, TOLL,      0008
-     &   DATI, IPDATI, IP, IPVRS, IPS, IPVRT, IPI, IPVRI)               0008
+      ELSEIF (IETAPE.EQ.45) THEN                                        0214
+         CALL LEGO45(NOBLC, ISLB, NUSTA, NUSCI, NINGR, SIVAR, LIBLSI    0234
+     &   , UNITSI, VARI, LIBLRI, UNITRI, XY, UU, XYU, CNXYU, TOLL,      0234
+     &   DATI, IPDATI, IP, IPVRS, IPS, IPVRT, IPI, IPVRI)               0234
       ENDIF
       END
 

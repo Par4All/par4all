@@ -7,6 +7,9 @@ activate MUST_REGIONS
 apply ARRAY_BOUND_CHECK_TOP_DOWN
 apply UNSPLIT
 
-close
-quit
+sh cat intro_example03.database/Src/intro_example03.f
 
+close
+# cleanup
+delete intro_example03
+quit

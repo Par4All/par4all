@@ -16,3 +16,4 @@ source include/fortran.tpips
 
 
 close
+delete DOTPROD

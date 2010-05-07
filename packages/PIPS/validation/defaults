@@ -1,5 +1,7 @@
 # $Id$
 # the default validation includes the following subdirectories
+Benchmarks
+SAC
 Syntax
 Control
 Preprocessor
@@ -18,7 +20,6 @@ Chains
 Rice
 Ricedg
 CoarseGrainParallelization
-SAC
 PHRASE
 Callgraph
 # Transformations, using PIPS initial default options
@@ -36,12 +37,28 @@ OpenMP
 Outlining
 # ngspice_bug:
 Step
+SC95
+Flint
 Bootstrap
 HardwareAccelerator
 Privatizing
 Terapix
+Tpips
 TutorialPPoPP2010
 Scalopes
-Benchmarks
 Expressions
 Pyps
+Properties
+Crough
+Top-level
+Demo-2009
+# should be added?
+# AliasChecking
+# ArrayBoundCheck
+# ArrayResizing
+# Blas
+# Gpu
+# Pointers
+# RegionTranslation
+# UseBeforeSet
+# Wp65

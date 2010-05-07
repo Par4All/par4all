@@ -10,8 +10,9 @@
       include "TRANSPOSE_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 512)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I
-      REAL*4 A(1:N,1:N),B(1:N,1:N)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+     &, I_4, I_5
+      REAL*4 A(1:N, 1:N), B(1:N, 1:N)
       CALL HPFC INIT HOST
 c
 c initialize b
@@ -22,19 +23,21 @@ c
          BUF INDEX = 0
          RECEIVED NOT PERFORMED = .FALSE.
          SIZE OF RECEIVED BUFFER = 0
-         T LID = -2+2*PSI1+PSI2
+         T LID = 2*PSI1+PSI2-2
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL4 BUFUPK
-         DO ALPHA2 = -252+256*PSI1, 13
-            ALPHA1 = -3+ALPHA2
-            LALPHA1 = 256+ALPHA1-256*PSI1
-            LALPHA2 = 256+ALPHA2-256*PSI2
+         DO ALPHA2 = MAX(256*PSI2-255, 256*PSI1-252), MIN(13, 256*
+     &   PSI2)
+            ALPHA1 = ALPHA2-3
+            LALPHA1 = ALPHA1-256*PSI1+256
+            LALPHA2 = ALPHA2-256*PSI2+256
             BUF INDEX = BUF INDEX+1
             B(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
          ENDDO
       ENDDO
 ! end of collect
-      PRINT *, (B(I,I+3), I = 1, 10)
+      I_4 = I+3
+      PRINT *, (B(I,I_4), I = 1, 10)
 ! updating shared variable I
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
@@ -59,22 +62,24 @@ c
          BUF INDEX = 0
          RECEIVED NOT PERFORMED = .FALSE.
          SIZE OF RECEIVED BUFFER = 0
-         T LID = -2+2*PSI1+PSI2
+         T LID = 2*PSI1+PSI2-2
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL4 BUFUPK
-         DO LALPHA2 = 1, 5
-            ALPHA2 = -2+2*LALPHA2+PSI1
-            ALPHA1 = 3+ALPHA2
-            LALPHA1 = 256+ALPHA1-256*PSI2
+         DO LALPHA2 = MAX(1, 128*PSI2+HPFC DIVIDE(-PSI1-255, 2)), MIN
+     &   (5, 128*PSI2+HPFC DIVIDE(-PSI1-1, 2))
+            ALPHA2 = 2*LALPHA2+PSI1-2
+            ALPHA1 = ALPHA2+3
+            LALPHA1 = ALPHA1-256*PSI2+256
             BUF INDEX = BUF INDEX+1
             A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
          ENDDO
       ENDDO
 ! end of collect
+      I_5 = I+3
 c
 c END OF TRANSPOSITION
 c
-      PRINT *, (A(I+3,I), I = 1, 10)
+      PRINT *, (A(I_5,I), I = 1, 10)
 ! updating shared variable I
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
@@ -100,13 +105,14 @@ c
       include "TRANSPOSE_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 512)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,LALPHAp1,LALPHAp2,PSI1,
-     &PSI2,PSIp1,PSIp2,T LID,I_11,I_10,I_9,I_8,I_7,I_6,I_5,I_4,I,J
-      REAL*4 A(1:256,1:256),B(1:256,1:256),B_1(1:256,1:256),A_1(1:256
-     &,1:256)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_10, 
+     &I_11, I_12, I_13, I_6, I_7, I_8, I_9, I, J, LALPHAp2, LALPHAp1
+     &, PSIp1, T LID, PSIp2
+      REAL*4 A(1:256, 1:256), B(1:256, 1:256), B_1(1:256, 1:256), A_1
+     &(1:256, 1:256)
       CALL HPFC INIT NODE
-      CALL HPFC LOOP BOUNDS(I_9, I_10, I_11, 1, N, 3, 1)
-      CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, N, 3, 2)
+      CALL HPFC LOOP BOUNDS(I_11, I_12, I_13, 1, N, 3, 1)
+      CALL HPFC LOOP BOUNDS(I_7, I_8, I_9, 1, N, 3, 2)
 ! all livenesss for B
       LIVE MAPPING(3) = .FALSE.
       LIVE MAPPING(2) = .FALSE.
@@ -122,25 +128,26 @@ c
 c
 c initialize b
 c
-      J = I_7
-      DO I_4 = I_5, I_6
+      J = I_9
+      DO I_6 = I_7, I_8
          J = J+1
-         I = I_11
-         DO I_8 = I_9, I_10
+         I = I_13
+         DO I_10 = I_11, I_12
             I = I+1
-            B(I_8,I_4) = REAL(I+J)
+            B(I_10,I_6) = REAL(I+J)
          ENDDO
       ENDDO
 ! collecting distributed variable B
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI2.LE.1.AND.PSI1.LE.1.AND.PSI1.LE.PSI2) THEN
+      IF (PSI2.LE.1.AND.PSI1.LE.PSI2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA2 = -252+256*PSI1, 13
-            ALPHA1 = -3+ALPHA2
-            LALPHA1 = 256+ALPHA1-256*PSI1
-            LALPHA2 = 256+ALPHA2-256*PSI2
+         DO ALPHA2 = MAX(256*PSI2-255, 256*PSI1-252), MIN(13, 256*
+     &   PSI2)
+            ALPHA1 = ALPHA2-3
+            LALPHA1 = ALPHA1-256*PSI1+256
+            LALPHA2 = ALPHA2-256*PSI2+256
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
          ENDDO
@@ -197,10 +204,11 @@ c
       IF (PSI2.LE.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO LALPHA2 = 1, 5
-            ALPHA2 = -2+2*LALPHA2+PSI1
-            ALPHA1 = 3+ALPHA2
-            LALPHA1 = 256+ALPHA1-256*PSI2
+         DO LALPHA2 = MAX(1, 128*PSI2+HPFC DIVIDE(-PSI1-255, 2)), MIN
+     &   (5, 128*PSI2+HPFC DIVIDE(-PSI1-1, 2))
+            ALPHA2 = 2*LALPHA2+PSI1-2
+            ALPHA1 = ALPHA2+3
+            LALPHA1 = ALPHA1-256*PSI2+256
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
          ENDDO
@@ -222,4 +230,3 @@ c
 !
 ! That is all for TRANSPOSE_node.f
 !
-

@@ -29,7 +29,7 @@ F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) $(F.F:%.F=%.result)
 F.result= $(wildcard *.result)
 
 # validation scripts
-F.tpips	= $(wildcard *.tpips)
+F.tpips	= $(wildcard *.tpips) $(wildcard *.tpips2)
 F.test	= $(wildcard *.test)
 F.py	= $(wildcard *.py)
 
@@ -38,6 +38,9 @@ F.exe	= $(F.tpips) $(F.test) $(F.py)
 # validation output
 F.valid	= $(F.result:%=%/$(TEST))
 
+# all base cases
+F.list	= $(F.result:%.result=%)
+
 SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
 FLT	= sed -e 's,$(here),$$VDIR,g'
@@ -45,7 +48,7 @@ FLT	= sed -e 's,$(here),$$VDIR,g'
 RESULTS	= failed
 
 SHELL	= /bin/bash
-PF	= set -o pipefail
+PF	= set -o pipefail ; export PIPS_MORE=cat
 
 # extract validation result for summary
 OK	= status=$$? ; \
@@ -109,7 +112,7 @@ test: $(F.valid)
 	$(PF) ; $(TPIPS) $< | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.tpips2
-	$(PF) ; $(TPIPS) $< 2<&1 | $(FLT) > $@ ; $(OK)
+	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $@ ; $(OK)
 
 # python scripts
 %.result/$(TEST): %.py
@@ -158,6 +161,17 @@ skipped:
 	  fi ; \
 	done >> $(RESULTS)
 
+orphan:
+	for base in $(sort $(F.list)) ; do \
+	  test -f $$base.tpips -o \
+	       -f $$base.tpips2 -o \
+	       -f $$base.test -o \
+	       -f $$base.py -o \
+	       -f default_tpips -o \
+	       -f default_test || \
+	  echo "orphan: $$base" ; \
+	done >> $(RESULTS)
+
 multi-script:
 	for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
 	do \
@@ -170,7 +184,7 @@ multi-source:
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
-inconsistencies: skipped multi-source multi-script
+inconsistencies: skipped orphan multi-source multi-script
 
 # what about nothing?
 missing:

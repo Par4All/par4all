@@ -28,4 +28,5 @@ apply SIMD_MEMORY_PACKING
 display PRINTED_FILE
 
 close
+delete c2h01
 quit

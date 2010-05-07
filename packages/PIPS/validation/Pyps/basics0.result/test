@@ -55,12 +55,12 @@ void megablast(int n)
 l99999:   LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 2);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-      j = foo(LU_IND0*1+0);
+      j = foo(LU_IND0);
 l99998:      ;
    }
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 2) {
-      j = foo((LU_IND0+0)*1+0);
-      j = foo((LU_IND0+1)*1+0);
+      j = foo(LU_IND0);
+      j = foo(LU_IND0+1);
 l99997:      ;
    }
    i = MAX0(LU_NUB0, 0);
