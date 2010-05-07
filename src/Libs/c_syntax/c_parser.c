@@ -216,7 +216,7 @@ extern void c_parse();
 void CParserError(char *msg)
 {
   entity mod = get_current_module_entity();
-  string mod_name = entity_undefined_p(mod)? "entity_undefined":entity_user_name(mod);
+  const char * mod_name = entity_undefined_p(mod)? "entity_undefined":entity_user_name(mod);
   extern void c_reset_lex(void);
   extern int c_lineno;
 

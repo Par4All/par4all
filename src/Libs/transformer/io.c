@@ -69,7 +69,7 @@ fprint_transformer(FILE * fd,
 
 	/* print argument list */
 	(void) fprintf(fd,"arguments:");
-	print_homogeneous_arguments(args, (string (*) (entity))value_name);
+	print_homogeneous_arguments(args, (const char* (*) (entity))value_name);
 
 	/* print relation */
 	if(SC_UNDEFINED_P(sc))

@@ -1143,10 +1143,10 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 
   /* Look for conflicting names: */
   FOREACH(ENTITY, e, declarations) {
-    string name = entity_user_name(e);
+    const char * name = entity_user_name(e);
     bool conflict = FALSE;
     FOREACH(ENTITY, e_above, declarations_above) {
-      string name_above = entity_user_name(e_above);
+      const char * name_above = entity_user_name(e_above);
       pips_debug(2, "Comparing variables %s and %s\n",
 		 entity_name(e), entity_name(e_above));
 

@@ -218,30 +218,30 @@ list module_entities(entity m)
    The current implementation is extremely ineffective, especially for
    a very unlikely, although mystifying, problem.
 */
-string entity_module_unambiguous_user_name(entity e, entity m)
+const char* entity_module_unambiguous_user_name(entity e, entity m)
 {
-  string uan = entity_user_name(e);
+  const char* uan = entity_user_name(e);
 
   /* No problem in Fortran */
   if(c_module_p(m)) {
     list conflicts = module_entities(m);
 
-    MAP(ENTITY, v, {
+    FOREACH(ENTITY, v, conflicts){
 	if(v!=e) {
-	  string vn = entity_user_name(v);
+	  const char* vn = entity_user_name(v);
 	  if(same_string_p(uan,vn)) {
 	    uan = entity_local_name(e);
 	    break;
 	  }
 	}
-      }, conflicts);
+      }
     gen_free_list(conflicts);
   }
 
   return (uan);
 }
 
-string entity_unambiguous_user_name(entity e)
+const char* entity_unambiguous_user_name(entity e)
 {
   entity m = get_current_module_entity();
 
@@ -260,11 +260,11 @@ string entity_unambiguous_user_name(entity e)
 /* For REGIONS_MODULE_NAME, which could/should be defined in
    ri-util-local.h as it is used to create entities? */
 #include "effects-convex.h"
-static string entity_more_or_less_minimal_name(entity e, bool strict_p)
+static const char* entity_more_or_less_minimal_name(entity e, bool strict_p)
 {
   entity m = get_current_module_entity();
   string mln = module_local_name(m);
-  string emn = string_undefined;
+  const char* emn = string_undefined;
   string cun = string_undefined; // compilation unit name
   entity cu = entity_undefined; // compilation unit
   list cudl = list_undefined; // compilation unit declaration list
@@ -366,7 +366,7 @@ static string entity_more_or_less_minimal_name(entity e, bool strict_p)
    the scope information in the name of extraprocedural variables and
    functions.
  */
-string entity_minimal_name(entity e)
+const char* entity_minimal_name(entity e)
 {
   return entity_more_or_less_minimal_name(e, TRUE);
 }
@@ -375,7 +375,7 @@ string entity_minimal_name(entity e)
 
    A new string is allocated.
  */
-string entity_minimal_user_name(entity e)
+const char* entity_minimal_user_name(entity e)
 {
   return entity_more_or_less_minimal_name(e, FALSE);
 }

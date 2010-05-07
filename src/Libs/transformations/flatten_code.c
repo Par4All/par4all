@@ -310,7 +310,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	if(redeclare_p) {
 
 	  /* Build the new variable */
-	  string eun  = entity_user_name(v);
+	  const char* eun  = entity_user_name(v);
 	  string negn = strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
 	  entity nv   = entity_undefined;
 	  //list unused_nvs = NIL;
@@ -439,7 +439,7 @@ static void statement_flatten_declarations(statement s)
                 string seln = entity_local_name(se);
                 string cs   = local_name_to_scope(seln); /* current scope for s */
                 string mn   = module_name(sen);
-                string cmn = entity_user_name(get_current_module_entity());
+                const char* cmn = entity_user_name(get_current_module_entity());
 
                 if(same_string_p(mn, cmn)) {
                     compute_renamings(s, cs, mn, renamings);
@@ -701,7 +701,7 @@ static void split_initializations_in_statement(statement s)
 
 	FOREACH(ENTITY, var, decls) {
 	  string mn  = module_name(entity_name(var));
-	  string cmn = entity_user_name(get_current_module_entity());
+	  const char* cmn = entity_user_name(get_current_module_entity());
 	  if ( strcmp(mn,cmn) == 0
 	       && !value_unknown_p(entity_initial(var))
 	       ) {

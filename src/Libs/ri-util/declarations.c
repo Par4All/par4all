@@ -494,7 +494,7 @@ list words_basic(basic obj, list pdl)
     case is_basic_derived:
       {
 	entity ent = basic_derived(obj);
-	string name = entity_user_name(ent);
+	const char* name = entity_user_name(ent);
 	string lname = entity_local_name(ent);
 	type t = entity_type(ent);
 
@@ -2274,7 +2274,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  }
 	  else {
 	    /* The derived type is declared by itself*/
-	    string name = entity_user_name(ent);
+	    const char* name = entity_user_name(ent);
 	    list epc = NIL;
 	    /* Do not recurse down if the derived type reference
 	       itself */
@@ -2511,7 +2511,7 @@ text c_text_entities(entity module, list ldecl, int margin, list pdl)
 }
 
 /* To print out a struct reference, such as "struct s"*/
-static list words_struct_reference(string name1, list pc)
+static list words_struct_reference(const char* name1, list pc)
 {
   pc = CHAIN_SWORD(pc,"struct ");
   if(strstr(name1,DUMMY_STRUCT_PREFIX)==NULL) {
@@ -2532,7 +2532,7 @@ static list words_struct(string name1, list pc)
 }
 */
 
-static list words_enum(string name1, list l, bool space_p, list pc, list pdl)
+static list words_enum(const char * name1, list l, bool space_p, list pc, list pdl)
 {
   bool first = TRUE;
   pc = CHAIN_SWORD(pc,"enum ");
@@ -2581,7 +2581,7 @@ static list words_enum(string name1, list l, bool space_p, list pc, list pdl)
   return pc;
 }
 
-static list words_union(string name1, list pc)
+static list words_union(const char* name1, list pc)
 {
   pc = CHAIN_SWORD(pc,"union ");
   if(strstr(name1,DUMMY_UNION_PREFIX)==NULL) {
@@ -2594,7 +2594,7 @@ static list words_union(string name1, list pc)
 
 static list words_variable_or_function(entity module, entity e, bool is_first, list pc, bool in_type_declaration, list pdl)
 {
-  string name = entity_user_name(e);
+  const char* name = entity_user_name(e);
   type t = entity_type(e);
   //storage s = entity_storage(e);
   value val = entity_initial(e);
@@ -2785,7 +2785,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
   text r = make_text(NIL);
   entity e1 = ENTITY(CAR(el)); // Let's use the first declared entity.
   entity e_last = ENTITY(CAR(gen_last(el))); // Let's also use the last declared entity.
-  string name1 = entity_user_name(e1);
+  const char* name1 = entity_user_name(e1);
   type t1 = entity_type(e1);
   type t_last = entity_type(e_last);
   //storage s1 = entity_storage(e1);

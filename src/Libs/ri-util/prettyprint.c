@@ -527,7 +527,7 @@ words_subscript_range(range obj, list pdl)
  *
  * Should only be used to prettyprint proper C references.
  */
-list words_any_reference(reference obj, list pdl, string (*enf)(entity))
+list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
 {
   list pc = NIL;
   string begin_attachment;

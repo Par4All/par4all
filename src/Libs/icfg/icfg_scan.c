@@ -116,8 +116,8 @@ static text (*decoration)(string) = NULL;
 static void append_marged_text(
     text t,
     int margin,
-    string what1,
-    string what2)
+    const char* what1,
+    const char* what2)
 {
     char *buffer;
     asprintf(&buffer, "%*s%s%s\n", margin, "", what1, what2);
@@ -319,9 +319,9 @@ static bool loop_flt (loop __attribute__ ((unused)) l)
 }
 
 static void anyloop_rwt(
-    string st_what,
-    string st_end_what,
-    string st_index,
+    const char* st_what,
+    const char* st_end_what,
+    const char* st_index,
     statement body)
 {
   text inside_the_loop = text_undefined,

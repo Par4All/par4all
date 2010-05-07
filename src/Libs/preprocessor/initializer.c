@@ -226,7 +226,7 @@ static text stub_text(entity module, bool is_fortran)
 	sentence bs = make_sentence(is_sentence_unformatted,
 				    make_unformatted(string_undefined, 0, 0,
 						     CONS(STRING, strdup("{}"), NIL)));
-	string name = entity_user_name(module);
+	const char* name = entity_user_name(module);
 	type t = entity_type(module);
 	/* FI: I do not know what to use to initialize pdl usefully */
 	list pdl = NIL; // each type supporting entity is declared independently
@@ -309,7 +309,7 @@ static text compilation_unit_text(entity cu, entity module)
     pips_assert("Each entity appears only once", gen_once_p(nsel));
 
     FOREACH(ENTITY, se, nsel) {
-      string n = entity_user_name(se);
+      const char* n = entity_user_name(se);
 
       /* Do not declare dummy structures, unions and enumerations,
 	 which must be part of another declaration, either a typedef

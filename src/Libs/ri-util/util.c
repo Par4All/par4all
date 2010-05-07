@@ -48,11 +48,11 @@
    in the EOLE project (JZ - 11/98) */
 
 /* Does take care of block scopes */
-string global_name_to_user_name(string global_name)
+const char* global_name_to_user_name(const char* global_name)
 {
-  string user_name = string_undefined;
+  const char* user_name = string_undefined;
   char lc = global_name[strlen(global_name)-1];
-  string p;
+  const char* p;
 
   /* First, take care of constrant strings and characters, wich may
      contain any of the PIPS special characters and strings.

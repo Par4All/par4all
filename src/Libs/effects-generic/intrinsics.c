@@ -1843,7 +1843,7 @@ static list effects_of_C_ioelem(expression arg, tag act)
  
        if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
 	 {
-	   string s = entity_user_name(effect_entity(fp_eff_r));
+	   const char* s = entity_user_name(effect_entity(fp_eff_r));
 	   if (same_string_p(s, "stdout"))
 	     unit = int_to_expression(STDOUT_FILENO);
 	   else if (same_string_p(s, "stdin"))
