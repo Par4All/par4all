@@ -8,7 +8,7 @@ Whole dependence graph, preconditions and loop bounds ignored (1)
  ******** Whole Dependence Graph with Dependence Cones ******
 
 	06 --> 06 with conflicts
-		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
+		from <M(I,J)-W-MUST> to <M(J,I)-R-MUST> at levels  1
 Generating system:
 1 Vertex 
 (1,-1)
@@ -16,8 +16,7 @@ Generating system:
 (1,-1)
 End of generating system ****
 
-	06 --> 06 with conflicts
-		from <M(I,J)-W-MUST> to <M(J,I)-R-MUST> at levels  1
+		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
 Generating system:
 1 Vertex 
 (1,-1)
@@ -71,9 +70,9 @@ Effective dependence graph, preconditions (and loop bounds) used (1b)
  **************** Effective Dependence Graph ****************
 
 	06 --> 06 with conflicts
-		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
-	06 --> 06 with conflicts
 		from <M(I,J)-W-MUST> to <M(J,I)-R-MUST> at levels  1
+	06 --> 06 with conflicts
+		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
 	05 --> 05 with conflicts
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 

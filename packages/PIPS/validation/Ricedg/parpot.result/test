@@ -2,25 +2,25 @@
  **************** Effective Dependence Graph ****************
 
 	86 --> 86 with conflicts
-		from <QSUM-R-MUST> to <QSUM-W-MUST> at levels  1 2
+		from <QSUM-W-MUST> to <QSUM-W-MUST> at levels  1 2
 	86 --> 86 with conflicts
 		from <QSUM-W-MUST> to <QSUM-R-MUST> at levels  1 2
 	86 --> 86 with conflicts
-		from <QSUM-W-MUST> to <QSUM-W-MUST> at levels  1 2
+		from <QSUM-R-MUST> to <QSUM-W-MUST> at levels  1 2
 	84 --> 85 with conflicts
 		from <J-W-MUST> to <J-W-MUST> at levels  2
 	84 --> 84 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-R-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
-	84 --> 84 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
 	84 --> 84 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-R-MUST> at levels  1
-	76 --> 76 with conflicts
+	84 --> 84 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-R-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
 	76 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
 	76 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-R-MUST> at levels  1
+	76 --> 76 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-R-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
 C     excerpt from the Perfect Club program BDNA
