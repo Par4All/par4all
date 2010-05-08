@@ -23,7 +23,7 @@ use_pdflatex = 1
 INSTALL_DOC = developer_guide.pdf auto_pips.pdf
 INSTALL_HTM = developer_guide.htdoc auto_pips.htdoc
 # Hide the PDF into the HTML documentation directory
-DOC.subd = $(INSTALL_HTM)
+DOC.subd = developer_guide
 
 #PUBLISH_LOCATION = ssh.cri.ensmp.fr:~pips/public_html/developer_guide
 #TO_BE_PUBLISH = $(INSTALL_DOC) $(INSTALL_HTM)
