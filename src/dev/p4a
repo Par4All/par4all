@@ -11,15 +11,15 @@ import sys, os, re, optparse, subprocess, string, random, shutil, logging, time,
 verbosity = 0
 logger = None
 
-def gen_name(length = 8, chars = string.letters + string.digits):
+def gen_name(length = 4, chars = string.letters + string.digits):
 	"Generates a random name / password"
-	return "".join(random.choice(chars) for x in range(random.randint(8, 16)))
+	return "P4A" + "".join(random.choice(chars) for x in range(length))
 
-def rmdb(dir):
-	"Removes a PIPS database directory recursively"
+def rmdir(dir):
+	"Removes a known directory recursively"
 	(base, ext) = os.path.splitext(dir)
-	if ext != ".database":
-		sys.stderr.write("Cannot remove, not a .database directory: " + dir)
+	if ext != ".database" and ext != ".build":
+		sys.stderr.write("Cannot remove unknown directory: " + dir)
 		sys.exit(123)
 	for root, dirs, files in os.walk(dir, topdown = False):
 		for name in files:
@@ -40,22 +40,19 @@ def info(msg):
 	if logger:
 		logger.info(msg)
 
-def warn(msg, prepend_warning = True):
+def warn(msg):
 	if verbosity >= 1:
-		prepend = ""
-		if prepend_warning:
-			prepend = "WARNING: "
-		sys.stderr.write(sys.argv[0] + ": " + prepend + msg.rstrip() + "\n");
+		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
 	if logger:
 		logger.warn(msg)
 
 def error(msg):
-	sys.stderr.write(sys.argv[0] + ": ERROR: " + msg.rstrip() + "\n");
+	sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
 	if logger:
 		logger.error(msg)
 
 def critical(msg):
-	sys.stderr.write(sys.argv[0] + ": ERROR: " + msg.rstrip() + "\n");
+	sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
 	if logger:
 		logger.critical(msg)
 
@@ -66,28 +63,31 @@ def main():
 
 	parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = "$Id")
 
-	main_group = optparse.OptionGroup(parser, "Processing Options")
+	main_group = optparse.OptionGroup(parser, "General Options")
 
 	main_group.add_option("-p", "--project", dest = "project", metavar = "NAME",
 		help = "Name for the project (and for the program database). If you do not specify the project, a random name will be used, and the program database will be removed after script execution (unless you say --keep-after).")
 
-	main_group.add_option("--keep-after", dest = "keep_after", action = "store_true", default = False,
+	main_group.add_option("--keep", "--keep-after", dest = "keep_after", action = "store_true", default = False,
 		help = "Keep database after processing. Useful only when --project is not specified.")
 
-	main_group.add_option("--remove-after", dest = "remove_after", action = "store_true", default = False,
-		help = "Remove database directory after processing. Inverse of --keep-after.")
+	main_group.add_option("--remove", "--remove-after", dest = "remove_after", action = "store_true", default = False,
+		help = "Remove database directory after processing. Cancels --keep-after.")
 
 	main_group.add_option("--remove-first", dest = "remove_first", action = "store_true", default = False,
-		help = "Remove existing database if it already exists. Remove existing output files if they already exist.")
+		help = "Remove existing database if it already exists. Remove existing output files if they already exist, prior to processing.")
 
-	main_group.add_option("--copy", dest = "copy", action = "store_true", default = False,
-		help = "Copy output files from database to source files directory, using the \"_p4a\" suffix.")
+	main_group.add_option("--copy", dest = "copy", action = "store_true", default = True,
+		help = "Copy output files from database to source files directory, using the \"_p4a\" suffix (default).")
+
+	main_group.add_option("--nocopy", dest = "copy", action = "store_false",
+		help = "Cancels --copy.")
 
 	main_group.add_option("--accel", dest = "accel", action = "store_true", default = False,
 		help = "Parallelize with output using the Par4All accel run-time that can execute code for various hardware accelerators such as GPU or even OpenMP emulation.")
 
 	main_group.add_option("--cuda", dest = "cuda", action = "store_true", default = False,
-		help = "Enable CUDA generation, should be used along with --accel.")
+		help = "Enable CUDA generation. Implies --accel.")
 
 	main_group.add_option("--include-modules", dest="filter_include", metavar = "REGULAR-EXPRESSION",
 		help = "Parallelize only the modules which names match the regular expression.")
@@ -105,20 +105,81 @@ def main():
 		help = "Use a fine-grained parallelization algorithm.")
 
 	main_group.add_option("--coarse", dest = "fine", action = "store_false",
-		help = "Use a coarse-grained parallelization algorithm.")
-
-	main_group.add_option("--cmake", dest = "cmake", action = "store_true", default = False,
-		help = "Generate a CMakeLists.txt in current directory for compiling the output files.")
-
-	main_group.add_option("--makeit", dest = "makeit", action = "store_true", default = False,
-		help = "Try to build CMake project in current directory (use in conjunction with --cmake).")
-
-	main_group.add_option("--here", dest = "here", action = "store_true", default = False,
-		help = "Do not spawn a process to run PIPS and be able to filter out its output, run it here.")
+		help = "Use a coarse-grained parallelization algorithm (default).")
 
 	parser.add_option_group(main_group)
 
-	debug_group = optparse.OptionGroup(parser, "Debugging & Reporting Options")
+	cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
+
+	cpp_group.add_option("-I", "--include-dir", dest="include_dirs", action = "append", metavar = "DIR", default = [],
+		help = "Add an include search directory. Same as the compiler -I option.")
+
+	cpp_group.add_option("-D", "--define", dest="defines", action = "append", metavar = "NAME[=VALUE]", default = [],
+		help = "Add a preprocessor define. Same as passing the preprocessor a -D option.")
+
+	cpp_group.add_option("-U", "--undefine", dest="undefines", action = "append", metavar = "NAME", default = [],
+		help = "Remove a preprocessor define. Same as passing the preprocessor a -U option.")
+
+	cpp_group.add_option("-f", "--cppflags", dest="cppflags", metavar = "FLAGS", default = "",
+		help = "Add other flags for the C preprocessor.")
+
+	parser.add_option_group(cpp_group)
+
+	compile_group = optparse.OptionGroup(parser, "Compilation Options")
+
+	compile_group.add_option("-c", "--compile", "--build", dest = "build", action = "store_true", default = False,
+		help = "Compile a simple executable after generation using GCC, unless you specify --cmake. In this case, after the CMakeLists.txt is generated, the project will be built using CMake.")
+
+	compile_group.add_option("-o", "--output-file", dest="output_file", metavar = "FILE", default = "",
+		help = "Output file (compiler -o option; defaults to project name in current directory).")
+
+	default_cflags = "-O2"
+	compile_group.add_option("--cflags", dest="cflags", metavar = "FLAGS", default = default_cflags,
+		help = "Specify flags to pass to the C compiler (default: " + default_cflags + ").")
+
+	compile_group.add_option("--cc", dest="cc", metavar = "COMPILER", default = "",
+		help = "C compiler to use (default: gcc or nvcc depending on --cuda).")
+
+	compile_group.add_option("-a", "--extra-file", dest="extra_files", action = "append", metavar = "FILE", default = "",
+		help = "Add an additional file for compilation.")
+
+	compile_group.add_option("--link", dest="link", action = "store_true", default = True,
+		help = "Call the linker (default).")
+
+	compile_group.add_option("--nolink", dest="link", action = "store_false", default = True,
+		help = "Cancels --link.")
+
+	compile_group.add_option("-L", "--lib-dir", dest="lib_dirs", action = "append", metavar = "DIR", default = [],
+		help = "Add a library search directory. Same as the linker -L option.")
+
+	compile_group.add_option("-l", "--lib", dest="libs", action = "append", metavar = "LIB", default = [],
+		help = "Specify an input library to link against. Same as the linker -l option.")
+
+	default_ldflags = ""
+	compile_group.add_option("--ldflags", dest="ldflags", metavar = "FLAGS", default = default_ldflags,
+		help = "Specify flags to pass to the linker (default: " + default_ldflags + ").")
+
+	compile_group.add_option("--cmake", dest = "cmake", action = "store_true", default = False,
+		help = "Generate a CMakeLists.txt in current directory for compiling the output files.")
+
+	compile_group.add_option("--generator", dest="generator", metavar = "GENERATOR",
+		help = "Specify CMake generator to use (-G options for cmake).")
+
+	compile_group.add_option("--exe", dest = "exe", action = "store_true", default = False,
+		help = "The CMakeLists.txt should generate an executable binary (default).")
+
+	compile_group.add_option("--noexe", dest = "exe", action = "store_false",
+		help = "The CMakeLists.txt should not generate an executable binary.")
+
+	compile_group.add_option("--shared", dest = "shared", action = "store_true", default = False,
+		help = "The CMakeLists.txt should generate a shared library.")
+
+	compile_group.add_option("--static", dest = "static", action = "store_true", default = False,
+		help = "The CMakeLists.txt should generate a static library.")
+
+	parser.add_option_group(compile_group)
+
+	debug_group = optparse.OptionGroup(parser, "Debugging, Reporting and Internal Options")
 
 	debug_group.add_option("-v", "--verbose", action = "count",
 						   dest = "verbosity", default = 0,
@@ -128,6 +189,12 @@ def main():
 						   dest = "report", default = 0,
 						   help = "Display a processing report.")
 
+	debug_group.add_option("--here", dest = "here", action = "store_true", default = False,
+		help = "Do not spawn a process to run PIPS and be able to filter out its output, run it here.")
+
+	debug_group.add_option("--nocommand", dest = "nocommand", action = "store_true", default = False,
+		help = "Do not execute external commands.")
+
 	#debug_group.add_option("--log", dest = "log", metavar = "FILE",
 	#	help = "Log all output to FILE.")
 
@@ -136,6 +203,11 @@ def main():
 	(options, args) = parser.parse_args()
 
 	verbosity = options.verbosity
+
+	# Preliminary check.
+	if not os.path.exists(os.environ["P4A_ROOT"]) or not os.path.exists(os.environ["P4A_ACCEL_DIR"]):
+		error("Invalid P4A_* environment variables -- Have you run \"source .../par4all-rc.sh\"?")
+		sys.exit(1)
 
 	# Check options.
 	if len(args) == 0:
@@ -153,12 +225,15 @@ def main():
 		report = ""
 		full_report = ""
 		sys.argv.append("--here")
+		sys.argv.append("--nocommand")
 		proc = subprocess.Popen(sys.argv, shell = False,
 			stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 		#space_re = re.compile(r"^\s*$")
 		module_re = re.compile(r"  Module +(\S+)")
 		made_re = re.compile(r"(\S+) made for (\S+)")
 		script_re = re.compile("(" + sys.argv[0] + r": .+?(\n|\Z))")
+		script_run_re = re.compile(sys.argv[0] + r": Running: (.+?)(\n|\Z)")
+		run = []
 		while True:
 			try:
 				stdout_value, stderr_value = proc.communicate()
@@ -173,7 +248,11 @@ def main():
 					if m:
 						report += m.group(1) + ": new module\n"
 					if script_re.match(line):
-						sys.stderr.write(line + "\n")
+						m = script_run_re.match(line)
+						if m:
+							run.append(m.group(1))
+						else:
+							sys.stderr.write(line + "\n")
 					else:
 						full_report += line + "\n"
 			except:
@@ -183,6 +262,9 @@ def main():
 			sys.stdout.write(report)
 		elif options.report > 1:
 			sys.stdout.write(full_report)
+		for r in run:
+			error("Running: " + r)
+			os.system(r)
 		if proc.returncode != None:
 			sys.exit(proc.returncode)
 		else:
@@ -192,9 +274,13 @@ def main():
 	if not options.simple and not options.cuda and not options.openmp:
 		info("Defaulting to --openmp")
 		options.openmp = True
+	if options.cuda and not options.accel:
+		info("Enabling --accel")
+		options.accel = True
+
+	files = []
 
 	# Make all paths absolute.
-	files = []
 	for file in args:
 		files.append(os.path.abspath(file))
 
@@ -223,7 +309,7 @@ def main():
 		if os.path.exists(database_dir):
 			if options.remove_first:
 				info("Removing existing database directory: " + database_dir)
-				rmdb(database_dir)
+				rmdir(database_dir)
 			else:
 				error("Database already exists: " + database_dir)
 				sys.exit(2)
@@ -236,36 +322,48 @@ def main():
 
 	# Make up the expected output file paths.
 	# Check if they already exist and act accordingly.
-	output_files = []
-	final_output_files = []
+	output_files = {}
+	final_output_files = {}
 	for file in files:
 		output_file = os.path.join(database_dir, "Src", os.path.basename(file))
-		output_files.append(output_file)
-		(base, ext) = os.path.splitext(file)
-		final_output_file = base + "_p4a" + ext
-		final_output_files.append(final_output_file)
+		if file not in output_files:
+			output_files[file] = []
+		output_files[file].append(output_file)
+		final_output_file = output_file
+		if options.copy:
+			(base, ext) = os.path.splitext(os.path.basename(file))
+			if base[0:3] == "p4a":
+				final_output_file = os.path.join(os.getcwd(), base + ext)
+			else:
+				final_output_file = os.path.join(os.getcwd(), base + "_p4a" + ext)
+		if file not in final_output_files:
+			final_output_files[file] = []
+		final_output_files[file].append(final_output_file)
 		if os.path.exists(output_file):
 			info("Removing " + output_file)
 			os.remove(output_file)
-		if os.path.exists(final_output_file):
+		if options.copy and os.path.exists(final_output_file):
 			if options.remove_first:
 				info("Removing " + final_output_file)
 				os.remove(final_output_file)
 			else:
-				if options.copy:
-					warn("Output file " + final_output_file + " already exists, will be lost")
-					os.remove(final_output_file)
-				else:
-					info("File " + final_output_file + " exists but this is not the final output destination (--copy not specified)")
+				warn("Output file " + final_output_file + " already exists, will be lost")
+				os.remove(final_output_file)
 		info(file + " -> " + output_file + " (" + final_output_file + ")")
 
-	# Reflect the final_output_files as being output_files if not copying.
-	if not options.copy:
-		for file in range(len(final_output_files)):
-			final_output_files[i] = output_files[i]
+	cppflags = ""
+	for i in options.cppflags:
+		cppflags += i + " "
+	for i in options.include_dirs:
+		cppflags += "-I" + i + " "
+	for i in options.defines:
+		cppflags += "-D" + i + " "
+	for i in options.undefines:
+		cppflags += "-U" + i + " "
+	info("CPP flags: " + cppflags)
 
 	# Create the PyPS workspace.
-	workspace = pyps.workspace(files, name = project, activates = [], verboseon = True)
+	workspace = pyps.workspace(files, name = project, activates = [], verboseon = True, cppflags = cppflags)
 	workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
 						   PRETTYPRINT_SEQUENTIAL_STYLE = "do")
 
@@ -300,90 +398,190 @@ def main():
 		all_modules.coarse_grain_parallelization()
 
 	if options.cuda:
-		#mn.display()
 		all_modules.gpu_ify()
-		#mn.display()
 
 		# Isolate kernels by using the fact that all the generated kernels have
 		# their name beginning with "p4a_":
 		kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
-		kernel_launchers = w.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+		kernel_launchers = workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
-		#kernels.display()
 		# Add communication around all the call site of the kernels:
 		kernel_launchers.kernel_load_store()
-		#kernel_launchers.display()
-
 		kernel_launchers.gpu_loop_nest_annotate()
-		#kernel_launchers.display()
 
 		# Inline back the kernel into the wrapper, since CUDA can only deal with
 		# local functions if they are in the same file as the caller (by inlining
 		# them, by the way... :-) )
 		kernel_filter_re = re.compile("p4a_kernel_\\d+$")
-		kernels = w.filter(lambda m: kernel_filter_re.match(m.name))
+		kernels = workspace.filter(lambda m: kernel_filter_re.match(m.name))
 		kernels.inlining()
 
 		# Display the wrappers to see the work done:
 		kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
-		kernel_wrappers = w.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
-		#kernel_wrappers.display()
-
-		# Instead, do a global loop normalization above:
-		#kernels.loop_normalize()
-		#kernels.use_def_elimination()
-		#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
-
-		#w.all.suppress_dead_code()
-		#w["main"].display()
-
-		#workspace["main"].prepend_comment(PREPEND_COMMENT = "/*** Prepend P4A_init_accel here ***/")
+		kernel_wrappers = workspace.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
 
 	if options.openmp:
 		all_modules.ompify_code()
 
 	for module in workspace:
-		module.prepend_comment(PREPEND_COMMENT = "// Generated on " + time.strftime("%Y-%m-%d %H:%M:%S") + " by " + " ".join(sys.argv) + "\n")
-		module.prepend_comment(PREPEND_COMMENT = "// Module name: " + module.name + "\n")
+		module.prepend_comment(PREPEND_COMMENT = "// Module: " + module.name
+			+ " -- Generated on " + time.strftime("%Y-%m-%d %H:%M:%S")
+			+ " by " + " ".join(sys.argv) + "\n")
 
 	# Build the output source files (UNSPLIT operation).
 	workspace.all.unsplit()
 
 	# Copy the output files to their final location.
-	for i in range(len(output_files)):
-		if os.path.exists(output_files[i]):
-			if options.copy:
-				info("Copying " + output_files[i] + " to " + final_output_files[i])
-				shutil.copyfile(output_files[i], final_output_files[i])
-			warn(final_output_files[i] + " created", False)
+	for file in files:
+		for i in range(len(output_files[file])):
+			if os.path.exists(output_files[file][i]):
+				if options.copy:
+					info("Copying " + output_files[file][i] + " to " + final_output_files[file][i])
+					shutil.copyfile(output_files[file][i], final_output_files[file][i])
+				warn(final_output_files[file][i] + " created")
+			else:
+				error("Expected output file for " + file + " not found: " + output_files[file][i])
+				error("You might want to re-run with -rr to display full PIPS output")
+				remove_after = False
+				options.cmake = False
+				options.build = False
+
+	if not options.output_file:
+		options.output_file = os.path.join(os.getcwd(), project)
+	cc = ""
+	if options.cc:
+		cc = options.cc
+	else:
+		if options.cuda:
+			cc = "nvcc"
 		else:
-			error("Expected output file for " + files[i] + " not found: " + output_files[i])
-			error("You might want to re-run with -rr to display full PIPS output")
-			remove_after = False
-			options.cmake = False
+			cc = "gcc"
+	cflags = cppflags + " " + options.cflags
+	if options.openmp:
+		cflags += " -fopenmp"
+	ldflags = options.ldflags + " "
+	for l in options.lib_dirs:
+		ldflags += "-L" + l + " "
+	for l in options.libs:
+		ldflags += "-l" + l + " "
+	all_output_files = []
+	for file in files:
+		for f in final_output_files[file]:
+			all_output_files.append(f)
+	all_output_files += options.extra_files
+	if options.build and not options.cmake:
+		info("Compiling using cc=[" + cc + "] cflags=[" + cflags + "] ldflags=[" + ldflags + "] output_file=" + options.output_file)
+		v = ""
+		if verbosity >= 3:
+			v = "-v -Wall "
+		cmd = ""
+		if options.link:
+			cmd = cc + " " + v + cflags + " " + ldflags + " -o " + options.output_file + " " + " ".join(all_output_files)
+		else:
+			cmd = cc + " -c " + v + cflags + " -o " + options.output_file + " " + " ".join(all_output_files)
+		error("Running: " + cmd)
+		if not options.nocommand:
+			os.system(cmd)
+		#workspace.compile(CC = cc, CFLAGS = cflags, LDFLAGS = ldflags, outfile = options.output_file,
+		#	link = options.link, extrafiles = options.extra_files)
 
 	# Remove the database directory if requested.
 	if remove_after:
 		info("Removing database directory: " + database_dir)
-		rmdb(database_dir)
+		rmdir(database_dir)
 
-	# Generate a CMakeLists.txt.
+	# Generate a CMakeLists.txt and build if requested.
 	if options.cmake:
+		if not (options.exe or options.shared or options.static):
+			options.exe = True
 		cmakefile = os.path.join(os.getcwd(), "CMakeLists.txt")
 		if os.path.exists(cmakefile):
-			cmakefile_backup = os.path.join(os.getcwd(), "CMakeLists.txt.BAK")
+			cmakefile_backup = os.path.join(os.getcwd(), "CMakeLists.txt.old")
 			warn("Moving existing " + cmakefile + " out of the way (" + cmakefile_backup + ")")
 			shutil.move(cmakefile, cmakefile_backup)
 		info("Generating " + cmakefile)
-		f = open(cmakefile, "w")
-		f.write("cmake_minimum_required(VERSION 2.6)\n")
-		f.write("add_executable(" + project + " " + " " .join(final_output_files) + ")\n")
-		if options.openmp:
-			f.write("set(CMAKE_C_FLAGS \"-fopenmp\")\n");
-		f.close()
-		if options.makeit:
-			os.system("mkdir -p __build && cd __build && cmake .. && make")
+		if len(options.libs) == 0:
+			options.libs = [ '""' ]
+		subst_dict = dict(time = time.strftime("%Y-%m-%d %H:%M:%S"), script = " ".join(sys.argv),
+			project = project, PROJECT = string.upper(project), source_files = "\n    ".join(all_output_files),
+			include_dirs = " ".join(options.include_dirs), lib_dirs = " ".join(options.lib_dirs), libs = " ".join(options.libs),
+			output_dir = os.path.dirname(cmakefile), cflags = cflags, cc = cc)
 
+		cmakelist = string.Template("""# Generated on $time by $script
+
+cmake_minimum_required(VERSION 2.6)
+
+if(MSVC)
+    message(FATAL_ERROR "MSVC not supported yet")
+endif()
+
+set(CMAKE_C_COMPILER $cc)
+
+set(OUTPUT_DIR $output_dir)
+set(LIBRARY_OUTPUT_PATH $${OUTPUT_DIR})
+set(CMAKE_BINARY_DIR $${OUTPUT_DIR})
+set(EXECUTABLE_OUTPUT_PATH $${OUTPUT_DIR})
+set(RUNTIME_OUTPUT_DIRECTORY $${OUTPUT_DIR})
+set(ARCHIVE_OUTPUT_DIRECTORY $${OUTPUT_DIR})
+
+set(${PROJECT}_INCLUDE_DIR "./")
+set(${PROJECT}_HEADER_FILES
+#    $${${PROJECT}_HEADER_FILES}/header.h
+#    Add headers here
+)
+
+set(${PROJECT}_SOURCE_FILES
+    $source_files
+)
+
+source_group("Header Files" FILES $${${PROJECT}_HEADER_FILES})
+source_group("Source Files" FILES $${${PROJECT}_SOURCE_FILES})
+
+include_directories($include_dirs)
+link_directories($lib_dirs)
+
+set(CMAKE_C_FLAGS "$cflags")
+""").substitute(subst_dict)
+
+		if options.shared:
+			cmakelist += string.Template("""
+add_library(${project}d SHARED $${${PROJECT}_SOURCE_FILES})
+target_link_libraries(${project}d $libs)
+set_target_properties(${project}d PROPERTIES DEFINE_SYMBOL "COMPILING_SHARED_LIBRARY")
+set_property(TARGET ${project}d PROPERTY LINK_INTERFACE_LIBRARIES "")
+""").substitute(subst_dict)
+
+		if options.static:
+			cmakelist += string.Template("""
+add_library(${project}s STATIC $${${PROJECT}_SOURCE_FILES})
+""").substitute(subst_dict)
+
+		if options.exe:
+			cmakelist += string.Template("""
+add_executable(${project} $${${PROJECT}_SOURCE_FILES})
+target_link_libraries(${project} $libs)
+""").substitute(subst_dict)
+
+		#print cmakelist
+		f = open(cmakefile, "w")
+		f.write(cmakelist)
+		f.close()
+		if options.build:
+			build_dir = os.path.join(os.getcwd(), project + ".build")
+			#if os.path.exists(build_dir):
+			#	info("Removing existing build dir: " + build_dir)
+			#	rmdir(build_dir)
+			cmd = "mkdir -p " + build_dir + " && cd " + build_dir + " && cmake "
+			if options.generator:
+				cmd += "-G \"" + options.generator + "\" "
+			if verbosity >= 3:
+				cmd += "--debug-output "
+			cmd += ".. && make"
+			if verbosity >= 2:
+				cmd += " VERBOSE=1"
+			error("Running: " + cmd)
+			if not options.nocommand:
+				os.system(cmd)
 
 if __name__ == "__main__":
 	main()
