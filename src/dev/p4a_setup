@@ -86,7 +86,9 @@ fi
 # Where everything is built:
 P4A_BUILD=$P4A_ROOT/build
 # Where things are installed
-P4A_INSTALL_PREFIX=$P4A_ROOT/run
+if [[ -z $P4A_INSTALL_PREFIX ]]; then
+	P4A_INSTALL_PREFIX=$P4A_ROOT/run
+fi
 
 P4A_ETC=$P4A_INSTALL_PREFIX/etc
 mkdir -p $P4A_ETC
