@@ -3,7 +3,7 @@ delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create $WKS $WKS.f p4a_stubs.f
+create $WKS $WKS.f include/p4a_stubs.f
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 

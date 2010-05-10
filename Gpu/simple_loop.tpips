@@ -3,7 +3,7 @@ delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create $WKS $WKS.c p4a_stubs.c
+create $WKS $WKS.c include/p4a_stubs.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"
