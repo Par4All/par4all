@@ -5,7 +5,7 @@ setenv PIPS_CPP "cpp -C -P"
 #setenv PIPS_CPP "cpp -ansi"
 
 create comment04 comment04.c
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER

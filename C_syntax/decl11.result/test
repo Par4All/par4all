@@ -11,7 +11,7 @@ Selecting rule: C_PARSER
 user warning in activate_phase: Rule `C_PARSER' already active
 Selecting rule: C_SYMBOL_TABLE
 user warning in activate_phase: Rule `C_SYMBOL_TABLE' already active
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 echo
 

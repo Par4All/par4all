@@ -47,7 +47,7 @@ create ${WSPC}_2 $WSPC.database/Src/$WSPC.c
 
 activate C_PARSER
 activate PRINT_CODE
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 
 # Because the code is parsed twice, these two options make the results
 # quite unreadable

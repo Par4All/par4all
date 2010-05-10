@@ -3,7 +3,7 @@ create formal_variables formal_variables.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER

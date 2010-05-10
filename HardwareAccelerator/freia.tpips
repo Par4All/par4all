@@ -5,7 +5,7 @@ setproperty ABORT_ON_USER_ERROR=TRUE
 setproperty CONSTANT_PATH_EFFECTS=FALSE
 shell ${PIPS_CC:-cc} -c freia.c -o freia.database/Tmp/freia.o
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE=TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER=TRUE
 activate PRINT_CODE
 display PRINTED_FILE[%ALLFUNC]

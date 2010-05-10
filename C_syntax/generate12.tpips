@@ -2,7 +2,7 @@ delete generate12
 create generate12 generate12.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 

@@ -2,7 +2,7 @@ delete externalloc08
 create externalloc08 externalloc08.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE

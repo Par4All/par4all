@@ -7,7 +7,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 create jacobi2 jacobi2.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
