@@ -125,13 +125,13 @@ bool print_code_or_source(string mod_name)
       return false;
     }
 
-    /* Implies PRETTYPRINT_FREE_FORM = true */
-    if(get_bool_property("PRETTYPRINT_C_CODE")) {
+    /* C or F95 Implies PRETTYPRINT_FREE_FORM = true */
+    string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
+    if ((strcmp (lang, "C") == 0) || (strcmp (lang, "F95") == 0)) {
       set_bool_property("PRETTYPRINT_FREE_FORM", TRUE);
     }
 
-    if(!get_bool_property("PRETTYPRINT_C_CODE")
-       && fortran_language_module_p(module)) {
+    if((strcmp (lang, "F77") == 0) && fortran_language_module_p(module)) {
       file_ext =
 	strdup(concatenate
 	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
@@ -139,8 +139,7 @@ bool print_code_or_source(string mod_name)
 		GRAPH_FILE_EXT : "",
 		NULL));
     }
-    else if(get_bool_property("PRETTYPRINT_C_CODE")
-	    || c_language_module_p(module)) {
+    else if((strcmp (lang, "C") == 0) || c_language_module_p(module)) {
       file_ext =
 	strdup(concatenate
 	       (is_user_view? PRETTYPRINT_C_EXT : PREDICAT_C_EXT,

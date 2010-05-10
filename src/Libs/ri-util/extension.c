@@ -130,7 +130,7 @@ extensions_to_string(extensions es, bool nl) {
   string s = string_undefined;
 
   /* Prettyprint in the correct language: */
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
+  set_prettyprint_language_from_property ();
 
   if (empty_extensions_p (es) == FALSE) {
     /* Use a string_buffer for efficient string concatenation: */

@@ -204,7 +204,7 @@ bool ompify_code (const string module_name) {
   reductions_pragma_omp_init (module_name);
 
   // generate pragma string or expression using the correct language:
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
+  set_prettyprint_language_from_property ();
   // generate omp pragma for parallel loops
   // We need to access to the statement containing the current loop, forloop
   // so ask NewGen gen_recurse to keep this informations for us

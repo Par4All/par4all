@@ -10243,16 +10243,14 @@ print_code_points_to_list      > MODULE.printed_file
 \subsubsection{Language}
 \index{PRETTYPRINT\_C\_CODE}
 
-PIPS is now extended to deal with C programs, so the following property is
-used to tell the prettyprinter to print a C code or not. By default, the
-Fortran output is printed.
+PIPS can handle several languages. By default the PrettyPrinter uses
+the native language as an output but it is also possible to prettyprint
+Fortran code as C code. Possible values for the PRETTYPRINT\_LANGUAGE property
+are: \texttt{native F95 F77 C}.
 
-\begin{PipsProp}{PRETTYPRINT_C_CODE} 
-PRETTYPRINT_C_CODE FALSE
+\begin{PipsProp}{PRETTYPRINT_LANGUAGE}
+PRETTYPRINT_LANGUAGE "F77"
 \end{PipsProp}
-
-However, this is not a good way to handle multi-target languages. To be
-replaced ...
 
 PIPS can handle many different languages. By default the PrettyPrinter uses
 the native language as an output but it is also possible to prettyprint

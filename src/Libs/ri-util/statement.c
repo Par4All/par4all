@@ -1149,7 +1149,7 @@ set r;
 
 /** Print a statement on stdout
 
-    Print the statement according to the current PRETTYPRINT_C_CODE
+    Print the statement according to the current PRETTYPRINT_LANGUAGE
     property
 
     See text_named_module() for improvements.
@@ -1162,7 +1162,7 @@ void print_statement(statement s)
   push_current_module_statement(s);
   language previous_language = copy_language (get_prettyprint_language ());
   /* Prettyprint in the correct language: */
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
+  set_prettyprint_language_from_property ();
   text txt = text_statement(entity_undefined, 0, s, NIL);
   print_text(stderr, txt);
   free_text(txt);

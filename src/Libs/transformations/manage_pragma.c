@@ -88,13 +88,10 @@ bool omp_loop_parallel_threshold_set (char mod_name[]) {
   statement mod_stmt = statement_undefined;
 
   // generate pragma string or expression using the correct language:
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
+  set_prettyprint_language_from_property ();
 
   // Get the code and tell PIPS_DBM we do want to modify it
   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-
-  // generate pragma string or expression using the correct language:
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
 
   // Add the parallel threshold to all the omp for pragmas
   gen_recurse(mod_stmt, pragma_domain, gen_true,

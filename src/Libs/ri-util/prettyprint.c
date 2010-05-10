@@ -147,30 +147,49 @@ extern string compilation_unit_of_module(string);
 /* The prettyprint language */
 static language prettyprint_language = language_undefined;
 
- language get_prettyprint_language () {
+/**
+   @return the prettyprint language as a newgen language object
+ **/
+language get_prettyprint_language () {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
   return prettyprint_language;
 }
 
+/**
+   @return the prettyprint language as a language_utype
+ **/
 static enum language_utype get_prettyprint_language_tag () {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
   return language_tag (prettyprint_language);
 }
 
+/**
+   @return true if the language is f77
+ **/
 bool prettyprint_language_is_fortran_p () {
   return (get_prettyprint_language_tag () == is_language_fortran?TRUE:FALSE);
 }
 
+/**
+   @return true if the language is f95
+ **/
 bool prettyprint_language_is_fortran95_p () {
   return (get_prettyprint_language_tag () == is_language_fortran95?TRUE:FALSE);
 }
 
+/**
+   @return true if the language is C
+ **/
 bool prettyprint_language_is_c_p () {
   return (get_prettyprint_language_tag () == is_language_c?TRUE:FALSE);
 }
 
+/**
+   @brief set the prettyprint language according to the property
+   PRETTYPRINT_LANGUAGE
+ **/
 void set_prettyprint_language_from_property () {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
@@ -189,12 +208,22 @@ void set_prettyprint_language_from_property () {
   }
 }
 
+/**
+   @brief set the prettyprint language from a newgen language object
+   @param lang, the language to be used to set the prettyprint_language
+   variable
+ **/
 void set_prettyprint_language (language lang) {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
   *prettyprint_language = *lang;
 }
 
+/**
+   @brief set the prettyprint language from a language_utype argument
+   @param lang, the language to be used to set the prettyprint_language
+   variable
+ **/
 void set_prettyprint_language_tag (enum language_utype lang) {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
@@ -203,22 +232,13 @@ void set_prettyprint_language_tag (enum language_utype lang) {
 
 /*===================== Variables and Function prototypes for C ===========*/
 
-/* This variable should be made static and accessed from other files
-   or at least from other libraries via its functions only */
-static bool prettyprint_is_fortran = TRUE;
-
-/* To track accesses from other libraries */
-
+/* old functions to keep compatibility with the new pretyprint_language
+    variable. Those functions shoul be removed soon
+*/
 
 /** Get the status of the Fortran prettyprint flag */
 bool get_prettyprint_is_fortran()
 {
-  if (prettyprint_is_fortran == TRUE)
-    pips_assert ("F77 language consistency check failed",
-		 language_tag (get_prettyprint_language ()) == is_language_fortran);
-  else
-    pips_assert ("C language consistency check failed",
-		 language_tag (get_prettyprint_language ()) == is_language_c);
   return (language_tag (get_prettyprint_language ()) == is_language_fortran);
 }
 
@@ -229,21 +249,18 @@ void set_prettyprint_is_fortran_p(bool is_fortran_p)
     set_prettyprint_language_tag (is_language_fortran);
   else
     set_prettyprint_language_tag (is_language_c);
-  prettyprint_is_fortran = is_fortran_p;
 }
 
 /** Select Fortran prettyprint */
 void set_prettyprint_is_fortran()
 {
   set_prettyprint_language_tag (is_language_fortran);
-  prettyprint_is_fortran = TRUE;
 }
 
 /** Deselect Fortran prettyprint */
 void reset_prettyprint_is_fortran()
 {
   set_prettyprint_language_tag (is_language_c);
-  prettyprint_is_fortran = FALSE;
 }
 
 static list words_cast(cast obj, int precedence, list pdl);
@@ -4264,7 +4281,7 @@ text text_named_module(
   text ral = text_undefined;
 
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
-  set_prettyprint_is_fortran_p (!get_bool_property("PRETTYPRINT_C_CODE"));
+  set_prettyprint_language_from_property ();
 
   /* This guard is correct but could be removed if find_last_statement()
    * were robust and/or if the internal representations were always "correct".

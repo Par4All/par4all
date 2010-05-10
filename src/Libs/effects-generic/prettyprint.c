@@ -365,7 +365,7 @@ print_source_or_code_effects_engine(
     char *file_name, *file_resource_name;
     bool success = TRUE;
 
-    set_prettyprint_is_fortran_p (!get_bool_property("PRETTYPRINT_C_CODE"));
+    set_prettyprint_language_from_property ();
 
     file_name =
       strdup(concatenate(file_suffix,
