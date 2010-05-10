@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0012*/
    float **a;                                                           /*0013*/
-   
+
    /*sizeof(float *)*/
    a = malloc(64*4);                                                    /*0015*/
    for (i = 0;i<64;i++) {                                               /*0016*/
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0012*/
    float **a;                                                           /*0013*/
-   
+
    /*sizeof(float *)*/
    a = malloc(64*4);                                                    /*0015*/
    for(i = 0; i <= 63; i += 1) {
@@ -39,14 +39,14 @@ int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0012*/
    float **a;                                                           /*0013*/
-   
+
    /*sizeof(float *)*/
    a = malloc(64*4);                                                    /*0015*/
 #pragma omp parallel for private(j)
    for(i = 0; i <= 63; i += 1) {
       /*sizeof(float)*/
       a[i] = malloc(64*4);                                              /*0017*/
-#pragma omp parallel for 
+#pragma omp parallel for
       for(j = 0; j <= 63; j += 1)
          a[i][j] = 0.;                                                  /*0019*/
    }
@@ -57,17 +57,18 @@ int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0012*/
    float **a;                                                           /*0013*/
-   
+
    /*sizeof(float *)*/
    a = malloc(64*4);                                                    /*0015*/
-#pragma omp parallel for private(j)
-   for(i = 0; i <= 63; i += 1) {
+#pragma omp parallel for
+   for(i = 0; i <= 63; i += 1)
       /*sizeof(float)*/
       a[i] = malloc(64*4);                                              /*0017*/
-#pragma omp parallel for 
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for
       for(j = 0; j <= 63; j += 1)
          a[i][j] = 0.;                                                  /*0019*/
-   }
 
    return 0;                                                            /*0023*/
 }
