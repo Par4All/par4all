@@ -1,0 +1,16 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete loop_interchange03
+create loop_interchange03 loop_interchange03.f
+
+# We use the winning combination, except TRANSFORMERS_IN_CONTEXT
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+apply LOOP_INTERCHANGE
+300
+apply UNSPLIT[%PROGRAM]
+
+close
+quit

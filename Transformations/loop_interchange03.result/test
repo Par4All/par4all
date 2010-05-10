@@ -1,0 +1,26 @@
+!!
+!! file for test.f
+!!
+!Non-Unit Stride Memory Access
+
+      PROGRAM LOOP_INTERCHANGE03
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER NUM
+      PARAMETER(NUM=5000)
+      INTEGER  I,J
+      REAL     A(1:NUM,1:NUM), B(1:NUM,1:NUM), C(1:NUM,1:NUM)
+
+      A = 0                                                             0012
+      B = 0                                                             0013
+      C = 0                                                             0014
+
+! loop before loop interchange
+      DO 300 Ip = 1, 5000                                               0017
+         DO 200 Jp = 1, 5000                                            0018
+            C(Ip,Jp) = C(Ip,Jp)+A(Ip,Jp)*B(Ip,Jp)                       0019
+200         CONTINUE                                                    0020
+300   CONTINUE
+
+      END
