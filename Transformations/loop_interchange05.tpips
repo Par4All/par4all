@@ -1,6 +1,6 @@
+delete loop_interchange05
 setproperty ABORT_ON_USER_ERROR TRUE
-delete loop_interchange03
-create loop_interchange03 loop_interchange03.f
+create loop_interchange05 loop_interchange05.f
 
 # We use the winning combination, except TRANSFORMERS_IN_CONTEXT
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
@@ -24,7 +24,7 @@ echo
 display PRINTED_FILE
 
 apply UNSPLIT[%PROGRAM]
-shell (cd loop_interchange03.database/Src; gfortran loop_interchange03.f)
+shell (cd loop_interchange05.database/Src; gfortran loop_interchange05.f)
 
 close
 quit
