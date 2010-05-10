@@ -701,21 +701,21 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
   type t = entity_type(f);
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-  if(call_arguments(obj) == NIL) {
-    if(type_statement_p(t))
-      return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
-    if(value_constant_p(i)||value_symbolic_p(i)) {
-      switch ( language_tag (get_prettyprint_language ()) ) {
+  if (call_arguments(obj) == NIL) {
+    if (type_statement_p(t))
+      return (CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
+    if (value_constant_p(i) || value_symbolic_p(i)) {
+      switch(language_tag (get_prettyprint_language ())) {
         case is_language_fortran:
         case is_language_fortran95:
-          return ( CHAIN_SWORD(pc, entity_user_name(f)) );
+          return (CHAIN_SWORD(pc, entity_user_name(f)));
           break;
         case is_language_c:
-          if ( ENTITY_TRUE_P(f) )
-            return ( CHAIN_SWORD(pc, "true") );
-          if ( ENTITY_FALSE_P(f) )
-            return ( CHAIN_SWORD(pc, "false") );
-          return ( CHAIN_SWORD(pc, entity_user_name(f)) );
+          if (ENTITY_TRUE_P(f))
+            return (CHAIN_SWORD(pc, "true"));
+          if (ENTITY_FALSE_P(f))
+            return (CHAIN_SWORD(pc, "false"));
+          return (CHAIN_SWORD(pc, entity_user_name(f)));
           break;
         default:
           pips_assert ("This case should have been handled before", FALSE);
@@ -727,25 +727,23 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
   type calltype = call_compatible_type(entity_type(call_function(obj)));
   bool function_p = type_void_p(functional_result(type_functional(calltype)));
 
-  if ( function_p ) {
-    if ( is_a_subroutine ) {
-      switch ( language_tag (get_prettyprint_language ()) ) {
+  if (function_p) {
+    if (is_a_subroutine) {
+      switch(language_tag (get_prettyprint_language ())) {
         case is_language_fortran:
+        case is_language_fortran95:
           pc = CHAIN_SWORD(pc, "CALL ");
           break;
         case is_language_c:
           pc = CHAIN_SWORD(pc, "");
           break;
-        case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
-          break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     } else {
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
+      switch(language_tag (get_prettyprint_language ())) {
+        case is_language_fortran:
           pips_user_warning("subroutine '%s' used as a function.\n",
               entity_name(f));
           break;
@@ -756,14 +754,14 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
           pips_assert ("Need to update F95 case", FALSE);
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }
-  }
-  else if(is_a_subroutine) {
-    switch (language_tag (get_prettyprint_language ())) {
-    case is_language_fortran:
+  } else if (is_a_subroutine) {
+    switch(language_tag (get_prettyprint_language ())) {
+      case is_language_fortran:
+      case is_language_fortran95:
         pips_user_warning("function '%s' used as a subroutine.\n",
             entity_name(f));
         pc = CHAIN_SWORD(pc, "CALL ");
@@ -772,11 +770,8 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
         // no warning in C
         pc = CHAIN_SWORD(pc, "");
         break;
-      case is_language_fortran95:
-        pips_assert ("Need to update F95 case", FALSE);
-        break;
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
         break;
     }
   }
@@ -924,11 +919,11 @@ words_assign_op(call obj,
 
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE, pdl));
 
-  if (strcmp(fun,MODULO_UPDATE_OPERATOR_NAME) == 0)
+  if (strcmp(fun, MODULO_UPDATE_OPERATOR_NAME) == 0)
     fun = "%=";
-  else if (strcmp(fun,BITWISE_AND_UPDATE_OPERATOR_NAME) == 0)
+  else if (strcmp(fun, BITWISE_AND_UPDATE_OPERATOR_NAME) == 0)
     fun = "&=";
-  else if (strcmp(fun,BITWISE_XOR_UPDATE_OPERATOR_NAME) == 0)
+  else if (strcmp(fun, BITWISE_XOR_UPDATE_OPERATOR_NAME) == 0)
     fun = "^=";
 
   /* FI: space_p could be used here to control spacing around assignment */
@@ -936,48 +931,49 @@ words_assign_op(call obj,
   pc = CHAIN_SWORD(pc, fun);
   pc = CHAIN_SWORD(pc," ");
   expression exp = expression_undefined;
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-  case is_language_fortran95:
-    exp = EXPRESSION(CAR(CDR(args)));
-    if(expression_call_p(exp)) {
-      /* = is not a Fortran operator. No need for parentheses ever,
-	 even with the parenthesis option */
-      /*
-	call c = syntax_call(expression_syntax(e));
-	pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
-      */
-      pc = gen_nconc(pc, words_syntax(expression_syntax(exp), pdl));
-    }
-    else
-      pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE, pdl));
-    break;
-  case is_language_c:
-    /* Brace expressions are not allowed in standard assignments */
-    exp = EXPRESSION(CAR(CDR(args)));
-    if(ENTITY_ASSIGN_P(call_function(obj))) {
-      if (brace_expression_p(exp))
-	//pc = gen_nconc(pc,words_brace_expression(exp));
-	pips_user_error("Brace expressions are not allowed in assignments\n");
-      else {
-	/* Be careful with expression lists, they may require
-	   surrounding parentheses. */
-	pc = gen_nconc(pc,words_subexpression(exp, prec, TRUE, pdl));
+  switch(language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      exp = EXPRESSION(CAR(CDR(args)));
+      if (expression_call_p(exp)) {
+        /* = is not a Fortran operator. No need for parentheses ever,
+         even with the parenthesis option */
+        /*
+         call c = syntax_call(expression_syntax(e));
+         pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
+         */
+        pc = gen_nconc(pc, words_syntax(expression_syntax(exp), pdl));
+      } else
+        pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))),
+                                               prec,
+                                               TRUE,
+                                               pdl));
+      break;
+    case is_language_c:
+      /* Brace expressions are not allowed in standard assignments */
+      exp = EXPRESSION(CAR(CDR(args)));
+      if (ENTITY_ASSIGN_P(call_function(obj))) {
+        if (brace_expression_p(exp))
+          //pc = gen_nconc(pc,words_brace_expression(exp));
+          pips_user_error("Brace expressions are not allowed in assignments\n");
+        else {
+          /* Be careful with expression lists, they may require
+           surrounding parentheses. */
+          pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE, pdl));
+        }
+      } else {
+        pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE, pdl));
       }
-    }
-    else {
-      pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE, pdl));
-    }
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
-  if(prec < precedence ||  (!precedence_p && precedence>0)) {
+  if (prec < precedence || (!precedence_p && precedence > 0)) {
     pc = CONS(STRING, MAKE_SWORD("("), pc);
     pc = CHAIN_SWORD(pc, ")");
   }
-  return(pc);
+  return (pc);
 }
 static list
 words_substring_op(call obj,
@@ -1203,9 +1199,9 @@ static list words_nullary_op_fortran(call obj,
 
   if(same_string_p(fname,RETURN_FUNCTION_NAME)
      ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
-    pc = CHAIN_SWORD(pc, "return");
+    pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
   else if (same_string_p(fname,OMP_FOR_FUNCTION_NAME))
-    pc = CHAIN_SWORD(pc, "do");
+    pc = CHAIN_SWORD(pc, "DO");
   else
     pc = CHAIN_SWORD(pc, fname);
 
@@ -1230,25 +1226,23 @@ static list words_nullary_op_fortran(call obj,
   return(pc);
 }
 
+
 static list words_nullary_op(call obj,
-			     int precedence,
-			     bool __attribute__ ((unused)) leftmost,
-			     list pdl)
-{
+                             int precedence,
+                             bool __attribute__ ((unused)) leftmost,
+                             list pdl) {
   list result = NIL;
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-    result = words_nullary_op_fortran (obj, precedence, leftmost, pdl);
-    break;
-  case is_language_c:
-    result = words_nullary_op_c (obj, precedence, leftmost, pdl);
-    break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+  switch(language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      result = words_nullary_op_fortran(obj, precedence, leftmost, pdl);
+      break;
+    case is_language_c:
+      result = words_nullary_op_c(obj, precedence, leftmost, pdl);
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
   return result;
 }
@@ -1462,7 +1456,7 @@ words_io_inst(call obj,
 	    pips_assert ("Need to update F95 case", FALSE);
 	    break;
 	  default:
-	    pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
 	    break;
 	  }
 	}
@@ -1713,30 +1707,27 @@ list /* of string */
 words_goto_label(string tlabel)
 {
     list pc = NIL;
-    if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
-	pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
-    }
-    else {
-      switch (language_tag (get_prettyprint_language ())) {
+  if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
+    pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
+  } else {
+    switch(language_tag (get_prettyprint_language ())) {
       case is_language_fortran:
-	pc = CHAIN_SWORD(pc, strdup("GOTO "));
-	break;
-      case is_language_c:
-	/* In C, a label cannot begin with a number so "l" is added for this case*/
-	pc = CHAIN_SWORD(pc, strdup((isdigit(tlabel[0])?"goto l":"goto ")));
-	break;
       case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
+        pc = CHAIN_SWORD(pc, strdup("GOTO "));
+        break;
+      case is_language_c:
+        /* In C, a label cannot begin with a number so "l" is added for this case*/
+        pc = CHAIN_SWORD(pc, strdup((isdigit(tlabel[0])?"goto l":"goto ")));
+        break;
       default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
-      }
-      pc = CHAIN_SWORD(pc, tlabel);
-      if (language_tag (get_prettyprint_language ()) == is_language_c)
-	pc = CHAIN_SWORD(pc, C_CONTINUE_FUNCTION_NAME);
+        pips_internal_error("Language unknown !");
+        break;
     }
-    return pc;
+    pc = CHAIN_SWORD(pc, tlabel);
+    if (language_tag (get_prettyprint_language ()) == is_language_c)
+      pc = CHAIN_SWORD(pc, C_CONTINUE_FUNCTION_NAME);
+  }
+  return pc;
 }
 
 static list
@@ -2347,7 +2338,7 @@ sentence_tail(void)
     result = MAKE_ONE_WORD_SENTENCE(0, strdup("}"));
     break;
   default:
-    pips_assert ("This case should have been handled before", FALSE);
+    pips_internal_error("Language unknown !");
     break;
   }
   return result;
@@ -2526,10 +2517,10 @@ loop_private_variables(loop obj, list pdl)
 	    private = "private(";
 	    break;
 	  case is_language_fortran95:
-	    pips_assert ("Need to update F95 case", FALSE);
+      pips_internal_error("Need to update F95 case");
 	    break;
 	  default:
-	    pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
 	    break;
 	  }
 	}
@@ -2561,70 +2552,61 @@ marged(
     return result;
 }
 
-static text
-text_directive(
-    loop obj,   /* the loop we're interested in */
-    int margin,
-    string basic_directive,
-    string basic_continuation,
-    string parallel,
-    list pdl)
-{
-    string
-	dir = marged(basic_directive, margin),
-	cont = marged(basic_continuation, margin);
-    text t = make_text(NIL);
-    char buffer[100]; /* ??? */
-    list /* of string */ l = NIL;
-    bool is_hpf = pp_hpf_style_p(), is_omp = pp_omp_style_p();
-    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-    /* start buffer */
-    buffer[0] = '\0';
+static text text_directive(loop obj, /* the loop we're interested in */
+                           int margin,
+                           string basic_directive,
+                           string basic_continuation,
+                           string parallel,
+                           list pdl) {
+  string dir = marged(basic_directive, margin), cont =
+      marged(basic_continuation, margin);
+  text t = make_text(NIL);
+  char buffer[100]; /* ??? */
+  list /* of string */l = NIL;
+  bool is_hpf = pp_hpf_style_p(), is_omp = pp_omp_style_p();
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-    if (execution_parallel_p(loop_execution(obj)))
-    {
-	add_to_current_line(buffer, dir, cont, t);
-	add_to_current_line(buffer, parallel, cont, t);
-	l = loop_private_variables(obj, pdl);
-	if (l && is_hpf)
-	    add_to_current_line(buffer, space_p? ", " : ",", cont, t);
+  /* start buffer */
+  buffer[0] = '\0';
+
+  if (execution_parallel_p(loop_execution(obj))) {
+    add_to_current_line(buffer, dir, cont, t);
+    add_to_current_line(buffer, parallel, cont, t);
+    l = loop_private_variables(obj, pdl);
+    if (l && is_hpf)
+      add_to_current_line(buffer, space_p ? ", " : ",", cont, t);
+  } else if (get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES")) {
+    l = loop_private_variables(obj, pdl);
+    if (l) {
+      add_to_current_line(buffer, dir, cont, t);
+      if (is_omp) {
+        switch(language_tag (get_prettyprint_language ())) {
+          case is_language_fortran:
+          case is_language_fortran95:
+            add_to_current_line(buffer, "DO ", cont, t);
+            break;
+          case is_language_c:
+            add_to_current_line(buffer, "for ", cont, t);
+            break;
+          default:
+            pips_internal_error("Language unknown !");
+            break;
+        }
+      }
     }
-    else if (get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"))
-    {
-      l = loop_private_variables(obj, pdl);
-	if (l)
-	{
-	    add_to_current_line(buffer, dir, cont, t);
-	    if (is_omp) {
-	      switch (language_tag (get_prettyprint_language ())) {
-	      case is_language_fortran:
-		add_to_current_line(buffer, "DO ", cont, t);
-		break;
-	      case is_language_c:
-		add_to_current_line(buffer, "for ", cont, t);
-		break;
-	      case is_language_fortran95:
-		pips_assert ("Need to update F95 case", FALSE);
-		break;
-	      default:
-		pips_assert ("This case should have been handled before", FALSE);
-		break;
-	      }
-	    }
-	}
-    }
+  }
 
-    if (strlen(buffer)>0)
-	MAP(STRING, s, add_to_current_line(buffer, s, cont, t), l);
+  if (strlen(buffer) > 0)
+    MAP(STRING, s, add_to_current_line(buffer, s, cont, t), l);
 
-    /* what about reductions? should be associated to the ri somewhere.
-     */
+  /* what about reductions? should be associated to the ri somewhere.
+   */
 
-    close_current_line(buffer, t,cont);
-    free(dir);
-    free(cont);
-    return t;
+  close_current_line(buffer, t, cont);
+  free(dir);
+  free(cont);
+  return t;
 }
 
 #define HPF_SENTINEL 		"!HPF$"
@@ -2657,6 +2639,7 @@ text_omp_directive(loop l, int m)
 
   switch (language_tag (get_prettyprint_language ())) {
   case is_language_fortran:
+  case is_language_fortran95:
     t = text_directive(l, m, "\n" OMP_DIRECTIVE, OMP_CONTINUATION,
 		       OMP_PARALLELDO, pdl);
     break;
@@ -2667,166 +2650,152 @@ text_omp_directive(loop l, int m)
     t = text_directive(l, m, OMP_C_DIRECTIVE, OMP_C_CONTINUATION,
 		       OMP_C_PARALLELDO, pdl);
     break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
-    break;
   default:
-    pips_assert ("This case should have been handled before", FALSE);
+    pips_internal_error("Language unknown !");
     break;
   }
   return t;
 }
 
 /* exported for fortran90.c */
-text
-text_loop_default(
-    entity module,
-    string label,
-    int margin,
-    loop obj,
-    int n,
-    list pdl)
-{
-    list pc = NIL;
-    sentence first_sentence = sentence_undefined;
-    unformatted u;
-    text r = make_text(NIL);
-    statement body = loop_body( obj ) ;
-    entity the_label = loop_label(obj);
-    string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = entity_empty_label_p(the_label);
-    bool doall_loop_p = FALSE;
-    bool hpf_prettyprint = pp_hpf_style_p();
-    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
-    bool all_private =  get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
+text text_loop_default(entity module,
+                       string label,
+                       int margin,
+                       loop obj,
+                       int n,
+                       list pdl) {
+  list pc = NIL;
+  sentence first_sentence = sentence_undefined;
+  unformatted u;
+  text r = make_text(NIL);
+  statement body = loop_body( obj );
+  entity the_label = loop_label(obj);
+  string do_label = entity_local_name(the_label) + strlen(LABEL_PREFIX);
+  bool structured_do = entity_empty_label_p(the_label);
+  bool doall_loop_p = FALSE;
+  bool hpf_prettyprint = pp_hpf_style_p();
+  bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
+  bool all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
 
-    if(execution_sequential_p(loop_execution(obj))) {
-	doall_loop_p = FALSE;
-    }
-    else {
-	doall_loop_p = pp_doall_style_p();
-    }
+  if (execution_sequential_p(loop_execution(obj))) {
+    doall_loop_p = FALSE;
+  } else {
+    doall_loop_p = pp_doall_style_p();
+  }
 
-    /* HPF directives before the loop if required (INDEPENDENT and NEW) */
-    if (hpf_prettyprint)  MERGE_TEXTS(r, text_hpf_directive(obj, margin));
-    /* idem if Open MP directives are required */
-    if (pp_omp_style_p()) MERGE_TEXTS(r, text_omp_directive(obj, margin));
+  /* HPF directives before the loop if required (INDEPENDENT and NEW) */
+  if (hpf_prettyprint)
+    MERGE_TEXTS(r, text_hpf_directive(obj, margin));
+  /* idem if Open MP directives are required */
+  if (pp_omp_style_p())
+    MERGE_TEXTS(r, text_omp_directive(obj, margin));
 
-
-    /* LOOP prologue.
-     */
-    switch (language_tag (get_prettyprint_language ())) {
+  /* LOOP prologue.
+   */
+  switch(language_tag (get_prettyprint_language ())) {
     case is_language_fortran:
+    case is_language_fortran95:
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
-      if(!structured_do && !doall_loop_p && !do_enddo_p) {
-	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
+      if (!structured_do && !doall_loop_p && !do_enddo_p) {
+        pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
       }
       break;
     case is_language_c:
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "forall(" : "for(" );
       break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
-    }
+  }
 
-    //pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
-    pc = CHAIN_SWORD(pc, entity_user_name(loop_index(obj)));
-    pc = CHAIN_SWORD(pc, " = ");
+  //pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
+  pc = CHAIN_SWORD(pc, entity_user_name(loop_index(obj)));
+  pc = CHAIN_SWORD(pc, " = ");
 
-    switch (language_tag (get_prettyprint_language ())) {
+  switch(language_tag (get_prettyprint_language ())) {
     case is_language_fortran:
+    case is_language_fortran95:
       pc = gen_nconc(pc, words_loop_range(loop_range(obj), pdl));
-      u = make_unformatted(strdup(label), n, margin, pc) ;
+      u = make_unformatted(strdup(label), n, margin, pc);
       ADD_SENTENCE_TO_TEXT(r, first_sentence =
-			   make_sentence(is_sentence_unformatted, u));
+          make_sentence(is_sentence_unformatted, u));
       break;
     case is_language_c:
       pc = gen_nconc(pc, C_loop_range(loop_range(obj), loop_index(obj), pdl));
-      if(!one_liner_p(body))
-	pc = CHAIN_SWORD(pc," {");
+      if (!one_liner_p(body))
+        pc = CHAIN_SWORD(pc," {");
       if ((label != NULL) && (label[0] != '\0')) {
-	pips_debug(9, "the label %s need to be print for a for C loop", label);
-	u = make_unformatted(strdup(label), 0, 0, NULL);
-	ADD_SENTENCE_TO_TEXT(r, first_sentence =
-			     make_sentence(is_sentence_unformatted, u));
+        pips_debug(9, "the label %s need to be print for a for C loop", label);
+        u = make_unformatted(strdup(label), 0, 0, NULL);
+        ADD_SENTENCE_TO_TEXT(r, first_sentence =
+            make_sentence(is_sentence_unformatted, u));
       }
-      u = make_unformatted(NULL, n, margin, pc) ;
+      u = make_unformatted(NULL, n, margin, pc);
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
       break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
-    }
-    /* builds the PRIVATE scalar declaration if required
-     */
-    if(!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
-       && !hpf_prettyprint)
-    {
-      list /* of string */ lp = loop_private_variables(obj, pdl);
+  }
+  /* builds the PRIVATE scalar declaration if required
+   */
+  if (!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
+      && !hpf_prettyprint) {
+    list /* of string */lp = loop_private_variables(obj, pdl);
 
-	// initialize the local variable text if needed
-	if ((local_flg == false) && (lp)) {
-	  local_flg = true;
-	  local_var =  make_text(NIL);
-	}
-
-	if (lp)
-	  /* local_var is a global variable which is exploited
-	     later... */
-	  /* FI: I do not understand why the local declarations were
-	     not added right away. I hope my change (simplification)
-	     does not break something else that is not tested by our
-	     non-regression suite. */
-	  if (!pp_omp_style_p()) {
-	    ADD_SENTENCE_TO_TEXT
-	      //	    ( local_var,
-	      ( r,
-		make_sentence(is_sentence_unformatted,
-			      make_unformatted(NULL, 0, margin+INDENTATION, lp)));
-	  }
+    // initialize the local variable text if needed
+    if ((local_flg == false) && (lp)) {
+      local_flg = true;
+      local_var = make_text(NIL);
     }
 
-    /* loop BODY
-     */
-    MERGE_TEXTS(r, text_statement_enclosed(module,
-					   margin+INDENTATION,
-					   body,
-					   !one_liner_p(body),
-					   !one_liner_p(body),
-					   pdl));
+    if (lp)
+      /* local_var is a global variable which is exploited
+       later... */
+      /* FI: I do not understand why the local declarations were
+       not added right away. I hope my change (simplification)
+       does not break something else that is not tested by our
+       non-regression suite. */
+      if (!pp_omp_style_p()) {
+        ADD_SENTENCE_TO_TEXT
+        //	    ( local_var,
+        ( r,
+            make_sentence(is_sentence_unformatted,
+                make_unformatted(NULL, 0, margin+INDENTATION, lp)));
+      }
+  }
 
-    /* LOOP postlogue
-     */
-    switch (language_tag (get_prettyprint_language ())) {
+  /* loop BODY
+   */
+  MERGE_TEXTS(r, text_statement_enclosed(module,
+          margin+INDENTATION,
+          body,
+          !one_liner_p(body),
+          !one_liner_p(body),
+          pdl));
+
+  /* LOOP postlogue
+   */
+  switch(language_tag (get_prettyprint_language ())) {
     case is_language_fortran:
-      if (structured_do || doall_loop_p || do_enddo_p ||
-	  pp_cray_style_p() || pp_craft_style_p() || pp_cmf_style_p())
-	{
-	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
-	}
+    case is_language_fortran95:
+      if (structured_do || doall_loop_p || do_enddo_p || pp_cray_style_p()
+          || pp_craft_style_p() || pp_cmf_style_p()) {
+        ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
+      }
       break;
     case is_language_c:
-      if(!one_liner_p(body))
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
+      if (!one_liner_p(body))
+        ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
-    }
+  }
 
-    attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
+  attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
 
-    return r;
+  return r;
 }
 
 /* exported for conversion/look_for_nested_loops.c */
