@@ -262,7 +262,7 @@ void activate_language(language l)
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
     set_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER", FALSE);
     set_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER", FALSE);
-    set_string_property("PRETTYPRINT_LANGUAGE", "F90");
+    set_string_property("PRETTYPRINT_LANGUAGE", "F95");
 
   } else if(language_c_p(l)) {
     /* Usual properties for C */
