@@ -60,7 +60,7 @@ entity find_enum_of_member( entity m ) {
   STUB_ERROR();
 }
 
-string entity_minimal_name( entity e ) {
+const char* entity_minimal_name(entity e) {
   STUB_ERROR();
 }
 
