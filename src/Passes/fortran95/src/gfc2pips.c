@@ -425,7 +425,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
       string use = NULL;
       int current_len = 1;
       FOREACH(string, a_use, use_stmts) {
-        printf( "Module use : '%s'\n", a_use );
         int a_len = strlen( a_use );
         current_len += a_len;
         if ( use == NULL ) {
@@ -435,7 +434,6 @@ void gfc2pips_namespace( gfc_namespace* ns ) {
         }
         strcpy( &( use[current_len - a_len - 1] ), a_use );
       }
-      printf( "Module whole use : \n'%s'\n", use );
       /* Create an entity */
       string entity_name;
       asprintf( &entity_name, "%s-use-%d", CurrentPackage, currentUse++ );
