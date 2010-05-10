@@ -1,0 +1,33 @@
+setenv WKS kernel_load_store01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WKS
+create $WKS $WKS.c include/p4a_stubs.c
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+
+display PRINTED_FILE[give,change]
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+
+display PRINTED_FILE[give,change]
+
+# Does KERNEL_LOAD_STORE should use CUMULATED_POINTER_EFFECTS ?
+
+# Here we should have a property saying we want to transfer pointed
+# scalars too:
+apply KERNEL_LOAD_STORE[change]
+
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c $WKS.database/Src/$WKS.c  -o  $WKS.database/Src/$WKS
+
+close
+#delete $WKS
+quit
