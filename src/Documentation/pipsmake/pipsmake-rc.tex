@@ -4650,32 +4650,34 @@ expression and subexpression by the points-to analysis.
 
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.
+
 The property \PipsPropRef{ALIASING_ACROSS_TYPES} specifies that two
-pointers of different effective types can be aliased. The default
-value it is set to TRUE, when it is turned to false two pointers of
-different types are never aliased.
+pointers of different effective types can be aliased. The default and
+safe value is {\tt TRUE}; when it is turned to {\tt FALSE} two
+pointers of different types are never aliased.
 \begin{PipsProp}{ALIASING_ACROSS_TYPES}
-ALIASING_ACROSS_TYPES FALSE
+ALIASING_ACROSS_TYPES TRUE
 \end{PipsProp}
 
 The property \PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} is used
-to handle the aliasing between formel parameters and global variables
-of pointer type. When it is set to TRUE two formels parameters or a
+to handle the aliasing between formal parameters and global variables
+of pointer type. When it is set to {\tt TRUE}, two formal parameters or a
 formal one and a global pointer or two global pointers can be
-aliased. If it is turned to FALSE, such pointers are assumed to be
+aliased. If it is turned to {\tt FALSE}, such pointers are assumed to be
 unaliased for intraprocedural analysis and generally for root
 module(i.e. modules without callers).
 \begin{PipsProp}{ALIASING_ACROSS_FORMAL_PARAMETERS}
-ALIASING_ACROSS_FORMAL_PARAMETERS FALSE
+ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
 \end{PipsProp}
 
 The nest property specifies that one data structure can recursively
 contain two pointers pointing to the same location. If it is turned to
-FALSE, it is assumed that two different not included
- memory access paths cannot point to the same memory locations. The safe value is TRUE.
+{\tt FALSE}, it is assumed that two different not included memory
+access paths cannot point to the same memory locations. The safe (and
+default) value is {\tt TRUE}.
 
 \begin{PipsProp}{ALIASING_INSIDE_DATA_STRUCTURE}
-ALIASING_INSIDE_DATA_STRUCTURE FALSE
+ALIASING_INSIDE_DATA_STRUCTURE TRUE
 \end{PipsProp}
 
 The following string property defines the lattice of maximal elements
