@@ -169,11 +169,11 @@ print_sentence(FILE * fd,
 	  for (i = 0; i < em; i++)
 	    putc_sentence(' ', fd);
 
-  col = em;
+	col = em;
 
-  if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
+	if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
 	  col = col + 7; /* Fortran77 start on 7th column */
-  }
+	}
 
 	pips_assert("not too many columns", col <= MAX_END_COLUMN);
 
@@ -298,17 +298,17 @@ print_sentence(FILE * fd,
 	size_t column_start = 0;
 	switch (language_tag (get_prettyprint_language ())) {
 	case is_language_fortran:
-	  /* fortran case */
+	  /* fortran case right the line number on the right where characters
+	     are ignored by a f77 parser*/
 	  column_start = MAX_END_COLUMN;
 	  break;
 	case is_language_c:
-	  /* C case */
+	case is_language_fortran95:
+	  /* C and F95 case, try to align the line number on the right using
+	     commentaries. The alignemnet is done modulo C_STATEMENT_LINE_STEP */
 	  column_start = C_STATEMENT_LINE_COLUMN;
 	  while (column_start <= col)
 	    column_start += C_STATEMENT_LINE_STEP;
-	  break;
-	case is_language_fortran95:
-	  pips_assert ("Need to update F95 case", FALSE);
 	  break;
 	default:
 	  pips_assert ("This case should have been handled before", FALSE);
@@ -329,7 +329,7 @@ print_sentence(FILE * fd,
 	    fprintf_sentence(fd, "/*%04d*/", n);
 	    break;
 	  case is_language_fortran95:
-	    pips_assert ("Need to update F95 case", FALSE);
+	    fprintf_sentence(fd, "! %04d", n);
 	    break;
 	  default:
 	    pips_assert ("This case should have been handled before", FALSE);

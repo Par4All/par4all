@@ -260,7 +260,8 @@ list words_declaration(
 	    {
 		list dims = variable_dimensions(type_variable(entity_type(e)));
 
-		if (language_tag (get_prettyprint_language ()) == is_language_fortran)
+		if ((language_tag (get_prettyprint_language ()) == is_language_fortran) ||
+		    (language_tag (get_prettyprint_language ()) == is_language_fortran95))
 		  {
 		    pl = CHAIN_SWORD(pl, "(");
 		    MAPL(pd,
@@ -278,10 +279,6 @@ list words_declaration(
 		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
 		      pl = CHAIN_SWORD(pl, "]");
 		    }, dims);
-		  }
-		else if (language_tag (get_prettyprint_language ()) == is_language_fortran95)
-		  {
-		    pips_assert ("Need to update F95 case", FALSE);
 		  }
 		else
 		  {
@@ -574,6 +571,7 @@ sentence sentence_head(entity e, list pdl)
       {
 	switch (language_tag (get_prettyprint_language ())) {
 	case is_language_fortran:
+	case is_language_fortran95:
 	  if (entity_main_module_p(e))
 	    pc = CHAIN_SWORD(pc,"PROGRAM ");
 	  else
@@ -588,9 +586,6 @@ sentence sentence_head(entity e, list pdl)
 	  break;
 	case is_language_c:
 	  pc = CHAIN_SWORD(pc,"void ");
-	  break;
-	case is_language_fortran95:
-	  pips_assert ("Need to update F95 case", FALSE);
 	  break;
 	default:
 	  pips_assert ("This case should have been handled before", FALSE);

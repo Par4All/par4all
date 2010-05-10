@@ -704,6 +704,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
     if(value_constant_p(i)||value_symbolic_p(i)) {
       switch (language_tag (get_prettyprint_language ())) {
       case is_language_fortran:
+      case is_language_fortran95:
 	return(CHAIN_SWORD(pc, entity_user_name(f)));
 	break;
       case is_language_c:
@@ -712,9 +713,6 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
 	if(ENTITY_FALSE_P(f))
 	  return(CHAIN_SWORD(pc, "false"));
 	return(CHAIN_SWORD(pc, entity_user_name(f)));
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
 	break;
       default:
 	pips_assert ("This case should have been handled before", FALSE);
@@ -935,6 +933,7 @@ words_assign_op(call obj,
   expression exp = expression_undefined;
   switch (language_tag (get_prettyprint_language ())) {
   case is_language_fortran:
+  case is_language_fortran95:
     exp = EXPRESSION(CAR(CDR(args)));
     if(expression_call_p(exp)) {
       /* = is not a Fortran operator. No need for parentheses ever,
@@ -964,9 +963,6 @@ words_assign_op(call obj,
     else {
       pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE, pdl));
     }
-    break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
     break;
   default:
     pips_assert ("This case should have been handled before", FALSE);
@@ -2339,13 +2335,11 @@ sentence_tail(void)
   sentence result = sentence_undefined;
   switch (language_tag (get_prettyprint_language ())) {
   case is_language_fortran:
+  case is_language_fortran95:
     result = MAKE_ONE_WORD_SENTENCE(0, strdup("END"));
     break;
   case is_language_c:
     result = MAKE_ONE_WORD_SENTENCE(0, strdup("}"));
-    break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
     break;
   default:
     pips_assert ("This case should have been handled before", FALSE);
@@ -3611,6 +3605,7 @@ text_instruction(
       else {
 	switch (language_tag (get_prettyprint_language ())) {
 	case is_language_fortran:
+	case is_language_fortran95:
 	  u = make_unformatted(strdup(label), n, margin,
 			       words_call(instruction_call(obj),
 					  0, TRUE, TRUE, pdl));
@@ -3620,9 +3615,6 @@ text_instruction(
 			       CHAIN_SWORD(words_call(instruction_call(obj),
 						      0, TRUE, TRUE, pdl),
 					   strdup(C_STATEMENT_END_STRING)));
-	  break;
-	case is_language_fortran95:
-	  pips_assert ("Need to update F95 case", FALSE);
 	  break;
 	default:
 	  pips_assert ("This case should have been handled before", FALSE);
@@ -4113,7 +4105,7 @@ text text_statement_enclosed(entity module,
   }
   attach_statement_information_to_text(r, stmt);
 
-  // the last thing to do is close the extension
+  // the last thing to do is to close the extension
   string close =  close_extensions (statement_extensions (stmt), TRUE);
   if (close != string_undefined) {
     ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, close));
@@ -4221,13 +4213,11 @@ find_last_statement(statement s)
 	 || return_statement_p(last))) {
       switch (language_tag (get_prettyprint_language ())) {
       case is_language_fortran:
+      case is_language_fortran95:
 	  pips_user_warning("Last statement is not a RETURN!\n");
 	  break;
       case is_language_c:
 	/* No warning needed for C, is it right for C ?*/
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
 	break;
       default:
 	pips_assert ("This case should have been handled before", FALSE);
@@ -4294,6 +4284,7 @@ text text_named_module(
   list l = NIL;
   switch (language_tag (get_prettyprint_language ())) {
   case is_language_fortran:
+  case is_language_fortran95:
     if ( strcmp(s,"") == 0
 	 || get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
       {
@@ -4341,9 +4332,6 @@ text text_named_module(
 	  }
 	}
     break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
-    break;
   default:
     pips_assert ("This case should have been handled before", FALSE);
     break;
@@ -4358,6 +4346,7 @@ text text_named_module(
     //entity cu = module_entity_to_compilation_unit_entity(module);
     switch (language_tag (get_prettyprint_language ())) {
     case is_language_fortran:
+    case is_language_fortran95:
       MERGE_TEXTS(r, text_statement(module, 0, stat, NIL));
       break;
     case is_language_c:
@@ -4365,9 +4354,6 @@ text text_named_module(
 		  text_statement(module,
 				 (compilation_unit_p(entity_name(name)))?0:INDENTATION,
 				 stat, NIL));
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
       break;
     default:
       pips_assert ("This case should have been handled before", FALSE);

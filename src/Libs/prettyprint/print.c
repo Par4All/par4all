@@ -147,6 +147,14 @@ bool print_code_or_source(string mod_name)
 		GRAPH_FILE_EXT : "",
 		NULL));
     }
+    else if(strcmp (lang, "F95") == 0) {
+      file_ext =
+	strdup(concatenate
+	       (is_user_view? PRETTYPRINT_F95_EXT : PREDICAT_F95_EXT,
+		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+		GRAPH_FILE_EXT : "",
+		NULL));
+    }
     else
       pips_internal_error("Unknown source language\n");
 
