@@ -224,8 +224,9 @@ def main():
 	if not options.here:
 		report = ""
 		full_report = ""
-		sys.argv.append("--here")
-		sys.argv.append("--nocommand")
+		sys.argv.insert(1, "--here")
+		sys.argv.insert(1, "--nocommand")
+		debug(repr(sys.argv))
 		proc = subprocess.Popen(sys.argv, shell = False,
 			stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 		#space_re = re.compile(r"^\s*$")
