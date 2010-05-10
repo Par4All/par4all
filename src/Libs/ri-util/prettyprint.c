@@ -562,43 +562,46 @@ list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
 
   begin_attachment = STRING(CAR(pc));
 
-  if (reference_indices(obj) != NIL) {
-    if (language_tag (get_prettyprint_language ()) == is_language_fortran) {
-      int count = 0;
-      pc = CHAIN_SWORD(pc,"(");
-      FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
-	 syntax ssubscript = expression_syntax(subscript);
-	if (count>0)
-	  pc = CHAIN_SWORD(pc,",");
-	else
-	  count++;
-	if(syntax_range_p(ssubscript)) {
-	  pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript), pdl));
-	}
-	else {
-	  pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
-	}
+  if ( reference_indices(obj) != NIL ) {
+    switch ( language_tag (get_prettyprint_language ()) ) {
+      case is_language_fortran95:
+      case is_language_fortran: {
+        int count = 0;
+        pc = CHAIN_SWORD(pc,"(");
+        FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+          syntax ssubscript = expression_syntax(subscript);
+          if ( count > 0 )
+            pc = CHAIN_SWORD(pc,",");
+          else
+            count++;
+          if ( syntax_range_p(ssubscript) ) {
+            pc = gen_nconc( pc,
+                            words_subscript_range( syntax_range(ssubscript),
+                                                   pdl ) );
+          } else {
+            pc = gen_nconc( pc, words_subexpression( subscript, 0, TRUE, pdl ) );
+          }
+        }
+        pc = CHAIN_SWORD(pc,")");
+        break;
       }
-      pc = CHAIN_SWORD(pc,")");
-    }
-    else if (language_tag (get_prettyprint_language ()) == is_language_c) {
-      FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
-	syntax ssubscript = expression_syntax(subscript);
-	pc = CHAIN_SWORD(pc, "[");
-	if(syntax_range_p(ssubscript)) {
-	  pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript), pdl));
-	}
-	else {
-	  pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
-	}
-	pc = CHAIN_SWORD(pc, "]");
+      case is_language_c: {
+        FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+          syntax ssubscript = expression_syntax(subscript);
+          pc = CHAIN_SWORD(pc, "[");
+          if ( syntax_range_p(ssubscript) ) {
+            pc = gen_nconc( pc,
+                            words_subscript_range( syntax_range(ssubscript),
+                                                   pdl ) );
+          } else {
+            pc = gen_nconc( pc, words_subexpression( subscript, 0, TRUE, pdl ) );
+          }
+          pc = CHAIN_SWORD(pc, "]");
+        }
+        break;
       }
-    }
-    else if (language_tag (get_prettyprint_language ()) == is_language_fortran95) {
-      pips_assert ("Need to update F95 case", FALSE);
-    }
-    else {
-      pips_assert ("This case should have been handled before", FALSE);
+      default:
+        pips_assert ("This case should have been handled before", FALSE);
     }
   }
   attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
@@ -611,7 +614,7 @@ list words_reference(reference obj, list pdl)
 {
   return words_any_reference(obj, pdl, entity_user_name);
 }
-
+
 /* Management of alternate returns */
 
 static list set_of_labels_required_for_alternate_returns = list_undefined;
@@ -651,29 +654,29 @@ text generate_alternate_return_targets()
 
   if(!ENDP(set_of_labels_required_for_alternate_returns)) {
     list sl = NIL;
-    MAP(ENTITY, le, {
+    FOREACH(entity, le, set_of_labels_required_for_alternate_returns) {
       sentence s1 = sentence_undefined;
       string str_continue = string_undefined;
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
-	str_continue = CONTINUE_FUNCTION_NAME;
-	break;
-      case is_language_c:
-	str_continue = C_CONTINUE_FUNCTION_NAME;
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+      switch ( language_tag (get_prettyprint_language ()) ) {
+        case is_language_fortran95:
+        case is_language_fortran:
+          str_continue = CONTINUE_FUNCTION_NAME;
+          break;
+        case is_language_c:
+          str_continue = C_CONTINUE_FUNCTION_NAME;
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
       }
-      unformatted u1 = make_unformatted	(strdup(label_local_name(le)),
-					 STATEMENT_NUMBER_UNDEFINED, 0,
-					 CONS(STRING, strdup(str_continue), NIL));
+      unformatted u1 =
+          make_unformatted( strdup( label_local_name( le ) ),
+                            STATEMENT_NUMBER_UNDEFINED,
+                            0,
+                            CONS(STRING, strdup(str_continue), NIL));
       s1 = make_sentence(is_sentence_unformatted, u1);
       sl = gen_nconc(sl, CONS(SENTENCE, s1, NIL));
-    }, set_of_labels_required_for_alternate_returns);
+    }
     ral = make_text(sl);
   }
   else {
@@ -702,77 +705,79 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
     if(type_statement_p(t))
       return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
     if(value_constant_p(i)||value_symbolic_p(i)) {
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
-      case is_language_fortran95:
-	return(CHAIN_SWORD(pc, entity_user_name(f)));
-	break;
-      case is_language_c:
-	if(ENTITY_TRUE_P(f))
-	  return(CHAIN_SWORD(pc, "true"));
-	if(ENTITY_FALSE_P(f))
-	  return(CHAIN_SWORD(pc, "false"));
-	return(CHAIN_SWORD(pc, entity_user_name(f)));
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+      switch ( language_tag (get_prettyprint_language ()) ) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          return ( CHAIN_SWORD(pc, entity_user_name(f)) );
+          break;
+        case is_language_c:
+          if ( ENTITY_TRUE_P(f) )
+            return ( CHAIN_SWORD(pc, "true") );
+          if ( ENTITY_FALSE_P(f) )
+            return ( CHAIN_SWORD(pc, "false") );
+          return ( CHAIN_SWORD(pc, entity_user_name(f)) );
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
       }
     }
   }
 
-  if(type_void_p(functional_result(type_functional(call_compatible_type(entity_type(call_function(obj))))))) {
-    if(is_a_subroutine) {
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
-	pc = CHAIN_SWORD(pc, "CALL ");
-	break;
-      case is_language_c:
-	pc = CHAIN_SWORD(pc, "");
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+  type calltype = call_compatible_type(entity_type(call_function(obj)));
+  bool function_p = type_void_p(functional_result(type_functional(calltype)));
+
+  if ( function_p ) {
+    if ( is_a_subroutine ) {
+      switch ( language_tag (get_prettyprint_language ()) ) {
+        case is_language_fortran:
+          pc = CHAIN_SWORD(pc, "CALL ");
+          break;
+        case is_language_c:
+          pc = CHAIN_SWORD(pc, "");
+          break;
+        case is_language_fortran95:
+          pips_assert ("Need to update F95 case", FALSE);
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
       }
-    }
-    else {
+    } else {
       switch (language_tag (get_prettyprint_language ())) {
       case is_language_fortran:
-	pips_user_warning("subroutine '%s' used as a function.\n",
-			  entity_name(f));
-	break;
-      case is_language_c:
-	// no warning in C
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+          pips_user_warning("subroutine '%s' used as a function.\n",
+              entity_name(f));
+          break;
+        case is_language_c:
+          // no warning in C
+          break;
+        case is_language_fortran95:
+          pips_assert ("Need to update F95 case", FALSE);
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
       }
     }
   }
   else if(is_a_subroutine) {
     switch (language_tag (get_prettyprint_language ())) {
     case is_language_fortran:
-      pips_user_warning("function '%s' used as a subroutine.\n",
-			entity_name(f));
-      pc = CHAIN_SWORD(pc, "CALL ");
-      break;
-    case is_language_c:
-      // no warning in C
-      pc = CHAIN_SWORD(pc, "");
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
-    default:
-      pips_assert ("This case should have been handled before", FALSE);
-      break;
+        pips_user_warning("function '%s' used as a subroutine.\n",
+            entity_name(f));
+        pc = CHAIN_SWORD(pc, "CALL ");
+        break;
+      case is_language_c:
+        // no warning in C
+        pc = CHAIN_SWORD(pc, "");
+        break;
+      case is_language_fortran95:
+        pips_assert ("Need to update F95 case", FALSE);
+        break;
+      default:
+        pips_assert ("This case should have been handled before", FALSE);
+        break;
     }
   }
 

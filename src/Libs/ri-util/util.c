@@ -378,7 +378,7 @@ entity find_ith_parameter(entity e, int i)
 
     if (type_variable_p(tv) && storage_formal_p(sv)) {
       if (formal_offset(storage_formal(sv)) == i) {
-	return(v);
+        return(v);
       }
     }
 

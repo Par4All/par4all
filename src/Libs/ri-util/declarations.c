@@ -92,7 +92,7 @@ static list words_value(value obj)
     return(pc);
 }
 
-/* #define LIST_SEPARATOR (is_fortran? ", " : ",") */
+/** #define LIST_SEPARATOR (is_fortran? ", " : ",") */
 
 static list words_parameters(entity e, list pdl)
 {
@@ -114,63 +114,64 @@ static list words_parameters(entity e, list pdl)
     }
 
     /* If prettyprint alternate returns... Property to be added. */
-    if(get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
-       && formal_label_replacement_p(param))
+    if ( get_bool_property( "PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS" )
+        && formal_label_replacement_p( param ) ) {
       pc = CHAIN_SWORD(pc, "*");
-    else
-      {
-	if(entity_undefined_p(param))
-	  {
-	    parameter p = PARAMETER(gen_nth(i-1,functional_parameters(fe)));
-	    type t = parameter_type(p);
-	    //string pn = parameter_name(p);
-	    switch (language_tag (get_prettyprint_language ())) {
-	    case is_language_fortran:
-	      pips_user_warning("%dth parameter out of %d parameters not found for function %s\n",
-				i, nparams, entity_name(e));
-	      break;
-	    case is_language_c:
-	      /* param can be undefined for C language: void foo(void)
-		 We do not have an entity corresponding to the 1st argument */
-	      break;
-	    case is_language_fortran95:
-	      pips_assert ("Need to update F95 case", FALSE);
-	      break;
-	    default:
-	      pips_assert ("This case should have been handled before", FALSE);
-	      break;
-	    }
-	    pc = gen_nconc(pc,words_type(t, pdl));
-	    /* Should be correct, but seems useless */
-	    //if(!same_string_p(pn, "")) {
-	    //  pc = gen_nconc(pc, strdup(" "));
-	    //  pc = gen_nconc(pc, strdup(pn));
-	    //}
-	  }
-	else
-	  {
-	    type t = type_undefined;
-	    switch (language_tag (get_prettyprint_language ())) {
-	    case is_language_fortran:
-	      pc = CHAIN_SWORD(pc, entity_local_name(param));
-	      break;
-	    case is_language_c:
-	      /* We have to print variable's type, dimensions, ... with C
-		 This can be also a formal function */
-	      t = entity_type(param);
-	      pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,entity_local_name(param)), pdl));
-	      break;
-	    case is_language_fortran95:
-	      pips_assert ("Need to update F95 case", FALSE);
-	      break;
-	    default:
-	      pips_assert ("This case should have been handled before", FALSE);
-	      break;
-	    }
-	  }
+    } else if ( entity_undefined_p(param) ) {
+      parameter p = PARAMETER(gen_nth(i-1,functional_parameters(fe)));
+      type t = parameter_type(p);
+      switch ( language_tag (get_prettyprint_language ()) ) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          pips_user_warning("%dth parameter out of %d parameters not found for "
+              "function %s\n", i, nparams, entity_name(e));
+          break;
+        case is_language_c:
+          /* param can be undefined for C language: void foo(void)
+           * We do not have an entity corresponding to the 1st argument
+           */
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
       }
+      pc = gen_nconc( pc, words_type( t, pdl ) );
+      /* Should be correct, but seems useless */
+      //if(!same_string_p(pn, "")) {
+      //  pc = gen_nconc(pc, strdup(" "));
+      //  pc = gen_nconc(pc, strdup(pn));
+      //}
+    } else {
+      switch ( language_tag (get_prettyprint_language ()) ) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          /*
+           * Variable type and dimensions will be (eventually) specified
+           * in declarations
+           */
+          pc = CHAIN_SWORD(pc, entity_local_name(param));
+          break;
+        case is_language_c: {
+          /*
+           * We have to print variable's type, dimensions, ... with C
+           * This can be also a formal function
+           */
+          type t = type_undefined;
+          t = entity_type(param);
+          list entity_word = CHAIN_SWORD(NIL,entity_local_name(param));
+          pc = gen_nconc( pc,
+                          c_words_entity( t,
+                                          entity_word,
+                                          pdl ) );
+          break;
+        }
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
+      }
+    }
   }
-  return(pc);
+  return ( pc );
 }
 
 static list words_dimension(dimension obj, list pdl)
@@ -182,54 +183,58 @@ static list words_dimension(dimension obj, list pdl)
   expression e1 = expression_undefined;
   expression e2 = expression_undefined;
   int up, i;
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-    pc = words_expression(dimension_lower(obj), pdl);
-    pc = CHAIN_SWORD(pc,":");
-    pc = gen_nconc(pc, words_expression(dimension_upper(obj), pdl));
-    break;
-  case is_language_c:
-    /* The lower bound of array in C is always equal to 0,
+  switch ( language_tag (get_prettyprint_language ()) ) {
+    case is_language_fortran95:
+    case is_language_fortran:
+      pc = words_expression( dimension_lower(obj), pdl );
+      pc = CHAIN_SWORD(pc,":");
+      pc = gen_nconc( pc, words_expression( dimension_upper(obj), pdl ) );
+      break;
+    case is_language_c:
+      /* The lower bound of array in C is always equal to 0,
        we only need to print (upper dimension + 1) */
-    if (unbounded_dimension_p(obj))
-      pc = CHAIN_SWORD(pc,"");
-    else {
-      eup = dimension_upper(obj);
-      if (FALSE && expression_integer_value(eup, &up))
-	/* FI: why do you want to change the source code? Because it
-	   may no longer be the user source code after partial
-	   evaluation */
-	pc = CHAIN_IWORD(pc,up+1);
-      if(expression_constant_p(eup)
-	 && constant_int_p(expression_constant(eup))) {
-	/* To deal with partial eval generated expressions */
-	up = expression_to_int(eup);
-	pc = CHAIN_IWORD(pc,up+1);
-      }
+      if ( unbounded_dimension_p( obj ) )
+        pc = CHAIN_SWORD(pc,"");
       else {
-	if(expression_call_p(eup)) {
-	  c = syntax_call(expression_syntax(eup));
-	  f = call_function(c);
-	  if(ENTITY_MINUS_P(f)||ENTITY_MINUS_C_P(f)){
-	    e1 = binary_call_lhs(c);
-	    e2 = binary_call_rhs(c);
-	    if (expression_integer_value(e2, &i) && i==1)
-	      pc = words_expression(e1, pdl);
-	  }
-	}
-	if(pc==NIL)
-	  /* to be refined here to make more beautiful expression, use normalize ? */
-	  /* FI: why would we modify the user C source code?*/
-	  pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)), pdl);
+        eup = dimension_upper(obj);
+        if ( FALSE && expression_integer_value( eup, &up ) ) {
+          /*
+           * FI: why do you want to change the source code? Because it may no
+           * longer be the user source code after partial evaluation
+           */
+          pc = CHAIN_IWORD(pc,up+1);
+        }
+        if ( expression_constant_p( eup )
+            && constant_int_p(expression_constant(eup)) ) {
+          /* To deal with partial eval generated expressions */
+          up = expression_to_int( eup );
+          pc = CHAIN_IWORD(pc,up+1);
+        } else {
+          if ( expression_call_p( eup ) ) {
+            c = syntax_call(expression_syntax(eup));
+            f = call_function(c);
+            if ( ENTITY_MINUS_P(f) || ENTITY_MINUS_C_P(f) ) {
+              e1 = binary_call_lhs(c);
+              e2 = binary_call_rhs(c);
+              if ( expression_integer_value( e2, &i ) && i == 1 )
+                pc = words_expression( e1, pdl );
+            }
+          }
+          if ( pc == NIL ) {
+            /* to be refined here to make more beautiful expression,
+             * use normalize ? FI: why would we modify the user C source code?
+             */
+            pc = words_expression( MakeBinaryCall( CreateIntrinsic( "+" ),
+                                                   eup,
+                                                   int_to_expression( 1 ) ),
+                                   pdl );
+          }
+        }
       }
-    }
-    break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
   }
   return(pc);
 }
