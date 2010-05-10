@@ -20,7 +20,7 @@ Chains
 Rice
 Ricedg
 CoarseGrainParallelization
-PHRASE
+#PHRASE # out as not maintained, 2010-05-10 FC
 Callgraph
 # Transformations, using PIPS initial default options
 Transformations
