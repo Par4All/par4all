@@ -3848,7 +3848,11 @@ instruction gfc2pips_code2instruction_( gfc_code* c ) {
       break;
     }
     case EXEC_DT_END:
-      pips_user_warning("DT_END has been encounter ! Ignoring it !\n");
+      /*
+       * This is normal end of recursion when handling data parameter for
+       * READ and WRITE statement. We have handle the data previously in
+       * EXEC_TRANSFER.
+       */
       break;
 
     case EXEC_OMP_ATOMIC:
