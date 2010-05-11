@@ -1202,20 +1202,33 @@ static void do_outliner_smart_replacment(reference r, ocontext_t * ctxt)
 {
     if(same_entity_p(ctxt->old,reference_variable(r)))
     {
-        reference_variable(r)=ctxt->new;
         size_t nb_dims = ctxt->nb_dims;
-        while (nb_dims--) POP(reference_indices(r)); /*SG:that's a leak ! */
+        list indices = reference_indices(r);
+        while (nb_dims--) POP(indices); 
+        indices=gen_full_copy_list(indices);
         if(basic_pointer_p(entity_basic(ctxt->new))) /*sg:may cause issues if basic_pointer_p(old) ? */
         {
             expression parent = (expression)gen_get_ancestor(expression_domain,r);
             pips_assert("parent exist",parent);
-            unnormalize_expression(parent);
-            expression_syntax(parent)=make_syntax_call(
-                    make_call(
-                        entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                        make_expression_list(copy_expression(parent))
-                        )
-                    );
+            free_syntax(expression_syntax(parent));
+            if(!ENDP(indices))
+                expression_syntax(parent)=
+                    make_syntax_subscript(
+                            make_subscript(
+                                MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(ctxt->new)),
+                                indices)
+                            );
+            else
+                expression_syntax(parent)=
+                    make_syntax_call(
+                            make_call(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),make_expression_list(entity_to_expression(ctxt->new)))
+                            );
+
+        }
+        else {
+            reference_variable(r)=ctxt->new;
+            gen_full_free_list(reference_indices(r));
+            reference_indices(r)=indices;
         }
     }
 }
@@ -1306,9 +1319,11 @@ static hash_table outliner_smart_references_computation(list referenced_entities
 
                 /* compute new dimensions */
                 list new_dimensions = NIL;
-                for(list iter = new_dimensions;!ENDP(iter);POP(iter))
+                size_t count_dims = 0;
+                for(list iter = entity_dimensions;!ENDP(iter);POP(iter))
                 {
-                    if(nb_constant_indices==nb_constant_indices) { new_dimensions=gen_full_copy_list(CDR(iter)); }
+                    ++count_dims;
+                    if(count_dims==nb_constant_indices) { new_dimensions=gen_full_copy_list(CDR(iter));break; }
                 }
 
 
@@ -1320,8 +1335,9 @@ static hash_table outliner_smart_references_computation(list referenced_entities
                     type new_type = make_type_variable(
                             make_variable(
                                 copy_basic(entity_basic(e)),
-                                gen_full_copy_list(variable_qualifiers(type_variable(entity_type(e)))),
-                                new_dimensions)
+                                new_dimensions,
+                                gen_full_copy_list(variable_qualifiers(type_variable(entity_type(e))))
+                                )
                             );
                     new_basic=make_basic_pointer(new_type);
                 }
@@ -1640,7 +1656,7 @@ outline(char* module_name)
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
  	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
- 	set_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE));
+ 	set_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
 
     /* retrieve name of the outiled module */
     string outline_module_name = get_string_property_or_ask("OUTLINE_MODULE_NAME","outline module name ?\n");

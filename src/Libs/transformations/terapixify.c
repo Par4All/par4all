@@ -1597,15 +1597,21 @@ void make_pointer_from_variable(variable param)
                             )
                         );
                 variable_basic(param)=new_parameter_basic;
-            } break;
+            }
+            break;
 
     }
+}
+
+static void make_pointer_from_all_variable(void* obj)
+{
+    gen_recurse(obj,variable_domain,gen_true,make_pointer_from_variable);
 }
 static
 void make_pointer_entity_from_reference_entity(entity e)
 {
     variable param = type_variable(entity_type(e));
-    make_pointer_from_variable(param);
+    make_pointer_from_all_variable(param);
 }
 
 static void
@@ -1652,7 +1658,7 @@ bool array_to_pointer(char *module_name)
                 expression_domain,expression_array_to_pointer,gen_null,
                 statement_domain,declaration_array_to_pointer,gen_null,
                 NULL);
-        /* now fix array declarations : one dimension for every one ! */
+        /* now fix array declarations : one dimension for everyone ! */
         gen_recurse(get_current_module_statement(),statement_domain,gen_true,reduce_array_declaration_dimension);
 
         /* eventually change the signature of the module
@@ -1670,7 +1676,7 @@ bool array_to_pointer(char *module_name)
                 if(dummy_identifier_p(d))
                     make_pointer_entity_from_reference_entity(dummy_identifier(d));
                 type t = parameter_type(p);
-                make_pointer_from_variable(type_variable(t));
+                make_pointer_from_all_variable(t);
             }
         }
 
