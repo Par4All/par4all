@@ -1,12 +1,15 @@
 # $Id$
 #
 # TODO
-# * timeout
 # * *.f95 for gfc2pips
 
 # pips exes
 TPIPS	= tpips
 PIPS	= pips
+
+# 10 minutes default timeout
+# use 0 for no timeout
+TIMEOUT	= 600
 
 # default output file
 # this can be modified to generate separate files
@@ -48,11 +51,13 @@ FLT	= sed -e 's,$(here),$$VDIR,g'
 RESULTS	= failed
 
 SHELL	= /bin/bash
-PF	= set -o pipefail ; export PIPS_MORE=cat
+PF	= set -o pipefail ; export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT)
 
 # extract validation result for summary
 OK	= status=$$? ; \
-	  if [ "$$status" != 0 ] ; then \
+	  if [ "$$status" -eq 134 ] ; then \
+	     echo "timeout: $(SUBDIR)/$*" ; \
+	  elif [ "$$status" != 0 ] ; then \
 	     echo "failed: $(SUBDIR)/$*" ; \
 	  elif [ $$(svn diff $@ | wc -l) -ne 0 ] ; then \
 	     echo "changed: $(SUBDIR)/$*" ; \
@@ -89,6 +94,7 @@ unvalidate:
 	svn revert $(F.valid)
 
 # generate "out" files
+# ??? does not work because of "svn diff"?
 validate-out:
 	$(MAKE) TEST=out validate-dir
 
