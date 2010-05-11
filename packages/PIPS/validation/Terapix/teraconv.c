@@ -1,3 +1,4 @@
+#include <stdio.h>
 void convol();
 #define kernel_size 3
 #define image_size 512

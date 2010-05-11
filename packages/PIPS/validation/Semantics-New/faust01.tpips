@@ -6,7 +6,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 create faust01 faust01.c 
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 
 
 echo

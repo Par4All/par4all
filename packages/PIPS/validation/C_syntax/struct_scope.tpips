@@ -3,7 +3,7 @@ create struct_scope struct_scope.c
 
 activate C_PARSER
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 display PRINTED_FILE[%ALL]

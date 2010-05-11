@@ -2,7 +2,7 @@ delete ptr_to_field
 create ptr_to_field ptr_to_field.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE

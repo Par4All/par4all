@@ -6,7 +6,7 @@ create dereference dereference.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 

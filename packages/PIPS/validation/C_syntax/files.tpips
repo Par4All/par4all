@@ -9,7 +9,7 @@ create files files/file1.c files/file2.c files/file3.c
 
 activate C_PARSER
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo

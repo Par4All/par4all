@@ -2,7 +2,7 @@ delete bit_field
 
 create bit_field bit_field.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER

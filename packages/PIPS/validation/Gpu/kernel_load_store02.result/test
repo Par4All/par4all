@@ -1,0 +1,63 @@
+void give()
+{
+   int k;
+   double array[N];
+
+   p4a_kernel_launcher_0(N, array, &k);
+
+   exit(k);
+}
+void p4a_kernel_0(int N, double array[N], int k)
+{
+   array[k] = 0;
+}
+void p4a_kernel_launcher_0(int N, double array[N], int *k)
+{
+
+   for(k = 0; k <= 99; k += 1)
+      // To be assigned to a call to P4A_vp_0: k
+      p4a_kernel_wrapper_0(N, array, *k);
+}
+void p4a_kernel_wrapper_0(int N, double array[N], int k)
+{
+   // To be assigned to a call to P4A_vp_0: k
+   p4a_kernel_0(N, array, k);
+}
+[after unsplit and recovering]
+/*
+ * file for kernel_load_store02.c
+ */
+/* Test kernel_load_store on a scalar modification.
+*/
+
+#include <stdlib.h>
+enum {N=100};
+
+extern void give();
+//PIPS generated variable
+void p4a_kernel_0(int N, double array[N], int k), p4a_kernel_wrapper_0(int N, double array[N], int k), p4a_kernel_launcher_0(int N, double array[N], int *k);
+void p4a_kernel_launcher_0(int N, double array[N], int *k)
+{
+
+   for(*k = 0; *k <= 99; *k += 1)
+      // To be assigned to a call to P4A_vp_0: k
+      p4a_kernel_wrapper_0(N, array, *k);
+}
+void p4a_kernel_wrapper_0(int N, double array[N], int k)
+{
+   // To be assigned to a call to P4A_vp_0: k
+   p4a_kernel_0(N, array, k);
+}
+void p4a_kernel_0(int N, double array[N], int k)
+{
+   array[k] = 0;
+}
+void give()
+{
+   int k;
+   double array[N];
+
+   p4a_kernel_launcher_0(N, array, &k);
+
+   exit(k);
+}

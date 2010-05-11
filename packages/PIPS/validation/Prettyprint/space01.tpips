@@ -7,7 +7,7 @@ create space01 space01.c
 
 activate C_PARSER
 activate C_SYMBOL_TABLE
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
@@ -24,7 +24,7 @@ create space01 space01.c
 
 activate C_PARSER
 activate C_SYMBOL_TABLE
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PRETTYPRINT_LISTS_WITH_SPACES FALSE
 

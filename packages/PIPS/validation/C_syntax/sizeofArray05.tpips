@@ -3,7 +3,7 @@ delete sizeofArray05
 create sizeofArray05 sizeofArray05.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 

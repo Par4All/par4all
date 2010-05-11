@@ -26,7 +26,7 @@ create tpips ${PIPS_ROOT}/src/Passes/tpips/tpips.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 activate C_PARSER
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 7

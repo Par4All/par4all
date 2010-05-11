@@ -2,7 +2,7 @@ delete main_abc
 create main_abc main_abc.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER

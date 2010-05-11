@@ -1,0 +1,136 @@
+Create the workspace from the files to parallelize
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+void compute(float_t space[501][501], float_t save[501][501])
+{
+   int t;
+   
+   /* Apply the relaxation T times: */
+   for(t = 0; t <= 399; t += 1)
+      iteration(space, save);
+}
+void get_data(char filename[])
+{
+   int i, j, nx, ny;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "r"))==(void *) 0) {
+      perror("Error loading file");
+      exit(0);
+   }
+   
+   /* Get *.pgm file type */
+   c = fgetc(fp);
+   c = fgetc(fp);
+   do {
+      while ((c = fgetc(fp))!='\n') 
+         ;
+   }
+   while ((c = fgetc(fp))=='#');
+   
+   /* Put back good char */
+   ungetc(c, fp);
+   
+   /* Get image dimensions */
+   fscanf(fp, "%d %d\n", &nx, &ny);
+   /* Get grey levels */
+   fscanf(fp, "%d", &i);
+   /* Get ONE carriage return */
+   fgetc(fp);
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
+   
+   /* Erase the memory, in case the image is not big enough: */
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 500; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 500; j += 1)
+         space[i][j] = 0;
+   
+   /* Read the pixel grey value: */
+   for(j = 0; j <= ny-1; j += 1)
+      for(i = 0; i <= nx-1; i += 1) {
+         c = fgetc(fp);
+         /* Truncate the image if too big: */
+         if (i<501&&j<501) 
+            space[i][j] = c;
+      }
+
+   fclose(fp);
+}
+void iteration(float_t space[501][501], float_t save[501][501])
+{
+   int i, j;
+   
+   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 499; i += 1)
+#pragma omp parallel for
+      for(j = 1; j <= 499; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+
+#pragma omp parallel for private(j)
+   for(i = 1; i <= 499; i += 1)
+#pragma omp parallel for
+      for(j = 1; j <= 499; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+int main(int argc, char *argv[])
+{
+   int i;
+
+   if (argc!=2) {
+      
+      
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);
+      exit(0);
+   }
+   get_data(argv[1]);
+   
+   /* Initialize the border of the destination image, since it is used but
+        never written to: */
+   for(i = 0; i <= 500; i += 1)
+      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;
+
+   compute(space, save);
+
+   write_data("output.pgm");
+
+   return 0;
+}
+void write_data(char filename[])
+{
+   int i, j;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "w"))==(void *) 0) {
+      perror("Error opening file");
+      exit(0);
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);
+
+   for(j = 0; j <= 500; j += 1)
+      for(i = 0; i <= 500; i += 1) {
+         c = space[i][j];
+         fputc(c, fp);
+      }
+   fclose(fp);
+}
+Regenerate the sources from the PIPS transformed code:
+

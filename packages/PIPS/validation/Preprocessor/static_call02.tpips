@@ -7,7 +7,7 @@ create static_call02 static_call02/static_call02.c static_call02/bar.c static_ca
 
 activate C_PARSER
 activate C_SYMBOL_TABLE
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo

@@ -89,7 +89,6 @@ INITIAL_PRECONDITION[pointer03] (add_or_kill_equivalenced_variables) storage ret
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer03 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[pointer03] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[pointer03] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 PRINT_CODE_TRANSFORMERS[pointer03] (add_or_kill_equivalenced_variables) storage return
 PRECONDITIONS_INTER_FULL[pointer03] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[pointer03] (add_or_kill_equivalenced_variables) storage return

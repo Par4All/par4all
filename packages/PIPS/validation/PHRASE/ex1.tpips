@@ -5,7 +5,7 @@ setpreoperty ABORT_ON_USER_ERROR TRUE
 create ex1 ex1.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 # Since the for loops are not dealt yet:

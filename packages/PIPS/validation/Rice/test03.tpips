@@ -14,7 +14,7 @@ activate C_PARSER
 
 echo Prettyprint the source as C, of course
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 
 echo Do not display original number lines as comment:
 

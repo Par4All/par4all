@@ -2,7 +2,7 @@ delete externalloc10
 create externalloc10 externalloc10/bar.c externalloc10/foo.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_SYMBOL_TABLE

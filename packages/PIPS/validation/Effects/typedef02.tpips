@@ -2,7 +2,7 @@ delete typedef02
 create typedef02 typedef02.c
 module main
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 apply FOR_LOOP_TO_DO_LOOP[compute]
 apply FOR_LOOP_TO_DO_LOOP[main]

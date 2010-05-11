@@ -24,6 +24,8 @@ void kernel(int i, int j, int bar[256][256])
 kernel:   bar[i][j] = i*j;
 }
 extern void foo(int bar[256][256]);
+//PIPS generated variable
+void kernel(int i, int j, int bar[256][256]);
 
 unsplit
 

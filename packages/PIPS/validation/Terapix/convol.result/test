@@ -124,7 +124,7 @@ l99996:
                   for(kj = 0; kj <= 2; kj += 1)
                      
                      
-                     new_image[i_1][j] = new_image[i_1][j]+image[i_1+ki-1][j+kj-1]*kernel[ki][kj];
+                     new_image[i_1][j] = new_image[i_1][j]+image[ki+i_1-1][kj+j-1]*kernel[ki][kj];
                new_image[i_1][j] = new_image[i_1][j]/9;
             }
          }
@@ -155,7 +155,7 @@ l99996:
                   for(kj = 0; kj <= 2; kj += 1)
                      
                      
-                     __scalar__0 = __scalar__0+image[i_1+ki-1][j+kj-1]*kernel[ki][kj];
+                     __scalar__0 = __scalar__0+image[ki+i_1-1][kj+j-1]*kernel[ki][kj];
                __scalar__0 = __scalar__0/9;
             }
             new_image[i_1][j] = __scalar__0;
@@ -187,7 +187,7 @@ l99996:
                   for(kj = 0; kj <= 2; kj += 1)
                      
                      
-                     __scalar__0 = __scalar__0+image[j+kj-1+isj*(i_1+ki-1)]*kernel[3*ki+kj];
+                     __scalar__0 = __scalar__0+image[kj+j-1+isj*(ki+i_1-1)]*kernel[3*ki+kj];
                __scalar__0 = __scalar__0/9;
             }
             new_image[j+isj*i_1] = __scalar__0;

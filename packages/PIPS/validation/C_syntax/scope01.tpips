@@ -6,7 +6,7 @@ create scope01 scope01/scope01_a.c  scope01/scope01_b.c
 
 activate C_PARSER
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo

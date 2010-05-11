@@ -106,12 +106,12 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
                   fgINT32 value0 = result;                              /*0077*/
                   {
                      //PIPS generated variable
-                     fgINT32 *array0 = array0;                          /*0080*/
+                     fgINT32 *array1 = array0;                          /*0080*/
                      //PIPS generated variable
-                     int pos0 = pos0;                                   /*0082*/
+                     int pos1 = pos0;                                   /*0082*/
                      //PIPS generated variable
-                     fgINT32 value0 = value0;                           /*0084*/
-                     array0[pos0] = value0;                             /*0085*/
+                     fgINT32 value1 = value0;                           /*0084*/
+                     array1[pos1] = value1;                             /*0085*/
                      /*0034*/
                      ;
                   }

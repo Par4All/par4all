@@ -11,7 +11,7 @@ create fulguro02 fulguro02.c
 activate C_PARSER
 activate C_SYMBOL_TABLE
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 #setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
