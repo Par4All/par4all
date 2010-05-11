@@ -1,0 +1,60 @@
+
+Source code before loop interchange
+
+!     Bug: make sure that labels 100, 200 and 300 are properly regenerated.
+
+      PROGRAM LOOP_INTERCHANGE06
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER NUM
+      PARAMETER(NUM=50)
+      INTEGER  I,J, K
+      REAL     A(1:NUM,1:NUM,1:NUM), B(1:NUM,1:NUM,1:NUM),
+     &     C(1:NUM,1:NUM,1:NUM)
+      REAL X
+
+      A = 0                                                             0014
+      B = 0                                                             0015
+      C = 0                                                             0016
+
+      DO 300 I = 1, NUM                                                 0018
+         DO 200 J = 1, NUM                                              0019
+            DO 100 K = 1, NUM                                           0020
+               IF (X.GT.0.) GOTO 100                                    0021
+               C(K,J,I) = C(K,J,I)+A(K,J,I)*B(K,J,I)                    0022
+100            CONTINUE                                                 0023
+200         CONTINUE                                                    0024
+300      CONTINUE                                                       0025
+
+      END
+
+Source code after loop interchange
+
+!     Bug: make sure that labels 100, 200 and 300 are properly regenerated.
+
+      PROGRAM LOOP_INTERCHANGE06
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER NUM
+      PARAMETER(NUM=50)
+      INTEGER  I,J, K
+      REAL     A(1:NUM,1:NUM,1:NUM), B(1:NUM,1:NUM,1:NUM),
+     &     C(1:NUM,1:NUM,1:NUM)
+      REAL X
+
+      A = 0                                                             0014
+      B = 0                                                             0015
+      C = 0                                                             0016
+
+      DO 300 Ip = 1, 50                                                 0018
+         DO 200 Jp = 1, 50                                              0019
+            DO 100 Kp = 1, 50                                           0020
+               IF (X.GT.0.) GOTO 100                                    0021
+               C(K,J,I) = C(K,J,I)+A(K,J,I)*B(K,J,I)                    0022
+100            CONTINUE                                                 0023
+200            CONTINUE
+300            CONTINUE
+
+      END
