@@ -32,6 +32,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
+#include <unistd.h>
+
+#include "genC.h"
+#include "misc.h"
 
 extern void checkpoint_workspace(void); /* in pipsmake */
 extern void interrupt_pipsmake_asap(void); /* in pipsdbm */
@@ -72,12 +76,70 @@ static void pips_signal_handler(int num)
     (void) signal(num, pips_signal_handler);
 }
 
+extern void set_pips_timeout_from_env(void);
+
 void initialize_signal_catcher(void)
 {
+    // misc signals
     (void) signal(SIGINT,  pips_signal_handler);
     (void) signal(SIGHUP,  pips_signal_handler);
     (void) signal(SIGTERM, pips_signal_handler);
 
     (void) signal(SIGUSR1, pips_signal_handler);
     (void) signal(SIGUSR2, pips_signal_handler);
+
+    // timeout handling
+    set_pips_timeout_from_env();
+}
+
+/* keep track of current timeout
+ */
+static unsigned int pips_timeout_delay;
+
+/* exit on timeout
+ */
+static void pips_timeout_handler(int __attribute__ ((__unused__)) sig)
+{
+  pips_internal_error("pips timeout of %d seconds reached\n", pips_timeout_delay);
+  exit(1);
+}
+
+/* set pips timeout on delay
+ */
+void set_pips_timeout(unsigned int delay)
+{
+  if (delay>0) {
+    pips_timeout_delay = delay;
+    struct sigaction act;
+    act.sa_handler = pips_timeout_handler;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+    sigaction(SIGALRM, &act, NULL);
+    alarm(delay);
+ }
+}
+
+/* set pips timeout using PIPS_TIMEOUT environment variable
+ */
+void set_pips_timeout_from_env(void)
+{
+  string sdelay = getenv("PIPS_TIMEOUT");
+  if (sdelay) {
+    unsigned int delay = atoi(sdelay);
+    set_pips_timeout(delay);
+  }
+}
+
+/* delete current pips timeout settings
+ */
+void reset_pips_timeout(void)
+{
+  // cleanup alarm
+  pips_timeout_delay = 0;
+  struct sigaction act;
+  act.sa_handler = SIG_DFL;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = 0;
+  sigaction(SIGALRM, &act, NULL);
+  alarm(0); 
 }
