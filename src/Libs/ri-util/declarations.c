@@ -1503,6 +1503,23 @@ void check_fortran_declaration_dependencies(list ldecl)
 }
 
 /********************************************************** ALL DECLARATIONS */
+/**
+   @brief do some specific prettyprinting choise according to the fortran
+   version
+ **/
+static list f77_f95_style_management (list prev, string str, bool space_p) {
+  list result = NIL;
+  if (prev == NIL) {
+    result = CHAIN_SWORD(prev, str);
+    if (prettyprint_language_is_fortran95_p ()) {
+      result = CHAIN_SWORD(result, ":: ");
+    }
+  }
+  else {
+    result = CHAIN_SWORD(prev, space_p? ", " : ",");
+  }
+  return result;
+}
 
 static text text_entity_declaration(entity module,
 				    list /* of entity */ ldecl,
@@ -1554,8 +1571,7 @@ static text text_entity_declaration(entity module,
   FOREACH(ENTITY, e,ldecl)
     {
       type te = entity_type(e);
-      bool func =
-	type_functional_p(te) && storage_rom_p(entity_storage(e));
+      bool func = type_functional_p(te) && storage_rom_p(entity_storage(e));
       value v = entity_initial(e);
       bool param = func && value_symbolic_p(v);
       bool external =     /* subroutines won't be declared */
@@ -1593,9 +1609,9 @@ static text text_entity_declaration(entity module,
       if (skip_it)
 	{
 	  pips_debug(5, "skipping function %s\n", entity_name(e));
-  } else if ( entity_f95use_p(e) ) {
-    uses = CONS(SENTENCE, sentence_f95use_declaration(e), uses);
-  }
+	} else if ( entity_f95use_p(e) ) {
+	uses = CONS(SENTENCE, sentence_f95use_declaration(e), uses);
+      }
       else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
 	{
 	  pips_debug(5, "skipping entity %s\n", entity_name(e));
@@ -1663,7 +1679,7 @@ static text text_entity_declaration(entity module,
 
 		    default: pips_internal_error("Unexpected integer size");
 		    }
-		  *ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : space_p? ", " : ",");
+		  *ppi = f77_f95_style_management (*ppi, s, space_p);
 		  *ppi = gen_nconc(*ppi, words_declaration(e, pp_dim, pdl));
 		}
 	      else
@@ -1686,7 +1702,7 @@ static text text_entity_declaration(entity module,
 		      break;
 		    default: pips_internal_error("Unexpected integer size");
 		    }
-		  *pph = CHAIN_SWORD(*pph, *pph==NIL ? s : (space_p? ", " : ","));
+		  *pph = f77_f95_style_management (*pph, s, space_p);
 		  *pph = gen_nconc(*pph, words_declaration(e, pp_dim, pdl));
 		}
 	      break;
