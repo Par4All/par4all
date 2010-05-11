@@ -259,11 +259,11 @@ list words_declaration(entity e,
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   /* UGLY (temporary) HACK FOR ALLOCATABLE */
-  if(allocatable_area_p(ram_section(storage_ram(entity_storage(e))))) {
-    pips_assert("Allocatable are handled in Fortran95 only...",
-                get_prettyprint_language_tag() == is_language_fortran95);
-
-    pl = CHAIN_SWORD(pl, ", ALLOCATABLE :: ");
+  if (is_language_fortran95 == get_prettyprint_language_tag( )
+      && storage_ram_p(entity_storage(e))) {
+    if(allocatable_area_p(ram_section(storage_ram(entity_storage(e))))) {
+      pl = CHAIN_SWORD(pl, ", ALLOCATABLE :: ");
+    }
   }
 
   pl = CHAIN_SWORD(pl, entity_user_name(e));
@@ -1685,7 +1685,8 @@ static text text_entity_declaration(entity module,
 
 		    default: pips_internal_error("Unexpected integer size");
 		    }
-		  *ppi = f77_f95_style_management (*ppi, s, space_p);
+//		  *ppi = f77_f95_style_management (*ppi, s, space_p);
+      *ppi = CHAIN_SWORD(*ppi, *ppi==NULL ? s : (space_p? ", " : ","));
 		  *ppi = gen_nconc(*ppi, words_declaration(e, pp_dim, pdl));
 		}
 	      else
@@ -1708,7 +1709,8 @@ static text text_entity_declaration(entity module,
 		      break;
 		    default: pips_internal_error("Unexpected integer size");
 		    }
-		  *pph = f77_f95_style_management (*pph, s, space_p);
+//		  *pph = f77_f95_style_management (*pph, s, space_p);
+      *pph = CHAIN_SWORD(*pph, *pph==NULL ? s : (space_p? ", " : ","));
 		  *pph = gen_nconc(*pph, words_declaration(e, pp_dim, pdl));
 		}
 	      break;
