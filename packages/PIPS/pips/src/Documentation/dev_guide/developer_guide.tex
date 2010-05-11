@@ -27,13 +27,15 @@
 \usepackage[latin9]{inputenc}
 \usepackage[backref,pagebackref]{hyperref}
 \makeatletter
+
 % Test for a TeX4ht command:
-%%\@ifundefined{HCode}{%
-%%  % We are generating PDF, so allow to break down URL:
-%%  \usepackage{breakurl}}{%
-%%  % else we are generating HTML with TeX4ht, use plain url:
-%%  \usepackage{url}}
-\usepackage{url}
+\@ifundefined{HCode}{%
+  % We are generating PDF, so allow to break down URL which is nicer
+  % instead of ugly line overflows:
+  \usepackage{breakurl}}{%
+  % else we are generating HTML with TeX4ht, use plain url:
+  \usepackage{url}}
+
 \usepackage{xspace,makeidx}
 \usepackage{wasysym}
 
@@ -54,6 +56,9 @@
 \newcommand{\PipsNewWWW}{\LINK{https://freia.enstb.org/pips}\xspace}
 \newcommand{\PipsDevGuidePDF}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc/developer_guide.pdf}}
 \newcommand{\PipsDevGuideHTDOC}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc}}
+% The PDF is indeed into the dev guide directory...
+\newcommand{\PipsAutotoolsGuidePDF}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc/auto_pips.pdf}}
+\newcommand{\PipsAutotoolsGuideHTDOC}{\LINK{http://www.cri.ensmp.fr/pips/auto_pips.htdoc}}
 \newcommand{\DoxygenSources}{\LINK{https://freia.enstb.org/pips/source}}
 
 \title{{\Huge PIPS} \\ ~ \\ Developer Guide}
@@ -74,7 +79,7 @@
   \emph{... and so many other contributors...}
 }
 
-\date{August 1996 - July 2009}
+\date{August 1996 - June 2010}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -93,9 +98,10 @@
 
 You can get a printable version of this document on\\
 \PipsDevGuidePDF and a HTML version on \PipsDevGuideHTDOC. Warning if you
-use the HTML version and do some copy/paste" it has been noticed that some
-characters are changes, such as the \verb|'| that should be a simple plain
-quote but is changed in something else...
+use the HTML version and do some copy/paste, it has been noticed that some
+characters are changed, such as the \verb|'| that should be a simple plain
+quote but is changed in something else that looks like a normal quote but
+is not a normal quote...
 
 The legacy WWW site is at \PipsOldWWW and a new one is at \PipsNewWWW.
 
@@ -154,7 +160,7 @@ advised for best subversion practices:
   the software for each developer. Developments are to be performed
   here and installed (joined, merged) once finished into \texttt{trunk};
 \item[tags] tagged revisions. Note these tags are not related with the
-  tags described in section~\ref{subsec:tags}.
+  tags described in section~\ref{sec:using-tags}.
 \end{description}
 
 Moreover the \texttt{pips} repository includes
@@ -293,7 +299,9 @@ AUCTeX, PreviewLaTeX and RefTeX mode are quite useful.
 Many macros and functions are available from the Linear and NewGen
 libraries, but also in PIPS. Their source code can be retrieved using the
 \emph{tags} indexing mechanism under editors such as \textbf{emacs} or
-\textbf{vi}.
+\textbf{vi}. You should notice that this notion of tags is unrelated to
+the tags in a version control systems as exposed in
+\S~\ref{sec:full-branch}.
 
 So the PIPS makefiles can generate tags index files to find the definition
 of symbols in the source files with your favorite editor and it is highly
@@ -458,6 +466,8 @@ sh> svn commit my-branch-name
 sh> cd my-branch-name
 sh> svn merge https://svn.cri.ensmp.fr/svn/pips/trunk
 # do the merging into the branch working copy
+# consider options -x -b or -x -w
+# to ignore space-related changes
 sh> svn commit
 \end{verbatim}
   }
@@ -467,6 +477,8 @@ sh> svn commit
 \begin{verbatim}
 sh> cd my-branch-name
 sh> svn merge ^/trunk
+# consider options -x -b or -x -w
+# to ignore space-related changes
 sh> svn commit
 \end{verbatim}
   }
@@ -513,6 +525,8 @@ sh> svn mergeinfo \
 sh> svn merge \
   https://svn.cri.ensmp.fr/svn/pips/branches/calvin/my-branch-name \
   --reintegrate
+# consider options -x -b or -x -w
+# to ignore space-related changes
 sh> svn commit
 \end{verbatim}
   }
@@ -632,16 +646,22 @@ So if you want to modify the \emph{Makefile} infrastructure, modify
 the \texttt{makes} directory and commit. It will be committed into the
 \texttt{svn/nlpmake/trunk} repository anyway.
 
+There is also another more modern build infrastructure you may use instead
+of this one that is described in the companion document of this one that
+describes the new \texttt{autotools} build infrastructure:
+\PipsAutotoolsGuidePDF{} and \PipsAutotoolsGuideHTDOC{}
+
+
 \subsection{The nomadic developer}
 \label{sec:nomadic}
 
-The SVN centralized development model assumes that you are connected
-to the repository. If you are stuck in a train between Paris
-and Brest (in the very far west), you may find it inconvenient not to
-be able to access the repository history and other details about
-previous commits, especially if the current version is broken.
-In order to help preventing this situation anyway, PIPS is checked
-every minute and possibly fully recompiled.
+The SVN centralized development model assumes that you are connected to
+the repository. If you are stuck in a train between Paris and Brest (in
+the very far west of France \smiley), you may find it inconvenient not to
+be able to access the repository history and other details about previous
+commits, especially if the current version is broken.  In order to help
+preventing this situation anyway, PIPS is checked every minute and
+possibly fully recompiled.
 
 So if you are Ronan, consider using \texttt{git-svn} or \texttt{svk}
 to have full copy of your branch or of the trunk on your laptop. Then
@@ -1255,7 +1275,7 @@ Useful targets defined:
 \item[clean:] clean up the project directories;
 \item[local-clean:] remove eventually some stuff in the current directory;
 \item[tags:] build the TAGS index files of identifiers found in the
-  subdirectories (see~\ref{subsec:tags} for more precision and other
+  subdirectories (see~\ref{sec:using-tags} for more precision and other
   specific targets);
 \item[unbuild:] clean up things: generated directories are removed;
 \item[rebuild:] unbuild then build;
@@ -1357,6 +1377,7 @@ standard error output. But if you want to have \texttt{make} stopping on
 the first error to help debugging, just add \verb|FWD_STOP_ON_ERROR=1| to
 the \texttt{make} invocation.
 
+
 \section{Validation}
 \label{sec:validation}
 
@@ -1408,6 +1429,7 @@ directory, which has very convenient targets including \texttt{validate
 accept clean}.  Using this approach does not require the validation
 directory to be under \texttt{\$PIPS\_ROOT}.
 
+
 \subsection{Validation makefile}
 \label{sec:validation-makefile}
 
@@ -1435,12 +1457,13 @@ make TARGET=LoopRecovering validate
 The \texttt{VOPT} \texttt{make} variable can be used to pass and modify
 default options for the validation.
 
+
 \subsection{Validation output}
 \label{sec:validation-output}
 
 As an output the make validate creates a RESULTS directory. This directory contains:
 a \texttt{SUMMARY} file, and 3 different file types (\texttt{.err}, \texttt{.diff} and
-\texttt{.out}). Those files are named using the following rule : FolderName\_TestCaseName.xxx
+\texttt{.out}). Those files are named using the following rule : \texttt{FolderName\_TestCaseName.xxx}
 
 \begin{itemize}
 \item Obviusly the \texttt{SUMMARY} file contains a summary of the previous validation.
@@ -1450,6 +1473,7 @@ a \texttt{SUMMARY} file, and 3 different file types (\texttt{.err}, \texttt{.dif
 \item \texttt{FolderName\_TestCaseName.out} contains the stdout of the test case
   named TestCaseName that you can find in the folder named FolderName.
 \end{itemize}
+
 
 \subsection{Validation scripts}
 \label{sec:validation-scripts}
@@ -1593,6 +1617,7 @@ PIPS_GRAPHICAL_DIFF=pips_emacs_diff pips_manual_accept --new
 %%  documentation here are welcome!
 %%\end{itemize}
 
+
 \subsubsection{Filtering}
 \label{sec:filtering}
 
@@ -1616,6 +1641,7 @@ PIPS_GRAPHICAL_DIFF=pips_emacs_diff pips_manual_accept --new
   \end{enumerate}
   A filter has to be a shell script getting an input file as its first
   parameter and printing the filtered file to the standard output.
+
 
 \subsubsection{Writing test cases and their validation scripts}
 \label{sec:writing-a-validation-script}
@@ -1724,6 +1750,7 @@ could be parallelized. This implies that scripts remains as
 independent as possible of each other. They shoud not use file names
 such as \verb/a.out/.
 
+
 \section{Parallel Validation}
 \label{sec:par-validate}
 
@@ -1745,11 +1772,13 @@ parallel. The typical (very short) \texttt{Makefile} is:
   include ../validate.mk
 \end{verbatim}
 
+
 \subsection{Intra-directory parallel validation}
 
 For the \textbf{intra}-directory parallel validation, all validation
-scripts must be \textbf{without any side effects}, that is temporary
-files must be fully isolated from those generated by other scripts.
+scripts must be \textbf{without any side effects} that may interact with
+other scripts, for example that temporary files should be fully isolated
+from those generated by other scripts.
 %%
 To run an intra-directory parallel validation:
 \begin{verbatim}
@@ -1781,6 +1810,7 @@ One can also run just one specific test:
   sh> make TEST_CASE.result/test
 \end{verbatim}
 
+
 \subsection{Inter-directory parallel validation}
 
 For the \textbf{inter}-directory parallel validation, on defaults or
@@ -1790,6 +1820,7 @@ only some directories by defining the \texttt{TARGET} make macro:
   sh> make -j 8 new-validate
   sh> make -j 8 TARGET='HardwareAccelerator Hpfc' new-validate
 \end{verbatim}
+
 The detailed results are stored in file \texttt{validation.out}.
 Possible test results include:
 \begin{description}
@@ -1813,6 +1844,7 @@ validation:
 \begin{verbatim}
   sh> make parallel-clean
 \end{verbatim}
+
 
 \section{Debugging: NewGen, macros, debug levels,...}
 \label{sec:newgen}
@@ -2132,7 +2164,7 @@ If a main program to test or use the library exists, then it is
 necessarily a pass (see section~\ref{sec:pass_organization}), or a
 \lstinline|main()|. But the easiest way to test a library is to test
 through the PIPS infrastructure after declaring it
-as explained in section~\label{sec:direct-pipsmake}.
+as explained in section~\ref{sec:direct-pipsmake}.
 
 
 \subsection{Libraries and data structures}
@@ -2231,6 +2263,11 @@ instead.
 
 Here are now the steps to install a new library named \texttt{mylib}
 with a new C file named \texttt{myphase}.
+
+You should also have a look to the document describing the new build
+infrastructure using \texttt{autotools} and update the various files
+accordingly: \PipsAutotoolsGuidePDF{} and \PipsAutotoolsGuideHTDOC{}
+
 
 \subsubsection{In the directory \texttt{src/Libs}}
 \label{sec:direct-textttsrcl-1}
@@ -3002,8 +3039,8 @@ keep both versions of PIPS.
 \end{document}
 
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
 %%% ispell-local-dictionary: "american"
-%%% End: 
+%%% End:

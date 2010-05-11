@@ -160,9 +160,9 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
     fprintf( stderr, "\n" );
     execvp( "gfc2pips", gfc2pips_args );
     // No return from exec
-    perror( "execvp f951" );
+    pips_user_error("gfc2pips is not installed, did you compile PIPS with"
+        " Fortran95 support ?\n");
     exit( -1 );
-
   } else {
     // in the Father
 
@@ -177,7 +177,6 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
       // Check the gfc2pips return code
       if ( statut != EXIT_SUCCESS ) {
         printf("error code %d\n",statut);
-        exit(0);
         return "gfc2pips return an error";
       }
     }

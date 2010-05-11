@@ -48,11 +48,11 @@
    in the EOLE project (JZ - 11/98) */
 
 /* Does take care of block scopes */
-string global_name_to_user_name(string global_name)
+const char* global_name_to_user_name(const char* global_name)
 {
-  string user_name = string_undefined;
+  const char* user_name = string_undefined;
   char lc = global_name[strlen(global_name)-1];
-  string p;
+  const char* p;
 
   /* First, take care of constrant strings and characters, wich may
      contain any of the PIPS special characters and strings.
@@ -378,7 +378,7 @@ entity find_ith_parameter(entity e, int i)
 
     if (type_variable_p(tv) && storage_formal_p(sv)) {
       if (formal_offset(storage_formal(sv)) == i) {
-	return(v);
+        return(v);
       }
     }
 
@@ -431,6 +431,9 @@ expression reference_ith_index(reference ref, int i)
 }
 
 /* functions for areas */
+bool allocatable_area_p(entity aire) {
+  return same_string_p(module_local_name(aire), ALLOCATABLE_AREA_LOCAL_NAME);
+}
 
 bool dynamic_area_p(entity aire)
 {

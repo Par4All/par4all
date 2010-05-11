@@ -570,7 +570,7 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
 
 bool c_symbol_table(string module_name)
 {
-  prettyprint_is_fortran = FALSE; // The "prettyprint_is_fortran" parameter is not propagated
+  set_prettyprint_is_fortran_p (FALSE); // The "prettyprint_is_fortran" parameter is not propagated
   //all the way down to words_basic()
   actual_symbol_table_dump(module_name, FALSE);
   return TRUE;

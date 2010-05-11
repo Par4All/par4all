@@ -677,14 +677,23 @@ statement loop_test(statement sl)
   else
     lab = label_local_name(loop_label(l));
 
-  if (get_bool_property("PRETTYPRINT_C_CODE"))
-    cs = prev_comm;
-  else
-    cs = strdup(concatenate(prev_comm,
-			    "C     DO loop ",
-			    lab,
-			    " with exit had to be desugared\n",
-			    NULL));
+  switch(language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      cs = strdup(concatenate(prev_comm,
+                              get_prettyprint_comment(),
+                              "     DO loop ",
+                              lab,
+                              " with exit had to be desugared\n",
+                              NULL));
+      break;
+    case is_language_c:
+      cs = prev_comm;
+      break;
+    default:
+      pips_internal_error("This language is not handled !");
+      break;
+  }
 
   ts = make_statement(entity_empty_label(),
 		      statement_number(sl),
@@ -796,10 +805,28 @@ statement whileloop_test(statement sl)
     whileloop l = instruction_whileloop(statement_instruction(sl));
     statement ts = statement_undefined;
     string cs = string_undefined;
-    call c = make_call(entity_intrinsic(get_bool_property("PRETTYPRINT_C_CODE")?C_NOT_OPERATOR_NAME:NOT_OPERATOR_NAME),
-		       CONS(EXPRESSION,
-			    copy_expression(whileloop_condition(l)),
-			    NIL));
+    call c = call_undefined;
+
+    string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
+    if (strcmp (lang, "F77") == 0) {
+      c = make_call(entity_intrinsic(NOT_OPERATOR_NAME),
+		    CONS(EXPRESSION,
+			 copy_expression(whileloop_condition(l)),
+			 NIL));
+    }
+    else if (strcmp (lang, "C") == 0) {
+      c = make_call(entity_intrinsic(C_NOT_OPERATOR_NAME),
+		    CONS(EXPRESSION,
+			 copy_expression(whileloop_condition(l)),
+			 NIL));
+    }
+    else if (strcmp (lang, "F95") == 0) {
+      pips_assert ("Need to update F95 case", FALSE);
+    }
+    else {
+      pips_assert ("Not supported value for the propertty", FALSE);
+    }
+
     test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				       normalized_undefined),
 		       make_plain_continue_statement(),
@@ -807,26 +834,34 @@ statement whileloop_test(statement sl)
     string csl = statement_comments(sl);
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
     string prev_comm = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
+    string lab = string_undefined;
 
-    if (get_bool_property("PRETTYPRINT_C_CODE"))
-      cs = prev_comm;
-    else
-      {
-	if(entity_empty_label_p(whileloop_label(l))) {
-	  cs = strdup(concatenate(prev_comm,
-				  "C     DO WHILE loop ",
-				  "with GO TO exit had to be desugared\n",
-				  NULL));
-	}
-	else {
-	  string lab = label_local_name(whileloop_label(l));
-	  cs = strdup(concatenate(prev_comm,
-				  "C     DO WHILE loop ",
-				  lab,
-				  " with GO TO exit had to be desugared\n",
-				  NULL));
-	}
+    lang = get_string_property ("PRETTYPRINT_LANGUAGE");
+    if (strcmp (lang, "F77") == 0) {
+      if(entity_empty_label_p(whileloop_label(l))) {
+	cs = strdup(concatenate(prev_comm,
+				"C     DO WHILE loop ",
+				"with GO TO exit had to be desugared\n",
+				NULL));
       }
+      else {
+	lab = label_local_name(whileloop_label(l));
+	cs = strdup(concatenate(prev_comm,
+				"C     DO WHILE loop ",
+				lab,
+				" with GO TO exit had to be desugared\n",
+				NULL));
+      }
+    }
+    else if (strcmp (lang, "C") == 0) {
+      cs = prev_comm;
+    }
+    else if (strcmp (lang, "F95") == 0) {
+      pips_assert ("Need to update F95 case", FALSE);
+    }
+    else {
+      pips_assert ("Not supported value for the propertty", FALSE);
+    }
 
     ts = make_statement(entity_empty_label(),
 			statement_number(sl),
@@ -1143,10 +1178,10 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 
   /* Look for conflicting names: */
   FOREACH(ENTITY, e, declarations) {
-    string name = entity_user_name(e);
+    const char * name = entity_user_name(e);
     bool conflict = FALSE;
     FOREACH(ENTITY, e_above, declarations_above) {
-      string name_above = entity_user_name(e_above);
+      const char * name_above = entity_user_name(e_above);
       pips_debug(2, "Comparing variables %s and %s\n",
 		 entity_name(e), entity_name(e_above));
 

@@ -494,224 +494,283 @@ dump_control_to_label_name(hash_table h)
     fprintf(stderr,"[dump_control_to_label_name] %d labels, end\n", i);
 }
 
-static text
-text_trail(entity module, int margin, list trail, hash_table labels)
-{
-    list cc = NIL;
-    text r = make_text(NIL);
+static text text_trail(entity module, int margin, list trail, hash_table labels) {
+  list cc = NIL;
+  text r = make_text(NIL);
 
-    pips_assert("trail cannot be empty", !ENDP(trail));
+  pips_assert("trail cannot be empty", !ENDP(trail));
 
-    for(cc=trail; !ENDP(cc); POP(cc)) {
-	control c = CONTROL(CAR(cc));
-	string l = string_undefined;
-	int nsucc = gen_length(control_successors(c));
-	statement st = control_statement(c);
+  for (cc = trail; !ENDP(cc); POP(cc)) {
+    control c = CONTROL(CAR(cc));
+    string l = string_undefined;
+    int nsucc = gen_length(control_successors(c));
+    statement st = control_statement(c);
 
-	debug(3, "text_trail", "Processing statement %s",
-	      statement_identification(st));
+    debug(3,
+          "text_trail",
+          "Processing statement %s",
+          statement_identification(st));
 
-	/* Is a label needed? */
-	if((l=control_to_label_name(c, labels))!=string_undefined) {
-	    if(strcmp(l, label_local_name(statement_to_label(control_statement(c))))
-	       != 0) {
-		list pc = CHAIN_SWORD(NIL,prettyprint_is_fortran?"CONTINUE":";") ;
-		sentence s = make_sentence(is_sentence_unformatted,
-					   make_unformatted(NULL, 0, margin, pc)) ;
-		unformatted_label(sentence_unformatted(s)) = l ;
-		ADD_SENTENCE_TO_TEXT(r, s);
-		debug(3, "text_trail", "Label %s generated for stmt %s\n",
-		      l, statement_identification(control_statement(c)));
-	    }
-	}
-
-	/* Perform the very same tests as in decorate_trail()
-	 * The successor may have a label but not need a GOTO to be reached.
-	 */
-
-	switch(nsucc) {
-	case 0:
-	  MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
-	    break;
-	case 1: {
-	    control succ = CONTROL(CAR(control_successors(c)));
-
-	    if(check_io_statement_p(control_statement(succ)) &&
-		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
-	      /* The real successor is the FALSE successor of the IO check */
-	      succ = CONTROL(CAR(CDR(control_successors(succ))));
-	      if(check_io_statement_p(control_statement(succ)) &&
-		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
-		/* The real successor is the FALSE successor of the IO check */
-		succ = CONTROL(CAR(CDR(control_successors(succ))));
-	      }
-	      pips_assert("The successor is not a check io statement",
-			  !check_io_statement_p(control_statement(succ)));
-	    }
-
-	    MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
-
-	    /* If the statement "really" has a continuation (e.g. not a STOP
-	     * or a RETURN)
-	     */
-	    /* if(statement_does_return(st) &&
-	       !(check_io_statement_p(control_statement(succ)) &&
-	       !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) ) { */
-	    if(statement_does_return(st)) {
-		if(!ENDP(CDR(cc))) {
-		    control tsucc = CONTROL(CAR(CDR(cc)));
-		    if(tsucc==succ) {
-			/* the control successor is the textual successor */
-			break;
-		    }
-		}
-		/* A GOTO must be generated to reach the control successor */
-		l = control_to_label_name(succ, labels);
-		pips_assert("Must be labelled", l!= string_undefined);
-		ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-							    margin, l, 0));
-	    }
-	    break;
-	}
-	case 2: {
-	    control succ1 = CONTROL(CAR(control_successors(c)));
-	    control succ2 = CONTROL(CAR(CDR(control_successors(c))));
-	    instruction i = statement_instruction(st);
-	    test t = test_undefined;
-	    unformatted u = unformatted_undefined;
-	    list pc = NIL;
-	    sentence s = sentence_undefined;
-	    string comments = statement_comments(st);
-	    text r1 = make_text(NIL);
-	    bool no_endif = FALSE;
-
-	    pips_assert("must be a test", instruction_test_p(i));
-
-	    MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
-	    if (! string_undefined_p(comments)) {
-		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-						      strdup(comments)));
-	    }
-
-	    pc = CHAIN_SWORD(NIL, prettyprint_is_fortran?"IF (":"if (");
-	    t = instruction_test(i);
-	    pc = gen_nconc(pc, words_expression(test_condition(t), NIL));
-
-	    /* Is there a textual successor? */
-	    if(!ENDP(CDR(cc))) {
-		control tsucc = CONTROL(CAR(CDR(cc)));
-		if(tsucc==succ1) {
-		    if(tsucc==succ2) {
-			/* This may happen after restructuring */
-			;
-		    }
-		    else {
-			/* succ2 must be reached by GOTO */
-			l = control_to_label_name(succ2, labels);
-			pips_assert("Must be labelled", l!= string_undefined);
-			if (prettyprint_is_fortran)
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-			  }
-			else 
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
-			  }
-			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
-								     margin+INDENTATION,
-								     l, 0));
-		    }
-		}
-		else {
-		    if(tsucc==succ2) {
-			/* succ1 must be reached by GOTO */
-			l = control_to_label_name(succ1, labels);
-			pips_assert("Must be labelled", l!= string_undefined);
-			no_endif = TRUE;
-		    }
-		    else {
-			/* Both successors must be labelled */
-			l = control_to_label_name(succ1, labels);
-			pips_assert("Must be labelled", l!= string_undefined);
-			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
-								     margin+INDENTATION,
-								     l, 0));
-			if (prettyprint_is_fortran)
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-			  }
-			else 
-			  {
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
-			  }
-			l = control_to_label_name(succ2, labels);
-			pips_assert("Must be labelled", l!= string_undefined);
-			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
-								     margin+INDENTATION,
-								     l, 0));
-		    }
-		}
-	    }
-	    else {
-		/* Both successors must be textual predecessors */
-		pips_assert("succ1 before c", appears_first_in_trail(trail, succ1, c));
-		pips_assert("succ1 before c", appears_first_in_trail(trail, succ2, c));
-		l = control_to_label_name(succ1, labels);
-		pips_assert("Must be labelled", l!= string_undefined);
-		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
-							     margin+INDENTATION,
-							     l, 0));
-		if (prettyprint_is_fortran)
-		  {
-		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-		  }
-		else 
-		  {
-		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
-		  }
-		l = control_to_label_name(succ2, labels);
-		pips_assert("Must be labelled", l!= string_undefined);
-		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
-							     margin+INDENTATION,
-							     l, 0));
-	    }
-
-	    if(no_endif) {
-		pc = CHAIN_SWORD(pc, ") ");
-		pc = gen_nconc(pc, words_goto_label(l));
-	    }
-	    else {
-	      pc = CHAIN_SWORD(pc, prettyprint_is_fortran? ") THEN": ") {");
-	    }
-	    u = make_unformatted(NULL, statement_number(st), margin, pc) ;
-
-	    if( !empty_global_label_p( entity_name( statement_label( st )))) {
-		/*
-		  string ln = control_to_label_name(c, labels);
-		  if(string_undefined_p(ln)) {
-		  entity lab = statement_label(st);
-		  print_statement(st);
-		  pips_assert("c must have been encountered before", !string_undefined_p(ln));
-		  }
-		  unformatted_label(u) = strdup(ln);
-		  */
-		unformatted_label(u) = strdup(label_local_name(statement_label(st)));
-	    }
-
-	    s = make_sentence(is_sentence_unformatted, u) ;
-	    ADD_SENTENCE_TO_TEXT(r, s);
-	    MERGE_TEXTS(r, r1);
-	    if(!no_endif)
-		ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,prettyprint_is_fortran?"ENDIF":"}"));
-	    break;
-	}
-	default:
-	    pips_internal_error("Too many successors for a control node\n");
-	}
+    /* Is a label needed? */
+    if ((l = control_to_label_name(c, labels)) != string_undefined) {
+      if (strcmp(l, label_local_name(statement_to_label(control_statement(c))))
+          != 0) {
+        list pc = NIL;
+        switch(language_tag (get_prettyprint_language ())) {
+          case is_language_fortran:
+          case is_language_fortran95:
+            pc = CHAIN_SWORD(pc, "CONTINUE");
+            break;
+          case is_language_c:
+            pc = CHAIN_SWORD(pc, ";");
+            break;
+          default:
+            pips_internal_error("Language unknown !");
+            break;
+        }
+        sentence s = make_sentence(is_sentence_unformatted,
+                                   make_unformatted(NULL, 0, margin, pc));
+        unformatted_label(sentence_unformatted(s)) = l;
+        ADD_SENTENCE_TO_TEXT(r, s);
+        debug(3,
+              "text_trail",
+              "Label %s generated for stmt %s\n",
+              l,
+              statement_identification(control_statement(c)));
+      }
     }
 
-    return r;
+    /* Perform the very same tests as in decorate_trail()
+     * The successor may have a label but not need a GOTO to be reached.
+     */
+
+    switch(nsucc) {
+      case 0:
+        MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
+        break;
+      case 1: {
+        control succ = CONTROL(CAR(control_successors(c)));
+
+        if (check_io_statement_p(control_statement(succ))
+            && !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
+          /* The real successor is the FALSE successor of the IO check */
+          succ = CONTROL(CAR(CDR(control_successors(succ))));
+          if (check_io_statement_p(control_statement(succ))
+              && !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
+            /* The real successor is the FALSE successor of the IO check */
+            succ = CONTROL(CAR(CDR(control_successors(succ))));
+          }
+          pips_assert("The successor is not a check io statement",
+              !check_io_statement_p(control_statement(succ)));
+        }
+
+        MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
+
+        /* If the statement "really" has a continuation (e.g. not a STOP
+         * or a RETURN)
+         */
+        /* if(statement_does_return(st) &&
+         !(check_io_statement_p(control_statement(succ)) &&
+         !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) ) { */
+        if (statement_does_return(st)) {
+          if (!ENDP(CDR(cc))) {
+            control tsucc = CONTROL(CAR(CDR(cc)));
+            if (tsucc == succ) {
+              /* the control successor is the textual successor */
+              break;
+            }
+          }
+          /* A GOTO must be generated to reach the control successor */
+          l = control_to_label_name(succ, labels);
+          pips_assert("Must be labelled", l!= string_undefined);
+          ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
+                  margin, l, 0));
+        }
+        break;
+      }
+      case 2: {
+        control succ1 = CONTROL(CAR(control_successors(c)));
+        control succ2 = CONTROL(CAR(CDR(control_successors(c))));
+        instruction i = statement_instruction(st);
+        test t = test_undefined;
+        unformatted u = unformatted_undefined;
+        list pc = NIL;
+        sentence s = sentence_undefined;
+        string comments = statement_comments(st);
+        text r1 = make_text(NIL);
+        bool no_endif = FALSE;
+
+        pips_assert("must be a test", instruction_test_p(i));
+
+        MERGE_TEXTS(r, init_text_statement(module, margin, st));
+        if (!string_undefined_p(comments)) {
+          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+                  strdup(comments)));
+        }
+        switch(language_tag (get_prettyprint_language ())) {
+          case is_language_fortran:
+          case is_language_fortran95:
+            pc = CHAIN_SWORD(NIL, "IF (");
+            break;
+          case is_language_c:
+            pc = CHAIN_SWORD(NIL, "if (");
+            break;
+          default:
+            pips_internal_error("Language unknown !");
+            break;
+        }
+        t = instruction_test(i);
+        pc = gen_nconc(pc, words_expression(test_condition(t), NIL));
+
+        /* Is there a textual successor? */
+        if (!ENDP(CDR(cc))) {
+          control tsucc = CONTROL(CAR(CDR(cc)));
+          if (tsucc == succ1) {
+            if (tsucc == succ2) {
+              /* This may happen after restructuring */
+              ;
+            } else {
+              /* succ2 must be reached by GOTO */
+              l = control_to_label_name(succ2, labels);
+              pips_assert("Must be labelled", l!= string_undefined);
+              switch(language_tag (get_prettyprint_language ())) {
+                case is_language_fortran:
+                case is_language_fortran95:
+                  ADD_SENTENCE_TO_TEXT(r1,
+                                       MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+                  break;
+                case is_language_c:
+                  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+                  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,
+                                                                  "else {" ));
+                  break;
+                default:
+                  pips_internal_error("Language unknown !");
+                  break;
+              }
+              ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+                                                           margin+INDENTATION,
+                                                           l, 0));
+            }
+          } else {
+            if (tsucc == succ2) {
+              /* succ1 must be reached by GOTO */
+              l = control_to_label_name(succ1, labels);
+              pips_assert("Must be labelled", l!= string_undefined);
+              no_endif = TRUE;
+            } else {
+              /* Both successors must be labelled */
+              l = control_to_label_name(succ1, labels);
+              pips_assert("Must be labelled", l!= string_undefined);
+              ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+                      margin+INDENTATION,
+                      l, 0));
+              switch(language_tag (get_prettyprint_language ())) {
+                case is_language_fortran:
+                case is_language_fortran95:
+                  ADD_SENTENCE_TO_TEXT(r1,
+                                       MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+                  break;
+                case is_language_c:
+                  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+                  ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,
+                                                                  "else {" ));
+                  break;
+                default:
+                  pips_internal_error("Language unknown !");
+                  break;
+              }
+              l = control_to_label_name(succ2, labels);
+              pips_assert("Must be labelled", l!= string_undefined);
+              ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+                      margin+INDENTATION,
+                      l, 0));
+            }
+          }
+        } else {
+          /* Both successors must be textual predecessors */
+          pips_assert("succ1 before c", appears_first_in_trail(trail, succ1, c));
+          pips_assert("succ1 before c", appears_first_in_trail(trail, succ2, c));
+          l = control_to_label_name(succ1, labels);
+          pips_assert("Must be labelled", l!= string_undefined);
+          ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+                  margin+INDENTATION,
+                  l, 0));
+          switch(language_tag (get_prettyprint_language ())) {
+            case is_language_fortran:
+            case is_language_fortran95:
+              ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+              break;
+            case is_language_c:
+              ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+              ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+              break;
+            default:
+              pips_internal_error("Language unknown !");
+              break;
+          }
+          l = control_to_label_name(succ2, labels);
+          pips_assert("Must be labelled", l!= string_undefined);
+          ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+                  margin+INDENTATION,
+                  l, 0));
+        }
+
+        if (no_endif) {
+          pc = CHAIN_SWORD(pc, ") ");
+          pc = gen_nconc(pc, words_goto_label(l));
+        } else {
+          switch(language_tag (get_prettyprint_language ())) {
+            case is_language_fortran:
+            case is_language_fortran95:
+              pc = CHAIN_SWORD(pc, ") THEN");
+              break;
+            case is_language_c:
+              pc = CHAIN_SWORD(pc, ") {");
+              break;
+            default:
+              pips_internal_error("Language unknown !");
+              break;
+          }
+        }
+        u = make_unformatted(NULL, statement_number(st), margin, pc);
+
+        if (!empty_global_label_p(entity_name( statement_label( st )))) {
+          /*
+           string ln = control_to_label_name(c, labels);
+           if(string_undefined_p(ln)) {
+           entity lab = statement_label(st);
+           print_statement(st);
+           pips_assert("c must have been encountered before", !string_undefined_p(ln));
+           }
+           unformatted_label(u) = strdup(ln);
+           */
+          unformatted_label(u) = strdup(label_local_name(statement_label(st)));
+        }
+
+        s = make_sentence(is_sentence_unformatted, u);
+        ADD_SENTENCE_TO_TEXT(r, s);
+        MERGE_TEXTS(r, r1);
+        if (!no_endif) {
+          switch(language_tag (get_prettyprint_language ())) {
+            case is_language_fortran:
+            case is_language_fortran95:
+              ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "ENDIF"));
+              break;
+            case is_language_c:
+              ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "}"));
+              break;
+            default:
+              pips_internal_error("Language unknown !");
+              break;
+          }
+        }
+        break;
+      }
+      default:
+        pips_internal_error("Too many successors for a control node\n");
+    }
+  }
+
+  return r;
 }

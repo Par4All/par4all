@@ -201,7 +201,7 @@ void dag_dump(FILE * out, const string what, const dag d)
 #define IMG_DEP ""
 #define SCL_DEP "arrowhead=empty"
 
-static string entity_dot_name(entity e)
+static const char* entity_dot_name(entity e)
 {
   return entity_user_name(e);
 }
@@ -218,7 +218,7 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
   bool show_arcs = get_bool_property("FREIA_LABEL_ARCS");
 
   vtxcontent co = dagvtx_content(vtx);
-  string vname = NULL;
+  const char* vname = NULL;
   if (vtxcontent_out(co)!=entity_undefined)
     vname = entity_dot_name(vtxcontent_out(co));
 

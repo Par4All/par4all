@@ -1396,7 +1396,7 @@ static void claire_reference(int taskNumber, reference r, bool wmode,
 		      string_buffer result)
 {
 
- string varname = entity_user_name(reference_variable(r));
+ const char* varname = entity_user_name(reference_variable(r));
  string_buffer_append
    (result,
     concatenate("name = symbol!(\"",

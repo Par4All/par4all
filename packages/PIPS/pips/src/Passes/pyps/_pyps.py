@@ -111,6 +111,7 @@ class workspace:
 
 	def __init__(self,sources2,name="",activates=[],verboseon=True,cppflags=''):
 		"""init a workspace from a list of sources"""
+		self._modules = {}
 		if name == "":
 			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
 		# SG: it may be smarter to save /restore the env ?
@@ -123,11 +124,10 @@ class workspace:
 		if not verboseon:
 			self.set_property(NO_USER_WARNING=True)
 			self.set_property(USER_LOG_P=False)
+		self.set_property(MAXIMUM_USER_ERROR=42)  # after this number of exceptions the programm will abort
 		map(lambda x:pypips.activate(x),activates)
-		self._modules = {}
 		self._build_module_list()
 		self._name=self.info("workspace")[0]
-		self._cleared=False
 
 	@property
 	def name(self):return self._name
@@ -223,12 +223,11 @@ class workspace:
 
 	def close(self):
 		"""force cleaning and deletion of the workspace"""
-		self._cleared=True
-		pypips.quit()
-		pypips.delete_workspace(self._name)
-
-	def __del__(self):
-		if not self._cleared:self.quit()
+		try :
+			pypips.quit()
+			pypips.delete_workspace(self._name)
+		except RuntimeError:
+			pass
 
 	def _build_module_list(self):
 		for m in self.info("modules"):

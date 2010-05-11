@@ -273,7 +273,7 @@ bool io_effect_p(effect e)
 
 bool std_file_effect_p(effect e)
 {
-  string s = entity_user_name(effect_entity(e));
+  const char * s = entity_user_name(effect_entity(e));
   return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr")); 
 }
 

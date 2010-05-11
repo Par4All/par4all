@@ -68,12 +68,12 @@
  * comment  : allows to "catch" the PHIs entities, else, it works like
  *            pips_user_value_name() (see semantics.c).
  */
-char *
+const char *
 pips_region_user_name(entity ent)
 {
     /* external_value_name cannot be used because there is no need for
        the #new suffix, but the #old one is necessary */
-    string name;
+    const char* name;
     if(ent == NULL)
 	/* take care of the constant term TCST */
 	name = "";

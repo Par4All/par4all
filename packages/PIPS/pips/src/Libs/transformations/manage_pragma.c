@@ -53,10 +53,19 @@ static void add_loop_parallel_threshold (pragma pr) {
       loop l = instruction_loop (inst);
       entity index = loop_index (l);
       entity op = entity_undefined;
-      if (get_prettyprint_is_fortran () == TRUE) {
+      switch (language_tag (get_prettyprint_language ())) {
+      case is_language_fortran:
 	op = CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME);
-      } else {
+	break;
+      case is_language_c:
 	op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
+	break;
+      case is_language_fortran95:
+	pips_assert ("Need to update F95 case", FALSE);
+	break;
+      default:
+	pips_assert ("This case should have been handled before", FALSE);
+	break;
       }
       int threshold = get_int_property ("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");
       list args_if =  gen_expression_cons (int_expr (threshold), NIL);
@@ -79,13 +88,17 @@ bool omp_loop_parallel_threshold_set (char mod_name[]) {
   statement mod_stmt = statement_undefined;
 
   // generate pragma string or expression using the correct language:
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
+  value mv = entity_initial(module_name_to_entity(mod_name));
+  if(value_code_p(mv)) {
+    code c = value_code(mv);
+    set_prettyprint_language_from_property(language_tag(code_language(c)));
+  } else {
+    /* Should never arise */
+    set_prettyprint_language_from_property(is_language_fortran);
+  }
 
   // Get the code and tell PIPS_DBM we do want to modify it
   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-
-  // generate pragma string or expression using the correct language:
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
 
   // Add the parallel threshold to all the omp for pragmas
   gen_recurse(mod_stmt, pragma_domain, gen_true,

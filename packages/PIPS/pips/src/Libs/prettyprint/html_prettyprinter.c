@@ -64,96 +64,111 @@
 #define current_module_is_a_function() \
 (entity_function_p(get_current_module_entity()))
 
-static void html_print_expression( expression e );
+static void html_print_expression( expression e, bool cr );
 static void html_print_range( range r );
 static void html_print_statement( statement r );
 static void html_print_type( type t );
 
-static void begin_block( char *block ) {
-  printf( "<li class=\"%s\"><span>%s</span><ul>" NL, block, block );
+static void begin_block( const char *block, bool cr ) {
+  if ( cr ) {
+    printf( "<li class=\"%s blocked\"><span>%s</span><ul class=\"inlined\">" NL, block, block );
+  } else {
+    printf( "<li class=\"%s inlined\"><span>%s</span><ul class=\"inlined\">" NL, block, block );
+  }
 }
 
-static void end_block( char *block ) {
-  printf( "</ul></li><!-- %s -->" NL, block );
+static void end_block( const char *block, bool cr ) {
+  if ( cr ) {
+    printf( "</ul></li><!-- %s -->" NL, block );
+  } else
+    printf( "</ul></li><!-- %s -->" NL, block );
 }
 
-void html_output( char *out ) {
-  printf( "<li>%s</li>" NL, out );
+void html_output( const char *out, bool cr ) {
+  if ( cr ) {
+    printf( "<li><span>%s</span></li>" NL, out );
+  } else {
+    printf( "<li class=\"inlined\"><span>%s</span></li>" NL, out );
+  }
 }
 
-static void html_print_entity( entity e ) {
-  begin_block( "entity" );
-  html_output( entity_name( e ) );
-  end_block( "entity" );
+static void html_print_entity_name( entity e ) {
+  begin_block( "entity", false );
+  html_output( entity_name( e ), false );
+  end_block( "entity", false );
 }
 
 static void html_print_ram( ram r ) {
-  begin_block( "ram" );
+  begin_block( "ram", true );
 
-  begin_block( "Function" );
-  html_print_entity( ram_function( r ) );
-  end_block( "Function" );
+  begin_block( "Function", true);
+  html_print_entity_name( ram_function( r ) );
+  end_block( "Function", true );
 
-  begin_block( "Section" );
-  html_print_entity( ram_section( r ) );
-  end_block( "Section" );
+  html_output( NL, false );
 
-  char str[100];
-  snprintf( str, 100, "Offset : %d", (int) ram_offset( r ) );
-  html_output( str );
+  begin_block( "Section", true );
+  html_print_entity_name( ram_section( r ) );
+  end_block( "Section", true );
 
+  string buf;
+  pips_assert("Asprintf !",
+              asprintf( &buf, "Offset : %d", (int) ram_offset( r ) ) > 0 );
+  html_output( buf, true );
+  free( buf );
   FOREACH(entity, e, ram_shared( r ) ) {
-    html_print_entity(e);
+    html_print_entity_name( e );
   }
 
-  end_block( "ram" );
+  end_block( "ram", true );
 }
 
 static void html_print_formal( formal f ) {
-  begin_block( "formal" );
+  begin_block( "formal", true );
 
-  html_output( "Function" );
-  html_print_entity( formal_function( f ) );
+  begin_block( "Function", false );
+  html_print_entity_name( formal_function( f ) );
+  end_block( "Function", false );
 
-  char str[100];
-  snprintf( str, 100, "Offset : %d", (int) formal_offset( f ) );
-  html_output( str );
+  string buf;
+  pips_assert("Asprintf !",
+              asprintf( &buf, "Offset : %d", (int) formal_offset( f ) ) > 0);
+  html_output( buf, true );
 
-  end_block( "formal" );
+  end_block( "formal", true );
 }
 
 static void html_print_rom( unit r ) {
-  begin_block( "rom" );
+  begin_block( "rom", false );
 
-  html_output( "unit ?" );
+  html_output( "unit ? (not implemented)", false );
 
-  end_block( "rom" );
+  end_block( "rom", false );
 }
 
 static void html_print_code( code c ) {
-  begin_block( "code" );
+  begin_block( "code", true );
 
   list l = code_declarations(c);
   if ( l ) {
-    begin_block( "declarations" );
+    begin_block( "declarations", true );
     if ( !ENDP(l) ) {
-      FOREACH(entity, e, l ) {
-        html_print_entity( e );
+      FOREACH(entity, e, l )
+      {
+        html_print_entity_name( e );
       }
     }
-    end_block( "declarations" );
+    end_block( "declarations", true );
   }
-  end_block( "code" );
+  end_block( "code", true );
 }
 
-
-
 static void html_print_storage( storage s ) {
-  begin_block( "storage" );
+  begin_block( "storage", true );
   switch ( storage_tag( s ) ) {
     case is_storage_return:
-      html_output( "Return" );
-      html_print_entity( storage_return( s ) );
+      html_output( "Return", false );
+      html_print_entity_name( storage_return( s ) );
       break;
     case is_storage_ram:
       html_print_ram( storage_ram( s ) );
@@ -165,293 +180,308 @@ static void html_print_storage( storage s ) {
       html_print_rom( storage_rom( s) );
       break;
     default:
-      html_output( "Unknown storage" );
+      html_output( "Unknown storage", true );
       break;
   }
-  end_block( "storage" );
+  end_block( "storage", true );
 }
 
 static void html_print_basic( basic b ) {
-  begin_block( "basic" );
+  begin_block( "basic", false );
 
   switch ( basic_tag( b ) ) {
     case is_basic_int:
-      html_output( "int" );
+      html_output( "int", false );
       break;
     case is_basic_float:
-      html_output( "float" );
+      html_output( "float", false );
       break;
     case is_basic_logical:
-      html_output( "logical" );
+      html_output( "logical", false );
       break;
     case is_basic_overloaded:
-      html_output( "overloaded" );
+      html_output( "overloaded", false );
       break;
     case is_basic_complex:
-      html_output( "complex" );
+      html_output( "complex", false );
       break;
     case is_basic_string:
-      html_output( "string" );
+      html_output( "string", false );
       break;
     case is_basic_bit:
-      html_output( "bit" );
+      html_output( "bit", false );
       break;
     case is_basic_pointer:
-      html_output( "pointer" );
+      html_output( "pointer", false );
       break;
     case is_basic_derived:
-      html_output( "deriver" );
+      html_output( "deriver", false );
       break;
     case is_basic_typedef:
-      html_output( "typedef" );
+      html_output( "typedef", false );
       break;
     default:
-      html_output( "unknown" );
+      html_output( "unknown", false );
       break;
   }
 
-  end_block( "basic" );
+  end_block( "basic", false );
 }
 
 static void html_print_area( area a ) {
-  begin_block( "area" );
+  begin_block( "area", false );
 
-  char str[100];
-  snprintf( str, 100, "Size : %d", (int) area_size( a ) );
-  html_output( str );
+  string buf;
+  pips_assert("Asprintf !",
+              asprintf( &buf, "Size : %d", (int) area_size( a ) )  > 0);
+  html_output( buf, false );
+  free( buf );
 
-  html_output( "Layout" );
-  FOREACH(entity, e, area_layout( a ) ){
-    html_print_entity(e);
+  html_output( "Layout", false );
+  FOREACH(entity, e, area_layout( a ) ) {
+    html_print_entity_name( e );
   }
 
-  end_block( "area" );
+  end_block( "area", false );
 }
 
 static void html_print_qualifier( qualifier q ) {
-  begin_block( "qualifier" );
+  begin_block( "qualifier", false );
 
   switch ( qualifier_tag( q ) ) {
     case is_qualifier_const:
-      html_output( "const" );
+      html_output( "const", false );
       break;
     case is_qualifier_restrict:
-      html_output( "restrict" );
+      html_output( "restrict", false );
       break;
     case is_qualifier_volatile:
-      html_output( "volatile" );
+      html_output( "volatile", false );
       break;
     case is_qualifier_register:
-      html_output( "register" );
+      html_output( "register", false );
       break;
     case is_qualifier_auto:
-      html_output( "auto" );
+      html_output( "auto", false );
       break;
     default:
-      html_output( "unknown" );
+      html_output( "unknown", false );
       break;
   }
 
-  end_block( "qualifier" );
+  end_block( "qualifier", false );
 }
 
 static void html_print_dimension( dimension d ) {
-  begin_block( "dimension" );
-
-  html_print_expression( dimension_lower( d ) );
-  html_print_expression( dimension_upper( d ) );
-
-  end_block( "dimension" );
+  begin_block( "dimension", true );
+  html_print_expression( dimension_lower( d ), true );
+  html_print_expression( dimension_upper( d ), true );
+  end_block( "dimension", true );
 }
 
 static void html_print_variable( variable v ) {
-  begin_block( "variable" );
+  begin_block( "variable", true );
 
   html_print_basic( variable_basic( v ) );
-
-  FOREACH(dimension, d, variable_dimensions( v )  ){
-    html_print_dimension(d);
+  FOREACH(dimension, d, variable_dimensions( v ) ) {
+    html_print_dimension( d );
   }
-  FOREACH(qualifier, q, variable_qualifiers( v )  ){
-    html_print_qualifier(q);
+  FOREACH(qualifier, q, variable_qualifiers( v ) ) {
+    html_print_qualifier( q );
   }
 
-  end_block( "variable" );
+  end_block( "variable", true );
 }
 
 static void html_print_mode( mode m ) {
-  begin_block( "mode" );
+  begin_block( "mode", false );
 
   switch ( mode_tag( m ) ) {
     case is_mode_value:
-      html_output( "value" );
+      html_output( "value", false );
       break;
     case is_mode_reference:
-      html_output( "reference" );
+      html_output( "reference", false );
       break;
     default:
-      html_output( "unknown" );
+      html_output( "unknown", false );
       break;
   }
 
-  end_block( "mode" );
+  end_block( "mode", false );
 }
 
 static void html_print_parameter( parameter p ) {
-  begin_block( "parameter" );
+  begin_block( "parameter", true );
 
   html_print_type( parameter_type( p ) );
   html_print_mode( parameter_mode( p ) );
-  html_output( "Dummy unimplemented" );
+  html_output( "Dummy :  not implemented", true );
 
-  end_block( "parameter" );
+  end_block( "parameter", true );
 }
 
 static void html_print_functional( functional f ) {
-  begin_block( "functional" );
-
+  begin_block( "functional", true );
   FOREACH(parameter, param, functional_parameters( f ) ) {
-    html_print_parameter(param);
+    html_print_parameter( param );
   }
 
   html_print_type( functional_result( f ) );
 
-  end_block( "functional" );
+  end_block( "functional", true );
 }
 
 static void html_print_type( type t ) {
-  begin_block( "type" );
-  switch ( type_tag( t ) ) {
-    case is_type_statement:
-      html_output( "Statement (unit ?) " );
-      break;
-    case is_type_area:
-      html_print_area( type_area( t ) );
-      break;
-    case is_type_variable:
-      html_print_variable( type_variable( t ) );
-      break;
-    case is_type_functional:
-      html_print_functional( type_functional( t ) );
-      break;
-    case is_type_varargs:
-      html_output( "VarArgs" );
-      html_print_type( type_varargs( t ) );
-      break;
-    case is_type_unknown:
-      html_output( "Unknown" );
-      break;
-    case is_type_void:
-      html_output( "Void" );
-      break;
-    case is_type_struct:
-      html_output( "Struct" );
-      FOREACH(entity, e, type_struct( t ) ) {
-        html_print_entity( e );
-      }
-      break;
-    case is_type_union:
-      html_output( "Union" );
-      FOREACH(entity, e, type_union( t ) ) {
-        html_print_entity( e );
-      }
-      break;
-    case is_type_enum:
-      html_output( "Enum" );
-      FOREACH(entity, e, type_enum( t ) ) {
-        html_print_entity( e );
-      }
-      break;
-    default:
-      break;
+  begin_block( "type", true );
+  if( t == type_undefined ) {
+    html_output( "*undefined*", true );
+  } else {
+  switch(type_tag( t )) {
+      case is_type_statement:
+        html_output("Statement (unit ?) ", true);
+        break;
+      case is_type_area:
+        html_print_area(type_area( t ));
+        break;
+      case is_type_variable:
+        html_print_variable(type_variable( t ));
+        break;
+      case is_type_functional:
+        html_print_functional(type_functional( t ));
+        break;
+      case is_type_varargs:
+        html_output("VarArgs", true);
+        html_print_type(type_varargs( t ));
+        break;
+      case is_type_unknown:
+        html_output("Unknown", true);
+        break;
+      case is_type_void:
+        html_output("Void", true);
+        break;
+      case is_type_struct:
+        html_output("Struct", true);
+        FOREACH(entity, e, type_struct( t ) )
+        {
+          html_print_entity_name(e);
+        }
+        break;
+      case is_type_union:
+        html_output("Union", true);
+        FOREACH(entity, e, type_union( t ) )
+        {
+          html_print_entity_name(e);
+        }
+        break;
+      case is_type_enum:
+        html_output("Enum", true);
+        FOREACH(entity, e, type_enum( t ) )
+        {
+          html_print_entity_name(e);
+        }
+        break;
+      default:
+        break;
+    }
   }
-  end_block( "type" );
+  end_block( "type", true );
 }
 
 static void html_print_value( value v ) {
-  begin_block( "value" );
+  begin_block( "value", false );
 
   switch ( value_tag( v ) ) {
     case is_value_code:
       html_print_code( value_code( v ) );
       break;
     case is_value_symbolic:
-      html_output( "symbolic" );
+      html_output( "symbolic", false );
       break;
     case is_value_constant:
-      html_output( "constant" );
+      html_output( "constant", false );
       break;
     case is_value_intrinsic:
-      html_output( "intrinsic" );
+      html_output( "intrinsic", false );
       break;
     case is_value_unknown:
-      html_output( "unknown" );
+      html_output( "unknown", false );
       break;
     case is_value_expression:
-      html_output( "expression" );
-      html_print_expression( value_expression( v ) );
+      begin_block( "expression", false );
+      html_print_expression( value_expression( v ), false );
+      end_block( "expression", false );
       break;
     default:
-      html_output( "error" );
+      html_output( "error", false );
       break;
   }
 
-  end_block( "value" );
+  end_block( "value", false );
 }
 void html_print_entity_full( entity e ) {
-  begin_block( "entity" );
-  html_output( entity_name( e ) );
+  begin_block( "entity", true );
+  html_output( entity_name( e ), true );
   html_print_type( entity_type( e ) );
   html_print_storage( entity_storage( e ) );
   html_print_value( entity_initial( e ) );
 
-  end_block( "entity" );
+  end_block( "entity", true );
 }
 
 static void html_print_call( call c ) {
-  begin_block( "call" );
+  bool cr = false;
+  if ( call_arguments( c ) ) {
+    cr = true;
+  }
+  begin_block( "call", cr );
 
-  begin_block( "function" );
-  html_print_entity( call_function(c) );
-  end_block( "function" );
+  begin_block( "function", cr );
+  html_print_entity_name( call_function(c) );
+  end_block( "function", cr );
 
   if ( call_arguments( c ) ) {
-    begin_block( "arguments" );
+    begin_block( "arguments", cr );
     FOREACH(expression, e, call_arguments( c ) ) {
-      html_print_expression( e );
+      html_print_expression( e, cr );
     }
-    end_block( "arguments" );
+    end_block( "arguments", cr );
   }
-  end_block( "call" );
+  end_block( "call", cr );
 }
 
 static void html_print_unstructured( unstructured u ) {
-  begin_block( "unstructured" );
-  printf( "<li>Not implemented</li>" NL );
-  end_block( "unstructured" );
+  begin_block( "unstructured", false );
+  html_output( "Not implemented", false );
+  end_block( "unstructured", false );
 }
 
 static void html_print_reference( reference r ) {
-  begin_block( "reference" );
-  begin_block( "variable" );
-  html_print_entity( reference_variable( r ) );
-  end_block( "variable" );
-
+  bool cr = false;
   if ( reference_indices( r ) ) {
-    begin_block( "indices" );
-    FOREACH(expression, e, reference_indices( r ) ) {
-      html_print_expression( e );
-    }
-    end_block( "indices" );
+    cr = true;
   }
 
-  end_block( "reference" );
+  begin_block( "reference", cr );
+  begin_block( "variable", cr );
+  html_print_entity_name( reference_variable( r ) );
+  end_block( "variable", cr );
+
+  if ( reference_indices( r ) ) {
+    begin_block( "indices", cr );
+    FOREACH(expression, e, reference_indices( r ) ) {
+      html_print_expression( e, false );
+    }
+    end_block( "indices", cr );
+  }
+
+  end_block( "reference", cr );
 }
 
-static void html_print_expression( expression e ) {
-  begin_block( "expression" );
+static void html_print_expression( expression e, bool cr ) {
+  begin_block( "expression", cr );
+  begin_block( "syntax", false );
 
-  begin_block( "syntax" );
   syntax s = expression_syntax(e);
   switch ( syntax_tag(s) ) {
     case is_syntax_call:
@@ -467,145 +497,146 @@ static void html_print_expression( expression e ) {
     default:
       pips_internal_error("unexpected syntax tag");
   }
-  end_block( "syntax" );
 
-  end_block( "expression" );
+  end_block( "syntax", false );
+  end_block( "expression", cr );
 }
 
 static void html_print_range( range r ) {
-  begin_block( "range" );
-  begin_block( "lower" );
-  html_print_expression( range_lower( r ) );
-  end_block( "lower" );
-  begin_block( "upper" );
-  html_print_expression( range_upper( r ) );
-  end_block( "upper" );
-  begin_block( "increment" );
-  html_print_expression( range_increment( r ) );
-  end_block( "increment" );
-  end_block( "range" );
+  begin_block( "range", true );
+  begin_block( "lower", false );
+  html_print_expression( range_lower( r ), false );
+  end_block( "lower", false );
+  begin_block( "upper", true );
+  html_print_expression( range_upper( r ), false );
+  end_block( "upper", true );
+  begin_block( "increment", true );
+  html_print_expression( range_increment( r ), false );
+  end_block( "increment", true );
+  end_block( "range", true );
 }
 
 static void html_print_loop( loop l ) {
-  begin_block( "loop" );
+  begin_block( "loop", true );
   /* partial implementation ??? */
 
-  begin_block( "index" );
-  html_print_entity( loop_index( l ) );
-  end_block( "index" );
+  begin_block( "index", false );
+  html_print_entity_name( loop_index( l ) );
+  end_block( "index", false );
 
   html_print_range( loop_range( l ) );
 
-  begin_block( "body" );
+  begin_block( "body", false );
   html_print_statement( loop_body( l ) );
-  end_block( "body" );
+  end_block( "body", false );
 
-  end_block( "loop" );
+  end_block( "loop", true );
 }
 
 static void html_print_whileloop( whileloop w ) {
   /* partial implementation...  ?? */
 
-  begin_block( "whileloop" );
+  begin_block( "whileloop", true );
 
-  begin_block( "condition" );
-  html_print_expression( whileloop_condition( w ) );
-  end_block( "condition" );
+  begin_block( "condition", false );
+  html_print_expression( whileloop_condition( w ), false );
+  end_block( "condition", false );
 
-  begin_block( "statement" );
+  begin_block( "statement", false );
   html_print_statement( whileloop_body( w ) );
-  end_block( "statement" );
+  end_block( "statement", false );
 
-  begin_block( "evaluation" );
+  begin_block( "evaluation", false );
   evaluation eval = whileloop_evaluation(w);
   /*do while and while do loops */
   if ( evaluation_before_p(eval) )
-    html_output( "while() {}" NL );
+    html_output( "while() {}" NL, false );
   else
-    html_output( "do {} while(); " NL );
-  end_block( "evaluation" );
+    html_output( "do {} while(); " NL, false );
+  end_block( "evaluation", false );
 
-  begin_block( "body" );
+  begin_block( "body", false );
   html_print_statement( whileloop_body( w ) );
-  end_block( "body" );
+  end_block( "body", false );
 
-  end_block( "whileloop" );
+  end_block( "whileloop", true );
 }
 
 static void html_print_forloop( forloop f ) {
   /* partial implementation... */
 
-  begin_block( "forloop" );
+  begin_block( "forloop", true );
 
-  begin_block( "initialization" );
-  html_print_expression( forloop_initialization( f ) );
-  end_block( "initialization" );
+  begin_block( "initialization", true );
+  html_print_expression( forloop_initialization( f ), false );
+  end_block( "initialization", true );
 
-  begin_block( "condition" );
-  html_print_expression( forloop_condition( f ) );
-  end_block( "condition" );
+  begin_block( "condition", true );
+  html_print_expression( forloop_condition( f ), false );
+  end_block( "condition", true );
 
-  begin_block( "increment" );
-  html_print_expression( forloop_increment( f ) );
-  end_block( "increment" );
+  begin_block( "increment", true );
+  html_print_expression( forloop_increment( f ), false );
+  end_block( "increment", true );
 
-  begin_block( "body" );
+  begin_block( "body", false );
   html_print_statement( forloop_body( f ) );
-  end_block( "body" );
+  end_block( "body", false );
 
-  end_block( "forloop" );
+  end_block( "forloop", true );
 }
 
 static void html_print_sequence( sequence seq ) {
-  begin_block( "sequence" );
+  begin_block( "sequence", true );
   FOREACH( statement, s, sequence_statements( seq ) ) {
     html_print_statement( s );
   }
-  end_block( "sequence" );
+  end_block( "sequence", true );
 }
 
 static void html_print_test( test t ) {
-  begin_block( "test" );
+  begin_block( "test", true );
 
-  begin_block( "cond" );
-  html_print_expression( test_condition( t ) );
-  end_block( "cond" );
+  begin_block( "cond", true );
+  html_print_expression( test_condition( t ), false );
+  end_block( "cond", true );
 
-  begin_block( "strue" );
+  begin_block( "strue", false );
   html_print_statement( test_true( t ) );
-  end_block( "cond" );
+  end_block( "strue", false );
 
   if ( !empty_statement_p( test_false( t ) ) ) {
-    begin_block( "sfalse" );
+    begin_block( "sfalse", false );
     html_print_statement( test_false(t) );
-    end_block( "sfalse" );
+    end_block( "sfalse", false );
   }
 
-  end_block( "test" );
+  end_block( "test", true );
 }
 
 static void html_print_statement( statement s ) {
-  begin_block( "statement" );
+  begin_block( "statement", true );
 
-  if(statement_label(s) != entity_undefined ) {
-    begin_block( "label" );
-    html_print_entity( statement_label(s) );
-    end_block( "label" );
+  if ( statement_label(s) != entity_undefined ) {
+    begin_block( "label", false );
+    html_print_entity_name( statement_label(s) );
+    end_block( "label", false );
   }
 
   list l = statement_declarations(s);
-  if ( l ) {
-    begin_block( "declarations" );
-    if ( !ENDP(l) ) {
-      FOREACH( entity, e, l ) {
-        html_print_entity( e );
-      }
+  if ( !ENDP(l) ) {
+    bool cr;
+    if ( CDR(l) ) {
+      cr = true;
     }
-    end_block( "declarations" );
+    begin_block( "declarations", cr );
+    FOREACH( entity, e, l ) {
+      html_print_entity_name( e );
+    }
+    end_block( "declarations", cr );
   }
 
-
-  begin_block( "instructions" );
+  begin_block( "instruction", true );
   instruction i = statement_instruction(s);
   switch ( instruction_tag(i) ) {
     case is_instruction_test:
@@ -630,7 +661,7 @@ static void html_print_statement( statement s ) {
       html_print_unstructured( instruction_unstructured( i ) );
       break;
     case is_instruction_expression:
-      html_print_expression( instruction_expression( i ) );
+      html_print_expression( instruction_expression( i ), false );
       break;
     case is_instruction_goto:
       /*      statement g = instruction_goto(i);
@@ -640,24 +671,24 @@ static void html_print_statement( statement s ) {
       break;
       /* add switch, forloop break, continue, return instructions here*/
     default:
-      html_output( " Instruction not implemented" NL );
+      html_output( " Instruction not implemented" NL, false );
       break;
   }
-  end_block( "instructions" );
+  end_block( "instruction", true );
 
-  end_block( "statement" );
+  end_block( "statement", true );
 }
 
-bool html_prettyprint( char *module_name ) {
+bool html_prettyprint( const char *module_name ) {
   statement module_statement =
       PIPS_PHASE_PRELUDE(module_name,"PREPEND_COMMENT_DEBUG_LEVEL");
 
   /* Print current module */
-  printf("<li><ul class=\"module\">");
-  begin_block( module_name );
+  printf( NL "<li><ul class=\"module\">" NL );
+  begin_block( module_name, true );
   html_print_statement( module_statement );
-  end_block( module_name );
-  printf("</li></ul>");
+  end_block( module_name, true );
+  printf( "<li class=\"endmodule\">&nbsp;</li>" NL "</ul></li>" NL );
 
   /* Put back the new statement module */
   PIPS_PHASE_POSTLUDE(module_statement);
@@ -665,13 +696,17 @@ bool html_prettyprint( char *module_name ) {
   return TRUE;
 }
 
-bool html_prettyprint_symbol_table( char /* unused */module ) {
+bool html_prettyprint_symbol_table( const char *module ) {
   /* Print symbol table */
-  begin_block( "Symbol table" );
+  printf( NL "<li><ul class=\"symbolTable\">" NL );
+  begin_block( "Symbol table", true );
   list entities = gen_filter_tabulated( gen_true, entity_domain );
   int i = 0;
   FOREACH(entity, e, entities ) {
     html_print_entity_full( e );
   }
-  end_block( "Symbol table" );
+  printf( "<li class=\"endSymbolTable\">&nbsp;</li>" NL "</ul></li>" NL );
+  end_block( "Symbol table", true );
+
+  return TRUE;
 }

@@ -148,13 +148,21 @@ static void pragma_str_for (loop l, statement stmt) {
   chop_newline (str, FALSE);
   if ((str !=string_undefined) && (str != NULL) && (strcmp (str, "") != 0)) {
     string tmp = string_undefined;
-    if (get_prettyprint_is_fortran () == TRUE) {
+    switch (language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
       // for fortran case we need to look at the O of OMP and skip !$
       tmp = strchr (str, 'O');
-    }
-    else {
+      break;
+    case is_language_c:
       // for C case we need to look at the o of omp and skip #pragma"
       tmp = strchr (str, 'o');
+      break;
+    case is_language_fortran95:
+      pips_assert ("Need to update F95 case", FALSE);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
     }
     // insert the pragma as a string to the current statement
     if ((tmp !=string_undefined) && (tmp != NULL) && (strcmp (tmp, "") != 0)) {
@@ -196,7 +204,15 @@ bool ompify_code (const string module_name) {
   reductions_pragma_omp_init (module_name);
 
   // generate pragma string or expression using the correct language:
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
+  value mv = entity_initial(module_name_to_entity(module_name));
+  if(value_code_p(mv)) {
+    code c = value_code(mv);
+    set_prettyprint_language_from_property(language_tag(code_language(c)));
+  } else {
+    /* Should never arise */
+    set_prettyprint_language_from_property(is_language_fortran);
+  }
+
   // generate omp pragma for parallel loops
   // We need to access to the statement containing the current loop, forloop
   // so ask NewGen gen_recurse to keep this informations for us

@@ -682,6 +682,12 @@ used interactively, or core dump for debugging purposes and for script
 executions, especially non-regression tests.
 
 Property
+\begin{PipsProp}{MAXIMUM_USER_ERROR}
+MAXIMUM_USER_ERROR 2
+\end{PipsProp}
+specifies the number of user error allowed before the programs brutally aborts.
+
+Property
 \begin{PipsProp}{ACTIVE_PHASES}
 ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE PRINT_CALL_GRAPH PRINT_ICFG TRANSFORMERS_INTER_FULL INTERPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTER_FULL ATOMIC_CHAINS RICE_SEMANTICS_DEPENDENCE_GRAPH MAY_REGIONS"
 \end{PipsProp}
@@ -4650,32 +4656,34 @@ expression and subexpression by the points-to analysis.
 
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.
+
 The property \PipsPropRef{ALIASING_ACROSS_TYPES} specifies that two
-pointers of different effective types can be aliased. The default
-value it is set to TRUE, when it is turned to false two pointers of
-different types are never aliased.
+pointers of different effective types can be aliased. The default and
+safe value is {\tt TRUE}; when it is turned to {\tt FALSE} two
+pointers of different types are never aliased.
 \begin{PipsProp}{ALIASING_ACROSS_TYPES}
-ALIASING_ACROSS_TYPES FALSE
+ALIASING_ACROSS_TYPES TRUE
 \end{PipsProp}
 
 The property \PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} is used
-to handle the aliasing between formel parameters and global variables
-of pointer type. When it is set to TRUE two formels parameters or a
+to handle the aliasing between formal parameters and global variables
+of pointer type. When it is set to {\tt TRUE}, two formal parameters or a
 formal one and a global pointer or two global pointers can be
-aliased. If it is turned to FALSE, such pointers are assumed to be
+aliased. If it is turned to {\tt FALSE}, such pointers are assumed to be
 unaliased for intraprocedural analysis and generally for root
 module(i.e. modules without callers).
 \begin{PipsProp}{ALIASING_ACROSS_FORMAL_PARAMETERS}
-ALIASING_ACROSS_FORMAL_PARAMETERS FALSE
+ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
 \end{PipsProp}
 
 The nest property specifies that one data structure can recursively
 contain two pointers pointing to the same location. If it is turned to
-FALSE, it is assumed that two different not included
- memory access paths cannot point to the same memory locations. The safe value is TRUE.
+{\tt FALSE}, it is assumed that two different not included memory
+access paths cannot point to the same memory locations. The safe (and
+default) value is {\tt TRUE}.
 
 \begin{PipsProp}{ALIASING_INSIDE_DATA_STRUCTURE}
-ALIASING_INSIDE_DATA_STRUCTURE FALSE
+ALIASING_INSIDE_DATA_STRUCTURE TRUE
 \end{PipsProp}
 
 The following string property defines the lattice of maximal elements
@@ -6273,7 +6281,7 @@ COMENGINE_NUMBER_OF_FIFO 100
 \end{PipsProp}
 
 
-\subsubsection{Code distribution on GPU}
+\subsection{Code distribution on GPU}
 \label{sec:code-distr-gpu}
 
 \begin{PipsPass}{gpu_ify}
@@ -10243,16 +10251,23 @@ print_code_points_to_list      > MODULE.printed_file
 \subsubsection{Language}
 \index{PRETTYPRINT\_C\_CODE}
 
-PIPS is now extended to deal with C programs, so the following property is
-used to tell the prettyprinter to print a C code or not. By default, the
-Fortran output is printed.
+PIPS can handle several languages. By default the PrettyPrinter uses
+the native language as an output but it is also possible to prettyprint
+Fortran code as C code. Possible values for the PRETTYPRINT\_LANGUAGE property
+are: \texttt{native F95 F77 C}.
 
-\begin{PipsProp}{PRETTYPRINT_C_CODE} 
-PRETTYPRINT_C_CODE FALSE
+\begin{PipsProp}{PRETTYPRINT_LANGUAGE}
+PRETTYPRINT_LANGUAGE "F77"
 \end{PipsProp}
 
-However, this is not a good way to handle multi-target languages. To be
-replaced ...
+PIPS can handle many different languages. By default the PrettyPrinter uses
+the native language as an output but it is also possible to prettyprint
+Fortran code as C code. Possible values for the PRETTYPRINT\_LANGUAGE property
+are: \texttt{native F95 F77 C}.
+
+\begin{PipsProp}{PRETTYPRINT_LANGUAGE}
+PRETTYPRINT_LANGUAGE "F77"
+\end{PipsProp}
 
 \subsubsection{Layout}
 \index{Analysis}

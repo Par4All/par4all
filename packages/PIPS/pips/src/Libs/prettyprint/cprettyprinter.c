@@ -444,14 +444,15 @@ static string this_entity_cdeclaration(entity var)
                         {
                             string sval = i2a(constant_int(c));
                             string svar = c_entity_local_name(var);
-                            bool old = get_prettyprint_is_fortran();
-                            reset_prettyprint_is_fortran();
+                            language old = copy_language (get_prettyprint_language ());
+                            set_prettyprint_language_tag (is_language_c);
                             string sbasic = basic_to_string(entity_basic(var));
-                            if(old) set_prettyprint_is_fortran();
+                            set_prettyprint_language (old);
                             asprintf(&result,"static const %s %s = %s;\n",sbasic,svar,sval);
                             free(sval);
                             free(svar);
                             free(sbasic);
+			    free_language (old);
                             return result;
                         }
                         /*What about real, double, string, ... ?*/

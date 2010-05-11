@@ -125,12 +125,6 @@ comments_equal_p(string c1, string c2)
 }
 
 
-/** @defgroup statements_p Predicates on statements
-
-    @{
-*/
-
-
 /* Return true if the statement has an empty statement: */
 bool
 statement_with_empty_comment_p(statement s)
@@ -146,6 +140,33 @@ assignment_statement_p(statement s) {
   instruction i = statement_instruction(s);
 
   return instruction_assign_p(i);
+}
+
+
+bool assignment_block_or_statement_p(statement s)
+{
+    instruction i = statement_instruction(s);
+
+    switch(instruction_tag(i)) {
+    case is_instruction_block:
+	return assignment_block_p(statement_instruction(s));
+	break;
+    case is_instruction_test:
+	break;
+    case is_instruction_loop:
+	break;
+    case is_instruction_whileloop:
+	break;
+    case is_instruction_goto:
+	pips_error("assignment_block_p", "unexpected GO TO\n");
+    case is_instruction_call:
+	return assignment_statement_p(s);
+    case is_instruction_unstructured:
+	break;
+    default: pips_error("assignment_block_or_statement_p",
+			"ill. instruction tag %d\n", instruction_tag(i));
+    }
+    return FALSE;
 }
 
 
@@ -327,8 +348,6 @@ bool statement_expression_p(statement s)
 {
   return instruction_expression_p(statement_instruction(s));
 }
-
-/* @} */
 
 
 /* Test if a statement is empty. */
@@ -525,6 +544,17 @@ decls_text_dup(string dt) {
 }
 
 
+statement make_assign_statement(expression l,
+				expression r)
+{
+    return make_stmt_of_instr(make_assign_instruction(l, r));
+}
+
+
+/** @defgroup block_statement_constructors Block/sequence statement constructors
+    @{
+ */
+
 /** Build a statement from a give instruction
 
     There is also a macro instruction_to_statement() that does the same job.
@@ -539,17 +569,6 @@ make_stmt_of_instr(instruction instr) {
 			empty_extensions()));
 }
 
-
-statement make_assign_statement(expression l,
-				expression r)
-{
-    return make_stmt_of_instr(make_assign_instruction(l, r));
-}
-
-
-/** @defgroup block_statement_constructors Block/sequence statement constructors
-    @{
- */
 
 /** Make a block statement from a list of statement
  */
@@ -1105,33 +1124,6 @@ statement_expression(statement s)
 /* @} */
 
 
-bool assignment_block_or_statement_p(statement s)
-{
-    instruction i = statement_instruction(s);
-
-    switch(instruction_tag(i)) {
-    case is_instruction_block:
-	return assignment_block_p(statement_instruction(s));
-	break;
-    case is_instruction_test:
-	break;
-    case is_instruction_loop:
-	break;
-    case is_instruction_whileloop:
-	break;
-    case is_instruction_goto:
-	pips_error("assignment_block_p", "unexpected GO TO\n");
-    case is_instruction_call:
-	return assignment_statement_p(s);
-    case is_instruction_unstructured:
-	break;
-    default: pips_error("assignment_block_or_statement_p",
-			"ill. instruction tag %d\n", instruction_tag(i));
-    }
-    return FALSE;
-}
-
-
 void
 print_statement_set(fd, r)
 FILE *fd;
@@ -1149,7 +1141,7 @@ set r;
 
 /** Print a statement on stdout
 
-    Print the statement according to the current PRETTYPRINT_C_CODE
+    Print the statement according to the current PRETTYPRINT_LANGUAGE
     property
 
     See text_named_module() for improvements.
@@ -1160,14 +1152,9 @@ void print_statement(statement s)
   set_alternate_return_set();
   reset_label_counter();
   push_current_module_statement(s);
-  bool previous_is_fortran_p = get_prettyprint_is_fortran();
-  /* Prettyprint in the correct language: */
-  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
   text txt = text_statement(entity_undefined, 0, s, NIL);
   print_text(stderr, txt);
   free_text(txt);
-  /* Put back the previous prettyprint language: */
-  set_prettyprint_is_fortran_p(previous_is_fortran_p);
   pop_current_module_statement();
   reset_alternate_return_set();
   debug_off();
@@ -2198,7 +2185,10 @@ figure_out_if_it_is_a_format(instruction i, bool *format_inside_statement_has_be
 }
 
 
-/* Return TRUE only if there is a FORMAT inside the statement: */
+/* Return TRUE only if there is a FORMAT inside the statement:
+
+   @addtogroup statement_predicate
+*/
 bool
 format_inside_statement_p(statement s)
 {
@@ -2615,9 +2605,12 @@ list statement_to_implicit_target_labels(statement s)
   
   return ll;
 }
-
-/* Make sure that s and all its substatements are defined */
 
+
+/* Make sure that s and all its substatements are defined
+
+   @addtogroup statement_predicate
+*/
 static bool undefined_statement_found_p(statement s, bool * p_undefined_p)
 {
   if(!(* p_undefined_p)) {
@@ -2640,6 +2633,10 @@ static bool undefined_statement_found_p(statement s, bool * p_undefined_p)
   return !(* p_undefined_p);
 }
 
+
+/*
+   @addtogroup statement_predicate
+*/
 bool all_statements_defined_p(statement s)
 {
   bool undefined_p = FALSE;
@@ -3384,6 +3381,10 @@ struct fswp {
     string begin;
 };
 
+
+/*
+   @addtogroup statement_predicate
+*/
 extension statement_with_pragma_p(statement s, string seed)
 {
     list exs = extensions_extension(statement_extensions(s));
@@ -3415,7 +3416,8 @@ list find_statements_with_pragma(statement s, string begin)
   gen_context_recurse(s,&p,statement_domain,find_statements_with_pragma_walker,gen_null);
   return gen_nreverse(p.l);
 }
-
+
+
 static bool look_for_user_call(call c, bool * user_call_p)
 {
   entity f = call_function(c);
@@ -3431,7 +3433,10 @@ static bool look_for_user_call(call c, bool * user_call_p)
 /* Check if a statement s contains a call to a user-defined
    function. This may be useful because PIPS does not contain a
    control effect analysis and because a user-defined function can
-   hide a control effect such as exit(), abort() or STOP. */
+   hide a control effect such as exit(), abort() or STOP.
+
+   @addtogroup statement_predicate
+*/
 bool statement_contains_user_call_p(statement s)
 {
   bool user_call_p = FALSE;
@@ -3467,7 +3472,10 @@ static bool look_for_control_effects(call c, bool * control_effect_p)
    or to an intrinsic with control effects. This may be useful because
    PIPS does not contain a control effect analysis and because a
    user-defined function can hide a control effect such as exit(),
-   abort() or STOP. */
+   abort() or STOP.
+
+   @addtogroup statement_predicate
+*/
 bool statement_may_have_control_effects_p(statement s)
 {
   bool control_effect_p = FALSE;
@@ -3490,7 +3498,8 @@ bool statement_may_have_control_effects_p(statement s)
 
   return control_effect_p;
 }
-
+
+
 /* Make (a bit more) sure that s is gen_defined_p in spite of poor
    decision for empty fields and that strdup can be used on the string
    fields. */
@@ -3531,6 +3540,8 @@ static bool statement_in_statement_walker(statement st, struct sb* sb)
    @param st is the outside statement
 
    @return TRUE is @p s is inside @p st
+
+   @addtogroup statement_predicate
 */
 bool statement_in_statement_p(statement s, statement st)
 {
@@ -3548,6 +3559,8 @@ bool statement_in_statement_p(statement s, statement st)
    @param st is the outside statement
 
    @return TRUE is at least one statement of @p l is inside @p st
+
+   @addtogroup statement_predicate
 */
 bool statement_in_statements_p(statement s, list l)
 {
