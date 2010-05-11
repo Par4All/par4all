@@ -549,11 +549,7 @@ list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
 {
   list pc = NIL;
   string begin_attachment;
-  string cmn = get_current_module_name();
-  entity cme = get_current_module_entity();
-  string cun = compilation_unit_of_module(cmn);
   entity e = reference_variable(obj);
-  string emn = entity_module_name(e);
 
   /* entity_user_name() returns a shorter result than
      entity_minimal_user_name() because the second one avoids
@@ -1519,24 +1515,18 @@ words_io_inst(call obj,
  *  Implemented for ALLOCATE(), but is applicable for every call to
  *  function that take STAT= parameter
  */
-static list
-words_stat_io_inst(call obj,
-        int precedence, bool leftmost, list pdl)
-{
+static list words_stat_io_inst(call obj,
+                               int __attribute__((unused)) precedence,
+                               bool __attribute__((unused)) leftmost,
+                               list pdl) {
   list pc = NIL;
   list pcio = call_arguments(obj);
   list pio_write = pcio;
-  boolean good_fmt = FALSE;
-  bool good_unit = FALSE;
-  bool iolist_reached = FALSE;
-  bool complex_io_control_list = FALSE;
-  expression fmt_arg = expression_undefined;
-  expression unit_arg = expression_undefined;
   string called = entity_local_name(call_function(obj));
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   /* Write call function */
-  pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+  pc = CHAIN_SWORD(pc, called);
   pc = CHAIN_SWORD(pc, " (");
 
   while ( ( pio_write != NIL ) ) {
@@ -1552,7 +1542,6 @@ words_stat_io_inst(call obj,
         /* get argument */
         pio_write = CDR(pio_write);
         expression arg = EXPRESSION(CAR(pio_write));
-        entity f;
         pc = gen_nconc( pc, words_expression( arg, pdl ) );
       }
     } else { /* It's not a call */
@@ -2327,21 +2316,76 @@ list words_subexpression(
 /**************************************************************** SENTENCE */
 
 static sentence
-sentence_tail(void)
+sentence_tail(entity e)
 {
   sentence result = sentence_undefined;
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-  case is_language_fortran95:
-    result = MAKE_ONE_WORD_SENTENCE(0, strdup("END"));
-    break;
-  case is_language_c:
-    result = MAKE_ONE_WORD_SENTENCE(0, strdup("}"));
-    break;
-  default:
-    pips_internal_error("Language unknown !");
-    break;
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+      result = MAKE_ONE_WORD_SENTENCE(0, strdup("END"));
+      break;
+    case is_language_c:
+      result = MAKE_ONE_WORD_SENTENCE(0, strdup("}"));
+      break;
+    case is_language_fortran95: {
+      /* In fortran 95, we want the end to be followed by the type of construct
+       * and its name.
+       */
+      list pc = NIL;
+      type te = entity_type(e);
+      functional fe;
+      type tr;
+
+      pc = CHAIN_SWORD(pc,"END ");
+
+      pips_assert("is functionnal", type_functional_p(te));
+
+      if (static_module_p(e))
+        pc = CHAIN_SWORD(pc,"static ");
+
+      fe = type_functional(te);
+      tr = functional_result(fe);
+
+      switch(type_tag(tr)) {
+        case is_type_void:
+          if (entity_main_module_p(e))
+            pc = CHAIN_SWORD(pc,"PROGRAM ");
+          else {
+            if (entity_blockdata_p(e))
+              pc = CHAIN_SWORD(pc, "BLOCKDATA ");
+            else if (entity_f95module_p(e))
+              pc = CHAIN_SWORD(pc, "MODULE ");
+            else
+              pc = CHAIN_SWORD(pc,"SUBROUTINE ");
+          }
+          break;
+        case is_type_variable: {
+          list pdl = NIL;
+          pc = CHAIN_SWORD(pc," FUNCTION ");
+          break;
+        }
+        case is_type_unknown:
+          /*
+           * For C functions with no return type.
+           * It can be treated as of type int, but we keep it unknown
+           * for the moment, to make the differences and to regenerate initial code
+           */
+          break;
+        default:
+          pips_internal_error("unexpected type for result\n");
+      }
+
+      pc = CHAIN_SWORD(pc, entity_user_name(e));
+      result = make_sentence(is_sentence_unformatted, make_unformatted(NULL,
+                                                                       0,
+                                                                       0,
+                                                                       pc));
+      break;
+    }
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
+
   return result;
 }
 
@@ -2360,14 +2404,11 @@ sentence_goto_label(
 	    make_unformatted(label?strdup(label):NULL, n, margin, pc)));
 }
 
-static sentence
-sentence_goto(
-    entity module,
-    string label,
-    int margin,
-    statement obj,
-    int n)
-{
+static sentence sentence_goto(entity module,
+                                string label,
+                                int margin,
+                                statement obj,
+                                int n) {
     string tlabel = entity_local_name(statement_label(obj)) +
       strlen(LABEL_PREFIX);
     pips_assert("Legal label required", strlen(tlabel)!=0);
@@ -2474,63 +2515,63 @@ text_block(entity module,
 static list /* of string */
 loop_private_variables(loop obj, list pdl)
 {
-    bool
-        all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
-	hpf_private = pp_hpf_style_p(),
-	omp_private = pp_omp_style_p(),
-	some_before = FALSE;
-    list l = NIL;
+    bool all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
+      hpf_private = pp_hpf_style_p(), omp_private = pp_omp_style_p(),
+      some_before = FALSE;
+  list l = NIL;
 
-    // list of local entities
-    // In case of openmp the variable declared in the loop body should
-    // not be made private, so ask for removing them from the list of locals.
-    // If all_private is FALSE -> remove loop indice from the list of locals.
-    list locals = loop_private_variables_as_entites (obj, omp_private, !all_private);
+  // list of local entities
+  // In case of openmp the variable declared in the loop body should
+  // not be made private, so ask for removing them from the list of locals.
+  // If all_private is FALSE -> remove loop indice from the list of locals.
+  list locals = loop_private_variables_as_entites(obj,
+                                                  omp_private,
+                                                  !all_private);
+  /* comma-separated list of private variables.
+   * built in reverse order to avoid adding at the end...
+   */
+  FOREACH (ENTITY, p, locals) {
+    if (some_before)
+      l = CHAIN_SWORD(l, ",");
+    else
+      some_before = TRUE; /* from now on commas, triggered... */
+    l = gen_nconc(l, words_declaration(p, TRUE, pdl));
+  }
 
-    /* comma-separated list of private variables.
-     * built in reverse order to avoid adding at the end...
-     */
-    FOREACH (ENTITY, p, locals) {
-      if (some_before)
-	l = CHAIN_SWORD(l, ",");
-      else
-	some_before = TRUE; /* from now on commas, triggered... */
-      l = gen_nconc(l, words_declaration(p,TRUE, pdl));
-    }
+  gen_free_list(locals);
 
-    gen_free_list (locals);
+  pips_debug(5, "#printed %zd/%zd\n", gen_length(l),
+      gen_length(loop_locals(obj)));
 
-    pips_debug(5, "#printed %zd/%zd\n", gen_length(l),
-	       gen_length(loop_locals(obj)));
+  /* stuff around if not empty
+   */
+  if (l) {
+    string private;
+    if (hpf_private) {
+    private = "NEW(";
+    } else if (omp_private) {
+      switch(language_tag (get_prettyprint_language ())) {
+        case is_language_fortran:
+        private = "PRIVATE(";
+          break;
+        case is_language_c:
+        private = "private(";
+          break;
+        case is_language_fortran95:
+          pips_internal_error("Need to update F95 case");
+          break;
+        default:
+          pips_internal_error("Language unknown !");
+          break;
+      }
+    } else
+    private = "PRIVATE ";
+    l = CONS(STRING, MAKE_SWORD(private), l);
+    if (hpf_private || omp_private)
+      CHAIN_SWORD(l, ")");
+  }
 
-    /* stuff around if not empty
-     */
-    if (l)
-    {
-	string private;
-	if (hpf_private) private = "NEW(";
-	else if (omp_private) {
-	  switch (language_tag (get_prettyprint_language ())) {
-	  case is_language_fortran:
-	    private = "PRIVATE(";
-	    break;
-	  case is_language_c:
-	    private = "private(";
-	    break;
-	  case is_language_fortran95:
-      pips_internal_error("Need to update F95 case");
-	    break;
-	  default:
-      pips_internal_error("Language unknown !");
-	    break;
-	  }
-	}
-	else private = "PRIVATE ";
-	l = CONS(STRING, MAKE_SWORD(private), l);
-	if (hpf_private || omp_private) CHAIN_SWORD(l, ")");
-    }
-
-    return l;
+  return l;
 }
 
 /* returns a formatted text for the HPF independent and new directive
@@ -4320,7 +4361,7 @@ text text_named_module(
   if (!compilation_unit_p(entity_name(name)) || (language_tag (get_prettyprint_language ()) == is_language_fortran))
     {
       /* No need to print TAIL (}) if the current module is a C compilation unit*/
-      ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+      ADD_SENTENCE_TO_TEXT(r, sentence_tail(module));
     }
 
   if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
