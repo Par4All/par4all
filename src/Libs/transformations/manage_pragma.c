@@ -88,7 +88,14 @@ bool omp_loop_parallel_threshold_set (char mod_name[]) {
   statement mod_stmt = statement_undefined;
 
   // generate pragma string or expression using the correct language:
-  set_prettyprint_language_from_property ();
+  value mv = entity_initial(module_name_to_entity(mod_name));
+  if(value_code_p(mv)) {
+    code c = value_code(mv);
+    set_prettyprint_language_from_property(language_tag(code_language(c)));
+  } else {
+    /* Should never arise */
+    set_prettyprint_language_from_property(is_language_fortran);
+  }
 
   // Get the code and tell PIPS_DBM we do want to modify it
   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);

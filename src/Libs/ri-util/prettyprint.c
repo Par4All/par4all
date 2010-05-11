@@ -159,10 +159,8 @@ language get_prettyprint_language () {
 /**
    @return the prettyprint language as a language_utype
  **/
-static enum language_utype get_prettyprint_language_tag () {
-  if (prettyprint_language == language_undefined)
-    prettyprint_language = make_language_fortran ();
-  return language_tag (prettyprint_language);
+enum language_utype get_prettyprint_language_tag () {
+  return language_tag (get_prettyprint_language ());
 }
 
 /**
@@ -190,9 +188,10 @@ bool prettyprint_language_is_c_p () {
    @brief set the prettyprint language according to the property
    PRETTYPRINT_LANGUAGE
  **/
-void set_prettyprint_language_from_property () {
-  if (prettyprint_language == language_undefined)
+void set_prettyprint_language_from_property( enum language_utype native ) {
+  if (prettyprint_language == language_undefined) {
     prettyprint_language = make_language_fortran ();
+  }
   string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
   if (strcmp (lang, "F77") == 0) {
     language_tag (prettyprint_language) = is_language_fortran;
@@ -203,8 +202,10 @@ void set_prettyprint_language_from_property () {
   else if (strcmp (lang, "F95") == 0) {
     language_tag (prettyprint_language) = is_language_fortran95;
   }
-  else {
-    pips_assert ("bad property value for language", false);
+  else if (strcmp (lang, "native") == 0) {
+    language_tag (prettyprint_language) = native;
+  } else {
+    pips_internal_error("bad property value for language");
   }
 }
 
@@ -4220,7 +4221,9 @@ text text_named_module(
   text ral = text_undefined;
 
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
-  set_prettyprint_language_from_property ();
+
+  /* Set the prettyprint language */
+  set_prettyprint_language_from_property(language_tag(code_language(c)));
 
   /* This guard is correct but could be removed if find_last_statement()
    * were robust and/or if the internal representations were always "correct".

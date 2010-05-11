@@ -115,7 +115,6 @@ bool print_code_or_source(string mod_name)
 	    DBR_GRAPH_PRINTED_FILE
 		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
     string file_ext = string_undefined;
-    int pff = get_bool_property("PRETTYPRINT_FREE_FORM");
 
     /* FI: This test could be moved up in pipsmake? */
     if(entity_undefined_p(module = module_name_to_entity(mod_name))) {
@@ -125,11 +124,7 @@ bool print_code_or_source(string mod_name)
       return false;
     }
 
-    /* C or F95 Implies PRETTYPRINT_FREE_FORM = true */
     string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
-    if ((strcmp (lang, "C") == 0) || (strcmp (lang, "F95") == 0)) {
-      set_bool_property("PRETTYPRINT_FREE_FORM", TRUE);
-    }
 
     if((strcmp (lang, "F77") == 0) && fortran_language_module_p(module)) {
       file_ext =
@@ -188,8 +183,6 @@ bool print_code_or_source(string mod_name)
        parallel code prettyprint: */
     set_string_property("PRETTYPRINT_PARALLEL", pp);
     free(pp);
-    /* Restore the previous PRETTYPRINT_FREE_FORM property */
-    set_bool_property("PRETTYPRINT_FREE_FORM", pff);
 
     reset_current_module_entity();
     reset_current_module_statement();

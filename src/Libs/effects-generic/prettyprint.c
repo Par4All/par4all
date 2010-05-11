@@ -364,8 +364,17 @@ print_source_or_code_effects_engine(
 {
     char *file_name, *file_resource_name;
     bool success = TRUE;
+    entity e_module = module_name_to_entity(module_name);
 
-    set_prettyprint_language_from_property ();
+    /* Set the prettyprint language */
+    value mv = entity_initial(e_module);
+    if(value_code_p(mv)) {
+      code c = value_code(mv);
+      set_prettyprint_language_from_property(language_tag(code_language(c)));
+    } else {
+      /* Should never arise */
+      set_prettyprint_language_from_property(is_language_fortran);
+    }
 
     file_name =
       strdup(concatenate(file_suffix,
@@ -374,8 +383,7 @@ print_source_or_code_effects_engine(
 			 GRAPH_FILE_EXT : "",
 
 			 /* To exploit the language sensitive prettyprint ability of the display */
-			 c_module_p(module_name_to_entity(module_name))? ".c" : ".f",
-
+			 c_module_p(e_module)? ".c" : ".f",
 			 NULL));
     file_resource_name = 
 	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?

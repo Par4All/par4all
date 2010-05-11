@@ -97,247 +97,248 @@ fprintf_sentence(FILE * fd,
  * a property... 17/12/1993.
  */
 
-#define MAX_END_COLUMN 		(72)
-#define MAX_START_COLUMN 	(42)
+#define MAX_END_COLUMN          (72)
+#define MAX_END_COLUMN_F95     (132)
+#define MAX_START_COLUMN 	      (42)
 #define C_STATEMENT_LINE_COLUMN (71)
 #define C_STATEMENT_LINE_STEP   (15)
 
-void
-print_sentence(FILE * fd,
-	       sentence s)
-{
-    if (sentence_formatted_p(s)) {
-	string ps = sentence_formatted(s);
+void print_sentence(FILE * fd, sentence s) {
+  enum language_utype lang = get_prettyprint_language_tag();
 
-	while (*ps) {
-	    char c = *ps;
-	    putc_sentence(c, fd);
-	    deal_with_attachments_at_this_character(ps,
-						    position_in_the_output);
-	    ps++;
-	}
+  if (sentence_formatted_p(s)) {
+    string ps = sentence_formatted(s);
+
+    while(*ps) {
+      char c = *ps;
+      putc_sentence(c, fd);
+      deal_with_attachments_at_this_character(ps, position_in_the_output);
+      ps++;
     }
-    else
-    {
-	/* col: the next column number, starting from 1.
-	 * it means tha columns 1 to col-1 have been output. I guess. FC.
-	 */
-	int i, line_num = 1;
-	unsigned int col;
-	unformatted u = sentence_unformatted(s);
-	string label = unformatted_label(u);
-	int em = unformatted_extra_margin(u);
-	int n = unformatted_number(u);
-	cons *lw = unformatted_words(u);
+  } else {
+    /* col: the next column number, starting from 1.
+     * it means tha columns 1 to col-1 have been output. I guess. FC.
+     */
+    int i, line_num = 1;
+    unsigned int col;
+    unformatted u = sentence_unformatted(s);
+    string label = unformatted_label(u);
+    int em = unformatted_extra_margin(u);
+    int n = unformatted_number(u);
+    cons *lw = unformatted_words(u);
 
-	/* first 6 columns (0-5)
-	 */
-	/* 05/08/2003 - Nga Nguyen - Add code for C prettyprinter */
+    /* first 6 columns (0-5)
+     */
+    /* 05/08/2003 - Nga Nguyen - Add code for C prettyprinter */
 
-	if (label != NULL && !string_undefined_p(label)) {
-	    /* Keep track of the attachment against the padding: */
-	    deal_with_attachments_in_this_string(label,
-						 position_in_the_output);
+    if (label != NULL && !string_undefined_p(label)) {
+      /* Keep track of the attachment against the padding: */
+      deal_with_attachments_in_this_string(label, position_in_the_output);
 
-	    if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
-	      fprintf_sentence(fd, "%-5s ", label);
-	    } else
-	      {
-		/* C prettyprinter: a label cannot begin with a number so "l" is added for this case*/
-		if (strlen(label)>0)
-		  fprintf_sentence(fd,isdigit(label[0])?"l%s:":"%s:",label);
-	      }
-	}
-	else {
-	  if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
-	    fprintf_sentence(fd,"      ");
-	  }
-	}
-
-	/* FI: do not indent too much (9 June 1995) */
-	em = (em > MAX_START_COLUMN) ? MAX_START_COLUMN : em;
-
-	/* Initial tabulation, if needed: do not put useless SPACEs
-	   in output file.
-
-	   Well, it's difficult to know if it is useful or not. The
-	   test below leads to misplaced opening braces.
-	*/
-	if(!ENDP(lw)
-	   /*&& gen_length(lw)>1
-	     && !same_string_p(STRING(CAR(lw)), "\n")*/)
-	  for (i = 0; i < em; i++)
-	    putc_sentence(' ', fd);
-
-	col = em;
-
-	if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
-	  col = col + 7; /* Fortran77 start on 7th column */
-	}
-
-	pips_assert("not too many columns", col <= MAX_END_COLUMN);
-
-	FOREACH(STRING, w, lw) {
-	  if( get_bool_property("PRETTYPRINT_FREE_FORM")) {
-	    col += fprintf_sentence(fd, "%s", w);
-	  } else {
-
-	    /* if the string fits on the current line: no problem */
-	    if (col + strlen(w) <= 70) {
-		deal_with_attachments_in_this_string(w,
-						     position_in_the_output);
-		col += fprintf_sentence(fd, "%s", w);
-	    }
-	    /* if the string fits on one line:
-	     * use the 88 algorithm to break as few
-	     * syntactic constructs as possible */
-	    else
-	      if((int)strlen(w) < 70-7-em) {
-		    if (col + strlen(w) > 70) {
-			/* Complete current line with the statement
-                           line number, if it is significative: */
-			if (n > 0 &&
-			    get_bool_property("PRETTYPRINT_STATEMENT_NUMBER"))
-			{
-			  for (i = col; i <= MAX_END_COLUMN; i++) {
-			    putc_sentence(' ', fd);
-			  }
-			  switch (language_tag (get_prettyprint_language ())) {
-			  case is_language_fortran:
-			    fprintf_sentence(fd, "%04d", n);
-			    break;
-			  case is_language_c:
-			    fprintf_sentence(fd, "/*%04d*/", n);
-			    break;
-			  case is_language_fortran95:
-			    pips_assert ("Need to update F95 case", FALSE);
-			    break;
-			  default:
-			    pips_assert ("This case should have been handled before", FALSE);
-			    break;
-			  }
-			}
-
-			/* start a new line with its prefix */
-			putc_sentence('\n', fd);
-
-			if(label != (char *) NULL && !string_undefined_p(label)
-			   && (strcmp(label,"CDIR$")==0
-			       || strcmp(label,"CDIR@")==0
-			       || strcmp(label,"CMIC$")==0)) {
-			    /* Special label for Cray directives */
-			    fprintf_sentence(fd, "%s%d", label,
-					     (++line_num)%10);
-			}
-			else
-			    fprintf_sentence(fd, "     &");
-
-			for (i = 0; i < em; i++)
-			    putc_sentence(' ', fd);
-
-			col = 7+em;
-		    }
-		    deal_with_attachments_in_this_string
-			(w, position_in_the_output);
-		    col += fprintf_sentence(fd, "%s", w);
-		}
-	    /* if the string has to be broken in at least two lines:
-	     * new algorithmic part
-	     * to avoid line overflow (FI, March 1993) */
-		else {
-		    char * line = w;
-		    int ncar;
-
-		    /* Complete the current line, but not after :-) */
-		    ncar = MIN(MAX_END_COLUMN - col + 1, strlen(line));;
-		    deal_with_attachments_in_this_string_length
-			(line, position_in_the_output, ncar);
-		    fprintf_sentence(fd, "%.*s", ncar, line);
-		    line += ncar;
-		    col = MAX_END_COLUMN;
-
-		    pips_debug(9, "line to print, col=%d\n", col);
-
-		    while(strlen(line)!=0)
-		    {
-			ncar = MIN(MAX_END_COLUMN - 7 + 1, strlen(line));
-
-			/* start a new line with its prefix but no indentation
-			 * since string constants may be broken onto two lines
-			 */
-			putc_sentence('\n', fd);
-
-			if(label != (char *) NULL
-			   && (strcmp(label,"CDIR$")==0
-			       || strcmp(label,"CDIR@")==0
-			       || strcmp(label,"CMIC$")==0)) {
-			    /* Special label for Cray directives */
-			    (void) fprintf_sentence
-				(fd, "%s%d", label, (++line_num)%10);
-			}
-			else
-			    (void) fprintf_sentence(fd, "     &");
-
-			col = 7 ;
-			deal_with_attachments_in_this_string_length
-			    (line, position_in_the_output, ncar);
-			(void) fprintf_sentence(fd, "%.*s", ncar, line);
-			line += ncar;
-			col += ncar;
-		    }
-		}
-	  }
-	}
-
-	pips_debug(9, "line completed, col=%d\n", col);
-	if( !get_bool_property("PRETTYPRINT_FREE_FORM")) {
-	  pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
-	}
-	/* statement line number starts at different column depending on */
-	/* the used language : C or fortran                              */
-	size_t column_start = 0;
-	switch (language_tag (get_prettyprint_language ())) {
-	case is_language_fortran:
-	  /* fortran case right the line number on the right where characters
-	     are ignored by a f77 parser*/
-	  column_start = MAX_END_COLUMN;
-	  break;
-	case is_language_c:
-	case is_language_fortran95:
-	  /* C and F95 case, try to align the line number on the right using
-	     commentaries. The alignemnet is done modulo C_STATEMENT_LINE_STEP */
-	  column_start = C_STATEMENT_LINE_COLUMN;
-	  while (column_start <= col)
-	    column_start += C_STATEMENT_LINE_STEP;
-	  break;
-	default:
-	  pips_assert ("This case should have been handled before", FALSE);
-	  break;
-	}
-
-	/* Output the statement line number on the right end of the
-           line: */
-	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
-	  for (size_t i = col; i <= column_start; i++) {
-	    putc_sentence(' ', fd);
-	  }
-	  switch (language_tag (get_prettyprint_language ())) {
-	  case is_language_fortran:
-	    fprintf_sentence(fd, "%04d", n);
-	    break;
-	  case is_language_c:
-	    fprintf_sentence(fd, "/*%04d*/", n);
-	    break;
-	  case is_language_fortran95:
-	    fprintf_sentence(fd, "! %04d", n);
-	    break;
-	  default:
-	    pips_assert ("This case should have been handled before", FALSE);
-	    break;
-	  }
-	}
-	putc_sentence('\n', fd);
+      switch(lang) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          fprintf_sentence(fd, "%-5s ", label);
+          break;
+        case is_language_c:
+          /* C prettyprinter: a label cannot begin with a number so "l" is added for this case*/
+          if (strlen(label) > 0)
+            fprintf_sentence(fd, isdigit(label[0]) ? "l%s:" : "%s:", label);
+          break;
+      }
+    } else if (lang==is_language_fortran) {
+      fprintf_sentence(fd, "      ");
     }
+
+
+    /* FI: do not indent too much (9 June 1995) */
+    em = (em > MAX_START_COLUMN) ? MAX_START_COLUMN : em;
+
+    /* Initial tabulation, if needed: do not put useless SPACEs
+     in output file.
+     Well, it's difficult to know if it is useful or not. The
+     test below leads to misplaced opening braces.
+     */
+    if (!ENDP(lw)
+    /*&& gen_length(lw)>1
+     && !same_string_p(STRING(CAR(lw)), "\n")*/)
+      for (i = 0; i < em; i++)
+        putc_sentence(' ', fd);
+
+    col = em;
+
+    if (lang == is_language_fortran) {
+      col = col + 7; /* Fortran77 start on 7th column */
+    }
+
+    pips_assert("not too many columns", col <= MAX_END_COLUMN);
+    FOREACH(string, w, lw) {
+      switch(lang) {
+        case is_language_c:
+          col += fprintf_sentence(fd, "%s", w);
+          break;
+        default: {
+          int max_line_size;
+          if(lang==is_language_fortran95) {
+            max_line_size =130;
+          } else {
+            max_line_size =70;
+          }
+
+          /* if the string fits on the current line: no problem */
+          if (col + strlen(w) <= max_line_size) {
+            deal_with_attachments_in_this_string(w, position_in_the_output);
+            col += fprintf_sentence(fd, "%s", w);
+          }
+          /* if the string fits on one line:
+           * use the 88 algorithm to break as few
+           * syntactic constructs as possible */
+          else if ((int)strlen(w) < max_line_size - 7 - em) {
+            if (col + strlen(w) > max_line_size) {
+              if(lang==is_language_fortran95) {
+                /* prepare to cut the line */
+                fprintf_sentence(fd," &");
+              }
+
+              /* Complete current line with the statement
+               line number, if it is significative: */
+              if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
+                for (i = col; i <= MAX_END_COLUMN; i++) {
+                  putc_sentence(' ', fd);
+                }
+                if (lang == is_language_fortran95) {
+                  fprintf_sentence(fd, "! %04d", n);
+                } else {
+                  fprintf_sentence(fd, "%04d", n);
+                }
+              }
+
+              /* start a new line with its prefix */
+              putc_sentence('\n', fd);
+
+              if (label != (char *)NULL && !string_undefined_p(label)
+                  && (strcmp(label, "CDIR$") == 0 || strcmp(label, "CDIR@")
+                      == 0 || strcmp(label, "CMIC$") == 0)) {
+                pips_assert("Cray with F95 not handled",
+                            lang!=is_language_fortran95);
+                /* Special label for Cray directives */
+                fprintf_sentence(fd, "%s%d", label, (++line_num) % 10);
+              } else if (lang != is_language_fortran95) {
+                fprintf_sentence(fd, "     &");
+              }
+
+              for (i = 0; i < em; i++)
+                putc_sentence(' ', fd);
+
+              if (lang != is_language_fortran95) {
+                col = 7 + em;
+              }
+            }
+            deal_with_attachments_in_this_string(w, position_in_the_output);
+            col += fprintf_sentence(fd, "%s", w);
+          }
+          /* if the string has to be broken in at least two lines:
+           * new algorithmic part
+           * to avoid line overflow (FI, March 1993) */
+          else {
+            char * line = w;
+            int ncar;
+
+            /* Complete the current line, but not after :-) */
+            ncar = MIN(MAX_END_COLUMN - col + 1, strlen(line));
+            ;
+            deal_with_attachments_in_this_string_length(line,
+                                                        position_in_the_output,
+                                                        ncar);
+            fprintf_sentence(fd, "%.*s", ncar, line);
+            line += ncar;
+            col = MAX_END_COLUMN;
+
+            pips_debug(9, "line to print, col=%d\n", col);
+
+            while(strlen(line) != 0) {
+              ncar = MIN(MAX_END_COLUMN - 7 + 1, strlen(line));
+
+              /* start a new line with its prefix but no indentation
+               * since string constants may be broken onto two lines
+               */
+              putc_sentence('\n', fd);
+
+              if (label != (char *)NULL
+                  && (strcmp(label, "CDIR$") == 0 || strcmp(label, "CDIR@")
+                      == 0 || strcmp(label, "CMIC$") == 0)) {
+                /* Special label for Cray directives */
+                (void)fprintf_sentence(fd, "%s%d", label, (++line_num) % 10);
+              } else
+                (void)fprintf_sentence(fd, "     &");
+
+              col = 7;
+              deal_with_attachments_in_this_string_length(line,
+                                                          position_in_the_output,
+                                                          ncar);
+              (void)fprintf_sentence(fd, "%.*s", ncar, line);
+              line += ncar;
+              col += ncar;
+            }
+          }
+        }
+      }
+    }
+
+    pips_debug(9, "line completed, col=%d\n", col);
+    if (lang == is_language_fortran95 ) {
+      pips_assert("not too many columns", col <= MAX_END_COLUMN_F95+1);
+    } else if (lang == is_language_fortran95 ) {
+      pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
+    }
+
+    /* statement line number starts at different column depending on
+     * the used language : C or fortran
+     */
+    size_t column_start = 0;
+    switch(language_tag (get_prettyprint_language ())) {
+      case is_language_fortran:
+        /* fortran case right the line number on the right where characters
+         are ignored by a f77 parser*/
+        column_start = MAX_END_COLUMN;
+        break;
+      case is_language_c:
+      case is_language_fortran95:
+        /* C and F95 case, try to align the line number on the right using
+         * commentaries. The alignment is done modulo C_STATEMENT_LINE_STEP
+         */
+        column_start = C_STATEMENT_LINE_COLUMN;
+        while(column_start <= col)
+          column_start += C_STATEMENT_LINE_STEP;
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
+    }
+
+    /* Output the statement line number on the right end of the
+     line: */
+    if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
+      for (size_t i = col; i <= column_start; i++) {
+        putc_sentence(' ', fd);
+      }
+      switch(language_tag (get_prettyprint_language ())) {
+        case is_language_fortran:
+          fprintf_sentence(fd, "%04d", n);
+          break;
+        case is_language_c:
+          fprintf_sentence(fd, "/*%04d*/", n);
+          break;
+        case is_language_fortran95:
+          fprintf_sentence(fd, "! %04d", n);
+          break;
+        default:
+          pips_internal_error("Language unknown !");
+          break;
+      }
+    }
+    putc_sentence('\n', fd);
+  }
 }
 
 void print_text(FILE *fd, text t)
