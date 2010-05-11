@@ -1,6 +1,8 @@
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
+
 \usepackage{url}
+
 \usepackage{alltt}
 \usepackage{../libs/tex/abbrev_reactive}
 \let\OldRightarrow=\Rightarrow
@@ -12,6 +14,10 @@
 \let\Sun\UnTrucIndefini%
 \RequirePackage[weather]{ifsym}
 
+
+\newcommand{\LINK}[1]{\url{#1}\xspace}
+\newcommand{\PfaOrganizationPDF}{\LINK{http://par4all.enstb.org/par4all/doc/organization/par4all_organization.pdf}}
+\newcommand{\PfaAllOrganizationHTDOC}{\LINK{http://par4all.enstb.org/par4all/doc/organization/par4all_organization.htdoc}}
 
 \sloppy
 
@@ -29,6 +35,12 @@
 \maketitle
 
 \tableofcontents{}
+
+\bigskip{}
+
+You can get this document in PDF format on \PfaOrganizationPDF and in HTML
+on \PfaAllOrganizationHTDOC.
+
 
 \section{Introduction}
 \label{sec:introduction}
