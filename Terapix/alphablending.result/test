@@ -137,243 +137,158 @@ l99996:         launcher_0(result0, src00, src10);
                result[i1+128*i_t][i0+8*j_t] = result0[i1][i0];
       }
 }
+
+//  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7}>
+//  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7}>
+//  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7}>
+
 void launcher_0(short result0[128][8], short src00[128][8], short src10[128][8])
 {
    //PIPS generated variable
    unsigned int i, j;
+
+//  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7}>
+//  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7}>
+//  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7}>
+
 l99996:
    for(i = 0; i <= 127; i += 1)
+
+//  <result0[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2<=7, 0<=i,
+//    i<=127}>
+//  <src00[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2, PHI2<=7, 0<=i,
+//    i<=127}>
+//  <src10[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2, PHI2<=7, 0<=i,
+//    i<=127}>
+
 l99997:
       for(j = 0; j <= 7; j += 1)
+
+//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=127,
+//    0<=j, j<=7}>
+//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=127, 0<=j,
+//    j<=7}>
+//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=127, 0<=j,
+//    j<=7}>
+
          result0[i][j] = (40*src00[i][j]+60*src10[i][j])/100;
 }
 outlining to microcode
+label: l99997
 void launcher_0(short result0[128][8], short src00[128][8], short src10[128][8])
 {
    //PIPS generated variable
    unsigned int i, j;
 l99996:
    for(i = 0; i <= 127; i += 1)
-l99997:      launcher_0_microcode(i, result0, src00, src10);
+l99997:      launcher_0_microcode(&result0[i], &src00[i], &src10[i]);
 }
-void launcher_0_microcode(unsigned int i, short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0_microcode(short (*result00)[8], short (*src000)[8], short (*src100)[8])
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
    for(j = 0; j <= 7; j += 1)
-      result0[i][j] = (40*src00[i][j]+60*src10[i][j])/100;
+      (*result00)[j] = (40*(*src000)[j]+60*(*src100)[j])/100;
 }
 normalize microcode launcher_0_microcode
-void launcher_0_microcode(unsigned int i, short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0_microcode(short (*result00)[8], short (*src000)[8], short (*src100)[8])
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
    for(j = 0; j <= 7; j += 1)
-      result0[i][j] = (40*src00[i][j]+60*src10[i][j])/100;
+      (*result00)[j] = (40*(*src000)[j]+60*(*src100)[j])/100;
    j = 8;
 }
-void launcher_0_microcode(unsigned int i, short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0_microcode(short (*result00)[8], short (*src000)[8], short (*src100)[8])
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
    for(j = 0; j <= 7; j += 1)
-      result0[i][j] = (40*src00[i][j]+60*src10[i][j])/100;
+      (*result00)[j] = (40*(*src000)[j]+60*(*src100)[j])/100;
    j = 8;
 }
-void launcher_0_microcode(unsigned int i, short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0_microcode(short **result00, short **src000, short **src100)
 {
    //PIPS generated variable
    unsigned int j;
-   //PIPS generated variable
-   short I_0;
-   //PIPS generated variable
-   int I_1;
-   //PIPS generated variable
-   short I_2;
-   //PIPS generated variable
-   int I_3, I_4, I_5;
 l99997:
    for(j = 0; j <= 7; j += 1)
-      result0[i][j] = (40*src00[i][j]+60*src10[i][j])/100;
+      *result00+j = (40*(*src000+j)+60*(*src100+j))/100;
    j = 8;
 }
-void launcher_0_microcode(unsigned int i, short result0[1024], short src00[1024], short src10[1024])
+void launcher_0_microcode(short **result00, short **src000, short **src100)
 {
    //PIPS generated variable
    unsigned int j;
    //PIPS generated variable
-   short I_0;
-   //PIPS generated variable
-   int I_1;
-   //PIPS generated variable
-   short I_2;
-   //PIPS generated variable
-   int I_3, I_4, I_5;
-l99997:
-   for(j = 0; j <= 7; j += 1)
-      result0[8*i+j] = (40*src00[8*i+j]+60*src10[8*i+j])/100;
-   j = 8;
-}
-void launcher_0_microcode(unsigned int i, short result0[1024], short src00[1024], short src10[1024])
-{
-   //PIPS generated variable
-   unsigned int j;
-   //PIPS generated variable
-   short I_0;
-   //PIPS generated variable
-   int I_1;
-   //PIPS generated variable
-   short I_2;
-   //PIPS generated variable
-   int I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14;
+   short *P_0, *P_1, *P_2;
 l99997:
    for(j = 0; j <= 7; j += 1) {
-      I_6 = 8*i;
-      I_7 = I_6+j;
-      I_8 = 40*src00[I_7];
-      I_9 = 8*i;
-      I_10 = I_9+j;
-      I_11 = 60*src10[I_10];
-      I_12 = I_8+I_11;
-      I_13 = 8*i;
-      I_14 = I_13+j;
-      result0[I_14] = I_12/100;
+      P_0 = *src000+j;
+      P_1 = *src100+j;
+      P_2 = *result00+j;
+      P_2 = (40*P_0+60*P_1)/100;
    }
    j = 8;
 }
-void launcher_0_microcode(unsigned int i, short result0[1024], short src00[1024], short src10[1024])
+void launcher_0_microcode(short **result00, short **src000, short **src100)
 {
    //PIPS generated variable
    unsigned int j;
    //PIPS generated variable
-   short I_0;
-   //PIPS generated variable
-   int I_1;
-   //PIPS generated variable
-   short I_2;
-   //PIPS generated variable
-   int I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14;
+   short *P_0, *P_1, *P_2;
 l99997:
    for(j = 0; j <= 7; j += 1) {
-      I_6 = 8;
-      I_6 = I_6*i;
-      I_7 = I_6;
-      I_7 = I_7+j;
-      I_8 = 40;
-      I_8 = I_8*src00[I_7];
-      I_9 = 8;
-      I_9 = I_9*i;
-      I_10 = I_9;
-      I_10 = I_10+j;
-      I_11 = 60;
-      I_11 = I_11*src10[I_10];
-      I_12 = I_8;
-      I_12 = I_12+I_11;
-      I_13 = 8;
-      I_13 = I_13*i;
-      I_14 = I_13;
-      I_14 = I_14+j;
-      result0[I_14] = I_12;
-      result0[I_14] = result0[I_14]/100;
+      P_0 = src000;
+      P_0 = *P_0+j;
+      P_1 = src100;
+      P_1 = *P_1+j;
+      P_2 = result00;
+      P_2 = *P_2+j;
+      P_2 = 40;
+      P_2 = (P_2*P_0+60*P_1)/100;
    }
    j = 8;
 }
-parameter i is not valid
-parameter result0 is not valid
-parameter src00 is not valid
-parameter src10 is not valid
-void launcher_0_microcode(unsigned int i, short result0[1024], short src00[1024], short src10[1024])
+result00 seems a mask
+src000 seems a mask
+src100 seems a mask
+void launcher_0_microcode(short **FIFO0, short **FIFO1, short **FIFO2)
 {
    //PIPS generated variable
    unsigned int j;
    //PIPS generated variable
-   short I_0;
+   short *P_0, *P_1, *P_2, *re0, *re1, *re2;
    //PIPS generated variable
-   int I_1;
+   char * re3, re4;
    //PIPS generated variable
-   short I_2;
+   short **result00, **src000, **src100;
    //PIPS generated variable
-   int I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, re0, re1, re2, re3, re4, re5, re6, re7, re8, re9, re10, re11;
+   unsigned int re5, re6;
    //PIPS generated variable
-   short re12;
+   short *im0, *im1, *im2, *im3, *im4, *im5;
    //PIPS generated variable
-   int re13;
-   //PIPS generated variable
-   short re14;
-   //PIPS generated variable
-   char * re15, re16;
-   //PIPS generated variable
-   unsigned int re17, re18;
-   //PIPS generated variable
-   short re19;
-   //PIPS generated variable
-   int re20;
-   //PIPS generated variable
-   short re21;
-   //PIPS generated variable
-   int re22, re23, re24, re25, re26, re27, re28, re29, re30, re31, re32, re33, N0 = 8;
-l99997:   ;
-   re17 = 1;
-   while (re17<=N0) {
-      re8 = 8;
-      re8 = re8*i;
-      re7 = re8;
-      re7 = re7+re17;
-      re6 = 40;
-      re6 = re6*src00[re7];
-      re5 = 8;
-      re5 = re5*i;
-      re4 = re5;
-      re4 = re4+re17;
-      re3 = 60;
-      re3 = re3*src10[re4];
-      re2 = re6;
-      re2 = re2+re3;
-      re1 = 8;
-      re1 = re1*i;
-      re0 = re1;
-      re0 = re0+re17;
-      result0[re0] = re2;
-      result0[re0] = result0[re0]/100;
-      re17 = 1+re17;
-   }
-   re17 = 8;
-}
-void launcher_0_microcode(unsigned int i, short result0[1024], short src00[1024], short src10[1024])
-{
-   //PIPS generated variable
-   int re0, re1, re2, re3, re4, re5, re6, re7, re8;
-   //PIPS generated variable
-   unsigned int re17;
+   short **im6, **im7, **im8;
    //PIPS generated variable
    int N0 = 8;
+   im8 = FIFO2;
+   im7 = FIFO1;
+   im6 = FIFO0;
 l99997:   ;
-   seti(re17, 1);
-   while (re17<=N0) {
-      seti(re8, 8);
-      muli(re8, i);
-      seti(re7, re8);
-      addi(re7, re17);
-      seti(re6, 40);
-      muli(re6, src00[re7]);
-      seti(re5, 8);
-      muli(re5, i);
-      seti(re4, re5);
-      addi(re4, re17);
-      seti(re3, 60);
-      muli(re3, src10[re4]);
-      seti(re2, re6);
-      addi(re2, re3);
-      seti(re1, 8);
-      muli(re1, i);
-      seti(re0, re1);
-      addi(re0, re17);
-      seti(result0[re0], re2);
-      divi(result0[re0], 100);
-      addi(re17, 1);
+   re5 = 1;
+   while (re5<=N0) {
+      im5 = im7;
+      im5 = *im5+re5;
+      im4 = im8;
+      im4 = *im4+re5;
+      im3 = im6;
+      im3 = *im3+re5;
+      im3 = 40;
+      im3 = (im3*im5+60*im4)/100;
+      re5 = 1+re5;
    }
-   seti(re17, 8);
+   re5 = 8;
 }
