@@ -101,7 +101,8 @@ static unsigned int pips_timeout_delay;
 static void pips_timeout_handler(int __attribute__ ((__unused__)) sig)
 {
   pips_internal_error("pips timeout of %d seconds reached\n", pips_timeout_delay);
-  exit(1);
+  // use 255 exit status for timeout, should be easy to detect
+  exit(255);
 }
 
 /* set pips timeout on delay
